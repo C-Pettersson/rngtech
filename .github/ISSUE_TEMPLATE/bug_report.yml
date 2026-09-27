@@ -1,0 +1,53 @@
+name: Bug report
+description: Report a crash, incorrect behavior, or compatibility problem.
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Search existing issues first. Report security vulnerabilities through the private security link, not this form.
+        Remove usernames, player identifiers, server addresses, local paths, and tokens from logs and screenshots.
+  - type: input
+    id: rngtech-version
+    attributes:
+      label: RNGTech version
+      description: Include the release version or source commit and where you downloaded it.
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: Game environment
+      description: List Minecraft, NeoForge, Java, operating system, and relevant mod versions. Do not include your device name or account details.
+    validations:
+      required: true
+  - type: dropdown
+    id: side
+    attributes:
+      label: Where does it happen?
+      options:
+        - Single-player
+        - Multiplayer client
+        - Dedicated server
+        - Both single-player and multiplayer
+        - Build or development tooling
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Steps to reproduce
+      description: Give the smallest set of steps that demonstrates the issue. Include machine stage, installed Gear, and relevant settings.
+    validations:
+      required: true
+  - type: textarea
+    id: expected-actual
+    attributes:
+      label: Expected and actual behavior
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Logs, screenshots, or additional context
+      description: Attach a redacted crash report or relevant log excerpt when available. Include whether the issue persists after reloading the world.

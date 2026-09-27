@@ -1,6 +1,6 @@
 # Security Policy
 
-Report security-sensitive issues through GitHub's private vulnerability reporting when the repository enables it. If it is unavailable, open an issue requesting a private contact channel and omit exploit details, credentials, and personal data.
+Report security-sensitive issues through [GitHub's private vulnerability reporting](https://github.com/C-Pettersson/rngtech/security/advisories/new). Use this for issues such as unauthorized file access, remote code execution, or exposed credentials. Report ordinary gameplay bugs through the [issue tracker](https://github.com/C-Pettersson/rngtech/issues/new/choose).
 
 Include the RNGTech version, Minecraft/NeoForge versions, client or dedicated-server context, and the minimum reproduction steps in the private report. Redact player identifiers, tokens, and local paths from logs.
 

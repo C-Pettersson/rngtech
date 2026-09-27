@@ -1,5 +1,7 @@
 # RNGTech
 
+[![Build](https://github.com/C-Pettersson/rngtech/actions/workflows/build.yml/badge.svg?branch=main)](https://github.com/C-Pettersson/rngtech/actions/workflows/build.yml)
+
 RNGTech is a Minecraft **1.21.1 / NeoForge** technology mod with staged machines, installable parts, and RPG-style item rolls. Machines and parts can have rarity, affixes, and a limited Refinement Potential budget for further changes.
 
 Build an ore-processing line, generate and store energy, then improve the machines and their Gear. The mod includes crushing, smelting, alloying, metal forming, recycling, calibration, fluid and gas processing, modular tools, and a rail-based Forestry Companion. Universal Cables transfer energy, fluids, and items; optional connectors bridge AE2 or Refined Storage networks.
@@ -32,6 +34,7 @@ For contributions and verification commands, see [CONTRIBUTING.md](CONTRIBUTING.
 - [Affixes and refinement](docs/systems/progression.md)
 - [ModDex source/data explorer](tools/moddex/README.md)
 - [Security reporting](SECURITY.md)
+- [Support and bug reports](SUPPORT.md)
 
 To build the documentation, install `requirements-docs.txt` and run `mkdocs build --strict`. Run `mkdocs serve` for a local preview, or `docker compose -f compose.docs.yml up` and open <http://localhost:8000>.
 

@@ -1,0 +1,17 @@
+name: Help or question
+description: Ask about installation, gameplay, documentation, or contributing.
+labels: [question]
+body:
+  - type: textarea
+    id: question
+    attributes:
+      label: What do you need help with?
+    validations:
+      required: true
+  - type: textarea
+    id: context
+    attributes:
+      label: Context and what you have tried
+      description: Include relevant versions, documentation you checked, and installed integrations. Remove private information from logs or screenshots.
+    validations:
+      required: true
