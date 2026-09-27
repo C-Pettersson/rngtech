@@ -8,7 +8,7 @@ The in-game update checker is disabled. There is no maintained `update.json` fee
 
 ## Verification
 
-Install Java 21, Node.js 20.19 or newer, and the Python documentation dependencies. Use the checked-in Gradle wrapper (`.\gradlew.bat` on Windows).
+Install Java 21, Node.js 22.22.2 or newer in the 22.x line, and the Python documentation dependencies. See `package.json` for other supported Node versions. Use the checked-in Gradle wrapper (`.\gradlew.bat` on Windows).
 
 ```sh
 npm ci
@@ -49,6 +49,8 @@ npm run release -- patch
 ```
 
 This updates `mod_version`, runs `quickCheck`, commits the version change, creates a `vX.Y.Z` tag, and pushes it. Run the full verification above before this command. The tag workflow builds the JAR, packages the optional quest ZIP, creates a GitHub Release, and publishes to GitHub Packages. A hyphenated version becomes a GitHub prerelease.
+
+Normal changes go through pull requests with passing CI and resolved review conversations. The repository administrator can bypass the pull-request rules for the release command's version commit. Keep that bypass limited to reviewed releases or recovery; it is not a substitute for the verification above. The separate rules against deleting or force-pushing `main` apply to administrators too.
 
 CurseForge publication uses the manual **Publish CurseForge Release** workflow. Configure `CURSEFORGE_API_TOKEN` as a repository secret and `CURSEFORGE_PROJECT_ID` as a repository variable. Select the target version and release type. The workflow can upload the optional quests as a child file. It does not run automatically from a Git tag.
 

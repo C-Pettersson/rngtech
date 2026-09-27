@@ -548,7 +548,7 @@ function extractIconBoxStatusBars(method, methodName, screenClass, tabId, consta
 }
 
 function iconLabelFromExpression(expression) {
-    const raw = expression.trim().replace(/_ICON_X$/, "").replace(/_X$/, "").replace(/^STATUS$/, "STATUS");
+    const raw = expression.trim().replace(/_ICON_X$/, "").replace(/_X$/, "");
     return titleCase(raw || "status");
 }
 

@@ -25,6 +25,7 @@ Machine implementation and balance work must follow [Machine Guidelines](docs/re
 ## Requirements
 
 - Java 21.
+- Node.js 22.22.2 or newer in the 22.x line for Node tooling; see `package.json` for other supported versions.
 - Use the checked-in Gradle wrapper.
 - For documentation work, install Python docs requirements from `requirements-docs.txt`.
 

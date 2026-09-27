@@ -1,0 +1,26 @@
+name: Feature proposal
+description: Propose a gameplay, documentation, or tooling improvement.
+labels: [enhancement]
+body:
+  - type: markdown
+    attributes:
+      value: Check existing issues and the current implementation reference before proposing a feature. Planned documentation does not promise a delivery date.
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem would this solve?
+      description: Describe the player or contributor need with an example.
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed behavior
+      description: Explain how it would fit the mod's progression or existing tools.
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives and compatibility
+      description: Include existing workarounds, integration options, and any expected impact on worlds or automation.
