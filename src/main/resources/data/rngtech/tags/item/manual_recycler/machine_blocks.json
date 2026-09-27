@@ -1,0 +1,27 @@
+{
+  "replace": false,
+  "values": [
+    "rngtech:crude_recycler",
+    "rngtech:furnace",
+    "rngtech:wooden_crusher_chassis",
+    "rngtech:iron_crusher_chassis",
+    "rngtech:copper_crusher_chassis",
+    "rngtech:iron_furnace_chassis",
+    "rngtech:copper_furnace_chassis",
+    "rngtech:wooden_battery_chassis",
+    "rngtech:iron_battery_chassis",
+    "rngtech:copper_battery_chassis",
+    "rngtech:crude_solid_fuel_burner",
+    "rngtech:copper_solid_fuel_burner",
+    "rngtech:iron_component_recycler",
+    "rngtech:copper_component_recycler",
+    "rngtech:bio_generator",
+    "rngtech:battery_assembler",
+    "rngtech:crude_solar_panel",
+    "rngtech:copper_solar_panel",
+    "rngtech:iron_resonance_calibrator_chassis",
+    "rngtech:copper_resonance_calibrator_chassis",
+    "rngtech:iron_compressor_tank",
+    "rngtech:copper_compressor_tank"
+  ]
+}

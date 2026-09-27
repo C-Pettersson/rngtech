@@ -1,0 +1,13 @@
+{
+  "values": [
+    "rngtech:iron_battery_cell",
+    "rngtech:iron_containment_lining",
+    "rngtech:iron_fuel_box",
+    "rngtech:iron_heat_core",
+    "rngtech:iron_reactor_chamber",
+    "rngtech:iron_recovery_filter",
+    "rngtech:iron_resonance_coil",
+    "rngtech:iron_control_board",
+    "rngtech:iron_stabilizer_matrix"
+  ]
+}

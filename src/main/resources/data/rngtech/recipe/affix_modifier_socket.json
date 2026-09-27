@@ -1,0 +1,36 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "rngtech:material_enabled",
+      "material": "bronze"
+    }
+  ],
+  "type": "rngtech:trait_shaped",
+  "category": "misc",
+  "pattern": [
+    "PQP",
+    "RGR",
+    "PLP"
+  ],
+  "key": {
+    "G": {
+      "item": "rngtech:bronze_gear"
+    },
+    "L": {
+      "item": "minecraft:lapis_lazuli"
+    },
+    "P": {
+      "item": "rngtech:bronze_plate"
+    },
+    "Q": {
+      "item": "minecraft:quartz"
+    },
+    "R": {
+      "item": "minecraft:redstone"
+    }
+  },
+  "result": {
+    "count": 1,
+    "id": "rngtech:affix_modifier_socket"
+  }
+}

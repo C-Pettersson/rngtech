@@ -1,0 +1,69 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Gradle: quickCheck",
+            "type": "shell",
+            "command": "./gradlew quickCheck",
+            "group": "test",
+            "problemMatcher": "$javac",
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "windows": {
+                "command": ".\\gradlew.bat quickCheck"
+            }
+        },
+        {
+            "label": "Gradle: build",
+            "type": "shell",
+            "command": "./gradlew build",
+            "group": "build",
+            "problemMatcher": "$javac",
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "windows": {
+                "command": ".\\gradlew.bat build"
+            }
+        },
+        {
+            "label": "Gradle: format",
+            "type": "shell",
+            "command": "./gradlew spotlessApply",
+            "problemMatcher": [],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "windows": {
+                "command": ".\\gradlew.bat spotlessApply"
+            }
+        },
+        {
+            "label": "Gradle: runClient",
+            "type": "shell",
+            "command": "./gradlew runClient",
+            "isBackground": true,
+            "problemMatcher": [],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "windows": {
+                "command": ".\\gradlew.bat runClient"
+            }
+        },
+        {
+            "label": "Gradle: runServer",
+            "type": "shell",
+            "command": "./gradlew runServer",
+            "isBackground": true,
+            "problemMatcher": [],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "windows": {
+                "command": ".\\gradlew.bat runServer"
+            }
+        }
+    ]
+}

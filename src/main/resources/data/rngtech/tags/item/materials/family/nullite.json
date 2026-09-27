@@ -1,0 +1,13 @@
+{
+  "replace": false,
+  "values": [
+    "rngtech:nullite_ingot",
+    "rngtech:nullite_nugget",
+    "rngtech:nullite_storage_block",
+    "rngtech:crushed_nullite",
+    "rngtech:nullite_plate",
+    "rngtech:nullite_gear",
+    "rngtech:nullite_rod",
+    "rngtech:nullite_coil"
+  ]
+}

@@ -1,0 +1,10 @@
+{
+  "parent": "rngtech:item/forestry_cart_base",
+  "textures": {
+    "accent": "rngtech:item/forestry_cart_crop_accent",
+    "payload": "rngtech:item/forestry_cart_crop_bed_payload",
+    "screen": "rngtech:item/forestry_cart_face_planting",
+    "tool": "rngtech:item/forestry_cart_cultivator_head",
+    "particle": "rngtech:item/forestry_cart_crop_bed_payload"
+  }
+}

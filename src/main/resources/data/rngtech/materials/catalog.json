@@ -1,0 +1,783 @@
+{
+  "metal_forms": [
+    {
+      "id": "ingot",
+      "display_pattern": "{material} Ingot",
+      "item_pattern": "{material}_ingot",
+      "stage_authority": true
+    },
+    {
+      "id": "dust",
+      "display_pattern": "{material} Dust",
+      "item_pattern": "{material}_dust",
+      "stage_authority": false
+    },
+    {
+      "id": "nugget",
+      "display_pattern": "{material} Nugget",
+      "item_pattern": "{material}_nugget",
+      "stage_authority": false
+    },
+    {
+      "id": "storage_block",
+      "display_pattern": "{material} Storage Block",
+      "item_pattern": "{material}_storage_block",
+      "stage_authority": false
+    },
+    {
+      "id": "ore",
+      "display_pattern": "{material} Ore",
+      "item_pattern": "{material}_ore",
+      "stage_authority": true
+    },
+    {
+      "id": "raw",
+      "display_pattern": "Raw {material}",
+      "item_pattern": "raw_{material}",
+      "stage_authority": false
+    },
+    {
+      "id": "crushed",
+      "display_pattern": "Crushed {material}",
+      "item_pattern": "crushed_{material}",
+      "stage_authority": false
+    },
+    {
+      "id": "plate",
+      "display_pattern": "{material} Plate",
+      "item_pattern": "{material}_plate",
+      "stage_authority": false
+    },
+    {
+      "id": "gear",
+      "display_pattern": "{material} Gear",
+      "item_pattern": "{material}_gear",
+      "stage_authority": false
+    },
+    {
+      "id": "rod",
+      "display_pattern": "{material} Rod",
+      "item_pattern": "{material}_rod",
+      "stage_authority": false
+    },
+    {
+      "id": "coil",
+      "display_pattern": "{material} Coil",
+      "item_pattern": "{material}_coil",
+      "stage_authority": false
+    },
+    {
+      "id": "casing",
+      "display_pattern": "{material} Casing",
+      "item_pattern": "{material}_casing",
+      "stage_authority": false
+    }
+  ],
+  "vanilla_form_mappings": {
+    "iron": {
+      "ingot": [
+        "minecraft:iron_ingot"
+      ],
+      "nugget": [
+        "minecraft:iron_nugget"
+      ],
+      "storage_block": [
+        "minecraft:iron_block"
+      ],
+      "ore": [
+        "minecraft:iron_ore",
+        "minecraft:deepslate_iron_ore"
+      ],
+      "raw": [
+        "minecraft:raw_iron"
+      ]
+    },
+    "copper": {
+      "ingot": [
+        "minecraft:copper_ingot"
+      ],
+      "storage_block": [
+        "minecraft:copper_block"
+      ],
+      "ore": [
+        "minecraft:copper_ore",
+        "minecraft:deepslate_copper_ore"
+      ],
+      "raw": [
+        "minecraft:raw_copper"
+      ]
+    },
+    "gold": {
+      "ingot": [
+        "minecraft:gold_ingot"
+      ],
+      "nugget": [
+        "minecraft:gold_nugget"
+      ],
+      "storage_block": [
+        "minecraft:gold_block"
+      ],
+      "ore": [
+        "minecraft:gold_ore",
+        "minecraft:deepslate_gold_ore",
+        "minecraft:nether_gold_ore"
+      ],
+      "raw": [
+        "minecraft:raw_gold"
+      ]
+    },
+    "netherite": {
+      "ingot": [
+        "minecraft:netherite_ingot"
+      ],
+      "storage_block": [
+        "minecraft:netherite_block"
+      ],
+      "ore": [
+        "minecraft:ancient_debris"
+      ]
+    }
+  },
+  "materials": [
+    {
+      "id": "iron",
+      "display": "Iron",
+      "stage": 1,
+      "default_enabled": true,
+      "default_reason": "Vanilla-backed early structural material."
+    },
+    {
+      "id": "copper",
+      "display": "Copper",
+      "stage": 2,
+      "default_enabled": true,
+      "default_reason": "Vanilla-backed early conductive material."
+    },
+    {
+      "id": "bronze",
+      "display": "Bronze",
+      "stage": 3,
+      "default_enabled": true,
+      "default_reason": "Common early alloy compatibility material.",
+      "excluded_forms": [
+        "dust",
+        "ore",
+        "raw"
+      ]
+    },
+    {
+      "id": "tin",
+      "display": "Tin",
+      "stage": 3,
+      "default_enabled": true,
+      "default_reason": "Common early alloy ingredient.",
+      "excluded_forms": [
+        "casing"
+      ]
+    },
+    {
+      "id": "zinc",
+      "display": "Zinc",
+      "stage": 3,
+      "default_enabled": true,
+      "default_reason": "Common early alloy ingredient.",
+      "excluded_forms": [
+        "casing"
+      ]
+    },
+    {
+      "id": "gold",
+      "display": "Gold",
+      "stage": 3,
+      "default_enabled": true,
+      "default_reason": "Vanilla-backed conductive and refinement material."
+    },
+    {
+      "id": "steel",
+      "display": "Steel",
+      "stage": 4,
+      "default_enabled": true,
+      "default_reason": "Common midgame structural compatibility material.",
+      "excluded_forms": [
+        "dust",
+        "ore",
+        "raw"
+      ]
+    },
+    {
+      "id": "invar",
+      "display": "Invar",
+      "stage": 4,
+      "default_enabled": true,
+      "default_reason": "Common midgame thermal compatibility material.",
+      "excluded_forms": [
+        "dust",
+        "ore",
+        "raw",
+        "casing"
+      ]
+    },
+    {
+      "id": "nickel",
+      "display": "Nickel",
+      "stage": 4,
+      "default_enabled": true,
+      "default_reason": "Common midgame metal compatibility material.",
+      "excluded_forms": [
+        "casing"
+      ]
+    },
+    {
+      "id": "lead",
+      "display": "Lead",
+      "stage": 4,
+      "default_enabled": true,
+      "default_reason": "Common midgame shielding compatibility material.",
+      "excluded_forms": [
+        "casing"
+      ]
+    },
+    {
+      "id": "silver",
+      "display": "Silver",
+      "stage": 4,
+      "default_enabled": true,
+      "default_reason": "Common midgame conductive compatibility material.",
+      "excluded_forms": [
+        "casing"
+      ]
+    },
+    {
+      "id": "aluminum",
+      "display": "Aluminum",
+      "stage": 5,
+      "default_enabled": true,
+      "default_reason": "Common efficient-control compatibility material."
+    },
+    {
+      "id": "sparksteel",
+      "display": "Sparksteel",
+      "stage": 5,
+      "default_enabled": true,
+      "default_reason": "RNGTech-owned energy-transfer alloy.",
+      "excluded_forms": [
+        "dust",
+        "ore",
+        "raw"
+      ]
+    },
+    {
+      "id": "osmium",
+      "display": "Osmium",
+      "stage": 5,
+      "default_enabled": true,
+      "default_reason": "Common advanced machine compatibility material.",
+      "excluded_forms": [
+        "casing"
+      ]
+    },
+    {
+      "id": "titanium",
+      "display": "Titanium",
+      "stage": 6,
+      "default_enabled": true,
+      "default_reason": "Advanced high-throughput compatibility material."
+    },
+    {
+      "id": "arclite",
+      "display": "Arclite",
+      "stage": 6,
+      "default_enabled": true,
+      "default_reason": "RNGTech-owned advanced control and transfer alloy.",
+      "excluded_forms": [
+        "dust",
+        "ore",
+        "raw"
+      ]
+    },
+    {
+      "id": "tungsten",
+      "display": "Tungsten",
+      "stage": 7,
+      "default_enabled": true,
+      "default_reason": "Late-game pressure compatibility material.",
+      "excluded_forms": [
+        "casing"
+      ]
+    },
+    {
+      "id": "tungstensteel",
+      "display": "Tungstensteel",
+      "stage": 7,
+      "default_enabled": true,
+      "default_reason": "Late-game machine-body compatibility material.",
+      "excluded_forms": [
+        "dust",
+        "ore",
+        "raw"
+      ]
+    },
+    {
+      "id": "nullite",
+      "display": "Nullite",
+      "stage": 7,
+      "default_enabled": true,
+      "default_reason": "RNGTech-owned late-game energy and phase alloy.",
+      "excluded_forms": [
+        "dust",
+        "ore",
+        "raw",
+        "casing"
+      ]
+    },
+    {
+      "id": "aethergold",
+      "display": "Aethergold",
+      "stage": 7,
+      "default_enabled": true,
+      "default_reason": "RNGTech-owned late-game visibility and transfer alloy.",
+      "excluded_forms": [
+        "dust",
+        "ore",
+        "raw",
+        "casing"
+      ]
+    },
+    {
+      "id": "platinum",
+      "display": "Platinum",
+      "stage": 7,
+      "default_enabled": true,
+      "default_reason": "Late-game catalyst compatibility material.",
+      "excluded_forms": [
+        "casing"
+      ]
+    },
+    {
+      "id": "netherite",
+      "display": "Netherite",
+      "stage": 8,
+      "default_enabled": true,
+      "default_reason": "Vanilla-backed exotic extension material.",
+      "excluded_forms": [
+        "casing"
+      ]
+    },
+    {
+      "id": "naquadah",
+      "display": "Naquadah",
+      "stage": 8,
+      "default_enabled": true,
+      "default_reason": "RNGTech-fictional exotic extension material."
+    }
+  ],
+  "material_groups": [
+    {
+      "id": "alloys",
+      "display": "Alloys",
+      "families": [
+        "bronze",
+        "steel",
+        "invar",
+        "sparksteel",
+        "arclite",
+        "tungstensteel",
+        "nullite",
+        "aethergold"
+      ],
+      "reason": "Shared recipe and datapack hook for alloy-backed material families."
+    }
+  ],
+  "generic_forms": [
+    {
+      "id": "machine_frame",
+      "display": "Machine Frame"
+    },
+    {
+      "id": "reinforced_machine_frame",
+      "display": "Reinforced Machine Frame"
+    },
+    {
+      "id": "advanced_machine_frame",
+      "display": "Advanced Machine Frame"
+    },
+    {
+      "id": "exotic_machine_frame",
+      "display": "Exotic Machine Frame"
+    },
+    {
+      "id": "lubricated_frame_coupling",
+      "display": "Lubricated Frame Coupling"
+    },
+    {
+      "id": "tank_frame",
+      "display": "Tank Frame"
+    },
+    {
+      "id": "pressure_tank_frame",
+      "display": "Pressure Tank Frame"
+    },
+    {
+      "id": "servo_frame",
+      "display": "Servo Frame"
+    },
+    {
+      "id": "high_heat_core_frame",
+      "display": "High Heat Core Frame"
+    },
+    {
+      "id": "pump_frame",
+      "display": "Pump Frame"
+    },
+    {
+      "id": "solar_panel_frame",
+      "display": "Solar Panel Frame"
+    },
+    {
+      "id": "casing",
+      "display": "Casing"
+    },
+    {
+      "id": "mechanism",
+      "display": "Mechanism"
+    },
+    {
+      "id": "heat_core",
+      "display": "Heat Core"
+    },
+    {
+      "id": "crush_head",
+      "display": "Crush Head"
+    },
+    {
+      "id": "energy_coil",
+      "display": "Energy Coil"
+    },
+    {
+      "id": "battery_cell",
+      "display": "Battery Cell"
+    },
+    {
+      "id": "control_board",
+      "display": "Control Board"
+    },
+    {
+      "id": "basic_electric_circuit",
+      "display": "Basic Electric Circuit"
+    },
+    {
+      "id": "advanced_electric_circuit",
+      "display": "Advanced Electric Circuit"
+    },
+    {
+      "id": "elite_electric_circuit",
+      "display": "Elite Electric Circuit"
+    },
+    {
+      "id": "ultimate_electric_circuit",
+      "display": "Ultimate Electric Circuit"
+    },
+    {
+      "id": "basic_circuit_blank",
+      "display": "Basic Circuit Blank"
+    },
+    {
+      "id": "advanced_circuit_blank",
+      "display": "Advanced Circuit Blank"
+    },
+    {
+      "id": "elite_circuit_blank",
+      "display": "Elite Circuit Blank"
+    },
+    {
+      "id": "ultimate_circuit_blank",
+      "display": "Ultimate Circuit Blank"
+    },
+    {
+      "id": "broken_circuit",
+      "display": "Broken Circuit"
+    },
+    {
+      "id": "insulator",
+      "display": "Insulator"
+    },
+    {
+      "id": "lens",
+      "display": "Lens"
+    },
+    {
+      "id": "matrix",
+      "display": "Matrix"
+    },
+    {
+      "id": "catalyst",
+      "display": "Catalyst"
+    },
+    {
+      "id": "scrap",
+      "display": "Scrap"
+    },
+    {
+      "id": "fragment",
+      "display": "Fragment"
+    },
+    {
+      "id": "spent_catalyst",
+      "display": "Spent Catalyst"
+    },
+    {
+      "id": "abrasive_compound",
+      "display": "Abrasive Compound"
+    },
+    {
+      "id": "output_bin",
+      "display": "Output Bin"
+    },
+    {
+      "id": "refractory_casing",
+      "display": "Refractory Casing"
+    },
+    {
+      "id": "ignition_catalyst",
+      "display": "Ignition Catalyst"
+    },
+    {
+      "id": "heat_shield",
+      "display": "Heat Shield"
+    },
+    {
+      "id": "fuel_chamber",
+      "display": "Fuel Chamber"
+    },
+    {
+      "id": "connector",
+      "display": "Connector"
+    },
+    {
+      "id": "cell_shell",
+      "display": "Cell Shell"
+    },
+    {
+      "id": "electrolyte",
+      "display": "Electrolyte"
+    },
+    {
+      "id": "conductive_plate",
+      "display": "Conductive Plate"
+    },
+    {
+      "id": "stabilization_catalyst",
+      "display": "Stabilization Catalyst"
+    },
+    {
+      "id": "bus_bar",
+      "display": "Bus Bar"
+    },
+    {
+      "id": "balancing_board",
+      "display": "Balancing Board"
+    },
+    {
+      "id": "shielding",
+      "display": "Shielding"
+    },
+    {
+      "id": "redstone_control",
+      "display": "Redstone Control"
+    },
+    {
+      "id": "risk_catalyst",
+      "display": "Risk Catalyst"
+    },
+    {
+      "id": "recycling_byproduct",
+      "display": "Recycling Byproduct"
+    }
+  ],
+  "non_stage_materials": [
+    {
+      "id": "stone",
+      "display": "Stone",
+      "handling": "map",
+      "maps_to": "minecraft:stone",
+      "reason": "Vanilla block item covers this ingredient."
+    },
+    {
+      "id": "clay",
+      "display": "Clay",
+      "handling": "map",
+      "maps_to": "minecraft:clay_ball",
+      "reason": "Vanilla item covers this ingredient."
+    },
+    {
+      "id": "glass",
+      "display": "Glass",
+      "handling": "map",
+      "maps_to": "minecraft:glass",
+      "reason": "Vanilla block item covers this ingredient."
+    },
+    {
+      "id": "coal",
+      "display": "Coal",
+      "handling": "map",
+      "maps_to": "minecraft:coal",
+      "reason": "Vanilla item covers this ingredient."
+    },
+    {
+      "id": "charcoal",
+      "display": "Charcoal",
+      "handling": "map",
+      "maps_to": "minecraft:charcoal",
+      "reason": "Vanilla item covers this ingredient."
+    },
+    {
+      "id": "coal_dust",
+      "display": "Coal Dust",
+      "handling": "register",
+      "reason": "RNGTech-owned crushed carbon input for gas-bucket bootstrap recipes."
+    },
+    {
+      "id": "wood",
+      "display": "Wood",
+      "handling": "map",
+      "maps_to": "minecraft:oak_log",
+      "reason": "Vanilla logs and tags cover this ingredient family."
+    },
+    {
+      "id": "plant_reagent",
+      "display": "Plant Reagent",
+      "handling": "register",
+      "reason": "RNGTech-owned planned reagent with no vanilla equivalent."
+    },
+    {
+      "id": "redstone",
+      "display": "Redstone",
+      "handling": "map",
+      "maps_to": "minecraft:redstone",
+      "reason": "Vanilla item covers this ingredient."
+    },
+    {
+      "id": "lapis_lazuli",
+      "display": "Lapis Lazuli",
+      "handling": "map",
+      "maps_to": "minecraft:lapis_lazuli",
+      "reason": "Vanilla item covers this ingredient."
+    },
+    {
+      "id": "amethyst",
+      "display": "Amethyst",
+      "handling": "map",
+      "maps_to": "minecraft:amethyst_shard",
+      "reason": "Vanilla item covers this ingredient."
+    },
+    {
+      "id": "quartz",
+      "display": "Quartz",
+      "handling": "map",
+      "maps_to": "minecraft:quartz",
+      "reason": "Vanilla item covers this ingredient."
+    },
+    {
+      "id": "diamond",
+      "display": "Diamond",
+      "handling": "map",
+      "maps_to": "minecraft:diamond",
+      "reason": "Vanilla item covers this ingredient."
+    },
+    {
+      "id": "emerald",
+      "display": "Emerald",
+      "handling": "map",
+      "maps_to": "minecraft:emerald",
+      "reason": "Vanilla item covers this ingredient."
+    },
+    {
+      "id": "ender_pearl",
+      "display": "Ender Pearl",
+      "handling": "map",
+      "maps_to": "minecraft:ender_pearl",
+      "reason": "Vanilla item covers this ingredient."
+    },
+    {
+      "id": "eye_of_ender",
+      "display": "Eye of Ender",
+      "handling": "map",
+      "maps_to": "minecraft:ender_eye",
+      "reason": "Vanilla item covers this ingredient."
+    },
+    {
+      "id": "glowstone",
+      "display": "Glowstone",
+      "handling": "map",
+      "maps_to": "minecraft:glowstone_dust",
+      "reason": "Vanilla item covers this ingredient."
+    },
+    {
+      "id": "obsidian",
+      "display": "Obsidian",
+      "handling": "map",
+      "maps_to": "minecraft:obsidian",
+      "reason": "Vanilla block item covers this ingredient."
+    },
+    {
+      "id": "blaze_rod",
+      "display": "Blaze Rod",
+      "handling": "map",
+      "maps_to": "minecraft:blaze_rod",
+      "reason": "Vanilla item covers this ingredient."
+    },
+    {
+      "id": "blaze_powder",
+      "display": "Blaze Powder",
+      "handling": "map",
+      "maps_to": "minecraft:blaze_powder",
+      "reason": "Vanilla item covers this ingredient."
+    },
+    {
+      "id": "slime",
+      "display": "Slime",
+      "handling": "map",
+      "maps_to": "minecraft:slime_ball",
+      "reason": "Vanilla item covers this ingredient."
+    },
+    {
+      "id": "honey",
+      "display": "Honey",
+      "handling": "map",
+      "maps_to": "minecraft:honey_bottle",
+      "reason": "Vanilla item covers this ingredient."
+    },
+    {
+      "id": "resin",
+      "display": "Resin",
+      "handling": "register",
+      "reason": "RNGTech-owned planned reagent with no vanilla equivalent."
+    },
+    {
+      "id": "rubber",
+      "display": "Rubber",
+      "handling": "register",
+      "reason": "RNGTech-owned planned insulator with no vanilla equivalent."
+    },
+    {
+      "id": "organic_reagent",
+      "display": "Organic Reagent",
+      "handling": "register",
+      "reason": "RNGTech-owned planned organic input with no vanilla equivalent."
+    },
+    {
+      "id": "lava_bucket",
+      "display": "Lava Bucket",
+      "handling": "map",
+      "maps_to": "minecraft:lava_bucket",
+      "reason": "Vanilla item covers this ingredient."
+    },
+    {
+      "id": "leather",
+      "display": "Leather",
+      "handling": "map",
+      "maps_to": "minecraft:leather",
+      "reason": "Vanilla item covers this ingredient."
+    }
+  ]
+}

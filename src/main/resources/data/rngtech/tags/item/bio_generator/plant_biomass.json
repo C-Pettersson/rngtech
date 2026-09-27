@@ -1,0 +1,10 @@
+{
+  "replace": false,
+  "values": [
+    "#rngtech:bio_generator/sapling_biomass",
+    "#rngtech:bio_generator/seed_biomass",
+    "minecraft:kelp",
+    "minecraft:dried_kelp",
+    "rngtech:plant_reagent"
+  ]
+}

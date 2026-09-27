@@ -1,0 +1,37 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "rngtech:material_enabled",
+      "material": "tungstensteel"
+    },
+    {
+      "type": "rngtech:material_enabled",
+      "material": "titanium"
+    }
+  ],
+  "type": "rngtech:trait_shaped",
+  "category": "redstone",
+  "pattern": [
+    "PGP",
+    "EFE",
+    "PGP"
+  ],
+  "key": {
+    "E": {
+      "tag": "c:circuits/elite"
+    },
+    "F": {
+      "item": "rngtech:pump_frame"
+    },
+    "G": {
+      "item": "rngtech:tungstensteel_gear"
+    },
+    "P": {
+      "item": "rngtech:tungstensteel_plate"
+    }
+  },
+  "result": {
+    "count": 1,
+    "id": "rngtech:tungstensteel_fluid_pump"
+  }
+}

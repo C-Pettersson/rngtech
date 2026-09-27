@@ -1,0 +1,32 @@
+{
+    "type": "rngtech:component_recycling",
+    "ingredient": {
+        "item": "rngtech:tungstensteel_resonance_coil"
+    },
+    "minimum_processing_level": 7,
+    "processing_ticks": 164,
+    "energy": 1790,
+    "outputs": [
+        {
+            "stack": {
+                "id": "rngtech:energy_coil",
+                "count": 1
+            },
+            "requires_filter": false
+        },
+        {
+            "stack": {
+                "id": "rngtech:tungstensteel_ingot",
+                "count": 1
+            },
+            "requires_filter": false
+        },
+        {
+            "stack": {
+                "id": "minecraft:redstone",
+                "count": 2
+            },
+            "requires_filter": true
+        }
+    ]
+}

@@ -1,0 +1,30 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "rngtech:material_enabled",
+      "material": "iron"
+    }
+  ],
+  "type": "rngtech:trait_shaped",
+  "category": "misc",
+  "pattern": [
+    "RBR",
+    "RMR",
+    "RBR"
+  ],
+  "key": {
+    "B": {
+      "item": "minecraft:bucket"
+    },
+    "M": {
+      "item": "rngtech:machine_frame"
+    },
+    "R": {
+      "item": "rngtech:iron_rod"
+    }
+  },
+  "result": {
+    "count": 1,
+    "id": "rngtech:tank_frame"
+  }
+}

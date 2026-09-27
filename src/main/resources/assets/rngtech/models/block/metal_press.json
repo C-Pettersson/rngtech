@@ -1,0 +1,12 @@
+{
+  "parent": "minecraft:block/cube",
+  "textures": {
+    "down": "rngtech:block/metal_press/bottom/metal_press",
+    "up": "rngtech:block/metal_press/top/metal_press",
+    "north": "rngtech:block/metal_press/front/metal_press",
+    "south": "rngtech:block/metal_press/side/metal_press",
+    "east": "rngtech:block/metal_press/side/metal_press",
+    "west": "rngtech:block/metal_press/side/metal_press",
+    "particle": "rngtech:block/metal_press/front/metal_press"
+  }
+}

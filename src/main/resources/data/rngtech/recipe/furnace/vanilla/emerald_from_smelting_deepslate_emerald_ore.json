@@ -1,0 +1,14 @@
+{
+    "type": "rngtech:furnace",
+    "group": "emerald",
+    "ingredient": {
+        "item": "minecraft:deepslate_emerald_ore"
+    },
+    "result": {
+        "id": "minecraft:emerald"
+    },
+    "processing_ticks": 200,
+    "energy": 4800,
+    "experience": 1,
+    "machine_xp": 1
+}

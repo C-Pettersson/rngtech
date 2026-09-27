@@ -1,0 +1,17 @@
+{
+  "type": "rngtech:trait_shaped",
+  "category": "misc",
+  "pattern": [
+    " P ",
+    "PCP",
+    " O "
+  ],
+  "key": {
+    "C": { "item": "rngtech:tungstensteel_casing" },
+    "O": { "item": "minecraft:obsidian" },
+    "P": { "item": "rngtech:tungstensteel_plate" }
+  },
+  "result": {
+    "id": "rngtech:tungstensteel_collapse_nozzle"
+  }
+}

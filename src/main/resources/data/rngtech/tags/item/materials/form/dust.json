@@ -1,0 +1,20 @@
+{
+  "replace": false,
+  "values": [
+    "rngtech:iron_dust",
+    "rngtech:copper_dust",
+    "rngtech:tin_dust",
+    "rngtech:zinc_dust",
+    "rngtech:gold_dust",
+    "rngtech:nickel_dust",
+    "rngtech:lead_dust",
+    "rngtech:silver_dust",
+    "rngtech:aluminum_dust",
+    "rngtech:osmium_dust",
+    "rngtech:titanium_dust",
+    "rngtech:tungsten_dust",
+    "rngtech:platinum_dust",
+    "rngtech:netherite_dust",
+    "rngtech:naquadah_dust"
+  ]
+}

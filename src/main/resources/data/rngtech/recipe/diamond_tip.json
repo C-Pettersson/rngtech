@@ -1,0 +1,22 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "equipment",
+  "ingredients": [
+    {
+      "item": "minecraft:diamond"
+    },
+    {
+      "item": "rngtech:steel_plate"
+    }
+  ],
+  "neoforge:conditions": [
+    {
+      "material": "steel",
+      "type": "rngtech:material_enabled"
+    }
+  ],
+  "result": {
+    "count": 1,
+    "id": "rngtech:diamond_tip"
+  }
+}

@@ -1,0 +1,27 @@
+{
+    "type":  "rngtech:trait_shaped",
+    "key":  {
+                "R":  {
+                          "item":  "rngtech:aluminum_rod"
+                      },
+                "P":  {
+                          "item":  "rngtech:aluminum_plate"
+                      }
+            },
+    "category":  "equipment",
+    "neoforge:conditions":  [
+                                {
+                                    "material":  "aluminum",
+                                    "type":  "rngtech:material_enabled"
+                                }
+                            ],
+    "pattern":  [
+                    " P ",
+                    " R ",
+                    " R "
+                ],
+    "result":  {
+                   "count":  1,
+                   "id":  "rngtech:aluminum_tool_rod"
+               }
+}

@@ -1,0 +1,30 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "rngtech:material_enabled",
+      "material": "iron"
+    }
+  ],
+  "type": "rngtech:trait_shaped",
+  "category": "misc",
+  "pattern": [
+    "PHP",
+    "PCP",
+    "PPP"
+  ],
+  "key": {
+    "C": {
+      "item": "minecraft:chest"
+    },
+    "H": {
+      "item": "minecraft:hopper"
+    },
+    "P": {
+      "item": "rngtech:iron_plate"
+    }
+  },
+  "result": {
+    "count": 1,
+    "id": "rngtech:output_bin"
+  }
+}

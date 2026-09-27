@@ -1,0 +1,27 @@
+{
+  "type": "rngtech:trait_shaped",
+  "category": "misc",
+  "pattern": [
+    " Q ",
+    "DGD",
+    " T "
+  ],
+  "key": {
+    "D": {
+      "item": "minecraft:diamond"
+    },
+    "G": {
+      "item": "minecraft:glass_pane"
+    },
+    "Q": {
+      "item": "minecraft:quartz"
+    },
+    "T": {
+      "item": "minecraft:redstone_torch"
+    }
+  },
+  "result": {
+    "count": 1,
+    "id": "rngtech:control_modifier_lens"
+  }
+}

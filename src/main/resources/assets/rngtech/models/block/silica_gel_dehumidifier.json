@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/orientable",
+  "textures": {
+    "front": "rngtech:block/silica_gel_dehumidifier/silica_gel_dehumidifier_front",
+    "side": "rngtech:block/silica_gel_dehumidifier/silica_gel_dehumidifier_side",
+    "top": "rngtech:block/silica_gel_dehumidifier/silica_gel_dehumidifier_top"
+  }
+}

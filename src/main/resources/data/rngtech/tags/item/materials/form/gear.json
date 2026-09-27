@@ -1,0 +1,28 @@
+{
+  "replace": false,
+  "values": [
+    "rngtech:iron_gear",
+    "rngtech:copper_gear",
+    "rngtech:bronze_gear",
+    "rngtech:tin_gear",
+    "rngtech:zinc_gear",
+    "rngtech:gold_gear",
+    "rngtech:steel_gear",
+    "rngtech:invar_gear",
+    "rngtech:nickel_gear",
+    "rngtech:lead_gear",
+    "rngtech:silver_gear",
+    "rngtech:aluminum_gear",
+    "rngtech:sparksteel_gear",
+    "rngtech:osmium_gear",
+    "rngtech:titanium_gear",
+    "rngtech:arclite_gear",
+    "rngtech:tungsten_gear",
+    "rngtech:tungstensteel_gear",
+    "rngtech:nullite_gear",
+    "rngtech:aethergold_gear",
+    "rngtech:platinum_gear",
+    "rngtech:netherite_gear",
+    "rngtech:naquadah_gear"
+  ]
+}

@@ -1,0 +1,29 @@
+{
+    "neoforge:conditions": [
+        {
+            "type": "rngtech:material_enabled",
+            "material": "titanium"
+        }
+    ],
+    "type": "rngtech:trait_shaped",
+    "category": "misc",
+    "pattern": [
+        "PGP",
+        "GCG",
+        "PGP"
+    ],
+    "key": {
+        "C": {
+            "item": "rngtech:titanium_casing"
+        },
+        "G": {
+            "item": "rngtech:titanium_gear"
+        },
+        "P": {
+            "item": "rngtech:titanium_plate"
+        }
+    },
+    "result": {
+        "id": "rngtech:titanium_cavitation_rotor"
+    }
+}

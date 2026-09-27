@@ -1,0 +1,12 @@
+{
+  "parent": "minecraft:block/cube",
+  "textures": {
+    "down": "rngtech:block/resonance_calibrator_chassis/bottom/iron_resonance_calibrator_chassis",
+    "up": "rngtech:block/resonance_calibrator_chassis/top/iron_resonance_calibrator_chassis",
+    "north": "rngtech:block/resonance_calibrator_chassis/front/iron_resonance_calibrator_chassis",
+    "south": "rngtech:block/resonance_calibrator_chassis/side/iron_resonance_calibrator_chassis",
+    "east": "rngtech:block/resonance_calibrator_chassis/side/iron_resonance_calibrator_chassis",
+    "west": "rngtech:block/resonance_calibrator_chassis/side/iron_resonance_calibrator_chassis",
+    "particle": "rngtech:block/resonance_calibrator_chassis/front/iron_resonance_calibrator_chassis"
+  }
+}

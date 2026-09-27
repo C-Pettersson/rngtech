@@ -1,0 +1,20 @@
+{
+  "type": "rngtech:trait_shaped",
+  "category": "misc",
+  "key": {
+    "I": {
+      "tag": "c:ingots/iron"
+    },
+    "N": {
+      "tag": "c:nuggets/iron"
+    }
+  },
+  "pattern": [
+    "III",
+    " N ",
+    "NNN"
+  ],
+  "result": {
+    "id": "rngtech:tiny_anvil"
+  }
+}

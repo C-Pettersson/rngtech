@@ -1,0 +1,33 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "rngtech:material_enabled",
+      "material": "bronze"
+    }
+  ],
+  "type": "rngtech:trait_shaped",
+  "category": "redstone",
+  "pattern": [
+    "RCR",
+    "IFI",
+    "RCR"
+  ],
+  "key": {
+    "C": {
+      "item": "rngtech:bronze_casing"
+    },
+    "F": {
+      "item": "rngtech:fuel_chamber"
+    },
+    "I": {
+      "tag": "c:ingots/bronze"
+    },
+    "R": {
+      "item": "minecraft:redstone"
+    }
+  },
+  "result": {
+    "count": 1,
+    "id": "rngtech:bronze_reactor_chamber"
+  }
+}

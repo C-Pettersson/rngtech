@@ -1,0 +1,39 @@
+{
+    "neoforge:conditions": [
+        {
+            "type": "rngtech:material_enabled",
+            "material": "bronze"
+        },
+        {
+            "type": "rngtech:material_enabled",
+            "material": "copper"
+        },
+        {
+            "type": "rngtech:material_enabled",
+            "material": "tin"
+        }
+    ],
+    "type": "minecraft:crafting_shapeless",
+    "category": "misc",
+    "ingredients": [
+        {
+            "tag": "c:dusts/copper"
+        },
+        {
+            "tag": "c:dusts/copper"
+        },
+        {
+            "tag": "c:dusts/copper"
+        },
+        {
+            "tag": "c:dusts/tin"
+        },
+        {
+            "tag": "c:dusts/coal"
+        }
+    ],
+    "result": {
+        "count": 2,
+        "id": "rngtech:bronze_blend"
+    }
+}

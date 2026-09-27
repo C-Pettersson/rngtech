@@ -1,0 +1,24 @@
+{
+  "type": "rngtech:trait_shaped",
+  "category": "misc",
+  "pattern": [
+    "RQR",
+    "QMQ",
+    "RQR"
+  ],
+  "key": {
+    "M": {
+      "item": "minecraft:diamond"
+    },
+    "Q": {
+      "item": "minecraft:quartz"
+    },
+    "R": {
+      "item": "minecraft:redstone"
+    }
+  },
+  "result": {
+    "count": 2,
+    "id": "rngtech:matrix"
+  }
+}

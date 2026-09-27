@@ -1,0 +1,30 @@
+{
+  "type": "rngtech:trait_shaped",
+  "category": "redstone",
+  "pattern": [
+    "CEC",
+    "RMR",
+    "CBC"
+  ],
+  "key": {
+    "B": {
+      "item": "rngtech:bus_bar"
+    },
+    "C": {
+      "item": "rngtech:steel_casing"
+    },
+    "E": {
+      "item": "rngtech:electrolyte"
+    },
+    "M": {
+      "tag": "rngtech:machine_frames/reinforced"
+    },
+    "R": {
+      "item": "minecraft:redstone"
+    }
+  },
+  "result": {
+    "count": 1,
+    "id": "rngtech:corrosion_cell"
+  }
+}

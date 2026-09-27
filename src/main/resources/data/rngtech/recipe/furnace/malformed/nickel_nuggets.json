@@ -1,0 +1,22 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "rngtech:material_enabled",
+      "material": "nickel"
+    }
+  ],
+  "type": "rngtech:furnace",
+  "group": "malformed_ingot_recovery",
+  "ingredient": {
+    "item": "rngtech:malformed_ingot"
+  },
+  "malformed_material": "nickel",
+  "result": {
+    "count": 2,
+    "id": "rngtech:nickel_nugget"
+  },
+  "processing_ticks": 400,
+  "energy": 1200,
+  "minimum_temperature": 400,
+  "bonus_output": false
+}

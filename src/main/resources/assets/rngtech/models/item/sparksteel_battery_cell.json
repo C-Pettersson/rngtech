@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "rngtech:item/battery_cells/sparksteel_battery_cell"
+  }
+}

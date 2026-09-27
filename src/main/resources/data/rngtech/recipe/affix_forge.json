@@ -1,0 +1,36 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "rngtech:material_enabled",
+      "material": "copper"
+    }
+  ],
+  "type": "rngtech:trait_shaped",
+  "category": "misc",
+  "pattern": [
+    "IRI",
+    "LCL",
+    "NNN"
+  ],
+  "key": {
+    "C": {
+      "item": "rngtech:casing"
+    },
+    "I": {
+      "tag": "c:ingots/iron"
+    },
+    "L": {
+      "item": "minecraft:lapis_lazuli"
+    },
+    "N": {
+      "tag": "c:nuggets/copper"
+    },
+    "R": {
+      "item": "minecraft:redstone"
+    }
+  },
+  "result": {
+    "count": 1,
+    "id": "rngtech:affix_forge"
+  }
+}

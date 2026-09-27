@@ -1,0 +1,27 @@
+{
+    "type":  "rngtech:trait_shaped",
+    "key":  {
+                "R":  {
+                          "item":  "rngtech:steel_rod"
+                      },
+                "P":  {
+                          "item":  "rngtech:steel_plate"
+                      }
+            },
+    "category":  "equipment",
+    "neoforge:conditions":  [
+                                {
+                                    "material":  "steel",
+                                    "type":  "rngtech:material_enabled"
+                                }
+                            ],
+    "pattern":  [
+                    " P ",
+                    " R ",
+                    " R "
+                ],
+    "result":  {
+                   "count":  1,
+                   "id":  "rngtech:steel_reinforced_tool_rod"
+               }
+}

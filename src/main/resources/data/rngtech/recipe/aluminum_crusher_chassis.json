@@ -1,0 +1,34 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "rngtech:material_enabled",
+      "material": "aluminum"
+    }
+  ],
+  "type": "rngtech:calibrated_shaped",
+  "category": "misc",
+  "pattern": [
+    "AEA",
+    "XMX",
+    "AAA"
+  ],
+  "key": {
+    "A": {
+      "ingredient": { "tag": "c:ingots/aluminum" }
+    },
+    "E": {
+      "ingredient": { "tag": "c:ingots/sparksteel" }
+    },
+    "M": {
+      "ingredient": { "tag": "rngtech:machine_frames/advanced" }
+    },
+    "X": {
+      "ingredient": { "item": "rngtech:calibrated_kinetic_component" },
+      "calibration": { "family": "kinetic", "min_stage": 1, "min_stability": 60 }
+    }
+  },
+  "result": {
+    "count": 1,
+    "id": "rngtech:aluminum_crusher_chassis"
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "parent": "minecraft:block/cube_bottom_top",
+  "textures": {
+    "bottom": "minecraft:block/composter_bottom",
+    "side": "minecraft:block/composter_side",
+    "top": "minecraft:block/composter_compost",
+    "particle": "minecraft:block/composter_side"
+  }
+}

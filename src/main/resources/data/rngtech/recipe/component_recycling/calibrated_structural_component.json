@@ -1,0 +1,18 @@
+{
+  "type": "rngtech:component_recycling",
+  "ingredient": {
+    "item": "rngtech:calibrated_structural_component"
+  },
+  "minimum_processing_level": 1,
+  "processing_ticks": 80,
+  "energy": 600,
+  "outputs": [
+    {
+      "stack": {
+        "id": "rngtech:iron_plate",
+        "count": 1
+      },
+      "requires_filter": false
+    }
+  ]
+}

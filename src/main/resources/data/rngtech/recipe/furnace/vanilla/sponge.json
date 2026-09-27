@@ -1,0 +1,12 @@
+{
+    "type": "rngtech:furnace",
+    "ingredient": {
+        "item": "minecraft:wet_sponge"
+    },
+    "result": {
+        "id": "minecraft:sponge"
+    },
+    "processing_ticks": 200,
+    "energy": 4800,
+    "experience": 0.15
+}

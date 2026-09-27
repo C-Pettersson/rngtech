@@ -1,0 +1,32 @@
+{
+  "type": "rngtech:component_recycling",
+  "ingredient": {
+    "item": "rngtech:bio_generator"
+  },
+  "minimum_processing_level": 2,
+  "processing_ticks": 144,
+  "energy": 1340,
+  "outputs": [
+    {
+      "stack": {
+        "id": "rngtech:fuel_chamber",
+        "count": 1
+      },
+      "requires_filter": false
+    },
+    {
+      "stack": {
+        "id": "rngtech:plant_reagent",
+        "count": 1
+      },
+      "requires_filter": false
+    },
+    {
+      "stack": {
+        "id": "minecraft:copper_ingot",
+        "count": 1
+      },
+      "requires_filter": true
+    }
+  ]
+}

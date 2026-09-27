@@ -1,0 +1,8 @@
+{
+  "replace": false,
+  "values": [
+    "rngtech:bronze_alloy_furnace_chassis",
+    "rngtech:steel_alloy_furnace_chassis",
+    "rngtech:titanium_alloy_furnace_chassis"
+  ]
+}

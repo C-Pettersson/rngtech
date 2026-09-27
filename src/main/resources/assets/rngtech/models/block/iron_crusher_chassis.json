@@ -1,0 +1,12 @@
+{
+  "parent": "minecraft:block/cube",
+  "textures": {
+    "down": "rngtech:block/crusher_chassis/bottom/iron_crusher_chassis",
+    "up": "rngtech:block/crusher_chassis/top/iron_crusher_chassis",
+    "north": "rngtech:block/crusher_chassis/front/iron_crusher_chassis",
+    "south": "rngtech:block/crusher_chassis/side/iron_crusher_chassis",
+    "east": "rngtech:block/crusher_chassis/side/iron_crusher_chassis",
+    "west": "rngtech:block/crusher_chassis/side/iron_crusher_chassis",
+    "particle": "rngtech:block/crusher_chassis/front/iron_crusher_chassis"
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "type": "rngtech:melter",
+  "group": "melter_gases",
+  "primary_ingredient": {
+    "item": "rngtech:algae_biomass"
+  },
+  "secondary_ingredient": {
+    "item": "rngtech:organic_reagent"
+  },
+  "fluid_input": {
+    "ingredient": {
+      "fluid": "minecraft:water"
+    },
+    "amount": 1000
+  },
+  "fluid_output": {
+    "id": "rngtech:methane",
+    "amount": 1000
+  },
+  "processing_ticks": 320,
+  "energy": 8000,
+  "minimum_temperature": 1400,
+  "required_processing_level": 6
+}

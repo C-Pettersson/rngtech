@@ -1,0 +1,25 @@
+{
+  "type": "rngtech:component_recycling",
+  "ingredient": {
+    "item": "rngtech:bronze_tool_rod"
+  },
+  "minimum_processing_level": 3,
+  "processing_ticks": 110,
+  "energy": 980,
+  "outputs": [
+    {
+      "stack": {
+        "id": "rngtech:bronze_rod",
+        "count": 1
+      },
+      "requires_filter": false
+    },
+    {
+      "stack": {
+        "id": "rngtech:bronze_plate",
+        "count": 1
+      },
+      "requires_filter": true
+    }
+  ]
+}

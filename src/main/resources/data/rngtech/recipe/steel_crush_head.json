@@ -1,0 +1,33 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "rngtech:material_enabled",
+      "material": "steel"
+    }
+  ],
+  "type": "rngtech:trait_shaped",
+  "category": "equipment",
+  "pattern": [
+    "PPP",
+    "BGB",
+    " R "
+  ],
+  "key": {
+    "B": {
+      "item": "rngtech:bronze_plate"
+    },
+    "G": {
+      "item": "rngtech:steel_gear"
+    },
+    "P": {
+      "item": "rngtech:steel_plate"
+    },
+    "R": {
+      "item": "minecraft:redstone"
+    }
+  },
+  "result": {
+    "count": 1,
+    "id": "rngtech:steel_crush_head"
+  }
+}

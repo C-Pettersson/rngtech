@@ -1,0 +1,30 @@
+{
+    "type": "rngtech:trait_shaped",
+    "category": "equipment",
+    "neoforge:conditions": [
+        {
+            "material": "copper",
+            "type": "rngtech:material_enabled"
+        }
+    ],
+    "pattern": [
+        " P ",
+        "PSP",
+        " R "
+    ],
+    "key": {
+        "P": {
+            "item": "rngtech:copper_plate"
+        },
+        "R": {
+            "item": "rngtech:copper_rod"
+        },
+        "S": {
+            "item": "minecraft:shears"
+        }
+    },
+    "result": {
+        "count": 1,
+        "id": "rngtech:copper_pruning_shears"
+    }
+}

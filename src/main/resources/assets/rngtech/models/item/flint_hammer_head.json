@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "rngtech:item/tool_heads/flint_hammer_head"
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "parent": "minecraft:block/cube",
+  "textures": {
+    "down": "rngtech:block/battery_chassis/iron_battery_chassis",
+    "up": "rngtech:block/melter/top/melter",
+    "north": "rngtech:block/battery_chassis/front/copper_battery_chassis",
+    "south": "rngtech:block/melter/side/melter",
+    "east": "rngtech:block/melter/side/melter",
+    "west": "rngtech:block/melter/side/melter",
+    "particle": "rngtech:block/battery_chassis/front/copper_battery_chassis"
+  }
+}

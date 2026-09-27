@@ -1,0 +1,40 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "rngtech:material_enabled",
+      "material": "aluminum"
+    }
+  ],
+  "type": "rngtech:calibrated_shaped",
+  "category": "redstone",
+  "pattern": [
+    "IBI",
+    "XFX",
+    "CSC"
+  ],
+  "key": {
+    "B": {
+      "ingredient": { "tag": "c:circuits/advanced" }
+    },
+    "C": {
+      "ingredient": { "tag": "c:ingots/aluminum" }
+    },
+    "F": {
+      "ingredient": { "tag": "rngtech:machine_frames/advanced" }
+    },
+    "I": {
+      "ingredient": { "tag": "c:ingots/aluminum" }
+    },
+    "S": {
+      "ingredient": { "item": "minecraft:smooth_stone" }
+    },
+    "X": {
+      "ingredient": { "item": "rngtech:calibrated_thermal_component" },
+      "calibration": { "family": "thermal", "min_stage": 2, "min_stability": 60 }
+    }
+  },
+  "result": {
+    "count": 1,
+    "id": "rngtech:aluminum_furnace_chassis"
+  }
+}

@@ -1,0 +1,14 @@
+{
+    "type": "rngtech:furnace",
+    "group": "lapis_lazuli",
+    "ingredient": {
+        "item": "minecraft:lapis_ore"
+    },
+    "result": {
+        "id": "minecraft:lapis_lazuli"
+    },
+    "processing_ticks": 200,
+    "energy": 4800,
+    "experience": 0.2,
+    "machine_xp": 1
+}

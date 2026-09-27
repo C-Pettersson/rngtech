@@ -1,0 +1,41 @@
+{
+  "neoforge:conditions": [
+    { "type": "rngtech:material_enabled", "material": "nullite" },
+    { "type": "rngtech:material_enabled", "material": "lead" },
+    { "type": "rngtech:material_enabled", "material": "platinum" }
+  ],
+  "type": "rngtech:alloy_furnace",
+  "group": "rngtech_direct_alloys",
+  "mode": "direct_ingot",
+  "ingredients": [
+    {
+      "ingredient": { "tag": "c:ingots/lead" },
+      "count": 3
+    },
+    {
+      "ingredient": { "tag": "c:ingots/platinum" },
+      "count": 1
+    },
+    {
+      "ingredient": { "item": "minecraft:ender_pearl" },
+      "count": 2
+    }
+  ],
+  "result": {
+    "count": 2,
+    "id": "rngtech:nullite_ingot"
+  },
+  "processing_ticks": 1200,
+  "energy": 26000,
+  "minimum_component_stage": 6,
+  "minimum_temperature": 1500,
+  "target_temperature": 1500,
+  "safe_maximum_temperature": 1800,
+  "required_temperature_stability": 1.18,
+  "failure_output": {
+    "count": 1,
+    "id": "rngtech:malformed_ingot"
+  },
+  "failure_material": "nullite",
+  "power_sensitive": true
+}

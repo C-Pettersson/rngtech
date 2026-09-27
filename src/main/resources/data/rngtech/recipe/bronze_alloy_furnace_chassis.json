@@ -1,0 +1,39 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "rngtech:material_enabled",
+      "material": "bronze"
+    }
+  ],
+  "type": "rngtech:trait_shaped",
+  "category": "redstone",
+  "pattern": [
+    "IBI",
+    "HFH",
+    "CRC"
+  ],
+  "key": {
+    "B": {
+      "tag": "c:circuits/basic"
+    },
+    "C": {
+      "item": "rngtech:bronze_casing"
+    },
+    "F": {
+      "tag": "rngtech:machine_frames/base"
+    },
+    "H": {
+      "item": "rngtech:bronze_heat_core"
+    },
+    "I": {
+      "tag": "c:ingots/bronze"
+    },
+    "R": {
+      "item": "minecraft:redstone"
+    }
+  },
+  "result": {
+    "count": 1,
+    "id": "rngtech:bronze_alloy_furnace_chassis"
+  }
+}

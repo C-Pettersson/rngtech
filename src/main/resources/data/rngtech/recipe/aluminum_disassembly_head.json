@@ -1,0 +1,27 @@
+{
+    "type":  "rngtech:trait_shaped",
+    "category":  "equipment",
+    "pattern":  [
+                    "PPP",
+                    "GMG",
+                    " R "
+                ],
+    "key":  {
+                "P":  {
+                          "item":  "rngtech:aluminum_plate"
+                      },
+                "G":  {
+                          "item":  "rngtech:aluminum_gear"
+                      },
+                "M":  {
+                          "item":  "rngtech:mechanism"
+                      },
+                "R":  {
+                          "item":  "minecraft:redstone"
+                      }
+            },
+    "result":  {
+                   "count":  1,
+                   "id":  "rngtech:aluminum_disassembly_head"
+               }
+}

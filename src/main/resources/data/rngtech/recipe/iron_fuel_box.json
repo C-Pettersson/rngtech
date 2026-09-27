@@ -1,0 +1,36 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "rngtech:material_enabled",
+      "material": "iron"
+    }
+  ],
+  "type": "rngtech:trait_shaped",
+  "category": "redstone",
+  "pattern": [
+    "ICI",
+    "HFH",
+    "IKI"
+  ],
+  "key": {
+    "C": {
+      "item": "minecraft:chest"
+    },
+    "F": {
+      "item": "rngtech:fuel_chamber"
+    },
+    "H": {
+      "item": "minecraft:hopper"
+    },
+    "I": {
+      "tag": "c:ingots/iron"
+    },
+    "K": {
+      "item": "minecraft:coal"
+    }
+  },
+  "result": {
+    "count": 1,
+    "id": "rngtech:iron_fuel_box"
+  }
+}

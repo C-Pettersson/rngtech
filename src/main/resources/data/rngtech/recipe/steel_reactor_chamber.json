@@ -1,0 +1,33 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "rngtech:material_enabled",
+      "material": "steel"
+    }
+  ],
+  "type": "rngtech:trait_shaped",
+  "category": "redstone",
+  "pattern": [
+    "RCR",
+    "IFI",
+    "RCR"
+  ],
+  "key": {
+    "C": {
+      "item": "rngtech:steel_casing"
+    },
+    "F": {
+      "item": "rngtech:fuel_chamber"
+    },
+    "I": {
+      "tag": "c:ingots/steel"
+    },
+    "R": {
+      "item": "minecraft:redstone"
+    }
+  },
+  "result": {
+    "count": 1,
+    "id": "rngtech:steel_reactor_chamber"
+  }
+}

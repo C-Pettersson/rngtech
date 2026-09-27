@@ -1,0 +1,30 @@
+{
+    "type":  "rngtech:trait_shaped",
+    "key":  {
+                "G":  {
+                          "item":  "rngtech:nullite_gear"
+                      },
+                "R":  {
+                          "item":  "rngtech:nullite_rod"
+                      },
+                "P":  {
+                          "item":  "rngtech:nullite_plate"
+                      }
+            },
+    "category":  "equipment",
+    "neoforge:conditions":  [
+                                {
+                                    "material":  "nullite",
+                                    "type":  "rngtech:material_enabled"
+                                }
+                            ],
+    "pattern":  [
+                    "PPP",
+                    " G ",
+                    " R "
+                ],
+    "result":  {
+                   "count":  1,
+                   "id":  "rngtech:nullite_pick_head"
+               }
+}

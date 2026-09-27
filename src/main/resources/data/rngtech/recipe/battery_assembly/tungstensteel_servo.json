@@ -1,0 +1,51 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "rngtech:material_enabled",
+      "material": "tungstensteel"
+    },
+    {
+      "type": "rngtech:material_enabled",
+      "material": "titanium"
+    }
+  ],
+  "type": "rngtech:battery_assembly",
+  "group": "component_assembly_servos",
+  "ingredients": [
+    {
+      "ingredient": {
+        "item": "minecraft:redstone"
+      },
+      "count": 4
+    },
+    {
+      "ingredient": {
+        "tag": "c:ingots/tungstensteel"
+      },
+      "count": 2
+    },
+    {
+      "ingredient": {
+        "tag": "c:circuits/ultimate"
+      }
+    },
+    {
+      "ingredient": {
+        "item": "rngtech:servo_frame"
+      }
+    }
+  ],
+  "fluid_input": {
+    "ingredient": {
+      "fluid": "rngtech:lubricant"
+    },
+    "amount": 1000
+  },
+  "result": {
+    "count": 1,
+    "id": "rngtech:tungstensteel_servo"
+  },
+  "processing_ticks": 300,
+  "energy": 7200,
+  "roll_result_traits": false
+}

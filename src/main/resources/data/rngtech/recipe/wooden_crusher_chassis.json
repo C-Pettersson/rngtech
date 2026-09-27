@@ -1,0 +1,24 @@
+{
+  "type": "rngtech:trait_shaped",
+  "category": "misc",
+  "pattern": [
+    "PSP",
+    "SFS",
+    "PSP"
+  ],
+  "key": {
+    "F": {
+      "item": "minecraft:flint"
+    },
+    "P": {
+      "tag": "minecraft:planks"
+    },
+    "S": {
+      "item": "minecraft:stick"
+    }
+  },
+  "result": {
+    "count": 1,
+    "id": "rngtech:wooden_crusher_chassis"
+  }
+}

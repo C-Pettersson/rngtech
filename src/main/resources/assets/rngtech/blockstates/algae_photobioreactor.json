@@ -1,0 +1,12 @@
+{
+  "variants": {
+    "active=false,facing=north": { "model": "rngtech:block/algae_photobioreactor" },
+    "active=false,facing=east": { "model": "rngtech:block/algae_photobioreactor", "y": 90 },
+    "active=false,facing=south": { "model": "rngtech:block/algae_photobioreactor", "y": 180 },
+    "active=false,facing=west": { "model": "rngtech:block/algae_photobioreactor", "y": 270 },
+    "active=true,facing=north": { "model": "rngtech:block/algae_photobioreactor_active" },
+    "active=true,facing=east": { "model": "rngtech:block/algae_photobioreactor_active", "y": 90 },
+    "active=true,facing=south": { "model": "rngtech:block/algae_photobioreactor_active", "y": 180 },
+    "active=true,facing=west": { "model": "rngtech:block/algae_photobioreactor_active", "y": 270 }
+  }
+}

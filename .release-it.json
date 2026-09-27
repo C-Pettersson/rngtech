@@ -1,0 +1,26 @@
+{
+    "$schema": "https://unpkg.com/release-it@20/schema/release-it.json",
+    "npm": false,
+    "git": {
+        "assets": [
+            "gradle.properties"
+        ],
+        "commitMessage": "chore: release v${version}",
+        "tagName": "v${version}"
+    },
+    "hooks": {
+        "after:bump": [
+            "node tools/release/update-gradle-version.mjs ${version}",
+            "npm run release:verify"
+        ]
+    },
+    "plugins": {
+        "@release-it/bumper": {
+            "in": {
+                "file": "gradle.properties",
+                "path": "mod_version",
+                "type": "text/x-properties"
+            }
+        }
+    }
+}

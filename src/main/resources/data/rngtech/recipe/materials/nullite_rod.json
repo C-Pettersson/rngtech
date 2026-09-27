@@ -1,0 +1,23 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "rngtech:material_enabled",
+      "material": "nullite"
+    }
+  ],
+  "type": "rngtech:trait_shaped",
+  "category": "misc",
+  "pattern": [
+    "N  ",
+    " N ",
+    "  N"
+  ],
+  "key": {
+    "N": {
+      "tag": "c:nuggets/nullite"
+    }
+  },
+  "result": {
+    "id": "rngtech:nullite_rod"
+  }
+}

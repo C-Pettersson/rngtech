@@ -1,0 +1,27 @@
+{
+  "type": "rngtech:trait_shaped",
+  "category": "misc",
+  "pattern": [
+    " A ",
+    "DGD",
+    " I "
+  ],
+  "key": {
+    "A": {
+      "item": "minecraft:amethyst_shard"
+    },
+    "D": {
+      "item": "minecraft:diamond"
+    },
+    "G": {
+      "item": "minecraft:glass_pane"
+    },
+    "I": {
+      "item": "minecraft:iron_ingot"
+    }
+  },
+  "result": {
+    "count": 1,
+    "id": "rngtech:stability_modifier_lens"
+  }
+}

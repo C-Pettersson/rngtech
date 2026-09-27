@@ -1,0 +1,104 @@
+# Alloy Furnace
+
+Status: Prototype
+
+Resource ids:
+
+- `rngtech:bronze_alloy_furnace_chassis`
+- `rngtech:steel_alloy_furnace_chassis`
+- `rngtech:titanium_alloy_furnace_chassis`
+
+## Summary
+
+The Alloy Furnace is an FE-powered mixing machine for alloy blend and direct-ingot routes. It consumes exact counted ratios from up to four input slots and outputs either material blend items or finished alloy ingots. Early access paths are deliberately slow, lossy, and additive-heavy, while stronger Alloy Furnace setups unlock cleaner direct-ingot routes. The machine reports recipe FE/t demand; external FE intake is limited by free buffer or installed-cell space plus the source or attached Universal Connector.
+
+Bronze is the first Alloy Furnace tier. Higher chassis and crucibles improve heat transfer, processing speed, stability, heat control, and active input slots through authored base stat catalogs.
+
+## Implementation Contract
+
+Current runtime surface:
+
+- Block entity: `AlloyFurnaceBlockEntity`.
+- Menu and screen: `AlloyFurnaceMenu` and `AlloyFurnaceScreen`.
+- Recipe source: custom `rngtech:alloy_furnace` recipe type.
+- Required Gear: one Heat Core and one Alloy Crucible.
+- Optional Gear: one Battery Cell and one Servo.
+- Automation: top inserts active process inputs, bottom extracts output, and sides receive FE. Gear slots are manual UI equipment.
+- Refinement applies to the placed chassis through the Refinement tab and to Alloy Crucible stacks through the Affix Forge.
+- JEI exposes alloy recipes, counted inputs, FE/tick cost, stage gates, heat gates, and stability gates.
+
+Machine/chassis numeric identity is authored through `MachineBaseStatCatalog`. Alloy Crucible numeric identity is authored through `ComponentBaseStatCatalog`. Fixed identity behavior remains in `MachineImplicitCatalog`; Steel and Titanium Alloy Furnace chassis carry `OUTPUT_GUARD`.
+
+## Chassis
+
+| Stage | Block | Notes |
+|---:|---|---|
+| 3 | `rngtech:bronze_alloy_furnace_chassis` | First full-yield alloy chassis. |
+| 4 | `rngtech:steel_alloy_furnace_chassis` | Midgame chassis with output guard behavior. |
+| 6 | `rngtech:titanium_alloy_furnace_chassis` | Advanced controlled alloy chassis with output guard behavior. |
+
+## Alloy Crucibles
+
+| Stage | Item | Input slots | Notes |
+|---:|---|---:|---|
+| 3 | `rngtech:bronze_alloy_crucible` | 3 | First valid crucible and Bronze blend gear, crafted through the Bronze Casing path. |
+| 4 | `rngtech:steel_alloy_crucible` | 3 | Handles three-input layouts. |
+| 6 | `rngtech:titanium_alloy_crucible` | 4 | Full four-slot mixing. |
+
+## Recipe Use
+
+Alloy Furnace recipes use counted, orderless ingredients:
+
+```json
+{
+  "type": "rngtech:alloy_furnace",
+  "group": "rngtech_direct_alloys",
+  "mode": "direct_ingot",
+  "ingredients": [
+    {
+      "ingredient": { "tag": "c:dusts/copper" },
+      "count": 3
+    },
+    {
+      "ingredient": { "tag": "c:dusts/tin" },
+      "count": 1
+    },
+    {
+      "ingredient": { "item": "minecraft:charcoal" },
+      "count": 1
+    }
+  ],
+  "result": {
+    "count": 3,
+    "id": "rngtech:bronze_blend"
+  },
+  "processing_ticks": 200,
+  "energy": 2400,
+  "minimum_component_stage": 3,
+  "minimum_temperature": 900,
+  "target_temperature": 900,
+  "safe_maximum_temperature": 1035,
+  "required_temperature_stability": 0.9
+}
+```
+
+Alloy Furnace recipes may also declare `failure_output`, `failure_material`, and `power_sensitive`. Processing waits for live heat to reach `target_temperature`, which defaults to `minimum_temperature`. Stage 4+ recipes with a failure output use the shared `6000` failure-strain threshold instead of hard-failing on stability after work starts. `power_sensitive: true` means empty FE after progress starts adds strain; empty FE during warmup only pauses and cools the machine.
+
+The first Bronze path is a shapeless blend recipe outside the Alloy Furnace: `3` Copper Dust, `1` Tin Dust, and `1` Coal Dust make `2` Bronze Blend. Furnace recipes smelt Bronze Blend into Bronze Ingots. Once the Bronze Alloy Furnace setup is built, its three-slot Bronze Alloy Crucible can make `3` Bronze Blend from `3` Copper Dust, `1` Tin Dust, and `1` Charcoal at `900` heat. The later direct-ingot Bronze route makes `4` Bronze Ingots from `3` Copper Ingots, `1` Tin Ingot, and `1` Charcoal at `1100` heat.
+
+Steel has a Stage 3 bootstrap route that runs in full Bronze Alloy Furnace gear and outputs Steel Blend from Iron Dust, Coal, and Charcoal at `900` heat over `1800` ticks for `36,000 FE`. Higher-heat Steel routes use Coal Dust or direct Iron Ingot inputs: Iron Dust, Coal Dust, and Charcoal make Steel Blend at `1100` heat over `1200` ticks for `24,000 FE`; Iron Ingot, Coal Dust, and Charcoal make a Steel Ingot at `1100` heat over `1800` ticks for `36,000 FE`; and Iron Ingot plus Coal makes a Steel Ingot at `1300` heat over `1200` ticks for `24,000 FE`.
+
+Invar keeps its existing direct-ingot Alloy Furnace routes.
+
+Sparksteel and Arclite are Stage 4 direct-ingot pressure routes. They use ingots plus Redstone, run slowly at `1200` ticks and `24,000 FE`, and output `1` alloy ingot so the first downstream coils, circuits, and Titanium infrastructure are reachable without adding alloy dust progression.
+
+Higher direct-ingot recipes make Aethergold from Tin, Silver, and Glowstone Dust; Nullite from Lead, Platinum, and Ender Pearls; and Tungstensteel from Tungsten, Steel, and Coal Dust. These late routes are intentionally slower and lossy compared with ordinary metal processing, and failure-bearing recipes output material-marked `rngtech:malformed_ingot` recovery stacks rather than ordinary progression inputs.
+
+Bronze Blend and Steel Blend are default progression items and are tagged as `rngtech:alloy_blend_smeltables` so Bronze Furnace's `ALLOY_BLEND` behavior applies to their Furnace recipes. Invar Blend and Sparksteel Blend remain hidden compatibility ids with no default survival recipes.
+
+## Related Pages
+
+- [Furnace](furnace.md)
+- [Machine Parts](machine-parts.md)
+- [Current Implementation Matrix](../reference/current-implementation.md)
+- [Modifier Eligibility](../reference/modifier-eligibility.md)

@@ -1,0 +1,27 @@
+{
+    "type":  "rngtech:trait_shaped",
+    "category":  "equipment",
+    "pattern":  [
+                    "PPP",
+                    "GMG",
+                    " R "
+                ],
+    "key":  {
+                "P":  {
+                          "item":  "rngtech:copper_plate"
+                      },
+                "G":  {
+                          "item":  "rngtech:copper_gear"
+                      },
+                "M":  {
+                          "item":  "rngtech:mechanism"
+                      },
+                "R":  {
+                          "item":  "minecraft:redstone"
+                      }
+            },
+    "result":  {
+                   "count":  1,
+                   "id":  "rngtech:copper_disassembly_head"
+               }
+}

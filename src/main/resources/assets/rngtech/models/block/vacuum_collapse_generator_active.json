@@ -1,0 +1,7 @@
+{
+  "parent": "rngtech:block/vacuum_collapse_generator",
+  "textures": {
+    "north": "rngtech:block/vacuum_collapse_generator/front/vacuum_collapse_generator_active",
+    "particle": "rngtech:block/vacuum_collapse_generator/front/vacuum_collapse_generator_active"
+  }
+}

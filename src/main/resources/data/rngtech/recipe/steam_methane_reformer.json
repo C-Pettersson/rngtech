@@ -1,0 +1,35 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "rngtech:material_enabled",
+      "material": "titanium"
+    }
+  ],
+  "type": "rngtech:trait_shaped",
+  "category": "redstone",
+  "pattern": [
+    "TCT",
+    "PMP",
+    "TBT"
+  ],
+  "key": {
+    "B": {
+      "item": "rngtech:bus_bar"
+    },
+    "C": {
+      "item": "rngtech:reforming_catalyst_bed"
+    },
+    "M": {
+      "tag": "rngtech:machine_frames/base"
+    },
+    "P": {
+      "item": "rngtech:titanium_plate"
+    },
+    "T": {
+      "item": "rngtech:titanium_casing"
+    }
+  },
+  "result": {
+    "id": "rngtech:steam_methane_reformer"
+  }
+}

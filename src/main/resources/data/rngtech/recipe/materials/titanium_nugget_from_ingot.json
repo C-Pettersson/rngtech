@@ -1,0 +1,19 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "rngtech:material_enabled",
+      "material": "titanium"
+    }
+  ],
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "tag": "c:ingots/titanium"
+    }
+  ],
+  "result": {
+    "count": 9,
+    "id": "rngtech:titanium_nugget"
+  }
+}

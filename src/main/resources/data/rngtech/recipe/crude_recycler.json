@@ -1,0 +1,30 @@
+{
+  "type": "rngtech:trait_shaped",
+  "category": "misc",
+  "pattern": [
+    "SFS",
+    "PCP",
+    "WWW"
+  ],
+  "key": {
+    "S": {
+      "item": "minecraft:cobblestone"
+    },
+    "F": {
+      "item": "rngtech:flint_crush_head"
+    },
+    "P": {
+      "tag": "minecraft:planks"
+    },
+    "C": {
+      "item": "minecraft:chest"
+    },
+    "W": {
+      "tag": "minecraft:wooden_slabs"
+    }
+  },
+  "result": {
+    "count": 1,
+    "id": "rngtech:crude_recycler"
+  }
+}

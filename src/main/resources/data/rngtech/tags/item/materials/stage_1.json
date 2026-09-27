@@ -1,0 +1,18 @@
+{
+  "replace": false,
+  "values": [
+    "minecraft:iron_ingot",
+    "rngtech:iron_dust",
+    "minecraft:iron_nugget",
+    "minecraft:iron_block",
+    "minecraft:iron_ore",
+    "minecraft:deepslate_iron_ore",
+    "minecraft:raw_iron",
+    "rngtech:crushed_iron",
+    "rngtech:iron_plate",
+    "rngtech:iron_gear",
+    "rngtech:iron_rod",
+    "rngtech:iron_coil",
+    "rngtech:iron_casing"
+  ]
+}

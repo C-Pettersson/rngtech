@@ -1,0 +1,9 @@
+{
+  "replace": false,
+  "values": [
+    "rngtech:resin",
+    "rngtech:rubber",
+    "minecraft:slime_ball",
+    "minecraft:honey_bottle"
+  ]
+}

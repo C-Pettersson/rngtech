@@ -1,0 +1,30 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "rngtech:material_enabled",
+      "material": "copper"
+    }
+  ],
+  "type": "rngtech:trait_shaped",
+  "category": "misc",
+  "pattern": [
+    "NGN",
+    "GDG",
+    "NGN"
+  ],
+  "key": {
+    "D": {
+      "item": "minecraft:diamond"
+    },
+    "G": {
+      "tag": "c:nuggets/gold"
+    },
+    "N": {
+      "tag": "c:nuggets/copper"
+    }
+  },
+  "result": {
+    "count": 1,
+    "id": "rngtech:affix_lens_array"
+  }
+}

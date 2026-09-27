@@ -1,0 +1,28 @@
+{
+  "replace": false,
+  "values": [
+    "minecraft:iron_nugget",
+    "rngtech:copper_nugget",
+    "rngtech:bronze_nugget",
+    "rngtech:tin_nugget",
+    "rngtech:zinc_nugget",
+    "minecraft:gold_nugget",
+    "rngtech:steel_nugget",
+    "rngtech:invar_nugget",
+    "rngtech:nickel_nugget",
+    "rngtech:lead_nugget",
+    "rngtech:silver_nugget",
+    "rngtech:aluminum_nugget",
+    "rngtech:sparksteel_nugget",
+    "rngtech:osmium_nugget",
+    "rngtech:titanium_nugget",
+    "rngtech:arclite_nugget",
+    "rngtech:tungsten_nugget",
+    "rngtech:tungstensteel_nugget",
+    "rngtech:nullite_nugget",
+    "rngtech:aethergold_nugget",
+    "rngtech:platinum_nugget",
+    "rngtech:netherite_nugget",
+    "rngtech:naquadah_nugget"
+  ]
+}

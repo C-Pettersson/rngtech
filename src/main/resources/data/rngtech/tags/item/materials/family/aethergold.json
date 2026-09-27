@@ -1,0 +1,13 @@
+{
+  "replace": false,
+  "values": [
+    "rngtech:aethergold_ingot",
+    "rngtech:aethergold_nugget",
+    "rngtech:aethergold_storage_block",
+    "rngtech:crushed_aethergold",
+    "rngtech:aethergold_plate",
+    "rngtech:aethergold_gear",
+    "rngtech:aethergold_rod",
+    "rngtech:aethergold_coil"
+  ]
+}

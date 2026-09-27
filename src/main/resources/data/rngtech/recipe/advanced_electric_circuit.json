@@ -1,0 +1,30 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "rngtech:material_enabled",
+      "material": "steel"
+    }
+  ],
+  "type": "rngtech:metal_press",
+  "group": "metal_press_circuits",
+  "ingredient": {
+    "item": "rngtech:advanced_circuit_blank"
+  },
+  "input_count": 1,
+  "mold": {
+    "item": "rngtech:circuit_mold"
+  },
+  "result": {
+    "count": 1,
+    "id": "rngtech:advanced_electric_circuit"
+  },
+  "processing_ticks": 240,
+  "energy": 3000,
+  "minimum_temperature": 1300,
+  "safe_maximum_temperature": 1550,
+  "required_temperature_stability": 1.05,
+  "failure_output": {
+    "count": 1,
+    "id": "rngtech:broken_circuit"
+  }
+}

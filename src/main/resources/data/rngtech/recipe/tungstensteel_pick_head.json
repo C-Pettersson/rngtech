@@ -1,0 +1,30 @@
+{
+    "type":  "rngtech:trait_shaped",
+    "key":  {
+                "G":  {
+                          "item":  "rngtech:tungstensteel_gear"
+                      },
+                "R":  {
+                          "item":  "rngtech:tungstensteel_rod"
+                      },
+                "P":  {
+                          "item":  "rngtech:tungstensteel_plate"
+                      }
+            },
+    "category":  "equipment",
+    "neoforge:conditions":  [
+                                {
+                                    "material":  "tungstensteel",
+                                    "type":  "rngtech:material_enabled"
+                                }
+                            ],
+    "pattern":  [
+                    "PPP",
+                    " G ",
+                    " R "
+                ],
+    "result":  {
+                   "count":  1,
+                   "id":  "rngtech:tungstensteel_pick_head"
+               }
+}

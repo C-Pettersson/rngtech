@@ -1,0 +1,31 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "rngtech:material_enabled",
+      "material": "aluminum"
+    }
+  ],
+  "type": "rngtech:metal_press",
+  "group": "metal_press_gears",
+  "ingredient": {
+    "tag": "c:ingots/aluminum"
+  },
+  "input_count": 3,
+  "mold": {
+    "item": "rngtech:gear_mold"
+  },
+  "result": {
+    "count": 1,
+    "id": "rngtech:aluminum_gear"
+  },
+  "processing_ticks": 300,
+  "energy": 3600,
+  "minimum_temperature": 1300,
+  "safe_maximum_temperature": 1600,
+  "required_temperature_stability": 0.95,
+  "failure_output": {
+    "count": 3,
+    "id": "rngtech:malformed_ingot"
+  },
+  "failure_material": "aluminum"
+}

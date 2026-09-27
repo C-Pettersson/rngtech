@@ -1,0 +1,51 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "rngtech:material_enabled",
+      "material": "titanium"
+    }
+  ],
+  "type": "rngtech:calibrated_shaped",
+  "category": "redstone",
+  "pattern": [
+    "PHP",
+    "CMC",
+    "PBP"
+  ],
+  "key": {
+    "B": {
+      "ingredient": {
+        "item": "rngtech:calibrated_conductive_component"
+      },
+      "calibration": {
+        "family": "conductive",
+        "min_stage": 5,
+        "min_stability": 70
+      }
+    },
+    "C": {
+      "ingredient": {
+        "item": "rngtech:titanium_crush_head"
+      }
+    },
+    "H": {
+      "ingredient": {
+        "item": "rngtech:titanium_heat_core"
+      }
+    },
+    "M": {
+      "ingredient": {
+        "item": "rngtech:advanced_machine_frame"
+      }
+    },
+    "P": {
+      "ingredient": {
+        "item": "rngtech:titanium_plate"
+      }
+    }
+  },
+  "result": {
+    "count": 1,
+    "id": "rngtech:melter"
+  }
+}

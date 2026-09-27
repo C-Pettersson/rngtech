@@ -1,0 +1,35 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "rngtech:material_enabled",
+      "material": "aluminum"
+    }
+  ],
+  "type": "rngtech:trait_shaped",
+  "category": "redstone",
+  "pattern": [
+    "ACA",
+    "BMB",
+    "APA"
+  ],
+  "key": {
+    "A": {
+      "item": "rngtech:aluminum_plate"
+    },
+    "B": {
+      "item": "rngtech:bus_bar"
+    },
+    "C": {
+      "item": "rngtech:aluminum_casing"
+    },
+    "M": {
+      "tag": "rngtech:machine_frames/base"
+    },
+    "P": {
+      "item": "rngtech:aluminum_heat_core"
+    }
+  },
+  "result": {
+    "id": "rngtech:syngas_combustor"
+  }
+}

@@ -1,0 +1,32 @@
+{
+    "type": "rngtech:component_recycling",
+    "ingredient": {
+        "item": "rngtech:wooden_crusher_chassis"
+    },
+    "minimum_processing_level": 1,
+    "processing_ticks": 132,
+    "energy": 600,
+    "outputs": [
+        {
+            "stack": {
+                "id": "minecraft:stick",
+                "count": 3
+            },
+            "requires_filter": false
+        },
+        {
+            "stack": {
+                "id": "minecraft:flint",
+                "count": 1
+            },
+            "requires_filter": false
+        },
+        {
+            "stack": {
+                "id": "minecraft:oak_planks",
+                "count": 2
+            },
+            "requires_filter": true
+        }
+    ]
+}

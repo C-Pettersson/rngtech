@@ -1,0 +1,30 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "rngtech:material_enabled",
+      "material": "sparksteel"
+    }
+  ],
+  "type": "rngtech:metal_press",
+  "group": "metal_press_plates",
+  "ingredient": {
+    "tag": "c:ingots/sparksteel"
+  },
+  "mold": {
+    "item": "rngtech:plate_mold"
+  },
+  "result": {
+    "count": 1,
+    "id": "rngtech:sparksteel_plate"
+  },
+  "processing_ticks": 200,
+  "energy": 2400,
+  "minimum_temperature": 1300,
+  "safe_maximum_temperature": 1600,
+  "required_temperature_stability": 0.95,
+  "failure_output": {
+    "count": 1,
+    "id": "rngtech:malformed_ingot"
+  },
+  "failure_material": "sparksteel"
+}

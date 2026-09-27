@@ -1,0 +1,17 @@
+{
+  "type": "rngtech:trait_shaped",
+  "category": "misc",
+  "pattern": [
+    "EPE",
+    "PCP",
+    "EPE"
+  ],
+  "key": {
+    "C": { "item": "rngtech:tungstensteel_casing" },
+    "E": { "item": "minecraft:ender_pearl" },
+    "P": { "item": "rngtech:tungstensteel_plate" }
+  },
+  "result": {
+    "id": "rngtech:tungstensteel_dimensional_stabilizer"
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "type": "rngtech:component_recycling",
+  "ingredient": {
+    "item": "rngtech:ammonia_fuel_cell"
+  },
+  "minimum_processing_level": 6,
+  "processing_ticks": 192,
+  "energy": 2220,
+  "outputs": [
+    {
+      "stack": {
+        "id": "rngtech:fuel_cell_membrane",
+        "count": 1
+      },
+      "requires_filter": false
+    },
+    {
+      "stack": {
+        "id": "rngtech:titanium_casing",
+        "count": 1
+      },
+      "requires_filter": false
+    },
+    {
+      "stack": {
+        "id": "rngtech:bus_bar",
+        "count": 1
+      },
+      "requires_filter": true
+    }
+  ]
+}

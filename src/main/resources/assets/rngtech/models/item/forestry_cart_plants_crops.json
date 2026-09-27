@@ -1,0 +1,14 @@
+{
+  "parent": "rngtech:item/forestry_cart_base",
+  "textures": {
+    "accent": "rngtech:item/forestry_cart_crop_accent",
+    "body": "rngtech:item/forestry_cart_copper_body",
+    "deck": "rngtech:item/forestry_cart_wood_deck",
+    "frame": "rngtech:item/forestry_cart_iron_frame",
+    "payload": "rngtech:item/forestry_cart_crop_bed_payload",
+    "screen": "rngtech:item/forestry_cart_crop_status_screen",
+    "tool": "rngtech:item/forestry_cart_cultivator_head",
+    "wheel": "rngtech:item/forestry_cart_wheel_tread",
+    "particle": "rngtech:item/forestry_cart_crop_bed_payload"
+  }
+}

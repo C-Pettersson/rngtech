@@ -1,0 +1,12 @@
+{
+  "parent": "minecraft:block/cube",
+  "textures": {
+    "down": "rngtech:block/solar_panel/bottom/copper_solar_panel",
+    "up": "rngtech:block/solar_panel/top/copper_solar_panel_active",
+    "north": "rngtech:block/solar_panel/front/copper_solar_panel_active",
+    "south": "rngtech:block/solar_panel/side/copper_solar_panel",
+    "east": "rngtech:block/solar_panel/side/copper_solar_panel",
+    "west": "rngtech:block/solar_panel/side/copper_solar_panel",
+    "particle": "rngtech:block/solar_panel/top/copper_solar_panel_active"
+  }
+}

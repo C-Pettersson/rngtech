@@ -1,0 +1,32 @@
+{
+    "neoforge:conditions": [
+        {
+            "type": "rngtech:material_enabled",
+            "material": "naquadah"
+        }
+    ],
+    "type": "rngtech:trait_shaped",
+    "category": "misc",
+    "pattern": [
+        "EPE",
+        "PFP",
+        "EUE"
+    ],
+    "key": {
+        "E": {
+            "item": "minecraft:ender_eye"
+        },
+        "F": {
+            "tag": "rngtech:machine_frames/exotic"
+        },
+        "P": {
+            "item": "rngtech:naquadah_plate"
+        },
+        "U": {
+            "tag": "c:circuits/ultimate"
+        }
+    },
+    "result": {
+        "id": "rngtech:exotic_void_chamber"
+    }
+}

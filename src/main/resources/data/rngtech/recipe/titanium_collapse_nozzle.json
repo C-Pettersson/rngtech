@@ -1,0 +1,29 @@
+{
+    "neoforge:conditions": [
+        {
+            "type": "rngtech:material_enabled",
+            "material": "titanium"
+        }
+    ],
+    "type": "rngtech:trait_shaped",
+    "category": "misc",
+    "pattern": [
+        " P ",
+        "PCP",
+        " S "
+    ],
+    "key": {
+        "C": {
+            "item": "rngtech:titanium_casing"
+        },
+        "P": {
+            "item": "rngtech:titanium_plate"
+        },
+        "S": {
+            "item": "rngtech:silica_gel_beads"
+        }
+    },
+    "result": {
+        "id": "rngtech:titanium_collapse_nozzle"
+    }
+}

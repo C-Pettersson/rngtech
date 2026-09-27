@@ -1,0 +1,33 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "rngtech:material_enabled",
+      "material": "steel"
+    }
+  ],
+  "type": "rngtech:trait_shaped",
+  "category": "redstone",
+  "pattern": [
+    "PBP",
+    "GCG",
+    "PBP"
+  ],
+  "key": {
+    "B": {
+      "item": "minecraft:bucket"
+    },
+    "C": {
+      "item": "rngtech:basic_fluid_connector"
+    },
+    "G": {
+      "item": "rngtech:steel_gear"
+    },
+    "P": {
+      "item": "rngtech:steel_plate"
+    }
+  },
+  "result": {
+    "count": 1,
+    "id": "rngtech:pump_frame"
+  }
+}

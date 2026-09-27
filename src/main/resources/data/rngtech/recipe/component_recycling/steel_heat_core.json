@@ -1,0 +1,32 @@
+{
+    "type": "rngtech:component_recycling",
+    "ingredient": {
+        "item": "rngtech:steel_heat_core"
+    },
+    "minimum_processing_level": 4,
+    "processing_ticks": 128,
+    "energy": 1280,
+    "outputs": [
+        {
+            "stack": {
+                "id": "rngtech:steel_coil",
+                "count": 1
+            },
+            "requires_filter": false
+        },
+        {
+            "stack": {
+                "id": "rngtech:heat_core",
+                "count": 1
+            },
+            "requires_filter": false
+        },
+        {
+            "stack": {
+                "id": "minecraft:blaze_rod",
+                "count": 1
+            },
+            "requires_filter": true
+        }
+    ]
+}

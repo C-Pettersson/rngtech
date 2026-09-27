@@ -1,0 +1,16 @@
+{
+  "type": "rngtech:vacuum_collapse",
+  "group": "vacuum_collapse",
+  "ingredient": {
+    "item": "rngtech:void_catalyst"
+  },
+  "minimum_chamber_stage": 7,
+  "minimum_stability": 1.0,
+  "energy": 1200000,
+  "processing_ticks": 600,
+  "instability": 0.18,
+  "residue": {
+    "id": "rngtech:collapse_residue"
+  },
+  "residue_requires_stabilizer": true
+}

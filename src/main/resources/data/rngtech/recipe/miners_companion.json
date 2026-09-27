@@ -1,0 +1,40 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "rngtech:material_enabled",
+      "material": "iron"
+    },
+    {
+      "type": "rngtech:material_enabled",
+      "material": "copper"
+    }
+  ],
+  "type": "rngtech:trait_shaped",
+  "category": "redstone",
+  "pattern": [
+    "PRP",
+    "CHC",
+    "PBP"
+  ],
+  "key": {
+    "B": {
+      "item": "rngtech:cell_shell"
+    },
+    "C": {
+      "item": "rngtech:conductive_plate"
+    },
+    "H": {
+      "item": "minecraft:hopper"
+    },
+    "P": {
+      "item": "rngtech:iron_plate"
+    },
+    "R": {
+      "item": "minecraft:redstone"
+    }
+  },
+  "result": {
+    "count": 1,
+    "id": "rngtech:miners_companion"
+  }
+}

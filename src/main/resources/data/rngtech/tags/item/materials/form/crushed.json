@@ -1,0 +1,28 @@
+{
+  "replace": false,
+  "values": [
+    "rngtech:crushed_iron",
+    "rngtech:crushed_copper",
+    "rngtech:crushed_bronze",
+    "rngtech:crushed_tin",
+    "rngtech:crushed_zinc",
+    "rngtech:crushed_gold",
+    "rngtech:crushed_steel",
+    "rngtech:crushed_invar",
+    "rngtech:crushed_nickel",
+    "rngtech:crushed_lead",
+    "rngtech:crushed_silver",
+    "rngtech:crushed_aluminum",
+    "rngtech:crushed_sparksteel",
+    "rngtech:crushed_osmium",
+    "rngtech:crushed_titanium",
+    "rngtech:crushed_arclite",
+    "rngtech:crushed_tungsten",
+    "rngtech:crushed_tungstensteel",
+    "rngtech:crushed_nullite",
+    "rngtech:crushed_aethergold",
+    "rngtech:crushed_platinum",
+    "rngtech:crushed_netherite",
+    "rngtech:crushed_naquadah"
+  ]
+}

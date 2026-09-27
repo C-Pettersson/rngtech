@@ -1,0 +1,12 @@
+{
+  "parent": "minecraft:block/cube",
+  "textures": {
+    "down": "rngtech:block/syngas_combustor/bottom/syngas_combustor",
+    "up": "rngtech:block/syngas_combustor/top/syngas_combustor",
+    "north": "rngtech:block/syngas_combustor/front/syngas_combustor",
+    "south": "rngtech:block/syngas_combustor/side/syngas_combustor",
+    "east": "rngtech:block/syngas_combustor/side/syngas_combustor",
+    "west": "rngtech:block/syngas_combustor/side/syngas_combustor",
+    "particle": "rngtech:block/syngas_combustor/front/syngas_combustor"
+  }
+}

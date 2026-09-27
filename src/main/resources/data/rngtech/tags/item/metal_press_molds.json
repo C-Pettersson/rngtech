@@ -1,0 +1,9 @@
+{
+  "values": [
+    "rngtech:plate_mold",
+    "rngtech:casing_mold",
+    "rngtech:gear_mold",
+    "rngtech:circuit_mold",
+    "rngtech:connector_mold"
+  ]
+}

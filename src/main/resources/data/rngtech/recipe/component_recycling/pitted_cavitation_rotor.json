@@ -1,0 +1,18 @@
+{
+  "type": "rngtech:component_recycling",
+  "ingredient": {
+    "item": "rngtech:pitted_cavitation_rotor"
+  },
+  "minimum_processing_level": 5,
+  "processing_ticks": 120,
+  "energy": 1200,
+  "outputs": [
+    {
+      "stack": {
+        "id": "rngtech:recycling_byproduct",
+        "count": 1
+      },
+      "requires_filter": false
+    }
+  ]
+}

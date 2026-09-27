@@ -1,0 +1,25 @@
+{
+    "type":  "rngtech:component_recycling",
+    "ingredient":  {
+                       "item":  "rngtech:iron_disassembly_head"
+                   },
+    "minimum_processing_level":  1,
+    "processing_ticks":  92,
+    "energy":  780,
+    "outputs":  [
+                    {
+                        "stack":  {
+                                      "id":  "rngtech:iron_gear",
+                                      "count":  1
+                                  },
+                        "requires_filter":  false
+                    },
+                    {
+                        "stack":  {
+                                      "id":  "rngtech:iron_plate",
+                                      "count":  2
+                                  },
+                        "requires_filter":  true
+                    }
+                ]
+}

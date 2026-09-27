@@ -1,0 +1,36 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "refinedstorage"
+    }
+  ],
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "CDC",
+    "AUA",
+    "CEC"
+  ],
+  "key": {
+    "A": {
+      "item": "refinedstorage:cable"
+    },
+    "C": {
+      "item": "rngtech:basic_item_connector"
+    },
+    "D": {
+      "item": "refinedstorage:destruction_core"
+    },
+    "E": {
+      "item": "refinedstorage:construction_core"
+    },
+    "U": {
+      "item": "rngtech:universal_connector"
+    }
+  },
+  "result": {
+    "count": 1,
+    "id": "rngtech:refined_storage_network_connector"
+  }
+}

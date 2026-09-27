@@ -1,0 +1,9 @@
+{
+  "values": [
+    "rngtech:basic_fluid_connector",
+    "rngtech:copper_fluid_connector",
+    "rngtech:gold_fluid_connector",
+    "rngtech:sparksteel_fluid_connector",
+    "rngtech:arclite_fluid_connector"
+  ]
+}

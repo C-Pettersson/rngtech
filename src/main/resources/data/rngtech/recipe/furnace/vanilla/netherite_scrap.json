@@ -1,0 +1,15 @@
+{
+    "type": "rngtech:furnace",
+    "ingredient": {
+        "item": "minecraft:ancient_debris"
+    },
+    "result": {
+        "id": "minecraft:netherite_scrap"
+    },
+    "processing_ticks": 200,
+    "energy": 4800,
+    "experience": 2,
+    "minimum_temperature": 2000,
+    "required_temperature_stability": 1.05,
+    "machine_xp": 8
+}

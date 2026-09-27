@@ -1,0 +1,30 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "rngtech:material_enabled",
+      "material": "iron"
+    }
+  ],
+  "type": "rngtech:metal_press",
+  "group": "metal_press_energy_connectors",
+  "ingredient": {
+    "item": "rngtech:iron_coil"
+  },
+  "input_count": 1,
+  "mold": {
+    "item": "rngtech:connector_mold"
+  },
+  "result": {
+    "count": 2,
+    "id": "rngtech:basic_energy_connector"
+  },
+  "processing_ticks": 120,
+  "energy": 1200,
+  "minimum_temperature": 900,
+  "safe_maximum_temperature": 1300,
+  "required_temperature_stability": 1.0,
+  "failure_output": {
+    "count": 1,
+    "id": "rngtech:scrap"
+  }
+}

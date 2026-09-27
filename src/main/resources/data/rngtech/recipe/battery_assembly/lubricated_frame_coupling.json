@@ -1,0 +1,30 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "rngtech:material_enabled",
+      "material": "tungstensteel"
+    }
+  ],
+  "type": "rngtech:battery_assembly",
+  "group": "component_assembly_frame_parts",
+  "ingredients": [
+    {
+      "ingredient": {
+        "item": "rngtech:tungstensteel_casing"
+      }
+    }
+  ],
+  "fluid_input": {
+    "ingredient": {
+      "fluid": "rngtech:lubricant"
+    },
+    "amount": 1000
+  },
+  "result": {
+    "count": 1,
+    "id": "rngtech:lubricated_frame_coupling"
+  },
+  "processing_ticks": 160,
+  "energy": 2400,
+  "roll_result_traits": false
+}

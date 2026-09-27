@@ -1,0 +1,15 @@
+{
+  "type": "rngtech:trait_shaped",
+  "category": "misc",
+  "pattern": [
+    "IPI",
+    "PFP",
+    "IPI"
+  ],
+  "key": {
+    "F": { "tag": "rngtech:machine_frames/base" },
+    "I": { "tag": "c:ingots/iron" },
+    "P": { "item": "minecraft:paper" }
+  },
+  "result": { "count": 1, "id": "rngtech:structural_calibration_pattern" }
+}

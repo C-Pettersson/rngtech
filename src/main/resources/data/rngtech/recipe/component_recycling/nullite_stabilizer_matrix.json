@@ -1,0 +1,32 @@
+{
+  "type": "rngtech:component_recycling",
+  "ingredient": {
+    "item": "rngtech:nullite_stabilizer_matrix"
+  },
+  "minimum_processing_level": 7,
+  "processing_ticks": 164,
+  "energy": 1790,
+  "outputs": [
+    {
+      "stack": {
+        "id": "rngtech:matrix",
+        "count": 1
+      },
+      "requires_filter": false
+    },
+    {
+      "stack": {
+        "id": "rngtech:nullite_ingot",
+        "count": 1
+      },
+      "requires_filter": false
+    },
+    {
+      "stack": {
+        "id": "rngtech:stabilization_catalyst",
+        "count": 1
+      },
+      "requires_filter": true
+    }
+  ]
+}

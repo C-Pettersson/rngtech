@@ -1,0 +1,34 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "rngtech:material_enabled",
+      "material": "bronze"
+    },
+    {
+      "type": "rngtech:material_enabled",
+      "material": "steel"
+    }
+  ],
+  "type": "rngtech:trait_shaped",
+  "category": "misc",
+  "pattern": [
+    "BIB",
+    "IGI",
+    "BIB"
+  ],
+  "key": {
+    "B": {
+      "item": "rngtech:bronze_plate"
+    },
+    "G": {
+      "item": "rngtech:bronze_gear"
+    },
+    "I": {
+      "tag": "c:ingots/steel"
+    }
+  },
+  "result": {
+    "count": 1,
+    "id": "rngtech:gear_mold"
+  }
+}

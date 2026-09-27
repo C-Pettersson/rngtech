@@ -1,0 +1,13 @@
+{
+    "type": "rngtech:furnace",
+    "ingredient": {
+        "item": "minecraft:nether_quartz_ore"
+    },
+    "result": {
+        "id": "minecraft:quartz"
+    },
+    "processing_ticks": 200,
+    "energy": 4800,
+    "experience": 0.2,
+    "machine_xp": 1
+}

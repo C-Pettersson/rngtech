@@ -1,0 +1,37 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "rngtech:material_enabled",
+      "material": "bronze"
+    }
+  ],
+  "type": "rngtech:calibrated_shaped",
+  "category": "misc",
+  "pattern": [
+    "BBB",
+    "RMR",
+    "SXS"
+  ],
+  "key": {
+    "B": {
+      "ingredient": { "tag": "c:ingots/bronze" }
+    },
+    "M": {
+      "ingredient": { "tag": "rngtech:machine_frames/base" }
+    },
+    "R": {
+      "ingredient": { "item": "minecraft:redstone" }
+    },
+    "S": {
+      "ingredient": { "item": "minecraft:smooth_stone" }
+    },
+    "X": {
+      "ingredient": { "item": "rngtech:calibrated_kinetic_component" },
+      "calibration": { "family": "kinetic", "min_stage": 1, "min_stability": 45 }
+    }
+  },
+  "result": {
+    "count": 1,
+    "id": "rngtech:bronze_crusher_chassis"
+  }
+}

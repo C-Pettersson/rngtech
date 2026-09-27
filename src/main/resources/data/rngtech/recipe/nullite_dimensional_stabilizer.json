@@ -1,0 +1,32 @@
+{
+    "neoforge:conditions": [
+        {
+            "type": "rngtech:material_enabled",
+            "material": "nullite"
+        }
+    ],
+    "type": "rngtech:trait_shaped",
+    "category": "misc",
+    "pattern": [
+        "EPE",
+        "PCP",
+        "EUE"
+    ],
+    "key": {
+        "C": {
+            "item": "rngtech:nullite_coil"
+        },
+        "E": {
+            "item": "minecraft:ender_pearl"
+        },
+        "P": {
+            "item": "rngtech:nullite_plate"
+        },
+        "U": {
+            "tag": "c:circuits/ultimate"
+        }
+    },
+    "result": {
+        "id": "rngtech:nullite_dimensional_stabilizer"
+    }
+}

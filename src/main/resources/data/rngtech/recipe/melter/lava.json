@@ -1,0 +1,24 @@
+{
+  "type": "rngtech:melter",
+  "group": "melter_lava",
+  "primary_ingredient": {
+    "item": "minecraft:stone"
+  },
+  "secondary_ingredient": {
+    "item": "minecraft:blaze_powder"
+  },
+  "fluid_input": {
+    "ingredient": {
+      "fluid": "minecraft:water"
+    },
+    "amount": 1000
+  },
+  "fluid_output": {
+    "id": "minecraft:lava",
+    "amount": 1000
+  },
+  "processing_ticks": 360,
+  "energy": 9600,
+  "minimum_temperature": 1200,
+  "required_processing_level": 6
+}

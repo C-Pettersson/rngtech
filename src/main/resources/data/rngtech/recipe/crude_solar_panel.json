@@ -1,0 +1,20 @@
+{
+  "type": "rngtech:trait_shaped",
+  "category": "redstone",
+  "pattern": [
+    "GGG",
+    "RCR",
+    "PWP"
+  ],
+  "key": {
+    "C": { "item": "rngtech:basic_electric_circuit" },
+    "G": { "item": "minecraft:glass_pane" },
+    "P": { "item": "rngtech:iron_plate" },
+    "R": { "item": "minecraft:redstone" },
+    "W": { "item": "rngtech:cable" }
+  },
+  "result": {
+    "count": 1,
+    "id": "rngtech:crude_solar_panel"
+  }
+}

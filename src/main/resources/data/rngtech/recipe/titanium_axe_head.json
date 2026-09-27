@@ -1,0 +1,30 @@
+{
+    "type":  "rngtech:trait_shaped",
+    "key":  {
+                "G":  {
+                          "item":  "rngtech:titanium_gear"
+                      },
+                "R":  {
+                          "item":  "rngtech:titanium_rod"
+                      },
+                "P":  {
+                          "item":  "rngtech:titanium_plate"
+                      }
+            },
+    "category":  "equipment",
+    "neoforge:conditions":  [
+                                {
+                                    "material":  "titanium",
+                                    "type":  "rngtech:material_enabled"
+                                }
+                            ],
+    "pattern":  [
+                    "PP ",
+                    "PG ",
+                    " R "
+                ],
+    "result":  {
+                   "count":  1,
+                   "id":  "rngtech:titanium_axe_head"
+               }
+}

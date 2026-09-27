@@ -1,0 +1,32 @@
+{
+    "type": "rngtech:component_recycling",
+    "ingredient": {
+        "item": "rngtech:crude_solid_fuel_burner"
+    },
+    "minimum_processing_level": 1,
+    "processing_ticks": 124,
+    "energy": 1070,
+    "outputs": [
+        {
+            "stack": {
+                "id": "rngtech:solid_fuel_burner_machine_chassis",
+                "count": 1
+            },
+            "requires_filter": false
+        },
+        {
+            "stack": {
+                "id": "minecraft:iron_ingot",
+                "count": 1
+            },
+            "requires_filter": false
+        },
+        {
+            "stack": {
+                "id": "minecraft:coal",
+                "count": 1
+            },
+            "requires_filter": true
+        }
+    ]
+}

@@ -1,0 +1,12 @@
+{
+    "type": "rngtech:furnace",
+    "ingredient": {
+        "item": "minecraft:sea_pickle"
+    },
+    "result": {
+        "id": "minecraft:lime_dye"
+    },
+    "processing_ticks": 200,
+    "energy": 4800,
+    "experience": 0.1
+}

@@ -1,0 +1,14 @@
+{
+  "replace": false,
+  "values": [
+    "rngtech:steel_ingot",
+    "rngtech:steel_nugget",
+    "rngtech:steel_storage_block",
+    "rngtech:crushed_steel",
+    "rngtech:steel_plate",
+    "rngtech:steel_gear",
+    "rngtech:steel_rod",
+    "rngtech:steel_coil",
+    "rngtech:steel_casing"
+  ]
+}

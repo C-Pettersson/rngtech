@@ -1,0 +1,25 @@
+{
+    "type":  "rngtech:component_recycling",
+    "ingredient":  {
+                       "item":  "rngtech:bronze_disassembly_head"
+                   },
+    "minimum_processing_level":  3,
+    "processing_ticks":  116,
+    "energy":  1140,
+    "outputs":  [
+                    {
+                        "stack":  {
+                                      "id":  "rngtech:bronze_gear",
+                                      "count":  1
+                                  },
+                        "requires_filter":  false
+                    },
+                    {
+                        "stack":  {
+                                      "id":  "rngtech:bronze_plate",
+                                      "count":  2
+                                  },
+                        "requires_filter":  true
+                    }
+                ]
+}

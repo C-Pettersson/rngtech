@@ -1,0 +1,21 @@
+{
+  "type": "rngtech:trait_shaped",
+  "category": "equipment",
+  "key": {
+    "F": {
+      "item": "minecraft:flint"
+    },
+    "B": {
+      "tag": "minecraft:wooden_buttons"
+    }
+  },
+  "pattern": [
+    "FFF",
+    " B ",
+    " F "
+  ],
+  "result": {
+    "count": 1,
+    "id": "rngtech:flint_digger_head"
+  }
+}

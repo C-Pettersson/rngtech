@@ -1,0 +1,40 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "rngtech:material_enabled",
+      "material": "nullite"
+    },
+    {
+      "type": "rngtech:material_enabled",
+      "material": "titanium"
+    }
+  ],
+  "type": "rngtech:trait_shaped",
+  "category": "redstone",
+  "pattern": [
+    "RLR",
+    "NCN",
+    "RSR"
+  ],
+  "key": {
+    "C": {
+      "tag": "c:circuits/ultimate"
+    },
+    "L": {
+      "item": "rngtech:lubricant_bucket"
+    },
+    "N": {
+      "tag": "c:ingots/nullite"
+    },
+    "R": {
+      "item": "minecraft:redstone"
+    },
+    "S": {
+      "item": "rngtech:titanium_servo"
+    }
+  },
+  "result": {
+    "count": 1,
+    "id": "rngtech:nullite_servo"
+  }
+}

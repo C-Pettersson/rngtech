@@ -1,0 +1,35 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "rngtech:material_enabled",
+      "material": "copper"
+    }
+  ],
+  "type": "rngtech:tool_damage_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "rngtech:forming_hammer"
+    },
+    {
+      "tag": "c:ingots/copper"
+    },
+    {
+      "tag": "c:ingots/copper"
+    },
+    {
+      "tag": "c:ingots/copper"
+    },
+    {
+      "tag": "c:ingots/copper"
+    }
+  ],
+  "tool": {
+    "item": "rngtech:forming_hammer"
+  },
+  "tool_damage": 1,
+  "result": {
+    "id": "rngtech:copper_plate",
+    "count": 2
+  }
+}

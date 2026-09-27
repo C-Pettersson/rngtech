@@ -1,0 +1,35 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "rngtech:material_enabled",
+      "material": "bronze"
+    }
+  ],
+  "type": "rngtech:trait_shaped",
+  "category": "redstone",
+  "pattern": [
+    " NG",
+    "NTN",
+    "GN "
+  ],
+  "key": {
+    "G": {
+      "item": "rngtech:bronze_rod"
+    },
+    "N": {
+      "item": "rngtech:bronze_gear"
+    },
+    "T": [
+      {
+        "item": "minecraft:torchflower"
+      },
+      {
+        "item": "minecraft:blaze_rod"
+      }
+    ]
+  },
+  "result": {
+    "count": 1,
+    "id": "rngtech:ignition_catalyst"
+  }
+}

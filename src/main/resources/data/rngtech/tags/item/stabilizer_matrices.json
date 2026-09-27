@@ -1,0 +1,10 @@
+{
+  "values": [
+    "rngtech:iron_stabilizer_matrix",
+    "rngtech:copper_stabilizer_matrix",
+    "rngtech:steel_stabilizer_matrix",
+    "rngtech:titanium_stabilizer_matrix",
+    "rngtech:tungstensteel_stabilizer_matrix",
+    "rngtech:nullite_stabilizer_matrix"
+  ]
+}

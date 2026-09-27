@@ -1,0 +1,31 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "rngtech:material_enabled",
+      "material": "naquadah"
+    }
+  ],
+  "type": "rngtech:metal_press",
+  "group": "metal_press_gears",
+  "ingredient": {
+    "tag": "c:ingots/naquadah"
+  },
+  "input_count": 3,
+  "mold": {
+    "item": "rngtech:gear_mold"
+  },
+  "result": {
+    "count": 1,
+    "id": "rngtech:naquadah_gear"
+  },
+  "processing_ticks": 300,
+  "energy": 3600,
+  "minimum_temperature": 2000,
+  "safe_maximum_temperature": 2300,
+  "required_temperature_stability": 1.05,
+  "failure_output": {
+    "count": 3,
+    "id": "rngtech:malformed_ingot"
+  },
+  "failure_material": "naquadah"
+}

@@ -1,0 +1,33 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "rngtech:material_enabled",
+      "material": "titanium"
+    }
+  ],
+  "type": "rngtech:trait_shaped",
+  "category": "redstone",
+  "pattern": [
+    "PGP",
+    "EFE",
+    "PGP"
+  ],
+  "key": {
+    "E": {
+      "tag": "c:circuits/elite"
+    },
+    "F": {
+      "item": "rngtech:pump_frame"
+    },
+    "G": {
+      "item": "rngtech:titanium_gear"
+    },
+    "P": {
+      "item": "rngtech:titanium_plate"
+    }
+  },
+  "result": {
+    "count": 1,
+    "id": "rngtech:titanium_fluid_pump"
+  }
+}

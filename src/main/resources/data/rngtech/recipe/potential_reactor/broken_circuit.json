@@ -1,0 +1,13 @@
+{
+  "type": "rngtech:potential_reactor",
+  "ingredient": {
+    "item": "rngtech:broken_circuit"
+  },
+  "energy": 2400,
+  "processing_ticks": 100,
+  "residue": {
+    "count": 1,
+    "id": "rngtech:scrap"
+  },
+  "minimum_material_stage": 1
+}

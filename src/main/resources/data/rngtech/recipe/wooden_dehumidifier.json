@@ -1,0 +1,27 @@
+{
+  "type": "rngtech:trait_shaped",
+  "category": "misc",
+  "pattern": [
+    "PGP",
+    "GBG",
+    "PCP"
+  ],
+  "key": {
+    "B": {
+      "item": "minecraft:barrel"
+    },
+    "C": {
+      "item": "minecraft:copper_ingot"
+    },
+    "G": {
+      "item": "minecraft:glass_pane"
+    },
+    "P": {
+      "item": "rngtech:waterproofed_planks"
+    }
+  },
+  "result": {
+    "count": 1,
+    "id": "rngtech:wooden_dehumidifier"
+  }
+}

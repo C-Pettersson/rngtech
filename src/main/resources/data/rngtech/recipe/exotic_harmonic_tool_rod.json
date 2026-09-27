@@ -1,0 +1,21 @@
+{
+    "type":  "rngtech:trait_shaped",
+    "key":  {
+                "R":  {
+                          "tag":  "rngtech:materials/exotic/rods"
+                      },
+                "P":  {
+                          "tag":  "rngtech:materials/exotic/plates"
+                      }
+            },
+    "category":  "equipment",
+    "pattern":  [
+                    " P ",
+                    " R ",
+                    " R "
+                ],
+    "result":  {
+                   "count":  1,
+                   "id":  "rngtech:exotic_harmonic_tool_rod"
+               }
+}

@@ -1,0 +1,30 @@
+{
+  "type": "rngtech:trait_shaped",
+  "category": "equipment",
+  "neoforge:conditions": [
+    {
+      "type": "rngtech:material_enabled",
+      "material": "nullite"
+    }
+  ],
+  "key": {
+    "G": {
+      "item": "rngtech:nullite_gear"
+    },
+    "R": {
+      "item": "rngtech:nullite_rod"
+    },
+    "P": {
+      "item": "rngtech:nullite_plate"
+    }
+  },
+  "pattern": [
+    "PPP",
+    "PGP",
+    " R "
+  ],
+  "result": {
+    "count": 1,
+    "id": "rngtech:nullite_digger_head"
+  }
+}

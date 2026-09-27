@@ -1,0 +1,8 @@
+{
+  "values": [
+    "rngtech:iron_recovery_filter",
+    "rngtech:copper_recovery_filter",
+    "rngtech:bronze_recovery_filter",
+    "rngtech:steel_recovery_filter"
+  ]
+}

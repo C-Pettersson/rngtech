@@ -1,0 +1,21 @@
+{
+    "neoforge:conditions": [
+        {
+            "type": "rngtech:material_enabled",
+            "material": "lead"
+        }
+    ],
+    "type": "rngtech:furnace",
+    "group": "rngtech_metals",
+    "ingredient": {
+        "item": "rngtech:lead_dust"
+    },
+    "result": {
+        "id": "rngtech:lead_ingot"
+    },
+    "processing_ticks": 200,
+    "energy": 4800,
+    "experience": 0.7,
+    "minimum_temperature": 1100,
+    "required_temperature_stability": 0.95
+}

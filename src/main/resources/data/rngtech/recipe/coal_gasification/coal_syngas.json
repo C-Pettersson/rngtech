@@ -1,0 +1,23 @@
+{
+  "type": "rngtech:coal_gasification",
+  "group": "coal_gasification",
+  "carbon_input": {
+    "tag": "c:dusts/coal"
+  },
+  "water_input": {
+    "ingredient": {
+      "fluid": "minecraft:water"
+    },
+    "amount": 500
+  },
+  "output": {
+    "id": "rngtech:syngas",
+    "amount": 1000
+  },
+  "residue": {
+    "id": "rngtech:gasification_residue"
+  },
+  "energy": 6000,
+  "processing_ticks": 240,
+  "minimum_heat_core_stage": 5
+}

@@ -1,0 +1,35 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "rngtech:material_enabled",
+      "material": "iron"
+    }
+  ],
+  "type": "rngtech:tool_damage_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "rngtech:forming_hammer"
+    },
+    {
+      "tag": "c:ingots/iron"
+    },
+    {
+      "tag": "c:ingots/iron"
+    },
+    {
+      "tag": "c:ingots/iron"
+    },
+    {
+      "tag": "c:ingots/iron"
+    }
+  ],
+  "tool": {
+    "item": "rngtech:forming_hammer"
+  },
+  "tool_damage": 1,
+  "result": {
+    "id": "rngtech:iron_plate",
+    "count": 2
+  }
+}

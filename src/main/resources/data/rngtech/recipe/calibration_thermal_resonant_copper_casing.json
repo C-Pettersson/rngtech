@@ -1,0 +1,17 @@
+{
+  "type": "rngtech:calibration",
+  "family": "thermal",
+  "ingredient": { "item": "rngtech:copper_casing" },
+  "pattern": { "item": "rngtech:thermal_calibration_pattern" },
+  "catalyst": { "item": "rngtech:matrix" },
+  "stabilizer": { "item": "rngtech:stabilization_catalyst" },
+  "minimum_stage": 4,
+  "processing_ticks": 320,
+  "energy": 5000,
+  "result": {
+    "stack": { "id": "rngtech:calibrated_thermal_component" },
+    "stage": 2,
+    "stability": { "min": 65, "max": 95 },
+    "refinement_potential": { "min": 1, "max": 3 }
+  }
+}

@@ -1,0 +1,33 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "rngtech:material_enabled",
+      "material": "steel"
+    }
+  ],
+  "type": "rngtech:trait_shaped",
+  "category": "redstone",
+  "pattern": [
+    "IPI",
+    "HOH",
+    "IPI"
+  ],
+  "key": {
+    "H": {
+      "item": "minecraft:hopper"
+    },
+    "I": {
+      "tag": "c:ingots/steel"
+    },
+    "O": {
+      "item": "rngtech:output_bin"
+    },
+    "P": {
+      "item": "rngtech:steel_plate"
+    }
+  },
+  "result": {
+    "count": 1,
+    "id": "rngtech:steel_recovery_filter"
+  }
+}

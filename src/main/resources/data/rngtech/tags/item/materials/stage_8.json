@@ -1,0 +1,29 @@
+{
+  "replace": false,
+  "values": [
+    "minecraft:netherite_ingot",
+    "rngtech:netherite_dust",
+    "rngtech:netherite_nugget",
+    "minecraft:netherite_block",
+    "minecraft:ancient_debris",
+    "rngtech:raw_netherite",
+    "rngtech:crushed_netherite",
+    "rngtech:netherite_plate",
+    "rngtech:netherite_gear",
+    "rngtech:netherite_rod",
+    "rngtech:netherite_coil",
+    "rngtech:naquadah_ingot",
+    "rngtech:naquadah_dust",
+    "rngtech:naquadah_nugget",
+    "rngtech:naquadah_storage_block",
+    "rngtech:naquadah_ore",
+    "rngtech:deepslate_naquadah_ore",
+    "rngtech:raw_naquadah",
+    "rngtech:crushed_naquadah",
+    "rngtech:naquadah_plate",
+    "rngtech:naquadah_gear",
+    "rngtech:naquadah_rod",
+    "rngtech:naquadah_coil",
+    "rngtech:naquadah_casing"
+  ]
+}

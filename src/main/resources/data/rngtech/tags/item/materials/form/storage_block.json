@@ -1,0 +1,28 @@
+{
+  "replace": false,
+  "values": [
+    "minecraft:iron_block",
+    "minecraft:copper_block",
+    "rngtech:bronze_storage_block",
+    "rngtech:tin_storage_block",
+    "rngtech:zinc_storage_block",
+    "minecraft:gold_block",
+    "rngtech:steel_storage_block",
+    "rngtech:invar_storage_block",
+    "rngtech:nickel_storage_block",
+    "rngtech:lead_storage_block",
+    "rngtech:silver_storage_block",
+    "rngtech:aluminum_storage_block",
+    "rngtech:sparksteel_storage_block",
+    "rngtech:osmium_storage_block",
+    "rngtech:titanium_storage_block",
+    "rngtech:arclite_storage_block",
+    "rngtech:tungsten_storage_block",
+    "rngtech:tungstensteel_storage_block",
+    "rngtech:nullite_storage_block",
+    "rngtech:aethergold_storage_block",
+    "rngtech:platinum_storage_block",
+    "minecraft:netherite_block",
+    "rngtech:naquadah_storage_block"
+  ]
+}

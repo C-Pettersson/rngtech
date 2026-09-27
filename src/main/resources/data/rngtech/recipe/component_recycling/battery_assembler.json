@@ -1,0 +1,32 @@
+{
+  "type": "rngtech:component_recycling",
+  "ingredient": {
+    "item": "rngtech:battery_assembler"
+  },
+  "minimum_processing_level": 2,
+  "processing_ticks": 144,
+  "energy": 1340,
+  "outputs": [
+    {
+      "stack": {
+        "id": "rngtech:machine_frame",
+        "count": 1
+      },
+      "requires_filter": false
+    },
+    {
+      "stack": {
+        "id": "rngtech:conductive_plate",
+        "count": 1
+      },
+      "requires_filter": false
+    },
+    {
+      "stack": {
+        "id": "rngtech:cell_shell",
+        "count": 2
+      },
+      "requires_filter": true
+    }
+  ]
+}

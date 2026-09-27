@@ -1,0 +1,28 @@
+{
+  "type": "rngtech:calibrated_shaped",
+  "category": "equipment",
+  "pattern": [
+    "PPP",
+    "BKB",
+    " A "
+  ],
+  "key": {
+    "A": {
+      "ingredient": { "item": "rngtech:ascension_matrix" }
+    },
+    "B": {
+      "ingredient": { "item": "rngtech:tungstensteel_plate" }
+    },
+    "K": {
+      "ingredient": { "item": "rngtech:calibrated_kinetic_component" },
+      "calibration": { "family": "kinetic", "min_stage": 1, "min_stability": 85 }
+    },
+    "P": {
+      "ingredient": { "tag": "rngtech:materials/exotic/plates" }
+    }
+  },
+  "result": {
+    "count": 1,
+    "id": "rngtech:exotic_crush_head"
+  }
+}

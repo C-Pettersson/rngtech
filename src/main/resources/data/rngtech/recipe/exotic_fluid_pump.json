@@ -1,0 +1,33 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "rngtech:material_enabled",
+      "material": "tungstensteel"
+    }
+  ],
+  "type": "rngtech:trait_shaped",
+  "category": "redstone",
+  "pattern": [
+    "NGN",
+    "AFA",
+    "NGN"
+  ],
+  "key": {
+    "A": {
+      "item": "rngtech:ascension_matrix"
+    },
+    "F": {
+      "item": "rngtech:pump_frame"
+    },
+    "G": {
+      "tag": "rngtech:materials/exotic/gears"
+    },
+    "N": {
+      "tag": "rngtech:materials/exotic/ingots"
+    }
+  },
+  "result": {
+    "count": 1,
+    "id": "rngtech:exotic_fluid_pump"
+  }
+}

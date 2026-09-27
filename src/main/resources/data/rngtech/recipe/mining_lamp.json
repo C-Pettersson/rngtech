@@ -1,0 +1,40 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "rngtech:material_enabled",
+      "material": "bronze"
+    },
+    {
+      "type": "rngtech:material_enabled",
+      "material": "copper"
+    }
+  ],
+  "type": "minecraft:crafting_shaped",
+  "category": "tools",
+  "pattern": [
+    "PGP",
+    "CEC",
+    " B "
+  ],
+  "key": {
+    "B": {
+      "item": "rngtech:bronze_plate"
+    },
+    "C": {
+      "item": "rngtech:copper_coil"
+    },
+    "E": {
+      "item": "rngtech:energy_coil"
+    },
+    "G": {
+      "item": "minecraft:glowstone_dust"
+    },
+    "P": {
+      "item": "rngtech:copper_plate"
+    }
+  },
+  "result": {
+    "count": 1,
+    "id": "rngtech:mining_lamp"
+  }
+}

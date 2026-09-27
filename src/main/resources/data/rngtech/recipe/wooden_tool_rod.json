@@ -1,0 +1,21 @@
+{
+    "key":  {
+                "S":  {
+                          "item":  "minecraft:stick"
+                      },
+                "B":  {
+                          "tag":  "minecraft:wooden_buttons"
+                      }
+            },
+    "category":  "equipment",
+    "pattern":  [
+                    " S ",
+                    "BS ",
+                    "BS "
+                ],
+    "result":  {
+                   "count":  1,
+                   "id":  "rngtech:wooden_tool_rod"
+               },
+    "type":  "rngtech:trait_shaped"
+}

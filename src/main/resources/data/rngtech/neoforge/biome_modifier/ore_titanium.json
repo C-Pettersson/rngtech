@@ -1,0 +1,12 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "rngtech:ore_worldgen_enabled",
+      "material": "titanium"
+    }
+  ],
+  "type": "neoforge:add_features",
+  "biomes": "#minecraft:is_overworld",
+  "features": "rngtech:ore_titanium",
+  "step": "underground_ores"
+}

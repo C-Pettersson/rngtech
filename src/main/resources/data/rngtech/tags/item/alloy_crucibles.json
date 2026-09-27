@@ -1,0 +1,8 @@
+{
+  "replace": false,
+  "values": [
+    "rngtech:bronze_alloy_crucible",
+    "rngtech:steel_alloy_crucible",
+    "rngtech:titanium_alloy_crucible"
+  ]
+}

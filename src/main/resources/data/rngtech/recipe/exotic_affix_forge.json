@@ -1,0 +1,39 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "rngtech:material_enabled",
+      "material": "nullite"
+    }
+  ],
+  "type": "rngtech:trait_shaped",
+  "category": "misc",
+  "pattern": [
+    "ANA",
+    "PFP",
+    "CLC"
+  ],
+  "key": {
+    "A": {
+      "item": "rngtech:ascension_matrix"
+    },
+    "C": {
+      "item": "rngtech:chaos_crystal"
+    },
+    "F": {
+      "item": "rngtech:exotic_machine_frame"
+    },
+    "L": {
+      "item": "rngtech:nullite_coil"
+    },
+    "N": {
+      "item": "rngtech:nullifier_coil"
+    },
+    "P": {
+      "tag": "rngtech:materials/exotic/plates"
+    }
+  },
+  "result": {
+    "count": 1,
+    "id": "rngtech:exotic_affix_forge"
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "rngtech:material_enabled",
+      "material": "iron"
+    }
+  ],
+  "type": "rngtech:trait_shaped",
+  "category": "misc",
+  "pattern": [
+    "PSP",
+    "PCP",
+    "PSP"
+  ],
+  "key": {
+    "C": {
+      "item": "rngtech:casing"
+    },
+    "P": {
+      "item": "rngtech:iron_plate"
+    },
+    "S": {
+      "item": "minecraft:smooth_stone"
+    }
+  },
+  "result": {
+    "count": 2,
+    "id": "rngtech:shielding"
+  }
+}

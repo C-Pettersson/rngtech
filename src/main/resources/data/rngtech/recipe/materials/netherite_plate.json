@@ -1,0 +1,35 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "rngtech:material_enabled",
+      "material": "netherite"
+    }
+  ],
+  "type": "rngtech:tool_damage_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "rngtech:forming_hammer"
+    },
+    {
+      "tag": "c:ingots/netherite"
+    },
+    {
+      "tag": "c:ingots/netherite"
+    },
+    {
+      "tag": "c:ingots/netherite"
+    },
+    {
+      "tag": "c:ingots/netherite"
+    }
+  ],
+  "tool": {
+    "item": "rngtech:forming_hammer"
+  },
+  "tool_damage": 1,
+  "result": {
+    "id": "rngtech:netherite_plate",
+    "count": 2
+  }
+}

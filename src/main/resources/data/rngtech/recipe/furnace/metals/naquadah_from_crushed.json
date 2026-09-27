@@ -1,0 +1,22 @@
+{
+    "neoforge:conditions": [
+        {
+            "type": "rngtech:material_enabled",
+            "material": "naquadah"
+        }
+    ],
+    "type": "rngtech:furnace",
+    "group": "rngtech_metals",
+    "ingredient": {
+        "item": "rngtech:crushed_naquadah"
+    },
+    "result": {
+        "id": "rngtech:naquadah_ingot"
+    },
+    "processing_ticks": 600,
+    "energy": 43200,
+    "experience": 0.7,
+    "minimum_temperature": 2000,
+    "required_temperature_stability": 1.05,
+    "machine_xp": 8
+}

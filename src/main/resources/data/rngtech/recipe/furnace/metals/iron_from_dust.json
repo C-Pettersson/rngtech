@@ -1,0 +1,21 @@
+{
+    "neoforge:conditions": [
+        {
+            "type": "rngtech:material_enabled",
+            "material": "iron"
+        }
+    ],
+    "type": "rngtech:furnace",
+    "group": "rngtech_metals",
+    "ingredient": {
+        "item": "rngtech:iron_dust"
+    },
+    "result": {
+        "id": "minecraft:iron_ingot"
+    },
+    "bonus_output": false,
+    "processing_ticks": 200,
+    "energy": 4800,
+    "experience": 0.7,
+    "minimum_temperature": 800
+}

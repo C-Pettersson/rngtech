@@ -1,0 +1,20 @@
+{
+  "type": "rngtech:trait_shaped",
+  "category": "equipment",
+  "key": {
+    "I": {
+      "tag": "c:ingots/iron"
+    },
+    "S": {
+      "item": "minecraft:stick"
+    }
+  },
+  "pattern": [
+    " I ",
+    "ISI",
+    " S "
+  ],
+  "result": {
+    "id": "rngtech:forming_hammer"
+  }
+}

@@ -1,0 +1,33 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "rngtech:material_enabled",
+      "material": "iron"
+    }
+  ],
+  "type": "rngtech:trait_shaped",
+  "category": "misc",
+  "pattern": [
+    "RIR",
+    "SCS",
+    "RIR"
+  ],
+  "key": {
+    "C": {
+      "item": "rngtech:casing"
+    },
+    "I": {
+      "tag": "c:ingots/iron"
+    },
+    "R": {
+      "item": "rngtech:iron_rod"
+    },
+    "S": {
+      "item": "minecraft:smooth_stone"
+    }
+  },
+  "result": {
+    "count": 1,
+    "id": "rngtech:machine_frame"
+  }
+}

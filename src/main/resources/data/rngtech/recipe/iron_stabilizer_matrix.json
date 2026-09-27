@@ -1,0 +1,12 @@
+{
+  "type": "rngtech:trait_shaped",
+  "category": "misc",
+  "pattern": [ "SMS", "ICI", "SMS" ],
+  "key": {
+    "C": { "item": "rngtech:stabilization_catalyst" },
+    "I": { "tag": "c:ingots/iron" },
+    "M": { "item": "rngtech:matrix" },
+    "S": { "item": "minecraft:diamond" }
+  },
+  "result": { "count": 1, "id": "rngtech:iron_stabilizer_matrix" }
+}

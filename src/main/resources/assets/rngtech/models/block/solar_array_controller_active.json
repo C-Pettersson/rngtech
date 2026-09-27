@@ -1,0 +1,12 @@
+{
+  "parent": "minecraft:block/cube",
+  "textures": {
+    "down": "rngtech:block/solar_array_controller/bottom/solar_array_controller",
+    "up": "rngtech:block/solar_array_controller/top/solar_array_controller_active",
+    "north": "rngtech:block/solar_array_controller/front/solar_array_controller_active",
+    "south": "rngtech:block/solar_array_controller/side/solar_array_controller",
+    "east": "rngtech:block/solar_array_controller/side/solar_array_controller",
+    "west": "rngtech:block/solar_array_controller/side/solar_array_controller",
+    "particle": "rngtech:block/solar_array_controller/top/solar_array_controller_active"
+  }
+}

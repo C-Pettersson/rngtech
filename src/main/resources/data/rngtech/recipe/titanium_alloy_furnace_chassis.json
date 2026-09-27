@@ -1,0 +1,39 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "rngtech:material_enabled",
+      "material": "titanium"
+    }
+  ],
+  "type": "rngtech:trait_shaped",
+  "category": "redstone",
+  "pattern": [
+    "IBI",
+    "HFH",
+    "CRC"
+  ],
+  "key": {
+    "B": {
+      "tag": "c:circuits/elite"
+    },
+    "C": {
+      "item": "rngtech:refractory_casing"
+    },
+    "F": {
+      "tag": "rngtech:machine_frames/advanced"
+    },
+    "H": {
+      "item": "rngtech:titanium_heat_core"
+    },
+    "I": {
+      "tag": "c:ingots/titanium"
+    },
+    "R": {
+      "item": "minecraft:redstone"
+    }
+  },
+  "result": {
+    "count": 1,
+    "id": "rngtech:titanium_alloy_furnace_chassis"
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "type": "rngtech:trait_shaped",
+  "category": "redstone",
+  "pattern": [
+    "RER",
+    "BHB",
+    "RER"
+  ],
+  "key": {
+    "B": {
+      "item": "minecraft:blaze_rod"
+    },
+    "E": {
+      "tag": "rngtech:materials/exotic/ingots"
+    },
+    "H": {
+      "item": "rngtech:high_heat_core_frame"
+    },
+    "R": {
+      "item": "minecraft:redstone"
+    }
+  },
+  "result": {
+    "count": 1,
+    "id": "rngtech:exotic_heat_core"
+  }
+}

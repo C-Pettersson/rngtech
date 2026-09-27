@@ -1,0 +1,32 @@
+{
+    "type": "rngtech:component_recycling",
+    "ingredient": {
+        "item": "rngtech:crude_recycler"
+    },
+    "minimum_processing_level": 1,
+    "processing_ticks": 120,
+    "energy": 900,
+    "outputs": [
+        {
+            "stack": {
+                "id": "minecraft:chest",
+                "count": 1
+            },
+            "requires_filter": false
+        },
+        {
+            "stack": {
+                "id": "rngtech:flint_crush_head",
+                "count": 1
+            },
+            "requires_filter": false
+        },
+        {
+            "stack": {
+                "id": "minecraft:oak_planks",
+                "count": 2
+            },
+            "requires_filter": true
+        }
+    ]
+}

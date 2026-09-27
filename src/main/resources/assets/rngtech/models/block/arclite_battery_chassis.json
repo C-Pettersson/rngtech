@@ -1,0 +1,12 @@
+{
+  "parent": "minecraft:block/cube",
+  "textures": {
+    "down": "rngtech:block/battery_chassis/bottom/arclite_battery_chassis",
+    "up": "rngtech:block/battery_chassis/top/arclite_battery_chassis",
+    "north": "rngtech:block/battery_chassis/front/arclite_battery_chassis",
+    "south": "rngtech:block/battery_chassis/side/arclite_battery_chassis",
+    "east": "rngtech:block/battery_chassis/side/arclite_battery_chassis",
+    "west": "rngtech:block/battery_chassis/side/arclite_battery_chassis",
+    "particle": "rngtech:block/battery_chassis/side/arclite_battery_chassis"
+  }
+}

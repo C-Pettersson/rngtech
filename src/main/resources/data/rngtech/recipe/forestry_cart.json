@@ -1,0 +1,33 @@
+{
+  "type": "rngtech:trait_shaped",
+  "category": "transportation",
+  "pattern": [
+    "BSB",
+    "CMC",
+    "RER"
+  ],
+  "key": {
+    "B": {
+      "item": "rngtech:basic_electric_circuit"
+    },
+    "C": {
+      "item": "minecraft:chest"
+    },
+    "E": {
+      "item": "rngtech:energy_coil"
+    },
+    "M": {
+      "item": "minecraft:minecart"
+    },
+    "R": {
+      "item": "minecraft:rail"
+    },
+    "S": {
+      "tag": "minecraft:saplings"
+    }
+  },
+  "result": {
+    "count": 1,
+    "id": "rngtech:forestry_cart"
+  }
+}

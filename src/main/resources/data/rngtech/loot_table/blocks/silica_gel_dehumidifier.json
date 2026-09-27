@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:block",
+  "pools": [
+    {
+      "bonus_rolls": 0.0,
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "rngtech:silica_gel_dehumidifier"
+        }
+      ],
+      "rolls": 1.0
+    }
+  ],
+  "random_sequence": "rngtech:blocks/silica_gel_dehumidifier"
+}

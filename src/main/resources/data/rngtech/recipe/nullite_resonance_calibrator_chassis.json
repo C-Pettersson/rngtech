@@ -1,0 +1,30 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "rngtech:material_enabled",
+      "material": "nullite"
+    }
+  ],
+  "type": "rngtech:calibrated_shaped",
+  "category": "misc",
+  "pattern": [
+    "EAE",
+    "BPC",
+    "ELE"
+  ],
+  "key": {
+    "A": {
+      "ingredient": { "item": "rngtech:calibrated_conductive_component" },
+      "calibration": { "family": "conductive", "min_stage": 2, "min_stability": 85, "min_refinement_potential": 1, "consume_refinement_potential": 1 }
+    },
+    "B": { "ingredient": { "item": "rngtech:nullite_control_board" } },
+    "C": { "ingredient": { "item": "rngtech:nullite_resonance_coil" } },
+    "E": { "ingredient": { "tag": "c:ingots/nullite" } },
+    "L": {
+      "ingredient": { "item": "rngtech:calibrated_diamond_crystal" },
+      "calibration": { "family": "logic", "min_stage": 6, "min_stability": 85 }
+    },
+    "P": { "ingredient": { "item": "rngtech:exotic_machine_frame" } }
+  },
+  "result": { "count": 1, "id": "rngtech:nullite_resonance_calibrator_chassis" }
+}

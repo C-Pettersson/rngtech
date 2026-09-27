@@ -1,0 +1,38 @@
+{
+    "neoforge:conditions": [
+        {
+            "type": "rngtech:material_enabled",
+            "material": "steel"
+        },
+        {
+            "type": "rngtech:material_enabled",
+            "material": "iron"
+        }
+    ],
+    "type": "rngtech:alloy_furnace",
+    "group": "rngtech_direct_alloys",
+    "mode": "direct_ingot",
+    "ingredients": [
+        {
+            "ingredient": {
+                "tag": "c:ingots/iron"
+            },
+            "count": 1
+        },
+        {
+            "ingredient": {
+                "item": "minecraft:coal"
+            },
+            "count": 1
+        }
+    ],
+    "result": {
+        "count": 1,
+        "id": "rngtech:steel_ingot"
+    },
+    "processing_ticks": 1200,
+    "energy": 24000,
+    "minimum_component_stage": 3,
+    "minimum_temperature": 1300,
+    "required_temperature_stability": 0.9
+}

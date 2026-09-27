@@ -1,0 +1,28 @@
+{
+  "replace": false,
+  "values": [
+    "rngtech:iron_plate",
+    "rngtech:copper_plate",
+    "rngtech:bronze_plate",
+    "rngtech:tin_plate",
+    "rngtech:zinc_plate",
+    "rngtech:gold_plate",
+    "rngtech:steel_plate",
+    "rngtech:invar_plate",
+    "rngtech:nickel_plate",
+    "rngtech:lead_plate",
+    "rngtech:silver_plate",
+    "rngtech:aluminum_plate",
+    "rngtech:sparksteel_plate",
+    "rngtech:osmium_plate",
+    "rngtech:titanium_plate",
+    "rngtech:arclite_plate",
+    "rngtech:tungsten_plate",
+    "rngtech:tungstensteel_plate",
+    "rngtech:nullite_plate",
+    "rngtech:aethergold_plate",
+    "rngtech:platinum_plate",
+    "rngtech:netherite_plate",
+    "rngtech:naquadah_plate"
+  ]
+}

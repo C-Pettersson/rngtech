@@ -1,0 +1,17 @@
+{
+  "type": "rngtech:trait_shaped",
+  "category": "misc",
+  "pattern": [
+    "PPP",
+    "RCR",
+    "PPP"
+  ],
+  "key": {
+    "C": { "item": "rngtech:titanium_casing" },
+    "P": { "item": "minecraft:paper" },
+    "R": { "item": "minecraft:redstone" }
+  },
+  "result": {
+    "id": "rngtech:fuel_cell_membrane"
+  }
+}

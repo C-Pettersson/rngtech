@@ -1,0 +1,220 @@
+{
+  "version": 1,
+  "entries": [
+    {
+      "check": "shared_blockstate_model",
+      "key": "rngtech:block/cable_*",
+      "subject_globs": [
+        "cable",
+        "universal_connector"
+      ],
+      "reason": "Universal Connector deliberately reuses the cable core and side geometry so it visually joins the same cable network."
+    },
+    {
+      "check": "shared_item_layer0",
+      "key": "rngtech:item/materials/dust/*",
+      "subject_globs": [
+        "*_blend",
+        "*_dust"
+      ],
+      "reason": "Alloy blend powders intentionally reuse the matching dust form texture until blend-specific ingredients receive a separate art pass."
+    },
+    {
+      "check": "shared_item_layer0",
+      "key": "rngtech:item/materials/rod/*",
+      "subject_globs": [
+        "*_rod",
+        "*_tool_rod",
+        "copper_conduit_tool_rod",
+        "sparksteel_routed_tool_rod",
+        "nullite_phase_tool_rod",
+        "exotic_harmonic_tool_rod",
+        "steel_reinforced_tool_rod",
+        "titanium_stabilized_tool_rod",
+        "tungstensteel_heavy_tool_rod"
+      ],
+      "reason": "Tool rod variants intentionally reuse raw rod textures; their behavior is carried by the assembled tool, not a distinct standalone part surface."
+    },
+    {
+      "check": "shared_item_layer0",
+      "key": "rngtech:item/materials/casing/*",
+      "subject_globs": [
+        "*_alloy_crucible",
+        "*_casing"
+      ],
+      "reason": "Current alloy crucible items are recipe-form stand-ins and intentionally reuse the matching casing material art for this pass."
+    },
+    {
+      "check": "shared_item_layer0",
+      "key": "rngtech:item/materials/non_stage/diamond",
+      "subject_globs": [
+        "calibrated_diamond_crystal",
+        "diamond_tip"
+      ],
+      "reason": "Calibrated Diamond Crystal and Diamond Tip intentionally share the vanilla diamond material art for this balance pass."
+    },
+    {
+      "check": "shared_item_layer0",
+      "key": "rngtech:item/materials/forms/*",
+      "subject_globs": [
+        "*_calibration_pattern",
+        "*_circuit_blank",
+        "advanced_electric_circuit",
+        "basic_electric_circuit",
+        "broken_circuit",
+        "calibrated_*_component",
+        "casing",
+        "casing_mold",
+        "cell_shell",
+        "circuit_mold",
+        "conductive_plate",
+        "connector",
+        "*_connector",
+        "connector_mold",
+        "control_board",
+        "elite_electric_circuit",
+        "energy_coil",
+        "heat_core",
+        "machine_frame",
+        "mechanism",
+        "refractory_casing",
+        "scrap",
+        "ultimate_electric_circuit"
+      ],
+      "reason": "Generic catalog forms, blanks, molds, calibration patterns, and calibrated intermediates intentionally share raw-form art; materialized machine parts now use owned part textures."
+    },
+    {
+      "check": "duplicate_png",
+      "subject_globs": [
+        "src/main/resources/assets/rngtech/textures/item/materials/forms/bus_bar.png",
+        "src/main/resources/assets/rngtech/textures/item/materials/forms/connector.png"
+      ],
+      "reason": "Bus bar and connector are generic conductive forms that intentionally share the same current placeholder silhouette."
+    },
+    {
+      "check": "duplicate_png",
+      "subject_globs": [
+        "src/main/resources/assets/rngtech/textures/item/materials/forms/conductive_plate.png",
+        "src/main/resources/assets/rngtech/textures/item/materials/plate/sparksteel.png"
+      ],
+      "reason": "The generic conductive plate intentionally aliases the sparksteel plate material form until a broader generic-form refresh."
+    },
+    {
+      "check": "duplicate_png",
+      "subject_globs": [
+        "src/main/resources/assets/rngtech/textures/item/materials/forms/control_board.png",
+        "src/main/resources/assets/rngtech/textures/item/materials/forms/redstone_control.png"
+      ],
+      "reason": "Generic control forms intentionally share a board placeholder; concrete control boards and servos now have family-specific icons."
+    },
+    {
+      "check": "duplicate_png",
+      "subject_globs": [
+        "src/main/resources/assets/rngtech/textures/item/materials/casing/steel.png",
+        "src/main/resources/assets/rngtech/textures/item/materials/forms/casing.png",
+        "src/main/resources/assets/rngtech/textures/item/materials/forms/fuel_chamber.png",
+        "src/main/resources/assets/rngtech/textures/item/materials/forms/machine_frame.png"
+      ],
+      "reason": "Generic casing, fuel chamber, and machine frame are raw recipe forms that intentionally share the steel casing template."
+    },
+    {
+      "check": "duplicate_png",
+      "subject_globs": [
+        "src/main/resources/assets/rngtech/textures/item/crushed_*.png",
+        "src/main/resources/assets/rngtech/textures/item/materials/crushed/*.png"
+      ],
+      "reason": "Legacy root crushed-ore outputs are retained by the material texture generator while item models point at the canonical material/crushed paths."
+    },
+    {
+      "check": "duplicate_png",
+      "subject_globs": [
+        "src/main/resources/assets/rngtech/textures/item/iron_crush_head.png",
+        "src/main/resources/assets/rngtech/textures/item/materials/forms/crush_head.png"
+      ],
+      "reason": "Legacy generated iron crush-head texture is retained for generator compatibility; current crush-head item models use owned parts/crush_head textures."
+    },
+    {
+      "check": "duplicate_png",
+      "subject_globs": [
+        "src/main/resources/assets/rngtech/textures/item/materials/forms/cell_shell.png",
+        "src/main/resources/assets/rngtech/textures/item/materials/plate/aluminum.png"
+      ],
+      "reason": "Generic cell shell intentionally aliases the aluminum plate template as a raw-form placeholder."
+    },
+    {
+      "check": "duplicate_png",
+      "subject_globs": [
+        "src/main/resources/assets/rngtech/textures/item/materials/coil/lead.png",
+        "src/main/resources/assets/rngtech/textures/item/materials/forms/shielding.png"
+      ],
+      "reason": "Generic shielding intentionally aliases lead coil art as a raw-form placeholder."
+    },
+    {
+      "check": "duplicate_png",
+      "subject_globs": [
+        "src/main/resources/assets/rngtech/textures/item/materials/forms/electrolyte.png",
+        "src/main/resources/assets/rngtech/textures/item/materials/non_stage/honey.png"
+      ],
+      "reason": "Electrolyte intentionally reuses the honey droplet placeholder pending a broader liquid-material refresh."
+    },
+    {
+      "check": "duplicate_png",
+      "subject_globs": [
+        "src/main/resources/assets/rngtech/textures/item/materials/forms/recycling_byproduct.png",
+        "src/main/resources/assets/rngtech/textures/item/materials/forms/scrap.png"
+      ],
+      "reason": "Recycling byproduct intentionally shares scrap art as a generic output placeholder."
+    },
+    {
+      "check": "duplicate_png",
+      "subject_globs": [
+        "src/main/resources/assets/rngtech/textures/item/materials/forms/catalyst.png",
+        "src/main/resources/assets/rngtech/textures/item/materials/forms/stabilization_catalyst.png"
+      ],
+      "reason": "Base and stabilization catalyst forms intentionally share a catalyst placeholder."
+    },
+    {
+      "check": "duplicate_png",
+      "subject_globs": [
+        "src/main/resources/assets/rngtech/textures/block/divinity_siphon/*divinity_siphon_controller*.png",
+        "src/main/resources/assets/rngtech/textures/block/divinity_siphon/*ritual_heart*.png"
+      ],
+      "reason": "Divinity Siphon controller and ritual-heart placeholder art is outside this texture-identity cleanup and remains tracked for a future endgame-art pass."
+    },
+    {
+      "check": "unused_png",
+      "subject_globs": [
+        "src/main/resources/assets/rngtech/textures/block/battery_chassis/*.png",
+        "src/main/resources/assets/rngtech/textures/block/battery_chassis/slotted/*.png",
+        "src/main/resources/assets/rngtech/textures/block/battery_chassis/slot_overlays/*.png"
+      ],
+      "reason": "Battery chassis slotted and slot-overlay textures are retained for renderer/runtime use rather than model JSON texture slots."
+    },
+    {
+      "check": "unused_png",
+      "subject_globs": [
+        "src/main/resources/assets/rngtech/textures/block/divinity_siphon/breath_containment_seal.png",
+        "src/main/resources/assets/rngtech/textures/block/divinity_siphon/breath_divinity_siphon_formed.png",
+        "src/main/resources/assets/rngtech/textures/block/divinity_siphon/heart_containment_seal.png",
+        "src/main/resources/assets/rngtech/textures/block/divinity_siphon/heart_divinity_siphon_formed.png"
+      ],
+      "reason": "Retained Divinity Siphon placeholder textures are outside this machine identity cleanup and are covered by the endgame-art follow-up."
+    },
+    {
+      "check": "unused_png",
+      "subject_globs": [
+        "src/main/resources/assets/rngtech/textures/item/crushed_*.png",
+        "src/main/resources/assets/rngtech/textures/item/flint_crush_head.png",
+        "src/main/resources/assets/rngtech/textures/item/iron_crush_head.png"
+      ],
+      "reason": "Legacy root generated item textures are retained for material texture generator compatibility while active models use canonical material or parts paths."
+    },
+    {
+      "check": "unused_png",
+      "subject_globs": [
+        "src/main/resources/assets/rngtech/textures/item/materials/non_stage/*.png"
+      ],
+      "reason": "The material texture generator emits the full non-stage material catalog even when individual generated forms are not yet referenced by item models."
+    }
+  ]
+}

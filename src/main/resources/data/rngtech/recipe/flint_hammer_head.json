@@ -1,0 +1,21 @@
+{
+    "key":  {
+                "F":  {
+                          "item":  "minecraft:flint"
+                      },
+                "B":  {
+                          "tag":  "minecraft:wooden_buttons"
+                      }
+            },
+    "category":  "equipment",
+    "pattern":  [
+                    "FFF",
+                    "FBF",
+                    "   "
+                ],
+    "result":  {
+                   "count":  1,
+                   "id":  "rngtech:flint_hammer_head"
+               },
+    "type":  "rngtech:trait_shaped"
+}

@@ -1,0 +1,19 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "rngtech:material_enabled",
+      "material": "nullite"
+    }
+  ],
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "tag": "c:ingots/nullite"
+    }
+  ],
+  "result": {
+    "count": 9,
+    "id": "rngtech:nullite_nugget"
+  }
+}

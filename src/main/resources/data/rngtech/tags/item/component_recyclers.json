@@ -1,0 +1,13 @@
+{
+  "values": [
+    "rngtech:crude_recycler",
+    "rngtech:iron_component_recycler",
+    "rngtech:copper_component_recycler",
+    "rngtech:bronze_component_recycler",
+    "rngtech:steel_component_recycler",
+    "rngtech:aluminum_component_recycler",
+    "rngtech:titanium_component_recycler",
+    "rngtech:tungstensteel_component_recycler",
+    "rngtech:exotic_component_recycler"
+  ]
+}

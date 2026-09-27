@@ -1,0 +1,20 @@
+{
+    "type": "rngtech:trait_shaped",
+    "category": "misc",
+    "pattern": [" P ", "CBC", "   "],
+    "key": {
+        "B": {
+            "item": "minecraft:composter"
+        },
+        "C": {
+            "tag": "c:ingots/copper"
+        },
+        "P": {
+            "item": "rngtech:plant_reagent"
+        }
+    },
+    "result": {
+        "count": 1,
+        "id": "rngtech:bio_chamber"
+    }
+}

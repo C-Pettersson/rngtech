@@ -1,0 +1,12 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "rngtech:ore_worldgen_enabled",
+      "material": "tin"
+    }
+  ],
+  "type": "neoforge:add_features",
+  "biomes": "#minecraft:is_overworld",
+  "features": "rngtech:ore_tin",
+  "step": "underground_ores"
+}

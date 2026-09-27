@@ -1,0 +1,24 @@
+{
+  "type": "rngtech:trait_shaped",
+  "category": "misc",
+  "pattern": [
+    "RGR",
+    "GAG",
+    "RGR"
+  ],
+  "key": {
+    "A": {
+      "item": "minecraft:diamond"
+    },
+    "G": {
+      "item": "minecraft:gunpowder"
+    },
+    "R": {
+      "item": "minecraft:redstone"
+    }
+  },
+  "result": {
+    "count": 1,
+    "id": "rngtech:destabilization_crystal"
+  }
+}

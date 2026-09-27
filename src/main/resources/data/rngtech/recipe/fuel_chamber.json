@@ -1,0 +1,30 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "rngtech:material_enabled",
+      "material": "iron"
+    }
+  ],
+  "type": "rngtech:trait_shaped",
+  "category": "misc",
+  "pattern": [
+    "PKP",
+    "KFK",
+    "PKP"
+  ],
+  "key": {
+    "F": {
+      "item": "minecraft:furnace"
+    },
+    "K": {
+      "item": "minecraft:coal"
+    },
+    "P": {
+      "item": "rngtech:iron_plate"
+    }
+  },
+  "result": {
+    "count": 1,
+    "id": "rngtech:fuel_chamber"
+  }
+}

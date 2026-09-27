@@ -1,0 +1,34 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "rngtech:material_enabled",
+      "material": "bronze"
+    },
+    {
+      "type": "rngtech:material_enabled",
+      "material": "iron"
+    }
+  ],
+  "type": "rngtech:trait_shaped",
+  "category": "misc",
+  "pattern": [
+    "BIB",
+    "IQI",
+    "BIB"
+  ],
+  "key": {
+    "B": {
+      "item": "rngtech:bronze_plate"
+    },
+    "I": {
+      "tag": "c:ingots/iron"
+    },
+    "Q": {
+      "item": "rngtech:insulator"
+    }
+  },
+  "result": {
+    "count": 1,
+    "id": "rngtech:plate_mold"
+  }
+}

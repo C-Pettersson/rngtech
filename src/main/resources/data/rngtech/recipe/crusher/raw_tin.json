@@ -1,0 +1,20 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "rngtech:material_enabled",
+      "material": "tin"
+    }
+  ],
+  "type": "rngtech:crusher",
+  "ingredient": {
+    "tag": "c:raw_materials/tin"
+  },
+  "result": {
+    "count": 2,
+    "id": "rngtech:crushed_tin"
+  },
+  "processing_ticks": 120,
+  "energy": 5760,
+  "required_processing_level": 2,
+  "machine_xp": 2
+}

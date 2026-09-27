@@ -1,0 +1,18 @@
+{
+  "replace": false,
+  "values": [
+    "rngtech:naquadah_ingot",
+    "rngtech:naquadah_dust",
+    "rngtech:naquadah_nugget",
+    "rngtech:naquadah_storage_block",
+    "rngtech:naquadah_ore",
+    "rngtech:deepslate_naquadah_ore",
+    "rngtech:raw_naquadah",
+    "rngtech:crushed_naquadah",
+    "rngtech:naquadah_plate",
+    "rngtech:naquadah_gear",
+    "rngtech:naquadah_rod",
+    "rngtech:naquadah_coil",
+    "rngtech:naquadah_casing"
+  ]
+}

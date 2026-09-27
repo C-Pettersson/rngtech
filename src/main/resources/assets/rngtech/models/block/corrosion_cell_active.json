@@ -1,0 +1,6 @@
+{
+  "parent": "rngtech:block/corrosion_cell",
+  "textures": {
+    "north": "rngtech:block/corrosion_cell/front/corrosion_cell_active"
+  }
+}

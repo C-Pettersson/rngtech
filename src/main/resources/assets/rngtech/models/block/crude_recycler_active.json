@@ -1,0 +1,12 @@
+{
+  "parent": "minecraft:block/cube",
+  "textures": {
+    "down": "rngtech:block/component_recycler/bottom/crude_recycler",
+    "up": "rngtech:block/component_recycler/top/crude_recycler",
+    "north": "rngtech:block/component_recycler/front/crude_recycler_active",
+    "south": "rngtech:block/component_recycler/side/crude_recycler",
+    "east": "rngtech:block/component_recycler/side/crude_recycler",
+    "west": "rngtech:block/component_recycler/side/crude_recycler",
+    "particle": "rngtech:block/component_recycler/front/crude_recycler_active"
+  }
+}

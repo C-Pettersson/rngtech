@@ -1,0 +1,33 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "rngtech:material_enabled",
+      "material": "osmium"
+    }
+  ],
+  "type": "rngtech:trait_shaped",
+  "category": "redstone",
+  "pattern": [
+    "PGP",
+    "EFE",
+    "PGP"
+  ],
+  "key": {
+    "E": {
+      "tag": "c:circuits/advanced"
+    },
+    "F": {
+      "item": "rngtech:pump_frame"
+    },
+    "G": {
+      "item": "rngtech:osmium_gear"
+    },
+    "P": {
+      "item": "rngtech:osmium_plate"
+    }
+  },
+  "result": {
+    "count": 1,
+    "id": "rngtech:osmium_fluid_pump"
+  }
+}

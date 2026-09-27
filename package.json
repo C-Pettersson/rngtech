@@ -1,0 +1,25 @@
+{
+    "name": "rngtech-release-tools",
+    "private": true,
+    "description": "Release tooling for the RNGTech Gradle project.",
+    "type": "module",
+    "scripts": {
+        "moddex:check": "node tools/moddex/smoke.mjs",
+        "moddex:export": "node tools/moddex/export-modifier-data.mjs",
+        "moddex:gui-export": "node tools/moddex/export-gui-layout-data.mjs",
+        "moddex:passive-tree-export": "node tools/moddex/export-passive-tree-data.mjs",
+        "moddex:serve": "node tools/moddex/serve.mjs",
+        "release": "release-it",
+        "release:dry-run": "release-it --dry-run",
+        "release:version": "release-it --release-version",
+        "release:verify": "node tools/release/run-gradle.mjs quickCheck",
+        "repo:check": "node tools/check-repository.mjs"
+    },
+    "devDependencies": {
+        "@release-it/bumper": "7.0.5",
+        "release-it": "20.0.1"
+    },
+    "engines": {
+        "node": ">=20.19"
+    }
+}

@@ -1,0 +1,25 @@
+{
+    "type": "rngtech:component_recycling",
+    "ingredient": {
+        "item": "rngtech:bronze_recovery_filter"
+    },
+    "minimum_processing_level": 3,
+    "processing_ticks": 110,
+    "energy": 990,
+    "outputs": [
+        {
+            "stack": {
+                "id": "rngtech:output_bin",
+                "count": 1
+            },
+            "requires_filter": false
+        },
+        {
+            "stack": {
+                "id": "rngtech:bronze_plate",
+                "count": 1
+            },
+            "requires_filter": true
+        }
+    ]
+}

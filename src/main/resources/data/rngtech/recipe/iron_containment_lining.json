@@ -1,0 +1,33 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "rngtech:material_enabled",
+      "material": "iron"
+    }
+  ],
+  "type": "rngtech:trait_shaped",
+  "category": "redstone",
+  "pattern": [
+    "PSP",
+    "ICI",
+    "PSP"
+  ],
+  "key": {
+    "C": {
+      "item": "rngtech:iron_casing"
+    },
+    "I": {
+      "tag": "c:ingots/iron"
+    },
+    "P": {
+      "item": "rngtech:iron_plate"
+    },
+    "S": {
+      "item": "rngtech:shielding"
+    }
+  },
+  "result": {
+    "count": 1,
+    "id": "rngtech:iron_containment_lining"
+  }
+}

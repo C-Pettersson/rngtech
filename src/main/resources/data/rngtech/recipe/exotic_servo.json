@@ -1,0 +1,36 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "rngtech:material_enabled",
+      "material": "tungstensteel"
+    }
+  ],
+  "type": "rngtech:trait_shaped",
+  "category": "redstone",
+  "pattern": [
+    "NLN",
+    "ACA",
+    "NSN"
+  ],
+  "key": {
+    "A": {
+      "item": "rngtech:ascension_matrix"
+    },
+    "C": {
+      "tag": "c:circuits/ultimate"
+    },
+    "L": {
+      "item": "rngtech:lubricant_bucket"
+    },
+    "N": {
+      "tag": "rngtech:materials/exotic/ingots"
+    },
+    "S": {
+      "item": "rngtech:servo_frame"
+    }
+  },
+  "result": {
+    "count": 1,
+    "id": "rngtech:exotic_servo"
+  }
+}

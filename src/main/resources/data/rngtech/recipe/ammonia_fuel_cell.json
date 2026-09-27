@@ -1,0 +1,18 @@
+{
+  "type": "rngtech:trait_shaped",
+  "category": "redstone",
+  "pattern": [
+    "CMC",
+    "PMP",
+    "CBC"
+  ],
+  "key": {
+    "B": { "item": "rngtech:bus_bar" },
+    "C": { "item": "rngtech:titanium_casing" },
+    "M": { "item": "rngtech:fuel_cell_membrane" },
+    "P": { "item": "rngtech:titanium_plate" }
+  },
+  "result": {
+    "id": "rngtech:ammonia_fuel_cell"
+  }
+}

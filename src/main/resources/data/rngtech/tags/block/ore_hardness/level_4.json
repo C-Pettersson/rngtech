@@ -1,0 +1,9 @@
+{
+  "replace": false,
+  "values": [
+    "rngtech:aluminum_ore",
+    "rngtech:deepslate_aluminum_ore",
+    "rngtech:osmium_ore",
+    "rngtech:deepslate_osmium_ore"
+  ]
+}

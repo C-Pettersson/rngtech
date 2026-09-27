@@ -1,0 +1,39 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "rngtech:material_enabled",
+      "material": "steel"
+    }
+  ],
+  "type": "rngtech:trait_shaped",
+  "category": "redstone",
+  "pattern": [
+    "IBI",
+    "HFH",
+    "CRC"
+  ],
+  "key": {
+    "B": {
+      "tag": "c:circuits/advanced"
+    },
+    "C": {
+      "item": "rngtech:refractory_casing"
+    },
+    "F": {
+      "tag": "rngtech:machine_frames/reinforced"
+    },
+    "H": {
+      "item": "rngtech:steel_heat_core"
+    },
+    "I": {
+      "tag": "c:ingots/steel"
+    },
+    "R": {
+      "item": "minecraft:redstone"
+    }
+  },
+  "result": {
+    "count": 1,
+    "id": "rngtech:steel_alloy_furnace_chassis"
+  }
+}

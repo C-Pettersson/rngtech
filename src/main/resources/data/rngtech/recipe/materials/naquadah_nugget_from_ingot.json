@@ -1,0 +1,19 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "rngtech:material_enabled",
+      "material": "naquadah"
+    }
+  ],
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "tag": "c:ingots/naquadah"
+    }
+  ],
+  "result": {
+    "count": 9,
+    "id": "rngtech:naquadah_nugget"
+  }
+}

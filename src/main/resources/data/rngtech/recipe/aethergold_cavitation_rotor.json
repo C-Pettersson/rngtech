@@ -1,0 +1,29 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "rngtech:material_enabled",
+      "material": "aethergold"
+    }
+  ],
+  "type": "rngtech:trait_shaped",
+  "category": "misc",
+  "pattern": [
+    "PGP",
+    "GCG",
+    "PGP"
+  ],
+  "key": {
+    "C": {
+      "item": "rngtech:aethergold_coil"
+    },
+    "G": {
+      "item": "rngtech:aethergold_gear"
+    },
+    "P": {
+      "item": "rngtech:aethergold_plate"
+    }
+  },
+  "result": {
+    "id": "rngtech:aethergold_cavitation_rotor"
+  }
+}

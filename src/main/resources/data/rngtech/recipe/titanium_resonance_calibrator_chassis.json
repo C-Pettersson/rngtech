@@ -1,0 +1,30 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "rngtech:material_enabled",
+      "material": "titanium"
+    }
+  ],
+  "type": "rngtech:calibrated_shaped",
+  "category": "misc",
+  "pattern": [
+    "TAT",
+    "BPC",
+    "TDT"
+  ],
+  "key": {
+    "A": {
+      "ingredient": { "item": "rngtech:calibrated_structural_component" },
+      "calibration": { "family": "structural", "min_stage": 2, "min_stability": 70, "min_refinement_potential": 1, "consume_refinement_potential": 1 }
+    },
+    "B": { "ingredient": { "item": "rngtech:titanium_control_board" } },
+    "C": { "ingredient": { "item": "rngtech:titanium_resonance_coil" } },
+    "D": {
+      "ingredient": { "item": "rngtech:calibrated_conductive_component" },
+      "calibration": { "family": "conductive", "min_stage": 2, "min_stability": 70 }
+    },
+    "P": { "ingredient": { "item": "rngtech:advanced_machine_frame" } },
+    "T": { "ingredient": { "tag": "c:ingots/titanium" } }
+  },
+  "result": { "count": 1, "id": "rngtech:titanium_resonance_calibrator_chassis" }
+}

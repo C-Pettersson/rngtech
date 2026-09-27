@@ -1,0 +1,6 @@
+{
+  "parent": "rngtech:block/cavitation_generator",
+  "textures": {
+    "north": "rngtech:block/cavitation_generator/front/cavitation_generator_active"
+  }
+}

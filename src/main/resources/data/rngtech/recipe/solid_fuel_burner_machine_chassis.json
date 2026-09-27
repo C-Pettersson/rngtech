@@ -1,0 +1,33 @@
+{
+  "type": "rngtech:trait_shaped",
+  "category": "misc",
+  "pattern": [
+    "RKR",
+    "CMC",
+    "SFS"
+  ],
+  "key": {
+    "C": {
+      "item": "minecraft:copper_ingot"
+    },
+    "F": {
+      "item": "minecraft:furnace"
+    },
+    "M": {
+      "tag": "rngtech:machine_frames/base"
+    },
+    "K": {
+      "item": "minecraft:coal"
+    },
+    "R": {
+      "item": "minecraft:redstone"
+    },
+    "S": {
+      "item": "minecraft:smooth_stone"
+    }
+  },
+  "result": {
+    "count": 1,
+    "id": "rngtech:solid_fuel_burner_machine_chassis"
+  }
+}

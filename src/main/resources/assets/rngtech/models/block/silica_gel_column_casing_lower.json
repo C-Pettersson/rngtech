@@ -1,0 +1,12 @@
+{
+  "parent": "minecraft:block/cube",
+  "textures": {
+    "down": "rngtech:block/silica_gel_dehumidifier/silica_gel_column_casing_join",
+    "up": "rngtech:block/silica_gel_dehumidifier/silica_gel_column_casing_join",
+    "north": "rngtech:block/silica_gel_dehumidifier/silica_gel_column_casing_side_lower",
+    "south": "rngtech:block/silica_gel_dehumidifier/silica_gel_column_casing_side_lower",
+    "east": "rngtech:block/silica_gel_dehumidifier/silica_gel_column_casing_side_lower",
+    "west": "rngtech:block/silica_gel_dehumidifier/silica_gel_column_casing_side_lower",
+    "particle": "rngtech:block/silica_gel_dehumidifier/silica_gel_column_casing_side_lower"
+  }
+}

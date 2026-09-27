@@ -1,0 +1,17 @@
+{
+  "type": "rngtech:calibration",
+  "family": "conductive",
+  "ingredient": { "item": "rngtech:copper_coil" },
+  "pattern": { "item": "rngtech:conductive_calibration_pattern" },
+  "catalyst": { "item": "rngtech:matrix" },
+  "stabilizer": { "item": "rngtech:stabilization_catalyst" },
+  "minimum_stage": 4,
+  "processing_ticks": 300,
+  "energy": 4600,
+  "result": {
+    "stack": { "id": "rngtech:calibrated_conductive_component" },
+    "stage": 2,
+    "stability": { "min": 65, "max": 95 },
+    "refinement_potential": { "min": 1, "max": 3 }
+  }
+}

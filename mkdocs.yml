@@ -1,0 +1,110 @@
+site_name: RNGTech
+site_description: Design and reference documentation for the RNGTech NeoForge mod.
+repo_name: RNGTech
+repo_url: https://github.com/c-pettersson/rngtech
+
+exclude_docs: |
+  page-templates/
+
+validation:
+  nav:
+    omitted_files: warn
+  links:
+    not_found: warn
+    anchors: warn
+
+theme:
+  name: material
+  features:
+    - navigation.instant
+    - navigation.sections
+    - navigation.top
+    - search.highlight
+    - search.suggest
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - def_list
+  - md_in_html
+  - pymdownx.details
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.tabbed:
+      alternate_style: true
+  - toc:
+      permalink: true
+
+nav:
+  - Home: index.md
+  - Conventions: conventions.md
+  - Getting Started: getting-started.md
+  - Systems:
+      - Progression: systems/progression.md
+      - Affix Generation: systems/affix-generation.md
+      - Stage Progression and Ore Duplication: systems/stage-progression-and-ore-duplication.md
+  - Modifiers:
+      - Overview: modifiers/index.md
+      - Balance Mode: modifiers/balance-mode.md
+      - Bulk Speed: modifiers/bulk-speed.md
+      - Fuel Governor: modifiers/fuel-governor.md
+  - Content:
+      - Affix Forge: content/affix-forge.md
+      - Exotic Affix Forge: content/exotic-affix-forge.md
+      - Component Assembler: content/battery-assembler.md
+      - Battery Chassis: content/battery-chassis.md
+      - Battery Cells: content/battery-cells.md
+      - Bio Generator: content/bio-generator.md
+      - Tree Farm Automation: content/tree-farm-automation.md
+      - Water Infrastructure: content/water-infrastructure.md
+      - Algae Photobioreactor: content/algae-photobioreactor.md
+      - Ammonia Power Chain: content/ammonia-power-chain.md
+      - Cavitation Generator: content/cavitation-generator.md
+      - Vacuum Collapse Generator: content/vacuum-collapse-generator.md
+      - Solar Panel and Array: content/solar-panel-and-array.md
+      - Universal Cable: content/basic-wire.md
+      - Potential Reactor: content/potential-reactor.md
+      - Corrosion Cell: content/corrosion-cell.md
+      - Component Recycler: content/component-recycler.md
+      - Metal Press: content/metal-press.md
+      - Melter: content/melter.md
+      - Compressor Tank: content/compressor-tank.md
+      - Resonance Calibrator: content/resonance-calibrator.md
+      - Solid Fuel Burning: content/solid-fuel-burner.md
+      - Crusher: content/crusher.md
+      - Furnace: content/furnace.md
+      - Alloy Furnace: content/alloy-furnace.md
+      - Modular Field Tools: content/modular-field-tools.md
+      - Miner's Companion: content/miners-companion.md
+      - Machine Chassis: content/machine-chassis.md
+      - Machine Parts: content/machine-parts.md
+  - Design Proposals:
+      - Overview: design-proposals.md
+      - Crafting and Upgrades: systems/crafting.md
+      - Affix-Driven Generator: content/affix-driven-generator.md
+      - Entropy Cell: content/entropy-cell.md
+      - Ore Slurry Turbine: content/ore-slurry-turbine.md
+      - Auto Balance: modifiers/auto-balance.md
+      - Packer: modifiers/packer.md
+      - Unique Item Ideas: reference/unique-item-ideas.md
+      - Passive Tree Framework: prds/passive-tree-framework.md
+      - Tree Farm Requirements: prds/tree-farm-automation.md
+  - Reference:
+      - Releasing: releasing.md
+      - Public Mod Description: public-mod-description.md
+      - Current Implementation Matrix: reference/current-implementation.md
+      - Machine Guidelines: reference/machine-guidelines.md
+      - Machine Visual Design: reference/machine-visual-design.md
+      - Machine GUI Design: reference/machine-gui-design.md
+      - Passive Tree Design Rules: reference/passive-tree-design-rules.md
+      - Rarity: reference/rarity.md
+      - Materials List: reference/materials.md
+      - Material Catalog Coverage: reference/material-catalog-coverage.md
+      - Material Usage Audit: reference/material-usage-audit.md
+      - Component Stages: reference/component-stages.md
+      - Quest Stage Coverage: reference/quest-stage-coverage.md
+      - Machine Stats: reference/machine-stats.md
+      - Modifier Eligibility: reference/modifier-eligibility.md

@@ -1,0 +1,37 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "rngtech:material_enabled",
+      "material": "tungstensteel"
+    }
+  ],
+  "type": "rngtech:calibrated_shaped",
+  "category": "misc",
+  "pattern": [
+    "TST",
+    "EME",
+    "T L"
+  ],
+  "key": {
+    "E": {
+      "ingredient": { "tag": "c:circuits/elite" }
+    },
+    "L": {
+      "ingredient": { "item": "rngtech:lubricated_frame_coupling" }
+    },
+    "M": {
+      "ingredient": { "tag": "rngtech:machine_frames/advanced" }
+    },
+    "S": {
+      "ingredient": { "item": "rngtech:calibrated_structural_component" },
+      "calibration": { "family": "structural", "min_stage": 3, "min_stability": 80 }
+    },
+    "T": {
+      "ingredient": { "item": "rngtech:tungstensteel_plate" }
+    }
+  },
+  "result": {
+    "count": 1,
+    "id": "rngtech:exotic_machine_frame"
+  }
+}

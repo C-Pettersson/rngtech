@@ -1,0 +1,29 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "rngtech:material_enabled",
+      "material": "titanium"
+    }
+  ],
+  "type": "rngtech:trait_shaped",
+  "category": "misc",
+  "pattern": [
+    "PGP",
+    "GRG",
+    "PGP"
+  ],
+  "key": {
+    "G": {
+      "item": "rngtech:titanium_gear"
+    },
+    "P": {
+      "item": "rngtech:titanium_plate"
+    },
+    "R": {
+      "item": "rngtech:reforming_catalyst_bed"
+    }
+  },
+  "result": {
+    "id": "rngtech:nitrogen_extraction_rotor"
+  }
+}

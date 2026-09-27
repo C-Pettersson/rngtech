@@ -1,0 +1,19 @@
+{
+  "type": "rngtech:trait_shaped",
+  "category": "redstone",
+  "pattern": [
+    "TCT",
+    "PMP",
+    "TBT"
+  ],
+  "key": {
+    "B": { "item": "rngtech:bus_bar" },
+    "C": { "item": "rngtech:ammonia_catalyst_bed" },
+    "M": { "tag": "rngtech:machine_frames/advanced" },
+    "P": { "item": "rngtech:titanium_plate" },
+    "T": { "item": "rngtech:titanium_casing" }
+  },
+  "result": {
+    "id": "rngtech:ammonia_synthesizer"
+  }
+}

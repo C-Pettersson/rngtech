@@ -1,0 +1,26 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "rngtech:material_enabled",
+      "material": "naquadah"
+    }
+  ],
+  "type": "rngtech:trait_shaped",
+  "category": "misc",
+  "pattern": [
+    "NNN",
+    "I I",
+    "III"
+  ],
+  "key": {
+    "I": {
+      "tag": "c:ingots/naquadah"
+    },
+    "N": {
+      "tag": "c:nuggets/naquadah"
+    }
+  },
+  "result": {
+    "id": "rngtech:naquadah_casing"
+  }
+}

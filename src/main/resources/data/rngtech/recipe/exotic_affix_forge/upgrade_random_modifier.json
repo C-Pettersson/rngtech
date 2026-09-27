@@ -1,0 +1,14 @@
+{
+  "type": "rngtech:exotic_affix_forge",
+  "action": "upgrade_random_modifier",
+  "catalyst": {
+    "item": "rngtech:exotic_affix_catalyst"
+  },
+  "catalyst_count": 3,
+  "max_catalyst_count": 16,
+  "energy": 10000000,
+  "processing_ticks": 4800,
+  "refinement_potential_cost": 0,
+  "total_use_energy_multiplier": 0.5,
+  "action_use_energy_multiplier": 0.75
+}

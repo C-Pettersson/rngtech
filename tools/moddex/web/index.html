@@ -1,0 +1,583 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>RNGTech Moddex</title>
+    <link rel="stylesheet" href="/styles.css">
+  </head>
+  <body>
+    <header class="topbar">
+      <div>
+        <h1>RNGTech Moddex</h1>
+        <p id="buildMeta">Loading modifier data...</p>
+      </div>
+      <div class="top-actions view-tabs">
+        <button class="active" data-view="modifiers" type="button">Modifiers</button>
+        <button data-view="rbom" type="button">RBOM</button>
+        <button data-view="stages" type="button">Stages</button>
+        <button data-view="passiveTree" type="button">Passive Trees</button>
+        <button data-view="gui" type="button">GUI</button>
+        <button id="refreshData" type="button">Refresh Data</button>
+      </div>
+    </header>
+
+    <main>
+      <section id="modifierView" class="view-section">
+        <section class="toolbar" aria-label="Modifier context">
+          <label>
+            Profile
+            <select id="profileSelect"></select>
+          </label>
+          <label>
+            Component Stage
+            <input id="stageInput" type="number" min="0" max="8" step="1" value="8">
+          </label>
+          <label>
+            Rarity
+            <select id="raritySelect">
+              <option value="NORMAL">Normal</option>
+              <option value="MAGIC">Magic</option>
+              <option value="RARE" selected>Rare</option>
+            </select>
+          </label>
+          <label>
+            Rolls
+            <input id="iterationInput" type="number" min="100" max="250000" step="100" value="10000">
+          </label>
+        </section>
+
+        <section class="grid">
+          <section class="panel">
+            <div class="panel-heading">
+              <h2>Pool</h2>
+              <label class="compact-filter">
+                Tags
+                <select id="poolTagSelect">
+                  <option value="">All</option>
+                  <option value="POWER">Power</option>
+                  <option value="SPEED">Speed</option>
+                  <option value="YIELD">Yield</option>
+                  <option value="STABILITY">Stability</option>
+                  <option value="CONTROL">Control</option>
+                  <option value="KINETIC">Kinetic</option>
+                  <option value="EFFICIENCY">Efficiency</option>
+                </select>
+              </label>
+              <span id="poolSummary"></span>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Slot</th>
+                    <th>Modifier</th>
+                    <th>Operation</th>
+                    <th>Weight</th>
+                    <th>Tags</th>
+                    <th>T1</th>
+                    <th>T2</th>
+                    <th>T3</th>
+                    <th>T4</th>
+                  </tr>
+                </thead>
+                <tbody id="poolBody"></tbody>
+              </table>
+            </div>
+          </section>
+
+          <section class="panel">
+            <div class="panel-heading">
+              <h2>Odds</h2>
+              <button id="runOdds" type="button">Run Simulation</button>
+            </div>
+            <div id="rollRules" class="metric-grid"></div>
+            <h3>Target Stats</h3>
+            <div id="targetStats" class="check-grid"></div>
+            <div id="simulationOutput" class="results"></div>
+          </section>
+        </section>
+
+        <section class="panel forge-panel">
+          <div class="panel-heading">
+            <h2>Forge Sandbox</h2>
+            <div class="button-row">
+              <button id="rollBase" type="button">Roll Base</button>
+              <button id="blankBase" type="button">Blank Target</button>
+            </div>
+          </div>
+
+          <div class="forge-layout">
+            <div>
+              <div id="sandboxSummary" class="sandbox-summary"></div>
+              <div class="button-row compact">
+                <button data-action="add-prefix" type="button">Add Prefix</button>
+                <button data-action="add-suffix" type="button">Add Suffix</button>
+                <button data-action="kinetic" type="button">Kinetic Lens</button>
+                <button data-action="efficiency" type="button">Efficiency Lens</button>
+                <button data-action="ascend" type="button">Ascend</button>
+                <button data-action="chaos" type="button">Chaos</button>
+                <button data-action="expansion" type="button">Expansion</button>
+                <button data-action="null" type="button">Null</button>
+              </div>
+              <p id="sandboxStatus" class="status-line"></p>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th></th>
+                    <th>Slot</th>
+                    <th>Modifier</th>
+                    <th>Tier</th>
+                    <th>Value</th>
+                  </tr>
+                </thead>
+                <tbody id="sandboxBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+      </section>
+
+      <section id="rbomView" class="view-section hidden">
+        <section class="toolbar rbom-toolbar" aria-label="RBOM context">
+          <label>
+            Target
+            <select id="rbomTargetSelect"></select>
+          </label>
+          <label>
+            Quantity
+            <input id="rbomQuantityInput" type="number" min="1" max="999" step="1" value="2">
+          </label>
+          <label>
+            Recipe
+            <select id="rbomRecipeSelect"></select>
+          </label>
+          <div class="toolbar-actions">
+            <button id="buildRbom" type="button">Build RBOM</button>
+          </div>
+        </section>
+        <p class="status-line rbom-note">RBOM stops at core resources such as ingots and redstone. Batch recipes round up to whole crafts, so spare output is listed when a recipe makes more than the requested quantity.</p>
+
+        <section class="grid">
+          <section class="panel">
+            <div class="panel-heading">
+              <h2>Direct Inputs</h2>
+              <span id="rbomRecipeMeta"></span>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Qty</th>
+                    <th>Input</th>
+                    <th>Kind</th>
+                    <th>Note</th>
+                  </tr>
+                </thead>
+                <tbody id="rbomDirectBody"></tbody>
+              </table>
+            </div>
+          </section>
+
+          <section class="panel">
+            <div class="panel-heading">
+              <h2>Raw Totals</h2>
+              <span id="rbomSummary"></span>
+            </div>
+            <div id="rbomMetrics" class="metric-grid"></div>
+            <div class="table-wrap rbom-table">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Qty</th>
+                    <th>Material</th>
+                    <th>Source</th>
+                  </tr>
+                </thead>
+                <tbody id="rbomTotalsBody"></tbody>
+              </table>
+            </div>
+          </section>
+        </section>
+
+        <section class="panel">
+          <div class="panel-heading">
+            <h2>Crafting Plan</h2>
+            <span id="rbomPlanMeta"></span>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Qty</th>
+                  <th>Target</th>
+                  <th>Recipe</th>
+                  <th>Batch</th>
+                </tr>
+              </thead>
+              <tbody id="rbomPlanBody"></tbody>
+            </table>
+          </div>
+        </section>
+      </section>
+
+      <section id="stageView" class="view-section hidden">
+        <section class="toolbar stage-toolbar" aria-label="Stage preview context">
+          <label>
+            Component Stage
+            <select id="stagePreviewSelect"></select>
+          </label>
+          <label>
+            Category
+            <select id="stageCategorySelect"></select>
+          </label>
+          <label>
+            Search
+            <input id="stageSearchInput" type="search" placeholder="Item id or name">
+          </label>
+          <label>
+            Min Prefix Groups
+            <input id="stageMinPrefixInput" type="number" min="0" max="32" step="1" value="4">
+          </label>
+          <label>
+            Min Suffix Groups
+            <input id="stageMinSuffixInput" type="number" min="0" max="32" step="1" value="4">
+          </label>
+          <label class="toggle-label">
+            <input id="stageAffixGapsOnly" type="checkbox">
+            Affix gaps only
+          </label>
+          <label class="toggle-label">
+            <input id="stageIssuesOnly" type="checkbox">
+            Issues only
+          </label>
+        </section>
+
+        <section class="panel">
+          <div class="panel-heading">
+            <h2>Stage Preview</h2>
+            <span id="stageCountMeta"></span>
+          </div>
+          <div id="stageMetrics" class="metric-grid stage-metrics"></div>
+          <div class="table-wrap stage-table">
+            <table>
+              <thead>
+                <tr>
+                  <th>Item</th>
+                  <th>Category</th>
+                  <th>Affixes</th>
+                  <th>Craft</th>
+                  <th>First Recipe</th>
+                  <th>Issues</th>
+                  <th>Direct Stage Inputs</th>
+                </tr>
+              </thead>
+              <tbody id="stageBody"></tbody>
+            </table>
+          </div>
+        </section>
+      </section>
+
+      <section id="guiView" class="view-section hidden">
+        <section class="toolbar gui-toolbar" aria-label="GUI editor context">
+          <label>
+            Source Screen
+            <select id="guiSourceSelect"></select>
+          </label>
+          <label>
+            Title
+            <input id="guiTitleInput" type="text" value="New Machine Screen">
+          </label>
+          <label>
+            Active Tab
+            <select id="guiActiveTabSelect"></select>
+          </label>
+          <label>
+            Preset Tab
+            <select id="guiPresetTabSelect">
+              <option value="PROCESSING">Processing</option>
+              <option value="GEAR">Gear</option>
+              <option value="STATS">Stats</option>
+              <option value="REFINEMENT">Refinement</option>
+            </select>
+          </label>
+          <div class="toolbar-actions button-row">
+            <button id="guiBlankLayout" type="button">Blank</button>
+            <button id="guiAddPresetTab" type="button">Add Preset</button>
+            <button id="guiAddCustomTab" type="button">Add Custom</button>
+          </div>
+        </section>
+
+        <section class="gui-layout">
+          <section class="panel gui-palette" aria-label="GUI element palette">
+            <div class="panel-heading">
+              <h2>Palette</h2>
+              <span id="guiElementCount"></span>
+            </div>
+            <div id="guiPaletteBody" class="palette-grid">
+              <button data-gui-add="TAB" draggable="true" type="button">Tab</button>
+              <button data-gui-add="ITEM_SLOT" draggable="true" type="button">Item Slot</button>
+              <button data-gui-add="FLUID_SLOT" draggable="true" type="button">Fluid Slot</button>
+              <button data-gui-add="FE_METER" draggable="true" type="button">FE Meter</button>
+              <button data-gui-add="FLUID_METER" draggable="true" type="button">Fluid Meter</button>
+              <button data-gui-add="FLUID_STACK" draggable="true" type="button">Fluid Stack</button>
+              <button data-gui-add="FLUID_TANK" draggable="true" type="button">Fluid Tank</button>
+              <button data-gui-add="COMPRESSOR_TANK" draggable="true" type="button">Compressor Tank</button>
+              <button data-gui-add="STATUS_BAR" draggable="true" type="button">Status Bar</button>
+              <button data-gui-add="LABEL" draggable="true" type="button">Label</button>
+              <button data-gui-add="CUSTOM_METER" draggable="true" type="button">Custom Meter</button>
+              <button data-gui-add="PLAYER_INVENTORY" draggable="true" type="button">Player Inventory</button>
+            </div>
+          </section>
+
+          <section class="panel gui-canvas-panel">
+            <div class="panel-heading">
+              <h2>Canvas</h2>
+              <span id="guiCanvasMeta"></span>
+            </div>
+            <div id="guiCanvasWrap" class="gui-canvas-wrap">
+              <div id="guiTabStrip" class="gui-tab-strip"></div>
+              <div id="guiCanvas" class="gui-canvas"></div>
+            </div>
+          </section>
+
+          <section class="panel gui-properties">
+            <div class="panel-heading">
+              <h2>Properties</h2>
+              <button id="guiDeleteSelected" type="button">Delete</button>
+            </div>
+            <div id="guiPropertiesBody" class="property-grid"></div>
+          </section>
+
+          <section class="panel gui-json-panel">
+            <div class="panel-heading">
+              <h2>JSON</h2>
+              <button id="guiCopyJson" type="button">Copy</button>
+            </div>
+            <textarea id="guiJsonOutput" class="json-output" spellcheck="false"></textarea>
+          </section>
+        </section>
+      </section>
+
+      <section id="passiveTreeView" class="view-section hidden">
+        <section class="toolbar passive-tree-toolbar" aria-label="Passive tree editor context">
+          <label>
+            Tree Id
+            <input id="passiveTreeIdInput" type="text" value="crusher">
+          </label>
+          <label>
+            Draft
+            <select id="passiveTreeDraftSelect"></select>
+          </label>
+          <label>
+            Draft Name
+            <input id="passiveTreeDraftNameInput" type="text" value="Crusher Default">
+          </label>
+          <label>
+            Package
+            <input id="passiveTreePackageInput" type="text" value="com.rngtech.rpg.progression">
+          </label>
+          <label>
+            Java Layout Class
+            <input id="passiveTreeClassInput" type="text" value="CrusherPassiveTreeLayout">
+          </label>
+          <label>
+            Canvas Size
+            <input id="passiveTreeCanvasInput" type="text" value="900x650">
+          </label>
+          <label>
+            Java Source
+            <select id="passiveTreeSourceSelect">
+              <option value="">Loading source trees...</option>
+            </select>
+          </label>
+          <div class="toolbar-actions button-row">
+            <button id="passiveTreeLoadSource" type="button">Load Java Tree</button>
+            <button id="passiveTreeSaveTree" type="button">Save Draft</button>
+            <button id="passiveTreeNewDraft" type="button">New Draft</button>
+            <button id="passiveTreeDuplicateDraft" type="button">Duplicate</button>
+            <button id="passiveTreeDeleteDraft" type="button">Delete Draft</button>
+            <button id="passiveTreeResetTree" type="button">Reset Draft</button>
+          </div>
+        </section>
+
+        <section class="passive-tree-layout">
+          <section class="panel passive-tree-palette" aria-label="Passive tree shape palette">
+            <div class="panel-heading">
+              <h2>Shape</h2>
+              <span id="passiveTreeShapeMeta"></span>
+            </div>
+            <div class="property-grid">
+              <label>
+                Preset
+                <select id="passiveTreeShapeKind">
+                  <option value="circle">Circle</option>
+                  <option value="halfCircle">Half Circle</option>
+                  <option value="arc">Arc</option>
+                  <option value="line">Line</option>
+                  <option value="travelPath">Travel Path</option>
+                  <option value="twoPathDeadEnd">Two Path Dead End</option>
+                  <option value="branchedTravelPath">Branched Travel Path</option>
+                  <option value="point">Point</option>
+                  <option value="free" disabled>Free Nodes</option>
+                </select>
+              </label>
+              <label>
+                Nodes
+                <input id="passiveTreeNodeCount" type="number" min="1" max="24" step="1" value="5">
+              </label>
+              <label>
+                Primary
+                <select id="passiveTreeIdentitySelect"></select>
+              </label>
+              <label class="toggle-label">
+                <input id="passiveTreeIdentityNegative" type="checkbox">
+                Primary Negative
+              </label>
+              <label>
+                Primary Custom
+                <input id="passiveTreeCustomIdentity" type="text" placeholder="Optional">
+              </label>
+              <label>
+                Secondary
+                <select id="passiveTreeSecondaryIdentitySelect"></select>
+              </label>
+              <label class="toggle-label">
+                <input id="passiveTreeSecondaryIdentityNegative" type="checkbox">
+                Secondary Negative
+              </label>
+              <label>
+                Secondary Custom
+                <input id="passiveTreeSecondaryCustomIdentity" type="text" placeholder="Optional">
+              </label>
+              <label>
+                Constant Prefix
+                <input id="passiveTreeNodePrefix" type="text" value="PROCESSING_SPEED">
+              </label>
+              <label>
+                Shape Constant
+                <input id="passiveTreeShapeName" type="text" value="PROCESSING_SPEED_CLUSTER">
+              </label>
+              <label>
+                Node Kind
+                <select id="passiveTreeNodeKind">
+                  <option value="NODE">Node</option>
+                  <option value="TRAVEL">Travel</option>
+                  <option value="NOTABLE">Notable</option>
+                  <option value="KEYSTONE">Keystone</option>
+                </select>
+              </label>
+            </div>
+            <div id="passiveTreeShapeParams" class="property-grid passive-tree-shape-params"></div>
+            <label class="property-wide">
+              Node Constants
+              <textarea id="passiveTreeNodeNames" spellcheck="false"></textarea>
+            </label>
+            <div class="button-row compact">
+              <button id="passiveTreeAddShape" type="button">Add Shape</button>
+              <button id="passiveTreeUpdateShape" type="button">Update Selected</button>
+              <button id="passiveTreeDeleteShape" type="button">Delete Selected</button>
+              <button id="passiveTreeDeshapeSelected" type="button">Deshape Selected</button>
+              <button id="passiveTreeRegenerateNames" type="button">Regenerate Names</button>
+            </div>
+            <h3>Saved Shapes</h3>
+            <div class="button-row compact">
+              <button id="passiveTreeSaveShape" type="button">Save Shape</button>
+            </div>
+            <div id="passiveTreeSavedShapes" class="saved-shape-list"></div>
+            <p id="passiveTreeStatus" class="status-line"></p>
+          </section>
+
+          <section class="panel passive-tree-canvas-panel">
+            <div class="panel-heading">
+              <h2>Canvas</h2>
+              <span id="passiveTreeCanvasMeta"></span>
+            </div>
+            <div id="passiveTreeCanvasWrap" class="passive-tree-canvas-wrap">
+              <svg id="passiveTreeCanvas" class="passive-tree-canvas" role="img" aria-label="Passive tree layout preview"></svg>
+            </div>
+            <div id="passiveTreeNodeContextMenu" class="passive-tree-context-menu hidden"></div>
+          </section>
+
+          <section class="panel passive-tree-groups">
+            <div class="panel-heading">
+              <h2>Groups</h2>
+              <span id="passiveTreeGroupCount"></span>
+            </div>
+            <div id="passiveTreeGroupList" class="passive-tree-group-list"></div>
+            <h3>Selected Node</h3>
+            <div id="passiveTreeNodeProperties" class="property-grid"></div>
+          </section>
+
+          <section class="panel passive-tree-preview">
+            <div class="panel-heading">
+              <h2>Visual Audit</h2>
+              <span id="passiveTreePreviewMeta"></span>
+            </div>
+            <p class="muted passive-tree-audit-copy">Fitted gameplay-style view of the full authored graph. Long chords and proper link crossings are highlighted so a numerically valid tree cannot hide behind the editing canvas.</p>
+            <div class="passive-tree-visual-audit-wrap">
+              <svg id="passiveTreeVisualAudit" class="passive-tree-visual-audit" role="img" aria-label="Fitted passive tree visual audit"></svg>
+            </div>
+            <div id="passiveTreeVisualAuditMetrics" class="metric-grid passive-tree-visual-audit-metrics"></div>
+            <h3>Shape Inspector</h3>
+            <div id="passiveTreePreviewMetrics" class="metric-grid passive-tree-preview-metrics"></div>
+            <div id="passiveTreePreviewShapeSummary" class="passive-tree-preview-summary"></div>
+            <div class="table-wrap passive-tree-preview-table">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Scope</th>
+                    <th>Constant</th>
+                    <th>Kind</th>
+                    <th>Identity</th>
+                    <th>X</th>
+                    <th>Y</th>
+                    <th>Accessor</th>
+                    <th>Flags</th>
+                  </tr>
+                </thead>
+                <tbody id="passiveTreePreviewBody"></tbody>
+              </table>
+            </div>
+            <h3>Connections</h3>
+            <div class="table-wrap passive-tree-preview-table">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Source</th>
+                    <th>From</th>
+                    <th>To</th>
+                    <th>Kind</th>
+                  </tr>
+                </thead>
+                <tbody id="passiveTreePreviewConnectionsBody"></tbody>
+              </table>
+            </div>
+          </section>
+
+          <section class="panel passive-tree-output">
+            <div class="panel-heading">
+              <h2>Java</h2>
+              <button id="passiveTreeCopyJava" type="button">Copy</button>
+            </div>
+            <textarea id="passiveTreeJavaOutput" class="json-output" spellcheck="false"></textarea>
+          </section>
+
+          <section class="panel passive-tree-json-output">
+            <div class="panel-heading">
+              <h2>JSON</h2>
+              <button id="passiveTreeCopyJson" type="button">Copy</button>
+            </div>
+            <textarea id="passiveTreeJsonOutput" class="json-output" spellcheck="false"></textarea>
+          </section>
+        </section>
+      </section>
+    </main>
+
+    <script type="module" src="/app.js"></script>
+    <script type="module" src="/gui-editor.js"></script>
+    <script type="module" src="/passive-tree-editor.js"></script>
+  </body>
+</html>

@@ -1,0 +1,23 @@
+{
+  "type": "rngtech:trait_shaped",
+  "category": "misc",
+  "key": {
+    "B": {
+      "item": "minecraft:gravel"
+    },
+    "C": {
+      "item": "minecraft:crafting_table"
+    },
+    "S": {
+      "item": "minecraft:oak_slab"
+    }
+  },
+  "pattern": [
+    "SSS",
+    "SCS",
+    "BBB"
+  ],
+  "result": {
+    "id": "rngtech:tool_bench"
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "replace": false,
+  "values": [
+    "rngtech:lead_ingot",
+    "rngtech:lead_dust",
+    "rngtech:lead_nugget",
+    "rngtech:lead_storage_block",
+    "rngtech:lead_ore",
+    "rngtech:deepslate_lead_ore",
+    "rngtech:raw_lead",
+    "rngtech:crushed_lead",
+    "rngtech:lead_plate",
+    "rngtech:lead_gear",
+    "rngtech:lead_rod",
+    "rngtech:lead_coil"
+  ]
+}

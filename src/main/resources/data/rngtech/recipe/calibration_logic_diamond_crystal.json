@@ -1,0 +1,14 @@
+{
+  "type": "rngtech:calibration",
+  "family": "logic",
+  "ingredient": { "item": "minecraft:diamond" },
+  "pattern": { "item": "rngtech:logic_calibration_pattern" },
+  "catalyst": { "item": "minecraft:emerald" },
+  "processing_ticks": 480,
+  "energy": 60000,
+  "result": {
+    "stack": { "id": "rngtech:calibrated_diamond_crystal" },
+    "stage": 6,
+    "stability": { "min": 75, "max": 95 }
+  }
+}

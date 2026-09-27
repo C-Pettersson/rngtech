@@ -1,0 +1,21 @@
+{
+    "neoforge:conditions": [
+        {
+            "type": "rngtech:material_enabled",
+            "material": "copper"
+        }
+    ],
+    "type": "rngtech:crusher",
+    "group": "rngtech_ingot_to_dust",
+    "ingredient": {
+        "tag": "c:ingots/copper"
+    },
+    "result": {
+        "id": "rngtech:copper_dust"
+    },
+    "bonus_output": false,
+    "processing_ticks": 60,
+    "energy": 1200,
+    "required_processing_level": 1,
+    "machine_xp": 0
+}

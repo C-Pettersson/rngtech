@@ -1,0 +1,46 @@
+{
+  "ambientocclusion": true,
+  "textures": {
+    "lens": "rngtech:block/affix_forge_lens_array",
+    "particle": "rngtech:block/affix_forge_lens_array",
+    "side": "rngtech:block/affix_forge_side"
+  },
+  "elements": [
+    {
+      "from": [4, 9, 11.5],
+      "to": [12, 10, 13],
+      "faces": {
+        "down": { "texture": "#side" },
+        "up": { "texture": "#lens" },
+        "north": { "texture": "#lens" },
+        "south": { "texture": "#lens" },
+        "east": { "texture": "#side" },
+        "west": { "texture": "#side" }
+      }
+    },
+    {
+      "from": [4.75, 10, 11],
+      "to": [6.75, 12, 13.5],
+      "faces": {
+        "down": { "texture": "#lens" },
+        "up": { "texture": "#lens" },
+        "north": { "texture": "#lens" },
+        "south": { "texture": "#lens" },
+        "east": { "texture": "#lens" },
+        "west": { "texture": "#lens" }
+      }
+    },
+    {
+      "from": [9.25, 10, 11],
+      "to": [11.25, 12, 13.5],
+      "faces": {
+        "down": { "texture": "#lens" },
+        "up": { "texture": "#lens" },
+        "north": { "texture": "#lens" },
+        "south": { "texture": "#lens" },
+        "east": { "texture": "#lens" },
+        "west": { "texture": "#lens" }
+      }
+    }
+  ]
+}

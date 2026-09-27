@@ -1,0 +1,33 @@
+{
+  "type": "rngtech:calibrated_shaped",
+  "category": "misc",
+  "pattern": [
+    "SAS",
+    "CMC",
+    "ALA"
+  ],
+  "key": {
+    "A": {
+      "ingredient": { "item": "minecraft:diamond" }
+    },
+    "C": {
+      "ingredient": { "item": "rngtech:calibrated_conductive_component" },
+      "calibration": { "family": "conductive", "min_stage": 2, "min_stability": 45 }
+    },
+    "L": {
+      "ingredient": { "item": "rngtech:calibrated_logic_component" },
+      "calibration": { "family": "logic", "min_stage": 2, "min_stability": 45 }
+    },
+    "M": {
+      "ingredient": { "item": "rngtech:matrix" }
+    },
+    "S": {
+      "ingredient": { "item": "rngtech:calibrated_structural_component" },
+      "calibration": { "family": "structural", "min_stage": 1, "min_stability": 45 }
+    }
+  },
+  "result": {
+    "count": 1,
+    "id": "rngtech:affix_resonance_matrix"
+  }
+}

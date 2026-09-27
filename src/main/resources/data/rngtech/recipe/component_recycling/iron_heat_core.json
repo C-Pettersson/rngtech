@@ -1,0 +1,32 @@
+{
+    "type": "rngtech:component_recycling",
+    "ingredient": {
+        "item": "rngtech:iron_heat_core"
+    },
+    "minimum_processing_level": 1,
+    "processing_ticks": 92,
+    "energy": 770,
+    "outputs": [
+        {
+            "stack": {
+                "id": "rngtech:iron_coil",
+                "count": 1
+            },
+            "requires_filter": false
+        },
+        {
+            "stack": {
+                "id": "rngtech:heat_core",
+                "count": 1
+            },
+            "requires_filter": false
+        },
+        {
+            "stack": {
+                "id": "minecraft:coal",
+                "count": 1
+            },
+            "requires_filter": true
+        }
+    ]
+}

@@ -1,0 +1,18 @@
+{
+  "replace": false,
+  "values": [
+    "minecraft:copper_ingot",
+    "rngtech:copper_dust",
+    "rngtech:copper_nugget",
+    "minecraft:copper_block",
+    "minecraft:copper_ore",
+    "minecraft:deepslate_copper_ore",
+    "minecraft:raw_copper",
+    "rngtech:crushed_copper",
+    "rngtech:copper_plate",
+    "rngtech:copper_gear",
+    "rngtech:copper_rod",
+    "rngtech:copper_coil",
+    "rngtech:copper_casing"
+  ]
+}

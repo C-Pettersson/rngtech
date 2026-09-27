@@ -1,0 +1,32 @@
+{
+  "type": "rngtech:component_recycling",
+  "ingredient": {
+    "item": "rngtech:vacuum_collapse_generator"
+  },
+  "minimum_processing_level": 7,
+  "processing_ticks": 204,
+  "energy": 2440,
+  "outputs": [
+    {
+      "stack": {
+        "id": "rngtech:exotic_machine_frame",
+        "count": 1
+      },
+      "requires_filter": false
+    },
+    {
+      "stack": {
+        "id": "rngtech:tungstensteel_void_chamber",
+        "count": 1
+      },
+      "requires_filter": false
+    },
+    {
+      "stack": {
+        "id": "rngtech:tungstensteel_dimensional_stabilizer",
+        "count": 1
+      },
+      "requires_filter": true
+    }
+  ]
+}

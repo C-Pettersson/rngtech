@@ -1,0 +1,10 @@
+services:
+  docs:
+    image: squidfunk/mkdocs-material:9.7.7
+    command: serve --dev-addr=0.0.0.0:8000
+    ports:
+      - "127.0.0.1:8000:8000"
+    volumes:
+      - ./docs:/docs/docs
+      - ./mkdocs.yml:/docs/mkdocs.yml
+      - ./requirements-docs.txt:/docs/requirements-docs.txt

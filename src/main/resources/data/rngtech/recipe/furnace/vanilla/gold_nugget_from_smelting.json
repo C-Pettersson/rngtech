@@ -1,0 +1,41 @@
+{
+    "type": "rngtech:furnace",
+    "ingredient": [
+        {
+            "item": "minecraft:golden_pickaxe"
+        },
+        {
+            "item": "minecraft:golden_shovel"
+        },
+        {
+            "item": "minecraft:golden_axe"
+        },
+        {
+            "item": "minecraft:golden_hoe"
+        },
+        {
+            "item": "minecraft:golden_sword"
+        },
+        {
+            "item": "minecraft:golden_helmet"
+        },
+        {
+            "item": "minecraft:golden_chestplate"
+        },
+        {
+            "item": "minecraft:golden_leggings"
+        },
+        {
+            "item": "minecraft:golden_boots"
+        },
+        {
+            "item": "minecraft:golden_horse_armor"
+        }
+    ],
+    "result": {
+        "id": "minecraft:gold_nugget"
+    },
+    "processing_ticks": 200,
+    "energy": 4800,
+    "experience": 0.1
+}

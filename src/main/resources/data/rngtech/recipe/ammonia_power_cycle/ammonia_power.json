@@ -1,0 +1,19 @@
+{
+  "type": "rngtech:ammonia_power_cycle",
+  "group": "ammonia_power",
+  "membrane": {
+    "item": "rngtech:fuel_cell_membrane"
+  },
+  "ammonia_input": {
+    "ingredient": {
+      "fluid": "rngtech:ammonia"
+    },
+    "amount": 1000
+  },
+  "energy": 96000,
+  "processing_ticks": 360,
+  "residue": {
+    "id": "rngtech:corrosion_residue"
+  },
+  "minimum_membrane_stage": 6
+}

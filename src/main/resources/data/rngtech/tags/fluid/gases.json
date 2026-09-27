@@ -1,0 +1,13 @@
+{
+  "replace": false,
+  "values": [
+    "rngtech:carbon_exhaust",
+    "rngtech:flowing_carbon_exhaust",
+    "rngtech:syngas",
+    "rngtech:flowing_syngas",
+    "rngtech:methane",
+    "rngtech:flowing_methane",
+    "rngtech:carbon_monoxide",
+    "rngtech:flowing_carbon_monoxide"
+  ]
+}

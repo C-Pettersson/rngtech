@@ -1,0 +1,137 @@
+{
+  "parent": "rngtech:item/forestry_cart_base",
+  "overrides": [
+    {
+      "predicate": {
+        "custom_model_data": 1
+      },
+      "model": "rngtech:item/forestry_cart_tree"
+    },
+    {
+      "predicate": {
+        "custom_model_data": 2
+      },
+      "model": "rngtech:item/forestry_cart_plants_crops"
+    },
+    {
+      "predicate": {
+        "custom_model_data": 3
+      },
+      "model": "rngtech:item/forestry_cart_broken_tool"
+    },
+    {
+      "predicate": {
+        "custom_model_data": 4
+      },
+      "model": "rngtech:item/forestry_cart_face_player_blocked"
+    },
+    {
+      "predicate": {
+        "custom_model_data": 5
+      },
+      "model": "rngtech:item/forestry_cart_face_chopping_leaves"
+    },
+    {
+      "predicate": {
+        "custom_model_data": 6
+      },
+      "model": "rngtech:item/forestry_cart_face_chopping_logs"
+    },
+    {
+      "predicate": {
+        "custom_model_data": 7
+      },
+      "model": "rngtech:item/forestry_cart_face_treefeller"
+    },
+    {
+      "predicate": {
+        "custom_model_data": 8
+      },
+      "model": "rngtech:item/forestry_cart_face_planting"
+    },
+    {
+      "predicate": {
+        "custom_model_data": 9
+      },
+      "model": "rngtech:item/forestry_cart_face_scanning"
+    },
+    {
+      "predicate": {
+        "custom_model_data": 10
+      },
+      "model": "rngtech:item/forestry_cart_face_moving"
+    },
+    {
+      "predicate": {
+        "custom_model_data": 11
+      },
+      "model": "rngtech:item/forestry_cart_face_no_power"
+    },
+    {
+      "predicate": {
+        "custom_model_data": 12
+      },
+      "model": "rngtech:item/forestry_cart_face_output_full"
+    },
+    {
+      "predicate": {
+        "custom_model_data": 13
+      },
+      "model": "rngtech:item/forestry_cart_face_no_saplings"
+    },
+    {
+      "predicate": {
+        "custom_model_data": 14
+      },
+      "model": "rngtech:item/forestry_cart_face_path_blocked"
+    },
+    {
+      "predicate": {
+        "custom_model_data": 15
+      },
+      "model": "rngtech:item/forestry_cart_face_clearing_path"
+    },
+    {
+      "predicate": {
+        "custom_model_data": 16
+      },
+      "model": "rngtech:item/forestry_cart_face_transfer"
+    },
+    {
+      "predicate": {
+        "custom_model_data": 17
+      },
+      "model": "rngtech:item/forestry_cart_face_setup_blocked"
+    },
+    {
+      "predicate": {
+        "custom_model_data": 18
+      },
+      "model": "rngtech:item/forestry_cart_face_managed"
+    },
+    {
+      "predicate": {
+        "custom_model_data": 19
+      },
+      "model": "rngtech:item/forestry_cart_face_cooldown"
+    },
+    {
+      "predicate": {
+        "custom_model_data": 20
+      },
+      "model": "rngtech:item/forestry_cart_face_harvest_blocked"
+    },
+    {
+      "predicate": {
+        "custom_model_data": 21
+      },
+      "model": "rngtech:item/forestry_cart_face_planting_blocked"
+    },
+    {
+      "predicate": {
+        "custom_model_data": 22
+      },
+      "model": "rngtech:item/forestry_cart_face_snapshot"
+    }
+  ]
+}

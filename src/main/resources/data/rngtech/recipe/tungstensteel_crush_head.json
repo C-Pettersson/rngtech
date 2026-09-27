@@ -1,0 +1,34 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "rngtech:material_enabled",
+      "material": "tungstensteel"
+    }
+  ],
+  "type": "rngtech:calibrated_shaped",
+  "category": "equipment",
+  "pattern": [
+    "PPP",
+    "BKB",
+    " R "
+  ],
+  "key": {
+    "B": {
+      "ingredient": { "item": "rngtech:titanium_plate" }
+    },
+    "K": {
+      "ingredient": { "item": "rngtech:calibrated_kinetic_component" },
+      "calibration": { "family": "kinetic", "min_stage": 1, "min_stability": 75 }
+    },
+    "P": {
+      "ingredient": { "item": "rngtech:tungstensteel_plate" }
+    },
+    "R": {
+      "ingredient": { "item": "minecraft:redstone_block" }
+    }
+  },
+  "result": {
+    "count": 1,
+    "id": "rngtech:tungstensteel_crush_head"
+  }
+}

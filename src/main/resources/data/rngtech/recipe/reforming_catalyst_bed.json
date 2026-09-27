@@ -1,0 +1,29 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "rngtech:material_enabled",
+      "material": "titanium"
+    }
+  ],
+  "type": "rngtech:trait_shaped",
+  "category": "misc",
+  "pattern": [
+    "PBP",
+    "BGB",
+    "PBP"
+  ],
+  "key": {
+    "B": {
+      "item": "minecraft:blaze_powder"
+    },
+    "G": {
+      "item": "rngtech:titanium_gear"
+    },
+    "P": {
+      "item": "rngtech:titanium_plate"
+    }
+  },
+  "result": {
+    "id": "rngtech:reforming_catalyst_bed"
+  }
+}

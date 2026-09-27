@@ -1,0 +1,23 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "rngtech:material_enabled",
+      "material": "aluminum"
+    }
+  ],
+  "type": "rngtech:trait_shaped",
+  "category": "misc",
+  "pattern": [
+    " I ",
+    "I I",
+    " I "
+  ],
+  "key": {
+    "I": {
+      "tag": "c:ingots/aluminum"
+    }
+  },
+  "result": {
+    "id": "rngtech:aluminum_gear"
+  }
+}

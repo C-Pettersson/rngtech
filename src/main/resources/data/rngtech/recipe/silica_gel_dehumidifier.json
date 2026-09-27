@@ -1,0 +1,23 @@
+{
+  "neoforge:conditions": [
+    { "type": "rngtech:material_enabled", "material": "aluminum" }
+  ],
+  "type": "rngtech:trait_shaped",
+  "category": "redstone",
+  "pattern": [
+    "GSG",
+    "PMP",
+    "GCG"
+  ],
+  "key": {
+    "C": { "item": "rngtech:aluminum_casing" },
+    "G": { "item": "minecraft:glass" },
+    "M": { "tag": "rngtech:machine_frames/advanced" },
+    "P": { "item": "rngtech:aluminum_plate" },
+    "S": { "item": "rngtech:silica_gel_beads" }
+  },
+  "result": {
+    "count": 1,
+    "id": "rngtech:silica_gel_dehumidifier"
+  }
+}

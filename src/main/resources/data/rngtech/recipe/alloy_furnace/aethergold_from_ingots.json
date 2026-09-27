@@ -1,0 +1,33 @@
+{
+  "neoforge:conditions": [
+    { "type": "rngtech:material_enabled", "material": "aethergold" },
+    { "type": "rngtech:material_enabled", "material": "tin" },
+    { "type": "rngtech:material_enabled", "material": "silver" }
+  ],
+  "type": "rngtech:alloy_furnace",
+  "group": "rngtech_direct_alloys",
+  "mode": "direct_ingot",
+  "ingredients": [
+    {
+      "ingredient": { "tag": "c:ingots/tin" },
+      "count": 3
+    },
+    {
+      "ingredient": { "tag": "c:ingots/silver" },
+      "count": 1
+    },
+    {
+      "ingredient": { "item": "minecraft:glowstone_dust" },
+      "count": 4
+    }
+  ],
+  "result": {
+    "count": 2,
+    "id": "rngtech:aethergold_ingot"
+  },
+  "processing_ticks": 1200,
+  "energy": 24000,
+  "minimum_component_stage": 6,
+  "minimum_temperature": 1400,
+  "required_temperature_stability": 1.12
+}

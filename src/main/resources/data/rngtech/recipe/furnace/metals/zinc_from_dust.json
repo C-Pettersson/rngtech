@@ -1,0 +1,20 @@
+{
+    "neoforge:conditions": [
+        {
+            "type": "rngtech:material_enabled",
+            "material": "zinc"
+        }
+    ],
+    "type": "rngtech:furnace",
+    "group": "rngtech_metals",
+    "ingredient": {
+        "item": "rngtech:zinc_dust"
+    },
+    "result": {
+        "id": "rngtech:zinc_ingot"
+    },
+    "processing_ticks": 200,
+    "energy": 4800,
+    "experience": 0.7,
+    "minimum_temperature": 1000
+}

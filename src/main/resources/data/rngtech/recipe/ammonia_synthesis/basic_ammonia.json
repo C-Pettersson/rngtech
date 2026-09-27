@@ -1,0 +1,26 @@
+{
+  "type": "rngtech:ammonia_synthesis",
+  "group": "ammonia_synthesis",
+  "catalyst": {
+    "item": "rngtech:ammonia_catalyst_bed"
+  },
+  "nitrogen_input": {
+    "ingredient": {
+      "fluid": "rngtech:nitrogen"
+    },
+    "amount": 500
+  },
+  "hydrogen_input": {
+    "ingredient": {
+      "fluid": "rngtech:hydrogen"
+    },
+    "amount": 1500
+  },
+  "output": {
+    "id": "rngtech:ammonia",
+    "amount": 1000
+  },
+  "energy": 12000,
+  "processing_ticks": 400,
+  "minimum_catalyst_stage": 6
+}

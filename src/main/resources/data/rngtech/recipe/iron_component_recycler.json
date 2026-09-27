@@ -1,0 +1,30 @@
+{
+    "type":  "rngtech:trait_shaped",
+    "category":  "misc",
+    "pattern":  [
+                    "CMC",
+                    "RHR",
+                    "CGC"
+                ],
+    "key":  {
+                "C":  {
+                          "item":  "rngtech:iron_casing"
+                      },
+                "M":  {
+                          "tag":  "rngtech:machine_frames/base"
+                      },
+                "R":  {
+                          "item":  "minecraft:redstone"
+                      },
+                "H":  {
+                          "item":  "rngtech:iron_disassembly_head"
+                      },
+                "G":  {
+                          "item":  "rngtech:iron_gear"
+                      }
+            },
+    "result":  {
+                   "count":  1,
+                   "id":  "rngtech:iron_component_recycler"
+               }
+}

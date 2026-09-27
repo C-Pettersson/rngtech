@@ -1,0 +1,18 @@
+{
+  "type": "rngtech:component_recycling",
+  "ingredient": {
+    "item": "rngtech:calibrated_thermal_component"
+  },
+  "minimum_processing_level": 2,
+  "processing_ticks": 100,
+  "energy": 760,
+  "outputs": [
+    {
+      "stack": {
+        "id": "rngtech:copper_casing",
+        "count": 1
+      },
+      "requires_filter": false
+    }
+  ]
+}

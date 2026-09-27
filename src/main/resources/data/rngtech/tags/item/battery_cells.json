@@ -1,0 +1,16 @@
+{
+  "replace": false,
+  "values": [
+    "rngtech:potato_battery_cell",
+    "rngtech:unique_potato_battery_cell",
+    "rngtech:iron_battery_cell",
+    "rngtech:copper_battery_cell",
+    "rngtech:lead_battery_cell",
+    "rngtech:invar_battery_cell",
+    "rngtech:sparksteel_battery_cell",
+    "rngtech:arclite_battery_cell",
+    "rngtech:nullite_battery_cell",
+    "rngtech:aethergold_battery_cell",
+    "rngtech:exotic_battery_cell"
+  ]
+}

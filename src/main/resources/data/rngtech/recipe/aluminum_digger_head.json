@@ -1,0 +1,30 @@
+{
+  "type": "rngtech:trait_shaped",
+  "category": "equipment",
+  "neoforge:conditions": [
+    {
+      "type": "rngtech:material_enabled",
+      "material": "aluminum"
+    }
+  ],
+  "key": {
+    "G": {
+      "item": "rngtech:aluminum_gear"
+    },
+    "R": {
+      "item": "rngtech:aluminum_rod"
+    },
+    "P": {
+      "item": "rngtech:aluminum_plate"
+    }
+  },
+  "pattern": [
+    "PPP",
+    "PGP",
+    " R "
+  ],
+  "result": {
+    "count": 1,
+    "id": "rngtech:aluminum_digger_head"
+  }
+}

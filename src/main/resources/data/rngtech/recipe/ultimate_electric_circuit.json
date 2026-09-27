@@ -1,0 +1,42 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "rngtech:material_enabled",
+      "material": "nullite"
+    },
+    {
+      "type": "rngtech:material_enabled",
+      "material": "tungstensteel"
+    },
+    {
+      "type": "rngtech:material_enabled",
+      "material": "naquadah"
+    },
+    {
+      "type": "rngtech:material_enabled",
+      "material": "netherite"
+    }
+  ],
+  "type": "rngtech:metal_press",
+  "group": "metal_press_circuits",
+  "ingredient": {
+    "item": "rngtech:ultimate_circuit_blank"
+  },
+  "input_count": 1,
+  "mold": {
+    "item": "rngtech:circuit_mold"
+  },
+  "result": {
+    "count": 1,
+    "id": "rngtech:ultimate_electric_circuit"
+  },
+  "processing_ticks": 400,
+  "energy": 8000,
+  "minimum_temperature": 2000,
+  "safe_maximum_temperature": 2450,
+  "required_temperature_stability": 1.15,
+  "failure_output": {
+    "count": 1,
+    "id": "rngtech:broken_circuit"
+  }
+}

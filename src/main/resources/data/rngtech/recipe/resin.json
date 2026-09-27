@@ -1,0 +1,24 @@
+{
+  "type": "rngtech:trait_shaped",
+  "category": "misc",
+  "pattern": [
+    " L ",
+    "LPL",
+    " C "
+  ],
+  "key": {
+    "C": {
+      "item": "minecraft:charcoal"
+    },
+    "L": {
+      "tag": "minecraft:logs"
+    },
+    "P": {
+      "item": "rngtech:plant_reagent"
+    }
+  },
+  "result": {
+    "count": 4,
+    "id": "rngtech:resin"
+  }
+}

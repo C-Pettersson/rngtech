@@ -1,0 +1,15 @@
+{
+  "parent": "rngtech:item/forestry_cart_base",
+  "textures": {
+    "accent": "rngtech:item/forestry_cart_base_accent",
+    "body": "rngtech:item/forestry_cart_copper_body",
+    "deck": "rngtech:item/forestry_cart_wood_deck",
+    "frame": "rngtech:item/forestry_cart_iron_frame",
+    "hover": "rngtech:item/forestry_cart_hover_blue",
+    "payload": "rngtech:item/forestry_cart_cargo_bin",
+    "screen": "rngtech:item/forestry_cart_broken_tool_screen",
+    "tool": "rngtech:item/forestry_cart_tool_arm",
+    "wheel": "rngtech:item/forestry_cart_wheel_tread",
+    "particle": "rngtech:item/forestry_cart_copper_body"
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "type": "rngtech:component_recycling",
+  "ingredient": {
+    "item": "rngtech:titanium_stabilizer_matrix"
+  },
+  "minimum_processing_level": 6,
+  "processing_ticks": 152,
+  "energy": 1620,
+  "outputs": [
+    {
+      "stack": {
+        "id": "rngtech:matrix",
+        "count": 1
+      },
+      "requires_filter": false
+    },
+    {
+      "stack": {
+        "id": "rngtech:titanium_ingot",
+        "count": 1
+      },
+      "requires_filter": false
+    },
+    {
+      "stack": {
+        "id": "rngtech:stabilization_catalyst",
+        "count": 1
+      },
+      "requires_filter": true
+    }
+  ]
+}

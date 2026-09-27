@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "rngtech:item/tool_heads/copper_axe_head"
+  }
+}

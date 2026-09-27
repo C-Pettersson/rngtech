@@ -1,0 +1,19 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "rngtech:material_enabled",
+      "material": "netherite"
+    }
+  ],
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "tag": "c:ingots/netherite"
+    }
+  ],
+  "result": {
+    "count": 9,
+    "id": "rngtech:netherite_nugget"
+  }
+}

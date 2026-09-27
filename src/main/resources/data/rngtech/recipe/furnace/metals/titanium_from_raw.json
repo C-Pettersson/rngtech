@@ -1,0 +1,21 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "rngtech:material_enabled",
+      "material": "titanium"
+    }
+  ],
+  "type": "rngtech:furnace",
+  "group": "rngtech_metals",
+  "ingredient": {
+    "tag": "c:raw_materials/titanium"
+  },
+  "result": {
+    "id": "rngtech:titanium_ingot"
+  },
+  "processing_ticks": 200,
+  "energy": 14400,
+  "experience": 0.7,
+  "minimum_temperature": 1000,
+  "machine_xp": 2
+}

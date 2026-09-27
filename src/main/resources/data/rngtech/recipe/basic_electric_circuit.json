@@ -1,0 +1,34 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "rngtech:material_enabled",
+      "material": "bronze"
+    },
+    {
+      "type": "rngtech:material_enabled",
+      "material": "copper"
+    }
+  ],
+  "type": "rngtech:metal_press",
+  "group": "metal_press_circuits",
+  "ingredient": {
+    "item": "rngtech:basic_circuit_blank"
+  },
+  "input_count": 1,
+  "mold": {
+    "item": "rngtech:circuit_mold"
+  },
+  "result": {
+    "count": 1,
+    "id": "rngtech:basic_electric_circuit"
+  },
+  "processing_ticks": 180,
+  "energy": 1600,
+  "minimum_temperature": 1300,
+  "safe_maximum_temperature": 1500,
+  "required_temperature_stability": 0.95,
+  "failure_output": {
+    "count": 1,
+    "id": "rngtech:broken_circuit"
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "replace": false,
+  "values": [
+    "rngtech:titanium_ingot",
+    "rngtech:titanium_dust",
+    "rngtech:titanium_nugget",
+    "rngtech:titanium_storage_block",
+    "rngtech:titanium_ore",
+    "rngtech:deepslate_titanium_ore",
+    "rngtech:raw_titanium",
+    "rngtech:crushed_titanium",
+    "rngtech:titanium_plate",
+    "rngtech:titanium_gear",
+    "rngtech:titanium_rod",
+    "rngtech:titanium_coil",
+    "rngtech:titanium_casing"
+  ]
+}

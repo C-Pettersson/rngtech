@@ -1,0 +1,35 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "rngtech:material_enabled",
+      "material": "gold"
+    }
+  ],
+  "type": "rngtech:tool_damage_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "rngtech:forming_hammer"
+    },
+    {
+      "tag": "c:ingots/gold"
+    },
+    {
+      "tag": "c:ingots/gold"
+    },
+    {
+      "tag": "c:ingots/gold"
+    },
+    {
+      "tag": "c:ingots/gold"
+    }
+  ],
+  "tool": {
+    "item": "rngtech:forming_hammer"
+  },
+  "tool_damage": 1,
+  "result": {
+    "id": "rngtech:gold_plate",
+    "count": 2
+  }
+}

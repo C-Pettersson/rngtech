@@ -1,0 +1,10 @@
+{
+  "values": [
+    "rngtech:iron_control_board",
+    "rngtech:copper_control_board",
+    "rngtech:steel_control_board",
+    "rngtech:titanium_control_board",
+    "rngtech:tungstensteel_control_board",
+    "rngtech:nullite_control_board"
+  ]
+}

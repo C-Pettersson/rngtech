@@ -1,0 +1,18 @@
+{
+  "type": "rngtech:wooden_dehumidifier_conversion",
+  "group": "wooden_dehumidifier_conversion",
+  "ingredient": {
+    "tag": "c:dusts/coal"
+  },
+  "water_input": {
+    "ingredient": {
+      "fluid": "minecraft:water"
+    },
+    "amount": 1000
+  },
+  "fluid_output": {
+    "id": "rngtech:carbon_exhaust",
+    "amount": 1000
+  },
+  "processing_ticks": 6000
+}

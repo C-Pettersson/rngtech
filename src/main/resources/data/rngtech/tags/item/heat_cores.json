@@ -1,0 +1,13 @@
+{
+  "replace": false,
+  "values": [
+    "rngtech:iron_heat_core",
+    "rngtech:copper_heat_core",
+    "rngtech:bronze_heat_core",
+    "rngtech:steel_heat_core",
+    "rngtech:aluminum_heat_core",
+    "rngtech:sparksteel_heat_core",
+    "rngtech:titanium_heat_core",
+    "rngtech:exotic_heat_core"
+  ]
+}

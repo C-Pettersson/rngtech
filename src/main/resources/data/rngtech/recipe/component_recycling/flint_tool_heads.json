@@ -1,0 +1,25 @@
+{
+  "type": "rngtech:component_recycling",
+  "ingredient": {
+    "tag": "rngtech:manual_recycler/flint_tool_heads"
+  },
+  "minimum_processing_level": 1,
+  "processing_ticks": 80,
+  "energy": 300,
+  "outputs": [
+    {
+      "stack": {
+        "id": "minecraft:flint",
+        "count": 2
+      },
+      "requires_filter": false
+    },
+    {
+      "stack": {
+        "id": "rngtech:scrap",
+        "count": 1
+      },
+      "requires_filter": true
+    }
+  ]
+}

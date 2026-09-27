@@ -1,0 +1,21 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "rngtech:material_enabled",
+      "material": "tin"
+    }
+  ],
+  "type": "rngtech:furnace",
+  "group": "rngtech_metals",
+  "ingredient": {
+    "tag": "c:ores/tin"
+  },
+  "result": {
+    "id": "rngtech:tin_ingot"
+  },
+  "processing_ticks": 300,
+  "energy": 7200,
+  "experience": 0.7,
+  "minimum_temperature": 1000,
+  "machine_xp": 2
+}

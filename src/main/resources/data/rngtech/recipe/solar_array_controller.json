@@ -1,0 +1,27 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "rngtech:material_enabled",
+      "material": "steel"
+    }
+  ],
+  "type": "rngtech:trait_shaped",
+  "category": "redstone",
+  "pattern": [
+    "SCS",
+    "PBP",
+    "RER"
+  ],
+  "key": {
+    "B": { "item": "rngtech:advanced_electric_circuit" },
+    "C": { "item": "rngtech:steel_casing" },
+    "E": { "item": "rngtech:energy_coil" },
+    "P": { "item": "rngtech:copper_solar_panel" },
+    "R": { "item": "minecraft:redstone" },
+    "S": { "item": "rngtech:steel_plate" }
+  },
+  "result": {
+    "count": 1,
+    "id": "rngtech:solar_array_controller"
+  }
+}

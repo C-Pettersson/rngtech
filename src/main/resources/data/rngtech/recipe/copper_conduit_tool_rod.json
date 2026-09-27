@@ -1,0 +1,27 @@
+{
+    "type":  "rngtech:trait_shaped",
+    "key":  {
+                "R":  {
+                          "item":  "rngtech:copper_rod"
+                      },
+                "P":  {
+                          "item":  "rngtech:copper_plate"
+                      }
+            },
+    "category":  "equipment",
+    "neoforge:conditions":  [
+                                {
+                                    "material":  "copper",
+                                    "type":  "rngtech:material_enabled"
+                                }
+                            ],
+    "pattern":  [
+                    " P ",
+                    " R ",
+                    " R "
+                ],
+    "result":  {
+                   "count":  1,
+                   "id":  "rngtech:copper_conduit_tool_rod"
+               }
+}

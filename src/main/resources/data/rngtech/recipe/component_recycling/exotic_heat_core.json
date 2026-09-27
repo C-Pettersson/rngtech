@@ -1,0 +1,32 @@
+{
+    "type": "rngtech:component_recycling",
+    "ingredient": {
+        "item": "rngtech:exotic_heat_core"
+    },
+    "minimum_processing_level": 8,
+    "processing_ticks": 176,
+    "energy": 1960,
+    "outputs": [
+        {
+            "stack": {
+                "id": "rngtech:naquadah_ingot",
+                "count": 1
+            },
+            "requires_filter": false
+        },
+        {
+            "stack": {
+                "id": "rngtech:high_heat_core_frame",
+                "count": 1
+            },
+            "requires_filter": false
+        },
+        {
+            "stack": {
+                "id": "minecraft:blaze_rod",
+                "count": 1
+            },
+            "requires_filter": true
+        }
+    ]
+}

@@ -1,0 +1,27 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "rngtech:material_enabled",
+      "material": "sparksteel"
+    }
+  ],
+  "type": "rngtech:trait_shaped",
+  "category": "redstone",
+  "pattern": [
+    "GCG",
+    "RPR",
+    "WBW"
+  ],
+  "key": {
+    "B": { "item": "rngtech:advanced_electric_circuit" },
+    "C": { "item": "rngtech:sparksteel_coil" },
+    "G": { "item": "minecraft:glass_pane" },
+    "P": { "item": "rngtech:solar_panel_frame" },
+    "R": { "item": "minecraft:redstone" },
+    "W": { "item": "rngtech:sparksteel_plate" }
+  },
+  "result": {
+    "count": 1,
+    "id": "rngtech:sparksteel_solar_panel"
+  }
+}

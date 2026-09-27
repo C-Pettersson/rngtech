@@ -1,0 +1,30 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "rngtech:material_enabled",
+      "material": "steel"
+    }
+  ],
+  "type": "rngtech:calibrated_shaped",
+  "category": "misc",
+  "pattern": [
+    "SAS",
+    "BPC",
+    "SLS"
+  ],
+  "key": {
+    "A": {
+      "ingredient": { "item": "rngtech:calibrated_structural_component" },
+      "calibration": { "family": "structural", "min_stage": 1, "min_stability": 55 }
+    },
+    "B": { "ingredient": { "item": "rngtech:steel_control_board" } },
+    "C": { "ingredient": { "item": "rngtech:steel_resonance_coil" } },
+    "L": {
+      "ingredient": { "item": "rngtech:calibrated_logic_component" },
+      "calibration": { "family": "logic", "min_stage": 2, "min_stability": 55 }
+    },
+    "P": { "ingredient": { "item": "rngtech:reinforced_machine_frame" } },
+    "S": { "ingredient": { "tag": "c:ingots/steel" } }
+  },
+  "result": { "count": 1, "id": "rngtech:steel_resonance_calibrator_chassis" }
+}

@@ -1,0 +1,14 @@
+{
+  "replace": false,
+  "values": [
+    "rngtech:sparksteel_ingot",
+    "rngtech:sparksteel_nugget",
+    "rngtech:sparksteel_storage_block",
+    "rngtech:crushed_sparksteel",
+    "rngtech:sparksteel_plate",
+    "rngtech:sparksteel_gear",
+    "rngtech:sparksteel_rod",
+    "rngtech:sparksteel_coil",
+    "rngtech:sparksteel_casing"
+  ]
+}

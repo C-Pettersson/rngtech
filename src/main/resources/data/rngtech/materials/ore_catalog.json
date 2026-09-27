@@ -1,0 +1,114 @@
+{
+  "ores": [
+    {
+      "material": "tin",
+      "hardness_level": 2,
+      "generated_by_default": true,
+      "vein_size": 9,
+      "veins_per_chunk": 10,
+      "min_y": -16,
+      "max_y": 96,
+      "discard_chance_on_air_exposure": 0.0
+    },
+    {
+      "material": "zinc",
+      "hardness_level": 2,
+      "generated_by_default": true,
+      "vein_size": 9,
+      "veins_per_chunk": 8,
+      "min_y": -16,
+      "max_y": 80,
+      "discard_chance_on_air_exposure": 0.0
+    },
+    {
+      "material": "nickel",
+      "hardness_level": 3,
+      "generated_by_default": true,
+      "vein_size": 8,
+      "veins_per_chunk": 6,
+      "min_y": -32,
+      "max_y": 48,
+      "discard_chance_on_air_exposure": 0.0
+    },
+    {
+      "material": "lead",
+      "hardness_level": 3,
+      "generated_by_default": true,
+      "vein_size": 8,
+      "veins_per_chunk": 6,
+      "min_y": -32,
+      "max_y": 40,
+      "discard_chance_on_air_exposure": 0.0
+    },
+    {
+      "material": "silver",
+      "hardness_level": 3,
+      "generated_by_default": true,
+      "vein_size": 7,
+      "veins_per_chunk": 5,
+      "min_y": -48,
+      "max_y": 32,
+      "discard_chance_on_air_exposure": 0.0
+    },
+    {
+      "material": "aluminum",
+      "hardness_level": 4,
+      "generated_by_default": true,
+      "vein_size": 8,
+      "veins_per_chunk": 6,
+      "min_y": -32,
+      "max_y": 64,
+      "discard_chance_on_air_exposure": 0.0
+    },
+    {
+      "material": "osmium",
+      "hardness_level": 4,
+      "generated_by_default": true,
+      "vein_size": 7,
+      "veins_per_chunk": 4,
+      "min_y": -48,
+      "max_y": 24,
+      "discard_chance_on_air_exposure": 0.0
+    },
+    {
+      "material": "titanium",
+      "hardness_level": 5,
+      "generated_by_default": true,
+      "vein_size": 6,
+      "veins_per_chunk": 3,
+      "min_y": -64,
+      "max_y": 16,
+      "discard_chance_on_air_exposure": 0.15
+    },
+    {
+      "material": "tungsten",
+      "hardness_level": 6,
+      "generated_by_default": true,
+      "vein_size": 5,
+      "veins_per_chunk": 2,
+      "min_y": -64,
+      "max_y": 0,
+      "discard_chance_on_air_exposure": 0.3
+    },
+    {
+      "material": "platinum",
+      "hardness_level": 6,
+      "generated_by_default": true,
+      "vein_size": 5,
+      "veins_per_chunk": 2,
+      "min_y": -48,
+      "max_y": 16,
+      "discard_chance_on_air_exposure": 0.2
+    },
+    {
+      "material": "naquadah",
+      "hardness_level": 8,
+      "generated_by_default": true,
+      "vein_size": 3,
+      "veins_per_chunk": 1,
+      "min_y": -64,
+      "max_y": -32,
+      "discard_chance_on_air_exposure": 0.5
+    }
+  ]
+}

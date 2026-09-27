@@ -1,0 +1,25 @@
+{
+    "type":  "rngtech:component_recycling",
+    "ingredient":  {
+                       "item":  "rngtech:exotic_disassembly_head"
+                   },
+    "minimum_processing_level":  8,
+    "processing_ticks":  176,
+    "energy":  2040,
+    "outputs":  [
+                    {
+                        "stack":  {
+                                      "id":  "rngtech:naquadah_gear",
+                                      "count":  1
+                                  },
+                        "requires_filter":  false
+                    },
+                    {
+                        "stack":  {
+                                      "id":  "rngtech:naquadah_plate",
+                                      "count":  2
+                                  },
+                        "requires_filter":  true
+                    }
+                ]
+}

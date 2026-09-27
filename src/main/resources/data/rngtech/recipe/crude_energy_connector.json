@@ -1,0 +1,30 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "rngtech:material_enabled",
+      "material": "iron"
+    }
+  ],
+  "type": "rngtech:trait_shaped",
+  "category": "redstone",
+  "pattern": [
+    " R ",
+    "CKC",
+    " R "
+  ],
+  "key": {
+    "C": {
+      "item": "rngtech:cable"
+    },
+    "K": {
+      "item": "rngtech:iron_coil"
+    },
+    "R": {
+      "item": "minecraft:redstone"
+    }
+  },
+  "result": {
+    "count": 2,
+    "id": "rngtech:crude_energy_connector"
+  }
+}

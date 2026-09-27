@@ -1,0 +1,27 @@
+{
+    "type":  "rngtech:trait_shaped",
+    "key":  {
+                "R":  {
+                          "item":  "rngtech:titanium_rod"
+                      },
+                "P":  {
+                          "item":  "rngtech:titanium_plate"
+                      }
+            },
+    "category":  "equipment",
+    "neoforge:conditions":  [
+                                {
+                                    "material":  "titanium",
+                                    "type":  "rngtech:material_enabled"
+                                }
+                            ],
+    "pattern":  [
+                    " P ",
+                    " R ",
+                    " R "
+                ],
+    "result":  {
+                   "count":  1,
+                   "id":  "rngtech:titanium_stabilized_tool_rod"
+               }
+}

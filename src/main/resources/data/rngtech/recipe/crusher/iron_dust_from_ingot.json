@@ -1,0 +1,21 @@
+{
+    "neoforge:conditions": [
+        {
+            "type": "rngtech:material_enabled",
+            "material": "iron"
+        }
+    ],
+    "type": "rngtech:crusher",
+    "group": "rngtech_ingot_to_dust",
+    "ingredient": {
+        "tag": "c:ingots/iron"
+    },
+    "result": {
+        "id": "rngtech:iron_dust"
+    },
+    "bonus_output": false,
+    "processing_ticks": 30,
+    "energy": 600,
+    "required_processing_level": 1,
+    "machine_xp": 0
+}

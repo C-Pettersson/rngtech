@@ -1,0 +1,30 @@
+{
+  "type": "rngtech:gas_reforming",
+  "group": "gas_reforming",
+  "catalyst": {
+    "item": "rngtech:reforming_catalyst_bed"
+  },
+  "gas_input": {
+    "ingredient": {
+      "fluid": "rngtech:methane"
+    },
+    "amount": 1000
+  },
+  "water_input": {
+    "ingredient": {
+      "fluid": "minecraft:water"
+    },
+    "amount": 500
+  },
+  "hydrogen_output": {
+    "id": "rngtech:hydrogen",
+    "amount": 1500
+  },
+  "carbon_monoxide_output": {
+    "id": "rngtech:carbon_monoxide",
+    "amount": 500
+  },
+  "energy": 12000,
+  "processing_ticks": 360,
+  "minimum_catalyst_stage": 6
+}

@@ -1,0 +1,14 @@
+{
+    "type": "rngtech:furnace",
+    "group": "diamond",
+    "ingredient": {
+        "item": "minecraft:deepslate_diamond_ore"
+    },
+    "result": {
+        "id": "minecraft:diamond"
+    },
+    "processing_ticks": 200,
+    "energy": 4800,
+    "experience": 1,
+    "machine_xp": 1
+}

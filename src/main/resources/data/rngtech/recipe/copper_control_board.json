@@ -1,0 +1,12 @@
+{
+  "type": "rngtech:trait_shaped",
+  "category": "misc",
+  "pattern": [ "RPR", "IBI", "RPR" ],
+  "key": {
+    "B": { "item": "rngtech:control_board" },
+    "I": { "tag": "c:ingots/copper" },
+    "P": { "item": "rngtech:conductive_plate" },
+    "R": { "item": "minecraft:redstone" }
+  },
+  "result": { "count": 1, "id": "rngtech:copper_control_board" }
+}

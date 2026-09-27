@@ -1,0 +1,26 @@
+pluginManagement {
+    repositories {
+        gradlePluginPortal()
+        maven { url = 'https://maven.neoforged.net/releases' }
+    }
+}
+
+plugins {
+    id 'org.gradle.toolchains.foojay-resolver-convention' version '1.0.0'
+}
+
+rootProject.name = 'RNGTech'
+
+dependencyResolutionManagement {
+    repositories {
+        maven {
+            name = 'MinecraftLibraries'
+            url = 'https://libraries.minecraft.net'
+        }
+        maven {
+            name = 'NeoForge'
+            url = 'https://maven.neoforged.net/releases'
+        }
+        mavenCentral()
+    }
+}

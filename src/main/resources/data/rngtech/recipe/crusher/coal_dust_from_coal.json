@@ -1,0 +1,14 @@
+{
+    "type": "rngtech:crusher",
+    "group": "rngtech_coal_to_dust",
+    "ingredient": {
+        "item": "minecraft:coal"
+    },
+    "result": {
+        "id": "rngtech:coal_dust"
+    },
+    "processing_ticks": 60,
+    "energy": 600,
+    "required_processing_level": 0,
+    "machine_xp": 1
+}

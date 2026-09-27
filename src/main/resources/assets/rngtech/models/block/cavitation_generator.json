@@ -1,0 +1,12 @@
+{
+  "parent": "minecraft:block/cube",
+  "textures": {
+    "down": "rngtech:block/cavitation_generator/bottom/cavitation_generator",
+    "up": "rngtech:block/cavitation_generator/top/cavitation_generator",
+    "north": "rngtech:block/cavitation_generator/front/cavitation_generator",
+    "south": "rngtech:block/cavitation_generator/side/cavitation_generator",
+    "east": "rngtech:block/cavitation_generator/side/cavitation_generator",
+    "west": "rngtech:block/cavitation_generator/side/cavitation_generator",
+    "particle": "rngtech:block/cavitation_generator/front/cavitation_generator"
+  }
+}

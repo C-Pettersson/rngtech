@@ -1,0 +1,25 @@
+{
+    "type": "rngtech:component_recycling",
+    "ingredient": {
+        "item": "rngtech:flint_crush_head"
+    },
+    "minimum_processing_level": 1,
+    "processing_ticks": 70,
+    "energy": 320,
+    "outputs": [
+        {
+            "stack": {
+                "id": "minecraft:flint",
+                "count": 2
+            },
+            "requires_filter": false
+        },
+        {
+            "stack": {
+                "id": "minecraft:stick",
+                "count": 1
+            },
+            "requires_filter": true
+        }
+    ]
+}

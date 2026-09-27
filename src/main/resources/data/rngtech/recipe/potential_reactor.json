@@ -1,0 +1,33 @@
+{
+  "type": "rngtech:trait_shaped",
+  "category": "redstone",
+  "pattern": [
+    "RFR",
+    "CMC",
+    "SBS"
+  ],
+  "key": {
+    "B": {
+      "item": "minecraft:furnace"
+    },
+    "C": {
+      "item": "rngtech:iron_casing"
+    },
+    "F": {
+      "item": "rngtech:fuel_chamber"
+    },
+    "M": {
+      "tag": "rngtech:machine_frames/base"
+    },
+    "R": {
+      "item": "minecraft:redstone"
+    },
+    "S": {
+      "item": "rngtech:shielding"
+    }
+  },
+  "result": {
+    "count": 1,
+    "id": "rngtech:potential_reactor"
+  }
+}

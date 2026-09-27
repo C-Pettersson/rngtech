@@ -1,0 +1,22 @@
+{
+  "neoforge:conditions": [
+    { "type": "rngtech:material_enabled", "material": "tungstensteel" }
+  ],
+  "type": "rngtech:trait_shaped",
+  "category": "redstone",
+  "pattern": [
+    "GIG",
+    "TCT",
+    "GIG"
+  ],
+  "key": {
+    "C": { "item": "rngtech:pressure_tank_frame" },
+    "G": { "item": "minecraft:glass" },
+    "I": { "tag": "rngtech:materials/exotic/ingots" },
+    "T": { "item": "rngtech:tungstensteel_casing" }
+  },
+  "result": {
+    "count": 1,
+    "id": "rngtech:exotic_compressor_tank"
+  }
+}

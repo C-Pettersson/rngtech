@@ -1,0 +1,30 @@
+{
+    "type": "rngtech:trait_shaped",
+    "category": "equipment",
+    "neoforge:conditions": [
+        {
+            "material": "bronze",
+            "type": "rngtech:material_enabled"
+        }
+    ],
+    "pattern": [
+        " P ",
+        "PSP",
+        " R "
+    ],
+    "key": {
+        "P": {
+            "item": "rngtech:bronze_plate"
+        },
+        "R": {
+            "item": "rngtech:bronze_rod"
+        },
+        "S": {
+            "item": "minecraft:shears"
+        }
+    },
+    "result": {
+        "count": 1,
+        "id": "rngtech:bronze_pruning_shears"
+    }
+}

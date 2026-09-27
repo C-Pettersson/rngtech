@@ -1,0 +1,34 @@
+{
+  "type": "rngtech:calibrated_shaped",
+  "category": "redstone",
+  "pattern": [
+    "IBI",
+    "XFX",
+    "CSC"
+  ],
+  "key": {
+    "B": {
+      "ingredient": { "tag": "c:circuits/ultimate" }
+    },
+    "C": {
+      "ingredient": { "tag": "rngtech:materials/exotic/ingots" }
+    },
+    "F": {
+      "ingredient": { "tag": "rngtech:machine_frames/exotic" }
+    },
+    "I": {
+      "ingredient": { "tag": "rngtech:materials/exotic/ingots" }
+    },
+    "S": {
+      "ingredient": { "item": "minecraft:smooth_stone" }
+    },
+    "X": {
+      "ingredient": { "item": "rngtech:calibrated_thermal_component" },
+      "calibration": { "family": "thermal", "min_stage": 2, "min_stability": 85 }
+    }
+  },
+  "result": {
+    "count": 1,
+    "id": "rngtech:exotic_furnace_chassis"
+  }
+}

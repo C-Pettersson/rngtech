@@ -1,0 +1,35 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "rngtech:material_enabled",
+      "material": "bronze"
+    }
+  ],
+  "type": "rngtech:tool_damage_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "rngtech:forming_hammer"
+    },
+    {
+      "tag": "c:ingots/bronze"
+    },
+    {
+      "tag": "c:ingots/bronze"
+    },
+    {
+      "tag": "c:ingots/bronze"
+    },
+    {
+      "tag": "c:ingots/bronze"
+    }
+  ],
+  "tool": {
+    "item": "rngtech:forming_hammer"
+  },
+  "tool_damage": 1,
+  "result": {
+    "id": "rngtech:bronze_plate",
+    "count": 2
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "type": "rngtech:component_recycling",
+  "ingredient": {
+    "item": "rngtech:broken_circuit"
+  },
+  "minimum_processing_level": 1,
+  "processing_ticks": 80,
+  "energy": 800,
+  "outputs": [
+    {
+      "stack": {
+        "count": 2,
+        "id": "minecraft:redstone"
+      },
+      "requires_filter": false
+    },
+    {
+      "stack": {
+        "count": 1,
+        "id": "rngtech:scrap"
+      },
+      "requires_filter": true
+    }
+  ]
+}

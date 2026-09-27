@@ -1,0 +1,15 @@
+{
+  "type": "minecraft:block",
+  "pools": [
+    {
+      "rolls": 1,
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "rngtech:algae_photobioreactor"
+        }
+      ]
+    }
+  ],
+  "random_sequence": "rngtech:blocks/algae_photobioreactor"
+}

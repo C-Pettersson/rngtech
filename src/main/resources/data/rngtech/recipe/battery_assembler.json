@@ -1,0 +1,37 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "rngtech:material_enabled",
+      "material": "iron"
+    },
+    {
+      "type": "rngtech:material_enabled",
+      "material": "copper"
+    }
+  ],
+  "type": "rngtech:trait_shaped",
+  "category": "redstone",
+  "pattern": [
+    "SCS",
+    "RMR",
+    "SCS"
+  ],
+  "key": {
+    "C": {
+      "item": "rngtech:conductive_plate"
+    },
+    "M": {
+      "tag": "rngtech:machine_frames/base"
+    },
+    "R": {
+      "item": "minecraft:redstone"
+    },
+    "S": {
+      "item": "rngtech:cell_shell"
+    }
+  },
+  "result": {
+    "count": 1,
+    "id": "rngtech:battery_assembler"
+  }
+}

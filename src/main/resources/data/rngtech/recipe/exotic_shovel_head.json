@@ -1,0 +1,24 @@
+{
+  "type": "rngtech:trait_shaped",
+  "category": "equipment",
+  "key": {
+    "G": {
+      "tag": "rngtech:materials/exotic/gears"
+    },
+    "R": {
+      "tag": "rngtech:materials/exotic/rods"
+    },
+    "P": {
+      "tag": "rngtech:materials/exotic/plates"
+    }
+  },
+  "pattern": [
+    " P ",
+    " G ",
+    " R "
+  ],
+  "result": {
+    "count": 1,
+    "id": "rngtech:exotic_shovel_head"
+  }
+}

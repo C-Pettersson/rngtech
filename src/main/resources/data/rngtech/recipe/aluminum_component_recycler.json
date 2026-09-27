@@ -1,0 +1,30 @@
+{
+    "type":  "rngtech:trait_shaped",
+    "category":  "misc",
+    "pattern":  [
+                    "CMC",
+                    "RHR",
+                    "CGC"
+                ],
+    "key":  {
+                "C":  {
+                          "item":  "rngtech:aluminum_casing"
+                      },
+                "M":  {
+                          "tag":  "rngtech:machine_frames/advanced"
+                      },
+                "R":  {
+                          "item":  "minecraft:redstone"
+                      },
+                "H":  {
+                          "item":  "rngtech:aluminum_disassembly_head"
+                      },
+                "G":  {
+                          "item":  "rngtech:aluminum_gear"
+                      }
+            },
+    "result":  {
+                   "count":  1,
+                   "id":  "rngtech:aluminum_component_recycler"
+               }
+}

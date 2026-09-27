@@ -1,0 +1,25 @@
+{
+    "type":  "rngtech:component_recycling",
+    "ingredient":  {
+                       "item":  "rngtech:tungstensteel_disassembly_head"
+                   },
+    "minimum_processing_level":  7,
+    "processing_ticks":  164,
+    "energy":  1860,
+    "outputs":  [
+                    {
+                        "stack":  {
+                                      "id":  "rngtech:tungstensteel_gear",
+                                      "count":  1
+                                  },
+                        "requires_filter":  false
+                    },
+                    {
+                        "stack":  {
+                                      "id":  "rngtech:tungstensteel_plate",
+                                      "count":  2
+                                  },
+                        "requires_filter":  true
+                    }
+                ]
+}

@@ -1,0 +1,23 @@
+{
+  "neoforge:conditions": [
+    { "type": "rngtech:material_enabled", "material": "tungstensteel" },
+    { "type": "rngtech:material_enabled", "material": "titanium" }
+  ],
+  "type": "rngtech:trait_shaped",
+  "category": "redstone",
+  "pattern": [
+    "GIG",
+    "TCT",
+    "GIG"
+  ],
+  "key": {
+    "C": { "item": "rngtech:pressure_tank_frame" },
+    "G": { "item": "minecraft:glass" },
+    "I": { "tag": "c:ingots/tungstensteel" },
+    "T": { "item": "rngtech:titanium_casing" }
+  },
+  "result": {
+    "count": 1,
+    "id": "rngtech:tungstensteel_compressor_tank"
+  }
+}

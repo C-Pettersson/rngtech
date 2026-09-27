@@ -1,0 +1,30 @@
+{
+    "type":  "rngtech:trait_shaped",
+    "key":  {
+                "G":  {
+                          "item":  "rngtech:iron_gear"
+                      },
+                "R":  {
+                          "item":  "rngtech:iron_rod"
+                      },
+                "P":  {
+                          "item":  "rngtech:iron_plate"
+                      }
+            },
+    "category":  "equipment",
+    "neoforge:conditions":  [
+                                {
+                                    "material":  "iron",
+                                    "type":  "rngtech:material_enabled"
+                                }
+                            ],
+    "pattern":  [
+                    "PPP",
+                    " G ",
+                    " R "
+                ],
+    "result":  {
+                   "count":  1,
+                   "id":  "rngtech:iron_pick_head"
+               }
+}

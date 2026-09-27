@@ -1,0 +1,30 @@
+{
+    "type":  "rngtech:trait_shaped",
+    "category":  "misc",
+    "pattern":  [
+                    "CMC",
+                    "RHR",
+                    "CGC"
+                ],
+    "key":  {
+                "C":  {
+                          "tag":  "rngtech:materials/exotic/casings"
+                      },
+                "M":  {
+                          "tag":  "rngtech:machine_frames/exotic"
+                      },
+                "R":  {
+                          "item":  "minecraft:redstone"
+                      },
+                "H":  {
+                          "item":  "rngtech:exotic_disassembly_head"
+                      },
+                "G":  {
+                          "tag":  "rngtech:materials/exotic/gears"
+                      }
+            },
+    "result":  {
+                   "count":  1,
+                   "id":  "rngtech:exotic_component_recycler"
+               }
+}

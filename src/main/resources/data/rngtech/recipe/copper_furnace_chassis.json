@@ -1,0 +1,39 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "rngtech:material_enabled",
+      "material": "copper"
+    }
+  ],
+  "type": "rngtech:trait_shaped",
+  "category": "redstone",
+  "pattern": [
+    "IBI",
+    "RFR",
+    "CSC"
+  ],
+  "key": {
+    "B": {
+      "tag": "c:circuits/basic"
+    },
+    "C": {
+      "tag": "c:ingots/copper"
+    },
+    "F": {
+      "tag": "rngtech:machine_frames/base"
+    },
+    "I": {
+      "tag": "c:ingots/copper"
+    },
+    "R": {
+      "item": "minecraft:redstone"
+    },
+    "S": {
+      "item": "minecraft:smooth_stone"
+    }
+  },
+  "result": {
+    "count": 1,
+    "id": "rngtech:copper_furnace_chassis"
+  }
+}

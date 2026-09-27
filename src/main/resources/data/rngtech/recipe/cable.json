@@ -1,0 +1,21 @@
+{
+  "type": "rngtech:trait_shaped",
+  "category": "redstone",
+  "pattern": [
+    "WWW",
+    " R ",
+    "WWW"
+  ],
+  "key": {
+    "R": {
+      "item": "minecraft:redstone"
+    },
+    "W": {
+      "tag": "minecraft:wooden_slabs"
+    }
+  },
+  "result": {
+    "count": 12,
+    "id": "rngtech:cable"
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "type": "rngtech:melter",
+  "group": "melter_lubricants",
+  "primary_ingredient": {
+    "tag": "rngtech:melter/lubricant_bases"
+  },
+  "secondary_ingredient": {
+    "tag": "rngtech:melter/lubricant_additives"
+  },
+  "fluid_input": {
+    "ingredient": {
+      "fluid": "minecraft:water"
+    },
+    "amount": 1000
+  },
+  "fluid_output": {
+    "id": "rngtech:lubricant",
+    "amount": 1000
+  },
+  "processing_ticks": 240,
+  "energy": 4800,
+  "minimum_temperature": 1200,
+  "required_processing_level": 6
+}

@@ -1,0 +1,32 @@
+{
+    "type": "rngtech:component_recycling",
+    "ingredient": {
+        "item": "rngtech:copper_solid_fuel_burner"
+    },
+    "minimum_processing_level": 2,
+    "processing_ticks": 138,
+    "energy": 1290,
+    "outputs": [
+        {
+            "stack": {
+                "id": "rngtech:fuel_chamber",
+                "count": 1
+            },
+            "requires_filter": false
+        },
+        {
+            "stack": {
+                "id": "rngtech:copper_casing",
+                "count": 1
+            },
+            "requires_filter": false
+        },
+        {
+            "stack": {
+                "id": "rngtech:copper_coil",
+                "count": 1
+            },
+            "requires_filter": true
+        }
+    ]
+}

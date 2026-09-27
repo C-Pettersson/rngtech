@@ -1,0 +1,15 @@
+{
+    "values":  [
+                   "rngtech:wooden_tool_rod",
+                   "rngtech:iron_tool_rod",
+                   "rngtech:copper_conduit_tool_rod",
+                   "rngtech:bronze_tool_rod",
+                   "rngtech:steel_reinforced_tool_rod",
+                   "rngtech:aluminum_tool_rod",
+                   "rngtech:sparksteel_routed_tool_rod",
+                   "rngtech:titanium_stabilized_tool_rod",
+                   "rngtech:tungstensteel_heavy_tool_rod",
+                   "rngtech:nullite_phase_tool_rod",
+                   "rngtech:exotic_harmonic_tool_rod"
+               ]
+}

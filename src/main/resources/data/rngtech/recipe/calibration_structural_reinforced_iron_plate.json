@@ -1,0 +1,16 @@
+{
+  "type": "rngtech:calibration",
+  "family": "structural",
+  "ingredient": { "item": "rngtech:iron_plate" },
+  "pattern": { "item": "rngtech:structural_calibration_pattern" },
+  "catalyst": { "item": "rngtech:stabilization_catalyst" },
+  "minimum_stage": 2,
+  "processing_ticks": 220,
+  "energy": 2200,
+  "result": {
+    "stack": { "id": "rngtech:calibrated_structural_component" },
+    "stage": 2,
+    "stability": { "min": 45, "max": 85 },
+    "refinement_potential": { "min": 0, "max": 2 }
+  }
+}

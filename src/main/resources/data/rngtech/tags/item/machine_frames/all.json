@@ -1,0 +1,9 @@
+{
+  "replace": false,
+  "values": [
+    "#rngtech:machine_frames/base",
+    "#rngtech:machine_frames/reinforced",
+    "#rngtech:machine_frames/advanced",
+    "#rngtech:machine_frames/exotic"
+  ]
+}

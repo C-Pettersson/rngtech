@@ -1,0 +1,17 @@
+{
+  "replace": false,
+  "values": [
+    "rngtech:tin_ingot",
+    "rngtech:tin_dust",
+    "rngtech:tin_nugget",
+    "rngtech:tin_storage_block",
+    "rngtech:tin_ore",
+    "rngtech:deepslate_tin_ore",
+    "rngtech:raw_tin",
+    "rngtech:crushed_tin",
+    "rngtech:tin_plate",
+    "rngtech:tin_gear",
+    "rngtech:tin_rod",
+    "rngtech:tin_coil"
+  ]
+}

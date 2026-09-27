@@ -1,0 +1,12 @@
+{
+  "parent": "minecraft:block/cube",
+  "textures": {
+    "down": "rngtech:block/melter/bottom/melter",
+    "up": "rngtech:block/melter/top/melter",
+    "north": "rngtech:block/melter/front/melter",
+    "south": "rngtech:block/melter/side/melter",
+    "east": "rngtech:block/melter/side/melter",
+    "west": "rngtech:block/melter/side/melter",
+    "particle": "rngtech:block/melter/front/melter"
+  }
+}

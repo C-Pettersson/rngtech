@@ -1,0 +1,22 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "rngtech:material_enabled",
+      "material": "tungsten"
+    }
+  ],
+  "type": "rngtech:furnace",
+  "group": "rngtech_metals",
+  "ingredient": {
+    "tag": "c:ores/tungsten"
+  },
+  "result": {
+    "id": "rngtech:tungsten_ingot"
+  },
+  "processing_ticks": 300,
+  "energy": 28800,
+  "experience": 0.7,
+  "minimum_temperature": 1750,
+  "required_temperature_stability": 1,
+  "machine_xp": 6
+}

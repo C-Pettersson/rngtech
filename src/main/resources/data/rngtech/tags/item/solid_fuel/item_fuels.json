@@ -1,0 +1,11 @@
+{
+  "replace": false,
+  "values": [
+    "#minecraft:logs",
+    "#minecraft:planks",
+    "minecraft:stick",
+    "minecraft:coal",
+    "minecraft:charcoal",
+    "minecraft:blaze_rod"
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "replace": false,
+  "values": [
+    "rngtech:invar_ingot",
+    "rngtech:invar_nugget",
+    "rngtech:invar_storage_block",
+    "rngtech:crushed_invar",
+    "rngtech:invar_plate",
+    "rngtech:invar_gear",
+    "rngtech:invar_rod",
+    "rngtech:invar_coil"
+  ]
+}

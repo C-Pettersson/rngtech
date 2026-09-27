@@ -1,0 +1,16 @@
+{
+  "type": "rngtech:corrosion_cell",
+  "plate": {
+    "item": "rngtech:copper_plate"
+  },
+  "electrolyte": {
+    "item": "rngtech:electrolyte"
+  },
+  "energy": 6400,
+  "processing_ticks": 220,
+  "minimum_material_stage": 4,
+  "residue": {
+    "count": 1,
+    "id": "rngtech:corrosion_residue"
+  }
+}

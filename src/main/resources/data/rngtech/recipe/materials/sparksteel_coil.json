@@ -1,0 +1,29 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "rngtech:material_enabled",
+      "material": "sparksteel"
+    }
+  ],
+  "type": "rngtech:trait_shaped",
+  "category": "misc",
+  "pattern": [
+    "RBR",
+    "BPB",
+    "RBR"
+  ],
+  "key": {
+    "B": {
+      "tag": "c:ingots/sparksteel"
+    },
+    "P": {
+      "item": "rngtech:sparksteel_plate"
+    },
+    "R": {
+      "item": "minecraft:redstone"
+    }
+  },
+  "result": {
+    "id": "rngtech:sparksteel_coil"
+  }
+}

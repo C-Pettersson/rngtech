@@ -1,0 +1,35 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "rngtech:material_enabled",
+      "material": "naquadah"
+    }
+  ],
+  "type": "rngtech:tool_damage_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "rngtech:forming_hammer"
+    },
+    {
+      "tag": "c:ingots/naquadah"
+    },
+    {
+      "tag": "c:ingots/naquadah"
+    },
+    {
+      "tag": "c:ingots/naquadah"
+    },
+    {
+      "tag": "c:ingots/naquadah"
+    }
+  ],
+  "tool": {
+    "item": "rngtech:forming_hammer"
+  },
+  "tool_damage": 1,
+  "result": {
+    "id": "rngtech:naquadah_plate",
+    "count": 2
+  }
+}

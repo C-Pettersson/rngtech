@@ -1,0 +1,33 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "rngtech:material_enabled",
+      "material": "naquadah"
+    },
+    {
+      "type": "rngtech:material_enabled",
+      "material": "nullite"
+    }
+  ],
+  "type": "rngtech:trait_shaped",
+  "category": "misc",
+  "pattern": [
+    "NRN",
+    "GGG",
+    "RNR"
+  ],
+  "key": {
+    "G": {
+      "item": "rngtech:naquadah_gear"
+    },
+    "N": {
+      "item": "rngtech:naquadah_plate"
+    },
+    "R": {
+      "item": "rngtech:nullite_rod"
+    }
+  },
+  "result": {
+    "id": "rngtech:naquadah_coil"
+  }
+}

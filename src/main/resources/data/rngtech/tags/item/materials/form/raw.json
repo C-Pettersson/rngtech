@@ -1,0 +1,20 @@
+{
+  "replace": false,
+  "values": [
+    "minecraft:raw_iron",
+    "minecraft:raw_copper",
+    "rngtech:raw_tin",
+    "rngtech:raw_zinc",
+    "minecraft:raw_gold",
+    "rngtech:raw_nickel",
+    "rngtech:raw_lead",
+    "rngtech:raw_silver",
+    "rngtech:raw_aluminum",
+    "rngtech:raw_osmium",
+    "rngtech:raw_titanium",
+    "rngtech:raw_tungsten",
+    "rngtech:raw_platinum",
+    "rngtech:raw_netherite",
+    "rngtech:raw_naquadah"
+  ]
+}

@@ -1,0 +1,24 @@
+{
+  "type": "rngtech:trait_shaped",
+  "category": "misc",
+  "pattern": [
+    "BOB",
+    "OCO",
+    "BOB"
+  ],
+  "key": {
+    "B": {
+      "item": "minecraft:brick"
+    },
+    "C": {
+      "item": "rngtech:casing"
+    },
+    "O": {
+      "item": "minecraft:obsidian"
+    }
+  },
+  "result": {
+    "count": 2,
+    "id": "rngtech:refractory_casing"
+  }
+}

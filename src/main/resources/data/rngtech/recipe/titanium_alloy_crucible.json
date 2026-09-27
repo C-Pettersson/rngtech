@@ -1,0 +1,27 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "rngtech:material_enabled",
+      "material": "titanium"
+    }
+  ],
+  "type": "rngtech:trait_shaped",
+  "category": "redstone",
+  "pattern": [
+    "T T",
+    "TCT",
+    "TTT"
+  ],
+  "key": {
+    "C": {
+      "item": "rngtech:steel_alloy_crucible"
+    },
+    "T": {
+      "tag": "c:ingots/titanium"
+    }
+  },
+  "result": {
+    "count": 1,
+    "id": "rngtech:titanium_alloy_crucible"
+  }
+}

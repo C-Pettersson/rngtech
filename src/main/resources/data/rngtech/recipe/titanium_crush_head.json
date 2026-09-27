@@ -1,0 +1,33 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "rngtech:material_enabled",
+      "material": "titanium"
+    }
+  ],
+  "type": "rngtech:trait_shaped",
+  "category": "equipment",
+  "pattern": [
+    "PPP",
+    "BGB",
+    " R "
+  ],
+  "key": {
+    "B": {
+      "item": "rngtech:aluminum_plate"
+    },
+    "G": {
+      "item": "rngtech:titanium_gear"
+    },
+    "P": {
+      "item": "rngtech:titanium_plate"
+    },
+    "R": {
+      "item": "minecraft:redstone"
+    }
+  },
+  "result": {
+    "count": 1,
+    "id": "rngtech:titanium_crush_head"
+  }
+}

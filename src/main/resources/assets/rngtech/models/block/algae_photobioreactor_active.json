@@ -1,0 +1,12 @@
+{
+  "parent": "minecraft:block/cube",
+  "textures": {
+    "down": "rngtech:block/algae_photobioreactor/bottom/algae_photobioreactor",
+    "up": "rngtech:block/algae_photobioreactor/top/algae_photobioreactor",
+    "north": "rngtech:block/algae_photobioreactor/front/algae_photobioreactor_active",
+    "south": "rngtech:block/algae_photobioreactor/side/algae_photobioreactor",
+    "east": "rngtech:block/algae_photobioreactor/side/algae_photobioreactor",
+    "west": "rngtech:block/algae_photobioreactor/side/algae_photobioreactor",
+    "particle": "rngtech:block/algae_photobioreactor/front/algae_photobioreactor_active"
+  }
+}

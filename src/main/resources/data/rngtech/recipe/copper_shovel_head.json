@@ -1,0 +1,30 @@
+{
+  "type": "rngtech:trait_shaped",
+  "category": "equipment",
+  "neoforge:conditions": [
+    {
+      "type": "rngtech:material_enabled",
+      "material": "copper"
+    }
+  ],
+  "key": {
+    "G": {
+      "item": "rngtech:copper_gear"
+    },
+    "R": {
+      "item": "rngtech:copper_rod"
+    },
+    "P": {
+      "item": "rngtech:copper_plate"
+    }
+  },
+  "pattern": [
+    " P ",
+    " G ",
+    " R "
+  ],
+  "result": {
+    "count": 1,
+    "id": "rngtech:copper_shovel_head"
+  }
+}

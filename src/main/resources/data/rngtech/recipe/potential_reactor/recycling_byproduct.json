@@ -1,0 +1,13 @@
+{
+  "type": "rngtech:potential_reactor",
+  "ingredient": {
+    "item": "rngtech:recycling_byproduct"
+  },
+  "energy": 7200,
+  "processing_ticks": 140,
+  "residue": {
+    "count": 1,
+    "id": "rngtech:scrap"
+  },
+  "minimum_material_stage": 2
+}

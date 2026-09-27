@@ -1,0 +1,23 @@
+{
+  "type": "rngtech:trait_shaped",
+  "pattern": [
+    "PPP",
+    "PCP",
+    " E "
+  ],
+  "key": {
+    "P": {
+      "item": "rngtech:sparksteel_plate"
+    },
+    "C": {
+      "item": "rngtech:control_board"
+    },
+    "E": {
+      "item": "rngtech:sparksteel_coil"
+    }
+  },
+  "result": {
+    "id": "rngtech:sparksteel_solar_array_extender",
+    "count": 1
+  }
+}

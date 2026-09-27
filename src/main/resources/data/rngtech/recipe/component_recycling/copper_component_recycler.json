@@ -1,0 +1,32 @@
+{
+    "type": "rngtech:component_recycling",
+    "ingredient": {
+        "item": "rngtech:copper_component_recycler"
+    },
+    "minimum_processing_level": 2,
+    "processing_ticks": 144,
+    "energy": 1660,
+    "outputs": [
+        {
+            "stack": {
+                "id": "rngtech:machine_frame",
+                "count": 1
+            },
+            "requires_filter": false
+        },
+        {
+            "stack": {
+                "id": "rngtech:copper_casing",
+                "count": 2
+            },
+            "requires_filter": false
+        },
+        {
+            "stack": {
+                "id": "rngtech:copper_disassembly_head",
+                "count": 1
+            },
+            "requires_filter": true
+        }
+    ]
+}

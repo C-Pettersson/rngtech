@@ -1,0 +1,10 @@
+{
+  "replace": false,
+  "values": [
+    "rngtech:coal_dust",
+    "rngtech:plant_reagent",
+    "rngtech:resin",
+    "rngtech:rubber",
+    "rngtech:organic_reagent"
+  ]
+}

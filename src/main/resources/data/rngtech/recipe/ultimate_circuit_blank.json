@@ -1,0 +1,64 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "rngtech:material_enabled",
+      "material": "nullite"
+    },
+    {
+      "type": "rngtech:material_enabled",
+      "material": "tungstensteel"
+    },
+    {
+      "type": "rngtech:material_enabled",
+      "material": "naquadah"
+    }
+  ],
+  "type": "rngtech:calibrated_shaped",
+  "category": "redstone",
+  "pattern": [
+    "TET",
+    "NXN",
+    "ICI"
+  ],
+  "key": {
+    "C": {
+      "ingredient": {
+        "item": "rngtech:nullite_resonance_coil"
+      }
+    },
+    "E": {
+      "ingredient": {
+        "tag": "c:circuits/elite"
+      }
+    },
+    "I": {
+      "ingredient": {
+        "item": "rngtech:insulator"
+      }
+    },
+    "N": {
+      "ingredient": {
+        "item": "rngtech:naquadah_coil"
+      }
+    },
+    "T": {
+      "ingredient": {
+        "item": "rngtech:tungstensteel_plate"
+      }
+    },
+    "X": {
+      "ingredient": {
+        "item": "rngtech:calibrated_diamond_crystal"
+      },
+      "calibration": {
+        "family": "logic",
+        "min_stage": 6,
+        "min_stability": 85
+      }
+    }
+  },
+  "result": {
+    "count": 4,
+    "id": "rngtech:ultimate_circuit_blank"
+  }
+}

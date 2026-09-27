@@ -1,0 +1,30 @@
+{
+  "type": "rngtech:trait_shaped",
+  "category": "equipment",
+  "neoforge:conditions": [
+    {
+      "type": "rngtech:material_enabled",
+      "material": "titanium"
+    }
+  ],
+  "key": {
+    "G": {
+      "item": "rngtech:titanium_gear"
+    },
+    "R": {
+      "item": "rngtech:titanium_rod"
+    },
+    "P": {
+      "item": "rngtech:titanium_plate"
+    }
+  },
+  "pattern": [
+    "PPP",
+    "PGP",
+    " R "
+  ],
+  "result": {
+    "count": 1,
+    "id": "rngtech:titanium_digger_head"
+  }
+}

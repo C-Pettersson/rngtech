@@ -1,0 +1,40 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "rngtech:material_enabled",
+      "material": "bronze"
+    },
+    {
+      "type": "rngtech:material_enabled",
+      "material": "copper"
+    }
+  ],
+  "type": "rngtech:trait_shaped",
+  "category": "misc",
+  "pattern": [
+    "BQB",
+    "ICI",
+    "BRB"
+  ],
+  "key": {
+    "B": {
+      "item": "rngtech:bronze_plate"
+    },
+    "C": {
+      "item": "rngtech:copper_coil"
+    },
+    "I": {
+      "item": "rngtech:insulator"
+    },
+    "Q": {
+      "item": "minecraft:quartz"
+    },
+    "R": {
+      "item": "minecraft:redstone"
+    }
+  },
+  "result": {
+    "count": 1,
+    "id": "rngtech:circuit_mold"
+  }
+}

@@ -1,0 +1,33 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "rngtech:material_enabled",
+      "material": "iron"
+    }
+  ],
+  "type": "rngtech:trait_shaped",
+  "category": "redstone",
+  "pattern": [
+    "RCR",
+    "KFK",
+    "RCR"
+  ],
+  "key": {
+    "C": {
+      "item": "rngtech:iron_coil"
+    },
+    "F": {
+      "item": "minecraft:furnace"
+    },
+    "K": {
+      "item": "minecraft:coal"
+    },
+    "R": {
+      "item": "minecraft:redstone"
+    }
+  },
+  "result": {
+    "count": 1,
+    "id": "rngtech:heat_core"
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "type": "rngtech:corrosion_cell",
+  "plate": {
+    "item": "rngtech:scrap"
+  },
+  "electrolyte": {
+    "item": "rngtech:electrolyte"
+  },
+  "energy": 2400,
+  "processing_ticks": 180,
+  "minimum_material_stage": 4,
+  "residue": {
+    "count": 1,
+    "id": "rngtech:corrosion_residue"
+  }
+}

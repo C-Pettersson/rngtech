@@ -1,0 +1,86 @@
+### Gradle ###
+.gradle
+.gradle-home/
+.gradle-user-home/
+build/
+!gradle/wrapper/gradle-wrapper.jar
+!**/src/**/build/
+
+### IntelliJ IDEA ###
+.idea/
+*.iws
+*.iml
+*.ipr
+out/
+!**/src/**/out/
+
+.run/
+
+### Eclipse ###
+.apt_generated
+.classpath
+.eclipse/
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+bin/
+!**/src/**/bin/
+
+### VS Code ###
+.vscode/
+!.vscode/
+!.vscode/extensions.json
+!.vscode/launch.json
+!.vscode/settings.json
+!.vscode/tasks.json
+
+### Mac OS ###
+.DS_Store
+
+### Minecraft Modding ###
+run/
+!**/src/**/run/
+**/src/generated/**/.cache/
+repo/
+!**/src/**/repo/
+
+# Local FTB Quests workspace for in-game authoring/debugging.
+# Releaseable quest content lives under extras/ftbquests/.
+config/ftbquests/
+
+### Documentation ###
+site/
+
+### Python tools ###
+__pycache__/
+
+### Node release tooling ###
+node_modules/
+npm-debug.log*
+
+# Codex
+tmp
+
+# Moddex
+tools/moddex/generated/gui-layouts.json
+tools/moddex/generated/modifier-data.json
+tools/moddex/generated/passive-trees.json
+
+
+### Local state and private data ###
+.obsidian/
+.agents/
+.codex/
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.jks
+*.log
+.venv/
+venv/
+public-release/

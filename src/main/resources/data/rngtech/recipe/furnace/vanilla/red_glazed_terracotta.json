@@ -1,0 +1,12 @@
+{
+    "type": "rngtech:furnace",
+    "ingredient": {
+        "item": "minecraft:red_terracotta"
+    },
+    "result": {
+        "id": "minecraft:red_glazed_terracotta"
+    },
+    "processing_ticks": 200,
+    "energy": 4800,
+    "experience": 0.1
+}

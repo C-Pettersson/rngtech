@@ -1,0 +1,18 @@
+{
+  "values": [
+    "#rngtech:manual_recycler/flint_tool_heads",
+    "#rngtech:manual_recycler/iron_tool_heads",
+    "#rngtech:manual_recycler/copper_tool_heads",
+    "#rngtech:manual_recycler/wooden_tool_rods",
+    "#rngtech:manual_recycler/iron_tool_rods",
+    "#rngtech:manual_recycler/copper_tool_rods",
+    "#rngtech:manual_recycler/calibrated_components",
+    "#rngtech:manual_recycler/iron_components",
+    "#rngtech:manual_recycler/machine_blocks",
+    "rngtech:flint_crush_head",
+    "rngtech:iron_crush_head",
+    "rngtech:copper_crush_head",
+    "rngtech:iron_disassembly_head",
+    "rngtech:copper_disassembly_head"
+  ]
+}

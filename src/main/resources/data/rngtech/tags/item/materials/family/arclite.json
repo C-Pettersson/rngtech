@@ -1,0 +1,14 @@
+{
+  "replace": false,
+  "values": [
+    "rngtech:arclite_ingot",
+    "rngtech:arclite_nugget",
+    "rngtech:arclite_storage_block",
+    "rngtech:crushed_arclite",
+    "rngtech:arclite_plate",
+    "rngtech:arclite_gear",
+    "rngtech:arclite_rod",
+    "rngtech:arclite_coil",
+    "rngtech:arclite_casing"
+  ]
+}

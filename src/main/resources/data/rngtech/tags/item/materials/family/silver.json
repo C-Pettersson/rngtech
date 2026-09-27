@@ -1,0 +1,17 @@
+{
+  "replace": false,
+  "values": [
+    "rngtech:silver_ingot",
+    "rngtech:silver_dust",
+    "rngtech:silver_nugget",
+    "rngtech:silver_storage_block",
+    "rngtech:silver_ore",
+    "rngtech:deepslate_silver_ore",
+    "rngtech:raw_silver",
+    "rngtech:crushed_silver",
+    "rngtech:silver_plate",
+    "rngtech:silver_gear",
+    "rngtech:silver_rod",
+    "rngtech:silver_coil"
+  ]
+}

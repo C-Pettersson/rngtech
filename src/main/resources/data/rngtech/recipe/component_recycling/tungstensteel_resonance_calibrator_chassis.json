@@ -1,0 +1,32 @@
+{
+  "type": "rngtech:component_recycling",
+  "ingredient": {
+    "item": "rngtech:tungstensteel_resonance_calibrator_chassis"
+  },
+  "minimum_processing_level": 7,
+  "processing_ticks": 204,
+  "energy": 2440,
+  "outputs": [
+    {
+      "stack": {
+        "id": "rngtech:exotic_machine_frame",
+        "count": 1
+      },
+      "requires_filter": false
+    },
+    {
+      "stack": {
+        "id": "rngtech:tungstensteel_resonance_coil",
+        "count": 1
+      },
+      "requires_filter": false
+    },
+    {
+      "stack": {
+        "id": "rngtech:tungstensteel_stabilizer_matrix",
+        "count": 1
+      },
+      "requires_filter": true
+    }
+  ]
+}

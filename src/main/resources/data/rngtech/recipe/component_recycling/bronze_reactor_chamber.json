@@ -1,0 +1,32 @@
+{
+    "type": "rngtech:component_recycling",
+    "ingredient": {
+        "item": "rngtech:bronze_reactor_chamber"
+    },
+    "minimum_processing_level": 3,
+    "processing_ticks": 126,
+    "energy": 1250,
+    "outputs": [
+        {
+            "stack": {
+                "id": "rngtech:bronze_casing",
+                "count": 1
+            },
+            "requires_filter": false
+        },
+        {
+            "stack": {
+                "id": "rngtech:bronze_ingot",
+                "count": 1
+            },
+            "requires_filter": false
+        },
+        {
+            "stack": {
+                "id": "rngtech:fuel_chamber",
+                "count": 1
+            },
+            "requires_filter": true
+        }
+    ]
+}

@@ -1,0 +1,15 @@
+{
+  "type": "rngtech:desiccant_absorption",
+  "dry_input": {
+    "item": "rngtech:silica_gel_beads"
+  },
+  "saturated_output": {
+    "id": "rngtech:saturated_silica_gel_beads"
+  },
+  "water_output": {
+    "id": "minecraft:water",
+    "amount": 945
+  },
+  "processing_ticks": 1134,
+  "minimum_stage": 5
+}

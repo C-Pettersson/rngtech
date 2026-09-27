@@ -1,0 +1,35 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "rngtech:material_enabled",
+      "material": "iron"
+    },
+    {
+      "type": "rngtech:material_enabled",
+      "material": "copper"
+    }
+  ],
+  "type": "rngtech:calibrated_shaped",
+  "category": "tools",
+  "pattern": [
+    "IRI",
+    "RCR",
+    "IRI"
+  ],
+  "key": {
+    "C": {
+      "ingredient": { "item": "rngtech:calibrated_conductive_component" },
+      "calibration": { "family": "conductive", "min_stage": 2, "min_stability": 40 }
+    },
+    "I": {
+      "ingredient": { "item": "rngtech:iron_plate" }
+    },
+    "R": {
+      "ingredient": { "item": "minecraft:redstone" }
+    }
+  },
+  "result": {
+    "count": 1,
+    "id": "rngtech:miners_companion_magnet"
+  }
+}

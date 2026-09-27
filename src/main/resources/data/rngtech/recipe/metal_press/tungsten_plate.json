@@ -1,0 +1,30 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "rngtech:material_enabled",
+      "material": "tungsten"
+    }
+  ],
+  "type": "rngtech:metal_press",
+  "group": "metal_press_plates",
+  "ingredient": {
+    "tag": "c:ingots/tungsten"
+  },
+  "mold": {
+    "item": "rngtech:plate_mold"
+  },
+  "result": {
+    "count": 1,
+    "id": "rngtech:tungsten_plate"
+  },
+  "processing_ticks": 200,
+  "energy": 2400,
+  "minimum_temperature": 1750,
+  "safe_maximum_temperature": 2050,
+  "required_temperature_stability": 1.0,
+  "failure_output": {
+    "count": 1,
+    "id": "rngtech:malformed_ingot"
+  },
+  "failure_material": "tungsten"
+}

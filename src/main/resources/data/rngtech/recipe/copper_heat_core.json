@@ -1,0 +1,33 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "rngtech:material_enabled",
+      "material": "copper"
+    }
+  ],
+  "type": "rngtech:trait_shaped",
+  "category": "redstone",
+  "pattern": [
+    "RCR",
+    "KHK",
+    "RCR"
+  ],
+  "key": {
+    "C": {
+      "item": "rngtech:copper_coil"
+    },
+    "H": {
+      "item": "rngtech:heat_core"
+    },
+    "K": {
+      "item": "minecraft:coal"
+    },
+    "R": {
+      "item": "minecraft:redstone"
+    }
+  },
+  "result": {
+    "count": 1,
+    "id": "rngtech:copper_heat_core"
+  }
+}

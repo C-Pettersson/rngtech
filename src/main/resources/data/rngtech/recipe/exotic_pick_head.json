@@ -1,0 +1,24 @@
+{
+    "type":  "rngtech:trait_shaped",
+    "key":  {
+                "G":  {
+                          "tag":  "rngtech:materials/exotic/gears"
+                      },
+                "R":  {
+                          "tag":  "rngtech:materials/exotic/rods"
+                      },
+                "P":  {
+                          "tag":  "rngtech:materials/exotic/plates"
+                      }
+            },
+    "category":  "equipment",
+    "pattern":  [
+                    "PPP",
+                    " G ",
+                    " R "
+                ],
+    "result":  {
+                   "count":  1,
+                   "id":  "rngtech:exotic_pick_head"
+               }
+}

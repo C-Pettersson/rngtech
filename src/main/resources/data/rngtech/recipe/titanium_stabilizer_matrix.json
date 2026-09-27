@@ -1,0 +1,13 @@
+{
+  "neoforge:conditions": [ { "type": "rngtech:material_enabled", "material": "titanium" } ],
+  "type": "rngtech:trait_shaped",
+  "category": "misc",
+  "pattern": [ "SMS", "ICI", "SMS" ],
+  "key": {
+    "C": { "item": "rngtech:stabilization_catalyst" },
+    "I": { "tag": "c:ingots/titanium" },
+    "M": { "item": "rngtech:matrix" },
+    "S": { "item": "minecraft:diamond" }
+  },
+  "result": { "count": 1, "id": "rngtech:titanium_stabilizer_matrix" }
+}

@@ -1,0 +1,17 @@
+{
+  "replace": false,
+  "values": [
+    "rngtech:tungsten_ingot",
+    "rngtech:tungsten_dust",
+    "rngtech:tungsten_nugget",
+    "rngtech:tungsten_storage_block",
+    "rngtech:tungsten_ore",
+    "rngtech:deepslate_tungsten_ore",
+    "rngtech:raw_tungsten",
+    "rngtech:crushed_tungsten",
+    "rngtech:tungsten_plate",
+    "rngtech:tungsten_gear",
+    "rngtech:tungsten_rod",
+    "rngtech:tungsten_coil"
+  ]
+}

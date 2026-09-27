@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "rngtech:algae_biomass"
+    },
+    {
+      "item": "rngtech:algae_biomass"
+    },
+    {
+      "item": "rngtech:algae_biomass"
+    },
+    {
+      "item": "rngtech:algae_biomass"
+    }
+  ],
+  "result": {
+    "id": "rngtech:dense_algae_biomass"
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "multipart": [
+    {
+      "when": { "OR": [{ "facing": "down" }, { "cable_down": "true" }] },
+      "apply": { "model": "rngtech:block/universal_connector", "x": 90 }
+    },
+    {
+      "when": { "OR": [{ "facing": "up" }, { "cable_up": "true" }] },
+      "apply": { "model": "rngtech:block/universal_connector", "x": 270 }
+    },
+    {
+      "when": { "OR": [{ "facing": "north" }, { "cable_north": "true" }] },
+      "apply": { "model": "rngtech:block/universal_connector" }
+    },
+    {
+      "when": { "OR": [{ "facing": "south" }, { "cable_south": "true" }] },
+      "apply": { "model": "rngtech:block/universal_connector", "y": 180 }
+    },
+    {
+      "when": { "OR": [{ "facing": "west" }, { "cable_west": "true" }] },
+      "apply": { "model": "rngtech:block/universal_connector", "y": 270 }
+    },
+    {
+      "when": { "OR": [{ "facing": "east" }, { "cable_east": "true" }] },
+      "apply": { "model": "rngtech:block/universal_connector", "y": 90 }
+    }
+  ]
+}

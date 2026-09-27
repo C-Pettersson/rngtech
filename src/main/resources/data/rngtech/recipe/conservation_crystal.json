@@ -1,0 +1,24 @@
+{
+  "type": "rngtech:trait_shaped",
+  "category": "misc",
+  "pattern": [
+    " Q ",
+    "ACA",
+    " Q "
+  ],
+  "key": {
+    "A": {
+      "item": "minecraft:emerald"
+    },
+    "C": {
+      "item": "minecraft:copper_ingot"
+    },
+    "Q": {
+      "item": "minecraft:quartz"
+    }
+  },
+  "result": {
+    "count": 1,
+    "id": "rngtech:conservation_crystal"
+  }
+}

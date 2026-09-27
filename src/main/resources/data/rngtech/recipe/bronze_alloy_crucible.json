@@ -1,0 +1,27 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "rngtech:material_enabled",
+      "material": "bronze"
+    }
+  ],
+  "type": "rngtech:trait_shaped",
+  "category": "redstone",
+  "pattern": [
+    "B B",
+    "BCB",
+    "BBB"
+  ],
+  "key": {
+    "B": {
+      "tag": "c:ingots/bronze"
+    },
+    "C": {
+      "item": "rngtech:bronze_casing"
+    }
+  },
+  "result": {
+    "count": 1,
+    "id": "rngtech:bronze_alloy_crucible"
+  }
+}

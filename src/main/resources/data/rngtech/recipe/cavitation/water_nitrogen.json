@@ -1,0 +1,26 @@
+{
+  "type": "rngtech:cavitation",
+  "group": "cavitation",
+  "fluid_input": {
+    "ingredient": {
+      "fluid": "minecraft:water"
+    },
+    "amount": 1000
+  },
+  "rotor": {
+    "item": "rngtech:nitrogen_extraction_rotor"
+  },
+  "nozzle": {
+    "item": "rngtech:nitrogen_separation_nozzle"
+  },
+  "fluid_output": {
+    "id": "rngtech:nitrogen",
+    "amount": 1000
+  },
+  "energy": 4800,
+  "processing_ticks": 300,
+  "minimum_rotor_stage": 6,
+  "pressure_rating": 1800,
+  "heat_strain": 140,
+  "wear": 45
+}

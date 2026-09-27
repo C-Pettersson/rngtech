@@ -1,0 +1,29 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "rngtech:material_enabled",
+      "material": "lead"
+    }
+  ],
+  "type": "rngtech:calibrated_shaped",
+  "category": "misc",
+  "pattern": [
+    "LAS",
+    "BPB",
+    "SAS"
+  ],
+  "key": {
+    "A": {
+      "ingredient": { "item": "rngtech:calibrated_structural_component" },
+      "calibration": { "family": "structural", "min_stage": 1, "min_stability": 45 }
+    },
+    "B": { "ingredient": { "item": "rngtech:iron_stabilizer_matrix" } },
+    "L": { "ingredient": { "tag": "c:ingots/lead" } },
+    "P": { "ingredient": { "item": "rngtech:reinforced_machine_frame" } },
+    "S": {
+      "ingredient": { "item": "rngtech:calibrated_storage_component" },
+      "calibration": { "family": "storage", "min_stage": 2, "min_stability": 45 }
+    }
+  },
+  "result": { "count": 1, "id": "rngtech:lead_resonance_calibrator_chassis" }
+}

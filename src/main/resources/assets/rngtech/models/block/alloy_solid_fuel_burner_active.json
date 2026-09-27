@@ -1,0 +1,12 @@
+{
+  "parent": "minecraft:block/cube",
+  "textures": {
+    "down": "rngtech:block/solid_fuel_burner/bottom/alloy_solid_fuel_burner",
+    "up": "rngtech:block/solid_fuel_burner/top/alloy_solid_fuel_burner",
+    "north": "rngtech:block/solid_fuel_burner/front/alloy_solid_fuel_burner_active",
+    "south": "rngtech:block/solid_fuel_burner/side/alloy_solid_fuel_burner",
+    "east": "rngtech:block/solid_fuel_burner/side/alloy_solid_fuel_burner",
+    "west": "rngtech:block/solid_fuel_burner/side/alloy_solid_fuel_burner",
+    "particle": "rngtech:block/solid_fuel_burner/front/alloy_solid_fuel_burner_active"
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "parent": "minecraft:block/cube",
+  "textures": {
+    "down": "rngtech:block/tool_bench_bottom",
+    "up": "rngtech:block/tool_bench_top",
+    "north": "rngtech:block/bio_generator/front/bio_generator_active",
+    "south": "rngtech:block/tool_bench_side",
+    "east": "rngtech:block/tool_bench_side",
+    "west": "rngtech:block/tool_bench_side",
+    "particle": "rngtech:block/tool_bench_side"
+  }
+}

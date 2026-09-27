@@ -1,0 +1,25 @@
+{
+  "type": "rngtech:battery_assembly",
+  "group": "battery_assembly_cores",
+  "ingredients": [
+    {
+      "item": "rngtech:cell_shell"
+    },
+    {
+      "item": "rngtech:conductive_plate"
+    }
+  ],
+  "fluid_input": {
+    "ingredient": {
+      "fluid": "rngtech:electrolyte_solution"
+    },
+    "amount": 250
+  },
+  "result": {
+    "count": 1,
+    "id": "rngtech:battery_cell"
+  },
+  "processing_ticks": 80,
+  "energy": 800,
+  "roll_result_traits": false
+}

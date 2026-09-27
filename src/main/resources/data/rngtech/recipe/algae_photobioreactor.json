@@ -1,0 +1,32 @@
+{
+  "type": "rngtech:trait_shaped",
+  "category": "misc",
+  "pattern": [
+    "GCG",
+    "SMS",
+    "IPI"
+  ],
+  "key": {
+    "G": {
+      "item": "minecraft:glass"
+    },
+    "C": {
+      "item": "rngtech:basic_electric_circuit"
+    },
+    "S": {
+      "item": "rngtech:casing"
+    },
+    "M": {
+      "tag": "rngtech:machine_frames/base"
+    },
+    "I": {
+      "tag": "c:ingots/iron"
+    },
+    "P": {
+      "item": "rngtech:bio_chamber"
+    }
+  },
+  "result": {
+    "id": "rngtech:algae_photobioreactor"
+  }
+}

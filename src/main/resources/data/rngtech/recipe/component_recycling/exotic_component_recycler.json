@@ -1,0 +1,32 @@
+{
+    "type": "rngtech:component_recycling",
+    "ingredient": {
+        "item": "rngtech:exotic_component_recycler"
+    },
+    "minimum_processing_level": 8,
+    "processing_ticks": 216,
+    "energy": 2740,
+    "outputs": [
+        {
+            "stack": {
+                "id": "rngtech:exotic_machine_frame",
+                "count": 1
+            },
+            "requires_filter": false
+        },
+        {
+            "stack": {
+                "id": "rngtech:naquadah_casing",
+                "count": 2
+            },
+            "requires_filter": false
+        },
+        {
+            "stack": {
+                "id": "rngtech:exotic_disassembly_head",
+                "count": 1
+            },
+            "requires_filter": true
+        }
+    ]
+}

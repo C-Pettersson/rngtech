@@ -1,0 +1,22 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "rngtech:material_enabled",
+      "material": "aluminum"
+    }
+  ],
+  "type": "rngtech:furnace",
+  "group": "rngtech_metals",
+  "ingredient": {
+    "tag": "c:ores/aluminum"
+  },
+  "result": {
+    "id": "rngtech:aluminum_ingot"
+  },
+  "processing_ticks": 300,
+  "energy": 14400,
+  "experience": 0.7,
+  "minimum_temperature": 1300,
+  "required_temperature_stability": 0.95,
+  "machine_xp": 4
+}

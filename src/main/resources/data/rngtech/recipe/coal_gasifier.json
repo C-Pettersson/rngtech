@@ -1,0 +1,35 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "rngtech:material_enabled",
+      "material": "aluminum"
+    }
+  ],
+  "type": "rngtech:trait_shaped",
+  "category": "redstone",
+  "pattern": [
+    "APA",
+    "CMC",
+    "AHA"
+  ],
+  "key": {
+    "A": {
+      "item": "rngtech:aluminum_plate"
+    },
+    "C": {
+      "item": "rngtech:aluminum_casing"
+    },
+    "H": {
+      "item": "rngtech:aluminum_heat_core"
+    },
+    "M": {
+      "tag": "rngtech:machine_frames/base"
+    },
+    "P": {
+      "item": "rngtech:steel_servo"
+    }
+  },
+  "result": {
+    "id": "rngtech:coal_gasifier"
+  }
+}

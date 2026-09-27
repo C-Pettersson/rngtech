@@ -1,0 +1,30 @@
+{
+    "type":  "rngtech:trait_shaped",
+    "category":  "misc",
+    "pattern":  [
+                    "CMC",
+                    "RHR",
+                    "CGC"
+                ],
+    "key":  {
+                "C":  {
+                          "item":  "rngtech:steel_casing"
+                      },
+                "M":  {
+                          "tag":  "rngtech:machine_frames/reinforced"
+                      },
+                "R":  {
+                          "item":  "minecraft:redstone"
+                      },
+                "H":  {
+                          "item":  "rngtech:steel_disassembly_head"
+                      },
+                "G":  {
+                          "item":  "rngtech:steel_gear"
+                      }
+            },
+    "result":  {
+                   "count":  1,
+                   "id":  "rngtech:steel_component_recycler"
+               }
+}

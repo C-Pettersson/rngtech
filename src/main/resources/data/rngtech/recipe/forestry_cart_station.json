@@ -1,0 +1,33 @@
+{
+  "type": "rngtech:trait_shaped",
+  "category": "redstone",
+  "pattern": [
+    "RCR",
+    "PTP",
+    "BEB"
+  ],
+  "key": {
+    "B": {
+      "item": "rngtech:basic_electric_circuit"
+    },
+    "C": {
+      "item": "minecraft:composter"
+    },
+    "E": {
+      "item": "rngtech:energy_coil"
+    },
+    "P": {
+      "tag": "minecraft:planks"
+    },
+    "R": {
+      "item": "minecraft:rail"
+    },
+    "T": {
+      "item": "rngtech:tool_bench"
+    }
+  },
+  "result": {
+    "count": 1,
+    "id": "rngtech:forestry_cart_station"
+  }
+}

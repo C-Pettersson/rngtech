@@ -1,0 +1,12 @@
+{
+  "parent": "minecraft:block/cube",
+  "textures": {
+    "down": "rngtech:block/vacuum_collapse_generator/bottom/vacuum_collapse_generator",
+    "up": "rngtech:block/vacuum_collapse_generator/top/vacuum_collapse_generator",
+    "north": "rngtech:block/vacuum_collapse_generator/front/vacuum_collapse_generator",
+    "south": "rngtech:block/vacuum_collapse_generator/side/vacuum_collapse_generator",
+    "east": "rngtech:block/vacuum_collapse_generator/side/vacuum_collapse_generator",
+    "west": "rngtech:block/vacuum_collapse_generator/side/vacuum_collapse_generator",
+    "particle": "rngtech:block/vacuum_collapse_generator/front/vacuum_collapse_generator"
+  }
+}

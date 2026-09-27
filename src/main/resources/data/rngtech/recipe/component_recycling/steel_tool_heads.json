@@ -1,0 +1,25 @@
+{
+  "type": "rngtech:component_recycling",
+  "ingredient": {
+    "tag": "rngtech:component_recycling/steel_tool_heads"
+  },
+  "minimum_processing_level": 4,
+  "processing_ticks": 120,
+  "energy": 1140,
+  "outputs": [
+    {
+      "stack": {
+        "id": "rngtech:steel_gear",
+        "count": 1
+      },
+      "requires_filter": false
+    },
+    {
+      "stack": {
+        "id": "rngtech:steel_plate",
+        "count": 1
+      },
+      "requires_filter": true
+    }
+  ]
+}

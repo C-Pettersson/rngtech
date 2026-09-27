@@ -1,0 +1,14 @@
+{
+  "values": [
+    "rngtech:furnace",
+    "rngtech:iron_furnace_chassis",
+    "rngtech:copper_furnace_chassis",
+    "rngtech:bronze_furnace_chassis",
+    "rngtech:steel_furnace_chassis",
+    "rngtech:lead_furnace_chassis",
+    "rngtech:aluminum_furnace_chassis",
+    "rngtech:titanium_furnace_chassis",
+    "rngtech:tungstensteel_furnace_chassis",
+    "rngtech:exotic_furnace_chassis"
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "parent": "minecraft:block/cube",
+  "textures": {
+    "down": "rngtech:block/component_recycler/bottom/iron_component_recycler",
+    "up": "rngtech:block/component_recycler/top/iron_component_recycler",
+    "north": "rngtech:block/component_recycler/front/iron_component_recycler_active",
+    "south": "rngtech:block/component_recycler/side/iron_component_recycler",
+    "east": "rngtech:block/component_recycler/side/iron_component_recycler",
+    "west": "rngtech:block/component_recycler/side/iron_component_recycler",
+    "particle": "rngtech:block/component_recycler/front/iron_component_recycler_active"
+  }
+}

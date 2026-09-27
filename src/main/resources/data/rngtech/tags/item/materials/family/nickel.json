@@ -1,0 +1,17 @@
+{
+  "replace": false,
+  "values": [
+    "rngtech:nickel_ingot",
+    "rngtech:nickel_dust",
+    "rngtech:nickel_nugget",
+    "rngtech:nickel_storage_block",
+    "rngtech:nickel_ore",
+    "rngtech:deepslate_nickel_ore",
+    "rngtech:raw_nickel",
+    "rngtech:crushed_nickel",
+    "rngtech:nickel_plate",
+    "rngtech:nickel_gear",
+    "rngtech:nickel_rod",
+    "rngtech:nickel_coil"
+  ]
+}

@@ -1,0 +1,27 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "rngtech:material_enabled",
+      "material": "gold"
+    }
+  ],
+  "type": "rngtech:trait_shaped",
+  "category": "redstone",
+  "pattern": [
+    "GCG",
+    "RPR",
+    "WBW"
+  ],
+  "key": {
+    "B": { "item": "rngtech:basic_electric_circuit" },
+    "C": { "item": "rngtech:gold_coil" },
+    "G": { "item": "minecraft:glass_pane" },
+    "P": { "item": "rngtech:solar_panel_frame" },
+    "R": { "item": "minecraft:redstone" },
+    "W": { "item": "rngtech:gold_plate" }
+  },
+  "result": {
+    "count": 1,
+    "id": "rngtech:gold_solar_panel"
+  }
+}

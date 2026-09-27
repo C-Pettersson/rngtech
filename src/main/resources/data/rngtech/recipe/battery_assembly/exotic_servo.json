@@ -1,0 +1,47 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "rngtech:material_enabled",
+      "material": "tungstensteel"
+    }
+  ],
+  "type": "rngtech:battery_assembly",
+  "group": "component_assembly_servos",
+  "ingredients": [
+    {
+      "ingredient": {
+        "tag": "rngtech:materials/exotic/ingots"
+      },
+      "count": 4
+    },
+    {
+      "ingredient": {
+        "item": "rngtech:ascension_matrix"
+      },
+      "count": 2
+    },
+    {
+      "ingredient": {
+        "tag": "c:circuits/ultimate"
+      }
+    },
+    {
+      "ingredient": {
+        "item": "rngtech:servo_frame"
+      }
+    }
+  ],
+  "fluid_input": {
+    "ingredient": {
+      "fluid": "rngtech:lubricant"
+    },
+    "amount": 1000
+  },
+  "result": {
+    "count": 1,
+    "id": "rngtech:exotic_servo"
+  },
+  "processing_ticks": 360,
+  "energy": 9600,
+  "roll_result_traits": false
+}

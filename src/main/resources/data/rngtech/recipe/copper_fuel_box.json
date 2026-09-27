@@ -1,0 +1,39 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "rngtech:material_enabled",
+      "material": "copper"
+    }
+  ],
+  "type": "rngtech:trait_shaped",
+  "category": "redstone",
+  "pattern": [
+    "ICI",
+    "HFH",
+    "RKR"
+  ],
+  "key": {
+    "C": {
+      "item": "minecraft:chest"
+    },
+    "F": {
+      "item": "rngtech:fuel_chamber"
+    },
+    "H": {
+      "item": "minecraft:hopper"
+    },
+    "I": {
+      "tag": "c:ingots/copper"
+    },
+    "K": {
+      "item": "minecraft:coal"
+    },
+    "R": {
+      "item": "minecraft:redstone"
+    }
+  },
+  "result": {
+    "count": 1,
+    "id": "rngtech:copper_fuel_box"
+  }
+}

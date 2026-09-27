@@ -1,0 +1,24 @@
+{
+  "type": "rngtech:melter",
+  "group": "melter_electrolytes",
+  "primary_ingredient": {
+    "item": "minecraft:sugar"
+  },
+  "secondary_ingredient": {
+    "item": "minecraft:redstone"
+  },
+  "fluid_input": {
+    "ingredient": {
+      "fluid": "minecraft:water"
+    },
+    "amount": 1000
+  },
+  "fluid_output": {
+    "id": "rngtech:electrolyte_solution",
+    "amount": 1000
+  },
+  "processing_ticks": 220,
+  "energy": 3600,
+  "minimum_temperature": 1200,
+  "required_processing_level": 6
+}

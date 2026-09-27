@@ -1,0 +1,20 @@
+{
+    "neoforge:conditions": [
+        {
+            "type": "rngtech:material_enabled",
+            "material": "aluminum"
+        }
+    ],
+    "type": "rngtech:crusher",
+    "group": "rngtech_crushed_to_dust",
+    "ingredient": {
+        "item": "rngtech:crushed_aluminum"
+    },
+    "result": {
+        "id": "rngtech:aluminum_dust"
+    },
+    "processing_ticks": 60,
+    "energy": 2400,
+    "required_processing_level": 1,
+    "machine_xp": 1
+}

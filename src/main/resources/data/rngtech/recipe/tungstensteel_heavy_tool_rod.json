@@ -1,0 +1,27 @@
+{
+    "type":  "rngtech:trait_shaped",
+    "key":  {
+                "R":  {
+                          "item":  "rngtech:tungstensteel_rod"
+                      },
+                "P":  {
+                          "item":  "rngtech:tungstensteel_plate"
+                      }
+            },
+    "category":  "equipment",
+    "neoforge:conditions":  [
+                                {
+                                    "material":  "tungstensteel",
+                                    "type":  "rngtech:material_enabled"
+                                }
+                            ],
+    "pattern":  [
+                    " P ",
+                    " R ",
+                    " R "
+                ],
+    "result":  {
+                   "count":  1,
+                   "id":  "rngtech:tungstensteel_heavy_tool_rod"
+               }
+}

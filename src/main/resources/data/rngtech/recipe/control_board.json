@@ -1,0 +1,27 @@
+{
+  "type": "rngtech:trait_shaped",
+  "category": "redstone",
+  "pattern": [
+    "RQR",
+    "ICI",
+    "RQR"
+  ],
+  "key": {
+    "C": {
+      "item": "rngtech:conductive_plate"
+    },
+    "I": {
+      "item": "rngtech:insulator"
+    },
+    "Q": {
+      "item": "minecraft:quartz"
+    },
+    "R": {
+      "item": "minecraft:redstone"
+    }
+  },
+  "result": {
+    "count": 2,
+    "id": "rngtech:control_board"
+  }
+}

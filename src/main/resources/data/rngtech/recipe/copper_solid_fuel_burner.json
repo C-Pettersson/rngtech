@@ -1,0 +1,39 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "rngtech:material_enabled",
+      "material": "copper"
+    }
+  ],
+  "type": "rngtech:trait_shaped",
+  "category": "redstone",
+  "pattern": [
+    "RCR",
+    "GBG",
+    "HFH"
+  ],
+  "key": {
+    "B": {
+      "item": "rngtech:solid_fuel_burner_machine_chassis"
+    },
+    "C": {
+      "item": "rngtech:copper_coil"
+    },
+    "F": {
+      "item": "rngtech:fuel_chamber"
+    },
+    "G": {
+      "tag": "c:ingots/copper"
+    },
+    "H": {
+      "item": "rngtech:copper_casing"
+    },
+    "R": {
+      "item": "minecraft:redstone"
+    }
+  },
+  "result": {
+    "count": 1,
+    "id": "rngtech:copper_solid_fuel_burner"
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "replace": false,
+  "values": [
+    "minecraft:iron_ingot",
+    "minecraft:copper_ingot",
+    "rngtech:bronze_ingot",
+    "rngtech:tin_ingot",
+    "rngtech:zinc_ingot",
+    "minecraft:gold_ingot",
+    "rngtech:steel_ingot",
+    "rngtech:invar_ingot",
+    "rngtech:nickel_ingot",
+    "rngtech:lead_ingot",
+    "rngtech:silver_ingot",
+    "rngtech:aluminum_ingot",
+    "rngtech:sparksteel_ingot",
+    "rngtech:osmium_ingot",
+    "rngtech:titanium_ingot",
+    "rngtech:arclite_ingot",
+    "rngtech:tungsten_ingot",
+    "rngtech:tungstensteel_ingot",
+    "rngtech:nullite_ingot",
+    "rngtech:aethergold_ingot",
+    "rngtech:platinum_ingot",
+    "minecraft:netherite_ingot",
+    "rngtech:naquadah_ingot"
+  ]
+}

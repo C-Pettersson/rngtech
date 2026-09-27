@@ -1,0 +1,17 @@
+{
+  "replace": false,
+  "values": [
+    "rngtech:osmium_ingot",
+    "rngtech:osmium_dust",
+    "rngtech:osmium_nugget",
+    "rngtech:osmium_storage_block",
+    "rngtech:osmium_ore",
+    "rngtech:deepslate_osmium_ore",
+    "rngtech:raw_osmium",
+    "rngtech:crushed_osmium",
+    "rngtech:osmium_plate",
+    "rngtech:osmium_gear",
+    "rngtech:osmium_rod",
+    "rngtech:osmium_coil"
+  ]
+}

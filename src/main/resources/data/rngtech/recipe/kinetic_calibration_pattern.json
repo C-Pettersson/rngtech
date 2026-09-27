@@ -1,0 +1,15 @@
+{
+  "type": "rngtech:trait_shaped",
+  "category": "misc",
+  "pattern": [
+    "IPI",
+    "PGP",
+    "IPI"
+  ],
+  "key": {
+    "G": { "item": "rngtech:mechanism" },
+    "I": { "tag": "c:ingots/iron" },
+    "P": { "item": "minecraft:paper" }
+  },
+  "result": { "count": 1, "id": "rngtech:kinetic_calibration_pattern" }
+}

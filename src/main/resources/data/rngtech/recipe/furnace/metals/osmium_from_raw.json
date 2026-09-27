@@ -1,0 +1,21 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "rngtech:material_enabled",
+      "material": "osmium"
+    }
+  ],
+  "type": "rngtech:furnace",
+  "group": "rngtech_metals",
+  "ingredient": {
+    "tag": "c:raw_materials/osmium"
+  },
+  "result": {
+    "id": "rngtech:osmium_ingot"
+  },
+  "processing_ticks": 200,
+  "energy": 9600,
+  "experience": 0.7,
+  "minimum_temperature": 1000,
+  "machine_xp": 2
+}

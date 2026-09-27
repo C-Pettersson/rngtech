@@ -1,0 +1,25 @@
+{
+  "type": "rngtech:battery_assembly",
+  "group": "battery_assembly_high_tier_cells",
+  "ingredients": [
+    {
+      "item": "rngtech:battery_cell"
+    },
+    {
+      "tag": "rngtech:materials/exotic/plates"
+    },
+    {
+      "item": "minecraft:redstone"
+    },
+    {
+      "item": "rngtech:stabilization_catalyst"
+    }
+  ],
+  "result": {
+    "count": 1,
+    "id": "rngtech:exotic_battery_cell"
+  },
+  "processing_ticks": 360,
+  "energy": 8000,
+  "roll_result_traits": true
+}

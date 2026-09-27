@@ -1,0 +1,32 @@
+{
+    "type": "rngtech:component_recycling",
+    "ingredient": {
+        "item": "rngtech:arclite_battery_cell"
+    },
+    "minimum_processing_level": 6,
+    "processing_ticks": 162,
+    "energy": 1730,
+    "outputs": [
+        {
+            "stack": {
+                "id": "rngtech:battery_cell",
+                "count": 1
+            },
+            "requires_filter": false
+        },
+        {
+            "stack": {
+                "id": "rngtech:stabilization_catalyst",
+                "count": 1
+            },
+            "requires_filter": false
+        },
+        {
+            "stack": {
+                "id": "rngtech:arclite_plate",
+                "count": 1
+            },
+            "requires_filter": true
+        }
+    ]
+}

@@ -1,0 +1,12 @@
+{
+  "parent": "minecraft:block/cube",
+  "textures": {
+    "down": "rngtech:block/ammonia_power_chain/bottom/ammonia_synthesizer",
+    "up": "rngtech:block/ammonia_power_chain/top/ammonia_synthesizer",
+    "north": "rngtech:block/ammonia_power_chain/front/ammonia_synthesizer",
+    "south": "rngtech:block/ammonia_power_chain/side/ammonia_synthesizer",
+    "east": "rngtech:block/ammonia_power_chain/side/ammonia_synthesizer",
+    "west": "rngtech:block/ammonia_power_chain/side/ammonia_synthesizer",
+    "particle": "rngtech:block/ammonia_power_chain/front/ammonia_synthesizer"
+  }
+}

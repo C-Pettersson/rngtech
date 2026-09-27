@@ -1,0 +1,26 @@
+{
+  "type": "rngtech:trait_shaped",
+  "category": "redstone",
+  "pattern": [
+    "RER",
+    "PWP"
+  ],
+  "key": {
+    "E": {
+      "item": "rngtech:electrolyte"
+    },
+    "P": {
+      "item": "minecraft:potato"
+    },
+    "R": {
+      "item": "minecraft:redstone"
+    },
+    "W": {
+      "item": "rngtech:cable"
+    }
+  },
+  "result": {
+    "count": 1,
+    "id": "rngtech:potato_battery_cell"
+  }
+}

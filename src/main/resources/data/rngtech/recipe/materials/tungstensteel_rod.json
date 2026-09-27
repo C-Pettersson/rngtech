@@ -1,0 +1,30 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "rngtech:material_enabled",
+      "material": "tungstensteel"
+    },
+    {
+      "type": "rngtech:material_enabled",
+      "material": "steel"
+    }
+  ],
+  "type": "rngtech:trait_shaped",
+  "category": "misc",
+  "pattern": [
+    " P ",
+    " R ",
+    " P "
+  ],
+  "key": {
+    "P": {
+      "item": "rngtech:tungstensteel_plate"
+    },
+    "R": {
+      "item": "rngtech:steel_rod"
+    }
+  },
+  "result": {
+    "id": "rngtech:tungstensteel_rod"
+  }
+}

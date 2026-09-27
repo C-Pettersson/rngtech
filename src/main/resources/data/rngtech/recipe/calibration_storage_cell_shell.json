@@ -1,0 +1,16 @@
+{
+  "type": "rngtech:calibration",
+  "family": "storage",
+  "ingredient": { "item": "rngtech:cell_shell" },
+  "pattern": { "item": "rngtech:storage_calibration_pattern" },
+  "catalyst": { "item": "minecraft:redstone" },
+  "stabilizer": { "item": "rngtech:stabilization_catalyst" },
+  "processing_ticks": 190,
+  "energy": 1500,
+  "result": {
+    "stack": { "id": "rngtech:calibrated_storage_component" },
+    "stage": 2,
+    "stability": { "min": 45, "max": 80 },
+    "refinement_potential": { "min": 0, "max": 2 }
+  }
+}

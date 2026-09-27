@@ -1,0 +1,33 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "rngtech:material_enabled",
+      "material": "iron"
+    }
+  ],
+  "type": "rngtech:trait_shaped",
+  "category": "redstone",
+  "pattern": [
+    "BMB",
+    "MCM",
+    "BRB"
+  ],
+  "key": {
+    "B": {
+      "item": "rngtech:bus_bar"
+    },
+    "C": {
+      "tag": "rngtech:machine_frames/base"
+    },
+    "M": {
+      "tag": "c:ingots/iron"
+    },
+    "R": {
+      "item": "minecraft:redstone"
+    }
+  },
+  "result": {
+    "count": 1,
+    "id": "rngtech:iron_battery_chassis"
+  }
+}

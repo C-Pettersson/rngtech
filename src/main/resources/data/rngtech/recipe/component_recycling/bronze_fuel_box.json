@@ -1,0 +1,32 @@
+{
+    "type": "rngtech:component_recycling",
+    "ingredient": {
+        "item": "rngtech:bronze_fuel_box"
+    },
+    "minimum_processing_level": 3,
+    "processing_ticks": 110,
+    "energy": 1000,
+    "outputs": [
+        {
+            "stack": {
+                "id": "rngtech:fuel_chamber",
+                "count": 1
+            },
+            "requires_filter": false
+        },
+        {
+            "stack": {
+                "id": "rngtech:bronze_ingot",
+                "count": 1
+            },
+            "requires_filter": false
+        },
+        {
+            "stack": {
+                "id": "minecraft:chest",
+                "count": 1
+            },
+            "requires_filter": true
+        }
+    ]
+}

@@ -1,0 +1,10 @@
+{
+  "values": [
+    "rngtech:calibrated_structural_component",
+    "rngtech:calibrated_kinetic_component",
+    "rngtech:calibrated_conductive_component",
+    "rngtech:calibrated_thermal_component",
+    "rngtech:calibrated_storage_component",
+    "rngtech:calibrated_logic_component"
+  ]
+}

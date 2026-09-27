@@ -1,0 +1,15 @@
+{
+  "type": "rngtech:calibration",
+  "family": "structural",
+  "ingredient": { "item": "rngtech:iron_plate" },
+  "pattern": { "item": "rngtech:structural_calibration_pattern" },
+  "catalyst": { "item": "minecraft:lapis_lazuli" },
+  "processing_ticks": 160,
+  "energy": 1200,
+  "result": {
+    "stack": { "id": "rngtech:calibrated_structural_component" },
+    "stage": 1,
+    "stability": { "min": 35, "max": 75 },
+    "refinement_potential": { "min": 0, "max": 1 }
+  }
+}

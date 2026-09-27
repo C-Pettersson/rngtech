@@ -1,0 +1,26 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "rngtech:material_enabled",
+      "material": "copper"
+    }
+  ],
+  "type": "rngtech:trait_shaped",
+  "category": "misc",
+  "pattern": [
+    "NNN",
+    "I I",
+    "III"
+  ],
+  "key": {
+    "I": {
+      "tag": "c:ingots/copper"
+    },
+    "N": {
+      "tag": "c:nuggets/copper"
+    }
+  },
+  "result": {
+    "id": "rngtech:copper_casing"
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "type": "rngtech:calibration",
+  "family": "logic",
+  "ingredient": { "item": "rngtech:basic_electric_circuit" },
+  "pattern": { "item": "rngtech:logic_calibration_pattern" },
+  "catalyst": { "item": "minecraft:quartz" },
+  "minimum_stage": 1,
+  "processing_ticks": 200,
+  "energy": 1600,
+  "result": {
+    "stack": { "id": "rngtech:calibrated_logic_component" },
+    "stage": 2,
+    "stability": { "min": 35, "max": 75 },
+    "refinement_potential": { "min": 0, "max": 2 }
+  }
+}

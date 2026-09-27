@@ -1,0 +1,32 @@
+{
+  "type": "rngtech:component_recycling",
+  "ingredient": {
+    "item": "rngtech:corrosion_cell"
+  },
+  "minimum_processing_level": 4,
+  "processing_ticks": 168,
+  "energy": 1780,
+  "outputs": [
+    {
+      "stack": {
+        "id": "rngtech:reinforced_machine_frame",
+        "count": 1
+      },
+      "requires_filter": false
+    },
+    {
+      "stack": {
+        "id": "rngtech:steel_casing",
+        "count": 1
+      },
+      "requires_filter": false
+    },
+    {
+      "stack": {
+        "id": "rngtech:bus_bar",
+        "count": 1
+      },
+      "requires_filter": true
+    }
+  ]
+}

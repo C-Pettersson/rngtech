@@ -1,0 +1,24 @@
+{
+  "type": "rngtech:trait_shaped",
+  "category": "misc",
+  "pattern": [
+    " Q ",
+    "LAL",
+    " Q "
+  ],
+  "key": {
+    "A": {
+      "item": "rngtech:affix_modifier"
+    },
+    "L": {
+      "item": "minecraft:lapis_lazuli"
+    },
+    "Q": {
+      "item": "minecraft:quartz"
+    }
+  },
+  "result": {
+    "count": 1,
+    "id": "rngtech:frugality_crystal"
+  }
+}

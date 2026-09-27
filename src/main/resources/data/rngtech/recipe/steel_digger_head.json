@@ -1,0 +1,30 @@
+{
+  "type": "rngtech:trait_shaped",
+  "category": "equipment",
+  "neoforge:conditions": [
+    {
+      "type": "rngtech:material_enabled",
+      "material": "steel"
+    }
+  ],
+  "key": {
+    "G": {
+      "item": "rngtech:steel_gear"
+    },
+    "R": {
+      "item": "rngtech:steel_rod"
+    },
+    "P": {
+      "item": "rngtech:steel_plate"
+    }
+  },
+  "pattern": [
+    "PPP",
+    "PGP",
+    " R "
+  ],
+  "result": {
+    "count": 1,
+    "id": "rngtech:steel_digger_head"
+  }
+}

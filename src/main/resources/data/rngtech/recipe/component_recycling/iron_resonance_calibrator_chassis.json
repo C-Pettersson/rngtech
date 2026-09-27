@@ -1,0 +1,32 @@
+{
+    "type": "rngtech:component_recycling",
+    "ingredient": {
+        "item": "rngtech:iron_resonance_calibrator_chassis"
+    },
+    "minimum_processing_level": 1,
+    "processing_ticks": 132,
+    "energy": 1120,
+    "outputs": [
+        {
+            "stack": {
+                "id": "rngtech:furnace_machine_chassis",
+                "count": 1
+            },
+            "requires_filter": false
+        },
+        {
+            "stack": {
+                "id": "rngtech:energy_coil",
+                "count": 1
+            },
+            "requires_filter": false
+        },
+        {
+            "stack": {
+                "id": "minecraft:iron_ingot",
+                "count": 2
+            },
+            "requires_filter": true
+        }
+    ]
+}

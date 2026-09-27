@@ -1,0 +1,33 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "rngtech:material_enabled",
+      "material": "copper"
+    }
+  ],
+  "type": "rngtech:trait_shaped",
+  "category": "equipment",
+  "pattern": [
+    "PPP",
+    "BGB",
+    " R "
+  ],
+  "key": {
+    "B": {
+      "item": "rngtech:iron_plate"
+    },
+    "G": {
+      "item": "rngtech:copper_gear"
+    },
+    "P": {
+      "item": "rngtech:copper_plate"
+    },
+    "R": {
+      "item": "minecraft:redstone"
+    }
+  },
+  "result": {
+    "count": 1,
+    "id": "rngtech:copper_crush_head"
+  }
+}

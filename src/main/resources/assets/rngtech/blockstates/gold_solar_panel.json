@@ -1,0 +1,12 @@
+{
+  "variants": {
+    "active=false,facing=north": { "model": "rngtech:block/gold_solar_panel" },
+    "active=false,facing=east": { "model": "rngtech:block/gold_solar_panel", "y": 90 },
+    "active=false,facing=south": { "model": "rngtech:block/gold_solar_panel", "y": 180 },
+    "active=false,facing=west": { "model": "rngtech:block/gold_solar_panel", "y": 270 },
+    "active=true,facing=north": { "model": "rngtech:block/gold_solar_panel_active" },
+    "active=true,facing=east": { "model": "rngtech:block/gold_solar_panel_active", "y": 90 },
+    "active=true,facing=south": { "model": "rngtech:block/gold_solar_panel_active", "y": 180 },
+    "active=true,facing=west": { "model": "rngtech:block/gold_solar_panel_active", "y": 270 }
+  }
+}

@@ -1,0 +1,121 @@
+name: Publish Release
+
+on:
+  push:
+    tags:
+      - '*'
+
+permissions:
+  contents: write
+  packages: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          fetch-tags: true
+
+      - name: Setup JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Derive version from tag
+        id: version
+        shell: bash
+        run: |
+          TAG="${GITHUB_REF_NAME}"
+          VERSION="${TAG#v}"
+
+          if [[ ! "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.-]+)?(\+[0-9A-Za-z.-]+)?$ ]]; then
+            echo "Tag must contain a numeric major.minor.patch version with optional prerelease/build suffixes." >&2
+            exit 1
+          fi
+
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: Build release jar
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+        run: ./gradlew ciCheck "-Pmod_version=$VERSION"
+
+      - name: Locate release jar
+        id: artifact
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+        shell: bash
+        run: |
+          JAR="build/libs/rngtech-${VERSION}.jar"
+
+          if [[ ! -f "$JAR" ]]; then
+            echo "Expected release jar not found: $JAR" >&2
+            find build/libs -maxdepth 1 -type f -name '*.jar' -print >&2
+            exit 1
+          fi
+
+          echo "jar=$JAR" >> "$GITHUB_OUTPUT"
+
+      - name: Package optional FTB Quests extra
+        id: ftbquests
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+        shell: bash
+        run: |
+          EXTRA="build/distributions/rngtech-ftbquests-${VERSION}.zip"
+
+          mkdir -p build/distributions
+          jar --create --no-manifest --file "$EXTRA" -C extras/ftbquests config
+
+          echo "zip=$EXTRA" >> "$GITHUB_OUTPUT"
+
+      - name: Upload release workflow artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: rngtech-${{ steps.version.outputs.version }}-mod-jar
+          path: ${{ steps.artifact.outputs.jar }}
+          if-no-files-found: error
+          retention-days: 90
+
+      - name: Upload FTB Quests workflow artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: rngtech-${{ steps.version.outputs.version }}-ftbquests-extra
+          path: ${{ steps.ftbquests.outputs.zip }}
+          if-no-files-found: error
+          retention-days: 90
+
+      - name: Create GitHub release and attach artifacts
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VERSION: ${{ steps.version.outputs.version }}
+          JAR: ${{ steps.artifact.outputs.jar }}
+          FTBQUESTS: ${{ steps.ftbquests.outputs.zip }}
+        shell: bash
+        run: |
+          RELEASE_FLAGS=()
+          if [[ "$VERSION" == *-* ]]; then
+            RELEASE_FLAGS+=(--prerelease)
+          fi
+
+          if gh release view "$GITHUB_REF_NAME" >/dev/null 2>&1; then
+            gh release upload "$GITHUB_REF_NAME" "$JAR" "$FTBQUESTS" --clobber
+            if [[ ${#RELEASE_FLAGS[@]} -gt 0 ]]; then
+              gh release edit "$GITHUB_REF_NAME" "${RELEASE_FLAGS[@]}"
+            fi
+          else
+            gh release create "$GITHUB_REF_NAME" "$JAR" "$FTBQUESTS" --title "RNGTech v$VERSION" --generate-notes "${RELEASE_FLAGS[@]}"
+          fi
+
+      - name: Publish Maven package
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VERSION: ${{ steps.version.outputs.version }}
+        run: ./gradlew publishMavenJavaPublicationToGitHubPackagesRepository "-Pmod_version=$VERSION"

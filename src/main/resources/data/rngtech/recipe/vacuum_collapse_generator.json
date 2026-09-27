@@ -1,0 +1,19 @@
+{
+  "type": "rngtech:trait_shaped",
+  "category": "redstone",
+  "pattern": [
+    "SCS",
+    "NMN",
+    "SBS"
+  ],
+  "key": {
+    "B": { "item": "rngtech:bus_bar" },
+    "C": { "item": "rngtech:tungstensteel_void_chamber" },
+    "M": { "tag": "rngtech:machine_frames/exotic" },
+    "N": { "item": "rngtech:tungstensteel_collapse_nozzle" },
+    "S": { "item": "rngtech:tungstensteel_dimensional_stabilizer" }
+  },
+  "result": {
+    "id": "rngtech:vacuum_collapse_generator"
+  }
+}

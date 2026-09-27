@@ -1,0 +1,43 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "rngtech:material_enabled",
+      "material": "steel"
+    }
+  ],
+  "type": "rngtech:calibrated_shaped",
+  "category": "redstone",
+  "pattern": [
+    "RCR",
+    "GBG",
+    "FXH"
+  ],
+  "key": {
+    "B": {
+      "ingredient": { "item": "rngtech:solid_fuel_burner_machine_chassis" }
+    },
+    "C": {
+      "ingredient": { "item": "rngtech:steel_coil" }
+    },
+    "F": {
+      "ingredient": { "item": "rngtech:fuel_chamber" }
+    },
+    "G": {
+      "ingredient": { "tag": "c:ingots/steel" }
+    },
+    "H": {
+      "ingredient": { "item": "rngtech:steel_casing" }
+    },
+    "R": {
+      "ingredient": { "item": "minecraft:redstone" }
+    },
+    "X": {
+      "ingredient": { "item": "rngtech:calibrated_thermal_component" },
+      "calibration": { "family": "thermal", "min_stage": 2, "min_stability": 55 }
+    }
+  },
+  "result": {
+    "count": 1,
+    "id": "rngtech:steel_solid_fuel_burner"
+  }
+}

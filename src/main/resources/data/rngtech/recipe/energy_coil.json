@@ -1,0 +1,30 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "rngtech:material_enabled",
+      "material": "copper"
+    }
+  ],
+  "type": "rngtech:trait_shaped",
+  "category": "redstone",
+  "pattern": [
+    " R ",
+    "WCW",
+    " R "
+  ],
+  "key": {
+    "C": {
+      "item": "rngtech:copper_coil"
+    },
+    "R": {
+      "item": "minecraft:redstone"
+    },
+    "W": {
+      "item": "rngtech:copper_energy_connector"
+    }
+  },
+  "result": {
+    "count": 1,
+    "id": "rngtech:energy_coil"
+  }
+}

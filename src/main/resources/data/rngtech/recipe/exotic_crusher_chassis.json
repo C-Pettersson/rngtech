@@ -1,0 +1,28 @@
+{
+  "type": "rngtech:calibrated_shaped",
+  "category": "misc",
+  "pattern": [
+    "NAN",
+    "XMX",
+    "NNN"
+  ],
+  "key": {
+    "A": {
+      "ingredient": { "tag": "c:circuits/ultimate" }
+    },
+    "N": {
+      "ingredient": { "tag": "rngtech:materials/exotic/ingots" }
+    },
+    "M": {
+      "ingredient": { "tag": "rngtech:machine_frames/exotic" }
+    },
+    "X": {
+      "ingredient": { "item": "rngtech:calibrated_kinetic_component" },
+      "calibration": { "family": "kinetic", "min_stage": 1, "min_stability": 85 }
+    }
+  },
+  "result": {
+    "count": 1,
+    "id": "rngtech:exotic_crusher_chassis"
+  }
+}

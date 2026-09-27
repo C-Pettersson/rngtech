@@ -1,0 +1,19 @@
+{
+  "replace": false,
+  "values": [
+    "minecraft:gold_ingot",
+    "rngtech:gold_dust",
+    "minecraft:gold_nugget",
+    "minecraft:gold_block",
+    "minecraft:gold_ore",
+    "minecraft:deepslate_gold_ore",
+    "minecraft:nether_gold_ore",
+    "minecraft:raw_gold",
+    "rngtech:crushed_gold",
+    "rngtech:gold_plate",
+    "rngtech:gold_gear",
+    "rngtech:gold_rod",
+    "rngtech:gold_coil",
+    "rngtech:gold_casing"
+  ]
+}

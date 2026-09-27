@@ -1,0 +1,24 @@
+{
+  "type": "rngtech:trait_shaped",
+  "category": "misc",
+  "pattern": [
+    " L ",
+    "ALA",
+    " G "
+  ],
+  "key": {
+    "A": {
+      "item": "minecraft:diamond"
+    },
+    "G": {
+      "item": "minecraft:gold_ingot"
+    },
+    "L": {
+      "item": "minecraft:glass_pane"
+    }
+  },
+  "result": {
+    "count": 1,
+    "id": "rngtech:efficiency_modifier_lens"
+  }
+}

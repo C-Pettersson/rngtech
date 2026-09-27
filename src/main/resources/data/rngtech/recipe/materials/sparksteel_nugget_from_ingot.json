@@ -1,0 +1,19 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "rngtech:material_enabled",
+      "material": "sparksteel"
+    }
+  ],
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "tag": "c:ingots/sparksteel"
+    }
+  ],
+  "result": {
+    "count": 9,
+    "id": "rngtech:sparksteel_nugget"
+  }
+}

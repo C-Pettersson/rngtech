@@ -1,0 +1,28 @@
+{
+  "replace": false,
+  "values": [
+    "rngtech:iron_rod",
+    "rngtech:copper_rod",
+    "rngtech:bronze_rod",
+    "rngtech:tin_rod",
+    "rngtech:zinc_rod",
+    "rngtech:gold_rod",
+    "rngtech:steel_rod",
+    "rngtech:invar_rod",
+    "rngtech:nickel_rod",
+    "rngtech:lead_rod",
+    "rngtech:silver_rod",
+    "rngtech:aluminum_rod",
+    "rngtech:sparksteel_rod",
+    "rngtech:osmium_rod",
+    "rngtech:titanium_rod",
+    "rngtech:arclite_rod",
+    "rngtech:tungsten_rod",
+    "rngtech:tungstensteel_rod",
+    "rngtech:nullite_rod",
+    "rngtech:aethergold_rod",
+    "rngtech:platinum_rod",
+    "rngtech:netherite_rod",
+    "rngtech:naquadah_rod"
+  ]
+}

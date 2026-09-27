@@ -1,0 +1,93 @@
+{
+  "textures": {
+    "wood": "rngtech:block/hand_crank/wood",
+    "metal": "rngtech:block/hand_crank/metal",
+    "particle": "rngtech:block/hand_crank/wood"
+  },
+  "elements": [
+    {
+      "from": [4, 0, 4],
+      "to": [12, 1, 12],
+      "faces": {
+        "down": { "texture": "#metal" },
+        "up": { "texture": "#metal" },
+        "north": { "texture": "#metal" },
+        "south": { "texture": "#metal" },
+        "west": { "texture": "#metal" },
+        "east": { "texture": "#metal" }
+      }
+    },
+    {
+      "from": [5, 1, 5],
+      "to": [11, 2, 11],
+      "faces": {
+        "down": { "texture": "#metal" },
+        "up": { "texture": "#metal" },
+        "north": { "texture": "#metal" },
+        "south": { "texture": "#metal" },
+        "west": { "texture": "#metal" },
+        "east": { "texture": "#metal" }
+      }
+    },
+    {
+      "from": [7, 2, 7],
+      "to": [9, 10, 9],
+      "faces": {
+        "down": { "texture": "#metal" },
+        "up": { "texture": "#metal" },
+        "north": { "texture": "#metal" },
+        "south": { "texture": "#metal" },
+        "west": { "texture": "#metal" },
+        "east": { "texture": "#metal" }
+      }
+    },
+    {
+      "from": [2, 10, 7],
+      "to": [6, 12, 9],
+      "faces": {
+        "down": { "texture": "#wood" },
+        "up": { "texture": "#wood" },
+        "north": { "texture": "#wood" },
+        "south": { "texture": "#wood" },
+        "west": { "texture": "#wood" },
+        "east": { "texture": "#wood" }
+      }
+    },
+    {
+      "from": [6, 9, 6],
+      "to": [10, 13, 10],
+      "faces": {
+        "down": { "texture": "#metal" },
+        "up": { "texture": "#metal" },
+        "north": { "texture": "#metal" },
+        "south": { "texture": "#metal" },
+        "west": { "texture": "#metal" },
+        "east": { "texture": "#metal" }
+      }
+    },
+    {
+      "from": [10, 10, 7],
+      "to": [14, 12, 9],
+      "faces": {
+        "down": { "texture": "#wood" },
+        "up": { "texture": "#wood" },
+        "north": { "texture": "#wood" },
+        "south": { "texture": "#wood" },
+        "west": { "texture": "#wood" },
+        "east": { "texture": "#wood" }
+      }
+    },
+    {
+      "from": [1, 9, 6],
+      "to": [3, 13, 10],
+      "faces": {
+        "down": { "texture": "#wood" },
+        "up": { "texture": "#wood" },
+        "north": { "texture": "#wood" },
+        "south": { "texture": "#wood" },
+        "west": { "texture": "#wood" },
+        "east": { "texture": "#wood" }
+      }
+    }
+  ]
+}

@@ -1,0 +1,33 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "rngtech:material_enabled",
+      "material": "copper"
+    }
+  ],
+  "type": "rngtech:trait_shaped",
+  "category": "redstone",
+  "pattern": [
+    "BMB",
+    "MCM",
+    "BRB"
+  ],
+  "key": {
+    "B": {
+      "item": "rngtech:bus_bar"
+    },
+    "C": {
+      "tag": "rngtech:machine_frames/base"
+    },
+    "M": {
+      "tag": "c:ingots/copper"
+    },
+    "R": {
+      "item": "minecraft:redstone"
+    }
+  },
+  "result": {
+    "count": 1,
+    "id": "rngtech:copper_battery_chassis"
+  }
+}

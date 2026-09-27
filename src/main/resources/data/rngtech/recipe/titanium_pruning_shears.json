@@ -1,0 +1,30 @@
+{
+    "type": "rngtech:trait_shaped",
+    "category": "equipment",
+    "neoforge:conditions": [
+        {
+            "material": "titanium",
+            "type": "rngtech:material_enabled"
+        }
+    ],
+    "pattern": [
+        " P ",
+        "PSP",
+        " R "
+    ],
+    "key": {
+        "P": {
+            "item": "rngtech:titanium_plate"
+        },
+        "R": {
+            "item": "rngtech:titanium_rod"
+        },
+        "S": {
+            "item": "minecraft:shears"
+        }
+    },
+    "result": {
+        "count": 1,
+        "id": "rngtech:titanium_pruning_shears"
+    }
+}

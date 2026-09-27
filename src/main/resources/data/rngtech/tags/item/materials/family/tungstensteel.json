@@ -1,0 +1,14 @@
+{
+  "replace": false,
+  "values": [
+    "rngtech:tungstensteel_ingot",
+    "rngtech:tungstensteel_nugget",
+    "rngtech:tungstensteel_storage_block",
+    "rngtech:crushed_tungstensteel",
+    "rngtech:tungstensteel_plate",
+    "rngtech:tungstensteel_gear",
+    "rngtech:tungstensteel_rod",
+    "rngtech:tungstensteel_coil",
+    "rngtech:tungstensteel_casing"
+  ]
+}

@@ -1,0 +1,30 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "rngtech:material_enabled",
+      "material": "nullite"
+    }
+  ],
+  "type": "rngtech:metal_press",
+  "group": "metal_press_energy_connectors",
+  "ingredient": {
+    "item": "rngtech:nullite_coil"
+  },
+  "input_count": 8,
+  "mold": {
+    "item": "rngtech:connector_mold"
+  },
+  "result": {
+    "count": 1,
+    "id": "rngtech:exotic_energy_connector"
+  },
+  "processing_ticks": 800,
+  "energy": 64000,
+  "minimum_temperature": 2100,
+  "safe_maximum_temperature": 2500,
+  "required_temperature_stability": 1.2,
+  "failure_output": {
+    "count": 4,
+    "id": "rngtech:scrap"
+  }
+}

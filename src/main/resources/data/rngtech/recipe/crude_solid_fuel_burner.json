@@ -1,0 +1,33 @@
+{
+  "type": "rngtech:trait_shaped",
+  "category": "redstone",
+  "pattern": [
+    "RCR",
+    "HBH",
+    "SFS"
+  ],
+  "key": {
+    "B": {
+      "item": "rngtech:solid_fuel_burner_machine_chassis"
+    },
+    "C": {
+      "item": "minecraft:coal"
+    },
+    "F": {
+      "item": "minecraft:furnace"
+    },
+    "H": {
+      "item": "minecraft:iron_ingot"
+    },
+    "R": {
+      "item": "minecraft:redstone"
+    },
+    "S": {
+      "item": "minecraft:smooth_stone"
+    }
+  },
+  "result": {
+    "count": 1,
+    "id": "rngtech:crude_solid_fuel_burner"
+  }
+}

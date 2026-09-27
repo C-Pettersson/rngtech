@@ -1,0 +1,15 @@
+{
+    "type": "rngtech:furnace",
+    "group": "copper_ingot",
+    "ingredient": {
+        "item": "minecraft:copper_ore"
+    },
+    "result": {
+        "id": "minecraft:copper_ingot"
+    },
+    "processing_ticks": 200,
+    "energy": 4800,
+    "experience": 0.7,
+    "minimum_temperature": 800,
+    "machine_xp": 1
+}

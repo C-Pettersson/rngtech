@@ -1,0 +1,30 @@
+{
+  "neoforge:conditions": [
+    { "type": "rngtech:material_enabled", "material": "titanium" }
+  ],
+  "type": "rngtech:alloy_furnace",
+  "group": "desiccant",
+  "mode": "desiccant",
+  "ingredients": [
+    {
+      "ingredient": { "item": "rngtech:silica_gel_beads" },
+      "count": 4
+    },
+    {
+      "ingredient": { "tag": "c:dusts/titanium" },
+      "count": 1
+    },
+    {
+      "ingredient": { "item": "minecraft:redstone" },
+      "count": 1
+    }
+  ],
+  "result": {
+    "id": "rngtech:supercharged_silica_gel_beads"
+  },
+  "processing_ticks": 240,
+  "energy": 6000,
+  "minimum_component_stage": 6,
+  "minimum_temperature": 1450,
+  "required_temperature_stability": 0.0
+}

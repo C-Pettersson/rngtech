@@ -1,0 +1,27 @@
+{
+    "type":  "rngtech:trait_shaped",
+    "category":  "equipment",
+    "pattern":  [
+                    "PPP",
+                    "GMG",
+                    " R "
+                ],
+    "key":  {
+                "P":  {
+                          "tag":  "rngtech:materials/exotic/plates"
+                      },
+                "G":  {
+                          "tag":  "rngtech:materials/exotic/gears"
+                      },
+                "M":  {
+                          "item":  "rngtech:mechanism"
+                      },
+                "R":  {
+                          "item":  "minecraft:redstone"
+                      }
+            },
+    "result":  {
+                   "count":  1,
+                   "id":  "rngtech:exotic_disassembly_head"
+               }
+}

@@ -1,0 +1,15 @@
+{
+  "type": "rngtech:trait_shaped",
+  "category": "misc",
+  "pattern": [
+    "CPC",
+    "PHP",
+    "CPC"
+  ],
+  "key": {
+    "C": { "item": "minecraft:coal" },
+    "H": { "item": "rngtech:heat_core" },
+    "P": { "item": "minecraft:paper" }
+  },
+  "result": { "count": 1, "id": "rngtech:thermal_calibration_pattern" }
+}

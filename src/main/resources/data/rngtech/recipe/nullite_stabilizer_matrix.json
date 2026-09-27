@@ -1,0 +1,16 @@
+{
+  "neoforge:conditions": [ { "type": "rngtech:material_enabled", "material": "nullite" } ],
+  "type": "rngtech:calibrated_shaped",
+  "category": "misc",
+  "pattern": [ "SMS", "ICI", "SMS" ],
+  "key": {
+    "C": { "ingredient": { "item": "rngtech:stabilization_catalyst" } },
+    "I": { "ingredient": { "tag": "c:ingots/nullite" } },
+    "M": { "ingredient": { "item": "rngtech:matrix" } },
+    "S": {
+      "ingredient": { "item": "rngtech:calibrated_diamond_crystal" },
+      "calibration": { "family": "logic", "min_stage": 6, "min_stability": 75 }
+    }
+  },
+  "result": { "count": 1, "id": "rngtech:nullite_stabilizer_matrix" }
+}

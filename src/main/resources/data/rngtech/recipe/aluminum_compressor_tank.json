@@ -1,0 +1,21 @@
+{
+  "neoforge:conditions": [
+    { "type": "rngtech:material_enabled", "material": "aluminum" }
+  ],
+  "type": "rngtech:trait_shaped",
+  "category": "redstone",
+  "pattern": [
+    "GIG",
+    "ICI",
+    "GIG"
+  ],
+  "key": {
+    "C": { "item": "rngtech:pressure_tank_frame" },
+    "G": { "item": "minecraft:glass" },
+    "I": { "tag": "c:ingots/aluminum" }
+  },
+  "result": {
+    "count": 1,
+    "id": "rngtech:aluminum_compressor_tank"
+  }
+}

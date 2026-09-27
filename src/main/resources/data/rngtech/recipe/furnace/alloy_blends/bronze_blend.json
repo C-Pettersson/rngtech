@@ -1,0 +1,22 @@
+{
+    "neoforge:conditions": [
+        {
+            "type": "rngtech:material_enabled",
+            "material": "bronze"
+        }
+    ],
+    "type": "rngtech:furnace",
+    "group": "rngtech_alloy_blends",
+    "ingredient": {
+        "item": "rngtech:bronze_blend"
+    },
+    "result": {
+        "id": "rngtech:bronze_ingot"
+    },
+    "bonus_output": false,
+    "processing_ticks": 160,
+    "energy": 2400,
+    "experience": 0.7,
+    "minimum_temperature": 700,
+    "machine_xp": 1
+}

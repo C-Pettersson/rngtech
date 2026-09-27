@@ -1,0 +1,10 @@
+{
+  "parent": "rngtech:item/forestry_cart_base",
+  "textures": {
+    "accent": "rngtech:item/forestry_cart_tree_leaf_accent",
+    "payload": "rngtech:item/forestry_cart_tree_log_payload",
+    "screen": "rngtech:item/forestry_cart_face_chopping_logs",
+    "tool": "rngtech:item/forestry_cart_saw_head",
+    "particle": "rngtech:item/forestry_cart_tree_log_payload"
+  }
+}

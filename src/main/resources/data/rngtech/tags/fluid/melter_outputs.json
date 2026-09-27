@@ -1,0 +1,11 @@
+{
+  "replace": false,
+  "values": [
+    "#rngtech:lubricants",
+    "#rngtech:electrolytes",
+    "rngtech:methane",
+    "rngtech:flowing_methane",
+    "minecraft:lava",
+    "minecraft:flowing_lava"
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "replace": false,
+  "values": [
+    "rngtech:iron_casing",
+    "rngtech:copper_casing",
+    "rngtech:bronze_casing",
+    "rngtech:gold_casing",
+    "rngtech:steel_casing",
+    "rngtech:aluminum_casing",
+    "rngtech:sparksteel_casing",
+    "rngtech:titanium_casing",
+    "rngtech:arclite_casing",
+    "rngtech:tungstensteel_casing",
+    "rngtech:naquadah_casing",
+    "rngtech:casing"
+  ]
+}

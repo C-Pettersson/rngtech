@@ -1,0 +1,27 @@
+{
+    "type":  "rngtech:trait_shaped",
+    "category":  "equipment",
+    "pattern":  [
+                    "PPP",
+                    "GMG",
+                    " R "
+                ],
+    "key":  {
+                "P":  {
+                          "item":  "rngtech:iron_plate"
+                      },
+                "G":  {
+                          "item":  "rngtech:iron_gear"
+                      },
+                "M":  {
+                          "item":  "rngtech:mechanism"
+                      },
+                "R":  {
+                          "item":  "minecraft:redstone"
+                      }
+            },
+    "result":  {
+                   "count":  1,
+                   "id":  "rngtech:iron_disassembly_head"
+               }
+}

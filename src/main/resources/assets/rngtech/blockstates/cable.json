@@ -1,0 +1,35 @@
+{
+  "multipart": [
+    { "apply": { "model": "rngtech:block/cable_core" } },
+    {
+      "when": { "OR": [{ "cable_down": "true" }, { "connector_down": "true" }] },
+      "apply": { "model": "rngtech:block/cable_side", "x": 90 }
+    },
+    {
+      "when": { "OR": [{ "cable_up": "true" }, { "connector_up": "true" }] },
+      "apply": { "model": "rngtech:block/cable_side", "x": 270 }
+    },
+    {
+      "when": { "OR": [{ "cable_north": "true" }, { "connector_north": "true" }] },
+      "apply": { "model": "rngtech:block/cable_side" }
+    },
+    {
+      "when": { "OR": [{ "cable_south": "true" }, { "connector_south": "true" }] },
+      "apply": { "model": "rngtech:block/cable_side", "y": 180 }
+    },
+    {
+      "when": { "OR": [{ "cable_west": "true" }, { "connector_west": "true" }] },
+      "apply": { "model": "rngtech:block/cable_side", "y": 270 }
+    },
+    {
+      "when": { "OR": [{ "cable_east": "true" }, { "connector_east": "true" }] },
+      "apply": { "model": "rngtech:block/cable_side", "y": 90 }
+    },
+    { "when": { "connector_down": "true" }, "apply": { "model": "rngtech:block/cable_connector", "x": 90 } },
+    { "when": { "connector_up": "true" }, "apply": { "model": "rngtech:block/cable_connector", "x": 270 } },
+    { "when": { "connector_north": "true" }, "apply": { "model": "rngtech:block/cable_connector" } },
+    { "when": { "connector_south": "true" }, "apply": { "model": "rngtech:block/cable_connector", "y": 180 } },
+    { "when": { "connector_west": "true" }, "apply": { "model": "rngtech:block/cable_connector", "y": 270 } },
+    { "when": { "connector_east": "true" }, "apply": { "model": "rngtech:block/cable_connector", "y": 90 } }
+  ]
+}

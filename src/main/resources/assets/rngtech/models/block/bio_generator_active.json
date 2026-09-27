@@ -1,0 +1,12 @@
+{
+  "parent": "minecraft:block/cube",
+  "textures": {
+    "down": "rngtech:block/bio_generator/bottom/bio_generator",
+    "up": "rngtech:block/bio_generator/top/bio_generator",
+    "north": "rngtech:block/bio_generator/front/bio_generator_active",
+    "south": "rngtech:block/bio_generator/side/bio_generator",
+    "east": "rngtech:block/bio_generator/side/bio_generator",
+    "west": "rngtech:block/bio_generator/side/bio_generator",
+    "particle": "rngtech:block/bio_generator/front/bio_generator_active"
+  }
+}

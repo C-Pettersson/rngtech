@@ -1,0 +1,16 @@
+{
+  "type": "rngtech:calibration",
+  "family": "thermal",
+  "ingredient": { "item": "rngtech:copper_casing" },
+  "pattern": { "item": "rngtech:thermal_calibration_pattern" },
+  "catalyst": { "item": "minecraft:glowstone_dust" },
+  "minimum_stage": 1,
+  "processing_ticks": 170,
+  "energy": 1300,
+  "result": {
+    "stack": { "id": "rngtech:calibrated_thermal_component" },
+    "stage": 2,
+    "stability": { "min": 35, "max": 75 },
+    "refinement_potential": { "min": 0, "max": 1 }
+  }
+}

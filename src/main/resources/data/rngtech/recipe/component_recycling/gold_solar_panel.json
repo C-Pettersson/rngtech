@@ -1,0 +1,32 @@
+{
+  "type": "rngtech:component_recycling",
+  "ingredient": {
+    "item": "rngtech:gold_solar_panel"
+  },
+  "minimum_processing_level": 3,
+  "processing_ticks": 156,
+  "energy": 1560,
+  "outputs": [
+    {
+      "stack": {
+        "id": "rngtech:gold_coil",
+        "count": 1
+      },
+      "requires_filter": false
+    },
+    {
+      "stack": {
+        "id": "rngtech:gold_plate",
+        "count": 1
+      },
+      "requires_filter": false
+    },
+    {
+      "stack": {
+        "id": "rngtech:basic_electric_circuit",
+        "count": 1
+      },
+      "requires_filter": true
+    }
+  ]
+}

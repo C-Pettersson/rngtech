@@ -1,0 +1,14 @@
+{
+    "type": "rngtech:crusher",
+    "ingredient": {
+        "item": "minecraft:copper_ore"
+    },
+    "result": {
+        "count": 3,
+        "id": "rngtech:crushed_copper"
+    },
+    "processing_ticks": 160,
+    "energy": 7680,
+    "required_processing_level": 2,
+    "machine_xp": 2
+}

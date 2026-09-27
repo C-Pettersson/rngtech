@@ -1,0 +1,51 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "rngtech:material_enabled",
+      "material": "steel"
+    }
+  ],
+  "type": "rngtech:calibrated_shaped",
+  "category": "redstone",
+  "pattern": [
+    "IBI",
+    "GXG",
+    "ISI"
+  ],
+  "key": {
+    "B": {
+      "ingredient": {
+        "tag": "c:circuits/basic"
+      }
+    },
+    "I": {
+      "ingredient": {
+        "item": "rngtech:insulator"
+      }
+    },
+    "G": {
+      "ingredient": {
+        "item": "rngtech:gold_coil"
+      }
+    },
+    "S": {
+      "ingredient": {
+        "item": "rngtech:steel_plate"
+      }
+    },
+    "X": {
+      "ingredient": {
+        "item": "rngtech:calibrated_logic_component"
+      },
+      "calibration": {
+        "family": "logic",
+        "min_stage": 2,
+        "min_stability": 55
+      }
+    }
+  },
+  "result": {
+    "count": 4,
+    "id": "rngtech:advanced_circuit_blank"
+  }
+}

@@ -1,0 +1,34 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "rngtech:material_enabled",
+      "material": "titanium"
+    },
+    {
+      "type": "rngtech:material_enabled",
+      "material": "arclite"
+    }
+  ],
+  "type": "rngtech:metal_press",
+  "group": "metal_press_circuits",
+  "ingredient": {
+    "item": "rngtech:elite_circuit_blank"
+  },
+  "input_count": 1,
+  "mold": {
+    "item": "rngtech:circuit_mold"
+  },
+  "result": {
+    "count": 1,
+    "id": "rngtech:elite_electric_circuit"
+  },
+  "processing_ticks": 300,
+  "energy": 5000,
+  "minimum_temperature": 1600,
+  "safe_maximum_temperature": 1900,
+  "required_temperature_stability": 1.1,
+  "failure_output": {
+    "count": 1,
+    "id": "rngtech:broken_circuit"
+  }
+}

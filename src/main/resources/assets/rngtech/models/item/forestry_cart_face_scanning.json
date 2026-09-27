@@ -1,0 +1,6 @@
+{
+  "parent": "rngtech:item/forestry_cart_base",
+  "textures": {
+    "screen": "rngtech:item/forestry_cart_face_scanning"
+  }
+}

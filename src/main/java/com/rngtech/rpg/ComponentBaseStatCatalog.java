@@ -1,0 +1,531 @@
+package com.rngtech.rpg;
+
+import com.rngtech.content.calibration.CalibrationGearMaterial;
+import com.rngtech.content.energy.BatteryCellMaterial;
+import com.rngtech.content.energy.CavitationRotorMaterial;
+import com.rngtech.content.energy.CollapseNozzleMaterial;
+import com.rngtech.content.energy.ContainmentLiningMaterial;
+import com.rngtech.content.energy.FuelBoxMaterial;
+import com.rngtech.content.energy.HeatCoreMaterial;
+import com.rngtech.content.energy.ReactorChamberMaterial;
+import com.rngtech.content.energy.RecoveryFilterMaterial;
+import com.rngtech.content.energy.SolarArrayExtenderMaterial;
+import com.rngtech.content.energy.VacuumCollapsePartMaterial;
+import com.rngtech.content.item.AlloyCrucibleItem;
+import com.rngtech.content.item.BatteryCellItem;
+import com.rngtech.content.item.BioChamberItem;
+import com.rngtech.content.item.CalibrationGearItem;
+import com.rngtech.content.item.CavitationPartItem;
+import com.rngtech.content.item.CollapseNozzleItem;
+import com.rngtech.content.item.CrushHeadItem;
+import com.rngtech.content.item.DisassemblyHeadItem;
+import com.rngtech.content.item.FluidPumpItem;
+import com.rngtech.content.item.GasChemistryPartItem;
+import com.rngtech.content.item.MachinePartItem;
+import com.rngtech.content.item.PotentialReactorPartItem;
+import com.rngtech.content.item.ServoItem;
+import com.rngtech.content.item.SolarArrayExtenderItem;
+import com.rngtech.content.item.SolidFuelBurnerPartItem;
+import com.rngtech.content.item.VacuumCollapsePartItem;
+import com.rngtech.content.machine.AlloyCrucibleMaterial;
+import com.rngtech.content.machine.CrushHeadMaterial;
+import com.rngtech.content.machine.FluidPumpMaterial;
+import com.rngtech.content.machine.ServoMaterial;
+import com.rngtech.content.recycling.DisassemblyHeadMaterial;
+
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+
+import java.util.ArrayList;
+import java.util.EnumMap;
+import java.util.EnumSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+public final class ComponentBaseStatCatalog {
+    private static final Set<MachineStat> HARD_GATE_STATS =
+            EnumSet.of(MachineStat.PROCESSING_LEVEL);
+
+    private enum MergeRule {
+        ADD,
+        MORE
+    }
+
+    private record Profile(
+            MachineStatAccumulator baseStats,
+            Map<MachineStat, MergeRule> mergeRules,
+            List<MachineStat> summaryStats
+    ) {
+    }
+
+    public static MachineStatAccumulator baseStats(ItemStack stack) {
+        Profile profile = profile(stack);
+        return profile == null ? null : profile.baseStats();
+    }
+
+    public static MachineStatAccumulator effectiveStats(ItemStack stack) {
+        Profile profile = profile(stack);
+        if (profile == null) {
+            return null;
+        }
+        return effectiveStats(stack, profile);
+    }
+
+    private static MachineStatAccumulator effectiveStats(ItemStack stack, Profile profile) {
+        MachineStatAccumulator stats = profile.baseStats();
+        for (MachineModifier modifier : componentTraits(stack).modifiers()) {
+            if (modifier.slot().isAffix() && !HARD_GATE_STATS.contains(modifier.stat())) {
+                stats.apply(modifier);
+            }
+        }
+        return stats;
+    }
+
+    public static List<MachineStat> summaryStats(ItemStack stack) {
+        Profile profile = profile(stack);
+        return profile == null ? List.of() : profile.summaryStats();
+    }
+
+    public static void applyEffectiveContribution(MachineStatAccumulator target, ItemStack stack) {
+        Profile profile = profile(stack);
+        if (profile == null) {
+            return;
+        }
+
+        MachineStatAccumulator contribution = effectiveStats(stack, profile);
+        applyProfileContribution(target, profile, contribution, componentTraits(stack));
+    }
+
+    public static void applyVacuumCollapseNozzleContribution(MachineStatAccumulator target, ItemStack stack) {
+        if (!(stack.getItem() instanceof CollapseNozzleItem nozzle) || !nozzle.material().vacuumCollapseCompatible()) {
+            return;
+        }
+
+        Profile profile = vacuumCollapseNozzle(nozzle.material());
+        MachineStatAccumulator contribution = effectiveStats(stack, profile);
+        applyProfileContribution(target, profile, contribution, componentTraits(stack));
+    }
+
+    private static void applyProfileContribution(
+            MachineStatAccumulator target,
+            Profile profile,
+            MachineStatAccumulator contribution,
+            MachineTraits traits
+    ) {
+        for (Map.Entry<MachineStat, MergeRule> entry : profile.mergeRules().entrySet()) {
+            MachineStat stat = entry.getKey();
+            double value = contribution.value(stat);
+            if (stat == MachineStat.ENERGY_GENERATION) {
+                double flatGeneration = contribution.effectiveFlatEnergyGenerationBonus();
+                if (entry.getValue() == MergeRule.ADD) {
+                    applyAdd(target, stat, contribution.valueWithoutFlatEnergyGenerationBonus(stat) + flatGeneration);
+                    target.addFlatEnergyGenerationBonus(flatGeneration);
+                } else {
+                    applyMore(target, stat, contribution.valueWithoutFlatEnergyGenerationBonus(stat));
+                    applyAdd(target, stat, flatGeneration);
+                    target.addFlatEnergyGenerationBonus(flatGeneration);
+                }
+                continue;
+            }
+            if (entry.getValue() == MergeRule.ADD) {
+                applyAdd(target, stat, value);
+            } else {
+                applyMore(target, stat, value);
+            }
+        }
+
+        int refinementPotential = traits.refinementPotential();
+        if (refinementPotential > 0) {
+            applyAdd(target, MachineStat.REFINEMENT_POTENTIAL, refinementPotential);
+        }
+    }
+
+    private static Profile profile(ItemStack stack) {
+        return stack.isEmpty() ? null : profile(stack.getItem());
+    }
+
+    private static Profile profile(Item item) {
+        if (item instanceof BatteryCellItem cell) {
+            return batteryCell(cell.material());
+        }
+        if (item instanceof BioChamberItem) {
+            return bioChamber();
+        }
+        if (item instanceof CrushHeadItem head) {
+            return crushHead(head.material());
+        }
+        if (item instanceof AlloyCrucibleItem crucible) {
+            return alloyCrucible(crucible.material());
+        }
+        if (item instanceof SolidFuelBurnerPartItem part) {
+            return part.partType() == MachinePartType.HEAT_CORE
+                    ? heatCore(part.heatCoreMaterial())
+                    : fuelBox(part.fuelBoxMaterial());
+        }
+        if (item instanceof PotentialReactorPartItem part) {
+            return switch (part.partType()) {
+                case REACTOR_CHAMBER -> reactorChamber(part.chamberMaterial());
+                case RECOVERY_FILTER -> recoveryFilter(part.filterMaterial());
+                case CONTAINMENT_LINING -> containmentLining(part.liningMaterial());
+                default -> null;
+            };
+        }
+        if (item instanceof VacuumCollapsePartItem part) {
+            return vacuumCollapsePart(part.partType(), part.material());
+        }
+        if (item instanceof CollapseNozzleItem nozzle) {
+            return collapseNozzle(nozzle.material());
+        }
+        if (item instanceof CavitationPartItem part) {
+            return switch (part.partType()) {
+                case CAVITATION_ROTOR -> cavitationRotor(part.rotorMaterial());
+                default -> null;
+            };
+        }
+        if (item instanceof DisassemblyHeadItem head) {
+            return disassemblyHead(head.material());
+        }
+        if (item instanceof ServoItem servo) {
+            return servo(servo.material());
+        }
+        if (item instanceof FluidPumpItem pump) {
+            return fluidPump(pump.material());
+        }
+        if (item instanceof GasChemistryPartItem part) {
+            return part.partType() == MachinePartType.REFORMING_CATALYST_BED ? reformingCatalystBed(part.stage()) : null;
+        }
+        if (item instanceof SolarArrayExtenderItem extender) {
+            return solarArrayExtender(extender.material());
+        }
+        if (item instanceof CalibrationGearItem gear) {
+            return switch (gear.partType()) {
+                case RESONANCE_COIL -> resonanceCoil(gear.material());
+                case CONTROL_BOARD -> controlBoard(gear.material());
+                case STABILIZER_MATRIX -> stabilizerMatrix(gear.material());
+                default -> null;
+            };
+        }
+        return null;
+    }
+
+    private static Profile batteryCell(BatteryCellMaterial material) {
+        return builder()
+                .add(MachineStat.ENERGY_CAPACITY, material.capacity())
+                .add(MachineStat.ENERGY_TRANSFER, material.inputRate())
+                .more(MachineStat.EFFICIENCY, material.efficiency())
+                .add(MachineStat.IDLE_LOSS, material.idleLossPercentPerMinute())
+                .build();
+    }
+
+    private static Profile bioChamber() {
+        return builder()
+                .more(MachineStat.FUEL_EFFICIENCY, 1.0)
+                .more(MachineStat.POTATO_POWER, 1.0)
+                .more(MachineStat.CARROT_POWER, 1.0)
+                .more(MachineStat.BREAD_POWER, 1.0)
+                .more(MachineStat.SAPLING_POWER, 1.0)
+                .more(MachineStat.SEED_POWER, 1.0)
+                .more(MachineStat.PLANT_POWER, 1.0)
+                .more(MachineStat.ORGANIC_REAGENT_POWER, 1.0)
+                .more(MachineStat.COMPOSTED_BIOMASS_POWER, 1.0)
+                .more(MachineStat.ALGAE_POWER, 1.0)
+                .more(MachineStat.RICH_BIOMASS_POWER, 1.0)
+                .more(MachineStat.ENERGY_GENERATION, 1.0)
+                .more(MachineStat.FUEL_DURATION, 1.0)
+                .buildWithoutSummary();
+    }
+
+    private static Profile crushHead(CrushHeadMaterial material) {
+        ProfileBuilder builder = builder()
+                .add(MachineStat.PROCESSING_LEVEL, material.processingLevel())
+                .more(MachineStat.PROCESSING_SPEED, crushHeadProcessingSpeed(material))
+                .more(MachineStat.OUTPUT_AMOUNT, crushHeadOutputAmount(material))
+                .add(MachineStat.INSTANT_PROCESS_CHANCE, 0.0)
+                .add(MachineStat.SUPER_OUTPUT_CHANCE, 0.0)
+                .add(MachineStat.CRUSHER_SALVAGE_CHANCE, 0.0);
+        return builder.build();
+    }
+
+    private static Profile alloyCrucible(AlloyCrucibleMaterial material) {
+        return builder()
+                .add(MachineStat.INPUT_SLOTS, material.inputSlots())
+                .more(MachineStat.STABILITY, material.stability())
+                .more(MachineStat.TEMPERATURE_STABILITY, material.temperatureStability())
+                .more(MachineStat.HEAT_TRANSFER, material.heatTransfer())
+                .more(MachineStat.HEAT_ISOLATION, 1.0)
+                .more(MachineStat.WARMUP_TIME, 1.0)
+                .more(MachineStat.COOLING_RATE, 1.0)
+                .more(MachineStat.OVERHEAT_TOLERANCE, 1.0)
+                .more(MachineStat.PROCESSING_SPEED, material.processingSpeed())
+                .build();
+    }
+
+    private static Profile heatCore(HeatCoreMaterial material) {
+        return builder()
+                .add(MachineStat.ENERGY_GENERATION, material.energyGeneration())
+                .more(MachineStat.FUEL_EFFICIENCY, material.fuelEfficiency())
+                .more(MachineStat.HEAT_ISOLATION, material.heatIsolation())
+                .more(MachineStat.HEAT_TRANSFER, material.heatTransfer())
+                .add(MachineStat.MAX_TEMPERATURE, material.maxTemperatureBonus())
+                .more(MachineStat.WARMUP_TIME, 1.0)
+                .more(MachineStat.COOLING_RATE, 1.0)
+                .more(MachineStat.TEMPERATURE_STABILITY, material.temperatureStability())
+                .more(MachineStat.OVERHEAT_TOLERANCE, 1.0)
+                .build();
+    }
+
+    private static Profile fuelBox(FuelBoxMaterial material) {
+        return builder()
+                .add(MachineStat.INPUT_SLOTS, material.fuelSlots())
+                .more(MachineStat.FUEL_EFFICIENCY, material.fuelEfficiency())
+                .more(MachineStat.STABILITY, material.stability())
+                .build();
+    }
+
+    private static Profile reactorChamber(ReactorChamberMaterial material) {
+        return builder()
+                .add(MachineStat.PROCESSING_LEVEL, material.stage())
+                .add(MachineStat.ENERGY_GENERATION, material.energyGenerationBonus())
+                .more(MachineStat.PROCESSING_SPEED, 1.0)
+                .more(MachineStat.STABILITY, material.stability())
+                .build();
+    }
+
+    private static Profile recoveryFilter(RecoveryFilterMaterial material) {
+        return builder()
+                .more(MachineStat.EFFICIENCY, material.efficiency())
+                .more(MachineStat.PROCESSING_SPEED, material.processingSpeed())
+                .more(MachineStat.OUTPUT_AMOUNT, 1.0)
+                .build();
+    }
+
+    private static Profile containmentLining(ContainmentLiningMaterial material) {
+        return builder()
+                .more(MachineStat.STABILITY, material.stability())
+                .build();
+    }
+
+    private static Profile vacuumCollapsePart(MachinePartType partType, VacuumCollapsePartMaterial material) {
+        return switch (partType) {
+            case VOID_CHAMBER -> builder()
+                    .add(MachineStat.PROCESSING_LEVEL, material.stage())
+                    .more(MachineStat.ENERGY_GENERATION, material.generation())
+                    .more(MachineStat.STABILITY, material.stability())
+                    .build();
+            case COLLAPSE_NOZZLE -> builder()
+                    .more(MachineStat.ENERGY_GENERATION, material.generation())
+                    .more(MachineStat.ENERGY_TRANSFER, material.generation())
+                    .more(MachineStat.PROCESSING_SPEED, 1.0 + (material.stage() - 6) * 0.05)
+                    .more(MachineStat.STABILITY, material.stability())
+                    .build();
+            case DIMENSIONAL_STABILIZER -> builder()
+                    .more(MachineStat.STABILITY, material.stability())
+                    .more(MachineStat.EFFICIENCY, 1.0 + (material.stage() - 6) * 0.04)
+                    .build();
+            default -> null;
+        };
+    }
+
+    private static Profile cavitationRotor(CavitationRotorMaterial material) {
+        return builder()
+                .add(MachineStat.PROCESSING_LEVEL, material.stage())
+                .add(MachineStat.DURABILITY, CavitationRotorMaterial.BASE_DURABILITY)
+                .more(MachineStat.ENERGY_GENERATION, material.generationMultiplier())
+                .more(MachineStat.ENERGY_TRANSFER, material.energyTransferMultiplier())
+                .more(MachineStat.PROCESSING_SPEED, material.processingSpeedMultiplier())
+                .more(MachineStat.STABILITY, 1.0 / material.wearMultiplier())
+                .more(MachineStat.OUTPUT_AMOUNT, material.outputMultiplier())
+                .build();
+    }
+
+    private static Profile collapseNozzle(CollapseNozzleMaterial material) {
+        return builder()
+                .more(MachineStat.ENERGY_GENERATION, material.generationMultiplier())
+                .more(MachineStat.ENERGY_TRANSFER, 1.0 + material.stage() * 0.04)
+                .more(MachineStat.TEMPERATURE_STABILITY, 1.0 / material.strainMultiplier())
+                .more(MachineStat.OUTPUT_AMOUNT, material.outputMultiplier())
+                .more(MachineStat.FLUID_TRANSFER, material.fluidTransferMultiplier())
+                .build();
+    }
+
+    private static Profile vacuumCollapseNozzle(CollapseNozzleMaterial material) {
+        return builder()
+                .more(MachineStat.ENERGY_GENERATION, material.vacuumGenerationMultiplier())
+                .more(MachineStat.ENERGY_TRANSFER, material.vacuumGenerationMultiplier())
+                .more(MachineStat.PROCESSING_SPEED, material.vacuumProcessingSpeedMultiplier())
+                .more(MachineStat.STABILITY, material.vacuumStabilityMultiplier())
+                .build();
+    }
+
+    private static Profile disassemblyHead(DisassemblyHeadMaterial material) {
+        return builder()
+                .add(MachineStat.PROCESSING_LEVEL, material.stage())
+                .more(MachineStat.PROCESSING_SPEED, material.processingSpeed())
+                .more(MachineStat.STABILITY, material.stability())
+                .build();
+    }
+
+    private static Profile servo(ServoMaterial material) {
+        return builder()
+                .more(MachineStat.PROCESSING_SPEED, percentMultiplier(material.processingSpeedPercent()))
+                .more(MachineStat.ENERGY_USAGE, 1.0)
+                .more(MachineStat.HEAT_TRANSFER, 1.0)
+                .more(MachineStat.HEAT_ISOLATION, 1.0)
+                .more(MachineStat.WARMUP_TIME, 1.0)
+                .more(MachineStat.COOLING_RATE, 1.0)
+                .more(MachineStat.STABILITY, percentMultiplier(material.stabilityPercent()))
+                .more(MachineStat.TEMPERATURE_STABILITY, percentMultiplier(material.temperatureStabilityPercent()))
+                .more(MachineStat.OVERHEAT_TOLERANCE, percentMultiplier(material.overheatTolerancePercent()))
+                .more(MachineStat.FLUID_TRANSFER, 1.0)
+                .build();
+    }
+
+    private static Profile fluidPump(FluidPumpMaterial material) {
+        return builder()
+                .add(MachineStat.FLUID_TRANSFER, material.transferRate())
+                .build();
+    }
+
+    private static Profile reformingCatalystBed(int stage) {
+        return builder()
+                .add(MachineStat.PROCESSING_LEVEL, stage)
+                .more(MachineStat.PROCESSING_SPEED, 1.0 + stage * 0.03)
+                .more(MachineStat.EFFICIENCY, 1.0 + stage * 0.02)
+                .more(MachineStat.STABILITY, 1.0 + stage * 0.02)
+                .add(MachineStat.FLUID_TRANSFER, stage * 150.0)
+                .build();
+    }
+
+    private static Profile solarArrayExtender(SolarArrayExtenderMaterial material) {
+        return builder()
+                .add(MachineStat.SOLAR_PANEL_LIMIT, material.rangeBonus())
+                .more(MachineStat.ENERGY_GENERATION, material.generationMultiplier())
+                .add(material.implicitBonusStat(), material.implicitBonusPercent())
+                .build();
+    }
+
+    private static Profile resonanceCoil(CalibrationGearMaterial material) {
+        return builder()
+                .add(MachineStat.PROCESSING_LEVEL, material.stage())
+                .more(MachineStat.CALIBRATION_QUALITY, percentMultiplier(material.qualityPercent()))
+                .more(MachineStat.ENERGY_TRANSFER, percentMultiplier(material.energyTransferPercent()))
+                .more(MachineStat.ENERGY_USAGE, 1.0)
+                .more(MachineStat.PROCESSING_SPEED, resonanceCoilProcessingSpeed(material))
+                .build();
+    }
+
+    private static Profile controlBoard(CalibrationGearMaterial material) {
+        return builder()
+                .more(MachineStat.CALIBRATION_PRECISION, percentMultiplier(material.precisionPercent()))
+                .more(MachineStat.STABILITY, percentMultiplier(Math.max(2, material.stage() * 2)))
+                .add(MachineStat.REFINEMENT_POTENTIAL_BONUS, material.refinementPotentialBonus())
+                .build();
+    }
+
+    private static Profile stabilizerMatrix(CalibrationGearMaterial material) {
+        return builder()
+                .more(MachineStat.STABILITY, percentMultiplier(Math.max(4, material.stage() * 3)))
+                .more(MachineStat.CALIBRATION_QUALITY, percentMultiplier(material.qualityPercent() / 2.0))
+                .more(MachineStat.CATALYST_EFFICIENCY, percentMultiplier(material.catalystEfficiencyPercent()))
+                .more(MachineStat.ENERGY_USAGE, 1.0)
+                .build();
+    }
+
+    private static MachineTraits componentTraits(ItemStack stack) {
+        if (stack.getItem() instanceof BatteryCellItem) {
+            return BatteryCellItem.traits(stack);
+        }
+        if (stack.getItem() instanceof MachinePartItem part) {
+            return part.traits(stack);
+        }
+        return MachineTraits.EMPTY;
+    }
+
+    private static double crushHeadProcessingSpeed(CrushHeadMaterial material) {
+        return switch (material) {
+            case FLINT -> 0.65;
+            case IRON -> 1.05;
+            case COPPER -> 1.20;
+            case BRONZE -> 1.10;
+            case STEEL -> 1.15;
+            case ALUMINUM -> 1.35;
+            case TITANIUM -> 1.25;
+            case TUNGSTENSTEEL -> 1.10;
+            case EXOTIC -> 1.35;
+        };
+    }
+
+    private static double crushHeadOutputAmount(CrushHeadMaterial material) {
+        return switch (material) {
+            case BRONZE -> 1.10;
+            case STEEL -> 1.05;
+            case TITANIUM -> 1.15;
+            case TUNGSTENSTEEL -> 1.30;
+            case EXOTIC -> 1.25;
+            default -> 1.0;
+        };
+    }
+
+    private static double resonanceCoilProcessingSpeed(CalibrationGearMaterial material) {
+        return material == CalibrationGearMaterial.COPPER || material == CalibrationGearMaterial.NULLITE
+                ? percentMultiplier(material.stage() * 3.0)
+                : 1.0;
+    }
+
+    private static double percentMultiplier(double percent) {
+        return 1.0 + percent / 100.0;
+    }
+
+    private static void applyAdd(MachineStatAccumulator target, MachineStat stat, double value) {
+        if (Math.abs(value) > 0.0001) {
+            target.apply(new MachineModifier(ModifierSlot.IMPLICIT, stat, ModifierOperation.ADD, value));
+        }
+    }
+
+    private static void applyMore(MachineStatAccumulator target, MachineStat stat, double value) {
+        if (Math.abs(value - 1.0) > 0.0001) {
+            target.apply(new MachineModifier(ModifierSlot.IMPLICIT, stat, ModifierOperation.MORE, value));
+        }
+    }
+
+    private static ProfileBuilder builder() {
+        return new ProfileBuilder();
+    }
+
+    private static final class ProfileBuilder {
+        private final Map<MachineStat, Double> values = new EnumMap<>(MachineStat.class);
+        private final Map<MachineStat, MergeRule> mergeRules = new EnumMap<>(MachineStat.class);
+        private final List<MachineStat> summaryStats = new ArrayList<>();
+
+        private ProfileBuilder add(MachineStat stat, double value) {
+            return stat(stat, value, MergeRule.ADD);
+        }
+
+        private ProfileBuilder more(MachineStat stat, double value) {
+            return stat(stat, value, MergeRule.MORE);
+        }
+
+        private ProfileBuilder stat(MachineStat stat, double value, MergeRule rule) {
+            values.put(stat, value);
+            mergeRules.put(stat, rule);
+            summaryStats.add(stat);
+            return this;
+        }
+
+        private Profile build() {
+            return new Profile(
+                    MachineStatAccumulator.componentBase(values),
+                    Map.copyOf(mergeRules),
+                    List.copyOf(summaryStats)
+            );
+        }
+
+        private Profile buildWithoutSummary() {
+            return new Profile(MachineStatAccumulator.componentBase(values), Map.copyOf(mergeRules), List.of());
+        }
+    }
+
+    private ComponentBaseStatCatalog() {
+    }
+}

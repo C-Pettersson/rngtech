@@ -1,0 +1,29 @@
+{
+    "neoforge:conditions": [
+        {
+            "type": "rngtech:material_enabled",
+            "material": "tungstensteel"
+        }
+    ],
+    "type": "rngtech:trait_shaped",
+    "category": "misc",
+    "pattern": [
+        "PGP",
+        "GCG",
+        "PGP"
+    ],
+    "key": {
+        "C": {
+            "item": "rngtech:tungstensteel_casing"
+        },
+        "G": {
+            "item": "rngtech:tungstensteel_gear"
+        },
+        "P": {
+            "item": "rngtech:tungstensteel_plate"
+        }
+    },
+    "result": {
+        "id": "rngtech:tungstensteel_cavitation_rotor"
+    }
+}

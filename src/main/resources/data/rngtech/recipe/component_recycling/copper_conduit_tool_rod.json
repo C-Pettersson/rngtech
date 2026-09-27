@@ -1,0 +1,25 @@
+{
+  "type": "rngtech:component_recycling",
+  "ingredient": {
+    "item": "rngtech:copper_conduit_tool_rod"
+  },
+  "minimum_processing_level": 2,
+  "processing_ticks": 100,
+  "energy": 820,
+  "outputs": [
+    {
+      "stack": {
+        "id": "rngtech:copper_rod",
+        "count": 1
+      },
+      "requires_filter": false
+    },
+    {
+      "stack": {
+        "id": "rngtech:copper_plate",
+        "count": 1
+      },
+      "requires_filter": true
+    }
+  ]
+}

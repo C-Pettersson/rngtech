@@ -1,0 +1,17 @@
+{
+  "type": "rngtech:trait_shaped",
+  "category": "equipment",
+  "pattern": [
+    "I I",
+    " II",
+    " I "
+  ],
+  "key": {
+    "I": {
+      "tag": "c:ingots/iron"
+    }
+  },
+  "result": {
+    "id": "rngtech:wrench"
+  }
+}

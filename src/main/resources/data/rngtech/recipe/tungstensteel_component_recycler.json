@@ -1,0 +1,30 @@
+{
+    "type":  "rngtech:trait_shaped",
+    "category":  "misc",
+    "pattern":  [
+                    "CMC",
+                    "RHR",
+                    "CGC"
+                ],
+    "key":  {
+                "C":  {
+                          "item":  "rngtech:tungstensteel_casing"
+                      },
+                "M":  {
+                          "tag":  "rngtech:machine_frames/exotic"
+                      },
+                "R":  {
+                          "item":  "minecraft:redstone"
+                      },
+                "H":  {
+                          "item":  "rngtech:tungstensteel_disassembly_head"
+                      },
+                "G":  {
+                          "item":  "rngtech:tungstensteel_gear"
+                      }
+            },
+    "result":  {
+                   "count":  1,
+                   "id":  "rngtech:tungstensteel_component_recycler"
+               }
+}

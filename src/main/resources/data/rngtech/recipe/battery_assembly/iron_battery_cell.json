@@ -1,0 +1,31 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "rngtech:material_enabled",
+      "material": "iron"
+    }
+  ],
+  "type": "rngtech:battery_assembly",
+  "group": "battery_assembly_cells",
+  "ingredients": [
+    {
+      "item": "rngtech:battery_cell"
+    },
+    {
+      "item": "rngtech:iron_plate"
+    },
+    {
+      "tag": "c:ingots/iron"
+    },
+    {
+      "item": "minecraft:redstone"
+    }
+  ],
+  "result": {
+    "count": 1,
+    "id": "rngtech:iron_battery_cell"
+  },
+  "processing_ticks": 120,
+  "energy": 1200,
+  "roll_result_traits": true
+}

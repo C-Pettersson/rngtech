@@ -1,0 +1,31 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "rngtech:material_enabled",
+      "material": "lead"
+    }
+  ],
+  "type": "rngtech:battery_assembly",
+  "group": "battery_assembly_cells",
+  "ingredients": [
+    {
+      "item": "rngtech:battery_cell"
+    },
+    {
+      "item": "rngtech:lead_plate"
+    },
+    {
+      "tag": "c:ingots/lead"
+    },
+    {
+      "item": "minecraft:redstone"
+    }
+  ],
+  "result": {
+    "count": 1,
+    "id": "rngtech:lead_battery_cell"
+  },
+  "processing_ticks": 150,
+  "energy": 1800,
+  "roll_result_traits": true
+}

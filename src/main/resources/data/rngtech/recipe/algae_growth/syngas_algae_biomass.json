@@ -1,0 +1,21 @@
+{
+  "type": "rngtech:algae_growth",
+  "group": "algae_growth",
+  "water_input": {
+    "ingredient": {
+      "fluid": "minecraft:water"
+    },
+    "amount": 250
+  },
+  "carbon_input": {
+    "ingredient": {
+      "fluid": "rngtech:syngas"
+    },
+    "amount": 80
+  },
+  "result": {
+    "id": "rngtech:algae_biomass"
+  },
+  "processing_ticks": 900,
+  "minimum_light": 12
+}

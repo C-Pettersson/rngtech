@@ -1,0 +1,17 @@
+{
+  "replace": false,
+  "values": [
+    "rngtech:zinc_ingot",
+    "rngtech:zinc_dust",
+    "rngtech:zinc_nugget",
+    "rngtech:zinc_storage_block",
+    "rngtech:zinc_ore",
+    "rngtech:deepslate_zinc_ore",
+    "rngtech:raw_zinc",
+    "rngtech:crushed_zinc",
+    "rngtech:zinc_plate",
+    "rngtech:zinc_gear",
+    "rngtech:zinc_rod",
+    "rngtech:zinc_coil"
+  ]
+}

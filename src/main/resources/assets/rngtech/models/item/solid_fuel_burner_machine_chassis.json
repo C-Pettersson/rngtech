@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "rngtech:item/chassis/solid_fuel_burner_machine_chassis"
+  }
+}

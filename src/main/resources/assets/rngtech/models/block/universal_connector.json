@@ -1,0 +1,56 @@
+{
+  "textures": {
+    "connector": "rngtech:block/cable_connector",
+    "particle": "rngtech:block/cable_connector"
+  },
+  "elements": [
+    {
+      "from": [4, 4, 0.5],
+      "to": [12, 6, 3.5],
+      "faces": {
+        "down": { "texture": "#connector" },
+        "up": { "texture": "#connector" },
+        "north": { "texture": "#connector" },
+        "south": { "texture": "#connector" },
+        "west": { "texture": "#connector" },
+        "east": { "texture": "#connector" }
+      }
+    },
+    {
+      "from": [4, 10, 0.5],
+      "to": [12, 12, 3.5],
+      "faces": {
+        "down": { "texture": "#connector" },
+        "up": { "texture": "#connector" },
+        "north": { "texture": "#connector" },
+        "south": { "texture": "#connector" },
+        "west": { "texture": "#connector" },
+        "east": { "texture": "#connector" }
+      }
+    },
+    {
+      "from": [4, 6, 0.5],
+      "to": [6, 10, 3.5],
+      "faces": {
+        "down": { "texture": "#connector" },
+        "up": { "texture": "#connector" },
+        "north": { "texture": "#connector" },
+        "south": { "texture": "#connector" },
+        "west": { "texture": "#connector" },
+        "east": { "texture": "#connector" }
+      }
+    },
+    {
+      "from": [10, 6, 0.5],
+      "to": [12, 10, 3.5],
+      "faces": {
+        "down": { "texture": "#connector" },
+        "up": { "texture": "#connector" },
+        "north": { "texture": "#connector" },
+        "south": { "texture": "#connector" },
+        "west": { "texture": "#connector" },
+        "east": { "texture": "#connector" }
+      }
+    }
+  ]
+}

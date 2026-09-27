@@ -1,0 +1,32 @@
+{
+    "type": "rngtech:component_recycling",
+    "ingredient": {
+        "item": "rngtech:copper_furnace_chassis"
+    },
+    "minimum_processing_level": 2,
+    "processing_ticks": 144,
+    "energy": 1340,
+    "outputs": [
+        {
+            "stack": {
+                "id": "rngtech:machine_frame",
+                "count": 1
+            },
+            "requires_filter": false
+        },
+        {
+            "stack": {
+                "id": "minecraft:copper_ingot",
+                "count": 1
+            },
+            "requires_filter": false
+        },
+        {
+            "stack": {
+                "id": "rngtech:basic_electric_circuit",
+                "count": 1
+            },
+            "requires_filter": true
+        }
+    ]
+}

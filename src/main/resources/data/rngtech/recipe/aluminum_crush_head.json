@@ -1,0 +1,33 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "rngtech:material_enabled",
+      "material": "aluminum"
+    }
+  ],
+  "type": "rngtech:trait_shaped",
+  "category": "equipment",
+  "pattern": [
+    "PPP",
+    "BGB",
+    " R "
+  ],
+  "key": {
+    "B": {
+      "item": "rngtech:steel_plate"
+    },
+    "G": {
+      "item": "rngtech:aluminum_gear"
+    },
+    "P": {
+      "item": "rngtech:aluminum_plate"
+    },
+    "R": {
+      "item": "minecraft:redstone"
+    }
+  },
+  "result": {
+    "count": 1,
+    "id": "rngtech:aluminum_crush_head"
+  }
+}

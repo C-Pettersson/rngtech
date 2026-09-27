@@ -1,0 +1,40 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "rngtech:material_enabled",
+      "material": "bronze"
+    },
+    {
+      "type": "rngtech:material_enabled",
+      "material": "steel"
+    }
+  ],
+  "type": "rngtech:trait_shaped",
+  "category": "redstone",
+  "pattern": [
+    "PBP",
+    "RCR",
+    "PSP"
+  ],
+  "key": {
+    "B": {
+      "tag": "c:circuits/basic"
+    },
+    "C": {
+      "tag": "rngtech:machine_frames/base"
+    },
+    "P": {
+      "item": "rngtech:steel_plate"
+    },
+    "R": {
+      "item": "minecraft:redstone"
+    },
+    "S": {
+      "item": "rngtech:steel_servo"
+    }
+  },
+  "result": {
+    "count": 1,
+    "id": "rngtech:metal_press"
+  }
+}

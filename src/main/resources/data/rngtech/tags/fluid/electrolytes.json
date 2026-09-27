@@ -1,0 +1,7 @@
+{
+  "replace": false,
+  "values": [
+    "rngtech:electrolyte_solution",
+    "rngtech:flowing_electrolyte_solution"
+  ]
+}

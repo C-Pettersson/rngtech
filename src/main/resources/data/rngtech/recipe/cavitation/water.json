@@ -1,0 +1,16 @@
+{
+  "type": "rngtech:cavitation",
+  "group": "cavitation",
+  "fluid_input": {
+    "ingredient": {
+      "fluid": "minecraft:water"
+    },
+    "amount": 1000
+  },
+  "energy": 24000,
+  "processing_ticks": 240,
+  "minimum_rotor_stage": 5,
+  "pressure_rating": 1200,
+  "heat_strain": 80,
+  "wear": 20
+}

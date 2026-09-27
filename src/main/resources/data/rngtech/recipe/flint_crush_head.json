@@ -1,0 +1,21 @@
+{
+  "type": "rngtech:trait_shaped",
+  "category": "equipment",
+  "pattern": [
+    " F ",
+    "FFF",
+    " S "
+  ],
+  "key": {
+    "F": {
+      "item": "minecraft:flint"
+    },
+    "S": {
+      "item": "minecraft:stick"
+    }
+  },
+  "result": {
+    "count": 1,
+    "id": "rngtech:flint_crush_head"
+  }
+}

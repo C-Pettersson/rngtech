@@ -1,0 +1,36 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "rngtech:material_enabled",
+      "material": "titanium"
+    }
+  ],
+  "type": "rngtech:trait_shaped",
+  "category": "redstone",
+  "pattern": [
+    "RLR",
+    "ICI",
+    "RSR"
+  ],
+  "key": {
+    "C": {
+      "tag": "c:circuits/elite"
+    },
+    "I": {
+      "tag": "c:ingots/titanium"
+    },
+    "L": {
+      "item": "rngtech:lubricant_bucket"
+    },
+    "R": {
+      "item": "minecraft:redstone"
+    },
+    "S": {
+      "item": "rngtech:servo_frame"
+    }
+  },
+  "result": {
+    "count": 1,
+    "id": "rngtech:titanium_servo"
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "rngtech:material_enabled",
+      "material": "copper"
+    }
+  ],
+  "type": "rngtech:trait_shaped",
+  "category": "redstone",
+  "pattern": [
+    "NNN",
+    " R ",
+    "NNN"
+  ],
+  "key": {
+    "N": {
+      "tag": "c:nuggets/copper"
+    },
+    "R": {
+      "item": "minecraft:redstone"
+    }
+  },
+  "result": {
+    "count": 4,
+    "id": "rngtech:bus_bar"
+  }
+}

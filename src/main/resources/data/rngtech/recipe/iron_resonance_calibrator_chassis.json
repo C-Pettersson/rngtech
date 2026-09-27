@@ -1,0 +1,17 @@
+{
+  "type": "rngtech:trait_shaped",
+  "category": "misc",
+  "pattern": [
+    "ICI",
+    "BFB",
+    "IRI"
+  ],
+  "key": {
+    "B": { "item": "rngtech:basic_electric_circuit" },
+    "C": { "item": "rngtech:energy_coil" },
+    "F": { "item": "rngtech:furnace_machine_chassis" },
+    "I": { "tag": "c:ingots/iron" },
+    "R": { "item": "minecraft:redstone" }
+  },
+  "result": { "count": 1, "id": "rngtech:iron_resonance_calibrator_chassis" }
+}

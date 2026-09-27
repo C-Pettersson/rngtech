@@ -1,0 +1,16 @@
+{
+  "type": "rngtech:gas_combustion",
+  "group": "gas_combustion",
+  "gas_input": {
+    "ingredient": {
+      "fluid": "rngtech:syngas"
+    },
+    "amount": 1000
+  },
+  "energy": 28000,
+  "processing_ticks": 240,
+  "exhaust_output": {
+    "id": "rngtech:carbon_exhaust",
+    "amount": 500
+  }
+}

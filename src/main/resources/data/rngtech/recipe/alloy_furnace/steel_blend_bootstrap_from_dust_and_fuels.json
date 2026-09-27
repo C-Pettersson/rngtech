@@ -1,0 +1,44 @@
+{
+    "neoforge:conditions": [
+        {
+            "type": "rngtech:material_enabled",
+            "material": "steel"
+        },
+        {
+            "type": "rngtech:material_enabled",
+            "material": "iron"
+        }
+    ],
+    "type": "rngtech:alloy_furnace",
+    "group": "rngtech_alloy_blends",
+    "mode": "blend",
+    "ingredients": [
+        {
+            "ingredient": {
+                "tag": "c:dusts/iron"
+            },
+            "count": 1
+        },
+        {
+            "ingredient": {
+                "item": "minecraft:coal"
+            },
+            "count": 1
+        },
+        {
+            "ingredient": {
+                "item": "minecraft:charcoal"
+            },
+            "count": 1
+        }
+    ],
+    "result": {
+        "count": 1,
+        "id": "rngtech:steel_blend"
+    },
+    "processing_ticks": 1800,
+    "energy": 36000,
+    "minimum_component_stage": 3,
+    "minimum_temperature": 900,
+    "required_temperature_stability": 0.9
+}

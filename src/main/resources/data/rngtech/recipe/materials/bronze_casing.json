@@ -1,0 +1,26 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "rngtech:material_enabled",
+      "material": "bronze"
+    }
+  ],
+  "type": "rngtech:trait_shaped",
+  "category": "misc",
+  "pattern": [
+    "NNN",
+    "I I",
+    "III"
+  ],
+  "key": {
+    "I": {
+      "tag": "c:ingots/bronze"
+    },
+    "N": {
+      "tag": "c:nuggets/bronze"
+    }
+  },
+  "result": {
+    "id": "rngtech:bronze_casing"
+  }
+}

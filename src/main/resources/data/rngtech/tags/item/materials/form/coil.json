@@ -1,0 +1,28 @@
+{
+  "replace": false,
+  "values": [
+    "rngtech:iron_coil",
+    "rngtech:copper_coil",
+    "rngtech:bronze_coil",
+    "rngtech:tin_coil",
+    "rngtech:zinc_coil",
+    "rngtech:gold_coil",
+    "rngtech:steel_coil",
+    "rngtech:invar_coil",
+    "rngtech:nickel_coil",
+    "rngtech:lead_coil",
+    "rngtech:silver_coil",
+    "rngtech:aluminum_coil",
+    "rngtech:sparksteel_coil",
+    "rngtech:osmium_coil",
+    "rngtech:titanium_coil",
+    "rngtech:arclite_coil",
+    "rngtech:tungsten_coil",
+    "rngtech:tungstensteel_coil",
+    "rngtech:nullite_coil",
+    "rngtech:aethergold_coil",
+    "rngtech:platinum_coil",
+    "rngtech:netherite_coil",
+    "rngtech:naquadah_coil"
+  ]
+}

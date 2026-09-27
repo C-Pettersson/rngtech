@@ -1,0 +1,32 @@
+{
+    "type": "rngtech:component_recycling",
+    "ingredient": {
+        "item": "rngtech:copper_reactor_chamber"
+    },
+    "minimum_processing_level": 2,
+    "processing_ticks": 114,
+    "energy": 1060,
+    "outputs": [
+        {
+            "stack": {
+                "id": "rngtech:copper_casing",
+                "count": 1
+            },
+            "requires_filter": false
+        },
+        {
+            "stack": {
+                "id": "minecraft:copper_ingot",
+                "count": 1
+            },
+            "requires_filter": false
+        },
+        {
+            "stack": {
+                "id": "rngtech:fuel_chamber",
+                "count": 1
+            },
+            "requires_filter": true
+        }
+    ]
+}

@@ -1,0 +1,13 @@
+{
+  "type": "rngtech:furnace",
+  "group": "silica_gel_recharge",
+  "ingredient": {
+    "item": "rngtech:saturated_silica_gel_beads"
+  },
+  "result": {
+    "id": "rngtech:silica_gel_beads"
+  },
+  "processing_ticks": 1200,
+  "energy": 28800,
+  "experience": 0.0
+}

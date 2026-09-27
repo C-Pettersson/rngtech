@@ -1,0 +1,12 @@
+{
+  "parent": "minecraft:block/cube",
+  "textures": {
+    "down": "rngtech:block/potential_reactor/bottom/potential_reactor",
+    "up": "rngtech:block/potential_reactor/top/potential_reactor",
+    "north": "rngtech:block/potential_reactor/front/potential_reactor_active",
+    "south": "rngtech:block/potential_reactor/side/potential_reactor",
+    "east": "rngtech:block/potential_reactor/side/potential_reactor",
+    "west": "rngtech:block/potential_reactor/side/potential_reactor",
+    "particle": "rngtech:block/potential_reactor/front/potential_reactor_active"
+  }
+}

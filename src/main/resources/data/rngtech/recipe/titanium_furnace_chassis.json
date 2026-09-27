@@ -1,0 +1,40 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "rngtech:material_enabled",
+      "material": "titanium"
+    }
+  ],
+  "type": "rngtech:calibrated_shaped",
+  "category": "redstone",
+  "pattern": [
+    "IBI",
+    "XFX",
+    "CSC"
+  ],
+  "key": {
+    "B": {
+      "ingredient": { "tag": "c:circuits/elite" }
+    },
+    "C": {
+      "ingredient": { "tag": "c:ingots/titanium" }
+    },
+    "F": {
+      "ingredient": { "tag": "rngtech:machine_frames/advanced" }
+    },
+    "I": {
+      "ingredient": { "tag": "c:ingots/titanium" }
+    },
+    "S": {
+      "ingredient": { "item": "minecraft:smooth_stone" }
+    },
+    "X": {
+      "ingredient": { "item": "rngtech:calibrated_thermal_component" },
+      "calibration": { "family": "thermal", "min_stage": 2, "min_stability": 70 }
+    }
+  },
+  "result": {
+    "count": 1,
+    "id": "rngtech:titanium_furnace_chassis"
+  }
+}

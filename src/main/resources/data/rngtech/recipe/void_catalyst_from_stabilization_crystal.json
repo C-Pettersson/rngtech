@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    { "item": "minecraft:ender_pearl" },
+    { "item": "rngtech:stabilization_crystal" },
+    { "item": "rngtech:tungstensteel_plate" }
+  ],
+  "result": {
+    "id": "rngtech:void_catalyst"
+  }
+}

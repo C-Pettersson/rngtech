@@ -1,0 +1,15 @@
+{
+  "replace": false,
+  "values": [
+    "rngtech:wooden_battery_chassis",
+    "rngtech:iron_battery_chassis",
+    "rngtech:copper_battery_chassis",
+    "rngtech:gold_battery_chassis",
+    "rngtech:steel_battery_chassis",
+    "rngtech:sparksteel_battery_chassis",
+    "rngtech:arclite_battery_chassis",
+    "rngtech:nullite_battery_chassis",
+    "rngtech:aethergold_battery_chassis",
+    "rngtech:exotic_battery_chassis"
+  ]
+}

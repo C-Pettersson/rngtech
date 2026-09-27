@@ -1,0 +1,33 @@
+{
+  "type": "rngtech:trait_shaped",
+  "category": "redstone",
+  "pattern": [
+    "GCG",
+    "PBP",
+    "RFR"
+  ],
+  "key": {
+    "B": {
+      "item": "minecraft:composter"
+    },
+    "C": {
+      "tag": "c:ingots/copper"
+    },
+    "F": {
+      "item": "rngtech:fuel_chamber"
+    },
+    "G": {
+      "item": "minecraft:glass"
+    },
+    "P": {
+      "item": "rngtech:plant_reagent"
+    },
+    "R": {
+      "item": "minecraft:redstone"
+    }
+  },
+  "result": {
+    "count": 1,
+    "id": "rngtech:bio_generator"
+  }
+}

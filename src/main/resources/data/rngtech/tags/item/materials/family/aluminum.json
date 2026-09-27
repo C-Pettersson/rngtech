@@ -1,0 +1,18 @@
+{
+  "replace": false,
+  "values": [
+    "rngtech:aluminum_ingot",
+    "rngtech:aluminum_dust",
+    "rngtech:aluminum_nugget",
+    "rngtech:aluminum_storage_block",
+    "rngtech:aluminum_ore",
+    "rngtech:deepslate_aluminum_ore",
+    "rngtech:raw_aluminum",
+    "rngtech:crushed_aluminum",
+    "rngtech:aluminum_plate",
+    "rngtech:aluminum_gear",
+    "rngtech:aluminum_rod",
+    "rngtech:aluminum_coil",
+    "rngtech:aluminum_casing"
+  ]
+}

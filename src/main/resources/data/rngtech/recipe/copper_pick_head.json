@@ -1,0 +1,30 @@
+{
+    "type":  "rngtech:trait_shaped",
+    "key":  {
+                "G":  {
+                          "item":  "rngtech:copper_gear"
+                      },
+                "R":  {
+                          "item":  "rngtech:copper_rod"
+                      },
+                "P":  {
+                          "item":  "rngtech:copper_plate"
+                      }
+            },
+    "category":  "equipment",
+    "neoforge:conditions":  [
+                                {
+                                    "material":  "copper",
+                                    "type":  "rngtech:material_enabled"
+                                }
+                            ],
+    "pattern":  [
+                    "PPP",
+                    " G ",
+                    " R "
+                ],
+    "result":  {
+                   "count":  1,
+                   "id":  "rngtech:copper_pick_head"
+               }
+}

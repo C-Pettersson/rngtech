@@ -1,0 +1,30 @@
+{
+    "type":  "rngtech:trait_shaped",
+    "key":  {
+                "G":  {
+                          "item":  "rngtech:bronze_gear"
+                      },
+                "R":  {
+                          "item":  "rngtech:bronze_rod"
+                      },
+                "P":  {
+                          "item":  "rngtech:bronze_plate"
+                      }
+            },
+    "category":  "equipment",
+    "neoforge:conditions":  [
+                                {
+                                    "material":  "bronze",
+                                    "type":  "rngtech:material_enabled"
+                                }
+                            ],
+    "pattern":  [
+                    "PP ",
+                    "PG ",
+                    " R "
+                ],
+    "result":  {
+                   "count":  1,
+                   "id":  "rngtech:bronze_axe_head"
+               }
+}

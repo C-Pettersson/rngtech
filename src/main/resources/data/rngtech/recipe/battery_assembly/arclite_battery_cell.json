@@ -1,0 +1,31 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "rngtech:material_enabled",
+      "material": "arclite"
+    }
+  ],
+  "type": "rngtech:battery_assembly",
+  "group": "battery_assembly_high_tier_cells",
+  "ingredients": [
+    {
+      "item": "rngtech:battery_cell"
+    },
+    {
+      "item": "rngtech:arclite_plate"
+    },
+    {
+      "item": "minecraft:redstone"
+    },
+    {
+      "item": "rngtech:stabilization_catalyst"
+    }
+  ],
+  "result": {
+    "count": 1,
+    "id": "rngtech:arclite_battery_cell"
+  },
+  "processing_ticks": 260,
+  "energy": 4400,
+  "roll_result_traits": true
+}

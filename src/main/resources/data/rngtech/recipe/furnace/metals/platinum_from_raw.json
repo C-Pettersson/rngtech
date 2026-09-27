@@ -1,0 +1,21 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "rngtech:material_enabled",
+      "material": "platinum"
+    }
+  ],
+  "type": "rngtech:furnace",
+  "group": "rngtech_metals",
+  "ingredient": {
+    "tag": "c:raw_materials/platinum"
+  },
+  "result": {
+    "id": "rngtech:platinum_ingot"
+  },
+  "processing_ticks": 200,
+  "energy": 19200,
+  "experience": 0.7,
+  "minimum_temperature": 1000,
+  "machine_xp": 2
+}

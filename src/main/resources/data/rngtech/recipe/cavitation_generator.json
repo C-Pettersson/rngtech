@@ -1,0 +1,33 @@
+{
+  "type": "rngtech:calibrated_shaped",
+  "category": "redstone",
+  "pattern": [
+    "CXC",
+    "PMP",
+    "SES"
+  ],
+  "key": {
+    "C": {
+      "ingredient": { "item": "rngtech:steel_coil" }
+    },
+    "E": {
+      "ingredient": { "item": "rngtech:crude_energy_connector" }
+    },
+    "M": {
+      "ingredient": { "tag": "rngtech:machine_frames/advanced" }
+    },
+    "P": {
+      "ingredient": { "item": "rngtech:steel_plate" }
+    },
+    "S": {
+      "ingredient": { "item": "minecraft:smooth_stone" }
+    },
+    "X": {
+      "ingredient": { "item": "rngtech:calibrated_kinetic_component" },
+      "calibration": { "family": "kinetic", "min_stage": 1, "min_stability": 65 }
+    }
+  },
+  "result": {
+    "id": "rngtech:cavitation_generator"
+  }
+}

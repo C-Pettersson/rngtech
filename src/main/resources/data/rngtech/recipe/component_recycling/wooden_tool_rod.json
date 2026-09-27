@@ -1,0 +1,25 @@
+{
+    "type": "rngtech:component_recycling",
+    "ingredient": {
+        "item": "rngtech:wooden_tool_rod"
+    },
+    "minimum_processing_level": 1,
+    "processing_ticks": 70,
+    "energy": 220,
+    "outputs": [
+        {
+            "stack": {
+                "id": "minecraft:stick",
+                "count": 2
+            },
+            "requires_filter": false
+        },
+        {
+            "stack": {
+                "id": "minecraft:stick",
+                "count": 1
+            },
+            "requires_filter": true
+        }
+    ]
+}

@@ -1,0 +1,11 @@
+{
+  "values": [
+    "rngtech:crude_energy_connector",
+    "rngtech:basic_energy_connector",
+    "rngtech:copper_energy_connector",
+    "rngtech:gold_energy_connector",
+    "rngtech:sparksteel_energy_connector",
+    "rngtech:arclite_energy_connector",
+    "rngtech:exotic_energy_connector"
+  ]
+}

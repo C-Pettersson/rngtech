@@ -1,0 +1,14 @@
+{
+  "type": "rngtech:crusher",
+  "ingredient": {
+    "tag": "rngtech:crusher/organic_reagent_inputs"
+  },
+  "result": {
+    "count": 1,
+    "id": "rngtech:organic_reagent"
+  },
+  "processing_ticks": 120,
+  "energy": 600,
+  "required_processing_level": 0,
+  "machine_xp": 1
+}

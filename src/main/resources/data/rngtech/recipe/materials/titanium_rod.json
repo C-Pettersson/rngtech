@@ -1,0 +1,23 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "rngtech:material_enabled",
+      "material": "titanium"
+    }
+  ],
+  "type": "rngtech:trait_shaped",
+  "category": "misc",
+  "pattern": [
+    "N  ",
+    " N ",
+    "  N"
+  ],
+  "key": {
+    "N": {
+      "tag": "c:nuggets/titanium"
+    }
+  },
+  "result": {
+    "id": "rngtech:titanium_rod"
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "type": "rngtech:trait_shaped",
+  "category": "misc",
+  "pattern": [
+    " P ",
+    "PCP",
+    " P "
+  ],
+  "key": {
+    "C": { "item": "rngtech:steel_casing" },
+    "P": { "item": "rngtech:steel_plate" }
+  },
+  "result": {
+    "id": "rngtech:steel_collapse_nozzle"
+  }
+}

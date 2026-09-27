@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "part=lower": { "model": "rngtech:block/silica_gel_column_casing_lower" },
+    "part=single": { "model": "rngtech:block/silica_gel_column_casing" },
+    "part=upper": { "model": "rngtech:block/silica_gel_column_casing_upper" }
+  }
+}

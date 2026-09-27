@@ -1,0 +1,43 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "rngtech:material_enabled",
+      "material": "bronze"
+    }
+  ],
+  "type": "rngtech:calibrated_shaped",
+  "category": "redstone",
+  "pattern": [
+    "IBI",
+    "RFR",
+    "CXS"
+  ],
+  "key": {
+    "B": {
+      "ingredient": { "tag": "c:circuits/basic" }
+    },
+    "C": {
+      "ingredient": { "tag": "c:ingots/bronze" }
+    },
+    "F": {
+      "ingredient": { "tag": "rngtech:machine_frames/base" }
+    },
+    "I": {
+      "ingredient": { "tag": "c:ingots/bronze" }
+    },
+    "R": {
+      "ingredient": { "item": "minecraft:redstone" }
+    },
+    "S": {
+      "ingredient": { "item": "minecraft:smooth_stone" }
+    },
+    "X": {
+      "ingredient": { "item": "rngtech:calibrated_thermal_component" },
+      "calibration": { "family": "thermal", "min_stage": 2, "min_stability": 45 }
+    }
+  },
+  "result": {
+    "count": 1,
+    "id": "rngtech:bronze_furnace_chassis"
+  }
+}

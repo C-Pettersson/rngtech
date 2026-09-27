@@ -1,0 +1,12 @@
+{
+  "variants": {
+    "active=false,facing=north": { "model": "rngtech:block/syngas_combustor" },
+    "active=false,facing=east": { "model": "rngtech:block/syngas_combustor", "y": 90 },
+    "active=false,facing=south": { "model": "rngtech:block/syngas_combustor", "y": 180 },
+    "active=false,facing=west": { "model": "rngtech:block/syngas_combustor", "y": 270 },
+    "active=true,facing=north": { "model": "rngtech:block/syngas_combustor_active" },
+    "active=true,facing=east": { "model": "rngtech:block/syngas_combustor_active", "y": 90 },
+    "active=true,facing=south": { "model": "rngtech:block/syngas_combustor_active", "y": 180 },
+    "active=true,facing=west": { "model": "rngtech:block/syngas_combustor_active", "y": 270 }
+  }
+}

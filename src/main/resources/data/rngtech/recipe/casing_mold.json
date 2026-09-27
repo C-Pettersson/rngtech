@@ -1,0 +1,34 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "rngtech:material_enabled",
+      "material": "bronze"
+    },
+    {
+      "type": "rngtech:material_enabled",
+      "material": "steel"
+    }
+  ],
+  "type": "rngtech:trait_shaped",
+  "category": "misc",
+  "pattern": [
+    "BIB",
+    "ICI",
+    "BIB"
+  ],
+  "key": {
+    "B": {
+      "item": "rngtech:bronze_plate"
+    },
+    "C": {
+      "item": "rngtech:casing"
+    },
+    "I": {
+      "tag": "c:ingots/steel"
+    }
+  },
+  "result": {
+    "count": 1,
+    "id": "rngtech:casing_mold"
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "type": "rngtech:component_recycling",
+  "ingredient": {
+    "item": "rngtech:calibrated_kinetic_component"
+  },
+  "minimum_processing_level": 1,
+  "processing_ticks": 80,
+  "energy": 700,
+  "outputs": [
+    {
+      "stack": {
+        "id": "rngtech:iron_gear",
+        "count": 1
+      },
+      "requires_filter": false
+    }
+  ]
+}

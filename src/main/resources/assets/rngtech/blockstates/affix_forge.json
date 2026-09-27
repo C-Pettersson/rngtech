@@ -1,0 +1,156 @@
+{
+  "multipart": [
+    {
+      "when": {
+        "facing": "north"
+      },
+      "apply": {
+        "model": "rngtech:block/affix_forge"
+      }
+    },
+    {
+      "when": {
+        "facing": "east"
+      },
+      "apply": {
+        "model": "rngtech:block/affix_forge",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "facing": "south"
+      },
+      "apply": {
+        "model": "rngtech:block/affix_forge",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "facing": "west"
+      },
+      "apply": {
+        "model": "rngtech:block/affix_forge",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "facing": "north",
+        "has_lens_array": "true"
+      },
+      "apply": {
+        "model": "rngtech:block/affix_forge_lens_array"
+      }
+    },
+    {
+      "when": {
+        "facing": "east",
+        "has_lens_array": "true"
+      },
+      "apply": {
+        "model": "rngtech:block/affix_forge_lens_array",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "facing": "south",
+        "has_lens_array": "true"
+      },
+      "apply": {
+        "model": "rngtech:block/affix_forge_lens_array",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "facing": "west",
+        "has_lens_array": "true"
+      },
+      "apply": {
+        "model": "rngtech:block/affix_forge_lens_array",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "facing": "north",
+        "has_modifier_socket": "true"
+      },
+      "apply": {
+        "model": "rngtech:block/affix_forge_modifier_socket"
+      }
+    },
+    {
+      "when": {
+        "facing": "east",
+        "has_modifier_socket": "true"
+      },
+      "apply": {
+        "model": "rngtech:block/affix_forge_modifier_socket",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "facing": "south",
+        "has_modifier_socket": "true"
+      },
+      "apply": {
+        "model": "rngtech:block/affix_forge_modifier_socket",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "facing": "west",
+        "has_modifier_socket": "true"
+      },
+      "apply": {
+        "model": "rngtech:block/affix_forge_modifier_socket",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "facing": "north",
+        "has_resonance_matrix": "true"
+      },
+      "apply": {
+        "model": "rngtech:block/affix_forge_resonance_matrix"
+      }
+    },
+    {
+      "when": {
+        "facing": "east",
+        "has_resonance_matrix": "true"
+      },
+      "apply": {
+        "model": "rngtech:block/affix_forge_resonance_matrix",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "facing": "south",
+        "has_resonance_matrix": "true"
+      },
+      "apply": {
+        "model": "rngtech:block/affix_forge_resonance_matrix",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "facing": "west",
+        "has_resonance_matrix": "true"
+      },
+      "apply": {
+        "model": "rngtech:block/affix_forge_resonance_matrix",
+        "y": 270
+      }
+    }
+  ]
+}

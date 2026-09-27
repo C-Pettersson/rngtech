@@ -1,0 +1,9 @@
+{
+  "values": [
+    "rngtech:basic_item_connector",
+    "rngtech:copper_item_connector",
+    "rngtech:gold_item_connector",
+    "rngtech:sparksteel_item_connector",
+    "rngtech:arclite_item_connector"
+  ]
+}

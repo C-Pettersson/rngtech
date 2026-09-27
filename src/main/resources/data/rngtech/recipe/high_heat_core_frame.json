@@ -1,0 +1,33 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "rngtech:material_enabled",
+      "material": "sparksteel"
+    }
+  ],
+  "type": "rngtech:trait_shaped",
+  "category": "redstone",
+  "pattern": [
+    "SRS",
+    "IHI",
+    "SRS"
+  ],
+  "key": {
+    "H": {
+      "item": "rngtech:heat_core"
+    },
+    "I": {
+      "item": "rngtech:ignition_catalyst"
+    },
+    "R": {
+      "item": "rngtech:refractory_casing"
+    },
+    "S": {
+      "item": "rngtech:sparksteel_rod"
+    }
+  },
+  "result": {
+    "count": 1,
+    "id": "rngtech:high_heat_core_frame"
+  }
+}

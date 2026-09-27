@@ -1,0 +1,37 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "rngtech:material_enabled",
+      "material": "aluminum"
+    }
+  ],
+  "type": "rngtech:calibrated_shaped",
+  "category": "misc",
+  "pattern": [
+    "ASA",
+    "CMC",
+    "APA"
+  ],
+  "key": {
+    "A": {
+      "ingredient": { "item": "rngtech:aluminum_plate" }
+    },
+    "C": {
+      "ingredient": { "tag": "c:circuits/advanced" }
+    },
+    "M": {
+      "ingredient": { "tag": "rngtech:machine_frames/reinforced" }
+    },
+    "P": {
+      "ingredient": { "item": "rngtech:aluminum_casing" }
+    },
+    "S": {
+      "ingredient": { "item": "rngtech:calibrated_structural_component" },
+      "calibration": { "family": "structural", "min_stage": 2, "min_stability": 60 }
+    }
+  },
+  "result": {
+    "count": 1,
+    "id": "rngtech:advanced_machine_frame"
+  }
+}

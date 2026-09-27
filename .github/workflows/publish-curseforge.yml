@@ -1,0 +1,302 @@
+name: Publish CurseForge Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to build and publish. Leave blank to use mod_version from gradle.properties.'
+        required: false
+        type: string
+      curseforge_project_id:
+        description: 'CurseForge project id. Leave blank to use repository variable CURSEFORGE_PROJECT_ID.'
+        required: false
+        type: string
+      release_type:
+        description: 'CurseForge release type.'
+        required: true
+        default: alpha
+        type: choice
+        options:
+          - alpha
+          - beta
+          - release
+      game_version_names:
+        description: 'Comma-separated CurseForge game version names for the mod jar.'
+        required: true
+        default: '1.21.1, NeoForge'
+        type: string
+      changelog:
+        description: 'Markdown changelog for the CurseForge file. Leave blank for a generic release note.'
+        required: false
+        type: string
+      mark_for_manual_release:
+        description: 'Keep approved files manually releasable on CurseForge instead of releasing immediately.'
+        required: true
+        default: false
+        type: boolean
+      upload_ftbquests_extra:
+        description: 'Upload extras/ftbquests as an additional child file.'
+        required: true
+        default: true
+        type: boolean
+
+permissions:
+  contents: read
+
+jobs:
+  publish-curseforge:
+    runs-on: ubuntu-latest
+    env:
+      CURSEFORGE_UPLOAD_BASE_URL: https://minecraft.curseforge.com
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Resolve release version
+        id: version
+        env:
+          REQUESTED_VERSION: ${{ inputs.version }}
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          VERSION="$REQUESTED_VERSION"
+          if [[ -z "$VERSION" ]]; then
+            VERSION="$(sed -n 's/^mod_version=//p' gradle.properties | head -n 1)"
+          fi
+
+          if [[ -z "$VERSION" ]]; then
+            echo "A version input or mod_version in gradle.properties is required." >&2
+            exit 1
+          fi
+
+          if [[ ! "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.-]+)?(\+[0-9A-Za-z.-]+)?$ ]]; then
+            echo "Version must contain numeric major.minor.patch with optional prerelease/build suffixes." >&2
+            exit 1
+          fi
+
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: Validate CurseForge configuration
+        id: curseforge
+        env:
+          INPUT_PROJECT_ID: ${{ inputs.curseforge_project_id }}
+          VAR_PROJECT_ID: ${{ vars.CURSEFORGE_PROJECT_ID }}
+          SECRET_PROJECT_ID: ${{ secrets.CURSEFORGE_PROJECT_ID }}
+          CURSEFORGE_API_TOKEN: ${{ secrets.CURSEFORGE_API_TOKEN }}
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          PROJECT_ID="${INPUT_PROJECT_ID:-}"
+          if [[ -z "$PROJECT_ID" ]]; then
+            PROJECT_ID="${VAR_PROJECT_ID:-}"
+          fi
+          if [[ -z "$PROJECT_ID" ]]; then
+            PROJECT_ID="${SECRET_PROJECT_ID:-}"
+          fi
+
+          if [[ -z "$PROJECT_ID" ]]; then
+            echo "Set repository variable CURSEFORGE_PROJECT_ID, set repository secret CURSEFORGE_PROJECT_ID, or provide the workflow input." >&2
+            exit 1
+          fi
+
+          if [[ ! "$PROJECT_ID" =~ ^[0-9]+$ ]]; then
+            echo "CurseForge project id must be numeric: $PROJECT_ID" >&2
+            exit 1
+          fi
+
+          if [[ -z "${CURSEFORGE_API_TOKEN:-}" ]]; then
+            echo "Set repository secret CURSEFORGE_API_TOKEN before publishing to CurseForge." >&2
+            exit 1
+          fi
+
+          echo "project_id=$PROJECT_ID" >> "$GITHUB_OUTPUT"
+
+      - name: Build release jar
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+        run: ./gradlew ciCheck "-Pmod_version=$VERSION"
+
+      - name: Locate release jar
+        id: artifact
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          JAR="build/libs/rngtech-${VERSION}.jar"
+          if [[ ! -f "$JAR" ]]; then
+            echo "Expected release jar not found: $JAR" >&2
+            find build/libs -maxdepth 1 -type f -name '*.jar' -print >&2
+            exit 1
+          fi
+
+          echo "jar=$JAR" >> "$GITHUB_OUTPUT"
+
+      - name: Package optional FTB Quests extra
+        id: ftbquests
+        if: ${{ inputs.upload_ftbquests_extra }}
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          EXTRA="build/distributions/rngtech-ftbquests-${VERSION}.zip"
+          if [[ ! -d extras/ftbquests/config ]]; then
+            echo "Expected extras/ftbquests/config to exist before packaging the FTB Quests extra." >&2
+            exit 1
+          fi
+
+          mkdir -p build/distributions
+          jar --create --no-manifest --file "$EXTRA" -C extras/ftbquests config
+
+          echo "zip=$EXTRA" >> "$GITHUB_OUTPUT"
+
+      - name: Upload mod jar to CurseForge
+        id: main_upload
+        env:
+          CURSEFORGE_API_TOKEN: ${{ secrets.CURSEFORGE_API_TOKEN }}
+          PROJECT_ID: ${{ steps.curseforge.outputs.project_id }}
+          VERSION: ${{ steps.version.outputs.version }}
+          JAR: ${{ steps.artifact.outputs.jar }}
+          RELEASE_TYPE: ${{ inputs.release_type }}
+          GAME_VERSION_NAMES: ${{ inputs.game_version_names }}
+          CHANGELOG: ${{ inputs.changelog }}
+          MARK_FOR_MANUAL_RELEASE: ${{ inputs.mark_for_manual_release }}
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          METADATA="$RUNNER_TEMP/curseforge-main-metadata.json"
+          RESPONSE="$RUNNER_TEMP/curseforge-main-response.json"
+
+          python3 - "$METADATA" <<'PY'
+          import json
+          import os
+          import sys
+
+          output_path = sys.argv[1]
+          version = os.environ["VERSION"]
+          game_version_names = [
+              part.strip()
+              for part in os.environ["GAME_VERSION_NAMES"].split(",")
+              if part.strip()
+          ]
+          if not game_version_names:
+              raise SystemExit("At least one CurseForge game version name is required.")
+
+          changelog = os.environ.get("CHANGELOG", "").strip()
+          if not changelog:
+              changelog = f"RNGTech v{version} release."
+
+          metadata = {
+              "changelog": changelog,
+              "changelogType": "markdown",
+              "displayName": f"RNGTech v{version}",
+              "gameVersionNames": game_version_names,
+              "releaseType": os.environ["RELEASE_TYPE"],
+              "isMarkedForManualRelease": os.environ["MARK_FOR_MANUAL_RELEASE"].lower() == "true",
+          }
+
+          with open(output_path, "w", encoding="utf-8") as handle:
+              json.dump(metadata, handle, separators=(",", ":"))
+          PY
+
+          HTTP_STATUS="$(
+            curl --silent --show-error --write-out '%{http_code}' --output "$RESPONSE" \
+              --request POST \
+              --url "${CURSEFORGE_UPLOAD_BASE_URL}/api/projects/${PROJECT_ID}/upload-file" \
+              --header "X-Api-Token: ${CURSEFORGE_API_TOKEN}" \
+              --form "metadata=<$METADATA;type=application/json" \
+              --form "file=@${JAR}"
+          )"
+
+          if [[ "$HTTP_STATUS" -lt 200 || "$HTTP_STATUS" -ge 300 ]]; then
+            echo "CurseForge mod jar upload failed with HTTP $HTTP_STATUS." >&2
+            python3 - "$RESPONSE" <<'PY' >&2
+          import pathlib
+          import sys
+
+          print(pathlib.Path(sys.argv[1]).read_text(encoding="utf-8", errors="replace")[:4000])
+          PY
+            exit 1
+          fi
+
+          FILE_ID="$(python3 -c 'import json, sys; print(json.load(open(sys.argv[1], encoding="utf-8"))["id"])' "$RESPONSE")"
+          echo "file_id=$FILE_ID" >> "$GITHUB_OUTPUT"
+          echo "Uploaded CurseForge mod jar file id $FILE_ID."
+
+      - name: Upload FTB Quests extra to CurseForge
+        if: ${{ inputs.upload_ftbquests_extra }}
+        env:
+          CURSEFORGE_API_TOKEN: ${{ secrets.CURSEFORGE_API_TOKEN }}
+          PROJECT_ID: ${{ steps.curseforge.outputs.project_id }}
+          VERSION: ${{ steps.version.outputs.version }}
+          FTBQUESTS: ${{ steps.ftbquests.outputs.zip }}
+          PARENT_FILE_ID: ${{ steps.main_upload.outputs.file_id }}
+          RELEASE_TYPE: ${{ inputs.release_type }}
+          MARK_FOR_MANUAL_RELEASE: ${{ inputs.mark_for_manual_release }}
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          METADATA="$RUNNER_TEMP/curseforge-ftbquests-metadata.json"
+          RESPONSE="$RUNNER_TEMP/curseforge-ftbquests-response.json"
+
+          python3 - "$METADATA" <<'PY'
+          import json
+          import os
+          import sys
+
+          output_path = sys.argv[1]
+          version = os.environ["VERSION"]
+          metadata = {
+              "changelog": (
+                  f"Optional FTB Quests content for RNGTech v{version}. "
+                  "Install by copying config/ftbquests into the pack instance root."
+              ),
+              "changelogType": "markdown",
+              "displayName": f"RNGTech FTB Quests v{version}",
+              "parentFileID": int(os.environ["PARENT_FILE_ID"]),
+              "releaseType": os.environ["RELEASE_TYPE"],
+              "isMarkedForManualRelease": os.environ["MARK_FOR_MANUAL_RELEASE"].lower() == "true",
+          }
+
+          with open(output_path, "w", encoding="utf-8") as handle:
+              json.dump(metadata, handle, separators=(",", ":"))
+          PY
+
+          HTTP_STATUS="$(
+            curl --silent --show-error --write-out '%{http_code}' --output "$RESPONSE" \
+              --request POST \
+              --url "${CURSEFORGE_UPLOAD_BASE_URL}/api/projects/${PROJECT_ID}/upload-file" \
+              --header "X-Api-Token: ${CURSEFORGE_API_TOKEN}" \
+              --form "metadata=<$METADATA;type=application/json" \
+              --form "file=@${FTBQUESTS}"
+          )"
+
+          if [[ "$HTTP_STATUS" -lt 200 || "$HTTP_STATUS" -ge 300 ]]; then
+            echo "CurseForge FTB Quests extra upload failed with HTTP $HTTP_STATUS." >&2
+            python3 - "$RESPONSE" <<'PY' >&2
+          import pathlib
+          import sys
+
+          print(pathlib.Path(sys.argv[1]).read_text(encoding="utf-8", errors="replace")[:4000])
+          PY
+            exit 1
+          fi
+
+          FILE_ID="$(python3 -c 'import json, sys; print(json.load(open(sys.argv[1], encoding="utf-8"))["id"])' "$RESPONSE")"
+          echo "Uploaded CurseForge FTB Quests extra file id $FILE_ID."

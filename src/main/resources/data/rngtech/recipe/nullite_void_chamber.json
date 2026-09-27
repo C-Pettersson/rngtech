@@ -1,0 +1,32 @@
+{
+    "neoforge:conditions": [
+        {
+            "type": "rngtech:material_enabled",
+            "material": "nullite"
+        }
+    ],
+    "type": "rngtech:trait_shaped",
+    "category": "misc",
+    "pattern": [
+        "OPO",
+        "PCP",
+        "OUO"
+    ],
+    "key": {
+        "C": {
+            "item": "rngtech:nullite_coil"
+        },
+        "O": {
+            "item": "minecraft:obsidian"
+        },
+        "P": {
+            "item": "rngtech:nullite_plate"
+        },
+        "U": {
+            "tag": "c:circuits/ultimate"
+        }
+    },
+    "result": {
+        "id": "rngtech:nullite_void_chamber"
+    }
+}

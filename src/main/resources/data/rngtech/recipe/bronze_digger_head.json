@@ -1,0 +1,30 @@
+{
+  "type": "rngtech:trait_shaped",
+  "category": "equipment",
+  "neoforge:conditions": [
+    {
+      "type": "rngtech:material_enabled",
+      "material": "bronze"
+    }
+  ],
+  "key": {
+    "G": {
+      "item": "rngtech:bronze_gear"
+    },
+    "R": {
+      "item": "rngtech:bronze_rod"
+    },
+    "P": {
+      "item": "rngtech:bronze_plate"
+    }
+  },
+  "pattern": [
+    "PPP",
+    "PGP",
+    " R "
+  ],
+  "result": {
+    "count": 1,
+    "id": "rngtech:bronze_digger_head"
+  }
+}

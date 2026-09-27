@@ -1,0 +1,34 @@
+{
+  "ambientocclusion": true,
+  "textures": {
+    "particle": "rngtech:block/affix_forge_modifier_socket",
+    "side": "rngtech:block/affix_forge_side",
+    "socket": "rngtech:block/affix_forge_modifier_socket"
+  },
+  "elements": [
+    {
+      "from": [1.5, 5, 5],
+      "to": [4, 7, 11],
+      "faces": {
+        "down": { "texture": "#side" },
+        "up": { "texture": "#socket" },
+        "north": { "texture": "#side" },
+        "south": { "texture": "#side" },
+        "east": { "texture": "#socket" },
+        "west": { "texture": "#socket" }
+      }
+    },
+    {
+      "from": [1, 7, 6],
+      "to": [3, 9, 10],
+      "faces": {
+        "down": { "texture": "#socket" },
+        "up": { "texture": "#socket" },
+        "north": { "texture": "#socket" },
+        "south": { "texture": "#socket" },
+        "east": { "texture": "#socket" },
+        "west": { "texture": "#socket" }
+      }
+    }
+  ]
+}

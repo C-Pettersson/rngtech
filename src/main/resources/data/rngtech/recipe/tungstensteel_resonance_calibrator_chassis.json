@@ -1,0 +1,30 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "rngtech:material_enabled",
+      "material": "tungstensteel"
+    }
+  ],
+  "type": "rngtech:calibrated_shaped",
+  "category": "misc",
+  "pattern": [
+    "WAW",
+    "BPC",
+    "WLW"
+  ],
+  "key": {
+    "A": {
+      "ingredient": { "item": "rngtech:calibrated_structural_component" },
+      "calibration": { "family": "structural", "min_stage": 3, "min_stability": 85, "min_refinement_potential": 1, "consume_refinement_potential": 1 }
+    },
+    "B": { "ingredient": { "item": "rngtech:tungstensteel_stabilizer_matrix" } },
+    "C": { "ingredient": { "item": "rngtech:tungstensteel_resonance_coil" } },
+    "L": {
+      "ingredient": { "item": "rngtech:calibrated_diamond_crystal" },
+      "calibration": { "family": "logic", "min_stage": 6, "min_stability": 85 }
+    },
+    "P": { "ingredient": { "item": "rngtech:exotic_machine_frame" } },
+    "W": { "ingredient": { "tag": "c:ingots/tungstensteel" } }
+  },
+  "result": { "count": 1, "id": "rngtech:tungstensteel_resonance_calibrator_chassis" }
+}

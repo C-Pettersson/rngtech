@@ -1,0 +1,30 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "rngtech:material_enabled",
+      "material": "titanium"
+    },
+    {
+      "type": "rngtech:material_enabled",
+      "material": "steel"
+    }
+  ],
+  "type": "rngtech:trait_shaped",
+  "category": "misc",
+  "pattern": [
+    " P ",
+    "PGP",
+    " P "
+  ],
+  "key": {
+    "G": {
+      "item": "rngtech:steel_gear"
+    },
+    "P": {
+      "item": "rngtech:titanium_plate"
+    }
+  },
+  "result": {
+    "id": "rngtech:titanium_gear"
+  }
+}

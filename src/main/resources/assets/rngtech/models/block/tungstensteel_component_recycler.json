@@ -1,0 +1,12 @@
+{
+  "parent": "minecraft:block/cube",
+  "textures": {
+    "down": "rngtech:block/component_recycler/bottom/tungstensteel_component_recycler",
+    "up": "rngtech:block/component_recycler/top/tungstensteel_component_recycler",
+    "north": "rngtech:block/component_recycler/front/tungstensteel_component_recycler",
+    "south": "rngtech:block/component_recycler/side/tungstensteel_component_recycler",
+    "east": "rngtech:block/component_recycler/side/tungstensteel_component_recycler",
+    "west": "rngtech:block/component_recycler/side/tungstensteel_component_recycler",
+    "particle": "rngtech:block/component_recycler/front/tungstensteel_component_recycler"
+  }
+}

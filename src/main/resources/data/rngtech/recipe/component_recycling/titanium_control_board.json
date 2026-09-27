@@ -1,0 +1,32 @@
+{
+  "type": "rngtech:component_recycling",
+  "ingredient": {
+    "item": "rngtech:titanium_control_board"
+  },
+  "minimum_processing_level": 6,
+  "processing_ticks": 152,
+  "energy": 1620,
+  "outputs": [
+    {
+      "stack": {
+        "id": "rngtech:control_board",
+        "count": 1
+      },
+      "requires_filter": false
+    },
+    {
+      "stack": {
+        "id": "rngtech:titanium_ingot",
+        "count": 1
+      },
+      "requires_filter": false
+    },
+    {
+      "stack": {
+        "id": "minecraft:redstone",
+        "count": 2
+      },
+      "requires_filter": true
+    }
+  ]
+}

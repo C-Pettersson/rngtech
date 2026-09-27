@@ -1,0 +1,33 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "rngtech:material_enabled",
+      "material": "bronze"
+    }
+  ],
+  "type": "rngtech:trait_shaped",
+  "category": "redstone",
+  "pattern": [
+    "IPI",
+    "HOH",
+    "IPI"
+  ],
+  "key": {
+    "H": {
+      "item": "minecraft:hopper"
+    },
+    "I": {
+      "tag": "c:ingots/bronze"
+    },
+    "O": {
+      "item": "rngtech:output_bin"
+    },
+    "P": {
+      "item": "rngtech:bronze_plate"
+    }
+  },
+  "result": {
+    "count": 1,
+    "id": "rngtech:bronze_recovery_filter"
+  }
+}

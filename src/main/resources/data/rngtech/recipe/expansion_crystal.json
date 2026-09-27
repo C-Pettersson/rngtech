@@ -1,0 +1,24 @@
+{
+  "type": "rngtech:trait_shaped",
+  "category": "misc",
+  "pattern": [
+    " A ",
+    "GEG",
+    " A "
+  ],
+  "key": {
+    "A": {
+      "item": "minecraft:diamond"
+    },
+    "E": {
+      "item": "minecraft:emerald"
+    },
+    "G": {
+      "item": "minecraft:gold_ingot"
+    }
+  },
+  "result": {
+    "count": 1,
+    "id": "rngtech:expansion_crystal"
+  }
+}

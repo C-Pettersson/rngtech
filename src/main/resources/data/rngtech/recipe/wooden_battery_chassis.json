@@ -1,0 +1,27 @@
+{
+  "type": "rngtech:trait_shaped",
+  "category": "redstone",
+  "pattern": [
+    "PBP",
+    "BCB",
+    "PRP"
+  ],
+  "key": {
+    "B": {
+      "item": "rngtech:bus_bar"
+    },
+    "C": {
+      "tag": "rngtech:machine_frames/base"
+    },
+    "P": {
+      "item": "minecraft:oak_planks"
+    },
+    "R": {
+      "item": "minecraft:redstone"
+    }
+  },
+  "result": {
+    "count": 1,
+    "id": "rngtech:wooden_battery_chassis"
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "type": "rngtech:trait_shaped",
+  "category": "misc",
+  "pattern": [
+    "RPR",
+    "PCP",
+    "RPR"
+  ],
+  "key": {
+    "C": { "item": "rngtech:energy_coil" },
+    "P": { "item": "minecraft:paper" },
+    "R": { "item": "minecraft:redstone" }
+  },
+  "result": { "count": 1, "id": "rngtech:conductive_calibration_pattern" }
+}

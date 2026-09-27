@@ -1,0 +1,33 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "rngtech:material_enabled",
+      "material": "steel"
+    }
+  ],
+  "type": "rngtech:trait_shaped",
+  "category": "misc",
+  "pattern": [
+    "PSP",
+    "CMC",
+    "PSP"
+  ],
+  "key": {
+    "C": {
+      "tag": "c:circuits/basic"
+    },
+    "M": {
+      "item": "rngtech:machine_frame"
+    },
+    "P": {
+      "item": "rngtech:steel_plate"
+    },
+    "S": {
+      "item": "rngtech:steel_casing"
+    }
+  },
+  "result": {
+    "count": 1,
+    "id": "rngtech:reinforced_machine_frame"
+  }
+}

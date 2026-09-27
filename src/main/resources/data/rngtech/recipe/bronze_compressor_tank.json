@@ -1,0 +1,21 @@
+{
+  "neoforge:conditions": [
+    { "type": "rngtech:material_enabled", "material": "bronze" }
+  ],
+  "type": "rngtech:trait_shaped",
+  "category": "redstone",
+  "pattern": [
+    "GIG",
+    "ICI",
+    "GIG"
+  ],
+  "key": {
+    "C": { "item": "rngtech:tank_frame" },
+    "G": { "item": "minecraft:glass" },
+    "I": { "tag": "c:ingots/bronze" }
+  },
+  "result": {
+    "count": 1,
+    "id": "rngtech:bronze_compressor_tank"
+  }
+}

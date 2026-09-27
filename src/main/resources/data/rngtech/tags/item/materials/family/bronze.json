@@ -1,0 +1,14 @@
+{
+  "replace": false,
+  "values": [
+    "rngtech:bronze_ingot",
+    "rngtech:bronze_nugget",
+    "rngtech:bronze_storage_block",
+    "rngtech:crushed_bronze",
+    "rngtech:bronze_plate",
+    "rngtech:bronze_gear",
+    "rngtech:bronze_rod",
+    "rngtech:bronze_coil",
+    "rngtech:bronze_casing"
+  ]
+}

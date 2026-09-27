@@ -1,0 +1,30 @@
+{
+    "type": "rngtech:trait_shaped",
+    "category": "equipment",
+    "neoforge:conditions": [
+        {
+            "material": "naquadah",
+            "type": "rngtech:material_enabled"
+        }
+    ],
+    "pattern": [
+        " P ",
+        "PSP",
+        " R "
+    ],
+    "key": {
+        "P": {
+            "item": "rngtech:naquadah_plate"
+        },
+        "R": {
+            "item": "rngtech:naquadah_rod"
+        },
+        "S": {
+            "item": "minecraft:shears"
+        }
+    },
+    "result": {
+        "count": 1,
+        "id": "rngtech:exotic_pruning_shears"
+    }
+}

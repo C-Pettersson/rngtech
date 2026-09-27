@@ -1,0 +1,19 @@
+{
+  "type": "rngtech:trait_shaped",
+  "category": "misc",
+  "pattern": [
+    "GQG",
+    "SRS",
+    "GQG"
+  ],
+  "key": {
+    "G": { "item": "minecraft:glass" },
+    "Q": { "item": "minecraft:quartz" },
+    "R": { "item": "minecraft:redstone" },
+    "S": { "item": "minecraft:sand" }
+  },
+  "result": {
+    "count": 8,
+    "id": "rngtech:silica_gel_beads"
+  }
+}

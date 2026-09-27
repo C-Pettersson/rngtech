@@ -1,0 +1,32 @@
+{
+  "type": "rngtech:component_recycling",
+  "ingredient": {
+    "item": "rngtech:solar_array_controller"
+  },
+  "minimum_processing_level": 4,
+  "processing_ticks": 168,
+  "energy": 1780,
+  "outputs": [
+    {
+      "stack": {
+        "id": "rngtech:steel_casing",
+        "count": 1
+      },
+      "requires_filter": false
+    },
+    {
+      "stack": {
+        "id": "rngtech:advanced_electric_circuit",
+        "count": 1
+      },
+      "requires_filter": false
+    },
+    {
+      "stack": {
+        "id": "rngtech:energy_coil",
+        "count": 1
+      },
+      "requires_filter": true
+    }
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "parent": "minecraft:block/cube",
+  "textures": {
+    "down": "rngtech:block/corrosion_cell/bottom/corrosion_cell",
+    "up": "rngtech:block/corrosion_cell/top/corrosion_cell",
+    "north": "rngtech:block/corrosion_cell/front/corrosion_cell",
+    "south": "rngtech:block/corrosion_cell/side/corrosion_cell",
+    "east": "rngtech:block/corrosion_cell/side/corrosion_cell",
+    "west": "rngtech:block/corrosion_cell/side/corrosion_cell",
+    "particle": "rngtech:block/corrosion_cell/front/corrosion_cell"
+  }
+}

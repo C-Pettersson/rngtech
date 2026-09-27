@@ -1,0 +1,30 @@
+{
+    "type":  "rngtech:trait_shaped",
+    "category":  "misc",
+    "pattern":  [
+                    "CMC",
+                    "RHR",
+                    "CGC"
+                ],
+    "key":  {
+                "C":  {
+                          "item":  "rngtech:titanium_casing"
+                      },
+                "M":  {
+                          "tag":  "rngtech:machine_frames/advanced"
+                      },
+                "R":  {
+                          "item":  "minecraft:redstone"
+                      },
+                "H":  {
+                          "item":  "rngtech:titanium_disassembly_head"
+                      },
+                "G":  {
+                          "item":  "rngtech:titanium_gear"
+                      }
+            },
+    "result":  {
+                   "count":  1,
+                   "id":  "rngtech:titanium_component_recycler"
+               }
+}

@@ -1,0 +1,9 @@
+{
+  "replace": false,
+  "values": [
+    "rngtech:iron_fuel_box",
+    "rngtech:copper_fuel_box",
+    "rngtech:bronze_fuel_box",
+    "rngtech:steel_fuel_box"
+  ]
+}

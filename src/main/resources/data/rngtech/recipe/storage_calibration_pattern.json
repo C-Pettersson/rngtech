@@ -1,0 +1,15 @@
+{
+  "type": "rngtech:trait_shaped",
+  "category": "misc",
+  "pattern": [
+    "RPR",
+    "PSP",
+    "RPR"
+  ],
+  "key": {
+    "P": { "item": "minecraft:paper" },
+    "R": { "item": "minecraft:redstone" },
+    "S": { "item": "rngtech:cell_shell" }
+  },
+  "result": { "count": 1, "id": "rngtech:storage_calibration_pattern" }
+}

@@ -1,0 +1,31 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "rngtech:material_enabled",
+      "material": "invar"
+    }
+  ],
+  "type": "rngtech:battery_assembly",
+  "group": "battery_assembly_cells",
+  "ingredients": [
+    {
+      "item": "rngtech:battery_cell"
+    },
+    {
+      "item": "rngtech:invar_plate"
+    },
+    {
+      "tag": "c:ingots/invar"
+    },
+    {
+      "item": "minecraft:redstone"
+    }
+  ],
+  "result": {
+    "count": 1,
+    "id": "rngtech:invar_battery_cell"
+  },
+  "processing_ticks": 170,
+  "energy": 2200,
+  "roll_result_traits": true
+}

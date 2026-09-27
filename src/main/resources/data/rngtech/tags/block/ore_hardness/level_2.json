@@ -1,0 +1,11 @@
+{
+  "replace": false,
+  "values": [
+    "rngtech:tin_ore",
+    "rngtech:deepslate_tin_ore",
+    "rngtech:zinc_ore",
+    "rngtech:deepslate_zinc_ore",
+    "minecraft:gold_ore",
+    "minecraft:deepslate_gold_ore"
+  ]
+}

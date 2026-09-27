@@ -1,0 +1,31 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "rngtech:material_enabled",
+      "material": "copper"
+    }
+  ],
+  "type": "rngtech:battery_assembly",
+  "group": "battery_assembly_cells",
+  "ingredients": [
+    {
+      "item": "rngtech:battery_cell"
+    },
+    {
+      "item": "rngtech:copper_plate"
+    },
+    {
+      "tag": "c:ingots/copper"
+    },
+    {
+      "item": "minecraft:redstone"
+    }
+  ],
+  "result": {
+    "count": 1,
+    "id": "rngtech:copper_battery_cell"
+  },
+  "processing_ticks": 130,
+  "energy": 1400,
+  "roll_result_traits": true
+}

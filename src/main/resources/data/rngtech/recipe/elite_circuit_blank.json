@@ -1,0 +1,65 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "rngtech:material_enabled",
+      "material": "titanium"
+    },
+    {
+      "type": "rngtech:material_enabled",
+      "material": "arclite"
+    }
+  ],
+  "type": "rngtech:calibrated_shaped",
+  "category": "redstone",
+  "pattern": [
+    "TAT",
+    "BXC",
+    "ISI"
+  ],
+  "key": {
+    "A": {
+      "ingredient": {
+        "tag": "c:circuits/advanced"
+      }
+    },
+    "B": {
+      "ingredient": {
+        "item": "rngtech:titanium_control_board"
+      }
+    },
+    "C": {
+      "ingredient": {
+        "item": "rngtech:titanium_resonance_coil"
+      }
+    },
+    "I": {
+      "ingredient": {
+        "item": "rngtech:insulator"
+      }
+    },
+    "S": {
+      "ingredient": {
+        "item": "rngtech:arclite_coil"
+      }
+    },
+    "T": {
+      "ingredient": {
+        "item": "rngtech:titanium_plate"
+      }
+    },
+    "X": {
+      "ingredient": {
+        "item": "rngtech:calibrated_logic_component"
+      },
+      "calibration": {
+        "family": "logic",
+        "min_stage": 2,
+        "min_stability": 80
+      }
+    }
+  },
+  "result": {
+    "count": 4,
+    "id": "rngtech:elite_circuit_blank"
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "type": "rngtech:component_recycling",
+  "ingredient": {
+    "item": "rngtech:sparksteel_solar_panel"
+  },
+  "minimum_processing_level": 5,
+  "processing_ticks": 180,
+  "energy": 2000,
+  "outputs": [
+    {
+      "stack": {
+        "id": "rngtech:sparksteel_coil",
+        "count": 1
+      },
+      "requires_filter": false
+    },
+    {
+      "stack": {
+        "id": "rngtech:sparksteel_plate",
+        "count": 1
+      },
+      "requires_filter": false
+    },
+    {
+      "stack": {
+        "id": "rngtech:advanced_electric_circuit",
+        "count": 1
+      },
+      "requires_filter": true
+    }
+  ]
+}

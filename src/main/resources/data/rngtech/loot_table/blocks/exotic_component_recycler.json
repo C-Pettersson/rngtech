@@ -1,0 +1,16 @@
+{
+    "type":  "minecraft:block",
+    "pools":  [
+                  {
+                      "bonus_rolls":  0,
+                      "entries":  [
+                                      {
+                                          "type":  "minecraft:item",
+                                          "name":  "rngtech:exotic_component_recycler"
+                                      }
+                                  ],
+                      "rolls":  1
+                  }
+              ],
+    "random_sequence":  "rngtech:blocks/exotic_component_recycler"
+}

@@ -1,0 +1,32 @@
+{
+    "type": "rngtech:component_recycling",
+    "ingredient": {
+        "item": "rngtech:aluminum_heat_core"
+    },
+    "minimum_processing_level": 5,
+    "processing_ticks": 140,
+    "energy": 1450,
+    "outputs": [
+        {
+            "stack": {
+                "id": "rngtech:aluminum_coil",
+                "count": 1
+            },
+            "requires_filter": false
+        },
+        {
+            "stack": {
+                "id": "rngtech:heat_core",
+                "count": 1
+            },
+            "requires_filter": false
+        },
+        {
+            "stack": {
+                "id": "minecraft:blaze_rod",
+                "count": 1
+            },
+            "requires_filter": true
+        }
+    ]
+}

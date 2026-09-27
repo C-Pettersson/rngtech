@@ -1,0 +1,32 @@
+{
+    "type": "rngtech:component_recycling",
+    "ingredient": {
+        "item": "rngtech:aluminum_component_recycler"
+    },
+    "minimum_processing_level": 5,
+    "processing_ticks": 180,
+    "energy": 2200,
+    "outputs": [
+        {
+            "stack": {
+                "id": "rngtech:advanced_machine_frame",
+                "count": 1
+            },
+            "requires_filter": false
+        },
+        {
+            "stack": {
+                "id": "rngtech:aluminum_casing",
+                "count": 2
+            },
+            "requires_filter": false
+        },
+        {
+            "stack": {
+                "id": "rngtech:aluminum_disassembly_head",
+                "count": 1
+            },
+            "requires_filter": true
+        }
+    ]
+}

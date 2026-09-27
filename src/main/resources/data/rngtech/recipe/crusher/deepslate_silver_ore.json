@@ -1,0 +1,20 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "rngtech:material_enabled",
+      "material": "silver"
+    }
+  ],
+  "type": "rngtech:crusher",
+  "ingredient": {
+    "item": "rngtech:deepslate_silver_ore"
+  },
+  "result": {
+    "count": 3,
+    "id": "rngtech:crushed_silver"
+  },
+  "processing_ticks": 200,
+  "energy": 9600,
+  "required_processing_level": 3,
+  "machine_xp": 3
+}

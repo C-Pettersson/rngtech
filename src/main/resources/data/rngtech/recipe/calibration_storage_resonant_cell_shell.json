@@ -1,0 +1,17 @@
+{
+  "type": "rngtech:calibration",
+  "family": "storage",
+  "ingredient": { "item": "rngtech:cell_shell" },
+  "pattern": { "item": "rngtech:storage_calibration_pattern" },
+  "catalyst": { "item": "rngtech:matrix" },
+  "stabilizer": { "item": "rngtech:stabilization_catalyst" },
+  "minimum_stage": 4,
+  "processing_ticks": 340,
+  "energy": 5200,
+  "result": {
+    "stack": { "id": "rngtech:calibrated_storage_component" },
+    "stage": 2,
+    "stability": { "min": 65, "max": 95 },
+    "refinement_potential": { "min": 1, "max": 3 }
+  }
+}

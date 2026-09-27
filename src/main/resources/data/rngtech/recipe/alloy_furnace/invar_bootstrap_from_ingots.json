@@ -1,0 +1,33 @@
+{
+  "neoforge:conditions": [
+    { "type": "rngtech:material_enabled", "material": "invar" },
+    { "type": "rngtech:material_enabled", "material": "iron" },
+    { "type": "rngtech:material_enabled", "material": "nickel" }
+  ],
+  "type": "rngtech:alloy_furnace",
+  "group": "rngtech_direct_alloys",
+  "mode": "direct_ingot",
+  "ingredients": [
+    {
+      "ingredient": { "tag": "c:ingots/iron" },
+      "count": 2
+    },
+    {
+      "ingredient": { "tag": "c:ingots/nickel" },
+      "count": 1
+    },
+    {
+      "ingredient": { "item": "minecraft:charcoal" },
+      "count": 1
+    }
+  ],
+  "result": {
+    "count": 2,
+    "id": "rngtech:invar_ingot"
+  },
+  "processing_ticks": 1200,
+  "energy": 24000,
+  "minimum_component_stage": 3,
+  "minimum_temperature": 900,
+  "required_temperature_stability": 0.9
+}

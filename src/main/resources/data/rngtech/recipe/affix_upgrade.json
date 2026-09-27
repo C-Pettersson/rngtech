@@ -1,0 +1,27 @@
+{
+  "type": "rngtech:trait_shaped",
+  "category": "misc",
+  "pattern": [
+    " G ",
+    "MAM",
+    " D "
+  ],
+  "key": {
+    "A": {
+      "item": "minecraft:amethyst_shard"
+    },
+    "D": {
+      "item": "minecraft:diamond"
+    },
+    "G": {
+      "item": "minecraft:gold_ingot"
+    },
+    "M": {
+      "item": "rngtech:affix_modifier"
+    }
+  },
+  "result": {
+    "count": 1,
+    "id": "rngtech:affix_upgrade"
+  }
+}

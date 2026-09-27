@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "has_tiny_anvil=false": {
+      "model": "rngtech:block/tool_bench"
+    },
+    "has_tiny_anvil=true": {
+      "model": "rngtech:block/tool_bench_with_anvil"
+    }
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "neoforge:conditions": [ { "type": "rngtech:material_enabled", "material": "steel" } ],
+  "type": "rngtech:trait_shaped",
+  "category": "misc",
+  "pattern": [ "RCR", "III", "RCR" ],
+  "key": {
+    "C": { "item": "rngtech:energy_coil" },
+    "I": { "tag": "c:ingots/steel" },
+    "R": { "item": "minecraft:redstone" }
+  },
+  "result": { "count": 1, "id": "rngtech:steel_resonance_coil" }
+}

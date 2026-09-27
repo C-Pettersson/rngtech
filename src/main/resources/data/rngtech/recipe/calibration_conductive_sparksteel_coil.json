@@ -1,0 +1,33 @@
+{
+  "type": "rngtech:calibration",
+  "family": "conductive",
+  "ingredient": {
+    "item": "rngtech:sparksteel_coil"
+  },
+  "pattern": {
+    "item": "rngtech:conductive_calibration_pattern"
+  },
+  "catalyst": {
+    "item": "rngtech:matrix"
+  },
+  "stabilizer": {
+    "item": "rngtech:stabilization_catalyst"
+  },
+  "minimum_stage": 4,
+  "processing_ticks": 360,
+  "energy": 7200,
+  "result": {
+    "stack": {
+      "id": "rngtech:calibrated_conductive_component"
+    },
+    "stage": 5,
+    "stability": {
+      "min": 60,
+      "max": 95
+    },
+    "refinement_potential": {
+      "min": 1,
+      "max": 3
+    }
+  }
+}

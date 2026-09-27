@@ -1,0 +1,16 @@
+{
+  "type": "rngtech:trait_shaped",
+  "category": "misc",
+  "pattern": [
+    "CRC",
+    "BFB",
+    "CCC"
+  ],
+  "key": {
+    "B": { "item": "rngtech:basic_electric_circuit" },
+    "C": { "tag": "c:ingots/copper" },
+    "F": { "item": "rngtech:machine_frame" },
+    "R": { "item": "rngtech:copper_resonance_coil" }
+  },
+  "result": { "count": 1, "id": "rngtech:copper_resonance_calibrator_chassis" }
+}

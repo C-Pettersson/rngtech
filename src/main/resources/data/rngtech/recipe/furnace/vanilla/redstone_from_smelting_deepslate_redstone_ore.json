@@ -1,0 +1,14 @@
+{
+    "type": "rngtech:furnace",
+    "group": "redstone",
+    "ingredient": {
+        "item": "minecraft:deepslate_redstone_ore"
+    },
+    "result": {
+        "id": "minecraft:redstone"
+    },
+    "processing_ticks": 200,
+    "energy": 4800,
+    "experience": 0.7,
+    "machine_xp": 1
+}

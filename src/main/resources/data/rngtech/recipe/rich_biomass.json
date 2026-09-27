@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "rngtech:composted_biomass"
+    },
+    {
+      "tag": "rngtech:bio_generator/rich_biomass_catalysts"
+    }
+  ],
+  "result": {
+    "count": 1,
+    "id": "rngtech:rich_biomass"
+  }
+}

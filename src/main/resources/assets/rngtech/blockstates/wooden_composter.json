@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "composting=false": {
+      "model": "rngtech:block/wooden_composter"
+    },
+    "composting=true": {
+      "model": "rngtech:block/wooden_composter"
+    }
+  }
+}

@@ -1,0 +1,37 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "rngtech:material_enabled",
+      "material": "aethergold"
+    }
+  ],
+  "type": "rngtech:calibrated_shaped",
+  "category": "redstone",
+  "pattern": [
+    "BFB",
+    "MXM",
+    "BRB"
+  ],
+  "key": {
+    "B": {
+      "ingredient": { "item": "rngtech:bus_bar" }
+    },
+    "F": {
+      "ingredient": { "tag": "rngtech:machine_frames/exotic" }
+    },
+    "M": {
+      "ingredient": { "tag": "c:ingots/aethergold" }
+    },
+    "R": {
+      "ingredient": { "item": "minecraft:redstone" }
+    },
+    "X": {
+      "ingredient": { "item": "rngtech:calibrated_storage_component" },
+      "calibration": { "family": "storage", "min_stage": 2, "min_stability": 90 }
+    }
+  },
+  "result": {
+    "count": 1,
+    "id": "rngtech:aethergold_battery_chassis"
+  }
+}

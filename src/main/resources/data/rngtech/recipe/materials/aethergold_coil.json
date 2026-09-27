@@ -1,0 +1,29 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "rngtech:material_enabled",
+      "material": "aethergold"
+    }
+  ],
+  "type": "rngtech:trait_shaped",
+  "category": "misc",
+  "pattern": [
+    "RBR",
+    "BPB",
+    "RBR"
+  ],
+  "key": {
+    "B": {
+      "tag": "c:ingots/aethergold"
+    },
+    "P": {
+      "item": "rngtech:aethergold_plate"
+    },
+    "R": {
+      "item": "minecraft:redstone"
+    }
+  },
+  "result": {
+    "id": "rngtech:aethergold_coil"
+  }
+}

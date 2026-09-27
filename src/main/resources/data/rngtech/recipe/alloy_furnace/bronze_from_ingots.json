@@ -1,0 +1,33 @@
+{
+  "neoforge:conditions": [
+    { "type": "rngtech:material_enabled", "material": "bronze" },
+    { "type": "rngtech:material_enabled", "material": "copper" },
+    { "type": "rngtech:material_enabled", "material": "tin" }
+  ],
+  "type": "rngtech:alloy_furnace",
+  "group": "rngtech_direct_alloys",
+  "mode": "direct_ingot",
+  "ingredients": [
+    {
+      "ingredient": { "tag": "c:ingots/copper" },
+      "count": 3
+    },
+    {
+      "ingredient": { "tag": "c:ingots/tin" },
+      "count": 1
+    },
+    {
+      "ingredient": { "item": "minecraft:charcoal" },
+      "count": 1
+    }
+  ],
+  "result": {
+    "count": 4,
+    "id": "rngtech:bronze_ingot"
+  },
+  "processing_ticks": 200,
+  "energy": 2400,
+  "minimum_component_stage": 3,
+  "minimum_temperature": 1100,
+  "required_temperature_stability": 0.9
+}

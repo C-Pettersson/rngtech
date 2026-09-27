@@ -1,0 +1,11 @@
+{
+  "replace": false,
+  "values": [
+    "rngtech:nickel_ore",
+    "rngtech:deepslate_nickel_ore",
+    "rngtech:lead_ore",
+    "rngtech:deepslate_lead_ore",
+    "rngtech:silver_ore",
+    "rngtech:deepslate_silver_ore"
+  ]
+}

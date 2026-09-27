@@ -1,0 +1,17 @@
+{
+  "type": "rngtech:trait_shaped",
+  "category": "misc",
+  "pattern": [
+    "PBP",
+    "BCB",
+    "PBP"
+  ],
+  "key": {
+    "B": { "item": "minecraft:blaze_powder" },
+    "C": { "item": "rngtech:steel_casing" },
+    "P": { "item": "rngtech:titanium_plate" }
+  },
+  "result": {
+    "id": "rngtech:ammonia_catalyst_bed"
+  }
+}

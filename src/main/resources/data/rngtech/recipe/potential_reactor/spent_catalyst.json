@@ -1,0 +1,13 @@
+{
+  "type": "rngtech:potential_reactor",
+  "ingredient": {
+    "item": "rngtech:spent_catalyst"
+  },
+  "energy": 12000,
+  "processing_ticks": 160,
+  "residue": {
+    "count": 1,
+    "id": "rngtech:scrap"
+  },
+  "minimum_material_stage": 3
+}

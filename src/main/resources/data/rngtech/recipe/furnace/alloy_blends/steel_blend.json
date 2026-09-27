@@ -1,0 +1,22 @@
+{
+    "neoforge:conditions": [
+        {
+            "type": "rngtech:material_enabled",
+            "material": "steel"
+        }
+    ],
+    "type": "rngtech:furnace",
+    "group": "rngtech_alloy_blends",
+    "ingredient": {
+        "item": "rngtech:steel_blend"
+    },
+    "result": {
+        "id": "rngtech:steel_ingot"
+    },
+    "bonus_output": false,
+    "processing_ticks": 240,
+    "energy": 7200,
+    "experience": 0.7,
+    "minimum_temperature": 1100,
+    "machine_xp": 3
+}

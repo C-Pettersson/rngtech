@@ -1,0 +1,9 @@
+{
+  "replace": false,
+  "values": [
+    "rngtech:crude_solid_fuel_burner",
+    "rngtech:copper_solid_fuel_burner",
+    "rngtech:alloy_solid_fuel_burner",
+    "rngtech:steel_solid_fuel_burner"
+  ]
+}

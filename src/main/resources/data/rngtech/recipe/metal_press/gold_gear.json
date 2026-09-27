@@ -1,0 +1,31 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "rngtech:material_enabled",
+      "material": "gold"
+    }
+  ],
+  "type": "rngtech:metal_press",
+  "group": "metal_press_gears",
+  "ingredient": {
+    "tag": "c:ingots/gold"
+  },
+  "input_count": 3,
+  "mold": {
+    "item": "rngtech:gear_mold"
+  },
+  "result": {
+    "count": 1,
+    "id": "rngtech:gold_gear"
+  },
+  "processing_ticks": 300,
+  "energy": 3600,
+  "minimum_temperature": 1000,
+  "safe_maximum_temperature": 1300,
+  "required_temperature_stability": 1.0,
+  "failure_output": {
+    "count": 3,
+    "id": "rngtech:malformed_ingot"
+  },
+  "failure_material": "gold"
+}

@@ -1,0 +1,36 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "rngtech:material_enabled",
+      "material": "iron"
+    }
+  ],
+  "type": "rngtech:trait_shaped",
+  "category": "redstone",
+  "pattern": [
+    "GGG",
+    "RFR",
+    "PWP"
+  ],
+  "key": {
+    "F": {
+      "item": "rngtech:machine_frame"
+    },
+    "G": {
+      "item": "minecraft:glass_pane"
+    },
+    "P": {
+      "item": "rngtech:iron_plate"
+    },
+    "R": {
+      "item": "minecraft:redstone"
+    },
+    "W": {
+      "item": "rngtech:cable"
+    }
+  },
+  "result": {
+    "count": 1,
+    "id": "rngtech:solar_panel_frame"
+  }
+}

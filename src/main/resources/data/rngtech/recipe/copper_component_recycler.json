@@ -1,0 +1,30 @@
+{
+    "type":  "rngtech:trait_shaped",
+    "category":  "misc",
+    "pattern":  [
+                    "CMC",
+                    "RHR",
+                    "CGC"
+                ],
+    "key":  {
+                "C":  {
+                          "item":  "rngtech:copper_casing"
+                      },
+                "M":  {
+                          "tag":  "rngtech:machine_frames/base"
+                      },
+                "R":  {
+                          "item":  "minecraft:redstone"
+                      },
+                "H":  {
+                          "item":  "rngtech:copper_disassembly_head"
+                      },
+                "G":  {
+                          "item":  "rngtech:copper_gear"
+                      }
+            },
+    "result":  {
+                   "count":  1,
+                   "id":  "rngtech:copper_component_recycler"
+               }
+}
