@@ -78,7 +78,9 @@ public final class MasteryScreenSupport<N extends PassiveNode> {
     private static final int MASTERY_TOOLTIP_WIDTH = 240;
     private static final int ROUTE_READY = 0xFFF2E6C2;
     private static final int ROUTE_BLOCKED = 0xFFC8604E;
-    private static final int SEARCH_HIGHLIGHT = 0xFFFFFF80;
+    // Icy white-blue keeps the widest margin from every Mastery accent under protanopia, deuteranopia, and tritanopia
+    // simulation; red and orange highlights collapse into the heat accents for red-green color blindness.
+    private static final int SEARCH_HIGHLIGHT = 0xFFE1F0FF;
     private static final int TARGET_BORDER = 0xFF8E9BE8;
     private static final int[] NO_ROUTE = new int[0];
 
@@ -882,9 +884,9 @@ public final class MasteryScreenSupport<N extends PassiveNode> {
 
     private void drawHighlights(GuiShapeBatch shapes, int leftPos, int topPos, int hovered, int[] steps) {
         for (int position = searchMatches.nextSetBit(0); position >= 0; position = searchMatches.nextSetBit(position + 1)) {
-            // Halos keep matches visible after they shrink to a few pixels.
+            // Halos keep matches visible after they shrink to a few pixels; their width, not only their color, sets them apart.
             float halo = Math.max(screenRadius(position) + 1.5F, 4.0F);
-            shapes.ring(screenX(centerX[position], leftPos), screenY(centerY[position], topPos), halo, halo + 1.0F, SEARCH_HIGHLIGHT);
+            shapes.ring(screenX(centerX[position], leftPos), screenY(centerY[position], topPos), halo, halo + 2.0F, SEARCH_HIGHLIGHT);
         }
         int routeColor = routeStatus(steps) == RouteStatus.READY ? ROUTE_READY : ROUTE_BLOCKED;
         for (int step : steps) {

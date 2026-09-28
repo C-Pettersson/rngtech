@@ -11,7 +11,7 @@ Status: Prototype
 - One point per non-starter node, 99 points at level 100. Storage allows 120 points for a future non-level source. Connected paths govern access; irrelevant effects remain selectable. Gear validation still applies.
 - Ordinary bonuses support chassis and Gear. Keystones offer major tradeoffs or distinct behavior, including family-specific effects. A payoff that depends on a family-specific cost is tagged to the machine group that pays it (for example, 100% more Processing Speed for heated machines), and keystone limits are ceilings.
 - Output rewards appear on both sides of the tree. Single Pass disables bonus output for 30% more Processing Speed on machines with bonus output.
-- The expanded Mastery view has a toggleable Bonus Summary drawer with hover explanations.
+- The expanded Mastery view has a toggleable Bonus Summary drawer with hover explanations. Search and relevance highlights use a color chosen for color-vision deficiencies.
 - Attributes have totals, family-specific inherent conversions, and separately authored explicit scaling. Attribute clusters may increase individual/all attributes. “Attributes grant no inherent bonuses” preserves totals and explicit scaling.
 - Absolute values and ceilings resolve after ordinary modifiers. Lower conflicting absolute maximum values win. A hard recipe ceiling is distinct from a fixed processing-level stat and must explicitly forbid recipes above its limit.
 - Progression stays with the chassis. Advanced work grants faster catch-up; low-tier work loses XP effectiveness. Reversible loops and idle placement grant no XP.
