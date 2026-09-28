@@ -66,13 +66,14 @@ Current stat hooks:
 
 Current Mastery hooks:
 
-- Crushers enter the [shared Machine Mastery tree](../systems/machine-mastery.md) at Drive. Successful jobs grant band-scaled XP per completed job, up to level 80 and 79 passive points.
+- Crushers enter the [shared Machine Mastery tree](../systems/machine-mastery.md) at Drive. Successful jobs grant band-scaled XP per completed job, up to level 100 and 99 passive points.
 - Paths, refunds, copy/paste, automatic allocation, attributes, and save migration follow the shared rules. Current Gear must remain legal for every allocation and refund.
 - Cell Bypass grants 100% increased Energy Capacity, 10% more Energy Usage, and +100 percentage points of no-cell output retention. It blocks the Battery Cell slot and cannot be allocated with a cell installed.
 - Precision Jaw Mount grants 10% increased Output Amount and +2 percentage points of salvage chance. An installed Crush Head must match the chassis stage.
 - Dense Batching enables Dense Parallel, adds two parallel jobs, and applies 25% less Processing Speed and 25% more Energy Usage.
 - Soft Material Specialist grants 200% more Processing Speed and 50% more Energy Usage, but forbids recipes above hardness 2 even with a stronger head.
-- Component Mount notables support higher-stage heads; Precision Jaw Mount still requires an exact match. Silent Operation mutes the machine's client-side loop and cues.
+- Heavy Yield grants 15% more Output Amount and 50% more Energy Usage.
+- Component Mount, Reinforced Mount, Stage Adapter, and Universal Bracket each support one higher Crush Head stage; Precision Jaw Mount still requires an exact match. Silent Operation mutes the machine's client-side loop and cues.
 
 
 Implementation checks:

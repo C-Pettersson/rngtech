@@ -17,8 +17,11 @@ import java.util.function.IntSupplier;
 import java.util.function.Supplier;
 
 public final class MasteryMenuSupport {
-    public static final int FIELD_COUNT = 168;
-    private static final int ATTRIBUTE_START = 165;
+    private static final int ALLOCATED_START = 6;
+    private static final int TARGET_START = ALLOCATED_START + MegaPassiveTree.MAX_ALLOCATIONS;
+    private static final int FOLLOWING = TARGET_START + MegaPassiveTree.MAX_ALLOCATIONS;
+    private static final int ATTRIBUTE_START = FOLLOWING + 1;
+    public static final int FIELD_COUNT = ATTRIBUTE_START + 3;
 
     public static int get(MachineProgressionState state, int field, Supplier<MachineStatAccumulator> stats) {
         if (field >= ATTRIBUTE_START && field < FIELD_COUNT) {
@@ -35,9 +38,6 @@ public final class MasteryMenuSupport {
         int index = switch (stat) { case CONTROL -> 0; case DRIVE -> 1; case RESERVE -> 2; default -> throw new IllegalArgumentException("Not an attribute"); };
         return data.get(base + ATTRIBUTE_START + index) / 100.0;
     }
-    private static final int ALLOCATED_START = 6;
-    private static final int TARGET_START = ALLOCATED_START + MegaPassiveTree.MAX_ALLOCATIONS;
-    private static final int FOLLOWING = TARGET_START + MegaPassiveTree.MAX_ALLOCATIONS;
 
     public static int get(MachineProgressionState state, int field) {
         if (field >= ALLOCATED_START && field < TARGET_START) { return encodedNode(state.allocatedNodes(), field - ALLOCATED_START); }

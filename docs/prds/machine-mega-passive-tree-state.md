@@ -2,20 +2,23 @@
 
 Source: [accepted design](machine-mega-passive-tree.md).
 
-Status: **Done** — implementation and travel-road redesign completed 2026-09-27. Gameplay remains a Prototype pending focused playtesting.
+Status: **Done** — implementation and travel-road redesign completed 2026-09-27; layered 1300-node redesign and level-100 cap completed 2026-09-28. Gameplay remains a Prototype pending focused playtesting.
 
 ## Scope checklist
 
 - [x] Create and switch to feature/machine-mega-passive-tree from clean main.
-- [x] Shared stable-ID graph: 750 nodes, six starts, asymmetric layout and validation.
-- [x] Versioned progression, level 80, XP bands and legacy allocation refund migration.
+- [x] Shared stable-ID graph: six starts, layout and validation (750 nodes in version 1, 1300 in version 2).
+- [x] Versioned progression, level 100 (80 before 2026-09-28), XP bands and legacy allocation refund migration.
 - [x] Three attributes, explicit scaling, absolute constraints and family behaviors.
 - [x] Crusher, Furnace and Forestry Companion integration.
 - [x] Mastery UI, refunds, ordered copy/paste and automatic allocation.
 - [x] Configurator build mode and refund consumable.
 - [x] Replace direct cluster links with connected attribute roads and optional reward arcs/rings.
 - [x] Verify reward investment costs and update design rules to v6.
-- [x] ModDex audit, canonical documentation and representative 79-point builds.
+- [x] ModDex audit, canonical documentation and representative full-budget builds.
+- [x] Layered redesign: outward starts, core pathing, distinct home regions, middle ring, outer field, and design rules v7.
+- [x] Larger reward constellations, and keystones spread through every layer, directly on roads or on reward arms, at least 10 points from every start.
+- [x] Level 100 with 99 level points and 120-point allocation storage.
 - [x] Verification, diff review, and staging on the feature branch.
 
 ## Progress log
@@ -27,7 +30,12 @@ Status: **Done** — implementation and travel-road redesign completed 2026-09-2
 - Every notable requires three reward allocations from its road gate; keystones continue those branches at four. Distinct gates have intervening travel nodes. Reward branches cannot shortcut between roads.
 - Preserved all 750 stable IDs and authored rewards, including modifier operations. Only grouping, placement, and connections changed in this redesign.
 - Updated the design rules, catalog audit, ModDex source export, and generated overview.
-- Reworked the Mastery screen for the 750-node catalog: batched, viewport-culled geometry replaces per-pixel fills; icons draw once per texture; allocation, search, and relevance state is cached. Hovering previews the shortest route, clicking allocates it atomically, allocation happens on release, scrolling zooms at the cursor, and right-click refunds now reach the tree.
+- Reworked the Mastery screen for the version 1 catalog: batched, viewport-culled geometry replaces per-pixel fills; icons draw once per texture; allocation, search, and relevance state is cached. Hovering previews the shortest route, clicking allocates it atomically, allocation happens on release, scrolling zooms at the cursor, and right-click refunds now reach the tree.
+- Rebuilt the catalog as version 2 in layers: a central hub and core ring, six starts moved outward, distinct home-region road silhouettes between boundary spokes, a polygonal middle ring, outer star hubs, and a curved perimeter road. The catalog grew to 1300 nodes with 627 travel nodes.
+- Added wheels, lattices, crowns, hexagram stars, and pearl chains alongside arcs, forks, diamonds, horseshoes, and rings. Notables have unique names and secondary effects; themes are balanced across the tree. Six new keystones bring the total to 30. Keystones moved off the perimeter into every layer: 4 in the core, 9 in home regions, 9 in the outer field, and 8 on or beyond the perimeter road. Twelve attach directly to roads, outer star hubs, or the center junction.
+- Rebuilt the center as a three-way junction with equal-length spokes. Silent Operation sits on it, 10 points from every start (previously 13–20), facing the Crusher start.
+- Mastery Find now highlights every keystone, notable, or travel node when the query is exactly that type word.
+- Raised the level cap to 100 (99 points from levels) with 120-point allocation storage reserved for a future non-level source. XP bands now reach 98. Version 1 allocations, targets, and build codes refund or are rejected.
 
 ## Verification
 
@@ -38,6 +46,7 @@ Status: **Done** — implementation and travel-road redesign completed 2026-09-2
 - ModDex fitted Visual Audit passes with zero proper crossings and zero long chords.
 - npm run repo:check and mkdocs build --strict — passed after the travel-road redesign.
 - Mastery screen rework: Gradle ciCheck passed with 446 domain checks, including shortest routes and atomic rejection of unaffordable, disconnected, or Gear-blocked routes. npm run repo:check, npm run moddex:check, and mkdocs build --strict passed. The rendering and input changes still need an in-game playtest.
+- Layered redesign (catalog version 2): Gradle quickCheck and ciCheck passed with 543 domain checks, including the level-100 budget, 120-point target builds, band rescaling, and version 1 refunds. npm run moddex:check and npm run repo:check passed. Catalog audit: 1300 nodes, 1445 links, zero overlaps, links through nodes, or crossings; every start sits within 33%–69% of the bounds; keystones are 10–46 points from every start, and Silent Operation is exactly 10 from each; representative builds spend exactly 99 points. ModDex fitted Visual Audit passes: zero crossings and long chords, P90/median 1.33x, endpoints in seven of eight sectors with a 76° maximum gap. mkdocs build --strict was not run because MkDocs is not installed locally.
 
 ## Handoff and limits
 

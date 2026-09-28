@@ -72,30 +72,35 @@ public final class MasteryChecks {
         require(original.allocatedNodes().stream().anyMatch(id -> MegaPassiveTree.node(id).index() > 127), "save exercises nodes beyond old mask limit");
         require(MachineProgressionState.xpQuarters(40, 37) == 0, "outleveled work grants no XP");
         require(MachineProgressionState.workXp(10, 78) > MachineProgressionState.workXp(10, 1) * 100, "advanced work accelerates catch-up");
-        for (int level = 2; level <= 80; level++) { require(MachineProgressionState.xpForLevel(level) > MachineProgressionState.xpForLevel(level - 1), "increasing level thresholds"); }
+        for (int level = 2; level <= MachineProgressionState.MAX_LEVEL; level++) { require(MachineProgressionState.xpForLevel(level) > MachineProgressionState.xpForLevel(level - 1), "increasing level thresholds"); }
+        require(MachineProgressionState.MAX_LEVEL == 100 && MachineProgressionState.EMPTY.forFamily(MachineMasteryFamily.CRUSHER)
+                .withAddedXp(MachineProgressionState.xpForLevel(100)).totalPoints() == 99, "level 100 grants 99 points");
+        require(MachineProgressionState.progressionBand(25) == MachineProgressionState.MAX_LEVEL - 2, "top legacy band trains toward the level cap");
+        var stale = JsonParser.parseString("{\"tree_version\":1,\"xp\":100,\"level\":2,\"allocated_nodes\":[\"r0_drive_0_0\"],\"start\":\"start_drive\"}");
+        require(MachineProgressionState.CODEC.parse(JsonOps.INSTANCE, stale).getOrThrow().allocatedNodes().isEmpty(), "previous tree version refunds allocations");
     }
 
     private static void graphAndBuilds() {
-        require(MegaPassiveTree.TREE.nodes().size() == 750, "full shared catalog");
+        require(MegaPassiveTree.TREE.nodes().size() == 1300, "full shared catalog");
         for (MegaPassiveNode root : MegaPassiveTree.TREE.nodes().stream().filter(n -> n.kind() == PassiveNodeKind.STARTER).toList()) {
             require(root.links().size() == 3, "three exits per starter");
             for (MegaPassiveNode key : MegaPassiveTree.TREE.nodes().stream().filter(n -> n.kind() == PassiveNodeKind.KEYSTONE).toList()) {
                 List<String> path = path(root.id(), key.id());
-                require(path.size() >= 7 && path.size() <= 79, "reachable keystone commitment from each start");
+                require(path.size() >= 7 && path.size() <= MachineProgressionState.MAX_LEVEL - 1, "reachable keystone commitment from each start");
                 require(MegaPassiveTree.validBuild(root.id(), path), "legal allocation order");
             }
         }
         var full = build(MachineMasteryFamily.CRUSHER, "soft_material_specialist");
         var code = MasteryBuildCode.decode(MasteryBuildCode.copy(full).encode());
         for (int i = 0; i < 14; i++) {
-            int level = i % 3 == 0 ? 10 : i % 3 == 1 ? 25 : 80;
+            int level = i % 3 == 0 ? 10 : i % 3 == 1 ? 40 : MachineProgressionState.MAX_LEVEL;
             var fresh = new MachineProgressionState(MachineProgressionState.xpForLevel(level), 0, level, List.of(), code.start(), List.of(), false);
             var partial = MegaPassiveTree.follow(fresh.withTarget(code.nodes()), state -> true);
             require(partial.spentPoints() == Math.min(level - 1, code.nodes().size()), "paste respects each machine's earned points");
-            var finished = MegaPassiveTree.follow(partial.withAddedXp(MachineProgressionState.xpForLevel(80)), state -> true);
+            var finished = MegaPassiveTree.follow(partial.withAddedXp(MachineProgressionState.xpForLevel(MachineProgressionState.MAX_LEVEL)), state -> true);
             require(finished.allocatedNodes().equals(code.nodes()), "14 machines follow the same target");
         }
-        var fresh = MachineProgressionState.EMPTY.forFamily(MachineMasteryFamily.CRUSHER).withAddedXp(MachineProgressionState.xpForLevel(80));
+        var fresh = MachineProgressionState.EMPTY.forFamily(MachineMasteryFamily.CRUSHER).withAddedXp(MachineProgressionState.xpForLevel(MachineProgressionState.MAX_LEVEL));
         var paused = MegaPassiveTree.follow(fresh.withTarget(code.nodes()), state -> !state.allocatedNodes().contains("soft_material_specialist"));
         require(!paused.following() && !paused.allocatedNodes().contains("soft_material_specialist"), "stop at gear conflict");
         var resumed = MegaPassiveTree.follow(paused.withFollowing(true), state -> true);
@@ -107,13 +112,19 @@ public final class MasteryChecks {
         require(!MegaPassiveTree.validBuild(code.start(), List.of("start_control")), "foreign starts do not become free roots");
         require(!MegaPassiveTree.validBuild(code.start(), List.of(code.nodes().getFirst(), code.nodes().getFirst())), "duplicate allocations are rejected");
         var overBudget = new ArrayList<>(code.nodes());
-        while (overBudget.size() < 80) { overBudget.add(code.nodes().getFirst()); }
+        while (overBudget.size() <= MegaPassiveTree.MAX_ALLOCATIONS) { overBudget.add(code.nodes().getFirst()); }
         require(!MegaPassiveTree.validBuild(code.start(), overBudget), "target builds cannot exceed the point ceiling");
+        List<String> ceiling = breadthFirst(code.start(), MegaPassiveTree.MAX_ALLOCATIONS);
+        require(MegaPassiveTree.validBuild(code.start(), ceiling), "target builds can plan the 120-point ceiling");
+        var planned = MachineProgressionState.EMPTY.forFamily(MachineMasteryFamily.CRUSHER)
+                .withAddedXp(MachineProgressionState.xpForLevel(MachineProgressionState.MAX_LEVEL)).withTarget(ceiling);
+        var followed = MegaPassiveTree.follow(planned, state -> true);
+        require(followed.targetNodes().size() == 120 && followed.spentPoints() == 99, "level points stop short of the reserved ceiling");
         require(fresh.withUnlockedNode(MegaPassiveTree.node("soft_material_specialist").index()).equals(fresh), "reject forged distant unlock");
     }
 
     private static void routeAllocation() {
-        var fresh = MachineProgressionState.EMPTY.forFamily(MachineMasteryFamily.CRUSHER).withAddedXp(MachineProgressionState.xpForLevel(80));
+        var fresh = MachineProgressionState.EMPTY.forFamily(MachineMasteryFamily.CRUSHER).withAddedXp(MachineProgressionState.xpForLevel(MachineProgressionState.MAX_LEVEL));
         MegaPassiveNode target = MegaPassiveTree.node("soft_material_specialist");
         List<MegaPassiveNode> route = MegaPassiveTree.allocationPath(node -> node.isUnlocked(fresh), target);
         List<String> ids = route.stream().map(MegaPassiveNode::id).toList();
@@ -196,8 +207,19 @@ public final class MasteryChecks {
     }
 
     private static MachineProgressionState build(MachineMasteryFamily family, String destination) {
-        return new MachineProgressionState(MachineProgressionState.xpForLevel(80), 0, 80,
+        return new MachineProgressionState(MachineProgressionState.xpForLevel(MachineProgressionState.MAX_LEVEL), 0, MachineProgressionState.MAX_LEVEL,
                 path(family.startNodeId(), destination), family.startNodeId(), List.of(), false);
+    }
+    private static List<String> breadthFirst(String start, int count) {
+        List<String> order = new ArrayList<>();
+        ArrayDeque<String> queue = new ArrayDeque<>(List.of(start));
+        java.util.Set<String> seen = new java.util.HashSet<>(List.of(start));
+        while (!queue.isEmpty() && order.size() < count) {
+            for (String next : MegaPassiveTree.node(queue.remove()).links()) {
+                if (order.size() < count && seen.add(next) && MegaPassiveTree.node(next).kind() != PassiveNodeKind.STARTER) { order.add(next); queue.add(next); }
+            }
+        }
+        return order;
     }
     private static List<String> path(String start, String destination) {
         Map<String, String> previous = new HashMap<>(); previous.put(start, "");

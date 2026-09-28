@@ -23,8 +23,9 @@ import java.util.Set;
 import java.util.function.Predicate;
 
 public final class MegaPassiveTree {
-    public static final int VERSION = 1;
-    public static final int MAX_ALLOCATIONS = 79;
+    public static final int VERSION = 2;
+    /** Levels grant 99 points; the remaining capacity is reserved for future non-level point sources. */
+    public static final int MAX_ALLOCATIONS = 120;
     private static final Map<String, MegaPassiveNode> CATALOG = load();
     public static final PassiveTree<MegaPassiveNode> TREE = new PassiveTree<>(List.copyOf(CATALOG.values()));
 

@@ -6,7 +6,11 @@ Machine Mastery is progression owned by each machine chassis. Machines share one
 
 ## Shared tree
 
-The catalog contains 750 nodes: six starts, 360 attribute travel nodes, 240 ordinary nodes, 120 notables, and 24 keystones. Its 809 links form an asymmetric attribute-road network with 90 optional reward pockets. Distinct pockets are separated by travel steps; each notable requires three reward allocations from its road gate, and keystones continue those investments at four. Reward rings and open arcs cannot shortcut between roads. Every paid allocation costs one point and must connect to the machine's start through allocated nodes. Foreign starts cannot be allocated or used as shortcuts. Nodes have no individual level or chassis-stage gates.
+The catalog contains 1300 nodes: six starts, 634 attribute travel nodes, 446 ordinary nodes, 184 notables, and 30 keystones, joined by 1445 links. It is built in layers. Inside the six starts, a central junction splits three ways to a core ring, so every machine can path through the middle and reaches the center for the same number of points. Each start opens into a home region with its own road shape between two boundary spokes. A middle ring leads through outer star hubs and climbs to the perimeter road.
+
+Optional reward constellations branch from single road gates: arcs, forks, diamonds, pearl chains, horseshoes, rings, wheels, lattices, crowns, and hexagram stars. Distinct constellations are separated by travel steps. Each notable requires at least three reward allocations from its road gate, and constellations cannot shortcut between roads. Keystones are spread through every layer, either directly on a road or at the end of a reward arm, and always at least 10 points from every start. Silent Operation sits on the center junction, 10 points from every start. Attribute Transfiguration, Singular Drive, and Reserve Actuation sit around the core, where any start can path inward to them. Family keystones sit in the home regions, outer field, and perimeter near their family's start.
+
+Every paid allocation costs one point and must connect to the machine's start through allocated nodes. Foreign starts cannot be allocated or used as shortcuts. Nodes have no individual level or chassis-stage gates.
 
 ![Shared machine passive tree](../assets/machine-mega-passive-tree.svg)
 
@@ -39,6 +43,8 @@ Conversions only have a gameplay effect where the receiving stat is used. For ex
 
 Explicit attribute scaling is separate. A node can grant an authored percentage per attribute point in addition to inherent conversions. **Attributes grant no inherent bonuses** removes only the conversions in the table: totals, attribute modifiers, and explicit scaling remain. Attribute Transfiguration grants 100% more of each attribute with that restriction. Reserve Actuation uses the same restriction and grants 0.5% increased Processing Speed per Reserve.
 
+Steady State grants 50% more Stability with 15% less Processing Speed. Singular Drive grants 50% more Drive with 50% less Control and Reserve. Lean Grid applies 30% less Energy Usage and 50% less Energy Capacity. Family keystones are described on each machine page.
+
 Hover the machine's starting node to see current attribute totals. Tool Control retains its separate durability mechanic; these machine conversions do not change tools.
 
 ## Modifier keywords and hard constraints
@@ -51,7 +57,7 @@ Fixed values and hard ceilings resolve after ordinary modifiers, including Gear.
 
 ## XP and chassis ownership
 
-Level 1 starts with no points; level 80 grants 79 points. Levels 1–30 retain their previous cumulative XP thresholds. Each cumulative threshold after level 30 is the preceding threshold multiplied by 1.10 and rounded. This is a long-term progression curve, still subject to gameplay balance testing.
+Level 1 starts with no points; each level grants one point, so level 100 grants 99 points. Allocation storage, target builds, and build codes hold up to 120 points; the remaining 21 are reserved for a future non-level source. Levels 1–30 retain their previous cumulative XP thresholds. Each cumulative threshold after level 30 is the preceding threshold multiplied by 1.10 and rounded. This is a long-term progression curve, still subject to gameplay balance testing.
 
 Successful work grants `base machine_xp × (1 + floor(band² / 20))`, followed by the band falloff below. Dense Crusher batches award XP per completed job. Failed work, idle placement, output waits, and recipes authored with zero machine XP grant none.
 
@@ -62,13 +68,13 @@ Successful work grants `base machine_xp × (1 + floor(band² / 20))`, followed b
 | Two above band | 25% |
 | Three or more above band | 0% |
 
-Quarter-XP remainders persist. Positive-XP Crusher recipes derive bands from hardness; Furnace recipes derive them from target heat. Their old 1–25 bands map to 1–78 with `min(78, 1 + floor((oldBand − 1) × 77 / 24))`. An explicitly authored `machine_xp_band` uses the new level scale directly. Forestry uses `min(78, 12 + floor(sqrt(Tree Fell Limit)) × 8)` for completed planting, leaf cleanup, and harvesting actions. Stronger work capability raises its training ceiling. Work in band 78 can eventually reach level 80.
+Quarter-XP remainders persist. Positive-XP Crusher recipes derive bands from hardness; Furnace recipes derive them from target heat. Their old 1–25 bands map to 1–98 with `min(98, 1 + floor((oldBand − 1) × 97 / 24))`. An explicitly authored `machine_xp_band` uses the new level scale directly. Forestry uses `min(98, 12 + floor(sqrt(Tree Fell Limit)) × 10)` for completed planting, leaf cleanup, and harvesting actions. Stronger work capability raises its training ceiling. Work in band 98 can eventually reach level 100.
 
-Progression survives supported drops, pick-block, and replacement through `rngtech:machine_progression`. It does not transfer to independently crafted higher-stage chassis. Existing saves preserve XP and earned levels while refunding old machine-specific allocations. New saves store versioned stable node IDs and ordered target builds instead of two node masks.
+Progression survives supported drops, pick-block, and replacement through `rngtech:machine_progression`. It does not transfer to independently crafted higher-stage chassis. Existing saves preserve XP and earned levels while refunding old machine-specific allocations. New saves store versioned stable node IDs and ordered target builds instead of two node masks. Catalog version 2 replaced the version 1 layout, so version 1 allocations and target builds are refunded and version 1 build codes are rejected.
 
 ## Allocating, refunding, and copying
 
-Open Mastery to browse the tree. Drag to pan and scroll to zoom at the cursor; Shift-scroll pans sideways and Ctrl-scroll pans vertically. Toolbar controls expand the view, fit the tree, or return home. Find searches names, IDs, and stat effects, shows the match count, and rings every match so it stays visible when zoomed out; Enter cycles through matches. The relevance control highlights useful nodes. Hover nodes for exact effects, constraints, and refund instructions.
+Open Mastery to browse the tree. Drag to pan and scroll to zoom at the cursor; Shift-scroll pans sideways and Ctrl-scroll pans vertically. Toolbar controls expand the view, fit the tree, or return home. Find searches names, IDs, and stat effects, shows the match count, and rings every match so it stays visible when zoomed out; Enter cycles through matches. Entering exactly `keystone`, `notable`, or `travel` (singular or plural) highlights every node of that type instead. The relevance control highlights useful nodes. Hover nodes for exact effects, constraints, and refund instructions.
 
 Hovering an unallocated node previews the shortest route from your allocations and its point cost. Left-click allocates the whole route in one server action when you can afford it and installed Gear allows every node on it; otherwise nothing is allocated and the tooltip explains why. Allocation happens on release, so a drag that starts on a node only pans. Right-click an allocated node to refund it. Each removed node costs one **Mastery Refund**, crafted eight at a time from paper, redstone, and a copper ingot. Refunds must leave every remaining allocation connected and keep installed Gear legal. Shift-click Clear pays the same per-node price for the whole tree. Creative players do not consume refunds.
 
@@ -78,8 +84,8 @@ The Configurator has a dedicated Mastery mode. Sneak-use in air toggles between 
 
 ## Authoring and verification
 
-The checked-in runtime catalog is `src/main/resources/data/rngtech/mastery/machine_tree.json`. `tools/moddex/author-mega-tree.mjs` deterministically authors its rewards and node names; `layout-mega-tree.mjs` authors connected attribute roads with optional reward arcs, horseshoes, and rings, without crossings. ModDex reads this catalog directly; its JSON draft and Java layout exports remain authoring views rather than runtime catalog writers. Follow [Passive Tree Design Rules](../reference/passive-tree-design-rules.md) when changing geometry or routes.
+The checked-in runtime catalog is `src/main/resources/data/rngtech/mastery/machine_tree.json`. `tools/moddex/layout-mega-tree.mjs` deterministically lays out the road layers, keystone placements, and reward constellations without crossings; `author-mega-tree.mjs` assigns attributes, themes, notable names, special notables, and keystones, then writes the catalog and language entries. ModDex reads this catalog directly; its JSON draft and Java layout exports remain authoring views rather than runtime catalog writers. Follow [Passive Tree Design Rules](../reference/passive-tree-design-rules.md) when changing geometry or routes.
 
-Run `node tools/moddex/check-mega-tree.mjs --report` to refresh the [audit report](../reference/machine-mega-tree-audit.json). It includes paths from all starts and representative 79-point builds combining local investment with distant keystones. `masteryCheck`, included in `quickCheck` and `ciCheck`, checks modifier math, migration, build ordering, connectivity, point budgets, attribute suppression, and hard constraints. `npm run moddex:check` checks catalog geometry and export consistency.
+Run `node tools/moddex/check-mega-tree.mjs --report` to refresh the [audit report](../reference/machine-mega-tree-audit.json). It includes paths from all starts and representative 99-point builds combining local investment with distant keystones. `masteryCheck`, included in `quickCheck` and `ciCheck`, checks modifier math, migration, build ordering, connectivity, point budgets, attribute suppression, and hard constraints. `npm run moddex:check` checks catalog geometry and export consistency.
 
 The implementation has automated domain and graph coverage. In-game interaction, multiplayer synchronization, and late-game balance still need focused playtesting.

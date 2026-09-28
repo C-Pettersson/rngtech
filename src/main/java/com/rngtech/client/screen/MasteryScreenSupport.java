@@ -327,6 +327,10 @@ public final class MasteryScreenSupport<N extends PassiveNode> {
             guiGraphics.renderComponentTooltip(font, List.of(Component.translatable("rngtech.mastery.toolbar." + tool)), mouseX, mouseY);
             return;
         }
+        if (!searchFocused && isOverSearch(leftPos, topPos, imageWidth, mouseX, mouseY)) {
+            guiGraphics.renderComponentTooltip(font, List.of(Component.translatable("rngtech.mastery.tooltip.search")), mouseX, mouseY);
+            return;
+        }
         if (isOverExpandButton(leftPos, topPos, imageWidth, mouseX, mouseY)) {
             guiGraphics.renderComponentTooltip(
                     font,
@@ -394,8 +398,7 @@ public final class MasteryScreenSupport<N extends PassiveNode> {
             }
             return true;
         }
-        searchFocused = mouseX >= leftPos + MASTERY_SEARCH_X && mouseX < leftPos + imageWidth - 8
-                && mouseY >= topPos + 42 && mouseY < topPos + 54;
+        searchFocused = isOverSearch(leftPos, topPos, imageWidth, mouseX, mouseY);
         if (searchFocused) { return true; }
         if (isOverExpandButton(leftPos, topPos, imageWidth, mouseX, mouseY)) {
             toggleExpanded(imageWidth, imageHeight);
@@ -574,15 +577,27 @@ public final class MasteryScreenSupport<N extends PassiveNode> {
         if (search.isBlank()) {
             return;
         }
-        String term = search.toLowerCase(Locale.ROOT);
+        String term = search.strip().toLowerCase(Locale.ROOT);
         String idTerm = term.replace(' ', '_');
+        PassiveNodeKind kind = searchKind(term);
         for (int position = 0; position < nodes.size(); position++) {
-            if (nodes.get(position) instanceof MegaPassiveNode node
-                    && (searchText(position).contains(term) || node.id().contains(idTerm))) {
+            if (nodes.get(position) instanceof MegaPassiveNode node && (kind != null ? node.kind() == kind
+                    : searchText(position).contains(term) || node.id().contains(idTerm))) {
                 searchMatches.set(position);
                 matchCount++;
             }
         }
+    }
+
+    /** A query that is exactly a node-type word, such as "keystones", highlights every node of that type. */
+    private static PassiveNodeKind searchKind(String term) {
+        for (PassiveNodeKind kind : List.of(PassiveNodeKind.KEYSTONE, PassiveNodeKind.NOTABLE, PassiveNodeKind.TRAVEL)) {
+            String words = Component.translatable("rngtech.mastery.search.kind." + kind.name().toLowerCase(Locale.ROOT)).getString();
+            if (List.of(words.toLowerCase(Locale.ROOT).split("\\|")).contains(term)) {
+                return kind;
+            }
+        }
+        return null;
     }
 
     private String searchText(int position) {
@@ -1093,6 +1108,11 @@ public final class MasteryScreenSupport<N extends PassiveNode> {
                 && mouseX < leftPos + viewRight(imageWidth)
                 && mouseY >= topPos + MASTERY_VIEW_Y
                 && mouseY < topPos + viewBottom(imageHeight);
+    }
+
+    private static boolean isOverSearch(int leftPos, int topPos, int imageWidth, double mouseX, double mouseY) {
+        return mouseX >= leftPos + MASTERY_SEARCH_X && mouseX < leftPos + imageWidth - 8
+                && mouseY >= topPos + 42 && mouseY < topPos + 54;
     }
 
     private boolean isOverExpandButton(int leftPos, int topPos, int imageWidth, double mouseX, double mouseY) {

@@ -338,7 +338,7 @@ public class ForestryCartEntity extends AbstractMinecart implements MenuProvider
 
     private void addMachineXp(int amount) {
         if (amount > 0) {
-            int band = Math.min(78, 12 + (int) Math.sqrt(Math.max(0, effectiveStats().value(MachineStat.TREE_FELL_LIMIT))) * 8);
+            int band = Math.min(MachineProgressionState.MAX_LEVEL - 2, 12 + (int) Math.sqrt(Math.max(0, effectiveStats().value(MachineStat.TREE_FELL_LIMIT))) * 10);
             grantMasteryXp(MachineProgressionState.workXp(amount, band), MachineProgressionState.xpQuarters(machineProgression().level(), band));
         }
     }

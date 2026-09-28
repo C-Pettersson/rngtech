@@ -4,11 +4,11 @@ Status: Prototype
 
 ## Accepted design
 
-- One 600–900-node graph for functional machines, with six starts around an inner ring and only three attributes: Control, Drive, and Reserve. The other starts mix pairs of those attributes.
+- One graph of about 1300 nodes for functional machines, with six starts on a start ring around a central pathing core and only three attributes: Control, Drive, and Reserve. The other starts mix pairs of those attributes.
 - First integrations: Crusher (Drive), Furnace (Drive/Reserve), Forestry Companion (Control/Drive). Other processors, generators, storage machines, and companions follow; Gear and cables are excluded.
-- Approximately half the nodes grant travel attributes on a connected road network. Travel steps separate optional reward arcs and rings; notables require at least three allocations into a reward branch. Single-entry reward pockets cannot shortcut between roads. Repeated reward packages support home-region investment plus a distant specialty.
-- Keep the full tree asymmetric, with irregular cluster placement and connections. Avoid concentric rings, mirrored sectors, and evenly repeated keystone pairs.
-- One point per non-starter node, 79 points at level 80. Connected paths govern access; irrelevant effects remain selectable. Gear validation still applies.
+- Approximately half the nodes grant travel attributes on a connected road network. Distinct layers of travel separate the core, home regions, middle ring, and outer field. Travel steps separate optional reward constellations; notables require at least three allocations into a reward branch. Single-entry reward pockets cannot shortcut between roads. Repeated reward packages support home-region investment plus a distant specialty.
+- Keep the layers varied: each home region has its own road silhouette, and hubs and constellations are placed irregularly. Avoid rings of identical clusters, mirrored sectors, and evenly repeated keystone pairs. Keystones are spread through every layer, including the core, and may sit directly on roads when they are at least 10 points from every start.
+- One point per non-starter node, 99 points at level 100. Storage allows 120 points for a future non-level source. Connected paths govern access; irrelevant effects remain selectable. Gear validation still applies.
 - Ordinary bonuses support chassis and Gear. Keystones offer major tradeoffs or distinct behavior, including family-specific effects.
 - Attributes have totals, family-specific inherent conversions, and separately authored explicit scaling. Attribute clusters may increase individual/all attributes. “Attributes grant no inherent bonuses” preserves totals and explicit scaling.
 - Absolute values and ceilings resolve after ordinary modifiers. Lower conflicting absolute maximum values win. A hard recipe ceiling is distinct from a fixed processing-level stat and must explicitly forbid recipes above its limit.

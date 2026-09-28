@@ -14,7 +14,7 @@ public record MachineProgressionState(
         String startNodeId, List<String> targetNodes, boolean following
 ) implements PassiveProgressionView {
     public static final int MIN_LEVEL = 1;
-    public static final int MAX_LEVEL = 80;
+    public static final int MAX_LEVEL = 100;
     public static final int XP_REMAINDER_SCALE = 4;
     private static final long[] LEVEL_XP = createLevelXp();
     public static final MachineProgressionState EMPTY = new MachineProgressionState(0, 0, 1, List.of(), "", List.of(), false);
@@ -125,7 +125,7 @@ public record MachineProgressionState(
         long multiplier = 1L + (long) Math.max(1, band) * Math.max(1, band) / 20;
         return base > Long.MAX_VALUE / multiplier ? Long.MAX_VALUE : base * multiplier;
     }
-    public static int progressionBand(int legacyBand) { return Math.min(78, 1 + Math.max(0, legacyBand - 1) * 77 / 24); }
+    public static int progressionBand(int legacyBand) { return Math.min(MAX_LEVEL - 2, 1 + Math.max(0, legacyBand - 1) * (MAX_LEVEL - 3) / 24); }
     private static long[] createLevelXp() {
         long[] old = {0, 100, 243, 448, 741, 1160, 1760, 2619, 3848, 5600, 8100, 11650, 16650, 23650,
                 33500, 47300, 66600, 93600, 131300, 184000, 257800, 361100, 505700, 708100, 991500,

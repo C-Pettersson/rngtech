@@ -1,9 +1,13 @@
 import assert from "node:assert/strict";
 import { readFile, writeFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
+import { KEYSTONE_START_DISTANCE } from "./layout-mega-tree.mjs";
 
 export const megaCatalogUrl = new URL("../../src/main/resources/data/rngtech/mastery/machine_tree.json", import.meta.url);
 export const diameters = { STARTER: 40, TRAVEL: 12, NODE: 18, NOTABLE: 34, KEYSTONE: 48 };
+export const CATALOG_NODES = 1300;
+// Points earned from levels 2-100. Allocation storage allows 120 for future non-level sources.
+export const LEVEL_POINTS = 99;
 
 export function auditMegaTree(tree) {
     const errors = [], byId = new Map(tree.nodes.map(node => [node.id, node]));
@@ -77,10 +81,8 @@ export function auditMegaTree(tree) {
                 notableInvestment.push(depth.get(id));
                 if(depth.get(id)<3)errors.push("Notable needs at least three reward allocations: "+id);
             }
-            if(byId.get(id).kind==="KEYSTONE") {
-                keystoneInvestment.push(depth.get(id));
-                if(depth.get(id)<4)errors.push("Keystone bypasses reward investment: "+id);
-            }
+            // Keystones may attach directly to a road; their distance from every start is checked below.
+            if(byId.get(id).kind==="KEYSTONE") keystoneInvestment.push(depth.get(id));
         }
     }
     let minimumGateTravel=Infinity;
@@ -107,7 +109,7 @@ export function auditMegaTree(tree) {
         if (depth.size !== tree.nodes.length - roots.length + 1) errors.push(`Unreachable nodes from ${root.id}`);
         distances[root.id] = Object.fromEntries(tree.nodes.filter(n=>n.kind === "KEYSTONE").map(n=>[n.id,depth.get(n.id)]));
         for (const [id, distance] of Object.entries(distances[root.id])) {
-            if (distance < 7 || distance > 79) errors.push(`Keystone commitment ${root.id} / ${id}: ${distance}`);
+            if (distance < KEYSTONE_START_DISTANCE || distance > LEVEL_POINTS) errors.push(`Keystone commitment ${root.id} / ${id}: ${distance}`);
         }
         const ordered = [];
         const candidates = tree.nodes.filter(n=>n.kind === "KEYSTONE").sort((a,b)=>depth.get(a.id)-depth.get(b.id));
@@ -117,15 +119,25 @@ export function auditMegaTree(tree) {
             for (let id=destination.id; id!==root.id; id=parent.get(id)) path.unshift(id);
             for (const id of path) if (!ordered.includes(id)) ordered.push(id);
         }
-        for (let i=0; ordered.length < 79 && i < queue.length; i++) {
+        for (let i=0; ordered.length < LEVEL_POINTS && i < queue.length; i++) {
             const id=queue[i];
             if (id!==root.id && !ordered.includes(id) && adjacency.get(id).some(n=>n===root.id || ordered.includes(n))) ordered.push(id);
         }
         builds[root.id] = ordered;
-        if (ordered.length !== 79) errors.push(`Representative build budget from ${root.id}: ${ordered.length}`);
+        if (ordered.length !== LEVEL_POINTS) errors.push(`Representative build budget from ${root.id}: ${ordered.length}`);
+    }
+    // Every start sits in the occupied center region, with room for core pathing inside the start ring.
+    const xs = tree.nodes.map(n => n.x), ys = tree.nodes.map(n => n.y);
+    const bounds = { minX: Math.min(...xs), minY: Math.min(...ys), width: Math.max(...xs) - Math.min(...xs), height: Math.max(...ys) - Math.min(...ys) };
+    const startPositions = Object.fromEntries(roots.map(root => [root.id, {
+        x: Math.round((root.x - bounds.minX) / bounds.width * 100) / 100,
+        y: Math.round((root.y - bounds.minY) / bounds.height * 100) / 100
+    }]));
+    for (const [id, position] of Object.entries(startPositions)) {
+        if (position.x < 0.3 || position.x > 0.7 || position.y < 0.3 || position.y > 0.7) errors.push(`Start outside center region: ${id}`);
     }
     const lengths = edges.map(([a,b])=>Math.hypot(a.x-b.x,a.y-b.y)).sort((a,b)=>a-b);
-    return { errors, builds, metrics: { nodes:tree.nodes.length, starts:roots.length, kinds:Object.fromEntries(Object.keys(caps).map(k=>[k,tree.nodes.filter(n=>n.kind===k).length])), groups: new Set(tree.nodes.map(n=>n.group)).size, edges:tree.links.length, cycleRank:tree.links.length-tree.nodes.length+1, investment, overlaps, throughNodes, crossings, medianLength:lengths[Math.floor(lengths.length/2)], p90Length:lengths[Math.floor(lengths.length*.9)], distances } };
+    return { errors, builds, metrics: { nodes:tree.nodes.length, starts:roots.length, startPositions, kinds:Object.fromEntries(Object.keys(caps).map(k=>[k,tree.nodes.filter(n=>n.kind===k).length])), groups: new Set(tree.nodes.map(n=>n.group)).size, edges:tree.links.length, cycleRank:tree.links.length-tree.nodes.length+1, investment, overlaps, throughNodes, crossings, medianLength:lengths[Math.floor(lengths.length/2)], p90Length:lengths[Math.floor(lengths.length*.9)], distances } };
 }
 
 function segmentDistance(p,a,b) {
@@ -137,7 +149,7 @@ function segmentDistance(p,a,b) {
 export async function checkMegaTree({log=true}={}) {
     const tree=JSON.parse(await readFile(megaCatalogUrl,"utf8"));
     const audit=auditMegaTree(tree);
-    assert.equal(tree.nodes.length,750);
+    assert.equal(tree.nodes.length,CATALOG_NODES);
     assert.equal(new Set(tree.nodes.map(n=>n.id)).size,tree.nodes.length);
     assert.equal(audit.metrics.starts,6);
     if(log) console.log(`Mega tree ${audit.errors.length ? "FAIL" : "PASS"}: ${JSON.stringify({...audit.metrics,distances:undefined})}`);
@@ -154,7 +166,10 @@ export async function checkMegaTree({log=true}={}) {
     assert.ok(auditMegaTree(bypass).errors.some(e=>e.startsWith("Reward pocket must have one road gate")));
     const lookup=new Map(tree.nodes.map(n=>[n.id,n]));
     const disconnected=structuredClone(tree);
-    const approach=disconnected.links.findIndex(([a,b])=>lookup.get(a).kind==="TRAVEL"&&lookup.get(b).kind==="TRAVEL"&&lookup.get(a).group.startsWith("start_")&&!lookup.get(b).group.startsWith("start_"));
+    // Cutting a start's first road step from the rest of its road leaves that step reachable only through the start.
+    const starter=tree.nodes.find(n=>n.kind==="STARTER");
+    const exit=tree.links.flatMap(([a,b])=>a===starter.id?[b]:b===starter.id?[a]:[])[0];
+    const approach=disconnected.links.findIndex(([a,b])=>(a===exit||b===exit)&&lookup.get(a===exit?b:a).kind==="TRAVEL");
     assert.ok(approach>=0);
     disconnected.links.splice(approach,1);
     assert.ok(auditMegaTree(disconnected).errors.some(e=>e.startsWith("Travel network must connect")));
