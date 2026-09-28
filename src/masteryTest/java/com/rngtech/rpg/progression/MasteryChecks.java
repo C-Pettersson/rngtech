@@ -34,6 +34,7 @@ public final class MasteryChecks {
         taggedPayoffs();
         keystonePayoffsNeedTheirCosts();
         bonusSummary();
+        iconTextures();
         System.out.println("Machine mastery: " + checks + " checks passed");
     }
 
@@ -347,6 +348,15 @@ public final class MasteryChecks {
         List<MachineStat> all = new ArrayList<>(first);
         all.addAll(second);
         return all;
+    }
+
+    private static void iconTextures() {
+        for (MegaPassiveNode node : MegaPassiveTree.TREE.nodes().stream().filter(n -> n.kind() == PassiveNodeKind.KEYSTONE).toList()) {
+            require(node.masteryIconKey().equals(node.id()), "keystone draws its own icon: " + node.id());
+        }
+        for (String key : MegaPassiveTree.TREE.nodes().stream().map(MegaPassiveNode::masteryIconKey).collect(Collectors.toSet())) {
+            require(MasteryChecks.class.getResource("/assets/rngtech/textures/gui/mastery/" + key + ".png") != null, "icon texture exists: " + key);
+        }
     }
 
     private static void bonusSummary() {

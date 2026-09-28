@@ -33,7 +33,9 @@ public record MegaPassiveNode(
     @Override public boolean grantsNothing() { return effects.isEmpty() && tagged.isEmpty(); }
     @Override public List<MegaPassiveNode> parents() { return links.stream().map(MegaPassiveTree::node).toList(); }
     @Override public MachineModifier modifier() { return MachineModifier.roll(id, id, ModifierSlot.IMPLICIT, 0, effects); }
+    /** Keystones are drawn with their own {@code textures/gui/mastery/<id>.png}; other nodes show their first stat. */
     @Override public String masteryIconKey() {
+        if (kind == PassiveNodeKind.KEYSTONE) { return id; }
         MachineModifierEffect first = !effects.isEmpty() ? effects.getFirst() : !tagged.isEmpty() ? tagged.getFirst().effect() : null;
         if (first == null) { return kind == PassiveNodeKind.STARTER ? "control" : "stability"; }
         return switch (first.stat()) {
