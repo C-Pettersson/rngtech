@@ -7,6 +7,9 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public final class MasteryOperations {
     private MasteryOperations() { }
 
@@ -15,7 +18,7 @@ public final class MasteryOperations {
         MachineProgressionState state = host.masteryState();
         switch (action) {
             case "allocate":
-                if (host.allocateMastery(MegaPassiveTree.node(value))) { return true; }
+                if (host.allocateMasteryPath(path(value))) { return true; }
                 return fail(player, "allocation_failed");
             case "paste":
                 if (!state.allocatedNodes().isEmpty()) { return fail(player, "requires_clear"); }
@@ -50,6 +53,19 @@ public final class MasteryOperations {
                 return fail(player, "no_configurator");
             default: return false;
         }
+    }
+
+    /** Parses one node ID or a comma-separated route in allocation order. */
+    private static List<MegaPassiveNode> path(String value) {
+        String[] ids = value.split(",", MegaPassiveTree.MAX_ALLOCATIONS + 1);
+        if (ids.length > MegaPassiveTree.MAX_ALLOCATIONS) { return List.of(); }
+        List<MegaPassiveNode> path = new ArrayList<>();
+        for (String id : ids) {
+            MegaPassiveNode node = MegaPassiveTree.node(id);
+            if (node == null) { return List.of(); }
+            path.add(node);
+        }
+        return path;
     }
 
     private static boolean consumeRefunds(Player player, int cost) {

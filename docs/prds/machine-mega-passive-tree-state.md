@@ -27,6 +27,7 @@ Status: **Done** — implementation and travel-road redesign completed 2026-09-2
 - Every notable requires three reward allocations from its road gate; keystones continue those branches at four. Distinct gates have intervening travel nodes. Reward branches cannot shortcut between roads.
 - Preserved all 750 stable IDs and authored rewards, including modifier operations. Only grouping, placement, and connections changed in this redesign.
 - Updated the design rules, catalog audit, ModDex source export, and generated overview.
+- Reworked the Mastery screen for the 750-node catalog: batched, viewport-culled geometry replaces per-pixel fills; icons draw once per texture; allocation, search, and relevance state is cached. Hovering previews the shortest route, clicking allocates it atomically, allocation happens on release, scrolling zooms at the cursor, and right-click refunds now reach the tree.
 
 ## Verification
 
@@ -36,6 +37,7 @@ Status: **Done** — implementation and travel-road redesign completed 2026-09-2
 - Keystone shortest paths from all six starts range from 15 to 42 points. Representative builds spend exactly 79 points.
 - ModDex fitted Visual Audit passes with zero proper crossings and zero long chords.
 - npm run repo:check and mkdocs build --strict — passed after the travel-road redesign.
+- Mastery screen rework: Gradle ciCheck passed with 446 domain checks, including shortest routes and atomic rejection of unaffordable, disconnected, or Gear-blocked routes. npm run repo:check, npm run moddex:check, and mkdocs build --strict passed. The rendering and input changes still need an in-game playtest.
 
 ## Handoff and limits
 

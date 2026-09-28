@@ -1,5 +1,7 @@
 package com.rngtech.rpg.progression;
 
+import java.util.List;
+
 public interface MachineMasteryHost {
     MachineMasteryFamily masteryFamily();
     MachineProgressionState machineProgression();
@@ -22,10 +24,18 @@ public interface MachineMasteryHost {
     }
 
     default boolean allocateMastery(MegaPassiveNode node) {
-        MachineProgressionState state = masteryState();
-        if (!MegaPassiveTree.TREE.canUnlock(node, state)) { return false; }
-        MachineProgressionState next = state.withUnlockedNode(node.index());
-        if (!masteryGearAllows(next)) { return false; }
+        return node != null && allocateMasteryPath(List.of(node));
+    }
+
+    /** Allocates every node in order, or nothing when any step lacks points, a connection, or legal Gear. */
+    default boolean allocateMasteryPath(List<MegaPassiveNode> path) {
+        if (path.isEmpty()) { return false; }
+        MachineProgressionState next = masteryState();
+        for (MegaPassiveNode node : path) {
+            if (!MegaPassiveTree.TREE.canUnlock(node, next)) { return false; }
+            next = next.withUnlockedNode(node.index());
+            if (!masteryGearAllows(next)) { return false; }
+        }
         applyMasteryState(next);
         return true;
     }

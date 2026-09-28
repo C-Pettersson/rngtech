@@ -79,6 +79,36 @@ public final class MegaPassiveTree {
         return remaining.isEmpty();
     }
 
+    /**
+     * Returns the shortest run of unallocated nodes that connects {@code target} to the allocated graph, in allocation
+     * order. Foreign starts are never part of a route. Returns an empty list when the target is allocated or unreachable.
+     */
+    public static List<MegaPassiveNode> allocationPath(Predicate<MegaPassiveNode> allocated, MegaPassiveNode target) {
+        if (target == null || target.kind() == PassiveNodeKind.STARTER || allocated.test(target)) { return List.of(); }
+        List<MegaPassiveNode> nodes = TREE.nodes();
+        int[] previous = new int[nodes.size()];
+        java.util.Arrays.fill(previous, -2);
+        java.util.ArrayDeque<MegaPassiveNode> queue = new java.util.ArrayDeque<>();
+        for (MegaPassiveNode node : nodes) {
+            if (allocated.test(node)) { previous[node.index()] = -1; queue.add(node); }
+        }
+        while (!queue.isEmpty()) {
+            MegaPassiveNode current = queue.remove();
+            for (String id : current.links()) {
+                MegaPassiveNode next = node(id);
+                if (previous[next.index()] != -2 || next.kind() == PassiveNodeKind.STARTER) { continue; }
+                previous[next.index()] = current.index();
+                if (next == target) {
+                    List<MegaPassiveNode> path = new ArrayList<>();
+                    for (int index = target.index(); previous[index] != -1; index = previous[index]) { path.addFirst(byIndex(index)); }
+                    return List.copyOf(path);
+                }
+                queue.add(next);
+            }
+        }
+        return List.of();
+    }
+
     public static List<String> allocationOrder(String start, List<String> allocations) {
         List<String> remaining = new ArrayList<>(allocations);
         List<String> ordered = new ArrayList<>();

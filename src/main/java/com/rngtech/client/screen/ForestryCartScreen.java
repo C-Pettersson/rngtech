@@ -81,18 +81,6 @@ public class ForestryCartScreen extends AbstractContainerScreen<ForestryCartMenu
                     }
 
                     @Override
-                    public boolean unlock(MegaPassiveNode node) {
-                        if (minecraft == null || minecraft.player == null || minecraft.gameMode == null) {
-                            return false;
-                        }
-                        if (!menu.canUnlockPassiveNode(node) || !menu.clickMenuButton(minecraft.player, node.buttonId())) {
-                            return false;
-                        }
-                        net.neoforged.neoforge.network.PacketDistributor.sendToServer(new com.rngtech.content.network.MasteryActionPayload(menu.containerId, "allocate", node.id()));
-                        return true;
-                    }
-
-                    @Override
                     public void appendSpecialTooltip(MegaPassiveNode node, List<Component> tooltip) {
                         if (node.behaviors().contains("MAGNET_MODE")) {
                             tooltip.add(Component.translatable("rngtech.mastery.tooltip.forestry_companion.magnet_mode")
@@ -161,7 +149,7 @@ public class ForestryCartScreen extends AbstractContainerScreen<ForestryCartMenu
         } else if (menu.selectedTab() == ForestryCartMenu.TAB_STATS) {
             renderStats(guiGraphics);
         } else {
-            masterySupport.render(guiGraphics, leftPos, topPos, imageWidth, imageHeight);
+            masterySupport.render(guiGraphics, leftPos, topPos, imageWidth, imageHeight, mouseX, mouseY);
         }
     }
 
@@ -213,10 +201,10 @@ public class ForestryCartScreen extends AbstractContainerScreen<ForestryCartMenu
                 sendButton(ForestryCartMenu.BUTTON_TOGGLE_MANUAL_SPEED);
                 return true;
             }
-            if (menu.selectedTab() == ForestryCartMenu.TAB_MASTERY
-                    && masterySupport.mouseClicked(mouseX, mouseY, button, leftPos, topPos, imageWidth, imageHeight)) {
-                return true;
-            }
+        }
+        if (menu.selectedTab() == ForestryCartMenu.TAB_MASTERY
+                && masterySupport.mouseClicked(mouseX, mouseY, button, leftPos, topPos, imageWidth, imageHeight)) {
+            return true;
         }
         return super.mouseClicked(mouseX, mouseY, button);
     }
@@ -232,7 +220,7 @@ public class ForestryCartScreen extends AbstractContainerScreen<ForestryCartMenu
 
     @Override
     public boolean mouseReleased(double mouseX, double mouseY, int button) {
-        if (masterySupport.mouseReleased(button)) {
+        if (masterySupport.mouseReleased(mouseX, mouseY, button, leftPos, topPos, imageWidth, imageHeight)) {
             return true;
         }
         return super.mouseReleased(mouseX, mouseY, button);

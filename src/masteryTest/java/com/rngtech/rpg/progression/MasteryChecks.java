@@ -23,6 +23,7 @@ public final class MasteryChecks {
         keywordMath();
         savesAndMigration();
         graphAndBuilds();
+        routeAllocation();
         attributesAndConstraints();
         System.out.println("Machine mastery: " + checks + " checks passed");
     }
@@ -109,6 +110,50 @@ public final class MasteryChecks {
         while (overBudget.size() < 80) { overBudget.add(code.nodes().getFirst()); }
         require(!MegaPassiveTree.validBuild(code.start(), overBudget), "target builds cannot exceed the point ceiling");
         require(fresh.withUnlockedNode(MegaPassiveTree.node("soft_material_specialist").index()).equals(fresh), "reject forged distant unlock");
+    }
+
+    private static void routeAllocation() {
+        var fresh = MachineProgressionState.EMPTY.forFamily(MachineMasteryFamily.CRUSHER).withAddedXp(MachineProgressionState.xpForLevel(80));
+        MegaPassiveNode target = MegaPassiveTree.node("soft_material_specialist");
+        List<MegaPassiveNode> route = MegaPassiveTree.allocationPath(node -> node.isUnlocked(fresh), target);
+        List<String> ids = route.stream().map(MegaPassiveNode::id).toList();
+        require(route.size() > 1 && route.getLast() == target, "route ends at the requested node");
+        require(route.size() == path(fresh.startNodeId(), target.id()).size(), "route is a shortest path");
+        require(MegaPassiveTree.validBuild(fresh.startNodeId(), ids), "route is a legal allocation order");
+        var partial = new MachineProgressionState(fresh.xp(), 0, fresh.level(), ids.subList(0, 2), fresh.startNodeId(), List.of(), false);
+        List<String> continued = new ArrayList<>(partial.allocatedNodes());
+        MegaPassiveTree.allocationPath(node -> node.isUnlocked(partial), target).forEach(node -> continued.add(node.id()));
+        require(continued.size() == route.size() && continued.getLast().equals(target.id())
+                && MegaPassiveTree.validBuild(fresh.startNodeId(), continued), "route continues from existing allocations");
+        require(MegaPassiveTree.allocationPath(node -> node.isUnlocked(fresh), MegaPassiveTree.node("start_control")).isEmpty(), "foreign starts are not route targets");
+
+        var host = new CheckHost(fresh, state -> true);
+        require(host.allocateMasteryPath(route) && host.state.allocatedNodes().equals(ids), "one action allocates the whole route");
+        require(MegaPassiveTree.allocationPath(node -> node.isUnlocked(host.state), target).isEmpty(), "allocated target has no route");
+        int level = route.size();
+        var poor = new CheckHost(new MachineProgressionState(MachineProgressionState.xpForLevel(level), 0, level, List.of(), fresh.startNodeId(), List.of(), false), state -> true);
+        require(!poor.allocateMasteryPath(route) && poor.state.allocatedNodes().isEmpty(), "unaffordable route allocates nothing");
+        String conflict = ids.get(ids.size() / 2);
+        var blocked = new CheckHost(fresh, state -> !state.allocatedNodes().contains(conflict));
+        require(!blocked.allocateMasteryPath(route) && blocked.state.allocatedNodes().isEmpty(), "gear conflict on a route allocates nothing");
+        var skipped = new CheckHost(fresh, state -> true);
+        require(!skipped.allocateMasteryPath(route.subList(1, route.size())) && skipped.state.allocatedNodes().isEmpty(), "disconnected route allocates nothing");
+        require(!skipped.allocateMasteryPath(List.of()), "empty route is rejected");
+    }
+
+    private static final class CheckHost implements MachineMasteryHost {
+        private final java.util.function.Predicate<MachineProgressionState> gear;
+        private MachineProgressionState state;
+
+        private CheckHost(MachineProgressionState state, java.util.function.Predicate<MachineProgressionState> gear) {
+            this.state = state;
+            this.gear = gear;
+        }
+
+        @Override public MachineMasteryFamily masteryFamily() { return MachineMasteryFamily.CRUSHER; }
+        @Override public MachineProgressionState machineProgression() { return state; }
+        @Override public void setMachineProgression(MachineProgressionState state) { this.state = state; }
+        @Override public boolean masteryGearAllows(MachineProgressionState state) { return gear.test(state); }
     }
 
     private static void attributesAndConstraints() {

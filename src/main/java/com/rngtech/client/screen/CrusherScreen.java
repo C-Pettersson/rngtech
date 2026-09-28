@@ -121,20 +121,6 @@ public class CrusherScreen extends AbstractContainerScreen<CrusherMenu> {
                     }
 
                     @Override
-                    public boolean unlock(MegaPassiveNode node) {
-                        if (minecraft == null || minecraft.player == null || minecraft.gameMode == null) {
-                            return false;
-                        }
-                        if (!menu.canUnlockPassiveNode(node)
-                                || !masteryNodeGearAllowsUnlock(node)
-                                || !menu.clickMenuButton(minecraft.player, node.buttonId())) {
-                            return false;
-                        }
-                        net.neoforged.neoforge.network.PacketDistributor.sendToServer(new com.rngtech.content.network.MasteryActionPayload(menu.containerId, "allocate", node.id()));
-                        return true;
-                    }
-
-                    @Override
                     public void appendSpecialTooltip(MegaPassiveNode node, List<Component> tooltip) {
                         if (node.blocksBatteryCell()) {
                             tooltip.add(Component.translatable("rngtech.mastery.tooltip.blocks_battery").withStyle(ChatFormatting.GOLD));
@@ -198,7 +184,7 @@ public class CrusherScreen extends AbstractContainerScreen<CrusherMenu> {
         } else if (menu.selectedTab() == CrusherMenu.TAB_REFINEMENT) {
             renderRefinement(guiGraphics);
         } else {
-            masterySupport.render(guiGraphics, leftPos, topPos, imageWidth, imageHeight);
+            masterySupport.render(guiGraphics, leftPos, topPos, imageWidth, imageHeight, mouseX, mouseY);
         }
     }
 
@@ -249,10 +235,10 @@ public class CrusherScreen extends AbstractContainerScreen<CrusherMenu> {
                     && RefinementScreenStyle.handleApplyClick(this, menu, mouseX, mouseY)) {
                 return true;
             }
-            if (menu.selectedTab() == CrusherMenu.TAB_MASTERY
-                    && masterySupport.mouseClicked(mouseX, mouseY, button, leftPos, topPos, imageWidth, imageHeight)) {
-                return true;
-            }
+        }
+        if (menu.selectedTab() == CrusherMenu.TAB_MASTERY
+                && masterySupport.mouseClicked(mouseX, mouseY, button, leftPos, topPos, imageWidth, imageHeight)) {
+            return true;
         }
         return super.mouseClicked(mouseX, mouseY, button);
     }
@@ -268,7 +254,7 @@ public class CrusherScreen extends AbstractContainerScreen<CrusherMenu> {
 
     @Override
     public boolean mouseReleased(double mouseX, double mouseY, int button) {
-        if (masterySupport.mouseReleased(button)) {
+        if (masterySupport.mouseReleased(mouseX, mouseY, button, leftPos, topPos, imageWidth, imageHeight)) {
             return true;
         }
         return super.mouseReleased(mouseX, mouseY, button);

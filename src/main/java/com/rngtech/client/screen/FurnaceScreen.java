@@ -157,18 +157,6 @@ public class FurnaceScreen extends AbstractContainerScreen<FurnaceMenu> {
                     }
 
                     @Override
-                    public boolean unlock(MegaPassiveNode node) {
-                        if (minecraft == null || minecraft.player == null || minecraft.gameMode == null) {
-                            return false;
-                        }
-                        if (!menu.canUnlockPassiveNode(node) || !menu.clickMenuButton(minecraft.player, node.buttonId())) {
-                            return false;
-                        }
-                        net.neoforged.neoforge.network.PacketDistributor.sendToServer(new com.rngtech.content.network.MasteryActionPayload(menu.containerId, "allocate", node.id()));
-                        return true;
-                    }
-
-                    @Override
                     public void appendSpecialTooltip(MegaPassiveNode node, List<Component> tooltip) {
                         if (node.behaviors().contains("QUENCH_PROTOCOL")) {
                             tooltip.add(Component.translatable("rngtech.mastery.tooltip.quench_protocol")
@@ -231,7 +219,7 @@ public class FurnaceScreen extends AbstractContainerScreen<FurnaceMenu> {
         } else if (menu.selectedTab() == FurnaceMenu.TAB_REFINEMENT) {
             renderRefinement(guiGraphics);
         } else {
-            masterySupport.render(guiGraphics, leftPos, topPos, imageWidth, imageHeight);
+            masterySupport.render(guiGraphics, leftPos, topPos, imageWidth, imageHeight, mouseX, mouseY);
         }
     }
 
@@ -281,10 +269,10 @@ public class FurnaceScreen extends AbstractContainerScreen<FurnaceMenu> {
                     && RefinementScreenStyle.handleApplyClick(this, menu, mouseX, mouseY)) {
                 return true;
             }
-            if (menu.selectedTab() == FurnaceMenu.TAB_MASTERY
-                    && masterySupport.mouseClicked(mouseX, mouseY, button, leftPos, topPos, imageWidth, imageHeight)) {
-                return true;
-            }
+        }
+        if (menu.selectedTab() == FurnaceMenu.TAB_MASTERY
+                && masterySupport.mouseClicked(mouseX, mouseY, button, leftPos, topPos, imageWidth, imageHeight)) {
+            return true;
         }
         return super.mouseClicked(mouseX, mouseY, button);
     }
@@ -300,7 +288,7 @@ public class FurnaceScreen extends AbstractContainerScreen<FurnaceMenu> {
 
     @Override
     public boolean mouseReleased(double mouseX, double mouseY, int button) {
-        if (masterySupport.mouseReleased(button)) {
+        if (masterySupport.mouseReleased(mouseX, mouseY, button, leftPos, topPos, imageWidth, imageHeight)) {
             return true;
         }
         return super.mouseReleased(mouseX, mouseY, button);
