@@ -11,7 +11,7 @@ public final class MachineStatDisplay {
     public static String statValue(MachineStat stat, double value) {
         return switch (stat) {
             case INPUT_SLOTS, OUTPUT_SLOTS, ADDON_SLOTS, BLOCK_FILTER_SLOTS -> formatUnit(value, "slot", "slots");
-            case DRIVE, RESERVE -> formatUnit(value, "point", "points");
+            case CONTROL, DRIVE, RESERVE -> formatUnit(value, "point", "points");
             case BATTERY_SLOTS -> formatUnit(value, "cell", "cells");
             case CRUSHER_INPUT_FILTER -> formatUnit(value, "filter", "filters");
             case PARALLEL_JOBS -> formatUnit(value, "job", "jobs");
@@ -70,8 +70,7 @@ public final class MachineStatDisplay {
                     PEAK_SOLAR_GENERATION,
                     MINING_SPEED,
                     ATTACK_SPEED,
-                    ORE_BURST_SPEED,
-                    CONTROL -> formatMultiplierDelta(value);
+                    ORE_BURST_SPEED -> formatMultiplierDelta(value);
             case BATTERY_SUPPORT -> "stage " + formatNumber(value);
             case SOLAR_PANEL_LIMIT -> formatUnit(value, "panel", "panels");
             default -> formatNumber(value);
@@ -83,11 +82,13 @@ public final class MachineStatDisplay {
     }
 
     public static MutableComponent effectText(MachineModifierEffect effect) {
-        return Component.translatable(
-                effectTextKey(effect.stat()),
-                effectValue(effect),
-                Component.translatable(effect.stat().translationKey())
-        );
+        double amount = switch (effect.operation()) {
+            case MORE -> (effect.value() - 1.0) * 100.0;
+            case LESS -> (1.0 - effect.value()) * 100.0;
+            default -> effect.value();
+        };
+        return Component.translatable("rngtech.stat.keyword." + effect.operation().name().toLowerCase(Locale.ROOT),
+                effect.operation() == ModifierOperation.ADD ? formatAdditiveEffectValue(effect.stat(), amount) : formatNumber(amount), Component.translatable(effect.stat().translationKey()));
     }
 
     public static String effectValue(MachineModifierEffect effect) {

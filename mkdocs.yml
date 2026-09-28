@@ -44,6 +44,7 @@ nav:
   - Getting Started: getting-started.md
   - Systems:
       - Progression: systems/progression.md
+      - Machine Mastery: systems/machine-mastery.md
       - Affix Generation: systems/affix-generation.md
       - Stage Progression and Ore Duplication: systems/stage-progression-and-ore-duplication.md
   - Modifiers:
@@ -91,6 +92,8 @@ nav:
       - Packer: modifiers/packer.md
       - Unique Item Ideas: reference/unique-item-ideas.md
       - Passive Tree Framework: prds/passive-tree-framework.md
+      - Machine Mega Passive Tree: prds/machine-mega-passive-tree.md
+      - Machine Mega Tree State: prds/machine-mega-passive-tree-state.md
       - Tree Farm Requirements: prds/tree-farm-automation.md
   - Reference:
       - Releasing: releasing.md

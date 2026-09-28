@@ -797,7 +797,8 @@ public enum CrusherPassiveNode implements StringRepresentable, PassiveNode {
     }
 
     public static CrusherPassiveNode byButtonId(int buttonId) {
-        return CrusherPassiveTree.TREE.byButtonId(buttonId);
+        int index = buttonId - 100;
+        return index >= 0 && index < values().length ? values()[index] : null;
     }
 
     @Override

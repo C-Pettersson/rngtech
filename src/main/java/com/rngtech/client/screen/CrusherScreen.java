@@ -5,8 +5,10 @@ import com.rngtech.content.blockentity.CrusherBlockEntity;
 import com.rngtech.content.item.CrushHeadItem;
 import com.rngtech.content.menu.CrusherMenu;
 import com.rngtech.rpg.MachineStat;
-import com.rngtech.rpg.progression.CrusherPassiveNode;
 import com.rngtech.rpg.progression.CrusherPassiveTree;
+import com.rngtech.rpg.progression.MachineMasteryFamily;
+import com.rngtech.rpg.progression.MegaPassiveNode;
+import com.rngtech.rpg.progression.MegaPassiveTree;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphics;
@@ -15,7 +17,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 
-import java.util.EnumMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -48,7 +49,7 @@ public class CrusherScreen extends AbstractContainerScreen<CrusherMenu> {
     private static final int PROCESSING_LEVEL_ICON_X = 184;
     private static final int PROCESSING_LEVEL_ICON_Y = 78;
     private static final int PROCESSING_LEVEL_MAX = 8;
-    private static final Map<CrusherPassiveNode, ResourceLocation> MASTERY_ICON_TEXTURES = createMasteryIconTextures();
+    private static final Map<MegaPassiveNode, ResourceLocation> MASTERY_ICON_TEXTURES = createMasteryIconTextures();
     private static final String[] STAT_LABEL_KEYS = {
             "rngtech.stat.input_slots",
             "rngtech.stat.crush_hardness",
@@ -91,11 +92,11 @@ public class CrusherScreen extends AbstractContainerScreen<CrusherMenu> {
             MachineStat.HIGH_HARDNESS_ENERGY_MITIGATION,
             MachineStat.CRUSHER_INPUT_FILTER
     };
-    private final MasteryScreenSupport<CrusherPassiveNode> masterySupport;
+    private final MasteryScreenSupport<MegaPassiveNode> masterySupport;
 
-    private static Map<CrusherPassiveNode, ResourceLocation> createMasteryIconTextures() {
-        EnumMap<CrusherPassiveNode, ResourceLocation> textures = new EnumMap<>(CrusherPassiveNode.class);
-        for (CrusherPassiveNode node : CrusherPassiveNode.values()) {
+    private static Map<MegaPassiveNode, ResourceLocation> createMasteryIconTextures() {
+        Map<MegaPassiveNode, ResourceLocation> textures = new java.util.HashMap<>();
+        for (MegaPassiveNode node : MegaPassiveTree.TREE.nodes()) {
             textures.put(node, RNGTech.id("textures/gui/mastery/" + node.masteryIconKey() + ".png"));
         }
         return Map.copyOf(textures);
@@ -110,17 +111,17 @@ public class CrusherScreen extends AbstractContainerScreen<CrusherMenu> {
         masterySupport = new MasteryScreenSupport<>(
                 CrusherPassiveTree.TREE,
                 CrusherPassiveTree.TREE.nodes(),
-                CrusherPassiveNode.STARTER,
+                MegaPassiveTree.node(MachineMasteryFamily.CRUSHER.startNodeId()),
                 MASTERY_ICON_TEXTURES,
                 menu,
                 new MasteryScreenSupport.Callbacks<>() {
                     @Override
-                    public boolean gearAllowsUnlock(CrusherPassiveNode node) {
+                    public boolean gearAllowsUnlock(MegaPassiveNode node) {
                         return masteryNodeGearAllowsUnlock(node);
                     }
 
                     @Override
-                    public boolean unlock(CrusherPassiveNode node) {
+                    public boolean unlock(MegaPassiveNode node) {
                         if (minecraft == null || minecraft.player == null || minecraft.gameMode == null) {
                             return false;
                         }
@@ -129,12 +130,12 @@ public class CrusherScreen extends AbstractContainerScreen<CrusherMenu> {
                                 || !menu.clickMenuButton(minecraft.player, node.buttonId())) {
                             return false;
                         }
-                        minecraft.gameMode.handleInventoryButtonClick(menu.containerId, node.buttonId());
+                        net.neoforged.neoforge.network.PacketDistributor.sendToServer(new com.rngtech.content.network.MasteryActionPayload(menu.containerId, "allocate", node.id()));
                         return true;
                     }
 
                     @Override
-                    public void appendSpecialTooltip(CrusherPassiveNode node, List<Component> tooltip) {
+                    public void appendSpecialTooltip(MegaPassiveNode node, List<Component> tooltip) {
                         if (node.blocksBatteryCell()) {
                             tooltip.add(Component.translatable("rngtech.mastery.tooltip.blocks_battery").withStyle(ChatFormatting.GOLD));
                         }
@@ -692,7 +693,7 @@ public class CrusherScreen extends AbstractContainerScreen<CrusherMenu> {
         return Component.translatable("rngtech.gear.tooltip.processing_level", menu.processingLevel());
     }
 
-    private boolean masteryNodeGearAllowsUnlock(CrusherPassiveNode node) {
+    private boolean masteryNodeGearAllowsUnlock(MegaPassiveNode node) {
         if (node.blocksBatteryCell() && CrusherBlockEntity.isBatteryCell(menu.getSlot(CrusherBlockEntity.SLOT_FUEL).getItem())) {
             return false;
         }
@@ -827,6 +828,15 @@ public class CrusherScreen extends AbstractContainerScreen<CrusherMenu> {
         int x = leftPos + 8 + index * TAB_SPACING;
         int y = topPos - 20;
         return mouseX >= x && mouseX < x + TAB_WIDTH && mouseY >= y && mouseY < y + 21;
+    }
+
+    @Override public boolean keyPressed(int key, int scan, int modifiers) {
+        if (menu.selectedTab() == CrusherMenu.TAB_MASTERY && masterySupport.keyPressed(key, scan, modifiers, imageWidth, imageHeight)) { return true; }
+        return super.keyPressed(key, scan, modifiers);
+    }
+    @Override public boolean charTyped(char character, int modifiers) {
+        if (menu.selectedTab() == CrusherMenu.TAB_MASTERY && masterySupport.charTyped(character)) { return true; }
+        return super.charTyped(character, modifiers);
     }
 
 }

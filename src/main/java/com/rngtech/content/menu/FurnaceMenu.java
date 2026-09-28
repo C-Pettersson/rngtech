@@ -3,9 +3,14 @@ package com.rngtech.content.menu;
 import com.rngtech.content.block.FurnaceBlock;
 import com.rngtech.content.blockentity.FurnaceBlockEntity;
 import com.rngtech.content.registry.ModMenus;
+import com.rngtech.rpg.MachineStat;
 import com.rngtech.rpg.MachineTraits;
-import com.rngtech.rpg.progression.FurnacePassiveNode;
 import com.rngtech.rpg.progression.FurnacePassiveTree;
+import com.rngtech.rpg.progression.MachineMasteryFamily;
+import com.rngtech.rpg.progression.MachineMasteryHost;
+import com.rngtech.rpg.progression.MachineProgressionState;
+import com.rngtech.rpg.progression.MegaPassiveNode;
+import com.rngtech.rpg.progression.MegaPassiveTree;
 import com.rngtech.rpg.progression.PassiveNode;
 import com.rngtech.rpg.progression.PassiveProgressionView;
 
@@ -26,7 +31,7 @@ import net.neoforged.neoforge.items.SlotItemHandler;
 
 import java.util.function.BooleanSupplier;
 
-public class FurnaceMenu extends AbstractContainerMenu implements MasteryMenuView<FurnacePassiveNode> {
+public class FurnaceMenu extends AbstractContainerMenu implements MasteryMenuView<MegaPassiveNode> {
     public static final int TAB_PROCESSING = 0;
     public static final int TAB_GEAR = 1;
     public static final int TAB_CONFIGURATION = 2;
@@ -94,7 +99,7 @@ public class FurnaceMenu extends AbstractContainerMenu implements MasteryMenuVie
     private final FurnaceBlockEntity furnace;
     private final ItemStackHandler refinementTarget = new ItemStackHandler(1);
     private final PassiveProgressionView passiveProgressionView =
-            MasteryMenuSupport.progressionView(this::hasPassiveNodeIndex, this::machineLevel, this::unspentPassivePoints);
+            MasteryMenuSupport.progressionView(this::hasPassiveNodeIndex, this::machineLevel, this::unspentPassivePoints, MachineMasteryFamily.FURNACE.startNodeId());
     private int selectedTab = TAB_PROCESSING;
 
     public FurnaceMenu(int containerId, Inventory playerInventory, RegistryFriendlyByteBuf extraData) {
@@ -385,7 +390,7 @@ public class FurnaceMenu extends AbstractContainerMenu implements MasteryMenuVie
         return node != null && node.isUnlocked(passiveProgressionView);
     }
 
-    public boolean canUnlockPassiveNode(FurnacePassiveNode node) {
+    public boolean canUnlockPassiveNode(MegaPassiveNode node) {
         return FurnacePassiveTree.TREE.canUnlock(node, passiveProgressionView);
     }
 
@@ -471,7 +476,7 @@ public class FurnaceMenu extends AbstractContainerMenu implements MasteryMenuVie
 
     @Override
     public boolean clickMenuButton(Player player, int id) {
-        FurnacePassiveNode passiveNode = FurnacePassiveNode.byButtonId(id);
+        MegaPassiveNode passiveNode = MegaPassiveTree.byButtonId(id);
         if (passiveNode != null) {
             if (player.level().isClientSide) {
                 return true;
@@ -625,4 +630,21 @@ public class FurnaceMenu extends AbstractContainerMenu implements MasteryMenuVie
             return activeSupplier.getAsBoolean();
         }
     }
+    @Override public MachineMasteryHost masteryHost() { return furnace; }
+    @Override public double masteryAttribute(MachineStat stat) { return MasteryMenuSupport.attribute(data, DATA_MACHINE_PROGRESSION_START, stat); }
+    @Override public boolean masterySupports(MachineStat stat) {
+        return masteryFamily().supports(stat) && switch (stat) {
+            case FUEL_DURATION, FUEL_EFFICIENCY -> !isElectric();
+            case ENERGY_USAGE, ENERGY_CAPACITY, ENERGY_CAPACITY_FLAT -> isElectric();
+            default -> true;
+        };
+    }
+    @Override public boolean masterySupportsBehavior(String behavior) {
+        return masteryFamily().supportsBehavior(behavior) && (!behavior.equals("CLOSED_LOOP_RECUPERATOR") || isElectric());
+    }
+    @Override public MachineMasteryFamily masteryFamily() { return MachineMasteryFamily.FURNACE; }
+    @Override public MachineProgressionState masterySnapshot() {
+        return MasteryMenuSupport.snapshot(data, DATA_MACHINE_PROGRESSION_START, masteryFamily());
+    }
+
 }

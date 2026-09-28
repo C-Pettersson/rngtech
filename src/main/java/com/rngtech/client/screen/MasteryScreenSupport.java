@@ -1,8 +1,13 @@
 package com.rngtech.client.screen;
 
 import com.rngtech.content.menu.MasteryMenuView;
+import com.rngtech.content.network.MasteryActionPayload;
+import com.rngtech.rpg.MachineStat;
 import com.rngtech.rpg.MachineStatDisplay;
+import com.rngtech.rpg.progression.MachineMasteryFamily;
 import com.rngtech.rpg.progression.MachineProgressionState;
+import com.rngtech.rpg.progression.MasteryBuildCode;
+import com.rngtech.rpg.progression.MegaPassiveNode;
 import com.rngtech.rpg.progression.PassiveNode;
 import com.rngtech.rpg.progression.PassiveNodeFlag;
 import com.rngtech.rpg.progression.PassiveNodeKind;
@@ -28,7 +33,7 @@ public final class MasteryScreenSupport<N extends PassiveNode> {
     private static final int MASTERY_XP_BAR_Y = 30;
     private static final int MASTERY_XP_BAR_WIDTH = 176;
     private static final int MASTERY_VIEW_X = 8;
-    private static final int MASTERY_VIEW_Y = 42;
+    private static final int MASTERY_VIEW_Y = 58;
     private static final int MASTERY_VIEW_WIDTH = 224;
     private static final int MASTERY_VIEW_HEIGHT = 148;
     private static final int MASTERY_VIEW_BOTTOM_PADDING = 10;
@@ -68,6 +73,11 @@ public final class MasteryScreenSupport<N extends PassiveNode> {
     private boolean restoreRequested;
     private double lastDragX;
     private double lastDragY;
+    private boolean searchFocused;
+    private String search = "";
+    private boolean highlightRelevant;
+    private int searchCursor;
+    private MachineProgressionState snapshot = MachineProgressionState.EMPTY;
 
     public MasteryScreenSupport(
             PassiveTree<N> tree,
@@ -121,6 +131,7 @@ public final class MasteryScreenSupport<N extends PassiveNode> {
     }
 
     public void render(GuiGraphics guiGraphics, int leftPos, int topPos, int imageWidth, int imageHeight) {
+        snapshot = view.masterySnapshot();
         ensurePanInitialized(imageWidth, imageHeight);
         if (fitRequested) {
             fitTree(imageWidth, imageHeight);
@@ -147,6 +158,7 @@ public final class MasteryScreenSupport<N extends PassiveNode> {
                 palette.statAccent()
         );
         renderExpandButton(guiGraphics, leftPos, topPos, imageWidth);
+        renderToolbar(guiGraphics, leftPos, topPos, imageWidth);
 
         int viewLeft = leftPos + MASTERY_VIEW_X;
         int viewTop = topPos + MASTERY_VIEW_Y;
@@ -195,6 +207,11 @@ public final class MasteryScreenSupport<N extends PassiveNode> {
             int mouseX,
             int mouseY
     ) {
+        int tool = toolbarIndex(leftPos, topPos, mouseX, mouseY);
+        if (tool >= 0) {
+            guiGraphics.renderComponentTooltip(font, List.of(Component.translatable("rngtech.mastery.toolbar." + tool)), mouseX, mouseY);
+            return;
+        }
         if (isOverExpandButton(leftPos, topPos, imageWidth, mouseX, mouseY)) {
             guiGraphics.renderComponentTooltip(
                     font,
@@ -228,9 +245,39 @@ public final class MasteryScreenSupport<N extends PassiveNode> {
             int imageWidth,
             int imageHeight
     ) {
+        if (button == 1) {
+            N hovered = hoveredNode(leftPos, topPos, imageWidth, imageHeight, mouseX, mouseY);
+            if (hovered instanceof MegaPassiveNode node && view.hasPassiveNode(node)) {
+                send("refund", node.id()); return true;
+            }
+            return false;
+        }
         if (button != 0) {
             return false;
         }
+        int tool = toolbarIndex(leftPos, topPos, mouseX, mouseY);
+        if (tool >= 0) {
+            switch (tool) {
+                case 0 -> {
+                    if (Screen.hasShiftDown()) { send("copy_configurator", ""); }
+                    else { net.minecraft.client.Minecraft.getInstance().keyboardHandler.setClipboard(MasteryBuildCode.copy(view.masterySnapshot()).encode()); }
+                }
+                case 1 -> {
+                    String code = net.minecraft.client.Minecraft.getInstance().keyboardHandler.getClipboard();
+                    if (code.length() <= MasteryBuildCode.MAX_LENGTH) { send("paste", code); }
+                }
+                case 2 -> send(view.masterySnapshot().following() ? "pause" : "resume", "");
+                case 3 -> { if (Screen.hasShiftDown()) { send("clear", ""); } }
+                case 4 -> { zoom = 0.7; panInitialized = false; ensurePanInitialized(imageWidth, imageHeight); }
+                case 5 -> fitTree(imageWidth, imageHeight);
+                case 6 -> highlightRelevant = !highlightRelevant;
+                default -> { }
+            }
+            return true;
+        }
+        searchFocused = mouseX >= leftPos + 154 && mouseX < leftPos + imageWidth - 8
+                && mouseY >= topPos + 42 && mouseY < topPos + 54;
+        if (searchFocused) { return true; }
         if (isOverExpandButton(leftPos, topPos, imageWidth, mouseX, mouseY)) {
             toggleExpanded(imageWidth, imageHeight);
             return true;
@@ -370,9 +417,13 @@ public final class MasteryScreenSupport<N extends PassiveNode> {
                 ? palette.startNode()
                 : unlocked ? palette.statAccent() : unlockable ? palette.outputBonus() : 0xFF9D885F;
         int fill = nodeFill(node, unlocked, unlockable);
+        if (node instanceof MegaPassiveNode shared) {
+            if (snapshot.targetNodes().contains(shared.id()) && !unlocked) { border = 0xFF8E9BE8; }
+            if (!search.isBlank() && matchesSearch(shared) || highlightRelevant && relevant(shared)) { border = 0xFFFFFF80; }
+        }
         int centerX = nodeCenterX(node, leftPos);
         int centerY = nodeCenterY(node, topPos);
-        int radius = Math.max(3, scaledLength(node.size() / 2.0D));
+        int radius = Math.max(1, scaledLength(node.size() / 2.0D));
         if (node.kind() == PassiveNodeKind.KEYSTONE) {
             drawDiamond(guiGraphics, centerX, centerY, radius, border);
             radius = Math.max(3, radius - scaledLength(2));
@@ -459,7 +510,9 @@ public final class MasteryScreenSupport<N extends PassiveNode> {
             tooltip.add(Component.translatable("rngtech.mastery.tooltip.notable").withStyle(ChatFormatting.AQUA));
         }
         for (var effect : node.effects()) {
-            tooltip.add(MachineStatDisplay.effectText(effect).withStyle(ChatFormatting.GRAY));
+            Component text = MachineStatDisplay.effectText(effect);
+            tooltip.add(view.masterySupports(effect.stat()) ? text.copy().withStyle(ChatFormatting.GRAY)
+                    : Component.translatable("rngtech.mastery.inactive", text).withStyle(ChatFormatting.DARK_GRAY));
         }
         for (PassiveNodeFlag flag : node.flags()) {
             tooltip.add(Component.translatable(flagTranslationKey(flag)).withStyle(ChatFormatting.GOLD));
@@ -467,10 +520,40 @@ public final class MasteryScreenSupport<N extends PassiveNode> {
         for (PassiveStatType stat : PassiveStatType.values()) {
             int value = node.passiveStat(stat);
             if (value != 0) {
-                tooltip.add(Component.translatable(passiveStatTranslationKey(stat), signed(value)).withStyle(ChatFormatting.GOLD));
+                tooltip.add(applicability(Component.translatable(passiveStatTranslationKey(stat), signed(value)), view.masteryFamily().supports(stat)));
             }
         }
-        callbacks.appendSpecialTooltip(node, tooltip);
+        if (node instanceof MegaPassiveNode shared) {
+            shared.fixed().forEach((stat, value) -> tooltip.add(applicability(Component.translatable("rngtech.mastery.fixed", Component.translatable(stat.translationKey()), MachineStatDisplay.formatNumber(value)), view.masterySupports(stat))));
+            shared.ceilings().forEach((stat, value) -> tooltip.add(applicability(Component.translatable("rngtech.mastery.ceiling", Component.translatable(stat.translationKey()), MachineStatDisplay.formatNumber(value)), view.masterySupports(stat))));
+            for (var scaling : shared.scaling()) {
+                tooltip.add(applicability(Component.translatable("rngtech.mastery.scaling", MachineStatDisplay.formatNumber(scaling.perPoint()),
+                        Component.translatable("rngtech.mastery.operation." + scaling.operation().name().toLowerCase(Locale.ROOT)),
+                        Component.translatable(scaling.stat().translationKey()), Component.translatable(scaling.attribute().translationKey())), view.masterySupports(scaling.stat())));
+            }
+            for (String behavior : shared.behaviors()) {
+                if (!behavior.equals("MUTE_MACHINE_SOUND")) {
+                    tooltip.add(applicability(Component.translatable("rngtech.mastery.behavior." + behavior.toLowerCase(Locale.ROOT)), view.masterySupportsBehavior(behavior)));
+                }
+            }
+            if (shared.recipeHardnessCeiling() > 0) {
+                tooltip.add(applicability(Component.translatable("rngtech.mastery.hardness_ceiling", shared.recipeHardnessCeiling()), view.masteryFamily() == MachineMasteryFamily.CRUSHER));
+            }
+            if (shared.kind() == PassiveNodeKind.STARTER) {
+                if (shared.id().equals(view.masteryFamily().startNodeId())) {
+                    for (var attribute : List.of(MachineStat.CONTROL, MachineStat.DRIVE, MachineStat.RESERVE)) {
+                        tooltip.add(Component.translatable("rngtech.mastery.attribute_total", Component.translatable(attribute.translationKey()), MachineStatDisplay.formatNumber(view.masteryAttribute(attribute))).withStyle(ChatFormatting.AQUA));
+                    }
+                    tooltip.add(Component.translatable("rngtech.mastery.tooltip.unlocked").withStyle(ChatFormatting.GREEN));
+                } else {
+                    tooltip.add(Component.translatable("rngtech.mastery.other_start").withStyle(ChatFormatting.DARK_GRAY));
+                }
+                return tooltip;
+            }
+            if (view.hasPassiveNode(node) && node.kind() != PassiveNodeKind.STARTER) {
+                tooltip.add(Component.translatable("rngtech.mastery.refund_hint").withStyle(ChatFormatting.DARK_GRAY));
+            }
+        } else { callbacks.appendSpecialTooltip(node, tooltip); }
         if (node.alwaysAllocated()) {
             tooltip.add(Component.translatable("rngtech.mastery.tooltip.unlocked").withStyle(ChatFormatting.GREEN));
             return tooltip;
@@ -507,6 +590,75 @@ public final class MasteryScreenSupport<N extends PassiveNode> {
             }
         }
         return null;
+    }
+
+    private void renderToolbar(GuiGraphics graphics, int left, int top, int width) {
+        var font = net.minecraft.client.Minecraft.getInstance().font;
+        String[] labels = {"C", "P", snapshot.following() ? "||" : ">", "X", "H", "F", "R"};
+        for (int i = 0; i < labels.length; i++) {
+            int x = left + 8 + i * 20;
+            graphics.fill(x, top + 42, x + 18, top + 54, i == 6 && highlightRelevant ? 0xFF596035 : 0xFF343E49);
+            graphics.drawString(font, labels[i], x + 5, top + 44, 0xFFE7DDC0, false);
+        }
+        graphics.fill(left + 154, top + 42, left + width - 8, top + 54, searchFocused ? 0xFF465366 : 0xFF252E38);
+        String text = search.isEmpty() ? Component.translatable("rngtech.mastery.search").getString() : search;
+        graphics.drawString(font, font.plainSubstrByWidth(text, Math.max(1, width - 168)), left + 157, top + 44, 0xFFE7DDC0, false);
+    }
+
+    private int toolbarIndex(int left, int top, double x, double y) {
+        if (y < top + 42 || y >= top + 54 || x < left + 8 || x >= left + 148) { return -1; }
+        return (int) (x - left - 8) / 20;
+    }
+
+    private void send(String action, String value) {
+        var player = net.minecraft.client.Minecraft.getInstance().player;
+        if (player != null) {
+            net.neoforged.neoforge.network.PacketDistributor.sendToServer(new MasteryActionPayload(player.containerMenu.containerId, action, value));
+        }
+    }
+
+    private boolean matchesSearch(MegaPassiveNode node) {
+        String term = search.toLowerCase(Locale.ROOT);
+        return Component.translatable(node.translationKey()).getString().toLowerCase(Locale.ROOT).contains(term)
+                || node.id().contains(term.replace(' ', '_'))
+                || node.effects().stream().anyMatch(effect -> MachineStatDisplay.effectText(effect).getString().toLowerCase(Locale.ROOT).contains(term));
+    }
+
+    private static Component applicability(Component text, boolean applies) {
+        return applies ? text.copy().withStyle(ChatFormatting.GOLD) : Component.translatable("rngtech.mastery.inactive", text).withStyle(ChatFormatting.DARK_GRAY);
+    }
+
+    private boolean relevant(MegaPassiveNode node) {
+        return node.effects().stream().anyMatch(effect -> view.masterySupports(effect.stat()))
+                || node.scaling().stream().anyMatch(effect -> view.masterySupports(effect.stat()))
+                || node.fixed().keySet().stream().anyMatch(view::masterySupports)
+                || node.ceilings().keySet().stream().anyMatch(view::masterySupports)
+                || node.behaviors().stream().anyMatch(view::masterySupportsBehavior)
+                || node.passive().keySet().stream().anyMatch(view.masteryFamily()::supports)
+                || node.recipeHardnessCeiling() > 0 && view.masteryFamily() == MachineMasteryFamily.CRUSHER;
+    }
+
+    public boolean charTyped(char character) {
+        if (!searchFocused) { return false; }
+        if (character >= 32 && character != 127 && search.length() < 64) { search += character; searchCursor = 0; }
+        return true;
+    }
+
+    public boolean keyPressed(int key, int scan, int modifiers, int width, int height) {
+        if (key == 70 && Screen.hasControlDown()) { searchFocused = true; return true; }
+        if (!searchFocused) { return false; }
+        if (key == 256) { searchFocused = false; return true; }
+        if (key == 259 && !search.isEmpty()) { search = search.substring(0, search.length() - 1); searchCursor = 0; }
+        if (key == 257 && !search.isBlank()) {
+            List<N> matches = nodes.stream().filter(node -> node instanceof MegaPassiveNode shared && matchesSearch(shared)).toList();
+            if (!matches.isEmpty()) {
+                N node = matches.get(Math.floorMod(searchCursor++, matches.size()));
+                zoom = 0.7;
+                setPan(node.x() + node.size() / 2.0 - (MASTERY_VIEW_X + viewWidth(width) / 2.0) / zoom,
+                        node.y() + node.size() / 2.0 - (MASTERY_VIEW_Y + viewHeight(height) / 2.0) / zoom, width, height);
+            }
+        }
+        return true;
     }
 
     private boolean isOverViewport(

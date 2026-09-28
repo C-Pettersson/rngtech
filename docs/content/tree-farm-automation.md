@@ -13,17 +13,9 @@ Tree Farm Automation is the first code-backed rail forestry slice. It is centere
 
 Right-clicking a Forestry Companion opens its Cart, Stats, and Mastery tabs. While at least one player has the cart menu open, the cart enters `MANAGED`, stops rail movement, and pauses forestry work. Closing the final cart viewer returns the cart to normal FSM evaluation. Any player can open and manage the cart; the owner stored on player-placed carts is used only for FakePlayer harvest attribution and protection checks.
 
-Forestry Companion Mastery is stored on the cart item stack through `rngtech:machine_progression`, survives placement, pick-block, and broken-cart drops, and grants XP from successful planting, leaf cleanup, and log harvest actions. The fixed passive tree improves route FE use, work speed, accepted tree log limits, and managed-cell capacity. Forestry is the first tree backed by the typed PoE-style passive tree definition: `100` total nodes, with `48` attribute-only travel nodes, `32` specialization nodes, `14` notables, `5` keystones, and `1` starter. Travel nodes use unique internal enum ids for saves, links, and effects, but display as `Attribute` in the UI and only grant Control, Drive, or Reserve. Non-travel specialization nodes carry managed-cell unlocks and cluster-local forestry choices. The layout is drawn as a three-exit starter, a pure three-node travel runway, non-overlapping local clusters, short cross-travel rungs, optional notable pockets, outer route choices, and single-link keystone endpoints rather than reward-specific sections, so a player chasing one stat such as work speed can still expand through several directions of the tree. Keystone Masteries are scattered around the outer edges as build-defining endpoints. Control improves cart stability and route FE use; Drive improves work interval and adds accepted-log capacity at higher totals; Reserve improves endurance through managed-cell headroom. Forestry Companion passive nodes are gated by passive points and connected path traversal rather than by machine level requirements, and the tree has more spendable nodes than a max-level cart can unlock. Its behavior keystones include Magnet Mode, which pulls nearby dropped item entities into onboard output cargo, Serrated Leaf Protocol, which allows leaf drops without shears at a much higher FE cost, Manual Throttle, which unlocks a player-toggled fast travel mode, Coasting Clutch, which improves no-power rail speed, and Seedling Magnet, which lets Magnet Mode refill sapling cargo before output cargo.
+Forestry Companion enters the [shared Machine Mastery tree](../systems/machine-mastery.md) at Control / Drive. Its progression survives placement, pick-block, and broken-cart drops. Successful planting, leaf cleanup, and log harvesting award band-scaled XP. Travel attributes, work speed, route FE use, log limits, and managed territory provide overlapping numerical choices. Other families' nodes remain selectable and identify inactive effects.
 
-Processing-oriented Mastery is intentionally split into three packages instead of one cardinal speed lane:
-
-| Package | Core nodes | Best use | Gives up |
-|---|---|---|---|
-| Raw overdrive | Light Axle, Fast Planter, Saw Rhythm, Advance Timer, Planting Servo, Logger Feed Rollers, Cut Order Routine, Hot-Swap Routine, and Forestry Overdrive | Highest work-interval pressure when FE supply is oversized | FE efficiency, reserve headroom, managed cells, and output routing |
-| Sustained control | Route Survey, Low-Loss Wheels, Conservation Loop, Energy Dispatch Table, Brake Recovery Loop, the coasting route, Cell Tender Matrix, and Grove Registry | Long-running routes that need speed without frequent transfer stops | Peak burst speed and broad-tree support |
-| Broad/output throughput | Root Mapping, Canopy Profile, Heavy Saw Frame, Broad Tree Protocol, Forest Loop, Depot Sorter, Canopy Workplan, and Stormfall Protocol | Larger trees, higher logs-per-action value, and output-oriented routes | Raw cycle speed, FE margin on the widest packages, and automation flexibility |
-
-These packages share little of their non-starter path. The raw and broad packages only touch at the early Light Axle branch in their shortest routes, while the sustained package can stay on the route-control and managed-cell side of the tree. High-processing notables are placed beside non-processing alternatives such as scan control, reserve travel, energy dispatch, managed cells, bin partitions, or canopy safety so the processing answer is a build choice rather than a single lane.
+Forestry behaviors include Magnet Mode, Serrated Leaf Protocol, Manual Throttle, Coasting Clutch, and Seedling Magnet. The shared page defines progression, attribute conversions, refunds, copy/paste, and automatic allocation. Existing 100-node Forestry allocations are refunded on migration while XP and earned levels remain.
 
 The station screen has Station, Gear, and Stats tabs. The Station tab stores one sapling staging input, one cart shears staging input, six station output slots, the station FE gauge, station status/action indicators, and the hold-at-station toggle. The Gear tab edits the station's optional Battery Cell, Energy Connector, Item Connector, and Fluid Connector ports. Stations do not store a cart UUID, do not show a remote cart UI, and do not own forestry workflow state.
 
@@ -143,15 +135,7 @@ The station receives FE only when an Energy Connector is installed and stores a 
 
 Forestry Companion item stacks use the `FORESTRY_COMPANION` modifier eligibility profile. Processing-speed affixes adjust the placed cart's work interval after installed tool speed is considered, and energy-usage affixes adjust movement, scan, plant, and cut FE costs. Placed carts save traits and Mastery progression, preserve them on pick-block, and drop the same rolled companion item when broken.
 
-Core stat conversions for the Forestry Companion:
-
-| Core stat | Forestry Companion effect |
-|---|---|
-| `CONTROL` | `+1% STABILITY` per point and `1% reduced ENERGY_USAGE` per `5` points. |
-| `DRIVE` | `+0.75% PROCESSING_SPEED` per point and `+1 TREE_FELL_LIMIT` per `10` points. |
-| `RESERVE` | `+2` maximum managed cells per point. |
-
-Crusher, Furnace, and Forestry Companion now have passive class metadata with base Control, Drive, and Reserve values plus a future-ready empty ascendancy list. In this branch those base class stats are metadata only and do not affect gameplay stats.
+Control, Drive, and Reserve use the [shared attribute conversions](../systems/machine-mastery.md#attributes). Base class attributes now affect gameplay. The family ascendancy list remains empty.
 
 Successful route actions consume cart FE:
 

@@ -1,6 +1,7 @@
 import { mkdir, readFile, readdir, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { megaCatalogUrl, diameters } from "./check-mega-tree.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PROJECT_ROOT = path.resolve(__dirname, "../..");
@@ -19,6 +20,24 @@ const ORBIT_ANGLES = [
 
 export async function buildPassiveTreeData() {
     const trees = [];
+    const mega = JSON.parse(await readFile(megaCatalogUrl, "utf8"));
+    const centers = new Map();
+    const placements = new Map();
+    const metadata = new Map();
+    for (const group of mega.groups) centers.set(group.id, { x: group.x, y: group.y });
+    for (const node of mega.nodes) {
+        if (!centers.has(node.group)) centers.set(node.group, { x: node.x, y: node.y });
+        placements.set(node.id, { groupId: node.group, orbit: 0, orbitIndex: 0, x: node.x, y: node.y });
+        metadata.set(node.id, { kind: node.kind, size: diameters[node.kind], identity: spacedName(node.effects[0]?.stat ?? "control"), alwaysAllocated: node.id === "start_drive", grantsNothing: node.kind === "STARTER" });
+    }
+    const shared = createTree("MachineMega", centers, placements, metadata, mega.links.map(([first, second]) => ({ first, second })));
+    shared.id = "machine_mastery";
+    shared.label = "Shared Machine Mega Tree";
+    shared.sourcePath = "src/main/resources/data/rngtech/mastery/machine_tree.json";
+    shared.sourceFormat = "catalog";
+    shared.tree.treeId = "machine_mastery";
+    shared.tree.multipleStarts = true;
+    trees.push(shared);
     const files = await readdir(PROGRESSION_ROOT);
     for (const fileName of files.filter((entry) => entry.endsWith("PassiveTreeLayout.java")).sort()) {
         const tree = await parseTypedTree(fileName);

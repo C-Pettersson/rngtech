@@ -116,10 +116,12 @@ Modifier operations are implemented in code.
 Final stat calculation:
 
 ```text
-(authored base + fixed additions) * (1 + (increased percent - decreased percent) / 100) * more multiplier 1 * less multiplier 1
+(authored base + fixed additions) * max(0, 1 + (increased percent - reduced percent) / 100) * each more factor * each less factor
 ```
 
 Status: Prototype
+
+Player-facing wording uses **increased**, **reduced**, **more**, and **less** explicitly. The internal `DECREASED_PERCENT` operation is displayed as reduced. Mastery fixed values and ceilings resolve after ordinary modifiers; see [hard constraints](machine-mastery.md#modifier-keywords-and-hard-constraints).
 
 ## Modifier Tiers
 

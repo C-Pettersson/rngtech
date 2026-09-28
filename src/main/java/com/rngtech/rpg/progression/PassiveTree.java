@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Objects;
 
 public final class PassiveTree<N extends PassiveNode> {
-    private static final int MAX_NODE_COUNT = Long.SIZE * 2;
+    private static final int MAX_NODE_COUNT = 4096;
 
     private final List<N> nodes;
 
@@ -36,6 +36,7 @@ public final class PassiveTree<N extends PassiveNode> {
         return node != null
                 && !node.isUnlocked(progression)
                 && !node.alwaysAllocated()
+                && node.kind() != PassiveNodeKind.STARTER
                 && progression.level() >= node.requiredLevel()
                 && progression.unspentPoints() > 0
                 && node.parentUnlocked(progression);

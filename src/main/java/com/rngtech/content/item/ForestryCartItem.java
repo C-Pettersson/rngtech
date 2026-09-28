@@ -3,16 +3,12 @@ package com.rngtech.content.item;
 import com.rngtech.content.entity.ForestryCartEntity;
 import com.rngtech.content.recycling.RecyclingData;
 import com.rngtech.content.registry.ModDataComponents;
-import com.rngtech.rpg.MachineModifier;
 import com.rngtech.rpg.MachineNameGenerator;
-import com.rngtech.rpg.MachineStat;
 import com.rngtech.rpg.MachineStatAccumulator;
 import com.rngtech.rpg.MachineTraitRoller;
 import com.rngtech.rpg.MachineTraits;
 import com.rngtech.rpg.MachineType;
 import com.rngtech.rpg.ModifierEligibilityProfiles;
-import com.rngtech.rpg.ModifierOperation;
-import com.rngtech.rpg.ModifierSlot;
 import com.rngtech.rpg.progression.ForestryCompanionPassiveTree;
 import com.rngtech.rpg.progression.MachineProgressionState;
 
@@ -65,38 +61,7 @@ public class ForestryCartItem extends Item {
         MachineStatAccumulator stats = MachineStatAccumulator.forestryCompanionBase();
         stats.apply(traits);
         ForestryCompanionPassiveTree.applyStats(stats, progression);
-        applyCoreStatConversions(stats);
         return stats;
-    }
-
-    private static void applyCoreStatConversions(MachineStatAccumulator stats) {
-        double control = coreStat(stats, MachineStat.CONTROL);
-        if (control > 0.0D) {
-            applyCoreEffect(stats, MachineStat.STABILITY, ModifierOperation.INCREASED_PERCENT, control);
-            applyCoreEffect(stats, MachineStat.ENERGY_USAGE, ModifierOperation.DECREASED_PERCENT, control / 5.0D);
-        }
-
-        double drive = coreStat(stats, MachineStat.DRIVE);
-        if (drive > 0.0D) {
-            applyCoreEffect(stats, MachineStat.PROCESSING_SPEED, ModifierOperation.INCREASED_PERCENT, drive * 0.75D);
-            int logLimitBonus = (int) Math.floor(drive / 10.0D);
-            if (logLimitBonus > 0) {
-                applyCoreEffect(stats, MachineStat.TREE_FELL_LIMIT, ModifierOperation.ADD, logLimitBonus);
-            }
-        }
-    }
-
-    private static void applyCoreEffect(
-            MachineStatAccumulator stats,
-            MachineStat stat,
-            ModifierOperation operation,
-            double value
-    ) {
-        stats.apply(new MachineModifier(ModifierSlot.IMPLICIT, stat, operation, value));
-    }
-
-    private static double coreStat(MachineStatAccumulator stats, MachineStat stat) {
-        return Math.max(0.0D, stats.value(stat));
     }
 
     @Override

@@ -66,16 +66,14 @@ Current stat hooks:
 
 Current Mastery hooks:
 
-- Completed Crusher jobs grant the recipe's `machine_xp` value once per completed job, so Dense Parallel grants XP per output-producing job rather than once per cycle.
-- Level is derived from total machine XP and grants one passive point per level after level 1, up to level 30. XP thresholds use the curve defined by `MachineProgressionState`.
-- Recipe XP falls off when the Crusher outlevels the recipe's `machine_xp_band`. Recipes at or above the Crusher's current level band grant full XP, recipes one level behind grant `50%`, recipes two levels behind grant `25%`, and recipes three or more levels behind grant no machine XP. Fractional XP is banked on the machine progression state in quarter-XP units.
-- The Crusher Mastery tree uses the authored ModDex passive-tree layout with an always-allocated starter node that grants nothing, small travel nodes, Notable Masteries, and Keystone Masteries. Every non-starter node costs one passive point, and a node is unlockable when the Crusher has the required level, an unspent point, compatible current Gear, and at least one linked unlocked node.
-- Standard Mastery effects are derived from the node's signed identity: Energy Capacity grants flat FE storage on small nodes and `+25% ENERGY_CAPACITY` on Notable Masteries, Energy Efficiency changes `ENERGY_USAGE`, Processing Speed changes `PROCESSING_SPEED`, Output Yield changes `OUTPUT_AMOUNT`, Control grants output-guard grace, and negative identities become drawbacks.
-- `Cell Bypass` is a Keystone Mastery that adds `+100% ENERGY_CAPACITY`, `10% more ENERGY_USAGE`, and `+100% NO_BATTERY_OUTPUT_RETENTION`, but blocks the Battery Cell slot. It cannot be unlocked while a Battery Cell is installed.
-- `Precision Jaw Mount` is a Keystone Mastery that adds `+20% OUTPUT_AMOUNT` and `+3% CRUSHER_SALVAGE_CHANCE`, but requires the installed Crush Head, if present, to match the chassis stage. After unlock, lower-stage heads no longer count as valid for that Crusher.
-- `Dense Batching` is a Keystone Mastery that adds `+2 PARALLEL_JOBS`, `25% less PROCESSING_SPEED`, and `25% more ENERGY_USAGE`, and enables Dense Parallel batching for that Crusher even if the chassis or rolled traits did not already provide the Dense Parallel behavior.
-- `Mute Machine Sound` is a generic passive node that mutes this Crusher's client-side machine loop and start/stop cues.
-- `Overspec Component Mount` and `Universal Component Mount` are generic passive nodes that each add `+1` Component Stage Support, allowing Crush Heads up to one and then two stages above the chassis. `Precision Jaw Mount` still requires an exact chassis-stage Crush Head.
+- Crushers enter the [shared Machine Mastery tree](../systems/machine-mastery.md) at Drive. Successful jobs grant band-scaled XP per completed job, up to level 80 and 79 passive points.
+- Paths, refunds, copy/paste, automatic allocation, attributes, and save migration follow the shared rules. Current Gear must remain legal for every allocation and refund.
+- Cell Bypass grants 100% increased Energy Capacity, 10% more Energy Usage, and +100 percentage points of no-cell output retention. It blocks the Battery Cell slot and cannot be allocated with a cell installed.
+- Precision Jaw Mount grants 10% increased Output Amount and +2 percentage points of salvage chance. An installed Crush Head must match the chassis stage.
+- Dense Batching enables Dense Parallel, adds two parallel jobs, and applies 25% less Processing Speed and 25% more Energy Usage.
+- Soft Material Specialist grants 200% more Processing Speed and 50% more Energy Usage, but forbids recipes above hardness 2 even with a stronger head.
+- Component Mount notables support higher-stage heads; Precision Jaw Mount still requires an exact match. Silent Operation mutes the machine's client-side loop and cues.
+
 
 Implementation checks:
 
@@ -83,11 +81,11 @@ Implementation checks:
 - Side insertion should only insert Battery Cells.
 - Bottom extraction should extract completed output.
 - A Crusher without a valid Crush Head should not process, consume FE, or keep partial progress.
-- A Crusher should reject Crush Heads above the placed chassis stage.
+- A Crusher should reject Crush Heads above the placed chassis stage plus allocated Component Stage Support.
 - A Crusher with Precision Jaw Mount should reject Crush Heads whose stage does not match the chassis stage.
 - A Crusher with Cell Bypass should reject Battery Cell insertion and should not count an already-present Battery Cell as installed.
-- A Crusher should reject Mastery unlock requests that lack level, points, prerequisites, or compatible current gear.
-- A Crusher should process recipes whose `required_processing_level` is higher than its effective `PROCESSING_LEVEL`, but at the configured under-hardness time, total-FE, and jam-risk penalty.
+- A Crusher should reject Mastery unlock requests that lack points, connected paths, or compatible current Gear.
+- A Crusher should process recipes whose `required_processing_level` is higher than its effective `PROCESSING_LEVEL`, but at the configured under-hardness time, total-FE, and jam-risk penalty, unless a Mastery hard ceiling forbids the recipe.
 - An under-level Crusher cycle should not roll Instant Process, Super Output, or Crusher Salvage, and should not apply positive `OUTPUT_AMOUNT` above the authored base output.
 - A charged Battery Cell in the Gear tab should contribute to processing work after the crusher's small internal buffer is used.
 - Removing the Battery Cell should reduce the effective output amount shown in the Stats tab and used by the output-bonus bar.
@@ -116,7 +114,7 @@ Crusher recipes currently support:
 - A per-recipe required processing level. This is the recipe's optimal crush hardness target; under-level processing is allowed but slower, more expensive, bonus-suppressed, and can jam.
 - A per-recipe `bonus_output` flag. Recipes with `bonus_output: false` always produce their authored base stack and ignore `OUTPUT_AMOUNT`, Super Output, and Crusher salvage.
 - A per-recipe `machine_xp` value. It is granted to the placed Crusher chassis once per successfully completed job, after recipe-band falloff. Shipped reversible `bonus_output: false` recipes grant `0` machine XP.
-- An optional per-recipe `machine_xp_band` value. If omitted, recipes with positive `machine_xp` map `required_processing_level` onto the Crusher Mastery curve as `1 + (required_processing_level - 1) * 4`, capped at the maximum machine level. Use an explicit band when a recipe's training value should follow the processed material rather than the mechanical hardness gate.
+- An optional per-recipe `machine_xp_band` value. If omitted, recipes with positive `machine_xp` map `required_processing_level` onto the Crusher Mastery curve through the [shared work-band mapping](../systems/machine-mastery.md#xp-and-chassis-ownership). Use an explicit band when a recipe's training value should follow the processed material rather than the mechanical hardness gate.
 
 With JEI installed, Crusher recipes are exposed with their input, input count, output, processing ticks, scaled FE cost, base output count, required processing level, and bonus-output opt-outs. Recipes at or above the configured high-hardness threshold show the multiplied FE cost.
 

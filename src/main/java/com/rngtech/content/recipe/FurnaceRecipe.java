@@ -4,6 +4,7 @@ import com.rngtech.content.item.MalformedIngotItem;
 import com.rngtech.content.registry.ModDataComponents;
 import com.rngtech.content.registry.ModItems;
 import com.rngtech.content.registry.ModRecipes;
+import com.rngtech.rpg.progression.MachineProgressionState;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
@@ -283,24 +284,24 @@ public record FurnaceRecipe(
                 return 0;
             }
             if (targetTemperature <= 800) {
-                return 1;
+                return MachineProgressionState.progressionBand(1);
             }
             if (targetTemperature <= 1000) {
-                return 5;
+                return MachineProgressionState.progressionBand(5);
             }
             if (targetTemperature <= 1200) {
-                return 9;
+                return MachineProgressionState.progressionBand(9);
             }
             if (targetTemperature <= 1400) {
-                return 13;
+                return MachineProgressionState.progressionBand(13);
             }
             if (targetTemperature <= 1600) {
-                return 17;
+                return MachineProgressionState.progressionBand(17);
             }
             if (targetTemperature <= 1800) {
-                return 21;
+                return MachineProgressionState.progressionBand(21);
             }
-            return 25;
+            return MachineProgressionState.progressionBand(25);
         }
 
         private record MachineXpFields(int machineXp, Optional<Integer> machineXpBand) {

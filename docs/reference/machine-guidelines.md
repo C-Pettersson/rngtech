@@ -77,6 +77,10 @@ Processing XP should be granted only after work actually completes and output is
 
 Passive nodes must route through the same effective-stat aggregation used by chassis, Gear, rarity, and modifiers. Slot-changing nodes must also participate in server-side slot validation and unlock validation; unlocking a node that blocks or limits an occupied Gear slot should fail unless the current gear is already compatible.
 
+All functional base-machine families should use the [shared Machine Mastery graph](../systems/machine-mastery.md); integrate new families through a start and capability adapter. Gear and cables are excluded. Attribute totals, inherent conversions, and explicit scaling are separate. Increased/reduced modifiers share an additive bucket; more/less factors multiply independently. Absolute ceilings resolve last.
+
+The Mastery graph deliberately includes irrelevant effects. Keep them visible and selectable, label applicability per effect, and apply supported penalties even when a benefit is inactive. Capability filtering still applies to the Stats tab. Refunds and copied targets must enforce connectivity, earned points, matching starts, and current Gear legality on the server. Old per-machine mask limits do not apply to the shared stable-ID graph.
+
 ## Stats Tab
 
 Stats must be capability-driven. Do not show stats that cannot apply to the machine.

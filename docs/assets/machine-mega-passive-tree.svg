@@ -1,0 +1,1578 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 6000 6250" width="1200" height="1250" role="img" aria-labelledby="title description">
+<title id="title">RNGTech shared machine passive tree</title>
+<desc id="description">750 nodes, six starts, 809 links. Control in green, Drive in copper, Reserve in blue. White notables and violet keystones. Each machine has 79 points at level 80.</desc>
+<rect width="6000" height="6250" fill="#111820"/>
+<g font-family="sans-serif" fill="#e5ecf3"><text x="240" y="230" font-size="96">Machine Mastery</text><text x="245" y="365" font-size="58" fill="#a9b9c9">750 nodes · 6 starts · 3 attributes · 79 points</text></g>
+<g stroke="#66727d" stroke-width="5" opacity="0.65">
+<path d="M2542,3440 L2463,3360"/>
+<path d="M2463,3360 L2384,3279"/>
+<path d="M2384,3279 L2305,3199"/>
+<path d="M3454,3448 L3369,3525"/>
+<path d="M3369,3525 L3284,3602"/>
+<path d="M3284,3602 L3199,3679"/>
+<path d="M3705,3208 L3621,3288"/>
+<path d="M3621,3288 L3538,3368"/>
+<path d="M3538,3368 L3454,3448"/>
+<path d="M2817,2288 L2932,2302"/>
+<path d="M2932,2302 L3047,2316"/>
+<path d="M3047,2316 L3162,2330"/>
+<path d="M3666,2821 L3596,2728"/>
+<path d="M3596,2728 L3525,2635"/>
+<path d="M3525,2635 L3455,2542"/>
+<path d="M2559,2539 L2645,2455"/>
+<path d="M2645,2455 L2731,2372"/>
+<path d="M2731,2372 L2817,2288"/>
+<path d="M3162,2330 L3260,2401"/>
+<path d="M3260,2401 L3357,2471"/>
+<path d="M3357,2471 L3455,2542"/>
+<path d="M2804,3695 L2717,3610"/>
+<path d="M2717,3610 L2629,3525"/>
+<path d="M2629,3525 L2542,3440"/>
+<path d="M2305,3199 L2308,3075"/>
+<path d="M2308,3075 L2312,2952"/>
+<path d="M2312,2952 L2315,2828"/>
+<path d="M2315,2828 L2396,2732"/>
+<path d="M2396,2732 L2478,2635"/>
+<path d="M2478,2635 L2559,2539"/>
+<path d="M3666,2821 L3679,2950"/>
+<path d="M3679,2950 L3692,3079"/>
+<path d="M3692,3079 L3705,3208"/>
+<path d="M4104,4130 L4238,4162"/>
+<path d="M4238,4162 L4371,4193"/>
+<path d="M4371,4193 L4505,4225"/>
+<path d="M5572,2859 L5526,2989"/>
+<path d="M5526,2989 L5481,3120"/>
+<path d="M5481,3120 L5435,3250"/>
+<path d="M2010,2358 L2107,2260"/>
+<path d="M2107,2260 L2205,2161"/>
+<path d="M2205,2161 L2302,2063"/>
+<path d="M1622,3848 L1748,3789"/>
+<path d="M1748,3789 L1875,3731"/>
+<path d="M1875,3731 L2001,3672"/>
+<path d="M1757,1335 L1855,1298"/>
+<path d="M1855,1298 L1953,1261"/>
+<path d="M1953,1261 L2051,1223"/>
+<path d="M2051,1223 L2149,1186"/>
+<path d="M3167,1218 L3259,1164"/>
+<path d="M3259,1164 L3350,1110"/>
+<path d="M3350,1110 L3442,1056"/>
+<path d="M3442,1056 L3533,1002"/>
+<path d="M1488,2593 L1382,2602"/>
+<path d="M1382,2602 L1277,2611"/>
+<path d="M1277,2611 L1171,2619"/>
+<path d="M1171,2619 L1065,2628"/>
+<path d="M5077,3017 L5167,3075"/>
+<path d="M5167,3075 L5256,3134"/>
+<path d="M5256,3134 L5346,3192"/>
+<path d="M5346,3192 L5435,3250"/>
+<path d="M2764,4638 L2786,4533"/>
+<path d="M2786,4533 L2808,4428"/>
+<path d="M2808,4428 L2830,4323"/>
+<path d="M2830,4323 L2852,4218"/>
+<path d="M2388,1641 L2367,1747"/>
+<path d="M2367,1747 L2345,1852"/>
+<path d="M2345,1852 L2324,1958"/>
+<path d="M2324,1958 L2302,2063"/>
+<path d="M909,4257 L982,4337"/>
+<path d="M982,4337 L1055,4416"/>
+<path d="M1055,4416 L1128,4496"/>
+<path d="M1128,4496 L1201,4575"/>
+<path d="M1749,3090 L1678,3171"/>
+<path d="M1678,3171 L1606,3252"/>
+<path d="M1606,3252 L1535,3333"/>
+<path d="M1535,3333 L1463,3414"/>
+<path d="M4773,3584 L4827,3678"/>
+<path d="M4827,3678 L4880,3773"/>
+<path d="M4880,3773 L4934,3867"/>
+<path d="M4934,3867 L4987,3961"/>
+<path d="M2388,1641 L2284,1673"/>
+<path d="M2284,1673 L2181,1705"/>
+<path d="M2181,1705 L2077,1736"/>
+<path d="M2077,1736 L1973,1768"/>
+<path d="M3289,4232 L3180,4229"/>
+<path d="M3180,4229 L3071,4225"/>
+<path d="M3071,4225 L2961,4222"/>
+<path d="M2961,4222 L2852,4218"/>
+<path d="M2804,3695 L2707,3746"/>
+<path d="M2707,3746 L2610,3798"/>
+<path d="M2610,3798 L2512,3849"/>
+<path d="M2512,3849 L2415,3900"/>
+<path d="M2661,1294 L2690,1188"/>
+<path d="M2690,1188 L2720,1081"/>
+<path d="M2720,1081 L2749,975"/>
+<path d="M2749,975 L2778,868"/>
+<path d="M2388,1641 L2456,1554"/>
+<path d="M2456,1554 L2525,1468"/>
+<path d="M2525,1468 L2593,1381"/>
+<path d="M2593,1381 L2661,1294"/>
+<path d="M4895,2194 L4843,2292"/>
+<path d="M4843,2292 L4791,2389"/>
+<path d="M4791,2389 L4738,2487"/>
+<path d="M4738,2487 L4686,2584"/>
+<path d="M4149,2489 L4197,2594"/>
+<path d="M4197,2594 L4246,2699"/>
+<path d="M4246,2699 L4294,2803"/>
+<path d="M4294,2803 L4342,2908"/>
+<path d="M1622,3848 L1582,3740"/>
+<path d="M1582,3740 L1543,3631"/>
+<path d="M1543,3631 L1503,3523"/>
+<path d="M1503,3523 L1463,3414"/>
+<path d="M3454,3448 L3512,3548"/>
+<path d="M3512,3548 L3570,3648"/>
+<path d="M3570,3648 L3628,3748"/>
+<path d="M3628,3748 L3686,3848"/>
+<path d="M3289,4232 L3398,4276"/>
+<path d="M3398,4276 L3506,4320"/>
+<path d="M3506,4320 L3615,4363"/>
+<path d="M3615,4363 L3723,4407"/>
+<path d="M962,3348 L926,3459"/>
+<path d="M926,3459 L890,3571"/>
+<path d="M890,3571 L854,3682"/>
+<path d="M854,3682 L818,3793"/>
+<path d="M3723,4407 L3818,4338"/>
+<path d="M3818,4338 L3914,4269"/>
+<path d="M3914,4269 L4009,4199"/>
+<path d="M4009,4199 L4104,4130"/>
+<path d="M4686,2584 L4600,2665"/>
+<path d="M4600,2665 L4514,2746"/>
+<path d="M4514,2746 L4428,2827"/>
+<path d="M4428,2827 L4342,2908"/>
+<path d="M818,3793 L841,3909"/>
+<path d="M841,3909 L864,4025"/>
+<path d="M864,4025 L886,4141"/>
+<path d="M886,4141 L909,4257"/>
+<path d="M2415,3900 L2312,3843"/>
+<path d="M2312,3843 L2208,3786"/>
+<path d="M2208,3786 L2105,3729"/>
+<path d="M2105,3729 L2001,3672"/>
+<path d="M3167,1218 L3266,1287"/>
+<path d="M3266,1287 L3364,1356"/>
+<path d="M3364,1356 L3463,1424"/>
+<path d="M3463,1424 L3561,1493"/>
+<path d="M4367,1968 L4313,1860"/>
+<path d="M4313,1860 L4260,1752"/>
+<path d="M4260,1752 L4206,1644"/>
+<path d="M4206,1644 L4152,1536"/>
+<path d="M1757,1335 L1811,1443"/>
+<path d="M1811,1443 L1865,1552"/>
+<path d="M1865,1552 L1919,1660"/>
+<path d="M1919,1660 L1973,1768"/>
+<path d="M3723,4407 L3772,4518"/>
+<path d="M3772,4518 L3820,4629"/>
+<path d="M3820,4629 L3869,4740"/>
+<path d="M3869,4740 L3917,4851"/>
+<path d="M3162,2330 L3166,2206"/>
+<path d="M3166,2206 L3171,2083"/>
+<path d="M3171,2083 L3175,1959"/>
+<path d="M3175,1959 L3179,1835"/>
+<path d="M4099,3572 L3996,3641"/>
+<path d="M3996,3641 L3893,3710"/>
+<path d="M3893,3710 L3789,3779"/>
+<path d="M3789,3779 L3686,3848"/>
+<path d="M4104,4130 L4000,4060"/>
+<path d="M4000,4060 L3895,3989"/>
+<path d="M3895,3989 L3791,3919"/>
+<path d="M3791,3919 L3686,3848"/>
+<path d="M962,3348 L1087,3365"/>
+<path d="M1087,3365 L1213,3381"/>
+<path d="M1213,3381 L1338,3398"/>
+<path d="M1338,3398 L1463,3414"/>
+<path d="M3167,1218 L3041,1237"/>
+<path d="M3041,1237 L2914,1256"/>
+<path d="M2914,1256 L2788,1275"/>
+<path d="M2788,1275 L2661,1294"/>
+<path d="M3179,1835 L3275,1750"/>
+<path d="M3275,1750 L3370,1664"/>
+<path d="M3370,1664 L3466,1579"/>
+<path d="M3466,1579 L3561,1493"/>
+<path d="M1767,4570 L1894,4540"/>
+<path d="M1894,4540 L2022,4511"/>
+<path d="M2022,4511 L2149,4481"/>
+<path d="M2149,4481 L2276,4451"/>
+<path d="M2764,4638 L2642,4591"/>
+<path d="M2642,4591 L2520,4545"/>
+<path d="M2520,4545 L2398,4498"/>
+<path d="M2398,4498 L2276,4451"/>
+<path d="M3809,1957 L3747,1841"/>
+<path d="M3747,1841 L3685,1725"/>
+<path d="M3685,1725 L3623,1609"/>
+<path d="M3623,1609 L3561,1493"/>
+<path d="M3289,4232 L3297,4366"/>
+<path d="M3297,4366 L3304,4500"/>
+<path d="M3304,4500 L3312,4634"/>
+<path d="M3312,4634 L3319,4768"/>
+<path d="M3809,1957 L3895,1852"/>
+<path d="M3895,1852 L3981,1747"/>
+<path d="M3981,1747 L4066,1641"/>
+<path d="M4066,1641 L4152,1536"/>
+<path d="M4505,4225 L4626,4159"/>
+<path d="M4626,4159 L4746,4093"/>
+<path d="M4746,4093 L4867,4027"/>
+<path d="M4867,4027 L4987,3961"/>
+<path d="M1488,2593 L1540,2692"/>
+<path d="M1540,2692 L1592,2792"/>
+<path d="M1592,2792 L1645,2891"/>
+<path d="M1645,2891 L1697,2991"/>
+<path d="M1697,2991 L1749,3090"/>
+<path d="M4367,1968 L4323,2072"/>
+<path d="M4323,2072 L4280,2176"/>
+<path d="M4280,2176 L4236,2281"/>
+<path d="M4236,2281 L4193,2385"/>
+<path d="M4193,2385 L4149,2489"/>
+<path d="M5077,3017 L4999,2930"/>
+<path d="M4999,2930 L4921,2844"/>
+<path d="M4921,2844 L4842,2757"/>
+<path d="M4842,2757 L4764,2671"/>
+<path d="M4764,2671 L4686,2584"/>
+<path d="M1394,1953 L1510,1916"/>
+<path d="M1510,1916 L1626,1879"/>
+<path d="M1626,1879 L1741,1842"/>
+<path d="M1741,1842 L1857,1805"/>
+<path d="M1857,1805 L1973,1768"/>
+<path d="M3199,3679 L3067,3684"/>
+<path d="M3067,3684 L2936,3690"/>
+<path d="M2936,3690 L2804,3695"/>
+<path d="M1973,1768 L2055,1842"/>
+<path d="M2055,1842 L2138,1916"/>
+<path d="M2138,1916 L2220,1989"/>
+<path d="M2220,1989 L2302,2063"/>
+<path d="M2542,3440 L2510,3555"/>
+<path d="M2510,3555 L2479,3670"/>
+<path d="M2479,3670 L2447,3785"/>
+<path d="M2447,3785 L2415,3900"/>
+<path d="M3533,1002 L3540,1125"/>
+<path d="M3540,1125 L3547,1248"/>
+<path d="M3547,1248 L3554,1370"/>
+<path d="M3554,1370 L3561,1493"/>
+<path d="M2388,1641 L2328,1527"/>
+<path d="M2328,1527 L2269,1414"/>
+<path d="M2269,1414 L2209,1300"/>
+<path d="M2209,1300 L2149,1186"/>
+<path d="M3199,3679 L3321,3721"/>
+<path d="M3321,3721 L3443,3764"/>
+<path d="M3443,3764 L3564,3806"/>
+<path d="M3564,3806 L3686,3848"/>
+<path d="M5077,3017 L5201,2978"/>
+<path d="M5201,2978 L5325,2938"/>
+<path d="M5325,2938 L5448,2899"/>
+<path d="M5448,2899 L5572,2859"/>
+<path d="M3167,1218 L3070,1131"/>
+<path d="M3070,1131 L2973,1043"/>
+<path d="M2973,1043 L2875,956"/>
+<path d="M2875,956 L2778,868"/>
+<path d="M2661,1294 L2533,1267"/>
+<path d="M2533,1267 L2405,1240"/>
+<path d="M2405,1240 L2277,1213"/>
+<path d="M2277,1213 L2149,1186"/>
+<path d="M3705,3208 L3804,3299"/>
+<path d="M3804,3299 L3902,3390"/>
+<path d="M3902,3390 L4001,3481"/>
+<path d="M4001,3481 L4099,3572"/>
+<path d="M2415,3900 L2524,3980"/>
+<path d="M2524,3980 L2634,4059"/>
+<path d="M2634,4059 L2743,4139"/>
+<path d="M2743,4139 L2852,4218"/>
+<path d="M2559,2539 L2495,2420"/>
+<path d="M2495,2420 L2431,2301"/>
+<path d="M2431,2301 L2366,2182"/>
+<path d="M2366,2182 L2302,2063"/>
+<path d="M3723,4407 L3622,4497"/>
+<path d="M3622,4497 L3521,4588"/>
+<path d="M3521,4588 L3420,4678"/>
+<path d="M3420,4678 L3319,4768"/>
+<path d="M4686,2584 L4552,2560"/>
+<path d="M4552,2560 L4418,2537"/>
+<path d="M4418,2537 L4283,2513"/>
+<path d="M4283,2513 L4149,2489"/>
+<path d="M4367,1968 L4228,1965"/>
+<path d="M4228,1965 L4088,1963"/>
+<path d="M4088,1963 L3949,1960"/>
+<path d="M3949,1960 L3809,1957"/>
+<path d="M4099,3572 L4100,3684"/>
+<path d="M4100,3684 L4101,3795"/>
+<path d="M4101,3795 L4102,3907"/>
+<path d="M4102,3907 L4103,4018"/>
+<path d="M4103,4018 L4104,4130"/>
+<path d="M2315,2828 L2254,2734"/>
+<path d="M2254,2734 L2193,2640"/>
+<path d="M2193,2640 L2132,2546"/>
+<path d="M2132,2546 L2071,2452"/>
+<path d="M2071,2452 L2010,2358"/>
+<path d="M2305,3199 L2244,3294"/>
+<path d="M2244,3294 L2183,3388"/>
+<path d="M2183,3388 L2123,3483"/>
+<path d="M2123,3483 L2062,3577"/>
+<path d="M2062,3577 L2001,3672"/>
+<path d="M1767,4570 L1654,4571"/>
+<path d="M1654,4571 L1541,4572"/>
+<path d="M1541,4572 L1427,4573"/>
+<path d="M1427,4573 L1314,4574"/>
+<path d="M1314,4574 L1201,4575"/>
+<path d="M2764,4638 L2875,4664"/>
+<path d="M2875,4664 L2986,4690"/>
+<path d="M2986,4690 L3097,4716"/>
+<path d="M3097,4716 L3208,4742"/>
+<path d="M3208,4742 L3319,4768"/>
+<path d="M1488,2593 L1592,2546"/>
+<path d="M1592,2546 L1697,2499"/>
+<path d="M1697,2499 L1801,2452"/>
+<path d="M1801,2452 L1906,2405"/>
+<path d="M1906,2405 L2010,2358"/>
+<path d="M4367,1968 L4473,2013"/>
+<path d="M4473,2013 L4578,2058"/>
+<path d="M4578,2058 L4684,2104"/>
+<path d="M4684,2104 L4789,2149"/>
+<path d="M4789,2149 L4895,2194"/>
+<path d="M2817,2288 L2889,2197"/>
+<path d="M2889,2197 L2962,2107"/>
+<path d="M2962,2107 L3034,2016"/>
+<path d="M3034,2016 L3107,1926"/>
+<path d="M3107,1926 L3179,1835"/>
+<path d="M3666,2821 L3763,2755"/>
+<path d="M3763,2755 L3859,2688"/>
+<path d="M3859,2688 L3956,2622"/>
+<path d="M3956,2622 L4052,2555"/>
+<path d="M4052,2555 L4149,2489"/>
+<path d="M2001,3672 L1893,3620"/>
+<path d="M1893,3620 L1786,3569"/>
+<path d="M1786,3569 L1678,3517"/>
+<path d="M1678,3517 L1571,3466"/>
+<path d="M1571,3466 L1463,3414"/>
+<path d="M3917,4851 L3797,4834"/>
+<path d="M3797,4834 L3678,4818"/>
+<path d="M3678,4818 L3558,4801"/>
+<path d="M3558,4801 L3439,4785"/>
+<path d="M3439,4785 L3319,4768"/>
+<path d="M2852,4218 L2737,4265"/>
+<path d="M2737,4265 L2622,4311"/>
+<path d="M2622,4311 L2506,4358"/>
+<path d="M2506,4358 L2391,4404"/>
+<path d="M2391,4404 L2276,4451"/>
+<path d="M3179,1835 L3305,1859"/>
+<path d="M3305,1859 L3431,1884"/>
+<path d="M3431,1884 L3557,1908"/>
+<path d="M3557,1908 L3683,1933"/>
+<path d="M3683,1933 L3809,1957"/>
+<path d="M5077,3017 L5016,3130"/>
+<path d="M5016,3130 L4955,3244"/>
+<path d="M4955,3244 L4895,3357"/>
+<path d="M4895,3357 L4834,3471"/>
+<path d="M4834,3471 L4773,3584"/>
+<path d="M1488,2593 L1469,2465"/>
+<path d="M1469,2465 L1450,2337"/>
+<path d="M1450,2337 L1432,2209"/>
+<path d="M1432,2209 L1413,2081"/>
+<path d="M1413,2081 L1394,1953"/>
+<path d="M3289,4232 L3184,4313"/>
+<path d="M3184,4313 L3079,4394"/>
+<path d="M3079,4394 L2974,4476"/>
+<path d="M2974,4476 L2869,4557"/>
+<path d="M2869,4557 L2764,4638"/>
+<path d="M4099,3572 L4234,3574"/>
+<path d="M4234,3574 L4369,3577"/>
+<path d="M4369,3577 L4503,3579"/>
+<path d="M4503,3579 L4638,3582"/>
+<path d="M4638,3582 L4773,3584"/>
+<path d="M4773,3584 L4719,3712"/>
+<path d="M4719,3712 L4666,3840"/>
+<path d="M4666,3840 L4612,3969"/>
+<path d="M4612,3969 L4559,4097"/>
+<path d="M4559,4097 L4505,4225"/>
+<path d="M3260,3000 L3463,2911"/>
+<path d="M3463,2911 L3666,2821"/>
+<path d="M3260,3000 L3483,3104"/>
+<path d="M3483,3104 L3705,3208"/>
+<path d="M3260,3000 L3323,2868"/>
+<path d="M3323,2868 L3463,2911"/>
+<path d="M3145,3251 L3300,3350"/>
+<path d="M3300,3350 L3454,3448"/>
+<path d="M3145,3251 L3172,3465"/>
+<path d="M3172,3465 L3199,3679"/>
+<path d="M3145,3251 L3274,3220"/>
+<path d="M3274,3220 L3300,3350"/>
+<path d="M2880,3208 L2842,3452"/>
+<path d="M2842,3452 L2804,3695"/>
+<path d="M2880,3208 L2711,3324"/>
+<path d="M2711,3324 L2542,3440"/>
+<path d="M2880,3208 L2955,3345"/>
+<path d="M2955,3345 L2842,3452"/>
+<path d="M2730,3000 L2518,3100"/>
+<path d="M2518,3100 L2305,3199"/>
+<path d="M2730,3000 L2523,2914"/>
+<path d="M2523,2914 L2315,2828"/>
+<path d="M2730,3000 L2665,3136"/>
+<path d="M2665,3136 L2518,3100"/>
+<path d="M2873,2779 L2716,2659"/>
+<path d="M2716,2659 L2559,2539"/>
+<path d="M2873,2779 L2845,2534"/>
+<path d="M2845,2534 L2817,2288"/>
+<path d="M2873,2779 L2737,2794"/>
+<path d="M2737,2794 L2716,2659"/>
+<path d="M3115,2801 L3139,2566"/>
+<path d="M3139,2566 L3162,2330"/>
+<path d="M3115,2801 L3285,2672"/>
+<path d="M3285,2672 L3455,2542"/>
+<path d="M3115,2801 L3032,2674"/>
+<path d="M3032,2674 L3139,2566"/>
+<path d="M1065,2628 L1109,2691"/>
+<path d="M1109,2691 L1087,2764"/>
+<path d="M1087,2764 L1016,2792"/>
+<path d="M1065,2628 L989,2623"/>
+<path d="M989,2623 L937,2679"/>
+<path d="M937,2679 L949,2755"/>
+<path d="M1016,2792 L949,2755"/>
+<path d="M2269,1414 L2272,1490"/>
+<path d="M2272,1490 L2214,1540"/>
+<path d="M2214,1540 L2139,1526"/>
+<path d="M2269,1414 L2208,1368"/>
+<path d="M2208,1368 L2134,1388"/>
+<path d="M2134,1388 L2103,1458"/>
+<path d="M2731,2372 L2659,2396"/>
+<path d="M2659,2396 L2594,2355"/>
+<path d="M2594,2355 L2587,2279"/>
+<path d="M2731,2372 L2757,2300"/>
+<path d="M2757,2300 L2717,2235"/>
+<path d="M2717,2235 L2642,2225"/>
+<path d="M2587,2279 L2642,2225"/>
+<path d="M5201,2978 L5125,2967"/>
+<path d="M5125,2967 L5087,2902"/>
+<path d="M5087,2902 L5114,2830"/>
+<path d="M5201,2978 L5256,2926"/>
+<path d="M5256,2926 L5250,2849"/>
+<path d="M5250,2849 L5187,2807"/>
+<path d="M4880,3773 L4875,3697"/>
+<path d="M4875,3697 L4931,3645"/>
+<path d="M4931,3645 L5007,3657"/>
+<path d="M4880,3773 L4943,3816"/>
+<path d="M4943,3816 L5016,3795"/>
+<path d="M5016,3795 L5044,3724"/>
+<path d="M5007,3657 L5044,3724"/>
+<path d="M1541,4572 L1610,4605"/>
+<path d="M1610,4605 L1628,4679"/>
+<path d="M1628,4679 L1581,4739"/>
+<path d="M1541,4572 L1472,4606"/>
+<path d="M1472,4606 L1456,4680"/>
+<path d="M1456,4680 L1504,4740"/>
+<path d="M4197,2594 L4196,2659"/>
+<path d="M4196,2659 L4144,2698"/>
+<path d="M4144,2698 L4081,2683"/>
+<path d="M4197,2594 L4147,2553"/>
+<path d="M4147,2553 L4083,2566"/>
+<path d="M4083,2566 L4054,2624"/>
+<path d="M4081,2683 L4054,2624"/>
+<path d="M3442,1056 L3366,1062"/>
+<path d="M3366,1062 L3313,1007"/>
+<path d="M3313,1007 L3324,931"/>
+<path d="M3442,1056 L3484,992"/>
+<path d="M3484,992 L3461,920"/>
+<path d="M3461,920 L3390,893"/>
+<path d="M3547,1248 L3576,1177"/>
+<path d="M3576,1177 L3650,1156"/>
+<path d="M3650,1156 L3712,1200"/>
+<path d="M3547,1248 L3584,1315"/>
+<path d="M3584,1315 L3659,1328"/>
+<path d="M3659,1328 L3716,1277"/>
+<path d="M3712,1200 L3716,1277"/>
+<path d="M3996,3641 L3932,3650"/>
+<path d="M3932,3650 L3885,3605"/>
+<path d="M3885,3605 L3890,3541"/>
+<path d="M3996,3641 L4029,3585"/>
+<path d="M4029,3585 L4006,3524"/>
+<path d="M4006,3524 L3944,3505"/>
+<path d="M1678,3171 L1748,3141"/>
+<path d="M1748,3141 L1815,3178"/>
+<path d="M1815,3178 L1829,3253"/>
+<path d="M1678,3171 L1657,3245"/>
+<path d="M1657,3245 L1702,3307"/>
+<path d="M1702,3307 L1778,3310"/>
+<path d="M1829,3253 L1778,3310"/>
+<path d="M3506,4320 L3455,4264"/>
+<path d="M3455,4264 L3467,4188"/>
+<path d="M3467,4188 L3533,4151"/>
+<path d="M3506,4320 L3582,4315"/>
+<path d="M3582,4315 L3626,4252"/>
+<path d="M3626,4252 L3604,4179"/>
+<path d="M1087,3365 L1023,3323"/>
+<path d="M1023,3323 L1016,3247"/>
+<path d="M1016,3247 L1071,3194"/>
+<path d="M1087,3365 L1160,3341"/>
+<path d="M1160,3341 L1186,3270"/>
+<path d="M1186,3270 L1147,3204"/>
+<path d="M1071,3194 L1147,3204"/>
+<path d="M2786,4533 L2746,4584"/>
+<path d="M2746,4584 L2682,4586"/>
+<path d="M2682,4586 L2640,4536"/>
+<path d="M2786,4533 L2770,4470"/>
+<path d="M2770,4470 L2711,4443"/>
+<path d="M2711,4443 L2653,4472"/>
+<path d="M4280,2176 L4337,2125"/>
+<path d="M4337,2125 L4412,2138"/>
+<path d="M4412,2138 L4449,2205"/>
+<path d="M4280,2176 L4284,2252"/>
+<path d="M4284,2252 L4346,2297"/>
+<path d="M4346,2297 L4420,2276"/>
+<path d="M4449,2205 L4420,2276"/>
+<path d="M2889,2197 L2820,2230"/>
+<path d="M2820,2230 L2751,2197"/>
+<path d="M2751,2197 L2734,2122"/>
+<path d="M2889,2197 L2906,2123"/>
+<path d="M2906,2123 L2859,2063"/>
+<path d="M2859,2063 L2782,2063"/>
+<path d="M3275,1750 L3202,1771"/>
+<path d="M3202,1771 L3139,1727"/>
+<path d="M3139,1727 L3135,1651"/>
+<path d="M3275,1750 L3304,1679"/>
+<path d="M3304,1679 L3267,1613"/>
+<path d="M3267,1613 L3192,1600"/>
+<path d="M3135,1651 L3192,1600"/>
+<path d="M2707,3746 L2783,3743"/>
+<path d="M2783,3743 L2833,3801"/>
+<path d="M2833,3801 L2819,3876"/>
+<path d="M2707,3746 L2662,3807"/>
+<path d="M2662,3807 L2681,3881"/>
+<path d="M2681,3881 L2751,3912"/>
+<path d="M3107,1926 L3038,1959"/>
+<path d="M3038,1959 L2969,1926"/>
+<path d="M2969,1926 L2952,1851"/>
+<path d="M3107,1926 L3124,1852"/>
+<path d="M3124,1852 L3077,1792"/>
+<path d="M3077,1792 L3000,1792"/>
+<path d="M2952,1851 L3000,1792"/>
+<path d="M1645,2891 L1642,2815"/>
+<path d="M1642,2815 L1700,2765"/>
+<path d="M1700,2765 L1775,2779"/>
+<path d="M1645,2891 L1706,2937"/>
+<path d="M1706,2937 L1780,2917"/>
+<path d="M1780,2917 L1811,2847"/>
+<path d="M2447,3785 L2404,3834"/>
+<path d="M2404,3834 L2339,3831"/>
+<path d="M2339,3831 L2301,3778"/>
+<path d="M2447,3785 L2435,3721"/>
+<path d="M2435,3721 L2378,3690"/>
+<path d="M2378,3690 L2319,3716"/>
+<path d="M2301,3778 L2319,3716"/>
+<path d="M1540,2692 L1538,2627"/>
+<path d="M1538,2627 L1587,2585"/>
+<path d="M1587,2585 L1651,2597"/>
+<path d="M1540,2692 L1592,2731"/>
+<path d="M1592,2731 L1655,2714"/>
+<path d="M1655,2714 L1681,2655"/>
+<path d="M2593,1381 L2662,1347"/>
+<path d="M2662,1347 L2731,1380"/>
+<path d="M2731,1380 L2748,1454"/>
+<path d="M2593,1381 L2576,1456"/>
+<path d="M2576,1456 L2625,1515"/>
+<path d="M2625,1515 L2701,1514"/>
+<path d="M2748,1454 L2701,1514"/>
+<path d="M5448,2899 L5372,2888"/>
+<path d="M5372,2888 L5334,2823"/>
+<path d="M5334,2823 L5361,2751"/>
+<path d="M5448,2899 L5503,2847"/>
+<path d="M5503,2847 L5497,2770"/>
+<path d="M5497,2770 L5434,2728"/>
+<path d="M2510,3555 L2460,3613"/>
+<path d="M2460,3613 L2383,3609"/>
+<path d="M2383,3609 L2339,3547"/>
+<path d="M2510,3555 L2496,3480"/>
+<path d="M2496,3480 L2429,3444"/>
+<path d="M2429,3444 L2359,3474"/>
+<path d="M2339,3547 L2359,3474"/>
+<path d="M2622,4311 L2546,4306"/>
+<path d="M2546,4306 L2502,4243"/>
+<path d="M2502,4243 L2524,4170"/>
+<path d="M2622,4311 L2673,4254"/>
+<path d="M2673,4254 L2661,4179"/>
+<path d="M2661,4179 L2595,4142"/>
+<path d="M3820,4629 L3823,4553"/>
+<path d="M3823,4553 L3884,4507"/>
+<path d="M3884,4507 L3958,4527"/>
+<path d="M3820,4629 L3878,4679"/>
+<path d="M3878,4679 L3953,4665"/>
+<path d="M3953,4665 L3989,4597"/>
+<path d="M3958,4527 L3989,4597"/>
+<path d="M2875,956 L2846,885"/>
+<path d="M2846,885 L2883,819"/>
+<path d="M2883,819 L2959,806"/>
+<path d="M2875,956 L2948,977"/>
+<path d="M2948,977 L3011,933"/>
+<path d="M3011,933 L3015,857"/>
+<path d="M4294,2803 L4293,2879"/>
+<path d="M4293,2879 L4232,2926"/>
+<path d="M4232,2926 L4158,2908"/>
+<path d="M4294,2803 L4235,2754"/>
+<path d="M4235,2754 L4160,2770"/>
+<path d="M4160,2770 L4126,2838"/>
+<path d="M4158,2908 L4126,2838"/>
+<path d="M2277,1213 L2217,1166"/>
+<path d="M2217,1166 L2215,1090"/>
+<path d="M2215,1090 L2274,1041"/>
+<path d="M2277,1213 L2351,1195"/>
+<path d="M2351,1195 L2383,1125"/>
+<path d="M2383,1125 L2349,1057"/>
+<path d="M2312,2952 L2257,2987"/>
+<path d="M2257,2987 L2235,3035"/>
+<path d="M2235,3035 L2226,3105"/>
+<path d="M1801,2452 L1746,2418"/>
+<path d="M1746,2418 L1693,2419"/>
+<path d="M1693,2419 L1626,2441"/>
+<path d="M3175,1959 L3120,1994"/>
+<path d="M3120,1994 L3097,2042"/>
+<path d="M3097,2042 L3088,2111"/>
+<path d="M1432,2209 L1384,2253"/>
+<path d="M1384,2253 L1370,2304"/>
+<path d="M1370,2304 L1374,2374"/>
+<path d="M3305,1859 L3344,1820"/>
+<path d="M3344,1820 L3355,1776"/>
+<path d="M3355,1776 L3350,1717"/>
+<path d="M2690,1188 L2648,1138"/>
+<path d="M2648,1138 L2598,1122"/>
+<path d="M2598,1122 L2527,1123"/>
+<path d="M2051,1223 L1998,1186"/>
+<path d="M1998,1186 L1945,1183"/>
+<path d="M1945,1183 L1877,1202"/>
+<path d="M4612,3969 L4676,3956"/>
+<path d="M4676,3956 L4714,3919"/>
+<path d="M4714,3919 L4747,3857"/>
+<path d="M4001,3481 L4010,3417"/>
+<path d="M4010,3417 L3989,3368"/>
+<path d="M3989,3368 L3942,3316"/>
+<path d="M1875,3731 L1819,3698"/>
+<path d="M1819,3698 L1766,3699"/>
+<path d="M1766,3699 L1700,3722"/>
+<path d="M2629,3525 L2618,3589"/>
+<path d="M2618,3589 L2638,3638"/>
+<path d="M2638,3638 L2683,3692"/>
+<path d="M3538,3368 L3602,3381"/>
+<path d="M3602,3381 L3651,3363"/>
+<path d="M3651,3363 L3707,3320"/>
+<path d="M3789,3779 L3849,3803"/>
+<path d="M3849,3803 L3902,3794"/>
+<path d="M3902,3794 L3963,3761"/>
+<path d="M4578,2058 L4565,1994"/>
+<path d="M4565,1994 L4529,1956"/>
+<path d="M4529,1956 L4467,1922"/>
+<path d="M4955,3244 L5020,3237"/>
+<path d="M5020,3237 L5061,3204"/>
+<path d="M5061,3204 L5100,3146"/>
+<path d="M3512,3548 L3577,3553"/>
+<path d="M3577,3553 L3624,3528"/>
+<path d="M3624,3528 L3673,3478"/>
+<path d="M4999,2930 L4935,2939"/>
+<path d="M4935,2939 L4894,2972"/>
+<path d="M4894,2972 L4856,3032"/>
+<path d="M2107,2260 L2043,2248"/>
+<path d="M2043,2248 L1994,2268"/>
+<path d="M1994,2268 L1940,2313"/>
+<path d="M4103,4018 L4156,3981"/>
+<path d="M4156,3981 L4177,3932"/>
+<path d="M4177,3932 L4183,3862"/>
+<path d="M3071,4225 L3038,4270"/>
+<path d="M3038,4270 L3035,4314"/>
+<path d="M3035,4314 L3049,4372"/>
+<path d="M5526,2989 L5589,2972"/>
+<path d="M5589,2972 L5625,2933"/>
+<path d="M5625,2933 L5654,2870"/>
+<path d="M3679,2950 L3721,2914"/>
+<path d="M3721,2914 L3735,2872"/>
+<path d="M3735,2872 L3735,2812"/>
+<path d="M3956,2622 L3895,2599"/>
+<path d="M3895,2599 L3843,2608"/>
+<path d="M3843,2608 L3782,2643"/>
+<path d="M4234,3574 L4198,3520"/>
+<path d="M4198,3520 L4150,3498"/>
+<path d="M4150,3498 L4080,3490"/>
+<path d="M3623,1609 L3593,1667"/>
+<path d="M3593,1667 L3597,1720"/>
+<path d="M3597,1720 L3624,1784"/>
+<path d="M1543,3631 L1505,3684"/>
+<path d="M1505,3684 L1502,3737"/>
+<path d="M1502,3737 L1520,3805"/>
+<path d="M2312,3843 L2318,3908"/>
+<path d="M2318,3908 L2350,3950"/>
+<path d="M2350,3950 L2409,3989"/>
+<path d="M3622,4497 L3630,4561"/>
+<path d="M3630,4561 L3664,4602"/>
+<path d="M3664,4602 L3723,4640"/>
+<path d="M4283,2513 L4310,2572"/>
+<path d="M4310,2572 L4354,2602"/>
+<path d="M4354,2602 L4422,2620"/>
+<path d="M3791,3919 L3791,3984"/>
+<path d="M3791,3984 L3820,4029"/>
+<path d="M3820,4029 L3874,4073"/>
+<path d="M4000,4060 L3940,4084"/>
+<path d="M3940,4084 L3908,4127"/>
+<path d="M3908,4127 L3886,4193"/>
+<path d="M4238,4162 L4286,4118"/>
+<path d="M4286,4118 L4301,4067"/>
+<path d="M4301,4067 L4297,3997"/>
+<path d="M4100,3684 L4154,3720"/>
+<path d="M4154,3720 L4207,3722"/>
+<path d="M4207,3722 L4274,3702"/>
+<path d="M2345,1852 L2405,1827"/>
+<path d="M2405,1827 L2435,1783"/>
+<path d="M2435,1783 L2456,1716"/>
+<path d="M2055,1842 L2109,1829"/>
+<path d="M2109,1829 L2140,1797"/>
+<path d="M2140,1797 L2166,1743"/>
+<path d="M3266,1287 L3327,1264"/>
+<path d="M3327,1264 L3359,1222"/>
+<path d="M3359,1222 L3382,1155"/>
+<path d="M2022,4511 L1974,4467"/>
+<path d="M1974,4467 L1922,4457"/>
+<path d="M1922,4457 L1852,4467"/>
+<path d="M1571,3466 L1581,3530"/>
+<path d="M1581,3530 L1615,3570"/>
+<path d="M1615,3570 L1676,3607"/>
+<path d="M3297,4366 L3353,4400"/>
+<path d="M3353,4400 L3406,4399"/>
+<path d="M3406,4399 L3472,4376"/>
+<path d="M2932,2302 L2968,2261"/>
+<path d="M2968,2261 L2976,2216"/>
+<path d="M2976,2216 L2967,2157"/>
+<path d="M2391,4404 L2445,4440"/>
+<path d="M2445,4440 L2498,4442"/>
+<path d="M2498,4442 L2565,4421"/>
+<path d="M2875,4664 L2898,4725"/>
+<path d="M2898,4725 L2889,4777"/>
+<path d="M2889,4777 L2855,4838"/>
+<path d="M2123,3483 L2188,3481"/>
+<path d="M2188,3481 L2232,3452"/>
+<path d="M2232,3452 L2276,3397"/>
+<path d="M1469,2465 L1411,2436"/>
+<path d="M1411,2436 L1358,2442"/>
+<path d="M1358,2442 L1294,2471"/>
+<path d="M3895,1852 L3877,1790"/>
+<path d="M3877,1790 L3837,1754"/>
+<path d="M3837,1754 L3772,1727"/>
+<path d="M841,3909 L887,3863"/>
+<path d="M887,3863 L898,3811"/>
+<path d="M898,3811 L891,3741"/>
+<path d="M3628,3748 L3656,3689"/>
+<path d="M3656,3689 L3650,3637"/>
+<path d="M3650,3637 L3621,3573"/>
+<path d="M3312,4634 L3364,4594"/>
+<path d="M3364,4594 L3382,4545"/>
+<path d="M3382,4545 L3385,4474"/>
+<path d="M1314,4574 L1278,4628"/>
+<path d="M1278,4628 L1276,4681"/>
+<path d="M1276,4681 L1296,4748"/>
+<path d="M1535,3333 L1551,3396"/>
+<path d="M1551,3396 L1589,3433"/>
+<path d="M1589,3433 L1652,3463"/>
+<path d="M4260,1752 L4228,1809"/>
+<path d="M4228,1809 L4231,1862"/>
+<path d="M4231,1862 L4256,1927"/>
+<path d="M3443,3764 L3426,3701"/>
+<path d="M3426,3701 L3387,3665"/>
+<path d="M3387,3665 L3323,3636"/>
+<path d="M4842,2757 L4827,2820"/>
+<path d="M4827,2820 L4843,2870"/>
+<path d="M4843,2870 L4885,2927"/>
+<path d="M2398,4498 L2413,4561"/>
+<path d="M2413,4561 L2451,4599"/>
+<path d="M2451,4599 L2514,4630"/>
+<path d="M2254,2734 L2229,2794"/>
+<path d="M2229,2794 L2237,2846"/>
+<path d="M2237,2846 L2270,2909"/>
+<path d="M3079,4394 L3141,4414"/>
+<path d="M3141,4414 L3192,4401"/>
+<path d="M3192,4401 L3252,4364"/>
+<path d="M4843,2292 L4908,2285"/>
+<path d="M4908,2285 L4949,2252"/>
+<path d="M4949,2252 L4988,2194"/>
+<path d="M2743,4139 L2745,4074"/>
+<path d="M2745,4074 L2718,4028"/>
+<path d="M2718,4028 L2666,3982"/>
+<path d="M982,4337 L997,4274"/>
+<path d="M997,4274 L980,4224"/>
+<path d="M980,4224 L937,4167"/>
+<path d="M1510,1916 L1459,1876"/>
+<path d="M1459,1876 L1406,1871"/>
+<path d="M1406,1871 L1337,1885"/>
+<path d="M5654,2870 L5591,2805"/>
+<path d="M5100,3146 L5188,3166"/>
+<path d="M4747,3857 L4836,3868"/>
+<path d="M4297,3997 L4211,3969"/>
+<path d="M3723,4640 L3705,4728"/>
+<path d="M3385,4474 L3470,4445"/>
+<path d="M2855,4838 L2912,4907"/>
+<path d="M2514,4630 L2506,4720"/>
+<path d="M1296,4748 L1386,4755"/>
+<path d="M1504,4740 L1459,4818"/>
+<path d="M937,4167 L984,4090"/>
+<path d="M891,3741 L971,3700"/>
+<path d="M1294,2471 L1299,2561"/>
+<path d="M1374,2374 L1292,2411"/>
+<path d="M1337,1885 L1322,1974"/>
+<path d="M1877,1202 L1823,1130"/>
+<path d="M2274,1041 L2245,956"/>
+<path d="M2349,1057 L2409,990"/>
+<path d="M2959,806 L2977,718"/>
+<path d="M3390,893 L3389,803"/>
+<path d="M3324,931 L3246,887"/>
+<path d="M4467,1922 L4479,1833"/>
+<path d="M4988,2194 L4937,2120"/>
+<path d="M5434,2728 L5453,2640"/>
+</g>
+<circle cx="3260" cy="3000" r="20" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>control (start_control)</title></circle>
+<circle cx="3145" cy="3251" r="20" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>control / drive (start_control_drive)</title></circle>
+<circle cx="2880" cy="3208" r="20" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>drive (start_drive)</title></circle>
+<circle cx="2730" cy="3000" r="20" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>drive / reserve (start_drive_reserve)</title></circle>
+<circle cx="2873" cy="2779" r="20" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>reserve (start_reserve)</title></circle>
+<circle cx="3115" cy="2801" r="20" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>reserve / control (start_reserve_control)</title></circle>
+<circle cx="3666" cy="2821" r="6" fill="#72bda7" stroke="#111820" stroke-width="3"><title>Attribute (r0_control_0_0)</title></circle>
+<circle cx="1109" cy="2691" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Precision (r0_control_0_1)</title></circle>
+<circle cx="3705" cy="3208" r="6" fill="#72bda7" stroke="#111820" stroke-width="3"><title>Attribute (r0_control_0_2)</title></circle>
+<circle cx="4099" cy="3572" r="6" fill="#72bda7" stroke="#111820" stroke-width="3"><title>Attribute (r0_control_0_3)</title></circle>
+<circle cx="1016" cy="2792" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Precision Mastery (r0_control_0_4)</title></circle>
+<circle cx="1087" cy="2764" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Precision (r0_control_0_5)</title></circle>
+<circle cx="4895" cy="2194" r="6" fill="#72bda7" stroke="#111820" stroke-width="3"><title>Attribute (r0_control_0_6)</title></circle>
+<circle cx="989" cy="2623" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Precision (r0_control_0_7)</title></circle>
+<circle cx="5077" cy="3017" r="6" fill="#72bda7" stroke="#111820" stroke-width="3"><title>Attribute (r0_control_0_8)</title></circle>
+<circle cx="4686" cy="2584" r="6" fill="#72bda7" stroke="#111820" stroke-width="3"><title>Attribute (r0_control_0_9)</title></circle>
+<circle cx="949" cy="2755" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Precision Mastery (r0_control_0_10)</title></circle>
+<circle cx="937" cy="2679" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Precision (r0_control_0_11)</title></circle>
+<circle cx="4773" cy="3584" r="6" fill="#72bda7" stroke="#111820" stroke-width="3"><title>Attribute (r0_control_1_0)</title></circle>
+<circle cx="2257" cy="2987" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Economy (r0_control_1_1)</title></circle>
+<circle cx="4149" cy="2489" r="6" fill="#72bda7" stroke="#111820" stroke-width="3"><title>Attribute (r0_control_1_2)</title></circle>
+<circle cx="4342" cy="2908" r="6" fill="#72bda7" stroke="#111820" stroke-width="3"><title>Attribute (r0_control_1_3)</title></circle>
+<circle cx="2226" cy="3105" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Economy Mastery (r0_control_1_4)</title></circle>
+<circle cx="2235" cy="3035" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Economy (r0_control_1_5)</title></circle>
+<circle cx="5572" cy="2859" r="6" fill="#72bda7" stroke="#111820" stroke-width="3"><title>Attribute (r0_control_1_6)</title></circle>
+<circle cx="1746" cy="2418" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Economy (r0_control_1_7)</title></circle>
+<circle cx="5435" cy="3250" r="6" fill="#72bda7" stroke="#111820" stroke-width="3"><title>Attribute (r0_control_1_8)</title></circle>
+<circle cx="4987" cy="3961" r="6" fill="#72bda7" stroke="#111820" stroke-width="3"><title>Attribute (r0_control_1_9)</title></circle>
+<circle cx="1626" cy="2441" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Economy Mastery (r0_control_1_10)</title></circle>
+<circle cx="1693" cy="2419" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Economy (r0_control_1_11)</title></circle>
+<circle cx="3454" cy="3448" r="6" fill="#72bda7" stroke="#111820" stroke-width="3"><title>Attribute (r0_control_drive_0_0)</title></circle>
+<circle cx="2272" cy="1490" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Actuation (r0_control_drive_0_1)</title></circle>
+<circle cx="3199" cy="3679" r="6" fill="#72bda7" stroke="#111820" stroke-width="3"><title>Attribute (r0_control_drive_0_2)</title></circle>
+<circle cx="3289" cy="4232" r="6" fill="#e6ab73" stroke="#111820" stroke-width="3"><title>Attribute (r0_control_drive_0_3)</title></circle>
+<circle cx="2139" cy="1526" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Actuation Mastery (r0_control_drive_0_4)</title></circle>
+<circle cx="2214" cy="1540" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Actuation (r0_control_drive_0_5)</title></circle>
+<circle cx="3723" cy="4407" r="6" fill="#72bda7" stroke="#111820" stroke-width="3"><title>Attribute (r0_control_drive_0_6)</title></circle>
+<circle cx="2208" cy="1368" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Actuation (r0_control_drive_0_7)</title></circle>
+<circle cx="3917" cy="4851" r="6" fill="#72bda7" stroke="#111820" stroke-width="3"><title>Attribute (r0_control_drive_0_8)</title></circle>
+<circle cx="4104" cy="4130" r="6" fill="#e6ab73" stroke="#111820" stroke-width="3"><title>Attribute (r0_control_drive_0_9)</title></circle>
+<circle cx="2103" cy="1458" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Actuation Mastery (r0_control_drive_0_10)</title></circle>
+<circle cx="2134" cy="1388" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Actuation (r0_control_drive_0_11)</title></circle>
+<circle cx="3319" cy="4768" r="6" fill="#72bda7" stroke="#111820" stroke-width="3"><title>Attribute (r0_control_drive_1_0)</title></circle>
+<circle cx="3120" cy="1994" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Recovery (r0_control_drive_1_1)</title></circle>
+<circle cx="4505" cy="4225" r="6" fill="#72bda7" stroke="#111820" stroke-width="3"><title>Attribute (r0_control_drive_1_2)</title></circle>
+<circle cx="3686" cy="3848" r="6" fill="#e6ab73" stroke="#111820" stroke-width="3"><title>Attribute (r0_control_drive_1_3)</title></circle>
+<circle cx="3088" cy="2111" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Recovery Mastery (r0_control_drive_1_4)</title></circle>
+<circle cx="3097" cy="2042" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Recovery (r0_control_drive_1_5)</title></circle>
+<circle cx="3369" cy="3525" r="6" fill="#72bda7" stroke="#111820" stroke-width="3"><title>Attribute (r0_control_drive_1_6)</title></circle>
+<circle cx="1384" cy="2253" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Recovery (r0_control_drive_1_7)</title></circle>
+<circle cx="3284" cy="3602" r="6" fill="#72bda7" stroke="#111820" stroke-width="3"><title>Attribute (r0_control_drive_1_8)</title></circle>
+<circle cx="3538" cy="3368" r="6" fill="#e6ab73" stroke="#111820" stroke-width="3"><title>Attribute (r0_control_drive_1_9)</title></circle>
+<circle cx="1374" cy="2374" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Recovery Mastery (r0_control_drive_1_10)</title></circle>
+<circle cx="1370" cy="2304" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Recovery (r0_control_drive_1_11)</title></circle>
+<circle cx="2804" cy="3695" r="6" fill="#e6ab73" stroke="#111820" stroke-width="3"><title>Attribute (r0_drive_0_0)</title></circle>
+<circle cx="2659" cy="2396" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Momentum (r0_drive_0_1)</title></circle>
+<circle cx="2542" cy="3440" r="6" fill="#e6ab73" stroke="#111820" stroke-width="3"><title>Attribute (r0_drive_0_2)</title></circle>
+<circle cx="1622" cy="3848" r="6" fill="#e6ab73" stroke="#111820" stroke-width="3"><title>Attribute (r0_drive_0_3)</title></circle>
+<circle cx="2587" cy="2279" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Momentum Mastery (r0_drive_0_4)</title></circle>
+<circle cx="2594" cy="2355" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Momentum (r0_drive_0_5)</title></circle>
+<circle cx="2415" cy="3900" r="6" fill="#e6ab73" stroke="#111820" stroke-width="3"><title>Attribute (r0_drive_0_6)</title></circle>
+<circle cx="2757" cy="2300" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Momentum (r0_drive_0_7)</title></circle>
+<circle cx="2764" cy="4638" r="6" fill="#e6ab73" stroke="#111820" stroke-width="3"><title>Attribute (r0_drive_0_8)</title></circle>
+<circle cx="1767" cy="4570" r="6" fill="#e6ab73" stroke="#111820" stroke-width="3"><title>Attribute (r0_drive_0_9)</title></circle>
+<circle cx="2642" cy="2225" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Momentum Mastery (r0_drive_0_10)</title></circle>
+<circle cx="2717" cy="2235" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Momentum (r0_drive_0_11)</title></circle>
+<circle cx="909" cy="4257" r="6" fill="#e6ab73" stroke="#111820" stroke-width="3"><title>Attribute (r0_drive_1_0)</title></circle>
+<circle cx="3344" cy="1820" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Hardness (r0_drive_1_1)</title></circle>
+<circle cx="2852" cy="4218" r="6" fill="#e6ab73" stroke="#111820" stroke-width="3"><title>Attribute (r0_drive_1_2)</title></circle>
+<circle cx="1201" cy="4575" r="6" fill="#e6ab73" stroke="#111820" stroke-width="3"><title>Attribute (r0_drive_1_3)</title></circle>
+<circle cx="3350" cy="1717" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Hardness Mastery (r0_drive_1_4)</title></circle>
+<circle cx="3355" cy="1776" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Hardness (r0_drive_1_5)</title></circle>
+<circle cx="2001" cy="3672" r="6" fill="#e6ab73" stroke="#111820" stroke-width="3"><title>Attribute (r0_drive_1_6)</title></circle>
+<circle cx="2648" cy="1138" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Hardness (r0_drive_1_7)</title></circle>
+<circle cx="2276" cy="4451" r="6" fill="#e6ab73" stroke="#111820" stroke-width="3"><title>Attribute (r0_drive_1_8)</title></circle>
+<circle cx="2463" cy="3360" r="6" fill="#e6ab73" stroke="#111820" stroke-width="3"><title>Attribute (r0_drive_1_9)</title></circle>
+<circle cx="2527" cy="1123" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Hardness Mastery (r0_drive_1_10)</title></circle>
+<circle cx="2598" cy="1122" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Hardness (r0_drive_1_11)</title></circle>
+<circle cx="2305" cy="3199" r="6" fill="#e6ab73" stroke="#111820" stroke-width="3"><title>Attribute (r0_drive_reserve_0_0)</title></circle>
+<circle cx="5125" cy="2967" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Thermal Reach (r0_drive_reserve_0_1)</title></circle>
+<circle cx="2315" cy="2828" r="6" fill="#e6ab73" stroke="#111820" stroke-width="3"><title>Attribute (r0_drive_reserve_0_2)</title></circle>
+<circle cx="1488" cy="2593" r="6" fill="#829bdb" stroke="#111820" stroke-width="3"><title>Attribute (r0_drive_reserve_0_3)</title></circle>
+<circle cx="5114" cy="2830" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Thermal Reach Mastery (r0_drive_reserve_0_4)</title></circle>
+<circle cx="5087" cy="2902" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Thermal Reach (r0_drive_reserve_0_5)</title></circle>
+<circle cx="962" cy="3348" r="6" fill="#e6ab73" stroke="#111820" stroke-width="3"><title>Attribute (r0_drive_reserve_0_6)</title></circle>
+<circle cx="5256" cy="2926" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Thermal Reach (r0_drive_reserve_0_7)</title></circle>
+<circle cx="818" cy="3793" r="6" fill="#e6ab73" stroke="#111820" stroke-width="3"><title>Attribute (r0_drive_reserve_0_8)</title></circle>
+<circle cx="1749" cy="3090" r="6" fill="#829bdb" stroke="#111820" stroke-width="3"><title>Attribute (r0_drive_reserve_0_9)</title></circle>
+<circle cx="5187" cy="2807" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Thermal Reach Mastery (r0_drive_reserve_0_10)</title></circle>
+<circle cx="5250" cy="2849" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Thermal Reach (r0_drive_reserve_0_11)</title></circle>
+<circle cx="1065" cy="2628" r="6" fill="#e6ab73" stroke="#111820" stroke-width="3"><title>Attribute (r0_drive_reserve_1_0)</title></circle>
+<circle cx="1998" cy="1186" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Heat Flow (r0_drive_reserve_1_1)</title></circle>
+<circle cx="1463" cy="3414" r="6" fill="#e6ab73" stroke="#111820" stroke-width="3"><title>Attribute (r0_drive_reserve_1_2)</title></circle>
+<circle cx="2384" cy="3279" r="6" fill="#829bdb" stroke="#111820" stroke-width="3"><title>Attribute (r0_drive_reserve_1_3)</title></circle>
+<circle cx="1877" cy="1202" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Heat Flow Mastery (r0_drive_reserve_1_4)</title></circle>
+<circle cx="1945" cy="1183" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Heat Flow (r0_drive_reserve_1_5)</title></circle>
+<circle cx="2308" cy="3075" r="6" fill="#e6ab73" stroke="#111820" stroke-width="3"><title>Attribute (r0_drive_reserve_1_6)</title></circle>
+<circle cx="4676" cy="3956" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Heat Flow (r0_drive_reserve_1_7)</title></circle>
+<circle cx="2312" cy="2952" r="6" fill="#e6ab73" stroke="#111820" stroke-width="3"><title>Attribute (r0_drive_reserve_1_8)</title></circle>
+<circle cx="2396" cy="2732" r="6" fill="#829bdb" stroke="#111820" stroke-width="3"><title>Attribute (r0_drive_reserve_1_9)</title></circle>
+<circle cx="4747" cy="3857" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Heat Flow Mastery (r0_drive_reserve_1_10)</title></circle>
+<circle cx="4714" cy="3919" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Heat Flow (r0_drive_reserve_1_11)</title></circle>
+<circle cx="2559" cy="2539" r="6" fill="#829bdb" stroke="#111820" stroke-width="3"><title>Attribute (r0_reserve_0_0)</title></circle>
+<circle cx="4875" cy="3697" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Reserves (r0_reserve_0_1)</title></circle>
+<circle cx="2817" cy="2288" r="6" fill="#829bdb" stroke="#111820" stroke-width="3"><title>Attribute (r0_reserve_0_2)</title></circle>
+<circle cx="2388" cy="1641" r="6" fill="#829bdb" stroke="#111820" stroke-width="3"><title>Attribute (r0_reserve_0_3)</title></circle>
+<circle cx="5007" cy="3657" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Reserves Mastery (r0_reserve_0_4)</title></circle>
+<circle cx="4931" cy="3645" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Reserves (r0_reserve_0_5)</title></circle>
+<circle cx="1394" cy="1953" r="6" fill="#829bdb" stroke="#111820" stroke-width="3"><title>Attribute (r0_reserve_0_6)</title></circle>
+<circle cx="4943" cy="3816" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Reserves (r0_reserve_0_7)</title></circle>
+<circle cx="1757" cy="1335" r="6" fill="#829bdb" stroke="#111820" stroke-width="3"><title>Attribute (r0_reserve_0_8)</title></circle>
+<circle cx="1973" cy="1768" r="6" fill="#829bdb" stroke="#111820" stroke-width="3"><title>Attribute (r0_reserve_0_9)</title></circle>
+<circle cx="5044" cy="3724" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Reserves Mastery (r0_reserve_0_10)</title></circle>
+<circle cx="5016" cy="3795" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Reserves (r0_reserve_0_11)</title></circle>
+<circle cx="2661" cy="1294" r="6" fill="#829bdb" stroke="#111820" stroke-width="3"><title>Attribute (r0_reserve_1_0)</title></circle>
+<circle cx="4010" cy="3417" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Insulation (r0_reserve_1_1)</title></circle>
+<circle cx="2010" cy="2358" r="6" fill="#829bdb" stroke="#111820" stroke-width="3"><title>Attribute (r0_reserve_1_2)</title></circle>
+<circle cx="2302" cy="2063" r="6" fill="#829bdb" stroke="#111820" stroke-width="3"><title>Attribute (r0_reserve_1_3)</title></circle>
+<circle cx="3942" cy="3316" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Insulation Mastery (r0_reserve_1_4)</title></circle>
+<circle cx="3989" cy="3368" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Insulation (r0_reserve_1_5)</title></circle>
+<circle cx="2149" cy="1186" r="6" fill="#829bdb" stroke="#111820" stroke-width="3"><title>Attribute (r0_reserve_1_6)</title></circle>
+<circle cx="1819" cy="3698" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Insulation (r0_reserve_1_7)</title></circle>
+<circle cx="2778" cy="868" r="6" fill="#829bdb" stroke="#111820" stroke-width="3"><title>Attribute (r0_reserve_1_8)</title></circle>
+<circle cx="2932" cy="2302" r="6" fill="#829bdb" stroke="#111820" stroke-width="3"><title>Attribute (r0_reserve_1_9)</title></circle>
+<circle cx="1700" cy="3722" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Insulation Mastery (r0_reserve_1_10)</title></circle>
+<circle cx="1766" cy="3699" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Insulation (r0_reserve_1_11)</title></circle>
+<circle cx="3162" cy="2330" r="6" fill="#829bdb" stroke="#111820" stroke-width="3"><title>Attribute (r0_reserve_control_0_0)</title></circle>
+<circle cx="1610" cy="4605" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Regulation (r0_reserve_control_0_1)</title></circle>
+<circle cx="3455" cy="2542" r="6" fill="#829bdb" stroke="#111820" stroke-width="3"><title>Attribute (r0_reserve_control_0_2)</title></circle>
+<circle cx="4367" cy="1968" r="6" fill="#72bda7" stroke="#111820" stroke-width="3"><title>Attribute (r0_reserve_control_0_3)</title></circle>
+<circle cx="1581" cy="4739" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Regulation Mastery (r0_reserve_control_0_4)</title></circle>
+<circle cx="1628" cy="4679" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Regulation (r0_reserve_control_0_5)</title></circle>
+<circle cx="3167" cy="1218" r="6" fill="#829bdb" stroke="#111820" stroke-width="3"><title>Attribute (r0_reserve_control_0_6)</title></circle>
+<circle cx="1472" cy="4606" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Regulation (r0_reserve_control_0_7)</title></circle>
+<circle cx="3179" cy="1835" r="6" fill="#829bdb" stroke="#111820" stroke-width="3"><title>Attribute (r0_reserve_control_0_8)</title></circle>
+<circle cx="3809" cy="1957" r="6" fill="#72bda7" stroke="#111820" stroke-width="3"><title>Attribute (r0_reserve_control_0_9)</title></circle>
+<circle cx="1504" cy="4740" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Regulation Mastery (r0_reserve_control_0_10)</title></circle>
+<circle cx="1456" cy="4680" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Regulation (r0_reserve_control_0_11)</title></circle>
+<circle cx="3533" cy="1002" r="6" fill="#829bdb" stroke="#111820" stroke-width="3"><title>Attribute (r0_reserve_control_1_0)</title></circle>
+<circle cx="2618" cy="3589" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Conservation (r0_reserve_control_1_1)</title></circle>
+<circle cx="4152" cy="1536" r="6" fill="#829bdb" stroke="#111820" stroke-width="3"><title>Attribute (r0_reserve_control_1_2)</title></circle>
+<circle cx="3561" cy="1493" r="6" fill="#72bda7" stroke="#111820" stroke-width="3"><title>Attribute (r0_reserve_control_1_3)</title></circle>
+<circle cx="2683" cy="3692" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Conservation Mastery (r0_reserve_control_1_4)</title></circle>
+<circle cx="2638" cy="3638" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Conservation (r0_reserve_control_1_5)</title></circle>
+<circle cx="3047" cy="2316" r="6" fill="#829bdb" stroke="#111820" stroke-width="3"><title>Attribute (r0_reserve_control_1_6)</title></circle>
+<circle cx="3602" cy="3381" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Conservation (r0_reserve_control_1_7)</title></circle>
+<circle cx="3525" cy="2635" r="6" fill="#829bdb" stroke="#111820" stroke-width="3"><title>Attribute (r0_reserve_control_1_8)</title></circle>
+<circle cx="3260" cy="2401" r="6" fill="#72bda7" stroke="#111820" stroke-width="3"><title>Attribute (r0_reserve_control_1_9)</title></circle>
+<circle cx="3707" cy="3320" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Conservation Mastery (r0_reserve_control_1_10)</title></circle>
+<circle cx="3651" cy="3363" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Conservation (r0_reserve_control_1_11)</title></circle>
+<circle cx="3621" cy="3288" r="6" fill="#72bda7" stroke="#111820" stroke-width="3"><title>Attribute (r1_control_0_0)</title></circle>
+<circle cx="4196" cy="2659" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Hardness (r1_control_0_1)</title></circle>
+<circle cx="3596" cy="2728" r="6" fill="#72bda7" stroke="#111820" stroke-width="3"><title>Attribute (r1_control_0_2)</title></circle>
+<circle cx="3679" cy="2950" r="6" fill="#72bda7" stroke="#111820" stroke-width="3"><title>Attribute (r1_control_0_3)</title></circle>
+<circle cx="4081" cy="2683" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Hardness Mastery (r1_control_0_4)</title></circle>
+<circle cx="4144" cy="2698" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Hardness (r1_control_0_5)</title></circle>
+<circle cx="3692" cy="3079" r="6" fill="#72bda7" stroke="#111820" stroke-width="3"><title>Attribute (r1_control_0_6)</title></circle>
+<circle cx="4147" cy="2553" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Hardness (r1_control_0_7)</title></circle>
+<circle cx="5526" cy="2989" r="6" fill="#72bda7" stroke="#111820" stroke-width="3"><title>Attribute (r1_control_0_8)</title></circle>
+<circle cx="5481" cy="3120" r="6" fill="#72bda7" stroke="#111820" stroke-width="3"><title>Attribute (r1_control_0_9)</title></circle>
+<circle cx="4054" cy="2624" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Hardness Mastery (r1_control_0_10)</title></circle>
+<circle cx="4083" cy="2566" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Hardness (r1_control_0_11)</title></circle>
+<circle cx="5167" cy="3075" r="6" fill="#72bda7" stroke="#111820" stroke-width="3"><title>Attribute (r1_control_1_0)</title></circle>
+<circle cx="3849" cy="3803" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Thermal Reach (r1_control_1_1)</title></circle>
+<circle cx="5256" cy="3134" r="6" fill="#72bda7" stroke="#111820" stroke-width="3"><title>Attribute (r1_control_1_2)</title></circle>
+<circle cx="5346" cy="3192" r="6" fill="#72bda7" stroke="#111820" stroke-width="3"><title>Attribute (r1_control_1_3)</title></circle>
+<circle cx="3963" cy="3761" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Thermal Reach Mastery (r1_control_1_4)</title></circle>
+<circle cx="3902" cy="3794" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Thermal Reach (r1_control_1_5)</title></circle>
+<circle cx="4827" cy="3678" r="6" fill="#72bda7" stroke="#111820" stroke-width="3"><title>Attribute (r1_control_1_6)</title></circle>
+<circle cx="4565" cy="1994" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Thermal Reach (r1_control_1_7)</title></circle>
+<circle cx="4880" cy="3773" r="6" fill="#72bda7" stroke="#111820" stroke-width="3"><title>Attribute (r1_control_1_8)</title></circle>
+<circle cx="4934" cy="3867" r="6" fill="#72bda7" stroke="#111820" stroke-width="3"><title>Attribute (r1_control_1_9)</title></circle>
+<circle cx="4467" cy="1922" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Component Mount (r1_control_1_10)</title></circle>
+<circle cx="4529" cy="1956" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Thermal Reach (r1_control_1_11)</title></circle>
+<circle cx="4238" cy="4162" r="6" fill="#72bda7" stroke="#111820" stroke-width="3"><title>Attribute (r1_control_drive_0_0)</title></circle>
+<circle cx="3366" cy="1062" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Heat Flow (r1_control_drive_0_1)</title></circle>
+<circle cx="4371" cy="4193" r="6" fill="#72bda7" stroke="#111820" stroke-width="3"><title>Attribute (r1_control_drive_0_2)</title></circle>
+<circle cx="3180" cy="4229" r="6" fill="#e6ab73" stroke="#111820" stroke-width="3"><title>Attribute (r1_control_drive_0_3)</title></circle>
+<circle cx="3324" cy="931" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Heat Flow Mastery (r1_control_drive_0_4)</title></circle>
+<circle cx="3313" cy="1007" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Heat Flow (r1_control_drive_0_5)</title></circle>
+<circle cx="3071" cy="4225" r="6" fill="#72bda7" stroke="#111820" stroke-width="3"><title>Attribute (r1_control_drive_0_6)</title></circle>
+<circle cx="3484" cy="992" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Heat Flow (r1_control_drive_0_7)</title></circle>
+<circle cx="3512" cy="3548" r="6" fill="#72bda7" stroke="#111820" stroke-width="3"><title>Attribute (r1_control_drive_0_8)</title></circle>
+<circle cx="3570" cy="3648" r="6" fill="#e6ab73" stroke="#111820" stroke-width="3"><title>Attribute (r1_control_drive_0_9)</title></circle>
+<circle cx="3390" cy="893" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Managed Territory (r1_control_drive_0_10)</title></circle>
+<circle cx="3461" cy="920" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Heat Flow (r1_control_drive_0_11)</title></circle>
+<circle cx="3628" cy="3748" r="6" fill="#72bda7" stroke="#111820" stroke-width="3"><title>Attribute (r1_control_drive_1_0)</title></circle>
+<circle cx="5020" cy="3237" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Reserves (r1_control_drive_1_1)</title></circle>
+<circle cx="3398" cy="4276" r="6" fill="#72bda7" stroke="#111820" stroke-width="3"><title>Attribute (r1_control_drive_1_2)</title></circle>
+<circle cx="3506" cy="4320" r="6" fill="#e6ab73" stroke="#111820" stroke-width="3"><title>Attribute (r1_control_drive_1_3)</title></circle>
+<circle cx="5100" cy="3146" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Reserves Mastery (r1_control_drive_1_4)</title></circle>
+<circle cx="5061" cy="3204" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Reserves (r1_control_drive_1_5)</title></circle>
+<circle cx="3615" cy="4363" r="6" fill="#72bda7" stroke="#111820" stroke-width="3"><title>Attribute (r1_control_drive_1_6)</title></circle>
+<circle cx="3577" cy="3553" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Reserves (r1_control_drive_1_7)</title></circle>
+<circle cx="3818" cy="4338" r="6" fill="#72bda7" stroke="#111820" stroke-width="3"><title>Attribute (r1_control_drive_1_8)</title></circle>
+<circle cx="3914" cy="4269" r="6" fill="#e6ab73" stroke="#111820" stroke-width="3"><title>Attribute (r1_control_drive_1_9)</title></circle>
+<circle cx="3673" cy="3478" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Reserves Mastery (r1_control_drive_1_10)</title></circle>
+<circle cx="3624" cy="3528" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Reserves (r1_control_drive_1_11)</title></circle>
+<circle cx="2717" cy="3610" r="6" fill="#e6ab73" stroke="#111820" stroke-width="3"><title>Attribute (r1_drive_0_0)</title></circle>
+<circle cx="3576" cy="1177" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Insulation (r1_drive_0_1)</title></circle>
+<circle cx="2629" cy="3525" r="6" fill="#e6ab73" stroke="#111820" stroke-width="3"><title>Attribute (r1_drive_0_2)</title></circle>
+<circle cx="1748" cy="3789" r="6" fill="#e6ab73" stroke="#111820" stroke-width="3"><title>Attribute (r1_drive_0_3)</title></circle>
+<circle cx="3712" cy="1200" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Insulation Mastery (r1_drive_0_4)</title></circle>
+<circle cx="3650" cy="1156" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Insulation (r1_drive_0_5)</title></circle>
+<circle cx="1875" cy="3731" r="6" fill="#e6ab73" stroke="#111820" stroke-width="3"><title>Attribute (r1_drive_0_6)</title></circle>
+<circle cx="3584" cy="1315" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Insulation (r1_drive_0_7)</title></circle>
+<circle cx="2786" cy="4533" r="6" fill="#e6ab73" stroke="#111820" stroke-width="3"><title>Attribute (r1_drive_0_8)</title></circle>
+<circle cx="2808" cy="4428" r="6" fill="#e6ab73" stroke="#111820" stroke-width="3"><title>Attribute (r1_drive_0_9)</title></circle>
+<circle cx="3716" cy="1277" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Component Mount (r1_drive_0_10)</title></circle>
+<circle cx="3659" cy="1328" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Insulation (r1_drive_0_11)</title></circle>
+<circle cx="2830" cy="4323" r="6" fill="#e6ab73" stroke="#111820" stroke-width="3"><title>Attribute (r1_drive_1_0)</title></circle>
+<circle cx="4935" cy="2939" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Regulation (r1_drive_1_1)</title></circle>
+<circle cx="982" cy="4337" r="6" fill="#e6ab73" stroke="#111820" stroke-width="3"><title>Attribute (r1_drive_1_2)</title></circle>
+<circle cx="1055" cy="4416" r="6" fill="#e6ab73" stroke="#111820" stroke-width="3"><title>Attribute (r1_drive_1_3)</title></circle>
+<circle cx="4856" cy="3032" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Regulation Mastery (r1_drive_1_4)</title></circle>
+<circle cx="4894" cy="2972" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Regulation (r1_drive_1_5)</title></circle>
+<circle cx="1128" cy="4496" r="6" fill="#e6ab73" stroke="#111820" stroke-width="3"><title>Attribute (r1_drive_1_6)</title></circle>
+<circle cx="2043" cy="2248" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Regulation (r1_drive_1_7)</title></circle>
+<circle cx="2961" cy="4222" r="6" fill="#e6ab73" stroke="#111820" stroke-width="3"><title>Attribute (r1_drive_1_8)</title></circle>
+<circle cx="2707" cy="3746" r="6" fill="#e6ab73" stroke="#111820" stroke-width="3"><title>Attribute (r1_drive_1_9)</title></circle>
+<circle cx="1940" cy="2313" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Managed Territory (r1_drive_1_10)</title></circle>
+<circle cx="1994" cy="2268" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Regulation (r1_drive_1_11)</title></circle>
+<circle cx="1382" cy="2602" r="6" fill="#e6ab73" stroke="#111820" stroke-width="3"><title>Attribute (r1_drive_reserve_0_0)</title></circle>
+<circle cx="3932" cy="3650" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Conservation (r1_drive_reserve_0_1)</title></circle>
+<circle cx="1277" cy="2611" r="6" fill="#e6ab73" stroke="#111820" stroke-width="3"><title>Attribute (r1_drive_reserve_0_2)</title></circle>
+<circle cx="1171" cy="2619" r="6" fill="#829bdb" stroke="#111820" stroke-width="3"><title>Attribute (r1_drive_reserve_0_3)</title></circle>
+<circle cx="3890" cy="3541" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Conservation Mastery (r1_drive_reserve_0_4)</title></circle>
+<circle cx="3885" cy="3605" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Conservation (r1_drive_reserve_0_5)</title></circle>
+<circle cx="1678" cy="3171" r="6" fill="#e6ab73" stroke="#111820" stroke-width="3"><title>Attribute (r1_drive_reserve_0_6)</title></circle>
+<circle cx="4029" cy="3585" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Conservation (r1_drive_reserve_0_7)</title></circle>
+<circle cx="1606" cy="3252" r="6" fill="#e6ab73" stroke="#111820" stroke-width="3"><title>Attribute (r1_drive_reserve_0_8)</title></circle>
+<circle cx="1535" cy="3333" r="6" fill="#829bdb" stroke="#111820" stroke-width="3"><title>Attribute (r1_drive_reserve_0_9)</title></circle>
+<circle cx="3944" cy="3505" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Conservation Mastery (r1_drive_reserve_0_10)</title></circle>
+<circle cx="4006" cy="3524" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Conservation (r1_drive_reserve_0_11)</title></circle>
+<circle cx="1582" cy="3740" r="6" fill="#e6ab73" stroke="#111820" stroke-width="3"><title>Attribute (r1_drive_reserve_1_0)</title></circle>
+<circle cx="4156" cy="3981" r="9" fill="#72bda7" stroke="#111820" stroke-width="3"><title>Control (r1_drive_reserve_1_1)</title></circle>
+<circle cx="1543" cy="3631" r="6" fill="#e6ab73" stroke="#111820" stroke-width="3"><title>Attribute (r1_drive_reserve_1_2)</title></circle>
+<circle cx="1503" cy="3523" r="6" fill="#829bdb" stroke="#111820" stroke-width="3"><title>Attribute (r1_drive_reserve_1_3)</title></circle>
+<circle cx="4183" cy="3862" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Control Mastery (r1_drive_reserve_1_4)</title></circle>
+<circle cx="4177" cy="3932" r="9" fill="#72bda7" stroke="#111820" stroke-width="3"><title>Control (r1_drive_reserve_1_5)</title></circle>
+<circle cx="926" cy="3459" r="6" fill="#e6ab73" stroke="#111820" stroke-width="3"><title>Attribute (r1_drive_reserve_1_6)</title></circle>
+<circle cx="3038" cy="4270" r="9" fill="#72bda7" stroke="#111820" stroke-width="3"><title>Control (r1_drive_reserve_1_7)</title></circle>
+<circle cx="890" cy="3571" r="6" fill="#e6ab73" stroke="#111820" stroke-width="3"><title>Attribute (r1_drive_reserve_1_8)</title></circle>
+<circle cx="854" cy="3682" r="6" fill="#829bdb" stroke="#111820" stroke-width="3"><title>Attribute (r1_drive_reserve_1_9)</title></circle>
+<circle cx="3049" cy="4372" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Component Mount (r1_drive_reserve_1_10)</title></circle>
+<circle cx="3035" cy="4314" r="9" fill="#72bda7" stroke="#111820" stroke-width="3"><title>Control (r1_drive_reserve_1_11)</title></circle>
+<circle cx="2645" cy="2455" r="6" fill="#829bdb" stroke="#111820" stroke-width="3"><title>Attribute (r1_reserve_0_0)</title></circle>
+<circle cx="1748" cy="3141" r="9" fill="#e6ab73" stroke="#111820" stroke-width="3"><title>Drive (r1_reserve_0_1)</title></circle>
+<circle cx="2731" cy="2372" r="6" fill="#829bdb" stroke="#111820" stroke-width="3"><title>Attribute (r1_reserve_0_2)</title></circle>
+<circle cx="2478" cy="2635" r="6" fill="#829bdb" stroke="#111820" stroke-width="3"><title>Attribute (r1_reserve_0_3)</title></circle>
+<circle cx="1829" cy="3253" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Drive Mastery (r1_reserve_0_4)</title></circle>
+<circle cx="1815" cy="3178" r="9" fill="#e6ab73" stroke="#111820" stroke-width="3"><title>Drive (r1_reserve_0_5)</title></circle>
+<circle cx="2107" cy="2260" r="6" fill="#829bdb" stroke="#111820" stroke-width="3"><title>Attribute (r1_reserve_0_6)</title></circle>
+<circle cx="1657" cy="3245" r="9" fill="#e6ab73" stroke="#111820" stroke-width="3"><title>Drive (r1_reserve_0_7)</title></circle>
+<circle cx="2205" cy="2161" r="6" fill="#829bdb" stroke="#111820" stroke-width="3"><title>Attribute (r1_reserve_0_8)</title></circle>
+<circle cx="1855" cy="1298" r="6" fill="#829bdb" stroke="#111820" stroke-width="3"><title>Attribute (r1_reserve_0_9)</title></circle>
+<circle cx="1778" cy="3310" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Managed Territory (r1_reserve_0_10)</title></circle>
+<circle cx="1702" cy="3307" r="9" fill="#e6ab73" stroke="#111820" stroke-width="3"><title>Drive (r1_reserve_0_11)</title></circle>
+<circle cx="1953" cy="1261" r="6" fill="#829bdb" stroke="#111820" stroke-width="3"><title>Attribute (r1_reserve_1_0)</title></circle>
+<circle cx="5589" cy="2972" r="9" fill="#829bdb" stroke="#111820" stroke-width="3"><title>Reserve (r1_reserve_1_1)</title></circle>
+<circle cx="2051" cy="1223" r="6" fill="#829bdb" stroke="#111820" stroke-width="3"><title>Attribute (r1_reserve_1_2)</title></circle>
+<circle cx="2367" cy="1747" r="6" fill="#829bdb" stroke="#111820" stroke-width="3"><title>Attribute (r1_reserve_1_3)</title></circle>
+<circle cx="5654" cy="2870" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Reserve Mastery (r1_reserve_1_4)</title></circle>
+<circle cx="5625" cy="2933" r="9" fill="#829bdb" stroke="#111820" stroke-width="3"><title>Reserve (r1_reserve_1_5)</title></circle>
+<circle cx="2345" cy="1852" r="6" fill="#829bdb" stroke="#111820" stroke-width="3"><title>Attribute (r1_reserve_1_6)</title></circle>
+<circle cx="3721" cy="2914" r="9" fill="#829bdb" stroke="#111820" stroke-width="3"><title>Reserve (r1_reserve_1_7)</title></circle>
+<circle cx="2324" cy="1958" r="6" fill="#829bdb" stroke="#111820" stroke-width="3"><title>Attribute (r1_reserve_1_8)</title></circle>
+<circle cx="2284" cy="1673" r="6" fill="#829bdb" stroke="#111820" stroke-width="3"><title>Attribute (r1_reserve_1_9)</title></circle>
+<circle cx="3735" cy="2812" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Reserve Mastery (r1_reserve_1_10)</title></circle>
+<circle cx="3735" cy="2872" r="9" fill="#829bdb" stroke="#111820" stroke-width="3"><title>Reserve (r1_reserve_1_11)</title></circle>
+<circle cx="3357" cy="2471" r="6" fill="#829bdb" stroke="#111820" stroke-width="3"><title>Attribute (r1_reserve_control_0_0)</title></circle>
+<circle cx="3455" cy="4264" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Fluid Handling (r1_reserve_control_0_1)</title></circle>
+<circle cx="3259" cy="1164" r="6" fill="#829bdb" stroke="#111820" stroke-width="3"><title>Attribute (r1_reserve_control_0_2)</title></circle>
+<circle cx="3350" cy="1110" r="6" fill="#72bda7" stroke="#111820" stroke-width="3"><title>Attribute (r1_reserve_control_0_3)</title></circle>
+<circle cx="3533" cy="4151" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Fluid Handling Mastery (r1_reserve_control_0_4)</title></circle>
+<circle cx="3467" cy="4188" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Fluid Handling (r1_reserve_control_0_5)</title></circle>
+<circle cx="3442" cy="1056" r="6" fill="#829bdb" stroke="#111820" stroke-width="3"><title>Attribute (r1_reserve_control_0_6)</title></circle>
+<circle cx="3582" cy="4315" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Fluid Handling (r1_reserve_control_0_7)</title></circle>
+<circle cx="3266" cy="1287" r="6" fill="#829bdb" stroke="#111820" stroke-width="3"><title>Attribute (r1_reserve_control_0_8)</title></circle>
+<circle cx="3364" cy="1356" r="6" fill="#72bda7" stroke="#111820" stroke-width="3"><title>Attribute (r1_reserve_control_0_9)</title></circle>
+<circle cx="3604" cy="4179" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Component Mount (r1_reserve_control_0_10)</title></circle>
+<circle cx="3626" cy="4252" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Fluid Handling (r1_reserve_control_0_11)</title></circle>
+<circle cx="3463" cy="1424" r="6" fill="#829bdb" stroke="#111820" stroke-width="3"><title>Attribute (r1_reserve_control_1_0)</title></circle>
+<circle cx="3895" cy="2599" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Power Supply (r1_reserve_control_1_1)</title></circle>
+<circle cx="4313" cy="1860" r="6" fill="#829bdb" stroke="#111820" stroke-width="3"><title>Attribute (r1_reserve_control_1_2)</title></circle>
+<circle cx="4260" cy="1752" r="6" fill="#72bda7" stroke="#111820" stroke-width="3"><title>Attribute (r1_reserve_control_1_3)</title></circle>
+<circle cx="3782" cy="2643" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Power Supply Mastery (r1_reserve_control_1_4)</title></circle>
+<circle cx="3843" cy="2608" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Power Supply (r1_reserve_control_1_5)</title></circle>
+<circle cx="4206" cy="1644" r="6" fill="#829bdb" stroke="#111820" stroke-width="3"><title>Attribute (r1_reserve_control_1_6)</title></circle>
+<circle cx="4198" cy="3520" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Power Supply (r1_reserve_control_1_7)</title></circle>
+<circle cx="3166" cy="2206" r="6" fill="#829bdb" stroke="#111820" stroke-width="3"><title>Attribute (r1_reserve_control_1_8)</title></circle>
+<circle cx="3171" cy="2083" r="6" fill="#72bda7" stroke="#111820" stroke-width="3"><title>Attribute (r1_reserve_control_1_9)</title></circle>
+<circle cx="4080" cy="3490" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Managed Territory (r1_reserve_control_1_10)</title></circle>
+<circle cx="4150" cy="3498" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Power Supply (r1_reserve_control_1_11)</title></circle>
+<circle cx="4843" cy="2292" r="6" fill="#72bda7" stroke="#111820" stroke-width="3"><title>Attribute (r2_control_0_0)</title></circle>
+<circle cx="1023" cy="3323" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Regulation (r2_control_0_1)</title></circle>
+<circle cx="4791" cy="2389" r="6" fill="#72bda7" stroke="#111820" stroke-width="3"><title>Attribute (r2_control_0_2)</title></circle>
+<circle cx="4738" cy="2487" r="6" fill="#72bda7" stroke="#111820" stroke-width="3"><title>Attribute (r2_control_0_3)</title></circle>
+<circle cx="1071" cy="3194" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Control Application (r2_control_0_4)</title></circle>
+<circle cx="1016" cy="3247" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Regulation (r2_control_0_5)</title></circle>
+<circle cx="4197" cy="2594" r="6" fill="#72bda7" stroke="#111820" stroke-width="3"><title>Attribute (r2_control_0_6)</title></circle>
+<circle cx="1160" cy="3341" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Regulation (r2_control_0_7)</title></circle>
+<circle cx="4246" cy="2699" r="6" fill="#72bda7" stroke="#111820" stroke-width="3"><title>Attribute (r2_control_0_8)</title></circle>
+<circle cx="4294" cy="2803" r="6" fill="#72bda7" stroke="#111820" stroke-width="3"><title>Attribute (r2_control_0_9)</title></circle>
+<circle cx="1147" cy="3204" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Control Application (r2_control_0_10)</title></circle>
+<circle cx="1186" cy="3270" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Regulation (r2_control_0_11)</title></circle>
+<circle cx="4600" cy="2665" r="6" fill="#72bda7" stroke="#111820" stroke-width="3"><title>Attribute (r2_control_1_0)</title></circle>
+<circle cx="3593" cy="1667" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Conservation (r2_control_1_1)</title></circle>
+<circle cx="4514" cy="2746" r="6" fill="#72bda7" stroke="#111820" stroke-width="3"><title>Attribute (r2_control_1_2)</title></circle>
+<circle cx="4428" cy="2827" r="6" fill="#72bda7" stroke="#111820" stroke-width="3"><title>Attribute (r2_control_1_3)</title></circle>
+<circle cx="3624" cy="1784" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Control Application (r2_control_1_4)</title></circle>
+<circle cx="3597" cy="1720" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Conservation (r2_control_1_5)</title></circle>
+<circle cx="4867" cy="4027" r="6" fill="#72bda7" stroke="#111820" stroke-width="3"><title>Attribute (r2_control_1_6)</title></circle>
+<circle cx="1505" cy="3684" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Conservation (r2_control_1_7)</title></circle>
+<circle cx="4193" cy="2385" r="6" fill="#72bda7" stroke="#111820" stroke-width="3"><title>Attribute (r2_control_1_8)</title></circle>
+<circle cx="4999" cy="2930" r="6" fill="#72bda7" stroke="#111820" stroke-width="3"><title>Attribute (r2_control_1_9)</title></circle>
+<circle cx="1520" cy="3805" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Control Application (r2_control_1_10)</title></circle>
+<circle cx="1502" cy="3737" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Conservation (r2_control_1_11)</title></circle>
+<circle cx="4009" cy="4199" r="6" fill="#72bda7" stroke="#111820" stroke-width="3"><title>Attribute (r2_control_drive_0_0)</title></circle>
+<circle cx="2746" cy="4584" r="9" fill="#72bda7" stroke="#111820" stroke-width="3"><title>Control (r2_control_drive_0_1)</title></circle>
+<circle cx="3772" cy="4518" r="6" fill="#72bda7" stroke="#111820" stroke-width="3"><title>Attribute (r2_control_drive_0_2)</title></circle>
+<circle cx="3820" cy="4629" r="6" fill="#e6ab73" stroke="#111820" stroke-width="3"><title>Attribute (r2_control_drive_0_3)</title></circle>
+<circle cx="2640" cy="4536" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Drive Application (r2_control_drive_0_4)</title></circle>
+<circle cx="2682" cy="4586" r="9" fill="#72bda7" stroke="#111820" stroke-width="3"><title>Control (r2_control_drive_0_5)</title></circle>
+<circle cx="3869" cy="4740" r="6" fill="#72bda7" stroke="#111820" stroke-width="3"><title>Attribute (r2_control_drive_0_6)</title></circle>
+<circle cx="2770" cy="4470" r="9" fill="#72bda7" stroke="#111820" stroke-width="3"><title>Control (r2_control_drive_0_7)</title></circle>
+<circle cx="3996" cy="3641" r="6" fill="#72bda7" stroke="#111820" stroke-width="3"><title>Attribute (r2_control_drive_0_8)</title></circle>
+<circle cx="3893" cy="3710" r="6" fill="#e6ab73" stroke="#111820" stroke-width="3"><title>Attribute (r2_control_drive_0_9)</title></circle>
+<circle cx="2653" cy="4472" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Drive Application (r2_control_drive_0_10)</title></circle>
+<circle cx="2711" cy="4443" r="9" fill="#72bda7" stroke="#111820" stroke-width="3"><title>Control (r2_control_drive_0_11)</title></circle>
+<circle cx="3789" cy="3779" r="6" fill="#72bda7" stroke="#111820" stroke-width="3"><title>Attribute (r2_control_drive_1_0)</title></circle>
+<circle cx="2318" cy="3908" r="9" fill="#e6ab73" stroke="#111820" stroke-width="3"><title>Drive (r2_control_drive_1_1)</title></circle>
+<circle cx="4000" cy="4060" r="6" fill="#72bda7" stroke="#111820" stroke-width="3"><title>Attribute (r2_control_drive_1_2)</title></circle>
+<circle cx="3895" cy="3989" r="6" fill="#e6ab73" stroke="#111820" stroke-width="3"><title>Attribute (r2_control_drive_1_3)</title></circle>
+<circle cx="2409" cy="3989" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Drive Application (r2_control_drive_1_4)</title></circle>
+<circle cx="2350" cy="3950" r="9" fill="#e6ab73" stroke="#111820" stroke-width="3"><title>Drive (r2_control_drive_1_5)</title></circle>
+<circle cx="3791" cy="3919" r="6" fill="#72bda7" stroke="#111820" stroke-width="3"><title>Attribute (r2_control_drive_1_6)</title></circle>
+<circle cx="3630" cy="4561" r="9" fill="#e6ab73" stroke="#111820" stroke-width="3"><title>Drive (r2_control_drive_1_7)</title></circle>
+<circle cx="3297" cy="4366" r="6" fill="#72bda7" stroke="#111820" stroke-width="3"><title>Attribute (r2_control_drive_1_8)</title></circle>
+<circle cx="3304" cy="4500" r="6" fill="#e6ab73" stroke="#111820" stroke-width="3"><title>Attribute (r2_control_drive_1_9)</title></circle>
+<circle cx="3723" cy="4640" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Drive Application (r2_control_drive_1_10)</title></circle>
+<circle cx="3664" cy="4602" r="9" fill="#e6ab73" stroke="#111820" stroke-width="3"><title>Drive (r2_control_drive_1_11)</title></circle>
+<circle cx="2610" cy="3798" r="6" fill="#e6ab73" stroke="#111820" stroke-width="3"><title>Attribute (r2_drive_0_0)</title></circle>
+<circle cx="4337" cy="2125" r="9" fill="#829bdb" stroke="#111820" stroke-width="3"><title>Reserve (r2_drive_0_1)</title></circle>
+<circle cx="2512" cy="3849" r="6" fill="#e6ab73" stroke="#111820" stroke-width="3"><title>Attribute (r2_drive_0_2)</title></circle>
+<circle cx="2312" cy="3843" r="6" fill="#e6ab73" stroke="#111820" stroke-width="3"><title>Attribute (r2_drive_0_3)</title></circle>
+<circle cx="4449" cy="2205" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Reserve Application (r2_drive_0_4)</title></circle>
+<circle cx="4412" cy="2138" r="9" fill="#829bdb" stroke="#111820" stroke-width="3"><title>Reserve (r2_drive_0_5)</title></circle>
+<circle cx="2208" cy="3786" r="6" fill="#e6ab73" stroke="#111820" stroke-width="3"><title>Attribute (r2_drive_0_6)</title></circle>
+<circle cx="4284" cy="2252" r="9" fill="#829bdb" stroke="#111820" stroke-width="3"><title>Reserve (r2_drive_0_7)</title></circle>
+<circle cx="2105" cy="3729" r="6" fill="#e6ab73" stroke="#111820" stroke-width="3"><title>Attribute (r2_drive_0_8)</title></circle>
+<circle cx="1894" cy="4540" r="6" fill="#e6ab73" stroke="#111820" stroke-width="3"><title>Attribute (r2_drive_0_9)</title></circle>
+<circle cx="4420" cy="2276" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Reserve Application (r2_drive_0_10)</title></circle>
+<circle cx="4346" cy="2297" r="9" fill="#829bdb" stroke="#111820" stroke-width="3"><title>Reserve (r2_drive_0_11)</title></circle>
+<circle cx="2022" cy="4511" r="6" fill="#e6ab73" stroke="#111820" stroke-width="3"><title>Attribute (r2_drive_1_0)</title></circle>
+<circle cx="4310" cy="2572" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Fluid Handling (r2_drive_1_1)</title></circle>
+<circle cx="2149" cy="4481" r="6" fill="#e6ab73" stroke="#111820" stroke-width="3"><title>Attribute (r2_drive_1_2)</title></circle>
+<circle cx="2642" cy="4591" r="6" fill="#e6ab73" stroke="#111820" stroke-width="3"><title>Attribute (r2_drive_1_3)</title></circle>
+<circle cx="4422" cy="2620" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Reserve Application (r2_drive_1_4)</title></circle>
+<circle cx="4354" cy="2602" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Fluid Handling (r2_drive_1_5)</title></circle>
+<circle cx="2520" cy="4545" r="6" fill="#e6ab73" stroke="#111820" stroke-width="3"><title>Attribute (r2_drive_1_6)</title></circle>
+<circle cx="3791" cy="3984" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Fluid Handling (r2_drive_1_7)</title></circle>
+<circle cx="2398" cy="4498" r="6" fill="#e6ab73" stroke="#111820" stroke-width="3"><title>Attribute (r2_drive_1_8)</title></circle>
+<circle cx="2936" cy="3690" r="6" fill="#e6ab73" stroke="#111820" stroke-width="3"><title>Attribute (r2_drive_1_9)</title></circle>
+<circle cx="3874" cy="4073" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Reserve Application (r2_drive_1_10)</title></circle>
+<circle cx="3820" cy="4029" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Fluid Handling (r2_drive_1_11)</title></circle>
+<circle cx="841" cy="3909" r="6" fill="#e6ab73" stroke="#111820" stroke-width="3"><title>Attribute (r2_drive_reserve_0_0)</title></circle>
+<circle cx="2820" cy="2230" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Power Supply (r2_drive_reserve_0_1)</title></circle>
+<circle cx="864" cy="4025" r="6" fill="#e6ab73" stroke="#111820" stroke-width="3"><title>Attribute (r2_drive_reserve_0_2)</title></circle>
+<circle cx="886" cy="4141" r="6" fill="#829bdb" stroke="#111820" stroke-width="3"><title>Attribute (r2_drive_reserve_0_3)</title></circle>
+<circle cx="2734" cy="2122" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Control Application (r2_drive_reserve_0_4)</title></circle>
+<circle cx="2751" cy="2197" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Power Supply (r2_drive_reserve_0_5)</title></circle>
+<circle cx="1087" cy="3365" r="6" fill="#e6ab73" stroke="#111820" stroke-width="3"><title>Attribute (r2_drive_reserve_0_6)</title></circle>
+<circle cx="2906" cy="2123" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Power Supply (r2_drive_reserve_0_7)</title></circle>
+<circle cx="1213" cy="3381" r="6" fill="#e6ab73" stroke="#111820" stroke-width="3"><title>Attribute (r2_drive_reserve_0_8)</title></circle>
+<circle cx="1338" cy="3398" r="6" fill="#829bdb" stroke="#111820" stroke-width="3"><title>Attribute (r2_drive_reserve_0_9)</title></circle>
+<circle cx="2782" cy="2063" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Control Application (r2_drive_reserve_0_10)</title></circle>
+<circle cx="2859" cy="2063" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Power Supply (r2_drive_reserve_0_11)</title></circle>
+<circle cx="1540" cy="2692" r="6" fill="#e6ab73" stroke="#111820" stroke-width="3"><title>Attribute (r2_drive_reserve_1_0)</title></circle>
+<circle cx="3940" cy="4084" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Fuel Economy (r2_drive_reserve_1_1)</title></circle>
+<circle cx="1592" cy="2792" r="6" fill="#e6ab73" stroke="#111820" stroke-width="3"><title>Attribute (r2_drive_reserve_1_2)</title></circle>
+<circle cx="1645" cy="2891" r="6" fill="#829bdb" stroke="#111820" stroke-width="3"><title>Attribute (r2_drive_reserve_1_3)</title></circle>
+<circle cx="3886" cy="4193" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Control Application (r2_drive_reserve_1_4)</title></circle>
+<circle cx="3908" cy="4127" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Fuel Economy (r2_drive_reserve_1_5)</title></circle>
+<circle cx="1697" cy="2991" r="6" fill="#e6ab73" stroke="#111820" stroke-width="3"><title>Attribute (r2_drive_reserve_1_6)</title></circle>
+<circle cx="4286" cy="4118" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Fuel Economy (r2_drive_reserve_1_7)</title></circle>
+<circle cx="2254" cy="2734" r="6" fill="#e6ab73" stroke="#111820" stroke-width="3"><title>Attribute (r2_drive_reserve_1_8)</title></circle>
+<circle cx="2193" cy="2640" r="6" fill="#829bdb" stroke="#111820" stroke-width="3"><title>Attribute (r2_drive_reserve_1_9)</title></circle>
+<circle cx="4297" cy="3997" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Control Application (r2_drive_reserve_1_10)</title></circle>
+<circle cx="4301" cy="4067" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Fuel Economy (r2_drive_reserve_1_11)</title></circle>
+<circle cx="2181" cy="1705" r="6" fill="#829bdb" stroke="#111820" stroke-width="3"><title>Attribute (r2_reserve_0_0)</title></circle>
+<circle cx="3202" cy="1771" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Thermal Inertia (r2_reserve_0_1)</title></circle>
+<circle cx="2077" cy="1736" r="6" fill="#829bdb" stroke="#111820" stroke-width="3"><title>Attribute (r2_reserve_0_2)</title></circle>
+<circle cx="2690" cy="1188" r="6" fill="#829bdb" stroke="#111820" stroke-width="3"><title>Attribute (r2_reserve_0_3)</title></circle>
+<circle cx="3135" cy="1651" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Drive Application (r2_reserve_0_4)</title></circle>
+<circle cx="3139" cy="1727" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Thermal Inertia (r2_reserve_0_5)</title></circle>
+<circle cx="2720" cy="1081" r="6" fill="#829bdb" stroke="#111820" stroke-width="3"><title>Attribute (r2_reserve_0_6)</title></circle>
+<circle cx="3304" cy="1679" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Thermal Inertia (r2_reserve_0_7)</title></circle>
+<circle cx="2749" cy="975" r="6" fill="#829bdb" stroke="#111820" stroke-width="3"><title>Attribute (r2_reserve_0_8)</title></circle>
+<circle cx="2456" cy="1554" r="6" fill="#829bdb" stroke="#111820" stroke-width="3"><title>Attribute (r2_reserve_0_9)</title></circle>
+<circle cx="3192" cy="1600" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Drive Application (r2_reserve_0_10)</title></circle>
+<circle cx="3267" cy="1613" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Thermal Inertia (r2_reserve_0_11)</title></circle>
+<circle cx="2525" cy="1468" r="6" fill="#829bdb" stroke="#111820" stroke-width="3"><title>Attribute (r2_reserve_1_0)</title></circle>
+<circle cx="4154" cy="3720" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Startup (r2_reserve_1_1)</title></circle>
+<circle cx="2593" cy="1381" r="6" fill="#829bdb" stroke="#111820" stroke-width="3"><title>Attribute (r2_reserve_1_2)</title></circle>
+<circle cx="1811" cy="1443" r="6" fill="#829bdb" stroke="#111820" stroke-width="3"><title>Attribute (r2_reserve_1_3)</title></circle>
+<circle cx="4274" cy="3702" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Drive Application (r2_reserve_1_4)</title></circle>
+<circle cx="4207" cy="3722" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Startup (r2_reserve_1_5)</title></circle>
+<circle cx="1865" cy="1552" r="6" fill="#829bdb" stroke="#111820" stroke-width="3"><title>Attribute (r2_reserve_1_6)</title></circle>
+<circle cx="2405" cy="1827" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Startup (r2_reserve_1_7)</title></circle>
+<circle cx="1919" cy="1660" r="6" fill="#829bdb" stroke="#111820" stroke-width="3"><title>Attribute (r2_reserve_1_8)</title></circle>
+<circle cx="2914" cy="1256" r="6" fill="#829bdb" stroke="#111820" stroke-width="3"><title>Attribute (r2_reserve_1_9)</title></circle>
+<circle cx="2456" cy="1716" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Drive Application (r2_reserve_1_10)</title></circle>
+<circle cx="2435" cy="1783" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Startup (r2_reserve_1_11)</title></circle>
+<circle cx="3175" cy="1959" r="6" fill="#829bdb" stroke="#111820" stroke-width="3"><title>Attribute (r2_reserve_control_0_0)</title></circle>
+<circle cx="2783" cy="3743" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Field Work (r2_reserve_control_0_1)</title></circle>
+<circle cx="3041" cy="1237" r="6" fill="#829bdb" stroke="#111820" stroke-width="3"><title>Attribute (r2_reserve_control_0_2)</title></circle>
+<circle cx="3275" cy="1750" r="6" fill="#72bda7" stroke="#111820" stroke-width="3"><title>Attribute (r2_reserve_control_0_3)</title></circle>
+<circle cx="2819" cy="3876" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Reserve Application (r2_reserve_control_0_4)</title></circle>
+<circle cx="2833" cy="3801" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Field Work (r2_reserve_control_0_5)</title></circle>
+<circle cx="3370" cy="1664" r="6" fill="#829bdb" stroke="#111820" stroke-width="3"><title>Attribute (r2_reserve_control_0_6)</title></circle>
+<circle cx="2662" cy="3807" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Field Work (r2_reserve_control_0_7)</title></circle>
+<circle cx="3466" cy="1579" r="6" fill="#829bdb" stroke="#111820" stroke-width="3"><title>Attribute (r2_reserve_control_0_8)</title></circle>
+<circle cx="3747" cy="1841" r="6" fill="#72bda7" stroke="#111820" stroke-width="3"><title>Attribute (r2_reserve_control_0_9)</title></circle>
+<circle cx="2751" cy="3912" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Reserve Application (r2_reserve_control_0_10)</title></circle>
+<circle cx="2681" cy="3881" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Field Work (r2_reserve_control_0_11)</title></circle>
+<circle cx="3685" cy="1725" r="6" fill="#829bdb" stroke="#111820" stroke-width="3"><title>Attribute (r2_reserve_control_1_0)</title></circle>
+<circle cx="2109" cy="1829" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Charge Routing (r2_reserve_control_1_1)</title></circle>
+<circle cx="3623" cy="1609" r="6" fill="#829bdb" stroke="#111820" stroke-width="3"><title>Attribute (r2_reserve_control_1_2)</title></circle>
+<circle cx="3895" cy="1852" r="6" fill="#72bda7" stroke="#111820" stroke-width="3"><title>Attribute (r2_reserve_control_1_3)</title></circle>
+<circle cx="2166" cy="1743" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Reserve Application (r2_reserve_control_1_4)</title></circle>
+<circle cx="2140" cy="1797" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Charge Routing (r2_reserve_control_1_5)</title></circle>
+<circle cx="3981" cy="1747" r="6" fill="#829bdb" stroke="#111820" stroke-width="3"><title>Attribute (r2_reserve_control_1_6)</title></circle>
+<circle cx="3327" cy="1264" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Charge Routing (r2_reserve_control_1_7)</title></circle>
+<circle cx="4066" cy="1641" r="6" fill="#829bdb" stroke="#111820" stroke-width="3"><title>Attribute (r2_reserve_control_1_8)</title></circle>
+<circle cx="4323" cy="2072" r="6" fill="#72bda7" stroke="#111820" stroke-width="3"><title>Attribute (r2_reserve_control_1_9)</title></circle>
+<circle cx="3382" cy="1155" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Reserve Application (r2_reserve_control_1_10)</title></circle>
+<circle cx="3359" cy="1222" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Charge Routing (r2_reserve_control_1_11)</title></circle>
+<circle cx="4921" cy="2844" r="6" fill="#72bda7" stroke="#111820" stroke-width="3"><title>Attribute (r3_control_0_0)</title></circle>
+<circle cx="3038" cy="1959" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Fluid Handling (r3_control_0_1)</title></circle>
+<circle cx="4842" cy="2757" r="6" fill="#72bda7" stroke="#111820" stroke-width="3"><title>Attribute (r3_control_0_2)</title></circle>
+<circle cx="4764" cy="2671" r="6" fill="#72bda7" stroke="#111820" stroke-width="3"><title>Attribute (r3_control_0_3)</title></circle>
+<circle cx="2952" cy="1851" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Integrated Attributes (r3_control_0_4)</title></circle>
+<circle cx="2969" cy="1926" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Fluid Handling (r3_control_0_5)</title></circle>
+<circle cx="5201" cy="2978" r="6" fill="#72bda7" stroke="#111820" stroke-width="3"><title>Attribute (r3_control_0_6)</title></circle>
+<circle cx="3124" cy="1852" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Fluid Handling (r3_control_0_7)</title></circle>
+<circle cx="5325" cy="2938" r="6" fill="#72bda7" stroke="#111820" stroke-width="3"><title>Attribute (r3_control_0_8)</title></circle>
+<circle cx="5448" cy="2899" r="6" fill="#72bda7" stroke="#111820" stroke-width="3"><title>Attribute (r3_control_0_9)</title></circle>
+<circle cx="3000" cy="1792" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Integrated Attributes (r3_control_0_10)</title></circle>
+<circle cx="3077" cy="1792" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Fluid Handling (r3_control_0_11)</title></circle>
+<circle cx="3804" cy="3299" r="6" fill="#72bda7" stroke="#111820" stroke-width="3"><title>Attribute (r3_control_1_0)</title></circle>
+<circle cx="1974" cy="4467" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Power Supply (r3_control_1_1)</title></circle>
+<circle cx="3902" cy="3390" r="6" fill="#72bda7" stroke="#111820" stroke-width="3"><title>Attribute (r3_control_1_2)</title></circle>
+<circle cx="4001" cy="3481" r="6" fill="#72bda7" stroke="#111820" stroke-width="3"><title>Attribute (r3_control_1_3)</title></circle>
+<circle cx="1852" cy="4467" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Power Supply Mastery (r3_control_1_4)</title></circle>
+<circle cx="1922" cy="4457" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Power Supply (r3_control_1_5)</title></circle>
+<circle cx="4552" cy="2560" r="6" fill="#72bda7" stroke="#111820" stroke-width="3"><title>Attribute (r3_control_1_6)</title></circle>
+<circle cx="1581" cy="3530" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Power Supply (r3_control_1_7)</title></circle>
+<circle cx="4418" cy="2537" r="6" fill="#72bda7" stroke="#111820" stroke-width="3"><title>Attribute (r3_control_1_8)</title></circle>
+<circle cx="4283" cy="2513" r="6" fill="#72bda7" stroke="#111820" stroke-width="3"><title>Attribute (r3_control_1_9)</title></circle>
+<circle cx="1676" cy="3607" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Power Supply Mastery (r3_control_1_10)</title></circle>
+<circle cx="1615" cy="3570" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Power Supply (r3_control_1_11)</title></circle>
+<circle cx="3312" cy="4634" r="6" fill="#72bda7" stroke="#111820" stroke-width="3"><title>Attribute (r3_control_drive_0_0)</title></circle>
+<circle cx="1642" cy="2815" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Fuel Economy (r3_control_drive_0_1)</title></circle>
+<circle cx="4626" cy="4159" r="6" fill="#72bda7" stroke="#111820" stroke-width="3"><title>Attribute (r3_control_drive_0_2)</title></circle>
+<circle cx="4746" cy="4093" r="6" fill="#e6ab73" stroke="#111820" stroke-width="3"><title>Attribute (r3_control_drive_0_3)</title></circle>
+<circle cx="1775" cy="2779" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Fuel Economy Mastery (r3_control_drive_0_4)</title></circle>
+<circle cx="1700" cy="2765" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Fuel Economy (r3_control_drive_0_5)</title></circle>
+<circle cx="3067" cy="3684" r="6" fill="#72bda7" stroke="#111820" stroke-width="3"><title>Attribute (r3_control_drive_0_6)</title></circle>
+<circle cx="1706" cy="2937" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Fuel Economy (r3_control_drive_0_7)</title></circle>
+<circle cx="3321" cy="3721" r="6" fill="#72bda7" stroke="#111820" stroke-width="3"><title>Attribute (r3_control_drive_0_8)</title></circle>
+<circle cx="3443" cy="3764" r="6" fill="#e6ab73" stroke="#111820" stroke-width="3"><title>Attribute (r3_control_drive_0_9)</title></circle>
+<circle cx="1811" cy="2847" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Fuel Economy Mastery (r3_control_drive_0_10)</title></circle>
+<circle cx="1780" cy="2917" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Fuel Economy (r3_control_drive_0_11)</title></circle>
+<circle cx="3564" cy="3806" r="6" fill="#72bda7" stroke="#111820" stroke-width="3"><title>Attribute (r3_control_drive_1_0)</title></circle>
+<circle cx="3353" cy="4400" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Thermal Inertia (r3_control_drive_1_1)</title></circle>
+<circle cx="3622" cy="4497" r="6" fill="#72bda7" stroke="#111820" stroke-width="3"><title>Attribute (r3_control_drive_1_2)</title></circle>
+<circle cx="3521" cy="4588" r="6" fill="#e6ab73" stroke="#111820" stroke-width="3"><title>Attribute (r3_control_drive_1_3)</title></circle>
+<circle cx="3472" cy="4376" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Integrated Attributes (r3_control_drive_1_4)</title></circle>
+<circle cx="3406" cy="4399" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Thermal Inertia (r3_control_drive_1_5)</title></circle>
+<circle cx="3420" cy="4678" r="6" fill="#72bda7" stroke="#111820" stroke-width="3"><title>Attribute (r3_control_drive_1_6)</title></circle>
+<circle cx="2968" cy="2261" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Thermal Inertia (r3_control_drive_1_7)</title></circle>
+<circle cx="4100" cy="3684" r="6" fill="#72bda7" stroke="#111820" stroke-width="3"><title>Attribute (r3_control_drive_1_8)</title></circle>
+<circle cx="4101" cy="3795" r="6" fill="#e6ab73" stroke="#111820" stroke-width="3"><title>Attribute (r3_control_drive_1_9)</title></circle>
+<circle cx="2967" cy="2157" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Integrated Attributes (r3_control_drive_1_10)</title></circle>
+<circle cx="2976" cy="2216" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Thermal Inertia (r3_control_drive_1_11)</title></circle>
+<circle cx="2510" cy="3555" r="6" fill="#e6ab73" stroke="#111820" stroke-width="3"><title>Attribute (r3_drive_0_0)</title></circle>
+<circle cx="2404" cy="3834" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Startup (r3_drive_0_1)</title></circle>
+<circle cx="2479" cy="3670" r="6" fill="#e6ab73" stroke="#111820" stroke-width="3"><title>Attribute (r3_drive_0_2)</title></circle>
+<circle cx="2447" cy="3785" r="6" fill="#e6ab73" stroke="#111820" stroke-width="3"><title>Attribute (r3_drive_0_3)</title></circle>
+<circle cx="2301" cy="3778" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Startup Mastery (r3_drive_0_4)</title></circle>
+<circle cx="2339" cy="3831" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Startup (r3_drive_0_5)</title></circle>
+<circle cx="2524" cy="3980" r="6" fill="#e6ab73" stroke="#111820" stroke-width="3"><title>Attribute (r3_drive_0_6)</title></circle>
+<circle cx="2435" cy="3721" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Startup (r3_drive_0_7)</title></circle>
+<circle cx="2634" cy="4059" r="6" fill="#e6ab73" stroke="#111820" stroke-width="3"><title>Attribute (r3_drive_0_8)</title></circle>
+<circle cx="2743" cy="4139" r="6" fill="#e6ab73" stroke="#111820" stroke-width="3"><title>Attribute (r3_drive_0_9)</title></circle>
+<circle cx="2319" cy="3716" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Startup Mastery (r3_drive_0_10)</title></circle>
+<circle cx="2378" cy="3690" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Startup (r3_drive_0_11)</title></circle>
+<circle cx="2062" cy="3577" r="6" fill="#e6ab73" stroke="#111820" stroke-width="3"><title>Attribute (r3_drive_1_0)</title></circle>
+<circle cx="2445" cy="4440" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Field Work (r3_drive_1_1)</title></circle>
+<circle cx="1654" cy="4571" r="6" fill="#e6ab73" stroke="#111820" stroke-width="3"><title>Attribute (r3_drive_1_2)</title></circle>
+<circle cx="1541" cy="4572" r="6" fill="#e6ab73" stroke="#111820" stroke-width="3"><title>Attribute (r3_drive_1_3)</title></circle>
+<circle cx="2565" cy="4421" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Field Work Mastery (r3_drive_1_4)</title></circle>
+<circle cx="2498" cy="4442" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Field Work (r3_drive_1_5)</title></circle>
+<circle cx="1427" cy="4573" r="6" fill="#e6ab73" stroke="#111820" stroke-width="3"><title>Attribute (r3_drive_1_6)</title></circle>
+<circle cx="2898" cy="4725" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Field Work (r3_drive_1_7)</title></circle>
+<circle cx="1314" cy="4574" r="6" fill="#e6ab73" stroke="#111820" stroke-width="3"><title>Attribute (r3_drive_1_8)</title></circle>
+<circle cx="2875" cy="4664" r="6" fill="#e6ab73" stroke="#111820" stroke-width="3"><title>Attribute (r3_drive_1_9)</title></circle>
+<circle cx="2855" cy="4838" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Field Work Mastery (r3_drive_1_10)</title></circle>
+<circle cx="2889" cy="4777" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Field Work (r3_drive_1_11)</title></circle>
+<circle cx="2132" cy="2546" r="6" fill="#e6ab73" stroke="#111820" stroke-width="3"><title>Attribute (r3_drive_reserve_0_0)</title></circle>
+<circle cx="1538" cy="2627" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Charge Routing (r3_drive_reserve_0_1)</title></circle>
+<circle cx="2244" cy="3294" r="6" fill="#e6ab73" stroke="#111820" stroke-width="3"><title>Attribute (r3_drive_reserve_0_2)</title></circle>
+<circle cx="2183" cy="3388" r="6" fill="#829bdb" stroke="#111820" stroke-width="3"><title>Attribute (r3_drive_reserve_0_3)</title></circle>
+<circle cx="1651" cy="2597" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Integrated Attributes (r3_drive_reserve_0_4)</title></circle>
+<circle cx="1587" cy="2585" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Charge Routing (r3_drive_reserve_0_5)</title></circle>
+<circle cx="2123" cy="3483" r="6" fill="#e6ab73" stroke="#111820" stroke-width="3"><title>Attribute (r3_drive_reserve_0_6)</title></circle>
+<circle cx="1592" cy="2731" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Charge Routing (r3_drive_reserve_0_7)</title></circle>
+<circle cx="1592" cy="2546" r="6" fill="#e6ab73" stroke="#111820" stroke-width="3"><title>Attribute (r3_drive_reserve_0_8)</title></circle>
+<circle cx="1697" cy="2499" r="6" fill="#829bdb" stroke="#111820" stroke-width="3"><title>Attribute (r3_drive_reserve_0_9)</title></circle>
+<circle cx="1681" cy="2655" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Integrated Attributes (r3_drive_reserve_0_10)</title></circle>
+<circle cx="1655" cy="2714" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Charge Routing (r3_drive_reserve_0_11)</title></circle>
+<circle cx="1801" cy="2452" r="6" fill="#e6ab73" stroke="#111820" stroke-width="3"><title>Attribute (r3_drive_reserve_1_0)</title></circle>
+<circle cx="2188" cy="3481" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Catalysis (r3_drive_reserve_1_1)</title></circle>
+<circle cx="1906" cy="2405" r="6" fill="#e6ab73" stroke="#111820" stroke-width="3"><title>Attribute (r3_drive_reserve_1_2)</title></circle>
+<circle cx="1893" cy="3620" r="6" fill="#829bdb" stroke="#111820" stroke-width="3"><title>Attribute (r3_drive_reserve_1_3)</title></circle>
+<circle cx="2276" cy="3397" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Catalysis Mastery (r3_drive_reserve_1_4)</title></circle>
+<circle cx="2232" cy="3452" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Catalysis (r3_drive_reserve_1_5)</title></circle>
+<circle cx="1786" cy="3569" r="6" fill="#e6ab73" stroke="#111820" stroke-width="3"><title>Attribute (r3_drive_reserve_1_6)</title></circle>
+<circle cx="1411" cy="2436" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Catalysis (r3_drive_reserve_1_7)</title></circle>
+<circle cx="1678" cy="3517" r="6" fill="#e6ab73" stroke="#111820" stroke-width="3"><title>Attribute (r3_drive_reserve_1_8)</title></circle>
+<circle cx="1571" cy="3466" r="6" fill="#829bdb" stroke="#111820" stroke-width="3"><title>Attribute (r3_drive_reserve_1_9)</title></circle>
+<circle cx="1294" cy="2471" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Catalysis Mastery (r3_drive_reserve_1_10)</title></circle>
+<circle cx="1358" cy="2442" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Catalysis (r3_drive_reserve_1_11)</title></circle>
+<circle cx="2788" cy="1275" r="6" fill="#829bdb" stroke="#111820" stroke-width="3"><title>Attribute (r3_reserve_0_0)</title></circle>
+<circle cx="2662" cy="1347" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Calibration (r3_reserve_0_1)</title></circle>
+<circle cx="1510" cy="1916" r="6" fill="#829bdb" stroke="#111820" stroke-width="3"><title>Attribute (r3_reserve_0_2)</title></circle>
+<circle cx="1626" cy="1879" r="6" fill="#829bdb" stroke="#111820" stroke-width="3"><title>Attribute (r3_reserve_0_3)</title></circle>
+<circle cx="2748" cy="1454" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Calibration Mastery (r3_reserve_0_4)</title></circle>
+<circle cx="2731" cy="1380" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Calibration (r3_reserve_0_5)</title></circle>
+<circle cx="1741" cy="1842" r="6" fill="#829bdb" stroke="#111820" stroke-width="3"><title>Attribute (r3_reserve_0_6)</title></circle>
+<circle cx="2576" cy="1456" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Calibration (r3_reserve_0_7)</title></circle>
+<circle cx="1857" cy="1805" r="6" fill="#829bdb" stroke="#111820" stroke-width="3"><title>Attribute (r3_reserve_0_8)</title></circle>
+<circle cx="2055" cy="1842" r="6" fill="#829bdb" stroke="#111820" stroke-width="3"><title>Attribute (r3_reserve_0_9)</title></circle>
+<circle cx="2701" cy="1514" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Calibration Mastery (r3_reserve_0_10)</title></circle>
+<circle cx="2625" cy="1515" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Calibration (r3_reserve_0_11)</title></circle>
+<circle cx="2138" cy="1916" r="6" fill="#829bdb" stroke="#111820" stroke-width="3"><title>Attribute (r3_reserve_1_0)</title></circle>
+<circle cx="3877" cy="1790" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Precision (r3_reserve_1_1)</title></circle>
+<circle cx="2220" cy="1989" r="6" fill="#829bdb" stroke="#111820" stroke-width="3"><title>Attribute (r3_reserve_1_2)</title></circle>
+<circle cx="2328" cy="1527" r="6" fill="#829bdb" stroke="#111820" stroke-width="3"><title>Attribute (r3_reserve_1_3)</title></circle>
+<circle cx="3772" cy="1727" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Integrated Attributes (r3_reserve_1_4)</title></circle>
+<circle cx="3837" cy="1754" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Precision (r3_reserve_1_5)</title></circle>
+<circle cx="2269" cy="1414" r="6" fill="#829bdb" stroke="#111820" stroke-width="3"><title>Attribute (r3_reserve_1_6)</title></circle>
+<circle cx="887" cy="3863" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Precision (r3_reserve_1_7)</title></circle>
+<circle cx="2209" cy="1300" r="6" fill="#829bdb" stroke="#111820" stroke-width="3"><title>Attribute (r3_reserve_1_8)</title></circle>
+<circle cx="2973" cy="1043" r="6" fill="#829bdb" stroke="#111820" stroke-width="3"><title>Attribute (r3_reserve_1_9)</title></circle>
+<circle cx="891" cy="3741" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Integrated Attributes (r3_reserve_1_10)</title></circle>
+<circle cx="898" cy="3811" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Precision (r3_reserve_1_11)</title></circle>
+<circle cx="4280" cy="2176" r="6" fill="#829bdb" stroke="#111820" stroke-width="3"><title>Attribute (r3_reserve_control_0_0)</title></circle>
+<circle cx="5372" cy="2888" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Economy (r3_reserve_control_0_1)</title></circle>
+<circle cx="4236" cy="2281" r="6" fill="#829bdb" stroke="#111820" stroke-width="3"><title>Attribute (r3_reserve_control_0_2)</title></circle>
+<circle cx="3540" cy="1125" r="6" fill="#72bda7" stroke="#111820" stroke-width="3"><title>Attribute (r3_reserve_control_0_3)</title></circle>
+<circle cx="5361" cy="2751" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Economy Mastery (r3_reserve_control_0_4)</title></circle>
+<circle cx="5334" cy="2823" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Economy (r3_reserve_control_0_5)</title></circle>
+<circle cx="3547" cy="1248" r="6" fill="#829bdb" stroke="#111820" stroke-width="3"><title>Attribute (r3_reserve_control_0_6)</title></circle>
+<circle cx="5503" cy="2847" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Economy (r3_reserve_control_0_7)</title></circle>
+<circle cx="3554" cy="1370" r="6" fill="#829bdb" stroke="#111820" stroke-width="3"><title>Attribute (r3_reserve_control_0_8)</title></circle>
+<circle cx="3070" cy="1131" r="6" fill="#72bda7" stroke="#111820" stroke-width="3"><title>Attribute (r3_reserve_control_0_9)</title></circle>
+<circle cx="5434" cy="2728" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Economy Mastery (r3_reserve_control_0_10)</title></circle>
+<circle cx="5497" cy="2770" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Economy (r3_reserve_control_0_11)</title></circle>
+<circle cx="4228" cy="1965" r="6" fill="#829bdb" stroke="#111820" stroke-width="3"><title>Attribute (r3_reserve_control_1_0)</title></circle>
+<circle cx="3656" cy="3689" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Actuation (r3_reserve_control_1_1)</title></circle>
+<circle cx="4088" cy="1963" r="6" fill="#829bdb" stroke="#111820" stroke-width="3"><title>Attribute (r3_reserve_control_1_2)</title></circle>
+<circle cx="3949" cy="1960" r="6" fill="#72bda7" stroke="#111820" stroke-width="3"><title>Attribute (r3_reserve_control_1_3)</title></circle>
+<circle cx="3621" cy="3573" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Actuation Mastery (r3_reserve_control_1_4)</title></circle>
+<circle cx="3650" cy="3637" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Actuation (r3_reserve_control_1_5)</title></circle>
+<circle cx="4473" cy="2013" r="6" fill="#829bdb" stroke="#111820" stroke-width="3"><title>Attribute (r3_reserve_control_1_6)</title></circle>
+<circle cx="3364" cy="4594" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Actuation (r3_reserve_control_1_7)</title></circle>
+<circle cx="4578" cy="2058" r="6" fill="#829bdb" stroke="#111820" stroke-width="3"><title>Attribute (r3_reserve_control_1_8)</title></circle>
+<circle cx="3034" cy="2016" r="6" fill="#72bda7" stroke="#111820" stroke-width="3"><title>Attribute (r3_reserve_control_1_9)</title></circle>
+<circle cx="3385" cy="4474" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Actuation Mastery (r3_reserve_control_1_10)</title></circle>
+<circle cx="3382" cy="4545" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Actuation (r3_reserve_control_1_11)</title></circle>
+<circle cx="4684" cy="2104" r="6" fill="#72bda7" stroke="#111820" stroke-width="3"><title>Attribute (r4_control_0_0)</title></circle>
+<circle cx="2460" cy="3613" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Field Work (r4_control_0_1)</title></circle>
+<circle cx="4789" cy="2149" r="6" fill="#72bda7" stroke="#111820" stroke-width="3"><title>Attribute (r4_control_0_2)</title></circle>
+<circle cx="3763" cy="2755" r="6" fill="#72bda7" stroke="#111820" stroke-width="3"><title>Attribute (r4_control_0_3)</title></circle>
+<circle cx="2339" cy="3547" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Field Work Mastery (r4_control_0_4)</title></circle>
+<circle cx="2383" cy="3609" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Field Work (r4_control_0_5)</title></circle>
+<circle cx="3859" cy="2688" r="6" fill="#72bda7" stroke="#111820" stroke-width="3"><title>Attribute (r4_control_0_6)</title></circle>
+<circle cx="2496" cy="3480" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Field Work (r4_control_0_7)</title></circle>
+<circle cx="3956" cy="2622" r="6" fill="#72bda7" stroke="#111820" stroke-width="3"><title>Attribute (r4_control_0_8)</title></circle>
+<circle cx="4052" cy="2555" r="6" fill="#72bda7" stroke="#111820" stroke-width="3"><title>Attribute (r4_control_0_9)</title></circle>
+<circle cx="2359" cy="3474" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Field Work Mastery (r4_control_0_10)</title></circle>
+<circle cx="2429" cy="3444" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Field Work (r4_control_0_11)</title></circle>
+<circle cx="5016" cy="3130" r="6" fill="#72bda7" stroke="#111820" stroke-width="3"><title>Attribute (r4_control_1_0)</title></circle>
+<circle cx="1278" cy="4628" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Charge Routing (r4_control_1_1)</title></circle>
+<circle cx="4955" cy="3244" r="6" fill="#72bda7" stroke="#111820" stroke-width="3"><title>Attribute (r4_control_1_2)</title></circle>
+<circle cx="4895" cy="3357" r="6" fill="#72bda7" stroke="#111820" stroke-width="3"><title>Attribute (r4_control_1_3)</title></circle>
+<circle cx="1296" cy="4748" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Charge Routing Mastery (r4_control_1_4)</title></circle>
+<circle cx="1276" cy="4681" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Charge Routing (r4_control_1_5)</title></circle>
+<circle cx="4834" cy="3471" r="6" fill="#72bda7" stroke="#111820" stroke-width="3"><title>Attribute (r4_control_1_6)</title></circle>
+<circle cx="1551" cy="3396" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Charge Routing (r4_control_1_7)</title></circle>
+<circle cx="4234" cy="3574" r="6" fill="#72bda7" stroke="#111820" stroke-width="3"><title>Attribute (r4_control_1_8)</title></circle>
+<circle cx="4369" cy="3577" r="6" fill="#72bda7" stroke="#111820" stroke-width="3"><title>Attribute (r4_control_1_9)</title></circle>
+<circle cx="1652" cy="3463" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Charge Routing Mastery (r4_control_1_10)</title></circle>
+<circle cx="1589" cy="3433" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Charge Routing (r4_control_1_11)</title></circle>
+<circle cx="4102" cy="3907" r="6" fill="#72bda7" stroke="#111820" stroke-width="3"><title>Attribute (r4_control_drive_0_0)</title></circle>
+<circle cx="2546" cy="4306" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Catalysis (r4_control_drive_0_1)</title></circle>
+<circle cx="4103" cy="4018" r="6" fill="#72bda7" stroke="#111820" stroke-width="3"><title>Attribute (r4_control_drive_0_2)</title></circle>
+<circle cx="3097" cy="4716" r="6" fill="#e6ab73" stroke="#111820" stroke-width="3"><title>Attribute (r4_control_drive_0_3)</title></circle>
+<circle cx="2524" cy="4170" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Catalysis Mastery (r4_control_drive_0_4)</title></circle>
+<circle cx="2502" cy="4243" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Catalysis (r4_control_drive_0_5)</title></circle>
+<circle cx="3208" cy="4742" r="6" fill="#72bda7" stroke="#111820" stroke-width="3"><title>Attribute (r4_control_drive_0_6)</title></circle>
+<circle cx="2673" cy="4254" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Catalysis (r4_control_drive_0_7)</title></circle>
+<circle cx="3797" cy="4834" r="6" fill="#72bda7" stroke="#111820" stroke-width="3"><title>Attribute (r4_control_drive_0_8)</title></circle>
+<circle cx="3678" cy="4818" r="6" fill="#e6ab73" stroke="#111820" stroke-width="3"><title>Attribute (r4_control_drive_0_9)</title></circle>
+<circle cx="2595" cy="4142" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Catalysis Mastery (r4_control_drive_0_10)</title></circle>
+<circle cx="2661" cy="4179" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Catalysis (r4_control_drive_0_11)</title></circle>
+<circle cx="3558" cy="4801" r="6" fill="#72bda7" stroke="#111820" stroke-width="3"><title>Attribute (r4_control_drive_1_0)</title></circle>
+<circle cx="4228" cy="1809" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Calibration (r4_control_drive_1_1)</title></circle>
+<circle cx="3439" cy="4785" r="6" fill="#72bda7" stroke="#111820" stroke-width="3"><title>Attribute (r4_control_drive_1_2)</title></circle>
+<circle cx="3184" cy="4313" r="6" fill="#e6ab73" stroke="#111820" stroke-width="3"><title>Attribute (r4_control_drive_1_3)</title></circle>
+<circle cx="4256" cy="1927" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Calibration Mastery (r4_control_drive_1_4)</title></circle>
+<circle cx="4231" cy="1862" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Calibration (r4_control_drive_1_5)</title></circle>
+<circle cx="3079" cy="4394" r="6" fill="#72bda7" stroke="#111820" stroke-width="3"><title>Attribute (r4_control_drive_1_6)</title></circle>
+<circle cx="3426" cy="3701" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Calibration (r4_control_drive_1_7)</title></circle>
+<circle cx="4503" cy="3579" r="6" fill="#72bda7" stroke="#111820" stroke-width="3"><title>Attribute (r4_control_drive_1_8)</title></circle>
+<circle cx="4638" cy="3582" r="6" fill="#e6ab73" stroke="#111820" stroke-width="3"><title>Attribute (r4_control_drive_1_9)</title></circle>
+<circle cx="3323" cy="3636" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Calibration Mastery (r4_control_drive_1_10)</title></circle>
+<circle cx="3387" cy="3665" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Calibration (r4_control_drive_1_11)</title></circle>
+<circle cx="2986" cy="4690" r="6" fill="#e6ab73" stroke="#111820" stroke-width="3"><title>Attribute (r4_drive_0_0)</title></circle>
+<circle cx="3823" cy="4553" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Precision (r4_drive_0_1)</title></circle>
+<circle cx="2737" cy="4265" r="6" fill="#e6ab73" stroke="#111820" stroke-width="3"><title>Attribute (r4_drive_0_2)</title></circle>
+<circle cx="2622" cy="4311" r="6" fill="#e6ab73" stroke="#111820" stroke-width="3"><title>Attribute (r4_drive_0_3)</title></circle>
+<circle cx="3958" cy="4527" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Precision Mastery (r4_drive_0_4)</title></circle>
+<circle cx="3884" cy="4507" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Precision (r4_drive_0_5)</title></circle>
+<circle cx="2506" cy="4358" r="6" fill="#e6ab73" stroke="#111820" stroke-width="3"><title>Attribute (r4_drive_0_6)</title></circle>
+<circle cx="3878" cy="4679" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Precision (r4_drive_0_7)</title></circle>
+<circle cx="2391" cy="4404" r="6" fill="#e6ab73" stroke="#111820" stroke-width="3"><title>Attribute (r4_drive_0_8)</title></circle>
+<circle cx="2974" cy="4476" r="6" fill="#e6ab73" stroke="#111820" stroke-width="3"><title>Attribute (r4_drive_0_9)</title></circle>
+<circle cx="3989" cy="4597" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Precision Mastery (r4_drive_0_10)</title></circle>
+<circle cx="3953" cy="4665" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Precision (r4_drive_0_11)</title></circle>
+<circle cx="2869" cy="4557" r="6" fill="#e6ab73" stroke="#111820" stroke-width="3"><title>Attribute (r4_drive_1_0)</title></circle>
+<circle cx="4827" cy="2820" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Economy (r4_drive_1_1)</title></circle>
+<circle cx="4719" cy="3712" r="6" fill="#e6ab73" stroke="#111820" stroke-width="3"><title>Attribute (r4_drive_1_2)</title></circle>
+<circle cx="4666" cy="3840" r="6" fill="#e6ab73" stroke="#111820" stroke-width="3"><title>Attribute (r4_drive_1_3)</title></circle>
+<circle cx="4885" cy="2927" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Economy Mastery (r4_drive_1_4)</title></circle>
+<circle cx="4843" cy="2870" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Economy (r4_drive_1_5)</title></circle>
+<circle cx="4612" cy="3969" r="6" fill="#e6ab73" stroke="#111820" stroke-width="3"><title>Attribute (r4_drive_1_6)</title></circle>
+<circle cx="2413" cy="4561" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Economy (r4_drive_1_7)</title></circle>
+<circle cx="4559" cy="4097" r="6" fill="#e6ab73" stroke="#111820" stroke-width="3"><title>Attribute (r4_drive_1_8)</title></circle>
+<circle cx="3463" cy="2911" r="6" fill="#e6ab73" stroke="#111820" stroke-width="3"><title>Attribute (r4_drive_1_9)</title></circle>
+<circle cx="2514" cy="4630" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Economy Mastery (r4_drive_1_10)</title></circle>
+<circle cx="2451" cy="4599" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Economy (r4_drive_1_11)</title></circle>
+<circle cx="1469" cy="2465" r="6" fill="#e6ab73" stroke="#111820" stroke-width="3"><title>Attribute (r4_drive_reserve_0_0)</title></circle>
+<circle cx="2846" cy="885" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Actuation (r4_drive_reserve_0_1)</title></circle>
+<circle cx="1450" cy="2337" r="6" fill="#e6ab73" stroke="#111820" stroke-width="3"><title>Attribute (r4_drive_reserve_0_2)</title></circle>
+<circle cx="1432" cy="2209" r="6" fill="#829bdb" stroke="#111820" stroke-width="3"><title>Attribute (r4_drive_reserve_0_3)</title></circle>
+<circle cx="2959" cy="806" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Actuation Mastery (r4_drive_reserve_0_4)</title></circle>
+<circle cx="2883" cy="819" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Actuation (r4_drive_reserve_0_5)</title></circle>
+<circle cx="3483" cy="3104" r="6" fill="#e6ab73" stroke="#111820" stroke-width="3"><title>Attribute (r4_drive_reserve_0_6)</title></circle>
+<circle cx="2948" cy="977" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Actuation (r4_drive_reserve_0_7)</title></circle>
+<circle cx="3323" cy="2868" r="6" fill="#e6ab73" stroke="#111820" stroke-width="3"><title>Attribute (r4_drive_reserve_0_8)</title></circle>
+<circle cx="3300" cy="3350" r="6" fill="#829bdb" stroke="#111820" stroke-width="3"><title>Attribute (r4_drive_reserve_0_9)</title></circle>
+<circle cx="3015" cy="857" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Actuation Mastery (r4_drive_reserve_0_10)</title></circle>
+<circle cx="3011" cy="933" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Actuation (r4_drive_reserve_0_11)</title></circle>
+<circle cx="3172" cy="3465" r="6" fill="#e6ab73" stroke="#111820" stroke-width="3"><title>Attribute (r4_drive_reserve_1_0)</title></circle>
+<circle cx="2229" cy="2794" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Recovery (r4_drive_reserve_1_1)</title></circle>
+<circle cx="3274" cy="3220" r="6" fill="#e6ab73" stroke="#111820" stroke-width="3"><title>Attribute (r4_drive_reserve_1_2)</title></circle>
+<circle cx="2842" cy="3452" r="6" fill="#829bdb" stroke="#111820" stroke-width="3"><title>Attribute (r4_drive_reserve_1_3)</title></circle>
+<circle cx="2270" cy="2909" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Recovery Mastery (r4_drive_reserve_1_4)</title></circle>
+<circle cx="2237" cy="2846" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Recovery (r4_drive_reserve_1_5)</title></circle>
+<circle cx="2711" cy="3324" r="6" fill="#e6ab73" stroke="#111820" stroke-width="3"><title>Attribute (r4_drive_reserve_1_6)</title></circle>
+<circle cx="3141" cy="4414" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Recovery (r4_drive_reserve_1_7)</title></circle>
+<circle cx="2955" cy="3345" r="6" fill="#e6ab73" stroke="#111820" stroke-width="3"><title>Attribute (r4_drive_reserve_1_8)</title></circle>
+<circle cx="2518" cy="3100" r="6" fill="#829bdb" stroke="#111820" stroke-width="3"><title>Attribute (r4_drive_reserve_1_9)</title></circle>
+<circle cx="3252" cy="4364" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Recovery Mastery (r4_drive_reserve_1_10)</title></circle>
+<circle cx="3192" cy="4401" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Recovery (r4_drive_reserve_1_11)</title></circle>
+<circle cx="2875" cy="956" r="6" fill="#829bdb" stroke="#111820" stroke-width="3"><title>Attribute (r4_reserve_0_0)</title></circle>
+<circle cx="4293" cy="2879" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Momentum (r4_reserve_0_1)</title></circle>
+<circle cx="2533" cy="1267" r="6" fill="#829bdb" stroke="#111820" stroke-width="3"><title>Attribute (r4_reserve_0_2)</title></circle>
+<circle cx="2405" cy="1240" r="6" fill="#829bdb" stroke="#111820" stroke-width="3"><title>Attribute (r4_reserve_0_3)</title></circle>
+<circle cx="4158" cy="2908" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Momentum Mastery (r4_reserve_0_4)</title></circle>
+<circle cx="4232" cy="2926" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Momentum (r4_reserve_0_5)</title></circle>
+<circle cx="2277" cy="1213" r="6" fill="#829bdb" stroke="#111820" stroke-width="3"><title>Attribute (r4_reserve_0_6)</title></circle>
+<circle cx="4235" cy="2754" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Momentum (r4_reserve_0_7)</title></circle>
+<circle cx="2495" cy="2420" r="6" fill="#829bdb" stroke="#111820" stroke-width="3"><title>Attribute (r4_reserve_0_8)</title></circle>
+<circle cx="2431" cy="2301" r="6" fill="#829bdb" stroke="#111820" stroke-width="3"><title>Attribute (r4_reserve_0_9)</title></circle>
+<circle cx="4126" cy="2838" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Momentum Mastery (r4_reserve_0_10)</title></circle>
+<circle cx="4160" cy="2770" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Momentum (r4_reserve_0_11)</title></circle>
+<circle cx="2366" cy="2182" r="6" fill="#829bdb" stroke="#111820" stroke-width="3"><title>Attribute (r4_reserve_1_0)</title></circle>
+<circle cx="4908" cy="2285" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Hardness (r4_reserve_1_1)</title></circle>
+<circle cx="2071" cy="2452" r="6" fill="#829bdb" stroke="#111820" stroke-width="3"><title>Attribute (r4_reserve_1_2)</title></circle>
+<circle cx="2889" cy="2197" r="6" fill="#829bdb" stroke="#111820" stroke-width="3"><title>Attribute (r4_reserve_1_3)</title></circle>
+<circle cx="4988" cy="2194" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Hardness Mastery (r4_reserve_1_4)</title></circle>
+<circle cx="4949" cy="2252" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Hardness (r4_reserve_1_5)</title></circle>
+<circle cx="2962" cy="2107" r="6" fill="#829bdb" stroke="#111820" stroke-width="3"><title>Attribute (r4_reserve_1_6)</title></circle>
+<circle cx="2745" cy="4074" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Hardness (r4_reserve_1_7)</title></circle>
+<circle cx="1413" cy="2081" r="6" fill="#829bdb" stroke="#111820" stroke-width="3"><title>Attribute (r4_reserve_1_8)</title></circle>
+<circle cx="2523" cy="2914" r="6" fill="#829bdb" stroke="#111820" stroke-width="3"><title>Attribute (r4_reserve_1_9)</title></circle>
+<circle cx="2666" cy="3982" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Hardness Mastery (r4_reserve_1_10)</title></circle>
+<circle cx="2718" cy="4028" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Hardness (r4_reserve_1_11)</title></circle>
+<circle cx="3107" cy="1926" r="6" fill="#829bdb" stroke="#111820" stroke-width="3"><title>Attribute (r4_reserve_control_0_0)</title></circle>
+<circle cx="2217" cy="1166" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Thermal Reach (r4_reserve_control_0_1)</title></circle>
+<circle cx="3305" cy="1859" r="6" fill="#829bdb" stroke="#111820" stroke-width="3"><title>Attribute (r4_reserve_control_0_2)</title></circle>
+<circle cx="3431" cy="1884" r="6" fill="#72bda7" stroke="#111820" stroke-width="3"><title>Attribute (r4_reserve_control_0_3)</title></circle>
+<circle cx="2274" cy="1041" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Thermal Reach Mastery (r4_reserve_control_0_4)</title></circle>
+<circle cx="2215" cy="1090" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Thermal Reach (r4_reserve_control_0_5)</title></circle>
+<circle cx="3557" cy="1908" r="6" fill="#829bdb" stroke="#111820" stroke-width="3"><title>Attribute (r4_reserve_control_0_6)</title></circle>
+<circle cx="2351" cy="1195" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Thermal Reach (r4_reserve_control_0_7)</title></circle>
+<circle cx="3683" cy="1933" r="6" fill="#829bdb" stroke="#111820" stroke-width="3"><title>Attribute (r4_reserve_control_0_8)</title></circle>
+<circle cx="2665" cy="3136" r="6" fill="#72bda7" stroke="#111820" stroke-width="3"><title>Attribute (r4_reserve_control_0_9)</title></circle>
+<circle cx="2349" cy="1057" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Thermal Reach Mastery (r4_reserve_control_0_10)</title></circle>
+<circle cx="2383" cy="1125" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Thermal Reach (r4_reserve_control_0_11)</title></circle>
+<circle cx="2716" cy="2659" r="6" fill="#829bdb" stroke="#111820" stroke-width="3"><title>Attribute (r4_reserve_control_1_0)</title></circle>
+<circle cx="997" cy="4274" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Heat Flow (r4_reserve_control_1_1)</title></circle>
+<circle cx="2845" cy="2534" r="6" fill="#829bdb" stroke="#111820" stroke-width="3"><title>Attribute (r4_reserve_control_1_2)</title></circle>
+<circle cx="2737" cy="2794" r="6" fill="#72bda7" stroke="#111820" stroke-width="3"><title>Attribute (r4_reserve_control_1_3)</title></circle>
+<circle cx="937" cy="4167" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Heat Flow Mastery (r4_reserve_control_1_4)</title></circle>
+<circle cx="980" cy="4224" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Heat Flow (r4_reserve_control_1_5)</title></circle>
+<circle cx="3139" cy="2566" r="6" fill="#829bdb" stroke="#111820" stroke-width="3"><title>Attribute (r4_reserve_control_1_6)</title></circle>
+<circle cx="1459" cy="1876" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Heat Flow (r4_reserve_control_1_7)</title></circle>
+<circle cx="3285" cy="2672" r="6" fill="#829bdb" stroke="#111820" stroke-width="3"><title>Attribute (r4_reserve_control_1_8)</title></circle>
+<circle cx="3032" cy="2674" r="6" fill="#72bda7" stroke="#111820" stroke-width="3"><title>Attribute (r4_reserve_control_1_9)</title></circle>
+<circle cx="1337" cy="1885" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Heat Flow Mastery (r4_reserve_control_1_10)</title></circle>
+<circle cx="1406" cy="1871" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Heat Flow (r4_reserve_control_1_11)</title></circle>
+<circle cx="5591" cy="2805" r="24" fill="#c79dea" stroke="#111820" stroke-width="3"><title>Attribute Transfiguration (attribute_transfiguration)</title></circle>
+<circle cx="5188" cy="3166" r="24" fill="#c79dea" stroke="#111820" stroke-width="3"><title>Silent Operation (silent_operation)</title></circle>
+<circle cx="4836" cy="3868" r="24" fill="#c79dea" stroke="#111820" stroke-width="3"><title>Magnet Mode (magnet_mode)</title></circle>
+<circle cx="4211" cy="3969" r="24" fill="#c79dea" stroke="#111820" stroke-width="3"><title>Serrated Leaf Protocol (serrated_leaf_protocol)</title></circle>
+<circle cx="3705" cy="4728" r="24" fill="#c79dea" stroke="#111820" stroke-width="3"><title>Manual Throttle (manual_throttle)</title></circle>
+<circle cx="3470" cy="4445" r="24" fill="#c79dea" stroke="#111820" stroke-width="3"><title>Coasting Clutch (coasting_clutch)</title></circle>
+<circle cx="2912" cy="4907" r="24" fill="#c79dea" stroke="#111820" stroke-width="3"><title>Seedling Magnet (seedling_magnet)</title></circle>
+<circle cx="2506" cy="4720" r="24" fill="#c79dea" stroke="#111820" stroke-width="3"><title>Precision Jaw Mount (precision_jaw_mount)</title></circle>
+<circle cx="1386" cy="4755" r="24" fill="#c79dea" stroke="#111820" stroke-width="3"><title>Dense Batching (dense_batching)</title></circle>
+<circle cx="1459" cy="4818" r="24" fill="#c79dea" stroke="#111820" stroke-width="3"><title>Soft Material Specialist (soft_material_specialist)</title></circle>
+<circle cx="984" cy="4090" r="24" fill="#c79dea" stroke="#111820" stroke-width="3"><title>Cell Bypass (cell_bypass)</title></circle>
+<circle cx="971" cy="3700" r="24" fill="#c79dea" stroke="#111820" stroke-width="3"><title>Redline Drive (redline_drive)</title></circle>
+<circle cx="1299" cy="2561" r="24" fill="#c79dea" stroke="#111820" stroke-width="3"><title>Low Heat Specialist (low_heat_specialist)</title></circle>
+<circle cx="1292" cy="2411" r="24" fill="#c79dea" stroke="#111820" stroke-width="3"><title>Flash Annealing (flash_annealing)</title></circle>
+<circle cx="1322" cy="1974" r="24" fill="#c79dea" stroke="#111820" stroke-width="3"><title>Quench Protocol (quench_protocol)</title></circle>
+<circle cx="1823" cy="1130" r="24" fill="#c79dea" stroke="#111820" stroke-width="3"><title>Closed Loop Recuperator (closed_loop_recuperator)</title></circle>
+<circle cx="2245" cy="956" r="24" fill="#c79dea" stroke="#111820" stroke-width="3"><title>Thermal Reservoir (thermal_reservoir)</title></circle>
+<circle cx="2409" cy="990" r="24" fill="#c79dea" stroke="#111820" stroke-width="3"><title>Cold Standby (cold_standby)</title></circle>
+<circle cx="2977" cy="718" r="24" fill="#c79dea" stroke="#111820" stroke-width="3"><title>High Flux (high_flux)</title></circle>
+<circle cx="3389" cy="803" r="24" fill="#c79dea" stroke="#111820" stroke-width="3"><title>Deep Reserve (deep_reserve)</title></circle>
+<circle cx="3246" cy="887" r="24" fill="#c79dea" stroke="#111820" stroke-width="3"><title>Regulated Heat (regulated_heat)</title></circle>
+<circle cx="4479" cy="1833" r="24" fill="#c79dea" stroke="#111820" stroke-width="3"><title>Deliberate Work (deliberate_work)</title></circle>
+<circle cx="4937" cy="2120" r="24" fill="#c79dea" stroke="#111820" stroke-width="3"><title>Measured Recovery (measured_recovery)</title></circle>
+<circle cx="5453" cy="2640" r="24" fill="#c79dea" stroke="#111820" stroke-width="3"><title>Reserve Actuation (reserve_actuation)</title></circle>
+<g font-family="sans-serif" fill="#e5ecf3" font-size="44" text-anchor="middle">
+<text x="3260" y="2955">control</text>
+<text x="3145" y="3206">control / drive</text>
+<text x="2880" y="3163">drive</text>
+<text x="2730" y="2955">drive / reserve</text>
+<text x="2873" y="2734">reserve</text>
+<text x="3115" y="2756">reserve / control</text>
+</g><g font-family="sans-serif" font-size="60">
+<circle cx="900" cy="5980" r="28" fill="#72bda7"/><text x="965" y="6000" fill="#72bda7">CONTROL</text>
+<circle cx="2600" cy="5980" r="28" fill="#e6ab73"/><text x="2665" y="6000" fill="#e6ab73">DRIVE</text>
+<circle cx="4300" cy="5980" r="28" fill="#829bdb"/><text x="4365" y="6000" fill="#829bdb">RESERVE</text>
+</g></svg>

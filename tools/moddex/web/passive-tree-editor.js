@@ -701,7 +701,7 @@ async function loadPassiveTreeSourceCatalog() {
         const payload = await response.json();
         passiveTreeState.sourceTrees = Array.isArray(payload.trees) ? payload.trees : [];
         ptEls.passiveTreeSourceSelect.innerHTML = passiveTreeState.sourceTrees.length
-            ? passiveTreeState.sourceTrees.map((entry) => `<option value="${escapeHtml(entry.id)}">${escapeHtml(entry.label)} - Java</option>`).join("")
+            ? passiveTreeState.sourceTrees.map((entry) => `<option value="${escapeHtml(entry.id)}">${escapeHtml(entry.label)} - ${entry.sourceFormat === "catalog" ? "JSON" : "Java"}</option>`).join("")
             : `<option value="">No typed Java trees found</option>`;
         ptEls.passiveTreeLoadSource.disabled = passiveTreeState.sourceTrees.length === 0;
     } catch (error) {
@@ -777,12 +777,15 @@ function renderPassiveTreeVisualAudit() {
     const edgeLengths = routeEdges.map((entry) => entry.length).sort((first, second) => first - second);
     const medianLength = percentile(edgeLengths, 0.5);
     const p90Length = percentile(edgeLengths, 0.9);
-    const longThreshold = Math.max(240, medianLength * 2.75);
+    const multipleStarts = graph.nodes.filter(entry => entry.detail.kind === "STARTER").length > 1;
+    const neighborhoodLengths = routeEdges.filter(entry => entry.from.groupId !== entry.to.groupId)
+        .map(entry => entry.length).sort((a, b) => a - b);
+    const longThreshold = Math.max(240, (multipleStarts ? percentile(neighborhoodLengths, 0.5) : medianLength) * 2.75);
     const longEdges = routeEdges.filter((entry) => entry.length > longThreshold);
     const crossings = properGraphCrossings(graph.edges);
     const centrality = starterCentrality(graph.nodes, bounds);
     const endpointSpread = passiveTreeEndpointSpread(graph.groups, graph.nodes);
-    const crossingLimit = Math.max(3, Math.round(graph.edges.length * 0.02));
+    const crossingLimit = multipleStarts ? 0 : Math.max(3, Math.round(graph.edges.length * 0.02));
     const longEdgeLimit = Math.max(3, Math.round(graph.edges.length * 0.06));
     const crossingsPass = crossings.length <= crossingLimit;
     const longEdgesPass = longEdges.length <= longEdgeLimit && p90Length <= longThreshold;
@@ -793,7 +796,7 @@ function renderPassiveTreeVisualAudit() {
     ptEls.passiveTreeVisualAudit.innerHTML = [
         `<defs><radialGradient id="passiveTreeAuditBackdrop"><stop offset="0%" stop-color="#1b251d"></stop><stop offset="62%" stop-color="#0d1415"></stop><stop offset="100%" stop-color="#070a0d"></stop></radialGradient></defs>`,
         `<rect x="${viewBox.x}" y="${viewBox.y}" width="${viewBox.width}" height="${viewBox.height}" fill="url(#passiveTreeAuditBackdrop)"></rect>`,
-        renderPassiveTreeAuditRings(graph.nodes, bounds),
+        multipleStarts ? "" : renderPassiveTreeAuditRings(graph.nodes, bounds),
         graph.edges.map((entry) => renderPassiveTreeAuditLink(entry, longThreshold)).join(""),
         graph.nodes.map((entry) => renderPassiveTreeAuditNode(entry)).join(""),
         crossings.slice(0, 200).map((entry) => `<circle class="passive-tree-audit-crossing" cx="${entry.x}" cy="${entry.y}" r="${3.2 * scale}"></circle>`).join("")
@@ -3872,6 +3875,7 @@ function writeDraftCollection() {
 function normalizeTree(stored) {
     const canvas = stored.canvas ?? DEFAULT_CANVAS;
     return ensureStarterTree({
+        multipleStarts: stored.multipleStarts === true,
         treeId: normalizedIdentifier(stored.treeId, "crusher"),
         packageName: stored.packageName || DEFAULT_PACKAGE,
         className: normalizedClassName(stored.className, DEFAULT_CLASS),
@@ -4148,6 +4152,10 @@ function normalizeNodeRef(ref) {
 }
 
 function ensureStarterTree(tree) {
+    if (tree.multipleStarts) {
+        tree.connections = validConnections(tree, tree.connections ?? []);
+        return tree;
+    }
     if (!tree.groups.some((entry) => entry.starter)) {
         tree.groups.unshift(normalizeGroup(group(
             "starter",

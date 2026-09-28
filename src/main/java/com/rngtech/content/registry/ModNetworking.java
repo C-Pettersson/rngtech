@@ -11,13 +11,16 @@ import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 
 public final class ModNetworking {
-    private static final String VERSION = "1";
+    private static final String VERSION = "2";
 
     private ModNetworking() {
     }
 
     public static void register(RegisterPayloadHandlersEvent event) {
         PayloadRegistrar registrar = event.registrar(VERSION);
+        registrar.playToServer(com.rngtech.content.network.MasteryActionPayload.TYPE,
+                com.rngtech.content.network.MasteryActionPayload.STREAM_CODEC,
+                com.rngtech.content.network.MasteryActionPayload::handle);
         registrar.playToServer(
                 WrenchOverlayRequestPayload.TYPE,
                 WrenchOverlayRequestPayload.STREAM_CODEC,

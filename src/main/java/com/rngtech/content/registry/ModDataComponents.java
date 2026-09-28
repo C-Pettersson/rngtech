@@ -23,6 +23,13 @@ public final class ModDataComponents {
     private static final DeferredRegister.DataComponents DATA_COMPONENTS =
             DeferredRegister.createDataComponents(Registries.DATA_COMPONENT_TYPE, RNGTech.MOD_ID);
 
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<String>> MASTERY_BUILD =
+            DATA_COMPONENTS.registerComponentType("mastery_build", builder -> builder
+                    .persistent(Codec.STRING).networkSynchronized(ByteBufCodecs.STRING_UTF8));
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Boolean>> MASTERY_CONFIGURATOR_MODE =
+            DATA_COMPONENTS.registerComponentType("mastery_configurator_mode", builder -> builder
+                    .persistent(Codec.BOOL).networkSynchronized(ByteBufCodecs.BOOL));
+
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<MachineTraits>> MACHINE_TRAITS =
             DATA_COMPONENTS.registerComponentType(
                     "machine_traits",

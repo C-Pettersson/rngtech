@@ -929,7 +929,8 @@ public enum ForestryCompanionPassiveNode implements StringRepresentable, Passive
     }
 
     public static ForestryCompanionPassiveNode byButtonId(int buttonId) {
-        return ForestryCompanionPassiveTree.TREE.byButtonId(buttonId);
+        int index = buttonId - 100;
+        return index >= 0 && index < values().length ? values()[index] : null;
     }
 
     @Override
