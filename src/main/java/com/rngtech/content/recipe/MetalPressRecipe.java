@@ -3,6 +3,7 @@ package com.rngtech.content.recipe;
 import com.rngtech.content.registry.ModDataComponents;
 import com.rngtech.content.registry.ModItems;
 import com.rngtech.content.registry.ModRecipes;
+import com.rngtech.rpg.progression.MachineProgressionState;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
@@ -35,12 +36,16 @@ public record MetalPressRecipe(
         double requiredTemperatureStability,
         ItemStack failureOutput,
         String failureMaterial,
-        boolean powerSensitive
+        boolean powerSensitive,
+        int machineXp,
+        int machineXpBand
 )
         implements Recipe<MetalPressRecipeInput> {
     public MetalPressRecipe {
         targetTemperature = targetTemperature > 0 ? targetTemperature : minimumTemperature;
         safeMaximumTemperature = Math.max(targetTemperature, safeMaximumTemperature);
+        machineXp = Math.max(0, machineXp);
+        machineXpBand = machineXp <= 0 ? 0 : Math.max(1, machineXpBand);
     }
 
     public ItemStack outputStack() {
@@ -149,7 +154,11 @@ public record MetalPressRecipe(
                                 .forGetter(MetalPressRecipe::requiredTemperatureStability),
                         ItemStack.STRICT_CODEC.fieldOf("failure_output").forGetter(MetalPressRecipe::failureOutput),
                         Codec.STRING.optionalFieldOf("failure_material", "").forGetter(MetalPressRecipe::failureMaterial),
-                        Codec.BOOL.fieldOf("power_sensitive").orElse(true).forGetter(MetalPressRecipe::powerSensitive)
+                        Codec.BOOL.fieldOf("power_sensitive").orElse(true).forGetter(MetalPressRecipe::powerSensitive),
+                        MachineXpFields.CODEC.forGetter(recipe -> new MachineXpFields(
+                                recipe.machineXp(),
+                                recipe.machineXpBand() <= 0 ? Optional.empty() : Optional.of(recipe.machineXpBand())
+                        ))
                 )
                 .apply(instance, (
                         group,
@@ -165,23 +174,29 @@ public record MetalPressRecipe(
                         requiredTemperatureStability,
                         failureOutput,
                         failureMaterial,
-                        powerSensitive
-                ) -> new MetalPressRecipe(
-                        group,
-                        ingredient,
-                        inputCount,
-                        mold,
-                        result,
-                        processingTicks,
-                        energy,
-                        minimumTemperature,
-                        targetTemperature.orElse(minimumTemperature),
-                        safeMaximumTemperature,
-                        requiredTemperatureStability,
-                        failureOutput,
-                        failureMaterial,
-                        powerSensitive
-                )));
+                        powerSensitive,
+                        machineXpFields
+                ) -> {
+                    int resolvedTarget = targetTemperature.orElse(minimumTemperature);
+                    return new MetalPressRecipe(
+                            group,
+                            ingredient,
+                            inputCount,
+                            mold,
+                            result,
+                            processingTicks,
+                            energy,
+                            minimumTemperature,
+                            resolvedTarget,
+                            safeMaximumTemperature,
+                            requiredTemperatureStability,
+                            failureOutput,
+                            failureMaterial,
+                            powerSensitive,
+                            machineXpFields.machineXp(),
+                            machineXpFields.machineXpBand().orElse(defaultMachineXpBand(machineXpFields.machineXp(), resolvedTarget))
+                    );
+                }));
 
         private static final StreamCodec<RegistryFriendlyByteBuf, MetalPressRecipe> STREAM_CODEC =
                 new StreamCodec<>() {
@@ -201,7 +216,9 @@ public record MetalPressRecipe(
                                 ByteBufCodecs.DOUBLE.decode(buffer),
                                 ItemStack.STREAM_CODEC.decode(buffer),
                                 ByteBufCodecs.STRING_UTF8.decode(buffer),
-                                ByteBufCodecs.BOOL.decode(buffer)
+                                ByteBufCodecs.BOOL.decode(buffer),
+                                ByteBufCodecs.VAR_INT.decode(buffer),
+                                ByteBufCodecs.VAR_INT.decode(buffer)
                         );
                     }
 
@@ -221,8 +238,48 @@ public record MetalPressRecipe(
                         ItemStack.STREAM_CODEC.encode(buffer, recipe.failureOutput);
                         ByteBufCodecs.STRING_UTF8.encode(buffer, recipe.failureMaterial);
                         ByteBufCodecs.BOOL.encode(buffer, recipe.powerSensitive);
+                        ByteBufCodecs.VAR_INT.encode(buffer, recipe.machineXp);
+                        ByteBufCodecs.VAR_INT.encode(buffer, recipe.machineXpBand);
                     }
                 };
+
+        private static int defaultMachineXpBand(int machineXp, int targetTemperature) {
+            if (machineXp <= 0) {
+                return 0;
+            }
+            if (targetTemperature <= 800) {
+                return MachineProgressionState.progressionBand(1);
+            }
+            if (targetTemperature <= 1000) {
+                return MachineProgressionState.progressionBand(5);
+            }
+            if (targetTemperature <= 1200) {
+                return MachineProgressionState.progressionBand(9);
+            }
+            if (targetTemperature <= 1400) {
+                return MachineProgressionState.progressionBand(13);
+            }
+            if (targetTemperature <= 1600) {
+                return MachineProgressionState.progressionBand(17);
+            }
+            if (targetTemperature <= 1800) {
+                return MachineProgressionState.progressionBand(21);
+            }
+            return MachineProgressionState.progressionBand(25);
+        }
+
+        private record MachineXpFields(int machineXp, Optional<Integer> machineXpBand) {
+            private static final MapCodec<MachineXpFields> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
+                            Codec.intRange(0, Integer.MAX_VALUE)
+                                    .fieldOf("machine_xp")
+                                    .orElse(0)
+                                    .forGetter(MachineXpFields::machineXp),
+                            Codec.intRange(0, Integer.MAX_VALUE)
+                                    .optionalFieldOf("machine_xp_band")
+                                    .forGetter(MachineXpFields::machineXpBand)
+                    )
+                    .apply(instance, MachineXpFields::new));
+        }
 
         @Override
         public MapCodec<MetalPressRecipe> codec() {

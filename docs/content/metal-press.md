@@ -7,7 +7,7 @@ Resource ids: `rngtech:crude_metal_press`, `rngtech:metal_press`
 
 ## Summary
 
-The press line is the powered forming path for material plates, material gears, selected material casings, and Electric Circuit tiers. Both placed blocks use the `rngtech:metal_press` recipe type, the same Process/Gear/Stats/Refinement screen, and the same top input, bottom output, and side FE capability layout.
+The press line is the powered forming path for material plates, material gears, selected material casings, and Electric Circuit tiers. Both placed blocks use the `rngtech:metal_press` recipe type, the same Process/Gear/Stats/Refinement/Mastery screen, and the same top input, bottom output, and side FE capability layout.
 
 The Crude Metal Press is the pre-Steel bootstrap press. It can make early circuits and material plates when its Heat Core, Mold, and optional control parts satisfy the recipe gates. The Steel Metal Press is the standalone Stage 4 press with mandatory Servo control and failure-output behavior; its body recipe uses the regular Machine Frame rather than consuming the Crude Metal Press.
 
@@ -61,6 +61,16 @@ The Crude Metal Press hard-gates unsafe recipes. If its effective heat capacity 
 The Steel Metal Press uses the failure-strain model. Strain can come from live heat below the recipe minimum, heat above the safe maximum after overheat tolerance, temperature stability below the recipe requirement, low effective Servo stability, or FE shortfalls after progress has already started on power-sensitive recipes. `POWER_GRACE` halves press power-drop strain.
 
 When a Steel Press cycle fails, the input is consumed and the output slot receives the recipe failure output. Plate and casing failures produce `rngtech:malformed_ingot`; Furnace malformed-ingot recovery reads the stored material component and returns two matching nuggets through slow low-FE recipes. Circuit failures produce `rngtech:broken_circuit`. The Potential Reactor and Component Recycler can recover generic scrap from broken circuits.
+
+## Mastery
+
+Both presses enter the [shared Machine Mastery tree](../systems/machine-mastery.md) at the Control start, which they share with the Resonance Calibrator. Each placed press keeps its own `rngtech:machine_progression`; drops and pick-block preserve it. A press starts with 20 Control and no Drive or Reserve. In addition to the shared attribute conversions, each Control point grants 0.05% increased Temperature Stability.
+
+Heat, processing speed, Energy Usage, Energy Capacity, Stability, Instant Process, and Super Output effects apply. Output-amount, parallel-job, energy-transfer, fuel, and fluid effects are marked inactive. Stability effects are marked inactive on the Crude Metal Press because it has no failure-strain model. Allocation changes reset the active cycle and failure strain but keep inventory, the selected mold, and current heat.
+
+Press recipes accept optional `machine_xp` and `machine_xp_band` fields. A press grants `machine_xp` once per successful normal output, including Instant Process completions. Failure outputs, Crude Press safety pauses, missing Gear, output-blocked waits, and FE shortfalls grant none. An omitted `machine_xp_band` derives from `target_temperature` with the Furnace heat ladder described in [Furnace Recipe Use](furnace.md#recipe-use).
+
+Shipped plate, gear, casing, and Electric Circuit recipes grant XP; connector recipes grant none. Plates grant `1` for Iron and Copper, then `2`, `3`, `4`, `5`, `6`, and `8` for Stage 3 through Stage 8 materials. Gears grant 1.5 times the plate value, rounded, and casings grant twice the plate value. Basic, Advanced, Elite, and Ultimate Electric Circuits grant `3`, `5`, `10`, and `27`.
 
 ## Automation
 

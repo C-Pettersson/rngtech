@@ -2,7 +2,7 @@
 
 Status: Prototype
 
-Machine Mastery is progression owned by each machine chassis. Machines share one passive graph and enter it at different starting positions. The [implementation matrix](../reference/current-implementation.md) records the current adapters; additional machines and family ascendancies are deferred.
+Machine Mastery is progression owned by each machine chassis. Machines share one passive graph and enter it at different starting positions. The [implementation matrix](../reference/current-implementation.md) records the current adapters; generator and storage adapters and family ascendancies are deferred.
 
 ## Shared tree
 
@@ -14,16 +14,16 @@ Every paid allocation costs one point and must connect to the machine's start th
 
 ![Shared machine passive tree](../assets/machine-mega-passive-tree.svg)
 
-| Starting archetype | Initial attributes | Initial machine adapter |
+| Starting archetype | Initial attributes | Machine adapters |
 | --- | --- | --- |
-| Control | 20 Control | Deferred |
+| Control | 20 Control | Metal Press, Resonance Calibrator |
 | Control / Drive | 10 Control, 10 Drive | Forestry Companion |
 | Drive | 20 Drive | Crusher |
-| Drive / Reserve | 10 Drive, 10 Reserve | Furnace |
+| Drive / Reserve | 10 Drive, 10 Reserve | Furnace, Alloy Furnace |
 | Reserve | 20 Reserve | Deferred |
-| Reserve / Control | 10 Reserve, 10 Control | Deferred |
+| Reserve / Control | 10 Reserve, 10 Control | Melter |
 
-The three unused starts are present in the graph. They do not yet have machine adapters. Gear and cables do not gain their own Mastery progression.
+The Reserve start is present in the graph but has no machine adapter yet. Machines that share a start keep their own progression, but build codes paste between them. Gear and cables do not gain their own Mastery progression.
 
 All nodes remain visible and selectable regardless of machine family. Applicability is evaluated for each effect. A Crusher can allocate maximum heat and gain no heat benefit. An electric Furnace gains no fuel-duration benefit. A node with an irrelevant benefit still applies any relevant penalty; tooltips label inactive effects. Relevance highlighting never hides routes.
 
@@ -35,9 +35,9 @@ Inherent conversions use final, nonnegative attribute totals:
 
 | Attribute | Shared conversion | Family conversion |
 | --- | --- | --- |
-| Control | 0.1% increased Stability and 0.02% reduced Energy Usage per point | Furnace: 0.05% increased Temperature Stability per point |
+| Control | 0.1% increased Stability and 0.02% reduced Energy Usage per point | Furnace, Alloy Furnace, and Metal Press: 0.05% increased Temperature Stability per point; Resonance Calibrator: 0.05% increased Calibration Precision per point |
 | Drive | 0.15% increased Processing Speed per point | Forestry: +1 Tree Fell Limit per complete 20 points |
-| Reserve | Crusher and Furnace: 0.25% increased Energy Capacity per point | Furnace: 0.1% increased Heat Isolation per point; Forestry: +1 managed-cell maximum per complete 4 points |
+| Reserve | Every machine except Forestry: 0.25% increased Energy Capacity per point | Furnace and Alloy Furnace: 0.1% increased Heat Isolation per point; Melter: 0.1% increased Fluid Transfer per point; Forestry: +1 managed-cell maximum per complete 4 points |
 
 Conversions only have a gameplay effect where the receiving stat is used. For example, the primitive fuel Furnace has no FE buffer to benefit from Reserve's energy capacity conversion. Gear and chassis remain the main sources of processing capability.
 
@@ -59,7 +59,7 @@ Fixed values and hard ceilings resolve after ordinary modifiers, including Gear.
 
 Level 1 starts with no points; each level grants one point, so level 100 grants 99 points. Allocation storage, target builds, and build codes hold up to 120 points; the remaining 21 are reserved for a future non-level source. Levels 1–30 retain their previous cumulative XP thresholds. Each cumulative threshold after level 30 is the preceding threshold multiplied by 1.10 and rounded. This is a long-term progression curve, still subject to gameplay balance testing.
 
-Successful work grants `base machine_xp × (1 + floor(band² / 20))`, followed by the band falloff below. Dense Crusher batches award XP per completed job. Failed work, idle placement, output waits, and recipes authored with zero machine XP grant none.
+Successful work grants `base machine_xp × (1 + floor(band² / 20))`, followed by the band falloff below. Dense Crusher batches and multi-lane Resonance Calibrators award XP per completed job. Failed work, idle placement, output waits, and recipes authored with zero machine XP grant none.
 
 | Machine level relative to work band | XP awarded |
 | --- | ---: |
@@ -68,7 +68,7 @@ Successful work grants `base machine_xp × (1 + floor(band² / 20))`, followed b
 | Two above band | 25% |
 | Three or more above band | 0% |
 
-Quarter-XP remainders persist. Positive-XP Crusher recipes derive bands from hardness; Furnace recipes derive them from target heat. Their old 1–25 bands map to 1–98 with `min(98, 1 + floor((oldBand − 1) × 97 / 24))`. An explicitly authored `machine_xp_band` uses the new level scale directly. Forestry uses `min(98, 12 + floor(sqrt(Tree Fell Limit)) × 10)` for completed planting, leaf cleanup, and harvesting actions. Stronger work capability raises its training ceiling. Work in band 98 can eventually reach level 100.
+Quarter-XP remainders persist. Positive-XP Crusher recipes derive bands from hardness, and Melter recipes from required processing level on the same scale. Furnace, Alloy Furnace, and Metal Press recipes derive them from target heat, and calibration recipes from the required calibrator stage. Their old 1–25 bands map to 1–98 with `min(98, 1 + floor((oldBand − 1) × 97 / 24))`. An explicitly authored `machine_xp_band` uses the new level scale directly. Forestry uses `min(98, 12 + floor(sqrt(Tree Fell Limit)) × 10)` for completed planting, leaf cleanup, and harvesting actions. Stronger work capability raises its training ceiling. Work in band 98 can eventually reach level 100.
 
 Progression survives supported drops, pick-block, and replacement through `rngtech:machine_progression`. It does not transfer to independently crafted higher-stage chassis. Existing saves preserve XP and earned levels while refunding old machine-specific allocations. New saves store versioned stable node IDs and ordered target builds instead of two node masks. Catalog version 2 replaced the version 1 layout, so version 1 allocations and target builds are refunded and version 1 build codes are rejected.
 

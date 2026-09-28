@@ -17,6 +17,8 @@ public interface MasteryMenuView<N extends PassiveNode> {
 
     default boolean masterySupports(MachineStat stat) { return masteryFamily().supports(stat); }
 
+    default boolean masterySupportsAbsolute(MachineStat stat) { return masterySupports(stat) && masteryFamily().supportsAbsolute(stat); }
+
     default boolean masterySupportsBehavior(String behavior) { return masteryFamily().supportsBehavior(behavior); }
 
     long machineXp();

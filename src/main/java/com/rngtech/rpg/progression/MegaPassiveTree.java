@@ -137,7 +137,13 @@ public final class MegaPassiveTree {
     }
 
     public static void applyStats(MachineStatAccumulator stats, MachineProgressionState state, MachineMasteryFamily family) {
-        double[] base = switch (family) { case CRUSHER -> new double[] {0, 20, 0}; case FURNACE -> new double[] {0, 10, 10}; case FORESTRY -> new double[] {10, 10, 0}; };
+        double[] base = switch (family) {
+            case CRUSHER -> new double[] {0, 20, 0};
+            case FURNACE, ALLOY_FURNACE -> new double[] {0, 10, 10};
+            case FORESTRY -> new double[] {10, 10, 0};
+            case METAL_PRESS, RESONANCE_CALIBRATOR -> new double[] {20, 0, 0};
+            case MELTER -> new double[] {10, 0, 10};
+        };
         MachineStat[] attributes = {MachineStat.CONTROL, MachineStat.DRIVE, MachineStat.RESERVE};
         for (int i = 0; i < attributes.length; i++) { apply(stats, attributes[i], ModifierOperation.ADD, base[i]); }
         List<MegaPassiveNode> allocated = state.allocatedNodes().stream().map(CATALOG::get).filter(java.util.Objects::nonNull).toList();
@@ -145,8 +151,8 @@ public final class MegaPassiveTree {
             for (MachineModifierEffect effect : node.effects()) {
                 if (family.supports(effect.stat())) { apply(stats, effect.stat(), effect.operation(), effect.value()); }
             }
-            node.fixed().forEach((stat, value) -> { if (family.supports(stat)) { stats.setAbsolute(stat, value); } });
-            node.ceilings().forEach((stat, value) -> { if (family.supports(stat)) { stats.capAbsolute(stat, value); } });
+            node.fixed().forEach((stat, value) -> { if (family.supportsAbsolute(stat)) { stats.setAbsolute(stat, value); } });
+            node.ceilings().forEach((stat, value) -> { if (family.supportsAbsolute(stat)) { stats.capAbsolute(stat, value); } });
         }
         double control = Math.max(0, stats.value(MachineStat.CONTROL));
         double drive = Math.max(0, stats.value(MachineStat.DRIVE));
@@ -160,9 +166,15 @@ public final class MegaPassiveTree {
             } else {
                 apply(stats, MachineStat.ENERGY_CAPACITY, ModifierOperation.INCREASED_PERCENT, reserve * 0.25);
             }
-            if (family == MachineMasteryFamily.FURNACE) {
-                apply(stats, MachineStat.TEMPERATURE_STABILITY, ModifierOperation.INCREASED_PERCENT, control * 0.05);
-                apply(stats, MachineStat.HEAT_ISOLATION, ModifierOperation.INCREASED_PERCENT, reserve * 0.1);
+            switch (family) {
+                case FURNACE, ALLOY_FURNACE -> {
+                    apply(stats, MachineStat.TEMPERATURE_STABILITY, ModifierOperation.INCREASED_PERCENT, control * 0.05);
+                    apply(stats, MachineStat.HEAT_ISOLATION, ModifierOperation.INCREASED_PERCENT, reserve * 0.1);
+                }
+                case METAL_PRESS -> apply(stats, MachineStat.TEMPERATURE_STABILITY, ModifierOperation.INCREASED_PERCENT, control * 0.05);
+                case MELTER -> apply(stats, MachineStat.FLUID_TRANSFER, ModifierOperation.INCREASED_PERCENT, reserve * 0.1);
+                case RESONANCE_CALIBRATOR -> apply(stats, MachineStat.CALIBRATION_PRECISION, ModifierOperation.INCREASED_PERCENT, control * 0.05);
+                default -> { }
             }
         }
         for (MegaPassiveNode node : allocated) {

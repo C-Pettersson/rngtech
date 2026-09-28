@@ -3,7 +3,15 @@ package com.rngtech.content.menu;
 import com.rngtech.content.block.AlloyFurnaceBlock;
 import com.rngtech.content.blockentity.AlloyFurnaceBlockEntity;
 import com.rngtech.content.registry.ModMenus;
+import com.rngtech.rpg.MachineStat;
 import com.rngtech.rpg.MachineTraits;
+import com.rngtech.rpg.progression.MachineMasteryFamily;
+import com.rngtech.rpg.progression.MachineMasteryHost;
+import com.rngtech.rpg.progression.MachineProgressionState;
+import com.rngtech.rpg.progression.MegaPassiveNode;
+import com.rngtech.rpg.progression.MegaPassiveTree;
+import com.rngtech.rpg.progression.PassiveNode;
+import com.rngtech.rpg.progression.PassiveProgressionView;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.RegistryFriendlyByteBuf;
@@ -22,11 +30,12 @@ import net.neoforged.neoforge.items.SlotItemHandler;
 
 import java.util.function.BooleanSupplier;
 
-public class AlloyFurnaceMenu extends AbstractContainerMenu {
+public class AlloyFurnaceMenu extends AbstractContainerMenu implements MasteryMenuView<MegaPassiveNode> {
     public static final int TAB_PROCESSING = 0;
     public static final int TAB_GEAR = 1;
     public static final int TAB_STATS = 2;
     public static final int TAB_REFINEMENT = 3;
+    public static final int TAB_MASTERY = 4;
 
     private static final int DATA_PROGRESS = 0;
     private static final int DATA_PROCESSING_TICKS = 1;
@@ -55,7 +64,8 @@ public class AlloyFurnaceMenu extends AbstractContainerMenu {
     private static final int DATA_WARMUP_TIME = 24;
     private static final int DATA_COOLING_RATE = 25;
     private static final int DATA_OVERHEAT_TOLERANCE = 26;
-    private static final int DATA_COUNT = 27;
+    private static final int DATA_MACHINE_PROGRESSION_START = 27;
+    private static final int DATA_COUNT = DATA_MACHINE_PROGRESSION_START + MasteryMenuSupport.FIELD_COUNT;
     private static final int STAT_SCALE = 100;
     private static final int PROCESS_SLOT_COUNT = AlloyFurnaceBlockEntity.PROCESS_SLOT_COUNT;
     private static final int GEAR_SLOT_START = PROCESS_SLOT_COUNT;
@@ -73,6 +83,12 @@ public class AlloyFurnaceMenu extends AbstractContainerMenu {
     private final ContainerData data;
     private final AlloyFurnaceBlockEntity furnace;
     private final ItemStackHandler refinementTarget = new ItemStackHandler(1);
+    private final PassiveProgressionView passiveProgressionView = MasteryMenuSupport.progressionView(
+            this::hasPassiveNodeIndex,
+            this::machineLevel,
+            this::unspentPassivePoints,
+            MachineMasteryFamily.ALLOY_FURNACE.startNodeId()
+    );
     private int selectedTab = TAB_PROCESSING;
 
     public AlloyFurnaceMenu(int containerId, Inventory playerInventory, RegistryFriendlyByteBuf extraData) {
@@ -146,6 +162,7 @@ public class AlloyFurnaceMenu extends AbstractContainerMenu {
             case TAB_GEAR -> TAB_GEAR;
             case TAB_STATS -> TAB_STATS;
             case TAB_REFINEMENT -> TAB_REFINEMENT;
+            case TAB_MASTERY -> TAB_MASTERY;
             default -> TAB_PROCESSING;
         };
     }
@@ -233,6 +250,75 @@ public class AlloyFurnaceMenu extends AbstractContainerMenu {
         return data.get(DATA_STATUS);
     }
 
+    @Override
+    public long machineXp() {
+        return MasteryMenuSupport.machineXp(data, DATA_MACHINE_PROGRESSION_START);
+    }
+
+    @Override
+    public int machineLevel() {
+        return MasteryMenuSupport.machineLevel(data, DATA_MACHINE_PROGRESSION_START);
+    }
+
+    @Override
+    public int machineXpInLevel() {
+        return MasteryMenuSupport.machineXpInLevel(data, DATA_MACHINE_PROGRESSION_START);
+    }
+
+    @Override
+    public int machineXpToNextLevel() {
+        return MasteryMenuSupport.machineXpToNextLevel(data, DATA_MACHINE_PROGRESSION_START);
+    }
+
+    @Override
+    public float machineXpProgress() {
+        return MasteryMenuSupport.machineXpProgress(data, DATA_MACHINE_PROGRESSION_START);
+    }
+
+    @Override
+    public int unspentPassivePoints() {
+        return MasteryMenuSupport.unspentPassivePoints(data, DATA_MACHINE_PROGRESSION_START);
+    }
+
+    @Override
+    public boolean hasPassiveNode(PassiveNode node) {
+        return node != null && node.isUnlocked(passiveProgressionView);
+    }
+
+    @Override
+    public boolean canUnlockPassiveNode(MegaPassiveNode node) {
+        return MegaPassiveTree.TREE.canUnlock(node, passiveProgressionView);
+    }
+
+    @Override
+    public boolean hasUnlockedPassiveConnection(PassiveNode node) {
+        return node != null && node.parentUnlocked(passiveProgressionView);
+    }
+
+    @Override
+    public MachineMasteryHost masteryHost() {
+        return furnace;
+    }
+
+    @Override
+    public MachineMasteryFamily masteryFamily() {
+        return MachineMasteryFamily.ALLOY_FURNACE;
+    }
+
+    @Override
+    public double masteryAttribute(MachineStat stat) {
+        return MasteryMenuSupport.attribute(data, DATA_MACHINE_PROGRESSION_START, stat);
+    }
+
+    @Override
+    public MachineProgressionState masterySnapshot() {
+        return MasteryMenuSupport.snapshot(data, DATA_MACHINE_PROGRESSION_START, masteryFamily());
+    }
+
+    private boolean hasPassiveNodeIndex(int index) {
+        return MasteryMenuSupport.hasPassiveNodeIndex(data, DATA_MACHINE_PROGRESSION_START, index);
+    }
+
     public MachineTraits machineTraits() {
         return RefinementMenuSupport.displayTraits(getSlot(REFINEMENT_TARGET_SLOT).getItem());
     }
@@ -306,6 +392,13 @@ public class AlloyFurnaceMenu extends AbstractContainerMenu {
 
     @Override
     public boolean clickMenuButton(Player player, int id) {
+        MegaPassiveNode passiveNode = MegaPassiveTree.byButtonId(id);
+        if (passiveNode != null) {
+            if (player.level().isClientSide) {
+                return true;
+            }
+            return furnace.unlockPassiveNode(passiveNode);
+        }
         if (id != RefinementMenuSupport.BUTTON_APPLY) {
             return false;
         }
@@ -399,7 +492,7 @@ public class AlloyFurnaceMenu extends AbstractContainerMenu {
                         column + row * 9 + 9,
                         39 + column * 18,
                         116 + row * 18,
-                        () -> selectedTab != TAB_STATS
+                        () -> selectedTab != TAB_STATS && selectedTab != TAB_MASTERY
                 ));
             }
         }
@@ -410,7 +503,7 @@ public class AlloyFurnaceMenu extends AbstractContainerMenu {
                     column,
                     39 + column * 18,
                     174,
-                    () -> selectedTab != TAB_STATS
+                    () -> selectedTab != TAB_STATS && selectedTab != TAB_MASTERY
             ));
         }
     }

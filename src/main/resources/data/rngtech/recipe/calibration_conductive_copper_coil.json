@@ -6,6 +6,7 @@
   "catalyst": { "item": "minecraft:redstone" },
   "processing_ticks": 150,
   "energy": 1100,
+  "machine_xp": 3,
   "result": {
     "stack": { "id": "rngtech:calibrated_conductive_component" },
     "stage": 2,

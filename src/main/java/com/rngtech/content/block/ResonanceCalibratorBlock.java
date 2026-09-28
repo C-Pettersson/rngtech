@@ -6,6 +6,7 @@ import com.rngtech.content.calibration.ResonanceCalibratorChassis;
 import com.rngtech.content.registry.ModBlockEntities;
 import com.rngtech.content.registry.ModDataComponents;
 import com.rngtech.rpg.MachineTraits;
+import com.rngtech.rpg.progression.MachineProgressionState;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.InteractionResult;
@@ -71,6 +72,9 @@ public class ResonanceCalibratorBlock extends BaseMachineBlock {
             MachineTraits traits = machine.machineTraits();
             if (!traits.isEmpty()) {
                 stack.set(ModDataComponents.MACHINE_TRAITS.get(), traits);
+            }
+            if (!machine.machineProgression().equals(MachineProgressionState.EMPTY)) {
+                stack.set(ModDataComponents.MACHINE_PROGRESSION.get(), machine.machineProgression());
             }
         }
         return stack;

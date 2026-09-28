@@ -8,6 +8,7 @@
   "minimum_stage": 4,
   "processing_ticks": 300,
   "energy": 4600,
+  "machine_xp": 5,
   "result": {
     "stack": { "id": "rngtech:calibrated_conductive_component" },
     "stage": 2,

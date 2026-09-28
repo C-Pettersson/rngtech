@@ -630,8 +630,8 @@ public final class MasteryScreenSupport<N extends PassiveNode> {
     private boolean relevant(MegaPassiveNode node) {
         return node.effects().stream().anyMatch(effect -> view.masterySupports(effect.stat()))
                 || node.scaling().stream().anyMatch(effect -> view.masterySupports(effect.stat()))
-                || node.fixed().keySet().stream().anyMatch(view::masterySupports)
-                || node.ceilings().keySet().stream().anyMatch(view::masterySupports)
+                || node.fixed().keySet().stream().anyMatch(view::masterySupportsAbsolute)
+                || node.ceilings().keySet().stream().anyMatch(view::masterySupportsAbsolute)
                 || node.behaviors().stream().anyMatch(view::masterySupportsBehavior)
                 || node.passive().keySet().stream().anyMatch(view.masteryFamily()::supports)
                 || node.recipeHardnessCeiling() > 0 && view.masteryFamily() == MachineMasteryFamily.CRUSHER;
@@ -963,8 +963,8 @@ public final class MasteryScreenSupport<N extends PassiveNode> {
             }
         }
         if (node instanceof MegaPassiveNode shared) {
-            shared.fixed().forEach((stat, value) -> tooltip.add(applicability(Component.translatable("rngtech.mastery.fixed", Component.translatable(stat.translationKey()), MachineStatDisplay.formatNumber(value)), view.masterySupports(stat))));
-            shared.ceilings().forEach((stat, value) -> tooltip.add(applicability(Component.translatable("rngtech.mastery.ceiling", Component.translatable(stat.translationKey()), MachineStatDisplay.formatNumber(value)), view.masterySupports(stat))));
+            shared.fixed().forEach((stat, value) -> tooltip.add(applicability(Component.translatable("rngtech.mastery.fixed", Component.translatable(stat.translationKey()), MachineStatDisplay.formatNumber(value)), view.masterySupportsAbsolute(stat))));
+            shared.ceilings().forEach((stat, value) -> tooltip.add(applicability(Component.translatable("rngtech.mastery.ceiling", Component.translatable(stat.translationKey()), MachineStatDisplay.formatNumber(value)), view.masterySupportsAbsolute(stat))));
             for (var scaling : shared.scaling()) {
                 tooltip.add(applicability(Component.translatable("rngtech.mastery.scaling", MachineStatDisplay.formatNumber(scaling.perPoint()),
                         Component.translatable("rngtech.mastery.operation." + scaling.operation().name().toLowerCase(Locale.ROOT)),

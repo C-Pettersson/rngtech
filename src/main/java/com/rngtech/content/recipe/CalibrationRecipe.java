@@ -4,6 +4,7 @@ import com.rngtech.content.calibration.CalibrationFamily;
 import com.rngtech.content.calibration.CalibrationRecipeResult;
 import com.rngtech.content.registry.ModItems;
 import com.rngtech.content.registry.ModRecipes;
+import com.rngtech.rpg.progression.MachineProgressionState;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
@@ -32,10 +33,18 @@ public record CalibrationRecipe(
         CalibrationRecipeResult result,
         int minimumStage,
         int processingTicks,
-        int energy
+        int energy,
+        int machineXp,
+        int machineXpBand
 ) implements Recipe<CalibrationRecipeInput> {
     public CalibrationRecipe {
-        minimumStage = minimumStage < 0 ? result.stage() : Math.max(0, Math.min(8, minimumStage));
+        minimumStage = normalizedMinimumStage(minimumStage, result);
+        machineXp = Math.max(0, machineXp);
+        machineXpBand = machineXp <= 0 ? 0 : Math.max(1, machineXpBand);
+    }
+
+    private static int normalizedMinimumStage(int minimumStage, CalibrationRecipeResult result) {
+        return minimumStage < 0 ? result.stage() : Math.max(0, Math.min(8, minimumStage));
     }
 
     public ItemStack outputStack() {
@@ -114,9 +123,41 @@ public record CalibrationRecipe(
                                 .fieldOf("processing_ticks")
                                 .orElse(160)
                                 .forGetter(CalibrationRecipe::processingTicks),
-                        Codec.intRange(1, Integer.MAX_VALUE).fieldOf("energy").orElse(1200).forGetter(CalibrationRecipe::energy)
+                        Codec.intRange(1, Integer.MAX_VALUE).fieldOf("energy").orElse(1200).forGetter(CalibrationRecipe::energy),
+                        MachineXpFields.CODEC.forGetter(recipe -> new MachineXpFields(
+                                recipe.machineXp(),
+                                recipe.machineXpBand() <= 0 ? Optional.empty() : Optional.of(recipe.machineXpBand())
+                        ))
                 )
-                .apply(instance, CalibrationRecipe::new));
+                .apply(instance, (
+                        group,
+                        family,
+                        ingredient,
+                        pattern,
+                        catalyst,
+                        stabilizer,
+                        result,
+                        minimumStage,
+                        processingTicks,
+                        energy,
+                        machineXpFields
+                ) -> new CalibrationRecipe(
+                        group,
+                        family,
+                        ingredient,
+                        pattern,
+                        catalyst,
+                        stabilizer,
+                        result,
+                        minimumStage,
+                        processingTicks,
+                        energy,
+                        machineXpFields.machineXp(),
+                        machineXpFields.machineXpBand().orElse(defaultMachineXpBand(
+                                machineXpFields.machineXp(),
+                                normalizedMinimumStage(minimumStage, result)
+                        ))
+                )));
 
         private static final StreamCodec<RegistryFriendlyByteBuf, CalibrationRecipe> STREAM_CODEC =
                 new StreamCodec<>() {
@@ -134,6 +175,8 @@ public record CalibrationRecipe(
                         int minimumStage = ByteBufCodecs.VAR_INT.decode(buffer);
                         int processingTicks = ByteBufCodecs.VAR_INT.decode(buffer);
                         int energy = ByteBufCodecs.VAR_INT.decode(buffer);
+                        int machineXp = ByteBufCodecs.VAR_INT.decode(buffer);
+                        int machineXpBand = ByteBufCodecs.VAR_INT.decode(buffer);
                         return new CalibrationRecipe(
                                 group,
                                 family,
@@ -144,7 +187,9 @@ public record CalibrationRecipe(
                                 result,
                                 minimumStage,
                                 processingTicks,
-                                energy
+                                energy,
+                                machineXp,
+                                machineXpBand
                         );
                     }
 
@@ -161,8 +206,31 @@ public record CalibrationRecipe(
                         ByteBufCodecs.VAR_INT.encode(buffer, recipe.minimumStage);
                         ByteBufCodecs.VAR_INT.encode(buffer, recipe.processingTicks);
                         ByteBufCodecs.VAR_INT.encode(buffer, recipe.energy);
+                        ByteBufCodecs.VAR_INT.encode(buffer, recipe.machineXp);
+                        ByteBufCodecs.VAR_INT.encode(buffer, recipe.machineXpBand);
                     }
                 };
+
+        private static int defaultMachineXpBand(int machineXp, int minimumStage) {
+            if (machineXp <= 0) {
+                return 0;
+            }
+            int stage = Math.max(1, minimumStage);
+            return MachineProgressionState.progressionBand(1 + (stage - 1) * 4);
+        }
+
+        private record MachineXpFields(int machineXp, Optional<Integer> machineXpBand) {
+            private static final MapCodec<MachineXpFields> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
+                            Codec.intRange(0, Integer.MAX_VALUE)
+                                    .fieldOf("machine_xp")
+                                    .orElse(0)
+                                    .forGetter(MachineXpFields::machineXp),
+                            Codec.intRange(0, Integer.MAX_VALUE)
+                                    .optionalFieldOf("machine_xp_band")
+                                    .forGetter(MachineXpFields::machineXpBand)
+                    )
+                    .apply(instance, MachineXpFields::new));
+        }
 
         @Override
         public MapCodec<CalibrationRecipe> codec() {

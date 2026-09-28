@@ -129,5 +129,14 @@ public final class MelterRecipeCategory implements IRecipeCategory<RecipeHolder<
                 86,
                 JeiCategoryUi.MUTED_TEXT_COLOR
         );
+        if (recipe.machineXp() > 0) {
+            JeiCategoryUi.drawLine(
+                    guiGraphics,
+                    font,
+                    Component.translatable("rngtech.jei.machine_xp", recipe.machineXp(), recipe.machineXpBand()),
+                    96,
+                    JeiCategoryUi.MUTED_TEXT_COLOR
+            );
+        }
     }
 }

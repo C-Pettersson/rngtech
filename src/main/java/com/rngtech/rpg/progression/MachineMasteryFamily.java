@@ -3,7 +3,8 @@ package com.rngtech.rpg.progression;
 import com.rngtech.rpg.MachineStat;
 
 public enum MachineMasteryFamily {
-    CRUSHER("drive"), FURNACE("drive_reserve"), FORESTRY("control_drive");
+    CRUSHER("drive"), FURNACE("drive_reserve"), FORESTRY("control_drive"),
+    ALLOY_FURNACE("drive_reserve"), METAL_PRESS("control"), MELTER("reserve_control"), RESONANCE_CALIBRATOR("control");
 
     private final String start;
 
@@ -37,15 +38,29 @@ public enum MachineMasteryFamily {
             return true;
         }
         return switch (stat) {
-            case PROCESSING_SPEED, ENERGY_USAGE, STABILITY -> true;
-            case ENERGY_CAPACITY, ENERGY_CAPACITY_FLAT, OUTPUT_AMOUNT, SUPER_OUTPUT_CHANCE,
-                    INSTANT_PROCESS_CHANCE, PARALLEL_JOBS -> this != FORESTRY;
-            case MAX_TEMPERATURE, HEAT_TRANSFER, HEAT_ISOLATION, TEMPERATURE_STABILITY,
-                    WARMUP_TIME, COOLING_RATE, OVERHEAT_TOLERANCE, FUEL_DURATION, FUEL_EFFICIENCY -> this == FURNACE;
+            case PROCESSING_SPEED, ENERGY_USAGE -> true;
+            case STABILITY -> this != MELTER;
+            case ENERGY_CAPACITY, INSTANT_PROCESS_CHANCE -> this != FORESTRY;
+            case SUPER_OUTPUT_CHANCE -> this != FORESTRY && this != MELTER;
+            case ENERGY_CAPACITY_FLAT, OUTPUT_AMOUNT, PARALLEL_JOBS -> this == CRUSHER || this == FURNACE;
+            case MAX_TEMPERATURE, HEAT_TRANSFER -> heatChassis() || this == MELTER;
+            case HEAT_ISOLATION, TEMPERATURE_STABILITY, WARMUP_TIME, COOLING_RATE, OVERHEAT_TOLERANCE -> heatChassis();
+            case FUEL_DURATION, FUEL_EFFICIENCY -> this == FURNACE;
+            case FLUID_TRANSFER -> this == MELTER;
+            case CALIBRATION_PRECISION, CATALYST_EFFICIENCY -> this == RESONANCE_CALIBRATOR;
             case PROCESSING_LEVEL, OUTPUT_GUARD_GRACE, NO_BATTERY_OUTPUT_RETENTION,
                     HIGH_HARDNESS_ENERGY_MITIGATION, CRUSHER_INPUT_FILTER, CRUSHER_SALVAGE_CHANCE -> this == CRUSHER;
             case TREE_FELL_LIMIT -> this == FORESTRY;
             default -> false;
         };
+    }
+
+    /** Fixed values and ceilings; the Melter keeps ordinary heat bonuses because every Melter recipe needs more heat than those constraints allow. */
+    public boolean supportsAbsolute(MachineStat stat) {
+        return supports(stat) && !(this == MELTER && stat == MachineStat.MAX_TEMPERATURE);
+    }
+
+    private boolean heatChassis() {
+        return this == FURNACE || this == ALLOY_FURNACE || this == METAL_PRESS;
     }
 }

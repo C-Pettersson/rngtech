@@ -9,6 +9,7 @@ import com.rngtech.content.item.ServoItem;
 import com.rngtech.content.item.SolidFuelBurnerPartItem;
 import com.rngtech.content.machine.AlloyFurnaceChassisMaterial;
 import com.rngtech.content.menu.AlloyFurnaceMenu;
+import com.rngtech.content.menu.MasteryMenuSupport;
 import com.rngtech.content.recipe.AlloyFurnaceRecipe;
 import com.rngtech.content.recipe.AlloyFurnaceRecipeInput;
 import com.rngtech.content.registry.ModBlockEntities;
@@ -25,6 +26,11 @@ import com.rngtech.rpg.MachineTraits;
 import com.rngtech.rpg.MachineType;
 import com.rngtech.rpg.ModifierOperation;
 import com.rngtech.rpg.ModifierSlot;
+import com.rngtech.rpg.progression.MachineMasteryFamily;
+import com.rngtech.rpg.progression.MachineMasteryHost;
+import com.rngtech.rpg.progression.MachineProgressionState;
+import com.rngtech.rpg.progression.MegaPassiveNode;
+import com.rngtech.rpg.progression.MegaPassiveTree;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -48,7 +54,7 @@ import net.neoforged.neoforge.items.ItemStackHandler;
 
 import java.util.Arrays;
 
-public class AlloyFurnaceBlockEntity extends BaseMachineBlockEntity implements MenuProvider, MachineInfoProvider {
+public class AlloyFurnaceBlockEntity extends BaseMachineBlockEntity implements MenuProvider, MachineInfoProvider, MachineMasteryHost {
     public static final int MAX_INPUT_SLOTS = 4;
     public static final int SLOT_INPUT_START = 0;
     public static final int SLOT_OUTPUT = SLOT_INPUT_START + MAX_INPUT_SLOTS;
@@ -102,7 +108,8 @@ public class AlloyFurnaceBlockEntity extends BaseMachineBlockEntity implements M
     private static final int DATA_WARMUP_TIME = 24;
     private static final int DATA_COOLING_RATE = 25;
     private static final int DATA_OVERHEAT_TOLERANCE = 26;
-    private static final int DATA_COUNT = 27;
+    private static final int DATA_MACHINE_PROGRESSION_START = 27;
+    private static final int DATA_COUNT = DATA_MACHINE_PROGRESSION_START + MasteryMenuSupport.FIELD_COUNT;
     private static final int STAT_SCALE = 100;
 
     private final ItemStackHandler processInventory = new ItemStackHandler(PROCESS_SLOT_COUNT) {
@@ -169,6 +176,10 @@ public class AlloyFurnaceBlockEntity extends BaseMachineBlockEntity implements M
     private final ContainerData menuData = new ContainerData() {
         @Override
         public int get(int index) {
+            if (index >= DATA_MACHINE_PROGRESSION_START
+                    && index < DATA_MACHINE_PROGRESSION_START + MasteryMenuSupport.FIELD_COUNT) {
+                return MasteryMenuSupport.get(machineProgression(), index - DATA_MACHINE_PROGRESSION_START, AlloyFurnaceBlockEntity.this::effectiveStats);
+            }
             MachineStatAccumulator stats = effectiveStats();
             AlloyFurnaceRecipe recipe = nextRecipe();
             return switch (index) {
@@ -433,6 +444,7 @@ public class AlloyFurnaceBlockEntity extends BaseMachineBlockEntity implements M
     public MachineStatAccumulator effectiveStats() {
         MachineStatAccumulator stats = MachineBaseStatCatalog.alloyFurnace(chassis());
         stats.apply(activeTraits());
+        MegaPassiveTree.applyStats(stats, machineProgression(), MachineMasteryFamily.ALLOY_FURNACE);
         applyGearStats(stats, heatCoreStack());
         applyGearStats(stats, crucibleStack());
         applyGearStats(stats, servoStack());
@@ -527,9 +539,48 @@ public class AlloyFurnaceBlockEntity extends BaseMachineBlockEntity implements M
 
         consumeInputs(match.consumed());
         mergeOutput(result);
+        grantRecipeXp(recipe);
         resetCycle();
         setChanged();
         return true;
+    }
+
+    private void grantRecipeXp(AlloyFurnaceRecipe recipe) {
+        if (recipe.machineXp() <= 0) {
+            return;
+        }
+        int xpQuarters = MachineProgressionState.xpQuarters(machineProgression().level(), recipe.machineXpBand());
+        if (xpQuarters <= 0) {
+            return;
+        }
+        grantMasteryXp(MachineProgressionState.workXp(recipe.machineXp(), recipe.machineXpBand()), xpQuarters);
+    }
+
+    public boolean unlockPassiveNode(MegaPassiveNode node) {
+        return allocateMastery(node);
+    }
+
+    @Override
+    public boolean mutesMachineSound() {
+        return MegaPassiveTree.has(machineProgression(), "MUTE_MACHINE_SOUND");
+    }
+
+    @Override
+    public MachineMasteryFamily masteryFamily() {
+        return MachineMasteryFamily.ALLOY_FURNACE;
+    }
+
+    @Override
+    public MachineProgressionState machineProgression() {
+        return super.machineProgression().forFamily(masteryFamily());
+    }
+
+    @Override
+    public void masteryChanged() {
+        resetCycle();
+        resetBulkSpeed();
+        clampInternalEnergy();
+        setChanged();
     }
 
     private boolean tryFailCycle(AlloyFurnaceRecipe recipe) {

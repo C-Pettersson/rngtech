@@ -34,7 +34,7 @@ Registered content:
 | Lava output | `minecraft:lava` |
 | Fluid Pumps | `rngtech:osmium_fluid_pump`, `rngtech:titanium_fluid_pump`, `rngtech:tungstensteel_fluid_pump`, `rngtech:exotic_fluid_pump` |
 
-The placed machine uses `MelterBlockEntity`, `MelterMenu`, and `MelterScreen`. It supports Process, Gear, Stats, and Refinement tabs.
+The placed machine uses `MelterBlockEntity`, `MelterMenu`, and `MelterScreen`. It supports Process, Gear, Stats, Refinement, and Mastery tabs.
 
 The Melter block recipe uses `rngtech:calibrated_shaped`. Its body keeps Titanium Plates, a Titanium Heat Core, a Titanium Crush Head, and an Advanced Machine Frame, then gates the conductive slot on `rngtech:calibrated_conductive_component` with family `conductive`, Stage `5+`, and `70+` stability. The default Stage 5 conductive source calibrates `rngtech:sparksteel_coil` with the Conductive Calibration Pattern, Matrix catalyst, and Stabilization Catalyst stabilizer.
 
@@ -46,7 +46,7 @@ The default Electrolyte Solution recipe consumes `minecraft:sugar`, `minecraft:r
 
 The default methane recipe consumes `rngtech:algae_biomass`, `rngtech:organic_reagent`, and `1000 mB minecraft:water`. It produces `1000 mB rngtech:methane`, requires `1400` temperature and processing level `6`, and takes `320` ticks and `8000 FE` before traits adjust timing and cost. Dense Algae Biomass is reserved for Bio Generator fuel instead of methane chemistry.
 
-With JEI installed, Melter recipes are exposed with primary and secondary item inputs, fluid input, fluid output, FE cost, processing ticks, minimum heat, and required processing level. Melter recipe transfer is intentionally omitted until fluid-container transfer can represent the tank requirement.
+With JEI installed, Melter recipes are exposed with primary and secondary item inputs, fluid input, fluid output, FE cost, processing ticks, minimum heat, required processing level, and machine XP when authored. Melter recipe transfer is intentionally omitted until fluid-container transfer can represent the tank requirement.
 
 ## Fluids
 
@@ -74,8 +74,23 @@ Melter machine stacks and placed machines use the `MELTER` modifier eligibility 
 
 Fluid Pumps are `FLUID_PUMP` machine parts for `MachineType.MELTER`. The Osmium Fluid Pump is the first pump tier at Stage 5 and gives the Melter its required fluid-output Gear. Each pump's authored base `FLUID_TRANSFER` value gates external extraction and output container filling rate.
 
+## Mastery
+
+The Melter enters the [shared Machine Mastery tree](../systems/machine-mastery.md) at the Reserve / Control start, whose home region covers insulation, regulation, thermal inertia, fluid handling, and catalysis. Base attributes are `10` Control, `0` Drive, and `10` Reserve. Besides the shared attribute conversions, each Reserve point grants `0.1%` increased Fluid Transfer. Effects the Melter cannot use, such as Stability, bonus output chance, and fuel duration, stay selectable but are marked inactive. Increased Maximum Temperature applies, but fixed or capped maximum temperature from Low Heat Specialist, Flash Annealing, and Regulated Heat does not, because those values sit below the `1200` minimum of every default recipe; their other effects still apply.
+
+Recipes may set `machine_xp` and an optional `machine_xp_band`; the band defaults from `required_processing_level` on the same scale as Crusher recipes, so the default level `6` recipes train in band `81`. XP is granted only after a completed melt puts fluid into the output tank. Missing Gear, low heat or processing level, a full output tank, invalid recipes, and power-starved ticks grant none; a Nullite Servo melt whose whole output is voided also grants none. Allocation changes reset active melt progress and Bulk Speed while keeping inventory, tanks, and Gear. Breaking and pick-blocking the Melter preserve `rngtech:machine_progression`.
+
+| Default XP | Recipes |
+|---:|---|
+| 4 | Electrolyte Solution |
+| 5 | Lubricant |
+| 6 | Methane |
+
+The lava recipe grants no XP.
+
 ## Related Pages
 
+- [Machine Mastery](../systems/machine-mastery.md)
 - [Machine Parts](machine-parts.md)
 - [Machine Stats](../reference/machine-stats.md)
 - [Modifier Eligibility](../reference/modifier-eligibility.md)

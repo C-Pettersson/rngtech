@@ -25,6 +25,7 @@ public final class MasteryChecks {
         graphAndBuilds();
         routeAllocation();
         attributesAndConstraints();
+        familyAdapters();
         System.out.println("Machine mastery: " + checks + " checks passed");
     }
 
@@ -204,6 +205,35 @@ public final class MasteryChecks {
         near(furnaceStats.value(MachineStat.MAX_TEMPERATURE), 800, "gear cannot exceed absolute temperature");
         var lowHardness = build(MachineMasteryFamily.CRUSHER, "soft_material_specialist");
         require(MegaPassiveTree.acceptsHardness(lowHardness, 2) && !MegaPassiveTree.acceptsHardness(lowHardness, 3), "hard recipe ceiling");
+    }
+
+    private static void familyAdapters() {
+        for (MachineMasteryFamily family : MachineMasteryFamily.values()) {
+            var start = MegaPassiveTree.node(family.startNodeId());
+            require(start != null && start.kind() == PassiveNodeKind.STARTER, family + " enters the shared graph at a start");
+        }
+        var furnaceBuild = build(MachineMasteryFamily.FURNACE, "kiln_discipline");
+        require(furnaceBuild.forFamily(MachineMasteryFamily.ALLOY_FURNACE).allocatedNodes().equals(furnaceBuild.allocatedNodes()), "families sharing a start keep allocations");
+        require(furnaceBuild.forFamily(MachineMasteryFamily.MELTER).allocatedNodes().isEmpty(), "a different start clears allocations");
+        require(MachineMasteryFamily.METAL_PRESS.startNodeId().equals(MachineMasteryFamily.RESONANCE_CALIBRATOR.startNodeId()), "Metal Press shares the Control start");
+        var empty = MachineProgressionState.EMPTY;
+        var press = new MachineStatAccumulator(); MegaPassiveTree.applyStats(press, empty.forFamily(MachineMasteryFamily.METAL_PRESS), MachineMasteryFamily.METAL_PRESS);
+        near(press.value(MachineStat.CONTROL), 20, "Control start grants 20 Control");
+        var melter = MachineStatAccumulator.componentBase(Map.of(MachineStat.FLUID_TRANSFER, 100.0));
+        MegaPassiveTree.applyStats(melter, empty.forFamily(MachineMasteryFamily.MELTER), MachineMasteryFamily.MELTER);
+        near(melter.value(MachineStat.RESERVE), 10, "Reserve/Control start grants 10 Reserve");
+        near(melter.value(MachineStat.FLUID_TRANSFER), 101, "Melter converts Reserve into Fluid Transfer");
+        var calibrator = MachineStatAccumulator.componentBase(Map.of(MachineStat.CALIBRATION_PRECISION, 100.0));
+        MegaPassiveTree.applyStats(calibrator, empty.forFamily(MachineMasteryFamily.RESONANCE_CALIBRATOR), MachineMasteryFamily.RESONANCE_CALIBRATOR);
+        near(calibrator.value(MachineStat.CALIBRATION_PRECISION), 101, "Resonance Calibrator converts Control into Calibration Precision");
+        require(!MachineMasteryFamily.CRUSHER.supports(MachineStat.CALIBRATION_PRECISION) && !MachineMasteryFamily.MELTER.supports(MachineStat.STABILITY),
+                "applicability follows the machine's real stat surface");
+        var lowHeatMelter = build(MachineMasteryFamily.MELTER, "low_heat_specialist");
+        var melterHeat = new MachineStatAccumulator(); MegaPassiveTree.applyStats(melterHeat, lowHeatMelter, MachineMasteryFamily.MELTER);
+        effect(melterHeat, ModifierOperation.ADD, 4000);
+        near(melterHeat.value(MachineStat.MAX_TEMPERATURE), 4000, "fixed temperature cannot strand a Melter below its recipes");
+        require(MachineMasteryFamily.MELTER.supports(MachineStat.MAX_TEMPERATURE) && MachineMasteryFamily.FURNACE.supportsAbsolute(MachineStat.MAX_TEMPERATURE),
+                "the Melter keeps ordinary heat bonuses while other heat machines keep absolute constraints");
     }
 
     private static MachineProgressionState build(MachineMasteryFamily family, String destination) {

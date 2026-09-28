@@ -27,5 +27,6 @@
     "count": 4,
     "id": "rngtech:malformed_ingot"
   },
-  "failure_material": "aluminum"
+  "failure_material": "aluminum",
+  "machine_xp": 8
 }

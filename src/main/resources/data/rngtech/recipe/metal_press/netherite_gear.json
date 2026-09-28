@@ -27,5 +27,6 @@
     "count": 3,
     "id": "rngtech:malformed_ingot"
   },
-  "failure_material": "netherite"
+  "failure_material": "netherite",
+  "machine_xp": 12
 }

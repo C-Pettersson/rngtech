@@ -10,6 +10,7 @@ import com.rngtech.content.item.BatteryCellItem;
 import com.rngtech.content.item.CalibrationGearItem;
 import com.rngtech.content.item.CalibrationPatternItem;
 import com.rngtech.content.item.MachinePartItem;
+import com.rngtech.content.menu.MasteryMenuSupport;
 import com.rngtech.content.menu.ResonanceCalibratorMenu;
 import com.rngtech.content.recipe.CalibrationRecipe;
 import com.rngtech.content.recipe.CalibrationRecipeInput;
@@ -26,6 +27,11 @@ import com.rngtech.rpg.MachineTraits;
 import com.rngtech.rpg.MachineType;
 import com.rngtech.rpg.ModifierOperation;
 import com.rngtech.rpg.ModifierSlot;
+import com.rngtech.rpg.progression.MachineMasteryFamily;
+import com.rngtech.rpg.progression.MachineMasteryHost;
+import com.rngtech.rpg.progression.MachineProgressionState;
+import com.rngtech.rpg.progression.MegaPassiveNode;
+import com.rngtech.rpg.progression.MegaPassiveTree;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -47,7 +53,7 @@ import net.neoforged.neoforge.energy.IEnergyStorage;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.ItemStackHandler;
 
-public class ResonanceCalibratorBlockEntity extends BaseMachineBlockEntity implements MenuProvider {
+public class ResonanceCalibratorBlockEntity extends BaseMachineBlockEntity implements MenuProvider, MachineMasteryHost {
     public static final int SLOT_INPUT = 0;
     public static final int SLOT_PATTERN = 1;
     public static final int SLOT_CATALYST = 2;
@@ -96,7 +102,8 @@ public class ResonanceCalibratorBlockEntity extends BaseMachineBlockEntity imple
     private static final int DATA_REFINEMENT_POTENTIAL_BONUS = 18;
     private static final int DATA_REFINEMENT_POTENTIAL = 19;
     private static final int DATA_SELECTED_PATTERN = 20;
-    private static final int DATA_COUNT = DATA_SELECTED_PATTERN + 1;
+    private static final int DATA_MACHINE_PROGRESSION_START = DATA_SELECTED_PATTERN + 1;
+    private static final int DATA_COUNT = DATA_MACHINE_PROGRESSION_START + MasteryMenuSupport.FIELD_COUNT;
     private static final int STAT_SCALE = 100;
     private static final int[] AUTOMATION_INPUT_SLOTS = {SLOT_INPUT, SLOT_CATALYST, SLOT_STABILIZER};
 
@@ -170,6 +177,14 @@ public class ResonanceCalibratorBlockEntity extends BaseMachineBlockEntity imple
     private final ContainerData menuData = new ContainerData() {
         @Override
         public int get(int index) {
+            if (index >= DATA_MACHINE_PROGRESSION_START
+                    && index < DATA_MACHINE_PROGRESSION_START + MasteryMenuSupport.FIELD_COUNT) {
+                return MasteryMenuSupport.get(
+                        machineProgression(),
+                        index - DATA_MACHINE_PROGRESSION_START,
+                        ResonanceCalibratorBlockEntity.this::effectiveStats
+                );
+            }
             MachineStatAccumulator stats = effectiveStats();
             CalibrationRecipe recipe = nextRecipe();
             CalibrationValueRange range = currentStabilityRange(recipe, stats);
@@ -356,6 +371,7 @@ public class ResonanceCalibratorBlockEntity extends BaseMachineBlockEntity imple
         ResonanceCalibratorChassis chassis = chassis();
         MachineStatAccumulator stats = MachineBaseStatCatalog.resonanceCalibrator(chassis);
         stats.apply(MachineImplicitCatalog.effectiveTraits(machineTraits(), getBlockState().getBlock()));
+        MegaPassiveTree.applyStats(stats, machineProgression(), masteryFamily());
         applyGearStats(stats, resonanceCoilStack());
         applyGearStats(stats, controlBoardStack());
         applyGearStats(stats, stabilizerMatrixStack());
@@ -497,9 +513,50 @@ public class ResonanceCalibratorBlockEntity extends BaseMachineBlockEntity imple
             recipe.stabilizer().ifPresent(ignored -> stabilizerStack().shrink(1));
         }
         mergeOutput(result);
+        for (int index = 0; index < operations; index++) {
+            grantRecipeXp(recipe);
+        }
         resetCycle();
         setChanged();
         return true;
+    }
+
+    private void grantRecipeXp(CalibrationRecipe recipe) {
+        if (recipe.machineXp() <= 0) {
+            return;
+        }
+        int xpQuarters = MachineProgressionState.xpQuarters(machineProgression().level(), recipe.machineXpBand());
+        if (xpQuarters <= 0) {
+            return;
+        }
+        grantMasteryXp(MachineProgressionState.workXp(recipe.machineXp(), recipe.machineXpBand()), xpQuarters);
+    }
+
+    public boolean unlockPassiveNode(MegaPassiveNode node) {
+        return allocateMastery(node);
+    }
+
+    @Override
+    public boolean mutesMachineSound() {
+        return MegaPassiveTree.has(machineProgression(), "MUTE_MACHINE_SOUND");
+    }
+
+    @Override
+    public MachineMasteryFamily masteryFamily() {
+        return MachineMasteryFamily.RESONANCE_CALIBRATOR;
+    }
+
+    @Override
+    public MachineProgressionState machineProgression() {
+        return super.machineProgression().forFamily(masteryFamily());
+    }
+
+    @Override
+    public void masteryChanged() {
+        resetCycle();
+        resetBulkSpeed();
+        clampInternalEnergy();
+        setChanged();
     }
 
     private ItemStack createOutput(CalibrationRecipe recipe, MachineStatAccumulator stats, int operations) {

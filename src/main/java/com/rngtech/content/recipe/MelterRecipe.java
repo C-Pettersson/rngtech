@@ -2,6 +2,7 @@ package com.rngtech.content.recipe;
 
 import com.rngtech.content.registry.ModItems;
 import com.rngtech.content.registry.ModRecipes;
+import com.rngtech.rpg.progression.MachineProgressionState;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
@@ -20,6 +21,8 @@ import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.crafting.SizedFluidIngredient;
 
+import java.util.Optional;
+
 public record MelterRecipe(
         String group,
         Ingredient primaryIngredient,
@@ -29,9 +32,16 @@ public record MelterRecipe(
         int processingTicks,
         int energy,
         int minimumTemperature,
-        int requiredProcessingLevel
+        int requiredProcessingLevel,
+        int machineXp,
+        int machineXpBand
 )
         implements Recipe<MelterRecipeInput> {
+    public MelterRecipe {
+        machineXp = Math.max(0, machineXp);
+        machineXpBand = machineXp <= 0 ? 0 : Math.max(1, machineXpBand);
+    }
+
     public FluidStack outputFluid() {
         return fluidOutput.copy();
     }
@@ -113,9 +123,37 @@ public record MelterRecipe(
                         Codec.intRange(1, Integer.MAX_VALUE)
                                 .fieldOf("required_processing_level")
                                 .orElse(1)
-                                .forGetter(MelterRecipe::requiredProcessingLevel)
+                                .forGetter(MelterRecipe::requiredProcessingLevel),
+                        MachineXpFields.CODEC.forGetter(recipe -> new MachineXpFields(
+                                recipe.machineXp(),
+                                recipe.machineXpBand() <= 0 ? Optional.empty() : Optional.of(recipe.machineXpBand())
+                        ))
                 )
-                .apply(instance, MelterRecipe::new));
+                .apply(instance, (
+                        group,
+                        primaryIngredient,
+                        secondaryIngredient,
+                        fluidInput,
+                        fluidOutput,
+                        processingTicks,
+                        energy,
+                        minimumTemperature,
+                        requiredProcessingLevel,
+                        machineXpFields
+                ) -> new MelterRecipe(
+                        group,
+                        primaryIngredient,
+                        secondaryIngredient,
+                        fluidInput,
+                        fluidOutput,
+                        processingTicks,
+                        energy,
+                        minimumTemperature,
+                        requiredProcessingLevel,
+                        machineXpFields.machineXp(),
+                        machineXpFields.machineXpBand()
+                                .orElse(defaultMachineXpBand(machineXpFields.machineXp(), requiredProcessingLevel))
+                )));
 
         private static final StreamCodec<RegistryFriendlyByteBuf, MelterRecipe> STREAM_CODEC =
                 new StreamCodec<>() {
@@ -127,6 +165,8 @@ public record MelterRecipe(
                                 Ingredient.CONTENTS_STREAM_CODEC.decode(buffer),
                                 SizedFluidIngredient.STREAM_CODEC.decode(buffer),
                                 FluidStack.STREAM_CODEC.decode(buffer),
+                                ByteBufCodecs.VAR_INT.decode(buffer),
+                                ByteBufCodecs.VAR_INT.decode(buffer),
                                 ByteBufCodecs.VAR_INT.decode(buffer),
                                 ByteBufCodecs.VAR_INT.decode(buffer),
                                 ByteBufCodecs.VAR_INT.decode(buffer),
@@ -145,8 +185,31 @@ public record MelterRecipe(
                         ByteBufCodecs.VAR_INT.encode(buffer, recipe.energy);
                         ByteBufCodecs.VAR_INT.encode(buffer, recipe.minimumTemperature);
                         ByteBufCodecs.VAR_INT.encode(buffer, recipe.requiredProcessingLevel);
+                        ByteBufCodecs.VAR_INT.encode(buffer, recipe.machineXp);
+                        ByteBufCodecs.VAR_INT.encode(buffer, recipe.machineXpBand);
                     }
                 };
+
+        private static int defaultMachineXpBand(int machineXp, int requiredProcessingLevel) {
+            if (machineXp <= 0) {
+                return 0;
+            }
+            int level = Math.max(1, requiredProcessingLevel);
+            return MachineProgressionState.progressionBand(1 + (level - 1) * 4);
+        }
+
+        private record MachineXpFields(int machineXp, Optional<Integer> machineXpBand) {
+            private static final MapCodec<MachineXpFields> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
+                            Codec.intRange(0, Integer.MAX_VALUE)
+                                    .fieldOf("machine_xp")
+                                    .orElse(0)
+                                    .forGetter(MachineXpFields::machineXp),
+                            Codec.intRange(0, Integer.MAX_VALUE)
+                                    .optionalFieldOf("machine_xp_band")
+                                    .forGetter(MachineXpFields::machineXpBand)
+                    )
+                    .apply(instance, MachineXpFields::new));
+        }
 
         @Override
         public MapCodec<MelterRecipe> codec() {

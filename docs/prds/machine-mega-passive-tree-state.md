@@ -20,6 +20,7 @@ Status: **Done** — implementation and travel-road redesign completed 2026-09-2
 - [x] Larger reward constellations, and keystones spread through every layer, directly on roads or on reward arms, at least 10 points from every start.
 - [x] Level 100 with 99 level points and 120-point allocation storage.
 - [x] Verification, diff review, and staging on the feature branch.
+- [x] Second adapter wave: Alloy Furnace, Metal Press, Melter, and Resonance Calibrator.
 
 ## Progress log
 
@@ -36,6 +37,7 @@ Status: **Done** — implementation and travel-road redesign completed 2026-09-2
 - Rebuilt the center as a three-way junction with equal-length spokes. Silent Operation sits on it, 10 points from every start (previously 13–20), facing the Crusher start.
 - Mastery Find now highlights every keystone, notable, or travel node when the query is exactly that type word.
 - Raised the level cap to 100 (99 points from levels) with 120-point allocation storage reserved for a future non-level source. XP bands now reach 98. Version 1 allocations, targets, and build codes refund or are rejected.
+- Added the second adapter wave on 2026-09-28. The Alloy Furnace shares the Furnace's Drive / Reserve start; the Metal Press and Resonance Calibrator take the Control start; the Melter takes the Reserve / Control start. Each has a Mastery tab, per-family stat applicability and conversions, recipe `machine_xp` with derived bands, JEI XP lines, and pick-block progression. Fixed and capped maximum temperature no longer applies to the Melter, whose recipes all need more heat than those keystones allow.
 
 ## Verification
 
@@ -47,11 +49,12 @@ Status: **Done** — implementation and travel-road redesign completed 2026-09-2
 - npm run repo:check and mkdocs build --strict — passed after the travel-road redesign.
 - Mastery screen rework: Gradle ciCheck passed with 446 domain checks, including shortest routes and atomic rejection of unaffordable, disconnected, or Gear-blocked routes. npm run repo:check, npm run moddex:check, and mkdocs build --strict passed. The rendering and input changes still need an in-game playtest.
 - Layered redesign (catalog version 2): Gradle quickCheck and ciCheck passed with 543 domain checks, including the level-100 budget, 120-point target builds, band rescaling, and version 1 refunds. npm run moddex:check and npm run repo:check passed. Catalog audit: 1300 nodes, 1445 links, zero overlaps, links through nodes, or crossings; every start sits within 33%–69% of the bounds; keystones are 10–46 points from every start, and Silent Operation is exactly 10 from each; representative builds spend exactly 99 points. ModDex fitted Visual Audit passes: zero crossings and long chords, P90/median 1.33x, endpoints in seven of eight sectors with a 76° maximum gap. mkdocs build --strict was not run because MkDocs is not installed locally.
+- Second adapter wave: Gradle spotlessApply and quickCheck passed with 560 domain checks, including start membership, shared-start allocation retention, per-family conversions, applicability, and Melter absolute-heat exemption. npm run moddex:check and npm run repo:check passed. mkdocs build --strict was not run because MkDocs is not installed locally. In-game checks of the four new Mastery tabs are still needed.
 
 ## Handoff and limits
 
 - Implementation files are staged on feature/machine-mega-passive-tree. No commit, push, merge, or deployment performed.
 - Suggested commit: feat: add shared machine mega passive tree.
-- Additional machine adapters and family ascendancies are intentionally deferred. Legacy graph definitions remain as reference/audit fixtures.
+- Reserve-start generator and storage adapters and family ascendancies are intentionally deferred. Legacy graph definitions remain as reference/audit fixtures.
 - In-game controls, multiplayer UI synchronization, refund inventory consumption, and late-game XP/balance need focused playtesting. Automated checks do not replace those checks.
 - Runtime catalog: src/main/resources/data/rngtech/mastery/machine_tree.json. Author rewards with tools/moddex/author-mega-tree.mjs and roads/reward placement with layout-mega-tree.mjs. Regenerate the audit report and overview after changes.

@@ -27,5 +27,6 @@
     "count": 4,
     "id": "rngtech:malformed_ingot"
   },
-  "failure_material": "titanium"
+  "failure_material": "titanium",
+  "machine_xp": 10
 }

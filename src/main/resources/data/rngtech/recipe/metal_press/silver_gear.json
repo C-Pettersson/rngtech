@@ -27,5 +27,6 @@
     "count": 3,
     "id": "rngtech:malformed_ingot"
   },
-  "failure_material": "silver"
+  "failure_material": "silver",
+  "machine_xp": 5
 }

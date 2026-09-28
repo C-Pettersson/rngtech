@@ -16,7 +16,7 @@ Status: Prototype
 - Refunds cost one consumable per removed allocation and preserve connectivity and Gear legality. Clear-tree uses the same per-node cost.
 - Ordered target builds copy through Mastery and the Configurator, paste only onto cleared trees with matching starts, and automatically allocate earned points. Gear conflicts pause allocation; manual refunds pause the target.
 - Migrate existing progression by preserving XP and earned levels while refunding old allocations. Preserve drops/pick-block and multiplayer validation.
-- Machine-family ascendancies and additional machine integrations are deferred.
+- The second adapter wave adds the Alloy Furnace (Drive / Reserve), Metal Press and Resonance Calibrator (Control), and Melter (Reserve / Control). Machines on a shared start keep their own progression but can exchange build codes. Machine-family ascendancies and Reserve-start generator and storage integrations are deferred.
 
 Implementation: [Machine Mastery](../systems/machine-mastery.md).
 

@@ -22,7 +22,7 @@ import net.minecraft.world.item.crafting.RecipeHolder;
 
 public final class ResonanceCalibrationRecipeCategory implements IRecipeCategory<RecipeHolder<CalibrationRecipe>> {
     private static final int WIDTH = 166;
-    private static final int HEIGHT = 84;
+    private static final int HEIGHT = 94;
     private static final int INPUT_X = 4;
     private static final int PATTERN_X = 30;
     private static final int CATALYST_X = 56;
@@ -162,6 +162,16 @@ public final class ResonanceCalibrationRecipeCategory implements IRecipeCategory
                 MUTED_TEXT_COLOR,
                 false
         );
+        if (recipe.machineXp() > 0) {
+            guiGraphics.drawString(
+                    font,
+                    Component.translatable("rngtech.jei.machine_xp", recipe.machineXp(), recipe.machineXpBand()),
+                    4,
+                    82,
+                    MUTED_TEXT_COLOR,
+                    false
+            );
+        }
     }
 
     private static IRecipeSlotBuilder slot(IRecipeLayoutBuilder builder, RecipeIngredientRole role, int x, int y) {

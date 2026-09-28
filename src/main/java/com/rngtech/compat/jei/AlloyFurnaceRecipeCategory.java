@@ -21,7 +21,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeHolder;
 
 public final class AlloyFurnaceRecipeCategory implements IRecipeCategory<RecipeHolder<AlloyFurnaceRecipe>> {
-    private static final int HEIGHT = 126;
+    private static final int HEIGHT = 136;
     private static final int[] INPUT_X = {4, 26, 48, 26};
     private static final int[] INPUT_Y = {24, 6, 24, 42};
     private static final int OUTPUT_X = 142;
@@ -118,5 +118,14 @@ public final class AlloyFurnaceRecipeCategory implements IRecipeCategory<RecipeH
                 116,
                 JeiCategoryUi.MUTED_TEXT_COLOR
         );
+        if (recipe.machineXp() > 0) {
+            JeiCategoryUi.drawLine(
+                    guiGraphics,
+                    font,
+                    Component.translatable("rngtech.jei.machine_xp", recipe.machineXp(), recipe.machineXpBand()),
+                    126,
+                    JeiCategoryUi.MUTED_TEXT_COLOR
+            );
+        }
     }
 }

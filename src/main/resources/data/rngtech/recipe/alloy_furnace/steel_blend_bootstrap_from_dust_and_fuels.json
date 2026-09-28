@@ -40,5 +40,6 @@
     "energy": 36000,
     "minimum_component_stage": 3,
     "minimum_temperature": 900,
-    "required_temperature_stability": 0.9
+    "required_temperature_stability": 0.9,
+    "machine_xp": 2
 }

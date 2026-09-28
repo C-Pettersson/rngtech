@@ -7,6 +7,7 @@ import com.rngtech.content.item.FluidPumpItem;
 import com.rngtech.content.item.MachinePartItem;
 import com.rngtech.content.item.ServoItem;
 import com.rngtech.content.item.SolidFuelBurnerPartItem;
+import com.rngtech.content.menu.MasteryMenuSupport;
 import com.rngtech.content.menu.MelterMenu;
 import com.rngtech.content.purge.FluidOutputOverflow;
 import com.rngtech.content.purge.FluidPurgeRole;
@@ -30,6 +31,11 @@ import com.rngtech.rpg.MachineTraits;
 import com.rngtech.rpg.MachineType;
 import com.rngtech.rpg.ModifierOperation;
 import com.rngtech.rpg.ModifierSlot;
+import com.rngtech.rpg.progression.MachineMasteryFamily;
+import com.rngtech.rpg.progression.MachineMasteryHost;
+import com.rngtech.rpg.progression.MachineProgressionState;
+import com.rngtech.rpg.progression.MegaPassiveNode;
+import com.rngtech.rpg.progression.MegaPassiveTree;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -60,7 +66,7 @@ import net.neoforged.neoforge.items.ItemStackHandler;
 
 import java.util.List;
 
-public class MelterBlockEntity extends BaseMachineBlockEntity implements MenuProvider, PurgeableFluidStorage {
+public class MelterBlockEntity extends BaseMachineBlockEntity implements MenuProvider, PurgeableFluidStorage, MachineMasteryHost {
     public static final int SLOT_PRIMARY_INPUT = 0;
     public static final int SLOT_SECONDARY_INPUT = 1;
     public static final int SLOT_FLUID_INPUT_CONTAINER = 2;
@@ -110,6 +116,8 @@ public class MelterBlockEntity extends BaseMachineBlockEntity implements MenuPro
     private static final int DATA_MAX_TEMPERATURE = 19;
     private static final int DATA_FLUID_TRANSFER = 20;
     private static final int DATA_REFINEMENT_POTENTIAL = 21;
+    private static final int DATA_MACHINE_PROGRESSION_START = DATA_REFINEMENT_POTENTIAL + 1;
+    private static final int DATA_COUNT = DATA_MACHINE_PROGRESSION_START + MasteryMenuSupport.FIELD_COUNT;
     private static final int STAT_SCALE = 100;
 
     private final ItemStackHandler processInventory = new ItemStackHandler(PROCESS_SLOT_COUNT) {
@@ -201,6 +209,9 @@ public class MelterBlockEntity extends BaseMachineBlockEntity implements MenuPro
     private final ContainerData menuData = new ContainerData() {
         @Override
         public int get(int index) {
+            if (index >= DATA_MACHINE_PROGRESSION_START && index < DATA_COUNT) {
+                return MasteryMenuSupport.get(machineProgression(), index - DATA_MACHINE_PROGRESSION_START, MelterBlockEntity.this::effectiveStats);
+            }
             MachineStatAccumulator stats = effectiveStats();
             MelterRecipe recipe = nextRecipe();
             return switch (index) {
@@ -236,7 +247,7 @@ public class MelterBlockEntity extends BaseMachineBlockEntity implements MenuPro
 
         @Override
         public int getCount() {
-            return DATA_REFINEMENT_POTENTIAL + 1;
+            return DATA_COUNT;
         }
     };
 
@@ -408,6 +419,7 @@ public class MelterBlockEntity extends BaseMachineBlockEntity implements MenuPro
     public MachineStatAccumulator effectiveStats() {
         MachineStatAccumulator stats = MachineBaseStatCatalog.melter();
         stats.apply(MachineImplicitCatalog.effectiveTraits(machineTraits(), getBlockState().getBlock()));
+        MegaPassiveTree.applyStats(stats, machineProgression(), MachineMasteryFamily.MELTER);
         applyHeatCoreStats(stats);
         applyCrushHeadStats(stats);
         applyServoStats(stats);
@@ -531,10 +543,50 @@ public class MelterBlockEntity extends BaseMachineBlockEntity implements MenuPro
             setChanged();
             return false;
         }
-        outputTank.fill(recipe.outputFluid(), IFluidHandler.FluidAction.EXECUTE);
+        if (outputTank.fill(recipe.outputFluid(), IFluidHandler.FluidAction.EXECUTE) > 0) {
+            grantRecipeXp(recipe);
+        }
         resetCycle();
         setChanged();
         return true;
+    }
+
+    private void grantRecipeXp(MelterRecipe recipe) {
+        if (recipe.machineXp() <= 0) {
+            return;
+        }
+        int xpQuarters = MachineProgressionState.xpQuarters(machineProgression().level(), recipe.machineXpBand());
+        if (xpQuarters <= 0) {
+            return;
+        }
+        grantMasteryXp(MachineProgressionState.workXp(recipe.machineXp(), recipe.machineXpBand()), xpQuarters);
+    }
+
+    public boolean unlockPassiveNode(MegaPassiveNode node) {
+        return allocateMastery(node);
+    }
+
+    @Override
+    public boolean mutesMachineSound() {
+        return MegaPassiveTree.has(machineProgression(), "MUTE_MACHINE_SOUND");
+    }
+
+    @Override
+    public MachineMasteryFamily masteryFamily() {
+        return MachineMasteryFamily.MELTER;
+    }
+
+    @Override
+    public MachineProgressionState machineProgression() {
+        return super.machineProgression().forFamily(masteryFamily());
+    }
+
+    @Override
+    public void masteryChanged() {
+        resetCycle();
+        resetBulkSpeed();
+        clampInternalEnergy();
+        setChanged();
     }
 
     private void consumeInput(int slot) {

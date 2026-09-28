@@ -20,5 +20,6 @@
   "processing_ticks": 240,
   "energy": 4800,
   "minimum_temperature": 1200,
-  "required_processing_level": 6
+  "required_processing_level": 6,
+  "machine_xp": 5
 }

@@ -18,7 +18,7 @@ Calibration is separate from refinement. Calibration creates component validity 
 | Tungstensteel Resonance Calibrator Chassis | 7 | Dense resonance array | Three-lane endgame bulk branch with `DENSE_PARALLEL`. |
 | Nullite Resonance Calibrator Chassis | 7 | Phase precision frame | One-lane endgame precision branch with stronger quality and RP control. |
 
-All chassis are block items, roll machine RPG traits, support placed-machine refinement, expose FE input, and share the same Process, Gear, Stats, and Refinement screen pattern.
+All chassis are block items, roll machine RPG traits, support placed-machine refinement, expose FE input, and share the same Process, Gear, Stats, Refinement, and Mastery screen pattern.
 
 Placed chassis art follows [Machine Visual Design](../reference/machine-visual-design.md#resonance-calibrator-chassis). Resonance Calibrator blocks should use owned `textures/block/resonance_calibrator_chassis/<face>/<id>` face textures, keep `64x64` block-face frames, and show a front tuning cue such as a lens, coil ring, waveform meter, or alignment target. Bulk sidegrades should visibly communicate multiple calibration lanes, while Nullite should read as the precision branch.
 
@@ -98,7 +98,7 @@ Resonance Calibrator chassis recipes do not consume the previous Resonance Calib
 
 The Calibrated Diamond Crystal is a Stage 6 logic-family calibration output used by late Stabilizer Matrix recipes and Stage 7 Resonance Calibrator chassis recipes. Tungstensteel and Nullite Stabilizer Matrix crafting requires a logic-calibrated crystal with at least Stage 6 and `75` stability, while Tungstensteel and Nullite Resonance Calibrator chassis require `85` stability, so the chassis gate sits after Titanium calibration and asks for a stronger crystal roll.
 
-When JEI is installed, `rngtech:calibration` recipes appear under a Resonance Calibration category. Resonance Calibrator chassis are registered as catalysts, and the recipe view shows input, reusable pattern, catalyst, optional stabilizer, output family, stability range, Refinement Potential range, FE cost, and processing time. Recipe transfer sends patterns to the selected, matching, or first empty Gear-tab pattern slot.
+When JEI is installed, `rngtech:calibration` recipes appear under a Resonance Calibration category. Resonance Calibrator chassis are registered as catalysts, and the recipe view shows input, reusable pattern, catalyst, optional stabilizer, output family, stability range, Refinement Potential range, FE cost, processing time, and machine XP. Recipe transfer sends patterns to the selected, matching, or first empty Gear-tab pattern slot.
 
 ## Progression
 
@@ -110,3 +110,19 @@ The late-game choice is intentionally split:
 - Nullite favors single-output speed, precision, stability, and RP outcomes.
 
 Future Exotic content should preserve that branch choice instead of merging both into one automatic best chassis.
+
+## Mastery
+
+Resonance Calibrators enter the [shared Machine Mastery tree](../systems/machine-mastery.md) at the Control start, which they share with the Metal Press. Each chassis keeps its own progression, and build codes paste between the two families. The start grants 20 Control, 0 Drive, and 0 Reserve. In addition to the [shared attribute conversions](../systems/machine-mastery.md#attributes), each Control point grants 0.05% increased Calibration Precision.
+
+The Resonance Calibrator is the only family that uses Calibration Precision and Catalyst Efficiency nodes. It also uses Processing Speed, Energy Usage, Stability, Energy Capacity, Instant Process Chance, and Super Output Chance. Heat, fuel, fluid, output-amount, and parallel-job effects are marked inactive. Mastery stats apply after chassis base stats and machine traits, before installed Gear, the no-Battery-Cell penalty, and Bulk Speed. Nodes do not change Gear slots, lanes, or coil stage reach. Allocation changes reset the active calibration cycle but keep inventory, stored patterns, and the selected pattern. Silent Operation mutes the calibrator's machine loop.
+
+Completed calibrations grant `machine_xp` once per calibrated job, so multi-lane chassis earn XP for each job completed in a cycle. Super Output bonuses, missing Gear, invalid or stage-gated recipes, output-blocked waits, and no-power pauses grant no XP. If `machine_xp_band` is omitted, positive-XP recipes map the required calibrator stage onto the [shared work-band scale](../systems/machine-mastery.md#xp-and-chassis-ownership) as old band `1 + (stage - 1) × 4`, the same mapping Crusher hardness uses.
+
+| Required reach | Default recipes | Base `machine_xp` | Derived band |
+|---:|---|---:|---:|
+| 1 | Iron Plate, Iron Gear, Copper Casing, and Basic Electric Circuit basic recipes | 2 | 1 |
+| 2 | Copper Coil, Cell Shell, and Stabilization Catalyst Iron Plate recipes | 3 | 17 |
+| 4 | Matrix-stabilized recipes | 5 | 49 |
+| 4 | Sparksteel Coil | 6 | 49 |
+| 6 | Calibrated Diamond Crystal | 8 | 81 |

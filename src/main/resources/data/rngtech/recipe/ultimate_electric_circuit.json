@@ -38,5 +38,6 @@
   "failure_output": {
     "count": 1,
     "id": "rngtech:broken_circuit"
-  }
+  },
+  "machine_xp": 27
 }
