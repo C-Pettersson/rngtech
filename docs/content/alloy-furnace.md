@@ -99,7 +99,7 @@ Bronze Blend and Steel Blend are default progression items and are tagged as `rn
 
 ## Mastery
 
-Alloy Furnaces enter the [shared Machine Mastery tree](../systems/machine-mastery.md) at the Drive / Reserve start shared with the [Furnace](furnace.md). Base attributes are `0` Control, `10` Drive, and `10` Reserve. Besides the shared attribute conversions, each Control point grants `0.05%` increased Temperature Stability and each Reserve point grants `0.1%` increased Heat Isolation, as on the Furnace. Effects the Alloy Furnace cannot use, such as fuel duration, output amount, and parallel jobs, stay selectable but are marked inactive.
+Alloy Furnaces enter the [shared Machine Mastery tree](../systems/machine-mastery.md) at the Drive / Reserve start shared with the [Furnace](furnace.md). Base attributes are `0` Control, `10` Drive, and `10` Reserve. Besides the shared attribute conversions, each Control point grants `0.05%` increased Temperature Stability and each Reserve point grants `0.1%` increased Heat Isolation, as on the Furnace. Effects the Alloy Furnace cannot use, such as fuel duration, output amount, and parallel jobs, stay selectable but are marked inactive. As a heated machine, it gains the [tagged](../systems/machine-mastery.md#tagged-payoffs) speed bonuses of Low Heat Specialist and Flash Annealing along with their temperature caps.
 
 Recipes may set `machine_xp` and an optional `machine_xp_band`; the band defaults from `target_temperature` on the same scale as Furnace recipes. XP is granted only after a completed craft merges its output. Failure outputs, stalled heat, blocked output, and power-starved ticks grant none.
 

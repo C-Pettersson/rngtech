@@ -1,6 +1,7 @@
 package com.rngtech.rpg.progression;
 
 import com.rngtech.rpg.MachineModifier;
+import com.rngtech.rpg.MachineModifierEffect;
 import com.rngtech.rpg.MachineStat;
 import com.rngtech.rpg.MachineStatAccumulator;
 import com.rngtech.rpg.ModifierOperation;
@@ -14,6 +15,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /** Executable domain checks without launching a client or server. */
 public final class MasteryChecks {
@@ -26,6 +28,8 @@ public final class MasteryChecks {
         routeAllocation();
         attributesAndConstraints();
         familyAdapters();
+        taggedPayoffs();
+        keystonePayoffsNeedTheirCosts();
         System.out.println("Machine mastery: " + checks + " checks passed");
     }
 
@@ -231,9 +235,93 @@ public final class MasteryChecks {
         var lowHeatMelter = build(MachineMasteryFamily.MELTER, "low_heat_specialist");
         var melterHeat = new MachineStatAccumulator(); MegaPassiveTree.applyStats(melterHeat, lowHeatMelter, MachineMasteryFamily.MELTER);
         effect(melterHeat, ModifierOperation.ADD, 4000);
-        near(melterHeat.value(MachineStat.MAX_TEMPERATURE), 4000, "fixed temperature cannot strand a Melter below its recipes");
+        near(melterHeat.value(MachineStat.MAX_TEMPERATURE), 4000, "a temperature ceiling cannot strand a Melter below its recipes");
         require(MachineMasteryFamily.MELTER.supports(MachineStat.MAX_TEMPERATURE) && MachineMasteryFamily.FURNACE.supportsAbsolute(MachineStat.MAX_TEMPERATURE),
                 "the Melter keeps ordinary heat bonuses while other heat machines keep absolute constraints");
+        require(!MachineMasteryFamily.FURNACE.supports(MachineStat.OUTPUT_AMOUNT) && !MachineMasteryFamily.FURNACE.supports(MachineStat.PARALLEL_JOBS)
+                && MachineMasteryFamily.FURNACE.supports(MachineStat.SUPER_OUTPUT_CHANCE), "only the Crusher reads Output Amount and Parallel Jobs");
+    }
+
+    private static void taggedPayoffs() {
+        for (MachineMasteryFamily family : MachineMasteryFamily.values()) {
+            double lowHeat = speedGain(family, "low_heat_specialist");
+            near(lowHeat, family.has(MachineTag.HEATED) ? 2 : 1, family + " gains Low Heat Specialist speed only when it is a heated machine");
+            near(speedGain(family, "soft_material_specialist"), family == MachineMasteryFamily.CRUSHER ? 3 : 1, family + " gains Soft Material Specialist speed only as a Crusher");
+        }
+
+        var furnace = build(MachineMasteryFamily.FURNACE, "low_heat_specialist");
+        var weakHeat = new MachineStatAccumulator(); MegaPassiveTree.applyStats(weakHeat, furnace, MachineMasteryFamily.FURNACE);
+        effect(weakHeat, ModifierOperation.ADD, 300);
+        near(weakHeat.value(MachineStat.MAX_TEMPERATURE), 300, "a heat ceiling never raises a weak heat source to its limit");
+    }
+
+    /** Speed multiplier the destination keystone adds on top of the route that reaches it. */
+    private static double speedGain(MachineMasteryFamily family, String keystone) {
+        var with = build(family, keystone);
+        var withStats = MachineStatAccumulator.componentBase(Map.of(MachineStat.PROCESSING_SPEED, 1.0));
+        var withoutStats = MachineStatAccumulator.componentBase(Map.of(MachineStat.PROCESSING_SPEED, 1.0));
+        MegaPassiveTree.applyStats(withStats, with, family);
+        MegaPassiveTree.applyStats(withoutStats, with.withoutNode(keystone), family);
+        return withStats.value(MachineStat.PROCESSING_SPEED) / withoutStats.value(MachineStat.PROCESSING_SPEED);
+    }
+
+    private static final Set<MachineStat> LOWER_IS_BETTER = Set.of(
+            MachineStat.ENERGY_USAGE, MachineStat.WARMUP_TIME, MachineStat.COOLING_RATE, MachineStat.IDLE_LOSS);
+    private static final Set<String> COST_BEHAVIORS = Set.of("BLOCK_BATTERY", "MATCHING_HEAD", "NO_INHERENT_ATTRIBUTES");
+
+    /**
+     * A keystone's payoff must never reach a machine that escapes its cost. Limits and restricting behaviors are the
+     * defining cost: a machine that gains the payoff must also receive one of them, not only a generic penalty.
+     */
+    private static void keystonePayoffsNeedTheirCosts() {
+        for (MegaPassiveNode keystone : MegaPassiveTree.TREE.nodes().stream().filter(n -> n.kind() == PassiveNodeKind.KEYSTONE).toList()) {
+            List<String> violations = payoffWithoutCost(keystone);
+            require(violations.isEmpty(), "keystone payoffs follow their costs: " + violations);
+        }
+        // Before tags, Low Heat Specialist doubled every non-heat machine's speed for free.
+        MegaPassiveNode lowHeat = MegaPassiveTree.node("low_heat_specialist");
+        var untagged = new MegaPassiveNode(lowHeat.index(), lowHeat.id(), lowHeat.name(), lowHeat.kind(), lowHeat.x(), lowHeat.y(), lowHeat.links(),
+                lowHeat.tagged().stream().map(MegaPassiveNode.TaggedEffect::effect).toList(), List.of(), lowHeat.behaviors(),
+                Map.of(MachineStat.MAX_TEMPERATURE, 800.0), Map.of(), lowHeat.scaling(), lowHeat.passive(), 0);
+        List<String> caught = payoffWithoutCost(untagged);
+        require(caught.stream().anyMatch(v -> v.contains("CRUSHER")) && caught.stream().anyMatch(v -> v.contains("MELTER"))
+                && caught.stream().noneMatch(v -> v.contains("FURNACE")), "audit catches an untagged heat payoff: " + caught);
+    }
+
+    private static List<String> payoffWithoutCost(MegaPassiveNode keystone) {
+        List<String> violations = new ArrayList<>();
+        for (MachineMasteryFamily family : MachineMasteryFamily.values()) {
+            boolean payoff = false, cost = false, limit = false, hasCost = false, hasLimit = false;
+            List<Map.Entry<MachineModifierEffect, Boolean>> effects = new ArrayList<>();
+            keystone.effects().forEach(effect -> effects.add(Map.entry(effect, family.supports(effect.stat()))));
+            keystone.tagged().forEach(tagged -> effects.add(Map.entry(tagged.effect(), tagged.appliesTo(family))));
+            for (var entry : effects) {
+                boolean raises = switch (entry.getKey().operation()) { case ADD, INCREASED_PERCENT, MORE -> true; case DECREASED_PERCENT, LESS -> false; };
+                if (raises == LOWER_IS_BETTER.contains(entry.getKey().stat())) { hasCost = true; cost |= entry.getValue(); } else { payoff |= entry.getValue(); }
+            }
+            for (MachineStat stat : concat(keystone.fixed().keySet(), keystone.ceilings().keySet())) {
+                hasCost = hasLimit = true;
+                if (family.supportsAbsolute(stat)) { cost = limit = true; }
+            }
+            if (keystone.recipeHardnessCeiling() > 0) {
+                hasCost = hasLimit = true;
+                if (family.supports(MachineStat.PROCESSING_LEVEL)) { cost = limit = true; }
+            }
+            for (String behavior : keystone.behaviors()) {
+                boolean applies = family.supportsBehavior(behavior);
+                if (COST_BEHAVIORS.contains(behavior)) { hasCost = hasLimit = true; cost |= applies; limit |= applies; } else { payoff |= applies; }
+            }
+            payoff |= keystone.scaling().stream().anyMatch(scaling -> family.supports(scaling.stat()));
+            if (payoff && hasCost && !cost) { violations.add(keystone.id() + " pays " + family + " without any cost"); }
+            if (payoff && hasLimit && !limit) { violations.add(keystone.id() + " pays " + family + " without its limit"); }
+        }
+        return violations;
+    }
+
+    private static List<MachineStat> concat(Set<MachineStat> first, Set<MachineStat> second) {
+        List<MachineStat> all = new ArrayList<>(first);
+        all.addAll(second);
+        return all;
     }
 
     private static MachineProgressionState build(MachineMasteryFamily family, String destination) {

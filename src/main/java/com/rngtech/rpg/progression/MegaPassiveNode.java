@@ -12,23 +12,31 @@ import java.util.Set;
 
 public record MegaPassiveNode(
         int index, String id, String name, PassiveNodeKind kind, int x, int y,
-        List<String> links, List<MachineModifierEffect> effects, Set<String> behaviors,
+        List<String> links, List<MachineModifierEffect> effects, List<TaggedEffect> tagged, Set<String> behaviors,
         Map<MachineStat, Double> fixed, Map<MachineStat, Double> ceilings,
         List<AttributeScaling> scaling, Map<PassiveStatType, Integer> passive, int recipeHardnessCeiling
 ) implements PassiveNode {
     public record AttributeScaling(MachineStat attribute, MachineStat stat, ModifierOperation operation, double perPoint) {
     }
 
+    /** An effect that only applies to machines carrying {@code tag}. */
+    public record TaggedEffect(MachineTag tag, MachineModifierEffect effect) {
+        public boolean appliesTo(MachineMasteryFamily family) {
+            return family.has(tag) && family.supports(effect.stat());
+        }
+    }
+
     @Override public int requiredLevel() { return 1; }
     @Override public int x() { return x - size() / 2; }
     @Override public int y() { return y - size() / 2; }
     @Override public boolean alwaysAllocated() { return false; }
-    @Override public boolean grantsNothing() { return effects.isEmpty(); }
+    @Override public boolean grantsNothing() { return effects.isEmpty() && tagged.isEmpty(); }
     @Override public List<MegaPassiveNode> parents() { return links.stream().map(MegaPassiveTree::node).toList(); }
     @Override public MachineModifier modifier() { return MachineModifier.roll(id, id, ModifierSlot.IMPLICIT, 0, effects); }
     @Override public String masteryIconKey() {
-        if (effects.isEmpty()) { return kind == PassiveNodeKind.STARTER ? "control" : "stability"; }
-        return switch (effects.getFirst().stat()) {
+        MachineModifierEffect first = !effects.isEmpty() ? effects.getFirst() : !tagged.isEmpty() ? tagged.getFirst().effect() : null;
+        if (first == null) { return kind == PassiveNodeKind.STARTER ? "control" : "stability"; }
+        return switch (first.stat()) {
             case DRIVE, PROCESSING_SPEED -> "processing_speed";
             case RESERVE, ENERGY_CAPACITY, ENERGY_CAPACITY_FLAT -> "energy_capacity";
             case OUTPUT_AMOUNT, CRUSHER_SALVAGE_CHANCE -> "output_yield";

@@ -10,6 +10,8 @@ const STARTS = ["control", "control_drive", "drive", "drive_reserve", "reserve",
 const START_ATTRIBUTES = [[0], [0, 1], [1], [1, 2], [2], [2, 0]];
 
 const effect = (stat, value, operation = "INCREASED_PERCENT") => ({ stat, operation, value });
+// A tagged effect only reaches machines in that group; keystones tag their payoff with the group that pays their cost.
+const tagged = (tag, taggedEffect) => ({ ...taggedEffect, tag });
 const title = value => value.toLowerCase().replace(/\b\w/g, c => c.toUpperCase());
 const slug = value => value.toLowerCase().replace(/[^a-z0-9]+/g, "_").replace(/^_|_$/g, "");
 const theme = (name, primary, small, notable, secondary, notables) => ({ name, primary, small, notable, secondary, notables });
@@ -112,18 +114,19 @@ const KEYSTONES = [
     { id: "redline_drive", name: "Redline Drive", effects: [effect("PROCESSING_SPEED", 1.5, "MORE"), effect("ENERGY_USAGE", 1.8, "MORE")] },
     { id: "dense_batching", name: "Dense Batching", behaviors: ["DENSE_PARALLEL"], effects: [effect("PARALLEL_JOBS", 2, "ADD"), effect("PROCESSING_SPEED", 0.75, "LESS"), effect("ENERGY_USAGE", 1.25, "MORE")] },
     { id: "precision_jaw_mount", name: "Precision Jaw Mount", behaviors: ["MATCHING_HEAD"], effects: [effect("OUTPUT_AMOUNT", 10), effect("CRUSHER_SALVAGE_CHANCE", 2, "ADD")] },
-    { id: "soft_material_specialist", name: "Soft Material Specialist", recipeHardnessCeiling: 2, effects: [effect("PROCESSING_SPEED", 3, "MORE"), effect("ENERGY_USAGE", 1.5, "MORE")] },
+    { id: "soft_material_specialist", name: "Soft Material Specialist", recipeHardnessCeiling: 2, effects: [tagged("CRUSHING", effect("PROCESSING_SPEED", 3, "MORE")), effect("ENERGY_USAGE", 1.5, "MORE")] },
     { id: "heavy_yield", name: "Heavy Yield", effects: [effect("OUTPUT_AMOUNT", 1.15, "MORE"), effect("ENERGY_USAGE", 1.5, "MORE")] },
-    { id: "flash_annealing", name: "Flash Annealing", fixed: { MAX_TEMPERATURE: 600 }, effects: [effect("PROCESSING_SPEED", 2, "MORE"), effect("ENERGY_USAGE", 1.5, "MORE")] },
-    { id: "low_heat_specialist", name: "Low Heat Specialist", fixed: { MAX_TEMPERATURE: 800 }, effects: [effect("PROCESSING_SPEED", 2, "MORE")] },
+    // Heat limits are ceilings, so a weak heat source is never raised to the limit.
+    { id: "flash_annealing", name: "Flash Annealing", ceilings: { MAX_TEMPERATURE: 600 }, effects: [tagged("HEATED", effect("PROCESSING_SPEED", 2, "MORE")), effect("ENERGY_USAGE", 1.5, "MORE")] },
+    { id: "low_heat_specialist", name: "Low Heat Specialist", ceilings: { MAX_TEMPERATURE: 800 }, effects: [tagged("HEATED", effect("PROCESSING_SPEED", 2, "MORE"))] },
     { id: "quench_protocol", name: "Quench Protocol", behaviors: ["QUENCH_PROTOCOL"], effects: [effect("HEAT_TRANSFER", 0.75, "LESS")] },
     { id: "closed_loop_recuperator", name: "Closed Loop Recuperator", behaviors: ["CLOSED_LOOP_RECUPERATOR"], effects: [effect("PROCESSING_SPEED", 0.85, "LESS")] },
     { id: "kiln_discipline", name: "Kiln Discipline", effects: [effect("TEMPERATURE_STABILITY", 1.6, "MORE"), effect("WARMUP_TIME", 1.4, "MORE")] },
     { id: "thermal_reservoir", name: "Thermal Reservoir", effects: [effect("COOLING_RATE", 0.4, "LESS"), effect("HEAT_TRANSFER", 0.5, "LESS")] },
     { id: "high_flux", name: "High Flux", effects: [effect("ENERGY_GENERATION", 1.5, "MORE"), effect("FUEL_DURATION", 0.6, "LESS")] },
-    { id: "cell_bypass", name: "Cell Bypass", behaviors: ["BLOCK_BATTERY"], effects: [effect("ENERGY_CAPACITY", 100), effect("NO_BATTERY_OUTPUT_RETENTION", 100, "ADD"), effect("ENERGY_USAGE", 1.1, "MORE")] },
+    { id: "cell_bypass", name: "Cell Bypass", behaviors: ["BLOCK_BATTERY"], effects: [tagged("CRUSHING", effect("ENERGY_CAPACITY", 100)), effect("NO_BATTERY_OUTPUT_RETENTION", 100, "ADD"), effect("ENERGY_USAGE", 1.1, "MORE")] },
     { id: "deep_reserve", name: "Deep Reserve", effects: [effect("ENERGY_CAPACITY", 2, "MORE"), effect("PROCESSING_SPEED", 0.7, "LESS")] },
-    { id: "lean_grid", name: "Lean Grid", effects: [effect("ENERGY_USAGE", 0.7, "LESS"), effect("ENERGY_CAPACITY", 0.5, "LESS")] },
+    { id: "lean_grid", name: "Lean Grid", effects: [tagged("ENERGY_BUFFER", effect("ENERGY_USAGE", 0.7, "LESS")), effect("ENERGY_CAPACITY", 0.5, "LESS")] },
     { id: "reserve_actuation", layer: "core", name: "Reserve Actuation", behaviors: ["NO_INHERENT_ATTRIBUTES"], scaling: [{ attribute: "RESERVE", stat: "PROCESSING_SPEED", operation: "INCREASED_PERCENT", perPoint: 0.5 }] },
     { id: "cold_standby", name: "Cold Standby", effects: [effect("IDLE_LOSS", 0.4, "LESS"), effect("ENERGY_TRANSFER", 0.5, "LESS")] },
     { id: "regulated_heat", name: "Regulated Heat", ceilings: { MAX_TEMPERATURE: 1000 }, effects: [effect("TEMPERATURE_STABILITY", 1.8, "MORE")] },

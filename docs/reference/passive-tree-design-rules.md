@@ -1,4 +1,4 @@
-# Passive Tree Design Rules v7
+# Passive Tree Design Rules v8
 
 Status: Implemented
 
@@ -32,6 +32,8 @@ The fitted render decides whether the composition works. Counts cannot overrule 
 Version 3 rewarded density and produced tangled links. Version 4 added a fitted-view gate. Version 5 removed the shared tree's symmetry but still placed its travel nodes inside repeated reward loops. Version 6 separated the travel network from optional reward investments, but clustered all six starts in the middle of a random road web.
 
 Version 7 moves the starts outward to leave room for core pathing, builds the road network in distinct layers with varied travel between them, adds larger reward constellations, and spreads keystones through every layer, directly on roads or at the end of reward arms, away from the starts. The catalog grows to 1300 nodes, and machines reach level 100.
+
+Version 8 ties keystone payoffs to their costs with machine tags, after Low Heat Specialist doubled the speed of machines that could never feel its heat limit.
 
 ## Runtime and topology constraints
 
@@ -89,6 +91,10 @@ Vary orientation, mirroring, radius, and spacing. Large showpiece shapes belong 
 Repeat broad goals across several regions: processing speed, energy efficiency, output handling, attribute scaling, and reserve support should offer more than one route package. Home regions carry their start's themes; outer constellations blend a region with its nearest neighbor, so nearby road gates present competing investments. Balance themes across the whole tree rather than per region.
 
 Keep the distinction between increased/reduced, more/less, flat additions, and absolute constraints. Changing a path must not silently change the meaning of its rewards.
+
+### Tie keystone payoffs to their costs
+
+Every node stays selectable on every machine, and an irrelevant benefit leaves its relevant penalty in place. The reverse must not happen: a machine that escapes a keystone's cost must not keep its payoff. When the defining cost is family-specific (a heat limit, a hardness ceiling, or a blocked Gear slot), tag the payoff with the [machine group](../systems/machine-mastery.md#tagged-payoffs) that pays the cost. A payoff that belongs with a generic penalty, such as energy usage every machine pays, needs no tag. Use ceilings rather than fixed values for keystone limits, so a limit never raises a weak machine to it. `masteryCheck` audits every keystone against every machine family and fails when a payoff reaches a family that receives none of the keystone's costs, or none of its limits.
 
 ### Place keystones as commitments
 

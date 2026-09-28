@@ -31,6 +31,7 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.ComponentUtils;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.neoforged.neoforge.network.PacketDistributor;
@@ -610,6 +611,11 @@ public final class MasteryScreenSupport<N extends PassiveNode> {
             for (var effect : node.effects()) {
                 text.append('\n').append(MachineStatDisplay.effectText(effect).getString());
             }
+            if (node instanceof MegaPassiveNode shared) {
+                for (var tagged : shared.tagged()) {
+                    text.append('\n').append(taggedText(tagged).getString());
+                }
+            }
             searchText[position] = text.toString().toLowerCase(Locale.ROOT);
         }
         return searchText[position];
@@ -629,6 +635,7 @@ public final class MasteryScreenSupport<N extends PassiveNode> {
 
     private boolean relevant(MegaPassiveNode node) {
         return node.effects().stream().anyMatch(effect -> view.masterySupports(effect.stat()))
+                || node.tagged().stream().anyMatch(tagged -> tagged.appliesTo(view.masteryFamily()))
                 || node.scaling().stream().anyMatch(effect -> view.masterySupports(effect.stat()))
                 || node.fixed().keySet().stream().anyMatch(view::masterySupportsAbsolute)
                 || node.ceilings().keySet().stream().anyMatch(view::masterySupportsAbsolute)
@@ -948,6 +955,17 @@ public final class MasteryScreenSupport<N extends PassiveNode> {
         } else if (node.kind() == PassiveNodeKind.NOTABLE) {
             tooltip.add(Component.translatable("rngtech.mastery.tooltip.notable").withStyle(ChatFormatting.AQUA));
         }
+        if (node instanceof MegaPassiveNode shared) {
+            // Tagged payoffs come first, then the costs every machine pays.
+            for (var tagged : shared.tagged()) {
+                Component text = taggedText(tagged);
+                tooltip.add(tagged.appliesTo(view.masteryFamily()) ? text.copy().withStyle(ChatFormatting.GRAY)
+                        : Component.translatable("rngtech.mastery.inactive", text).withStyle(ChatFormatting.DARK_GRAY));
+                List<Component> members = tagged.tag().members().stream().map(family -> (Component) Component.translatable(family.translationKey())).toList();
+                tooltip.add(Component.translatable("rngtech.mastery.tag.members", Component.translatable(tagged.tag().translationKey()),
+                        ComponentUtils.formatList(members, Component.literal(", "))).withStyle(ChatFormatting.DARK_GRAY));
+            }
+        }
         for (var effect : node.effects()) {
             Component text = MachineStatDisplay.effectText(effect);
             tooltip.add(view.masterySupports(effect.stat()) ? text.copy().withStyle(ChatFormatting.GRAY)
@@ -1086,6 +1104,10 @@ public final class MasteryScreenSupport<N extends PassiveNode> {
         }
         PacketDistributor.sendToServer(new MasteryActionPayload(player.containerMenu.containerId, action, value));
         return true;
+    }
+
+    private static Component taggedText(MegaPassiveNode.TaggedEffect tagged) {
+        return Component.translatable("rngtech.mastery.tagged", MachineStatDisplay.effectText(tagged.effect()), Component.translatable(tagged.tag().translationKey()));
     }
 
     private static Component applicability(Component text, boolean applies) {

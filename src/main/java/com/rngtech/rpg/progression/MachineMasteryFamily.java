@@ -2,6 +2,8 @@ package com.rngtech.rpg.progression;
 
 import com.rngtech.rpg.MachineStat;
 
+import java.util.Locale;
+
 public enum MachineMasteryFamily {
     CRUSHER("drive"), FURNACE("drive_reserve"), FORESTRY("control_drive"),
     ALLOY_FURNACE("drive_reserve"), METAL_PRESS("control"), MELTER("reserve_control"), RESONANCE_CALIBRATOR("control");
@@ -14,6 +16,18 @@ public enum MachineMasteryFamily {
 
     public String startNodeId() {
         return start;
+    }
+
+    public String translationKey() {
+        return "rngtech.mastery.family." + name().toLowerCase(Locale.ROOT);
+    }
+
+    public boolean has(MachineTag tag) {
+        return switch (tag) {
+            case HEATED -> heatChassis();
+            case CRUSHING -> this == CRUSHER;
+            case ENERGY_BUFFER -> supports(MachineStat.ENERGY_CAPACITY);
+        };
     }
 
     public boolean supportsBehavior(String behavior) {
@@ -42,7 +56,9 @@ public enum MachineMasteryFamily {
             case STABILITY -> this != MELTER;
             case ENERGY_CAPACITY, INSTANT_PROCESS_CHANCE -> this != FORESTRY;
             case SUPER_OUTPUT_CHANCE -> this != FORESTRY && this != MELTER;
-            case ENERGY_CAPACITY_FLAT, OUTPUT_AMOUNT, PARALLEL_JOBS -> this == CRUSHER || this == FURNACE;
+            case ENERGY_CAPACITY_FLAT -> this == CRUSHER || this == FURNACE;
+            // Only the Crusher reads Output Amount and Parallel Jobs; other machines' bonus output is Super Output.
+            case OUTPUT_AMOUNT, PARALLEL_JOBS -> this == CRUSHER;
             case MAX_TEMPERATURE, HEAT_TRANSFER -> heatChassis() || this == MELTER;
             case HEAT_ISOLATION, TEMPERATURE_STABILITY, WARMUP_TIME, COOLING_RATE, OVERHEAT_TOLERANCE -> heatChassis();
             case FUEL_DURATION, FUEL_EFFICIENCY -> this == FURNACE;

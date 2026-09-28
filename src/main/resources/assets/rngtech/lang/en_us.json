@@ -5109,5 +5109,17 @@
   "rngtech.mastery.behavior.coasting_clutch": "Forestry Companion: faster unpowered rolling.",
   "rngtech.mastery.behavior.seedling_magnet": "Forestry Companion: collected saplings refill sapling cargo first.",
   "rngtech.mastery.attribute_total": "%s: %s",
-  "rngtech.mastery.other_start": "Starting point for another machine archetype."
+  "rngtech.mastery.other_start": "Starting point for another machine archetype.",
+  "rngtech.mastery.tagged": "%s for %s",
+  "rngtech.mastery.tag.heated": "Heated machines",
+  "rngtech.mastery.tag.crushing": "Crushers",
+  "rngtech.mastery.tag.energy_buffer": "machines with an energy buffer",
+  "rngtech.mastery.tag.members": "%s: %s.",
+  "rngtech.mastery.family.crusher": "Crusher",
+  "rngtech.mastery.family.furnace": "Furnace",
+  "rngtech.mastery.family.forestry": "Forestry Companion",
+  "rngtech.mastery.family.alloy_furnace": "Alloy Furnace",
+  "rngtech.mastery.family.metal_press": "Metal Press",
+  "rngtech.mastery.family.melter": "Melter",
+  "rngtech.mastery.family.resonance_calibrator": "Resonance Calibrator"
 }

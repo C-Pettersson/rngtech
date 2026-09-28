@@ -29301,7 +29301,8 @@
                 {
                     "stat": "PROCESSING_SPEED",
                     "operation": "MORE",
-                    "value": 3
+                    "value": 3,
+                    "tag": "CRUSHING"
                 },
                 {
                     "stat": "ENERGY_USAGE",
@@ -29352,7 +29353,8 @@
                 {
                     "stat": "ENERGY_USAGE",
                     "operation": "LESS",
-                    "value": 0.7
+                    "value": 0.7,
+                    "tag": "ENERGY_BUFFER"
                 },
                 {
                     "stat": "ENERGY_CAPACITY",
@@ -29562,7 +29564,8 @@
                 {
                     "stat": "PROCESSING_SPEED",
                     "operation": "MORE",
-                    "value": 2
+                    "value": 2,
+                    "tag": "HEATED"
                 },
                 {
                     "stat": "ENERGY_USAGE",
@@ -29571,10 +29574,10 @@
                 }
             ],
             "behaviors": [],
-            "fixed": {
+            "fixed": {},
+            "ceilings": {
                 "MAX_TEMPERATURE": 600
             },
-            "ceilings": {},
             "scaling": [],
             "passive": {},
             "id": "flash_annealing",
@@ -29611,7 +29614,8 @@
                 {
                     "stat": "ENERGY_CAPACITY",
                     "operation": "INCREASED_PERCENT",
-                    "value": 100
+                    "value": 100,
+                    "tag": "CRUSHING"
                 },
                 {
                     "stat": "NO_BATTERY_OUTPUT_RETENTION",
@@ -29734,14 +29738,15 @@
                 {
                     "stat": "PROCESSING_SPEED",
                     "operation": "MORE",
-                    "value": 2
+                    "value": 2,
+                    "tag": "HEATED"
                 }
             ],
             "behaviors": [],
-            "fixed": {
+            "fixed": {},
+            "ceilings": {
                 "MAX_TEMPERATURE": 800
             },
-            "ceilings": {},
             "scaling": [],
             "passive": {},
             "id": "low_heat_specialist",

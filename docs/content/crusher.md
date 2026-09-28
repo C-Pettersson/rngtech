@@ -71,7 +71,7 @@ Current Mastery hooks:
 - Cell Bypass grants 100% increased Energy Capacity, 10% more Energy Usage, and +100 percentage points of no-cell output retention. It blocks the Battery Cell slot and cannot be allocated with a cell installed.
 - Precision Jaw Mount grants 10% increased Output Amount and +2 percentage points of salvage chance. An installed Crush Head must match the chassis stage.
 - Dense Batching enables Dense Parallel, adds two parallel jobs, and applies 25% less Processing Speed and 25% more Energy Usage.
-- Soft Material Specialist grants 200% more Processing Speed and 50% more Energy Usage, but forbids recipes above hardness 2 even with a stronger head.
+- Soft Material Specialist grants 200% more Processing Speed and 50% more Energy Usage, but forbids recipes above hardness 2 even with a stronger head. Its speed is [tagged](../systems/machine-mastery.md#tagged-payoffs) for Crushers, as is Cell Bypass's Energy Capacity, because only a Crusher pays their hardness and Battery Cell costs.
 - Heavy Yield grants 15% more Output Amount and 50% more Energy Usage.
 - Component Mount, Reinforced Mount, Stage Adapter, and Universal Bracket each support one higher Crush Head stage; Precision Jaw Mount still requires an exact match. Silent Operation mutes the machine's client-side loop and cues.
 

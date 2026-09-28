@@ -25,7 +25,7 @@ Every paid allocation costs one point and must connect to the machine's start th
 
 The Reserve start is present in the graph but has no machine adapter yet. Machines that share a start keep their own progression, but build codes paste between them. Gear and cables do not gain their own Mastery progression.
 
-All nodes remain visible and selectable regardless of machine family. Applicability is evaluated for each effect. A Crusher can allocate maximum heat and gain no heat benefit. An electric Furnace gains no fuel-duration benefit. A node with an irrelevant benefit still applies any relevant penalty; tooltips label inactive effects. Relevance highlighting never hides routes.
+All nodes remain visible and selectable regardless of machine family. Applicability is evaluated for each effect. A Crusher can allocate maximum heat and gain no heat benefit. An electric Furnace gains no fuel-duration benefit. A node with an irrelevant benefit still applies any relevant penalty; tooltips label inactive effects. The reverse does not happen: a keystone payoff that depends on a family-specific cost is [tagged](#tagged-payoffs), so a machine that escapes the cost does not get the payoff. Relevance highlighting never hides routes.
 
 ## Attributes
 
@@ -43,9 +43,23 @@ Conversions only have a gameplay effect where the receiving stat is used. For ex
 
 Explicit attribute scaling is separate. A node can grant an authored percentage per attribute point in addition to inherent conversions. **Attributes grant no inherent bonuses** removes only the conversions in the table: totals, attribute modifiers, and explicit scaling remain. Attribute Transfiguration grants 100% more of each attribute with that restriction. Reserve Actuation uses the same restriction and grants 0.5% increased Processing Speed per Reserve.
 
-Steady State grants 50% more Stability with 15% less Processing Speed. Singular Drive grants 50% more Drive with 50% less Control and Reserve. Lean Grid applies 30% less Energy Usage and 50% less Energy Capacity. Family keystones are described on each machine page.
+Steady State grants 50% more Stability with 15% less Processing Speed. Singular Drive grants 50% more Drive with 50% less Control and Reserve. Lean Grid applies 30% less Energy Usage for machines with an energy buffer and 50% less Energy Capacity. Family keystones are described on each machine page.
 
 Hover the machine's starting node to see current attribute totals. Tool Control retains its separate durability mechanic; these machine conversions do not change tools.
+
+## Tagged payoffs
+
+A tagged effect applies only to machines in its group, and only where the machine uses the stat. Tooltips show the group and its members, and mark the effect inactive on other machines.
+
+| Tag | Machines | Used by |
+| --- | --- | --- |
+| Heated machines | Furnace, Alloy Furnace, Metal Press | Low Heat Specialist and Flash Annealing speed |
+| Crushers | Crusher | Soft Material Specialist speed, Cell Bypass Energy Capacity |
+| Machines with an energy buffer | Every family except the Forestry Companion | Lean Grid Energy Usage reduction |
+
+Group membership follows each machine's real stat surface. Heated machines are those whose maximum temperature accepts absolute limits; the Melter is excluded because every Melter recipe needs more heat than those limits allow. Only the Crusher reads Output Amount and Parallel Jobs, so effects that raise them are inactive on every other machine.
+
+Untagged penalties still apply everywhere. Flash Annealing's 50% more Energy Usage and Soft Material Specialist's 50% more Energy Usage reach every machine that allocates them, as the Closed Loop Recuperator's speed penalty does.
 
 ## Modifier keywords and hard constraints
 
@@ -53,7 +67,7 @@ The canonical operation definitions are in [Affix Generation](affix-generation.m
 
 Two 50% reduced modifiers add to 100% reduced. Two 50% less modifiers leave 25%. A 100% less modifier leaves zero even with increased modifiers. “More” and “less” are written as percentages in tooltips and stored as factors in the catalog: `1.5` means 50% more; `0.75` means 25% less.
 
-Fixed values and hard ceilings resolve after ordinary modifiers, including Gear. A fixed maximum temperature of 800 sets it to 800; a ceiling of 800 only prevents exceeding 800. The lower value wins when absolute maximum values conflict. A recipe hardness ceiling rejects harder Crusher recipes regardless of installed head or processing level; ordinary under-level recipes retain their existing penalty behavior when no hard ceiling forbids them.
+Fixed values and hard ceilings resolve after ordinary modifiers, including Gear. A fixed maximum temperature of 800 sets it to 800; a ceiling of 800 only prevents exceeding 800. The lower value wins when absolute maximum values conflict. Keystone heat limits are ceilings, so Low Heat Specialist (800) and Flash Annealing (600) never raise a weaker heat source to their limit. A recipe hardness ceiling rejects harder Crusher recipes regardless of installed head or processing level; ordinary under-level recipes retain their existing penalty behavior when no hard ceiling forbids them.
 
 ## XP and chassis ownership
 
@@ -86,6 +100,6 @@ The Configurator has a dedicated Mastery mode. Sneak-use in air toggles between 
 
 The checked-in runtime catalog is `src/main/resources/data/rngtech/mastery/machine_tree.json`. `tools/moddex/layout-mega-tree.mjs` deterministically lays out the road layers, keystone placements, and reward constellations without crossings; `author-mega-tree.mjs` assigns attributes, themes, notable names, special notables, and keystones, then writes the catalog and language entries. ModDex reads this catalog directly; its JSON draft and Java layout exports remain authoring views rather than runtime catalog writers. Follow [Passive Tree Design Rules](../reference/passive-tree-design-rules.md) when changing geometry or routes.
 
-Run `node tools/moddex/check-mega-tree.mjs --report` to refresh the [audit report](../reference/machine-mega-tree-audit.json). It includes paths from all starts and representative 99-point builds combining local investment with distant keystones. `masteryCheck`, included in `quickCheck` and `ciCheck`, checks modifier math, migration, build ordering, connectivity, point budgets, attribute suppression, and hard constraints. `npm run moddex:check` checks catalog geometry and export consistency.
+Run `node tools/moddex/check-mega-tree.mjs --report` to refresh the [audit report](../reference/machine-mega-tree-audit.json). It includes paths from all starts and representative 99-point builds combining local investment with distant keystones. `masteryCheck`, included in `quickCheck` and `ciCheck`, checks modifier math, migration, build ordering, connectivity, point budgets, attribute suppression, hard constraints, tagged payoffs, and a keystone audit that fails when a payoff reaches a machine that escapes the keystone's cost. `npm run moddex:check` checks catalog geometry and export consistency.
 
 The implementation has automated domain and graph coverage. In-game interaction, multiplayer synchronization, and late-game balance still need focused playtesting.

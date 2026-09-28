@@ -151,6 +151,9 @@ public final class MegaPassiveTree {
             for (MachineModifierEffect effect : node.effects()) {
                 if (family.supports(effect.stat())) { apply(stats, effect.stat(), effect.operation(), effect.value()); }
             }
+            for (MegaPassiveNode.TaggedEffect tagged : node.tagged()) {
+                if (tagged.appliesTo(family)) { apply(stats, tagged.effect().stat(), tagged.effect().operation(), tagged.effect().value()); }
+            }
             node.fixed().forEach((stat, value) -> { if (family.supportsAbsolute(stat)) { stats.setAbsolute(stat, value); } });
             node.ceilings().forEach((stat, value) -> { if (family.supportsAbsolute(stat)) { stats.capAbsolute(stat, value); } });
         }
@@ -205,9 +208,12 @@ public final class MegaPassiveTree {
             for (JsonElement element : data.getAsJsonArray("nodes")) {
                 JsonObject raw = element.getAsJsonObject(); String id = raw.get("id").getAsString();
                 List<MachineModifierEffect> effects = new ArrayList<>();
+                List<MegaPassiveNode.TaggedEffect> tagged = new ArrayList<>();
                 for (JsonElement item : raw.getAsJsonArray("effects")) {
                     JsonObject e = item.getAsJsonObject();
-                    effects.add(MachineModifierEffect.fixed(MachineStat.valueOf(e.get("stat").getAsString()), ModifierOperation.valueOf(e.get("operation").getAsString()), e.get("value").getAsDouble()));
+                    MachineModifierEffect effect = MachineModifierEffect.fixed(MachineStat.valueOf(e.get("stat").getAsString()), ModifierOperation.valueOf(e.get("operation").getAsString()), e.get("value").getAsDouble());
+                    if (e.has("tag")) { tagged.add(new MegaPassiveNode.TaggedEffect(MachineTag.valueOf(e.get("tag").getAsString()), effect)); }
+                    else { effects.add(effect); }
                 }
                 Set<String> behaviors = new HashSet<>(); raw.getAsJsonArray("behaviors").forEach(e -> behaviors.add(e.getAsString()));
                 List<MegaPassiveNode.AttributeScaling> scaling = new ArrayList<>();
@@ -217,7 +223,7 @@ public final class MegaPassiveTree {
                 });
                 Map<PassiveStatType, Integer> passive = new HashMap<>();
                 raw.getAsJsonObject("passive").entrySet().forEach(e -> passive.put(PassiveStatType.valueOf(e.getKey()), e.getValue().getAsInt()));
-                MegaPassiveNode node = new MegaPassiveNode(nodes.size(), id, raw.get("name").getAsString(), PassiveNodeKind.valueOf(raw.get("kind").getAsString()), raw.get("x").getAsInt(), raw.get("y").getAsInt(), List.copyOf(links.getOrDefault(id, List.of())), List.copyOf(effects), Set.copyOf(behaviors), statsMap(raw.getAsJsonObject("fixed")), statsMap(raw.getAsJsonObject("ceilings")), List.copyOf(scaling), Map.copyOf(passive), raw.has("recipeHardnessCeiling") ? raw.get("recipeHardnessCeiling").getAsInt() : 0);
+                MegaPassiveNode node = new MegaPassiveNode(nodes.size(), id, raw.get("name").getAsString(), PassiveNodeKind.valueOf(raw.get("kind").getAsString()), raw.get("x").getAsInt(), raw.get("y").getAsInt(), List.copyOf(links.getOrDefault(id, List.of())), List.copyOf(effects), List.copyOf(tagged), Set.copyOf(behaviors), statsMap(raw.getAsJsonObject("fixed")), statsMap(raw.getAsJsonObject("ceilings")), List.copyOf(scaling), Map.copyOf(passive), raw.has("recipeHardnessCeiling") ? raw.get("recipeHardnessCeiling").getAsInt() : 0);
                 if (nodes.put(id, node) != null) { throw new IllegalStateException("Duplicate mastery node " + id); }
             }
             for (MegaPassiveNode node : nodes.values()) {
