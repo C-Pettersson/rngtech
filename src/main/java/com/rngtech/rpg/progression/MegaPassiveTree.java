@@ -160,30 +160,13 @@ public final class MegaPassiveTree {
             node.fixed().forEach((stat, value) -> { if (family.supportsAbsolute(stat)) { stats.setAbsolute(stat, value); } });
             node.ceilings().forEach((stat, value) -> { if (family.supportsAbsolute(stat)) { stats.capAbsolute(stat, value); } });
         }
-        double control = Math.max(0, stats.value(MachineStat.CONTROL));
-        double drive = Math.max(0, stats.value(MachineStat.DRIVE));
-        double reserve = Math.max(0, stats.value(MachineStat.RESERVE));
         if (has(state, "NO_BONUS_OUTPUT")) {
             NO_BONUS_OUTPUT_CEILINGS.forEach((stat, value) -> { if (family.supportsAbsolute(stat)) { stats.capAbsolute(stat, value); } });
         }
         if (!has(state, "NO_INHERENT_ATTRIBUTES")) {
-            apply(stats, MachineStat.STABILITY, ModifierOperation.INCREASED_PERCENT, control * 0.1);
-            apply(stats, MachineStat.ENERGY_USAGE, ModifierOperation.DECREASED_PERCENT, control * 0.02);
-            apply(stats, MachineStat.PROCESSING_SPEED, ModifierOperation.INCREASED_PERCENT, drive * 0.15);
-            if (family == MachineMasteryFamily.FORESTRY) {
-                apply(stats, MachineStat.TREE_FELL_LIMIT, ModifierOperation.ADD, Math.floor(drive / 20));
-            } else {
-                apply(stats, MachineStat.ENERGY_CAPACITY, ModifierOperation.INCREASED_PERCENT, reserve * 0.25);
-            }
-            switch (family) {
-                case FURNACE, ALLOY_FURNACE -> {
-                    apply(stats, MachineStat.TEMPERATURE_STABILITY, ModifierOperation.INCREASED_PERCENT, control * 0.05);
-                    apply(stats, MachineStat.HEAT_ISOLATION, ModifierOperation.INCREASED_PERCENT, reserve * 0.1);
-                }
-                case METAL_PRESS -> apply(stats, MachineStat.TEMPERATURE_STABILITY, ModifierOperation.INCREASED_PERCENT, control * 0.05);
-                case MELTER -> apply(stats, MachineStat.FLUID_TRANSFER, ModifierOperation.INCREASED_PERCENT, reserve * 0.1);
-                case RESONANCE_CALIBRATOR -> apply(stats, MachineStat.CALIBRATION_PRECISION, ModifierOperation.INCREASED_PERCENT, control * 0.05);
-                default -> { }
+            for (Conversion conversion : inherentConversions(family, stats.value(MachineStat.CONTROL), stats.value(MachineStat.DRIVE), stats.value(MachineStat.RESERVE))) {
+                MachineModifierEffect effect = conversion.effect();
+                apply(stats, effect.stat(), effect.operation(), effect.value());
             }
         }
         for (MegaPassiveNode node : allocated) {
@@ -193,6 +176,41 @@ public final class MegaPassiveTree {
                 }
             }
         }
+    }
+
+    /** An attribute's inherent contribution to one stat. */
+    public record Conversion(MachineStat attribute, MachineModifierEffect effect) {
+    }
+
+    /** Inherent attribute conversions for {@code family}, from final attribute totals; negative totals convert nothing. */
+    public static List<Conversion> inherentConversions(MachineMasteryFamily family, double control, double drive, double reserve) {
+        control = Math.max(0, control);
+        drive = Math.max(0, drive);
+        reserve = Math.max(0, reserve);
+        List<Conversion> conversions = new ArrayList<>();
+        conversions.add(conversion(MachineStat.CONTROL, MachineStat.STABILITY, ModifierOperation.INCREASED_PERCENT, control * 0.1));
+        conversions.add(conversion(MachineStat.CONTROL, MachineStat.ENERGY_USAGE, ModifierOperation.DECREASED_PERCENT, control * 0.02));
+        conversions.add(conversion(MachineStat.DRIVE, MachineStat.PROCESSING_SPEED, ModifierOperation.INCREASED_PERCENT, drive * 0.15));
+        if (family == MachineMasteryFamily.FORESTRY) {
+            conversions.add(conversion(MachineStat.DRIVE, MachineStat.TREE_FELL_LIMIT, ModifierOperation.ADD, Math.floor(drive / 20)));
+        } else {
+            conversions.add(conversion(MachineStat.RESERVE, MachineStat.ENERGY_CAPACITY, ModifierOperation.INCREASED_PERCENT, reserve * 0.25));
+        }
+        switch (family) {
+            case FURNACE, ALLOY_FURNACE -> {
+                conversions.add(conversion(MachineStat.CONTROL, MachineStat.TEMPERATURE_STABILITY, ModifierOperation.INCREASED_PERCENT, control * 0.05));
+                conversions.add(conversion(MachineStat.RESERVE, MachineStat.HEAT_ISOLATION, ModifierOperation.INCREASED_PERCENT, reserve * 0.1));
+            }
+            case METAL_PRESS -> conversions.add(conversion(MachineStat.CONTROL, MachineStat.TEMPERATURE_STABILITY, ModifierOperation.INCREASED_PERCENT, control * 0.05));
+            case MELTER -> conversions.add(conversion(MachineStat.RESERVE, MachineStat.FLUID_TRANSFER, ModifierOperation.INCREASED_PERCENT, reserve * 0.1));
+            case RESONANCE_CALIBRATOR -> conversions.add(conversion(MachineStat.CONTROL, MachineStat.CALIBRATION_PRECISION, ModifierOperation.INCREASED_PERCENT, control * 0.05));
+            default -> { }
+        }
+        return List.copyOf(conversions);
+    }
+
+    private static Conversion conversion(MachineStat attribute, MachineStat stat, ModifierOperation operation, double value) {
+        return new Conversion(attribute, MachineModifierEffect.fixed(stat, operation, value));
     }
 
     private static void apply(MachineStatAccumulator stats, MachineStat stat, ModifierOperation operation, double value) {

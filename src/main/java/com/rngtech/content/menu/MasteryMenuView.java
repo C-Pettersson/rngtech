@@ -4,22 +4,18 @@ import com.rngtech.rpg.MachineStat;
 import com.rngtech.rpg.progression.MachineMasteryFamily;
 import com.rngtech.rpg.progression.MachineMasteryHost;
 import com.rngtech.rpg.progression.MachineProgressionState;
+import com.rngtech.rpg.progression.MasteryApplicability;
 import com.rngtech.rpg.progression.PassiveNode;
 
-public interface MasteryMenuView<N extends PassiveNode> {
+public interface MasteryMenuView<N extends PassiveNode> extends MasteryApplicability {
     MachineMasteryHost masteryHost();
 
     MachineProgressionState masterySnapshot();
 
+    @Override
     MachineMasteryFamily masteryFamily();
 
     double masteryAttribute(MachineStat stat);
-
-    default boolean masterySupports(MachineStat stat) { return masteryFamily().supports(stat); }
-
-    default boolean masterySupportsAbsolute(MachineStat stat) { return masterySupports(stat) && masteryFamily().supportsAbsolute(stat); }
-
-    default boolean masterySupportsBehavior(String behavior) { return masteryFamily().supportsBehavior(behavior); }
 
     long machineXp();
 

@@ -12,10 +12,13 @@ import com.mojang.serialization.JsonOps;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /** Executable domain checks without launching a client or server. */
 public final class MasteryChecks {
@@ -30,6 +33,7 @@ public final class MasteryChecks {
         familyAdapters();
         taggedPayoffs();
         keystonePayoffsNeedTheirCosts();
+        bonusSummary();
         System.out.println("Machine mastery: " + checks + " checks passed");
     }
 
@@ -285,6 +289,7 @@ public final class MasteryChecks {
         return withStats.value(MachineStat.PROCESSING_SPEED) / withoutStats.value(MachineStat.PROCESSING_SPEED);
     }
 
+    private static final Map<MachineStat, Double> BASE_100 = Arrays.stream(MachineStat.values()).collect(Collectors.toMap(stat -> stat, stat -> 100.0));
     private static final Set<MachineStat> LOWER_IS_BETTER = Set.of(
             MachineStat.ENERGY_USAGE, MachineStat.WARMUP_TIME, MachineStat.COOLING_RATE, MachineStat.IDLE_LOSS);
     private static final Set<String> COST_BEHAVIORS = Set.of("BLOCK_BATTERY", "MATCHING_HEAD", "NO_BONUS_OUTPUT", "NO_INHERENT_ATTRIBUTES");
@@ -342,6 +347,42 @@ public final class MasteryChecks {
         List<MachineStat> all = new ArrayList<>(first);
         all.addAll(second);
         return all;
+    }
+
+    private static void bonusSummary() {
+        for (MachineMasteryFamily family : MachineMasteryFamily.values()) {
+            var state = build(family, "single_pass");
+            var totals = new MachineStatAccumulator(); MegaPassiveTree.applyStats(totals, state, family);
+            var lines = MasteryBonusSummary.of(state, MasteryApplicability.of(family), totals.value(MachineStat.CONTROL), totals.value(MachineStat.DRIVE), totals.value(MachineStat.RESERVE));
+            var direct = MachineStatAccumulator.componentBase(BASE_100);
+            var summarized = MachineStatAccumulator.componentBase(BASE_100);
+            for (String id : state.allocatedNodes()) {
+                MegaPassiveNode node = MegaPassiveTree.node(id);
+                node.effects().stream().filter(e -> family.supports(e.stat())).forEach(e -> direct.apply(new MachineModifier(ModifierSlot.IMPLICIT, e.stat(), e.operation(), e.value())));
+                node.tagged().stream().filter(t -> t.appliesTo(family)).forEach(t -> direct.apply(new MachineModifier(ModifierSlot.IMPLICIT, t.effect().stat(), t.effect().operation(), t.effect().value())));
+            }
+            Set<MachineStat> touched = new HashSet<>();
+            for (var line : lines) {
+                if (line.kind() == MasteryBonusSummary.Kind.EFFECT && line.active()) {
+                    summarized.apply(new MachineModifier(ModifierSlot.IMPLICIT, line.effect().stat(), line.effect().operation(), line.effect().value()));
+                    touched.add(line.effect().stat());
+                }
+            }
+            for (MachineStat stat : touched) {
+                near(summarized.value(stat), direct.value(stat), family + " summary combines " + stat + " like the stat pipeline");
+            }
+            boolean paysOutput = family.has(MachineTag.BONUS_OUTPUT);
+            require(lines.stream().anyMatch(line -> line.kind() == MasteryBonusSummary.Kind.BEHAVIOR && "NO_BONUS_OUTPUT".equals(line.behavior()) && line.active() == paysOutput),
+                    family + " summary marks Single Pass's cost active only where it applies");
+            require(lines.stream().anyMatch(line -> line.kind() == MasteryBonusSummary.Kind.EFFECT && line.effect().stat() == MachineStat.PROCESSING_SPEED
+                    && line.effect().operation() == ModifierOperation.MORE && line.active() == paysOutput && line.sources().contains(MegaPassiveTree.node("single_pass"))),
+                    family + " summary lists the tagged speed payoff with its source");
+            require(lines.stream().anyMatch(line -> line.kind() == MasteryBonusSummary.Kind.CONVERSION),
+                    family + " summary shows inherent attribute conversions");
+        }
+        var transfigured = build(MachineMasteryFamily.CRUSHER, "attribute_transfiguration");
+        require(MasteryBonusSummary.of(transfigured, MasteryApplicability.of(MachineMasteryFamily.CRUSHER), 10, 10, 10).stream().noneMatch(line -> line.kind() == MasteryBonusSummary.Kind.CONVERSION),
+                "no inherent bonuses removes conversions from the summary");
     }
 
     private static MachineProgressionState build(MachineMasteryFamily family, String destination) {

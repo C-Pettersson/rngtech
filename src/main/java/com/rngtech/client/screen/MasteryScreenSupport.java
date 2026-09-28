@@ -33,6 +33,7 @@ import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.ComponentUtils;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.util.Mth;
 import net.neoforged.neoforge.network.PacketDistributor;
 import org.joml.Matrix4f;
@@ -74,6 +75,7 @@ public final class MasteryScreenSupport<N extends PassiveNode> {
     private static final float MASTERY_MIN_ICON_SIZE = 5.0F;
     private static final float MASTERY_DETAIL_RADIUS = 2.5F;
     private static final long MASTERY_PENDING_TIMEOUT_MS = 1500L;
+    private static final int MASTERY_TOOLTIP_WIDTH = 240;
     private static final int ROUTE_READY = 0xFFF2E6C2;
     private static final int ROUTE_BLOCKED = 0xFFC8604E;
     private static final int SEARCH_HIGHLIGHT = 0xFFFFFF80;
@@ -99,6 +101,7 @@ public final class MasteryScreenSupport<N extends PassiveNode> {
     private final int[] linkTo;
     private final List<ResourceLocation> iconTextures;
     private final int[][] iconPositions;
+    private final MasterySummaryDrawer summary;
 
     private final BitSet allocated = new BitSet();
     private final BitSet pending = new BitSet();
@@ -214,6 +217,7 @@ public final class MasteryScreenSupport<N extends PassiveNode> {
         this.iconPositions = iconGroups.values().stream()
                 .map(positions -> positions.stream().mapToInt(Integer::intValue).toArray())
                 .toArray(int[][]::new);
+        this.summary = new MasterySummaryDrawer(view, node -> position(node) >= 0 ? nodeTooltip(position(node)) : List.of());
     }
 
     public boolean expanded() {
@@ -291,6 +295,9 @@ public final class MasteryScreenSupport<N extends PassiveNode> {
         shapes.flush();
         drawIcons(guiGraphics, leftPos, topPos, viewLeft, viewTop, viewRight, viewBottom);
         guiGraphics.disableScissor();
+        if (expanded) {
+            summary.render(guiGraphics, Minecraft.getInstance().font, viewBounds(leftPos, topPos, imageWidth, imageHeight), mouseX, mouseY);
+        }
     }
 
     public void drawLabels(GuiGraphics guiGraphics, Font font, int imageWidth) {
@@ -350,6 +357,15 @@ public final class MasteryScreenSupport<N extends PassiveNode> {
             guiGraphics.renderComponentTooltip(font, List.of(xpTooltip()), mouseX, mouseY);
             return;
         }
+        if (expanded) {
+            List<Component> drawer = summary.tooltip(viewBounds(leftPos, topPos, imageWidth, imageHeight), font, mouseX, mouseY);
+            if (!drawer.isEmpty()) {
+                List<FormattedCharSequence> lines = new ArrayList<>();
+                drawer.forEach(line -> lines.addAll(font.split(line, MASTERY_TOOLTIP_WIDTH)));
+                guiGraphics.renderTooltip(font, lines, mouseX, mouseY);
+                return;
+            }
+        }
         int hovered = panning() ? -1 : hoveredNode(leftPos, topPos, imageWidth, imageHeight, mouseX, mouseY);
         if (hovered >= 0) {
             guiGraphics.renderComponentTooltip(font, nodeTooltip(hovered), mouseX, mouseY);
@@ -403,6 +419,9 @@ public final class MasteryScreenSupport<N extends PassiveNode> {
         if (searchFocused) { return true; }
         if (isOverExpandButton(leftPos, topPos, imageWidth, mouseX, mouseY)) {
             toggleExpanded(imageWidth, imageHeight);
+            return true;
+        }
+        if (expanded && summary.mouseClicked(viewBounds(leftPos, topPos, imageWidth, imageHeight), mouseX, mouseY)) {
             return true;
         }
         if (isOverViewport(leftPos, topPos, imageWidth, imageHeight, mouseX, mouseY)) {
@@ -476,6 +495,9 @@ public final class MasteryScreenSupport<N extends PassiveNode> {
     ) {
         if (!isOverViewport(leftPos, topPos, imageWidth, imageHeight, mouseX, mouseY)) {
             return false;
+        }
+        if (expanded && summary.mouseScrolled(viewBounds(leftPos, topPos, imageWidth, imageHeight), Minecraft.getInstance().font, mouseX, mouseY, scrollY)) {
+            return true;
         }
         boolean horizontal = Math.abs(scrollX) > Math.abs(scrollY);
         double scrollAmount = horizontal ? scrollX : scrollY;
@@ -635,7 +657,7 @@ public final class MasteryScreenSupport<N extends PassiveNode> {
 
     private boolean relevant(MegaPassiveNode node) {
         return node.effects().stream().anyMatch(effect -> view.masterySupports(effect.stat()))
-                || node.tagged().stream().anyMatch(tagged -> tagged.appliesTo(view.masteryFamily()))
+                || node.tagged().stream().anyMatch(view::masterySupports)
                 || node.scaling().stream().anyMatch(effect -> view.masterySupports(effect.stat()))
                 || node.fixed().keySet().stream().anyMatch(view::masterySupportsAbsolute)
                 || node.ceilings().keySet().stream().anyMatch(view::masterySupportsAbsolute)
@@ -959,7 +981,7 @@ public final class MasteryScreenSupport<N extends PassiveNode> {
             // Tagged payoffs come first, then the costs every machine pays.
             for (var tagged : shared.tagged()) {
                 Component text = taggedText(tagged);
-                tooltip.add(tagged.appliesTo(view.masteryFamily()) ? text.copy().withStyle(ChatFormatting.GRAY)
+                tooltip.add(view.masterySupports(tagged) ? text.copy().withStyle(ChatFormatting.GRAY)
                         : Component.translatable("rngtech.mastery.inactive", text).withStyle(ChatFormatting.DARK_GRAY));
                 List<Component> members = tagged.tag().members().stream().map(family -> (Component) Component.translatable(family.translationKey())).toList();
                 tooltip.add(Component.translatable("rngtech.mastery.tag.members", Component.translatable(tagged.tag().translationKey()),
@@ -1045,7 +1067,8 @@ public final class MasteryScreenSupport<N extends PassiveNode> {
     }
 
     private int hoveredNode(int leftPos, int topPos, int imageWidth, int imageHeight, double mouseX, double mouseY) {
-        if (!isOverViewport(leftPos, topPos, imageWidth, imageHeight, mouseX, mouseY)) {
+        if (!isOverViewport(leftPos, topPos, imageWidth, imageHeight, mouseX, mouseY)
+                || expanded && summary.covers(viewBounds(leftPos, topPos, imageWidth, imageHeight), mouseX, mouseY)) {
             return -1;
         }
         double contentX = screenToContentX(mouseX, leftPos);
@@ -1130,6 +1153,10 @@ public final class MasteryScreenSupport<N extends PassiveNode> {
                 && mouseX < leftPos + viewRight(imageWidth)
                 && mouseY >= topPos + MASTERY_VIEW_Y
                 && mouseY < topPos + viewBottom(imageHeight);
+    }
+
+    private MasterySummaryDrawer.Bounds viewBounds(int leftPos, int topPos, int imageWidth, int imageHeight) {
+        return new MasterySummaryDrawer.Bounds(leftPos + MASTERY_VIEW_X, topPos + MASTERY_VIEW_Y, leftPos + viewRight(imageWidth), topPos + viewBottom(imageHeight));
     }
 
     private static boolean isOverSearch(int leftPos, int topPos, int imageWidth, double mouseX, double mouseY) {
