@@ -86,7 +86,7 @@ public final class MasteryChecks {
     }
 
     private static void graphAndBuilds() {
-        require(MegaPassiveTree.TREE.nodes().size() == 1300, "full shared catalog");
+        require(MegaPassiveTree.TREE.nodes().size() == 1315, "full shared catalog");
         for (MegaPassiveNode root : MegaPassiveTree.TREE.nodes().stream().filter(n -> n.kind() == PassiveNodeKind.STARTER).toList()) {
             require(root.links().size() == 3, "three exits per starter");
             for (MegaPassiveNode key : MegaPassiveTree.TREE.nodes().stream().filter(n -> n.kind() == PassiveNodeKind.KEYSTONE).toList()) {
@@ -247,12 +247,32 @@ public final class MasteryChecks {
             double lowHeat = speedGain(family, "low_heat_specialist");
             near(lowHeat, family.has(MachineTag.HEATED) ? 2 : 1, family + " gains Low Heat Specialist speed only when it is a heated machine");
             near(speedGain(family, "soft_material_specialist"), family == MachineMasteryFamily.CRUSHER ? 3 : 1, family + " gains Soft Material Specialist speed only as a Crusher");
+            near(speedGain(family, "single_pass"), family.has(MachineTag.BONUS_OUTPUT) ? 1.3 : 1, family + " gains Single Pass speed only with bonus output to give up");
         }
+        require(!MachineMasteryFamily.FORESTRY.has(MachineTag.BONUS_OUTPUT) && !MachineMasteryFamily.MELTER.has(MachineTag.BONUS_OUTPUT)
+                && MachineMasteryFamily.METAL_PRESS.has(MachineTag.BONUS_OUTPUT), "bonus output follows Output Amount and Super Output support");
 
         var furnace = build(MachineMasteryFamily.FURNACE, "low_heat_specialist");
         var weakHeat = new MachineStatAccumulator(); MegaPassiveTree.applyStats(weakHeat, furnace, MachineMasteryFamily.FURNACE);
         effect(weakHeat, ModifierOperation.ADD, 300);
         near(weakHeat.value(MachineStat.MAX_TEMPERATURE), 300, "a heat ceiling never raises a weak heat source to its limit");
+
+        var crusher = build(MachineMasteryFamily.CRUSHER, "single_pass");
+        var output = MachineStatAccumulator.componentBase(Map.of(MachineStat.OUTPUT_AMOUNT, 1.0, MachineStat.SUPER_OUTPUT_CHANCE, 0.0, MachineStat.CRUSHER_SALVAGE_CHANCE, 0.0));
+        MegaPassiveTree.applyStats(output, crusher, MachineMasteryFamily.CRUSHER);
+        output.apply(new MachineModifier(ModifierSlot.IMPLICIT, MachineStat.OUTPUT_AMOUNT, ModifierOperation.INCREASED_PERCENT, 50));
+        output.apply(new MachineModifier(ModifierSlot.IMPLICIT, MachineStat.SUPER_OUTPUT_CHANCE, ModifierOperation.ADD, 25));
+        output.apply(new MachineModifier(ModifierSlot.IMPLICIT, MachineStat.CRUSHER_SALVAGE_CHANCE, ModifierOperation.ADD, 5));
+        near(output.value(MachineStat.OUTPUT_AMOUNT), 1, "Single Pass stops Gear from raising Output Amount above the base");
+        near(output.value(MachineStat.SUPER_OUTPUT_CHANCE), 0, "Single Pass removes Super Output chance");
+        near(output.value(MachineStat.CRUSHER_SALVAGE_CHANCE), 0, "Single Pass removes salvage chance");
+        var penalized = MachineStatAccumulator.componentBase(Map.of(MachineStat.OUTPUT_AMOUNT, 0.75));
+        MegaPassiveTree.applyStats(penalized, crusher, MachineMasteryFamily.CRUSHER);
+        near(penalized.value(MachineStat.OUTPUT_AMOUNT), 0.75, "Single Pass never lifts a penalized Output Amount");
+        var press = build(MachineMasteryFamily.METAL_PRESS, "single_pass");
+        var pressOutput = MachineStatAccumulator.componentBase(Map.of(MachineStat.SUPER_OUTPUT_CHANCE, 10.0));
+        MegaPassiveTree.applyStats(pressOutput, press, MachineMasteryFamily.METAL_PRESS);
+        near(pressOutput.value(MachineStat.SUPER_OUTPUT_CHANCE), 0, "Single Pass removes a Metal Press's Super Output");
     }
 
     /** Speed multiplier the destination keystone adds on top of the route that reaches it. */
@@ -267,7 +287,7 @@ public final class MasteryChecks {
 
     private static final Set<MachineStat> LOWER_IS_BETTER = Set.of(
             MachineStat.ENERGY_USAGE, MachineStat.WARMUP_TIME, MachineStat.COOLING_RATE, MachineStat.IDLE_LOSS);
-    private static final Set<String> COST_BEHAVIORS = Set.of("BLOCK_BATTERY", "MATCHING_HEAD", "NO_INHERENT_ATTRIBUTES");
+    private static final Set<String> COST_BEHAVIORS = Set.of("BLOCK_BATTERY", "MATCHING_HEAD", "NO_BONUS_OUTPUT", "NO_INHERENT_ATTRIBUTES");
 
     /**
      * A keystone's payoff must never reach a machine that escapes its cost. Limits and restricting behaviors are the

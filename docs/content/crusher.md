@@ -72,6 +72,7 @@ Current Mastery hooks:
 - Precision Jaw Mount grants 10% increased Output Amount and +2 percentage points of salvage chance. An installed Crush Head must match the chassis stage.
 - Dense Batching enables Dense Parallel, adds two parallel jobs, and applies 25% less Processing Speed and 25% more Energy Usage.
 - Soft Material Specialist grants 200% more Processing Speed and 50% more Energy Usage, but forbids recipes above hardness 2 even with a stronger head. Its speed is [tagged](../systems/machine-mastery.md#tagged-payoffs) for Crushers, as is Cell Bypass's Energy Capacity, because only a Crusher pays their hardness and Battery Cell costs.
+- Single Pass disables bonus output: Output Amount cannot exceed the base, and Super Output and salvage chances drop to zero. In exchange it grants 30% more Processing Speed. It never raises the no-cell Output Amount penalty.
 - Heavy Yield grants 15% more Output Amount and 50% more Energy Usage.
 - Component Mount, Reinforced Mount, Stage Adapter, and Universal Bracket each support one higher Crush Head stage; Precision Jaw Mount still requires an exact match. Silent Operation mutes the machine's client-side loop and cues.
 

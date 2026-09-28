@@ -12,6 +12,8 @@ public enum MachineTag {
     /** Furnace, Alloy Furnace, and Metal Press: heat machines whose maximum temperature accepts absolute limits. */
     HEATED,
     CRUSHING,
+    /** Machines that can produce bonus output through Output Amount, Super Output, or salvage. */
+    BONUS_OUTPUT,
     ENERGY_BUFFER;
 
     public String translationKey() {

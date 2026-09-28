@@ -4,6 +4,7 @@ import { CENTER, START_ANGLES, layoutMegaTree } from "./layout-mega-tree.mjs";
 
 // Deterministic authoring source. Runtime and ModDex read the same checked-in catalog.
 export const TREE_VERSION = 2;
+// Nodes placed by the original fill; EXTRAS append after it, so the catalog holds more.
 export const TOTAL_NODES = 1300;
 const ATTRIBUTES = ["CONTROL", "DRIVE", "RESERVE"];
 const STARTS = ["control", "control_drive", "drive", "drive_reserve", "reserve", "reserve_control"];
@@ -130,7 +131,16 @@ const KEYSTONES = [
     { id: "reserve_actuation", layer: "core", name: "Reserve Actuation", behaviors: ["NO_INHERENT_ATTRIBUTES"], scaling: [{ attribute: "RESERVE", stat: "PROCESSING_SPEED", operation: "INCREASED_PERCENT", perPoint: 0.5 }] },
     { id: "cold_standby", name: "Cold Standby", effects: [effect("IDLE_LOSS", 0.4, "LESS"), effect("ENERGY_TRANSFER", 0.5, "LESS")] },
     { id: "regulated_heat", name: "Regulated Heat", ceilings: { MAX_TEMPERATURE: 1000 }, effects: [effect("TEMPERATURE_STABILITY", 1.8, "MORE")] },
-    { id: "measured_recovery", name: "Measured Recovery", effects: [effect("OUTPUT_AMOUNT", 1.1, "MORE"), effect("PROCESSING_SPEED", 0.65, "LESS")] }
+    { id: "measured_recovery", name: "Measured Recovery", effects: [effect("OUTPUT_AMOUNT", 1.1, "MORE"), effect("PROCESSING_SPEED", 0.65, "LESS")] },
+    { id: "single_pass", extra: "single_pass", name: "Single Pass", behaviors: ["NO_BONUS_OUTPUT"], effects: [tagged("BONUS_OUTPUT", effect("PROCESSING_SPEED", 1.3, "MORE"))] }
+];
+
+// Additions placed after the original fill, in design coordinates. Output constellations mirror Clean Dust Ledge on the
+// left, and Single Pass sits between them so trading bonus output for speed is a local choice.
+const EXTRAS = [
+    { id: "left_recovery_upper", angle: -122, radius: 3250, shapes: ["wheel"], theme: "recovery" },
+    { id: "left_recovery_lower", angle: 158, radius: 3050, shapes: ["wheel"], theme: "recovery" },
+    { id: "single_pass", angle: -150, radius: 2900, shapes: ["keyDirect"], keystone: true, layer: "outer" }
 ];
 
 const regionAt = angle => {
@@ -144,7 +154,7 @@ const offsetFrom = (angle, region) => ((angle - START_ANGLES[region]) % 360 + 54
 
 export function createMegaTree() {
     // Distances to the center keystone tie; it faces the Crusher's Drive start.
-    const layout = layoutMegaTree({ starts: STARTS, totalNodes: TOTAL_NODES, keystones: KEYSTONES.length, centerFacing: "drive" });
+    const layout = layoutMegaTree({ starts: STARTS, totalNodes: TOTAL_NODES, keystones: KEYSTONES.filter(k => !k.extra).length, centerFacing: "drive", extras: EXTRAS });
     const byId = new Map(layout.nodes.map(node => [node.id, node]));
     const angleOf = node => Math.atan2(node.y - CENTER.y, node.x - CENTER.x) * 180 / Math.PI;
     const content = new Map();
@@ -179,7 +189,7 @@ export function createMegaTree() {
         const themes = pocket.layer === "core" ? CORE_THEMES
             : pocket.layer === "home" || Math.abs(offset) < 12 ? REGION_THEMES[STARTS[region]]
                 : [...REGION_THEMES[STARTS[region]], ...REGION_THEMES[neighbor]];
-        const chosen = themes.reduce((best, key) => (usage.get(key) ?? 0) < (usage.get(best) ?? 0) ? key : best);
+        const chosen = EXTRAS.find(e => e.id === pocket.extra)?.theme ?? themes.reduce((best, key) => (usage.get(key) ?? 0) < (usage.get(best) ?? 0) ? key : best);
         const notables = pocket.nodes.filter(id => byId.get(id).kind === "NOTABLE").length;
         usage.set(chosen, (usage.get(chosen) ?? 0) + notables);
         return { ...pocket, region: STARTS[region], theme: chosen };
@@ -191,7 +201,8 @@ export function createMegaTree() {
         }
         throw new Error(`Theme ${key} needs more notable names`);
     };
-    const notableSlots = pockets.flatMap(pocket => pocket.nodes.filter(id => byId.get(id).kind === "NOTABLE").map(id => ({ id, pocket })));
+    const notableSlots = pockets.filter(pocket => !pocket.extra)
+        .flatMap(pocket => pocket.nodes.filter(id => byId.get(id).kind === "NOTABLE").map(id => ({ id, pocket })));
 
     // Special notables replace ordinary notables in chosen regions and layers, one per pocket and spread apart.
     const special = new Map(), claimed = [];
@@ -219,11 +230,12 @@ export function createMegaTree() {
     const slotLayer = layer => layer === "center" || layer === "core" ? layer : "ring";
     const keystoneFor = new Map();
     for (const layer of ["center", "core", "ring"]) {
-        const wanted = KEYSTONES.filter(k => (k.layer ?? "ring") === layer);
-        const slots = layout.keystones.filter(k => slotLayer(k.layer) === layer).map(k => byId.get(k.id)).sort((a, b) => angleOf(a) - angleOf(b));
+        const wanted = KEYSTONES.filter(k => !k.extra && (k.layer ?? "ring") === layer);
+        const slots = layout.keystones.filter(k => !k.extra && slotLayer(k.layer) === layer).map(k => byId.get(k.id)).sort((a, b) => angleOf(a) - angleOf(b));
         if (slots.length !== wanted.length) throw new Error(`Expected ${wanted.length} ${layer} keystone slots, found ${slots.length}`);
         slots.forEach((node, i) => keystoneFor.set(node.id, wanted[i]));
     }
+    for (const slot of layout.keystones.filter(k => k.extra)) keystoneFor.set(slot.id, KEYSTONES.find(k => k.extra === slot.extra));
 
     // Notables and keystones take IDs from their names; ordinary pocket nodes follow their pocket's first notable.
     const rename = new Map(), nodes = [], keystoneNodes = [];
@@ -247,7 +259,7 @@ export function createMegaTree() {
             if (kind === "NODE") build(id, `${base}_${++small}`, { name: t.name, kind, effects: [effect(t.primary[0], t.small, t.primary[1])] });
             if (kind === "NOTABLE") build(id, slug(entries.get(id).name), { kind, ...entries.get(id) });
             if (kind === "KEYSTONE") {
-                const { id: keystoneId, layer, ...keystone } = keystoneFor.get(id);
+                const { id: keystoneId, layer, extra, ...keystone } = keystoneFor.get(id);
                 build(id, keystoneId, { kind, ...keystone }, keystoneNodes);
             }
         }

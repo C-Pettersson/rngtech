@@ -5,7 +5,7 @@ import { KEYSTONE_START_DISTANCE } from "./layout-mega-tree.mjs";
 
 export const megaCatalogUrl = new URL("../../src/main/resources/data/rngtech/mastery/machine_tree.json", import.meta.url);
 export const diameters = { STARTER: 40, TRAVEL: 12, NODE: 18, NOTABLE: 34, KEYSTONE: 48 };
-export const CATALOG_NODES = 1300;
+export const CATALOG_NODES = 1315;
 // Points earned from levels 2-100. Allocation storage allows 120 for future non-level sources.
 export const LEVEL_POINTS = 99;
 

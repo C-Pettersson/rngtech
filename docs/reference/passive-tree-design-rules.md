@@ -33,7 +33,7 @@ Version 3 rewarded density and produced tangled links. Version 4 added a fitted-
 
 Version 7 moves the starts outward to leave room for core pathing, builds the road network in distinct layers with varied travel between them, adds larger reward constellations, and spreads keystones through every layer, directly on roads or at the end of reward arms, away from the starts. The catalog grows to 1300 nodes, and machines reach level 100.
 
-Version 8 ties keystone payoffs to their costs with machine tags, after Low Heat Specialist doubled the speed of machines that could never feel its heat limit.
+Version 8 ties keystone payoffs to their costs with machine tags, after Low Heat Specialist doubled the speed of machines that could never feel its heat limit. It also appends new content after the original fill instead of relaying the tree.
 
 ## Runtime and topology constraints
 
@@ -92,9 +92,11 @@ Repeat broad goals across several regions: processing speed, energy efficiency, 
 
 Keep the distinction between increased/reduced, more/less, flat additions, and absolute constraints. Changing a path must not silently change the meaning of its rewards.
 
+Spread output handling too. Output constellations exist on both sides of the tree, so a build that paths away from the Drive start still meets output rewards.
+
 ### Tie keystone payoffs to their costs
 
-Every node stays selectable on every machine, and an irrelevant benefit leaves its relevant penalty in place. The reverse must not happen: a machine that escapes a keystone's cost must not keep its payoff. When the defining cost is family-specific (a heat limit, a hardness ceiling, or a blocked Gear slot), tag the payoff with the [machine group](../systems/machine-mastery.md#tagged-payoffs) that pays the cost. A payoff that belongs with a generic penalty, such as energy usage every machine pays, needs no tag. Use ceilings rather than fixed values for keystone limits, so a limit never raises a weak machine to it. `masteryCheck` audits every keystone against every machine family and fails when a payoff reaches a family that receives none of the keystone's costs, or none of its limits.
+Every node stays selectable on every machine, and an irrelevant benefit leaves its relevant penalty in place. The reverse must not happen: a machine that escapes a keystone's cost must not keep its payoff. When the defining cost is family-specific (a heat limit, a hardness ceiling, a blocked Gear slot, or disabled bonus output), tag the payoff with the [machine group](../systems/machine-mastery.md#tagged-payoffs) that pays the cost. A payoff that belongs with a generic penalty, such as energy usage every machine pays, needs no tag. Use ceilings rather than fixed values for keystone limits, so a limit never raises a weak machine to it. `masteryCheck` audits every keystone against every machine family and fails when a payoff reaches a family that receives none of the keystone's costs, or none of its limits.
 
 ### Place keystones as commitments
 
@@ -110,7 +112,7 @@ Use the median cross-group link length for the fitted long-chord threshold: max(
 
 Endpoints should occupy at least five of eight angular sectors, with no empty arc larger than 120 degrees. Do not add a seventh synthetic starter when importing the catalog.
 
-The current catalog has 1300 nodes and 1445 links: 6 starts, 634 travel nodes, 446 ordinary nodes, 184 notables, and 30 keystones. Its cycle rank is 146. Reward constellations use 120 road gates: 17 wheels, 4 stars, 4 crowns, 3 lattices, 6 rings, 11 horseshoes, 21 chains, 12 forks, 10 diamonds, 2 arcs, and 18 keystone arms. Twelve more keystones sit directly on roads, outer star hubs, or the center junction. By radius, 4 keystones are in the core, 9 in home regions, 9 in the outer field, 4 on the perimeter road, and 4 beyond it. Notables cost three to seven reward points from their gates. Keystones are 10 to 46 points from each start; Silent Operation, on the center junction, is exactly 10 from every start. The [generated audit](machine-mega-tree-audit.json) records the exact geometry, distances, and representative 99-point builds.
+The current catalog has 1315 nodes and 1464 links: 6 starts, 634 travel nodes, 458 ordinary nodes, 186 notables, and 31 keystones. Its cycle rank is 150. Reward constellations use 123 road gates: 19 wheels, 4 stars, 4 crowns, 3 lattices, 6 rings, 11 horseshoes, 21 chains, 12 forks, 10 diamonds, 2 arcs, and 18 keystone arms. Thirteen more keystones sit directly on roads, outer star hubs, or the center junction. By radius, 4 keystones are in the core, 9 in home regions, 10 in the outer field, 4 on the perimeter road, and 4 beyond it. The original 1300-node fill is unchanged; two left-side Recovery wheels and the Single Pass keystone were appended after it. Notables cost three to seven reward points from their gates. Keystones are 10 to 46 points from each start; Silent Operation, on the center junction, is exactly 10 from every start. The [generated audit](machine-mega-tree-audit.json) records the exact geometry, distances, and representative 99-point builds.
 
 The legacy small-tree review ranges remain useful for the historical reference only: node cycle rank 15–30%, bridge edges up to 20% excluding keystone endpoints, degree-two corridors up to five nodes, and articulation review above 25%. For its 25–35 groups, review cross-group ratios of 25–40%, group cycle rank at least max(8, ceil(groupCount * 0.25)), group articulation up to 35%, group bridges up to 20%, and low-degree group corridors up to three groups. These are not shared-tree targets.
 
@@ -124,6 +126,8 @@ The legacy small-tree review ranges remain useful for the historical reference o
 6. Check investment costs, keystone distances, runtime reachability, geometry, and the fitted render.
 
 `tools/moddex/layout-mega-tree.mjs` owns steps 1–3, and `author-mega-tree.mjs` owns step 4. Do not add links to chase cycle rank or reduce bridge counts after the composition works.
+
+Add later content through `EXTRAS` in `author-mega-tree.mjs`. Each entry names a target position, allowed shapes, and a theme or keystone. The layout places extras after the original fill, and special notables and angle-ordered keystone slots ignore them, so every earlier node keeps its ID, position, and links without a catalog version bump.
 
 ## Historical Forestry Companion reference result
 

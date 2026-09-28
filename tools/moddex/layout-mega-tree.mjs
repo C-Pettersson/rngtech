@@ -95,7 +95,7 @@ function starPoints() {
     });
 }
 
-export function layoutMegaTree({ starts, totalNodes, keystones, centerFacing }) {
+export function layoutMegaTree({ starts, totalNodes, keystones, centerFacing, extras = [] }) {
     let seed = 0x5eed17;
     const random = () => { seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0; return seed / 4294967296; };
     const nodes = [], byId = new Map(), adjacency = new Map(), links = [], groups = [];
@@ -389,11 +389,11 @@ export function layoutMegaTree({ starts, totalNodes, keystones, centerFacing }) 
             return next - angle >= 100 ? [angle + (next - angle) / 2] : [];
         });
     };
-    const placeKeystone = (gates, directionsOf, shapes, turns, layer) => {
+    const placeKeystone = (gates, directionsOf, shapes, turns, layer, extra) => {
         for (const gate of gates) for (const direction of directionsOf(gate)) {
             const allowed = shapes.filter(name => startDistance.get(gate.id) + keystoneDepth[name] >= KEYSTONE_START_DISTANCE);
             const created = tryPlace(gate, direction, allowed, turns);
-            if (created) return keystoneNodes.push({ id: created.find(n => n.kind === "KEYSTONE").id, layer });
+            if (created) return keystoneNodes.push({ id: created.find(n => n.kind === "KEYSTONE").id, layer, ...(extra ? { extra } : {}) });
         }
         return 0;
     };
@@ -463,6 +463,28 @@ export function layoutMegaTree({ starts, totalNodes, keystones, centerFacing }) 
         if (!created) { candidate.dead = true; continue; }
         placedRewards += created.length;
         for (const other of candidates) if (!other.dead && distance(other.gate, candidate.gate) < 700) other.clearance = clearance(other);
+    }
+
+    // Later additions are placed after the original fill, so every earlier node keeps its ID and position.
+    for (const extra of extras) {
+        const point = at(extra.radius, extra.angle);
+        const toward = gate => gapDirections(gate).sort((a, b) => Math.abs(normalize(a - angleOf(point, gate))) - Math.abs(normalize(b - angleOf(point, gate))));
+        const turns = [0, 12, -12, 24, -24, 36, -36];
+        let placed = false;
+        for (const reach of [260, 420, 600]) {
+            const gates = nodes.filter(n => n.kind === "TRAVEL" && distance(n, point) < reach).sort((a, b) => distance(a, point) - distance(b, point));
+            if (extra.keystone) {
+                placed = placeKeystone(gates, toward, extra.shapes, turns, extra.layer, extra.id) > 0;
+            } else {
+                for (const gate of gates) {
+                    for (const direction of toward(gate)) if (!placed && tryPlace(gate, direction, extra.shapes, turns)) placed = true;
+                    if (placed) break;
+                }
+            }
+            if (placed) break;
+        }
+        if (!placed) throw new Error(`Cannot place ${extra.id}`);
+        pockets.at(-1).extra = extra.id;
     }
 
     for (const node of nodes) { node.x = Math.round(node.x); node.y = Math.round(node.y); }

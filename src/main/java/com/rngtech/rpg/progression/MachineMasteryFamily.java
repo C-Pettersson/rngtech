@@ -26,6 +26,7 @@ public enum MachineMasteryFamily {
         return switch (tag) {
             case HEATED -> heatChassis();
             case CRUSHING -> this == CRUSHER;
+            case BONUS_OUTPUT -> supports(MachineStat.OUTPUT_AMOUNT) || supports(MachineStat.SUPER_OUTPUT_CHANCE);
             case ENERGY_BUFFER -> supports(MachineStat.ENERGY_CAPACITY);
         };
     }
@@ -33,6 +34,7 @@ public enum MachineMasteryFamily {
     public boolean supportsBehavior(String behavior) {
         return switch (behavior) {
             case "NO_INHERENT_ATTRIBUTES", "MUTE_MACHINE_SOUND" -> true;
+            case "NO_BONUS_OUTPUT" -> has(MachineTag.BONUS_OUTPUT);
             case "BLOCK_BATTERY", "MATCHING_HEAD", "DENSE_PARALLEL" -> this == CRUSHER;
             case "QUENCH_PROTOCOL", "CLOSED_LOOP_RECUPERATOR" -> this == FURNACE;
             case "MAGNET_MODE", "SERRATED_LEAF_PROTOCOL", "MANUAL_THROTTLE", "COASTING_CLUTCH", "SEEDLING_MAGNET" -> this == FORESTRY;

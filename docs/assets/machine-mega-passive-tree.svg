@@ -1,8 +1,8 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="1829 1536 4369 4769" width="1200" height="1310" role="img" aria-labelledby="title description">
 <title id="title">RNGTech shared machine passive tree</title>
-<desc id="description">1300 nodes, six starts, 1445 links. Control in green, Drive in copper, Reserve in blue. White notables and violet keystones. Each machine earns 99 points by level 100.</desc>
+<desc id="description">1315 nodes, six starts, 1464 links. Control in green, Drive in copper, Reserve in blue. White notables and violet keystones. Each machine earns 99 points by level 100.</desc>
 <rect x="1829" y="1536" width="4369" height="4769" fill="#111820"/>
-<g font-family="sans-serif" fill="#e5ecf3"><text x="1909" y="1686" font-size="96">Machine Mastery</text><text x="1914" y="1806" font-size="58" fill="#a9b9c9">1300 nodes · 6 starts · 3 attributes · 99 points at level 100</text></g>
+<g font-family="sans-serif" fill="#e5ecf3"><text x="1909" y="1686" font-size="96">Machine Mastery</text><text x="1914" y="1806" font-size="58" fill="#a9b9c9">1315 nodes · 6 starts · 3 attributes · 99 points at level 100</text></g>
 <g stroke="#66727d" stroke-width="5" opacity="0.65">
 <path d="M4000,4000 L3939,3895"/>
 <path d="M4000,4000 L4122,3998"/>
@@ -1449,6 +1449,25 @@
 <path d="M3702,2545 L3640,2554"/>
 <path d="M3689,2607 L3625,2618"/>
 <path d="M3640,2554 L3625,2618"/>
+<path d="M3092,2662 L3118,2615"/>
+<path d="M3118,2615 L3088,2564"/>
+<path d="M3088,2564 L3117,2513"/>
+<path d="M3117,2513 L3176,2512"/>
+<path d="M3176,2512 L3206,2563"/>
+<path d="M3206,2563 L3177,2614"/>
+<path d="M3177,2614 L3118,2615"/>
+<path d="M3147,2564 L3117,2513"/>
+<path d="M3147,2564 L3206,2563"/>
+<path d="M2754,4405 L2697,4416"/>
+<path d="M2697,4416 L2676,4476"/>
+<path d="M2676,4476 L2613,4488"/>
+<path d="M2613,4488 L2571,4439"/>
+<path d="M2571,4439 L2592,4379"/>
+<path d="M2592,4379 L2655,4367"/>
+<path d="M2655,4367 L2697,4416"/>
+<path d="M2634,4427 L2613,4488"/>
+<path d="M2634,4427 L2592,4379"/>
+<path d="M2671,3516 L2638,3606"/>
 </g>
 <circle cx="3388" cy="3633" r="20" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>control (start_control)</title></circle>
 <circle cx="4000" cy="3310" r="20" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>control / drive (start_control_drive)</title></circle>
@@ -2720,6 +2739,20 @@
 <circle cx="3689" cy="2607" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Economy (frugal_circuits_2)</title></circle>
 <circle cx="3640" cy="2554" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Economy (frugal_circuits_3)</title></circle>
 <circle cx="3625" cy="2618" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Frugal Circuits (frugal_circuits)</title></circle>
+<circle cx="3118" cy="2615" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Recovery (material_memory_1)</title></circle>
+<circle cx="3088" cy="2564" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Recovery (material_memory_2)</title></circle>
+<circle cx="3117" cy="2513" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Recovery (material_memory_3)</title></circle>
+<circle cx="3176" cy="2512" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Recovery (material_memory_4)</title></circle>
+<circle cx="3206" cy="2563" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Recovery (material_memory_5)</title></circle>
+<circle cx="3177" cy="2614" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Recovery (material_memory_6)</title></circle>
+<circle cx="3147" cy="2564" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Material Memory (material_memory)</title></circle>
+<circle cx="2697" cy="4416" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Recovery (fine_screens_1)</title></circle>
+<circle cx="2676" cy="4476" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Recovery (fine_screens_2)</title></circle>
+<circle cx="2613" cy="4488" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Recovery (fine_screens_3)</title></circle>
+<circle cx="2571" cy="4439" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Recovery (fine_screens_4)</title></circle>
+<circle cx="2592" cy="4379" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Recovery (fine_screens_5)</title></circle>
+<circle cx="2655" cy="4367" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Recovery (fine_screens_6)</title></circle>
+<circle cx="2634" cy="4427" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Fine Screens (fine_screens)</title></circle>
 <circle cx="4047" cy="3916" r="24" fill="#c79dea" stroke="#111820" stroke-width="3"><title>Silent Operation (silent_operation)</title></circle>
 <circle cx="2579" cy="3318" r="24" fill="#c79dea" stroke="#111820" stroke-width="3"><title>Manual Throttle (manual_throttle)</title></circle>
 <circle cx="3900" cy="2301" r="24" fill="#c79dea" stroke="#111820" stroke-width="3"><title>Seedling Magnet (seedling_magnet)</title></circle>
@@ -2750,6 +2783,7 @@
 <circle cx="6038" cy="3534" r="24" fill="#c79dea" stroke="#111820" stroke-width="3"><title>Heavy Yield (heavy_yield)</title></circle>
 <circle cx="4789" cy="5720" r="24" fill="#c79dea" stroke="#111820" stroke-width="3"><title>Thermal Reservoir (thermal_reservoir)</title></circle>
 <circle cx="2537" cy="5446" r="24" fill="#c79dea" stroke="#111820" stroke-width="3"><title>Cold Standby (cold_standby)</title></circle>
+<circle cx="2638" cy="3606" r="24" fill="#c79dea" stroke="#111820" stroke-width="3"><title>Single Pass (single_pass)</title></circle>
 <g font-family="sans-serif" fill="#e5ecf3" font-size="44" text-anchor="middle">
 <text x="3388" y="3588">control</text>
 <text x="4000" y="3265">control / drive</text>

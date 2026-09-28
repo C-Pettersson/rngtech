@@ -26,6 +26,9 @@ public final class MegaPassiveTree {
     public static final int VERSION = 2;
     /** Levels grant 99 points; the remaining capacity is reserved for future non-level point sources. */
     public static final int MAX_ALLOCATIONS = 120;
+    /** Disabled bonus output: Output Amount cannot exceed the base 1x, and duplication chances drop to zero. */
+    public static final Map<MachineStat, Double> NO_BONUS_OUTPUT_CEILINGS = Map.of(
+            MachineStat.OUTPUT_AMOUNT, 1.0, MachineStat.SUPER_OUTPUT_CHANCE, 0.0, MachineStat.CRUSHER_SALVAGE_CHANCE, 0.0);
     private static final Map<String, MegaPassiveNode> CATALOG = load();
     public static final PassiveTree<MegaPassiveNode> TREE = new PassiveTree<>(List.copyOf(CATALOG.values()));
 
@@ -160,6 +163,9 @@ public final class MegaPassiveTree {
         double control = Math.max(0, stats.value(MachineStat.CONTROL));
         double drive = Math.max(0, stats.value(MachineStat.DRIVE));
         double reserve = Math.max(0, stats.value(MachineStat.RESERVE));
+        if (has(state, "NO_BONUS_OUTPUT")) {
+            NO_BONUS_OUTPUT_CEILINGS.forEach((stat, value) -> { if (family.supportsAbsolute(stat)) { stats.capAbsolute(stat, value); } });
+        }
         if (!has(state, "NO_INHERENT_ATTRIBUTES")) {
             apply(stats, MachineStat.STABILITY, ModifierOperation.INCREASED_PERCENT, control * 0.1);
             apply(stats, MachineStat.ENERGY_USAGE, ModifierOperation.DECREASED_PERCENT, control * 0.02);

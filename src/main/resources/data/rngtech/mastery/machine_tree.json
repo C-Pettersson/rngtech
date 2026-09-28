@@ -2936,6 +2936,38 @@
             "theme": "Economy",
             "region": "control_drive",
             "layer": "outer"
+        },
+        {
+            "id": "reward_389",
+            "x": 3147,
+            "y": 2564,
+            "role": "reward",
+            "shape": "wheel",
+            "gate": "path_0427",
+            "theme": "Recovery",
+            "region": "control",
+            "layer": "outer"
+        },
+        {
+            "id": "reward_390",
+            "x": 2634,
+            "y": 4427,
+            "role": "reward",
+            "shape": "wheel",
+            "gate": "path_0325",
+            "theme": "Recovery",
+            "region": "reserve_control",
+            "layer": "outer"
+        },
+        {
+            "id": "reward_391",
+            "x": 2638,
+            "y": 3606,
+            "role": "reward",
+            "shape": "keyDirect",
+            "gate": "path_0353",
+            "region": "control",
+            "layer": "outer"
         }
     ],
     "nodes": [
@@ -29248,6 +29280,296 @@
             "group": "reward_388"
         },
         {
+            "effects": [
+                {
+                    "stat": "OUTPUT_AMOUNT",
+                    "operation": "INCREASED_PERCENT",
+                    "value": 0.5
+                }
+            ],
+            "behaviors": [],
+            "fixed": {},
+            "ceilings": {},
+            "scaling": [],
+            "passive": {},
+            "id": "material_memory_1",
+            "name": "Recovery",
+            "kind": "NODE",
+            "x": 3118,
+            "y": 2615,
+            "group": "reward_389"
+        },
+        {
+            "effects": [
+                {
+                    "stat": "OUTPUT_AMOUNT",
+                    "operation": "INCREASED_PERCENT",
+                    "value": 0.5
+                }
+            ],
+            "behaviors": [],
+            "fixed": {},
+            "ceilings": {},
+            "scaling": [],
+            "passive": {},
+            "id": "material_memory_2",
+            "name": "Recovery",
+            "kind": "NODE",
+            "x": 3088,
+            "y": 2564,
+            "group": "reward_389"
+        },
+        {
+            "effects": [
+                {
+                    "stat": "OUTPUT_AMOUNT",
+                    "operation": "INCREASED_PERCENT",
+                    "value": 0.5
+                }
+            ],
+            "behaviors": [],
+            "fixed": {},
+            "ceilings": {},
+            "scaling": [],
+            "passive": {},
+            "id": "material_memory_3",
+            "name": "Recovery",
+            "kind": "NODE",
+            "x": 3117,
+            "y": 2513,
+            "group": "reward_389"
+        },
+        {
+            "effects": [
+                {
+                    "stat": "OUTPUT_AMOUNT",
+                    "operation": "INCREASED_PERCENT",
+                    "value": 0.5
+                }
+            ],
+            "behaviors": [],
+            "fixed": {},
+            "ceilings": {},
+            "scaling": [],
+            "passive": {},
+            "id": "material_memory_4",
+            "name": "Recovery",
+            "kind": "NODE",
+            "x": 3176,
+            "y": 2512,
+            "group": "reward_389"
+        },
+        {
+            "effects": [
+                {
+                    "stat": "OUTPUT_AMOUNT",
+                    "operation": "INCREASED_PERCENT",
+                    "value": 0.5
+                }
+            ],
+            "behaviors": [],
+            "fixed": {},
+            "ceilings": {},
+            "scaling": [],
+            "passive": {},
+            "id": "material_memory_5",
+            "name": "Recovery",
+            "kind": "NODE",
+            "x": 3206,
+            "y": 2563,
+            "group": "reward_389"
+        },
+        {
+            "effects": [
+                {
+                    "stat": "OUTPUT_AMOUNT",
+                    "operation": "INCREASED_PERCENT",
+                    "value": 0.5
+                }
+            ],
+            "behaviors": [],
+            "fixed": {},
+            "ceilings": {},
+            "scaling": [],
+            "passive": {},
+            "id": "material_memory_6",
+            "name": "Recovery",
+            "kind": "NODE",
+            "x": 3177,
+            "y": 2614,
+            "group": "reward_389"
+        },
+        {
+            "effects": [
+                {
+                    "stat": "OUTPUT_AMOUNT",
+                    "operation": "INCREASED_PERCENT",
+                    "value": 1.5
+                },
+                {
+                    "stat": "PROCESSING_SPEED",
+                    "operation": "INCREASED_PERCENT",
+                    "value": 2
+                }
+            ],
+            "behaviors": [],
+            "fixed": {},
+            "ceilings": {},
+            "scaling": [],
+            "passive": {},
+            "id": "material_memory",
+            "kind": "NOTABLE",
+            "name": "Material Memory",
+            "x": 3147,
+            "y": 2564,
+            "group": "reward_389"
+        },
+        {
+            "effects": [
+                {
+                    "stat": "OUTPUT_AMOUNT",
+                    "operation": "INCREASED_PERCENT",
+                    "value": 0.5
+                }
+            ],
+            "behaviors": [],
+            "fixed": {},
+            "ceilings": {},
+            "scaling": [],
+            "passive": {},
+            "id": "fine_screens_1",
+            "name": "Recovery",
+            "kind": "NODE",
+            "x": 2697,
+            "y": 4416,
+            "group": "reward_390"
+        },
+        {
+            "effects": [
+                {
+                    "stat": "OUTPUT_AMOUNT",
+                    "operation": "INCREASED_PERCENT",
+                    "value": 0.5
+                }
+            ],
+            "behaviors": [],
+            "fixed": {},
+            "ceilings": {},
+            "scaling": [],
+            "passive": {},
+            "id": "fine_screens_2",
+            "name": "Recovery",
+            "kind": "NODE",
+            "x": 2676,
+            "y": 4476,
+            "group": "reward_390"
+        },
+        {
+            "effects": [
+                {
+                    "stat": "OUTPUT_AMOUNT",
+                    "operation": "INCREASED_PERCENT",
+                    "value": 0.5
+                }
+            ],
+            "behaviors": [],
+            "fixed": {},
+            "ceilings": {},
+            "scaling": [],
+            "passive": {},
+            "id": "fine_screens_3",
+            "name": "Recovery",
+            "kind": "NODE",
+            "x": 2613,
+            "y": 4488,
+            "group": "reward_390"
+        },
+        {
+            "effects": [
+                {
+                    "stat": "OUTPUT_AMOUNT",
+                    "operation": "INCREASED_PERCENT",
+                    "value": 0.5
+                }
+            ],
+            "behaviors": [],
+            "fixed": {},
+            "ceilings": {},
+            "scaling": [],
+            "passive": {},
+            "id": "fine_screens_4",
+            "name": "Recovery",
+            "kind": "NODE",
+            "x": 2571,
+            "y": 4439,
+            "group": "reward_390"
+        },
+        {
+            "effects": [
+                {
+                    "stat": "OUTPUT_AMOUNT",
+                    "operation": "INCREASED_PERCENT",
+                    "value": 0.5
+                }
+            ],
+            "behaviors": [],
+            "fixed": {},
+            "ceilings": {},
+            "scaling": [],
+            "passive": {},
+            "id": "fine_screens_5",
+            "name": "Recovery",
+            "kind": "NODE",
+            "x": 2592,
+            "y": 4379,
+            "group": "reward_390"
+        },
+        {
+            "effects": [
+                {
+                    "stat": "OUTPUT_AMOUNT",
+                    "operation": "INCREASED_PERCENT",
+                    "value": 0.5
+                }
+            ],
+            "behaviors": [],
+            "fixed": {},
+            "ceilings": {},
+            "scaling": [],
+            "passive": {},
+            "id": "fine_screens_6",
+            "name": "Recovery",
+            "kind": "NODE",
+            "x": 2655,
+            "y": 4367,
+            "group": "reward_390"
+        },
+        {
+            "effects": [
+                {
+                    "stat": "OUTPUT_AMOUNT",
+                    "operation": "INCREASED_PERCENT",
+                    "value": 1.5
+                },
+                {
+                    "stat": "PROCESSING_SPEED",
+                    "operation": "INCREASED_PERCENT",
+                    "value": 2
+                }
+            ],
+            "behaviors": [],
+            "fixed": {},
+            "ceilings": {},
+            "scaling": [],
+            "passive": {},
+            "id": "fine_screens",
+            "kind": "NOTABLE",
+            "name": "Fine Screens",
+            "x": 2634,
+            "y": 4427,
+            "group": "reward_390"
+        },
+        {
             "effects": [],
             "behaviors": [
                 "MUTE_MACHINE_SOUND"
@@ -29965,6 +30287,29 @@
             "x": 2537,
             "y": 5446,
             "group": "reward_298"
+        },
+        {
+            "effects": [
+                {
+                    "stat": "PROCESSING_SPEED",
+                    "operation": "MORE",
+                    "value": 1.3,
+                    "tag": "BONUS_OUTPUT"
+                }
+            ],
+            "behaviors": [
+                "NO_BONUS_OUTPUT"
+            ],
+            "fixed": {},
+            "ceilings": {},
+            "scaling": [],
+            "passive": {},
+            "id": "single_pass",
+            "kind": "KEYSTONE",
+            "name": "Single Pass",
+            "x": 2638,
+            "y": 3606,
+            "group": "reward_391"
         }
     ],
     "links": [
@@ -35747,6 +36092,82 @@
         [
             "frugal_circuits_3",
             "frugal_circuits"
+        ],
+        [
+            "path_0427",
+            "material_memory_1"
+        ],
+        [
+            "material_memory_1",
+            "material_memory_2"
+        ],
+        [
+            "material_memory_2",
+            "material_memory_3"
+        ],
+        [
+            "material_memory_3",
+            "material_memory_4"
+        ],
+        [
+            "material_memory_4",
+            "material_memory_5"
+        ],
+        [
+            "material_memory_5",
+            "material_memory_6"
+        ],
+        [
+            "material_memory_6",
+            "material_memory_1"
+        ],
+        [
+            "material_memory",
+            "material_memory_3"
+        ],
+        [
+            "material_memory",
+            "material_memory_5"
+        ],
+        [
+            "path_0325",
+            "fine_screens_1"
+        ],
+        [
+            "fine_screens_1",
+            "fine_screens_2"
+        ],
+        [
+            "fine_screens_2",
+            "fine_screens_3"
+        ],
+        [
+            "fine_screens_3",
+            "fine_screens_4"
+        ],
+        [
+            "fine_screens_4",
+            "fine_screens_5"
+        ],
+        [
+            "fine_screens_5",
+            "fine_screens_6"
+        ],
+        [
+            "fine_screens_6",
+            "fine_screens_1"
+        ],
+        [
+            "fine_screens",
+            "fine_screens_3"
+        ],
+        [
+            "fine_screens",
+            "fine_screens_5"
+        ],
+        [
+            "path_0353",
+            "single_pass"
         ]
     ]
 }

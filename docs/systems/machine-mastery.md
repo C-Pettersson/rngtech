@@ -6,9 +6,9 @@ Machine Mastery is progression owned by each machine chassis. Machines share one
 
 ## Shared tree
 
-The catalog contains 1300 nodes: six starts, 634 attribute travel nodes, 446 ordinary nodes, 184 notables, and 30 keystones, joined by 1445 links. It is built in layers. Inside the six starts, a central junction splits three ways to a core ring, so every machine can path through the middle and reaches the center for the same number of points. Each start opens into a home region with its own road shape between two boundary spokes. A middle ring leads through outer star hubs and climbs to the perimeter road.
+The catalog contains 1315 nodes: six starts, 634 attribute travel nodes, 458 ordinary nodes, 186 notables, and 31 keystones, joined by 1464 links. It is built in layers. Inside the six starts, a central junction splits three ways to a core ring, so every machine can path through the middle and reaches the center for the same number of points. Each start opens into a home region with its own road shape between two boundary spokes. A middle ring leads through outer star hubs and climbs to the perimeter road.
 
-Optional reward constellations branch from single road gates: arcs, forks, diamonds, pearl chains, horseshoes, rings, wheels, lattices, crowns, and hexagram stars. Distinct constellations are separated by travel steps. Each notable requires at least three reward allocations from its road gate, and constellations cannot shortcut between roads. Keystones are spread through every layer, either directly on a road or at the end of a reward arm, and always at least 10 points from every start. Silent Operation sits on the center junction, 10 points from every start. Attribute Transfiguration, Singular Drive, and Reserve Actuation sit around the core, where any start can path inward to them. Family keystones sit in the home regions, outer field, and perimeter near their family's start.
+Optional reward constellations branch from single road gates: arcs, forks, diamonds, pearl chains, horseshoes, rings, wheels, lattices, crowns, and hexagram stars. Distinct constellations are separated by travel steps. Each notable requires at least three reward allocations from its road gate, and constellations cannot shortcut between roads. Keystones are spread through every layer, either directly on a road or at the end of a reward arm, and always at least 10 points from every start. Silent Operation sits on the center junction, 10 points from every start. Attribute Transfiguration, Singular Drive, and Reserve Actuation sit around the core, where any start can path inward to them. Family keystones sit in the home regions, outer field, and perimeter near their family's start. Output constellations appear on both sides of the tree: Material Memory and Fine Screens mirror the Drive region's Recovery wheels on the Control and Reserve / Control side, with Single Pass on the road between them.
 
 Every paid allocation costs one point and must connect to the machine's start through allocated nodes. Foreign starts cannot be allocated or used as shortcuts. Nodes have no individual level or chassis-stage gates.
 
@@ -43,7 +43,7 @@ Conversions only have a gameplay effect where the receiving stat is used. For ex
 
 Explicit attribute scaling is separate. A node can grant an authored percentage per attribute point in addition to inherent conversions. **Attributes grant no inherent bonuses** removes only the conversions in the table: totals, attribute modifiers, and explicit scaling remain. Attribute Transfiguration grants 100% more of each attribute with that restriction. Reserve Actuation uses the same restriction and grants 0.5% increased Processing Speed per Reserve.
 
-Steady State grants 50% more Stability with 15% less Processing Speed. Singular Drive grants 50% more Drive with 50% less Control and Reserve. Lean Grid applies 30% less Energy Usage for machines with an energy buffer and 50% less Energy Capacity. Family keystones are described on each machine page.
+Steady State grants 50% more Stability with 15% less Processing Speed. Singular Drive grants 50% more Drive with 50% less Control and Reserve. Lean Grid applies 30% less Energy Usage for machines with an energy buffer and 50% less Energy Capacity. Single Pass disables bonus output and grants 30% more Processing Speed for machines with bonus output. Family keystones are described on each machine page.
 
 Hover the machine's starting node to see current attribute totals. Tool Control retains its separate durability mechanic; these machine conversions do not change tools.
 
@@ -55,9 +55,12 @@ A tagged effect applies only to machines in its group, and only where the machin
 | --- | --- | --- |
 | Heated machines | Furnace, Alloy Furnace, Metal Press | Low Heat Specialist and Flash Annealing speed |
 | Crushers | Crusher | Soft Material Specialist speed, Cell Bypass Energy Capacity |
+| Machines with bonus output | Crusher, Furnace, Alloy Furnace, Metal Press, Resonance Calibrator | Single Pass speed |
 | Machines with an energy buffer | Every family except the Forestry Companion | Lean Grid Energy Usage reduction |
 
-Group membership follows each machine's real stat surface. Heated machines are those whose maximum temperature accepts absolute limits; the Melter is excluded because every Melter recipe needs more heat than those limits allow. Only the Crusher reads Output Amount and Parallel Jobs, so effects that raise them are inactive on every other machine.
+Group membership follows each machine's real stat surface. Heated machines are those whose maximum temperature accepts absolute limits; the Melter is excluded because every Melter recipe needs more heat than those limits allow. Machines with bonus output use Output Amount or Super Output. Only the Crusher reads Output Amount; the other members produce bonus output through Super Output.
+
+Single Pass disables bonus output: Output Amount cannot exceed the base output, and Super Output and Crusher salvage chances drop to zero. It never raises a penalized Output Amount, such as a Crusher running without a Battery Cell.
 
 Untagged penalties still apply everywhere. Flash Annealing's 50% more Energy Usage and Soft Material Specialist's 50% more Energy Usage reach every machine that allocates them, as the Closed Loop Recuperator's speed penalty does.
 
@@ -98,7 +101,7 @@ The Configurator has a dedicated Mastery mode. Sneak-use in air toggles between 
 
 ## Authoring and verification
 
-The checked-in runtime catalog is `src/main/resources/data/rngtech/mastery/machine_tree.json`. `tools/moddex/layout-mega-tree.mjs` deterministically lays out the road layers, keystone placements, and reward constellations without crossings; `author-mega-tree.mjs` assigns attributes, themes, notable names, special notables, and keystones, then writes the catalog and language entries. ModDex reads this catalog directly; its JSON draft and Java layout exports remain authoring views rather than runtime catalog writers. Follow [Passive Tree Design Rules](../reference/passive-tree-design-rules.md) when changing geometry or routes.
+The checked-in runtime catalog is `src/main/resources/data/rngtech/mastery/machine_tree.json`. `tools/moddex/layout-mega-tree.mjs` deterministically lays out the road layers, keystone placements, and reward constellations without crossings; `author-mega-tree.mjs` assigns attributes, themes, notable names, special notables, and keystones, then writes the catalog and language entries. Later additions go in its `EXTRAS` list, which the layout places after the original fill so existing node IDs, positions, and links stay stable. ModDex reads this catalog directly; its JSON draft and Java layout exports remain authoring views rather than runtime catalog writers. Follow [Passive Tree Design Rules](../reference/passive-tree-design-rules.md) when changing geometry or routes.
 
 Run `node tools/moddex/check-mega-tree.mjs --report` to refresh the [audit report](../reference/machine-mega-tree-audit.json). It includes paths from all starts and representative 99-point builds combining local investment with distant keystones. `masteryCheck`, included in `quickCheck` and `ciCheck`, checks modifier math, migration, build ordering, connectivity, point budgets, attribute suppression, hard constraints, tagged payoffs, and a keystone audit that fails when a payoff reaches a machine that escapes the keystone's cost. `npm run moddex:check` checks catalog geometry and export consistency.
 
