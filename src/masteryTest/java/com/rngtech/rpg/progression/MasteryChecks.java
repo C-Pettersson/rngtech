@@ -351,8 +351,8 @@ public final class MasteryChecks {
     }
 
     private static void iconTextures() {
-        for (MegaPassiveNode node : MegaPassiveTree.TREE.nodes().stream().filter(n -> n.kind() == PassiveNodeKind.KEYSTONE).toList()) {
-            require(node.masteryIconKey().equals(node.id()), "keystone draws its own icon: " + node.id());
+        for (MegaPassiveNode node : MegaPassiveTree.TREE.nodes().stream().filter(n -> n.kind() == PassiveNodeKind.KEYSTONE || n.kind() == PassiveNodeKind.STARTER).toList()) {
+            require(node.masteryIconKey().equals(node.id()), node.kind() + " draws its own icon: " + node.id());
         }
         for (String key : MegaPassiveTree.TREE.nodes().stream().map(MegaPassiveNode::masteryIconKey).collect(Collectors.toSet())) {
             require(MasteryChecks.class.getResource("/assets/rngtech/textures/gui/mastery/" + key + ".png") != null, "icon texture exists: " + key);

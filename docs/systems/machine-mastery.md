@@ -14,16 +14,16 @@ Every paid allocation costs one point and must connect to the machine's start th
 
 ![Shared machine passive tree](../assets/machine-mega-passive-tree.svg)
 
-| Starting archetype | Initial attributes | Machine adapters |
-| --- | --- | --- |
-| Control | 20 Control | Metal Press, Resonance Calibrator |
-| Control / Drive | 10 Control, 10 Drive | Forestry Companion |
-| Drive | 20 Drive | Crusher |
-| Drive / Reserve | 10 Drive, 10 Reserve | Furnace, Alloy Furnace |
-| Reserve | 20 Reserve | Deferred |
-| Reserve / Control | 10 Reserve, 10 Control | Melter |
+| Starting archetype | Emblem | Initial attributes | Machine adapters |
+| --- | --- | --- | --- |
+| Control | Tuning fork | 20 Control | Metal Press, Resonance Calibrator |
+| Control / Drive | Steering wheel | 10 Control, 10 Drive | Forestry Companion |
+| Drive | Drive cog | 20 Drive | Crusher |
+| Drive / Reserve | Hearth flame | 10 Drive, 10 Reserve | Furnace, Alloy Furnace |
+| Reserve | Leyden jar | 20 Reserve | Deferred |
+| Reserve / Control | Valve tap | 10 Reserve, 10 Control | Melter |
 
-The Reserve start is present in the graph but has no machine adapter yet. Machines that share a start keep their own progression, but build codes paste between them. Gear and cables do not gain their own Mastery progression.
+Each start draws its emblem in its attributes' colors: teal for Control, gold for Drive, and red for Reserve. Mixed starts combine both colors. The Reserve start is present in the graph but has no machine adapter yet. Machines that share a start keep their own progression, but build codes paste between them. Gear and cables do not gain their own Mastery progression.
 
 All nodes remain visible and selectable regardless of machine family. Applicability is evaluated for each effect. A Crusher can allocate maximum heat and gain no heat benefit. An electric Furnace gains no fuel-duration benefit. A node with an irrelevant benefit still applies any relevant penalty; tooltips label inactive effects. The reverse does not happen: a keystone payoff that depends on a family-specific cost is [tagged](#tagged-payoffs), so a machine that escapes the cost does not get the payoff. Relevance highlighting never hides routes.
 
