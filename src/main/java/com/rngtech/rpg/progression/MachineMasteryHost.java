@@ -6,6 +6,8 @@ public interface MachineMasteryHost {
     MachineMasteryFamily masteryFamily();
     MachineProgressionState machineProgression();
     void setMachineProgression(MachineProgressionState state);
+    /** The stage that gates a first Ascendancy Seal: the chassis stage, or an equivalent for hosts without one. */
+    int ascendancyEntryStage();
 
     default MachineProgressionState masteryState() { return machineProgression().forFamily(masteryFamily()); }
     default boolean masteryGearAllows(MachineProgressionState state) { return true; }
@@ -38,5 +40,19 @@ public interface MachineMasteryHost {
         }
         applyMasteryState(next);
         return true;
+    }
+
+    /** Allocates ascendancy nodes in order until one lacks a point, a connection, or legal Gear, keeping the ones before it. */
+    default int allocateAscendancyNodes(List<String> order) {
+        MachineProgressionState next = masteryState();
+        int allocated = 0;
+        for (String id : order) {
+            MachineProgressionState candidate = next.withAscendancyNode(id);
+            if (candidate.ascendancyNodes().size() == next.ascendancyNodes().size() || !masteryGearAllows(candidate)) { break; }
+            next = candidate;
+            allocated++;
+        }
+        if (allocated > 0) { applyMasteryState(next); }
+        return allocated;
     }
 }

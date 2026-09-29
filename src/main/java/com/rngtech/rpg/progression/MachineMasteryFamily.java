@@ -38,7 +38,7 @@ public enum MachineMasteryFamily {
             case "BLOCK_BATTERY", "MATCHING_HEAD", "DENSE_PARALLEL" -> this == CRUSHER;
             case "QUENCH_PROTOCOL", "CLOSED_LOOP_RECUPERATOR" -> this == FURNACE;
             case "MAGNET_MODE", "SERRATED_LEAF_PROTOCOL", "MANUAL_THROTTLE", "COASTING_CLUTCH", "SEEDLING_MAGNET" -> this == FORESTRY;
-            default -> false;
+            default -> MasteryDeclarations.families(behavior).contains(this);
         };
     }
 
@@ -69,7 +69,7 @@ public enum MachineMasteryFamily {
             case PROCESSING_LEVEL, OUTPUT_GUARD_GRACE, NO_BATTERY_OUTPUT_RETENTION,
                     HIGH_HARDNESS_ENERGY_MITIGATION, CRUSHER_INPUT_FILTER, CRUSHER_SALVAGE_CHANCE -> this == CRUSHER;
             case TREE_FELL_LIMIT -> this == FORESTRY;
-            default -> false;
+            default -> MasteryDeclarations.families(stat).contains(this);
         };
     }
 

@@ -9,7 +9,7 @@ Status: **Planned** for the 2.0 release — PRD accepted 2026-09-29 on `feature/
 - [x] Create `feature/machine-ascendancies` from clean `main`.
 - [x] Draft the PRD and this state page.
 - [x] Resolve the PRD's open questions.
-- [ ] Framework: catalog index loader, shared node parser, stat declarations, behavior registry, `ascendancyEntryStage()`, state fields, load validation, `forFamily()` family check, effect pipeline, build codes, generic catalog validation, fixture ascendancy, domain checks.
+- [x] Framework: catalog index loader, shared node parser, stat declarations, behavior registry, `ascendancyEntryStage()`, state fields, load validation, `forFamily()` family check, effect pipeline, build codes, generic catalog validation, fixture ascendancies, domain checks.
 - [ ] Loop safety: eligibility field on Alloy Furnace, Metal Press, Melter, and calibration recipes; loop audit in report mode reading declared yield stats and behaviors; fix or allowlist known cycles; turn on the CI gate.
 - [ ] Seals: items, recipes, `rngtech:ascendancy_seal_recipes_enabled` condition and config key, entry gate, server actions.
 - [ ] UI: Ascendancy panel and choose dialog in `MasteryScreenSupport`, Stats tab visibility, Bonus Summary section, Jade line, JEI.
@@ -60,9 +60,28 @@ Recorded 2026-09-29:
 - The Forestry cart has no chassis stage, but its installed modular tool's head has a material stage (`ToolHeadMaterial.stage()`), reachable through `ForestryCartEntity.toolStack()`.
 - Grove Warden's growth pulse turns FE into logs, and logs burn as fuel. The loop audit models it as an FE → log edge.
 
+## Progress log
+
+- 2026-09-29, Phase 2 framework (no content):
+    - `AscendancyCatalog` loads `data/rngtech/mastery/ascendancies/index.json` (empty until content lands) and validates every entry's shape and family support on load.
+    - `MasteryNodeJson` is the shared node parser for both catalogs. `MasteryEffectSource` lets `MegaPassiveTree.applyStats`, `has`, `passive`, and `acceptsHardness` include the chosen ascendancy's root and allocated nodes, filtered to the owning family.
+    - `MasteryDeclarations` reads `data/rngtech/mastery/declarations.json` (empty for now). `MachineMasteryFamily.supports` and `supportsBehavior` fall back to it, so new stats and behaviors need no switch changes.
+    - `MachineProgressionState` gained `ascendancy`, `ascendancy_nodes`, and `seal_tiers`. Load validation drops retired nodes, prunes disconnected ones, and refunds over-budget allocations. `forFamily()` drops a foreign ascendancy and keeps earned tiers.
+    - Domain operations: `withSealTier`, `withAscendancyChoice`, `withSwitchedAscendancy`, `withAscendancyNode`, and `withoutAscendancyNode`.
+    - Every host implements `ascendancyEntryStage()`:
+        - chassis stage for the Crusher, Furnace, Alloy Furnace, and Resonance Calibrator;
+        - 3 or 4 for the Crude or Steel Metal Press, and 6 for the Melter;
+        - the installed tool head stage for the Forestry cart.
+    - Build codes carry the ascendancy and its order. Paste allocates onto a matching, empty ascendancy as far as points and Gear allow. Unknown ascendancies or invalid orders are dropped, so older codes still paste.
+    - Test-only fixtures live in `src/masteryTest/resources/data/rngtech/mastery/ascendancies/fixtures/`: three Crusher ascendancies, one Furnace ascendancy, and a fixture declaration of `LUCK` and `FIXTURE_ECHO` for the Crusher.
+- Not yet covered, and left for the UI phase:
+    - Menus sync Mastery through `ContainerData`, so the client snapshot has no ascendancy yet. The Mastery screen's Copy button therefore omits it, while Configurator copies from the server state and include it.
+    - The Bonus Summary drawer does not list ascendancy effects yet.
+
 ## Verification
 
 - 2026-09-29 PRD revisions: `npm run repo:check` passed. `mkdocs build --strict` was not run because MkDocs is not installed locally; CI runs it.
+- 2026-09-29 Phase 2: `gradlew spotlessApply` and `quickCheck` passed with 837 domain checks (753 on the previous commit). `npm run moddex:check` and `npm run repo:check` passed. No in-game check: Phase 2 adds no player-facing surface.
 
 ## Handoff and limits
 

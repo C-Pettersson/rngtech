@@ -2696,5 +2696,7 @@ public class ForestryCartEntity extends AbstractMinecart implements MenuProvider
         }
     }
     @Override public MachineMasteryFamily masteryFamily() { return MachineMasteryFamily.FORESTRY; }
+    /** The cart has no chassis stage, so its installed Axe or Treefeller head stands in. */
+    @Override public int ascendancyEntryStage() { return hasUsableTool() ? ModularToolItem.assembly(toolStack()).headMaterial().stage() : 0; }
 
 }

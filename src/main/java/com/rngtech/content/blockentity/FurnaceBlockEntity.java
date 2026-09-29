@@ -1669,6 +1669,7 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
         }
     }
     @Override public MachineMasteryFamily masteryFamily() { return MachineMasteryFamily.FURNACE; }
+    @Override public int ascendancyEntryStage() { return furnaceMaterial().stage(); }
 
     @Override public MachineProgressionState machineProgression() { return super.machineProgression().forFamily(masteryFamily()); }
 

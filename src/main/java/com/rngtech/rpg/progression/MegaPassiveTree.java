@@ -9,10 +9,7 @@ import com.rngtech.rpg.ModifierSlot;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 
-import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -40,19 +37,31 @@ public final class MegaPassiveTree {
     }
     public static MegaPassiveNode byButtonId(int id) { return TREE.byButtonId(id); }
 
+    /** Shared-tree allocations followed by the chosen ascendancy's root and allocated nodes. */
+    public static List<MasteryEffectSource> sources(MachineProgressionState state) {
+        List<MasteryEffectSource> sources = new ArrayList<>();
+        state.allocatedNodes().stream().map(CATALOG::get).filter(java.util.Objects::nonNull).forEach(sources::add);
+        sources.addAll(AscendancyCatalog.allocated(state));
+        return sources;
+    }
+
+    private static List<MasteryEffectSource> sources(MachineProgressionState state, MachineMasteryFamily family) {
+        List<MasteryEffectSource> sources = new ArrayList<>();
+        state.allocatedNodes().stream().map(CATALOG::get).filter(java.util.Objects::nonNull).forEach(sources::add);
+        sources.addAll(AscendancyCatalog.allocated(state, family));
+        return sources;
+    }
+
     public static boolean has(MachineProgressionState state, String behavior) {
-        return state.allocatedNodes().stream().map(CATALOG::get).filter(java.util.Objects::nonNull)
-                .anyMatch(node -> node.behaviors().contains(behavior));
+        return sources(state).stream().anyMatch(source -> source.behaviors().contains(behavior));
     }
 
     public static int passive(MachineProgressionState state, PassiveStatType stat) {
-        return state.allocatedNodes().stream().map(CATALOG::get).filter(java.util.Objects::nonNull)
-                .mapToInt(node -> node.passiveStat(stat)).sum();
+        return sources(state).stream().mapToInt(source -> source.passive().getOrDefault(stat, 0)).sum();
     }
 
     public static boolean acceptsHardness(MachineProgressionState state, int hardness) {
-        return state.allocatedNodes().stream().map(CATALOG::get).filter(java.util.Objects::nonNull)
-                .allMatch(node -> node.recipeHardnessCeiling() <= 0 || hardness <= node.recipeHardnessCeiling());
+        return sources(state).stream().allMatch(source -> source.recipeHardnessCeiling() <= 0 || hardness <= source.recipeHardnessCeiling());
     }
 
     public static boolean validBuild(String start, List<String> order) {
@@ -149,8 +158,8 @@ public final class MegaPassiveTree {
         };
         MachineStat[] attributes = {MachineStat.CONTROL, MachineStat.DRIVE, MachineStat.RESERVE};
         for (int i = 0; i < attributes.length; i++) { apply(stats, attributes[i], ModifierOperation.ADD, base[i]); }
-        List<MegaPassiveNode> allocated = state.allocatedNodes().stream().map(CATALOG::get).filter(java.util.Objects::nonNull).toList();
-        for (MegaPassiveNode node : allocated) {
+        List<MasteryEffectSource> allocated = sources(state, family);
+        for (MasteryEffectSource node : allocated) {
             for (MachineModifierEffect effect : node.effects()) {
                 if (family.supports(effect.stat())) { apply(stats, effect.stat(), effect.operation(), effect.value()); }
             }
@@ -169,7 +178,7 @@ public final class MegaPassiveTree {
                 apply(stats, effect.stat(), effect.operation(), effect.value());
             }
         }
-        for (MegaPassiveNode node : allocated) {
+        for (MasteryEffectSource node : allocated) {
             for (MegaPassiveNode.AttributeScaling scaling : node.scaling()) {
                 if (family.supports(scaling.stat())) {
                     apply(stats, scaling.stat(), scaling.operation(), Math.max(0, stats.value(scaling.attribute())) * scaling.perPoint());
@@ -218,48 +227,25 @@ public final class MegaPassiveTree {
     }
 
     private static Map<String, MegaPassiveNode> load() {
-        try (var stream = MegaPassiveTree.class.getResourceAsStream("/data/rngtech/mastery/machine_tree.json")) {
-            if (stream == null) { throw new IllegalStateException("Missing shared machine tree"); }
-            JsonObject data = JsonParser.parseReader(new InputStreamReader(stream, StandardCharsets.UTF_8)).getAsJsonObject();
-            if (data.get("version").getAsInt() != VERSION) { throw new IllegalStateException("Unsupported machine tree version"); }
-            Map<String, List<String>> links = new HashMap<>();
-            for (JsonElement element : data.getAsJsonArray("links")) {
-                var link = element.getAsJsonArray(); String a = link.get(0).getAsString(), b = link.get(1).getAsString();
-                links.computeIfAbsent(a, ignored -> new ArrayList<>()).add(b);
-                links.computeIfAbsent(b, ignored -> new ArrayList<>()).add(a);
-            }
-            Map<String, MegaPassiveNode> nodes = new LinkedHashMap<>();
-            for (JsonElement element : data.getAsJsonArray("nodes")) {
-                JsonObject raw = element.getAsJsonObject(); String id = raw.get("id").getAsString();
-                List<MachineModifierEffect> effects = new ArrayList<>();
-                List<MegaPassiveNode.TaggedEffect> tagged = new ArrayList<>();
-                for (JsonElement item : raw.getAsJsonArray("effects")) {
-                    JsonObject e = item.getAsJsonObject();
-                    MachineModifierEffect effect = MachineModifierEffect.fixed(MachineStat.valueOf(e.get("stat").getAsString()), ModifierOperation.valueOf(e.get("operation").getAsString()), e.get("value").getAsDouble());
-                    if (e.has("tag")) { tagged.add(new MegaPassiveNode.TaggedEffect(MachineTag.valueOf(e.get("tag").getAsString()), effect)); }
-                    else { effects.add(effect); }
-                }
-                Set<String> behaviors = new HashSet<>(); raw.getAsJsonArray("behaviors").forEach(e -> behaviors.add(e.getAsString()));
-                List<MegaPassiveNode.AttributeScaling> scaling = new ArrayList<>();
-                raw.getAsJsonArray("scaling").forEach(e -> {
-                    JsonObject s = e.getAsJsonObject();
-                    scaling.add(new MegaPassiveNode.AttributeScaling(MachineStat.valueOf(s.get("attribute").getAsString()), MachineStat.valueOf(s.get("stat").getAsString()), ModifierOperation.valueOf(s.get("operation").getAsString()), s.get("perPoint").getAsDouble()));
-                });
-                Map<PassiveStatType, Integer> passive = new HashMap<>();
-                raw.getAsJsonObject("passive").entrySet().forEach(e -> passive.put(PassiveStatType.valueOf(e.getKey()), e.getValue().getAsInt()));
-                MegaPassiveNode node = new MegaPassiveNode(nodes.size(), id, raw.get("name").getAsString(), PassiveNodeKind.valueOf(raw.get("kind").getAsString()), raw.get("x").getAsInt(), raw.get("y").getAsInt(), List.copyOf(links.getOrDefault(id, List.of())), List.copyOf(effects), List.copyOf(tagged), Set.copyOf(behaviors), statsMap(raw.getAsJsonObject("fixed")), statsMap(raw.getAsJsonObject("ceilings")), List.copyOf(scaling), Map.copyOf(passive), raw.has("recipeHardnessCeiling") ? raw.get("recipeHardnessCeiling").getAsInt() : 0);
-                if (nodes.put(id, node) != null) { throw new IllegalStateException("Duplicate mastery node " + id); }
-            }
-            for (MegaPassiveNode node : nodes.values()) {
-                if (node.links().stream().anyMatch(id -> !nodes.containsKey(id)) || new HashSet<>(node.links()).size() != node.links().size()) { throw new IllegalStateException("Invalid links: " + node.id()); }
-            }
-            return java.util.Collections.unmodifiableMap(nodes);
-        } catch (java.io.IOException exception) { throw new IllegalStateException("Cannot load machine tree", exception); }
-    }
-
-    private static Map<MachineStat, Double> statsMap(JsonObject raw) {
-        Map<MachineStat, Double> result = new HashMap<>();
-        raw.entrySet().forEach(e -> result.put(MachineStat.valueOf(e.getKey()), e.getValue().getAsDouble()));
-        return Map.copyOf(result);
+        JsonObject data = MasteryNodeJson.resource("/data/rngtech/mastery/machine_tree.json");
+        if (data == null) { throw new IllegalStateException("Missing shared machine tree"); }
+        if (data.get("version").getAsInt() != VERSION) { throw new IllegalStateException("Unsupported machine tree version"); }
+        Map<String, List<String>> links = new HashMap<>();
+        for (JsonElement element : data.getAsJsonArray("links")) {
+            var link = element.getAsJsonArray(); String a = link.get(0).getAsString(), b = link.get(1).getAsString();
+            links.computeIfAbsent(a, ignored -> new ArrayList<>()).add(b);
+            links.computeIfAbsent(b, ignored -> new ArrayList<>()).add(a);
+        }
+        Map<String, MegaPassiveNode> nodes = new LinkedHashMap<>();
+        for (JsonElement element : data.getAsJsonArray("nodes")) {
+            JsonObject raw = element.getAsJsonObject(); String id = raw.get("id").getAsString();
+            MasteryNodeJson.Effects e = MasteryNodeJson.effects(raw);
+            MegaPassiveNode node = new MegaPassiveNode(nodes.size(), id, raw.get("name").getAsString(), PassiveNodeKind.valueOf(raw.get("kind").getAsString()), raw.get("x").getAsInt(), raw.get("y").getAsInt(), List.copyOf(links.getOrDefault(id, List.of())), e.effects(), e.tagged(), e.behaviors(), e.fixed(), e.ceilings(), e.scaling(), e.passive(), e.recipeHardnessCeiling());
+            if (nodes.put(id, node) != null) { throw new IllegalStateException("Duplicate mastery node " + id); }
+        }
+        for (MegaPassiveNode node : nodes.values()) {
+            if (node.links().stream().anyMatch(id -> !nodes.containsKey(id)) || new HashSet<>(node.links()).size() != node.links().size()) { throw new IllegalStateException("Invalid links: " + node.id()); }
+        }
+        return java.util.Collections.unmodifiableMap(nodes);
     }
 }

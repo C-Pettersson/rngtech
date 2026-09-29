@@ -547,6 +547,11 @@ public class ResonanceCalibratorBlockEntity extends BaseMachineBlockEntity imple
     }
 
     @Override
+    public int ascendancyEntryStage() {
+        return chassis().stage();
+    }
+
+    @Override
     public MachineProgressionState machineProgression() {
         return super.machineProgression().forFamily(masteryFamily());
     }

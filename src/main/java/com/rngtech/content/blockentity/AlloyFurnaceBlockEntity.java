@@ -571,6 +571,11 @@ public class AlloyFurnaceBlockEntity extends BaseMachineBlockEntity implements M
     }
 
     @Override
+    public int ascendancyEntryStage() {
+        return chassis().stage();
+    }
+
+    @Override
     public MachineProgressionState machineProgression() {
         return super.machineProgression().forFamily(masteryFamily());
     }

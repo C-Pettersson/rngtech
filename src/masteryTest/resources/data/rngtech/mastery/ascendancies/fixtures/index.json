@@ -1,0 +1,9 @@
+{
+    "version": 1,
+    "ascendancies": [
+        "fixtures/crusher_alpha.json",
+        "fixtures/crusher_beta.json",
+        "fixtures/crusher_gamma.json",
+        "fixtures/furnace_alpha.json"
+    ]
+}

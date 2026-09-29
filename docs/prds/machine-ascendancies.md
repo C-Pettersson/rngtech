@@ -182,11 +182,11 @@ Ascendancy nodes use the shared node effect schema: effects, tagged effects, beh
 
 Ascendancies are encouraged to introduce new stats and behaviors. Rules:
 
-- A new stat is a `MachineStat` with a declaration:
+- A new stat is a `MachineStat` with a declaration in `data/rngtech/mastery/declarations.json`:
     - the families that support it;
-    - how the Stats tab shows it;
-    - whether it is a yield stat for [Loop Prevention](#loop-prevention).
-- A new behavior is registered by id with its owning families, tooltip key, and yield classification.
+    - its yield classification for [Loop Prevention](#loop-prevention): `none`, `output`, `input`, or `energy`.
+- Its Stats tab display is added with the stat itself.
+- A new behavior is declared in the same file by id, with its owning families and yield classification. Its tooltip uses a language key named after the id.
 - The Stats tab shows an ascendancy stat only when an allocated node grants it, following the capability-driven rule in [Machine Guidelines](../reference/machine-guidelines.md).
 - Once declared, a stat can later be used by affixes, Gear, or the shared tree, but a yield stat needs loop-audit coverage before it appears anywhere else.
 - Reusable mechanics are built once and shared:
@@ -245,7 +245,7 @@ Ascendancies are content. Adding one later needs data, plus only the code for an
     - language keys under `rngtech.mastery.ascendancy.<id>`;
     - icons under `textures/gui/mastery/ascendancy/<id>/`;
     - code only for new stats or behaviors.
-- **Behavior registry:** ascendancy behaviors are registered by id instead of being added to the string switch in `MachineMasteryFamily.supportsBehavior`. Hosts query them the same way they query shared-tree behaviors today.
+- **Behavior registry:** ascendancy behaviors are declared in `declarations.json` instead of being added to the string switch in `MachineMasteryFamily.supportsBehavior`; the switch falls back to the declarations. Hosts query them the same way they query shared-tree behaviors today.
 - **Entry stage hook:** `MachineMasteryHost.ascendancyEntryStage()`. Every current host implements it, and future families (such as generator or storage adapters) implement the same hook.
 - **UI:** the Ascendancy panel and choose dialog live in `MasteryScreenSupport`, which every Mastery screen already uses, including the Forestry cart.
 - **Stable ids:** ascendancy and node ids are permanent.
@@ -257,7 +257,9 @@ Ascendancies are content. Adding one later needs data, plus only the code for an
     - stat and behavior references, and family support for each;
     - language keys and icons;
     - loop-audit coverage for yield stats and behaviors.
-- **Fixture:** a test-only third ascendancy for one family exercises loading, choosing, saving, build codes, and retirement, and proves an ascendancy can be added without touching family code.
+- **Fixtures:** test-only ascendancies under `src/masteryTest/resources/data/rngtech/mastery/ascendancies/fixtures/` exercise loading, choosing, saving, build codes, and retirement.
+    - Three Crusher fixtures and one Furnace fixture load only on the domain-check classpath.
+    - A fixture declaration file adds a stat and a behavior for the Crusher, which proves an ascendancy can be added without touching family code.
 
 ## Refunds and Switching
 
@@ -580,7 +582,7 @@ Follow [Machine Guidelines](../reference/machine-guidelines.md): graphical state
     - state fields, codecs, and load validation;
     - `forFamily()` family check;
     - effect pipeline integration and build codes;
-    - generic catalog validation and the fixture ascendancy;
+    - generic catalog validation and the fixture ascendancies;
     - domain checks.
 3. **Loop safety:**
     - eligibility field on the four new recipe types, with Super Output routed through the shared check;
@@ -608,16 +610,16 @@ Domain checks (`masteryCheck`):
 - Build codes paste ascendancy nodes only onto the same family and ascendancy.
 - Refiner's Oath: 5% per Parallel Job with a 50% cap.
 - Seal use: next-tier order, the entry stage gate for Seal I (chassis stage, and tool head stage for the Forestry Companion), rejection without consuming the Seal, and creative use without consumption.
-- The fixture ascendancy loads, can be chosen, saves by id, pastes through build codes, and is cleared cleanly when retired. A retired node returns its point.
+- The fixture ascendancies load, can be chosen, save by id, paste through build codes, and are cleared cleanly when retired. A retired node returns its point.
 - New stats combine correctly with existing modifiers.
+- Every ascendancy follows the tree shape rules, and its stats and behaviors are declared and supported by its family. Mutated fixtures are rejected with the matching violation.
+- Language keys and icons exist for every shipped ascendancy and node.
 
 ModDex checks (`npm run moddex:check`):
 
 - The loop audit passes. The mutation fixture fails it.
 - Every yield stat and behavior has loop-audit coverage.
 - Every Seal recipe carries the `rngtech:ascendancy_seal_recipes_enabled` condition.
-- Every ascendancy follows the tree shape rules, and its stats and behaviors are declared and supported by its family.
-- Language keys and icons exist for every ascendancy and node.
 
 In-game checks:
 
@@ -632,7 +634,7 @@ In-game checks:
 - Every shipped family has at least two ascendancies that follow the tree shape rules. For 2.0 that means at least the Crusher and Furnace.
 - Tiers I–III grant 2 points each, for 6 in total, separate from the shared tree's 120 allocations.
 - Using a Seal grants its 2 points immediately. Seal I requires entry stage 4. Seal recipes can be disabled by config or datapack without affecting Seals from other sources.
-- The fixture ascendancy works with only its catalog file, language keys, and icons, which proves new ascendancies need no family code.
+- The fixture ascendancies work with only their catalog files and declarations, which proves new ascendancies need no family code.
 - Existing progression loads unchanged, and ascendancy state survives drops and pick-block.
 - The loop audit is a CI gate and passes, with every allowlist entry justified.
 - No ascendancy node lowers authored recipe input counts, raises Refinement Potential, or bypasses a `bonus_output` opt-out.

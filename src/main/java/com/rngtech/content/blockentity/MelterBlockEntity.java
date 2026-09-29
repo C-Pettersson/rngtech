@@ -576,6 +576,12 @@ public class MelterBlockEntity extends BaseMachineBlockEntity implements MenuPro
         return MachineMasteryFamily.MELTER;
     }
 
+    /** The Melter has a single Titanium-stage body. */
+    @Override
+    public int ascendancyEntryStage() {
+        return 6;
+    }
+
     @Override
     public MachineProgressionState machineProgression() {
         return super.machineProgression().forFamily(masteryFamily());

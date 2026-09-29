@@ -1,0 +1,188 @@
+{
+    "id": "fixture_crusher_beta",
+    "family": "crusher",
+    "nodes": [
+        {
+            "id": "root",
+            "kind": "ROOT",
+            "x": 0,
+            "y": 0,
+            "effects": [
+                {
+                    "stat": "STABILITY",
+                    "operation": "INCREASED_PERCENT",
+                    "value": 20
+                }
+            ],
+            "behaviors": []
+        },
+        {
+            "id": "small_a",
+            "kind": "SMALL",
+            "parent": "root",
+            "x": -2,
+            "y": 1,
+            "effects": [
+                {
+                    "stat": "STABILITY",
+                    "operation": "INCREASED_PERCENT",
+                    "value": 8
+                }
+            ]
+        },
+        {
+            "id": "notable_a",
+            "kind": "NOTABLE",
+            "parent": "small_a",
+            "x": -2,
+            "y": 2,
+            "effects": [
+                {
+                    "stat": "ENERGY_USAGE",
+                    "operation": "LESS",
+                    "value": 0.9
+                }
+            ]
+        },
+        {
+            "id": "small_b",
+            "kind": "SMALL",
+            "parent": "root",
+            "x": -1,
+            "y": 1,
+            "effects": [
+                {
+                    "stat": "ENERGY_USAGE",
+                    "operation": "DECREASED_PERCENT",
+                    "value": 5
+                }
+            ]
+        },
+        {
+            "id": "notable_b",
+            "kind": "NOTABLE",
+            "parent": "small_b",
+            "x": -1,
+            "y": 2,
+            "effects": [
+                {
+                    "stat": "STABILITY",
+                    "operation": "MORE",
+                    "value": 1.1
+                }
+            ]
+        },
+        {
+            "id": "small_c",
+            "kind": "SMALL",
+            "parent": "root",
+            "x": 1,
+            "y": 1,
+            "effects": [
+                {
+                    "stat": "PROCESSING_SPEED",
+                    "operation": "INCREASED_PERCENT",
+                    "value": 8
+                }
+            ]
+        },
+        {
+            "id": "notable_c",
+            "kind": "NOTABLE",
+            "parent": "small_c",
+            "x": 1,
+            "y": 2,
+            "effects": [
+                {
+                    "stat": "PROCESSING_SPEED",
+                    "operation": "INCREASED_PERCENT",
+                    "value": 15
+                }
+            ]
+        },
+        {
+            "id": "small_d",
+            "kind": "SMALL",
+            "parent": "root",
+            "x": 2,
+            "y": 1,
+            "effects": [
+                {
+                    "stat": "STABILITY",
+                    "operation": "INCREASED_PERCENT",
+                    "value": 8
+                }
+            ]
+        },
+        {
+            "id": "notable_d",
+            "kind": "NOTABLE",
+            "parent": "small_d",
+            "x": 2,
+            "y": 2,
+            "effects": [
+                {
+                    "stat": "OUTPUT_AMOUNT",
+                    "operation": "INCREASED_PERCENT",
+                    "value": 5
+                }
+            ]
+        },
+        {
+            "id": "small_e",
+            "kind": "SMALL",
+            "parent": "notable_a",
+            "x": -2,
+            "y": 3,
+            "effects": [
+                {
+                    "stat": "OUTPUT_AMOUNT",
+                    "operation": "INCREASED_PERCENT",
+                    "value": 4
+                }
+            ]
+        },
+        {
+            "id": "deep_e",
+            "kind": "NOTABLE",
+            "parent": "small_e",
+            "x": -2,
+            "y": 4,
+            "effects": [
+                {
+                    "stat": "ENERGY_USAGE",
+                    "operation": "LESS",
+                    "value": 0.8
+                }
+            ]
+        },
+        {
+            "id": "small_f",
+            "kind": "SMALL",
+            "parent": "notable_c",
+            "x": 1,
+            "y": 3,
+            "effects": [
+                {
+                    "stat": "PROCESSING_SPEED",
+                    "operation": "INCREASED_PERCENT",
+                    "value": 8
+                }
+            ]
+        },
+        {
+            "id": "deep_f",
+            "kind": "NOTABLE",
+            "parent": "small_f",
+            "x": 1,
+            "y": 4,
+            "effects": [
+                {
+                    "stat": "PROCESSING_SPEED",
+                    "operation": "MORE",
+                    "value": 1.2
+                }
+            ]
+        }
+    ]
+}

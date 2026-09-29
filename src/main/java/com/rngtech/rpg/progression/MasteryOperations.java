@@ -26,6 +26,7 @@ public final class MasteryOperations {
                     MasteryBuildCode code = MasteryBuildCode.decode(value);
                     if (!code.start().equals(state.startNodeId())) { return fail(player, "wrong_start"); }
                     host.applyMasteryState(state.withTarget(code.nodes()));
+                    pasteAscendancy(host, code);
                     return true;
                 } catch (IllegalArgumentException exception) { return fail(player, "invalid_build"); }
             case "pause":
@@ -52,6 +53,14 @@ public final class MasteryOperations {
                 }
                 return fail(player, "no_configurator");
             default: return false;
+        }
+    }
+
+    /** Ascendancy nodes paste only onto the same ascendancy with none allocated, as far as its earned points reach. */
+    static void pasteAscendancy(MachineMasteryHost host, MasteryBuildCode code) {
+        MachineProgressionState state = host.masteryState();
+        if (!code.ascendancy().isEmpty() && code.ascendancy().equals(state.ascendancy()) && state.ascendancyNodes().isEmpty()) {
+            host.allocateAscendancyNodes(code.ascendancyNodes());
         }
     }
 
