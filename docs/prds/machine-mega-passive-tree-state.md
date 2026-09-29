@@ -59,8 +59,8 @@ Status: **Done** — implementation and travel-road redesign completed 2026-09-2
 
 ## Handoff and limits
 
-- Implementation files are staged on feature/machine-mega-passive-tree. No commit, push, merge, or deployment performed.
-- Suggested commit: feat: add shared machine mega passive tree.
+- Work is committed on feature/machine-mega-passive-tree and merges into main as part of the planned 2.0 release. The full in-game release checklist in docs/releasing.md runs once for 2.0 after the remaining 2.0 features land.
+- Start emblems and the getting-started rewrite (2026-09-29): Gradle quickCheck and ciCheck passed with 753 domain checks; npm run moddex:check, npm run repo:check, and mkdocs build --strict passed.
 - Reserve-start generator and storage adapters and family ascendancies are intentionally deferred. Legacy graph definitions remain as reference/audit fixtures.
 - In-game controls, multiplayer UI synchronization, refund inventory consumption, and late-game XP/balance need focused playtesting. Automated checks do not replace those checks.
 - Runtime catalog: src/main/resources/data/rngtech/mastery/machine_tree.json. Author rewards with tools/moddex/author-mega-tree.mjs and roads/reward placement with layout-mega-tree.mjs. Regenerate the audit report and overview after changes.
