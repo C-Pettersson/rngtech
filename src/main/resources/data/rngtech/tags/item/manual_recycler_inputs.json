@@ -9,6 +9,7 @@
     "#rngtech:manual_recycler/calibrated_components",
     "#rngtech:manual_recycler/iron_components",
     "#rngtech:manual_recycler/machine_blocks",
+    "rngtech:flint_shovel_head",
     "rngtech:flint_crush_head",
     "rngtech:iron_crush_head",
     "rngtech:copper_crush_head",

@@ -227,12 +227,6 @@ public final class ModifierEligibilityProfiles {
             new ModifierValueRange(11, 16, true),
             new ModifierValueRange(18, 25, true)
     );
-    private static final List<ModifierValueRange> RUNTIME_CHANCE_RANGES = List.of(
-            new ModifierValueRange(1, 2, true),
-            new ModifierValueRange(2, 4, true),
-            new ModifierValueRange(4, 6, true),
-            new ModifierValueRange(6, 9, true)
-    );
     private static final List<ModifierValueRange> RUNTIME_INPUT_SLOT_RANGES = List.of(
             ModifierValueRange.fixed(1),
             ModifierValueRange.fixed(1),
@@ -942,15 +936,6 @@ public final class ModifierEligibilityProfiles {
             RUNTIME_PERCENT_RANGES,
             60
     );
-    private static final ModifierDefinition DISASSEMBLY_STATIC_DRAIN = runtime(
-            "static_drain",
-            "recycling_fe_recovery",
-            ModifierSlot.PREFIX,
-            MachineStat.SUPER_OUTPUT_CHANCE,
-            ModifierOperation.ADD,
-            RUNTIME_CHANCE_RANGES,
-            45
-    );
     private static final ModifierDefinition PUMP_SELF_PRIMING = runtime(
             "self_priming",
             "pump_start_volume",
@@ -1299,7 +1284,6 @@ public final class ModifierEligibilityProfiles {
             DISASSEMBLY_FASTENER_FINDER.id(),
             DISASSEMBLY_GENTLE_PRY.id(),
             DISASSEMBLY_TRACE_CUTTER.id(),
-            DISASSEMBLY_STATIC_DRAIN.id(),
             PUMP_SELF_PRIMING.id(),
             PUMP_CHECK_VALVE.id(),
             PUMP_PULSE.id(),
@@ -1569,7 +1553,7 @@ public final class ModifierEligibilityProfiles {
             ),
             poweredProcessingAffixes(
                     "recycling",
-                    true,
+                    false,
                     List.of(MACHINE_ENERGY_CAPACITY_ADD, RECYCLER_PATTERN_MEMORY, RECYCLER_CLEAN_BREAK),
                     MachineStat.ENERGY_CAPACITY,
                     MachineStat.ENERGY_TRANSFER,
@@ -2318,8 +2302,8 @@ public final class ModifierEligibilityProfiles {
             ),
             processingAffixes(
                     "disassembling",
-                    true,
-                    List.of(DISASSEMBLY_FASTENER_FINDER, DISASSEMBLY_GENTLE_PRY, DISASSEMBLY_TRACE_CUTTER, DISASSEMBLY_STATIC_DRAIN),
+                    false,
+                    List.of(DISASSEMBLY_FASTENER_FINDER, DISASSEMBLY_GENTLE_PRY, DISASSEMBLY_TRACE_CUTTER),
                     MachineStat.PROCESSING_SPEED,
                     MachineStat.STABILITY
             )
