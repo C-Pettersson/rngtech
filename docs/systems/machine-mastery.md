@@ -2,7 +2,7 @@
 
 Status: Prototype
 
-Machine Mastery is progression owned by each machine chassis. Machines share one passive graph and enter it at different starting positions. The [implementation matrix](../reference/current-implementation.md) records the current adapters; generator and storage adapters and family ascendancies are deferred.
+Machine Mastery is progression owned by each machine chassis. Machines share one passive graph and enter it at different starting positions. The [implementation matrix](../reference/current-implementation.md) records the current adapters; generator and storage adapters are deferred, and family ascendancies are [planned](../prds/machine-ascendancies.md).
 
 ## Shared tree
 
