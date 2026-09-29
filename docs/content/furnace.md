@@ -39,7 +39,7 @@ Implementation checks:
 - Bottom extraction should extract completed output from active output lanes.
 - `rngtech:furnace` recipes should process with RNGTech timing, temperature, and stability gates.
 - Placed-machine refinement should persist after closing and reopening the screen.
-- Mastery unlocks should require level, one unspent passive point, and at least one linked unlocked node. Unlocking a node resets active cycles and failure strain but preserves inventory and current lane heat.
+- Mastery unlocks should require one unspent passive point, and at least one linked unlocked node. Unlocking a node resets active cycles and failure strain but preserves inventory and current lane heat.
 
 ## Stage Behavior
 
@@ -169,29 +169,17 @@ Current stat behavior:
 
 ## Mastery
 
-Furnace Mastery uses a fixed passive tree of small travel nodes, ordinary nodes, Notable Masteries, Keystone Masteries, and a generic Mute Machine Sound node. Every non-starter node costs one passive point. The starter node is always allocated and grants no stats. Additional endpoint keystones extend each branch without changing slot counts, Heat Core compatibility, or existing node masks.
+Furnaces enter the [shared Machine Mastery tree](../systems/machine-mastery.md) at Drive / Reserve. Heat, throughput, efficiency, attributes, and behavior choices share routes with other machine families. Fuel-only effects are marked inactive on electric chassis, and FE effects are marked inactive on the primitive fuel chassis.
 
-The V1 tree has five main branches:
+Low Heat Specialist caps maximum temperature at 800 and grants 100% more Processing Speed. Flash Annealing caps it at 600, grants 100% more Processing Speed, and applies 50% more Energy Usage. Both speed bonuses are [tagged](../systems/machine-mastery.md#tagged-payoffs) for heated machines, so they reach the Furnace, Alloy Furnace, and Metal Press but not machines their heat caps cannot limit. A cap never raises a weaker heat source. Regulated Heat caps maximum temperature at 1000 with 80% more Temperature Stability. Kiln Discipline grants 60% more Temperature Stability with 40% more Warmup Time. Gear cannot override these absolute limits; the lower limit wins if several apply.
 
-- Flat Heat adds `MAX_TEMPERATURE` and usually reduces `TEMPERATURE_STABILITY`.
-- Increased Heat scales `MAX_TEMPERATURE`, which is stronger on high-end setups, but carries larger stability penalties.
-- Throughput increases `PROCESSING_SPEED`; larger nodes lower flat `MAX_TEMPERATURE`, so faster furnaces can lose access to higher-heat recipes.
-- Thermal Control improves `TEMPERATURE_STABILITY`, `OVERHEAT_TOLERANCE`, warmup, and cooling behavior. These nodes can soften heat tradeoffs but do not cheaply erase Keystone downsides.
-- Efficiency reduces electric `ENERGY_USAGE` and improves fuel-side `FUEL_EFFICIENCY`.
+Quench Protocol halves temperature-derived failure strain, leaves power-drop strain unchanged, and applies 25% less Heat Transfer. Closed Loop Recuperator returns 5% of adjusted electric recipe FE after successful output, with 15% less Processing Speed. Its recovery is inactive on the primitive Furnace, while its speed penalty still applies.
 
-The additional endpoint keystones are:
-
-- Thermal Mass adds flat maximum heat with slower warmup and lower temperature stability.
-- Overfire Aperture scales maximum heat and heat transfer, but costs stability and FE per craft.
-- Continuous Draft pushes throughput, but lowers heat reach and raises FE/fuel pressure.
-- Quench Protocol improves thermal control and halves temperature-derived failure strain; it does not reduce sensitive power-drop strain.
-- Closed-Loop Recuperator improves efficiency and returns `5%` of adjusted electric recipe FE to the internal buffer after successful output; Stage 0 receives only its listed stat effects.
-
-No V1 Furnace Mastery node changes slot counts or Heat Core stage compatibility. That keeps unlock validation focused on machine level, unspent points, links, and active machine state.
+Nodes do not change Furnace slot counts or Heat Core compatibility. Allocation changes reset active cycles and failure strain while preserving inventory and current lane heat. Shared progression, attributes, refunds, copying, and migration are defined on the Mastery page.
 
 ## Screen Tabs
 
-The furnace screen has Processing, Gear, Stats, Refinement, and Mastery tabs. The Process tab adapts to the placed stage: Stage 0 shows a fuel slot and burn bar, electric single-lane stages show an energy bar and move the Battery Cell to Gear, and Lead shows four compact lane progress bars. The Process tab also shows live heat and, for failure-bearing recipes, failure strain; hover text exposes current heat, minimum, target, safe maximum, overheat limit, and power-drop strain status. The Refinement tab targets the placed furnace itself, accepts one refinement catalyst, and applies the shared refinement rules. The Mastery tab shows machine XP, level, unspent passive points, and the panning Furnace passive tree.
+The furnace screen has Processing, Gear, Stats, Refinement, and Mastery tabs. The Process tab adapts to the placed stage: Stage 0 shows a fuel slot and burn bar, electric single-lane stages show an energy bar and move the Battery Cell to Gear, and Lead shows four compact lane progress bars. The Process tab also shows live heat and, for failure-bearing recipes, failure strain; hover text exposes current heat, minimum, target, safe maximum, overheat limit, and power-drop strain status. The Refinement tab targets the placed furnace itself, accepts one refinement catalyst, and applies the shared refinement rules. The Mastery tab shows machine XP, level, unspent passive points, and the shared passive tree.
 
 ## Modifier Eligibility
 

@@ -92,9 +92,9 @@ Modifier operations currently support:
 | `ORE_BURST_FE_USAGE` | Prototype | Extra FE charged per successfully broken ore block while Ore Burst applies. |
 | `ORE_BURST_COOLDOWN` | Reserved | Reserved for future burst pacing. |
 | `LUCK` | Prototype | Tool-local extra drop chance for eligible modular-tool block drops. It does not affect machines, recipes, chests, mobs, or arbitrary loot. |
-| `CONTROL` | Prototype | Core precision and routing stat for machines. Forestry Companion converts Control into `+1% STABILITY` per point and `1% reduced ENERGY_USAGE` per `5` points. Modular Tool Rods also use Control as deterministic FE-assisted durability protection: values above `1.0` move `control - 1.0` of each durability point onto the installed Battery Cell after Stability does not skip cost, capped at `100%`. |
-| `DRIVE` | Prototype | Core actuation and work-force stat for machines. Forestry Companion converts Drive into `+0.75% PROCESSING_SPEED` per point and `+1 TREE_FELL_LIMIT` per `10` points. |
-| `RESERVE` | Prototype | Core endurance and buffer stat for machines. Forestry Companion converts Reserve into `+2` managed-cell maximum per point. Future machine families can map it to energy, heat, fluid, or interruption buffers where those capacities are real runtime surfaces. |
+| `CONTROL` | Prototype | Machine precision attribute; conversions and explicit scaling are defined in [Machine Mastery](../systems/machine-mastery.md#attributes). Modular Tool Rod Control retains its separate deterministic FE-assisted durability protection above 1.0, after Stability, capped at 100%. |
+| `DRIVE` | Prototype | Machine actuation attribute; see [Mastery conversions](../systems/machine-mastery.md#attributes). |
+| `RESERVE` | Prototype | Machine capacity attribute; see [Mastery conversions](../systems/machine-mastery.md#attributes). |
 
 ## Behavior Flags
 

@@ -214,7 +214,7 @@ public record CrusherRecipe(
                 return 0;
             }
             int level = Math.max(1, requiredProcessingLevel);
-            return Math.min(MachineProgressionState.MAX_LEVEL, 1 + (level - 1) * 4);
+            return MachineProgressionState.progressionBand(1 + (level - 1) * 4);
         }
 
         @Override

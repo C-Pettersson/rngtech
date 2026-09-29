@@ -27,9 +27,13 @@ import com.rngtech.rpg.MachineType;
 import com.rngtech.rpg.ModifierOperation;
 import com.rngtech.rpg.ModifierSlot;
 import com.rngtech.rpg.OutputAmountTracker;
-import com.rngtech.rpg.progression.CrusherPassiveNode;
 import com.rngtech.rpg.progression.CrusherPassiveTree;
+import com.rngtech.rpg.progression.MachineMasteryFamily;
+import com.rngtech.rpg.progression.MachineMasteryHost;
 import com.rngtech.rpg.progression.MachineProgressionState;
+import com.rngtech.rpg.progression.MegaPassiveNode;
+import com.rngtech.rpg.progression.MegaPassiveTree;
+import com.rngtech.rpg.progression.PassiveStatType;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -51,7 +55,7 @@ import net.neoforged.neoforge.energy.IEnergyStorage;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.ItemStackHandler;
 
-public class CrusherBlockEntity extends BaseMachineBlockEntity implements MenuProvider, MachineInfoProvider {
+public class CrusherBlockEntity extends BaseMachineBlockEntity implements MenuProvider, MachineInfoProvider, MachineMasteryHost {
     public static final int STATUS_READY = 0;
     public static final int STATUS_MISSING_CRUSH_HEAD = 1;
     public static final int STATUS_NO_INPUT = 2;
@@ -100,9 +104,9 @@ public class CrusherBlockEntity extends BaseMachineBlockEntity implements MenuPr
     private static final int DATA_UNDER_LEVEL_PENALTY_MULTIPLIER = 28;
     private static final int DATA_MACHINE_PROGRESSION_START = 29;
     private static final int DATA_BATTERY_SLOT_BLOCKED = DATA_MACHINE_PROGRESSION_START + MasteryMenuSupport.FIELD_COUNT;
-    private static final int DATA_CRUSH_HEAD_MATCHING_STAGE_REQUIRED = 40;
-    private static final int DATA_CHASSIS_STAGE = 41;
-    private static final int DATA_COUNT = 42;
+    private static final int DATA_CRUSH_HEAD_MATCHING_STAGE_REQUIRED = DATA_BATTERY_SLOT_BLOCKED + 1;
+    private static final int DATA_CHASSIS_STAGE = DATA_CRUSH_HEAD_MATCHING_STAGE_REQUIRED + 1;
+    private static final int DATA_COUNT = DATA_CHASSIS_STAGE + 1;
     private static final int STAT_SCALE = 100;
 
     private final ItemStackHandler inventory = new ItemStackHandler(SLOT_COUNT) {
@@ -145,12 +149,12 @@ public class CrusherBlockEntity extends BaseMachineBlockEntity implements MenuPr
     private final ContainerData menuData = new ContainerData() {
         @Override
         public int get(int index) {
-            MachineStatAccumulator stats = effectiveStats();
             MachineProgressionState progression = machineProgression();
             if (index >= DATA_MACHINE_PROGRESSION_START
                     && index < DATA_MACHINE_PROGRESSION_START + MasteryMenuSupport.FIELD_COUNT) {
-                return MasteryMenuSupport.get(progression, index - DATA_MACHINE_PROGRESSION_START);
+                return MasteryMenuSupport.get(progression, index - DATA_MACHINE_PROGRESSION_START, CrusherBlockEntity.this::effectiveStats);
             }
+            MachineStatAccumulator stats = effectiveStats();
             return switch (index) {
                 case DATA_PROGRESS -> progress;
                 case DATA_PROCESSING_TICKS -> currentProcessingTicks(stats);
@@ -406,7 +410,7 @@ public class CrusherBlockEntity extends BaseMachineBlockEntity implements MenuPr
         }
         ItemStack input = inventory.getStackInSlot(SLOT_INPUT_A);
         CrusherRecipe recipe = CrusherRecipes.find(level, input).orElse(null);
-        if (recipe != null && (!requireOutputSpace || canAcceptOutput(recipe, stats))) {
+        if (recipe != null && MegaPassiveTree.acceptsHardness(machineProgression(), recipe.requiredProcessingLevel()) && (!requireOutputSpace || canAcceptOutput(recipe, stats))) {
             return recipe;
         }
         return null;
@@ -462,7 +466,7 @@ public class CrusherBlockEntity extends BaseMachineBlockEntity implements MenuPr
         if (xpQuarters <= 0) {
             return;
         }
-        setMachineProgression(progression.withAddedScaledXp((long) recipe.machineXp() * completedJobs, xpQuarters));
+        grantMasteryXp(MachineProgressionState.workXp((long) recipe.machineXp() * completedJobs, recipe.machineXpBand()), xpQuarters);
     }
 
     private static int recipeXpQuarters(CrusherRecipe recipe, MachineProgressionState progression) {
@@ -480,17 +484,8 @@ public class CrusherBlockEntity extends BaseMachineBlockEntity implements MenuPr
         return 0;
     }
 
-    public boolean unlockPassiveNode(CrusherPassiveNode node) {
-        if (node == null) {
-            return false;
-        }
-        MachineProgressionState progression = machineProgression();
-        if (!CrusherPassiveTree.TREE.canUnlock(node, progression) || !gearAllowsPassive(node)) {
-            return false;
-        }
-        setMachineProgression(progression.withUnlockedNode(node.index()));
-        clampInternalEnergy();
-        return true;
+    public boolean unlockPassiveNode(MegaPassiveNode node) {
+        return allocateMastery(node);
     }
 
     public boolean canInstallCrushHead(ItemStack stack) {
@@ -696,6 +691,9 @@ public class CrusherBlockEntity extends BaseMachineBlockEntity implements MenuPr
         CrusherRecipe recipe = CrusherRecipes.find(level, input).orElse(null);
         if (recipe == null) {
             return STATUS_INVALID_RECIPE;
+        }
+        if (!MegaPassiveTree.acceptsHardness(machineProgression(), recipe.requiredProcessingLevel())) {
+            return STATUS_BLOCKED_LEVEL;
         }
         if (input.getCount() < recipe.inputCount()) {
             return STATUS_INSUFFICIENT_INPUT;
@@ -1131,7 +1129,7 @@ public class CrusherBlockEntity extends BaseMachineBlockEntity implements MenuPr
         return CrusherPassiveTree.requiresMatchingCrushHeadStage(machineProgression());
     }
 
-    private boolean gearAllowsPassive(CrusherPassiveNode node) {
+    private boolean gearAllowsPassive(MegaPassiveNode node) {
         if (node.blocksBatteryCell() && isBatteryCell(inventory.getStackInSlot(SLOT_FUEL))) {
             return false;
         }
@@ -1247,4 +1245,19 @@ public class CrusherBlockEntity extends BaseMachineBlockEntity implements MenuPr
             return cell != null && cell.canReceive() && cell.getEnergyStored() < cell.getMaxEnergyStored();
         }
     }
+    @Override public MachineMasteryFamily masteryFamily() { return MachineMasteryFamily.CRUSHER; }
+
+    @Override public MachineProgressionState machineProgression() { return super.machineProgression().forFamily(masteryFamily()); }
+
+    @Override public boolean masteryGearAllows(MachineProgressionState state) {
+        if (MegaPassiveTree.has(state, "BLOCK_BATTERY") && isBatteryCell(inventory.getStackInSlot(SLOT_FUEL))) { return false; }
+        ItemStack headStack = crushHeadStack();
+        if (headStack.isEmpty()) { return true; }
+        if (!(headStack.getItem() instanceof CrushHeadItem head)) { return false; }
+        int stage = head.material().stage();
+        return MegaPassiveTree.has(state, "MATCHING_HEAD") ? stage == chassisMaterial().stage()
+                : stage <= chassisMaterial().stage() + MegaPassiveTree.passive(state, PassiveStatType.COMPONENT_STAGE_SUPPORT);
+    }
+    @Override public void masteryChanged() { progress = 0; batchJobs = 0; clampInternalEnergy(); setChanged(); }
+
 }

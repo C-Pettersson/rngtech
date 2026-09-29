@@ -1,145 +1,137 @@
-# Passive Tree Design Rules v4
+# Passive Tree Design Rules v8
 
 Status: Implemented
 
 Design standard for passive-tree authoring. See [Design Proposals](../design-proposals.md) for broader framework requirements.
 
-Scope: RNGTech machine passive trees built with typed node enums, `PassiveTreeDefinition`, and `PassiveTreeGroup`
+Scope: the shared [Machine Mastery catalog](../systems/machine-mastery.md) and retained legacy typed-tree references. The shared catalog supersedes the per-machine enum/mask format.
 
 ## Design target
 
-Use Path of Exile as a reference for spatial grammar: a central start, compact constellations, short paths between nearby clusters, loops that offer route choices, and keystones around the perimeter. Keep RNGTech names, icons, mechanics, and artwork distinct.
+Use Path of Exile as a reference for spatial grammar: distinct layers of attribute roads, junctions, and star hubs, with varied reward constellations branching into the spaces between roads. Keep RNGTech names, icons, mechanics, and artwork distinct.
 
-A finished tree should read as one field of connected constellations at fit-to-screen scale. Themes may form regions, but each region needs links to its neighbors. Long isolated rails and map-spanning chords fail review.
+The shared tree reads from the center outward:
 
-The fitted render decides whether a layout passes. Graph counts help find problems; they cannot overrule a poor render.
+1. A central junction splits three ways to the core ring. Each branch serves two neighboring starts through spokes of equal step count, so every start pays the same number of points to reach the center.
+2. Six starts sit on a start ring outside the core, so the middle of the tree is travel rather than starting territory.
+3. Each start owns a home region between two boundary spokes. Every home region has its own road silhouette: lattice, trident, loop, bridge, fan, or star hub.
+4. A polygonal middle ring separates the home regions from the outer field.
+5. The outer field has star hubs and bowed climbs up to a curved perimeter road.
+6. Outer constellations sit on and beyond the perimeter.
 
-## Why v3 failed
+Keystones are spread through every layer, from the core to beyond the perimeter, so a build can commit by pathing inward, sideways, or outward. Reaching the outer ring must not be the default route to every keystone.
 
-The v3 rules rewarded edge density. Its 30% node-cycle target and 35% to 55% cross-group link target encouraged authors to add long links until the graph passed. The resulting Forestry Companion tree had 144 edges and a node-cycle rank of 45. It still rendered as tangled lanes spread across a large canvas.
+Travel must consume allocations. Moving between layers should mean following attribute nodes along a spoke, loop, hub, or climb, then deciding whether to leave the road and invest in a reward branch. A sequence of directly connected reward wheels fails this design even when its geometry is tidy.
 
-Version 4 lowers the density targets and adds a ModDex visual gate. The gate loads coordinates and links from the Java source, fits the full graph into a gameplay-style view, and marks crossings and long chords in red.
+Layers are structure, not repetition. Vary road silhouettes, junction radii, hub placement, reward shapes, and open space between regions. Avoid identical clusters in concentric bands, mirrored sectors, and identical keystone pairs.
 
-## Runtime constraints
+The fitted render decides whether the composition works. Counts cannot overrule a poor render.
 
-Keep these constraints unless a tree class records an exception:
+## Why the rules changed
 
-- Preserve released enum order. Append new enum constants after existing constants.
-- Keep the tree within the 128-node save cap imposed by two `long` masks.
-- Target about 100 nodes for a full machine tree.
-- Use one `STARTER` node. Allocate it without spending a point.
-- Give the starter three exits.
-- Give each node a placement and a `PassiveTreeNodeSpec`.
-- Make each node reachable from the starter.
-- Limit `TRAVEL` grants to the tree's core passive attributes.
-- Keep keystones at least seven allocated nodes from the starter.
+Version 3 rewarded density and produced tangled links. Version 4 added a fitted-view gate. Version 5 removed the shared tree's symmetry but still placed its travel nodes inside repeated reward loops. Version 6 separated the travel network from optional reward investments, but clustered all six starts in the middle of a random road web.
 
-Use these degree caps:
+Version 7 moves the starts outward to leave room for core pathing, builds the road network in distinct layers with varied travel between them, adds larger reward constellations, and spreads keystones through every layer, directly on roads or at the end of reward arms, away from the starts. The catalog grows to 1300 nodes, and machines reach level 100.
+
+Version 8 ties keystone payoffs to their costs with machine tags, after Low Heat Specialist doubled the speed of machines that could never feel its heat limit. It also appends new content after the original fill instead of relaying the tree.
+
+## Runtime and topology constraints
+
+- Preserve stable string IDs. Array order is only a synchronized catalog index, never save identity. A layout that renames nodes must bump the catalog version so saved allocations refund.
+- Target about 1300 shared nodes, with approximately half granting travel attributes. The runtime guard allows up to 4096.
+- Levels grant 99 points by level 100. Allocation storage and target builds hold 120 points for future non-level sources.
+- Use six starters, each with three exits: one inward to the core ring and two into its home region. A machine receives only its family's start for free. Foreign starts cannot be traversed.
+- Keep every start within 30%–70% of the occupied bounds on both axes.
+- Make every non-starter reachable from each start without crossing another starter.
+- Limit travel grants to Control, Drive, and Reserve. Hybrid starts do not add attributes. Hybrid regions alternate attributes by road, not by node, and boundary spokes carry the attribute both neighbors share.
+- Connect all travel nodes using travel nodes alone. Removing reward nodes and starters must leave one connected road network.
+- Attach each reward component to one road gate. Multiple open arms may share a gate; reward branches must not form shortcuts between roads.
+- Separate distinct reward gates by at least two travel edges, so even neighboring investments have intervening travel.
+- Require at least three reward allocations from a road gate to a notable. Ordinary bonuses precede the notable on each approach.
+- Keystones may attach directly to a travel node or end an invested reward arm. Every keystone must be at least 10 and at most 99 allocations from every start, so no start region begins beside a commitment. Keep keystones at least 280 units apart.
+- Give travel dead ends a reward destination. Do not add empty spurs to meet a node-count target.
 
 | Kind | Degree cap |
 | --- | ---: |
-| `STARTER` | exactly 3 |
-| `TRAVEL` | 4 |
-| `NODE` | 3 |
-| `NOTABLE` | 2 |
-| `KEYSTONE` | exactly 1 |
+| STARTER | exactly 3 |
+| TRAVEL | 4 |
+| NODE | 3 |
+| NOTABLE | 2 |
+| KEYSTONE | exactly 1 |
 
-The geometry validator must report:
+Released legacy masks and earlier catalog versions are refunded during migration, preserving XP and levels. They do not constrain the shared graph. Nodes have no individual level or chassis-stage gates.
 
-- zero overlapping node bounds;
-- zero links through unrelated node bounds; and
-- zero exact duplicate links.
+## Composition and investment
 
-## Fitted-view acceptance gate
+### Lay out roads first
 
-Load the Java tree in ModDex and inspect **Visual Audit** before handoff. Use the fitted view, since the editor canvas can hide a weak composition behind scroll position and zoom.
+Place the layers before any reward. Connect the core ring to each start's inward exit and to the boundary spokes, and split the center three ways with spokes of equal step count. Give each home region a distinct silhouette with lateral links to its boundary spokes. Join spoke ends and region arrivals with the polygonal middle ring. Climb from the middle ring to the perimeter through star hubs and bowed roads at irregular angles.
 
-For a 90 to 110 node tree, apply these gates:
+A junction that needs more than four roads becomes a roundabout: a small ring of degree-limited travel nodes, each carrying at most one road.
 
-| Metric | Pass condition |
-| --- | ---: |
-| Proper link crossings | `<= max(3, round(edgeCount * 0.02))` |
-| Starter position | within 30% to 70% of both occupied axes |
-| Endpoint coverage | at least 5 of 8 angular sectors |
-| Largest empty endpoint arc | `<= 120 degrees` |
-| Long internal chords | `<= max(3, round(edgeCount * 0.06))` |
-| Internal edge P90 | `<= max(240 px, medianLength * 2.75)` |
+Road spacing and reward spacing serve different purposes. Roads need room to read across the map; rewards sit closer together in constellations. Long roads are allowed when they contain visible, paid travel steps. A single map-spanning edge that bypasses that investment is not a road.
 
-The chord calculation excludes the final link into a one-degree keystone. That link represents a deliberate endpoint commitment. The calculation includes links to ordinary nodes and notables.
+### Branch rewards into the open spaces
 
-Use red crossing markers as repair locations. Move a cluster, rotate orbit occupancy, or remove a redundant link. Keep a crossing only if each local alternative creates a node overlap, a link through a node, or more crossings elsewhere.
+Fill the widest open spaces first, then tighter gaps. Use a mixture of:
 
-## Graph health ranges
+- open arcs, forks, diamonds, and pearl chains with notables along or at the end of the approach;
+- open horseshoes and single-entry rings with notables on the far side;
+- wheels with a central notable;
+- three-by-three lattices entered from two corners, with notables across the far row;
+- crowns: two climbing arms that meet in a scalloped row of three notables;
+- hexagram stars with notables on three tips.
 
-Graph metrics should support the composition without turning the tree into a mesh.
+A constellation may reconnect its own arms locally. It must not connect to a second road and become the cheapest path between specialties. Do not connect tips merely to increase cycle rank.
 
-For a 90 to 110 node tree:
+Vary orientation, mirroring, radius, and spacing. Large showpiece shapes belong in large cells; compact shapes fill the gaps. Leave clear space between reward constellations and the roads that carry the player across the tree.
 
-| Metric | Review range |
-| --- | ---: |
-| Node cycle rank | 15% to 30% of node count |
-| Bridge edges | `<= 20%` after excluding final keystone links |
-| Longest degree-2 corridor | `<= 5` nodes |
-| Articulation nodes | investigate above 25% of node count |
+### Make choices compete
 
-For a 25 to 35 group tree:
+Repeat broad goals across several regions: processing speed, energy efficiency, output handling, attribute scaling, and reserve support should offer more than one route package. Home regions carry their start's themes; outer constellations blend a region with its nearest neighbor, so nearby road gates present competing investments. Balance themes across the whole tree rather than per region.
 
-| Metric | Review range |
-| --- | ---: |
-| Group cycle rank | `>= max(8, ceil(groupCount * 0.25))` |
-| Group articulation count | `<= ceil(groupCount * 0.35)` |
-| Group bridge count | `<= ceil(groupEdges * 0.20)` after excluding endpoint groups |
-| Cross-group edge ratio | 25% to 40% of all edges |
-| Longest low-degree group corridor | at most 3 non-endpoint groups |
+Keep the distinction between increased/reduced, more/less, flat additions, and absolute constraints. Changing a path must not silently change the meaning of its rewards.
 
-A result outside a review range needs a written exception and a clean fitted render. The runtime validator still enforces reachability, node kinds, degree caps, and save limits.
+Spread output handling too. Output constellations exist on both sides of the tree, so a build that paths away from the Drive start still meets output rewards.
 
-## Composition rules
+### Tie keystone payoffs to their costs
 
-### Build a compact skeleton
+Every node stays selectable on every machine, and an irrelevant benefit leaves its relevant penalty in place. The reverse must not happen: a machine that escapes a keystone's cost must not keep its payoff. When the defining cost is family-specific (a heat limit, a hardness ceiling, a blocked Gear slot, or disabled bonus output), tag the payoff with the [machine group](../systems/machine-mastery.md#tagged-payoffs) that pays the cost. A payoff that belongs with a generic penalty, such as energy usage every machine pays, needs no tag. Use ceilings rather than fixed values for keystone limits, so a limit never raises a weak machine to it. `masteryCheck` audits every keystone against every machine family and fails when a payoff reaches a family that receives none of the keystone's costs, or none of its limits.
 
-Place the starter inside the occupied tree body. Arrange three to five regions around it. Each region should contain several clusters, and adjacent regions should share short links near their boundary.
+### Place keystones as commitments
 
-Keep most group centers close enough that a cross-group edge has a similar length to an internal travel edge. Reserve extra distance for a keystone approach or a clear boundary between regions.
+Distribute keystones across the layers: a few in the core for any start that paths inward, some in each home region's outer half, more in the outer field and on outer star hubs, and only a few on the perimeter. Stagger their angles between layers so commitments do not line up along spokes. General keystones belong in the core. A keystone on the center junction is equally far from every start; when distances tie, it faces the Crusher's Drive start. Family keystones sit near the start whose family they suit. A keystone may sit directly on a road, but it must stay at least 10 allocations from every start. All starting archetypes must be able to reach each keystone within the level-100 budget. Check representative builds that combine a nearby commitment with a distant specialty.
 
-Avoid rows, columns, and long monotonic runs. A route that moves in one direction through four group centers reads as a rail even when small loops decorate it.
+## Validation and fitted-view gate
 
-### Use local constellation templates
+Run the catalog audit and load the regenerated source in ModDex before handoff. Inspect the fitted Visual Audit as well as a zoomed section showing road steps and reward approaches.
 
-Useful templates include:
+The shared graph must have zero overlapping node bounds, links through unrelated nodes, exact duplicate links, degree violations, and proper link crossings. Validate travel-only connectivity, one-gate reward components, gate separation, notable investment, keystone start distances, and start positions from the actual links and coordinates; group labels are not proof.
 
-- a crescent with one notable at its edge;
-- two short approaches that meet at a notable;
-- a triangle linking two neighboring clusters;
-- a side pocket with a nearby rejoin;
-- a short keystone approach with a choice near the final link; and
-- a starter rosette whose exits reconnect within four nodes.
+Use the median cross-group link length for the fitted long-chord threshold: max(240 px, median * 2.75). Keep the long-link allowance at max(3, round(edgeCount * 0.06)) and P90 below the threshold. Subdivided roads pass because the travel is paid in visible steps. The final link to a degree-one keystone is excluded from this chord calculation.
 
-Avoid inline notable chains, six-node theme pipes, decorative wheels with one usable route, and several endpoints hanging from one side.
+Endpoints should occupy at least five of eight angular sectors, with no empty arc larger than 120 degrees. Do not add a seventh synthetic starter when importing the catalog.
 
-### Mix reward packages
+The current catalog has 1315 nodes and 1464 links: 6 starts, 634 travel nodes, 458 ordinary nodes, 186 notables, and 31 keystones. Its cycle rank is 150. Reward constellations use 123 road gates: 19 wheels, 4 stars, 4 crowns, 3 lattices, 6 rings, 11 horseshoes, 21 chains, 12 forks, 10 diamonds, 2 arcs, and 18 keystone arms. Thirteen more keystones sit directly on roads, outer star hubs, or the center junction. By radius, 4 keystones are in the core, 9 in home regions, 10 in the outer field, 4 on the perimeter road, and 4 beyond it. The original 1300-node fill is unchanged; two left-side Recovery wheels and the Single Pass keystone were appended after it. Notables cost three to seven reward points from their gates. Keystones are 10 to 46 points from each start; Silent Operation, on the center junction, is exactly 10 from every start. The [generated audit](machine-mega-tree-audit.json) records the exact geometry, distances, and representative 99-point builds.
 
-Split each broad goal across at least three regions. Processing speed, energy efficiency, output handling, and reserve support each need more than one route package.
-
-Give a strong package a nearby competing choice. A speed cluster can border reserve support or control. A cargo cluster can border energy recovery or canopy safety. These links give the player reasons to cross a regional boundary.
-
-### Treat keystones as perimeter commitments
-
-A keystone may use a bridge as its final link. Give its approach cluster a branch, loop, or cross-group choice within two graph steps of that link. Place endpoint groups around the occupied perimeter instead of collecting them into a comb.
+The legacy small-tree review ranges remain useful for the historical reference only: node cycle rank 15–30%, bridge edges up to 20% excluding keystone endpoints, degree-two corridors up to five nodes, and articulation review above 25%. For its 25–35 groups, review cross-group ratios of 25–40%, group cycle rank at least max(8, ceil(groupCount * 0.25)), group articulation up to 35%, group bridges up to 20%, and low-degree group corridors up to three groups. These are not shared-tree targets.
 
 ## Authoring workflow
 
-1. Sketch a group graph with the starter, regional clusters, and endpoint groups.
-2. Place group centers around the starter and assign orbit templates.
-3. Add short internal links and links between neighboring groups.
-4. Assign themes and rewards after the skeleton reads as one tree.
-5. Run the runtime and geometry validators.
-6. Load the Java source in ModDex and repair each fitted-view failure.
-7. Record graph metrics and intentional exceptions in the handoff.
+1. Place the hub, core ring, starts, boundary spokes, and home-region silhouettes.
+2. Add the middle ring, outer star hubs, climbs, and perimeter road, with paid intermediate steps.
+3. Place keystones, then fill open spaces with reward constellations, largest cells first.
+4. Assign themes, notable names, special notables, and keystones without altering modifier keyword semantics.
+5. Regenerate the runtime catalog, ModDex source export, audit report, and overview.
+6. Check investment costs, keystone distances, runtime reachability, geometry, and the fitted render.
 
-Do not add links to chase cycle rank after the fitted composition works. Add a link when it creates a useful route choice and can stay local in the render.
+`tools/moddex/layout-mega-tree.mjs` owns steps 1–3, and `author-mega-tree.mjs` owns step 4. Do not add links to chase cycle rank or reduce bridge counts after the composition works.
 
-## Forestry Companion reference result
+Add later content through `EXTRAS` in `author-mega-tree.mjs`. Each entry names a target position, allowed shapes, and a theme or keystone. The layout places extras after the original fill, and special notables and angle-ordered keystone slots ignore them, so every earlier node keeps its ID, position, and links without a catalog version bump.
+
+## Historical Forestry Companion reference result
+
+This retained 100-node definition documents the v4 reference, not the graph currently used in gameplay. The shared catalog, [audit report](machine-mega-tree-audit.json), and [overview](../assets/machine-mega-passive-tree.svg) are the current source for all three adapters.
 
 The Forestry Companion layout follows the [concept image](passive-tree-concept.png): a central start, an irregular field of connected constellations, larger notable landmarks, and five keystones around the perimeter. All 100 node ids, enum ordinals, effects, and level requirements are preserved. Routes have been re-authored, so the paths to future allocations change while saved allocations keep their identities.
 

@@ -7,6 +7,7 @@
   "minimum_stage": 1,
   "processing_ticks": 170,
   "energy": 1300,
+  "machine_xp": 2,
   "result": {
     "stack": { "id": "rngtech:calibrated_thermal_component" },
     "stage": 2,

@@ -2,6 +2,7 @@ package com.rngtech.content.entity;
 
 import com.rngtech.content.blockentity.ForestryCartStationBlockEntity;
 import com.rngtech.content.item.BatteryCellItem;
+import com.rngtech.content.item.ConfiguratorItem;
 import com.rngtech.content.item.ForestryCartItem;
 import com.rngtech.content.item.ModularToolItem;
 import com.rngtech.content.item.PruningShearsItem;
@@ -16,9 +17,12 @@ import com.rngtech.content.tool.ToolHeadFamily;
 import com.rngtech.rpg.MachineStat;
 import com.rngtech.rpg.MachineStatAccumulator;
 import com.rngtech.rpg.MachineTraits;
-import com.rngtech.rpg.progression.ForestryCompanionPassiveNode;
 import com.rngtech.rpg.progression.ForestryCompanionPassiveTree;
+import com.rngtech.rpg.progression.MachineMasteryFamily;
+import com.rngtech.rpg.progression.MachineMasteryHost;
 import com.rngtech.rpg.progression.MachineProgressionState;
+import com.rngtech.rpg.progression.MegaPassiveNode;
+import com.rngtech.rpg.progression.MegaPassiveTree;
 
 import com.mojang.authlib.GameProfile;
 import net.minecraft.core.BlockPos;
@@ -82,7 +86,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
-public class ForestryCartEntity extends AbstractMinecart implements MenuProvider {
+public class ForestryCartEntity extends AbstractMinecart implements MenuProvider, MachineMasteryHost {
     public static final int SAPLING_SLOT_START = 0;
     public static final int SAPLING_SLOT_COUNT = 2;
     public static final int OUTPUT_SLOT_START = SAPLING_SLOT_START + SAPLING_SLOT_COUNT;
@@ -185,7 +189,7 @@ public class ForestryCartEntity extends AbstractMinecart implements MenuProvider
         public int get(int index) {
             if (index >= ForestryCartMenu.DATA_MACHINE_PROGRESSION_START
                     && index < ForestryCartMenu.DATA_MACHINE_PROGRESSION_START + MasteryMenuSupport.FIELD_COUNT) {
-                return MasteryMenuSupport.get(machineProgression, index - ForestryCartMenu.DATA_MACHINE_PROGRESSION_START);
+                return MasteryMenuSupport.get(machineProgression(), index - ForestryCartMenu.DATA_MACHINE_PROGRESSION_START, ForestryCartEntity.this::effectiveStats);
             }
             return switch (index) {
                 case ForestryCartMenu.DATA_STATUS -> status;
@@ -318,27 +322,24 @@ public class ForestryCartEntity extends AbstractMinecart implements MenuProvider
     }
 
     public MachineProgressionState machineProgression() {
-        return machineProgression;
+        return machineProgression.forFamily(masteryFamily());
     }
 
     public void setMachineProgression(MachineProgressionState machineProgression) {
-        this.machineProgression = machineProgression == null ? MachineProgressionState.EMPTY : machineProgression;
+        this.machineProgression = (machineProgression == null ? MachineProgressionState.EMPTY : machineProgression).forFamily(masteryFamily());
         if (!manualSpeedUnlocked()) {
             manualSpeedEnabled = false;
         }
     }
 
-    public boolean unlockPassiveNode(ForestryCompanionPassiveNode node) {
-        if (node == null || !ForestryCompanionPassiveTree.TREE.canUnlock(node, machineProgression)) {
-            return false;
-        }
-        setMachineProgression(machineProgression.withUnlockedNode(node.index()));
-        return true;
+    public boolean unlockPassiveNode(MegaPassiveNode node) {
+        return allocateMastery(node);
     }
 
     private void addMachineXp(int amount) {
         if (amount > 0) {
-            setMachineProgression(machineProgression.withAddedXp(amount));
+            int band = Math.min(MachineProgressionState.MAX_LEVEL - 2, 12 + (int) Math.sqrt(Math.max(0, effectiveStats().value(MachineStat.TREE_FELL_LIMIT))) * 10);
+            grantMasteryXp(MachineProgressionState.workXp(amount, band), MachineProgressionState.xpQuarters(machineProgression().level(), band));
         }
     }
 
@@ -379,7 +380,7 @@ public class ForestryCartEntity extends AbstractMinecart implements MenuProvider
 
     public int maxManagedCells() {
         return BASE_MAX_MANAGED_CELLS + ForestryCompanionPassiveTree.managedCellBonus(machineProgression)
-                + coreStatPoints(MachineStat.RESERVE) * 2;
+                + (MegaPassiveTree.has(machineProgression, "NO_INHERENT_ATTRIBUTES") ? 0 : coreStatPoints(MachineStat.RESERVE) / 4);
     }
 
     public boolean manualSpeedUnlocked() {
@@ -737,6 +738,11 @@ public class ForestryCartEntity extends AbstractMinecart implements MenuProvider
 
     @Override
     public InteractionResult interact(Player player, InteractionHand hand) {
+        ItemStack held = player.getItemInHand(hand);
+        if (held.getItem() instanceof ConfiguratorItem
+                && held.getOrDefault(ModDataComponents.MASTERY_CONFIGURATOR_MODE.get(), false)) {
+            return ConfiguratorItem.useMastery(player, held, this);
+        }
         if (level().isClientSide) {
             return InteractionResult.SUCCESS;
         }
@@ -2689,4 +2695,6 @@ public class ForestryCartEntity extends AbstractMinecart implements MenuProvider
             this.state = state;
         }
     }
+    @Override public MachineMasteryFamily masteryFamily() { return MachineMasteryFamily.FORESTRY; }
+
 }

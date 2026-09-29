@@ -2,44 +2,42 @@ package com.rngtech.rpg.progression;
 
 import com.rngtech.rpg.MachineStatAccumulator;
 
-import java.util.List;
 
 public final class ForestryCompanionPassiveTree {
     public static final PassiveTreeDefinition<ForestryCompanionPassiveNode> DEFINITION =
             ForestryCompanionPassiveTreeDefinition.create();
-    public static final PassiveTree<ForestryCompanionPassiveNode> TREE =
-            new PassiveTree<>(List.of(ForestryCompanionPassiveNode.values()));
+    public static final PassiveTree<MegaPassiveNode> TREE = MegaPassiveTree.TREE;
 
     public static void applyStats(MachineStatAccumulator stats, MachineProgressionState progression) {
-        TREE.applyStats(stats, progression);
+        MegaPassiveTree.applyStats(stats, progression, MachineMasteryFamily.FORESTRY);
     }
 
     public static boolean mutesMachineSound(MachineProgressionState progression) {
-        return TREE.hasUnlockedFlag(PassiveNodeFlag.MUTE_MACHINE_SOUND, progression);
+        return MegaPassiveTree.has(progression, "MUTE_MACHINE_SOUND");
     }
 
     public static boolean enablesMagnetMode(MachineProgressionState progression) {
-        return ForestryCompanionPassiveNode.MAGNET_MODE.isUnlocked(progression);
+        return MegaPassiveTree.has(progression, "MAGNET_MODE");
     }
 
     public static boolean processesLeavesWithoutShears(MachineProgressionState progression) {
-        return ForestryCompanionPassiveNode.SERRATED_LEAF_PROTOCOL.isUnlocked(progression);
+        return MegaPassiveTree.has(progression, "SERRATED_LEAF_PROTOCOL");
     }
 
     public static boolean enablesManualThrottle(MachineProgressionState progression) {
-        return ForestryCompanionPassiveNode.MANUAL_THROTTLE.isUnlocked(progression);
+        return MegaPassiveTree.has(progression, "MANUAL_THROTTLE");
     }
 
     public static boolean enablesCoastingClutch(MachineProgressionState progression) {
-        return ForestryCompanionPassiveNode.COASTING_CLUTCH.isUnlocked(progression);
+        return MegaPassiveTree.has(progression, "COASTING_CLUTCH");
     }
 
     public static boolean routesMagnetSaplings(MachineProgressionState progression) {
-        return ForestryCompanionPassiveNode.SEEDLING_MAGNET.isUnlocked(progression);
+        return MegaPassiveTree.has(progression, "SEEDLING_MAGNET");
     }
 
     public static int managedCellBonus(MachineProgressionState progression) {
-        return TREE.statTotal(PassiveStatType.MANAGED_CELLS, progression);
+        return MegaPassiveTree.passive(progression, PassiveStatType.MANAGED_CELLS);
     }
 
     private ForestryCompanionPassiveTree() {

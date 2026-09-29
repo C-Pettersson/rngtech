@@ -27,5 +27,6 @@
     "count": 4,
     "id": "rngtech:malformed_ingot"
   },
-  "failure_material": "tungstensteel"
+  "failure_material": "tungstensteel",
+  "machine_xp": 12
 }

@@ -26,9 +26,11 @@ import com.rngtech.rpg.MachineTraits;
 import com.rngtech.rpg.MachineType;
 import com.rngtech.rpg.ModifierOperation;
 import com.rngtech.rpg.ModifierSlot;
-import com.rngtech.rpg.progression.FurnacePassiveNode;
 import com.rngtech.rpg.progression.FurnacePassiveTree;
+import com.rngtech.rpg.progression.MachineMasteryFamily;
+import com.rngtech.rpg.progression.MachineMasteryHost;
 import com.rngtech.rpg.progression.MachineProgressionState;
+import com.rngtech.rpg.progression.MegaPassiveNode;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -52,7 +54,7 @@ import net.neoforged.neoforge.energy.IEnergyStorage;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.ItemStackHandler;
 
-public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuProvider, MachineInfoProvider {
+public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuProvider, MachineInfoProvider, MachineMasteryHost {
     public static final int MAX_PROCESSING_SLOTS = 4;
     public static final int MAX_GEAR_SLOTS = 4;
     public static final int SLOT_INPUT_START = 0;
@@ -214,7 +216,7 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
             }
             if (index >= DATA_MACHINE_PROGRESSION_START
                     && index < DATA_MACHINE_PROGRESSION_START + MasteryMenuSupport.FIELD_COUNT) {
-                return MasteryMenuSupport.get(machineProgression(), index - DATA_MACHINE_PROGRESSION_START);
+                return MasteryMenuSupport.get(machineProgression(), index - DATA_MACHINE_PROGRESSION_START, FurnaceBlockEntity.this::effectiveStats);
             }
             return switch (index) {
                 case DATA_BURN_TIME -> burnTime;
@@ -915,7 +917,7 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
         if (xpQuarters <= 0) {
             return;
         }
-        setMachineProgression(progression.withAddedScaledXp(recipe.machineXp(), xpQuarters));
+        grantMasteryXp(MachineProgressionState.workXp(recipe.machineXp(), recipe.machineXpBand()), xpQuarters);
     }
 
     private static int recipeXpQuarters(FurnaceRecipe recipe, MachineProgressionState progression) {
@@ -932,20 +934,8 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
         return 0;
     }
 
-    public boolean unlockPassiveNode(FurnacePassiveNode node) {
-        if (node == null) {
-            return false;
-        }
-        MachineProgressionState progression = machineProgression();
-        if (!FurnacePassiveTree.TREE.canUnlock(node, progression)) {
-            return false;
-        }
-        setMachineProgression(progression.withUnlockedNode(node.index()));
-        resetAllCycles();
-        resetBulkSpeed();
-        clampInternalEnergy();
-        setChanged();
-        return true;
+    public boolean unlockPassiveNode(MegaPassiveNode node) {
+        return allocateMastery(node);
     }
 
     @Override
@@ -1678,4 +1668,10 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
             return cell != null && cell.canReceive() && cell.getEnergyStored() < cell.getMaxEnergyStored();
         }
     }
+    @Override public MachineMasteryFamily masteryFamily() { return MachineMasteryFamily.FURNACE; }
+
+    @Override public MachineProgressionState machineProgression() { return super.machineProgression().forFamily(masteryFamily()); }
+
+    @Override public void masteryChanged() { resetAllCycles(); resetBulkSpeed(); clampInternalEnergy(); setChanged(); }
+
 }

@@ -6,6 +6,7 @@
   "catalyst": { "item": "minecraft:emerald" },
   "processing_ticks": 480,
   "energy": 60000,
+  "machine_xp": 8,
   "result": {
     "stack": { "id": "rngtech:calibrated_diamond_crystal" },
     "stage": 6,

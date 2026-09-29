@@ -6,6 +6,7 @@
   "catalyst": { "item": "minecraft:lapis_lazuli" },
   "processing_ticks": 160,
   "energy": 1200,
+  "machine_xp": 2,
   "result": {
     "stack": { "id": "rngtech:calibrated_structural_component" },
     "stage": 1,

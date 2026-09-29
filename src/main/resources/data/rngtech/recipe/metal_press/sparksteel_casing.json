@@ -27,5 +27,6 @@
     "count": 4,
     "id": "rngtech:malformed_ingot"
   },
-  "failure_material": "sparksteel"
+  "failure_material": "sparksteel",
+  "machine_xp": 8
 }

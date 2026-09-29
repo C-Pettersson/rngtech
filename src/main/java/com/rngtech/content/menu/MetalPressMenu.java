@@ -3,7 +3,15 @@ package com.rngtech.content.menu;
 import com.rngtech.content.block.MetalPressBlock;
 import com.rngtech.content.blockentity.MetalPressBlockEntity;
 import com.rngtech.content.registry.ModMenus;
+import com.rngtech.rpg.MachineStat;
 import com.rngtech.rpg.MachineTraits;
+import com.rngtech.rpg.progression.MachineMasteryFamily;
+import com.rngtech.rpg.progression.MachineMasteryHost;
+import com.rngtech.rpg.progression.MachineProgressionState;
+import com.rngtech.rpg.progression.MegaPassiveNode;
+import com.rngtech.rpg.progression.MegaPassiveTree;
+import com.rngtech.rpg.progression.PassiveNode;
+import com.rngtech.rpg.progression.PassiveProgressionView;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.RegistryFriendlyByteBuf;
@@ -22,11 +30,12 @@ import net.neoforged.neoforge.items.SlotItemHandler;
 
 import java.util.function.BooleanSupplier;
 
-public class MetalPressMenu extends AbstractContainerMenu {
+public class MetalPressMenu extends AbstractContainerMenu implements MasteryMenuView<MegaPassiveNode> {
     public static final int TAB_PROCESSING = 0;
     public static final int TAB_GEAR = 1;
     public static final int TAB_CONFIGURATION = 2;
     public static final int TAB_REFINEMENT = 3;
+    public static final int TAB_MASTERY = 4;
 
     private static final int DATA_PROGRESS = 0;
     private static final int DATA_PROCESSING_TICKS = 1;
@@ -55,7 +64,8 @@ public class MetalPressMenu extends AbstractContainerMenu {
     private static final int DATA_SELECTED_MOLD = 24;
     private static final int DATA_ENERGY_PER_TICK = 25;
     private static final int DATA_ENERGY_PER_CRAFT = 26;
-    private static final int DATA_COUNT = DATA_ENERGY_PER_CRAFT + 1;
+    private static final int DATA_MACHINE_PROGRESSION_START = DATA_ENERGY_PER_CRAFT + 1;
+    private static final int DATA_COUNT = DATA_MACHINE_PROGRESSION_START + MasteryMenuSupport.FIELD_COUNT;
     private static final int STAT_SCALE = 100;
     public static final int BUTTON_SELECT_MOLD_BASE = 100;
     private static final int PROCESS_SLOT_COUNT = MetalPressBlockEntity.PROCESS_SLOT_COUNT;
@@ -73,6 +83,12 @@ public class MetalPressMenu extends AbstractContainerMenu {
     private final ContainerData data;
     private final MetalPressBlockEntity press;
     private final ItemStackHandler refinementTarget = new ItemStackHandler(1);
+    private final PassiveProgressionView passiveProgressionView = MasteryMenuSupport.progressionView(
+            this::hasPassiveNodeIndex,
+            this::machineLevel,
+            this::unspentPassivePoints,
+            MachineMasteryFamily.METAL_PRESS.startNodeId()
+    );
     private int selectedTab = TAB_PROCESSING;
 
     public MetalPressMenu(int containerId, Inventory playerInventory, RegistryFriendlyByteBuf extraData) {
@@ -134,6 +150,7 @@ public class MetalPressMenu extends AbstractContainerMenu {
             case TAB_GEAR -> TAB_GEAR;
             case TAB_CONFIGURATION -> TAB_CONFIGURATION;
             case TAB_REFINEMENT -> TAB_REFINEMENT;
+            case TAB_MASTERY -> TAB_MASTERY;
             default -> TAB_PROCESSING;
         };
     }
@@ -215,6 +232,84 @@ public class MetalPressMenu extends AbstractContainerMenu {
 
     public int selectedMold() {
         return data.get(DATA_SELECTED_MOLD);
+    }
+
+    public boolean isCrudePress() {
+        return press.isCrudePress();
+    }
+
+    @Override
+    public long machineXp() {
+        return MasteryMenuSupport.machineXp(data, DATA_MACHINE_PROGRESSION_START);
+    }
+
+    @Override
+    public int machineLevel() {
+        return MasteryMenuSupport.machineLevel(data, DATA_MACHINE_PROGRESSION_START);
+    }
+
+    @Override
+    public int machineXpInLevel() {
+        return MasteryMenuSupport.machineXpInLevel(data, DATA_MACHINE_PROGRESSION_START);
+    }
+
+    @Override
+    public int machineXpToNextLevel() {
+        return MasteryMenuSupport.machineXpToNextLevel(data, DATA_MACHINE_PROGRESSION_START);
+    }
+
+    @Override
+    public float machineXpProgress() {
+        return MasteryMenuSupport.machineXpProgress(data, DATA_MACHINE_PROGRESSION_START);
+    }
+
+    @Override
+    public int unspentPassivePoints() {
+        return MasteryMenuSupport.unspentPassivePoints(data, DATA_MACHINE_PROGRESSION_START);
+    }
+
+    @Override
+    public boolean hasPassiveNode(PassiveNode node) {
+        return node != null && node.isUnlocked(passiveProgressionView);
+    }
+
+    @Override
+    public boolean canUnlockPassiveNode(MegaPassiveNode node) {
+        return MegaPassiveTree.TREE.canUnlock(node, passiveProgressionView);
+    }
+
+    @Override
+    public boolean hasUnlockedPassiveConnection(PassiveNode node) {
+        return node != null && node.parentUnlocked(passiveProgressionView);
+    }
+
+    private boolean hasPassiveNodeIndex(int index) {
+        return MasteryMenuSupport.hasPassiveNodeIndex(data, DATA_MACHINE_PROGRESSION_START, index);
+    }
+
+    @Override
+    public MachineMasteryHost masteryHost() {
+        return press;
+    }
+
+    @Override
+    public MachineMasteryFamily masteryFamily() {
+        return MachineMasteryFamily.METAL_PRESS;
+    }
+
+    @Override
+    public MachineProgressionState masterySnapshot() {
+        return MasteryMenuSupport.snapshot(data, DATA_MACHINE_PROGRESSION_START, masteryFamily());
+    }
+
+    @Override
+    public double masteryAttribute(MachineStat stat) {
+        return MasteryMenuSupport.attribute(data, DATA_MACHINE_PROGRESSION_START, stat);
+    }
+
+    @Override
+    public boolean masterySupports(MachineStat stat) {
+        return masteryFamily().supports(stat) && (stat != MachineStat.STABILITY || !isCrudePress());
     }
 
     public MachineTraits machineTraits() {
@@ -300,6 +395,13 @@ public class MetalPressMenu extends AbstractContainerMenu {
             data.set(DATA_SELECTED_MOLD, selectedMold);
             press.selectMold(selectedMold);
             return true;
+        }
+        MegaPassiveNode passiveNode = MegaPassiveTree.byButtonId(id);
+        if (passiveNode != null) {
+            if (player.level().isClientSide) {
+                return true;
+            }
+            return press.unlockPassiveNode(passiveNode);
         }
         if (id == RefinementMenuSupport.BUTTON_APPLY) {
             if (player.level().isClientSide) {
@@ -394,7 +496,7 @@ public class MetalPressMenu extends AbstractContainerMenu {
                         column + row * 9 + 9,
                         39 + column * 18,
                         116 + row * 18,
-                        () -> selectedTab != TAB_CONFIGURATION
+                        () -> selectedTab != TAB_CONFIGURATION && selectedTab != TAB_MASTERY
                 ));
             }
         }
@@ -405,7 +507,7 @@ public class MetalPressMenu extends AbstractContainerMenu {
                     column,
                     39 + column * 18,
                     174,
-                    () -> selectedTab != TAB_CONFIGURATION
+                    () -> selectedTab != TAB_CONFIGURATION && selectedTab != TAB_MASTERY
             ));
         }
     }

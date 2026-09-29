@@ -490,7 +490,8 @@ public enum FurnacePassiveNode implements StringRepresentable, PassiveNode {
     }
 
     public static FurnacePassiveNode byButtonId(int buttonId) {
-        return FurnacePassiveTree.TREE.byButtonId(buttonId);
+        int index = buttonId - 100;
+        return index >= 0 && index < values().length ? values()[index] : null;
     }
 
     @Override

@@ -3,9 +3,14 @@ package com.rngtech.content.menu;
 import com.rngtech.content.block.CrusherBlock;
 import com.rngtech.content.blockentity.CrusherBlockEntity;
 import com.rngtech.content.registry.ModMenus;
+import com.rngtech.rpg.MachineStat;
 import com.rngtech.rpg.MachineTraits;
-import com.rngtech.rpg.progression.CrusherPassiveNode;
 import com.rngtech.rpg.progression.CrusherPassiveTree;
+import com.rngtech.rpg.progression.MachineMasteryFamily;
+import com.rngtech.rpg.progression.MachineMasteryHost;
+import com.rngtech.rpg.progression.MachineProgressionState;
+import com.rngtech.rpg.progression.MegaPassiveNode;
+import com.rngtech.rpg.progression.MegaPassiveTree;
 import com.rngtech.rpg.progression.PassiveNode;
 import com.rngtech.rpg.progression.PassiveProgressionView;
 
@@ -26,7 +31,7 @@ import net.neoforged.neoforge.items.SlotItemHandler;
 
 import java.util.function.BooleanSupplier;
 
-public class CrusherMenu extends AbstractContainerMenu implements MasteryMenuView<CrusherPassiveNode> {
+public class CrusherMenu extends AbstractContainerMenu implements MasteryMenuView<MegaPassiveNode> {
     public static final int TAB_PROCESSING = 0;
     public static final int TAB_GEAR = 1;
     public static final int TAB_CONFIGURATION = 2;
@@ -64,9 +69,9 @@ public class CrusherMenu extends AbstractContainerMenu implements MasteryMenuVie
     private static final int DATA_UNDER_LEVEL_PENALTY_MULTIPLIER = 28;
     private static final int DATA_MACHINE_PROGRESSION_START = 29;
     private static final int DATA_BATTERY_SLOT_BLOCKED = DATA_MACHINE_PROGRESSION_START + MasteryMenuSupport.FIELD_COUNT;
-    private static final int DATA_CRUSH_HEAD_MATCHING_STAGE_REQUIRED = 40;
-    private static final int DATA_CHASSIS_STAGE = 41;
-    private static final int DATA_COUNT = 42;
+    private static final int DATA_CRUSH_HEAD_MATCHING_STAGE_REQUIRED = DATA_BATTERY_SLOT_BLOCKED + 1;
+    private static final int DATA_CHASSIS_STAGE = DATA_CRUSH_HEAD_MATCHING_STAGE_REQUIRED + 1;
+    private static final int DATA_COUNT = DATA_CHASSIS_STAGE + 1;
     private static final int STAT_SCALE = 100;
     private static final int OUTPUT_BONUS_SCALE = 1000;
     private static final int MACHINE_SLOT_COUNT = CrusherBlockEntity.SLOT_COUNT;
@@ -84,7 +89,7 @@ public class CrusherMenu extends AbstractContainerMenu implements MasteryMenuVie
     private final CrusherBlockEntity crusher;
     private final ItemStackHandler refinementTarget = new ItemStackHandler(1);
     private final PassiveProgressionView passiveProgressionView =
-            MasteryMenuSupport.progressionView(this::hasPassiveNodeIndex, this::machineLevel, this::unspentPassivePoints);
+            MasteryMenuSupport.progressionView(this::hasPassiveNodeIndex, this::machineLevel, this::unspentPassivePoints, MachineMasteryFamily.CRUSHER.startNodeId());
     private int selectedTab = TAB_PROCESSING;
 
     public CrusherMenu(int containerId, Inventory playerInventory, RegistryFriendlyByteBuf extraData) {
@@ -274,7 +279,7 @@ public class CrusherMenu extends AbstractContainerMenu implements MasteryMenuVie
         return node != null && node.isUnlocked(passiveProgressionView);
     }
 
-    public boolean canUnlockPassiveNode(CrusherPassiveNode node) {
+    public boolean canUnlockPassiveNode(MegaPassiveNode node) {
         return CrusherPassiveTree.TREE.canUnlock(node, passiveProgressionView);
     }
 
@@ -396,7 +401,7 @@ public class CrusherMenu extends AbstractContainerMenu implements MasteryMenuVie
 
     @Override
     public boolean clickMenuButton(Player player, int id) {
-        CrusherPassiveNode passiveNode = CrusherPassiveNode.byButtonId(id);
+        MegaPassiveNode passiveNode = MegaPassiveTree.byButtonId(id);
         if (passiveNode != null) {
             if (player.level().isClientSide) {
                 return true;
@@ -535,6 +540,13 @@ public class CrusherMenu extends AbstractContainerMenu implements MasteryMenuVie
         public boolean isActive() {
             return activeSupplier.getAsBoolean();
         }
+    }
+
+    @Override public MachineMasteryHost masteryHost() { return crusher; }
+    @Override public double masteryAttribute(MachineStat stat) { return MasteryMenuSupport.attribute(data, DATA_MACHINE_PROGRESSION_START, stat); }
+    @Override public MachineMasteryFamily masteryFamily() { return MachineMasteryFamily.CRUSHER; }
+    @Override public MachineProgressionState masterySnapshot() {
+        return MasteryMenuSupport.snapshot(data, DATA_MACHINE_PROGRESSION_START, masteryFamily());
     }
 
 }

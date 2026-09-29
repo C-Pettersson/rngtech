@@ -27,5 +27,6 @@
     "count": 4,
     "id": "rngtech:malformed_ingot"
   },
-  "failure_material": "naquadah"
+  "failure_material": "naquadah",
+  "machine_xp": 16
 }

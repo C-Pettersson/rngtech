@@ -30,5 +30,6 @@
   "minimum_component_stage": 4,
   "minimum_temperature": 1100,
   "target_temperature": 1100,
-  "required_temperature_stability": 1.0
+  "required_temperature_stability": 1.0,
+  "machine_xp": 3
 }

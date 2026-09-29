@@ -3,6 +3,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import vm from "node:vm";
 import { buildPassiveTreeData } from "./export-passive-tree-data.mjs";
+import { checkMegaTree } from "./check-mega-tree.mjs";
 
 const TOOL_ROOT = path.dirname(fileURLToPath(import.meta.url));
 const PROJECT_ROOT = path.resolve(TOOL_ROOT, "../..");
@@ -19,6 +20,13 @@ export async function checkPassiveTreeData(catalog, { log = true } = {}) {
         failures.push("Missing Forestry Companion Java export");
     }
     for (const entry of catalog.trees ?? []) {
+        if (entry.sourceFormat === "catalog") {
+            const shared = await checkMegaTree({ log });
+            const count = entry.tree.groups.reduce((sum, group) => sum + group.nodeCount, 0);
+            if (count !== shared.tree.nodes.length || entry.tree.connections.length !== shared.tree.links.length) failures.push("Shared tree export does not match runtime catalog");
+            results.push(shared.metrics);
+            continue;
+        }
         const enumPath = path.resolve(PROJECT_ROOT, entry.sourcePath.replace("PassiveTreeLayout.java", "PassiveNode.java"));
         const enumSource = await readFile(enumPath, "utf8");
         const expectedNodes = new Map([...enumSource.matchAll(/\b([A-Z][A-Z0-9_]+)\s*\(\s*\d+\s*,\s*PassiveNodeKind\.([A-Z]+)/g)]

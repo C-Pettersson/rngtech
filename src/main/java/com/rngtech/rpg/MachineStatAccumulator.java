@@ -26,6 +26,16 @@ public final class MachineStatAccumulator {
     private final Map<MachineStat, Double> increasedPercentValues = new EnumMap<>(MachineStat.class);
     private final Map<MachineStat, Double> moreValues = new EnumMap<>(MachineStat.class);
     private double flatEnergyGenerationBonus;
+    private final Map<MachineStat, Double> absoluteValues = new EnumMap<>(MachineStat.class);
+    private final Map<MachineStat, Double> absoluteCeilings = new EnumMap<>(MachineStat.class);
+
+    public void setAbsolute(MachineStat stat, double value) {
+        absoluteValues.merge(accumulationStat(stat), value, Math::min);
+    }
+
+    public void capAbsolute(MachineStat stat, double value) {
+        absoluteCeilings.merge(accumulationStat(stat), value, Math::min);
+    }
 
     public static MachineStatAccumulator fromRanges(List<MachineStatRange> ranges, RandomSource random) {
         MachineStatAccumulator stats = new MachineStatAccumulator();
@@ -614,7 +624,9 @@ public final class MachineStatAccumulator {
         double added = additiveValues.getOrDefault(resolvedStat, 0.0);
         double increased = increasedPercentValues.getOrDefault(resolvedStat, 0.0);
         double more = moreValues.getOrDefault(resolvedStat, 1.0);
-        return (base + added) * (1.0 + increased / 100.0) * more;
+        double ordinary = (base + added) * Math.max(0.0, 1.0 + increased / 100.0) * more;
+        return Math.min(absoluteValues.getOrDefault(resolvedStat, ordinary),
+                absoluteCeilings.getOrDefault(resolvedStat, Double.POSITIVE_INFINITY));
     }
 
     public double generatedEnergyTotal(double baseEnergy, int processingTicks) {

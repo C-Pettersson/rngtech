@@ -105,6 +105,7 @@ public final class ModCreativeTabs {
                         }
                         output.accept(ModItems.WRENCH.get());
                         output.accept(ModItems.CONFIGURATOR.get());
+                        output.accept(ModItems.MASTERY_REFUND.get());
                         output.accept(ModItems.ADVANCED_ITEM_FILTER.get());
                         output.accept(ModItems.MINERS_COMPANION.get());
                         output.accept(ModItems.MINERS_COMPANION_MAGNET.get());

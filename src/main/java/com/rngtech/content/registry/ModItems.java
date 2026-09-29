@@ -225,6 +225,8 @@ public final class ModItems {
             "wrench",
             () -> new WrenchItem(new Item.Properties().stacksTo(1))
     );
+    public static final DeferredItem<Item> MASTERY_REFUND = ITEMS.registerSimpleItem("mastery_refund");
+
     public static final DeferredItem<ConfiguratorItem> CONFIGURATOR = ITEMS.register(
             "configurator",
             () -> new ConfiguratorItem(new Item.Properties().stacksTo(1))

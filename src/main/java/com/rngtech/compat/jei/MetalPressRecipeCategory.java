@@ -22,7 +22,7 @@ import java.util.Arrays;
 import java.util.List;
 
 public final class MetalPressRecipeCategory implements IRecipeCategory<RecipeHolder<MetalPressRecipe>> {
-    private static final int HEIGHT = 110;
+    private static final int HEIGHT = 116;
     private static final int INPUT_X = 4;
     private static final int MOLD_X = 34;
     private static final int OUTPUT_X = 142;
@@ -145,6 +145,15 @@ public final class MetalPressRecipeCategory implements IRecipeCategory<RecipeHol
                 92,
                 JeiCategoryUi.MUTED_TEXT_COLOR
         );
+        if (recipe.machineXp() > 0) {
+            JeiCategoryUi.drawLine(
+                    guiGraphics,
+                    font,
+                    Component.translatable("rngtech.jei.machine_xp", recipe.machineXp(), recipe.machineXpBand()),
+                    102,
+                    JeiCategoryUi.MUTED_TEXT_COLOR
+            );
+        }
     }
 
     private static List<ItemStack> countedIngredientStacks(MetalPressRecipe recipe) {

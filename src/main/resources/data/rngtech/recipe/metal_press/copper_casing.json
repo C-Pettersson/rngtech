@@ -27,5 +27,6 @@
     "count": 4,
     "id": "rngtech:malformed_ingot"
   },
-  "failure_material": "copper"
+  "failure_material": "copper",
+  "machine_xp": 2
 }

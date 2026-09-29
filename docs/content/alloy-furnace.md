@@ -25,7 +25,8 @@ Current runtime surface:
 - Optional Gear: one Battery Cell and one Servo.
 - Automation: top inserts active process inputs, bottom extracts output, and sides receive FE. Gear slots are manual UI equipment.
 - Refinement applies to the placed chassis through the Refinement tab and to Alloy Crucible stacks through the Affix Forge.
-- JEI exposes alloy recipes, counted inputs, FE/tick cost, stage gates, heat gates, and stability gates.
+- JEI exposes alloy recipes, counted inputs, FE/tick cost, stage gates, heat gates, stability gates, and machine XP.
+- Mastery applies to the placed chassis's `rngtech:machine_progression` component. Breaking and pick-blocking the chassis preserve Mastery state.
 
 Machine/chassis numeric identity is authored through `MachineBaseStatCatalog`. Alloy Crucible numeric identity is authored through `ComponentBaseStatCatalog`. Fixed identity behavior remains in `MachineImplicitCatalog`; Steel and Titanium Alloy Furnace chassis carry `OUTPUT_GUARD`.
 
@@ -96,9 +97,25 @@ Higher direct-ingot recipes make Aethergold from Tin, Silver, and Glowstone Dust
 
 Bronze Blend and Steel Blend are default progression items and are tagged as `rngtech:alloy_blend_smeltables` so Bronze Furnace's `ALLOY_BLEND` behavior applies to their Furnace recipes. Invar Blend and Sparksteel Blend remain hidden compatibility ids with no default survival recipes.
 
+## Mastery
+
+Alloy Furnaces enter the [shared Machine Mastery tree](../systems/machine-mastery.md) at the Drive / Reserve start shared with the [Furnace](furnace.md). Base attributes are `0` Control, `10` Drive, and `10` Reserve. Besides the shared attribute conversions, each Control point grants `0.05%` increased Temperature Stability and each Reserve point grants `0.1%` increased Heat Isolation, as on the Furnace. Effects the Alloy Furnace cannot use, such as fuel duration, output amount, and parallel jobs, stay selectable but are marked inactive. As a heated machine, it gains the [tagged](../systems/machine-mastery.md#tagged-payoffs) speed bonuses of Low Heat Specialist and Flash Annealing along with their temperature caps.
+
+Recipes may set `machine_xp` and an optional `machine_xp_band`; the band defaults from `target_temperature` on the same scale as Furnace recipes. XP is granted only after a completed craft merges its output. Failure outputs, stalled heat, blocked output, and power-starved ticks grant none.
+
+| Default XP | Recipes |
+|---:|---|
+| 2 | Bronze Blend, Steel Blend bootstrap, Invar bootstrap |
+| 3 | Bronze Ingot, Steel Blend, Steel Ingot from Coal Dust, Invar, Sparksteel, Arclite |
+| 4 | Steel Ingot from Coal |
+| 6 | Aethergold, Nullite, Tungstensteel |
+
+Supercharged Silica Gel Beads grant no XP.
+
 ## Related Pages
 
 - [Furnace](furnace.md)
+- [Machine Mastery](../systems/machine-mastery.md)
 - [Machine Parts](machine-parts.md)
 - [Current Implementation Matrix](../reference/current-implementation.md)
 - [Modifier Eligibility](../reference/modifier-eligibility.md)

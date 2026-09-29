@@ -86,7 +86,7 @@ mkdocs build --strict
 - Run `quickCheck` after Java or resource changes when feasible.
 - Run `ciCheck` before larger handoffs or changes that affect build configuration, resources, or shared behavior.
 - `check` depends on `spotlessCheck`, so formatting failures are build failures.
-- There is no Java test source tree. Run `npm run moddex:check` for the source/data smoke checks and passive-tree validation. Run `npm run repo:check` and `mkdocs build --strict` for public repository and documentation changes. Gameplay still needs focused in-game checks.
+- Domain checks live in `src/masteryTest` and run through `masteryCheck`, included in `quickCheck` and `ciCheck`. Run `npm run moddex:check` for the source/data smoke checks and passive-tree validation. Run `npm run repo:check` and `mkdocs build --strict` for public repository and documentation changes. Gameplay still needs focused in-game checks.
 
 ## Formatting and Style
 

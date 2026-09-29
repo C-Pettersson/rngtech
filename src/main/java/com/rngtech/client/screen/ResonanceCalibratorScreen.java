@@ -1,16 +1,26 @@
 package com.rngtech.client.screen;
 
+import com.rngtech.RNGTech;
 import com.rngtech.content.blockentity.ResonanceCalibratorBlockEntity;
 import com.rngtech.content.calibration.CalibrationFamily;
 import com.rngtech.content.menu.ResonanceCalibratorMenu;
 import com.rngtech.rpg.MachineStat;
+import com.rngtech.rpg.progression.MachineMasteryFamily;
+import com.rngtech.rpg.progression.MegaPassiveNode;
+import com.rngtech.rpg.progression.MegaPassiveTree;
 
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class ResonanceCalibratorScreen extends AbstractContainerScreen<ResonanceCalibratorMenu> {
+    private static final int BASE_IMAGE_WIDTH = 240;
+    private static final int BASE_IMAGE_HEIGHT = 200;
     private static final int PANEL = 0xFFC6C6C6;
     private static final int PANEL_DARK = 0xFF8B8B8B;
     private static final int PANEL_LIGHT = 0xFFE9E9E9;
@@ -20,12 +30,15 @@ public class ResonanceCalibratorScreen extends AbstractContainerScreen<Resonance
     private static final int PROGRESS = 0xFF667F51;
     private static final int QUALITY = 0xFF4F7A85;
     private static final int STAT_ACCENT = 0xFF4F7A85;
+    private static final int MASTERY_HIGHLIGHT = 0xFFD3A33A;
+    private static final int MASTERY_START_NODE = 0xFF38D857;
+    private static final int MASTERY_RING = 0xFF2F4A51;
     private static final int STAT_PANEL_X = 8;
     private static final int STAT_PANEL_Y = 18;
     private static final int STAT_PANEL_WIDTH = 224;
     private static final int TITLE_RIGHT_PADDING = 8;
-    private static final int TAB_WIDTH = 54;
-    private static final int TAB_SPACING = 56;
+    private static final int TAB_WIDTH = 42;
+    private static final int TAB_SPACING = 44;
     private static final int STABILITY_BAR_X = 92;
     private static final int STABILITY_BAR_Y = 66;
     private static final int STABILITY_BAR_WIDTH = 76;
@@ -83,13 +96,57 @@ public class ResonanceCalibratorScreen extends AbstractContainerScreen<Resonance
             MachineStat.CATALYST_EFFICIENCY,
             MachineStat.REFINEMENT_POTENTIAL_BONUS
     };
+    private static final Map<MegaPassiveNode, ResourceLocation> MASTERY_ICON_TEXTURES = createMasteryIconTextures();
+
+    private final MasteryScreenSupport<MegaPassiveNode> masterySupport;
 
     public ResonanceCalibratorScreen(ResonanceCalibratorMenu menu, Inventory playerInventory, Component title) {
         super(menu, playerInventory, title);
-        imageWidth = 240;
-        imageHeight = 200;
+        imageWidth = BASE_IMAGE_WIDTH;
+        imageHeight = BASE_IMAGE_HEIGHT;
         inventoryLabelX = 39;
         inventoryLabelY = 104;
+        masterySupport = new MasteryScreenSupport<>(
+                MegaPassiveTree.TREE,
+                MegaPassiveTree.TREE.nodes(),
+                MegaPassiveTree.node(MachineMasteryFamily.RESONANCE_CALIBRATOR.startNodeId()),
+                MASTERY_ICON_TEXTURES,
+                menu,
+                new MasteryScreenSupport.Callbacks<>() {
+                    @Override
+                    public boolean gearAllowsUnlock(MegaPassiveNode node) {
+                        return true;
+                    }
+
+                    @Override
+                    public void geometryChanged() {
+                        updateImageSizeForSelectedTab();
+                    }
+                },
+                new MasteryScreenSupport.Palette(
+                        PANEL_DARK,
+                        PANEL_LIGHT,
+                        TEXT,
+                        STAT_ACCENT,
+                        MASTERY_HIGHLIGHT,
+                        MASTERY_START_NODE,
+                        MASTERY_RING
+                )
+        );
+    }
+
+    private static Map<MegaPassiveNode, ResourceLocation> createMasteryIconTextures() {
+        Map<MegaPassiveNode, ResourceLocation> textures = new HashMap<>();
+        for (MegaPassiveNode node : MegaPassiveTree.TREE.nodes()) {
+            textures.put(node, RNGTech.id("textures/gui/mastery/" + node.masteryIconKey() + ".png"));
+        }
+        return Map.copyOf(textures);
+    }
+
+    @Override
+    protected void init() {
+        updateImageSizeForSelectedTab();
+        super.init();
     }
 
     @Override
@@ -98,6 +155,9 @@ public class ResonanceCalibratorScreen extends AbstractContainerScreen<Resonance
         renderTooltip(guiGraphics, mouseX, mouseY);
         renderValueTooltips(guiGraphics, mouseX, mouseY);
         renderStatTooltips(guiGraphics, mouseX, mouseY);
+        if (menu.selectedTab() == ResonanceCalibratorMenu.TAB_MASTERY) {
+            masterySupport.renderTooltips(guiGraphics, font, leftPos, topPos, imageWidth, imageHeight, mouseX, mouseY);
+        }
         RefinementScreenStyle.renderTooltips(guiGraphics, font, leftPos, topPos, mouseX, mouseY, menu.selectedTab() == RefinementScreenStyle.REFINEMENT_TAB_INDEX, menu.machineTraits());
         renderLabelTooltips(guiGraphics, mouseX, mouseY);
         renderPatternSelectorTooltips(guiGraphics, mouseX, mouseY);
@@ -118,13 +178,16 @@ public class ResonanceCalibratorScreen extends AbstractContainerScreen<Resonance
             renderConfiguration(guiGraphics);
         } else if (menu.selectedTab() == ResonanceCalibratorMenu.TAB_REFINEMENT) {
             renderRefinement(guiGraphics);
+        } else {
+            masterySupport.render(guiGraphics, leftPos, topPos, imageWidth, imageHeight, mouseX, mouseY);
         }
     }
 
     @Override
     protected void renderLabels(GuiGraphics guiGraphics, int mouseX, int mouseY) {
         drawTitle(guiGraphics);
-        if (menu.selectedTab() != ResonanceCalibratorMenu.TAB_CONFIGURATION) {
+        if (menu.selectedTab() != ResonanceCalibratorMenu.TAB_CONFIGURATION
+                && menu.selectedTab() != ResonanceCalibratorMenu.TAB_MASTERY) {
             guiGraphics.drawString(font, playerInventoryTitle, inventoryLabelX, inventoryLabelY, TEXT, false);
         }
 
@@ -134,8 +197,10 @@ public class ResonanceCalibratorScreen extends AbstractContainerScreen<Resonance
             drawGearLabels(guiGraphics);
         } else if (menu.selectedTab() == ResonanceCalibratorMenu.TAB_CONFIGURATION) {
             drawConfigurationLabels(guiGraphics);
-        } else {
+        } else if (menu.selectedTab() == ResonanceCalibratorMenu.TAB_REFINEMENT) {
             drawRefinementLabels(guiGraphics);
+        } else {
+            masterySupport.drawLabels(guiGraphics, font, imageWidth);
         }
     }
 
@@ -154,19 +219,23 @@ public class ResonanceCalibratorScreen extends AbstractContainerScreen<Resonance
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         if (button == 0) {
             if (isOverTab(mouseX, mouseY, 0)) {
-                menu.selectTab(ResonanceCalibratorMenu.TAB_PROCESSING);
+                selectTab(ResonanceCalibratorMenu.TAB_PROCESSING);
                 return true;
             }
             if (isOverTab(mouseX, mouseY, 1)) {
-                menu.selectTab(ResonanceCalibratorMenu.TAB_GEAR);
+                selectTab(ResonanceCalibratorMenu.TAB_GEAR);
                 return true;
             }
             if (isOverTab(mouseX, mouseY, 2)) {
-                menu.selectTab(ResonanceCalibratorMenu.TAB_CONFIGURATION);
+                selectTab(ResonanceCalibratorMenu.TAB_CONFIGURATION);
                 return true;
             }
             if (isOverTab(mouseX, mouseY, 3)) {
-                menu.selectTab(ResonanceCalibratorMenu.TAB_REFINEMENT);
+                selectTab(ResonanceCalibratorMenu.TAB_REFINEMENT);
+                return true;
+            }
+            if (isOverTab(mouseX, mouseY, 4)) {
+                selectTab(ResonanceCalibratorMenu.TAB_MASTERY);
                 return true;
             }
             if (menu.selectedTab() == ResonanceCalibratorMenu.TAB_REFINEMENT
@@ -180,7 +249,78 @@ public class ResonanceCalibratorScreen extends AbstractContainerScreen<Resonance
                 }
             }
         }
+        if (menu.selectedTab() == ResonanceCalibratorMenu.TAB_MASTERY
+                && masterySupport.mouseClicked(mouseX, mouseY, button, leftPos, topPos, imageWidth, imageHeight)) {
+            return true;
+        }
         return super.mouseClicked(mouseX, mouseY, button);
+    }
+
+    @Override
+    public boolean mouseDragged(double mouseX, double mouseY, int button, double dragX, double dragY) {
+        if (menu.selectedTab() == ResonanceCalibratorMenu.TAB_MASTERY
+                && masterySupport.mouseDragged(mouseX, mouseY, button, imageWidth, imageHeight)) {
+            return true;
+        }
+        return super.mouseDragged(mouseX, mouseY, button, dragX, dragY);
+    }
+
+    @Override
+    public boolean mouseReleased(double mouseX, double mouseY, int button) {
+        if (masterySupport.mouseReleased(mouseX, mouseY, button, leftPos, topPos, imageWidth, imageHeight)) {
+            return true;
+        }
+        return super.mouseReleased(mouseX, mouseY, button);
+    }
+
+    @Override
+    public boolean mouseScrolled(double mouseX, double mouseY, double scrollX, double scrollY) {
+        if (menu.selectedTab() == ResonanceCalibratorMenu.TAB_MASTERY
+                && masterySupport.mouseScrolled(mouseX, mouseY, scrollX, scrollY, leftPos, topPos, imageWidth, imageHeight)) {
+            return true;
+        }
+        return super.mouseScrolled(mouseX, mouseY, scrollX, scrollY);
+    }
+
+    @Override
+    public boolean keyPressed(int key, int scan, int modifiers) {
+        if (menu.selectedTab() == ResonanceCalibratorMenu.TAB_MASTERY
+                && masterySupport.keyPressed(key, scan, modifiers, imageWidth, imageHeight)) {
+            return true;
+        }
+        return super.keyPressed(key, scan, modifiers);
+    }
+
+    @Override
+    public boolean charTyped(char character, int modifiers) {
+        if (menu.selectedTab() == ResonanceCalibratorMenu.TAB_MASTERY && masterySupport.charTyped(character)) {
+            return true;
+        }
+        return super.charTyped(character, modifiers);
+    }
+
+    private void selectTab(int tab) {
+        masterySupport.resetDragging();
+        menu.selectTab(tab);
+        updateImageSizeForSelectedTab();
+        if (menu.selectedTab() == ResonanceCalibratorMenu.TAB_MASTERY) {
+            masterySupport.clampAfterGeometryChange(imageWidth, imageHeight);
+        }
+    }
+
+    private void updateImageSizeForSelectedTab() {
+        if (menu.selectedTab() == ResonanceCalibratorMenu.TAB_MASTERY && masterySupport.expanded()) {
+            imageWidth = masterySupport.imageWidth(BASE_IMAGE_WIDTH, width);
+            imageHeight = masterySupport.imageHeight(BASE_IMAGE_HEIGHT, height);
+        } else {
+            imageWidth = BASE_IMAGE_WIDTH;
+            imageHeight = BASE_IMAGE_HEIGHT;
+        }
+        leftPos = (width - imageWidth) / 2;
+        topPos = (height - imageHeight) / 2;
+        if (masterySupport != null) {
+            masterySupport.clampAfterGeometryChange(imageWidth, imageHeight);
+        }
     }
 
     private void renderPanel(GuiGraphics guiGraphics) {
@@ -198,6 +338,7 @@ public class ResonanceCalibratorScreen extends AbstractContainerScreen<Resonance
         renderTab(guiGraphics, 1, Component.translatable("rngtech.tab.gear"), menu.selectedTab() == ResonanceCalibratorMenu.TAB_GEAR);
         renderTab(guiGraphics, 2, Component.translatable("rngtech.tab.stats"), menu.selectedTab() == ResonanceCalibratorMenu.TAB_CONFIGURATION);
         renderTab(guiGraphics, 3, Component.translatable("rngtech.tab.refinement.short"), menu.selectedTab() == ResonanceCalibratorMenu.TAB_REFINEMENT);
+        renderTab(guiGraphics, 4, Component.translatable("rngtech.tab.mastery.short"), menu.selectedTab() == ResonanceCalibratorMenu.TAB_MASTERY);
     }
 
     private void renderTab(GuiGraphics guiGraphics, int index, Component label, boolean selected) {
@@ -238,7 +379,8 @@ public class ResonanceCalibratorScreen extends AbstractContainerScreen<Resonance
             renderSlotFrame(guiGraphics, RefinementScreenStyle.CONSUMABLE_SLOT_X - 1, RefinementScreenStyle.SLOT_Y - 1);
         }
 
-        if (menu.selectedTab() != ResonanceCalibratorMenu.TAB_CONFIGURATION) {
+        if (menu.selectedTab() != ResonanceCalibratorMenu.TAB_CONFIGURATION
+                && menu.selectedTab() != ResonanceCalibratorMenu.TAB_MASTERY) {
             renderPlayerInventoryFrames(guiGraphics);
         }
     }
@@ -443,6 +585,7 @@ public class ResonanceCalibratorScreen extends AbstractContainerScreen<Resonance
         renderTabTooltip(guiGraphics, mouseX, mouseY, 1, Component.translatable("rngtech.tab.gear"));
         renderTabTooltip(guiGraphics, mouseX, mouseY, 2, Component.translatable("rngtech.tab.stats"));
         renderTabTooltip(guiGraphics, mouseX, mouseY, 3, Component.translatable("rngtech.tab.refinement"));
+        renderTabTooltip(guiGraphics, mouseX, mouseY, 4, Component.translatable("rngtech.tab.mastery"));
 
         if (menu.selectedTab() != ResonanceCalibratorMenu.TAB_PROCESSING) {
             return;

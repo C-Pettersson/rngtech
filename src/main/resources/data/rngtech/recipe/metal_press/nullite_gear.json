@@ -27,5 +27,6 @@
     "count": 3,
     "id": "rngtech:malformed_ingot"
   },
-  "failure_material": "nullite"
+  "failure_material": "nullite",
+  "machine_xp": 9
 }

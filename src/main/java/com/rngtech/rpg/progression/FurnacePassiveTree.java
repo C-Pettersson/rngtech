@@ -2,25 +2,24 @@ package com.rngtech.rpg.progression;
 
 import com.rngtech.rpg.MachineStatAccumulator;
 
-import java.util.List;
 
 public final class FurnacePassiveTree {
-    public static final PassiveTree<FurnacePassiveNode> TREE = new PassiveTree<>(List.of(FurnacePassiveNode.values()));
+    public static final PassiveTree<MegaPassiveNode> TREE = MegaPassiveTree.TREE;
 
     public static void applyStats(MachineStatAccumulator stats, MachineProgressionState progression) {
-        TREE.applyStats(stats, progression);
+        MegaPassiveTree.applyStats(stats, progression, MachineMasteryFamily.FURNACE);
     }
 
     public static boolean mutesMachineSound(MachineProgressionState progression) {
-        return TREE.hasUnlockedFlag(PassiveNodeFlag.MUTE_MACHINE_SOUND, progression);
+        return MegaPassiveTree.has(progression, "MUTE_MACHINE_SOUND");
     }
 
     public static boolean usesQuenchProtocol(MachineProgressionState progression) {
-        return FurnacePassiveNode.QUENCH_PROTOCOL.isUnlocked(progression);
+        return MegaPassiveTree.has(progression, "QUENCH_PROTOCOL");
     }
 
     public static boolean usesClosedLoopRecuperator(MachineProgressionState progression) {
-        return FurnacePassiveNode.CLOSED_LOOP_RECUPERATOR.isUnlocked(progression);
+        return MegaPassiveTree.has(progression, "CLOSED_LOOP_RECUPERATOR");
     }
 
     private FurnacePassiveTree() {

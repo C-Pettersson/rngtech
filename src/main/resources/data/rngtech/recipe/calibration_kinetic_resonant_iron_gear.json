@@ -8,6 +8,7 @@
   "minimum_stage": 4,
   "processing_ticks": 280,
   "energy": 4200,
+  "machine_xp": 5,
   "result": {
     "stack": { "id": "rngtech:calibrated_kinetic_component" },
     "stage": 1,

@@ -7,6 +7,7 @@
   "stabilizer": { "item": "rngtech:stabilization_catalyst" },
   "processing_ticks": 190,
   "energy": 1500,
+  "machine_xp": 3,
   "result": {
     "stack": { "id": "rngtech:calibrated_storage_component" },
     "stage": 2,

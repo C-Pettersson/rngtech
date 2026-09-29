@@ -5,6 +5,8 @@ import com.rngtech.content.blockentity.MelterBlockEntity;
 import com.rngtech.content.registry.ModBlockEntities;
 import com.rngtech.content.registry.ModDataComponents;
 import com.rngtech.rpg.MachineTraits;
+import com.rngtech.rpg.progression.MachineMasteryFamily;
+import com.rngtech.rpg.progression.MachineProgressionState;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.InteractionResult;
@@ -59,6 +61,11 @@ public class MelterBlock extends BaseMachineBlock {
             MachineTraits traits = machine.machineTraits();
             if (!traits.isEmpty()) {
                 stack.set(ModDataComponents.MACHINE_TRAITS.get(), traits);
+            }
+            MachineProgressionState progression = machine.machineProgression();
+            if (!progression.equals(MachineProgressionState.EMPTY)
+                    && !progression.equals(MachineProgressionState.EMPTY.forFamily(MachineMasteryFamily.MELTER))) {
+                stack.set(ModDataComponents.MACHINE_PROGRESSION.get(), progression);
             }
         }
         return stack;

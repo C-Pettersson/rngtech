@@ -6,6 +6,7 @@ import com.rngtech.content.item.BatteryCellItem;
 import com.rngtech.content.item.MachinePartItem;
 import com.rngtech.content.item.ServoItem;
 import com.rngtech.content.item.SolidFuelBurnerPartItem;
+import com.rngtech.content.menu.MasteryMenuSupport;
 import com.rngtech.content.menu.MetalPressMenu;
 import com.rngtech.content.recipe.MetalPressRecipe;
 import com.rngtech.content.recipe.MetalPressRecipeInput;
@@ -25,6 +26,11 @@ import com.rngtech.rpg.MachineTraits;
 import com.rngtech.rpg.MachineType;
 import com.rngtech.rpg.ModifierOperation;
 import com.rngtech.rpg.ModifierSlot;
+import com.rngtech.rpg.progression.MachineMasteryFamily;
+import com.rngtech.rpg.progression.MachineMasteryHost;
+import com.rngtech.rpg.progression.MachineProgressionState;
+import com.rngtech.rpg.progression.MegaPassiveNode;
+import com.rngtech.rpg.progression.MegaPassiveTree;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -46,7 +52,7 @@ import net.neoforged.neoforge.energy.IEnergyStorage;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.ItemStackHandler;
 
-public class MetalPressBlockEntity extends BaseMachineBlockEntity implements MenuProvider {
+public class MetalPressBlockEntity extends BaseMachineBlockEntity implements MenuProvider, MachineMasteryHost {
     public static final int SLOT_INPUT = 0;
     public static final int SLOT_OUTPUT = 1;
     public static final int PROCESS_SLOT_COUNT = 2;
@@ -103,7 +109,8 @@ public class MetalPressBlockEntity extends BaseMachineBlockEntity implements Men
     private static final int DATA_SELECTED_MOLD = 24;
     private static final int DATA_ENERGY_PER_TICK = 25;
     private static final int DATA_ENERGY_PER_CRAFT = 26;
-    private static final int DATA_COUNT = DATA_ENERGY_PER_CRAFT + 1;
+    private static final int DATA_MACHINE_PROGRESSION_START = DATA_ENERGY_PER_CRAFT + 1;
+    private static final int DATA_COUNT = DATA_MACHINE_PROGRESSION_START + MasteryMenuSupport.FIELD_COUNT;
     private static final int STAT_SCALE = 100;
     private static final int LEGACY_SLOT_BATTERY_CELL = 3;
 
@@ -173,6 +180,13 @@ public class MetalPressBlockEntity extends BaseMachineBlockEntity implements Men
     private final ContainerData menuData = new ContainerData() {
         @Override
         public int get(int index) {
+            if (index >= DATA_MACHINE_PROGRESSION_START && index < DATA_COUNT) {
+                return MasteryMenuSupport.get(
+                        machineProgression(),
+                        index - DATA_MACHINE_PROGRESSION_START,
+                        MetalPressBlockEntity.this::effectiveStats
+                );
+            }
             MachineStatAccumulator stats = effectiveStats();
             MetalPressRecipe recipe = nextRecipe();
             return switch (index) {
@@ -420,6 +434,7 @@ public class MetalPressBlockEntity extends BaseMachineBlockEntity implements Men
     public MachineStatAccumulator effectiveStats() {
         MachineStatAccumulator stats = MachineBaseStatCatalog.metalPress();
         stats.apply(MachineImplicitCatalog.effectiveTraits(machineTraits(), getBlockState().getBlock()));
+        MegaPassiveTree.applyStats(stats, machineProgression(), MachineMasteryFamily.METAL_PRESS);
         applyHeatCoreStats(stats);
         applyServoStats(stats);
         if (!hasBatteryCell()) {
@@ -562,9 +577,48 @@ public class MetalPressBlockEntity extends BaseMachineBlockEntity implements Men
 
         consumeInput(recipe.inputCount());
         mergeOutput(result);
+        grantRecipeXp(recipe);
         resetCycle();
         setChanged();
         return true;
+    }
+
+    private void grantRecipeXp(MetalPressRecipe recipe) {
+        if (recipe.machineXp() <= 0) {
+            return;
+        }
+        int xpQuarters = MachineProgressionState.xpQuarters(machineProgression().level(), recipe.machineXpBand());
+        if (xpQuarters <= 0) {
+            return;
+        }
+        grantMasteryXp(MachineProgressionState.workXp(recipe.machineXp(), recipe.machineXpBand()), xpQuarters);
+    }
+
+    public boolean unlockPassiveNode(MegaPassiveNode node) {
+        return allocateMastery(node);
+    }
+
+    @Override
+    public MachineMasteryFamily masteryFamily() {
+        return MachineMasteryFamily.METAL_PRESS;
+    }
+
+    @Override
+    public MachineProgressionState machineProgression() {
+        return super.machineProgression().forFamily(masteryFamily());
+    }
+
+    @Override
+    public void masteryChanged() {
+        resetCycle();
+        resetBulkSpeed();
+        clampInternalEnergy();
+        setChanged();
+    }
+
+    @Override
+    public boolean mutesMachineSound() {
+        return MegaPassiveTree.has(machineProgression(), "MUTE_MACHINE_SOUND");
     }
 
     private boolean tryFailCycle(MetalPressRecipe recipe) {
@@ -962,7 +1016,7 @@ public class MetalPressBlockEntity extends BaseMachineBlockEntity implements Men
         return hasHeatCore() && (isCrudePress() || hasServo()) && hasMold();
     }
 
-    private boolean isCrudePress() {
+    public boolean isCrudePress() {
         return getBlockState().getBlock() instanceof MetalPressBlock press && press.isCrude();
     }
 

@@ -5,8 +5,13 @@ import com.rngtech.content.item.EnergyConnectorItem;
 import com.rngtech.content.item.FluidConnectorItem;
 import com.rngtech.content.item.ItemConnectorItem;
 import com.rngtech.content.registry.ModMenus;
-import com.rngtech.rpg.progression.ForestryCompanionPassiveNode;
+import com.rngtech.rpg.MachineStat;
 import com.rngtech.rpg.progression.ForestryCompanionPassiveTree;
+import com.rngtech.rpg.progression.MachineMasteryFamily;
+import com.rngtech.rpg.progression.MachineMasteryHost;
+import com.rngtech.rpg.progression.MachineProgressionState;
+import com.rngtech.rpg.progression.MegaPassiveNode;
+import com.rngtech.rpg.progression.MegaPassiveTree;
 import com.rngtech.rpg.progression.PassiveNode;
 import com.rngtech.rpg.progression.PassiveProgressionView;
 
@@ -24,7 +29,7 @@ import net.neoforged.neoforge.items.SlotItemHandler;
 
 import java.util.function.BooleanSupplier;
 
-public class ForestryCartMenu extends AbstractContainerMenu implements MasteryMenuView<ForestryCompanionPassiveNode> {
+public class ForestryCartMenu extends AbstractContainerMenu implements MasteryMenuView<MegaPassiveNode> {
     public static final int TAB_CART = 0;
     public static final int TAB_STATS = 1;
     public static final int TAB_MASTERY = 2;
@@ -86,7 +91,7 @@ public class ForestryCartMenu extends AbstractContainerMenu implements MasteryMe
     private final ContainerData data;
     private final ForestryCartEntity cart;
     private final PassiveProgressionView passiveProgressionView =
-            MasteryMenuSupport.progressionView(this::hasPassiveNodeIndex, this::machineLevel, this::unspentPassivePoints);
+            MasteryMenuSupport.progressionView(this::hasPassiveNodeIndex, this::machineLevel, this::unspentPassivePoints, MachineMasteryFamily.FORESTRY.startNodeId());
     private int selectedTab = TAB_CART;
     private boolean managementViewer = true;
 
@@ -366,7 +371,7 @@ public class ForestryCartMenu extends AbstractContainerMenu implements MasteryMe
     }
 
     @Override
-    public boolean canUnlockPassiveNode(ForestryCompanionPassiveNode node) {
+    public boolean canUnlockPassiveNode(MegaPassiveNode node) {
         return ForestryCompanionPassiveTree.TREE.canUnlock(node, passiveProgressionView);
     }
 
@@ -381,7 +386,7 @@ public class ForestryCartMenu extends AbstractContainerMenu implements MasteryMe
 
     @Override
     public boolean clickMenuButton(Player player, int id) {
-        ForestryCompanionPassiveNode passiveNode = ForestryCompanionPassiveNode.byButtonId(id);
+        MegaPassiveNode passiveNode = MegaPassiveTree.byButtonId(id);
         if (passiveNode != null) {
             if (player.level().isClientSide) {
                 return true;
@@ -547,4 +552,11 @@ public class ForestryCartMenu extends AbstractContainerMenu implements MasteryMe
             return activeSupplier.getAsBoolean();
         }
     }
+    @Override public MachineMasteryHost masteryHost() { return cart; }
+    @Override public double masteryAttribute(MachineStat stat) { return MasteryMenuSupport.attribute(data, DATA_MACHINE_PROGRESSION_START, stat); }
+    @Override public MachineMasteryFamily masteryFamily() { return MachineMasteryFamily.FORESTRY; }
+    @Override public MachineProgressionState masterySnapshot() {
+        return MasteryMenuSupport.snapshot(data, DATA_MACHINE_PROGRESSION_START, masteryFamily());
+    }
+
 }

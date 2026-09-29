@@ -259,6 +259,27 @@ tasks.register('ciCheck') {
     dependsOn 'build'
 }
 
+sourceSets {
+    masteryTest {
+        compileClasspath += sourceSets.main.output + sourceSets.main.compileClasspath
+        runtimeClasspath += sourceSets.main.output + sourceSets.main.runtimeClasspath
+    }
+}
+
+tasks.register('masteryCheck', JavaExec) {
+    group = 'verification'
+    description = 'Checks shared mastery progression, build templates and modifier semantics.'
+    dependsOn tasks.named('masteryTestClasses')
+    classpath = sourceSets.masteryTest.runtimeClasspath
+    mainClass = 'com.rngtech.rpg.progression.MasteryChecks'
+    javaLauncher = javaToolchains.launcherFor { languageVersion = JavaLanguageVersion.of(21) }
+    workingDir = layout.buildDirectory.dir('mastery-check').get().asFile
+    doFirst { workingDir.mkdirs() }
+}
+
+tasks.named('quickCheck') { dependsOn 'masteryCheck' }
+tasks.named('check') { dependsOn 'masteryCheck' }
+
 def localFtbQuestsDir = layout.projectDirectory.dir('config/ftbquests')
 def devFtbQuestsDir = layout.projectDirectory.dir('run/client/config/ftbquests')
 

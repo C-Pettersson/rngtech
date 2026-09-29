@@ -38,7 +38,7 @@ try {
             || !indexHtml.includes("Affix gaps only")
             || !indexHtml.includes("Two Path Dead End")
             || !indexHtml.includes("Java Layout Class")
-            || !indexHtml.includes("Load Java Tree")
+            || !indexHtml.includes("Load Source Tree")
             || !indexHtml.includes("Visual Audit")
             || !indexHtml.includes("Draft Name")
             || !indexHtml.includes("Duplicate")

@@ -4,8 +4,10 @@ import com.rngtech.RNGTech;
 import com.rngtech.content.blockentity.ForestryCartStationBlockEntity;
 import com.rngtech.content.entity.ForestryCartEntity;
 import com.rngtech.content.menu.ForestryCartMenu;
-import com.rngtech.rpg.progression.ForestryCompanionPassiveNode;
 import com.rngtech.rpg.progression.ForestryCompanionPassiveTree;
+import com.rngtech.rpg.progression.MachineMasteryFamily;
+import com.rngtech.rpg.progression.MegaPassiveNode;
+import com.rngtech.rpg.progression.MegaPassiveTree;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
@@ -16,7 +18,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 
-import java.util.EnumMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -49,13 +50,13 @@ public class ForestryCartScreen extends AbstractContainerScreen<ForestryCartMenu
     private static final int ICON_SIZE = 12;
     private static final int BASE_IMAGE_WIDTH = 240;
     private static final int BASE_IMAGE_HEIGHT = 200;
-    private static final Map<ForestryCompanionPassiveNode, ResourceLocation> MASTERY_ICON_TEXTURES = createMasteryIconTextures();
+    private static final Map<MegaPassiveNode, ResourceLocation> MASTERY_ICON_TEXTURES = createMasteryIconTextures();
 
-    private final MasteryScreenSupport<ForestryCompanionPassiveNode> masterySupport;
+    private final MasteryScreenSupport<MegaPassiveNode> masterySupport;
 
-    private static Map<ForestryCompanionPassiveNode, ResourceLocation> createMasteryIconTextures() {
-        EnumMap<ForestryCompanionPassiveNode, ResourceLocation> textures = new EnumMap<>(ForestryCompanionPassiveNode.class);
-        for (ForestryCompanionPassiveNode node : ForestryCompanionPassiveNode.values()) {
+    private static Map<MegaPassiveNode, ResourceLocation> createMasteryIconTextures() {
+        Map<MegaPassiveNode, ResourceLocation> textures = new java.util.HashMap<>();
+        for (MegaPassiveNode node : MegaPassiveTree.TREE.nodes()) {
             textures.put(node, RNGTech.id("textures/gui/mastery/" + node.masteryIconKey() + ".png"));
         }
         return Map.copyOf(textures);
@@ -70,48 +71,36 @@ public class ForestryCartScreen extends AbstractContainerScreen<ForestryCartMenu
         masterySupport = new MasteryScreenSupport<>(
                 ForestryCompanionPassiveTree.TREE,
                 ForestryCompanionPassiveTree.TREE.nodes(),
-                ForestryCompanionPassiveNode.STARTER,
+                MegaPassiveTree.node(MachineMasteryFamily.FORESTRY.startNodeId()),
                 MASTERY_ICON_TEXTURES,
                 menu,
                 new MasteryScreenSupport.Callbacks<>() {
                     @Override
-                    public boolean gearAllowsUnlock(ForestryCompanionPassiveNode node) {
+                    public boolean gearAllowsUnlock(MegaPassiveNode node) {
                         return true;
                     }
 
                     @Override
-                    public boolean unlock(ForestryCompanionPassiveNode node) {
-                        if (minecraft == null || minecraft.player == null || minecraft.gameMode == null) {
-                            return false;
-                        }
-                        if (!menu.canUnlockPassiveNode(node) || !menu.clickMenuButton(minecraft.player, node.buttonId())) {
-                            return false;
-                        }
-                        minecraft.gameMode.handleInventoryButtonClick(menu.containerId, node.buttonId());
-                        return true;
-                    }
-
-                    @Override
-                    public void appendSpecialTooltip(ForestryCompanionPassiveNode node, List<Component> tooltip) {
-                        if (node == ForestryCompanionPassiveNode.MAGNET_MODE) {
+                    public void appendSpecialTooltip(MegaPassiveNode node, List<Component> tooltip) {
+                        if (node.behaviors().contains("MAGNET_MODE")) {
                             tooltip.add(Component.translatable("rngtech.mastery.tooltip.forestry_companion.magnet_mode")
                                     .withStyle(ChatFormatting.GOLD));
                         }
-                        if (node == ForestryCompanionPassiveNode.SERRATED_LEAF_PROTOCOL) {
+                        if (node.behaviors().contains("SERRATED_LEAF_PROTOCOL")) {
                             tooltip.add(Component.translatable(
                                     "rngtech.mastery.tooltip.forestry_companion.serrated_leaf_protocol",
                                     menu.unshearedLeafFe()
                             ).withStyle(ChatFormatting.GOLD));
                         }
-                        if (node == ForestryCompanionPassiveNode.MANUAL_THROTTLE) {
+                        if (node.behaviors().contains("MANUAL_THROTTLE")) {
                             tooltip.add(Component.translatable("rngtech.mastery.tooltip.forestry_companion.manual_throttle")
                                     .withStyle(ChatFormatting.GOLD));
                         }
-                        if (node == ForestryCompanionPassiveNode.COASTING_CLUTCH) {
+                        if (node.behaviors().contains("COASTING_CLUTCH")) {
                             tooltip.add(Component.translatable("rngtech.mastery.tooltip.forestry_companion.coasting_clutch")
                                     .withStyle(ChatFormatting.GOLD));
                         }
-                        if (node == ForestryCompanionPassiveNode.SEEDLING_MAGNET) {
+                        if (node.behaviors().contains("SEEDLING_MAGNET")) {
                             tooltip.add(Component.translatable("rngtech.mastery.tooltip.forestry_companion.seedling_magnet")
                                     .withStyle(ChatFormatting.GOLD));
                         }
@@ -160,7 +149,7 @@ public class ForestryCartScreen extends AbstractContainerScreen<ForestryCartMenu
         } else if (menu.selectedTab() == ForestryCartMenu.TAB_STATS) {
             renderStats(guiGraphics);
         } else {
-            masterySupport.render(guiGraphics, leftPos, topPos, imageWidth, imageHeight);
+            masterySupport.render(guiGraphics, leftPos, topPos, imageWidth, imageHeight, mouseX, mouseY);
         }
     }
 
@@ -212,10 +201,10 @@ public class ForestryCartScreen extends AbstractContainerScreen<ForestryCartMenu
                 sendButton(ForestryCartMenu.BUTTON_TOGGLE_MANUAL_SPEED);
                 return true;
             }
-            if (menu.selectedTab() == ForestryCartMenu.TAB_MASTERY
-                    && masterySupport.mouseClicked(mouseX, mouseY, button, leftPos, topPos, imageWidth, imageHeight)) {
-                return true;
-            }
+        }
+        if (menu.selectedTab() == ForestryCartMenu.TAB_MASTERY
+                && masterySupport.mouseClicked(mouseX, mouseY, button, leftPos, topPos, imageWidth, imageHeight)) {
+            return true;
         }
         return super.mouseClicked(mouseX, mouseY, button);
     }
@@ -231,7 +220,7 @@ public class ForestryCartScreen extends AbstractContainerScreen<ForestryCartMenu
 
     @Override
     public boolean mouseReleased(double mouseX, double mouseY, int button) {
-        if (masterySupport.mouseReleased(button)) {
+        if (masterySupport.mouseReleased(mouseX, mouseY, button, leftPos, topPos, imageWidth, imageHeight)) {
             return true;
         }
         return super.mouseReleased(mouseX, mouseY, button);
@@ -803,4 +792,13 @@ public class ForestryCartScreen extends AbstractContainerScreen<ForestryCartMenu
             minecraft.gameMode.handleInventoryButtonClick(menu.containerId, id);
         }
     }
+    @Override public boolean keyPressed(int key, int scan, int modifiers) {
+        if (menu.selectedTab() == ForestryCartMenu.TAB_MASTERY && masterySupport.keyPressed(key, scan, modifiers, imageWidth, imageHeight)) { return true; }
+        return super.keyPressed(key, scan, modifiers);
+    }
+    @Override public boolean charTyped(char character, int modifiers) {
+        if (menu.selectedTab() == ForestryCartMenu.TAB_MASTERY && masterySupport.charTyped(character)) { return true; }
+        return super.charTyped(character, modifiers);
+    }
+
 }

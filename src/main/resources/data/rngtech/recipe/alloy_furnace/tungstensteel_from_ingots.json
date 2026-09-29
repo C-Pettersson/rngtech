@@ -37,5 +37,6 @@
     "id": "rngtech:malformed_ingot"
   },
   "failure_material": "tungstensteel",
-  "power_sensitive": true
+  "power_sensitive": true,
+  "machine_xp": 6
 }

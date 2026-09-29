@@ -5,8 +5,10 @@ import com.rngtech.content.blockentity.FurnaceBlockEntity;
 import com.rngtech.content.menu.FurnaceMenu;
 import com.rngtech.rpg.MachineStat;
 import com.rngtech.rpg.MachineStatAccumulator;
-import com.rngtech.rpg.progression.FurnacePassiveNode;
 import com.rngtech.rpg.progression.FurnacePassiveTree;
+import com.rngtech.rpg.progression.MachineMasteryFamily;
+import com.rngtech.rpg.progression.MegaPassiveNode;
+import com.rngtech.rpg.progression.MegaPassiveTree;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphics;
@@ -15,7 +17,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 
-import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 
@@ -125,13 +126,13 @@ public class FurnaceScreen extends AbstractContainerScreen<FurnaceMenu> {
             MachineStat.ENERGY_USAGE,
             MachineStat.ENERGY_CAPACITY
     };
-    private static final Map<FurnacePassiveNode, ResourceLocation> MASTERY_ICON_TEXTURES = createMasteryIconTextures();
+    private static final Map<MegaPassiveNode, ResourceLocation> MASTERY_ICON_TEXTURES = createMasteryIconTextures();
 
-    private final MasteryScreenSupport<FurnacePassiveNode> masterySupport;
+    private final MasteryScreenSupport<MegaPassiveNode> masterySupport;
 
-    private static Map<FurnacePassiveNode, ResourceLocation> createMasteryIconTextures() {
-        EnumMap<FurnacePassiveNode, ResourceLocation> textures = new EnumMap<>(FurnacePassiveNode.class);
-        for (FurnacePassiveNode node : FurnacePassiveNode.values()) {
+    private static Map<MegaPassiveNode, ResourceLocation> createMasteryIconTextures() {
+        Map<MegaPassiveNode, ResourceLocation> textures = new java.util.HashMap<>();
+        for (MegaPassiveNode node : MegaPassiveTree.TREE.nodes()) {
             textures.put(node, RNGTech.id("textures/gui/mastery/" + node.masteryIconKey() + ".png"));
         }
         return Map.copyOf(textures);
@@ -146,34 +147,22 @@ public class FurnaceScreen extends AbstractContainerScreen<FurnaceMenu> {
         masterySupport = new MasteryScreenSupport<>(
                 FurnacePassiveTree.TREE,
                 FurnacePassiveTree.TREE.nodes(),
-                FurnacePassiveNode.STARTER,
+                MegaPassiveTree.node(MachineMasteryFamily.FURNACE.startNodeId()),
                 MASTERY_ICON_TEXTURES,
                 menu,
                 new MasteryScreenSupport.Callbacks<>() {
                     @Override
-                    public boolean gearAllowsUnlock(FurnacePassiveNode node) {
+                    public boolean gearAllowsUnlock(MegaPassiveNode node) {
                         return true;
                     }
 
                     @Override
-                    public boolean unlock(FurnacePassiveNode node) {
-                        if (minecraft == null || minecraft.player == null || minecraft.gameMode == null) {
-                            return false;
-                        }
-                        if (!menu.canUnlockPassiveNode(node) || !menu.clickMenuButton(minecraft.player, node.buttonId())) {
-                            return false;
-                        }
-                        minecraft.gameMode.handleInventoryButtonClick(menu.containerId, node.buttonId());
-                        return true;
-                    }
-
-                    @Override
-                    public void appendSpecialTooltip(FurnacePassiveNode node, List<Component> tooltip) {
-                        if (node == FurnacePassiveNode.QUENCH_PROTOCOL) {
+                    public void appendSpecialTooltip(MegaPassiveNode node, List<Component> tooltip) {
+                        if (node.behaviors().contains("QUENCH_PROTOCOL")) {
                             tooltip.add(Component.translatable("rngtech.mastery.tooltip.quench_protocol")
                                     .withStyle(ChatFormatting.GOLD));
                         }
-                        if (node == FurnacePassiveNode.CLOSED_LOOP_RECUPERATOR) {
+                        if (node.behaviors().contains("CLOSED_LOOP_RECUPERATOR")) {
                             tooltip.add(Component.translatable("rngtech.mastery.tooltip.closed_loop_recuperator")
                                     .withStyle(ChatFormatting.GOLD));
                         }
@@ -230,7 +219,7 @@ public class FurnaceScreen extends AbstractContainerScreen<FurnaceMenu> {
         } else if (menu.selectedTab() == FurnaceMenu.TAB_REFINEMENT) {
             renderRefinement(guiGraphics);
         } else {
-            masterySupport.render(guiGraphics, leftPos, topPos, imageWidth, imageHeight);
+            masterySupport.render(guiGraphics, leftPos, topPos, imageWidth, imageHeight, mouseX, mouseY);
         }
     }
 
@@ -280,10 +269,10 @@ public class FurnaceScreen extends AbstractContainerScreen<FurnaceMenu> {
                     && RefinementScreenStyle.handleApplyClick(this, menu, mouseX, mouseY)) {
                 return true;
             }
-            if (menu.selectedTab() == FurnaceMenu.TAB_MASTERY
-                    && masterySupport.mouseClicked(mouseX, mouseY, button, leftPos, topPos, imageWidth, imageHeight)) {
-                return true;
-            }
+        }
+        if (menu.selectedTab() == FurnaceMenu.TAB_MASTERY
+                && masterySupport.mouseClicked(mouseX, mouseY, button, leftPos, topPos, imageWidth, imageHeight)) {
+            return true;
         }
         return super.mouseClicked(mouseX, mouseY, button);
     }
@@ -299,7 +288,7 @@ public class FurnaceScreen extends AbstractContainerScreen<FurnaceMenu> {
 
     @Override
     public boolean mouseReleased(double mouseX, double mouseY, int button) {
-        if (masterySupport.mouseReleased(button)) {
+        if (masterySupport.mouseReleased(mouseX, mouseY, button, leftPos, topPos, imageWidth, imageHeight)) {
             return true;
         }
         return super.mouseReleased(mouseX, mouseY, button);
@@ -846,4 +835,13 @@ public class FurnaceScreen extends AbstractContainerScreen<FurnaceMenu> {
         int y = topPos - 20;
         return mouseX >= x && mouseX < x + TAB_WIDTH && mouseY >= y && mouseY < y + 21;
     }
+    @Override public boolean keyPressed(int key, int scan, int modifiers) {
+        if (menu.selectedTab() == FurnaceMenu.TAB_MASTERY && masterySupport.keyPressed(key, scan, modifiers, imageWidth, imageHeight)) { return true; }
+        return super.keyPressed(key, scan, modifiers);
+    }
+    @Override public boolean charTyped(char character, int modifiers) {
+        if (menu.selectedTab() == FurnaceMenu.TAB_MASTERY && masterySupport.charTyped(character)) { return true; }
+        return super.charTyped(character, modifiers);
+    }
+
 }
