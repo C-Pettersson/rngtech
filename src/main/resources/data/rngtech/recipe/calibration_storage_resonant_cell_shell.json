@@ -9,6 +9,7 @@
   "processing_ticks": 340,
   "energy": 5200,
   "machine_xp": 5,
+  "bonus_output": false,
   "result": {
     "stack": { "id": "rngtech:calibrated_storage_component" },
     "stage": 2,

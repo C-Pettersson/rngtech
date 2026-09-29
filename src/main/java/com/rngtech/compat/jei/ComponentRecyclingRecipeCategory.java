@@ -87,6 +87,9 @@ public final class ComponentRecyclingRecipeCategory implements IRecipeCategory<R
                         if (output.requiresFilter()) {
                             tooltip.add(Component.translatable("rngtech.jei.requires_recovery_filter"));
                         }
+                        if (!recipe.allowsBonusOutput()) {
+                            tooltip.add(Component.translatable("rngtech.jei.output_bonuses_disabled"));
+                        }
                     });
         }
     }

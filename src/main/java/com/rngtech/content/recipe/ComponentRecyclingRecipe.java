@@ -27,7 +27,8 @@ public record ComponentRecyclingRecipe(
         int minimumProcessingLevel,
         int processingTicks,
         int energy,
-        List<ComponentRecyclingOutput> outputs
+        List<ComponentRecyclingOutput> outputs,
+        boolean allowsBonusOutput
 )
         implements Recipe<SingleRecipeInput> {
     public List<ItemStack> outputStacks(boolean hasRecoveryFilter) {
@@ -108,7 +109,8 @@ public record ComponentRecyclingRecipe(
                                 .forGetter(ComponentRecyclingRecipe::energy),
                         ComponentRecyclingOutput.CODEC.listOf()
                                 .fieldOf("outputs")
-                                .forGetter(ComponentRecyclingRecipe::outputs)
+                                .forGetter(ComponentRecyclingRecipe::outputs),
+                        Codec.BOOL.fieldOf("bonus_output").orElse(true).forGetter(ComponentRecyclingRecipe::allowsBonusOutput)
                 )
                 .apply(instance, ComponentRecyclingRecipe::new));
 
@@ -122,7 +124,8 @@ public record ComponentRecyclingRecipe(
                                 ByteBufCodecs.VAR_INT.decode(buffer),
                                 ByteBufCodecs.VAR_INT.decode(buffer),
                                 ByteBufCodecs.VAR_INT.decode(buffer),
-                                ComponentRecyclingOutput.STREAM_CODEC.apply(ByteBufCodecs.list()).decode(buffer)
+                                ComponentRecyclingOutput.STREAM_CODEC.apply(ByteBufCodecs.list()).decode(buffer),
+                                ByteBufCodecs.BOOL.decode(buffer)
                         );
                     }
 
@@ -134,6 +137,7 @@ public record ComponentRecyclingRecipe(
                         ByteBufCodecs.VAR_INT.encode(buffer, recipe.processingTicks);
                         ByteBufCodecs.VAR_INT.encode(buffer, recipe.energy);
                         ComponentRecyclingOutput.STREAM_CODEC.apply(ByteBufCodecs.list()).encode(buffer, recipe.outputs);
+                        ByteBufCodecs.BOOL.encode(buffer, recipe.allowsBonusOutput);
                     }
                 };
 

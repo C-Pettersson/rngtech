@@ -109,6 +109,9 @@ public final class ResonanceCalibrationRecipeCategory implements IRecipeCategory
                             result.refinementPotential().min(),
                             result.refinementPotential().max()
                     ));
+                    if (!recipe.allowsBonusOutput()) {
+                        tooltip.add(Component.translatable("rngtech.jei.output_bonuses_disabled"));
+                    }
                 });
     }
 
