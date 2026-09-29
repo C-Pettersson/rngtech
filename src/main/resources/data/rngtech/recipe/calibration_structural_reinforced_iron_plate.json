@@ -8,6 +8,7 @@
   "processing_ticks": 220,
   "energy": 2200,
   "machine_xp": 3,
+  "bonus_output": false,
   "result": {
     "stack": { "id": "rngtech:calibrated_structural_component" },
     "stage": 2,

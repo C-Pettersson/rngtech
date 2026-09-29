@@ -54,7 +54,7 @@ Stored calibration state contains:
 
 Patterns are reusable, stored internally in the Gear tab, and are not consumed. Catalysts are consumed unless catalyst efficiency preserves them. Recipe stabilizers are consumed when a calibration recipe declares one.
 
-Low-stability calibrated outputs are not dead ends. Current calibrated components have Component Recycler recipes that recover the main raw input, such as Iron Gear from a Calibrated Kinetic Component, so a failed stability roll can be recouped for another attempt. The recycler does not return the reusable pattern, consumed catalyst, consumed recipe stabilizer, calibration state, or Refinement Potential.
+Low-stability calibrated outputs are not dead ends. Current calibrated components have Component Recycler recipes that recover the main raw input, such as Iron Gear from a Calibrated Kinetic Component, so a failed stability roll can be recouped for another attempt. The recycler does not return the reusable pattern, consumed catalyst, consumed recipe stabilizer, calibration state, or Refinement Potential. Because the recovery returns the calibration input, both sides of that retry opt out of Super Output (see [Recipe Surface](#recipe-surface)), so calibrating and recycling never returns more raw input than it consumed.
 
 ## Recipe Surface
 
@@ -78,6 +78,8 @@ The `rngtech:calibration` recipe type is data-driven. Recipes can declare the mi
 | Logic | Basic Electric Circuit | Matrix plus Stabilization Catalyst stabilizer | 4 | 2 | Calibrated Logic Component |
 | Logic | Diamond | Emerald | 6 | 6 | Calibrated Diamond Crystal |
 
+Calibration recipes accept an optional `bonus_output` flag, which defaults to `true`. Recipes with `bonus_output: false` always produce their authored output count and ignore Super Output. Following the [reversible-conversion rule](../reference/machine-guidelines.md), every shipped recipe whose calibrated component recycles back into its input opts out. Only the Sparksteel Coil conductive recipe and the Calibrated Diamond Crystal recipe keep Super Output: calibrated conductive components recycle to Copper Coil rather than Sparksteel Coil, and nothing recycles back into Diamond.
+
 The Basic Electric Circuit logic recipe and the basic Copper Casing thermal recipe require Stage 1 calibrator reach while storing Stage 2 calibration state. This lets Iron Resonance Calibrators produce the first Steel progression gates. Copper Resonance Calibrators remain an optional speed and transfer sidegrade instead of a mandatory step.
 
 The `rngtech:calibrated_shaped` recipe serializer can require calibrated components by family, minimum stage, minimum stability, minimum Refinement Potential, and declared Refinement Potential consumption. Stage 3+ chassis recipes use those gates for calibrated component family, stage, and stability. Selected Resonance Calibrator branch recipes also require Refinement Potential.
@@ -98,7 +100,7 @@ Resonance Calibrator chassis recipes do not consume the previous Resonance Calib
 
 The Calibrated Diamond Crystal is a Stage 6 logic-family calibration output used by late Stabilizer Matrix recipes and Stage 7 Resonance Calibrator chassis recipes. Tungstensteel and Nullite Stabilizer Matrix crafting requires a logic-calibrated crystal with at least Stage 6 and `75` stability, while Tungstensteel and Nullite Resonance Calibrator chassis require `85` stability, so the chassis gate sits after Titanium calibration and asks for a stronger crystal roll.
 
-When JEI is installed, `rngtech:calibration` recipes appear under a Resonance Calibration category. Resonance Calibrator chassis are registered as catalysts, and the recipe view shows input, reusable pattern, catalyst, optional stabilizer, output family, stability range, Refinement Potential range, FE cost, processing time, and machine XP. Recipe transfer sends patterns to the selected, matching, or first empty Gear-tab pattern slot.
+When JEI is installed, `rngtech:calibration` recipes appear under a Resonance Calibration category. Resonance Calibrator chassis are registered as catalysts, and the recipe view shows input, reusable pattern, catalyst, optional stabilizer, output family, stability range, Refinement Potential range, FE cost, processing time, and machine XP. The output tooltip marks recipes with output bonuses off. Recipe transfer sends patterns to the selected, matching, or first empty Gear-tab pattern slot.
 
 ## Progression
 
@@ -115,7 +117,7 @@ Future Exotic content should preserve that branch choice instead of merging both
 
 Resonance Calibrators enter the [shared Machine Mastery tree](../systems/machine-mastery.md) at the Control start, which they share with the Metal Press. Each chassis keeps its own progression, and build codes paste between the two families. The start grants 20 Control, 0 Drive, and 0 Reserve. In addition to the [shared attribute conversions](../systems/machine-mastery.md#attributes), each Control point grants 0.05% increased Calibration Precision.
 
-The Resonance Calibrator is the only family that uses Calibration Precision and Catalyst Efficiency nodes. It also uses Processing Speed, Energy Usage, Stability, Energy Capacity, Instant Process Chance, and Super Output Chance. Heat, fuel, fluid, output-amount, and parallel-job effects are marked inactive. Single Pass removes Super Output Chance in exchange for 30% more Processing Speed. Mastery stats apply after chassis base stats and machine traits, before installed Gear, the no-Battery-Cell penalty, and Bulk Speed. Nodes do not change Gear slots, lanes, or coil stage reach. Allocation changes reset the active calibration cycle but keep inventory, stored patterns, and the selected pattern. Silent Operation mutes the calibrator's machine loop.
+The Resonance Calibrator is the only family that uses Calibration Precision and Catalyst Efficiency nodes. It also uses Processing Speed, Energy Usage, Stability, Energy Capacity, Instant Process Chance, and Super Output Chance; Super Output Chance only affects recipes that allow bonus output. Heat, fuel, fluid, output-amount, and parallel-job effects are marked inactive. Single Pass removes Super Output Chance in exchange for 30% more Processing Speed. Mastery stats apply after chassis base stats and machine traits, before installed Gear, the no-Battery-Cell penalty, and Bulk Speed. Nodes do not change Gear slots, lanes, or coil stage reach. Allocation changes reset the active calibration cycle but keep inventory, stored patterns, and the selected pattern. Silent Operation mutes the calibrator's machine loop.
 
 Completed calibrations grant `machine_xp` once per calibrated job, so multi-lane chassis earn XP for each job completed in a cycle. Super Output bonuses, missing Gear, invalid or stage-gated recipes, output-blocked waits, and no-power pauses grant no XP. If `machine_xp_band` is omitted, positive-XP recipes map the required calibrator stage onto the [shared work-band scale](../systems/machine-mastery.md#xp-and-chassis-ownership) as old band `1 + (stage - 1) × 4`, the same mapping Crusher hardness uses.
 

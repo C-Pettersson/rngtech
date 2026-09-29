@@ -34,6 +34,7 @@ public record CalibrationRecipe(
         int minimumStage,
         int processingTicks,
         int energy,
+        boolean allowsBonusOutput,
         int machineXp,
         int machineXpBand
 ) implements Recipe<CalibrationRecipeInput> {
@@ -124,6 +125,7 @@ public record CalibrationRecipe(
                                 .orElse(160)
                                 .forGetter(CalibrationRecipe::processingTicks),
                         Codec.intRange(1, Integer.MAX_VALUE).fieldOf("energy").orElse(1200).forGetter(CalibrationRecipe::energy),
+                        Codec.BOOL.fieldOf("bonus_output").orElse(true).forGetter(CalibrationRecipe::allowsBonusOutput),
                         MachineXpFields.CODEC.forGetter(recipe -> new MachineXpFields(
                                 recipe.machineXp(),
                                 recipe.machineXpBand() <= 0 ? Optional.empty() : Optional.of(recipe.machineXpBand())
@@ -140,6 +142,7 @@ public record CalibrationRecipe(
                         minimumStage,
                         processingTicks,
                         energy,
+                        allowsBonusOutput,
                         machineXpFields
                 ) -> new CalibrationRecipe(
                         group,
@@ -152,6 +155,7 @@ public record CalibrationRecipe(
                         minimumStage,
                         processingTicks,
                         energy,
+                        allowsBonusOutput,
                         machineXpFields.machineXp(),
                         machineXpFields.machineXpBand().orElse(defaultMachineXpBand(
                                 machineXpFields.machineXp(),
@@ -175,6 +179,7 @@ public record CalibrationRecipe(
                         int minimumStage = ByteBufCodecs.VAR_INT.decode(buffer);
                         int processingTicks = ByteBufCodecs.VAR_INT.decode(buffer);
                         int energy = ByteBufCodecs.VAR_INT.decode(buffer);
+                        boolean allowsBonusOutput = ByteBufCodecs.BOOL.decode(buffer);
                         int machineXp = ByteBufCodecs.VAR_INT.decode(buffer);
                         int machineXpBand = ByteBufCodecs.VAR_INT.decode(buffer);
                         return new CalibrationRecipe(
@@ -188,6 +193,7 @@ public record CalibrationRecipe(
                                 minimumStage,
                                 processingTicks,
                                 energy,
+                                allowsBonusOutput,
                                 machineXp,
                                 machineXpBand
                         );
@@ -206,6 +212,7 @@ public record CalibrationRecipe(
                         ByteBufCodecs.VAR_INT.encode(buffer, recipe.minimumStage);
                         ByteBufCodecs.VAR_INT.encode(buffer, recipe.processingTicks);
                         ByteBufCodecs.VAR_INT.encode(buffer, recipe.energy);
+                        ByteBufCodecs.BOOL.encode(buffer, recipe.allowsBonusOutput);
                         ByteBufCodecs.VAR_INT.encode(buffer, recipe.machineXp);
                         ByteBufCodecs.VAR_INT.encode(buffer, recipe.machineXpBand);
                     }

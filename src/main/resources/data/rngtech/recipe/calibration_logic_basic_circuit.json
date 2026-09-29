@@ -8,6 +8,7 @@
   "processing_ticks": 200,
   "energy": 1600,
   "machine_xp": 2,
+  "bonus_output": false,
   "result": {
     "stack": { "id": "rngtech:calibrated_logic_component" },
     "stage": 2,

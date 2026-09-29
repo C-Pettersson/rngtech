@@ -9,6 +9,7 @@
   "processing_ticks": 300,
   "energy": 4600,
   "machine_xp": 5,
+  "bonus_output": false,
   "result": {
     "stack": { "id": "rngtech:calibrated_conductive_component" },
     "stage": 2,
