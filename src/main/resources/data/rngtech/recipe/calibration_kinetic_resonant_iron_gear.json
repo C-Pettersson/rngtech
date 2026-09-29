@@ -9,6 +9,7 @@
   "processing_ticks": 280,
   "energy": 4200,
   "machine_xp": 5,
+  "bonus_output": false,
   "result": {
     "stack": { "id": "rngtech:calibrated_kinetic_component" },
     "stage": 1,

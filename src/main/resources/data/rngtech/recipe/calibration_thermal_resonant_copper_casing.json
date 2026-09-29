@@ -9,6 +9,7 @@
   "processing_ticks": 320,
   "energy": 5000,
   "machine_xp": 5,
+  "bonus_output": false,
   "result": {
     "stack": { "id": "rngtech:calibrated_thermal_component" },
     "stage": 2,

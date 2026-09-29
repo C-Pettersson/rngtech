@@ -499,7 +499,9 @@ public class ResonanceCalibratorBlockEntity extends BaseMachineBlockEntity imple
 
         int operations = Math.max(1, Math.min(chassis().lanes(), maximumOperations(recipe)));
         ItemStack baseResult = createOutput(recipe, stats, operations);
-        ItemStack result = ProcessingChance.applySuperOutput(level, stats, baseResult, baseResult.copyWithCount(1));
+        ItemStack result = recipe.allowsBonusOutput()
+                ? ProcessingChance.applySuperOutput(level, stats, baseResult, baseResult.copyWithCount(1))
+                : baseResult;
         if (!canMergeOutput(result)) {
             result = baseResult;
             if (!canMergeOutput(result)) {
