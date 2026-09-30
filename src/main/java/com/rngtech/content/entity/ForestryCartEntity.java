@@ -1365,7 +1365,7 @@ public class ForestryCartEntity extends AbstractMinecart implements MenuProvider
                 ForestryCartStationBlockEntity.STATUS_READY,
                 ForestryCartStationBlockEntity.ACTION_CREATING_SNAPSHOT
         );
-        HarvestScan scan = scanConnectedHarvestBlocks(logBase, logBase, maxTreeHeight());
+        HarvestScan scan = scanHarvestTree(logBase, maxTreeHeight());
         if (scan.tooLarge()) {
             setCellState(managedCells.get(logBase), ManagedCell.STATE_BLOCKED);
             return SnapshotCreationResult.TOO_LARGE;
@@ -1803,148 +1803,18 @@ public class ForestryCartEntity extends AbstractMinecart implements MenuProvider
         return level().getBlockState(root).is(BlockTags.LOGS);
     }
 
-    private HarvestScan scanConnectedHarvestBlocks(BlockPos root, BlockPos start, int maxHeight) {
-        LogScan logScan = scanConnectedLogs(root, start, maxHeight, maxSnapshotLogs());
-        if (logScan.tooLarge()) {
-            return HarvestScan.tooLarge(logScan.logs());
+    private HarvestScan scanHarvestTree(BlockPos logBase, int maxHeight) {
+        ForestryTreeScan.TreeBlocks blocks = ForestryTreeScan.TreeBlocks.of(level());
+        ForestryTreeScan.Bounds bounds = treeBounds(logBase, maxHeight);
+        ForestryTreeScan.OwnedLogs owned = ForestryTreeScan.ownedLogs(blocks, bounds, logBase, maxSnapshotLogs());
+        if (owned.tooLarge()) {
+            return HarvestScan.TOO_LARGE;
         }
-        if (logScan.logs().isEmpty()) {
-            return HarvestScan.empty();
+        if (owned.logs().isEmpty()) {
+            return HarvestScan.EMPTY;
         }
-        return new HarvestScan(logScan.logs(), scanLeavesAroundLogs(root, logScan.logs(), maxHeight), false);
-    }
-
-    private LogScan scanConnectedLogs(BlockPos root, BlockPos start, int maxHeight, int logLimit) {
-        ArrayDeque<BlockPos> queue = new ArrayDeque<>();
-        List<BlockPos> logs = new ArrayList<>();
-        Set<BlockPos> seen = new HashSet<>();
-        int boundedLogLimit = Math.min(Math.max(0, logLimit), MAX_HARVEST_SNAPSHOT_LOGS);
-        if (boundedLogLimit <= 0 || !level().getBlockState(start).is(BlockTags.LOGS)) {
-            return LogScan.empty();
-        }
-        queue.add(start);
-        seen.add(start);
-        int logCount = 0;
-        boolean tooLarge = false;
-        while (!queue.isEmpty() && !tooLarge) {
-            BlockPos current = queue.remove();
-            if (!withinTreeBounds(root, current, maxHeight)) {
-                tooLarge = true;
-                break;
-            }
-            BlockState currentState = level().getBlockState(current);
-            if (!currentState.is(BlockTags.LOGS)) {
-                continue;
-            }
-            logCount++;
-            if (logCount > boundedLogLimit) {
-                tooLarge = true;
-                break;
-            }
-            logs.add(current);
-            for (int dx = -1; dx <= 1; dx++) {
-                for (int dy = -1; dy <= 1; dy++) {
-                    for (int dz = -1; dz <= 1; dz++) {
-                        if (dx == 0 && dy == 0 && dz == 0) {
-                            continue;
-                        }
-                        BlockPos next = current.offset(dx, dy, dz);
-                        if (!withinTreeBounds(root, next, maxHeight)) {
-                            if (level().getBlockState(next).is(BlockTags.LOGS)) {
-                                tooLarge = true;
-                                break;
-                            }
-                            continue;
-                        }
-                        if (!level().getBlockState(next).is(BlockTags.LOGS) || !seen.add(next)) {
-                            continue;
-                        }
-                        queue.add(next);
-                    }
-                    if (tooLarge) {
-                        break;
-                    }
-                }
-                if (tooLarge) {
-                    break;
-                }
-            }
-        }
-        return new LogScan(List.copyOf(logs), tooLarge);
-    }
-
-    private List<BlockPos> scanLeavesAroundLogs(BlockPos root, List<BlockPos> logs, int maxHeight) {
-        ArrayDeque<BlockPos> queue = new ArrayDeque<>();
-        List<BlockPos> leaves = new ArrayList<>();
-        Set<BlockPos> logSet = new HashSet<>(logs);
-        Set<BlockPos> seen = new HashSet<>(logs);
-        for (BlockPos log : logs) {
-            enqueueAdjacentLeaves(root, log, maxHeight, logs, seen, queue);
-        }
-        while (!queue.isEmpty() && leaves.size() < MAX_CONNECTED_LEAF_BLOCKS) {
-            BlockPos current = queue.remove();
-            if (!level().getBlockState(current).is(BlockTags.LEAVES) || touchesForeignLog(current, logSet)) {
-                continue;
-            }
-            leaves.add(current);
-            enqueueAdjacentLeaves(root, current, maxHeight, logs, seen, queue);
-        }
-        return List.copyOf(leaves);
-    }
-
-    private void enqueueAdjacentLeaves(
-            BlockPos root,
-            BlockPos current,
-            int maxHeight,
-            List<BlockPos> logs,
-            Set<BlockPos> seen,
-            ArrayDeque<BlockPos> queue
-    ) {
-        for (int dx = -1; dx <= 1; dx++) {
-            for (int dy = -1; dy <= 1; dy++) {
-                for (int dz = -1; dz <= 1; dz++) {
-                    if (dx == 0 && dy == 0 && dz == 0) {
-                        continue;
-                    }
-                    BlockPos next = current.offset(dx, dy, dz);
-                    if (!seen.add(next)
-                            || !withinTreeBounds(root, next, maxHeight)
-                            || !withinLeafReach(logs, next)
-                            || !level().getBlockState(next).is(BlockTags.LEAVES)) {
-                        continue;
-                    }
-                    queue.add(next);
-                }
-            }
-        }
-    }
-
-    private boolean touchesForeignLog(BlockPos leaf, Set<BlockPos> logs) {
-        for (int dx = -1; dx <= 1; dx++) {
-            for (int dy = -1; dy <= 1; dy++) {
-                for (int dz = -1; dz <= 1; dz++) {
-                    if (dx == 0 && dy == 0 && dz == 0) {
-                        continue;
-                    }
-                    BlockPos neighbor = leaf.offset(dx, dy, dz);
-                    if (!logs.contains(neighbor) && level().getBlockState(neighbor).is(BlockTags.LOGS)) {
-                        return true;
-                    }
-                }
-            }
-        }
-        return false;
-    }
-
-    private boolean withinLeafReach(List<BlockPos> logs, BlockPos candidate) {
-        for (BlockPos log : logs) {
-            if (Math.abs(candidate.getX() - log.getX()) <= LEAF_SCAN_RADIUS
-                    && Math.abs(candidate.getY() - log.getY()) <= LEAF_SCAN_RADIUS
-                    && Math.abs(candidate.getZ() - log.getZ()) <= LEAF_SCAN_RADIUS) {
-                return true;
-            }
-        }
-        return false;
+        List<BlockPos> leaves = ForestryTreeScan.leavesAround(blocks, bounds, owned.logs(), LEAF_SCAN_RADIUS, MAX_CONNECTED_LEAF_BLOCKS);
+        return new HarvestScan(owned.logs(), leaves, false);
     }
 
     private List<BlockPos> scanRemainingSnapshotLeaves(BlockPos root, List<BlockPos> leafAnchors, int maxHeight) {
@@ -2003,10 +1873,10 @@ public class ForestryCartEntity extends AbstractMinecart implements MenuProvider
     }
 
     private boolean isSnapshotLeaf(BlockPos root, BlockPos candidate, List<BlockPos> leafAnchors, Set<BlockPos> anchorSet, int maxHeight) {
-        return withinTreeBounds(root, candidate, maxHeight)
+        return treeBounds(root, maxHeight).contains(candidate)
                 && level().getBlockState(candidate).is(BlockTags.LEAVES)
-                && withinLeafReach(leafAnchors, candidate)
-                && !touchesForeignLog(candidate, anchorSet);
+                && ForestryTreeScan.withinLeafReach(leafAnchors, candidate, LEAF_SCAN_RADIUS)
+                && !ForestryTreeScan.touchesForeignLog(ForestryTreeScan.TreeBlocks.of(level()), candidate, anchorSet);
     }
 
     private List<BlockPos> harvestOrder(BlockPos root, List<BlockPos> blocks) {
@@ -2041,11 +1911,8 @@ public class ForestryCartEntity extends AbstractMinecart implements MenuProvider
         return dx * dx + dz * dz;
     }
 
-    private boolean withinTreeBounds(BlockPos root, BlockPos candidate, int maxHeight) {
-        return candidate.getY() >= root.getY()
-                && candidate.getY() <= root.getY() + maxHeight
-                && Math.abs(candidate.getX() - root.getX()) <= SCAN_BOUND_HORIZONTAL
-                && Math.abs(candidate.getZ() - root.getZ()) <= SCAN_BOUND_HORIZONTAL;
+    private ForestryTreeScan.Bounds treeBounds(BlockPos root, int maxHeight) {
+        return new ForestryTreeScan.Bounds(root, maxHeight, SCAN_BOUND_HORIZONTAL);
     }
 
     private boolean isSaplingBlock(BlockState state) {
@@ -2340,12 +2207,14 @@ public class ForestryCartEntity extends AbstractMinecart implements MenuProvider
     private AABB cartClearanceAt(BlockPos railPos) {
         double halfWidth = getBbWidth() * 0.5D;
         double baseY = railPos.getY() + 0.1D;
+        RailShape shape = railShape(railPos);
+        double slopeRise = shape != null && shape.isAscending() ? 1.0D : 0.0D;
         return new AABB(
                 railPos.getX() + 0.5D - halfWidth,
                 baseY,
                 railPos.getZ() + 0.5D - halfWidth,
                 railPos.getX() + 0.5D + halfWidth,
-                baseY + getBbHeight(),
+                baseY + slopeRise + getBbHeight(),
                 railPos.getZ() + 0.5D + halfWidth
         );
     }
@@ -2646,19 +2515,8 @@ public class ForestryCartEntity extends AbstractMinecart implements MenuProvider
     }
 
     private record HarvestScan(List<BlockPos> logs, List<BlockPos> leaves, boolean tooLarge) {
-        private static HarvestScan empty() {
-            return new HarvestScan(List.of(), List.of(), false);
-        }
-
-        private static HarvestScan tooLarge(List<BlockPos> logs) {
-            return new HarvestScan(List.copyOf(logs), List.of(), true);
-        }
-    }
-
-    private record LogScan(List<BlockPos> logs, boolean tooLarge) {
-        private static LogScan empty() {
-            return new LogScan(List.of(), false);
-        }
+        private static final HarvestScan EMPTY = new HarvestScan(List.of(), List.of(), false);
+        private static final HarvestScan TOO_LARGE = new HarvestScan(List.of(), List.of(), true);
     }
 
     private record PathBlockage(BlockPos pos, BlockState state, boolean player) {
