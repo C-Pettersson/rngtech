@@ -89,10 +89,7 @@ public final class MasteryScreenSupport<N extends PassiveNode> {
     private static final int TARGET_BORDER = 0xFF8E9BE8;
     private static final int[] NO_ROUTE = new int[0];
     private static final ResourceLocation ASCENDANCY_CREST = RNGTech.id("textures/gui/mastery/ascendancy_crest.png");
-    /** The crest is drawn at its native 32 pixels, or exactly half when the tree is zoomed far out, so it stays crisp. */
-    private static final int CREST_SIZE = 32;
-    /** Half-width of the crest's gem in texture pixels, for hit tests and the glow. */
-    private static final float CREST_GEM_HALF = 14.0F;
+    private static final int CREST_SIZE = MasteryCrestPlacement.CREST_SIZE;
     private static final int CREST_SOCKET = 0xFF3A2F5C;
 
     private final List<N> nodes;
@@ -138,6 +135,8 @@ public final class MasteryScreenSupport<N extends PassiveNode> {
     private double panX;
     private double panY;
     private double zoom = 1.0D;
+    /** The crest's direction around the start node, chosen once from the tree layout. */
+    private double crestAngle = Double.NaN;
     private double compactPanX;
     private double compactPanY;
     private double compactZoom = 1.0D;
@@ -1167,17 +1166,20 @@ public final class MasteryScreenSupport<N extends PassiveNode> {
         return best;
     }
 
-    /** The Ascendancy crest sits at the start node's upper right, as PoE shows the ascendancy button at the class start. */
+    /** The Ascendancy crest sits beside the start node, at the upper right unless links or nodes need that space. */
     private Badge badge(int leftPos, int topPos) {
         int starterPosition = position(starter);
         if (starterPosition < 0 || !ascendancy.available()) {
             return null;
         }
+        if (Double.isNaN(crestAngle)) {
+            crestAngle = MasteryCrestPlacement.angle(centerX, centerY, radius, linkSegments, starterPosition);
+        }
         float startRadius = screenRadius(starterPosition);
-        int size = startRadius >= 14.0F ? CREST_SIZE : CREST_SIZE / 2;
-        float half = CREST_GEM_HALF * size / CREST_SIZE;
-        return new Badge(screenX(centerX[starterPosition], leftPos) + startRadius + half,
-                screenY(centerY[starterPosition], topPos) - startRadius - half * 0.5F, half, size);
+        float offset = MasteryCrestPlacement.offset(startRadius);
+        return new Badge(screenX(centerX[starterPosition], leftPos) + (float) Math.cos(crestAngle) * offset,
+                screenY(centerY[starterPosition], topPos) + (float) Math.sin(crestAngle) * offset,
+                MasteryCrestPlacement.crestHalf(startRadius), MasteryCrestPlacement.crestSize(startRadius));
     }
 
     private boolean overBadge(int leftPos, int topPos, int imageWidth, int imageHeight, double mouseX, double mouseY) {

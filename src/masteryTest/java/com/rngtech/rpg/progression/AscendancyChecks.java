@@ -1,6 +1,7 @@
 package com.rngtech.rpg.progression;
 
 import com.rngtech.client.screen.AscendancyTreeLayout;
+import com.rngtech.client.screen.MasteryCrestPlacement;
 import com.rngtech.content.menu.MasteryMenuSupport;
 import com.rngtech.rpg.BonusBanks;
 import com.rngtech.rpg.MachineModifier;
@@ -56,6 +57,7 @@ final class AscendancyChecks {
         formulas();
         familyFormulas();
         familyLaunchContent();
+        crestPlacement();
         mainCatalogAssets();
         return checks;
     }
@@ -603,6 +605,46 @@ final class AscendancyChecks {
         var nursery = ascendedForestry("grove_warden", List.of("nursery_cells", "nursery", "grove_cells", "ancient_grove"));
         require(MegaPassiveTree.passive(nursery, PassiveStatType.MANAGED_CELLS) == 12, "Nursery nodes add 12 managed cells");
         require(AscendancyFormulas.pulseAttempts(forestryStats(ascendedForestry("grove_warden", List.of())), 0.0) == 1, "the root pulses once");
+    }
+
+    /** Every family's crest faces away from the tree's center and sits clear of links and nodes at each zoom. */
+    private static void crestPlacement() {
+        List<MegaPassiveNode> nodes = MegaPassiveTree.TREE.nodes();
+        int count = nodes.size();
+        float[] centerX = new float[count];
+        float[] centerY = new float[count];
+        float[] radius = new float[count];
+        List<Float> segments = new java.util.ArrayList<>();
+        for (int position = 0; position < count; position++) {
+            MegaPassiveNode node = nodes.get(position);
+            centerX[position] = node.x() + node.size() / 2.0F;
+            centerY[position] = node.y() + node.size() / 2.0F;
+            radius[position] = node.size() / 2.0F;
+            for (PassiveNode parent : node.parents()) {
+                if (parent.index() >= node.index()) {
+                    continue;
+                }
+                var path = parent.linkPathTo(node);
+                for (int index = 1; index < path.size(); index++) {
+                    segments.addAll(List.of((float) path.get(index - 1).x(), (float) path.get(index - 1).y(), (float) path.get(index).x(), (float) path.get(index).y()));
+                }
+            }
+        }
+        float[] links = new float[segments.size()];
+        for (int index = 0; index < links.length; index++) {
+            links[index] = segments.get(index);
+        }
+        for (MachineMasteryFamily family : MachineMasteryFamily.values()) {
+            int start = nodes.indexOf(MegaPassiveTree.node(family.startNodeId()));
+            double angle = MasteryCrestPlacement.angle(centerX, centerY, radius, links, start);
+            double outward = MasteryCrestPlacement.outward(centerX, centerY, start);
+            require(Math.abs(Math.IEEEremainder(angle - outward, Math.PI * 2.0D)) <= Math.toRadians(20.0D),
+                    family + " crest faces away from the tree's center, turned at most 20 degrees for room");
+            for (double zoom : new double[] {0.5D, 0.7D, 1.0D, 1.5D, 2.0D}) {
+                require(MasteryCrestPlacement.clearance(centerX, centerY, radius, links, start, angle, zoom) > 0.0D,
+                        family + " crest clears links and nodes at zoom " + zoom);
+            }
+        }
     }
 
     private static MachineProgressionState ascendedForestry(String ascendancy, List<String> nodes) {
