@@ -1,6 +1,6 @@
 # RNGTech Moddex
 
-Static modifier-pool, rolling simulator, recipe bill-of-material explorer, component-stage preview, and GUI layout editor for RNGTech.
+Static modifier-pool, rolling simulator, recipe bill-of-material explorer, component-stage preview, ascendancy browser, and GUI layout editor for RNGTech.
 
 Run:
 
@@ -52,6 +52,16 @@ The audit reads every recipe type, the vanilla tags and crafting it chains into,
 - an allowlist of reviewed loops, each with a reason.
 
 A linear program finds the loop with the largest gain. Each loop found is shrunk to a minimal recipe set, reported with a likely fix, and then set aside so the search can surface the next one. Mutation self-tests re-enable bonus output on known loops and fail when the audit misses them. Every stat or behavior declared with a yield in `data/rngtech/mastery/declarations.json` must be covered by a bound.
+
+The Ascendancies tab browses the shipped [ascendancy](../../docs/systems/machine-mastery.md#ascendancies) catalog by Mastery family. It draws each ascendancy's tree, lists every node's effects and behaviors, highlights search matches, and shows each declared stat or behavior with its yield kind and the loop-audit bound that covers it. `export-ascendancy-data.mjs` builds `tools/moddex/generated/ascendancies.json` from `data/rngtech/mastery` and the language file when the server starts.
+
+The same exporter writes the node tables on each family page between `<!-- ascendancy-trees:start -->` and `<!-- ascendancy-trees:end -->`. Regenerate them after changing an ascendancy, its names, or its behavior tooltips:
+
+```sh
+node tools/moddex/export-ascendancy-data.mjs --write-docs
+```
+
+The smoke check fails when those tables are stale or a declared stat has no row in Machine Stats.
 
 Check Java passive-tree geometry and graph constraints directly:
 

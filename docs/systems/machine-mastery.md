@@ -2,7 +2,7 @@
 
 Status: Prototype
 
-Machine Mastery is progression owned by each machine chassis. Machines share one passive graph and enter it at different starting positions. The [implementation matrix](../reference/current-implementation.md) records the current adapters; generator and storage adapters are deferred, and family ascendancies are [planned](../prds/machine-ascendancies.md).
+Machine Mastery is progression owned by each machine chassis. Machines share one passive graph and enter it at different starting positions. The [implementation matrix](../reference/current-implementation.md) records the current adapters; generator and storage adapters are deferred. Each family also has [ascendancies](#ascendancies): small specialization trees unlocked with Ascendancy Seals.
 
 ## Shared tree
 
@@ -101,10 +101,60 @@ Copy stores an ordered build code in the clipboard. Paste requires an empty tree
 
 The Configurator has a dedicated Mastery mode. Sneak-use in air toggles between connector and Mastery modes. In Mastery mode, sneak-use a supported machine to copy and use normally to paste. Shift-click Copy in the Mastery screen stores the build on an inventory Configurator and selects Mastery mode. Entity companions use the same workflow.
 
+## Ascendancies
+
+Status: Prototype. Ascendancies still need an in-game playtest, and their node values are subject to balance testing.
+
+An ascendancy is a family-specific specialization for one machine, modeled on Path of Exile ascendancy classes. Every Mastery family has two. A machine chooses one when it uses its first Ascendancy Seal, then spends ascendancy points in that ascendancy's small tree. Ascendancy points are separate from the shared tree's points and allocations.
+
+| Family | Ascendancies |
+| --- | --- |
+| [Crusher](../content/crusher.md#ascendancies) | Rockbreaker, Assayer |
+| [Furnace](../content/furnace.md#ascendancies) | Crucible Keeper, Bloomer |
+| [Alloy Furnace](../content/alloy-furnace.md#ascendancies) | Metallurgist, Blendwright |
+| [Metal Press](../content/metal-press.md#ascendancies) | Die Keeper, Drop Forge |
+| [Resonance Calibrator](../content/resonance-calibrator.md#ascendancies) | Harmonist, Mass Tuner |
+| [Melter](../content/melter.md#ascendancies) | Pressure Vessel, Twin Crucible |
+| [Forestry Companion](../content/tree-farm-automation.md#ascendancies) | Timber Baron, Grove Warden |
+
+### Seals and tiers
+
+Each Ascendancy Seal grants 2 ascendancy points to one machine, for at most 6 across three tiers. Seals are used in order, one tier at a time:
+
+| Seal | Recipe materials | Needs |
+| --- | --- | --- |
+| Ascendancy Seal I | Sparksteel, aluminum casings, advanced circuits, a Stage 5 calibrated conductive component, and a Primed Seal Core from the Component Assembler | Entry stage 4 or higher; chooses the ascendancy |
+| Ascendancy Seal II | Tungstensteel, nullite, elite circuits, a calibrated diamond crystal, and a Lubricated Seal Core | Seal I used on the same machine |
+| Ascendancy Seal III | Naquadah, an Exotic Machine Frame, ultimate circuits, a high-stability calibrated diamond crystal, and a Lubricated Seal Core | Seal II used on the same machine |
+
+The entry stage is the chassis stage for block machines. It is 3 for the Crude Metal Press and 4 for the Metal Press, and 6 for the Melter. The Forestry Companion uses the stage of its installed Axe or Treefeller head. The gate is checked only when Seal I is used.
+
+Seals carry no data, so Seals from loot tables, quests, or commands work the same as crafted ones. Pack makers can turn Seal recipes off with the `ascendancy.sealRecipesEnabled` common config key or the `rngtech:ascendancy_seal_recipes_enabled` recipe condition. Crafting the Seal is the only trial; there is no work requirement.
+
+### Choosing, allocating, and switching
+
+The crest beside the machine's start node on the Mastery tab opens the **Ascendancy panel**. Its pips show earned Seal tiers, and it glows when a Seal can be used or points are unspent. The crest appears on families with ascendancies and on any machine that already earned a tier.
+
+- **Ascend** uses the next Seal from your inventory. Seal I opens the choose dialog, which previews every ascendancy for the family with its tree and root effects. Creative players must carry the Seal but keep it.
+- The chosen ascendancy's root is allocated for free. Every other node costs one point. Small nodes lead to exactly one notable, and a deep notable sits behind a notable's small node, so 6 points reach at most three notables.
+- Click a node to allocate it and right-click to refund it. Each refunded node costs five Mastery Refunds, and nodes are refunded from the tips inward. The root cannot be refunded.
+- **Switch** changes to the family's other ascendancy. It needs an empty tree, apart from the root, and consumes a Seal I. Earned tiers and points stay.
+- If a machine's ascendancy is ever retired from the catalog, the machine keeps its tiers and chooses again for free.
+
+Ascendancy effects use the same modifier rules and stat pipeline as the shared tree. Granted ascendancy stats appear on the machine's Stats tab only when they apply, and [Machine Stats](../reference/machine-stats.md#ascendancy-stats) defines each one. The Bonus Summary drawer has an Ascendancy section. Jade shows the ascendancy and its points while sneaking, and JEI has an information entry for the three Seals.
+
+Ascendancy state lives in `rngtech:machine_progression`, so it survives drops, pick-block, and the Forestry Companion's item form. Like the rest of Mastery, it does not transfer to a newly crafted chassis. Build codes carry the ascendancy and its allocation order. Paste allocates ascendancy nodes only onto the same ascendancy with none allocated, as far as its earned points reach.
+
+### Yield and loops
+
+No mix of recipes may return every consumed input while gaining items or producing net FE, including through ascendancies. Every yield effect honors a recipe's `bonus_output` opt-out, no node lowers authored recipe input counts, and no node raises Refinement Potential. The recipe loop audit in `npm run moddex:check` is a CI gate, and every declared yield stat or behavior must be covered by one of its bounds. See the [ascendancies PRD](../prds/machine-ascendancies.md#loop-prevention) for the audit's model.
+
 ## Authoring and verification
 
 The checked-in runtime catalog is `src/main/resources/data/rngtech/mastery/machine_tree.json`. `tools/moddex/layout-mega-tree.mjs` deterministically lays out the road layers, keystone placements, and reward constellations without crossings; `author-mega-tree.mjs` assigns attributes, themes, notable names, special notables, and keystones, then writes the catalog and language entries. Later additions go in its `EXTRAS` list, which the layout places after the original fill so existing node IDs, positions, and links stay stable. ModDex reads this catalog directly; its JSON draft and Java layout exports remain authoring views rather than runtime catalog writers. Follow [Passive Tree Design Rules](../reference/passive-tree-design-rules.md) when changing geometry or routes.
 
 Run `node tools/moddex/check-mega-tree.mjs --report` to refresh the [audit report](../reference/machine-mega-tree-audit.json). It includes paths from all starts and representative 99-point builds combining local investment with distant keystones. `masteryCheck`, included in `quickCheck` and `ciCheck`, checks modifier math, migration, build ordering, connectivity, point budgets, attribute suppression, hard constraints, tagged payoffs, the bonus summary, and a keystone audit that fails when a payoff reaches a machine that escapes the keystone's cost. `npm run moddex:check` checks catalog geometry and export consistency.
+
+Ascendancies are data-driven. `data/rngtech/mastery/ascendancies/index.json` lists one file per ascendancy in display order, and each file holds its family and nodes. New stats and behaviors are declared, with the families they reach and their yield kind, in `data/rngtech/mastery/declarations.json`. The catalog validates tree shape and family support on load and is not datapack-overridable. `masteryCheck` validates every shipped ascendancy, runs test-only fixture ascendancies, and checks language keys and icons. `node tools/moddex/export-ascendancy-data.mjs --write-docs` regenerates the node tables on each family page, and `npm run moddex:check` fails when they are stale or a declared stat has no [Machine Stats](../reference/machine-stats.md#ascendancy-stats) row.
 
 The implementation has automated domain and graph coverage. In-game interaction, multiplayer synchronization, and late-game balance still need focused playtesting.

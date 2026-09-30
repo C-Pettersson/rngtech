@@ -112,6 +112,58 @@ Recipes may set `machine_xp` and an optional `machine_xp_band`; the band default
 
 Supercharged Silica Gel Beads grant no XP.
 
+## Ascendancies
+
+Status: Prototype
+
+Alloy Furnace machines choose between Metallurgist and Blendwright when they use their first Ascendancy Seal. [Machine Mastery](../systems/machine-mastery.md#ascendancies) defines Seals, points, refunds, and switching, and [Machine Stats](../reference/machine-stats.md#ascendancy-stats) defines the new stats. The tables below are generated from the ascendancy catalog.
+
+- Metallurgist banks Flux toward skipping a unit of an alloy’s largest ingredient, first on a tie. Only an ingredient that needs two or more units is saved, so no input reaches zero. Reactive Flux doubles the Flux Rate on direct-ingot routes.
+- Recipe Lock limits top automation to the current recipe’s inputs in recipe ratio. Dross Skimming refunds one unit of the recipe’s largest input on a failure.
+- Blendwright favors blend routes. Blend Reversal returns the blend whose furnace smelt makes a failed direct route’s ingot, never more than the direct route would make, and makes direct-ingot routes 15% slower.
+- Master Blend disables direct-ingot routes on its chassis; the Process tab shows a route-disabled status for them.
+- The Process tab draws the Flux or blend ledger under the progress bar.
+
+<!-- ascendancy-trees:start -->
+
+### Metallurgist
+
+| Node | Type | After | Effect |
+|---|---|---|---|
+| **Flux Ledger** | Root | — | +10% Flux Rate. |
+| Fluxed Charge | Small | Flux Ledger | +3% Flux Rate. |
+| **Reactive Flux** | Notable | Fluxed Charge | Flux Rate is doubled on direct-ingot routes. |
+| Rich Flux | Small | Reactive Flux | +3% Flux Rate. |
+| **Transmuter’s Rate** | Deep notable | Rich Flux | +12% Flux Rate; 25% less Processing Speed. |
+| Steady Measure | Small | Flux Ledger | 8% increased Temperature Stability. |
+| **Recipe Lock** | Notable | Steady Measure | Automation inserts only the current recipe’s inputs, one craft ahead at most. |
+| Lucky Pour | Small | Recipe Lock | +1% Super Output. |
+| **Unbroken Pour** | Deep notable | Lucky Pour | Super Output Cadence fixed at 32 cycles. |
+| Skimmed Melt | Small | Flux Ledger | 8% increased Stability. |
+| **Dross Skimming** | Notable | Skimmed Melt | A failure keeps one unit of the recipe’s largest input. |
+| Banked Heat | Small | Flux Ledger | 5% reduced Energy Use. |
+| **Heat Economy** | Notable | Banked Heat | Warmup costs 30% less FE. |
+
+### Blendwright
+
+| Node | Type | After | Effect |
+|---|---|---|---|
+| **Blend Reversal** | Root | — | +25% Blend Speed. A failed direct-ingot craft returns the blend its inputs would make, never more. Direct-ingot routes are 15% slower. |
+| Quick Blend | Small | Blend Reversal | +5% Blend Speed. |
+| **Cold Mixing** | Notable | Quick Blend | +100 °C Blend Heat Reduction. |
+| Warm Mix | Small | Cold Mixing | +5% Blend Speed. |
+| **Continuous Pour** | Deep notable | Warm Mix | Back-to-back blend crafts skip re-warmup. |
+| Steady Pace | Small | Blend Reversal | 6% increased Processing Speed. |
+| **Blend Ledger** | Notable | Steady Pace | +25% Ledger Rate. |
+| Measured Pace | Small | Blend Ledger | 6% increased Processing Speed. |
+| **Master Blend** | Deep notable | Measured Pace | 100% more Ledger Rate. Direct-ingot routes are disabled. |
+| Even Heat | Small | Blend Reversal | 8% increased Temperature Stability. |
+| **Tempered Crucible** | Notable | Even Heat | 40% more Temperature Stability on blend routes. |
+| Sure Footing | Small | Blend Reversal | 8% increased Stability. |
+| **Steady Supply** | Notable | Sure Footing | Power-drop failure strain is halved. |
+
+<!-- ascendancy-trees:end -->
+
 ## Related Pages
 
 - [Furnace](furnace.md)

@@ -257,6 +257,57 @@ Without an installed Battery Cell, the Crusher can still run from direct FE inpu
 
 `PROCESSING_SPEED` improves throughput, not energy efficiency. A faster crusher completes the craft in fewer ticks and draws more FE each tick to preserve the recipe's effective total cost. `ENERGY_USAGE` and `OUTPUT_AMOUNT` are the main ways modifiers make the machine feel lighter.
 
+## Ascendancies
+
+Status: Prototype
+
+Crusher machines choose between Rockbreaker and Assayer when they use their first Ascendancy Seal. [Machine Mastery](../systems/machine-mastery.md#ascendancies) defines Seals, points, refunds, and switching, and [Machine Stats](../reference/machine-stats.md#ascendancy-stats) defines the new stats. The tables below are generated from the ascendancy catalog.
+
+- Rockbreaker makes under-level crushing viable. Hardness Tolerance forgives missing Crush Head levels for time, FE, and jam risk, but the Crusher still counts as under level, so bonus output stays off.
+- Assayer turns the Output Amount bank into a per-input ledger. Bank Memory keeps one bank per remembered input, and Wide Ledger saves the banks in `rngtech:output_banks` so they survive drops and pick-block.
+- Compound Yield rolls Super Output a second time when a craft’s bank pays out and copies the items the bank paid. Tailings Recovery banks one whole item in the current input’s bank. Mother Lode counts eligible cycles per remembered input.
+- Refiner’s Oath turns Parallel Jobs into up to 50% more Output Amount with Dense Parallel off.
+
+<!-- ascendancy-trees:start -->
+
+### Rockbreaker
+
+| Node | Type | After | Effect |
+|---|---|---|---|
+| **Breaker’s Stance** | Root | — | +1 Hardness Tolerance. |
+| Quick Release | Small | Breaker’s Stance | +10% Jam Recovery. |
+| **Jam Breaker** | Notable | Quick Release | 50% less Jam Chance; +40% Jam Recovery. |
+| Tempered Jaws | Small | Breaker’s Stance | +3% Hardness Energy Mitigation. |
+| **Fault Lines** | Notable | Tempered Jaws | Under-level cycles keep positive Output Amount. Super Output and salvage stay off. |
+| Salvage Grit | Small | Fault Lines | +2% Crusher Salvage. |
+| **Rubble Reclaimer** | Deep notable | Salvage Grit | Under-level cycles can roll salvage at half chance. |
+| Steady Pressure | Small | Breaker’s Stance | +10% Under-Level Efficiency. |
+| **Pressure Stacking** | Notable | Steady Pressure | +40% Under-Level Efficiency. |
+| Deep Pressure | Small | Pressure Stacking | +10% Under-Level Efficiency. |
+| **Bedrock Bite** | Deep notable | Deep Pressure | +1 Hardness Tolerance. |
+| Lean Crushing | Small | Breaker’s Stance | 5% reduced Energy Use. |
+| **Shatter Point** | Notable | Lean Crushing | The extra FE cost of high-hardness recipes is halved. |
+
+### Assayer
+
+| Node | Type | After | Effect |
+|---|---|---|---|
+| **Assay Ledger** | Root | — | +4 Bank Memory. |
+| Ledger Pages | Small | Assay Ledger | +2 Bank Memory. |
+| **Wide Ledger** | Notable | Ledger Pages | +6 Bank Memory. Remembered bonus banks survive breaking and pick-block. |
+| Sworn Yield | Small | Wide Ledger | 4% increased Bonus Output. |
+| **Refiner’s Oath** | Deep notable | Sworn Yield | Dense Parallel is off. 5% more Output Amount per Parallel Job, up to 50%. |
+| Rich Assay | Small | Assay Ledger | 4% increased Bonus Output. |
+| **Compound Yield** | Notable | Rich Assay | A bonus bank payout can also trigger Super Output. |
+| Vein Sense | Small | Compound Yield | +1% Super Output. |
+| **Mother Lode** | Deep notable | Vein Sense | Super Output Cadence fixed at 16 cycles. |
+| Lucky Strike | Small | Assay Ledger | +1% Super Output. |
+| **Tailings Recovery** | Notable | Lucky Strike | +3% Crusher Salvage. Salvage that does not fit the output is banked instead of lost. |
+| True Measure | Small | Assay Ledger | +5% At-Level Output. |
+| **Matched Hardness** | Notable | True Measure | +15% At-Level Output. |
+
+<!-- ascendancy-trees:end -->
+
 ## Modifier Eligibility
 
 | Modifier Source | Notes |

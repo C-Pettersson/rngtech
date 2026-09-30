@@ -66,11 +66,62 @@ When a Steel Press cycle fails, the input is consumed and the output slot receiv
 
 Both presses enter the [shared Machine Mastery tree](../systems/machine-mastery.md) at the Control start, which they share with the Resonance Calibrator. Each placed press keeps its own `rngtech:machine_progression`; drops and pick-block preserve it. A press starts with 20 Control and no Drive or Reserve. In addition to the shared attribute conversions, each Control point grants 0.05% increased Temperature Stability.
 
-Heat, processing speed, Energy Usage, Energy Capacity, Stability, Instant Process, and Super Output effects apply. Output-amount, parallel-job, energy-transfer, fuel, and fluid effects are marked inactive. As a heated machine, the press gains the [tagged](../systems/machine-mastery.md#tagged-payoffs) speed bonuses of Low Heat Specialist and Flash Annealing along with their temperature caps. Single Pass removes its Super Output chance in exchange for 30% more Processing Speed. Stability effects are marked inactive on the Crude Metal Press because it has no failure-strain model. Allocation changes reset the active cycle and failure strain but keep inventory, the selected mold, and current heat.
+Heat, processing speed, Energy Usage, Energy Capacity, Stability, Instant Process, and Super Output effects apply. Output-amount, energy-transfer, fuel, and fluid effects are marked inactive. Parallel Jobs presses more inputs only with the Drop Forge ascendancy. As a heated machine, the press gains the [tagged](../systems/machine-mastery.md#tagged-payoffs) speed bonuses of Low Heat Specialist and Flash Annealing along with their temperature caps. Single Pass removes its Super Output chance in exchange for 30% more Processing Speed. Stability effects are marked inactive on the Crude Metal Press because it has no failure-strain model. Allocation changes reset the active cycle and failure strain but keep inventory, the selected mold, and current heat.
 
 Press recipes accept optional `machine_xp` and `machine_xp_band` fields. A press grants `machine_xp` once per successful normal output, including Instant Process completions. Failure outputs, Crude Press safety pauses, missing Gear, output-blocked waits, and FE shortfalls grant none. An omitted `machine_xp_band` derives from `target_temperature` with the Furnace heat ladder described in [Furnace Recipe Use](furnace.md#recipe-use).
 
 Shipped plate, gear, casing, and Electric Circuit recipes grant XP; connector recipes grant none. Plates grant `1` for Iron and Copper, then `2`, `3`, `4`, `5`, `6`, and `8` for Stage 3 through Stage 8 materials. Gears grant 1.5 times the plate value, rounded, and casings grant twice the plate value. Basic, Advanced, Elite, and Ultimate Electric Circuits grant `3`, `5`, `10`, and `27`.
+
+## Ascendancies
+
+Status: Prototype
+
+Metal Press machines choose between Die Keeper and Drop Forge when they use their first Ascendancy Seal. [Machine Mastery](../systems/machine-mastery.md#ascendancies) defines Seals, points, refunds, and switching, and [Machine Stats](../reference/machine-stats.md#ascendancy-stats) defines the new stats. The tables below are generated from the ascendancy catalog.
+
+- Recipes are classed by their mold tag: `rngtech:plate_molds`, `rngtech:gear_molds`, `rngtech:casing_molds`, and `rngtech:circuit_molds`.
+- Die Keeper’s Mold Rack switches to the first installed mold that fits the input and pauses for the Mold Swap Time. Quick Change keeps heat during the swap.
+- Drop Forge’s Drop Hammer presses 1 + Parallel Jobs input sets per plate, gear, or casing cycle at that many times the FE, and rolls Super Output for each job. Circuits are unaffected; Forge Line disables them on its press. Heat Window moves both edges of each recipe’s safe window toward its target.
+- Split Failure fails one job’s input and keeps the rest for the next cycle, because a failure output and pressed outputs cannot share the output slot.
+
+<!-- ascendancy-trees:start -->
+
+### Die Keeper
+
+| Node | Type | After | Effect |
+|---|---|---|---|
+| **Mold Rack** | Root | — | +40 ticks Mold Swap Time. Switches to the stored mold that fits the input after the Mold Swap Time. |
+| Swap Drill | Small | Mold Rack | −5 ticks Mold Swap Time. |
+| **Quick Change** | Notable | Swap Drill | −25 ticks Mold Swap Time. The press keeps its heat while it swaps molds. |
+| Rack Drill | Small | Quick Change | −5 ticks Mold Swap Time. |
+| **Production Die** | Deep notable | Rack Drill | Gears and casings press 40% faster; circuits 25% slower. |
+| Steady Bed | Small | Mold Rack | 8% increased Temperature Stability. |
+| **Tolerance Map** | Notable | Steady Bed | 40% less heat-related failure strain. |
+| True Bed | Small | Tolerance Map | 8% increased Temperature Stability. |
+| **Master Die** | Deep notable | True Bed | 20% less Processing Speed. No failures while heat stays in the window and power holds. |
+| Fine Servos | Small | Mold Rack | 8% increased Stability. |
+| **Circuit Discipline** | Notable | Fine Servos | Circuit recipes gain 20% increased Stability and use 15% less FE. |
+| Heat Margin | Small | Mold Rack | 10% increased Overheat Tolerance. |
+| **Servo Sync** | Notable | Heat Margin | Power-drop grace is doubled, halving power-drop strain again. |
+
+### Drop Forge
+
+| Node | Type | After | Effect |
+|---|---|---|---|
+| **Drop Hammer** | Root | — | +3 Parallel Jobs; −25% Heat Window. Plate, gear, and casing recipes press one input set per Parallel Job at once. Circuits are unaffected. |
+| Heavy Blows | Small | Drop Hammer | 8% increased Processing Speed. |
+| **Anvil Mass** | Notable | Heavy Blows | +2 Parallel Jobs. |
+| Fast Line | Small | Anvil Mass | 8% increased Processing Speed. |
+| **Forge Line** | Deep notable | Fast Line | +4 Parallel Jobs. Circuit recipes are disabled. |
+| Wide Bed | Small | Drop Hammer | +5% Heat Window. |
+| **Split Failure** | Notable | Wide Bed | A failed batch ruins one job’s input instead of all of them; the rest waits for the next cycle. |
+| Broad Bed | Small | Split Failure | +5% Heat Window. |
+| **Batch Ledger** | Deep notable | Broad Bed | +5% Ledger Rate. |
+| Lean Strikes | Small | Drop Hammer | 5% reduced Energy Use. |
+| **Shock Absorbers** | Notable | Lean Strikes | Power-drop grace is doubled while batching. |
+| Hot Platen | Small | Drop Hammer | 8% increased Heat Transfer. |
+| **Hot Stamping** | Notable | Hot Platen | Plates press 20% faster above their target temperature. |
+
+<!-- ascendancy-trees:end -->
 
 ## Automation
 

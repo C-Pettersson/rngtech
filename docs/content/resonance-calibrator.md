@@ -117,7 +117,7 @@ Future Exotic content should preserve that branch choice instead of merging both
 
 Resonance Calibrators enter the [shared Machine Mastery tree](../systems/machine-mastery.md) at the Control start, which they share with the Metal Press. Each chassis keeps its own progression, and build codes paste between the two families. The start grants 20 Control, 0 Drive, and 0 Reserve. In addition to the [shared attribute conversions](../systems/machine-mastery.md#attributes), each Control point grants 0.05% increased Calibration Precision.
 
-The Resonance Calibrator is the only family that uses Calibration Precision and Catalyst Efficiency nodes. It also uses Processing Speed, Energy Usage, Stability, Energy Capacity, Instant Process Chance, and Super Output Chance; Super Output Chance only affects recipes that allow bonus output. Heat, fuel, fluid, output-amount, and parallel-job effects are marked inactive. Single Pass removes Super Output Chance in exchange for 30% more Processing Speed. Mastery stats apply after chassis base stats and machine traits, before installed Gear, the no-Battery-Cell penalty, and Bulk Speed. Nodes do not change Gear slots, lanes, or coil stage reach. Allocation changes reset the active calibration cycle but keep inventory, stored patterns, and the selected pattern. Silent Operation mutes the calibrator's machine loop.
+The Resonance Calibrator is the only family that uses Calibration Precision and Catalyst Efficiency nodes. It also uses Processing Speed, Energy Usage, Stability, Energy Capacity, Instant Process Chance, and Super Output Chance; Super Output Chance only affects recipes that allow bonus output. Heat, fuel, fluid, and output-amount effects are marked inactive. Parallel Jobs adds jobs per lane only with the Mass Tuner’s Resonance Array. Single Pass removes Super Output Chance in exchange for 30% more Processing Speed. Mastery stats apply after chassis base stats and machine traits, before installed Gear, the no-Battery-Cell penalty, and Bulk Speed. Shared-tree nodes do not change Gear slots, lanes, or coil stage reach. Allocation changes reset the active calibration cycle but keep inventory, stored patterns, and the selected pattern. Silent Operation mutes the calibrator's machine loop.
 
 Completed calibrations grant `machine_xp` once per calibrated job, so multi-lane chassis earn XP for each job completed in a cycle. Super Output bonuses, missing Gear, invalid or stage-gated recipes, output-blocked waits, and no-power pauses grant no XP. If `machine_xp_band` is omitted, positive-XP recipes map the required calibrator stage onto the [shared work-band scale](../systems/machine-mastery.md#xp-and-chassis-ownership) as old band `1 + (stage - 1) × 4`, the same mapping Crusher hardness uses.
 
@@ -128,3 +128,54 @@ Completed calibrations grant `machine_xp` once per calibrated job, so multi-lane
 | 4 | Matrix-stabilized recipes | 5 | 49 |
 | 4 | Sparksteel Coil | 6 | 49 |
 | 6 | Calibrated Diamond Crystal | 8 | 81 |
+
+## Ascendancies
+
+Status: Prototype
+
+Resonance Calibrator machines choose between Harmonist and Mass Tuner when they use their first Ascendancy Seal. [Machine Mastery](../systems/machine-mastery.md#ascendancies) defines Seals, points, refunds, and switching, and [Machine Stats](../reference/machine-stats.md#ascendancy-stats) defines the new stats. The tables below are generated from the ascendancy catalog.
+
+- Harmonist’s Resonant Streak counts consecutive calibrations of one family on one pattern and raises the stability floor by Streak Floor each, up to the Streak Cap. The streak is stored in `rngtech:calibration_streak`, and the calibrator tooltip shows the current floor.
+- Pattern Memory saves the streak on the dropped machine and lets it survive one change of pattern or family.
+- Mass Tuner’s Shared Field spends one catalyst per cycle however many lanes run, and Stabilizer Economy consumes recipe stabilizers every other cycle. Lane Sync applies while more than one operation runs.
+- Resonance Array runs lanes × (1 + Parallel Jobs) operations from the lane inputs. Overreach’s Coil Reach counts as extra coil stage when checking a recipe’s required stage.
+
+<!-- ascendancy-trees:start -->
+
+### Harmonist
+
+| Node | Type | After | Effect |
+|---|---|---|---|
+| **Resonant Streak** | Root | — | +1 Streak Floor; +10 Streak Cap. |
+| Held Note | Small | Resonant Streak | +2 Streak Cap. |
+| **Sustained Tone** | Notable | Held Note | +8 Streak Cap. |
+| Long Note | Small | Sustained Tone | +2 Streak Cap. |
+| **Master Harmonic** | Deep notable | Long Note | 30% less Processing Speed. At the full streak, every 8th calibration comes out at exactly 100 stability. |
+| Quiet Coil | Small | Resonant Streak | 5% reduced Energy Use. |
+| **Second Pass** | Notable | Quiet Coil | A calibration under 40 stability is re-run once, paying FE and a catalyst again but not the input. |
+| Soft Reset | Small | Second Pass | 5% reduced Energy Use. |
+| **Pattern Memory** | Deep notable | Soft Reset | The streak survives one pattern or family change, and breaking the machine. |
+| Clean Line | Small | Resonant Streak | 8% increased Stability. |
+| **Clear Signal** | Notable | Clean Line | At the full streak, the stability ceiling rises by 5. |
+| Quick Ear | Small | Resonant Streak | 8% increased Processing Speed. |
+| **Perfect Pitch** | Notable | Quick Ear | 20% increased Calibration Precision. |
+
+### Mass Tuner
+
+| Node | Type | After | Effect |
+|---|---|---|---|
+| **Shared Field** | Root | — | One catalyst per cycle however many lanes run; the stability ceiling drops by 10. |
+| Brisk Field | Small | Shared Field | 8% increased Processing Speed. |
+| **Stabilizer Economy** | Notable | Brisk Field | Recipe stabilizers are consumed every other cycle. |
+| Tight Field | Small | Shared Field | 8% increased Calibration Precision. |
+| **Lane Sync** | Notable | Tight Field | 15% more Processing Speed while more than one lane runs. |
+| Focused Array | Small | Lane Sync | 8% increased Calibration Precision. |
+| **Resonance Array** | Deep notable | Focused Array | +1 Parallel Jobs. Each lane runs one job per Parallel Job plus one; the stability ceiling drops by another 15. |
+| Lean Field | Small | Shared Field | 5% reduced Energy Use. |
+| **Catalytic Surplus** | Notable | Lean Field | 25% increased Catalyst Efficiency. |
+| Broad Field | Small | Shared Field | 8% increased Stability. |
+| **Wide Tolerance** | Notable | Broad Field | +5 stability floor on a multi-lane chassis. |
+| Steady Reach | Small | Wide Tolerance | 8% increased Stability. |
+| **Overreach** | Deep notable | Steady Reach | +1 Coil Reach; 20% less Calibration Precision. |
+
+<!-- ascendancy-trees:end -->

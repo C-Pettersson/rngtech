@@ -1,0 +1,132 @@
+{
+	default_hide_dependency_lines: false
+	default_quest_shape: ""
+	filename: "rngtech_mastery_ascendancies"
+	group: "7106E7A1B10FA000"
+	icon: {
+		id: "rngtech:ascendancy_seal_1"
+	}
+	id: "7106E7A1B10FA070"
+	order_index: 7
+	quest_links: [ ]
+	quests: [
+		{
+			dependencies: ["37A6C9E1284B5D10"]
+			id: "FB45A90F15D87663"
+			rewards: [{
+				count: 4
+				id: "6FBEF4B53CFBAFF9"
+				item: {
+					count: 1
+					id: "rngtech:mastery_refund"
+				}
+				type: "item"
+			}]
+			tasks: [{
+				id: "F18C924AA3036AD7"
+				type: "checkmark"
+			}]
+			x: 0.0d
+			y: 0.0d
+		}
+		{
+			dependencies: ["FB45A90F15D87663"]
+			id: "C3604160EA637458"
+			optional: true
+			tasks: [{
+				id: "845B3E56F44FD779"
+				item: { count: 1, id: "rngtech:mastery_refund" }
+				type: "item"
+			}]
+			x: 0.0d
+			y: 2.0d
+		}
+		{
+			dependencies: ["FB45A90F15D87663", "44B6B0AADE341E23"]
+			id: "FAEF4E1A8753B3FE"
+			optional: true
+			tasks: [{
+				id: "813482CED295DB6A"
+				item: { count: 1, id: "rngtech:configurator" }
+				type: "item"
+			}]
+			x: 2.5d
+			y: 2.0d
+		}
+		{
+			dependencies: ["FB45A90F15D87663"]
+			id: "9978E0313902657D"
+			tasks: [{
+				id: "76125B34AF53AD84"
+				type: "checkmark"
+			}]
+			x: 2.5d
+			y: 0.0d
+		}
+		{
+			dependencies: ["9978E0313902657D", "4CC5AA5185C3D06B"]
+			id: "866D43F46AC8E5BE"
+			tasks: [{
+				id: "59E417C8998BC7C5"
+				item: { count: 1, id: "rngtech:primed_seal_core" }
+				type: "item"
+			}]
+			x: 5.0d
+			y: 0.0d
+		}
+		{
+			dependencies: ["866D43F46AC8E5BE"]
+			id: "B707E4F323CE4189"
+			rewards: [{
+				count: 8
+				id: "732A30C958ECC304"
+				item: {
+					count: 1
+					id: "minecraft:experience_bottle"
+				}
+				type: "item"
+			}]
+			tasks: [{
+				id: "63D1E29D1E076D12"
+				item: { count: 1, id: "rngtech:ascendancy_seal_1" }
+				type: "item"
+			}]
+			x: 7.5d
+			y: 0.0d
+		}
+		{
+			dependencies: ["B707E4F323CE4189", "46A1F2C0DE100040", "7C968747D63F427E"]
+			id: "83437B2BE1852F4E"
+			tasks: [{
+				id: "F45D6DB5DD6EB973"
+				item: { count: 1, id: "rngtech:lubricated_seal_core" }
+				type: "item"
+			}]
+			x: 10.0d
+			y: 0.0d
+		}
+		{
+			dependencies: ["83437B2BE1852F4E", "17E4A9571BBF913F"]
+			id: "49D6781084057122"
+			tasks: [{
+				id: "86A7A7B9EF255B39"
+				item: { count: 1, id: "rngtech:ascendancy_seal_2" }
+				type: "item"
+			}]
+			x: 12.5d
+			y: 0.0d
+		}
+		{
+			dependencies: ["49D6781084057122", "46A1F2C0DE100050", "46A1F2C0DE100060"]
+			id: "5C7D614307ED2822"
+			optional: true
+			tasks: [{
+				id: "30E61F4CCA721975"
+				item: { count: 1, id: "rngtech:ascendancy_seal_3" }
+				type: "item"
+			}]
+			x: 15.0d
+			y: 0.0d
+		}
+	]
+}

@@ -17,6 +17,7 @@
         <button data-view="rbom" type="button">RBOM</button>
         <button data-view="stages" type="button">Stages</button>
         <button data-view="passiveTree" type="button">Passive Trees</button>
+        <button data-view="ascendancies" type="button">Ascendancies</button>
         <button data-view="gui" type="button">GUI</button>
         <button id="refreshData" type="button">Refresh Data</button>
       </div>
@@ -277,6 +278,58 @@
               <tbody id="stageBody"></tbody>
             </table>
           </div>
+        </section>
+      </section>
+
+      <section id="ascendancyView" class="view-section hidden">
+        <section class="toolbar ascendancy-toolbar" aria-label="Ascendancy context">
+          <label>
+            Mastery Family
+            <select id="ascendancyFamilySelect"></select>
+          </label>
+          <label>
+            Search Nodes
+            <input id="ascendancySearchInput" type="search" placeholder="Name, effect, or behavior">
+          </label>
+        </section>
+
+        <section class="panel">
+          <div class="panel-heading">
+            <h2>Ascendancy Catalog</h2>
+            <span>From data/rngtech/mastery</span>
+          </div>
+          <div id="ascendancyMetrics" class="metric-grid ascendancy-metrics"></div>
+        </section>
+
+        <section id="ascendancyCards" class="ascendancy-grid"></section>
+
+        <section class="grid">
+          <section class="panel">
+            <div class="panel-heading">
+              <h2>Declared Stats and Behaviors</h2>
+              <span id="ascendancyDeclarationMeta"></span>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Id</th>
+                    <th>Kind</th>
+                    <th>Meaning</th>
+                    <th>Yield</th>
+                    <th>Loop Bound</th>
+                  </tr>
+                </thead>
+                <tbody id="ascendancyDeclarationBody"></tbody>
+              </table>
+            </div>
+          </section>
+          <section class="panel">
+            <div class="panel-heading">
+              <h2>Selected Node</h2>
+            </div>
+            <div id="ascendancyNodeDetail"></div>
+          </section>
         </section>
       </section>
 
@@ -579,5 +632,6 @@
     <script type="module" src="/app.js"></script>
     <script type="module" src="/gui-editor.js"></script>
     <script type="module" src="/passive-tree-editor.js"></script>
+    <script type="module" src="/ascendancy-view.js"></script>
   </body>
 </html>

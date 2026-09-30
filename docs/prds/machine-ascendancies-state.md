@@ -2,7 +2,7 @@
 
 Source: [draft design](machine-ascendancies.md).
 
-Status: **Prototype** for the 2.0 release — PRD accepted 2026-09-29 on `feature/machine-ascendancies`. The framework, loop audit, Seals, UI, and all fourteen launch ascendancies are in; they still need an in-game playtest.
+Status: **Prototype** for the 2.0 release — PRD accepted 2026-09-29 on `feature/machine-ascendancies`. All eight delivery phases are in: the framework, loop audit, Seals, UI, all fourteen launch ascendancies, and their documentation. They still need an in-game playtest.
 
 ## Scope checklist
 
@@ -16,7 +16,7 @@ Status: **Prototype** for the 2.0 release — PRD accepted 2026-09-29 on `featur
 - [x] Crusher and Furnace content with their new stats, Stats tab rows shown only when granted, and shared mechanics.
 - [ ] In-game playtest of every family's ascendancies and the Ascendancy panel.
 - [x] Alloy Furnace, Metal Press, Resonance Calibrator, Melter, and Forestry Companion content.
-- [ ] Canonical documentation, Machine Stats entries, implementation matrix, getting-started, quests, and ModDex view.
+- [x] Canonical documentation, Machine Stats entries, implementation matrix, getting-started, quests, and ModDex view.
 
 ## Decisions
 
@@ -196,6 +196,13 @@ Recorded 2026-09-30 for the Alloy Furnace, Metal Press, Resonance Calibrator, Me
     - Mastery Stats tabs on the Alloy Furnace, Metal Press, Melter, Resonance Calibrator, and Forestry cart list granted declared stats.
     - Loot tables for 13 machines now copy `rngtech:machine_progression`, and the calibrator tables also copy `rngtech:calibration_streak`.
     - The loop audit gained Phase 7 bounds and a Forestry world source that fails if any recipe makes bone meal or saplings, with a third mutation self-test.
+- 2026-09-30, Phase 8 documentation:
+    - [Machine Mastery](../systems/machine-mastery.md#ascendancies) gained the canonical Ascendancies section: Seals and tiers, the entry gate, choosing, allocating, refunds, switching, persistence, loop safety, and authoring.
+    - Each family page has an Ascendancies section with its rules and generated node tables. `tools/moddex/export-ascendancy-data.mjs --write-docs` writes the tables from the catalog and language file, and `npm run moddex:check` fails when they are stale.
+    - [Machine Stats](../reference/machine-stats.md#ascendancy-stats) lists all 24 new stats; the check also fails when a declared stat has no row. Parallel Jobs and Fluid Capacity rows name their ascendancy uses.
+    - Getting-started has a Mastery and ascendancies section, and the implementation matrix records the finished surfaces.
+    - ModDex has an Ascendancies tab: a family picker, a drawn tree and node table per ascendancy with search, node details, and every declared stat and behavior with its yield kind and loop-audit bound.
+    - The optional FTB Quests extra has a Mastery and Ascendancies chapter: reading Mastery and ascendancies, Mastery Refunds, copying builds with the Configurator, both Seal Cores, and Seals I–III, gated on the stage quests that unlock their materials.
 
 ## Verification
 
@@ -206,6 +213,7 @@ Recorded 2026-09-30 for the Alloy Furnace, Metal Press, Resonance Calibrator, Me
 - 2026-09-30 Phase 5: `gradlew spotlessApply` and `quickCheck` passed with 1058 domain checks, including menu sync, Ascend status agreement with the server, the Bonus Summary, and panel layout for every catalog entry. `npm run moddex:check` and `npm run repo:check` passed. Not yet run in game: the panel has no shipped ascendancy to show until Phase 6, so rendering, clicks, Jade, and JEI need a client check then.
 - 2026-09-30 Phase 6: `gradlew spotlessApply` and `quickCheck` passed with 1431 domain checks, including launch content, stat and behavior language keys, bank memory, the ledger, the formulas, granted stat sync, and layout of the new trees. `npm run moddex:check` passed: the loop audit covers 988 recipes with the new bounds and still finds no loop. `npm run repo:check` passed. Not yet run in game; every Crusher and Furnace mechanic still needs a playtest.
 - 2026-09-30 Phase 7: `gradlew spotlessApply` and `quickCheck` passed with 2275 domain checks, including every family shipping two ascendancies, launch order, the Phase 7 formulas, and the worst-case Fluid Yield, Ledger Rate, and Growth Pulse values that the loop bounds assume. `npm run moddex:check` passed: the loop audit covers 988 recipes with no loop, and all three mutation self-tests were caught. `runGameTestServer` completed mod loading, then exited because no game tests are registered. Not yet run in game; every Phase 7 mechanic, the fertilizer bars, and bone meal loading still need a playtest.
+- 2026-09-30 Phase 8: `npm run moddex:check` passed, including the new Ascendancies view checks and the ascendancy docs check (14 ascendancies on 7 family pages, 25 declared stats in Machine Stats). `mkdocs build --strict` passed in a local virtual environment built from `requirements-docs.txt`, and every new cross-page anchor resolves in the built site. `npm run repo:check` and `gradlew quickCheck` passed. The ModDex Ascendancies tab was checked in a browser: family switching, search highlighting, node selection, and the declarations table work with no console errors. The quest chapter has not been loaded in FTB Quests yet.
 
 ## Handoff and limits
 

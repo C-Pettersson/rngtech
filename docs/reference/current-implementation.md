@@ -115,7 +115,7 @@ Fluid purge cleanup is code-backed for RNGTech machines that own real stored tan
 
 Status: Prototype. [Machine Mastery](../systems/machine-mastery.md) provides one layered 1315-node catalog, six starting archetypes, Control/Drive/Reserve attributes, 100 levels, and 99 points from levels, with storage for 120. Crusher, Furnace, Forestry Companion, Alloy Furnace, Metal Press, Melter, and Resonance Calibrator use this graph from five of the six starts; the Alloy Furnace shares the Furnace start, and the Metal Press and Resonance Calibrator share the Control start. It includes per-effect applicability, keystone payoffs tagged to the machine groups that pay their costs, additive increased/reduced and multiplicative more/less operations, attribute suppression with explicit scaling, absolute heat constraints, hard Crusher recipe ceilings, a bonus-output-disabling Single Pass keystone, Gear-safe refunds, ordered build codes, automatic allocation, a Bonus Summary drawer in the expanded view, and Configurator Mastery mode. The registered `rngtech:mastery_refund` item has a shapeless recipe. Versioned stable-ID saves preserve legacy XP and levels and refund old allocations. Generator and storage adapters for the Reserve start are deferred. Gameplay balance and multiplayer UI still require focused in-game checks.
 
-Family ascendancies are in progress for 2.0; see the [ascendancies PRD](../prds/machine-ascendancies.md). Code-backed so far:
+[Ascendancies](../systems/machine-mastery.md#ascendancies) ship for all seven Mastery families in 2.0; the [ascendancies PRD](../prds/machine-ascendancies.md) records the design and the loop-audit model. Code-backed:
 
 - a data-driven ascendancy catalog with tree-shape validation;
 - ascendancy state in `rngtech:machine_progression` and ascendancy effects in the Mastery stat pipeline;
@@ -127,6 +127,9 @@ Family ascendancies are in progress for 2.0; see the [ascendancies PRD](../prds/
 - an Ascendancy section in the Bonus Summary drawer, a Jade line, and a JEI entry for Seals;
 - the Crusher's Rockbreaker and Assayer and the Furnace's Crucible Keeper and Bloomer, with twelve new stats, per-input bonus banks, Overdrive, and the Bloom Ledger;
 - the Alloy Furnace's Metallurgist and Blendwright, the Metal Press's Die Keeper and Drop Forge, the Resonance Calibrator's Harmonist and Mass Tuner, the Melter's Pressure Vessel and Twin Crucible, and the Forestry Companion's Timber Baron and Grove Warden, with twelve more stats, Flux and output ledgers, Metal Press batching and mold racks, the calibration streak (`rngtech:calibration_streak`), Melter parallel melting and Fluid Yield, and a bone meal fertilizer store on the Forestry cart and station.
+
+- generated node tables on each family page, checked for drift by `npm run moddex:check`, and a ModDex Ascendancies tab that browses the catalog with each yield's loop-audit bound;
+- a Mastery and Ascendancies chapter in the optional FTB Quests extra, from reading Mastery through all three Seals.
 
 Alloy Furnace, Metal Press, Melter, and Resonance Calibrator drops now copy `rngtech:machine_progression`, so breaking these machines keeps their Mastery and ascendancy. Every family's ascendancies still need an in-game playtest.
 

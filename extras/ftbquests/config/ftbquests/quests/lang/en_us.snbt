@@ -6,6 +6,7 @@
 	chapter.7106E7A1B10FA040.title: "Stage 7-8: Advanced Power"
 	chapter.7106E7A1B10FA050.title: "Logistics and Transport"
 	chapter.7106E7A1B10FA060.title: "Affix Forge"
+	chapter.7106E7A1B10FA070.title: "Mastery and Ascendancies"
 	chapter_group.7106E7A1B10FA000.title: "RNGTech"
 	quest.01C84F033E61813D.quest_desc: ["Battery with the highest burst capabilities"]
 	quest.0511A72AEC9FAB27.quest_desc: [
@@ -882,6 +883,13 @@
 		"- Run Stage 8 powered refinement recipes for long-term targets."
 	]
 	quest.46A1F2C0DE100070.title: "Exotic Affix Forge"
+	quest.49D6781084057122.quest_desc: [
+		"Needs Tungstensteel and Nullite Plates, Elite Electric Circuits, a Lubricated Seal Core, and a calibrated diamond crystal of 85+ stability."
+		""
+		"Use it on a machine that already used Seal I."
+	]
+	quest.49D6781084057122.quest_subtitle: "Two more points."
+	quest.49D6781084057122.title: "Ascendancy Seal II"
 	quest.4CC5AA5185C3D06B.quest_desc: [
 		"Now that you have access to creating various fluids. You star bulk producing batteries, make stuff cheaper in &bComponent Assembler&r"
 		""
@@ -938,6 +946,13 @@
 		"This is your first introduction to more deterministic crafting. This allows you to target specific mods, either for adding or upgrading."
 		"Not all mods are available through deterministic crafting."
 	]
+	quest.5C7D614307ED2822.quest_desc: [
+		"Naquadah Plates, an Exotic Machine Frame, Ultimate Electric Circuits, a Lubricated Seal Core, and a calibrated diamond crystal of 95+ stability."
+		""
+		"The third Seal completes a machine's six ascendancy points."
+	]
+	quest.5C7D614307ED2822.quest_subtitle: "The last tier."
+	quest.5C7D614307ED2822.title: "Ascendancy Seal III"
 	quest.5E1CA6E1D5C00500.quest_desc: [
 		"Twice as effective as a max Wooden Dehumidifier, and it works underground."
 		""
@@ -1506,6 +1521,60 @@
 	]
 	quest.7E96148C6A2F7B94.quest_subtitle: "Conductive parts start here."
 	quest.7E96148C6A2F7B94.title: "First Copper"
+	quest.83437B2BE1852F4E.quest_desc: [
+		"Upgrade a Primed Seal Core in the Component Assembler with a Tungstensteel Casing, a Nullite Coil, an Elite Electric Circuit, and 1,000 mB of Lubricant."
+	]
+	quest.83437B2BE1852F4E.quest_subtitle: "Stage 7 precision."
+	quest.83437B2BE1852F4E.title: "Lubricated Seal Core"
+	quest.866D43F46AC8E5BE.quest_desc: [
+		"Assemble a &ePrimed Seal Core&r in the &eComponent Assembler&r from a Sparksteel Coil, an Aluminum Casing, four redstone, a Stabilization Catalyst, and 1,000 mB of Electrolyte Solution."
+	]
+	quest.866D43F46AC8E5BE.quest_subtitle: "The heart of a Seal."
+	quest.866D43F46AC8E5BE.title: "Primed Seal Core"
+	quest.9978E0313902657D.quest_desc: [
+		"From Stage 5, a machine can specialize. Open the crest beside its start node on the Mastery tab and press &aAscend&r with an &eAscendancy Seal&r in your inventory."
+		""
+		"- Seal I needs a Stage 4+ chassis, or a Stage 4+ tool head on a Forestry Companion, and chooses one of the family's two ascendancies."
+		"- Each Seal grants &a2&r ascendancy points, for 6 across Seals I, II, and III."
+		"- An ascendancy node costs five Mastery Refunds to refund. Switching needs an empty tree and another Seal I."
+		""
+		"&7&oTip: each machine's wiki page lists both of its ascendancies.&r"
+	]
+	quest.9978E0313902657D.quest_subtitle: "Two paths per machine."
+	quest.9978E0313902657D.title: "Read: Ascendancies"
+	quest.B707E4F323CE4189.quest_desc: [
+		"Frame the core with Sparksteel Plates, Aluminum Casings, Advanced Electric Circuits, and a &eStage 5 calibrated conductive component&r of 70+ stability."
+		""
+		"Calibrate a Sparksteel Coil in a Steel Resonance Calibrator to get one. A Stabilizer Matrix recipe accepts components down to 55 stability."
+		""
+		"Use it on a machine you plan to keep. The ascendancy stays with that chassis."
+	]
+	quest.B707E4F323CE4189.quest_subtitle: "Choose a path."
+	quest.B707E4F323CE4189.title: "Ascendancy Seal I"
+	quest.C3604160EA637458.quest_desc: [
+		"Craft &eMastery Refunds&r from paper, redstone, and a copper ingot, eight at a time."
+		""
+		"One refund removes a shared-tree node. An ascendancy node costs five."
+	]
+	quest.C3604160EA637458.quest_subtitle: "Change your mind."
+	quest.C3604160EA637458.title: "Mastery Refunds"
+	quest.FAEF4E1A8753B3FE.quest_desc: [
+		"Sneak-use the &eConfigurator&r in the air to switch it to Mastery mode."
+		""
+		"Sneak-use a machine to copy its build, then use another machine of the same start to paste it. The target follows the build as it earns points."
+	]
+	quest.FAEF4E1A8753B3FE.quest_subtitle: "One build, many machines."
+	quest.FAEF4E1A8753B3FE.title: "Copy a Build"
+	quest.FB45A90F15D87663.quest_desc: [
+		"Every machine levels up from the work it finishes. Open its &eMastery&r tab to spend points in the shared passive tree."
+		""
+		"- Mastery belongs to the chassis. Breaking and replacing the machine keeps it."
+		"- Hover a node to preview its route and cost, then click to allocate the whole route."
+		"- Right-click an allocated node to refund it for one &eMastery Refund&r."
+		"- &eCopy&r and &ePaste&r move a build between machines that share a start."
+	]
+	quest.FB45A90F15D87663.quest_subtitle: "Machines are characters too."
+	quest.FB45A90F15D87663.title: "Read: Machine Mastery"
 	reward_table.078B604FCB901AA9.title: "Refine"
 	reward_table.72A0AC975B999BE5.title: "lenses"
 	task.07652CB1B5828F97.title: "Check Affixes"
