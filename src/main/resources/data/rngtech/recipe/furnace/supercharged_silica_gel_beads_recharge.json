@@ -9,5 +9,6 @@
   },
   "processing_ticks": 2400,
   "energy": 57600,
+  "bonus_output": false,
   "experience": 0.0
 }

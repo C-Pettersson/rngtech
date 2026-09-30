@@ -86,7 +86,12 @@ public final class MetalPressRecipeCategory implements IRecipeCategory<RecipeHol
                 .addRichTooltipCallback((view, tooltip) -> tooltip.add(Component.translatable("rngtech.jei.mold")));
         JeiCategoryUi.slot(builder, RecipeIngredientRole.OUTPUT, OUTPUT_X, SLOT_Y)
                 .addIngredient(VanillaTypes.ITEM_STACK, recipe.outputStack())
-                .addRichTooltipCallback((view, tooltip) -> tooltip.add(Component.translatable("rngtech.processing.output")));
+                .addRichTooltipCallback((view, tooltip) -> {
+                    tooltip.add(Component.translatable("rngtech.processing.output"));
+                    if (!recipe.allowsBonusOutput()) {
+                        tooltip.add(Component.translatable("rngtech.jei.output_bonuses_disabled"));
+                    }
+                });
         if (!recipe.failureOutput().isEmpty()) {
             JeiCategoryUi.slot(builder, RecipeIngredientRole.OUTPUT, FAILURE_X, SLOT_Y)
                     .addIngredient(VanillaTypes.ITEM_STACK, recipe.failureStack())

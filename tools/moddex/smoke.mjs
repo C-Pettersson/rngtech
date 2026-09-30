@@ -1,6 +1,6 @@
 import { startModdexServer } from "./serve.mjs";
 import { checkPassiveTreeData } from "./check-passive-tree.mjs";
-import { checkCalibrationRecyclingLoops } from "./check-recipe-loops.mjs";
+import { checkRecipeLoopMutations, checkRecipeLoops } from "./check-recipe-loops.mjs";
 
 const { server, url } = await startModdexServer({ port: 0, log: false });
 
@@ -107,7 +107,8 @@ try {
 
     const passiveTreeData = await passiveTreeDataResponse.json();
     await checkPassiveTreeData(passiveTreeData);
-    await checkCalibrationRecyclingLoops();
+    await checkRecipeLoops();
+    await checkRecipeLoopMutations();
 
     const data = await dataResponse.json();
     const profiles = Object.keys(data.profiles ?? {});

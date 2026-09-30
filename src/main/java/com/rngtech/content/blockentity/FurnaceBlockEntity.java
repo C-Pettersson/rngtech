@@ -875,9 +875,7 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
         }
 
         ItemStack baseResult = recipe.outputStack();
-        ItemStack result = recipe.allowsBonusOutput()
-                ? ProcessingChance.applySuperOutput(level, stats, baseResult, baseResult)
-                : baseResult;
+        ItemStack result = ProcessingChance.applySuperOutput(level, stats, recipe, baseResult, baseResult);
         int outputSlot = outputSlot(lane);
         if (!canMergeOutput(outputSlot, result)) {
             result = baseResult;

@@ -89,7 +89,7 @@ The only valid structure is the controller with two `rngtech:silica_gel_column_c
 
 Each lane progresses only while the structure is valid, the dry input matches a loaded `rngtech:desiccant_absorption` recipe, the matching saturated output slot can accept the result, and the shared tank can accept the recipe water output. The batch consumes one dry bead and produces one saturated bead only at completion. At full three-lane throughput, one stack of dry beads lasts about `20` minutes.
 
-Saturated beads recharge through explicit `rngtech:furnace` recipes. Normal saturated beads recharge in `1,200 ticks` for `28,800 FE`; supercharged saturated beads recharge in `2,400 ticks` for `57,600 FE`. Supercharged dry beads are made through `rngtech:alloy_furnace` mode `desiccant` from `4x rngtech:silica_gel_beads`, `1x #c:dusts/titanium`, and `1x minecraft:redstone` at Stage 6, `1,450 C`, `6,000 FE`, and `240 ticks`.
+Saturated beads recharge through explicit `rngtech:furnace` recipes. Normal saturated beads recharge in `1,200 ticks` for `28,800 FE`; supercharged saturated beads recharge in `2,400 ticks` for `57,600 FE`. Both recharge recipes set `bonus_output: false`: absorbing and recharging returns the same beads, so Super Output would duplicate them. Supercharged dry beads are made through `rngtech:alloy_furnace` mode `desiccant` from `4x rngtech:silica_gel_beads`, `1x #c:dusts/titanium`, and `1x minecraft:redstone` at Stage 6, `1,450 C`, `6,000 FE`, and `240 ticks`.
 
 The Process tab has a purge button for the shared water tank. The craftable `rngtech:purge_bucket` can also right-click the placed controller to void up to `1000 mB` of stored water.
 

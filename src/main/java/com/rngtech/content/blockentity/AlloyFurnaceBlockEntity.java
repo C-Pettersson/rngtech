@@ -529,7 +529,7 @@ public class AlloyFurnaceBlockEntity extends BaseMachineBlockEntity implements M
         }
 
         ItemStack baseResult = recipe.outputStack();
-        ItemStack result = ProcessingChance.applySuperOutput(level, stats, baseResult, baseResult);
+        ItemStack result = ProcessingChance.applySuperOutput(level, stats, recipe, baseResult, baseResult);
         if (!canMergeOutput(result)) {
             result = baseResult;
             if (!canMergeOutput(result)) {

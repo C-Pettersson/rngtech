@@ -37,7 +37,7 @@ public record CalibrationRecipe(
         boolean allowsBonusOutput,
         int machineXp,
         int machineXpBand
-) implements Recipe<CalibrationRecipeInput> {
+) implements Recipe<CalibrationRecipeInput>, BonusOutputRecipe {
     public CalibrationRecipe {
         minimumStage = normalizedMinimumStage(minimumStage, result);
         machineXp = Math.max(0, machineXp);

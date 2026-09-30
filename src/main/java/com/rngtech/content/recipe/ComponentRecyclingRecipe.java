@@ -30,7 +30,7 @@ public record ComponentRecyclingRecipe(
         List<ComponentRecyclingOutput> outputs,
         boolean allowsBonusOutput
 )
-        implements Recipe<SingleRecipeInput> {
+        implements Recipe<SingleRecipeInput>, BonusOutputRecipe {
     public List<ItemStack> outputStacks(boolean hasRecoveryFilter) {
         return outputs.stream()
                 .filter(output -> !output.requiresFilter() || hasRecoveryFilter)

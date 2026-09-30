@@ -10,7 +10,7 @@ Status: **Planned** for the 2.0 release — PRD accepted 2026-09-29 on `feature/
 - [x] Draft the PRD and this state page.
 - [x] Resolve the PRD's open questions.
 - [x] Framework: catalog index loader, shared node parser, stat declarations, behavior registry, `ascendancyEntryStage()`, state fields, load validation, `forFamily()` family check, effect pipeline, build codes, generic catalog validation, fixture ascendancies, domain checks.
-- [ ] Loop safety: eligibility field on Alloy Furnace, Metal Press, Melter, and calibration recipes; loop audit in report mode reading declared yield stats and behaviors; fix or allowlist known cycles; turn on the CI gate.
+- [x] Loop safety: `bonus_output` on Alloy Furnace and Metal Press recipes (calibration and recycling from PR #14; the Melter's arrives with its first yield effect), a shared `BonusOutputRecipe` check, the recipe loop audit with mutation self-tests, opt-outs for every loop found, and the CI gate on.
 - [ ] Seals: items, recipes, `rngtech:ascendancy_seal_recipes_enabled` condition and config key, entry gate, server actions.
 - [ ] UI: Ascendancy panel and choose dialog in `MasteryScreenSupport`, Stats tab visibility, Bonus Summary section, Jade line, JEI.
 - [ ] Crusher and Furnace content with their new stats and shared mechanics, then an in-game playtest.
@@ -46,13 +46,11 @@ Recorded 2026-09-29:
 
 ## Findings
 
-- Only Crusher and Furnace recipes have a `bonus_output` opt-out. Today 31 recipes opt out: copper, iron, and tin ingot/dust conversions, blend smelting, and malformed-ingot nugget recovery. Slag Reclaim was changed to a speed and FE effect so it does not bypass the recovery opt-out.
+- At PRD time only Crusher and Furnace recipes had a `bonus_output` opt-out, on 31 recipes: copper, iron, and tin ingot/dust conversions, blend smelting, and malformed-ingot nugget recovery. Slag Reclaim was changed to a speed and FE effect so it does not bypass the recovery opt-out.
 - Blend routes are one-way. Crushed items come only from ore and raw inputs.
-- An item cycle already exists on `main`:
-    - Calibrated components stack, so Resonance Calibrator Super Output can duplicate them.
-    - The Component Recycler returns one Iron Plate per Calibrated Structural Component, and the recycler can also roll Super Output.
-    - This was confirmed by reading the code and recipes, not in game.
-- The Potential Reactor pays FE for Refinement Potential and returns a stripped copy that the Component Recycler can reduce to the raw input. That cycle needs measuring.
+- The calibrate-then-recycle item cycle found during planning was fixed in PR #14.
+- Calibrated components are not refinement targets, so the Potential Reactor pays nothing for them and the suspected Refinement Potential to FE cycle does not exist. The audit models the general case: stripping any recyclable machine or part.
+- Recycler Super Output was the main loop source. Recycling returns an item's own ingredients, so wherever the returns cover what the item cost, Super Output duplicated them.
 - Furnace lanes stop warming at the recipe's required temperature (`FurnaceBlockEntity.warmLane`). Crucible Keeper therefore needs a new warm target.
 - Every current Melter recipe is processing level 6, and no Furnace recipe targets 2200 °C or more. This shaped the dropped work-trial design and no longer affects Seals.
 - `MachinePassiveClass` and its empty `ascendancies` list are used only by legacy tree definitions. `MachineMasteryFamily` is the live family source.
@@ -74,6 +72,13 @@ Recorded 2026-09-29:
         - the installed tool head stage for the Forestry cart.
     - Build codes carry the ascendancy and its order. Paste allocates onto a matching, empty ascendancy as far as points and Gear allow. Unknown ascendancies or invalid orders are dropped, so older codes still paste.
     - Test-only fixtures live in `src/masteryTest/resources/data/rngtech/mastery/ascendancies/fixtures/`: three Crusher ascendancies, one Furnace ascendancy, and a fixture declaration of `LUCK` and `FIXTURE_ECHO` for the Crusher.
+- 2026-09-29, Phase 3 loop safety:
+    - Merged `main` with PR #14, which fixed the calibrate-then-recycle loop and added a calibration-only loop check.
+    - Replaced that check with a general recipe loop audit, `tools/moddex/check-recipe-loops.mjs`, run by `npm run moddex:check`. It solves a linear program over every recipe type, vanilla tags and wood/chest/furnace crafting, bucket conversions, and Potential Reactor stripping.
+    - An earlier per-edge version ignored co-inputs. It reported more than 1,600 false cycles, such as redstone turning into 16 cables, so it was dropped in favor of whole-recipe semantics.
+    - Every loop the audit found ran through bonus output on one of 21 recipes: 19 Component Recycling recipes and 2 Furnace silica gel recharge recipes. They now set `bonus_output: false`. It found no base-recipe or FE loop.
+    - Calibration catalysts and stabilizers are free inputs, so the calibrate-then-recycle pattern stays a loop even though it consumes lapis.
+    - Alloy Furnace and Metal Press recipes gained `bonus_output`, and JEI marks opted-out recipes. Every machine now applies Super Output and salvage through `ProcessingChance` with the recipe, instead of per-machine checks.
 - Not yet covered, and left for the UI phase:
     - Menus sync Mastery through `ContainerData`, so the client snapshot has no ascendancy yet. The Mastery screen's Copy button therefore omits it, while Configurator copies from the server state and include it.
     - The Bonus Summary drawer does not list ascendancy effects yet.
@@ -81,9 +86,10 @@ Recorded 2026-09-29:
 ## Verification
 
 - 2026-09-29 PRD revisions: `npm run repo:check` passed. `mkdocs build --strict` was not run because MkDocs is not installed locally; CI runs it.
-- 2026-09-29 Phase 2: `gradlew spotlessApply` and `quickCheck` passed with 837 domain checks (753 on the previous commit). `npm run moddex:check` and `npm run repo:check` passed. No in-game check: Phase 2 adds no player-facing surface.
+- 2026-09-29 Phase 2: `gradlew spotlessApply` and `quickCheck` passed with 837 domain checks (753 on the previous commit).
+- 2026-09-29 Phase 3: `gradlew spotlessApply` and `quickCheck` passed with 837 domain checks. `npm run moddex:check` passed, including the recipe loop audit (982 recipes, no item or FE loop, no allowlist entries) and both mutation self-tests. `npm run repo:check` passed. No in-game check yet: the gameplay changes are Super Output no longer applying to 21 opted-out recipes, and JEI marking them. `npm run moddex:check` and `npm run repo:check` passed. No in-game check: Phase 2 adds no player-facing surface.
 
 ## Handoff and limits
 
 - The PRD is accepted. Its node numbers are placeholders until balance testing.
-- The existing calibrate-then-recycle cycle is independent of ascendancies. It needs its own fix before the loop audit can become a CI gate.
+- The loop audit is a CI gate. New recipes that loop fail `npm run moddex:check` with a minimal loop and a likely fix.

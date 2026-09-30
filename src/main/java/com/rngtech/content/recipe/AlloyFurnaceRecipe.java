@@ -39,10 +39,11 @@ public record AlloyFurnaceRecipe(
         ItemStack failureOutput,
         String failureMaterial,
         boolean powerSensitive,
+        boolean allowsBonusOutput,
         int machineXp,
         int machineXpBand
 )
-        implements Recipe<AlloyFurnaceRecipeInput> {
+        implements Recipe<AlloyFurnaceRecipeInput>, BonusOutputRecipe {
     public AlloyFurnaceRecipe {
         ingredients = List.copyOf(ingredients);
         targetTemperature = targetTemperature > 0 ? targetTemperature : minimumTemperature;
@@ -235,6 +236,7 @@ public record AlloyFurnaceRecipe(
                                 .forGetter(AlloyFurnaceRecipe::failureOutput),
                         Codec.STRING.optionalFieldOf("failure_material", "").forGetter(AlloyFurnaceRecipe::failureMaterial),
                         Codec.BOOL.fieldOf("power_sensitive").orElse(false).forGetter(AlloyFurnaceRecipe::powerSensitive),
+                        Codec.BOOL.fieldOf("bonus_output").orElse(true).forGetter(AlloyFurnaceRecipe::allowsBonusOutput),
                         MachineXpFields.CODEC.forGetter(recipe -> new MachineXpFields(
                                 recipe.machineXp(),
                                 recipe.machineXpBand() <= 0 ? Optional.empty() : Optional.of(recipe.machineXpBand())
@@ -255,6 +257,7 @@ public record AlloyFurnaceRecipe(
                         failureOutput,
                         failureMaterial,
                         powerSensitive,
+                        allowsBonusOutput,
                         machineXpFields
                 ) -> {
                     int resolvedTarget = targetTemperature.orElse(minimumTemperature);
@@ -273,6 +276,7 @@ public record AlloyFurnaceRecipe(
                             failureOutput,
                             failureMaterial,
                             powerSensitive,
+                            allowsBonusOutput,
                             machineXpFields.machineXp(),
                             machineXpFields.machineXpBand().orElse(defaultMachineXpBand(machineXpFields.machineXp(), resolvedTarget))
                     );
@@ -297,6 +301,7 @@ public record AlloyFurnaceRecipe(
                                 ItemStack.OPTIONAL_STREAM_CODEC.decode(buffer),
                                 ByteBufCodecs.STRING_UTF8.decode(buffer),
                                 ByteBufCodecs.BOOL.decode(buffer),
+                                ByteBufCodecs.BOOL.decode(buffer),
                                 ByteBufCodecs.VAR_INT.decode(buffer),
                                 ByteBufCodecs.VAR_INT.decode(buffer)
                         );
@@ -318,6 +323,7 @@ public record AlloyFurnaceRecipe(
                         ItemStack.OPTIONAL_STREAM_CODEC.encode(buffer, recipe.failureOutput);
                         ByteBufCodecs.STRING_UTF8.encode(buffer, recipe.failureMaterial);
                         ByteBufCodecs.BOOL.encode(buffer, recipe.powerSensitive);
+                        ByteBufCodecs.BOOL.encode(buffer, recipe.allowsBonusOutput);
                         ByteBufCodecs.VAR_INT.encode(buffer, recipe.machineXp);
                         ByteBufCodecs.VAR_INT.encode(buffer, recipe.machineXpBand);
                     }

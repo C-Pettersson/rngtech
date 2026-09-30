@@ -458,9 +458,7 @@ public class ComponentRecyclerBlockEntity extends BaseMachineBlockEntity impleme
             return false;
         }
         List<ItemStack> baseOutputs = recipe.outputStacks(hasRecoveryFilter());
-        List<ItemStack> outputs = recipe.allowsBonusOutput()
-                ? ProcessingChance.applySuperOutputs(level, stats, baseOutputs)
-                : baseOutputs;
+        List<ItemStack> outputs = ProcessingChance.applySuperOutputs(level, stats, recipe, baseOutputs);
         if (outputs.isEmpty() || !canMergeOutputs(outputs)) {
             outputs = baseOutputs;
             if (outputs.isEmpty() || !canMergeOutputs(outputs)) {

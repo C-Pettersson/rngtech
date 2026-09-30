@@ -1,0 +1,52 @@
+{
+    "version": 1,
+    "free": ["fluid:minecraft:water", "minecraft:cobblestone"],
+    "freeReason": "Water sources and cobblestone generators produce these without limit.",
+    "freeInputKeys": ["catalyst", "stabilizer"],
+    "freeInputKeysReason": "Calibration catalysts and stabilizers are cheap consumables. A cycle that only uses them up still duplicates its main input, as the calibrate-then-recycle loop did.",
+    "strippingFe": 100000,
+    "strippingFeReason": "Conservative ceiling on the Potential Reactor's payout for one machine or part: rarity value, Refinement Potential at 120 FE each, and up to 9,000 FE per affix tier.",
+    "notStrippable": [
+        "rngtech:broken_circuit",
+        "rngtech:calibrated_conductive_component",
+        "rngtech:calibrated_kinetic_component",
+        "rngtech:calibrated_logic_component",
+        "rngtech:calibrated_storage_component",
+        "rngtech:calibrated_structural_component",
+        "rngtech:calibrated_thermal_component",
+        "rngtech:pitted_cavitation_rotor"
+    ],
+    "types": {
+        "rngtech:crusher": {
+            "maxOutputMultiplier": 8,
+            "covers": ["OUTPUT_AMOUNT", "SUPER_OUTPUT_CHANCE", "CRUSHER_SALVAGE_CHANCE"],
+            "reason": "Output Amount has no hard cap. 8x is a deliberately generous bound above any current chassis, Crush Head, affix, and keystone stack, plus one Super Output copy and one salvage copy."
+        },
+        "rngtech:furnace": {
+            "maxOutputMultiplier": 2,
+            "covers": ["SUPER_OUTPUT_CHANCE"],
+            "reason": "Super Output adds at most one copy of the base output."
+        },
+        "rngtech:alloy_furnace": {
+            "maxOutputMultiplier": 2,
+            "covers": ["SUPER_OUTPUT_CHANCE"],
+            "reason": "Super Output adds at most one copy of the base output."
+        },
+        "rngtech:metal_press": {
+            "maxOutputMultiplier": 2,
+            "covers": ["SUPER_OUTPUT_CHANCE"],
+            "reason": "Super Output adds at most one copy of the base output."
+        },
+        "rngtech:calibration": {
+            "maxOutputMultiplier": 2,
+            "covers": ["SUPER_OUTPUT_CHANCE"],
+            "reason": "Super Output adds at most one copy of the base output."
+        },
+        "rngtech:component_recycling": {
+            "maxOutputMultiplier": 2,
+            "covers": ["SUPER_OUTPUT_CHANCE"],
+            "reason": "Super Output duplicates each output at most once."
+        }
+    },
+    "allow": []
+}

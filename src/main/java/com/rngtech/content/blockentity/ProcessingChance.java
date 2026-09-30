@@ -1,5 +1,6 @@
 package com.rngtech.content.blockentity;
 
+import com.rngtech.content.recipe.BonusOutputRecipe;
 import com.rngtech.rpg.MachineStat;
 import com.rngtech.rpg.MachineStatAccumulator;
 
@@ -14,8 +15,9 @@ final class ProcessingChance {
         return rollPercent(level, stats.value(MachineStat.INSTANT_PROCESS_CHANCE));
     }
 
-    static ItemStack applySuperOutput(Level level, MachineStatAccumulator stats, ItemStack output, ItemStack baseOutput) {
+    static ItemStack applySuperOutput(Level level, MachineStatAccumulator stats, BonusOutputRecipe recipe, ItemStack output, ItemStack baseOutput) {
         if (output.isEmpty()
+                || !recipe.allowsBonusOutput()
                 || !canDuplicate(baseOutput)
                 || !rollPercent(level, stats.value(MachineStat.SUPER_OUTPUT_CHANCE))) {
             return output;
@@ -33,8 +35,9 @@ final class ProcessingChance {
         return enhanced;
     }
 
-    static ItemStack applyCrusherSalvage(Level level, MachineStatAccumulator stats, ItemStack output, ItemStack baseOutput) {
+    static ItemStack applyCrusherSalvage(Level level, MachineStatAccumulator stats, BonusOutputRecipe recipe, ItemStack output, ItemStack baseOutput) {
         if (output.isEmpty()
+                || !recipe.allowsBonusOutput()
                 || !canDuplicate(baseOutput)
                 || !rollPercent(level, stats.value(MachineStat.CRUSHER_SALVAGE_CHANCE))) {
             return output;
@@ -50,8 +53,8 @@ final class ProcessingChance {
         return enhanced;
     }
 
-    static List<ItemStack> applySuperOutputs(Level level, MachineStatAccumulator stats, List<ItemStack> outputs) {
-        if (outputs.isEmpty() || !rollPercent(level, stats.value(MachineStat.SUPER_OUTPUT_CHANCE))) {
+    static List<ItemStack> applySuperOutputs(Level level, MachineStatAccumulator stats, BonusOutputRecipe recipe, List<ItemStack> outputs) {
+        if (outputs.isEmpty() || !recipe.allowsBonusOutput() || !rollPercent(level, stats.value(MachineStat.SUPER_OUTPUT_CHANCE))) {
             return outputs;
         }
         ArrayList<ItemStack> enhanced = new ArrayList<>(outputs.size() * 2);

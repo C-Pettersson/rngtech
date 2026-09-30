@@ -54,7 +54,7 @@ Casing recipes consume four matching ingots, require the Casing Mold to be insta
 
 ## Failure Behavior
 
-Metal Press recipes support `target_temperature` and `power_sensitive` in addition to the existing `minimum_temperature`, `safe_maximum_temperature`, `required_temperature_stability`, and failure-output fields. `target_temperature` defaults to `minimum_temperature`; `power_sensitive` defaults to true for existing press recipes. Pressing starts only after live stored heat reaches the target temperature. Warmup consumes the recipe's normal FE/t, while no FE during warmup pauses the machine and lets it cool.
+Metal Press recipes support `target_temperature` and `power_sensitive` in addition to the existing `minimum_temperature`, `safe_maximum_temperature`, `required_temperature_stability`, and failure-output fields. `target_temperature` defaults to `minimum_temperature`; `power_sensitive` defaults to true for existing press recipes. `bonus_output` defaults to `true`; set it to `false` to turn off Super Output for a recipe that could otherwise form a loop. Pressing starts only after live stored heat reaches the target temperature. Warmup consumes the recipe's normal FE/t, while no FE during warmup pauses the machine and lets it cool.
 
 The Crude Metal Press hard-gates unsafe recipes. If its effective heat capacity is below the target, if live stored heat is above the safe maximum after overheat tolerance, or if temperature stability is below the recipe requirement, the machine pauses and leaves inputs untouched. A press that is too hot for the current recipe cools down before continuing. Power shortfalls also pause without converting inputs into failure outputs.
 

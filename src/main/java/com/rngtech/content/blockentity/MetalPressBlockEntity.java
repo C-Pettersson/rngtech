@@ -567,7 +567,7 @@ public class MetalPressBlockEntity extends BaseMachineBlockEntity implements Men
         }
 
         ItemStack baseResult = recipe.outputStack();
-        ItemStack result = ProcessingChance.applySuperOutput(level, stats, baseResult, baseResult);
+        ItemStack result = ProcessingChance.applySuperOutput(level, stats, recipe, baseResult, baseResult);
         if (!canMergeOutput(result)) {
             result = baseResult;
             if (!canMergeOutput(result)) {

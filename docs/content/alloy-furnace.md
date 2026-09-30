@@ -83,7 +83,7 @@ Alloy Furnace recipes use counted, orderless ingredients:
 }
 ```
 
-Alloy Furnace recipes may also declare `failure_output`, `failure_material`, and `power_sensitive`. Processing waits for live heat to reach `target_temperature`, which defaults to `minimum_temperature`. Stage 4+ recipes with a failure output use the shared `6000` failure-strain threshold instead of hard-failing on stability after work starts. `power_sensitive: true` means empty FE after progress starts adds strain; empty FE during warmup only pauses and cools the machine.
+Alloy Furnace recipes may also declare `failure_output`, `failure_material`, `power_sensitive`, and `bonus_output`. `bonus_output` defaults to `true`; set it to `false` to turn off Super Output for a recipe that could otherwise form a loop. Processing waits for live heat to reach `target_temperature`, which defaults to `minimum_temperature`. Stage 4+ recipes with a failure output use the shared `6000` failure-strain threshold instead of hard-failing on stability after work starts. `power_sensitive: true` means empty FE after progress starts adds strain; empty FE during warmup only pauses and cools the machine.
 
 The first Bronze path is a shapeless blend recipe outside the Alloy Furnace: `3` Copper Dust, `1` Tin Dust, and `1` Coal Dust make `2` Bronze Blend. Furnace recipes smelt Bronze Blend into Bronze Ingots. Once the Bronze Alloy Furnace setup is built, its three-slot Bronze Alloy Crucible can make `3` Bronze Blend from `3` Copper Dust, `1` Tin Dust, and `1` Charcoal at `900` heat. The later direct-ingot Bronze route makes `4` Bronze Ingots from `3` Copper Ingots, `1` Tin Ingot, and `1` Charcoal at `1100` heat.
 

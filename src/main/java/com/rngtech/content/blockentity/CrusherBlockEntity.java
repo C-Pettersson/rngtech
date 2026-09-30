@@ -440,11 +440,11 @@ public class CrusherBlockEntity extends BaseMachineBlockEntity implements MenuPr
             result = baseResult;
             if (allowsOutputBonusEffects(recipe, stats)) {
                 ItemStack baseOutput = recipe.outputStack(recipe.baseOutputCount());
-                result = ProcessingChance.applySuperOutput(level, stats, baseResult, baseOutput);
+                result = ProcessingChance.applySuperOutput(level, stats, recipe, baseResult, baseOutput);
                 if (!canMergeOutput(result)) {
                     result = baseResult;
                 }
-                ItemStack salvageResult = ProcessingChance.applyCrusherSalvage(level, stats, result, baseOutput);
+                ItemStack salvageResult = ProcessingChance.applyCrusherSalvage(level, stats, recipe, result, baseOutput);
                 if (canMergeOutput(salvageResult)) {
                     result = salvageResult;
                 }

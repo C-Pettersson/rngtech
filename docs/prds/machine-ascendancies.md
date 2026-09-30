@@ -292,7 +292,7 @@ Following PoE, where one ascendancy point costs five regular refund points:
 
 ## Loop Prevention
 
-Hard requirement: no recipe cycle may return more of an item than it consumed, and no cycle may return its own inputs while producing net FE. This covers every combination of ascendancies, keystones, and affixes, and every stat or behavior declared as yield.
+Hard requirement: no mix of recipes may return every consumed input while gaining items or producing net FE. Only water, cobblestone, and calibration catalysts and stabilizers are treated as free, since they are unlimited or cheap consumables. This covers every combination of ascendancies, keystones, and affixes, and every stat or behavior declared as yield.
 
 ### Yield effects
 
@@ -309,15 +309,16 @@ Speed, FE, heat, stability, and failure-strain changes are not yield. Stability 
 
 ### Eligibility
 
-- Every yield effect goes through one shared eligibility check, the same one that ordinary Output Amount, Super Output, and salvage use.
-- Crusher and Furnace recipes keep their `bonus_output` field and defaults. Today 31 recipes opt out:
-    - copper, iron, and tin ingot/dust conversions;
-    - blend smelting;
-    - malformed-ingot nugget recovery.
-- Alloy Furnace, Metal Press, Melter, and calibration recipes gain the same field.
-    - For these types it defaults to not eligible, so a forgotten recipe fails safe.
-    - Their existing Super Output moves behind the same check.
-    - Authors mark current one-way routes eligible in the same change, so behavior only changes on routes that could loop.
+- Every yield effect goes through one shared check: recipes implement `BonusOutputRecipe`, and `ProcessingChance` pays Output Amount bonuses, Super Output, and salvage only when `allowsBonusOutput()` is true.
+- Crusher, Furnace, Alloy Furnace, Metal Press, calibration, and Component Recycling recipes all use `bonus_output`, which defaults to `true`.
+    - Alloy Furnace and Metal Press gained the field in Phase 3; calibration and recycling gained it in PR #14.
+    - A single default keeps every type consistent. The loop audit, not the default, is what catches a missing opt-out.
+    - The Melter gains the field with its first yield effect, since it has no bonus output today.
+- Opt-outs as of Phase 3:
+    - Crusher and Furnace: copper, iron, and tin ingot/dust conversions, blend smelting, and malformed-ingot nugget recovery.
+    - Furnace: silica gel bead recharging.
+    - Calibration and Component Recycling: the calibrate-then-recycle pairs.
+    - Component Recycling: recipes whose returns cover what the recycled item cost. That is the metal tool rods, the Alloy Crucibles, the Wooden, Iron, and Copper Crusher Chassis, the Crude Recycler, the Flint Crush Head, and the Invar Battery Cell.
 - Recipe-count reductions are not allowed. No node lowers a recipe's authored input counts.
 - No saving effect may reduce an input to zero. Catalyst Efficiency stays below `100%`, and multi-lane savings still consume at least one catalyst per cycle.
 - A failure-recovery effect returns at most what the success route would produce from the same inputs.
@@ -326,34 +327,39 @@ Speed, FE, heat, stability, and failure-strain changes are not yield. Stability 
 
 `tools/moddex/check-recipe-loops.mjs` runs from `npm run moddex:check`, so CI enforces it.
 
-- It builds one graph from every recipe type:
-    - crafting: shaped, shapeless, `trait_shaped`, `calibrated_shaped`;
-    - machine recipes, the Component Recycler, and the Potential Reactor;
-    - generators, fuels, and fluid recipes.
-- Items, fluids, and FE are nodes. Tags resolve through the tag files, and every `material_enabled` condition is treated as enabled.
-- Each input-to-output pair becomes an edge with its count ratio. Co-inputs are ignored, which overestimates gains and fails safe.
-- Eligible edges take the strongest stacked yield from affixes, keystones, and ascendancies, read from the declared yield stats and behaviors. Chance outputs use their maximum stacked chance as expected value.
-- Non-recipe conversions declared as yield become edges too. Grove Warden's growth pulse is an FE → log edge at its strongest stacked strength, combined with the strongest log yield from any ascendancy, because two carts can split growing and harvesting.
-- It fails on any cycle with an item gain above `1`, or any cycle that returns its inputs with net FE.
-- Reviewed false positives go in an allowlist, each with a written reason.
-- A mutation fixture that marks Crusher ingot-to-dust eligible must fail the audit.
-- It runs in report mode until the known cycles below are fixed or allowlisted, then becomes a CI gate. No yield node ships before the gate is on.
+- **What it reads:**
+    - Every recipe file becomes a reaction with its consumed inputs, outputs, and FE.
+    - Molds, patterns, membranes, catalyst beds, and durability tools are reusable, not consumed.
+    - An ingredient that accepts several items becomes a choice any of them can fill.
+    - Fluids are measured in buckets.
+- **What it adds:**
+    - Vanilla tags and the vanilla crafting that RNGTech outputs chain into: wood into sticks, buttons, slabs, and chests; cobblestone into a furnace; and metal, gem, and raw-ore compaction.
+    - Bucket filling and draining, the code-defined Carbon Exhaust Bucket recipe, and dry electrolyte dissolving.
+    - An unknown tag fails the audit, so no ingredient is silently free.
+- **Worst-case yield:** bonus-eligible outputs are multiplied by their type's bound in `tools/moddex/recipe-loop-bounds.json`: Super Output at most doubles an output, and the Crusher's uncapped Output Amount uses a generous `8x`. Every stat or behavior declared with a yield must be covered by a bound.
+- **Stripping:** Potential Reactor stripping of every recyclable machine or part is a reaction worth a conservative `100,000 FE`, and recycling recipes also accept the stripped copy.
+- **Free inputs:** recipes whose inputs are all free are sources, not loops, and their outputs count as free.
+- **The search:**
+    - A linear program maximizes the net item gain, with FE free, and then net FE, over recipe run counts.
+    - A perturbed right-hand side keeps the search fast. Every result is re-solved on its own support without the perturbation, so only real loops are reported.
+    - Each loop is shrunk to a minimal recipe set and reported with its likely fix. Its bonus is then set aside, or the recipe removed when it has none, and the search repeats.
+- **Allowlist:** reviewed loops can be allowlisted with a written reason, and a stale entry fails the audit.
+- **Mutation self-tests:** re-enabling bonus output on copper ingot/dust, or on the calibrate-then-recycle pair, must fail the audit.
+- **Status:** the gate is on as of Phase 3. The audit passes on all 982 recipes with no allowlist entries.
 
-### Known cycles
+### Resolved cycles
 
-- **Calibrate, then recycle (exists on `main` today, independent of ascendancies):**
-    - An Iron Plate, a lapis catalyst, and `1,200 FE` make a Calibrated Structural Component.
-    - Calibrated components stack, so the Calibrator's Super Output can add a copy.
-    - The Component Recycler returns one Iron Plate per component, and the recycler can also roll Super Output.
-    - Net: more Iron Plates than consumed, paid in lapis and FE. It is fixed separately; the audit must catch it.
-- **Refinement Potential to FE:**
-    - Calibrated outputs roll Refinement Potential.
-    - The Potential Reactor pays FE for that Refinement Potential and returns a stripped copy.
-    - The Component Recycler turns the stripped copy back into the raw input.
-    - The audit measures this cycle. For that reason, no ascendancy node raises Refinement Potential, and catalyst-saving nodes are limited as described above.
+- **Calibrate, then recycle:** fixed in PR #14. Both halves opt out of bonus output, and the audit's mutation self-test keeps it fixed.
+- **Recycler Super Output:** any recycling recipe whose returns cover what the item cost duplicated its inputs through Super Output. Phase 3 opted out the recipes the audit found.
+- **Silica gel:** absorbing and recharging returns the same beads, so recharge Super Output duplicated them. Both recharge recipes opt out.
+- **Refinement Potential to FE through calibrated components:** does not exist. Calibrated components are not refinement targets, so the Potential Reactor pays nothing for them. The general case, stripping a recyclable machine or part for FE and recycling it back into its inputs, is modeled by the audit.
+
+### Future yield checks
+
 - **FE to logs:**
     - Grove Warden turns FE into tree growth, and logs burn in Solid Fuel Burners.
-    - A growth pulse must cost more FE than the burn value of the wood it produces at the strongest stacked rates, including Timber Baron's ledger on another cart.
+    - A growth pulse must cost more FE than the burn value of the wood it produces at the strongest stacked rates, including Timber Baron's ledger on another cart. The audit models it once the stat exists.
+- **Refinement Potential:** no ascendancy node raises Refinement Potential, and catalyst-saving nodes are limited as described above.
 
 ## Launch Ascendancies
 
@@ -617,7 +623,7 @@ Domain checks (`masteryCheck`):
 
 ModDex checks (`npm run moddex:check`):
 
-- The loop audit passes. The mutation fixture fails it.
+- The loop audit passes, and its mutation self-tests catch every reintroduced loop.
 - Every yield stat and behavior has loop-audit coverage.
 - Every Seal recipe carries the `rngtech:ascendancy_seal_recipes_enabled` condition.
 
