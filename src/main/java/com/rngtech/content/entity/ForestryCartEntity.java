@@ -196,7 +196,7 @@ public class ForestryCartEntity extends AbstractMinecart implements MenuProvider
                 case ForestryCartMenu.DATA_CURRENT_ACTION -> currentAction;
                 case ForestryCartMenu.DATA_MANAGED_CELLS -> managedCells.size();
                 case ForestryCartMenu.DATA_ACTIVE_CELLS -> activeManagedCells();
-                case ForestryCartMenu.DATA_MAX_CONNECTED_LOGS -> maxConnectedLogs();
+                case ForestryCartMenu.DATA_MAX_CONNECTED_LOGS -> maxSnapshotLogs();
                 case ForestryCartMenu.DATA_MAX_TREE_HEIGHT -> maxTreeHeight();
                 case ForestryCartMenu.DATA_MOVEMENT_FE -> movementEnergyCost();
                 case ForestryCartMenu.DATA_SCAN_FE -> scanEnergyCost();
@@ -626,15 +626,16 @@ public class ForestryCartEntity extends AbstractMinecart implements MenuProvider
                 ForestryCartStationBlockEntity.STATUS_READY,
                 ForestryCartStationBlockEntity.ACTION_SCANNING_LOG_BASES
         );
+        boolean treeTooLarge = false;
         for (BlockPos root : workRoots) {
             updateManagedSaplingState(root);
             if (!isLogBase(root)) {
                 continue;
             }
             SnapshotCreationResult result = createHarvestSnapshot(root);
-            if (result == SnapshotCreationResult.BLOCKED) {
-                handleWorkResult(status == ForestryCartStationBlockEntity.STATUS_NO_POWER ? WorkResult.NEEDS_TRANSFER : WorkResult.BLOCKED_STOP, railPos);
-                return;
+            if (result == SnapshotCreationResult.TOO_LARGE) {
+                treeTooLarge = true;
+                continue;
             }
             if (result == SnapshotCreationResult.CREATED) {
                 if (handleWorkResult(processActiveHarvestSnapshot(), railPos)) {
@@ -657,6 +658,16 @@ public class ForestryCartEntity extends AbstractMinecart implements MenuProvider
 
         if (plantingBlocked) {
             setWorkflowState(WorkflowState.MOVING, status, ForestryCartStationBlockEntity.ACTION_PLANTING_BLOCKED);
+            driveOnRails(railPos, false);
+            return;
+        }
+
+        if (treeTooLarge) {
+            setWorkflowState(
+                    WorkflowState.MOVING,
+                    ForestryCartStationBlockEntity.STATUS_TREE_TOO_LARGE,
+                    ForestryCartStationBlockEntity.ACTION_HARVEST_BLOCKED
+            );
             driveOnRails(railPos, false);
             return;
         }
@@ -1074,6 +1085,10 @@ public class ForestryCartEntity extends AbstractMinecart implements MenuProvider
         return AXE_CONNECTED_LOG_LIMIT + masteryBonus;
     }
 
+    public int maxSnapshotLogs() {
+        return maxConnectedLogs() > 0 ? MAX_HARVEST_SNAPSHOT_LOGS : 0;
+    }
+
     public int maxLogsPerAction() {
         return hasTreefellerTool() ? maxConnectedLogs() : hasUsableTool() ? 1 : 0;
     }
@@ -1352,10 +1367,8 @@ public class ForestryCartEntity extends AbstractMinecart implements MenuProvider
         );
         HarvestScan scan = scanConnectedHarvestBlocks(logBase, logBase, maxTreeHeight());
         if (scan.tooLarge()) {
-            setCellState(managedCell(logBase), ManagedCell.STATE_BLOCKED);
-            setStatus(ForestryCartStationBlockEntity.STATUS_TREE_TOO_LARGE);
-            setCurrentAction(ForestryCartStationBlockEntity.ACTION_HARVEST_BLOCKED);
-            return SnapshotCreationResult.BLOCKED;
+            setCellState(managedCells.get(logBase), ManagedCell.STATE_BLOCKED);
+            return SnapshotCreationResult.TOO_LARGE;
         }
         if (scan.logs().isEmpty()) {
             return SnapshotCreationResult.NO_TREE;
@@ -1791,7 +1804,7 @@ public class ForestryCartEntity extends AbstractMinecart implements MenuProvider
     }
 
     private HarvestScan scanConnectedHarvestBlocks(BlockPos root, BlockPos start, int maxHeight) {
-        LogScan logScan = scanConnectedLogs(root, start, maxHeight, maxConnectedLogs());
+        LogScan logScan = scanConnectedLogs(root, start, maxHeight, maxSnapshotLogs());
         if (logScan.tooLarge()) {
             return HarvestScan.tooLarge(logScan.logs());
         }
@@ -2109,7 +2122,7 @@ public class ForestryCartEntity extends AbstractMinecart implements MenuProvider
     }
 
     private void updateScanDebugData() {
-        entityData.set(DATA_DEBUG_MAX_CONNECTED_LOGS, maxConnectedLogs());
+        entityData.set(DATA_DEBUG_MAX_CONNECTED_LOGS, maxSnapshotLogs());
         entityData.set(DATA_DEBUG_MAX_TREE_HEIGHT, maxTreeHeight());
         entityData.set(DATA_DEBUG_CAN_HARVEST_LEAVES, true);
     }
@@ -2539,7 +2552,7 @@ public class ForestryCartEntity extends AbstractMinecart implements MenuProvider
     private enum SnapshotCreationResult {
         CREATED,
         NO_TREE,
-        BLOCKED
+        TOO_LARGE
     }
 
     private enum WorkResult {
