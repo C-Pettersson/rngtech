@@ -37,13 +37,9 @@ import com.rngtech.rpg.progression.MegaPassiveNode;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
-import net.minecraft.nbt.Tag;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.Containers;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
@@ -60,9 +56,6 @@ import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.energy.IEnergyStorage;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.ItemStackHandler;
-
-import java.util.HashMap;
-import java.util.Map;
 
 public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuProvider, MachineInfoProvider, MachineMasteryHost {
     public static final int MAX_PROCESSING_SLOTS = 4;
@@ -535,14 +528,7 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
         tag.putInt("TotalBurnTime", totalBurnTime);
         tag.putInt("Energy", internalEnergyStored());
         bulkSpeed.save(tag);
-        ListTag ledger = new ListTag();
-        bloomLedger.entries().forEach((item, amount) -> {
-            CompoundTag entry = new CompoundTag();
-            entry.putString("Item", BuiltInRegistries.ITEM.getKey(item).toString());
-            entry.putDouble("Progress", amount);
-            ledger.add(entry);
-        });
-        tag.put("BloomLedger", ledger);
+        LedgerNbt.save(tag, "BloomLedger", bloomLedger);
     }
 
     @Override
@@ -600,15 +586,7 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
         internalEnergy = Math.max(0, tag.getInt("Energy"));
         bulkSpeed.load(tag);
         clampInternalEnergy();
-        Map<Item, Double> ledger = new HashMap<>();
-        for (Tag element : tag.getList("BloomLedger", Tag.TAG_COMPOUND)) {
-            CompoundTag entry = (CompoundTag) element;
-            ResourceLocation id = ResourceLocation.tryParse(entry.getString("Item"));
-            if (id != null) {
-                BuiltInRegistries.ITEM.getOptional(id).ifPresent(item -> ledger.put(item, entry.getDouble("Progress")));
-            }
-        }
-        bloomLedger.restore(ledger);
+        LedgerNbt.load(tag, "BloomLedger", bloomLedger);
     }
 
     public static boolean isFuel(ItemStack stack) {
@@ -998,8 +976,7 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
                 || !ledgerEligible(recipe, inventory.getStackInSlot(inputSlot(lane)), statsForLane(lane))) {
             return -1;
         }
-        double progress = bloomLedger.progress(recipe.outputStack().getItem());
-        return progress >= 1.0 ? 1000 : (int) Math.round(progress * 1000);
+        return LedgerNbt.permille(bloomLedger.progress(recipe.outputStack().getItem()));
     }
 
     /** Crucible Heart's second input costs a second craft's FE, or its burn time on a fuel furnace. */

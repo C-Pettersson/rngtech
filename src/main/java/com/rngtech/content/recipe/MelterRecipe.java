@@ -33,10 +33,11 @@ public record MelterRecipe(
         int energy,
         int minimumTemperature,
         int requiredProcessingLevel,
+        boolean allowsBonusOutput,
         int machineXp,
         int machineXpBand
 )
-        implements Recipe<MelterRecipeInput> {
+        implements Recipe<MelterRecipeInput>, BonusOutputRecipe {
     public MelterRecipe {
         machineXp = Math.max(0, machineXp);
         machineXpBand = machineXp <= 0 ? 0 : Math.max(1, machineXpBand);
@@ -124,6 +125,7 @@ public record MelterRecipe(
                                 .fieldOf("required_processing_level")
                                 .orElse(1)
                                 .forGetter(MelterRecipe::requiredProcessingLevel),
+                        Codec.BOOL.optionalFieldOf("bonus_output", true).forGetter(MelterRecipe::allowsBonusOutput),
                         MachineXpFields.CODEC.forGetter(recipe -> new MachineXpFields(
                                 recipe.machineXp(),
                                 recipe.machineXpBand() <= 0 ? Optional.empty() : Optional.of(recipe.machineXpBand())
@@ -139,6 +141,7 @@ public record MelterRecipe(
                         energy,
                         minimumTemperature,
                         requiredProcessingLevel,
+                        allowsBonusOutput,
                         machineXpFields
                 ) -> new MelterRecipe(
                         group,
@@ -150,6 +153,7 @@ public record MelterRecipe(
                         energy,
                         minimumTemperature,
                         requiredProcessingLevel,
+                        allowsBonusOutput,
                         machineXpFields.machineXp(),
                         machineXpFields.machineXpBand()
                                 .orElse(defaultMachineXpBand(machineXpFields.machineXp(), requiredProcessingLevel))
@@ -169,6 +173,7 @@ public record MelterRecipe(
                                 ByteBufCodecs.VAR_INT.decode(buffer),
                                 ByteBufCodecs.VAR_INT.decode(buffer),
                                 ByteBufCodecs.VAR_INT.decode(buffer),
+                                ByteBufCodecs.BOOL.decode(buffer),
                                 ByteBufCodecs.VAR_INT.decode(buffer),
                                 ByteBufCodecs.VAR_INT.decode(buffer)
                         );
@@ -185,6 +190,7 @@ public record MelterRecipe(
                         ByteBufCodecs.VAR_INT.encode(buffer, recipe.energy);
                         ByteBufCodecs.VAR_INT.encode(buffer, recipe.minimumTemperature);
                         ByteBufCodecs.VAR_INT.encode(buffer, recipe.requiredProcessingLevel);
+                        ByteBufCodecs.BOOL.encode(buffer, recipe.allowsBonusOutput);
                         ByteBufCodecs.VAR_INT.encode(buffer, recipe.machineXp);
                         ByteBufCodecs.VAR_INT.encode(buffer, recipe.machineXpBand);
                     }

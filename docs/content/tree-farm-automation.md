@@ -135,7 +135,7 @@ The station receives FE only when an Energy Connector is installed and stores a 
 
 Forestry Companion item stacks use the `FORESTRY_COMPANION` modifier eligibility profile. Processing-speed affixes adjust the placed cart's work interval after installed tool speed is considered, and energy-usage affixes adjust movement, scan, plant, and cut FE costs. Placed carts save traits and Mastery progression, preserve them on pick-block, and drop the same rolled companion item when broken.
 
-Control, Drive, and Reserve use the [shared attribute conversions](../systems/machine-mastery.md#attributes). Base class attributes now affect gameplay. The family ascendancy list remains empty.
+Control, Drive, and Reserve use the [shared attribute conversions](../systems/machine-mastery.md#attributes). Base class attributes now affect gameplay. The Forestry Companion has two [ascendancies](../prds/machine-ascendancies.md#forestry-companion): Timber Baron, which banks harvested logs in a Log Ledger, and Grove Warden, whose growth pulses spend bone meal from a fertilizer store. A Grove Warden takes bone meal through its sapling slots or from a docked station; the station keeps up to 256 bone meal in its own store, so bone meal inserted into its sapling slot never blocks saplings.
 
 Successful route actions consume cart FE:
 

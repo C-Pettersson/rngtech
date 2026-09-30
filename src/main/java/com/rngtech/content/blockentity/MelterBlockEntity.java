@@ -31,6 +31,7 @@ import com.rngtech.rpg.MachineTraits;
 import com.rngtech.rpg.MachineType;
 import com.rngtech.rpg.ModifierOperation;
 import com.rngtech.rpg.ModifierSlot;
+import com.rngtech.rpg.progression.AscendancyFormulas;
 import com.rngtech.rpg.progression.MachineMasteryFamily;
 import com.rngtech.rpg.progression.MachineMasteryHost;
 import com.rngtech.rpg.progression.MachineProgressionState;
@@ -40,6 +41,7 @@ import com.rngtech.rpg.progression.MegaPassiveTree;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
@@ -268,6 +270,7 @@ public class MelterBlockEntity extends BaseMachineBlockEntity implements MenuPro
         melter.fillOutputContainer();
 
         MachineStatAccumulator stats = melter.effectiveStats();
+        melter.updateTankCapacity(stats);
         MelterRecipe recipe = melter.nextRecipe();
         if (recipe == null || !melter.hasRequiredComponents()) {
             melter.resetCycleIfActive();
@@ -280,18 +283,18 @@ public class MelterBlockEntity extends BaseMachineBlockEntity implements MenuPro
         }
         if (melter.effectiveHeat(stats) < recipe.minimumTemperature()
                 || melter.processingLevel(stats) < recipe.requiredProcessingLevel()
-                || !melter.canAcceptOutputFluid(recipe.outputFluid())) {
+                || !melter.canAcceptOutputFluid(melter.yieldedOutput(recipe, stats))) {
             BaseMachineBlock.setActive(level, pos, state, false);
             return;
         }
 
-        int energyCost = melter.energyCostPerTick(recipe, stats);
+        int energyCost = melter.scaledForJobs(melter.energyCostPerTick(recipe, stats), recipe, stats);
         if (melter.progress == 0 && ProcessingChance.rollInstant(level, stats)) {
-            int fullEnergyCost = melter.energyCostPerCraft(recipe, stats);
+            int fullEnergyCost = melter.scaledForJobs(melter.energyCostPerCraft(recipe, stats), recipe, stats);
             if (melter.consumeWorkingEnergy(fullEnergyCost, true) >= fullEnergyCost) {
                 melter.startCycleIfNeeded(recipe, stats);
                 melter.consumeWorkingEnergy(fullEnergyCost, false);
-                if (melter.process(recipe)) {
+                if (melter.process(recipe, stats)) {
                     melter.bulkSpeed.recordProcess(melter.activeTraits());
                 }
                 BaseMachineBlock.setActive(level, pos, state, true);
@@ -308,7 +311,7 @@ public class MelterBlockEntity extends BaseMachineBlockEntity implements MenuPro
         melter.consumeWorkingEnergy(energyCost, false);
         melter.progress++;
         if (melter.progress >= melter.activeCycleProcessingTicks(recipe, stats)) {
-            if (melter.process(recipe)) {
+            if (melter.process(recipe, stats)) {
                 melter.bulkSpeed.recordProcess(melter.activeTraits());
             }
         }
@@ -526,29 +529,95 @@ public class MelterBlockEntity extends BaseMachineBlockEntity implements MenuPro
                 : MelterRecipes.find(level, primaryStack(), secondaryStack(), inputTank.getFluid()).orElse(null);
     }
 
-    private boolean process(MelterRecipe recipe) {
-        if (level == null || !recipe.matches(new MelterRecipeInput(primaryStack(), secondaryStack(), inputTank.getFluid()), level)) {
-            return false;
-        }
-        if (!canAcceptOutputFluid(recipe.outputFluid())) {
-            return false;
-        }
-
-        consumeInput(SLOT_PRIMARY_INPUT);
-        consumeInput(SLOT_SECONDARY_INPUT);
-        FluidStack drained = inputTank.drain(inputTank.getFluid().copyWithAmount(recipe.fluidInput().amount()), IFluidHandler.FluidAction.EXECUTE);
-        if (drained.getAmount() < recipe.fluidInput().amount()) {
-            resetCycle();
-            resetBulkSpeed();
-            setChanged();
-            return false;
-        }
-        if (outputTank.fill(recipe.outputFluid(), IFluidHandler.FluidAction.EXECUTE) > 0) {
-            grantRecipeXp(recipe);
+    private boolean process(MelterRecipe recipe, MachineStatAccumulator stats) {
+        int jobs = parallelMelts(recipe, stats);
+        boolean melted = false;
+        for (int job = 0; job < jobs; job++) {
+            if (level == null || !recipe.matches(new MelterRecipeInput(primaryStack(), secondaryStack(), inputTank.getFluid()), level)) {
+                break;
+            }
+            FluidStack output = yieldedOutput(recipe, stats);
+            if (!canAcceptOutputFluid(output)) {
+                break;
+            }
+            consumeInput(SLOT_PRIMARY_INPUT);
+            consumeInput(SLOT_SECONDARY_INPUT);
+            FluidStack drained = inputTank.drain(inputTank.getFluid().copyWithAmount(recipe.fluidInput().amount()), IFluidHandler.FluidAction.EXECUTE);
+            if (drained.getAmount() < recipe.fluidInput().amount()) {
+                break;
+            }
+            if (outputTank.fill(output, IFluidHandler.FluidAction.EXECUTE) > 0) {
+                grantRecipeXp(recipe);
+            }
+            melted = true;
         }
         resetCycle();
+        if (!melted) {
+            resetBulkSpeed();
+        }
         setChanged();
-        return true;
+        return melted;
+    }
+
+    /** One melt's output with Fluid Yield on eligible recipes; Methane Trap and Brine Loop add to their fluids. */
+    private FluidStack yieldedOutput(MelterRecipe recipe, MachineStatAccumulator stats) {
+        FluidStack output = recipe.outputFluid();
+        if (!recipe.allowsBonusOutput()) {
+            return output;
+        }
+        String fluid = BuiltInRegistries.FLUID.getKey(output.getFluid()).toString();
+        double yield = stats.value(MachineStat.FLUID_YIELD)
+                + (hasMasteryBehavior("METHANE_TRAP") && fluid.equals("rngtech:methane") ? 25.0 : 0.0)
+                + (hasMasteryBehavior("BRINE_LOOP") && fluid.equals("rngtech:electrolyte_solution") ? 25.0 : 0.0);
+        return output.copyWithAmount(AscendancyFormulas.yieldedFluid(output.getAmount(), yield));
+    }
+
+    /** Second Crucible melts one extra set per Parallel Job, as far as inputs, fluid, and tank room allow. */
+    private int parallelMelts(MelterRecipe recipe, MachineStatAccumulator stats) {
+        if (!hasMasteryBehavior("SECOND_CRUCIBLE") || hasMasteryBehavior("FUSED_CRUCIBLES")) {
+            return 1;
+        }
+        int jobs = 1 + stats.intValue(MachineStat.PARALLEL_JOBS);
+        jobs = Math.min(jobs, Math.min(primaryStack().getCount(), secondaryStack().getCount()));
+        jobs = Math.min(jobs, inputTank.getFluidAmount() / Math.max(1, recipe.fluidInput().amount()));
+        FluidStack output = yieldedOutput(recipe, stats);
+        while (jobs > 1 && !canAcceptOutputFluid(output.copyWithAmount(output.getAmount() * jobs))) {
+            jobs--;
+        }
+        return Math.max(1, jobs);
+    }
+
+    /** Parallel melts each pay FE; Shared Heat makes every melt after the first 20% cheaper. */
+    private int scaledForJobs(int energy, MelterRecipe recipe, MachineStatAccumulator stats) {
+        int extra = parallelMelts(recipe, stats) - 1;
+        double scale = 1.0 + extra * (hasMasteryBehavior("SHARED_HEAT") ? 0.8 : 1.0);
+        return Math.max(1, (int) Math.ceil(energy * scale));
+    }
+
+    /** Overpressure, Lava Tap, Crush Feed, and Fused Crucibles speed up a melt; set when its cycle starts. */
+    private double meltSpeed(MelterRecipe recipe, MachineStatAccumulator stats) {
+        double speed = 1.0;
+        if (hasMasteryBehavior("OVERPRESSURE") && outputTank.getFluidAmount() * 2 > outputTank.getCapacity()) {
+            speed *= 1.3;
+        }
+        if (hasMasteryBehavior("LAVA_TAP") && recipe.fluidOutput().getFluid().isSame(Fluids.LAVA)) {
+            speed *= 1.5;
+        }
+        int overlevel = Math.max(0, processingLevel(stats) - recipe.requiredProcessingLevel());
+        speed *= 1.0 + Math.max(0.0, stats.value(MachineStat.OVERLEVEL_SPEED)) / 100.0 * overlevel;
+        if (hasMasteryBehavior("FUSED_CRUCIBLES")) {
+            speed *= 1.0 + 0.3 * stats.intValue(MachineStat.PARALLEL_JOBS);
+        }
+        return speed;
+    }
+
+    /** Fluid Capacity sizes both tanks; fluid above a smaller capacity stays until it drains. */
+    private void updateTankCapacity(MachineStatAccumulator stats) {
+        int capacity = Math.max(TANK_CAPACITY, (int) Math.round(stats.value(MachineStat.FLUID_CAPACITY)));
+        if (inputTank.getCapacity() != capacity) {
+            inputTank.setCapacity(capacity);
+            outputTank.setCapacity(capacity);
+        }
     }
 
     private void grantRecipeXp(MelterRecipe recipe) {
@@ -608,12 +677,14 @@ public class MelterBlockEntity extends BaseMachineBlockEntity implements MenuPro
         }
     }
 
+    /** Sealed Lines never vents excess output, so a full tank pauses the melt instead. */
     private boolean canAcceptOutputFluid(FluidStack result) {
-        return !result.isEmpty() && FluidOutputOverflow.canAcceptOrVoidExcess(outputTank, result, autoPurgesFluidOutput());
+        return !result.isEmpty()
+                && FluidOutputOverflow.canAcceptOrVoidExcess(outputTank, result, autoPurgesFluidOutput() && !hasMasteryBehavior("SEALED_LINES"));
     }
 
     private int processingTicks(MelterRecipe recipe, MachineStatAccumulator stats) {
-        return stats.adjustedHeatProcessingTicks(recipe.processingTicks());
+        return Math.max(1, (int) Math.ceil(stats.adjustedHeatProcessingTicks(recipe.processingTicks()) / meltSpeed(recipe, stats)));
     }
 
     private int energyCostPerTick(MelterRecipe recipe, MachineStatAccumulator stats) {
@@ -655,7 +726,7 @@ public class MelterBlockEntity extends BaseMachineBlockEntity implements MenuPro
         if (processingLevel(stats) < recipe.requiredProcessingLevel()) {
             return STATUS_LEVEL_LOW;
         }
-        if (!canAcceptOutputFluid(recipe.outputFluid())) {
+        if (!canAcceptOutputFluid(yieldedOutput(recipe, stats))) {
             return STATUS_OUTPUT_TANK_FULL;
         }
         int energyCost = energyCostPerTick(recipe, stats);

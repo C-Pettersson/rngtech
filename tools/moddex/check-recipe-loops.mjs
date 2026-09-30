@@ -99,7 +99,7 @@ export async function checkRecipeLoops({ log = true, report = false, mutate = nu
     const network = loopNetwork(reactions, new Set(bounds.free ?? []));
     const allowed = new Map((bounds.allow ?? []).map((entry) => [signatureOf(entry.recipes), entry.reason]));
     const usedAllowances = new Set();
-    const failures = [...coverageFailures(bounds, declarations)];
+    const failures = [...coverageFailures(bounds, declarations), ...await worldSourceFailures(bounds, reactions, tags)];
     const findings = [];
 
     // Item loops are set aside before the FE search, so each FE loop reported is one that FE alone makes possible.
@@ -143,7 +143,8 @@ export async function checkRecipeLoops({ log = true, report = false, mutate = nu
 
 /** Every declared yield stat or behavior must be covered by a bound, so a new yield source cannot skip the audit. */
 function coverageFailures(bounds, declarations) {
-    const covered = new Set(Object.values(bounds.types ?? {}).flatMap((type) => type.covers ?? []));
+    const covered = new Set([...Object.values(bounds.types ?? {}), ...Object.values(bounds.worldSources ?? {})]
+        .flatMap((type) => type.covers ?? []));
     const declared = [
         ...(declarations.stats ?? []).map((entry) => [entry.stat, entry.yield]),
         ...(declarations.behaviors ?? []).map((entry) => [entry.id, entry.yield])
@@ -151,6 +152,30 @@ function coverageFailures(bounds, declarations) {
     return declared
         .filter(([id, yieldKind]) => (yieldKind ?? "none") !== "none" && !covered.has(id))
         .map(([id]) => `Declared yield ${id} has no loop-audit bound in tools/moddex/recipe-loop-bounds.json`);
+}
+
+/**
+ * A world source, such as tree growth, is safe only while no recipe makes what feeds it, so a recipe that outputs one
+ * of its `notMadeByRecipes` items fails the audit.
+ */
+async function worldSourceFailures(bounds, reactions, tags) {
+    const failures = [];
+    for (const [name, source] of Object.entries(bounds.worldSources ?? {})) {
+        const fed = new Set();
+        for (const entry of source.notMadeByRecipes ?? []) {
+            for (const item of entry.startsWith("#") ? await tagItems(entry.slice(1), tags) : [entry]) {
+                fed.add(item);
+            }
+        }
+        for (const reaction of reactions) {
+            for (const node of reaction.outputs.keys()) {
+                if (fed.has(node)) {
+                    failures.push(`World source ${name} assumes no recipe makes ${node}, but ${reaction.id} does`);
+                }
+            }
+        }
+    }
+    return failures;
 }
 
 /**
@@ -573,26 +598,32 @@ async function tagItems(tagId, tags) {
 
 /**
  * Proves the audit still catches known loops: re-enabling bonus output on a reversible conversion, or on the
- * calibrate-then-recycle pair, must fail it.
+ * calibrate-then-recycle pair, must fail it, and so must a recipe that makes the bone meal feeding growth pulses.
  */
 export async function checkRecipeLoopMutations() {
+    const recipe = (recipes, id) => {
+        const found = recipes.find((entry) => entry.id === id);
+        if (!found) {
+            throw new Error(`Recipe loop mutation: missing ${id}`);
+        }
+        return found;
+    };
+    const bonusReturned = (ids) => ({
+        label: `bonus output returned to ${ids.join(" and ")}`,
+        mutate: (recipes) => ids.forEach((id) => delete recipe(recipes, id).json.bonus_output)
+    });
     const mutations = [
-        ["rngtech:crusher/copper_dust_from_ingot", "rngtech:furnace/metals/copper_from_dust"],
-        ["rngtech:calibration_structural_iron_plate", "rngtech:component_recycling/calibrated_structural_component"]
+        bonusReturned(["rngtech:crusher/copper_dust_from_ingot", "rngtech:furnace/metals/copper_from_dust"]),
+        bonusReturned(["rngtech:calibration_structural_iron_plate", "rngtech:component_recycling/calibrated_structural_component"]),
+        {
+            label: "Plant Reagent was changed to make bone meal",
+            mutate: (recipes) => { recipe(recipes, "rngtech:plant_reagent").json.result = { count: 4, id: "minecraft:bone_meal" }; }
+        }
     ];
-    for (const ids of mutations) {
-        const mutate = (recipes) => {
-            for (const id of ids) {
-                const recipe = recipes.find((entry) => entry.id === id);
-                if (!recipe) {
-                    throw new Error(`Recipe loop mutation: missing ${id}`);
-                }
-                delete recipe.json.bonus_output;
-            }
-        };
+    for (const { label, mutate } of mutations) {
         const caught = await checkRecipeLoops({ log: false, mutate }).then(() => false, () => true);
         if (!caught) {
-            throw new Error(`Recipe loop audit missed a loop when bonus output returned to ${ids.join(" and ")}`);
+            throw new Error(`Recipe loop audit missed a loop when ${label}`);
         }
     }
     console.log(`Recipe loop mutations PASS: ${mutations.length} reintroduced loops were caught`);

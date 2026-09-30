@@ -54,6 +54,8 @@ final class AscendancyChecks {
         bonusBanks();
         outputLedger();
         formulas();
+        familyFormulas();
+        familyLaunchContent();
         mainCatalogAssets();
         return checks;
     }
@@ -61,7 +63,10 @@ final class AscendancyChecks {
     private static void catalog() {
         require(fixtures(CRUSHER).equals(List.of(ALPHA, BETA, GAMMA)), "a family can have more than two ascendancies, listed in index order");
         require(fixtures(MachineMasteryFamily.FURNACE).equals(List.of(FURNACE)), "ascendancies belong to their own family");
-        require(AscendancyCatalog.forFamily(MachineMasteryFamily.MELTER).isEmpty(), "a family without entries has no ascendancies");
+        for (MachineMasteryFamily family : MachineMasteryFamily.values()) {
+            require(AscendancyCatalog.forFamily(family).stream().filter(ascendancy -> !ascendancy.id().startsWith("fixture_")).count() >= 2,
+                    family + " ships at least two ascendancies");
+        }
         for (Ascendancy ascendancy : AscendancyCatalog.all()) {
             require(AscendancyCatalog.violations(ascendancy).isEmpty(), ascendancy.id() + " follows the tree rules");
         }
@@ -280,8 +285,8 @@ final class AscendancyChecks {
         require(AscendStatus.of(fresh, CRUSHER, 3, tier -> true) == AscendStatus.ENTRY_STAGE, "Seal I status names the entry stage first");
         require(AscendStatus.of(fresh, CRUSHER, 4, tier -> false) == AscendStatus.SEAL_MISSING, "Seal I status needs the Seal in inventory");
         require(AscendStatus.of(fresh, CRUSHER, 4, tier -> tier == 1) == AscendStatus.READY, "Seal I is ready with the Seal and the entry stage");
-        var melter = MachineProgressionState.EMPTY.forFamily(MachineMasteryFamily.MELTER);
-        require(AscendStatus.of(melter, MachineMasteryFamily.MELTER, 6, tier -> true) == AscendStatus.NO_ASCENDANCIES, "a family without ascendancies cannot ascend");
+        var forestry = MachineProgressionState.EMPTY.forFamily(MachineMasteryFamily.FORESTRY);
+        require(AscendStatus.of(forestry, MachineMasteryFamily.FORESTRY, 6, tier -> true) == AscendStatus.READY, "the Forestry Companion ascends from its tool head stage");
         var one = ascended(ALPHA, List.of(), 1);
         require(AscendStatus.of(one, CRUSHER, 0, tier -> tier == 2) == AscendStatus.READY, "later tiers need no entry stage");
         require(AscendStatus.of(one, CRUSHER, 8, tier -> tier == 1) == AscendStatus.SEAL_MISSING, "only the next tier's Seal counts");
@@ -535,6 +540,79 @@ final class AscendancyChecks {
         apply(heat, MachineStat.LEDGER_RATE, ModifierOperation.ADD, 100.0 / 9.0);
         near(AscendancyFormulas.ledgerShare(heat, 1, false), 1.0 / 9.0, "the root banks a ninth of an item per smelt");
         near(AscendancyFormulas.ledgerShare(heat, 1, true), 2.0 / 9.0, "Crusher Line feeds crushed smelts twice");
+    }
+
+    /** Phase 7 formulas: input savings, heat windows, streaks, and fluid yield. */
+    private static void familyFormulas() {
+        require(AscendancyFormulas.savableIngredient(new int[] {3, 1, 1}) == 0, "the largest ingredient is the one saved");
+        require(AscendancyFormulas.savableIngredient(new int[] {1, 4, 4}) == 1, "a tie saves the first largest ingredient");
+        require(AscendancyFormulas.savableIngredient(new int[] {1, 1}) == -1, "no saving removes an ingredient's only unit");
+        var flux = MachineStatAccumulator.componentBase(Map.of());
+        apply(flux, MachineStat.FLUX_RATE, ModifierOperation.ADD, 28);
+        near(AscendancyFormulas.fluxShare(flux, true), 0.56, "Reactive Flux doubles the strongest Flux Rate to 0.56 of a unit");
+        near(AscendancyFormulas.fluxShare(flux, false), 0.28, "Flux Rate is a share of one unit per craft");
+
+        var window = MachineStatAccumulator.componentBase(Map.of());
+        require(AscendancyFormulas.windowEdge(1000, 900, window) == 900, "the authored window is unchanged without Heat Window");
+        apply(window, MachineStat.HEAT_WINDOW, ModifierOperation.ADD, -25);
+        require(AscendancyFormulas.windowEdge(1000, 900, window) == 925 && AscendancyFormulas.windowEdge(1000, 1200, window) == 1150,
+                "Drop Hammer narrows both edges toward the target");
+
+        var streak = MachineStatAccumulator.componentBase(Map.of());
+        apply(streak, MachineStat.STREAK_FLOOR, ModifierOperation.ADD, 1);
+        apply(streak, MachineStat.STREAK_CAP, ModifierOperation.ADD, 10);
+        require(AscendancyFormulas.streakFloor(4, streak) == 4 && AscendancyFormulas.streakFloor(40, streak) == 10,
+                "the streak raises the floor by one per calibration up to its cap");
+
+        require(AscendancyFormulas.yieldedFluid(1000, 0) == 1000 && AscendancyFormulas.yieldedFluid(1000, 59) == 1590,
+                "Fluid Yield adds to the recipe amount");
+        var vessel = new MachineProgressionState(0, 0, 1, List.of(), MachineMasteryFamily.MELTER.startNodeId(), List.of(), false, "pressure_vessel",
+                List.of("loop_yield", "brine_loop", "autoclave_yield", "autoclave", "trap_yield"), 3);
+        var melter = MachineStatAccumulator.componentBase(Map.of(MachineStat.PROCESSING_SPEED, 1.0, MachineStat.FLUID_CAPACITY, 4000.0));
+        MegaPassiveTree.applyStats(melter, vessel, MachineMasteryFamily.MELTER);
+        near(melter.value(MachineStat.FLUID_YIELD) + 25, 59, "the strongest Electrolyte Solution yield stays at the loop bound's 59%");
+        near(melter.value(MachineStat.FLUID_CAPACITY), 12000, "Pressurized Tanks triple the tanks");
+    }
+
+    /** Phase 7 launch order and the worst-case values the loop bounds rely on. */
+    private static void familyLaunchContent() {
+        Map<MachineMasteryFamily, List<String>> launch = Map.of(
+                MachineMasteryFamily.ALLOY_FURNACE, List.of("metallurgist", "blendwright"),
+                MachineMasteryFamily.METAL_PRESS, List.of("die_keeper", "drop_forge"),
+                MachineMasteryFamily.RESONANCE_CALIBRATOR, List.of("harmonist", "mass_tuner"),
+                MachineMasteryFamily.MELTER, List.of("pressure_vessel", "twin_crucible"),
+                MachineMasteryFamily.FORESTRY, List.of("timber_baron", "grove_warden"));
+        launch.forEach((family, ids) -> require(AscendancyCatalog.forFamily(family).stream().map(Ascendancy::id).toList().subList(0, 2).equals(ids),
+                family + " ships " + ids));
+
+        var baron = ascendedForestry("timber_baron", List.of("heart_ledger", "fell_reach", "sawyers_eye", "charter_reach", "clearcut_charter"));
+        var baronStats = forestryStats(baron);
+        near(baronStats.value(MachineStat.LEDGER_RATE), 28, "the strongest Timber Baron Ledger Rate stays at the bound's 28%");
+        near(AscendancyFormulas.ledgerShare(baronStats, 1, true), 0.56, "Heartwood doubles it to the bound's 56% of a batch log");
+        require(MegaPassiveTree.has(baron, "CLEARCUT_CHARTER") && MegaPassiveTree.has(baron, "LOG_LEDGER"), "Clearcut Charter builds on the Log Ledger");
+        var sprinter = forestryStats(ascendedForestry("timber_baron", List.of("rail_speed", "dock_sprint", "rolling_speed", "rolling_harvest")));
+        near(sprinter.value(MachineStat.CART_SPEED), 1.2, "two Cart Speed nodes make the cart 20% faster");
+        near(sprinter.valueWithIncreased(MachineStat.CART_SPEED, 50), 1.7, "Dock Sprint adds 50% while seeking a station");
+
+        var warden = ascendedForestry("grove_warden", List.of("soil_pulse", "rich_soil", "surge_pulse", "verdant_surge"));
+        var wardenStats = forestryStats(warden);
+        near(wardenStats.value(MachineStat.GROWTH_PULSE), 1.7, "the strongest Growth Pulse applies bone meal 1.7 times");
+        require(AscendancyFormulas.pulseAttempts(wardenStats, 0.5) == 2 && AscendancyFormulas.pulseAttempts(wardenStats, 0.8) == 1,
+                "the fraction of Growth Pulse is a chance for one more use");
+        require(MegaPassiveTree.has(warden, "FERTILIZER_PULSE"), "the Grove Warden root spends bone meal on each pulse");
+        var nursery = ascendedForestry("grove_warden", List.of("nursery_cells", "nursery", "grove_cells", "ancient_grove"));
+        require(MegaPassiveTree.passive(nursery, PassiveStatType.MANAGED_CELLS) == 12, "Nursery nodes add 12 managed cells");
+        require(AscendancyFormulas.pulseAttempts(forestryStats(ascendedForestry("grove_warden", List.of())), 0.0) == 1, "the root pulses once");
+    }
+
+    private static MachineProgressionState ascendedForestry(String ascendancy, List<String> nodes) {
+        return new MachineProgressionState(0, 0, 1, List.of(), MachineMasteryFamily.FORESTRY.startNodeId(), List.of(), false, ascendancy, nodes, 3);
+    }
+
+    private static MachineStatAccumulator forestryStats(MachineProgressionState state) {
+        var stats = MachineStatAccumulator.forestryCompanionBase();
+        MegaPassiveTree.applyStats(stats, state, MachineMasteryFamily.FORESTRY);
+        return stats;
     }
 
     private static void apply(MachineStatAccumulator stats, MachineStat stat, ModifierOperation operation, double value) {

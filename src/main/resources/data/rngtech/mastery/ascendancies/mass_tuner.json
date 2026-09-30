@@ -1,0 +1,179 @@
+{
+    "id": "mass_tuner",
+    "family": "resonance_calibrator",
+    "nodes": [
+        {
+            "id": "shared_field",
+            "kind": "ROOT",
+            "x": 0,
+            "y": 0,
+            "behaviors": [
+                "SHARED_FIELD"
+            ]
+        },
+        {
+            "id": "economy_speed",
+            "kind": "SMALL",
+            "parent": "shared_field",
+            "x": -2,
+            "y": 1,
+            "effects": [
+                {
+                    "stat": "PROCESSING_SPEED",
+                    "operation": "INCREASED_PERCENT",
+                    "value": 8
+                }
+            ]
+        },
+        {
+            "id": "stabilizer_economy",
+            "kind": "NOTABLE",
+            "parent": "economy_speed",
+            "x": -2,
+            "y": 2,
+            "behaviors": [
+                "STABILIZER_ECONOMY"
+            ]
+        },
+        {
+            "id": "sync_precision",
+            "kind": "SMALL",
+            "parent": "shared_field",
+            "x": -1,
+            "y": 1,
+            "effects": [
+                {
+                    "stat": "CALIBRATION_PRECISION",
+                    "operation": "INCREASED_PERCENT",
+                    "value": 8
+                }
+            ]
+        },
+        {
+            "id": "lane_sync",
+            "kind": "NOTABLE",
+            "parent": "sync_precision",
+            "x": -1,
+            "y": 2,
+            "behaviors": [
+                "LANE_SYNC"
+            ]
+        },
+        {
+            "id": "surplus_energy",
+            "kind": "SMALL",
+            "parent": "shared_field",
+            "x": 1,
+            "y": 1,
+            "effects": [
+                {
+                    "stat": "ENERGY_USAGE",
+                    "operation": "DECREASED_PERCENT",
+                    "value": 5
+                }
+            ]
+        },
+        {
+            "id": "catalytic_surplus",
+            "kind": "NOTABLE",
+            "parent": "surplus_energy",
+            "x": 1,
+            "y": 2,
+            "effects": [
+                {
+                    "stat": "CATALYST_EFFICIENCY",
+                    "operation": "INCREASED_PERCENT",
+                    "value": 25
+                }
+            ]
+        },
+        {
+            "id": "tolerance_stability",
+            "kind": "SMALL",
+            "parent": "shared_field",
+            "x": 2,
+            "y": 1,
+            "effects": [
+                {
+                    "stat": "STABILITY",
+                    "operation": "INCREASED_PERCENT",
+                    "value": 8
+                }
+            ]
+        },
+        {
+            "id": "wide_tolerance",
+            "kind": "NOTABLE",
+            "parent": "tolerance_stability",
+            "x": 2,
+            "y": 2,
+            "behaviors": [
+                "WIDE_TOLERANCE"
+            ]
+        },
+        {
+            "id": "array_precision",
+            "kind": "SMALL",
+            "parent": "lane_sync",
+            "x": -1,
+            "y": 3,
+            "effects": [
+                {
+                    "stat": "CALIBRATION_PRECISION",
+                    "operation": "INCREASED_PERCENT",
+                    "value": 8
+                }
+            ]
+        },
+        {
+            "id": "resonance_array",
+            "kind": "NOTABLE",
+            "parent": "array_precision",
+            "x": -1,
+            "y": 4,
+            "effects": [
+                {
+                    "stat": "PARALLEL_JOBS",
+                    "operation": "ADD",
+                    "value": 1
+                }
+            ],
+            "behaviors": [
+                "RESONANCE_ARRAY"
+            ]
+        },
+        {
+            "id": "reach_stability",
+            "kind": "SMALL",
+            "parent": "wide_tolerance",
+            "x": 2,
+            "y": 3,
+            "effects": [
+                {
+                    "stat": "STABILITY",
+                    "operation": "INCREASED_PERCENT",
+                    "value": 8
+                }
+            ]
+        },
+        {
+            "id": "overreach",
+            "kind": "NOTABLE",
+            "parent": "reach_stability",
+            "x": 2,
+            "y": 4,
+            "effects": [
+                {
+                    "stat": "COIL_REACH",
+                    "operation": "ADD",
+                    "value": 1
+                },
+                {
+                    "stat": "CALIBRATION_PRECISION",
+                    "operation": "LESS",
+                    "value": 0.8
+                }
+            ]
+        }
+    ]
+}

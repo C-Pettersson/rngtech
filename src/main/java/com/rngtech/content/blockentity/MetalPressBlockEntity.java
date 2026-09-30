@@ -26,6 +26,8 @@ import com.rngtech.rpg.MachineTraits;
 import com.rngtech.rpg.MachineType;
 import com.rngtech.rpg.ModifierOperation;
 import com.rngtech.rpg.ModifierSlot;
+import com.rngtech.rpg.OutputLedger;
+import com.rngtech.rpg.progression.AscendancyFormulas;
 import com.rngtech.rpg.progression.MachineMasteryFamily;
 import com.rngtech.rpg.progression.MachineMasteryHost;
 import com.rngtech.rpg.progression.MachineProgressionState;
@@ -44,6 +46,7 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerData;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
@@ -76,6 +79,8 @@ public class MetalPressBlockEntity extends BaseMachineBlockEntity implements Men
     public static final int STATUS_HEAT_HIGH = 10;
     public static final int STATUS_STABILITY_LOW = 11;
     public static final int STATUS_WARMING = 12;
+    public static final int STATUS_ROUTE_DISABLED = 13;
+    public static final int STATUS_SWAPPING_MOLD = 14;
 
     private static final double NO_BATTERY_PROCESSING_SPEED = 0.85;
     private static final int NO_BATTERY_STABILITY_PENALTY = 20;
@@ -109,7 +114,8 @@ public class MetalPressBlockEntity extends BaseMachineBlockEntity implements Men
     private static final int DATA_SELECTED_MOLD = 24;
     private static final int DATA_ENERGY_PER_TICK = 25;
     private static final int DATA_ENERGY_PER_CRAFT = 26;
-    private static final int DATA_MACHINE_PROGRESSION_START = DATA_ENERGY_PER_CRAFT + 1;
+    private static final int DATA_LEDGER = DATA_ENERGY_PER_CRAFT + 1;
+    private static final int DATA_MACHINE_PROGRESSION_START = DATA_LEDGER + 1;
     private static final int DATA_COUNT = DATA_MACHINE_PROGRESSION_START + MasteryMenuSupport.FIELD_COUNT;
     private static final int STAT_SCALE = 100;
     private static final int LEGACY_SLOT_BATTERY_CELL = 3;
@@ -187,17 +193,17 @@ public class MetalPressBlockEntity extends BaseMachineBlockEntity implements Men
                         MetalPressBlockEntity.this::effectiveStats
                 );
             }
-            MachineStatAccumulator stats = effectiveStats();
             MetalPressRecipe recipe = nextRecipe();
+            MachineStatAccumulator stats = routeStats(recipe, effectiveStats());
             return switch (index) {
                 case DATA_PROGRESS -> progress;
                 case DATA_PROCESSING_TICKS -> currentProcessingTicks(recipe, stats);
                 case DATA_ENERGY -> energyStored();
                 case DATA_ENERGY_CAPACITY -> energyCapacity();
                 case DATA_HEAT -> currentTemperature;
-                case DATA_MIN_TEMPERATURE -> currentMinimumTemperature(recipe);
+                case DATA_MIN_TEMPERATURE -> currentMinimumTemperature(recipe, stats);
                 case DATA_TARGET_TEMPERATURE -> currentTargetTemperature(recipe);
-                case DATA_SAFE_MAX_TEMPERATURE -> currentSafeMaximumTemperature(recipe);
+                case DATA_SAFE_MAX_TEMPERATURE -> currentSafeMaximumTemperature(recipe, stats);
                 case DATA_OVERHEAT_TEMPERATURE -> currentOverheatTemperature(recipe, stats);
                 case DATA_FAILURE_RISK -> HeatControl.failureProgress(failureStrain);
                 case DATA_STATUS -> statusCode(recipe, stats);
@@ -217,6 +223,7 @@ public class MetalPressBlockEntity extends BaseMachineBlockEntity implements Men
                 case DATA_SELECTED_MOLD -> selectedMold;
                 case DATA_ENERGY_PER_TICK -> recipe == null ? 0 : energyCostPerTick(recipe, stats);
                 case DATA_ENERGY_PER_CRAFT -> recipe == null ? 0 : energyCostPerCraft(recipe, stats);
+                case DATA_LEDGER -> recipe == null || !ledgerActive(recipe, stats) ? -1 : LedgerNbt.permille(batchLedger.progress(recipe.outputStack().getItem()));
                 default -> 0;
             };
         }
@@ -244,17 +251,21 @@ public class MetalPressBlockEntity extends BaseMachineBlockEntity implements Men
     private int selectedMold;
     private ItemStack activeInput = ItemStack.EMPTY;
     private ItemStack activeMold = ItemStack.EMPTY;
+    private final OutputLedger<Item> batchLedger = new OutputLedger<>();
+    private int moldSwapTicks;
 
     public MetalPressBlockEntity(BlockPos pos, BlockState blockState) {
         super(ModBlockEntities.METAL_PRESS.get(), pos, blockState, MachineType.METAL_PRESS, SLOT_INPUT, SLOT_INPUT, SLOT_OUTPUT);
     }
 
     public static void serverTick(Level level, BlockPos pos, BlockState state, MetalPressBlockEntity press) {
-        MachineStatAccumulator stats = press.effectiveStats();
         MetalPressRecipe recipe = press.nextRecipe();
+        MachineStatAccumulator stats = press.routeStats(recipe, press.effectiveStats());
         if (recipe == null || !press.hasRequiredComponents()) {
+            boolean swapping = press.rackMolds(stats);
             press.resetCycleIfActive();
-            if (press.cool(stats)) {
+            // Quick Change keeps the press hot while Mold Rack swaps.
+            if (!(swapping && press.hasMasteryBehavior("QUICK_CHANGE")) && press.cool(stats)) {
                 press.setChanged();
             }
             BaseMachineBlock.setActive(level, pos, state, false);
@@ -264,7 +275,8 @@ public class MetalPressBlockEntity extends BaseMachineBlockEntity implements Men
             press.resetCycle();
             press.resetBulkSpeed();
         }
-        press.rememberHeatEnvelope(recipe);
+        press.moldSwapTicks = 0;
+        press.rememberHeatEnvelope(recipe, stats);
 
         if (press.effectiveHeat(stats) < recipe.targetTemperature()
                 || press.crudePressBlocksUnsafeRecipe(recipe, stats)
@@ -280,7 +292,7 @@ public class MetalPressBlockEntity extends BaseMachineBlockEntity implements Men
         if (press.progress == 0 && press.currentTemperature < recipe.targetTemperature()) {
             press.targetReached = false;
         }
-        int requiredTemperature = press.requiredTemperatureForProgress(recipe);
+        int requiredTemperature = press.requiredTemperatureForProgress(recipe, stats);
         if (press.currentTemperature < requiredTemperature) {
             if (press.consumeWorkingEnergy(energyCost, true) >= energyCost) {
                 press.consumeWorkingEnergy(energyCost, false);
@@ -302,7 +314,7 @@ public class MetalPressBlockEntity extends BaseMachineBlockEntity implements Men
         press.targetReached = true;
 
         if (press.progress == 0 && ProcessingChance.rollInstant(level, stats)) {
-            int fullEnergyCost = press.energyCostPerCraft(recipe, stats);
+            int fullEnergyCost = press.energyCostPerCraft(recipe, stats) * press.batchJobs(recipe, stats);
             if (press.consumeWorkingEnergy(fullEnergyCost, true) >= fullEnergyCost) {
                 press.startCycleIfNeeded();
                 press.consumeWorkingEnergy(fullEnergyCost, false);
@@ -315,6 +327,8 @@ public class MetalPressBlockEntity extends BaseMachineBlockEntity implements Men
                 return;
             }
         }
+        // Each batched job pays its share of the FE.
+        energyCost *= press.batchJobs(recipe, stats);
         if (press.consumeWorkingEnergy(energyCost, true) < energyCost) {
             if (!press.isCrudePress() && press.progress > 0 && press.registerPowerDrop(recipe)) {
                 press.tryFailCycle(recipe);
@@ -477,6 +491,8 @@ public class MetalPressBlockEntity extends BaseMachineBlockEntity implements Men
         tag.put("ActiveInput", activeInput.saveOptional(registries));
         tag.put("ActiveMold", activeMold.saveOptional(registries));
         bulkSpeed.save(tag);
+        LedgerNbt.save(tag, "BatchLedger", batchLedger);
+        tag.putInt("MoldSwapTicks", moldSwapTicks);
     }
 
     @Override
@@ -502,6 +518,8 @@ public class MetalPressBlockEntity extends BaseMachineBlockEntity implements Men
         activeInput = ItemStack.parseOptional(registries, tag.getCompound("ActiveInput"));
         activeMold = ItemStack.parseOptional(registries, tag.getCompound("ActiveMold"));
         bulkSpeed.load(tag);
+        LedgerNbt.load(tag, "BatchLedger", batchLedger);
+        moldSwapTicks = Math.max(0, tag.getInt("MoldSwapTicks"));
         clampInternalEnergy();
     }
 
@@ -558,7 +576,106 @@ public class MetalPressBlockEntity extends BaseMachineBlockEntity implements Men
     private MetalPressRecipe nextRecipe() {
         return level == null
                 ? null
-                : MetalPressRecipes.find(level, inputStack(), moldStack()).orElse(null);
+                : MetalPressRecipes.find(level, inputStack(), moldStack()).filter(recipe -> !routeDisabled(recipe)).orElse(null);
+    }
+
+    private static boolean isCircuit(MetalPressRecipe recipe) {
+        return moldMatches(recipe, ModTags.Items.CIRCUIT_MOLDS);
+    }
+
+    private static boolean isPlate(MetalPressRecipe recipe) {
+        return moldMatches(recipe, ModTags.Items.PLATE_MOLDS);
+    }
+
+    private static boolean isGearOrCasing(MetalPressRecipe recipe) {
+        return moldMatches(recipe, ModTags.Items.GEAR_MOLDS) || moldMatches(recipe, ModTags.Items.CASING_MOLDS);
+    }
+
+    private static boolean moldMatches(MetalPressRecipe recipe, net.minecraft.tags.TagKey<Item> tag) {
+        for (ItemStack mold : recipe.mold().getItems()) {
+            if (mold.is(tag)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /** Forge Line disables circuit recipes. */
+    private boolean routeDisabled(MetalPressRecipe recipe) {
+        return isCircuit(recipe) && hasMasteryBehavior("FORGE_LINE");
+    }
+
+    /** Circuit Discipline: circuit recipes gain Stability and use less FE. */
+    private MachineStatAccumulator routeStats(MetalPressRecipe recipe, MachineStatAccumulator stats) {
+        if (recipe != null && isCircuit(recipe) && hasMasteryBehavior("CIRCUIT_DISCIPLINE")) {
+            stats.apply(new MachineModifier(ModifierSlot.IMPLICIT, MachineStat.STABILITY, ModifierOperation.INCREASED_PERCENT, 20.0));
+            stats.apply(new MachineModifier(ModifierSlot.IMPLICIT, MachineStat.ENERGY_USAGE, ModifierOperation.LESS, 0.85));
+        }
+        return stats;
+    }
+
+    /** Production Die speeds gears and casings and slows circuits; Hot Stamping speeds plates above their target. */
+    private double routeSpeed(MetalPressRecipe recipe, MachineStatAccumulator stats) {
+        double speed = 1.0;
+        if (hasMasteryBehavior("PRODUCTION_DIE")) {
+            speed *= isGearOrCasing(recipe) ? 1.4 : isCircuit(recipe) ? 0.75 : 1.0;
+        }
+        if (hasMasteryBehavior("HOT_STAMPING") && isPlate(recipe) && currentTemperature > recipe.targetTemperature()) {
+            speed *= 1.2;
+        }
+        return speed;
+    }
+
+    /** Drop Hammer presses one input set per job for plates, gears, and casings, as far as input and output allow. */
+    private int batchJobs(MetalPressRecipe recipe, MachineStatAccumulator stats) {
+        if (!hasMasteryBehavior("DROP_HAMMER") || isCircuit(recipe) || !(isPlate(recipe) || isGearOrCasing(recipe))) {
+            return 1;
+        }
+        int jobs = Math.max(1, Math.min(1 + stats.intValue(MachineStat.PARALLEL_JOBS), inputStack().getCount() / Math.max(1, recipe.inputCount())));
+        while (jobs > 1 && !canMergeOutput(recipe.outputStack().copyWithCount(recipe.outputStack().getCount() * jobs))) {
+            jobs--;
+        }
+        return jobs;
+    }
+
+    private boolean ledgerActive(MetalPressRecipe recipe, MachineStatAccumulator stats) {
+        return recipe.allowsBonusOutput() && stats.value(MachineStat.LEDGER_RATE) > 0.0;
+    }
+
+    /**
+     * Mold Rack: when the selected mold has no recipe for the input, count toward a swap to a stored mold that has one.
+     * Returns whether a swap is under way.
+     */
+    private boolean rackMolds(MachineStatAccumulator stats) {
+        if (!hasMasteryBehavior("MOLD_RACK") || level == null || inputStack().isEmpty()) {
+            moldSwapTicks = 0;
+            return false;
+        }
+        int match = -1;
+        for (int index = 0; index < MOLD_SLOT_COUNT && match < 0; index++) {
+            ItemStack mold = gearInventory.getStackInSlot(SLOT_MOLD + index);
+            if (index != selectedMold && isMetalPressMold(mold) && MetalPressRecipes.find(level, inputStack(), mold).filter(recipe -> !routeDisabled(recipe)).isPresent()) {
+                match = index;
+            }
+        }
+        if (match < 0) {
+            moldSwapTicks = 0;
+            return false;
+        }
+        if (++moldSwapTicks >= stats.intValue(MachineStat.MOLD_SWAP_TIME)) {
+            moldSwapTicks = 0;
+            selectMold(match);
+        }
+        setChanged();
+        return true;
+    }
+
+    private int minimumTemperature(MetalPressRecipe recipe, MachineStatAccumulator stats) {
+        return AscendancyFormulas.windowEdge(recipe.targetTemperature(), recipe.minimumTemperature(), stats);
+    }
+
+    private int safeMaximumTemperature(MetalPressRecipe recipe, MachineStatAccumulator stats) {
+        return AscendancyFormulas.windowEdge(recipe.targetTemperature(), recipe.safeMaximumTemperature(), stats);
     }
 
     private boolean process(MetalPressRecipe recipe, MachineStatAccumulator stats) {
@@ -566,21 +683,45 @@ public class MetalPressBlockEntity extends BaseMachineBlockEntity implements Men
             return false;
         }
 
+        int jobs = batchJobs(recipe, stats);
         ItemStack baseResult = recipe.outputStack();
-        ItemStack result = ProcessingChance.applySuperOutput(level, stats, recipe, baseResult, baseResult);
-        if (!canMergeOutput(result)) {
-            result = baseResult;
-            if (!canMergeOutput(result)) {
-                return false;
+        ItemStack batch = baseResult.copyWithCount(baseResult.getCount() * jobs);
+        if (!canMergeOutput(batch)) {
+            return false;
+        }
+        ItemStack result = batch;
+        for (int job = 0; job < jobs; job++) {
+            if (ProcessingChance.rollSuperOutput(level, stats, recipe, baseResult)) {
+                ItemStack grown = ProcessingChance.grow(result, baseResult, baseResult.getCount());
+                result = canMergeOutput(grown) ? grown : result;
             }
         }
+        result = withBatchLedger(recipe, stats, result, jobs);
 
-        consumeInput(recipe.inputCount());
+        consumeInput(recipe.inputCount() * jobs);
         mergeOutput(result);
-        grantRecipeXp(recipe);
+        for (int job = 0; job < jobs; job++) {
+            grantRecipeXp(recipe);
+        }
         resetCycle();
         setChanged();
         return true;
+    }
+
+    /** The Batch Ledger banks a share of every eligible job and pays whole items once the output has room. */
+    private ItemStack withBatchLedger(MetalPressRecipe recipe, MachineStatAccumulator stats, ItemStack result, int jobs) {
+        if (!ledgerActive(recipe, stats)) {
+            return result;
+        }
+        ItemStack base = recipe.outputStack();
+        batchLedger.add(base.getItem(), AscendancyFormulas.ledgerShare(stats, base.getCount(), false) * jobs);
+        int payable = batchLedger.payable(base.getItem());
+        ItemStack paid = ProcessingChance.grow(result, base, payable);
+        if (paid == result || !canMergeOutput(paid)) {
+            return result;
+        }
+        batchLedger.pay(base.getItem(), payable);
+        return paid;
     }
 
     private void grantRecipeXp(MetalPressRecipe recipe) {
@@ -635,13 +776,16 @@ public class MetalPressBlockEntity extends BaseMachineBlockEntity implements Men
             return false;
         }
 
-        ItemStack result = recipe.failureStack();
-        if (!canMergeOutput(result)) {
+        // A failed batch ruins every job's input, unless Split Failure limits it to one job; the rest waits for the next cycle.
+        int jobs = hasMasteryBehavior("SPLIT_FAILURE") ? 1 : batchJobs(recipe, effectiveStats());
+        ItemStack failure = recipe.failureStack();
+        ItemStack failed = failure.copyWithCount(failure.getCount() * jobs);
+        if (!canMergeOutput(failed)) {
             return false;
         }
 
-        consumeInput(recipe.inputCount());
-        mergeOutput(result);
+        consumeInput(recipe.inputCount() * jobs);
+        mergeOutput(failed);
         resetCycle();
         resetBulkSpeed();
         setChanged();
@@ -689,7 +833,7 @@ public class MetalPressBlockEntity extends BaseMachineBlockEntity implements Men
     }
 
     private int processingTicks(MetalPressRecipe recipe, MachineStatAccumulator stats) {
-        return stats.adjustedHeatProcessingTicks(recipe.processingTicks());
+        return Math.max(1, (int) Math.ceil(stats.adjustedHeatProcessingTicks(recipe.processingTicks()) / routeSpeed(recipe, stats)));
     }
 
     private int energyCostPerTick(MetalPressRecipe recipe, MachineStatAccumulator stats) {
@@ -706,27 +850,27 @@ public class MetalPressBlockEntity extends BaseMachineBlockEntity implements Men
         return recipe == null ? 0 : processingTicks(recipe, stats);
     }
 
-    private int currentMinimumTemperature(MetalPressRecipe recipe) {
-        return recipe == null ? hasCooldownHeat() ? lastMinimumTemperature : 0 : recipe.minimumTemperature();
+    private int currentMinimumTemperature(MetalPressRecipe recipe, MachineStatAccumulator stats) {
+        return recipe == null ? hasCooldownHeat() ? lastMinimumTemperature : 0 : minimumTemperature(recipe, stats);
     }
 
     private int currentTargetTemperature(MetalPressRecipe recipe) {
         return recipe == null ? hasCooldownHeat() ? lastTargetTemperature : 0 : recipe.targetTemperature();
     }
 
-    private int currentSafeMaximumTemperature(MetalPressRecipe recipe) {
-        return recipe == null ? hasCooldownHeat() ? lastSafeMaximumTemperature : 0 : recipe.safeMaximumTemperature();
+    private int currentSafeMaximumTemperature(MetalPressRecipe recipe, MachineStatAccumulator stats) {
+        return recipe == null ? hasCooldownHeat() ? lastSafeMaximumTemperature : 0 : safeMaximumTemperature(recipe, stats);
     }
 
     private int currentOverheatTemperature(MetalPressRecipe recipe, MachineStatAccumulator stats) {
-        int safeMaximumTemperature = currentSafeMaximumTemperature(recipe);
+        int safeMaximumTemperature = currentSafeMaximumTemperature(recipe, stats);
         return safeMaximumTemperature <= 0
                 ? 0
                 : HeatControl.effectiveOverheatTemperature(safeMaximumTemperature, stats);
     }
 
     private int effectiveSafeMaximumTemperature(MetalPressRecipe recipe, MachineStatAccumulator stats) {
-        return HeatControl.effectiveOverheatTemperature(recipe.safeMaximumTemperature(), stats);
+        return HeatControl.effectiveOverheatTemperature(safeMaximumTemperature(recipe, stats), stats);
     }
 
     private int statusCode(MetalPressRecipe recipe, MachineStatAccumulator stats) {
@@ -736,6 +880,9 @@ public class MetalPressBlockEntity extends BaseMachineBlockEntity implements Men
         if (!isCrudePress() && !hasServo()) {
             return STATUS_MISSING_SERVO;
         }
+        if (moldSwapTicks > 0) {
+            return STATUS_SWAPPING_MOLD;
+        }
         if (!hasMold()) {
             return STATUS_MISSING_MOLD;
         }
@@ -743,7 +890,7 @@ public class MetalPressBlockEntity extends BaseMachineBlockEntity implements Men
             return STATUS_NO_INPUT;
         }
         if (recipe == null) {
-            return STATUS_INVALID_RECIPE;
+            return level != null && MetalPressRecipes.find(level, inputStack(), moldStack()).isPresent() ? STATUS_ROUTE_DISABLED : STATUS_INVALID_RECIPE;
         }
         if (isCrudePress() && currentTemperature > effectiveSafeMaximumTemperature(recipe, stats)) {
             return STATUS_HEAT_HIGH;
@@ -763,7 +910,7 @@ public class MetalPressBlockEntity extends BaseMachineBlockEntity implements Men
         if (powerDropTicks > 0) {
             return STATUS_POWER_DROP;
         }
-        if (currentTemperature < requiredTemperatureForProgress(recipe)) {
+        if (currentTemperature < requiredTemperatureForProgress(recipe, stats)) {
             int energyCost = energyCostPerTick(recipe, stats);
             return consumeWorkingEnergy(energyCost, true) < energyCost ? STATUS_NO_POWER : STATUS_WARMING;
         }
@@ -777,8 +924,8 @@ public class MetalPressBlockEntity extends BaseMachineBlockEntity implements Men
                         || stats.value(MachineStat.TEMPERATURE_STABILITY) < recipe.requiredTemperatureStability());
     }
 
-    private int requiredTemperatureForProgress(MetalPressRecipe recipe) {
-        return targetReached ? recipe.minimumTemperature() : recipe.targetTemperature();
+    private int requiredTemperatureForProgress(MetalPressRecipe recipe, MachineStatAccumulator stats) {
+        return targetReached ? minimumTemperature(recipe, stats) : recipe.targetTemperature();
     }
 
     private boolean warm(MetalPressRecipe recipe, MachineStatAccumulator stats, int requiredTemperature) {
@@ -809,10 +956,10 @@ public class MetalPressBlockEntity extends BaseMachineBlockEntity implements Men
         return changed;
     }
 
-    private void rememberHeatEnvelope(MetalPressRecipe recipe) {
-        lastMinimumTemperature = recipe.minimumTemperature();
+    private void rememberHeatEnvelope(MetalPressRecipe recipe, MachineStatAccumulator stats) {
+        lastMinimumTemperature = minimumTemperature(recipe, stats);
         lastTargetTemperature = recipe.targetTemperature();
-        lastSafeMaximumTemperature = recipe.safeMaximumTemperature();
+        lastSafeMaximumTemperature = safeMaximumTemperature(recipe, stats);
     }
 
     private boolean clearHeatEnvelope() {
@@ -833,10 +980,13 @@ public class MetalPressBlockEntity extends BaseMachineBlockEntity implements Men
             return;
         }
 
+        // Master Die: only heat outside the window adds strain, measured without the stability wobble.
+        boolean masterDie = hasMasteryBehavior("MASTER_DIE");
+        double requiredStability = masterDie ? 0.0 : recipe.requiredTemperatureStability();
         int simulatedTemperature = HeatControl.simulatedTemperature(
                 currentTemperature,
                 recipe.targetTemperature(),
-                recipe.requiredTemperatureStability(),
+                requiredStability,
                 stats,
                 worldPosition,
                 level == null ? 0L : level.getGameTime(),
@@ -844,12 +994,15 @@ public class MetalPressBlockEntity extends BaseMachineBlockEntity implements Men
         );
         int addedStrain = HeatControl.failureStrainFromTemperature(
                 simulatedTemperature,
-                recipe.minimumTemperature(),
-                HeatControl.effectiveOverheatTemperature(recipe.safeMaximumTemperature(), stats),
-                recipe.requiredTemperatureStability(),
+                minimumTemperature(recipe, stats),
+                HeatControl.effectiveOverheatTemperature(safeMaximumTemperature(recipe, stats), stats),
+                requiredStability,
                 stats
         );
-        double servoInstability = Math.max(0.0, 1.0 - stats.value(MachineStat.STABILITY));
+        if (hasMasteryBehavior("TOLERANCE_MAP")) {
+            addedStrain = (int) Math.round(addedStrain * 0.6);
+        }
+        double servoInstability = masterDie ? 0.0 : Math.max(0.0, 1.0 - stats.value(MachineStat.STABILITY));
         addedStrain += Math.max(0, (int) Math.round(servoInstability * 50.0));
         if (addedStrain > 0) {
             failureStrain = Math.min(FAILURE_STRAIN_THRESHOLD, failureStrain + addedStrain);
@@ -867,7 +1020,16 @@ public class MetalPressBlockEntity extends BaseMachineBlockEntity implements Men
             return false;
         }
         powerDropTicks++;
-        failureStrain += hasPowerGrace() ? POWER_DROP_STRAIN / 2 : POWER_DROP_STRAIN;
+        int strain = hasPowerGrace() ? POWER_DROP_STRAIN / 2 : POWER_DROP_STRAIN;
+        // Servo Sync, and Shock Absorbers while batching, double the grace: each halves the strain again.
+        if (hasMasteryBehavior("SERVO_SYNC")) {
+            strain /= 2;
+        }
+        MetalPressRecipe current = nextRecipe();
+        if (hasMasteryBehavior("SHOCK_ABSORBERS") && current != null && batchJobs(current, effectiveStats()) > 1) {
+            strain /= 2;
+        }
+        failureStrain += strain;
         setChanged();
         return failureStrain >= FAILURE_STRAIN_THRESHOLD;
     }

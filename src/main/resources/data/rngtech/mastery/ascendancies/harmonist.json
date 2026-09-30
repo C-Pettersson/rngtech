@@ -1,0 +1,183 @@
+{
+    "id": "harmonist",
+    "family": "resonance_calibrator",
+    "nodes": [
+        {
+            "id": "resonant_streak",
+            "kind": "ROOT",
+            "x": 0,
+            "y": 0,
+            "effects": [
+                {
+                    "stat": "STREAK_FLOOR",
+                    "operation": "ADD",
+                    "value": 1
+                },
+                {
+                    "stat": "STREAK_CAP",
+                    "operation": "ADD",
+                    "value": 10
+                }
+            ]
+        },
+        {
+            "id": "tone_cap",
+            "kind": "SMALL",
+            "parent": "resonant_streak",
+            "x": -2,
+            "y": 1,
+            "effects": [
+                {
+                    "stat": "STREAK_CAP",
+                    "operation": "ADD",
+                    "value": 2
+                }
+            ]
+        },
+        {
+            "id": "sustained_tone",
+            "kind": "NOTABLE",
+            "parent": "tone_cap",
+            "x": -2,
+            "y": 2,
+            "effects": [
+                {
+                    "stat": "STREAK_CAP",
+                    "operation": "ADD",
+                    "value": 8
+                }
+            ]
+        },
+        {
+            "id": "pass_energy",
+            "kind": "SMALL",
+            "parent": "resonant_streak",
+            "x": -1,
+            "y": 1,
+            "effects": [
+                {
+                    "stat": "ENERGY_USAGE",
+                    "operation": "DECREASED_PERCENT",
+                    "value": 5
+                }
+            ]
+        },
+        {
+            "id": "second_pass",
+            "kind": "NOTABLE",
+            "parent": "pass_energy",
+            "x": -1,
+            "y": 2,
+            "behaviors": [
+                "SECOND_PASS"
+            ]
+        },
+        {
+            "id": "signal_stability",
+            "kind": "SMALL",
+            "parent": "resonant_streak",
+            "x": 1,
+            "y": 1,
+            "effects": [
+                {
+                    "stat": "STABILITY",
+                    "operation": "INCREASED_PERCENT",
+                    "value": 8
+                }
+            ]
+        },
+        {
+            "id": "clear_signal",
+            "kind": "NOTABLE",
+            "parent": "signal_stability",
+            "x": 1,
+            "y": 2,
+            "behaviors": [
+                "CLEAR_SIGNAL"
+            ]
+        },
+        {
+            "id": "pitch_speed",
+            "kind": "SMALL",
+            "parent": "resonant_streak",
+            "x": 2,
+            "y": 1,
+            "effects": [
+                {
+                    "stat": "PROCESSING_SPEED",
+                    "operation": "INCREASED_PERCENT",
+                    "value": 8
+                }
+            ]
+        },
+        {
+            "id": "perfect_pitch",
+            "kind": "NOTABLE",
+            "parent": "pitch_speed",
+            "x": 2,
+            "y": 2,
+            "effects": [
+                {
+                    "stat": "CALIBRATION_PRECISION",
+                    "operation": "INCREASED_PERCENT",
+                    "value": 20
+                }
+            ]
+        },
+        {
+            "id": "harmonic_cap",
+            "kind": "SMALL",
+            "parent": "sustained_tone",
+            "x": -2,
+            "y": 3,
+            "effects": [
+                {
+                    "stat": "STREAK_CAP",
+                    "operation": "ADD",
+                    "value": 2
+                }
+            ]
+        },
+        {
+            "id": "master_harmonic",
+            "kind": "NOTABLE",
+            "parent": "harmonic_cap",
+            "x": -2,
+            "y": 4,
+            "effects": [
+                {
+                    "stat": "PROCESSING_SPEED",
+                    "operation": "LESS",
+                    "value": 0.7
+                }
+            ],
+            "behaviors": [
+                "MASTER_HARMONIC"
+            ]
+        },
+        {
+            "id": "memory_energy",
+            "kind": "SMALL",
+            "parent": "second_pass",
+            "x": -1,
+            "y": 3,
+            "effects": [
+                {
+                    "stat": "ENERGY_USAGE",
+                    "operation": "DECREASED_PERCENT",
+                    "value": 5
+                }
+            ]
+        },
+        {
+            "id": "pattern_memory",
+            "kind": "NOTABLE",
+            "parent": "memory_energy",
+            "x": -1,
+            "y": 4,
+            "behaviors": [
+                "PATTERN_MEMORY"
+            ]
+        }
+    ]
+}

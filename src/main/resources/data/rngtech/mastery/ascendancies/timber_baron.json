@@ -1,0 +1,177 @@
+{
+    "id": "timber_baron",
+    "family": "forestry",
+    "nodes": [
+        {
+            "id": "log_ledger",
+            "kind": "ROOT",
+            "x": 0,
+            "y": 0,
+            "effects": [
+                {
+                    "stat": "LEDGER_RATE",
+                    "operation": "ADD",
+                    "value": 10
+                }
+            ],
+            "behaviors": [
+                "LOG_LEDGER"
+            ]
+        },
+        {
+            "id": "fell_reach",
+            "kind": "SMALL",
+            "parent": "log_ledger",
+            "x": -2,
+            "y": 1,
+            "effects": [
+                {
+                    "stat": "TREE_FELL_LIMIT",
+                    "operation": "ADD",
+                    "value": 2
+                }
+            ]
+        },
+        {
+            "id": "sawyers_eye",
+            "kind": "NOTABLE",
+            "parent": "fell_reach",
+            "x": -2,
+            "y": 2,
+            "effects": [
+                {
+                    "stat": "TREE_FELL_LIMIT",
+                    "operation": "ADD",
+                    "value": 5
+                }
+            ]
+        },
+        {
+            "id": "fell_energy",
+            "kind": "SMALL",
+            "parent": "log_ledger",
+            "x": -1,
+            "y": 1,
+            "effects": [
+                {
+                    "stat": "ENERGY_USAGE",
+                    "operation": "DECREASED_PERCENT",
+                    "value": 5
+                }
+            ]
+        },
+        {
+            "id": "clean_fell",
+            "kind": "NOTABLE",
+            "parent": "fell_energy",
+            "x": -1,
+            "y": 2,
+            "behaviors": [
+                "CLEAN_FELL"
+            ]
+        },
+        {
+            "id": "rail_speed",
+            "kind": "SMALL",
+            "parent": "log_ledger",
+            "x": 1,
+            "y": 1,
+            "effects": [
+                {
+                    "stat": "CART_SPEED",
+                    "operation": "INCREASED_PERCENT",
+                    "value": 10
+                }
+            ]
+        },
+        {
+            "id": "dock_sprint",
+            "kind": "NOTABLE",
+            "parent": "rail_speed",
+            "x": 1,
+            "y": 2,
+            "behaviors": [
+                "DOCK_SPRINT"
+            ]
+        },
+        {
+            "id": "heart_ledger",
+            "kind": "SMALL",
+            "parent": "log_ledger",
+            "x": 2,
+            "y": 1,
+            "effects": [
+                {
+                    "stat": "LEDGER_RATE",
+                    "operation": "ADD",
+                    "value": 3
+                }
+            ]
+        },
+        {
+            "id": "heartwood",
+            "kind": "NOTABLE",
+            "parent": "heart_ledger",
+            "x": 2,
+            "y": 2,
+            "behaviors": [
+                "HEARTWOOD"
+            ]
+        },
+        {
+            "id": "charter_reach",
+            "kind": "SMALL",
+            "parent": "sawyers_eye",
+            "x": -2,
+            "y": 3,
+            "effects": [
+                {
+                    "stat": "TREE_FELL_LIMIT",
+                    "operation": "ADD",
+                    "value": 2
+                }
+            ]
+        },
+        {
+            "id": "clearcut_charter",
+            "kind": "NOTABLE",
+            "parent": "charter_reach",
+            "x": -2,
+            "y": 4,
+            "effects": [
+                {
+                    "stat": "LEDGER_RATE",
+                    "operation": "ADD",
+                    "value": 15
+                }
+            ],
+            "behaviors": [
+                "CLEARCUT_CHARTER"
+            ]
+        },
+        {
+            "id": "rolling_speed",
+            "kind": "SMALL",
+            "parent": "dock_sprint",
+            "x": 1,
+            "y": 3,
+            "effects": [
+                {
+                    "stat": "CART_SPEED",
+                    "operation": "INCREASED_PERCENT",
+                    "value": 10
+                }
+            ]
+        },
+        {
+            "id": "rolling_harvest",
+            "kind": "NOTABLE",
+            "parent": "rolling_speed",
+            "x": 1,
+            "y": 4,
+            "behaviors": [
+                "ROLLING_HARVEST"
+            ]
+        }
+    ]
+}

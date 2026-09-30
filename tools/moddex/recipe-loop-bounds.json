@@ -32,19 +32,24 @@
             "reason": "Super Output adds at most one copy of the base output. The Bloom Ledger adds at most about 0.77 of one on crushed smelts with every Ledger Rate node and Crusher Line, so 3x covers both."
         },
         "rngtech:alloy_furnace": {
-            "maxOutputMultiplier": 2,
-            "covers": ["SUPER_OUTPUT_CHANCE"],
-            "reason": "Super Output adds at most one copy of the base output."
+            "maxOutputMultiplier": 3,
+            "covers": ["SUPER_OUTPUT_CHANCE", "SUPER_OUTPUT_CADENCE", "FLUX_RATE", "REACTIVE_FLUX", "DROSS_SKIMMING", "BLEND_REVERSAL", "LEDGER_RATE"],
+            "reason": "Super Output adds at most one copy of the base output. Metallurgist's Flux saves at most 0.56 of one unit of an ingredient that needs two or more, so a craft needs at least 72% of that ingredient; Blendwright's ledger adds at most half an output. Only one ascendancy applies, so 3x covers either. Failures return no more than the success route."
         },
         "rngtech:metal_press": {
-            "maxOutputMultiplier": 2,
-            "covers": ["SUPER_OUTPUT_CHANCE"],
-            "reason": "Super Output adds at most one copy of the base output."
+            "maxOutputMultiplier": 3,
+            "covers": ["SUPER_OUTPUT_CHANCE", "LEDGER_RATE"],
+            "reason": "Super Output adds at most one copy of the base output, and the Drop Forge's Batch Ledger adds a small share of one. Batching presses more input sets without changing the ratio."
+        },
+        "rngtech:melter": {
+            "maxOutputMultiplier": 1.6,
+            "covers": ["FLUID_YIELD", "METHANE_TRAP", "BRINE_LOOP"],
+            "reason": "The Pressure Vessel adds at most 59% Fluid Yield: 34% from its general nodes, including Autoclave, and 25% more on methane or Electrolyte Solution."
         },
         "rngtech:calibration": {
             "maxOutputMultiplier": 2,
-            "covers": ["SUPER_OUTPUT_CHANCE"],
-            "reason": "Super Output adds at most one copy of the base output."
+            "covers": ["SUPER_OUTPUT_CHANCE", "SHARED_FIELD", "STABILIZER_ECONOMY"],
+            "reason": "Super Output adds at most one copy of the base output. Shared Field and Stabilizer Economy only save catalysts and stabilizers, which the audit already treats as free."
         },
         "rngtech:component_recycling": {
             "maxOutputMultiplier": 2,
@@ -52,5 +57,12 @@
             "reason": "Super Output duplicates each output at most once."
         }
     },
-    "allow": []
+    "allow": [],
+    "worldSources": {
+        "forestry": {
+            "covers": ["LEDGER_RATE", "LOG_LEDGER", "HEARTWOOD", "GROWTH_PULSE", "FERTILIZER_PULSE", "ANCIENT_GROVE"],
+            "notMadeByRecipes": ["minecraft:bone_meal", "#minecraft:saplings", "#rngtech:giant_saplings"],
+            "reason": "Forestry yields act on tree growth, a free world source like cobblestone. Growth pulses spend one bone meal each and FE only as an application cost, so FE never becomes wood, and no recipe makes bone meal or saplings. The Log Ledger adds at most 56% of harvested logs with Heartwood, and Ancient Grove only changes tree shape."
+        }
+    }
 }

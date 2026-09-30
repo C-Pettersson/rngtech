@@ -2,6 +2,7 @@ package com.rngtech.content.registry;
 
 import com.rngtech.RNGTech;
 import com.rngtech.content.calibration.CalibrationState;
+import com.rngtech.content.calibration.CalibrationStreak;
 import com.rngtech.content.configurator.ConfiguratorPreset;
 import com.rngtech.content.item.UnidentifiedTraitRoll;
 import com.rngtech.content.itemfilter.AdvancedItemFilterSettings;
@@ -51,6 +52,15 @@ public final class ModDataComponents {
                                     .networkSynchronized(MachineProgressionState.STREAM_CODEC)
                                     .cacheEncoding()
                     );
+
+    /** The Harmonist's streak, kept on a dropped or picked Resonance Calibrator by Pattern Memory. */
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<CalibrationStreak>> CALIBRATION_STREAK =
+            DATA_COMPONENTS.registerComponentType(
+                    "calibration_streak",
+                    builder -> builder
+                            .persistent(CalibrationStreak.CODEC)
+                            .networkSynchronized(ByteBufCodecs.fromCodecWithRegistries(CalibrationStreak.CODEC))
+            );
 
     /** Crusher bonus banks kept on a dropped or picked machine by the Assayer's Wide Ledger. */
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<List<OutputAmountTracker.SavedBank>>> OUTPUT_BANKS =

@@ -59,8 +59,10 @@ public enum MachineMasteryFamily {
             case ENERGY_CAPACITY, INSTANT_PROCESS_CHANCE -> this != FORESTRY;
             case SUPER_OUTPUT_CHANCE -> this != FORESTRY && this != MELTER;
             case ENERGY_CAPACITY_FLAT -> this == CRUSHER || this == FURNACE;
-            // Only the Crusher reads Output Amount and Parallel Jobs; other machines' bonus output is Super Output.
-            case OUTPUT_AMOUNT, PARALLEL_JOBS -> this == CRUSHER;
+            // Only the Crusher reads Output Amount; other machines' bonus output is Super Output. Parallel Jobs reach the
+            // Metal Press, Resonance Calibrator, and Melter only through their ascendancies' batching.
+            case OUTPUT_AMOUNT -> this == CRUSHER;
+            case PARALLEL_JOBS -> this == CRUSHER || this == METAL_PRESS || this == RESONANCE_CALIBRATOR || this == MELTER;
             case MAX_TEMPERATURE, HEAT_TRANSFER -> heatChassis() || this == MELTER;
             case HEAT_ISOLATION, TEMPERATURE_STABILITY, WARMUP_TIME, COOLING_RATE, OVERHEAT_TOLERANCE -> heatChassis();
             case FUEL_DURATION, FUEL_EFFICIENCY -> this == FURNACE;

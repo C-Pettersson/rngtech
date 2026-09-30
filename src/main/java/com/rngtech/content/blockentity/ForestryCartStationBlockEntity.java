@@ -24,6 +24,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
@@ -107,7 +108,8 @@ public class ForestryCartStationBlockEntity extends BlockEntity implements MenuP
     private static final int DATA_ITEM_TRANSFER = 6;
     private static final int DATA_FLUID_TRANSFER = 7;
     private static final int DATA_CURRENT_ACTION = 8;
-    private static final int DATA_COUNT = 9;
+    private static final int DATA_FERTILIZER = 9;
+    private static final int DATA_COUNT = 10;
 
     private static final int INTERNAL_ENERGY_CAPACITY = 256;
     private static final int CART_TRANSFER_LIMIT = ForestryCartEntity.CARGO_SLOT_COUNT * 64;
@@ -116,7 +118,8 @@ public class ForestryCartStationBlockEntity extends BlockEntity implements MenuP
         @Override
         public boolean isItemValid(int slot, ItemStack stack) {
             return switch (slot) {
-                case SLOT_SAPLING -> ForestryCartEntity.isSaplingStack(stack);
+                case SLOT_SAPLING -> ForestryCartEntity.isSaplingStack(stack)
+                        || ForestryCartEntity.isFertilizerStack(stack) && fertilizer < ForestryCartEntity.FERTILIZER_CAPACITY;
                 case SLOT_SHEARS_INPUT -> ForestryCartEntity.isShearsCandidate(stack);
                 default -> false;
             };
@@ -129,6 +132,9 @@ public class ForestryCartStationBlockEntity extends BlockEntity implements MenuP
 
         @Override
         public ItemStack insertItem(int slot, ItemStack stack, boolean simulate) {
+            if (slot == SLOT_SAPLING && ForestryCartEntity.isFertilizerStack(stack)) {
+                return stack.copyWithCount(stack.getCount() - storeFertilizer(stack.getCount(), simulate));
+            }
             return isItemValid(slot, stack) ? super.insertItem(slot, stack, simulate) : stack;
         }
 
@@ -181,6 +187,7 @@ public class ForestryCartStationBlockEntity extends BlockEntity implements MenuP
                 case DATA_ITEM_TRANSFER -> itemConnectorTransferLimit();
                 case DATA_FLUID_TRANSFER -> fluidConnectorTransferLimit();
                 case DATA_CURRENT_ACTION -> currentAction;
+                case DATA_FERTILIZER -> fertilizer;
                 default -> 0;
             };
         }
@@ -199,6 +206,7 @@ public class ForestryCartStationBlockEntity extends BlockEntity implements MenuP
     private int status = STATUS_READY;
     private int currentAction = ACTION_IDLE;
     private boolean holdCartAtStation;
+    private int fertilizer;
 
     public ForestryCartStationBlockEntity(BlockPos pos, BlockState blockState) {
         super(ModBlockEntities.FORESTRY_CART_STATION.get(), pos, blockState);
@@ -323,6 +331,7 @@ public class ForestryCartStationBlockEntity extends BlockEntity implements MenuP
         boolean changed = unloadCartOutputs(cart);
         changed |= chargeDockedCart(cart);
         changed |= loadCartSaplings(cart);
+        changed |= loadCartFertilizer(cart);
         changed |= loadCartShears(cart);
         if (changed) {
             setChanged();
@@ -351,6 +360,11 @@ public class ForestryCartStationBlockEntity extends BlockEntity implements MenuP
         for (int slot = 0; slot < connectorInventory.getSlots(); slot++) {
             dropSlot(level, connectorInventory, slot);
         }
+        while (fertilizer > 0) {
+            int count = Math.min(fertilizer, Items.BONE_MEAL.getDefaultMaxStackSize());
+            Containers.dropItemStack(level, worldPosition.getX(), worldPosition.getY(), worldPosition.getZ(), new ItemStack(Items.BONE_MEAL, count));
+            fertilizer -= count;
+        }
     }
 
     @Override
@@ -360,6 +374,7 @@ public class ForestryCartStationBlockEntity extends BlockEntity implements MenuP
         tag.put("ConnectorInventory", connectorInventory.serializeNBT(registries));
         tag.putInt("Energy", internalEnergy);
         tag.putBoolean("HoldCartAtStation", holdCartAtStation);
+        tag.putInt("Fertilizer", fertilizer);
     }
 
     @Override
@@ -370,6 +385,7 @@ public class ForestryCartStationBlockEntity extends BlockEntity implements MenuP
         ensureConnectorInventorySize();
         internalEnergy = Math.max(0, tag.getInt("Energy"));
         holdCartAtStation = tag.getBoolean("HoldCartAtStation");
+        fertilizer = Math.max(0, Math.min(ForestryCartEntity.FERTILIZER_CAPACITY, tag.getInt("Fertilizer")));
         clampInternalEnergy();
     }
 
@@ -385,6 +401,7 @@ public class ForestryCartStationBlockEntity extends BlockEntity implements MenuP
             return false;
         }
 
+        absorbSlotFertilizer();
         boolean docked = false;
         boolean transferred = false;
         boolean cartNeedsRecharge = false;
@@ -505,6 +522,33 @@ public class ForestryCartStationBlockEntity extends BlockEntity implements MenuP
             cart.recordStationSaplingTransfer(worldPosition);
         }
         return true;
+    }
+
+    /** Grove Warden carts take bone meal from the station's fertilizer store. */
+    private boolean loadCartFertilizer(ForestryCartEntity cart) {
+        int moved = fertilizer > 0 ? cart.acceptFertilizer(fertilizer) : 0;
+        fertilizer -= moved;
+        return moved > 0;
+    }
+
+    private int storeFertilizer(int count, boolean simulate) {
+        int accepted = Math.max(0, Math.min(count, ForestryCartEntity.FERTILIZER_CAPACITY - fertilizer));
+        if (!simulate && accepted > 0) {
+            fertilizer += accepted;
+            setChanged();
+        }
+        return accepted;
+    }
+
+    /** Bone meal a player placed in the sapling slot moves into the fertilizer store, so it never blocks saplings. */
+    private void absorbSlotFertilizer() {
+        ItemStack stack = processInventory.getStackInSlot(SLOT_SAPLING);
+        if (ForestryCartEntity.isFertilizerStack(stack)) {
+            int accepted = storeFertilizer(stack.getCount(), false);
+            if (accepted > 0) {
+                processInventory.extractItem(SLOT_SAPLING, accepted, false);
+            }
+        }
     }
 
     private boolean loadCartShears(ForestryCartEntity cart) {

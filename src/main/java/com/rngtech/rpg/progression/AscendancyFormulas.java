@@ -53,6 +53,53 @@ public final class AscendancyFormulas {
         return 1.0 + Math.min(cap, Math.max(0.0, stats.value(MachineStat.OVERDRIVE_SPEED)) * over / 10.0) / 100.0;
     }
 
+    /** Units of the largest input banked by Flux for one alloy craft; Reactive Flux doubles it on direct-ingot routes. */
+    public static double fluxShare(MachineStatAccumulator stats, boolean doubled) {
+        return Math.max(0.0, stats.value(MachineStat.FLUX_RATE)) / 100.0 * (doubled ? 2 : 1);
+    }
+
+    /**
+     * The ingredient an input saving may skip: the one with the largest count, first on a tie, and only when it needs at
+     * least two units, so no saving removes an input entirely. Returns -1 when there is none.
+     */
+    public static int savableIngredient(int[] counts) {
+        int best = -1;
+        for (int index = 0; index < counts.length; index++) {
+            if (counts[index] >= 2 && (best < 0 || counts[index] > counts[best])) {
+                best = index;
+            }
+        }
+        return best;
+    }
+
+    /** The Resonant Streak's stability floor bonus: Streak Floor per earlier calibration, up to the Streak Cap. */
+    public static int streakFloor(int streak, MachineStatAccumulator stats) {
+        return (int) Math.min(Math.max(0.0, stats.value(MachineStat.STREAK_CAP)), Math.max(0, streak) * Math.max(0.0, stats.value(MachineStat.STREAK_FLOOR)));
+    }
+
+    /** Fluid made by one melt: the recipe amount plus Fluid Yield, rounded down to whole millibuckets. */
+    public static int yieldedFluid(int amount, double yieldPercent) {
+        int base = Math.max(0, amount);
+        return base + (int) Math.floor(base * Math.max(0.0, yieldPercent) / 100.0 + 1.0E-9);
+    }
+
+    /** How far a recipe's minimum and safe maximum sit from its target, as a share of the authored window. */
+    public static double heatWindowScale(MachineStatAccumulator stats) {
+        return Math.max(0.1, 1.0 + stats.value(MachineStat.HEAT_WINDOW) / 100.0);
+    }
+
+    /** A window edge moved toward or away from the target by the Heat Window scale. */
+    public static int windowEdge(int target, int edge, MachineStatAccumulator stats) {
+        return (int) Math.round(target + (edge - target) * heatWindowScale(stats));
+    }
+
+    /** Bone meal uses in one growth pulse: the whole part of Growth Pulse, plus one more when {@code roll} falls under the rest. */
+    public static int pulseAttempts(MachineStatAccumulator stats, double roll) {
+        double strength = Math.max(0.0, stats.value(MachineStat.GROWTH_PULSE));
+        int whole = (int) Math.floor(strength + 1.0E-9);
+        return whole + (roll < strength - whole - 1.0E-9 ? 1 : 0);
+    }
+
     /** Items banked in the Bloom Ledger for one smelt; Crusher Line feeds crushed inputs twice. */
     public static double ledgerShare(MachineStatAccumulator stats, int baseCount, boolean doubled) {
         return Math.max(0.0, stats.value(MachineStat.LEDGER_RATE)) / 100.0 * Math.max(0, baseCount) * (doubled ? 2 : 1);

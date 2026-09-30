@@ -224,7 +224,7 @@ Launch stats:
 | `FLUID_YIELD` | Extra fluid on eligible melts | Pressure Vessel | Yes |
 | `OVERLEVEL_SPEED` | Processing Speed per Crush Head level above the recipe's requirement | Twin Crucible | No |
 | `CART_SPEED` | Cart movement speed | Timber Baron | No |
-| `GROWTH_PULSE` | Strength of the cart's FE-paid sapling growth pulse | Grove Warden | Yes |
+| `GROWTH_PULSE` | Bone meal uses per growth pulse; each pulse spends one bone meal and FE | Grove Warden | Yes |
 
 Existing stats extended to new families:
 
@@ -347,7 +347,8 @@ Speed, FE, heat, stability, and failure-strain changes are not yield. Stability 
     - Each loop is shrunk to a minimal recipe set and reported with its likely fix. Its bonus is then set aside, or the recipe removed when it has none, and the search repeats.
 - **Allowlist:** reviewed loops can be allowlisted with a written reason, and a stale entry fails the audit.
 - **Mutation self-tests:** re-enabling bonus output on copper ingot/dust, or on the calibrate-then-recycle pair, must fail the audit.
-- **Status:** the gate is on as of Phase 3. The audit passes on all 988 recipes with no allowlist entries. Phase 6 raised the Crusher bound to `12x` for the Assayer and Refiner's Oath and the Furnace bound to `3x` for the Bloom Ledger.
+- **World sources:** yields that act outside recipes, such as tree growth, are covered by a `worldSources` entry in the bounds file. Each lists the items that feed it, and a recipe that outputs one of them fails the audit. A mutation self-test makes Plant Reagent output bone meal and must fail.
+- **Status:** the gate is on as of Phase 3. The audit passes on all 988 recipes with no allowlist entries. Phase 6 raised the Crusher bound to `12x` for the Assayer and Refiner's Oath and the Furnace bound to `3x` for the Bloom Ledger. Phase 7 raised the Alloy Furnace and Metal Press bounds to `3x`, added a `1.6x` Melter bound for Fluid Yield, covered Mass Tuner's savings under calibration, and added the Forestry world source.
 
 ### Resolved cycles
 
@@ -356,11 +357,10 @@ Speed, FE, heat, stability, and failure-strain changes are not yield. Stability 
 - **Silica gel:** absorbing and recharging returns the same beads, so recharge Super Output duplicated them. Both recharge recipes opt out.
 - **Refinement Potential to FE through calibrated components:** does not exist. Calibrated components are not refinement targets, so the Potential Reactor pays nothing for them. The general case, stripping a recyclable machine or part for FE and recycling it back into its inputs, is modeled by the audit.
 
+- **FE to logs:** resolved in Phase 7. A growth pulse priced above the burn value of the wood it grows would cost hundreds of thousands of FE, because a log crafts into four planks worth 1,200 burn ticks, or smelts into 1,600-tick charcoal. Growth pulses therefore spend one bone meal each and FE only as an application cost, so FE never becomes wood. No recipe makes bone meal or saplings, and the audit's Forestry world source enforces that.
+
 ### Future yield checks
 
-- **FE to logs:**
-    - Grove Warden turns FE into tree growth, and logs burn in Solid Fuel Burners.
-    - A growth pulse must cost more FE than the burn value of the wood it produces at the strongest stacked rates, including Timber Baron's ledger on another cart. The audit models it once the stat exists.
 - **Refinement Potential:** no ascendancy node raises Refinement Potential, and catalyst-saving nodes are limited as described above.
 
 ## Launch Ascendancies
@@ -509,7 +509,7 @@ Crushed items currently come only from ore and raw inputs. The strongest Bloomer
 | ★ **Resonance Array** (after Lane Sync) | +1 Parallel Job per lane: each lane runs two jobs from one input stack; stability ceiling another −15. | N |
 | ★ **Overreach** (after Wide Tolerance) | +1 Coil Reach; 20% less Calibration Precision. | S |
 
-Mass Tuner's catalyst savings sit inside the Refinement Potential to FE cycle. Their final numbers depend on the loop audit passing.
+Mass Tuner's catalyst and stabilizer savings are covered by the calibration bound. The audit treats catalysts and stabilizers as free, so the savings cannot open a loop.
 
 ### Melter
 
@@ -559,7 +559,7 @@ The Forestry Companion's entry gate is its installed cutting tool head, and its 
 
 | Node | Effect | Cost |
 |---|---|---|
-| **Growth Pulse** (root) | As the cart passes a managed sapling, it spends FE on a growth pulse of bone-meal strength (Growth Pulse 1). Movement costs 25% more FE. | N |
+| **Growth Pulse** (root) | As the cart passes a managed sapling, it spends one bone meal from its fertilizer store and FE on a growth pulse that applies bone meal Growth Pulse times (Growth Pulse 1). Movement costs 25% more FE. | N |
 | +2 managed cells → **Nursery** | +8 managed cells. | S → S |
 | 10% increased Growth Pulse → **Rich Soil** | 50% increased Growth Pulse. | S → S |
 | 5% reduced Energy Usage → **Seed Library** | Each managed cell remembers its tree species and replants the same species. | S → N |

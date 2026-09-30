@@ -1,0 +1,172 @@
+{
+    "id": "metallurgist",
+    "family": "alloy_furnace",
+    "nodes": [
+        {
+            "id": "flux_ledger",
+            "kind": "ROOT",
+            "x": 0,
+            "y": 0,
+            "effects": [
+                {
+                    "stat": "FLUX_RATE",
+                    "operation": "ADD",
+                    "value": 10
+                }
+            ]
+        },
+        {
+            "id": "flux_rate",
+            "kind": "SMALL",
+            "parent": "flux_ledger",
+            "x": -2,
+            "y": 1,
+            "effects": [
+                {
+                    "stat": "FLUX_RATE",
+                    "operation": "ADD",
+                    "value": 3
+                }
+            ]
+        },
+        {
+            "id": "reactive_flux",
+            "kind": "NOTABLE",
+            "parent": "flux_rate",
+            "x": -2,
+            "y": 2,
+            "behaviors": [
+                "REACTIVE_FLUX"
+            ]
+        },
+        {
+            "id": "lock_stability",
+            "kind": "SMALL",
+            "parent": "flux_ledger",
+            "x": -1,
+            "y": 1,
+            "effects": [
+                {
+                    "stat": "TEMPERATURE_STABILITY",
+                    "operation": "INCREASED_PERCENT",
+                    "value": 8
+                }
+            ]
+        },
+        {
+            "id": "recipe_lock",
+            "kind": "NOTABLE",
+            "parent": "lock_stability",
+            "x": -1,
+            "y": 2,
+            "behaviors": [
+                "RECIPE_LOCK"
+            ]
+        },
+        {
+            "id": "dross_stability",
+            "kind": "SMALL",
+            "parent": "flux_ledger",
+            "x": 1,
+            "y": 1,
+            "effects": [
+                {
+                    "stat": "STABILITY",
+                    "operation": "INCREASED_PERCENT",
+                    "value": 8
+                }
+            ]
+        },
+        {
+            "id": "dross_skimming",
+            "kind": "NOTABLE",
+            "parent": "dross_stability",
+            "x": 1,
+            "y": 2,
+            "behaviors": [
+                "DROSS_SKIMMING"
+            ]
+        },
+        {
+            "id": "heat_energy",
+            "kind": "SMALL",
+            "parent": "flux_ledger",
+            "x": 2,
+            "y": 1,
+            "effects": [
+                {
+                    "stat": "ENERGY_USAGE",
+                    "operation": "DECREASED_PERCENT",
+                    "value": 5
+                }
+            ]
+        },
+        {
+            "id": "heat_economy",
+            "kind": "NOTABLE",
+            "parent": "heat_energy",
+            "x": 2,
+            "y": 2,
+            "behaviors": [
+                "HEAT_ECONOMY"
+            ]
+        },
+        {
+            "id": "transmuter_flux",
+            "kind": "SMALL",
+            "parent": "reactive_flux",
+            "x": -2,
+            "y": 3,
+            "effects": [
+                {
+                    "stat": "FLUX_RATE",
+                    "operation": "ADD",
+                    "value": 3
+                }
+            ]
+        },
+        {
+            "id": "transmuters_rate",
+            "kind": "NOTABLE",
+            "parent": "transmuter_flux",
+            "x": -2,
+            "y": 4,
+            "effects": [
+                {
+                    "stat": "FLUX_RATE",
+                    "operation": "ADD",
+                    "value": 12
+                },
+                {
+                    "stat": "PROCESSING_SPEED",
+                    "operation": "LESS",
+                    "value": 0.75
+                }
+            ]
+        },
+        {
+            "id": "pour_chance",
+            "kind": "SMALL",
+            "parent": "recipe_lock",
+            "x": -1,
+            "y": 3,
+            "effects": [
+                {
+                    "stat": "SUPER_OUTPUT_CHANCE",
+                    "operation": "ADD",
+                    "value": 1
+                }
+            ]
+        },
+        {
+            "id": "unbroken_pour",
+            "kind": "NOTABLE",
+            "parent": "pour_chance",
+            "x": -1,
+            "y": 4,
+            "fixed": {
+                "SUPER_OUTPUT_CADENCE": 32
+            }
+        }
+    ]
+}

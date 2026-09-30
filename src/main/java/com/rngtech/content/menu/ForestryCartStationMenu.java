@@ -1,6 +1,7 @@
 package com.rngtech.content.menu;
 
 import com.rngtech.content.blockentity.ForestryCartStationBlockEntity;
+import com.rngtech.content.entity.ForestryCartEntity;
 import com.rngtech.content.item.EnergyConnectorItem;
 import com.rngtech.content.item.FluidConnectorItem;
 import com.rngtech.content.item.ItemConnectorItem;
@@ -39,7 +40,8 @@ public class ForestryCartStationMenu extends AbstractContainerMenu {
     private static final int DATA_ITEM_TRANSFER = 6;
     private static final int DATA_FLUID_TRANSFER = 7;
     private static final int DATA_CURRENT_ACTION = 8;
-    private static final int DATA_COUNT = 9;
+    private static final int DATA_FERTILIZER = 9;
+    private static final int DATA_COUNT = 10;
 
     private static final int SAPLING_SLOT = ForestryCartStationBlockEntity.SLOT_SAPLING;
     private static final int OUTPUT_SLOT_START = ForestryCartStationBlockEntity.SLOT_OUTPUT_START;
@@ -159,6 +161,10 @@ public class ForestryCartStationMenu extends AbstractContainerMenu {
         return data.get(DATA_FLUID_TRANSFER);
     }
 
+    public int fertilizer() {
+        return data.get(DATA_FERTILIZER);
+    }
+
     @Override
     public boolean clickMenuButton(Player player, int id) {
         if (player.level().isClientSide) {
@@ -186,7 +192,7 @@ public class ForestryCartStationMenu extends AbstractContainerMenu {
             if (!moveItemStackTo(stack, PLAYER_INVENTORY_START, HOTBAR_END, false)) {
                 return ItemStack.EMPTY;
             }
-        } else if (station.isSaplingStack(stack)) {
+        } else if (station.isSaplingStack(stack) || ForestryCartEntity.isFertilizerStack(stack)) {
             if (!moveItemStackTo(stack, SAPLING_SLOT, SAPLING_SLOT + 1, false)) {
                 return ItemStack.EMPTY;
             }

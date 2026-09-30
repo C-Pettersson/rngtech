@@ -41,6 +41,17 @@ public final class ModTags {
         /** Ore, raw, and crushed inputs whose smelts feed the Bloomer's ledger. */
         public static final TagKey<Item> BLOOM_LEDGER_INPUTS =
                 TagKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath(RNGTech.MOD_ID, "bloom_ledger_inputs"));
+        public static final TagKey<Item> PLATE_MOLDS =
+                TagKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath(RNGTech.MOD_ID, "plate_molds"));
+        public static final TagKey<Item> GEAR_MOLDS =
+                TagKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath(RNGTech.MOD_ID, "gear_molds"));
+        public static final TagKey<Item> CASING_MOLDS =
+                TagKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath(RNGTech.MOD_ID, "casing_molds"));
+        public static final TagKey<Item> CIRCUIT_MOLDS =
+                TagKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath(RNGTech.MOD_ID, "circuit_molds"));
+        /** Saplings Ancient Grove plants as 2x2 giant trees. */
+        public static final TagKey<Item> GIANT_SAPLINGS =
+                TagKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath(RNGTech.MOD_ID, "giant_saplings"));
         public static final TagKey<Item> METAL_PRESS_MOLDS =
                 TagKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath(RNGTech.MOD_ID, "metal_press_molds"));
         public static final TagKey<Item> MANUAL_RECYCLER_INPUTS =

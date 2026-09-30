@@ -107,7 +107,19 @@ public enum MachineStat implements StringRepresentable {
     OVERDRIVE_CAP,
     OVERDRIVE_MARGIN,
     STRAIN_RECOVERY,
-    LEDGER_RATE;
+    LEDGER_RATE,
+    FLUX_RATE,
+    BLEND_SPEED,
+    BLEND_HEAT_REDUCTION,
+    MOLD_SWAP_TIME,
+    HEAT_WINDOW,
+    STREAK_FLOOR,
+    STREAK_CAP,
+    COIL_REACH,
+    FLUID_YIELD,
+    OVERLEVEL_SPEED,
+    CART_SPEED,
+    GROWTH_PULSE;
 
     public static final Codec<MachineStat> CODEC = StringRepresentable.fromEnum(MachineStat::values);
     public static final StreamCodec<ByteBuf, MachineStat> STREAM_CODEC =
