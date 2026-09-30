@@ -26,6 +26,8 @@ import com.rngtech.rpg.MachineTraits;
 import com.rngtech.rpg.MachineType;
 import com.rngtech.rpg.ModifierOperation;
 import com.rngtech.rpg.ModifierSlot;
+import com.rngtech.rpg.OutputLedger;
+import com.rngtech.rpg.progression.AscendancyFormulas;
 import com.rngtech.rpg.progression.FurnacePassiveTree;
 import com.rngtech.rpg.progression.MachineMasteryFamily;
 import com.rngtech.rpg.progression.MachineMasteryHost;
@@ -35,15 +37,20 @@ import com.rngtech.rpg.progression.MegaPassiveNode;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.Containers;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerData;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.item.crafting.SingleRecipeInput;
@@ -53,6 +60,9 @@ import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.energy.IEnergyStorage;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.ItemStackHandler;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuProvider, MachineInfoProvider, MachineMasteryHost {
     public static final int MAX_PROCESSING_SLOTS = 4;
@@ -109,7 +119,8 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
     private static final int DATA_FAILURE_STRAIN_START = DATA_OVERHEAT_TEMPERATURE_START + MAX_PROCESSING_SLOTS;
     private static final int DATA_FAILURE_ENABLED_START = DATA_FAILURE_STRAIN_START + MAX_PROCESSING_SLOTS;
     private static final int DATA_POWER_SENSITIVE_START = DATA_FAILURE_ENABLED_START + MAX_PROCESSING_SLOTS;
-    private static final int DATA_MACHINE_PROGRESSION_START = DATA_POWER_SENSITIVE_START + MAX_PROCESSING_SLOTS;
+    private static final int DATA_LEDGER_START = DATA_POWER_SENSITIVE_START + MAX_PROCESSING_SLOTS;
+    private static final int DATA_MACHINE_PROGRESSION_START = DATA_LEDGER_START + MAX_PROCESSING_SLOTS;
     private static final int DATA_COUNT = DATA_MACHINE_PROGRESSION_START + MasteryMenuSupport.FIELD_COUNT;
     private static final int STAT_SCALE = 100;
 
@@ -214,6 +225,9 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
                 int lane = index - DATA_POWER_SENSITIVE_START;
                 return powerSensitiveActive(lane, statsForLane(lane)) ? 1 : 0;
             }
+            if (index >= DATA_LEDGER_START && index < DATA_LEDGER_START + MAX_PROCESSING_SLOTS) {
+                return ledgerDisplay(index - DATA_LEDGER_START);
+            }
             if (index >= DATA_MACHINE_PROGRESSION_START
                     && index < DATA_MACHINE_PROGRESSION_START + MasteryMenuSupport.FIELD_COUNT) {
                 return MasteryMenuSupport.get(FurnaceBlockEntity.this, index - DATA_MACHINE_PROGRESSION_START, FurnaceBlockEntity.this::effectiveStats);
@@ -262,6 +276,7 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
     private final int[] failureStrain = new int[MAX_PROCESSING_SLOTS];
     private final boolean[] targetReached = new boolean[MAX_PROCESSING_SLOTS];
     private final ItemStack[] activeInputs = emptyInputs();
+    private final OutputLedger<Item> bloomLedger = new OutputLedger<>();
     private int burnTime;
     private int totalBurnTime;
     private int internalEnergy;
@@ -294,7 +309,7 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
             }
             changed |= furnace.rememberHeatEnvelope(lane, recipe);
 
-            if (furnace.progress[lane] == 0 && furnace.currentTemperature[lane] < recipe.targetTemperature()) {
+            if (furnace.progress[lane] == 0 && furnace.currentTemperature[lane] < furnace.targetTemperature(recipe)) {
                 furnace.targetReached[lane] = false;
             }
             int requiredTemperature = furnace.requiredTemperatureForProgress(lane, recipe);
@@ -364,8 +379,9 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
             furnace.progress[lane]++;
             running = true;
             changed = true;
+            changed |= furnace.overdrive(lane, recipe, laneStats);
 
-            if (furnace.progress[lane] >= furnace.processingTicks(recipe, laneStats)) {
+            if (furnace.progress[lane] >= furnace.processingTicks(lane, recipe, laneStats)) {
                 if (furnace.process(lane, recipe, laneStats)) {
                     changed |= furnace.bulkSpeed.recordProcess(furnace.activeTraits());
                 }
@@ -519,6 +535,14 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
         tag.putInt("TotalBurnTime", totalBurnTime);
         tag.putInt("Energy", internalEnergyStored());
         bulkSpeed.save(tag);
+        ListTag ledger = new ListTag();
+        bloomLedger.entries().forEach((item, amount) -> {
+            CompoundTag entry = new CompoundTag();
+            entry.putString("Item", BuiltInRegistries.ITEM.getKey(item).toString());
+            entry.putDouble("Progress", amount);
+            ledger.add(entry);
+        });
+        tag.put("BloomLedger", ledger);
     }
 
     @Override
@@ -576,6 +600,15 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
         internalEnergy = Math.max(0, tag.getInt("Energy"));
         bulkSpeed.load(tag);
         clampInternalEnergy();
+        Map<Item, Double> ledger = new HashMap<>();
+        for (Tag element : tag.getList("BloomLedger", Tag.TAG_COMPOUND)) {
+            CompoundTag entry = (CompoundTag) element;
+            ResourceLocation id = ResourceLocation.tryParse(entry.getString("Item"));
+            if (id != null) {
+                BuiltInRegistries.ITEM.getOptional(id).ifPresent(item -> ledger.put(item, entry.getDouble("Progress")));
+            }
+        }
+        bloomLedger.restore(ledger);
     }
 
     public static boolean isFuel(ItemStack stack) {
@@ -692,7 +725,7 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
             return null;
         }
         FurnaceRecipe recipe = FurnaceRecipes.find(level, input).orElse(null);
-        if (recipe == null || !meetsRecipeRequirements(recipe, stats) || !canAcceptOutput(lane, recipe)) {
+        if (recipe == null || !meetsRecipeRequirements(recipe, stats, input) || !canAcceptOutput(lane, recipe)) {
             return null;
         }
         return recipe;
@@ -706,12 +739,42 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
         return input.isEmpty() ? null : FurnaceRecipes.find(level, input).orElse(null);
     }
 
-    private boolean meetsRecipeRequirements(FurnaceRecipe recipe, MachineStatAccumulator stats) {
-        if (stats.intValue(MachineStat.MAX_TEMPERATURE) < recipe.targetTemperature()) {
+    private boolean meetsRecipeRequirements(FurnaceRecipe recipe, MachineStatAccumulator stats, ItemStack input) {
+        if (stats.intValue(MachineStat.MAX_TEMPERATURE) < targetTemperature(recipe)) {
             return false;
         }
-        return (recipe.hasFailureOutput() && furnaceMaterial().stage() >= 4)
+        return (recipe.hasFailureOutput() && furnaceMaterial().stage() >= 4 && !cleanBloom(input))
                 || stats.value(MachineStat.TEMPERATURE_STABILITY) >= recipe.requiredTemperatureStability();
+    }
+
+    /** Fluxed Blend lowers every temperature of a blend smelt. */
+    private int blendRelief(FurnaceRecipe recipe) {
+        if (!hasMasteryBehavior("FLUXED_BLEND")) {
+            return 0;
+        }
+        for (ItemStack stack : recipe.ingredient().getItems()) {
+            if (stack.is(ModTags.Items.ALLOY_BLEND_SMELTABLES)) {
+                return AscendancyFormulas.FLUXED_BLEND_DEGREES;
+            }
+        }
+        return 0;
+    }
+
+    private int targetTemperature(FurnaceRecipe recipe) {
+        return Math.max(0, recipe.targetTemperature() - blendRelief(recipe));
+    }
+
+    private int minimumTemperature(FurnaceRecipe recipe) {
+        return Math.max(0, recipe.minimumTemperature() - blendRelief(recipe));
+    }
+
+    private int safeMaximumTemperature(FurnaceRecipe recipe) {
+        return Math.max(targetTemperature(recipe), recipe.safeMaximumTemperature() - blendRelief(recipe));
+    }
+
+    /** Clean Bloom: ore, raw, and crushed smelts never fail; low stability pauses them as it does below Stage 4. */
+    private boolean cleanBloom(ItemStack input) {
+        return hasMasteryBehavior("CLEAN_BLOOM") && input.is(ModTags.Items.BLOOM_LEDGER_INPUTS);
     }
 
     private int currentMinimumTemperature(MachineStatAccumulator baseStats) {
@@ -727,10 +790,10 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
                 continue;
             }
             MachineStatAccumulator laneStats = statsForLane(lane);
-            if (laneStats.intValue(MachineStat.MAX_TEMPERATURE) < recipe.targetTemperature()) {
-                return recipe.minimumTemperature();
+            if (laneStats.intValue(MachineStat.MAX_TEMPERATURE) < targetTemperature(recipe)) {
+                return minimumTemperature(recipe);
             }
-            minimumTemperature = Math.max(minimumTemperature, recipe.minimumTemperature());
+            minimumTemperature = Math.max(minimumTemperature, minimumTemperature(recipe));
         }
         return minimumTemperature;
     }
@@ -752,7 +815,7 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
                 blockedStatus = STATUS_INVALID_RECIPE;
                 continue;
             }
-            if (laneStats.intValue(MachineStat.MAX_TEMPERATURE) < recipe.targetTemperature()) {
+            if (laneStats.intValue(MachineStat.MAX_TEMPERATURE) < targetTemperature(recipe)) {
                 blockedStatus = STATUS_HEAT_LOW;
                 continue;
             }
@@ -866,9 +929,23 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
     }
 
     private boolean process(int lane, FurnaceRecipe recipe, MachineStatAccumulator stats) {
-        if (level == null) {
+        if (level == null || !craft(lane, recipe, stats)) {
             return false;
         }
+        // Crucible Heart finishes a second input when the lane runs at twice the recipe target or hotter.
+        if (hasMasteryBehavior("CRUCIBLE_HEART")
+                && currentTemperature[lane] >= 2 * targetTemperature(recipe)
+                && recipe.matches(new SingleRecipeInput(inventory.getStackInSlot(inputSlot(lane))), level)
+                && canMergeOutput(outputSlot(lane), recipe.outputStack())
+                && payExtraCraft(lane, recipe, stats)) {
+            craft(lane, recipe, stats);
+        }
+        resetCycle(lane);
+        setChanged();
+        return true;
+    }
+
+    private boolean craft(int lane, FurnaceRecipe recipe, MachineStatAccumulator stats) {
         ItemStack input = inventory.getStackInSlot(inputSlot(lane));
         if (!recipe.matches(new SingleRecipeInput(input), level)) {
             return false;
@@ -884,12 +961,62 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
             }
         }
 
+        result = withLedger(recipe, stats, input, result, outputSlot);
         input.shrink(1);
         mergeOutput(outputSlot, result);
         grantRecipeXp(recipe);
         refundClosedLoopEnergy(recipe, stats);
-        resetCycle(lane);
-        setChanged();
+        return true;
+    }
+
+    /** The Bloom Ledger banks a share of each eligible smelt and pays whole items once the output has room. */
+    private ItemStack withLedger(FurnaceRecipe recipe, MachineStatAccumulator stats, ItemStack input, ItemStack result, int outputSlot) {
+        if (!ledgerEligible(recipe, input, stats)) {
+            return result;
+        }
+        ItemStack base = recipe.outputStack();
+        Item item = base.getItem();
+        boolean crushed = hasMasteryBehavior("CRUSHER_LINE") && input.is(ModTags.Items.CRUSHED_MATERIALS);
+        bloomLedger.add(item, AscendancyFormulas.ledgerShare(stats, base.getCount(), crushed));
+        int payable = bloomLedger.payable(item);
+        ItemStack paid = ProcessingChance.grow(result, base, payable);
+        if (paid == result || !canMergeOutput(outputSlot, paid)) {
+            return result;
+        }
+        bloomLedger.pay(item, payable);
+        return paid;
+    }
+
+    private boolean ledgerEligible(FurnaceRecipe recipe, ItemStack input, MachineStatAccumulator stats) {
+        return recipe.allowsBonusOutput() && stats.value(MachineStat.LEDGER_RATE) > 0.0 && input.is(ModTags.Items.BLOOM_LEDGER_INPUTS);
+    }
+
+    /** A lane's Bloom Ledger progress toward its next item, per thousand, or -1 when its smelt does not feed the ledger. */
+    private int ledgerDisplay(int lane) {
+        FurnaceRecipe recipe = findRecipeWithoutGates(lane);
+        if (recipe == null || lane >= activeProcessingSlots()
+                || !ledgerEligible(recipe, inventory.getStackInSlot(inputSlot(lane)), statsForLane(lane))) {
+            return -1;
+        }
+        double progress = bloomLedger.progress(recipe.outputStack().getItem());
+        return progress >= 1.0 ? 1000 : (int) Math.round(progress * 1000);
+    }
+
+    /** Crucible Heart's second input costs a second craft's FE, or its burn time on a fuel furnace. */
+    private boolean payExtraCraft(int lane, FurnaceRecipe recipe, MachineStatAccumulator stats) {
+        if (isElectric()) {
+            int cost = energyCostPerCraft(recipe, stats);
+            if (consumeWorkingEnergy(cost, true) < cost) {
+                return false;
+            }
+            consumeWorkingEnergy(cost, false);
+            return true;
+        }
+        int ticks = processingTicks(lane, recipe, stats);
+        if (burnTime < ticks) {
+            return false;
+        }
+        burnTime -= ticks;
         return true;
     }
 
@@ -1001,7 +1128,7 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
 
     private int currentProcessingTicks(int lane) {
         FurnaceRecipe recipe = findNextRecipe(lane);
-        return recipe == null ? 0 : processingTicks(recipe, statsForLane(lane));
+        return recipe == null ? 0 : processingTicks(lane, recipe, statsForLane(lane));
     }
 
     private int currentEnergyCostPerTick(int lane) {
@@ -1048,7 +1175,7 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
     private int currentTargetTemperature(int lane) {
         FurnaceRecipe recipe = findNextRecipe(lane);
         if (recipe != null) {
-            return recipe.targetTemperature();
+            return targetTemperature(recipe);
         }
         return hasCooldownHeat(lane) ? lastTargetTemperature[lane] : 0;
     }
@@ -1056,7 +1183,7 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
     private int currentSafeMaximumTemperature(int lane) {
         FurnaceRecipe recipe = findNextRecipe(lane);
         if (recipe != null) {
-            return recipe.safeMaximumTemperature();
+            return safeMaximumTemperature(recipe);
         }
         return hasCooldownHeat(lane) ? lastSafeMaximumTemperature[lane] : 0;
     }
@@ -1065,20 +1192,45 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
         FurnaceRecipe recipe = findNextRecipe(lane);
         int safeMaximumTemperature = recipe == null
                 ? hasCooldownHeat(lane) ? lastSafeMaximumTemperature[lane] : 0
-                : recipe.safeMaximumTemperature();
+                : safeMaximumTemperature(recipe);
         if (safeMaximumTemperature <= 0) {
             return 0;
         }
         return HeatControl.effectiveOverheatTemperature(safeMaximumTemperature, statsForLane(lane));
     }
 
-    private int processingTicks(FurnaceRecipe recipe, MachineStatAccumulator stats) {
-        return stats.adjustedHeatProcessingTicks(recipe.processingTicks());
+    /** Overdrive shortens a lane's cycle while it runs above the recipe target; the cycle's FE stays the same. */
+    private int processingTicks(int lane, FurnaceRecipe recipe, MachineStatAccumulator stats) {
+        int ticks = stats.adjustedHeatProcessingTicks(recipe.processingTicks());
+        double overdrive = AscendancyFormulas.overdriveSpeedMultiplier(currentTemperature[lane], targetTemperature(recipe), stats);
+        return Math.max(1, (int) Math.ceil(ticks / overdrive));
     }
 
     private int energyCostForProgress(int lane, FurnaceRecipe recipe, MachineStatAccumulator stats) {
-        int adjustedTicks = stats.adjustedHeatProcessingTicks(recipe.processingTicks());
+        int adjustedTicks = processingTicks(lane, recipe, stats);
         return stats.adjustedEnergyCostForProgress(ProcessingEnergyScaling.furnaceEnergy(recipe), adjustedTicks, progress[lane]);
+    }
+
+    /** Overdrive heats toward the lane maximum, or stops Overdrive Margin below the recipe's safe maximum. */
+    private int overdriveTarget(FurnaceRecipe recipe, MachineStatAccumulator stats) {
+        int ceiling = stats.intValue(MachineStat.MAX_TEMPERATURE);
+        int margin = stats.intValue(MachineStat.OVERDRIVE_MARGIN);
+        if (margin > 0 || hasMasteryBehavior("SAFE_OVERDRIVE")) {
+            ceiling = Math.min(ceiling, safeMaximumTemperature(recipe) - margin);
+        }
+        return Math.max(targetTemperature(recipe), ceiling);
+    }
+
+    /** Overdrive keeps heating a working lane past the recipe target; each step costs another heat tick. */
+    private boolean overdrive(int lane, FurnaceRecipe recipe, MachineStatAccumulator stats) {
+        if (stats.value(MachineStat.OVERDRIVE_CAP) <= 0.0 || stats.value(MachineStat.OVERDRIVE_SPEED) <= 0.0) {
+            return false;
+        }
+        int target = overdriveTarget(recipe, stats);
+        if (currentTemperature[lane] >= target || !payHeatTick(lane, recipe, stats)) {
+            return false;
+        }
+        return warmLane(lane, recipe, stats, target);
     }
 
     private int energyCostPerCraft(FurnaceRecipe recipe, MachineStatAccumulator stats) {
@@ -1088,6 +1240,11 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
     private MachineStatAccumulator statsForLane(int lane) {
         MachineStatAccumulator stats = baseEffectiveStats();
         applyLaneGearStats(stats, lane);
+        applySharedHearth(stats);
+        if (hasMasteryBehavior("SLAG_RECLAIM") && inventory.getStackInSlot(inputSlot(lane)).is(ModTags.Items.MALFORMED_INGOTS)) {
+            stats.apply(new MachineModifier(ModifierSlot.IMPLICIT, MachineStat.PROCESSING_SPEED, ModifierOperation.MORE, 2.0));
+            stats.apply(new MachineModifier(ModifierSlot.IMPLICIT, MachineStat.ENERGY_USAGE, ModifierOperation.LESS, 0.5));
+        }
         if (alloyBlendActive(lane)) {
             stats.apply(new MachineModifier(
                     ModifierSlot.IMPLICIT,
@@ -1097,6 +1254,19 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
             ));
         }
         return stats;
+    }
+
+    /** Shared Hearth: on a Heat Core furnace, every lane reaches at least 90% of the hottest core's maximum. */
+    private void applySharedHearth(MachineStatAccumulator stats) {
+        if (!usesHeatCores() || !hasMasteryBehavior("SHARED_HEARTH")) {
+            return;
+        }
+        MachineStatAccumulator hottest = baseEffectiveStats();
+        applyBestHeatCoreStats(hottest);
+        double shared = Math.floor(hottest.value(MachineStat.MAX_TEMPERATURE) * AscendancyFormulas.SHARED_HEARTH_SHARE);
+        if (shared > stats.value(MachineStat.MAX_TEMPERATURE)) {
+            stats.setAbsolute(MachineStat.MAX_TEMPERATURE, shared);
+        }
     }
 
     private void applyLaneGearStats(MachineStatAccumulator stats, int lane) {
@@ -1271,7 +1441,7 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
     }
 
     private int requiredTemperatureForProgress(int lane, FurnaceRecipe recipe) {
-        return targetReached[lane] ? recipe.minimumTemperature() : recipe.targetTemperature();
+        return targetReached[lane] ? minimumTemperature(recipe) : targetTemperature(recipe);
     }
 
     private boolean warmLane(int lane, FurnaceRecipe recipe, MachineStatAccumulator stats, int requiredTemperature) {
@@ -1283,17 +1453,17 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
             return false;
         }
         currentTemperature[lane] = nextTemperature;
-        if (currentTemperature[lane] >= recipe.targetTemperature()) {
+        if (currentTemperature[lane] >= targetTemperature(recipe)) {
             targetReached[lane] = true;
         }
         return true;
     }
 
     private boolean rememberHeatEnvelope(int lane, FurnaceRecipe recipe) {
-        boolean changed = lastTargetTemperature[lane] != recipe.targetTemperature()
-                || lastSafeMaximumTemperature[lane] != recipe.safeMaximumTemperature();
-        lastTargetTemperature[lane] = recipe.targetTemperature();
-        lastSafeMaximumTemperature[lane] = recipe.safeMaximumTemperature();
+        boolean changed = lastTargetTemperature[lane] != targetTemperature(recipe)
+                || lastSafeMaximumTemperature[lane] != safeMaximumTemperature(recipe);
+        lastTargetTemperature[lane] = targetTemperature(recipe);
+        lastSafeMaximumTemperature[lane] = safeMaximumTemperature(recipe);
         return changed;
     }
 
@@ -1309,6 +1479,9 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
     }
 
     private boolean coolLane(int lane, MachineStatAccumulator stats) {
+        if (hasMasteryBehavior("HOLD_THE_FIRE") && findRecipeWithoutGates(lane) != null) {
+            return false;
+        }
         int nextTemperature = Math.max(HeatControl.AMBIENT_TEMPERATURE, currentTemperature[lane] - HeatControl.coolingRate(stats));
         boolean changed = false;
         if (nextTemperature != currentTemperature[lane]) {
@@ -1348,17 +1521,21 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
 
         int simulatedTemperature = HeatControl.simulatedTemperature(
                 currentTemperature[lane],
-                recipe.targetTemperature(),
+                targetTemperature(recipe),
                 recipe.requiredTemperatureStability(),
                 stats,
                 worldPosition,
                 level == null ? 0L : level.getGameTime(),
                 lane
         );
+        int overheatTemperature = HeatControl.effectiveOverheatTemperature(safeMaximumTemperature(recipe), stats);
+        if (hasMasteryBehavior("SAFE_OVERDRIVE") && currentTemperature[lane] > targetTemperature(recipe)) {
+            simulatedTemperature = Math.min(simulatedTemperature, overheatTemperature);
+        }
         int addedStrain = HeatControl.failureStrainFromTemperature(
                 simulatedTemperature,
-                recipe.minimumTemperature(),
-                HeatControl.effectiveOverheatTemperature(recipe.safeMaximumTemperature(), stats),
+                minimumTemperature(recipe),
+                overheatTemperature,
                 recipe.requiredTemperatureStability(),
                 stats
         );
@@ -1393,7 +1570,8 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
         return recipe != null
                 && recipe.hasFailureOutput()
                 && furnaceMaterial().stage() >= 4
-                && stats.intValue(MachineStat.MAX_TEMPERATURE) >= recipe.targetTemperature();
+                && !cleanBloom(inventory.getStackInSlot(inputSlot(lane)))
+                && stats.intValue(MachineStat.MAX_TEMPERATURE) >= targetTemperature(recipe);
     }
 
     private boolean powerSensitiveActive(int lane, MachineStatAccumulator stats) {

@@ -76,8 +76,10 @@ final class HeatControl {
         return Mth.clamp((int) Math.round(risk), 0, 100);
     }
 
+    /** Strain drained per tick inside the safe band; Strain Recovery adds to it. */
     static int strainRecovery(MachineStatAccumulator stats) {
-        return Math.max(4, (int) Math.round(6.0 * Math.max(0.25, stats.value(MachineStat.TEMPERATURE_STABILITY))));
+        return Math.max(4, (int) Math.round(6.0 * Math.max(0.25, stats.value(MachineStat.TEMPERATURE_STABILITY))))
+                + stats.intValue(MachineStat.STRAIN_RECOVERY);
     }
 
     static int powerDropStrain(MachineTraits traits) {

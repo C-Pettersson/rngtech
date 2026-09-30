@@ -52,6 +52,13 @@ public final class MegaPassiveTree {
         return sources;
     }
 
+    /** Every behavior granted by allocated shared-tree and ascendancy nodes. */
+    public static Set<String> behaviors(MachineProgressionState state) {
+        Set<String> behaviors = new HashSet<>();
+        sources(state).forEach(source -> behaviors.addAll(source.behaviors()));
+        return Set.copyOf(behaviors);
+    }
+
     public static boolean has(MachineProgressionState state, String behavior) {
         return sources(state).stream().anyMatch(source -> source.behaviors().contains(behavior));
     }

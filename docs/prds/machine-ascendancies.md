@@ -347,7 +347,7 @@ Speed, FE, heat, stability, and failure-strain changes are not yield. Stability 
     - Each loop is shrunk to a minimal recipe set and reported with its likely fix. Its bonus is then set aside, or the recipe removed when it has none, and the search repeats.
 - **Allowlist:** reviewed loops can be allowlisted with a written reason, and a stale entry fails the audit.
 - **Mutation self-tests:** re-enabling bonus output on copper ingot/dust, or on the calibrate-then-recycle pair, must fail the audit.
-- **Status:** the gate is on as of Phase 3. The audit passes on all 982 recipes with no allowlist entries.
+- **Status:** the gate is on as of Phase 3. The audit passes on all 988 recipes with no allowlist entries. Phase 6 raised the Crusher bound to `12x` for the Assayer and Refiner's Oath and the Furnace bound to `3x` for the Bloom Ledger.
 
 ### Resolved cycles
 
@@ -384,8 +384,8 @@ Each ascendancy lists the stats it introduces. Every yield effect applies only t
 | 3 High-Hardness Mitigation → **Fault Lines** | Under-level cycles keep positive Output Amount. Super Output and salvage stay off. | S → H |
 | +10% Under-Level Efficiency → **Pressure Stacking** | +40% Under-Level Efficiency: each missing level beyond the tolerance adds `+0.5x` time and FE instead of `+1.0x`. | S → S |
 | 5% reduced Energy Usage → **Shatter Point** | The FE surcharge on level 7+ recipes drops from `2.0x` to `1.5x`. | S → H |
-| ★ **Bedrock Bite** (after Pressure Stacking) | +1 Hardness Tolerance. | S |
-| ★ **Rubble Reclaimer** (after Fault Lines) | Under-level cycles can roll salvage at half chance. | H |
+| +10% Under-Level Efficiency → ★ **Bedrock Bite** (after Pressure Stacking) | +1 Hardness Tolerance. | S |
+| +2% salvage → ★ **Rubble Reclaimer** (after Fault Lines) | Under-level cycles can roll salvage at half chance. | H |
 
 **Assayer** keeps every fraction of bonus output. Introduces `BANK_MEMORY`, `AT_LEVEL_OUTPUT`, and `SUPER_OUTPUT_CADENCE`.
 
@@ -396,8 +396,8 @@ Each ascendancy lists the stats it introduces. Every yield effect applies only t
 | 4% increased Output Amount → **Compound Yield** | A bank payout can also trigger Super Output. | S → H |
 | +1% Super Output chance → **Tailings Recovery** | +3% salvage; salvage that does not fit the output is banked instead of lost. | S → H |
 | +5% At-Level Output → **Matched Hardness** | +15% At-Level Output. | S → S |
-| ★ **Mother Lode** (after Compound Yield) | Super Output Cadence 16: every 16th eligible cycle on the same input is a guaranteed Super Output. | S |
-| ★ **Refiner's Oath** (after Wide Ledger) | Dense Parallel is off; 5% more Output Amount per Parallel Job, up to 50%. | H |
+| +1% Super Output chance → ★ **Mother Lode** (after Compound Yield) | Super Output Cadence 16: every 16th eligible cycle on the same input is a guaranteed Super Output. | S |
+| 4% increased Output Amount → ★ **Refiner's Oath** (after Wide Ledger) | Dense Parallel is off; 5% more Output Amount per Parallel Job, up to 50%. | H |
 
 Refiner's Oath counts Parallel Jobs from every source: chassis, Crusher Throughput prefixes, and Dense Batching. A one-job chassis gets 5%, Tungstensteel 20%, Exotic 45%, and 10 or more jobs reach the 50% cap.
 
@@ -412,8 +412,8 @@ Refiner's Oath counts Parallel Jobs from every source: chassis, Crusher Throughp
 | 10% increased Heat Isolation → **Hold the Fire** | A lane does not cool while its input slot holds a valid input. | S → H |
 | +10 °C Overdrive Margin → **Safe Margin** | +15 °C Overdrive Margin; Overdrive never enters a recipe's overheat band. | S → H |
 | 4% increased Max Temperature → **Shared Hearth** | Lead Furnace: every lane uses the hottest installed Heat Core's maximum at 90%. | S → H |
-| ★ **Crucible Heart** (after Superheat) | Recipes whose target is at most half the lane's temperature finish two inputs per cycle at twice the FE. | N |
-| ★ **Strain Bleed** (after Safe Margin) | +10 Strain Recovery: failure strain drains 10 per tick while a lane is inside its safe band. | S |
+| 10% increased Heat Transfer → ★ **Crucible Heart** (after Superheat) | Recipes whose target is at most half the lane's temperature finish two inputs per cycle at twice the FE. | N |
+| +2 Strain Recovery → ★ **Strain Bleed** (after Safe Margin) | +10 Strain Recovery: failure strain drains 10 per tick while a lane is inside its safe band. | S |
 
 Today lanes stop warming at the recipe's required temperature (`FurnaceBlockEntity.warmLane`), so Overdrive Lanes changes that warm target.
 
@@ -426,8 +426,8 @@ Today lanes stop warming at the recipe's required temperature (`FurnaceBlockEnti
 | 8% increased Temperature Stability → **Fluxed Blend** | Blend smelts need 100 °C less. | S → H |
 | 8% increased Stability → **Slag Reclaim** | Malformed-ingot recovery takes half the time and half the FE. Its output is unchanged, because the recovery recipes opt out of bonus output. | S → H |
 | 10% increased Ledger Rate → **Crusher Line** | Crushed inputs feed the ledger twice. | S → H |
-| ★ **Patient Bloom** (after Rich Blooms) | 50% more Ledger Rate; 30% less Processing Speed. | S |
-| ★ **Clean Bloom** (after Slag Reclaim) | Ore smelts never produce failure outputs; failures pause the lane as at Stages 0–3. | H |
+| 10% increased Ledger Rate → ★ **Patient Bloom** (after Rich Blooms) | 50% more Ledger Rate; 30% less Processing Speed. | S |
+| 8% increased Temperature Stability → ★ **Clean Bloom** (after Slag Reclaim) | Ore smelts never produce failure outputs; failures pause the lane as at Stages 0–3. | H |
 
 Crushed items currently come only from ore and raw inputs. The strongest Bloomer build (Rich Blooms, Patient Bloom, Crusher Line) banks about 0.73 of an ingot per crushed smelt. Check it against the ore duplication budget together with the Crusher's Output Amount.
 

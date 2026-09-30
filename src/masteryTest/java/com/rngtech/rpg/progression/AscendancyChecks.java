@@ -2,8 +2,13 @@ package com.rngtech.rpg.progression;
 
 import com.rngtech.client.screen.AscendancyTreeLayout;
 import com.rngtech.content.menu.MasteryMenuSupport;
+import com.rngtech.rpg.BonusBanks;
+import com.rngtech.rpg.MachineModifier;
 import com.rngtech.rpg.MachineStat;
 import com.rngtech.rpg.MachineStatAccumulator;
+import com.rngtech.rpg.ModifierOperation;
+import com.rngtech.rpg.ModifierSlot;
+import com.rngtech.rpg.OutputLedger;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -45,15 +50,17 @@ final class AscendancyChecks {
         clientSync();
         bonusSummary();
         panelLayout();
+        launchContent();
+        bonusBanks();
+        outputLedger();
+        formulas();
         mainCatalogAssets();
         return checks;
     }
 
     private static void catalog() {
-        require(AscendancyCatalog.forFamily(CRUSHER).stream().map(Ascendancy::id).toList().equals(List.of(ALPHA, BETA, GAMMA)),
-                "a family can have more than two ascendancies, listed in index order");
-        require(AscendancyCatalog.forFamily(MachineMasteryFamily.FURNACE).stream().map(Ascendancy::id).toList().equals(List.of(FURNACE)),
-                "ascendancies belong to their own family");
+        require(fixtures(CRUSHER).equals(List.of(ALPHA, BETA, GAMMA)), "a family can have more than two ascendancies, listed in index order");
+        require(fixtures(MachineMasteryFamily.FURNACE).equals(List.of(FURNACE)), "ascendancies belong to their own family");
         require(AscendancyCatalog.forFamily(MachineMasteryFamily.MELTER).isEmpty(), "a family without entries has no ascendancies");
         for (Ascendancy ascendancy : AscendancyCatalog.all()) {
             require(AscendancyCatalog.violations(ascendancy).isEmpty(), ascendancy.id() + " follows the tree rules");
@@ -300,10 +307,23 @@ final class AscendancyChecks {
         require(MasteryBuildCode.copy(synced).ascendancyNodes().equals(host.state.ascendancyNodes()), "the screen's Copy includes the ascendancy");
         var none = MasteryMenuSupport.snapshot(synced(new Host(MachineProgressionState.EMPTY.forFamily(CRUSHER), s -> true)), 0, CRUSHER);
         require(none.ascendancy().isEmpty() && none.sealTiers() == 0 && none.ascendancyNodes().isEmpty(), "a machine without Seals syncs no ascendancy");
+
+        var rockbreaker = new Host(ascended("rockbreaker", List.of("jam_recovery", "jam_breaker"), 1), s -> true);
+        var stats = MachineStatAccumulator.componentBase(Map.of(MachineStat.JAM_CHANCE, 1.0));
+        MegaPassiveTree.applyStats(stats, rockbreaker.state, CRUSHER);
+        require(MasteryMenuSupport.grantedStats(synced(rockbreaker, stats), 0).equals(List.of(
+                new MasteryMenuSupport.GrantedStat(MachineStat.HARDNESS_TOLERANCE, 1.0),
+                new MasteryMenuSupport.GrantedStat(MachineStat.JAM_RECOVERY, 50.0),
+                new MasteryMenuSupport.GrantedStat(MachineStat.JAM_CHANCE, 0.5))), "menus sync granted ascendancy stats with their values");
+        require(MasteryMenuSupport.grantedStats(synced(new Host(MachineProgressionState.EMPTY.forFamily(CRUSHER), s -> true)), 0).isEmpty(),
+                "a machine without an ascendancy syncs no granted stats");
     }
 
     private static SimpleContainerData synced(Host host) {
-        var stats = MachineStatAccumulator.componentBase(Map.of());
+        return synced(host, MachineStatAccumulator.componentBase(Map.of()));
+    }
+
+    private static SimpleContainerData synced(Host host, MachineStatAccumulator stats) {
         var data = new SimpleContainerData(MasteryMenuSupport.FIELD_COUNT);
         for (int field = 0; field < MasteryMenuSupport.FIELD_COUNT; field++) {
             data.set(field, MasteryMenuSupport.get(host, field, () -> stats));
@@ -388,6 +408,137 @@ final class AscendancyChecks {
                         "icon texture: " + node.masteryIconKey());
             }
         }
+    }
+
+    private static List<String> fixtures(MachineMasteryFamily family) {
+        return AscendancyCatalog.forFamily(family).stream().map(Ascendancy::id).filter(id -> id.startsWith("fixture_")).toList();
+    }
+
+    /** The shipped Crusher and Furnace ascendancies, their declarations, and the values their nodes produce. */
+    private static void launchContent() {
+        require(AscendancyCatalog.forFamily(CRUSHER).stream().map(Ascendancy::id).toList().subList(0, 2).equals(List.of("rockbreaker", "assayer")),
+                "the Crusher ships Rockbreaker and Assayer first");
+        require(AscendancyCatalog.forFamily(MachineMasteryFamily.FURNACE).stream().map(Ascendancy::id).toList().subList(0, 2)
+                .equals(List.of("crucible_keeper", "bloomer")), "the Furnace ships Crucible Keeper and Bloomer first");
+        JsonObject lang = MasteryNodeJson.resource("/assets/rngtech/lang/en_us.json");
+        for (MachineStat stat : MachineStat.values()) {
+            if (MasteryDeclarations.declared(stat)) {
+                require(lang.has(stat.translationKey()) && lang.has(stat.translationKey() + ".description"), "declared stat names and describes " + stat);
+            }
+        }
+        JsonObject declarations = MasteryNodeJson.resource("/data/rngtech/mastery/declarations.json");
+        for (JsonElement behavior : MasteryNodeJson.array(declarations, "behaviors")) {
+            String id = behavior.getAsJsonObject().get("id").getAsString();
+            require(lang.has("rngtech.mastery.behavior." + id.toLowerCase(java.util.Locale.ROOT)), "declared behavior has a tooltip: " + id);
+        }
+
+        var rockbreaker = ascended("rockbreaker", List.of("jam_recovery", "jam_breaker", "under_level_efficiency", "pressure_stacking", "deep_efficiency", "bedrock_bite"), 3);
+        var crusher = MachineStatAccumulator.componentBase(Map.of(MachineStat.JAM_CHANCE, 1.0));
+        MegaPassiveTree.applyStats(crusher, rockbreaker, CRUSHER);
+        require(crusher.intValue(MachineStat.HARDNESS_TOLERANCE) == 2, "Breaker's Stance and Bedrock Bite tolerate two missing levels");
+        near(crusher.value(MachineStat.JAM_CHANCE), 0.5, "Jam Breaker halves the jam chance");
+        near(crusher.value(MachineStat.UNDER_LEVEL_EFFICIENCY), 60, "the efficiency path stacks to 60%");
+        var assayer = ascended("assayer", List.of("assay_yield", "compound_yield", "lode_chance", "mother_lode"), 2);
+        var lode = MachineStatAccumulator.componentBase(Map.of());
+        MegaPassiveTree.applyStats(lode, assayer, CRUSHER);
+        require(lode.intValue(MachineStat.SUPER_OUTPUT_CADENCE) == 16 && lode.intValue(MachineStat.BANK_MEMORY) == 4,
+                "Mother Lode fixes the cadence at 16 and the root remembers four inputs");
+        require(MegaPassiveTree.has(assayer, "COMPOUND_YIELD") && !MegaPassiveTree.has(assayer, "REFINERS_OATH"), "allocated notables grant their behaviors");
+        require(AscendancyCatalog.grantedStats(rockbreaker, CRUSHER).equals(List.of(MachineStat.HARDNESS_TOLERANCE, MachineStat.JAM_RECOVERY,
+                MachineStat.JAM_CHANCE, MachineStat.UNDER_LEVEL_EFFICIENCY)), "the Stats tab lists declared stats in node order, without shared stats");
+        require(AscendancyCatalog.grantedStats(rockbreaker, MachineMasteryFamily.FURNACE).isEmpty(), "another family shows no ascendancy stats");
+
+        // The loop bound for Furnace recipes assumes the Bloom Ledger stays under one extra item per smelt.
+        var bloomer = new MachineProgressionState(0, 0, 1, List.of(), MachineMasteryFamily.FURNACE.startNodeId(), List.of(), false, "bloomer",
+                List.of("rich_rate", "rich_blooms", "patient_rate", "patient_bloom", "line_rate", "crusher_line"), 3);
+        var furnace = MachineStatAccumulator.componentBase(Map.of(MachineStat.PROCESSING_SPEED, 1.0));
+        MegaPassiveTree.applyStats(furnace, bloomer, MachineMasteryFamily.FURNACE);
+        double strongest = AscendancyFormulas.ledgerShare(furnace, 1, true);
+        require(strongest > 0.7 && strongest < 0.8, "the strongest Bloom Ledger banks about 0.77 of an item per crushed smelt: " + strongest);
+    }
+
+    private static void bonusBanks() {
+        BonusBanks<String> banks = new BonusBanks<>(String::equals);
+        banks.select("iron");
+        banks.bank(0.5);
+        banks.select("copper");
+        require(banks.progressFor("iron") == 0.0 && banks.currentKey().equals("copper"), "one bank of memory resets when the input changes");
+        require(!banks.wouldEvictProgress("tin"), "switching away from an empty bank loses nothing");
+        banks.bank(0.25);
+        require(banks.wouldEvictProgress("tin") && !banks.wouldEvictProgress("copper"), "a new input would push out banked progress");
+
+        banks.setMemory(3);
+        banks.select("iron");
+        banks.bank(0.5);
+        banks.select("tin");
+        banks.select("copper");
+        near(banks.currentProgress(), 0.25, "Bank Memory restores a remembered input's progress");
+        near(banks.progressFor("iron"), 0.5, "other inputs keep their banks");
+        banks.select("gold");
+        require(banks.progressFor("iron") == 0.0 && banks.banks().size() == 3, "the oldest input is forgotten past the memory");
+
+        banks.setMemory(1);
+        require(banks.banks().size() == 1 && banks.currentKey().equals("gold"), "less memory keeps the most recent inputs");
+        require(!banks.countCycle(3) && !banks.countCycle(3) && banks.countCycle(3) && !banks.countCycle(3), "a cadence of three fires every third cycle");
+        require(!banks.countCycle(0), "a cadence below one never fires");
+        banks.bank(100);
+        near(banks.currentProgress(), BonusBanks.MAX_PROGRESS, "a bank holds at most its maximum");
+        banks.resetCurrent();
+        require(banks.currentProgress() == 0.0 && banks.currentKey().equals("gold"), "a reset empties the bank but keeps the input");
+    }
+
+    private static void outputLedger() {
+        OutputLedger<String> ledger = new OutputLedger<>();
+        ledger.add("iron", 0.4);
+        ledger.add("iron", 0.4);
+        require(ledger.payable("iron") == 0, "a ledger pays only whole items");
+        ledger.add("iron", 0.4);
+        require(ledger.payable("iron") == 1, "three smelts at 0.4 pay one item");
+        ledger.pay("iron", 1);
+        near(ledger.progress("iron"), 0.2, "a payout keeps the remainder");
+        ledger.pay("iron", 1);
+        require(ledger.progress("iron") == 0.0, "an overpaid entry clears");
+        for (int item = 0; item <= OutputLedger.MAX_ENTRIES; item++) {
+            ledger.add("item" + item, 0.5);
+        }
+        require(ledger.entries().size() == OutputLedger.MAX_ENTRIES && ledger.progress("item0") == 0.0, "the ledger forgets its least recent output");
+    }
+
+    private static void formulas() {
+        var stats = MachineStatAccumulator.componentBase(Map.of(MachineStat.JAM_CHANCE, 1.0, MachineStat.OUTPUT_AMOUNT, 1.0));
+        require(AscendancyFormulas.penalizedDeficit(3, stats) == 3, "without tolerance every missing level counts");
+        near(AscendancyFormulas.underLevelPenaltyMultiplier(2, 1.0, stats), 3.0, "each penalized level adds the configured multiplier");
+        require(AscendancyFormulas.jamChancePerThousand(2, 50, stats) == 100 && AscendancyFormulas.jamTicks(2, 40, stats) == 80,
+                "base jam chance and duration are unchanged without ascendancy stats");
+        apply(stats, MachineStat.HARDNESS_TOLERANCE, ModifierOperation.ADD, 2);
+        apply(stats, MachineStat.UNDER_LEVEL_EFFICIENCY, ModifierOperation.ADD, 95);
+        apply(stats, MachineStat.JAM_CHANCE, ModifierOperation.LESS, 0.5);
+        apply(stats, MachineStat.JAM_RECOVERY, ModifierOperation.ADD, 50);
+        require(AscendancyFormulas.penalizedDeficit(3, stats) == 1 && AscendancyFormulas.penalizedDeficit(1, stats) == 0, "tolerance removes missing levels");
+        near(AscendancyFormulas.underLevelPenaltyMultiplier(2, 1.0, stats), 1.2, "Under-Level Efficiency stops at 90%");
+        require(AscendancyFormulas.jamChancePerThousand(2, 50, stats) == 50 && AscendancyFormulas.jamTicks(2, 40, stats) == 54,
+                "Jam Chance scales the chance and Jam Recovery shortens the jam");
+        near(AscendancyFormulas.refinersOathMultiplier(1), 1.05, "a one-job chassis gets 5% more Output Amount");
+        near(AscendancyFormulas.refinersOathMultiplier(4), 1.2, "Tungstensteel's four jobs give 20%");
+        near(AscendancyFormulas.refinersOathMultiplier(9), 1.45, "Exotic's nine jobs give 45%");
+        near(AscendancyFormulas.refinersOathMultiplier(20), 1.5, "Refiner's Oath stops at 50%");
+        apply(stats, MachineStat.OUTPUT_AMOUNT, ModifierOperation.INCREASED_PERCENT, 10);
+        near(stats.valueWithIncreased(MachineStat.OUTPUT_AMOUNT, 20), 1.3, "At-Level Output joins the increased bucket");
+
+        var heat = MachineStatAccumulator.componentBase(Map.of());
+        near(AscendancyFormulas.overdriveSpeedMultiplier(1500, 1000, heat), 1.0, "no Overdrive without the Crucible Keeper");
+        apply(heat, MachineStat.OVERDRIVE_SPEED, ModifierOperation.ADD, 1);
+        apply(heat, MachineStat.OVERDRIVE_CAP, ModifierOperation.ADD, 30);
+        near(AscendancyFormulas.overdriveSpeedMultiplier(1200, 1000, heat), 1.2, "1% speed per 10 degrees over target");
+        near(AscendancyFormulas.overdriveSpeedMultiplier(1600, 1000, heat), 1.3, "Overdrive stops at its cap");
+        near(AscendancyFormulas.overdriveSpeedMultiplier(900, 1000, heat), 1.0, "a lane below target gains nothing");
+        apply(heat, MachineStat.LEDGER_RATE, ModifierOperation.ADD, 100.0 / 9.0);
+        near(AscendancyFormulas.ledgerShare(heat, 1, false), 1.0 / 9.0, "the root banks a ninth of an item per smelt");
+        near(AscendancyFormulas.ledgerShare(heat, 1, true), 2.0 / 9.0, "Crusher Line feeds crushed smelts twice");
+    }
+
+    private static void apply(MachineStatAccumulator stats, MachineStat stat, ModifierOperation operation, double value) {
+        stats.apply(new MachineModifier(ModifierSlot.IMPLICIT, stat, operation, value));
     }
 
     private static MachineProgressionState ascended(String ascendancy, List<String> nodes, int tiers) {

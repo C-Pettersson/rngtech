@@ -34,6 +34,13 @@ public final class ModTags {
         public static final TagKey<Item> BIO_GENERATOR_EXCLUDED_FOODS = bioGenerator("excluded_foods");
         public static final TagKey<Item> WOODEN_COMPOSTER_INPUTS = woodenComposter("inputs");
         public static final TagKey<Item> WOODEN_COMPOSTER_PREPARED_INPUTS = woodenComposter("prepared_inputs");
+        public static final TagKey<Item> MALFORMED_INGOTS =
+                TagKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath(RNGTech.MOD_ID, "malformed_ingots"));
+        public static final TagKey<Item> CRUSHED_MATERIALS =
+                TagKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath(RNGTech.MOD_ID, "materials/form/crushed"));
+        /** Ore, raw, and crushed inputs whose smelts feed the Bloomer's ledger. */
+        public static final TagKey<Item> BLOOM_LEDGER_INPUTS =
+                TagKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath(RNGTech.MOD_ID, "bloom_ledger_inputs"));
         public static final TagKey<Item> METAL_PRESS_MOLDS =
                 TagKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath(RNGTech.MOD_ID, "metal_press_molds"));
         public static final TagKey<Item> MANUAL_RECYCLER_INPUTS =

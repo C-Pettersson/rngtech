@@ -88,7 +88,7 @@ Fluid purge cleanup is code-backed for RNGTech machines that own real stored tan
 | Affix Injector | `rngtech:affix_injector` | Refinement consumable item | Yes | None | No | Acts as catalyst | Adds a legal rolled prefix or suffix for `1-8` RP | Prototype |
 | Affix Upgrader | `rngtech:affix_modifier` | Refinement consumable item | Yes | None | No | Acts as catalyst | Upgrades one weighted random eligible rolled affix for `2-6` RP | Prototype |
 | Greater Affix Upgrader | `rngtech:affix_upgrade` | Refinement consumable item | Yes | None | No | Acts as catalyst | Requires an installed Affix Resonance Matrix, then upgrades one weighted random eligible rolled affix or tunes a capped retunable affix for `6-10` RP | Prototype |
-| Ascendancy Seals | `rngtech:ascendancy_seal_1`, `rngtech:ascendancy_seal_2`, `rngtech:ascendancy_seal_3`, plus intermediates `rngtech:primed_seal_core` and `rngtech:lubricated_seal_core` | Items | Yes through `rngtech:calibrated_shaped` Seal recipes and Component Assembler Seal Core recipes, all gated by the `rngtech:ascendancy_seal_recipes_enabled` condition and the `ascendancy.sealRecipesEnabled` config key (default on) | None | No | No | Each Seal grants 2 ascendancy points to one machine through the Mastery Ascend action, in tier order; Seal I chooses the ascendancy and needs entry stage 4. Switching ascendancy consumes a Seal I. Creative players must carry the Seal but do not consume it. Seals carry no data, so Seals from loot, quests, or `/give` work the same. Used from the Ascendancy panel on the Mastery tab, which appears once the family has ascendancies; JEI has an information entry. | Prototype |
+| Ascendancy Seals | `rngtech:ascendancy_seal_1`, `rngtech:ascendancy_seal_2`, `rngtech:ascendancy_seal_3`, plus intermediates `rngtech:primed_seal_core` and `rngtech:lubricated_seal_core` | Items | Yes through `rngtech:calibrated_shaped` Seal recipes and Component Assembler Seal Core recipes, all gated by the `rngtech:ascendancy_seal_recipes_enabled` condition and the `ascendancy.sealRecipesEnabled` config key (default on) | None | No | No | Each Seal grants 2 ascendancy points to one machine through the Mastery Ascend action, in tier order; Seal I chooses the ascendancy and needs entry stage 4. Switching ascendancy consumes a Seal I. Creative players must carry the Seal but do not consume it. Seals carry no data, so Seals from loot, quests, or `/give` work the same. Used from the Ascendancy panel on the Mastery tab, which appears on the Crusher and Furnace today; JEI has an information entry. | Prototype |
 | Ascension Catalyst | `rngtech:ascension_catalyst` | Refinement consumable item | Yes | None | No | Acts as catalyst | Promotes Magic targets with at least `5` RP to Rare, adds one legal Rare affix, and consumes `4` RP | Prototype |
 | Ascension Matrix | `rngtech:ascension_matrix` | Refinement consumable item | Yes | None | No | Acts as catalyst | Promotes Magic targets to Rare, adds rolled affixes, upgrades or retunes one pre-existing rolled affix, and consumes all RP | Prototype |
 | Nullifier Coil | `rngtech:nullifier_coil` | Refinement consumable item | Yes | None | No | Acts as catalyst | Removes one random non-implicit rolled affix | Prototype |
@@ -124,9 +124,10 @@ Family ascendancies are in progress for 2.0; see the [ascendancies PRD](../prds/
 - Ascendancy Seal items and recipes;
 - server actions to ascend, choose, switch, allocate, and refund;
 - the Ascendancy panel, opened from a crest beside the start node, with the chosen tree, points, and the Ascend and Switch actions, plus a choose dialog that previews every ascendancy;
-- an Ascendancy section in the Bonus Summary drawer, a Jade line, and a JEI entry for Seals.
+- an Ascendancy section in the Bonus Summary drawer, a Jade line, and a JEI entry for Seals;
+- the Crusher's Rockbreaker and Assayer and the Furnace's Crucible Keeper and Bloomer, with twelve new stats, per-input bonus banks, Overdrive, and the Bloom Ledger.
 
-The launch ascendancies are not implemented yet, so the panel stays hidden in normal play.
+The Alloy Furnace, Metal Press, Resonance Calibrator, Melter, and Forestry Companion ascendancies are not implemented yet, so the panel stays hidden on those machines.
 
 ## Material Catalog
 

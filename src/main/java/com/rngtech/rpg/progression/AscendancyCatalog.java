@@ -68,6 +68,23 @@ public final class AscendancyCatalog {
         return chosen != null && chosen.family() == family ? allocated(state) : List.of();
     }
 
+    /**
+     * Declared stats that the chosen root and allocated nodes grant, in node order. The Stats tab shows these only while
+     * they are granted, since they mean nothing on a machine without them.
+     */
+    public static List<MachineStat> grantedStats(MachineProgressionState state, MachineMasteryFamily family) {
+        Set<MachineStat> granted = new LinkedHashSet<>();
+        for (AscendancyNode node : allocated(state, family)) {
+            node.effects().forEach(effect -> granted.add(effect.stat()));
+            node.tagged().forEach(tagged -> granted.add(tagged.effect().stat()));
+            granted.addAll(node.fixed().keySet());
+            granted.addAll(node.ceilings().keySet());
+            node.scaling().forEach(scaling -> granted.add(scaling.stat()));
+        }
+        granted.removeIf(stat -> !MasteryDeclarations.declared(stat));
+        return List.copyOf(granted);
+    }
+
     /** Known, connected allocations in stored order. Everything is refunded when they exceed {@code budget}. */
     static List<String> sanitize(Ascendancy ascendancy, List<String> allocated, int budget) {
         List<String> kept = new ArrayList<>(new LinkedHashSet<>(allocated));

@@ -1,0 +1,183 @@
+{
+    "id": "crucible_keeper",
+    "family": "furnace",
+    "nodes": [
+        {
+            "id": "overdrive_lanes",
+            "kind": "ROOT",
+            "x": 0,
+            "y": 0,
+            "effects": [
+                {
+                    "stat": "OVERDRIVE_SPEED",
+                    "operation": "ADD",
+                    "value": 1
+                },
+                {
+                    "stat": "OVERDRIVE_CAP",
+                    "operation": "ADD",
+                    "value": 30
+                }
+            ]
+        },
+        {
+            "id": "superheat_cap",
+            "kind": "SMALL",
+            "parent": "overdrive_lanes",
+            "x": -2,
+            "y": 1,
+            "effects": [
+                {
+                    "stat": "OVERDRIVE_CAP",
+                    "operation": "ADD",
+                    "value": 5
+                }
+            ]
+        },
+        {
+            "id": "superheat",
+            "kind": "NOTABLE",
+            "parent": "superheat_cap",
+            "x": -2,
+            "y": 2,
+            "effects": [
+                {
+                    "stat": "OVERDRIVE_CAP",
+                    "operation": "ADD",
+                    "value": 15
+                }
+            ]
+        },
+        {
+            "id": "heat_isolation",
+            "kind": "SMALL",
+            "parent": "overdrive_lanes",
+            "x": -1,
+            "y": 1,
+            "effects": [
+                {
+                    "stat": "HEAT_ISOLATION",
+                    "operation": "INCREASED_PERCENT",
+                    "value": 10
+                }
+            ]
+        },
+        {
+            "id": "hold_the_fire",
+            "kind": "NOTABLE",
+            "parent": "heat_isolation",
+            "x": -1,
+            "y": 2,
+            "behaviors": [
+                "HOLD_THE_FIRE"
+            ]
+        },
+        {
+            "id": "overdrive_margin",
+            "kind": "SMALL",
+            "parent": "overdrive_lanes",
+            "x": 1,
+            "y": 1,
+            "effects": [
+                {
+                    "stat": "OVERDRIVE_MARGIN",
+                    "operation": "ADD",
+                    "value": 10
+                }
+            ]
+        },
+        {
+            "id": "safe_margin",
+            "kind": "NOTABLE",
+            "parent": "overdrive_margin",
+            "x": 1,
+            "y": 2,
+            "effects": [
+                {
+                    "stat": "OVERDRIVE_MARGIN",
+                    "operation": "ADD",
+                    "value": 15
+                }
+            ],
+            "behaviors": [
+                "SAFE_OVERDRIVE"
+            ]
+        },
+        {
+            "id": "hearth_heat",
+            "kind": "SMALL",
+            "parent": "overdrive_lanes",
+            "x": 2,
+            "y": 1,
+            "effects": [
+                {
+                    "stat": "MAX_TEMPERATURE",
+                    "operation": "INCREASED_PERCENT",
+                    "value": 4
+                }
+            ]
+        },
+        {
+            "id": "shared_hearth",
+            "kind": "NOTABLE",
+            "parent": "hearth_heat",
+            "x": 2,
+            "y": 2,
+            "behaviors": [
+                "SHARED_HEARTH"
+            ]
+        },
+        {
+            "id": "heart_transfer",
+            "kind": "SMALL",
+            "parent": "superheat",
+            "x": -2,
+            "y": 3,
+            "effects": [
+                {
+                    "stat": "HEAT_TRANSFER",
+                    "operation": "INCREASED_PERCENT",
+                    "value": 10
+                }
+            ]
+        },
+        {
+            "id": "crucible_heart",
+            "kind": "NOTABLE",
+            "parent": "heart_transfer",
+            "x": -2,
+            "y": 4,
+            "behaviors": [
+                "CRUCIBLE_HEART"
+            ]
+        },
+        {
+            "id": "bleed_recovery",
+            "kind": "SMALL",
+            "parent": "safe_margin",
+            "x": 1,
+            "y": 3,
+            "effects": [
+                {
+                    "stat": "STRAIN_RECOVERY",
+                    "operation": "ADD",
+                    "value": 2
+                }
+            ]
+        },
+        {
+            "id": "strain_bleed",
+            "kind": "NOTABLE",
+            "parent": "bleed_recovery",
+            "x": 1,
+            "y": 4,
+            "effects": [
+                {
+                    "stat": "STRAIN_RECOVERY",
+                    "operation": "ADD",
+                    "value": 10
+                }
+            ]
+        }
+    ]
+}

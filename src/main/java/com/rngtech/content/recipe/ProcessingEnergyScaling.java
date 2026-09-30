@@ -10,9 +10,15 @@ public final class ProcessingEnergyScaling {
     }
 
     public static int crusherEnergy(CrusherRecipe recipe, MachineStatAccumulator stats) {
+        return crusherEnergy(recipe, stats, 1.0D);
+    }
+
+    /** {@code surchargeScale} scales what remains of the high-hardness surcharge after mitigation. */
+    public static int crusherEnergy(CrusherRecipe recipe, MachineStatAccumulator stats, double surchargeScale) {
         double multiplier = crusherEnergyMultiplier(recipe);
         double mitigation = stats == null ? 0.0D : stats.value(MachineStat.HIGH_HARDNESS_ENERGY_MITIGATION);
-        return scaledEnergy(recipe.energy(), mitigatedMultiplier(multiplier, mitigation));
+        double mitigated = mitigatedMultiplier(multiplier, mitigation);
+        return scaledEnergy(recipe.energy(), 1.0D + (mitigated - 1.0D) * Math.max(0.0D, surchargeScale));
     }
 
     public static double crusherEnergyMultiplier(CrusherRecipe recipe) {

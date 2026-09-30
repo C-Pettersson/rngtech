@@ -29,6 +29,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.neoforged.neoforge.items.ItemStackHandler;
 import net.neoforged.neoforge.items.SlotItemHandler;
 
+import java.util.List;
 import java.util.function.BooleanSupplier;
 
 public class FurnaceMenu extends AbstractContainerMenu implements MasteryMenuView<MegaPassiveNode> {
@@ -72,7 +73,8 @@ public class FurnaceMenu extends AbstractContainerMenu implements MasteryMenuVie
     private static final int DATA_FAILURE_STRAIN_START = DATA_OVERHEAT_TEMPERATURE_START + MAX_PROCESSING_SLOTS;
     private static final int DATA_FAILURE_ENABLED_START = DATA_FAILURE_STRAIN_START + MAX_PROCESSING_SLOTS;
     private static final int DATA_POWER_SENSITIVE_START = DATA_FAILURE_ENABLED_START + MAX_PROCESSING_SLOTS;
-    private static final int DATA_MACHINE_PROGRESSION_START = DATA_POWER_SENSITIVE_START + MAX_PROCESSING_SLOTS;
+    private static final int DATA_LEDGER_START = DATA_POWER_SENSITIVE_START + MAX_PROCESSING_SLOTS;
+    private static final int DATA_MACHINE_PROGRESSION_START = DATA_LEDGER_START + MAX_PROCESSING_SLOTS;
     private static final int DATA_COUNT = DATA_MACHINE_PROGRESSION_START + MasteryMenuSupport.FIELD_COUNT;
     private static final int STAT_SCALE = 100;
     private static final int MACHINE_SLOT_COUNT = FurnaceBlockEntity.SLOT_COUNT;
@@ -352,6 +354,12 @@ public class FurnaceMenu extends AbstractContainerMenu implements MasteryMenuVie
 
     public int statusCode() {
         return data.get(DATA_STATUS);
+    }
+
+    /** The lane's Bloom Ledger progress toward its next item, from 0 to 1, or -1 when its smelt does not feed the ledger. */
+    public float ledgerProgress(int lane) {
+        int value = data.get(DATA_LEDGER_START + lane);
+        return value < 0 ? -1.0F : Mth.clamp(value / 1000.0F, 0.0F, 1.0F);
     }
 
     public long machineXp() {
@@ -648,6 +656,9 @@ public class FurnaceMenu extends AbstractContainerMenu implements MasteryMenuVie
     }
     @Override public int ascendancyEntryStage() {
         return MasteryMenuSupport.ascendancyEntryStage(data, DATA_MACHINE_PROGRESSION_START);
+    }
+    @Override public List<MasteryMenuSupport.GrantedStat> ascendancyStats() {
+        return MasteryMenuSupport.grantedStats(data, DATA_MACHINE_PROGRESSION_START);
     }
 
 }

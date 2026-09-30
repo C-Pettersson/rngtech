@@ -33,6 +33,7 @@ public class FurnaceScreen extends AbstractContainerScreen<FurnaceMenu> {
     private static final int FUEL = 0xFFD3942F;
     private static final int HEAT = 0xFFE0712F;
     private static final int FAILURE = 0xFFB45B4A;
+    private static final int LEDGER = 0xFFD3A33A;
     private static final int STAT_ACCENT = 0xFFD18A3C;
     private static final int STATUS_ERROR = 0xFFB45B4A;
     private static final int STAT_PANEL_X = 8;
@@ -419,6 +420,7 @@ public class FurnaceScreen extends AbstractContainerScreen<FurnaceMenu> {
         if (menu.activeProcessingSlots() == 1) {
             guiGraphics.fill(x + 86, y + 51, x + 155, y + 59, 0xFF5F5F5F);
             guiGraphics.fill(x + 87, y + 52, x + 87 + Math.round(67 * menu.processingProgress()), y + 58, PROGRESS);
+            renderLedgerBar(guiGraphics, 0, 58);
         } else {
             for (int lane = 0; lane < menu.activeProcessingSlots(); lane++) {
                 int barY = MULTI_PROGRESS_Y[lane];
@@ -430,6 +432,7 @@ public class FurnaceScreen extends AbstractContainerScreen<FurnaceMenu> {
                         y + barY + 4,
                         PROGRESS
                 );
+                renderLedgerBar(guiGraphics, lane, barY + 4);
             }
         }
 
@@ -448,6 +451,16 @@ public class FurnaceScreen extends AbstractContainerScreen<FurnaceMenu> {
             guiGraphics.fill(x + 87, y + 70, x + 87 + Math.round(67 * menu.fuelProgress()), y + 72, FUEL);
         }
         renderStatusIcon(guiGraphics);
+    }
+
+    /** The Bloomer's ledger fills a thin line along the bottom edge of a lane's progress bar. */
+    private void renderLedgerBar(GuiGraphics guiGraphics, int lane, int barY) {
+        float ledger = menu.ledgerProgress(lane);
+        if (ledger < 0.0F) {
+            return;
+        }
+        guiGraphics.fill(leftPos + 87, topPos + barY, leftPos + 154, topPos + barY + 1, 0xFF3A3326);
+        guiGraphics.fill(leftPos + 87, topPos + barY, leftPos + 87 + Math.round(67 * ledger), topPos + barY + 1, LEDGER);
     }
 
     private void renderVerticalBar(GuiGraphics guiGraphics, int barX, float progress, int color) {
@@ -638,6 +651,13 @@ public class FurnaceScreen extends AbstractContainerScreen<FurnaceMenu> {
     }
 
     private Component progressTooltip(int lane) {
+        Component progress = laneProgressText(lane);
+        float ledger = menu.ledgerProgress(lane);
+        return ledger < 0.0F ? progress : progress.copy().append(" ")
+                .append(Component.translatable("rngtech.furnace.tooltip.ledger", Math.round(ledger * 100)));
+    }
+
+    private Component laneProgressText(int lane) {
         int ticks = menu.processingTicks(lane);
         if (menu.activeProcessingSlots() > 1) {
             if (menu.isElectric() && ticks > 0) {
@@ -769,7 +789,10 @@ public class FurnaceScreen extends AbstractContainerScreen<FurnaceMenu> {
                     )
             );
         }
-        return statLines;
+        return MachineScreenStyle.fitStatLines(
+                MachineScreenStyle.withAscendancyStats(statLines, menu.ascendancyStats()),
+                MachineScreenStyle.maxStatRows(STAT_PANEL_Y, BASE_IMAGE_HEIGHT)
+        );
     }
 
     private String[] statLabelKeys() {

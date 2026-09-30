@@ -35,22 +35,23 @@ final class ProcessingChance {
         return enhanced;
     }
 
-    static ItemStack applyCrusherSalvage(Level level, MachineStatAccumulator stats, BonusOutputRecipe recipe, ItemStack output, ItemStack baseOutput) {
-        if (output.isEmpty()
-                || !recipe.allowsBonusOutput()
-                || !canDuplicate(baseOutput)
-                || !rollPercent(level, stats.value(MachineStat.CRUSHER_SALVAGE_CHANCE))) {
+    static boolean rollSuperOutput(Level level, MachineStatAccumulator stats, BonusOutputRecipe recipe, ItemStack baseOutput) {
+        return recipe.allowsBonusOutput() && canDuplicate(baseOutput) && rollPercent(level, stats.value(MachineStat.SUPER_OUTPUT_CHANCE));
+    }
+
+    /** Crusher salvage, rolled at {@code chanceScale} of the Salvage chance. */
+    static boolean rollCrusherSalvage(Level level, MachineStatAccumulator stats, BonusOutputRecipe recipe, ItemStack baseOutput, double chanceScale) {
+        return recipe.allowsBonusOutput() && canDuplicate(baseOutput)
+                && rollPercent(level, stats.value(MachineStat.CRUSHER_SALVAGE_CHANCE) * chanceScale);
+    }
+
+    /** {@code output} with {@code extra} more of the same item, or unchanged when it would not stack. */
+    static ItemStack grow(ItemStack output, ItemStack baseOutput, int extra) {
+        if (output.isEmpty() || extra <= 0 || !ItemStack.isSameItemSameComponents(output, baseOutput)
+                || output.getCount() + extra > output.getMaxStackSize()) {
             return output;
         }
-        if (!ItemStack.isSameItemSameComponents(output, baseOutput)) {
-            return output;
-        }
-        ItemStack enhanced = output.copy();
-        if (enhanced.getCount() + 1 > enhanced.getMaxStackSize()) {
-            return output;
-        }
-        enhanced.grow(1);
-        return enhanced;
+        return output.copyWithCount(output.getCount() + extra);
     }
 
     static List<ItemStack> applySuperOutputs(Level level, MachineStatAccumulator stats, BonusOutputRecipe recipe, List<ItemStack> outputs) {

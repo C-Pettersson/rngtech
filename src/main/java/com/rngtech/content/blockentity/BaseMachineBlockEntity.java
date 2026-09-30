@@ -24,6 +24,7 @@ import com.rngtech.content.registry.ModDataComponents;
 import com.rngtech.rpg.MachineTraits;
 import com.rngtech.rpg.MachineType;
 import com.rngtech.rpg.progression.MachineProgressionState;
+import com.rngtech.rpg.progression.MegaPassiveTree;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -40,11 +41,15 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.ItemStackHandler;
 
+import java.util.Set;
+
 public abstract class BaseMachineBlockEntity extends BlockEntity implements RefinableMachine {
     private final IItemHandler topItemHandler;
     private final IItemHandler sideItemHandler;
     private final IItemHandler bottomItemHandler;
     private final MachineType machineType;
+    private MachineProgressionState behaviorState;
+    private Set<String> behaviors = Set.of();
     private final ItemStackHandler refinementInventory = new ItemStackHandler(1) {
         @Override
         public boolean isItemValid(int slot, ItemStack stack) {
@@ -120,6 +125,16 @@ public abstract class BaseMachineBlockEntity extends BlockEntity implements Refi
     public MachineProgressionState machineProgression() {
         MachineProgressionState progression = components().get(ModDataComponents.MACHINE_PROGRESSION.get());
         return progression == null ? MachineProgressionState.EMPTY : progression;
+    }
+
+    /** Whether allocated Mastery grants {@code behavior}, cached until the progression changes. */
+    protected boolean hasMasteryBehavior(String behavior) {
+        MachineProgressionState state = machineProgression();
+        if (state != behaviorState) {
+            behaviorState = state;
+            behaviors = MegaPassiveTree.behaviors(state);
+        }
+        return behaviors.contains(behavior);
     }
 
     public void setMachineProgression(MachineProgressionState progression) {

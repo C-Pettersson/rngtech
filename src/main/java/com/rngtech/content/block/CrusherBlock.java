@@ -75,6 +75,9 @@ public class CrusherBlock extends BaseMachineBlock {
             if (!machine.machineProgression().equals(MachineProgressionState.EMPTY)) {
                 stack.set(ModDataComponents.MACHINE_PROGRESSION.get(), machine.machineProgression());
             }
+            if (machine instanceof CrusherBlockEntity crusher && !crusher.persistentBanks().isEmpty()) {
+                stack.set(ModDataComponents.OUTPUT_BANKS.get(), crusher.persistentBanks());
+            }
         }
         return stack;
     }

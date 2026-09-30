@@ -54,6 +54,8 @@ public final class MachineStatAccumulator {
         stats.baseValues.put(MachineStat.INPUT_SLOTS, (double) RNGTechConfig.CRUSHER_BASE_INPUT_SLOTS.get());
         applyBaseMachineValues(stats);
         stats.baseValues.put(MachineStat.PROCESSING_LEVEL, 0.0);
+        // A multiplier on the configured under-level jam chance, so "less Jam Chance" has something to scale.
+        stats.baseValues.put(MachineStat.JAM_CHANCE, 1.0);
         stats.baseValues.put(MachineStat.ENERGY_CAPACITY, RNGTechConfig.CRUSHER_ENERGY_CAPACITY.get() * chassis.energyCapacity());
         stats.baseValues.put(MachineStat.ENERGY_TRANSFER, RNGTechConfig.CRUSHER_MAX_ENERGY_INPUT.get() * chassis.energyTransfer());
         stats.baseValues.put(MachineStat.EFFICIENCY, chassis.efficiency());
@@ -619,10 +621,15 @@ public final class MachineStatAccumulator {
     }
 
     public double value(MachineStat stat) {
+        return valueWithIncreased(stat, 0.0);
+    }
+
+    /** {@code stat} with {@code extraPercent} added to its increased bucket, as a conditional increase would combine. */
+    public double valueWithIncreased(MachineStat stat, double extraPercent) {
         MachineStat resolvedStat = accumulationStat(stat);
         double base = baseValues.getOrDefault(resolvedStat, 0.0);
         double added = additiveValues.getOrDefault(resolvedStat, 0.0);
-        double increased = increasedPercentValues.getOrDefault(resolvedStat, 0.0);
+        double increased = increasedPercentValues.getOrDefault(resolvedStat, 0.0) + extraPercent;
         double more = moreValues.getOrDefault(resolvedStat, 1.0);
         double ordinary = (base + added) * Math.max(0.0, 1.0 + increased / 100.0) * more;
         return Math.min(absoluteValues.getOrDefault(resolvedStat, ordinary),

@@ -7,6 +7,8 @@ import com.rngtech.rpg.progression.MachineProgressionState;
 import com.rngtech.rpg.progression.MasteryApplicability;
 import com.rngtech.rpg.progression.PassiveNode;
 
+import java.util.List;
+
 public interface MasteryMenuView<N extends PassiveNode> extends MasteryApplicability {
     MachineMasteryHost masteryHost();
 
@@ -14,6 +16,9 @@ public interface MasteryMenuView<N extends PassiveNode> extends MasteryApplicabi
 
     /** The synced stage that gates a first Ascendancy Seal. */
     int ascendancyEntryStage();
+
+    /** Declared stats the chosen ascendancy grants, for the Stats tab. */
+    List<MasteryMenuSupport.GrantedStat> ascendancyStats();
 
     @Override
     MachineMasteryFamily masteryFamily();

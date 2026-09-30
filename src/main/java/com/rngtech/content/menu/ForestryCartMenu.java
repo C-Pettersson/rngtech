@@ -27,6 +27,7 @@ import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.items.SlotItemHandler;
 
+import java.util.List;
 import java.util.function.BooleanSupplier;
 
 public class ForestryCartMenu extends AbstractContainerMenu implements MasteryMenuView<MegaPassiveNode> {
@@ -560,6 +561,9 @@ public class ForestryCartMenu extends AbstractContainerMenu implements MasteryMe
     }
     @Override public int ascendancyEntryStage() {
         return MasteryMenuSupport.ascendancyEntryStage(data, DATA_MACHINE_PROGRESSION_START);
+    }
+    @Override public List<MasteryMenuSupport.GrantedStat> ascendancyStats() {
+        return MasteryMenuSupport.grantedStats(data, DATA_MACHINE_PROGRESSION_START);
     }
 
 }

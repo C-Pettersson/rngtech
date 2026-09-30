@@ -1,9 +1,11 @@
 package com.rngtech.client.screen;
 
+import com.rngtech.RNGTech;
 import com.rngtech.content.menu.MasteryMenuView;
 import com.rngtech.content.network.MasteryActionPayload;
 import com.rngtech.rpg.MachineStat;
 import com.rngtech.rpg.MachineStatDisplay;
+import com.rngtech.rpg.progression.AscendancyCatalog;
 import com.rngtech.rpg.progression.AscendancyNode;
 import com.rngtech.rpg.progression.MachineMasteryFamily;
 import com.rngtech.rpg.progression.MachineProgressionState;
@@ -86,6 +88,12 @@ public final class MasteryScreenSupport<N extends PassiveNode> {
     private static final int SEARCH_HIGHLIGHT = 0xFFE1F0FF;
     private static final int TARGET_BORDER = 0xFF8E9BE8;
     private static final int[] NO_ROUTE = new int[0];
+    private static final ResourceLocation ASCENDANCY_CREST = RNGTech.id("textures/gui/mastery/ascendancy_crest.png");
+    /** The crest is drawn at its native 32 pixels, or exactly half when the tree is zoomed far out, so it stays crisp. */
+    private static final int CREST_SIZE = 32;
+    /** Half-width of the crest's gem in texture pixels, for hit tests and the glow. */
+    private static final float CREST_GEM_HALF = 14.0F;
+    private static final int CREST_SOCKET = 0xFF3A2F5C;
 
     private final List<N> nodes;
     private final N starter;
@@ -300,12 +308,16 @@ public final class MasteryScreenSupport<N extends PassiveNode> {
             drawNode(shapes, leftPos, topPos, position);
         }
         drawHighlights(shapes, leftPos, topPos, hovered, hoveredRoute);
-        Badge badge = badge(leftPos, topPos);
-        if (badge != null && !ascendancy.isOpen()) {
-            drawBadge(shapes, badge, overBadge(leftPos, topPos, imageWidth, imageHeight, mouseX, mouseY));
+        Badge badge = ascendancy.isOpen() ? null : badge(leftPos, topPos);
+        boolean badgeHovered = badge != null && overBadge(leftPos, topPos, imageWidth, imageHeight, mouseX, mouseY);
+        if (badge != null) {
+            drawBadgeGlow(shapes, badge, badgeHovered);
         }
         shapes.flush();
         drawIcons(guiGraphics, leftPos, topPos, viewLeft, viewTop, viewRight, viewBottom);
+        if (badge != null) {
+            drawBadgeCrest(guiGraphics, badge);
+        }
         guiGraphics.disableScissor();
         MasterySummaryDrawer.Bounds bounds = viewBounds(leftPos, topPos, imageWidth, imageHeight);
         if (ascendancy.isOpen()) {
@@ -1162,9 +1174,10 @@ public final class MasteryScreenSupport<N extends PassiveNode> {
             return null;
         }
         float startRadius = screenRadius(starterPosition);
-        float half = Math.max(5.0F, startRadius * 0.5F);
+        int size = startRadius >= 14.0F ? CREST_SIZE : CREST_SIZE / 2;
+        float half = CREST_GEM_HALF * size / CREST_SIZE;
         return new Badge(screenX(centerX[starterPosition], leftPos) + startRadius + half,
-                screenY(centerY[starterPosition], topPos) - startRadius - half * 0.5F, half);
+                screenY(centerY[starterPosition], topPos) - startRadius - half * 0.5F, half, size);
     }
 
     private boolean overBadge(int leftPos, int topPos, int imageWidth, int imageHeight, double mouseX, double mouseY) {
@@ -1174,18 +1187,34 @@ public final class MasteryScreenSupport<N extends PassiveNode> {
                 && Math.abs(mouseX - badge.x()) + Math.abs(mouseY - badge.y()) <= badge.half() + 1.0F;
     }
 
-    private void drawBadge(GuiShapeBatch shapes, Badge badge, boolean hovered) {
-        int border = hovered ? ROUTE_READY : ascendancy.needsAttention() ? palette.outputBonus() : AscendancyPanel.ACCENT;
-        int tiers = snapshot.sealTiers();
-        shapes.diamond(badge.x(), badge.y(), badge.half() + 1.0F, 0xFF080D11);
-        shapes.diamond(badge.x(), badge.y(), badge.half(), border);
-        shapes.diamond(badge.x(), badge.y(), badge.half() - 1.5F, tiers > 0 ? 0xFF54421E : 0xFF291E35);
-        // One pip per earned Seal tier.
-        float pip = Math.max(0.8F, badge.half() * 0.18F);
-        float spacing = badge.half() * 0.5F;
-        for (int tier = 0; tier < tiers; tier++) {
-            shapes.disc(badge.x() + (tier - (tiers - 1) / 2.0F) * spacing, badge.y(), pip, AscendancyPanel.ACCENT);
+    /**
+     * A soft gold glow pulses behind the crest while a Seal can be used or points wait, and holds bright on hover. Three
+     * sockets under the crest light up for the earned Seal tiers.
+     */
+    private void drawBadgeGlow(GuiShapeBatch shapes, Badge badge, boolean hovered) {
+        float half = badge.half();
+        if (hovered || ascendancy.needsAttention()) {
+            double pulse = hovered ? 1.0D : 0.5D + 0.5D * Math.sin(Util.getMillis() / 260.0D);
+            int alpha = (int) (0x30 + 0x50 * pulse);
+            int gold = AscendancyPanel.ACCENT & 0xFFFFFF;
+            shapes.diamond(badge.x(), badge.y(), half + 8.0F, alpha / 4 << 24 | gold);
+            shapes.diamond(badge.x(), badge.y(), half + 5.0F, alpha / 2 << 24 | gold);
+            shapes.diamond(badge.x(), badge.y(), half + 2.5F, alpha << 24 | gold);
         }
+        int tiers = snapshot.sealTiers();
+        float pip = Math.max(1.5F, half * 0.16F);
+        float pipY = badge.y() + half + pip + 2.0F;
+        for (int tier = 0; tier < AscendancyCatalog.MAX_TIERS; tier++) {
+            float pipX = badge.x() + (tier - 1) * pip * 2.8F;
+            shapes.diamond(pipX, pipY, pip + 1.0F, 0xFF080D11);
+            shapes.diamond(pipX, pipY, pip, tier < tiers ? AscendancyPanel.ACCENT : CREST_SOCKET);
+        }
+    }
+
+    private void drawBadgeCrest(GuiGraphics guiGraphics, Badge badge) {
+        int size = badge.size();
+        guiGraphics.blit(ASCENDANCY_CREST, Math.round(badge.x() - size / 2.0F), Math.round(badge.y() - size / 2.0F), size, size,
+                0, 0, CREST_SIZE, CREST_SIZE, CREST_SIZE, CREST_SIZE);
     }
 
     private static void renderWrapped(GuiGraphics guiGraphics, Font font, List<Component> tooltip, int mouseX, int mouseY) {
@@ -1422,7 +1451,7 @@ public final class MasteryScreenSupport<N extends PassiveNode> {
         return value > 0 ? "+" + value : Integer.toString(value);
     }
 
-    private record Badge(float x, float y, float half) {
+    private record Badge(float x, float y, float half, int size) {
     }
 
     private enum RouteStatus {

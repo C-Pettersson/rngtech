@@ -1,0 +1,180 @@
+{
+    "id": "rockbreaker",
+    "family": "crusher",
+    "nodes": [
+        {
+            "id": "breakers_stance",
+            "kind": "ROOT",
+            "x": 0,
+            "y": 0,
+            "effects": [
+                {
+                    "stat": "HARDNESS_TOLERANCE",
+                    "operation": "ADD",
+                    "value": 1
+                }
+            ]
+        },
+        {
+            "id": "jam_recovery",
+            "kind": "SMALL",
+            "parent": "breakers_stance",
+            "x": -2,
+            "y": 1,
+            "effects": [
+                {
+                    "stat": "JAM_RECOVERY",
+                    "operation": "ADD",
+                    "value": 10
+                }
+            ]
+        },
+        {
+            "id": "jam_breaker",
+            "kind": "NOTABLE",
+            "parent": "jam_recovery",
+            "x": -2,
+            "y": 2,
+            "effects": [
+                {
+                    "stat": "JAM_CHANCE",
+                    "operation": "LESS",
+                    "value": 0.5
+                },
+                {
+                    "stat": "JAM_RECOVERY",
+                    "operation": "ADD",
+                    "value": 40
+                }
+            ]
+        },
+        {
+            "id": "energy_mitigation",
+            "kind": "SMALL",
+            "parent": "breakers_stance",
+            "x": -1,
+            "y": 1,
+            "effects": [
+                {
+                    "stat": "HIGH_HARDNESS_ENERGY_MITIGATION",
+                    "operation": "ADD",
+                    "value": 3
+                }
+            ]
+        },
+        {
+            "id": "fault_lines",
+            "kind": "NOTABLE",
+            "parent": "energy_mitigation",
+            "x": -1,
+            "y": 2,
+            "behaviors": [
+                "FAULT_LINES"
+            ]
+        },
+        {
+            "id": "under_level_efficiency",
+            "kind": "SMALL",
+            "parent": "breakers_stance",
+            "x": 1,
+            "y": 1,
+            "effects": [
+                {
+                    "stat": "UNDER_LEVEL_EFFICIENCY",
+                    "operation": "ADD",
+                    "value": 10
+                }
+            ]
+        },
+        {
+            "id": "pressure_stacking",
+            "kind": "NOTABLE",
+            "parent": "under_level_efficiency",
+            "x": 1,
+            "y": 2,
+            "effects": [
+                {
+                    "stat": "UNDER_LEVEL_EFFICIENCY",
+                    "operation": "ADD",
+                    "value": 40
+                }
+            ]
+        },
+        {
+            "id": "lean_crushing",
+            "kind": "SMALL",
+            "parent": "breakers_stance",
+            "x": 2,
+            "y": 1,
+            "effects": [
+                {
+                    "stat": "ENERGY_USAGE",
+                    "operation": "DECREASED_PERCENT",
+                    "value": 5
+                }
+            ]
+        },
+        {
+            "id": "shatter_point",
+            "kind": "NOTABLE",
+            "parent": "lean_crushing",
+            "x": 2,
+            "y": 2,
+            "behaviors": [
+                "SHATTER_POINT"
+            ]
+        },
+        {
+            "id": "salvage_grit",
+            "kind": "SMALL",
+            "parent": "fault_lines",
+            "x": -1,
+            "y": 3,
+            "effects": [
+                {
+                    "stat": "CRUSHER_SALVAGE_CHANCE",
+                    "operation": "ADD",
+                    "value": 2
+                }
+            ]
+        },
+        {
+            "id": "rubble_reclaimer",
+            "kind": "NOTABLE",
+            "parent": "salvage_grit",
+            "x": -1,
+            "y": 4,
+            "behaviors": [
+                "RUBBLE_RECLAIMER"
+            ]
+        },
+        {
+            "id": "deep_efficiency",
+            "kind": "SMALL",
+            "parent": "pressure_stacking",
+            "x": 1,
+            "y": 3,
+            "effects": [
+                {
+                    "stat": "UNDER_LEVEL_EFFICIENCY",
+                    "operation": "ADD",
+                    "value": 10
+                }
+            ]
+        },
+        {
+            "id": "bedrock_bite",
+            "kind": "NOTABLE",
+            "parent": "deep_efficiency",
+            "x": 1,
+            "y": 4,
+            "effects": [
+                {
+                    "stat": "HARDNESS_TOLERANCE",
+                    "operation": "ADD",
+                    "value": 1
+                }
+            ]
+        }
+    ]
+}

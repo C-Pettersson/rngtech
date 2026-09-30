@@ -1,5 +1,196 @@
 {
     "version": 1,
-    "stats": [],
-    "behaviors": []
+    "stats": [
+        {
+            "stat": "HARDNESS_TOLERANCE",
+            "families": [
+                "crusher"
+            ],
+            "yield": "none"
+        },
+        {
+            "stat": "JAM_CHANCE",
+            "families": [
+                "crusher"
+            ],
+            "yield": "none"
+        },
+        {
+            "stat": "JAM_RECOVERY",
+            "families": [
+                "crusher"
+            ],
+            "yield": "none"
+        },
+        {
+            "stat": "UNDER_LEVEL_EFFICIENCY",
+            "families": [
+                "crusher"
+            ],
+            "yield": "none"
+        },
+        {
+            "stat": "BANK_MEMORY",
+            "families": [
+                "crusher"
+            ],
+            "yield": "output"
+        },
+        {
+            "stat": "AT_LEVEL_OUTPUT",
+            "families": [
+                "crusher"
+            ],
+            "yield": "output"
+        },
+        {
+            "stat": "SUPER_OUTPUT_CADENCE",
+            "families": [
+                "crusher"
+            ],
+            "yield": "output"
+        },
+        {
+            "stat": "OVERDRIVE_SPEED",
+            "families": [
+                "furnace"
+            ],
+            "yield": "none"
+        },
+        {
+            "stat": "OVERDRIVE_CAP",
+            "families": [
+                "furnace"
+            ],
+            "yield": "none"
+        },
+        {
+            "stat": "OVERDRIVE_MARGIN",
+            "families": [
+                "furnace"
+            ],
+            "yield": "none"
+        },
+        {
+            "stat": "STRAIN_RECOVERY",
+            "families": [
+                "furnace"
+            ],
+            "yield": "none"
+        },
+        {
+            "stat": "LEDGER_RATE",
+            "families": [
+                "furnace"
+            ],
+            "yield": "output"
+        }
+    ],
+    "behaviors": [
+        {
+            "id": "FAULT_LINES",
+            "families": [
+                "crusher"
+            ],
+            "yield": "output"
+        },
+        {
+            "id": "SHATTER_POINT",
+            "families": [
+                "crusher"
+            ],
+            "yield": "none"
+        },
+        {
+            "id": "RUBBLE_RECLAIMER",
+            "families": [
+                "crusher"
+            ],
+            "yield": "output"
+        },
+        {
+            "id": "PERSISTENT_BANKS",
+            "families": [
+                "crusher"
+            ],
+            "yield": "output"
+        },
+        {
+            "id": "COMPOUND_YIELD",
+            "families": [
+                "crusher"
+            ],
+            "yield": "output"
+        },
+        {
+            "id": "TAILINGS_RECOVERY",
+            "families": [
+                "crusher"
+            ],
+            "yield": "output"
+        },
+        {
+            "id": "REFINERS_OATH",
+            "families": [
+                "crusher"
+            ],
+            "yield": "output"
+        },
+        {
+            "id": "HOLD_THE_FIRE",
+            "families": [
+                "furnace"
+            ],
+            "yield": "none"
+        },
+        {
+            "id": "SAFE_OVERDRIVE",
+            "families": [
+                "furnace"
+            ],
+            "yield": "none"
+        },
+        {
+            "id": "SHARED_HEARTH",
+            "families": [
+                "furnace"
+            ],
+            "yield": "none"
+        },
+        {
+            "id": "CRUCIBLE_HEART",
+            "families": [
+                "furnace"
+            ],
+            "yield": "none"
+        },
+        {
+            "id": "FLUXED_BLEND",
+            "families": [
+                "furnace"
+            ],
+            "yield": "none"
+        },
+        {
+            "id": "SLAG_RECLAIM",
+            "families": [
+                "furnace"
+            ],
+            "yield": "none"
+        },
+        {
+            "id": "CRUSHER_LINE",
+            "families": [
+                "furnace"
+            ],
+            "yield": "output"
+        },
+        {
+            "id": "CLEAN_BLOOM",
+            "families": [
+                "furnace"
+            ],
+            "yield": "none"
+        }
+    ]
 }

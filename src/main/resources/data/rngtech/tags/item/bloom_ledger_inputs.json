@@ -1,0 +1,10 @@
+{
+  "replace": false,
+  "values": [
+    "#c:ores",
+    "#c:raw_materials",
+    "#rngtech:materials/form/ore",
+    "#rngtech:materials/form/raw",
+    "#rngtech:materials/form/crushed"
+  ]
+}

@@ -18,14 +18,18 @@
     ],
     "types": {
         "rngtech:crusher": {
-            "maxOutputMultiplier": 8,
-            "covers": ["OUTPUT_AMOUNT", "SUPER_OUTPUT_CHANCE", "CRUSHER_SALVAGE_CHANCE"],
-            "reason": "Output Amount has no hard cap. 8x is a deliberately generous bound above any current chassis, Crush Head, affix, and keystone stack, plus one Super Output copy and one salvage copy."
+            "maxOutputMultiplier": 12,
+            "covers": [
+                "OUTPUT_AMOUNT", "SUPER_OUTPUT_CHANCE", "CRUSHER_SALVAGE_CHANCE",
+                "BANK_MEMORY", "AT_LEVEL_OUTPUT", "SUPER_OUTPUT_CADENCE",
+                "FAULT_LINES", "RUBBLE_RECLAIMER", "PERSISTENT_BANKS", "COMPOUND_YIELD", "TAILINGS_RECOVERY", "REFINERS_OATH"
+            ],
+            "reason": "Output Amount has no hard cap. 12x is a deliberately generous bound above any chassis, Crush Head, affix, keystone, and ascendancy stack, including Refiner's Oath and At-Level Output, plus one Super Output copy, one Compound Yield copy, and salvage. Bank Memory, Wide Ledger, and Tailings Recovery only keep bonus progress the bound already counts."
         },
         "rngtech:furnace": {
-            "maxOutputMultiplier": 2,
-            "covers": ["SUPER_OUTPUT_CHANCE"],
-            "reason": "Super Output adds at most one copy of the base output."
+            "maxOutputMultiplier": 3,
+            "covers": ["SUPER_OUTPUT_CHANCE", "LEDGER_RATE", "CRUSHER_LINE"],
+            "reason": "Super Output adds at most one copy of the base output. The Bloom Ledger adds at most about 0.77 of one on crushed smelts with every Ledger Rate node and Crusher Line, so 3x covers both."
         },
         "rngtech:alloy_furnace": {
             "maxOutputMultiplier": 2,

@@ -15,6 +15,8 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.TextColor;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.item.ItemStack;
@@ -181,18 +183,39 @@ final class AscendancyPanel {
         };
     }
 
-    /** The crest beside the start node. */
+    /** The crest beside the start node: the ascendancy, Seal tiers as gems, points, and what to do next. */
     List<Component> badgeTooltip() {
         MachineProgressionState state = view.masterySnapshot();
         Ascendancy chosen = AscendancyCatalog.get(state.ascendancy());
         List<Component> tooltip = new ArrayList<>();
-        tooltip.add(Component.translatable("rngtech.mastery.ascendancy.title").withStyle(ChatFormatting.WHITE));
-        if (chosen != null) {
-            tooltip.add(Component.translatable(chosen.translationKey()).withStyle(ChatFormatting.GOLD));
+        tooltip.add(Component.translatable("rngtech.mastery.ascendancy.crest.title")
+                .withStyle(style -> style.withColor(TextColor.fromRgb(ACCENT & 0xFFFFFF)).withBold(true)));
+        tooltip.add(chosen == null
+                ? Component.translatable("rngtech.mastery.ascendancy.crest.unclaimed").withStyle(ChatFormatting.DARK_GRAY, ChatFormatting.ITALIC)
+                : Component.translatable(chosen.translationKey()).withStyle(ChatFormatting.LIGHT_PURPLE));
+        MutableComponent tiers = Component.empty();
+        for (int tier = 0; tier < AscendancyCatalog.MAX_TIERS; tier++) {
+            boolean earned = tier < state.sealTiers();
+            tiers.append(Component.literal(earned ? "\u25c6" : "\u25c7").withStyle(earned ? ChatFormatting.GOLD : ChatFormatting.DARK_GRAY));
         }
-        tooltip.addAll(pointsTooltip(state).subList(1, 3));
-        tooltip.add(Component.translatable("rngtech.mastery.ascendancy.open").withStyle(ChatFormatting.YELLOW));
+        tooltip.add(tiers.append("  ").append(Component.translatable("rngtech.mastery.ascendancy.crest.points",
+                state.ascendancyNodes().size(), state.ascendancyPoints()).withStyle(ChatFormatting.GRAY)));
+        tooltip.add(crestHint(state));
         return tooltip;
+    }
+
+    private Component crestHint(MachineProgressionState state) {
+        AscendStatus status = status(state);
+        if (status == AscendStatus.READY) {
+            return Component.translatable("rngtech.mastery.ascendancy.crest.ready").withStyle(ChatFormatting.GREEN);
+        }
+        if (status == AscendStatus.FREE_CHOICE) {
+            return Component.translatable("rngtech.mastery.ascendancy.crest.choose").withStyle(ChatFormatting.GREEN);
+        }
+        if (state.ascendancyUnspent() > 0 && !state.ascendancy().isEmpty()) {
+            return Component.translatable("rngtech.mastery.ascendancy.crest.unspent", state.ascendancyUnspent()).withStyle(ChatFormatting.YELLOW);
+        }
+        return Component.translatable("rngtech.mastery.ascendancy.open").withStyle(ChatFormatting.DARK_GRAY);
     }
 
     /** A node's name, kind, and effects; {@code actions} adds allocation and refund hints for the chosen tree. */

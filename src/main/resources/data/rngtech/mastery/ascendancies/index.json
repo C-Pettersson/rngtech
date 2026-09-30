@@ -1,4 +1,9 @@
 {
     "version": 1,
-    "ascendancies": []
+    "ascendancies": [
+        "rockbreaker.json",
+        "assayer.json",
+        "crucible_keeper.json",
+        "bloomer.json"
+    ]
 }

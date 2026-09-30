@@ -2,7 +2,7 @@
 
 Source: [draft design](machine-ascendancies.md).
 
-Status: **Prototype** for the 2.0 release — PRD accepted 2026-09-29 on `feature/machine-ascendancies`. The framework, loop audit, Seals, and UI are in; no ascendancy content ships yet.
+Status: **Prototype** for the 2.0 release — PRD accepted 2026-09-29 on `feature/machine-ascendancies`. The framework, loop audit, Seals, UI, and the Crusher and Furnace ascendancies are in; they still need an in-game playtest.
 
 ## Scope checklist
 
@@ -13,7 +13,8 @@ Status: **Prototype** for the 2.0 release — PRD accepted 2026-09-29 on `featur
 - [x] Loop safety: `bonus_output` on Alloy Furnace and Metal Press recipes (calibration and recycling from PR #14; the Melter's arrives with its first yield effect), a shared `BonusOutputRecipe` check, the recipe loop audit with mutation self-tests, opt-outs for every loop found, and the CI gate on.
 - [x] Seals: items, recipes, `rngtech:ascendancy_seal_recipes_enabled` condition and config key, entry gate, server actions.
 - [x] UI: Ascendancy panel and choose dialog in `MasteryScreenSupport`, client sync, Bonus Summary section, Jade line, JEI.
-- [ ] Crusher and Furnace content with their new stats, Stats tab rows shown only when granted, and shared mechanics, then an in-game playtest.
+- [x] Crusher and Furnace content with their new stats, Stats tab rows shown only when granted, and shared mechanics.
+- [ ] In-game playtest of the Crusher and Furnace ascendancies and the Ascendancy panel.
 - [ ] Alloy Furnace, Metal Press, Resonance Calibrator, Melter, and Forestry Companion content.
 - [ ] Canonical documentation, Machine Stats entries, implementation matrix, getting-started, quests, and ModDex view.
 
@@ -43,6 +44,37 @@ Recorded 2026-09-29:
 - Deep notables must define the build. Tradeoffs are optional and can pay for more power.
 - The system must support adding ascendancies later: data-driven catalog with no fixed count per family, a behavior registry, declared stats, and a test fixture ascendancy.
 - Ascendancies may introduce new stats and behaviors, and are encouraged to. The launch set introduces 24 stats and extends two existing ones.
+
+Recorded 2026-09-30 for the Crusher and Furnace content (Phase 6):
+
+- **Stat units:**
+    - Jam Chance is a multiplier on the configured under-level jam chance; every Crusher starts at 1.
+    - Ledger Rate is a percent of the base output; the Bloom Ledger root grants 11.11%, a ninth of an item.
+    - Jam Recovery, Under-Level Efficiency, At-Level Output, and Overdrive Cap are percents. Overdrive Speed is a percent per 10 °C.
+    - Mother Lode fixes Super Output Cadence at 16 instead of adding to it.
+- **Deep notables' small nodes**, which the PRD tables left open:
+    - Rockbreaker: +10% Under-Level Efficiency before Bedrock Bite, and +2% salvage before Rubble Reclaimer.
+    - Assayer: 4% increased Output Amount before Refiner's Oath, and +1% Super Output chance before Mother Lode.
+    - Crucible Keeper: 10% increased Heat Transfer before Crucible Heart, and +2 Strain Recovery before Strain Bleed.
+    - Bloomer: 10% increased Ledger Rate before Patient Bloom, and 8% increased Temperature Stability before Clean Bloom.
+- **Crusher rules:**
+    - Hardness Tolerance removes missing levels from the time, FE, and jam penalties, but the machine is still under level, so bonus output stays off.
+    - Under-Level Efficiency stops at 90%.
+    - Bank Memory is the number of remembered inputs; without it a Crusher keeps one bank, as before.
+    - Compound Yield rolls Super Output a second time when a craft's bank pays out, and copies the items the bank paid.
+    - Tailings Recovery banks one whole item in the current input's bank.
+    - Mother Lode counts eligible cycles per remembered input.
+    - Wide Ledger saves the banks in a new `rngtech:output_banks` component that drops and pick-block copy.
+- **Furnace rules:**
+    - Overdrive heats a working lane toward its maximum temperature. Each step costs another heat tick of FE or fuel.
+    - With any Overdrive Margin, Overdrive stops that far below the recipe's safe maximum. Safe Margin also keeps an overdriving lane's stability wobble out of the overheat band.
+    - Hold the Fire keeps a lane's heat whenever its input slot holds anything the Furnace can smelt.
+    - Shared Hearth gives every Lead Furnace lane at least 90% of the hottest lane's maximum, meaning the base plus its Heat Core.
+    - Crucible Heart pays a second craft's FE, or its burn time on a fuel furnace.
+    - The Bloom Ledger feeds from bonus-eligible smelts of inputs in the new `rngtech:bloom_ledger_inputs` tag (ores, raw ores, and crushed materials). It pays whole items when the output has room.
+    - Fluxed Blend lowers the minimum, target, and safe maximum of blend smelts (`rngtech:alloy_blend_smeltables`) by 100 °C.
+    - Slag Reclaim gives malformed-ingot recovery 100% more Processing Speed and 50% less Energy Usage.
+- **Stats tab:** granted declared stats follow the machine's own rows, highlighted. Rows that would run off the screen collapse into a last "+N more stats" row whose tooltip lists them.
 
 ## Findings
 
@@ -101,6 +133,17 @@ Recorded 2026-09-29:
     - Jade shows the ascendancy and its points while sneaking. JEI has an information entry for the three Seals.
     - Deferred to Phase 6: Stats tab rows for ascendancy stats, because no declared stat exists yet.
     - The panel is hidden until a family has ascendancies, so it first appears in normal play with Phase 6 content.
+- 2026-09-30, Phase 6 Crusher and Furnace content:
+    - Four ascendancies ship: Rockbreaker and Assayer for the Crusher, and Crucible Keeper and Bloomer for the Furnace. Each has 13 nodes and placeholder icons for its root and notables.
+    - Twelve new stats are declared: Hardness Tolerance, Jam Chance, Jam Recovery, Under-Level Efficiency, Bank Memory, At-Level Output, Super Output Cadence, Overdrive Speed, Overdrive Cap, Overdrive Margin, Strain Recovery, and Ledger Rate. So are fifteen behaviors. Their names, descriptions, and tooltips are in the language file.
+    - Shared mechanics:
+        - `BonusBanks` gives the Crusher's bonus bar per-input memory and cadence counts.
+        - `OutputLedger` banks fractional extra output per output item.
+        - `AscendancyFormulas` holds the penalty, jam, Refiner's Oath, Overdrive, and ledger math.
+        - Machines cache their Mastery behaviors until the progression changes.
+    - Mastery menus sync up to eight granted declared stats. The Crusher and Furnace Stats tabs show them.
+    - The Furnace screen draws each lane's Bloom Ledger along the bottom of its progress bar, and the progress tooltip gives the percentage.
+    - The loop audit covers every new yield stat and behavior: the Crusher bound is now `12x` and the Furnace bound `3x`. The audit still finds no loop. A domain check keeps the strongest Bloom Ledger below the bound's assumed 0.8 of an item per smelt.
 
 ## Verification
 
@@ -109,6 +152,7 @@ Recorded 2026-09-29:
 - 2026-09-29 Phase 3: `gradlew spotlessApply` and `quickCheck` passed with 837 domain checks. `npm run moddex:check` passed, including the recipe loop audit (982 recipes, no item or FE loop, no allowlist entries) and both mutation self-tests. `npm run repo:check` passed. No in-game check yet: the gameplay changes are Super Output no longer applying to 21 opted-out recipes, and JEI marking them.
 - 2026-09-30 Phase 4: `gradlew spotlessApply` and `quickCheck` passed with 853 domain checks, including the ascendancy action checks with a fake payment. `npm run moddex:check` passed: the loop audit covers 988 recipes, and the new Seal recipe check covers 6. `npm run repo:check` passed. `runGameTestServer` completed mod loading with the new items, config key, and condition registered, then exited before datapack loading because no game tests are registered. Recipe parsing and Seal use still need an in-game check.
 - 2026-09-30 Phase 5: `gradlew spotlessApply` and `quickCheck` passed with 1058 domain checks, including menu sync, Ascend status agreement with the server, the Bonus Summary, and panel layout for every catalog entry. `npm run moddex:check` and `npm run repo:check` passed. Not yet run in game: the panel has no shipped ascendancy to show until Phase 6, so rendering, clicks, Jade, and JEI need a client check then.
+- 2026-09-30 Phase 6: `gradlew spotlessApply` and `quickCheck` passed with 1431 domain checks, including launch content, stat and behavior language keys, bank memory, the ledger, the formulas, granted stat sync, and layout of the new trees. `npm run moddex:check` passed: the loop audit covers 988 recipes with the new bounds and still finds no loop. `npm run repo:check` passed. Not yet run in game; every Crusher and Furnace mechanic still needs a playtest.
 
 ## Handoff and limits
 

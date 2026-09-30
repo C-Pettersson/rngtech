@@ -7,6 +7,7 @@ import com.rngtech.rpg.progression.AscendancyCatalog;
 import com.rngtech.rpg.progression.MachineMasteryFamily;
 import com.rngtech.rpg.progression.MachineMasteryHost;
 import com.rngtech.rpg.progression.MachineProgressionState;
+import com.rngtech.rpg.progression.MasteryDeclarations;
 import com.rngtech.rpg.progression.MegaPassiveTree;
 import com.rngtech.rpg.progression.PassiveProgressionView;
 
@@ -28,14 +29,39 @@ public final class MasteryMenuSupport {
     private static final int SEAL_TIERS = ASCENDANCY + 1;
     private static final int ENTRY_STAGE = SEAL_TIERS + 1;
     private static final int ASCENDANCY_NODES_START = ENTRY_STAGE + 1;
-    public static final int FIELD_COUNT = ASCENDANCY_NODES_START + AscendancyCatalog.MAX_POINTS;
+    /** Declared stats granted by the ascendancy, as a stat id plus one and its value times 100. */
+    private static final int GRANTED_STATS_START = ASCENDANCY_NODES_START + AscendancyCatalog.MAX_POINTS;
+    public static final int GRANTED_STAT_SLOTS = 8;
+    public static final int FIELD_COUNT = GRANTED_STATS_START + GRANTED_STAT_SLOTS * 2;
+
+    /** A declared stat the chosen ascendancy grants, with its current value. */
+    public record GrantedStat(MachineStat stat, double value) {
+    }
 
     public static int get(MachineMasteryHost host, int field, Supplier<MachineStatAccumulator> stats) {
         if (field >= ATTRIBUTE_START && field < ASCENDANCY) {
             return (int) Math.round(stats.get().value(attribute(field - ATTRIBUTE_START)) * 100);
         }
         if (field == ENTRY_STAGE) { return host.ascendancyEntryStage(); }
+        if (field >= GRANTED_STATS_START) {
+            int slot = (field - GRANTED_STATS_START) / 2;
+            List<MachineStat> granted = AscendancyCatalog.grantedStats(host.masteryState(), host.masteryFamily());
+            if (slot >= granted.size()) { return 0; }
+            MachineStat stat = granted.get(slot);
+            return (field - GRANTED_STATS_START) % 2 == 0 ? stat.ordinal() + 1 : (int) Math.round(stats.get().value(stat) * 100);
+        }
         return field >= ASCENDANCY ? ascendancyField(host.masteryState(), field) : get(host.machineProgression(), field);
+    }
+
+    public static List<GrantedStat> grantedStats(ContainerData data, int base) {
+        List<GrantedStat> granted = new ArrayList<>();
+        for (int slot = 0; slot < GRANTED_STAT_SLOTS; slot++) {
+            int id = data.get(base + GRANTED_STATS_START + slot * 2) - 1;
+            if (id >= 0 && id < MachineStat.values().length && MasteryDeclarations.declared(MachineStat.byId(id))) {
+                granted.add(new GrantedStat(MachineStat.byId(id), data.get(base + GRANTED_STATS_START + slot * 2 + 1) / 100.0));
+            }
+        }
+        return granted;
     }
 
     /** The chosen ascendancy as its catalog index plus one, and its nodes as their index in that ascendancy plus one. */

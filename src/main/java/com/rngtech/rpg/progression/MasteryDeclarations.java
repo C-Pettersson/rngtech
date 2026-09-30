@@ -46,6 +46,7 @@ public final class MasteryDeclarations {
     public static Yield yield(MachineStat stat) { return STATS.getOrDefault(stat, Declaration.NONE).yield(); }
     public static Yield yield(String behavior) { return BEHAVIORS.getOrDefault(behavior, Declaration.NONE).yield(); }
     public static boolean declared(String behavior) { return BEHAVIORS.containsKey(behavior); }
+    public static boolean declared(MachineStat stat) { return STATS.containsKey(stat); }
 
     private static void load(JsonObject data) {
         for (JsonElement element : MasteryNodeJson.array(data, "stats")) {

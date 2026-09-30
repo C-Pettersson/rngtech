@@ -743,7 +743,10 @@ public class CrusherScreen extends AbstractContainerScreen<CrusherMenu> {
                     tooltip
             );
         }
-        return MachineScreenStyle.withoutInactiveModifierStats(STAT_TYPES, statLines);
+        return MachineScreenStyle.fitStatLines(
+                MachineScreenStyle.withAscendancyStats(MachineScreenStyle.withoutInactiveModifierStats(STAT_TYPES, statLines), menu.ascendancyStats()),
+                MachineScreenStyle.maxStatRows(STAT_PANEL_Y, BASE_IMAGE_HEIGHT)
+        );
     }
 
     private Component statTooltip(int index, double value) {

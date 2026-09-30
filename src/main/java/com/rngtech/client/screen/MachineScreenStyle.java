@@ -1,5 +1,6 @@
 package com.rngtech.client.screen;
 
+import com.rngtech.content.menu.MasteryMenuSupport;
 import com.rngtech.rpg.MachineBehavior;
 import com.rngtech.rpg.MachineModifier;
 import com.rngtech.rpg.MachineModifierEffect;
@@ -14,9 +15,11 @@ import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.world.item.ItemStack;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
@@ -478,6 +481,52 @@ final class MachineScreenStyle {
             Component tooltip
     ) {
         return new StatLine(label, value, strength, integral, enhanced, tooltip);
+    }
+
+    /** Declared ascendancy stats follow the machine's own rows, highlighted, only while an allocated node grants them. */
+    static StatLine[] withAscendancyStats(StatLine[] statLines, List<MasteryMenuSupport.GrantedStat> granted) {
+        StatLine[] all = Arrays.copyOf(statLines, statLines.length + granted.size());
+        for (int index = 0; index < granted.size(); index++) {
+            MasteryMenuSupport.GrantedStat stat = granted.get(index);
+            all[statLines.length + index] = statLine(
+                    Component.translatable(stat.stat().translationKey()),
+                    statValue(stat.stat(), stat.value()),
+                    1.0,
+                    true,
+                    true,
+                    MachineStatDisplay.statTooltip(stat.stat(), stat.value())
+            );
+        }
+        return all;
+    }
+
+    /** Rows a stat panel at {@code panelY} can show inside a screen {@code imageHeight} tall. */
+    static int maxStatRows(int panelY, int imageHeight) {
+        return Math.max(1, (imageHeight - panelY - HEADER_HEIGHT - ROW_TOP_OFFSET - FOOTER_PADDING - 4) / ROW_HEIGHT);
+    }
+
+    /** Keeps a stat panel on screen: rows past the limit collapse into a last row whose tooltip lists them. */
+    static StatLine[] fitStatLines(StatLine[] statLines, int maxRows) {
+        if (statLines.length <= maxRows) {
+            return statLines;
+        }
+        StatLine[] visible = Arrays.copyOf(statLines, maxRows);
+        MutableComponent hidden = Component.empty();
+        for (int index = maxRows - 1; index < statLines.length; index++) {
+            if (index > maxRows - 1) {
+                hidden.append(", ");
+            }
+            hidden.append(statLines[index].label()).append(" " + statLines[index].value());
+        }
+        visible[maxRows - 1] = new StatLine(
+                Component.translatable("rngtech.configuration.more_stats", statLines.length - maxRows + 1),
+                "",
+                0.0,
+                true,
+                false,
+                hidden
+        );
+        return visible;
     }
 
     static StatLine[] withoutInactiveModifierStats(MachineStat[] stats, StatLine[] statLines) {
