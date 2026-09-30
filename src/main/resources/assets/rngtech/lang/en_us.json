@@ -1925,8 +1925,6 @@
   "rngtech.tooltip.modifier.affix.shock_tooth.extra": "Installed Crush Heads spend less extra FE on hard recipes.",
   "rngtech.tooltip.modifier.affix.sieve_memory": "Improves Recovery Filter processing speed. %s",
   "rngtech.tooltip.modifier.affix.sieve_memory.extra": "Repeated residue patterns finish faster.",
-  "rngtech.tooltip.modifier.affix.static_drain": "Adds recycler duplication chance. %s",
-  "rngtech.tooltip.modifier.affix.static_drain.extra": "Recovered stored FE can become an extra recycler output.",
   "rngtech.tooltip.modifier.affix.trace_cutter": "Improves Disassembly Head processing speed. %s",
   "rngtech.tooltip.modifier.affix.trace_cutter.extra": "Data-bearing scrap is stripped faster.",
   "rngtech.tooltip.modifier.affix.vapor_lock_breaker": "Improves Fluid Pump transfer recovery. %s",
