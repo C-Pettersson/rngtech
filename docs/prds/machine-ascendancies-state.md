@@ -2,7 +2,7 @@
 
 Source: [draft design](machine-ascendancies.md).
 
-Status: **Planned** for the 2.0 release — PRD accepted 2026-09-29 on `feature/machine-ascendancies`. No code yet.
+Status: **Prototype** for the 2.0 release — PRD accepted 2026-09-29 on `feature/machine-ascendancies`. The framework, loop audit, and Seals are in; no ascendancy content ships yet.
 
 ## Scope checklist
 
@@ -11,7 +11,7 @@ Status: **Planned** for the 2.0 release — PRD accepted 2026-09-29 on `feature/
 - [x] Resolve the PRD's open questions.
 - [x] Framework: catalog index loader, shared node parser, stat declarations, behavior registry, `ascendancyEntryStage()`, state fields, load validation, `forFamily()` family check, effect pipeline, build codes, generic catalog validation, fixture ascendancies, domain checks.
 - [x] Loop safety: `bonus_output` on Alloy Furnace and Metal Press recipes (calibration and recycling from PR #14; the Melter's arrives with its first yield effect), a shared `BonusOutputRecipe` check, the recipe loop audit with mutation self-tests, opt-outs for every loop found, and the CI gate on.
-- [ ] Seals: items, recipes, `rngtech:ascendancy_seal_recipes_enabled` condition and config key, entry gate, server actions.
+- [x] Seals: items, recipes, `rngtech:ascendancy_seal_recipes_enabled` condition and config key, entry gate, server actions.
 - [ ] UI: Ascendancy panel and choose dialog in `MasteryScreenSupport`, Stats tab visibility, Bonus Summary section, Jade line, JEI.
 - [ ] Crusher and Furnace content with their new stats and shared mechanics, then an in-game playtest.
 - [ ] Alloy Furnace, Metal Press, Resonance Calibrator, Melter, and Forestry Companion content.
@@ -79,15 +79,24 @@ Recorded 2026-09-29:
     - Every loop the audit found ran through bonus output on one of 21 recipes: 19 Component Recycling recipes and 2 Furnace silica gel recharge recipes. They now set `bonus_output: false`. It found no base-recipe or FE loop.
     - Calibration catalysts and stabilizers are free inputs, so the calibrate-then-recycle pattern stays a loop even though it consumes lapis.
     - Alloy Furnace and Metal Press recipes gained `bonus_output`, and JEI marks opted-out recipes. Every machine now applies Super Output and salvage through `ProcessingChance` with the recipe, instead of per-machine checks.
+- 2026-09-30, Phase 4 Seals:
+    - Registered `rngtech:ascendancy_seal_1` to `_3` (`AscendancySealItem`, stack of 16, uncommon, rare, and epic) and the `rngtech:primed_seal_core` and `rngtech:lubricated_seal_core` intermediates. All have placeholder textures and creative tab entries.
+    - Six recipes, all gated by `rngtech:ascendancy_seal_recipes_enabled` and material conditions: two Component Assembler Seal Core recipes, two Seal I routes, and one each for Seals II and III.
+    - The `ascendancy.sealRecipesEnabled` common config key backs the condition and defaults to on.
+    - Server actions in `MasteryOperations`: `ascend`, `choose_ascendancy`, `switch_ascendancy`, `allocate_ascendancy`, and `refund_ascendancy`.
+    - Validation happens before payment, so a rejected action costs nothing. A Seal is taken from the player's inventory; creative players must carry it but keep it. A refund costs five Mastery Refunds (`AscendancyCatalog.REFUNDS_PER_NODE`).
+    - `tools/moddex/check-ascendancy-seals.mjs` fails `moddex:check` when a Seal or Seal Core recipe lacks the condition.
 - Not yet covered, and left for the UI phase:
     - Menus sync Mastery through `ContainerData`, so the client snapshot has no ascendancy yet. The Mastery screen's Copy button therefore omits it, while Configurator copies from the server state and include it.
     - The Bonus Summary drawer does not list ascendancy effects yet.
+    - No screen sends the ascendancy actions yet.
 
 ## Verification
 
 - 2026-09-29 PRD revisions: `npm run repo:check` passed. `mkdocs build --strict` was not run because MkDocs is not installed locally; CI runs it.
-- 2026-09-29 Phase 2: `gradlew spotlessApply` and `quickCheck` passed with 837 domain checks (753 on the previous commit).
-- 2026-09-29 Phase 3: `gradlew spotlessApply` and `quickCheck` passed with 837 domain checks. `npm run moddex:check` passed, including the recipe loop audit (982 recipes, no item or FE loop, no allowlist entries) and both mutation self-tests. `npm run repo:check` passed. No in-game check yet: the gameplay changes are Super Output no longer applying to 21 opted-out recipes, and JEI marking them. `npm run moddex:check` and `npm run repo:check` passed. No in-game check: Phase 2 adds no player-facing surface.
+- 2026-09-29 Phase 2: `gradlew spotlessApply` and `quickCheck` passed with 837 domain checks (753 on the previous commit). `npm run moddex:check` and `npm run repo:check` passed. No in-game check: Phase 2 adds no player-facing surface.
+- 2026-09-29 Phase 3: `gradlew spotlessApply` and `quickCheck` passed with 837 domain checks. `npm run moddex:check` passed, including the recipe loop audit (982 recipes, no item or FE loop, no allowlist entries) and both mutation self-tests. `npm run repo:check` passed. No in-game check yet: the gameplay changes are Super Output no longer applying to 21 opted-out recipes, and JEI marking them.
+- 2026-09-30 Phase 4: `gradlew spotlessApply` and `quickCheck` passed with 853 domain checks, including the ascendancy action checks with a fake payment. `npm run moddex:check` passed: the loop audit covers 988 recipes, and the new Seal recipe check covers 6. `npm run repo:check` passed. `runGameTestServer` completed mod loading with the new items, config key, and condition registered, then exited before datapack loading because no game tests are registered. Recipe parsing and Seal use still need an in-game check.
 
 ## Handoff and limits
 

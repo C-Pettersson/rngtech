@@ -88,6 +88,7 @@ Fluid purge cleanup is code-backed for RNGTech machines that own real stored tan
 | Affix Injector | `rngtech:affix_injector` | Refinement consumable item | Yes | None | No | Acts as catalyst | Adds a legal rolled prefix or suffix for `1-8` RP | Prototype |
 | Affix Upgrader | `rngtech:affix_modifier` | Refinement consumable item | Yes | None | No | Acts as catalyst | Upgrades one weighted random eligible rolled affix for `2-6` RP | Prototype |
 | Greater Affix Upgrader | `rngtech:affix_upgrade` | Refinement consumable item | Yes | None | No | Acts as catalyst | Requires an installed Affix Resonance Matrix, then upgrades one weighted random eligible rolled affix or tunes a capped retunable affix for `6-10` RP | Prototype |
+| Ascendancy Seals | `rngtech:ascendancy_seal_1`, `rngtech:ascendancy_seal_2`, `rngtech:ascendancy_seal_3`, plus intermediates `rngtech:primed_seal_core` and `rngtech:lubricated_seal_core` | Items | Yes through `rngtech:calibrated_shaped` Seal recipes and Component Assembler Seal Core recipes, all gated by the `rngtech:ascendancy_seal_recipes_enabled` condition and the `ascendancy.sealRecipesEnabled` config key (default on) | None | No | No | Each Seal grants 2 ascendancy points to one machine through the Mastery Ascend action, in tier order; Seal I chooses the ascendancy and needs entry stage 4. Switching ascendancy consumes a Seal I. Creative players must carry the Seal but do not consume it. Seals carry no data, so Seals from loot, quests, or `/give` work the same. No player-facing panel yet. | Prototype |
 | Ascension Catalyst | `rngtech:ascension_catalyst` | Refinement consumable item | Yes | None | No | Acts as catalyst | Promotes Magic targets with at least `5` RP to Rare, adds one legal Rare affix, and consumes `4` RP | Prototype |
 | Ascension Matrix | `rngtech:ascension_matrix` | Refinement consumable item | Yes | None | No | Acts as catalyst | Promotes Magic targets to Rare, adds rolled affixes, upgrades or retunes one pre-existing rolled affix, and consumes all RP | Prototype |
 | Nullifier Coil | `rngtech:nullifier_coil` | Refinement consumable item | Yes | None | No | Acts as catalyst | Removes one random non-implicit rolled affix | Prototype |
@@ -112,7 +113,18 @@ Fluid purge cleanup is code-backed for RNGTech machines that own real stored tan
 
 ## Shared Machine Mastery
 
-Status: Prototype. [Machine Mastery](../systems/machine-mastery.md) provides one layered 1315-node catalog, six starting archetypes, Control/Drive/Reserve attributes, 100 levels, and 99 points from levels, with storage for 120. Crusher, Furnace, Forestry Companion, Alloy Furnace, Metal Press, Melter, and Resonance Calibrator use this graph from five of the six starts; the Alloy Furnace shares the Furnace start, and the Metal Press and Resonance Calibrator share the Control start. It includes per-effect applicability, keystone payoffs tagged to the machine groups that pay their costs, additive increased/reduced and multiplicative more/less operations, attribute suppression with explicit scaling, absolute heat constraints, hard Crusher recipe ceilings, a bonus-output-disabling Single Pass keystone, Gear-safe refunds, ordered build codes, automatic allocation, a Bonus Summary drawer in the expanded view, and Configurator Mastery mode. The registered `rngtech:mastery_refund` item has a shapeless recipe. Versioned stable-ID saves preserve legacy XP and levels and refund old allocations. Generator and storage adapters for the Reserve start, and family ascendancies, are deferred. Gameplay balance and multiplayer UI still require focused in-game checks.
+Status: Prototype. [Machine Mastery](../systems/machine-mastery.md) provides one layered 1315-node catalog, six starting archetypes, Control/Drive/Reserve attributes, 100 levels, and 99 points from levels, with storage for 120. Crusher, Furnace, Forestry Companion, Alloy Furnace, Metal Press, Melter, and Resonance Calibrator use this graph from five of the six starts; the Alloy Furnace shares the Furnace start, and the Metal Press and Resonance Calibrator share the Control start. It includes per-effect applicability, keystone payoffs tagged to the machine groups that pay their costs, additive increased/reduced and multiplicative more/less operations, attribute suppression with explicit scaling, absolute heat constraints, hard Crusher recipe ceilings, a bonus-output-disabling Single Pass keystone, Gear-safe refunds, ordered build codes, automatic allocation, a Bonus Summary drawer in the expanded view, and Configurator Mastery mode. The registered `rngtech:mastery_refund` item has a shapeless recipe. Versioned stable-ID saves preserve legacy XP and levels and refund old allocations. Generator and storage adapters for the Reserve start are deferred. Gameplay balance and multiplayer UI still require focused in-game checks.
+
+Family ascendancies are in progress for 2.0; see the [ascendancies PRD](../prds/machine-ascendancies.md). Code-backed so far:
+
+- a data-driven ascendancy catalog with tree-shape validation, currently empty outside test fixtures;
+- ascendancy state in `rngtech:machine_progression` and ascendancy effects in the Mastery stat pipeline;
+- build codes that carry the ascendancy;
+- the recipe loop audit;
+- Ascendancy Seal items and recipes;
+- server actions to ascend, choose, switch, allocate, and refund.
+
+The Ascendancy panel and the launch ascendancies are not implemented yet.
 
 ## Material Catalog
 

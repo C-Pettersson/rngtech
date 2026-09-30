@@ -1,0 +1,58 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "rngtech:ascendancy_seal_recipes_enabled"
+    },
+    {
+      "type": "rngtech:material_enabled",
+      "material": "tungstensteel"
+    },
+    {
+      "type": "rngtech:material_enabled",
+      "material": "nullite"
+    }
+  ],
+  "type": "rngtech:calibrated_shaped",
+  "category": "misc",
+  "pattern": [
+    "TDT",
+    "NKN",
+    "TCT"
+  ],
+  "key": {
+    "C": {
+      "ingredient": {
+        "tag": "c:circuits/elite"
+      }
+    },
+    "D": {
+      "ingredient": {
+        "item": "rngtech:calibrated_diamond_crystal"
+      },
+      "calibration": {
+        "family": "logic",
+        "min_stage": 6,
+        "min_stability": 85
+      }
+    },
+    "K": {
+      "ingredient": {
+        "item": "rngtech:lubricated_seal_core"
+      }
+    },
+    "N": {
+      "ingredient": {
+        "item": "rngtech:nullite_plate"
+      }
+    },
+    "T": {
+      "ingredient": {
+        "item": "rngtech:tungstensteel_plate"
+      }
+    }
+  },
+  "result": {
+    "count": 1,
+    "id": "rngtech:ascendancy_seal_2"
+  }
+}

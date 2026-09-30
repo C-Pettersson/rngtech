@@ -3,6 +3,7 @@ package com.rngtech.content.registry;
 import com.rngtech.RNGTech;
 import com.rngtech.content.material.MaterialEnabledCondition;
 import com.rngtech.content.material.OreWorldgenEnabledCondition;
+import com.rngtech.content.recipe.AscendancySealRecipesEnabledCondition;
 
 import com.mojang.serialization.MapCodec;
 import net.neoforged.bus.api.IEventBus;
@@ -19,6 +20,8 @@ public final class ModConditions {
             CONDITIONS.register("material_enabled", () -> MaterialEnabledCondition.CODEC);
     public static final DeferredHolder<MapCodec<? extends ICondition>, MapCodec<OreWorldgenEnabledCondition>> ORE_WORLDGEN_ENABLED =
             CONDITIONS.register("ore_worldgen_enabled", () -> OreWorldgenEnabledCondition.CODEC);
+    public static final DeferredHolder<MapCodec<? extends ICondition>, MapCodec<AscendancySealRecipesEnabledCondition>> ASCENDANCY_SEAL_RECIPES_ENABLED =
+            CONDITIONS.register("ascendancy_seal_recipes_enabled", () -> AscendancySealRecipesEnabledCondition.CODEC);
 
     public static void register(IEventBus bus) {
         CONDITIONS.register(bus);

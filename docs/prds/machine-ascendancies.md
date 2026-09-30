@@ -100,18 +100,20 @@ Key existing code:
 
 ### Tiers
 
-| Tier | Seal materials | Calibrated part in the recipe | Reward |
-|---|---|---|---|
-| I | Stage 5 (Aluminum, Sparksteel) | Stage 5 part at `70+` stability, or two at `55+` plus a Stabilizer Matrix | Choose an ascendancy, +2 points |
-| II | Stage 7 (Tungstensteel, Nullite, Aethergold) | Stage 7 part or Calibrated Diamond Crystal at `85+` stability | +2 points |
-| III (aspirational) | Stage 8 (Exotic) | Highest-stage calibrated part at `95+` stability | +2 points |
+| Tier | Seal materials | Calibrated part in the recipe | Seal Core | Reward |
+|---|---|---|---|---|
+| I | Sparksteel plates, Aluminum casings, an Advanced circuit | Stage 5 Calibrated Conductive Component at `70+` stability, or two at `55+` plus a Stabilizer Matrix | Primed Seal Core | Choose an ascendancy, +2 points |
+| II | Tungstensteel and Nullite plates, an Elite circuit | Calibrated Diamond Crystal at `85+` stability | Lubricated Seal Core | +2 points |
+| III (aspirational) | Naquadah plates, an Exotic Machine Frame, an Ultimate circuit | Calibrated Diamond Crystal at `95+` stability | Two Lubricated Seal Cores | +2 points |
 
 - Each tier is earned once per chassis, in order.
 - Seal items are `rngtech:ascendancy_seal_1`, `rngtech:ascendancy_seal_2`, and `rngtech:ascendancy_seal_3`.
 - Crafting a Seal is the trial. Seal recipes are `rngtech:calibrated_shaped` and combine several machine families:
-    - Metal Press plates of the tier material.
-    - A calibrated part from the Resonance Calibrator.
-    - A Primed Seal Core from the Component Assembler, using Electrolyte Solution for Tier I and Lubricant for Tiers II–III.
+    - Metal Press plates and casings of the tier material.
+    - A calibrated part from the Resonance Calibrator. The Calibrated Diamond Crystal (Stage 6, `75`–`95` stability) is the highest calibrated part that exists, so Tiers II and III gate on its stability; a `95` roll is the aspirational top of its range.
+    - Seal Cores from the Component Assembler:
+        - `rngtech:primed_seal_core` uses Electrolyte Solution, a Sparksteel Coil, an Aluminum Casing, redstone, and a Stabilization Catalyst.
+        - `rngtech:lubricated_seal_core` uses Lubricant, a Primed Seal Core, a Tungstensteel Casing, a Nullite Coil, and an Elite circuit.
     - The two calibrated-part routes in Tier I let players trade stability for a Stabilizer Matrix.
 - Seals and Seal Cores have no Component Recycler or Potential Reactor recipes and carry no RPG traits.
 - **Pack-maker control:**

@@ -37,6 +37,7 @@ final class AscendancyChecks {
         familyScope();
         effectPipeline();
         buildCodes();
+        sealActions();
         mainCatalogAssets();
         return checks;
     }
@@ -218,6 +219,67 @@ final class AscendancyChecks {
         require(blocked.state.ascendancyNodes().equals(List.of("small_a")), "paste stops before a Gear conflict");
     }
 
+    private static void sealActions() {
+        var pay = new Payment(Map.of(1, 1, 2, 1, 3, 1), 12);
+        var host = new Host(MachineProgressionState.EMPTY.forFamily(CRUSHER), s -> true);
+        host.entryStage = 3;
+        require("entry_stage".equals(MasteryOperations.ascendancy(host, "ascend", ALPHA, pay)) && pay.seals.get(1) == 1,
+                "Seal I needs entry stage 4 and costs nothing when rejected");
+        host.entryStage = AscendancyCatalog.ENTRY_STAGE;
+        require("ascend_failed".equals(MasteryOperations.ascendancy(host, "ascend", FURNACE, pay)) && pay.seals.get(1) == 1,
+                "a foreign ascendancy is rejected before the Seal is paid");
+        require("seal_missing".equals(MasteryOperations.ascendancy(host, "ascend", ALPHA, new Payment(Map.of(), 0))) && host.state.sealTiers() == 0,
+                "a missing Seal leaves the machine unchanged");
+        require(MasteryOperations.ascendancy(host, "ascend", ALPHA, pay) == null && host.state.ascendancy().equals(ALPHA)
+                && host.state.sealTiers() == 1 && pay.seals.get(1) == 0, "Seal I is consumed and chooses the ascendancy");
+        require(MasteryOperations.ascendancy(host, "ascend", "", pay) == null && host.state.sealTiers() == 2 && pay.seals.get(2) == 0,
+                "Seal II adds the next tier");
+        require(MasteryOperations.ascendancy(host, "allocate_ascendancy", "small_a", pay) == null && host.state.ascendancyNodes().equals(List.of("small_a")),
+                "the allocate action spends an ascendancy point");
+        require("ascendancy_allocation_failed".equals(MasteryOperations.ascendancy(host, "allocate_ascendancy", "deep_e", pay)),
+                "the allocate action rejects a node without its parent");
+        require("switch_failed".equals(MasteryOperations.ascendancy(host, "switch_ascendancy", BETA, pay)) && pay.seals.get(1) == 0,
+                "switching needs an empty ascendancy tree");
+        require("ascendancy_refund_cost".equals(MasteryOperations.ascendancy(host, "refund_ascendancy", "small_a", new Payment(Map.of(), 4)))
+                && host.state.ascendancyNodes().size() == 1, "a refund needs five Mastery Refunds");
+        require(MasteryOperations.ascendancy(host, "refund_ascendancy", "small_a", pay) == null && host.state.ascendancyNodes().isEmpty()
+                && pay.refunds == 12 - AscendancyCatalog.REFUNDS_PER_NODE, "a refund costs five Mastery Refunds");
+        require("seal_missing".equals(MasteryOperations.ascendancy(host, "switch_ascendancy", BETA, pay)), "switching costs a Seal I");
+        pay.seals.put(1, 1);
+        require(MasteryOperations.ascendancy(host, "switch_ascendancy", BETA, pay) == null && host.state.ascendancy().equals(BETA)
+                && host.state.sealTiers() == 2 && pay.seals.get(1) == 0, "switching consumes a Seal I and keeps earned tiers");
+        require(MasteryOperations.ascendancy(host, "ascend", "", pay) == null && "all_seals_used".equals(MasteryOperations.ascendancy(host, "ascend", "", pay)),
+                "a machine earns each of the three tiers once");
+        var retired = new Host(ascended("retired_ascendancy", List.of(), 2), s -> true);
+        var free = new Payment(Map.of(), 0);
+        require(MasteryOperations.ascendancy(retired, "choose_ascendancy", GAMMA, free) == null && retired.state.ascendancy().equals(GAMMA),
+                "a free choice after retirement costs nothing");
+        require("choice_failed".equals(MasteryOperations.ascendancy(retired, "choose_ascendancy", ALPHA, free)), "a free choice needs a missing ascendancy");
+        require("unknown_action".equals(MasteryOperations.ascendancy(retired, "transmute", "", free)), "unknown actions are rejected");
+    }
+
+    /** Seals by tier and Mastery Refunds available to an action. */
+    private static final class Payment implements MasteryOperations.AscendancyPayment {
+        private final Map<Integer, Integer> seals;
+        private int refunds;
+
+        private Payment(Map<Integer, Integer> seals, int refunds) {
+            this.seals = new java.util.HashMap<>(seals);
+            this.refunds = refunds;
+        }
+
+        @Override public boolean seal(int tier) {
+            if (seals.getOrDefault(tier, 0) <= 0) { return false; }
+            seals.merge(tier, -1, Integer::sum);
+            return true;
+        }
+        @Override public boolean refunds(int count) {
+            if (refunds < count) { return false; }
+            refunds -= count;
+            return true;
+        }
+    }
+
     /** Shipped ascendancies need language keys and icons; fixtures stay out of the shipped index. */
     private static void mainCatalogAssets() {
         JsonObject index = MasteryNodeJson.resource(DIRECTORY + "index.json");
@@ -273,6 +335,7 @@ final class AscendancyChecks {
     private static final class Host implements MachineMasteryHost {
         private final Predicate<MachineProgressionState> gear;
         private MachineProgressionState state;
+        private int entryStage = AscendancyCatalog.ENTRY_STAGE;
 
         private Host(MachineProgressionState state, Predicate<MachineProgressionState> gear) {
             this.state = state;
@@ -282,7 +345,7 @@ final class AscendancyChecks {
         @Override public MachineMasteryFamily masteryFamily() { return CRUSHER; }
         @Override public MachineProgressionState machineProgression() { return state; }
         @Override public void setMachineProgression(MachineProgressionState state) { this.state = state; }
-        @Override public int ascendancyEntryStage() { return AscendancyCatalog.ENTRY_STAGE; }
+        @Override public int ascendancyEntryStage() { return entryStage; }
         @Override public boolean masteryGearAllows(MachineProgressionState state) { return gear.test(state); }
     }
 

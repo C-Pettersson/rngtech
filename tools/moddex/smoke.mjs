@@ -1,5 +1,6 @@
 import { startModdexServer } from "./serve.mjs";
 import { checkPassiveTreeData } from "./check-passive-tree.mjs";
+import { checkAscendancySeals } from "./check-ascendancy-seals.mjs";
 import { checkRecipeLoopMutations, checkRecipeLoops } from "./check-recipe-loops.mjs";
 
 const { server, url } = await startModdexServer({ port: 0, log: false });
@@ -109,6 +110,7 @@ try {
     await checkPassiveTreeData(passiveTreeData);
     await checkRecipeLoops();
     await checkRecipeLoopMutations();
+    await checkAscendancySeals();
 
     const data = await dataResponse.json();
     const profiles = Object.keys(data.profiles ?? {});

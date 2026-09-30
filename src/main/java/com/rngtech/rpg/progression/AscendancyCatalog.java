@@ -27,6 +27,8 @@ public final class AscendancyCatalog {
     public static final int MAX_POINTS = MAX_TIERS * POINTS_PER_TIER;
     /** Minimum chassis stage, or its host equivalent, for a first Ascendancy Seal. */
     public static final int ENTRY_STAGE = 4;
+    /** Mastery Refunds per refunded ascendancy node, as PoE charges five refunds per ascendancy point. */
+    public static final int REFUNDS_PER_NODE = 5;
     public static final int MIN_NODES = 12;
     public static final int MAX_NODES = 16;
     /** Notables that the full budget must be able to reach, at two points each. */
