@@ -27,10 +27,9 @@ public record ComponentRecyclingRecipe(
         int minimumProcessingLevel,
         int processingTicks,
         int energy,
-        List<ComponentRecyclingOutput> outputs,
-        boolean allowsBonusOutput
+        List<ComponentRecyclingOutput> outputs
 )
-        implements Recipe<SingleRecipeInput>, BonusOutputRecipe {
+        implements Recipe<SingleRecipeInput> {
     public List<ItemStack> outputStacks(boolean hasRecoveryFilter) {
         return outputs.stream()
                 .filter(output -> !output.requiresFilter() || hasRecoveryFilter)
@@ -109,8 +108,7 @@ public record ComponentRecyclingRecipe(
                                 .forGetter(ComponentRecyclingRecipe::energy),
                         ComponentRecyclingOutput.CODEC.listOf()
                                 .fieldOf("outputs")
-                                .forGetter(ComponentRecyclingRecipe::outputs),
-                        Codec.BOOL.fieldOf("bonus_output").orElse(true).forGetter(ComponentRecyclingRecipe::allowsBonusOutput)
+                                .forGetter(ComponentRecyclingRecipe::outputs)
                 )
                 .apply(instance, ComponentRecyclingRecipe::new));
 
@@ -124,8 +122,7 @@ public record ComponentRecyclingRecipe(
                                 ByteBufCodecs.VAR_INT.decode(buffer),
                                 ByteBufCodecs.VAR_INT.decode(buffer),
                                 ByteBufCodecs.VAR_INT.decode(buffer),
-                                ComponentRecyclingOutput.STREAM_CODEC.apply(ByteBufCodecs.list()).decode(buffer),
-                                ByteBufCodecs.BOOL.decode(buffer)
+                                ComponentRecyclingOutput.STREAM_CODEC.apply(ByteBufCodecs.list()).decode(buffer)
                         );
                     }
 
@@ -137,7 +134,6 @@ public record ComponentRecyclingRecipe(
                         ByteBufCodecs.VAR_INT.encode(buffer, recipe.processingTicks);
                         ByteBufCodecs.VAR_INT.encode(buffer, recipe.energy);
                         ComponentRecyclingOutput.STREAM_CODEC.apply(ByteBufCodecs.list()).encode(buffer, recipe.outputs);
-                        ByteBufCodecs.BOOL.encode(buffer, recipe.allowsBonusOutput);
                     }
                 };
 

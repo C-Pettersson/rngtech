@@ -6,7 +6,6 @@
   "minimum_processing_level": 4,
   "processing_ticks": 128,
   "energy": 1280,
-  "bonus_output": false,
   "outputs": [
     {
       "stack": {

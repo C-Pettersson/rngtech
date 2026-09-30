@@ -54,7 +54,7 @@ Stored calibration state contains:
 
 Patterns are reusable, stored internally in the Gear tab, and are not consumed. Catalysts are consumed unless catalyst efficiency preserves them. Recipe stabilizers are consumed when a calibration recipe declares one.
 
-Low-stability calibrated outputs are not dead ends. Current calibrated components have Component Recycler recipes that recover the main raw input, such as Iron Gear from a Calibrated Kinetic Component, so a failed stability roll can be recouped for another attempt. The recycler does not return the reusable pattern, consumed catalyst, consumed recipe stabilizer, calibration state, or Refinement Potential. Because the recovery returns the calibration input, both sides of that retry opt out of Super Output (see [Recipe Surface](#recipe-surface)), so calibrating and recycling never returns more raw input than it consumed.
+Low-stability calibrated outputs are not dead ends. Current calibrated components have Component Recycler recipes that recover the main raw input, such as Iron Gear from a Calibrated Kinetic Component, so a failed stability roll can be recouped for another attempt. The recycler does not return the reusable pattern, consumed catalyst, consumed recipe stabilizer, calibration state, or Refinement Potential. Because the recovery returns the calibration input, the calibration recipe opts out of Super Output (see [Recipe Surface](#recipe-surface)) and the Component Recycler has none, so calibrating and recycling never returns more raw input than it consumed.
 
 ## Recipe Surface
 

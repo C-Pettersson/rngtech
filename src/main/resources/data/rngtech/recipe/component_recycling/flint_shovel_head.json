@@ -1,22 +1,22 @@
 {
   "type": "rngtech:component_recycling",
   "ingredient": {
-    "item": "rngtech:steel_reinforced_tool_rod"
+    "item": "rngtech:flint_shovel_head"
   },
-  "minimum_processing_level": 4,
-  "processing_ticks": 120,
-  "energy": 1140,
+  "minimum_processing_level": 1,
+  "processing_ticks": 80,
+  "energy": 300,
   "outputs": [
     {
       "stack": {
-        "id": "rngtech:steel_rod",
+        "id": "minecraft:flint",
         "count": 1
       },
       "requires_filter": false
     },
     {
       "stack": {
-        "id": "rngtech:steel_plate",
+        "id": "rngtech:scrap",
         "count": 1
       },
       "requires_filter": true

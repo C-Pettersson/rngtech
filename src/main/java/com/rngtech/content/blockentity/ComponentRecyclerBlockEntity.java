@@ -229,7 +229,7 @@ public class ComponentRecyclerBlockEntity extends BaseMachineBlockEntity impleme
             int fullEnergyCost = recycler.energyCostPerCraft(recipe, stats);
             if (recycler.consumeWorkingEnergy(fullEnergyCost, true) >= fullEnergyCost) {
                 recycler.consumeWorkingEnergy(fullEnergyCost, false);
-                if (recycler.process(recipe, stats)) {
+                if (recycler.process(recipe)) {
                     recycler.bulkSpeed.recordProcess(recycler.activeTraits());
                 }
                 BaseMachineBlock.setActive(level, pos, state, true);
@@ -245,7 +245,7 @@ public class ComponentRecyclerBlockEntity extends BaseMachineBlockEntity impleme
         recycler.consumeWorkingEnergy(energyCost, false);
         recycler.progress++;
         if (recycler.progress >= recycler.processingTicks(recipe, stats)) {
-            if (recycler.process(recipe, stats)) {
+            if (recycler.process(recipe)) {
                 recycler.bulkSpeed.recordProcess(recycler.activeTraits());
             }
         }
@@ -311,7 +311,7 @@ public class ComponentRecyclerBlockEntity extends BaseMachineBlockEntity impleme
         progress = Math.min(processingTicks, progress + MANUAL_CRANK_INTERVAL_TICKS);
         playManualGrindSound(crankPos);
 
-        if (progress >= processingTicks && process(recipe, stats)) {
+        if (progress >= processingTicks && process(recipe)) {
             playManualCompleteSound();
         }
 
@@ -450,20 +450,17 @@ public class ComponentRecyclerBlockEntity extends BaseMachineBlockEntity impleme
                         .orElse(null);
     }
 
-    private boolean process(ComponentRecyclingRecipe recipe, MachineStatAccumulator stats) {
+    private boolean process(ComponentRecyclingRecipe recipe) {
         if (level == null || !recipe.matches(new net.minecraft.world.item.crafting.SingleRecipeInput(inputStack()), level)) {
             return false;
         }
         if (isManual() && !isManualRecipeInput(inputStack(), recipe)) {
             return false;
         }
-        List<ItemStack> baseOutputs = recipe.outputStacks(hasRecoveryFilter());
-        List<ItemStack> outputs = ProcessingChance.applySuperOutputs(level, stats, recipe, baseOutputs);
+        // Recycling returns the craft's own inputs, so Super Output would duplicate them.
+        List<ItemStack> outputs = recipe.outputStacks(hasRecoveryFilter());
         if (outputs.isEmpty() || !canMergeOutputs(outputs)) {
-            outputs = baseOutputs;
-            if (outputs.isEmpty() || !canMergeOutputs(outputs)) {
-                return false;
-            }
+            return false;
         }
         consumeInput();
         mergeOutputs(outputs);

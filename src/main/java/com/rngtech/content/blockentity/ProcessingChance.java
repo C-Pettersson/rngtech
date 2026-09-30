@@ -7,9 +7,6 @@ import com.rngtech.rpg.MachineStatAccumulator;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 
-import java.util.ArrayList;
-import java.util.List;
-
 final class ProcessingChance {
     static boolean rollInstant(Level level, MachineStatAccumulator stats) {
         return rollPercent(level, stats.value(MachineStat.INSTANT_PROCESS_CHANCE));
@@ -52,20 +49,6 @@ final class ProcessingChance {
             return output;
         }
         return output.copyWithCount(output.getCount() + extra);
-    }
-
-    static List<ItemStack> applySuperOutputs(Level level, MachineStatAccumulator stats, BonusOutputRecipe recipe, List<ItemStack> outputs) {
-        if (outputs.isEmpty() || !recipe.allowsBonusOutput() || !rollPercent(level, stats.value(MachineStat.SUPER_OUTPUT_CHANCE))) {
-            return outputs;
-        }
-        ArrayList<ItemStack> enhanced = new ArrayList<>(outputs.size() * 2);
-        for (ItemStack output : outputs) {
-            enhanced.add(output);
-            if (canDuplicate(output)) {
-                enhanced.add(output.copy());
-            }
-        }
-        return List.copyOf(enhanced);
     }
 
     private static boolean rollPercent(Level level, double chancePercent) {

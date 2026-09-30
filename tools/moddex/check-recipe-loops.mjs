@@ -597,8 +597,9 @@ async function tagItems(tagId, tags) {
 }
 
 /**
- * Proves the audit still catches known loops: re-enabling bonus output on a reversible conversion, or on the
- * calibrate-then-recycle pair, must fail it, and so must a recipe that makes the bone meal feeding growth pulses.
+ * Proves the audit still catches known loops: re-enabling bonus output on a reversible conversion, or on a calibration
+ * whose component recycles back into its input, must fail it, and so must a recipe that makes the bone meal feeding
+ * growth pulses.
  */
 export async function checkRecipeLoopMutations() {
     const recipe = (recipes, id) => {
@@ -614,7 +615,7 @@ export async function checkRecipeLoopMutations() {
     });
     const mutations = [
         bonusReturned(["rngtech:crusher/copper_dust_from_ingot", "rngtech:furnace/metals/copper_from_dust"]),
-        bonusReturned(["rngtech:calibration_structural_iron_plate", "rngtech:component_recycling/calibrated_structural_component"]),
+        bonusReturned(["rngtech:calibration_structural_iron_plate"]),
         {
             label: "Plant Reagent was changed to make bone meal",
             mutate: (recipes) => { recipe(recipes, "rngtech:plant_reagent").json.result = { count: 4, id: "minecraft:bone_meal" }; }

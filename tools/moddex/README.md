@@ -38,7 +38,7 @@ npm run moddex:check
 
 The smoke check also fails when the RBOM exporter finds overlapping crafting recipes with different outputs, including collisions against built-in vanilla iron tool recipe sentinels.
 
-The smoke check runs the recipe loop audit. Run it directly, with `--report` to list every loop found:
+The smoke check runs the recipe loop audit and the recycling return check. Run the loop audit directly, with `--report` to list every loop found:
 
 ```sh
 node tools/moddex/check-recipe-loops.mjs --report
@@ -62,6 +62,12 @@ node tools/moddex/export-ascendancy-data.mjs --write-docs
 ```
 
 The smoke check fails when those tables are stale or a declared stat has no row in Machine Stats.
+
+The recycling return check compares every Component Recycler recipe with every recipe that makes its input, and fails when a return exceeds what the craft consumed of the same item. Add `--report --recycler-super-output` to list the recipes that recycler Super Output would break:
+
+```sh
+node tools/moddex/check-recycling-returns.mjs --report --recycler-super-output
+```
 
 Check Java passive-tree geometry and graph constraints directly:
 

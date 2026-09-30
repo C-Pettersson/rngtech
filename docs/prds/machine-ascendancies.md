@@ -312,22 +312,21 @@ Speed, FE, heat, stability, and failure-strain changes are not yield. Stability 
 ### Eligibility
 
 - Every yield effect goes through one shared check: recipes implement `BonusOutputRecipe`, and `ProcessingChance` pays Output Amount bonuses, Super Output, and salvage only when `allowsBonusOutput()` is true.
-- Crusher, Furnace, Alloy Furnace, Metal Press, calibration, and Component Recycling recipes all use `bonus_output`, which defaults to `true`.
-    - Alloy Furnace and Metal Press gained the field in Phase 3; calibration and recycling gained it in PR #14.
+- Crusher, Furnace, Alloy Furnace, Metal Press, Melter, and calibration recipes all use `bonus_output`, which defaults to `true`.
+    - Alloy Furnace and Metal Press gained the field in Phase 3, calibration in PR #14, and the Melter in Phase 7 with Fluid Yield.
     - A single default keeps every type consistent. The loop audit, not the default, is what catches a missing opt-out.
-    - The Melter gains the field with its first yield effect, since it has no bonus output today.
-- Opt-outs as of Phase 3:
+    - Component Recycling has no bonus output since PR #15, so its recipes have no field.
+- Opt-outs:
     - Crusher and Furnace: copper, iron, and tin ingot/dust conversions, blend smelting, and malformed-ingot nugget recovery.
     - Furnace: silica gel bead recharging.
-    - Calibration and Component Recycling: the calibrate-then-recycle pairs.
-    - Component Recycling: recipes whose returns cover what the recycled item cost. That is the metal tool rods, the Alloy Crucibles, the Wooden, Iron, and Copper Crusher Chassis, the Crude Recycler, the Flint Crush Head, and the Invar Battery Cell.
+    - Calibration: recipes whose calibrated component recycles back into the calibration input.
 - Recipe-count reductions are not allowed. No node lowers a recipe's authored input counts.
 - No saving effect may reduce an input to zero. Catalyst Efficiency stays below `100%`, and multi-lane savings still consume at least one catalyst per cycle.
 - A failure-recovery effect returns at most what the success route would produce from the same inputs.
 
 ### Loop audit
 
-`tools/moddex/check-recipe-loops.mjs` runs from `npm run moddex:check`, so CI enforces it.
+`tools/moddex/check-recipe-loops.mjs` runs from `npm run moddex:check`, so CI enforces it. Beside it, `tools/moddex/check-recycling-returns.mjs` from PR #15 enforces a stricter per-recipe rule: no recycling return may exceed what any recipe making its input consumed of the same item.
 
 - **What it reads:**
     - Every recipe file becomes a reaction with its consumed inputs, outputs, and FE.
@@ -352,8 +351,8 @@ Speed, FE, heat, stability, and failure-strain changes are not yield. Stability 
 
 ### Resolved cycles
 
-- **Calibrate, then recycle:** fixed in PR #14. Both halves opt out of bonus output, and the audit's mutation self-test keeps it fixed.
-- **Recycler Super Output:** any recycling recipe whose returns cover what the item cost duplicated its inputs through Super Output. Phase 3 opted out the recipes the audit found.
+- **Calibrate, then recycle:** fixed in PR #14. The calibration half opts out of bonus output, and the audit's mutation self-test keeps it fixed.
+- **Recycler Super Output:** any recycling recipe whose returns cover what the item cost duplicated its inputs through Super Output. Phase 3 opted out the recipes the audit found, and PR #15 then removed recycler Super Output entirely.
 - **Silica gel:** absorbing and recharging returns the same beads, so recharge Super Output duplicated them. Both recharge recipes opt out.
 - **Refinement Potential to FE through calibrated components:** does not exist. Calibrated components are not refinement targets, so the Potential Reactor pays nothing for them. The general case, stripping a recyclable machine or part for FE and recycling it back into its inputs, is modeled by the audit.
 

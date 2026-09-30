@@ -50,11 +50,6 @@
             "maxOutputMultiplier": 2,
             "covers": ["SUPER_OUTPUT_CHANCE", "SHARED_FIELD", "STABILIZER_ECONOMY"],
             "reason": "Super Output adds at most one copy of the base output. Shared Field and Stabilizer Economy only save catalysts and stabilizers, which the audit already treats as free."
-        },
-        "rngtech:component_recycling": {
-            "maxOutputMultiplier": 2,
-            "covers": ["SUPER_OUTPUT_CHANCE"],
-            "reason": "Super Output duplicates each output at most once."
         }
     },
     "allow": [],

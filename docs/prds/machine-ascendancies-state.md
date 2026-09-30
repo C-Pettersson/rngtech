@@ -124,7 +124,7 @@ Recorded 2026-09-30 for the Alloy Furnace, Metal Press, Resonance Calibrator, Me
 - Blend routes are one-way. Crushed items come only from ore and raw inputs.
 - The calibrate-then-recycle item cycle found during planning was fixed in PR #14.
 - Calibrated components are not refinement targets, so the Potential Reactor pays nothing for them and the suspected Refinement Potential to FE cycle does not exist. The audit models the general case: stripping any recyclable machine or part.
-- Recycler Super Output was the main loop source. Recycling returns an item's own ingredients, so wherever the returns cover what the item cost, Super Output duplicated them.
+- Recycler Super Output was the main loop source. Recycling returns an item's own ingredients, so wherever the returns cover what the item cost, Super Output duplicated them. PR #15 on `main` removed recycler Super Output entirely.
 - Furnace lanes stop warming at the recipe's required temperature (`FurnaceBlockEntity.warmLane`). Crucible Keeper therefore needs a new warm target.
 - Every current Melter recipe is processing level 6, and no Furnace recipe targets 2200 °C or more. This shaped the dropped work-trial design and no longer affects Seals.
 - `MachinePassiveClass` and its empty `ascendancies` list are used only by legacy tree definitions. `MachineMasteryFamily` is the live family source.
@@ -203,6 +203,9 @@ Recorded 2026-09-30 for the Alloy Furnace, Metal Press, Resonance Calibrator, Me
     - Getting-started has a Mastery and ascendancies section, and the implementation matrix records the finished surfaces.
     - ModDex has an Ascendancies tab: a family picker, a drawn tree and node table per ascendancy with search, node details, and every declared stat and behavior with its yield kind and loop-audit bound.
     - The optional FTB Quests extra has a Mastery and Ascendancies chapter: reading Mastery and ascendancies, Mastery Refunds, copying builds with the Configurator, both Seal Cores, and Seals I–III, gated on the stage quests that unlock their materials.
+- 2026-09-30, merge of `main` with PR #15:
+    - PR #15 removed Component Recycler Super Output and extended `main`'s calibration-only check to every recycling recipe. Its per-recipe rule now runs as `tools/moddex/check-recycling-returns.mjs` beside the general loop audit.
+    - The recycler's loop bound and the 19 recycling `bonus_output` opt-outs from Phase 3 were removed, since nothing reads them. The calibrate-then-recycle mutation self-test now re-enables bonus output on the calibration recipe alone.
 
 ## Verification
 
