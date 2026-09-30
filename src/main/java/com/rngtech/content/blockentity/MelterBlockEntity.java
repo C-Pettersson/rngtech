@@ -210,7 +210,7 @@ public class MelterBlockEntity extends BaseMachineBlockEntity implements MenuPro
         @Override
         public int get(int index) {
             if (index >= DATA_MACHINE_PROGRESSION_START && index < DATA_COUNT) {
-                return MasteryMenuSupport.get(machineProgression(), index - DATA_MACHINE_PROGRESSION_START, MelterBlockEntity.this::effectiveStats);
+                return MasteryMenuSupport.get(MelterBlockEntity.this, index - DATA_MACHINE_PROGRESSION_START, MelterBlockEntity.this::effectiveStats);
             }
             MachineStatAccumulator stats = effectiveStats();
             MelterRecipe recipe = nextRecipe();

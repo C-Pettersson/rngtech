@@ -335,6 +335,11 @@ public class ResonanceCalibratorMenu extends AbstractContainerMenu implements Ma
     }
 
     @Override
+    public int ascendancyEntryStage() {
+        return MasteryMenuSupport.ascendancyEntryStage(data, DATA_MACHINE_PROGRESSION_START);
+    }
+
+    @Override
     public MachineMasteryFamily masteryFamily() {
         return MachineMasteryFamily.RESONANCE_CALIBRATOR;
     }

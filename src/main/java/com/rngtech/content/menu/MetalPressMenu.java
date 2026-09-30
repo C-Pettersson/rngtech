@@ -303,6 +303,11 @@ public class MetalPressMenu extends AbstractContainerMenu implements MasteryMenu
     }
 
     @Override
+    public int ascendancyEntryStage() {
+        return MasteryMenuSupport.ascendancyEntryStage(data, DATA_MACHINE_PROGRESSION_START);
+    }
+
+    @Override
     public double masteryAttribute(MachineStat stat) {
         return MasteryMenuSupport.attribute(data, DATA_MACHINE_PROGRESSION_START, stat);
     }

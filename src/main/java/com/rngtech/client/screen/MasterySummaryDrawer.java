@@ -4,7 +4,12 @@ import com.rngtech.content.menu.MasteryMenuView;
 import com.rngtech.rpg.MachineModifierEffect;
 import com.rngtech.rpg.MachineStat;
 import com.rngtech.rpg.MachineStatDisplay;
+import com.rngtech.rpg.progression.Ascendancy;
+import com.rngtech.rpg.progression.AscendancyCatalog;
+import com.rngtech.rpg.progression.AscendancyNode;
+import com.rngtech.rpg.progression.MachineProgressionState;
 import com.rngtech.rpg.progression.MasteryBonusSummary;
+import com.rngtech.rpg.progression.MasteryEffectSource;
 import com.rngtech.rpg.progression.MegaPassiveNode;
 import com.rngtech.rpg.progression.MegaPassiveTree;
 import com.rngtech.rpg.progression.PassiveNodeKind;
@@ -46,12 +51,13 @@ final class MasterySummaryDrawer {
     private static final int VALUE = 0xFFC9C3B3;
     private static final int ATTRIBUTE = 0xFF8FD3E6;
     private static final int KEYSTONE = 0xFFC79DEA;
+    private static final int ASCENDANCY = 0xFFE3B866;
     private static final int INACTIVE = 0xFF6F6A60;
     private static final int HOVER = 0x30FFFFFF;
     private static final List<MachineStat> ATTRIBUTES = List.of(MachineStat.CONTROL, MachineStat.DRIVE, MachineStat.RESERVE);
 
     private final MasteryMenuView<?> view;
-    private final Function<MegaPassiveNode, List<Component>> nodeTooltip;
+    private final Function<MasteryEffectSource, List<Component>> nodeTooltip;
     private boolean open;
     private double scroll;
     private Object rowsKey;
@@ -59,7 +65,7 @@ final class MasterySummaryDrawer {
     private List<List<FormattedCharSequence>> wrapped;
     private int wrappedWidth;
 
-    MasterySummaryDrawer(MasteryMenuView<?> view, Function<MegaPassiveNode, List<Component>> nodeTooltip) {
+    MasterySummaryDrawer(MasteryMenuView<?> view, Function<MasteryEffectSource, List<Component>> nodeTooltip) {
         this.view = view;
         this.nodeTooltip = nodeTooltip;
     }
@@ -173,10 +179,10 @@ final class MasterySummaryDrawer {
     private List<Row> rows() {
         var snapshot = view.masterySnapshot();
         double[] attributes = ATTRIBUTES.stream().mapToDouble(view::masteryAttribute).toArray();
-        Object key = List.of(snapshot.allocatedNodes(), view.masteryFamily(), Arrays.toString(attributes));
+        Object key = List.of(snapshot.allocatedNodes(), snapshot.ascendancy(), snapshot.ascendancyNodes(), view.masteryFamily(), Arrays.toString(attributes));
         if (!key.equals(rowsKey)) {
             rowsKey = key;
-            rows = buildRows(snapshot.allocatedNodes(), attributes);
+            rows = buildRows(snapshot, attributes);
             wrapped = null;
         }
         return rows;
@@ -193,11 +199,13 @@ final class MasterySummaryDrawer {
         return wrapped;
     }
 
-    private List<Row> buildRows(List<String> allocatedIds, double[] attributes) {
-        List<MasteryBonusSummary.Line> lines = MasteryBonusSummary.of(view.masterySnapshot(), view, attributes[0], attributes[1], attributes[2]);
+    private List<Row> buildRows(MachineProgressionState snapshot, double[] attributes) {
+        List<String> allocatedIds = snapshot.allocatedNodes();
+        List<AscendancyNode> ascendancy = AscendancyCatalog.allocated(snapshot, view.masteryFamily());
+        List<MasteryBonusSummary.Line> lines = MasteryBonusSummary.of(snapshot, view, attributes[0], attributes[1], attributes[2]);
         List<Row> built = new ArrayList<>();
         built.add(new Row(Component.translatable("rngtech.mastery.summary.title"), TITLE, 0, 0, null));
-        built.add(new Row(allocatedIds.isEmpty() ? Component.translatable("rngtech.mastery.summary.empty")
+        built.add(new Row(allocatedIds.isEmpty() && ascendancy.isEmpty() ? Component.translatable("rngtech.mastery.summary.empty")
                 : Component.translatable("rngtech.mastery.summary.allocated", allocatedIds.size()), INACTIVE, 0, 0, null));
         for (int index = 0; index < ATTRIBUTES.size(); index++) {
             MachineStat attribute = ATTRIBUTES.get(index);
@@ -209,6 +217,7 @@ final class MasterySummaryDrawer {
         List<MegaPassiveNode> keystones = allocatedIds.stream().map(MegaPassiveTree::node).filter(Objects::nonNull)
                 .filter(node -> node.kind() == PassiveNodeKind.KEYSTONE).toList();
         section(built, "keystones", keystones.stream().map(node -> new Row(Component.translatable(node.translationKey()), KEYSTONE, 4, 0, () -> nodeTooltip.apply(node))).toList());
+        section(built, "ascendancy", ascendancyRows(snapshot, ascendancy));
         section(built, "modifiers", rowsOf(lines, true, MasteryBonusSummary.Kind.EFFECT));
         section(built, "attributes", rowsOf(lines, true, MasteryBonusSummary.Kind.CONVERSION));
         section(built, "scaling", rowsOf(lines, true, MasteryBonusSummary.Kind.SCALING));
@@ -216,6 +225,20 @@ final class MasterySummaryDrawer {
         section(built, "special", rowsOf(lines, true, MasteryBonusSummary.Kind.BEHAVIOR, MasteryBonusSummary.Kind.PASSIVE));
         section(built, "inactive", rowsOf(lines, false, MasteryBonusSummary.Kind.values()));
         return List.copyOf(built);
+    }
+
+    /** The chosen ascendancy with its root, then its allocated notables; small nodes appear only in the combined lines. */
+    private List<Row> ascendancyRows(MachineProgressionState snapshot, List<AscendancyNode> allocated) {
+        Ascendancy chosen = AscendancyCatalog.get(snapshot.ascendancy());
+        if (allocated.isEmpty() || chosen == null) {
+            return List.of();
+        }
+        List<Row> rows = new ArrayList<>();
+        rows.add(new Row(Component.translatable("rngtech.mastery.summary.ascendancy", Component.translatable(chosen.translationKey()),
+                snapshot.ascendancyNodes().size(), snapshot.ascendancyPoints()), ASCENDANCY, 4, 0, () -> nodeTooltip.apply(chosen.root())));
+        allocated.stream().filter(node -> node.kind() == AscendancyNode.Kind.NOTABLE)
+                .forEach(node -> rows.add(new Row(Component.translatable(node.translationKey()), ASCENDANCY, 8, 0, () -> nodeTooltip.apply(node))));
+        return rows;
     }
 
     private static void section(List<Row> rows, String name, List<Row> entries) {
@@ -297,7 +320,7 @@ final class MasterySummaryDrawer {
         }
     }
 
-    private static void sources(List<Component> tooltip, List<MegaPassiveNode> sources) {
+    private static void sources(List<Component> tooltip, List<MasteryEffectSource> sources) {
         if (sources.isEmpty()) {
             return;
         }

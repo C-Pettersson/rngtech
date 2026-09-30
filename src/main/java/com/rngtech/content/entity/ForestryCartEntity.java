@@ -189,7 +189,7 @@ public class ForestryCartEntity extends AbstractMinecart implements MenuProvider
         public int get(int index) {
             if (index >= ForestryCartMenu.DATA_MACHINE_PROGRESSION_START
                     && index < ForestryCartMenu.DATA_MACHINE_PROGRESSION_START + MasteryMenuSupport.FIELD_COUNT) {
-                return MasteryMenuSupport.get(machineProgression(), index - ForestryCartMenu.DATA_MACHINE_PROGRESSION_START, ForestryCartEntity.this::effectiveStats);
+                return MasteryMenuSupport.get(ForestryCartEntity.this, index - ForestryCartMenu.DATA_MACHINE_PROGRESSION_START, ForestryCartEntity.this::effectiveStats);
             }
             return switch (index) {
                 case ForestryCartMenu.DATA_STATUS -> status;

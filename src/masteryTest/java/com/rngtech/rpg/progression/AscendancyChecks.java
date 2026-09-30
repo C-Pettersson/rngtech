@@ -1,5 +1,7 @@
 package com.rngtech.rpg.progression;
 
+import com.rngtech.client.screen.AscendancyTreeLayout;
+import com.rngtech.content.menu.MasteryMenuSupport;
 import com.rngtech.rpg.MachineStat;
 import com.rngtech.rpg.MachineStatAccumulator;
 
@@ -8,6 +10,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.mojang.serialization.JsonOps;
+import net.minecraft.world.inventory.SimpleContainerData;
 
 import java.util.List;
 import java.util.Map;
@@ -38,6 +41,10 @@ final class AscendancyChecks {
         effectPipeline();
         buildCodes();
         sealActions();
+        ascendStatus();
+        clientSync();
+        bonusSummary();
+        panelLayout();
         mainCatalogAssets();
         return checks;
     }
@@ -70,6 +77,8 @@ final class AscendancyChecks {
         rejects(raw -> node(raw, "small_b").addProperty("id", "small_a"), "duplicate node");
         rejects(raw -> node(raw, "notable_d").addProperty("kind", "ROOT"), "second root");
         rejects(raw -> raw.addProperty("id", "Fixture-Alpha"), "lowercase letters");
+        rejects(raw -> { node(raw, "small_b").add("x", node(raw, "small_a").get("x")); node(raw, "small_b").add("y", node(raw, "small_a").get("y")); },
+                "shares a grid position");
     }
 
     private static void declarations() {
@@ -256,6 +265,90 @@ final class AscendancyChecks {
                 "a free choice after retirement costs nothing");
         require("choice_failed".equals(MasteryOperations.ascendancy(retired, "choose_ascendancy", ALPHA, free)), "a free choice needs a missing ascendancy");
         require("unknown_action".equals(MasteryOperations.ascendancy(retired, "transmute", "", free)), "unknown actions are rejected");
+    }
+
+    /** The panel's Ascend status follows the server's order, so a ready button is an action the server accepts. */
+    private static void ascendStatus() {
+        var fresh = MachineProgressionState.EMPTY.forFamily(CRUSHER);
+        require(AscendStatus.of(fresh, CRUSHER, 3, tier -> true) == AscendStatus.ENTRY_STAGE, "Seal I status names the entry stage first");
+        require(AscendStatus.of(fresh, CRUSHER, 4, tier -> false) == AscendStatus.SEAL_MISSING, "Seal I status needs the Seal in inventory");
+        require(AscendStatus.of(fresh, CRUSHER, 4, tier -> tier == 1) == AscendStatus.READY, "Seal I is ready with the Seal and the entry stage");
+        var melter = MachineProgressionState.EMPTY.forFamily(MachineMasteryFamily.MELTER);
+        require(AscendStatus.of(melter, MachineMasteryFamily.MELTER, 6, tier -> true) == AscendStatus.NO_ASCENDANCIES, "a family without ascendancies cannot ascend");
+        var one = ascended(ALPHA, List.of(), 1);
+        require(AscendStatus.of(one, CRUSHER, 0, tier -> tier == 2) == AscendStatus.READY, "later tiers need no entry stage");
+        require(AscendStatus.of(one, CRUSHER, 8, tier -> tier == 1) == AscendStatus.SEAL_MISSING, "only the next tier's Seal counts");
+        require(AscendStatus.of(ascended(ALPHA, List.of(), 3), CRUSHER, 8, tier -> true) == AscendStatus.ALL_TIERS, "three tiers end the Seals");
+        require(AscendStatus.of(ascended("retired_ascendancy", List.of(), 2), CRUSHER, 8, tier -> false) == AscendStatus.FREE_CHOICE,
+                "an earned tier without an ascendancy offers a free choice");
+        var host = new Host(fresh, s -> true);
+        host.entryStage = 3;
+        require("entry_stage".equals(MasteryOperations.ascendancy(host, "ascend", ALPHA, new Payment(Map.of(1, 1), 0))), "the server agrees on the entry stage");
+        host.entryStage = AscendancyCatalog.ENTRY_STAGE;
+        require("seal_missing".equals(MasteryOperations.ascendancy(host, "ascend", ALPHA, new Payment(Map.of(), 0))), "the server agrees on a missing Seal");
+        require(MasteryOperations.ascendancy(host, "ascend", ALPHA, new Payment(Map.of(1, 1), 0)) == null, "the server accepts a ready Seal");
+    }
+
+    /** Menus send ascendancy state to the client as numbers; the screen rebuilds it, so Copy includes the ascendancy. */
+    private static void clientSync() {
+        var host = new Host(ascended(ALPHA, List.of("small_e", "small_a", "deep_e"), 3), s -> true);
+        host.entryStage = 5;
+        var synced = MasteryMenuSupport.snapshot(synced(host), 0, CRUSHER);
+        require(synced.ascendancy().equals(ALPHA) && synced.sealTiers() == 3, "menus sync the ascendancy and its Seal tiers");
+        require(synced.ascendancyNodes().equals(host.state.ascendancyNodes()), "menus sync ascendancy nodes in allocation order");
+        require(MasteryMenuSupport.ascendancyEntryStage(synced(host), 0) == 5, "menus sync the entry stage");
+        require(MasteryBuildCode.copy(synced).ascendancyNodes().equals(host.state.ascendancyNodes()), "the screen's Copy includes the ascendancy");
+        var none = MasteryMenuSupport.snapshot(synced(new Host(MachineProgressionState.EMPTY.forFamily(CRUSHER), s -> true)), 0, CRUSHER);
+        require(none.ascendancy().isEmpty() && none.sealTiers() == 0 && none.ascendancyNodes().isEmpty(), "a machine without Seals syncs no ascendancy");
+    }
+
+    private static SimpleContainerData synced(Host host) {
+        var stats = MachineStatAccumulator.componentBase(Map.of());
+        var data = new SimpleContainerData(MasteryMenuSupport.FIELD_COUNT);
+        for (int field = 0; field < MasteryMenuSupport.FIELD_COUNT; field++) {
+            data.set(field, MasteryMenuSupport.get(host, field, () -> stats));
+        }
+        return data;
+    }
+
+    private static void bonusSummary() {
+        var alpha = ascended(ALPHA, List.of("small_a", "notable_a"), 1);
+        Ascendancy chosen = AscendancyCatalog.get(ALPHA);
+        var lines = MasteryBonusSummary.of(alpha, MasteryApplicability.of(CRUSHER), 0, 0, 0);
+        require(lines.stream().anyMatch(line -> line.kind() == MasteryBonusSummary.Kind.EFFECT && line.effect().stat() == MachineStat.PROCESSING_SPEED
+                && line.sources().contains(chosen.root())), "the summary combines the root's effects and names it as a source");
+        require(lines.stream().anyMatch(line -> line.kind() == MasteryBonusSummary.Kind.EFFECT && line.sources().contains(chosen.node("notable_a"))),
+                "the summary includes allocated ascendancy nodes");
+        require(lines.stream().anyMatch(line -> line.kind() == MasteryBonusSummary.Kind.BEHAVIOR && "FIXTURE_ECHO".equals(line.behavior()) && line.active()),
+                "the summary lists ascendancy behaviors as active");
+        var furnace = MasteryBonusSummary.of(alpha, MasteryApplicability.of(MachineMasteryFamily.FURNACE), 0, 0, 0);
+        require(furnace.stream().noneMatch(line -> line.sources().stream().anyMatch(AscendancyNode.class::isInstance)),
+                "another family's summary leaves the ascendancy out");
+    }
+
+    /** Every ascendancy fits the compact panel, a choose-dialog column, and a small box without overlapping nodes. */
+    private static void panelLayout() {
+        List<float[]> boxes = List.of(new float[] {12, 78, 228, 180}, new float[] {15, 92, 118, 147}, new float[] {0, 0, 40, 40});
+        for (Ascendancy ascendancy : AscendancyCatalog.all()) {
+            for (float[] box : boxes) {
+                var placed = AscendancyTreeLayout.fit(ascendancy, box[0], box[1], box[2], box[3]);
+                require(placed.size() == ascendancy.nodes().size() + 1 && placed.getFirst().node() == ascendancy.root(), ascendancy.id() + " places every node, root first");
+                for (var node : placed) {
+                    require(node.x() - node.radius() >= box[0] && node.x() + node.radius() <= box[2] && node.y() - node.radius() >= box[1]
+                            && node.y() + node.radius() <= box[3], ascendancy.id() + " keeps " + node.node().id() + " inside the panel");
+                }
+                boolean apart = true;
+                for (int first = 0; first < placed.size(); first++) {
+                    for (int second = first + 1; second < placed.size(); second++) {
+                        var a = placed.get(first);
+                        var b = placed.get(second);
+                        apart &= Math.hypot(a.x() - b.x(), a.y() - b.y()) >= a.radius() + b.radius();
+                    }
+                }
+                require(apart, ascendancy.id() + " nodes do not overlap");
+            }
+            require(AscendancyTreeLayout.fit(ascendancy, 0, 0, 216, 102).stream().anyMatch(AscendancyTreeLayout.Placed::deep), ascendancy.id() + " marks its deep notables");
+        }
     }
 
     /** Seals by tier and Mastery Refunds available to an action. */

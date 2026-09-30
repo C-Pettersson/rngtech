@@ -182,7 +182,7 @@ public class MetalPressBlockEntity extends BaseMachineBlockEntity implements Men
         public int get(int index) {
             if (index >= DATA_MACHINE_PROGRESSION_START && index < DATA_COUNT) {
                 return MasteryMenuSupport.get(
-                        machineProgression(),
+                        MetalPressBlockEntity.this,
                         index - DATA_MACHINE_PROGRESSION_START,
                         MetalPressBlockEntity.this::effectiveStats
                 );

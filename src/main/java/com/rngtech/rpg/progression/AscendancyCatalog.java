@@ -8,11 +8,13 @@ import com.google.gson.JsonObject;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
@@ -38,11 +40,15 @@ public final class AscendancyCatalog {
     private static final String FIXTURE_INDEX = "fixtures/index.json";
     private static final Pattern ID = Pattern.compile("[a-z0-9_]+");
     private static final Map<String, Ascendancy> CATALOG = load();
+    /** Catalog order, used to sync the chosen ascendancy as a number. Client and server load the same catalog. */
+    private static final List<Ascendancy> ORDER = List.copyOf(CATALOG.values());
 
     private AscendancyCatalog() { }
 
     public static Ascendancy get(String id) { return id == null ? null : CATALOG.get(id); }
     public static Collection<Ascendancy> all() { return CATALOG.values(); }
+    public static int index(Ascendancy ascendancy) { return ORDER.indexOf(ascendancy); }
+    public static Ascendancy byIndex(int index) { return index >= 0 && index < ORDER.size() ? ORDER.get(index) : null; }
     public static List<Ascendancy> forFamily(MachineMasteryFamily family) {
         return CATALOG.values().stream().filter(ascendancy -> ascendancy.family() == family).toList();
     }
@@ -114,8 +120,10 @@ public final class AscendancyCatalog {
         int count = ascendancy.nodes().size() + 1;
         if (count < MIN_NODES || count > MAX_NODES) { violations.add(count + " nodes; expected " + MIN_NODES + "-" + MAX_NODES); }
         if (ascendancy.nodes().containsKey(root.id())) { violations.add(root.id() + ": a node reuses the root id"); }
+        Set<String> positions = new HashSet<>();
         for (AscendancyNode node : Stream.concat(Stream.of(root), ascendancy.nodes().values().stream()).toList()) {
             if (!ID.matcher(node.id()).matches()) { violations.add(node.id() + ": invalid id"); }
+            if (!positions.add(node.x() + "," + node.y())) { violations.add(node.id() + " shares a grid position"); }
             if (node.grantsNothing()) { violations.add(node.id() + " grants nothing"); }
             violations.addAll(unsupported(ascendancy.family(), node));
         }

@@ -13,6 +13,20 @@ public record Ascendancy(String id, MachineMasteryFamily family, AscendancyNode 
     /** A non-root node, or {@code null}. */
     public AscendancyNode node(String nodeId) { return nodes.get(nodeId); }
 
+    /** A non-root node's position in authored order, or -1. */
+    public int nodeIndex(String nodeId) {
+        int index = 0;
+        for (String id : nodes.keySet()) {
+            if (id.equals(nodeId)) { return index; }
+            index++;
+        }
+        return -1;
+    }
+
+    public AscendancyNode nodeAt(int index) {
+        return index < 0 || index >= nodes.size() ? null : nodes.values().stream().skip(index).findFirst().orElse(null);
+    }
+
     public List<AscendancyNode> children(String parentId) {
         return nodes.values().stream().filter(node -> node.parent().equals(parentId)).toList();
     }

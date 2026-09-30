@@ -572,12 +572,13 @@ The Forestry Companion's entry gate is its installed cutting tool head, and its 
 Follow [Machine Guidelines](../reference/machine-guidelines.md): graphical state with hover detail and minimal visible text.
 
 - **Mastery tab:**
-    - An Ascendancy button beside the machine's start node, as PoE shows the ascendancy tab near the class start.
-    - The panel shows the chosen tree, earned and spent points, and an Ascend action. Hovering Ascend names the next Seal tier and why the action is unavailable, if it is.
+    - An Ascendancy crest beside the machine's start node, as PoE shows the ascendancy tab near the class start. Pips show earned Seal tiers, and the crest is highlighted when a Seal can be used or points are unspent. It appears only for families with ascendancies, or on a machine that already earned a tier.
+    - The panel covers the tree view. It shows the chosen tree, earned and spent points, an Ascend button with the next Seal, and a Switch button when the family has more than one ascendancy. Hovering Ascend names the next Seal tier and why the action is unavailable, if it is.
+    - Clicking a node allocates it; right-clicking an allocated node refunds it. Deep notables are drawn as diamonds.
     - Both live in `MasteryScreenSupport`, so every family, including the Forestry cart, gets them without per-screen work.
-- **Choose dialog:** every ascendancy for the family side by side (paged when there are more than fit), read-only trees, root effects, and a confirm step.
-- **Stats tab:** ascendancy stats appear only when an allocated node grants them.
-- **Bonus Summary drawer:** an Ascendancy section, combined the same way as other effects.
+- **Choose dialog:** every ascendancy for the family side by side (paged when there are more than fit), read-only trees, root effects, and a confirm step: select a column, then press the confirm button. It opens for Seal I, for a free choice after a retired ascendancy, and for switching.
+- **Stats tab:** ascendancy stats appear only when an allocated node grants them. The rows arrive with the first declared stats in Phase 6.
+- **Bonus Summary drawer:** ascendancy effects combine with shared-tree effects and name their source node. An Ascendancy section lists the chosen ascendancy and its allocated notables.
 - **Jade (sneak):** ascendancy name and points.
 - **JEI:** Seal recipes plus an information entry explaining Seal use.
 
@@ -597,8 +598,8 @@ Follow [Machine Guidelines](../reference/machine-guidelines.md): graphical state
     - loop audit in report mode, reading declared yield stats and behaviors;
     - fix or allowlist the known cycles, then turn the CI gate on.
 4. **Seals:** items, recipes, the `rngtech:ascendancy_seal_recipes_enabled` condition and its config key, the entry gate, and server actions for Ascend, choose, allocate, refund, and switch.
-5. **UI:** Ascendancy panel and choose dialog in `MasteryScreenSupport`, Stats tab visibility, Bonus Summary section, Jade line, and JEI.
-6. **Crusher and Furnace content**, including their new stats and shared mechanics, then an in-game playtest.
+5. **UI:** Ascendancy panel and choose dialog in `MasteryScreenSupport`, client sync of ascendancy state, Bonus Summary section, Jade line, and JEI.
+6. **Crusher and Furnace content**, including their new stats with Stats tab rows shown only when granted, and shared mechanics, then an in-game playtest.
 7. **Alloy Furnace, Metal Press, Resonance Calibrator, Melter, and Forestry Companion content.**
 8. **Documentation:**
     - canonical Machine Mastery section and family pages;
@@ -622,6 +623,10 @@ Domain checks (`masteryCheck`):
 - New stats combine correctly with existing modifiers.
 - Every ascendancy follows the tree shape rules, and its stats and behaviors are declared and supported by its family. Mutated fixtures are rejected with the matching violation.
 - Language keys and icons exist for every shipped ascendancy and node.
+- Menus sync the ascendancy, its node order, Seal tiers, and the entry stage, so the screen's Copy button includes the ascendancy.
+- The panel's Ascend status agrees with the server action for every reason.
+- The Bonus Summary combines ascendancy effects with their source nodes, only for the owning family.
+- Every ascendancy tree fits the compact panel and a choose-dialog column without overlapping nodes, and no two nodes share a grid position.
 
 ModDex checks (`npm run moddex:check`):
 

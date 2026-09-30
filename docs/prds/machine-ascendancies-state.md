@@ -2,7 +2,7 @@
 
 Source: [draft design](machine-ascendancies.md).
 
-Status: **Prototype** for the 2.0 release — PRD accepted 2026-09-29 on `feature/machine-ascendancies`. The framework, loop audit, and Seals are in; no ascendancy content ships yet.
+Status: **Prototype** for the 2.0 release — PRD accepted 2026-09-29 on `feature/machine-ascendancies`. The framework, loop audit, Seals, and UI are in; no ascendancy content ships yet.
 
 ## Scope checklist
 
@@ -12,8 +12,8 @@ Status: **Prototype** for the 2.0 release — PRD accepted 2026-09-29 on `featur
 - [x] Framework: catalog index loader, shared node parser, stat declarations, behavior registry, `ascendancyEntryStage()`, state fields, load validation, `forFamily()` family check, effect pipeline, build codes, generic catalog validation, fixture ascendancies, domain checks.
 - [x] Loop safety: `bonus_output` on Alloy Furnace and Metal Press recipes (calibration and recycling from PR #14; the Melter's arrives with its first yield effect), a shared `BonusOutputRecipe` check, the recipe loop audit with mutation self-tests, opt-outs for every loop found, and the CI gate on.
 - [x] Seals: items, recipes, `rngtech:ascendancy_seal_recipes_enabled` condition and config key, entry gate, server actions.
-- [ ] UI: Ascendancy panel and choose dialog in `MasteryScreenSupport`, Stats tab visibility, Bonus Summary section, Jade line, JEI.
-- [ ] Crusher and Furnace content with their new stats and shared mechanics, then an in-game playtest.
+- [x] UI: Ascendancy panel and choose dialog in `MasteryScreenSupport`, client sync, Bonus Summary section, Jade line, JEI.
+- [ ] Crusher and Furnace content with their new stats, Stats tab rows shown only when granted, and shared mechanics, then an in-game playtest.
 - [ ] Alloy Furnace, Metal Press, Resonance Calibrator, Melter, and Forestry Companion content.
 - [ ] Canonical documentation, Machine Stats entries, implementation matrix, getting-started, quests, and ModDex view.
 
@@ -86,10 +86,21 @@ Recorded 2026-09-29:
     - Server actions in `MasteryOperations`: `ascend`, `choose_ascendancy`, `switch_ascendancy`, `allocate_ascendancy`, and `refund_ascendancy`.
     - Validation happens before payment, so a rejected action costs nothing. A Seal is taken from the player's inventory; creative players must carry it but keep it. A refund costs five Mastery Refunds (`AscendancyCatalog.REFUNDS_PER_NODE`).
     - `tools/moddex/check-ascendancy-seals.mjs` fails `moddex:check` when a Seal or Seal Core recipe lacks the condition.
-- Not yet covered, and left for the UI phase:
-    - Menus sync Mastery through `ContainerData`, so the client snapshot has no ascendancy yet. The Mastery screen's Copy button therefore omits it, while Configurator copies from the server state and include it.
-    - The Bonus Summary drawer does not list ascendancy effects yet.
-    - No screen sends the ascendancy actions yet.
+- 2026-09-30, Phase 5 UI:
+    - Mastery menus sync the chosen ascendancy (catalog index), its nodes in allocation order, Seal tiers, and the entry stage through the shared `MasteryMenuSupport` fields. The client snapshot now carries the ascendancy, so the Mastery screen's Copy button includes it.
+    - `AscendancyPanel` lives in `MasteryScreenSupport`, so all seven Mastery screens get it, including the Forestry cart:
+        - A crest beside the start node opens it. The crest shows earned tiers as pips and is highlighted when a Seal can be used or points are unspent.
+        - The tree view shows the chosen ascendancy with points and tier pips. Nodes allocate on click and refund on right-click; deep notables are diamonds.
+        - Its Ascend button shows the next Seal, and its Switch button opens the choose dialog.
+        - The choose dialog previews every ascendancy for the family in paged columns with read-only trees and root effects, then confirms the selection. It serves Seal I, a free choice after retirement, and switching.
+        - Hover text explains every button, including why Ascend is unavailable.
+    - `AscendStatus` computes the Ascend state in the server's order; domain checks confirm the two agree.
+    - `AscendancyTreeLayout` fits an authored grid into any box. The catalog now rejects two nodes on one grid position, so nodes never overlap.
+    - Node tooltips for both trees share one effect-line helper.
+    - `MasteryBonusSummary` combines ascendancy effects with shared-tree effects and names ascendancy nodes as sources. The drawer adds an Ascendancy section with the chosen ascendancy and its allocated notables.
+    - Jade shows the ascendancy and its points while sneaking. JEI has an information entry for the three Seals.
+    - Deferred to Phase 6: Stats tab rows for ascendancy stats, because no declared stat exists yet.
+    - The panel is hidden until a family has ascendancies, so it first appears in normal play with Phase 6 content.
 
 ## Verification
 
@@ -97,6 +108,7 @@ Recorded 2026-09-29:
 - 2026-09-29 Phase 2: `gradlew spotlessApply` and `quickCheck` passed with 837 domain checks (753 on the previous commit). `npm run moddex:check` and `npm run repo:check` passed. No in-game check: Phase 2 adds no player-facing surface.
 - 2026-09-29 Phase 3: `gradlew spotlessApply` and `quickCheck` passed with 837 domain checks. `npm run moddex:check` passed, including the recipe loop audit (982 recipes, no item or FE loop, no allowlist entries) and both mutation self-tests. `npm run repo:check` passed. No in-game check yet: the gameplay changes are Super Output no longer applying to 21 opted-out recipes, and JEI marking them.
 - 2026-09-30 Phase 4: `gradlew spotlessApply` and `quickCheck` passed with 853 domain checks, including the ascendancy action checks with a fake payment. `npm run moddex:check` passed: the loop audit covers 988 recipes, and the new Seal recipe check covers 6. `npm run repo:check` passed. `runGameTestServer` completed mod loading with the new items, config key, and condition registered, then exited before datapack loading because no game tests are registered. Recipe parsing and Seal use still need an in-game check.
+- 2026-09-30 Phase 5: `gradlew spotlessApply` and `quickCheck` passed with 1058 domain checks, including menu sync, Ascend status agreement with the server, the Bonus Summary, and panel layout for every catalog entry. `npm run moddex:check` and `npm run repo:check` passed. Not yet run in game: the panel has no shipped ascendancy to show until Phase 6, so rendering, clicks, Jade, and JEI need a client check then.
 
 ## Handoff and limits
 

@@ -646,5 +646,8 @@ public class FurnaceMenu extends AbstractContainerMenu implements MasteryMenuVie
     @Override public MachineProgressionState masterySnapshot() {
         return MasteryMenuSupport.snapshot(data, DATA_MACHINE_PROGRESSION_START, masteryFamily());
     }
+    @Override public int ascendancyEntryStage() {
+        return MasteryMenuSupport.ascendancyEntryStage(data, DATA_MACHINE_PROGRESSION_START);
+    }
 
 }

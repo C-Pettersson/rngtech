@@ -10,6 +10,7 @@ import java.util.Set;
 /** Allocated Mastery content that contributes effects: shared-tree nodes and ascendancy nodes. */
 public interface MasteryEffectSource {
     String id();
+    String translationKey();
     List<MachineModifierEffect> effects();
     List<MegaPassiveNode.TaggedEffect> tagged();
     Set<String> behaviors();

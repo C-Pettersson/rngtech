@@ -315,6 +315,11 @@ public class AlloyFurnaceMenu extends AbstractContainerMenu implements MasteryMe
         return MasteryMenuSupport.snapshot(data, DATA_MACHINE_PROGRESSION_START, masteryFamily());
     }
 
+    @Override
+    public int ascendancyEntryStage() {
+        return MasteryMenuSupport.ascendancyEntryStage(data, DATA_MACHINE_PROGRESSION_START);
+    }
+
     private boolean hasPassiveNodeIndex(int index) {
         return MasteryMenuSupport.hasPassiveNodeIndex(data, DATA_MACHINE_PROGRESSION_START, index);
     }

@@ -180,7 +180,7 @@ public class ResonanceCalibratorBlockEntity extends BaseMachineBlockEntity imple
             if (index >= DATA_MACHINE_PROGRESSION_START
                     && index < DATA_MACHINE_PROGRESSION_START + MasteryMenuSupport.FIELD_COUNT) {
                 return MasteryMenuSupport.get(
-                        machineProgression(),
+                        ResonanceCalibratorBlockEntity.this,
                         index - DATA_MACHINE_PROGRESSION_START,
                         ResonanceCalibratorBlockEntity.this::effectiveStats
                 );

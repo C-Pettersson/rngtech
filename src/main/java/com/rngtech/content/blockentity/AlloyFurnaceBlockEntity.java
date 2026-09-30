@@ -178,7 +178,7 @@ public class AlloyFurnaceBlockEntity extends BaseMachineBlockEntity implements M
         public int get(int index) {
             if (index >= DATA_MACHINE_PROGRESSION_START
                     && index < DATA_MACHINE_PROGRESSION_START + MasteryMenuSupport.FIELD_COUNT) {
-                return MasteryMenuSupport.get(machineProgression(), index - DATA_MACHINE_PROGRESSION_START, AlloyFurnaceBlockEntity.this::effectiveStats);
+                return MasteryMenuSupport.get(AlloyFurnaceBlockEntity.this, index - DATA_MACHINE_PROGRESSION_START, AlloyFurnaceBlockEntity.this::effectiveStats);
             }
             MachineStatAccumulator stats = effectiveStats();
             AlloyFurnaceRecipe recipe = nextRecipe();

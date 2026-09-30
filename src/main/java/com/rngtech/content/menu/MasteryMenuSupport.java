@@ -2,7 +2,10 @@ package com.rngtech.content.menu;
 
 import com.rngtech.rpg.MachineStat;
 import com.rngtech.rpg.MachineStatAccumulator;
+import com.rngtech.rpg.progression.Ascendancy;
+import com.rngtech.rpg.progression.AscendancyCatalog;
 import com.rngtech.rpg.progression.MachineMasteryFamily;
+import com.rngtech.rpg.progression.MachineMasteryHost;
 import com.rngtech.rpg.progression.MachineProgressionState;
 import com.rngtech.rpg.progression.MegaPassiveTree;
 import com.rngtech.rpg.progression.PassiveProgressionView;
@@ -21,13 +24,27 @@ public final class MasteryMenuSupport {
     private static final int TARGET_START = ALLOCATED_START + MegaPassiveTree.MAX_ALLOCATIONS;
     private static final int FOLLOWING = TARGET_START + MegaPassiveTree.MAX_ALLOCATIONS;
     private static final int ATTRIBUTE_START = FOLLOWING + 1;
-    public static final int FIELD_COUNT = ATTRIBUTE_START + 3;
+    private static final int ASCENDANCY = ATTRIBUTE_START + 3;
+    private static final int SEAL_TIERS = ASCENDANCY + 1;
+    private static final int ENTRY_STAGE = SEAL_TIERS + 1;
+    private static final int ASCENDANCY_NODES_START = ENTRY_STAGE + 1;
+    public static final int FIELD_COUNT = ASCENDANCY_NODES_START + AscendancyCatalog.MAX_POINTS;
 
-    public static int get(MachineProgressionState state, int field, Supplier<MachineStatAccumulator> stats) {
-        if (field >= ATTRIBUTE_START && field < FIELD_COUNT) {
+    public static int get(MachineMasteryHost host, int field, Supplier<MachineStatAccumulator> stats) {
+        if (field >= ATTRIBUTE_START && field < ASCENDANCY) {
             return (int) Math.round(stats.get().value(attribute(field - ATTRIBUTE_START)) * 100);
         }
-        return get(state, field);
+        if (field == ENTRY_STAGE) { return host.ascendancyEntryStage(); }
+        return field >= ASCENDANCY ? ascendancyField(host.masteryState(), field) : get(host.machineProgression(), field);
+    }
+
+    /** The chosen ascendancy as its catalog index plus one, and its nodes as their index in that ascendancy plus one. */
+    private static int ascendancyField(MachineProgressionState state, int field) {
+        Ascendancy chosen = AscendancyCatalog.get(state.ascendancy());
+        if (field == ASCENDANCY) { return chosen == null ? 0 : AscendancyCatalog.index(chosen) + 1; }
+        if (field == SEAL_TIERS) { return state.sealTiers(); }
+        int slot = field - ASCENDANCY_NODES_START;
+        return chosen == null || slot >= state.ascendancyNodes().size() ? 0 : chosen.nodeIndex(state.ascendancyNodes().get(slot)) + 1;
     }
 
     private static MachineStat attribute(int index) {
@@ -80,9 +97,17 @@ public final class MasteryMenuSupport {
     private static long mask(ContainerData data, int base, int offset) {
         long result = 0; for (int i = 0; i < 64; i++) { if (hasPassiveNodeIndex(data, base, offset + i)) { result |= 1L << i; } } return result;
     }
+    public static int ascendancyEntryStage(ContainerData data, int base) { return data.get(base + ENTRY_STAGE); }
     public static MachineProgressionState snapshot(ContainerData data, int base, MachineMasteryFamily family) {
+        Ascendancy chosen = AscendancyCatalog.byIndex(data.get(base + ASCENDANCY) - 1);
+        List<String> ascendancyNodes = new ArrayList<>();
+        for (int i = 0; chosen != null && i < AscendancyCatalog.MAX_POINTS; i++) {
+            var node = chosen.nodeAt(data.get(base + ASCENDANCY_NODES_START + i) - 1);
+            if (node != null) { ascendancyNodes.add(node.id()); }
+        }
         return new MachineProgressionState(machineXp(data, base), 0, machineLevel(data, base),
-                readNodes(data, base + ALLOCATED_START), family.startNodeId(), readNodes(data, base + TARGET_START), data.get(base + FOLLOWING) != 0);
+                readNodes(data, base + ALLOCATED_START), family.startNodeId(), readNodes(data, base + TARGET_START), data.get(base + FOLLOWING) != 0,
+                chosen == null ? "" : chosen.id(), ascendancyNodes, data.get(base + SEAL_TIERS));
     }
     private static List<String> readNodes(ContainerData data, int base) {
         List<String> result = new ArrayList<>();

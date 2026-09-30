@@ -1,0 +1,736 @@
+package com.rngtech.client.screen;
+
+import com.rngtech.RNGTech;
+import com.rngtech.content.menu.MasteryMenuView;
+import com.rngtech.content.registry.ModItems;
+import com.rngtech.rpg.progression.AscendStatus;
+import com.rngtech.rpg.progression.Ascendancy;
+import com.rngtech.rpg.progression.AscendancyCatalog;
+import com.rngtech.rpg.progression.AscendancyNode;
+import com.rngtech.rpg.progression.MachineMasteryFamily;
+import com.rngtech.rpg.progression.MachineProgressionState;
+
+import net.minecraft.ChatFormatting;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.FormattedCharSequence;
+import net.minecraft.world.item.ItemStack;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.function.BiPredicate;
+
+/**
+ * The Mastery tab's Ascendancy panel. It covers the tree view and shows either the chosen ascendancy, with its points and
+ * the next Seal, or the choose dialog that previews every ascendancy for the family before a Seal is spent.
+ */
+final class AscendancyPanel {
+    static final int ACCENT = 0xFFE3B866;
+    private static final int HEADER_HEIGHT = 16;
+    private static final int FOOTER_HEIGHT = 22;
+    private static final int PADDING = 4;
+    private static final int BUTTON_SIZE = 18;
+    private static final int BUTTON_GAP = 4;
+    private static final int CLOSE_SIZE = 10;
+    private static final int MIN_COLUMN_WIDTH = 100;
+    private static final int COLUMN_GAP = 4;
+    private static final int LINE_HEIGHT = 10;
+    private static final int ROOT_LINES = 3;
+    private static final int BACKGROUND = 0xF20D1318;
+    private static final int BORDER = 0xFF655B46;
+    private static final int BUTTON = 0xFF343E49;
+    private static final int BUTTON_HOVER = 0xFF465366;
+    private static final int BUTTON_READY = 0xFF596035;
+    private static final int COLUMN = 0xFF141D24;
+    private static final int COLUMN_SELECTED = 0xFF232C1F;
+    private static final int TITLE = 0xFFFFFFFF;
+    private static final int TEXT = 0xFFE7DDC0;
+    private static final int MUTED = 0xFF8A8372;
+    private static final int LINK = 0xFF82745A;
+    private static final int LOCKED_BORDER = 0xFF9D885F;
+    private static final int OUTLINE = 0xFF080D11;
+    private static final int HOVER_RING = 0xFFF2E6C2;
+
+    private final MasteryMenuView<?> view;
+    private final MasteryScreenSupport.Palette palette;
+    private final BiPredicate<String, String> send;
+    private final Map<ResourceLocation, Boolean> iconPresent = new HashMap<>();
+    private boolean open;
+    private boolean choosing;
+    private Purpose purpose = Purpose.ASCEND;
+    private String selected;
+    private int page;
+
+    private enum Purpose { ASCEND, FREE, SWITCH }
+
+    private enum Part { NONE, CLOSE, POINTS, PRIMARY, SECONDARY, PREVIOUS, NEXT, COLUMN, NODE }
+
+    private record Hit(Part part, Ascendancy ascendancy, AscendancyTreeLayout.Placed node) {
+        private static final Hit NONE = new Hit(Part.NONE, null, null);
+
+        private static Hit of(Part part) {
+            return new Hit(part, null, null);
+        }
+    }
+
+    AscendancyPanel(MasteryMenuView<?> view, MasteryScreenSupport.Palette palette, BiPredicate<String, String> send) {
+        this.view = view;
+        this.palette = palette;
+        this.send = send;
+    }
+
+    /** The panel exists for families with ascendancies, and for machines that already earned a tier. */
+    boolean available() {
+        return !AscendancyCatalog.forFamily(view.masteryFamily()).isEmpty() || view.masterySnapshot().sealTiers() > 0;
+    }
+
+    boolean isOpen() {
+        return open;
+    }
+
+    void toggle() {
+        open = !open;
+        choosing = false;
+        selected = null;
+        page = 0;
+    }
+
+    void close() {
+        open = false;
+    }
+
+    /** A Seal can be used, a free choice is waiting, or points are unspent. */
+    boolean needsAttention() {
+        MachineProgressionState state = view.masterySnapshot();
+        AscendStatus status = status(state);
+        return status == AscendStatus.READY || status == AscendStatus.FREE_CHOICE || state.ascendancyUnspent() > 0 && !state.ascendancy().isEmpty();
+    }
+
+    void render(GuiGraphics graphics, Font font, MasterySummaryDrawer.Bounds bounds, int mouseX, int mouseY) {
+        MachineProgressionState state = sync();
+        graphics.fill(bounds.left(), bounds.top(), bounds.right(), bounds.bottom(), BACKGROUND);
+        graphics.fill(bounds.left(), bounds.top() + HEADER_HEIGHT, bounds.right(), bounds.top() + HEADER_HEIGHT + 1, BORDER);
+        graphics.fill(bounds.left(), bounds.bottom() - FOOTER_HEIGHT - 1, bounds.right(), bounds.bottom() - FOOTER_HEIGHT, BORDER);
+        Hit hit = hit(bounds, font, state, mouseX, mouseY);
+        renderClose(graphics, bounds, hit.part() == Part.CLOSE);
+        if (choosing) {
+            renderChoose(graphics, font, bounds, state, hit);
+        } else {
+            renderTree(graphics, font, bounds, state, hit);
+        }
+    }
+
+    boolean mouseClicked(MasterySummaryDrawer.Bounds bounds, double mouseX, double mouseY, int button) {
+        MachineProgressionState state = sync();
+        Hit hit = hit(bounds, Minecraft.getInstance().font, state, mouseX, mouseY);
+        if (button == 1) {
+            if (!choosing && hit.part() == Part.NODE && state.ascendancyNodes().contains(hit.node().node().id())) {
+                send.test("refund_ascendancy", hit.node().node().id());
+            }
+            return true;
+        }
+        if (button != 0) {
+            return true;
+        }
+        switch (hit.part()) {
+            case CLOSE -> close();
+            case PRIMARY -> primary(state);
+            case SECONDARY -> secondary();
+            case PREVIOUS -> page = Math.max(0, page - 1);
+            case NEXT -> page++;
+            case COLUMN -> selected = hit.ascendancy().id();
+            case NODE -> {
+                if (choosing) {
+                    selected = hit.ascendancy().id();
+                } else if (allocatable(state, hit.ascendancy(), hit.node().node())) {
+                    send.test("allocate_ascendancy", hit.node().node().id());
+                }
+            }
+            default -> { }
+        }
+        return true;
+    }
+
+    boolean mouseScrolled(double amount) {
+        if (choosing) {
+            page = Math.max(0, page - (int) Math.signum(amount));
+        }
+        return true;
+    }
+
+    List<Component> tooltip(MasterySummaryDrawer.Bounds bounds, Font font, double mouseX, double mouseY) {
+        MachineProgressionState state = sync();
+        Hit hit = hit(bounds, font, state, mouseX, mouseY);
+        return switch (hit.part()) {
+            case CLOSE -> List.of(Component.translatable("rngtech.mastery.ascendancy.close"));
+            case POINTS -> pointsTooltip(state);
+            case PRIMARY -> primaryTooltip(state);
+            case SECONDARY -> secondaryTooltip(state);
+            case PREVIOUS -> List.of(Component.translatable("rngtech.mastery.ascendancy.previous"));
+            case NEXT -> List.of(Component.translatable("rngtech.mastery.ascendancy.next"));
+            case COLUMN -> columnTooltip(hit.ascendancy());
+            case NODE -> choosing ? nodeTooltip(hit.node().node(), false) : nodeTooltip(hit.node().node(), true);
+            case NONE -> List.of();
+        };
+    }
+
+    /** The crest beside the start node. */
+    List<Component> badgeTooltip() {
+        MachineProgressionState state = view.masterySnapshot();
+        Ascendancy chosen = AscendancyCatalog.get(state.ascendancy());
+        List<Component> tooltip = new ArrayList<>();
+        tooltip.add(Component.translatable("rngtech.mastery.ascendancy.title").withStyle(ChatFormatting.WHITE));
+        if (chosen != null) {
+            tooltip.add(Component.translatable(chosen.translationKey()).withStyle(ChatFormatting.GOLD));
+        }
+        tooltip.addAll(pointsTooltip(state).subList(1, 3));
+        tooltip.add(Component.translatable("rngtech.mastery.ascendancy.open").withStyle(ChatFormatting.YELLOW));
+        return tooltip;
+    }
+
+    /** A node's name, kind, and effects; {@code actions} adds allocation and refund hints for the chosen tree. */
+    List<Component> nodeTooltip(AscendancyNode node, boolean actions) {
+        Ascendancy ascendancy = AscendancyCatalog.get(node.ascendancy());
+        List<Component> tooltip = new ArrayList<>();
+        tooltip.add(Component.translatable(node.translationKey()).withStyle(ChatFormatting.WHITE));
+        switch (node.kind()) {
+            case ROOT -> tooltip.add(Component.translatable("rngtech.mastery.ascendancy.tooltip.root").withStyle(ChatFormatting.GOLD));
+            case NOTABLE -> tooltip.add(ascendancy != null && ascendancy.isDeep(node)
+                    ? Component.translatable("rngtech.mastery.ascendancy.tooltip.deep_notable").withStyle(ChatFormatting.GOLD)
+                    : Component.translatable("rngtech.mastery.tooltip.notable").withStyle(ChatFormatting.AQUA));
+            case SMALL -> { }
+        }
+        MasteryScreenSupport.effectLines(node, view, tooltip);
+        if (!actions || ascendancy == null) {
+            return tooltip;
+        }
+        MachineProgressionState state = view.masterySnapshot();
+        if (node.kind() == AscendancyNode.Kind.ROOT || state.ascendancyNodes().contains(node.id())) {
+            tooltip.add(Component.translatable("rngtech.mastery.tooltip.unlocked").withStyle(ChatFormatting.GREEN));
+            if (node.kind() != AscendancyNode.Kind.ROOT) {
+                tooltip.add(Component.translatable("rngtech.mastery.ascendancy.refund_hint", AscendancyCatalog.REFUNDS_PER_NODE).withStyle(ChatFormatting.DARK_GRAY));
+            }
+        } else if (!connected(state, ascendancy, node)) {
+            tooltip.add(Component.translatable("rngtech.mastery.tooltip.requires_link").withStyle(ChatFormatting.RED));
+        } else if (state.ascendancyUnspent() <= 0) {
+            tooltip.add(Component.translatable("rngtech.mastery.ascendancy.no_points").withStyle(ChatFormatting.RED));
+        } else {
+            tooltip.add(Component.translatable("rngtech.mastery.tooltip.click_unlock").withStyle(ChatFormatting.YELLOW));
+        }
+        return tooltip;
+    }
+
+    /** Follows the synced state: a new choice shows its tree, and a machine without one shows the choose dialog. */
+    private MachineProgressionState sync() {
+        MachineProgressionState state = view.masterySnapshot();
+        boolean chosen = !state.ascendancy().isEmpty();
+        if (choosing && chosen && (purpose != Purpose.SWITCH || state.ascendancy().equals(selected))) {
+            choosing = false;
+            selected = null;
+        } else if (!choosing && !chosen) {
+            choosing = true;
+            purpose = state.awaitingAscendancyChoice() ? Purpose.FREE : Purpose.ASCEND;
+            selected = null;
+            page = 0;
+        }
+        return state;
+    }
+
+    /** The tree view's primary button uses the next Seal; the choose dialog's confirms the selection. */
+    private void primary(MachineProgressionState state) {
+        if (!primaryReady(state)) {
+            return;
+        }
+        if (!choosing) {
+            send.test("ascend", "");
+            return;
+        }
+        switch (purpose) {
+            case ASCEND -> send.test("ascend", selected);
+            case FREE -> send.test("choose_ascendancy", selected);
+            case SWITCH -> send.test("switch_ascendancy", selected);
+        }
+    }
+
+    /** The tree view's secondary button opens the switch dialog; while switching it goes back to the tree. */
+    private void secondary() {
+        choosing = !choosing;
+        purpose = Purpose.SWITCH;
+        selected = null;
+        page = 0;
+    }
+
+    private boolean primaryReady(MachineProgressionState state) {
+        if (!choosing) {
+            return status(state) == AscendStatus.READY;
+        }
+        return selected != null && switch (purpose) {
+            case ASCEND -> status(state) == AscendStatus.READY;
+            case FREE -> true;
+            case SWITCH -> switchReady(state);
+        };
+    }
+
+    private boolean switchReady(MachineProgressionState state) {
+        return state.ascendancyNodes().isEmpty() && hasSeal(1);
+    }
+
+    private boolean switchable() {
+        return AscendancyCatalog.forFamily(view.masteryFamily()).size() > 1;
+    }
+
+    private AscendStatus status(MachineProgressionState state) {
+        return AscendStatus.of(state, view.masteryFamily(), view.ascendancyEntryStage(), AscendancyPanel::hasSeal);
+    }
+
+    // Flat fills, text, and items end the GUI vertex batch, so each view draws them first, then its shapes, then icons.
+    private void renderTree(GuiGraphics graphics, Font font, MasterySummaryDrawer.Bounds bounds, MachineProgressionState state, Hit hit) {
+        Ascendancy chosen = AscendancyCatalog.get(state.ascendancy());
+        if (chosen == null) {
+            return;
+        }
+        int textLeft = bounds.left() + PADDING;
+        graphics.drawString(font, clip(font, Component.translatable(chosen.translationKey()), pointsLeft(bounds, font) - textLeft - PADDING), textLeft, bounds.top() + 4, ACCENT, false);
+        renderPoints(graphics, font, bounds, state);
+        int tier = state.sealTiers() + 1;
+        boolean ascendable = tier <= AscendancyCatalog.MAX_TIERS;
+        if (ascendable) {
+            renderButton(graphics, font, primaryX(bounds), buttonY(bounds), hit.part() == Part.PRIMARY, primaryReady(state), sealStack(tier), null);
+        }
+        if (switchable()) {
+            renderButton(graphics, font, secondaryX(bounds, ascendable), buttonY(bounds), hit.part() == Part.SECONDARY, switchReady(state), null, "\u2194");
+        }
+        List<AscendancyTreeLayout.Placed> placed = treeLayout(bounds, chosen);
+        GuiShapeBatch shapes = new GuiShapeBatch(graphics, bounds.left(), bounds.top(), bounds.right(), bounds.bottom());
+        drawTree(shapes, chosen, placed, state, hit, true);
+        shapes.flush();
+        drawIcons(graphics, placed);
+    }
+
+    private void renderChoose(GuiGraphics graphics, Font font, MasterySummaryDrawer.Bounds bounds, MachineProgressionState state, Hit hit) {
+        List<Ascendancy> candidates = candidates(state);
+        int columns = columns(bounds);
+        int pages = Math.max(1, (candidates.size() + columns - 1) / columns);
+        page = Math.min(page, pages - 1);
+        Component title = Component.translatable("rngtech.mastery.ascendancy.choose." + purpose.name().toLowerCase(Locale.ROOT));
+        int textLeft = bounds.left() + PADDING;
+        graphics.drawString(font, clip(font, title, closeLeft(bounds) - textLeft - PADDING), textLeft, bounds.top() + 4, TITLE, false);
+        if (candidates.isEmpty()) {
+            graphics.drawString(font, clip(font, Component.translatable("rngtech.mastery.ascendancy.status.none"), bounds.right() - textLeft - PADDING),
+                    textLeft, bodyTop(bounds) + 4, MUTED, false);
+            return;
+        }
+        Map<Ascendancy, List<AscendancyTreeLayout.Placed>> trees = new LinkedHashMap<>();
+        for (int slot = 0; slot < columns; slot++) {
+            int index = page * columns + slot;
+            if (index >= candidates.size()) {
+                break;
+            }
+            Ascendancy ascendancy = candidates.get(index);
+            int[] column = column(bounds, columns, slot);
+            boolean picked = ascendancy.id().equals(selected);
+            graphics.fill(column[0] - 1, column[1] - 1, column[2] + 1, column[3] + 1, picked ? palette.outputBonus() : BORDER);
+            graphics.fill(column[0], column[1], column[2], column[3], picked ? COLUMN_SELECTED : COLUMN);
+            graphics.drawString(font, clip(font, Component.translatable(ascendancy.translationKey()), column[2] - column[0] - 4), column[0] + 2, column[1] + 2, ACCENT, false);
+            List<FormattedCharSequence> lines = rootLines(font, column, ascendancy);
+            int y = column[3] - lines.size() * LINE_HEIGHT - 1;
+            for (FormattedCharSequence line : lines) {
+                graphics.drawString(font, line, column[0] + 2, y, MUTED, false);
+                y += LINE_HEIGHT;
+            }
+            trees.put(ascendancy, previewLayout(font, column, ascendancy));
+        }
+        ItemStack seal = purpose == Purpose.FREE ? null : sealStack(purpose == Purpose.SWITCH ? 1 : state.sealTiers() + 1);
+        renderButton(graphics, font, primaryX(bounds), buttonY(bounds), hit.part() == Part.PRIMARY, primaryReady(state), seal, seal == null ? "\u2714" : null);
+        if (purpose == Purpose.SWITCH) {
+            renderButton(graphics, font, secondaryX(bounds, true), buttonY(bounds), hit.part() == Part.SECONDARY, true, null, "\u2190");
+        }
+        if (pages > 1) {
+            renderButton(graphics, font, previousX(bounds), buttonY(bounds), hit.part() == Part.PREVIOUS, page > 0, null, "<");
+            renderButton(graphics, font, nextX(bounds), buttonY(bounds), hit.part() == Part.NEXT, page < pages - 1, null, ">");
+            String count = (page + 1) + "/" + pages;
+            graphics.drawString(font, count, previousX(bounds) - BUTTON_GAP - font.width(count), buttonY(bounds) + 5, MUTED, false);
+        }
+        GuiShapeBatch shapes = new GuiShapeBatch(graphics, bounds.left(), bounds.top(), bounds.right(), bounds.bottom());
+        trees.forEach((ascendancy, placed) -> drawTree(shapes, ascendancy, placed, state, hit, false));
+        shapes.flush();
+        trees.values().forEach(placed -> drawIcons(graphics, placed));
+    }
+
+    private void drawTree(GuiShapeBatch shapes, Ascendancy ascendancy, List<AscendancyTreeLayout.Placed> placed, MachineProgressionState state, Hit hit, boolean live) {
+        Map<String, AscendancyTreeLayout.Placed> byId = new HashMap<>();
+        placed.forEach(entry -> byId.put(entry.node().id(), entry));
+        for (AscendancyTreeLayout.Placed entry : placed) {
+            AscendancyTreeLayout.Placed parent = byId.get(entry.node().parent());
+            if (parent != null) {
+                boolean active = live && allocated(state, entry.node()) && allocated(state, parent.node());
+                shapes.line(parent.x(), parent.y(), entry.x(), entry.y(), active ? 2.0F : 1.0F, active ? palette.statAccent() : LINK);
+            }
+        }
+        for (AscendancyTreeLayout.Placed entry : placed) {
+            AscendancyNode node = entry.node();
+            boolean isAllocated = live && allocated(state, node);
+            boolean isAllocatable = live && !isAllocated && allocatable(state, ascendancy, node);
+            int border = node.kind() == AscendancyNode.Kind.ROOT ? palette.startNode()
+                    : isAllocated ? palette.statAccent() : isAllocatable ? palette.outputBonus() : LOCKED_BORDER;
+            float radius = entry.radius();
+            if (entry.deep()) {
+                shapes.diamond(entry.x(), entry.y(), radius + 1.0F, OUTLINE);
+                shapes.diamond(entry.x(), entry.y(), radius, border);
+                shapes.diamond(entry.x(), entry.y(), Math.max(1.0F, radius - 1.5F), isAllocated ? 0xFF49315C : 0xFF291E35);
+            } else {
+                shapes.disc(entry.x(), entry.y(), radius + 1.0F, OUTLINE);
+                shapes.disc(entry.x(), entry.y(), radius, border);
+                shapes.disc(entry.x(), entry.y(), Math.max(1.0F, radius - 1.0F), fill(node, isAllocated, isAllocatable));
+            }
+            if (hit.part() == Part.NODE && hit.node() == entry) {
+                shapes.ring(entry.x(), entry.y(), radius + 1.5F, radius + 2.5F, HOVER_RING);
+            }
+        }
+    }
+
+    private int fill(AscendancyNode node, boolean allocated, boolean allocatable) {
+        if (node.kind() == AscendancyNode.Kind.ROOT) {
+            return 0xFF54421E;
+        }
+        if (allocatable) {
+            return 0xFF454024;
+        }
+        return switch (node.kind()) {
+            case NOTABLE -> allocated ? 0xFF27434C : 0xFF1C3037;
+            default -> allocated ? 0xFF263C3E : 0xFF202A2D;
+        };
+    }
+
+    /** Draws icons that exist; roots and notables fall back to their shape until their art lands. */
+    private void drawIcons(GuiGraphics graphics, List<AscendancyTreeLayout.Placed> placed) {
+        for (AscendancyTreeLayout.Placed entry : placed) {
+            int size = Math.min(16, Math.round(entry.radius() * 1.2F));
+            if (size < 5) {
+                continue;
+            }
+            ResourceLocation texture = RNGTech.id("textures/gui/mastery/" + entry.node().masteryIconKey() + ".png");
+            boolean present = iconPresent.computeIfAbsent(texture, key -> Minecraft.getInstance().getResourceManager().getResource(key).isPresent());
+            if (present) {
+                graphics.blit(texture, Math.round(entry.x() - size / 2.0F), Math.round(entry.y() - size / 2.0F), size, size, 0, 0, 16, 16, 16, 16);
+            }
+        }
+    }
+
+    private void renderPoints(GuiGraphics graphics, Font font, MasterySummaryDrawer.Bounds bounds, MachineProgressionState state) {
+        String points = state.ascendancyNodes().size() + "/" + state.ascendancyPoints();
+        int left = pointsLeft(bounds, font);
+        for (int tier = 0; tier < AscendancyCatalog.MAX_TIERS; tier++) {
+            int x = left + tier * 7 + 3;
+            int y = bounds.top() + 8;
+            int color = tier < state.sealTiers() ? ACCENT : 0xFF3A3F44;
+            for (int row = -3; row <= 3; row++) {
+                int half = 3 - Math.abs(row);
+                graphics.fill(x - half, y + row, x + half + 1, y + row + 1, color);
+            }
+        }
+        int color = state.ascendancyUnspent() > 0 ? palette.outputBonus() : TEXT;
+        graphics.drawString(font, points, left + AscendancyCatalog.MAX_TIERS * 7 + 3, bounds.top() + 4, color, false);
+    }
+
+    private void renderClose(GuiGraphics graphics, MasterySummaryDrawer.Bounds bounds, boolean hovered) {
+        int left = closeLeft(bounds);
+        int top = bounds.top() + 3;
+        graphics.fill(left, top, left + CLOSE_SIZE, top + CLOSE_SIZE, hovered ? BUTTON_HOVER : BUTTON);
+        for (int step = 2; step < CLOSE_SIZE - 2; step++) {
+            graphics.fill(left + step, top + step, left + step + 1, top + step + 1, TEXT);
+            graphics.fill(left + CLOSE_SIZE - 1 - step, top + step, left + CLOSE_SIZE - step, top + step + 1, TEXT);
+        }
+    }
+
+    private void renderButton(GuiGraphics graphics, Font font, int left, int top, boolean hovered, boolean ready, ItemStack icon, String glyph) {
+        graphics.fill(left - 1, top - 1, left + BUTTON_SIZE + 1, top + BUTTON_SIZE + 1, ready ? palette.outputBonus() : BORDER);
+        graphics.fill(left, top, left + BUTTON_SIZE, top + BUTTON_SIZE, hovered ? BUTTON_HOVER : ready ? BUTTON_READY : BUTTON);
+        if (icon != null) {
+            graphics.renderItem(icon, left + 1, top + 1);
+            if (!ready) {
+                // Items render in front of flat fills, so the dimming layer moves forward too.
+                graphics.pose().pushPose();
+                graphics.pose().translate(0.0F, 0.0F, 200.0F);
+                graphics.fill(left, top, left + BUTTON_SIZE, top + BUTTON_SIZE, 0x90101418);
+                graphics.pose().popPose();
+            }
+        } else if (glyph != null) {
+            graphics.drawString(font, glyph, left + (BUTTON_SIZE - font.width(glyph) + 1) / 2, top + 5, ready ? TEXT : MUTED, false);
+        }
+    }
+
+    private Hit hit(MasterySummaryDrawer.Bounds bounds, Font font, MachineProgressionState state, double mouseX, double mouseY) {
+        if (inside(mouseX, mouseY, closeLeft(bounds), bounds.top() + 3, CLOSE_SIZE, CLOSE_SIZE)) {
+            return Hit.of(Part.CLOSE);
+        }
+        int buttonY = buttonY(bounds);
+        if (choosing) {
+            List<Ascendancy> candidates = candidates(state);
+            int columns = columns(bounds);
+            int pages = Math.max(1, (candidates.size() + columns - 1) / columns);
+            if (inside(mouseX, mouseY, primaryX(bounds), buttonY, BUTTON_SIZE, BUTTON_SIZE) && !candidates.isEmpty()) {
+                return Hit.of(Part.PRIMARY);
+            }
+            if (purpose == Purpose.SWITCH && inside(mouseX, mouseY, secondaryX(bounds, true), buttonY, BUTTON_SIZE, BUTTON_SIZE)) {
+                return Hit.of(Part.SECONDARY);
+            }
+            if (pages > 1 && inside(mouseX, mouseY, previousX(bounds), buttonY, BUTTON_SIZE, BUTTON_SIZE)) {
+                return Hit.of(Part.PREVIOUS);
+            }
+            if (pages > 1 && inside(mouseX, mouseY, nextX(bounds), buttonY, BUTTON_SIZE, BUTTON_SIZE)) {
+                return Hit.of(Part.NEXT);
+            }
+            for (int slot = 0; slot < columns; slot++) {
+                int index = Math.min(page, pages - 1) * columns + slot;
+                if (index >= candidates.size()) {
+                    break;
+                }
+                int[] column = column(bounds, columns, slot);
+                if (mouseX >= column[0] && mouseX < column[2] && mouseY >= column[1] && mouseY < column[3]) {
+                    Ascendancy ascendancy = candidates.get(index);
+                    for (AscendancyTreeLayout.Placed entry : previewLayout(font, column, ascendancy)) {
+                        if (entry.contains(mouseX, mouseY)) {
+                            return new Hit(Part.NODE, ascendancy, entry);
+                        }
+                    }
+                    return new Hit(Part.COLUMN, ascendancy, null);
+                }
+            }
+            return Hit.NONE;
+        }
+        Ascendancy chosen = AscendancyCatalog.get(state.ascendancy());
+        if (chosen == null) {
+            return Hit.NONE;
+        }
+        boolean ascendable = state.sealTiers() < AscendancyCatalog.MAX_TIERS;
+        if (ascendable && inside(mouseX, mouseY, primaryX(bounds), buttonY, BUTTON_SIZE, BUTTON_SIZE)) {
+            return Hit.of(Part.PRIMARY);
+        }
+        if (switchable() && inside(mouseX, mouseY, secondaryX(bounds, ascendable), buttonY, BUTTON_SIZE, BUTTON_SIZE)) {
+            return Hit.of(Part.SECONDARY);
+        }
+        if (mouseY >= bounds.top() && mouseY < bounds.top() + HEADER_HEIGHT && mouseX >= pointsLeft(bounds, font) && mouseX < closeLeft(bounds)) {
+            return Hit.of(Part.POINTS);
+        }
+        for (AscendancyTreeLayout.Placed entry : treeLayout(bounds, chosen)) {
+            if (entry.contains(mouseX, mouseY)) {
+                return new Hit(Part.NODE, chosen, entry);
+            }
+        }
+        return Hit.NONE;
+    }
+
+    private List<Component> pointsTooltip(MachineProgressionState state) {
+        return List.of(
+                Component.translatable("rngtech.mastery.ascendancy.title").withStyle(ChatFormatting.WHITE),
+                Component.translatable("rngtech.mastery.ascendancy.tiers", state.sealTiers(), AscendancyCatalog.MAX_TIERS).withStyle(ChatFormatting.GRAY),
+                Component.translatable("rngtech.mastery.ascendancy.points", state.ascendancyNodes().size(), state.ascendancyPoints(), state.ascendancyUnspent())
+                        .withStyle(ChatFormatting.GRAY));
+    }
+
+    private List<Component> primaryTooltip(MachineProgressionState state) {
+        List<Component> tooltip = new ArrayList<>();
+        if (!choosing) {
+            int tier = state.sealTiers() + 1;
+            tooltip.add(Component.translatable("rngtech.mastery.ascendancy.ascend").withStyle(ChatFormatting.WHITE));
+            tooltip.add(Component.translatable("rngtech.mastery.ascendancy.uses_seal", sealName(tier), AscendancyCatalog.POINTS_PER_TIER).withStyle(ChatFormatting.GRAY));
+            tooltip.add(statusLine(status(state), tier));
+            return tooltip;
+        }
+        tooltip.add(Component.translatable("rngtech.mastery.ascendancy.confirm." + purpose.name().toLowerCase(Locale.ROOT)).withStyle(ChatFormatting.WHITE));
+        switch (purpose) {
+            case ASCEND -> {
+                tooltip.add(Component.translatable("rngtech.mastery.ascendancy.uses_seal", sealName(1), AscendancyCatalog.POINTS_PER_TIER).withStyle(ChatFormatting.GRAY));
+                AscendStatus status = status(state);
+                if (status != AscendStatus.READY) {
+                    tooltip.add(statusLine(status, state.sealTiers() + 1));
+                } else if (selected == null) {
+                    tooltip.add(Component.translatable("rngtech.mastery.ascendancy.select_first").withStyle(ChatFormatting.RED));
+                } else {
+                    tooltip.add(Component.translatable("rngtech.mastery.ascendancy.click_confirm").withStyle(ChatFormatting.YELLOW));
+                }
+            }
+            case FREE -> {
+                tooltip.add(statusLine(AscendStatus.FREE_CHOICE, 1));
+                tooltip.add((selected == null ? Component.translatable("rngtech.mastery.ascendancy.select_first").withStyle(ChatFormatting.RED)
+                        : Component.translatable("rngtech.mastery.ascendancy.click_confirm").withStyle(ChatFormatting.YELLOW)));
+            }
+            case SWITCH -> {
+                tooltip.add(Component.translatable("rngtech.mastery.ascendancy.switch_cost", sealName(1)).withStyle(ChatFormatting.GRAY));
+                if (!hasSeal(1)) {
+                    tooltip.add(statusLine(AscendStatus.SEAL_MISSING, 1));
+                } else if (selected == null) {
+                    tooltip.add(Component.translatable("rngtech.mastery.ascendancy.select_first").withStyle(ChatFormatting.RED));
+                } else {
+                    tooltip.add(Component.translatable("rngtech.mastery.ascendancy.click_confirm").withStyle(ChatFormatting.YELLOW));
+                }
+            }
+        }
+        return tooltip;
+    }
+
+    private List<Component> switchTooltip(MachineProgressionState state) {
+        List<Component> tooltip = new ArrayList<>();
+        tooltip.add(Component.translatable("rngtech.mastery.ascendancy.switch").withStyle(ChatFormatting.WHITE));
+        tooltip.add(Component.translatable("rngtech.mastery.ascendancy.switch_cost", sealName(1)).withStyle(ChatFormatting.GRAY));
+        if (!state.ascendancyNodes().isEmpty()) {
+            tooltip.add(Component.translatable("rngtech.mastery.ascendancy.switch_refund_first").withStyle(ChatFormatting.RED));
+        } else if (!hasSeal(1)) {
+            tooltip.add(statusLine(AscendStatus.SEAL_MISSING, 1));
+        } else {
+            tooltip.add(Component.translatable("rngtech.mastery.ascendancy.click_switch").withStyle(ChatFormatting.YELLOW));
+        }
+        return tooltip;
+    }
+
+    private List<Component> secondaryTooltip(MachineProgressionState state) {
+        return choosing ? List.of(Component.translatable("rngtech.mastery.ascendancy.back")) : switchTooltip(state);
+    }
+
+    private List<Component> columnTooltip(Ascendancy ascendancy) {
+        List<Component> tooltip = new ArrayList<>();
+        tooltip.add(Component.translatable(ascendancy.translationKey()).withStyle(ChatFormatting.GOLD));
+        tooltip.addAll(nodeTooltip(ascendancy.root(), false));
+        tooltip.add(Component.translatable(ascendancy.id().equals(selected) ? "rngtech.mastery.ascendancy.selected" : "rngtech.mastery.ascendancy.click_select")
+                .withStyle(ascendancy.id().equals(selected) ? ChatFormatting.GREEN : ChatFormatting.YELLOW));
+        return tooltip;
+    }
+
+    private Component statusLine(AscendStatus status, int tier) {
+        return switch (status) {
+            case READY -> Component.translatable("rngtech.mastery.ascendancy.status.ready").withStyle(ChatFormatting.YELLOW);
+            case FREE_CHOICE -> Component.translatable("rngtech.mastery.ascendancy.status.free_choice").withStyle(ChatFormatting.GREEN);
+            case ALL_TIERS -> Component.translatable("rngtech.mastery.ascendancy.status.all_tiers").withStyle(ChatFormatting.GREEN);
+            case NO_ASCENDANCIES -> Component.translatable("rngtech.mastery.ascendancy.status.none").withStyle(ChatFormatting.RED);
+            case ENTRY_STAGE -> Component.translatable(view.masteryFamily() == MachineMasteryFamily.FORESTRY
+                            ? "rngtech.mastery.ascendancy.status.entry_stage_tool" : "rngtech.mastery.ascendancy.status.entry_stage",
+                    AscendancyCatalog.ENTRY_STAGE, view.ascendancyEntryStage()).withStyle(ChatFormatting.RED);
+            case SEAL_MISSING -> Component.translatable("rngtech.mastery.ascendancy.status.seal_missing", sealName(tier)).withStyle(ChatFormatting.RED);
+        };
+    }
+
+    /** Every ascendancy for the family; switching leaves out the current one. */
+    private List<Ascendancy> candidates(MachineProgressionState state) {
+        List<Ascendancy> all = AscendancyCatalog.forFamily(view.masteryFamily());
+        return purpose == Purpose.SWITCH ? all.stream().filter(ascendancy -> !ascendancy.id().equals(state.ascendancy())).toList() : all;
+    }
+
+    private boolean allocated(MachineProgressionState state, AscendancyNode node) {
+        return node.kind() == AscendancyNode.Kind.ROOT || state.ascendancyNodes().contains(node.id());
+    }
+
+    private boolean connected(MachineProgressionState state, Ascendancy ascendancy, AscendancyNode node) {
+        return node.parent().equals(ascendancy.root().id()) || state.ascendancyNodes().contains(node.parent());
+    }
+
+    private boolean allocatable(MachineProgressionState state, Ascendancy ascendancy, AscendancyNode node) {
+        return node.kind() != AscendancyNode.Kind.ROOT && !state.ascendancyNodes().contains(node.id())
+                && state.ascendancyUnspent() > 0 && connected(state, ascendancy, node);
+    }
+
+    private List<AscendancyTreeLayout.Placed> treeLayout(MasterySummaryDrawer.Bounds bounds, Ascendancy ascendancy) {
+        return AscendancyTreeLayout.fit(ascendancy, bounds.left() + PADDING, bodyTop(bounds), bounds.right() - PADDING, bodyBottom(bounds));
+    }
+
+    private List<AscendancyTreeLayout.Placed> previewLayout(Font font, int[] column, Ascendancy ascendancy) {
+        int bottom = column[3] - rootLines(font, column, ascendancy).size() * LINE_HEIGHT - 3;
+        return AscendancyTreeLayout.fit(ascendancy, column[0] + 3, column[1] + LINE_HEIGHT + 4, column[2] - 3, bottom);
+    }
+
+    /** The root's effects, cut to the lines that leave the preview tree enough room. */
+    private List<FormattedCharSequence> rootLines(Font font, int[] column, Ascendancy ascendancy) {
+        List<Component> effects = new ArrayList<>();
+        MasteryScreenSupport.effectLines(ascendancy.root(), view, effects);
+        List<FormattedCharSequence> lines = new ArrayList<>();
+        for (Component effect : effects) {
+            lines.addAll(font.split(effect, column[2] - column[0] - 4));
+        }
+        return lines.size() > ROOT_LINES ? lines.subList(0, ROOT_LINES) : lines;
+    }
+
+    private int columns(MasterySummaryDrawer.Bounds bounds) {
+        return Math.max(1, (bounds.right() - bounds.left() - PADDING * 2 + COLUMN_GAP) / (MIN_COLUMN_WIDTH + COLUMN_GAP));
+    }
+
+    private int[] column(MasterySummaryDrawer.Bounds bounds, int columns, int slot) {
+        int width = (bounds.right() - bounds.left() - PADDING * 2 - COLUMN_GAP * (columns - 1)) / columns;
+        int left = bounds.left() + PADDING + slot * (width + COLUMN_GAP);
+        return new int[] {left, bodyTop(bounds), left + width, bodyBottom(bounds)};
+    }
+
+    private static FormattedCharSequence clip(Font font, Component text, int width) {
+        List<FormattedCharSequence> lines = font.split(text, Math.max(1, width));
+        return lines.isEmpty() ? FormattedCharSequence.EMPTY : lines.getFirst();
+    }
+
+    private static boolean inside(double x, double y, int left, int top, int width, int height) {
+        return x >= left && x < left + width && y >= top && y < top + height;
+    }
+
+    private static int bodyTop(MasterySummaryDrawer.Bounds bounds) {
+        return bounds.top() + HEADER_HEIGHT + 4;
+    }
+
+    private static int bodyBottom(MasterySummaryDrawer.Bounds bounds) {
+        return bounds.bottom() - FOOTER_HEIGHT - 4;
+    }
+
+    private static int buttonY(MasterySummaryDrawer.Bounds bounds) {
+        return bounds.bottom() - FOOTER_HEIGHT + 2;
+    }
+
+    private static int primaryX(MasterySummaryDrawer.Bounds bounds) {
+        return bounds.left() + PADDING + 1;
+    }
+
+    private static int secondaryX(MasterySummaryDrawer.Bounds bounds, boolean afterPrimary) {
+        return afterPrimary ? primaryX(bounds) + BUTTON_SIZE + BUTTON_GAP : primaryX(bounds);
+    }
+
+    private static int nextX(MasterySummaryDrawer.Bounds bounds) {
+        return bounds.right() - PADDING - 1 - BUTTON_SIZE;
+    }
+
+    private static int previousX(MasterySummaryDrawer.Bounds bounds) {
+        return nextX(bounds) - BUTTON_GAP - BUTTON_SIZE;
+    }
+
+    private static int closeLeft(MasterySummaryDrawer.Bounds bounds) {
+        return bounds.right() - PADDING - CLOSE_SIZE;
+    }
+
+    private static int pointsLeft(MasterySummaryDrawer.Bounds bounds, Font font) {
+        return closeLeft(bounds) - PADDING - AscendancyCatalog.MAX_TIERS * 7 - 3 - font.width("6/6");
+    }
+
+    private static Component sealName(int tier) {
+        return tier < 1 || tier > AscendancyCatalog.MAX_TIERS ? Component.empty() : sealStack(tier).getHoverName();
+    }
+
+    private static ItemStack sealStack(int tier) {
+        return new ItemStack(ModItems.ascendancySeal(tier).get());
+    }
+
+    /** Creative players also need the Seal in inventory, matching the server. */
+    private static boolean hasSeal(int tier) {
+        var player = Minecraft.getInstance().player;
+        if (player == null || tier < 1 || tier > AscendancyCatalog.MAX_TIERS) {
+            return false;
+        }
+        var inventory = player.getInventory();
+        for (int slot = 0; slot < inventory.getContainerSize(); slot++) {
+            if (inventory.getItem(slot).is(ModItems.ascendancySeal(tier).get())) {
+                return true;
+            }
+        }
+        return false;
+    }
+}

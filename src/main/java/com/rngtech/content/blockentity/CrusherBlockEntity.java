@@ -149,10 +149,9 @@ public class CrusherBlockEntity extends BaseMachineBlockEntity implements MenuPr
     private final ContainerData menuData = new ContainerData() {
         @Override
         public int get(int index) {
-            MachineProgressionState progression = machineProgression();
             if (index >= DATA_MACHINE_PROGRESSION_START
                     && index < DATA_MACHINE_PROGRESSION_START + MasteryMenuSupport.FIELD_COUNT) {
-                return MasteryMenuSupport.get(progression, index - DATA_MACHINE_PROGRESSION_START, CrusherBlockEntity.this::effectiveStats);
+                return MasteryMenuSupport.get(CrusherBlockEntity.this, index - DATA_MACHINE_PROGRESSION_START, CrusherBlockEntity.this::effectiveStats);
             }
             MachineStatAccumulator stats = effectiveStats();
             return switch (index) {

@@ -12,6 +12,9 @@ public interface MasteryMenuView<N extends PassiveNode> extends MasteryApplicabi
 
     MachineProgressionState masterySnapshot();
 
+    /** The synced stage that gates a first Ascendancy Seal. */
+    int ascendancyEntryStage();
+
     @Override
     MachineMasteryFamily masteryFamily();
 

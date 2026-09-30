@@ -216,7 +216,7 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
             }
             if (index >= DATA_MACHINE_PROGRESSION_START
                     && index < DATA_MACHINE_PROGRESSION_START + MasteryMenuSupport.FIELD_COUNT) {
-                return MasteryMenuSupport.get(machineProgression(), index - DATA_MACHINE_PROGRESSION_START, FurnaceBlockEntity.this::effectiveStats);
+                return MasteryMenuSupport.get(FurnaceBlockEntity.this, index - DATA_MACHINE_PROGRESSION_START, FurnaceBlockEntity.this::effectiveStats);
             }
             return switch (index) {
                 case DATA_BURN_TIME -> burnTime;
