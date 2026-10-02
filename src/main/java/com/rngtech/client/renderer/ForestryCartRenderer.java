@@ -2,6 +2,7 @@ package com.rngtech.client.renderer;
 
 import com.rngtech.content.blockentity.ForestryCartStationBlockEntity;
 import com.rngtech.content.entity.ForestryCartEntity;
+import com.rngtech.content.entity.ForestryTreeScan;
 import com.rngtech.content.registry.ModItems;
 
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -63,6 +64,7 @@ public class ForestryCartRenderer extends EntityRenderer<ForestryCartEntity> {
     private static final int SCAN_BOUND_HORIZONTAL = 8;
     private static final int REMAINING_HARVEST_SEARCH_HORIZONTAL = SCAN_BOUND_HORIZONTAL;
     private static final int MAX_CONNECTED_LEAF_BLOCKS = 192;
+    private static final int LEAF_SCAN_RADIUS = 4;
     private static final float HOVER_LIFT = 0.18F;
     private static final float HOVER_BOB_HEIGHT = 0.035F;
     private static final float HOVER_BOB_SPEED = 0.14F;
@@ -523,6 +525,9 @@ public class ForestryCartRenderer extends EntityRenderer<ForestryCartEntity> {
         if (logLimit <= 0) {
             return HarvestDebugScan.empty(maxHeight);
         }
+        if (level.getBlockState(start).is(BlockTags.LOGS)) {
+            return scanOwnedTree(level, root, start, logLimit, maxHeight, canHarvestLeaves);
+        }
 
         ArrayDeque<BlockPos> queue = new ArrayDeque<>();
         List<BlockPos> logs = new ArrayList<>();
@@ -530,32 +535,11 @@ public class ForestryCartRenderer extends EntityRenderer<ForestryCartEntity> {
         Set<BlockPos> seen = new HashSet<>();
         queue.add(start);
         seen.add(start);
-        int logCount = 0;
-        int leafCount = 0;
-        boolean tooLarge = false;
-        while (!queue.isEmpty() && !tooLarge) {
+        while (!queue.isEmpty() && leaves.size() < MAX_CONNECTED_LEAF_BLOCKS && logs.size() < logLimit) {
             BlockPos current = queue.remove();
-            if (!withinTreeBounds(root, current, maxHeight)) {
-                tooLarge = true;
-                break;
-            }
-            BlockState currentState = level.getBlockState(current);
-            if (!isHarvestScanBlock(currentState, canHarvestLeaves)) {
-                continue;
-            }
-            if (currentState.is(BlockTags.LEAVES)) {
-                leafCount++;
-                if (leafCount > MAX_CONNECTED_LEAF_BLOCKS) {
-                    tooLarge = true;
-                    break;
-                }
+            if (level.getBlockState(current).is(BlockTags.LEAVES)) {
                 leaves.add(current);
             } else {
-                logCount++;
-                if (logCount > logLimit) {
-                    tooLarge = true;
-                    break;
-                }
                 logs.add(current);
             }
             for (int dx = -1; dx <= 1; dx++) {
@@ -565,24 +549,13 @@ public class ForestryCartRenderer extends EntityRenderer<ForestryCartEntity> {
                             continue;
                         }
                         BlockPos next = current.offset(dx, dy, dz);
-                        if (!withinTreeBounds(root, next, maxHeight)) {
-                            if (isHarvestScanBlock(level.getBlockState(next), canHarvestLeaves)) {
-                                tooLarge = true;
-                                break;
-                            }
-                            continue;
-                        }
-                        if (!isHarvestScanBlock(level.getBlockState(next), canHarvestLeaves) || !seen.add(next)) {
+                        if (!withinTreeBounds(root, next, maxHeight)
+                                || !isHarvestScanBlock(level.getBlockState(next), canHarvestLeaves)
+                                || !seen.add(next)) {
                             continue;
                         }
                         queue.add(next);
                     }
-                    if (tooLarge) {
-                        break;
-                    }
-                }
-                if (tooLarge) {
-                    break;
                 }
             }
         }
@@ -594,7 +567,34 @@ public class ForestryCartRenderer extends EntityRenderer<ForestryCartEntity> {
             return HarvestDebugScan.empty(maxHeight);
         }
         BlockPos target = leaves.isEmpty() ? selectHarvestBlock(root, logs) : selectHarvestBlock(root, leaves);
-        return new HarvestDebugScan(List.copyOf(blocks), target, tooLarge, maxHeight);
+        return new HarvestDebugScan(List.copyOf(blocks), target, false, maxHeight);
+    }
+
+    private static HarvestDebugScan scanOwnedTree(
+            Level level,
+            BlockPos root,
+            BlockPos start,
+            int logLimit,
+            int maxHeight,
+            boolean canHarvestLeaves
+    ) {
+        ForestryTreeScan.TreeBlocks blocks = ForestryTreeScan.TreeBlocks.of(level);
+        ForestryTreeScan.Bounds bounds = new ForestryTreeScan.Bounds(root, maxHeight, SCAN_BOUND_HORIZONTAL);
+        ForestryTreeScan.OwnedLogs owned = ForestryTreeScan.ownedLogs(blocks, bounds, start, logLimit);
+        if (owned.tooLarge()) {
+            return new HarvestDebugScan(List.of(start), start, true, maxHeight);
+        }
+        if (owned.logs().isEmpty()) {
+            return HarvestDebugScan.empty(maxHeight);
+        }
+        List<BlockPos> leaves = canHarvestLeaves
+                ? ForestryTreeScan.leavesAround(blocks, bounds, owned.logs(), LEAF_SCAN_RADIUS, MAX_CONNECTED_LEAF_BLOCKS)
+                : List.of();
+        List<BlockPos> treeBlocks = new ArrayList<>(leaves.size() + owned.logs().size());
+        treeBlocks.addAll(leaves);
+        treeBlocks.addAll(owned.logs());
+        BlockPos target = leaves.isEmpty() ? selectHarvestBlock(root, owned.logs()) : selectHarvestBlock(root, leaves);
+        return new HarvestDebugScan(List.copyOf(treeBlocks), target, false, maxHeight);
     }
 
     private static BlockPos selectHarvestBlock(BlockPos root, List<BlockPos> blocks) {

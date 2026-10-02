@@ -84,7 +84,7 @@ Modifier operations currently support:
 | `BATTERY_SUPPORT` | Prototype | Highest Battery Cell stage a modular-tool rod can accept. It gates installed cells and inventory charge sources only. |
 | `AREA_WIDTH` | Prototype | Hammer area width. Current authored heads default to `3`; normal first-pass profiles do not broadly expand it. |
 | `AREA_HEIGHT` | Prototype | Hammer area height. Current authored heads default to `3`; normal first-pass profiles do not broadly expand it. |
-| `TREE_FELL_LIMIT` | Prototype | Maximum connected log blocks a Treefeller action can break, and the Forestry Companion's accepted connected-log snapshot limit. Durability and FE are still charged per block for direct tool use; Forestry Companion Treefeller batches pay the configured batch FE. |
+| `TREE_FELL_LIMIT` | Prototype | Maximum connected log blocks a Treefeller action can break, and the Forestry Companion's Treefeller batch size. It does not limit which trees the Forestry Companion can harvest. Durability and FE are still charged per block for direct tool use; Forestry Companion Treefeller batches pay the configured batch FE. |
 | `VEIN_MINE_LIMIT` | Prototype | Maximum connected same-type ore blocks a Vein Miner Pick action can break, including the targeted block. Pick Heads can roll this as part of the rare Vein Miner prefix. |
 | `VEIN_MINE_FE_USAGE` | Prototype | Extra FE required for each connected ore block broken by Vein Miner after the targeted block. Lower values are better. Normal per-block durability and FE costs still apply. |
 | `ORE_BURST_SPEED` | Prototype | Ore-only mining speed bonus for Ore Burst-capable Pick and Hammer tools. |
