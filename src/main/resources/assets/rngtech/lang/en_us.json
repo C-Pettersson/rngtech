@@ -1590,7 +1590,7 @@
   "rngtech.forestry_cart.stat_tooltip.managed_cells": "%s active managed cells, %s tracked cells, %s maximum.",
   "rngtech.forestry_cart.stat_tooltip.sapling_cargo": "%s saplings loaded, %s sapling capacity.",
   "rngtech.forestry_cart.stat_tooltip.output_cargo": "%s output items stored, %s output capacity. Dock at a station to unload.",
-  "rngtech.forestry_cart.stat_tooltip.tree_log_limit": "Largest connected log snapshot accepted before Tree Too Large.",
+  "rngtech.forestry_cart.stat_tooltip.tree_log_limit": "Largest connected tree the cart will fell. Larger trees are skipped as Tree Too Large while the cart keeps working.",
   "rngtech.forestry_cart.stat_tooltip.logs_per_action": "Logs cut per work action. Axes cut 1; Treefellers cut up to their limit.",
   "rngtech.forestry_cart.stat_tooltip.height_limit": "Maximum vertical harvest scan span.",
   "rngtech.forestry_cart.stat_tooltip.action_interval": "Cut interval: %s ticks. Leaf interval: %s ticks. Current cooldown: %s ticks.",

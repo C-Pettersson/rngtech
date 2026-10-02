@@ -1,5 +1,6 @@
 package com.rngtech.rpg.progression;
 
+import com.rngtech.content.entity.ForestryTreeScanChecks;
 import com.rngtech.rpg.MachineModifier;
 import com.rngtech.rpg.MachineModifierEffect;
 import com.rngtech.rpg.MachineStat;
@@ -37,6 +38,7 @@ public final class MasteryChecks {
         iconTextures();
         checks += AscendancyChecks.run();
         System.out.println("Machine mastery: " + checks + " checks passed");
+        ForestryTreeScanChecks.run();
     }
 
     private static void keywordMath() {
