@@ -8,6 +8,7 @@ import com.rngtech.content.registry.ModItems;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
@@ -19,6 +20,7 @@ import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.component.DataComponents;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.util.Mth;
@@ -29,6 +31,9 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
+import org.joml.Matrix4f;
+import org.joml.Vector3f;
+import org.joml.Vector4f;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -95,11 +100,23 @@ public class ForestryCartRenderer extends EntityRenderer<ForestryCartEntity> {
     private static final int HARVEST_BLOCKED_CUSTOM_MODEL_DATA = 20;
     private static final int PLANTING_BLOCKED_CUSTOM_MODEL_DATA = 21;
     private static final int SNAPSHOT_CUSTOM_MODEL_DATA = 22;
+    private static final int SPRINKLER_HEAD_CUSTOM_MODEL_DATA = 23;
+    private static final float SPRINKLER_DEGREES_PER_TICK = 12.0F;
+    private static final float SPRINKLER_HEAD_SCALE = 0.6F;
+    /** Nozzle tips in the head's local space: the nozzles end at x = 0.5 and 15.5 of 16. */
+    private static final float SPRINKLER_NOZZLE_OFFSET = 0.46875F * SPRINKLER_HEAD_SCALE;
+    /** Nozzle height above the roof: the nozzles are centered 5 of 16 up the head model. */
+    private static final float SPRINKLER_HEAD_HEIGHT = 0.3125F * SPRINKLER_HEAD_SCALE;
+    /** A splash droplet launched level falls back to the deck height in about this many ticks, coasting this far per unit speed. */
+    private static final double SPRINKLER_DISTANCE_PER_SPEED = 9.5D;
+    private static final double[] SPRINKLER_JET_SPREAD = {0.35D, 0.6D, 0.85D, 1.0D};
 
     private final ItemRenderer itemRenderer;
     private final ItemStack cartStack;
     private final Map<Integer, ItemStack> actionCartStacks = new HashMap<>();
     private final Map<Integer, TurnState> turnStates = new HashMap<>();
+    private final Map<Integer, Integer> sprinklerJetTicks = new HashMap<>();
+    private final ItemStack sprinklerHeadStack;
 
     public ForestryCartRenderer(EntityRendererProvider.Context context) {
         super(context);
@@ -125,6 +142,8 @@ public class ForestryCartRenderer extends EntityRenderer<ForestryCartEntity> {
         registerActionCartStack(HARVEST_BLOCKED_CUSTOM_MODEL_DATA);
         registerActionCartStack(PLANTING_BLOCKED_CUSTOM_MODEL_DATA);
         registerActionCartStack(SNAPSHOT_CUSTOM_MODEL_DATA);
+        this.sprinklerHeadStack = new ItemStack(ModItems.FORESTRY_CART.get());
+        sprinklerHeadStack.set(DataComponents.CUSTOM_MODEL_DATA, new CustomModelData(SPRINKLER_HEAD_CUSTOM_MODEL_DATA));
         this.shadowRadius = 0.7F;
     }
 
@@ -155,7 +174,50 @@ public class ForestryCartRenderer extends EntityRenderer<ForestryCartEntity> {
                 entity.level(),
                 entity.getId()
         );
+        if (entity.sprinklerReach() > 0) {
+            renderSprinkler(entity, animationTicks, poseStack, buffer, packedLight);
+        }
         poseStack.popPose();
+    }
+
+    /**
+     * A sprinkler head spins on the cart's roof and sprays from both arm ends. Jets start at the nozzles as drawn and
+     * land about the sprinkler's reach away, once per game tick whatever the frame rate.
+     */
+    private void renderSprinkler(ForestryCartEntity entity, float animationTicks, PoseStack poseStack, MultiBufferSource buffer, int packedLight) {
+        poseStack.pushPose();
+        poseStack.translate(0.0F, 0.5F, 0.0F);
+        poseStack.mulPose(Axis.YP.rotationDegrees(animationTicks * SPRINKLER_DEGREES_PER_TICK));
+        poseStack.pushPose();
+        poseStack.translate(0.0F, SPRINKLER_HEAD_SCALE * 0.5F, 0.0F);
+        poseStack.scale(SPRINKLER_HEAD_SCALE, SPRINKLER_HEAD_SCALE, SPRINKLER_HEAD_SCALE);
+        itemRenderer.renderStatic(sprinklerHeadStack, ItemDisplayContext.NONE, packedLight, OverlayTexture.NO_OVERLAY, poseStack, buffer, entity.level(), entity.getId());
+        poseStack.popPose();
+        Integer lastTick = sprinklerJetTicks.get(entity.getId());
+        if (lastTick == null || lastTick != entity.tickCount) {
+            sprinklerJetTicks.put(entity.getId(), entity.tickCount);
+            sprayJets(entity, poseStack.last().pose());
+        }
+        poseStack.popPose();
+    }
+
+    private void sprayJets(ForestryCartEntity entity, Matrix4f pose) {
+        Vec3 camera = Minecraft.getInstance().gameRenderer.getMainCamera().getPosition();
+        double reach = entity.sprinklerReach() + 0.5D;
+        for (int side = -1; side <= 1; side += 2) {
+            Vector4f tip = pose.transform(new Vector4f(side * SPRINKLER_NOZZLE_OFFSET, SPRINKLER_HEAD_HEIGHT, 0.0F, 1.0F));
+            Vector3f direction = pose.transformDirection(new Vector3f(side, 0.0F, 0.0F));
+            double length = Math.hypot(direction.x(), direction.z());
+            if (length < 1.0E-4D) {
+                continue;
+            }
+            double dx = direction.x() / length;
+            double dz = direction.z() / length;
+            for (double spread : SPRINKLER_JET_SPREAD) {
+                double speed = reach * spread / SPRINKLER_DISTANCE_PER_SPEED * (0.92D + entity.getRandom().nextDouble() * 0.16D);
+                entity.level().addParticle(ParticleTypes.SPLASH, camera.x + tip.x(), camera.y + tip.y(), camera.z + tip.z(), dx * speed, 0.0D, dz * speed);
+            }
+        }
     }
 
     private ItemStack cartStack(ForestryCartEntity entity) {

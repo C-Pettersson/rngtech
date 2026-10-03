@@ -132,6 +132,12 @@
         "custom_model_data": 22
       },
       "model": "rngtech:item/forestry_cart_face_snapshot"
+    },
+    {
+      "predicate": {
+        "custom_model_data": 23
+      },
+      "model": "rngtech:item/forestry_cart_sprinkler_head"
     }
   ]
 }

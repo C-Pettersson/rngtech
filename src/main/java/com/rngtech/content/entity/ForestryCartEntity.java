@@ -35,7 +35,6 @@ import com.mojang.authlib.GameProfile;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.component.DataComponents;
-import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
@@ -163,8 +162,6 @@ public class ForestryCartEntity extends AbstractMinecart implements MenuProvider
     private static final int HYDRATION_TICKS = 1200;
     private static final double IRRIGATION_HYDRATION_MULTIPLIER = 1.5;
     private static final int HYDRATION_CHECK_INTERVAL_TICKS = 20;
-    /** Watered cells still get a spray as the cart passes, without spending water. */
-    private static final int COSMETIC_SPRAY_INTERVAL_TICKS = 10;
     private static final int BREAK_SOUND_INTERVAL_TICKS = 4;
     private static final int MAX_CRACK_OVERLAYS = 64;
     private static final float REFERENCE_LOG_HARDNESS = 2.0F;
@@ -194,6 +191,9 @@ public class ForestryCartEntity extends AbstractMinecart implements MenuProvider
     private static final EntityDataAccessor<Integer> DATA_VISUAL_STATUS =
             SynchedEntityData.defineId(ForestryCartEntity.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Integer> DATA_VISUAL_ACTION =
+            SynchedEntityData.defineId(ForestryCartEntity.class, EntityDataSerializers.INT);
+    /** Rows the sprinkler jets reach on each side, or 0 while it is not spraying; drives the rotating head. */
+    private static final EntityDataAccessor<Integer> DATA_SPRINKLER_REACH =
             SynchedEntityData.defineId(ForestryCartEntity.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Boolean> DATA_SCAN_DEBUG_VISIBLE =
             SynchedEntityData.defineId(ForestryCartEntity.class, EntityDataSerializers.BOOLEAN);
@@ -549,6 +549,21 @@ public class ForestryCartEntity extends AbstractMinecart implements MenuProvider
         }
     }
 
+    /** Rows the sprinkler is spraying to on each side, or 0; read by the renderer. */
+    public int sprinklerReach() {
+        return entityData.get(DATA_SPRINKLER_REACH);
+    }
+
+    private void updateSprinklerReach() {
+        BlockPos railPos = railPosition();
+        boolean spraying = managementViewers == 0 && hasMasteryBehavior("SPRINKLER") && hasPump() && waterTank.getFluidAmount() > 0
+                && railPos != null && isForestryWorkRail(railPos);
+        int reach = spraying ? workRange() + (hasMasteryBehavior("IRRIGATION") ? 1 : 0) : 0;
+        if (entityData.get(DATA_SPRINKLER_REACH) != reach) {
+            entityData.set(DATA_SPRINKLER_REACH, reach);
+        }
+    }
+
     public boolean scanDebugVisible() {
         return entityData.get(DATA_SCAN_DEBUG_VISIBLE);
     }
@@ -616,6 +631,7 @@ public class ForestryCartEntity extends AbstractMinecart implements MenuProvider
             maintainHydration();
             updateWaterCapacity();
         }
+        updateSprinklerReach();
 
         if (managementViewers > 0) {
             setWorkflowState(WorkflowState.MANAGED, ForestryCartStationBlockEntity.STATUS_READY, ForestryCartStationBlockEntity.ACTION_MANAGED);
@@ -909,6 +925,7 @@ public class ForestryCartEntity extends AbstractMinecart implements MenuProvider
         builder.define(DATA_VISUAL_STATUS, ForestryCartStationBlockEntity.STATUS_MISSING_BATTERY_CELL);
         builder.define(DATA_VISUAL_ACTION, ForestryCartStationBlockEntity.ACTION_SETUP_BLOCKED);
         builder.define(DATA_SCAN_DEBUG_VISIBLE, false);
+        builder.define(DATA_SPRINKLER_REACH, 0);
         builder.define(DATA_DEBUG_MAX_CONNECTED_LOGS, 0);
         builder.define(DATA_DEBUG_MAX_TREE_HEIGHT, BASE_MAX_TREE_HEIGHT);
         builder.define(DATA_DEBUG_CAN_HARVEST_LEAVES, true);
@@ -2758,9 +2775,6 @@ public class ForestryCartEntity extends AbstractMinecart implements MenuProvider
             if (soilState.is(Blocks.FARMLAND)) {
                 Long until = hydratedUntil.get(soil);
                 if (until != null && until - now > duration / 2 && soilState.getValue(FarmBlock.MOISTURE) == FarmBlock.MAX_MOISTURE) {
-                    if (tickCount % COSMETIC_SPRAY_INTERVAL_TICKS == 0) {
-                        sprayWater(soil);
-                    }
                     continue;
                 }
                 changed = soilState.getValue(FarmBlock.MOISTURE) == FarmBlock.MAX_MOISTURE
@@ -2771,31 +2785,11 @@ public class ForestryCartEntity extends AbstractMinecart implements MenuProvider
             if (changed) {
                 hydrate(soil, now + duration);
                 waterTank.drain(cost, IFluidHandler.FluidAction.EXECUTE);
-                sprayWater(soil);
                 sprayed = true;
             }
         }
         if (sprayed) {
             level().playSound(null, getX(), getY(), getZ(), SoundEvents.BOAT_PADDLE_WATER, SoundSource.BLOCKS, 0.35F, 1.4F + random.nextFloat() * 0.2F);
-        }
-    }
-
-    /** A spray arcs from the cart and splashes down on the watered block. */
-    private void sprayWater(BlockPos soil) {
-        if (!(level() instanceof ServerLevel serverLevel)) {
-            return;
-        }
-        double x = soil.getX() + 0.5D;
-        double y = soil.getY() + 1.0D;
-        double z = soil.getZ() + 0.5D;
-        serverLevel.sendParticles(ParticleTypes.SPLASH, x, y + 0.05D, z, 10, 0.3D, 0.05D, 0.3D, 0.0D);
-        serverLevel.sendParticles(ParticleTypes.FALLING_WATER, x, y + 0.9D, z, 4, 0.25D, 0.1D, 0.25D, 0.0D);
-        double dx = x - getX();
-        double dz = z - getZ();
-        for (int step = 1; step <= 3; step++) {
-            double t = step / 4.0D;
-            double arc = Math.sin(t * Math.PI) * 0.8D;
-            serverLevel.sendParticles(ParticleTypes.SPLASH, getX() + dx * t, getY() + 0.9D + arc, getZ() + dz * t, 2, 0.05D, 0.05D, 0.05D, 0.0D);
         }
     }
 
