@@ -113,7 +113,7 @@ Recorded 2026-09-30 for the Alloy Furnace, Metal Press, Resonance Calibrator, Me
 - **Forestry Companion rules:**
     - The Log Ledger banks Ledger Rate of each harvested log and pays whole logs into output cargo when there is room. Leaf cleanup waits 25% longer per leaf.
     - Clearcut Charter stops planting, waiting for saplings, and taking saplings from a station, and routes sapling drops to output cargo.
-    - Rolling Harvest keeps the cart moving after planting and through work cooldowns, and cuts a tree while it stays within 2 blocks of the rail. The cart halts only when the tree would leave reach at the next rail block, so a fast cart may skip a cell until its next pass.
+    - Rolling Harvest keeps the cart moving after planting and through work cooldowns, and cuts a tree while it stays within 2 blocks of the rail. Cells it rolled past stay on its work list while within reach, and the cart halts only when the tree being cut, or a tree or empty cell still waiting for work, would leave reach at the next rail block, so rows are not skipped.
     - A growth pulse reaches each managed sapling at most once per 100 ticks. A pulse on a ready sapling that still cannot grow backs that cell off for 1,200 ticks.
     - Seed Library replants each cell's remembered species and leaves the cell empty until that sapling is in cargo.
     - Ancient Grove plants a 2×2 plot extending away from the rail and along the route when four saplings from the new `rngtech:giant_saplings` tag are in cargo and the plot is clear. It costs four plantings of FE and registers one managed cell.
