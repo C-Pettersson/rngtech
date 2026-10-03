@@ -1,0 +1,190 @@
+{
+    "id": "field_hand",
+    "family": "forestry",
+    "nodes": [
+        {
+            "id": "field_rotation",
+            "kind": "ROOT",
+            "x": 0,
+            "y": 0,
+            "effects": [
+                {
+                    "stat": "WORK_RANGE",
+                    "operation": "ADD",
+                    "value": 1
+                }
+            ],
+            "behaviors": [
+                "CROP_TENDING",
+                "NO_TREE_WORK"
+            ]
+        },
+        {
+            "id": "furrow_cells",
+            "kind": "SMALL",
+            "parent": "field_rotation",
+            "x": -2,
+            "y": 1,
+            "passive": {
+                "MANAGED_CELLS": 16
+            }
+        },
+        {
+            "id": "wide_furrows",
+            "kind": "NOTABLE",
+            "parent": "furrow_cells",
+            "x": -2,
+            "y": 2,
+            "effects": [
+                {
+                    "stat": "WORK_RANGE",
+                    "operation": "ADD",
+                    "value": 1
+                }
+            ]
+        },
+        {
+            "id": "hose_fittings",
+            "kind": "SMALL",
+            "parent": "field_rotation",
+            "x": -1,
+            "y": 1,
+            "effects": [
+                {
+                    "stat": "FLUID_CAPACITY",
+                    "operation": "INCREASED_PERCENT",
+                    "value": 25
+                }
+            ]
+        },
+        {
+            "id": "sprinkler",
+            "kind": "NOTABLE",
+            "parent": "hose_fittings",
+            "x": -1,
+            "y": 2,
+            "behaviors": [
+                "SPRINKLER"
+            ]
+        },
+        {
+            "id": "reap_speed",
+            "kind": "SMALL",
+            "parent": "field_rotation",
+            "x": 1,
+            "y": 1,
+            "effects": [
+                {
+                    "stat": "PROCESSING_SPEED",
+                    "operation": "INCREASED_PERCENT",
+                    "value": 5
+                }
+            ]
+        },
+        {
+            "id": "reap_and_sow",
+            "kind": "NOTABLE",
+            "parent": "reap_speed",
+            "x": 1,
+            "y": 2,
+            "behaviors": [
+                "REAP_AND_SOW"
+            ]
+        },
+        {
+            "id": "seed_bins",
+            "kind": "SMALL",
+            "parent": "field_rotation",
+            "x": 2,
+            "y": 1,
+            "passive": {
+                "MANAGED_CELLS": 16
+            }
+        },
+        {
+            "id": "seed_ledger",
+            "kind": "NOTABLE",
+            "parent": "seed_bins",
+            "x": 2,
+            "y": 2,
+            "behaviors": [
+                "SEED_LIBRARY"
+            ]
+        },
+        {
+            "id": "long_furrows",
+            "kind": "SMALL",
+            "parent": "wide_furrows",
+            "x": -2,
+            "y": 3,
+            "passive": {
+                "MANAGED_CELLS": 16
+            }
+        },
+        {
+            "id": "open_fields",
+            "kind": "NOTABLE",
+            "parent": "long_furrows",
+            "x": -2,
+            "y": 4,
+            "effects": [
+                {
+                    "stat": "WORK_RANGE",
+                    "operation": "ADD",
+                    "value": 1
+                }
+            ],
+            "passive": {
+                "MANAGED_CELLS": 32
+            }
+        },
+        {
+            "id": "wide_nozzles",
+            "kind": "SMALL",
+            "parent": "sprinkler",
+            "x": -1,
+            "y": 3,
+            "effects": [
+                {
+                    "stat": "FLUID_CAPACITY",
+                    "operation": "INCREASED_PERCENT",
+                    "value": 25
+                }
+            ]
+        },
+        {
+            "id": "irrigation",
+            "kind": "NOTABLE",
+            "parent": "wide_nozzles",
+            "x": -1,
+            "y": 4,
+            "behaviors": [
+                "IRRIGATION"
+            ]
+        },
+        {
+            "id": "reap_rail",
+            "kind": "SMALL",
+            "parent": "reap_and_sow",
+            "x": 1,
+            "y": 3,
+            "effects": [
+                {
+                    "stat": "CART_SPEED",
+                    "operation": "INCREASED_PERCENT",
+                    "value": 10
+                }
+            ]
+        },
+        {
+            "id": "rolling_reap",
+            "kind": "NOTABLE",
+            "parent": "reap_rail",
+            "x": 1,
+            "y": 4,
+            "behaviors": [
+                "ROLLING_REAP"
+            ]
+        }
+    ]
+}

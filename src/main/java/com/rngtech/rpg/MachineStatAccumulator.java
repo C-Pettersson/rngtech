@@ -176,6 +176,7 @@ public final class MachineStatAccumulator {
         stats.baseValues.put(MachineStat.ENERGY_CAPACITY, (double) energyCapacity);
         stats.baseValues.put(MachineStat.ENERGY_TRANSFER, (double) transferRate);
         stats.baseValues.put(MachineStat.FLUID_TRANSFER, 0.0);
+        stats.baseValues.put(MachineStat.FLUID_CAPACITY, 4000.0);
         stats.baseValues.put(MachineStat.ENERGY_GENERATION, 1.0);
         stats.baseValues.put(MachineStat.EFFICIENCY, 1.0);
         stats.baseValues.put(MachineStat.PROCESSING_SPEED, 1.0);
@@ -515,6 +516,8 @@ public final class MachineStatAccumulator {
         stats.baseValues.put(MachineStat.PROCESSING_SPEED, 1.0);
         stats.baseValues.put(MachineStat.ENERGY_USAGE, 1.0);
         stats.baseValues.put(MachineStat.CART_SPEED, 1.0);
+        stats.baseValues.put(MachineStat.WORK_RANGE, 1.0);
+        stats.baseValues.put(MachineStat.FLUID_CAPACITY, 8000.0);
         return stats;
     }
 

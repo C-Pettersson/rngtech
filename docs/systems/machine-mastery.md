@@ -6,7 +6,7 @@ Machine Mastery is progression owned by each machine chassis. Machines share one
 
 ## Shared tree
 
-The catalog contains 1315 nodes: six starts, 634 attribute travel nodes, 458 ordinary nodes, 186 notables, and 31 keystones, joined by 1464 links. It is built in layers. Inside the six starts, a central junction splits three ways to a core ring, so every machine can path through the middle and reaches the center for the same number of points. Each start opens into a home region with its own road shape between two boundary spokes. A middle ring leads through outer star hubs and climbs to the perimeter road.
+The catalog contains 1346 nodes: six starts, 634 attribute travel nodes, 480 ordinary nodes, 195 notables, and 31 keystones, joined by 1499 links. It is built in layers. Inside the six starts, a central junction splits three ways to a core ring, so every machine can path through the middle and reaches the center for the same number of points. Each start opens into a home region with its own road shape between two boundary spokes. A middle ring leads through outer star hubs and climbs to the perimeter road.
 
 Optional reward constellations branch from single road gates: arcs, forks, diamonds, pearl chains, horseshoes, rings, wheels, lattices, crowns, and hexagram stars. Distinct constellations are separated by travel steps. Each notable requires at least three reward allocations from its road gate, and constellations cannot shortcut between roads. Keystones are spread through every layer, either directly on a road or at the end of a reward arm, and always at least 10 points from every start. Silent Operation sits on the center junction, 10 points from every start. Attribute Transfiguration, Singular Drive, and Reserve Actuation sit around the core, where any start can path inward to them. Family keystones sit in the home regions, outer field, and perimeter near their family's start. Output constellations appear on both sides of the tree: Material Memory and Fine Screens mirror the Drive region's Recovery wheels on the Control and Reserve / Control side, with Single Pass on the road between them.
 
@@ -115,7 +115,7 @@ An ascendancy is a family-specific specialization for one machine, modeled on Pa
 | [Metal Press](../content/metal-press.md#ascendancies) | Die Keeper, Drop Forge |
 | [Resonance Calibrator](../content/resonance-calibrator.md#ascendancies) | Harmonist, Mass Tuner |
 | [Melter](../content/melter.md#ascendancies) | Pressure Vessel, Twin Crucible |
-| [Forestry Companion](../content/tree-farm-automation.md#ascendancies) | Timber Baron, Grove Warden |
+| [Forestry Companion](../content/tree-farm-automation.md#ascendancies) | Timber Baron, Grove Warden, Field Hand |
 
 ### Seals and tiers
 
@@ -127,7 +127,7 @@ Each Ascendancy Seal grants 2 ascendancy points to one machine, for at most 6 ac
 | Ascendancy Seal II | Tungstensteel, nullite, elite circuits, a calibrated diamond crystal, and a Lubricated Seal Core | Seal I used on the same machine |
 | Ascendancy Seal III | Naquadah, an Exotic Machine Frame, ultimate circuits, a high-stability calibrated diamond crystal, and a Lubricated Seal Core | Seal II used on the same machine |
 
-The entry stage is the chassis stage for block machines. It is 3 for the Crude Metal Press and 4 for the Metal Press, and 6 for the Melter. The Forestry Companion uses the stage of its installed Axe or Treefeller head. The gate is checked only when Seal I is used.
+The entry stage is the chassis stage for block machines. It is 3 for the Crude Metal Press and 4 for the Metal Press, and 6 for the Melter. The Forestry Companion has no chassis stage and always meets the gate, so crafting Seal I is its only requirement. The gate is checked only when Seal I is used.
 
 Seals carry no data, so Seals from loot tables, quests, or commands work the same as crafted ones. Pack makers can turn Seal recipes off with the `ascendancy.sealRecipesEnabled` common config key or the `rngtech:ascendancy_seal_recipes_enabled` recipe condition. Crafting the Seal is the only trial; there is no work requirement.
 

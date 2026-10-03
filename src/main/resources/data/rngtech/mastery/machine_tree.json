@@ -2968,6 +2968,72 @@
             "gate": "path_0353",
             "region": "control",
             "layer": "outer"
+        },
+        {
+            "id": "reward_392",
+            "x": 3793,
+            "y": 2873,
+            "role": "reward",
+            "shape": "chain",
+            "gate": "path_0179",
+            "theme": "Rail Pace",
+            "region": "control_drive",
+            "layer": "home"
+        },
+        {
+            "id": "reward_393",
+            "x": 4132,
+            "y": 2570,
+            "role": "reward",
+            "shape": "wheel",
+            "gate": "path_0480",
+            "theme": "Open Track",
+            "region": "control_drive",
+            "layer": "outer"
+        },
+        {
+            "id": "reward_394",
+            "x": 3544,
+            "y": 2666,
+            "role": "reward",
+            "shape": "diamond",
+            "gate": "path_0195",
+            "theme": "Rowcraft",
+            "region": "control_drive",
+            "layer": "outer"
+        },
+        {
+            "id": "reward_395",
+            "x": 4680,
+            "y": 2461,
+            "role": "reward",
+            "shape": "diamond",
+            "gate": "path_0435",
+            "theme": "Rowcraft",
+            "region": "control_drive",
+            "layer": "outer"
+        },
+        {
+            "id": "reward_396",
+            "x": 3582,
+            "y": 2426,
+            "role": "reward",
+            "shape": "fork",
+            "gate": "path_0372",
+            "theme": "Reservoirs",
+            "region": "control_drive",
+            "layer": "outer"
+        },
+        {
+            "id": "reward_397",
+            "x": 3047,
+            "y": 4529,
+            "role": "reward",
+            "shape": "fork",
+            "gate": "path_0310",
+            "theme": "Reservoirs",
+            "region": "reserve_control",
+            "layer": "home"
         }
     ],
     "nodes": [
@@ -29570,6 +29636,663 @@
             "group": "reward_390"
         },
         {
+            "effects": [
+                {
+                    "stat": "CART_SPEED",
+                    "operation": "INCREASED_PERCENT",
+                    "value": 4
+                }
+            ],
+            "behaviors": [],
+            "fixed": {},
+            "ceilings": {},
+            "scaling": [],
+            "passive": {},
+            "id": "greased_rails_1",
+            "name": "Rail Pace",
+            "kind": "NODE",
+            "x": 3892,
+            "y": 2957,
+            "group": "reward_392"
+        },
+        {
+            "effects": [
+                {
+                    "stat": "CART_SPEED",
+                    "operation": "INCREASED_PERCENT",
+                    "value": 4
+                }
+            ],
+            "behaviors": [],
+            "fixed": {},
+            "ceilings": {},
+            "scaling": [],
+            "passive": {},
+            "id": "greased_rails_2",
+            "name": "Rail Pace",
+            "kind": "NODE",
+            "x": 3845,
+            "y": 2934,
+            "group": "reward_392"
+        },
+        {
+            "effects": [
+                {
+                    "stat": "CART_SPEED",
+                    "operation": "INCREASED_PERCENT",
+                    "value": 12
+                },
+                {
+                    "stat": "DRIVE",
+                    "operation": "ADD",
+                    "value": 4
+                }
+            ],
+            "behaviors": [],
+            "fixed": {},
+            "ceilings": {},
+            "scaling": [],
+            "passive": {},
+            "id": "greased_rails",
+            "kind": "NOTABLE",
+            "name": "Greased Rails",
+            "x": 3802,
+            "y": 2901,
+            "group": "reward_392"
+        },
+        {
+            "effects": [
+                {
+                    "stat": "CART_SPEED",
+                    "operation": "INCREASED_PERCENT",
+                    "value": 4
+                }
+            ],
+            "behaviors": [],
+            "fixed": {},
+            "ceilings": {},
+            "scaling": [],
+            "passive": {},
+            "id": "greased_rails_3",
+            "name": "Rail Pace",
+            "kind": "NODE",
+            "x": 3765,
+            "y": 2862,
+            "group": "reward_392"
+        },
+        {
+            "effects": [
+                {
+                    "stat": "CART_SPEED",
+                    "operation": "INCREASED_PERCENT",
+                    "value": 4
+                }
+            ],
+            "behaviors": [],
+            "fixed": {},
+            "ceilings": {},
+            "scaling": [],
+            "passive": {},
+            "id": "greased_rails_4",
+            "name": "Rail Pace",
+            "kind": "NODE",
+            "x": 3736,
+            "y": 2817,
+            "group": "reward_392"
+        },
+        {
+            "effects": [
+                {
+                    "stat": "CART_SPEED",
+                    "operation": "INCREASED_PERCENT",
+                    "value": 6
+                }
+            ],
+            "behaviors": [],
+            "fixed": {},
+            "ceilings": {},
+            "scaling": [
+                {
+                    "attribute": "DRIVE",
+                    "stat": "CART_SPEED",
+                    "operation": "INCREASED_PERCENT",
+                    "perPoint": 0.5
+                }
+            ],
+            "passive": {},
+            "id": "driven_wheels",
+            "kind": "NOTABLE",
+            "name": "Driven Wheels",
+            "x": 3717,
+            "y": 2766,
+            "group": "reward_392"
+        },
+        {
+            "effects": [
+                {
+                    "stat": "IDLE_CART_SPEED",
+                    "operation": "ADD",
+                    "value": 8
+                }
+            ],
+            "behaviors": [],
+            "fixed": {},
+            "ceilings": {},
+            "scaling": [],
+            "passive": {},
+            "id": "open_track_1",
+            "name": "Open Track",
+            "kind": "NODE",
+            "x": 4111,
+            "y": 2625,
+            "group": "reward_393"
+        },
+        {
+            "effects": [
+                {
+                    "stat": "IDLE_CART_SPEED",
+                    "operation": "ADD",
+                    "value": 8
+                }
+            ],
+            "behaviors": [],
+            "fixed": {},
+            "ceilings": {},
+            "scaling": [],
+            "passive": {},
+            "id": "open_track_2",
+            "name": "Open Track",
+            "kind": "NODE",
+            "x": 4074,
+            "y": 2579,
+            "group": "reward_393"
+        },
+        {
+            "effects": [
+                {
+                    "stat": "IDLE_CART_SPEED",
+                    "operation": "ADD",
+                    "value": 8
+                }
+            ],
+            "behaviors": [],
+            "fixed": {},
+            "ceilings": {},
+            "scaling": [],
+            "passive": {},
+            "id": "open_track_3",
+            "name": "Open Track",
+            "kind": "NODE",
+            "x": 4096,
+            "y": 2524,
+            "group": "reward_393"
+        },
+        {
+            "effects": [
+                {
+                    "stat": "IDLE_CART_SPEED",
+                    "operation": "ADD",
+                    "value": 8
+                }
+            ],
+            "behaviors": [],
+            "fixed": {},
+            "ceilings": {},
+            "scaling": [],
+            "passive": {},
+            "id": "open_track_4",
+            "name": "Open Track",
+            "kind": "NODE",
+            "x": 4154,
+            "y": 2515,
+            "group": "reward_393"
+        },
+        {
+            "effects": [
+                {
+                    "stat": "IDLE_CART_SPEED",
+                    "operation": "ADD",
+                    "value": 8
+                }
+            ],
+            "behaviors": [],
+            "fixed": {},
+            "ceilings": {},
+            "scaling": [],
+            "passive": {},
+            "id": "open_track_5",
+            "name": "Open Track",
+            "kind": "NODE",
+            "x": 4191,
+            "y": 2561,
+            "group": "reward_393"
+        },
+        {
+            "effects": [
+                {
+                    "stat": "IDLE_CART_SPEED",
+                    "operation": "ADD",
+                    "value": 8
+                }
+            ],
+            "behaviors": [],
+            "fixed": {},
+            "ceilings": {},
+            "scaling": [],
+            "passive": {},
+            "id": "open_track_6",
+            "name": "Open Track",
+            "kind": "NODE",
+            "x": 4169,
+            "y": 2616,
+            "group": "reward_393"
+        },
+        {
+            "effects": [
+                {
+                    "stat": "IDLE_CART_SPEED",
+                    "operation": "ADD",
+                    "value": 25
+                },
+                {
+                    "stat": "CART_SPEED",
+                    "operation": "INCREASED_PERCENT",
+                    "value": 4
+                }
+            ],
+            "behaviors": [],
+            "fixed": {},
+            "ceilings": {},
+            "scaling": [],
+            "passive": {},
+            "id": "open_track",
+            "kind": "NOTABLE",
+            "name": "Open Track",
+            "x": 4132,
+            "y": 2570,
+            "group": "reward_393"
+        },
+        {
+            "effects": [
+                {
+                    "stat": "TREE_FELL_LIMIT",
+                    "operation": "ADD",
+                    "value": 1
+                }
+            ],
+            "behaviors": [],
+            "fixed": {},
+            "ceilings": {},
+            "scaling": [],
+            "passive": {},
+            "id": "far_rows_1",
+            "name": "Rowcraft",
+            "kind": "NODE",
+            "x": 3587,
+            "y": 2696,
+            "group": "reward_394"
+        },
+        {
+            "effects": [
+                {
+                    "stat": "TREE_FELL_LIMIT",
+                    "operation": "ADD",
+                    "value": 1
+                }
+            ],
+            "behaviors": [],
+            "fixed": {},
+            "ceilings": {},
+            "scaling": [],
+            "passive": {},
+            "id": "far_rows_2",
+            "name": "Rowcraft",
+            "kind": "NODE",
+            "x": 3523,
+            "y": 2696,
+            "group": "reward_394"
+        },
+        {
+            "effects": [
+                {
+                    "stat": "TREE_FELL_LIMIT",
+                    "operation": "ADD",
+                    "value": 1
+                }
+            ],
+            "behaviors": [],
+            "fixed": {},
+            "ceilings": {},
+            "scaling": [],
+            "passive": {},
+            "id": "far_rows_3",
+            "name": "Rowcraft",
+            "kind": "NODE",
+            "x": 3565,
+            "y": 2637,
+            "group": "reward_394"
+        },
+        {
+            "effects": [
+                {
+                    "stat": "WORK_RANGE",
+                    "operation": "ADD",
+                    "value": 1
+                }
+            ],
+            "behaviors": [],
+            "fixed": {},
+            "ceilings": {},
+            "scaling": [],
+            "passive": {},
+            "id": "far_rows",
+            "kind": "NOTABLE",
+            "name": "Far Rows",
+            "x": 3500,
+            "y": 2636,
+            "group": "reward_394"
+        },
+        {
+            "effects": [
+                {
+                    "stat": "TREE_FELL_LIMIT",
+                    "operation": "ADD",
+                    "value": 1
+                }
+            ],
+            "behaviors": [],
+            "fixed": {},
+            "ceilings": {},
+            "scaling": [],
+            "passive": {},
+            "id": "outer_rows_1",
+            "name": "Rowcraft",
+            "kind": "NODE",
+            "x": 4730,
+            "y": 2479,
+            "group": "reward_395"
+        },
+        {
+            "effects": [
+                {
+                    "stat": "TREE_FELL_LIMIT",
+                    "operation": "ADD",
+                    "value": 1
+                }
+            ],
+            "behaviors": [],
+            "fixed": {},
+            "ceilings": {},
+            "scaling": [],
+            "passive": {},
+            "id": "outer_rows_2",
+            "name": "Rowcraft",
+            "kind": "NODE",
+            "x": 4668,
+            "y": 2496,
+            "group": "reward_395"
+        },
+        {
+            "effects": [
+                {
+                    "stat": "TREE_FELL_LIMIT",
+                    "operation": "ADD",
+                    "value": 1
+                }
+            ],
+            "behaviors": [],
+            "fixed": {},
+            "ceilings": {},
+            "scaling": [],
+            "passive": {},
+            "id": "outer_rows_3",
+            "name": "Rowcraft",
+            "kind": "NODE",
+            "x": 4693,
+            "y": 2428,
+            "group": "reward_395"
+        },
+        {
+            "effects": [
+                {
+                    "stat": "WORK_RANGE",
+                    "operation": "ADD",
+                    "value": 1
+                }
+            ],
+            "behaviors": [],
+            "fixed": {},
+            "ceilings": {},
+            "scaling": [],
+            "passive": {},
+            "id": "outer_rows",
+            "kind": "NOTABLE",
+            "name": "Outer Rows",
+            "x": 4630,
+            "y": 2443,
+            "group": "reward_395"
+        },
+        {
+            "effects": [
+                {
+                    "stat": "FLUID_CAPACITY",
+                    "operation": "INCREASED_PERCENT",
+                    "value": 10
+                }
+            ],
+            "behaviors": [],
+            "fixed": {},
+            "ceilings": {},
+            "scaling": [],
+            "passive": {},
+            "id": "holding_tanks_1",
+            "name": "Reservoirs",
+            "kind": "NODE",
+            "x": 3622,
+            "y": 2391,
+            "group": "reward_396"
+        },
+        {
+            "effects": [
+                {
+                    "stat": "FLUID_CAPACITY",
+                    "operation": "INCREASED_PERCENT",
+                    "value": 10
+                }
+            ],
+            "behaviors": [],
+            "fixed": {},
+            "ceilings": {},
+            "scaling": [],
+            "passive": {},
+            "id": "holding_tanks_2",
+            "name": "Reservoirs",
+            "kind": "NODE",
+            "x": 3616,
+            "y": 2448,
+            "group": "reward_396"
+        },
+        {
+            "effects": [
+                {
+                    "stat": "FLUID_CAPACITY",
+                    "operation": "INCREASED_PERCENT",
+                    "value": 30
+                },
+                {
+                    "stat": "RESERVE",
+                    "operation": "ADD",
+                    "value": 4
+                }
+            ],
+            "behaviors": [],
+            "fixed": {},
+            "ceilings": {},
+            "scaling": [],
+            "passive": {},
+            "id": "holding_tanks",
+            "kind": "NOTABLE",
+            "name": "Holding Tanks",
+            "x": 3602,
+            "y": 2505,
+            "group": "reward_396"
+        },
+        {
+            "effects": [
+                {
+                    "stat": "FLUID_CAPACITY",
+                    "operation": "INCREASED_PERCENT",
+                    "value": 10
+                }
+            ],
+            "behaviors": [],
+            "fixed": {},
+            "ceilings": {},
+            "scaling": [],
+            "passive": {},
+            "id": "holding_tanks_3",
+            "name": "Reservoirs",
+            "kind": "NODE",
+            "x": 3564,
+            "y": 2390,
+            "group": "reward_396"
+        },
+        {
+            "effects": [
+                {
+                    "stat": "FLUID_CAPACITY",
+                    "operation": "INCREASED_PERCENT",
+                    "value": 30
+                },
+                {
+                    "stat": "RESERVE",
+                    "operation": "ADD",
+                    "value": 4
+                }
+            ],
+            "behaviors": [],
+            "fixed": {},
+            "ceilings": {},
+            "scaling": [],
+            "passive": {},
+            "id": "cistern_walls",
+            "kind": "NOTABLE",
+            "name": "Cistern Walls",
+            "x": 3507,
+            "y": 2397,
+            "group": "reward_396"
+        },
+        {
+            "effects": [
+                {
+                    "stat": "FLUID_CAPACITY",
+                    "operation": "INCREASED_PERCENT",
+                    "value": 10
+                }
+            ],
+            "behaviors": [],
+            "fixed": {},
+            "ceilings": {},
+            "scaling": [],
+            "passive": {},
+            "id": "deep_tanks_1",
+            "name": "Reservoirs",
+            "kind": "NODE",
+            "x": 3001,
+            "y": 4555,
+            "group": "reward_397"
+        },
+        {
+            "effects": [
+                {
+                    "stat": "FLUID_CAPACITY",
+                    "operation": "INCREASED_PERCENT",
+                    "value": 10
+                }
+            ],
+            "behaviors": [],
+            "fixed": {},
+            "ceilings": {},
+            "scaling": [],
+            "passive": {},
+            "id": "deep_tanks_2",
+            "name": "Reservoirs",
+            "kind": "NODE",
+            "x": 3018,
+            "y": 4500,
+            "group": "reward_397"
+        },
+        {
+            "effects": [
+                {
+                    "stat": "FLUID_CAPACITY",
+                    "operation": "INCREASED_PERCENT",
+                    "value": 30
+                },
+                {
+                    "stat": "RESERVE",
+                    "operation": "ADD",
+                    "value": 4
+                }
+            ],
+            "behaviors": [],
+            "fixed": {},
+            "ceilings": {},
+            "scaling": [],
+            "passive": {},
+            "id": "deep_tanks",
+            "kind": "NOTABLE",
+            "name": "Deep Tanks",
+            "x": 3043,
+            "y": 4448,
+            "group": "reward_397"
+        },
+        {
+            "effects": [
+                {
+                    "stat": "FLUID_CAPACITY",
+                    "operation": "INCREASED_PERCENT",
+                    "value": 10
+                }
+            ],
+            "behaviors": [],
+            "fixed": {},
+            "ceilings": {},
+            "scaling": [],
+            "passive": {},
+            "id": "deep_tanks_3",
+            "name": "Reservoirs",
+            "kind": "NODE",
+            "x": 3057,
+            "y": 4567,
+            "group": "reward_397"
+        },
+        {
+            "effects": [
+                {
+                    "stat": "FLUID_CAPACITY",
+                    "operation": "INCREASED_PERCENT",
+                    "value": 30
+                },
+                {
+                    "stat": "RESERVE",
+                    "operation": "ADD",
+                    "value": 4
+                }
+            ],
+            "behaviors": [],
+            "fixed": {},
+            "ceilings": {},
+            "scaling": [],
+            "passive": {},
+            "id": "bulk_reservoir",
+            "kind": "NOTABLE",
+            "name": "Bulk Reservoir",
+            "x": 3115,
+            "y": 4572,
+            "group": "reward_397"
+        },
+        {
             "effects": [],
             "behaviors": [
                 "MUTE_MACHINE_SOUND"
@@ -36168,6 +36891,146 @@
         [
             "path_0353",
             "single_pass"
+        ],
+        [
+            "path_0179",
+            "greased_rails_1"
+        ],
+        [
+            "greased_rails_1",
+            "greased_rails_2"
+        ],
+        [
+            "greased_rails_2",
+            "greased_rails"
+        ],
+        [
+            "greased_rails",
+            "greased_rails_3"
+        ],
+        [
+            "greased_rails_3",
+            "greased_rails_4"
+        ],
+        [
+            "greased_rails_4",
+            "driven_wheels"
+        ],
+        [
+            "path_0480",
+            "open_track_1"
+        ],
+        [
+            "open_track_1",
+            "open_track_2"
+        ],
+        [
+            "open_track_2",
+            "open_track_3"
+        ],
+        [
+            "open_track_3",
+            "open_track_4"
+        ],
+        [
+            "open_track_4",
+            "open_track_5"
+        ],
+        [
+            "open_track_5",
+            "open_track_6"
+        ],
+        [
+            "open_track_6",
+            "open_track_1"
+        ],
+        [
+            "open_track",
+            "open_track_3"
+        ],
+        [
+            "open_track",
+            "open_track_5"
+        ],
+        [
+            "path_0195",
+            "far_rows_1"
+        ],
+        [
+            "far_rows_1",
+            "far_rows_2"
+        ],
+        [
+            "far_rows_1",
+            "far_rows_3"
+        ],
+        [
+            "far_rows_2",
+            "far_rows"
+        ],
+        [
+            "far_rows_3",
+            "far_rows"
+        ],
+        [
+            "path_0435",
+            "outer_rows_1"
+        ],
+        [
+            "outer_rows_1",
+            "outer_rows_2"
+        ],
+        [
+            "outer_rows_1",
+            "outer_rows_3"
+        ],
+        [
+            "outer_rows_2",
+            "outer_rows"
+        ],
+        [
+            "outer_rows_3",
+            "outer_rows"
+        ],
+        [
+            "path_0372",
+            "holding_tanks_1"
+        ],
+        [
+            "holding_tanks_1",
+            "holding_tanks_2"
+        ],
+        [
+            "holding_tanks_2",
+            "holding_tanks"
+        ],
+        [
+            "holding_tanks_1",
+            "holding_tanks_3"
+        ],
+        [
+            "holding_tanks_3",
+            "cistern_walls"
+        ],
+        [
+            "path_0310",
+            "deep_tanks_1"
+        ],
+        [
+            "deep_tanks_1",
+            "deep_tanks_2"
+        ],
+        [
+            "deep_tanks_2",
+            "deep_tanks"
+        ],
+        [
+            "deep_tanks_1",
+            "deep_tanks_3"
+        ],
+        [
+            "deep_tanks_3",
+            "bulk_reservoir"
         ]
     ]
 }

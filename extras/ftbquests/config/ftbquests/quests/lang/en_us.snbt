@@ -1534,11 +1534,11 @@
 	quest.9978E0313902657D.quest_desc: [
 		"From Stage 5, a machine can specialize. Open the crest beside its start node on the Mastery tab and press &aAscend&r with an &eAscendancy Seal&r in your inventory."
 		""
-		"- Seal I needs a Stage 4+ chassis, or a Stage 4+ tool head on a Forestry Companion, and chooses one of the family's two ascendancies."
+		"- Seal I needs a Stage 4+ chassis (a Forestry Companion can always use it) and chooses one of the family's ascendancies."
 		"- Each Seal grants &a2&r ascendancy points, for 6 across Seals I, II, and III."
 		"- An ascendancy node costs five Mastery Refunds to refund. Switching needs an empty tree and another Seal I."
 		""
-		"&7&oTip: each machine's wiki page lists both of its ascendancies.&r"
+		"&7&oTip: each machine's wiki page lists all of its ascendancies.&r"
 	]
 	quest.9978E0313902657D.quest_subtitle: "Two paths per machine."
 	quest.9978E0313902657D.title: "Read: Ascendancies"

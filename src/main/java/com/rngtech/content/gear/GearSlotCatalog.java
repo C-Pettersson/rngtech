@@ -287,6 +287,15 @@ public final class GearSlotCatalog {
                         ForestryCartEntity.SLOT_SHEARS,
                         forestryCartShears(),
                         anyRegistered()
+                ),
+                slot(
+                        "rngtech.gear.fluid_pump",
+                        false,
+                        GearSlotArea.GEAR,
+                        ForestryCartEntity.SLOT_PUMP,
+                        fluidPumps(pump -> true),
+                        anyRegistered(),
+                        Component.translatable("rngtech.gear_guide.forestry_cart_pump").withStyle(ChatFormatting.GRAY)
                 )
         ));
         specs.add(spec(

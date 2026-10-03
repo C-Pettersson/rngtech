@@ -15,6 +15,8 @@ import com.rngtech.content.menu.ComponentRecyclerMenu;
 import com.rngtech.content.menu.CompressorTankMenu;
 import com.rngtech.content.menu.CorrosionCellMenu;
 import com.rngtech.content.menu.CrusherMenu;
+import com.rngtech.content.menu.ForestryCartMenu;
+import com.rngtech.content.menu.ForestryCartStationMenu;
 import com.rngtech.content.menu.FurnaceMenu;
 import com.rngtech.content.menu.GasChemistryMenu;
 import com.rngtech.content.menu.MelterMenu;
@@ -89,6 +91,9 @@ final class GearSlotTooltips {
     }
 
     private static Optional<GearSlotSpec> gearSlot(AbstractContainerMenu menu, Slot slot) {
+        if (menu instanceof ForestryCartMenu cart && !cart.isGearSlot(slot)) {
+            return Optional.empty();
+        }
         ItemStack machineStack = machineStack(menu);
         if (machineStack.isEmpty()) {
             return Optional.empty();
@@ -178,6 +183,12 @@ final class GearSlotTooltips {
         if (menu instanceof MinersCompanionMenu minersCompanion) {
             return minersCompanion.minersCompanionStack();
         }
+        if (menu instanceof ForestryCartMenu) {
+            return new ItemStack(ModItems.FORESTRY_CART.get());
+        }
+        if (menu instanceof ForestryCartStationMenu) {
+            return new ItemStack(ModItems.FORESTRY_CART_STATION.get());
+        }
         return ItemStack.EMPTY;
     }
 
@@ -247,6 +258,12 @@ final class GearSlotTooltips {
         }
         if (menu instanceof MinersCompanionMenu minersCompanion) {
             return minersCompanion.selectedTab() == MinersCompanionMenu.TAB_GEAR;
+        }
+        if (menu instanceof ForestryCartMenu cart) {
+            return cart.selectedTab() == ForestryCartMenu.TAB_CART;
+        }
+        if (menu instanceof ForestryCartStationMenu station) {
+            return station.selectedTab() == ForestryCartStationMenu.TAB_GEAR;
         }
         return false;
     }

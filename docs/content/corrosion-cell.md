@@ -19,7 +19,7 @@ The Corrosion Cell is a Stage 4 recipe-backed FE generator registered as `rngtec
 
 The machine pauses before consuming another plate and electrolyte when residue cannot fit or its internal buffer plus installed Battery Cell are full. Redstone power pauses active generation.
 
-The tank accepts fluids tagged as `rngtech:electrolytes`; the current default fluid is Electrolyte Solution. A Fluid Pump is not required for item-backed electrolyte recipes, but it enables direct side filling into the tank. The Process tab includes a purge control for the electrolyte tank. Corrosion waste remains item-backed so it can feed later recycling or chemistry recipes without adding a sludge-fluid slice.
+The tank accepts fluids tagged as `rngtech:electrolytes`; the current default fluid is Electrolyte Solution. A Fluid Pump is not required for item-backed electrolyte recipes, but it enables direct side filling into the tank. The tank holds `4,000 mB`; a pump's Fluid Capacity affixes (flat Brimming, percent Depth) enlarge it. The Process tab includes a purge control for the electrolyte tank. Corrosion waste remains item-backed so it can feed later recycling or chemistry recipes without adding a sludge-fluid slice.
 
 Placed block art follows [Machine Visual Design](../reference/machine-visual-design.md). The Corrosion Cell uses owned `textures/block/corrosion_cell/<face>/corrosion_cell` face textures with `64x64` frames, paired plate sockets, an electrolyte channel, a residue tray, insulated bus bars, and a localized active front glow.
 

@@ -7,7 +7,6 @@ import com.rngtech.rpg.progression.AscendStatus;
 import com.rngtech.rpg.progression.Ascendancy;
 import com.rngtech.rpg.progression.AscendancyCatalog;
 import com.rngtech.rpg.progression.AscendancyNode;
-import com.rngtech.rpg.progression.MachineMasteryFamily;
 import com.rngtech.rpg.progression.MachineProgressionState;
 
 import net.minecraft.ChatFormatting;
@@ -667,8 +666,7 @@ final class AscendancyPanel {
             case FREE_CHOICE -> Component.translatable("rngtech.mastery.ascendancy.status.free_choice").withStyle(ChatFormatting.GREEN);
             case ALL_TIERS -> Component.translatable("rngtech.mastery.ascendancy.status.all_tiers").withStyle(ChatFormatting.GREEN);
             case NO_ASCENDANCIES -> Component.translatable("rngtech.mastery.ascendancy.status.none").withStyle(ChatFormatting.RED);
-            case ENTRY_STAGE -> Component.translatable(view.masteryFamily() == MachineMasteryFamily.FORESTRY
-                            ? "rngtech.mastery.ascendancy.status.entry_stage_tool" : "rngtech.mastery.ascendancy.status.entry_stage",
+            case ENTRY_STAGE -> Component.translatable("rngtech.mastery.ascendancy.status.entry_stage",
                     AscendancyCatalog.ENTRY_STAGE, view.ascendancyEntryStage()).withStyle(ChatFormatting.RED);
             case SEAL_MISSING -> Component.translatable("rngtech.mastery.ascendancy.status.seal_missing", sealName(tier)).withStyle(ChatFormatting.RED);
         };

@@ -175,7 +175,8 @@ public class ForestryCartRenderer extends EntityRenderer<ForestryCartEntity> {
         }
         return switch (entity.visualActionCode()) {
             case ForestryCartStationBlockEntity.ACTION_PLAYER_BLOCKING_PATH -> PLAYER_BLOCKED_CUSTOM_MODEL_DATA;
-            case ForestryCartStationBlockEntity.ACTION_HARVESTING_LEAVES -> CHOPPING_LEAVES_CUSTOM_MODEL_DATA;
+            case ForestryCartStationBlockEntity.ACTION_HARVESTING_LEAVES,
+                    ForestryCartStationBlockEntity.ACTION_HARVESTING_CROP -> CHOPPING_LEAVES_CUSTOM_MODEL_DATA;
             case ForestryCartStationBlockEntity.ACTION_HARVESTING_LOG -> CHOPPING_LOGS_CUSTOM_MODEL_DATA;
             case ForestryCartStationBlockEntity.ACTION_TREEFELLER_BATCH -> TREEFELLER_CUSTOM_MODEL_DATA;
             case ForestryCartStationBlockEntity.ACTION_PLANTING -> PLANTING_CUSTOM_MODEL_DATA;

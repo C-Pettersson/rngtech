@@ -4,6 +4,7 @@ import com.rngtech.content.blockentity.ForestryCartStationBlockEntity;
 import com.rngtech.content.blockentity.LedgerNbt;
 import com.rngtech.content.item.BatteryCellItem;
 import com.rngtech.content.item.ConfiguratorItem;
+import com.rngtech.content.item.FluidPumpItem;
 import com.rngtech.content.item.ForestryCartItem;
 import com.rngtech.content.item.ModularToolItem;
 import com.rngtech.content.item.PruningShearsItem;
@@ -16,10 +17,12 @@ import com.rngtech.content.registry.ModSounds;
 import com.rngtech.content.registry.ModTags;
 import com.rngtech.content.tool.ToolBaseStatCatalog;
 import com.rngtech.content.tool.ToolHeadFamily;
+import com.rngtech.rpg.ComponentBaseStatCatalog;
 import com.rngtech.rpg.MachineStat;
 import com.rngtech.rpg.MachineStatAccumulator;
 import com.rngtech.rpg.MachineTraits;
 import com.rngtech.rpg.OutputLedger;
+import com.rngtech.rpg.progression.AscendancyCatalog;
 import com.rngtech.rpg.progression.AscendancyFormulas;
 import com.rngtech.rpg.progression.ForestryCompanionPassiveTree;
 import com.rngtech.rpg.progression.MachineMasteryFamily;
@@ -32,7 +35,9 @@ import com.mojang.authlib.GameProfile;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.component.DataComponents;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.NbtOps;
@@ -45,6 +50,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.ItemTags;
@@ -64,28 +70,41 @@ import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.enchantment.EnchantmentHelper;
+import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.BaseRailBlock;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.CropBlock;
+import net.minecraft.world.level.block.FarmBlock;
 import net.minecraft.world.level.block.LevelEvent;
 import net.minecraft.world.level.block.SaplingBlock;
+import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.RailShape;
+import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.common.CommonHooks;
+import net.neoforged.neoforge.common.FarmlandWaterManager;
 import net.neoforged.neoforge.common.ItemAbilities;
+import net.neoforged.neoforge.common.ticket.AABBTicket;
 import net.neoforged.neoforge.common.util.FakePlayer;
 import net.neoforged.neoforge.common.util.FakePlayerFactory;
 import net.neoforged.neoforge.energy.IEnergyStorage;
+import net.neoforged.neoforge.fluids.FluidStack;
+import net.neoforged.neoforge.fluids.capability.IFluidHandler;
+import net.neoforged.neoforge.fluids.capability.templates.FluidTank;
 import net.neoforged.neoforge.items.ItemStackHandler;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -103,7 +122,9 @@ public class ForestryCartEntity extends AbstractMinecart implements MenuProvider
     public static final int SLOT_BATTERY_CELL = 0;
     public static final int SLOT_TOOL = 1;
     public static final int SLOT_SHEARS = 2;
-    public static final int GEAR_SLOT_COUNT = SLOT_SHEARS + 1;
+    public static final int SLOT_PUMP = 3;
+    public static final int GEAR_SLOT_COUNT = SLOT_PUMP + 1;
+    public static final int WATER_CAPACITY = 8000;
     public static final int GEAR_CONDITION_MISSING = 0;
     public static final int GEAR_CONDITION_INVALID = 1;
     public static final int GEAR_CONDITION_BROKEN = 2;
@@ -121,8 +142,6 @@ public class ForestryCartEntity extends AbstractMinecart implements MenuProvider
     private static final int PULSE_FE = 30;
     private static final int PULSE_INTERVAL_TICKS = 100;
     private static final int PULSE_STALLED_INTERVAL_TICKS = 1200;
-    private static final int VERDANT_SURGE_REACH = 3;
-    private static final int ROLLING_REACH = 2;
     private static final int GIANT_TREE_SAPLINGS = 4;
     private static final double DOCK_SPRINT_PERCENT = 50.0;
     private static final double LOG_LEDGER_LEAF_SLOWDOWN = 0.25;
@@ -136,6 +155,19 @@ public class ForestryCartEntity extends AbstractMinecart implements MenuProvider
     private static final int MANUAL_SPEED_FE_MULTIPLIER = 4;
     private static final int VANILLA_CART_SHEARS_LEAF_BUDGET = 8;
     private static final int SHEAR_WORK_COOLDOWN = 1;
+    private static final int LOG_SETTLE_TICKS = 4;
+    private static final int CROP_HARVEST_FE = 20;
+    private static final int CROP_HARVEST_MACHINE_XP = 2;
+    private static final int SPRINKLER_WATER_MB = 50;
+    /** Sprinkled farmland counts as near water this long, like a block beside a water source; Irrigation adds half. */
+    private static final int HYDRATION_TICKS = 1200;
+    private static final double IRRIGATION_HYDRATION_MULTIPLIER = 1.5;
+    private static final int HYDRATION_CHECK_INTERVAL_TICKS = 20;
+    /** Watered cells still get a spray as the cart passes, without spending water. */
+    private static final int COSMETIC_SPRAY_INTERVAL_TICKS = 10;
+    private static final int BREAK_SOUND_INTERVAL_TICKS = 4;
+    private static final int MAX_CRACK_OVERLAYS = 64;
+    private static final float REFERENCE_LOG_HARDNESS = 2.0F;
     private static final int BASE_MAX_MANAGED_CELLS = 96;
     private static final int SCAN_BOUND_HORIZONTAL = 8;
     private static final int STATION_SAPLING_IDLE_RELEASE_TICKS = 20;
@@ -151,11 +183,11 @@ public class ForestryCartEntity extends AbstractMinecart implements MenuProvider
     private static final int MAX_HARVEST_SNAPSHOT_HEIGHT = 64;
     private static final int MAX_CONNECTED_LEAF_BLOCKS = 192;
     private static final double MAGNET_RADIUS = 3.0D;
-    private static final double POWERED_CART_SPEED = 0.08D;
-    private static final double TRANSFER_SEEKING_CART_SPEED = 0.12D;
+    private static final double POWERED_CART_SPEED = 0.055D;
+    private static final double TRANSFER_SEEKING_CART_SPEED = 0.08D;
     private static final double UNPOWERED_CART_SPEED = 0.03D;
-    private static final double MANUAL_POWERED_CART_SPEED = 0.14D;
-    private static final double MANUAL_TRANSFER_SEEKING_CART_SPEED = 0.18D;
+    private static final double MANUAL_POWERED_CART_SPEED = 0.095D;
+    private static final double MANUAL_TRANSFER_SEEKING_CART_SPEED = 0.12D;
     private static final double COASTING_CART_SPEED = 0.06D;
     private static final EntityDataAccessor<Integer> DATA_ROUTE_DIRECTION =
             SynchedEntityData.defineId(ForestryCartEntity.class, EntityDataSerializers.INT);
@@ -176,7 +208,7 @@ public class ForestryCartEntity extends AbstractMinecart implements MenuProvider
         @Override
         public boolean isItemValid(int slot, ItemStack stack) {
             if (slot >= SAPLING_SLOT_START && slot < OUTPUT_SLOT_START) {
-                return isSaplingStack(stack) || isFertilizerStack(stack) && acceptsFertilizer();
+                return isPlantableStack(stack) || isFertilizerStack(stack) && acceptsFertilizer();
             }
             return slot >= OUTPUT_SLOT_START && slot < CARGO_SLOT_COUNT;
         }
@@ -196,6 +228,7 @@ public class ForestryCartEntity extends AbstractMinecart implements MenuProvider
                 case SLOT_BATTERY_CELL -> isBatteryCell(stack);
                 case SLOT_TOOL -> isToolCandidate(stack);
                 case SLOT_SHEARS -> isShearsCandidate(stack);
+                case SLOT_PUMP -> isPumpCandidate(stack);
                 default -> false;
             };
         }
@@ -210,7 +243,10 @@ public class ForestryCartEntity extends AbstractMinecart implements MenuProvider
             return isItemValid(slot, stack) ? super.insertItem(slot, stack, simulate) : stack;
         }
     };
+    private final FluidTank waterTank = new FluidTank(WATER_CAPACITY, stack -> stack.getFluid().isSame(Fluids.WATER));
     private final Map<BlockPos, ManagedCell> managedCells = new LinkedHashMap<>();
+    private final Map<BlockPos, Long> hydratedUntil = new HashMap<>();
+    private final Map<BlockPos, AABBTicket> hydrationTickets = new HashMap<>();
     private final ContainerData menuData = new ContainerData() {
         @Override
         public int get(int index) {
@@ -261,6 +297,11 @@ public class ForestryCartEntity extends AbstractMinecart implements MenuProvider
                 case ForestryCartMenu.DATA_CORE_RESERVE -> coreStatPoints(MachineStat.RESERVE);
                 case ForestryCartMenu.DATA_FERTILIZER -> fertilizer;
                 case ForestryCartMenu.DATA_FERTILIZER_CAPACITY -> acceptsFertilizer() ? FERTILIZER_CAPACITY : 0;
+                case ForestryCartMenu.DATA_WATER -> waterStored();
+                case ForestryCartMenu.DATA_WATER_CAPACITY -> hasMasteryBehavior("SPRINKLER") ? waterTank.getCapacity() : 0;
+                case ForestryCartMenu.DATA_WORK_RANGE -> workRange();
+                case ForestryCartMenu.DATA_IDLE_SPEED_ACTIVE -> idleSpeedActive() ? 1 : 0;
+                case ForestryCartMenu.DATA_RESERVED_PLANTABLES -> reservedPlantables();
                 default -> 0;
             };
         }
@@ -281,11 +322,13 @@ public class ForestryCartEntity extends AbstractMinecart implements MenuProvider
     private boolean manualSpeedEnabled;
     private WorkflowState workflowState = WorkflowState.SETUP_BLOCKED;
     private HarvestSnapshot activeHarvestSnapshot;
+    private ActiveBreak activeBreak;
     private UUID ownerUuid;
     private String ownerName = "";
     private int status = ForestryCartStationBlockEntity.STATUS_MISSING_BATTERY_CELL;
     private int currentAction = ForestryCartStationBlockEntity.ACTION_SETUP_BLOCKED;
     private int workCooldown;
+    private int ticksSinceWork = AscendancyFormulas.IDLE_CART_TICKS;
     private int managementViewers;
     private BlockPos dockSaplingTransferStation;
     private int dockSaplingTransferIdleTicks;
@@ -370,7 +413,9 @@ public class ForestryCartEntity extends AbstractMinecart implements MenuProvider
         return allocateMastery(node);
     }
 
+    /** Work XP marks the cart as busy, which pauses Idle Cart Speed for the next 4 seconds. */
     private void addMachineXp(int amount) {
+        ticksSinceWork = 0;
         if (amount > 0) {
             int band = Math.min(MachineProgressionState.MAX_LEVEL - 2, 12 + (int) Math.sqrt(Math.max(0, effectiveStats().value(MachineStat.TREE_FELL_LIMIT))) * 10);
             grantMasteryXp(MachineProgressionState.workXp(amount, band), MachineProgressionState.xpQuarters(machineProgression().level(), band));
@@ -391,7 +436,17 @@ public class ForestryCartEntity extends AbstractMinecart implements MenuProvider
     }
 
     public int scanEnergyCost() {
-        return effectiveStats().adjustedEnergyCost(SCAN_FE);
+        return effectiveStats().adjustedEnergyCost(SCAN_FE * workRange());
+    }
+
+    /** Rows worked on each side of the rail. */
+    public int workRange() {
+        return ForestryCartRules.workRange(effectiveStats().value(MachineStat.WORK_RANGE));
+    }
+
+    /** Verdant Surge and Rolling Harvest reach one row past the worked rows. */
+    private int workReach() {
+        return workRange() + 1;
     }
 
     public int plantEnergyCost() {
@@ -443,8 +498,15 @@ public class ForestryCartEntity extends AbstractMinecart implements MenuProvider
         return cartSpeed(manualSpeedEnabled() ? MANUAL_TRANSFER_SEEKING_CART_SPEED : TRANSFER_SEEKING_CART_SPEED, sprint);
     }
 
+    /** Whether Idle Cart Speed currently applies. */
+    public boolean idleSpeedActive() {
+        return AscendancyFormulas.idleCartSpeedPercent(effectiveStats(), ticksSinceWork) > 0.0;
+    }
+
     private double cartSpeed(double baseSpeed, double extraPercent) {
-        return Math.min(MAX_CART_SPEED, baseSpeed * Math.max(0.1, effectiveStats().valueWithIncreased(MachineStat.CART_SPEED, extraPercent)));
+        MachineStatAccumulator stats = effectiveStats();
+        double percent = extraPercent + AscendancyFormulas.idleCartSpeedPercent(stats, ticksSinceWork);
+        return Math.min(MAX_CART_SPEED, baseSpeed * Math.max(0.1, stats.valueWithIncreased(MachineStat.CART_SPEED, percent)));
     }
 
     public double unpoweredCartSpeed() {
@@ -515,14 +577,11 @@ public class ForestryCartEntity extends AbstractMinecart implements MenuProvider
         if (!isForestryWorkRail(railPos)) {
             return List.of();
         }
-        return plantingScanRoots(railPos, scanDirection(railPos));
+        return ForestryCartRules.scanRoots(railPos, scanDirection(railPos), workRange());
     }
 
     public static List<BlockPos> plantingScanRoots(BlockPos railPos, Direction routeDirection) {
-        Direction forward = routeDirection.getAxis().isHorizontal() ? routeDirection : Direction.NORTH;
-        Direction left = forward.getCounterClockWise();
-        Direction right = forward.getClockWise();
-        return List.of(railPos.relative(left), railPos.relative(right));
+        return ForestryCartRules.scanRoots(railPos, routeDirection, ForestryCartRules.MIN_WORK_RANGE);
     }
 
     public BlockPos railPosition() {
@@ -547,8 +606,16 @@ public class ForestryCartEntity extends AbstractMinecart implements MenuProvider
             return;
         }
 
+        if (ticksSinceWork < AscendancyFormulas.IDLE_CART_TICKS) {
+            ticksSinceWork++;
+        }
         tryMagnetNearbyItems();
         absorbSuppliedFertilizer();
+        evictUnplantableSupply();
+        if (tickCount % HYDRATION_CHECK_INTERVAL_TICKS == 0) {
+            maintainHydration();
+            updateWaterCapacity();
+        }
 
         if (managementViewers > 0) {
             setWorkflowState(WorkflowState.MANAGED, ForestryCartStationBlockEntity.STATUS_READY, ForestryCartStationBlockEntity.ACTION_MANAGED);
@@ -640,6 +707,9 @@ public class ForestryCartEntity extends AbstractMinecart implements MenuProvider
         }
 
         List<BlockPos> workRoots = workRoots(railPos);
+        if (activeHarvestSnapshot != null && !worksTrees()) {
+            clearActiveHarvestSnapshot();
+        }
         if (activeHarvestSnapshot != null) {
             if (!harvestInReach(railPos, workRoots, activeHarvestSnapshot.logBase())) {
                 clearActiveHarvestSnapshot();
@@ -665,7 +735,9 @@ public class ForestryCartEntity extends AbstractMinecart implements MenuProvider
         }
         consumeEnergy(scanCost, false);
         playScanSound();
+        pruneManagedCells(railPos);
         pulseSaplings(railPos, workRoots);
+        sprinkle(railPos, workRoots);
 
         setWorkflowState(
                 WorkflowState.SCANNING,
@@ -675,7 +747,13 @@ public class ForestryCartEntity extends AbstractMinecart implements MenuProvider
         boolean treeTooLarge = false;
         for (BlockPos root : workRoots) {
             updateManagedSaplingState(root);
-            if (!isLogBase(root)) {
+            if (tendsCrops() && isMatureCrop(root)) {
+                if (handleWorkResult(harvestCrop(root, rolledRail(root, railPos)), railPos)) {
+                    return;
+                }
+                continue;
+            }
+            if (!worksTrees() || !isLogBase(root)) {
                 continue;
             }
             SnapshotCreationResult result = createHarvestSnapshot(root);
@@ -861,6 +939,14 @@ public class ForestryCartEntity extends AbstractMinecart implements MenuProvider
     }
 
     @Override
+    public void remove(RemovalReason reason) {
+        clearBreakProgress();
+        hydrationTickets.values().forEach(AABBTicket::invalidate);
+        hydrationTickets.clear();
+        super.remove(reason);
+    }
+
+    @Override
     public void destroy(DamageSource source) {
         kill();
         if (!level().getGameRules().getBoolean(GameRules.RULE_DOENTITYDROPS)) {
@@ -868,6 +954,13 @@ public class ForestryCartEntity extends AbstractMinecart implements MenuProvider
         }
         Containers.dropItemStack(level(), getX(), getY(), getZ(), cartItemStack());
         dropFertilizer();
+        for (ManagedCell cell : managedCells.values()) {
+            ItemStack reserve = reserveStack(cell);
+            cell.setReserved(0);
+            if (!reserve.isEmpty()) {
+                Containers.dropItemStack(level(), getX(), getY(), getZ(), reserve);
+            }
+        }
         for (int slot = 0; slot < cargoInventory.getSlots(); slot++) {
             ItemStack stack = cargoInventory.getStackInSlot(slot);
             if (!stack.isEmpty()) {
@@ -905,6 +998,18 @@ public class ForestryCartEntity extends AbstractMinecart implements MenuProvider
         tag.putInt("Status", status);
         tag.putInt("CurrentAction", currentAction);
         tag.putInt("WorkCooldown", workCooldown);
+        tag.putInt("TicksSinceWork", ticksSinceWork);
+        tag.put("WaterTank", waterTank.writeToNBT(level().registryAccess(), new CompoundTag()));
+        ListTag hydrated = new ListTag();
+        hydratedUntil.forEach((pos, until) -> {
+            CompoundTag entry = new CompoundTag();
+            entry.putInt("X", pos.getX());
+            entry.putInt("Y", pos.getY());
+            entry.putInt("Z", pos.getZ());
+            entry.putLong("Until", until);
+            hydrated.add(entry);
+        });
+        tag.put("Hydrated", hydrated);
         tag.putInt("PendingEnergyRequirement", pendingEnergyRequirement);
         tag.putBoolean(TAG_MANUAL_SPEED_ENABLED, manualSpeedEnabled());
         if (ownerUuid != null) {
@@ -946,6 +1051,18 @@ public class ForestryCartEntity extends AbstractMinecart implements MenuProvider
         setStatus(tag.contains("Status") ? tag.getInt("Status") : ForestryCartStationBlockEntity.STATUS_READY);
         setCurrentAction(tag.contains("CurrentAction") ? tag.getInt("CurrentAction") : ForestryCartStationBlockEntity.ACTION_IDLE);
         workCooldown = Math.max(0, tag.getInt("WorkCooldown"));
+        ticksSinceWork = tag.contains("TicksSinceWork") ? Math.max(0, tag.getInt("TicksSinceWork")) : AscendancyFormulas.IDLE_CART_TICKS;
+        waterTank.setFluid(FluidStack.EMPTY);
+        updateWaterCapacity();
+        if (tag.contains("WaterTank", Tag.TAG_COMPOUND)) {
+            waterTank.readFromNBT(level().registryAccess(), tag.getCompound("WaterTank"));
+        }
+        hydratedUntil.clear();
+        ListTag hydrated = tag.getList("Hydrated", Tag.TAG_COMPOUND);
+        for (int index = 0; index < hydrated.size(); index++) {
+            CompoundTag entry = hydrated.getCompound(index);
+            hydratedUntil.put(new BlockPos(entry.getInt("X"), entry.getInt("Y"), entry.getInt("Z")), entry.getLong("Until"));
+        }
         pendingEnergyRequirement = Math.max(0, tag.getInt("PendingEnergyRequirement"));
         manualSpeedEnabled = tag.getBoolean(TAG_MANUAL_SPEED_ENABLED) && manualSpeedUnlocked();
         if (status != ForestryCartStationBlockEntity.STATUS_NO_POWER) {
@@ -973,7 +1090,7 @@ public class ForestryCartEntity extends AbstractMinecart implements MenuProvider
     public ItemStack saplingStack() {
         for (int slot = SAPLING_SLOT_START; slot < OUTPUT_SLOT_START; slot++) {
             ItemStack stack = cargoInventory.getStackInSlot(slot);
-            if (isSaplingStack(stack)) {
+            if (isPlantableStack(stack)) {
                 return stack;
             }
         }
@@ -983,7 +1100,7 @@ public class ForestryCartEntity extends AbstractMinecart implements MenuProvider
     public ItemStack extractSapling() {
         for (int slot = SAPLING_SLOT_START; slot < OUTPUT_SLOT_START; slot++) {
             ItemStack stack = cargoInventory.getStackInSlot(slot);
-            if (isSaplingStack(stack)) {
+            if (isPlantableStack(stack)) {
                 return cargoInventory.extractItem(slot, 1, false);
             }
         }
@@ -993,7 +1110,7 @@ public class ForestryCartEntity extends AbstractMinecart implements MenuProvider
     private ItemStack saplingStack(Predicate<ItemStack> filter) {
         for (int slot = SAPLING_SLOT_START; slot < OUTPUT_SLOT_START; slot++) {
             ItemStack stack = cargoInventory.getStackInSlot(slot);
-            if (isSaplingStack(stack) && filter.test(stack)) {
+            if (isPlantableStack(stack) && filter.test(stack)) {
                 return stack;
             }
         }
@@ -1023,7 +1140,7 @@ public class ForestryCartEntity extends AbstractMinecart implements MenuProvider
     }
 
     public boolean canAcceptSaplings(ItemStack stack) {
-        return plantsSaplings() && isSaplingStack(stack) && insertSaplings(stack, true).getCount() < stack.getCount();
+        return plantsSaplings() && isPlantableStack(stack) && insertSaplings(stack, true).getCount() < stack.getCount();
     }
 
     public void recordStationSaplingTransfer(BlockPos stationPos) {
@@ -1094,6 +1211,23 @@ public class ForestryCartEntity extends AbstractMinecart implements MenuProvider
         return !stack.isEmpty()
                 && stack.getItem() instanceof BlockItem blockItem
                 && blockItem.getBlock() instanceof SaplingBlock;
+    }
+
+    /** Crop items a Field Hand cart plants: tagged {@code rngtech:cart_crops} and placing a crop block. */
+    public static boolean isCropStack(ItemStack stack) {
+        return !stack.isEmpty()
+                && stack.is(ModTags.Items.CART_CROPS)
+                && stack.getItem() instanceof BlockItem blockItem
+                && blockItem.getBlock() instanceof CropBlock;
+    }
+
+    /** What this cart's supply slots hold: crop items for a Field Hand cart, saplings for every other cart. */
+    public boolean isPlantableStack(ItemStack stack) {
+        return tendsCrops() ? isCropStack(stack) : isSaplingStack(stack);
+    }
+
+    public static boolean isPumpCandidate(ItemStack stack) {
+        return stack.getItem() instanceof FluidPumpItem;
     }
 
     public static boolean isBatteryCell(ItemStack stack) {
@@ -1201,11 +1335,31 @@ public class ForestryCartEntity extends AbstractMinecart implements MenuProvider
         return ForestryCompanionPassiveTree.processesLeavesWithoutShears(machineProgression);
     }
 
+    /** Ticks the installed tool takes to break an ordinary log; shown on the cart's Stats tab. */
     public int workIntervalTicks() {
         ItemStack tool = toolStack();
-        float speed = ModularToolItem.hasValidAssembly(tool) ? ToolBaseStatCatalog.miningSpeed(tool) : 1.0F;
-        int toolAdjustedTicks = Math.max(6, Math.round(36.0F / Math.max(1.0F, speed / 3.0F)));
-        return Math.max(6, effectiveStats().adjustedProcessingTicks(toolAdjustedTicks));
+        float speed = ModularToolItem.hasValidAssembly(tool) ? ToolBaseStatCatalog.miningSpeed(tool) + efficiencyBonus(tool) : 1.0F;
+        return ForestryCartRules.breakTicks(REFERENCE_LOG_HARDNESS, speed, effectiveStats().value(MachineStat.PROCESSING_SPEED));
+    }
+
+    public int plantIntervalTicks() {
+        return ForestryCartRules.plantIntervalTicks(effectiveStats().value(MachineStat.PROCESSING_SPEED));
+    }
+
+    /** Ticks the installed tool takes to break this block, as a player would with the same tool and Efficiency. */
+    private int breakTicks(BlockPos pos, BlockState state) {
+        ItemStack tool = toolStack();
+        float speed = tool.getDestroySpeed(state);
+        if (speed > 1.0F) {
+            speed += efficiencyBonus(tool);
+        }
+        return ForestryCartRules.breakTicks(state.getDestroySpeed(level(), pos), speed, effectiveStats().value(MachineStat.PROCESSING_SPEED));
+    }
+
+    private float efficiencyBonus(ItemStack tool) {
+        int efficiency = EnchantmentHelper.getItemEnchantmentLevel(
+                level().registryAccess().lookupOrThrow(Registries.ENCHANTMENT).getOrThrow(Enchantments.EFFICIENCY), tool);
+        return efficiency > 0 ? efficiency * efficiency + 1 : 0.0F;
     }
 
     public int shearIntervalTicks() {
@@ -1433,6 +1587,9 @@ public class ForestryCartEntity extends AbstractMinecart implements MenuProvider
         if (!hasBatteryCell()) {
             return ForestryCartStationBlockEntity.STATUS_MISSING_BATTERY_CELL;
         }
+        if (!worksTrees()) {
+            return ForestryCartStationBlockEntity.STATUS_READY;
+        }
         ItemStack tool = toolStack();
         if (tool.isEmpty()) {
             return ForestryCartStationBlockEntity.STATUS_MISSING_TOOL;
@@ -1497,15 +1654,22 @@ public class ForestryCartEntity extends AbstractMinecart implements MenuProvider
 
         if (!snapshot.logs().isEmpty()) {
             WorkResult result;
-            if (hasTreefellerTool()) {
-                int batchSize = Math.min(Math.max(1, maxLogsPerAction()), snapshot.logs().size());
-                result = harvestTreeBlocks(cell, new ArrayList<>(snapshot.logs().subList(0, batchSize)));
+            boolean treefeller = hasTreefellerTool();
+            List<BlockPos> targets = treefeller
+                    ? new ArrayList<>(snapshot.logs().subList(0, Math.min(Math.max(1, maxLogsPerAction()), snapshot.logs().size())))
+                    : List.of(snapshot.logs().get(0));
+            if (!advanceBreak(targets, treefeller)) {
+                return WorkResult.WORKED;
+            }
+            if (treefeller) {
+                result = harvestTreeBlocks(cell, targets);
                 removeInvalidSnapshotTargets(snapshot.logs(), BlockTags.LOGS);
             } else {
-                BlockPos harvestPos = snapshot.logs().get(0);
+                BlockPos harvestPos = targets.get(0);
                 result = harvestTreeBlock(cell, harvestPos);
                 removeIfNoLonger(snapshot.logs(), harvestPos, BlockTags.LOGS);
             }
+            clearBreakProgress();
             if (snapshot.isEmpty()) {
                 clearActiveHarvestSnapshot();
             }
@@ -1534,14 +1698,18 @@ public class ForestryCartEntity extends AbstractMinecart implements MenuProvider
         }
 
         BlockState current = level().getBlockState(root);
-        if (isSaplingBlock(current) || isLogBase(root)) {
+        if (isPlantedBlock(current) || isLogBase(root)) {
             return WorkResult.NO_WORK;
         }
         ItemStack sapling = plantingSapling(root).copy();
         if (sapling.isEmpty()) {
             return WorkResult.NO_WORK;
         }
-        if (!(sapling.getItem() instanceof BlockItem blockItem) || !(blockItem.getBlock() instanceof SaplingBlock saplingBlock)) {
+        if (!(sapling.getItem() instanceof BlockItem blockItem) || !isPlantableBlock(blockItem.getBlock())) {
+            return WorkResult.NO_WORK;
+        }
+        BlockState plantedState = blockItem.getBlock().defaultBlockState();
+        if (ForestryCartRules.rowDistance(railPos, root) > 1 && (!current.canBeReplaced() || !plantedState.canSurvive(level(), root))) {
             return WorkResult.NO_WORK;
         }
         setWorkflowState(
@@ -1554,7 +1722,6 @@ public class ForestryCartEntity extends AbstractMinecart implements MenuProvider
             setCurrentAction(ForestryCartStationBlockEntity.ACTION_PLANTING_BLOCKED);
             return WorkResult.BLOCKED_STOP;
         }
-        BlockState plantedState = saplingBlock.defaultBlockState();
         if (!plantedState.canSurvive(level(), root)) {
             setStatus(ForestryCartStationBlockEntity.STATUS_INVALID_SOIL);
             setCurrentAction(ForestryCartStationBlockEntity.ACTION_PLANTING_BLOCKED);
@@ -1569,7 +1736,7 @@ public class ForestryCartEntity extends AbstractMinecart implements MenuProvider
 
         int planted = 0;
         for (BlockPos pos : plot) {
-            ItemStack consumed = extractSapling(sapling.getItem());
+            ItemStack consumed = extractPlantable(sapling.getItem(), managedCells.get(root));
             if (consumed.isEmpty()) {
                 break;
             }
@@ -1588,7 +1755,7 @@ public class ForestryCartEntity extends AbstractMinecart implements MenuProvider
         consumeEnergy(plantEnergyCost() * planted, false);
         managedCells.put(root, new ManagedCell(root, saplingId.toString(), ManagedCell.STATE_PLANTED));
         addMachineXp(PLANT_MACHINE_XP);
-        workCooldown = workIntervalTicks();
+        workCooldown = plantIntervalTicks();
         playWorkSound(ModSounds.FORESTRY_COMPANION_PLANT.get(), 0.55F, 1.0F, WORK_SOUND_COOLDOWN_TICKS);
         setWorkflowState(WorkflowState.PLANTING, ForestryCartStationBlockEntity.STATUS_READY, ForestryCartStationBlockEntity.ACTION_PLANTING);
         return WorkResult.WORKED;
@@ -1629,7 +1796,7 @@ public class ForestryCartEntity extends AbstractMinecart implements MenuProvider
         List<ItemStack> expectedDrops = collectDrops
                 ? Block.getDrops(state, serverLevel, harvestPos, blockEntity, fakePlayer, lootTool)
                 : List.of();
-        if (collectDrops && !canAcceptOutputs(expectedDrops)) {
+        if (collectDrops && !canAcceptOutputs(leaves ? afterReserve(cell, expectedDrops) : expectedDrops)) {
             fakePlayer.setItemInHand(InteractionHand.MAIN_HAND, ItemStack.EMPTY);
             setWorkflowState(WorkflowState.SEEKING_TRANSFER, ForestryCartStationBlockEntity.STATUS_OUTPUT_FULL, ForestryCartStationBlockEntity.ACTION_OUTPUT_FULL);
             return WorkResult.NEEDS_TRANSFER;
@@ -1653,14 +1820,14 @@ public class ForestryCartEntity extends AbstractMinecart implements MenuProvider
             applyCartShearsWear();
         }
         if (collectDrops) {
-            insertOutputs(expectedDrops);
+            insertOutputs(leaves ? reserveFromDrops(cell, expectedDrops) : expectedDrops);
             if (!leaves) {
                 feedLogLedger(expectedDrops, false);
             }
         }
         addMachineXp(leaves ? LEAF_HARVEST_MACHINE_XP : LOG_HARVEST_MACHINE_XP);
         setCellState(cell, ManagedCell.STATE_HARVESTING);
-        workCooldown = leaves ? leafWorkCooldown() : workIntervalTicks();
+        workCooldown = leaves ? leafWorkCooldown() : LOG_SETTLE_TICKS;
         setStatus(ForestryCartStationBlockEntity.STATUS_READY);
         playWorkSound(
                 leaves ? ModSounds.FORESTRY_COMPANION_LEAF_CUT.get() : ModSounds.FORESTRY_COMPANION_LOG_CUT.get(),
@@ -1758,7 +1925,7 @@ public class ForestryCartEntity extends AbstractMinecart implements MenuProvider
         feedLogLedger(expectedDrops, true);
         setCellState(cell, ManagedCell.STATE_HARVESTING);
         addMachineXp(LOG_HARVEST_MACHINE_XP * brokenCount);
-        workCooldown = workIntervalTicks();
+        workCooldown = LOG_SETTLE_TICKS;
         setStatus(ForestryCartStationBlockEntity.STATUS_READY);
         playWorkSound(
                 ModSounds.FORESTRY_COMPANION_TREEFELLER.get(),
@@ -1874,6 +2041,67 @@ public class ForestryCartEntity extends AbstractMinecart implements MenuProvider
 
     private void clearActiveHarvestSnapshot() {
         activeHarvestSnapshot = null;
+        clearBreakProgress();
+    }
+
+    /**
+     * Cracks the next logs over time before they are cut, as a player would. Returns true once the break is complete;
+     * a changed target list restarts it. A cart that cannot pay for the cut skips the wait so the cut reports why.
+     */
+    private boolean advanceBreak(List<BlockPos> targets, boolean batch) {
+        if (!(level() instanceof ServerLevel serverLevel)) {
+            return true;
+        }
+        if (activeBreak == null || !activeBreak.targets().equals(targets)) {
+            clearBreakProgress();
+            int cost = batch ? cutActionEnergyCost() : cutEnergyCost();
+            if (!consumeEnergy(cost, true)) {
+                return true;
+            }
+            int single = 0;
+            for (BlockPos pos : targets) {
+                single = Math.max(single, breakTicks(pos, serverLevel.getBlockState(pos)));
+            }
+            activeBreak = new ActiveBreak(List.copyOf(targets), batch ? ForestryCartRules.batchBreakTicks(single, targets.size()) : single);
+        }
+        activeBreak.tick();
+        if (activeBreak.done()) {
+            return true;
+        }
+        setWorkflowState(
+                WorkflowState.HARVESTING_LOGS,
+                ForestryCartStationBlockEntity.STATUS_READY,
+                batch ? ForestryCartStationBlockEntity.ACTION_TREEFELLER_BATCH : ForestryCartStationBlockEntity.ACTION_HARVESTING_LOG
+        );
+        int stage = ForestryCartRules.crackStage(activeBreak.elapsed(), activeBreak.total());
+        List<BlockPos> shown = activeBreak.targets();
+        for (int index = 0; index < Math.min(MAX_CRACK_OVERLAYS, shown.size()); index++) {
+            serverLevel.destroyBlockProgress(crackId(index), shown.get(index), stage);
+        }
+        if (activeBreak.elapsed() % BREAK_SOUND_INTERVAL_TICKS == 1) {
+            BlockPos pos = shown.get(0);
+            SoundType sound = serverLevel.getBlockState(pos).getSoundType(serverLevel, pos, this);
+            serverLevel.playSound(null, pos, sound.getHitSound(), SoundSource.BLOCKS, (sound.getVolume() + 1.0F) / 8.0F, sound.getPitch() * 0.5F);
+        }
+        return false;
+    }
+
+    private void clearBreakProgress() {
+        if (activeBreak == null) {
+            return;
+        }
+        if (level() instanceof ServerLevel serverLevel) {
+            List<BlockPos> shown = activeBreak.targets();
+            for (int index = 0; index < Math.min(MAX_CRACK_OVERLAYS, shown.size()); index++) {
+                serverLevel.destroyBlockProgress(crackId(index), shown.get(index), -1);
+            }
+        }
+        activeBreak = null;
+    }
+
+    /** Crack overlays need one breaker id per block; negative ids never collide with real entities. */
+    private int crackId(int index) {
+        return -(getId() * MAX_CRACK_OVERLAYS + index) - 1;
     }
 
     private ManagedCell managedCell(BlockPos root) {
@@ -1891,9 +2119,27 @@ public class ForestryCartEntity extends AbstractMinecart implements MenuProvider
         }
     }
 
+    /**
+     * A cell remembers whatever is growing in it, so Seed Library replants what was there, even when a player planted
+     * it. Plants this cart can tend are adopted into the managed cells while the cap allows.
+     */
     private void updateManagedSaplingState(BlockPos root) {
+        BlockState state = level().getBlockState(root);
         ManagedCell cell = managedCells.get(root);
-        if (cell != null && isSaplingBlock(level().getBlockState(root))) {
+        if (!isPlantedBlock(state)) {
+            return;
+        }
+        if (isPlantableBlock(state.getBlock()) && state.getBlock().asItem() != Items.AIR) {
+            String plantedId = BuiltInRegistries.ITEM.getKey(state.getBlock().asItem()).toString();
+            if (cell == null && managedCells.size() < maxManagedCells()) {
+                cell = new ManagedCell(root.immutable(), plantedId, ManagedCell.STATE_PLANTED);
+                managedCells.put(cell.root(), cell);
+            } else if (cell != null && !cell.saplingId().equals(plantedId)) {
+                releaseReserve(cell);
+                cell.setSaplingId(plantedId);
+            }
+        }
+        if (cell != null) {
             cell.setState(ManagedCell.STATE_PLANTED);
         }
     }
@@ -2018,6 +2264,19 @@ public class ForestryCartEntity extends AbstractMinecart implements MenuProvider
         return state.getBlock() instanceof SaplingBlock;
     }
 
+    private boolean isPlantedBlock(BlockState state) {
+        return isSaplingBlock(state) || state.getBlock() instanceof CropBlock;
+    }
+
+    private boolean isPlantableBlock(Block block) {
+        return tendsCrops() ? block instanceof CropBlock : block instanceof SaplingBlock;
+    }
+
+    private boolean isMatureCrop(BlockPos root) {
+        BlockState state = level().getBlockState(root);
+        return managedCells.containsKey(root) && state.getBlock() instanceof CropBlock crop && crop.isMaxAge(state);
+    }
+
     private int activeManagedCells() {
         int active = 0;
         for (ManagedCell cell : managedCells.values()) {
@@ -2058,9 +2317,9 @@ public class ForestryCartEntity extends AbstractMinecart implements MenuProvider
         return plantsSaplings() ? routeOutput(inventory, stack) : insertIntoRange(inventory, OUTPUT_SLOT_START, OUTPUT_SLOT_COUNT, stack);
     }
 
-    private static ItemStack routeOutput(ItemStackHandler inventory, ItemStack stack) {
+    private ItemStack routeOutput(ItemStackHandler inventory, ItemStack stack) {
         ItemStack remaining = stack.copy();
-        if (isSaplingStack(remaining)) {
+        if (isPlantableStack(remaining)) {
             remaining = insertIntoRange(inventory, SAPLING_SLOT_START, SAPLING_SLOT_COUNT, remaining);
         }
         return insertIntoRange(inventory, OUTPUT_SLOT_START, OUTPUT_SLOT_COUNT, remaining);
@@ -2147,6 +2406,165 @@ public class ForestryCartEntity extends AbstractMinecart implements MenuProvider
         }
     }
 
+    /** After a change of ascendancy, supply items this cart can no longer plant move to output cargo. */
+    private void evictUnplantableSupply() {
+        if (!keepsReserves()) {
+            managedCells.values().forEach(this::releaseReserve);
+        } else {
+            for (ManagedCell cell : managedCells.values()) {
+                if (cell.reserved() > 0 && !isPlantableStack(reserveStack(cell))) {
+                    releaseReserve(cell);
+                }
+            }
+        }
+        for (int slot = SAPLING_SLOT_START; slot < OUTPUT_SLOT_START; slot++) {
+            ItemStack stack = cargoInventory.getStackInSlot(slot);
+            if (stack.isEmpty() || isPlantableStack(stack) || isFertilizerStack(stack)) {
+                continue;
+            }
+            ItemStack rest = insertIntoRange(cargoInventory, OUTPUT_SLOT_START, OUTPUT_SLOT_COUNT, stack);
+            cargoInventory.setStackInSlot(slot, rest);
+        }
+    }
+
+    /** Seed Library carts set aside each cell's replant from that cell's own harvest. */
+    private boolean keepsReserves() {
+        return plantsSaplings() && hasMasteryBehavior("SEED_LIBRARY");
+    }
+
+    /** How many of {@code item} the cell holds for its replant. */
+    private int reservedFor(ManagedCell cell, Item item) {
+        if (cell == null || cell.reserved() <= 0 || item == Items.AIR) {
+            return 0;
+        }
+        return BuiltInRegistries.ITEM.getKey(item).toString().equals(cell.saplingId()) ? cell.reserved() : 0;
+    }
+
+    /** One replant, or four for an Ancient Grove plot of a giant sapling. */
+    private int reserveTarget(Item item) {
+        return hasMasteryBehavior("ANCIENT_GROVE") && new ItemStack(item).is(ModTags.Items.GIANT_SAPLINGS) ? GIANT_TREE_SAPLINGS : 1;
+    }
+
+    /** The species and count this harvest would set aside for the cell, or null when nothing is reserved. */
+    private ItemStack plannedReserve(ManagedCell cell, List<ItemStack> drops) {
+        if (cell == null || !keepsReserves()) {
+            return ItemStack.EMPTY;
+        }
+        Item item = cell.saplingId().isEmpty() ? Items.AIR : BuiltInRegistries.ITEM.get(ResourceLocation.tryParse(cell.saplingId()));
+        if (item == Items.AIR) {
+            item = drops.stream().filter(this::isPlantableStack).map(ItemStack::getItem).findFirst().orElse(Items.AIR);
+        }
+        if (item == Items.AIR || !isPlantableStack(new ItemStack(item))) {
+            return ItemStack.EMPTY;
+        }
+        int need = reserveTarget(item) - reservedFor(cell, item);
+        Item species = item;
+        int available = drops.stream().filter(drop -> drop.is(species)).mapToInt(ItemStack::getCount).sum();
+        int take = Math.min(need, available);
+        return take > 0 ? new ItemStack(item, take) : ItemStack.EMPTY;
+    }
+
+    /** The drops left to route after the cell's reserve is set aside. */
+    private List<ItemStack> afterReserve(ManagedCell cell, List<ItemStack> drops) {
+        ItemStack reserve = plannedReserve(cell, drops);
+        if (reserve.isEmpty()) {
+            return drops;
+        }
+        int remaining = reserve.getCount();
+        List<ItemStack> rest = new ArrayList<>();
+        for (ItemStack drop : drops) {
+            ItemStack copy = drop.copy();
+            if (remaining > 0 && copy.is(reserve.getItem())) {
+                int taken = Math.min(remaining, copy.getCount());
+                copy.shrink(taken);
+                remaining -= taken;
+            }
+            if (!copy.isEmpty()) {
+                rest.add(copy);
+            }
+        }
+        return rest;
+    }
+
+    /** Sets the cell's replant aside from its own harvest and returns the drops left to route. */
+    private List<ItemStack> reserveFromDrops(ManagedCell cell, List<ItemStack> drops) {
+        ItemStack reserve = plannedReserve(cell, drops);
+        if (reserve.isEmpty()) {
+            return drops;
+        }
+        List<ItemStack> rest = afterReserve(cell, drops);
+        String id = BuiltInRegistries.ITEM.getKey(reserve.getItem()).toString();
+        if (!id.equals(cell.saplingId())) {
+            releaseReserve(cell);
+            cell.setSaplingId(id);
+        }
+        cell.setReserved(cell.reserved() + reserve.getCount());
+        return rest;
+    }
+
+    private ItemStack reserveStack(ManagedCell cell) {
+        if (cell == null || cell.reserved() <= 0 || cell.saplingId().isEmpty()) {
+            return ItemStack.EMPTY;
+        }
+        Item item = BuiltInRegistries.ITEM.get(ResourceLocation.tryParse(cell.saplingId()));
+        return item == Items.AIR ? ItemStack.EMPTY : new ItemStack(item, cell.reserved());
+    }
+
+    /** Returns a cell's reserve to cargo, or drops it when cargo is full. */
+    private void releaseReserve(ManagedCell cell) {
+        ItemStack reserve = reserveStack(cell);
+        if (cell != null) {
+            cell.setReserved(0);
+        }
+        if (!reserve.isEmpty()) {
+            insertOutputs(List.of(reserve));
+        }
+    }
+
+    /** Takes one plantable for a cell, from its reserve first and then from supply cargo. */
+    private ItemStack extractPlantable(Item item, ManagedCell cell) {
+        if (reservedFor(cell, item) > 0) {
+            cell.setReserved(cell.reserved() - 1);
+            return new ItemStack(item);
+        }
+        return extractSapling(item);
+    }
+
+    /** Plantables set aside in managed cells for their replants. */
+    public int reservedPlantables() {
+        return managedCells.values().stream().mapToInt(ManagedCell::reserved).sum();
+    }
+
+    /**
+     * Species a Seed Library cart is waiting for: how many empty managed cells remember each one and have no reserve.
+     * A docked station loads these first.
+     */
+    public Map<Item, Integer> plantDemand() {
+        Map<Item, Integer> demand = new LinkedHashMap<>();
+        if (!keepsReserves()) {
+            return demand;
+        }
+        for (ManagedCell cell : managedCells.values()) {
+            if (cell.saplingId().isEmpty() || cell.reserved() > 0) {
+                continue;
+            }
+            BlockState state = level().getBlockState(cell.root());
+            if (isPlantedBlock(state) || state.is(BlockTags.LOGS)) {
+                continue;
+            }
+            Item item = BuiltInRegistries.ITEM.get(ResourceLocation.tryParse(cell.saplingId()));
+            if (item != Items.AIR && isPlantableStack(new ItemStack(item))) {
+                demand.merge(item, 1, Integer::sum);
+            }
+        }
+        return demand;
+    }
+
+    /** Supply cargo of one item. */
+    public int supplyCount(Item item) {
+        return saplingCount(item);
+    }
+
     private void dropFertilizer() {
         while (fertilizer > 0) {
             int count = Math.min(fertilizer, Items.BONE_MEAL.getDefaultMaxStackSize());
@@ -2207,7 +2625,7 @@ public class ForestryCartEntity extends AbstractMinecart implements MenuProvider
     /** The cells beside the rail, or with Verdant Surge every managed cell within reach of it. */
     private List<ManagedCell> pulseTargets(BlockPos railPos, List<BlockPos> workRoots) {
         if (hasMasteryBehavior("VERDANT_SURGE")) {
-            return managedCells.values().stream().filter(cell -> withinReach(railPos, cell.root(), VERDANT_SURGE_REACH)).toList();
+            return managedCells.values().stream().filter(cell -> withinReach(railPos, cell.root(), workReach())).toList();
         }
         return workRoots.stream().map(managedCells::get).filter(java.util.Objects::nonNull).toList();
     }
@@ -2257,7 +2675,220 @@ public class ForestryCartEntity extends AbstractMinecart implements MenuProvider
     }
 
     private boolean rollingHarvest() {
-        return hasMasteryBehavior("ROLLING_HARVEST");
+        return hasMasteryBehavior("ROLLING_HARVEST") || hasMasteryBehavior("ROLLING_REAP");
+    }
+
+    /** Field Hand carts plant and harvest crops. */
+    public boolean tendsCrops() {
+        return hasMasteryBehavior("CROP_TENDING");
+    }
+
+    /** Field Hand carts never plant saplings or cut trees. */
+    public boolean worksTrees() {
+        return !hasMasteryBehavior("NO_TREE_WORK");
+    }
+
+    /** Harvests a fully grown managed crop; Reap and Sow replants the cell in the same action. */
+    private WorkResult harvestCrop(BlockPos root, BlockPos railPos) {
+        if (!(level() instanceof ServerLevel serverLevel)) {
+            return WorkResult.NO_WORK;
+        }
+        BlockState state = serverLevel.getBlockState(root);
+        int cost = effectiveStats().adjustedEnergyCost(CROP_HARVEST_FE);
+        if (!consumeEnergy(cost, true)) {
+            markNoPower(cost);
+            return WorkResult.NEEDS_TRANSFER;
+        }
+        FakePlayer fakePlayer = fakePlayer(serverLevel);
+        fakePlayer.moveTo(root.getX() + 0.5D, root.getY(), root.getZ() + 0.5D, 0.0F, 0.0F);
+        fakePlayer.setItemInHand(InteractionHand.MAIN_HAND, ItemStack.EMPTY);
+        List<ItemStack> drops = Block.getDrops(state, serverLevel, root, null, fakePlayer, ItemStack.EMPTY);
+        ManagedCell cell = managedCells.get(root);
+        if (!canAcceptOutputs(afterReserve(cell, drops))) {
+            setWorkflowState(WorkflowState.SEEKING_TRANSFER, ForestryCartStationBlockEntity.STATUS_OUTPUT_FULL, ForestryCartStationBlockEntity.ACTION_OUTPUT_FULL);
+            return WorkResult.NEEDS_TRANSFER;
+        }
+        if (!harvestBlockIntoCart(serverLevel, fakePlayer, root, state)) {
+            setCellState(managedCells.get(root), ManagedCell.STATE_BLOCKED);
+            setStatus(ForestryCartStationBlockEntity.STATUS_HARVEST_BLOCKED);
+            setCurrentAction(ForestryCartStationBlockEntity.ACTION_HARVEST_BLOCKED);
+            return WorkResult.BLOCKED_STOP;
+        }
+        consumeEnergy(cost, false);
+        insertOutputs(reserveFromDrops(cell, drops));
+        addMachineXp(CROP_HARVEST_MACHINE_XP);
+        workCooldown = plantIntervalTicks();
+        setWorkflowState(WorkflowState.HARVESTING_LEAVES, ForestryCartStationBlockEntity.STATUS_READY, ForestryCartStationBlockEntity.ACTION_HARVESTING_CROP);
+        playWorkSound(ModSounds.FORESTRY_COMPANION_LEAF_CUT.get(), 0.42F, 1.15F, WORK_SOUND_COOLDOWN_TICKS);
+        if (hasMasteryBehavior("REAP_AND_SOW")) {
+            tryPlant(root, railPos);
+        }
+        return WorkResult.WORKED;
+    }
+
+    /**
+     * The sprinkler tills dirt and grass under empty crop cells and keeps farmland fully moist, spending water from the
+     * cart's tank; it needs a Fluid Pump installed. Irrigation reaches one row further at half the water.
+     */
+    private void sprinkle(BlockPos railPos, List<BlockPos> workRoots) {
+        if (!hasMasteryBehavior("SPRINKLER") || !hasPump() || !hasSaplings() && reservedPlantables() == 0) {
+            return;
+        }
+        boolean irrigation = hasMasteryBehavior("IRRIGATION");
+        int cost = irrigation ? SPRINKLER_WATER_MB / 2 : SPRINKLER_WATER_MB;
+        List<BlockPos> cells = new ArrayList<>(workRoots);
+        if (irrigation && isForestryWorkRail(railPos)) {
+            for (BlockPos root : ForestryCartRules.scanRoots(railPos, scanDirection(railPos), workRange() + 1)) {
+                if (!cells.contains(root)) {
+                    cells.add(root);
+                }
+            }
+        }
+        long now = level().getGameTime();
+        int duration = irrigation ? (int) (HYDRATION_TICKS * IRRIGATION_HYDRATION_MULTIPLIER) : HYDRATION_TICKS;
+        boolean sprayed = false;
+        for (BlockPos root : cells) {
+            if (waterTank.getFluidAmount() < cost) {
+                return;
+            }
+            BlockPos soil = root.below();
+            BlockState soilState = level().getBlockState(soil);
+            BlockState wet = Blocks.FARMLAND.defaultBlockState().setValue(FarmBlock.MOISTURE, FarmBlock.MAX_MOISTURE);
+            boolean changed = false;
+            if (soilState.is(Blocks.FARMLAND)) {
+                Long until = hydratedUntil.get(soil);
+                if (until != null && until - now > duration / 2 && soilState.getValue(FarmBlock.MOISTURE) == FarmBlock.MAX_MOISTURE) {
+                    if (tickCount % COSMETIC_SPRAY_INTERVAL_TICKS == 0) {
+                        sprayWater(soil);
+                    }
+                    continue;
+                }
+                changed = soilState.getValue(FarmBlock.MOISTURE) == FarmBlock.MAX_MOISTURE
+                        || level().setBlock(soil, soilState.setValue(FarmBlock.MOISTURE, FarmBlock.MAX_MOISTURE), Block.UPDATE_CLIENTS);
+            } else if (isTillable(soilState) && level().getBlockState(root).isAir() && level().getBlockState(soil.above()).isAir()) {
+                changed = level().setBlock(soil, wet, Block.UPDATE_ALL);
+            }
+            if (changed) {
+                hydrate(soil, now + duration);
+                waterTank.drain(cost, IFluidHandler.FluidAction.EXECUTE);
+                sprayWater(soil);
+                sprayed = true;
+            }
+        }
+        if (sprayed) {
+            level().playSound(null, getX(), getY(), getZ(), SoundEvents.BOAT_PADDLE_WATER, SoundSource.BLOCKS, 0.35F, 1.4F + random.nextFloat() * 0.2F);
+        }
+    }
+
+    /** A spray arcs from the cart and splashes down on the watered block. */
+    private void sprayWater(BlockPos soil) {
+        if (!(level() instanceof ServerLevel serverLevel)) {
+            return;
+        }
+        double x = soil.getX() + 0.5D;
+        double y = soil.getY() + 1.0D;
+        double z = soil.getZ() + 0.5D;
+        serverLevel.sendParticles(ParticleTypes.SPLASH, x, y + 0.05D, z, 10, 0.3D, 0.05D, 0.3D, 0.0D);
+        serverLevel.sendParticles(ParticleTypes.FALLING_WATER, x, y + 0.9D, z, 4, 0.25D, 0.1D, 0.25D, 0.0D);
+        double dx = x - getX();
+        double dz = z - getZ();
+        for (int step = 1; step <= 3; step++) {
+            double t = step / 4.0D;
+            double arc = Math.sin(t * Math.PI) * 0.8D;
+            serverLevel.sendParticles(ParticleTypes.SPLASH, getX() + dx * t, getY() + 0.9D + arc, getZ() + dz * t, 2, 0.05D, 0.05D, 0.05D, 0.0D);
+        }
+    }
+
+    /** Sprinkled farmland holds a water ticket, so it stays moist until the ticket runs out or the cart refreshes it. */
+    private void hydrate(BlockPos soil, long until) {
+        BlockPos pos = soil.immutable();
+        hydratedUntil.put(pos, until);
+        AABBTicket ticket = hydrationTickets.get(pos);
+        if (ticket == null || !ticket.isValid() || !FarmlandWaterManager.hasBlockWaterTicket(level(), pos)) {
+            if (ticket != null) {
+                ticket.invalidate();
+            }
+            ticket = FarmlandWaterManager.addAABBTicket(level(), new AABB(pos));
+            ticket.validate();
+            hydrationTickets.put(pos, ticket);
+        }
+    }
+
+    /**
+     * Ends expired water tickets and restores live ones after a reload or chunk unload, which drop tickets. Ends early
+     * where the farmland is gone.
+     */
+    private void maintainHydration() {
+        if (hydratedUntil.isEmpty()) {
+            return;
+        }
+        long now = level().getGameTime();
+        var entries = hydratedUntil.entrySet().iterator();
+        while (entries.hasNext()) {
+            var entry = entries.next();
+            BlockPos pos = entry.getKey();
+            if (!level().isLoaded(pos)) {
+                continue;
+            }
+            if (entry.getValue() <= now || !level().getBlockState(pos).is(Blocks.FARMLAND)) {
+                AABBTicket ticket = hydrationTickets.remove(pos);
+                if (ticket != null) {
+                    ticket.invalidate();
+                }
+                entries.remove();
+            } else if (!FarmlandWaterManager.hasBlockWaterTicket(level(), pos)) {
+                AABBTicket ticket = FarmlandWaterManager.addAABBTicket(level(), new AABB(pos));
+                ticket.validate();
+                hydrationTickets.put(pos, ticket);
+            }
+        }
+    }
+
+    private static boolean isTillable(BlockState state) {
+        return state.is(Blocks.DIRT) || state.is(Blocks.GRASS_BLOCK) || state.is(Blocks.DIRT_PATH);
+    }
+
+    public boolean hasPump() {
+        return isPumpCandidate(gearInventory.getStackInSlot(SLOT_PUMP));
+    }
+
+    public ItemStack pumpStack() {
+        return gearInventory.getStackInSlot(SLOT_PUMP);
+    }
+
+    public int waterStored() {
+        return waterTank.getFluidAmount();
+    }
+
+    /** Fluid Capacity sizes the water tank; water above a smaller capacity stays until the sprinkler uses it. */
+    private void updateWaterCapacity() {
+        int capacity = Math.max(WATER_CAPACITY, (int) Math.round(pumpStats().value(MachineStat.FLUID_CAPACITY)));
+        if (waterTank.getCapacity() != capacity) {
+            waterTank.setCapacity(capacity);
+        }
+    }
+
+    /** Water a docked station may load per tick: the installed pump's rolled transfer rate, or nothing without one. */
+    public int waterTransferRate() {
+        return hasPump() ? (int) Math.round(pumpStats().value(MachineStat.FLUID_TRANSFER)) : 0;
+    }
+
+    /** Cart stats with the installed Fluid Pump's contribution, whose Fluid Capacity affixes size the water tank. */
+    private MachineStatAccumulator pumpStats() {
+        MachineStatAccumulator stats = effectiveStats();
+        if (hasPump()) {
+            ComponentBaseStatCatalog.applyEffectiveContribution(stats, pumpStack());
+        }
+        return stats;
+    }
+
+    /** Fills the cart's water tank from a station; returns the millibuckets accepted. */
+    public int acceptWater(int amount, boolean simulate) {
+        int limited = Math.min(amount, waterTransferRate());
+        if (limited <= 0 || !hasMasteryBehavior("SPRINKLER")) {
+            return 0;
+        }
+        return waterTank.fill(new FluidStack(Fluids.WATER, limited), simulate ? IFluidHandler.FluidAction.SIMULATE : IFluidHandler.FluidAction.EXECUTE);
     }
 
     /**
@@ -2270,11 +2901,12 @@ public class ForestryCartEntity extends AbstractMinecart implements MenuProvider
             return false;
         }
         BlockPos nextRail = railPos.relative(next);
-        if (activeHarvestSnapshot != null && !withinReach(nextRail, activeHarvestSnapshot.logBase(), ROLLING_REACH)) {
+        if (activeHarvestSnapshot != null && !withinReach(nextRail, activeHarvestSnapshot.logBase(), workReach())) {
             return false;
         }
+        int reach = workReach();
         for (BlockPos root : workRoots(railPos)) {
-            if (!withinReach(nextRail, root, ROLLING_REACH) && hasPendingWork(root)) {
+            if (!withinReach(nextRail, root, reach) && hasPendingWork(root)) {
                 return false;
             }
         }
@@ -2287,9 +2919,10 @@ public class ForestryCartEntity extends AbstractMinecart implements MenuProvider
             return plantingScanRoots(railPos);
         }
         List<BlockPos> roots = new ArrayList<>();
+        int reach = workReach();
         for (List<BlockPos> railRoots : rolledRails.values()) {
             for (BlockPos root : railRoots) {
-                if (withinReach(railPos, root, ROLLING_REACH) && !roots.contains(root)) {
+                if (withinReach(railPos, root, reach) && !roots.contains(root)) {
                     roots.add(root);
                 }
             }
@@ -2313,7 +2946,8 @@ public class ForestryCartEntity extends AbstractMinecart implements MenuProvider
         }
         rolledRails.remove(railPos);
         rolledRails.put(railPos.immutable(), roots);
-        rolledRails.keySet().removeIf(rail -> !withinReach(railPos, rail, ROLLING_REACH + 1));
+        int reach = workReach();
+        rolledRails.keySet().removeIf(rail -> !withinReach(railPos, rail, reach + 1));
     }
 
     private BlockPos rolledRail(BlockPos root, BlockPos railPos) {
@@ -2325,8 +2959,25 @@ public class ForestryCartEntity extends AbstractMinecart implements MenuProvider
         return railPos;
     }
 
+    /** Drops managed cells beyond the current Work Range that no longer hold anything, so they stop using the cap. */
+    private void pruneManagedCells(BlockPos railPos) {
+        if (managedCells.isEmpty()) {
+            return;
+        }
+        for (BlockPos pos : ForestryCartRules.pruneRoots(railPos, scanDirection(railPos), workRange())) {
+            if (managedCells.containsKey(pos) && !holdsManagedGrowth(pos)) {
+                releaseReserve(managedCells.remove(pos));
+            }
+        }
+    }
+
+    private boolean holdsManagedGrowth(BlockPos pos) {
+        BlockState state = level().getBlockState(pos);
+        return isSaplingBlock(state) || state.getBlock() instanceof CropBlock || state.is(BlockTags.LOGS);
+    }
+
     private boolean hasPendingWork(BlockPos root) {
-        return isLogBase(root) || canPlantAt(root);
+        return worksTrees() && isLogBase(root) || tendsCrops() && isMatureCrop(root) || canPlantAt(root);
     }
 
     private boolean canPlantAt(BlockPos root) {
@@ -2334,17 +2985,17 @@ public class ForestryCartEntity extends AbstractMinecart implements MenuProvider
             return false;
         }
         BlockState current = level().getBlockState(root);
-        if (isSaplingBlock(current) || !current.canBeReplaced()) {
+        if (isPlantedBlock(current) || !current.canBeReplaced()) {
             return false;
         }
         ItemStack sapling = plantingSapling(root);
         return sapling.getItem() instanceof BlockItem blockItem
-                && blockItem.getBlock() instanceof SaplingBlock saplingBlock
-                && saplingBlock.defaultBlockState().canSurvive(level(), root);
+                && isPlantableBlock(blockItem.getBlock())
+                && blockItem.getBlock().defaultBlockState().canSurvive(level(), root);
     }
 
     private boolean harvestInReach(BlockPos railPos, List<BlockPos> workRoots, BlockPos logBase) {
-        return workRoots.contains(logBase) || rollingHarvest() && withinReach(railPos, logBase, ROLLING_REACH);
+        return workRoots.contains(logBase) || rollingHarvest() && withinReach(railPos, logBase, workReach());
     }
 
     private static boolean withinReach(BlockPos railPos, BlockPos target, int reach) {
@@ -2356,8 +3007,14 @@ public class ForestryCartEntity extends AbstractMinecart implements MenuProvider
     /** Seed Library replants a cell's remembered species, and leaves the cell empty until that species is in cargo. */
     private ItemStack plantingSapling(BlockPos root) {
         ManagedCell cell = managedCells.get(root);
+        Item reservedItem = cell == null ? Items.AIR : BuiltInRegistries.ITEM.get(ResourceLocation.tryParse(cell.saplingId()));
+        if (reservedFor(cell, reservedItem) > 0) {
+            return new ItemStack(reservedItem, reservedFor(cell, reservedItem));
+        }
         if (cell == null || cell.saplingId().isEmpty() || !hasMasteryBehavior("SEED_LIBRARY")) {
-            return saplingStack();
+            ItemStack survives = saplingStack(stack -> stack.getItem() instanceof BlockItem blockItem
+                    && blockItem.getBlock().defaultBlockState().canSurvive(level(), root));
+            return survives.isEmpty() ? saplingStack() : survives;
         }
         return saplingStack(stack -> BuiltInRegistries.ITEM.getKey(stack.getItem()).toString().equals(cell.saplingId()));
     }
@@ -2365,10 +3022,10 @@ public class ForestryCartEntity extends AbstractMinecart implements MenuProvider
     /** Ancient Grove plants a clear 2x2 plot away from the rail when four matching giant saplings are in cargo. */
     private List<BlockPos> plantingPlot(BlockPos root, BlockPos railPos, ItemStack sapling, BlockState plantedState) {
         if (!hasMasteryBehavior("ANCIENT_GROVE") || !sapling.is(ModTags.Items.GIANT_SAPLINGS)
-                || saplingCount(sapling.getItem()) < GIANT_TREE_SAPLINGS) {
+                || saplingCount(sapling.getItem()) + reservedFor(managedCells.get(root), sapling.getItem()) < GIANT_TREE_SAPLINGS) {
             return List.of(root);
         }
-        Direction outward = Direction.fromDelta(root.getX() - railPos.getX(), 0, root.getZ() - railPos.getZ());
+        Direction outward = ForestryCartRules.outwardDirection(railPos, root);
         Direction forward = scanDirection(railPos);
         if (outward == null || outward.getAxis() == forward.getAxis()) {
             return List.of(root);
@@ -2820,6 +3477,38 @@ public class ForestryCartEntity extends AbstractMinecart implements MenuProvider
         NO_WORK
     }
 
+    /** Logs being cracked before a cut; not saved, so a reloaded cart restarts the break. */
+    private static final class ActiveBreak {
+        private final List<BlockPos> targets;
+        private final int total;
+        private int elapsed;
+
+        private ActiveBreak(List<BlockPos> targets, int total) {
+            this.targets = targets;
+            this.total = Math.max(1, total);
+        }
+
+        private List<BlockPos> targets() {
+            return targets;
+        }
+
+        private int total() {
+            return total;
+        }
+
+        private int elapsed() {
+            return elapsed;
+        }
+
+        private void tick() {
+            elapsed++;
+        }
+
+        private boolean done() {
+            return elapsed >= total;
+        }
+    }
+
     private static final class HarvestSnapshot {
         private final BlockPos logBase;
         private final List<BlockPos> leaves;
@@ -2916,9 +3605,11 @@ public class ForestryCartEntity extends AbstractMinecart implements MenuProvider
         private static final int STATE_HARVESTING = 2;
         private static final int STATE_BLOCKED = 3;
         private final BlockPos root;
-        private final String saplingId;
+        private String saplingId;
         private int state;
         private long nextPulseTick;
+        /** Plantables of {@link #saplingId} set aside from this cell's own harvest for its replant. */
+        private int reserved;
 
         private ManagedCell(BlockPos root, String saplingId, int state) {
             this.root = root.immutable();
@@ -2927,11 +3618,13 @@ public class ForestryCartEntity extends AbstractMinecart implements MenuProvider
         }
 
         private static ManagedCell load(CompoundTag tag) {
-            return new ManagedCell(
+            ManagedCell cell = new ManagedCell(
                     new BlockPos(tag.getInt("X"), tag.getInt("Y"), tag.getInt("Z")),
                     tag.getString("Sapling"),
                     tag.getInt("State")
             );
+            cell.reserved = Math.max(0, tag.getInt("Reserved"));
+            return cell;
         }
 
         private CompoundTag save() {
@@ -2941,6 +3634,9 @@ public class ForestryCartEntity extends AbstractMinecart implements MenuProvider
             tag.putInt("Z", root.getZ());
             tag.putString("Sapling", saplingId);
             tag.putInt("State", state);
+            if (reserved > 0) {
+                tag.putInt("Reserved", reserved);
+            }
             return tag;
         }
 
@@ -2960,6 +3656,18 @@ public class ForestryCartEntity extends AbstractMinecart implements MenuProvider
             return saplingId;
         }
 
+        private void setSaplingId(String saplingId) {
+            this.saplingId = saplingId;
+        }
+
+        private int reserved() {
+            return reserved;
+        }
+
+        private void setReserved(int reserved) {
+            this.reserved = Math.max(0, reserved);
+        }
+
         private long nextPulseTick() {
             return nextPulseTick;
         }
@@ -2969,7 +3677,7 @@ public class ForestryCartEntity extends AbstractMinecart implements MenuProvider
         }
     }
     @Override public MachineMasteryFamily masteryFamily() { return MachineMasteryFamily.FORESTRY; }
-    /** The cart has no chassis stage, so its installed Axe or Treefeller head stands in. */
-    @Override public int ascendancyEntryStage() { return hasUsableTool() ? ModularToolItem.assembly(toolStack()).headMaterial().stage() : 0; }
+    /** The cart has no chassis stage and needs no particular Gear to ascend; crafting Seal I is its gate. */
+    @Override public int ascendancyEntryStage() { return AscendancyCatalog.ENTRY_STAGE; }
 
 }
