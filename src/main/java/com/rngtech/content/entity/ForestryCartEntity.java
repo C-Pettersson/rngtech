@@ -329,6 +329,8 @@ public class ForestryCartEntity extends AbstractMinecart implements MenuProvider
     private int currentAction = ForestryCartStationBlockEntity.ACTION_SETUP_BLOCKED;
     private int workCooldown;
     private int ticksSinceWork = AscendancyFormulas.IDLE_CART_TICKS;
+    /** Ticks left in which a rolling cart that just planted holds to one rail block per plant interval. */
+    private int plantStrideTicks;
     private int managementViewers;
     private BlockPos dockSaplingTransferStation;
     private int dockSaplingTransferIdleTicks;
@@ -624,6 +626,9 @@ public class ForestryCartEntity extends AbstractMinecart implements MenuProvider
         if (ticksSinceWork < AscendancyFormulas.IDLE_CART_TICKS) {
             ticksSinceWork++;
         }
+        if (plantStrideTicks > 0) {
+            plantStrideTicks--;
+        }
         tryMagnetNearbyItems();
         absorbSuppliedFertilizer();
         evictUnplantableSupply();
@@ -785,15 +790,26 @@ public class ForestryCartEntity extends AbstractMinecart implements MenuProvider
         }
 
         boolean plantingBlocked = false;
+        boolean plantedWhileRolling = false;
         for (BlockPos root : workRoots) {
             WorkResult result = tryPlant(root, rolledRail(root, railPos));
             if (result == WorkResult.BLOCKED_STOP) {
                 plantingBlocked = true;
                 continue;
             }
+            // Rolling Harvest plants every empty cell in reach in one action, then strides to the next rail block.
+            if (result == WorkResult.WORKED && rollingHarvest()) {
+                plantedWhileRolling = true;
+                continue;
+            }
             if (handleWorkResult(result, railPos)) {
                 return;
             }
+        }
+        if (plantedWhileRolling) {
+            plantStrideTicks = plantIntervalTicks();
+            handleWorkResult(WorkResult.WORKED, railPos);
+            return;
         }
 
         if (plantingBlocked) {
@@ -2886,8 +2902,8 @@ public class ForestryCartEntity extends AbstractMinecart implements MenuProvider
     }
 
     /**
-     * Rolling Harvest keeps moving unless the tree being cut, or a tree or empty cell still waiting for work, would leave
-     * reach at the next rail block.
+     * Rolling Harvest keeps moving unless the tree being cut, or a tree or ripe crop still waiting to be harvested, would
+     * leave reach at the next rail block. Empty cells never hold it up: it plants them on the move or on the next pass.
      */
     private boolean canRollPast(BlockPos railPos) {
         Direction next = nextRailDirection(railPos);
@@ -2900,7 +2916,7 @@ public class ForestryCartEntity extends AbstractMinecart implements MenuProvider
         }
         int reach = workReach();
         for (BlockPos root : workRoots(railPos)) {
-            if (!withinReach(nextRail, root, reach) && hasPendingWork(root)) {
+            if (!withinReach(nextRail, root, reach) && hasPendingHarvest(root)) {
                 return false;
             }
         }
@@ -2970,22 +2986,8 @@ public class ForestryCartEntity extends AbstractMinecart implements MenuProvider
         return isSaplingBlock(state) || state.getBlock() instanceof CropBlock || state.is(BlockTags.LOGS);
     }
 
-    private boolean hasPendingWork(BlockPos root) {
-        return worksTrees() && isLogBase(root) || tendsCrops() && isMatureCrop(root) || canPlantAt(root);
-    }
-
-    private boolean canPlantAt(BlockPos root) {
-        if (!plantsSaplings() || managedCells.size() >= maxManagedCells() && !managedCells.containsKey(root)) {
-            return false;
-        }
-        BlockState current = level().getBlockState(root);
-        if (isPlantedBlock(current) || !current.canBeReplaced()) {
-            return false;
-        }
-        ItemStack sapling = plantingSapling(root);
-        return sapling.getItem() instanceof BlockItem blockItem
-                && isPlantableBlock(blockItem.getBlock())
-                && blockItem.getBlock().defaultBlockState().canSurvive(level(), root);
+    private boolean hasPendingHarvest(BlockPos root) {
+        return worksTrees() && isLogBase(root) || tendsCrops() && isMatureCrop(root);
     }
 
     private boolean harvestInReach(BlockPos railPos, List<BlockPos> workRoots, BlockPos logBase) {
@@ -3069,6 +3071,9 @@ public class ForestryCartEntity extends AbstractMinecart implements MenuProvider
 
         boolean powered = consumeEnergy(movementCharge(), false);
         double speed = powered ? (seekingTransfer ? transferSeekingCartSpeed() : poweredCartSpeed()) : unpoweredCartSpeed();
+        if (!seekingTransfer && plantStrideTicks > 0 && rollingHarvest()) {
+            speed = Math.min(speed, 1.0D / plantIntervalTicks());
+        }
         Vec3 railVelocity = railVelocity(railPos, nextDirection, speed);
         setYRot(nextDirection.toYRot());
         setDeltaMovement(new Vec3(railVelocity.x, getDeltaMovement().y, railVelocity.z));

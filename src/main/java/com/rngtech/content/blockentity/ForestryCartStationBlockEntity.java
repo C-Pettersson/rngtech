@@ -586,7 +586,8 @@ public class ForestryCartStationBlockEntity extends BlockEntity implements MenuP
 
     /**
      * Loads what the docked cart's Seed Library cells are waiting for first, making room by moving supply nobody waits
-     * for into the plantables buffer. Other plantables top up only species the cart already carries while cells wait.
+     * for into the plantables buffer. While the station still stocks a species cells wait for, other plantables top up
+     * only species the cart already carries; otherwise anything plantable tops up.
      */
     private boolean loadCartSaplings(ForestryCartEntity cart) {
         if (!hasSaplingsQueued()) {
@@ -609,9 +610,10 @@ public class ForestryCartStationBlockEntity extends BlockEntity implements MenuP
             takePlantables(item, loaded);
             moved += loaded;
         }
+        boolean demandStocked = demand.keySet().stream().anyMatch(item -> plantablesCount(item) > 0);
         for (int slot : plantablesSlots()) {
             ItemStack stack = processInventory.getStackInSlot(slot);
-            if (stack.isEmpty() || !demand.isEmpty() && cart.supplyCount(stack.getItem()) == 0) {
+            if (stack.isEmpty() || demandStocked && cart.supplyCount(stack.getItem()) == 0) {
                 continue;
             }
             ItemStack candidate = stack.copyWithCount(Math.min(CART_TRANSFER_LIMIT, stack.getCount()));
