@@ -17,7 +17,7 @@ The Melter requires three Gear-tab components before it can process:
 | Crush Head | Yes | Provides base-profile `PROCESSING_LEVEL`; the default lubricant recipes require level `6`. |
 | Battery Cell | No | Adds portable FE storage. Without a cell, the Melter keeps only its small working buffer and runs more slowly. |
 | Servo | No | Adds processing-speed and control contribution from the installed Servo stack. |
-| Fluid Pump | Yes | Required before processing. Enables output container filling and side fluid extraction, with transfer from the pump's base profile plus stored pump affixes. |
+| Fluid Pump | Yes | Required before processing. Enables output container filling and side fluid extraction, with transfer from the pump's base profile plus stored pump affixes. Fluid Capacity affixes on the pump, a flat Brimming prefix and a percent Depth suffix, size both Melter tanks. |
 
 ## Current Runtime Surface
 

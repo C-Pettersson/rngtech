@@ -29,13 +29,14 @@ export const FAMILIES = [
 const PERCENT_STATS = new Set([
     "LEDGER_RATE", "FLUX_RATE", "BLEND_SPEED", "SUPER_OUTPUT_CHANCE", "CRUSHER_SALVAGE_CHANCE", "INSTANT_PROCESS_CHANCE",
     "FLUID_YIELD", "OVERLEVEL_SPEED", "HEAT_WINDOW", "JAM_RECOVERY", "UNDER_LEVEL_EFFICIENCY", "AT_LEVEL_OUTPUT",
-    "OVERDRIVE_CAP", "OVERDRIVE_SPEED", "HIGH_HARDNESS_ENERGY_MITIGATION"
+    "OVERDRIVE_CAP", "OVERDRIVE_SPEED", "HIGH_HARDNESS_ENERGY_MITIGATION", "IDLE_CART_SPEED"
 ]);
 const UNITS = new Map([
     ["MOLD_SWAP_TIME", ["tick", "ticks"]],
     ["BLEND_HEAT_REDUCTION", ["°C", "°C"]],
     ["OVERDRIVE_MARGIN", ["°C", "°C"]],
-    ["SUPER_OUTPUT_CADENCE", ["cycle", "cycles"]]
+    ["SUPER_OUTPUT_CADENCE", ["cycle", "cycles"]],
+    ["WORK_RANGE", ["row", "rows"]]
 ]);
 const PASSIVE_LABELS = new Map([
     ["MANAGED_CELLS", ["managed cell", "managed cells"]],

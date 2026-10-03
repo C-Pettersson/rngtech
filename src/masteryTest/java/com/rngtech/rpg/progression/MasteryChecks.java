@@ -1,5 +1,6 @@
 package com.rngtech.rpg.progression;
 
+import com.rngtech.content.entity.ForestryCartRulesChecks;
 import com.rngtech.content.entity.ForestryTreeScanChecks;
 import com.rngtech.rpg.MachineModifier;
 import com.rngtech.rpg.MachineModifierEffect;
@@ -39,6 +40,17 @@ public final class MasteryChecks {
         checks += AscendancyChecks.run();
         System.out.println("Machine mastery: " + checks + " checks passed");
         ForestryTreeScanChecks.run();
+        ForestryCartRulesChecks.run();
+        modifierProfilesLoad();
+    }
+
+    /** Every modifier profile validates when its class loads; a broken profile crashes the game on world load instead. */
+    private static void modifierProfilesLoad() {
+        var profiles = com.rngtech.rpg.ModifierEligibilityProfiles.allProfiles();
+        if (profiles.isEmpty()) {
+            throw new AssertionError("modifier profiles load");
+        }
+        System.out.println("Modifier profiles: " + profiles.size() + " load and validate");
     }
 
     private static void keywordMath() {
@@ -94,7 +106,7 @@ public final class MasteryChecks {
     }
 
     private static void graphAndBuilds() {
-        require(MegaPassiveTree.TREE.nodes().size() == 1315, "full shared catalog");
+        require(MegaPassiveTree.TREE.nodes().size() == 1346, "full shared catalog");
         for (MegaPassiveNode root : MegaPassiveTree.TREE.nodes().stream().filter(n -> n.kind() == PassiveNodeKind.STARTER).toList()) {
             require(root.links().size() == 3, "three exits per starter");
             for (MegaPassiveNode key : MegaPassiveTree.TREE.nodes().stream().filter(n -> n.kind() == PassiveNodeKind.KEYSTONE).toList()) {

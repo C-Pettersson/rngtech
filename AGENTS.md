@@ -63,6 +63,8 @@ Launch the client:
 ./gradlew runClient
 ```
 
+In a linked git worktree, every run uses the main checkout's `run/` directory, so worktrees share its settings and worlds.
+
 Generate data resources:
 
 ```sh

@@ -12,6 +12,7 @@ public final class ModifierEligibilityProfiles {
     public static final String CRUSHER_FRAME_AFFIX_ID = "crusher_frame";
     public static final String CRUSHER_THROUGHPUT_AFFIX_ID = "crusher_throughput";
     public static final String ENERGY_GENERATION_FLAT_AFFIX_ID = "energy_generation_flat";
+    public static final String FLUID_CAPACITY_FLAT_AFFIX_ID = "fluid_capacity_flat";
     private static final int PROCESSING_SPECIFIC_SPEED_WEIGHT = 75;
     private static final int HIGH_IMPACT_CHANCE_WEIGHT = 35;
     private static final int OVERCLOCKED_WEIGHT = 25;
@@ -266,6 +267,16 @@ public final class ModifierEligibilityProfiles {
             new ModifierValueRange(250, 400, true),
             new ModifierValueRange(500, 800, true)
     );
+    /** Millibuckets of tank capacity a Fluid Pump adds to the machine it is installed in. */
+    private static final List<ModifierValueRange> FLUID_CAPACITY_ADD_RANGES = List.of(
+            new ModifierValueRange(250, 500, true),
+            new ModifierValueRange(500, 1000, true),
+            new ModifierValueRange(1000, 2000, true),
+            new ModifierValueRange(2000, 3000, true),
+            new ModifierValueRange(3000, 4500, true),
+            new ModifierValueRange(4500, 6500, true),
+            new ModifierValueRange(6500, 9000, true)
+    );
     private static final List<ModifierValueRange> ENERGY_GENERATION_ADD_RANGES = List.of(
             new ModifierValueRange(5, 10, true),
             new ModifierValueRange(10, 20, true),
@@ -370,6 +381,15 @@ public final class ModifierEligibilityProfiles {
     );
     private static final ModifierDefinition ENERGY_TRANSFER = percent(ModifierSlot.SUFFIX, MachineStat.ENERGY_TRANSFER);
     private static final ModifierDefinition FLUID_TRANSFER = percent(ModifierSlot.SUFFIX, MachineStat.FLUID_TRANSFER);
+    private static final ModifierDefinition FLUID_CAPACITY = percent(ModifierSlot.SUFFIX, MachineStat.FLUID_CAPACITY);
+    private static final ModifierDefinition FLUID_CAPACITY_ADD = ModifierDefinition.rollable(
+            FLUID_CAPACITY_FLAT_AFFIX_ID,
+            FLUID_CAPACITY_FLAT_AFFIX_ID,
+            ModifierSlot.PREFIX,
+            MachineStat.FLUID_CAPACITY,
+            ModifierOperation.ADD,
+            FLUID_CAPACITY_ADD_RANGES
+    );
     private static final ModifierDefinition FUEL_EFFICIENCY = percent(ModifierSlot.PREFIX, MachineStat.FUEL_EFFICIENCY);
     private static final ModifierDefinition STABILITY = percent(ModifierSlot.SUFFIX, MachineStat.STABILITY);
     private static final ModifierDefinition TEMPERATURE_STABILITY =
@@ -2312,12 +2332,15 @@ public final class ModifierEligibilityProfiles {
             "fluid_pump",
             Set.of(
                     ModifierCapability.HAS_GEAR_STATS,
+                    ModifierCapability.HAS_FLUID_STORAGE,
                     ModifierCapability.HAS_FLUID_INPUT,
                     ModifierCapability.HAS_FLUID_OUTPUT
             ),
             affixes(
-                    List.of(PUMP_SELF_PRIMING, PUMP_CHECK_VALVE, PUMP_PULSE, PUMP_SEAL_FLUSH, PUMP_HIGH_HEAD, PUMP_VAPOR_LOCK_BREAKER, PUMP_METERED_DRIP),
-                    MachineStat.FLUID_TRANSFER
+                    List.of(PUMP_SELF_PRIMING, PUMP_CHECK_VALVE, PUMP_PULSE, PUMP_SEAL_FLUSH, PUMP_HIGH_HEAD, PUMP_VAPOR_LOCK_BREAKER, PUMP_METERED_DRIP,
+                            FLUID_CAPACITY_ADD),
+                    MachineStat.FLUID_TRANSFER,
+                    MachineStat.FLUID_CAPACITY
             )
     );
     public static final ModifierEligibilityProfile SOLAR_ARRAY_EXTENDER = profile(
@@ -2895,7 +2918,7 @@ public final class ModifierEligibilityProfiles {
         put(definitions, ModifierCapability.HAS_IDLE_LOSS, IDLE_LOSS);
         put(definitions, ModifierCapability.HAS_GLOBAL_MODIFIER_EFFECTS, GLOBAL_MODIFIER_STRENGTH);
         put(definitions, ModifierCapability.HAS_STABILITY, STABILITY);
-        put(definitions, ModifierCapability.HAS_FLUID_STORAGE);
+        put(definitions, ModifierCapability.HAS_FLUID_STORAGE, FLUID_CAPACITY_ADD, FLUID_CAPACITY);
         put(definitions, ModifierCapability.HAS_FLUID_INPUT, FLUID_TRANSFER);
         put(definitions, ModifierCapability.HAS_FLUID_OUTPUT, FLUID_TRANSFER);
         put(
@@ -2993,6 +3016,7 @@ public final class ModifierEligibilityProfiles {
             case ENERGY_GENERATION -> ENERGY_GENERATION;
             case ENERGY_TRANSFER -> ENERGY_TRANSFER;
             case FLUID_TRANSFER -> FLUID_TRANSFER;
+            case FLUID_CAPACITY -> FLUID_CAPACITY;
             case FUEL_EFFICIENCY -> FUEL_EFFICIENCY;
             case STABILITY -> STABILITY;
             case TEMPERATURE_STABILITY -> TEMPERATURE_STABILITY;

@@ -17,6 +17,8 @@ import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.inventory.Slot;
+import net.neoforged.neoforge.items.SlotItemHandler;
 
 import java.util.List;
 import java.util.Locale;
@@ -41,6 +43,14 @@ public class ForestryCartScreen extends AbstractContainerScreen<ForestryCartMenu
     private static final int STATUS_ICON_Y = 52;
     private static final int ACTION_ICON_X = 150;
     private static final int ACTION_ICON_Y = 52;
+    private static final int RANGE_ICON_X = 134;
+    private static final int RANGE_ICON_Y = 38;
+    private static final int IDLE_ICON_X = 150;
+    private static final int IDLE_ICON_Y = 38;
+    private static final int WATER_GAUGE_X = 202;
+    private static final int WATER_GAUGE_Y = 42;
+    private static final int WATER_GAUGE_WIDTH = 8;
+    private static final int WATER = 0xFF3F76E4;
     private static final int SCAN_DEBUG_BUTTON_X = 166;
     private static final int SCAN_DEBUG_BUTTON_Y = 52;
     private static final int MANUAL_SPEED_BUTTON_X = 166;
@@ -137,6 +147,8 @@ public class ForestryCartScreen extends AbstractContainerScreen<ForestryCartMenu
     public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         super.render(guiGraphics, mouseX, mouseY, partialTick);
         renderTooltip(guiGraphics, mouseX, mouseY);
+        GearSlotTooltips.render(this, guiGraphics, font, mouseX, mouseY);
+        renderSupplySlotHint(guiGraphics, mouseX, mouseY);
         renderValueTooltips(guiGraphics, mouseX, mouseY);
         if (menu.selectedTab() == ForestryCartMenu.TAB_MASTERY) {
             masterySupport.renderTooltips(guiGraphics, font, leftPos, topPos, imageWidth, imageHeight, mouseX, mouseY);
@@ -164,9 +176,12 @@ public class ForestryCartScreen extends AbstractContainerScreen<ForestryCartMenu
             guiGraphics.drawString(font, playerInventoryTitle, inventoryLabelX, inventoryLabelY, TEXT, false);
             MachineScreenStyle.drawClippedCentered(guiGraphics, font, Component.translatable("rngtech.gear.battery_cell.short"), 51, 39, 30, TEXT_MUTED);
             MachineScreenStyle.drawClippedCentered(guiGraphics, font, Component.translatable("rngtech.gear.modular_tool.short"), 81, 39, 30, TEXT_MUTED);
-            MachineScreenStyle.drawClippedCentered(guiGraphics, font, Component.translatable("rngtech.gear.shears.short"), 111, 39, 32, TEXT_MUTED);
+            MachineScreenStyle.drawClippedCentered(guiGraphics, font, Component.translatable("rngtech.gear.shears.short"), 111, 39, 30, TEXT_MUTED);
+            MachineScreenStyle.drawClippedCentered(guiGraphics, font, Component.translatable("rngtech.gear.fluid_pump.short"), 21, 39, 26, TEXT_MUTED);
             MachineScreenStyle.drawClippedCentered(guiGraphics, font, Component.translatable("rngtech.forestry_station.saplings"), 52, 72, 50, TEXT_MUTED);
             MachineScreenStyle.drawClippedCentered(guiGraphics, font, Component.translatable("rngtech.forestry_station.output"), 146, 72, 110, TEXT_MUTED);
+            MachineScreenStyle.drawClippedCentered(guiGraphics, font, Component.literal(Integer.toString(Math.max(1, menu.workRange()))),
+                    RANGE_ICON_X + ICON_SIZE / 2, RANGE_ICON_Y + 2, ICON_SIZE - 2, 0xFFE0E0E0);
         } else if (menu.selectedTab() == ForestryCartMenu.TAB_STATS) {
             drawStatsLabels(guiGraphics);
         } else {
@@ -276,6 +291,7 @@ public class ForestryCartScreen extends AbstractContainerScreen<ForestryCartMenu
         renderSlotFrame(guiGraphics, 42, 51);
         renderSlotFrame(guiGraphics, 72, 51);
         renderSlotFrame(guiGraphics, 102, 51);
+        renderSlotFrame(guiGraphics, 12, 51);
         renderSlotFrame(guiGraphics, 42, 81);
         renderSlotFrame(guiGraphics, 60, 81);
         for (int slot = 0; slot < ForestryCartEntity.OUTPUT_SLOT_COUNT; slot++) {
@@ -308,6 +324,22 @@ public class ForestryCartScreen extends AbstractContainerScreen<ForestryCartMenu
                 y + ENERGY_GAUGE_Y + ENERGY_GAUGE_HEIGHT - 2,
                 ENERGY
         );
+        if (menu.waterCapacity() > 0 || menu.water() > 0) {
+            int capacity = Math.max(menu.water(), Math.max(1, menu.waterCapacity()));
+            int waterHeight = Math.round((ENERGY_GAUGE_HEIGHT - 4) * (float) menu.water() / capacity);
+            guiGraphics.fill(x + WATER_GAUGE_X, y + WATER_GAUGE_Y, x + WATER_GAUGE_X + WATER_GAUGE_WIDTH, y + WATER_GAUGE_Y + ENERGY_GAUGE_HEIGHT, 0xFF5F5F5F);
+            guiGraphics.fill(
+                    x + WATER_GAUGE_X + 2,
+                    y + WATER_GAUGE_Y + ENERGY_GAUGE_HEIGHT - 2 - waterHeight,
+                    x + WATER_GAUGE_X + WATER_GAUGE_WIDTH - 2,
+                    y + WATER_GAUGE_Y + ENERGY_GAUGE_HEIGHT - 2,
+                    WATER
+            );
+        }
+        renderIconBox(guiGraphics, RANGE_ICON_X, RANGE_ICON_Y);
+        renderIconBox(guiGraphics, IDLE_ICON_X, IDLE_ICON_Y);
+        guiGraphics.fill(x + IDLE_ICON_X + 3, y + IDLE_ICON_Y + 3, x + IDLE_ICON_X + 9, y + IDLE_ICON_Y + 9,
+                menu.idleSpeedActive() ? 0xFF5F7DA8 : PANEL_DARK);
         renderIconBox(guiGraphics, STATUS_ICON_X, STATUS_ICON_Y);
         guiGraphics.fill(x + STATUS_ICON_X + 3, y + STATUS_ICON_Y + 3, x + STATUS_ICON_X + 9, y + STATUS_ICON_Y + 9, statusColor());
         renderIconBox(guiGraphics, ACTION_ICON_X, ACTION_ICON_Y);
@@ -420,6 +452,11 @@ public class ForestryCartScreen extends AbstractContainerScreen<ForestryCartMenu
                         "rngtech.forestry_cart.stat.height_limit",
                         Integer.toString(menu.maxTreeHeight()),
                         Component.translatable("rngtech.forestry_cart.stat_tooltip.height_limit")
+                ),
+                stat(
+                        "rngtech.forestry_cart.stat.reserved_plantables",
+                        Integer.toString(menu.reservedPlantables()),
+                        Component.translatable("rngtech.forestry_cart.stat_tooltip.reserved_plantables", menu.reservedPlantables())
                 ),
                 stat(
                         "rngtech.forestry_cart.stat.action_interval",
@@ -602,6 +639,7 @@ public class ForestryCartScreen extends AbstractContainerScreen<ForestryCartMenu
             case ForestryCartStationBlockEntity.ACTION_SCANNING_LOG_BASES -> Component.translatable("rngtech.forestry_station.action.scanning_log_bases");
             case ForestryCartStationBlockEntity.ACTION_CREATING_SNAPSHOT -> Component.translatable("rngtech.forestry_station.action.creating_snapshot");
             case ForestryCartStationBlockEntity.ACTION_HARVESTING_LEAVES -> Component.translatable("rngtech.forestry_station.action.harvesting_leaves");
+            case ForestryCartStationBlockEntity.ACTION_HARVESTING_CROP -> Component.translatable("rngtech.forestry_station.action.harvesting_crop");
             case ForestryCartStationBlockEntity.ACTION_HARVESTING_LOG -> Component.translatable("rngtech.forestry_station.action.harvesting_log");
             case ForestryCartStationBlockEntity.ACTION_TREEFELLER_BATCH -> Component.translatable("rngtech.forestry_station.action.treefeller_batch");
             case ForestryCartStationBlockEntity.ACTION_PLANTING -> Component.translatable("rngtech.forestry_station.action.planting");
@@ -623,6 +661,7 @@ public class ForestryCartScreen extends AbstractContainerScreen<ForestryCartMenu
     private int actionColor() {
         return switch (menu.currentAction()) {
             case ForestryCartStationBlockEntity.ACTION_HARVESTING_LEAVES,
+                    ForestryCartStationBlockEntity.ACTION_HARVESTING_CROP,
                     ForestryCartStationBlockEntity.ACTION_HARVESTING_LOG,
                     ForestryCartStationBlockEntity.ACTION_TREEFELLER_BATCH,
                     ForestryCartStationBlockEntity.ACTION_PLANTING,
@@ -660,6 +699,27 @@ public class ForestryCartScreen extends AbstractContainerScreen<ForestryCartMenu
                     FERTILIZER_BAR_WIDTH,
                     4,
                     Component.translatable("rngtech.forestry_station.tooltip.fertilizer", menu.fertilizer(), ForestryCartEntity.FERTILIZER_CAPACITY)
+            );
+        }
+        if (menu.selectedTab() == ForestryCartMenu.TAB_CART) {
+            CompactValueText.renderTooltipIfHovered(guiGraphics, font, leftPos, topPos, mouseX, mouseY, RANGE_ICON_X, RANGE_ICON_Y, ICON_SIZE, ICON_SIZE,
+                    Component.translatable("rngtech.forestry_cart.tooltip.work_range", Math.max(1, menu.workRange())));
+            CompactValueText.renderTooltipIfHovered(guiGraphics, font, leftPos, topPos, mouseX, mouseY, IDLE_ICON_X, IDLE_ICON_Y, ICON_SIZE, ICON_SIZE,
+                    Component.translatable(menu.idleSpeedActive() ? "rngtech.forestry_cart.tooltip.idle_speed_on" : "rngtech.forestry_cart.tooltip.idle_speed_off"));
+        }
+        if (menu.selectedTab() == ForestryCartMenu.TAB_CART && (menu.waterCapacity() > 0 || menu.water() > 0)) {
+            CompactValueText.renderTooltipIfHovered(
+                    guiGraphics,
+                    font,
+                    leftPos,
+                    topPos,
+                    mouseX,
+                    mouseY,
+                    WATER_GAUGE_X,
+                    WATER_GAUGE_Y,
+                    WATER_GAUGE_WIDTH,
+                    ENERGY_GAUGE_HEIGHT,
+                    Component.translatable("rngtech.forestry_cart.tooltip.water", menu.water(), Math.max(menu.water(), menu.waterCapacity()))
             );
         }
         if (menu.selectedTab() == ForestryCartMenu.TAB_CART) {
@@ -831,6 +891,20 @@ public class ForestryCartScreen extends AbstractContainerScreen<ForestryCartMenu
     @Override public boolean charTyped(char character, int modifiers) {
         if (menu.selectedTab() == ForestryCartMenu.TAB_MASTERY && masterySupport.charTyped(character)) { return true; }
         return super.charTyped(character, modifiers);
+    }
+
+
+    /** Hovering an empty supply slot says what this cart plants. */
+    private void renderSupplySlotHint(GuiGraphics guiGraphics, int mouseX, int mouseY) {
+        Slot slot = hoveredSlot;
+        if (menu.selectedTab() != ForestryCartMenu.TAB_CART || slot == null || slot.hasItem() || !(slot instanceof SlotItemHandler)
+                || menu.isGearSlot(slot) || slot.getSlotIndex() >= ForestryCartEntity.OUTPUT_SLOT_START) {
+            return;
+        }
+        guiGraphics.renderComponentTooltip(font, List.of(
+                Component.translatable("rngtech.forestry_cart.slot.supply").withStyle(ChatFormatting.YELLOW),
+                Component.translatable("rngtech.forestry_cart.slot.supply.hint").withStyle(ChatFormatting.GRAY)
+        ), mouseX, mouseY);
     }
 
 }

@@ -609,7 +609,7 @@
         ]
     },
     "metrics": {
-        "nodes": 1315,
+        "nodes": 1346,
         "starts": 6,
         "startPositions": {
             "start_control": {
@@ -640,17 +640,17 @@
         "kinds": {
             "STARTER": 6,
             "TRAVEL": 634,
-            "NODE": 458,
-            "NOTABLE": 186,
+            "NODE": 480,
+            "NOTABLE": 195,
             "KEYSTONE": 31
         },
-        "groups": 392,
-        "edges": 1464,
-        "cycleRank": 150,
+        "groups": 398,
+        "edges": 1499,
+        "cycleRank": 154,
         "investment": {
             "travelNodes": 634,
-            "rewardPockets": 123,
-            "rewardComponents": 134,
+            "rewardPockets": 129,
+            "rewardComponents": 140,
             "minimumGateTravel": 2,
             "notablePointsFromRoad": {
                 "min": 3,
@@ -664,7 +664,7 @@
         "overlaps": 0,
         "throughNodes": 0,
         "crossings": 0,
-        "medianLength": 72.42237223399962,
+        "medianLength": 71.8679344353238,
         "p90Length": 95.88013350011566,
         "distances": {
             "start_control": {

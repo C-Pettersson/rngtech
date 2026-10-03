@@ -593,8 +593,8 @@ final class AscendancyChecks {
         near(AscendancyFormulas.ledgerShare(baronStats, 1, true), 0.56, "Heartwood doubles it to the bound's 56% of a batch log");
         require(MegaPassiveTree.has(baron, "CLEARCUT_CHARTER") && MegaPassiveTree.has(baron, "LOG_LEDGER"), "Clearcut Charter builds on the Log Ledger");
         var sprinter = forestryStats(ascendedForestry("timber_baron", List.of("rail_speed", "dock_sprint", "rolling_speed", "rolling_harvest")));
-        near(sprinter.value(MachineStat.CART_SPEED), 1.2, "two Cart Speed nodes make the cart 20% faster");
-        near(sprinter.valueWithIncreased(MachineStat.CART_SPEED, 50), 1.7, "Dock Sprint adds 50% while seeking a station");
+        near(sprinter.value(MachineStat.CART_SPEED), 1.3, "two Cart Speed nodes make the cart 30% faster");
+        near(sprinter.valueWithIncreased(MachineStat.CART_SPEED, 50), 1.8, "Dock Sprint adds 50% while seeking a station");
 
         var warden = ascendedForestry("grove_warden", List.of("soil_pulse", "rich_soil", "surge_pulse", "verdant_surge"));
         var wardenStats = forestryStats(warden);
@@ -603,8 +603,39 @@ final class AscendancyChecks {
                 "the fraction of Growth Pulse is a chance for one more use");
         require(MegaPassiveTree.has(warden, "FERTILIZER_PULSE"), "the Grove Warden root spends bone meal on each pulse");
         var nursery = ascendedForestry("grove_warden", List.of("nursery_cells", "nursery", "grove_cells", "ancient_grove"));
-        require(MegaPassiveTree.passive(nursery, PassiveStatType.MANAGED_CELLS) == 12, "Nursery nodes add 12 managed cells");
+        require(MegaPassiveTree.passive(nursery, PassiveStatType.MANAGED_CELLS) == 32, "Spare Plots and Old Rows add 32 managed cells");
+        near(forestryStats(ascendedForestry("grove_warden", List.of())).value(MachineStat.WORK_RANGE), 1, "a cart works one row per side");
+        near(forestryStats(nursery).value(MachineStat.WORK_RANGE), 3, "Nursery widens the cart to three rows per side");
+        near(forestryStats(sharedForestry(List.of("far_rows"))).value(MachineStat.WORK_RANGE), 2, "Far Rows adds a row");
+        near(forestryStats(sharedForestry(List.of("far_rows", "outer_rows"))).value(MachineStat.WORK_RANGE), 3, "Outer Rows adds another");
+        var farRows = sharedForestry(List.of("far_rows"));
+        require(MegaPassiveTree.allocationPath(node -> farRows.allocatedNodes().contains(node.id()), MegaPassiveTree.node("outer_rows")).size() >= 8,
+                "the two shared Work Range notables sit in separate, distant clusters");
+        var idle = forestryStats(sharedForestry(List.of("open_track")));
+        require(AscendancyFormulas.idleCartSpeedPercent(idle, AscendancyFormulas.IDLE_CART_TICKS - 1) == 0.0, "Idle Cart Speed waits 4 seconds");
+        require(AscendancyFormulas.idleCartSpeedPercent(idle, AscendancyFormulas.IDLE_CART_TICKS) > 0.0, "Idle Cart Speed applies after 4 seconds");
+        var driven = sharedForestry(List.of("driven_wheels"));
+        var drivenStats = forestryStats(driven);
+        require(drivenStats.value(MachineStat.CART_SPEED) > forestryStats(sharedForestry(List.of("greased_rails"))).value(MachineStat.CART_SPEED),
+                "Driven Wheels scales Cart Speed from Drive");
         require(AscendancyFormulas.pulseAttempts(forestryStats(ascendedForestry("grove_warden", List.of())), 0.0) == 1, "the root pulses once");
+
+        require(AscendancyCatalog.forFamily(MachineMasteryFamily.FORESTRY).stream().map(Ascendancy::id).toList()
+                .equals(List.of("timber_baron", "grove_warden", "field_hand")), "Forestry ships Timber Baron, Grove Warden, and Field Hand");
+        var fieldHand = ascendedForestry("field_hand", List.of());
+        require(MegaPassiveTree.has(fieldHand, "CROP_TENDING") && MegaPassiveTree.has(fieldHand, "NO_TREE_WORK"),
+                "the Field Hand root tends crops and gives up tree work");
+        near(forestryStats(fieldHand).value(MachineStat.WORK_RANGE), 2, "the Field Hand root adds a row");
+        var openFields = ascendedForestry("field_hand", List.of("furrow_cells", "wide_furrows", "long_furrows", "open_fields"));
+        near(forestryStats(openFields).value(MachineStat.WORK_RANGE), 4, "Wide Furrows and Open Fields reach four rows per side");
+        require(MegaPassiveTree.passive(openFields, PassiveStatType.MANAGED_CELLS) == 64, "the furrow branch adds 64 managed cells");
+        Ascendancy field = AscendancyCatalog.get("field_hand");
+        for (String deep : List.of("open_fields", "irrigation", "rolling_reap")) {
+            require(field.isDeep(field.node(deep)), deep + " is a deep notable");
+        }
+        var sprinkler = ascendedForestry("field_hand", List.of("hose_fittings", "sprinkler", "wide_nozzles", "irrigation"));
+        require(MegaPassiveTree.has(sprinkler, "SPRINKLER") && MegaPassiveTree.has(sprinkler, "IRRIGATION"), "Irrigation builds on the Sprinkler");
+        near(forestryStats(sprinkler).value(MachineStat.FLUID_CAPACITY), 12000, "the sprinkler branch's two small nodes grow the 8,000 mB tank by half");
     }
 
     /** Every family's crest faces away from the tree's center and sits clear of links and nodes at each zoom. */
@@ -649,6 +680,17 @@ final class AscendancyChecks {
 
     private static MachineProgressionState ascendedForestry(String ascendancy, List<String> nodes) {
         return new MachineProgressionState(0, 0, 1, List.of(), MachineMasteryFamily.FORESTRY.startNodeId(), List.of(), false, ascendancy, nodes, 3);
+    }
+
+    /** A Forestry build that allocates the shortest routes to the given shared-tree nodes. */
+    private static MachineProgressionState sharedForestry(List<String> targets) {
+        String start = MachineMasteryFamily.FORESTRY.startNodeId();
+        java.util.Set<String> allocated = new java.util.LinkedHashSet<>();
+        for (String target : targets) {
+            MegaPassiveTree.allocationPath(node -> node.id().equals(start) || allocated.contains(node.id()), MegaPassiveTree.node(target))
+                    .forEach(node -> allocated.add(node.id()));
+        }
+        return new MachineProgressionState(0, 0, MachineProgressionState.MAX_LEVEL, List.copyOf(allocated), start, List.of(), false, "", List.of(), 0);
     }
 
     private static MachineStatAccumulator forestryStats(MachineProgressionState state) {

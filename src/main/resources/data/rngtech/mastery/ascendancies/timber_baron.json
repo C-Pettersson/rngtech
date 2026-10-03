@@ -80,7 +80,7 @@
                 {
                     "stat": "CART_SPEED",
                     "operation": "INCREASED_PERCENT",
-                    "value": 10
+                    "value": 15
                 }
             ]
         },
@@ -159,7 +159,7 @@
                 {
                     "stat": "CART_SPEED",
                     "operation": "INCREASED_PERCENT",
-                    "value": 10
+                    "value": 15
                 }
             ]
         },

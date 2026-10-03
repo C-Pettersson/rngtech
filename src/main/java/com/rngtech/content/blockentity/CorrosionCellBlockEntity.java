@@ -373,13 +373,26 @@ public class CorrosionCellBlockEntity extends BaseMachineBlockEntity implements 
         clampInternalEnergy();
     }
 
+    /** Fluid Capacity, from Fluid Pump affixes, sizes the electrolyte tank; fluid above a smaller capacity stays until used. */
+    private void updateTankCapacity(MachineStatAccumulator stats) {
+        int capacity = Math.max(TANK_CAPACITY, (int) Math.round(stats.value(MachineStat.FLUID_CAPACITY)));
+        if (electrolyteTank.getCapacity() != capacity) {
+            electrolyteTank.setCapacity(capacity);
+        }
+    }
+
     private boolean tickCell() {
-        if (level == null || redstoneDisabled()) {
+        if (level == null) {
+            resetBulkSpeed();
+            return false;
+        }
+        MachineStatAccumulator stats = effectiveStats();
+        updateTankCapacity(stats);
+        if (redstoneDisabled()) {
             resetBulkSpeed();
             return false;
         }
 
-        MachineStatAccumulator stats = effectiveStats();
         if (!hasActiveRecipe() && !tryStartRecipe(stats)) {
             return false;
         }

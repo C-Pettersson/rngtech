@@ -52,6 +52,9 @@ public final class ModTags {
         /** Saplings Ancient Grove plants as 2x2 giant trees. */
         public static final TagKey<Item> GIANT_SAPLINGS =
                 TagKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath(RNGTech.MOD_ID, "giant_saplings"));
+        /** Crop items a Field Hand Forestry Companion plants on farmland. */
+        public static final TagKey<Item> CART_CROPS =
+                TagKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath(RNGTech.MOD_ID, "cart_crops"));
         public static final TagKey<Item> METAL_PRESS_MOLDS =
                 TagKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath(RNGTech.MOD_ID, "metal_press_molds"));
         public static final TagKey<Item> MANUAL_RECYCLER_INPUTS =

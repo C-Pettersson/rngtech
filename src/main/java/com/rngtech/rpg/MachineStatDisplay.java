@@ -85,6 +85,8 @@ public final class MachineStatDisplay {
             case FLUID_YIELD, OVERLEVEL_SPEED -> formatSignedPercentPoints(value);
             case CART_SPEED -> formatMultiplierDelta(value);
             case GROWTH_PULSE -> formatNumber(value) + " bone meal";
+            case WORK_RANGE -> formatUnit(value, "row", "rows");
+            case IDLE_CART_SPEED -> formatSignedPercentPoints(value);
             case SUPER_OUTPUT_CADENCE -> value < 1.0 ? "off" : "every " + formatUnit(value, "cycle", "cycles");
             case OVERDRIVE_SPEED -> formatSignedPercentPoints(value) + " per 10 \u00b0C";
             case OVERDRIVE_MARGIN -> formatNumber(value) + " \u00b0C";
@@ -183,6 +185,8 @@ public final class MachineStatDisplay {
             case COIL_REACH -> formatSignedUnit(value, "stage", "stages");
             case FLUID_YIELD, OVERLEVEL_SPEED -> formatSignedPercentPoints(value);
             case GROWTH_PULSE -> formatSignedNumber(value) + " bone meal";
+            case WORK_RANGE -> formatSignedUnit(value, "row", "rows");
+            case IDLE_CART_SPEED -> formatSignedPercentPoints(value);
             case SUPER_OUTPUT_CADENCE -> formatSignedUnit(value, "cycle", "cycles");
             case OVERDRIVE_SPEED -> formatSignedPercentPoints(value) + " per 10 \u00b0C";
             case OVERDRIVE_MARGIN -> formatSignedNumber(value) + " \u00b0C";
