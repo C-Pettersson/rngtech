@@ -52,9 +52,6 @@ public final class RNGTechJadePlugin implements IWailaPlugin {
 
     @Override
     public void registerClient(IWailaClientRegistration registration) {
-        registration.addConfig(MachineStateProvider.MACHINE.getUid(), true);
-        registration.addConfig(MachineStateProvider.UNIVERSAL_CONNECTOR.getUid(), true);
-        registration.addConfig(MachineStateProvider.CABLE_CONNECTOR.getUid(), true);
         registration.registerBlockComponent(MachineStateProvider.MACHINE, BaseMachineBlock.class);
         registration.registerBlockComponent(MachineStateProvider.UNIVERSAL_CONNECTOR, UniversalConnectorBlock.class);
         registration.registerBlockComponent(MachineStateProvider.CABLE_CONNECTOR, CableBlock.class);
