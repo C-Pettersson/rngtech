@@ -708,7 +708,7 @@ final class AscendancyPanel {
     }
 
     /**
-     * The root's effects, then each deep notable, which defines the build. Lines give way, deep notables first, until the
+     * The root's effects, then each deep notable. Lines give way, deep notables first, until the
      * tree keeps {@link #CARD_MIN_TREE_HEIGHT}; the card's tooltip still lists the root's effects.
      */
     private List<Line> cardLines(Font font, int[] card, Ascendancy ascendancy) {
