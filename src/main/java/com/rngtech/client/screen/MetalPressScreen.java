@@ -397,6 +397,13 @@ public class MetalPressScreen extends AbstractContainerScreen<MetalPressMenu> {
                 y + PROGRESS_BAR_Y + PROGRESS_BAR_HEIGHT - 1,
                 PROGRESS
         );
+        float ledger = menu.ledgerProgress();
+        if (ledger >= 0.0F) {
+            // The Batch Ledger fills a thin line along the progress bar's bottom edge.
+            int ledgerY = y + PROGRESS_BAR_Y + PROGRESS_BAR_HEIGHT - 1;
+            guiGraphics.fill(x + PROGRESS_BAR_X + 1, ledgerY, x + PROGRESS_BAR_X + PROGRESS_BAR_WIDTH - 1, ledgerY + 1, 0xFF3A3326);
+            guiGraphics.fill(x + PROGRESS_BAR_X + 1, ledgerY, x + PROGRESS_BAR_X + 1 + Math.round((PROGRESS_BAR_WIDTH - 2) * ledger), ledgerY + 1, 0xFFD3A33A);
+        }
 
         guiGraphics.fill(x + ENERGY_BAR_X, y + BAR_Y, x + ENERGY_BAR_X + BAR_WIDTH, y + BAR_Y + BAR_HEIGHT, 0xFF5F5F5F);
         int energyHeight = Math.round(BAR_FILL_HEIGHT * menu.energyProgress());
@@ -603,8 +610,12 @@ public class MetalPressScreen extends AbstractContainerScreen<MetalPressMenu> {
         }
         int progress = menu.progress();
         int remaining = Math.max(0, ticks - progress);
+        float ledger = menu.ledgerProgress();
         return List.of(
-                Component.translatable("rngtech.press.tooltip.progress", progress, ticks, remaining),
+                ledger < 0.0F
+                        ? Component.translatable("rngtech.press.tooltip.progress", progress, ticks, remaining)
+                        : Component.translatable("rngtech.press.tooltip.progress", progress, ticks, remaining).append(" ")
+                                .append(Component.translatable("rngtech.press.tooltip.batch_ledger", Math.round(ledger * 100))),
                 Component.translatable(
                         "rngtech.press.tooltip.progress.energy",
                         CompactValueText.energyRate(menu.energyPerTick()),
@@ -659,6 +670,8 @@ public class MetalPressScreen extends AbstractContainerScreen<MetalPressMenu> {
             case MetalPressBlockEntity.STATUS_NO_POWER -> Component.translatable("rngtech.press.status.no_power");
             case MetalPressBlockEntity.STATUS_POWER_DROP -> Component.translatable("rngtech.press.status.power_drop");
             case MetalPressBlockEntity.STATUS_WARMING -> Component.translatable("rngtech.press.status.warming", menu.targetTemperature());
+            case MetalPressBlockEntity.STATUS_ROUTE_DISABLED -> Component.translatable("rngtech.press.status.route_disabled");
+            case MetalPressBlockEntity.STATUS_SWAPPING_MOLD -> Component.translatable("rngtech.press.status.swapping_mold");
             default -> Component.translatable("rngtech.press.status.ready");
         };
     }
@@ -672,6 +685,7 @@ public class MetalPressScreen extends AbstractContainerScreen<MetalPressMenu> {
                     MetalPressBlockEntity.STATUS_MISSING_SERVO,
                     MetalPressBlockEntity.STATUS_MISSING_MOLD,
                     MetalPressBlockEntity.STATUS_HEAT_LOW,
+                    MetalPressBlockEntity.STATUS_SWAPPING_MOLD,
                     MetalPressBlockEntity.STATUS_WARMING -> STATUS_WARN;
             default -> STATUS_ERROR;
         };
@@ -707,7 +721,10 @@ public class MetalPressScreen extends AbstractContainerScreen<MetalPressMenu> {
                     )
             );
         }
-        return statLines;
+        return MachineScreenStyle.fitStatLines(
+                MachineScreenStyle.withAscendancyStats(statLines, menu.ascendancyStats()),
+                MachineScreenStyle.maxStatRows(STAT_PANEL_Y, BASE_IMAGE_HEIGHT)
+        );
     }
 
     private boolean isIntegralStat(int dataIndex) {

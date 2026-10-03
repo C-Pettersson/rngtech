@@ -1,12 +1,17 @@
 package com.rngtech.client.screen;
 
+import com.rngtech.RNGTech;
 import com.rngtech.content.menu.MasteryMenuView;
 import com.rngtech.content.network.MasteryActionPayload;
 import com.rngtech.rpg.MachineStat;
 import com.rngtech.rpg.MachineStatDisplay;
+import com.rngtech.rpg.progression.AscendancyCatalog;
+import com.rngtech.rpg.progression.AscendancyNode;
 import com.rngtech.rpg.progression.MachineMasteryFamily;
 import com.rngtech.rpg.progression.MachineProgressionState;
+import com.rngtech.rpg.progression.MasteryApplicability;
 import com.rngtech.rpg.progression.MasteryBuildCode;
+import com.rngtech.rpg.progression.MasteryEffectSource;
 import com.rngtech.rpg.progression.MegaPassiveNode;
 import com.rngtech.rpg.progression.MegaPassiveTree;
 import com.rngtech.rpg.progression.PassiveNode;
@@ -83,6 +88,9 @@ public final class MasteryScreenSupport<N extends PassiveNode> {
     private static final int SEARCH_HIGHLIGHT = 0xFFE1F0FF;
     private static final int TARGET_BORDER = 0xFF8E9BE8;
     private static final int[] NO_ROUTE = new int[0];
+    private static final ResourceLocation ASCENDANCY_CREST = RNGTech.id("textures/gui/mastery/ascendancy_crest.png");
+    private static final int CREST_SIZE = MasteryCrestPlacement.CREST_SIZE;
+    private static final int CREST_SOCKET = 0xFF3A2F5C;
 
     private final List<N> nodes;
     private final N starter;
@@ -103,6 +111,7 @@ public final class MasteryScreenSupport<N extends PassiveNode> {
     private final int[] linkTo;
     private final List<ResourceLocation> iconTextures;
     private final int[][] iconPositions;
+    private final AscendancyPanel ascendancy;
     private final MasterySummaryDrawer summary;
 
     private final BitSet allocated = new BitSet();
@@ -126,6 +135,8 @@ public final class MasteryScreenSupport<N extends PassiveNode> {
     private double panX;
     private double panY;
     private double zoom = 1.0D;
+    /** The crest's direction around the start node, chosen once from the tree layout. */
+    private double crestAngle = Double.NaN;
     private double compactPanX;
     private double compactPanY;
     private double compactZoom = 1.0D;
@@ -219,7 +230,9 @@ public final class MasteryScreenSupport<N extends PassiveNode> {
         this.iconPositions = iconGroups.values().stream()
                 .map(positions -> positions.stream().mapToInt(Integer::intValue).toArray())
                 .toArray(int[][]::new);
-        this.summary = new MasterySummaryDrawer(view, node -> position(node) >= 0 ? nodeTooltip(position(node)) : List.of());
+        this.ascendancy = new AscendancyPanel(view, palette, this::send);
+        this.summary = new MasterySummaryDrawer(view, source -> source instanceof AscendancyNode node ? ascendancy.nodeTooltip(node, false)
+                : source instanceof PassiveNode node && position(node) >= 0 ? nodeTooltip(position(node)) : List.of());
     }
 
     public boolean expanded() {
@@ -294,11 +307,22 @@ public final class MasteryScreenSupport<N extends PassiveNode> {
             drawNode(shapes, leftPos, topPos, position);
         }
         drawHighlights(shapes, leftPos, topPos, hovered, hoveredRoute);
+        Badge badge = ascendancy.isOpen() ? null : badge(leftPos, topPos);
+        boolean badgeHovered = badge != null && overBadge(leftPos, topPos, imageWidth, imageHeight, mouseX, mouseY);
+        if (badge != null) {
+            drawBadgeGlow(shapes, badge, badgeHovered);
+        }
         shapes.flush();
         drawIcons(guiGraphics, leftPos, topPos, viewLeft, viewTop, viewRight, viewBottom);
+        if (badge != null) {
+            drawBadgeCrest(guiGraphics, badge);
+        }
         guiGraphics.disableScissor();
-        if (expanded) {
-            summary.render(guiGraphics, Minecraft.getInstance().font, viewBounds(leftPos, topPos, imageWidth, imageHeight), mouseX, mouseY);
+        MasterySummaryDrawer.Bounds bounds = viewBounds(leftPos, topPos, imageWidth, imageHeight);
+        if (ascendancy.isOpen()) {
+            ascendancy.render(guiGraphics, Minecraft.getInstance().font, bounds, mouseX, mouseY);
+        } else if (expanded) {
+            summary.render(guiGraphics, Minecraft.getInstance().font, bounds, mouseX, mouseY);
         }
     }
 
@@ -359,14 +383,22 @@ public final class MasteryScreenSupport<N extends PassiveNode> {
             guiGraphics.renderComponentTooltip(font, List.of(xpTooltip()), mouseX, mouseY);
             return;
         }
+        if (ascendancy.isOpen()) {
+            if (isOverViewport(leftPos, topPos, imageWidth, imageHeight, mouseX, mouseY)) {
+                renderWrapped(guiGraphics, font, ascendancy.tooltip(viewBounds(leftPos, topPos, imageWidth, imageHeight), font, mouseX, mouseY), mouseX, mouseY);
+            }
+            return;
+        }
         if (expanded) {
             List<Component> drawer = summary.tooltip(viewBounds(leftPos, topPos, imageWidth, imageHeight), font, mouseX, mouseY);
             if (!drawer.isEmpty()) {
-                List<FormattedCharSequence> lines = new ArrayList<>();
-                drawer.forEach(line -> lines.addAll(font.split(line, MASTERY_TOOLTIP_WIDTH)));
-                guiGraphics.renderTooltip(font, lines, mouseX, mouseY);
+                renderWrapped(guiGraphics, font, drawer, mouseX, mouseY);
                 return;
             }
+        }
+        if (overBadge(leftPos, topPos, imageWidth, imageHeight, mouseX, mouseY)) {
+            renderWrapped(guiGraphics, font, ascendancy.badgeTooltip(), mouseX, mouseY);
+            return;
         }
         int hovered = panning() ? -1 : hoveredNode(leftPos, topPos, imageWidth, imageHeight, mouseX, mouseY);
         if (hovered >= 0) {
@@ -383,6 +415,9 @@ public final class MasteryScreenSupport<N extends PassiveNode> {
             int imageWidth,
             int imageHeight
     ) {
+        if (ascendancy.isOpen() && isOverViewport(leftPos, topPos, imageWidth, imageHeight, mouseX, mouseY)) {
+            return ascendancy.mouseClicked(viewBounds(leftPos, topPos, imageWidth, imageHeight), mouseX, mouseY, button);
+        }
         if (button == 1) {
             int hovered = hoveredNode(leftPos, topPos, imageWidth, imageHeight, mouseX, mouseY);
             if (hovered >= 0
@@ -424,6 +459,10 @@ public final class MasteryScreenSupport<N extends PassiveNode> {
             return true;
         }
         if (expanded && summary.mouseClicked(viewBounds(leftPos, topPos, imageWidth, imageHeight), mouseX, mouseY)) {
+            return true;
+        }
+        if (overBadge(leftPos, topPos, imageWidth, imageHeight, mouseX, mouseY)) {
+            ascendancy.toggle();
             return true;
         }
         if (isOverViewport(leftPos, topPos, imageWidth, imageHeight, mouseX, mouseY)) {
@@ -498,6 +537,9 @@ public final class MasteryScreenSupport<N extends PassiveNode> {
         if (!isOverViewport(leftPos, topPos, imageWidth, imageHeight, mouseX, mouseY)) {
             return false;
         }
+        if (ascendancy.isOpen()) {
+            return ascendancy.mouseScrolled(scrollY);
+        }
         if (expanded && summary.mouseScrolled(viewBounds(leftPos, topPos, imageWidth, imageHeight), Minecraft.getInstance().font, mouseX, mouseY, scrollY)) {
             return true;
         }
@@ -522,6 +564,7 @@ public final class MasteryScreenSupport<N extends PassiveNode> {
 
     public boolean keyPressed(int key, int scan, int modifiers, int width, int height) {
         if (key == 70 && Screen.hasControlDown()) { searchFocused = true; return true; }
+        if (key == 256 && !searchFocused && ascendancy.isOpen()) { ascendancy.close(); return true; }
         if (!searchFocused) { return false; }
         if (key == 256) { searchFocused = false; return true; }
         if (key == 259 && !search.isEmpty()) { search = search.substring(0, search.length() - 1); searchCursor = 0; }
@@ -980,52 +1023,16 @@ public final class MasteryScreenSupport<N extends PassiveNode> {
             tooltip.add(Component.translatable("rngtech.mastery.tooltip.notable").withStyle(ChatFormatting.AQUA));
         }
         if (node instanceof MegaPassiveNode shared) {
-            // Tagged payoffs come first, then the costs every machine pays.
-            for (var tagged : shared.tagged()) {
-                Component text = taggedText(tagged);
-                tooltip.add(view.masterySupports(tagged) ? text.copy().withStyle(ChatFormatting.GRAY)
-                        : Component.translatable("rngtech.mastery.inactive", text).withStyle(ChatFormatting.DARK_GRAY));
-                List<Component> members = tagged.tag().members().stream().map(family -> (Component) Component.translatable(family.translationKey())).toList();
-                tooltip.add(Component.translatable("rngtech.mastery.tag.members", Component.translatable(tagged.tag().translationKey()),
-                        ComponentUtils.formatList(members, Component.literal(", "))).withStyle(ChatFormatting.DARK_GRAY));
-            }
-        }
-        for (var effect : node.effects()) {
-            Component text = MachineStatDisplay.effectText(effect);
-            tooltip.add(view.masterySupports(effect.stat()) ? text.copy().withStyle(ChatFormatting.GRAY)
-                    : Component.translatable("rngtech.mastery.inactive", text).withStyle(ChatFormatting.DARK_GRAY));
-        }
-        for (PassiveNodeFlag flag : node.flags()) {
-            tooltip.add(Component.translatable(flagTranslationKey(flag)).withStyle(ChatFormatting.GOLD));
-        }
-        for (PassiveStatType stat : PassiveStatType.values()) {
-            int value = node.passiveStat(stat);
-            if (value != 0) {
-                tooltip.add(applicability(Component.translatable(passiveStatTranslationKey(stat), signed(value)), view.masteryFamily().supports(stat)));
-            }
-        }
-        if (node instanceof MegaPassiveNode shared) {
-            shared.fixed().forEach((stat, value) -> tooltip.add(applicability(Component.translatable("rngtech.mastery.fixed", Component.translatable(stat.translationKey()), MachineStatDisplay.formatNumber(value)), view.masterySupportsAbsolute(stat))));
-            shared.ceilings().forEach((stat, value) -> tooltip.add(applicability(Component.translatable("rngtech.mastery.ceiling", Component.translatable(stat.translationKey()), MachineStatDisplay.formatNumber(value)), view.masterySupportsAbsolute(stat))));
-            for (var scaling : shared.scaling()) {
-                tooltip.add(applicability(Component.translatable("rngtech.mastery.scaling", MachineStatDisplay.formatNumber(scaling.perPoint()),
-                        Component.translatable("rngtech.mastery.operation." + scaling.operation().name().toLowerCase(Locale.ROOT)),
-                        Component.translatable(scaling.stat().translationKey()), Component.translatable(scaling.attribute().translationKey())), view.masterySupports(scaling.stat())));
-            }
-            for (String behavior : shared.behaviors()) {
-                if (!behavior.equals("MUTE_MACHINE_SOUND")) {
-                    tooltip.add(applicability(Component.translatable("rngtech.mastery.behavior." + behavior.toLowerCase(Locale.ROOT)), view.masterySupportsBehavior(behavior)));
-                }
-            }
-            if (shared.recipeHardnessCeiling() > 0) {
-                tooltip.add(applicability(Component.translatable("rngtech.mastery.hardness_ceiling", shared.recipeHardnessCeiling()), view.masteryFamily() == MachineMasteryFamily.CRUSHER));
-            }
+            effectLines(shared, view, tooltip);
             if (shared.kind() == PassiveNodeKind.STARTER) {
                 if (shared.id().equals(view.masteryFamily().startNodeId())) {
                     for (var attribute : List.of(MachineStat.CONTROL, MachineStat.DRIVE, MachineStat.RESERVE)) {
                         tooltip.add(Component.translatable("rngtech.mastery.attribute_total", Component.translatable(attribute.translationKey()), MachineStatDisplay.formatNumber(view.masteryAttribute(attribute))).withStyle(ChatFormatting.AQUA));
                     }
                     tooltip.add(Component.translatable("rngtech.mastery.tooltip.unlocked").withStyle(ChatFormatting.GREEN));
+                    if (ascendancy.available()) {
+                        tooltip.add(Component.translatable("rngtech.mastery.ascendancy.start_hint").withStyle(ChatFormatting.GOLD));
+                    }
                 } else {
                     tooltip.add(Component.translatable("rngtech.mastery.other_start").withStyle(ChatFormatting.DARK_GRAY));
                 }
@@ -1034,7 +1041,23 @@ public final class MasteryScreenSupport<N extends PassiveNode> {
             if (allocated.get(position)) {
                 tooltip.add(Component.translatable("rngtech.mastery.refund_hint").withStyle(ChatFormatting.DARK_GRAY));
             }
-        } else { callbacks.appendSpecialTooltip(node, tooltip); }
+        } else {
+            for (var effect : node.effects()) {
+                Component text = MachineStatDisplay.effectText(effect);
+                tooltip.add(view.masterySupports(effect.stat()) ? text.copy().withStyle(ChatFormatting.GRAY)
+                        : Component.translatable("rngtech.mastery.inactive", text).withStyle(ChatFormatting.DARK_GRAY));
+            }
+            for (PassiveNodeFlag flag : node.flags()) {
+                tooltip.add(Component.translatable(flagTranslationKey(flag)).withStyle(ChatFormatting.GOLD));
+            }
+            for (PassiveStatType stat : PassiveStatType.values()) {
+                int value = node.passiveStat(stat);
+                if (value != 0) {
+                    tooltip.add(applicability(Component.translatable(passiveStatTranslationKey(stat), signed(value)), view.masteryFamily().supports(stat)));
+                }
+            }
+            callbacks.appendSpecialTooltip(node, tooltip);
+        }
         if (node.alwaysAllocated()) {
             tooltip.add(Component.translatable("rngtech.mastery.tooltip.unlocked").withStyle(ChatFormatting.GREEN));
             return tooltip;
@@ -1053,6 +1076,51 @@ public final class MasteryScreenSupport<N extends PassiveNode> {
         return tooltip;
     }
 
+    /**
+     * Effect lines for shared-tree and ascendancy nodes, in one order: tagged payoffs, effects, the mute flag, passive
+     * stats, limits, scaling, behaviors, and the hardness ceiling. Lines that do not apply to this machine are dimmed.
+     */
+    static void effectLines(MasteryEffectSource source, MasteryApplicability machine, List<Component> tooltip) {
+        // Tagged payoffs come first, then the costs every machine pays.
+        for (var tagged : source.tagged()) {
+            Component text = taggedText(tagged);
+            tooltip.add(machine.masterySupports(tagged) ? text.copy().withStyle(ChatFormatting.GRAY)
+                    : Component.translatable("rngtech.mastery.inactive", text).withStyle(ChatFormatting.DARK_GRAY));
+            List<Component> members = tagged.tag().members().stream().map(family -> (Component) Component.translatable(family.translationKey())).toList();
+            tooltip.add(Component.translatable("rngtech.mastery.tag.members", Component.translatable(tagged.tag().translationKey()),
+                    ComponentUtils.formatList(members, Component.literal(", "))).withStyle(ChatFormatting.DARK_GRAY));
+        }
+        for (var effect : source.effects()) {
+            Component text = MachineStatDisplay.effectText(effect);
+            tooltip.add(machine.masterySupports(effect.stat()) ? text.copy().withStyle(ChatFormatting.GRAY)
+                    : Component.translatable("rngtech.mastery.inactive", text).withStyle(ChatFormatting.DARK_GRAY));
+        }
+        if (source.behaviors().contains("MUTE_MACHINE_SOUND")) {
+            tooltip.add(Component.translatable(flagTranslationKey(PassiveNodeFlag.MUTE_MACHINE_SOUND)).withStyle(ChatFormatting.GOLD));
+        }
+        for (PassiveStatType stat : PassiveStatType.values()) {
+            int value = source.passive().getOrDefault(stat, 0);
+            if (value != 0) {
+                tooltip.add(applicability(Component.translatable(passiveStatTranslationKey(stat), signed(value)), machine.masteryFamily().supports(stat)));
+            }
+        }
+        source.fixed().forEach((stat, value) -> tooltip.add(applicability(Component.translatable("rngtech.mastery.fixed", Component.translatable(stat.translationKey()), MachineStatDisplay.formatNumber(value)), machine.masterySupportsAbsolute(stat))));
+        source.ceilings().forEach((stat, value) -> tooltip.add(applicability(Component.translatable("rngtech.mastery.ceiling", Component.translatable(stat.translationKey()), MachineStatDisplay.formatNumber(value)), machine.masterySupportsAbsolute(stat))));
+        for (var scaling : source.scaling()) {
+            tooltip.add(applicability(Component.translatable("rngtech.mastery.scaling", MachineStatDisplay.formatNumber(scaling.perPoint()),
+                    Component.translatable("rngtech.mastery.operation." + scaling.operation().name().toLowerCase(Locale.ROOT)),
+                    Component.translatable(scaling.stat().translationKey()), Component.translatable(scaling.attribute().translationKey())), machine.masterySupports(scaling.stat())));
+        }
+        for (String behavior : source.behaviors()) {
+            if (!behavior.equals("MUTE_MACHINE_SOUND")) {
+                tooltip.add(applicability(Component.translatable("rngtech.mastery.behavior." + behavior.toLowerCase(Locale.ROOT)), machine.masterySupportsBehavior(behavior)));
+            }
+        }
+        if (source.recipeHardnessCeiling() > 0) {
+            tooltip.add(applicability(Component.translatable("rngtech.mastery.hardness_ceiling", source.recipeHardnessCeiling()), machine.masteryFamily() == MachineMasteryFamily.CRUSHER));
+        }
+    }
+
     private Component routeTooltip(int[] steps) {
         return switch (routeStatus(steps)) {
             case READY -> (steps.length == 1
@@ -1069,8 +1137,9 @@ public final class MasteryScreenSupport<N extends PassiveNode> {
     }
 
     private int hoveredNode(int leftPos, int topPos, int imageWidth, int imageHeight, double mouseX, double mouseY) {
-        if (!isOverViewport(leftPos, topPos, imageWidth, imageHeight, mouseX, mouseY)
-                || expanded && summary.covers(viewBounds(leftPos, topPos, imageWidth, imageHeight), mouseX, mouseY)) {
+        if (ascendancy.isOpen() || !isOverViewport(leftPos, topPos, imageWidth, imageHeight, mouseX, mouseY)
+                || expanded && summary.covers(viewBounds(leftPos, topPos, imageWidth, imageHeight), mouseX, mouseY)
+                || overBadge(leftPos, topPos, imageWidth, imageHeight, mouseX, mouseY)) {
             return -1;
         }
         double contentX = screenToContentX(mouseX, leftPos);
@@ -1095,6 +1164,68 @@ public final class MasteryScreenSupport<N extends PassiveNode> {
             }
         }
         return best;
+    }
+
+    /** The Ascendancy crest sits beside the start node, at the upper right unless links or nodes need that space. */
+    private Badge badge(int leftPos, int topPos) {
+        int starterPosition = position(starter);
+        if (starterPosition < 0 || !ascendancy.available()) {
+            return null;
+        }
+        if (Double.isNaN(crestAngle)) {
+            crestAngle = MasteryCrestPlacement.angle(centerX, centerY, radius, linkSegments, starterPosition);
+        }
+        float startRadius = screenRadius(starterPosition);
+        float offset = MasteryCrestPlacement.offset(startRadius);
+        return new Badge(screenX(centerX[starterPosition], leftPos) + (float) Math.cos(crestAngle) * offset,
+                screenY(centerY[starterPosition], topPos) + (float) Math.sin(crestAngle) * offset,
+                MasteryCrestPlacement.crestHalf(startRadius), MasteryCrestPlacement.crestSize(startRadius));
+    }
+
+    private boolean overBadge(int leftPos, int topPos, int imageWidth, int imageHeight, double mouseX, double mouseY) {
+        Badge badge = ascendancy.isOpen() || panning() ? null : badge(leftPos, topPos);
+        return badge != null && isOverViewport(leftPos, topPos, imageWidth, imageHeight, mouseX, mouseY)
+                && !(expanded && summary.covers(viewBounds(leftPos, topPos, imageWidth, imageHeight), mouseX, mouseY))
+                && Math.abs(mouseX - badge.x()) + Math.abs(mouseY - badge.y()) <= badge.half() + 1.0F;
+    }
+
+    /**
+     * A soft gold glow pulses behind the crest while a Seal can be used or points wait, and holds bright on hover. Three
+     * sockets under the crest light up for the earned Seal tiers.
+     */
+    private void drawBadgeGlow(GuiShapeBatch shapes, Badge badge, boolean hovered) {
+        float half = badge.half();
+        if (hovered || ascendancy.needsAttention()) {
+            double pulse = hovered ? 1.0D : 0.5D + 0.5D * Math.sin(Util.getMillis() / 260.0D);
+            int alpha = (int) (0x30 + 0x50 * pulse);
+            int gold = AscendancyPanel.ACCENT & 0xFFFFFF;
+            shapes.diamond(badge.x(), badge.y(), half + 8.0F, alpha / 4 << 24 | gold);
+            shapes.diamond(badge.x(), badge.y(), half + 5.0F, alpha / 2 << 24 | gold);
+            shapes.diamond(badge.x(), badge.y(), half + 2.5F, alpha << 24 | gold);
+        }
+        int tiers = snapshot.sealTiers();
+        float pip = Math.max(1.5F, half * 0.16F);
+        float pipY = badge.y() + half + pip + 2.0F;
+        for (int tier = 0; tier < AscendancyCatalog.MAX_TIERS; tier++) {
+            float pipX = badge.x() + (tier - 1) * pip * 2.8F;
+            shapes.diamond(pipX, pipY, pip + 1.0F, 0xFF080D11);
+            shapes.diamond(pipX, pipY, pip, tier < tiers ? AscendancyPanel.ACCENT : CREST_SOCKET);
+        }
+    }
+
+    private void drawBadgeCrest(GuiGraphics guiGraphics, Badge badge) {
+        int size = badge.size();
+        guiGraphics.blit(ASCENDANCY_CREST, Math.round(badge.x() - size / 2.0F), Math.round(badge.y() - size / 2.0F), size, size,
+                0, 0, CREST_SIZE, CREST_SIZE, CREST_SIZE, CREST_SIZE);
+    }
+
+    private static void renderWrapped(GuiGraphics guiGraphics, Font font, List<Component> tooltip, int mouseX, int mouseY) {
+        if (tooltip.isEmpty()) {
+            return;
+        }
+        List<FormattedCharSequence> lines = new ArrayList<>();
+        tooltip.forEach(line -> lines.addAll(font.split(line, MASTERY_TOOLTIP_WIDTH)));
+        guiGraphics.renderTooltip(font, lines, mouseX, mouseY);
     }
 
     private void renderToolbar(GuiGraphics graphics, int left, int top, int width) {
@@ -1189,11 +1320,14 @@ public final class MasteryScreenSupport<N extends PassiveNode> {
         clampAfterGeometryChange(imageWidth, imageHeight);
     }
 
+    /** Panning reaches half a view past the outermost nodes, so an edge node can be brought to the middle of the view. */
     private void setPan(double nextPanX, double nextPanY, int imageWidth, int imageHeight) {
-        double minPanX = contentMinX - MASTERY_CONTENT_PADDING - MASTERY_VIEW_X / zoom;
-        double maxPanX = contentMaxX + MASTERY_CONTENT_PADDING - viewRight(imageWidth) / zoom;
-        double minPanY = contentMinY - MASTERY_CONTENT_PADDING - MASTERY_VIEW_Y / zoom;
-        double maxPanY = contentMaxY + MASTERY_CONTENT_PADDING - viewBottom(imageHeight) / zoom;
+        double reachX = Math.max(MASTERY_CONTENT_PADDING, viewWidth(imageWidth) / 2.0D / zoom);
+        double reachY = Math.max(MASTERY_CONTENT_PADDING, viewHeight(imageHeight) / 2.0D / zoom);
+        double minPanX = contentMinX - reachX - MASTERY_VIEW_X / zoom;
+        double maxPanX = contentMaxX + reachX - viewRight(imageWidth) / zoom;
+        double minPanY = contentMinY - reachY - MASTERY_VIEW_Y / zoom;
+        double maxPanY = contentMaxY + reachY - viewBottom(imageHeight) / zoom;
         panX = minPanX > maxPanX ? (minPanX + maxPanX) / 2.0D : Mth.clamp(nextPanX, minPanX, maxPanX);
         panY = minPanY > maxPanY ? (minPanY + maxPanY) / 2.0D : Mth.clamp(nextPanY, minPanY, maxPanY);
     }
@@ -1320,6 +1454,9 @@ public final class MasteryScreenSupport<N extends PassiveNode> {
 
     private static String signed(int value) {
         return value > 0 ? "+" + value : Integer.toString(value);
+    }
+
+    private record Badge(float x, float y, float half, int size) {
     }
 
     private enum RouteStatus {

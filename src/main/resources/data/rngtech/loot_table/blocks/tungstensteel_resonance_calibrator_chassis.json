@@ -15,7 +15,9 @@
             {
               "function": "minecraft:copy_components",
               "include": [
-                "rngtech:machine_traits"
+                "rngtech:machine_traits",
+                "rngtech:machine_progression",
+                "rngtech:calibration_streak"
               ],
               "source": "block_entity"
             }

@@ -38,7 +38,7 @@ public enum MachineMasteryFamily {
             case "BLOCK_BATTERY", "MATCHING_HEAD", "DENSE_PARALLEL" -> this == CRUSHER;
             case "QUENCH_PROTOCOL", "CLOSED_LOOP_RECUPERATOR" -> this == FURNACE;
             case "MAGNET_MODE", "SERRATED_LEAF_PROTOCOL", "MANUAL_THROTTLE", "COASTING_CLUTCH", "SEEDLING_MAGNET" -> this == FORESTRY;
-            default -> false;
+            default -> MasteryDeclarations.families(behavior).contains(this);
         };
     }
 
@@ -59,8 +59,10 @@ public enum MachineMasteryFamily {
             case ENERGY_CAPACITY, INSTANT_PROCESS_CHANCE -> this != FORESTRY;
             case SUPER_OUTPUT_CHANCE -> this != FORESTRY && this != MELTER;
             case ENERGY_CAPACITY_FLAT -> this == CRUSHER || this == FURNACE;
-            // Only the Crusher reads Output Amount and Parallel Jobs; other machines' bonus output is Super Output.
-            case OUTPUT_AMOUNT, PARALLEL_JOBS -> this == CRUSHER;
+            // Only the Crusher reads Output Amount; other machines' bonus output is Super Output. Parallel Jobs reach the
+            // Metal Press, Resonance Calibrator, and Melter only through their ascendancies' batching.
+            case OUTPUT_AMOUNT -> this == CRUSHER;
+            case PARALLEL_JOBS -> this == CRUSHER || this == METAL_PRESS || this == RESONANCE_CALIBRATOR || this == MELTER;
             case MAX_TEMPERATURE, HEAT_TRANSFER -> heatChassis() || this == MELTER;
             case HEAT_ISOLATION, TEMPERATURE_STABILITY, WARMUP_TIME, COOLING_RATE, OVERHEAT_TOLERANCE -> heatChassis();
             case FUEL_DURATION, FUEL_EFFICIENCY -> this == FURNACE;
@@ -69,7 +71,7 @@ public enum MachineMasteryFamily {
             case PROCESSING_LEVEL, OUTPUT_GUARD_GRACE, NO_BATTERY_OUTPUT_RETENTION,
                     HIGH_HARDNESS_ENERGY_MITIGATION, CRUSHER_INPUT_FILTER, CRUSHER_SALVAGE_CHANCE -> this == CRUSHER;
             case TREE_FELL_LIMIT -> this == FORESTRY;
-            default -> false;
+            default -> MasteryDeclarations.families(stat).contains(this);
         };
     }
 

@@ -16,7 +16,8 @@
               "function": "minecraft:copy_components",
               "include": [
                 "rngtech:machine_traits",
-                "rngtech:machine_progression"
+                "rngtech:machine_progression",
+                "rngtech:output_banks"
               ],
               "source": "block_entity"
             }

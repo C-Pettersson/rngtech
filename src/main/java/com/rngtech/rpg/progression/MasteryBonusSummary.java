@@ -23,10 +23,10 @@ public final class MasteryBonusSummary {
     /**
      * One summary line. {@code effect} holds the combined change for effects and conversions, the combined per-point
      * value for scaling, and the limit for fixed values and ceilings. {@code attribute} names the source attribute of a
-     * conversion or scaling line. Sources list one allocated node per contribution.
+     * conversion or scaling line. Sources list one allocated shared-tree or ascendancy node per contribution.
      */
     public record Line(Kind kind, boolean active, MachineModifierEffect effect, MachineStat attribute, String behavior,
-                       PassiveStatType passive, int amount, List<MegaPassiveNode> sources) {
+                       PassiveStatType passive, int amount, List<MasteryEffectSource> sources) {
         public Line {
             sources = List.copyOf(sources);
         }
@@ -35,7 +35,8 @@ public final class MasteryBonusSummary {
     private MasteryBonusSummary() { }
 
     public static List<Line> of(MachineProgressionState state, MasteryApplicability machine, double control, double drive, double reserve) {
-        List<MegaPassiveNode> allocated = state.allocatedNodes().stream().map(MegaPassiveTree::node).filter(Objects::nonNull).toList();
+        List<MasteryEffectSource> allocated = new ArrayList<>(state.allocatedNodes().stream().map(MegaPassiveTree::node).filter(Objects::nonNull).toList());
+        allocated.addAll(AscendancyCatalog.allocated(state, machine.masteryFamily()));
         Map<EffectKey, Total> effects = new LinkedHashMap<>();
         Map<ScalingKey, Total> scaling = new LinkedHashMap<>();
         Map<MachineStat, Total> fixed = new EnumMap<>(MachineStat.class);
@@ -43,7 +44,7 @@ public final class MasteryBonusSummary {
         Map<PassiveStatType, Total> passive = new EnumMap<>(PassiveStatType.class);
         Map<String, Total> behaviors = new LinkedHashMap<>();
         Total hardness = null;
-        for (MegaPassiveNode node : allocated) {
+        for (MasteryEffectSource node : allocated) {
             node.effects().forEach(effect -> addEffect(effects, effect, machine.masterySupports(effect.stat()), node));
             node.tagged().forEach(tagged -> addEffect(effects, tagged.effect(), machine.masterySupports(tagged), node));
             node.scaling().forEach(s -> scaling.computeIfAbsent(new ScalingKey(s.attribute(), s.stat(), s.operation()), key -> new Total(0)).add(s.perPoint(), node));
@@ -81,7 +82,7 @@ public final class MasteryBonusSummary {
         return List.copyOf(lines);
     }
 
-    private static void addEffect(Map<EffectKey, Total> effects, MachineModifierEffect effect, boolean active, MegaPassiveNode node) {
+    private static void addEffect(Map<EffectKey, Total> effects, MachineModifierEffect effect, boolean active, MasteryEffectSource node) {
         ModifierOperation bucket = switch (effect.operation()) {
             case ADD -> ModifierOperation.ADD;
             case INCREASED_PERCENT, DECREASED_PERCENT -> ModifierOperation.INCREASED_PERCENT;
@@ -126,23 +127,23 @@ public final class MasteryBonusSummary {
 
     private static final class Total {
         private double value;
-        private final List<MegaPassiveNode> sources = new ArrayList<>();
+        private final List<MasteryEffectSource> sources = new ArrayList<>();
 
         private Total(double initial) {
             value = initial;
         }
 
-        private void add(double amount, MegaPassiveNode node) {
+        private void add(double amount, MasteryEffectSource node) {
             value += amount;
             sources.add(node);
         }
 
-        private void multiply(double factor, MegaPassiveNode node) {
+        private void multiply(double factor, MasteryEffectSource node) {
             value *= factor;
             sources.add(node);
         }
 
-        private void min(double limit, MegaPassiveNode node) {
+        private void min(double limit, MasteryEffectSource node) {
             value = Math.min(value, limit);
             sources.add(node);
         }

@@ -1,6 +1,6 @@
 # RNGTech Moddex
 
-Static modifier-pool, rolling simulator, recipe bill-of-material explorer, component-stage preview, and GUI layout editor for RNGTech.
+Static modifier-pool, rolling simulator, recipe bill-of-material explorer, component-stage preview, ascendancy browser, and GUI layout editor for RNGTech.
 
 Run:
 
@@ -37,6 +37,37 @@ npm run moddex:check
 ```
 
 The smoke check also fails when the RBOM exporter finds overlapping crafting recipes with different outputs, including collisions against built-in vanilla iron tool recipe sentinels.
+
+The smoke check runs the recipe loop audit and the recycling return check. Run the loop audit directly, with `--report` to list every loop found:
+
+```sh
+node tools/moddex/check-recipe-loops.mjs --report
+```
+
+The audit reads every recipe type, the vanilla tags and crafting it chains into, and `tools/moddex/recipe-loop-bounds.json`. The bounds file sets:
+
+- the free items and free input keys;
+- the worst-case bonus multiplier for each recipe type;
+- the Potential Reactor stripping payout and the recyclable items it cannot strip;
+- an allowlist of reviewed loops, each with a reason.
+
+A linear program finds the loop with the largest gain. Each loop found is shrunk to a minimal recipe set, reported with a likely fix, and then set aside so the search can surface the next one. Mutation self-tests re-enable bonus output on known loops and fail when the audit misses them. Every stat or behavior declared with a yield in `data/rngtech/mastery/declarations.json` must be covered by a bound.
+
+The Ascendancies tab browses the shipped [ascendancy](../../docs/systems/machine-mastery.md#ascendancies) catalog by Mastery family. It draws each ascendancy's tree, lists every node's effects and behaviors, highlights search matches, and shows each declared stat or behavior with its yield kind and the loop-audit bound that covers it. `export-ascendancy-data.mjs` builds `tools/moddex/generated/ascendancies.json` from `data/rngtech/mastery` and the language file when the server starts.
+
+The same exporter writes the node tables on each family page between `<!-- ascendancy-trees:start -->` and `<!-- ascendancy-trees:end -->`. Regenerate them after changing an ascendancy, its names, or its behavior tooltips:
+
+```sh
+node tools/moddex/export-ascendancy-data.mjs --write-docs
+```
+
+The smoke check fails when those tables are stale or a declared stat has no row in Machine Stats.
+
+The recycling return check compares every Component Recycler recipe with every recipe that makes its input, and fails when a return exceeds what the craft consumed of the same item. Add `--report --recycler-super-output` to list the recipes that recycler Super Output would break:
+
+```sh
+node tools/moddex/check-recycling-returns.mjs --report --recycler-super-output
+```
 
 Check Java passive-tree geometry and graph constraints directly:
 

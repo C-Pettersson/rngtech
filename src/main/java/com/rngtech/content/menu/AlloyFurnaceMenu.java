@@ -28,6 +28,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.neoforged.neoforge.items.ItemStackHandler;
 import net.neoforged.neoforge.items.SlotItemHandler;
 
+import java.util.List;
 import java.util.function.BooleanSupplier;
 
 public class AlloyFurnaceMenu extends AbstractContainerMenu implements MasteryMenuView<MegaPassiveNode> {
@@ -64,7 +65,9 @@ public class AlloyFurnaceMenu extends AbstractContainerMenu implements MasteryMe
     private static final int DATA_WARMUP_TIME = 24;
     private static final int DATA_COOLING_RATE = 25;
     private static final int DATA_OVERHEAT_TOLERANCE = 26;
-    private static final int DATA_MACHINE_PROGRESSION_START = 27;
+    private static final int DATA_LEDGER = 27;
+    private static final int DATA_LEDGER_BLEND = 28;
+    private static final int DATA_MACHINE_PROGRESSION_START = 29;
     private static final int DATA_COUNT = DATA_MACHINE_PROGRESSION_START + MasteryMenuSupport.FIELD_COUNT;
     private static final int STAT_SCALE = 100;
     private static final int PROCESS_SLOT_COUNT = AlloyFurnaceBlockEntity.PROCESS_SLOT_COUNT;
@@ -169,6 +172,16 @@ public class AlloyFurnaceMenu extends AbstractContainerMenu implements MasteryMe
 
     public int selectedTab() {
         return selectedTab;
+    }
+
+    /** The flux or blend ledger's progress toward its next unit, from 0 to 1, or -1 when neither applies. */
+    public float ledgerProgress() {
+        int value = data.get(DATA_LEDGER);
+        return value < 0 ? -1.0F : Math.min(1.0F, value / 1000.0F);
+    }
+
+    public boolean ledgerIsBlend() {
+        return data.get(DATA_LEDGER_BLEND) != 0;
     }
 
     public float processingProgress() {
@@ -313,6 +326,16 @@ public class AlloyFurnaceMenu extends AbstractContainerMenu implements MasteryMe
     @Override
     public MachineProgressionState masterySnapshot() {
         return MasteryMenuSupport.snapshot(data, DATA_MACHINE_PROGRESSION_START, masteryFamily());
+    }
+
+    @Override
+    public int ascendancyEntryStage() {
+        return MasteryMenuSupport.ascendancyEntryStage(data, DATA_MACHINE_PROGRESSION_START);
+    }
+
+    @Override
+    public List<MasteryMenuSupport.GrantedStat> ascendancyStats() {
+        return MasteryMenuSupport.grantedStats(data, DATA_MACHINE_PROGRESSION_START);
     }
 
     private boolean hasPassiveNodeIndex(int index) {

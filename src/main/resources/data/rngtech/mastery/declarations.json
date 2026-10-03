@@ -1,0 +1,634 @@
+{
+    "version": 1,
+    "stats": [
+        {
+            "stat": "HARDNESS_TOLERANCE",
+            "families": [
+                "crusher"
+            ],
+            "yield": "none"
+        },
+        {
+            "stat": "JAM_CHANCE",
+            "families": [
+                "crusher"
+            ],
+            "yield": "none"
+        },
+        {
+            "stat": "JAM_RECOVERY",
+            "families": [
+                "crusher"
+            ],
+            "yield": "none"
+        },
+        {
+            "stat": "UNDER_LEVEL_EFFICIENCY",
+            "families": [
+                "crusher"
+            ],
+            "yield": "none"
+        },
+        {
+            "stat": "BANK_MEMORY",
+            "families": [
+                "crusher"
+            ],
+            "yield": "output"
+        },
+        {
+            "stat": "AT_LEVEL_OUTPUT",
+            "families": [
+                "crusher"
+            ],
+            "yield": "output"
+        },
+        {
+            "stat": "SUPER_OUTPUT_CADENCE",
+            "families": [
+                "crusher",
+                "alloy_furnace"
+            ],
+            "yield": "output"
+        },
+        {
+            "stat": "OVERDRIVE_SPEED",
+            "families": [
+                "furnace"
+            ],
+            "yield": "none"
+        },
+        {
+            "stat": "OVERDRIVE_CAP",
+            "families": [
+                "furnace"
+            ],
+            "yield": "none"
+        },
+        {
+            "stat": "OVERDRIVE_MARGIN",
+            "families": [
+                "furnace"
+            ],
+            "yield": "none"
+        },
+        {
+            "stat": "STRAIN_RECOVERY",
+            "families": [
+                "furnace"
+            ],
+            "yield": "none"
+        },
+        {
+            "stat": "LEDGER_RATE",
+            "families": [
+                "furnace",
+                "alloy_furnace",
+                "metal_press",
+                "forestry"
+            ],
+            "yield": "output"
+        },
+        {
+            "stat": "FLUX_RATE",
+            "families": [
+                "alloy_furnace"
+            ],
+            "yield": "input"
+        },
+        {
+            "stat": "BLEND_SPEED",
+            "families": [
+                "alloy_furnace"
+            ],
+            "yield": "none"
+        },
+        {
+            "stat": "BLEND_HEAT_REDUCTION",
+            "families": [
+                "alloy_furnace"
+            ],
+            "yield": "none"
+        },
+        {
+            "stat": "MOLD_SWAP_TIME",
+            "families": [
+                "metal_press"
+            ],
+            "yield": "none"
+        },
+        {
+            "stat": "HEAT_WINDOW",
+            "families": [
+                "metal_press"
+            ],
+            "yield": "none"
+        },
+        {
+            "stat": "STREAK_FLOOR",
+            "families": [
+                "resonance_calibrator"
+            ],
+            "yield": "none"
+        },
+        {
+            "stat": "STREAK_CAP",
+            "families": [
+                "resonance_calibrator"
+            ],
+            "yield": "none"
+        },
+        {
+            "stat": "COIL_REACH",
+            "families": [
+                "resonance_calibrator"
+            ],
+            "yield": "none"
+        },
+        {
+            "stat": "FLUID_YIELD",
+            "families": [
+                "melter"
+            ],
+            "yield": "output"
+        },
+        {
+            "stat": "OVERLEVEL_SPEED",
+            "families": [
+                "melter"
+            ],
+            "yield": "none"
+        },
+        {
+            "stat": "FLUID_CAPACITY",
+            "families": [
+                "melter"
+            ],
+            "yield": "none"
+        },
+        {
+            "stat": "CART_SPEED",
+            "families": [
+                "forestry"
+            ],
+            "yield": "none"
+        },
+        {
+            "stat": "GROWTH_PULSE",
+            "families": [
+                "forestry"
+            ],
+            "yield": "output"
+        }
+    ],
+    "behaviors": [
+        {
+            "id": "FAULT_LINES",
+            "families": [
+                "crusher"
+            ],
+            "yield": "output"
+        },
+        {
+            "id": "SHATTER_POINT",
+            "families": [
+                "crusher"
+            ],
+            "yield": "none"
+        },
+        {
+            "id": "RUBBLE_RECLAIMER",
+            "families": [
+                "crusher"
+            ],
+            "yield": "output"
+        },
+        {
+            "id": "PERSISTENT_BANKS",
+            "families": [
+                "crusher"
+            ],
+            "yield": "output"
+        },
+        {
+            "id": "COMPOUND_YIELD",
+            "families": [
+                "crusher"
+            ],
+            "yield": "output"
+        },
+        {
+            "id": "TAILINGS_RECOVERY",
+            "families": [
+                "crusher"
+            ],
+            "yield": "output"
+        },
+        {
+            "id": "REFINERS_OATH",
+            "families": [
+                "crusher"
+            ],
+            "yield": "output"
+        },
+        {
+            "id": "HOLD_THE_FIRE",
+            "families": [
+                "furnace"
+            ],
+            "yield": "none"
+        },
+        {
+            "id": "SAFE_OVERDRIVE",
+            "families": [
+                "furnace"
+            ],
+            "yield": "none"
+        },
+        {
+            "id": "SHARED_HEARTH",
+            "families": [
+                "furnace"
+            ],
+            "yield": "none"
+        },
+        {
+            "id": "CRUCIBLE_HEART",
+            "families": [
+                "furnace"
+            ],
+            "yield": "none"
+        },
+        {
+            "id": "FLUXED_BLEND",
+            "families": [
+                "furnace"
+            ],
+            "yield": "none"
+        },
+        {
+            "id": "SLAG_RECLAIM",
+            "families": [
+                "furnace"
+            ],
+            "yield": "none"
+        },
+        {
+            "id": "CRUSHER_LINE",
+            "families": [
+                "furnace"
+            ],
+            "yield": "output"
+        },
+        {
+            "id": "CLEAN_BLOOM",
+            "families": [
+                "furnace"
+            ],
+            "yield": "none"
+        },
+        {
+            "id": "REACTIVE_FLUX",
+            "families": [
+                "alloy_furnace"
+            ],
+            "yield": "input"
+        },
+        {
+            "id": "RECIPE_LOCK",
+            "families": [
+                "alloy_furnace"
+            ],
+            "yield": "none"
+        },
+        {
+            "id": "DROSS_SKIMMING",
+            "families": [
+                "alloy_furnace"
+            ],
+            "yield": "input"
+        },
+        {
+            "id": "HEAT_ECONOMY",
+            "families": [
+                "alloy_furnace"
+            ],
+            "yield": "none"
+        },
+        {
+            "id": "BLEND_REVERSAL",
+            "families": [
+                "alloy_furnace"
+            ],
+            "yield": "output"
+        },
+        {
+            "id": "TEMPERED_CRUCIBLE",
+            "families": [
+                "alloy_furnace"
+            ],
+            "yield": "none"
+        },
+        {
+            "id": "STEADY_SUPPLY",
+            "families": [
+                "alloy_furnace"
+            ],
+            "yield": "none"
+        },
+        {
+            "id": "CONTINUOUS_POUR",
+            "families": [
+                "alloy_furnace"
+            ],
+            "yield": "none"
+        },
+        {
+            "id": "MASTER_BLEND",
+            "families": [
+                "alloy_furnace"
+            ],
+            "yield": "none"
+        },
+        {
+            "id": "MOLD_RACK",
+            "families": [
+                "metal_press"
+            ],
+            "yield": "none"
+        },
+        {
+            "id": "QUICK_CHANGE",
+            "families": [
+                "metal_press"
+            ],
+            "yield": "none"
+        },
+        {
+            "id": "TOLERANCE_MAP",
+            "families": [
+                "metal_press"
+            ],
+            "yield": "none"
+        },
+        {
+            "id": "CIRCUIT_DISCIPLINE",
+            "families": [
+                "metal_press"
+            ],
+            "yield": "none"
+        },
+        {
+            "id": "SERVO_SYNC",
+            "families": [
+                "metal_press"
+            ],
+            "yield": "none"
+        },
+        {
+            "id": "MASTER_DIE",
+            "families": [
+                "metal_press"
+            ],
+            "yield": "none"
+        },
+        {
+            "id": "PRODUCTION_DIE",
+            "families": [
+                "metal_press"
+            ],
+            "yield": "none"
+        },
+        {
+            "id": "DROP_HAMMER",
+            "families": [
+                "metal_press"
+            ],
+            "yield": "none"
+        },
+        {
+            "id": "SPLIT_FAILURE",
+            "families": [
+                "metal_press"
+            ],
+            "yield": "none"
+        },
+        {
+            "id": "SHOCK_ABSORBERS",
+            "families": [
+                "metal_press"
+            ],
+            "yield": "none"
+        },
+        {
+            "id": "HOT_STAMPING",
+            "families": [
+                "metal_press"
+            ],
+            "yield": "none"
+        },
+        {
+            "id": "FORGE_LINE",
+            "families": [
+                "metal_press"
+            ],
+            "yield": "none"
+        },
+        {
+            "id": "SECOND_PASS",
+            "families": [
+                "resonance_calibrator"
+            ],
+            "yield": "none"
+        },
+        {
+            "id": "CLEAR_SIGNAL",
+            "families": [
+                "resonance_calibrator"
+            ],
+            "yield": "none"
+        },
+        {
+            "id": "MASTER_HARMONIC",
+            "families": [
+                "resonance_calibrator"
+            ],
+            "yield": "none"
+        },
+        {
+            "id": "PATTERN_MEMORY",
+            "families": [
+                "resonance_calibrator"
+            ],
+            "yield": "none"
+        },
+        {
+            "id": "SHARED_FIELD",
+            "families": [
+                "resonance_calibrator"
+            ],
+            "yield": "input"
+        },
+        {
+            "id": "STABILIZER_ECONOMY",
+            "families": [
+                "resonance_calibrator"
+            ],
+            "yield": "input"
+        },
+        {
+            "id": "LANE_SYNC",
+            "families": [
+                "resonance_calibrator"
+            ],
+            "yield": "none"
+        },
+        {
+            "id": "WIDE_TOLERANCE",
+            "families": [
+                "resonance_calibrator"
+            ],
+            "yield": "none"
+        },
+        {
+            "id": "RESONANCE_ARRAY",
+            "families": [
+                "resonance_calibrator"
+            ],
+            "yield": "none"
+        },
+        {
+            "id": "METHANE_TRAP",
+            "families": [
+                "melter"
+            ],
+            "yield": "output"
+        },
+        {
+            "id": "BRINE_LOOP",
+            "families": [
+                "melter"
+            ],
+            "yield": "output"
+        },
+        {
+            "id": "SEALED_LINES",
+            "families": [
+                "melter"
+            ],
+            "yield": "none"
+        },
+        {
+            "id": "OVERPRESSURE",
+            "families": [
+                "melter"
+            ],
+            "yield": "none"
+        },
+        {
+            "id": "SECOND_CRUCIBLE",
+            "families": [
+                "melter"
+            ],
+            "yield": "none"
+        },
+        {
+            "id": "SHARED_HEAT",
+            "families": [
+                "melter"
+            ],
+            "yield": "none"
+        },
+        {
+            "id": "LAVA_TAP",
+            "families": [
+                "melter"
+            ],
+            "yield": "none"
+        },
+        {
+            "id": "FUSED_CRUCIBLES",
+            "families": [
+                "melter"
+            ],
+            "yield": "none"
+        },
+        {
+            "id": "LOG_LEDGER",
+            "families": [
+                "forestry"
+            ],
+            "yield": "output"
+        },
+        {
+            "id": "CLEAN_FELL",
+            "families": [
+                "forestry"
+            ],
+            "yield": "none"
+        },
+        {
+            "id": "DOCK_SPRINT",
+            "families": [
+                "forestry"
+            ],
+            "yield": "none"
+        },
+        {
+            "id": "HEARTWOOD",
+            "families": [
+                "forestry"
+            ],
+            "yield": "output"
+        },
+        {
+            "id": "CLEARCUT_CHARTER",
+            "families": [
+                "forestry"
+            ],
+            "yield": "none"
+        },
+        {
+            "id": "ROLLING_HARVEST",
+            "families": [
+                "forestry"
+            ],
+            "yield": "none"
+        },
+        {
+            "id": "FERTILIZER_PULSE",
+            "families": [
+                "forestry"
+            ],
+            "yield": "output"
+        },
+        {
+            "id": "SEED_LIBRARY",
+            "families": [
+                "forestry"
+            ],
+            "yield": "none"
+        },
+        {
+            "id": "CANOPY_CARE",
+            "families": [
+                "forestry"
+            ],
+            "yield": "none"
+        },
+        {
+            "id": "ANCIENT_GROVE",
+            "families": [
+                "forestry"
+            ],
+            "yield": "output"
+        },
+        {
+            "id": "VERDANT_SURGE",
+            "families": [
+                "forestry"
+            ],
+            "yield": "none"
+        }
+    ]
+}

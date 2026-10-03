@@ -1,0 +1,180 @@
+{
+    "id": "die_keeper",
+    "family": "metal_press",
+    "nodes": [
+        {
+            "id": "mold_rack",
+            "kind": "ROOT",
+            "x": 0,
+            "y": 0,
+            "effects": [
+                {
+                    "stat": "MOLD_SWAP_TIME",
+                    "operation": "ADD",
+                    "value": 40
+                }
+            ],
+            "behaviors": [
+                "MOLD_RACK"
+            ]
+        },
+        {
+            "id": "swap_drill",
+            "kind": "SMALL",
+            "parent": "mold_rack",
+            "x": -2,
+            "y": 1,
+            "effects": [
+                {
+                    "stat": "MOLD_SWAP_TIME",
+                    "operation": "ADD",
+                    "value": -5
+                }
+            ]
+        },
+        {
+            "id": "quick_change",
+            "kind": "NOTABLE",
+            "parent": "swap_drill",
+            "x": -2,
+            "y": 2,
+            "effects": [
+                {
+                    "stat": "MOLD_SWAP_TIME",
+                    "operation": "ADD",
+                    "value": -25
+                }
+            ],
+            "behaviors": [
+                "QUICK_CHANGE"
+            ]
+        },
+        {
+            "id": "map_stability",
+            "kind": "SMALL",
+            "parent": "mold_rack",
+            "x": -1,
+            "y": 1,
+            "effects": [
+                {
+                    "stat": "TEMPERATURE_STABILITY",
+                    "operation": "INCREASED_PERCENT",
+                    "value": 8
+                }
+            ]
+        },
+        {
+            "id": "tolerance_map",
+            "kind": "NOTABLE",
+            "parent": "map_stability",
+            "x": -1,
+            "y": 2,
+            "behaviors": [
+                "TOLERANCE_MAP"
+            ]
+        },
+        {
+            "id": "circuit_stability",
+            "kind": "SMALL",
+            "parent": "mold_rack",
+            "x": 1,
+            "y": 1,
+            "effects": [
+                {
+                    "stat": "STABILITY",
+                    "operation": "INCREASED_PERCENT",
+                    "value": 8
+                }
+            ]
+        },
+        {
+            "id": "circuit_discipline",
+            "kind": "NOTABLE",
+            "parent": "circuit_stability",
+            "x": 1,
+            "y": 2,
+            "behaviors": [
+                "CIRCUIT_DISCIPLINE"
+            ]
+        },
+        {
+            "id": "servo_tolerance",
+            "kind": "SMALL",
+            "parent": "mold_rack",
+            "x": 2,
+            "y": 1,
+            "effects": [
+                {
+                    "stat": "OVERHEAT_TOLERANCE",
+                    "operation": "INCREASED_PERCENT",
+                    "value": 10
+                }
+            ]
+        },
+        {
+            "id": "servo_sync",
+            "kind": "NOTABLE",
+            "parent": "servo_tolerance",
+            "x": 2,
+            "y": 2,
+            "behaviors": [
+                "SERVO_SYNC"
+            ]
+        },
+        {
+            "id": "die_stability",
+            "kind": "SMALL",
+            "parent": "tolerance_map",
+            "x": -1,
+            "y": 3,
+            "effects": [
+                {
+                    "stat": "TEMPERATURE_STABILITY",
+                    "operation": "INCREASED_PERCENT",
+                    "value": 8
+                }
+            ]
+        },
+        {
+            "id": "master_die",
+            "kind": "NOTABLE",
+            "parent": "die_stability",
+            "x": -1,
+            "y": 4,
+            "effects": [
+                {
+                    "stat": "PROCESSING_SPEED",
+                    "operation": "LESS",
+                    "value": 0.8
+                }
+            ],
+            "behaviors": [
+                "MASTER_DIE"
+            ]
+        },
+        {
+            "id": "production_drill",
+            "kind": "SMALL",
+            "parent": "quick_change",
+            "x": -2,
+            "y": 3,
+            "effects": [
+                {
+                    "stat": "MOLD_SWAP_TIME",
+                    "operation": "ADD",
+                    "value": -5
+                }
+            ]
+        },
+        {
+            "id": "production_die",
+            "kind": "NOTABLE",
+            "parent": "production_drill",
+            "x": -2,
+            "y": 4,
+            "behaviors": [
+                "PRODUCTION_DIE"
+            ]
+        }
+    ]
+}

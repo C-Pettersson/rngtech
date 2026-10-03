@@ -1,0 +1,21 @@
+{
+    "version": 1,
+    "stats": [
+        {
+            "stat": "LUCK",
+            "families": [
+                "crusher"
+            ],
+            "yield": "output"
+        }
+    ],
+    "behaviors": [
+        {
+            "id": "FIXTURE_ECHO",
+            "families": [
+                "crusher"
+            ],
+            "yield": "none"
+        }
+    ]
+}

@@ -1,0 +1,19 @@
+{
+    "version": 1,
+    "ascendancies": [
+        "rockbreaker.json",
+        "assayer.json",
+        "crucible_keeper.json",
+        "bloomer.json",
+        "metallurgist.json",
+        "blendwright.json",
+        "die_keeper.json",
+        "drop_forge.json",
+        "harmonist.json",
+        "mass_tuner.json",
+        "pressure_vessel.json",
+        "twin_crucible.json",
+        "timber_baron.json",
+        "grove_warden.json"
+    ]
+}

@@ -27,6 +27,7 @@ import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.items.SlotItemHandler;
 
+import java.util.List;
 import java.util.function.BooleanSupplier;
 
 public class ForestryCartMenu extends AbstractContainerMenu implements MasteryMenuView<MegaPassiveNode> {
@@ -77,7 +78,9 @@ public class ForestryCartMenu extends AbstractContainerMenu implements MasteryMe
     public static final int DATA_CORE_CONTROL = 37;
     public static final int DATA_CORE_DRIVE = 38;
     public static final int DATA_CORE_RESERVE = 39;
-    public static final int DATA_MACHINE_PROGRESSION_START = 40;
+    public static final int DATA_FERTILIZER = 40;
+    public static final int DATA_FERTILIZER_CAPACITY = 41;
+    public static final int DATA_MACHINE_PROGRESSION_START = 42;
     public static final int DATA_COUNT = DATA_MACHINE_PROGRESSION_START + MasteryMenuSupport.FIELD_COUNT;
 
     private static final int CART_BATTERY_SLOT = 0;
@@ -236,6 +239,15 @@ public class ForestryCartMenu extends AbstractContainerMenu implements MasteryMe
 
     public int saplingCargoCapacity() {
         return data.get(DATA_SAPLING_CARGO_CAPACITY);
+    }
+
+    public int fertilizer() {
+        return data.get(DATA_FERTILIZER);
+    }
+
+    /** Zero unless the cart has Growth Pulse. */
+    public int fertilizerCapacity() {
+        return data.get(DATA_FERTILIZER_CAPACITY);
     }
 
     public int outputCargo() {
@@ -446,7 +458,7 @@ public class ForestryCartMenu extends AbstractContainerMenu implements MasteryMe
             if (!moveItemStackTo(stack, PLAYER_INVENTORY_START, HOTBAR_END, false)) {
                 return ItemStack.EMPTY;
             }
-        } else if (ForestryCartEntity.isSaplingStack(stack)) {
+        } else if (ForestryCartEntity.isSaplingStack(stack) || ForestryCartEntity.isFertilizerStack(stack)) {
             if (!moveItemStackTo(
                     stack,
                     CART_CARGO_SLOT_START,
@@ -557,6 +569,12 @@ public class ForestryCartMenu extends AbstractContainerMenu implements MasteryMe
     @Override public MachineMasteryFamily masteryFamily() { return MachineMasteryFamily.FORESTRY; }
     @Override public MachineProgressionState masterySnapshot() {
         return MasteryMenuSupport.snapshot(data, DATA_MACHINE_PROGRESSION_START, masteryFamily());
+    }
+    @Override public int ascendancyEntryStage() {
+        return MasteryMenuSupport.ascendancyEntryStage(data, DATA_MACHINE_PROGRESSION_START);
+    }
+    @Override public List<MasteryMenuSupport.GrantedStat> ascendancyStats() {
+        return MasteryMenuSupport.grantedStats(data, DATA_MACHINE_PROGRESSION_START);
     }
 
 }

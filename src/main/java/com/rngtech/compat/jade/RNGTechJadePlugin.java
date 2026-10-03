@@ -13,6 +13,9 @@ import com.rngtech.content.cable.NetworkBridgeType;
 import com.rngtech.content.menu.UniversalConnectorAccess;
 import com.rngtech.content.registry.ModBlocks;
 import com.rngtech.content.registry.ModItems;
+import com.rngtech.rpg.progression.AscendancyCatalog;
+import com.rngtech.rpg.progression.MachineMasteryHost;
+import com.rngtech.rpg.progression.MachineProgressionState;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
@@ -67,6 +70,7 @@ public final class RNGTechJadePlugin implements IWailaPlugin {
 
         private static final String DATA_KEY = "RNGTechMachineInfo";
         private static final String CONNECTOR_DATA_KEY = "RNGTechConnectorInfo";
+        private static final String ASCENDANCY_DATA_KEY = "RNGTechAscendancy";
         private final ResourceLocation uid;
 
         MachineStateProvider(String uid) {
@@ -83,6 +87,15 @@ public final class RNGTechJadePlugin implements IWailaPlugin {
             MachineInfoProvider provider = machineInfoProvider(accessor);
             if (provider != null) {
                 tag.put(DATA_KEY, provider.machineInfo().save());
+            }
+            if (provider instanceof MachineMasteryHost host && host.masteryState().sealTiers() > 0) {
+                MachineProgressionState state = host.masteryState();
+                CompoundTag ascendancy = new CompoundTag();
+                ascendancy.putString("id", state.ascendancy());
+                ascendancy.putInt("spent", state.ascendancyNodes().size());
+                ascendancy.putInt("points", state.ascendancyPoints());
+                ascendancy.putInt("tiers", state.sealTiers());
+                tag.put(ASCENDANCY_DATA_KEY, ascendancy);
             }
             CompoundTag connectorInfo = connectorInfo(accessor);
             if (connectorInfo != null) {
@@ -113,6 +126,7 @@ public final class RNGTechJadePlugin implements IWailaPlugin {
                 appendOutput(tooltip, info);
                 appendSlots(tooltip, info, details);
                 appendRefinement(tooltip, info, details);
+                appendAscendancy(tooltip, accessor, details);
             }
             appendConnectorEnergy(tooltip, accessor);
             appendConnectorBridge(tooltip, accessor);
@@ -261,6 +275,24 @@ public final class RNGTechJadePlugin implements IWailaPlugin {
                     Component.translatable("rngtech.rarity." + info.refinementRarity()),
                     value(info.refinementPotential()),
                     value(info.affixCount())
+            ));
+        }
+
+        private static void appendAscendancy(ITooltip tooltip, BlockAccessor accessor, boolean details) {
+            if (!details || !accessor.getServerData().contains(ASCENDANCY_DATA_KEY)) {
+                return;
+            }
+            CompoundTag tag = accessor.getServerData().getCompound(ASCENDANCY_DATA_KEY);
+            var ascendancy = AscendancyCatalog.get(tag.getString("id"));
+            if (ascendancy == null) {
+                tooltip.add(Component.translatable("rngtech.jade.machine_state.line.ascendancy_unchosen", value(tag.getInt("tiers"))));
+                return;
+            }
+            tooltip.add(Component.translatable(
+                    "rngtech.jade.machine_state.line.ascendancy",
+                    Component.translatable(ascendancy.translationKey()).withStyle(ChatFormatting.GOLD),
+                    value(tag.getInt("spent")),
+                    value(tag.getInt("points"))
             ));
         }
 

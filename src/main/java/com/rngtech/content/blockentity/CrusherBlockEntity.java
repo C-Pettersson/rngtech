@@ -13,6 +13,7 @@ import com.rngtech.content.menu.MasteryMenuSupport;
 import com.rngtech.content.recipe.CrusherRecipe;
 import com.rngtech.content.recipe.ProcessingEnergyScaling;
 import com.rngtech.content.registry.ModBlockEntities;
+import com.rngtech.content.registry.ModDataComponents;
 import com.rngtech.rpg.ComponentBaseStatCatalog;
 import com.rngtech.rpg.MachineBaseStatCatalog;
 import com.rngtech.rpg.MachineBehavior;
@@ -27,6 +28,7 @@ import com.rngtech.rpg.MachineType;
 import com.rngtech.rpg.ModifierOperation;
 import com.rngtech.rpg.ModifierSlot;
 import com.rngtech.rpg.OutputAmountTracker;
+import com.rngtech.rpg.progression.AscendancyFormulas;
 import com.rngtech.rpg.progression.CrusherPassiveTree;
 import com.rngtech.rpg.progression.MachineMasteryFamily;
 import com.rngtech.rpg.progression.MachineMasteryHost;
@@ -38,6 +40,7 @@ import com.rngtech.rpg.progression.PassiveStatType;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.core.component.DataComponentMap;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
@@ -49,11 +52,14 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.energy.IEnergyStorage;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.ItemStackHandler;
+
+import java.util.List;
 
 public class CrusherBlockEntity extends BaseMachineBlockEntity implements MenuProvider, MachineInfoProvider, MachineMasteryHost {
     public static final int STATUS_READY = 0;
@@ -149,10 +155,9 @@ public class CrusherBlockEntity extends BaseMachineBlockEntity implements MenuPr
     private final ContainerData menuData = new ContainerData() {
         @Override
         public int get(int index) {
-            MachineProgressionState progression = machineProgression();
             if (index >= DATA_MACHINE_PROGRESSION_START
                     && index < DATA_MACHINE_PROGRESSION_START + MasteryMenuSupport.FIELD_COUNT) {
-                return MasteryMenuSupport.get(progression, index - DATA_MACHINE_PROGRESSION_START, CrusherBlockEntity.this::effectiveStats);
+                return MasteryMenuSupport.get(CrusherBlockEntity.this, index - DATA_MACHINE_PROGRESSION_START, CrusherBlockEntity.this::effectiveStats);
             }
             MachineStatAccumulator stats = effectiveStats();
             return switch (index) {
@@ -226,8 +231,9 @@ public class CrusherBlockEntity extends BaseMachineBlockEntity implements MenuPr
             return;
         }
 
-        crusher.outputAmountTracker.updateInput(crusher.inventory.getStackInSlot(SLOT_INPUT_A));
         MachineStatAccumulator stats = crusher.effectiveStats();
+        crusher.outputAmountTracker.setMemory(stats.intValue(MachineStat.BANK_MEMORY));
+        crusher.outputAmountTracker.updateInput(crusher.inventory.getStackInSlot(SLOT_INPUT_A));
         CrusherRecipe recipe = crusher.findNextRecipe(stats);
         if (recipe == null) {
             if (crusher.preserveOutputBlockedProgress(stats)) {
@@ -252,7 +258,7 @@ public class CrusherBlockEntity extends BaseMachineBlockEntity implements MenuPr
             return;
         }
 
-        int energyCost = energyCostForProgress(recipe, stats, crusher.progress, jobs);
+        int energyCost = crusher.energyCostForProgress(recipe, stats, crusher.progress, jobs);
         if (crusher.progress == 0 && crusher.rollUnderLevelJam(level, recipe, stats)) {
             BaseMachineBlock.setActive(level, pos, state, false);
             crusher.setChanged();
@@ -260,7 +266,7 @@ public class CrusherBlockEntity extends BaseMachineBlockEntity implements MenuPr
         }
 
         if (crusher.progress == 0 && !underLevel(recipe, stats) && ProcessingChance.rollInstant(level, stats)) {
-            int fullEnergyCost = energyCostPerBatch(recipe, stats, jobs);
+            int fullEnergyCost = crusher.energyCostPerBatch(recipe, stats, jobs);
             if (crusher.consumeWorkingEnergy(fullEnergyCost, true) >= fullEnergyCost) {
                 BaseMachineBlock.setActive(level, pos, state, true);
                 crusher.consumeWorkingEnergy(fullEnergyCost, false);
@@ -418,6 +424,7 @@ public class CrusherBlockEntity extends BaseMachineBlockEntity implements MenuPr
 
     private int process(CrusherRecipe recipe, MachineStatAccumulator stats, Level level, int jobs) {
         int completed = 0;
+        ItemStack baseOutput = recipe.outputStack(recipe.baseOutputCount());
         for (int job = 0; job < jobs; job++) {
             ItemStack input = inventory.getStackInSlot(SLOT_INPUT_A);
             if (!recipe.hasRequiredInput(input)) {
@@ -433,28 +440,61 @@ public class CrusherBlockEntity extends BaseMachineBlockEntity implements MenuPr
                 return completed;
             }
 
-            ItemStack baseResult = recipe.outputStack(outputAmountTracker.consumeOutputCount(
-                    recipe.baseOutputCount(),
-                    outputAmount
-            ));
-            result = baseResult;
+            OutputAmountTracker.Payout payout = outputAmountTracker.consume(recipe.baseOutputCount(), outputAmount);
+            result = recipe.outputStack(payout.total());
             if (allowsOutputBonusEffects(recipe, stats)) {
-                ItemStack baseOutput = recipe.outputStack(recipe.baseOutputCount());
-                result = ProcessingChance.applySuperOutput(level, stats, baseResult, baseOutput);
-                if (!canMergeOutput(result)) {
-                    result = baseResult;
-                }
-                ItemStack salvageResult = ProcessingChance.applyCrusherSalvage(level, stats, result, baseOutput);
-                if (canMergeOutput(salvageResult)) {
-                    result = salvageResult;
-                }
+                result = withSuperOutput(level, stats, recipe, result, baseOutput, payout);
             }
+            result = withSalvage(level, stats, recipe, result, baseOutput);
             input.shrink(recipe.inputCount());
             mergeOutput(result);
             completed++;
         }
         setChanged();
         return completed;
+    }
+
+    /** Super Output, guaranteed on each Super Output Cadence cycle, plus a Compound Yield roll to copy what the bank paid. */
+    private ItemStack withSuperOutput(
+            Level level,
+            MachineStatAccumulator stats,
+            CrusherRecipe recipe,
+            ItemStack result,
+            ItemStack baseOutput,
+            OutputAmountTracker.Payout payout
+    ) {
+        boolean guaranteed = outputAmountTracker.countCadence(stats.intValue(MachineStat.SUPER_OUTPUT_CADENCE));
+        if (guaranteed || ProcessingChance.rollSuperOutput(level, stats, recipe, baseOutput)) {
+            result = mergeableOr(result, ProcessingChance.grow(result, baseOutput, baseOutput.getCount()));
+        }
+        if (payout.banked() > 0 && hasMasteryBehavior("COMPOUND_YIELD") && ProcessingChance.rollSuperOutput(level, stats, recipe, baseOutput)) {
+            result = mergeableOr(result, ProcessingChance.grow(result, baseOutput, payout.banked()));
+        }
+        return result;
+    }
+
+    /**
+     * Salvage adds one base output. Under level it needs Rubble Reclaimer and rolls at half chance, and Tailings Recovery
+     * banks salvage that does not fit the output.
+     */
+    private ItemStack withSalvage(Level level, MachineStatAccumulator stats, CrusherRecipe recipe, ItemStack result, ItemStack baseOutput) {
+        boolean under = underLevel(recipe, stats);
+        if (under && !hasMasteryBehavior("RUBBLE_RECLAIMER")
+                || !ProcessingChance.rollCrusherSalvage(level, stats, recipe, baseOutput, under ? 0.5D : 1.0D)) {
+            return result;
+        }
+        ItemStack salvaged = ProcessingChance.grow(result, baseOutput, 1);
+        if (salvaged != result && canMergeOutput(salvaged)) {
+            return salvaged;
+        }
+        if (hasMasteryBehavior("TAILINGS_RECOVERY")) {
+            outputAmountTracker.bank(1.0D);
+        }
+        return result;
+    }
+
+    private ItemStack mergeableOr(ItemStack current, ItemStack candidate) {
+        return canMergeOutput(candidate) ? candidate : current;
     }
 
     private void grantRecipeXp(CrusherRecipe recipe, int completedJobs) {
@@ -613,6 +653,14 @@ public class CrusherBlockEntity extends BaseMachineBlockEntity implements MenuPr
             ComponentBaseStatCatalog.applyEffectiveContribution(stats, crushHead);
         }
         CrusherPassiveTree.applyStats(stats, machineProgression());
+        if (hasMasteryBehavior("REFINERS_OATH")) {
+            stats.apply(new MachineModifier(
+                    ModifierSlot.IMPLICIT,
+                    MachineStat.OUTPUT_AMOUNT,
+                    ModifierOperation.MORE,
+                    AscendancyFormulas.refinersOathMultiplier(stats.intValue(MachineStat.PARALLEL_JOBS))
+            ));
+        }
         if (!hasBatteryCell()) {
             stats.apply(new MachineModifier(
                     ModifierSlot.IMPLICIT,
@@ -642,14 +690,19 @@ public class CrusherBlockEntity extends BaseMachineBlockEntity implements MenuPr
 
     private int currentBonusOutputIncrement(MachineStatAccumulator stats) {
         CrusherRecipe recipe = findNextRecipe(stats);
-        return recipe == null || underLevel(recipe, stats)
+        return recipe == null || bonusSuppressed(recipe, stats)
                 ? 0
                 : OutputAmountTracker.scaledBonusIncrement(recipe.baseOutputCount(), outputAmountFor(recipe, stats));
     }
 
     private int currentOutputBonusProgress(MachineStatAccumulator stats) {
         CrusherRecipe recipe = findNextRecipe(stats);
-        return recipe != null && underLevel(recipe, stats) ? 0 : outputAmountTracker.scaledBonusProgress();
+        return recipe != null && bonusSuppressed(recipe, stats) ? 0 : outputAmountTracker.scaledBonusProgress();
+    }
+
+    /** Under level the bank is paused, unless Fault Lines keeps Output Amount. */
+    private boolean bonusSuppressed(CrusherRecipe recipe, MachineStatAccumulator stats) {
+        return underLevel(recipe, stats) && !hasMasteryBehavior("FAULT_LINES");
     }
 
     private int currentEnergyCostPerTick(MachineStatAccumulator stats) {
@@ -760,7 +813,7 @@ public class CrusherBlockEntity extends BaseMachineBlockEntity implements MenuPr
                 : MachineInfoSnapshot.OutputSummary.NONE;
     }
 
-    private static int energyCostForProgress(CrusherRecipe recipe, MachineStatAccumulator stats, int progress, int jobs) {
+    private int energyCostForProgress(CrusherRecipe recipe, MachineStatAccumulator stats, int progress, int jobs) {
         int adjustedTicks = adjustedProcessingTicks(recipe, stats);
         return multiplyEnergy(
                 distributedEnergyCostForProgress(energyCostPerCraft(recipe, stats), adjustedTicks, progress),
@@ -776,11 +829,16 @@ public class CrusherBlockEntity extends BaseMachineBlockEntity implements MenuPr
     }
 
     private static double underLevelPenaltyMultiplier(CrusherRecipe recipe, MachineStatAccumulator stats) {
-        int deficit = hardnessDeficit(recipe, stats);
-        if (deficit <= 0) {
-            return 1.0D;
-        }
-        return 1.0D + deficit * Math.max(0.0D, RNGTechConfig.CRUSHER_UNDER_LEVEL_PENALTY_MULTIPLIER_PER_LEVEL.get());
+        return AscendancyFormulas.underLevelPenaltyMultiplier(
+                penalizedDeficit(recipe, stats),
+                RNGTechConfig.CRUSHER_UNDER_LEVEL_PENALTY_MULTIPLIER_PER_LEVEL.get(),
+                stats
+        );
+    }
+
+    /** Missing levels beyond Hardness Tolerance, which alone add time, FE, and jam risk. */
+    private static int penalizedDeficit(CrusherRecipe recipe, MachineStatAccumulator stats) {
+        return AscendancyFormulas.penalizedDeficit(hardnessDeficit(recipe, stats), stats);
     }
 
     private static int hardnessDeficit(CrusherRecipe recipe, MachineStatAccumulator stats) {
@@ -792,30 +850,33 @@ public class CrusherBlockEntity extends BaseMachineBlockEntity implements MenuPr
     }
 
     private static int underLevelJamChancePerThousand(CrusherRecipe recipe, MachineStatAccumulator stats) {
-        int chance = hardnessDeficit(recipe, stats) * RNGTechConfig.CRUSHER_UNDER_LEVEL_JAM_CHANCE_PER_LEVEL.get();
-        return Math.max(0, Math.min(1000, chance));
+        return AscendancyFormulas.jamChancePerThousand(penalizedDeficit(recipe, stats), RNGTechConfig.CRUSHER_UNDER_LEVEL_JAM_CHANCE_PER_LEVEL.get(), stats);
     }
 
     private static int underLevelJamTicks(CrusherRecipe recipe, MachineStatAccumulator stats) {
-        long ticks = (long) hardnessDeficit(recipe, stats) * RNGTechConfig.CRUSHER_UNDER_LEVEL_JAM_TICKS_PER_LEVEL.get();
-        return (int) Math.max(0L, Math.min(Integer.MAX_VALUE, ticks));
+        return AscendancyFormulas.jamTicks(penalizedDeficit(recipe, stats), RNGTechConfig.CRUSHER_UNDER_LEVEL_JAM_TICKS_PER_LEVEL.get(), stats);
     }
 
-    private static int energyCostPerCraft(CrusherRecipe recipe, MachineStatAccumulator stats) {
-        int baseEnergy = stats.adjustedEnergyCost(ProcessingEnergyScaling.crusherEnergy(recipe, stats));
+    /** Shatter Point halves the high-hardness FE surcharge. */
+    private int energyCostPerCraft(CrusherRecipe recipe, MachineStatAccumulator stats) {
+        double surchargeScale = hasMasteryBehavior("SHATTER_POINT") ? 0.5D : 1.0D;
+        int baseEnergy = stats.adjustedEnergyCost(ProcessingEnergyScaling.crusherEnergy(recipe, stats, surchargeScale));
         return scaledEnergyCost(baseEnergy, underLevelPenaltyMultiplier(recipe, stats));
     }
 
-    private static int energyCostPerBatch(CrusherRecipe recipe, MachineStatAccumulator stats, int jobs) {
+    private int energyCostPerBatch(CrusherRecipe recipe, MachineStatAccumulator stats, int jobs) {
         return multiplyEnergy(energyCostPerCraft(recipe, stats), jobs);
     }
 
-    private static double outputAmountFor(CrusherRecipe recipe, MachineStatAccumulator stats) {
+    /** At-Level Output adds to the increased bucket on recipes exactly at the Crush Head's hardness. */
+    private double outputAmountFor(CrusherRecipe recipe, MachineStatAccumulator stats) {
         if (!recipe.allowsBonusOutput()) {
             return 1.0D;
         }
-        double outputAmount = stats.value(MachineStat.OUTPUT_AMOUNT);
-        return underLevel(recipe, stats) ? Math.min(1.0D, outputAmount) : outputAmount;
+        double outputAmount = recipe.requiredProcessingLevel() == stats.intValue(MachineStat.PROCESSING_LEVEL)
+                ? stats.valueWithIncreased(MachineStat.OUTPUT_AMOUNT, stats.value(MachineStat.AT_LEVEL_OUTPUT))
+                : stats.value(MachineStat.OUTPUT_AMOUNT);
+        return bonusSuppressed(recipe, stats) ? Math.min(1.0D, outputAmount) : outputAmount;
     }
 
     private static boolean allowsOutputBonusEffects(CrusherRecipe recipe, MachineStatAccumulator stats) {
@@ -882,7 +943,8 @@ public class CrusherBlockEntity extends BaseMachineBlockEntity implements MenuPr
     }
 
     private int parallelJobs(MachineStatAccumulator stats) {
-        if (!activeTraits().hasBehavior(MachineBehavior.DENSE_PARALLEL)
+        if (hasMasteryBehavior("REFINERS_OATH")
+                || !activeTraits().hasBehavior(MachineBehavior.DENSE_PARALLEL)
                 && !CrusherPassiveTree.enablesDenseParallel(machineProgression())) {
             return 1;
         }
@@ -1245,7 +1307,33 @@ public class CrusherBlockEntity extends BaseMachineBlockEntity implements MenuPr
             return cell != null && cell.canReceive() && cell.getEnergyStored() < cell.getMaxEnergyStored();
         }
     }
+    /** Wide Ledger keeps remembered banks on the dropped or picked machine. */
+    public List<OutputAmountTracker.SavedBank> persistentBanks() {
+        return hasMasteryBehavior("PERSISTENT_BANKS") ? outputAmountTracker.saved() : List.of();
+    }
+
+    @Override
+    protected void collectImplicitComponents(DataComponentMap.Builder components) {
+        super.collectImplicitComponents(components);
+        List<OutputAmountTracker.SavedBank> banks = persistentBanks();
+        if (!banks.isEmpty()) {
+            components.set(ModDataComponents.OUTPUT_BANKS.get(), banks);
+        }
+    }
+
+    @Override
+    protected void applyImplicitComponents(BlockEntity.DataComponentInput componentInput) {
+        super.applyImplicitComponents(componentInput);
+        List<OutputAmountTracker.SavedBank> banks = componentInput.get(ModDataComponents.OUTPUT_BANKS.get());
+        if (banks != null) {
+            // Keep every saved bank until the first tick applies this machine's Bank Memory.
+            outputAmountTracker.setMemory(banks.size());
+            outputAmountTracker.restore(banks);
+        }
+    }
+
     @Override public MachineMasteryFamily masteryFamily() { return MachineMasteryFamily.CRUSHER; }
+    @Override public int ascendancyEntryStage() { return chassisMaterial().stage(); }
 
     @Override public MachineProgressionState machineProgression() { return super.machineProgression().forFamily(masteryFamily()); }
 

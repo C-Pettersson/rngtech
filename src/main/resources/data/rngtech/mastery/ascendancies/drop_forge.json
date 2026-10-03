@@ -1,0 +1,186 @@
+{
+    "id": "drop_forge",
+    "family": "metal_press",
+    "nodes": [
+        {
+            "id": "drop_hammer",
+            "kind": "ROOT",
+            "x": 0,
+            "y": 0,
+            "effects": [
+                {
+                    "stat": "PARALLEL_JOBS",
+                    "operation": "ADD",
+                    "value": 3
+                },
+                {
+                    "stat": "HEAT_WINDOW",
+                    "operation": "ADD",
+                    "value": -25
+                }
+            ],
+            "behaviors": [
+                "DROP_HAMMER"
+            ]
+        },
+        {
+            "id": "anvil_speed",
+            "kind": "SMALL",
+            "parent": "drop_hammer",
+            "x": -2,
+            "y": 1,
+            "effects": [
+                {
+                    "stat": "PROCESSING_SPEED",
+                    "operation": "INCREASED_PERCENT",
+                    "value": 8
+                }
+            ]
+        },
+        {
+            "id": "anvil_mass",
+            "kind": "NOTABLE",
+            "parent": "anvil_speed",
+            "x": -2,
+            "y": 2,
+            "effects": [
+                {
+                    "stat": "PARALLEL_JOBS",
+                    "operation": "ADD",
+                    "value": 2
+                }
+            ]
+        },
+        {
+            "id": "split_window",
+            "kind": "SMALL",
+            "parent": "drop_hammer",
+            "x": -1,
+            "y": 1,
+            "effects": [
+                {
+                    "stat": "HEAT_WINDOW",
+                    "operation": "ADD",
+                    "value": 5
+                }
+            ]
+        },
+        {
+            "id": "split_failure",
+            "kind": "NOTABLE",
+            "parent": "split_window",
+            "x": -1,
+            "y": 2,
+            "behaviors": [
+                "SPLIT_FAILURE"
+            ]
+        },
+        {
+            "id": "shock_energy",
+            "kind": "SMALL",
+            "parent": "drop_hammer",
+            "x": 1,
+            "y": 1,
+            "effects": [
+                {
+                    "stat": "ENERGY_USAGE",
+                    "operation": "DECREASED_PERCENT",
+                    "value": 5
+                }
+            ]
+        },
+        {
+            "id": "shock_absorbers",
+            "kind": "NOTABLE",
+            "parent": "shock_energy",
+            "x": 1,
+            "y": 2,
+            "behaviors": [
+                "SHOCK_ABSORBERS"
+            ]
+        },
+        {
+            "id": "stamping_transfer",
+            "kind": "SMALL",
+            "parent": "drop_hammer",
+            "x": 2,
+            "y": 1,
+            "effects": [
+                {
+                    "stat": "HEAT_TRANSFER",
+                    "operation": "INCREASED_PERCENT",
+                    "value": 8
+                }
+            ]
+        },
+        {
+            "id": "hot_stamping",
+            "kind": "NOTABLE",
+            "parent": "stamping_transfer",
+            "x": 2,
+            "y": 2,
+            "behaviors": [
+                "HOT_STAMPING"
+            ]
+        },
+        {
+            "id": "line_speed",
+            "kind": "SMALL",
+            "parent": "anvil_mass",
+            "x": -2,
+            "y": 3,
+            "effects": [
+                {
+                    "stat": "PROCESSING_SPEED",
+                    "operation": "INCREASED_PERCENT",
+                    "value": 8
+                }
+            ]
+        },
+        {
+            "id": "forge_line",
+            "kind": "NOTABLE",
+            "parent": "line_speed",
+            "x": -2,
+            "y": 4,
+            "effects": [
+                {
+                    "stat": "PARALLEL_JOBS",
+                    "operation": "ADD",
+                    "value": 4
+                }
+            ],
+            "behaviors": [
+                "FORGE_LINE"
+            ]
+        },
+        {
+            "id": "ledger_window",
+            "kind": "SMALL",
+            "parent": "split_failure",
+            "x": -1,
+            "y": 3,
+            "effects": [
+                {
+                    "stat": "HEAT_WINDOW",
+                    "operation": "ADD",
+                    "value": 5
+                }
+            ]
+        },
+        {
+            "id": "batch_ledger",
+            "kind": "NOTABLE",
+            "parent": "ledger_window",
+            "x": -1,
+            "y": 4,
+            "effects": [
+                {
+                    "stat": "LEDGER_RATE",
+                    "operation": "ADD",
+                    "value": 5
+                }
+            ]
+        }
+    ]
+}

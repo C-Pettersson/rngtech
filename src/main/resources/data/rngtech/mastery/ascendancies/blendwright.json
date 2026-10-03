@@ -1,0 +1,181 @@
+{
+    "id": "blendwright",
+    "family": "alloy_furnace",
+    "nodes": [
+        {
+            "id": "blend_reversal",
+            "kind": "ROOT",
+            "x": 0,
+            "y": 0,
+            "effects": [
+                {
+                    "stat": "BLEND_SPEED",
+                    "operation": "ADD",
+                    "value": 25
+                }
+            ],
+            "behaviors": [
+                "BLEND_REVERSAL"
+            ]
+        },
+        {
+            "id": "blend_speed",
+            "kind": "SMALL",
+            "parent": "blend_reversal",
+            "x": -2,
+            "y": 1,
+            "effects": [
+                {
+                    "stat": "BLEND_SPEED",
+                    "operation": "ADD",
+                    "value": 5
+                }
+            ]
+        },
+        {
+            "id": "cold_mixing",
+            "kind": "NOTABLE",
+            "parent": "blend_speed",
+            "x": -2,
+            "y": 2,
+            "effects": [
+                {
+                    "stat": "BLEND_HEAT_REDUCTION",
+                    "operation": "ADD",
+                    "value": 100
+                }
+            ]
+        },
+        {
+            "id": "blend_pace",
+            "kind": "SMALL",
+            "parent": "blend_reversal",
+            "x": -1,
+            "y": 1,
+            "effects": [
+                {
+                    "stat": "PROCESSING_SPEED",
+                    "operation": "INCREASED_PERCENT",
+                    "value": 6
+                }
+            ]
+        },
+        {
+            "id": "blend_ledger",
+            "kind": "NOTABLE",
+            "parent": "blend_pace",
+            "x": -1,
+            "y": 2,
+            "effects": [
+                {
+                    "stat": "LEDGER_RATE",
+                    "operation": "ADD",
+                    "value": 25
+                }
+            ]
+        },
+        {
+            "id": "tempered_stability",
+            "kind": "SMALL",
+            "parent": "blend_reversal",
+            "x": 1,
+            "y": 1,
+            "effects": [
+                {
+                    "stat": "TEMPERATURE_STABILITY",
+                    "operation": "INCREASED_PERCENT",
+                    "value": 8
+                }
+            ]
+        },
+        {
+            "id": "tempered_crucible",
+            "kind": "NOTABLE",
+            "parent": "tempered_stability",
+            "x": 1,
+            "y": 2,
+            "behaviors": [
+                "TEMPERED_CRUCIBLE"
+            ]
+        },
+        {
+            "id": "supply_stability",
+            "kind": "SMALL",
+            "parent": "blend_reversal",
+            "x": 2,
+            "y": 1,
+            "effects": [
+                {
+                    "stat": "STABILITY",
+                    "operation": "INCREASED_PERCENT",
+                    "value": 8
+                }
+            ]
+        },
+        {
+            "id": "steady_supply",
+            "kind": "NOTABLE",
+            "parent": "supply_stability",
+            "x": 2,
+            "y": 2,
+            "behaviors": [
+                "STEADY_SUPPLY"
+            ]
+        },
+        {
+            "id": "pour_speed",
+            "kind": "SMALL",
+            "parent": "cold_mixing",
+            "x": -2,
+            "y": 3,
+            "effects": [
+                {
+                    "stat": "BLEND_SPEED",
+                    "operation": "ADD",
+                    "value": 5
+                }
+            ]
+        },
+        {
+            "id": "continuous_pour",
+            "kind": "NOTABLE",
+            "parent": "pour_speed",
+            "x": -2,
+            "y": 4,
+            "behaviors": [
+                "CONTINUOUS_POUR"
+            ]
+        },
+        {
+            "id": "master_pace",
+            "kind": "SMALL",
+            "parent": "blend_ledger",
+            "x": -1,
+            "y": 3,
+            "effects": [
+                {
+                    "stat": "PROCESSING_SPEED",
+                    "operation": "INCREASED_PERCENT",
+                    "value": 6
+                }
+            ]
+        },
+        {
+            "id": "master_blend",
+            "kind": "NOTABLE",
+            "parent": "master_pace",
+            "x": -1,
+            "y": 4,
+            "effects": [
+                {
+                    "stat": "LEDGER_RATE",
+                    "operation": "MORE",
+                    "value": 2.0
+                }
+            ],
+            "behaviors": [
+                "MASTER_BLEND"
+            ]
+        }
+    ]
+}

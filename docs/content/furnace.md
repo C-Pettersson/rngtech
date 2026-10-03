@@ -177,6 +177,58 @@ Quench Protocol halves temperature-derived failure strain, leaves power-drop str
 
 Nodes do not change Furnace slot counts or Heat Core compatibility. Allocation changes reset active cycles and failure strain while preserving inventory and current lane heat. Shared progression, attributes, refunds, copying, and migration are defined on the Mastery page.
 
+## Ascendancies
+
+Status: Prototype
+
+Furnace machines choose between Crucible Keeper and Bloomer when they use their first Ascendancy Seal. [Machine Mastery](../systems/machine-mastery.md#ascendancies) defines Seals, points, refunds, and switching, and [Machine Stats](../reference/machine-stats.md#ascendancy-stats) defines the new stats. The tables below are generated from the ascendancy catalog.
+
+- Crucible Keeper’s Overdrive Lanes heat a working lane past the recipe target toward its maximum temperature. Each step costs another heat tick of FE or fuel. With any Overdrive Margin, it stops that far below the recipe’s safe maximum, and Safe Margin keeps an overdriving lane’s stability wobble out of the overheat band.
+- Hold the Fire keeps a lane’s heat whenever its input slot holds anything the Furnace can smelt. Shared Hearth gives every Lead Furnace lane at least 90% of the hottest lane’s maximum.
+- Crucible Heart pays a second craft’s FE, or its burn time on a fuel furnace.
+- The Bloom Ledger feeds from bonus-eligible smelts of inputs in `rngtech:bloom_ledger_inputs` (ores, raw ores, and crushed materials) and pays whole items when the output has room. The Process tab draws each lane’s ledger along the bottom of its progress bar.
+- Fluxed Blend lowers blend smelts’ minimum, target, and safe maximum by 100 °C. Slag Reclaim speeds up and cheapens malformed-ingot recovery without changing its output.
+
+<!-- ascendancy-trees:start -->
+
+### Crucible Keeper
+
+| Node | Type | After | Effect |
+|---|---|---|---|
+| **Overdrive Lanes** | Root | — | +1% Overdrive Speed; +30% Overdrive Cap. |
+| Hotter Lanes | Small | Overdrive Lanes | +5% Overdrive Cap. |
+| **Superheat** | Notable | Hotter Lanes | +15% Overdrive Cap. |
+| Deep Draft | Small | Superheat | 10% increased Heat Transfer. |
+| **Crucible Heart** | Deep notable | Deep Draft | Recipes whose target is at most half the lane’s temperature finish two inputs per cycle at twice the FE. |
+| Banked Coals | Small | Overdrive Lanes | 10% increased Heat Insulation. |
+| **Hold the Fire** | Notable | Banked Coals | A lane does not cool while its input slot holds a smeltable input. |
+| Watchful Gauge | Small | Overdrive Lanes | +10 °C Overdrive Margin. |
+| **Safe Margin** | Notable | Watchful Gauge | +15 °C Overdrive Margin. Overdrive never enters a recipe’s overheat band. |
+| Steady Hands | Small | Safe Margin | +2 Strain Recovery. |
+| **Strain Bleed** | Deep notable | Steady Hands | +10 Strain Recovery. |
+| Stoked Hearth | Small | Overdrive Lanes | 4% increased Max Temperature. |
+| **Shared Hearth** | Notable | Stoked Hearth | Every lane uses the hottest installed Heat Core’s maximum at 90%. |
+
+### Bloomer
+
+| Node | Type | After | Effect |
+|---|---|---|---|
+| **Bloom Ledger** | Root | — | +11.11% Ledger Rate; 50% less Super Output. |
+| Rich Ore | Small | Bloom Ledger | 10% increased Ledger Rate. |
+| **Rich Blooms** | Notable | Rich Ore | 100% increased Ledger Rate. |
+| Slow Growth | Small | Rich Blooms | 10% increased Ledger Rate. |
+| **Patient Bloom** | Deep notable | Slow Growth | 50% more Ledger Rate; 30% less Processing Speed. |
+| Flux Bed | Small | Bloom Ledger | 8% increased Temperature Stability. |
+| **Fluxed Blend** | Notable | Flux Bed | Blend smelts need 100 °C less. |
+| Skimmed Slag | Small | Bloom Ledger | 8% increased Stability. |
+| **Slag Reclaim** | Notable | Skimmed Slag | Malformed-ingot recovery takes half the time and half the FE. |
+| Clean Pour | Small | Slag Reclaim | 8% increased Temperature Stability. |
+| **Clean Bloom** | Deep notable | Clean Pour | Ore, raw, and crushed smelts never produce failure outputs. Low stability pauses the lane instead. |
+| Fed Line | Small | Bloom Ledger | 10% increased Ledger Rate. |
+| **Crusher Line** | Notable | Fed Line | Crushed inputs feed the Bloom Ledger twice. |
+
+<!-- ascendancy-trees:end -->
+
 ## Screen Tabs
 
 The furnace screen has Processing, Gear, Stats, Refinement, and Mastery tabs. The Process tab adapts to the placed stage: Stage 0 shows a fuel slot and burn bar, electric single-lane stages show an energy bar and move the Battery Cell to Gear, and Lead shows four compact lane progress bars. The Process tab also shows live heat and, for failure-bearing recipes, failure strain; hover text exposes current heat, minimum, target, safe maximum, overheat limit, and power-drop strain status. The Refinement tab targets the placed furnace itself, accepts one refinement catalyst, and applies the shared refinement rules. The Mastery tab shows machine XP, level, unspent passive points, and the shared passive tree.

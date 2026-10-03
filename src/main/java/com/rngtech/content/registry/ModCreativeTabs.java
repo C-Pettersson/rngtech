@@ -106,6 +106,9 @@ public final class ModCreativeTabs {
                         output.accept(ModItems.WRENCH.get());
                         output.accept(ModItems.CONFIGURATOR.get());
                         output.accept(ModItems.MASTERY_REFUND.get());
+                        ModItems.ASCENDANCY_SEALS.forEach(seal -> output.accept(seal.get()));
+                        output.accept(ModItems.PRIMED_SEAL_CORE.get());
+                        output.accept(ModItems.LUBRICATED_SEAL_CORE.get());
                         output.accept(ModItems.ADVANCED_ITEM_FILTER.get());
                         output.accept(ModItems.MINERS_COMPANION.get());
                         output.accept(ModItems.MINERS_COMPANION_MAGNET.get());

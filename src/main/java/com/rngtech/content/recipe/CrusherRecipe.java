@@ -38,7 +38,7 @@ public record CrusherRecipe(
         int machineXp,
         int machineXpBand
 )
-        implements Recipe<SingleRecipeInput> {
+        implements Recipe<SingleRecipeInput>, BonusOutputRecipe {
     public CrusherRecipe {
         malformedMaterial = malformedMaterial == null ? "" : malformedMaterial.toLowerCase(Locale.ROOT);
         machineXp = Math.max(0, machineXp);

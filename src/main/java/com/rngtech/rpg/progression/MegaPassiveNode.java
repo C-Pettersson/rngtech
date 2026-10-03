@@ -15,7 +15,7 @@ public record MegaPassiveNode(
         List<String> links, List<MachineModifierEffect> effects, List<TaggedEffect> tagged, Set<String> behaviors,
         Map<MachineStat, Double> fixed, Map<MachineStat, Double> ceilings,
         List<AttributeScaling> scaling, Map<PassiveStatType, Integer> passive, int recipeHardnessCeiling
-) implements PassiveNode {
+) implements PassiveNode, MasteryEffectSource {
     public record AttributeScaling(MachineStat attribute, MachineStat stat, ModifierOperation operation, double perPoint) {
     }
 
@@ -36,6 +36,10 @@ public record MegaPassiveNode(
     /** Starts and keystones are drawn with their own {@code textures/gui/mastery/<id>.png}; other nodes show their first stat. */
     @Override public String masteryIconKey() {
         if (kind == PassiveNodeKind.STARTER || kind == PassiveNodeKind.KEYSTONE) { return id; }
+        return statIconKey(effects, tagged);
+    }
+    /** The shared stat icon for a node's first effect. */
+    static String statIconKey(List<MachineModifierEffect> effects, List<TaggedEffect> tagged) {
         MachineModifierEffect first = !effects.isEmpty() ? effects.getFirst() : !tagged.isEmpty() ? tagged.getFirst().effect() : null;
         if (first == null) { return "stability"; }
         return switch (first.stat()) {

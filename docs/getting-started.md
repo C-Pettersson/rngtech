@@ -145,9 +145,15 @@ The **Affix Forge** applies refinement catalysts to machine items, parts, and Ba
 
 Spend Refinement Potential deliberately. A Magic part with two good affixes is a strong ascension target, and stripped items can still feed the Potential Reactor.
 
+## Mastery and ascendancies
+
+Every machine earns its own Mastery XP from successful work and spends points in the shared passive tree on its Mastery tab. Mastery stays with the chassis through drops and pick-block, so level the machines you keep. See [Machine Mastery](systems/machine-mastery.md).
+
+From Stage 5, a machine with a Stage 4 or later chassis can use an **Ascendancy Seal** to choose one of its family's two ascendancies. Open the crest beside the start node on the Mastery tab, press Ascend with a Seal in your inventory, and pick an ascendancy. Each Seal grants 2 points, and Seals II and III come from Stage 7 and 8 materials. Refunds cost five Mastery Refunds per node. Each family page lists its ascendancies; see [Ascendancies](systems/machine-mastery.md#ascendancies).
+
 ## Read the machine screen
 
-The Process tab shows work, stored resources, and status squares. The Gear tab holds installed components. Hover status icons, meters, and slots for missing requirements, temperature problems, or blocked output. Stats shows effective values with hover explanations, Refinement changes the placed machine's affixes within its remaining budget, and Mastery shows the chassis' level and passive tree. Available tabs vary by machine.
+The Process tab shows work, stored resources, and status squares. The Gear tab holds installed components. Hover status icons, meters, and slots for missing requirements, temperature problems, or blocked output. Stats shows effective values with hover explanations, Refinement changes the placed machine's affixes within its remaining budget, and Mastery shows the chassis' level, passive tree, and ascendancy. Available tabs vary by machine.
 
 ## When a machine underperforms
 

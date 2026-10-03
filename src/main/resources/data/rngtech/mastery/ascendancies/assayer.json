@@ -1,0 +1,181 @@
+{
+    "id": "assayer",
+    "family": "crusher",
+    "nodes": [
+        {
+            "id": "assay_ledger",
+            "kind": "ROOT",
+            "x": 0,
+            "y": 0,
+            "effects": [
+                {
+                    "stat": "BANK_MEMORY",
+                    "operation": "ADD",
+                    "value": 4
+                }
+            ]
+        },
+        {
+            "id": "ledger_memory",
+            "kind": "SMALL",
+            "parent": "assay_ledger",
+            "x": -2,
+            "y": 1,
+            "effects": [
+                {
+                    "stat": "BANK_MEMORY",
+                    "operation": "ADD",
+                    "value": 2
+                }
+            ]
+        },
+        {
+            "id": "wide_ledger",
+            "kind": "NOTABLE",
+            "parent": "ledger_memory",
+            "x": -2,
+            "y": 2,
+            "effects": [
+                {
+                    "stat": "BANK_MEMORY",
+                    "operation": "ADD",
+                    "value": 6
+                }
+            ],
+            "behaviors": [
+                "PERSISTENT_BANKS"
+            ]
+        },
+        {
+            "id": "assay_yield",
+            "kind": "SMALL",
+            "parent": "assay_ledger",
+            "x": -1,
+            "y": 1,
+            "effects": [
+                {
+                    "stat": "OUTPUT_AMOUNT",
+                    "operation": "INCREASED_PERCENT",
+                    "value": 4
+                }
+            ]
+        },
+        {
+            "id": "compound_yield",
+            "kind": "NOTABLE",
+            "parent": "assay_yield",
+            "x": -1,
+            "y": 2,
+            "behaviors": [
+                "COMPOUND_YIELD"
+            ]
+        },
+        {
+            "id": "super_assay",
+            "kind": "SMALL",
+            "parent": "assay_ledger",
+            "x": 1,
+            "y": 1,
+            "effects": [
+                {
+                    "stat": "SUPER_OUTPUT_CHANCE",
+                    "operation": "ADD",
+                    "value": 1
+                }
+            ]
+        },
+        {
+            "id": "tailings_recovery",
+            "kind": "NOTABLE",
+            "parent": "super_assay",
+            "x": 1,
+            "y": 2,
+            "effects": [
+                {
+                    "stat": "CRUSHER_SALVAGE_CHANCE",
+                    "operation": "ADD",
+                    "value": 3
+                }
+            ],
+            "behaviors": [
+                "TAILINGS_RECOVERY"
+            ]
+        },
+        {
+            "id": "at_level_output",
+            "kind": "SMALL",
+            "parent": "assay_ledger",
+            "x": 2,
+            "y": 1,
+            "effects": [
+                {
+                    "stat": "AT_LEVEL_OUTPUT",
+                    "operation": "ADD",
+                    "value": 5
+                }
+            ]
+        },
+        {
+            "id": "matched_hardness",
+            "kind": "NOTABLE",
+            "parent": "at_level_output",
+            "x": 2,
+            "y": 2,
+            "effects": [
+                {
+                    "stat": "AT_LEVEL_OUTPUT",
+                    "operation": "ADD",
+                    "value": 15
+                }
+            ]
+        },
+        {
+            "id": "oath_yield",
+            "kind": "SMALL",
+            "parent": "wide_ledger",
+            "x": -2,
+            "y": 3,
+            "effects": [
+                {
+                    "stat": "OUTPUT_AMOUNT",
+                    "operation": "INCREASED_PERCENT",
+                    "value": 4
+                }
+            ]
+        },
+        {
+            "id": "refiners_oath",
+            "kind": "NOTABLE",
+            "parent": "oath_yield",
+            "x": -2,
+            "y": 4,
+            "behaviors": [
+                "REFINERS_OATH"
+            ]
+        },
+        {
+            "id": "lode_chance",
+            "kind": "SMALL",
+            "parent": "compound_yield",
+            "x": -1,
+            "y": 3,
+            "effects": [
+                {
+                    "stat": "SUPER_OUTPUT_CHANCE",
+                    "operation": "ADD",
+                    "value": 1
+                }
+            ]
+        },
+        {
+            "id": "mother_lode",
+            "kind": "NOTABLE",
+            "parent": "lode_chance",
+            "x": -1,
+            "y": 4,
+            "fixed": {
+                "SUPER_OUTPUT_CADENCE": 16
+            }
+        }
+    ]
+}

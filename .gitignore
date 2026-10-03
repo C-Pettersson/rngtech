@@ -67,6 +67,7 @@ tmp
 tools/moddex/generated/gui-layouts.json
 tools/moddex/generated/modifier-data.json
 tools/moddex/generated/passive-trees.json
+tools/moddex/generated/ascendancies.json
 
 
 ### Local state and private data ###

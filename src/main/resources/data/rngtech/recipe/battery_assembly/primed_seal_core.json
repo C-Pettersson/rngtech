@@ -1,0 +1,53 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "rngtech:ascendancy_seal_recipes_enabled"
+    },
+    {
+      "type": "rngtech:material_enabled",
+      "material": "sparksteel"
+    },
+    {
+      "type": "rngtech:material_enabled",
+      "material": "aluminum"
+    }
+  ],
+  "type": "rngtech:battery_assembly",
+  "group": "component_assembly_seal_cores",
+  "ingredients": [
+    {
+      "ingredient": {
+        "item": "rngtech:sparksteel_coil"
+      }
+    },
+    {
+      "ingredient": {
+        "item": "rngtech:aluminum_casing"
+      }
+    },
+    {
+      "ingredient": {
+        "item": "minecraft:redstone"
+      },
+      "count": 4
+    },
+    {
+      "ingredient": {
+        "item": "rngtech:stabilization_catalyst"
+      }
+    }
+  ],
+  "fluid_input": {
+    "ingredient": {
+      "fluid": "rngtech:electrolyte_solution"
+    },
+    "amount": 1000
+  },
+  "result": {
+    "count": 1,
+    "id": "rngtech:primed_seal_core"
+  },
+  "processing_ticks": 400,
+  "energy": 12000,
+  "roll_result_traits": false
+}

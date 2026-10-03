@@ -183,6 +183,10 @@ public final class RNGTechJeiPlugin implements IModPlugin {
                 uniqueItemStacks(),
                 Component.translatable("rngtech.jei.unique.drop_find_only")
         );
+        registration.addItemStackInfo(
+                ModItems.ASCENDANCY_SEALS.stream().map(seal -> new ItemStack(seal.get())).toList(),
+                Component.translatable("rngtech.jei.ascendancy_seal.info")
+        );
 
         Level level = Minecraft.getInstance().level;
         if (level == null) {

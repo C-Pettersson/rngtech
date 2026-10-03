@@ -1,0 +1,62 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "rngtech:ascendancy_seal_recipes_enabled"
+    },
+    {
+      "type": "rngtech:material_enabled",
+      "material": "naquadah"
+    },
+    {
+      "type": "rngtech:material_enabled",
+      "material": "tungstensteel"
+    },
+    {
+      "type": "rngtech:material_enabled",
+      "material": "nullite"
+    }
+  ],
+  "type": "rngtech:calibrated_shaped",
+  "category": "misc",
+  "pattern": [
+    "XDX",
+    "KFK",
+    "XCX"
+  ],
+  "key": {
+    "C": {
+      "ingredient": {
+        "tag": "c:circuits/ultimate"
+      }
+    },
+    "D": {
+      "ingredient": {
+        "item": "rngtech:calibrated_diamond_crystal"
+      },
+      "calibration": {
+        "family": "logic",
+        "min_stage": 6,
+        "min_stability": 95
+      }
+    },
+    "F": {
+      "ingredient": {
+        "item": "rngtech:exotic_machine_frame"
+      }
+    },
+    "K": {
+      "ingredient": {
+        "item": "rngtech:lubricated_seal_core"
+      }
+    },
+    "X": {
+      "ingredient": {
+        "item": "rngtech:naquadah_plate"
+      }
+    }
+  },
+  "result": {
+    "count": 1,
+    "id": "rngtech:ascendancy_seal_3"
+  }
+}

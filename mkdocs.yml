@@ -94,6 +94,8 @@ nav:
       - Passive Tree Framework: prds/passive-tree-framework.md
       - Machine Mega Passive Tree: prds/machine-mega-passive-tree.md
       - Machine Mega Tree State: prds/machine-mega-passive-tree-state.md
+      - Machine Ascendancies: prds/machine-ascendancies.md
+      - Machine Ascendancies State: prds/machine-ascendancies-state.md
       - Tree Farm Requirements: prds/tree-farm-automation.md
   - Reference:
       - Releasing: releasing.md

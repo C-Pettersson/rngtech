@@ -26,6 +26,7 @@ const VIEW_PATHS = {
     rbom: "/rbom",
     stages: "/stages",
     passiveTree: "/passive-trees",
+    ascendancies: "/ascendancies",
     gui: "/gui"
 };
 const PATH_VIEWS = new Map(Object.entries(VIEW_PATHS).map(([view, path]) => [path, view]));
@@ -93,6 +94,7 @@ function bindElements() {
         "rbomView",
         "stageView",
         "passiveTreeView",
+        "ascendancyView",
         "guiView",
         "rbomTargetSelect",
         "rbomQuantityInput",
@@ -302,6 +304,7 @@ function renderView() {
     els.rbomView.classList.toggle("hidden", state.activeView !== "rbom");
     els.stageView.classList.toggle("hidden", state.activeView !== "stages");
     els.passiveTreeView.classList.toggle("hidden", state.activeView !== "passiveTree");
+    els.ascendancyView.classList.toggle("hidden", state.activeView !== "ascendancies");
     els.guiView.classList.toggle("hidden", state.activeView !== "gui");
     document.querySelectorAll("[data-view]").forEach((button) => {
         button.classList.toggle("active", button.dataset.view === state.activeView);

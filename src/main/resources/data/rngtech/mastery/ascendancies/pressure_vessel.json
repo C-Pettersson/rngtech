@@ -1,0 +1,186 @@
+{
+    "id": "pressure_vessel",
+    "family": "melter",
+    "nodes": [
+        {
+            "id": "pressurized_tanks",
+            "kind": "ROOT",
+            "x": 0,
+            "y": 0,
+            "effects": [
+                {
+                    "stat": "FLUID_CAPACITY",
+                    "operation": "INCREASED_PERCENT",
+                    "value": 200
+                },
+                {
+                    "stat": "FLUID_YIELD",
+                    "operation": "ADD",
+                    "value": 10
+                },
+                {
+                    "stat": "PROCESSING_SPEED",
+                    "operation": "LESS",
+                    "value": 0.8
+                }
+            ]
+        },
+        {
+            "id": "intake_transfer",
+            "kind": "SMALL",
+            "parent": "pressurized_tanks",
+            "x": -2,
+            "y": 1,
+            "effects": [
+                {
+                    "stat": "FLUID_TRANSFER",
+                    "operation": "INCREASED_PERCENT",
+                    "value": 10
+                }
+            ]
+        },
+        {
+            "id": "deep_intake",
+            "kind": "NOTABLE",
+            "parent": "intake_transfer",
+            "x": -2,
+            "y": 2,
+            "effects": [
+                {
+                    "stat": "FLUID_CAPACITY",
+                    "operation": "INCREASED_PERCENT",
+                    "value": 100
+                }
+            ]
+        },
+        {
+            "id": "trap_yield",
+            "kind": "SMALL",
+            "parent": "pressurized_tanks",
+            "x": -1,
+            "y": 1,
+            "effects": [
+                {
+                    "stat": "FLUID_YIELD",
+                    "operation": "ADD",
+                    "value": 3
+                }
+            ]
+        },
+        {
+            "id": "methane_trap",
+            "kind": "NOTABLE",
+            "parent": "trap_yield",
+            "x": -1,
+            "y": 2,
+            "behaviors": [
+                "METHANE_TRAP"
+            ]
+        },
+        {
+            "id": "loop_yield",
+            "kind": "SMALL",
+            "parent": "pressurized_tanks",
+            "x": 1,
+            "y": 1,
+            "effects": [
+                {
+                    "stat": "FLUID_YIELD",
+                    "operation": "ADD",
+                    "value": 3
+                }
+            ]
+        },
+        {
+            "id": "brine_loop",
+            "kind": "NOTABLE",
+            "parent": "loop_yield",
+            "x": 1,
+            "y": 2,
+            "behaviors": [
+                "BRINE_LOOP"
+            ]
+        },
+        {
+            "id": "sealed_capacity",
+            "kind": "SMALL",
+            "parent": "pressurized_tanks",
+            "x": 2,
+            "y": 1,
+            "effects": [
+                {
+                    "stat": "ENERGY_CAPACITY",
+                    "operation": "INCREASED_PERCENT",
+                    "value": 10
+                }
+            ]
+        },
+        {
+            "id": "sealed_lines",
+            "kind": "NOTABLE",
+            "parent": "sealed_capacity",
+            "x": 2,
+            "y": 2,
+            "behaviors": [
+                "SEALED_LINES"
+            ]
+        },
+        {
+            "id": "autoclave_yield",
+            "kind": "SMALL",
+            "parent": "brine_loop",
+            "x": 1,
+            "y": 3,
+            "effects": [
+                {
+                    "stat": "FLUID_YIELD",
+                    "operation": "ADD",
+                    "value": 3
+                }
+            ]
+        },
+        {
+            "id": "autoclave",
+            "kind": "NOTABLE",
+            "parent": "autoclave_yield",
+            "x": 1,
+            "y": 4,
+            "effects": [
+                {
+                    "stat": "FLUID_YIELD",
+                    "operation": "ADD",
+                    "value": 15
+                },
+                {
+                    "stat": "PROCESSING_SPEED",
+                    "operation": "LESS",
+                    "value": 0.6
+                }
+            ]
+        },
+        {
+            "id": "overpressure_transfer",
+            "kind": "SMALL",
+            "parent": "deep_intake",
+            "x": -2,
+            "y": 3,
+            "effects": [
+                {
+                    "stat": "FLUID_TRANSFER",
+                    "operation": "INCREASED_PERCENT",
+                    "value": 10
+                }
+            ]
+        },
+        {
+            "id": "overpressure",
+            "kind": "NOTABLE",
+            "parent": "overpressure_transfer",
+            "x": -2,
+            "y": 4,
+            "behaviors": [
+                "OVERPRESSURE"
+            ]
+        }
+    ]
+}

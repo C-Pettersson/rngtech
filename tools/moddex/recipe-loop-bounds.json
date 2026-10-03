@@ -1,0 +1,63 @@
+{
+    "version": 1,
+    "free": ["fluid:minecraft:water", "minecraft:cobblestone"],
+    "freeReason": "Water sources and cobblestone generators produce these without limit.",
+    "freeInputKeys": ["catalyst", "stabilizer"],
+    "freeInputKeysReason": "Calibration catalysts and stabilizers are cheap consumables. A cycle that only uses them up still duplicates its main input, as the calibrate-then-recycle loop did.",
+    "strippingFe": 100000,
+    "strippingFeReason": "Conservative ceiling on the Potential Reactor's payout for one machine or part: rarity value, Refinement Potential at 120 FE each, and up to 9,000 FE per affix tier.",
+    "notStrippable": [
+        "rngtech:broken_circuit",
+        "rngtech:calibrated_conductive_component",
+        "rngtech:calibrated_kinetic_component",
+        "rngtech:calibrated_logic_component",
+        "rngtech:calibrated_storage_component",
+        "rngtech:calibrated_structural_component",
+        "rngtech:calibrated_thermal_component",
+        "rngtech:pitted_cavitation_rotor"
+    ],
+    "types": {
+        "rngtech:crusher": {
+            "maxOutputMultiplier": 12,
+            "covers": [
+                "OUTPUT_AMOUNT", "SUPER_OUTPUT_CHANCE", "CRUSHER_SALVAGE_CHANCE",
+                "BANK_MEMORY", "AT_LEVEL_OUTPUT", "SUPER_OUTPUT_CADENCE",
+                "FAULT_LINES", "RUBBLE_RECLAIMER", "PERSISTENT_BANKS", "COMPOUND_YIELD", "TAILINGS_RECOVERY", "REFINERS_OATH"
+            ],
+            "reason": "Output Amount has no hard cap. 12x is a deliberately generous bound above any chassis, Crush Head, affix, keystone, and ascendancy stack, including Refiner's Oath and At-Level Output, plus one Super Output copy, one Compound Yield copy, and salvage. Bank Memory, Wide Ledger, and Tailings Recovery only keep bonus progress the bound already counts."
+        },
+        "rngtech:furnace": {
+            "maxOutputMultiplier": 3,
+            "covers": ["SUPER_OUTPUT_CHANCE", "LEDGER_RATE", "CRUSHER_LINE"],
+            "reason": "Super Output adds at most one copy of the base output. The Bloom Ledger adds at most about 0.77 of one on crushed smelts with every Ledger Rate node and Crusher Line, so 3x covers both."
+        },
+        "rngtech:alloy_furnace": {
+            "maxOutputMultiplier": 3,
+            "covers": ["SUPER_OUTPUT_CHANCE", "SUPER_OUTPUT_CADENCE", "FLUX_RATE", "REACTIVE_FLUX", "DROSS_SKIMMING", "BLEND_REVERSAL", "LEDGER_RATE"],
+            "reason": "Super Output adds at most one copy of the base output. Metallurgist's Flux saves at most 0.56 of one unit of an ingredient that needs two or more, so a craft needs at least 72% of that ingredient; Blendwright's ledger adds at most half an output. Only one ascendancy applies, so 3x covers either. Failures return no more than the success route."
+        },
+        "rngtech:metal_press": {
+            "maxOutputMultiplier": 3,
+            "covers": ["SUPER_OUTPUT_CHANCE", "LEDGER_RATE"],
+            "reason": "Super Output adds at most one copy of the base output, and the Drop Forge's Batch Ledger adds a small share of one. Batching presses more input sets without changing the ratio."
+        },
+        "rngtech:melter": {
+            "maxOutputMultiplier": 1.6,
+            "covers": ["FLUID_YIELD", "METHANE_TRAP", "BRINE_LOOP"],
+            "reason": "The Pressure Vessel adds at most 59% Fluid Yield: 34% from its general nodes, including Autoclave, and 25% more on methane or Electrolyte Solution."
+        },
+        "rngtech:calibration": {
+            "maxOutputMultiplier": 2,
+            "covers": ["SUPER_OUTPUT_CHANCE", "SHARED_FIELD", "STABILIZER_ECONOMY"],
+            "reason": "Super Output adds at most one copy of the base output. Shared Field and Stabilizer Economy only save catalysts and stabilizers, which the audit already treats as free."
+        }
+    },
+    "allow": [],
+    "worldSources": {
+        "forestry": {
+            "covers": ["LEDGER_RATE", "LOG_LEDGER", "HEARTWOOD", "GROWTH_PULSE", "FERTILIZER_PULSE", "ANCIENT_GROVE"],
+            "notMadeByRecipes": ["minecraft:bone_meal", "#minecraft:saplings", "#rngtech:giant_saplings"],
+            "reason": "Forestry yields act on tree growth, a free world source like cobblestone. Growth pulses spend one bone meal each and FE only as an application cost, so FE never becomes wood, and no recipe makes bone meal or saplings. The Log Ledger adds at most 56% of harvested logs with Heartwood, and Ancient Grove only changes tree shape."
+        }
+    }
+}

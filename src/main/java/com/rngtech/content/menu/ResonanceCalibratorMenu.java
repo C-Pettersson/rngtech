@@ -29,6 +29,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.neoforged.neoforge.items.ItemStackHandler;
 import net.neoforged.neoforge.items.SlotItemHandler;
 
+import java.util.List;
 import java.util.function.BooleanSupplier;
 
 public class ResonanceCalibratorMenu extends AbstractContainerMenu implements MasteryMenuView<MegaPassiveNode> {
@@ -59,7 +60,8 @@ public class ResonanceCalibratorMenu extends AbstractContainerMenu implements Ma
     private static final int DATA_REFINEMENT_POTENTIAL_BONUS = 18;
     private static final int DATA_REFINEMENT_POTENTIAL = 19;
     private static final int DATA_SELECTED_PATTERN = 20;
-    private static final int DATA_MACHINE_PROGRESSION_START = DATA_SELECTED_PATTERN + 1;
+    private static final int DATA_STREAK = DATA_SELECTED_PATTERN + 1;
+    private static final int DATA_MACHINE_PROGRESSION_START = DATA_STREAK + 1;
     private static final int DATA_COUNT = DATA_MACHINE_PROGRESSION_START + MasteryMenuSupport.FIELD_COUNT;
     private static final int STAT_SCALE = 100;
     /** Kept below 100 so pattern selection never overlaps Mastery node button ids. */
@@ -262,6 +264,11 @@ public class ResonanceCalibratorMenu extends AbstractContainerMenu implements Ma
         return data.get(DATA_STATUS);
     }
 
+    /** The Resonant Streak's current stability floor bonus. */
+    public int streakFloor() {
+        return data.get(DATA_STREAK);
+    }
+
     public int selectedPattern() {
         return data.get(DATA_SELECTED_PATTERN);
     }
@@ -332,6 +339,16 @@ public class ResonanceCalibratorMenu extends AbstractContainerMenu implements Ma
     @Override
     public MachineProgressionState masterySnapshot() {
         return MasteryMenuSupport.snapshot(data, DATA_MACHINE_PROGRESSION_START, masteryFamily());
+    }
+
+    @Override
+    public int ascendancyEntryStage() {
+        return MasteryMenuSupport.ascendancyEntryStage(data, DATA_MACHINE_PROGRESSION_START);
+    }
+
+    @Override
+    public List<MasteryMenuSupport.GrantedStat> ascendancyStats() {
+        return MasteryMenuSupport.grantedStats(data, DATA_MACHINE_PROGRESSION_START);
     }
 
     @Override

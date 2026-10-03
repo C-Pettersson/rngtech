@@ -73,6 +73,22 @@ public final class MachineStatDisplay {
                     ORE_BURST_SPEED -> formatMultiplierDelta(value);
             case BATTERY_SUPPORT -> "stage " + formatNumber(value);
             case SOLAR_PANEL_LIMIT -> formatUnit(value, "panel", "panels");
+            case HARDNESS_TOLERANCE -> formatUnit(value, "level", "levels");
+            case BANK_MEMORY -> formatUnit(value, "input", "inputs");
+            case JAM_CHANCE -> formatMultiplierDelta(value);
+            case JAM_RECOVERY, UNDER_LEVEL_EFFICIENCY, AT_LEVEL_OUTPUT, OVERDRIVE_CAP, LEDGER_RATE, FLUX_RATE, BLEND_SPEED -> formatSignedPercentPoints(value);
+            case BLEND_HEAT_REDUCTION -> formatNumber(value) + " \u00b0C";
+            case MOLD_SWAP_TIME -> formatUnit(value, "tick", "ticks");
+            case HEAT_WINDOW -> formatSignedPercentPoints(value);
+            case STREAK_FLOOR, STREAK_CAP -> formatNumber(value) + " stability";
+            case COIL_REACH -> formatUnit(value, "stage", "stages");
+            case FLUID_YIELD, OVERLEVEL_SPEED -> formatSignedPercentPoints(value);
+            case CART_SPEED -> formatMultiplierDelta(value);
+            case GROWTH_PULSE -> formatNumber(value) + " bone meal";
+            case SUPER_OUTPUT_CADENCE -> value < 1.0 ? "off" : "every " + formatUnit(value, "cycle", "cycles");
+            case OVERDRIVE_SPEED -> formatSignedPercentPoints(value) + " per 10 \u00b0C";
+            case OVERDRIVE_MARGIN -> formatNumber(value) + " \u00b0C";
+            case STRAIN_RECOVERY -> formatNumber(value) + " per tick";
             default -> formatNumber(value);
         };
     }
@@ -157,6 +173,20 @@ public final class MachineStatDisplay {
                     HIGH_HARDNESS_ENERGY_MITIGATION -> formatSignedPercentPoints(value);
             case OUTPUT_GUARD_GRACE -> formatSignedNumber(value) + " ticks";
             case REFINEMENT_POTENTIAL_BONUS -> formatSignedNumber(value) + " RP";
+            case HARDNESS_TOLERANCE -> formatSignedUnit(value, "level", "levels");
+            case BANK_MEMORY -> formatSignedUnit(value, "input", "inputs");
+            case JAM_RECOVERY, UNDER_LEVEL_EFFICIENCY, AT_LEVEL_OUTPUT, OVERDRIVE_CAP, LEDGER_RATE, FLUX_RATE, BLEND_SPEED -> formatSignedPercentPoints(value);
+            case BLEND_HEAT_REDUCTION -> formatSignedNumber(value) + " \u00b0C";
+            case MOLD_SWAP_TIME -> formatSignedUnit(value, "tick", "ticks");
+            case HEAT_WINDOW -> formatSignedPercentPoints(value);
+            case STREAK_FLOOR, STREAK_CAP -> formatSignedNumber(value) + " stability";
+            case COIL_REACH -> formatSignedUnit(value, "stage", "stages");
+            case FLUID_YIELD, OVERLEVEL_SPEED -> formatSignedPercentPoints(value);
+            case GROWTH_PULSE -> formatSignedNumber(value) + " bone meal";
+            case SUPER_OUTPUT_CADENCE -> formatSignedUnit(value, "cycle", "cycles");
+            case OVERDRIVE_SPEED -> formatSignedPercentPoints(value) + " per 10 \u00b0C";
+            case OVERDRIVE_MARGIN -> formatSignedNumber(value) + " \u00b0C";
+            case STRAIN_RECOVERY -> formatSignedNumber(value) + " per tick";
             default -> formatSignedNumber(value);
         };
     }

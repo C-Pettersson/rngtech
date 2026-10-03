@@ -662,9 +662,11 @@ public class ResonanceCalibratorScreen extends AbstractContainerScreen<Resonance
 
     private Component progressTooltip() {
         int ticks = menu.processingTicks();
-        return ticks <= 0
+        Component progress = ticks <= 0
                 ? Component.literal("Progress: -- / --")
                 : Component.literal("Progress: " + menu.progress() + " / " + ticks);
+        return menu.streakFloor() <= 0 ? progress
+                : progress.copy().append(" ").append(Component.translatable("rngtech.calibration.tooltip.streak", menu.streakFloor()));
     }
 
     private void renderStatTooltips(GuiGraphics guiGraphics, int mouseX, int mouseY) {
@@ -741,7 +743,10 @@ public class ResonanceCalibratorScreen extends AbstractContainerScreen<Resonance
                     )
             );
         }
-        return MachineScreenStyle.withoutInactiveModifierStats(STAT_TYPES, statLines);
+        return MachineScreenStyle.fitStatLines(
+                MachineScreenStyle.withAscendancyStats(MachineScreenStyle.withoutInactiveModifierStats(STAT_TYPES, statLines), menu.ascendancyStats()),
+                MachineScreenStyle.maxStatRows(STAT_PANEL_Y, BASE_IMAGE_HEIGHT)
+        );
     }
 
     private boolean isIntegralStat(int dataIndex) {

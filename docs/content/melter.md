@@ -76,7 +76,7 @@ Fluid Pumps are `FLUID_PUMP` machine parts for `MachineType.MELTER`. The Osmium 
 
 ## Mastery
 
-The Melter enters the [shared Machine Mastery tree](../systems/machine-mastery.md) at the Reserve / Control start, whose home region covers insulation, regulation, thermal inertia, fluid handling, and catalysis. Base attributes are `10` Control, `0` Drive, and `10` Reserve. Besides the shared attribute conversions, each Reserve point grants `0.1%` increased Fluid Transfer. Effects the Melter cannot use, such as Stability, bonus output chance, and fuel duration, stay selectable but are marked inactive. Increased Maximum Temperature applies, but the maximum-temperature caps from Low Heat Specialist, Flash Annealing, and Regulated Heat do not, because those values sit below the `1200` minimum of every default recipe. The Melter is not a heated machine for [tagged payoffs](../systems/machine-mastery.md#tagged-payoffs), so it also does not gain their speed bonuses; untagged penalties such as Flash Annealing's Energy Usage still apply. It has no bonus output, so Single Pass does nothing on a Melter.
+The Melter enters the [shared Machine Mastery tree](../systems/machine-mastery.md) at the Reserve / Control start, whose home region covers insulation, regulation, thermal inertia, fluid handling, and catalysis. Base attributes are `10` Control, `0` Drive, and `10` Reserve. Besides the shared attribute conversions, each Reserve point grants `0.1%` increased Fluid Transfer. Effects the Melter cannot use, such as Stability, bonus output chance, and fuel duration, stay selectable but are marked inactive. Increased Maximum Temperature applies, but the maximum-temperature caps from Low Heat Specialist, Flash Annealing, and Regulated Heat do not, because those values sit below the `1200` minimum of every default recipe. The Melter is not a heated machine for [tagged payoffs](../systems/machine-mastery.md#tagged-payoffs), so it also does not gain their speed bonuses; untagged penalties such as Flash Annealing's Energy Usage still apply. It has no Super Output, so Single Pass does nothing on a Melter; ascendancy Fluid Yield is unaffected.
 
 Recipes may set `machine_xp` and an optional `machine_xp_band`; the band defaults from `required_processing_level` on the same scale as Crusher recipes, so the default level `6` recipes train in band `81`. XP is granted only after a completed melt puts fluid into the output tank. Missing Gear, low heat or processing level, a full output tank, invalid recipes, and power-starved ticks grant none; a Nullite Servo melt whose whole output is voided also grants none. Allocation changes reset active melt progress and Bulk Speed while keeping inventory, tanks, and Gear. Breaking and pick-blocking the Melter preserve `rngtech:machine_progression`.
 
@@ -87,6 +87,57 @@ Recipes may set `machine_xp` and an optional `machine_xp_band`; the band default
 | 6 | Methane |
 
 The lava recipe grants no XP.
+
+## Ascendancies
+
+Status: Prototype
+
+Melter machines choose between Pressure Vessel and Twin Crucible when they use their first Ascendancy Seal. [Machine Mastery](../systems/machine-mastery.md#ascendancies) defines Seals, points, refunds, and switching, and [Machine Stats](../reference/machine-stats.md#ascendancy-stats) defines the new stats. The tables below are generated from the ascendancy catalog.
+
+- The Melter’s tanks start at 4,000 mB, and Pressurized Tanks raise them. Melter recipes carry `bonus_output`, and only eligible melts gain Fluid Yield, rounded down per melt.
+- Sealed Lines stops excess output from being voided, even with an auto-purge servo, so a full tank pauses work and keeps progress.
+- Twin Crucible’s Second Crucible and Triple Crucible run parallel melts from the input. Shared Heat makes each melt after the first 20% cheaper, and Fused Crucibles turns them off for 30% more Processing Speed per job.
+- Electrolyte Solution, Methane, and lava feed generators, so the loop audit bounds Melter yield at 1.6 times the recipe fluid.
+
+<!-- ascendancy-trees:start -->
+
+### Pressure Vessel
+
+| Node | Type | After | Effect |
+|---|---|---|---|
+| **Pressurized Tanks** | Root | — | 200% increased Fluid Capacity; +10% Fluid Yield; 20% less Processing Speed. |
+| Wide Valves | Small | Pressurized Tanks | 10% increased Fluid Transfer. |
+| **Deep Intake** | Notable | Wide Valves | 100% increased Fluid Capacity. |
+| Relief Valve | Small | Deep Intake | 10% increased Fluid Transfer. |
+| **Overpressure** | Deep notable | Relief Valve | Melts run 30% faster while the output tank is over half full. |
+| Tight Seals | Small | Pressurized Tanks | +3% Fluid Yield. |
+| **Methane Trap** | Notable | Tight Seals | +25% Fluid Yield on methane from algae. |
+| Closed Circuit | Small | Pressurized Tanks | +3% Fluid Yield. |
+| **Brine Loop** | Notable | Closed Circuit | +25% Fluid Yield on Electrolyte Solution. |
+| Slow Boil | Small | Brine Loop | +3% Fluid Yield. |
+| **Autoclave** | Deep notable | Slow Boil | +15% Fluid Yield; 40% less Processing Speed. |
+| Spare Charge | Small | Pressurized Tanks | 10% increased Energy Capacity. |
+| **Sealed Lines** | Notable | Spare Charge | A full output tank pauses work and keeps progress, even with an auto-purge servo. |
+
+### Twin Crucible
+
+| Node | Type | After | Effect |
+|---|---|---|---|
+| **Second Crucible** | Root | — | +1 Parallel Jobs; 15% more Energy Use. Runs one extra melt in parallel per Parallel Job. |
+| Steady Feed | Small | Second Crucible | 8% increased Processing Speed. |
+| **Crush Feed** | Notable | Steady Feed | +10% Overlevel Speed. |
+| Hot Walls | Small | Second Crucible | 8% increased Heat Transfer. |
+| **Flash Point** | Notable | Hot Walls | 40% increased Heat Transfer. |
+| Fused Walls | Small | Flash Point | 8% increased Heat Transfer. |
+| **Fused Crucibles** | Deep notable | Fused Walls | Parallel melting is off; 30% more Processing Speed per Parallel Job given up. |
+| Lean Burn | Small | Second Crucible | 5% reduced Energy Use. |
+| **Shared Heat** | Notable | Lean Burn | Parallel melts after the first use 20% less FE. |
+| Banked Burn | Small | Shared Heat | 5% reduced Energy Use. |
+| **Triple Crucible** | Deep notable | Banked Burn | +1 Parallel Jobs. |
+| Deep Heat | Small | Second Crucible | 4% increased Max Temperature. |
+| **Lava Tap** | Notable | Deep Heat | The lava recipe runs 50% faster. |
+
+<!-- ascendancy-trees:end -->
 
 ## Related Pages
 

@@ -36,6 +36,7 @@ public final class MasteryChecks {
         keystonePayoffsNeedTheirCosts();
         bonusSummary();
         iconTextures();
+        checks += AscendancyChecks.run();
         System.out.println("Machine mastery: " + checks + " checks passed");
         ForestryTreeScanChecks.run();
     }
@@ -176,6 +177,7 @@ public final class MasteryChecks {
         @Override public MachineMasteryFamily masteryFamily() { return MachineMasteryFamily.CRUSHER; }
         @Override public MachineProgressionState machineProgression() { return state; }
         @Override public void setMachineProgression(MachineProgressionState state) { this.state = state; }
+        @Override public int ascendancyEntryStage() { return AscendancyCatalog.ENTRY_STAGE; }
         @Override public boolean masteryGearAllows(MachineProgressionState state) { return gear.test(state); }
     }
 

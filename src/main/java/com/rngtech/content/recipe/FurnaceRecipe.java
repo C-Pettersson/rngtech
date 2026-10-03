@@ -44,7 +44,7 @@ public record FurnaceRecipe(
         int machineXp,
         int machineXpBand
 )
-        implements Recipe<SingleRecipeInput> {
+        implements Recipe<SingleRecipeInput>, BonusOutputRecipe {
     public FurnaceRecipe {
         malformedMaterial = malformedMaterial == null ? "" : malformedMaterial.toLowerCase(Locale.ROOT);
         targetTemperature = targetTemperature > 0 ? targetTemperature : minimumTemperature;

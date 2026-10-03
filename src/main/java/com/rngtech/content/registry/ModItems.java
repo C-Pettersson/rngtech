@@ -27,6 +27,7 @@ import com.rngtech.content.item.AlloyCrucibleItem;
 import com.rngtech.content.item.AlloyFurnaceChassisBlockItem;
 import com.rngtech.content.item.AmmoniaMachineBlockItem;
 import com.rngtech.content.item.AmmoniaPartItem;
+import com.rngtech.content.item.AscendancySealItem;
 import com.rngtech.content.item.BatteryCellItem;
 import com.rngtech.content.item.BatteryChassisBlockItem;
 import com.rngtech.content.item.BioChamberItem;
@@ -110,6 +111,7 @@ import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.BucketItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.Rarity;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredItem;
 import net.neoforged.neoforge.registries.DeferredRegister;
@@ -226,6 +228,12 @@ public final class ModItems {
             () -> new WrenchItem(new Item.Properties().stacksTo(1))
     );
     public static final DeferredItem<Item> MASTERY_REFUND = ITEMS.registerSimpleItem("mastery_refund");
+    public static final DeferredItem<AscendancySealItem> ASCENDANCY_SEAL_1 = registerAscendancySeal(1, Rarity.UNCOMMON);
+    public static final DeferredItem<AscendancySealItem> ASCENDANCY_SEAL_2 = registerAscendancySeal(2, Rarity.RARE);
+    public static final DeferredItem<AscendancySealItem> ASCENDANCY_SEAL_3 = registerAscendancySeal(3, Rarity.EPIC);
+    public static final List<DeferredItem<AscendancySealItem>> ASCENDANCY_SEALS = List.of(ASCENDANCY_SEAL_1, ASCENDANCY_SEAL_2, ASCENDANCY_SEAL_3);
+    public static final DeferredItem<Item> PRIMED_SEAL_CORE = ITEMS.registerSimpleItem("primed_seal_core");
+    public static final DeferredItem<Item> LUBRICATED_SEAL_CORE = ITEMS.registerSimpleItem("lubricated_seal_core");
 
     public static final DeferredItem<ConfiguratorItem> CONFIGURATOR = ITEMS.register(
             "configurator",
@@ -785,6 +793,15 @@ public final class ModItems {
                 STABILITY_MODIFIER_LENS,
                 CONTROL_MODIFIER_LENS
         );
+    }
+
+    /** The Seal of a tier from 1 to {@value com.rngtech.rpg.progression.AscendancyCatalog#MAX_TIERS}. */
+    public static DeferredItem<AscendancySealItem> ascendancySeal(int tier) {
+        return ASCENDANCY_SEALS.get(tier - 1);
+    }
+
+    private static DeferredItem<AscendancySealItem> registerAscendancySeal(int tier, Rarity rarity) {
+        return ITEMS.register("ascendancy_seal_" + tier, () -> new AscendancySealItem(tier, new Item.Properties().stacksTo(16).rarity(rarity)));
     }
 
     public static DeferredItem<Item> materialItem(String itemId) {

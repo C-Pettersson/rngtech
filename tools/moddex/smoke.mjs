@@ -1,6 +1,9 @@
 import { startModdexServer } from "./serve.mjs";
 import { checkPassiveTreeData } from "./check-passive-tree.mjs";
-import { checkRecipeLoops } from "./check-recipe-loops.mjs";
+import { checkAscendancySeals } from "./check-ascendancy-seals.mjs";
+import { checkAscendancyDocs } from "./export-ascendancy-data.mjs";
+import { checkRecipeLoopMutations, checkRecipeLoops } from "./check-recipe-loops.mjs";
+import { checkRecyclingReturns } from "./check-recycling-returns.mjs";
 
 const { server, url } = await startModdexServer({ port: 0, log: false });
 
@@ -108,6 +111,11 @@ try {
     const passiveTreeData = await passiveTreeDataResponse.json();
     await checkPassiveTreeData(passiveTreeData);
     await checkRecipeLoops();
+    await checkRecipeLoopMutations();
+    await checkRecyclingReturns();
+    await checkAscendancySeals();
+    await checkAscendancyView(url);
+    await checkAscendancyDocs();
 
     const data = await dataResponse.json();
     const profiles = Object.keys(data.profiles ?? {});
@@ -537,6 +545,41 @@ try {
     await new Promise((resolve, reject) => {
         server.close((error) => error ? reject(error) : resolve());
     });
+}
+
+/** The Ascendancies tab serves its route, script, and generated catalog, and every family's ascendancies are in it. */
+async function checkAscendancyView(url) {
+    const [routeResponse, scriptResponse, dataResponse] = await Promise.all([
+        fetch(new URL("./ascendancies", url)),
+        fetch(new URL("./ascendancy-view.js", url)),
+        fetch(new URL("./generated/ascendancies.json", url))
+    ]);
+    assertOk(routeResponse, "ascendancies route");
+    assertOk(scriptResponse, "ascendancy-view.js");
+    assertOk(dataResponse, "ascendancies.json");
+    const html = await routeResponse.text();
+    if (!html.includes("ascendancyView") || !html.includes("ascendancyCards") || !html.includes("/ascendancy-view.js")) {
+        throw new Error("ascendancies route did not return the Ascendancies view.");
+    }
+    const script = await scriptResponse.text();
+    if (!script.includes("treeSvg") || !script.includes("ascendancyDeclarationBody") || !script.includes("coveredBy")) {
+        throw new Error("ascendancy-view.js did not include the tree, node, and declaration views.");
+    }
+    const data = await dataResponse.json();
+    for (const family of data.families) {
+        if (family.ascendancies.length < 2) {
+            throw new Error(`ascendancies.json lists fewer than two ascendancies for ${family.id}.`);
+        }
+        for (const ascendancy of family.ascendancies) {
+            if (ascendancy.nodes.filter((node) => node.kind === "ROOT").length !== 1 || !ascendancy.nodes.some((node) => node.kind === "DEEP")) {
+                throw new Error(`ascendancies.json has a malformed tree for ${ascendancy.id}.`);
+            }
+        }
+    }
+    const uncovered = [...data.stats, ...data.behaviors].filter((entry) => entry.yield !== "none" && !entry.coveredBy.length);
+    if (uncovered.length) {
+        throw new Error(`ascendancies.json has yield entries without a loop bound: ${uncovered.map((entry) => entry.id).join(", ")}`);
+    }
 }
 
 function assertOk(response, label) {

@@ -37,10 +37,11 @@ public record MetalPressRecipe(
         ItemStack failureOutput,
         String failureMaterial,
         boolean powerSensitive,
+        boolean allowsBonusOutput,
         int machineXp,
         int machineXpBand
 )
-        implements Recipe<MetalPressRecipeInput> {
+        implements Recipe<MetalPressRecipeInput>, BonusOutputRecipe {
     public MetalPressRecipe {
         targetTemperature = targetTemperature > 0 ? targetTemperature : minimumTemperature;
         safeMaximumTemperature = Math.max(targetTemperature, safeMaximumTemperature);
@@ -155,6 +156,7 @@ public record MetalPressRecipe(
                         ItemStack.STRICT_CODEC.fieldOf("failure_output").forGetter(MetalPressRecipe::failureOutput),
                         Codec.STRING.optionalFieldOf("failure_material", "").forGetter(MetalPressRecipe::failureMaterial),
                         Codec.BOOL.fieldOf("power_sensitive").orElse(true).forGetter(MetalPressRecipe::powerSensitive),
+                        Codec.BOOL.fieldOf("bonus_output").orElse(true).forGetter(MetalPressRecipe::allowsBonusOutput),
                         MachineXpFields.CODEC.forGetter(recipe -> new MachineXpFields(
                                 recipe.machineXp(),
                                 recipe.machineXpBand() <= 0 ? Optional.empty() : Optional.of(recipe.machineXpBand())
@@ -175,6 +177,7 @@ public record MetalPressRecipe(
                         failureOutput,
                         failureMaterial,
                         powerSensitive,
+                        allowsBonusOutput,
                         machineXpFields
                 ) -> {
                     int resolvedTarget = targetTemperature.orElse(minimumTemperature);
@@ -193,6 +196,7 @@ public record MetalPressRecipe(
                             failureOutput,
                             failureMaterial,
                             powerSensitive,
+                            allowsBonusOutput,
                             machineXpFields.machineXp(),
                             machineXpFields.machineXpBand().orElse(defaultMachineXpBand(machineXpFields.machineXp(), resolvedTarget))
                     );
@@ -217,6 +221,7 @@ public record MetalPressRecipe(
                                 ItemStack.STREAM_CODEC.decode(buffer),
                                 ByteBufCodecs.STRING_UTF8.decode(buffer),
                                 ByteBufCodecs.BOOL.decode(buffer),
+                                ByteBufCodecs.BOOL.decode(buffer),
                                 ByteBufCodecs.VAR_INT.decode(buffer),
                                 ByteBufCodecs.VAR_INT.decode(buffer)
                         );
@@ -238,6 +243,7 @@ public record MetalPressRecipe(
                         ItemStack.STREAM_CODEC.encode(buffer, recipe.failureOutput);
                         ByteBufCodecs.STRING_UTF8.encode(buffer, recipe.failureMaterial);
                         ByteBufCodecs.BOOL.encode(buffer, recipe.powerSensitive);
+                        ByteBufCodecs.BOOL.encode(buffer, recipe.allowsBonusOutput);
                         ByteBufCodecs.VAR_INT.encode(buffer, recipe.machineXp);
                         ByteBufCodecs.VAR_INT.encode(buffer, recipe.machineXpBand);
                     }

@@ -135,7 +135,7 @@ The station receives FE only when an Energy Connector is installed and stores a 
 
 Forestry Companion item stacks use the `FORESTRY_COMPANION` modifier eligibility profile. Processing-speed affixes adjust the placed cart's work interval after installed tool speed is considered, and energy-usage affixes adjust movement, scan, plant, and cut FE costs. Placed carts save traits and Mastery progression, preserve them on pick-block, and drop the same rolled companion item when broken.
 
-Control, Drive, and Reserve use the [shared attribute conversions](../systems/machine-mastery.md#attributes). Base class attributes now affect gameplay. The family ascendancy list remains empty.
+Control, Drive, and Reserve use the [shared attribute conversions](../systems/machine-mastery.md#attributes). Base class attributes now affect gameplay. The Forestry Companion also has two [ascendancies](#ascendancies).
 
 Successful route actions consume cart FE:
 
@@ -152,6 +152,59 @@ Automation surfaces:
 - FE automation requires an installed Energy Connector, charges the station buffer, optional station Battery Cell, and any physically docked cart, and is capped by the installed Energy Connector tier.
 - Fluid automation requires an installed Fluid Connector. The current cart has no fluid cargo or tank, so the endpoint is reserved and inert.
 - Cart Battery Cell, modular tool, shears Gear, and onboard cargo are managed from the cart's own right-click menu. A station can only install staged shears into an empty docked-cart shears slot; it does not replace usable installed shears. The station Battery Cell and connector ports are managed from the station Gear tab.
+
+## Ascendancies
+
+Status: Prototype
+
+Forestry Companion machines choose between Timber Baron and Grove Warden when they use their first Ascendancy Seal. [Machine Mastery](../systems/machine-mastery.md#ascendancies) defines Seals, points, refunds, and switching, and [Machine Stats](../reference/machine-stats.md#ascendancy-stats) defines the new stats. The tables below are generated from the ascendancy catalog.
+
+- The entry stage for Seal I is the stage of the installed Axe or Treefeller head.
+- Timber Baron’s Log Ledger banks Ledger Rate of each harvested log and pays whole logs into output cargo when there is room. Heartwood feeds Treefeller batches twice. Clearcut Charter stops planting and waiting for saplings, and routes sapling drops to output cargo.
+- Rolling Harvest keeps the cart moving after planting and through work cooldowns, and cuts a tree while it stays within 2 blocks of the rail. The cart halts only when the tree would leave reach, so a fast cart may leave a cell for its next pass.
+- Grove Warden’s growth pulses spend bone meal, not FE alone, so FE never becomes wood. A Grove Warden cart stores up to 256 bone meal, loaded through its sapling slots or from a docked station. The station keeps its own 256 store, loaded through its sapling slot, so bone meal never blocks saplings. The cart and station show the store as a bar under the sapling slots.
+- Each managed sapling takes at most one pulse per 100 ticks. A pulse that cannot grow a ready sapling, for lack of room or a single-tree form, backs that cell off for 1,200 ticks.
+- Seed Library replants each cell’s remembered species and leaves the cell empty until that sapling is in cargo. Ancient Grove plants a clear 2×2 plot away from the rail when four saplings from `rngtech:giant_saplings` are in cargo; it costs four plantings of FE and counts as one managed cell.
+
+<!-- ascendancy-trees:start -->
+
+### Timber Baron
+
+| Node | Type | After | Effect |
+|---|---|---|---|
+| **Log Ledger** | Root | — | +10% Ledger Rate. Harvested logs bank Ledger Rate of themselves and pay whole logs into cargo; leaf cleanup is 25% slower. |
+| Long Reach | Small | Log Ledger | +2 Tree Fell Limit. |
+| **Sawyer’s Eye** | Notable | Long Reach | +5 Tree Fell Limit. |
+| Broad Reach | Small | Sawyer’s Eye | +2 Tree Fell Limit. |
+| **Clearcut Charter** | Deep notable | Broad Reach | +15% Ledger Rate. The cart stops planting and sends saplings to output cargo. |
+| Lean Cut | Small | Log Ledger | 5% reduced Energy Use. |
+| **Clean Fell** | Notable | Lean Cut | Treefeller batches cost FE only for the logs cut, not the full Tree Fell Limit. |
+| Greased Axles | Small | Log Ledger | 10% increased Cart Speed. |
+| **Dock Sprint** | Notable | Greased Axles | +50% Cart Speed while heading to a station. |
+| Loose Brakes | Small | Dock Sprint | 10% increased Cart Speed. |
+| **Rolling Harvest** | Deep notable | Loose Brakes | The cart keeps rolling while it plants and waits out work, and cuts trees up to 2 blocks from the rail. |
+| Tally Board | Small | Log Ledger | +3% Ledger Rate. |
+| **Heartwood** | Notable | Tally Board | Logs cut in one Treefeller batch feed the Log Ledger twice. |
+
+### Grove Warden
+
+| Node | Type | After | Effect |
+|---|---|---|---|
+| **Growth Pulse** | Root | — | +1 Growth Pulse. As the cart passes a managed sapling, a growth pulse spends 1 bone meal and 30 FE. Load bone meal through the sapling slots of the cart or its station. Movement costs 25% more FE. |
+| Spare Plots | Small | Growth Pulse | +2 managed cells. |
+| **Nursery** | Notable | Spare Plots | +8 managed cells. |
+| Old Rows | Small | Nursery | +2 managed cells. |
+| **Ancient Grove** | Deep notable | Old Rows | With four matching saplings in cargo, plants a 2×2 giant dark oak, jungle, or spruce away from the rail. |
+| Loam | Small | Growth Pulse | 10% increased Growth Pulse. |
+| **Rich Soil** | Notable | Loam | 50% increased Growth Pulse. |
+| Deep Roots | Small | Rich Soil | 10% increased Growth Pulse. |
+| **Verdant Surge** | Deep notable | Deep Roots | Growth pulses reach every managed sapling within 3 blocks of the rail. |
+| Seed Drawers | Small | Growth Pulse | 5% reduced Energy Use. |
+| **Seed Library** | Notable | Seed Drawers | Each managed cell replants the species it last grew, and waits until that sapling is in cargo. |
+| Light Touch | Small | Growth Pulse | 5% increased Processing Speed. |
+| **Canopy Care** | Notable | Light Touch | Shears wear half as fast. |
+
+<!-- ascendancy-trees:end -->
 
 ## Current Limits
 

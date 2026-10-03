@@ -5,12 +5,13 @@ import { fileURLToPath } from "node:url";
 import { buildModifierData } from "./export-modifier-data.mjs";
 import { buildGuiLayoutData } from "./export-gui-layout-data.mjs";
 import { buildPassiveTreeData } from "./export-passive-tree-data.mjs";
+import { buildAscendancyData } from "./export-ascendancy-data.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const WEB_ROOT = path.join(__dirname, "web");
 const GENERATED_ROOT = path.join(__dirname, "generated");
 const START_PORT = Number(globalThis.process?.env?.PORT ?? 4177);
-const APP_ROUTES = new Set(["/modifiers", "/rbom", "/stages", "/passive-trees", "/gui"]);
+const APP_ROUTES = new Set(["/modifiers", "/rbom", "/stages", "/passive-trees", "/ascendancies", "/gui"]);
 
 const mimeTypes = new Map([
     [".html", "text/html; charset=utf-8"],
@@ -24,6 +25,7 @@ export async function startModdexServer({ port = START_PORT, host = "127.0.0.1",
     await buildModifierData();
     await buildGuiLayoutData();
     await buildPassiveTreeData();
+    await buildAscendancyData();
     return listenWithFallback(port, host, log, port + 20);
 }
 

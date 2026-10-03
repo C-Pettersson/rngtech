@@ -106,6 +106,10 @@ public final class RNGTechConfig {
             .comment("Flat Refinement Potential adjustment applied to all calibrated outputs.")
             .defineInRange("calibration.refinementPotentialBonus", 0, -64, 64);
 
+    public static final ModConfigSpec.BooleanValue ASCENDANCY_SEAL_RECIPES_ENABLED = BUILDER
+            .comment("Whether the default Ascendancy Seal and Seal Core recipes load. Disable them to award Seals through loot, quests, or custom recipes instead.")
+            .define("ascendancy.sealRecipesEnabled", true);
+
     public static final Map<String, ModConfigSpec.BooleanValue> MATERIALS = defineMaterials();
     private static final OreWorldgenConfig ORE_WORLDGEN_CONFIG = defineOreWorldgen();
     public static final ModConfigSpec.BooleanValue ORE_WORLDGEN_ENABLED = ORE_WORLDGEN_CONFIG.enabled();

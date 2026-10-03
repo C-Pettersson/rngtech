@@ -2,12 +2,14 @@ package com.rngtech.content.registry;
 
 import com.rngtech.RNGTech;
 import com.rngtech.content.calibration.CalibrationState;
+import com.rngtech.content.calibration.CalibrationStreak;
 import com.rngtech.content.configurator.ConfiguratorPreset;
 import com.rngtech.content.item.UnidentifiedTraitRoll;
 import com.rngtech.content.itemfilter.AdvancedItemFilterSettings;
 import com.rngtech.content.minerscompanion.MinersCompanionState;
 import com.rngtech.content.tool.FieldToolAssembly;
 import com.rngtech.rpg.MachineTraits;
+import com.rngtech.rpg.OutputAmountTracker;
 import com.rngtech.rpg.progression.MachineProgressionState;
 import com.rngtech.rpg.refinement.ExoticAffixForgeHistory;
 
@@ -18,6 +20,8 @@ import net.minecraft.network.codec.ByteBufCodecs;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
+
+import java.util.List;
 
 public final class ModDataComponents {
     private static final DeferredRegister.DataComponents DATA_COMPONENTS =
@@ -48,6 +52,24 @@ public final class ModDataComponents {
                                     .networkSynchronized(MachineProgressionState.STREAM_CODEC)
                                     .cacheEncoding()
                     );
+
+    /** The Harmonist's streak, kept on a dropped or picked Resonance Calibrator by Pattern Memory. */
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<CalibrationStreak>> CALIBRATION_STREAK =
+            DATA_COMPONENTS.registerComponentType(
+                    "calibration_streak",
+                    builder -> builder
+                            .persistent(CalibrationStreak.CODEC)
+                            .networkSynchronized(ByteBufCodecs.fromCodecWithRegistries(CalibrationStreak.CODEC))
+            );
+
+    /** Crusher bonus banks kept on a dropped or picked machine by the Assayer's Wide Ledger. */
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<List<OutputAmountTracker.SavedBank>>> OUTPUT_BANKS =
+            DATA_COMPONENTS.registerComponentType(
+                    "output_banks",
+                    builder -> builder
+                            .persistent(OutputAmountTracker.SavedBank.LIST_CODEC)
+                            .networkSynchronized(ByteBufCodecs.fromCodecWithRegistries(OutputAmountTracker.SavedBank.LIST_CODEC))
+            );
 
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<UnidentifiedTraitRoll>>
             UNIDENTIFIED_TRAIT_ROLL =

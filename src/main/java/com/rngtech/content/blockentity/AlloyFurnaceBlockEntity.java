@@ -12,7 +12,10 @@ import com.rngtech.content.menu.AlloyFurnaceMenu;
 import com.rngtech.content.menu.MasteryMenuSupport;
 import com.rngtech.content.recipe.AlloyFurnaceRecipe;
 import com.rngtech.content.recipe.AlloyFurnaceRecipeInput;
+import com.rngtech.content.recipe.CountedIngredient;
+import com.rngtech.content.recipe.FurnaceRecipe;
 import com.rngtech.content.registry.ModBlockEntities;
+import com.rngtech.content.registry.ModRecipes;
 import com.rngtech.rpg.ComponentBaseStatCatalog;
 import com.rngtech.rpg.MachineBaseStatCatalog;
 import com.rngtech.rpg.MachineBehavior;
@@ -26,6 +29,8 @@ import com.rngtech.rpg.MachineTraits;
 import com.rngtech.rpg.MachineType;
 import com.rngtech.rpg.ModifierOperation;
 import com.rngtech.rpg.ModifierSlot;
+import com.rngtech.rpg.OutputLedger;
+import com.rngtech.rpg.progression.AscendancyFormulas;
 import com.rngtech.rpg.progression.MachineMasteryFamily;
 import com.rngtech.rpg.progression.MachineMasteryHost;
 import com.rngtech.rpg.progression.MachineProgressionState;
@@ -44,7 +49,9 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerData;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.capabilities.Capabilities;
@@ -53,6 +60,10 @@ import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.ItemStackHandler;
 
 import java.util.Arrays;
+import java.util.IdentityHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 public class AlloyFurnaceBlockEntity extends BaseMachineBlockEntity implements MenuProvider, MachineInfoProvider, MachineMasteryHost {
     public static final int MAX_INPUT_SLOTS = 4;
@@ -78,6 +89,7 @@ public class AlloyFurnaceBlockEntity extends BaseMachineBlockEntity implements M
     public static final int STATUS_WARMING = 10;
     public static final int STATUS_POWER_DROP = 11;
     public static final int STATUS_FAILURE_RISK = 12;
+    public static final int STATUS_ROUTE_DISABLED = 13;
 
     private static final double NO_BATTERY_PROCESSING_SPEED = 0.85;
     private static final int NO_BATTERY_STABILITY_PENALTY = 10;
@@ -108,7 +120,9 @@ public class AlloyFurnaceBlockEntity extends BaseMachineBlockEntity implements M
     private static final int DATA_WARMUP_TIME = 24;
     private static final int DATA_COOLING_RATE = 25;
     private static final int DATA_OVERHEAT_TOLERANCE = 26;
-    private static final int DATA_MACHINE_PROGRESSION_START = 27;
+    private static final int DATA_LEDGER = 27;
+    private static final int DATA_LEDGER_BLEND = 28;
+    private static final int DATA_MACHINE_PROGRESSION_START = 29;
     private static final int DATA_COUNT = DATA_MACHINE_PROGRESSION_START + MasteryMenuSupport.FIELD_COUNT;
     private static final int STAT_SCALE = 100;
 
@@ -178,17 +192,17 @@ public class AlloyFurnaceBlockEntity extends BaseMachineBlockEntity implements M
         public int get(int index) {
             if (index >= DATA_MACHINE_PROGRESSION_START
                     && index < DATA_MACHINE_PROGRESSION_START + MasteryMenuSupport.FIELD_COUNT) {
-                return MasteryMenuSupport.get(machineProgression(), index - DATA_MACHINE_PROGRESSION_START, AlloyFurnaceBlockEntity.this::effectiveStats);
+                return MasteryMenuSupport.get(AlloyFurnaceBlockEntity.this, index - DATA_MACHINE_PROGRESSION_START, AlloyFurnaceBlockEntity.this::effectiveStats);
             }
-            MachineStatAccumulator stats = effectiveStats();
             AlloyFurnaceRecipe recipe = nextRecipe();
+            MachineStatAccumulator stats = routeStats(recipe, effectiveStats());
             return switch (index) {
                 case DATA_PROGRESS -> progress;
                 case DATA_PROCESSING_TICKS -> currentProcessingTicks(recipe, stats);
                 case DATA_ENERGY -> energyStored();
                 case DATA_ENERGY_CAPACITY -> energyCapacity();
                 case DATA_ENERGY_PER_TICK -> recipe == null ? 0 : energyCostPerTick(recipe, stats);
-                case DATA_MIN_TEMPERATURE -> recipe == null ? 0 : recipe.minimumTemperature();
+                case DATA_MIN_TEMPERATURE -> recipe == null ? 0 : minimumTemperature(recipe, stats);
                 case DATA_STATUS -> statusCode(recipe, stats);
                 case DATA_PROCESSING_SPEED -> scaledStat(stats, MachineStat.PROCESSING_SPEED);
                 case DATA_ENERGY_USAGE -> scaledStat(stats, MachineStat.ENERGY_USAGE);
@@ -201,8 +215,8 @@ public class AlloyFurnaceBlockEntity extends BaseMachineBlockEntity implements M
                 case DATA_INPUT_SLOTS -> activeInputSlots(stats);
                 case DATA_REFINEMENT_POTENTIAL -> scaledStat(stats, MachineStat.REFINEMENT_POTENTIAL);
                 case DATA_CURRENT_TEMPERATURE -> currentTemperature;
-                case DATA_TARGET_TEMPERATURE -> currentTargetTemperature(recipe);
-                case DATA_SAFE_MAX_TEMPERATURE -> currentSafeMaximumTemperature(recipe);
+                case DATA_TARGET_TEMPERATURE -> currentTargetTemperature(recipe, stats);
+                case DATA_SAFE_MAX_TEMPERATURE -> currentSafeMaximumTemperature(recipe, stats);
                 case DATA_OVERHEAT_TEMPERATURE -> currentOverheatTemperature(recipe, stats);
                 case DATA_FAILURE_STRAIN -> HeatControl.failureProgress(failureStrain);
                 case DATA_FAILURE_ENABLED -> failureEnabled(recipe, stats) ? 1 : 0;
@@ -210,6 +224,8 @@ public class AlloyFurnaceBlockEntity extends BaseMachineBlockEntity implements M
                 case DATA_WARMUP_TIME -> scaledStat(stats, MachineStat.WARMUP_TIME);
                 case DATA_COOLING_RATE -> scaledStat(stats, MachineStat.COOLING_RATE);
                 case DATA_OVERHEAT_TOLERANCE -> scaledStat(stats, MachineStat.OVERHEAT_TOLERANCE);
+                case DATA_LEDGER -> ledgerDisplay(recipe, stats);
+                case DATA_LEDGER_BLEND -> recipe != null && blendLedgerActive(recipe, stats) ? 1 : 0;
                 default -> 0;
             };
         }
@@ -233,6 +249,12 @@ public class AlloyFurnaceBlockEntity extends BaseMachineBlockEntity implements M
     private int failureStrain;
     private boolean targetReached;
     private ItemStack[] activeInputs = emptyInputs();
+    private final OutputLedger<Item> fluxLedger = new OutputLedger<>();
+    private final OutputLedger<Item> blendLedger = new OutputLedger<>();
+    private final Map<AlloyFurnaceRecipe, ItemStack> reversalBlends = new IdentityHashMap<>();
+    private AlloyFurnaceRecipe lastRecipe;
+    private int cadenceCycles;
+    private boolean pourContinues;
     private long energyTelemetryTick = Long.MIN_VALUE;
     private int energyInputThisTick;
     private int lastEnergyInput;
@@ -243,9 +265,10 @@ public class AlloyFurnaceBlockEntity extends BaseMachineBlockEntity implements M
 
     public static void serverTick(Level level, BlockPos pos, BlockState state, AlloyFurnaceBlockEntity furnace) {
         furnace.beginEnergyTelemetryTick();
-        MachineStatAccumulator stats = furnace.effectiveStats();
         AlloyFurnaceRecipe recipe = furnace.nextRecipe();
+        MachineStatAccumulator stats = furnace.routeStats(recipe, furnace.effectiveStats());
         if (recipe == null || !furnace.hasRequiredGear() || !furnace.meetsRecipeRequirements(recipe, stats)) {
+            furnace.pourContinues = false;
             furnace.resetCycleIfActive();
             furnace.cool(stats);
             BaseMachineBlock.setActive(level, pos, state, false);
@@ -256,17 +279,21 @@ public class AlloyFurnaceBlockEntity extends BaseMachineBlockEntity implements M
             furnace.resetCycle();
             furnace.resetBulkSpeed();
         }
-        furnace.rememberHeatEnvelope(recipe);
+        furnace.rememberHeatEnvelope(recipe, stats);
 
         if (!furnace.canMergeOutput(recipe.outputStack())) {
             BaseMachineBlock.setActive(level, pos, state, false);
             return;
         }
 
-        if (furnace.progress == 0 && furnace.currentTemperature < recipe.targetTemperature()) {
-            furnace.targetReached = false;
+        if (furnace.progress == 0) {
+            if (furnace.pourContinues(recipe)) {
+                furnace.targetReached = true;
+            } else if (furnace.currentTemperature < furnace.targetTemperature(recipe, stats)) {
+                furnace.targetReached = false;
+            }
         }
-        int requiredTemperature = furnace.requiredTemperatureForProgress(recipe);
+        int requiredTemperature = furnace.requiredTemperatureForProgress(recipe, stats);
         if (furnace.currentTemperature < requiredTemperature) {
             if (furnace.payHeatTick(recipe, stats)) {
                 furnace.warm(recipe, stats, requiredTemperature);
@@ -346,8 +373,8 @@ public class AlloyFurnaceBlockEntity extends BaseMachineBlockEntity implements M
 
     @Override
     public MachineInfoSnapshot machineInfo() {
-        MachineStatAccumulator stats = effectiveStats();
         AlloyFurnaceRecipe recipe = nextRecipe();
+        MachineStatAccumulator stats = routeStats(recipe, effectiveStats());
         int status = statusCode(recipe, stats);
         int energyDemand = recipe == null || !hasEnergyDemandStatus(status) ? 0 : energyCostPerTick(recipe, stats);
         AdjacentEnergyConnector.Info connector = AdjacentEnergyConnector.forSink(level, worldPosition);
@@ -362,7 +389,7 @@ public class AlloyFurnaceBlockEntity extends BaseMachineBlockEntity implements M
                         connector.transferRate(),
                         connectorInputBottleneck(connector, energyDemand)
                 )
-                .heat(currentTemperature, currentTargetTemperature(recipe))
+                .heat(currentTemperature, currentTargetTemperature(recipe, stats))
                 .slots(activeInputSlots(stats), MAX_INPUT_SLOTS)
                 .gear(alloyGearSummary(status))
                 .output(status == STATUS_OUTPUT_FULL
@@ -482,6 +509,10 @@ public class AlloyFurnaceBlockEntity extends BaseMachineBlockEntity implements M
             tag.put("ActiveInput" + slot, activeInputs[slot].saveOptional(registries));
         }
         bulkSpeed.save(tag);
+        LedgerNbt.save(tag, "FluxLedger", fluxLedger);
+        LedgerNbt.save(tag, "BlendLedger", blendLedger);
+        tag.putInt("CadenceCycles", cadenceCycles);
+        tag.putBoolean("PourContinues", pourContinues);
     }
 
     @Override
@@ -501,6 +532,10 @@ public class AlloyFurnaceBlockEntity extends BaseMachineBlockEntity implements M
             activeInputs[slot] = ItemStack.parseOptional(registries, tag.getCompound("ActiveInput" + slot));
         }
         bulkSpeed.load(tag);
+        LedgerNbt.load(tag, "FluxLedger", fluxLedger);
+        LedgerNbt.load(tag, "BlendLedger", blendLedger);
+        cadenceCycles = Math.max(0, tag.getInt("CadenceCycles"));
+        pourContinues = tag.getBoolean("PourContinues");
         clampInternalEnergy();
     }
 
@@ -522,14 +557,15 @@ public class AlloyFurnaceBlockEntity extends BaseMachineBlockEntity implements M
         if (level == null) {
             return false;
         }
-        AlloyFurnaceRecipeInput input = new AlloyFurnaceRecipeInput(inputStacks());
+        ItemStack[] stacks = inputStacks();
+        AlloyFurnaceRecipeInput input = new AlloyFurnaceRecipeInput(stacks);
         AlloyFurnaceRecipe.Match match = recipe.match(input).orElse(null);
         if (match == null || !recipe.matches(input, level)) {
             return false;
         }
 
         ItemStack baseResult = recipe.outputStack();
-        ItemStack result = ProcessingChance.applySuperOutput(level, stats, baseResult, baseResult);
+        ItemStack result = withSuperOutput(recipe, stats, baseResult);
         if (!canMergeOutput(result)) {
             result = baseResult;
             if (!canMergeOutput(result)) {
@@ -537,12 +573,208 @@ public class AlloyFurnaceBlockEntity extends BaseMachineBlockEntity implements M
             }
         }
 
-        consumeInputs(match.consumed());
+        result = withBlendLedger(recipe, stats, result);
+        int[] consumed = match.consumed().clone();
+        applyFlux(recipe, stats, stacks, consumed);
+        consumeInputs(consumed);
         mergeOutput(result);
         grantRecipeXp(recipe);
+        lastRecipe = recipe;
         resetCycle();
+        // Continuous Pour: the next blend craft starts without warming back up to its target.
+        pourContinues = blend(recipe) && hasMasteryBehavior("CONTINUOUS_POUR");
+        targetReached = pourContinues;
         setChanged();
         return true;
+    }
+
+    /** Super Output, guaranteed on every Super Output Cadence craft; a failure restarts the count. */
+    private ItemStack withSuperOutput(AlloyFurnaceRecipe recipe, MachineStatAccumulator stats, ItemStack baseResult) {
+        int cadence = stats.intValue(MachineStat.SUPER_OUTPUT_CADENCE);
+        if (cadence > 0 && recipe.allowsBonusOutput() && ++cadenceCycles >= cadence) {
+            cadenceCycles = 0;
+            return ProcessingChance.grow(baseResult, baseResult, baseResult.getCount());
+        }
+        return ProcessingChance.applySuperOutput(level, stats, recipe, baseResult, baseResult);
+    }
+
+    /** The Blend Ledger banks a share of each eligible blend craft and pays whole items once the output has room. */
+    private ItemStack withBlendLedger(AlloyFurnaceRecipe recipe, MachineStatAccumulator stats, ItemStack result) {
+        if (!blendLedgerActive(recipe, stats)) {
+            return result;
+        }
+        ItemStack base = recipe.outputStack();
+        blendLedger.add(base.getItem(), AscendancyFormulas.ledgerShare(stats, base.getCount(), false));
+        int payable = blendLedger.payable(base.getItem());
+        ItemStack paid = ProcessingChance.grow(result, base, payable);
+        if (paid == result || !canMergeOutput(paid)) {
+            return result;
+        }
+        blendLedger.pay(base.getItem(), payable);
+        return paid;
+    }
+
+    private boolean blendLedgerActive(AlloyFurnaceRecipe recipe, MachineStatAccumulator stats) {
+        return blend(recipe) && recipe.allowsBonusOutput() && stats.value(MachineStat.LEDGER_RATE) > 0.0;
+    }
+
+    /** Flux banks a share of one unit of the largest input and skips a whole unit once banked. */
+    private void applyFlux(AlloyFurnaceRecipe recipe, MachineStatAccumulator stats, ItemStack[] stacks, int[] consumed) {
+        if (!recipe.allowsBonusOutput() || stats.value(MachineStat.FLUX_RATE) <= 0.0) {
+            return;
+        }
+        int slot = savableSlot(recipe, stacks, consumed);
+        if (slot < 0) {
+            return;
+        }
+        Item item = stacks[slot].getItem();
+        fluxLedger.add(item, AscendancyFormulas.fluxShare(stats, directIngot(recipe) && hasMasteryBehavior("REACTIVE_FLUX")));
+        if (fluxLedger.payable(item) >= 1) {
+            consumed[slot]--;
+            fluxLedger.pay(item, 1);
+        }
+    }
+
+    /** A slot the craft takes the largest ingredient from, when that ingredient needs two or more units. */
+    private static int savableSlot(AlloyFurnaceRecipe recipe, ItemStack[] stacks, int[] consumed) {
+        int ingredient = AscendancyFormulas.savableIngredient(recipe.ingredients().stream().mapToInt(CountedIngredient::count).toArray());
+        if (ingredient < 0) {
+            return -1;
+        }
+        CountedIngredient counted = recipe.ingredients().get(ingredient);
+        for (int slot = 0; slot < Math.min(consumed.length, stacks.length); slot++) {
+            if (consumed[slot] > 0 && counted.test(stacks[slot])) {
+                return slot;
+            }
+        }
+        return -1;
+    }
+
+    /** The flux or blend ledger's progress toward its next unit, per thousand, or -1 when neither applies. */
+    private int ledgerDisplay(AlloyFurnaceRecipe recipe, MachineStatAccumulator stats) {
+        if (recipe == null || !recipe.allowsBonusOutput()) {
+            return -1;
+        }
+        if (blendLedgerActive(recipe, stats)) {
+            return LedgerNbt.permille(blendLedger.progress(recipe.outputStack().getItem()));
+        }
+        if (stats.value(MachineStat.FLUX_RATE) <= 0.0) {
+            return -1;
+        }
+        ItemStack[] stacks = inputStacks();
+        AlloyFurnaceRecipe.Match match = recipe.match(new AlloyFurnaceRecipeInput(stacks)).orElse(null);
+        int slot = match == null ? -1 : savableSlot(recipe, stacks, match.consumed());
+        return slot < 0 ? -1 : LedgerNbt.permille(fluxLedger.progress(stacks[slot].getItem()));
+    }
+
+    private static boolean blend(AlloyFurnaceRecipe recipe) {
+        return "blend".equals(recipe.mode());
+    }
+
+    private static boolean directIngot(AlloyFurnaceRecipe recipe) {
+        return "direct_ingot".equals(recipe.mode());
+    }
+
+    /** Tempered Crucible's stability on blend routes; route speed applies to processing time instead. */
+    private MachineStatAccumulator routeStats(AlloyFurnaceRecipe recipe, MachineStatAccumulator stats) {
+        if (recipe != null && blend(recipe) && hasMasteryBehavior("TEMPERED_CRUCIBLE")) {
+            stats.apply(new MachineModifier(ModifierSlot.IMPLICIT, MachineStat.TEMPERATURE_STABILITY, ModifierOperation.MORE, 1.4));
+        }
+        return stats;
+    }
+
+    /** Blend Speed on blend routes; Blend Reversal slows direct-ingot routes by 15%. */
+    private double routeSpeed(AlloyFurnaceRecipe recipe, MachineStatAccumulator stats) {
+        if (blend(recipe)) {
+            return 1.0 + Math.max(0.0, stats.value(MachineStat.BLEND_SPEED)) / 100.0;
+        }
+        return directIngot(recipe) && hasMasteryBehavior("BLEND_REVERSAL") ? 0.85 : 1.0;
+    }
+
+    /** Master Blend disables direct-ingot routes. */
+    private boolean routeDisabled(AlloyFurnaceRecipe recipe) {
+        return directIngot(recipe) && hasMasteryBehavior("MASTER_BLEND");
+    }
+
+    private boolean pourContinues(AlloyFurnaceRecipe recipe) {
+        return pourContinues && blend(recipe) && hasMasteryBehavior("CONTINUOUS_POUR");
+    }
+
+    /** Cold Mixing lowers every temperature of a blend route. */
+    private static int heatRelief(AlloyFurnaceRecipe recipe, MachineStatAccumulator stats) {
+        return blend(recipe) ? Math.max(0, stats.intValue(MachineStat.BLEND_HEAT_REDUCTION)) : 0;
+    }
+
+    private static int targetTemperature(AlloyFurnaceRecipe recipe, MachineStatAccumulator stats) {
+        return Math.max(0, recipe.targetTemperature() - heatRelief(recipe, stats));
+    }
+
+    private static int minimumTemperature(AlloyFurnaceRecipe recipe, MachineStatAccumulator stats) {
+        return Math.max(0, recipe.minimumTemperature() - heatRelief(recipe, stats));
+    }
+
+    private static int safeMaximumTemperature(AlloyFurnaceRecipe recipe, MachineStatAccumulator stats) {
+        return Math.max(targetTemperature(recipe, stats), recipe.safeMaximumTemperature() - heatRelief(recipe, stats));
+    }
+
+    /** Blend Reversal: the blend route for a direct-ingot recipe's output, at no more than the direct route makes. */
+    private ItemStack reversalBlend(AlloyFurnaceRecipe direct) {
+        if (level == null) {
+            return ItemStack.EMPTY;
+        }
+        return reversalBlends.computeIfAbsent(direct, recipe -> {
+            for (RecipeHolder<AlloyFurnaceRecipe> holder : level.getRecipeManager().getAllRecipesFor(ModRecipes.ALLOY_FURNACE_TYPE.get())) {
+                ItemStack blend = holder.value().outputStack();
+                Optional<FurnaceRecipe> smelt = blend(holder.value()) ? FurnaceRecipes.find(level, blend) : Optional.empty();
+                if (smelt.isPresent() && smelt.get().outputStack().is(recipe.outputStack().getItem())) {
+                    return blend.copyWithCount(Math.min(blend.getCount(), recipe.outputStack().getCount()));
+                }
+            }
+            return ItemStack.EMPTY;
+        });
+    }
+
+    /**
+     * Recipe Lock: automation may add only the current recipe's ingredients, or the last recipe's, each until it is one
+     * craft ahead of the scarcest other ingredient.
+     */
+    private int recipeLockAllowance(ItemStack stack) {
+        AlloyFurnaceRecipe locked = hasMasteryBehavior("RECIPE_LOCK") ? Optional.ofNullable(nextRecipe()).orElse(lastRecipe) : null;
+        if (locked == null) {
+            return stack.getCount();
+        }
+        List<CountedIngredient> ingredients = locked.ingredients();
+        int matched = -1;
+        for (int index = 0; index < ingredients.size() && matched < 0; index++) {
+            if (ingredients.get(index).test(stack)) {
+                matched = index;
+            }
+        }
+        if (matched < 0) {
+            return 0;
+        }
+        ItemStack[] stacks = inputStacks();
+        int scarcest = Integer.MAX_VALUE;
+        for (int index = 0; index < ingredients.size(); index++) {
+            if (index != matched) {
+                scarcest = Math.min(scarcest, held(ingredients.get(index), stacks) / ingredients.get(index).count());
+            }
+        }
+        if (scarcest == Integer.MAX_VALUE) {
+            return stack.getCount();
+        }
+        int limit = (scarcest + 1) * ingredients.get(matched).count() - held(ingredients.get(matched), stacks);
+        return Math.max(0, Math.min(stack.getCount(), limit));
+    }
+
+    private static int held(CountedIngredient ingredient, ItemStack[] stacks) {
+        int held = 0;
+        for (ItemStack stack : stacks) {
+            if (!stack.isEmpty() && ingredient.test(stack)) {
+                held += stack.getCount();
+            }
+        }
+        return held;
     }
 
     private void grantRecipeXp(AlloyFurnaceRecipe recipe) {
@@ -571,6 +803,11 @@ public class AlloyFurnaceBlockEntity extends BaseMachineBlockEntity implements M
     }
 
     @Override
+    public int ascendancyEntryStage() {
+        return chassis().stage();
+    }
+
+    @Override
     public MachineProgressionState machineProgression() {
         return super.machineProgression().forFamily(masteryFamily());
     }
@@ -587,29 +824,45 @@ public class AlloyFurnaceBlockEntity extends BaseMachineBlockEntity implements M
         if (level == null || !failureEnabled(recipe, effectiveStats())) {
             return false;
         }
-        AlloyFurnaceRecipeInput input = new AlloyFurnaceRecipeInput(inputStacks());
+        ItemStack[] stacks = inputStacks();
+        AlloyFurnaceRecipeInput input = new AlloyFurnaceRecipeInput(stacks);
         AlloyFurnaceRecipe.Match match = recipe.match(input).orElse(null);
         if (match == null || !recipe.matches(input, level)) {
             return false;
         }
 
-        ItemStack result = recipe.failureStack();
+        ItemStack result = failureResult(recipe);
         if (!canMergeOutput(result)) {
             return false;
         }
 
-        consumeInputs(match.consumed());
+        int[] consumed = match.consumed().clone();
+        // Dross Skimming keeps one unit of the largest input.
+        int skimmed = hasMasteryBehavior("DROSS_SKIMMING") ? savableSlot(recipe, stacks, consumed) : -1;
+        if (skimmed >= 0) {
+            consumed[skimmed]--;
+        }
+        consumeInputs(consumed);
         mergeOutput(result);
+        cadenceCycles = 0;
+        pourContinues = false;
         resetCycle();
         resetBulkSpeed();
         setChanged();
         return true;
     }
 
+    /** Blend Reversal turns a failed direct-ingot craft into the blend its inputs would make. */
+    private ItemStack failureResult(AlloyFurnaceRecipe recipe) {
+        ItemStack blend = directIngot(recipe) && hasMasteryBehavior("BLEND_REVERSAL") ? reversalBlend(recipe) : ItemStack.EMPTY;
+        return blend.isEmpty() ? recipe.failureStack() : blend.copy();
+    }
+
     private boolean meetsRecipeRequirements(AlloyFurnaceRecipe recipe, MachineStatAccumulator stats) {
-        return chassis().stage() >= recipe.minimumComponentStage()
+        return !routeDisabled(recipe)
+                && chassis().stage() >= recipe.minimumComponentStage()
                 && crucibleStage() >= recipe.minimumComponentStage()
-                && effectiveHeat(stats) >= recipe.targetTemperature()
+                && effectiveHeat(stats) >= targetTemperature(recipe, stats)
                 && (failureEnabled(recipe, stats)
                         || stats.value(MachineStat.TEMPERATURE_STABILITY) >= recipe.requiredTemperatureStability());
     }
@@ -646,7 +899,7 @@ public class AlloyFurnaceBlockEntity extends BaseMachineBlockEntity implements M
     }
 
     private int processingTicks(AlloyFurnaceRecipe recipe, MachineStatAccumulator stats) {
-        return stats.adjustedHeatProcessingTicks(recipe.processingTicks());
+        return Math.max(1, (int) Math.ceil(stats.adjustedHeatProcessingTicks(recipe.processingTicks()) / routeSpeed(recipe, stats)));
     }
 
     private int currentProcessingTicks(AlloyFurnaceRecipe recipe, MachineStatAccumulator stats) {
@@ -676,10 +929,13 @@ public class AlloyFurnaceBlockEntity extends BaseMachineBlockEntity implements M
         if (recipe == null) {
             return STATUS_INVALID_RECIPE;
         }
+        if (routeDisabled(recipe)) {
+            return STATUS_ROUTE_DISABLED;
+        }
         if (chassis().stage() < recipe.minimumComponentStage() || crucibleStage() < recipe.minimumComponentStage()) {
             return STATUS_BLOCKED_STAGE;
         }
-        if (effectiveHeat(stats) < recipe.targetTemperature()) {
+        if (effectiveHeat(stats) < targetTemperature(recipe, stats)) {
             return STATUS_HEAT_LOW;
         }
         if (!failureEnabled(recipe, stats)
@@ -700,7 +956,7 @@ public class AlloyFurnaceBlockEntity extends BaseMachineBlockEntity implements M
         if (failureStrain > 0 && failureEnabled(recipe, stats)) {
             return STATUS_FAILURE_RISK;
         }
-        if (currentTemperature < requiredTemperatureForProgress(recipe)) {
+        if (currentTemperature < requiredTemperatureForProgress(recipe, stats)) {
             int energyCost = energyCostPerTick(recipe, stats);
             return consumeWorkingEnergy(energyCost, true) < energyCost ? STATUS_NO_POWER : STATUS_WARMING;
         }
@@ -797,8 +1053,8 @@ public class AlloyFurnaceBlockEntity extends BaseMachineBlockEntity implements M
         }
     }
 
-    private int requiredTemperatureForProgress(AlloyFurnaceRecipe recipe) {
-        return targetReached ? recipe.minimumTemperature() : recipe.targetTemperature();
+    private int requiredTemperatureForProgress(AlloyFurnaceRecipe recipe, MachineStatAccumulator stats) {
+        return targetReached ? minimumTemperature(recipe, stats) : targetTemperature(recipe, stats);
     }
 
     private void warm(AlloyFurnaceRecipe recipe, MachineStatAccumulator stats, int requiredTemperature) {
@@ -806,14 +1062,14 @@ public class AlloyFurnaceBlockEntity extends BaseMachineBlockEntity implements M
                 Math.min(requiredTemperature, stats.intValue(MachineStat.MAX_TEMPERATURE)),
                 currentTemperature + HeatControl.warmupRate(stats)
         );
-        if (currentTemperature >= recipe.targetTemperature()) {
+        if (currentTemperature >= targetTemperature(recipe, stats)) {
             targetReached = true;
         }
     }
 
-    private void rememberHeatEnvelope(AlloyFurnaceRecipe recipe) {
-        lastTargetTemperature = recipe.targetTemperature();
-        lastSafeMaximumTemperature = recipe.safeMaximumTemperature();
+    private void rememberHeatEnvelope(AlloyFurnaceRecipe recipe, MachineStatAccumulator stats) {
+        lastTargetTemperature = targetTemperature(recipe, stats);
+        lastSafeMaximumTemperature = safeMaximumTemperature(recipe, stats);
     }
 
     private void clearHeatEnvelope() {
@@ -825,16 +1081,16 @@ public class AlloyFurnaceBlockEntity extends BaseMachineBlockEntity implements M
         return currentTemperature > HeatControl.AMBIENT_TEMPERATURE && lastSafeMaximumTemperature > 0;
     }
 
-    private int currentTargetTemperature(AlloyFurnaceRecipe recipe) {
-        return recipe == null ? hasCooldownHeat() ? lastTargetTemperature : 0 : recipe.targetTemperature();
+    private int currentTargetTemperature(AlloyFurnaceRecipe recipe, MachineStatAccumulator stats) {
+        return recipe == null ? hasCooldownHeat() ? lastTargetTemperature : 0 : targetTemperature(recipe, stats);
     }
 
-    private int currentSafeMaximumTemperature(AlloyFurnaceRecipe recipe) {
-        return recipe == null ? hasCooldownHeat() ? lastSafeMaximumTemperature : 0 : recipe.safeMaximumTemperature();
+    private int currentSafeMaximumTemperature(AlloyFurnaceRecipe recipe, MachineStatAccumulator stats) {
+        return recipe == null ? hasCooldownHeat() ? lastSafeMaximumTemperature : 0 : safeMaximumTemperature(recipe, stats);
     }
 
     private int currentOverheatTemperature(AlloyFurnaceRecipe recipe, MachineStatAccumulator stats) {
-        int safeMaximumTemperature = currentSafeMaximumTemperature(recipe);
+        int safeMaximumTemperature = currentSafeMaximumTemperature(recipe, stats);
         return safeMaximumTemperature <= 0
                 ? 0
                 : HeatControl.effectiveOverheatTemperature(safeMaximumTemperature, stats);
@@ -847,8 +1103,12 @@ public class AlloyFurnaceBlockEntity extends BaseMachineBlockEntity implements M
         }
     }
 
+    /** Heat Economy makes warmup ticks 30% cheaper. */
     private boolean payHeatTick(AlloyFurnaceRecipe recipe, MachineStatAccumulator stats) {
         int energyCost = energyCostPerTick(recipe, stats);
+        if (hasMasteryBehavior("HEAT_ECONOMY")) {
+            energyCost = Math.max(1, (int) Math.ceil(energyCost * 0.7));
+        }
         if (consumeWorkingEnergy(energyCost, true) < energyCost) {
             return false;
         }
@@ -863,7 +1123,7 @@ public class AlloyFurnaceBlockEntity extends BaseMachineBlockEntity implements M
         }
         int simulatedTemperature = HeatControl.simulatedTemperature(
                 currentTemperature,
-                recipe.targetTemperature(),
+                targetTemperature(recipe, stats),
                 recipe.requiredTemperatureStability(),
                 stats,
                 worldPosition,
@@ -872,8 +1132,8 @@ public class AlloyFurnaceBlockEntity extends BaseMachineBlockEntity implements M
         );
         int addedStrain = HeatControl.failureStrainFromTemperature(
                 simulatedTemperature,
-                recipe.minimumTemperature(),
-                HeatControl.effectiveOverheatTemperature(recipe.safeMaximumTemperature(), stats),
+                minimumTemperature(recipe, stats),
+                HeatControl.effectiveOverheatTemperature(safeMaximumTemperature(recipe, stats), stats),
                 recipe.requiredTemperatureStability(),
                 stats
         );
@@ -888,17 +1148,16 @@ public class AlloyFurnaceBlockEntity extends BaseMachineBlockEntity implements M
         if (!recipe.powerSensitive() || progress <= 0 || !failureEnabled(recipe, stats)) {
             return;
         }
-        failureStrain = Math.min(
-                HeatControl.FAILURE_STRAIN_THRESHOLD,
-                failureStrain + (hasPowerGrace() ? HeatControl.POWER_DROP_STRAIN / 2 : HeatControl.POWER_DROP_STRAIN)
-        );
+        int strain = hasPowerGrace() ? HeatControl.POWER_DROP_STRAIN / 2 : HeatControl.POWER_DROP_STRAIN;
+        // Steady Supply halves power-drop strain.
+        failureStrain = Math.min(HeatControl.FAILURE_STRAIN_THRESHOLD, failureStrain + (hasMasteryBehavior("STEADY_SUPPLY") ? strain / 2 : strain));
     }
 
     private boolean failureEnabled(AlloyFurnaceRecipe recipe, MachineStatAccumulator stats) {
         return recipe != null
                 && recipe.hasFailureOutput()
                 && recipe.minimumComponentStage() >= 4
-                && stats.intValue(MachineStat.MAX_TEMPERATURE) >= recipe.targetTemperature();
+                && stats.intValue(MachineStat.MAX_TEMPERATURE) >= targetTemperature(recipe, stats);
     }
 
     private boolean powerSensitiveActive(AlloyFurnaceRecipe recipe, MachineStatAccumulator stats) {
@@ -1162,7 +1421,15 @@ public class AlloyFurnaceBlockEntity extends BaseMachineBlockEntity implements M
 
         @Override
         public ItemStack insertItem(int slot, ItemStack stack, boolean simulate) {
-            return processInventory.insertItem(mappedSlot(slot), stack, simulate);
+            int allowed = recipeLockAllowance(stack);
+            if (allowed <= 0) {
+                return stack;
+            }
+            if (allowed >= stack.getCount()) {
+                return processInventory.insertItem(mappedSlot(slot), stack, simulate);
+            }
+            ItemStack rejected = processInventory.insertItem(mappedSlot(slot), stack.copyWithCount(allowed), simulate);
+            return stack.copyWithCount(stack.getCount() - allowed + rejected.getCount());
         }
 
         @Override
@@ -1177,7 +1444,7 @@ public class AlloyFurnaceBlockEntity extends BaseMachineBlockEntity implements M
 
         @Override
         public boolean isItemValid(int slot, ItemStack stack) {
-            return processInventory.isItemValid(mappedSlot(slot), stack);
+            return processInventory.isItemValid(mappedSlot(slot), stack) && recipeLockAllowance(stack) > 0;
         }
 
         private int mappedSlot(int slot) {

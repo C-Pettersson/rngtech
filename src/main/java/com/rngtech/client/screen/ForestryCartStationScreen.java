@@ -1,6 +1,7 @@
 package com.rngtech.client.screen;
 
 import com.rngtech.content.blockentity.ForestryCartStationBlockEntity;
+import com.rngtech.content.entity.ForestryCartEntity;
 import com.rngtech.content.menu.ForestryCartStationMenu;
 
 import net.minecraft.client.Minecraft;
@@ -33,6 +34,10 @@ public class ForestryCartStationScreen extends AbstractContainerScreen<ForestryC
     private static final int CONTROL_BUTTON_WIDTH = 30;
     private static final int CONTROL_BUTTON_HEIGHT = 12;
     private static final int ICON_SIZE = 12;
+    private static final int FERTILIZER_BAR_X = 46;
+    private static final int FERTILIZER_BAR_Y = 58;
+    private static final int FERTILIZER_BAR_WIDTH = 18;
+    private static final int FERTILIZER = 0xFFE3DCC4;
 
     public ForestryCartStationScreen(ForestryCartStationMenu menu, Inventory playerInventory, Component title) {
         super(menu, playerInventory, title);
@@ -170,6 +175,11 @@ public class ForestryCartStationScreen extends AbstractContainerScreen<ForestryC
                 y + ENERGY_GAUGE_Y + ENERGY_GAUGE_HEIGHT - 2,
                 ENERGY
         );
+        if (menu.fertilizer() > 0) {
+            int filled = Math.max(1, Math.round(FERTILIZER_BAR_WIDTH * (float) menu.fertilizer() / ForestryCartEntity.FERTILIZER_CAPACITY));
+            guiGraphics.fill(x + FERTILIZER_BAR_X, y + FERTILIZER_BAR_Y, x + FERTILIZER_BAR_X + FERTILIZER_BAR_WIDTH, y + FERTILIZER_BAR_Y + 2, 0xFF5F5F5F);
+            guiGraphics.fill(x + FERTILIZER_BAR_X, y + FERTILIZER_BAR_Y, x + FERTILIZER_BAR_X + filled, y + FERTILIZER_BAR_Y + 2, FERTILIZER);
+        }
         renderStatusIcons(guiGraphics);
         renderControlButtons(guiGraphics);
     }
@@ -252,6 +262,21 @@ public class ForestryCartStationScreen extends AbstractContainerScreen<ForestryC
     }
 
     private void renderValueTooltips(GuiGraphics guiGraphics, int mouseX, int mouseY) {
+        if (menu.selectedTab() == ForestryCartStationMenu.TAB_PROCESSING && menu.fertilizer() > 0) {
+            CompactValueText.renderTooltipIfHovered(
+                    guiGraphics,
+                    font,
+                    leftPos,
+                    topPos,
+                    mouseX,
+                    mouseY,
+                    FERTILIZER_BAR_X,
+                    FERTILIZER_BAR_Y - 1,
+                    FERTILIZER_BAR_WIDTH,
+                    4,
+                    Component.translatable("rngtech.forestry_station.tooltip.fertilizer", menu.fertilizer(), ForestryCartEntity.FERTILIZER_CAPACITY)
+            );
+        }
         if (menu.selectedTab() == ForestryCartStationMenu.TAB_PROCESSING) {
             CompactValueText.renderTooltipIfHovered(
                     guiGraphics,

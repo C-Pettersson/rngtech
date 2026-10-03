@@ -1,0 +1,58 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "rngtech:ascendancy_seal_recipes_enabled"
+    },
+    {
+      "type": "rngtech:material_enabled",
+      "material": "sparksteel"
+    },
+    {
+      "type": "rngtech:material_enabled",
+      "material": "aluminum"
+    }
+  ],
+  "type": "rngtech:calibrated_shaped",
+  "category": "misc",
+  "pattern": [
+    "LSL",
+    "AKA",
+    "SMS"
+  ],
+  "key": {
+    "A": {
+      "ingredient": {
+        "item": "rngtech:aluminum_casing"
+      }
+    },
+    "K": {
+      "ingredient": {
+        "item": "rngtech:primed_seal_core"
+      }
+    },
+    "L": {
+      "ingredient": {
+        "item": "rngtech:calibrated_conductive_component"
+      },
+      "calibration": {
+        "family": "conductive",
+        "min_stage": 5,
+        "min_stability": 55
+      }
+    },
+    "M": {
+      "ingredient": {
+        "tag": "rngtech:stabilizer_matrices"
+      }
+    },
+    "S": {
+      "ingredient": {
+        "item": "rngtech:sparksteel_plate"
+      }
+    }
+  },
+  "result": {
+    "count": 1,
+    "id": "rngtech:ascendancy_seal_1"
+  }
+}

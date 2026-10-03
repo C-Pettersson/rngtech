@@ -4,6 +4,7 @@ import com.rngtech.RNGTechConfig;
 import com.rngtech.content.block.BaseMachineBlock;
 import com.rngtech.content.block.ResonanceCalibratorBlock;
 import com.rngtech.content.calibration.CalibrationRecipeResult;
+import com.rngtech.content.calibration.CalibrationStreak;
 import com.rngtech.content.calibration.CalibrationValueRange;
 import com.rngtech.content.calibration.ResonanceCalibratorChassis;
 import com.rngtech.content.item.BatteryCellItem;
@@ -15,6 +16,7 @@ import com.rngtech.content.menu.ResonanceCalibratorMenu;
 import com.rngtech.content.recipe.CalibrationRecipe;
 import com.rngtech.content.recipe.CalibrationRecipeInput;
 import com.rngtech.content.registry.ModBlockEntities;
+import com.rngtech.content.registry.ModDataComponents;
 import com.rngtech.rpg.ComponentBaseStatCatalog;
 import com.rngtech.rpg.MachineBaseStatCatalog;
 import com.rngtech.rpg.MachineImplicitCatalog;
@@ -27,6 +29,7 @@ import com.rngtech.rpg.MachineTraits;
 import com.rngtech.rpg.MachineType;
 import com.rngtech.rpg.ModifierOperation;
 import com.rngtech.rpg.ModifierSlot;
+import com.rngtech.rpg.progression.AscendancyFormulas;
 import com.rngtech.rpg.progression.MachineMasteryFamily;
 import com.rngtech.rpg.progression.MachineMasteryHost;
 import com.rngtech.rpg.progression.MachineProgressionState;
@@ -36,6 +39,7 @@ import com.rngtech.rpg.progression.MegaPassiveTree;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.core.component.DataComponentMap;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
@@ -47,6 +51,7 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.energy.IEnergyStorage;
@@ -102,7 +107,8 @@ public class ResonanceCalibratorBlockEntity extends BaseMachineBlockEntity imple
     private static final int DATA_REFINEMENT_POTENTIAL_BONUS = 18;
     private static final int DATA_REFINEMENT_POTENTIAL = 19;
     private static final int DATA_SELECTED_PATTERN = 20;
-    private static final int DATA_MACHINE_PROGRESSION_START = DATA_SELECTED_PATTERN + 1;
+    private static final int DATA_STREAK = DATA_SELECTED_PATTERN + 1;
+    private static final int DATA_MACHINE_PROGRESSION_START = DATA_STREAK + 1;
     private static final int DATA_COUNT = DATA_MACHINE_PROGRESSION_START + MasteryMenuSupport.FIELD_COUNT;
     private static final int STAT_SCALE = 100;
     private static final int[] AUTOMATION_INPUT_SLOTS = {SLOT_INPUT, SLOT_CATALYST, SLOT_STABILIZER};
@@ -180,7 +186,7 @@ public class ResonanceCalibratorBlockEntity extends BaseMachineBlockEntity imple
             if (index >= DATA_MACHINE_PROGRESSION_START
                     && index < DATA_MACHINE_PROGRESSION_START + MasteryMenuSupport.FIELD_COUNT) {
                 return MasteryMenuSupport.get(
-                        machineProgression(),
+                        ResonanceCalibratorBlockEntity.this,
                         index - DATA_MACHINE_PROGRESSION_START,
                         ResonanceCalibratorBlockEntity.this::effectiveStats
                 );
@@ -210,6 +216,7 @@ public class ResonanceCalibratorBlockEntity extends BaseMachineBlockEntity imple
                 case DATA_REFINEMENT_POTENTIAL_BONUS -> scaledStat(stats, MachineStat.REFINEMENT_POTENTIAL_BONUS);
                 case DATA_REFINEMENT_POTENTIAL -> scaledStat(stats, MachineStat.REFINEMENT_POTENTIAL);
                 case DATA_SELECTED_PATTERN -> selectedPattern;
+                case DATA_STREAK -> recipe == null ? 0 : AscendancyFormulas.streakFloor(streakBefore(recipe).streak(), stats);
                 default -> 0;
             };
         }
@@ -232,6 +239,8 @@ public class ResonanceCalibratorBlockEntity extends BaseMachineBlockEntity imple
     private ItemStack activePattern = ItemStack.EMPTY;
     private ItemStack activeCatalyst = ItemStack.EMPTY;
     private ItemStack activeStabilizer = ItemStack.EMPTY;
+    private CalibrationStreak streak = CalibrationStreak.EMPTY;
+    private boolean stabilizerSkip;
 
     public ResonanceCalibratorBlockEntity(BlockPos pos, BlockState blockState) {
         super(
@@ -248,7 +257,7 @@ public class ResonanceCalibratorBlockEntity extends BaseMachineBlockEntity imple
     public static void serverTick(Level level, BlockPos pos, BlockState state, ResonanceCalibratorBlockEntity calibrator) {
         MachineStatAccumulator stats = calibrator.effectiveStats();
         CalibrationRecipe recipe = calibrator.nextRecipe();
-        if (recipe == null || !calibrator.hasRequiredGear() || !calibrator.hasRequiredRecipeStage(recipe)) {
+        if (recipe == null || !calibrator.hasRequiredGear() || !calibrator.hasRequiredRecipeStage(recipe, stats)) {
             calibrator.resetCycleIfActive();
             BaseMachineBlock.setActive(level, pos, state, false);
             return;
@@ -410,6 +419,9 @@ public class ResonanceCalibratorBlockEntity extends BaseMachineBlockEntity imple
         tag.put("ActiveCatalyst", activeCatalyst.saveOptional(registries));
         tag.put("ActiveStabilizer", activeStabilizer.saveOptional(registries));
         bulkSpeed.save(tag);
+        CalibrationStreak.CODEC.encodeStart(registries.createSerializationContext(net.minecraft.nbt.NbtOps.INSTANCE), streak)
+                .ifSuccess(saved -> tag.put("Streak", saved));
+        tag.putBoolean("StabilizerSkip", stabilizerSkip);
     }
 
     @Override
@@ -431,6 +443,11 @@ public class ResonanceCalibratorBlockEntity extends BaseMachineBlockEntity imple
         activeCatalyst = ItemStack.parseOptional(registries, tag.getCompound("ActiveCatalyst"));
         activeStabilizer = ItemStack.parseOptional(registries, tag.getCompound("ActiveStabilizer"));
         bulkSpeed.load(tag);
+        streak = tag.contains("Streak")
+                ? CalibrationStreak.CODEC.parse(registries.createSerializationContext(net.minecraft.nbt.NbtOps.INSTANCE), tag.get("Streak"))
+                        .result().orElse(CalibrationStreak.EMPTY)
+                : CalibrationStreak.EMPTY;
+        stabilizerSkip = tag.getBoolean("StabilizerSkip");
         clampInternalEnergy();
     }
 
@@ -497,11 +514,10 @@ public class ResonanceCalibratorBlockEntity extends BaseMachineBlockEntity imple
             return false;
         }
 
-        int operations = Math.max(1, Math.min(chassis().lanes(), maximumOperations(recipe)));
+        streak = streakBefore(recipe);
+        int operations = operationsFor(recipe, stats);
         ItemStack baseResult = createOutput(recipe, stats, operations);
-        ItemStack result = recipe.allowsBonusOutput()
-                ? ProcessingChance.applySuperOutput(level, stats, baseResult, baseResult.copyWithCount(1))
-                : baseResult;
+        ItemStack result = ProcessingChance.applySuperOutput(level, stats, recipe, baseResult, baseResult.copyWithCount(1));
         if (!canMergeOutput(result)) {
             result = baseResult;
             if (!canMergeOutput(result)) {
@@ -509,14 +525,25 @@ public class ResonanceCalibratorBlockEntity extends BaseMachineBlockEntity imple
             }
         }
 
+        // Shared Field spends one catalyst per cycle; Stabilizer Economy skips stabilizers every other cycle.
+        boolean sharedField = hasMasteryBehavior("SHARED_FIELD");
+        boolean spendStabilizers = !(hasMasteryBehavior("STABILIZER_ECONOMY") && stabilizerSkip);
+        stabilizerSkip = hasMasteryBehavior("STABILIZER_ECONOMY") && !stabilizerSkip;
         for (int index = 0; index < operations; index++) {
             consumeInput();
-            consumeCatalyst(stats);
-            recipe.stabilizer().ifPresent(ignored -> stabilizerStack().shrink(1));
+            if (!sharedField || index == 0) {
+                consumeCatalyst(stats);
+            }
+            if (spendStabilizers) {
+                recipe.stabilizer().ifPresent(ignored -> stabilizerStack().shrink(1));
+            }
         }
         mergeOutput(result);
         for (int index = 0; index < operations; index++) {
             grantRecipeXp(recipe);
+        }
+        if (stats.value(MachineStat.STREAK_FLOOR) > 0.0) {
+            streak = streak.after(activePatternOrCurrent(), recipe.family().getSerializedName(), streak.harmonic());
         }
         resetCycle();
         setChanged();
@@ -543,9 +570,36 @@ public class ResonanceCalibratorBlockEntity extends BaseMachineBlockEntity imple
         return MegaPassiveTree.has(machineProgression(), "MUTE_MACHINE_SOUND");
     }
 
+    /** Pattern Memory keeps the streak on the dropped or picked machine. */
+    public CalibrationStreak persistentStreak() {
+        return hasMasteryBehavior("PATTERN_MEMORY") ? streak : CalibrationStreak.EMPTY;
+    }
+
+    @Override
+    protected void collectImplicitComponents(DataComponentMap.Builder components) {
+        super.collectImplicitComponents(components);
+        if (persistentStreak().streak() > 0) {
+            components.set(ModDataComponents.CALIBRATION_STREAK.get(), persistentStreak());
+        }
+    }
+
+    @Override
+    protected void applyImplicitComponents(BlockEntity.DataComponentInput componentInput) {
+        super.applyImplicitComponents(componentInput);
+        CalibrationStreak saved = componentInput.get(ModDataComponents.CALIBRATION_STREAK.get());
+        if (saved != null) {
+            streak = saved;
+        }
+    }
+
     @Override
     public MachineMasteryFamily masteryFamily() {
         return MachineMasteryFamily.RESONANCE_CALIBRATOR;
+    }
+
+    @Override
+    public int ascendancyEntryStage() {
+        return chassis().stage();
     }
 
     @Override
@@ -564,16 +618,62 @@ public class ResonanceCalibratorBlockEntity extends BaseMachineBlockEntity imple
     private ItemStack createOutput(CalibrationRecipe recipe, MachineStatAccumulator stats, int operations) {
         CalibrationRecipeResult recipeResult = recipe.result();
         CalibrationValueRange stabilityRange = currentStabilityRange(recipe, stats);
-        int stability = stabilityRange.roll(level.random);
+        int stability = secondPass(recipe, stats, stabilityRange, stabilityRange.roll(level.random), operations);
+        // Master Harmonic: at the full streak, every 8th calibration is perfect.
+        if (hasMasteryBehavior("MASTER_HARMONIC") && fullStreak(streak, stats)) {
+            int harmonic = streak.harmonic() + 1;
+            if (harmonic >= 8) {
+                stability = 100;
+                harmonic = 0;
+            }
+            streak = new CalibrationStreak(streak.streak(), streak.family(), streak.pattern(), streak.swapUsed(), harmonic);
+        }
         int rp = currentRefinementPotentialRange(recipe, stats).roll(level.random);
         ItemStack result = recipeResult.stackWithState(recipe.family(), stability, rp);
         result.setCount(Math.min(result.getMaxStackSize(), result.getCount() * operations));
         return result;
     }
 
+    /** Lanes run one calibration each; Resonance Array adds a job per lane for each Parallel Job. */
+    private int operationsFor(CalibrationRecipe recipe, MachineStatAccumulator stats) {
+        int jobsPerLane = hasMasteryBehavior("RESONANCE_ARRAY") ? 1 + stats.intValue(MachineStat.PARALLEL_JOBS) : 1;
+        return Math.max(1, Math.min(chassis().lanes() * jobsPerLane, maximumOperations(recipe)));
+    }
+
+    /** Second Pass: a result under 40 stability is rolled once more for another craft's FE and one catalyst. */
+    private int secondPass(CalibrationRecipe recipe, MachineStatAccumulator stats, CalibrationValueRange range, int stability, int operations) {
+        if (stability >= 40 || !hasMasteryBehavior("SECOND_PASS") || level == null) {
+            return stability;
+        }
+        int catalystsNeeded = hasMasteryBehavior("SHARED_FIELD") ? 1 : operations;
+        int energy = energyCostPerCraft(recipe, stats);
+        if (catalystStack().getCount() <= catalystsNeeded || consumeWorkingEnergy(energy, true) < energy) {
+            return stability;
+        }
+        consumeWorkingEnergy(energy, false);
+        catalystStack().shrink(1);
+        return range.roll(level.random);
+    }
+
+    /** The streak this calibration builds on: kept on the same family and pattern, or once more with Pattern Memory. */
+    private CalibrationStreak streakBefore(CalibrationRecipe recipe) {
+        return streak.before(activePatternOrCurrent(), recipe.family().getSerializedName(), hasMasteryBehavior("PATTERN_MEMORY"));
+    }
+
+    private ItemStack activePatternOrCurrent() {
+        return activePattern.isEmpty() ? patternStack() : activePattern;
+    }
+
+    private static boolean fullStreak(CalibrationStreak streak, MachineStatAccumulator stats) {
+        int cap = stats.intValue(MachineStat.STREAK_CAP);
+        return cap > 0 && AscendancyFormulas.streakFloor(streak.streak(), stats) >= cap;
+    }
+
     private int maximumOperations(CalibrationRecipe recipe) {
         int operations = inputStack().getCount();
-        operations = Math.min(operations, catalystStack().getCount());
+        if (!hasMasteryBehavior("SHARED_FIELD")) {
+            operations = Math.min(operations, catalystStack().getCount());
+        }
         if (recipe.stabilizer().isPresent()) {
             operations = Math.min(operations, stabilizerStack().getCount());
         }
@@ -625,9 +725,11 @@ public class ResonanceCalibratorBlockEntity extends BaseMachineBlockEntity imple
         processInventory.setStackInSlot(SLOT_OUTPUT, merged);
     }
 
+    /** Lane Sync is 15% faster while more than one lane runs. */
     private int processingTicks(CalibrationRecipe recipe, MachineStatAccumulator stats) {
         int baseTicks = Math.max(1, (int) Math.ceil(recipe.processingTicks() * RNGTechConfig.CALIBRATION_TIME_MULTIPLIER.get()));
-        return stats.adjustedProcessingTicks(baseTicks);
+        int ticks = stats.adjustedProcessingTicks(baseTicks);
+        return hasMasteryBehavior("LANE_SYNC") && operationsFor(recipe, stats) > 1 ? Math.max(1, (int) Math.ceil(ticks / 1.15)) : ticks;
     }
 
     private int energyCostPerTick(CalibrationRecipe recipe, MachineStatAccumulator stats) {
@@ -660,6 +762,22 @@ public class ResonanceCalibratorBlockEntity extends BaseMachineBlockEntity imple
         int precisionReduction = Math.max(0, (int) Math.round((precision - 1.0) * spread * 0.35));
         int min = base.min() + floorBonus + RNGTechConfig.CALIBRATION_STABILITY_BONUS.get();
         int max = base.max() + ceilingBonus - precisionReduction + RNGTechConfig.CALIBRATION_STABILITY_BONUS.get();
+        // Ascendancy floors and ceilings: the Resonant Streak and Wide Tolerance raise the floor; Clear Signal lifts the
+        // ceiling at the full streak, while Shared Field and Resonance Array lower it.
+        CalibrationStreak building = streakBefore(recipe);
+        min += AscendancyFormulas.streakFloor(building.streak(), stats);
+        if (hasMasteryBehavior("WIDE_TOLERANCE") && chassis().lanes() > 1) {
+            min += 5;
+        }
+        if (hasMasteryBehavior("CLEAR_SIGNAL") && fullStreak(building, stats)) {
+            max += 5;
+        }
+        if (hasMasteryBehavior("SHARED_FIELD")) {
+            max -= 10;
+        }
+        if (hasMasteryBehavior("RESONANCE_ARRAY")) {
+            max -= 15;
+        }
         if (max < min) {
             max = min;
         }
@@ -695,7 +813,7 @@ public class ResonanceCalibratorBlockEntity extends BaseMachineBlockEntity imple
         if (recipe == null) {
             return STATUS_INVALID_RECIPE;
         }
-        if (!hasRequiredRecipeStage(recipe)) {
+        if (!hasRequiredRecipeStage(recipe, stats)) {
             return STATUS_INSUFFICIENT_STAGE;
         }
         if (!canMergeOutput(recipe.outputStack())) {
@@ -705,8 +823,9 @@ public class ResonanceCalibratorBlockEntity extends BaseMachineBlockEntity imple
         return consumeWorkingEnergy(energyCost, true) < energyCost ? STATUS_NO_POWER : STATUS_READY;
     }
 
-    private boolean hasRequiredRecipeStage(CalibrationRecipe recipe) {
-        return recipe.minimumStage() <= chassis().stage() && coilStage() >= recipe.minimumStage();
+    /** Coil Reach lets the Resonance Coil calibrate recipes above its own stage; the chassis stage still applies. */
+    private boolean hasRequiredRecipeStage(CalibrationRecipe recipe, MachineStatAccumulator stats) {
+        return recipe.minimumStage() <= chassis().stage() && coilStage() + stats.intValue(MachineStat.COIL_REACH) >= recipe.minimumStage();
     }
 
     private int coilStage() {

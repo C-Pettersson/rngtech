@@ -1,0 +1,162 @@
+{
+    "id": "grove_warden",
+    "family": "forestry",
+    "nodes": [
+        {
+            "id": "growth_pulse",
+            "kind": "ROOT",
+            "x": 0,
+            "y": 0,
+            "effects": [
+                {
+                    "stat": "GROWTH_PULSE",
+                    "operation": "ADD",
+                    "value": 1
+                }
+            ],
+            "behaviors": [
+                "FERTILIZER_PULSE"
+            ]
+        },
+        {
+            "id": "nursery_cells",
+            "kind": "SMALL",
+            "parent": "growth_pulse",
+            "x": -2,
+            "y": 1,
+            "passive": {
+                "MANAGED_CELLS": 2
+            }
+        },
+        {
+            "id": "nursery",
+            "kind": "NOTABLE",
+            "parent": "nursery_cells",
+            "x": -2,
+            "y": 2,
+            "passive": {
+                "MANAGED_CELLS": 8
+            }
+        },
+        {
+            "id": "soil_pulse",
+            "kind": "SMALL",
+            "parent": "growth_pulse",
+            "x": -1,
+            "y": 1,
+            "effects": [
+                {
+                    "stat": "GROWTH_PULSE",
+                    "operation": "INCREASED_PERCENT",
+                    "value": 10
+                }
+            ]
+        },
+        {
+            "id": "rich_soil",
+            "kind": "NOTABLE",
+            "parent": "soil_pulse",
+            "x": -1,
+            "y": 2,
+            "effects": [
+                {
+                    "stat": "GROWTH_PULSE",
+                    "operation": "INCREASED_PERCENT",
+                    "value": 50
+                }
+            ]
+        },
+        {
+            "id": "library_energy",
+            "kind": "SMALL",
+            "parent": "growth_pulse",
+            "x": 1,
+            "y": 1,
+            "effects": [
+                {
+                    "stat": "ENERGY_USAGE",
+                    "operation": "DECREASED_PERCENT",
+                    "value": 5
+                }
+            ]
+        },
+        {
+            "id": "seed_library",
+            "kind": "NOTABLE",
+            "parent": "library_energy",
+            "x": 1,
+            "y": 2,
+            "behaviors": [
+                "SEED_LIBRARY"
+            ]
+        },
+        {
+            "id": "canopy_speed",
+            "kind": "SMALL",
+            "parent": "growth_pulse",
+            "x": 2,
+            "y": 1,
+            "effects": [
+                {
+                    "stat": "PROCESSING_SPEED",
+                    "operation": "INCREASED_PERCENT",
+                    "value": 5
+                }
+            ]
+        },
+        {
+            "id": "canopy_care",
+            "kind": "NOTABLE",
+            "parent": "canopy_speed",
+            "x": 2,
+            "y": 2,
+            "behaviors": [
+                "CANOPY_CARE"
+            ]
+        },
+        {
+            "id": "grove_cells",
+            "kind": "SMALL",
+            "parent": "nursery",
+            "x": -2,
+            "y": 3,
+            "passive": {
+                "MANAGED_CELLS": 2
+            }
+        },
+        {
+            "id": "ancient_grove",
+            "kind": "NOTABLE",
+            "parent": "grove_cells",
+            "x": -2,
+            "y": 4,
+            "behaviors": [
+                "ANCIENT_GROVE"
+            ]
+        },
+        {
+            "id": "surge_pulse",
+            "kind": "SMALL",
+            "parent": "rich_soil",
+            "x": -1,
+            "y": 3,
+            "effects": [
+                {
+                    "stat": "GROWTH_PULSE",
+                    "operation": "INCREASED_PERCENT",
+                    "value": 10
+                }
+            ]
+        },
+        {
+            "id": "verdant_surge",
+            "kind": "NOTABLE",
+            "parent": "surge_pulse",
+            "x": -1,
+            "y": 4,
+            "behaviors": [
+                "VERDANT_SURGE"
+            ]
+        }
+    ]
+}

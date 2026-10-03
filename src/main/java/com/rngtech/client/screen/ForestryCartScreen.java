@@ -48,6 +48,10 @@ public class ForestryCartScreen extends AbstractContainerScreen<ForestryCartMenu
     private static final int CONTROL_BUTTON_WIDTH = 30;
     private static final int CONTROL_BUTTON_HEIGHT = 12;
     private static final int ICON_SIZE = 12;
+    private static final int FERTILIZER_BAR_X = 42;
+    private static final int FERTILIZER_BAR_Y = 100;
+    private static final int FERTILIZER_BAR_WIDTH = 36;
+    private static final int FERTILIZER = 0xFFE3DCC4;
     private static final int BASE_IMAGE_WIDTH = 240;
     private static final int BASE_IMAGE_HEIGHT = 200;
     private static final Map<MegaPassiveNode, ResourceLocation> MASTERY_ICON_TEXTURES = createMasteryIconTextures();
@@ -283,6 +287,12 @@ public class ForestryCartScreen extends AbstractContainerScreen<ForestryCartMenu
     private void renderCart(GuiGraphics guiGraphics) {
         int x = leftPos;
         int y = topPos;
+        if (menu.fertilizerCapacity() > 0 || menu.fertilizer() > 0) {
+            int capacity = Math.max(menu.fertilizer(), menu.fertilizerCapacity());
+            int filled = Math.round(FERTILIZER_BAR_WIDTH * (float) menu.fertilizer() / capacity);
+            guiGraphics.fill(x + FERTILIZER_BAR_X, y + FERTILIZER_BAR_Y, x + FERTILIZER_BAR_X + FERTILIZER_BAR_WIDTH, y + FERTILIZER_BAR_Y + 2, 0xFF5F5F5F);
+            guiGraphics.fill(x + FERTILIZER_BAR_X, y + FERTILIZER_BAR_Y, x + FERTILIZER_BAR_X + filled, y + FERTILIZER_BAR_Y + 2, FERTILIZER);
+        }
         guiGraphics.fill(
                 x + ENERGY_GAUGE_X,
                 y + ENERGY_GAUGE_Y,
@@ -342,6 +352,13 @@ public class ForestryCartScreen extends AbstractContainerScreen<ForestryCartMenu
     }
 
     private MachineScreenStyle.StatLine[] statLines() {
+        return MachineScreenStyle.fitStatLines(
+                MachineScreenStyle.withAscendancyStats(cartStatLines(), menu.ascendancyStats()),
+                MachineScreenStyle.maxStatRows(18, BASE_IMAGE_HEIGHT)
+        );
+    }
+
+    private MachineScreenStyle.StatLine[] cartStatLines() {
         return new MachineScreenStyle.StatLine[] {
                 stat(
                         "rngtech.forestry_cart.stat.cart_energy",
@@ -630,6 +647,21 @@ public class ForestryCartScreen extends AbstractContainerScreen<ForestryCartMenu
     }
 
     private void renderValueTooltips(GuiGraphics guiGraphics, int mouseX, int mouseY) {
+        if (menu.selectedTab() == ForestryCartMenu.TAB_CART && (menu.fertilizerCapacity() > 0 || menu.fertilizer() > 0)) {
+            CompactValueText.renderTooltipIfHovered(
+                    guiGraphics,
+                    font,
+                    leftPos,
+                    topPos,
+                    mouseX,
+                    mouseY,
+                    FERTILIZER_BAR_X,
+                    FERTILIZER_BAR_Y - 1,
+                    FERTILIZER_BAR_WIDTH,
+                    4,
+                    Component.translatable("rngtech.forestry_station.tooltip.fertilizer", menu.fertilizer(), ForestryCartEntity.FERTILIZER_CAPACITY)
+            );
+        }
         if (menu.selectedTab() == ForestryCartMenu.TAB_CART) {
             CompactValueText.renderTooltipIfHovered(
                     guiGraphics,

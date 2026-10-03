@@ -1,0 +1,181 @@
+{
+    "id": "bloomer",
+    "family": "furnace",
+    "nodes": [
+        {
+            "id": "bloom_ledger",
+            "kind": "ROOT",
+            "x": 0,
+            "y": 0,
+            "effects": [
+                {
+                    "stat": "LEDGER_RATE",
+                    "operation": "ADD",
+                    "value": 11.1111
+                },
+                {
+                    "stat": "SUPER_OUTPUT_CHANCE",
+                    "operation": "LESS",
+                    "value": 0.5
+                }
+            ]
+        },
+        {
+            "id": "rich_rate",
+            "kind": "SMALL",
+            "parent": "bloom_ledger",
+            "x": -2,
+            "y": 1,
+            "effects": [
+                {
+                    "stat": "LEDGER_RATE",
+                    "operation": "INCREASED_PERCENT",
+                    "value": 10
+                }
+            ]
+        },
+        {
+            "id": "rich_blooms",
+            "kind": "NOTABLE",
+            "parent": "rich_rate",
+            "x": -2,
+            "y": 2,
+            "effects": [
+                {
+                    "stat": "LEDGER_RATE",
+                    "operation": "INCREASED_PERCENT",
+                    "value": 100
+                }
+            ]
+        },
+        {
+            "id": "flux_stability",
+            "kind": "SMALL",
+            "parent": "bloom_ledger",
+            "x": -1,
+            "y": 1,
+            "effects": [
+                {
+                    "stat": "TEMPERATURE_STABILITY",
+                    "operation": "INCREASED_PERCENT",
+                    "value": 8
+                }
+            ]
+        },
+        {
+            "id": "fluxed_blend",
+            "kind": "NOTABLE",
+            "parent": "flux_stability",
+            "x": -1,
+            "y": 2,
+            "behaviors": [
+                "FLUXED_BLEND"
+            ]
+        },
+        {
+            "id": "slag_stability",
+            "kind": "SMALL",
+            "parent": "bloom_ledger",
+            "x": 1,
+            "y": 1,
+            "effects": [
+                {
+                    "stat": "STABILITY",
+                    "operation": "INCREASED_PERCENT",
+                    "value": 8
+                }
+            ]
+        },
+        {
+            "id": "slag_reclaim",
+            "kind": "NOTABLE",
+            "parent": "slag_stability",
+            "x": 1,
+            "y": 2,
+            "behaviors": [
+                "SLAG_RECLAIM"
+            ]
+        },
+        {
+            "id": "line_rate",
+            "kind": "SMALL",
+            "parent": "bloom_ledger",
+            "x": 2,
+            "y": 1,
+            "effects": [
+                {
+                    "stat": "LEDGER_RATE",
+                    "operation": "INCREASED_PERCENT",
+                    "value": 10
+                }
+            ]
+        },
+        {
+            "id": "crusher_line",
+            "kind": "NOTABLE",
+            "parent": "line_rate",
+            "x": 2,
+            "y": 2,
+            "behaviors": [
+                "CRUSHER_LINE"
+            ]
+        },
+        {
+            "id": "patient_rate",
+            "kind": "SMALL",
+            "parent": "rich_blooms",
+            "x": -2,
+            "y": 3,
+            "effects": [
+                {
+                    "stat": "LEDGER_RATE",
+                    "operation": "INCREASED_PERCENT",
+                    "value": 10
+                }
+            ]
+        },
+        {
+            "id": "patient_bloom",
+            "kind": "NOTABLE",
+            "parent": "patient_rate",
+            "x": -2,
+            "y": 4,
+            "effects": [
+                {
+                    "stat": "LEDGER_RATE",
+                    "operation": "MORE",
+                    "value": 1.5
+                },
+                {
+                    "stat": "PROCESSING_SPEED",
+                    "operation": "LESS",
+                    "value": 0.7
+                }
+            ]
+        },
+        {
+            "id": "clean_stability",
+            "kind": "SMALL",
+            "parent": "slag_reclaim",
+            "x": 1,
+            "y": 3,
+            "effects": [
+                {
+                    "stat": "TEMPERATURE_STABILITY",
+                    "operation": "INCREASED_PERCENT",
+                    "value": 8
+                }
+            ]
+        },
+        {
+            "id": "clean_bloom",
+            "kind": "NOTABLE",
+            "parent": "clean_stability",
+            "x": 1,
+            "y": 4,
+            "behaviors": [
+                "CLEAN_BLOOM"
+            ]
+        }
+    ]
+}

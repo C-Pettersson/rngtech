@@ -76,6 +76,9 @@ public class ResonanceCalibratorBlock extends BaseMachineBlock {
             if (!machine.machineProgression().equals(MachineProgressionState.EMPTY)) {
                 stack.set(ModDataComponents.MACHINE_PROGRESSION.get(), machine.machineProgression());
             }
+            if (machine instanceof ResonanceCalibratorBlockEntity calibrator && calibrator.persistentStreak().streak() > 0) {
+                stack.set(ModDataComponents.CALIBRATION_STREAK.get(), calibrator.persistentStreak());
+            }
         }
         return stack;
     }

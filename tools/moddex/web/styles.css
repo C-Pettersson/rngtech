@@ -1133,7 +1133,116 @@ tr:last-child td {
   resize: vertical;
 }
 
+.ascendancy-toolbar {
+  grid-template-columns: minmax(220px, 0.6fr) minmax(260px, 1.4fr);
+  align-items: end;
+}
+
+.ascendancy-metrics {
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+}
+
+.ascendancy-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(420px, 1fr));
+  gap: 16px;
+}
+
+.ascendancy-tree {
+  display: block;
+  width: 100%;
+  max-width: 520px;
+  margin: 0 auto 12px;
+}
+
+.ascendancy-link {
+  stroke: var(--line);
+  stroke-width: 3;
+}
+
+.ascendancy-node {
+  cursor: pointer;
+}
+
+.ascendancy-node circle,
+.ascendancy-node rect {
+  fill: var(--surface-2);
+  stroke: var(--muted);
+  stroke-width: 2;
+}
+
+.ascendancy-node.kind-root circle {
+  fill: rgba(215, 166, 66, 0.25);
+  stroke: var(--accent-2);
+}
+
+.ascendancy-node.kind-notable rect {
+  fill: rgba(54, 194, 160, 0.2);
+  stroke: var(--accent);
+}
+
+.ascendancy-node.kind-deep rect {
+  fill: rgba(179, 140, 240, 0.22);
+  stroke: #b38cf0;
+}
+
+.ascendancy-node.match circle,
+.ascendancy-node.match rect {
+  stroke: #d8f0ff;
+  stroke-width: 4;
+}
+
+.ascendancy-node.selected circle,
+.ascendancy-node.selected rect {
+  stroke: var(--text);
+  stroke-width: 4;
+}
+
+.ascendancy-label {
+  fill: var(--text);
+  font-size: 11px;
+  text-anchor: middle;
+  paint-order: stroke;
+  stroke: var(--surface);
+  stroke-width: 4px;
+  stroke-linejoin: round;
+}
+
+.ascendancy-node-table table {
+  min-width: 0;
+}
+
+.ascendancy-node-table tr {
+  cursor: pointer;
+}
+
+.ascendancy-node-table tr.selected td {
+  background: rgba(54, 194, 160, 0.12);
+}
+
+td.wrap {
+  white-space: normal;
+}
+
+.ascendancy-uncovered {
+  color: var(--danger);
+  font-weight: 700;
+}
+
+.ascendancy-effects {
+  margin: 12px 0;
+  padding-left: 18px;
+}
+
 @media (max-width: 980px) {
+  .ascendancy-metrics {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .ascendancy-grid {
+    grid-template-columns: 1fr;
+  }
+
   .toolbar,
   .rbom-toolbar,
   .stage-toolbar,

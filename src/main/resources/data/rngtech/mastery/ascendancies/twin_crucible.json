@@ -1,0 +1,183 @@
+{
+    "id": "twin_crucible",
+    "family": "melter",
+    "nodes": [
+        {
+            "id": "second_crucible",
+            "kind": "ROOT",
+            "x": 0,
+            "y": 0,
+            "effects": [
+                {
+                    "stat": "PARALLEL_JOBS",
+                    "operation": "ADD",
+                    "value": 1
+                },
+                {
+                    "stat": "ENERGY_USAGE",
+                    "operation": "MORE",
+                    "value": 1.15
+                }
+            ],
+            "behaviors": [
+                "SECOND_CRUCIBLE"
+            ]
+        },
+        {
+            "id": "feed_speed",
+            "kind": "SMALL",
+            "parent": "second_crucible",
+            "x": -2,
+            "y": 1,
+            "effects": [
+                {
+                    "stat": "PROCESSING_SPEED",
+                    "operation": "INCREASED_PERCENT",
+                    "value": 8
+                }
+            ]
+        },
+        {
+            "id": "crush_feed",
+            "kind": "NOTABLE",
+            "parent": "feed_speed",
+            "x": -2,
+            "y": 2,
+            "effects": [
+                {
+                    "stat": "OVERLEVEL_SPEED",
+                    "operation": "ADD",
+                    "value": 10
+                }
+            ]
+        },
+        {
+            "id": "flash_transfer",
+            "kind": "SMALL",
+            "parent": "second_crucible",
+            "x": -1,
+            "y": 1,
+            "effects": [
+                {
+                    "stat": "HEAT_TRANSFER",
+                    "operation": "INCREASED_PERCENT",
+                    "value": 8
+                }
+            ]
+        },
+        {
+            "id": "flash_point",
+            "kind": "NOTABLE",
+            "parent": "flash_transfer",
+            "x": -1,
+            "y": 2,
+            "effects": [
+                {
+                    "stat": "HEAT_TRANSFER",
+                    "operation": "INCREASED_PERCENT",
+                    "value": 40
+                }
+            ]
+        },
+        {
+            "id": "shared_energy",
+            "kind": "SMALL",
+            "parent": "second_crucible",
+            "x": 1,
+            "y": 1,
+            "effects": [
+                {
+                    "stat": "ENERGY_USAGE",
+                    "operation": "DECREASED_PERCENT",
+                    "value": 5
+                }
+            ]
+        },
+        {
+            "id": "shared_heat",
+            "kind": "NOTABLE",
+            "parent": "shared_energy",
+            "x": 1,
+            "y": 2,
+            "behaviors": [
+                "SHARED_HEAT"
+            ]
+        },
+        {
+            "id": "lava_heat",
+            "kind": "SMALL",
+            "parent": "second_crucible",
+            "x": 2,
+            "y": 1,
+            "effects": [
+                {
+                    "stat": "MAX_TEMPERATURE",
+                    "operation": "INCREASED_PERCENT",
+                    "value": 4
+                }
+            ]
+        },
+        {
+            "id": "lava_tap",
+            "kind": "NOTABLE",
+            "parent": "lava_heat",
+            "x": 2,
+            "y": 2,
+            "behaviors": [
+                "LAVA_TAP"
+            ]
+        },
+        {
+            "id": "triple_energy",
+            "kind": "SMALL",
+            "parent": "shared_heat",
+            "x": 1,
+            "y": 3,
+            "effects": [
+                {
+                    "stat": "ENERGY_USAGE",
+                    "operation": "DECREASED_PERCENT",
+                    "value": 5
+                }
+            ]
+        },
+        {
+            "id": "triple_crucible",
+            "kind": "NOTABLE",
+            "parent": "triple_energy",
+            "x": 1,
+            "y": 4,
+            "effects": [
+                {
+                    "stat": "PARALLEL_JOBS",
+                    "operation": "ADD",
+                    "value": 1
+                }
+            ]
+        },
+        {
+            "id": "fused_transfer",
+            "kind": "SMALL",
+            "parent": "flash_point",
+            "x": -1,
+            "y": 3,
+            "effects": [
+                {
+                    "stat": "HEAT_TRANSFER",
+                    "operation": "INCREASED_PERCENT",
+                    "value": 8
+                }
+            ]
+        },
+        {
+            "id": "fused_crucibles",
+            "kind": "NOTABLE",
+            "parent": "fused_transfer",
+            "x": -1,
+            "y": 4,
+            "behaviors": [
+                "FUSED_CRUCIBLES"
+            ]
+        }
+    ]
+}

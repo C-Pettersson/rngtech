@@ -28,6 +28,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.neoforged.neoforge.items.ItemStackHandler;
 import net.neoforged.neoforge.items.SlotItemHandler;
 
+import java.util.List;
 import java.util.function.BooleanSupplier;
 
 public class MetalPressMenu extends AbstractContainerMenu implements MasteryMenuView<MegaPassiveNode> {
@@ -64,7 +65,8 @@ public class MetalPressMenu extends AbstractContainerMenu implements MasteryMenu
     private static final int DATA_SELECTED_MOLD = 24;
     private static final int DATA_ENERGY_PER_TICK = 25;
     private static final int DATA_ENERGY_PER_CRAFT = 26;
-    private static final int DATA_MACHINE_PROGRESSION_START = DATA_ENERGY_PER_CRAFT + 1;
+    private static final int DATA_LEDGER = DATA_ENERGY_PER_CRAFT + 1;
+    private static final int DATA_MACHINE_PROGRESSION_START = DATA_LEDGER + 1;
     private static final int DATA_COUNT = DATA_MACHINE_PROGRESSION_START + MasteryMenuSupport.FIELD_COUNT;
     private static final int STAT_SCALE = 100;
     public static final int BUTTON_SELECT_MOLD_BASE = 100;
@@ -157,6 +159,12 @@ public class MetalPressMenu extends AbstractContainerMenu implements MasteryMenu
 
     public int selectedTab() {
         return selectedTab;
+    }
+
+    /** The Batch Ledger's progress toward its next item, from 0 to 1, or -1 when it does not apply. */
+    public float ledgerProgress() {
+        int value = data.get(DATA_LEDGER);
+        return value < 0 ? -1.0F : Math.min(1.0F, value / 1000.0F);
     }
 
     public float processingProgress() {
@@ -300,6 +308,16 @@ public class MetalPressMenu extends AbstractContainerMenu implements MasteryMenu
     @Override
     public MachineProgressionState masterySnapshot() {
         return MasteryMenuSupport.snapshot(data, DATA_MACHINE_PROGRESSION_START, masteryFamily());
+    }
+
+    @Override
+    public int ascendancyEntryStage() {
+        return MasteryMenuSupport.ascendancyEntryStage(data, DATA_MACHINE_PROGRESSION_START);
+    }
+
+    @Override
+    public List<MasteryMenuSupport.GrantedStat> ascendancyStats() {
+        return MasteryMenuSupport.grantedStats(data, DATA_MACHINE_PROGRESSION_START);
     }
 
     @Override

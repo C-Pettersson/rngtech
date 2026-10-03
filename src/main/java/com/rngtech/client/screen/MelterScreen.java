@@ -774,7 +774,10 @@ public class MelterScreen extends AbstractContainerScreen<MelterMenu> {
                     )
             );
         }
-        return statLines;
+        return MachineScreenStyle.fitStatLines(
+                MachineScreenStyle.withAscendancyStats(statLines, menu.ascendancyStats()),
+                MachineScreenStyle.maxStatRows(STAT_PANEL_Y, BASE_IMAGE_HEIGHT)
+        );
     }
 
     private boolean isIntegralStat(int dataIndex) {

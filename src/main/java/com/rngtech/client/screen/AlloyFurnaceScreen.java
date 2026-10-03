@@ -29,6 +29,8 @@ public class AlloyFurnaceScreen extends AbstractContainerScreen<AlloyFurnaceMenu
     private static final int HEAT = 0xFFE0712F;
     private static final int FAILURE = 0xFFB45B4A;
     private static final int PROGRESS = 0xFFB87832;
+    private static final int BLEND_LEDGER = 0xFFD3A33A;
+    private static final int FLUX_LEDGER = 0xFF8FB4D8;
     private static final int STATUS_READY = 0xFF5F8A45;
     private static final int STATUS_WARN = 0xFFAA7A31;
     private static final int STATUS_ERROR = 0xFFB45B4A;
@@ -363,6 +365,14 @@ public class AlloyFurnaceScreen extends AbstractContainerScreen<AlloyFurnaceMenu
                 y + PROGRESS_Y + PROGRESS_HEIGHT - 1,
                 PROGRESS
         );
+        float ledger = menu.ledgerProgress();
+        if (ledger >= 0.0F) {
+            // The flux or blend ledger fills a thin line along the progress bar's bottom edge.
+            int ledgerY = y + PROGRESS_Y + PROGRESS_HEIGHT - 1;
+            guiGraphics.fill(x + PROGRESS_X + 1, ledgerY, x + PROGRESS_X + PROGRESS_WIDTH - 1, ledgerY + 1, 0xFF3A3326);
+            guiGraphics.fill(x + PROGRESS_X + 1, ledgerY, x + PROGRESS_X + 1 + Math.round((PROGRESS_WIDTH - 2) * ledger), ledgerY + 1,
+                    menu.ledgerIsBlend() ? BLEND_LEDGER : FLUX_LEDGER);
+        }
 
         guiGraphics.fill(x + ENERGY_BAR_X, y + BAR_Y, x + ENERGY_BAR_X + BAR_WIDTH, y + BAR_Y + BAR_HEIGHT, 0xFF5F5F5F);
         int energyHeight = Math.round(BAR_FILL_HEIGHT * menu.energyProgress());
@@ -542,9 +552,12 @@ public class AlloyFurnaceScreen extends AbstractContainerScreen<AlloyFurnaceMenu
 
     private Component progressTooltip() {
         int ticks = menu.processingTicks();
-        return ticks <= 0
+        Component progress = ticks <= 0
                 ? Component.translatable("rngtech.alloy_furnace.tooltip.progress.empty")
                 : Component.translatable("rngtech.alloy_furnace.tooltip.progress", menu.progress(), ticks, CompactValueText.energyRate(menu.energyPerTick()));
+        float ledger = menu.ledgerProgress();
+        return ledger < 0.0F ? progress : progress.copy().append(" ").append(Component.translatable(
+                menu.ledgerIsBlend() ? "rngtech.alloy_furnace.tooltip.blend_ledger" : "rngtech.alloy_furnace.tooltip.flux", Math.round(ledger * 100)));
     }
 
     private void renderStatTooltips(GuiGraphics guiGraphics, int mouseX, int mouseY) {
@@ -572,6 +585,7 @@ public class AlloyFurnaceScreen extends AbstractContainerScreen<AlloyFurnaceMenu
             case AlloyFurnaceBlockEntity.STATUS_NO_INPUT -> Component.translatable("rngtech.alloy_furnace.status.no_input");
             case AlloyFurnaceBlockEntity.STATUS_INVALID_RECIPE -> Component.translatable("rngtech.alloy_furnace.status.invalid_recipe");
             case AlloyFurnaceBlockEntity.STATUS_BLOCKED_STAGE -> Component.translatable("rngtech.alloy_furnace.status.blocked_stage");
+            case AlloyFurnaceBlockEntity.STATUS_ROUTE_DISABLED -> Component.translatable("rngtech.alloy_furnace.status.route_disabled");
             case AlloyFurnaceBlockEntity.STATUS_HEAT_LOW -> Component.translatable("rngtech.alloy_furnace.status.heat_low", menu.minimumTemperature());
             case AlloyFurnaceBlockEntity.STATUS_STABILITY_LOW -> Component.translatable("rngtech.alloy_furnace.status.stability_low");
             case AlloyFurnaceBlockEntity.STATUS_OUTPUT_FULL -> Component.translatable("rngtech.alloy_furnace.status.output_full");
@@ -622,7 +636,10 @@ public class AlloyFurnaceScreen extends AbstractContainerScreen<AlloyFurnaceMenu
                     )
             );
         }
-        return statLines;
+        return MachineScreenStyle.fitStatLines(
+                MachineScreenStyle.withAscendancyStats(statLines, menu.ascendancyStats()),
+                MachineScreenStyle.maxStatRows(STAT_PANEL_Y, BASE_IMAGE_HEIGHT)
+        );
     }
 
     private String statValue(int index) {

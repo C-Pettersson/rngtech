@@ -1,0 +1,52 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "rngtech:ascendancy_seal_recipes_enabled"
+    },
+    {
+      "type": "rngtech:material_enabled",
+      "material": "tungstensteel"
+    },
+    {
+      "type": "rngtech:material_enabled",
+      "material": "nullite"
+    }
+  ],
+  "type": "rngtech:battery_assembly",
+  "group": "component_assembly_seal_cores",
+  "ingredients": [
+    {
+      "ingredient": {
+        "item": "rngtech:primed_seal_core"
+      }
+    },
+    {
+      "ingredient": {
+        "item": "rngtech:tungstensteel_casing"
+      }
+    },
+    {
+      "ingredient": {
+        "item": "rngtech:nullite_coil"
+      }
+    },
+    {
+      "ingredient": {
+        "tag": "c:circuits/elite"
+      }
+    }
+  ],
+  "fluid_input": {
+    "ingredient": {
+      "fluid": "rngtech:lubricant"
+    },
+    "amount": 1000
+  },
+  "result": {
+    "count": 1,
+    "id": "rngtech:lubricated_seal_core"
+  },
+  "processing_ticks": 600,
+  "energy": 32000,
+  "roll_result_traits": false
+}

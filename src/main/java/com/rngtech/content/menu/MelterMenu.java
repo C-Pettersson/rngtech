@@ -31,6 +31,7 @@ import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.items.ItemStackHandler;
 import net.neoforged.neoforge.items.SlotItemHandler;
 
+import java.util.List;
 import java.util.function.BooleanSupplier;
 
 public class MelterMenu extends AbstractContainerMenu implements MasteryMenuView<MegaPassiveNode> {
@@ -514,5 +515,15 @@ public class MelterMenu extends AbstractContainerMenu implements MasteryMenuView
     @Override
     public MachineProgressionState masterySnapshot() {
         return MasteryMenuSupport.snapshot(data, DATA_MACHINE_PROGRESSION_START, masteryFamily());
+    }
+
+    @Override
+    public int ascendancyEntryStage() {
+        return MasteryMenuSupport.ascendancyEntryStage(data, DATA_MACHINE_PROGRESSION_START);
+    }
+
+    @Override
+    public List<MasteryMenuSupport.GrantedStat> ascendancyStats() {
+        return MasteryMenuSupport.grantedStats(data, DATA_MACHINE_PROGRESSION_START);
     }
 }
