@@ -248,9 +248,7 @@ final class AscendancyPanel {
         tooltip.add(Component.translatable(node.translationKey()).withStyle(ChatFormatting.WHITE));
         switch (node.kind()) {
             case ROOT -> tooltip.add(Component.translatable("rngtech.mastery.ascendancy.tooltip.root").withStyle(ChatFormatting.GOLD));
-            case NOTABLE -> tooltip.add(ascendancy != null && ascendancy.isDeep(node)
-                    ? Component.translatable("rngtech.mastery.ascendancy.tooltip.deep_notable").withStyle(ChatFormatting.GOLD)
-                    : Component.translatable("rngtech.mastery.tooltip.notable").withStyle(ChatFormatting.AQUA));
+            case NOTABLE -> tooltip.add(Component.translatable("rngtech.mastery.tooltip.notable").withStyle(ChatFormatting.AQUA));
             case SMALL -> { }
         }
         MasteryScreenSupport.effectLines(node, view, tooltip);
