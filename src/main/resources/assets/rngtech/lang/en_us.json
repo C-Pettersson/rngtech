@@ -5204,7 +5204,7 @@
   "rngtech.mastery.ascendancy.next": "More ascendancies",
   "rngtech.mastery.ascendancy.back": "Back to the ascendancy tree.",
   "rngtech.mastery.ascendancy.tooltip.root": "Ascendancy root: always allocated",
-  "rngtech.mastery.ascendancy.tooltip.deep_notable": "Deep Notable: defines the build",
+  "rngtech.mastery.ascendancy.tooltip.deep_notable": "Deep Notable",
   "rngtech.mastery.ascendancy.refund_hint": "Right-click to refund: %s Mastery Refunds. No allocated node may depend on it.",
   "rngtech.mastery.ascendancy.no_points": "No unspent ascendancy points. Use the next Ascendancy Seal.",
   "rngtech.mastery.ascendancy.choose.ascend": "Choose an ascendancy",
