@@ -42,9 +42,21 @@ final class AscendancyPanel {
     private static final int BUTTON_GAP = 4;
     private static final int CLOSE_SIZE = 10;
     private static final int MIN_COLUMN_WIDTH = 100;
-    private static final int COLUMN_GAP = 4;
+    private static final int CARD_MAX_WIDTH = 196;
+    private static final int CARD_MAX_HEIGHT = 300;
+    private static final int CARD_GAP = 12;
+    private static final int CARD_INSET = 6;
+    private static final int CARD_HEADER = 28;
+    private static final int CARD_HEADER_SHORT = 15;
+    /** Cards shorter than this drop the root subtitle, as in the compact Mastery view. */
+    private static final int CARD_SHORT_HEIGHT = 170;
+    /** Text lines give way until the tree keeps at least this much height. */
+    private static final int CARD_MIN_TREE_HEIGHT = 64;
+    private static final float CARD_TREE_SPACING = 34.0F;
     private static final int LINE_HEIGHT = 10;
-    private static final int ROOT_LINES = 3;
+    private static final int ROOT_LINES = 4;
+    private static final int CARD_LINES = 7;
+    private static final int LABEL_GAP = 6;
     private static final int BACKGROUND = 0xF20D1318;
     private static final int BORDER = 0xFF655B46;
     private static final int BUTTON = 0xFF343E49;
@@ -59,6 +71,8 @@ final class AscendancyPanel {
     private static final int LOCKED_BORDER = 0xFF9D885F;
     private static final int OUTLINE = 0xFF080D11;
     private static final int HOVER_RING = 0xFFF2E6C2;
+    private static final int CARD_HOVER = 0xFF8C7F5E;
+    private static final int DEEP_TEXT = 0xFFB794E6;
 
     private final MasteryMenuView<?> view;
     private final MasteryScreenSupport.Palette palette;
@@ -73,6 +87,15 @@ final class AscendancyPanel {
     private enum Purpose { ASCEND, FREE, SWITCH }
 
     private enum Part { NONE, CLOSE, POINTS, PRIMARY, SECONDARY, PREVIOUS, NEXT, COLUMN, NODE }
+
+    /** A line of card text in its own color. */
+    private record Line(FormattedCharSequence text, int color) { }
+
+    /**
+     * Where the choose dialog draws the current page: one centered card per ascendancy, and a footer with the confirm
+     * button centered beside its label. Rendering and hit tests share it.
+     */
+    private record ChooseLayout(List<Ascendancy> shown, List<int[]> cards, int page, int pages, int primaryX, int labelX, FormattedCharSequence label) { }
 
     private record Hit(Part part, Ascendancy ascendancy, AscendancyTreeLayout.Placed node) {
         private static final Hit NONE = new Hit(Part.NONE, null, null);
@@ -338,53 +361,67 @@ final class AscendancyPanel {
     }
 
     private void renderChoose(GuiGraphics graphics, Font font, MasterySummaryDrawer.Bounds bounds, MachineProgressionState state, Hit hit) {
-        List<Ascendancy> candidates = candidates(state);
-        int columns = columns(bounds);
-        int pages = Math.max(1, (candidates.size() + columns - 1) / columns);
-        page = Math.min(page, pages - 1);
         Component title = Component.translatable("rngtech.mastery.ascendancy.choose." + purpose.name().toLowerCase(Locale.ROOT));
         int textLeft = bounds.left() + PADDING;
         graphics.drawString(font, clip(font, title, closeLeft(bounds) - textLeft - PADDING), textLeft, bounds.top() + 4, TITLE, false);
-        if (candidates.isEmpty()) {
+        if (candidates(state).isEmpty()) {
             graphics.drawString(font, clip(font, Component.translatable("rngtech.mastery.ascendancy.status.none"), bounds.right() - textLeft - PADDING),
                     textLeft, bodyTop(bounds) + 4, MUTED, false);
             return;
         }
+        ChooseLayout layout = chooseLayout(bounds, font, state);
+        page = layout.page();
         Map<Ascendancy, List<AscendancyTreeLayout.Placed>> trees = new LinkedHashMap<>();
-        for (int slot = 0; slot < columns; slot++) {
-            int index = page * columns + slot;
-            if (index >= candidates.size()) {
-                break;
-            }
-            Ascendancy ascendancy = candidates.get(index);
-            int[] column = column(bounds, columns, slot);
-            boolean picked = ascendancy.id().equals(selected);
-            graphics.fill(column[0] - 1, column[1] - 1, column[2] + 1, column[3] + 1, picked ? palette.outputBonus() : BORDER);
-            graphics.fill(column[0], column[1], column[2], column[3], picked ? COLUMN_SELECTED : COLUMN);
-            graphics.drawString(font, clip(font, Component.translatable(ascendancy.translationKey()), column[2] - column[0] - 4), column[0] + 2, column[1] + 2, ACCENT, false);
-            List<FormattedCharSequence> lines = rootLines(font, column, ascendancy);
-            int y = column[3] - lines.size() * LINE_HEIGHT - 1;
-            for (FormattedCharSequence line : lines) {
-                graphics.drawString(font, line, column[0] + 2, y, MUTED, false);
-                y += LINE_HEIGHT;
-            }
-            trees.put(ascendancy, previewLayout(font, column, ascendancy));
+        for (int index = 0; index < layout.shown().size(); index++) {
+            Ascendancy ascendancy = layout.shown().get(index);
+            int[] card = layout.cards().get(index);
+            boolean hovered = (hit.part() == Part.COLUMN || hit.part() == Part.NODE) && hit.ascendancy() == ascendancy;
+            renderCard(graphics, font, card, ascendancy, ascendancy.id().equals(selected), hovered);
+            trees.put(ascendancy, previewLayout(font, card, ascendancy));
         }
+        boolean ready = primaryReady(state);
         ItemStack seal = purpose == Purpose.FREE ? null : sealStack(purpose == Purpose.SWITCH ? 1 : state.sealTiers() + 1);
-        renderButton(graphics, font, primaryX(bounds), buttonY(bounds), hit.part() == Part.PRIMARY, primaryReady(state), seal, seal == null ? "\u2714" : null);
+        renderButton(graphics, font, layout.primaryX(), buttonY(bounds), hit.part() == Part.PRIMARY, ready, seal, seal == null ? "\u2714" : null);
+        graphics.drawString(font, layout.label(), layout.labelX(), buttonY(bounds) + 5, ready ? TEXT : MUTED, false);
         if (purpose == Purpose.SWITCH) {
-            renderButton(graphics, font, secondaryX(bounds, true), buttonY(bounds), hit.part() == Part.SECONDARY, true, null, "\u2190");
+            renderButton(graphics, font, primaryX(bounds), buttonY(bounds), hit.part() == Part.SECONDARY, true, null, "\u2190");
         }
-        if (pages > 1) {
-            renderButton(graphics, font, previousX(bounds), buttonY(bounds), hit.part() == Part.PREVIOUS, page > 0, null, "<");
-            renderButton(graphics, font, nextX(bounds), buttonY(bounds), hit.part() == Part.NEXT, page < pages - 1, null, ">");
-            String count = (page + 1) + "/" + pages;
+        if (layout.pages() > 1) {
+            renderButton(graphics, font, previousX(bounds), buttonY(bounds), hit.part() == Part.PREVIOUS, layout.page() > 0, null, "<");
+            renderButton(graphics, font, nextX(bounds), buttonY(bounds), hit.part() == Part.NEXT, layout.page() < layout.pages() - 1, null, ">");
+            String count = (layout.page() + 1) + "/" + layout.pages();
             graphics.drawString(font, count, previousX(bounds) - BUTTON_GAP - font.width(count), buttonY(bounds) + 5, MUTED, false);
         }
         GuiShapeBatch shapes = new GuiShapeBatch(graphics, bounds.left(), bounds.top(), bounds.right(), bounds.bottom());
         trees.forEach((ascendancy, placed) -> drawTree(shapes, ascendancy, placed, state, hit, false));
         shapes.flush();
         trees.values().forEach(placed -> drawIcons(graphics, placed));
+    }
+
+    /** A card: the ascendancy and its root at the top, the tree in the middle, and the root's effects and deep notables below. */
+    private void renderCard(GuiGraphics graphics, Font font, int[] card, Ascendancy ascendancy, boolean picked, boolean hovered) {
+        int border = picked ? palette.outputBonus() : hovered ? CARD_HOVER : BORDER;
+        graphics.fill(card[0] - 1, card[1] - 1, card[2] + 1, card[3] + 1, border);
+        graphics.fill(card[0], card[1], card[2], card[3], picked ? COLUMN_SELECTED : COLUMN);
+        int center = (card[0] + card[2]) / 2;
+        int textWidth = card[2] - card[0] - CARD_INSET * 2;
+        FormattedCharSequence name = clip(font, Component.translatable(ascendancy.translationKey()), textWidth);
+        graphics.drawString(font, name, center - font.width(name) / 2, card[1] + 5, ACCENT, false);
+        int header = cardHeader(card);
+        if (header == CARD_HEADER) {
+            FormattedCharSequence root = clip(font, Component.translatable(ascendancy.root().translationKey()), textWidth);
+            graphics.drawString(font, root, center - font.width(root) / 2, card[1] + 16, MUTED, false);
+        }
+        graphics.fill(card[0] + CARD_INSET, card[1] + header - 1, card[2] - CARD_INSET, card[1] + header, picked ? palette.outputBonus() : BORDER);
+        List<Line> lines = cardLines(font, card, ascendancy);
+        int y = card[3] - CARD_INSET - lines.size() * LINE_HEIGHT;
+        if (!lines.isEmpty()) {
+            graphics.fill(card[0] + CARD_INSET, y - 4, card[2] - CARD_INSET, y - 3, BORDER);
+        }
+        for (Line line : lines) {
+            graphics.drawString(font, line.text(), card[0] + CARD_INSET, y, line.color(), false);
+            y += LINE_HEIGHT;
+        }
     }
 
     private void drawTree(GuiShapeBatch shapes, Ascendancy ascendancy, List<AscendancyTreeLayout.Placed> placed, MachineProgressionState state, Hit hit, boolean live) {
@@ -496,30 +533,27 @@ final class AscendancyPanel {
         }
         int buttonY = buttonY(bounds);
         if (choosing) {
-            List<Ascendancy> candidates = candidates(state);
-            int columns = columns(bounds);
-            int pages = Math.max(1, (candidates.size() + columns - 1) / columns);
-            if (inside(mouseX, mouseY, primaryX(bounds), buttonY, BUTTON_SIZE, BUTTON_SIZE) && !candidates.isEmpty()) {
+            if (candidates(state).isEmpty()) {
+                return Hit.NONE;
+            }
+            ChooseLayout layout = chooseLayout(bounds, font, state);
+            if (inside(mouseX, mouseY, layout.primaryX(), buttonY, BUTTON_SIZE, BUTTON_SIZE)) {
                 return Hit.of(Part.PRIMARY);
             }
-            if (purpose == Purpose.SWITCH && inside(mouseX, mouseY, secondaryX(bounds, true), buttonY, BUTTON_SIZE, BUTTON_SIZE)) {
+            if (purpose == Purpose.SWITCH && inside(mouseX, mouseY, primaryX(bounds), buttonY, BUTTON_SIZE, BUTTON_SIZE)) {
                 return Hit.of(Part.SECONDARY);
             }
-            if (pages > 1 && inside(mouseX, mouseY, previousX(bounds), buttonY, BUTTON_SIZE, BUTTON_SIZE)) {
+            if (layout.pages() > 1 && inside(mouseX, mouseY, previousX(bounds), buttonY, BUTTON_SIZE, BUTTON_SIZE)) {
                 return Hit.of(Part.PREVIOUS);
             }
-            if (pages > 1 && inside(mouseX, mouseY, nextX(bounds), buttonY, BUTTON_SIZE, BUTTON_SIZE)) {
+            if (layout.pages() > 1 && inside(mouseX, mouseY, nextX(bounds), buttonY, BUTTON_SIZE, BUTTON_SIZE)) {
                 return Hit.of(Part.NEXT);
             }
-            for (int slot = 0; slot < columns; slot++) {
-                int index = Math.min(page, pages - 1) * columns + slot;
-                if (index >= candidates.size()) {
-                    break;
-                }
-                int[] column = column(bounds, columns, slot);
-                if (mouseX >= column[0] && mouseX < column[2] && mouseY >= column[1] && mouseY < column[3]) {
-                    Ascendancy ascendancy = candidates.get(index);
-                    for (AscendancyTreeLayout.Placed entry : previewLayout(font, column, ascendancy)) {
+            for (int index = 0; index < layout.shown().size(); index++) {
+                int[] card = layout.cards().get(index);
+                if (mouseX >= card[0] && mouseX < card[2] && mouseY >= card[1] && mouseY < card[3]) {
+                    Ascendancy ascendancy = layout.shown().get(index);
+                    for (AscendancyTreeLayout.Placed entry : previewLayout(font, card, ascendancy)) {
                         if (entry.contains(mouseX, mouseY)) {
                             return new Hit(Part.NODE, ascendancy, entry);
                         }
@@ -663,30 +697,73 @@ final class AscendancyPanel {
         return AscendancyTreeLayout.fit(ascendancy, bounds.left() + PADDING, bodyTop(bounds), bounds.right() - PADDING, bodyBottom(bounds));
     }
 
-    private List<AscendancyTreeLayout.Placed> previewLayout(Font font, int[] column, Ascendancy ascendancy) {
-        int bottom = column[3] - rootLines(font, column, ascendancy).size() * LINE_HEIGHT - 3;
-        return AscendancyTreeLayout.fit(ascendancy, column[0] + 3, column[1] + LINE_HEIGHT + 4, column[2] - 3, bottom);
+    private List<AscendancyTreeLayout.Placed> previewLayout(Font font, int[] card, Ascendancy ascendancy) {
+        int lines = cardLines(font, card, ascendancy).size();
+        int bottom = card[3] - (lines > 0 ? CARD_INSET + lines * LINE_HEIGHT + 10 : CARD_INSET + 2);
+        return AscendancyTreeLayout.fit(ascendancy, card[0] + CARD_INSET, card[1] + cardHeader(card) + 6, card[2] - CARD_INSET, bottom, CARD_TREE_SPACING);
     }
 
-    /** The root's effects, cut to the lines that leave the preview tree enough room. */
-    private List<FormattedCharSequence> rootLines(Font font, int[] column, Ascendancy ascendancy) {
+    private static int cardHeader(int[] card) {
+        return card[3] - card[1] < CARD_SHORT_HEIGHT ? CARD_HEADER_SHORT : CARD_HEADER;
+    }
+
+    /**
+     * The root's effects, then each deep notable, which defines the build. Lines give way, deep notables first, until the
+     * tree keeps {@link #CARD_MIN_TREE_HEIGHT}; the card's tooltip still lists the root's effects.
+     */
+    private List<Line> cardLines(Font font, int[] card, Ascendancy ascendancy) {
+        int room = card[3] - card[1] - cardHeader(card) - 6 - CARD_MIN_TREE_HEIGHT - CARD_INSET - 10;
+        int limit = Math.max(0, Math.min(CARD_LINES, room / LINE_HEIGHT));
+        int width = Math.max(1, card[2] - card[0] - CARD_INSET * 2);
         List<Component> effects = new ArrayList<>();
         MasteryScreenSupport.effectLines(ascendancy.root(), view, effects);
-        List<FormattedCharSequence> lines = new ArrayList<>();
+        List<Line> lines = new ArrayList<>();
         for (Component effect : effects) {
-            lines.addAll(font.split(effect, column[2] - column[0] - 4));
+            font.split(effect, width).forEach(line -> lines.add(new Line(line, TEXT)));
         }
-        return lines.size() > ROOT_LINES ? lines.subList(0, ROOT_LINES) : lines;
+        List<Line> kept = new ArrayList<>(lines.subList(0, Math.min(lines.size(), Math.min(ROOT_LINES, limit))));
+        for (AscendancyNode node : ascendancy.nodes().values()) {
+            if (ascendancy.isDeep(node) && kept.size() < limit) {
+                kept.add(new Line(clip(font, Component.literal("\u25c6 ").append(Component.translatable(node.translationKey())), width), DEEP_TEXT));
+            }
+        }
+        return kept;
     }
 
-    private int columns(MasterySummaryDrawer.Bounds bounds) {
-        return Math.max(1, (bounds.right() - bounds.left() - PADDING * 2 + COLUMN_GAP) / (MIN_COLUMN_WIDTH + COLUMN_GAP));
+    /** Cards for the current page, centered as a row and capped in size; the confirm button and its label sit centered below. */
+    private ChooseLayout chooseLayout(MasterySummaryDrawer.Bounds bounds, Font font, MachineProgressionState state) {
+        List<Ascendancy> candidates = candidates(state);
+        int width = bounds.right() - bounds.left() - PADDING * 2;
+        int perPage = Math.max(1, (width + CARD_GAP) / (MIN_COLUMN_WIDTH + CARD_GAP));
+        int pages = Math.max(1, (candidates.size() + perPage - 1) / perPage);
+        int current = Math.max(0, Math.min(page, pages - 1));
+        List<Ascendancy> shown = candidates.subList(Math.min(candidates.size(), current * perPage), Math.min(candidates.size(), (current + 1) * perPage));
+        int count = Math.max(1, shown.size());
+        int cardWidth = Math.min(CARD_MAX_WIDTH, (width - CARD_GAP * (count - 1)) / count);
+        int height = bodyBottom(bounds) - bodyTop(bounds);
+        int cardHeight = Math.min(CARD_MAX_HEIGHT, height);
+        int left = bounds.left() + PADDING + (width - count * cardWidth - CARD_GAP * (count - 1)) / 2;
+        int top = bodyTop(bounds) + (height - cardHeight) / 2;
+        List<int[]> cards = new ArrayList<>();
+        for (int index = 0; index < shown.size(); index++) {
+            int cardLeft = left + index * (cardWidth + CARD_GAP);
+            cards.add(new int[] {cardLeft, top, cardLeft + cardWidth, top + cardHeight});
+        }
+        int spanLeft = purpose == Purpose.SWITCH ? primaryX(bounds) + BUTTON_SIZE + BUTTON_GAP : bounds.left() + PADDING;
+        int spanRight = pages > 1 ? previousX(bounds) - BUTTON_GAP - font.width(pages + "/" + pages) - BUTTON_GAP : bounds.right() - PADDING;
+        FormattedCharSequence label = clip(font, confirmLabel(), Math.max(1, spanRight - spanLeft - BUTTON_SIZE - LABEL_GAP));
+        int group = BUTTON_SIZE + LABEL_GAP + font.width(label);
+        int primary = Math.max(spanLeft, (bounds.left() + bounds.right()) / 2 - group / 2);
+        return new ChooseLayout(shown, cards, current, pages, primary, primary + BUTTON_SIZE + LABEL_GAP, label);
     }
 
-    private int[] column(MasterySummaryDrawer.Bounds bounds, int columns, int slot) {
-        int width = (bounds.right() - bounds.left() - PADDING * 2 - COLUMN_GAP * (columns - 1)) / columns;
-        int left = bounds.left() + PADDING + slot * (width + COLUMN_GAP);
-        return new int[] {left, bodyTop(bounds), left + width, bodyBottom(bounds)};
+    private Component confirmLabel() {
+        Ascendancy picked = AscendancyCatalog.get(selected);
+        if (picked == null) {
+            return Component.translatable("rngtech.mastery.ascendancy.choose_hint");
+        }
+        return Component.translatable("rngtech.mastery.ascendancy.confirm_label." + purpose.name().toLowerCase(Locale.ROOT),
+                Component.translatable(picked.translationKey()));
     }
 
     private static FormattedCharSequence clip(Font font, Component text, int width) {

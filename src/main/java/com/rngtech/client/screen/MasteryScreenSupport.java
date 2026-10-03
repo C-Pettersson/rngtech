@@ -1320,11 +1320,14 @@ public final class MasteryScreenSupport<N extends PassiveNode> {
         clampAfterGeometryChange(imageWidth, imageHeight);
     }
 
+    /** Panning reaches half a view past the outermost nodes, so an edge node can be brought to the middle of the view. */
     private void setPan(double nextPanX, double nextPanY, int imageWidth, int imageHeight) {
-        double minPanX = contentMinX - MASTERY_CONTENT_PADDING - MASTERY_VIEW_X / zoom;
-        double maxPanX = contentMaxX + MASTERY_CONTENT_PADDING - viewRight(imageWidth) / zoom;
-        double minPanY = contentMinY - MASTERY_CONTENT_PADDING - MASTERY_VIEW_Y / zoom;
-        double maxPanY = contentMaxY + MASTERY_CONTENT_PADDING - viewBottom(imageHeight) / zoom;
+        double reachX = Math.max(MASTERY_CONTENT_PADDING, viewWidth(imageWidth) / 2.0D / zoom);
+        double reachY = Math.max(MASTERY_CONTENT_PADDING, viewHeight(imageHeight) / 2.0D / zoom);
+        double minPanX = contentMinX - reachX - MASTERY_VIEW_X / zoom;
+        double maxPanX = contentMaxX + reachX - viewRight(imageWidth) / zoom;
+        double minPanY = contentMinY - reachY - MASTERY_VIEW_Y / zoom;
+        double maxPanY = contentMaxY + reachY - viewBottom(imageHeight) / zoom;
         panX = minPanX > maxPanX ? (minPanX + maxPanX) / 2.0D : Mth.clamp(nextPanX, minPanX, maxPanX);
         panY = minPanY > maxPanY ? (minPanY + maxPanY) / 2.0D : Mth.clamp(nextPanY, minPanY, maxPanY);
     }

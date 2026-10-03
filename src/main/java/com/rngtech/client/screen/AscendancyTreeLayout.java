@@ -22,6 +22,11 @@ public final class AscendancyTreeLayout {
     private AscendancyTreeLayout() { }
 
     public static List<Placed> fit(Ascendancy ascendancy, float left, float top, float right, float bottom) {
+        return fit(ascendancy, left, top, right, bottom, MAX_SPACING);
+    }
+
+    /** As {@link #fit(Ascendancy, float, float, float, float)}, with a wider grid step allowed when the box has room. */
+    public static List<Placed> fit(Ascendancy ascendancy, float left, float top, float right, float bottom, float maxSpacing) {
         List<AscendancyNode> nodes = new ArrayList<>();
         nodes.add(ascendancy.root());
         nodes.addAll(ascendancy.nodes().values());
@@ -29,7 +34,7 @@ public final class AscendancyTreeLayout {
         int maxX = nodes.stream().mapToInt(AscendancyNode::x).max().orElse(0);
         int minY = nodes.stream().mapToInt(AscendancyNode::y).min().orElse(0);
         int maxY = nodes.stream().mapToInt(AscendancyNode::y).max().orElse(0);
-        float spacing = Math.min(MAX_SPACING, Math.min((right - left) / (maxX - minX + 1.0F), (bottom - top) / (maxY - minY + 1.0F)));
+        float spacing = Math.min(maxSpacing, Math.min((right - left) / (maxX - minX + 1.0F), (bottom - top) / (maxY - minY + 1.0F)));
         float originX = (left + right) / 2.0F - (maxX - minX) * spacing / 2.0F;
         float originY = (top + bottom) / 2.0F - (maxY - minY) * spacing / 2.0F;
         List<Placed> placed = new ArrayList<>(nodes.size());
