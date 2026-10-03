@@ -299,6 +299,7 @@ public class ForestryCartEntity extends AbstractMinecart implements MenuProvider
     private int fertilizer;
     private double leafDelayCarry;
     private double movementSurchargeCarry;
+    private final Map<BlockPos, List<BlockPos>> rolledRails = new LinkedHashMap<>();
 
     public ForestryCartEntity(EntityType<? extends ForestryCartEntity> entityType, Level level) {
         super(entityType, level);
@@ -622,6 +623,7 @@ public class ForestryCartEntity extends AbstractMinecart implements MenuProvider
             return;
         }
 
+        rememberRolledRail(railPos);
         if (workCooldown > 0) {
             workCooldown--;
             setWorkflowState(
@@ -637,7 +639,7 @@ public class ForestryCartEntity extends AbstractMinecart implements MenuProvider
             return;
         }
 
-        List<BlockPos> workRoots = plantingScanRoots(railPos);
+        List<BlockPos> workRoots = workRoots(railPos);
         if (activeHarvestSnapshot != null) {
             if (!harvestInReach(railPos, workRoots, activeHarvestSnapshot.logBase())) {
                 clearActiveHarvestSnapshot();
@@ -690,7 +692,7 @@ public class ForestryCartEntity extends AbstractMinecart implements MenuProvider
 
         boolean plantingBlocked = false;
         for (BlockPos root : workRoots) {
-            WorkResult result = tryPlant(root, railPos);
+            WorkResult result = tryPlant(root, rolledRail(root, railPos));
             if (result == WorkResult.BLOCKED_STOP) {
                 plantingBlocked = true;
                 continue;
@@ -2258,13 +2260,87 @@ public class ForestryCartEntity extends AbstractMinecart implements MenuProvider
         return hasMasteryBehavior("ROLLING_HARVEST");
     }
 
-    /** Rolling Harvest keeps moving unless the tree being cut would leave reach at the next rail block. */
+    /**
+     * Rolling Harvest keeps moving unless the tree being cut, or a tree or empty cell still waiting for work, would leave
+     * reach at the next rail block.
+     */
     private boolean canRollPast(BlockPos railPos) {
-        if (activeHarvestSnapshot == null) {
-            return true;
-        }
         Direction next = nextRailDirection(railPos);
-        return next != null && withinReach(railPos.relative(next), activeHarvestSnapshot.logBase(), ROLLING_REACH);
+        if (next == null) {
+            return false;
+        }
+        BlockPos nextRail = railPos.relative(next);
+        if (activeHarvestSnapshot != null && !withinReach(nextRail, activeHarvestSnapshot.logBase(), ROLLING_REACH)) {
+            return false;
+        }
+        for (BlockPos root : workRoots(railPos)) {
+            if (!withinReach(nextRail, root, ROLLING_REACH) && hasPendingWork(root)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /** The side cells to work: the current rail block's, plus under Rolling Harvest the cells it rolled past within reach. */
+    private List<BlockPos> workRoots(BlockPos railPos) {
+        if (!rollingHarvest()) {
+            return plantingScanRoots(railPos);
+        }
+        List<BlockPos> roots = new ArrayList<>();
+        for (List<BlockPos> railRoots : rolledRails.values()) {
+            for (BlockPos root : railRoots) {
+                if (withinReach(railPos, root, ROLLING_REACH) && !roots.contains(root)) {
+                    roots.add(root);
+                }
+            }
+        }
+        for (BlockPos root : plantingScanRoots(railPos)) {
+            if (!roots.contains(root)) {
+                roots.add(root);
+            }
+        }
+        return roots;
+    }
+
+    private void rememberRolledRail(BlockPos railPos) {
+        if (!rollingHarvest()) {
+            rolledRails.clear();
+            return;
+        }
+        List<BlockPos> roots = plantingScanRoots(railPos);
+        if (roots.isEmpty()) {
+            return;
+        }
+        rolledRails.remove(railPos);
+        rolledRails.put(railPos.immutable(), roots);
+        rolledRails.keySet().removeIf(rail -> !withinReach(railPos, rail, ROLLING_REACH + 1));
+    }
+
+    private BlockPos rolledRail(BlockPos root, BlockPos railPos) {
+        for (Map.Entry<BlockPos, List<BlockPos>> entry : rolledRails.entrySet()) {
+            if (entry.getValue().contains(root)) {
+                return entry.getKey();
+            }
+        }
+        return railPos;
+    }
+
+    private boolean hasPendingWork(BlockPos root) {
+        return isLogBase(root) || canPlantAt(root);
+    }
+
+    private boolean canPlantAt(BlockPos root) {
+        if (!plantsSaplings() || managedCells.size() >= maxManagedCells() && !managedCells.containsKey(root)) {
+            return false;
+        }
+        BlockState current = level().getBlockState(root);
+        if (isSaplingBlock(current) || !current.canBeReplaced()) {
+            return false;
+        }
+        ItemStack sapling = plantingSapling(root);
+        return sapling.getItem() instanceof BlockItem blockItem
+                && blockItem.getBlock() instanceof SaplingBlock saplingBlock
+                && saplingBlock.defaultBlockState().canSurvive(level(), root);
     }
 
     private boolean harvestInReach(BlockPos railPos, List<BlockPos> workRoots, BlockPos logBase) {
