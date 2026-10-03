@@ -162,7 +162,8 @@
         {
             "stat": "FLUID_CAPACITY",
             "families": [
-                "melter"
+                "melter",
+                "forestry"
             ],
             "yield": "none"
         },
@@ -179,6 +180,20 @@
                 "forestry"
             ],
             "yield": "output"
+        },
+        {
+            "stat": "WORK_RANGE",
+            "families": [
+                "forestry"
+            ],
+            "yield": "none"
+        },
+        {
+            "stat": "IDLE_CART_SPEED",
+            "families": [
+                "forestry"
+            ],
+            "yield": "none"
         }
     ],
     "behaviors": [
@@ -625,6 +640,48 @@
         },
         {
             "id": "VERDANT_SURGE",
+            "families": [
+                "forestry"
+            ],
+            "yield": "none"
+        },
+        {
+            "id": "CROP_TENDING",
+            "families": [
+                "forestry"
+            ],
+            "yield": "output"
+        },
+        {
+            "id": "NO_TREE_WORK",
+            "families": [
+                "forestry"
+            ],
+            "yield": "none"
+        },
+        {
+            "id": "SPRINKLER",
+            "families": [
+                "forestry"
+            ],
+            "yield": "none"
+        },
+        {
+            "id": "IRRIGATION",
+            "families": [
+                "forestry"
+            ],
+            "yield": "none"
+        },
+        {
+            "id": "REAP_AND_SOW",
+            "families": [
+                "forestry"
+            ],
+            "yield": "none"
+        },
+        {
+            "id": "ROLLING_REAP",
             "families": [
                 "forestry"
             ],

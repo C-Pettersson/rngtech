@@ -149,7 +149,7 @@ Spend Refinement Potential deliberately. A Magic part with two good affixes is a
 
 Every machine earns its own Mastery XP from successful work and spends points in the shared passive tree on its Mastery tab. Mastery stays with the chassis through drops and pick-block, so level the machines you keep. See [Machine Mastery](systems/machine-mastery.md).
 
-From Stage 5, a machine with a Stage 4 or later chassis can use an **Ascendancy Seal** to choose one of its family's two ascendancies. Open the crest beside the start node on the Mastery tab, press Ascend with a Seal in your inventory, and pick an ascendancy. Each Seal grants 2 points, and Seals II and III come from Stage 7 and 8 materials. Refunds cost five Mastery Refunds per node. Each family page lists its ascendancies; see [Ascendancies](systems/machine-mastery.md#ascendancies).
+From Stage 5, a machine with a Stage 4 or later chassis can use an **Ascendancy Seal** to choose one of its family's ascendancies. Open the crest beside the start node on the Mastery tab, press Ascend with a Seal in your inventory, and pick an ascendancy. Each Seal grants 2 points, and Seals II and III come from Stage 7 and 8 materials. Refunds cost five Mastery Refunds per node. Each family page lists its ascendancies; see [Ascendancies](systems/machine-mastery.md#ascendancies).
 
 ## Read the machine screen
 

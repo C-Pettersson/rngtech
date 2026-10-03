@@ -119,7 +119,9 @@ public enum MachineStat implements StringRepresentable {
     FLUID_YIELD,
     OVERLEVEL_SPEED,
     CART_SPEED,
-    GROWTH_PULSE;
+    GROWTH_PULSE,
+    WORK_RANGE,
+    IDLE_CART_SPEED;
 
     public static final Codec<MachineStat> CODEC = StringRepresentable.fromEnum(MachineStat::values);
     public static final StreamCodec<ByteBuf, MachineStat> STREAM_CODEC =

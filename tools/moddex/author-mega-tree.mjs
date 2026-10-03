@@ -66,7 +66,17 @@ const THEMES = {
     drive: theme("Drive", ["DRIVE", "INCREASED_PERCENT"], 5, 15, effect("DRIVE", 5, "ADD"),
         ["Raw Power", "Torque Surge", "Driving Force", "Horsepower", "Brute Gearing", "Engine Heart", "Full Throttle", "Pulling Power", "Iron Will", "Hard Push"]),
     reserve: theme("Reserve", ["RESERVE", "INCREASED_PERCENT"], 5, 15, effect("RESERVE", 5, "ADD"),
-        ["Deep Reserves", "Stockpile", "Endurance", "Stamina Cells", "Hoarded Charge", "Backup Supply", "Resilience", "Staying Power", "Held Breath", "Second Wind"])
+        ["Deep Reserves", "Stockpile", "Endurance", "Stamina Cells", "Hoarded Charge", "Backup Supply", "Resilience", "Staying Power", "Held Breath", "Second Wind"]),
+    // Forestry Companion themes used only by EXTRAS, so they never join a region's theme rotation.
+    railPace: theme("Rail Pace", ["CART_SPEED", "INCREASED_PERCENT"], 4, 12, effect("DRIVE", 4, "ADD"),
+        ["Greased Rails", "Smooth Bogies", "Rail Runner", "Quick Couplings", "Track Glide", "Spoked Wheels"]),
+    openTrack: theme("Open Track", ["IDLE_CART_SPEED", "ADD"], 8, 25, effect("CART_SPEED", 4),
+        ["Open Track", "Clear Line", "Free Running", "Long Straight", "Empty Run", "Loose Coupling"]),
+    rowcraft: theme("Rowcraft", ["TREE_FELL_LIMIT", "ADD"], 1, 2, effect("PROCESSING_SPEED", 3),
+        ["Row Markers", "Field Lines", "Survey Stakes", "Plot Chains"]),
+    // Fluid Capacity for the Melter's tanks and the Forestry Companion's sprinkler tank; also used only by EXTRAS.
+    reservoirs: theme("Reservoirs", ["FLUID_CAPACITY", "INCREASED_PERCENT"], 10, 30, effect("RESERVE", 4, "ADD"),
+        ["Holding Tanks", "Cistern Walls", "Deep Tanks", "Bulk Reservoir", "Header Cisterns", "Overflow Basin"])
 };
 
 // Home regions carry their start's identity; outer pockets blend a region with its nearest neighbor.
@@ -136,11 +146,22 @@ const KEYSTONES = [
 ];
 
 // Additions placed after the original fill, in design coordinates. Output constellations mirror Clean Dust Ledge on the
-// left, and Single Pass sits between them so trading bonus output for speed is a local choice.
+// left, and Single Pass sits between them so trading bonus output for speed is a local choice. The Forestry Companion
+// pockets sit around its start; the two Work Range notables are on opposite sides so taking both costs a detour.
+// An extra may replace its pocket's notables in order; a null entry keeps the themed notable.
 const EXTRAS = [
     { id: "left_recovery_upper", angle: -122, radius: 3250, shapes: ["wheel"], theme: "recovery" },
     { id: "left_recovery_lower", angle: 158, radius: 3050, shapes: ["wheel"], theme: "recovery" },
-    { id: "single_pass", angle: -150, radius: 2900, shapes: ["keyDirect"], keystone: true, layer: "outer" }
+    { id: "single_pass", angle: -150, radius: 2900, shapes: ["keyDirect"], keystone: true, layer: "outer" },
+    { id: "forestry_rail_pace", angle: -94, radius: 1900, shapes: ["chain"], theme: "railPace",
+        notables: [null, { name: "Driven Wheels", effects: [effect("CART_SPEED", 6)], scaling: [{ attribute: "DRIVE", stat: "CART_SPEED", operation: "INCREASED_PERCENT", perPoint: 0.5 }] }] },
+    { id: "forestry_open_track", angle: -84, radius: 2700, shapes: ["wheel"], theme: "openTrack" },
+    { id: "forestry_far_rows", angle: -108, radius: 2250, shapes: ["diamond"], theme: "rowcraft",
+        notables: [{ name: "Far Rows", effects: [effect("WORK_RANGE", 1, "ADD")] }] },
+    { id: "forestry_outer_rows", angle: -70, radius: 3150, shapes: ["diamond"], theme: "rowcraft",
+        notables: [{ name: "Outer Rows", effects: [effect("WORK_RANGE", 1, "ADD")] }] },
+    { id: "forestry_reservoirs", angle: -112, radius: 2900, shapes: ["fork"], theme: "reservoirs" },
+    { id: "melter_reservoirs", angle: 150, radius: 2500, shapes: ["fork"], theme: "reservoirs" }
 ];
 
 const regionAt = angle => {
@@ -225,6 +246,14 @@ export function createMegaTree() {
         { name, effects: [effect("HIGH_HARDNESS_ENERGY_MITIGATION", 2, "ADD")], passive: { COMPONENT_STAGE_SUPPORT: 1 } }));
     SPECIAL_NOTABLES.managedTerritory.forEach(([name, region]) => claim(p => (p.layer === "home" || p.layer === "outer") && p.region === region,
         { name, effects: [effect("TREE_FELL_LIMIT", 1, "ADD")], passive: { MANAGED_CELLS: 8 } }));
+    for (const pocket of pockets.filter(p => p.extra)) {
+        const replacements = EXTRAS.find(e => e.id === pocket.extra)?.notables ?? [];
+        pocket.nodes.filter(id => byId.get(id).kind === "NOTABLE").forEach((id, i) => {
+            if (!replacements[i]) return;
+            special.set(id, replacements[i]);
+            usedNames.add(replacements[i].name);
+        });
+    }
 
     // Center and core keystones take their own slots; the rest follow the start order around the tree.
     const slotLayer = layer => layer === "center" || layer === "core" ? layer : "ring";

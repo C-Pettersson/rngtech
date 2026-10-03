@@ -6,6 +6,7 @@ import com.rngtech.content.item.BatteryCellItem;
 import com.rngtech.content.item.EnergyConnectorItem;
 import com.rngtech.content.item.FluidConnectorItem;
 import com.rngtech.content.item.ItemConnectorItem;
+import com.rngtech.content.item.ModularToolItem;
 import com.rngtech.content.menu.ForestryCartStationMenu;
 import com.rngtech.content.registry.ModBlockEntities;
 
@@ -23,28 +24,37 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerData;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.phys.AABB;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.energy.IEnergyStorage;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.capability.IFluidHandler;
+import net.neoforged.neoforge.fluids.capability.templates.FluidTank;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.ItemStackHandler;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class ForestryCartStationBlockEntity extends BlockEntity implements MenuProvider {
     public static final int SLOT_SAPLING = 0;
     public static final int SLOT_OUTPUT_START = 1;
     public static final int OUTPUT_SLOT_COUNT = 6;
     public static final int SLOT_SHEARS_INPUT = SLOT_OUTPUT_START + OUTPUT_SLOT_COUNT;
-    public static final int PROCESS_SLOT_COUNT = SLOT_SHEARS_INPUT + 1;
+    public static final int SLOT_FERTILIZER_INPUT = SLOT_SHEARS_INPUT + 1;
+    public static final int SLOT_TOOL_INPUT = SLOT_FERTILIZER_INPUT + 1;
+    /** More plantables slots, appended so older saves keep their items; with the first slot they form a 3x3 buffer. */
+    public static final int SLOT_PLANTABLES_EXTRA_START = SLOT_TOOL_INPUT + 1;
+    public static final int PLANTABLES_EXTRA_COUNT = 8;
+    public static final int PROCESS_SLOT_COUNT = SLOT_PLANTABLES_EXTRA_START + PLANTABLES_EXTRA_COUNT;
     public static final int SLOT_ENERGY_CONNECTOR = 0;
     public static final int SLOT_ITEM_CONNECTOR = 1;
     public static final int SLOT_FLUID_CONNECTOR = 2;
@@ -98,6 +108,7 @@ public class ForestryCartStationBlockEntity extends BlockEntity implements MenuP
     public static final int ACTION_SEEKING_TRANSFER = 24;
     public static final int ACTION_CLEARING_PATH = 25;
     public static final int ACTION_PLAYER_BLOCKING_PATH = 26;
+    public static final int ACTION_HARVESTING_CROP = 27;
 
     private static final int DATA_ENERGY = 0;
     private static final int DATA_ENERGY_CAPACITY = 1;
@@ -109,32 +120,40 @@ public class ForestryCartStationBlockEntity extends BlockEntity implements MenuP
     private static final int DATA_FLUID_TRANSFER = 7;
     private static final int DATA_CURRENT_ACTION = 8;
     private static final int DATA_FERTILIZER = 9;
-    private static final int DATA_COUNT = 10;
+    private static final int DATA_WATER = 10;
+    private static final int DATA_CART_TOOL_CONDITION = 11;
+    private static final int DATA_CART_ENERGY_PERCENT = 12;
+    private static final int DATA_CART_WORK_RANGE = 13;
+    private static final int DATA_CART_WATER = 14;
+    private static final int DATA_CART_CROPS = 15;
+    private static final int DATA_CART_WAITING_CELLS = 16;
+    private static final int DATA_COUNT = 17;
 
     private static final int INTERNAL_ENERGY_CAPACITY = 256;
+    public static final int WATER_CAPACITY = 16000;
     private static final int CART_TRANSFER_LIMIT = ForestryCartEntity.CARGO_SLOT_COUNT * 64;
 
     private final ItemStackHandler processInventory = new ItemStackHandler(PROCESS_SLOT_COUNT) {
         @Override
         public boolean isItemValid(int slot, ItemStack stack) {
+            if (isPlantablesSlot(slot)) {
+                return isPlantableStack(stack);
+            }
             return switch (slot) {
-                case SLOT_SAPLING -> ForestryCartEntity.isSaplingStack(stack)
-                        || ForestryCartEntity.isFertilizerStack(stack) && fertilizer < ForestryCartEntity.FERTILIZER_CAPACITY;
+                case SLOT_FERTILIZER_INPUT -> ForestryCartEntity.isFertilizerStack(stack);
                 case SLOT_SHEARS_INPUT -> ForestryCartEntity.isShearsCandidate(stack);
+                case SLOT_TOOL_INPUT -> ForestryCartEntity.isToolCandidate(stack);
                 default -> false;
             };
         }
 
         @Override
         public int getSlotLimit(int slot) {
-            return slot == SLOT_SHEARS_INPUT ? 1 : super.getSlotLimit(slot);
+            return slot == SLOT_SHEARS_INPUT || slot == SLOT_TOOL_INPUT ? 1 : super.getSlotLimit(slot);
         }
 
         @Override
         public ItemStack insertItem(int slot, ItemStack stack, boolean simulate) {
-            if (slot == SLOT_SAPLING && ForestryCartEntity.isFertilizerStack(stack)) {
-                return stack.copyWithCount(stack.getCount() - storeFertilizer(stack.getCount(), simulate));
-            }
             return isItemValid(slot, stack) ? super.insertItem(slot, stack, simulate) : stack;
         }
 
@@ -173,6 +192,12 @@ public class ForestryCartStationBlockEntity extends BlockEntity implements MenuP
     private final IItemHandler topItemHandler = new StationInputItemHandler();
     private final IItemHandler bottomItemHandler = new OutputItemHandler();
     private final IEnergyStorage energyStorage = new StationEnergyStorage();
+    private final FluidTank waterTank = new FluidTank(WATER_CAPACITY, stack -> stack.getFluid().isSame(Fluids.WATER)) {
+        @Override
+        protected void onContentsChanged() {
+            setChanged();
+        }
+    };
     private final IFluidHandler fluidHandler = new StationFluidHandler();
     private final ContainerData menuData = new ContainerData() {
         @Override
@@ -188,6 +213,13 @@ public class ForestryCartStationBlockEntity extends BlockEntity implements MenuP
                 case DATA_FLUID_TRANSFER -> fluidConnectorTransferLimit();
                 case DATA_CURRENT_ACTION -> currentAction;
                 case DATA_FERTILIZER -> fertilizer;
+                case DATA_WATER -> waterTank.getFluidAmount();
+                case DATA_CART_TOOL_CONDITION -> dockedCartToolCondition;
+                case DATA_CART_ENERGY_PERCENT -> dockedCartEnergyPercent;
+                case DATA_CART_WORK_RANGE -> dockedCartWorkRange;
+                case DATA_CART_WATER -> dockedCartWater;
+                case DATA_CART_CROPS -> dockedCartCrops ? 1 : 0;
+                case DATA_CART_WAITING_CELLS -> dockedCartWaitingCells;
                 default -> 0;
             };
         }
@@ -207,6 +239,12 @@ public class ForestryCartStationBlockEntity extends BlockEntity implements MenuP
     private int currentAction = ACTION_IDLE;
     private boolean holdCartAtStation;
     private int fertilizer;
+    private int dockedCartToolCondition;
+    private int dockedCartEnergyPercent;
+    private int dockedCartWorkRange;
+    private int dockedCartWater;
+    private boolean dockedCartCrops;
+    private int dockedCartWaitingCells;
 
     public ForestryCartStationBlockEntity(BlockPos pos, BlockState blockState) {
         super(ModBlockEntities.FORESTRY_CART_STATION.get(), pos, blockState);
@@ -284,7 +322,16 @@ public class ForestryCartStationBlockEntity extends BlockEntity implements MenuP
     }
 
     public boolean isSaplingStack(ItemStack stack) {
-        return ForestryCartEntity.isSaplingStack(stack);
+        return isPlantableStack(stack);
+    }
+
+    /** The plantables slot takes saplings and Field Hand crops; the station cannot know which cart will dock next. */
+    public static boolean isPlantableStack(ItemStack stack) {
+        return ForestryCartEntity.isSaplingStack(stack) || ForestryCartEntity.isCropStack(stack);
+    }
+
+    public int waterStored() {
+        return waterTank.getFluidAmount();
     }
 
     public boolean isShearsStack(ItemStack stack) {
@@ -306,12 +353,35 @@ public class ForestryCartStationBlockEntity extends BlockEntity implements MenuP
     }
 
     public boolean hasSaplingsQueued() {
-        return !saplingStack().isEmpty();
+        for (int slot : plantablesSlots()) {
+            if (!processInventory.getStackInSlot(slot).isEmpty()) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public boolean canLoadQueuedSaplingsInto(ForestryCartEntity cart) {
-        ItemStack stack = saplingStack();
-        return !stack.isEmpty() && cart.canAcceptSaplings(stack);
+        for (int slot : plantablesSlots()) {
+            ItemStack stack = processInventory.getStackInSlot(slot);
+            if (!stack.isEmpty() && cart.canAcceptSaplings(stack)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static boolean isPlantablesSlot(int slot) {
+        return slot == SLOT_SAPLING || slot >= SLOT_PLANTABLES_EXTRA_START && slot < SLOT_PLANTABLES_EXTRA_START + PLANTABLES_EXTRA_COUNT;
+    }
+
+    private static int[] plantablesSlots() {
+        int[] slots = new int[PLANTABLES_EXTRA_COUNT + 1];
+        slots[0] = SLOT_SAPLING;
+        for (int index = 0; index < PLANTABLES_EXTRA_COUNT; index++) {
+            slots[index + 1] = SLOT_PLANTABLES_EXTRA_START + index;
+        }
+        return slots;
     }
 
     public boolean isDockRail(BlockPos railPos) {
@@ -332,7 +402,9 @@ public class ForestryCartStationBlockEntity extends BlockEntity implements MenuP
         changed |= chargeDockedCart(cart);
         changed |= loadCartSaplings(cart);
         changed |= loadCartFertilizer(cart);
+        changed |= loadCartWater(cart);
         changed |= loadCartShears(cart);
+        changed |= loadCartTool(cart);
         if (changed) {
             setChanged();
         }
@@ -375,6 +447,7 @@ public class ForestryCartStationBlockEntity extends BlockEntity implements MenuP
         tag.putInt("Energy", internalEnergy);
         tag.putBoolean("HoldCartAtStation", holdCartAtStation);
         tag.putInt("Fertilizer", fertilizer);
+        tag.put("WaterTank", waterTank.writeToNBT(registries, new CompoundTag()));
     }
 
     @Override
@@ -382,10 +455,15 @@ public class ForestryCartStationBlockEntity extends BlockEntity implements MenuP
         super.loadAdditional(tag, registries);
         processInventory.deserializeNBT(registries, tag.getCompound("ProcessInventory"));
         connectorInventory.deserializeNBT(registries, tag.getCompound("ConnectorInventory"));
+        ensureInventorySize(processInventory, PROCESS_SLOT_COUNT);
         ensureConnectorInventorySize();
         internalEnergy = Math.max(0, tag.getInt("Energy"));
         holdCartAtStation = tag.getBoolean("HoldCartAtStation");
         fertilizer = Math.max(0, Math.min(ForestryCartEntity.FERTILIZER_CAPACITY, tag.getInt("Fertilizer")));
+        waterTank.setFluid(FluidStack.EMPTY);
+        if (tag.contains("WaterTank")) {
+            waterTank.readFromNBT(registries, tag.getCompound("WaterTank"));
+        }
         clampInternalEnergy();
     }
 
@@ -405,12 +483,14 @@ public class ForestryCartStationBlockEntity extends BlockEntity implements MenuP
         boolean docked = false;
         boolean transferred = false;
         boolean cartNeedsRecharge = false;
+        clearDockedCartSummary();
         for (ForestryCartEntity cart : dockedCarts()) {
             BlockPos railPos = cart.railPosition();
             if (railPos == null) {
                 continue;
             }
             docked = true;
+            recordDockedCartSummary(cart);
             transferred |= serviceCart(cart, railPos);
             cartNeedsRecharge |= cart.energyCapacity() > 0 && cart.energyStored() < cart.energyCapacity();
         }
@@ -504,24 +584,112 @@ public class ForestryCartStationBlockEntity extends BlockEntity implements MenuP
         return moved;
     }
 
+    /**
+     * Loads what the docked cart's Seed Library cells are waiting for first, making room by moving supply nobody waits
+     * for into the plantables buffer. While the station still stocks a species cells wait for, other plantables top up
+     * only species the cart already carries; otherwise anything plantable tops up.
+     */
     private boolean loadCartSaplings(ForestryCartEntity cart) {
-        ItemStack stack = saplingStack();
-        if (stack.isEmpty()) {
+        if (!hasSaplingsQueued()) {
             return false;
         }
-
         boolean cartWaitingForSaplings = !cart.hasSaplings() || cart.isWaitingForStationSaplings(worldPosition);
-        ItemStack candidate = stack.copyWithCount(Math.min(CART_TRANSFER_LIMIT, stack.getCount()));
-        ItemStack remainder = cart.insertSaplings(candidate);
-        int moved = candidate.getCount() - remainder.getCount();
-        if (moved <= 0) {
-            return false;
+        Map<Item, Integer> demand = cart.plantDemand();
+        int moved = 0;
+        for (Map.Entry<Item, Integer> entry : demand.entrySet()) {
+            Item item = entry.getKey();
+            int wanted = Math.min(entry.getValue() - cart.supplyCount(item), plantablesCount(item));
+            if (wanted <= 0) {
+                continue;
+            }
+            ItemStack candidate = new ItemStack(item, Math.min(CART_TRANSFER_LIMIT, wanted));
+            if (!cart.canAcceptSaplings(candidate)) {
+                freeCartSupplySlot(cart, demand);
+            }
+            int loaded = candidate.getCount() - cart.insertSaplings(candidate).getCount();
+            takePlantables(item, loaded);
+            moved += loaded;
         }
-        processInventory.extractItem(SLOT_SAPLING, moved, false);
-        if (cartWaitingForSaplings) {
+        boolean demandStocked = demand.keySet().stream().anyMatch(item -> plantablesCount(item) > 0);
+        for (int slot : plantablesSlots()) {
+            ItemStack stack = processInventory.getStackInSlot(slot);
+            if (stack.isEmpty() || demandStocked && cart.supplyCount(stack.getItem()) == 0) {
+                continue;
+            }
+            ItemStack candidate = stack.copyWithCount(Math.min(CART_TRANSFER_LIMIT, stack.getCount()));
+            int loaded = candidate.getCount() - cart.insertSaplings(candidate).getCount();
+            if (loaded > 0) {
+                processInventory.extractItem(slot, loaded, false);
+                moved += loaded;
+            }
+        }
+        if (moved > 0 && cartWaitingForSaplings) {
             cart.recordStationSaplingTransfer(worldPosition);
         }
-        return true;
+        return moved > 0;
+    }
+
+    /** Moves one cart supply stack that no waiting cell needs into the plantables buffer, or the outputs. */
+    private void freeCartSupplySlot(ForestryCartEntity cart, Map<Item, Integer> demand) {
+        var supply = cart.cargoInventory();
+        for (int slot = ForestryCartEntity.SAPLING_SLOT_START; slot < ForestryCartEntity.OUTPUT_SLOT_START; slot++) {
+            ItemStack stack = supply.getStackInSlot(slot);
+            if (stack.isEmpty() || demand.containsKey(stack.getItem())) {
+                continue;
+            }
+            if (insertPlantables(stack, true).isEmpty()) {
+                insertPlantables(stack, false);
+            } else if (insertStationOutput(stack, true).isEmpty()) {
+                insertStationOutput(stack, false);
+            } else {
+                continue;
+            }
+            supply.setStackInSlot(slot, ItemStack.EMPTY);
+            return;
+        }
+    }
+
+    private int plantablesCount(Item item) {
+        int count = 0;
+        for (int slot : plantablesSlots()) {
+            ItemStack stack = processInventory.getStackInSlot(slot);
+            count += stack.is(item) ? stack.getCount() : 0;
+        }
+        return count;
+    }
+
+    private void takePlantables(Item item, int count) {
+        for (int slot : plantablesSlots()) {
+            if (count <= 0) {
+                return;
+            }
+            if (processInventory.getStackInSlot(slot).is(item)) {
+                count -= processInventory.extractItem(slot, count, false).getCount();
+            }
+        }
+    }
+
+    private ItemStack insertPlantables(ItemStack stack, boolean simulate) {
+        ItemStack remaining = stack.copy();
+        for (int pass = 0; pass < 2 && !remaining.isEmpty(); pass++) {
+            for (int slot : plantablesSlots()) {
+                boolean empty = processInventory.getStackInSlot(slot).isEmpty();
+                if (pass == 0 && !empty || pass == 1 && empty) {
+                    remaining = processInventory.insertItem(slot, remaining, simulate);
+                }
+            }
+        }
+        return remaining;
+    }
+
+    /** Field Hand sprinklers take water from the station tank, as fast as the cart's Fluid Pump allows. */
+    private boolean loadCartWater(ForestryCartEntity cart) {
+        int available = waterTank.getFluidAmount();
+        int moved = available > 0 ? cart.acceptWater(available, false) : 0;
+        if (moved > 0) {
+            waterTank.drain(moved, IFluidHandler.FluidAction.EXECUTE);
+        }
+        return moved > 0;
     }
 
     /** Grove Warden carts take bone meal from the station's fertilizer store. */
@@ -540,15 +708,61 @@ public class ForestryCartStationBlockEntity extends BlockEntity implements MenuP
         return accepted;
     }
 
-    /** Bone meal a player placed in the sapling slot moves into the fertilizer store, so it never blocks saplings. */
+    /**
+     * Bone meal in the bone meal slot drains into the fertilizer store. Bone meal an older station left in the
+     * plantables slot drains too, so it never blocks saplings.
+     */
     private void absorbSlotFertilizer() {
-        ItemStack stack = processInventory.getStackInSlot(SLOT_SAPLING);
-        if (ForestryCartEntity.isFertilizerStack(stack)) {
-            int accepted = storeFertilizer(stack.getCount(), false);
-            if (accepted > 0) {
-                processInventory.extractItem(SLOT_SAPLING, accepted, false);
+        for (int slot : new int[] {SLOT_FERTILIZER_INPUT, SLOT_SAPLING}) {
+            ItemStack stack = processInventory.getStackInSlot(slot);
+            if (ForestryCartEntity.isFertilizerStack(stack)) {
+                int accepted = storeFertilizer(stack.getCount(), false);
+                if (accepted > 0) {
+                    processInventory.setStackInSlot(slot, stack.copyWithCount(stack.getCount() - accepted));
+                }
             }
         }
+    }
+
+    /**
+     * A tree-working cart with no tool, or a broken one, takes the station's spare. The broken tool goes to the
+     * station outputs, and nothing is swapped while they have no room for it.
+     */
+    private boolean loadCartTool(ForestryCartEntity cart) {
+        ItemStack spare = processInventory.getStackInSlot(SLOT_TOOL_INPUT);
+        if (spare.isEmpty() || !cart.worksTrees()) {
+            return false;
+        }
+        ItemStack installed = cart.toolStack();
+        if (!installed.isEmpty() && !ModularToolItem.isBroken(installed)) {
+            return false;
+        }
+        if (!installed.isEmpty() && !insertStationOutput(installed, true).isEmpty()) {
+            return false;
+        }
+        if (!installed.isEmpty()) {
+            insertStationOutput(installed, false);
+        }
+        cart.setToolStack(processInventory.extractItem(SLOT_TOOL_INPUT, 1, false));
+        return true;
+    }
+
+    private void clearDockedCartSummary() {
+        dockedCartToolCondition = 0;
+        dockedCartEnergyPercent = 0;
+        dockedCartWorkRange = 0;
+        dockedCartWater = 0;
+        dockedCartCrops = false;
+        dockedCartWaitingCells = 0;
+    }
+
+    private void recordDockedCartSummary(ForestryCartEntity cart) {
+        dockedCartToolCondition = cart.toolCondition();
+        dockedCartEnergyPercent = cart.energyCapacity() <= 0 ? 0 : (int) Math.floor(100.0 * cart.energyStored() / cart.energyCapacity());
+        dockedCartWorkRange = cart.workRange();
+        dockedCartWater = cart.waterStored();
+        dockedCartCrops = cart.tendsCrops();
+        dockedCartWaitingCells = cart.plantDemand().values().stream().mapToInt(Integer::intValue).sum();
     }
 
     private boolean loadCartShears(ForestryCartEntity cart) {
@@ -776,16 +990,21 @@ public class ForestryCartStationBlockEntity extends BlockEntity implements MenuP
     }
 
     private void ensureConnectorInventorySize() {
-        if (connectorInventory.getSlots() >= CONNECTOR_SLOT_COUNT) {
+        ensureInventorySize(connectorInventory, CONNECTOR_SLOT_COUNT);
+    }
+
+    /** Older saves have fewer slots; new slots are appended so existing items keep their positions. */
+    private static void ensureInventorySize(ItemStackHandler inventory, int size) {
+        if (inventory.getSlots() >= size) {
             return;
         }
         List<ItemStack> existing = new ArrayList<>();
-        for (int slot = 0; slot < connectorInventory.getSlots(); slot++) {
-            existing.add(connectorInventory.getStackInSlot(slot).copy());
+        for (int slot = 0; slot < inventory.getSlots(); slot++) {
+            existing.add(inventory.getStackInSlot(slot).copy());
         }
-        connectorInventory.setSize(CONNECTOR_SLOT_COUNT);
+        inventory.setSize(size);
         for (int slot = 0; slot < existing.size(); slot++) {
-            connectorInventory.setStackInSlot(slot, existing.get(slot));
+            inventory.setStackInSlot(slot, existing.get(slot));
         }
     }
 
@@ -814,7 +1033,7 @@ public class ForestryCartStationBlockEntity extends BlockEntity implements MenuP
     private final class StationInputItemHandler implements IItemHandler {
         @Override
         public int getSlots() {
-            return 2;
+            return 4;
         }
 
         @Override
@@ -837,7 +1056,9 @@ public class ForestryCartStationBlockEntity extends BlockEntity implements MenuP
                 return stack;
             }
             ItemStack candidate = stack.copyWithCount(limit);
-            ItemStack remainder = processInventory.insertItem(mappedSlot, candidate, simulate);
+            ItemStack remainder = mappedSlot == SLOT_SAPLING
+                    ? insertPlantables(candidate, simulate)
+                    : processInventory.insertItem(mappedSlot, candidate, simulate);
             int accepted = candidate.getCount() - remainder.getCount();
             if (accepted <= 0) {
                 return stack;
@@ -868,16 +1089,17 @@ public class ForestryCartStationBlockEntity extends BlockEntity implements MenuP
             return switch (slot) {
                 case 0 -> SLOT_SAPLING;
                 case 1 -> SLOT_SHEARS_INPUT;
-                default -> throw new RuntimeException("Slot " + slot + " not in valid range - [0,2)");
+                case 2 -> SLOT_FERTILIZER_INPUT;
+                case 3 -> SLOT_TOOL_INPUT;
+                default -> throw new RuntimeException("Slot " + slot + " not in valid range - [0,4)");
             };
         }
 
         private int targetInputSlot(ItemStack stack) {
-            if (processInventory.isItemValid(SLOT_SAPLING, stack)) {
-                return SLOT_SAPLING;
-            }
-            if (processInventory.isItemValid(SLOT_SHEARS_INPUT, stack)) {
-                return SLOT_SHEARS_INPUT;
+            for (int slot : new int[] {SLOT_SAPLING, SLOT_FERTILIZER_INPUT, SLOT_SHEARS_INPUT, SLOT_TOOL_INPUT}) {
+                if (processInventory.isItemValid(slot, stack)) {
+                    return slot;
+                }
             }
             return -1;
         }
@@ -958,30 +1180,35 @@ public class ForestryCartStationBlockEntity extends BlockEntity implements MenuP
         }
     }
 
+    /** Water-only input for Field Hand sprinklers, capped per call by the installed Fluid Connector. */
     private final class StationFluidHandler implements IFluidHandler {
         @Override
         public int getTanks() {
-            return 0;
+            return 1;
         }
 
         @Override
         public FluidStack getFluidInTank(int tank) {
-            return FluidStack.EMPTY;
+            return tank == 0 ? waterTank.getFluid() : FluidStack.EMPTY;
         }
 
         @Override
         public int getTankCapacity(int tank) {
-            return 0;
+            return tank == 0 ? WATER_CAPACITY : 0;
         }
 
         @Override
         public boolean isFluidValid(int tank, FluidStack stack) {
-            return false;
+            return tank == 0 && waterTank.isFluidValid(stack);
         }
 
         @Override
         public int fill(FluidStack resource, FluidAction action) {
-            return 0;
+            int limit = fluidConnectorTransferLimit();
+            if (resource.isEmpty() || limit <= 0) {
+                return 0;
+            }
+            return waterTank.fill(resource.copyWithAmount(Math.min(resource.getAmount(), limit)), action);
         }
 
         @Override

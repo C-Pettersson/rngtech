@@ -256,6 +256,8 @@ Tool stats should matter:
 
 The station should not consume or replace the tool when it breaks. A broken tool remains installed and blocks work until repaired or replaced.
 
+Superseded by the [Companion Rebalance](companion-rebalance.md): the renamed Companion Station has a spare-tool slot and installs the spare when a docked tree-working cart's tool is missing or broken, moving the broken tool to its outputs.
+
 ## Energy Model
 
 The Forestry Cart Station is a physical dock that charges any docked Forestry Cart's installed Battery Cell.
@@ -292,7 +294,7 @@ Suggested station slots:
 | Shears input | Station | Top insertion |
 | Output slots | Station | Bottom extraction |
 | Cart Battery Cell | Cart | Manual only through cart right-click UI |
-| Modular Axe/Treefeller | Cart | Manual only through cart right-click UI |
+| Modular Axe/Treefeller | Cart | Manual through cart right-click UI; the station installs its spare when the docked cart's tool is missing or broken |
 | Cart shears | Cart | Manual through cart right-click UI; station can fill an empty slot while docked |
 | Cart cargo | Cart | Manual only through cart right-click UI |
 | Station Battery Cell | Gear | Manual only |

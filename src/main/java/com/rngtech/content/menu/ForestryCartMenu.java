@@ -37,6 +37,7 @@ public class ForestryCartMenu extends AbstractContainerMenu implements MasteryMe
     public static final int BUTTON_TOGGLE_SCAN_DEBUG = 0;
     public static final int BUTTON_RELEASE_MANAGEMENT_VIEW = 1;
     public static final int BUTTON_TOGGLE_MANUAL_SPEED = 2;
+    public static final int BUTTON_RESET_MANAGED_CELLS = 3;
 
     public static final int DATA_STATUS = 0;
     public static final int DATA_CURRENT_ACTION = 1;
@@ -80,7 +81,12 @@ public class ForestryCartMenu extends AbstractContainerMenu implements MasteryMe
     public static final int DATA_CORE_RESERVE = 39;
     public static final int DATA_FERTILIZER = 40;
     public static final int DATA_FERTILIZER_CAPACITY = 41;
-    public static final int DATA_MACHINE_PROGRESSION_START = 42;
+    public static final int DATA_WATER = 42;
+    public static final int DATA_WATER_CAPACITY = 43;
+    public static final int DATA_WORK_RANGE = 44;
+    public static final int DATA_IDLE_SPEED_ACTIVE = 45;
+    public static final int DATA_RESERVED_PLANTABLES = 46;
+    public static final int DATA_MACHINE_PROGRESSION_START = 47;
     public static final int DATA_COUNT = DATA_MACHINE_PROGRESSION_START + MasteryMenuSupport.FIELD_COUNT;
 
     private static final int CART_BATTERY_SLOT = 0;
@@ -88,7 +94,8 @@ public class ForestryCartMenu extends AbstractContainerMenu implements MasteryMe
     private static final int CART_SHEARS_SLOT = 2;
     private static final int CART_CARGO_SLOT_START = 3;
     private static final int CART_OUTPUT_SLOT_START = CART_CARGO_SLOT_START + ForestryCartEntity.SAPLING_SLOT_COUNT;
-    private static final int PLAYER_INVENTORY_START = CART_OUTPUT_SLOT_START + ForestryCartEntity.OUTPUT_SLOT_COUNT;
+    private static final int CART_PUMP_SLOT = CART_OUTPUT_SLOT_START + ForestryCartEntity.OUTPUT_SLOT_COUNT;
+    private static final int PLAYER_INVENTORY_START = CART_PUMP_SLOT + 1;
     private static final int HOTBAR_END = PLAYER_INVENTORY_START + 36;
 
     private final ContainerData data;
@@ -148,6 +155,14 @@ public class ForestryCartMenu extends AbstractContainerMenu implements MasteryMe
                     () -> selectedTab == TAB_CART
             ));
         }
+
+        addSlot(new TabbedSlot(
+                cart.gearInventory(),
+                ForestryCartEntity.SLOT_PUMP,
+                13,
+                52,
+                () -> selectedTab == TAB_CART
+        ));
 
         addPlayerInventory(playerInventory);
         addDataSlots(data);
@@ -248,6 +263,31 @@ public class ForestryCartMenu extends AbstractContainerMenu implements MasteryMe
     /** Zero unless the cart has Growth Pulse. */
     public int fertilizerCapacity() {
         return data.get(DATA_FERTILIZER_CAPACITY);
+    }
+
+    public int water() {
+        return data.get(DATA_WATER);
+    }
+
+    /** Gear slot hints apply only to the cart's own Gear, not to supply cargo slots that share handler indices. */
+    public boolean isGearSlot(Slot slot) {
+        return slot instanceof SlotItemHandler handlerSlot && handlerSlot.getItemHandler() == cart.gearInventory();
+    }
+
+    public int waterCapacity() {
+        return data.get(DATA_WATER_CAPACITY);
+    }
+
+    public int workRange() {
+        return data.get(DATA_WORK_RANGE);
+    }
+
+    public boolean idleSpeedActive() {
+        return data.get(DATA_IDLE_SPEED_ACTIVE) != 0;
+    }
+
+    public int reservedPlantables() {
+        return data.get(DATA_RESERVED_PLANTABLES);
     }
 
     public int outputCargo() {
@@ -408,7 +448,8 @@ public class ForestryCartMenu extends AbstractContainerMenu implements MasteryMe
         if (player.level().isClientSide) {
             return id == BUTTON_TOGGLE_SCAN_DEBUG
                     || id == BUTTON_RELEASE_MANAGEMENT_VIEW
-                    || (id == BUTTON_TOGGLE_MANUAL_SPEED && manualSpeedUnlocked());
+                    || (id == BUTTON_TOGGLE_MANUAL_SPEED && manualSpeedUnlocked())
+                    || (id == BUTTON_RESET_MANAGED_CELLS && managedCells() > 0);
         }
         if (id == BUTTON_TOGGLE_SCAN_DEBUG) {
             cart.toggleScanDebugVisible();
@@ -420,6 +461,9 @@ public class ForestryCartMenu extends AbstractContainerMenu implements MasteryMe
         if (id == BUTTON_RELEASE_MANAGEMENT_VIEW) {
             releaseManagementView();
             return true;
+        }
+        if (id == BUTTON_RESET_MANAGED_CELLS) {
+            return cart.resetManagedCells();
         }
         return false;
     }
@@ -458,7 +502,7 @@ public class ForestryCartMenu extends AbstractContainerMenu implements MasteryMe
             if (!moveItemStackTo(stack, PLAYER_INVENTORY_START, HOTBAR_END, false)) {
                 return ItemStack.EMPTY;
             }
-        } else if (ForestryCartEntity.isSaplingStack(stack) || ForestryCartEntity.isFertilizerStack(stack)) {
+        } else if (cart.isPlantableStack(stack) || ForestryCartEntity.isFertilizerStack(stack)) {
             if (!moveItemStackTo(
                     stack,
                     CART_CARGO_SLOT_START,
@@ -477,6 +521,10 @@ public class ForestryCartMenu extends AbstractContainerMenu implements MasteryMe
             }
         } else if (ForestryCartEntity.isShearsCandidate(stack)) {
             if (!moveItemStackTo(stack, CART_SHEARS_SLOT, CART_SHEARS_SLOT + 1, false)) {
+                return ItemStack.EMPTY;
+            }
+        } else if (ForestryCartEntity.isPumpCandidate(stack)) {
+            if (!moveItemStackTo(stack, CART_PUMP_SLOT, CART_PUMP_SLOT + 1, false)) {
                 return ItemStack.EMPTY;
             }
         } else if (stack.getItem() instanceof EnergyConnectorItem

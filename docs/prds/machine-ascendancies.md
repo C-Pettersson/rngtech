@@ -12,7 +12,7 @@ Last updated: 2026-09-29
 
 ## Summary
 
-Machine ascendancies are family-specific specializations for one chassis, modeled on Path of Exile ascendancy classes. Every [Machine Mastery](../systems/machine-mastery.md) family, including the Forestry Companion, starts with two ascendancies. A chassis chooses one when it uses its first Ascendancy Seal, then spends ascendancy points in a small tree for that ascendancy.
+Machine ascendancies are family-specific specializations for one chassis, modeled on Path of Exile ascendancy classes. Every [Machine Mastery](../systems/machine-mastery.md) family, including the Forestry Companion, starts with at least two ascendancies. A chassis chooses one when it uses its first Ascendancy Seal, then spends ascendancy points in a small tree for that ascendancy.
 
 Ascendancies use their own points and items. Using a Seal on a chassis grants 2 points immediately; crafting the Seal is the trial. There are three Seal tiers, for 6 points in total. Tiers follow material stages and lean toward late game; the last tier is aspirational. Ascendancy state stays with the chassis, like the rest of Mastery.
 
@@ -123,7 +123,7 @@ Key existing code:
 
 ### Entry gate
 
-Using Seal I requires an entry stage of 4 or higher. The host supplies it through `MachineMasteryHost.ascendancyEntryStage()`: the chassis stage for block machines, and the installed Axe or Treefeller head stage for the Forestry Companion, which has no chassis stage. The gate is checked only when Seal I is used; removing the tool later does not remove the ascendancy.
+Using Seal I requires an entry stage of 4 or higher. The host supplies it through `MachineMasteryHost.ascendancyEntryStage()`: the chassis stage for block machines. The Forestry Companion has no chassis stage and always meets the gate; it once used its installed Axe or Treefeller head stage, which the [Companion Rebalance](companion-rebalance.md) dropped because Field Hand carts need no cutting tool. The gate is checked only when Seal I is used.
 
 Later tiers have no entry gate. The Seal's material stage carries the tier, because a chassis gate could never be met by several families:
 
@@ -540,7 +540,7 @@ Melter fluids feed generators through Electrolyte Solution, Methane, and lava, s
 
 ### Forestry Companion
 
-The Forestry Companion's entry gate is its installed cutting tool head, and its Ascendancy panel is the shared panel in the cart's Mastery screen.
+The Forestry Companion always meets the entry gate, and its Ascendancy panel is the shared panel in the cart's Mastery screen.
 
 **Timber Baron** turns the cart into a log hauler. Introduces `CART_SPEED` and reuses `LEDGER_RATE`.
 
@@ -559,12 +559,14 @@ The Forestry Companion's entry gate is its installed cutting tool head, and its 
 | Node | Effect | Cost |
 |---|---|---|
 | **Growth Pulse** (root) | As the cart passes a managed sapling, it spends one bone meal from its fertilizer store and FE on a growth pulse that applies bone meal Growth Pulse times (Growth Pulse 1). Movement costs 25% more FE. | N |
-| +2 managed cells → **Nursery** | +8 managed cells. | S → S |
+| +16 managed cells → **Nursery** | +2 Work Range: the cart works three rows on each side of the rail. | S → S |
 | 10% increased Growth Pulse → **Rich Soil** | 50% increased Growth Pulse. | S → S |
 | 5% reduced Energy Usage → **Seed Library** | Each managed cell remembers its tree species and replants the same species. | S → N |
 | 5% increased Processing Speed → **Canopy Care** | Shears wear half as fast. | S → H |
-| ★ **Ancient Grove** (after Nursery) | Plants 2×2 giant species (dark oak, jungle, spruce) when four matching saplings are in cargo. | N |
-| ★ **Verdant Surge** (after Rich Soil) | Growth pulses reach every managed sapling within 3 blocks of the rail, not only the next cell. | N |
+| ★ **Ancient Grove** (after Nursery, through +16 managed cells) | Plants 2×2 giant species (dark oak, jungle, spruce) when four matching saplings are in cargo. | N |
+| ★ **Verdant Surge** (after Rich Soil) | Growth pulses reach every managed sapling within Work Range + 1 blocks of the rail, not only the next cell. | N |
+
+The [Companion Rebalance](companion-rebalance.md) added Work Range and changed Nursery, Spare Plots, and Old Rows as shown above. It also added a third Forestry ascendancy, **Field Hand**, which farms crops instead of trees; that PRD describes it.
 
 ## UI
 
@@ -617,7 +619,7 @@ Domain checks (`masteryCheck`):
 - Ascendancy effects apply through `applyStats`, behaviors apply only to their owning families, and Gear legality is enforced.
 - Build codes paste ascendancy nodes only onto the same family and ascendancy.
 - Refiner's Oath: 5% per Parallel Job with a 50% cap.
-- Seal use: next-tier order, the entry stage gate for Seal I (chassis stage, and tool head stage for the Forestry Companion), rejection without consuming the Seal, and creative use without consumption.
+- Seal use: next-tier order, the entry stage gate for Seal I (chassis stage; the Forestry Companion always meets it), rejection without consuming the Seal, and creative use without consumption.
 - The fixture ascendancies load, can be chosen, save by id, paste through build codes, and are cleared cleanly when retired. A retired node returns its point.
 - New stats combine correctly with existing modifiers.
 - Every ascendancy follows the tree shape rules, and its stats and behaviors are declared and supported by its family. Mutated fixtures are rejected with the matching violation.

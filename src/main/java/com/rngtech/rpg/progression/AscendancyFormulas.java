@@ -100,6 +100,14 @@ public final class AscendancyFormulas {
         return whole + (roll < strength - whole - 1.0E-9 ? 1 : 0);
     }
 
+    /** Ticks without work after which Idle Cart Speed applies: 4 seconds. */
+    public static final int IDLE_CART_TICKS = 80;
+
+    /** Extra increased Cart Speed once the cart has gone {@link #IDLE_CART_TICKS} without work. */
+    public static double idleCartSpeedPercent(MachineStatAccumulator stats, int ticksSinceWork) {
+        return ticksSinceWork >= IDLE_CART_TICKS ? Math.max(0.0, stats.value(MachineStat.IDLE_CART_SPEED)) : 0.0;
+    }
+
     /** Items banked in the Bloom Ledger for one smelt; Crusher Line feeds crushed inputs twice. */
     public static double ledgerShare(MachineStatAccumulator stats, int baseCount, boolean doubled) {
         return Math.max(0.0, stats.value(MachineStat.LEDGER_RATE)) / 100.0 * Math.max(0, baseCount) * (doubled ? 2 : 1);

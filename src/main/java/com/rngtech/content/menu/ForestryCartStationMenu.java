@@ -27,8 +27,9 @@ import java.util.function.BooleanSupplier;
 
 public class ForestryCartStationMenu extends AbstractContainerMenu {
     public static final int TAB_PROCESSING = 0;
-    public static final int TAB_GEAR = 1;
-    public static final int TAB_STATS = 2;
+    public static final int TAB_SUPPLY = 1;
+    public static final int TAB_GEAR = 2;
+    public static final int TAB_STATS = 3;
     public static final int BUTTON_TOGGLE_HOLD = 0;
 
     private static final int DATA_ENERGY = 0;
@@ -41,12 +42,30 @@ public class ForestryCartStationMenu extends AbstractContainerMenu {
     private static final int DATA_FLUID_TRANSFER = 7;
     private static final int DATA_CURRENT_ACTION = 8;
     private static final int DATA_FERTILIZER = 9;
-    private static final int DATA_COUNT = 10;
+    private static final int DATA_WATER = 10;
+    private static final int DATA_CART_TOOL_CONDITION = 11;
+    private static final int DATA_CART_ENERGY_PERCENT = 12;
+    private static final int DATA_CART_WORK_RANGE = 13;
+    private static final int DATA_CART_WATER = 14;
+    private static final int DATA_CART_CROPS = 15;
+    private static final int DATA_CART_WAITING_CELLS = 16;
+    private static final int DATA_COUNT = 17;
 
-    private static final int SAPLING_SLOT = ForestryCartStationBlockEntity.SLOT_SAPLING;
-    private static final int OUTPUT_SLOT_START = ForestryCartStationBlockEntity.SLOT_OUTPUT_START;
+    public static final int PLANTABLES_X = 20;
+    public static final int FERTILIZER_X = 100;
+    public static final int TOOL_X = 118;
+    public static final int SHEARS_X = 136;
+    public static final int OUTPUT_X = 20;
+    public static final int SUPPLY_ROW_Y = 32;
+    public static final int PLANTABLES_COLUMNS = 3;
+
+    private static final int SAPLING_SLOT = 0;
+    private static final int PLANTABLES_SLOT_END = SAPLING_SLOT + 1 + ForestryCartStationBlockEntity.PLANTABLES_EXTRA_COUNT;
+    private static final int OUTPUT_SLOT_START = PLANTABLES_SLOT_END;
     private static final int SHEARS_INPUT_SLOT = OUTPUT_SLOT_START + ForestryCartStationBlockEntity.OUTPUT_SLOT_COUNT;
-    private static final int STATION_BATTERY_SLOT = SHEARS_INPUT_SLOT + 1;
+    private static final int FERTILIZER_INPUT_SLOT = SHEARS_INPUT_SLOT + 1;
+    private static final int TOOL_INPUT_SLOT = FERTILIZER_INPUT_SLOT + 1;
+    private static final int STATION_BATTERY_SLOT = TOOL_INPUT_SLOT + 1;
     private static final int ENERGY_CONNECTOR_SLOT = STATION_BATTERY_SLOT + 1;
     private static final int ITEM_CONNECTOR_SLOT = ENERGY_CONNECTOR_SLOT + 1;
     private static final int FLUID_CONNECTOR_SLOT = ITEM_CONNECTOR_SLOT + 1;
@@ -80,23 +99,30 @@ public class ForestryCartStationMenu extends AbstractContainerMenu {
         this.station = station;
 
         ItemStackHandler processInventory = station.getProcessInventory();
-        addSlot(new TabbedSlot(processInventory, ForestryCartStationBlockEntity.SLOT_SAPLING, 47, 39, () -> selectedTab == TAB_PROCESSING));
+        BooleanSupplier processing = () -> selectedTab == TAB_PROCESSING;
+        BooleanSupplier supply = () -> selectedTab == TAB_SUPPLY;
+        for (int index = 0; index <= ForestryCartStationBlockEntity.PLANTABLES_EXTRA_COUNT; index++) {
+            int handlerSlot = index == 0 ? ForestryCartStationBlockEntity.SLOT_SAPLING : ForestryCartStationBlockEntity.SLOT_PLANTABLES_EXTRA_START + index - 1;
+            addSlot(new TabbedSlot(
+                    processInventory,
+                    handlerSlot,
+                    PLANTABLES_X + (index % PLANTABLES_COLUMNS) * 18,
+                    SUPPLY_ROW_Y + (index / PLANTABLES_COLUMNS) * 18,
+                    supply
+            ));
+        }
         for (int slot = 0; slot < ForestryCartStationBlockEntity.OUTPUT_SLOT_COUNT; slot++) {
             addSlot(new TabbedSlot(
                     processInventory,
                     ForestryCartStationBlockEntity.SLOT_OUTPUT_START + slot,
-                    101 + (slot % 3) * 18,
-                    30 + (slot / 3) * 18,
-                    () -> selectedTab == TAB_PROCESSING
+                    OUTPUT_X + (slot % 3) * 18,
+                    SUPPLY_ROW_Y + (slot / 3) * 18,
+                    processing
             ));
         }
-        addSlot(new TabbedSlot(
-                processInventory,
-                ForestryCartStationBlockEntity.SLOT_SHEARS_INPUT,
-                74,
-                39,
-                () -> selectedTab == TAB_PROCESSING
-        ));
+        addSlot(new TabbedSlot(processInventory, ForestryCartStationBlockEntity.SLOT_SHEARS_INPUT, SHEARS_X, SUPPLY_ROW_Y, supply));
+        addSlot(new TabbedSlot(processInventory, ForestryCartStationBlockEntity.SLOT_FERTILIZER_INPUT, FERTILIZER_X, SUPPLY_ROW_Y, supply));
+        addSlot(new TabbedSlot(processInventory, ForestryCartStationBlockEntity.SLOT_TOOL_INPUT, TOOL_X, SUPPLY_ROW_Y, supply));
 
         ItemStackHandler connectorInventory = station.getConnectorInventory();
         addSlot(new TabbedSlot(connectorInventory, ForestryCartStationBlockEntity.SLOT_STATION_BATTERY_CELL, 71, 52, () -> selectedTab == TAB_GEAR));
@@ -110,6 +136,7 @@ public class ForestryCartStationMenu extends AbstractContainerMenu {
 
     public void selectTab(int tab) {
         selectedTab = switch (tab) {
+            case TAB_SUPPLY -> TAB_SUPPLY;
             case TAB_GEAR -> TAB_GEAR;
             case TAB_STATS -> TAB_STATS;
             default -> TAB_PROCESSING;
@@ -165,6 +192,38 @@ public class ForestryCartStationMenu extends AbstractContainerMenu {
         return data.get(DATA_FERTILIZER);
     }
 
+    public int water() {
+        return data.get(DATA_WATER);
+    }
+
+    public ItemStackHandler processInventory() {
+        return station.getProcessInventory();
+    }
+
+    public int cartToolCondition() {
+        return data.get(DATA_CART_TOOL_CONDITION);
+    }
+
+    public int cartEnergyPercent() {
+        return data.get(DATA_CART_ENERGY_PERCENT);
+    }
+
+    public int cartWorkRange() {
+        return data.get(DATA_CART_WORK_RANGE);
+    }
+
+    public int cartWater() {
+        return data.get(DATA_CART_WATER);
+    }
+
+    public boolean cartTendsCrops() {
+        return data.get(DATA_CART_CROPS) != 0;
+    }
+
+    public int cartWaitingCells() {
+        return data.get(DATA_CART_WAITING_CELLS);
+    }
+
     @Override
     public boolean clickMenuButton(Player player, int id) {
         if (player.level().isClientSide) {
@@ -192,8 +251,16 @@ public class ForestryCartStationMenu extends AbstractContainerMenu {
             if (!moveItemStackTo(stack, PLAYER_INVENTORY_START, HOTBAR_END, false)) {
                 return ItemStack.EMPTY;
             }
-        } else if (station.isSaplingStack(stack) || ForestryCartEntity.isFertilizerStack(stack)) {
-            if (!moveItemStackTo(stack, SAPLING_SLOT, SAPLING_SLOT + 1, false)) {
+        } else if (station.isSaplingStack(stack)) {
+            if (!moveItemStackTo(stack, SAPLING_SLOT, PLANTABLES_SLOT_END, false)) {
+                return ItemStack.EMPTY;
+            }
+        } else if (ForestryCartEntity.isFertilizerStack(stack)) {
+            if (!moveItemStackTo(stack, FERTILIZER_INPUT_SLOT, FERTILIZER_INPUT_SLOT + 1, false)) {
+                return ItemStack.EMPTY;
+            }
+        } else if (ForestryCartEntity.isToolCandidate(stack)) {
+            if (!moveItemStackTo(stack, TOOL_INPUT_SLOT, TOOL_INPUT_SLOT + 1, false)) {
                 return ItemStack.EMPTY;
             }
         } else if (station.isShearsStack(stack)) {

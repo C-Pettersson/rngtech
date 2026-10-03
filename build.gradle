@@ -57,6 +57,20 @@ java.toolchain.languageVersion = JavaLanguageVersion.of(21)
 //minecraft.accessTransformers.entry public net.minecraft.client.Minecraft textureManager # textureManager
 
 // Default run configurations.
+// A linked git worktree has a .git file that points into the main checkout's .git/worktrees/<name>. Its runs use the
+// main checkout's run directory, so every worktree launches with the same settings and worlds.
+def sharedRunRoot = {
+    def dotGit = project.file('.git')
+    if (dotGit.isFile()) {
+        def line = dotGit.readLines().find { it.startsWith('gitdir:') }
+        def mainCheckout = line == null ? null : new File(line.substring('gitdir:'.length()).trim()).parentFile?.parentFile?.parentFile
+        if (mainCheckout != null && new File(mainCheckout, '.git').isDirectory()) {
+            return new File(mainCheckout, 'run')
+        }
+    }
+    return project.file('run')
+}()
+
 // These can be tweaked, removed, or duplicated as needed.
 runs {
     // applies to all the run configs below
@@ -73,7 +87,7 @@ runs {
         // Please read: https://stackoverflow.com/questions/2031163/when-to-use-the-different-log-levels
         systemProperty 'forge.logging.console.level', 'debug'
 
-        workingDirectory project.layout.projectDirectory.dir('run').dir(name)
+        workingDirectory.set(new File(sharedRunRoot, name))
 
         modSource project.sourceSets.main
     }

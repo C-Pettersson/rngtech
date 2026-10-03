@@ -97,6 +97,8 @@ nav:
       - Machine Ascendancies: prds/machine-ascendancies.md
       - Machine Ascendancies State: prds/machine-ascendancies-state.md
       - Tree Farm Requirements: prds/tree-farm-automation.md
+      - Companion Rebalance: prds/companion-rebalance.md
+      - Companion Rebalance State: prds/companion-rebalance-state.md
   - Reference:
       - Releasing: releasing.md
       - Public Mod Description: public-mod-description.md

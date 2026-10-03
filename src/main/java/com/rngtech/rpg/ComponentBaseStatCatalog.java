@@ -47,6 +47,12 @@ public final class ComponentBaseStatCatalog {
     private static final Set<MachineStat> HARD_GATE_STATS =
             EnumSet.of(MachineStat.PROCESSING_LEVEL);
 
+    /**
+     * Affix stats that describe the host machine rather than the part, such as a Fluid Pump's Fluid Capacity: they apply
+     * to the machine as rolled, so a percent affix scales the machine's tanks.
+     */
+    private static final Set<MachineStat> HOST_STATS = Set.of(MachineStat.FLUID_CAPACITY);
+
     private enum MergeRule {
         ADD,
         MORE
@@ -95,6 +101,11 @@ public final class ComponentBaseStatCatalog {
 
         MachineStatAccumulator contribution = effectiveStats(stack, profile);
         applyProfileContribution(target, profile, contribution, componentTraits(stack));
+        for (MachineModifier modifier : componentTraits(stack).modifiers()) {
+            if (modifier.slot().isAffix() && HOST_STATS.contains(modifier.stat())) {
+                target.apply(modifier);
+            }
+        }
     }
 
     public static void applyVacuumCollapseNozzleContribution(MachineStatAccumulator target, ItemStack stack) {

@@ -55,9 +55,9 @@
     "allow": [],
     "worldSources": {
         "forestry": {
-            "covers": ["LEDGER_RATE", "LOG_LEDGER", "HEARTWOOD", "GROWTH_PULSE", "FERTILIZER_PULSE", "ANCIENT_GROVE"],
-            "notMadeByRecipes": ["minecraft:bone_meal", "#minecraft:saplings", "#rngtech:giant_saplings"],
-            "reason": "Forestry yields act on tree growth, a free world source like cobblestone. Growth pulses spend one bone meal each and FE only as an application cost, so FE never becomes wood, and no recipe makes bone meal or saplings. The Log Ledger adds at most 56% of harvested logs with Heartwood, and Ancient Grove only changes tree shape."
+            "covers": ["LEDGER_RATE", "LOG_LEDGER", "HEARTWOOD", "GROWTH_PULSE", "FERTILIZER_PULSE", "ANCIENT_GROVE", "CROP_TENDING"],
+            "notMadeByRecipes": ["minecraft:bone_meal", "#minecraft:saplings", "#rngtech:giant_saplings", "#rngtech:cart_crops", "minecraft:wheat", "minecraft:beetroot"],
+            "reason": "Forestry yields act on tree and crop growth, a free world source like cobblestone. Growth pulses spend one bone meal each and FE only as an application cost, so FE never becomes wood, and no recipe makes bone meal, saplings, or the crops a Field Hand cart plants and harvests. Sprinkler water only matches vanilla hydration and never adds growth. The Log Ledger adds at most 56% of harvested logs with Heartwood, and Ancient Grove only changes tree shape."
         }
     }
 }
