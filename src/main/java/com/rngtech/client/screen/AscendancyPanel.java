@@ -248,10 +248,8 @@ final class AscendancyPanel {
         tooltip.add(Component.translatable(node.translationKey()).withStyle(ChatFormatting.WHITE));
         switch (node.kind()) {
             case ROOT -> tooltip.add(Component.translatable("rngtech.mastery.ascendancy.tooltip.root").withStyle(ChatFormatting.GOLD));
-            case NOTABLE -> tooltip.add(ascendancy != null && ascendancy.isDeep(node)
-                    ? Component.translatable("rngtech.mastery.ascendancy.tooltip.deep_notable").withStyle(ChatFormatting.GOLD)
-                    : Component.translatable("rngtech.mastery.tooltip.notable").withStyle(ChatFormatting.AQUA));
-            case SMALL -> { }
+            case NOTABLE -> tooltip.add(Component.translatable("rngtech.mastery.ascendancy.tooltip.notable").withStyle(ChatFormatting.AQUA));
+            case SMALL -> tooltip.add(Component.translatable("rngtech.mastery.ascendancy.tooltip.passive").withStyle(ChatFormatting.GRAY));
         }
         MasteryScreenSupport.effectLines(node, view, tooltip);
         if (!actions || ascendancy == null) {
@@ -708,7 +706,7 @@ final class AscendancyPanel {
     }
 
     /**
-     * The root's effects, then each deep notable, which defines the build. Lines give way, deep notables first, until the
+     * The root's effects, then each deep notable. Lines give way, deep notables first, until the
      * tree keeps {@link #CARD_MIN_TREE_HEIGHT}; the card's tooltip still lists the root's effects.
      */
     private List<Line> cardLines(Font font, int[] card, Ascendancy ascendancy) {
