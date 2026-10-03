@@ -101,6 +101,7 @@ public class ForestryCartRenderer extends EntityRenderer<ForestryCartEntity> {
     private static final int PLANTING_BLOCKED_CUSTOM_MODEL_DATA = 21;
     private static final int SNAPSHOT_CUSTOM_MODEL_DATA = 22;
     private static final int SPRINKLER_HEAD_CUSTOM_MODEL_DATA = 23;
+    private static final int BLUE_SCREEN_CUSTOM_MODEL_DATA = 24;
     private static final float SPRINKLER_DEGREES_PER_TICK = 12.0F;
     private static final float SPRINKLER_HEAD_SCALE = 0.6F;
     /** Nozzle tips in the head's local space: the nozzles end at x = 0.5 and 15.5 of 16. */
@@ -142,6 +143,7 @@ public class ForestryCartRenderer extends EntityRenderer<ForestryCartEntity> {
         registerActionCartStack(HARVEST_BLOCKED_CUSTOM_MODEL_DATA);
         registerActionCartStack(PLANTING_BLOCKED_CUSTOM_MODEL_DATA);
         registerActionCartStack(SNAPSHOT_CUSTOM_MODEL_DATA);
+        registerActionCartStack(BLUE_SCREEN_CUSTOM_MODEL_DATA);
         this.sprinklerHeadStack = new ItemStack(ModItems.FORESTRY_CART.get());
         sprinklerHeadStack.set(DataComponents.CUSTOM_MODEL_DATA, new CustomModelData(SPRINKLER_HEAD_CUSTOM_MODEL_DATA));
         this.shadowRadius = 0.7F;
@@ -232,6 +234,9 @@ public class ForestryCartRenderer extends EntityRenderer<ForestryCartEntity> {
     }
 
     private static int cartCustomModelData(ForestryCartEntity entity) {
+        if (entity.rebooting()) {
+            return BLUE_SCREEN_CUSTOM_MODEL_DATA;
+        }
         if (entity.visualStatusCode() == ForestryCartStationBlockEntity.STATUS_BROKEN_TOOL) {
             return BROKEN_TOOL_CUSTOM_MODEL_DATA;
         }

@@ -37,6 +37,7 @@ public class ForestryCartMenu extends AbstractContainerMenu implements MasteryMe
     public static final int BUTTON_TOGGLE_SCAN_DEBUG = 0;
     public static final int BUTTON_RELEASE_MANAGEMENT_VIEW = 1;
     public static final int BUTTON_TOGGLE_MANUAL_SPEED = 2;
+    public static final int BUTTON_RESET_MANAGED_CELLS = 3;
 
     public static final int DATA_STATUS = 0;
     public static final int DATA_CURRENT_ACTION = 1;
@@ -447,7 +448,8 @@ public class ForestryCartMenu extends AbstractContainerMenu implements MasteryMe
         if (player.level().isClientSide) {
             return id == BUTTON_TOGGLE_SCAN_DEBUG
                     || id == BUTTON_RELEASE_MANAGEMENT_VIEW
-                    || (id == BUTTON_TOGGLE_MANUAL_SPEED && manualSpeedUnlocked());
+                    || (id == BUTTON_TOGGLE_MANUAL_SPEED && manualSpeedUnlocked())
+                    || (id == BUTTON_RESET_MANAGED_CELLS && managedCells() > 0);
         }
         if (id == BUTTON_TOGGLE_SCAN_DEBUG) {
             cart.toggleScanDebugVisible();
@@ -459,6 +461,9 @@ public class ForestryCartMenu extends AbstractContainerMenu implements MasteryMe
         if (id == BUTTON_RELEASE_MANAGEMENT_VIEW) {
             releaseManagementView();
             return true;
+        }
+        if (id == BUTTON_RESET_MANAGED_CELLS) {
+            return cart.resetManagedCells();
         }
         return false;
     }

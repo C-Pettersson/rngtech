@@ -67,6 +67,22 @@ public final class ForestryCartRules {
         return Math.max(MIN_BREAK_TICKS, (int) Math.ceil(PLANT_INTERVAL_TICKS / Math.max(0.1, processingSpeed) - 1.0E-9));
     }
 
+    /** Height above a rail block where the cart's clearance starts. */
+    public static final double CLEARANCE_BASE = 0.1;
+
+    /** Top of the space a cart needs over one rail: a slope lifts the cart up to a block. */
+    public static double clearanceTop(int railY, boolean ascending, double cartHeight) {
+        return railY + CLEARANCE_BASE + (ascending ? 1.0 : 0.0) + cartHeight;
+    }
+
+    /**
+     * Top of the space a cart needs to move between two rails. A cart leaving or entering a slope still rides high on it
+     * while its body overhangs the flat rail at the foot, so both rails get the higher of the two clearances.
+     */
+    public static double transitionClearanceTop(int fromY, boolean fromAscending, int toY, boolean toAscending, double cartHeight) {
+        return Math.max(clearanceTop(fromY, fromAscending, cartHeight), clearanceTop(toY, toAscending, cartHeight));
+    }
+
     /** The crack stage, 0 to 9, shown after {@code elapsed} of {@code total} ticks. */
     public static int crackStage(int elapsed, int total) {
         return Math.max(0, Math.min(9, elapsed * 10 / Math.max(1, total)));

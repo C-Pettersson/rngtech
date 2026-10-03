@@ -22,6 +22,7 @@ public final class ForestryCartRulesChecks {
         outwardDirectionWorksOnOuterRows();
         workRangeIsClamped();
         breakTimeFollowsHardnessToolAndSpeed();
+        slopeFootGetsTheSlopeClearance();
         System.out.println("Forestry cart rules: " + checks + " checks passed");
     }
 
@@ -100,6 +101,21 @@ public final class ForestryCartRulesChecks {
         require(ForestryCartRules.plantIntervalTicks(1.0) == ForestryCartRules.PLANT_INTERVAL_TICKS, "planting takes 30 ticks at base speed");
         require(ForestryCartRules.crackStage(0, 20) == 0 && ForestryCartRules.crackStage(19, 20) == 9 && ForestryCartRules.crackStage(40, 20) == 9,
                 "crack stages run 0 to 9");
+    }
+
+    /** A leaf over the flat rail at a slope's foot blocks a cart still riding the slope, so it must count as in the path. */
+    private static void slopeFootGetsTheSlopeClearance() {
+        double cartHeight = 0.7;
+        int low = 64;
+        double leafBottom = low + 1;
+        require(ForestryCartRules.clearanceTop(low, false, cartHeight) < leafBottom, "a flat rail alone clears a block one above");
+        double descending = ForestryCartRules.transitionClearanceTop(low, true, low, false, cartHeight);
+        double climbing = ForestryCartRules.transitionClearanceTop(low, false, low, true, cartHeight);
+        require(descending > leafBottom, "leaving a slope onto its foot reaches the block over the foot");
+        require(climbing > leafBottom, "climbing from the foot onto a slope reaches the block over the foot");
+        double top = ForestryCartRules.transitionClearanceTop(low + 1, false, low, true, cartHeight);
+        require(top == ForestryCartRules.clearanceTop(low + 1, false, cartHeight), "the rail at a slope's top keeps its own clearance");
+        require(top < low + 2, "a one-high tunnel over the top rail stays passable");
     }
 
     private static void require(boolean condition, String label) {

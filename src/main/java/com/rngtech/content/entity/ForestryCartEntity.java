@@ -166,6 +166,7 @@ public class ForestryCartEntity extends AbstractMinecart implements MenuProvider
     private static final int MAX_CRACK_OVERLAYS = 64;
     private static final float REFERENCE_LOG_HARDNESS = 2.0F;
     private static final int BASE_MAX_MANAGED_CELLS = 96;
+    private static final int REBOOT_TICKS = 60;
     private static final int SCAN_BOUND_HORIZONTAL = 8;
     private static final int STATION_SAPLING_IDLE_RELEASE_TICKS = 20;
     private static final int MOVE_SOUND_INTERVAL_TICKS = 18;
@@ -193,6 +194,9 @@ public class ForestryCartEntity extends AbstractMinecart implements MenuProvider
     private static final EntityDataAccessor<Integer> DATA_VISUAL_ACTION =
             SynchedEntityData.defineId(ForestryCartEntity.class, EntityDataSerializers.INT);
     /** Rows the sprinkler jets reach on each side, or 0 while it is not spraying; drives the rotating head. */
+    /** True while the cart reboots after a factory reset; the renderer shows a blue screen. */
+    private static final EntityDataAccessor<Boolean> DATA_REBOOTING =
+            SynchedEntityData.defineId(ForestryCartEntity.class, EntityDataSerializers.BOOLEAN);
     private static final EntityDataAccessor<Integer> DATA_SPRINKLER_REACH =
             SynchedEntityData.defineId(ForestryCartEntity.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Boolean> DATA_SCAN_DEBUG_VISIBLE =
@@ -245,6 +249,7 @@ public class ForestryCartEntity extends AbstractMinecart implements MenuProvider
     };
     private final FluidTank waterTank = new FluidTank(WATER_CAPACITY, stack -> stack.getFluid().isSame(Fluids.WATER));
     private final Map<BlockPos, ManagedCell> managedCells = new LinkedHashMap<>();
+    private int rebootTicks;
     private final Map<BlockPos, Long> hydratedUntil = new HashMap<>();
     private final Map<BlockPos, AABBTicket> hydrationTickets = new HashMap<>();
     private final ContainerData menuData = new ContainerData() {
@@ -558,7 +563,7 @@ public class ForestryCartEntity extends AbstractMinecart implements MenuProvider
 
     private void updateSprinklerReach() {
         BlockPos railPos = railPosition();
-        boolean spraying = managementViewers == 0 && hasMasteryBehavior("SPRINKLER") && hasPump() && waterTank.getFluidAmount() > 0
+        boolean spraying = managementViewers == 0 && rebootTicks == 0 && hasMasteryBehavior("SPRINKLER") && hasPump() && waterTank.getFluidAmount() > 0
                 && railPos != null && isForestryWorkRail(railPos);
         int reach = spraying ? workRange() + (hasMasteryBehavior("IRRIGATION") ? 1 : 0) : 0;
         if (entityData.get(DATA_SPRINKLER_REACH) != reach) {
@@ -580,6 +585,44 @@ public class ForestryCartEntity extends AbstractMinecart implements MenuProvider
 
     public boolean debugCanHarvestLeaves() {
         return entityData.get(DATA_DEBUG_CAN_HARVEST_LEAVES);
+    }
+
+    /**
+     * Forgets every managed cell and returns Seed Library reserves to cargo. Plants stay in the world; the cart adopts
+     * the ones it can tend again as it passes them.
+     */
+    public boolean resetManagedCells() {
+        if (managedCells.isEmpty()) {
+            return false;
+        }
+        for (ManagedCell cell : managedCells.values()) {
+            releaseReserve(cell);
+        }
+        managedCells.clear();
+        rolledRails.clear();
+        rebootTicks = REBOOT_TICKS;
+        entityData.set(DATA_REBOOTING, true);
+        setDeltaMovement(Vec3.ZERO);
+        level().playSound(null, blockPosition(), SoundEvents.BEACON_DEACTIVATE, SoundSource.NEUTRAL, 0.6F, 1.2F);
+        return true;
+    }
+
+    /** True for the three seconds after a factory reset, while the cart stands still and shows a blue screen. */
+    public boolean rebooting() {
+        return entityData.get(DATA_REBOOTING);
+    }
+
+    /** Counts down a reboot; returns true while the cart should stay idle. */
+    private boolean tickReboot() {
+        if (rebootTicks <= 0) {
+            return false;
+        }
+        setDeltaMovement(Vec3.ZERO);
+        if (--rebootTicks == 0) {
+            entityData.set(DATA_REBOOTING, false);
+            level().playSound(null, blockPosition(), SoundEvents.BEACON_ACTIVATE, SoundSource.NEUTRAL, 0.6F, 1.4F);
+        }
+        return true;
     }
 
     public void toggleScanDebugVisible() {
@@ -637,6 +680,9 @@ public class ForestryCartEntity extends AbstractMinecart implements MenuProvider
             updateWaterCapacity();
         }
         updateSprinklerReach();
+        if (tickReboot()) {
+            return;
+        }
 
         if (managementViewers > 0) {
             setWorkflowState(WorkflowState.MANAGED, ForestryCartStationBlockEntity.STATUS_READY, ForestryCartStationBlockEntity.ACTION_MANAGED);
@@ -864,7 +910,7 @@ public class ForestryCartEntity extends AbstractMinecart implements MenuProvider
     }
 
     private void stopBeforeMinecartPhysics() {
-        if (managementViewers > 0) {
+        if (managementViewers > 0 || rebootTicks > 0) {
             setDeltaMovement(Vec3.ZERO);
             return;
         }
@@ -942,6 +988,7 @@ public class ForestryCartEntity extends AbstractMinecart implements MenuProvider
         builder.define(DATA_VISUAL_ACTION, ForestryCartStationBlockEntity.ACTION_SETUP_BLOCKED);
         builder.define(DATA_SCAN_DEBUG_VISIBLE, false);
         builder.define(DATA_SPRINKLER_REACH, 0);
+        builder.define(DATA_REBOOTING, false);
         builder.define(DATA_DEBUG_MAX_CONNECTED_LOGS, 0);
         builder.define(DATA_DEBUG_MAX_TREE_HEIGHT, BASE_MAX_TREE_HEIGHT);
         builder.define(DATA_DEBUG_CAN_HARVEST_LEAVES, true);
@@ -3206,15 +3253,18 @@ public class ForestryCartEntity extends AbstractMinecart implements MenuProvider
     }
 
     private PathBlockage pathBlockage(BlockPos railPos, Direction direction) {
-        PathBlockage current = pathBlockageAt(railPos.above(), railPos);
+        BlockPos nextRail = connectedRailNeighbor(railPos, direction);
+        double top = nextRail == null
+                ? clearanceTop(railPos)
+                : ForestryCartRules.transitionClearanceTop(railPos.getY(), ascending(railPos), nextRail.getY(), ascending(nextRail), getBbHeight());
+        PathBlockage current = pathBlockageAt(railPos.above(), railPos, top);
         if (current != null) {
             return current;
         }
-        BlockPos nextRail = connectedRailNeighbor(railPos, direction);
-        return nextRail == null ? null : pathBlockageAt(nextRail.above(), nextRail);
+        return nextRail == null ? null : pathBlockageAt(nextRail.above(), nextRail, top);
     }
 
-    private PathBlockage pathBlockageAt(BlockPos pos, BlockPos railPos) {
+    private PathBlockage pathBlockageAt(BlockPos pos, BlockPos railPos, double top) {
         PathBlockage playerBlockage = playerPathBlockageAt(railPos);
         if (playerBlockage != null) {
             return playerBlockage;
@@ -3224,7 +3274,7 @@ public class ForestryCartEntity extends AbstractMinecart implements MenuProvider
             return null;
         }
         VoxelShape collisionShape = state.getCollisionShape(level(), pos);
-        if ((state.is(BlockTags.LEAVES) || !collisionShape.isEmpty()) && intersectsCartClearance(collisionShape, pos, railPos)) {
+        if ((state.is(BlockTags.LEAVES) || !collisionShape.isEmpty()) && intersectsCartClearance(collisionShape, pos, railPos, top)) {
             return new PathBlockage(pos.immutable(), state, false);
         }
         return null;
@@ -3236,11 +3286,11 @@ public class ForestryCartEntity extends AbstractMinecart implements MenuProvider
         return blockers.isEmpty() ? null : new PathBlockage(railPos.above().immutable(), level().getBlockState(railPos.above()), true);
     }
 
-    private boolean intersectsCartClearance(VoxelShape collisionShape, BlockPos pos, BlockPos railPos) {
+    private boolean intersectsCartClearance(VoxelShape collisionShape, BlockPos pos, BlockPos railPos, double top) {
         if (collisionShape.isEmpty()) {
             return false;
         }
-        AABB clearance = cartClearanceAt(railPos);
+        AABB clearance = cartClearanceAt(railPos, top);
         for (AABB box : collisionShape.toAabbs()) {
             if (box.move(pos).intersects(clearance)) {
                 return true;
@@ -3250,18 +3300,28 @@ public class ForestryCartEntity extends AbstractMinecart implements MenuProvider
     }
 
     private AABB cartClearanceAt(BlockPos railPos) {
+        return cartClearanceAt(railPos, clearanceTop(railPos));
+    }
+
+    private AABB cartClearanceAt(BlockPos railPos, double top) {
         double halfWidth = getBbWidth() * 0.5D;
-        double baseY = railPos.getY() + 0.1D;
-        RailShape shape = railShape(railPos);
-        double slopeRise = shape != null && shape.isAscending() ? 1.0D : 0.0D;
         return new AABB(
                 railPos.getX() + 0.5D - halfWidth,
-                baseY,
+                railPos.getY() + ForestryCartRules.CLEARANCE_BASE,
                 railPos.getZ() + 0.5D - halfWidth,
                 railPos.getX() + 0.5D + halfWidth,
-                baseY + slopeRise + getBbHeight(),
+                top,
                 railPos.getZ() + 0.5D + halfWidth
         );
+    }
+
+    private double clearanceTop(BlockPos railPos) {
+        return ForestryCartRules.clearanceTop(railPos.getY(), ascending(railPos), getBbHeight());
+    }
+
+    private boolean ascending(BlockPos railPos) {
+        RailShape shape = railShape(railPos);
+        return shape != null && shape.isAscending();
     }
 
     private boolean tryClearPathLeaves(PathBlockage blockage) {

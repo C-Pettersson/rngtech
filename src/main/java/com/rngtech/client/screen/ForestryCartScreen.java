@@ -55,6 +55,8 @@ public class ForestryCartScreen extends AbstractContainerScreen<ForestryCartMenu
     private static final int SCAN_DEBUG_BUTTON_Y = 52;
     private static final int MANUAL_SPEED_BUTTON_X = 166;
     private static final int MANUAL_SPEED_BUTTON_Y = 66;
+    private static final int RESET_CELLS_BUTTON_X = 166;
+    private static final int RESET_CELLS_BUTTON_Y = 38;
     private static final int CONTROL_BUTTON_WIDTH = 30;
     private static final int CONTROL_BUTTON_HEIGHT = 12;
     private static final int ICON_SIZE = 12;
@@ -220,6 +222,13 @@ public class ForestryCartScreen extends AbstractContainerScreen<ForestryCartMenu
                 sendButton(ForestryCartMenu.BUTTON_TOGGLE_MANUAL_SPEED);
                 return true;
             }
+            if (menu.selectedTab() == ForestryCartMenu.TAB_CART
+                    && inBounds(mouseX, mouseY, RESET_CELLS_BUTTON_X, RESET_CELLS_BUTTON_Y, CONTROL_BUTTON_WIDTH, CONTROL_BUTTON_HEIGHT)) {
+                if (Screen.hasShiftDown()) {
+                    sendButton(ForestryCartMenu.BUTTON_RESET_MANAGED_CELLS);
+                }
+                return true;
+            }
         }
         if (menu.selectedTab() == ForestryCartMenu.TAB_MASTERY
                 && masterySupport.mouseClicked(mouseX, mouseY, button, leftPos, topPos, imageWidth, imageHeight)) {
@@ -363,6 +372,16 @@ public class ForestryCartScreen extends AbstractContainerScreen<ForestryCartMenu
                 topPos + MANUAL_SPEED_BUTTON_Y + 3,
                 CONTROL_BUTTON_WIDTH - 4,
                 menu.manualSpeedUnlocked() ? menu.manualSpeedEnabled() ? TEXT : TEXT_MUTED : 0xFF707070
+        );
+        renderButton(guiGraphics, RESET_CELLS_BUTTON_X, RESET_CELLS_BUTTON_Y, CONTROL_BUTTON_WIDTH, CONTROL_BUTTON_HEIGHT, false);
+        MachineScreenStyle.drawClippedCentered(
+                guiGraphics,
+                font,
+                Component.translatable("rngtech.forestry_station.control.reset_cells"),
+                leftPos + RESET_CELLS_BUTTON_X + CONTROL_BUTTON_WIDTH / 2,
+                topPos + RESET_CELLS_BUTTON_Y + 3,
+                CONTROL_BUTTON_WIDTH - 4,
+                menu.managedCells() > 0 ? WARNING : 0xFF707070
         );
     }
 
@@ -792,6 +811,21 @@ public class ForestryCartScreen extends AbstractContainerScreen<ForestryCartMenu
                     CONTROL_BUTTON_WIDTH,
                     CONTROL_BUTTON_HEIGHT,
                     Component.translatable(manualSpeedTooltipKey())
+            );
+            CompactValueText.renderTooltipIfHovered(
+                    guiGraphics,
+                    font,
+                    leftPos,
+                    topPos,
+                    mouseX,
+                    mouseY,
+                    RESET_CELLS_BUTTON_X,
+                    RESET_CELLS_BUTTON_Y,
+                    CONTROL_BUTTON_WIDTH,
+                    CONTROL_BUTTON_HEIGHT,
+                    menu.managedCells() > 0
+                            ? Component.translatable("rngtech.forestry_station.tooltip.reset_cells", menu.managedCells())
+                            : Component.translatable("rngtech.forestry_station.tooltip.reset_cells_empty")
             );
         } else if (menu.selectedTab() == ForestryCartMenu.TAB_STATS) {
             MachineScreenStyle.renderStatPanelTooltip(guiGraphics, font, leftPos, topPos, mouseX, mouseY, 8, 18, 224, statLines());
