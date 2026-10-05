@@ -49,7 +49,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public class SolarArrayControllerBlockEntity extends BaseMachineBlockEntity implements MenuProvider {
+public class SolarArrayControllerBlockEntity extends BaseMachineBlockEntity implements MenuProvider, MachineInfoProvider {
     public static final int SLOT_BATTERY_CELL = 0;
     public static final int SLOT_ENERGY_CONNECTOR = 1;
     public static final int SLOT_SOLAR_ARRAY_EXTENDER = 2;
@@ -123,6 +123,8 @@ public class SolarArrayControllerBlockEntity extends BaseMachineBlockEntity impl
     };
     private final IItemHandler emptyItemHandler = new EmptyItemHandler();
     private final IEnergyStorage energyStorage = new ControllerEnergyStorage();
+    private final EnergyTelemetry energyFlow = new EnergyTelemetry(this::getLevel);
+    private final IEnergyStorage trackedEnergyStorage = energyFlow.track(energyStorage);
     private final ContainerData menuData = new ContainerData() {
         @Override
         public int get(int index) {
@@ -198,7 +200,7 @@ public class SolarArrayControllerBlockEntity extends BaseMachineBlockEntity impl
     }
 
     public IEnergyStorage getEnergyStorage(Direction side) {
-        return energyStorage;
+        return trackedEnergyStorage;
     }
 
     @Override
@@ -278,6 +280,47 @@ public class SolarArrayControllerBlockEntity extends BaseMachineBlockEntity impl
     public void setMachineTraits(MachineTraits traits) {
         super.setMachineTraits(traits);
         syncPreviewToClient();
+    }
+
+    @Override
+    public MachineInfoSnapshot machineInfo() {
+        MachineStatAccumulator stats = effectiveStats();
+        int status = lastStatus;
+        boolean active = getBlockState().getValue(BaseMachineBlock.ACTIVE);
+        AdjacentEnergyConnector.Info connector = AdjacentEnergyConnector.forSource(level, worldPosition);
+        return MachineInfoSnapshot.builder("solar_array_controller")
+                .state(
+                        MachineInfoSnapshot.workState(
+                                status == STATUS_CLEAR,
+                                active,
+                                status == STATUS_WEATHER || status == STATUS_NIGHT || status == STATUS_FULL
+                        ),
+                        MachineInfoSnapshot.BlockedReason.NONE
+                )
+                .status(statusKey(status))
+                .energy(energyStored(stats), energyCapacity(stats), active ? lastEnergyPerTick : 0)
+                .energyTelemetry(energyFlow.lastInput(), energyFlow.lastOutput(), connector.transferRate(), MachineInfoSnapshot.EnergyBottleneck.NONE)
+                .gear(BatteryCellItem.isBatteryCell(batteryCellStack())
+                        ? MachineInfoSnapshot.GearSummary.BATTERY_CELL_INSTALLED
+                        : MachineInfoSnapshot.GearSummary.NONE)
+                .output(status == STATUS_FULL
+                        ? MachineInfoSnapshot.OutputSummary.ENERGY_FULL
+                        : MachineInfoSnapshot.OutputSummary.NONE)
+                .refinement(machineTraits())
+                .build();
+    }
+
+    private static String statusKey(int status) {
+        String name = switch (status) {
+            case STATUS_WEATHER -> "weather";
+            case STATUS_NIGHT -> "night";
+            case STATUS_BAD_DIMENSION -> "dimension";
+            case STATUS_NO_PANELS -> "no_panels";
+            case STATUS_FULL -> "full";
+            case STATUS_BLOCKED -> "blocked";
+            default -> "";
+        };
+        return name.isEmpty() ? "" : "rngtech.solar.status." + name;
     }
 
     @Override
@@ -529,6 +572,7 @@ public class SolarArrayControllerBlockEntity extends BaseMachineBlockEntity impl
             int offered = extractEnergyInternal(remainingOutput, stats, true);
             int received = target.receiveEnergy(offered, false);
             int delivered = extractEnergyInternal(received, stats, false);
+            energyFlow.recordOutput(delivered);
             remainingOutput -= delivered;
             exported |= delivered > 0;
         }

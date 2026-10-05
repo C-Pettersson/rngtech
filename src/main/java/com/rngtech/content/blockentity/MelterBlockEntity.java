@@ -68,7 +68,8 @@ import net.neoforged.neoforge.items.ItemStackHandler;
 
 import java.util.List;
 
-public class MelterBlockEntity extends BaseMachineBlockEntity implements MenuProvider, PurgeableFluidStorage, MachineMasteryHost {
+public class MelterBlockEntity extends BaseMachineBlockEntity
+        implements MenuProvider, PurgeableFluidStorage, MachineMasteryHost, MachineInfoProvider {
     public static final int SLOT_PRIMARY_INPUT = 0;
     public static final int SLOT_SECONDARY_INPUT = 1;
     public static final int SLOT_FLUID_INPUT_CONTAINER = 2;
@@ -207,6 +208,8 @@ public class MelterBlockEntity extends BaseMachineBlockEntity implements MenuPro
     private final IItemHandler containerInputHandler = new ProcessItemHandler(SLOT_FLUID_INPUT_CONTAINER, SLOT_FLUID_OUTPUT_CONTAINER, true, false);
     private final IItemHandler containerOutputHandler = new ProcessItemHandler(SLOT_FLUID_OUTPUT_CONTAINER, SLOT_FLUID_OUTPUT_CONTAINER, false, true);
     private final IEnergyStorage energyStorage = new MelterEnergyStorage();
+    private final EnergyTelemetry energyFlow = new EnergyTelemetry(this::getLevel);
+    private final IEnergyStorage trackedEnergyStorage = energyFlow.track(energyStorage);
     private final IFluidHandler fluidHandler = new MelterFluidHandler();
     private final ContainerData menuData = new ContainerData() {
         @Override
@@ -341,7 +344,7 @@ public class MelterBlockEntity extends BaseMachineBlockEntity implements MenuPro
     }
 
     public IEnergyStorage getEnergyStorage(Direction side) {
-        return energyStorage;
+        return trackedEnergyStorage;
     }
 
     public IFluidHandler getFluidHandler(Direction side) {
@@ -359,7 +362,7 @@ public class MelterBlockEntity extends BaseMachineBlockEntity implements MenuPro
                         inputTank::drain,
                         this::resetCycleAndBulkSpeed,
                         this::setChanged
-                ),
+                ).withCapacity(inputTank::getCapacity),
                 FluidPurgeTarget.of(
                         PURGE_OUTPUT_TANK,
                         Component.translatable("rngtech.purge.target.output_tank"),
@@ -367,8 +370,59 @@ public class MelterBlockEntity extends BaseMachineBlockEntity implements MenuPro
                         outputTank::getFluid,
                         outputTank::drain,
                         this::setChanged
-                )
+                ).withCapacity(outputTank::getCapacity)
         );
+    }
+
+    @Override
+    public MachineInfoSnapshot machineInfo() {
+        MachineStatAccumulator stats = effectiveStats();
+        MelterRecipe recipe = nextRecipe();
+        int status = statusCode(recipe, stats);
+        int energyDemand = status == STATUS_READY || status == STATUS_NO_POWER ? energyCostPerTick(recipe, stats) : 0;
+        AdjacentEnergyConnector.Info connector = AdjacentEnergyConnector.forSink(level, worldPosition);
+        return MachineInfoSnapshot.builder("melter")
+                .state(
+                        MachineInfoSnapshot.workState(
+                                status == STATUS_READY,
+                                getBlockState().getValue(BaseMachineBlock.ACTIVE),
+                                status == STATUS_NO_INPUT
+                        ),
+                        MachineInfoSnapshot.BlockedReason.NONE
+                )
+                .status(statusKey(status), recipe == null ? 0 : recipe.minimumTemperature())
+                .progress(progress, currentProcessingTicks(recipe, stats))
+                .energy(energyStored(), energyCapacity(), -energyDemand)
+                .energyTelemetry(energyFlow.lastInput(), energyFlow.lastOutput(), connector.transferRate(), MachineInfoSnapshot.EnergyBottleneck.NONE)
+                .processingLevel(
+                        processingLevel(stats),
+                        recipe == null ? MachineInfoSnapshot.UNSET : recipe.requiredProcessingLevel()
+                )
+                .heat(effectiveHeat(stats), recipe == null ? 0 : recipe.minimumTemperature())
+                .gear(hasHeatCore()
+                        ? MachineInfoSnapshot.GearSummary.HEAT_CORE_INSTALLED
+                        : MachineInfoSnapshot.GearSummary.MISSING_HEAT_CORE)
+                .output(status == STATUS_OUTPUT_TANK_FULL
+                        ? MachineInfoSnapshot.OutputSummary.OUTPUT_FULL
+                        : MachineInfoSnapshot.OutputSummary.NONE)
+                .refinement(machineTraits())
+                .build();
+    }
+
+    private static String statusKey(int status) {
+        String name = switch (status) {
+            case STATUS_MISSING_HEAT_CORE -> "missing_heat_core";
+            case STATUS_MISSING_CRUSH_HEAD -> "missing_crush_head";
+            case STATUS_NO_INPUT -> "no_input";
+            case STATUS_INVALID_RECIPE -> "invalid_recipe";
+            case STATUS_HEAT_LOW -> "heat_low";
+            case STATUS_LEVEL_LOW -> "level_low";
+            case STATUS_OUTPUT_TANK_FULL -> "output_full";
+            case STATUS_NO_POWER -> "no_power";
+            case STATUS_NO_FLUID -> "no_fluid";
+            default -> "";
+        };
+        return name.isEmpty() ? "" : "rngtech.melter.status." + name;
     }
 
     @Override

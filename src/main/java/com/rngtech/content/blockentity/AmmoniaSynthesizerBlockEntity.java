@@ -43,7 +43,8 @@ import net.neoforged.neoforge.items.ItemStackHandler;
 
 import java.util.List;
 
-public class AmmoniaSynthesizerBlockEntity extends BaseMachineBlockEntity implements MenuProvider, PurgeableFluidStorage {
+public class AmmoniaSynthesizerBlockEntity extends BaseMachineBlockEntity
+        implements MenuProvider, PurgeableFluidStorage, MachineInfoProvider {
     public static final int SLOT_CATALYST_BED = 0;
     public static final int GEAR_SLOT_COUNT = 1;
     public static final int STATUS_READY = 0;
@@ -95,6 +96,8 @@ public class AmmoniaSynthesizerBlockEntity extends BaseMachineBlockEntity implem
     };
     private final MachineEnergyStorage energyStorage =
             new MachineEnergyStorage(this::internalEnergyCapacity, this::effectiveMaxEnergyInput, () -> 0, this::setChanged);
+    private final EnergyTelemetry energyFlow = new EnergyTelemetry(this::getLevel);
+    private final IEnergyStorage trackedEnergyStorage = energyFlow.track(energyStorage);
     private final FluidTank nitrogenTank = tank(ModFluids.NITROGEN_SOURCE.get());
     private final FluidTank hydrogenTank = tank(ModFluids.HYDROGEN_SOURCE.get());
     private final FluidTank outputTank = tank(ModFluids.AMMONIA_SOURCE.get());
@@ -158,7 +161,7 @@ public class AmmoniaSynthesizerBlockEntity extends BaseMachineBlockEntity implem
     }
 
     public IEnergyStorage getEnergyStorage(Direction side) {
-        return side == null || side == Direction.DOWN ? null : energyStorage;
+        return side == null || side == Direction.DOWN ? null : trackedEnergyStorage;
     }
 
     public IFluidHandler getFluidHandler(Direction side) {
@@ -176,7 +179,7 @@ public class AmmoniaSynthesizerBlockEntity extends BaseMachineBlockEntity implem
                         nitrogenTank::drain,
                         this::clearActiveRecipe,
                         this::setChanged
-                ),
+                ).withCapacity(nitrogenTank::getCapacity),
                 FluidPurgeTarget.of(
                         PURGE_HYDROGEN_TANK,
                         Component.translatable("rngtech.purge.target.hydrogen_tank"),
@@ -185,7 +188,7 @@ public class AmmoniaSynthesizerBlockEntity extends BaseMachineBlockEntity implem
                         hydrogenTank::drain,
                         this::clearActiveRecipe,
                         this::setChanged
-                ),
+                ).withCapacity(hydrogenTank::getCapacity),
                 FluidPurgeTarget.of(
                         PURGE_OUTPUT_TANK,
                         Component.translatable("rngtech.purge.target.output_tank"),
@@ -193,8 +196,47 @@ public class AmmoniaSynthesizerBlockEntity extends BaseMachineBlockEntity implem
                         outputTank::getFluid,
                         outputTank::drain,
                         this::setChanged
-                )
+                ).withCapacity(outputTank::getCapacity)
         );
+    }
+
+    @Override
+    public MachineInfoSnapshot machineInfo() {
+        int status = statusCode();
+        AmmoniaSynthesisRecipe recipe = status == STATUS_READY || status == STATUS_NO_POWER ? currentRecipe() : null;
+        int energyDemand = recipe == null ? 0 : energyCostPerTick(recipe);
+        AdjacentEnergyConnector.Info connector = AdjacentEnergyConnector.forSink(level, worldPosition);
+        return MachineInfoSnapshot.builder("ammonia_synthesizer")
+                .state(
+                        MachineInfoSnapshot.workState(status == STATUS_READY, isActive(), status == STATUS_NO_FLUID),
+                        MachineInfoSnapshot.BlockedReason.NONE
+                )
+                .status(statusKey(status))
+                .progress(progress, activeTicks)
+                .energy(energyStorage.getEnergyStored(), energyStorage.getMaxEnergyStored(), -energyDemand)
+                .energyTelemetry(energyFlow.lastInput(), energyFlow.lastOutput(), connector.transferRate(), MachineInfoSnapshot.EnergyBottleneck.NONE)
+                .output(status == STATUS_OUTPUT_FULL
+                        ? MachineInfoSnapshot.OutputSummary.OUTPUT_FULL
+                        : MachineInfoSnapshot.OutputSummary.NONE)
+                .refinement(machineTraits())
+                .build();
+    }
+
+    private String statusKey(int status) {
+        String name = switch (status) {
+            case STATUS_MISSING_CATALYST -> "no_catalyst";
+            case STATUS_NO_RECIPE -> "no_recipe";
+            case STATUS_NO_POWER -> "no_power";
+            case STATUS_OUTPUT_FULL -> "output_full";
+            case STATUS_NO_FLUID -> nitrogenTank.isEmpty() ? "no_nitrogen" : "no_hydrogen";
+            default -> "";
+        };
+        return name.isEmpty() ? "" : "rngtech.ammonia_synthesizer.status." + name;
+    }
+
+    private boolean isActive() {
+        BlockState state = getBlockState();
+        return state.hasProperty(BaseMachineBlock.ACTIVE) && state.getValue(BaseMachineBlock.ACTIVE);
     }
 
     @Override
@@ -294,9 +336,11 @@ public class AmmoniaSynthesizerBlockEntity extends BaseMachineBlockEntity implem
         if (outputTank.fill(recipe.outputFluid(), IFluidHandler.FluidAction.SIMULATE) < recipe.output().getAmount()) {
             return STATUS_OUTPUT_FULL;
         }
-        int ticks = adjustedTicks(recipe);
-        int energy = Math.max(1, Mth.ceil(adjustedEnergy(recipe) / (double) ticks));
-        return energyStorage.getEnergyStored() < energy ? STATUS_NO_POWER : STATUS_READY;
+        return energyStorage.getEnergyStored() < energyCostPerTick(recipe) ? STATUS_NO_POWER : STATUS_READY;
+    }
+
+    private int energyCostPerTick(AmmoniaSynthesisRecipe recipe) {
+        return Math.max(1, Mth.ceil(adjustedEnergy(recipe) / (double) adjustedTicks(recipe)));
     }
 
     private ItemStack catalystStack() {

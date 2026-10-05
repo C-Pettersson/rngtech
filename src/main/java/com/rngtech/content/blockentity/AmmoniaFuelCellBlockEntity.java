@@ -45,7 +45,8 @@ import net.neoforged.neoforge.items.ItemStackHandler;
 
 import java.util.List;
 
-public class AmmoniaFuelCellBlockEntity extends BaseMachineBlockEntity implements MenuProvider, PurgeableFluidStorage {
+public class AmmoniaFuelCellBlockEntity extends BaseMachineBlockEntity
+        implements MenuProvider, PurgeableFluidStorage, MachineInfoProvider {
     public static final int SLOT_RESIDUE = 0;
     public static final int SLOT_MEMBRANE = 0;
     public static final int SLOT_BATTERY_CELL = 1;
@@ -134,6 +135,8 @@ public class AmmoniaFuelCellBlockEntity extends BaseMachineBlockEntity implement
     private final IItemHandler outputHandler = new OutputItemHandler();
     private final IItemHandler emptyItemHandler = new EmptyItemHandler();
     private final IEnergyStorage energyView = new GeneratorEnergyStorage();
+    private final EnergyTelemetry energyFlow = new EnergyTelemetry(this::getLevel);
+    private final IEnergyStorage trackedEnergyView = energyFlow.track(energyView);
     private final ContainerData menuData = new ContainerData() {
         @Override
         public int get(int index) {
@@ -197,7 +200,7 @@ public class AmmoniaFuelCellBlockEntity extends BaseMachineBlockEntity implement
     }
 
     public IEnergyStorage getEnergyStorage(Direction side) {
-        return side == Direction.DOWN ? null : energyView;
+        return side == Direction.DOWN ? null : trackedEnergyView;
     }
 
     public IFluidHandler getFluidHandler(Direction side) {
@@ -214,7 +217,61 @@ public class AmmoniaFuelCellBlockEntity extends BaseMachineBlockEntity implement
                 ammoniaTank::drain,
                 this::clearActiveRecipe,
                 this::setChanged
-        ));
+        ).withCapacity(ammoniaTank::getCapacity));
+    }
+
+    @Override
+    public MachineInfoSnapshot machineInfo() {
+        int status = statusCode();
+        int generation = status == STATUS_READY ? currentEnergyPerTick() : 0;
+        AdjacentEnergyConnector.Info connector = AdjacentEnergyConnector.forSource(level, worldPosition);
+        return MachineInfoSnapshot.builder("ammonia_fuel_cell")
+                .state(
+                        MachineInfoSnapshot.workState(status == STATUS_READY, isActive(), status == STATUS_NO_FLUID),
+                        MachineInfoSnapshot.BlockedReason.NONE
+                )
+                .status(statusKey(status))
+                .progress(progress, activeTicks)
+                .energy(energyStored(), energyCapacity(), generation)
+                .energyTelemetry(
+                        energyFlow.lastInput(),
+                        energyFlow.lastOutput(),
+                        connector.transferRate(),
+                        connector.present() && generation > connector.transferRate()
+                                ? MachineInfoSnapshot.EnergyBottleneck.CONNECTOR_OUTPUT
+                                : MachineInfoSnapshot.EnergyBottleneck.NONE
+                )
+                .gear(batteryCellStorage() != null
+                        ? MachineInfoSnapshot.GearSummary.BATTERY_CELL_INSTALLED
+                        : MachineInfoSnapshot.GearSummary.NONE)
+                .output(outputSummary(status))
+                .refinement(machineTraits())
+                .build();
+    }
+
+    private static String statusKey(int status) {
+        String name = switch (status) {
+            case STATUS_MISSING_MEMBRANE -> "no_membrane";
+            case STATUS_NO_RECIPE -> "no_recipe";
+            case STATUS_ENERGY_FULL -> "energy_full";
+            case STATUS_OUTPUT_FULL -> "output_full";
+            case STATUS_NO_FLUID -> "no_ammonia";
+            default -> "";
+        };
+        return name.isEmpty() ? "" : "rngtech.ammonia_fuel_cell.status." + name;
+    }
+
+    private static MachineInfoSnapshot.OutputSummary outputSummary(int status) {
+        return switch (status) {
+            case STATUS_OUTPUT_FULL -> MachineInfoSnapshot.OutputSummary.OUTPUT_FULL;
+            case STATUS_ENERGY_FULL -> MachineInfoSnapshot.OutputSummary.ENERGY_FULL;
+            default -> MachineInfoSnapshot.OutputSummary.NONE;
+        };
+    }
+
+    private boolean isActive() {
+        BlockState state = getBlockState();
+        return state.hasProperty(BaseMachineBlock.ACTIVE) && state.getValue(BaseMachineBlock.ACTIVE);
     }
 
     @Override
@@ -400,6 +457,7 @@ public class AmmoniaFuelCellBlockEntity extends BaseMachineBlockEntity implement
             int offered = extractEnergyInternal(remaining, true);
             int received = target.receiveEnergy(offered, false);
             int delivered = extractEnergyInternal(received, false);
+            energyFlow.recordOutput(delivered);
             remaining -= delivered;
             moved |= delivered > 0;
         }
