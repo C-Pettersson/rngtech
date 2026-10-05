@@ -15,7 +15,7 @@ Recompute counts when reviewing a pack; do not use an old snapshot as proof of s
 - Gate mandatory quests with available recipes and machine Gear, including temperature and calibration requirements.
 - Teach a machine process before requiring an output from it. Check press and Circuit Mold requirements before electric-furnace gates.
 - Use optional branches for sidegrades, storage variants, and repeated material tiers.
-- Verify late-game routes against [Component Stages](component-stages.md), including the Stage 8 capstone.
+- Verify late-game quest lines against [Component Stages](component-stages.md), including the Stage 8 capstone.
 - Keep loot-only items, compatibility-only IDs, and planned machines out of mandatory crafting quests.
 - Test rewards, unlock dependencies, and completion in a new quest save. Pack recipe changes can invalidate the default progression.
 

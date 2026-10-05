@@ -675,7 +675,7 @@ public class AlloyFurnaceBlockEntity extends BaseMachineBlockEntity implements M
         return "direct_ingot".equals(recipe.mode());
     }
 
-    /** Tempered Crucible's stability on blend routes; route speed applies to processing time instead. */
+    /** Tempered Crucible's stability on blend recipes; recipe speed applies to processing time instead. */
     private MachineStatAccumulator routeStats(AlloyFurnaceRecipe recipe, MachineStatAccumulator stats) {
         if (recipe != null && blend(recipe) && hasMasteryBehavior("TEMPERED_CRUCIBLE")) {
             stats.apply(new MachineModifier(ModifierSlot.IMPLICIT, MachineStat.TEMPERATURE_STABILITY, ModifierOperation.MORE, 1.4));
@@ -683,7 +683,7 @@ public class AlloyFurnaceBlockEntity extends BaseMachineBlockEntity implements M
         return stats;
     }
 
-    /** Blend Speed on blend routes; Blend Reversal slows direct-ingot routes by 15%. */
+    /** Blend Speed on blend recipes; Blend Reversal slows direct-ingot recipes by 15%. */
     private double routeSpeed(AlloyFurnaceRecipe recipe, MachineStatAccumulator stats) {
         if (blend(recipe)) {
             return 1.0 + Math.max(0.0, stats.value(MachineStat.BLEND_SPEED)) / 100.0;
@@ -691,7 +691,7 @@ public class AlloyFurnaceBlockEntity extends BaseMachineBlockEntity implements M
         return directIngot(recipe) && hasMasteryBehavior("BLEND_REVERSAL") ? 0.85 : 1.0;
     }
 
-    /** Master Blend disables direct-ingot routes. */
+    /** Master Blend disables direct-ingot recipes. */
     private boolean routeDisabled(AlloyFurnaceRecipe recipe) {
         return directIngot(recipe) && hasMasteryBehavior("MASTER_BLEND");
     }
@@ -700,7 +700,7 @@ public class AlloyFurnaceBlockEntity extends BaseMachineBlockEntity implements M
         return pourContinues && blend(recipe) && hasMasteryBehavior("CONTINUOUS_POUR");
     }
 
-    /** Cold Mixing lowers every temperature of a blend route. */
+    /** Cold Mixing lowers every temperature of a blend recipe. */
     private static int heatRelief(AlloyFurnaceRecipe recipe, MachineStatAccumulator stats) {
         return blend(recipe) ? Math.max(0, stats.intValue(MachineStat.BLEND_HEAT_REDUCTION)) : 0;
     }
@@ -717,7 +717,7 @@ public class AlloyFurnaceBlockEntity extends BaseMachineBlockEntity implements M
         return Math.max(targetTemperature(recipe, stats), recipe.safeMaximumTemperature() - heatRelief(recipe, stats));
     }
 
-    /** Blend Reversal: the blend route for a direct-ingot recipe's output, at no more than the direct route makes. */
+    /** Blend Reversal: the blend recipe for a direct-ingot recipe's output, at no more than the direct-ingot recipe makes. */
     private ItemStack reversalBlend(AlloyFurnaceRecipe direct) {
         if (level == null) {
             return ItemStack.EMPTY;

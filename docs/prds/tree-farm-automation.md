@@ -66,7 +66,7 @@ Existing RNGTech systems already support Battery Cells, modular Axes, modular Tr
 - Harvest only trees the system planted or explicitly adopted as managed planting cells.
 - Clear connected snapshot leaves before cutting logs.
 - Break logs one at a time or in bounded connected-log batches, with FE and tool-wear costs per log.
-- Route saplings from leaf drops into cart sapling cargo first, with overflow to output cargo.
+- Send saplings from leaf drops to cart sapling cargo first, with overflow to output cargo.
 - Stop safely when output is full, power is missing, the tool is broken, the rail route is blocked, or the target tree exceeds the current tool/stage limits.
 - Keep scanning and harvesting performance bounded.
 - Preserve room for later Big Saw Gantry and Forestry Drone variants without requiring them in the first implementation.
@@ -220,7 +220,7 @@ Harvest loop:
 1. Stop movement beside a track-adjacent log base.
 2. Build or resume the persisted bounded snapshot for that log base.
 3. If snapshot leaves remain, target a leaf before any log.
-4. Confirm routed cargo space before breaking the next block or Treefeller log batch.
+4. Confirm cargo space before breaking the next block or Treefeller log batch.
 5. Confirm the installed tool can harvest logs, or that leaf cleanup is allowed.
 6. Confirm enough FE is available for the action or full Treefeller log batch.
 7. Remove one leaf, break one Axe log, or break the preflighted Treefeller log batch.
@@ -534,7 +534,7 @@ Drones should be expensive precision tools, not a replacement for rail and gantr
 - Cart does not harvest arbitrary log structures away from the rail-defined work lanes.
 - Cart clears leaves before cutting logs and uses bounded, protection-aware block removal.
 - Treefeller-equipped carts batch-cut snapshot logs after leaf cleanup, capped by `TREE_FELL_LIMIT`; Axe-equipped carts continue cutting one log per interval.
-- Drops are routed into cart sapling cargo or output cargo before station unloading, or work pauses before breaking.
+- Drops go into cart sapling cargo or output cargo before station unloading, or work pauses before breaking.
 - FE and tool durability are charged per successful log or collected leaf action; Treefeller batch FE and wear are applied per log, and cart shears wear is amortized by shears type.
 - Missing power, full output, invalid tool, broken tool, blocked route, invalid soil, and too-large trees produce non-destructive pause states.
 - Cart right-click management pauses movement/work while open and resumes after the final viewer closes.

@@ -15,7 +15,7 @@ For processing machines:
 - If a machine family has staged chassis, the placed chassis should be the machine body. Do not model it as a separate item-only ingredient unless the machine itself is not staged.
 - Chassis stage may gate installed Gear stage, but chassis material should also change base stats or fixed behavior identity so same-stage choices can matter.
 - Processing speed should increase throughput, not silently make each craft cheaper.
-- Reduced energy usage and output amount are the main routes to cheaper effective processing-machine production.
+- Reduced energy usage and output amount are the main ways to cheaper effective processing-machine production.
 - Config keys may tune baselines, but renaming a key is appropriate when an old local config would preserve an obsolete balance target.
 
 ## Energy Model
@@ -80,7 +80,7 @@ Machine XP and passive-tree state belongs to the machine chassis, not to a playe
 
 Processing XP should be granted only after work actually completes and output is produced. Parallel processing should grant XP per completed job. Failed starts, jams, output-blocked waits, invalid recipes, and no-power pauses should not grant XP.
 
-Passive nodes must route through the same effective-stat aggregation used by chassis, Gear, rarity, and modifiers. Slot-changing nodes must also participate in server-side slot validation and unlock validation; unlocking a node that blocks or limits an occupied Gear slot should fail unless the current gear is already compatible.
+Passive nodes must go through the same effective-stat aggregation used by chassis, Gear, rarity, and modifiers. Slot-changing nodes must also participate in server-side slot validation and unlock validation; unlocking a node that blocks or limits an occupied Gear slot should fail unless the current gear is already compatible.
 
 All functional base-machine families should use the [shared Machine Mastery graph](../systems/machine-mastery.md); integrate new families through a start and capability adapter. Gear and cables are excluded. Attribute totals, inherent conversions, and explicit scaling are separate. Increased/reduced modifiers share an additive bucket; more/less factors multiply independently. Absolute ceilings resolve last.
 

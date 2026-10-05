@@ -96,10 +96,10 @@ These are design targets for material personality, not final balance values.
 | Copper | `2` | Better early transfer, light loss or low stability. |
 | Bronze or Gold | `3` | Conductive burst behavior, worse stability. |
 | Lead or Steel | `4-5` | Shielding, low idle loss, stable discharge. |
-| Redstone or Sparksteel | `4-5` | Control, reserve thresholds, better transfer routing. |
+| Redstone or Sparksteel | `4-5` | Control, reserve thresholds, better transfer. |
 | Quartz or Aluminum | `5` | Efficient charging and precise balancing. |
 | Arclite or Titanium | `6` | High transfer, burst output, advanced control. |
-| Nullite or Tungstensteel | `7-8` | Late-game throughput and special routing behavior. |
+| Nullite or Tungstensteel | `7-8` | Late-game throughput and special charge-balancing behavior. |
 | Aethergold | `6` | Focused no-leak burst bank with strong short-window surge identity. |
 | Pack-defined Exotic, Naquadah by default | `8-10` | Endgame stability, high heat tolerance, or pack-defined behavior. |
 
@@ -118,13 +118,13 @@ These values are first-pass balance targets. Inserted cells still define base st
 | Steel Battery Chassis | 4 | `4` | `256 FE/t` | `1.0x` | `0 ticks` | `1.00` | `1.15` | `0%/min` | `1.00` | `Reinforced Rack`: stable discharge, overload resistance, and Cell Leakage Damping. |
 | Sparksteel Battery Chassis | 5 | `5` | `512 FE/t` | `1.4x` | `60 ticks` | `1.04` | `1.00` | `0.01%/min` | `0.95` | `Balanced Bus`: Charge Balancer plus Burst Release. |
 | Arclite Battery Chassis | 6 | `6` | `1024 FE/t` | `2.0x` | `60 ticks` | `0.98` | `0.90` | `0.03%/min` | `0.90` | `Signal Bus`: high transfer with Charge Balancer and Burst Release. |
-| Nullite Battery Chassis | 7 | `8` | `2048 FE/t` | `2.0x` | `80 ticks` | `1.02` | `0.95` | `0.02%/min` | `0.80` | `Phase Bus`: late routing behavior with Charge Balancer, Burst Release, and mild instability. |
+| Nullite Battery Chassis | 7 | `8` | `2048 FE/t` | `2.0x` | `80 ticks` | `1.02` | `0.95` | `0.02%/min` | `0.80` | `Phase Bus`: late charge-balancing behavior with Charge Balancer, Burst Release, and mild instability. |
 | Aethergold Battery Chassis | 7 | `6` | `3072 FE/t` | `4.0x` | `100 ticks` | `1.03` | `1.05` | `0%/min` | `0.90` | `Aetherburst Bus`: strongest current Burst Release identity with Charge Balancer and sealed installed-cell leakage. |
 | Exotic Battery Chassis | 8 | `10` | `4096 FE/t` | `1.5x` | `80 ticks` | `1.05` | `1.20` | `0%/min` | `0.70` | `Harmonic Bank`: broad storage bank with Charge Balancer, Burst Release, and weaker per-cell global scaling. |
 
 Low-slot chassis intentionally have higher `GLOBAL_MODIFIER_STRENGTH`. This lets a focused chassis remain useful even after larger chassis become available.
 
-Steel applies a flat `0.02` Cell Leakage Damping reduction to installed cell idle loss before chassis idle loss is added. Aethergold seals installed-cell idle loss entirely while also carrying no chassis idle loss. Sparksteel, Arclite, Nullite, Aethergold, and Exotic have fixed Charge Balancer identity. The rollable Balance Mode prefix enables the same routing behavior on any Battery Chassis: charge, discharge, and idle-loss draws are spread across eligible installed cells while respecting each cell's input, output, stored FE, and remaining capacity. Copper, Gold, Sparksteel, Arclite, Nullite, Aethergold, and Exotic keep Burst Release identity for surge tuning, but current steady transfer remains cell-led.
+Steel applies a flat `0.02` Cell Leakage Damping reduction to installed cell idle loss before chassis idle loss is added. Aethergold seals installed-cell idle loss entirely while also carrying no chassis idle loss. Sparksteel, Arclite, Nullite, Aethergold, and Exotic have fixed Charge Balancer identity. The rollable Balance Mode prefix enables the same charge-balancing behavior on any Battery Chassis: charge, discharge, and idle-loss draws are spread across eligible installed cells while respecting each cell's input, output, stored FE, and remaining capacity. Copper, Gold, Sparksteel, Arclite, Nullite, Aethergold, and Exotic keep Burst Release identity for surge tuning, but current steady transfer remains cell-led.
 
 ## Effective Transfer
 
@@ -201,7 +201,7 @@ Burst should reinforce chassis personality:
 | Steel | Little or no burst, but very safe sustained output. |
 | Sparksteel | Moderate controlled burst with smarter balancing. |
 | Arclite | Strong burst for advanced machine demand spikes. |
-| Nullite | Strong burst plus unusual routing behavior. |
+| Nullite | Strong burst plus unusual charge-balancing behavior. |
 | Aethergold | Highest current burst multiplier and longest burst window, with no leakage. |
 | Exotic | Lower burst multiplier than Arclite, but very stable. |
 

@@ -4,7 +4,7 @@ RNGTech is a Minecraft 1.21.1 NeoForge technology mod with staged machines, inst
 
 ## Start here
 
-- [Getting Started](getting-started.md): installation, the stage-by-stage route from first tools to exotic power, logistics, and refinement.
+- [Getting Started](getting-started.md): installation, the stage-by-stage path from first tools to exotic power, logistics, and refinement.
 - [Current Implementation](reference/current-implementation.md): which features exist, their automation surfaces, and refinement support.
 - [Component Stages](reference/component-stages.md): the material progression ladder.
 - [Progression](systems/progression.md): rarity and refinement.

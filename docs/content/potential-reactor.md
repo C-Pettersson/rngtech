@@ -71,7 +71,7 @@ Current starter recipes:
 | `rngtech:recycling_byproduct` | `7200` | `140` | `2` | `rngtech:scrap` |
 | `rngtech:spent_catalyst` | `12000` | `160` | `3` | `rngtech:scrap` |
 
-The Potential Reactor also has a built-in recovery route for `rngtech:malformed_ingot`, the generic Metal Press failure output. This route reads the stack's `rngtech:material` component. With a Recovery Filter installed, known material failures return two matching nuggets; malformed ingots without a known material component return two generic `rngtech:scrap`.
+The Potential Reactor also has a built-in recovery recipe for `rngtech:malformed_ingot`, the generic Metal Press failure output. This recipe reads the stack's `rngtech:material` component. With a Recovery Filter installed, known material failures return two matching nuggets; malformed ingots without a known material component return two generic `rngtech:scrap`.
 
 Residue is only produced when a valid Recovery Filter is installed. Without a filter, the reactor can still process valid fuel, but byproducts are lost. The starter datapack keeps `rngtech:scrap` as residue-only material so recovered residue cannot be fed back into the reactor for more FE.
 
