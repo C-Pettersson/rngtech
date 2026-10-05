@@ -163,14 +163,14 @@ Uniques come from vanilla places by default. Pack makers can move them to RNGTec
 
 ### Pack configuration
 
-A pack maker can use any of these routes, alone or together:
+A pack maker can use any of these options, alone or together:
 
 1. **Switch off defaults:** set `uniques.loot.enabled=false`, or `uniques.loot.<id>.enabled=false` for one Unique.
 2. **Challenge loot:** add the Unique to one of RNGTech's [challenge loot tables](#challenge-loot) with a datapack, for example as a reward for a Stage 6+ heat failure or a Mastery level.
 3. **Quests and commands:** give the plain item, for example as an FTB Quests item reward. A Unique with no traits counts as unidentified, so each player rolls their own copy on identification. `/rngtech unique give <player> <id>` gives an unidentified copy for testing and command-based quests.
 4. **Own loot:** replace or extend any loot table or loot modifier with ordinary datapacks.
 
-The same routes work for the [Volatile Catalyst](corruption.md#sources), whose recipe can be switched off by config.
+The same options work for the [Volatile Catalyst](corruption.md#sources), whose recipe can be switched off by config.
 
 ### Challenge loot
 
@@ -264,11 +264,11 @@ The Voltaic Potato Battery Cell moves onto the catalog with fixed lines equal to
 
 `rngtech:crying_crucible`, Unique Alloy Crucible, slot stage 3.
 
-- **Identity:** a Bronze-class crucible tuned for blend routes. It has the same fixed input-slot count as the Bronze crucible, so it does not skip the Steel crucible.
+- **Identity:** a Bronze-class crucible tuned for blend recipes. It has the same fixed input-slot count as the Bronze crucible, so it does not skip the Steel crucible.
 - **Signature:** +(15–30)% Blend Speed and (10–20)% Blend Heat Reduction, which normally come only from Blendwright.
 - **Ascendancy hook:** the signature itself stacks with Blendwright.
 - **Drawback:** (40–20)% less Stability and (40–20)% less Temperature Stability, which raise failure strain on failure-bearing recipes.
-- **Why:** it opens a blend-route Alloy Furnace before the ascendancy, and rewards Blendwright players who accept more failures.
+- **Why:** it opens a blend-recipe Alloy Furnace before the ascendancy, and rewards Blendwright players who accept more failures.
 
 ### Trial Vault Escapement
 
