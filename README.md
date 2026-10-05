@@ -2,9 +2,21 @@
 
 [![Build](https://github.com/C-Pettersson/rngtech/actions/workflows/build.yml/badge.svg?branch=main)](https://github.com/C-Pettersson/rngtech/actions/workflows/build.yml)
 
-RNGTech is a Minecraft **1.21.1 / NeoForge** technology mod with staged machines, installable parts, and RPG-style item rolls. Machines and parts can have rarity, affixes, and a limited Refinement Potential budget for further changes.
+RNGTech is a Minecraft **1.21.1 / NeoForge** technology mod with staged machines, installable parts, and action-RPG item rolls inspired by **Path of Exile** and **Last Epoch**. Machines and parts can have rarity, affixes, and a limited Refinement Potential budget for further changes.
 
 Build an ore-processing line, generate and store energy, then improve the machines and their Gear. The mod includes crushing, smelting, alloying, metal forming, recycling, calibration, fluid and gas processing, modular tools, and a rail-based Forestry Companion. Universal Cables transfer energy, fluids, and items; optional connectors bridge AE2 or Refined Storage networks.
+
+## Influences
+
+RNGTech brings action-RPG loot and build planning to a tech mod. The ideas come mainly from Path of Exile and Last Epoch, but they apply to machines instead of characters:
+
+- **Rarity and affixes** (Path of Exile, Last Epoch). Machines, parts, and Battery Cells roll Normal, Magic, Rare, or Unique rarity, with tiered prefix and suffix modifiers. See [Rarity](docs/reference/rarity.md) and [Affix generation](docs/systems/affix-generation.md).
+- **A limited crafting budget** (Last Epoch). Refinement Potential works like Forging Potential: each refinement spends a rolled amount, so every item can be improved only so far. See [Affixes and refinement](docs/systems/progression.md).
+- **Single-purpose crafting currency** (Path of Exile). Crystals, catalysts, and coils each add, upgrade, reroll, or remove affixes, or promote rarity, much like orbs.
+- **A shared passive tree** (Path of Exile). Machine Mastery gives each machine chassis its own points to spend on one large passive tree, with attribute roads, notables, and keystones that trade a cost for a strong payoff. See [Machine Mastery](docs/systems/machine-mastery.md).
+- **Ascendancies** (Path of Exile). Each Mastery family has two ascendancies: small specialization trees that a machine unlocks with Ascendancy Seals.
+
+The machines, progression, and resource chains remain grounded in Minecraft tech mods. RNGTech uses its own names, mechanics, and artwork, and is not affiliated with or endorsed by Grinding Gear Games or Eleventh Hour Games.
 
 ## Install and play
 
