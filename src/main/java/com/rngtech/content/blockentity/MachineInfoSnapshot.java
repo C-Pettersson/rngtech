@@ -3,7 +3,12 @@ package com.rngtech.content.blockentity;
 import com.rngtech.rpg.MachineTraits;
 
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.StringTag;
+import net.minecraft.nbt.Tag;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Locale;
 
 public record MachineInfoSnapshot(
@@ -32,7 +37,9 @@ public record MachineInfoSnapshot(
         OutputSummary outputSummary,
         String refinementRarity,
         int refinementPotential,
-        int affixCount
+        int affixCount,
+        String statusKey,
+        List<String> statusArgs
 ) {
     public static final int UNSET = -1;
 
@@ -64,6 +71,12 @@ public record MachineInfoSnapshot(
         tag.putString("refinement_rarity", refinementRarity);
         tag.putInt("refinement_potential", refinementPotential);
         tag.putInt("affix_count", affixCount);
+        if (!statusKey.isEmpty()) {
+            tag.putString("status_key", statusKey);
+            ListTag args = new ListTag();
+            statusArgs.forEach(arg -> args.add(StringTag.valueOf(arg)));
+            tag.put("status_args", args);
+        }
         return tag;
     }
 
@@ -94,12 +107,21 @@ public record MachineInfoSnapshot(
                 OutputSummary.byName(tag.getString("output_summary")),
                 tag.getString("refinement_rarity"),
                 tag.getInt("refinement_potential"),
-                tag.getInt("affix_count")
+                tag.getInt("affix_count"),
+                tag.getString("status_key"),
+                tag.getList("status_args", Tag.TAG_STRING).stream().map(Tag::getAsString).toList()
         );
     }
 
     public static Builder builder(String family) {
         return new Builder(family);
+    }
+
+    public static WorkState workState(boolean ready, boolean active, boolean waitingForInput) {
+        if (ready) {
+            return active ? WorkState.RUNNING : WorkState.IDLE;
+        }
+        return waitingForInput ? WorkState.IDLE : WorkState.BLOCKED;
     }
 
     public enum WorkState {
@@ -235,6 +257,8 @@ public record MachineInfoSnapshot(
         private String refinementRarity = "normal";
         private int refinementPotential;
         private int affixCount;
+        private String statusKey = "";
+        private List<String> statusArgs = List.of();
 
         private Builder(String family) {
             this.family = family;
@@ -318,6 +342,12 @@ public record MachineInfoSnapshot(
             return this;
         }
 
+        public Builder status(String statusKey, Object... args) {
+            this.statusKey = statusKey == null ? "" : statusKey;
+            this.statusArgs = Arrays.stream(args).map(String::valueOf).toList();
+            return this;
+        }
+
         public MachineInfoSnapshot build() {
             return new MachineInfoSnapshot(
                     family,
@@ -345,7 +375,9 @@ public record MachineInfoSnapshot(
                     outputSummary,
                     refinementRarity,
                     refinementPotential,
-                    affixCount
+                    affixCount,
+                    statusKey,
+                    statusArgs
             );
         }
     }

@@ -51,7 +51,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
 
-public class WoodenDehumidifierBlockEntity extends BlockEntity implements MenuProvider, PurgeableFluidStorage {
+public class WoodenDehumidifierBlockEntity extends BlockEntity
+        implements MenuProvider, PurgeableFluidStorage, MachineInfoProvider {
     public static final int SLOT_CONVERSION_INPUT = 0;
     public static final int SLOT_EMPTY_CONTAINER = 1;
     public static final int SLOT_FILLED_CONTAINER = 2;
@@ -236,7 +237,7 @@ public class WoodenDehumidifierBlockEntity extends BlockEntity implements MenuPr
                         waterTank::drain,
                         this::resetConversionProgress,
                         this::setChanged
-                ),
+                ).withCapacity(waterTank::getCapacity),
                 FluidPurgeTarget.of(
                         PURGE_CONVERTED_OUTPUT_TANK,
                         Component.translatable("rngtech.purge.target.converted_output_tank"),
@@ -244,8 +245,41 @@ public class WoodenDehumidifierBlockEntity extends BlockEntity implements MenuPr
                         convertedOutputTank::getFluid,
                         convertedOutputTank::drain,
                         this::setChanged
-                )
+                ).withCapacity(convertedOutputTank::getCapacity)
         );
+    }
+
+    @Override
+    public MachineInfoSnapshot machineInfo() {
+        WoodenDehumidifierConversionRecipe recipe = nextRecipe().map(RecipeHolder::value).orElse(null);
+        int status = statusCode(recipe);
+        boolean generating = productionRatePerMinute() > 0 && waterTank.getSpace() > 0;
+        return MachineInfoSnapshot.builder("wooden_dehumidifier")
+                .state(
+                        MachineInfoSnapshot.workState(
+                                status == STATUS_READY || generating,
+                                progress > 0 || generating,
+                                status == STATUS_NO_RECIPE || status == STATUS_NO_WATER
+                        ),
+                        MachineInfoSnapshot.BlockedReason.NONE
+                )
+                .status(statusKey(status))
+                .progress(progress, recipe == null ? 0 : recipe.processingTicks())
+                .output(status == STATUS_OUTPUT_FULL
+                        ? MachineInfoSnapshot.OutputSummary.OUTPUT_FULL
+                        : MachineInfoSnapshot.OutputSummary.NONE)
+                .build();
+    }
+
+    private static String statusKey(int status) {
+        String name = switch (status) {
+            case STATUS_INVALID_STRUCTURE -> "invalid_structure";
+            case STATUS_NO_RECIPE -> "no_recipe";
+            case STATUS_NO_WATER -> "no_water";
+            case STATUS_OUTPUT_FULL -> "output_full";
+            default -> "";
+        };
+        return name.isEmpty() ? "" : "rngtech.wooden_dehumidifier.status." + name;
     }
 
     public void requestStructureRescan() {
