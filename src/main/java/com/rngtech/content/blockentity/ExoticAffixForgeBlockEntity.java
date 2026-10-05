@@ -41,7 +41,7 @@ import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.energy.IEnergyStorage;
 import net.neoforged.neoforge.items.ItemStackHandler;
 
-public class ExoticAffixForgeBlockEntity extends BlockEntity implements MenuProvider {
+public class ExoticAffixForgeBlockEntity extends BlockEntity implements MenuProvider, MachineInfoProvider {
     public static final int SLOT_TARGET = 0;
     public static final int SLOT_CATALYST = 1;
     public static final int SLOT_OUTPUT = 2;
@@ -142,6 +142,8 @@ public class ExoticAffixForgeBlockEntity extends BlockEntity implements MenuProv
         }
     };
     private final IEnergyStorage energyStorage = new ForgeEnergyStorage();
+    private final EnergyTelemetry energyFlow = new EnergyTelemetry(this::getLevel);
+    private final IEnergyStorage trackedEnergyStorage = energyFlow.track(energyStorage);
     private final ContainerData menuData = new ContainerData() {
         @Override
         public int get(int index) {
@@ -228,7 +230,7 @@ public class ExoticAffixForgeBlockEntity extends BlockEntity implements MenuProv
     }
 
     public IEnergyStorage getEnergyStorage(Direction side) {
-        return energyStorage;
+        return trackedEnergyStorage;
     }
 
     public ExoticAffixForgeAction selectedAction() {
@@ -333,6 +335,54 @@ public class ExoticAffixForgeBlockEntity extends BlockEntity implements MenuProv
         selectedAction = actionByName(tag.getString("SelectedAction"));
         selectedRefinement = selectionFromTag(tag);
         clampInternalEnergy();
+    }
+
+    @Override
+    public MachineInfoSnapshot machineInfo() {
+        ExoticAffixForgeRecipe recipe = nextRecipe();
+        int status = statusCode(recipe);
+        int energyDemand = status == STATUS_WORKING || status == STATUS_NO_POWER ? energyCostPerTick(recipe) : 0;
+        AdjacentEnergyConnector.Info connector = AdjacentEnergyConnector.forSink(level, worldPosition);
+        return MachineInfoSnapshot.builder("exotic_affix_forge")
+                .state(
+                        MachineInfoSnapshot.workState(
+                                status == STATUS_WORKING || status == STATUS_READY,
+                                craftActive,
+                                status == STATUS_NO_TARGET || status == STATUS_MISSING_CATALYST
+                        ),
+                        MachineInfoSnapshot.BlockedReason.NONE
+                )
+                .status(statusKey(status))
+                .progress(progress, recipe == null ? 0 : processingTicks(recipe))
+                .energy(energyStored(), energyCapacity(), -energyDemand)
+                .energyTelemetry(energyFlow.lastInput(), energyFlow.lastOutput(), connector.transferRate(), MachineInfoSnapshot.EnergyBottleneck.NONE)
+                .gear(BatteryCellItem.isBatteryCell(batteryCellStack())
+                        ? MachineInfoSnapshot.GearSummary.BATTERY_CELL_INSTALLED
+                        : MachineInfoSnapshot.GearSummary.NONE)
+                .output(status == STATUS_OUTPUT_FULL
+                        ? MachineInfoSnapshot.OutputSummary.OUTPUT_FULL
+                        : MachineInfoSnapshot.OutputSummary.NONE)
+                .build();
+    }
+
+    private static String statusKey(int status) {
+        String name = switch (status) {
+            case STATUS_READY -> "ready";
+            case STATUS_NO_TARGET -> "no_target";
+            case STATUS_INVALID_TARGET -> "invalid_target";
+            case STATUS_UNIQUE_TARGET -> "unique";
+            case STATUS_MISSING_CATALYST -> "missing_catalyst";
+            case STATUS_INVALID_RECIPE -> "invalid_recipe";
+            case STATUS_INSUFFICIENT_CATALYST -> "insufficient_catalyst";
+            case STATUS_MISSING_SELECTION -> "missing_selection";
+            case STATUS_INSUFFICIENT_POTENTIAL -> "insufficient_potential";
+            case STATUS_ILLEGAL_OPERATION -> "illegal_operation";
+            case STATUS_NO_POWER -> "no_power";
+            case STATUS_OUTPUT_FULL -> "output_full";
+            case STATUS_FAILED -> "failed";
+            default -> "";
+        };
+        return name.isEmpty() ? "" : "rngtech.exotic_affix_forge.status." + name;
     }
 
     private ExoticAffixForgeRecipe nextRecipe() {

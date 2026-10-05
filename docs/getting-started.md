@@ -2,7 +2,7 @@
 
 RNGTech is a Minecraft 1.21.1 NeoForge technology mod that treats machines like RPG characters. A machine chassis sets base stats and limits, installed Gear supplies the real capability, and machines, parts, tools, and Battery Cells can roll rarity and affixes. Progress moves through [component stages](reference/component-stages.md) from flint and iron to steel, fluids, gas chemistry, and exotic materials.
 
-This page follows the same order as the optional quest book that ships with the mod: a Start chapter for tools, four stage chapters, and side chapters for logistics and the Affix Forge. If your pack includes the quest extra, the book and this page agree on the route. Exact ingredients, temperatures, and amounts belong to JEI, because datapacks and configuration can change them.
+This page follows the same order as the optional quest book that ships with the mod: a Start chapter for tools, four stage chapters, and side chapters for logistics and the Affix Forge. If your pack includes the quest extra, the book and this page agree on the order. Exact ingredients, temperatures, and amounts belong to JEI, because datapacks and configuration can change them.
 
 ## Install
 
@@ -92,11 +92,11 @@ Stage 3-4 changes the rules. Recipes start to care about temperature, machines n
 
 Two recovery machines become worthwhile here. The **Potential Reactor** turns leftover affixes and Refinement Potential into FE, and the **Component Recycler** returns crafting material from parts and machines while ignoring affixes entirely. Run a stack through the reactor first, then recycle the stripped item. See [Potential Reactor](content/potential-reactor.md) and [Component Recycler](content/component-recycler.md).
 
-Power options widen as well. The [Corrosion Cell](content/corrosion-cell.md) eats iron or copper plates and Electrolyte. [Solar Panels](content/solar-panel-and-array.md) need circuits and open sky. The [Algae Photobioreactor](content/algae-photobioreactor.md) grows Bio Generator fuel from water, carbon, and light, and the [Wooden Dehumidifier](content/water-infrastructure.md) multiblock supplies the water. Copper, alloy, and steel solid-fuel burners keep the fuel route alive.
+Power options widen as well. The [Corrosion Cell](content/corrosion-cell.md) eats iron or copper plates and Electrolyte. [Solar Panels](content/solar-panel-and-array.md) need circuits and open sky. The [Algae Photobioreactor](content/algae-photobioreactor.md) grows Bio Generator fuel from water, carbon, and light, and the [Wooden Dehumidifier](content/water-infrastructure.md) multiblock supplies the water. Copper, alloy, and steel solid-fuel burners keep solid fuel viable.
 
 ## Stage 5-6: fluids and chemistry
 
-Stage 5-6 is about fluids. Most of its quests are optional, but every route ends in more power, and the next band needs that power. Machine sets now come in Aluminum with Invar Battery Cells and Titanium with Sparksteel Battery Cells. Lower-stage components still mix in freely.
+Stage 5-6 is about fluids. Most of its quests are optional, but every branch ends in more power, and the next band needs that power. Machine sets now come in Aluminum with Invar Battery Cells and Titanium with Sparksteel Battery Cells. Lower-stage components still mix in freely.
 
 1. Craft an **Advanced Machine Frame**.
 2. Build the **Melter** with a Heat Core, a Crush Head, and a Fluid Pump. It melts plant material and resin into **Lubricant**, which later machine parts require. Bucket lubricant early and pump it once lines need steady flow. See [Melter](content/melter.md).

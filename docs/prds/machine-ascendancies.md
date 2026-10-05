@@ -114,7 +114,7 @@ Key existing code:
     - Seal Cores from the Component Assembler:
         - `rngtech:primed_seal_core` uses Electrolyte Solution, a Sparksteel Coil, an Aluminum Casing, redstone, and a Stabilization Catalyst.
         - `rngtech:lubricated_seal_core` uses Lubricant, a Primed Seal Core, a Tungstensteel Casing, a Nullite Coil, and an Elite circuit.
-    - The two calibrated-part routes in Tier I let players trade stability for a Stabilizer Matrix.
+    - The two calibrated-part recipes in Tier I let players trade stability for a Stabilizer Matrix.
 - Seals and Seal Cores have no Component Recycler or Potential Reactor recipes and carry no RPG traits.
 - **Pack-maker control:**
     - Seals are plain items with no crafted-only data, so a Seal from a loot table, quest reward, or `/give` works exactly like a crafted one.
@@ -214,8 +214,8 @@ Launch stats:
 | `STRAIN_RECOVERY` | Failure strain drained per tick inside the safe band | Crucible Keeper | No |
 | `LEDGER_RATE` | Share of a base output banked per eligible cycle, paid out as whole items | Bloomer, Blendwright, Drop Forge, Timber Baron | Yes |
 | `FLUX_RATE` | Share of one unit of the largest input banked per craft; a full unit is skipped later | Metallurgist | Yes |
-| `BLEND_SPEED` | Processing Speed on blend routes | Blendwright | No |
-| `BLEND_HEAT_REDUCTION` | °C less needed on blend routes | Blendwright | No |
+| `BLEND_SPEED` | Processing Speed on blend recipes | Blendwright | No |
+| `BLEND_HEAT_REDUCTION` | °C less needed on blend recipes | Blendwright | No |
 | `MOLD_SWAP_TIME` | Ticks to swap to another stored mold | Die Keeper | No |
 | `HEAT_WINDOW` | Width of the safe heat window | Drop Forge | No |
 | `STREAK_FLOOR` | Stability floor per consecutive same-family calibration | Harmonist | No |
@@ -322,7 +322,7 @@ Speed, FE, heat, stability, and failure-strain changes are not yield. Stability 
     - Calibration: recipes whose calibrated component recycles back into the calibration input.
 - Recipe-count reductions are not allowed. No node lowers a recipe's authored input counts.
 - No saving effect may reduce an input to zero. Catalyst Efficiency stays below `100%`, and multi-lane savings still consume at least one catalyst per cycle.
-- A failure-recovery effect returns at most what the success route would produce from the same inputs.
+- A failure-recovery effect returns at most what the successful recipe would produce from the same inputs.
 
 ### Loop audit
 
@@ -437,24 +437,24 @@ Crushed items currently come only from ore and raw inputs. The strongest Bloomer
 | Node | Effect | Cost |
 |---|---|---|
 | **Flux Ledger** (root) | 10% Flux Rate: each eligible alloy craft banks 10% of one unit of its largest input, and a full unit is skipped on a later craft. | N |
-| +3% Flux Rate → **Reactive Flux** | Flux Rate doubled on direct-ingot routes. | S → H |
+| +3% Flux Rate → **Reactive Flux** | Flux Rate doubled on direct-ingot recipes. | S → H |
 | 8% increased Temperature Stability → **Recipe Lock** | Top automation accepts only the current recipe's inputs, in recipe ratio. | S → H |
 | 8% increased Stability → **Dross Skimming** | Failure outputs also refund one unit of the recipe's largest input. | S → H |
 | 5% reduced Energy Usage → **Heat Economy** | Warmup costs 30% less FE. | S → H |
 | ★ **Transmuter's Rate** (after Reactive Flux) | +12% Flux Rate; 25% less Processing Speed. | S |
 | ★ **Unbroken Pour** (after Recipe Lock) | Super Output Cadence 32; the count also resets on a failure. | S |
 
-**Blendwright** makes blend routes the safe, fast path. Introduces `BLEND_SPEED` and `BLEND_HEAT_REDUCTION`, and reuses `LEDGER_RATE`.
+**Blendwright** makes blend recipes the safe, fast path. Introduces `BLEND_SPEED` and `BLEND_HEAT_REDUCTION`, and reuses `LEDGER_RATE`.
 
 | Node | Effect | Cost |
 |---|---|---|
-| **Blend Reversal** (root) | A failed direct-ingot craft returns the blend its inputs would make through the blend route, never more. +25% Blend Speed; direct-ingot routes are 15% slower. | H |
+| **Blend Reversal** (root) | A failed direct-ingot craft returns the blend its inputs would make through the blend recipe, never more. +25% Blend Speed; direct-ingot recipes are 15% slower. | H |
 | +5% Blend Speed → **Cold Mixing** | +100 °C Blend Heat Reduction. | S → S |
-| 6% increased Processing Speed → **Blend Ledger** | Eligible blend routes feed an output ledger at 25% Ledger Rate. | S → S |
-| 8% increased Temperature Stability → **Tempered Crucible** | 40% more Temperature Stability on blend routes. | S → H |
+| 6% increased Processing Speed → **Blend Ledger** | Eligible blend recipes feed an output ledger at 25% Ledger Rate. | S → S |
+| 8% increased Temperature Stability → **Tempered Crucible** | 40% more Temperature Stability on blend recipes. | S → H |
 | 8% increased Stability → **Steady Supply** | Power-drop failure strain halved. | S → H |
 | ★ **Continuous Pour** (after Cold Mixing) | Back-to-back blend crafts skip re-warmup. | H |
-| ★ **Master Blend** (after Blend Ledger) | 100% more Ledger Rate; direct-ingot routes are disabled on this chassis. | S |
+| ★ **Master Blend** (after Blend Ledger) | 100% more Ledger Rate; direct-ingot recipes are disabled on this chassis. | S |
 
 ### Metal Press
 
@@ -595,7 +595,7 @@ Follow [Machine Guidelines](../reference/machine-guidelines.md): graphical state
     - generic catalog validation and the fixture ascendancies;
     - domain checks.
 3. **Loop safety:**
-    - eligibility field on the four new recipe types, with Super Output routed through the shared check;
+    - eligibility field on the four new recipe types, with Super Output going through the shared check;
     - loop audit in report mode, reading declared yield stats and behaviors;
     - fix or allowlist the known cycles, then turn the CI gate on.
 4. **Seals:** items, recipes, the `rngtech:ascendancy_seal_recipes_enabled` condition and its config key, the entry gate, and server actions for Ascend, choose, allocate, refund, and switch.

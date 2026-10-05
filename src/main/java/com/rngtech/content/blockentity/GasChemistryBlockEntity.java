@@ -54,7 +54,8 @@ import net.neoforged.neoforge.items.ItemStackHandler;
 import java.util.ArrayList;
 import java.util.List;
 
-public class GasChemistryBlockEntity extends BaseMachineBlockEntity implements MenuProvider, PurgeableFluidStorage {
+public class GasChemistryBlockEntity extends BaseMachineBlockEntity
+        implements MenuProvider, PurgeableFluidStorage, MachineInfoProvider {
     public static final int SLOT_PROCESS_INPUT = 0;
     public static final int SLOT_PROCESS_OUTPUT = 1;
     public static final int SLOT_HEAT_CORE = 0;
@@ -197,6 +198,9 @@ public class GasChemistryBlockEntity extends BaseMachineBlockEntity implements M
     private final IItemHandler emptyItemHandler = new EmptyItemHandler();
     private final IEnergyStorage consumerEnergyView = new ConsumerEnergyStorage();
     private final IEnergyStorage generatorEnergyView = new GeneratorEnergyStorage();
+    private final EnergyTelemetry energyFlow = new EnergyTelemetry(this::getLevel);
+    private final IEnergyStorage trackedGeneratorEnergyView = energyFlow.track(generatorEnergyView);
+    private final IEnergyStorage trackedConsumerEnergyView = energyFlow.track(consumerEnergyView);
     private final ContainerData menuData = new ContainerData() {
         @Override
         public int get(int index) {
@@ -273,7 +277,7 @@ public class GasChemistryBlockEntity extends BaseMachineBlockEntity implements M
         if (side == Direction.DOWN) {
             return null;
         }
-        return machine == GasChemistryMachine.SYNGAS_COMBUSTOR ? generatorEnergyView : consumerEnergyView;
+        return machine == GasChemistryMachine.SYNGAS_COMBUSTOR ? trackedGeneratorEnergyView : trackedConsumerEnergyView;
     }
 
     public IFluidHandler getFluidHandler(Direction side) {
@@ -308,7 +312,7 @@ public class GasChemistryBlockEntity extends BaseMachineBlockEntity implements M
                     waterTank::drain,
                     this::clearActiveRecipe,
                     this::setChanged
-            ));
+            ).withCapacity(waterTank::getCapacity));
         }
         if (hasInputGasTank()) {
             targets.add(FluidPurgeTarget.of(
@@ -319,7 +323,7 @@ public class GasChemistryBlockEntity extends BaseMachineBlockEntity implements M
                     inputTank::drain,
                     this::clearActiveRecipe,
                     this::setChanged
-            ));
+            ).withCapacity(inputTank::getCapacity));
         }
         targets.add(FluidPurgeTarget.of(
                 PURGE_OUTPUT_TANK,
@@ -328,7 +332,7 @@ public class GasChemistryBlockEntity extends BaseMachineBlockEntity implements M
                 outputTank::getFluid,
                 outputTank::drain,
                 this::setChanged
-        ));
+        ).withCapacity(outputTank::getCapacity));
         if (hasSecondaryOutputTank()) {
             targets.add(FluidPurgeTarget.of(
                     PURGE_SECONDARY_OUTPUT_TANK,
@@ -337,9 +341,87 @@ public class GasChemistryBlockEntity extends BaseMachineBlockEntity implements M
                     secondaryOutputTank::getFluid,
                     secondaryOutputTank::drain,
                     this::setChanged
-            ));
+            ).withCapacity(secondaryOutputTank::getCapacity));
         }
         return List.copyOf(targets);
+    }
+
+    @Override
+    public MachineInfoSnapshot machineInfo() {
+        int status = statusCode();
+        boolean generator = machine == GasChemistryMachine.SYNGAS_COMBUSTOR;
+        int energyDelta = hasEnergyRateStatus(status, generator) ? currentEnergyDelta() : 0;
+        AdjacentEnergyConnector.Info connector = generator
+                ? AdjacentEnergyConnector.forSource(level, worldPosition)
+                : AdjacentEnergyConnector.forSink(level, worldPosition);
+        return MachineInfoSnapshot.builder(machine.blockId())
+                .stage(machine.stage())
+                .state(
+                        MachineInfoSnapshot.workState(
+                                status == STATUS_READY,
+                                isActive(),
+                                status == STATUS_NO_FLUID || status == STATUS_NO_INPUT
+                        ),
+                        MachineInfoSnapshot.BlockedReason.NONE
+                )
+                .status(statusKey(status))
+                .progress(progress, activeTicks)
+                .energy(energyStored(), energyCapacity(), generator ? energyDelta : -energyDelta)
+                .energyTelemetry(
+                        energyFlow.lastInput(),
+                        energyFlow.lastOutput(),
+                        connector.transferRate(),
+                        generator && connector.present() && energyDelta > connector.transferRate()
+                                ? MachineInfoSnapshot.EnergyBottleneck.CONNECTOR_OUTPUT
+                                : MachineInfoSnapshot.EnergyBottleneck.NONE
+                )
+                .gear(gearSummary())
+                .output(outputSummary(status))
+                .refinement(machineTraits())
+                .build();
+    }
+
+    private static boolean hasEnergyRateStatus(int status, boolean generator) {
+        return status == STATUS_READY || (!generator && status == STATUS_NO_POWER);
+    }
+
+    private static String statusKey(int status) {
+        String name = switch (status) {
+            case STATUS_MISSING_HEAT_CORE -> "no_heat_core";
+            case STATUS_MISSING_CATALYST -> "no_catalyst";
+            case STATUS_NO_RECIPE -> "no_recipe";
+            case STATUS_NO_POWER -> "no_power";
+            case STATUS_ENERGY_FULL -> "energy_full";
+            case STATUS_OUTPUT_FULL -> "output_full";
+            case STATUS_NO_FLUID -> "no_fluid";
+            case STATUS_NO_INPUT -> "no_input";
+            default -> "";
+        };
+        return name.isEmpty() ? "" : "rngtech.gas_chemistry.status." + name;
+    }
+
+    private MachineInfoSnapshot.GearSummary gearSummary() {
+        if (hasHeatCoreGearSlot()) {
+            return isHeatCore(heatCoreStack())
+                    ? MachineInfoSnapshot.GearSummary.HEAT_CORE_INSTALLED
+                    : MachineInfoSnapshot.GearSummary.MISSING_HEAT_CORE;
+        }
+        return batteryCellStorage() != null
+                ? MachineInfoSnapshot.GearSummary.BATTERY_CELL_INSTALLED
+                : MachineInfoSnapshot.GearSummary.NONE;
+    }
+
+    private static MachineInfoSnapshot.OutputSummary outputSummary(int status) {
+        return switch (status) {
+            case STATUS_OUTPUT_FULL -> MachineInfoSnapshot.OutputSummary.OUTPUT_FULL;
+            case STATUS_ENERGY_FULL -> MachineInfoSnapshot.OutputSummary.ENERGY_FULL;
+            default -> MachineInfoSnapshot.OutputSummary.NONE;
+        };
+    }
+
+    private boolean isActive() {
+        BlockState state = getBlockState();
+        return state.hasProperty(BaseMachineBlock.ACTIVE) && state.getValue(BaseMachineBlock.ACTIVE);
     }
 
     @Override
@@ -713,6 +795,7 @@ public class GasChemistryBlockEntity extends BaseMachineBlockEntity implements M
             int offered = extractEnergyInternal(remaining, true);
             int received = target.receiveEnergy(offered, false);
             int delivered = extractEnergyInternal(received, false);
+            energyFlow.recordOutput(delivered);
             remaining -= delivered;
             moved |= delivered > 0;
         }

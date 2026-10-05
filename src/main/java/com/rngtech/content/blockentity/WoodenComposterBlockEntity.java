@@ -41,7 +41,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public class WoodenComposterBlockEntity extends BlockEntity implements MenuProvider, PurgeableFluidStorage {
+public class WoodenComposterBlockEntity extends BlockEntity
+        implements MenuProvider, PurgeableFluidStorage, MachineInfoProvider {
     public static final int INPUT_SLOT_COUNT = 27;
     public static final int SLOT_OUTPUT = 27;
     public static final int SLOT_WATER_INPUT_CONTAINER = 28;
@@ -187,7 +188,36 @@ public class WoodenComposterBlockEntity extends BlockEntity implements MenuProvi
                 waterTank::getFluid,
                 waterTank::drain,
                 this::setChanged
-        ));
+        ).withCapacity(waterTank::getCapacity));
+    }
+
+    @Override
+    public MachineInfoSnapshot machineInfo() {
+        int status = statusCode();
+        return MachineInfoSnapshot.builder("wooden_composter")
+                .state(
+                        MachineInfoSnapshot.workState(
+                                status == STATUS_READY || status == STATUS_COMPOSTING,
+                                status == STATUS_COMPOSTING,
+                                status == STATUS_NO_INPUT
+                        ),
+                        MachineInfoSnapshot.BlockedReason.NONE
+                )
+                .status(statusKey(status))
+                .progress(progress, currentRequiredTicks())
+                .output(status == STATUS_OUTPUT_FULL
+                        ? MachineInfoSnapshot.OutputSummary.OUTPUT_FULL
+                        : MachineInfoSnapshot.OutputSummary.NONE)
+                .build();
+    }
+
+    private static String statusKey(int status) {
+        String name = switch (status) {
+            case STATUS_OUTPUT_FULL -> "output_full";
+            case STATUS_NO_INPUT -> "no_input";
+            default -> "";
+        };
+        return name.isEmpty() ? "" : "rngtech.wooden_composter.status." + name;
     }
 
     public static boolean isCompostable(ItemStack stack) {

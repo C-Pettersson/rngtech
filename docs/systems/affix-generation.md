@@ -178,7 +178,7 @@ Most current rollable stat effects use the shared percent tier table above:
 | `OUTPUT_AMOUNT` | Suffix | `INCREASED_PERCENT` | Shared percent table |
 | `INPUT_SLOTS` / fuel slots | Suffix | `ADD` | Flat slot table |
 | Battery Chassis Charged Storage | Prefix | `MORE ENERGY_CAPACITY` | Untiered fixed `2.0x` multiplier after `10` minutes with stored energy |
-| Battery Chassis Balance Mode | Prefix | Behavioral `CHARGE_BALANCER` | Single-tier routing behavior; fills and drains installed cells evenly |
+| Battery Chassis Balance Mode | Prefix | Behavioral `CHARGE_BALANCER` | Single-tier charge-balancing behavior; fills and drains installed cells evenly |
 | Battery Chassis Additional Battery Slots | Prefix | `ADD BATTERY_SLOTS` | Battery Chassis slot table |
 | `ENERGY_GENERATION` flat | Prefix | `ADD` | Flat generation table |
 | `ENERGY_GENERATION` | Suffix | `INCREASED_PERCENT` | Shared percent table |

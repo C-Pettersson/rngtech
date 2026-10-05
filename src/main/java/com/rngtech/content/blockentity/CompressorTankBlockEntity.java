@@ -51,7 +51,8 @@ import net.neoforged.neoforge.items.ItemStackHandler;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CompressorTankBlockEntity extends BaseMachineBlockEntity implements MenuProvider, PurgeableFluidStorage {
+public class CompressorTankBlockEntity extends BaseMachineBlockEntity
+        implements MenuProvider, PurgeableFluidStorage, MachineInfoProvider {
     public static final int SLOT_FLUID_INPUT_CONTAINER = 0;
     public static final int SLOT_FLUID_OUTPUT_CONTAINER = 1;
     public static final int PROCESS_SLOT_COUNT = 2;
@@ -166,6 +167,8 @@ public class CompressorTankBlockEntity extends BaseMachineBlockEntity implements
             true
     );
     private final IEnergyStorage energyStorage = new CompressorTankEnergyStorage();
+    private final EnergyTelemetry energyFlow = new EnergyTelemetry(this::getLevel);
+    private final IEnergyStorage trackedEnergyStorage = energyFlow.track(energyStorage);
     private final IFluidHandler fluidHandler = new OrdinaryFluidHandler();
     private final ContainerData menuData = new ContainerData() {
         @Override
@@ -267,7 +270,7 @@ public class CompressorTankBlockEntity extends BaseMachineBlockEntity implements
     }
 
     public IEnergyStorage getEnergyStorage(Direction side) {
-        return supportsCompression() ? energyStorage : null;
+        return supportsCompression() ? trackedEnergyStorage : null;
     }
 
     public IFluidHandler getFluidHandler(Direction side) {
@@ -284,7 +287,7 @@ public class CompressorTankBlockEntity extends BaseMachineBlockEntity implements
                 looseTank::getFluid,
                 looseTank::drain,
                 this::setChanged
-        ));
+        ).withCapacity(looseTank::getCapacity));
         if (supportsCompression()) {
             targets.add(FluidPurgeTarget.of(
                     PURGE_COMPRESSED_TANK,
@@ -293,9 +296,63 @@ public class CompressorTankBlockEntity extends BaseMachineBlockEntity implements
                     this::getCompressedFluid,
                     this::purgeCompressedFluid,
                     this::setChanged
-            ));
+            ).withCapacity(this::compressedEquivalentCapacity));
         }
         return List.copyOf(targets);
+    }
+
+    @Override
+    public MachineInfoSnapshot machineInfo() {
+        MachineStatAccumulator stats = effectiveStats();
+        int status = statusCode(stats);
+        int energyDemand = status == STATUS_READY || status == STATUS_NO_POWER ? compressionEnergyDemand(stats) : 0;
+        AdjacentEnergyConnector.Info connector = AdjacentEnergyConnector.forSink(level, worldPosition);
+        return MachineInfoSnapshot.builder("compressor_tank")
+                .stage(material().stage())
+                .state(
+                        MachineInfoSnapshot.workState(
+                                status == STATUS_READY,
+                                getBlockState().getValue(BaseMachineBlock.ACTIVE),
+                                status == STATUS_NO_FLUID || status == STATUS_PLAIN_TANK
+                        ),
+                        MachineInfoSnapshot.BlockedReason.NONE
+                )
+                .status(statusKey(status))
+                .energy(energyStored(), energyCapacity(), -energyDemand)
+                .energyTelemetry(energyFlow.lastInput(), energyFlow.lastOutput(), connector.transferRate(), MachineInfoSnapshot.EnergyBottleneck.NONE)
+                .gear(gearSummary())
+                .output(status == STATUS_COMPRESSED_FULL
+                        ? MachineInfoSnapshot.OutputSummary.OUTPUT_FULL
+                        : MachineInfoSnapshot.OutputSummary.NONE)
+                .refinement(machineTraits())
+                .build();
+    }
+
+    private int compressionEnergyDemand(MachineStatAccumulator stats) {
+        int amount = Math.min(looseTank.getFluidAmount(), Math.min(compressedRemaining(), effectiveCompressionRate(stats)));
+        return energyCost(amount, adjustedCompressFePerBucket(stats));
+    }
+
+    private MachineInfoSnapshot.GearSummary gearSummary() {
+        if (!supportsCompression()) {
+            return MachineInfoSnapshot.GearSummary.NONE;
+        }
+        return hasBatteryCell()
+                ? MachineInfoSnapshot.GearSummary.BATTERY_CELL_INSTALLED
+                : MachineInfoSnapshot.GearSummary.MISSING_BATTERY_CELL;
+    }
+
+    private static String statusKey(int status) {
+        String name = switch (status) {
+            case STATUS_PLAIN_TANK -> "plain_tank";
+            case STATUS_NO_FLUID -> "no_fluid";
+            case STATUS_COMPRESSED_FULL -> "compressed_full";
+            case STATUS_MISSING_BATTERY_CELL -> "missing_battery_cell";
+            case STATUS_MISSING_SERVO -> "missing_servo";
+            case STATUS_NO_POWER -> "no_power";
+            default -> "";
+        };
+        return name.isEmpty() ? "" : "rngtech.compressor_tank.status." + name;
     }
 
     @Override

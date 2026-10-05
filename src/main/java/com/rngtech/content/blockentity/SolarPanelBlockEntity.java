@@ -23,7 +23,7 @@ import net.neoforged.neoforge.energy.IEnergyStorage;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.ItemStackHandler;
 
-public class SolarPanelBlockEntity extends BaseMachineBlockEntity {
+public class SolarPanelBlockEntity extends BaseMachineBlockEntity implements MachineInfoProvider {
     public static final int STATUS_CLEAR = 0;
     public static final int STATUS_WEATHER = 1;
     public static final int STATUS_NIGHT = 2;
@@ -40,6 +40,8 @@ public class SolarPanelBlockEntity extends BaseMachineBlockEntity {
     private final ItemStackHandler emptyInventory = new ItemStackHandler(0);
     private final IItemHandler emptyItemHandler = new EmptyItemHandler();
     private final IEnergyStorage energyStorage = new PanelEnergyStorage();
+    private final EnergyTelemetry energyFlow = new EnergyTelemetry(this::getLevel);
+    private final IEnergyStorage trackedEnergyStorage = energyFlow.track(energyStorage);
     private int internalEnergy;
     private double generationCarry;
     private long lastControlledTick = Long.MIN_VALUE;
@@ -67,7 +69,7 @@ public class SolarPanelBlockEntity extends BaseMachineBlockEntity {
     }
 
     public IEnergyStorage getEnergyStorage(Direction side) {
-        return energyStorage;
+        return trackedEnergyStorage;
     }
 
     @Override
@@ -166,6 +168,59 @@ public class SolarPanelBlockEntity extends BaseMachineBlockEntity {
         return RNGTechConfig.SOLAR_GENERATES_IN_OTHER_DIMENSIONS.get();
     }
 
+    @Override
+    public MachineInfoSnapshot machineInfo() {
+        MachineStatAccumulator stats = effectiveStats();
+        int status = infoStatus(stats);
+        boolean controlled = level != null && isControlled(level);
+        AdjacentEnergyConnector.Info connector = AdjacentEnergyConnector.forSource(level, worldPosition);
+        return MachineInfoSnapshot.builder("solar_panel")
+                .stage(material().stage())
+                .state(
+                        MachineInfoSnapshot.workState(
+                                status == STATUS_CLEAR,
+                                getBlockState().getValue(BaseMachineBlock.ACTIVE),
+                                status == STATUS_WEATHER || status == STATUS_NIGHT || status == STATUS_FULL
+                        ),
+                        MachineInfoSnapshot.BlockedReason.NONE
+                )
+                .status(statusKey(status))
+                .energy(
+                        internalEnergyStored(stats),
+                        energyCapacity(stats),
+                        controlled || status == STATUS_FULL ? 0 : currentGeneration(stats)
+                )
+                .energyTelemetry(energyFlow.lastInput(), energyFlow.lastOutput(), connector.transferRate(), MachineInfoSnapshot.EnergyBottleneck.NONE)
+                .output(status == STATUS_FULL
+                        ? MachineInfoSnapshot.OutputSummary.ENERGY_FULL
+                        : MachineInfoSnapshot.OutputSummary.NONE)
+                .refinement(machineTraits())
+                .build();
+    }
+
+    private int infoStatus(MachineStatAccumulator stats) {
+        if (level == null) {
+            return STATUS_NO_SKY;
+        }
+        int status = sunlightStatus(level, worldPosition);
+        if (isDaylightStatus(status) && internalEnergyStored(stats) >= energyCapacity(stats)) {
+            return STATUS_FULL;
+        }
+        return status;
+    }
+
+    private static String statusKey(int status) {
+        String name = switch (status) {
+            case STATUS_WEATHER -> "weather";
+            case STATUS_NIGHT -> "night";
+            case STATUS_NO_SKY -> "blocked";
+            case STATUS_BAD_DIMENSION -> "dimension";
+            case STATUS_FULL -> "full";
+            default -> "";
+        };
+        return name.isEmpty() ? "" : "rngtech.solar.status." + name;
+    }
+
     public int energyStored() {
         return internalEnergyStored(effectiveStats());
     }
@@ -238,6 +293,7 @@ public class SolarPanelBlockEntity extends BaseMachineBlockEntity {
             int offered = extractEnergyInternal(remainingOutput, stats, true);
             int received = target.receiveEnergy(offered, false);
             int delivered = extractEnergyInternal(received, stats, false);
+            energyFlow.recordOutput(delivered);
             remainingOutput -= delivered;
             exported |= delivered > 0;
         }

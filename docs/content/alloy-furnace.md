@@ -10,7 +10,7 @@ Resource ids:
 
 ## Summary
 
-The Alloy Furnace is an FE-powered mixing machine for alloy blend and direct-ingot routes. It consumes exact counted ratios from up to four input slots and outputs either material blend items or finished alloy ingots. Early access paths are deliberately slow, lossy, and additive-heavy, while stronger Alloy Furnace setups unlock cleaner direct-ingot routes. The machine reports recipe FE/t demand; external FE intake is limited by free buffer or installed-cell space plus the source or attached Universal Connector.
+The Alloy Furnace is an FE-powered mixing machine for alloy blend and direct-ingot recipes. It consumes exact counted ratios from up to four input slots and outputs either material blend items or finished alloy ingots. Early access paths are deliberately slow, lossy, and additive-heavy, while stronger Alloy Furnace setups unlock cleaner direct-ingot recipes. The machine reports recipe FE/t demand; external FE intake is limited by free buffer or installed-cell space plus the source or attached Universal Connector.
 
 Bronze is the first Alloy Furnace tier. Higher chassis and crucibles improve heat transfer, processing speed, stability, heat control, and active input slots through authored base stat catalogs.
 
@@ -85,15 +85,15 @@ Alloy Furnace recipes use counted, orderless ingredients:
 
 Alloy Furnace recipes may also declare `failure_output`, `failure_material`, `power_sensitive`, and `bonus_output`. `bonus_output` defaults to `true`; set it to `false` to turn off Super Output for a recipe that could otherwise form a loop. Processing waits for live heat to reach `target_temperature`, which defaults to `minimum_temperature`. Stage 4+ recipes with a failure output use the shared `6000` failure-strain threshold instead of hard-failing on stability after work starts. `power_sensitive: true` means empty FE after progress starts adds strain; empty FE during warmup only pauses and cools the machine.
 
-The first Bronze path is a shapeless blend recipe outside the Alloy Furnace: `3` Copper Dust, `1` Tin Dust, and `1` Coal Dust make `2` Bronze Blend. Furnace recipes smelt Bronze Blend into Bronze Ingots. Once the Bronze Alloy Furnace setup is built, its three-slot Bronze Alloy Crucible can make `3` Bronze Blend from `3` Copper Dust, `1` Tin Dust, and `1` Charcoal at `900` heat. The later direct-ingot Bronze route makes `4` Bronze Ingots from `3` Copper Ingots, `1` Tin Ingot, and `1` Charcoal at `1100` heat.
+The first Bronze path is a shapeless blend recipe outside the Alloy Furnace: `3` Copper Dust, `1` Tin Dust, and `1` Coal Dust make `2` Bronze Blend. Furnace recipes smelt Bronze Blend into Bronze Ingots. Once the Bronze Alloy Furnace setup is built, its three-slot Bronze Alloy Crucible can make `3` Bronze Blend from `3` Copper Dust, `1` Tin Dust, and `1` Charcoal at `900` heat. The later direct-ingot Bronze recipe makes `4` Bronze Ingots from `3` Copper Ingots, `1` Tin Ingot, and `1` Charcoal at `1100` heat.
 
-Steel has a Stage 3 bootstrap route that runs in full Bronze Alloy Furnace gear and outputs Steel Blend from Iron Dust, Coal, and Charcoal at `900` heat over `1800` ticks for `36,000 FE`. Higher-heat Steel routes use Coal Dust or direct Iron Ingot inputs: Iron Dust, Coal Dust, and Charcoal make Steel Blend at `1100` heat over `1200` ticks for `24,000 FE`; Iron Ingot, Coal Dust, and Charcoal make a Steel Ingot at `1100` heat over `1800` ticks for `36,000 FE`; and Iron Ingot plus Coal makes a Steel Ingot at `1300` heat over `1200` ticks for `24,000 FE`.
+Steel has a Stage 3 bootstrap recipe that runs in full Bronze Alloy Furnace gear and outputs Steel Blend from Iron Dust, Coal, and Charcoal at `900` heat over `1800` ticks for `36,000 FE`. Higher-heat Steel recipes use Coal Dust or direct Iron Ingot inputs: Iron Dust, Coal Dust, and Charcoal make Steel Blend at `1100` heat over `1200` ticks for `24,000 FE`; Iron Ingot, Coal Dust, and Charcoal make a Steel Ingot at `1100` heat over `1800` ticks for `36,000 FE`; and Iron Ingot plus Coal makes a Steel Ingot at `1300` heat over `1200` ticks for `24,000 FE`.
 
-Invar keeps its existing direct-ingot Alloy Furnace routes.
+Invar keeps its existing direct-ingot Alloy Furnace recipes.
 
-Sparksteel and Arclite are Stage 4 direct-ingot pressure routes. They use ingots plus Redstone, run slowly at `1200` ticks and `24,000 FE`, and output `1` alloy ingot so the first downstream coils, circuits, and Titanium infrastructure are reachable without adding alloy dust progression.
+Sparksteel and Arclite are Stage 4 direct-ingot recipes. They use ingots plus Redstone, run slowly at `1200` ticks and `24,000 FE`, and output `1` alloy ingot so the first downstream coils, circuits, and Titanium infrastructure are reachable without adding alloy dust progression.
 
-Higher direct-ingot recipes make Aethergold from Tin, Silver, and Glowstone Dust; Nullite from Lead, Platinum, and Ender Pearls; and Tungstensteel from Tungsten, Steel, and Coal Dust. These late routes are intentionally slower and lossy compared with ordinary metal processing, and failure-bearing recipes output material-marked `rngtech:malformed_ingot` recovery stacks rather than ordinary progression inputs.
+Higher direct-ingot recipes make Aethergold from Tin, Silver, and Glowstone Dust; Nullite from Lead, Platinum, and Ender Pearls; and Tungstensteel from Tungsten, Steel, and Coal Dust. These late recipes are intentionally slower and lossy compared with ordinary metal processing, and failure-bearing recipes output material-marked `rngtech:malformed_ingot` recovery stacks rather than ordinary progression inputs.
 
 Bronze Blend and Steel Blend are default progression items and are tagged as `rngtech:alloy_blend_smeltables` so Bronze Furnace's `ALLOY_BLEND` behavior applies to their Furnace recipes. Invar Blend and Sparksteel Blend remain hidden compatibility ids with no default survival recipes.
 
@@ -118,10 +118,10 @@ Status: Prototype
 
 Alloy Furnace machines choose between Metallurgist and Blendwright when they use their first Ascendancy Seal. [Machine Mastery](../systems/machine-mastery.md#ascendancies) defines Seals, points, refunds, and switching, and [Machine Stats](../reference/machine-stats.md#ascendancy-stats) defines the new stats. The tables below are generated from the ascendancy catalog.
 
-- Metallurgist banks Flux toward skipping a unit of an alloy’s largest ingredient, first on a tie. Only an ingredient that needs two or more units is saved, so no input reaches zero. Reactive Flux doubles the Flux Rate on direct-ingot routes.
+- Metallurgist banks Flux toward skipping a unit of an alloy’s largest ingredient, first on a tie. Only an ingredient that needs two or more units is saved, so no input reaches zero. Reactive Flux doubles the Flux Rate on direct-ingot recipes.
 - Recipe Lock limits top automation to the current recipe’s inputs in recipe ratio. Dross Skimming refunds one unit of the recipe’s largest input on a failure.
-- Blendwright favors blend routes. Blend Reversal returns the blend whose furnace smelt makes a failed direct route’s ingot, never more than the direct route would make, and makes direct-ingot routes 15% slower.
-- Master Blend disables direct-ingot routes on its chassis; the Process tab shows a route-disabled status for them.
+- Blendwright favors blend recipes. Blend Reversal returns the blend whose furnace smelt makes a failed direct-ingot recipe’s ingot, never more than that recipe would make, and makes direct-ingot recipes 15% slower.
+- Master Blend disables direct-ingot recipes on its chassis; the Process tab shows a recipe-disabled status for them.
 - The Process tab draws the Flux or blend ledger under the progress bar.
 
 <!-- ascendancy-trees:start -->
@@ -132,7 +132,7 @@ Alloy Furnace machines choose between Metallurgist and Blendwright when they use
 |---|---|---|---|
 | **Flux Ledger** | Root | — | +10% Flux Rate. |
 | Fluxed Charge | Small | Flux Ledger | +3% Flux Rate. |
-| **Reactive Flux** | Notable | Fluxed Charge | Flux Rate is doubled on direct-ingot routes. |
+| **Reactive Flux** | Notable | Fluxed Charge | Flux Rate is doubled on direct-ingot recipes. |
 | Rich Flux | Small | Reactive Flux | +3% Flux Rate. |
 | **Transmuter’s Rate** | Deep notable | Rich Flux | +12% Flux Rate; 25% less Processing Speed. |
 | Steady Measure | Small | Flux Ledger | 8% increased Temperature Stability. |
@@ -148,7 +148,7 @@ Alloy Furnace machines choose between Metallurgist and Blendwright when they use
 
 | Node | Type | After | Effect |
 |---|---|---|---|
-| **Blend Reversal** | Root | — | +25% Blend Speed. A failed direct-ingot craft returns the blend its inputs would make, never more. Direct-ingot routes are 15% slower. |
+| **Blend Reversal** | Root | — | +25% Blend Speed. A failed direct-ingot craft returns the blend its inputs would make, never more. Direct-ingot recipes are 15% slower. |
 | Quick Blend | Small | Blend Reversal | +5% Blend Speed. |
 | **Cold Mixing** | Notable | Quick Blend | +100 °C Blend Heat Reduction. |
 | Warm Mix | Small | Cold Mixing | +5% Blend Speed. |
@@ -156,9 +156,9 @@ Alloy Furnace machines choose between Metallurgist and Blendwright when they use
 | Steady Pace | Small | Blend Reversal | 6% increased Processing Speed. |
 | **Blend Ledger** | Notable | Steady Pace | +25% Ledger Rate. |
 | Measured Pace | Small | Blend Ledger | 6% increased Processing Speed. |
-| **Master Blend** | Deep notable | Measured Pace | 100% more Ledger Rate. Direct-ingot routes are disabled. |
+| **Master Blend** | Deep notable | Measured Pace | 100% more Ledger Rate. Direct-ingot recipes are disabled. |
 | Even Heat | Small | Blend Reversal | 8% increased Temperature Stability. |
-| **Tempered Crucible** | Notable | Even Heat | 40% more Temperature Stability on blend routes. |
+| **Tempered Crucible** | Notable | Even Heat | 40% more Temperature Stability on blend recipes. |
 | Sure Footing | Small | Blend Reversal | 8% increased Stability. |
 | **Steady Supply** | Notable | Sure Footing | Power-drop failure strain is halved. |
 

@@ -53,7 +53,7 @@ public final class AscendancyFormulas {
         return 1.0 + Math.min(cap, Math.max(0.0, stats.value(MachineStat.OVERDRIVE_SPEED)) * over / 10.0) / 100.0;
     }
 
-    /** Units of the largest input banked by Flux for one alloy craft; Reactive Flux doubles it on direct-ingot routes. */
+    /** Units of the largest input banked by Flux for one alloy craft; Reactive Flux doubles it on direct-ingot recipes. */
     public static double fluxShare(MachineStatAccumulator stats, boolean doubled) {
         return Math.max(0.0, stats.value(MachineStat.FLUX_RATE)) / 100.0 * (doubled ? 2 : 1);
     }

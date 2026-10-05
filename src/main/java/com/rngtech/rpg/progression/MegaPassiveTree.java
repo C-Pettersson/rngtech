@@ -101,7 +101,7 @@ public final class MegaPassiveTree {
 
     /**
      * Returns the shortest run of unallocated nodes that connects {@code target} to the allocated graph, in allocation
-     * order. Foreign starts are never part of a route. Returns an empty list when the target is allocated or unreachable.
+     * order. Foreign starts are never part of a path. Returns an empty list when the target is allocated or unreachable.
      */
     public static List<MegaPassiveNode> allocationPath(Predicate<MegaPassiveNode> allocated, MegaPassiveNode target) {
         if (target == null || target.kind() == PassiveNodeKind.STARTER || allocated.test(target)) { return List.of(); }

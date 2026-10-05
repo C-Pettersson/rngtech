@@ -2141,10 +2141,10 @@
 <circle cx="4323" cy="5052" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Reserves (stored_momentum_1)</title></circle>
 <circle cx="4275" cy="5039" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Reserves (stored_momentum_2)</title></circle>
 <circle cx="4221" cy="5011" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Stored Momentum (stored_momentum)</title></circle>
-<circle cx="3606" cy="4971" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Charge Routing (reserve_channels_1)</title></circle>
-<circle cx="3662" cy="4988" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Charge Routing (reserve_channels_2)</title></circle>
+<circle cx="3606" cy="4971" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Charge Transfer (reserve_channels_1)</title></circle>
+<circle cx="3662" cy="4988" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Charge Transfer (reserve_channels_2)</title></circle>
 <circle cx="3716" cy="5012" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Reserve Channels (reserve_channels)</title></circle>
-<circle cx="3595" cy="5030" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Charge Routing (reserve_channels_3)</title></circle>
+<circle cx="3595" cy="5030" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Charge Transfer (reserve_channels_3)</title></circle>
 <circle cx="3604" cy="5088" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Internal Bus (internal_bus)</title></circle>
 <circle cx="3037" cy="3014" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Calibration (reference_gauges_1)</title></circle>
 <circle cx="3015" cy="2965" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Calibration (reference_gauges_2)</title></circle>
@@ -2407,12 +2407,12 @@
 <circle cx="6023" cy="4211" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Ember Keeper (ember_keeper)</title></circle>
 <circle cx="5960" cy="4255" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Fuel Economy (air_dampers_3)</title></circle>
 <circle cx="5887" cy="4234" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Fuel Economy (air_dampers_4)</title></circle>
-<circle cx="5400" cy="5182" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Charge Routing (recovery_bus_1)</title></circle>
-<circle cx="5467" cy="5217" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Charge Routing (recovery_bus_2)</title></circle>
+<circle cx="5400" cy="5182" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Charge Transfer (recovery_bus_1)</title></circle>
+<circle cx="5467" cy="5217" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Charge Transfer (recovery_bus_2)</title></circle>
 <circle cx="5481" cy="5292" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Recovery Bus (recovery_bus)</title></circle>
 <circle cx="5431" cy="5350" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Wide Busbars (wide_busbars)</title></circle>
-<circle cx="5355" cy="5347" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Charge Routing (recovery_bus_3)</title></circle>
-<circle cx="5310" cy="5286" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Charge Routing (recovery_bus_4)</title></circle>
+<circle cx="5355" cy="5347" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Charge Transfer (recovery_bus_3)</title></circle>
+<circle cx="5310" cy="5286" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Charge Transfer (recovery_bus_4)</title></circle>
 <circle cx="2289" cy="4788" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Insulation (vacuum_gaps_1)</title></circle>
 <circle cx="2237" cy="4799" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Insulation (vacuum_gaps_2)</title></circle>
 <circle cx="2184" cy="4801" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Vacuum Gaps (vacuum_gaps)</title></circle>
@@ -2532,11 +2532,11 @@
 <circle cx="3483" cy="3503" r="9" fill="#72bda7" stroke="#111820" stroke-width="3"><title>Control (fine_control_2)</title></circle>
 <circle cx="3493" cy="3575" r="9" fill="#72bda7" stroke="#111820" stroke-width="3"><title>Control (fine_control_3)</title></circle>
 <circle cx="3542" cy="3531" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Fine Control (fine_control)</title></circle>
-<circle cx="4487" cy="5763" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Charge Routing (cell_contacts_1)</title></circle>
-<circle cx="4487" cy="5816" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Charge Routing (cell_contacts_2)</title></circle>
+<circle cx="4487" cy="5763" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Charge Transfer (cell_contacts_1)</title></circle>
+<circle cx="4487" cy="5816" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Charge Transfer (cell_contacts_2)</title></circle>
 <circle cx="4476" cy="5868" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Cell Contacts (cell_contacts)</title></circle>
-<circle cx="4458" cy="5919" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Charge Routing (cell_contacts_3)</title></circle>
-<circle cx="4430" cy="5965" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Charge Routing (cell_contacts_4)</title></circle>
+<circle cx="4458" cy="5919" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Charge Transfer (cell_contacts_3)</title></circle>
+<circle cx="4430" cy="5965" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Charge Transfer (cell_contacts_4)</title></circle>
 <circle cx="4393" cy="6005" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Buffered Discharge (buffered_discharge)</title></circle>
 <circle cx="2117" cy="3805" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Regulation (setpoint_hold_1)</title></circle>
 <circle cx="2082" cy="3859" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Regulation (setpoint_hold_2)</title></circle>
@@ -2729,11 +2729,11 @@
 <circle cx="4807" cy="4660" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Long Grate (long_grate)</title></circle>
 <circle cx="4739" cy="4643" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Fuel Economy (deep_cell_tap_3)</title></circle>
 <circle cx="4709" cy="4579" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Fuel Economy (deep_cell_tap_4)</title></circle>
-<circle cx="3988" cy="5792" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Charge Routing (low_ohm_paths_1)</title></circle>
-<circle cx="3975" cy="5843" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Charge Routing (low_ohm_paths_2)</title></circle>
+<circle cx="3988" cy="5792" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Charge Transfer (low_ohm_paths_1)</title></circle>
+<circle cx="3975" cy="5843" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Charge Transfer (low_ohm_paths_2)</title></circle>
 <circle cx="3953" cy="5892" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Low Ohm Paths (low_ohm_paths)</title></circle>
-<circle cx="3922" cy="5937" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Charge Routing (low_ohm_paths_3)</title></circle>
-<circle cx="3884" cy="5975" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Charge Routing (low_ohm_paths_4)</title></circle>
+<circle cx="3922" cy="5937" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Charge Transfer (low_ohm_paths_3)</title></circle>
+<circle cx="3884" cy="5975" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Charge Transfer (low_ohm_paths_4)</title></circle>
 <circle cx="3839" cy="6005" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Split Feeds (split_feeds)</title></circle>
 <circle cx="3702" cy="2545" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Economy (frugal_circuits_1)</title></circle>
 <circle cx="3689" cy="2607" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Economy (frugal_circuits_2)</title></circle>

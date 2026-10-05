@@ -55,7 +55,8 @@ import net.neoforged.neoforge.energy.IEnergyStorage;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.ItemStackHandler;
 
-public class MetalPressBlockEntity extends BaseMachineBlockEntity implements MenuProvider, MachineMasteryHost {
+public class MetalPressBlockEntity extends BaseMachineBlockEntity
+        implements MenuProvider, MachineMasteryHost, MachineInfoProvider {
     public static final int SLOT_INPUT = 0;
     public static final int SLOT_OUTPUT = 1;
     public static final int PROCESS_SLOT_COUNT = 2;
@@ -183,6 +184,8 @@ public class MetalPressBlockEntity extends BaseMachineBlockEntity implements Men
     private final IItemHandler inputHandler = new ProcessItemHandler(SLOT_INPUT, true, false);
     private final IItemHandler outputHandler = new ProcessItemHandler(SLOT_OUTPUT, false, true);
     private final IEnergyStorage energyStorage = new PressEnergyStorage();
+    private final EnergyTelemetry energyFlow = new EnergyTelemetry(this::getLevel);
+    private final IEnergyStorage trackedEnergyStorage = energyFlow.track(energyStorage);
     private final ContainerData menuData = new ContainerData() {
         @Override
         public int get(int index) {
@@ -394,7 +397,7 @@ public class MetalPressBlockEntity extends BaseMachineBlockEntity implements Men
     }
 
     public IEnergyStorage getEnergyStorage(Direction side) {
-        return energyStorage;
+        return trackedEnergyStorage;
     }
 
     @Override
@@ -411,6 +414,71 @@ public class MetalPressBlockEntity extends BaseMachineBlockEntity implements Men
     @Override
     protected ItemStackHandler getMachineInventory() {
         return processInventory;
+    }
+
+    @Override
+    public MachineInfoSnapshot machineInfo() {
+        MetalPressRecipe recipe = nextRecipe();
+        MachineStatAccumulator stats = routeStats(recipe, effectiveStats());
+        int status = statusCode(recipe, stats);
+        AdjacentEnergyConnector.Info connector = AdjacentEnergyConnector.forSink(level, worldPosition);
+        return MachineInfoSnapshot.builder("metal_press")
+                .state(
+                        MachineInfoSnapshot.workState(
+                                status == STATUS_READY || status == STATUS_WARMING,
+                                getBlockState().getValue(BaseMachineBlock.ACTIVE),
+                                status == STATUS_NO_INPUT
+                        ),
+                        MachineInfoSnapshot.BlockedReason.NONE
+                )
+                .status(
+                        statusKey(status),
+                        status == STATUS_WARMING ? currentTargetTemperature(recipe) : currentMinimumTemperature(recipe, stats)
+                )
+                .progress(progress, currentProcessingTicks(recipe, stats))
+                .energy(energyStored(), energyCapacity(), -energyDemand(status, recipe, stats))
+                .energyTelemetry(energyFlow.lastInput(), energyFlow.lastOutput(), connector.transferRate(), MachineInfoSnapshot.EnergyBottleneck.NONE)
+                .heat(currentTemperature, currentTargetTemperature(recipe))
+                .gear(hasHeatCore()
+                        ? MachineInfoSnapshot.GearSummary.HEAT_CORE_INSTALLED
+                        : MachineInfoSnapshot.GearSummary.MISSING_HEAT_CORE)
+                .output(status == STATUS_OUTPUT_FULL
+                        ? MachineInfoSnapshot.OutputSummary.OUTPUT_FULL
+                        : MachineInfoSnapshot.OutputSummary.NONE)
+                .refinement(machineTraits())
+                .build();
+    }
+
+    private int energyDemand(int status, MetalPressRecipe recipe, MachineStatAccumulator stats) {
+        if (recipe == null) {
+            return 0;
+        }
+        return switch (status) {
+            case STATUS_READY -> energyCostPerTick(recipe, stats) * batchJobs(recipe, stats);
+            case STATUS_WARMING, STATUS_NO_POWER -> energyCostPerTick(recipe, stats);
+            default -> 0;
+        };
+    }
+
+    private static String statusKey(int status) {
+        String name = switch (status) {
+            case STATUS_MISSING_HEAT_CORE -> "missing_heat_core";
+            case STATUS_MISSING_SERVO -> "missing_servo";
+            case STATUS_MISSING_MOLD -> "missing_mold";
+            case STATUS_NO_INPUT -> "no_input";
+            case STATUS_INVALID_RECIPE -> "invalid_recipe";
+            case STATUS_HEAT_LOW -> "heat_low";
+            case STATUS_HEAT_HIGH -> "heat_high";
+            case STATUS_STABILITY_LOW -> "stability_low";
+            case STATUS_OUTPUT_FULL -> "output_full";
+            case STATUS_NO_POWER -> "no_power";
+            case STATUS_POWER_DROP -> "power_drop";
+            case STATUS_WARMING -> "warming";
+            case STATUS_ROUTE_DISABLED -> "route_disabled";
+            case STATUS_SWAPPING_MOLD -> "swapping_mold";
+            default -> "";
+        };
+        return name.isEmpty() ? "" : "rngtech.press.status." + name;
     }
 
     @Override

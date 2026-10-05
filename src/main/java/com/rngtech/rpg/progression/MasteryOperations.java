@@ -135,7 +135,7 @@ public final class MasteryOperations {
         }
     }
 
-    /** Parses one node ID or a comma-separated route in allocation order. */
+    /** Parses one node ID or a comma-separated path in allocation order. */
     private static List<MegaPassiveNode> path(String value) {
         String[] ids = value.split(",", MegaPassiveTree.MAX_ALLOCATIONS + 1);
         if (ids.length > MegaPassiveTree.MAX_ALLOCATIONS) { return List.of(); }

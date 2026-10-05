@@ -1,3 +1,19 @@
+// NeoGradle's plugin classpath brings vulnerable library versions; these build-time-only constraints lift them.
+buildscript {
+    dependencies {
+        constraints {
+            classpath 'com.fasterxml.jackson.core:jackson-core:2.18.11'
+            classpath 'com.fasterxml.jackson.core:jackson-databind:2.18.11'
+            classpath 'com.google.guava:guava:33.7.2-jre'
+            classpath 'commons-io:commons-io:2.20.0'
+            classpath 'org.apache.commons:commons-compress:1.28.0'
+            classpath 'org.apache.commons:commons-lang3:3.20.0'
+            classpath 'org.apache.ivy:ivy:2.5.3'
+            classpath 'org.codehaus.plexus:plexus-utils:3.6.2'
+        }
+    }
+}
+
 plugins {
     id 'java-library'
     id 'idea'

@@ -58,7 +58,8 @@ import net.neoforged.neoforge.energy.IEnergyStorage;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.ItemStackHandler;
 
-public class ResonanceCalibratorBlockEntity extends BaseMachineBlockEntity implements MenuProvider, MachineMasteryHost {
+public class ResonanceCalibratorBlockEntity extends BaseMachineBlockEntity
+        implements MenuProvider, MachineMasteryHost, MachineInfoProvider {
     public static final int SLOT_INPUT = 0;
     public static final int SLOT_PATTERN = 1;
     public static final int SLOT_CATALYST = 2;
@@ -180,6 +181,8 @@ public class ResonanceCalibratorBlockEntity extends BaseMachineBlockEntity imple
     private final IItemHandler inputHandler = new AutomationInputHandler();
     private final IItemHandler outputHandler = new ProcessItemHandler(SLOT_OUTPUT, false, true);
     private final IEnergyStorage energyStorage = new CalibratorEnergyStorage();
+    private final EnergyTelemetry energyFlow = new EnergyTelemetry(this::getLevel);
+    private final IEnergyStorage trackedEnergyStorage = energyFlow.track(energyStorage);
     private final ContainerData menuData = new ContainerData() {
         @Override
         public int get(int index) {
@@ -331,7 +334,7 @@ public class ResonanceCalibratorBlockEntity extends BaseMachineBlockEntity imple
     }
 
     public IEnergyStorage getEnergyStorage(Direction side) {
-        return energyStorage;
+        return trackedEnergyStorage;
     }
 
     @Override
@@ -345,6 +348,50 @@ public class ResonanceCalibratorBlockEntity extends BaseMachineBlockEntity imple
     @Override
     protected ItemStackHandler getMachineInventory() {
         return processInventory;
+    }
+
+    @Override
+    public MachineInfoSnapshot machineInfo() {
+        MachineStatAccumulator stats = effectiveStats();
+        CalibrationRecipe recipe = nextRecipe();
+        int status = statusCode(recipe, stats);
+        int energyDemand = status == STATUS_READY || status == STATUS_NO_POWER ? energyCostPerTick(recipe, stats) : 0;
+        AdjacentEnergyConnector.Info connector = AdjacentEnergyConnector.forSink(level, worldPosition);
+        return MachineInfoSnapshot.builder("resonance_calibrator")
+                .stage(chassis().stage())
+                .state(
+                        MachineInfoSnapshot.workState(
+                                status == STATUS_READY,
+                                getBlockState().getValue(BaseMachineBlock.ACTIVE),
+                                status == STATUS_NO_INPUT
+                        ),
+                        MachineInfoSnapshot.BlockedReason.NONE
+                )
+                .status(statusKey(status))
+                .progress(progress, currentProcessingTicks(recipe, stats))
+                .energy(energyStored(), energyCapacity(), -energyDemand)
+                .energyTelemetry(energyFlow.lastInput(), energyFlow.lastOutput(), connector.transferRate(), MachineInfoSnapshot.EnergyBottleneck.NONE)
+                .output(status == STATUS_OUTPUT_FULL
+                        ? MachineInfoSnapshot.OutputSummary.OUTPUT_FULL
+                        : MachineInfoSnapshot.OutputSummary.NONE)
+                .refinement(machineTraits())
+                .build();
+    }
+
+    private static String statusKey(int status) {
+        String name = switch (status) {
+            case STATUS_MISSING_RESONANCE_COIL -> "missing_resonance_coil";
+            case STATUS_MISSING_CONTROL_BOARD -> "missing_control_board";
+            case STATUS_MISSING_PATTERN -> "missing_pattern";
+            case STATUS_MISSING_CATALYST -> "missing_catalyst";
+            case STATUS_NO_INPUT -> "no_input";
+            case STATUS_INVALID_RECIPE -> "invalid_recipe";
+            case STATUS_INSUFFICIENT_STAGE -> "insufficient_stage";
+            case STATUS_OUTPUT_FULL -> "output_full";
+            case STATUS_NO_POWER -> "no_power";
+            default -> "";
+        };
+        return name.isEmpty() ? "" : "rngtech.calibrator.status." + name;
     }
 
     @Override
