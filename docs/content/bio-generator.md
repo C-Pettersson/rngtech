@@ -101,14 +101,14 @@ Runtime behavior:
 
 Stage 0 Crusher recipes convert potatoes, carrots, and crushable non-seed plant biomass into `rngtech:organic_reagent`. Each Organic Reagent conversion is authored as `120 ticks` and `600 FE`.
 
-Seeds have a separate Stage 0 Crusher route into `rngtech:compost_feedstock`. One seed produces one Compost Feedstock over `16 ticks` for `80 FE`; Compost Feedstock is a Wooden Composter prepared input worth `2` compost units. That makes the pre-crush route energy-positive once the resulting Composted Biomass is burned:
+Seeds have a separate Stage 0 Crusher recipe into `rngtech:compost_feedstock`. One seed produces one Compost Feedstock over `16 ticks` for `80 FE`; Compost Feedstock is a Wooden Composter prepared input worth `2` compost units. That makes crushing seeds first energy-positive once the resulting Composted Biomass is burned:
 
-| Seed compost route | Result |
+| Seed compost chain | Result |
 |---|---:|
 | `8` seeds directly composted | `1` Composted Biomass = `1,600 FE` |
 | `8` seeds crushed first | `8` Compost Feedstock = `16` compost units = `2` Composted Biomass |
 | Crusher cost | `640 FE` |
-| Crushed route value after Crusher cost | `2,560 FE` |
+| Crushed-seed value after Crusher cost | `2,560 FE` |
 | Gain over direct composting | `960 FE` |
 
 At base energy stats, converting a potato or carrot into Organic Reagent is an energy-negative processing step before Bio Generator modifiers:

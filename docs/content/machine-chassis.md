@@ -27,7 +27,7 @@ Current runtime surface:
 - Implemented subtypes: `FURNACE`, `CRUSHER`, `WASHER`, and `SOLID_FUEL_BURNER`.
 - Tooltip: item-only chassis show subtype; Crusher and Furnace chassis blocks show material and component stage.
 - Creative tab: placed chassis and the Furnace, Washer, and solid-fuel subtype ingredients appear in the RNGTech creative tab. The Washer ingredient does not provide a working Washer machine.
-- Recipes: the item-only subtype ingredients and placed chassis blocks have crafting recipes. A craftable Washer chassis ingredient does not imply a working Washer machine. Crusher chassis recipes are standalone and route their base body pressure through the Machine Frame ladder or direct early-game materials instead of requiring another Crusher chassis.
+- Recipes: the item-only subtype ingredients and placed chassis blocks have crafting recipes. A craftable Washer chassis ingredient does not imply a working Washer machine. Crusher chassis recipes are standalone and draw their base body cost from the Machine Frame ladder or direct early-game materials instead of requiring another Crusher chassis.
 - Capabilities: item-only chassis have none. Placed Crusher, electric Furnace, and powered Component Recycler chassis expose block FE input and sided process-item automation.
 - RPG traits: no for item-only chassis ingredients; yes for placed Crusher, Furnace, and Component Recycler chassis blocks.
 - Refinement target: no for item-only chassis ingredients; yes for placed Crusher, Furnace, and Component Recycler chassis blocks and placed machines.

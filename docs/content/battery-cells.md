@@ -69,7 +69,7 @@ These values use a staged rechargeable battery ladder as the unmodified baseline
 | Invar Cell | 4 | `50,000 FE` | `512 FE/t` | `256 FE/t` | `1.02` | `0%/min` | `Insulated Cell`: high-density storage and good durability. |
 | Sparksteel Cell | 5 | `100,000 FE` | `1024 FE/t` | `512 FE/t` | `1.04` | `0.01%/min` | `Balanced Cell`: strong transfer and efficiency. |
 | Arclite Cell | 6 | `400,000 FE` | `2048 FE/t` | `1024 FE/t` | `0.99` | `0.02%/min` | `Signal Cell`: advanced throughput with mild leakage. |
-| Nullite Cell | 7 | `1,600,000 FE` | `4096 FE/t` | `2048 FE/t` | `1.02` | `0.02%/min` | `Phase Cell`: late-game storage and routing-friendly output. |
+| Nullite Cell | 7 | `1,600,000 FE` | `4096 FE/t` | `2048 FE/t` | `1.02` | `0.02%/min` | `Phase Cell`: late-game storage and high-rate output. |
 | Aethergold Cell | 7 | `1,200,000 FE` | `6144 FE/t` | `3072 FE/t` | `1.03` | `0%/min` | `Aetherburst Cell`: high-output transfer cell with no idle loss and lower capacity than Nullite. |
 | Exotic Cell | 8 | `10,000,000 FE` | `8192 FE/t` | `4096 FE/t` | `1.06` | `0%/min` | `Harmonic Cell`: pack-endgame capacity, high efficiency, no idle loss. |
 

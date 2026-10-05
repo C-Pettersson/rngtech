@@ -209,7 +209,7 @@ Rows without links are either current named affix families summarized in this ma
 | Input Filter | Prototype | Planned | Deferred | Out of scope | Crusher Feed Control prefixes narrow top automation insertion by valid recipe, output acceptance, output-bonus-bank compatibility, and dense-batch output acceptance. Broader input-filter modifiers remain planned. |
 | Input Pairing | Planned | Planned | Deferred | Out of scope | For bulk machines, processes matching items from paired slots together only when both sides are ready. |
 | Instant Process | Prototype | Prototype | Deferred | Out of scope | Rollable chance suffix for processing profiles. Powered machines require full adjusted craft FE up front; otherwise normal processing continues. |
-| Jam Bypass | Planned | Planned | Deferred | Out of scope | Routes compatible outputs to another active output slot if the preferred slot is blocked. |
+| Jam Bypass | Planned | Planned | Deferred | Out of scope | Sends compatible outputs to another active output slot if the preferred slot is blocked. |
 | Output Sorter | Planned | Planned | Deferred | Out of scope | Sends primary outputs and bonus or byproduct outputs to different active output slots. |
 | Overflow Guard | Prototype | Planned | Deferred | Out of scope | Implemented as fixed `OUTPUT_GUARD` identity on selected processing chassis and as the Crusher Frame prefix family for Crusher machines. |
 | Overclocked | Prototype | Prototype | Deferred | Out of scope | Rollable compound suffix for powered processing profiles. It increases processing speed and also increases energy usage in the shared `processing_speed` group. |

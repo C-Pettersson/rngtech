@@ -145,7 +145,7 @@ Furnace `machine_xp` is granted once per successful normal output-producing lane
 
 Dust-to-ingot Furnace recipes that pair with Crusher ingot-to-dust recipes set `bonus_output: false`. They still smelt normally, but Furnace Super Output cannot turn the reversible iron, copper, or tin conversion chain into an ingot source.
 
-Steel is intended to come through the Alloy Furnace route. Stage 3 Bronze Alloy Furnace gear can bootstrap Steel Blend from Iron Dust, Coal, and Charcoal flux, then Furnace recipes smelt Steel Blend into Steel Ingots. Higher-heat Alloy Furnace recipes can output Steel Blend more efficiently or output Steel Ingots directly. No default Furnace Steel Dust smelting path ships in the public data.
+Steel is intended to come from the Alloy Furnace. Stage 3 Bronze Alloy Furnace gear can bootstrap Steel Blend from Iron Dust, Coal, and Charcoal flux, then Furnace recipes smelt Steel Blend into Steel Ingots. Higher-heat Alloy Furnace recipes can output Steel Blend more efficiently or output Steel Ingots directly. No default Furnace Steel Dust smelting path ships in the public data.
 
 Current stat behavior:
 
@@ -169,7 +169,7 @@ Current stat behavior:
 
 ## Mastery
 
-Furnaces enter the [shared Machine Mastery tree](../systems/machine-mastery.md) at Drive / Reserve. Heat, throughput, efficiency, attributes, and behavior choices share routes with other machine families. Fuel-only effects are marked inactive on electric chassis, and FE effects are marked inactive on the primitive fuel chassis.
+Furnaces enter the [shared Machine Mastery tree](../systems/machine-mastery.md) at Drive / Reserve. Heat, throughput, efficiency, attributes, and behavior choices share paths with other machine families. Fuel-only effects are marked inactive on electric chassis, and FE effects are marked inactive on the primitive fuel chassis.
 
 Low Heat Specialist caps maximum temperature at 800 and grants 100% more Processing Speed. Flash Annealing caps it at 600, grants 100% more Processing Speed, and applies 50% more Energy Usage. Both speed bonuses are [tagged](../systems/machine-mastery.md#tagged-payoffs) for heated machines, so they reach the Furnace, Alloy Furnace, and Metal Press but not machines their heat caps cannot limit. A cap never raises a weaker heat source. Regulated Heat caps maximum temperature at 1000 with 80% more Temperature Stability. Kiln Discipline grants 60% more Temperature Stability with 40% more Warmup Time. Gear cannot override these absolute limits; the lower limit wins if several apply.
 

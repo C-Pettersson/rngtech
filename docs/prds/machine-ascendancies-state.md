@@ -93,8 +93,8 @@ Recorded 2026-09-30 for the Alloy Furnace, Metal Press, Resonance Calibrator, Me
     - Grove Warden: +2 managed cells before Ancient Grove, and 10% increased Growth Pulse before Verdant Surge.
 - **Alloy Furnace rules:**
     - Flux saves the ingredient with the largest count, first on a tie, and only one that needs at least two units, so no input reaches zero.
-    - Blend Reversal returns the blend whose furnace smelt makes the failed direct route's ingot, at most as many as the direct route would make.
-    - Recipe Lock limits top automation to the current recipe's inputs in recipe ratio. Master Blend disables direct-ingot routes and shows a route-disabled status.
+    - Blend Reversal returns the blend whose furnace smelt makes the failed direct-ingot recipe's ingot, at most as many as that recipe would make.
+    - Recipe Lock limits top automation to the current recipe's inputs in recipe ratio. Master Blend disables direct-ingot recipes and shows a recipe-disabled status.
 - **Metal Press rules:**
     - Recipes are classed by mold tag: `rngtech:plate_molds`, `gear_molds`, `casing_molds`, and `circuit_molds`.
     - Mold Rack picks the first installed mold that matches the input and pauses for the Mold Swap Time; Quick Change keeps heat during the swap.
@@ -112,7 +112,7 @@ Recorded 2026-09-30 for the Alloy Furnace, Metal Press, Resonance Calibrator, Me
     - Second Crucible and Triple Crucible run parallel melts; Fused Crucibles turns them into 30% more Processing Speed per job.
 - **Forestry Companion rules:**
     - The Log Ledger banks Ledger Rate of each harvested log and pays whole logs into output cargo when there is room. Leaf cleanup waits 25% longer per leaf.
-    - Clearcut Charter stops planting, waiting for saplings, and taking saplings from a station, and routes sapling drops to output cargo.
+    - Clearcut Charter stops planting, waiting for saplings, and taking saplings from a station, and sends sapling drops to output cargo.
     - Rolling Harvest keeps the cart moving after planting and through work cooldowns, and cuts a tree while it stays within 2 blocks of the rail. Cells it rolled past stay on its work list while within reach, and the cart halts only when the tree being cut, or a tree or empty cell still waiting for work, would leave reach at the next rail block, so rows are not skipped.
     - A growth pulse reaches each managed sapling at most once per 100 ticks. A pulse on a ready sapling that still cannot grow backs that cell off for 1,200 ticks.
     - Seed Library replants each cell's remembered species and leaves the cell empty until that sapling is in cargo.
@@ -121,7 +121,7 @@ Recorded 2026-09-30 for the Alloy Furnace, Metal Press, Resonance Calibrator, Me
 ## Findings
 
 - At PRD time only Crusher and Furnace recipes had a `bonus_output` opt-out, on 31 recipes: copper, iron, and tin ingot/dust conversions, blend smelting, and malformed-ingot nugget recovery. Slag Reclaim was changed to a speed and FE effect so it does not bypass the recovery opt-out.
-- Blend routes are one-way. Crushed items come only from ore and raw inputs.
+- Blend recipes are one-way. Crushed items come only from ore and raw inputs.
 - The calibrate-then-recycle item cycle found during planning was fixed in PR #14.
 - Calibrated components are not refinement targets, so the Potential Reactor pays nothing for them and the suspected Refinement Potential to FE cycle does not exist. The audit models the general case: stripping any recyclable machine or part.
 - Recycler Super Output was the main loop source. Recycling returns an item's own ingredients, so wherever the returns cover what the item cost, Super Output duplicated them. PR #15 on `main` removed recycler Super Output entirely.
@@ -157,7 +157,7 @@ Recorded 2026-09-30 for the Alloy Furnace, Metal Press, Resonance Calibrator, Me
     - Alloy Furnace and Metal Press recipes gained `bonus_output`, and JEI marks opted-out recipes. Every machine now applies Super Output and salvage through `ProcessingChance` with the recipe, instead of per-machine checks.
 - 2026-09-30, Phase 4 Seals:
     - Registered `rngtech:ascendancy_seal_1` to `_3` (`AscendancySealItem`, stack of 16, uncommon, rare, and epic) and the `rngtech:primed_seal_core` and `rngtech:lubricated_seal_core` intermediates. All have placeholder textures and creative tab entries.
-    - Six recipes, all gated by `rngtech:ascendancy_seal_recipes_enabled` and material conditions: two Component Assembler Seal Core recipes, two Seal I routes, and one each for Seals II and III.
+    - Six recipes, all gated by `rngtech:ascendancy_seal_recipes_enabled` and material conditions: two Component Assembler Seal Core recipes, two Seal I recipes, and one each for Seals II and III.
     - The `ascendancy.sealRecipesEnabled` common config key backs the condition and defaults to on.
     - Server actions in `MasteryOperations`: `ascend`, `choose_ascendancy`, `switch_ascendancy`, `allocate_ascendancy`, and `refund_ascendancy`.
     - Validation happens before payment, so a rejected action costs nothing. A Seal is taken from the player's inventory; creative players must carry it but keep it. A refund costs five Mastery Refunds (`AscendancyCatalog.REFUNDS_PER_NODE`).

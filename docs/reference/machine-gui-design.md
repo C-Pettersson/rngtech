@@ -419,7 +419,7 @@ Rules:
 
 ### Template E: Storage or battery machine
 
-Use for machines whose main purpose is storing, routing, or buffering energy/items/fluids.
+Use for machines whose main purpose is storing, transferring, or buffering energy/items/fluids.
 
 ```text
 Left lane:    input or accepted resource

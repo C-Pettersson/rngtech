@@ -45,7 +45,7 @@ const THEMES = {
         ["Slow Burn", "Banked Coals", "Clean Combustion", "Air Dampers", "Ember Keeper", "Fuel Metering", "Long Grate", "Charcoal Bed", "Lean Mixture", "Afterburner Loop", "Stoking Rhythm", "Coke Oven"]),
     reserves: theme("Reserves", ["ENERGY_CAPACITY", "INCREASED_PERCENT"], 3, 9, effect("RESERVE", 4, "ADD"),
         ["Frame Reservoir", "Buffer Laminate", "Massive Buffer", "Battery Shell", "Auxiliary Bank", "Deep Cells", "Capacitor Trace", "Copper Plates", "Stacked Cells", "Charge Vault", "Spare Capacity", "Reservoir Tanks"]),
-    chargeRouting: theme("Charge Routing", ["ENERGY_TRANSFER", "INCREASED_PERCENT"], 3, 9, effect("ENERGY_CAPACITY", 3),
+    chargeTransfer: theme("Charge Transfer", ["ENERGY_TRANSFER", "INCREASED_PERCENT"], 3, 9, effect("ENERGY_CAPACITY", 3),
         ["Reserve Channels", "Internal Bus", "Recovery Bus", "Wide Busbars", "Cell Contacts", "Buffered Discharge", "Low Ohm Paths", "Split Feeds", "Trunk Lines", "Relay Mesh", "Surge Gates", "Charge Ladders"]),
     powerSupply: theme("Power Supply", ["ENERGY_GENERATION", "INCREASED_PERCENT"], 2, 6, effect("FUEL_DURATION", 2),
         ["Induction Coils", "Dynamo Windings", "Field Magnets", "Turbine Blades", "Stator Rings", "Exciter Loop", "Generator Tuning", "Rotor Balance", "Phase Matching", "Peak Output", "Brush Contacts", "Armature Wrap"]),
@@ -85,7 +85,7 @@ const REGION_THEMES = {
     control_drive: ["fieldWork", "actuation", "precision"],
     drive: ["momentum", "hardness", "recovery", "drive"],
     drive_reserve: ["thermalReach", "heatFlow", "startup", "fuelEconomy"],
-    reserve: ["reserves", "chargeRouting", "powerSupply", "conservation", "reserve"],
+    reserve: ["reserves", "chargeTransfer", "powerSupply", "conservation", "reserve"],
     reserve_control: ["insulation", "regulation", "thermalInertia", "fluidHandling", "catalysis"]
 };
 const CORE_THEMES = ["control", "drive", "reserve"];
