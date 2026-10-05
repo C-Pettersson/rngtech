@@ -8,6 +8,7 @@ import com.rngtech.rpg.MachineStat;
 import com.rngtech.rpg.MachineStatAccumulator;
 import com.rngtech.rpg.ModifierOperation;
 import com.rngtech.rpg.ModifierSlot;
+import com.rngtech.rpg.PartGenerationChecks;
 
 import com.google.gson.JsonParser;
 import com.mojang.serialization.JsonOps;
@@ -38,6 +39,7 @@ public final class MasteryChecks {
         bonusSummary();
         iconTextures();
         checks += AscendancyChecks.run();
+        checks += PartGenerationChecks.run();
         System.out.println("Machine mastery: " + checks + " checks passed");
         ForestryTreeScanChecks.run();
         ForestryCartRulesChecks.run();

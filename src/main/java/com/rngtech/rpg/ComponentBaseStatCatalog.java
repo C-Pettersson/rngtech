@@ -128,15 +128,7 @@ public final class ComponentBaseStatCatalog {
             MachineStat stat = entry.getKey();
             double value = contribution.value(stat);
             if (stat == MachineStat.ENERGY_GENERATION) {
-                double flatGeneration = contribution.effectiveFlatEnergyGenerationBonus();
-                if (entry.getValue() == MergeRule.ADD) {
-                    applyAdd(target, stat, contribution.valueWithoutFlatEnergyGenerationBonus(stat) + flatGeneration);
-                    target.addFlatEnergyGenerationBonus(flatGeneration);
-                } else {
-                    applyMore(target, stat, contribution.valueWithoutFlatEnergyGenerationBonus(stat));
-                    applyAdd(target, stat, flatGeneration);
-                    target.addFlatEnergyGenerationBonus(flatGeneration);
-                }
+                target.applyPartEnergyGeneration(contribution, entry.getValue() == MergeRule.MORE);
                 continue;
             }
             if (entry.getValue() == MergeRule.ADD) {
