@@ -23,6 +23,18 @@ The recipe type is `rngtech:vacuum_collapse`. Recipes declare catalyst input, mi
 
 The current starter catalyst item is `rngtech:void_catalyst`; default recipes can produce `rngtech:collapse_residue`. Void Chamber stage remains the hard recipe gate. If the installed Collapse Nozzle stage is below a recipe's minimum chamber stage, each missing stage adds `+1.0` local instability pressure.
 
+## Balance
+
+The Vacuum Collapse Generator is the Stage 7 primary generator. Its target band is listed in [Component Stages](../reference/component-stages.md).
+
+| Setup | Generated FE/t |
+|---|---:|
+| Void Catalyst recipe before part multipliers | `1,000 FE/t` (`600,000 FE / 600 ticks`) |
+| Unmodified Tungstensteel Void Chamber, Collapse Nozzle, and Dimensional Stabilizer | about `1,430 FE/t` |
+| Unmodified Exotic Void Chamber, Collapse Nozzle, and Dimensional Stabilizer | about `3,000 FE/t` |
+
+Void Chamber and Collapse Nozzle generation multiply each other, the nozzle stage raises cycle speed, and the stabilizer stage raises efficiency. Rolled and refined parts carry the machine above these baselines. The Process tab output icon shows the side FE export cap, which is the installed Energy Connector tier, not generated FE/t; the generation icon shows generated FE/t.
+
 ## Step-By-Step Guide
 
 1. Craft a Tungstensteel Void Chamber, Tungstensteel Collapse Nozzle, and Tungstensteel Dimensional Stabilizer.
