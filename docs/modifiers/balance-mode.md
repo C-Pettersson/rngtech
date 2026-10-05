@@ -10,7 +10,7 @@ When the chassis receives FE, it spreads the stored energy across eligible insta
 
 The behavior respects each cell's remaining capacity, stored FE, input rate, and output rate. If one cell cannot accept or provide its share, the remainder is redistributed across the other eligible cells.
 
-Balance Mode changes routing behavior only. It does not add capacity, transfer rate, burst output, or efficiency.
+Balance Mode changes charge balancing only. It does not add capacity, transfer rate, burst output, or efficiency.
 
 ## Eligibility
 

@@ -220,7 +220,7 @@
 		"- Run enough ore to collect &eCrushed Iron&r and &eCrushed Copper&r."
 		""
 		"&aUse:&r"
-		"- Route raw ore into the Crusher first."
+		"- Put raw ore through the Crusher first."
 		"- When power allows, crush the crushed output into dust before smelting."
 		"- Send crushed outputs to Furnace, Mekanism, Create, or Oritech depending on the pack path."
 	]
@@ -240,7 +240,7 @@
 	quest.37A6C9E1284B5D19.quest_subtitle: "Solid-fuel smelting after duplication."
 	quest.37A6C9E1284B5D19.title: "Hotter Furnace "
 	quest.37A6C9E1284B5D1A.quest_desc: [
-		"&eCable&r and &eUniversal Connectors&r are the physical network for RNGTech routing item/energy/fluid. One cable to rule them all. It's the connectors that decide throughput. So if you see a spike in demand from one machine you can easily switch to a better connector without the need replacing the cables. "
+		"&eCable&r and &eUniversal Connectors&r are the physical network that moves RNGTech items, energy, and fluids. One cable to rule them all. It's the connectors that decide throughput. So if you see a spike in demand from one machine you can easily switch to a better connector without the need replacing the cables. "
 		""
 		"All connectors support many-to-many. Meaning you can send water and &bcarbon exhaust&r on the same channel to one or many &bAlgae Photobioreactors&r"
 		""
@@ -274,7 +274,7 @@
 		"- Interface. Fluid and item has three interfaces. Each with separate connector. Energy only has 1 interface"
 		"- Channel. Each interface support up 15 channels. Separate network within the network"
 	]
-	quest.37A6C9E1284B5D1A.quest_subtitle: "Route shells now, modules later."
+	quest.37A6C9E1284B5D1A.quest_subtitle: "Lay cable now, add modules later."
 	quest.37A6C9E1284B5D1A.title: "Cable Backbone"
 	quest.37A6C9E1284B5D1B.quest_desc: [
 		"&aRead:&r Stage 3-4 will put preassure on both resources and power"
@@ -800,7 +800,7 @@
 		""
 		"&bTip:&r Lava and water buckets can make a temporary portal if obsidian is tight."
 	]
-	quest.42BFA6CFEA87EC68.quest_subtitle: "Nether Quartz opens the press route."
+	quest.42BFA6CFEA87EC68.quest_subtitle: "Nether Quartz unlocks the Circuit Mold."
 	quest.42BFA6CFEA87EC68.title: "Nether Quartz"
 	quest.44B6B0AADE341E23.quest_desc: [
 		"Configurator allows you to copy/paste per page configuration of a &lUniversal Connector&r. It can also insert modules if enable it under config menu (enabled by &lkeybind&r)"
@@ -905,7 +905,7 @@
 		""
 		"&aUse:&r"
 		"- Electric Furnace sidegrades start after this checkpoint."
-		"- Keep blocked Alloy Furnace chassis out of the required route."
+		"- Keep blocked Alloy Furnace chassis out of the required path."
 	]
 	quest.4F5AA1D34A0C1A4C.title: "Pressed Circuits"
 	quest.51085B8552CE2F6C.quest_desc: [
@@ -965,7 +965,7 @@
 	quest.5E1CA6E1D5C00500.title: "Silica Gel Dehumidifier"
 	quest.61F18F2CD460DDD9.quest_desc: [
 		"Optional. You have multiple ways of generating power. You have a few options"
-		"- Organic route, "
+		"- Organic fuel"
 		"- Corrode plates"
 		"- Solar (requires circuits)"
 		"- Keep burning solid fuels"
@@ -1026,7 +1026,7 @@
 	quest.7106E7A1B10F0050.quest_subtitle: "Plate plus electrolyte becomes FE and residue."
 	quest.7106E7A1B10F0050.title: "Step 1: Corrosion Cell"
 	quest.7106E7A1B10F0060.quest_desc: [
-		"Optional. The &eCavitation Generator&r remains the separate gas-input route for this power chapter."
+		"Optional. The &eCavitation Generator&r remains the separate gas-input option for this power chapter."
 		""
 		"&aBuild:&r"
 		"- Craft a &eSteel Cavitation Rotor&r and &eSteel Collapse Nozzle&r first."
@@ -1128,7 +1128,7 @@
 	quest.7106E7A1B10F0130.quest_subtitle: "Biomass becomes methane."
 	quest.7106E7A1B10F0130.title: "Methane from Biomass"
 	quest.7106E7A1B10F0140.quest_desc: [
-		"The &eSteam Methane Reformer&r is the normal hydrogen route for ammonia."
+		"The &eSteam Methane Reformer&r is the normal hydrogen source for ammonia."
 		""
 		"&aBuild:&r"
 		"- Craft a &eSteam Methane Reformer&r and &eReforming Catalyst Bed&r."
@@ -1569,7 +1569,7 @@
 		"Every machine levels up from the work it finishes. Open its &eMastery&r tab to spend points in the shared passive tree."
 		""
 		"- Mastery belongs to the chassis. Breaking and replacing the machine keeps it."
-		"- Hover a node to preview its route and cost, then click to allocate the whole route."
+		"- Hover a node to preview its path and cost, then click to allocate the whole path."
 		"- Right-click an allocated node to refund it for one &eMastery Refund&r."
 		"- &eCopy&r and &ePaste&r move a build between machines that share a start."
 	]

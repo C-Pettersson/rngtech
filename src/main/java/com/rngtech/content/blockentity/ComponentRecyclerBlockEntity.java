@@ -47,7 +47,7 @@ import net.neoforged.neoforge.items.ItemStackHandler;
 
 import java.util.List;
 
-public class ComponentRecyclerBlockEntity extends BaseMachineBlockEntity implements MenuProvider {
+public class ComponentRecyclerBlockEntity extends BaseMachineBlockEntity implements MenuProvider, MachineInfoProvider {
     public static final int SLOT_INPUT = 0;
     public static final int SLOT_OUTPUT_PRIMARY = 1;
     public static final int SLOT_OUTPUT_SECONDARY = 2;
@@ -150,6 +150,8 @@ public class ComponentRecyclerBlockEntity extends BaseMachineBlockEntity impleme
     private final IItemHandler inputHandler = new InputItemHandler();
     private final IItemHandler outputHandler = new OutputItemHandler();
     private final IEnergyStorage energyStorage = new RecyclerEnergyStorage();
+    private final EnergyTelemetry energyFlow = new EnergyTelemetry(this::getLevel);
+    private final IEnergyStorage trackedEnergyStorage = energyFlow.track(energyStorage);
     private final ContainerData menuData = new ContainerData() {
         @Override
         public int get(int index) {
@@ -324,7 +326,7 @@ public class ComponentRecyclerBlockEntity extends BaseMachineBlockEntity impleme
         if (isManual()) {
             return null;
         }
-        return side == Direction.UP || side == Direction.DOWN ? null : energyStorage;
+        return side == Direction.UP || side == Direction.DOWN ? null : trackedEnergyStorage;
     }
 
     @Override
@@ -341,6 +343,55 @@ public class ComponentRecyclerBlockEntity extends BaseMachineBlockEntity impleme
     @Override
     protected ItemStackHandler getMachineInventory() {
         return processInventory;
+    }
+
+    @Override
+    public MachineInfoSnapshot machineInfo() {
+        MachineStatAccumulator stats = effectiveStats();
+        ComponentRecyclingRecipe recipe = nextRecipe();
+        int status = statusCode(recipe, stats);
+        boolean manual = isManual();
+        int energyDemand = !manual && (status == STATUS_READY || status == STATUS_NO_POWER)
+                ? energyCostPerTick(recipe, stats)
+                : 0;
+        AdjacentEnergyConnector.Info connector = AdjacentEnergyConnector.forSink(level, worldPosition);
+        return MachineInfoSnapshot.builder("component_recycler")
+                .stage(chassis().stage())
+                .state(
+                        MachineInfoSnapshot.workState(
+                                status == STATUS_READY,
+                                getBlockState().getValue(BaseMachineBlock.ACTIVE),
+                                status == STATUS_NO_INPUT
+                        ),
+                        MachineInfoSnapshot.BlockedReason.NONE
+                )
+                .status(statusKey(status))
+                .progress(progress, currentProcessingTicks(recipe, stats))
+                .energy(manual ? 0 : energyStored(), manual ? 0 : energyCapacity(), -energyDemand)
+                .energyTelemetry(energyFlow.lastInput(), energyFlow.lastOutput(), manual ? 0 : connector.transferRate(), MachineInfoSnapshot.EnergyBottleneck.NONE)
+                .processingLevel(
+                        stats.intValue(MachineStat.PROCESSING_LEVEL),
+                        recipe == null ? MachineInfoSnapshot.UNSET : recipe.minimumProcessingLevel()
+                )
+                .output(status == STATUS_OUTPUT_FULL
+                        ? MachineInfoSnapshot.OutputSummary.OUTPUT_FULL
+                        : MachineInfoSnapshot.OutputSummary.NONE)
+                .refinement(machineTraits())
+                .build();
+    }
+
+    private static String statusKey(int status) {
+        String name = switch (status) {
+            case STATUS_MISSING_HEAD -> "missing_head";
+            case STATUS_NO_INPUT -> "no_input";
+            case STATUS_INVALID_RECIPE -> "invalid_recipe";
+            case STATUS_BLOCKED_STAGE -> "blocked_stage";
+            case STATUS_OUTPUT_FULL -> "output_full";
+            case STATUS_NO_POWER -> "no_power";
+            case STATUS_MISSING_CRANK -> "missing_crank";
+            default -> "";
+        };
+        return name.isEmpty() ? "" : "rngtech.recycler.status." + name;
     }
 
     @Override

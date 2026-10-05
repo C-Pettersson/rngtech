@@ -59,7 +59,8 @@ import net.neoforged.neoforge.items.ItemStackHandler;
 
 import java.util.List;
 
-public class CavitationGeneratorBlockEntity extends BaseMachineBlockEntity implements MenuProvider, PurgeableFluidStorage {
+public class CavitationGeneratorBlockEntity extends BaseMachineBlockEntity
+        implements MenuProvider, PurgeableFluidStorage, MachineInfoProvider {
     public static final int SLOT_FLUID_INPUT_CONTAINER = 0;
     public static final int SLOT_DAMAGED_ROTOR = 1;
     public static final int PROCESS_SLOT_COUNT = 2;
@@ -197,6 +198,8 @@ public class CavitationGeneratorBlockEntity extends BaseMachineBlockEntity imple
     private final IItemHandler containerInputHandler = new ProcessItemHandler(SLOT_FLUID_INPUT_CONTAINER, SLOT_FLUID_INPUT_CONTAINER, true, false);
     private final IItemHandler damagedRotorHandler = new ProcessItemHandler(SLOT_DAMAGED_ROTOR, SLOT_DAMAGED_ROTOR, false, true);
     private final IEnergyStorage energyStorage = new GeneratorEnergyStorage();
+    private final EnergyTelemetry energyFlow = new EnergyTelemetry(this::getLevel);
+    private final IEnergyStorage trackedEnergyStorage = energyFlow.track(energyStorage);
     private final IFluidHandler fluidHandler = new InputFluidHandler();
     private final ContainerData menuData = new ContainerData() {
         @Override
@@ -296,7 +299,7 @@ public class CavitationGeneratorBlockEntity extends BaseMachineBlockEntity imple
     }
 
     public IEnergyStorage getEnergyStorage(Direction side) {
-        return side == Direction.UP || side == Direction.DOWN ? null : energyStorage;
+        return side == Direction.UP || side == Direction.DOWN ? null : trackedEnergyStorage;
     }
 
     public IFluidHandler getFluidHandler(Direction side) {
@@ -314,7 +317,7 @@ public class CavitationGeneratorBlockEntity extends BaseMachineBlockEntity imple
                         inputTank::drain,
                         this::clearActiveRecipe,
                         this::setChanged
-                ),
+                ).withCapacity(inputTank::getCapacity),
                 FluidPurgeTarget.of(
                         PURGE_OUTPUT_TANK,
                         Component.translatable("rngtech.purge.target.output_tank"),
@@ -322,8 +325,62 @@ public class CavitationGeneratorBlockEntity extends BaseMachineBlockEntity imple
                         outputTank::getFluid,
                         outputTank::drain,
                         this::setChanged
-                )
+                ).withCapacity(outputTank::getCapacity)
         );
+    }
+
+    @Override
+    public MachineInfoSnapshot machineInfo() {
+        MachineStatAccumulator stats = effectiveStats();
+        CavitationRecipe recipe = nextRecipe();
+        int status = statusCode(stats);
+        AdjacentEnergyConnector.Info connector = AdjacentEnergyConnector.forSource(level, worldPosition);
+        return MachineInfoSnapshot.builder("cavitation_generator")
+                .state(
+                        MachineInfoSnapshot.workState(
+                                status == STATUS_READY,
+                                getBlockState().getValue(BaseMachineBlock.ACTIVE),
+                                status == STATUS_NO_FLUID
+                        ),
+                        MachineInfoSnapshot.BlockedReason.NONE
+                )
+                .status(statusKey(status))
+                .progress(progress, currentProcessingTicks(stats))
+                .energy(energyStored(), energyCapacity(), isWorking() ? currentEnergyPerTick(stats) : 0)
+                .energyTelemetry(energyFlow.lastInput(), energyFlow.lastOutput(), connector.transferRate(), MachineInfoSnapshot.EnergyBottleneck.NONE)
+                .processingLevel(
+                        rotorStage(stats),
+                        recipe == null ? MachineInfoSnapshot.UNSET : recipe.minimumRotorStage()
+                )
+                .output(outputSummary(status))
+                .refinement(machineTraits())
+                .build();
+    }
+
+    private static MachineInfoSnapshot.OutputSummary outputSummary(int status) {
+        return switch (status) {
+            case STATUS_OUTPUT_FULL, STATUS_FLUID_OUTPUT_FULL -> MachineInfoSnapshot.OutputSummary.OUTPUT_FULL;
+            case STATUS_ENERGY_FULL -> MachineInfoSnapshot.OutputSummary.ENERGY_FULL;
+            default -> MachineInfoSnapshot.OutputSummary.NONE;
+        };
+    }
+
+    private static String statusKey(int status) {
+        String name = switch (status) {
+            case STATUS_MISSING_ROTOR -> "no_rotor";
+            case STATUS_MISSING_NOZZLE -> "no_nozzle";
+            case STATUS_NO_FLUID -> "no_fluid";
+            case STATUS_INVALID_RECIPE -> "invalid_recipe";
+            case STATUS_BLOCKED_STAGE -> "blocked_stage";
+            case STATUS_ENERGY_FULL -> "energy_full";
+            case STATUS_STRAIN_HIGH -> "strain_high";
+            case STATUS_ROTOR_WORN -> "rotor_worn";
+            case STATUS_OUTPUT_FULL -> "output_full";
+            case STATUS_FLUID_OUTPUT_FULL -> "fluid_output_full";
+            case STATUS_REDSTONE_DISABLED -> "redstone";
+            default -> "";
+        };
+        return name.isEmpty() ? "" : "rngtech.cavitation.status." + name;
     }
 
     @Override
@@ -802,6 +859,7 @@ public class CavitationGeneratorBlockEntity extends BaseMachineBlockEntity imple
             int extracted = extractEnergyInternal(remainingOutput, true);
             int received = target.receiveEnergy(extracted, false);
             int delivered = extractEnergyInternal(received, false);
+            energyFlow.recordOutput(delivered);
             remainingOutput -= delivered;
             exported |= delivered > 0;
         }

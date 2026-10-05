@@ -40,7 +40,7 @@ Recorded 2026-10-03:
     - Grove Warden: Spare Plots and Old Rows grant 16 managed cells each, and Nursery grants +2 Work Range. Timber Baron's two Cart Speed nodes grant 15% each.
     - Base speeds dropped: powered 0.055, seeking 0.08, Manual Throttle 0.095 and 0.12. Idle Cart Speed applies after 80 ticks without work and is saved with the cart.
     - The shared tree gained four extra Forestry pockets (21 nodes) without moving or renaming any existing node. Extras can now replace their pocket's notables.
-    - Balance pass: the shortest Forestry route to Rail Pace, Open Track, Far Rows, and Outer Rows spends 50 points and reaches 48 Drive. Driven Wheels at 0.5% per Drive then gives +62% Cart Speed in total, about 1.11× the old powered speed; Timber Baron's two nodes take it to about 1.32×. Open Track adds up to 73% more while idle.
+    - Balance pass: the shortest Forestry path to Rail Pace, Open Track, Far Rows, and Outer Rows spends 50 points and reaches 48 Drive. Driven Wheels at 0.5% per Drive then gives +62% Cart Speed in total, about 1.11× the old powered speed; Timber Baron's two nodes take it to about 1.32×. Open Track adds up to 73% more while idle.
 - 2026-10-03, slice 2:
     - Logs crack over time with `destroyBlockProgress` and block hit sounds before the existing cut runs. Break time follows hardness, the tool's destroy speed against the block plus Efficiency, and Processing Speed, with a 2x scale over vanilla and a 6-tick floor. A cut is followed by a 4-tick settle.
     - Treefeller batches crack every log at once for the slowest log's time times `1 + 0.35 × log2(N)`.
@@ -56,7 +56,7 @@ Recorded 2026-10-03:
     - The station is named Companion Station in display text; registry IDs are unchanged.
     - New process slots are appended after the shears slot, so older saves keep their items: a bone meal slot that drains into the 256 store, and a spare-tool slot. The plantables slot no longer takes bone meal; bone meal an older station left there still drains into the store.
     - A docked tree-working cart whose tool is missing or broken gets the spare tool, and the broken tool goes to the station outputs only when they have room.
-    - Hoppers route plantables, bone meal, shears, and tools by type through four virtual input slots.
+    - Hoppers sort plantables, bone meal, shears, and tools by type through four virtual input slots.
     - The Station tab groups Supply (plantables, bone meal), Cart (tool, shears), and Output under short centered labels, with water and FE gauges, the bone meal bar, and the status, action, and hold controls moved below the Supply group. Empty supply slots show faded example items and hover hints. The Gear tab spaces its heading from the slot labels and labels the energy port FE. Gear hints now appear on the station's Gear tab and the cart's Gear row.
     - The Stats tab lists the water store and, for a docked cart, its energy, Work Range, and tool condition or water.
     - The cart screen gained a Work Range readout and an Idle Cart Speed light beside the status icons, and supply-slot hints.
@@ -86,7 +86,7 @@ Recorded 2026-10-03:
     - New base speeds, Driven Wheels, and the Idle Cart Speed light and bonus.
     - Crack animations for axe and Treefeller breaks, cracks clearing on abort, and the hit sounds.
     - Field Hand: no tree work and no tool needed; crops planting, harvesting, and replanting; Sprinkler tilling and wetting with a pump and station water; Irrigation; Reap and Sow; Rolling Reap; Seed Ledger; switching away moving crops to output.
-    - Companion Station: Supply tab, demand-first plantables loading, bone meal slot, spare-tool swap with a broken tool, hopper routing, slot hints and ghost items, no overlapping labels at default and large GUI scales, and the new Stats rows.
+    - Companion Station: Supply tab, demand-first plantables loading, bone meal slot, spare-tool swap with a broken tool, hopper sorting, slot hints and ghost items, no overlapping labels at default and large GUI scales, and the new Stats rows.
     - Seed Library reserves: a mixed farm keeps replanting rare species, reserves survive save and reload, and they return or drop correctly on pruning, respec, and cart breakage.
     - Reset: shift-click clears the managed cells, a plain click does nothing, reserves return to cargo, and the blue screen shows for 3 seconds while the cart stands still.
     - Save and reload, including a station and a cart saved before this change.

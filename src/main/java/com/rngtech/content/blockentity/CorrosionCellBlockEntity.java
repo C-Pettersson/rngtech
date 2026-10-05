@@ -48,7 +48,8 @@ import net.neoforged.neoforge.items.ItemStackHandler;
 
 import java.util.List;
 
-public class CorrosionCellBlockEntity extends BaseMachineBlockEntity implements MenuProvider, PurgeableFluidStorage {
+public class CorrosionCellBlockEntity extends BaseMachineBlockEntity
+        implements MenuProvider, PurgeableFluidStorage, MachineInfoProvider {
     public static final int SLOT_PLATE = 0;
     public static final int SLOT_ELECTROLYTE = 1;
     public static final int SLOT_RESIDUE = 2;
@@ -159,6 +160,8 @@ public class CorrosionCellBlockEntity extends BaseMachineBlockEntity implements 
     private final IItemHandler sideInputHandler = new SideInputItemHandler();
     private final IItemHandler residueHandler = new ResidueItemHandler();
     private final IEnergyStorage energyStorage = new CellEnergyStorage();
+    private final EnergyTelemetry energyFlow = new EnergyTelemetry(this::getLevel);
+    private final IEnergyStorage trackedEnergyStorage = energyFlow.track(energyStorage);
     private final IFluidHandler fluidHandler = new ElectrolyteFluidHandler();
     private final ContainerData menuData = new ContainerData() {
         @Override
@@ -237,7 +240,7 @@ public class CorrosionCellBlockEntity extends BaseMachineBlockEntity implements 
     }
 
     public IEnergyStorage getEnergyStorage(Direction side) {
-        return side == Direction.UP || side == Direction.DOWN ? null : energyStorage;
+        return side == Direction.UP || side == Direction.DOWN ? null : trackedEnergyStorage;
     }
 
     public IFluidHandler getFluidHandler(Direction side) {
@@ -254,7 +257,58 @@ public class CorrosionCellBlockEntity extends BaseMachineBlockEntity implements 
                 electrolyteTank::drain,
                 this::resetInactiveProgress,
                 this::setChanged
-        ));
+        ).withCapacity(electrolyteTank::getCapacity));
+    }
+
+    @Override
+    public MachineInfoSnapshot machineInfo() {
+        MachineStatAccumulator stats = effectiveStats();
+        CorrosionCellRecipe recipe = nextRecipe();
+        int status = statusCode(stats);
+        AdjacentEnergyConnector.Info connector = AdjacentEnergyConnector.forSource(level, worldPosition);
+        return MachineInfoSnapshot.builder("corrosion_cell")
+                .stage(COMPONENT_STAGE)
+                .state(
+                        MachineInfoSnapshot.workState(
+                                status == STATUS_READY,
+                                getBlockState().getValue(BaseMachineBlock.ACTIVE),
+                                status == STATUS_NO_PLATE || status == STATUS_NO_ELECTROLYTE
+                        ),
+                        MachineInfoSnapshot.BlockedReason.NONE
+                )
+                .status(statusKey(status), recipe == null ? 0 : recipe.minimumMaterialStage())
+                .progress(progress, currentProcessingTicks(stats))
+                .energy(energyStored(), energyCapacity(stats), isWorking() ? currentEnergyPerTick(stats) : 0)
+                .energyTelemetry(energyFlow.lastInput(), energyFlow.lastOutput(), connector.transferRate(), MachineInfoSnapshot.EnergyBottleneck.NONE)
+                .processingLevel(
+                        COMPONENT_STAGE,
+                        recipe == null ? MachineInfoSnapshot.UNSET : recipe.minimumMaterialStage()
+                )
+                .output(outputSummary(status))
+                .refinement(machineTraits())
+                .build();
+    }
+
+    private static MachineInfoSnapshot.OutputSummary outputSummary(int status) {
+        return switch (status) {
+            case STATUS_OUTPUT_FULL -> MachineInfoSnapshot.OutputSummary.OUTPUT_FULL;
+            case STATUS_ENERGY_FULL -> MachineInfoSnapshot.OutputSummary.ENERGY_FULL;
+            default -> MachineInfoSnapshot.OutputSummary.NONE;
+        };
+    }
+
+    private static String statusKey(int status) {
+        String name = switch (status) {
+            case STATUS_NO_PLATE -> "no_plate";
+            case STATUS_NO_ELECTROLYTE -> "no_electrolyte";
+            case STATUS_INVALID_RECIPE -> "invalid_recipe";
+            case STATUS_BLOCKED_STAGE -> "blocked_stage";
+            case STATUS_OUTPUT_FULL -> "output_full";
+            case STATUS_ENERGY_FULL -> "energy_full";
+            case STATUS_REDSTONE_DISABLED -> "redstone";
+            default -> "";
+        };
+        return name.isEmpty() ? "" : "rngtech.corrosion_cell.status." + name;
     }
 
     @Override
@@ -587,6 +641,7 @@ public class CorrosionCellBlockEntity extends BaseMachineBlockEntity implements 
             int offered = extractEnergyInternal(remainingOutput, stats, true);
             int received = target.receiveEnergy(offered, false);
             int delivered = extractEnergyInternal(received, stats, false);
+            energyFlow.recordOutput(delivered);
             remainingOutput -= delivered;
             exported |= delivered > 0;
         }

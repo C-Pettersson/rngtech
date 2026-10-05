@@ -53,7 +53,8 @@ import net.neoforged.neoforge.items.ItemStackHandler;
 import java.util.Arrays;
 import java.util.List;
 
-public class BatteryAssemblerBlockEntity extends BaseMachineBlockEntity implements MenuProvider, PurgeableFluidStorage {
+public class BatteryAssemblerBlockEntity extends BaseMachineBlockEntity
+        implements MenuProvider, PurgeableFluidStorage, MachineInfoProvider {
     public static final int SLOT_INPUT_0 = 0;
     public static final int SLOT_INPUT_1 = 1;
     public static final int SLOT_INPUT_2 = 2;
@@ -159,6 +160,8 @@ public class BatteryAssemblerBlockEntity extends BaseMachineBlockEntity implemen
     private final IItemHandler electrolyteInputHandler = new ElectrolyteItemHandler();
     private final IItemHandler outputHandler = new RangedItemHandler(SLOT_OUTPUT_0, SLOT_OUTPUT_3, false, true);
     private final IEnergyStorage energyStorage = new BatteryAssemblerEnergyStorage();
+    private final EnergyTelemetry energyFlow = new EnergyTelemetry(this::getLevel);
+    private final IEnergyStorage trackedEnergyStorage = energyFlow.track(energyStorage);
     private final IFluidHandler fluidHandler = new BatteryAssemblerFluidHandler();
     private final ContainerData menuData = new ContainerData() {
         @Override
@@ -281,7 +284,7 @@ public class BatteryAssemblerBlockEntity extends BaseMachineBlockEntity implemen
     }
 
     public IEnergyStorage getEnergyStorage(Direction side) {
-        return energyStorage;
+        return trackedEnergyStorage;
     }
 
     public IFluidHandler getFluidHandler(Direction side) {
@@ -298,7 +301,49 @@ public class BatteryAssemblerBlockEntity extends BaseMachineBlockEntity implemen
                 inputTank::drain,
                 this::resetCycleAndBulkSpeed,
                 this::setChanged
-        ));
+        ).withCapacity(inputTank::getCapacity));
+    }
+
+    @Override
+    public MachineInfoSnapshot machineInfo() {
+        MachineStatAccumulator stats = effectiveStats();
+        BatteryAssemblyRecipe recipe = nextRecipe();
+        int status = statusCode(recipe, stats);
+        int energyDemand = status == STATUS_READY || status == STATUS_NO_POWER ? energyCostPerTick(recipe, stats) : 0;
+        AdjacentEnergyConnector.Info connector = AdjacentEnergyConnector.forSink(level, worldPosition);
+        return MachineInfoSnapshot.builder("battery_assembler")
+                .state(
+                        MachineInfoSnapshot.workState(
+                                status == STATUS_READY,
+                                getBlockState().getValue(BaseMachineBlock.ACTIVE),
+                                status == STATUS_NO_INPUT
+                        ),
+                        MachineInfoSnapshot.BlockedReason.NONE
+                )
+                .status(statusKey(status))
+                .progress(progress, currentProcessingTicks(recipe, stats))
+                .energy(energyStored(), energyCapacity(), -energyDemand)
+                .energyTelemetry(energyFlow.lastInput(), energyFlow.lastOutput(), connector.transferRate(), MachineInfoSnapshot.EnergyBottleneck.NONE)
+                .gear(hasBatteryCell()
+                        ? MachineInfoSnapshot.GearSummary.BATTERY_CELL_INSTALLED
+                        : MachineInfoSnapshot.GearSummary.MISSING_BATTERY_CELL)
+                .output(status == STATUS_OUTPUT_FULL
+                        ? MachineInfoSnapshot.OutputSummary.OUTPUT_FULL
+                        : MachineInfoSnapshot.OutputSummary.NONE)
+                .refinement(machineTraits())
+                .build();
+    }
+
+    private static String statusKey(int status) {
+        String name = switch (status) {
+            case STATUS_NO_INPUT -> "no_input";
+            case STATUS_INVALID_RECIPE -> "invalid_recipe";
+            case STATUS_NO_FLUID -> "no_fluid";
+            case STATUS_OUTPUT_FULL -> "output_full";
+            case STATUS_NO_POWER -> "no_power";
+            default -> "";
+        };
+        return name.isEmpty() ? "" : "rngtech.battery_assembler.status." + name;
     }
 
     @Override

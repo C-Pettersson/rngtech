@@ -19,7 +19,7 @@ The shared tree reads from the center outward:
 5. The outer field has star hubs and bowed climbs up to a curved perimeter road.
 6. Outer constellations sit on and beyond the perimeter.
 
-Keystones are spread through every layer, from the core to beyond the perimeter, so a build can commit by pathing inward, sideways, or outward. Reaching the outer ring must not be the default route to every keystone.
+Keystones are spread through every layer, from the core to beyond the perimeter, so a build can commit by pathing inward, sideways, or outward. Reaching the outer ring must not be the default path to every keystone.
 
 Travel must consume allocations. Moving between layers should mean following attribute nodes along a spoke, loop, hub, or climb, then deciding whether to leave the road and invest in a reward branch. A sequence of directly connected reward wheels fails this design even when its geometry is tidy.
 
@@ -88,7 +88,7 @@ Vary orientation, mirroring, radius, and spacing. Large showpiece shapes belong 
 
 ### Make choices compete
 
-Repeat broad goals across several regions: processing speed, energy efficiency, output handling, attribute scaling, and reserve support should offer more than one route package. Home regions carry their start's themes; outer constellations blend a region with its nearest neighbor, so nearby road gates present competing investments. Balance themes across the whole tree rather than per region.
+Repeat broad goals across several regions: processing speed, energy efficiency, output handling, attribute scaling, and reserve support should be reachable through more than one package. Home regions carry their start's themes; outer constellations blend a region with its nearest neighbor, so nearby road gates present competing investments. Balance themes across the whole tree rather than per region.
 
 Keep the distinction between increased/reduced, more/less, flat additions, and absolute constraints. Changing a path must not silently change the meaning of its rewards.
 
@@ -133,7 +133,7 @@ Add later content through `EXTRAS` in `author-mega-tree.mjs`. Each entry names a
 
 This retained 100-node definition documents the v4 reference, not the graph currently used in gameplay. The shared catalog, [audit report](machine-mega-tree-audit.json), and [overview](../assets/machine-mega-passive-tree.svg) are the current source for all three adapters.
 
-The Forestry Companion layout follows the [concept image](passive-tree-concept.png): a central start, an irregular field of connected constellations, larger notable landmarks, and five keystones around the perimeter. All 100 node ids, enum ordinals, effects, and level requirements are preserved. Routes have been re-authored, so the paths to future allocations change while saved allocations keep their identities.
+The Forestry Companion layout follows the [concept image](passive-tree-concept.png): a central start, an irregular field of connected constellations, larger notable landmarks, and five keystones around the perimeter. All 100 node ids, enum ordinals, effects, and level requirements are preserved. Connections have been re-authored, so the paths to future allocations change while saved allocations keep their identities.
 
 Small local loops and open crescents connect adjacent regions. Forestry uses display diameters of 12 for travel nodes, 16 for ordinary nodes, 48 for notables, 60 for keystones, and 40 for the starter. These sizes are specific to Forestry and are included in geometry checks and the ModDex export. The shared in-game view uses circular frames, faint background rings, and a full-tree fit when expanded; collapsing restores the previous view.
 

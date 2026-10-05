@@ -173,7 +173,7 @@ The Forestry Companion Station is renamed **Companion Station** in display text.
 - **Bone meal slot.** A dedicated slot fills the fertilizer store. The plantables slot no longer takes bone meal.
 - **Tool slot.** It holds a spare Axe or Treefeller. When a docked tree-working cart has no tool, or a broken one, the station installs the spare and moves the broken tool to its output. Nothing is swapped if the output is full.
 - **Water tank.** A 16,000 mB, water-only tank is filled through a Fluid Connector and loads Field Hand carts.
-- **Hoppers** route plantables, bone meal, tools, and shears by item type.
+- **Hoppers** sort plantables, bone meal, tools, and shears by item type.
 - **GUI**, following [Machine GUI Design](../reference/machine-gui-design.md):
     - grouped slots with short labels above each group, and no overlaps;
     - hover hints and faded ghost items on empty slots;

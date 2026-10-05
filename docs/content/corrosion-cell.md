@@ -36,7 +36,7 @@ Gear slots are UI equipment and are not exposed through the Corrosion Cell's sid
 
 1. Craft the Corrosion Cell once Steel Casings, Electrolyte, Bus Bar, and a Reinforced Machine Frame are available.
 2. Place the block and optionally install a compatible Battery Cell in the Gear tab.
-3. Put Iron Plate, Copper Plate, or Scrap in the plate input. Top automation inserts valid plate/scrap inputs; side automation can also route them when using a side connector.
+3. Put Iron Plate, Copper Plate, or Scrap in the plate input. Top automation inserts valid plate/scrap inputs; side automation can also insert them when using a side connector.
 4. Put `rngtech:electrolyte` in the electrolyte input, or install a Fluid Pump and pump Electrolyte Solution into the side fluid capability.
 5. Extract FE from the sides and Corrosion Residue from the bottom.
 6. Clear the residue slot or attached output before the next cycle; the machine will not consume inputs when residue cannot fit.

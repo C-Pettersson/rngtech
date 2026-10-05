@@ -40,7 +40,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
 
-public class SilicaGelDehumidifierBlockEntity extends BlockEntity implements MenuProvider, PurgeableFluidStorage {
+public class SilicaGelDehumidifierBlockEntity extends BlockEntity
+        implements MenuProvider, PurgeableFluidStorage, MachineInfoProvider {
     public static final int LANE_COUNT = 3;
     public static final int SLOT_DRY_START = 0;
     public static final int SLOT_SATURATED_START = SLOT_DRY_START + LANE_COUNT;
@@ -212,7 +213,67 @@ public class SilicaGelDehumidifierBlockEntity extends BlockEntity implements Men
                 waterTank::getFluid,
                 waterTank::drain,
                 this::setChanged
-        ));
+        ).withCapacity(waterTank::getCapacity));
+    }
+
+    @Override
+    public MachineInfoSnapshot machineInfo() {
+        int status = STATUS_NO_INPUT;
+        int activeLanes = 0;
+        int laneProgress = 0;
+        int laneTicks = 0;
+        for (int lane = 0; lane < LANE_COUNT; lane++) {
+            DesiccantAbsorptionRecipe recipe = nextRecipe(lane).map(RecipeHolder::value).orElse(null);
+            int laneStatus = statusCode(lane, recipe);
+            if (statusPriority(laneStatus) > statusPriority(status)) {
+                status = laneStatus;
+            }
+            if (progress[lane] > 0) {
+                activeLanes++;
+            }
+            if (recipe != null && (laneTicks == 0 || progress[lane] > laneProgress)) {
+                laneProgress = progress[lane];
+                laneTicks = recipe.processingTicks();
+            }
+        }
+        return MachineInfoSnapshot.builder("silica_gel_dehumidifier")
+                .state(
+                        MachineInfoSnapshot.workState(
+                                status == STATUS_READY,
+                                structureValid && activeLanes > 0,
+                                status == STATUS_NO_INPUT || status == STATUS_NO_RECIPE
+                        ),
+                        MachineInfoSnapshot.BlockedReason.NONE
+                )
+                .status(statusKey(status))
+                .progress(laneProgress, laneTicks)
+                .slots(activeLanes, LANE_COUNT)
+                .output(status == STATUS_OUTPUT_FULL || status == STATUS_WATER_FULL
+                        ? MachineInfoSnapshot.OutputSummary.OUTPUT_FULL
+                        : MachineInfoSnapshot.OutputSummary.NONE)
+                .build();
+    }
+
+    private static int statusPriority(int status) {
+        return switch (status) {
+            case STATUS_INVALID_STRUCTURE -> 4;
+            case STATUS_READY -> 3;
+            case STATUS_OUTPUT_FULL, STATUS_WATER_FULL -> 2;
+            case STATUS_NO_RECIPE -> 1;
+            default -> 0;
+        };
+    }
+
+    private static String statusKey(int status) {
+        String name = switch (status) {
+            case STATUS_INVALID_STRUCTURE -> "invalid_structure";
+            case STATUS_NO_INPUT -> "no_input";
+            case STATUS_NO_RECIPE -> "no_recipe";
+            case STATUS_WATER_FULL -> "water_full";
+            case STATUS_OUTPUT_FULL -> "output_full";
+            default -> "";
+        };
+        return name.isEmpty() ? "" : "rngtech.silica_gel_dehumidifier.status." + name;
     }
 
     public void requestStructureRescan() {

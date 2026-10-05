@@ -46,7 +46,8 @@ import net.neoforged.neoforge.items.ItemStackHandler;
 
 import java.util.List;
 
-public class AlgaePhotobioreactorBlockEntity extends BlockEntity implements MenuProvider, PurgeableFluidStorage {
+public class AlgaePhotobioreactorBlockEntity extends BlockEntity
+        implements MenuProvider, PurgeableFluidStorage, MachineInfoProvider {
     public static final int SLOT_OUTPUT = 0;
     public static final int SLOT_WATER_INPUT_CONTAINER = 1;
     public static final int SLOT_WATER_OUTPUT_CONTAINER = 2;
@@ -278,7 +279,7 @@ public class AlgaePhotobioreactorBlockEntity extends BlockEntity implements Menu
                         waterTank::drain,
                         this::resetCycle,
                         this::setChanged
-                ),
+                ).withCapacity(waterTank::getCapacity),
                 FluidPurgeTarget.of(
                         PURGE_CARBON_TANK,
                         Component.translatable("rngtech.purge.target.carbon_tank"),
@@ -287,8 +288,47 @@ public class AlgaePhotobioreactorBlockEntity extends BlockEntity implements Menu
                         carbonTank::drain,
                         this::resetCycle,
                         this::setChanged
-                )
+                ).withCapacity(carbonTank::getCapacity)
         );
+    }
+
+    @Override
+    public MachineInfoSnapshot machineInfo() {
+        MachineStatAccumulator stats = effectiveStats();
+        AlgaeGrowthRecipe recipe = nextRecipe();
+        int status = statusCode(recipe, stats);
+        return MachineInfoSnapshot.builder("algae_photobioreactor")
+                .state(
+                        MachineInfoSnapshot.workState(
+                                status == STATUS_READY,
+                                isActive(),
+                                status == STATUS_NO_WATER || status == STATUS_NO_CARBON
+                        ),
+                        MachineInfoSnapshot.BlockedReason.NONE
+                )
+                .status(statusKey(status))
+                .progress(progress, recipe == null ? 0 : currentProcessingTicks(recipe, stats))
+                .output(status == STATUS_OUTPUT_FULL
+                        ? MachineInfoSnapshot.OutputSummary.OUTPUT_FULL
+                        : MachineInfoSnapshot.OutputSummary.NONE)
+                .build();
+    }
+
+    private static String statusKey(int status) {
+        String name = switch (status) {
+            case STATUS_NO_RECIPE -> "no_recipe";
+            case STATUS_LOW_LIGHT -> "low_light";
+            case STATUS_OUTPUT_FULL -> "output_full";
+            case STATUS_NO_WATER -> "no_water";
+            case STATUS_NO_CARBON -> "no_carbon";
+            default -> "";
+        };
+        return name.isEmpty() ? "" : "rngtech.algae_photobioreactor.status." + name;
+    }
+
+    private boolean isActive() {
+        BlockState state = getBlockState();
+        return state.hasProperty(BaseMachineBlock.ACTIVE) && state.getValue(BaseMachineBlock.ACTIVE);
     }
 
     public static boolean isWaterInputContainer(ItemStack stack) {
