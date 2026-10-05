@@ -44,7 +44,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class ForestryCartStationBlockEntity extends BlockEntity implements MenuProvider {
+public class ForestryCartStationBlockEntity extends BlockEntity implements MenuProvider, MachineInfoProvider {
     public static final int SLOT_SAPLING = 0;
     public static final int SLOT_OUTPUT_START = 1;
     public static final int OUTPUT_SLOT_COUNT = 6;
@@ -192,6 +192,8 @@ public class ForestryCartStationBlockEntity extends BlockEntity implements MenuP
     private final IItemHandler topItemHandler = new StationInputItemHandler();
     private final IItemHandler bottomItemHandler = new OutputItemHandler();
     private final IEnergyStorage energyStorage = new StationEnergyStorage();
+    private final EnergyTelemetry energyFlow = new EnergyTelemetry(this::getLevel);
+    private final IEnergyStorage trackedEnergyStorage = energyFlow.track(energyStorage);
     private final FluidTank waterTank = new FluidTank(WATER_CAPACITY, stack -> stack.getFluid().isSame(Fluids.WATER)) {
         @Override
         protected void onContentsChanged() {
@@ -298,7 +300,7 @@ public class ForestryCartStationBlockEntity extends BlockEntity implements MenuP
     }
 
     public IEnergyStorage getEnergyStorage(Direction side) {
-        return hasEnergyConnector() ? energyStorage : null;
+        return hasEnergyConnector() ? trackedEnergyStorage : null;
     }
 
     public IFluidHandler getFluidHandler(Direction side) {
@@ -409,6 +411,36 @@ public class ForestryCartStationBlockEntity extends BlockEntity implements MenuP
             setChanged();
         }
         return changed;
+    }
+
+    @Override
+    public MachineInfoSnapshot machineInfo() {
+        AdjacentEnergyConnector.Info connector = AdjacentEnergyConnector.forSink(level, worldPosition);
+        return MachineInfoSnapshot.builder("forestry_cart_station")
+                .state(
+                        MachineInfoSnapshot.workState(
+                                status == STATUS_READY,
+                                currentAction == ACTION_DOCK_TRANSFER || currentAction == ACTION_DOCKED_READY,
+                                status == STATUS_HOLDING_CART
+                        ),
+                        MachineInfoSnapshot.BlockedReason.NONE
+                )
+                .status(statusKey(status))
+                .energy(energyStored(), energyCapacity(), 0)
+                .energyTelemetry(energyFlow.lastInput(), energyFlow.lastOutput(), connector.transferRate(), MachineInfoSnapshot.EnergyBottleneck.NONE)
+                .gear(stationBatteryCellStack().isEmpty()
+                        ? MachineInfoSnapshot.GearSummary.NONE
+                        : MachineInfoSnapshot.GearSummary.BATTERY_CELL_INSTALLED)
+                .build();
+    }
+
+    private static String statusKey(int status) {
+        String name = switch (status) {
+            case STATUS_MISSING_RAIL -> "missing_rail";
+            case STATUS_HOLDING_CART -> "holding_cart";
+            default -> "";
+        };
+        return name.isEmpty() ? "" : "rngtech.forestry_station.status." + name;
     }
 
     @Override

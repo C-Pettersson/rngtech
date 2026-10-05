@@ -39,7 +39,7 @@ import net.neoforged.neoforge.energy.IEnergyStorage;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.ItemStackHandler;
 
-public class VacuumCollapseGeneratorBlockEntity extends BaseMachineBlockEntity implements MenuProvider {
+public class VacuumCollapseGeneratorBlockEntity extends BaseMachineBlockEntity implements MenuProvider, MachineInfoProvider {
     public static final int SLOT_INPUT = 0;
     public static final int SLOT_RESIDUE = 1;
     public static final int PROCESS_SLOT_COUNT = 2;
@@ -130,6 +130,8 @@ public class VacuumCollapseGeneratorBlockEntity extends BaseMachineBlockEntity i
     private final IItemHandler inputHandler = new InputItemHandler();
     private final IItemHandler residueHandler = new ResidueItemHandler();
     private final IEnergyStorage energyStorage = new GeneratorEnergyStorage();
+    private final EnergyTelemetry energyFlow = new EnergyTelemetry(this::getLevel);
+    private final IEnergyStorage trackedEnergyStorage = energyFlow.track(energyStorage);
     private final ContainerData menuData = new ContainerData() {
         @Override
         public int get(int index) {
@@ -217,7 +219,58 @@ public class VacuumCollapseGeneratorBlockEntity extends BaseMachineBlockEntity i
     }
 
     public IEnergyStorage getEnergyStorage(Direction side) {
-        return side == Direction.UP || side == Direction.DOWN ? null : energyStorage;
+        return side == Direction.UP || side == Direction.DOWN ? null : trackedEnergyStorage;
+    }
+
+    @Override
+    public MachineInfoSnapshot machineInfo() {
+        MachineStatAccumulator stats = effectiveStats();
+        VacuumCollapseRecipe recipe = nextRecipe();
+        int status = statusCode(stats);
+        AdjacentEnergyConnector.Info connector = AdjacentEnergyConnector.forSource(level, worldPosition);
+        return MachineInfoSnapshot.builder("vacuum_collapse_generator")
+                .state(
+                        MachineInfoSnapshot.workState(
+                                status == STATUS_READY,
+                                getBlockState().getValue(BaseMachineBlock.ACTIVE),
+                                status == STATUS_NO_CATALYST
+                        ),
+                        MachineInfoSnapshot.BlockedReason.NONE
+                )
+                .status(statusKey(status))
+                .progress(progress, currentProcessingTicks(stats))
+                .energy(energyStored, energyCapacity(stats), isWorking() ? currentEnergyPerTick(stats) : 0L)
+                .energyTelemetry(energyFlow.lastInput(), energyFlow.lastOutput(), connector.transferRate(), MachineInfoSnapshot.EnergyBottleneck.NONE)
+                .processingLevel(
+                        stats.intValue(MachineStat.PROCESSING_LEVEL),
+                        recipe == null ? MachineInfoSnapshot.UNSET : recipe.minimumChamberStage()
+                )
+                .output(outputSummary(status))
+                .refinement(machineTraits())
+                .build();
+    }
+
+    private static MachineInfoSnapshot.OutputSummary outputSummary(int status) {
+        return switch (status) {
+            case STATUS_OUTPUT_FULL -> MachineInfoSnapshot.OutputSummary.OUTPUT_FULL;
+            case STATUS_ENERGY_FULL -> MachineInfoSnapshot.OutputSummary.ENERGY_FULL;
+            default -> MachineInfoSnapshot.OutputSummary.NONE;
+        };
+    }
+
+    private static String statusKey(int status) {
+        String name = switch (status) {
+            case STATUS_MISSING_GEAR -> "missing_gear";
+            case STATUS_NO_CATALYST -> "no_catalyst";
+            case STATUS_INVALID_CATALYST -> "invalid_catalyst";
+            case STATUS_BLOCKED_STAGE -> "blocked_stage";
+            case STATUS_LOW_STABILITY -> "low_stability";
+            case STATUS_OUTPUT_FULL -> "output_full";
+            case STATUS_ENERGY_FULL -> "energy_full";
+            case STATUS_REDSTONE_DISABLED -> "redstone";
+            default -> "";
+        };
+        return name.isEmpty() ? "" : "rngtech.collapse.status." + name;
     }
 
     @Override
@@ -498,6 +551,7 @@ public class VacuumCollapseGeneratorBlockEntity extends BaseMachineBlockEntity i
             int offered = extractEnergyInternal(remainingOutput, stats, true);
             int received = target.receiveEnergy(offered, false);
             int delivered = extractEnergyInternal(received, stats, false);
+            energyFlow.recordOutput(delivered);
             remainingOutput -= delivered;
             exported |= delivered > 0;
         }

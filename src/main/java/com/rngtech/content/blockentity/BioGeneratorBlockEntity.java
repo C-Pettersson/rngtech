@@ -38,7 +38,7 @@ import net.neoforged.neoforge.energy.IEnergyStorage;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.ItemStackHandler;
 
-public class BioGeneratorBlockEntity extends BaseMachineBlockEntity implements MenuProvider {
+public class BioGeneratorBlockEntity extends BaseMachineBlockEntity implements MenuProvider, MachineInfoProvider {
     public static final int SLOT_FUEL = 0;
     public static final int SLOT_BATTERY_CELL = 0;
     public static final int SLOT_BIO_CHAMBER = 1;
@@ -141,6 +141,8 @@ public class BioGeneratorBlockEntity extends BaseMachineBlockEntity implements M
     private final IItemHandler fuelHandler = new FuelItemHandler();
     private final IItemHandler emptyItemHandler = new EmptyItemHandler();
     private final IEnergyStorage energyStorage = new GeneratorEnergyStorage();
+    private final EnergyTelemetry energyFlow = new EnergyTelemetry(this::getLevel);
+    private final IEnergyStorage trackedEnergyStorage = energyFlow.track(energyStorage);
     private final ContainerData menuData = new ContainerData() {
         @Override
         public int get(int index) {
@@ -219,7 +221,42 @@ public class BioGeneratorBlockEntity extends BaseMachineBlockEntity implements M
     }
 
     public IEnergyStorage getEnergyStorage(Direction side) {
-        return side == Direction.UP || side == Direction.DOWN ? null : energyStorage;
+        return side == Direction.UP || side == Direction.DOWN ? null : trackedEnergyStorage;
+    }
+
+    @Override
+    public MachineInfoSnapshot machineInfo() {
+        MachineStatAccumulator stats = effectiveStats();
+        int status = statusCode(stats);
+        AdjacentEnergyConnector.Info connector = AdjacentEnergyConnector.forSource(level, worldPosition);
+        return MachineInfoSnapshot.builder("bio_generator")
+                .state(
+                        MachineInfoSnapshot.workState(
+                                status == STATUS_READY,
+                                getBlockState().getValue(BaseMachineBlock.ACTIVE),
+                                status == STATUS_NO_FUEL
+                        ),
+                        MachineInfoSnapshot.BlockedReason.NONE
+                )
+                .status(statusKey(status))
+                .energy(energyStored(), energyCapacity(stats), currentEnergyPerTick())
+                .energyTelemetry(energyFlow.lastInput(), energyFlow.lastOutput(), connector.transferRate(), MachineInfoSnapshot.EnergyBottleneck.NONE)
+                .fuel(burnTime, totalBurnTime)
+                .output(status == STATUS_ENERGY_FULL
+                        ? MachineInfoSnapshot.OutputSummary.ENERGY_FULL
+                        : MachineInfoSnapshot.OutputSummary.NONE)
+                .refinement(machineTraits())
+                .build();
+    }
+
+    private static String statusKey(int status) {
+        String name = switch (status) {
+            case STATUS_NO_FUEL -> "no_fuel";
+            case STATUS_INVALID_FUEL -> "invalid_fuel";
+            case STATUS_ENERGY_FULL -> "energy_full";
+            default -> "";
+        };
+        return name.isEmpty() ? "" : "rngtech.bio_generator.status." + name;
     }
 
     @Override
@@ -534,6 +571,7 @@ public class BioGeneratorBlockEntity extends BaseMachineBlockEntity implements M
             int offered = extractEnergyInternal(remainingOutput, stats, true);
             int received = target.receiveEnergy(offered, false);
             int delivered = extractEnergyInternal(received, stats, false);
+            energyFlow.recordOutput(delivered);
             remainingOutput -= delivered;
             exported |= delivered > 0;
         }

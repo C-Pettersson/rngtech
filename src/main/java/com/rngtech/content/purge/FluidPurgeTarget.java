@@ -4,6 +4,7 @@ import net.minecraft.network.chat.Component;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 
+import java.util.function.IntSupplier;
 import java.util.function.Supplier;
 
 public record FluidPurgeTarget(
@@ -13,7 +14,8 @@ public record FluidPurgeTarget(
         Supplier<FluidStack> fluidSupplier,
         Drain drain,
         Runnable beforePurge,
-        Runnable afterPurge
+        Runnable afterPurge,
+        IntSupplier capacitySupplier
 ) {
     private static final Runnable NO_OP = () -> {
     };
@@ -21,6 +23,14 @@ public record FluidPurgeTarget(
     public FluidStack fluid() {
         FluidStack stack = fluidSupplier.get();
         return stack == null ? FluidStack.EMPTY : stack;
+    }
+
+    public int capacity() {
+        return capacitySupplier == null ? 0 : Math.max(0, capacitySupplier.getAsInt());
+    }
+
+    public FluidPurgeTarget withCapacity(IntSupplier capacity) {
+        return new FluidPurgeTarget(id, name, role, fluidSupplier, drain, beforePurge, afterPurge, capacity);
     }
 
     public FluidStack drain(int amount, IFluidHandler.FluidAction action) {
@@ -60,7 +70,7 @@ public record FluidPurgeTarget(
             Runnable beforePurge,
             Runnable afterPurge
     ) {
-        return new FluidPurgeTarget(id, name, role, fluidSupplier, drain, beforePurge, afterPurge);
+        return new FluidPurgeTarget(id, name, role, fluidSupplier, drain, beforePurge, afterPurge, null);
     }
 
     @FunctionalInterface
