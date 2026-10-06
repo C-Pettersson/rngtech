@@ -52,7 +52,8 @@ public class SolarArrayControllerMenu extends AbstractContainerMenu {
     private static final int DATA_CONNECTOR_OUTPUT_CAP = 20;
     private static final int DATA_PREVIEW_RANGE = 21;
     private static final int DATA_PANEL_RANGE = 22;
-    private static final int DATA_COUNT = 23;
+    private static final int DATA_FLAT_ENERGY_GENERATION = 23;
+    private static final int DATA_COUNT = 24;
     private static final int STAT_SCALE = 100;
     public static final int BUTTON_TOGGLE_PREVIEW_RANGE = 10;
     private static final int BATTERY_CELL_SLOT = 0;
@@ -224,6 +225,10 @@ public class SolarArrayControllerMenu extends AbstractContainerMenu {
 
     public static int energyGenerationDataIndex() {
         return DATA_ENERGY_GENERATION;
+    }
+
+    public static int flatEnergyGenerationDataIndex() {
+        return DATA_FLAT_ENERGY_GENERATION;
     }
 
     public static int energyCapacityStatDataIndex() {

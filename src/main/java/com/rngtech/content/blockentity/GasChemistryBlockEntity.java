@@ -97,6 +97,7 @@ public class GasChemistryBlockEntity extends BaseMachineBlockEntity
     private static final int DATA_EFFICIENCY = 15;
     private static final int DATA_MAX_TEMPERATURE = 16;
     private static final int DATA_REFINEMENT_POTENTIAL = 17;
+    private static final int DATA_FLAT_ENERGY_GENERATION = 18;
     private static final int STAT_SCALE = 100;
 
     private GasChemistryMachine machine;
@@ -217,7 +218,8 @@ public class GasChemistryBlockEntity extends BaseMachineBlockEntity
                 case DATA_TANK_CAPACITY -> TANK_CAPACITY;
                 case DATA_STATUS -> statusCode();
                 case DATA_ENERGY_DELTA -> currentEnergyDelta();
-                case DATA_ENERGY_GENERATION -> scaledStat(stats, MachineStat.ENERGY_GENERATION);
+                case DATA_ENERGY_GENERATION -> (int) Math.round(stats.effectiveEnergyGenerationMultiplier() * STAT_SCALE);
+                case DATA_FLAT_ENERGY_GENERATION -> (int) Math.round(stats.effectiveFlatEnergyGenerationBonus() * STAT_SCALE);
                 case DATA_ENERGY_USAGE -> scaledStat(stats, MachineStat.ENERGY_USAGE);
                 case DATA_ENERGY_TRANSFER -> scaledStat(stats, MachineStat.ENERGY_TRANSFER);
                 case DATA_PROCESSING_SPEED -> scaledStat(stats, MachineStat.PROCESSING_SPEED);
@@ -234,7 +236,7 @@ public class GasChemistryBlockEntity extends BaseMachineBlockEntity
 
         @Override
         public int getCount() {
-            return DATA_REFINEMENT_POTENTIAL + 1;
+            return DATA_FLAT_ENERGY_GENERATION + 1;
         }
     };
 

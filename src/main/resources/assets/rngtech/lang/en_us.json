@@ -2005,6 +2005,8 @@
   "rngtech.stat.energy_capacity_flat.description": "Adds %s to the machine buffer before capacity multipliers.",
   "rngtech.stat.energy_generation": "Energy Generation",
   "rngtech.stat.energy_generation.description": "Generates %s before output limits apply.",
+  "rngtech.stat.energy_generation.multiplier": "Scales this generator's base FE by %s.",
+  "rngtech.stat.energy_generation.multiplier_with_flat": "Scales this generator's base FE by %s, then adds %s from flat generation rolls.",
   "rngtech.stat.energy_transfer": "Energy Transfer",
   "rngtech.stat.energy_transfer.description": "Moves up to %s through this machine's exposed energy cap.",
   "rngtech.stat.efficiency": "Efficiency",

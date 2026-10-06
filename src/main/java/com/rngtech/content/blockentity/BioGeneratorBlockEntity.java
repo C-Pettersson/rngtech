@@ -88,6 +88,7 @@ public class BioGeneratorBlockEntity extends BaseMachineBlockEntity implements M
     private static final int DATA_RICH_BIOMASS_POWER = 22;
     private static final int DATA_FUEL_DURATION = 23;
     private static final int DATA_REFINEMENT_POTENTIAL = 24;
+    private static final int DATA_FLAT_ENERGY_GENERATION = 25;
     private static final int STAT_SCALE = 100;
 
     private final ItemStackHandler fuelInventory = new ItemStackHandler(1) {
@@ -156,7 +157,8 @@ public class BioGeneratorBlockEntity extends BaseMachineBlockEntity implements M
                 case DATA_MAX_OUTPUT -> effectiveOutputRate(stats);
                 case DATA_RECIPE_ENERGY -> currentRecipeEnergy(stats);
                 case DATA_STATUS -> statusCode(stats);
-                case DATA_ENERGY_GENERATION -> scaledStat(stats, MachineStat.ENERGY_GENERATION);
+                case DATA_ENERGY_GENERATION -> (int) Math.round(stats.effectiveEnergyGenerationMultiplier() * STAT_SCALE);
+                case DATA_FLAT_ENERGY_GENERATION -> (int) Math.round(stats.effectiveFlatEnergyGenerationBonus() * STAT_SCALE);
                 case DATA_ENERGY_CAPACITY_STAT -> scaledStat(stats, MachineStat.ENERGY_CAPACITY);
                 case DATA_ENERGY_TRANSFER -> scaledStat(stats, MachineStat.ENERGY_TRANSFER);
                 case DATA_EFFICIENCY -> scaledStat(stats, MachineStat.EFFICIENCY);
@@ -183,7 +185,7 @@ public class BioGeneratorBlockEntity extends BaseMachineBlockEntity implements M
 
         @Override
         public int getCount() {
-            return DATA_REFINEMENT_POTENTIAL + 1;
+            return DATA_FLAT_ENERGY_GENERATION + 1;
         }
     };
 

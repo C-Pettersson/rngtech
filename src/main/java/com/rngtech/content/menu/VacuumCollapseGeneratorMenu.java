@@ -49,7 +49,8 @@ public class VacuumCollapseGeneratorMenu extends AbstractContainerMenu {
     private static final int DATA_PROCESSING_SPEED = 18;
     private static final int DATA_STABILITY = 19;
     private static final int DATA_REFINEMENT_POTENTIAL = 20;
-    private static final int DATA_COUNT = 21;
+    private static final int DATA_FLAT_ENERGY_GENERATION = 21;
+    private static final int DATA_COUNT = 22;
     private static final int STAT_SCALE = 100;
     private static final int INPUT_SLOT = 0;
     private static final int RESIDUE_SLOT = 1;
@@ -210,6 +211,10 @@ public class VacuumCollapseGeneratorMenu extends AbstractContainerMenu {
 
     public static int energyGenerationDataIndex() {
         return DATA_ENERGY_GENERATION;
+    }
+
+    public static int flatEnergyGenerationDataIndex() {
+        return DATA_FLAT_ENERGY_GENERATION;
     }
 
     public static int energyCapacityDataIndex() {

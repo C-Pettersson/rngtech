@@ -483,6 +483,28 @@ final class MachineScreenStyle {
         return new StatLine(label, value, strength, integral, enhanced, tooltip);
     }
 
+    /** Shows each Energy Generation row as the multiplier it is, with flat FE/t rolls in its hover. */
+    static StatLine[] withGenerationMultiplier(MachineStat[] stats, StatLine[] statLines, double flatPerTick) {
+        for (int index = 0; index < Math.min(stats.length, statLines.length); index++) {
+            if (stats[index] == MachineStat.ENERGY_GENERATION) {
+                statLines[index] = generationMultiplierLine(statLines[index], flatPerTick);
+            }
+        }
+        return statLines;
+    }
+
+    static StatLine generationMultiplierLine(StatLine line, double flatPerTick) {
+        double multiplier = line.strength();
+        return new StatLine(
+                line.label(),
+                MachineStatDisplay.generationMultiplierValue(multiplier),
+                multiplier,
+                false,
+                multiplier > 1.001,
+                MachineStatDisplay.generationMultiplierTooltip(multiplier, flatPerTick)
+        );
+    }
+
     /** Declared ascendancy stats follow the machine's own rows, highlighted, only while an allocated node grants them. */
     static StatLine[] withAscendancyStats(StatLine[] statLines, List<MasteryMenuSupport.GrantedStat> granted) {
         StatLine[] all = Arrays.copyOf(statLines, statLines.length + granted.size());

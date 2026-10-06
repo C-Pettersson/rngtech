@@ -449,7 +449,7 @@ public class BioGeneratorScreen extends AbstractContainerScreen<BioGeneratorMenu
                     )
             );
         }
-        return statLines;
+        return MachineScreenStyle.withGenerationMultiplier(STAT_TYPES, statLines, menu.statValue(BioGeneratorMenu.flatEnergyGenerationDataIndex()));
     }
 
     private boolean isEnhancedStat(int dataIndex, double value) {

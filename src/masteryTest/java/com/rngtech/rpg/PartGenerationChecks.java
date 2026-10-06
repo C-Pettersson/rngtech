@@ -15,6 +15,7 @@ public final class PartGenerationChecks {
         partModifiersScaleOnlyTheirOwnPart();
         machineWideIncreasesScalePartFlatsOnce();
         additivePartsKeepTheirFlatSeparate();
+        generationMultiplierDisplaysAsPercent();
         return checks;
     }
 
@@ -45,6 +46,12 @@ public final class PartGenerationChecks {
         near(machine.effectiveFlatEnergyGenerationBonus(), 15, "additive part flat counts once");
     }
 
+    private static void generationMultiplierDisplaysAsPercent() {
+        MachineStatAccumulator machine = machineWithChamberAndNozzle();
+        require(MachineStatDisplay.generationMultiplierValue(machine.effectiveEnergyGenerationMultiplier()).equals("+166%"),
+                "Stats tab shows the generation multiplier without flat FE/t");
+    }
+
     private static MachineStatAccumulator machineWithChamberAndNozzle() {
         MachineStatAccumulator chamber = MachineStatAccumulator.componentBase(Map.of(MachineStat.ENERGY_GENERATION, 1.0));
         chamber.apply(flatGeneration(207));
@@ -61,6 +68,13 @@ public final class PartGenerationChecks {
         String id = ModifierEligibilityProfiles.ENERGY_GENERATION_FLAT_AFFIX_ID;
         return new MachineModifier(id, id, ModifierSlot.PREFIX, MachineStat.ENERGY_GENERATION, ModifierOperation.ADD, 0,
                 ModifierValueRange.fixed(value), value, List.of());
+    }
+
+    private static void require(boolean condition, String label) {
+        checks++;
+        if (!condition) {
+            throw new AssertionError(label);
+        }
     }
 
     private static void near(double actual, double expected, String label) {

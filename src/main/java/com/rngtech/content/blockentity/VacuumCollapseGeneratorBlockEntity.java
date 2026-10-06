@@ -80,6 +80,7 @@ public class VacuumCollapseGeneratorBlockEntity extends BaseMachineBlockEntity i
     private static final int DATA_PROCESSING_SPEED = 18;
     private static final int DATA_STABILITY = 19;
     private static final int DATA_REFINEMENT_POTENTIAL = 20;
+    private static final int DATA_FLAT_ENERGY_GENERATION = 21;
     private static final int STAT_SCALE = 100;
     private static final long BASE_CAPACITY = 1_000_000L;
     private static final int BASE_TRANSFER = 8192;
@@ -151,7 +152,8 @@ public class VacuumCollapseGeneratorBlockEntity extends BaseMachineBlockEntity i
                 case DATA_PROCESSING_LEVEL -> stats.intValue(MachineStat.PROCESSING_LEVEL);
                 case DATA_STATUS -> statusCode(stats);
                 case DATA_INSTABILITY -> (int) Math.round(activeInstability * STAT_SCALE);
-                case DATA_ENERGY_GENERATION -> scaledStat(stats, MachineStat.ENERGY_GENERATION);
+                case DATA_ENERGY_GENERATION -> (int) Math.round(stats.effectiveEnergyGenerationMultiplier() * STAT_SCALE);
+                case DATA_FLAT_ENERGY_GENERATION -> (int) Math.round(stats.effectiveFlatEnergyGenerationBonus() * STAT_SCALE);
                 case DATA_ENERGY_CAPACITY_STAT -> scaledStat(stats, MachineStat.ENERGY_CAPACITY);
                 case DATA_ENERGY_TRANSFER -> effectiveOutputRate(stats);
                 case DATA_EFFICIENCY -> scaledStat(stats, MachineStat.EFFICIENCY);
@@ -168,7 +170,7 @@ public class VacuumCollapseGeneratorBlockEntity extends BaseMachineBlockEntity i
 
         @Override
         public int getCount() {
-            return DATA_REFINEMENT_POTENTIAL + 1;
+            return DATA_FLAT_ENERGY_GENERATION + 1;
         }
     };
 

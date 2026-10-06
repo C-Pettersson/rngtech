@@ -489,7 +489,7 @@ public class PotentialReactorScreen extends AbstractContainerScreen<PotentialRea
                     )
             );
         }
-        return statLines;
+        return MachineScreenStyle.withGenerationMultiplier(STAT_TYPES, statLines, menu.statValue(PotentialReactorMenu.flatEnergyGenerationDataIndex()));
     }
 
     private boolean isEnhancedStat(int dataIndex, double value) {

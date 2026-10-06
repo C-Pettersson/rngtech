@@ -53,7 +53,8 @@ public class BioGeneratorMenu extends AbstractContainerMenu {
     private static final int DATA_RICH_BIOMASS_POWER = 22;
     private static final int DATA_FUEL_DURATION = 23;
     private static final int DATA_REFINEMENT_POTENTIAL = 24;
-    private static final int DATA_COUNT = 25;
+    private static final int DATA_FLAT_ENERGY_GENERATION = 25;
+    private static final int DATA_COUNT = 26;
     private static final int STAT_SCALE = 100;
     private static final int FUEL_SLOT = 0;
     private static final int BATTERY_CELL_SLOT = 1;
@@ -191,6 +192,10 @@ public class BioGeneratorMenu extends AbstractContainerMenu {
 
     public static int energyGenerationDataIndex() {
         return DATA_ENERGY_GENERATION;
+    }
+
+    public static int flatEnergyGenerationDataIndex() {
+        return DATA_FLAT_ENERGY_GENERATION;
     }
 
     public static int energyCapacityStatDataIndex() {

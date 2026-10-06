@@ -50,7 +50,8 @@ public class CorrosionCellMenu extends AbstractContainerMenu {
     private static final int DATA_PROCESSING_SPEED = 16;
     private static final int DATA_STABILITY = 17;
     private static final int DATA_REFINEMENT_POTENTIAL = 18;
-    private static final int DATA_COUNT = 19;
+    private static final int DATA_FLAT_ENERGY_GENERATION = 19;
+    private static final int DATA_COUNT = 20;
     private static final int STAT_SCALE = 100;
     private static final int PLATE_SLOT = 0;
     private static final int ELECTROLYTE_SLOT = 1;
@@ -219,6 +220,10 @@ public class CorrosionCellMenu extends AbstractContainerMenu {
 
     public static int energyGenerationDataIndex() {
         return DATA_ENERGY_GENERATION;
+    }
+
+    public static int flatEnergyGenerationDataIndex() {
+        return DATA_FLAT_ENERGY_GENERATION;
     }
 
     public static int energyCapacityDataIndex() {

@@ -99,6 +99,22 @@ public final class MachineStatDisplay {
         return Component.translatable(stat.translationKey() + ".description", statValue(stat, value));
     }
 
+    /** Energy Generation on generators that scale a recipe, fuel, or panel output, where the stat is a multiplier. */
+    public static String generationMultiplierValue(double multiplier) {
+        return formatMultiplierDelta(multiplier);
+    }
+
+    public static MutableComponent generationMultiplierTooltip(double multiplier, double flatPerTick) {
+        if (Math.abs(flatPerTick) <= EPSILON) {
+            return Component.translatable("rngtech.stat.energy_generation.multiplier", formatMultiplierDelta(multiplier));
+        }
+        return Component.translatable(
+                "rngtech.stat.energy_generation.multiplier_with_flat",
+                formatMultiplierDelta(multiplier),
+                formatSignedNumber(Math.round(flatPerTick)) + " FE/t"
+        );
+    }
+
     public static MutableComponent effectText(MachineModifierEffect effect) {
         double amount = switch (effect.operation()) {
             case MORE -> (effect.value() - 1.0) * 100.0;

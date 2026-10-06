@@ -73,6 +73,7 @@ public class AmmoniaFuelCellBlockEntity extends BaseMachineBlockEntity
     private static final int DATA_EFFICIENCY = 10;
     private static final int DATA_PROCESSING_SPEED = 11;
     private static final int DATA_REFINEMENT_POTENTIAL = 12;
+    private static final int DATA_FLAT_ENERGY_GENERATION = 13;
     private static final int STAT_SCALE = 100;
     private static final Direction[] ENERGY_OUTPUT_DIRECTIONS = {
             Direction.UP,
@@ -150,7 +151,8 @@ public class AmmoniaFuelCellBlockEntity extends BaseMachineBlockEntity
                 case DATA_TANK_CAPACITY -> TANK_CAPACITY;
                 case DATA_STATUS -> statusCode();
                 case DATA_ENERGY_PER_TICK -> currentEnergyPerTick();
-                case DATA_ENERGY_GENERATION -> scaledStat(stats, MachineStat.ENERGY_GENERATION);
+                case DATA_ENERGY_GENERATION -> (int) Math.round(stats.effectiveEnergyGenerationMultiplier() * STAT_SCALE);
+                case DATA_FLAT_ENERGY_GENERATION -> (int) Math.round(stats.effectiveFlatEnergyGenerationBonus() * STAT_SCALE);
                 case DATA_ENERGY_TRANSFER -> scaledStat(stats, MachineStat.ENERGY_TRANSFER);
                 case DATA_EFFICIENCY -> scaledStat(stats, MachineStat.EFFICIENCY);
                 case DATA_PROCESSING_SPEED -> scaledStat(stats, MachineStat.PROCESSING_SPEED);
@@ -165,7 +167,7 @@ public class AmmoniaFuelCellBlockEntity extends BaseMachineBlockEntity
 
         @Override
         public int getCount() {
-            return DATA_REFINEMENT_POTENTIAL + 1;
+            return DATA_FLAT_ENERGY_GENERATION + 1;
         }
     };
 

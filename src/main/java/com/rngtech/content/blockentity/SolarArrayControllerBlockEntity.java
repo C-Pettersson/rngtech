@@ -88,6 +88,7 @@ public class SolarArrayControllerBlockEntity extends BaseMachineBlockEntity impl
     private static final int DATA_CONNECTOR_OUTPUT_CAP = 20;
     private static final int DATA_PREVIEW_RANGE = 21;
     private static final int DATA_PANEL_RANGE = 22;
+    private static final int DATA_FLAT_ENERGY_GENERATION = 23;
     private static final int STAT_SCALE = 100;
 
     private final ItemStackHandler gearInventory = new ItemStackHandler(GEAR_SLOT_COUNT) {
@@ -137,7 +138,8 @@ public class SolarArrayControllerBlockEntity extends BaseMachineBlockEntity impl
                 case DATA_ACTIVE_PANELS -> lastActivePanelCount;
                 case DATA_BLOCKED_PANELS -> lastBlockedPanelCount;
                 case DATA_STATUS -> lastStatus;
-                case DATA_ENERGY_GENERATION -> scaledStat(stats, MachineStat.ENERGY_GENERATION);
+                case DATA_ENERGY_GENERATION -> (int) Math.round(stats.effectiveEnergyGenerationMultiplier() * STAT_SCALE);
+                case DATA_FLAT_ENERGY_GENERATION -> (int) Math.round(stats.effectiveFlatEnergyGenerationBonus() * STAT_SCALE);
                 case DATA_ENERGY_CAPACITY_STAT -> scaledStat(stats, MachineStat.ENERGY_CAPACITY);
                 case DATA_ENERGY_TRANSFER -> effectiveOutputRate(stats);
                 case DATA_EFFICIENCY -> scaledStat(stats, MachineStat.EFFICIENCY);
@@ -163,7 +165,7 @@ public class SolarArrayControllerBlockEntity extends BaseMachineBlockEntity impl
 
         @Override
         public int getCount() {
-            return DATA_PANEL_RANGE + 1;
+            return DATA_FLAT_ENERGY_GENERATION + 1;
         }
     };
 
