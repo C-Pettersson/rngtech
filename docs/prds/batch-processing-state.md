@@ -2,7 +2,7 @@
 
 Source: [Batch Processing PRD](batch-processing.md).
 
-Status: **Prototype** for the 2.0 release. Slice 1 is in on `feature/batch-processing` and passes the automated checks; it still needs an in-game playtest.
+Status: **Prototype** for the 2.0 release. Slice 1 is in on `feature/batch-processing`, passes the automated checks, and passed an in-game check on 2026-10-06. Slices 2–4 remain.
 
 ## Scope checklist
 
@@ -47,4 +47,5 @@ Recorded 2026-10-06, during slice 1:
     - `DENSE_PARALLEL` is gone from chassis implicits, the Crusher Throughput affix, the Dense Batching keystone, and every gate.
     - Canonical docs, generated ascendancy tables, and Moddex data are updated.
     - The Resonance Calibrator, Metal Press, and Melter Stats tabs show Batch Size. The Press and Melter never showed Parallel Jobs, so batches from Drop Forge, Twin Crucible, or Dense Batching were invisible there. The Calibrator chassis tooltip names its base Batch Size.
+    - In-game check passed: Crusher, Metal Press, Melter, and Resonance Calibrator batching, plus the new Stats tab rows.
     - Still open for slice 4: Lane Sync, Shared Field, and Wide Tolerance still say "lanes".
