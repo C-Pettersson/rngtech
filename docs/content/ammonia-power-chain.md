@@ -17,9 +17,11 @@ Ammonia synthesis uses the `rngtech:ammonia_synthesis` recipe type. Ammonia gene
 
 | Machine | Slot | Required | Accepted item | Role |
 |---|---|---:|---|---|
-| Ammonia Synthesizer | Catalyst Bed | Yes | `rngtech:ammonia_catalyst_bed` | Gates synthesis recipes and contributes processing, efficiency, stability, and fluid transfer |
-| Ammonia Fuel Cell | Fuel Cell Membrane | Yes | `rngtech:fuel_cell_membrane` | Gates ammonia power recipes and contributes generation, transfer, speed, efficiency, and stability |
+| Ammonia Synthesizer | Catalyst Bed | Yes | `rngtech:ammonia_catalyst_bed` | Gates synthesis recipes by stage. Its rolled Processing Speed and Energy Usage modifiers apply to the Synthesizer |
+| Ammonia Fuel Cell | Fuel Cell Membrane | Yes | `rngtech:fuel_cell_membrane` | Gates ammonia power recipes by stage. Its rolled Energy Generation, Energy Transfer, Processing Speed, and Efficiency modifiers apply to the Fuel Cell |
 | Ammonia Fuel Cell | Battery Cell | No | Stage 6+ Battery Cells | Adds portable FE capacity and output storage |
+
+Both parts have neutral base stats, so an unrolled part only gates recipes. Their rolled modifiers are local to the part, as on other machine parts. The machines do not currently read Stability or Fluid Transfer, and the Synthesizer does not read Efficiency or Instant Process chance, so those rolls have no effect yet.
 
 The ammonia synthesizer owns nitrogen, hydrogen, and ammonia tanks. The fuel cell owns one ammonia input tank and one residue output slot. The default code-backed Nitrogen source is the Cavitation Generator's Stage 6 water separation recipe with `rngtech:nitrogen_extraction_rotor` and `rngtech:nitrogen_separation_nozzle`; the default Hydrogen source is Steam Methane Reforming.
 
