@@ -26,6 +26,7 @@ public final class MachineStatAccumulator {
     private final Map<MachineStat, Double> increasedPercentValues = new EnumMap<>(MachineStat.class);
     private final Map<MachineStat, Double> moreValues = new EnumMap<>(MachineStat.class);
     private double flatEnergyGenerationBonus;
+    private double partEnergyGenerationMore = 1.0;
     private final Map<MachineStat, Double> absoluteValues = new EnumMap<>(MachineStat.class);
     private final Map<MachineStat, Double> absoluteCeilings = new EnumMap<>(MachineStat.class);
 
@@ -651,8 +652,25 @@ public final class MachineStatAccumulator {
                 0.1,
                 (baseValues.getOrDefault(MachineStat.ENERGY_GENERATION, 0.0) + nonFlatAdditive) * statScale
         );
-        double flatGeneration = flatEnergyGenerationBonus * Math.max(1, processingTicks) * statScale;
+        double flatGeneration = flatEnergyGenerationBonus * Math.max(1, processingTicks) * flatEnergyGenerationScale();
         return baseEnergy * generationMultiplier + flatGeneration;
+    }
+
+    /**
+     * Merges an installed part's locally resolved generation. Part modifiers are local: they already scaled the
+     * part's own multiplier and flat FE/t, so neither is rescaled by this or any other part's multiplier here.
+     */
+    void applyPartEnergyGeneration(MachineStatAccumulator part, boolean multiplier) {
+        double generation = part.valueWithoutFlatEnergyGenerationBonus(MachineStat.ENERGY_GENERATION);
+        if (!multiplier) {
+            add(MachineStat.ENERGY_GENERATION, generation);
+        } else if (Math.abs(generation - 1.0) > 0.0001) {
+            addMore(MachineStat.ENERGY_GENERATION, generation);
+            partEnergyGenerationMore *= generation;
+        }
+        double flat = part.effectiveFlatEnergyGenerationBonus();
+        add(MachineStat.ENERGY_GENERATION, flat);
+        addFlatEnergyGenerationBonus(flat);
     }
 
     double valueWithoutFlatEnergyGenerationBonus(MachineStat stat) {
@@ -668,11 +686,19 @@ public final class MachineStatAccumulator {
     }
 
     public double effectiveFlatEnergyGenerationBonus() {
-        return flatEnergyGenerationBonus * percentAndMore(MachineStat.ENERGY_GENERATION);
+        return flatEnergyGenerationBonus * flatEnergyGenerationScale();
     }
 
-    void addFlatEnergyGenerationBonus(double value) {
+    private void addFlatEnergyGenerationBonus(double value) {
         flatEnergyGenerationBonus += value;
+    }
+
+    /** Machine-wide increased and more generation, excluding installed part multipliers. */
+    private double flatEnergyGenerationScale() {
+        if (partEnergyGenerationMore <= 0.0) {
+            return 0.0;
+        }
+        return percentAndMore(MachineStat.ENERGY_GENERATION) / partEnergyGenerationMore;
     }
 
     public double baseValue(MachineStat stat) {

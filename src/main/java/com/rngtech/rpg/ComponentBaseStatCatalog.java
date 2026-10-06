@@ -12,6 +12,7 @@ import com.rngtech.content.energy.RecoveryFilterMaterial;
 import com.rngtech.content.energy.SolarArrayExtenderMaterial;
 import com.rngtech.content.energy.VacuumCollapsePartMaterial;
 import com.rngtech.content.item.AlloyCrucibleItem;
+import com.rngtech.content.item.AmmoniaPartItem;
 import com.rngtech.content.item.BatteryCellItem;
 import com.rngtech.content.item.BioChamberItem;
 import com.rngtech.content.item.CalibrationGearItem;
@@ -128,15 +129,7 @@ public final class ComponentBaseStatCatalog {
             MachineStat stat = entry.getKey();
             double value = contribution.value(stat);
             if (stat == MachineStat.ENERGY_GENERATION) {
-                double flatGeneration = contribution.effectiveFlatEnergyGenerationBonus();
-                if (entry.getValue() == MergeRule.ADD) {
-                    applyAdd(target, stat, contribution.valueWithoutFlatEnergyGenerationBonus(stat) + flatGeneration);
-                    target.addFlatEnergyGenerationBonus(flatGeneration);
-                } else {
-                    applyMore(target, stat, contribution.valueWithoutFlatEnergyGenerationBonus(stat));
-                    applyAdd(target, stat, flatGeneration);
-                    target.addFlatEnergyGenerationBonus(flatGeneration);
-                }
+                target.applyPartEnergyGeneration(contribution, entry.getValue() == MergeRule.MORE);
                 continue;
             }
             if (entry.getValue() == MergeRule.ADD) {
@@ -202,6 +195,13 @@ public final class ComponentBaseStatCatalog {
         }
         if (item instanceof FluidPumpItem pump) {
             return fluidPump(pump.material());
+        }
+        if (item instanceof AmmoniaPartItem part) {
+            return switch (part.partType()) {
+                case AMMONIA_CATALYST_BED -> ammoniaCatalystBed();
+                case FUEL_CELL_MEMBRANE -> fuelCellMembrane();
+                default -> null;
+            };
         }
         if (item instanceof GasChemistryPartItem part) {
             return part.partType() == MachinePartType.REFORMING_CATALYST_BED ? reformingCatalystBed(part.stage()) : null;
@@ -396,6 +396,28 @@ public final class ComponentBaseStatCatalog {
         return builder()
                 .add(MachineStat.FLUID_TRANSFER, material.transferRate())
                 .build();
+    }
+
+    private static Profile ammoniaCatalystBed() {
+        return builder()
+                .more(MachineStat.ENERGY_USAGE, 1.0)
+                .more(MachineStat.PROCESSING_SPEED, 1.0)
+                .more(MachineStat.EFFICIENCY, 1.0)
+                .more(MachineStat.STABILITY, 1.0)
+                .more(MachineStat.FLUID_TRANSFER, 1.0)
+                .add(MachineStat.INSTANT_PROCESS_CHANCE, 0.0)
+                .buildWithoutSummary();
+    }
+
+    private static Profile fuelCellMembrane() {
+        return builder()
+                .more(MachineStat.ENERGY_GENERATION, 1.0)
+                .more(MachineStat.ENERGY_TRANSFER, 1.0)
+                .more(MachineStat.PROCESSING_SPEED, 1.0)
+                .more(MachineStat.EFFICIENCY, 1.0)
+                .more(MachineStat.STABILITY, 1.0)
+                .more(MachineStat.FLUID_TRANSFER, 1.0)
+                .buildWithoutSummary();
     }
 
     private static Profile reformingCatalystBed(int stage) {
