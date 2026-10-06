@@ -35,7 +35,7 @@ final class MasteryNodeJson {
         List<MegaPassiveNode.TaggedEffect> tagged = new ArrayList<>();
         for (JsonElement item : array(raw, "effects")) {
             JsonObject e = item.getAsJsonObject();
-            MachineModifierEffect effect = MachineModifierEffect.fixed(MachineStat.valueOf(e.get("stat").getAsString()), ModifierOperation.valueOf(e.get("operation").getAsString()), e.get("value").getAsDouble());
+            MachineModifierEffect effect = MachineModifierEffect.fixed(MachineStat.fromName(e.get("stat").getAsString()), ModifierOperation.valueOf(e.get("operation").getAsString()), e.get("value").getAsDouble());
             if (e.has("tag")) { tagged.add(new MegaPassiveNode.TaggedEffect(MachineTag.valueOf(e.get("tag").getAsString()), effect)); }
             else { effects.add(effect); }
         }
@@ -43,7 +43,7 @@ final class MasteryNodeJson {
         List<MegaPassiveNode.AttributeScaling> scaling = new ArrayList<>();
         array(raw, "scaling").forEach(e -> {
             JsonObject s = e.getAsJsonObject();
-            scaling.add(new MegaPassiveNode.AttributeScaling(MachineStat.valueOf(s.get("attribute").getAsString()), MachineStat.valueOf(s.get("stat").getAsString()), ModifierOperation.valueOf(s.get("operation").getAsString()), s.get("perPoint").getAsDouble()));
+            scaling.add(new MegaPassiveNode.AttributeScaling(MachineStat.fromName(s.get("attribute").getAsString()), MachineStat.fromName(s.get("stat").getAsString()), ModifierOperation.valueOf(s.get("operation").getAsString()), s.get("perPoint").getAsDouble()));
         });
         Map<PassiveStatType, Integer> passive = new HashMap<>();
         object(raw, "passive").entrySet().forEach(e -> passive.put(PassiveStatType.valueOf(e.getKey()), e.getValue().getAsInt()));
@@ -64,7 +64,7 @@ final class MasteryNodeJson {
 
     private static Map<MachineStat, Double> statsMap(JsonObject raw) {
         Map<MachineStat, Double> result = new HashMap<>();
-        raw.entrySet().forEach(e -> result.put(MachineStat.valueOf(e.getKey()), e.getValue().getAsDouble()));
+        raw.entrySet().forEach(e -> result.put(MachineStat.fromName(e.getKey()), e.getValue().getAsDouble()));
         return Map.copyOf(result);
     }
 }

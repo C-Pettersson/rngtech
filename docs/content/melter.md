@@ -96,7 +96,7 @@ Melter machines choose between Pressure Vessel and Twin Crucible when they use t
 
 - The Melter’s tanks start at 4,000 mB, and Pressurized Tanks raise them. Melter recipes carry `bonus_output`, and only eligible melts gain Fluid Yield, rounded down per melt.
 - Sealed Lines stops excess output from being voided, even with an auto-purge servo, so a full tank pauses work and keeps progress.
-- Twin Crucible’s Second Crucible and Triple Crucible run parallel melts from the input. Shared Heat makes each melt after the first 20% cheaper, and Fused Crucibles turns them off for 30% more Processing Speed per job.
+- Twin Crucible’s Second Crucible and Triple Crucible raise [Batch Size](../reference/machine-stats.md), so one cycle melts several sets, each needing its own inputs, fluid, and tank room. Each extra melt adds Batch Overhead to the cycle time. Shared Heat makes each melt after the first 20% cheaper, and Fused Crucibles turns batching off for 20% more Processing Speed per point of Batch Size.
 - Electrolyte Solution, Methane, and lava feed generators, so the loop audit bounds Melter yield at 1.6 times the recipe fluid.
 
 <!-- ascendancy-trees:start -->
@@ -123,17 +123,17 @@ Melter machines choose between Pressure Vessel and Twin Crucible when they use t
 
 | Node | Type | After | Effect |
 |---|---|---|---|
-| **Second Crucible** | Root | — | +1 Parallel Jobs; 15% more Energy Use. Runs one extra melt in parallel per Parallel Job. |
+| **Second Crucible** | Root | — | +2 Batch Size; 15% more Energy Use. Each batched melt needs its own inputs, fluid, and tank room. |
 | Steady Feed | Small | Second Crucible | 8% increased Processing Speed. |
 | **Crush Feed** | Notable | Steady Feed | +10% Overlevel Speed. |
 | Hot Walls | Small | Second Crucible | 8% increased Heat Transfer. |
 | **Flash Point** | Notable | Hot Walls | 40% increased Heat Transfer. |
 | Fused Walls | Small | Flash Point | 8% increased Heat Transfer. |
-| **Fused Crucibles** | Deep notable | Fused Walls | Parallel melting is off; 30% more Processing Speed per Parallel Job given up. |
+| **Fused Crucibles** | Deep notable | Fused Walls | Batching is off; 20% more Processing Speed per point of Batch Size. |
 | Lean Burn | Small | Second Crucible | 5% reduced Energy Use. |
-| **Shared Heat** | Notable | Lean Burn | Parallel melts after the first use 20% less FE. |
+| **Shared Heat** | Notable | Lean Burn | Batched melts after the first use 20% less FE. |
 | Banked Burn | Small | Shared Heat | 5% reduced Energy Use. |
-| **Triple Crucible** | Deep notable | Banked Burn | +1 Parallel Jobs. |
+| **Triple Crucible** | Deep notable | Banked Burn | +1 Batch Size. |
 | Deep Heat | Small | Second Crucible | 4% increased Max Temperature. |
 | **Lava Tap** | Notable | Deep Heat | The lava recipe runs 50% faster. |
 

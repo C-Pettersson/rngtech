@@ -1,6 +1,7 @@
 package com.rngtech.rpg;
 
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.DataResult;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
@@ -24,7 +25,7 @@ public enum MachineStat implements StringRepresentable {
     ENERGY_GENERATION,
     ENERGY_TRANSFER,
     EFFICIENCY,
-    PARALLEL_JOBS,
+    BATCH_SIZE,
     BUFFER_SIZE,
     STABILITY,
     UPGRADE_LIMIT,
@@ -121,9 +122,16 @@ public enum MachineStat implements StringRepresentable {
     CART_SPEED,
     GROWTH_PULSE,
     WORK_RANGE,
-    IDLE_CART_SPEED;
+    IDLE_CART_SPEED,
+    BATCH_OVERHEAD;
 
-    public static final Codec<MachineStat> CODEC = StringRepresentable.fromEnum(MachineStat::values);
+    public static final Codec<MachineStat> CODEC = Codec.STRING.comapFlatMap(
+            name -> {
+                MachineStat stat = bySerializedName(name);
+                return stat == null ? DataResult.error(() -> "Unknown machine stat: " + name) : DataResult.success(stat);
+            },
+            MachineStat::getSerializedName
+    );
     public static final StreamCodec<ByteBuf, MachineStat> STREAM_CODEC =
             ByteBufCodecs.idMapper(MachineStat::byId, MachineStat::ordinal);
     private static final MachineStat[] VALUES = values();
@@ -136,6 +144,29 @@ public enum MachineStat implements StringRepresentable {
 
     public static MachineStat byId(int id) {
         return VALUES[id];
+    }
+
+    /** Looks a stat up by serialized or enum name, accepting names stored before a rename. */
+    public static MachineStat bySerializedName(String name) {
+        String key = name.toLowerCase(Locale.ROOT);
+        for (MachineStat stat : VALUES) {
+            if (stat.serializedName.equals(key)) {
+                return stat;
+            }
+        }
+        return switch (key) {
+            case "parallel_jobs" -> BATCH_SIZE;
+            default -> null;
+        };
+    }
+
+    /** Parses a stat name from authored data, failing on unknown names like {@link #valueOf}. */
+    public static MachineStat fromName(String name) {
+        MachineStat stat = bySerializedName(name);
+        if (stat == null) {
+            throw new IllegalArgumentException("Unknown machine stat: " + name);
+        }
+        return stat;
     }
 
     public String translationKey() {

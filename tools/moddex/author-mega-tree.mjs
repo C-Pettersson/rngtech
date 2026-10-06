@@ -123,7 +123,7 @@ const KEYSTONES = [
     { id: "clear_cutting", name: "Clear Cutting", effects: [effect("TREE_FELL_LIMIT", 10, "ADD"), effect("PROCESSING_SPEED", 0.8, "LESS")] },
     { id: "singular_drive", layer: "core", name: "Singular Drive", effects: [effect("DRIVE", 1.5, "MORE"), effect("CONTROL", 0.5, "LESS"), effect("RESERVE", 0.5, "LESS")] },
     { id: "redline_drive", name: "Redline Drive", effects: [effect("PROCESSING_SPEED", 1.5, "MORE"), effect("ENERGY_USAGE", 1.8, "MORE")] },
-    { id: "dense_batching", name: "Dense Batching", behaviors: ["DENSE_PARALLEL"], effects: [effect("PARALLEL_JOBS", 2, "ADD"), effect("PROCESSING_SPEED", 0.75, "LESS"), effect("ENERGY_USAGE", 1.25, "MORE")] },
+    { id: "dense_batching", name: "Dense Batching", effects: [effect("BATCH_SIZE", 2, "ADD"), effect("PROCESSING_SPEED", 0.75, "LESS"), effect("ENERGY_USAGE", 1.25, "MORE")] },
     { id: "precision_jaw_mount", name: "Precision Jaw Mount", behaviors: ["MATCHING_HEAD"], effects: [effect("OUTPUT_AMOUNT", 10), effect("CRUSHER_SALVAGE_CHANCE", 2, "ADD")] },
     { id: "soft_material_specialist", name: "Soft Material Specialist", recipeHardnessCeiling: 2, effects: [tagged("CRUSHING", effect("PROCESSING_SPEED", 3, "MORE")), effect("ENERGY_USAGE", 1.5, "MORE")] },
     { id: "heavy_yield", name: "Heavy Yield", effects: [effect("OUTPUT_AMOUNT", 1.15, "MORE"), effect("ENERGY_USAGE", 1.5, "MORE")] },

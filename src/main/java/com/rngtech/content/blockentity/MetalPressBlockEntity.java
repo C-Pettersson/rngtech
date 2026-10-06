@@ -13,6 +13,7 @@ import com.rngtech.content.recipe.MetalPressRecipeInput;
 import com.rngtech.content.registry.ModBlockEntities;
 import com.rngtech.content.registry.ModItems;
 import com.rngtech.content.registry.ModTags;
+import com.rngtech.rpg.BatchProcessing;
 import com.rngtech.rpg.ComponentBaseStatCatalog;
 import com.rngtech.rpg.MachineBaseStatCatalog;
 import com.rngtech.rpg.MachineBehavior;
@@ -256,6 +257,7 @@ public class MetalPressBlockEntity extends BaseMachineBlockEntity
     private ItemStack activeMold = ItemStack.EMPTY;
     private final OutputLedger<Item> batchLedger = new OutputLedger<>();
     private int moldSwapTicks;
+    private int lockedBatch;
 
     public MetalPressBlockEntity(BlockPos pos, BlockState blockState) {
         super(ModBlockEntities.METAL_PRESS.get(), pos, blockState, MachineType.METAL_PRESS, SLOT_INPUT, SLOT_INPUT, SLOT_OUTPUT);
@@ -319,7 +321,7 @@ public class MetalPressBlockEntity extends BaseMachineBlockEntity
         if (press.progress == 0 && ProcessingChance.rollInstant(level, stats)) {
             int fullEnergyCost = press.energyCostPerCraft(recipe, stats) * press.batchJobs(recipe, stats);
             if (press.consumeWorkingEnergy(fullEnergyCost, true) >= fullEnergyCost) {
-                press.startCycleIfNeeded();
+                press.startCycleIfNeeded(recipe, stats);
                 press.consumeWorkingEnergy(fullEnergyCost, false);
                 press.decayPowerDrop();
                 if (press.process(recipe, stats)) {
@@ -343,7 +345,7 @@ public class MetalPressBlockEntity extends BaseMachineBlockEntity
             return;
         }
 
-        press.startCycleIfNeeded();
+        press.startCycleIfNeeded(recipe, stats);
         press.consumeWorkingEnergy(energyCost, false);
         press.decayPowerDrop();
         press.progress++;
@@ -561,6 +563,7 @@ public class MetalPressBlockEntity extends BaseMachineBlockEntity
         bulkSpeed.save(tag);
         LedgerNbt.save(tag, "BatchLedger", batchLedger);
         tag.putInt("MoldSwapTicks", moldSwapTicks);
+        tag.putInt("LockedBatch", lockedBatch);
     }
 
     @Override
@@ -588,6 +591,7 @@ public class MetalPressBlockEntity extends BaseMachineBlockEntity
         bulkSpeed.load(tag);
         LedgerNbt.load(tag, "BatchLedger", batchLedger);
         moldSwapTicks = Math.max(0, tag.getInt("MoldSwapTicks"));
+        lockedBatch = Math.max(0, tag.getInt("LockedBatch"));
         clampInternalEnergy();
     }
 
@@ -694,16 +698,20 @@ public class MetalPressBlockEntity extends BaseMachineBlockEntity
         return speed;
     }
 
-    /** Drop Hammer presses one input set per job for plates, gears, and casings, as far as input and output allow. */
+    /** The batch locked when the cycle started, shrunk only if its input has since gone. */
     private int batchJobs(MetalPressRecipe recipe, MachineStatAccumulator stats) {
-        if (!hasMasteryBehavior("DROP_HAMMER") || isCircuit(recipe) || !(isPlate(recipe) || isGearOrCasing(recipe))) {
+        int available = availableBatch(recipe, stats);
+        return progress > 0 && lockedBatch > 0 ? Math.min(lockedBatch, available) : available;
+    }
+
+    /** Plates, gears, and casings press one input set per batched item, as far as input and output allow. Circuits never batch. */
+    private int availableBatch(MetalPressRecipe recipe, MachineStatAccumulator stats) {
+        if (isCircuit(recipe) || !(isPlate(recipe) || isGearOrCasing(recipe))) {
             return 1;
         }
-        int jobs = Math.max(1, Math.min(1 + stats.intValue(MachineStat.PARALLEL_JOBS), inputStack().getCount() / Math.max(1, recipe.inputCount())));
-        while (jobs > 1 && !canMergeOutput(recipe.outputStack().copyWithCount(recipe.outputStack().getCount() * jobs))) {
-            jobs--;
-        }
-        return jobs;
+        int limit = Math.min(BatchProcessing.batchSize(stats, false), inputStack().getCount() / Math.max(1, recipe.inputCount()));
+        ItemStack output = recipe.outputStack();
+        return Math.max(1, BatchProcessing.largestFitting(limit, batch -> batch == 1 || canMergeOutput(output.copyWithCount(output.getCount() * batch))));
     }
 
     private boolean ledgerActive(MetalPressRecipe recipe, MachineStatAccumulator stats) {
@@ -901,7 +909,8 @@ public class MetalPressBlockEntity extends BaseMachineBlockEntity
     }
 
     private int processingTicks(MetalPressRecipe recipe, MachineStatAccumulator stats) {
-        return Math.max(1, (int) Math.ceil(stats.adjustedHeatProcessingTicks(recipe.processingTicks()) / routeSpeed(recipe, stats)));
+        int ticks = Math.max(1, (int) Math.ceil(stats.adjustedHeatProcessingTicks(recipe.processingTicks()) / routeSpeed(recipe, stats)));
+        return BatchProcessing.batchTicks(ticks, stats, batchJobs(recipe, stats));
     }
 
     private int energyCostPerTick(MetalPressRecipe recipe, MachineStatAccumulator stats) {
@@ -1108,10 +1117,11 @@ public class MetalPressBlockEntity extends BaseMachineBlockEntity
         }
     }
 
-    private void startCycleIfNeeded() {
+    private void startCycleIfNeeded(MetalPressRecipe recipe, MachineStatAccumulator stats) {
         if (progress != 0) {
             return;
         }
+        lockedBatch = availableBatch(recipe, stats);
         activeInput = singleCopy(inputStack());
         activeMold = singleCopy(moldStack());
         failureStrain = 0;
@@ -1143,6 +1153,7 @@ public class MetalPressBlockEntity extends BaseMachineBlockEntity
 
     private void resetCycle() {
         progress = 0;
+        lockedBatch = 0;
         failureStrain = 0;
         powerDropTicks = 0;
         targetReached = false;

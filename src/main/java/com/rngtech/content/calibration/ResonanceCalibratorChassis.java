@@ -11,8 +11,8 @@ public enum ResonanceCalibratorChassis implements StringRepresentable {
     COPPER(2, 1, 2200, 160, 1.18, 1.00, 1.08, 0.92, 4, -4, 0),
     STEEL(4, 1, 3600, 128, 0.90, 1.08, 0.94, 1.14, 10, 4, 0, MachineBehavior.OUTPUT_GUARD),
     TITANIUM(6, 1, 4600, 176, 1.28, 1.12, 0.90, 1.18, 12, 14, 1, MachineBehavior.OUTPUT_GUARD),
-    LEAD(4, 2, 5600, 96, 0.72, 0.92, 1.20, 0.90, 2, -6, 0, MachineBehavior.DENSE_PARALLEL),
-    TUNGSTENSTEEL(7, 3, 9000, 280, 0.82, 0.96, 1.16, 1.08, 8, 2, 0, MachineBehavior.DENSE_PARALLEL, MachineBehavior.OUTPUT_GUARD),
+    LEAD(4, 2, 5600, 96, 0.72, 0.92, 1.20, 0.90, 2, -6, 0),
+    TUNGSTENSTEEL(7, 3, 9000, 280, 0.82, 0.96, 1.16, 1.08, 8, 2, 0, MachineBehavior.OUTPUT_GUARD),
     NULLITE(7, 1, 6200, 224, 1.65, 1.18, 0.86, 1.20, 16, 22, 2, MachineBehavior.OUTPUT_GUARD);
 
     private final int stage;

@@ -129,7 +129,7 @@ public enum ModifierLensTag {
         switch (stat) {
             case PROCESSING_SPEED,
                     INSTANT_PROCESS_CHANCE,
-                    PARALLEL_JOBS,
+                    BATCH_SIZE,
                     MINING_SPEED,
                     ATTACK_SPEED,
                     ORE_BURST_SPEED -> tags.add(KINETIC);
@@ -159,7 +159,7 @@ public enum ModifierLensTag {
                 tags.add(EFFICIENCY);
             }
             case MAX_TEMPERATURE, HEAT_TRANSFER, FUEL_DURATION -> tags.add(POWER);
-            case PROCESSING_LEVEL, MINING_LEVEL, PARALLEL_JOBS -> tags.add(SPEED);
+            case PROCESSING_LEVEL, MINING_LEVEL, BATCH_SIZE -> tags.add(SPEED);
             case GLOBAL_MODIFIER_STRENGTH -> {
                 tags.add(POWER);
                 tags.add(YIELD);

@@ -9,9 +9,9 @@
             "y": 0,
             "effects": [
                 {
-                    "stat": "PARALLEL_JOBS",
+                    "stat": "BATCH_SIZE",
                     "operation": "ADD",
-                    "value": 3
+                    "value": 4
                 },
                 {
                     "stat": "HEAT_WINDOW",
@@ -45,7 +45,7 @@
             "y": 2,
             "effects": [
                 {
-                    "stat": "PARALLEL_JOBS",
+                    "stat": "BATCH_SIZE",
                     "operation": "ADD",
                     "value": 2
                 }
@@ -145,7 +145,7 @@
             "y": 4,
             "effects": [
                 {
-                    "stat": "PARALLEL_JOBS",
+                    "stat": "BATCH_SIZE",
                     "operation": "ADD",
                     "value": 4
                 }

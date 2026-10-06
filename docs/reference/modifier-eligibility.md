@@ -34,7 +34,7 @@ Modifier family weights, tier selection, and value ranges are documented in [Aff
 | `HAS_FIELD_TOOL` | Applies to modular field tool heads, rods, and assembled tool stacks. |
 | `HAS_SOLAR_ARRAY` | Has Solar Array Controller-only panel selection, low-light, and overflow behavior. |
 | `HAS_SOLAR_PANEL` | Has direct daylight Solar Panel generation behavior. |
-| `HAS_CRUSHER_SPECIALS` | Has Crusher-only prefix stats for output-guard grace, no-cell retention, high-hardness mitigation, top input filtering, Dense Parallel job additions, and salvage chance. Used by Crusher blocks and Crush Head special prefixes. |
+| `HAS_CRUSHER_SPECIALS` | Has Crusher-only prefix stats for output-guard grace, no-cell retention, high-hardness mitigation, top input filtering, Batch Size additions, and salvage chance. Used by Crusher blocks and Crush Head special prefixes. |
 | `HAS_MINERS_COMPANION` | Has portable Miner's Companion filter capacity behavior. |
 
 ## Modifier Definition Flags
@@ -65,7 +65,7 @@ Behavior flags are stored separately from numeric modifiers. Most are fixed iden
 | `CELL_LEAKAGE_DAMPING` | Steel Battery Chassis subtracts a flat installed-cell idle-loss amount and clamps at zero; Aethergold Battery Chassis seals installed-cell idle loss. |
 | `CHARGE_BALANCER` | Sparksteel+ Battery Chassis variants, including Aethergold, have fixed balancing identity, and the Balance Mode Battery Chassis prefix can enable the same behavior. Balanced chassis fill and drain eligible installed cells evenly instead of using one slot first. |
 | `BURST_RELEASE` | Burst-capable Battery Chassis variants may output above steady transfer while burst ticks remain. |
-| `DENSE_PARALLEL` | Lead Furnace has four lanes; Tungstensteel and Exotic Crusher chassis process dense batches from one input stack, and the Crusher Throughput prefix can enable Dense Parallel with added jobs. |
+| `DENSE_PARALLEL` | Retired. Batching needs no behavior; stored traits that name it still load and do nothing. |
 | `BULK_SPEED` | Rollable on current processing-machine block profiles at family weight `25`. Each completed process adds `1%` processing speed, up to `100%`; powered machines draw higher FE/t as processing time falls. It uses the `processing_speed` modifier group. |
 | `OUTPUT_GUARD` | Processing identities that carry it avoid work when output cannot be accepted. The Crusher Frame prefix enables the same behavior and adds a finite blocked-output progress grace window. |
 | `THERMAL_BUFFER` | Steel+ Heat Cores and high-control thermal identities expose heat stability behavior hooks. |
@@ -165,7 +165,7 @@ The rollable modifiers column lists active stat families and special named affix
 | Tool Rod | `HAS_DURABILITY`, `HAS_FIELD_TOOL` | Flat durability, increased durability, Self Repair, mining speed, attack speed, FE usage, FE transfer, stability, control, and Battery Support. Battery Support gates Battery Cell compatibility only. |
 | Modular Tool | `HAS_DURABILITY`, `HAS_FIELD_TOOL` | Reserved profile. Assembled modular tools currently carry no own rolled affixes; effective stats come from installed Tool Head and Tool Rod stacks. |
 
-Modifier lens tags are inferred from each modifier definition's stat/effect family. Power, Speed, Yield, Stability, and Control lenses cover the focused families. Kinetic covers speed and motion families such as processing speed, instant process, parallel jobs, mining speed, attack speed, and Ore Burst speed. Efficiency remains the legacy broad-family lens for existing item ids. Lens tags bias Affix Forge add/upgrade selection weights and do not change modifier eligibility, tier eligibility, or slot limits. The same `lensTags` data is exposed in Moddex as tag chips and tag filters for the selected profile's modifier pool.
+Modifier lens tags are inferred from each modifier definition's stat/effect family. Power, Speed, Yield, Stability, and Control lenses cover the focused families. Kinetic covers speed and motion families such as processing speed, instant process, batch size, mining speed, attack speed, and Ore Burst speed. Efficiency remains the legacy broad-family lens for existing item ids. Lens tags bias Affix Forge add/upgrade selection weights and do not change modifier eligibility, tier eligibility, or slot limits. The same `lensTags` data is exposed in Moddex as tag chips and tag filters for the selected profile's modifier pool.
 
 ## Unique Rules
 

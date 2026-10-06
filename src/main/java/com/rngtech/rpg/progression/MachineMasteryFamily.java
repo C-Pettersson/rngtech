@@ -35,7 +35,7 @@ public enum MachineMasteryFamily {
         return switch (behavior) {
             case "NO_INHERENT_ATTRIBUTES", "MUTE_MACHINE_SOUND" -> true;
             case "NO_BONUS_OUTPUT" -> has(MachineTag.BONUS_OUTPUT);
-            case "BLOCK_BATTERY", "MATCHING_HEAD", "DENSE_PARALLEL" -> this == CRUSHER;
+            case "BLOCK_BATTERY", "MATCHING_HEAD" -> this == CRUSHER;
             case "QUENCH_PROTOCOL", "CLOSED_LOOP_RECUPERATOR" -> this == FURNACE;
             case "MAGNET_MODE", "SERRATED_LEAF_PROTOCOL", "MANUAL_THROTTLE", "COASTING_CLUTCH", "SEEDLING_MAGNET" -> this == FORESTRY;
             default -> MasteryDeclarations.families(behavior).contains(this);
@@ -62,7 +62,7 @@ public enum MachineMasteryFamily {
             // Only the Crusher reads Output Amount; other machines' bonus output is Super Output. Parallel Jobs reach the
             // Metal Press, Resonance Calibrator, and Melter only through their ascendancies' batching.
             case OUTPUT_AMOUNT -> this == CRUSHER;
-            case PARALLEL_JOBS -> this == CRUSHER || this == METAL_PRESS || this == RESONANCE_CALIBRATOR || this == MELTER;
+            case BATCH_SIZE -> this == CRUSHER || this == METAL_PRESS || this == RESONANCE_CALIBRATOR || this == MELTER;
             case MAX_TEMPERATURE, HEAT_TRANSFER -> heatChassis() || this == MELTER;
             case HEAT_ISOLATION, TEMPERATURE_STABILITY, WARMUP_TIME, COOLING_RATE, OVERHEAT_TOLERANCE -> heatChassis();
             case FUEL_DURATION, FUEL_EFFICIENCY -> this == FURNACE;

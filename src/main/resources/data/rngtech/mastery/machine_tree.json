@@ -30548,7 +30548,7 @@
         {
             "effects": [
                 {
-                    "stat": "PARALLEL_JOBS",
+                    "stat": "BATCH_SIZE",
                     "operation": "ADD",
                     "value": 2
                 },
@@ -30563,9 +30563,7 @@
                     "value": 1.25
                 }
             ],
-            "behaviors": [
-                "DENSE_PARALLEL"
-            ],
+            "behaviors": [],
             "fixed": {},
             "ceilings": {},
             "scaling": [],

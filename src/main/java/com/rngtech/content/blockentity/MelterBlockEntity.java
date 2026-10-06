@@ -18,6 +18,7 @@ import com.rngtech.content.recipe.MelterRecipeInput;
 import com.rngtech.content.registry.ModBlockEntities;
 import com.rngtech.content.registry.ModFluids;
 import com.rngtech.content.registry.ModTags;
+import com.rngtech.rpg.BatchProcessing;
 import com.rngtech.rpg.ComponentBaseStatCatalog;
 import com.rngtech.rpg.MachineBaseStatCatalog;
 import com.rngtech.rpg.MachineBehavior;
@@ -259,6 +260,7 @@ public class MelterBlockEntity extends BaseMachineBlockEntity
     private final BulkSpeedState bulkSpeed = new BulkSpeedState();
     private int progress;
     private int activeProcessingTicks;
+    private int lockedBatch;
     private int internalEnergy;
     private ItemStack activePrimary = ItemStack.EMPTY;
     private ItemStack activeSecondary = ItemStack.EMPTY;
@@ -506,6 +508,7 @@ public class MelterBlockEntity extends BaseMachineBlockEntity
         tag.put("OutputTank", outputTank.writeToNBT(registries, new CompoundTag()));
         tag.putInt("Progress", progress);
         tag.putInt("ActiveProcessingTicks", activeProcessingTicks);
+        tag.putInt("LockedBatch", lockedBatch);
         tag.putInt("Energy", internalEnergyStored());
         tag.put("ActivePrimary", activePrimary.saveOptional(registries));
         tag.put("ActiveSecondary", activeSecondary.saveOptional(registries));
@@ -522,6 +525,7 @@ public class MelterBlockEntity extends BaseMachineBlockEntity
         outputTank.readFromNBT(registries, tag.getCompound("OutputTank"));
         progress = tag.getInt("Progress");
         activeProcessingTicks = Math.max(0, tag.getInt("ActiveProcessingTicks"));
+        lockedBatch = Math.max(0, tag.getInt("LockedBatch"));
         internalEnergy = Math.max(0, tag.getInt("Energy"));
         activePrimary = ItemStack.parseOptional(registries, tag.getCompound("ActivePrimary"));
         activeSecondary = ItemStack.parseOptional(registries, tag.getCompound("ActiveSecondary"));
@@ -626,22 +630,22 @@ public class MelterBlockEntity extends BaseMachineBlockEntity
         return output.copyWithAmount(AscendancyFormulas.yieldedFluid(output.getAmount(), yield));
     }
 
-    /** Second Crucible melts one extra set per Parallel Job, as far as inputs, fluid, and tank room allow. */
+    /** The batch locked when the cycle started, shrunk only if its inputs have since gone. */
     private int parallelMelts(MelterRecipe recipe, MachineStatAccumulator stats) {
-        if (!hasMasteryBehavior("SECOND_CRUCIBLE") || hasMasteryBehavior("FUSED_CRUCIBLES")) {
-            return 1;
-        }
-        int jobs = 1 + stats.intValue(MachineStat.PARALLEL_JOBS);
-        jobs = Math.min(jobs, Math.min(primaryStack().getCount(), secondaryStack().getCount()));
-        jobs = Math.min(jobs, inputTank.getFluidAmount() / Math.max(1, recipe.fluidInput().amount()));
-        FluidStack output = yieldedOutput(recipe, stats);
-        while (jobs > 1 && !canAcceptOutputFluid(output.copyWithAmount(output.getAmount() * jobs))) {
-            jobs--;
-        }
-        return Math.max(1, jobs);
+        int available = availableMelts(recipe, stats);
+        return progress > 0 && lockedBatch > 0 ? Math.min(lockedBatch, available) : available;
     }
 
-    /** Parallel melts each pay FE; Shared Heat makes every melt after the first 20% cheaper. */
+    /** Each batched melt needs its own inputs, fluid, and tank room. Fused Crucibles gives up batching. */
+    private int availableMelts(MelterRecipe recipe, MachineStatAccumulator stats) {
+        int limit = BatchProcessing.batchSize(stats, hasMasteryBehavior("FUSED_CRUCIBLES"));
+        limit = Math.min(limit, Math.min(primaryStack().getCount(), secondaryStack().getCount()));
+        limit = Math.min(limit, inputTank.getFluidAmount() / Math.max(1, recipe.fluidInput().amount()));
+        FluidStack output = yieldedOutput(recipe, stats);
+        return Math.max(1, BatchProcessing.largestFitting(limit, batch -> batch == 1 || canAcceptOutputFluid(output.copyWithAmount(output.getAmount() * batch))));
+    }
+
+    /** Batched melts each pay FE; Shared Heat makes every melt after the first 20% cheaper. */
     private int scaledForJobs(int energy, MelterRecipe recipe, MachineStatAccumulator stats) {
         int extra = parallelMelts(recipe, stats) - 1;
         double scale = 1.0 + extra * (hasMasteryBehavior("SHARED_HEAT") ? 0.8 : 1.0);
@@ -660,7 +664,7 @@ public class MelterBlockEntity extends BaseMachineBlockEntity
         int overlevel = Math.max(0, processingLevel(stats) - recipe.requiredProcessingLevel());
         speed *= 1.0 + Math.max(0.0, stats.value(MachineStat.OVERLEVEL_SPEED)) / 100.0 * overlevel;
         if (hasMasteryBehavior("FUSED_CRUCIBLES")) {
-            speed *= 1.0 + 0.3 * stats.intValue(MachineStat.PARALLEL_JOBS);
+            speed *= 1.0 + AscendancyFormulas.FUSED_CRUCIBLES_SPEED_PER_BATCH * BatchProcessing.statBatchSize(stats);
         }
         return speed;
     }
@@ -738,7 +742,8 @@ public class MelterBlockEntity extends BaseMachineBlockEntity
     }
 
     private int processingTicks(MelterRecipe recipe, MachineStatAccumulator stats) {
-        return Math.max(1, (int) Math.ceil(stats.adjustedHeatProcessingTicks(recipe.processingTicks()) / meltSpeed(recipe, stats)));
+        int ticks = Math.max(1, (int) Math.ceil(stats.adjustedHeatProcessingTicks(recipe.processingTicks()) / meltSpeed(recipe, stats)));
+        return BatchProcessing.batchTicks(ticks, stats, parallelMelts(recipe, stats));
     }
 
     private int energyCostPerTick(MelterRecipe recipe, MachineStatAccumulator stats) {
@@ -791,6 +796,7 @@ public class MelterBlockEntity extends BaseMachineBlockEntity
         if (progress != 0) {
             return;
         }
+        lockedBatch = availableMelts(recipe, stats);
         activePrimary = singleCopy(primaryStack());
         activeSecondary = singleCopy(secondaryStack());
         activeFluid = inputTank.getFluid().copyWithAmount(recipe.fluidInput().amount());
@@ -828,6 +834,7 @@ public class MelterBlockEntity extends BaseMachineBlockEntity
     private void resetCycle() {
         progress = 0;
         activeProcessingTicks = 0;
+        lockedBatch = 0;
         activePrimary = ItemStack.EMPTY;
         activeSecondary = ItemStack.EMPTY;
         activeFluid = FluidStack.EMPTY;

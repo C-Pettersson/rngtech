@@ -78,7 +78,7 @@ Fuel slots belong on Process only when the machine burns fuel as part of its act
 
 Machine XP and passive-tree state belongs to the machine chassis, not to a player or world position. When a machine supports progression, store XP, level, spent points, and unlocked nodes on a machine-owned item/block data component and copy that component anywhere the machine's identity is expected to survive, including block drops and pick-block.
 
-Processing XP should be granted only after work actually completes and output is produced. Parallel processing should grant XP per completed job. Failed starts, jams, output-blocked waits, invalid recipes, and no-power pauses should not grant XP.
+Processing XP should be granted only after work actually completes and output is produced. Batched processing should grant XP per completed item. Failed starts, jams, output-blocked waits, invalid recipes, and no-power pauses should not grant XP.
 
 Passive nodes must go through the same effective-stat aggregation used by chassis, Gear, rarity, and modifiers. Slot-changing nodes must also participate in server-side slot validation and unlock validation; unlocking a node that blocks or limits an occupied Gear slot should fail unless the current gear is already compatible.
 

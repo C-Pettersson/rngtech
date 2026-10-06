@@ -63,7 +63,7 @@ public final class MachineStatAccumulator {
         stats.baseValues.put(MachineStat.PROCESSING_SPEED, chassis.processingSpeed());
         stats.baseValues.put(MachineStat.OUTPUT_AMOUNT, chassis.outputAmount());
         stats.baseValues.put(
-                MachineStat.PARALLEL_JOBS,
+                MachineStat.BATCH_SIZE,
                 switch (chassis) {
                     case TUNGSTENSTEEL -> 4.0;
                     case EXOTIC -> 9.0;
@@ -432,7 +432,7 @@ public final class MachineStatAccumulator {
 
     public static MachineStatAccumulator resonanceCalibratorBase(ResonanceCalibratorChassis chassis) {
         MachineStatAccumulator stats = resonanceCalibratorBase(chassis.energyCapacity(), chassis.energyTransfer());
-        stats.baseValues.put(MachineStat.PARALLEL_JOBS, (double) chassis.lanes());
+        stats.baseValues.put(MachineStat.BATCH_SIZE, (double) chassis.lanes());
         stats.baseValues.put(MachineStat.PROCESSING_SPEED, chassis.processingSpeed());
         stats.baseValues.put(MachineStat.EFFICIENCY, chassis.efficiency());
         stats.baseValues.put(MachineStat.ENERGY_USAGE, chassis.energyUsage());
@@ -557,7 +557,8 @@ public final class MachineStatAccumulator {
         stats.baseValues.put(MachineStat.ENERGY_GENERATION, 1.0);
         stats.baseValues.put(MachineStat.ENERGY_TRANSFER, 1.0);
         stats.baseValues.put(MachineStat.EFFICIENCY, 1.0);
-        stats.baseValues.put(MachineStat.PARALLEL_JOBS, 1.0);
+        stats.baseValues.put(MachineStat.BATCH_SIZE, 1.0);
+        stats.baseValues.put(MachineStat.BATCH_OVERHEAD, BatchProcessing.BASE_BATCH_OVERHEAD);
         stats.baseValues.put(MachineStat.BUFFER_SIZE, 1.0);
         stats.baseValues.put(MachineStat.STABILITY, 1.0);
         stats.baseValues.put(MachineStat.UPGRADE_LIMIT, 1.0);

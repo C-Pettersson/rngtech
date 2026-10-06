@@ -17,6 +17,7 @@ import com.rngtech.content.recipe.CalibrationRecipe;
 import com.rngtech.content.recipe.CalibrationRecipeInput;
 import com.rngtech.content.registry.ModBlockEntities;
 import com.rngtech.content.registry.ModDataComponents;
+import com.rngtech.rpg.BatchProcessing;
 import com.rngtech.rpg.ComponentBaseStatCatalog;
 import com.rngtech.rpg.MachineBaseStatCatalog;
 import com.rngtech.rpg.MachineImplicitCatalog;
@@ -236,6 +237,7 @@ public class ResonanceCalibratorBlockEntity extends BaseMachineBlockEntity
 
     private final BulkSpeedState bulkSpeed = new BulkSpeedState();
     private int progress;
+    private int lockedBatch;
     private int internalEnergy;
     private int selectedPattern;
     private ItemStack activeInput = ItemStack.EMPTY;
@@ -276,9 +278,9 @@ public class ResonanceCalibratorBlockEntity extends BaseMachineBlockEntity
 
         int energyCost = calibrator.energyCostPerTick(recipe, stats);
         if (calibrator.progress == 0 && ProcessingChance.rollInstant(level, stats)) {
-            int fullEnergyCost = calibrator.energyCostPerCraft(recipe, stats);
+            int fullEnergyCost = calibrator.energyCostPerBatch(recipe, stats);
             if (calibrator.consumeWorkingEnergy(fullEnergyCost, true) >= fullEnergyCost) {
-                calibrator.startCycleIfNeeded();
+                calibrator.startCycleIfNeeded(recipe, stats);
                 calibrator.consumeWorkingEnergy(fullEnergyCost, false);
                 if (calibrator.process(recipe, stats)) {
                     calibrator.bulkSpeed.recordProcess(calibrator.activeTraits());
@@ -293,7 +295,7 @@ public class ResonanceCalibratorBlockEntity extends BaseMachineBlockEntity
             return;
         }
 
-        calibrator.startCycleIfNeeded();
+        calibrator.startCycleIfNeeded(recipe, stats);
         calibrator.consumeWorkingEnergy(energyCost, false);
         calibrator.progress++;
         if (calibrator.progress >= calibrator.processingTicks(recipe, stats)) {
@@ -459,6 +461,7 @@ public class ResonanceCalibratorBlockEntity extends BaseMachineBlockEntity
         tag.put("ProcessInventory", processInventory.serializeNBT(registries));
         tag.put("GearInventory", gearInventory.serializeNBT(registries));
         tag.putInt("Progress", progress);
+        tag.putInt("LockedBatch", lockedBatch);
         tag.putInt("Energy", internalEnergyStored());
         tag.putInt("SelectedPattern", selectedPattern);
         tag.put("ActiveInput", activeInput.saveOptional(registries));
@@ -480,6 +483,7 @@ public class ResonanceCalibratorBlockEntity extends BaseMachineBlockEntity
                 && isCalibrationPattern(processInventory.getStackInSlot(SLOT_PATTERN));
         gearInventory.deserializeNBT(registries, gearTag);
         progress = tag.getInt("Progress");
+        lockedBatch = Math.max(0, tag.getInt("LockedBatch"));
         internalEnergy = Math.max(0, tag.getInt("Energy"));
         selectedPattern = clampPatternIndex(tag.getInt("SelectedPattern"));
         if (legacyProcessPattern) {
@@ -681,10 +685,15 @@ public class ResonanceCalibratorBlockEntity extends BaseMachineBlockEntity
         return result;
     }
 
-    /** Lanes run one calibration each; Resonance Array adds a job per lane for each Parallel Job. */
+    /** The batch locked when the cycle started, shrunk only if its inputs have since gone. */
     private int operationsFor(CalibrationRecipe recipe, MachineStatAccumulator stats) {
-        int jobsPerLane = hasMasteryBehavior("RESONANCE_ARRAY") ? 1 + stats.intValue(MachineStat.PARALLEL_JOBS) : 1;
-        return Math.max(1, Math.min(chassis().lanes() * jobsPerLane, maximumOperations(recipe)));
+        int available = availableOperations(recipe, stats);
+        return progress > 0 && lockedBatch > 0 ? Math.min(lockedBatch, available) : available;
+    }
+
+    /** One calibration per point of Batch Size, as far as the input, catalyst, and stabilizer stacks allow. */
+    private int availableOperations(CalibrationRecipe recipe, MachineStatAccumulator stats) {
+        return Math.max(1, Math.min(BatchProcessing.batchSize(stats, false), maximumOperations(recipe)));
     }
 
     /** Second Pass: a result under 40 stability is rolled once more for another craft's FE and one catalyst. */
@@ -775,15 +784,20 @@ public class ResonanceCalibratorBlockEntity extends BaseMachineBlockEntity
     /** Lane Sync is 15% faster while more than one lane runs. */
     private int processingTicks(CalibrationRecipe recipe, MachineStatAccumulator stats) {
         int baseTicks = Math.max(1, (int) Math.ceil(recipe.processingTicks() * RNGTechConfig.CALIBRATION_TIME_MULTIPLIER.get()));
-        int ticks = stats.adjustedProcessingTicks(baseTicks);
-        return hasMasteryBehavior("LANE_SYNC") && operationsFor(recipe, stats) > 1 ? Math.max(1, (int) Math.ceil(ticks / 1.15)) : ticks;
+        int operations = operationsFor(recipe, stats);
+        int ticks = BatchProcessing.batchTicks(stats.adjustedProcessingTicks(baseTicks), stats, operations);
+        return hasMasteryBehavior("LANE_SYNC") && operations > 1 ? Math.max(1, (int) Math.ceil(ticks / 1.15)) : ticks;
     }
 
+    /** Every calibration in the batch pays its own FE. */
     private int energyCostPerTick(CalibrationRecipe recipe, MachineStatAccumulator stats) {
         int adjustedTicks = processingTicks(recipe, stats);
-        int baseEnergy = Math.max(1, (int) Math.ceil(recipe.energy() * RNGTechConfig.CALIBRATION_ENERGY_MULTIPLIER.get()));
-        int totalEnergy = stats.adjustedEnergyCost(baseEnergy);
-        return Math.max(1, (int) Math.ceil(totalEnergy / (double) adjustedTicks));
+        return Math.max(1, (int) Math.ceil(energyCostPerBatch(recipe, stats) / (double) adjustedTicks));
+    }
+
+    private int energyCostPerBatch(CalibrationRecipe recipe, MachineStatAccumulator stats) {
+        long total = (long) energyCostPerCraft(recipe, stats) * operationsFor(recipe, stats);
+        return (int) Math.min(Integer.MAX_VALUE, total);
     }
 
     private int energyCostPerCraft(CalibrationRecipe recipe, MachineStatAccumulator stats) {
@@ -880,10 +894,11 @@ public class ResonanceCalibratorBlockEntity extends BaseMachineBlockEntity
         return stack.getItem() instanceof CalibrationGearItem gear ? gear.stage() : 0;
     }
 
-    private void startCycleIfNeeded() {
+    private void startCycleIfNeeded(CalibrationRecipe recipe, MachineStatAccumulator stats) {
         if (progress != 0) {
             return;
         }
+        lockedBatch = availableOperations(recipe, stats);
         activeInput = singleCopy(inputStack());
         activePattern = singleCopy(patternStack());
         activeCatalyst = singleCopy(catalystStack());
@@ -910,6 +925,7 @@ public class ResonanceCalibratorBlockEntity extends BaseMachineBlockEntity
 
     private void resetCycle() {
         progress = 0;
+        lockedBatch = 0;
         activeInput = ItemStack.EMPTY;
         activePattern = ItemStack.EMPTY;
         activeCatalyst = ItemStack.EMPTY;

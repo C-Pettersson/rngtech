@@ -29,7 +29,7 @@ The crusher processes ore-related inputs into crushed outputs. Non-alloy crushed
 
 It exposes NeoForge item and energy capabilities so hoppers and other modded automation can interact with it through standard APIs.
 
-The crusher screen has Processing, Gear, Stats, Refinement, and Mastery tabs. The Processing tab shows the input, output, energy bar, processing bar, banked output-bonus bar, a recipe-state status square, and a Battery Cell status square; hover text reports exact progress, per-job FE/t, total dense-batch FE/t when applicable, projected FE per craft, under-hardness time and FE penalty, jam chance, output-bonus payout preview, status, and no-cell output penalties. The Gear tab exposes the crush-head component slot and Battery Cell slot. The Stats tab exposes Crusher-specific prefix stats such as output-guard grace, no-cell retention, high-hardness mitigation, input filtering, and salvage chance. The Refinement tab targets the placed crusher itself, accepts one refinement catalyst, and applies the shared refinement rules. The Mastery tab shows the placed Crusher chassis' machine-owned XP, level, unspent passive points, and a fixed passive tree inside a panning viewport. The tree starts from a green lower-left node, expands through layered clusters for energy capacity, energy use, bonus output, processing speed, and high-hardness stability, lets some paths cross between regions, and puts keystones on the outer layer as chase choices with tradeoffs.
+The crusher screen has Processing, Gear, Stats, Refinement, and Mastery tabs. The Processing tab shows the input, output, energy bar, processing bar, banked output-bonus bar, a recipe-state status square, and a Battery Cell status square; hover text reports exact progress, per-job FE/t, total batch FE/t when applicable, projected FE per craft, under-hardness time and FE penalty, jam chance, output-bonus payout preview, status, and no-cell output penalties. The Gear tab exposes the crush-head component slot and Battery Cell slot. The Stats tab exposes Crusher-specific prefix stats such as output-guard grace, no-cell retention, high-hardness mitigation, input filtering, and salvage chance. The Refinement tab targets the placed crusher itself, accepts one refinement catalyst, and applies the shared refinement rules. The Mastery tab shows the placed Crusher chassis' machine-owned XP, level, unspent passive points, and a fixed passive tree inside a panning viewport. The tree starts from a green lower-left node, expands through layered clusters for energy capacity, energy use, bonus output, processing speed, and high-hardness stability, lets some paths cross between regions, and puts keystones on the outer layer as chase choices with tradeoffs.
 
 ## Implementation Contract
 
@@ -45,7 +45,7 @@ Current runtime surface:
 - Battery Cell slot runtime behavior: the crusher has only a small internal working buffer without an installed Battery Cell. The installed cell provides the meaningful FE storage and keeps its stored energy on the item stack.
 - No-cell production penalty: when no Battery Cell is installed, effective `OUTPUT_AMOUNT` is multiplied by `crusher.noBatteryCellOutputMultiplier`; Crusher Battery Link prefixes retain part or all of the lost multiplier.
 - Gear tab accepts staged `CRUSH_HEAD` machine parts in the crush-head slot. A valid Crush Head is required for processing, and its stage may not exceed the placed chassis stage. The installed part's authored base profile plus stored rolled affixes contribute to effective crusher stats and define the Crusher's active hardness level.
-- Crusher chassis materials provide authored base stats for internal buffer scale, energy usage, processing speed, output amount, and fixed behavior flags such as Output Guard and Dense Parallel. Crusher Frame and Crusher Throughput prefixes can also enable those behaviors on rolled machines.
+- Crusher chassis materials provide authored base stats for internal buffer scale, energy usage, processing speed, output amount, and fixed behavior flags such as Output Guard. Crusher Frame prefixes can also enable Output Guard on rolled machines, and Crusher Throughput prefixes add Batch Size.
 - Refinement applies to the placed crusher's machine traits, not to the installed part.
 - Mastery applies to the placed crusher chassis itself, not to a player. Breaking and replacing the chassis keeps Mastery state when the chassis item survives and its loot path copies `rngtech:machine_progression`.
 
@@ -56,7 +56,7 @@ Current stat hooks:
 - `PROCESSING_SPEED` affects processing time. Faster processing raises FE draw per tick so speed does not make the recipe cheaper by itself.
 - `PROCESSING_LEVEL` is the active Crush Head hardness level. Crusher recipes with higher `required_processing_level` still run, but each missing level adds configured processing time, total FE cost, and jam risk, and disables positive output bonuses and chance procs.
 - `OUTPUT_AMOUNT` affects produced stack count. Fractional output is banked deterministically toward the next bonus item and resets when the input item changes. Under-level Crusher recipes cap positive output amount at base output, while still allowing output penalties such as the missing-Battery-Cell penalty.
-- `PARALLEL_JOBS` allows Dense Parallel Crusher identities to complete multiple recipe jobs from one input stack in a single completed cycle. Tungstensteel runs up to `4` jobs, and Exotic runs up to `9` jobs.
+- [`BATCH_SIZE`](../reference/machine-stats.md) lets a Crusher complete several recipe jobs from one input stack in one cycle. Tungstensteel batches up to `4` and Exotic up to `9`. Each extra item adds [`BATCH_OVERHEAD`](../reference/machine-stats.md) to the cycle time.
 - `OUTPUT_GUARD_GRACE` preserves in-progress work for a fixed number of output-blocked ticks before normal progress reset.
 - `NO_BATTERY_OUTPUT_RETENTION` reduces the missing-Battery-Cell output penalty by retaining part of the lost output multiplier.
 - `HIGH_HARDNESS_ENERGY_MITIGATION` reduces only the configured high-hardness Crusher energy surcharge before `ENERGY_USAGE`.
@@ -70,7 +70,7 @@ Current Mastery hooks:
 - Paths, refunds, copy/paste, automatic allocation, attributes, and save migration follow the shared rules. Current Gear must remain legal for every allocation and refund.
 - Cell Bypass grants 100% increased Energy Capacity, 10% more Energy Usage, and +100 percentage points of no-cell output retention. It blocks the Battery Cell slot and cannot be allocated with a cell installed.
 - Precision Jaw Mount grants 10% increased Output Amount and +2 percentage points of salvage chance. An installed Crush Head must match the chassis stage.
-- Dense Batching enables Dense Parallel, adds two parallel jobs, and applies 25% less Processing Speed and 25% more Energy Usage.
+- Dense Batching adds two Batch Size and applies 25% less Processing Speed and 25% more Energy Usage.
 - Soft Material Specialist grants 200% more Processing Speed and 50% more Energy Usage, but forbids recipes above hardness 2 even with a stronger head. Its speed is [tagged](../systems/machine-mastery.md#tagged-payoffs) for Crushers, as is Cell Bypass's Energy Capacity, because only a Crusher pays their hardness and Battery Cell costs.
 - Single Pass disables bonus output: Output Amount cannot exceed the base, and Super Output and salvage chances drop to zero. In exchange it grants 30% more Processing Speed. It never raises the no-cell Output Amount penalty.
 - Heavy Yield grants 15% more Output Amount and 50% more Energy Usage.
@@ -94,7 +94,7 @@ Implementation checks:
 - A Flint Crush Head should process under-level raw ore recipes slowly with jam risk instead of rejecting them.
 - An Iron or higher Crush Head should require a matching or higher-stage Crusher chassis.
 - A crusher with `1.25x` output amount should advance the output-bonus bar after completed crafts by the banked fractional output contribution, preview the next payout in hover text, and grant an extra output when the bank reaches a full item.
-- Dense Parallel Crushers should lock their active job count at the start of a cycle, consume FE for that job count every tick, and only start a batch when the output slot can accept the whole deterministic batch output.
+- Batching Crushers lock their job count at the start of a cycle, consume FE for that job count every tick, and only start a batch when the output slot can accept the whole deterministic batch output.
 - Crusher Frame rolls should pause progress during output blockage for their grace window and then reset when the grace expires.
 - Crusher Feed Control rolls should reject top automation insertion according to their tier while still allowing manual slot use.
 - Crusher Salvage rolls should remain separate from deterministic `OUTPUT_AMOUNT` and Super Output, and should only apply when the output slot can accept the extra item.
@@ -160,7 +160,7 @@ Code-backed crusher base values:
 | Processing speed | `1.0x` | Adjusts recipe processing ticks. |
 | Processing level | `0` machine base, `1-8` from staged Crush Heads | `PROCESSING_LEVEL` sets the optimal recipe hardness target. The Crusher machine contributes none by itself; installed Crush Heads provide the active value. |
 | Output amount | `1.0x` | Multiplies recipe output count and banks fractional extra output toward the next bonus item. |
-| Parallel jobs | `1`, `4`, or `9` | Stages 0-6 run one job. Tungstensteel runs up to four jobs. Exotic runs up to nine jobs. |
+| Batch size | `1`, `4`, or `9` | Stages 0-6 batch one item. Tungstensteel batches up to four. Exotic batches up to nine. |
 | Gear slots | `2` | One required Crush Head slot and one Battery Cell slot in the Gear tab. |
 
 ## Tiered Crusher Prefixes
@@ -177,7 +177,7 @@ Crusher-specific prefixes use tier-aware name keys, so the rolled tier changes t
 | `crusher_feed_control` | Guided / Metered / Indexed / Synchronized | Improves top automation input filtering by tier. | None |
 | `crusher_compression` | Clamped / Pressured / Force-Bound / Hypercompressed | Reduces only the high-hardness energy surcharge by `15% / 30% / 45% / 60%`. | Efficiency |
 | `crusher_vibration` | Dampened / Isolated / Stabilized / Anchored | Prefix-side reduced `ENERGY_USAGE` from the shared percent table; conflicts with other energy-usage affixes. | Efficiency |
-| `crusher_throughput` | Belted / Chain-Driven / Shaft-Driven / Turbine-Coupled | Enables Dense Parallel and adds `+1 / +2 / +3 / +5` `PARALLEL_JOBS`. | Kinetic |
+| `crusher_throughput` | Belted / Chain-Driven / Shaft-Driven / Turbine-Coupled | Adds `+1 / +2 / +3 / +5` `BATCH_SIZE`. | Kinetic |
 | `crusher_salvage` | Picking / Sifting / Winnowing / Reclaiming | Adds `CRUSHER_SALVAGE_CHANCE`; on success, adds one extra base-output item if the output slot can accept it. | Yield |
 
 ## Crush Head Prefixes
@@ -205,8 +205,8 @@ Crusher chassis are placed machine blocks. They roll Crusher machine traits when
 | 4 | Steel | Durable and efficient, but slower. |
 | 5 | Aluminum | Fast and efficient, lighter buffer. |
 | 6 | Titanium | High throughput with stronger output. |
-| 7 | Tungstensteel | Heavy output-focused body with slower handling, Output Guard, and up to `4` Dense Parallel jobs. |
-| 8 | Exotic | Endgame body with Output Guard, a full-batch Naquadah working buffer, and up to `9` Dense Parallel jobs. |
+| 7 | Tungstensteel | Heavy output-focused body with slower handling, Output Guard, and a batch of up to `4`. |
+| 8 | Exotic | Endgame body with Output Guard, a full-batch Naquadah working buffer, and a batch of up to `9`. |
 
 ## Balance Position
 
@@ -219,9 +219,9 @@ base total FE = recipe energy * high-hardness multiplier when required_processin
 hardness deficit = max(0, required_processing_level - active PROCESSING_LEVEL)
 under-level penalty multiplier = 1 + hardness deficit * under-level penalty
 effective FE per craft = base total FE * ENERGY_USAGE * under-level penalty multiplier
-adjusted processing ticks = speed-adjusted recipe ticks * under-level penalty multiplier
+adjusted processing ticks = speed-adjusted recipe ticks * (1 + BATCH_OVERHEAD * (active jobs - 1)) * under-level penalty multiplier
 effective FE/t = effective FE per craft / adjusted processing ticks
-dense batch FE/t = effective FE/t * active jobs
+batch FE/t = effective FE/t * active jobs
 ```
 
 Stage 5-8 material-form Crusher recipes use authored FE ramps before machine modifiers: Stage 5 costs `2.0x`, Stage 6 costs `3.0x`, Stage 7 costs `4.0x`, and Stage 8 costs `6.0x` compared to the early-stage base. This applies to raw or ore inputs producing crushed material and to non-alloy crushed material producing dust.
@@ -266,7 +266,7 @@ Crusher machines choose between Rockbreaker and Assayer when they use their firs
 - Rockbreaker makes under-level crushing viable. Hardness Tolerance forgives missing Crush Head levels for time, FE, and jam risk, but the Crusher still counts as under level, so bonus output stays off.
 - Assayer turns the Output Amount bank into a per-input ledger. Bank Memory keeps one bank per remembered input, and Wide Ledger saves the banks in `rngtech:output_banks` so they survive drops and pick-block.
 - Compound Yield rolls Super Output a second time when a craft’s bank pays out and copies the items the bank paid. Tailings Recovery banks one whole item in the current input’s bank. Mother Lode counts eligible cycles per remembered input.
-- Refiner’s Oath turns Parallel Jobs into up to 50% more Output Amount with Dense Parallel off.
+- Refiner’s Oath turns batching off for 5% more Output Amount per point of Batch Size, up to 50%.
 
 <!-- ascendancy-trees:start -->
 
@@ -296,7 +296,7 @@ Crusher machines choose between Rockbreaker and Assayer when they use their firs
 | Ledger Pages | Small | Assay Ledger | +2 Bank Memory. |
 | **Wide Ledger** | Notable | Ledger Pages | +6 Bank Memory. Remembered bonus banks survive breaking and pick-block. |
 | Sworn Yield | Small | Wide Ledger | 4% increased Bonus Output. |
-| **Refiner’s Oath** | Deep notable | Sworn Yield | Dense Parallel is off. 5% more Output Amount per Parallel Job, up to 50%. |
+| **Refiner’s Oath** | Deep notable | Sworn Yield | Batching is off. 5% more Output Amount per point of Batch Size, up to 50%. |
 | Rich Assay | Small | Assay Ledger | 4% increased Bonus Output. |
 | **Compound Yield** | Notable | Rich Assay | A bonus bank payout can also trigger Super Output. |
 | Vein Sense | Small | Compound Yield | +1% Super Output. |
@@ -312,7 +312,7 @@ Crusher machines choose between Rockbreaker and Assayer when they use their firs
 
 | Modifier Source | Notes |
 |---|---|
-| Machine implicit | Crusher chassis material identity defines base stats through `MachineBaseStatCatalog` and behavior flags through `MachineImplicitCatalog`; Tungstensteel and Exotic add `DENSE_PARALLEL`, and Steel, Titanium, Tungstensteel, and Exotic carry `OUTPUT_GUARD`. |
+| Machine implicit | Crusher chassis material identity defines base stats through `MachineBaseStatCatalog` and behavior flags through `MachineImplicitCatalog`; Tungstensteel and Exotic author base `BATCH_SIZE` `4` and `9`, and Steel, Titanium, Tungstensteel, and Exotic carry `OUTPUT_GUARD`. |
 | Machine prefix | Crusher-specific Frame, Kinetics, Jaws, Ore Handling, Battery Link, Feed Control, Compression, Vibration, Throughput, and Salvage families. |
 | Machine suffix | `PROCESSING_SPEED`, `ENERGY_USAGE`, `OUTPUT_AMOUNT`, Instant Process, Super Output, Overclocked, and Bulk Speed. New Crusher rolls no longer present `ENERGY_TRANSFER` as a useful machine stat. |
 | Machine enchant | See [Modifier Eligibility](../reference/modifier-eligibility.md). |

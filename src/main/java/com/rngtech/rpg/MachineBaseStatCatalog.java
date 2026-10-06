@@ -453,7 +453,7 @@ public final class MachineBaseStatCatalog {
             return List.of(
                     MachineStat.ENERGY_CAPACITY,
                     MachineStat.ENERGY_TRANSFER,
-                    MachineStat.PARALLEL_JOBS,
+                    MachineStat.BATCH_SIZE,
                     MachineStat.PROCESSING_SPEED,
                     MachineStat.ENERGY_USAGE,
                     MachineStat.CALIBRATION_QUALITY
@@ -578,7 +578,7 @@ public final class MachineBaseStatCatalog {
                 MachineStat.ENERGY_USAGE,
                 MachineStat.PROCESSING_SPEED,
                 MachineStat.OUTPUT_AMOUNT,
-                MachineStat.PARALLEL_JOBS
+                MachineStat.BATCH_SIZE
         );
     }
 
