@@ -905,10 +905,12 @@
 			y: 5.5d
 		}
 		{
+			dependencies: ["2DD5120E11128BFD"]
 			id: "1427760B7576D8D6"
 			tasks: [{
+				count: 3L
 				id: "0E3279E6AAF8388E"
-				item: { count: 1, id: "rngtech:invar_blend" }
+				item: { count: 1, id: "rngtech:invar_ingot" }
 				type: "item"
 			}]
 			x: 17.5d
