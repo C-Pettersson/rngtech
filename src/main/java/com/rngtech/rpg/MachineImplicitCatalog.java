@@ -473,8 +473,7 @@ public final class MachineImplicitCatalog {
 
     private static Identity crusher(CrusherChassisMaterial material) {
         MachineBehavior[] behaviors = switch (material) {
-            case STEEL, TITANIUM -> new MachineBehavior[] {MachineBehavior.OUTPUT_GUARD};
-            case TUNGSTENSTEEL, EXOTIC -> new MachineBehavior[] {MachineBehavior.DENSE_PARALLEL, MachineBehavior.OUTPUT_GUARD};
+            case STEEL, TITANIUM, TUNGSTENSTEEL, EXOTIC -> new MachineBehavior[] {MachineBehavior.OUTPUT_GUARD};
             default -> new MachineBehavior[0];
         };
         return identity("crusher." + material.getSerializedName(), Rarity.NORMAL, 0, List.of(), behaviors);
@@ -484,7 +483,6 @@ public final class MachineImplicitCatalog {
         MachineBehavior[] behaviors = switch (material) {
             case BRONZE -> new MachineBehavior[] {MachineBehavior.ALLOY_BLEND};
             case STEEL -> new MachineBehavior[] {MachineBehavior.OUTPUT_GUARD};
-            case LEAD -> new MachineBehavior[] {MachineBehavior.DENSE_PARALLEL};
             case TITANIUM, TUNGSTENSTEEL, EXOTIC -> new MachineBehavior[] {MachineBehavior.THERMAL_BUFFER, MachineBehavior.OUTPUT_GUARD};
             default -> new MachineBehavior[0];
         };

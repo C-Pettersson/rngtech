@@ -243,7 +243,7 @@ final class MachineTraitTooltip {
         if (Math.abs(value) <= 0.0001) {
             return false;
         }
-        if (stat == MachineStat.PARALLEL_JOBS) {
+        if (stat == MachineStat.BATCH_SIZE) {
             return value > 1.0001;
         }
         if (stat == MachineStat.BURST_DURATION || stat == MachineStat.FLUID_TRANSFER) {

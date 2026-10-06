@@ -66,7 +66,8 @@ public class MetalPressMenu extends AbstractContainerMenu implements MasteryMenu
     private static final int DATA_ENERGY_PER_TICK = 25;
     private static final int DATA_ENERGY_PER_CRAFT = 26;
     private static final int DATA_LEDGER = DATA_ENERGY_PER_CRAFT + 1;
-    private static final int DATA_MACHINE_PROGRESSION_START = DATA_LEDGER + 1;
+    private static final int DATA_BATCH_SIZE = DATA_LEDGER + 1;
+    private static final int DATA_MACHINE_PROGRESSION_START = DATA_BATCH_SIZE + 1;
     private static final int DATA_COUNT = DATA_MACHINE_PROGRESSION_START + MasteryMenuSupport.FIELD_COUNT;
     private static final int STAT_SCALE = 100;
     public static final int BUTTON_SELECT_MOLD_BASE = 100;
@@ -388,6 +389,10 @@ public class MetalPressMenu extends AbstractContainerMenu implements MasteryMenu
 
     public static int overheatToleranceDataIndex() {
         return DATA_OVERHEAT_TOLERANCE;
+    }
+
+    public static int batchSizeDataIndex() {
+        return DATA_BATCH_SIZE;
     }
 
     public static int stabilityDataIndex() {

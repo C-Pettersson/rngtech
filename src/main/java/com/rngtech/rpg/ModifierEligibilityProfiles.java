@@ -668,9 +668,9 @@ public final class ModifierEligibilityProfiles {
     ).withRollWeight(CRUSHER_PREFIX_WEIGHT);
     private static final ModifierDefinition CRUSHER_THROUGHPUT = ModifierDefinition.rollable(
             CRUSHER_THROUGHPUT_AFFIX_ID,
-            MachineBehavior.DENSE_PARALLEL.getSerializedName(),
+            "dense_parallel",
             ModifierSlot.PREFIX,
-            MachineStat.PARALLEL_JOBS,
+            MachineStat.BATCH_SIZE,
             ModifierOperation.ADD,
             CRUSHER_PARALLEL_JOB_RANGES
     ).withRollWeight(CRUSHER_PREFIX_WEIGHT);
@@ -2617,7 +2617,6 @@ public final class ModifierEligibilityProfiles {
         return switch (behavior) {
             case CHARGE_BALANCER -> BATTERY_CHASSIS_BALANCE_MODE_AFFIX_ID.equals(modifier.affixId());
             case OUTPUT_GUARD -> CRUSHER_FRAME_AFFIX_ID.equals(modifier.affixId());
-            case DENSE_PARALLEL -> CRUSHER_THROUGHPUT_AFFIX_ID.equals(modifier.affixId());
             case POWER_GRACE -> BATTERY_BROWNOUT_CUSHION.id().equals(modifier.affixId());
             default -> false;
         };
@@ -3005,7 +3004,7 @@ public final class ModifierEligibilityProfiles {
             case EFFICIENCY -> EFFICIENCY;
             case ENERGY_USAGE -> ENERGY_USAGE;
             case OUTPUT_AMOUNT -> OUTPUT_AMOUNT;
-            case PARALLEL_JOBS -> CRUSHER_THROUGHPUT;
+            case BATCH_SIZE -> CRUSHER_THROUGHPUT;
             case HEAT_TRANSFER -> HEAT_TRANSFER;
             case MAX_TEMPERATURE -> MAX_TEMPERATURE;
             case HEAT_ISOLATION -> HEAT_ISOLATION;

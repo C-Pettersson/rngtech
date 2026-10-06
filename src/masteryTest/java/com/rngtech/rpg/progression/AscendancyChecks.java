@@ -98,10 +98,10 @@ final class AscendancyChecks {
     private static void declarations() {
         require(CRUSHER.supports(MachineStat.LUCK) && !MachineMasteryFamily.FURNACE.supports(MachineStat.LUCK), "a declared stat applies only to its families");
         require(CRUSHER.supportsBehavior("FIXTURE_ECHO") && !MachineMasteryFamily.FURNACE.supportsBehavior("FIXTURE_ECHO"), "a declared behavior needs no family switch");
-        require(CRUSHER.supportsBehavior("DENSE_PARALLEL") && !MachineMasteryFamily.FURNACE.supportsBehavior("DENSE_PARALLEL"), "built-in behaviors are unchanged");
+        require(CRUSHER.supportsBehavior("MATCHING_HEAD") && !MachineMasteryFamily.FURNACE.supportsBehavior("MATCHING_HEAD"), "built-in behaviors are unchanged");
         require(MasteryDeclarations.yield(MachineStat.LUCK) == MasteryDeclarations.Yield.OUTPUT
                 && MasteryDeclarations.yield(MachineStat.PROCESSING_SPEED) == MasteryDeclarations.Yield.NONE, "stats declare their yield for the loop audit");
-        require(MasteryDeclarations.declared("FIXTURE_ECHO") && !MasteryDeclarations.declared("DENSE_PARALLEL"), "only registered behaviors are declared");
+        require(MasteryDeclarations.declared("FIXTURE_ECHO") && !MasteryDeclarations.declared("MATCHING_HEAD"), "only registered behaviors are declared");
     }
 
     private static void sealTiers() {

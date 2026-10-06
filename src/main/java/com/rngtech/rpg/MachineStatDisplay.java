@@ -14,7 +14,8 @@ public final class MachineStatDisplay {
             case CONTROL, DRIVE, RESERVE -> formatUnit(value, "point", "points");
             case BATTERY_SLOTS -> formatUnit(value, "cell", "cells");
             case CRUSHER_INPUT_FILTER -> formatUnit(value, "filter", "filters");
-            case PARALLEL_JOBS -> formatUnit(value, "job", "jobs");
+            case BATCH_SIZE -> formatUnit(value, "item", "items");
+            case BATCH_OVERHEAD -> formatNumber(value) + "% per extra item";
             case ENERGY_CAPACITY, ENERGY_CAPACITY_FLAT, BUFFER_SIZE -> formatNumber(value) + " FE";
             case ENERGY_GENERATION -> formatNumber(value) + " FE/t";
             case ENERGY_TRANSFER, BURST_TRANSFER, FE_TRANSFER -> formatNumber(value) + " FE/t";
@@ -152,7 +153,8 @@ public final class MachineStatDisplay {
             case CONTROL, DRIVE, RESERVE -> formatSignedUnit(value, "point", "points");
             case BATTERY_SLOTS -> formatSignedUnit(value, "cell", "cells");
             case CRUSHER_INPUT_FILTER -> formatSignedUnit(value, "filter", "filters");
-            case PARALLEL_JOBS -> formatSignedUnit(value, "job", "jobs");
+            case BATCH_SIZE -> formatSignedUnit(value, "item", "items");
+            case BATCH_OVERHEAD -> formatSignedPercentPoints(value) + " per extra item";
             case FLUID_CAPACITY -> formatSignedNumber(value) + " mB";
             case FLUID_TRANSFER -> formatSignedNumber(value) + " mB/t";
             case MAX_TEMPERATURE -> formatSignedNumber(value) + " heat";

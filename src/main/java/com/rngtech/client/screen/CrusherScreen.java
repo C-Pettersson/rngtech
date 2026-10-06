@@ -53,7 +53,7 @@ public class CrusherScreen extends AbstractContainerScreen<CrusherMenu> {
     private static final String[] STAT_LABEL_KEYS = {
             "rngtech.stat.input_slots",
             "rngtech.stat.crush_hardness",
-            "rngtech.stat.parallel_jobs",
+            "rngtech.stat.batch_size",
             "rngtech.stat.output_amount",
             "rngtech.stat.crusher_salvage_chance",
             "rngtech.stat.processing_speed",
@@ -67,7 +67,7 @@ public class CrusherScreen extends AbstractContainerScreen<CrusherMenu> {
     private static final int[] STAT_DATA_INDICES = {
             CrusherMenu.inputSlotsDataIndex(),
             CrusherMenu.processingLevelDataIndex(),
-            CrusherMenu.parallelJobsDataIndex(),
+            CrusherMenu.batchSizeDataIndex(),
             CrusherMenu.outputAmountDataIndex(),
             CrusherMenu.crusherSalvageChanceDataIndex(),
             CrusherMenu.processingSpeedDataIndex(),
@@ -81,7 +81,7 @@ public class CrusherScreen extends AbstractContainerScreen<CrusherMenu> {
     private static final MachineStat[] STAT_TYPES = {
             MachineStat.INPUT_SLOTS,
             MachineStat.PROCESSING_LEVEL,
-            MachineStat.PARALLEL_JOBS,
+            MachineStat.BATCH_SIZE,
             MachineStat.OUTPUT_AMOUNT,
             MachineStat.CRUSHER_SALVAGE_CHANCE,
             MachineStat.PROCESSING_SPEED,
@@ -127,9 +127,6 @@ public class CrusherScreen extends AbstractContainerScreen<CrusherMenu> {
                         }
                         if (node.requiresMatchingCrushHeadStage()) {
                             tooltip.add(Component.translatable("rngtech.mastery.tooltip.matching_head").withStyle(ChatFormatting.GOLD));
-                        }
-                        if (node.enablesDenseParallel()) {
-                            tooltip.add(Component.translatable("rngtech.mastery.tooltip.dense_parallel").withStyle(ChatFormatting.GOLD));
                         }
                     }
 
@@ -764,7 +761,7 @@ public class CrusherScreen extends AbstractContainerScreen<CrusherMenu> {
         return dataIndex == CrusherMenu.inputSlotsDataIndex()
                 || dataIndex == CrusherMenu.energyCapacityStatDataIndex()
                 || dataIndex == CrusherMenu.processingLevelDataIndex()
-                || dataIndex == CrusherMenu.parallelJobsDataIndex()
+                || dataIndex == CrusherMenu.batchSizeDataIndex()
                 || dataIndex == CrusherMenu.outputGuardGraceDataIndex()
                 || dataIndex == CrusherMenu.noBatteryOutputRetentionDataIndex()
                 || dataIndex == CrusherMenu.highHardnessEnergyMitigationDataIndex()
@@ -785,7 +782,7 @@ public class CrusherScreen extends AbstractContainerScreen<CrusherMenu> {
         if (dataIndex == CrusherMenu.processingLevelDataIndex()) {
             return value > 0.001;
         }
-        if (dataIndex == CrusherMenu.parallelJobsDataIndex()) {
+        if (dataIndex == CrusherMenu.batchSizeDataIndex()) {
             return value > 1.001;
         }
         return value > 1.001;

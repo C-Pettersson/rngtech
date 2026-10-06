@@ -47,7 +47,7 @@ public class ResonanceCalibratorMenu extends AbstractContainerMenu implements Ma
     private static final int DATA_STABILITY_MAX = 5;
     private static final int DATA_STATUS = 6;
     private static final int DATA_FAMILY = 7;
-    private static final int DATA_LANES = 8;
+    private static final int DATA_BATCH_SIZE = 8;
     private static final int DATA_PROCESSING_SPEED = 9;
     private static final int DATA_EFFICIENCY = 10;
     private static final int DATA_ENERGY_USAGE = 11;
@@ -273,9 +273,6 @@ public class ResonanceCalibratorMenu extends AbstractContainerMenu implements Ma
         return data.get(DATA_SELECTED_PATTERN);
     }
 
-    public int lanes() {
-        return data.get(DATA_LANES);
-    }
 
     public CalibrationFamily family() {
         int family = data.get(DATA_FAMILY);
@@ -375,6 +372,10 @@ public class ResonanceCalibratorMenu extends AbstractContainerMenu implements Ma
 
     public double statValue(int dataIndex) {
         return data.get(dataIndex) / (double) STAT_SCALE;
+    }
+
+    public static int batchSizeDataIndex() {
+        return DATA_BATCH_SIZE;
     }
 
     public static int processingSpeedDataIndex() {

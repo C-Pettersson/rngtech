@@ -237,7 +237,7 @@ The furnace screen has Processing, Gear, Stats, Refinement, and Mastery tabs. Th
 
 | Modifier Source | Notes |
 |---|---|
-| Machine implicit | Furnace chassis material provides base heat, processing, electric behavior, and fixed behavior flags such as `ALLOY_BLEND`, `DENSE_PARALLEL`, `OUTPUT_GUARD`, and `THERMAL_BUFFER`. |
+| Machine implicit | Furnace chassis material provides base heat, processing, electric behavior, and fixed behavior flags such as `ALLOY_BLEND`, `OUTPUT_GUARD`, and `THERMAL_BUFFER`. Lead Furnace lanes come from its base `INPUT_SLOTS`. |
 | Machine prefix | Stage 0 uses the `FURNACE` profile; electric stages use the `ELECTRIC_FURNACE` profile. Heat-capable machine prefixes can include `HEAT_TRANSFER`, `MAX_TEMPERATURE`, `HEAT_ISOLATION`, reduced `WARMUP_TIME`, and reduced `COOLING_RATE`. |
 | Machine suffix | Stage-specific profiles keep fuel-only and FE-only stats separate. Heat-control suffixes include `TEMPERATURE_STABILITY` and `OVERHEAT_TOLERANCE`. |
 | Machine behavior | Electric Furnace can roll `POWER_GRACE`, which halves sensitive power-drop strain. |

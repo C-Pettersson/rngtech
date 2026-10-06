@@ -27,7 +27,7 @@ Recorded 2026-10-05 when the PRD was accepted:
 - No yield or Refinement Potential in 2.0 pools.
 - The name Volatile Catalyst is kept.
 - Outcomes are weighted. Corruption implicits have one fixed value, with no tiers or ranges.
-- +1 Processing Level and +1 Parallel Jobs are in the Blessed pools.
+- +1 Processing Level and +1 Batch Size are in the Blessed pools.
 - Uniques use the same four outcomes. Reforged rerolls their ranged lines.
 - A Corrupted item hides its Refinement Potential (decided 2026-10-05, after acceptance).
 

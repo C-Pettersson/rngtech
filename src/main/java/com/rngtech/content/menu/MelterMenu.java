@@ -63,7 +63,8 @@ public class MelterMenu extends AbstractContainerMenu implements MasteryMenuView
     private static final int DATA_MAX_TEMPERATURE = 19;
     private static final int DATA_FLUID_TRANSFER = 20;
     private static final int DATA_REFINEMENT_POTENTIAL = 21;
-    private static final int DATA_MACHINE_PROGRESSION_START = DATA_REFINEMENT_POTENTIAL + 1;
+    private static final int DATA_BATCH_SIZE = DATA_REFINEMENT_POTENTIAL + 1;
+    private static final int DATA_MACHINE_PROGRESSION_START = DATA_BATCH_SIZE + 1;
     private static final int DATA_COUNT = DATA_MACHINE_PROGRESSION_START + MasteryMenuSupport.FIELD_COUNT;
     private static final int STAT_SCALE = 100;
     private static final int PROCESS_SLOT_COUNT = MelterBlockEntity.PROCESS_SLOT_COUNT;
@@ -327,6 +328,10 @@ public class MelterMenu extends AbstractContainerMenu implements MasteryMenuView
 
     public static int maxTemperatureDataIndex() {
         return DATA_MAX_TEMPERATURE;
+    }
+
+    public static int batchSizeDataIndex() {
+        return DATA_BATCH_SIZE;
     }
 
     public static int fluidTransferDataIndex() {
