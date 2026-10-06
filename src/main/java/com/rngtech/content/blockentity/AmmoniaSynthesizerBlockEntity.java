@@ -9,6 +9,7 @@ import com.rngtech.content.purge.PurgeableFluidStorage;
 import com.rngtech.content.recipe.AmmoniaSynthesisRecipe;
 import com.rngtech.content.registry.ModBlockEntities;
 import com.rngtech.content.registry.ModFluids;
+import com.rngtech.rpg.ComponentBaseStatCatalog;
 import com.rngtech.rpg.MachineBaseStatCatalog;
 import com.rngtech.rpg.MachineNameGenerator;
 import com.rngtech.rpg.MachinePartType;
@@ -370,6 +371,9 @@ public class AmmoniaSynthesizerBlockEntity extends BaseMachineBlockEntity
     private MachineStatAccumulator effectiveStats() {
         MachineStatAccumulator stats = MachineBaseStatCatalog.ammoniaSynthesizer();
         machineTraits().modifiers().forEach(stats::apply);
+        if (isCatalystBed(catalystStack())) {
+            ComponentBaseStatCatalog.applyEffectiveContribution(stats, catalystStack());
+        }
         return stats;
     }
 
