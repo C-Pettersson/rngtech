@@ -99,6 +99,10 @@ nav:
       - Tree Farm Requirements: prds/tree-farm-automation.md
       - Companion Rebalance: prds/companion-rebalance.md
       - Companion Rebalance State: prds/companion-rebalance-state.md
+      - Batch Processing: prds/batch-processing.md
+      - Batch Processing State: prds/batch-processing-state.md
+      - Heat Model: prds/heat-model.md
+      - Heat Model State: prds/heat-model-state.md
   - Reference:
       - Releasing: releasing.md
       - Public Mod Description: public-mod-description.md
