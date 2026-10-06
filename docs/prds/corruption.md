@@ -107,7 +107,7 @@ Each host type has a Blessed pool and a Blighted pool in `data/rngtech/corruptio
 | Fluid Pump | 50% increased host Fluid Capacity | 30% less Fluid Transfer |
 | Battery Cell | `CELL_LEAKAGE_DAMPING`; 20% increased Energy Transfer | Doubled Idle Loss |
 | Control Board, Coil, Stabilizer Matrix | +1 Coil Reach; +Streak Floor; +Catalyst Efficiency | 20% less Processing Speed; 10% less Calibration Precision |
-| Placed processing machine | +1 Parallel Jobs where the machine reads it; +10% Processing Speed | 25% increased Energy Usage |
+| Placed processing machine | +1 Batch Size where the machine reads it; +10% Processing Speed | 25% increased Energy Usage |
 | Placed generator | +10% Energy Generation | 20% less Efficiency |
 | Battery Chassis | +1 active Battery Slot | 15% increased Idle Loss |
 
@@ -118,7 +118,7 @@ Pool rules, checked at load:
 - No entry raises Gear stage acceptance, lowers authored recipe inputs, or bypasses a `bonus_output` opt-out.
 - Entries may grant ascendancy stats. They have no effect without the ascendancy, and the tooltip names it.
 
-+1 Processing Level and +1 Parallel Jobs stay in the Blessed pools by decision. They are the iconic "+1 level" corruptions, and their pool weights, not their values, control how often they appear.
++1 Processing Level and +1 Batch Size stay in the Blessed pools by decision. They are the iconic "+1 level" corruptions, and their pool weights, not their values, control how often they appear.
 
 ## Uniques
 
@@ -258,7 +258,7 @@ Resolved 2026-10-05:
 
 - The catalyst is named Volatile Catalyst.
 - Outcomes are weighted. A corruption implicit has one fixed value, with no tiers or ranges.
-- +1 Processing Level and +1 Parallel Jobs are in the Blessed pools.
+- +1 Processing Level and +1 Batch Size are in the Blessed pools.
 - Uniques use the same four outcomes. Reforged rerolls their ranged lines.
 - A Corrupted item hides its Refinement Potential.
 

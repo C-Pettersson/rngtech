@@ -12,7 +12,7 @@ Last updated: 2026-10-06
 
 ## Summary
 
-Unique items are authored, find-only Gear with ranged stats, one signature mechanic, and one visible drawback, modeled on Path of Exile uniques. Every copy of a Unique has the same stat lines, but each copy rolls its own values inside the catalog ranges, so players can find a well-rolled or poorly rolled copy. For example, a Unique might roll +1 to +3 Parallel Jobs.
+Unique items are authored, find-only Gear with ranged stats, one signature mechanic, and one visible drawback, modeled on Path of Exile uniques. Every copy of a Unique has the same stat lines, but each copy rolls its own values inside the catalog ranges, so players can find a well-rolled or poorly rolled copy. For example, a Unique might roll +1 to +3 Batch Size.
 
 A Unique is a sidegrade or a build-around piece, not a higher stage. It comes from one exact place in the world, and the best Uniques make a Mastery build or an ascendancy work differently.
 
@@ -51,7 +51,7 @@ Key existing code:
 ## Goals
 
 - A shared Unique catalog, so a new Unique needs a catalog entry, a loot table, language keys, and a texture, plus code only for a new signature mechanic.
-- Ranged stat lines that roll once per copy. Integer stats, such as Parallel Jobs or Processing Level, roll whole numbers.
+- Ranged stat lines that roll once per copy. Integer stats, such as Batch Size or Processing Level, roll whole numbers.
 - Eight launch Uniques. Together they reach every Mastery family (Crusher, Furnace, Alloy Furnace, Metal Press, Melter, Resonance Calibrator, Forestry Companion) and the Battery Chassis.
 - Every stat on a Unique, including its drawback, is read by at least one host it fits. No display-only drawbacks.
 - Uniques can grant ascendancy stats, which matter only on a chassis with that ascendancy. This is the PoE build-around pattern.
@@ -255,10 +255,10 @@ The Voltaic Potato Battery Cell moves onto the catalog with fixed lines equal to
 `rngtech:mineshaft_worn_pick_jaw`, Unique Crush Head, slot stage 2.
 
 - **Identity:** a Stage 2 head that crushes one hardness level above its stage.
-- **Signature:** a fixed +1 Processing Level over its slot stage, and +(1–3) Parallel Jobs. Chassis acceptance still uses slot stage 2, so it fits early Crushers and does not change stage-support keystones.
+- **Signature:** a fixed +1 Processing Level over its slot stage, and +(1–3) Batch Size. Chassis acceptance still uses slot stage 2, so it fits early Crushers and does not change stage-support keystones.
 - **Ascendancy hook:** +(10–30)% Jam Recovery (Rockbreaker).
 - **Drawback:** +(8–3)% Jam Chance on every cycle, not only under-level cycles, and (25–15)% less Output Amount on the Crusher.
-- **Why:** an early exploration find for players who push wide, under-level crushing, and a natural Rockbreaker piece. Parallel Jobs adds throughput, not yield, and the Output Amount line only lowers yield.
+- **Why:** an early exploration find for players who push wide, under-level crushing, and a natural Rockbreaker piece. Batch Size adds throughput, not yield, and the Output Amount line only lowers yield.
 
 ### Crying Crucible
 
@@ -443,7 +443,7 @@ In-game checks:
 
 Resolved 2026-10-05:
 
-- Unique stat lines are ranged and roll per copy, so copies can be well or poorly rolled. Integer stats roll whole numbers, such as +1 to +3 Parallel Jobs.
+- Unique stat lines are ranged and roll per copy, so copies can be well or poorly rolled. Integer stats roll whole numbers, such as +1 to +3 Batch Size.
 - There is no limit on how many Uniques a machine holds.
 - Uniques drop unidentified and roll when identified, reusing the existing identification flow.
 - Uniques never add yield in 2.0.
