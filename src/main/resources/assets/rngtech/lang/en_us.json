@@ -2796,7 +2796,7 @@
   "rngtech.tooltip.fluid_pump.stage": "Component stage: %s",
   "rngtech.tooltip.fluid_pump.profile": "Fluid transfer: %s mB/t",
   "rngtech.tooltip.resonance_calibrator_chassis.material": "Chassis material: %s",
-  "rngtech.tooltip.resonance_calibrator_chassis.lanes": "Calibration lanes: %s",
+  "rngtech.tooltip.resonance_calibrator_chassis.lanes": "Base Batch Size: %s",
   "rngtech.tooltip.component_recycler_chassis.material": "Chassis material: %s",
   "rngtech.tooltip.component_recycler_chassis.stage": "Accepts component recipes up to Stage %s",
   "rngtech.tooltip.crude_recycler.manual": "Manual recycler: add an input, close the screen, then right-click a Hand Crank on top to process tagged Stage 1-2 recyclables through a recipe-scaled manual cycle.",

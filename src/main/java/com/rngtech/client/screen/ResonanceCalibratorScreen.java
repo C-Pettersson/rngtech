@@ -67,6 +67,7 @@ public class ResonanceCalibratorScreen extends AbstractContainerScreen<Resonance
     private static final int PATTERN_SELECTOR_WIDTH = 12;
     private static final int PATTERN_SELECTOR_HEIGHT = 5;
     private static final String[] STAT_LABEL_KEYS = {
+            "rngtech.stat.batch_size",
             "rngtech.stat.processing_speed",
             "rngtech.stat.energy_usage",
             "rngtech.stat.energy_capacity",
@@ -77,6 +78,7 @@ public class ResonanceCalibratorScreen extends AbstractContainerScreen<Resonance
             "rngtech.stat.refinement_potential_bonus"
     };
     private static final int[] STAT_DATA_INDICES = {
+            ResonanceCalibratorMenu.batchSizeDataIndex(),
             ResonanceCalibratorMenu.processingSpeedDataIndex(),
             ResonanceCalibratorMenu.energyUsageDataIndex(),
             ResonanceCalibratorMenu.energyCapacityStatDataIndex(),
@@ -87,6 +89,7 @@ public class ResonanceCalibratorScreen extends AbstractContainerScreen<Resonance
             ResonanceCalibratorMenu.refinementPotentialBonusDataIndex()
     };
     private static final MachineStat[] STAT_TYPES = {
+            MachineStat.BATCH_SIZE,
             MachineStat.PROCESSING_SPEED,
             MachineStat.ENERGY_USAGE,
             MachineStat.ENERGY_CAPACITY,

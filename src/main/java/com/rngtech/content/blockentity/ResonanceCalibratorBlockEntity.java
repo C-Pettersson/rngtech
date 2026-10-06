@@ -96,7 +96,7 @@ public class ResonanceCalibratorBlockEntity extends BaseMachineBlockEntity
     private static final int DATA_STABILITY_MAX = 5;
     private static final int DATA_STATUS = 6;
     private static final int DATA_FAMILY = 7;
-    private static final int DATA_LANES = 8;
+    private static final int DATA_BATCH_SIZE = 8;
     private static final int DATA_PROCESSING_SPEED = 9;
     private static final int DATA_EFFICIENCY = 10;
     private static final int DATA_ENERGY_USAGE = 11;
@@ -207,7 +207,7 @@ public class ResonanceCalibratorBlockEntity extends BaseMachineBlockEntity
                 case DATA_STABILITY_MAX -> range.max();
                 case DATA_STATUS -> statusCode(recipe, stats);
                 case DATA_FAMILY -> recipe == null ? -1 : recipe.family().ordinal();
-                case DATA_LANES -> chassis().lanes();
+                case DATA_BATCH_SIZE -> BatchProcessing.statBatchSize(stats) * STAT_SCALE;
                 case DATA_PROCESSING_SPEED -> scaledStat(stats, MachineStat.PROCESSING_SPEED);
                 case DATA_EFFICIENCY -> scaledStat(stats, MachineStat.EFFICIENCY);
                 case DATA_ENERGY_USAGE -> scaledStat(stats, MachineStat.ENERGY_USAGE);
