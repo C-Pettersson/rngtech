@@ -46,5 +46,5 @@ Recorded 2026-10-06, during slice 1:
     - Crusher, Metal Press, Melter, and Resonance Calibrator use it. Each locks its batch at cycle start, scales cycle time by Batch Overhead, and pays FE per item.
     - `DENSE_PARALLEL` is gone from chassis implicits, the Crusher Throughput affix, the Dense Batching keystone, and every gate.
     - Canonical docs, generated ascendancy tables, and Moddex data are updated.
-    - The Calibrator Stats tab shows Batch Size, and the chassis tooltip names its base Batch Size.
+    - The Resonance Calibrator, Metal Press, and Melter Stats tabs show Batch Size. The Press and Melter never showed Parallel Jobs, so batches from Drop Forge, Twin Crucible, or Dense Batching were invisible there. The Calibrator chassis tooltip names its base Batch Size.
     - Still open for slice 4: Lane Sync, Shared Field, and Wide Tolerance still say "lanes".

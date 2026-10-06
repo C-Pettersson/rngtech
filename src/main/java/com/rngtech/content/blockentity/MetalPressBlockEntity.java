@@ -117,7 +117,8 @@ public class MetalPressBlockEntity extends BaseMachineBlockEntity
     private static final int DATA_ENERGY_PER_TICK = 25;
     private static final int DATA_ENERGY_PER_CRAFT = 26;
     private static final int DATA_LEDGER = DATA_ENERGY_PER_CRAFT + 1;
-    private static final int DATA_MACHINE_PROGRESSION_START = DATA_LEDGER + 1;
+    private static final int DATA_BATCH_SIZE = DATA_LEDGER + 1;
+    private static final int DATA_MACHINE_PROGRESSION_START = DATA_BATCH_SIZE + 1;
     private static final int DATA_COUNT = DATA_MACHINE_PROGRESSION_START + MasteryMenuSupport.FIELD_COUNT;
     private static final int STAT_SCALE = 100;
     private static final int LEGACY_SLOT_BATTERY_CELL = 3;
@@ -224,6 +225,7 @@ public class MetalPressBlockEntity extends BaseMachineBlockEntity
                 case DATA_OVERHEAT_TOLERANCE -> scaledStat(stats, MachineStat.OVERHEAT_TOLERANCE);
                 case DATA_STABILITY -> scaledStat(stats, MachineStat.STABILITY);
                 case DATA_REFINEMENT_POTENTIAL -> scaledStat(stats, MachineStat.REFINEMENT_POTENTIAL);
+                case DATA_BATCH_SIZE -> BatchProcessing.statBatchSize(stats) * STAT_SCALE;
                 case DATA_SELECTED_MOLD -> selectedMold;
                 case DATA_ENERGY_PER_TICK -> recipe == null ? 0 : energyCostPerTick(recipe, stats);
                 case DATA_ENERGY_PER_CRAFT -> recipe == null ? 0 : energyCostPerCraft(recipe, stats);

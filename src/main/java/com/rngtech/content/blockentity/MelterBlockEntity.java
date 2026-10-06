@@ -120,7 +120,8 @@ public class MelterBlockEntity extends BaseMachineBlockEntity
     private static final int DATA_MAX_TEMPERATURE = 19;
     private static final int DATA_FLUID_TRANSFER = 20;
     private static final int DATA_REFINEMENT_POTENTIAL = 21;
-    private static final int DATA_MACHINE_PROGRESSION_START = DATA_REFINEMENT_POTENTIAL + 1;
+    private static final int DATA_BATCH_SIZE = DATA_REFINEMENT_POTENTIAL + 1;
+    private static final int DATA_MACHINE_PROGRESSION_START = DATA_BATCH_SIZE + 1;
     private static final int DATA_COUNT = DATA_MACHINE_PROGRESSION_START + MasteryMenuSupport.FIELD_COUNT;
     private static final int STAT_SCALE = 100;
 
@@ -243,6 +244,7 @@ public class MelterBlockEntity extends BaseMachineBlockEntity
                 case DATA_MAX_TEMPERATURE -> scaledStat(stats, MachineStat.MAX_TEMPERATURE);
                 case DATA_FLUID_TRANSFER -> effectiveFluidTransfer(stats);
                 case DATA_REFINEMENT_POTENTIAL -> scaledStat(stats, MachineStat.REFINEMENT_POTENTIAL);
+                case DATA_BATCH_SIZE -> BatchProcessing.statBatchSize(stats) * STAT_SCALE;
                 default -> 0;
             };
         }
