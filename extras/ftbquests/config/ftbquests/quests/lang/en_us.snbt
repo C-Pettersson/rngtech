@@ -79,11 +79,15 @@
 	]
 	quest.135EB1E2D3366D98.quest_subtitle: "Getting varmer"
 	quest.1427760B7576D8D6.quest_desc: [
-		"You might need to upgrade to a Bronze Alloy Furnace, deepending how you current alloy furnace is equipped."
+		"The &eSteel Crusher Chassis&r needs 3 &eInvar Ingots&r. Invar Battery Cells need more later."
 		""
-		"&aCraft:&r"
-		"- Invar blend from iron dust and nickel dust"
+		"Invar is a direct alloy: the Alloy Furnace makes ingots, not a blend. Your Bronze Alloy Furnace reaches the 900 degrees the charcoal recipe needs."
+		""
+		"&aAlloy:&r"
+		"- 2 Iron Ingot + 1 Nickel Ingot + 1 Charcoal -> 2 Invar Ingot"
+		"- With stage 4 components and 1050 degrees, skip the charcoal and get 3 Invar Ingot"
 	]
+	quest.1427760B7576D8D6.title: "Invar Alloy"
 	quest.1FACE973E783CB4C.quest_desc: [
 		"You need calibrated parts to progress further."
 		""
