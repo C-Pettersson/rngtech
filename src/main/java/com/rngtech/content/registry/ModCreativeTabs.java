@@ -9,6 +9,7 @@ import com.rngtech.content.calibration.CalibrationGearMaterial;
 import com.rngtech.content.calibration.ResonanceCalibratorChassis;
 import com.rngtech.content.energy.BatteryCellMaterial;
 import com.rngtech.content.energy.BatteryChassisMaterial;
+import com.rngtech.content.energy.CathodeMaterial;
 import com.rngtech.content.energy.CavitationRotorMaterial;
 import com.rngtech.content.energy.CollapseNozzleMaterial;
 import com.rngtech.content.energy.ContainmentLiningMaterial;
@@ -211,6 +212,9 @@ public final class ModCreativeTabs {
                         output.accept(ModItems.CAVITATION_GENERATOR.get());
                         output.accept(ModItems.VACUUM_COLLAPSE_GENERATOR.get());
                         output.accept(ModItems.CORROSION_RESIDUE.get());
+                        for (CathodeMaterial material : CathodeMaterial.values()) {
+                            output.accept(ModItems.anode(material).get());
+                        }
                         output.accept(ModItems.GASIFICATION_RESIDUE.get());
                         output.accept(ModItems.VOID_CATALYST.get());
                         output.accept(ModItems.COLLAPSE_RESIDUE.get());
@@ -249,6 +253,9 @@ public final class ModCreativeTabs {
                         }
                         for (FluidPumpMaterial material : FluidPumpMaterial.values()) {
                             output.accept(ModItems.fluidPump(material).get());
+                        }
+                        for (CathodeMaterial material : CathodeMaterial.values()) {
+                            output.accept(ModItems.cathode(material).get());
                         }
                         for (AlloyCrucibleMaterial material : AlloyCrucibleMaterial.values()) {
                             output.accept(ModItems.alloyCrucible(material).get());

@@ -60,6 +60,7 @@ public class CorrosionCellMenu extends AbstractContainerMenu {
     private static final int GEAR_SLOT_START = 3;
     private static final int BATTERY_CELL_SLOT = GEAR_SLOT_START + CorrosionCellBlockEntity.SLOT_BATTERY_CELL;
     private static final int FLUID_PUMP_SLOT = GEAR_SLOT_START + CorrosionCellBlockEntity.SLOT_FLUID_PUMP;
+    private static final int CATHODE_SLOT = GEAR_SLOT_START + CorrosionCellBlockEntity.SLOT_CATHODE;
     private static final int REFINEMENT_CONSUMABLE_SLOT = GEAR_SLOT_START + CorrosionCellBlockEntity.GEAR_SLOT_COUNT;
     private static final int REFINEMENT_TARGET_SLOT = REFINEMENT_CONSUMABLE_SLOT + 1;
     private static final int PLAYER_INVENTORY_START = REFINEMENT_TARGET_SLOT + 1;
@@ -104,8 +105,9 @@ public class CorrosionCellMenu extends AbstractContainerMenu {
         addSlot(new TabbedSlot(processInventory, CorrosionCellBlockEntity.SLOT_ELECTROLYTE, 17, 71, () -> selectedTab == TAB_PROCESSING));
         addSlot(new TabbedSlot(processInventory, CorrosionCellBlockEntity.SLOT_RESIDUE, 176, 71, () -> selectedTab == TAB_PROCESSING));
 
-        addSlot(new TabbedSlot(cell.getGearInventory(), CorrosionCellBlockEntity.SLOT_BATTERY_CELL, 74, 48, () -> selectedTab == TAB_GEAR));
-        addSlot(new TabbedSlot(cell.getGearInventory(), CorrosionCellBlockEntity.SLOT_FLUID_PUMP, 116, 48, () -> selectedTab == TAB_GEAR));
+        addSlot(new TabbedSlot(cell.getGearInventory(), CorrosionCellBlockEntity.SLOT_BATTERY_CELL, 53, 48, () -> selectedTab == TAB_GEAR));
+        addSlot(new TabbedSlot(cell.getGearInventory(), CorrosionCellBlockEntity.SLOT_FLUID_PUMP, 95, 48, () -> selectedTab == TAB_GEAR));
+        addSlot(new TabbedSlot(cell.getGearInventory(), CorrosionCellBlockEntity.SLOT_CATHODE, 137, 48, () -> selectedTab == TAB_GEAR));
 
         addSlot(RefinementMenuSupport.consumableSlot(
                 cell.getRefinementInventory(),
@@ -303,6 +305,10 @@ public class CorrosionCellMenu extends AbstractContainerMenu {
             }
         } else if (CorrosionCellBlockEntity.isFluidPump(stack)) {
             if (!moveItemStackTo(stack, FLUID_PUMP_SLOT, FLUID_PUMP_SLOT + 1, false)) {
+                return ItemStack.EMPTY;
+            }
+        } else if (CorrosionCellBlockEntity.isCathode(stack)) {
+            if (!moveItemStackTo(stack, CATHODE_SLOT, CATHODE_SLOT + 1, false)) {
                 return ItemStack.EMPTY;
             }
         } else if (cell.isKnownElectrolyteInput(stack)) {

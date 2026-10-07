@@ -1,0 +1,30 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "rngtech:material_enabled",
+      "material": "aluminum"
+    }
+  ],
+  "type": "rngtech:trait_shaped",
+  "category": "redstone",
+  "pattern": [
+    "PRP",
+    "RCR",
+    "PRP"
+  ],
+  "key": {
+    "C": {
+      "tag": "c:circuits/advanced"
+    },
+    "P": {
+      "item": "rngtech:aluminum_plate"
+    },
+    "R": {
+      "item": "rngtech:aluminum_rod"
+    }
+  },
+  "result": {
+    "count": 1,
+    "id": "rngtech:aluminum_cathode"
+  }
+}

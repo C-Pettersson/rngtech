@@ -52,6 +52,54 @@
             "chain_fe": 2400,
             "chain": "Metal Press copper plate 2,400 FE; ingot from vanilla furnace; electrolyte crafted."
         },
+        "corrosion_cell/aluminum_plate": {
+            "input": "1 aluminum plate + 1 electrolyte",
+            "chain_fe": 12000,
+            "available_from_stage": 5,
+            "chain": "Furnace raw aluminum 9,600 + Metal Press 2,400."
+        },
+        "corrosion_cell/aluminum_anode": {
+            "input": "1 aluminum anode + 1 electrolyte",
+            "chain_fe": 29700,
+            "available_from_stage": 5,
+            "chain": "Component Assembler 4,800 FE + 2 plates (12,000 each) + 250 mB Electrolyte Solution (Melter 900 FE). Needs a Stage 5 Cathode."
+        },
+        "corrosion_cell/titanium_plate": {
+            "input": "1 titanium plate + 1 electrolyte",
+            "chain_fe": 16800,
+            "available_from_stage": 6,
+            "chain": "Furnace raw titanium 14,400 + Metal Press 2,400."
+        },
+        "corrosion_cell/titanium_anode": {
+            "input": "1 titanium anode + 1 electrolyte",
+            "chain_fe": 39300,
+            "available_from_stage": 6,
+            "chain": "Component Assembler 4,800 FE + 2 plates (16,800 each) + 250 mB Electrolyte Solution (Melter 900 FE). Needs a Stage 6 Cathode."
+        },
+        "corrosion_cell/tungstensteel_plate": {
+            "input": "1 tungstensteel plate + 1 electrolyte",
+            "chain_fe": 45600,
+            "available_from_stage": 7,
+            "chain": "Tungstensteel plate chain, see void_catalyst."
+        },
+        "corrosion_cell/tungstensteel_anode": {
+            "input": "1 tungstensteel anode + 1 electrolyte",
+            "chain_fe": 96900,
+            "available_from_stage": 7,
+            "chain": "Component Assembler 4,800 FE + 2 plates (45,600 each) + 250 mB Electrolyte Solution (Melter 900 FE). Needs a Stage 7 Cathode."
+        },
+        "corrosion_cell/naquadah_plate": {
+            "input": "1 naquadah plate + 1 electrolyte",
+            "chain_fe": 31200,
+            "available_from_stage": 8,
+            "chain": "Furnace raw naquadah 28,800 + Metal Press 2,400."
+        },
+        "corrosion_cell/naquadah_anode": {
+            "input": "1 naquadah anode + 1 electrolyte",
+            "chain_fe": 68100,
+            "available_from_stage": 8,
+            "chain": "Component Assembler 4,800 FE + 2 plates (31,200 each) + 250 mB Electrolyte Solution (Melter 900 FE). Needs a Stage 8 Cathode."
+        },
         "syngas_combustor/syngas_power": {
             "input": "1000 mB syngas",
             "chain_fe": 6600,

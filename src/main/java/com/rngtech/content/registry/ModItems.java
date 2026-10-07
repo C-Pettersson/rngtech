@@ -11,6 +11,7 @@ import com.rngtech.content.calibration.CalibrationGearMaterial;
 import com.rngtech.content.calibration.ResonanceCalibratorChassis;
 import com.rngtech.content.energy.BatteryCellMaterial;
 import com.rngtech.content.energy.BatteryChassisMaterial;
+import com.rngtech.content.energy.CathodeMaterial;
 import com.rngtech.content.energy.CavitationRotorMaterial;
 import com.rngtech.content.energy.CollapseNozzleMaterial;
 import com.rngtech.content.energy.ContainmentLiningMaterial;
@@ -36,6 +37,7 @@ import com.rngtech.content.item.CableItem;
 import com.rngtech.content.item.CalibratedComponentItem;
 import com.rngtech.content.item.CalibrationGearItem;
 import com.rngtech.content.item.CalibrationPatternItem;
+import com.rngtech.content.item.CathodeItem;
 import com.rngtech.content.item.CavitationPartItem;
 import com.rngtech.content.item.CollapseNozzleItem;
 import com.rngtech.content.item.ComponentRecyclerBlockItem;
@@ -662,6 +664,8 @@ public final class ModItems {
     public static final Map<ServoMaterial, DeferredItem<ServoItem>> SERVOS = registerServos();
     public static final DeferredItem<ServoItem> STEEL_SERVO = servo(ServoMaterial.STEEL);
     public static final Map<FluidPumpMaterial, DeferredItem<FluidPumpItem>> FLUID_PUMPS = registerFluidPumps();
+    public static final Map<CathodeMaterial, DeferredItem<CathodeItem>> CATHODES = registerCathodes();
+    public static final Map<CathodeMaterial, DeferredItem<Item>> ANODES = registerAnodes();
     public static final Map<AlloyCrucibleMaterial, DeferredItem<AlloyCrucibleItem>> ALLOY_CRUCIBLES =
             registerAlloyCrucibles();
     public static final Map<CalibrationGearMaterial, DeferredItem<CalibrationGearItem>> RESONANCE_COILS =
@@ -1051,6 +1055,22 @@ public final class ModItems {
         DeferredItem<ServoItem> item = SERVOS.get(material);
         if (item == null) {
             throw new IllegalArgumentException("Unknown servo material: " + material);
+        }
+        return item;
+    }
+
+    public static DeferredItem<CathodeItem> cathode(CathodeMaterial material) {
+        DeferredItem<CathodeItem> item = CATHODES.get(material);
+        if (item == null) {
+            throw new IllegalArgumentException("Unknown cathode material: " + material);
+        }
+        return item;
+    }
+
+    public static DeferredItem<Item> anode(CathodeMaterial material) {
+        DeferredItem<Item> item = ANODES.get(material);
+        if (item == null) {
+            throw new IllegalArgumentException("Unknown anode material: " + material);
         }
         return item;
     }
@@ -1565,6 +1585,26 @@ public final class ModItems {
                     () -> new ServoItem(material, new Item.Properties().stacksTo(1))
             );
             items.put(material, item);
+        }
+        return Collections.unmodifiableMap(items);
+    }
+
+    private static Map<CathodeMaterial, DeferredItem<CathodeItem>> registerCathodes() {
+        Map<CathodeMaterial, DeferredItem<CathodeItem>> items = new EnumMap<>(CathodeMaterial.class);
+        for (CathodeMaterial material : CathodeMaterial.values()) {
+            DeferredItem<CathodeItem> item = ITEMS.register(
+                    material.itemId(),
+                    () -> new CathodeItem(material, new Item.Properties().stacksTo(1))
+            );
+            items.put(material, item);
+        }
+        return Collections.unmodifiableMap(items);
+    }
+
+    private static Map<CathodeMaterial, DeferredItem<Item>> registerAnodes() {
+        Map<CathodeMaterial, DeferredItem<Item>> items = new EnumMap<>(CathodeMaterial.class);
+        for (CathodeMaterial material : CathodeMaterial.values()) {
+            items.put(material, ITEMS.register(material.anodeItemId(), () -> new Item(new Item.Properties())));
         }
         return Collections.unmodifiableMap(items);
     }

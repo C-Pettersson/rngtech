@@ -181,6 +181,17 @@ Fluid Pumps control fluid transfer for machines with fluid input or output. They
 
 The current prototype implements all three listed pumps as Melter Gear parts. No RNGTech fluid pipes are implemented; machines expose standard NeoForge fluid capabilities when the installed pump allows it.
 
+### Cathodes
+
+Cathodes are Corrosion Cell Gear. The installed Cathode's stage sets the highest Anode the cell can burn; Anodes are consumed fuel assembled in the Component Assembler.
+
+| Stage | Cathode | Anode it unlocks | Anode FE/t | Base Efficiency |
+|---:|---|---|---:|---:|
+| 5 | Aluminum Cathode | Aluminum Anode | `200` | `1.00x` |
+| 6 | Titanium Cathode | Titanium Anode | `480` | `1.02x` |
+| 7 | Tungstensteel Cathode | Tungstensteel Anode | `900` | `1.04x` |
+| 8 | Naquadah Cathode | Naquadah Anode | `1,800` | `1.06x` |
+
 ### Crush Heads
 
 Crush heads control processing speed, output amount, output slots, processing level, and special ore-processing effects. On Crushers, `PROCESSING_LEVEL` is the crush hardness level compared against recipe `required_processing_level`; under-level heads can still run the recipe, but more slowly, with higher total FE cost, and with jam risk.

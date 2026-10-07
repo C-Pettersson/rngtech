@@ -2,6 +2,7 @@ package com.rngtech.content.blockentity;
 
 import com.rngtech.content.block.BaseMachineBlock;
 import com.rngtech.content.item.BatteryCellItem;
+import com.rngtech.content.item.CathodeItem;
 import com.rngtech.content.item.FluidPumpItem;
 import com.rngtech.content.item.MachinePartItem;
 import com.rngtech.content.menu.CorrosionCellMenu;
@@ -56,7 +57,8 @@ public class CorrosionCellBlockEntity extends BaseMachineBlockEntity
     public static final int PROCESS_SLOT_COUNT = 3;
     public static final int SLOT_BATTERY_CELL = 0;
     public static final int SLOT_FLUID_PUMP = 1;
-    public static final int GEAR_SLOT_COUNT = 2;
+    public static final int SLOT_CATHODE = 2;
+    public static final int GEAR_SLOT_COUNT = 3;
 
     public static final int STATUS_READY = 0;
     public static final int STATUS_NO_PLATE = 1;
@@ -66,6 +68,7 @@ public class CorrosionCellBlockEntity extends BaseMachineBlockEntity
     public static final int STATUS_OUTPUT_FULL = 5;
     public static final int STATUS_ENERGY_FULL = 6;
     public static final int STATUS_REDSTONE_DISABLED = 7;
+    public static final int STATUS_BLOCKED_CATHODE = 8;
     public static final int PURGE_ELECTROLYTE_TANK = 0;
     public static final int ELECTROLYTE_PER_REAGENT = BatteryAssemblerBlockEntity.ELECTROLYTE_PER_REAGENT;
 
@@ -126,6 +129,7 @@ public class CorrosionCellBlockEntity extends BaseMachineBlockEntity
             return switch (slot) {
                 case SLOT_BATTERY_CELL -> isBatteryCell(stack);
                 case SLOT_FLUID_PUMP -> isFluidPump(stack);
+                case SLOT_CATHODE -> isCathode(stack);
                 default -> false;
             };
         }
@@ -310,6 +314,7 @@ public class CorrosionCellBlockEntity extends BaseMachineBlockEntity
             case STATUS_OUTPUT_FULL -> "output_full";
             case STATUS_ENERGY_FULL -> "energy_full";
             case STATUS_REDSTONE_DISABLED -> "redstone";
+            case STATUS_BLOCKED_CATHODE -> "blocked_cathode";
             default -> "";
         };
         return name.isEmpty() ? "" : "rngtech.corrosion_cell.status." + name;
@@ -386,10 +391,17 @@ public class CorrosionCellBlockEntity extends BaseMachineBlockEntity
         return stack.getItem() instanceof FluidPumpItem;
     }
 
+    public static boolean isCathode(ItemStack stack) {
+        return stack.getItem() instanceof CathodeItem;
+    }
+
     public MachineStatAccumulator effectiveStats() {
         MachineStatAccumulator stats = MachineBaseStatCatalog.corrosionCell();
         stats.apply(MachineImplicitCatalog.effectiveTraits(machineTraits(), getBlockState().getBlock()));
         applyFluidPumpStats(stats);
+        if (isCathode(cathodeStack())) {
+            ComponentBaseStatCatalog.applyEffectiveContribution(stats, cathodeStack());
+        }
         bulkSpeed.apply(stats, activeTraits());
         return stats;
     }
@@ -418,7 +430,7 @@ public class CorrosionCellBlockEntity extends BaseMachineBlockEntity
     protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.loadAdditional(tag, registries);
         processInventory.deserializeNBT(registries, tag.getCompound("ProcessInventory"));
-        gearInventory.deserializeNBT(registries, tag.getCompound("GearInventory"));
+        loadGearInventory(tag.getCompound("GearInventory"), registries);
         electrolyteTank.readFromNBT(registries, tag.getCompound("ElectrolyteTank"));
         progress = tag.getInt("Progress");
         activeProcessingTicks = tag.getInt("ActiveProcessingTicks");
@@ -564,7 +576,7 @@ public class CorrosionCellBlockEntity extends BaseMachineBlockEntity
     }
 
     private boolean canProcessStage(CorrosionCellRecipe recipe) {
-        return COMPONENT_STAGE >= recipe.minimumMaterialStage();
+        return COMPONENT_STAGE >= recipe.minimumMaterialStage() && cathodeStage() >= recipe.minimumCathodeStage();
     }
 
     private double effectiveRecipeEnergy(CorrosionCellRecipe recipe, MachineStatAccumulator stats) {
@@ -744,7 +756,10 @@ public class CorrosionCellBlockEntity extends BaseMachineBlockEntity
 
     private int currentMinimumStage() {
         CorrosionCellRecipe recipe = nextRecipe();
-        return recipe == null ? 0 : recipe.minimumMaterialStage();
+        if (recipe == null) {
+            return 0;
+        }
+        return recipe.minimumCathodeStage() > 0 ? recipe.minimumCathodeStage() : recipe.minimumMaterialStage();
     }
 
     private int statusCode(MachineStatAccumulator stats) {
@@ -766,6 +781,9 @@ public class CorrosionCellBlockEntity extends BaseMachineBlockEntity
         CorrosionCellRecipe recipe = nextRecipe();
         if (recipe == null) {
             return STATUS_INVALID_RECIPE;
+        }
+        if (cathodeStage() < recipe.minimumCathodeStage()) {
+            return STATUS_BLOCKED_CATHODE;
         }
         if (!canProcessStage(recipe)) {
             return STATUS_BLOCKED_STAGE;
@@ -857,6 +875,30 @@ public class CorrosionCellBlockEntity extends BaseMachineBlockEntity
 
     private ItemStack fluidPumpStack() {
         return gearInventory.getStackInSlot(SLOT_FLUID_PUMP);
+    }
+
+    private ItemStack cathodeStack() {
+        return gearInventory.getStackInSlot(SLOT_CATHODE);
+    }
+
+    private int cathodeStage() {
+        return cathodeStack().getItem() instanceof CathodeItem cathode ? cathode.stage() : 0;
+    }
+
+    /** Older saves have a two-slot Gear inventory without the Cathode slot. */
+    private void loadGearInventory(CompoundTag gearTag, HolderLookup.Provider registries) {
+        int savedSize = gearTag.getInt("Size");
+        if (savedSize == GEAR_SLOT_COUNT) {
+            gearInventory.deserializeNBT(registries, gearTag);
+            return;
+        }
+
+        ItemStackHandler legacyGear = new ItemStackHandler(Math.max(0, savedSize));
+        legacyGear.deserializeNBT(registries, gearTag);
+        gearInventory.setSize(GEAR_SLOT_COUNT);
+        for (int slot = 0; slot < Math.min(legacyGear.getSlots(), GEAR_SLOT_COUNT); slot++) {
+            gearInventory.setStackInSlot(slot, legacyGear.getStackInSlot(slot));
+        }
     }
 
     private int scaledStat(MachineStatAccumulator stats, MachineStat stat) {

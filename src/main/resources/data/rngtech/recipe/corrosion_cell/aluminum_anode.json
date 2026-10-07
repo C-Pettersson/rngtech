@@ -1,0 +1,23 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "rngtech:material_enabled",
+      "material": "aluminum"
+    }
+  ],
+  "type": "rngtech:corrosion_cell",
+  "plate": {
+    "item": "rngtech:aluminum_anode"
+  },
+  "electrolyte": {
+    "item": "rngtech:electrolyte"
+  },
+  "minimum_material_stage": 4,
+  "residue": {
+    "count": 1,
+    "id": "rngtech:corrosion_residue"
+  },
+  "energy": 64000,
+  "processing_ticks": 320,
+  "minimum_cathode_stage": 5
+}

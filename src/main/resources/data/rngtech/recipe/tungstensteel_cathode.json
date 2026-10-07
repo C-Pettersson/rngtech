@@ -1,0 +1,30 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "rngtech:material_enabled",
+      "material": "tungstensteel"
+    }
+  ],
+  "type": "rngtech:trait_shaped",
+  "category": "redstone",
+  "pattern": [
+    "PRP",
+    "RCR",
+    "PRP"
+  ],
+  "key": {
+    "C": {
+      "tag": "c:circuits/elite"
+    },
+    "P": {
+      "item": "rngtech:tungstensteel_plate"
+    },
+    "R": {
+      "item": "rngtech:tungstensteel_rod"
+    }
+  },
+  "result": {
+    "count": 1,
+    "id": "rngtech:tungstensteel_cathode"
+  }
+}

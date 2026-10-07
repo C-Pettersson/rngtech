@@ -24,6 +24,7 @@ import com.rngtech.content.calibration.CalibrationGearMaterial;
 import com.rngtech.content.calibration.ResonanceCalibratorChassis;
 import com.rngtech.content.energy.BatteryCellMaterial;
 import com.rngtech.content.energy.BatteryChassisMaterial;
+import com.rngtech.content.energy.CathodeMaterial;
 import com.rngtech.content.energy.CavitationRotorMaterial;
 import com.rngtech.content.energy.CollapseNozzleMaterial;
 import com.rngtech.content.energy.ContainmentLiningMaterial;
@@ -38,6 +39,7 @@ import com.rngtech.content.item.AlloyFurnaceChassisBlockItem;
 import com.rngtech.content.item.BatteryCellItem;
 import com.rngtech.content.item.BatteryChassisBlockItem;
 import com.rngtech.content.item.CalibrationGearItem;
+import com.rngtech.content.item.CathodeItem;
 import com.rngtech.content.item.CavitationPartItem;
 import com.rngtech.content.item.CollapseNozzleItem;
 import com.rngtech.content.item.ComponentRecyclerBlockItem;
@@ -188,6 +190,9 @@ public final class MachineImplicitCatalog {
         }
         if (item instanceof FluidPumpItem pump) {
             return fluidPump(pump.material());
+        }
+        if (item instanceof CathodeItem cathode) {
+            return cathode(cathode.material());
         }
         if (item instanceof SolarArrayExtenderItem extender) {
             return identity(
@@ -447,6 +452,10 @@ public final class MachineImplicitCatalog {
                 List.of(),
                 behaviors.toArray(MachineBehavior[]::new)
         );
+    }
+
+    public static Identity cathode(CathodeMaterial material) {
+        return identity("cathode." + material.getSerializedName(), Rarity.NORMAL, material.refinementPotential(), List.of());
     }
 
     public static Identity fluidPump(FluidPumpMaterial material) {

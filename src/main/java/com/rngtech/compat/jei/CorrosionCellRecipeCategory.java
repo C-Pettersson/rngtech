@@ -116,5 +116,14 @@ public final class CorrosionCellRecipeCategory implements IRecipeCategory<Recipe
                 62,
                 JeiCategoryUi.MUTED_TEXT_COLOR
         );
+        if (recipe.minimumCathodeStage() > 0) {
+            JeiCategoryUi.drawLine(
+                    guiGraphics,
+                    font,
+                    Component.translatable("rngtech.jei.corrosion_cell.cathode_stage", recipe.minimumCathodeStage()),
+                    72,
+                    JeiCategoryUi.MUTED_TEXT_COLOR
+            );
+        }
     }
 }

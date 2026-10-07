@@ -901,6 +901,9 @@ async function knownComponentStageEntries() {
     await appendEnumStages(entries, path.join(MACHINE_SRC, "FluidPumpMaterial.java"), (entry) => [
         stageEntry(`${entry.name}_fluid_pump`, javaNumber(entry.args[0]), "FluidPumpMaterial")
     ]);
+    await appendEnumStages(entries, path.join(ENERGY_SRC, "CathodeMaterial.java"), (entry) => [
+        stageEntry(`${entry.name}_cathode`, javaNumber(entry.args[0]), "CathodeMaterial")
+    ]);
     await appendEnumStages(entries, path.join(MACHINE_SRC, "AlloyCrucibleMaterial.java"), (entry) => [
         stageEntry(`${entry.name}_alloy_crucible`, javaNumber(entry.args[0]), "AlloyCrucibleMaterial")
     ]);
@@ -1729,6 +1732,7 @@ function stageItemCategory(id, materialItemIds) {
             || local.endsWith("_containment_lining")
             || local.endsWith("_servo")
             || local.endsWith("_fluid_pump")
+            || local.endsWith("_cathode")
             || local.endsWith("_alloy_crucible")
             || local.endsWith("_resonance_coil")
             || local.endsWith("_control_board")
@@ -1912,6 +1916,9 @@ function modifierProfileIdForItem(id) {
     }
     if (local.endsWith("_fluid_pump")) {
         return "fluid_pump";
+    }
+    if (local.endsWith("_cathode")) {
+        return "cathode";
     }
     if (local.endsWith("_solar_array_extender")) {
         return "solar_array_extender";

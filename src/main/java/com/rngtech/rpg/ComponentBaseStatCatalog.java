@@ -2,6 +2,7 @@ package com.rngtech.rpg;
 
 import com.rngtech.content.calibration.CalibrationGearMaterial;
 import com.rngtech.content.energy.BatteryCellMaterial;
+import com.rngtech.content.energy.CathodeMaterial;
 import com.rngtech.content.energy.CavitationRotorMaterial;
 import com.rngtech.content.energy.CollapseNozzleMaterial;
 import com.rngtech.content.energy.ContainmentLiningMaterial;
@@ -16,6 +17,7 @@ import com.rngtech.content.item.AmmoniaPartItem;
 import com.rngtech.content.item.BatteryCellItem;
 import com.rngtech.content.item.BioChamberItem;
 import com.rngtech.content.item.CalibrationGearItem;
+import com.rngtech.content.item.CathodeItem;
 import com.rngtech.content.item.CavitationPartItem;
 import com.rngtech.content.item.CollapseNozzleItem;
 import com.rngtech.content.item.CrushHeadItem;
@@ -234,6 +236,9 @@ public final class ComponentBaseStatCatalog {
         if (item instanceof FluidPumpItem pump) {
             return fluidPump(pump.material());
         }
+        if (item instanceof CathodeItem cathode) {
+            return cathode(cathode.material());
+        }
         if (item instanceof AmmoniaPartItem part) {
             return switch (part.partType()) {
                 case AMMONIA_CATALYST_BED -> ammoniaCatalystBed();
@@ -427,6 +432,16 @@ public final class ComponentBaseStatCatalog {
                 .more(MachineStat.TEMPERATURE_STABILITY, percentMultiplier(material.temperatureStabilityPercent()))
                 .more(MachineStat.OVERHEAT_TOLERANCE, percentMultiplier(material.overheatTolerancePercent()))
                 .more(MachineStat.FLUID_TRANSFER, 1.0)
+                .build();
+    }
+
+    /** Every stat the Cathode can roll must merge here, or its affixes would be dropped. */
+    static Profile cathode(CathodeMaterial material) {
+        return builder()
+                .more(MachineStat.ENERGY_GENERATION, 1.0)
+                .more(MachineStat.EFFICIENCY, material.efficiency())
+                .more(MachineStat.PROCESSING_SPEED, 1.0)
+                .more(MachineStat.STABILITY, 1.0)
                 .build();
     }
 

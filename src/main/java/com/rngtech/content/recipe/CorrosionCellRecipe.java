@@ -25,7 +25,8 @@ public record CorrosionCellRecipe(
         int energy,
         int processingTicks,
         ItemStack residue,
-        int minimumMaterialStage
+        int minimumMaterialStage,
+        int minimumCathodeStage
 )
         implements Recipe<CorrosionCellRecipeInput> {
     @Override
@@ -95,7 +96,10 @@ public record CorrosionCellRecipe(
                         Codec.intRange(1, Integer.MAX_VALUE)
                                 .fieldOf("minimum_material_stage")
                                 .orElse(4)
-                                .forGetter(CorrosionCellRecipe::minimumMaterialStage)
+                                .forGetter(CorrosionCellRecipe::minimumMaterialStage),
+                        Codec.intRange(0, Integer.MAX_VALUE)
+                                .optionalFieldOf("minimum_cathode_stage", 0)
+                                .forGetter(CorrosionCellRecipe::minimumCathodeStage)
                 )
                 .apply(instance, CorrosionCellRecipe::new));
 
@@ -110,6 +114,7 @@ public record CorrosionCellRecipe(
                                 ByteBufCodecs.VAR_INT.decode(buffer),
                                 ByteBufCodecs.VAR_INT.decode(buffer),
                                 ItemStack.STREAM_CODEC.decode(buffer),
+                                ByteBufCodecs.VAR_INT.decode(buffer),
                                 ByteBufCodecs.VAR_INT.decode(buffer)
                         );
                     }
@@ -123,6 +128,7 @@ public record CorrosionCellRecipe(
                         ByteBufCodecs.VAR_INT.encode(buffer, recipe.processingTicks);
                         ItemStack.STREAM_CODEC.encode(buffer, recipe.residue);
                         ByteBufCodecs.VAR_INT.encode(buffer, recipe.minimumMaterialStage);
+                        ByteBufCodecs.VAR_INT.encode(buffer, recipe.minimumCathodeStage);
                     }
                 };
 

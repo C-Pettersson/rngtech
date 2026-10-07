@@ -11,11 +11,12 @@ Recipe type id: `rngtech:battery_assembly`
 
 The Component Assembler is a powered fluid-backed assembly machine. Its public ids still use the older Battery Assembler names for save and datapack compatibility, but the player-facing machine is now the Component Assembler.
 
-It has three current jobs:
+It has four current jobs:
 
 - Produce stackable Primed Cell Cores from shells, conductive plates, and `rngtech:electrolyte_solution`.
 - Assemble final material Battery Cells from Primed Cell Cores and material-specific battery ingredients.
 - Assemble lubricant-backed endgame components from ordinary item ingredients and stored `rngtech:lubricant`.
+- Assemble Corrosion Cell Anodes from two Aluminum, Titanium, Tungstensteel, or Naquadah plates and `250 mB` Electrolyte Solution for `4,800 FE` each. See [Corrosion Cell](corrosion-cell.md).
 
 ## Current Runtime Surface
 
@@ -31,6 +32,7 @@ Registered content:
 | Lubricant bucket | `rngtech:lubricant_bucket` |
 | Stackable Primed Cell Core | `rngtech:battery_cell` |
 | Lubricated Frame Coupling | `rngtech:lubricated_frame_coupling` |
+| Corrosion Cell Anodes | `rngtech:aluminum_anode`, `rngtech:titanium_anode`, `rngtech:tungstensteel_anode`, `rngtech:naquadah_anode` |
 
 The placed machine uses `BatteryAssemblerBlockEntity`, `BatteryAssemblerMenu`, and `BatteryAssemblerScreen`. It supports Process, Gear, Stats, and Refinement tabs.
 

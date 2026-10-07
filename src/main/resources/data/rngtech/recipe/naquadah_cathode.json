@@ -1,0 +1,30 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "rngtech:material_enabled",
+      "material": "naquadah"
+    }
+  ],
+  "type": "rngtech:trait_shaped",
+  "category": "redstone",
+  "pattern": [
+    "PRP",
+    "RCR",
+    "PRP"
+  ],
+  "key": {
+    "C": {
+      "tag": "c:circuits/ultimate"
+    },
+    "P": {
+      "item": "rngtech:naquadah_plate"
+    },
+    "R": {
+      "item": "rngtech:naquadah_rod"
+    }
+  },
+  "result": {
+    "count": 1,
+    "id": "rngtech:naquadah_cathode"
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "rngtech:material_enabled",
+      "material": "aluminum"
+    }
+  ],
+  "type": "rngtech:battery_assembly",
+  "group": "battery_assembly_anodes",
+  "ingredients": [
+    {
+      "item": "rngtech:aluminum_plate"
+    },
+    {
+      "item": "rngtech:aluminum_plate"
+    }
+  ],
+  "fluid_input": {
+    "ingredient": {
+      "fluid": "rngtech:electrolyte_solution"
+    },
+    "amount": 250
+  },
+  "result": {
+    "count": 1,
+    "id": "rngtech:aluminum_anode"
+  },
+  "processing_ticks": 200,
+  "energy": 4800,
+  "roll_result_traits": false
+}

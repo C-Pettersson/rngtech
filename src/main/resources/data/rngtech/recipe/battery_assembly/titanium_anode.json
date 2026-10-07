@@ -1,0 +1,31 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "rngtech:material_enabled",
+      "material": "titanium"
+    }
+  ],
+  "type": "rngtech:battery_assembly",
+  "group": "battery_assembly_anodes",
+  "ingredients": [
+    {
+      "item": "rngtech:titanium_plate"
+    },
+    {
+      "item": "rngtech:titanium_plate"
+    }
+  ],
+  "fluid_input": {
+    "ingredient": {
+      "fluid": "rngtech:electrolyte_solution"
+    },
+    "amount": 250
+  },
+  "result": {
+    "count": 1,
+    "id": "rngtech:titanium_anode"
+  },
+  "processing_ticks": 200,
+  "energy": 4800,
+  "roll_result_traits": false
+}

@@ -112,8 +112,9 @@ public class CorrosionCellScreen extends AbstractContainerScreen<CorrosionCellMe
         if (menu.selectedTab() == CorrosionCellMenu.TAB_PROCESSING) {
             drawProcessingLabels(guiGraphics);
         } else if (menu.selectedTab() == CorrosionCellMenu.TAB_GEAR) {
-            drawCentered(guiGraphics, Component.translatable("rngtech.gear.battery_cell.short"), 83, 35);
-            drawCentered(guiGraphics, Component.translatable("rngtech.gear.fluid_pump.short"), 125, 35);
+            drawCentered(guiGraphics, Component.translatable("rngtech.gear.battery_cell.short"), 62, 35);
+            drawCentered(guiGraphics, Component.translatable("rngtech.gear.fluid_pump.short"), 104, 35);
+            drawCentered(guiGraphics, Component.translatable("rngtech.gear.cathode.short"), 146, 35);
         } else if (menu.selectedTab() == CorrosionCellMenu.TAB_STATS) {
             MachineScreenStyle.drawStatPanelLabels(guiGraphics, font, Component.translatable("rngtech.tab.stats"), statLines(), STAT_PANEL_X, STAT_PANEL_Y, STAT_PANEL_WIDTH, STAT_ACCENT);
         } else {
@@ -178,8 +179,9 @@ public class CorrosionCellScreen extends AbstractContainerScreen<CorrosionCellMe
             renderSlotFrame(guiGraphics, ELECTROLYTE_SLOT_X, ELECTROLYTE_SLOT_Y);
             renderSlotFrame(guiGraphics, RESIDUE_SLOT_X, RESIDUE_SLOT_Y);
         } else if (menu.selectedTab() == CorrosionCellMenu.TAB_GEAR) {
-            renderSlotFrame(guiGraphics, 73, 47);
-            renderSlotFrame(guiGraphics, 115, 47);
+            renderSlotFrame(guiGraphics, 52, 47);
+            renderSlotFrame(guiGraphics, 94, 47);
+            renderSlotFrame(guiGraphics, 136, 47);
         } else if (menu.selectedTab() == CorrosionCellMenu.TAB_REFINEMENT) {
             renderSlotFrame(guiGraphics, RefinementScreenStyle.TARGET_SLOT_X - 1, RefinementScreenStyle.SLOT_Y - 1);
             renderSlotFrame(guiGraphics, RefinementScreenStyle.CONSUMABLE_SLOT_X - 1, RefinementScreenStyle.SLOT_Y - 1);
@@ -264,6 +266,7 @@ public class CorrosionCellScreen extends AbstractContainerScreen<CorrosionCellMe
             case CorrosionCellBlockEntity.STATUS_NO_ELECTROLYTE -> Component.translatable("rngtech.corrosion_cell.status.no_electrolyte");
             case CorrosionCellBlockEntity.STATUS_INVALID_RECIPE -> Component.translatable("rngtech.corrosion_cell.status.invalid_recipe");
             case CorrosionCellBlockEntity.STATUS_BLOCKED_STAGE -> Component.translatable("rngtech.corrosion_cell.status.blocked_stage", menu.minimumStage());
+            case CorrosionCellBlockEntity.STATUS_BLOCKED_CATHODE -> Component.translatable("rngtech.corrosion_cell.status.blocked_cathode", menu.minimumStage());
             case CorrosionCellBlockEntity.STATUS_OUTPUT_FULL -> Component.translatable("rngtech.corrosion_cell.status.output_full");
             case CorrosionCellBlockEntity.STATUS_ENERGY_FULL -> Component.translatable("rngtech.corrosion_cell.status.energy_full");
             case CorrosionCellBlockEntity.STATUS_REDSTONE_DISABLED -> Component.translatable("rngtech.corrosion_cell.status.redstone");

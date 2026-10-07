@@ -1,16 +1,22 @@
 {
+  "neoforge:conditions": [
+    {
+      "type": "rngtech:material_enabled",
+      "material": "naquadah"
+    }
+  ],
   "type": "rngtech:corrosion_cell",
   "plate": {
-    "item": "rngtech:copper_plate"
+    "item": "rngtech:naquadah_plate"
   },
   "electrolyte": {
     "item": "rngtech:electrolyte"
   },
-  "energy": 16000,
-  "processing_ticks": 160,
   "minimum_material_stage": 4,
   "residue": {
     "count": 1,
     "id": "rngtech:corrosion_residue"
-  }
+  },
+  "energy": 115200,
+  "processing_ticks": 160
 }
