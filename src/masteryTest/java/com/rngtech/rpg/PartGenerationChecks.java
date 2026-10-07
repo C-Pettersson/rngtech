@@ -15,6 +15,7 @@ public final class PartGenerationChecks {
         partModifiersScaleOnlyTheirOwnPart();
         machineWideIncreasesScalePartFlatsOnce();
         additivePartsKeepTheirFlatSeparate();
+        generationBreakdownExplainsFinalOutput();
         return checks;
     }
 
@@ -45,6 +46,16 @@ public final class PartGenerationChecks {
         near(machine.effectiveFlatEnergyGenerationBonus(), 15, "additive part flat counts once");
     }
 
+    private static void generationBreakdownExplainsFinalOutput() {
+        MachineStatAccumulator machine = machineWithChamberAndNozzle();
+        double multiplier = machine.effectiveEnergyGenerationMultiplier();
+        double flat = machine.effectiveFlatEnergyGenerationBonus();
+        double finalPerTick = (1000 * multiplier + flat) * 1.08;
+        near(MachineStatDisplay.generationOtherFactor(finalPerTick, 1000, multiplier, flat), 1.08, "breakdown isolates other stats");
+        near(MachineStatDisplay.generationOtherFactor(finalPerTick, 0, multiplier, flat), 1.0, "unknown base hides the other line");
+        require(MachineStatDisplay.energyRate(3592.4).equals("3,592 FE/t"), "Stats tab row shows final FE/t");
+    }
+
     private static MachineStatAccumulator machineWithChamberAndNozzle() {
         MachineStatAccumulator chamber = MachineStatAccumulator.componentBase(Map.of(MachineStat.ENERGY_GENERATION, 1.0));
         chamber.apply(flatGeneration(207));
@@ -61,6 +72,13 @@ public final class PartGenerationChecks {
         String id = ModifierEligibilityProfiles.ENERGY_GENERATION_FLAT_AFFIX_ID;
         return new MachineModifier(id, id, ModifierSlot.PREFIX, MachineStat.ENERGY_GENERATION, ModifierOperation.ADD, 0,
                 ModifierValueRange.fixed(value), value, List.of());
+    }
+
+    private static void require(boolean condition, String label) {
+        checks++;
+        if (!condition) {
+            throw new AssertionError(label);
+        }
     }
 
     private static void near(double actual, double expected, String label) {
