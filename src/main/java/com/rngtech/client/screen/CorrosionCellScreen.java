@@ -1,13 +1,19 @@
 package com.rngtech.client.screen;
 
 import com.rngtech.content.blockentity.CorrosionCellBlockEntity;
+import com.rngtech.content.item.CathodeItem;
 import com.rngtech.content.menu.CorrosionCellMenu;
 import com.rngtech.rpg.MachineStat;
 
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.ItemStack;
+
+import java.util.List;
 
 public class CorrosionCellScreen extends AbstractContainerScreen<CorrosionCellMenu> {
     private static final int PANEL = 0xFFC6C6C6;
@@ -25,14 +31,17 @@ public class CorrosionCellScreen extends AbstractContainerScreen<CorrosionCellMe
     private static final int STAT_PANEL_WIDTH = 224;
     private static final int PLATE_SLOT_X = 16;
     private static final int PLATE_SLOT_Y = 32;
-    private static final int ELECTROLYTE_SLOT_X = 16;
-    private static final int ELECTROLYTE_SLOT_Y = 70;
+    private static final int ELECTROLYTE_SLOT_X = 39;
+    private static final int ELECTROLYTE_SLOT_Y = 78;
+    private static final int CATHODE_BADGE_X = 19;
+    private static final int CATHODE_BADGE_Y = 55;
+    private static final int CATHODE_BADGE_SIZE = 12;
     private static final int RESIDUE_SLOT_X = 175;
     private static final int RESIDUE_SLOT_Y = 70;
     private static final int ELECTROLYTE_METER_X = 42;
     private static final int ELECTROLYTE_METER_Y = 36;
     private static final int ELECTROLYTE_METER_WIDTH = 12;
-    private static final int ELECTROLYTE_METER_HEIGHT = 52;
+    private static final int ELECTROLYTE_METER_HEIGHT = 38;
     private static final int ENERGY_METER_X = 158;
     private static final int ENERGY_METER_Y = 36;
     private static final int ENERGY_METER_WIDTH = 12;
@@ -202,7 +211,7 @@ public class CorrosionCellScreen extends AbstractContainerScreen<CorrosionCellMe
                 y + ELECTROLYTE_METER_Y + ELECTROLYTE_METER_HEIGHT,
                 0xFF5F5F5F
         );
-        int electrolyteHeight = Math.round(48 * menu.electrolyteFluidProgress());
+        int electrolyteHeight = Math.round((ELECTROLYTE_METER_HEIGHT - 4) * menu.electrolyteFluidProgress());
         int electrolyteBottom = y + ELECTROLYTE_METER_Y + ELECTROLYTE_METER_HEIGHT - 2;
         guiGraphics.fill(
                 x + ELECTROLYTE_METER_X + 2,
@@ -211,6 +220,7 @@ public class CorrosionCellScreen extends AbstractContainerScreen<CorrosionCellMe
                 electrolyteBottom,
                 0xFF5C86C7
         );
+        renderCathodeBadge(guiGraphics);
         guiGraphics.fill(
                 x + ENERGY_METER_X,
                 y + ENERGY_METER_Y,
@@ -256,8 +266,63 @@ public class CorrosionCellScreen extends AbstractContainerScreen<CorrosionCellMe
 
     private void drawProcessingLabels(GuiGraphics guiGraphics) {
         guiGraphics.drawString(font, Component.translatable("rngtech.corrosion_cell.plate"), 18, 22, TEXT_MUTED, false);
-        guiGraphics.drawString(font, Component.translatable("rngtech.corrosion_cell.electrolyte.short"), 18, 60, TEXT_MUTED, false);
         guiGraphics.drawString(font, Component.translatable("rngtech.corrosion_cell.residue"), 175, 56, TEXT_MUTED, false);
+    }
+
+    /** The installed Cathode, shown under the Fuel slot so the Anode gate is visible without opening the Gear tab. */
+    private void renderCathodeBadge(GuiGraphics guiGraphics) {
+        int left = leftPos + CATHODE_BADGE_X;
+        int top = topPos + CATHODE_BADGE_Y;
+        ItemStack cathode = menu.cathodeStack();
+        if (cathode.isEmpty()) {
+            guiGraphics.fill(left, top, left + CATHODE_BADGE_SIZE, top + CATHODE_BADGE_SIZE, 0xFF8B8B8B);
+            guiGraphics.fill(left + 1, top + 1, left + CATHODE_BADGE_SIZE - 1, top + CATHODE_BADGE_SIZE - 1, PANEL);
+            return;
+        }
+        guiGraphics.pose().pushPose();
+        guiGraphics.pose().translate(left, top, 0);
+        guiGraphics.pose().scale(0.75F, 0.75F, 1.0F);
+        guiGraphics.renderItem(cathode, 0, 0);
+        guiGraphics.pose().popPose();
+    }
+
+    private void renderInputTooltips(GuiGraphics guiGraphics, int mouseX, int mouseY) {
+        if (hoveredEmptyProcessSlot(CorrosionCellBlockEntity.SLOT_PLATE)) {
+            guiGraphics.renderComponentTooltip(font, List.of(
+                    Component.translatable("rngtech.corrosion_cell.plate").withStyle(ChatFormatting.YELLOW),
+                    Component.translatable("rngtech.corrosion_cell.slot.fuel").withStyle(ChatFormatting.GRAY),
+                    Component.translatable("rngtech.corrosion_cell.slot.fuel.anode").withStyle(ChatFormatting.DARK_GRAY)
+            ), mouseX, mouseY);
+            return;
+        }
+        if (hoveredEmptyProcessSlot(CorrosionCellBlockEntity.SLOT_ELECTROLYTE)) {
+            guiGraphics.renderComponentTooltip(font, List.of(
+                    Component.translatable("rngtech.corrosion_cell.electrolyte").withStyle(ChatFormatting.YELLOW),
+                    Component.translatable("rngtech.corrosion_cell.slot.electrolyte").withStyle(ChatFormatting.GRAY)
+            ), mouseX, mouseY);
+            return;
+        }
+        int left = leftPos + CATHODE_BADGE_X;
+        int top = topPos + CATHODE_BADGE_Y;
+        if (mouseX < left || mouseX >= left + CATHODE_BADGE_SIZE || mouseY < top || mouseY >= top + CATHODE_BADGE_SIZE) {
+            return;
+        }
+        ItemStack cathode = menu.cathodeStack();
+        List<Component> lines = cathode.getItem() instanceof CathodeItem item
+                ? List.of(
+                        Component.translatable("rngtech.corrosion_cell.cathode.installed", cathode.getHoverName()).withStyle(ChatFormatting.YELLOW),
+                        Component.translatable("rngtech.corrosion_cell.cathode.runs", item.stage()).withStyle(ChatFormatting.GRAY)
+                )
+                : List.of(
+                        Component.translatable("rngtech.corrosion_cell.cathode.none").withStyle(ChatFormatting.YELLOW),
+                        Component.translatable("rngtech.corrosion_cell.cathode.install").withStyle(ChatFormatting.GRAY)
+                );
+        guiGraphics.renderComponentTooltip(font, lines, mouseX, mouseY);
+    }
+
+    private boolean hoveredEmptyProcessSlot(int processSlot) {
+        Slot slot = hoveredSlot;
+        return slot != null && slot.isActive() && !slot.hasItem() && slot.index == processSlot;
     }
 
     private Component statusComponent() {
@@ -290,6 +355,7 @@ public class CorrosionCellScreen extends AbstractContainerScreen<CorrosionCellMe
         if (renderPurgeTooltips(guiGraphics, mouseX, mouseY)) {
             return;
         }
+        renderInputTooltips(guiGraphics, mouseX, mouseY);
         CompactValueText.renderTooltipIfHovered(
                 guiGraphics,
                 font,
