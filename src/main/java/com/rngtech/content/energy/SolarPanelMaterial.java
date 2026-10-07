@@ -8,7 +8,7 @@ public enum SolarPanelMaterial implements StringRepresentable {
     CRUDE("crude", 1, 4, 1, 256, 32),
     COPPER("copper", 2, 8, 2, 512, 64),
     GOLD("gold", 3, 12, 3, 512, 96),
-    SPARKSTEEL("sparksteel", 5, 24, 8, 1024, 192);
+    SPARKSTEEL("sparksteel", 5, 20, 7, 1024, 192);
 
     private final String id;
     private final int stage;

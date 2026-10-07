@@ -37,11 +37,11 @@ public enum SolarArrayExtenderMaterial implements StringRepresentable {
     }
 
     public int rangeBonus() {
-        return 4;
+        return 1;
     }
 
     public double generationMultiplier() {
-        return 1.10;
+        return 1.0;
     }
 
     public double implicitBonusPercent() {

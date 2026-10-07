@@ -357,15 +357,27 @@ public final class EnergyBalanceSimulation {
         List<FuelRecipe> recipes = scenario.corrosionRecipes() != null
                 ? scenario.corrosionRecipes()
                 : recipes("corrosion_cell").stream().map(recipe -> FuelRecipe.of(recipe, chains.fuel("corrosion_cell/" + recipe.id()))).toList();
+        boolean anodes = recipes.stream().anyMatch(recipe -> recipe.id().endsWith("_anode"));
         for (int playerStage = 4; playerStage <= 8; playerStage++) {
-            int stage = playerStage;
-            add("corrosion_cell", "Corrosion Cell", stage, List.of("fuel_access:stage_" + stage), null, roller -> {
+            for (boolean platesOnly : anodes ? new boolean[] {false, true} : new boolean[] {false}) {
+                corrosionCell(recipes, playerStage, platesOnly);
+            }
+        }
+    }
+
+    private void corrosionCell(List<FuelRecipe> recipes, int stage, boolean platesOnly) {
+        List<String> components = platesOnly
+                ? List.of("fuel_access:stage_" + stage, "fuel:plates_only")
+                : List.of("fuel_access:stage_" + stage);
+        {
+            add("corrosion_cell", "Corrosion Cell", stage, components, null, roller -> {
                 MachineStatAccumulator stats = MachineBaseStatCatalog.corrosionCell();
                 MachineTraits traits = roller.machine(MachineType.CORROSION_CELL, 4);
                 stats.apply(traits);
                 bulkSpeed(stats, traits);
                 List<FuelRecipe> legal = recipes.stream()
                         .filter(recipe -> 4 >= recipe.minimumStage() && recipe.obtainable() && stage >= recipe.availableFromStage())
+                        .filter(recipe -> !platesOnly || !recipe.id().endsWith("_anode"))
                         .toList();
                 return bestRecipe(legal, recipe -> {
                     int ticks = stats.adjustedProcessingTicks(recipe.ticks());
@@ -459,14 +471,7 @@ public final class EnergyBalanceSimulation {
                             Outcome outcome = Outcome.running(steady[0], steady[0], fePerRotor)
                                     .withMetric("strainPenalty", 1.0 - steady[0] / (energy / ticks))
                                     .withMetric("rotorSeconds", fePerRotor / steady[0] / 20.0);
-                            double fallback = Math.max(0, Math.round(stats.value(MachineStat.ENERGY_TRANSFER)));
-                            outcome.withMetric("delivered_none", delivered(steady[0], fallback));
-                            outcome.withMetric("perRotor_none", deliveredPerRotor(fePerRotor, steady[0], fallback));
-                            for (EnergyConnectorTier tier : REPORTED_CONNECTORS) {
-                                String key = name(tier);
-                                outcome.withMetric("delivered_" + key, delivered(steady[0], tier.transferRate()));
-                                outcome.withMetric("perRotor_" + key, deliveredPerRotor(fePerRotor, steady[0], tier.transferRate()));
-                            }
+                            connectorMetrics(outcome, steady[0], fePerRotor, stats, scenario.cavitationVent());
                             return outcome;
                         });
                     }
@@ -475,13 +480,21 @@ public final class EnergyBalanceSimulation {
         }
     }
 
-    private static double delivered(double generation, double cap) {
-        return Math.min(generation, cap);
+    /**
+     * Output kept per connector tier, or the generator's own transfer stat without one (#effectiveOutputRate). Stalling
+     * keeps every FE for later; venting loses what the connector cannot take while the input is still consumed.
+     */
+    private static void connectorMetrics(Outcome outcome, double generation, double perInput, MachineStatAccumulator stats, boolean vent) {
+        double fallback = Math.max(0, Math.round(stats.value(MachineStat.ENERGY_TRANSFER)));
+        connectorMetric(outcome, "none", generation, perInput, fallback, vent);
+        for (EnergyConnectorTier tier : REPORTED_CONNECTORS) {
+            connectorMetric(outcome, name(tier), generation, perInput, tier.transferRate(), vent);
+        }
     }
 
-    /** Stalling keeps every FE for later; venting loses what the connector cannot take while the rotor keeps wearing. */
-    private double deliveredPerRotor(double perRotor, double generation, double cap) {
-        return scenario.cavitationVent() && generation > cap ? perRotor * cap / generation : perRotor;
+    private static void connectorMetric(Outcome outcome, String key, double generation, double perInput, double cap, boolean vent) {
+        outcome.withMetric("delivered_" + key, Math.min(generation, cap));
+        outcome.withMetric("perInput_" + key, vent && generation > cap ? perInput * cap / generation : perInput);
     }
 
     /** AmmoniaFuelCellBlockEntity#adjustedTicks and #adjustedEnergy. */
@@ -533,7 +546,9 @@ public final class EnergyBalanceSimulation {
                         double energy = Math.max(1L, Math.round(stats.generatedEnergyTotal(catalyst.energy(), ticks)
                                 * Math.max(0.1, stats.value(MachineStat.EFFICIENCY))
                                 * (1.0 - Math.min(0.35, pressure * 0.08))));
-                        return Outcome.recipe(catalyst, energy, ticks);
+                        Outcome outcome = Outcome.recipe(catalyst, energy, ticks);
+                        connectorMetrics(outcome, energy / ticks, energy, stats, scenario.vacuumVent());
+                        return outcome;
                     });
                 }
             }
@@ -545,7 +560,12 @@ public final class EnergyBalanceSimulation {
     // ---------------------------------------------------------------------------------------------------------------
 
     /** A craftable RPG item a player might feed the Potential Reactor, rolled the way crafting rolls it. */
-    private record GearItem(String id, String label, int stage, String recipe, ModifierEligibilityProfile profile, int materialRp) {
+    private record GearItem(String id, String label, int stage, String recipe, ModifierEligibilityProfile profile, int materialRp,
+            int masteryLevel, int sealTiers) {
+        GearItem(String id, String label, int stage, String recipe, ModifierEligibilityProfile profile, int materialRp) {
+            this(id, label, stage, recipe, profile, materialRp, 0, 0);
+        }
+
         MachineTraits craft(RandomSource random) {
             MachineTraits rolled = MachineTraitRoller.roll(profile, stage, random);
             return new MachineTraits(rolled.rarity(), materialRp + rolled.refinementPotential(), rolled.modifiers());
@@ -563,8 +583,16 @@ public final class EnergyBalanceSimulation {
             new GearItem("titanium_heat_core", "Titanium Heat Core (retired)", 6, "Stage 6 gear being replaced",
                     ModifierEligibilityProfiles.forMachinePart(MachinePartType.HEAT_CORE, MachineType.SOLID_FUEL_BURNER), HeatCoreMaterial.TITANIUM.refinementPotential()),
             new GearItem("exotic_heat_core", "Exotic Heat Core (retired)", 8, "Stage 8 gear being replaced",
-                    ModifierEligibilityProfiles.forMachinePart(MachinePartType.HEAT_CORE, MachineType.SOLID_FUEL_BURNER), HeatCoreMaterial.EXOTIC.refinementPotential())
+                    ModifierEligibilityProfiles.forMachinePart(MachinePartType.HEAT_CORE, MachineType.SOLID_FUEL_BURNER), HeatCoreMaterial.EXOTIC.refinementPotential()),
+            masteryCrusher(0), masteryCrusher(1), masteryCrusher(2), masteryCrusher(3)
     );
+
+    /** A retired Steel Crusher at Mastery level 50 with the given Ascendancy Seal tiers. */
+    private static GearItem masteryCrusher(int sealTiers) {
+        String seals = sealTiers == 0 ? "no Seals" : sealTiers + " Seal tier" + (sealTiers > 1 ? "s" : "");
+        return new GearItem("steel_crusher_seal_" + sealTiers, "Steel Crusher, Mastery 50, " + seals, 4, "Retired Mastery machine",
+                ModifierEligibilityProfiles.forMachine(MachineType.CRUSHER), 0, 50, sealTiers);
+    }
 
     /**
      * Gear burned in an unrolled all-Steel Potential Reactor (PotentialReactorBlockEntity#nextWork, RecyclingData#rpgEnergyValue).
@@ -582,6 +610,9 @@ public final class EnergyBalanceSimulation {
                 int value = rpgEnergyValue(item.craft(random));
                 if (scenario.gearScale() != null) {
                     value = (int) Math.round(value * scenario.gearScale().at(item.stage()));
+                }
+                if (scenario.mastery() != null) {
+                    value = (int) Math.round(value * scenario.mastery().at(item.masteryLevel(), item.sealTiers()));
                 }
                 int ticks = Math.max(100, Math.min(280, 80 + Math.max(1, item.stage()) * 15 + value / 240));
                 int adjusted = reactor.adjustedProcessingTicks(ticks);
@@ -602,6 +633,9 @@ public final class EnergyBalanceSimulation {
         result.put("items", items);
         if (scenario.gearScale() != null) {
             result.put("stageScale", Map.of("stage0", scenario.gearScale().stage0(), "perStage", scenario.gearScale().perStage()));
+        }
+        if (scenario.mastery() != null) {
+            result.put("mastery", Map.of("perLevel", scenario.mastery().perLevel(), "perSealTier", scenario.mastery().perSealTier()));
         }
         Scenario.Fatigue fatigue = scenario.fatigue();
         if (fatigue != null) {
@@ -1396,9 +1430,19 @@ public final class EnergyBalanceSimulation {
             Fatigue fatigue,
             GearScale gearScale,
             boolean cavitationVent,
-            Double aethergoldTransfer
+            boolean vacuumVent,
+            Double aethergoldTransfer,
+            Mastery mastery
     ) {
-        static final Scenario CURRENT = new Scenario("current", "Current", new JsonObject(), 0, Map.of(), Solar.CURRENT, null, null, null, false, null);
+        static final Scenario CURRENT = new Scenario("current", "Current", new JsonObject(), 0, Map.of(), Solar.CURRENT, null, null, null, false,
+                false, null, null);
+
+        /** Reactor gear-fuel bonus for a machine's Mastery: {@code (1 + level * perLevel) * (1 + sealTiers * perSealTier)}. */
+        record Mastery(double perLevel, double perSealTier) {
+            double at(int level, int sealTiers) {
+                return (1.0 + level * perLevel) * (1.0 + sealTiers * perSealTier);
+            }
+        }
 
         private static Map<String, Integer> intMap(JsonObject json, String key) {
             Map<String, Integer> values = new LinkedHashMap<>();
@@ -1410,7 +1454,8 @@ public final class EnergyBalanceSimulation {
 
         record Solar(Integer extenderRangeBonus, Double extenderGeneration, boolean controllerFlatOnce, int maxRange,
                 Map<String, Integer> panelClearGeneration) {
-            static final Solar CURRENT = new Solar(null, null, false, 6, Map.of());
+            /** SolarArrayControllerBlockEntity: flat bonus once per array, MAX_RANGE 2. */
+            static final Solar CURRENT = new Solar(null, null, true, 2, Map.of());
         }
 
         /** Reactor gear-fuel value multiplier: {@code stage0 + perStage * stage}, so obsolete late gear is worth more than junk. */
@@ -1447,8 +1492,8 @@ public final class EnergyBalanceSimulation {
                 solar = new Solar(
                         value.has("extender_range_bonus") ? value.get("extender_range_bonus").getAsInt() : null,
                         value.has("extender_generation") ? value.get("extender_generation").getAsDouble() : null,
-                        value.has("controller_flat_once") && value.get("controller_flat_once").getAsBoolean(),
-                        value.has("max_range") ? value.get("max_range").getAsInt() : 6,
+                        !value.has("controller_flat_once") || value.get("controller_flat_once").getAsBoolean(),
+                        value.has("max_range") ? value.get("max_range").getAsInt() : Solar.CURRENT.maxRange(),
                         intMap(value, "panel_clear_generation")
                 );
             }
@@ -1483,7 +1528,12 @@ public final class EnergyBalanceSimulation {
                     fatigue,
                     gearScale,
                     json.has("cavitation_overflow") && "vent".equals(json.get("cavitation_overflow").getAsString()),
-                    json.has("aethergold_transfer_multiplier") ? json.get("aethergold_transfer_multiplier").getAsDouble() : null
+                    json.has("vacuum_collapse_overflow") && "vent".equals(json.get("vacuum_collapse_overflow").getAsString()),
+                    json.has("aethergold_transfer_multiplier") ? json.get("aethergold_transfer_multiplier").getAsDouble() : null,
+                    json.has("reactor_mastery")
+                            ? new Mastery(json.getAsJsonObject("reactor_mastery").get("per_level").getAsDouble(),
+                                    json.getAsJsonObject("reactor_mastery").get("per_seal_tier").getAsDouble())
+                            : null
             );
         }
     }
