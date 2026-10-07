@@ -4,11 +4,6 @@
         "current": {},
         "proposal": {
             "label": "Proposal A",
-            "solid_fuel_fe_per_burn_tick": 10,
-            "recipe_energy": {
-                "gas_combustion/syngas_power": 57600,
-                "ammonia_power_cycle/ammonia_power": 216000
-            },
             "solar": {
                 "extender_range_bonus": 1,
                 "extender_generation": 1.0,

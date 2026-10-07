@@ -1,5 +1,6 @@
 package com.rngtech.rpg;
 
+import com.rngtech.content.blockentity.SolidFuelBurnerBlockEntity;
 import com.rngtech.content.cable.EnergyConnectorTier;
 import com.rngtech.content.energy.CavitationRotorMaterial;
 import com.rngtech.content.energy.CollapseNozzleMaterial;
@@ -133,7 +134,7 @@ public final class EnergyBalanceSimulation {
         vacuumCollapseGenerators();
     }
 
-    /** SolidFuelBurnerBlockEntity#effectiveStats, #effectiveFuelDurationTicks, #applyHeatWaste. */
+    /** SolidFuelBurnerBlockEntity#effectiveStats, #tryStartBurningFuel, #effectiveFuelDurationTicks, #applyHeatWaste. */
     private void solidFuelBurners() {
         ChainCosts.Fuel coal = chains.fuel("solid_fuel_burner");
         for (SolidFuelBurnerChassis chassis : SolidFuelBurnerChassis.values()) {
@@ -162,12 +163,10 @@ public final class EnergyBalanceSimulation {
                                 * Math.max(0.1, stats.value(MachineStat.FUEL_DURATION));
                         double isolation = stats.value(MachineStat.HEAT_ISOLATION);
                         double wastePerTick = isolation >= 1.0 ? 0.0 : Math.min(1.0, 1.0 - Math.max(0.0, isolation));
-                        double fuelEnergy;
-                        if (scenario.solidFuelFePerBurnTick() > 0) {
-                            fuelEnergy = coal.baseAmount() * scenario.solidFuelFePerBurnTick() * fuelScale;
-                        } else {
-                            fuelEnergy = Math.max(1, ceil(coal.baseAmount() * fuelScale)) * (double) generation;
-                        }
+                        double fePerBurnTick = scenario.solidFuelFePerBurnTick() > 0
+                                ? scenario.solidFuelFePerBurnTick()
+                                : SolidFuelBurnerBlockEntity.FUEL_ENERGY_PER_BURN_TICK;
+                        double fuelEnergy = generation <= 0 ? 0.0 : Math.max(1, ceil(coal.baseAmount() * fuelScale)) * fePerBurnTick;
                         double perItem = fuelEnergy / (1.0 + wastePerTick);
                         return Outcome.running(generation, generation, perItem)
                                 .withMetric("burnSeconds", generation <= 0 ? 0.0 : perItem / generation / 20.0);

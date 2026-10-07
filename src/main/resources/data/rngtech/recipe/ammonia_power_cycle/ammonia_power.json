@@ -10,7 +10,7 @@
     },
     "amount": 1000
   },
-  "energy": 96000,
+  "energy": 216000,
   "processing_ticks": 360,
   "residue": {
     "id": "rngtech:corrosion_residue"

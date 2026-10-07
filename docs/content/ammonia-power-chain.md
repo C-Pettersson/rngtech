@@ -27,7 +27,7 @@ The ammonia synthesizer owns nitrogen, hydrogen, and ammonia tanks. The fuel cel
 
 The Process tabs have purge buttons beside the visible gas tanks. The craftable `rngtech:purge_bucket` can also right-click these placed machines to void up to `1000 mB`; normal use prefers input tanks, while sneak-use on the Synthesizer prefers the Ammonia output tank. Purging Synthesizer Nitrogen/Hydrogen or Fuel Cell Ammonia resets that machine's active work state before draining.
 
-Gas Chemistry machines follow the same purge rules. Coal Gasifier exposes Water and Syngas purge targets, Syngas Combustor exposes gas input and Carbon Exhaust purge targets, and Steam Methane Reformer exposes Water, gas input, Hydrogen output, and Carbon Monoxide output purge targets. The Syngas Combustor burns Syngas as its main Stage 5 gas-power fuel and also accepts Carbon Monoxide as a weaker disposal fuel. Nullite Servo Auto Purge applies to Gas Chemistry output tanks when produced fluid overflows matching stored fluid, including the Syngas Combustor's Carbon Exhaust tank.
+Gas Chemistry machines follow the same purge rules. Coal Gasifier exposes Water and Syngas purge targets, Syngas Combustor exposes gas input and Carbon Exhaust purge targets, and Steam Methane Reformer exposes Water, gas input, Hydrogen output, and Carbon Monoxide output purge targets. The Syngas Combustor burns Syngas as its main Stage 5 gas-power fuel, `57,600 FE` per `1,000 mB` over `240` ticks (`240 FE/t` before Servo and rolls), and also accepts Carbon Monoxide as a weaker disposal fuel. Nullite Servo Auto Purge applies to Gas Chemistry output tanks when produced fluid overflows matching stored fluid, including the Syngas Combustor's Carbon Exhaust tank.
 
 ## Step-By-Step Guide
 
@@ -37,7 +37,7 @@ Gas Chemistry machines follow the same purge rules. Coal Gasifier exposes Water 
 4. Craft a Fuel Cell Membrane.
 5. Craft and place the Ammonia Fuel Cell, then install the membrane in Gear.
 6. Optionally install a Stage 6+ Battery Cell in the Fuel Cell for output buffering.
-7. Move Ammonia from the Synthesizer to the Fuel Cell.
+7. Move Ammonia from the Synthesizer to the Fuel Cell. The default power cycle burns `1,000 mB` Ammonia for `216,000 FE` over `360` ticks (`600 FE/t`) before membrane and machine rolls.
 8. Extract FE from Fuel Cell top or sides and residue from the bottom.
 
 ## Automation
