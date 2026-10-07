@@ -307,6 +307,21 @@ tasks.register('masteryCheck', JavaExec) {
     doFirst { workingDir.mkdirs() }
 }
 
+tasks.register('energyBalanceSim', JavaExec) {
+    group = 'balance'
+    description = 'Simulates generator FE/t across rolled machines and parts. -PbalanceTrials and -PbalanceBehaviorTrials set trials per setup.'
+    dependsOn tasks.named('masteryTestClasses')
+    classpath = sourceSets.masteryTest.runtimeClasspath
+    mainClass = 'com.rngtech.rpg.EnergyBalanceSimulation'
+    javaLauncher = javaToolchains.launcherFor { languageVersion = JavaLanguageVersion.of(21) }
+    def output = layout.buildDirectory.file('energy-balance/energy-balance.json').get().asFile
+    def trials = (project.findProperty('balanceTrials') ?: '1000').toString()
+    def behaviorTrials = (project.findProperty('balanceBehaviorTrials') ?: '500').toString()
+    args layout.projectDirectory.asFile.path, output.path, trials, behaviorTrials
+    workingDir = layout.buildDirectory.dir('energy-balance').get().asFile
+    doFirst { workingDir.mkdirs() }
+}
+
 tasks.named('quickCheck') { dependsOn 'masteryCheck' }
 tasks.named('check') { dependsOn 'masteryCheck' }
 
