@@ -2699,6 +2699,7 @@
   "rngtech.tooltip.behavior": "%s: %s",
   "rngtech.tooltip.identity": "Identity: %s",
   "rngtech.tooltip.modifiers": "Rolled Modifiers",
+  "rngtech.tooltip.modifier.local": " (Local)",
   "rngtech.tooltip.hint.shift": "Hold Left Shift for material and affix details",
   "rngtech.tooltip.hint.alt": "Hold Left Alt for tiers/rolls",
   "rngtech.tooltip.part_modifiers": "Part Modifiers",
