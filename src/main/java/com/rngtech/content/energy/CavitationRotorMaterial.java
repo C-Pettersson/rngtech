@@ -9,7 +9,7 @@ public enum CavitationRotorMaterial {
     TITANIUM(6, 1.20, 0.85, 1.00, 16),
     NITROGEN_EXTRACTION(6, 0.35, 1.15, 1.75, 18, "nitrogen_extraction_rotor"),
     TUNGSTENSTEEL(7, 1.35, 0.70, 1.00, 18),
-    AETHERGOLD(7, 6.00, 5.00, 1.00, 4.00, 12.00, 20),
+    AETHERGOLD(7, 6.00, 5.00, 1.00, 4.00, 1.00, 20),
     NULLITE(8, 1.60, 0.60, 1.00, 20);
 
     public static final int BASE_DURABILITY = 1000;

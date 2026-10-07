@@ -1,12 +1,6 @@
 {
-    "description": "Balance what-if scenarios for energyBalanceSim. 'current' must stay empty: it is the game as coded. Other scenarios override the simulator's mirrored generator formulas; nothing here changes the game.",
+    "description": "Balance what-if scenarios for energyBalanceSim. 'current' must stay empty: it is the game as coded. Add other scenarios to override the simulator's mirrored generator formulas (see tools/balance/README.md); nothing here changes the game.",
     "scenarios": {
-        "current": {},
-        "proposal": {
-            "label": "Proposal A",
-            "cavitation_overflow": "vent",
-            "vacuum_collapse_overflow": "vent",
-            "aethergold_transfer_multiplier": 1.0
-        }
+        "current": {}
     }
 }

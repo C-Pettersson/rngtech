@@ -2,7 +2,7 @@
 
 Status: Prototype
 
-The Vacuum Collapse Generator is a late-stage item-fed FE generator registered as `rngtech:vacuum_collapse_generator`. It consumes recipe-authored catalysts, generates large FE batches, and can produce residue. It uses local instability and a dedicated Dimensional Stabilizer instead of sharing Potential Reactor Containment Linings. High-output setups can install an Energy Connector to raise side FE export beyond the machine's effective `ENERGY_TRANSFER` fallback.
+The Vacuum Collapse Generator is a late-stage item-fed FE generator registered as `rngtech:vacuum_collapse_generator`. It consumes recipe-authored catalysts, generates large FE batches, and can produce residue. It uses local instability and a dedicated Dimensional Stabilizer instead of sharing Potential Reactor Containment Linings. High-output setups can install an Energy Connector to raise side FE export beyond the machine's effective `ENERGY_TRANSFER` fallback. A running collapse never pauses for a full buffer: FE that its `20,000 FE` internal buffer and Battery Cell cannot hold is vented, so storage and wiring must keep up with each catalyst.
 
 ## Runtime Surface
 
@@ -30,7 +30,7 @@ The Vacuum Collapse Generator is the Stage 7 primary generator. Its target band 
 | Setup | Generated FE/t |
 |---|---:|
 | Void Catalyst recipe before part multipliers | `1,000 FE/t` (`600,000 FE / 600 ticks`) |
-| Unmodified Tungstensteel Void Chamber, Collapse Nozzle, and Dimensional Stabilizer | about `1,430 FE/t` |
+| Unmodified Tungstensteel Void Chamber, Collapse Nozzle, and Dimensional Stabilizer | about `1,057 FE/t` |
 | Unmodified Exotic Void Chamber, Collapse Nozzle, and Dimensional Stabilizer | about `3,000 FE/t` |
 
 Void Chamber and Collapse Nozzle generation multiply each other, the nozzle stage raises cycle speed, and the stabilizer stage raises efficiency. Rolled and refined parts carry the machine above these baselines. The Process tab output icon shows the side FE export cap, which is the installed Energy Connector tier, not generated FE/t; the generation icon shows generated FE/t.
@@ -44,7 +44,7 @@ Void Chamber and Collapse Nozzle generation multiply each other, the nozzle stag
 5. Insert Void Catalyst from the top.
 6. Keep effective stability at or above the recipe requirement. The default recipe requires `1.0` stability and a Stage 7 Void Chamber.
 7. Extract FE from the sides and Collapse Residue from the bottom.
-8. Use redstone power to pause generation when downstream storage is full or maintenance is needed.
+8. Use redstone power to pause generation when downstream storage is full or maintenance is needed. While running, FE the buffer cannot hold is vented.
 
 ## Automation
 

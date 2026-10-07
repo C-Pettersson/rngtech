@@ -60,9 +60,9 @@ public final class MachineBaseStatCatalog {
     public static final int POTENTIAL_REACTOR_ENERGY_TRANSFER = 96;
     public static final int CORROSION_CELL_ENERGY_CAPACITY = 8000;
     public static final int CORROSION_CELL_ENERGY_TRANSFER = 128;
-    public static final long VACUUM_COLLAPSE_ENERGY_CAPACITY = 1_000_000L;
+    public static final long VACUUM_COLLAPSE_ENERGY_CAPACITY = 20_000L;
     public static final int VACUUM_COLLAPSE_ENERGY_TRANSFER = 8192;
-    public static final int CAVITATION_GENERATOR_ENERGY_CAPACITY = 12000;
+    public static final int CAVITATION_GENERATOR_ENERGY_CAPACITY = 4000;
     public static final int CAVITATION_GENERATOR_ENERGY_TRANSFER = 160;
     public static final int METAL_PRESS_ENERGY_CAPACITY = 1000;
     public static final int METAL_PRESS_ENERGY_TRANSFER = 128;
