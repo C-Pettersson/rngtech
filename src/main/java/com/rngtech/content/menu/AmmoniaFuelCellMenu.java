@@ -42,7 +42,8 @@ public class AmmoniaFuelCellMenu extends AbstractContainerMenu {
     private static final int DATA_PROCESSING_SPEED = 11;
     private static final int DATA_REFINEMENT_POTENTIAL = 12;
     private static final int DATA_FLAT_ENERGY_GENERATION = 13;
-    private static final int DATA_COUNT = 14;
+    private static final int DATA_BASE_ENERGY_GENERATION = 14;
+    private static final int DATA_COUNT = 15;
     private static final int STAT_SCALE = 100;
     private static final int RESIDUE_SLOT = 0;
     private static final int MEMBRANE_SLOT = 1;
@@ -162,6 +163,10 @@ public class AmmoniaFuelCellMenu extends AbstractContainerMenu {
 
     public static int flatEnergyGenerationDataIndex() {
         return DATA_FLAT_ENERGY_GENERATION;
+    }
+
+    public static int baseEnergyGenerationDataIndex() {
+        return DATA_BASE_ENERGY_GENERATION;
     }
 
     public static int energyTransferDataIndex() {

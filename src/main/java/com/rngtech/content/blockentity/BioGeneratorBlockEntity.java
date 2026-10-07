@@ -89,6 +89,7 @@ public class BioGeneratorBlockEntity extends BaseMachineBlockEntity implements M
     private static final int DATA_FUEL_DURATION = 23;
     private static final int DATA_REFINEMENT_POTENTIAL = 24;
     private static final int DATA_FLAT_ENERGY_GENERATION = 25;
+    private static final int DATA_BASE_ENERGY_GENERATION = 26;
     private static final int STAT_SCALE = 100;
 
     private final ItemStackHandler fuelInventory = new ItemStackHandler(1) {
@@ -159,6 +160,7 @@ public class BioGeneratorBlockEntity extends BaseMachineBlockEntity implements M
                 case DATA_STATUS -> statusCode(stats);
                 case DATA_ENERGY_GENERATION -> (int) Math.round(stats.effectiveEnergyGenerationMultiplier() * STAT_SCALE);
                 case DATA_FLAT_ENERGY_GENERATION -> (int) Math.round(stats.effectiveFlatEnergyGenerationBonus() * STAT_SCALE);
+                case DATA_BASE_ENERGY_GENERATION -> (int) Math.round(baseEnergyPerTick() * STAT_SCALE);
                 case DATA_ENERGY_CAPACITY_STAT -> scaledStat(stats, MachineStat.ENERGY_CAPACITY);
                 case DATA_ENERGY_TRANSFER -> scaledStat(stats, MachineStat.ENERGY_TRANSFER);
                 case DATA_EFFICIENCY -> scaledStat(stats, MachineStat.EFFICIENCY);
@@ -185,7 +187,7 @@ public class BioGeneratorBlockEntity extends BaseMachineBlockEntity implements M
 
         @Override
         public int getCount() {
-            return DATA_FLAT_ENERGY_GENERATION + 1;
+            return DATA_BASE_ENERGY_GENERATION + 1;
         }
     };
 
@@ -816,5 +818,10 @@ public class BioGeneratorBlockEntity extends BaseMachineBlockEntity implements M
         public boolean canReceive() {
             return false;
         }
+    }
+
+    /** Generation before machine and part stats, for the Stats tab breakdown; 0 when unknown. */
+    private double baseEnergyPerTick() {
+        return BASE_GENERATION_RATE;
     }
 }

@@ -122,6 +122,7 @@ public class CavitationGeneratorBlockEntity extends BaseMachineBlockEntity
     private static final int DATA_OUTPUT_FLUID_CAPACITY = 29;
     private static final int DATA_RECIPE_FLUID_OUTPUT = 30;
     private static final int DATA_FLAT_ENERGY_GENERATION = 31;
+    private static final int DATA_BASE_ENERGY_GENERATION = 32;
     private static final int STAT_SCALE = 100;
 
     private final ItemStackHandler processInventory = new ItemStackHandler(PROCESS_SLOT_COUNT) {
@@ -228,6 +229,7 @@ public class CavitationGeneratorBlockEntity extends BaseMachineBlockEntity
                 case DATA_RECIPE_WEAR -> recipe == null ? 0 : recipe.wear();
                 case DATA_ENERGY_GENERATION -> (int) Math.round(stats.effectiveEnergyGenerationMultiplier() * STAT_SCALE);
                 case DATA_FLAT_ENERGY_GENERATION -> (int) Math.round(stats.effectiveFlatEnergyGenerationBonus() * STAT_SCALE);
+                case DATA_BASE_ENERGY_GENERATION -> (int) Math.round(baseEnergyPerTick() * STAT_SCALE);
                 case DATA_ENERGY_CAPACITY_STAT -> scaledStat(stats, MachineStat.ENERGY_CAPACITY);
                 case DATA_ENERGY_TRANSFER -> effectiveOutputRate(stats);
                 case DATA_EFFICIENCY -> scaledStat(stats, MachineStat.EFFICIENCY);
@@ -250,7 +252,7 @@ public class CavitationGeneratorBlockEntity extends BaseMachineBlockEntity
 
         @Override
         public int getCount() {
-            return DATA_FLAT_ENERGY_GENERATION + 1;
+            return DATA_BASE_ENERGY_GENERATION + 1;
         }
     };
 
@@ -1176,5 +1178,11 @@ public class CavitationGeneratorBlockEntity extends BaseMachineBlockEntity
         public boolean canReceive() {
             return false;
         }
+    }
+
+    /** Generation before machine and part stats, for the Stats tab breakdown; 0 when unknown. */
+    private double baseEnergyPerTick() {
+        CavitationRecipe recipe = nextRecipe();
+        return recipe == null ? 0.0 : recipe.energy() / (double) Math.max(1, recipe.processingTicks());
     }
 }

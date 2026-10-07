@@ -63,7 +63,8 @@ public class CavitationGeneratorMenu extends AbstractContainerMenu {
     private static final int DATA_OUTPUT_FLUID_CAPACITY = 29;
     private static final int DATA_RECIPE_FLUID_OUTPUT = 30;
     private static final int DATA_FLAT_ENERGY_GENERATION = 31;
-    private static final int DATA_COUNT = 32;
+    private static final int DATA_BASE_ENERGY_GENERATION = 32;
+    private static final int DATA_COUNT = 33;
     private static final int STAT_SCALE = 100;
 
     private static final int FLUID_CONTAINER_SLOT = 0;
@@ -302,6 +303,10 @@ public class CavitationGeneratorMenu extends AbstractContainerMenu {
 
     public static int flatEnergyGenerationDataIndex() {
         return DATA_FLAT_ENERGY_GENERATION;
+    }
+
+    public static int baseEnergyGenerationDataIndex() {
+        return DATA_BASE_ENERGY_GENERATION;
     }
 
     public static int energyCapacityDataIndex() {

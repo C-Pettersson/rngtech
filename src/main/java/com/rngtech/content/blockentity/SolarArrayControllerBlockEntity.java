@@ -89,6 +89,7 @@ public class SolarArrayControllerBlockEntity extends BaseMachineBlockEntity impl
     private static final int DATA_PREVIEW_RANGE = 21;
     private static final int DATA_PANEL_RANGE = 22;
     private static final int DATA_FLAT_ENERGY_GENERATION = 23;
+    private static final int DATA_BASE_ENERGY_GENERATION = 24;
     private static final int STAT_SCALE = 100;
 
     private final ItemStackHandler gearInventory = new ItemStackHandler(GEAR_SLOT_COUNT) {
@@ -140,6 +141,7 @@ public class SolarArrayControllerBlockEntity extends BaseMachineBlockEntity impl
                 case DATA_STATUS -> lastStatus;
                 case DATA_ENERGY_GENERATION -> (int) Math.round(stats.effectiveEnergyGenerationMultiplier() * STAT_SCALE);
                 case DATA_FLAT_ENERGY_GENERATION -> (int) Math.round(stats.effectiveFlatEnergyGenerationBonus() * STAT_SCALE);
+                case DATA_BASE_ENERGY_GENERATION -> (int) Math.round(baseEnergyPerTick() * STAT_SCALE);
                 case DATA_ENERGY_CAPACITY_STAT -> scaledStat(stats, MachineStat.ENERGY_CAPACITY);
                 case DATA_ENERGY_TRANSFER -> effectiveOutputRate(stats);
                 case DATA_EFFICIENCY -> scaledStat(stats, MachineStat.EFFICIENCY);
@@ -165,7 +167,7 @@ public class SolarArrayControllerBlockEntity extends BaseMachineBlockEntity impl
 
         @Override
         public int getCount() {
-            return DATA_FLAT_ENERGY_GENERATION + 1;
+            return DATA_BASE_ENERGY_GENERATION + 1;
         }
     };
 
@@ -901,5 +903,10 @@ public class SolarArrayControllerBlockEntity extends BaseMachineBlockEntity impl
         private boolean singleMaterial() {
             return material != null && !mixed;
         }
+    }
+
+    /** Solar output has no fixed base, so the Stats tab breakdown omits it. */
+    private double baseEnergyPerTick() {
+        return 0.0;
     }
 }

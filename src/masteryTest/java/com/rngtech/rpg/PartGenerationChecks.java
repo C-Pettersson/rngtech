@@ -15,7 +15,7 @@ public final class PartGenerationChecks {
         partModifiersScaleOnlyTheirOwnPart();
         machineWideIncreasesScalePartFlatsOnce();
         additivePartsKeepTheirFlatSeparate();
-        generationMultiplierDisplaysAsPercent();
+        generationBreakdownExplainsFinalOutput();
         return checks;
     }
 
@@ -46,10 +46,14 @@ public final class PartGenerationChecks {
         near(machine.effectiveFlatEnergyGenerationBonus(), 15, "additive part flat counts once");
     }
 
-    private static void generationMultiplierDisplaysAsPercent() {
+    private static void generationBreakdownExplainsFinalOutput() {
         MachineStatAccumulator machine = machineWithChamberAndNozzle();
-        require(MachineStatDisplay.generationMultiplierValue(machine.effectiveEnergyGenerationMultiplier()).equals("+166%"),
-                "Stats tab shows the generation multiplier without flat FE/t");
+        double multiplier = machine.effectiveEnergyGenerationMultiplier();
+        double flat = machine.effectiveFlatEnergyGenerationBonus();
+        double finalPerTick = (1000 * multiplier + flat) * 1.08;
+        near(MachineStatDisplay.generationOtherFactor(finalPerTick, 1000, multiplier, flat), 1.08, "breakdown isolates other stats");
+        near(MachineStatDisplay.generationOtherFactor(finalPerTick, 0, multiplier, flat), 1.0, "unknown base hides the other line");
+        require(MachineStatDisplay.energyRate(3592.4).equals("3,592 FE/t"), "Stats tab row shows final FE/t");
     }
 
     private static MachineStatAccumulator machineWithChamberAndNozzle() {

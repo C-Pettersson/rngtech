@@ -3,6 +3,8 @@ package com.rngtech.rpg;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 
 public final class MachineStatDisplay {
@@ -99,20 +101,42 @@ public final class MachineStatDisplay {
         return Component.translatable(stat.translationKey() + ".description", statValue(stat, value));
     }
 
-    /** Energy Generation on generators that scale a recipe, fuel, or panel output, where the stat is a multiplier. */
-    public static String generationMultiplierValue(double multiplier) {
-        return formatMultiplierDelta(multiplier);
+    public static String energyRate(double perTick) {
+        return formatNumber(Math.round(perTick)) + " FE/t";
     }
 
-    public static MutableComponent generationMultiplierTooltip(double multiplier, double flatPerTick) {
-        if (Math.abs(flatPerTick) <= EPSILON) {
-            return Component.translatable("rngtech.stat.energy_generation.multiplier", formatMultiplierDelta(multiplier));
+    /**
+     * Where a generator's final FE/t comes from: {@code finalPerTick = (basePerTick * multiplier + flatPerTick) * other},
+     * where {@code other} folds in speed, efficiency, stability, and machine-specific effects. An unknown base omits the
+     * base and other lines.
+     */
+    public static List<Component> generationBreakdown(double finalPerTick, double basePerTick, double multiplier, double flatPerTick) {
+        List<Component> lines = new ArrayList<>();
+        lines.add(Component.translatable("rngtech.stat.energy_generation.breakdown.final", energyRate(finalPerTick)));
+        if (basePerTick > EPSILON) {
+            lines.add(Component.translatable("rngtech.stat.energy_generation.breakdown.base", energyRate(basePerTick)));
         }
-        return Component.translatable(
-                "rngtech.stat.energy_generation.multiplier_with_flat",
-                formatMultiplierDelta(multiplier),
-                formatSignedNumber(Math.round(flatPerTick)) + " FE/t"
-        );
+        lines.add(Component.translatable("rngtech.stat.energy_generation.breakdown.multiplier", formatMultiplierDelta(multiplier)));
+        if (Math.abs(flatPerTick) > EPSILON) {
+            lines.add(Component.translatable(
+                    "rngtech.stat.energy_generation.breakdown.flat",
+                    formatSignedNumber(Math.round(flatPerTick)) + " FE/t"
+            ));
+        }
+        double other = generationOtherFactor(finalPerTick, basePerTick, multiplier, flatPerTick);
+        if (Math.abs(other - 1.0) >= 0.005) {
+            lines.add(Component.translatable("rngtech.stat.energy_generation.breakdown.other", formatMultiplierDelta(other)));
+        }
+        return lines;
+    }
+
+    /** The share of final FE/t not explained by base, multiplier, and flat generation; 1 when the base is unknown. */
+    public static double generationOtherFactor(double finalPerTick, double basePerTick, double multiplier, double flatPerTick) {
+        double beforeOther = basePerTick * multiplier + flatPerTick;
+        if (basePerTick <= EPSILON || finalPerTick <= EPSILON || beforeOther <= EPSILON) {
+            return 1.0;
+        }
+        return finalPerTick / beforeOther;
     }
 
     public static MutableComponent effectText(MachineModifierEffect effect) {

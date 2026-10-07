@@ -441,7 +441,13 @@ public class CorrosionCellScreen extends AbstractContainerScreen<CorrosionCellMe
                     MachineScreenStyle.statLayerTooltip(menu.getSlot(menu.refinementTargetSlot()).getItem(), STAT_TYPES[index], value)
             );
         }
-        return MachineScreenStyle.withGenerationMultiplier(STAT_TYPES, statLines, menu.statValue(CorrosionCellMenu.flatEnergyGenerationDataIndex()));
+        return MachineScreenStyle.withGenerationBreakdown(
+                STAT_TYPES,
+                statLines,
+                menu.energyPerTick(),
+                menu.statValue(CorrosionCellMenu.baseEnergyGenerationDataIndex()),
+                menu.statValue(CorrosionCellMenu.flatEnergyGenerationDataIndex())
+        );
     }
 
     private boolean isIntegralStat(int dataIndex) {

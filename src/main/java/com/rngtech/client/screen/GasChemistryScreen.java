@@ -160,8 +160,10 @@ public class GasChemistryScreen extends AbstractContainerScreen<GasChemistryMenu
     private MachineScreenStyle.StatLine[] statLines() {
         if (menu.machine() == GasChemistryMachine.SYNGAS_COMBUSTOR) {
             return new MachineScreenStyle.StatLine[] {
-                    MachineScreenStyle.generationMultiplierLine(
+                    MachineScreenStyle.generationBreakdownLine(
                             stat("rngtech.stat.energy_generation", menu.statValue(GasChemistryMenu.energyGenerationDataIndex()), MachineStat.ENERGY_GENERATION),
+                            menu.energyDelta(),
+                            menu.statValue(GasChemistryMenu.baseEnergyGenerationDataIndex()),
                             menu.statValue(GasChemistryMenu.flatEnergyGenerationDataIndex())
                     ),
                     stat("rngtech.stat.efficiency", menu.statValue(GasChemistryMenu.efficiencyDataIndex()), MachineStat.EFFICIENCY),

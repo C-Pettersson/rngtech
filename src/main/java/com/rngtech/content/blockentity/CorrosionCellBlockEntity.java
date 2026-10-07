@@ -90,6 +90,7 @@ public class CorrosionCellBlockEntity extends BaseMachineBlockEntity
     private static final int DATA_STABILITY = 17;
     private static final int DATA_REFINEMENT_POTENTIAL = 18;
     private static final int DATA_FLAT_ENERGY_GENERATION = 19;
+    private static final int DATA_BASE_ENERGY_GENERATION = 20;
     private static final int STAT_SCALE = 100;
     private static final int COMPONENT_STAGE = 4;
 
@@ -183,6 +184,7 @@ public class CorrosionCellBlockEntity extends BaseMachineBlockEntity
                 case DATA_FLUID_TRANSFER -> effectiveFluidTransfer(stats);
                 case DATA_ENERGY_GENERATION -> (int) Math.round(stats.effectiveEnergyGenerationMultiplier() * STAT_SCALE);
                 case DATA_FLAT_ENERGY_GENERATION -> (int) Math.round(stats.effectiveFlatEnergyGenerationBonus() * STAT_SCALE);
+                case DATA_BASE_ENERGY_GENERATION -> (int) Math.round(baseEnergyPerTick() * STAT_SCALE);
                 case DATA_ENERGY_CAPACITY_STAT -> scaledStat(stats, MachineStat.ENERGY_CAPACITY);
                 case DATA_ENERGY_TRANSFER -> scaledStat(stats, MachineStat.ENERGY_TRANSFER);
                 case DATA_EFFICIENCY -> scaledStat(stats, MachineStat.EFFICIENCY);
@@ -199,7 +201,7 @@ public class CorrosionCellBlockEntity extends BaseMachineBlockEntity
 
         @Override
         public int getCount() {
-            return DATA_FLAT_ENERGY_GENERATION + 1;
+            return DATA_BASE_ENERGY_GENERATION + 1;
         }
     };
 
@@ -1069,5 +1071,11 @@ public class CorrosionCellBlockEntity extends BaseMachineBlockEntity
         public boolean canReceive() {
             return false;
         }
+    }
+
+    /** Generation before machine and part stats, for the Stats tab breakdown; 0 when unknown. */
+    private double baseEnergyPerTick() {
+        CorrosionCellRecipe recipe = nextRecipe();
+        return recipe == null ? 0.0 : recipe.energy() / (double) Math.max(1, recipe.processingTicks());
     }
 }

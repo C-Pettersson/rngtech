@@ -282,8 +282,8 @@ final class MachineScreenStyle {
                     && mouseX < left + width - 6
                     && mouseY >= rowY
                     && mouseY < rowY + ROW_HEIGHT - 1
-                    && !statLine.tooltip().getString().isEmpty()) {
-                guiGraphics.renderTooltip(font, statLine.tooltip(), mouseX, mouseY);
+                    && statLine.hasTooltip()) {
+                statLine.renderTooltip(guiGraphics, font, mouseX, mouseY);
                 return;
             }
             rowY += ROW_HEIGHT;
@@ -314,8 +314,8 @@ final class MachineScreenStyle {
                     && mouseX < cellX + cellWidth
                     && mouseY >= cellY
                     && mouseY < cellY + COMPACT_ROW_HEIGHT - 1
-                    && !statLine.tooltip().getString().isEmpty()) {
-                guiGraphics.renderTooltip(font, statLine.tooltip(), mouseX, mouseY);
+                    && statLine.hasTooltip()) {
+                statLine.renderTooltip(guiGraphics, font, mouseX, mouseY);
                 return;
             }
         }
@@ -483,25 +483,35 @@ final class MachineScreenStyle {
         return new StatLine(label, value, strength, integral, enhanced, tooltip);
     }
 
-    /** Shows each Energy Generation row as the multiplier it is, with flat FE/t rolls in its hover. */
-    static StatLine[] withGenerationMultiplier(MachineStat[] stats, StatLine[] statLines, double flatPerTick) {
+    /**
+     * Shows each Energy Generation row as the generator's final FE/t, with a hover that breaks it into sources. The
+     * row's own value is the generation multiplier, which keeps driving its pips and highlight.
+     */
+    static StatLine[] withGenerationBreakdown(
+            MachineStat[] stats,
+            StatLine[] statLines,
+            double finalPerTick,
+            double basePerTick,
+            double flatPerTick
+    ) {
         for (int index = 0; index < Math.min(stats.length, statLines.length); index++) {
             if (stats[index] == MachineStat.ENERGY_GENERATION) {
-                statLines[index] = generationMultiplierLine(statLines[index], flatPerTick);
+                statLines[index] = generationBreakdownLine(statLines[index], finalPerTick, basePerTick, flatPerTick);
             }
         }
         return statLines;
     }
 
-    static StatLine generationMultiplierLine(StatLine line, double flatPerTick) {
+    static StatLine generationBreakdownLine(StatLine line, double finalPerTick, double basePerTick, double flatPerTick) {
         double multiplier = line.strength();
         return new StatLine(
                 line.label(),
-                MachineStatDisplay.generationMultiplierValue(multiplier),
+                MachineStatDisplay.energyRate(finalPerTick),
                 multiplier,
                 false,
                 multiplier > 1.001,
-                MachineStatDisplay.generationMultiplierTooltip(multiplier, flatPerTick)
+                Component.empty(),
+                MachineStatDisplay.generationBreakdown(finalPerTick, basePerTick, multiplier, flatPerTick)
         );
     }
 
@@ -1060,14 +1070,40 @@ final class MachineScreenStyle {
         private final boolean integral;
         private final boolean enhanced;
         private final Component tooltip;
+        private final List<Component> tooltipLines;
 
         private StatLine(Component label, String value, double strength, boolean integral, boolean enhanced, Component tooltip) {
+            this(label, value, strength, integral, enhanced, tooltip, List.of());
+        }
+
+        private StatLine(
+                Component label,
+                String value,
+                double strength,
+                boolean integral,
+                boolean enhanced,
+                Component tooltip,
+                List<Component> tooltipLines
+        ) {
             this.label = label;
             this.value = value;
             this.strength = strength;
             this.integral = integral;
             this.enhanced = enhanced;
             this.tooltip = tooltip;
+            this.tooltipLines = List.copyOf(tooltipLines);
+        }
+
+        private boolean hasTooltip() {
+            return !tooltipLines.isEmpty() || !tooltip.getString().isEmpty();
+        }
+
+        private void renderTooltip(GuiGraphics guiGraphics, Font font, int mouseX, int mouseY) {
+            if (tooltipLines.isEmpty()) {
+                guiGraphics.renderTooltip(font, tooltip, mouseX, mouseY);
+            } else {
+                guiGraphics.renderComponentTooltip(font, tooltipLines, mouseX, mouseY);
+            }
         }
 
         private Component label() {

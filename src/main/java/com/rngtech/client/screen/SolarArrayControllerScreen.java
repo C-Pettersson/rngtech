@@ -434,9 +434,11 @@ public class SolarArrayControllerScreen extends AbstractContainerScreen<SolarArr
                     )
             );
         }
-        MachineScreenStyle.withGenerationMultiplier(
+        MachineScreenStyle.withGenerationBreakdown(
                 STAT_TYPES,
                 statLines,
+                menu.energyPerTick(),
+                menu.statValue(SolarArrayControllerMenu.baseEnergyGenerationDataIndex()),
                 menu.statValue(SolarArrayControllerMenu.flatEnergyGenerationDataIndex())
         );
         return MachineScreenStyle.withoutInactiveModifierStats(STAT_TYPES, statLines);

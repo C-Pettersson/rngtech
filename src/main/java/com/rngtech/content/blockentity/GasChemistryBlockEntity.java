@@ -98,6 +98,7 @@ public class GasChemistryBlockEntity extends BaseMachineBlockEntity
     private static final int DATA_MAX_TEMPERATURE = 16;
     private static final int DATA_REFINEMENT_POTENTIAL = 17;
     private static final int DATA_FLAT_ENERGY_GENERATION = 18;
+    private static final int DATA_BASE_ENERGY_GENERATION = 19;
     private static final int STAT_SCALE = 100;
 
     private GasChemistryMachine machine;
@@ -220,6 +221,7 @@ public class GasChemistryBlockEntity extends BaseMachineBlockEntity
                 case DATA_ENERGY_DELTA -> currentEnergyDelta();
                 case DATA_ENERGY_GENERATION -> (int) Math.round(stats.effectiveEnergyGenerationMultiplier() * STAT_SCALE);
                 case DATA_FLAT_ENERGY_GENERATION -> (int) Math.round(stats.effectiveFlatEnergyGenerationBonus() * STAT_SCALE);
+                case DATA_BASE_ENERGY_GENERATION -> (int) Math.round(baseEnergyPerTick() * STAT_SCALE);
                 case DATA_ENERGY_USAGE -> scaledStat(stats, MachineStat.ENERGY_USAGE);
                 case DATA_ENERGY_TRANSFER -> scaledStat(stats, MachineStat.ENERGY_TRANSFER);
                 case DATA_PROCESSING_SPEED -> scaledStat(stats, MachineStat.PROCESSING_SPEED);
@@ -236,7 +238,7 @@ public class GasChemistryBlockEntity extends BaseMachineBlockEntity
 
         @Override
         public int getCount() {
-            return DATA_FLAT_ENERGY_GENERATION + 1;
+            return DATA_BASE_ENERGY_GENERATION + 1;
         }
     };
 
@@ -1211,5 +1213,11 @@ public class GasChemistryBlockEntity extends BaseMachineBlockEntity
         public boolean isItemValid(int slot, ItemStack stack) {
             return false;
         }
+    }
+
+    /** Generation before machine and part stats, for the Stats tab breakdown; 0 when unknown. */
+    private double baseEnergyPerTick() {
+        GasCombustionRecipe recipe = currentCombustionRecipe();
+        return recipe == null ? 0.0 : recipe.energy() / (double) Math.max(1, recipe.processingTicks());
     }
 }
