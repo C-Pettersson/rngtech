@@ -59,6 +59,9 @@ public class SolidFuelBurnerBlockEntity extends BaseMachineBlockEntity implement
     public static final int STATUS_FULL_GOVERNED = 7;
     public static final int STATUS_NOT_BURNABLE = 8;
 
+    /** FE per effective fuel burn tick. Heat Cores set FE/t, so a stronger core burns the same FE faster. */
+    public static final int FUEL_ENERGY_PER_BURN_TICK = 10;
+
     private static final int DATA_BURN_TIME = 0;
     private static final int DATA_TOTAL_BURN_TIME = 1;
     private static final int DATA_ENERGY = 2;
@@ -422,10 +425,12 @@ public class SolidFuelBurnerBlockEntity extends BaseMachineBlockEntity implement
             }
         }
 
-        int effectiveFuelBurnTime = effectiveFuelDurationTicks(fuelBurnTime, stats);
+        int generation = effectiveGeneration(stats);
+        double fuelEnergy = effectiveFuelDurationTicks(fuelBurnTime, stats) * (double) FUEL_ENERGY_PER_BURN_TICK;
+        int effectiveFuelBurnTime = generation <= 0 ? 0 : Math.max(1, Mth.ceil(fuelEnergy / generation));
         burnTime = effectiveFuelBurnTime;
         totalBurnTime = effectiveFuelBurnTime;
-        remainingFuelEnergy = effectiveFuelBurnTime * (double) effectiveGeneration(stats);
+        remainingFuelEnergy = generation <= 0 ? 0.0 : fuelEnergy;
         generationCarry = 0.0;
         heatWasteCarry = 0.0;
         setChanged();

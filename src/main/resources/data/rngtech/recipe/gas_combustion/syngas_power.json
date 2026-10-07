@@ -7,7 +7,7 @@
     },
     "amount": 1000
   },
-  "energy": 28000,
+  "energy": 57600,
   "processing_ticks": 240,
   "exhaust_output": {
     "id": "rngtech:carbon_exhaust",
