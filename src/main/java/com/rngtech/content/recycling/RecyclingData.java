@@ -19,11 +19,17 @@ import com.rngtech.content.registry.ModDataComponents;
 import com.rngtech.rpg.MachineModifier;
 import com.rngtech.rpg.MachineTraits;
 import com.rngtech.rpg.Rarity;
+import com.rngtech.rpg.progression.MachineProgressionState;
 import com.rngtech.rpg.refinement.RefinementTargets;
 
 import net.minecraft.world.item.ItemStack;
 
 public final class RecyclingData {
+    private static final double STAGE_ZERO_FUEL_SCALE = 0.25;
+    private static final double FUEL_SCALE_PER_STAGE = 0.25;
+    private static final double FUEL_SCALE_PER_MASTERY_LEVEL = 0.01;
+    private static final double FUEL_SCALE_PER_SEAL_TIER = 2.0;
+
     public static boolean isStripped(ItemStack stack) {
         return stack.getOrDefault(ModDataComponents.RECYCLING_STRIPPED.get(), false);
     }
@@ -60,6 +66,28 @@ public final class RecyclingData {
             };
         }
         return Math.max(0, value);
+    }
+
+    /** FE a Potential Reactor gets from burning this item, before reactor stats and repeat fatigue. */
+    public static int reactorFuelValue(ItemStack stack) {
+        MachineProgressionState progression = stack.get(ModDataComponents.MACHINE_PROGRESSION.get());
+        return reactorFuelValue(
+                rpgEnergyValue(stack),
+                componentStage(stack),
+                progression == null ? 0 : progression.level() - 1,
+                progression == null ? 0 : progression.sealTiers()
+        );
+    }
+
+    /**
+     * Trait value scaled so the reactor recoups retired gear rather than paying for junk: Stage 0 items keep a
+     * quarter, each stage adds a quarter, each Mastery level adds 1%, and each Ascendancy Seal tier adds 200%.
+     */
+    public static int reactorFuelValue(int traitValue, int stage, int masteryLevels, int sealTiers) {
+        double scale = (STAGE_ZERO_FUEL_SCALE + FUEL_SCALE_PER_STAGE * Math.max(0, stage))
+                * (1.0 + FUEL_SCALE_PER_MASTERY_LEVEL * Math.max(0, masteryLevels))
+                * (1.0 + FUEL_SCALE_PER_SEAL_TIER * Math.max(0, sealTiers));
+        return (int) Math.round(Math.max(0, traitValue) * scale);
     }
 
     private static MachineTraits recyclableTraits(ItemStack stack) {

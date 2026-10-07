@@ -4,19 +4,6 @@
         "current": {},
         "proposal": {
             "label": "Proposal A",
-            "reactor_fatigue": {
-                "window": 16,
-                "factor_per_repeat": 0.75,
-                "floor": 0.1
-            },
-            "reactor_gear_stage_scale": {
-                "stage_0": 0.25,
-                "per_stage": 0.25
-            },
-            "reactor_mastery": {
-                "per_level": 0.01,
-                "per_seal_tier": 2.0
-            },
             "cavitation_overflow": "vent",
             "vacuum_collapse_overflow": "vent",
             "aethergold_transfer_multiplier": 1.0

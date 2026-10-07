@@ -47,7 +47,17 @@ The Potential Reactor accepts a stack that is already a valid refinement target 
 
 Stored `rngtech:machine_traits` are used when present. Machine parts that define authored Refinement Potential through their part identity also count, so a plain Steel Resonance Coil can still pay out its part RP. Authored base stats and fixed identity behavior do not pay FE by themselves. For example, a plain Steel Heat Core is still physically valuable, but its base component stats do not create modifier energy beyond the part's own RP.
 
-The payout is deterministic and currently uses rarity value, affix tier value, and Refinement Potential value before machine stat multipliers. The output is always a one-count stripped copy of the input item. This stripped output is the intended feedstock for the Component Recycler.
+The payout starts from rarity value, affix tier value, and Refinement Potential value, then scales with what the item was, so the reactor recoups retired gear instead of paying for cheap crafts:
+
+| Factor | Scale |
+|---|---|
+| Item stage | `0.25 + 0.25 x stage`: Stage 0 junk keeps a quarter, Stage 4 gear `1.25x`, Stage 8 gear `2.25x` |
+| Machine Mastery | `+1%` per Mastery level above 1 |
+| Ascendancy Seals | `+200%` per Seal tier used on the machine, so a fully ascended machine is worth `7x` |
+
+Repeats lose value. The reactor remembers the item ids of its last 15 gear burns; each earlier burn of the same id multiplies the next one's FE by `0.75`, down to `10%`. Rotating 16 or more different items avoids the penalty. Explicit fuel recipes such as Broken Circuits are not affected.
+
+These factors apply before machine stat multipliers. The output is always a one-count stripped copy of the input item. This stripped output is the intended feedstock for the Component Recycler.
 
 Unique stacks are not accepted by this generic RPG-value path.
 

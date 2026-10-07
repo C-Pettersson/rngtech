@@ -22,7 +22,11 @@ import com.rngtech.rpg.MachineType;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.StringTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
@@ -38,6 +42,8 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.energy.IEnergyStorage;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.ItemStackHandler;
+
+import java.util.ArrayDeque;
 
 public class PotentialReactorBlockEntity extends BaseMachineBlockEntity implements MenuProvider, MachineInfoProvider {
     public static final int SLOT_INPUT = 0;
@@ -183,9 +189,16 @@ public class PotentialReactorBlockEntity extends BaseMachineBlockEntity implemen
             int processingTicks,
             int minimumMaterialStage,
             ItemStack residue,
-            boolean requiresRecoveryFilter
+            boolean requiresRecoveryFilter,
+            String gearId
     ) {
     }
+
+    private static final int GEAR_FATIGUE_MEMORY = 15;
+    private static final double GEAR_FATIGUE_PER_REPEAT = 0.75;
+    private static final double GEAR_FATIGUE_FLOOR = 0.10;
+    /** Item ids of the most recent gear burns, oldest first; each repeat of an id lowers that item's FE. */
+    private final ArrayDeque<String> recentGear = new ArrayDeque<>();
 
     public PotentialReactorBlockEntity(BlockPos pos, BlockState blockState) {
         super(ModBlockEntities.POTENTIAL_REACTOR.get(), pos, blockState, MachineType.POTENTIAL_REACTOR, SLOT_INPUT, SLOT_INPUT, SLOT_RESIDUE);
@@ -335,6 +348,9 @@ public class PotentialReactorBlockEntity extends BaseMachineBlockEntity implemen
         tag.putDouble("RemainingEnergy", remainingEnergy);
         tag.putDouble("GenerationCarry", generationCarry);
         tag.put("PendingResidue", pendingResidue.saveOptional(registries));
+        ListTag gear = new ListTag();
+        recentGear.forEach(id -> gear.add(StringTag.valueOf(id)));
+        tag.put("RecentGear", gear);
         bulkSpeed.save(tag);
     }
 
@@ -350,6 +366,11 @@ public class PotentialReactorBlockEntity extends BaseMachineBlockEntity implemen
         remainingEnergy = tag.getDouble("RemainingEnergy");
         generationCarry = tag.getDouble("GenerationCarry");
         pendingResidue = ItemStack.parseOptional(registries, tag.getCompound("PendingResidue"));
+        recentGear.clear();
+        ListTag gear = tag.getList("RecentGear", Tag.TAG_STRING);
+        for (int index = 0; index < gear.size(); index++) {
+            recordGear(gear.getString(index));
+        }
         bulkSpeed.load(tag);
         clampInternalEnergy();
     }
@@ -382,6 +403,9 @@ public class PotentialReactorBlockEntity extends BaseMachineBlockEntity implemen
             return false;
         }
 
+        if (work.gearId() != null) {
+            recordGear(work.gearId());
+        }
         consumeInput();
         pendingResidue = residue;
         activeProcessingTicks = stats.adjustedProcessingTicks(work.processingTicks());
@@ -440,6 +464,18 @@ public class PotentialReactorBlockEntity extends BaseMachineBlockEntity implemen
         setChanged();
     }
 
+    private double gearFatigue(String gearId) {
+        long repeats = recentGear.stream().filter(gearId::equals).count();
+        return Math.max(GEAR_FATIGUE_FLOOR, Math.pow(GEAR_FATIGUE_PER_REPEAT, repeats));
+    }
+
+    private void recordGear(String gearId) {
+        recentGear.addLast(gearId);
+        while (recentGear.size() > GEAR_FATIGUE_MEMORY) {
+            recentGear.removeFirst();
+        }
+    }
+
     private void consumeInput() {
         ItemStack input = processInventory.getStackInSlot(SLOT_INPUT);
         ItemStack remainder = input.getCraftingRemainingItem();
@@ -460,10 +496,11 @@ public class PotentialReactorBlockEntity extends BaseMachineBlockEntity implemen
     private ReactorWork nextWork() {
         ItemStack input = processInventory.getStackInSlot(SLOT_INPUT);
         if (RecyclingData.hasRecyclableRpgValue(input)) {
-            int energy = RecyclingData.rpgEnergyValue(input);
+            String gearId = BuiltInRegistries.ITEM.getKey(input.getItem()).toString();
+            int energy = (int) Math.round(RecyclingData.reactorFuelValue(input) * gearFatigue(gearId));
             int stage = Math.max(1, RecyclingData.componentStage(input));
             int ticks = Mth.clamp(80 + stage * 15 + energy / 240, 100, 280);
-            return new ReactorWork(energy, ticks, 1, RecyclingData.strippedCopy(input), false);
+            return new ReactorWork(energy, ticks, 1, RecyclingData.strippedCopy(input), false, gearId);
         }
         PotentialReactorRecipe recipe = nextRecipe();
         return recipe == null
@@ -473,7 +510,8 @@ public class PotentialReactorBlockEntity extends BaseMachineBlockEntity implemen
                         recipe.processingTicks(),
                         recipe.minimumMaterialStage(),
                         recipe.residue().copy(),
-                        true
+                        true,
+                        null
                 );
     }
 
