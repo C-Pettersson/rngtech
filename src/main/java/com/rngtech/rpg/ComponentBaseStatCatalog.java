@@ -89,6 +89,11 @@ public final class ComponentBaseStatCatalog {
         return stats;
     }
 
+    /** Whether a part's rolled modifier on {@code stat} applies to the host machine instead of the part. */
+    public static boolean appliesToHost(MachineStat stat) {
+        return HOST_STATS.contains(stat);
+    }
+
     public static List<MachineStat> summaryStats(ItemStack stack) {
         Profile profile = profile(stack);
         return profile == null ? List.of() : profile.summaryStats();

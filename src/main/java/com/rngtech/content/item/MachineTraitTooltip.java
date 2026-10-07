@@ -121,7 +121,16 @@ final class MachineTraitTooltip {
     }
 
     static void appendTraitDetails(MachineTraits traits, List<Component> tooltipComponents) {
-        appendModifierSections(traits, tooltipComponents);
+        appendTraitDetails(traits, tooltipComponents, false);
+    }
+
+    /** {@code installedPart} splits rolled modifiers into local ones, which scale only the part, and global ones. */
+    static void appendTraitDetails(MachineTraits traits, List<Component> tooltipComponents, boolean installedPart) {
+        if (installedPart) {
+            appendPartModifierSections(traits.modifierSet(), tooltipComponents);
+        } else {
+            appendModifierSections(traits, tooltipComponents);
+        }
         appendBehaviorSection(traits, tooltipComponents);
         if (TooltipKeyState.hasAltDown()) {
             appendTierTooltip(tooltipComponents, traits.modifierSet());
@@ -199,6 +208,56 @@ final class MachineTraitTooltip {
                     appendModifierDescriptionDetail(modifier, tooltipComponents);
                 }
             }
+        }
+    }
+
+    private static void appendPartModifierSections(ModifierSet modifierSet, List<Component> tooltipComponents) {
+        appendBaseModifierSection(modifierSet, tooltipComponents);
+        List<MachineModifier> rolled = modifierSet.modifiers().stream().filter(modifier -> modifier.slot().isAffix()).toList();
+        appendRolledSection(
+                rolled.stream().filter(modifier -> !ComponentBaseStatCatalog.appliesToHost(modifier.stat())).toList(),
+                "rngtech.tooltip.modifiers.local",
+                "rngtech.tooltip.modifiers.local.detail",
+                tooltipComponents
+        );
+        appendRolledSection(
+                rolled.stream().filter(modifier -> ComponentBaseStatCatalog.appliesToHost(modifier.stat())).toList(),
+                "rngtech.tooltip.modifiers.global",
+                "rngtech.tooltip.modifiers.global.detail",
+                tooltipComponents
+        );
+    }
+
+    private static void appendBaseModifierSection(ModifierSet modifierSet, List<Component> tooltipComponents) {
+        List<MachineModifier> base = modifierSet.modifiers().stream().filter(modifier -> !modifier.slot().isAffix()).toList();
+        if (base.isEmpty()) {
+            return;
+        }
+        tooltipComponents.add(Component.empty());
+        tooltipComponents.add(Component.translatable("rngtech.tooltip.base_modifiers").withStyle(ChatFormatting.DARK_AQUA));
+        for (MachineModifier modifier : base) {
+            tooltipComponents.add(MachineModifierText.tooltipLine(modifier).withStyle(ChatFormatting.BLUE));
+            appendModifierDescriptionDetail(modifier, tooltipComponents);
+        }
+    }
+
+    private static void appendRolledSection(
+            List<MachineModifier> modifiers,
+            String headerKey,
+            String detailKey,
+            List<Component> tooltipComponents
+    ) {
+        if (modifiers.isEmpty()) {
+            return;
+        }
+        tooltipComponents.add(Component.empty());
+        tooltipComponents.add(Component.translatable(headerKey).withStyle(ChatFormatting.DARK_AQUA));
+        if (TooltipKeyState.hasShiftDown()) {
+            tooltipComponents.add(Component.translatable(detailKey).withStyle(ChatFormatting.DARK_GRAY));
+        }
+        for (MachineModifier modifier : modifiers) {
+            tooltipComponents.add(MachineModifierText.tooltipLine(modifier).withStyle(ChatFormatting.BLUE));
+            appendModifierDescriptionDetail(modifier, tooltipComponents);
         }
     }
 
