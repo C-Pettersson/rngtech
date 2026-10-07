@@ -14,9 +14,9 @@ import com.rngtech.content.recipe.CrusherRecipe;
 import com.rngtech.content.recipe.ProcessingEnergyScaling;
 import com.rngtech.content.registry.ModBlockEntities;
 import com.rngtech.content.registry.ModDataComponents;
+import com.rngtech.rpg.BatchProcessing;
 import com.rngtech.rpg.ComponentBaseStatCatalog;
 import com.rngtech.rpg.MachineBaseStatCatalog;
-import com.rngtech.rpg.MachineBehavior;
 import com.rngtech.rpg.MachineImplicitCatalog;
 import com.rngtech.rpg.MachineModifier;
 import com.rngtech.rpg.MachineNameGenerator;
@@ -96,7 +96,7 @@ public class CrusherBlockEntity extends BaseMachineBlockEntity implements MenuPr
     private static final int DATA_ENERGY_PER_TICK = 14;
     private static final int DATA_ENERGY_PER_CRAFT = 15;
     private static final int DATA_ACTIVE_JOBS = 16;
-    private static final int DATA_PARALLEL_JOBS = 17;
+    private static final int DATA_BATCH_SIZE = 17;
     private static final int DATA_STATUS = 18;
     private static final int DATA_OUTPUT_GUARD_GRACE = 19;
     private static final int DATA_NO_BATTERY_OUTPUT_RETENTION = 20;
@@ -178,7 +178,7 @@ public class CrusherBlockEntity extends BaseMachineBlockEntity implements MenuPr
                 case DATA_ENERGY_PER_TICK -> currentEnergyCostPerTick(stats);
                 case DATA_ENERGY_PER_CRAFT -> currentEnergyCostPerCraft(stats);
                 case DATA_ACTIVE_JOBS -> currentActiveJobs(stats);
-                case DATA_PARALLEL_JOBS -> parallelJobs(stats);
+                case DATA_BATCH_SIZE -> batchSize(stats);
                 case DATA_STATUS -> statusCode(stats);
                 case DATA_OUTPUT_GUARD_GRACE -> scaledStat(stats, MachineStat.OUTPUT_GUARD_GRACE);
                 case DATA_NO_BATTERY_OUTPUT_RETENTION -> scaledStat(stats, MachineStat.NO_BATTERY_OUTPUT_RETENTION);
@@ -288,7 +288,7 @@ public class CrusherBlockEntity extends BaseMachineBlockEntity implements MenuPr
         crusher.consumeWorkingEnergy(energyCost, false);
         crusher.progress++;
 
-        if (crusher.progress >= adjustedProcessingTicks(recipe, stats)) {
+        if (crusher.progress >= adjustedProcessingTicks(recipe, stats, jobs)) {
             int completed = crusher.process(recipe, stats, level, jobs);
             crusher.grantRecipeXp(recipe, completed);
             crusher.bulkSpeed.recordProcesses(crusher.activeTraits(), completed);
@@ -575,7 +575,7 @@ public class CrusherBlockEntity extends BaseMachineBlockEntity implements MenuPr
         if (input.isEmpty() || !recipe.matchesInput(input) || input.getCount() < recipe.inputCount()) {
             return 0;
         }
-        int maxJobs = Math.min(parallelJobs(stats), input.getCount() / recipe.inputCount());
+        int maxJobs = Math.min(batchSize(stats), input.getCount() / recipe.inputCount());
         for (int jobs = maxJobs; jobs > 0; jobs--) {
             if (canAcceptBatchOutput(recipe, stats, jobs)) {
                 return jobs;
@@ -585,7 +585,7 @@ public class CrusherBlockEntity extends BaseMachineBlockEntity implements MenuPr
     }
 
     private boolean canProcessBatch(CrusherRecipe recipe, MachineStatAccumulator stats, int jobs) {
-        if (jobs <= 0 || jobs > parallelJobs(stats) || level == null) {
+        if (jobs <= 0 || jobs > batchSize(stats) || level == null) {
             return false;
         }
         ItemStack input = inventory.getStackInSlot(SLOT_INPUT_A);
@@ -658,7 +658,7 @@ public class CrusherBlockEntity extends BaseMachineBlockEntity implements MenuPr
                     ModifierSlot.IMPLICIT,
                     MachineStat.OUTPUT_AMOUNT,
                     ModifierOperation.MORE,
-                    AscendancyFormulas.refinersOathMultiplier(stats.intValue(MachineStat.PARALLEL_JOBS))
+                    AscendancyFormulas.refinersOathMultiplier(BatchProcessing.statBatchSize(stats))
             ));
         }
         if (!hasBatteryCell()) {
@@ -685,7 +685,7 @@ public class CrusherBlockEntity extends BaseMachineBlockEntity implements MenuPr
 
     private int currentProcessingTicks(MachineStatAccumulator stats) {
         CrusherRecipe recipe = findNextRecipe(stats);
-        return recipe == null ? 0 : adjustedProcessingTicks(recipe, stats);
+        return recipe == null ? 0 : adjustedProcessingTicks(recipe, stats, Math.max(1, currentActiveJobs(stats)));
     }
 
     private int currentBonusOutputIncrement(MachineStatAccumulator stats) {
@@ -814,15 +814,15 @@ public class CrusherBlockEntity extends BaseMachineBlockEntity implements MenuPr
     }
 
     private int energyCostForProgress(CrusherRecipe recipe, MachineStatAccumulator stats, int progress, int jobs) {
-        int adjustedTicks = adjustedProcessingTicks(recipe, stats);
+        int adjustedTicks = adjustedProcessingTicks(recipe, stats, jobs);
         return multiplyEnergy(
                 distributedEnergyCostForProgress(energyCostPerCraft(recipe, stats), adjustedTicks, progress),
                 jobs
         );
     }
 
-    private static int adjustedProcessingTicks(CrusherRecipe recipe, MachineStatAccumulator stats) {
-        int baseTicks = stats.adjustedProcessingTicks(recipe.processingTicks());
+    private static int adjustedProcessingTicks(CrusherRecipe recipe, MachineStatAccumulator stats, int jobs) {
+        int baseTicks = BatchProcessing.batchTicks(stats.adjustedProcessingTicks(recipe.processingTicks()), stats, jobs);
         double multiplier = underLevelPenaltyMultiplier(recipe, stats);
         long adjustedTicks = (long) Math.ceil(baseTicks * multiplier);
         return (int) Math.max(1L, Math.min(Integer.MAX_VALUE, adjustedTicks));
@@ -942,13 +942,9 @@ public class CrusherBlockEntity extends BaseMachineBlockEntity implements MenuPr
         return CrusherRecipes.find(level, inventory.getStackInSlot(SLOT_INPUT_A)).orElse(null);
     }
 
-    private int parallelJobs(MachineStatAccumulator stats) {
-        if (hasMasteryBehavior("REFINERS_OATH")
-                || !activeTraits().hasBehavior(MachineBehavior.DENSE_PARALLEL)
-                && !CrusherPassiveTree.enablesDenseParallel(machineProgression())) {
-            return 1;
-        }
-        return Math.max(1, stats.intValue(MachineStat.PARALLEL_JOBS));
+    /** Refiner's Oath gives up batching for Output Amount. */
+    private int batchSize(MachineStatAccumulator stats) {
+        return BatchProcessing.batchSize(stats, hasMasteryBehavior("REFINERS_OATH"));
     }
 
     private boolean preserveOutputBlockedProgress(MachineStatAccumulator stats) {
@@ -1011,7 +1007,7 @@ public class CrusherBlockEntity extends BaseMachineBlockEntity implements MenuPr
             candidateCount += existingInput.getCount();
         }
         int jobsByInput = Math.max(1, candidateCount / Math.max(1, recipe.inputCount()));
-        return Math.max(1, Math.min(parallelJobs(stats), jobsByInput));
+        return Math.max(1, Math.min(batchSize(stats), jobsByInput));
     }
 
     private int energyStored() {

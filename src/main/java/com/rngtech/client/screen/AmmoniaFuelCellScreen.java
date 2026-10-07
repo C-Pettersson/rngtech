@@ -140,7 +140,12 @@ public class AmmoniaFuelCellScreen extends AbstractContainerScreen<AmmoniaFuelCe
 
     private MachineScreenStyle.StatLine[] statLines() {
         return new MachineScreenStyle.StatLine[] {
-                stat("rngtech.stat.energy_generation", menu.statValue(AmmoniaFuelCellMenu.energyGenerationDataIndex()), MachineStat.ENERGY_GENERATION),
+                MachineScreenStyle.generationBreakdownLine(
+                        stat("rngtech.stat.energy_generation", menu.statValue(AmmoniaFuelCellMenu.energyGenerationDataIndex()), MachineStat.ENERGY_GENERATION),
+                        menu.energyPerTick(),
+                        menu.statValue(AmmoniaFuelCellMenu.baseEnergyGenerationDataIndex()),
+                        menu.statValue(AmmoniaFuelCellMenu.flatEnergyGenerationDataIndex())
+                ),
                 stat("rngtech.stat.efficiency", menu.statValue(AmmoniaFuelCellMenu.efficiencyDataIndex()), MachineStat.EFFICIENCY),
                 stat("rngtech.stat.processing_speed", menu.statValue(AmmoniaFuelCellMenu.processingSpeedDataIndex()), MachineStat.PROCESSING_SPEED)
         };

@@ -7,8 +7,10 @@ import com.rngtech.rpg.MachineStatAccumulator;
 public final class AscendancyFormulas {
     /** Under-Level Efficiency stops here, so every penalized level still costs something. */
     public static final double MAX_UNDER_LEVEL_EFFICIENCY = 90.0;
-    public static final double REFINERS_OATH_PER_JOB = 0.05;
+    public static final double REFINERS_OATH_PER_BATCH = 0.05;
     public static final double REFINERS_OATH_CAP = 0.5;
+    /** Fused Crucibles turns batching off for this much Processing Speed per point of Batch Size. */
+    public static final double FUSED_CRUCIBLES_SPEED_PER_BATCH = 0.2;
     /** Shared Hearth gives every lane this share of the hottest installed Heat Core's maximum. */
     public static final double SHARED_HEARTH_SHARE = 0.9;
     /** Fluxed Blend lowers blend smelt temperatures by this many degrees. */
@@ -38,9 +40,9 @@ public final class AscendancyFormulas {
         return (int) Math.min(Integer.MAX_VALUE, Math.ceil(ticks));
     }
 
-    /** Refiner's Oath: 5% more Output Amount per Parallel Job from every source, up to 50%. */
-    public static double refinersOathMultiplier(int parallelJobs) {
-        return 1.0 + Math.min(REFINERS_OATH_CAP, REFINERS_OATH_PER_JOB * Math.max(1, parallelJobs));
+    /** Refiner's Oath turns batching off: 5% more Output Amount per point of Batch Size, up to 50%. */
+    public static double refinersOathMultiplier(int batchSize) {
+        return 1.0 + Math.min(REFINERS_OATH_CAP, REFINERS_OATH_PER_BATCH * Math.max(1, batchSize));
     }
 
     /** Overdrive's Processing Speed multiplier for a lane running {@code temperature} against a recipe target. */

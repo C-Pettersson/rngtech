@@ -38,7 +38,7 @@ const kineticStats = new Set([
     "SUPER_OUTPUT_CHANCE",
     "ENERGY_GENERATION",
     "ENERGY_CAPACITY",
-    "PARALLEL_JOBS",
+    "BATCH_SIZE",
     "CRUSHER_SALVAGE_CHANCE",
     "MINING_SPEED",
     "FE_TRANSFER",

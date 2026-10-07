@@ -70,6 +70,7 @@ public class MetalPressScreen extends AbstractContainerScreen<MetalPressMenu> {
     private static final int MOLD_SELECTOR_WIDTH = 12;
     private static final int MOLD_SELECTOR_HEIGHT = 5;
     private static final String[] STAT_LABEL_KEYS = {
+            "rngtech.stat.batch_size",
             "rngtech.stat.processing_speed",
             "rngtech.stat.energy_usage",
             "rngtech.stat.energy_capacity",
@@ -82,6 +83,7 @@ public class MetalPressScreen extends AbstractContainerScreen<MetalPressMenu> {
             "rngtech.stat.stability"
     };
     private static final int[] STAT_DATA_INDICES = {
+            MetalPressMenu.batchSizeDataIndex(),
             MetalPressMenu.processingSpeedDataIndex(),
             MetalPressMenu.energyUsageDataIndex(),
             MetalPressMenu.energyCapacityStatDataIndex(),
@@ -94,6 +96,7 @@ public class MetalPressScreen extends AbstractContainerScreen<MetalPressMenu> {
             MetalPressMenu.stabilityDataIndex()
     };
     private static final MachineStat[] STAT_TYPES = {
+            MachineStat.BATCH_SIZE,
             MachineStat.PROCESSING_SPEED,
             MachineStat.ENERGY_USAGE,
             MachineStat.ENERGY_CAPACITY,

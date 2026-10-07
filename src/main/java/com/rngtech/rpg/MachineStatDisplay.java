@@ -3,6 +3,8 @@ package com.rngtech.rpg;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 
 public final class MachineStatDisplay {
@@ -14,7 +16,8 @@ public final class MachineStatDisplay {
             case CONTROL, DRIVE, RESERVE -> formatUnit(value, "point", "points");
             case BATTERY_SLOTS -> formatUnit(value, "cell", "cells");
             case CRUSHER_INPUT_FILTER -> formatUnit(value, "filter", "filters");
-            case PARALLEL_JOBS -> formatUnit(value, "job", "jobs");
+            case BATCH_SIZE -> formatUnit(value, "item", "items");
+            case BATCH_OVERHEAD -> formatNumber(value) + "% per extra item";
             case ENERGY_CAPACITY, ENERGY_CAPACITY_FLAT, BUFFER_SIZE -> formatNumber(value) + " FE";
             case ENERGY_GENERATION -> formatNumber(value) + " FE/t";
             case ENERGY_TRANSFER, BURST_TRANSFER, FE_TRANSFER -> formatNumber(value) + " FE/t";
@@ -99,6 +102,44 @@ public final class MachineStatDisplay {
         return Component.translatable(stat.translationKey() + ".description", statValue(stat, value));
     }
 
+    public static String energyRate(double perTick) {
+        return formatNumber(Math.round(perTick)) + " FE/t";
+    }
+
+    /**
+     * Where a generator's final FE/t comes from: {@code finalPerTick = (basePerTick * multiplier + flatPerTick) * other},
+     * where {@code other} folds in speed, efficiency, stability, and machine-specific effects. An unknown base omits the
+     * base and other lines.
+     */
+    public static List<Component> generationBreakdown(double finalPerTick, double basePerTick, double multiplier, double flatPerTick) {
+        List<Component> lines = new ArrayList<>();
+        lines.add(Component.translatable("rngtech.stat.energy_generation.breakdown.final", energyRate(finalPerTick)));
+        if (basePerTick > EPSILON) {
+            lines.add(Component.translatable("rngtech.stat.energy_generation.breakdown.base", energyRate(basePerTick)));
+        }
+        lines.add(Component.translatable("rngtech.stat.energy_generation.breakdown.multiplier", formatMultiplierDelta(multiplier)));
+        if (Math.abs(flatPerTick) > EPSILON) {
+            lines.add(Component.translatable(
+                    "rngtech.stat.energy_generation.breakdown.flat",
+                    formatSignedNumber(Math.round(flatPerTick)) + " FE/t"
+            ));
+        }
+        double other = generationOtherFactor(finalPerTick, basePerTick, multiplier, flatPerTick);
+        if (Math.abs(other - 1.0) >= 0.005) {
+            lines.add(Component.translatable("rngtech.stat.energy_generation.breakdown.other", formatMultiplierDelta(other)));
+        }
+        return lines;
+    }
+
+    /** The share of final FE/t not explained by base, multiplier, and flat generation; 1 when the base is unknown. */
+    public static double generationOtherFactor(double finalPerTick, double basePerTick, double multiplier, double flatPerTick) {
+        double beforeOther = basePerTick * multiplier + flatPerTick;
+        if (basePerTick <= EPSILON || finalPerTick <= EPSILON || beforeOther <= EPSILON) {
+            return 1.0;
+        }
+        return finalPerTick / beforeOther;
+    }
+
     public static MutableComponent effectText(MachineModifierEffect effect) {
         double amount = switch (effect.operation()) {
             case MORE -> (effect.value() - 1.0) * 100.0;
@@ -152,7 +193,8 @@ public final class MachineStatDisplay {
             case CONTROL, DRIVE, RESERVE -> formatSignedUnit(value, "point", "points");
             case BATTERY_SLOTS -> formatSignedUnit(value, "cell", "cells");
             case CRUSHER_INPUT_FILTER -> formatSignedUnit(value, "filter", "filters");
-            case PARALLEL_JOBS -> formatSignedUnit(value, "job", "jobs");
+            case BATCH_SIZE -> formatSignedUnit(value, "item", "items");
+            case BATCH_OVERHEAD -> formatSignedPercentPoints(value) + " per extra item";
             case FLUID_CAPACITY -> formatSignedNumber(value) + " mB";
             case FLUID_TRANSFER -> formatSignedNumber(value) + " mB/t";
             case MAX_TEMPERATURE -> formatSignedNumber(value) + " heat";

@@ -562,7 +562,7 @@ public enum CrusherPassiveNode implements StringRepresentable, PassiveNode {
                     fixed(MachineStat.NO_BATTERY_OUTPUT_RETENTION, ModifierOperation.ADD, 100.0)
             );
             case DENSE_BATCHING -> List.of(
-                    fixed(MachineStat.PARALLEL_JOBS, ModifierOperation.ADD, 2.0),
+                    fixed(MachineStat.BATCH_SIZE, ModifierOperation.ADD, 2.0),
                     fixed(MachineStat.PROCESSING_SPEED, ModifierOperation.LESS, 0.75),
                     fixed(MachineStat.ENERGY_USAGE, ModifierOperation.MORE, 1.25)
             );
@@ -767,10 +767,6 @@ public enum CrusherPassiveNode implements StringRepresentable, PassiveNode {
 
     public boolean requiresMatchingCrushHeadStage() {
         return this == PRECISION_JAW_MOUNT;
-    }
-
-    public boolean enablesDenseParallel() {
-        return this == DENSE_BATCHING;
     }
 
     @Override

@@ -103,6 +103,10 @@ nav:
       - Unique Items State: prds/uniques-state.md
       - Corruption: prds/corruption.md
       - Corruption State: prds/corruption-state.md
+      - Batch Processing: prds/batch-processing.md
+      - Batch Processing State: prds/batch-processing-state.md
+      - Heat Model: prds/heat-model.md
+      - Heat Model State: prds/heat-model-state.md
   - Reference:
       - Releasing: releasing.md
       - Public Mod Description: public-mod-description.md

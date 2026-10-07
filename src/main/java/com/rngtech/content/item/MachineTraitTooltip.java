@@ -15,6 +15,7 @@ import com.rngtech.rpg.Rarity;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.world.item.ItemStack;
 
 import java.util.List;
@@ -121,7 +122,12 @@ final class MachineTraitTooltip {
     }
 
     static void appendTraitDetails(MachineTraits traits, List<Component> tooltipComponents) {
-        appendModifierSections(traits, tooltipComponents);
+        appendTraitDetails(traits, tooltipComponents, ItemStack.EMPTY);
+    }
+
+    /** With Shift held, marks rolled modifiers that are local to {@code part}; an empty stack marks none. */
+    static void appendTraitDetails(MachineTraits traits, List<Component> tooltipComponents, ItemStack part) {
+        appendModifierSections(traits.modifierSet(), tooltipComponents, part);
         appendBehaviorSection(traits, tooltipComponents);
         if (TooltipKeyState.hasAltDown()) {
             appendTierTooltip(tooltipComponents, traits.modifierSet());
@@ -173,11 +179,11 @@ final class MachineTraitTooltip {
         ).withStyle(ChatFormatting.GRAY));
     }
 
-    private static void appendModifierSections(MachineTraits traits, List<Component> tooltipComponents) {
-        appendModifierSections(traits.modifierSet(), tooltipComponents);
+    private static void appendModifierSections(ModifierSet modifierSet, List<Component> tooltipComponents) {
+        appendModifierSections(modifierSet, tooltipComponents, ItemStack.EMPTY);
     }
 
-    private static void appendModifierSections(ModifierSet modifierSet, List<Component> tooltipComponents) {
+    private static void appendModifierSections(ModifierSet modifierSet, List<Component> tooltipComponents, ItemStack part) {
         boolean hasBaseModifiers = modifierSet.modifiers().stream().anyMatch(modifier -> !modifier.slot().isAffix());
         boolean hasRolledModifiers = modifierSet.modifiers().stream().anyMatch(modifier -> modifier.slot().isAffix());
         if (hasBaseModifiers) {
@@ -195,11 +201,19 @@ final class MachineTraitTooltip {
             tooltipComponents.add(Component.translatable("rngtech.tooltip.modifiers").withStyle(ChatFormatting.DARK_AQUA));
             for (var modifier : modifierSet.modifiers()) {
                 if (modifier.slot().isAffix()) {
-                    tooltipComponents.add(MachineModifierText.tooltipLine(modifier).withStyle(ChatFormatting.BLUE));
+                    tooltipComponents.add(rolledModifierLine(modifier, part));
                     appendModifierDescriptionDetail(modifier, tooltipComponents);
                 }
             }
         }
+    }
+
+    private static Component rolledModifierLine(MachineModifier modifier, ItemStack part) {
+        MutableComponent line = MachineModifierText.tooltipLine(modifier).withStyle(ChatFormatting.BLUE);
+        if (TooltipKeyState.hasShiftDown() && ComponentBaseStatCatalog.isLocalModifier(part, modifier)) {
+            line.append(Component.translatable("rngtech.tooltip.modifier.local").withStyle(ChatFormatting.DARK_GRAY));
+        }
+        return line;
     }
 
     private static void appendModifierDescriptionDetail(MachineModifier modifier, List<Component> tooltipComponents) {
@@ -243,7 +257,7 @@ final class MachineTraitTooltip {
         if (Math.abs(value) <= 0.0001) {
             return false;
         }
-        if (stat == MachineStat.PARALLEL_JOBS) {
+        if (stat == MachineStat.BATCH_SIZE) {
             return value > 1.0001;
         }
         if (stat == MachineStat.BURST_DURATION || stat == MachineStat.FLUID_TRANSFER) {

@@ -93,6 +93,38 @@ public final class ComponentBaseStatCatalog {
         return stats;
     }
 
+    /**
+     * Whether a rolled modifier on a part is local in a way that changes the result: a percent roll that scales the
+     * part's own value, or a flat roll that the same part's percent roll on that stat scales. Rolls that pass straight
+     * through to the machine, apply to the host, or target a stat the part does not carry are not.
+     */
+    public static boolean isLocalModifier(ItemStack stack, MachineModifier modifier) {
+        Profile profile = profile(stack);
+        if (profile == null || !modifier.slot().isAffix()) {
+            return false;
+        }
+        List<MachineModifier> rolled = componentTraits(stack).modifiers();
+        for (MachineModifierEffect effect : modifier.effects()) {
+            MachineStat stat = effect.stat();
+            if (!profile.mergeRules().containsKey(stat) || HOST_STATS.contains(stat)) {
+                continue;
+            }
+            if (isScaling(effect.operation()) || rolled.stream().anyMatch(other -> other != modifier && scalesStat(other, stat))) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static boolean scalesStat(MachineModifier modifier, MachineStat stat) {
+        return modifier.slot().isAffix()
+                && modifier.effects().stream().anyMatch(effect -> effect.stat() == stat && isScaling(effect.operation()));
+    }
+
+    private static boolean isScaling(ModifierOperation operation) {
+        return operation != ModifierOperation.ADD;
+    }
+
     public static List<MachineStat> summaryStats(ItemStack stack) {
         Profile profile = profile(stack);
         return profile == null ? List.of() : profile.summaryStats();

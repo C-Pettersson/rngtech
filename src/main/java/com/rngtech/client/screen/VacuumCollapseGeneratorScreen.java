@@ -463,7 +463,13 @@ public class VacuumCollapseGeneratorScreen extends AbstractContainerScreen<Vacuu
                     MachineScreenStyle.statLayerTooltip(menu.getSlot(menu.refinementTargetSlot()).getItem(), STAT_TYPES[index], value)
             );
         }
-        return statLines;
+        return MachineScreenStyle.withGenerationBreakdown(
+                STAT_TYPES,
+                statLines,
+                menu.energyPerTick(),
+                menu.statValue(VacuumCollapseGeneratorMenu.baseEnergyGenerationDataIndex()),
+                menu.statValue(VacuumCollapseGeneratorMenu.flatEnergyGenerationDataIndex())
+        );
     }
 
     private boolean isEnhancedStat(int dataIndex, double value) {

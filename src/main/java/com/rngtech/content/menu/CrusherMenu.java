@@ -56,7 +56,7 @@ public class CrusherMenu extends AbstractContainerMenu implements MasteryMenuVie
     private static final int DATA_ENERGY_PER_TICK = 14;
     private static final int DATA_ENERGY_PER_CRAFT = 15;
     private static final int DATA_ACTIVE_JOBS = 16;
-    private static final int DATA_PARALLEL_JOBS = 17;
+    private static final int DATA_BATCH_SIZE = 17;
     private static final int DATA_STATUS = 18;
     private static final int DATA_OUTPUT_GUARD_GRACE = 19;
     private static final int DATA_NO_BATTERY_OUTPUT_RETENTION = 20;
@@ -196,8 +196,8 @@ public class CrusherMenu extends AbstractContainerMenu implements MasteryMenuVie
         return data.get(DATA_ACTIVE_JOBS);
     }
 
-    public int parallelJobs() {
-        return data.get(DATA_PARALLEL_JOBS);
+    public int batchSize() {
+        return data.get(DATA_BATCH_SIZE);
     }
 
     public int statusCode() {
@@ -339,7 +339,7 @@ public class CrusherMenu extends AbstractContainerMenu implements MasteryMenuVie
     public double statValue(int dataIndex) {
         return switch (dataIndex) {
             case DATA_INPUT_SLOTS -> effectiveInputSlots();
-            case DATA_PARALLEL_JOBS -> parallelJobs();
+            case DATA_BATCH_SIZE -> batchSize();
             default -> data.get(dataIndex) / (double) STAT_SCALE;
         };
     }
@@ -376,8 +376,8 @@ public class CrusherMenu extends AbstractContainerMenu implements MasteryMenuVie
         return DATA_REFINEMENT_POTENTIAL;
     }
 
-    public static int parallelJobsDataIndex() {
-        return DATA_PARALLEL_JOBS;
+    public static int batchSizeDataIndex() {
+        return DATA_BATCH_SIZE;
     }
 
     public static int outputGuardGraceDataIndex() {

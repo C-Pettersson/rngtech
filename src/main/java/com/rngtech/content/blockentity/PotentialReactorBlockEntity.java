@@ -73,6 +73,8 @@ public class PotentialReactorBlockEntity extends BaseMachineBlockEntity implemen
     private static final int DATA_PROCESSING_SPEED = 13;
     private static final int DATA_STABILITY = 14;
     private static final int DATA_REFINEMENT_POTENTIAL = 15;
+    private static final int DATA_FLAT_ENERGY_GENERATION = 16;
+    private static final int DATA_BASE_ENERGY_GENERATION = 17;
     private static final int STAT_SCALE = 100;
 
     private final ItemStackHandler processInventory = new ItemStackHandler(PROCESS_SLOT_COUNT) {
@@ -144,7 +146,9 @@ public class PotentialReactorBlockEntity extends BaseMachineBlockEntity implemen
                 case DATA_RECIPE_ENERGY -> currentRecipeEnergy(stats);
                 case DATA_PROCESSING_LEVEL -> stats.intValue(MachineStat.PROCESSING_LEVEL);
                 case DATA_STATUS -> statusCode(stats);
-                case DATA_ENERGY_GENERATION -> scaledStat(stats, MachineStat.ENERGY_GENERATION);
+                case DATA_ENERGY_GENERATION -> (int) Math.round(stats.effectiveEnergyGenerationMultiplier() * STAT_SCALE);
+                case DATA_FLAT_ENERGY_GENERATION -> (int) Math.round(stats.effectiveFlatEnergyGenerationBonus() * STAT_SCALE);
+                case DATA_BASE_ENERGY_GENERATION -> (int) Math.round(baseEnergyPerTick() * STAT_SCALE);
                 case DATA_ENERGY_CAPACITY_STAT -> scaledStat(stats, MachineStat.ENERGY_CAPACITY);
                 case DATA_ENERGY_TRANSFER -> scaledStat(stats, MachineStat.ENERGY_TRANSFER);
                 case DATA_EFFICIENCY -> scaledStat(stats, MachineStat.EFFICIENCY);
@@ -161,7 +165,7 @@ public class PotentialReactorBlockEntity extends BaseMachineBlockEntity implemen
 
         @Override
         public int getCount() {
-            return DATA_REFINEMENT_POTENTIAL + 1;
+            return DATA_BASE_ENERGY_GENERATION + 1;
         }
     };
 
@@ -871,5 +875,11 @@ public class PotentialReactorBlockEntity extends BaseMachineBlockEntity implemen
         public boolean canReceive() {
             return false;
         }
+    }
+
+    /** Generation before machine and part stats, for the Stats tab breakdown; 0 when unknown. */
+    private double baseEnergyPerTick() {
+        ReactorWork work = nextWork();
+        return work == null ? 0.0 : work.energy() / (double) Math.max(1, work.processingTicks());
     }
 }

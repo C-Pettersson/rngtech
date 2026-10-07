@@ -467,7 +467,13 @@ public class CavitationGeneratorScreen extends AbstractContainerScreen<Cavitatio
                     MachineScreenStyle.statLayerTooltip(menu.getSlot(menu.refinementTargetSlot()).getItem(), STAT_TYPES[index], value)
             );
         }
-        return statLines;
+        return MachineScreenStyle.withGenerationBreakdown(
+                STAT_TYPES,
+                statLines,
+                menu.energyPerTick(),
+                menu.statValue(CavitationGeneratorMenu.baseEnergyGenerationDataIndex()),
+                menu.statValue(CavitationGeneratorMenu.flatEnergyGenerationDataIndex())
+        );
     }
 
     private String statValue(int index) {

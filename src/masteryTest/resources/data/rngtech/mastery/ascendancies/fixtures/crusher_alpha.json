@@ -120,7 +120,7 @@
             "y": 2,
             "effects": [
                 {
-                    "stat": "PARALLEL_JOBS",
+                    "stat": "BATCH_SIZE",
                     "operation": "ADD",
                     "value": 1
                 }
