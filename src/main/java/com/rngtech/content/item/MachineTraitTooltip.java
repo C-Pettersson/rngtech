@@ -15,6 +15,7 @@ import com.rngtech.rpg.Rarity;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.world.item.ItemStack;
 
 import java.util.List;
@@ -121,16 +122,12 @@ final class MachineTraitTooltip {
     }
 
     static void appendTraitDetails(MachineTraits traits, List<Component> tooltipComponents) {
-        appendTraitDetails(traits, tooltipComponents, false);
+        appendTraitDetails(traits, tooltipComponents, ItemStack.EMPTY);
     }
 
-    /** {@code installedPart} splits rolled modifiers into local ones, which scale only the part, and global ones. */
-    static void appendTraitDetails(MachineTraits traits, List<Component> tooltipComponents, boolean installedPart) {
-        if (installedPart) {
-            appendPartModifierSections(traits.modifierSet(), tooltipComponents);
-        } else {
-            appendModifierSections(traits, tooltipComponents);
-        }
+    /** With Shift held, marks rolled modifiers that are local to {@code part}; an empty stack marks none. */
+    static void appendTraitDetails(MachineTraits traits, List<Component> tooltipComponents, ItemStack part) {
+        appendModifierSections(traits.modifierSet(), tooltipComponents, part);
         appendBehaviorSection(traits, tooltipComponents);
         if (TooltipKeyState.hasAltDown()) {
             appendTierTooltip(tooltipComponents, traits.modifierSet());
@@ -182,11 +179,11 @@ final class MachineTraitTooltip {
         ).withStyle(ChatFormatting.GRAY));
     }
 
-    private static void appendModifierSections(MachineTraits traits, List<Component> tooltipComponents) {
-        appendModifierSections(traits.modifierSet(), tooltipComponents);
+    private static void appendModifierSections(ModifierSet modifierSet, List<Component> tooltipComponents) {
+        appendModifierSections(modifierSet, tooltipComponents, ItemStack.EMPTY);
     }
 
-    private static void appendModifierSections(ModifierSet modifierSet, List<Component> tooltipComponents) {
+    private static void appendModifierSections(ModifierSet modifierSet, List<Component> tooltipComponents, ItemStack part) {
         boolean hasBaseModifiers = modifierSet.modifiers().stream().anyMatch(modifier -> !modifier.slot().isAffix());
         boolean hasRolledModifiers = modifierSet.modifiers().stream().anyMatch(modifier -> modifier.slot().isAffix());
         if (hasBaseModifiers) {
@@ -204,61 +201,19 @@ final class MachineTraitTooltip {
             tooltipComponents.add(Component.translatable("rngtech.tooltip.modifiers").withStyle(ChatFormatting.DARK_AQUA));
             for (var modifier : modifierSet.modifiers()) {
                 if (modifier.slot().isAffix()) {
-                    tooltipComponents.add(MachineModifierText.tooltipLine(modifier).withStyle(ChatFormatting.BLUE));
+                    tooltipComponents.add(rolledModifierLine(modifier, part));
                     appendModifierDescriptionDetail(modifier, tooltipComponents);
                 }
             }
         }
     }
 
-    private static void appendPartModifierSections(ModifierSet modifierSet, List<Component> tooltipComponents) {
-        appendBaseModifierSection(modifierSet, tooltipComponents);
-        List<MachineModifier> rolled = modifierSet.modifiers().stream().filter(modifier -> modifier.slot().isAffix()).toList();
-        appendRolledSection(
-                rolled.stream().filter(modifier -> !ComponentBaseStatCatalog.appliesToHost(modifier.stat())).toList(),
-                "rngtech.tooltip.modifiers.local",
-                "rngtech.tooltip.modifiers.local.detail",
-                tooltipComponents
-        );
-        appendRolledSection(
-                rolled.stream().filter(modifier -> ComponentBaseStatCatalog.appliesToHost(modifier.stat())).toList(),
-                "rngtech.tooltip.modifiers.global",
-                "rngtech.tooltip.modifiers.global.detail",
-                tooltipComponents
-        );
-    }
-
-    private static void appendBaseModifierSection(ModifierSet modifierSet, List<Component> tooltipComponents) {
-        List<MachineModifier> base = modifierSet.modifiers().stream().filter(modifier -> !modifier.slot().isAffix()).toList();
-        if (base.isEmpty()) {
-            return;
+    private static Component rolledModifierLine(MachineModifier modifier, ItemStack part) {
+        MutableComponent line = MachineModifierText.tooltipLine(modifier).withStyle(ChatFormatting.BLUE);
+        if (TooltipKeyState.hasShiftDown() && ComponentBaseStatCatalog.isLocalModifier(part, modifier)) {
+            line.append(Component.translatable("rngtech.tooltip.modifier.local").withStyle(ChatFormatting.DARK_GRAY));
         }
-        tooltipComponents.add(Component.empty());
-        tooltipComponents.add(Component.translatable("rngtech.tooltip.base_modifiers").withStyle(ChatFormatting.DARK_AQUA));
-        for (MachineModifier modifier : base) {
-            tooltipComponents.add(MachineModifierText.tooltipLine(modifier).withStyle(ChatFormatting.BLUE));
-            appendModifierDescriptionDetail(modifier, tooltipComponents);
-        }
-    }
-
-    private static void appendRolledSection(
-            List<MachineModifier> modifiers,
-            String headerKey,
-            String detailKey,
-            List<Component> tooltipComponents
-    ) {
-        if (modifiers.isEmpty()) {
-            return;
-        }
-        tooltipComponents.add(Component.empty());
-        tooltipComponents.add(Component.translatable(headerKey).withStyle(ChatFormatting.DARK_AQUA));
-        if (TooltipKeyState.hasShiftDown()) {
-            tooltipComponents.add(Component.translatable(detailKey).withStyle(ChatFormatting.DARK_GRAY));
-        }
-        for (MachineModifier modifier : modifiers) {
-            tooltipComponents.add(MachineModifierText.tooltipLine(modifier).withStyle(ChatFormatting.BLUE));
-            appendModifierDescriptionDetail(modifier, tooltipComponents);
-        }
+        return line;
     }
 
     private static void appendModifierDescriptionDetail(MachineModifier modifier, List<Component> tooltipComponents) {
