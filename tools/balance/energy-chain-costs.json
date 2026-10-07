@@ -1,0 +1,71 @@
+{
+    "description": "FE spent at base (unrolled) machine stats to produce one generator input. Read by the energyBalanceSim Gradle task. Recheck when chain recipes change.",
+    "inputs": {
+        "solid_fuel_burner": {
+            "input": "1 coal",
+            "base_amount": 1600,
+            "chain_fe": 0,
+            "chain": "Mined. Vanilla burn time 1600 ticks; tier 1 item fuel."
+        },
+        "bio_generator": {
+            "input": "1 rich biomass",
+            "base_amount": 3200,
+            "stat": "RICH_BIOMASS_POWER",
+            "chain_fe": 0,
+            "chain": "Wooden Composter (0 FE) composted biomass + bone meal, crafted."
+        },
+        "potential_reactor/broken_circuit": {
+            "input": "1 broken circuit",
+            "chain_fe": 0,
+            "chain": "Metal Press circuit failure byproduct; no dedicated FE."
+        },
+        "potential_reactor/fragment": {
+            "input": "1 fragment",
+            "chain_fe": 0,
+            "obtainable": false,
+            "chain": "No producing recipe or code exists."
+        },
+        "potential_reactor/recycling_byproduct": {
+            "input": "1 recycling byproduct",
+            "chain_fe": 1200,
+            "chain": "Component Recycler on a pitted (worn) cavitation rotor: 1,200 FE. Pitted rotors first exist at Stage 5 (Cavitation).",
+            "available_from_stage": 5
+        },
+        "potential_reactor/spent_catalyst": {
+            "input": "1 spent catalyst",
+            "chain_fe": 0,
+            "obtainable": false,
+            "chain": "No producing recipe or code exists."
+        },
+        "corrosion_cell/scrap": {
+            "input": "1 scrap + 1 electrolyte",
+            "chain_fe": 0,
+            "chain": "Scrap is a byproduct; electrolyte crafted 8 per batch with no FE."
+        },
+        "corrosion_cell/iron_plate": {
+            "input": "1 iron plate + 1 electrolyte",
+            "chain_fe": 2400,
+            "chain": "Metal Press iron plate 2,400 FE; ingot from vanilla furnace; electrolyte crafted."
+        },
+        "corrosion_cell/copper_plate": {
+            "input": "1 copper plate + 1 electrolyte",
+            "chain_fe": 2400,
+            "chain": "Metal Press copper plate 2,400 FE; ingot from vanilla furnace; electrolyte crafted."
+        },
+        "syngas_combustor/syngas_power": {
+            "input": "1000 mB syngas",
+            "chain_fe": 6600,
+            "chain": "Coal Gasifier 6,000 FE + Crusher coal dust 600 FE."
+        },
+        "ammonia_fuel_cell/ammonia_power": {
+            "input": "1000 mB ammonia",
+            "chain_fe": 32472,
+            "chain": "Ammonia Synthesizer 12,000 + SMR 12,000 + Melter methane 8,000 + Crusher organic reagent 600 - Cavitation nitrogen credit 128."
+        },
+        "vacuum_collapse_generator/void_catalyst": {
+            "input": "1 void catalyst",
+            "chain_fe": 45600,
+            "chain": "Tungstensteel plate: Metal Press 2,400 + half of Alloy Furnace batch (2 tungsten 38,400, steel 24,480, coal dust 600, alloy 22,880). Ender pearl and echo shard carry no FE."
+        }
+    }
+}

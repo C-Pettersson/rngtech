@@ -59,7 +59,7 @@ public final class ComponentBaseStatCatalog {
         MORE
     }
 
-    private record Profile(
+    record Profile(
             MachineStatAccumulator baseStats,
             Map<MachineStat, MergeRule> mergeRules,
             List<MachineStat> summaryStats
@@ -80,8 +80,12 @@ public final class ComponentBaseStatCatalog {
     }
 
     private static MachineStatAccumulator effectiveStats(ItemStack stack, Profile profile) {
+        return effectiveStats(profile, componentTraits(stack));
+    }
+
+    static MachineStatAccumulator effectiveStats(Profile profile, MachineTraits traits) {
         MachineStatAccumulator stats = profile.baseStats();
-        for (MachineModifier modifier : componentTraits(stack).modifiers()) {
+        for (MachineModifier modifier : traits.modifiers()) {
             if (modifier.slot().isAffix() && !HARD_GATE_STATS.contains(modifier.stat())) {
                 stats.apply(modifier);
             }
@@ -132,8 +136,7 @@ public final class ComponentBaseStatCatalog {
             return;
         }
 
-        MachineStatAccumulator contribution = effectiveStats(stack, profile);
-        applyProfileContribution(target, profile, contribution, componentTraits(stack));
+        applyContribution(target, profile, componentTraits(stack));
         for (MachineModifier modifier : componentTraits(stack).modifiers()) {
             if (modifier.slot().isAffix() && HOST_STATS.contains(modifier.stat())) {
                 target.apply(modifier);
@@ -146,9 +149,12 @@ public final class ComponentBaseStatCatalog {
             return;
         }
 
-        Profile profile = vacuumCollapseNozzle(nozzle.material());
-        MachineStatAccumulator contribution = effectiveStats(stack, profile);
-        applyProfileContribution(target, profile, contribution, componentTraits(stack));
+        applyContribution(target, vacuumCollapseNozzle(nozzle.material()), componentTraits(stack));
+    }
+
+    /** Registry-free part merge, shared with headless balance simulation. */
+    static void applyContribution(MachineStatAccumulator target, Profile profile, MachineTraits traits) {
+        applyProfileContribution(target, profile, effectiveStats(profile, traits), traits);
     }
 
     private static void applyProfileContribution(
@@ -261,7 +267,7 @@ public final class ComponentBaseStatCatalog {
                 .build();
     }
 
-    private static Profile bioChamber() {
+    static Profile bioChamber() {
         return builder()
                 .more(MachineStat.FUEL_EFFICIENCY, 1.0)
                 .more(MachineStat.POTATO_POWER, 1.0)
@@ -304,7 +310,7 @@ public final class ComponentBaseStatCatalog {
                 .build();
     }
 
-    private static Profile heatCore(HeatCoreMaterial material) {
+    static Profile heatCore(HeatCoreMaterial material) {
         return builder()
                 .add(MachineStat.ENERGY_GENERATION, material.energyGeneration())
                 .more(MachineStat.FUEL_EFFICIENCY, material.fuelEfficiency())
@@ -318,7 +324,7 @@ public final class ComponentBaseStatCatalog {
                 .build();
     }
 
-    private static Profile fuelBox(FuelBoxMaterial material) {
+    static Profile fuelBox(FuelBoxMaterial material) {
         return builder()
                 .add(MachineStat.INPUT_SLOTS, material.fuelSlots())
                 .more(MachineStat.FUEL_EFFICIENCY, material.fuelEfficiency())
@@ -326,7 +332,7 @@ public final class ComponentBaseStatCatalog {
                 .build();
     }
 
-    private static Profile reactorChamber(ReactorChamberMaterial material) {
+    static Profile reactorChamber(ReactorChamberMaterial material) {
         return builder()
                 .add(MachineStat.PROCESSING_LEVEL, material.stage())
                 .add(MachineStat.ENERGY_GENERATION, material.energyGenerationBonus())
@@ -335,7 +341,7 @@ public final class ComponentBaseStatCatalog {
                 .build();
     }
 
-    private static Profile recoveryFilter(RecoveryFilterMaterial material) {
+    static Profile recoveryFilter(RecoveryFilterMaterial material) {
         return builder()
                 .more(MachineStat.EFFICIENCY, material.efficiency())
                 .more(MachineStat.PROCESSING_SPEED, material.processingSpeed())
@@ -343,13 +349,13 @@ public final class ComponentBaseStatCatalog {
                 .build();
     }
 
-    private static Profile containmentLining(ContainmentLiningMaterial material) {
+    static Profile containmentLining(ContainmentLiningMaterial material) {
         return builder()
                 .more(MachineStat.STABILITY, material.stability())
                 .build();
     }
 
-    private static Profile vacuumCollapsePart(MachinePartType partType, VacuumCollapsePartMaterial material) {
+    static Profile vacuumCollapsePart(MachinePartType partType, VacuumCollapsePartMaterial material) {
         return switch (partType) {
             case VOID_CHAMBER -> builder()
                     .add(MachineStat.PROCESSING_LEVEL, material.stage())
@@ -370,7 +376,7 @@ public final class ComponentBaseStatCatalog {
         };
     }
 
-    private static Profile cavitationRotor(CavitationRotorMaterial material) {
+    static Profile cavitationRotor(CavitationRotorMaterial material) {
         return builder()
                 .add(MachineStat.PROCESSING_LEVEL, material.stage())
                 .add(MachineStat.DURABILITY, CavitationRotorMaterial.BASE_DURABILITY)
@@ -382,7 +388,7 @@ public final class ComponentBaseStatCatalog {
                 .build();
     }
 
-    private static Profile collapseNozzle(CollapseNozzleMaterial material) {
+    static Profile collapseNozzle(CollapseNozzleMaterial material) {
         return builder()
                 .more(MachineStat.ENERGY_GENERATION, material.generationMultiplier())
                 .more(MachineStat.ENERGY_TRANSFER, 1.0 + material.stage() * 0.04)
@@ -392,7 +398,7 @@ public final class ComponentBaseStatCatalog {
                 .build();
     }
 
-    private static Profile vacuumCollapseNozzle(CollapseNozzleMaterial material) {
+    static Profile vacuumCollapseNozzle(CollapseNozzleMaterial material) {
         return builder()
                 .more(MachineStat.ENERGY_GENERATION, material.vacuumGenerationMultiplier())
                 .more(MachineStat.ENERGY_TRANSFER, material.vacuumGenerationMultiplier())
@@ -409,7 +415,7 @@ public final class ComponentBaseStatCatalog {
                 .build();
     }
 
-    private static Profile servo(ServoMaterial material) {
+    static Profile servo(ServoMaterial material) {
         return builder()
                 .more(MachineStat.PROCESSING_SPEED, percentMultiplier(material.processingSpeedPercent()))
                 .more(MachineStat.ENERGY_USAGE, 1.0)
@@ -441,7 +447,7 @@ public final class ComponentBaseStatCatalog {
                 .buildWithoutSummary();
     }
 
-    private static Profile fuelCellMembrane() {
+    static Profile fuelCellMembrane() {
         return builder()
                 .more(MachineStat.ENERGY_GENERATION, 1.0)
                 .more(MachineStat.ENERGY_TRANSFER, 1.0)
@@ -462,7 +468,7 @@ public final class ComponentBaseStatCatalog {
                 .build();
     }
 
-    private static Profile solarArrayExtender(SolarArrayExtenderMaterial material) {
+    static Profile solarArrayExtender(SolarArrayExtenderMaterial material) {
         return builder()
                 .add(MachineStat.SOLAR_PANEL_LIMIT, material.rangeBonus())
                 .more(MachineStat.ENERGY_GENERATION, material.generationMultiplier())
