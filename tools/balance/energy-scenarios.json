@@ -4,15 +4,6 @@
         "current": {},
         "proposal": {
             "label": "Proposal A",
-            "solar": {
-                "extender_range_bonus": 1,
-                "extender_generation": 1.0,
-                "controller_flat_once": true,
-                "max_range": 2,
-                "panel_clear_generation": {
-                    "SPARKSTEEL": 20
-                }
-            },
             "corrosion_recipes": [
                 {"id": "scrap", "input": "1 scrap + 1 electrolyte", "energy": 4800, "ticks": 160, "chain_fe": 0},
                 {"id": "iron_plate", "input": "1 iron plate + 1 electrolyte", "energy": 12800, "ticks": 160, "chain_fe": 2400},

@@ -1454,7 +1454,8 @@ public final class EnergyBalanceSimulation {
 
         record Solar(Integer extenderRangeBonus, Double extenderGeneration, boolean controllerFlatOnce, int maxRange,
                 Map<String, Integer> panelClearGeneration) {
-            static final Solar CURRENT = new Solar(null, null, false, 6, Map.of());
+            /** SolarArrayControllerBlockEntity: flat bonus once per array, MAX_RANGE 2. */
+            static final Solar CURRENT = new Solar(null, null, true, 2, Map.of());
         }
 
         /** Reactor gear-fuel value multiplier: {@code stage0 + perStage * stage}, so obsolete late gear is worth more than junk. */
@@ -1491,8 +1492,8 @@ public final class EnergyBalanceSimulation {
                 solar = new Solar(
                         value.has("extender_range_bonus") ? value.get("extender_range_bonus").getAsInt() : null,
                         value.has("extender_generation") ? value.get("extender_generation").getAsDouble() : null,
-                        value.has("controller_flat_once") && value.get("controller_flat_once").getAsBoolean(),
-                        value.has("max_range") ? value.get("max_range").getAsInt() : 6,
+                        !value.has("controller_flat_once") || value.get("controller_flat_once").getAsBoolean(),
+                        value.has("max_range") ? value.get("max_range").getAsInt() : Solar.CURRENT.maxRange(),
                         intMap(value, "panel_clear_generation")
                 );
             }

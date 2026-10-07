@@ -63,7 +63,7 @@ public class SolarArrayControllerBlockEntity extends BaseMachineBlockEntity impl
     public static final int STATUS_FULL = 5;
     public static final int STATUS_BLOCKED = 6;
 
-    private static final int MAX_RANGE = 6;
+    private static final int MAX_RANGE = 2;
     private static final int SCAN_INTERVAL_TICKS = 20;
     private static final int DATA_ENERGY = 0;
     private static final int DATA_ENERGY_CAPACITY = 1;
@@ -398,7 +398,7 @@ public class SolarArrayControllerBlockEntity extends BaseMachineBlockEntity impl
 
             panel.markControlled(level.getGameTime());
             materialState.accept(panel);
-            double generation = adjustedPanelGeneration(level, panel, stats) / controllerClaims(level, panelPos);
+            double generation = panelGeneration(level, panel, stats) / controllerClaims(level, panelPos);
             if (generation > 0.0) {
                 active++;
                 generatedThisTick += generation;
@@ -407,6 +407,10 @@ public class SolarArrayControllerBlockEntity extends BaseMachineBlockEntity impl
             }
         }
 
+        if (generatedThisTick > 0.0) {
+            double controllerEfficiency = Math.max(0.01, stats.value(MachineStat.EFFICIENCY));
+            generatedThisTick = Math.max(0.0, stats.generatedEnergyTotal(generatedThisTick, 1)) * controllerEfficiency;
+        }
         if (active > 1 && materialState.singleMaterial() && stats.value(MachineStat.SOLAR_PANEL_SYNCHRONIZATION) > 0.0) {
             generatedThisTick *= 1.0 + stats.value(MachineStat.SOLAR_PANEL_SYNCHRONIZATION) / 100.0;
         }
@@ -434,7 +438,8 @@ public class SolarArrayControllerBlockEntity extends BaseMachineBlockEntity impl
         return stored > 0;
     }
 
-    private double adjustedPanelGeneration(Level level, SolarPanelBlockEntity panel, MachineStatAccumulator controllerStats) {
+    /** One panel's output before the controller's generation stats, which apply once to the whole array. */
+    private double panelGeneration(Level level, SolarPanelBlockEntity panel, MachineStatAccumulator controllerStats) {
         int status = panel.sunlightStatus(level, panel.getBlockPos());
         if (status != SolarPanelBlockEntity.STATUS_CLEAR
                 && status != SolarPanelBlockEntity.STATUS_WEATHER
@@ -468,11 +473,7 @@ public class SolarArrayControllerBlockEntity extends BaseMachineBlockEntity impl
         }
         generation = SolarPanelBlockEntity.applyPeakSolarBonus(level, status, panelStats, generation);
 
-        if (generation <= 0.0) {
-            return 0.0;
-        }
-        double controllerEfficiency = Math.max(0.01, controllerStats.value(MachineStat.EFFICIENCY));
-        return Math.max(0.0, controllerStats.generatedEnergyTotal(generation, 1)) * controllerEfficiency;
+        return Math.max(0.0, generation);
     }
 
     private int statusFor(Level level, int active, int blocked, MachineStatAccumulator stats) {

@@ -12,7 +12,7 @@ Solar power is a passive FE generator path. It depends on daylight, sky access, 
 | Crude Solar Panel | `rngtech:crude_solar_panel` | 1 | `4 FE/t` | `1 FE/t` | `256 FE` |
 | Copper Solar Panel | `rngtech:copper_solar_panel` | 2 | `8 FE/t` | `2 FE/t` | `512 FE` |
 | Gold Solar Panel | `rngtech:gold_solar_panel` | 3 | `12 FE/t` | `3 FE/t` | `512 FE` |
-| Sparksteel Solar Panel | `rngtech:sparksteel_solar_panel` | 5 | `24 FE/t` | `8 FE/t` | `1024 FE` |
+| Sparksteel Solar Panel | `rngtech:sparksteel_solar_panel` | 5 | `20 FE/t` | `7 FE/t` | `1024 FE` |
 | Solar Array Controller | `rngtech:solar_array_controller` | 4 | Aggregates panels | Aggregates panels | `512 FE` plus optional Battery Cell |
 
 Panels are registered blocks with block entities and FE extraction capability. They do not have item slots, fuel slots, processing recipes, or a placed-machine UI.
@@ -41,16 +41,16 @@ The controller scans a bounded horizontal area every 20 ticks:
 | Range rule | Value |
 |---|---:|
 | Base range | `1` |
-| Maximum effective range | `6` |
+| Maximum effective range | `2` |
 | Scan height | Same Y level as the controller |
 
 Range is a square radius around the controller. A range `1` controller can use the eight surrounding positions, range `2` can use a `5x5` field around the controller, and so on. The controller's own position is excluded. Panels must be connected to the controller through adjacent Solar Panels inside that square; disconnected panel islands inside the range are ignored.
 
-The Array Expansion modifier now increases controller range instead of panel count. The unmodified controller has range `1`; controller rolls can add up to `+2`; an installed Solar Array Extender can add up to `+4`; the final effective range is capped at `6`.
+The Array Expansion modifier now increases controller range instead of panel count. The unmodified controller has range `1`; controller rolls can add up to `+2`; an installed Solar Array Extender adds `+1`; the final effective range is capped at `2`, so an array holds at most `24` panels.
 
-Overlapping controllers share panel generation. If two controllers both cover the same panel, each receives half of that panel's controller-adjusted generation for that tick.
+Overlapping controllers share panel generation. If two controllers both cover the same panel, each receives half of that panel's generation for that tick.
 
-While a controller owns a panel for aggregation, the panel's standalone generation/export path is suppressed briefly so the same panel does not double-generate. The controller computes each selected panel's environment-adjusted generation, applies solar controller modifiers and generation/efficiency traits, stores FE internally or in the installed Battery Cell, then exports through its block energy capability.
+While a controller owns a panel for aggregation, the panel's standalone generation/export path is suppressed briefly so the same panel does not double-generate. The controller sums each selected panel's environment-adjusted generation, then applies its own generation modifiers, flat generation and efficiency once to the whole array, so a flat roll adds its FE/t once rather than once per panel. It stores FE internally or in the installed Battery Cell, then exports through its block energy capability.
 
 If every panel position inside the current range is filled by Solar Panels of the same stage, the controller applies a `20%` Set bonus. The Process tab has a single icon button that toggles a persistent client-side ghost range overlay for the placed controller. The overlay remains visible after the UI closes while the controller is loaded and the toggle is enabled. The Process tab also exposes tooltips for current FE/t, stored FE, connector-controlled max output, active panel count, blocked panel count, and daylight/weather state.
 
@@ -61,7 +61,7 @@ If every panel position inside the current range is filled by Solar Panels of th
 | Sparksteel Solar Array Extender | `rngtech:sparksteel_solar_array_extender` | Clear-day bonus |
 | Aethergold Solar Array Extender | `rngtech:aethergold_solar_array_extender` | Nighttime bonus |
 
-Both extenders provide the same base array range and generation contribution. Their implicit identity decides whether the component leans toward daytime or nighttime output. Stored rolled affixes on the component also contribute while it is installed.
+Both extenders add `+1` array range and no generation multiplier. Their implicit identity decides whether the component leans toward daytime or nighttime output. Stored rolled affixes on the component also contribute while it is installed.
 
 ## Solar Panel Modifiers
 
