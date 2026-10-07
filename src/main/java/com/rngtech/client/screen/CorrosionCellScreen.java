@@ -42,6 +42,7 @@ public class CorrosionCellScreen extends AbstractContainerScreen<CorrosionCellMe
     private static final int ELECTROLYTE_METER_Y = 36;
     private static final int ELECTROLYTE_METER_WIDTH = 12;
     private static final int ELECTROLYTE_METER_HEIGHT = 38;
+    private static final int PURGE_BUTTON_X = ELECTROLYTE_METER_X + (ELECTROLYTE_METER_WIDTH - FluidPurgeButton.SIZE) / 2;
     private static final int ENERGY_METER_X = 158;
     private static final int ENERGY_METER_Y = 36;
     private static final int ENERGY_METER_WIDTH = 12;
@@ -456,7 +457,7 @@ public class CorrosionCellScreen extends AbstractContainerScreen<CorrosionCellMe
                 guiGraphics,
                 leftPos,
                 topPos,
-                ELECTROLYTE_METER_X + 3,
+                PURGE_BUTTON_X,
                 ELECTROLYTE_METER_Y + 2,
                 menu.electrolyteFluid() > 0
         );
@@ -469,7 +470,7 @@ public class CorrosionCellScreen extends AbstractContainerScreen<CorrosionCellMe
                 topPos,
                 mouseX,
                 mouseY,
-                ELECTROLYTE_METER_X + 3,
+                PURGE_BUTTON_X,
                 ELECTROLYTE_METER_Y + 2,
                 CorrosionCellBlockEntity.PURGE_ELECTROLYTE_TANK
         );
@@ -483,7 +484,7 @@ public class CorrosionCellScreen extends AbstractContainerScreen<CorrosionCellMe
                 topPos,
                 mouseX,
                 mouseY,
-                ELECTROLYTE_METER_X + 3,
+                PURGE_BUTTON_X,
                 ELECTROLYTE_METER_Y + 2,
                 Component.translatable("rngtech.purge.target.electrolyte_tank"),
                 menu.electrolyteFluid() > 0 ? menu.electrolyteFluidName() : Component.translatable("rngtech.purge.empty_fluid"),
