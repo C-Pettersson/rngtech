@@ -25,7 +25,7 @@ These eight are specified, with their ranges, in the [Unique Items PRD](../prds/
 |---|---|---:|---|---|---|
 | Fortress Heater Element | Heat Core | 4 | Nether fortress chest | Titanium-class Maximum Temperature, 75% less Warmup Time, Overdrive Margin hook | More Energy Usage, less Temperature Stability, poor Solid Fuel Burner fuel efficiency |
 | Igloo Basement Thermostat | Heat Core | 2 | Igloo basement chest | Top Temperature Stability and Overheat Tolerance, early `POWER_GRACE`, Heat Window hook | Bronze-class Maximum Temperature cap, less Heat Transfer |
-| Mineshaft Worn Pick-Jaw | Crush Head | 2 | Mineshaft minecart chest | +1 Processing Level over slot stage, +1 to +3 Parallel Jobs, Jam Recovery hook | Jam Chance on every cycle, less Output Amount |
+| Mineshaft Worn Pick-Jaw | Crush Head | 2 | Mineshaft minecart chest | +1 Processing Level over slot stage, +1 to +3 Batch Size, Jam Recovery hook | Jam Chance on every cycle, less Output Amount |
 | Crying Crucible | Alloy Crucible | 3 | Ruined portal chest | Blend Speed and Blend Heat Reduction without Blendwright | Less Stability and Temperature Stability |
 | Trial Vault Escapement | Servo | 6 | Ominous trial vault | `ESCAPEMENT` first-cycle speed, Mold Swap Time hook | Slower sustained cycles, no `POWER_GRACE` |
 | Witch-Bottle Reflux Pump | Fluid Pump | 5 | Witch drop | Doubled host Fluid Capacity, `REFLUX` cheaper Sprinkler | Much less Fluid Transfer |

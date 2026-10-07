@@ -15,7 +15,7 @@ Calibration is separate from refinement. Calibration creates component validity 
 | Steel Resonance Calibrator Chassis | 4 | Reinforced stabilizer | Slower but more stable and output-guarded. |
 | Titanium Resonance Calibrator Chassis | 6 | Precision frame | Better speed, precision, stability, and RP outcomes. |
 | Lead Resonance Calibrator Chassis | 4 | Dense calibration bed | Two-lane bulk sidegrade with lower precision. |
-| Tungstensteel Resonance Calibrator Chassis | 7 | Dense resonance array | Three-lane endgame bulk branch with `DENSE_PARALLEL`. |
+| Tungstensteel Resonance Calibrator Chassis | 7 | Dense resonance array | Three-lane endgame bulk branch. |
 | Nullite Resonance Calibrator Chassis | 7 | Phase precision frame | One-lane endgame precision branch with stronger quality and RP control. |
 
 All chassis are block items, roll machine RPG traits, support placed-machine refinement, expose FE input, and share the same Process, Gear, Stats, Refinement, and Mastery screen pattern.
@@ -117,7 +117,7 @@ Future Exotic content should preserve that branch choice instead of merging both
 
 Resonance Calibrators enter the [shared Machine Mastery tree](../systems/machine-mastery.md) at the Control start, which they share with the Metal Press. Each chassis keeps its own progression, and build codes paste between the two families. The start grants 20 Control, 0 Drive, and 0 Reserve. In addition to the [shared attribute conversions](../systems/machine-mastery.md#attributes), each Control point grants 0.05% increased Calibration Precision.
 
-The Resonance Calibrator is the only family that uses Calibration Precision and Catalyst Efficiency nodes. It also uses Processing Speed, Energy Usage, Stability, Energy Capacity, Instant Process Chance, and Super Output Chance; Super Output Chance only affects recipes that allow bonus output. Heat, fuel, fluid, and output-amount effects are marked inactive. Parallel Jobs adds jobs per lane only with the Mass Tuner’s Resonance Array. Single Pass removes Super Output Chance in exchange for 30% more Processing Speed. Mastery stats apply after chassis base stats and machine traits, before installed Gear, the no-Battery-Cell penalty, and Bulk Speed. Shared-tree nodes do not change Gear slots, lanes, or coil stage reach. Allocation changes reset the active calibration cycle but keep inventory, stored patterns, and the selected pattern. Silent Operation mutes the calibrator's machine loop.
+The Resonance Calibrator is the only family that uses Calibration Precision and Catalyst Efficiency nodes. It also uses Processing Speed, Energy Usage, Stability, Energy Capacity, Instant Process Chance, and Super Output Chance; Super Output Chance only affects recipes that allow bonus output. Heat, fuel, fluid, and output-amount effects are marked inactive. A chassis's lanes are its base [Batch Size](../reference/machine-stats.md): one input stack calibrates that many copies per cycle, each paying its own FE, with Batch Overhead added per extra copy. Single Pass removes Super Output Chance in exchange for 30% more Processing Speed. Mastery stats apply after chassis base stats and machine traits, before installed Gear, the no-Battery-Cell penalty, and Bulk Speed. Shared-tree nodes do not change Gear slots, lanes, or coil stage reach. Allocation changes reset the active calibration cycle but keep inventory, stored patterns, and the selected pattern. Silent Operation mutes the calibrator's machine loop.
 
 Completed calibrations grant `machine_xp` once per calibrated job, so multi-lane chassis earn XP for each job completed in a cycle. Super Output bonuses, missing Gear, invalid or stage-gated recipes, output-blocked waits, and no-power pauses grant no XP. If `machine_xp_band` is omitted, positive-XP recipes map the required calibrator stage onto the [shared work-band scale](../systems/machine-mastery.md#xp-and-chassis-ownership) as old band `1 + (stage - 1) × 4`, the same mapping Crusher hardness uses.
 
@@ -138,7 +138,7 @@ Resonance Calibrator machines choose between Harmonist and Mass Tuner when they 
 - Harmonist’s Resonant Streak counts consecutive calibrations of one family on one pattern and raises the stability floor by Streak Floor each, up to the Streak Cap. The streak is stored in `rngtech:calibration_streak`, and the calibrator tooltip shows the current floor.
 - Pattern Memory saves the streak on the dropped machine and lets it survive one change of pattern or family.
 - Mass Tuner’s Shared Field spends one catalyst per cycle however many lanes run, and Stabilizer Economy consumes recipe stabilizers every other cycle. Lane Sync applies while more than one operation runs.
-- Resonance Array runs lanes × (1 + Parallel Jobs) operations from the lane inputs. Overreach’s Coil Reach counts as extra coil stage when checking a recipe’s required stage.
+- Resonance Array doubles Batch Size, so a three-lane chassis calibrates six copies per cycle. Overreach’s Coil Reach counts as extra coil stage when checking a recipe’s required stage.
 
 <!-- ascendancy-trees:start -->
 
@@ -170,7 +170,7 @@ Resonance Calibrator machines choose between Harmonist and Mass Tuner when they 
 | Tight Field | Small | Shared Field | 8% increased Calibration Precision. |
 | **Lane Sync** | Notable | Tight Field | 15% more Processing Speed while more than one lane runs. |
 | Focused Array | Small | Lane Sync | 8% increased Calibration Precision. |
-| **Resonance Array** | Deep notable | Focused Array | +1 Parallel Jobs. Each lane runs one job per Parallel Job plus one; the stability ceiling drops by another 15. |
+| **Resonance Array** | Deep notable | Focused Array | 100% increased Batch Size. The stability ceiling drops by another 15. |
 | Lean Field | Small | Shared Field | 5% reduced Energy Use. |
 | **Catalytic Surplus** | Notable | Lean Field | 25% increased Catalyst Efficiency. |
 | Broad Field | Small | Shared Field | 8% increased Stability. |

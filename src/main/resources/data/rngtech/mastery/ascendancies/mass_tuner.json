@@ -133,9 +133,9 @@
             "y": 4,
             "effects": [
                 {
-                    "stat": "PARALLEL_JOBS",
-                    "operation": "ADD",
-                    "value": 1
+                    "stat": "BATCH_SIZE",
+                    "operation": "INCREASED_PERCENT",
+                    "value": 100
                 }
             ],
             "behaviors": [

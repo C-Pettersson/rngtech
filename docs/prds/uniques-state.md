@@ -21,7 +21,7 @@ Status: **Planned** for the 2.0 release. The PRD was accepted on 2026-10-05. No 
 
 Recorded 2026-10-05 when the PRD was accepted:
 
-- Ranged stat lines that roll per copy, so copies can be well or poorly rolled. Integer stats roll whole numbers, for example +1 to +3 Parallel Jobs.
+- Ranged stat lines that roll per copy, so copies can be well or poorly rolled. Integer stats roll whole numbers, for example +1 to +3 Batch Size.
 - No limit on Uniques per machine.
 - Uniques drop unidentified and roll on identification.
 

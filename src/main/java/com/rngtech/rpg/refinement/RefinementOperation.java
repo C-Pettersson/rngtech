@@ -22,7 +22,7 @@ public enum RefinementOperation {
                     MachineStat.ENERGY_GENERATION,
                     MachineStat.ENERGY_CAPACITY,
                     MachineStat.ENERGY_CAPACITY_FLAT,
-                    MachineStat.PARALLEL_JOBS,
+                    MachineStat.BATCH_SIZE,
                     MachineStat.CRUSHER_SALVAGE_CHANCE,
                     MachineStat.MINING_SPEED,
                     MachineStat.ATTACK_SPEED,

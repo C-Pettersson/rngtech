@@ -17,6 +17,7 @@ public enum MachineBehavior implements StringRepresentable {
     CELL_LEAKAGE_DAMPING,
     CHARGE_BALANCER,
     BURST_RELEASE,
+    /** Retired: batching needs no behavior. Kept so stored traits that name it still decode. */
     DENSE_PARALLEL,
     BULK_SPEED,
     OUTPUT_GUARD,

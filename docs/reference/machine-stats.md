@@ -4,7 +4,7 @@ Machine stats are the canonical values modified by RNGTech progression systems.
 
 Effective stats are built from machine-family defaults plus an authored machine or chassis base stat profile. Installable components and Battery Cells also have authored base profiles: a component's stored rolled affixes are evaluated against that component first, then the effective component contribution is merged into the host machine. Host rolled affixes, refinement changes, and runtime effects then scale or add to the assembled machine. Numeric rolled affixes carry a tier and value range, but base stat profiles do not have modifier tiers and are not removable modifiers.
 
-Slot counts, processing level, parallel jobs, buffer size, and upgrade limit roll as whole numbers. Multiplier-style stats roll as decimal values.
+Slot counts, processing level, batch size, buffer size, and upgrade limit roll as whole numbers. Multiplier-style stats roll as decimal values.
 
 Modifier operations currently support:
 
@@ -48,7 +48,8 @@ Modifier operations currently support:
 | `BURST_DURATION` | Prototype | Number of ticks a chassis can sustain future burst-risk behavior. |
 | `EFFICIENCY` | Prototype | Non-recipe efficiency. For generators and Potential Reactors, it increases recovered or generated FE. For fuel machines, it can extend fuel duration or output. For battery storage, it represents charge or discharge loss behavior. It does not reduce powered processing recipe FE cost. |
 | `IDLE_LOSS` | Prototype | Stored energy lost while the block is idle. Lower is better. |
-| `PARALLEL_JOBS` | Prototype | Number of recipes or dense batches the machine can process at the same time. Lead Furnace implements this as four lanes; Tungstensteel and Exotic Crusher chassis use `DENSE_PARALLEL` to process multiple jobs from one input stack, and Crusher Throughput prefixes can enable Dense Parallel with extra jobs. Ascendancies extend it to the Metal Press (Drop Forge batches), the Resonance Calibrator (Resonance Array jobs per lane), and the Melter (Twin Crucible parallel melts). |
+| `BATCH_SIZE` | Prototype | The most items a machine takes from one input stack and works together in one cycle. Base `1`, clamped to `1-16`. A cycle locks its batch when it starts: the largest batch the input, fluid, and output room allow. Every item in the batch pays its own FE and grants its own XP. Tungstensteel and Exotic Crusher chassis author `4` and `9`; Lead and Tungstensteel Resonance Calibrator chassis author `2` and `3`; Crusher Throughput prefixes, Dense Batching, and the Drop Forge, Mass Tuner, and Twin Crucible ascendancies add more. Metal Press circuit recipes never batch. Refiner’s Oath and Fused Crucibles turn batching off for a payoff that scales with Batch Size. Stored and authored `PARALLEL_JOBS` values load as `BATCH_SIZE`. Furnace lanes are separate and come from `INPUT_SLOTS`. |
+| `BATCH_OVERHEAD` | Prototype | Extra cycle time for each item past the first in a batch, as a percentage of the single-item time. Base `25`, never below `5`. A batch of `n` takes `1 + overhead × (n − 1)` times as long, so throughput approaches `1 / overhead`. |
 | `BUFFER_SIZE` | Planned | Internal buffer capacity for inputs, outputs, fluids, heat, or energy. |
 | `STABILITY` | Prototype | Reliability stat used for failures, quality variance, overclocking risk, battery chassis overload risk, or tool cost avoidance. Modular Field Tools use Stability above `1.0` as a per-block chance to skip both durability and FE cost; `1.10` is a `10%` skip chance. Potential Reactors currently use stability as a deterministic recovered-FE multiplier until jam or contamination behavior exists. Metal Press uses stability to reduce forming failure. |
 | `UPGRADE_LIMIT` | Planned | Maximum number or total weight of upgrades the machine can accept. |
@@ -149,7 +150,8 @@ Most current behavior flags are fixed identity traits. They are shown separately
 | `ENERGY_CAPACITY` | `0.8-1.2` | Percent/multiplier scaling against configured storage. |
 | `ENERGY_TRANSFER` | `1` | Neutral transfer-rate multiplier for energy storage items. |
 | `EFFICIENCY` | `0.9-1.1` | Non-recipe efficiency for machine families that explicitly use it. Higher is better where applicable. |
-| `PARALLEL_JOBS` | `1` | Advanced machines can raise this later. |
+| `BATCH_SIZE` | `1` | Chassis, prefixes, Mastery, and ascendancies raise it. |
+| `BATCH_OVERHEAD` | `25` | Percentage of the single-item cycle time added per extra batched item. |
 | `BUFFER_SIZE` | `1` | Neutral base multiplier for future buffers. |
 | `STABILITY` | `0.9-1.1` | Neutral for most generic machines until failure or quality systems exist. Modular Field Tools use values above `1.0` as free durability and FE cost avoidance before Control can spend FE for durability protection. |
 | `UPGRADE_LIMIT` | `1-3` | Upgrade capacity budget. |
@@ -313,7 +315,7 @@ Resonance Calibrators use normal processing and FE stats plus calibration-specif
 | `CALIBRATION_PRECISION` | `0.9-1.4` | Narrows random stability spread. Control Boards and Nullite chassis are the main sources. |
 | `CATALYST_EFFICIENCY` | `1.0+` | Gives a capped chance to preserve catalysts. Stabilizer Matrices are the main source. |
 | `REFINEMENT_POTENTIAL_BONUS` | `0+` | Adds flat RP to calibration outputs. Titanium/Nullite chassis and Control Boards are the main sources. |
-| `PARALLEL_JOBS` | `1-3` | Lead and Tungstensteel chassis consume multiple inputs/catalysts per completed cycle and output a same-state batch. |
+| `BATCH_SIZE` | `1-3` | Lead and Tungstensteel chassis consume multiple inputs/catalysts per completed cycle and output a same-state batch. Each calibration pays its own FE. |
 
 ## Refinement Potential
 

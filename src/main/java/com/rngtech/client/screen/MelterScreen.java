@@ -69,6 +69,7 @@ public class MelterScreen extends AbstractContainerScreen<MelterMenu> {
     private static final int OUTPUT_FLUID_CONTAINER_SLOT_FRAME_X = OUTPUT_FLUID_BAR_X + FLUID_BAR_WIDTH / 2 - 9;
     private static final int INPUT_GROUP_CENTER_X = 69;
     private static final String[] STAT_LABEL_KEYS = {
+            "rngtech.stat.batch_size",
             "rngtech.stat.processing_speed",
             "rngtech.stat.energy_usage",
             "rngtech.stat.energy_capacity",
@@ -77,6 +78,7 @@ public class MelterScreen extends AbstractContainerScreen<MelterMenu> {
             "rngtech.stat.fluid_transfer"
     };
     private static final int[] STAT_DATA_INDICES = {
+            MelterMenu.batchSizeDataIndex(),
             MelterMenu.processingSpeedDataIndex(),
             MelterMenu.energyUsageDataIndex(),
             MelterMenu.energyCapacityStatDataIndex(),
@@ -85,6 +87,7 @@ public class MelterScreen extends AbstractContainerScreen<MelterMenu> {
             MelterMenu.fluidTransferDataIndex()
     };
     private static final MachineStat[] STAT_TYPES = {
+            MachineStat.BATCH_SIZE,
             MachineStat.PROCESSING_SPEED,
             MachineStat.ENERGY_USAGE,
             MachineStat.ENERGY_CAPACITY,

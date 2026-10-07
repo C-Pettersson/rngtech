@@ -63,5 +63,4 @@ public record MegaPassiveNode(
     }
     public boolean blocksBatteryCell() { return behaviors.contains("BLOCK_BATTERY"); }
     public boolean requiresMatchingCrushHeadStage() { return behaviors.contains("MATCHING_HEAD"); }
-    public boolean enablesDenseParallel() { return behaviors.contains("DENSE_PARALLEL"); }
 }

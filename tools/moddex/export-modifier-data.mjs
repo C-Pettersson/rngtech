@@ -3401,7 +3401,7 @@ function addLensTags(tags, stat) {
     }
     if ([
         "PROCESSING_SPEED", "INSTANT_PROCESS_CHANCE", "MINING_SPEED", "ATTACK_SPEED", "ORE_BURST_SPEED",
-        "WARMUP_TIME", "COOLING_RATE", "PROCESSING_LEVEL", "MINING_LEVEL", "PARALLEL_JOBS"
+        "WARMUP_TIME", "COOLING_RATE", "PROCESSING_LEVEL", "MINING_LEVEL", "BATCH_SIZE"
     ].includes(stat)) {
         tags.add("SPEED");
     }
@@ -3430,7 +3430,7 @@ function addLensTags(tags, stat) {
         tags.add("CONTROL");
     }
     if ([
-        "PROCESSING_SPEED", "INSTANT_PROCESS_CHANCE", "PARALLEL_JOBS",
+        "PROCESSING_SPEED", "INSTANT_PROCESS_CHANCE", "BATCH_SIZE",
         "MINING_SPEED", "ATTACK_SPEED", "ORE_BURST_SPEED"
     ].includes(stat)) {
         tags.add("KINETIC");

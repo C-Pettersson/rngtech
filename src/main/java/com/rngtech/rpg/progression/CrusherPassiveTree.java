@@ -18,10 +18,6 @@ public final class CrusherPassiveTree {
         return MegaPassiveTree.has(progression, "MATCHING_HEAD");
     }
 
-    public static boolean enablesDenseParallel(MachineProgressionState progression) {
-        return MegaPassiveTree.has(progression, "DENSE_PARALLEL");
-    }
-
     public static boolean mutesMachineSound(MachineProgressionState progression) {
         return MegaPassiveTree.has(progression, "MUTE_MACHINE_SOUND");
     }

@@ -14,7 +14,7 @@ public final class MachineStatRanges {
             new MachineStatRange(MachineStat.ENERGY_USAGE, 0.9, 1.1),
             new MachineStatRange(MachineStat.ENERGY_CAPACITY, 0.8, 1.2),
             new MachineStatRange(MachineStat.EFFICIENCY, 0.9, 1.1),
-            new MachineStatRange(MachineStat.PARALLEL_JOBS, 1.0, 1.0, true),
+            new MachineStatRange(MachineStat.BATCH_SIZE, 1.0, 1.0, true),
             new MachineStatRange(MachineStat.BUFFER_SIZE, 1.0, 1.0, true),
             new MachineStatRange(MachineStat.STABILITY, 0.9, 1.1),
             new MachineStatRange(MachineStat.UPGRADE_LIMIT, 1.0, 3.0, true)

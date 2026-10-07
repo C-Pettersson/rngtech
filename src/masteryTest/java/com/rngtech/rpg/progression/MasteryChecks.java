@@ -2,6 +2,7 @@ package com.rngtech.rpg.progression;
 
 import com.rngtech.content.entity.ForestryCartRulesChecks;
 import com.rngtech.content.entity.ForestryTreeScanChecks;
+import com.rngtech.rpg.BatchProcessing;
 import com.rngtech.rpg.MachineModifier;
 import com.rngtech.rpg.MachineModifierEffect;
 import com.rngtech.rpg.MachineStat;
@@ -29,6 +30,7 @@ public final class MasteryChecks {
 
     public static void main(String[] args) {
         keywordMath();
+        batchProcessing();
         savesAndMigration();
         graphAndBuilds();
         routeAllocation();
@@ -79,6 +81,28 @@ public final class MasteryChecks {
         near(stats.value(MachineStat.MAX_TEMPERATURE), 600, "lower fixed value wins");
         stats.capAbsolute(MachineStat.MAX_TEMPERATURE, 500);
         near(stats.value(MachineStat.MAX_TEMPERATURE), 500, "lower absolute ceiling wins");
+    }
+
+    private static void batchProcessing() {
+        MachineStatAccumulator stats = MachineStatAccumulator.metalPressBase(1000, 100);
+        require(BatchProcessing.statBatchSize(stats) == 1, "machines batch one item by default");
+        near(BatchProcessing.timeMultiplier(stats, 1), 1.0, "a single item takes the base cycle time");
+        near(BatchProcessing.timeMultiplier(stats, 4), 1.75, "every extra item adds 25% of the base cycle time");
+        require(BatchProcessing.batchTicks(100, stats, 4) == 175, "batch ticks scale with Batch Overhead");
+        effect(stats, MachineStat.BATCH_SIZE, ModifierOperation.ADD, 40);
+        require(BatchProcessing.batchSize(stats, false) == BatchProcessing.MAX_BATCH_SIZE, "Batch Size is clamped");
+        require(BatchProcessing.batchSize(stats, true) == 1, "a batching opt-out locks one item");
+        effect(stats, MachineStat.BATCH_OVERHEAD, ModifierOperation.LESS, 0.01);
+        near(BatchProcessing.overhead(stats), 0.05, "Batch Overhead never drops below 5%");
+        MachineStatAccumulator calibrator = MachineStatAccumulator.resonanceCalibratorBase(com.rngtech.content.calibration.ResonanceCalibratorChassis.TUNGSTENSTEEL);
+        require(BatchProcessing.statBatchSize(calibrator) == 3, "calibrator lanes are its base Batch Size");
+        effect(calibrator, MachineStat.BATCH_SIZE, ModifierOperation.INCREASED_PERCENT, 100);
+        require(BatchProcessing.statBatchSize(calibrator) == 6, "Resonance Array doubles the chassis batch");
+        require(BatchProcessing.largestFitting(5, batch -> batch <= 3) == 3, "the largest batch that fits is locked");
+        require(BatchProcessing.largestFitting(5, batch -> false) == 0, "nothing locks when one item does not fit");
+        var legacy = new com.google.gson.JsonPrimitive("parallel_jobs");
+        require(MachineStat.CODEC.parse(JsonOps.INSTANCE, legacy).getOrThrow() == MachineStat.BATCH_SIZE, "stored Parallel Jobs decode as Batch Size");
+        require(MachineStat.fromName("PARALLEL_JOBS") == MachineStat.BATCH_SIZE, "authored Parallel Jobs parse as Batch Size");
     }
 
     private static void savesAndMigration() {
@@ -261,7 +285,7 @@ public final class MasteryChecks {
         near(melterHeat.value(MachineStat.MAX_TEMPERATURE), 4000, "a temperature ceiling cannot strand a Melter below its recipes");
         require(MachineMasteryFamily.MELTER.supports(MachineStat.MAX_TEMPERATURE) && MachineMasteryFamily.FURNACE.supportsAbsolute(MachineStat.MAX_TEMPERATURE),
                 "the Melter keeps ordinary heat bonuses while other heat machines keep absolute constraints");
-        require(!MachineMasteryFamily.FURNACE.supports(MachineStat.OUTPUT_AMOUNT) && !MachineMasteryFamily.FURNACE.supports(MachineStat.PARALLEL_JOBS)
+        require(!MachineMasteryFamily.FURNACE.supports(MachineStat.OUTPUT_AMOUNT) && !MachineMasteryFamily.FURNACE.supports(MachineStat.BATCH_SIZE)
                 && MachineMasteryFamily.FURNACE.supports(MachineStat.SUPER_OUTPUT_CHANCE), "only the Crusher reads Output Amount and Parallel Jobs");
     }
 
@@ -446,6 +470,9 @@ public final class MasteryChecks {
     }
     private static void effect(MachineStatAccumulator stats, ModifierOperation operation, double value) {
         stats.apply(new MachineModifier(ModifierSlot.IMPLICIT, MachineStat.MAX_TEMPERATURE, operation, value));
+    }
+    private static void effect(MachineStatAccumulator stats, MachineStat stat, ModifierOperation operation, double value) {
+        stats.apply(new MachineModifier(ModifierSlot.IMPLICIT, stat, operation, value));
     }
     private static void near(double actual, double expected, String label) { require(Math.abs(actual - expected) < 0.00001, label + ": " + actual); }
     private static void require(boolean condition, String label) { checks++; if (!condition) { throw new AssertionError(label); } }

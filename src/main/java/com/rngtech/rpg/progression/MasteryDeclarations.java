@@ -51,7 +51,7 @@ public final class MasteryDeclarations {
     private static void load(JsonObject data) {
         for (JsonElement element : MasteryNodeJson.array(data, "stats")) {
             JsonObject raw = element.getAsJsonObject();
-            MachineStat stat = MachineStat.valueOf(raw.get("stat").getAsString());
+            MachineStat stat = MachineStat.fromName(raw.get("stat").getAsString());
             if (STATS.put(stat, declaration(raw)) != null) { throw new IllegalStateException("Duplicate stat declaration " + stat); }
         }
         for (JsonElement element : MasteryNodeJson.array(data, "behaviors")) {

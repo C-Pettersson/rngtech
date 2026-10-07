@@ -199,7 +199,7 @@ Most current rollable stat effects use the shared percent tier table above:
 | Crusher Feed Control | Prefix | `ADD CRUSHER_INPUT_FILTER` | Filter tiers `1-4` |
 | Crusher Compression | Prefix | `ADD HIGH_HARDNESS_ENERGY_MITIGATION` | `15%`, `30%`, `45%`, `60%` surcharge mitigation |
 | Crusher Vibration | Prefix | `DECREASED_PERCENT ENERGY_USAGE` | Shared percent table |
-| Crusher Throughput | Prefix | `ADD PARALLEL_JOBS` and enables `DENSE_PARALLEL` | `+1`, `+2`, `+3`, `+5` jobs |
+| Crusher Throughput | Prefix | `ADD BATCH_SIZE` | `+1`, `+2`, `+3`, `+5` items |
 | Crusher Salvage | Prefix | `ADD CRUSHER_SALVAGE_CHANCE` | Chance table |
 | Crush Head Pulverizing | Prefix | `INCREASED_PERCENT OUTPUT_AMOUNT` | Shared percent table |
 | Crush Head Jagged | Prefix | `ADD CRUSHER_SALVAGE_CHANCE` | Chance table |
