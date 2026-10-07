@@ -102,7 +102,7 @@ public class CorrosionCellMenu extends AbstractContainerMenu {
 
         ItemStackHandler processInventory = cell.getProcessInventory();
         addSlot(new TabbedSlot(processInventory, CorrosionCellBlockEntity.SLOT_PLATE, 17, 33, () -> selectedTab == TAB_PROCESSING));
-        addSlot(new TabbedSlot(processInventory, CorrosionCellBlockEntity.SLOT_ELECTROLYTE, 17, 71, () -> selectedTab == TAB_PROCESSING));
+        addSlot(new TabbedSlot(processInventory, CorrosionCellBlockEntity.SLOT_ELECTROLYTE, 40, 79, () -> selectedTab == TAB_PROCESSING));
         addSlot(new TabbedSlot(processInventory, CorrosionCellBlockEntity.SLOT_RESIDUE, 176, 71, () -> selectedTab == TAB_PROCESSING));
 
         addSlot(new TabbedSlot(cell.getGearInventory(), CorrosionCellBlockEntity.SLOT_BATTERY_CELL, 53, 48, () -> selectedTab == TAB_GEAR));
@@ -208,6 +208,10 @@ public class CorrosionCellMenu extends AbstractContainerMenu {
 
     public int refinementConsumableSlot() {
         return REFINEMENT_CONSUMABLE_SLOT;
+    }
+
+    public ItemStack cathodeStack() {
+        return getSlot(CATHODE_SLOT).getItem();
     }
 
     public int refinementTargetSlot() {
