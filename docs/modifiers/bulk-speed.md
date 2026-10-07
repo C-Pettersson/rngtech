@@ -21,13 +21,18 @@ Bulk Speed can roll on current machine block profiles that already support proce
 | Crusher block | Yes |
 | Furnace block | No |
 | Electric Furnace block | Yes |
+| Alloy Furnace block | Yes |
+| Component Assembler block | Yes |
 | Potential Reactor block | Yes |
+| Corrosion Cell block | Yes |
 | Component Recycler block | Yes |
 | Metal Press block | Yes |
 | Melter block | Yes |
 | Resonance Calibrator block | Yes |
 
-Stage 0 solid-fuel Furnace, solid fuel-burning generators, Battery Cells, Battery Chassis, and machine parts do not currently roll Bulk Speed.
+Stage 0 solid-fuel Furnace, solid fuel-burning generators, Battery Cells, Battery Chassis, and machine parts do not currently roll Bulk Speed. The Cavitation Generator, Vacuum Collapse Generator, Syngas Combustor, and Ammonia Fuel Cell do not roll it either: they never applied it, so it was a dead roll. Among generators only the Potential Reactor and Corrosion Cell use it, where it can double FE/t at its cap.
+
+The Coal Gasifier, Steam Methane Reformer, and Ammonia Synthesizer still roll Bulk Speed but do not apply it yet.
 
 ## Related Pages
 
