@@ -372,7 +372,7 @@ Melter special case:
   can identify it. Use `Water` for an empty input fallback and `Melter Product`
   for an empty output fallback.
 
-Accepted pattern from the example: Corrosion Cell uses `Plate` and `Elect.` inputs on the left, reaction progress in the middle, and residue plus output energy on the right.
+Accepted pattern from the example: Corrosion Cell uses a `Fuel` input with a Cathode badge on the left, the electrolyte tank with its item slot directly below it, reaction progress in the middle, and residue plus output energy on the right.
 
 ### Template C: Multi-input chemical or gas synthesizer
 
@@ -512,10 +512,10 @@ inventory: bottom, unchanged
 
 Good pattern:
 
-- Inputs are on the left: plate and electrolyte.
+- Inputs are on the left: the Fuel slot (plates, Scrap, or Anodes) with a small badge for the installed Cathode, then the electrolyte tank with its item slot directly below it.
 - Reaction progress is in the middle.
 - Residue and energy output are on the right.
-- Labels clarify the non-obvious slot roles.
+- Empty input slots and the Cathode badge explain their roles on hover instead of with extra labels.
 
 Optimized direction:
 
@@ -523,8 +523,8 @@ Optimized direction:
 machine_id: corrosion_cell
 process_type: electrochemical_generator
 left_lane:
-    - plate_slot_labelled_Plate
-    - electrolyte_slot_or_tank_labelled_Elect
+    - fuel_slot_labelled_Fuel_with_cathode_badge_below
+    - electrolyte_tank_with_item_slot_below
 center_lane:
     - horizontal_reaction_progress
     - status_rail_attached_to_progress

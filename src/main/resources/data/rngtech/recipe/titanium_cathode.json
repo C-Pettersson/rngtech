@@ -1,0 +1,30 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "rngtech:material_enabled",
+      "material": "titanium"
+    }
+  ],
+  "type": "rngtech:trait_shaped",
+  "category": "redstone",
+  "pattern": [
+    "PRP",
+    "RCR",
+    "PRP"
+  ],
+  "key": {
+    "C": {
+      "tag": "c:circuits/elite"
+    },
+    "P": {
+      "item": "rngtech:titanium_plate"
+    },
+    "R": {
+      "item": "rngtech:titanium_rod"
+    }
+  },
+  "result": {
+    "count": 1,
+    "id": "rngtech:titanium_cathode"
+  }
+}

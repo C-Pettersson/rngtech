@@ -6,8 +6,8 @@
   "electrolyte": {
     "item": "rngtech:electrolyte"
   },
-  "energy": 4800,
-  "processing_ticks": 200,
+  "energy": 12800,
+  "processing_ticks": 160,
   "minimum_material_stage": 4,
   "residue": {
     "count": 1,

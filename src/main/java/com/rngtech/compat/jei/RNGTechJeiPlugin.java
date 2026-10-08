@@ -691,7 +691,7 @@ public final class RNGTechJeiPlugin implements IModPlugin {
                 JeiRecipeTypes.CORROSION_CELL,
                 0,
                 2,
-                6,
+                8,
                 36
         );
         registration.addRecipeTransferHandler(

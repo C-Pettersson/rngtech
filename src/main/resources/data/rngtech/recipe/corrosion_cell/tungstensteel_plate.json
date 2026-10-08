@@ -1,16 +1,22 @@
 {
+  "neoforge:conditions": [
+    {
+      "type": "rngtech:material_enabled",
+      "material": "tungstensteel"
+    }
+  ],
   "type": "rngtech:corrosion_cell",
   "plate": {
-    "item": "rngtech:copper_plate"
+    "item": "rngtech:tungstensteel_plate"
   },
   "electrolyte": {
     "item": "rngtech:electrolyte"
   },
-  "energy": 16000,
-  "processing_ticks": 160,
   "minimum_material_stage": 4,
   "residue": {
     "count": 1,
     "id": "rngtech:corrosion_residue"
-  }
+  },
+  "energy": 57600,
+  "processing_ticks": 160
 }

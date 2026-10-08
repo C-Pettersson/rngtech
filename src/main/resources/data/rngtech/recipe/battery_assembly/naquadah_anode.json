@@ -1,0 +1,31 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "rngtech:material_enabled",
+      "material": "naquadah"
+    }
+  ],
+  "type": "rngtech:battery_assembly",
+  "group": "battery_assembly_anodes",
+  "ingredients": [
+    {
+      "item": "rngtech:naquadah_plate"
+    },
+    {
+      "item": "rngtech:naquadah_plate"
+    }
+  ],
+  "fluid_input": {
+    "ingredient": {
+      "fluid": "rngtech:electrolyte_solution"
+    },
+    "amount": 250
+  },
+  "result": {
+    "count": 1,
+    "id": "rngtech:naquadah_anode"
+  },
+  "processing_ticks": 200,
+  "energy": 4800,
+  "roll_result_traits": false
+}

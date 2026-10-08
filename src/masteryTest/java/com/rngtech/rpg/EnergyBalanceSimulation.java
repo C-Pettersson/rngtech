@@ -2,6 +2,7 @@ package com.rngtech.rpg;
 
 import com.rngtech.content.blockentity.SolidFuelBurnerBlockEntity;
 import com.rngtech.content.cable.EnergyConnectorTier;
+import com.rngtech.content.energy.CathodeMaterial;
 import com.rngtech.content.energy.CavitationRotorMaterial;
 import com.rngtech.content.energy.CollapseNozzleMaterial;
 import com.rngtech.content.energy.ContainmentLiningMaterial;
@@ -350,41 +351,56 @@ public final class EnergyBalanceSimulation {
     }
 
     /**
-     * CorrosionCellBlockEntity#effectiveStats and #effectiveRecipeEnergy; the Fluid Pump has no generation stats. One
-     * setup per player stage, since later plates unlock better fuel for the same Stage 4 machine.
+     * CorrosionCellBlockEntity#effectiveStats, #canProcessStage and #effectiveRecipeEnergy; the Fluid Pump has no
+     * generation stats. One setup per player stage with that stage's Cathode installed, plus a plates-only setup
+     * without a Cathode, since later plates and anodes unlock better fuel for the same Stage 4 machine.
      */
     private void corrosionCells() throws IOException {
-        List<FuelRecipe> recipes = scenario.corrosionRecipes() != null
-                ? scenario.corrosionRecipes()
-                : recipes("corrosion_cell").stream().map(recipe -> FuelRecipe.of(recipe, chains.fuel("corrosion_cell/" + recipe.id()))).toList();
-        boolean anodes = recipes.stream().anyMatch(recipe -> recipe.id().endsWith("_anode"));
+        List<FuelRecipe> recipes;
+        Map<String, Integer> cathodeStages = new LinkedHashMap<>();
+        if (scenario.corrosionRecipes() != null) {
+            recipes = scenario.corrosionRecipes();
+        } else {
+            recipes = recipes("corrosion_cell").stream().map(recipe -> FuelRecipe.of(recipe, chains.fuel("corrosion_cell/" + recipe.id()))).toList();
+            for (FuelRecipe recipe : recipes) {
+                JsonObject json = recipeJson("corrosion_cell", recipe.id());
+                cathodeStages.put(recipe.id(), json.has("minimum_cathode_stage") ? json.get("minimum_cathode_stage").getAsInt() : 0);
+            }
+        }
         for (int playerStage = 4; playerStage <= 8; playerStage++) {
-            for (boolean platesOnly : anodes ? new boolean[] {false, true} : new boolean[] {false}) {
-                corrosionCell(recipes, playerStage, platesOnly);
+            int stage = playerStage;
+            CathodeMaterial cathode = Arrays.stream(CathodeMaterial.values()).filter(material -> material.stage() == stage).findFirst().orElse(null);
+            corrosionCell(recipes, cathodeStages, stage, cathode);
+            if (cathode != null) {
+                corrosionCell(recipes, cathodeStages, stage, null);
             }
         }
     }
 
-    private void corrosionCell(List<FuelRecipe> recipes, int stage, boolean platesOnly) {
-        List<String> components = platesOnly
-                ? List.of("fuel_access:stage_" + stage, "fuel:plates_only")
-                : List.of("fuel_access:stage_" + stage);
-        {
-            add("corrosion_cell", "Corrosion Cell", stage, components, null, roller -> {
-                MachineStatAccumulator stats = MachineBaseStatCatalog.corrosionCell();
-                MachineTraits traits = roller.machine(MachineType.CORROSION_CELL, 4);
-                stats.apply(traits);
-                bulkSpeed(stats, traits);
-                List<FuelRecipe> legal = recipes.stream()
-                        .filter(recipe -> 4 >= recipe.minimumStage() && recipe.obtainable() && stage >= recipe.availableFromStage())
-                        .filter(recipe -> !platesOnly || !recipe.id().endsWith("_anode"))
-                        .toList();
-                return bestRecipe(legal, recipe -> {
-                    int ticks = stats.adjustedProcessingTicks(recipe.ticks());
-                    return new double[] {reactorEnergy(stats, recipe.energy(), ticks), ticks};
-                });
+    private void corrosionCell(List<FuelRecipe> recipes, Map<String, Integer> cathodeStages, int stage, CathodeMaterial cathode) {
+        List<String> components = cathode != null
+                ? List.of("fuel_access:stage_" + stage, "cathode:" + name(cathode))
+                : stage >= 5 ? List.of("fuel_access:stage_" + stage, "cathode:none") : List.of("fuel_access:stage_" + stage);
+        int cathodeStage = cathode == null ? 0 : cathode.stage();
+        add("corrosion_cell", "Corrosion Cell", stage, components, null, roller -> {
+            MachineStatAccumulator stats = MachineBaseStatCatalog.corrosionCell();
+            MachineTraits traits = roller.machine(MachineType.CORROSION_CELL, 4);
+            stats.apply(traits);
+            if (cathode != null) {
+                part(stats, ComponentBaseStatCatalog.cathode(cathode),
+                        roller.part(MachinePartType.CATHODE, MachineType.CORROSION_CELL, cathode.stage(), cathode.refinementPotential()));
+            }
+            bulkSpeed(stats, traits);
+            List<FuelRecipe> legal = recipes.stream()
+                    .filter(recipe -> 4 >= recipe.minimumStage() && recipe.obtainable() && stage >= recipe.availableFromStage())
+                    .filter(recipe -> cathodeStages.getOrDefault(recipe.id(), 0) <= cathodeStage)
+                    .filter(recipe -> cathode != null || !recipe.id().endsWith("_anode"))
+                    .toList();
+            return bestRecipe(legal, recipe -> {
+                int ticks = stats.adjustedProcessingTicks(recipe.ticks());
+                return new double[] {reactorEnergy(stats, recipe.energy(), ticks), ticks};
             });
-        }
+        });
     }
 
     /** GasChemistryBlockEntity#adjustedTicks and #adjustedGeneration for the Syngas Combustor. */

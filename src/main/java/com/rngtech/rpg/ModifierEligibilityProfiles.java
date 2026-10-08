@@ -2241,6 +2241,22 @@ public final class ModifierEligibilityProfiles {
                     MachineStat.FLUID_TRANSFER
             )
     );
+    public static final ModifierEligibilityProfile CATHODE = profile(
+            "cathode",
+            Set.of(
+                    ModifierCapability.HAS_GEAR_STATS,
+                    ModifierCapability.HAS_FE_GENERATION,
+                    ModifierCapability.HAS_PROCESSING,
+                    ModifierCapability.HAS_STABILITY
+            ),
+            processingStatAffixes(
+                    "electroplating",
+                    MachineStat.ENERGY_GENERATION,
+                    MachineStat.EFFICIENCY,
+                    MachineStat.PROCESSING_SPEED,
+                    MachineStat.STABILITY
+            )
+    );
     public static final ModifierEligibilityProfile CAVITATION_ROTOR = profile(
             "cavitation_rotor",
             Set.of(
@@ -2474,6 +2490,7 @@ public final class ModifierEligibilityProfiles {
                 AMMONIA_CATALYST_BED,
                 REFORMING_CATALYST_BED,
                 FUEL_CELL_MEMBRANE,
+                CATHODE,
                 CAVITATION_ROTOR,
                 VOID_CHAMBER,
                 COLLAPSE_NOZZLE,
@@ -2547,6 +2564,7 @@ public final class ModifierEligibilityProfiles {
             case REFORMING_CATALYST_BED -> REFORMING_CATALYST_BED;
             case AMMONIA_CATALYST_BED -> AMMONIA_CATALYST_BED;
             case FUEL_CELL_MEMBRANE -> FUEL_CELL_MEMBRANE;
+            case CATHODE -> CATHODE;
             case CAVITATION_ROTOR -> CAVITATION_ROTOR;
             case VOID_CHAMBER -> VOID_CHAMBER;
             case COLLAPSE_NOZZLE -> COLLAPSE_NOZZLE;

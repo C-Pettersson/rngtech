@@ -33,6 +33,7 @@ import com.rngtech.content.calibration.ResonanceCalibratorChassis;
 import com.rngtech.content.chemistry.GasChemistryMachine;
 import com.rngtech.content.energy.BatteryCellMaterial;
 import com.rngtech.content.energy.BatteryChassisMaterial;
+import com.rngtech.content.energy.CathodeMaterial;
 import com.rngtech.content.energy.CavitationRotorMaterial;
 import com.rngtech.content.energy.CollapseNozzleMaterial;
 import com.rngtech.content.energy.ContainmentLiningMaterial;
@@ -440,6 +441,14 @@ public final class GearSlotCatalog {
                         CorrosionCellBlockEntity.SLOT_FLUID_PUMP,
                         fluidPumps(pump -> true),
                         anyRegistered()
+                ),
+                slot(
+                        "rngtech.gear.cathode",
+                        false,
+                        GearSlotArea.GEAR,
+                        CorrosionCellBlockEntity.SLOT_CATHODE,
+                        cathodes(cathode -> true),
+                        stageRange(5, 8)
                 )
         ));
         specs.add(spec(
@@ -1063,6 +1072,13 @@ public final class GearSlotCatalog {
         return Arrays.stream(ServoMaterial.values())
                 .filter(filter)
                 .map(material -> item(ModItems.servo(material).get()))
+                .toList();
+    }
+
+    private static List<ItemStack> cathodes(Predicate<CathodeMaterial> filter) {
+        return Arrays.stream(CathodeMaterial.values())
+                .filter(filter)
+                .map(material -> item(ModItems.cathode(material).get()))
                 .toList();
     }
 
