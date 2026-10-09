@@ -269,6 +269,14 @@ public final class CableUniversalConnectorData implements UniversalConnectorAcce
     void addNetworkDebugStats(CableBlockEntity.NetworkDebugAccumulator accumulator) {
         if (connectorTier().isPresent()) {
             accumulator.addEnergyModule(channel);
+            accumulator.addEnergyConnector(
+                    channel,
+                    mode,
+                    transferRate(),
+                    targetEnergyStorage(),
+                    lastEnergyInput(),
+                    lastEnergyOutput()
+            );
         }
         for (int moduleIndex = 0; moduleIndex < UniversalConnectorBlockEntity.FLUID_MODULE_SLOT_COUNT; moduleIndex++) {
             FluidModuleState module = fluidModules[moduleIndex];
@@ -1476,6 +1484,15 @@ public final class CableUniversalConnectorData implements UniversalConnectorAcce
     private int connectorData(int index) {
         if (index == UniversalConnectorBlockEntity.dataEnergyTargetAccessIndex()) {
             return targetHasEnergyAccess() ? 1 : 0;
+        }
+        if (index == UniversalConnectorBlockEntity.dataNetworkEnergyInputCapIndex()) {
+            return networkDebugSnapshot().energyInputCap();
+        }
+        if (index == UniversalConnectorBlockEntity.dataNetworkEnergyOutputCapIndex()) {
+            return networkDebugSnapshot().energyOutputCap();
+        }
+        if (index == UniversalConnectorBlockEntity.dataNetworkEnergyChannelCapIndex()) {
+            return networkDebugSnapshot().energyChannelCap(channel);
         }
         if (UniversalConnectorBlockEntity.isNetworkDebugDataIndex(index)) {
             return UniversalConnectorBlockEntity.networkDebugData(index, networkDebugSnapshot());

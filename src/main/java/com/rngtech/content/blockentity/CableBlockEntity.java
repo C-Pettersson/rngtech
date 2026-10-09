@@ -538,13 +538,20 @@ public class CableBlockEntity extends BlockEntity implements UniversalConnectorD
     }
 
     private boolean directTargetHasEnergyAccess(Direction face) {
+        return directTargetEnergy(face) != null;
+    }
+
+    private IEnergyStorage directTargetEnergy(Direction face) {
         ConnectorData connector = connectors.get(face);
         if (level == null || connector == null) {
-            return false;
+            return null;
         }
         BlockPos targetPos = worldPosition.relative(face);
-        return !isNetworkNode(level.getBlockState(targetPos))
-                && level.getCapability(Capabilities.EnergyStorage.BLOCK, targetPos, connector.attachAs()) != null;
+        BlockState targetState = level.getBlockState(targetPos);
+        if (isNetworkNode(targetState) || targetState.getBlock() instanceof UniversalConnectorBlock) {
+            return null;
+        }
+        return level.getCapability(Capabilities.EnergyStorage.BLOCK, targetPos, connector.attachAs());
     }
 
     private IEnergyStorage directTargetEnergyBuffer(Direction face) {
@@ -1130,17 +1137,20 @@ public class CableBlockEntity extends BlockEntity implements UniversalConnectorD
 
     private static NetworkDebugSnapshot buildNetworkDebugSnapshot(Level level, NetworkSnapshot snapshot) {
         NetworkDebugAccumulator accumulator = new NetworkDebugAccumulator(cacheAgeTicks(level, snapshot));
-        for (int channel = 0; channel <= MAX_CHANNEL; channel++) {
-            for (EnergyEndpoint endpoint : snapshot.energyEndpoints(channel)) {
-                accumulator.addEnergyEndpoint(channel, endpoint.transferRate());
-            }
-        }
-
         for (BlockPos pos : snapshot.cablePositions()) {
             if (level.getBlockEntity(pos) instanceof CableBlockEntity cable) {
                 accumulator.addCableNode();
-                for (ConnectorData connector : cable.connectors.values()) {
+                for (Map.Entry<Direction, ConnectorData> entry : cable.connectors.entrySet()) {
+                    ConnectorData connector = entry.getValue();
                     accumulator.addEnergyModule(connector.channel());
+                    accumulator.addEnergyConnector(
+                            connector.channel(),
+                            connector.mode(),
+                            connector.transferRate(),
+                            cable.directTargetEnergy(entry.getKey()),
+                            cable.lastDirectEnergyInput(entry.getKey()),
+                            cable.lastDirectEnergyOutput(entry.getKey())
+                    );
                 }
                 for (CableUniversalConnectorData connector : cable.universalConnectors.values()) {
                     accumulator.addUniversalConnector();
@@ -1161,7 +1171,7 @@ public class CableBlockEntity extends BlockEntity implements UniversalConnectorD
             Level level,
             BlockPos startPos,
             long gameTime,
-            NetworkEnergyTelemetry energyTelemetry
+            LevelNetworkCache cache
     ) {
         ArrayDeque<BlockPos> queue = new ArrayDeque<>();
         Set<BlockPos> visited = new HashSet<>();
@@ -1196,13 +1206,14 @@ public class CableBlockEntity extends BlockEntity implements UniversalConnectorD
             }
         }
 
+        List<BlockPos> cablePositions = immutableList(networkPositions);
         return new NetworkSnapshot(
                 gameTime,
-                immutableList(networkPositions),
+                cablePositions,
                 immutableEnergyBuckets(energyEndpoints),
                 immutableList(universalEndpoints),
                 immutableList(bridgeEndpoints),
-                energyTelemetry
+                cache.claimTelemetry(cablePositions, gameTime)
         );
     }
 
@@ -1374,7 +1385,10 @@ public class CableBlockEntity extends BlockEntity implements UniversalConnectorD
     private static final class LevelNetworkCache {
         private static final long PRUNE_INTERVAL_TICKS = 200L;
 
+        private static final long TELEMETRY_RETENTION_TICKS = 16L * 60L * 20L;
+
         private final Map<BlockPos, NetworkSnapshot> byCablePosition = new HashMap<>();
+        private final Map<BlockPos, NetworkEnergyTelemetry> telemetryByAnchor = new HashMap<>();
         private long lastPruneGameTime = Long.MIN_VALUE;
 
         private NetworkSnapshot getOrBuild(Level level, BlockPos startPos) {
@@ -1386,14 +1400,46 @@ public class CableBlockEntity extends BlockEntity implements UniversalConnectorD
                 return snapshot;
             }
 
-            NetworkEnergyTelemetry energyTelemetry = snapshot == null ? null : snapshot.energyTelemetry();
             if (snapshot != null) {
                 removeSnapshot(snapshot);
             }
 
-            snapshot = buildNetworkSnapshot(level, startPos, gameTime, energyTelemetry);
+            snapshot = buildNetworkSnapshot(level, startPos, gameTime, this);
             addSnapshot(snapshot);
             return snapshot;
+        }
+
+        /**
+         * Finds the throughput history for a rebuilt network. History is keyed by the network's lowest cable position,
+         * so it survives the per-tick rebuild, cache pruning and invalidation. A merged network keeps the history of
+         * every part, and the part of a split network that lost the old key starts fresh.
+         */
+        private NetworkEnergyTelemetry claimTelemetry(List<BlockPos> cablePositions, long gameTime) {
+            if (cablePositions.isEmpty()) {
+                return new NetworkEnergyTelemetry(gameTime);
+            }
+            BlockPos anchor = Collections.min(cablePositions);
+            NetworkEnergyTelemetry telemetry = telemetryByAnchor.get(anchor);
+            for (BlockPos pos : cablePositions) {
+                if (pos.equals(anchor)) {
+                    continue;
+                }
+                NetworkEnergyTelemetry other = telemetryByAnchor.remove(pos);
+                if (other == null) {
+                    continue;
+                }
+                if (telemetry == null) {
+                    telemetry = other;
+                } else {
+                    telemetry.absorb(other);
+                }
+            }
+            if (telemetry == null) {
+                telemetry = new NetworkEnergyTelemetry(gameTime);
+            }
+            telemetry.markUsed(gameTime);
+            telemetryByAnchor.put(anchor, telemetry);
+            return telemetry;
         }
 
         private void invalidate(BlockPos pos) {
@@ -1422,6 +1468,7 @@ public class CableBlockEntity extends BlockEntity implements UniversalConnectorD
 
             lastPruneGameTime = gameTime;
             byCablePosition.entrySet().removeIf(entry -> !entry.getValue().isFresh(gameTime));
+            telemetryByAnchor.values().removeIf(telemetry -> telemetry.unusedFor(gameTime) > TELEMETRY_RETENTION_TICKS);
         }
     }
 
@@ -1450,7 +1497,7 @@ public class CableBlockEntity extends BlockEntity implements UniversalConnectorD
             this.energyEndpoints = energyEndpoints;
             this.universalEndpoints = universalEndpoints;
             this.bridgeEndpoints = bridgeEndpoints;
-            this.energyTelemetry = energyTelemetry == null ? new NetworkEnergyTelemetry() : energyTelemetry;
+            this.energyTelemetry = energyTelemetry;
         }
 
         private boolean isFresh(long gameTime) {
@@ -1478,10 +1525,6 @@ public class CableBlockEntity extends BlockEntity implements UniversalConnectorD
                 debugSnapshot = buildNetworkDebugSnapshot(level, this);
             }
             return debugSnapshot;
-        }
-
-        private NetworkEnergyTelemetry energyTelemetry() {
-            return energyTelemetry;
         }
 
         private void recordEnergyInput(int channel, int amount, long gameTime) {
@@ -1552,7 +1595,10 @@ public class CableBlockEntity extends BlockEntity implements UniversalConnectorD
             int energyTransferCap,
             int fluidShipmentCap,
             int itemShipmentCap,
-            int cacheAgeTicks
+            int cacheAgeTicks,
+            int energyInputCap,
+            int energyOutputCap,
+            int[] energyChannelCaps
     ) {
         public static final NetworkDebugSnapshot EMPTY = new NetworkDebugSnapshot(
                 0,
@@ -1572,8 +1618,16 @@ public class CableBlockEntity extends BlockEntity implements UniversalConnectorD
                 0,
                 0,
                 0,
-                0
+                0,
+                0,
+                0,
+                new int[MAX_CHANNEL + 1]
         );
+
+        /** Most FE/t the channel can move: the smaller of its supplying and its accepting connector tiers. */
+        public int energyChannelCap(int channel) {
+            return isValidChannel(channel) ? energyChannelCaps[channel] : 0;
+        }
     }
 
     public record NetworkEnergyTelemetrySnapshot(
@@ -1605,10 +1659,29 @@ public class CableBlockEntity extends BlockEntity implements UniversalConnectorD
         private static final int FIFTEEN_MINUTES_SECONDS = 15 * ONE_MINUTE_SECONDS;
 
         private final ChannelTelemetry[] channels = new ChannelTelemetry[MAX_CHANNEL + 1];
+        private long createdTick;
+        private long lastUsedTick;
 
-        private NetworkEnergyTelemetry() {
+        private NetworkEnergyTelemetry(long gameTime) {
+            createdTick = gameTime;
+            lastUsedTick = gameTime;
             for (int channel = 0; channel < channels.length; channel++) {
                 channels[channel] = new ChannelTelemetry();
+            }
+        }
+
+        private void markUsed(long gameTime) {
+            lastUsedTick = gameTime;
+        }
+
+        private long unusedFor(long gameTime) {
+            return gameTime - lastUsedTick;
+        }
+
+        private void absorb(NetworkEnergyTelemetry other) {
+            createdTick = Math.min(createdTick, other.createdTick);
+            for (int channel = 0; channel < channels.length; channel++) {
+                channels[channel].absorb(other.channels[channel]);
             }
         }
 
@@ -1626,7 +1699,7 @@ public class CableBlockEntity extends BlockEntity implements UniversalConnectorD
 
         private NetworkEnergyTelemetrySnapshot snapshot(int channel, long gameTime) {
             return isValidChannel(channel)
-                    ? channels[channel].snapshot(gameTime)
+                    ? channels[channel].snapshot(gameTime, createdTick)
                     : NetworkEnergyTelemetrySnapshot.EMPTY;
         }
 
@@ -1656,18 +1729,35 @@ public class CableBlockEntity extends BlockEntity implements UniversalConnectorD
                 bin(gameTime).output += amount;
             }
 
-            private NetworkEnergyTelemetrySnapshot snapshot(long gameTime) {
+            private NetworkEnergyTelemetrySnapshot snapshot(long gameTime, long createdTick) {
                 beginTick(gameTime);
                 return new NetworkEnergyTelemetrySnapshot(
                         liveInput,
                         liveOutput,
-                        averageInput(FIFTEEN_MINUTES_SECONDS, gameTime, ONE_MINUTE_SECONDS),
-                        averageOutput(FIFTEEN_MINUTES_SECONDS, gameTime, ONE_MINUTE_SECONDS),
-                        averageInput(FIFTEEN_MINUTES_SECONDS, gameTime, FIVE_MINUTES_SECONDS),
-                        averageOutput(FIFTEEN_MINUTES_SECONDS, gameTime, FIVE_MINUTES_SECONDS),
-                        averageInput(FIFTEEN_MINUTES_SECONDS, gameTime, FIFTEEN_MINUTES_SECONDS),
-                        averageOutput(FIFTEEN_MINUTES_SECONDS, gameTime, FIFTEEN_MINUTES_SECONDS)
+                        average(gameTime, createdTick, ONE_MINUTE_SECONDS, true),
+                        average(gameTime, createdTick, ONE_MINUTE_SECONDS, false),
+                        average(gameTime, createdTick, FIVE_MINUTES_SECONDS, true),
+                        average(gameTime, createdTick, FIVE_MINUTES_SECONDS, false),
+                        average(gameTime, createdTick, FIFTEEN_MINUTES_SECONDS, true),
+                        average(gameTime, createdTick, FIFTEEN_MINUTES_SECONDS, false)
                 );
+            }
+
+            private void absorb(ChannelTelemetry other) {
+                for (SecondBin otherBin : other.bins) {
+                    if (otherBin.second == Long.MIN_VALUE) {
+                        continue;
+                    }
+                    SecondBin bin = bins[(int) (otherBin.second % bins.length)];
+                    if (bin.second == otherBin.second) {
+                        bin.input += otherBin.input;
+                        bin.output += otherBin.output;
+                    } else if (bin.second < otherBin.second) {
+                        bin.second = otherBin.second;
+                        bin.input = otherBin.input;
+                        bin.output = otherBin.output;
+                    }
+                }
             }
 
             private void beginTick(long gameTime) {
@@ -1698,25 +1788,19 @@ public class CableBlockEntity extends BlockEntity implements UniversalConnectorD
                 return bin;
             }
 
-            private int averageInput(int binCount, long gameTime, int seconds) {
-                return average(binCount, gameTime, seconds, true);
-            }
-
-            private int averageOutput(int binCount, long gameTime, int seconds) {
-                return average(binCount, gameTime, seconds, false);
-            }
-
-            private int average(int binCount, long gameTime, int seconds, boolean input) {
+            /** Averages over the ticks actually measured, so a fresh network reads its real rate instead of ramping. */
+            private int average(long gameTime, long createdTick, int seconds, boolean input) {
                 long currentSecond = Math.max(0L, gameTime / TICKS_PER_SECOND);
                 long earliestSecond = currentSecond - seconds + 1L;
                 long total = 0L;
-                for (int index = 0; index < binCount; index++) {
-                    SecondBin bin = bins[index];
+                for (SecondBin bin : bins) {
                     if (bin.second >= earliestSecond && bin.second <= currentSecond) {
                         total += input ? bin.input : bin.output;
                     }
                 }
-                return NetworkDebugAccumulator.saturatedInt(total / ((long) seconds * TICKS_PER_SECOND));
+                long windowStart = Math.max(earliestSecond * TICKS_PER_SECOND, createdTick);
+                long measuredTicks = Math.max(1L, gameTime - windowStart + 1L);
+                return NetworkDebugAccumulator.saturatedInt(total / measuredTicks);
             }
         }
 
@@ -1742,7 +1826,8 @@ public class CableBlockEntity extends BlockEntity implements UniversalConnectorD
         private int fluidChannelsMask;
         private int itemChannelsMask;
         private int bridgeChannelsMask;
-        private long energyTransferCap;
+        private final long[] energyInputCaps = new long[MAX_CHANNEL + 1];
+        private final long[] energyOutputCaps = new long[MAX_CHANNEL + 1];
         private long fluidShipmentCap;
         private long itemShipmentCap;
         private final int cacheAgeTicks;
@@ -1764,10 +1849,28 @@ public class CableBlockEntity extends BlockEntity implements UniversalConnectorD
             markEnergyChannel(channel);
         }
 
-        void addEnergyEndpoint(int channel, int transferRate) {
-            energyEndpoints++;
-            energyTransferCap += Math.max(0, transferRate);
-            markEnergyChannel(channel);
+        /**
+         * Counts a connector's tier only in the directions its target can move FE: it can right now, or it did last
+         * tick. The second check keeps a generator that empties its buffer every tick from dropping out.
+         */
+        void addEnergyConnector(
+                int channel,
+                CableConnectorMode mode,
+                int transferRate,
+                IEnergyStorage target,
+                int lastInput,
+                int lastOutput
+        ) {
+            if (!isValidChannel(channel) || target == null || transferRate <= 0) {
+                return;
+            }
+            if (mode.acceptsNetworkInput() && (lastInput > 0 || target.canExtract())) {
+                energyInputCaps[channel] += transferRate;
+            }
+            if (mode.sendsNetworkOutput() && (lastOutput > 0 || target.canReceive())) {
+                energyEndpoints++;
+                energyOutputCaps[channel] += transferRate;
+            }
         }
 
         void addFluidModule(int channel, int shipmentCap, boolean active) {
@@ -1800,6 +1903,17 @@ public class CableBlockEntity extends BlockEntity implements UniversalConnectorD
         }
 
         NetworkDebugSnapshot snapshot() {
+            long inputCap = 0L;
+            long outputCap = 0L;
+            long throughputCap = 0L;
+            int[] channelCaps = new int[MAX_CHANNEL + 1];
+            for (int channel = 0; channel <= MAX_CHANNEL; channel++) {
+                inputCap += energyInputCaps[channel];
+                outputCap += energyOutputCaps[channel];
+                long channelCap = Math.min(energyInputCaps[channel], energyOutputCaps[channel]);
+                channelCaps[channel] = saturatedInt(channelCap);
+                throughputCap += channelCap;
+            }
             return new NetworkDebugSnapshot(
                     cableNodes,
                     universalConnectors,
@@ -1815,10 +1929,13 @@ public class CableBlockEntity extends BlockEntity implements UniversalConnectorD
                     energyChannelsMask,
                     fluidChannelsMask,
                     itemChannelsMask,
-                    saturatedInt(energyTransferCap),
+                    saturatedInt(throughputCap),
                     saturatedInt(fluidShipmentCap),
                     saturatedInt(itemShipmentCap),
-                    cacheAgeTicks
+                    cacheAgeTicks,
+                    saturatedInt(inputCap),
+                    saturatedInt(outputCap),
+                    channelCaps
             );
         }
 

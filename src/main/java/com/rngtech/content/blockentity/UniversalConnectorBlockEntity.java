@@ -113,7 +113,10 @@ public class UniversalConnectorBlockEntity extends BlockEntity
     private static final int DATA_NETWORK_ENERGY_INPUT_15M = DATA_NETWORK_ENERGY_OUTPUT_5M + 1;
     private static final int DATA_NETWORK_ENERGY_OUTPUT_15M = DATA_NETWORK_ENERGY_INPUT_15M + 1;
     private static final int DATA_ENERGY_TARGET_ACCESS = DATA_NETWORK_ENERGY_OUTPUT_15M + 1;
-    private static final int DATA_COUNT = DATA_ENERGY_TARGET_ACCESS + 1;
+    private static final int DATA_NETWORK_ENERGY_INPUT_CAP = DATA_ENERGY_TARGET_ACCESS + 1;
+    private static final int DATA_NETWORK_ENERGY_OUTPUT_CAP = DATA_NETWORK_ENERGY_INPUT_CAP + 1;
+    private static final int DATA_NETWORK_ENERGY_CHANNEL_CAP = DATA_NETWORK_ENERGY_OUTPUT_CAP + 1;
+    private static final int DATA_COUNT = DATA_NETWORK_ENERGY_CHANNEL_CAP + 1;
 
     private final ItemStackHandler inventory = new ItemStackHandler(SLOT_COUNT) {
         @Override
@@ -1353,6 +1356,18 @@ public class UniversalConnectorBlockEntity extends BlockEntity
 
     public static int dataEnergyTargetAccessIndex() {
         return DATA_ENERGY_TARGET_ACCESS;
+    }
+
+    public static int dataNetworkEnergyInputCapIndex() {
+        return DATA_NETWORK_ENERGY_INPUT_CAP;
+    }
+
+    public static int dataNetworkEnergyOutputCapIndex() {
+        return DATA_NETWORK_ENERGY_OUTPUT_CAP;
+    }
+
+    public static int dataNetworkEnergyChannelCapIndex() {
+        return DATA_NETWORK_ENERGY_CHANNEL_CAP;
     }
 
     public static boolean isNetworkDebugDataIndex(int index) {

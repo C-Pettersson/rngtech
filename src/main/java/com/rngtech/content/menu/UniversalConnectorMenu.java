@@ -352,6 +352,18 @@ public class UniversalConnectorMenu extends AbstractContainerMenu {
         return data.get(UniversalConnectorBlockEntity.dataNetworkEnergyTransferCapIndex());
     }
 
+    public int networkEnergyInputCap() {
+        return data.get(UniversalConnectorBlockEntity.dataNetworkEnergyInputCapIndex());
+    }
+
+    public int networkEnergyOutputCap() {
+        return data.get(UniversalConnectorBlockEntity.dataNetworkEnergyOutputCapIndex());
+    }
+
+    public int networkEnergyChannelCap() {
+        return data.get(UniversalConnectorBlockEntity.dataNetworkEnergyChannelCapIndex());
+    }
+
     public int networkFluidShipmentCap() {
         return data.get(UniversalConnectorBlockEntity.dataNetworkFluidShipmentCapIndex());
     }
