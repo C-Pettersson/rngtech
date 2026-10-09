@@ -16,6 +16,9 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
+import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.game.ClientGamePacketListener;
+import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.world.Containers;
 import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.item.ItemStack;
@@ -2020,6 +2023,17 @@ public class CableBlockEntity extends BlockEntity implements UniversalConnectorD
             universalConnectorsTag.put(direction.getSerializedName(), connector.save(registries));
         }
         tag.put("UniversalConnectors", universalConnectorsTag);
+    }
+
+    /** The client needs which faces hold which connector so Jade and pick-block name the targeted connector. */
+    @Override
+    public Packet<ClientGamePacketListener> getUpdatePacket() {
+        return ClientboundBlockEntityDataPacket.create(this);
+    }
+
+    @Override
+    public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
+        return saveWithoutMetadata(registries);
     }
 
     @Override
