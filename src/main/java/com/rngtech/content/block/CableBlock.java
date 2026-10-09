@@ -194,6 +194,8 @@ public class CableBlock extends Block implements EntityBlock {
                 }
                 return ItemInteractionResult.sidedSuccess(level.isClientSide);
             }
+            // Holding Cable means "build", so place it instead of opening a connector menu on this block.
+            return ItemInteractionResult.SKIP_DEFAULT_BLOCK_INTERACTION;
         }
 
         return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
