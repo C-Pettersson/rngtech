@@ -42,7 +42,7 @@ wiki:
 - **Fluid Tanks** (Iron, Copper, Bronze) are plain tanks. They need no power or Gear.
 - **Compressor Tanks** (Steel and later) also have a second, compressed store. With a Battery Cell, at least one Servo, and FE, they squeeze fluid into it, so a small block holds far more fluid.
 
-Each tank you craft rolls its own [rarity and affixes](rarity-and-affixes.md) where its tier allows it. Fluid Tanks do not roll affixes.
+Each tank you craft rolls its own [rarity and affixes](rarity-and-affixes.md) where its tier allows it. Fluid Tanks do not roll affixes. Compressor Tank affixes improve FE storage, FE use, speed, fluid transfer, and stability. Tank capacity and compression ratio never roll.
 
 ## Obtaining
 
@@ -66,9 +66,13 @@ Pipe fluid into any side, or use the container slots on the Process tab to fill 
 
 On a Compressor Tank, fluid first goes into the **loose** tank. With a valid Battery Cell, at least one Servo, and FE, the tank moves loose fluid into the **compressed** store. Compressed fluid still counts as the same amount of ordinary fluid. The Process tab also shows the smaller physical volume it takes up, so a Steel tank holding 100 buckets compressed shows about 10 buckets.
 
-When you drain the tank, it empties loose fluid first. Draining compressed fluid needs the same Gear and FE, and costs a quarter of the FE it took to compress it. Without power, compressed fluid simply stays put: it never leaks, vanishes, or gets voided.
+When you drain the tank, it empties loose fluid first. Draining compressed fluid needs the same Gear and FE, and costs a quarter of the FE it took to compress it. It runs at the same rate limit as compression. Without power, compressed fluid simply stays put: it never leaks, vanishes, or gets voided.
 
 Idle compressed storage costs no FE.
+
+FE you feed the tank fills its small internal buffer first, then charges the Battery Cell. Compression spends the buffer first, then draws from the cell. The tank sets no intake limit of its own, so only the cell, your cable, and the source limit charging.
+
+Compression speed is the base rate times the Servo bonus, raised further by speed and fluid transfer affixes.
 
 ### Stages
 

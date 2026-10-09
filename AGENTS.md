@@ -123,7 +123,7 @@ mkdocs build --strict -f mkdocs.wiki.yml
 - Use status labels consistently: `Implemented`, `Prototype`, `Planned`, `Deferred`, and `Out of scope`.
 - Define each game concept once, then link to that canonical definition from other pages.
 - Do not promote example-only concepts into canonical docs until they become real RNGTech design.
-- Use `docs/page-templates/modifier.md` for modifier pages and `docs/page-templates/content.md` for content pages.
+- Docs do not restate shipped code. Shipped machine behavior lives in the code and on its wiki page; design intent and balance rules live in `docs/reference/machine-guidelines.md` (Machine Design Notes). Use `docs/page-templates/content.md` only for proposed (Planned) content and `docs/page-templates/modifier.md` for proposed modifiers; when a proposal ships, move its player behavior to the wiki, its design rules to the guidelines, and delete the proposal page.
 - The player wiki (`wiki/`) documents implemented behavior for players only: no planned content, no PRD/state content, no links into `docs/`. Follow `docs/reference/wiki-authoring.md` and `docs/page-templates/wiki.md`. When gameplay changes, update the affected wiki page too. Wiki icons for vanilla items need the Minecraft client jar; run `python tools/rngwiki/vanilla.py --fetch` once if no NeoGradle cache provides it.
 
 ## CI

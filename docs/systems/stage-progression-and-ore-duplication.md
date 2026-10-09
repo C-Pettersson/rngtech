@@ -6,7 +6,7 @@ Player guide: [Stages](https://c-pettersson.github.io/rngtech/stages/)
 
 The component upgrade loop below is planned and not registered gameplay; the stage ladder and Crusher duplication path are implemented.
 
-This page is a schema for how [Component Stages](../reference/component-stages.md), [Crafting and Upgrades](crafting.md), and the [Crusher](../content/crusher.md) connect. It does not replace those canonical rule pages.
+This page is a schema for how [Component Stages](../reference/component-stages.md), [Crafting and Upgrades](crafting.md), and the [Crusher](https://c-pettersson.github.io/rngtech/crusher/) connect. It does not replace those canonical rule pages.
 
 ## Progression Schema
 
@@ -142,5 +142,5 @@ flowchart TD
 
 - [Component Stages](../reference/component-stages.md)
 - [Crafting and Upgrades](crafting.md)
-- [Crusher](../content/crusher.md)
+- [Crusher](https://c-pettersson.github.io/rngtech/crusher/)
 - [Machine Stats](../reference/machine-stats.md)

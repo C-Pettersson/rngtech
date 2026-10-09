@@ -1,6 +1,6 @@
 # PRD: Corruption
 
-> Design requirements, not a release status report. See [Current Implementation](../reference/current-implementation.md) and [Progression](../systems/progression.md#refinement-operations) for current behavior.
+> Design requirements, not a release status report. See [Current Implementation](../reference/current-implementation.md) and [Progression](https://c-pettersson.github.io/rngtech/rarity-and-affixes/) for current behavior.
 
 PRD status: Accepted
 
@@ -20,9 +20,9 @@ Today the Stabilization Crystal is a focus item whose description promises to pr
 
 ## References
 
-- [Progression: Refinement Operations](../systems/progression.md#refinement-operations)
+- [Progression: Refinement Operations](https://c-pettersson.github.io/rngtech/rarity-and-affixes/)
 - [Affix Generation](../systems/affix-generation.md)
-- [Affix Forge](../content/affix-forge.md), [Exotic Affix Forge](../content/exotic-affix-forge.md)
+- [Affix Forge](https://c-pettersson.github.io/rngtech/affix-forge/), [Exotic Affix Forge](https://c-pettersson.github.io/rngtech/exotic-affix-forge/)
 - [Unique Items PRD](uniques.md)
 - [Machine Ascendancies PRD: Loop Prevention](machine-ascendancies.md#loop-prevention)
 - [Machine Guidelines](../reference/machine-guidelines.md)

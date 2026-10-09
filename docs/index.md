@@ -4,19 +4,18 @@ RNGTech is a Minecraft 1.21.1 NeoForge technology mod with staged machines, inst
 
 ## Start here
 
-- [Player wiki](https://c-pettersson.github.io/rngtech/): how to play, every machine, and the player guides. Player-facing behavior lives only there; these docs keep implementation and design detail.
+- [Player wiki](https://c-pettersson.github.io/rngtech/): how to play, every machine, and the player guides. Player-facing behavior lives only there, and shipped implementation detail lives only in the code; these docs keep design intent, system design, and proposals.
 - [Wiki Authoring](reference/wiki-authoring.md): how the published player wiki in `wiki/` is built and what belongs in it.
 - [Current Implementation](reference/current-implementation.md): which features exist, their automation surfaces, and refinement support.
 - [Component Stages](reference/component-stages.md): the material progression ladder.
-- [Progression](systems/progression.md): rarity and refinement.
-- [Universal Cable](content/basic-wire.md): energy, fluid, item, and optional external-network connections.
-- [Tree Farm Automation](content/tree-farm-automation.md): Forestry Companion, station, and mastery.
+- [Machine Guidelines](reference/machine-guidelines.md): machine rules, balance, and per-machine design notes.
+- [Machine Mastery](systems/machine-mastery.md) and [Affix Generation](systems/affix-generation.md): system design.
 
 ## Read feature status
 
-**Prototype** features exist but may change. **Planned** features are design proposals. A release version does not mean that every design page describes shipped gameplay. The [current implementation reference](reference/current-implementation.md) records status; content pages explain behavior.
+**Prototype** features exist but may change. **Planned** features are design proposals. A release version does not mean that every design page describes shipped gameplay. The [current implementation reference](reference/current-implementation.md) records status; the wiki explains behavior.
 
-The navigation separates current content from [design proposals](design-proposals.md), which describe requirements beyond the implemented feature set.
+Shipped behavior is documented on the [player wiki](https://c-pettersson.github.io/rngtech/); design intent and balance rules are in [Machine Guidelines](reference/machine-guidelines.md). [Design proposals](design-proposals.md) describe requirements beyond the implemented feature set.
 
 ## Maintain the project
 

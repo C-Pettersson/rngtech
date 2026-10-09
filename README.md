@@ -10,8 +10,8 @@ Build an ore-processing line, generate and store energy, then improve the machin
 
 RNGTech brings action-RPG loot and build planning to a tech mod. The ideas come mainly from Path of Exile and Last Epoch, but they apply to machines instead of characters:
 
-- **Rarity and affixes** (Path of Exile, Last Epoch). Machines, parts, and Battery Cells roll Normal, Magic, Rare, or Unique rarity, with tiered prefix and suffix modifiers. See [Rarity](docs/reference/rarity.md) and [Affix generation](docs/systems/affix-generation.md).
-- **A limited crafting budget** (Last Epoch). Refinement Potential works like Forging Potential: each refinement spends a rolled amount, so every item can be improved only so far. See [Affixes and refinement](docs/systems/progression.md).
+- **Rarity and affixes** (Path of Exile, Last Epoch). Machines, parts, and Battery Cells roll Normal, Magic, Rare, or Unique rarity, with tiered prefix and suffix modifiers. See [Rarity](https://c-pettersson.github.io/rngtech/rarity-and-affixes/) and [Affix generation](docs/systems/affix-generation.md).
+- **A limited crafting budget** (Last Epoch). Refinement Potential works like Forging Potential: each refinement spends a rolled amount, so every item can be improved only so far. See [Affixes and refinement](https://c-pettersson.github.io/rngtech/rarity-and-affixes/).
 - **Single-purpose crafting currency** (Path of Exile). Crystals, catalysts, and coils each add, upgrade, reroll, or remove affixes, or promote rarity, much like orbs.
 - **A shared passive tree** (Path of Exile). Machine Mastery gives each machine chassis its own points to spend on one large passive tree, with attribute roads, notables, and keystones that trade a cost for a strong payoff. See [Machine Mastery](docs/systems/machine-mastery.md).
 - **Ascendancies** (Path of Exile). Each Mastery family has two ascendancies: small specialization trees that a machine unlocks with Ascendancy Seals.
@@ -43,7 +43,7 @@ For contributions and verification commands, see [CONTRIBUTING.md](CONTRIBUTING.
 
 - [Documentation index](docs/index.md)
 - [Machine and part stages](docs/reference/component-stages.md)
-- [Affixes and refinement](docs/systems/progression.md)
+- [Affixes and refinement](https://c-pettersson.github.io/rngtech/rarity-and-affixes/)
 - [ModDex source/data explorer](tools/moddex/README.md)
 - [Security reporting](SECURITY.md)
 - [Support and bug reports](SUPPORT.md)

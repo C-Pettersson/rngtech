@@ -52,7 +52,7 @@ A Modular Field Tool is made from:
 - a **Tool Rod**, which sets durability, speed adjustments, FE transfer, and which Battery Cells the tool supports, such as a {{ item('rngtech:wooden_tool_rod') }}.
 - an optional **Battery Cell**, which pays the FE for tool features that use it.
 
-Heads and rods are crafted at a crafting table, and each one rolls its own rarity and affixes. The assembled tool has no affixes of its own; it uses whatever its installed parts have.
+Heads and rods are crafted at a crafting table, and each one rolls its own rarity and affixes. They roll 2 more Refinement Potential than other parts of the same stage, and land higher affix tiers a little more often. The assembled tool has no affixes of its own; it uses whatever its installed parts have.
 
 {{ crafting("rngtech:flint_pick_head", "rngtech:wooden_tool_rod") }}
 
@@ -93,7 +93,8 @@ By default, a vanilla stone pickaxe reaches hardness 1 and an iron or better pic
 - **Stability** above 1.0 gives each broken block a chance to cost no durability and no FE. 1.10 Stability is a 10% chance.
 - **Control** above 1.0 moves part of each durability point onto the installed Battery Cell as FE. 1.60 Control pays 60% of the wear in FE, up to 100% at 2.0. The full FE price per durability point is 16 FE for a Pick or Axe, 12 FE for a Shovel, 32 FE for a Hammer, and 28 FE for a Digger or Treefeller, scaled down by the share Control covers. If the cell cannot pay, the tool takes full durability wear for that block. Stability is checked first.
 - **Self Repair** heads and rods restore 3 to 8 durability, depending on the affix tier, every 7.5 seconds while the tool sits idle in your hotbar or offhand. A head and rod that both have it add together. Mining pauses the repair.
-- **Vein Miner** Pick Heads break connected ore of the same type, up to the Vein Mine Limit. Each block after the first costs extra FE; when the cell cannot pay it, the rest of the vein stays. Sneak while mining to break only the block you aim at.
+- **Battery Cells** in your inventory recharge the tool's installed cell, first inventory slot first, up to the tool's FE transfer rate. Only cells within the rod's Battery Support count, the same limit that decides which cells you can install.
+- **Vein Miner**, a rare Pick Head affix, breaks connected ore of the same type, up to the Vein Mine Limit. Each block after the first costs extra FE; when the cell cannot pay it, the rest of the vein stays. Sneak while mining to break only the block you aim at.
 - **Ore Burst** speeds up mining on ore for Picks and Hammers. It needs the Ore Burst suffix on a part and an Ore Burst material: a Copper, Nullite, or Exotic head, or a {{ item('rngtech:copper_conduit_tool_rod') }}, {{ item('rngtech:sparksteel_routed_tool_rod') }}, {{ item('rngtech:nullite_phase_tool_rod') }}, or {{ item('rngtech:exotic_harmonic_tool_rod') }}. Each ore it breaks costs extra FE, and without enough FE the ore mines at normal speed.
 - **Luck** can add extra drops from ores and logs broken by the tool. Each point, up to 5, gives every drop a 15% chance of one extra copy. It does nothing with Silk Touch, and nothing for machines, chests, or mobs.
 
@@ -116,7 +117,7 @@ A {{ item('rngtech:diamond_tip') }} in the repair slot upgrades a Steel Pick Hea
 The Gear tab has:
 
 - one **Tiny Anvil** slot. A {{ item('rngtech:tiny_anvil') }} is needed to build a Hammer, Digger, or Treefeller, or to swap one of their heads. It is never used up.
-- one **Energy Connector** slot. With a connector installed, the bench accepts FE and charges the Battery Cell of the tool in its Tool slot, up to the connector's rate. It can also charge a {{ item('rngtech:miners_companion') }} placed in the Tool slot.
+- one **Energy Connector** slot. With a connector installed, the bench accepts FE and charges the Battery Cell of the tool in its Tool slot, up to the connector's rate or the tool's FE transfer rate, whichever is lower. It can also charge a {{ item('rngtech:miners_companion') }} placed in the Tool slot.
 
 {{ crafting("rngtech:tiny_anvil") }}
 

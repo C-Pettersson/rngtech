@@ -47,7 +47,7 @@ Progress, decisions, and verification are tracked on [Heat Model State](heat-mod
 - [Machine Stats](../reference/machine-stats.md)
 - [Machine GUI Design](../reference/machine-gui-design.md)
 - [Batch Processing PRD](batch-processing.md)
-- [Furnace](../content/furnace.md), [Alloy Furnace](../content/alloy-furnace.md), [Metal Press](../content/metal-press.md), [Melter](../content/melter.md)
+- [Furnace](https://c-pettersson.github.io/rngtech/furnace/), [Alloy Furnace](https://c-pettersson.github.io/rngtech/alloy-furnace/), [Metal Press](https://c-pettersson.github.io/rngtech/metal-press/), [Melter](https://c-pettersson.github.io/rngtech/melter/)
 - [Component Stages](../reference/component-stages.md)
 
 Key existing code:

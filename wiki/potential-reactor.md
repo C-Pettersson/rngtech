@@ -52,6 +52,8 @@ Burning a rolled item pays FE for its rarity, affix tiers, and Refinement Potent
 - **Mastery**: +1% for each Mastery level above 1.
 - **Ascendancy**: +200% for each Seal tier used on the machine, so a fully ascended machine is worth 7×.
 
+These scales apply to the item's base value. The reactor's own stats then multiply every payout, salvage fuel included: energy generation, efficiency, and stability all raise the FE you recover, and processing speed makes each item finish sooner.
+
 Repeats lose value. The reactor remembers the item types of its last 15 gear burns, and each earlier burn of the same type cuts the next payout by a quarter, down to 10%. Rotate through 16 or more different items to avoid the penalty. Salvage fuel recipes are not affected.
 
 The output is a single **stripped** copy of the item you burned. A stripped item cannot be placed, installed, refined, or charged, but the [Component Recycler](component-recycler.md) still recognizes it. A typical chain is:
@@ -75,7 +77,7 @@ Chest → Potential Reactor → Component Recycler → storage
 | 3 | {{ item('rngtech:bronze_reactor_chamber') }} | {{ item('rngtech:bronze_recovery_filter') }} | {{ item('rngtech:bronze_containment_lining') }} |
 | 4 | {{ item('rngtech:steel_reactor_chamber') }} | {{ item('rngtech:steel_recovery_filter') }} | {{ item('rngtech:steel_containment_lining') }} |
 
-Recovered residue is {{ item('rngtech:scrap') }}, which cannot be fed back in for more FE. The reactor also accepts {{ item('rngtech:malformed_ingot') }} from failed smelts and presses. With a Recovery Filter, a malformed ingot of a known metal returns two matching nuggets, and an unknown one returns two Scrap.
+Recovered residue is {{ item('rngtech:scrap') }}, which cannot be fed back in for more FE. The reactor also accepts {{ item('rngtech:malformed_ingot') }} from failed smelts and presses. It needs a Stage 4 (Steel) Reactor Chamber and pays 3,600 FE before stats. With a Recovery Filter, a malformed ingot of a known metal returns two matching nuggets, and an unknown one returns two Scrap.
 
 ### Automation
 

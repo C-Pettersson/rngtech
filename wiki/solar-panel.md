@@ -101,11 +101,11 @@ Besides the usual generator stats, a controller can roll these array affixes. Th
 | Affix | Stat | Effect |
 |---|---|---|
 | Array Expansion | Array Range | +1 or +2 range, still capped at 2. |
-| Moonlit Conversion | Moonlight Conversion | The array keeps generating at night, at a share of its clear-day output. |
-| Lunar Inverter | Lunar Inversion | Stronger night generation, but clear-day output drops by 15%. Cannot roll alongside Moonlit Conversion. |
-| Cloud Piercer | Weather Recovery | Recovers part of the gap between weather output and clear-day output. Higher Stability also helps. |
-| Clear-Sky Amplifier | Clear Sky Amplification | Boosts clear-day output only. |
-| Panel Synchronizer | Panel Synchronization | Boosts output when every active panel is the same material. |
+| Moonlit Conversion | Moonlight Conversion | The array keeps generating at night, at 10–55% of its clear-day output depending on tier. |
+| Lunar Inverter | Lunar Inversion | Stronger night generation, 30–85% of clear-day output, but clear-day output drops by 15%. Cannot roll alongside Moonlit Conversion. |
+| Cloud Piercer | Weather Recovery | Recovers 10–60% of the gap between weather output and clear-day output. Stability above 1.0 also helps. Recovery is capped at 85% of the gap. |
+| Clear-Sky Amplifier | Clear Sky Amplification | Boosts clear-day output by 5–50%. |
+| Panel Synchronizer | Panel Synchronization | Boosts output by 5–50% when every panel in the array is the same material and at least two are generating. |
 | Panel Arbitration | Panel Arbitration | Collects the highest-output panels first instead of the nearest. |
 
 ### Gear
@@ -116,10 +116,10 @@ Panels have no Gear and no screen. The controller's Gear tab has three optional 
 - **Energy Connector**: sets the maximum FE/t the controller exports. The caps per tier are listed under [Universal Cable energy](universal-cable.md#energy).
 - **Solar Array Extender**: adds +1 range.
 
-| Extender | Leans toward |
+| Extender | Built-in bonus |
 |---|---|
-| {{ item('rngtech:sparksteel_solar_array_extender') }} | Clear-day output |
-| {{ item('rngtech:aethergold_solar_array_extender') }} | Night-time output |
+| {{ item('rngtech:sparksteel_solar_array_extender') }} | +20% Clear Sky Amplification |
+| {{ item('rngtech:aethergold_solar_array_extender') }} | +20% Moonlight Conversion, so the array generates at night |
 
 Extenders also roll their own affixes, which apply while installed.
 

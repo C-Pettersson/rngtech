@@ -246,9 +246,11 @@ Most staged machine bodies are built around a frame for their stage band:
 | {{ item('rngtech:advanced_machine_frame') }} | Stage 5–6 bodies. |
 | {{ item('rngtech:exotic_machine_frame') }} | Stage 7–8 bodies. |
 
-Each frame is crafted from the one before it. The Exotic frame also needs a {{ item('rngtech:lubricated_frame_coupling') }}, assembled from Tungstensteel Casing and Lubricant in the [Component Assembler](component-assembler.md).
+Frames are plain crafting ingredients: they have no stats or affixes, and a frame's tier does not change the finished machine's stats. Each frame is crafted from the one before it. A Reinforced Machine Frame adds 12 Steel Ingots, pressed into four Steel Plates and two Steel Casings in six [Metal Press](metal-press.md) runs. The Exotic frame also needs a {{ item('rngtech:lubricated_frame_coupling') }}, assembled from Tungstensteel Casing and Lubricant in the [Component Assembler](component-assembler.md).
 
 {{ crafting("rngtech:machine_frame", "rngtech:reinforced_machine_frame", "rngtech:advanced_machine_frame", "rngtech:exotic_machine_frame") }}
+
+The Washer Machine Chassis can be crafted from a Machine Frame, but no recipe or machine uses it, so don't spend a frame on it.
 
 ## Stage and rolls
 

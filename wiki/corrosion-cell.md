@@ -47,7 +47,7 @@ The electrolyte tank holds 4,000 mB, and a Fluid Pump's Fluid Capacity rolls mak
 
 ### Fuel tiers
 
-Plain plates burn on their own. From Stage 5, the main fuel is an **Anode**: two plates of one metal assembled with Electrolyte Solution in the [Component Assembler](component-assembler.md). An Anode burns for twice as long as a plate and produces far more FE, but it only burns when the installed Cathode is at least the Anode's stage. A higher-tier plate still burns without a Cathode, at roughly 40% of its Anode's FE/t.
+Plain plates burn on their own. From Stage 5, the main fuel is an **Anode**: two plates of one metal assembled with 250 mB of Electrolyte Solution and 4,800 FE in the [Component Assembler](component-assembler.md). An Anode burns for twice as long as a plate and produces far more FE, but it only burns when the installed Cathode is at least the Anode's stage. A higher-tier plate still burns without a Cathode, at roughly 40% of its Anode's FE/t.
 
 | Fuel | Stage | FE/t (base) | Cathode needed |
 |---|---:|---:|---|
@@ -67,7 +67,7 @@ The Gear tab has three optional slots:
 
 - **Battery Cell**: adds FE storage. It accepts cells up to Stage 5.
 - **Fluid Pump**: lets pipes fill the electrolyte tank from the sides. Without one, the cell runs on dry Electrolyte items. The pump's Fluid Transfer sets the fill rate.
-- **Cathode**: sets the highest Anode stage the cell can burn. Its rolled Energy Generation, Efficiency, Processing Speed, and Stability affixes apply to the cell, and each stage above Aluminum adds a little base Efficiency.
+- **Cathode**: sets the highest Anode stage the cell can burn. Its rolled Energy Generation, Efficiency, Processing Speed, and Stability affixes apply to the cell, and each stage above Aluminum adds 2% base Efficiency.
 
 None of the Gear is required to burn plates, Scrap, and dry Electrolyte.
 

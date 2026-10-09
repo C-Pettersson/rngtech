@@ -11,7 +11,7 @@ The Entropy Cell is a risky generator that converts order into FE.
 
 Order can mean stored charge, remaining Refinement Potential, stable rarity structure, or future catalyst quality. The machine pays well when the player feeds it valuable structured items, so the UI must make the cost explicit before anything is consumed.
 
-The Entropy Cell is not a [Battery Cell](battery-cells.md). It is a planned generator block.
+The Entropy Cell is not a [Battery Cell](https://c-pettersson.github.io/rngtech/battery-cells/). It is a planned generator block.
 
 ## Design Role
 
@@ -126,9 +126,9 @@ A future implementation should build a preview-first UI before adding Collapse b
 ## Related Pages
 
 - [Current Implementation Matrix](../reference/current-implementation.md)
-- [Affix Forge](affix-forge.md)
-- [Battery Cells](battery-cells.md)
-- [Machine Parts](machine-parts.md)
+- [Affix Forge](https://c-pettersson.github.io/rngtech/affix-forge/)
+- [Battery Cells](https://c-pettersson.github.io/rngtech/battery-cells/)
+- [Machine Parts](https://c-pettersson.github.io/rngtech/gear/)
 - [Machine Stats](../reference/machine-stats.md)
-- [Progression](../systems/progression.md)
-- [Rarity](../reference/rarity.md)
+- [Progression](https://c-pettersson.github.io/rngtech/rarity-and-affixes/)
+- [Rarity](https://c-pettersson.github.io/rngtech/rarity-and-affixes/)

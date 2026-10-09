@@ -67,7 +67,7 @@ The wiki is for players. It describes the game as it is today.
 - Document implemented behavior only. Leave out anything Planned, Deferred, or Out of scope, design proposals, and PRD or state-file content. Don't promise future changes ("not yet", "will", "reserved for").
 - Link only to other wiki pages. The wiki cannot link into `docs/`, because those pages are not published. Explain a concept on its wiki guide page (Rarity and Affixes, Machine Mastery, Machine Stats, Gear, Battery Cells, Stages) instead.
 - Use player voice: no Java class names, recipe JSON fields, config keys, or internal status labels.
-- When behavior changes in code, update the wiki page in the same change as the matching `docs/content/` page.
+- When behavior changes in code, update the wiki page in the same change, and the Machine Design Notes in `docs/reference/machine-guidelines.md` if a design rule changed.
 
 ## Writing a page
 

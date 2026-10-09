@@ -71,9 +71,11 @@ The Gear tab has one optional **Bio Chamber** slot. The chamber's fuel-efficienc
 
 ### Using Algae Biomass
 
-- Burn it in the [Bio Generator](bio-generator.md).
-- Craft four into one {{ item('rngtech:dense_algae_biomass') }}, which is worth more FE in the Bio Generator than the four pieces burned separately.
+- Burn it in the [Bio Generator](bio-generator.md) for 400 FE base.
+- Craft four into one {{ item('rngtech:dense_algae_biomass') }}, worth 2,400 FE base in the Bio Generator instead of 1,600 FE for the four pieces burned separately.
 - Melt it with Organic Reagent and water in the [Melter](melter.md) to make methane.
+
+Neither algae item burns in a vanilla furnace or a [Solid Fuel Burner](solid-fuel-burner.md).
 
 {{ crafting('rngtech:dense_algae_biomass') }}
 

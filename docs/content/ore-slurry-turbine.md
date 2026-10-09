@@ -143,8 +143,8 @@ A future implementation should decide the slurry representation before adding re
 ## Related Pages
 
 - [Current Implementation Matrix](../reference/current-implementation.md)
-- [Crusher](crusher.md)
-- [Machine Chassis](machine-chassis.md)
-- [Machine Parts](machine-parts.md)
+- [Crusher](https://c-pettersson.github.io/rngtech/crusher/)
+- [Machine Chassis](https://c-pettersson.github.io/rngtech/stages/#machine-frames)
+- [Machine Parts](https://c-pettersson.github.io/rngtech/gear/)
 - [Machine Stats](../reference/machine-stats.md)
 - [Stage Progression and Ore Duplication](../systems/stage-progression-and-ore-duplication.md)

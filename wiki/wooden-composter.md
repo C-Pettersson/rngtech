@@ -62,7 +62,7 @@ These prepared inputs count as 2 compost units each:
 
 ### Crushing seeds first
 
-Crushing seeds in a [Crusher](crusher.md) turns each seed into one Compost Feedstock, which is worth twice as much in the Composter. Eight seeds composted directly make one Composted Biomass; eight seeds crushed first make two. The Crusher's FE cost is far less than the extra fuel value you get back.
+Crushing seeds in a [Crusher](crusher.md) turns each seed into one Compost Feedstock, which is worth twice as much in the Composter. Eight seeds composted directly make one Composted Biomass; eight seeds crushed first make two. Crushing eight seeds costs 640 FE, and the extra Composted Biomass burns for 1,600 FE, so you come out 960 FE ahead.
 
 {{ processing("crusher", output="rngtech:compost_feedstock") }}
 

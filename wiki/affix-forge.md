@@ -43,7 +43,7 @@ wiki:
     },
 ) }}
 
-The **Affix Forge** is RNGTech's early refinement station. Put in a machine item, machine part, or Battery Cell, add a catalyst, and the forge adds, upgrades, rerolls, or removes that item's rolled affixes. It needs no power. Three reusable upgrades unlock stronger catalysts and the optional focus slot.
+The **Affix Forge** is RNGTech's early refinement station. Put in a machine item, machine part, Battery Cell, Tool Head, Tool Rod, or companion item, add a catalyst, and the forge adds, upgrades, rerolls, or removes that item's rolled affixes. It needs no power. Three reusable upgrades unlock stronger catalysts and the optional focus slot.
 
 The forge refines items, not placed machines. To refine a machine that is already placed, use the Refinement tab in that machine's own screen. For late-game powered refinement, see the [Exotic Affix Forge](exotic-affix-forge.md).
 
@@ -70,7 +70,7 @@ Every refinable item has a [rarity](rarity-and-affixes.md) and a budget of [Refi
 
 A failed or illegal operation costs nothing: no catalyst and no RP. Identify an item before you refine it (see [Getting Started](getting-started.md)). Unique items, unidentified items, and recycled (stripped) items cannot be refined.
 
-Affix and tier odds are weighted, not guaranteed. Tier 7 affixes can appear only on Stage 8 Exotic items. See [Rarity and Affixes](rarity-and-affixes.md#affix-tiers) for tiers and weights.
+Affix and tier odds are weighted, not guaranteed. Tier 7 affixes can appear only on Stage 8 Exotic items, and only when an affix is added or rerolled. Upgrades and the Ascension catalysts stop at Tier 6. See [Rarity and Affixes](rarity-and-affixes.md#affix-tiers) for tiers and weights.
 
 ### Using the forge
 
@@ -86,16 +86,20 @@ The modifier list shows the item's current affixes. You cannot pick which affix 
 | Catalyst | Effect | RP cost | Needs |
 |---|---|---|---|
 | {{ item('rngtech:affix_injector') }} | Adds one affix. Normal items become Magic. Magic items can only fill their missing prefix or suffix. Rare items can keep adding until full. | 1–8 | — |
-| {{ item('rngtech:affix_modifier') }} | Upgrades one random affix. | 2–6 | — |
+| {{ item('rngtech:affix_modifier') }} | Upgrades one random affix by one tier. Fails if every affix is already at its top tier. | 2–6 | — |
 | {{ item('rngtech:nullifier_coil') }} | Removes one random rolled affix. | 1–4 | — |
-| {{ item('rngtech:affix_upgrade') }} | Upgrades one random affix, or retunes it if it is already at the top tier. | 6–10 | Resonance Matrix |
+| {{ item('rngtech:affix_upgrade') }} | Upgrades one random affix. If every affix is already at its top tier, it retunes one instead. | 6–10 | Resonance Matrix |
 | {{ item('rngtech:ascension_catalyst') }} | Makes a Magic item Rare and adds one affix. The item needs at least 5 RP. | 4 | Resonance Matrix |
-| {{ item('rngtech:ascension_matrix') }} | Makes a Magic item with at least one affix Rare, adds 1–4 affixes, and upgrades one existing affix. | All remaining | Resonance Matrix |
-| {{ item('rngtech:chaos_crystal') }} | Rerolls all of the item's current affixes. | 1–4 | Resonance Matrix |
-| {{ item('rngtech:expansion_crystal') }} | Tries to fill every open affix slot. | 1–18 per affix | Resonance Matrix |
+| {{ item('rngtech:ascension_matrix') }} | Makes a Magic item with at least one affix Rare, adds 1–4 affixes (usually 1), and upgrades or retunes one existing affix. | All remaining | Resonance Matrix |
+| {{ item('rngtech:chaos_crystal') }} | Rerolls all of the item's current affixes. Rarity and the number of prefixes and suffixes stay the same. | 1–4 | Resonance Matrix |
+| {{ item('rngtech:expansion_crystal') }} | Adds affixes until every open slot is full or the RP runs out. A Normal item becomes Magic. | 1–18 per affix | Resonance Matrix |
 | {{ item('rngtech:null_crystal') }} | Removes one random rolled affix. | 1–4 | Resonance Matrix |
 
-Stronger affixes tend to cost more RP. The final cost is capped by what the item has left, so a low-RP item can still gamble, but may spend everything. A placed machine's Refinement tab works the same way, with one catalyst slot and no focus slot.
+Stronger affixes cost more RP. Each tier above Tier 1 raises the lowest possible cost by 3 RP, up to the catalyst's maximum. For example, an Affix Injector that adds a Tier 3 affix costs 7–8 RP. The final cost is capped by what the item has left, so a low-RP item can still gamble, but may spend everything. The Affix Upgrader needs at least 2 RP to start, and the Greater Affix Upgrader at least 6.
+
+Removing or rerolling is cheap. The Nullifier Coil, Chaos Crystal, and Null Crystal cost 1 RP half the time, 2 RP 30% of the time, 3 RP 15% of the time, and 4 RP 5% of the time.
+
+A placed machine's Refinement tab works the same way, with one catalyst slot and no focus slot. It needs no forge upgrades: every catalyst works there.
 
 Removing affixes never touches an item's fixed identity traits or base stats. Only rolled affixes can be added or removed.
 
@@ -133,12 +137,14 @@ With an Affix Modifier Socket installed, a crystal in the focus slot changes how
 
 | Crystal | Works with | Effect |
 |---|---|---|
-| {{ item('rngtech:conservation_crystal') }} | Adds and upgrades | 25% chance to keep the catalyst. The crystal is used up. |
+| {{ item('rngtech:conservation_crystal') }} | Affix Injector, Affix Upgrader, Greater Affix Upgrader | 25% chance to keep the catalyst. The crystal is used up. |
 | {{ item('rngtech:frugality_crystal') }} | Affix Upgrader | 25% chance the upgrade costs only 1 RP. The crystal is used up. |
 | {{ item('rngtech:transmutation_crystal') }} | Greater Affix Upgrader | Swaps the upgraded affix for a different one in the same prefix or suffix slot. |
 | {{ item('rngtech:resonance_crystal') }} | Greater Affix Upgrader | Keeps the upgraded affix's roll quality in its new tier. |
-| {{ item('rngtech:destabilization_crystal') }} | Greater Affix Upgrader | Rerolls the item's other affixes after the upgrade. |
-| {{ item('rngtech:stabilization_crystal') }} | — | Has no effect and is not used up. |
+| {{ item('rngtech:destabilization_crystal') }} | Greater Affix Upgrader | Rerolls the item's other affixes, at their current tiers, after the upgrade. |
+| {{ item('rngtech:stabilization_crystal') }} | Affix Injector, Affix Upgrader, Greater Affix Upgrader | Has no effect and is not used up. |
+
+Every crystal except the Stabilization Crystal is used up on success. A crystal paired with a catalyst it does not work with blocks Reforge, and nothing is used.
 
 ### Automation
 

@@ -96,7 +96,7 @@ A Universal Connector placed on its own, with no Cable, works as a standalone pl
 | Channel | 0–15. Connectors only exchange with the same channel. Energy, Fluid, Item, and Bridge channels are separate. |
 | Mode | Energy: Input takes FE from the machine into the cable, Output sends FE from the cable into the machine, and Both does both. Hover a mode button for its description. Fluid and Item rows: IN pulls from the machine into the cable, OUT pushes from the cable into the machine. |
 | Attach As | Which side of the machine the connector acts as. For example, a connector under a machine can insert as if it were on top. Set a Fluid or Item row to None to switch it off. |
-| Distribution | Energy only. Round Robin rotates between outputs, Even splits each transfer, First Available fills outputs in order. |
+| Distribution | Energy only. Round Robin rotates between outputs, Even splits each transfer and then sends leftovers to outputs that can still take more, First Available fills outputs in order. |
 | Filters | Fluid and Item rows each have two ghost filter slots. Filters are copies and are never used up. |
 
 A new connector starts on channel 0, with Energy mode Both, Distribution Round Robin, and every Fluid and Item row set to IN. Attach As starts as the machine face the connector actually touches. Each Fluid and Item row has its own mode, channel, and Attach, and several rows can share a channel and side.
@@ -117,7 +117,7 @@ The Energy tab has one Energy Connector slot. The connector pulls FE from machin
 
 The tier is a per-tick cap in both directions. A connector takes at most its tier in FE/t from its machine, and delivers at most its tier in FE/t into its machine, however many generators feed the network. Most machines do not limit how fast they take or give FE, so the connector tier is usually what sets the rate.
 
-**Storage balancing.** Between two storage blocks, such as [Battery Chassis](battery-chassis.md), whose connectors are both on Both, FE flows only from the fuller block to the emptier one, by fill percentage, and stops once they are equally full. Gaps under 1% move nothing. Daisy-chained banks still pass charge along: a generator charges the first bank, and the first bank shares with the next. Generators still charge banks, and banks still feed machines. A completely full bank passes its overflow on freely, and a completely empty bank takes FE freely. To fill one bank from another regardless of fill, set the source bank's connector to Input or the destination bank's connector to Output.
+**Storage balancing.** A storage block is any block that can both take and give FE at that moment, such as a [Battery Chassis](battery-chassis.md). Between two storage blocks whose connectors are both on Both, FE flows only from the fuller block to the emptier one, by fill percentage, and stops once they are equally full. Gaps under 1% move nothing, so idle banks do not trade FE back and forth and lose it to charge and discharge losses. Daisy-chained banks still pass charge along: a generator charges the first bank, and the first bank shares with the next. Generators still charge banks, and banks still feed machines. A completely full bank passes its overflow on freely, and a completely empty bank takes FE freely. To fill one bank from another regardless of fill, set the source bank's connector to Input or the destination bank's connector to Output.
 
 **No FE on this side.** You can put a connector on any face, but many machines take or give FE only on some sides. If the machine has no FE on the connector's Attach As side, the Energy tab and the Wrench hologram show a red warning: `No FE on this side of the target. Change Attach As or move the connector.`
 
@@ -128,6 +128,8 @@ The tier is a per-tick cap in both directions. A connector takes at most its tie
 The Fluid tab has three rows, each with a Fluid Connector slot, its own mode, channel, and Attach setting, and two filter slots. An IN row drains a shipment from the machine, waits, and repeats. An OUT row fills its machine from shipments arriving on its channel, up to its tier's shipment size. To filter a row, put a filled bucket or other fluid container in a filter slot.
 
 Each shipment can **jam**: the row pauses for a few seconds without losing any fluid. Several IN rows on the same machine side and channel run in parallel, so stacking rows raises throughput.
+
+A connector with an IN row also accepts fluid or items that its machine pushes out on its own, and sends them to that row's channel. Pushed shipments follow the same size, wait, jam, and filter rules.
 
 | Connector | Stage | Shipment | Every | Jam chance, pause |
 |---|---:|---:|---:|---:|
@@ -153,7 +155,7 @@ The Item tab works the same way as the Fluid tab, with three Item Connector rows
 
 An {{ item('rngtech:advanced_item_filter') }} is a reusable filter you configure once and drop into an item filter slot. Right-click it to set it to **allow** or **deny**, and match by sample items, item tags, mod, component stage, Stability, identified state, or rarity. Deny filters are checked first, then allow filters. A row with only deny filters passes everything not denied.
 
-The Miner's Companion accepts the same filter.
+The {{ item('rngtech:miners_companion') }} accepts the same filter.
 
 ### Network bridges
 

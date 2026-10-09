@@ -62,7 +62,9 @@ Each job uses the input and the catalyst. The stabilizer is used up when a recip
 
 A recipe runs only if both the chassis stage and the installed Resonance Coil's stage reach the recipe's required stage. When a recipe lists no required stage, it needs the stage of its output.
 
-If a component rolls too low for the recipe you need, put it in a [Component Recycler](component-recycler.md) to get its raw input back and try again.
+If a component rolls too low for the recipe you need, put it in a [Component Recycler](component-recycler.md) to get its raw input back and try again. You lose the catalyst, the stabilizer, and the Refinement Potential. Calibrated Conductive Components always recycle into a Copper Coil, even ones made from a Sparksteel Coil.
+
+Only the Sparksteel Coil and Calibrated Diamond Crystal recipes can give Super Output. Every other recipe makes exactly one component per job, so calibrating and recycling never gains you items.
 
 ### Calibration families
 
@@ -82,7 +84,7 @@ Several families have a "resonant" recipe that adds a Matrix and a Stabilization
 | 7 | {{ item('rngtech:tungstensteel_resonance_calibrator_chassis') }} | 3 | Three-lane late-game bulk branch. |
 | 7 | {{ item('rngtech:nullite_resonance_calibrator_chassis') }} | 1 | Late-game precision branch with the best quality and Refinement Potential. |
 
-A multi-lane chassis calibrates that many copies of the input per cycle, each paying its own FE.
+A multi-lane chassis calibrates that many copies of the input per cycle, each paying its own FE. A cycle runs only as many copies as the input, catalyst, and stabilizer stacks allow. All copies from one cycle share the same stability and Refinement Potential roll.
 
 ### Gear
 
@@ -106,9 +108,13 @@ Coils, Control Boards, and Stabilizer Matrices come in Iron, Copper, Steel, Tita
 
 Gear and pattern slots are not reachable by automation.
 
+With JEI installed, recipes are listed under Resonance Calibration. Recipe transfer puts the pattern into the selected pattern slot if it is empty or already holds that pattern, otherwise into a slot holding it or the first empty one.
+
 ### Mastery and Ascendancies
 
 Each completed calibration earns Mastery XP; higher-stage recipes earn more. Multi-lane chassis earn XP for every job in a cycle. Calibrators start from the Control start of the shared [Machine Mastery](machine-mastery.md) tree, which they share with the [Metal Press](metal-press.md). They choose between the **Harmonist**, which rewards long runs of the same family with a rising stability floor, and the **Mass Tuner**, which makes multi-lane chassis cheaper to run. See [Resonance Calibrator ascendancies](machine-mastery.md#ascendancies).
+
+Extra components from Super Output earn no XP. Changing your Mastery allocation restarts the current calibration, but keeps your items and patterns.
 
 ### Calibration recipes
 
@@ -116,11 +122,55 @@ The Resonance Calibrator uses the `rngtech:calibration` recipe type. Hover an ou
 
 {{ processing("calibration", columns=["processing_ticks", "energy", "minimum_stage", "machine_xp"]) }}
 
+## Ascendancy trees
+
+Every node in this machine's ascendancies. See [Machine Mastery](machine-mastery.md#ascendancies) for how Seals and points work.
+
+<!-- ascendancy-trees:start -->
+
+### Harmonist
+
+| Node | Type | After | Effect |
+|---|---|---|---|
+| **Resonant Streak** | Root | — | +1 Streak Floor; +10 Streak Cap. |
+| Held Note | Small | Resonant Streak | +2 Streak Cap. |
+| **Sustained Tone** | Notable | Held Note | +8 Streak Cap. |
+| Long Note | Small | Sustained Tone | +2 Streak Cap. |
+| **Master Harmonic** | Deep notable | Long Note | 30% less Processing Speed. At the full streak, every 8th calibration comes out at exactly 100 stability. |
+| Quiet Coil | Small | Resonant Streak | 5% reduced Energy Use. |
+| **Second Pass** | Notable | Quiet Coil | A calibration under 40 stability is re-run once, paying FE and a catalyst again but not the input. |
+| Soft Reset | Small | Second Pass | 5% reduced Energy Use. |
+| **Pattern Memory** | Deep notable | Soft Reset | The streak survives one pattern or family change, and breaking the machine. |
+| Clean Line | Small | Resonant Streak | 8% increased Stability. |
+| **Clear Signal** | Notable | Clean Line | At the full streak, the stability ceiling rises by 5. |
+| Quick Ear | Small | Resonant Streak | 8% increased Processing Speed. |
+| **Perfect Pitch** | Notable | Quick Ear | 20% increased Calibration Precision. |
+
+### Mass Tuner
+
+| Node | Type | After | Effect |
+|---|---|---|---|
+| **Shared Field** | Root | — | One catalyst per cycle however many lanes run; the stability ceiling drops by 10. |
+| Brisk Field | Small | Shared Field | 8% increased Processing Speed. |
+| **Stabilizer Economy** | Notable | Brisk Field | Recipe stabilizers are consumed every other cycle. |
+| Tight Field | Small | Shared Field | 8% increased Calibration Precision. |
+| **Lane Sync** | Notable | Tight Field | 15% more Processing Speed while more than one lane runs. |
+| Focused Array | Small | Lane Sync | 8% increased Calibration Precision. |
+| **Resonance Array** | Deep notable | Focused Array | 100% increased Batch Size. The stability ceiling drops by another 15. |
+| Lean Field | Small | Shared Field | 5% reduced Energy Use. |
+| **Catalytic Surplus** | Notable | Lean Field | 25% increased Catalyst Efficiency. |
+| Broad Field | Small | Shared Field | 8% increased Stability. |
+| **Wide Tolerance** | Notable | Broad Field | +5 stability floor on a multi-lane chassis. |
+| Steady Reach | Small | Wide Tolerance | 8% increased Stability. |
+| **Overreach** | Deep notable | Steady Reach | +1 Coil Reach; 20% less Calibration Precision. |
+
+<!-- ascendancy-trees:end -->
+
 ## Screen
 
 The Resonance Calibrator screen has five tabs:
 
-- **Process**: input, catalyst, stabilizer, and output slots, progress, and energy.
+- **Process**: input, catalyst, stabilizer, and output slots, progress, and energy. With the Harmonist's Resonant Streak, the progress tooltip shows your current stability-floor bonus.
 - **Gear**: Resonance Coil, Control Board, Stabilizer Matrix, Battery Cell, and pattern slots.
 - **Stats**: the machine's current stats, including traits, Gear, and Mastery.
 - **Refinement**: refine the placed Calibrator's traits with a catalyst.

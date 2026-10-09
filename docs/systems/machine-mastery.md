@@ -108,13 +108,13 @@ An ascendancy is a family-specific specialization for one machine, modeled on Pa
 
 | Family | Ascendancies |
 | --- | --- |
-| [Crusher](../content/crusher.md#ascendancies) | Rockbreaker, Assayer |
-| [Furnace](../content/furnace.md#ascendancies) | Crucible Keeper, Bloomer |
-| [Alloy Furnace](../content/alloy-furnace.md#ascendancies) | Metallurgist, Blendwright |
-| [Metal Press](../content/metal-press.md#ascendancies) | Die Keeper, Drop Forge |
-| [Resonance Calibrator](../content/resonance-calibrator.md#ascendancies) | Harmonist, Mass Tuner |
-| [Melter](../content/melter.md#ascendancies) | Pressure Vessel, Twin Crucible |
-| [Forestry Companion](../content/tree-farm-automation.md#ascendancies) | Timber Baron, Grove Warden, Field Hand |
+| [Crusher](https://c-pettersson.github.io/rngtech/crusher/#ascendancy-trees) | Rockbreaker, Assayer |
+| [Furnace](https://c-pettersson.github.io/rngtech/furnace/#ascendancy-trees) | Crucible Keeper, Bloomer |
+| [Alloy Furnace](https://c-pettersson.github.io/rngtech/alloy-furnace/#ascendancy-trees) | Metallurgist, Blendwright |
+| [Metal Press](https://c-pettersson.github.io/rngtech/metal-press/#ascendancy-trees) | Die Keeper, Drop Forge |
+| [Resonance Calibrator](https://c-pettersson.github.io/rngtech/resonance-calibrator/#ascendancy-trees) | Harmonist, Mass Tuner |
+| [Melter](https://c-pettersson.github.io/rngtech/melter/#ascendancy-trees) | Pressure Vessel, Twin Crucible |
+| [Forestry Companion](https://c-pettersson.github.io/rngtech/forestry-cart-station/#ascendancy-trees) | Timber Baron, Grove Warden, Field Hand |
 
 ### Seals and tiers
 

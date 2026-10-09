@@ -46,7 +46,7 @@ Methane takes plain {{ item('rngtech:algae_biomass') }}. {{ item('rngtech:dense_
 
 You can fill the input tank with water buckets or other fluid containers in the Process tab, or pipe water in from the sides. To take fluid out, fill an empty container in the output container slot, or pull from the sides once a Fluid Pump is installed. If you put the wrong fluid in, use the purge buttons on the Process tab, or right-click the Melter with a {{ item('rngtech:purge_bucket') }} to void up to 1,000 mB (sneak to purge the output tank). Purging the input tank resets the current melt.
 
-When the output tank is full, the Melter stops. A Nullite Servo instead voids the overflow so it keeps running.
+Both tanks hold 4,000 mB to start. When the output tank is full, the Melter stops. A Nullite Servo instead voids the overflow so it keeps running.
 
 ### Gear
 
@@ -55,7 +55,7 @@ The Gear tab has five slots:
 - **Heat Core** (required): sets the Melter's temperature. Iron through Titanium Heat Cores fit.
 - **Crush Head** (required): sets the Melter's hardness level.
 - **Fluid Pump** (required): lets the Melter output fluid, and sets how fast it fills containers and pushes fluid out of the sides. Rolled Fluid Capacity affixes on the pump enlarge both tanks.
-- **Battery Cell** (optional): adds portable FE storage. Without a cell, the Melter keeps only a small working buffer and runs more slowly.
+- **Battery Cell** (optional): adds portable FE storage. Without a cell, the Melter keeps only a small working buffer and runs more slowly. Incoming FE fills the Melter's own buffer first, then charges the cell, and melting draws from the buffer before the cell.
 - **Servo** (optional): adds speed and control.
 
 | Fluid Pump | Stage | Base transfer |
@@ -80,11 +80,59 @@ Gear slots and the Refinement slot cannot be filled by automation.
 
 Each completed melt earns Melter Mastery XP, and you spend the points on the shared [Machine Mastery](machine-mastery.md) tree. The lava recipe earns none, and nothing is earned while the Melter is missing Gear, too cold, blocked by a full tank, or out of power. Melters choose between the **Pressure Vessel** and **Twin Crucible** [ascendancies](machine-mastery.md#ascendancies).
 
+A melt whose whole output a Nullite Servo voids earns no XP. Changing your Mastery allocation restarts the current melt, but keeps items, tanks, and Gear.
+
+The Melter has no Stability or Super Output, so those effects and the Single Pass keystone do nothing on it. It does not get the speed bonus of heat keystones such as Low Heat Specialist and Flash Annealing, and their max-heat caps do not apply to it, but their other penalties do. Fluid Yield is rounded down to whole millibuckets on each melt.
+
 ### Melter recipes
 
 The Melter uses its own recipe type, `rngtech:melter`. The Lubricant recipe accepts several base and additive items; hover a slot to see them cycle.
 
 {{ processing("melter") }}
+
+## Ascendancy trees
+
+Every node in this machine's ascendancies. See [Machine Mastery](machine-mastery.md#ascendancies) for how Seals and points work.
+
+<!-- ascendancy-trees:start -->
+
+### Pressure Vessel
+
+| Node | Type | After | Effect |
+|---|---|---|---|
+| **Pressurized Tanks** | Root | — | 200% increased Fluid Capacity; +10% Fluid Yield; 20% less Processing Speed. |
+| Wide Valves | Small | Pressurized Tanks | 10% increased Fluid Transfer. |
+| **Deep Intake** | Notable | Wide Valves | 100% increased Fluid Capacity. |
+| Relief Valve | Small | Deep Intake | 10% increased Fluid Transfer. |
+| **Overpressure** | Deep notable | Relief Valve | Melts run 30% faster while the output tank is over half full. |
+| Tight Seals | Small | Pressurized Tanks | +3% Fluid Yield. |
+| **Methane Trap** | Notable | Tight Seals | +25% Fluid Yield on methane from algae. |
+| Closed Circuit | Small | Pressurized Tanks | +3% Fluid Yield. |
+| **Brine Loop** | Notable | Closed Circuit | +25% Fluid Yield on Electrolyte Solution. |
+| Slow Boil | Small | Brine Loop | +3% Fluid Yield. |
+| **Autoclave** | Deep notable | Slow Boil | +15% Fluid Yield; 40% less Processing Speed. |
+| Spare Charge | Small | Pressurized Tanks | 10% increased Energy Capacity. |
+| **Sealed Lines** | Notable | Spare Charge | A full output tank pauses work and keeps progress, even with an auto-purge servo. |
+
+### Twin Crucible
+
+| Node | Type | After | Effect |
+|---|---|---|---|
+| **Second Crucible** | Root | — | +2 Batch Size; 15% more Energy Use. Each batched melt needs its own inputs, fluid, and tank room. |
+| Steady Feed | Small | Second Crucible | 8% increased Processing Speed. |
+| **Crush Feed** | Notable | Steady Feed | +10% Overlevel Speed. |
+| Hot Walls | Small | Second Crucible | 8% increased Heat Transfer. |
+| **Flash Point** | Notable | Hot Walls | 40% increased Heat Transfer. |
+| Fused Walls | Small | Flash Point | 8% increased Heat Transfer. |
+| **Fused Crucibles** | Deep notable | Fused Walls | Batching is off; 20% more Processing Speed per point of Batch Size. |
+| Lean Burn | Small | Second Crucible | 5% reduced Energy Use. |
+| **Shared Heat** | Notable | Lean Burn | Batched melts after the first use 20% less FE. |
+| Banked Burn | Small | Shared Heat | 5% reduced Energy Use. |
+| **Triple Crucible** | Deep notable | Banked Burn | +1 Batch Size. |
+| Deep Heat | Small | Second Crucible | 4% increased Max Temperature. |
+| **Lava Tap** | Notable | Deep Heat | The lava recipe runs 50% faster. |
+
+<!-- ascendancy-trees:end -->
 
 ## Screen
 

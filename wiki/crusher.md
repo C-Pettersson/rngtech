@@ -107,7 +107,7 @@ Output Amount above 1× is banked: each craft adds its fractional share to a bon
 | 7 | {{ item('rngtech:tungstensteel_crusher_chassis') }} | Heavy output body. Crushes up to 4 items per cycle. Has Output Guard. |
 | 8 | {{ item('rngtech:exotic_crusher_chassis') }} | Endgame body. Crushes up to 9 items per cycle. Has Output Guard and a far larger internal buffer than any other chassis. |
 
-Output Guard keeps progress for a while when the output slot is full instead of resetting it. Batching chassis process several items from the same input stack in one cycle; each extra item makes the cycle a little longer.
+Output Guard keeps progress for a while when the output slot is full instead of resetting it. Batching chassis process several items from the same input stack in one cycle; each extra item makes the cycle a little longer. A batch takes as many items as the input stack and the free output space allow, up to the batch size, and keeps that count until the cycle ends.
 
 ### Gear
 
@@ -136,6 +136,50 @@ Each completed crushing job earns Crusher Mastery XP, and you spend the points o
 The Crusher uses its own recipe type, `rngtech:crusher`. The Processing level column is the recipe's hardness.
 
 {{ processing("crusher") }}
+
+## Ascendancy trees
+
+Every node in this machine's ascendancies. See [Machine Mastery](machine-mastery.md#ascendancies) for how Seals and points work.
+
+<!-- ascendancy-trees:start -->
+
+### Rockbreaker
+
+| Node | Type | After | Effect |
+|---|---|---|---|
+| **Breaker’s Stance** | Root | — | +1 Hardness Tolerance. |
+| Quick Release | Small | Breaker’s Stance | +10% Jam Recovery. |
+| **Jam Breaker** | Notable | Quick Release | 50% less Jam Chance; +40% Jam Recovery. |
+| Tempered Jaws | Small | Breaker’s Stance | +3% Hardness Energy Mitigation. |
+| **Fault Lines** | Notable | Tempered Jaws | Under-level cycles keep positive Output Amount. Super Output and salvage stay off. |
+| Salvage Grit | Small | Fault Lines | +2% Crusher Salvage. |
+| **Rubble Reclaimer** | Deep notable | Salvage Grit | Under-level cycles can roll salvage at half chance. |
+| Steady Pressure | Small | Breaker’s Stance | +10% Under-Level Efficiency. |
+| **Pressure Stacking** | Notable | Steady Pressure | +40% Under-Level Efficiency. |
+| Deep Pressure | Small | Pressure Stacking | +10% Under-Level Efficiency. |
+| **Bedrock Bite** | Deep notable | Deep Pressure | +1 Hardness Tolerance. |
+| Lean Crushing | Small | Breaker’s Stance | 5% reduced Energy Use. |
+| **Shatter Point** | Notable | Lean Crushing | The extra FE cost of high-hardness recipes is halved. |
+
+### Assayer
+
+| Node | Type | After | Effect |
+|---|---|---|---|
+| **Assay Ledger** | Root | — | +4 Bank Memory. |
+| Ledger Pages | Small | Assay Ledger | +2 Bank Memory. |
+| **Wide Ledger** | Notable | Ledger Pages | +6 Bank Memory. Remembered bonus banks survive breaking and pick-block. |
+| Sworn Yield | Small | Wide Ledger | 4% increased Bonus Output. |
+| **Refiner’s Oath** | Deep notable | Sworn Yield | Batching is off. 5% more Output Amount per point of Batch Size, up to 50%. |
+| Rich Assay | Small | Assay Ledger | 4% increased Bonus Output. |
+| **Compound Yield** | Notable | Rich Assay | A bonus bank payout can also trigger Super Output. |
+| Vein Sense | Small | Compound Yield | +1% Super Output. |
+| **Mother Lode** | Deep notable | Vein Sense | Super Output Cadence fixed at 16 cycles. |
+| Lucky Strike | Small | Assay Ledger | +1% Super Output. |
+| **Tailings Recovery** | Notable | Lucky Strike | +3% Crusher Salvage. Salvage that does not fit the output is banked instead of lost. |
+| True Measure | Small | Assay Ledger | +5% At-Level Output. |
+| **Matched Hardness** | Notable | True Measure | +15% At-Level Output. |
+
+<!-- ascendancy-trees:end -->
 
 ## Screen
 

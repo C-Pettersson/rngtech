@@ -61,7 +61,7 @@ The {{ item('rngtech:aethergold_cavitation_rotor') }} is a Stage 7 sidegrade. It
 | Collapse Nozzle | Yes | Steel through Exotic Collapse Nozzles, or the Nitrogen Separation Nozzle. Tunes FE, heat strain, and Nitrogen output. |
 | Heat Core | No | Makes heat strain cool faster. Higher-stage cores cool faster; an Iron Heat Core adds nothing. |
 | Battery Cell | No | Adds FE storage. It does not raise the export rate. |
-| Servo | No | Stage 6+ Servos only ({{ item('rngtech:titanium_servo') }} and up). Speeds cycles and reduces wear and heat strain. |
+| Servo | No | Stage 6+ Servos only ({{ item('rngtech:titanium_servo') }} and up). Speeds cycles and reduces wear and heat strain. The Nullite Servo instead halves cycle speed, in exchange for voiding excess Nitrogen. |
 | Energy Connector | No | Sets how fast FE leaves the sides. Without one, the rotor and nozzle set a lower fallback rate. Either way, the cap is per tick and shared by all sides. |
 
 Cavitation Rotors can roll flat and percent Durability affixes.
@@ -92,7 +92,7 @@ The Cavitation Generator screen has four tabs:
 - **Stats**: the machine's current stats, including traits and Gear.
 - **Refinement**: refine the placed generator's traits with a catalyst.
 
-A {{ item('rngtech:purge_bucket') }} used on the generator voids up to 1,000 mB from the input tank, or from the Nitrogen tank while sneaking.
+A {{ item('rngtech:purge_bucket') }} used on the generator voids up to 1,000 mB from the input tank, or from the Nitrogen tank while sneaking. Purging the input tank also cancels the cycle in progress, and its Water is lost.
 
 ## Data values
 

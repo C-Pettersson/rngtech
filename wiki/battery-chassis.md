@@ -64,6 +64,7 @@ Put Battery Cells in the chassis, then connect it to generators and machines dir
 - **Capacity** is the total of the installed cells, multiplied by the chassis's capacity affixes. That bonus only applies while the cells stay in this chassis.
 - **Input and output speed** come from the installed cells. Their combined charge and discharge rates are the limit, not the chassis, so a big chassis full of weak cells is still slow. These rates are per tick and shared by every side and connector, so adding sides or connectors does not raise them. An attached Universal Cable connector can cap it lower; while it runs at its cap and the cells could move more, the readout shows **Attached connector limits input energy** or **Attached connector limits output energy**.
 - **Idle loss** slowly drains stored FE. Cells leak on their own, and some chassis add or remove leakage.
+- **Efficiency** below 1.0 wastes FE: the chassis stores less than it accepts and draws more from its cells than it delivers. The Wooden, Copper, Gold, and Arclite chassis start below 1.0, and Efficiency affixes can raise it. Efficiency above 1.0 gives no bonus.
 
 Two Battery Chassis placed directly next to each other slowly even out their fill levels. Banks on the same cable network with connectors on Both also even out their charge and then stop, instead of draining each other, so daisy-chained banks pass charge along. See [storage balancing](universal-cable.md#energy).
 
@@ -75,22 +76,22 @@ Two Battery Chassis placed directly next to each other slowly even out their fil
 | 1 | {{ item('rngtech:iron_battery_chassis') }} | 1 | Simple and reliable, with no leakage. Strong per-cell bonuses. |
 | 2 | {{ item('rngtech:copper_battery_chassis') }} | 2 | Better transfer rating with light leakage. |
 | 3 | {{ item('rngtech:gold_battery_chassis') }} | 3 | Large burst identity, but less stable and leakier. |
-| 4 | {{ item('rngtech:steel_battery_chassis') }} | 4 | Stable, no chassis leakage, and reduces installed cells' own leakage. |
+| 4 | {{ item('rngtech:steel_battery_chassis') }} | 4 | Stable, no chassis leakage, and cuts each installed cell's own leakage by 0.02%/min. |
 | 5 | {{ item('rngtech:sparksteel_battery_chassis') }} | 5 | Charge Balancer. |
 | 6 | {{ item('rngtech:arclite_battery_chassis') }} | 6 | High transfer rating with Charge Balancer. |
 | 7 | {{ item('rngtech:nullite_battery_chassis') }} | 8 | Late-game bank with Charge Balancer. |
-| 7 | {{ item('rngtech:aethergold_battery_chassis') }} | 6 | Seals installed cells so they do not leak at all. Strongest burst identity. |
-| 8 | {{ item('rngtech:exotic_battery_chassis') }} | 10 | Largest, most stable bank, with weaker per-cell bonuses. |
+| 7 | {{ item('rngtech:aethergold_battery_chassis') }} | 6 | Charge Balancer. Seals installed cells so they do not leak at all. Strongest burst identity. |
+| 8 | {{ item('rngtech:exotic_battery_chassis') }} | 10 | Charge Balancer. Largest, most stable bank, with weaker per-cell bonuses. |
 
 More slots is not always better. Low-slot chassis apply their affixes more strongly to each cell, so a focused Iron or Copper chassis can still be worth keeping.
 
-**Charge Balancer** spreads charging, discharging, and leakage evenly across all installed cells instead of filling or draining one at a time. Chassis without it can roll the **Balance Mode** prefix for the same effect. See [Balance Mode](rarity-and-affixes.md#balance-mode).
+**Charge Balancer** spreads charging, discharging, and leakage evenly across all installed cells instead of filling or draining one at a time. Chassis without it can roll the **Balance Mode** prefix for the same effect. See [Balance Mode](rarity-and-affixes.md#balance-mode). Balancing still respects each cell's own rates, stored FE, and free space: when one cell cannot take or give its share, the others cover it. It does not change capacity or transfer rate.
 
 The Copper and Gold chassis, and every chassis from Sparksteel up, carry a burst identity. It does not raise output above what the cells can deliver.
 
 ### Gear
 
-The Gear tab holds the Battery Cells. Any Battery Cell fits, one per slot. The **Additional Battery Slots** prefix can unlock up to four more slots, and the **Charged Storage** prefix doubles capacity after the chassis has held energy continuously for 10 minutes.
+The Gear tab holds the Battery Cells. Any Battery Cell fits, one per slot. The **Additional Battery Slots** prefix can unlock up to four more slots, and the **Charged Storage** prefix doubles capacity after the chassis has held energy continuously for 10 minutes. If the bank runs empty, that timer starts over.
 
 ### Automation
 

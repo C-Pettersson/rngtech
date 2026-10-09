@@ -40,9 +40,9 @@ Mine a placed Component Assembler with a pickaxe. It drops itself and keeps its 
 
 ### Assembling
 
-Put the item ingredients in the four input slots on the Process tab and fill the assembly tank with the fluid the recipe needs. The machine then runs on FE and places the result in its four-slot output rack. Some recipes take more than one of an item from a single input slot, such as four Redstone for a Servo.
+Put the item ingredients in the four input slots on the Process tab and fill the assembly tank with the fluid the recipe needs. The machine then runs on FE and places the result in its four-slot output rack. Ingredients go in slot order: the recipe's first ingredient in the first slot, the second in the next, and so on. Leave unused input slots empty. Some recipes take more than one of an item from a single input slot, such as four Redstone for a Servo.
 
-The tank holds one assembly fluid at a time:
+The tank holds 4,000 mB of one assembly fluid at a time:
 
 - **Electrolyte Solution** for Primed Cell Cores, Anodes, and the Primed Seal Core.
 - **Lubricant** for Servos, the Lubricated Seal Core, and the {{ item('rngtech:lubricated_frame_coupling') }}.

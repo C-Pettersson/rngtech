@@ -1,6 +1,6 @@
 # PRD: Tree Farm Automation
 
-> Design requirements, not a release status report. See [Current Implementation](../reference/current-implementation.md) and [Tree Farm Automation](../content/tree-farm-automation.md) for current behavior.
+> Design requirements, not a release status report. See [Current Implementation](../reference/current-implementation.md) and [Tree Farm Automation](https://c-pettersson.github.io/rngtech/forestry-cart-station/) for current behavior.
 
 
 PRD status: Draft
@@ -26,9 +26,9 @@ The design goal is industrial automation that still feels like Minecraft: rails,
 - [Component Stages](../reference/component-stages.md)
 - [Machine Stats](../reference/machine-stats.md)
 - [Modifier Eligibility](../reference/modifier-eligibility.md)
-- [Battery Cells](../content/battery-cells.md)
-- [Universal Cable](../content/basic-wire.md)
-- [Modular Field Tools](../content/modular-field-tools.md)
+- [Battery Cells](https://c-pettersson.github.io/rngtech/battery-cells/)
+- [Universal Cable](https://c-pettersson.github.io/rngtech/universal-cable/)
+- [Modular Field Tools](https://c-pettersson.github.io/rngtech/tool-bench/)
 
 Key existing code to reuse:
 

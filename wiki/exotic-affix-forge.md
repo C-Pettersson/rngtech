@@ -49,7 +49,7 @@ While the operation runs, the operation and selection controls are locked. When 
 
 ### Power failure
 
-The forge draws FE every tick while it works. If it cannot draw enough, the power-failure meter fills. When the meter is full, the operation fails with an audible cue, progress resets, and the button changes to **Retry**.
+The forge draws FE every tick while it works. Each tick it cannot draw enough fills the power-failure meter a little, and each powered tick drains it again. After 100 unpowered ticks (5 seconds) the meter is full: the operation fails with an audible cue, progress resets, and the button changes to **Retry**.
 
 A failure keeps your item, catalysts, and RP. Only the FE already spent is lost. Make sure your supply, plus the internal buffer and Battery Cell, can carry the whole operation.
 
@@ -62,13 +62,15 @@ A failure keeps your item, catalysts, and RP. Only the FE already spent is lost.
 | Refine Selected | Rerolls the value of one affix within its current tier. | One affix |
 | Remove Selected | Removes one rolled affix. Fixed identity traits cannot be removed. | One affix |
 | Add Modifier | Adds a legal affix to an empty prefix or suffix slot. | One empty slot |
-| Reforge | Rerolls rarity, Refinement Potential, and affixes as if the item were newly crafted. Stored energy and the item's Exotic Forge history are kept. | None |
+| Reforge | Rerolls rarity, Refinement Potential, and affixes as if the item were newly crafted. Stored energy and the item's Exotic Forge history are kept. Works even on an item with 0 RP. | None |
+
+If a reforged Battery Cell rolls a smaller capacity, any stored energy above the new capacity is lost.
 
 The forge refuses to start, and uses nothing, if the item cannot be refined, has too little RP, lacks a selection, or the operation is not legal for it.
 
 ### Rising costs
 
-The forge records how many times it has worked on each item, both in total and per operation. Every successful operation raises the FE and catalyst cost of the next one on that item, up to 16 catalysts per operation. A fresh item costs the base amounts shown in the table below, unless the server config scales FE or time.
+The forge records how many times it has worked on each item, both in total and per operation. Every successful operation raises the FE and catalyst cost of the next one on that item, up to 16 catalysts per operation. Each earlier operation adds 35% to 75% of the base cost, depending on the operation, and each earlier use of the same operation adds another 50% to 100%. For example, a second Reforge on the same item costs 2.5 times the first. The time does not grow, so the FE drawn per tick rises with the cost. A fresh item costs the base amounts shown in the table below, unless the server config scales FE or time.
 
 ### Gear
 

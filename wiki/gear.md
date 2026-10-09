@@ -130,9 +130,9 @@ A few slots work differently:
 
 ## Rolls and refinement
 
-Each crafted part rolls its own rarity and affixes, and you can refine it in the [Affix Forge](affix-forge.md). A part's affixes are **local**: they scale that part's own stats, and the result is then added to the machine. Holding Shift on a tooltip marks these rolls "(Local)".
+Each crafted part rolls its own rarity and affixes, and you can refine it in the [Affix Forge](affix-forge.md). Parts do not stack. A part's affixes are **local**: they scale that part's own stats, and the result is then added to the machine. Holding Shift on a tooltip marks these rolls "(Local)". Rolls without the mark, such as a Fluid Pump's Fluid Capacity, apply to the machine as they are.
 
-Higher-stage parts are crafted from fresh materials, not from the previous part. You can keep a well-rolled part in service and craft the next stage separately. The {{ item('rngtech:nullite_servo') }} is the one part that upgrades from an older part, the {{ item('rngtech:titanium_servo') }}.
+Higher-stage parts are crafted from fresh materials, not from the previous part. You can keep a well-rolled part in service and craft the next stage separately. The {{ item('rngtech:nullite_servo') }} is the one part that upgrades from an older part, the {{ item('rngtech:titanium_servo') }}. It rolls fresh traits: the Titanium Servo's affixes and RP are lost.
 
 Many parts you no longer need can be broken down for materials in a [Component Recycler](component-recycler.md).
 
@@ -156,7 +156,7 @@ A Crush Head sets the **hardness level** your machine can crush, from 1 to 8. Th
 
 The Flint Crush Head is cheap starter tooling with slower processing.
 
-**Used in:** [Crusher](crusher.md) (required, up to the chassis stage), [Melter](melter.md) (required, any stage, sets the processing level for melts), and the Miner's Companion (required).
+**Used in:** [Crusher](crusher.md) (required, up to the chassis stage), [Melter](melter.md) (required, any stage, sets the processing level for melts), and the {{ item('rngtech:miners_companion') }} (required).
 
 {{ crafting('rngtech:iron_crush_head') }}
 
@@ -240,7 +240,7 @@ The [Potential Reactor](potential-reactor.md) uses three part types:
 | 3 | {{ item('rngtech:bronze_reactor_chamber') }} | {{ item('rngtech:bronze_recovery_filter') }} | {{ item('rngtech:bronze_containment_lining') }} |
 | 4 | {{ item('rngtech:steel_reactor_chamber') }} | {{ item('rngtech:steel_recovery_filter') }} | {{ item('rngtech:steel_containment_lining') }} |
 
-Recovery Filters also fit the [Component Recycler](component-recycler.md) (optional, up to the chassis stage), where they unlock filter-only outputs, and the Miner's Companion, where they unlock rare trace recovery.
+Recovery Filters also fit the [Component Recycler](component-recycler.md) (optional, up to the chassis stage), where they unlock filter-only outputs, and the {{ item('rngtech:miners_companion') }}, where they unlock rare trace recovery.
 
 ### Disassembly Heads
 

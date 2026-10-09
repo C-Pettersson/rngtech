@@ -2,7 +2,7 @@
 
 Status: Planned
 
-Player guide: link the matching wiki page once the content is implemented, e.g. `https://c-pettersson.github.io/rngtech/<slug>/`.
+Use this template for proposed content only. When it ships, player behavior moves to a wiki page, design rules move to Machine Design Notes in `docs/reference/machine-guidelines.md`, and this page is deleted.
 
 Resource id: `rngtech:example`
 

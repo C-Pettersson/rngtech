@@ -68,8 +68,11 @@ Put the item to recycle in the input slot. When it finishes, its returns go to t
 | Machine part | One gear, coil, core, plate, casing, or other functional part | Another ingredient |
 | Calibrated component | Its main raw ingredient, such as the Iron Gear from a {{ item('rngtech:calibrated_kinetic_component') }} | Nothing extra |
 | Battery Cell | The cell core or shell plus one material ingredient | One plate or stabilizing ingredient |
+| Resonance Coil, Control Board, or Stabilizer Matrix | Its core part (Energy Coil, Control Board, or Matrix) plus one matching ingot | Redstone, or a Stabilization Catalyst for a Matrix |
+| Alloy Crucible | The previous crucible, or a Bronze Casing for the Bronze one, plus two ingots of its metal | Two more ingots |
+| {{ item('rngtech:pitted_cavitation_rotor') }} | Recycling Byproduct only, at Stage 5 | Nothing extra |
 
-Calibrated components return their raw ingredient, so a low-stability roll from the [Resonance Calibrator](resonance-calibrator.md) is not wasted: recycle it and try again. Patterns, catalysts, and stabilizers used in the calibration are not returned. Machines and parts that were crafted from calibrated components return the uncalibrated ingredient instead.
+Calibrated components return their raw ingredient, so a low-stability roll from the [Resonance Calibrator](resonance-calibrator.md) is not wasted: recycle it and try again. Patterns, catalysts, and stabilizers used in the calibration are not returned. Machines and parts that were crafted from calibrated components return the uncalibrated ingredient instead. Calibrated Conductive Components always return a Copper Coil, even ones calibrated from a Sparksteel Coil.
 
 ### Crude Recycler and Hand Crank
 
@@ -98,7 +101,7 @@ Each recipe has a minimum processing level. To run it, both the Recycler's stage
 Powered Recyclers have a Gear tab with:
 
 - one **Disassembly Head** slot (required). The head sets the processing level, speed, and stability. Heads range from {{ item('rngtech:iron_disassembly_head') }} to {{ item('rngtech:exotic_disassembly_head') }}, and the head's stage cannot exceed the Recycler's.
-- one **Recovery Filter** slot (optional). A filter unlocks the extra returns marked "needs a Recovery Filter" in the table below. Filters run from {{ item('rngtech:iron_recovery_filter') }} to {{ item('rngtech:steel_recovery_filter') }} and are shared with the [Potential Reactor](potential-reactor.md).
+- one **Recovery Filter** slot (optional). A filter unlocks the extra returns marked "needs a Recovery Filter" in the table below. Filters run from {{ item('rngtech:iron_recovery_filter') }} to {{ item('rngtech:steel_recovery_filter') }} and are shared with the [Potential Reactor](potential-reactor.md). Like the head, the filter's stage cannot exceed the Recycler's.
 - one **Battery Cell** slot (optional) for extra FE storage.
 
 Recyclers never roll or use Super Output, so recycling can never duplicate materials.

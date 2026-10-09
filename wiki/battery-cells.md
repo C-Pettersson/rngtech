@@ -20,7 +20,7 @@ wiki:
 
 **Battery Cells** are rechargeable [Gear](gear.md) that store FE. You install them in a machine's Gear tab to give it a power reserve, or fill a [Battery Chassis](battery-chassis.md) with them to build an energy bank.
 
-Each cell is its own item with its own [rarity and affixes](rarity-and-affixes.md). A cell keeps its stored FE when you take it out, and its durability bar shows how full it is. Cells can be charged by anything that charges FE items.
+Each cell is its own item with its own [rarity and affixes](rarity-and-affixes.md), so cells do not stack. A cell keeps its stored FE when you take it out, and its durability bar shows how full it is. Cells can be charged by anything that charges FE items.
 
 ## Cell tiers
 
@@ -51,7 +51,7 @@ The {{ item('rngtech:unique_potato_battery_cell') }} is a rare find in village c
 
 ## Affixes
 
-Cells roll affixes like any other Gear. Capacity affixes come in two kinds: flat (+FE) and percentage (increased capacity). Flat bonuses apply first, so a Copper Cell with +4,000 FE and 25% increased capacity holds (12,000 + 4,000) × 1.25 = 20,000 FE. Other affixes improve transfer rates or reduce leakage. You can refine standard cells in the [Affix Forge](affix-forge.md).
+Cells roll affixes like any other Gear. Capacity affixes come in two kinds: flat (+FE) and percentage (increased capacity). Flat bonuses apply first, so a Copper Cell with +4,000 FE and 25% increased capacity holds (12,000 + 4,000) × 1.25 = 20,000 FE. Other affixes improve transfer rates or reduce leakage. Cells can also roll Efficiency, and the Left Shift tooltip shows an Efficiency value, but it has no effect on how a cell charges or discharges. You can refine standard cells in the [Affix Forge](affix-forge.md).
 
 ## Cells in machines
 
@@ -90,7 +90,7 @@ Most slots take any cell. These machines limit the stage:
 | [Ammonia Fuel Cell](ammonia-fuel-cell.md) | Optional, Stage 6 or higher. |
 | [Compressor Tank](compressor-tank.md) (Steel and higher) | Required, up to the tank's stage. |
 
-Modular tools and the Miner's Companion also run on an installed Battery Cell; the [Tool Bench](tool-bench.md) installs and charges them.
+Modular tools and the {{ item('rngtech:miners_companion') }} also run on an installed Battery Cell. The [Tool Bench](tool-bench.md) installs cells in modular tools and charges both; the Miner's Companion takes its cell in its own Gear tab.
 
 ## Cells in a Battery Chassis
 

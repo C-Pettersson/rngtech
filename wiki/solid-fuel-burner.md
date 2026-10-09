@@ -51,7 +51,7 @@ A burner needs all three Gear parts before it burns anything: a **Heat Core**, a
 
 The burner writes generated FE straight into the installed Battery Cell and pushes it out to adjacent blocks that accept FE, such as a [Universal Cable](universal-cable.md) or a [Battery Chassis](battery-chassis.md). The burner does not limit its own output, so the receiver or cable tier decides how much FE moves each tick. It never accepts FE from outside.
 
-Each fuel item holds a fixed amount of energy: 10 FE per tick of its furnace burn time. One Coal holds 16,000 FE before fuel stats. A stronger Heat Core does not get more FE from that Coal. It spends the same Coal faster, at a higher FE/t. Fuel efficiency and fuel duration stats are what make each item worth more.
+Each fuel item holds a fixed amount of energy: 10 FE per tick of its furnace burn time. One Coal holds 16,000 FE before fuel stats. A stronger Heat Core does not get more FE from that Coal. It spends the same Coal faster, at a higher FE/t. Fuel efficiency and fuel duration stats are what make each item worth more. For example, a Steel Heat Core in a Steel Fuel Box gets about 20,000 FE from one Coal and burns through it in about 10 seconds.
 
 Logs are accepted but burn for only a quarter of their furnace burn time, so turn them into planks first.
 
@@ -99,23 +99,27 @@ The Gear tab has three required slots:
 - **Fuel Box**: sets the number of fuel slots, which fuel forms are accepted, and fuel behaviors.
 - **Battery Cell**: stores the generated FE. Stage 0–4 cells fit, up to the chassis stage. In a burner, the cell only adds storage and does not cap output.
 
-| Heat Core | Base output | Max fuel tier |
-|---|---:|---:|
-| {{ item('rngtech:iron_heat_core') }} | 24 FE/t | 1 |
-| {{ item('rngtech:copper_heat_core') }} | 40 FE/t | 2 |
-| {{ item('rngtech:bronze_heat_core') }} | 64 FE/t | 3 |
-| {{ item('rngtech:steel_heat_core') }} | 96 FE/t | 4 |
+| Heat Core | Base output | Fuel efficiency | Heat isolation | Max fuel tier |
+|---|---:|---:|---:|---:|
+| {{ item('rngtech:iron_heat_core') }} | 24 FE/t | 0.85x | 0.85x | 1 |
+| {{ item('rngtech:copper_heat_core') }} | 40 FE/t | 0.80x | 0.75x | 2 |
+| {{ item('rngtech:bronze_heat_core') }} | 64 FE/t | 1.00x | 1.00x | 3 |
+| {{ item('rngtech:steel_heat_core') }} | 96 FE/t | 1.15x | 1.20x | 4 |
 
-| Fuel Box | Fuel slots | Forms | Behaviors |
-|---|---:|---|---|
-| {{ item('rngtech:iron_fuel_box') }} | 1 | Item fuels | None |
-| {{ item('rngtech:copper_fuel_box') }} | 1 | Item fuels | Fuel Governor, Quick Feed |
-| {{ item('rngtech:bronze_fuel_box') }} | 2 | Item fuels | Fuel Governor, Fuel Reserve |
-| {{ item('rngtech:steel_fuel_box') }} | 2 | Item and block fuels | Fuel Governor, Block Feed |
+Heat isolation below 1.00x leaks heat: part of each fuel item's burn time is lost while it burns, so Iron and Copper Heat Cores waste some fuel. At 1.00x or above, nothing leaks.
+
+| Fuel Box | Fuel slots | Fuel efficiency | Forms | Behaviors |
+|---|---:|---:|---|---|
+| {{ item('rngtech:iron_fuel_box') }} | 1 | 0.95x | Item fuels | None |
+| {{ item('rngtech:copper_fuel_box') }} | 1 | 0.90x | Item fuels | Fuel Governor, Quick Feed |
+| {{ item('rngtech:bronze_fuel_box') }} | 2 | 1.00x | Item fuels | Fuel Governor, Fuel Reserve |
+| {{ item('rngtech:steel_fuel_box') }} | 2 | 1.10x | Item and block fuels | Fuel Governor, Block Feed |
+
+The Heat Core's and Fuel Box's fuel efficiency multiply together.
 
 What the behaviors do:
 
-- **Fuel Governor**: when the Battery Cell is full, the burner pauses instead of burning fuel for nothing. An Iron Fuel Box has no governor, so it keeps burning and wastes fuel while the cell is full. See [Fuel Governor](rarity-and-affixes.md#fuel-governor).
+- **Fuel Governor**: when the Battery Cell is full, the burner pauses instead of burning fuel for nothing. The current fuel item stops burning and loses no burn time to heat leakage, the burner keeps exporting FE, and it picks up where it left off once the cell has room. An Iron Fuel Box has no governor, so it keeps burning and wastes fuel while the cell is full. See [Fuel Governor](rarity-and-affixes.md#fuel-governor).
 - **Quick Feed**: an identity trait on the Copper burner, Copper Heat Core, and Copper Fuel Box. It does not change how the burner runs.
 - **Fuel Reserve**: the burner leaves the last fuel item in its slot untouched, so an automated feed line never runs completely dry. Comes from the Alloy burner and Bronze Fuel Box.
 - **Block Feed**: lets the burner accept compact block fuels such as Blocks of Coal.

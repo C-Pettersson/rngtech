@@ -60,7 +60,7 @@ The odds depend on the item's [stage](stages.md):
 
 Stage 1–4 items are never Normal, so the gear you build early always shows some affixes. From Stage 5 up, a Normal roll is common, and the [Affix Forge](affix-forge.md) does more of the work.
 
-The Miner's Companion and the Forestry Companion roll as Stage 2 items. The Crude and Steel [Metal Press](metal-press.md) roll as Stage 8 items, with Stage 8 tiers and RP, because they have no upgrade ladder to carry your investment forward.
+The {{ item('rngtech:miners_companion') }} and the Forestry Companion roll as Stage 2 items. The Crude and Steel [Metal Press](metal-press.md) roll as Stage 8 items, with Stage 8 tiers and RP, because they have no upgrade ladder to carry your investment forward.
 
 ## Affixes
 
@@ -167,7 +167,7 @@ A suffix that halves the failure strain a heat machine takes when its power drop
 
 ## Refinement Potential
 
-**Refinement Potential** (RP) is each item's budget for changing its affixes. Every successful refinement spends some. When RP runs out, the item is final, so spend it where it matters.
+**Refinement Potential** (RP) is each item's budget for changing its affixes. Every successful refinement spends some. When RP runs out, the item is final, so spend it where it matters. The only way back is a Reforge in the [Exotic Affix Forge](exotic-affix-forge.md), which rerolls the whole item, RP included.
 
 RP is rolled separately from rarity, and the starting affixes cost nothing. A Rare item keeps its full budget, just like a Normal one. Higher stages get bigger budgets:
 

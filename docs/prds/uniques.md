@@ -1,6 +1,6 @@
 # PRD: Unique Items
 
-> Design requirements, not a release status report. See [Current Implementation](../reference/current-implementation.md) and [Rarity](../reference/rarity.md) for current behavior.
+> Design requirements, not a release status report. See [Current Implementation](../reference/current-implementation.md) and [Rarity](https://c-pettersson.github.io/rngtech/rarity-and-affixes/) for current behavior.
 
 PRD status: Accepted
 
@@ -22,12 +22,12 @@ Uniques cannot be refined. [Corruption](corruption.md) is the only way to change
 
 ## References
 
-- [Rarity](../reference/rarity.md)
+- [Rarity](https://c-pettersson.github.io/rngtech/rarity-and-affixes/)
 - [Unique Item Ideas](../reference/unique-item-ideas.md): the candidate catalog this PRD promotes from
 - [Corruption PRD](corruption.md)
 - [Machine Guidelines](../reference/machine-guidelines.md)
 - [Machine Stats](../reference/machine-stats.md)
-- [Machine Parts](../content/machine-parts.md), [Battery Cells](../content/battery-cells.md)
+- [Machine Parts](https://c-pettersson.github.io/rngtech/gear/), [Battery Cells](https://c-pettersson.github.io/rngtech/battery-cells/)
 - [Machine Mastery](../systems/machine-mastery.md) and the [Machine Ascendancies PRD](machine-ascendancies.md)
 - [Crafting and Upgrades](../systems/crafting.md#unique-components)
 

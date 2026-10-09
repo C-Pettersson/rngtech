@@ -47,11 +47,11 @@ The fuel cell is the last step of the chain:
 
 Install a Fuel Cell Membrane in the Gear tab, then pipe Ammonia into the 8,000 mB tank. Each cycle burns 1,000 mB of Ammonia and generates 216,000 FE over 18 seconds, which is 600 FE/t before membrane and machine rolls. After the synthesis cost, the chain nets about 510 FE/t.
 
-The cell pushes FE out of its top and sides. It does not limit its own output, so the receiver or connector tier decides how much FE moves each tick. It stops when its internal storage and Battery Cell are full or when the residue slot is full, so keep both drained. The Process tab has a purge button for the Ammonia tank.
+The cell pushes FE out of its top and sides. It does not limit its own output, so the receiver or connector tier decides how much FE moves each tick. It stops when its internal storage and Battery Cell are full or when the residue slot is full, so keep both drained. The Process tab has a purge button for the Ammonia tank. Purging resets the cycle in progress.
 
 ### Gear
 
-- **Fuel Cell Membrane** (required): gates recipes by stage. The membrane has neutral base stats, so an unrolled one only unlocks the cell. Its rolled Energy Generation, Processing Speed, and Efficiency affixes apply to the fuel cell.
+- **Fuel Cell Membrane** (required): gates recipes by stage. The membrane has neutral base stats, so an unrolled one only unlocks the cell. Its rolled Energy Generation, Processing Speed, and Efficiency affixes apply to the fuel cell. Other rolls, such as Stability or Fluid Transfer, do nothing here.
 - **Battery Cell** (optional): adds FE storage. Only Stage 6 and higher cells fit.
 
 ### Automation

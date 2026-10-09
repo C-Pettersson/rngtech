@@ -72,6 +72,14 @@ Heat decides your progress. Unmodified electric chassis reach about:
 | {{ item('rngtech:steel_heat_core') }} | 1,400 | Stage 4 metals |
 | {{ item('rngtech:sparksteel_heat_core') }} | 1,600 | High-heat metals |
 | {{ item('rngtech:titanium_heat_core') }} | 1,800 | Late-game metals |
+| {{ item('rngtech:exotic_heat_core') }} | 2,200 | Every metal recipe |
+| {{ item('rngtech:aluminum_heat_core') }} | 850 | Low-heat Stage 5 sidegrade that heats up much faster |
+
+Vanilla ores and raw metals go through the same heat gates as RNGTech metals, so you cannot skip heat progression by smelting them directly.
+
+Crushed material smelts straight into ingots, which is handy for simple hopper lines, but it takes three times as long and costs 50% more FE than smelting dust. Crush it into dust first for faster, cheaper smelting.
+
+There is no Steel Dust smelting recipe. Steel comes from Steel Blend, which you make in the [Alloy Furnace](alloy-furnace.md) and then smelt here.
 
 Stage 4 and higher recipes also need temperature stability. On recipes that have a failure output, poor stability, overheating, or a power drop mid-cycle builds up failure strain. When strain fills, the input becomes a recoverable failure item such as a {{ item('rngtech:malformed_ingot') }}. Smelt it again to get two nuggets back.
 
@@ -85,7 +93,7 @@ Stage 4 and higher recipes also need temperature stability. On recipes that have
 | 3 | {{ item('rngtech:bronze_furnace_chassis') }} | Smelts Bronze Blend and Steel Blend faster. |
 | 4 | {{ item('rngtech:steel_furnace_chassis') }} | More efficient midgame chassis. |
 | 4 | {{ item('rngtech:lead_furnace_chassis') }} | Four smelting lanes and four Heat Core slots, at half the base speed. |
-| 5 | {{ item('rngtech:aluminum_furnace_chassis') }} | Fast but low-heat (850) sidegrade. |
+| 5 | {{ item('rngtech:aluminum_furnace_chassis') }} | Fast, efficient body with quick heat transfer. |
 | 6 | {{ item('rngtech:titanium_furnace_chassis') }} | High-heat advanced chassis. |
 | 7 | {{ item('rngtech:tungstensteel_furnace_chassis') }} | Heavy late-game heat chassis. |
 | 8 | {{ item('rngtech:exotic_furnace_chassis') }} | Optional endgame chassis. |
@@ -119,6 +127,50 @@ Smelting ores, raw metals, crushed ores, and alloy blends earns Furnace Mastery 
 The Furnace uses its own recipe type, `rngtech:furnace`, which covers vanilla smelting as well as RNGTech metals, alloy blends, and malformed-ingot recovery.
 
 {{ processing("furnace", hide=["experience"]) }}
+
+## Ascendancy trees
+
+Every node in this machine's ascendancies. See [Machine Mastery](machine-mastery.md#ascendancies) for how Seals and points work.
+
+<!-- ascendancy-trees:start -->
+
+### Crucible Keeper
+
+| Node | Type | After | Effect |
+|---|---|---|---|
+| **Overdrive Lanes** | Root | — | +1% Overdrive Speed; +30% Overdrive Cap. |
+| Hotter Lanes | Small | Overdrive Lanes | +5% Overdrive Cap. |
+| **Superheat** | Notable | Hotter Lanes | +15% Overdrive Cap. |
+| Deep Draft | Small | Superheat | 10% increased Heat Transfer. |
+| **Crucible Heart** | Deep notable | Deep Draft | Recipes whose target is at most half the lane’s temperature finish two inputs per cycle at twice the FE. |
+| Banked Coals | Small | Overdrive Lanes | 10% increased Heat Insulation. |
+| **Hold the Fire** | Notable | Banked Coals | A lane does not cool while its input slot holds a smeltable input. |
+| Watchful Gauge | Small | Overdrive Lanes | +10 °C Overdrive Margin. |
+| **Safe Margin** | Notable | Watchful Gauge | +15 °C Overdrive Margin. Overdrive never enters a recipe’s overheat band. |
+| Steady Hands | Small | Safe Margin | +2 Strain Recovery. |
+| **Strain Bleed** | Deep notable | Steady Hands | +10 Strain Recovery. |
+| Stoked Hearth | Small | Overdrive Lanes | 4% increased Max Temperature. |
+| **Shared Hearth** | Notable | Stoked Hearth | Every lane uses the hottest installed Heat Core’s maximum at 90%. |
+
+### Bloomer
+
+| Node | Type | After | Effect |
+|---|---|---|---|
+| **Bloom Ledger** | Root | — | +11.11% Ledger Rate; 50% less Super Output. |
+| Rich Ore | Small | Bloom Ledger | 10% increased Ledger Rate. |
+| **Rich Blooms** | Notable | Rich Ore | 100% increased Ledger Rate. |
+| Slow Growth | Small | Rich Blooms | 10% increased Ledger Rate. |
+| **Patient Bloom** | Deep notable | Slow Growth | 50% more Ledger Rate; 30% less Processing Speed. |
+| Flux Bed | Small | Bloom Ledger | 8% increased Temperature Stability. |
+| **Fluxed Blend** | Notable | Flux Bed | Blend smelts need 100 °C less. |
+| Skimmed Slag | Small | Bloom Ledger | 8% increased Stability. |
+| **Slag Reclaim** | Notable | Skimmed Slag | Malformed-ingot recovery takes half the time and half the FE. |
+| Clean Pour | Small | Slag Reclaim | 8% increased Temperature Stability. |
+| **Clean Bloom** | Deep notable | Clean Pour | Ore, raw, and crushed smelts never produce failure outputs. Low stability pauses the lane instead. |
+| Fed Line | Small | Bloom Ledger | 10% increased Ledger Rate. |
+| **Crusher Line** | Notable | Fed Line | Crushed inputs feed the Bloom Ledger twice. |
+
+<!-- ascendancy-trees:end -->
 
 ## Screen
 
