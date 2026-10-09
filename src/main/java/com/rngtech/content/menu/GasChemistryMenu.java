@@ -21,7 +21,6 @@ import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.items.ItemStackHandler;
 import net.neoforged.neoforge.items.SlotItemHandler;
 
@@ -52,7 +51,11 @@ public class GasChemistryMenu extends AbstractContainerMenu {
     private static final int DATA_REFINEMENT_POTENTIAL = 17;
     private static final int DATA_FLAT_ENERGY_GENERATION = 18;
     private static final int DATA_BASE_ENERGY_GENERATION = 19;
-    private static final int DATA_COUNT = 20;
+    private static final int DATA_WATER_FLUID_ID = 20;
+    private static final int DATA_INPUT_FLUID_ID = 21;
+    private static final int DATA_OUTPUT_FLUID_ID = 22;
+    private static final int DATA_SECONDARY_OUTPUT_FLUID_ID = 23;
+    private static final int DATA_COUNT = 24;
     private static final int STAT_SCALE = 100;
     private static final int PROCESS_INPUT_SLOT = 0;
     private static final int PROCESS_OUTPUT_SLOT = 1;
@@ -179,19 +182,19 @@ public class GasChemistryMenu extends AbstractContainerMenu {
     }
 
     public Component waterFluidName() {
-        return fluidName(gasChemistry.getWaterFluid(), Component.translatable("block.minecraft.water"));
+        return FluidMenuSupport.fluidName(data.get(DATA_WATER_FLUID_ID), Component.translatable("block.minecraft.water"));
     }
 
     public Component inputFluidName() {
-        return fluidName(gasChemistry.getInputFluid(), configuredInputFluidName());
+        return FluidMenuSupport.fluidName(data.get(DATA_INPUT_FLUID_ID), configuredInputFluidName());
     }
 
     public Component outputFluidName() {
-        return fluidName(gasChemistry.getOutputFluid(), configuredOutputFluidName());
+        return FluidMenuSupport.fluidName(data.get(DATA_OUTPUT_FLUID_ID), configuredOutputFluidName());
     }
 
     public Component secondaryOutputFluidName() {
-        return fluidName(gasChemistry.getSecondaryOutputFluid(), Component.translatable("fluid.rngtech.carbon_monoxide"));
+        return FluidMenuSupport.fluidName(data.get(DATA_SECONDARY_OUTPUT_FLUID_ID), Component.translatable("fluid.rngtech.carbon_monoxide"));
     }
 
     public int statusCode() {
@@ -252,8 +255,8 @@ public class GasChemistryMenu extends AbstractContainerMenu {
 
     private Component configuredInputFluidName() {
         return switch (machine()) {
-            case SYNGAS_COMBUSTOR -> Component.literal("Syngas / Carbon Monoxide");
-            case STEAM_METHANE_REFORMER -> Component.literal("Methane / Syngas");
+            case SYNGAS_COMBUSTOR -> Component.translatable("rngtech.gas_chemistry.input.syngas_combustor");
+            case STEAM_METHANE_REFORMER -> Component.translatable("rngtech.gas_chemistry.input.steam_methane_reformer");
             default -> Component.translatable("rngtech.purge.empty_fluid");
         };
     }
@@ -264,10 +267,6 @@ public class GasChemistryMenu extends AbstractContainerMenu {
             case SYNGAS_COMBUSTOR -> Component.translatable("fluid.rngtech.carbon_exhaust");
             case STEAM_METHANE_REFORMER -> Component.translatable("fluid.rngtech.hydrogen");
         };
-    }
-
-    private static Component fluidName(FluidStack stack, Component emptyName) {
-        return stack.isEmpty() ? emptyName : stack.getHoverName();
     }
 
     @Override

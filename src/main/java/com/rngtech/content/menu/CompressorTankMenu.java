@@ -19,7 +19,6 @@ import net.minecraft.world.inventory.SimpleContainerData;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.items.ItemStackHandler;
 import net.neoforged.neoforge.items.SlotItemHandler;
 
@@ -51,7 +50,9 @@ public class CompressorTankMenu extends AbstractContainerMenu {
     private static final int DATA_ENERGY_TRANSFER = 17;
     private static final int DATA_FLUID_TRANSFER = 18;
     private static final int DATA_REFINEMENT_POTENTIAL = 19;
-    private static final int DATA_COUNT = 20;
+    private static final int DATA_LOOSE_FLUID_ID = 20;
+    private static final int DATA_COMPRESSED_FLUID_ID = 21;
+    private static final int DATA_COUNT = 22;
     private static final int STAT_SCALE = 100;
     private static final int PROCESS_SLOT_COUNT = CompressorTankBlockEntity.PROCESS_SLOT_COUNT;
     private static final int GEAR_SLOT_START = PROCESS_SLOT_COUNT;
@@ -185,16 +186,12 @@ public class CompressorTankMenu extends AbstractContainerMenu {
     }
 
     public Component looseFluidName() {
-        FluidStack stack = tank.getLooseTank().getFluid();
-        if (!stack.isEmpty()) {
-            return stack.getHoverName();
-        }
-        return Component.literal(supportsCompression() ? "Loose Fluid" : "Stored Fluid");
+        Component emptyName = Component.translatable(supportsCompression() ? "rngtech.compressor_tank.loose_fluid" : "rngtech.compressor_tank.stored_fluid");
+        return FluidMenuSupport.fluidName(data.get(DATA_LOOSE_FLUID_ID), emptyName);
     }
 
     public Component compressedFluidName() {
-        FluidStack stack = tank.getCompressedFluid();
-        return stack.isEmpty() ? Component.literal("Compressed Fluid") : stack.getHoverName();
+        return FluidMenuSupport.fluidName(data.get(DATA_COMPRESSED_FLUID_ID), Component.translatable("rngtech.compressor_tank.compressed_fluid"));
     }
 
     public int compressedPhysical() {

@@ -18,7 +18,6 @@ import net.minecraft.world.inventory.SimpleContainerData;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.items.ItemStackHandler;
 import net.neoforged.neoforge.items.SlotItemHandler;
 
@@ -40,7 +39,9 @@ public class AlgaePhotobioreactorMenu extends AbstractContainerMenu {
     private static final int DATA_MIN_LIGHT = 8;
     private static final int DATA_BIO_CONVERSION = 9;
     private static final int DATA_OUTPUT_BONUS_PROGRESS = 10;
-    private static final int DATA_COUNT = 11;
+    private static final int DATA_WATER_FLUID_ID = 11;
+    private static final int DATA_CARBON_FLUID_ID = 12;
+    private static final int DATA_COUNT = 13;
     private static final int STAT_SCALE = 100;
     private static final int OUTPUT_BONUS_PROGRESS_SCALE = 1000;
     private static final int BIO_CHAMBER_SLOT = 5;
@@ -161,11 +162,11 @@ public class AlgaePhotobioreactorMenu extends AbstractContainerMenu {
     }
 
     public Component waterFluidName() {
-        return fluidName(reactor.getWaterFluid(), Component.translatable("block.minecraft.water"));
+        return FluidMenuSupport.fluidName(data.get(DATA_WATER_FLUID_ID), Component.translatable("block.minecraft.water"));
     }
 
     public Component carbonFluidName() {
-        return fluidName(reactor.getCarbonFluid(), Component.translatable("rngtech.algae_photobioreactor.carbon"));
+        return FluidMenuSupport.fluidName(data.get(DATA_CARBON_FLUID_ID), Component.translatable("rngtech.algae_photobioreactor.carbon"));
     }
 
     public int statusCode() {
@@ -289,10 +290,6 @@ public class AlgaePhotobioreactorMenu extends AbstractContainerMenu {
 
     private static float tankProgress(int amount, int capacity) {
         return capacity <= 0 ? 0.0F : Mth.clamp(amount / (float) capacity, 0.0F, 1.0F);
-    }
-
-    private static Component fluidName(FluidStack stack, Component emptyName) {
-        return stack.isEmpty() ? emptyName : stack.getHoverName();
     }
 
     private static AlgaePhotobioreactorBlockEntity blockEntity(Inventory playerInventory, BlockPos pos) {

@@ -19,7 +19,6 @@ import net.minecraft.world.inventory.SimpleContainerData;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.items.ItemStackHandler;
 import net.neoforged.neoforge.items.SlotItemHandler;
 
@@ -64,7 +63,9 @@ public class CavitationGeneratorMenu extends AbstractContainerMenu {
     private static final int DATA_RECIPE_FLUID_OUTPUT = 30;
     private static final int DATA_FLAT_ENERGY_GENERATION = 31;
     private static final int DATA_BASE_ENERGY_GENERATION = 32;
-    private static final int DATA_COUNT = 33;
+    private static final int DATA_INPUT_FLUID_ID = 33;
+    private static final int DATA_OUTPUT_FLUID_ID = 34;
+    private static final int DATA_COUNT = 35;
     private static final int STAT_SCALE = 100;
 
     private static final int FLUID_CONTAINER_SLOT = 0;
@@ -226,8 +227,7 @@ public class CavitationGeneratorMenu extends AbstractContainerMenu {
     }
 
     public Component inputFluidName() {
-        FluidStack stack = generator.getInputTank().getFluid();
-        return stack.isEmpty() ? Component.translatable("rngtech.purge.empty_fluid") : stack.getHoverName();
+        return FluidMenuSupport.fluidName(data.get(DATA_INPUT_FLUID_ID), Component.translatable("rngtech.purge.empty_fluid"));
     }
 
     public int heatStrain() {
@@ -267,8 +267,7 @@ public class CavitationGeneratorMenu extends AbstractContainerMenu {
     }
 
     public Component outputFluidName() {
-        FluidStack stack = generator.getOutputTank().getFluid();
-        return stack.isEmpty() ? Component.translatable("rngtech.purge.empty_fluid") : stack.getHoverName();
+        return FluidMenuSupport.fluidName(data.get(DATA_OUTPUT_FLUID_ID), Component.translatable("rngtech.purge.empty_fluid"));
     }
 
     public int recipeFluidOutput() {
