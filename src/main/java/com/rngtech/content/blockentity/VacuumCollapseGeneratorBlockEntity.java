@@ -83,7 +83,6 @@ public class VacuumCollapseGeneratorBlockEntity extends BaseMachineBlockEntity i
     private static final int DATA_FLAT_ENERGY_GENERATION = 21;
     private static final int DATA_BASE_ENERGY_GENERATION = 22;
     private static final int STAT_SCALE = 100;
-    private static final long BASE_CAPACITY = 1_000_000L;
     private static final int BASE_TRANSFER = 8192;
 
     private final ItemStackHandler processInventory = new ItemStackHandler(PROCESS_SLOT_COUNT) {
@@ -396,9 +395,6 @@ public class VacuumCollapseGeneratorBlockEntity extends BaseMachineBlockEntity i
         if (!hasActiveRecipe() && !tryStartRecipe(stats)) {
             return false;
         }
-        if (energyStored >= energyCapacity(stats)) {
-            return false;
-        }
         return generateActiveRecipe(stats);
     }
 
@@ -413,7 +409,7 @@ public class VacuumCollapseGeneratorBlockEntity extends BaseMachineBlockEntity i
             return false;
         }
         ItemStack residue = residueFor(recipe);
-        if (!canMergeResidue(residue) || energyStored >= energyCapacity(stats)) {
+        if (!canMergeResidue(residue)) {
             return false;
         }
 
@@ -434,26 +430,18 @@ public class VacuumCollapseGeneratorBlockEntity extends BaseMachineBlockEntity i
             return false;
         }
 
-        long freeSpace = energyCapacity(stats) - energyStored;
-        if (freeSpace <= 0L) {
-            return false;
-        }
-
         double perTick = activeTotalEnergy / (double) Math.max(1, activeProcessingTicks);
         generationCarry += Math.min(perTick, remainingEnergy);
-        long wholeEnergy = Math.min((long) Math.floor(generationCarry), freeSpace);
-        if (wholeEnergy <= 0L) {
-            progress++;
-            finishIfComplete();
-            return true;
+        long wholeEnergy = (long) Math.floor(generationCarry);
+        if (wholeEnergy > 0L) {
+            // A collapse cannot pause: FE the buffer cannot hold is vented.
+            long freeSpace = Math.max(0L, energyCapacity(stats) - energyStored);
+            if (freeSpace > 0L) {
+                receiveInternalEnergy(Math.min(wholeEnergy, freeSpace), stats, false);
+            }
+            generationCarry -= wholeEnergy;
+            remainingEnergy = Math.max(0L, remainingEnergy - wholeEnergy);
         }
-
-        long accepted = receiveInternalEnergy(wholeEnergy, stats, false);
-        if (accepted <= 0L) {
-            return false;
-        }
-        generationCarry -= accepted;
-        remainingEnergy = Math.max(0L, remainingEnergy - accepted);
         progress++;
         finishIfComplete();
         return true;

@@ -533,9 +533,6 @@ public class CavitationGeneratorBlockEntity extends BaseMachineBlockEntity
             return false;
         }
         normalizeActiveRecipeEnergy(stats);
-        if (energyStored() >= energyCapacity()) {
-            return false;
-        }
         return generateActiveRecipe(stats);
     }
 
@@ -547,7 +544,6 @@ public class CavitationGeneratorBlockEntity extends BaseMachineBlockEntity
         }
         FluidStack fluidOutput = scaledFluidOutput(recipe, stats);
         if (inputTank.getFluidAmount() < recipe.fluidInput().amount()
-                || energyStored() >= energyCapacity()
                 || !canAcceptFluidOutput(fluidOutput)) {
             return false;
         }
@@ -573,15 +569,15 @@ public class CavitationGeneratorBlockEntity extends BaseMachineBlockEntity
     private boolean generateActiveRecipe(MachineStatAccumulator stats) {
         double perTick = currentGenerationRate(activeTotalEnergy, activeProcessingTicks);
         generationCarry += Math.min(perTick, remainingEnergy);
-        int freeSpace = energyCapacity() - energyStored();
-        int wholeEnergy = Math.min((int) Math.floor(generationCarry), freeSpace);
+        int wholeEnergy = (int) Math.floor(generationCarry);
         if (wholeEnergy > 0) {
-            int accepted = receiveGeneratedEnergy(wholeEnergy, false);
-            if (accepted <= 0) {
-                return false;
+            // Cavitation cannot pause: FE the buffer cannot hold is vented.
+            int freeSpace = Math.max(0, energyCapacity() - energyStored());
+            if (freeSpace > 0) {
+                receiveGeneratedEnergy(Math.min(wholeEnergy, freeSpace), false);
             }
-            generationCarry -= accepted;
-            remainingEnergy = Math.max(0.0, remainingEnergy - accepted);
+            generationCarry -= wholeEnergy;
+            remainingEnergy = Math.max(0.0, remainingEnergy - wholeEnergy);
         }
 
         progress++;

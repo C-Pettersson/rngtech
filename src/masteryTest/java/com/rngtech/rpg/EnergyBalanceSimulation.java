@@ -1455,8 +1455,9 @@ public final class EnergyBalanceSimulation {
     ) {
         /** PotentialReactorBlockEntity: 15 remembered burns, x0.75 per repeat, floor 10%. */
         static final Fatigue CURRENT_FATIGUE = new Fatigue(16, 0.75, 0.10);
+        /** Cavitation and Vacuum Collapse vent FE their buffer cannot hold instead of pausing. */
         static final Scenario CURRENT = new Scenario("current", "Current", new JsonObject(), 0, Map.of(), Solar.CURRENT, null, CURRENT_FATIGUE,
-                null, false, false, null, null);
+                null, true, true, null, null);
 
         /** Reactor gear-fuel bonus for a machine's Mastery: {@code (1 + level * perLevel) * (1 + sealTiers * perSealTier)}. */
         record Mastery(double perLevel, double perSealTier) {
@@ -1548,8 +1549,8 @@ public final class EnergyBalanceSimulation {
                     corrosion,
                     fatigue,
                     gearScale,
-                    json.has("cavitation_overflow") && "vent".equals(json.get("cavitation_overflow").getAsString()),
-                    json.has("vacuum_collapse_overflow") && "vent".equals(json.get("vacuum_collapse_overflow").getAsString()),
+                    !json.has("cavitation_overflow") || "vent".equals(json.get("cavitation_overflow").getAsString()),
+                    !json.has("vacuum_collapse_overflow") || "vent".equals(json.get("vacuum_collapse_overflow").getAsString()),
                     json.has("aethergold_transfer_multiplier") ? json.get("aethergold_transfer_multiplier").getAsDouble() : null,
                     json.has("reactor_mastery")
                             ? new Mastery(json.getAsJsonObject("reactor_mastery").get("per_level").getAsDouble(),

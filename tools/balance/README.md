@@ -19,7 +19,17 @@ A full run at the defaults (1,000 fresh crafts and 500 crafts per other behavior
 
 ### Scenarios
 
-`energy-scenarios.json` holds what-if scenarios. `current` must stay empty: it is the game as coded. Other scenarios override the simulator's mirrored generator formulas (recipe energy, solid fuel value, solar array rules, Corrosion Cell recipes, Potential Reactor gear-fuel scaling and fatigue, Aethergold overflow). Nothing in a scenario changes the game.
+`energy-scenarios.json` holds what-if scenarios. `current` must stay empty: it is the game as coded. Add another scenario to preview a change before editing the game. Supported keys:
+
+- `solid_fuel_fe_per_burn_tick`: FE per effective burn tick for Solid Fuel Burner fuel.
+- `recipe_energy`: recipe energy overrides keyed `<recipe folder>/<recipe id>`, e.g. `gas_combustion/syngas_power`.
+- `solar`: `extender_range_bonus`, `extender_generation`, `controller_flat_once`, `max_range`, `panel_clear_generation`.
+- `corrosion_recipes`: a full replacement Corrosion Cell recipe list with chain costs.
+- `reactor_fatigue`, `reactor_gear_stage_scale`, `reactor_mastery`: Potential Reactor gear-fuel rules.
+- `cavitation_overflow`, `vacuum_collapse_overflow`: `vent` (the game's behavior) or `stall`.
+- `aethergold_transfer_multiplier`: the Aethergold rotor's export multiplier.
+
+Nothing in a scenario changes the game.
 
 ### Output
 
