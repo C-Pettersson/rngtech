@@ -9,6 +9,7 @@ import com.rngtech.content.cable.NetworkBridgeType;
 import com.rngtech.content.menu.UniversalConnectorAccess;
 import com.rngtech.content.registry.ModBlockEntities;
 import com.rngtech.content.registry.ModItems;
+import com.rngtech.util.TickTransferCounter;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -49,6 +50,7 @@ public class CableBlockEntity extends BlockEntity implements UniversalConnectorD
     private static final int DATA_MODE = 2;
     private static final int DATA_DISTRIBUTION = 3;
     private static final int DATA_TRANSFER_RATE = 4;
+    private static final int DATA_ENERGY_TARGET_ACCESS = 5;
 
     /**
      * Per-level cache of connected cable components.
@@ -63,13 +65,15 @@ public class CableBlockEntity extends BlockEntity implements UniversalConnectorD
     private final EnumSet<Direction> disabledLinks = EnumSet.noneOf(Direction.class);
     private final EnumMap<Direction, ConnectorData> connectors = new EnumMap<>(Direction.class);
     private final EnumMap<Direction, CableUniversalConnectorData> universalConnectors = new EnumMap<>(Direction.class);
-    private final long[] energyInputBudgetTicks = new long[DIRECTIONS.length];
-    private final int[] energyInputTransferredThisTick = new int[DIRECTIONS.length];
+    private final TickTransferCounter[] directEnergyInput = new TickTransferCounter[DIRECTIONS.length];
+    private final TickTransferCounter[] directEnergyOutput = new TickTransferCounter[DIRECTIONS.length];
 
     public CableBlockEntity(BlockPos pos, BlockState blockState) {
         super(ModBlockEntities.CABLE.get(), pos, blockState);
         for (Direction direction : DIRECTIONS) {
             sidedEnergyStorages[direction.ordinal()] = new CableEnergyStorage(direction);
+            directEnergyInput[direction.ordinal()] = new TickTransferCounter();
+            directEnergyOutput[direction.ordinal()] = new TickTransferCounter();
         }
     }
 
@@ -245,6 +249,7 @@ public class CableBlockEntity extends BlockEntity implements UniversalConnectorD
                     case DATA_MODE -> connector.mode().ordinal();
                     case DATA_DISTRIBUTION -> connector.distributionMode().ordinal();
                     case DATA_TRANSFER_RATE -> connector.transferRate();
+                    case DATA_ENERGY_TARGET_ACCESS -> directTargetHasEnergyAccess(face) ? 1 : 0;
                     default -> 0;
                 };
             }
@@ -404,13 +409,13 @@ public class CableBlockEntity extends BlockEntity implements UniversalConnectorD
             return 0;
         }
 
-        int transferable = Math.min(remainingEnergyInputBudget(entrySide, source.transferRate()), amount);
+        int transferable = Math.min(remainingDirectEnergyInput(entrySide, source.transferRate()), amount);
         if (transferable <= 0) {
             return 0;
         }
 
         BlockPos sourcePos = worldPosition.relative(entrySide);
-        TransferOrigin sourceOrigin = TransferOrigin.endpoint(sourcePos, source.attachAs());
+        TransferOrigin sourceOrigin = directSourceOrigin(sourcePos, source);
         int moved = distributeEnergy(
                 level,
                 worldPosition,
@@ -421,7 +426,7 @@ public class CableBlockEntity extends BlockEntity implements UniversalConnectorD
                 source.distributionMode()
         );
         if (!simulate) {
-            recordEnergyInputTransfer(entrySide, moved);
+            directEnergyInput[entrySide.ordinal()].add(level.getGameTime(), moved);
         }
         return moved;
     }
@@ -447,7 +452,7 @@ public class CableBlockEntity extends BlockEntity implements UniversalConnectorD
             return false;
         }
 
-        int request = remainingEnergyInputBudget(face, connector.transferRate());
+        int request = remainingDirectEnergyInput(face, connector.transferRate());
         if (request <= 0) {
             return false;
         }
@@ -468,7 +473,8 @@ public class CableBlockEntity extends BlockEntity implements UniversalConnectorD
             return false;
         }
 
-        TransferOrigin sourceOrigin = TransferOrigin.endpoint(sourcePos, connector.attachAs());
+        TransferOrigin sourceOrigin = TransferOrigin.endpoint(sourcePos, connector.attachAs())
+                .withEnergyBuffer(connector.mode() == CableConnectorMode.BOTH && isEnergyBuffer(source));
         int accepted = distributeEnergy(
                 level,
                 worldPosition,
@@ -496,36 +502,93 @@ public class CableBlockEntity extends BlockEntity implements UniversalConnectorD
                 false,
                 connector.distributionMode()
         );
-        recordEnergyInputTransfer(face, moved);
+        directEnergyInput[face.ordinal()].add(level.getGameTime(), moved);
         return moved > 0;
     }
 
-    private int remainingEnergyInputBudget(Direction direction, int transferRate) {
-        if (level == null) {
+    private TransferOrigin directSourceOrigin(BlockPos sourcePos, ConnectorData connector) {
+        TransferOrigin origin = TransferOrigin.endpoint(sourcePos, connector.attachAs());
+        if (level == null || connector.mode() != CableConnectorMode.BOTH) {
+            return origin;
+        }
+        IEnergyStorage source = level.getCapability(Capabilities.EnergyStorage.BLOCK, sourcePos, connector.attachAs());
+        return origin.withEnergyBuffer(isEnergyBuffer(source));
+    }
+
+    private int sendToDirectTarget(Direction face, int amount, boolean simulate) {
+        ConnectorData connector = connectors.get(face);
+        if (level == null || amount <= 0 || connector == null || !connector.mode().sendsNetworkOutput()) {
             return 0;
         }
 
-        int index = direction.ordinal();
-        long gameTime = level.getGameTime();
-        if (energyInputBudgetTicks[index] != gameTime) {
-            energyInputBudgetTicks[index] = gameTime;
-            energyInputTransferredThisTick[index] = 0;
+        int transferable = Math.min(amount, remainingDirectEnergyOutput(face, connector.transferRate()));
+        if (transferable <= 0) {
+            return 0;
         }
-        return Math.max(0, transferRate - energyInputTransferredThisTick[index]);
+
+        BlockPos targetPos = worldPosition.relative(face);
+        BlockState targetState = level.getBlockState(targetPos);
+        if (targetState.getBlock() instanceof CableBlock || targetState.getBlock() instanceof UniversalConnectorBlock) {
+            return 0;
+        }
+
+        IEnergyStorage target = level.getCapability(Capabilities.EnergyStorage.BLOCK, targetPos, connector.attachAs());
+        if (target == null || !target.canReceive()) {
+            return 0;
+        }
+
+        int accepted = target.receiveEnergy(transferable, simulate);
+        if (!simulate) {
+            directEnergyOutput[face.ordinal()].add(level.getGameTime(), accepted);
+        }
+        return accepted;
     }
 
-    private void recordEnergyInputTransfer(Direction direction, int amount) {
-        if (level == null || amount <= 0) {
-            return;
+    private boolean directTargetHasEnergyAccess(Direction face) {
+        ConnectorData connector = connectors.get(face);
+        if (level == null || connector == null) {
+            return false;
         }
+        BlockPos targetPos = worldPosition.relative(face);
+        return !isNetworkNode(level.getBlockState(targetPos))
+                && level.getCapability(Capabilities.EnergyStorage.BLOCK, targetPos, connector.attachAs()) != null;
+    }
 
-        int index = direction.ordinal();
-        long gameTime = level.getGameTime();
-        if (energyInputBudgetTicks[index] != gameTime) {
-            energyInputBudgetTicks[index] = gameTime;
-            energyInputTransferredThisTick[index] = 0;
+    private boolean directTargetIsEnergyBuffer(Direction face) {
+        ConnectorData connector = connectors.get(face);
+        if (level == null || connector == null) {
+            return false;
         }
-        energyInputTransferredThisTick[index] += amount;
+        return isEnergyBuffer(level.getCapability(
+                Capabilities.EnergyStorage.BLOCK,
+                worldPosition.relative(face),
+                connector.attachAs()
+        ));
+    }
+
+    private int remainingDirectEnergyInput(Direction direction, int transferRate) {
+        return level == null ? 0 : directEnergyInput[direction.ordinal()].remaining(level.getGameTime(), transferRate);
+    }
+
+    private int remainingDirectEnergyOutput(Direction direction, int transferRate) {
+        return level == null ? 0 : directEnergyOutput[direction.ordinal()].remaining(level.getGameTime(), transferRate);
+    }
+
+    public int lastDirectEnergyInput(Direction face) {
+        return level == null || face == null ? 0 : directEnergyInput[face.ordinal()].lastTick(level.getGameTime());
+    }
+
+    public int lastDirectEnergyOutput(Direction face) {
+        return level == null || face == null ? 0 : directEnergyOutput[face.ordinal()].lastTick(level.getGameTime());
+    }
+
+    /**
+     * True for blocks that both accept and supply FE right now, such as Battery Chassis. Two such blocks behind
+     * {@link CableConnectorMode#BOTH} connectors would otherwise trade FE back and forth every tick and lose it to
+     * charge/discharge efficiency.
+     */
+    static boolean isEnergyBuffer(IEnergyStorage storage) {
+        return storage != null && storage.canReceive() && storage.canExtract();
     }
 
     /**
@@ -538,12 +601,16 @@ public class CableBlockEntity extends BlockEntity implements UniversalConnectorD
      * battery bypass cannot route charge back into the same storage through another connector face. If {@code side} is
      * {@code null}, the origin intentionally falls back to whole-block exclusion for legacy callers where the source
      * side cannot be known.</p>
+     *
+     * <p>{@code energyBuffer} marks FE drawn from a storage block through a {@link CableConnectorMode#BOTH} connector.
+     * That FE is not delivered to another storage block behind a {@code BOTH} connector, so buffers on one network
+     * feed consumers instead of draining into each other.</p>
      */
-    public record TransferOrigin(BlockPos pos, Direction side, BlockPos energyTargetPos) {
-        public static final TransferOrigin NONE = new TransferOrigin(null, null, null);
+    public record TransferOrigin(BlockPos pos, Direction side, BlockPos energyTargetPos, boolean energyBuffer) {
+        public static final TransferOrigin NONE = new TransferOrigin(null, null, null, false);
 
         public static TransferOrigin wholeBlock(BlockPos pos) {
-            return pos == null ? NONE : new TransferOrigin(pos, null, pos);
+            return pos == null ? NONE : new TransferOrigin(pos, null, pos, false);
         }
 
         public static TransferOrigin endpoint(BlockPos pos, Direction side) {
@@ -551,7 +618,11 @@ public class CableBlockEntity extends BlockEntity implements UniversalConnectorD
         }
 
         public static TransferOrigin endpoint(BlockPos pos, Direction side, BlockPos energyTargetPos) {
-            return pos == null ? NONE : new TransferOrigin(pos, side, energyTargetPos);
+            return pos == null ? NONE : new TransferOrigin(pos, side, energyTargetPos, false);
+        }
+
+        public TransferOrigin withEnergyBuffer(boolean energyBuffer) {
+            return this == NONE ? NONE : new TransferOrigin(pos, side, energyTargetPos, energyBuffer);
         }
 
         public static TransferOrigin inferAdjacentEndpoint(BlockPos startPos, BlockPos sourcePos) {
@@ -1168,9 +1239,11 @@ public class CableBlockEntity extends BlockEntity implements UniversalConnectorD
             }
 
             energyEndpoints[connector.channel()].add(EnergyEndpoint.direct(
-                    targetPos,
+                    pos,
+                    direction,
                     connector.attachAs(),
-                    connector.transferRate()
+                    connector.transferRate(),
+                    connector.mode() == CableConnectorMode.BOTH
             ));
         }
     }
@@ -1237,7 +1310,12 @@ public class CableBlockEntity extends BlockEntity implements UniversalConnectorD
         for (int channel = 0; channel <= MAX_CHANNEL; channel++) {
             int transferRate = connector.transferRateForChannel(channel);
             if (transferRate > 0) {
-                energyEndpoints[channel].add(EnergyEndpoint.cableUniversal(targetPos, targetSide, transferRate));
+                energyEndpoints[channel].add(EnergyEndpoint.cableUniversal(
+                        targetPos,
+                        targetSide,
+                        transferRate,
+                        connector.mode() == CableConnectorMode.BOTH
+                ));
             }
         }
     }
@@ -1784,19 +1862,42 @@ public class CableBlockEntity extends BlockEntity implements UniversalConnectorD
         }
     }
 
-    private record EnergyEndpoint(BlockPos pos, Direction side, int transferRate, EnergyEndpointType type) {
-        private static EnergyEndpoint direct(BlockPos pos, Direction side, int transferRate) {
-            return new EnergyEndpoint(pos, side, transferRate, EnergyEndpointType.DIRECT);
+    private record EnergyEndpoint(
+            BlockPos pos,
+            Direction side,
+            int transferRate,
+            EnergyEndpointType type,
+            BlockPos connectorPos,
+            Direction connectorFace,
+            boolean bothMode
+    ) {
+        private static EnergyEndpoint direct(
+                BlockPos cablePos,
+                Direction face,
+                Direction attachAs,
+                int transferRate,
+                boolean bothMode
+        ) {
+            return new EnergyEndpoint(
+                    cablePos.relative(face),
+                    attachAs,
+                    transferRate,
+                    EnergyEndpointType.DIRECT,
+                    cablePos,
+                    face,
+                    bothMode
+            );
         }
 
-        private static EnergyEndpoint cableUniversal(BlockPos pos, Direction side, int transferRate) {
-            return new EnergyEndpoint(pos, side, transferRate, EnergyEndpointType.CABLE_UNIVERSAL);
+        private static EnergyEndpoint cableUniversal(BlockPos pos, Direction side, int transferRate, boolean bothMode) {
+            return new EnergyEndpoint(pos, side, transferRate, EnergyEndpointType.CABLE_UNIVERSAL, pos, side, bothMode);
         }
 
         private boolean isExcludedBy(Level level, TransferOrigin origin) {
             return origin.matches(pos, side)
                     || origin.matchesEnergyTarget(energyTargetPos())
-                    || isAdjacentBatteryChassisTransfer(level, origin.energyTargetPos(), energyTargetPos());
+                    || isAdjacentBatteryChassisTransfer(level, origin.energyTargetPos(), energyTargetPos())
+                    || (origin.energyBuffer() && bothMode && targetIsEnergyBuffer(level));
         }
 
         private BlockPos energyTargetPos() {
@@ -1821,30 +1922,27 @@ public class CableBlockEntity extends BlockEntity implements UniversalConnectorD
             return distance == 1;
         }
 
+        private boolean targetIsEnergyBuffer(Level level) {
+            if (!(level.getBlockEntity(connectorPos) instanceof CableBlockEntity cable)) {
+                return false;
+            }
+            return switch (type) {
+                case DIRECT -> cable.directTargetIsEnergyBuffer(connectorFace);
+                case CABLE_UNIVERSAL -> cable.universalConnector(connectorFace) != null
+                        && cable.universalConnector(connectorFace).targetIsEnergyBuffer();
+            };
+        }
+
         private int receive(Level level, int channel, int amount, boolean simulate) {
-            if (type == EnergyEndpointType.CABLE_UNIVERSAL) {
-                if (level.getBlockEntity(pos) instanceof CableBlockEntity cable
-                        && cable.universalConnector(side) != null) {
-                    return cable.universalConnector(side).receiveFromCableNetwork(side, channel, amount, simulate);
-                }
+            if (!(level.getBlockEntity(connectorPos) instanceof CableBlockEntity cable)) {
                 return 0;
             }
-
-            BlockState targetState = level.getBlockState(pos);
-            if (targetState.getBlock() instanceof CableBlock || targetState.getBlock() instanceof UniversalConnectorBlock) {
-                return 0;
-            }
-
-            IEnergyStorage target = level.getCapability(
-                    Capabilities.EnergyStorage.BLOCK,
-                    pos,
-                    side
-            );
-            if (target == null || !target.canReceive()) {
-                return 0;
-            }
-
-            return target.receiveEnergy(amount, simulate);
+            return switch (type) {
+                case DIRECT -> cable.sendToDirectTarget(connectorFace, amount, simulate);
+                case CABLE_UNIVERSAL -> cable.universalConnector(connectorFace) == null
+                        ? 0
+                        : cable.universalConnector(connectorFace).receiveFromCableNetwork(connectorFace, channel, amount, simulate);
+            };
         }
     }
 
@@ -1947,8 +2045,12 @@ public class CableBlockEntity extends BlockEntity implements UniversalConnectorD
         return DATA_TRANSFER_RATE;
     }
 
+    public static int dataEnergyTargetAccessIndex() {
+        return DATA_ENERGY_TARGET_ACCESS;
+    }
+
     public static int dataCount() {
-        return DATA_TRANSFER_RATE + 1;
+        return DATA_ENERGY_TARGET_ACCESS + 1;
     }
 
     public static final class ConnectorData {

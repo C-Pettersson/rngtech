@@ -21,7 +21,7 @@ The default recipe type is `rngtech:cavitation`. Recipes declare fluid input, ge
 | Heat Core | No | Existing Heat Core items | Adds heat-related stat contribution |
 | Battery Cell | No | Existing Battery Cell items | Adds portable FE capacity |
 | Servo | No | `rngtech:titanium_servo`, `rngtech:tungstensteel_servo`, `rngtech:nullite_servo`, or `rngtech:exotic_servo` | Improves processing speed, rotor wear control, heat strain control, and nitrogen output handling |
-| Energy Connector | No | Existing Energy Connector items | Sets the side FE export cap when installed; without one, export uses the rotor/nozzle `ENERGY_TRANSFER` fallback |
+| Energy Connector | No | Existing Energy Connector items | Sets the side FE export cap when installed; without one, export uses the rotor/nozzle `ENERGY_TRANSFER` fallback. The cap is per tick, shared between the generator's own push and connector pulls |
 
 The process inventory has one fluid-container slot, one damaged rotor output slot, and an internal Nitrogen output tank. The Process tab shows compact meters for input fluid, nitrogen output, FE, cycle progress, heat strain, and rotor wear. `OUTPUT_AMOUNT` controls produced Nitrogen mB per recipe cycle; Servo `PROCESSING_SPEED`, `STABILITY`, `TEMPERATURE_STABILITY`, and `FLUID_TRANSFER` affect cycle time, rotor wear, heat strain, and output-tank draining respectively. Battery Cells add storage but do not raise the side export cap. Nullite Servo halves base processing speed but lets excess produced Nitrogen void when the output tank already contains Nitrogen.
 

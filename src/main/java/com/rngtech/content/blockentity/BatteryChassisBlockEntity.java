@@ -384,7 +384,7 @@ public class BatteryChassisBlockEntity extends BaseMachineBlockEntity implements
             return 0;
         }
 
-        int accepted = Math.min(toReceive, Math.min(effectiveInputRate(context), availableCellSpace(context)));
+        int accepted = Math.min(toReceive, Math.min(remainingInputThisTick(context), availableCellSpace(context)));
         if (accepted <= 0) {
             return 0;
         }
@@ -413,7 +413,7 @@ public class BatteryChassisBlockEntity extends BaseMachineBlockEntity implements
         double efficiency = transferEfficiency(context);
         int cellDrawCeiling = Math.min(cellOutputCeiling(context), energyStored(context));
         int maxDeliveredByCells = deliveredAfterDischargeLoss(cellDrawCeiling, efficiency);
-        int delivered = Math.min(toExtract, Math.min(effectiveOutputRate(context), maxDeliveredByCells));
+        int delivered = Math.min(toExtract, Math.min(remainingOutputThisTick(context), maxDeliveredByCells));
         if (delivered <= 0) {
             return 0;
         }
@@ -667,6 +667,17 @@ public class BatteryChassisBlockEntity extends BaseMachineBlockEntity implements
     private int lastEnergyOutput() {
         beginEnergyTelemetryTick();
         return lastEnergyOutput;
+    }
+
+    /** Cell rates are per tick, shared by every side and connector that moves FE this tick. */
+    private int remainingInputThisTick(RuntimeContext context) {
+        beginEnergyTelemetryTick();
+        return Math.max(0, effectiveInputRate(context) - energyInputThisTick);
+    }
+
+    private int remainingOutputThisTick(RuntimeContext context) {
+        beginEnergyTelemetryTick();
+        return Math.max(0, effectiveOutputRate(context) - energyOutputThisTick);
     }
 
     private void recordEnergyInput(int amount) {

@@ -208,6 +208,10 @@ public class UniversalConnectorMenu extends AbstractContainerMenu {
         return data.get(UniversalConnectorBlockEntity.dataHasConnectorIndex()) != 0;
     }
 
+    public boolean targetHasEnergyAccess() {
+        return data.get(UniversalConnectorBlockEntity.dataEnergyTargetAccessIndex()) != 0;
+    }
+
     public int lastEnergyInput() {
         return data.get(UniversalConnectorBlockEntity.dataLastEnergyInputIndex());
     }

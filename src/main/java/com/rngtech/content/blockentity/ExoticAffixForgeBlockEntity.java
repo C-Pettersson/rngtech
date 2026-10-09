@@ -65,7 +65,6 @@ public class ExoticAffixForgeBlockEntity extends BlockEntity implements MenuProv
     public static final int STATUS_FAILED = 13;
 
     private static final int INTERNAL_ENERGY_CAPACITY = 2_000_000;
-    private static final int MAX_ENERGY_INPUT = 65_536;
     private static final int POWER_FAILURE_THRESHOLD = 100;
     private static final int POWER_FAILURE_PER_TICK = 1;
     private static final int POWER_FAILURE_RECOVERY_PER_TICK = 1;
@@ -355,7 +354,12 @@ public class ExoticAffixForgeBlockEntity extends BlockEntity implements MenuProv
                 .status(statusKey(status))
                 .progress(progress, recipe == null ? 0 : processingTicks(recipe))
                 .energy(energyStored(), energyCapacity(), -energyDemand)
-                .energyTelemetry(energyFlow.lastInput(), energyFlow.lastOutput(), connector.transferRate(), MachineInfoSnapshot.EnergyBottleneck.NONE)
+                .energyTelemetry(
+                        energyFlow.lastInput(),
+                        energyFlow.lastOutput(),
+                        connector.transferRate(),
+                        AdjacentEnergyConnector.inputBottleneck(connector, energyDemand)
+                )
                 .gear(BatteryCellItem.isBatteryCell(batteryCellStack())
                         ? MachineInfoSnapshot.GearSummary.BATTERY_CELL_INSTALLED
                         : MachineInfoSnapshot.GearSummary.NONE)
@@ -783,7 +787,7 @@ public class ExoticAffixForgeBlockEntity extends BlockEntity implements MenuProv
             if (!canReceive() || toReceive <= 0) {
                 return 0;
             }
-            int remaining = Math.min(toReceive, MAX_ENERGY_INPUT);
+            int remaining = toReceive;
             int received = receiveInternalEnergy(remaining, simulate);
             remaining -= received;
             IEnergyStorage cell = batteryCellEnergyStorage();

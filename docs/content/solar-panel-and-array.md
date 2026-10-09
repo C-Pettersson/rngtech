@@ -32,7 +32,7 @@ Solar generation is server-authoritative.
 - The Peak Solar suffix is a panel-local modifier. During the zenith window, from Minecraft time `4000` through `8000` each day, it multiplies that panel's clear or weather output before standalone storage/export or controller aggregation.
 - Night, blocked sky, or disabled dimensions produce `0 FE/t`.
 
-Standalone panels store generated FE in their small internal buffer and export through standard NeoForge energy capability. They do not accept external FE.
+Standalone panels store generated FE in their small internal buffer and export through standard NeoForge energy capability. They have no machine-side export cap: the attached receiver or [Universal Connector tier](basic-wire.md#energy-transfer-limits) decides the rate. They do not accept external FE.
 
 ## Array Controller
 
@@ -85,7 +85,7 @@ Solar Array Controller modifiers include normal generator stats plus controller-
 | Panel Synchronizer | Prefix | Boosts generation when all controlled panels are the same material. |
 | Panel Arbitration | Prefix | Selects highest-output panels before nearest panels. |
 
-Energy Connector transfer uses the existing connector tiers: Basic `128 FE/t`, Copper `512 FE/t`, Gold `2,048 FE/t`, Sparksteel `8,192 FE/t`, Arclite `32,768 FE/t`, and Debug `50,000,000 FE/t`. Without an installed connector, the controller uses its base `128 FE/t` output rate. The controller Stats tab reports this effective connector-controlled Energy Transfer value.
+Energy Connector transfer uses the existing connector tiers: Basic `128 FE/t`, Copper `512 FE/t`, Gold `2,048 FE/t`, Sparksteel `8,192 FE/t`, Arclite `32,768 FE/t`, and Debug `50,000,000 FE/t`. Without an installed connector, the controller uses its base `128 FE/t` output rate. This cap is per tick and shared between the controller's own push to adjacent receivers and any connector pulls from its sides. The controller Stats tab reports this effective connector-controlled Energy Transfer value.
 
 ## Automation
 
@@ -100,14 +100,14 @@ The controller is the preferred automation surface. It exports to adjacent energ
 
 Solar numeric identity is authored in `MachineBaseStatCatalog`:
 
-- Solar Panel base profiles define `ENERGY_GENERATION`, `ENERGY_CAPACITY`, `ENERGY_TRANSFER`, and `EFFICIENCY`.
+- Solar Panel base profiles define `ENERGY_GENERATION`, `ENERGY_CAPACITY`, and `EFFICIENCY`. The base profile still carries a legacy material `ENERGY_TRANSFER` value, but it no longer limits panel export and is not shown in the item summary.
 - Solar Array Controller base profile defines `ENERGY_GENERATION`, `ENERGY_CAPACITY`, fallback `ENERGY_TRANSFER`, `EFFICIENCY`, `STABILITY`, one Battery Cell slot, one Energy Connector slot, one Solar Array Extender slot, and solar array control stats.
 
 Solar modifiers use dedicated profiles:
 
 | Target | Rollable stats |
 |---|---|
-| Solar Panel | Flat `ENERGY_CAPACITY_FLAT`, increased `ENERGY_CAPACITY`, `EFFICIENCY`, `ENERGY_GENERATION`, `ENERGY_TRANSFER`, and Peak Solar |
+| Solar Panel | Flat `ENERGY_CAPACITY_FLAT`, increased `ENERGY_CAPACITY`, `EFFICIENCY`, `ENERGY_GENERATION`, and Peak Solar |
 | Solar Array Controller | Flat `ENERGY_CAPACITY_FLAT`, increased `ENERGY_CAPACITY`, `EFFICIENCY`, `ENERGY_GENERATION`, `STABILITY`, plus Array Expansion, Moonlit Conversion, Cloud Piercer, Lunar Inverter, Clear-Sky Amplifier, Panel Synchronizer, and Panel Arbitration |
 | Solar Array Extender | `ENERGY_GENERATION`, array range, Moonlit Conversion, Weather Recovery, and Clear-Sky Amplification |
 

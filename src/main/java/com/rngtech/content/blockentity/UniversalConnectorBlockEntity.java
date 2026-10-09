@@ -112,7 +112,8 @@ public class UniversalConnectorBlockEntity extends BlockEntity
     private static final int DATA_NETWORK_ENERGY_OUTPUT_5M = DATA_NETWORK_ENERGY_INPUT_5M + 1;
     private static final int DATA_NETWORK_ENERGY_INPUT_15M = DATA_NETWORK_ENERGY_OUTPUT_5M + 1;
     private static final int DATA_NETWORK_ENERGY_OUTPUT_15M = DATA_NETWORK_ENERGY_INPUT_15M + 1;
-    private static final int DATA_COUNT = DATA_NETWORK_ENERGY_OUTPUT_15M + 1;
+    private static final int DATA_ENERGY_TARGET_ACCESS = DATA_NETWORK_ENERGY_OUTPUT_15M + 1;
+    private static final int DATA_COUNT = DATA_ENERGY_TARGET_ACCESS + 1;
 
     private final ItemStackHandler inventory = new ItemStackHandler(SLOT_COUNT) {
         @Override
@@ -1350,12 +1351,16 @@ public class UniversalConnectorBlockEntity extends BlockEntity
         return DATA_COUNT;
     }
 
+    public static int dataEnergyTargetAccessIndex() {
+        return DATA_ENERGY_TARGET_ACCESS;
+    }
+
     public static boolean isNetworkDebugDataIndex(int index) {
         return index >= DATA_NETWORK_CABLE_NODES && index < DATA_NETWORK_DEBUG_END;
     }
 
     public static boolean isNetworkEnergyTelemetryDataIndex(int index) {
-        return index >= DATA_NETWORK_ENERGY_LIVE_INPUT && index < DATA_COUNT;
+        return index >= DATA_NETWORK_ENERGY_LIVE_INPUT && index <= DATA_NETWORK_ENERGY_OUTPUT_15M;
     }
 
     public static int networkDebugData(int index, CableBlockEntity.NetworkDebugSnapshot snapshot) {

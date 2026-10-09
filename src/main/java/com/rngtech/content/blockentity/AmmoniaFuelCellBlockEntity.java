@@ -121,7 +121,7 @@ public class AmmoniaFuelCellBlockEntity extends BaseMachineBlockEntity
         }
     };
     private final MachineEnergyStorage energyStorage =
-            new MachineEnergyStorage(this::internalEnergyCapacity, () -> 0, this::effectiveMaxEnergyOutput, this::setChanged);
+            new MachineEnergyStorage(this::internalEnergyCapacity, () -> 0, () -> Integer.MAX_VALUE, this::setChanged);
     private final FluidTank ammoniaTank = new FluidTank(TANK_CAPACITY) {
         @Override
         public boolean isFluidValid(FluidStack stack) {
@@ -447,8 +447,7 @@ public class AmmoniaFuelCellBlockEntity extends BaseMachineBlockEntity
     }
 
     private boolean exportEnergy(Level level, BlockPos pos) {
-        MachineStatAccumulator stats = effectiveStats();
-        int remaining = Math.max(1, Mth.floor(stats.value(MachineStat.ENERGY_TRANSFER)));
+        int remaining = energyStored();
         boolean moved = false;
         for (Direction direction : ENERGY_OUTPUT_DIRECTIONS) {
             if (remaining <= 0) {
@@ -491,10 +490,6 @@ public class AmmoniaFuelCellBlockEntity extends BaseMachineBlockEntity
 
     private int internalEnergyCapacity() {
         return Math.max(1, Mth.floor(effectiveStats().value(MachineStat.ENERGY_CAPACITY)));
-    }
-
-    private int effectiveMaxEnergyOutput() {
-        return Math.max(1, Mth.floor(effectiveStats().value(MachineStat.ENERGY_TRANSFER)));
     }
 
     private IEnergyStorage batteryCellStorage() {

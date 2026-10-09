@@ -5,12 +5,12 @@ import net.minecraft.util.StringRepresentable;
 import java.util.Locale;
 
 public enum CalibrationGearMaterial implements StringRepresentable {
-    IRON(1, 4, 6, 4, 3, 0, 8),
-    COPPER(2, 6, 10, 3, 2, 0, 18),
-    STEEL(4, 10, 12, 8, 7, 1, 10),
-    TITANIUM(6, 15, 18, 16, 12, 2, 14),
-    TUNGSTENSTEEL(7, 18, 16, 12, 18, 2, 24),
-    NULLITE(7, 18, 20, 24, 16, 3, 16);
+    IRON(1, 4, 6, 4, 3, 0),
+    COPPER(2, 6, 10, 3, 2, 0),
+    STEEL(4, 10, 12, 8, 7, 1),
+    TITANIUM(6, 15, 18, 16, 12, 2),
+    TUNGSTENSTEEL(7, 18, 16, 12, 18, 2),
+    NULLITE(7, 18, 20, 24, 16, 3);
 
     private final int stage;
     private final int refinementPotential;
@@ -18,7 +18,6 @@ public enum CalibrationGearMaterial implements StringRepresentable {
     private final int precisionPercent;
     private final int catalystEfficiencyPercent;
     private final int refinementPotentialBonus;
-    private final int energyTransferPercent;
     private final String serializedName;
 
     CalibrationGearMaterial(
@@ -27,8 +26,7 @@ public enum CalibrationGearMaterial implements StringRepresentable {
             int qualityPercent,
             int precisionPercent,
             int catalystEfficiencyPercent,
-            int refinementPotentialBonus,
-            int energyTransferPercent
+            int refinementPotentialBonus
     ) {
         this.stage = stage;
         this.refinementPotential = refinementPotential;
@@ -36,7 +34,6 @@ public enum CalibrationGearMaterial implements StringRepresentable {
         this.precisionPercent = precisionPercent;
         this.catalystEfficiencyPercent = catalystEfficiencyPercent;
         this.refinementPotentialBonus = refinementPotentialBonus;
-        this.energyTransferPercent = energyTransferPercent;
         serializedName = name().toLowerCase(Locale.ROOT);
     }
 
@@ -62,10 +59,6 @@ public enum CalibrationGearMaterial implements StringRepresentable {
 
     public int refinementPotentialBonus() {
         return refinementPotentialBonus;
-    }
-
-    public int energyTransferPercent() {
-        return energyTransferPercent;
     }
 
     public String itemId(String suffix) {

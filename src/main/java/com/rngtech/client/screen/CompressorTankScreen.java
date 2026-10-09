@@ -57,8 +57,7 @@ public class CompressorTankScreen extends AbstractContainerScreen<CompressorTank
             "rngtech.stat.fluid_transfer",
             "rngtech.stat.processing_speed",
             "rngtech.stat.energy_usage",
-            "rngtech.stat.energy_capacity",
-            "rngtech.stat.energy_transfer"
+            "rngtech.stat.energy_capacity"
     };
     private static final int[] COMPRESSOR_STAT_DATA_INDICES = {
             CompressorTankMenu.fluidCapacityStatDataIndex(),
@@ -66,8 +65,7 @@ public class CompressorTankScreen extends AbstractContainerScreen<CompressorTank
             CompressorTankMenu.fluidTransferDataIndex(),
             CompressorTankMenu.processingSpeedDataIndex(),
             CompressorTankMenu.energyUsageDataIndex(),
-            CompressorTankMenu.energyCapacityStatDataIndex(),
-            CompressorTankMenu.energyTransferDataIndex()
+            CompressorTankMenu.energyCapacityStatDataIndex()
     };
     private static final MachineStat[] COMPRESSOR_STAT_TYPES = {
             MachineStat.FLUID_CAPACITY,
@@ -75,8 +73,7 @@ public class CompressorTankScreen extends AbstractContainerScreen<CompressorTank
             MachineStat.FLUID_TRANSFER,
             MachineStat.PROCESSING_SPEED,
             MachineStat.ENERGY_USAGE,
-            MachineStat.ENERGY_CAPACITY,
-            MachineStat.ENERGY_TRANSFER
+            MachineStat.ENERGY_CAPACITY
     };
     private static final String[] PLAIN_STAT_LABEL_KEYS = {"rngtech.stat.fluid_capacity"};
     private static final int[] PLAIN_STAT_DATA_INDICES = {CompressorTankMenu.fluidCapacityStatDataIndex()};

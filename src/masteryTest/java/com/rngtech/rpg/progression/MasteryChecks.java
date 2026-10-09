@@ -1,5 +1,6 @@
 package com.rngtech.rpg.progression;
 
+import com.rngtech.content.blockentity.EnergyTransferChecks;
 import com.rngtech.content.entity.ForestryCartRulesChecks;
 import com.rngtech.content.entity.ForestryTreeScanChecks;
 import com.rngtech.rpg.BatchProcessing;
@@ -45,6 +46,7 @@ public final class MasteryChecks {
         System.out.println("Machine mastery: " + checks + " checks passed");
         ForestryTreeScanChecks.run();
         ForestryCartRulesChecks.run();
+        EnergyTransferChecks.run();
         modifierProfilesLoad();
     }
 

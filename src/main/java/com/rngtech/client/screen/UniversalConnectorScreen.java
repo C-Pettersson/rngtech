@@ -368,6 +368,10 @@ public class UniversalConnectorScreen extends AbstractContainerScreen<UniversalC
         );
         guiGraphics.drawString(font, font.plainSubstrByWidth(transfer, 170), 76, 84, TEXT_MUTED, false);
         guiGraphics.drawString(font, font.plainSubstrByWidth(live, 190), 76, 96, TEXT_MUTED, false);
+        if (menu.hasConnector() && !menu.targetHasEnergyAccess()) {
+            String warning = Component.translatable("rngtech.cable_connector.no_energy_access").getString();
+            guiGraphics.drawString(font, font.plainSubstrByWidth(warning, 226), 76, 110, COLOR_NEGATIVE, false);
+        }
     }
 
     private void drawModuleLabels(GuiGraphics guiGraphics) {
@@ -837,10 +841,13 @@ public class UniversalConnectorScreen extends AbstractContainerScreen<UniversalC
     }
 
     private Component modeName() {
+        return Component.translatable(connectorMode().translationKey());
+    }
+
+    private CableConnectorMode connectorMode() {
         CableConnectorMode[] values = CableConnectorMode.values();
         int ordinal = menu.modeOrdinal();
-        CableConnectorMode mode = ordinal >= 0 && ordinal < values.length ? values[ordinal] : CableConnectorMode.BOTH;
-        return Component.translatable(mode.translationKey());
+        return ordinal >= 0 && ordinal < values.length ? values[ordinal] : CableConnectorMode.BOTH;
     }
 
     private EnergyDistributionMode distributionMode() {
@@ -866,6 +873,19 @@ public class UniversalConnectorScreen extends AbstractContainerScreen<UniversalC
             if (!tooltip.isEmpty()) {
                 guiGraphics.renderComponentTooltip(font, tooltip, mouseX, mouseY);
             }
+            return;
+        }
+        if (isEnergyTab() && inBounds(mouseX, mouseY, ENERGY_MODE_X, ENERGY_ROW_Y, ENERGY_MODE_WIDTH, SMALL_BUTTON)) {
+            CableConnectorMode connectorMode = connectorMode();
+            guiGraphics.renderComponentTooltip(
+                    font,
+                    List.of(
+                            Component.translatable(connectorMode.translationKey()),
+                            Component.translatable(connectorMode.descriptionKey())
+                    ),
+                    mouseX,
+                    mouseY
+            );
             return;
         }
         if (!isEnergyTab()
