@@ -36,7 +36,7 @@ public class MinersCompanionScreen extends AbstractContainerScreen<MinersCompani
     private static final int ENERGY_X = 18;
     private static final int ENERGY_Y = 34;
     private static final int ENERGY_WIDTH = 8;
-    private static final int ENERGY_HEIGHT = 55;
+    private static final int ENERGY_HEIGHT = 50;
     private static final int FILTER_X = 40;
     private static final int FILTER_Y = 34;
     private static final int TOGGLE_X = 132;
@@ -215,11 +215,11 @@ public class MinersCompanionScreen extends AbstractContainerScreen<MinersCompani
     }
 
     private void renderGearLabels(GuiGraphics guiGraphics) {
-        drawGearLabel(guiGraphics, Component.translatable("rngtech.miners_companion.gear.head"), 17);
-        drawGearLabel(guiGraphics, Component.translatable("rngtech.miners_companion.gear.cell"), 51);
-        drawGearLabel(guiGraphics, Component.translatable("rngtech.miners_companion.gear.filter"), 85);
-        drawGearLabel(guiGraphics, Component.translatable("rngtech.miners_companion.gear.magnet"), 119);
-        drawGearLabel(guiGraphics, Component.translatable("rngtech.miners_companion.gear.lamp"), 153);
+        drawGearLabel(guiGraphics, Component.translatable("rngtech.miners_companion.gear.head"), 16);
+        drawGearLabel(guiGraphics, Component.translatable("rngtech.miners_companion.gear.cell"), 50);
+        drawGearLabel(guiGraphics, Component.translatable("rngtech.miners_companion.gear.filter"), 84);
+        drawGearLabel(guiGraphics, Component.translatable("rngtech.miners_companion.gear.magnet"), 118);
+        drawGearLabel(guiGraphics, Component.translatable("rngtech.miners_companion.gear.lamp"), 152);
     }
 
     private void renderStatsLabels(GuiGraphics guiGraphics) {

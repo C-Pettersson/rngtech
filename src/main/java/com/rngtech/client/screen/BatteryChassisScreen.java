@@ -197,7 +197,7 @@ public class BatteryChassisScreen extends AbstractContainerScreen<BatteryChassis
         guiGraphics.fill(x + 1, y + 1, x + 149, y + 69, PANEL_LIGHT);
         guiGraphics.fill(x + 2, y + 2, x + 148, y + 68, 0xFF9B9B9B);
         for (int index = 0; index < 5; index++) {
-            int rowY = y + 5 + index * 12;
+            int rowY = y + 7 + index * 12;
             guiGraphics.fill(x + 7, rowY, x + 142, rowY + 9, index % 2 == 0 ? 0xFFB4B4B4 : 0xFFA9A9A9);
             guiGraphics.fill(x + 7, rowY, x + 9, rowY + 9, index < 2 ? ENERGY : TRANSFER);
         }
@@ -264,7 +264,7 @@ public class BatteryChassisScreen extends AbstractContainerScreen<BatteryChassis
 
     private void drawRow(GuiGraphics guiGraphics, int x, int y, Component label, String value, int accent) {
         guiGraphics.drawString(font, label, x, y, TEXT_MUTED, false);
-        guiGraphics.drawString(font, value, 196 - font.width(value), y, accent == ENERGY ? TEXT : 0xFF4A3426, false);
+        guiGraphics.drawString(font, value, 194 - font.width(value), y, accent == ENERGY ? TEXT : 0xFF4A3426, false);
     }
 
     private String energyText() {

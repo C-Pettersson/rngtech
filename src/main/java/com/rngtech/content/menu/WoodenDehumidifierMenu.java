@@ -73,9 +73,9 @@ public class WoodenDehumidifierMenu extends AbstractContainerMenu {
         addDataSlots(data);
 
         ItemStackHandler inventory = dehumidifier.getInventory();
-        addSlot(new SlotItemHandler(inventory, WoodenDehumidifierBlockEntity.SLOT_CONVERSION_INPUT, 60, 54));
-        addSlot(new SlotItemHandler(inventory, WoodenDehumidifierBlockEntity.SLOT_EMPTY_CONTAINER, 176, 78));
-        addSlot(new SlotItemHandler(inventory, WoodenDehumidifierBlockEntity.SLOT_FILLED_CONTAINER, 198, 78));
+        addSlot(new SlotItemHandler(inventory, WoodenDehumidifierBlockEntity.SLOT_CONVERSION_INPUT, 61, 55));
+        addSlot(new SlotItemHandler(inventory, WoodenDehumidifierBlockEntity.SLOT_EMPTY_CONTAINER, 177, 79));
+        addSlot(new SlotItemHandler(inventory, WoodenDehumidifierBlockEntity.SLOT_FILLED_CONTAINER, 199, 79));
 
         addPlayerInventory(playerInventory);
     }

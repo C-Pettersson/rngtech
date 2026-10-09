@@ -482,19 +482,19 @@ public class ResonanceCalibratorScreen extends AbstractContainerScreen<Resonance
     }
 
     private void drawProcessingLabels(GuiGraphics guiGraphics) {
-        drawCentered(guiGraphics, Component.translatable("rngtech.processing.input.tiny"), 47, 28);
-        drawCentered(guiGraphics, Component.translatable("rngtech.calibration.catalyst.tiny"), 89, 28);
-        drawCentered(guiGraphics, Component.translatable("rngtech.calibration.stabilizer.tiny"), 117, 28);
+        drawCentered(guiGraphics, Component.translatable("rngtech.processing.input.tiny"), 46, 28);
+        drawCentered(guiGraphics, Component.translatable("rngtech.calibration.catalyst.tiny"), 88, 28);
+        drawCentered(guiGraphics, Component.translatable("rngtech.calibration.stabilizer.tiny"), 116, 28);
         drawCentered(guiGraphics, Component.translatable("rngtech.processing.output.tiny"), 184, 28);
         drawProcessingTargetLabel(guiGraphics);
     }
 
     private void drawGearLabels(GuiGraphics guiGraphics) {
-        drawGearLabel(guiGraphics, Component.translatable("rngtech.gear.battery_cell.short"), 39, 35, 38);
-        drawGearLabel(guiGraphics, Component.translatable("rngtech.gear.resonance_coil.short"), 79, 35, 38);
-        drawGearLabel(guiGraphics, Component.translatable("rngtech.gear.control_board.short"), 119, 35, 38);
-        drawGearLabel(guiGraphics, Component.translatable("rngtech.gear.stabilizer_matrix.tiny"), 159, 35, 38);
-        drawGearLabel(guiGraphics, Component.translatable("rngtech.calibration.pattern.tiny"), 123, 66, 128);
+        drawGearLabel(guiGraphics, Component.translatable("rngtech.gear.battery_cell.short"), 38, 35, 38);
+        drawGearLabel(guiGraphics, Component.translatable("rngtech.gear.resonance_coil.short"), 78, 35, 38);
+        drawGearLabel(guiGraphics, Component.translatable("rngtech.gear.control_board.short"), 118, 35, 38);
+        drawGearLabel(guiGraphics, Component.translatable("rngtech.gear.stabilizer_matrix.tiny"), 158, 35, 38);
+        drawGearLabel(guiGraphics, Component.translatable("rngtech.calibration.pattern.tiny"), 122, 66, 128);
     }
 
     private void drawConfigurationLabels(GuiGraphics guiGraphics) {
@@ -594,9 +594,9 @@ public class ResonanceCalibratorScreen extends AbstractContainerScreen<Resonance
             return;
         }
 
-        renderCenteredLabelTooltip(guiGraphics, mouseX, mouseY, 47, 28, 24, Component.translatable("rngtech.processing.input"));
-        renderCenteredLabelTooltip(guiGraphics, mouseX, mouseY, 89, 28, 24, Component.translatable("rngtech.calibration.catalyst"));
-        renderCenteredLabelTooltip(guiGraphics, mouseX, mouseY, 117, 28, 24, Component.translatable("rngtech.calibration.stabilizer"));
+        renderCenteredLabelTooltip(guiGraphics, mouseX, mouseY, 46, 28, 24, Component.translatable("rngtech.processing.input"));
+        renderCenteredLabelTooltip(guiGraphics, mouseX, mouseY, 88, 28, 24, Component.translatable("rngtech.calibration.catalyst"));
+        renderCenteredLabelTooltip(guiGraphics, mouseX, mouseY, 116, 28, 24, Component.translatable("rngtech.calibration.stabilizer"));
         renderCenteredLabelTooltip(guiGraphics, mouseX, mouseY, 184, 28, 24, Component.translatable("rngtech.processing.output"));
         renderCenteredLabelTooltip(
                 guiGraphics,

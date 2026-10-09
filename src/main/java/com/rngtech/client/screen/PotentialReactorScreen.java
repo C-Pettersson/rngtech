@@ -39,7 +39,7 @@ public class PotentialReactorScreen extends AbstractContainerScreen<PotentialRea
     private static final int STATUS_ICON_SPACING = 16;
     private static final int STATUS_ICON_ROW_WIDTH = ICON_SIZE + STATUS_ICON_SPACING * 2;
     private static final int STATUS_ICON_X = PROGRESS_BAR_X + (PROGRESS_BAR_WIDTH - STATUS_ICON_ROW_WIDTH) / 2;
-    private static final int STATUS_ICON_Y = PROGRESS_BAR_Y + PROGRESS_BAR_HEIGHT + 4;
+    private static final int STATUS_ICON_Y = PROGRESS_BAR_Y + PROGRESS_BAR_HEIGHT + 5;
     private static final int GENERATION_ICON_X = STATUS_ICON_X + STATUS_ICON_SPACING;
     private static final int OUTPUT_ICON_X = GENERATION_ICON_X + STATUS_ICON_SPACING;
     private static final int PROCESSING_LEVEL_ICON_X = 184;
@@ -271,9 +271,9 @@ public class PotentialReactorScreen extends AbstractContainerScreen<PotentialRea
     }
 
     private void drawGearLabels(GuiGraphics guiGraphics) {
-        drawGearLabel(guiGraphics, Component.translatable("rngtech.gear.reactor_chamber.short"), 53);
-        drawGearLabel(guiGraphics, Component.translatable("rngtech.gear.recovery_filter.short"), 101);
-        drawGearLabel(guiGraphics, Component.translatable("rngtech.gear.containment_lining.short"), 149);
+        drawGearLabel(guiGraphics, Component.translatable("rngtech.gear.reactor_chamber.short"), 52);
+        drawGearLabel(guiGraphics, Component.translatable("rngtech.gear.recovery_filter.short"), 100);
+        drawGearLabel(guiGraphics, Component.translatable("rngtech.gear.containment_lining.short"), 148);
     }
 
     private void drawStatsLabels(GuiGraphics guiGraphics) {

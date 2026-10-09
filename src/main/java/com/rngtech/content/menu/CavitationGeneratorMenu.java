@@ -122,7 +122,7 @@ public class CavitationGeneratorMenu extends AbstractContainerMenu {
         RefinementMenuSupport.setMachineDisplay(refinementTarget, ModBlocks.CAVITATION_GENERATOR.get(), machineTraits);
 
         ItemStackHandler processInventory = generator.getProcessInventory();
-        addSlot(new TabbedSlot(processInventory, CavitationGeneratorBlockEntity.SLOT_FLUID_INPUT_CONTAINER, 29, 59, () -> selectedTab == TAB_PROCESSING));
+        addSlot(new TabbedSlot(processInventory, CavitationGeneratorBlockEntity.SLOT_FLUID_INPUT_CONTAINER, 29, 62, () -> selectedTab == TAB_PROCESSING));
         addSlot(new TabbedSlot(processInventory, CavitationGeneratorBlockEntity.SLOT_DAMAGED_ROTOR, 193, 62, () -> selectedTab == TAB_PROCESSING));
 
         ItemStackHandler gearInventory = generator.getGearInventory();
@@ -236,7 +236,7 @@ public class CavitationGeneratorMenu extends AbstractContainerMenu {
     }
 
     public Component inputFluidName() {
-        return FluidMenuSupport.fluidName(data.get(DATA_INPUT_FLUID_ID), Component.translatable("rngtech.purge.empty_fluid"));
+        return FluidMenuSupport.fluidName(data.get(DATA_INPUT_FLUID_ID), Component.translatable("block.minecraft.water"));
     }
 
     public int heatStrain() {
@@ -276,7 +276,7 @@ public class CavitationGeneratorMenu extends AbstractContainerMenu {
     }
 
     public Component outputFluidName() {
-        return FluidMenuSupport.fluidName(data.get(DATA_OUTPUT_FLUID_ID), Component.translatable("rngtech.purge.empty_fluid"));
+        return FluidMenuSupport.fluidName(data.get(DATA_OUTPUT_FLUID_ID), Component.translatable("fluid.rngtech.nitrogen"));
     }
 
     public int recipeFluidOutput() {

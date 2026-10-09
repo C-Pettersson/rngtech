@@ -43,7 +43,7 @@ public class CrusherScreen extends AbstractContainerScreen<CrusherMenu> {
     private static final int TAB_SPACING = 44;
     private static final int STATUS_ICON_X = 96;
     private static final int CELL_STATUS_ICON_X = 112;
-    private static final int STATUS_ICON_Y = 28;
+    private static final int STATUS_ICON_Y = 26;
     private static final int ICON_SIZE = 12;
     private static final int OUTPUT_BONUS_BAR_WIDTH = 67;
     private static final int PROCESSING_LEVEL_ICON_X = 184;
@@ -325,7 +325,7 @@ public class CrusherScreen extends AbstractContainerScreen<CrusherMenu> {
     private void renderSlotFrames(GuiGraphics guiGraphics) {
         if (menu.selectedTab() == CrusherMenu.TAB_PROCESSING) {
             renderSlotFrame(guiGraphics, 55, 41);
-            renderSlotFrame(guiGraphics, 169, 53);
+            renderSlotFrame(guiGraphics, 169, 51);
             renderSlotFrame(
                     guiGraphics,
                     RefinementScreenStyle.PROCESSING_TARGET_SLOT_X - 1,
@@ -356,16 +356,16 @@ public class CrusherScreen extends AbstractContainerScreen<CrusherMenu> {
     private void renderProcessing(GuiGraphics guiGraphics) {
         int x = leftPos;
         int y = topPos;
-        guiGraphics.fill(x + 86, y + 43, x + 155, y + 48, 0xFF5F5F5F);
+        guiGraphics.fill(x + 86, y + 41, x + 155, y + 46, 0xFF5F5F5F);
         guiGraphics.fill(
                 x + 87,
-                y + 44,
+                y + 42,
                 x + 87 + Math.round(OUTPUT_BONUS_BAR_WIDTH * menu.outputBonusProgress()),
-                y + 47,
+                y + 45,
                 OUTPUT_BONUS
         );
         if (menu.outputBonusPayoutsNextCraft() > 0) {
-            guiGraphics.fill(x + 153, y + 44, x + 154, y + 47, 0xFFFFE2A2);
+            guiGraphics.fill(x + 153, y + 42, x + 154, y + 45, 0xFFFFE2A2);
         }
 
         guiGraphics.fill(x + 86, y + 51, x + 155, y + 59, 0xFF5F5F5F);
@@ -457,8 +457,8 @@ public class CrusherScreen extends AbstractContainerScreen<CrusherMenu> {
     private void drawGearLabels(GuiGraphics guiGraphics) {
         Component crushHead = Component.translatable("rngtech.gear.crush_head.short");
         Component batteryCell = Component.translatable("rngtech.gear.battery_cell.short");
-        guiGraphics.drawString(font, crushHead, 53 - font.width(crushHead) / 2, 35, TEXT_MUTED, false);
-        guiGraphics.drawString(font, batteryCell, 89 - font.width(batteryCell) / 2, 35, TEXT_MUTED, false);
+        guiGraphics.drawString(font, crushHead, 52 - font.width(crushHead) / 2, 35, TEXT_MUTED, false);
+        guiGraphics.drawString(font, batteryCell, 88 - font.width(batteryCell) / 2, 35, TEXT_MUTED, false);
     }
 
     private void drawRefinementLabels(GuiGraphics guiGraphics) {
@@ -509,7 +509,7 @@ public class CrusherScreen extends AbstractContainerScreen<CrusherMenu> {
                 mouseX,
                 mouseY,
                 86,
-                43,
+                41,
                 69,
                 5,
                 outputBonusTooltip()

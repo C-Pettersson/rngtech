@@ -42,7 +42,7 @@ public class CompressorTankScreen extends AbstractContainerScreen<CompressorTank
     private static final int COMPRESSION_INDICATOR_Y = 38;
     private static final int COMPRESSION_INDICATOR_WIDTH = 28;
     private static final int COMPRESSION_INDICATOR_HEIGHT = 7;
-    private static final int PLAIN_TANK_X = 76;
+    private static final int PLAIN_TANK_X = 73;
     private static final int PLAIN_TANK_Y = BAR_Y;
     private static final int PLAIN_TANK_WIDTH = 72;
     private static final int PLAIN_TANK_HEIGHT = BAR_HEIGHT;
@@ -357,11 +357,11 @@ public class CompressorTankScreen extends AbstractContainerScreen<CompressorTank
         if (!menu.supportsCompression()) {
             return;
         }
-        drawGearLabel(guiGraphics, Component.translatable("rngtech.gear.battery_cell.short"), 41);
-        drawGearLabel(guiGraphics, Component.translatable("rngtech.gear.servo.short"), 77);
-        drawGearLabel(guiGraphics, Component.translatable("rngtech.gear.servo.short"), 113);
-        drawGearLabel(guiGraphics, Component.translatable("rngtech.gear.servo.short"), 149);
-        drawGearLabel(guiGraphics, Component.translatable("rngtech.gear.servo.short"), 185);
+        drawGearLabel(guiGraphics, Component.translatable("rngtech.gear.battery_cell.short"), 40);
+        drawGearLabel(guiGraphics, Component.translatable("rngtech.gear.servo.short"), 76);
+        drawGearLabel(guiGraphics, Component.translatable("rngtech.gear.servo.short"), 112);
+        drawGearLabel(guiGraphics, Component.translatable("rngtech.gear.servo.short"), 148);
+        drawGearLabel(guiGraphics, Component.translatable("rngtech.gear.servo.short"), 184);
     }
 
     private void drawStatLabels(GuiGraphics guiGraphics) {

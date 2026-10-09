@@ -53,11 +53,11 @@ public class AmmoniaSynthesizerScreen extends AbstractContainerScreen<AmmoniaSyn
             renderPurgeButtons(guiGraphics);
             guiGraphics.fill(leftPos + 92, topPos + 54, leftPos + 140, topPos + 62, DARK);
             guiGraphics.fill(leftPos + 93, topPos + 55, leftPos + 93 + Math.round(46 * menu.progressFill()), topPos + 61, PROGRESS);
-            statusIcon(guiGraphics, 116, 70);
+            statusIcon(guiGraphics, 110, 66);
         } else if (menu.selectedTab() == AmmoniaSynthesizerMenu.TAB_GEAR) {
             slot(guiGraphics, 79, 47);
         } else if (menu.selectedTab() == AmmoniaSynthesizerMenu.TAB_STATS) {
-            MachineScreenStyle.renderStatPanel(guiGraphics, leftPos, topPos, 8, 18, 224, 4, STAT_ACCENT);
+            MachineScreenStyle.renderStatPanel(guiGraphics, leftPos, topPos, 8, 18, 224, statLines().length, STAT_ACCENT);
         } else {
             slot(guiGraphics, RefinementScreenStyle.TARGET_SLOT_X - 1, RefinementScreenStyle.SLOT_Y - 1);
             slot(guiGraphics, RefinementScreenStyle.CONSUMABLE_SLOT_X - 1, RefinementScreenStyle.SLOT_Y - 1);
@@ -75,7 +75,7 @@ public class AmmoniaSynthesizerScreen extends AbstractContainerScreen<AmmoniaSyn
             guiGraphics.drawString(font, playerInventoryTitle, inventoryLabelX, inventoryLabelY, TEXT, false);
         }
         if (menu.selectedTab() == AmmoniaSynthesizerMenu.TAB_GEAR) {
-            guiGraphics.drawString(font, Component.translatable("rngtech.gear.catalyst_bed.short"), 62, 35, MUTED, false);
+            MachineScreenStyle.drawClippedCentered(guiGraphics, font, Component.translatable("rngtech.gear.catalyst_bed.short"), 88, 35, 54, MUTED);
         } else if (menu.selectedTab() == AmmoniaSynthesizerMenu.TAB_STATS) {
             MachineScreenStyle.drawStatPanelLabels(guiGraphics, font, Component.translatable("rngtech.tab.stats"), statLines(), 8, 18, 224, STAT_ACCENT);
         } else if (menu.selectedTab() == AmmoniaSynthesizerMenu.TAB_REFINEMENT) {
@@ -184,7 +184,7 @@ public class AmmoniaSynthesizerScreen extends AbstractContainerScreen<AmmoniaSyn
         CompactValueText.renderTooltipIfHovered(guiGraphics, font, leftPos, topPos, mouseX, mouseY, 154, 28, 10, 50,
                 FluidMeterTooltips.amount(Component.translatable("fluid.rngtech.ammonia"), menu.ammonia(), menu.tankCapacity()));
         CompactValueText.renderTooltipIfHovered(guiGraphics, font, leftPos, topPos, mouseX, mouseY, 92, 54, 48, 8, progressTooltip());
-        CompactValueText.renderTooltipIfHovered(guiGraphics, font, leftPos, topPos, mouseX, mouseY, 116, 70, 12, 12,
+        CompactValueText.renderTooltipIfHovered(guiGraphics, font, leftPos, topPos, mouseX, mouseY, 110, 66, 12, 12,
                 Component.translatable("rngtech.ammonia_synthesizer.tooltip.status", statusComponent()));
     }
 

@@ -180,8 +180,8 @@ public class ForestryCartScreen extends AbstractContainerScreen<ForestryCartMenu
             MachineScreenStyle.drawClippedCentered(guiGraphics, font, Component.translatable("rngtech.gear.modular_tool.short"), 81, 39, 30, TEXT_MUTED);
             MachineScreenStyle.drawClippedCentered(guiGraphics, font, Component.translatable("rngtech.gear.shears.short"), 111, 39, 30, TEXT_MUTED);
             MachineScreenStyle.drawClippedCentered(guiGraphics, font, Component.translatable("rngtech.gear.fluid_pump.short"), 21, 39, 26, TEXT_MUTED);
-            MachineScreenStyle.drawClippedCentered(guiGraphics, font, Component.translatable("rngtech.forestry_station.saplings"), 52, 72, 50, TEXT_MUTED);
-            MachineScreenStyle.drawClippedCentered(guiGraphics, font, Component.translatable("rngtech.forestry_station.output"), 146, 72, 110, TEXT_MUTED);
+            MachineScreenStyle.drawClippedCentered(guiGraphics, font, Component.translatable("rngtech.forestry_station.saplings"), 60, 72, 50, TEXT_MUTED);
+            MachineScreenStyle.drawClippedCentered(guiGraphics, font, Component.translatable("rngtech.forestry_station.output"), 145, 72, 110, TEXT_MUTED);
             MachineScreenStyle.drawClippedCentered(guiGraphics, font, Component.literal(Integer.toString(Math.max(1, menu.workRange()))),
                     RANGE_ICON_X + ICON_SIZE / 2, RANGE_ICON_Y + 2, ICON_SIZE - 2, 0xFFE0E0E0);
         } else if (menu.selectedTab() == ForestryCartMenu.TAB_STATS) {

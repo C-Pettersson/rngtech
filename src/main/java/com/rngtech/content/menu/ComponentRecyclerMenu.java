@@ -95,7 +95,7 @@ public class ComponentRecyclerMenu extends AbstractContainerMenu {
         RefinementMenuSupport.setMachineDisplay(refinementTarget, recycler.getBlockState().getBlock(), machineTraits);
 
         ItemStackHandler processInventory = recycler.getProcessInventory();
-        addSlot(new TabbedSlot(processInventory, ComponentRecyclerBlockEntity.SLOT_INPUT, 45, 48, () -> selectedTab == TAB_PROCESSING));
+        addSlot(new TabbedSlot(processInventory, ComponentRecyclerBlockEntity.SLOT_INPUT, 45, 52, () -> selectedTab == TAB_PROCESSING));
         addSlot(new TabbedSlot(processInventory, ComponentRecyclerBlockEntity.SLOT_OUTPUT_PRIMARY, 177, 30, () -> selectedTab == TAB_PROCESSING));
         addSlot(new TabbedSlot(processInventory, ComponentRecyclerBlockEntity.SLOT_OUTPUT_SECONDARY, 177, 52, () -> selectedTab == TAB_PROCESSING));
         addSlot(new TabbedSlot(processInventory, ComponentRecyclerBlockEntity.SLOT_OUTPUT_TERTIARY, 177, 74, () -> selectedTab == TAB_PROCESSING));
