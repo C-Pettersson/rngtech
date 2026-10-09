@@ -35,7 +35,7 @@ Mine it with a pickaxe to get it back. Items in its slots and installed Gear dro
 
 ### Generating power
 
-Install a Reactor Chamber on the Gear tab, then put fuel in the input slot. The reactor processes one item at a time, adds the FE to its internal buffer, and pushes it out to adjacent blocks on its four sides, for example a [Universal Cable](universal-cable.md). When the buffer is full, the reactor pauses so expensive fuel is never burned for nothing.
+Install a Reactor Chamber on the Gear tab, then put fuel in the input slot. The reactor processes one item at a time, adds the FE to its internal buffer, and pushes it out to adjacent blocks on its four sides, for example a [Universal Cable](universal-cable.md). The reactor does not limit its own output, so the receiver or connector tier decides how much FE moves each tick. When the buffer is full, the reactor pauses so expensive fuel is never burned for nothing.
 
 A redstone signal pauses the reactor.
 
@@ -99,7 +99,7 @@ With JEI installed, click the recipe line on the Process tab to open the Potenti
 
 The Potential Reactor screen has four tabs:
 
-- **Process**: input and residue slots, the FE buffer, processing progress, and status. Hover for exact FE, fuel value, and rates.
+- **Process**: input and residue slots, the FE buffer, processing progress, and status. Hover for exact FE, fuel value, generation rate, and last tick's FE output.
 - **Gear**: Reactor Chamber, Recovery Filter, and Containment Lining slots, plus the chamber's stage.
 - **Stats**: the reactor's current stats, including traits and Gear.
 - **Refinement**: refine the placed reactor's traits with a catalyst.

@@ -41,7 +41,7 @@ Each cycle needs two things:
 - **Fuel**: one plate, Anode, or {{ item('rngtech:scrap') }} in the plate slot.
 - **Electrolyte**: one {{ item('rngtech:electrolyte') }} in the electrolyte slot, or 125 mB of Electrolyte Solution from the internal tank. The dry item is used first when both are present.
 
-The cell then generates the recipe's FE over the cycle and drops one Corrosion Residue into the output slot. It pulls the next fuel only when the residue slot has room and its internal buffer or installed Battery Cell can still take FE. Clear the residue and draw FE away, or the cell sits idle. A redstone signal pauses it.
+The cell then generates the recipe's FE over the cycle and drops one Corrosion Residue into the output slot. It pulls the next fuel only when the residue slot has room and its internal buffer or installed Battery Cell can still take FE. Clear the residue and draw FE away, or the cell sits idle. The cell does not limit its own output, so the receiver or connector tier decides how much FE moves each tick. A redstone signal pauses it.
 
 The electrolyte tank holds 4,000 mB, and a Fluid Pump's Fluid Capacity rolls make it bigger. To empty it, use the purge button on the Process tab or right-click the cell with a {{ item('rngtech:purge_bucket') }}. Each purge voids up to 1,000 mB.
 

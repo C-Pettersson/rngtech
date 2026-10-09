@@ -59,7 +59,7 @@ Every recipe adds instability, and higher stability reduces it. Instability make
 | Void Chamber | Tungstensteel, Nullite, or Exotic Void Chambers | Required. Sets the stage, generation, and stability. |
 | Collapse Nozzle | Steel through Exotic Collapse Nozzles. The Nitrogen Separation Nozzle is rejected. | Required. Tunes generation, transfer, speed, and stability. |
 | Dimensional Stabilizer | Tungstensteel, Nullite, or Exotic Dimensional Stabilizers | Raises stability and efficiency. Void Catalyst only leaves residue while one is installed. |
-| Energy Connector | Any Energy Connector | Optional. Sets how fast FE leaves the sides. Without one, the Gear's own transfer rate is used. |
+| Energy Connector | Any Energy Connector | Optional. Sets how fast FE leaves the sides. Without one, the Gear's own transfer rate is used. Either way, the cap is per tick and shared by all sides. |
 
 Chamber and nozzle generation multiply each other. Unmodified Tungstensteel Gear reaches about 1,057 FE/t, and unmodified Exotic Gear about 3,000 FE/t. Rolled and refined parts push beyond that. See [Stages](stages.md) for the Stage 7 power band.
 

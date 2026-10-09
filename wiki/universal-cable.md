@@ -83,7 +83,7 @@ Mine Cables and Universal Connectors with a pickaxe. Aiming at a connector on a 
 
 One Cable can hold a connector on each of its six faces.
 
-You can also install an Energy Connector directly on a cable face, without a Universal Connector, for simple power links. Each face holds either one direct Energy Connector or one Universal Connector, never both.
+Energy Connectors are modules: they go in a Universal Connector's Energy tab or in a machine's Gear slot. Right-clicking a Cable with one does not place it on the cable; if you aim at a connector, that connector's screen opens instead. Direct Energy Connectors on a cable face from older worlds keep working, and you can still configure and mine them, but you cannot place new ones.
 
 #### Standalone plates
 
@@ -94,7 +94,7 @@ A Universal Connector placed on its own, with no Cable, works as a standalone pl
 | Setting | What it does |
 |---|---|
 | Channel | 0–15. Connectors only exchange with the same channel. Energy, Fluid, Item, and Bridge channels are separate. |
-| Mode | Energy: Both, Input, or Output. Fluid and Item rows: IN pulls from the machine into the cable, OUT pushes from the cable into the machine. |
+| Mode | Energy: Input takes FE from the machine into the cable, Output sends FE from the cable into the machine, and Both does both. Hover a mode button for its description. Fluid and Item rows: IN pulls from the machine into the cable, OUT pushes from the cable into the machine. |
 | Attach As | Which side of the machine the connector acts as. For example, a connector under a machine can insert as if it were on top. Set a Fluid or Item row to None to switch it off. |
 | Distribution | Energy only. Round Robin rotates between outputs, Even splits each transfer, First Available fills outputs in order. |
 | Filters | Fluid and Item rows each have two ghost filter slots. Filters are copies and are never used up. |
@@ -114,6 +114,14 @@ The Energy tab has one Energy Connector slot. The connector pulls FE from machin
 | {{ item('rngtech:sparksteel_energy_connector') }} | 5 | 8,192 FE/t |
 | {{ item('rngtech:arclite_energy_connector') }} | 6 | 32,768 FE/t |
 | {{ item('rngtech:exotic_energy_connector') }} | 8 | 1,000,000 FE/t |
+
+The tier is a per-tick cap in both directions. A connector takes at most its tier in FE/t from its machine, and delivers at most its tier in FE/t into its machine, however many generators feed the network. Most machines do not limit how fast they take or give FE, so the connector tier is usually what sets the rate.
+
+**Storage balancing.** Between two storage blocks, such as [Battery Chassis](battery-chassis.md), whose connectors are both on Both, FE flows only from the fuller block to the emptier one, by fill percentage, and stops once they are equally full. Gaps under 1% move nothing. Daisy-chained banks still pass charge along: a generator charges the first bank, and the first bank shares with the next. Generators still charge banks, and banks still feed machines. A completely full bank passes its overflow on freely, and a completely empty bank takes FE freely. To fill one bank from another regardless of fill, set the source bank's connector to Input or the destination bank's connector to Output.
+
+**No FE on this side.** You can put a connector on any face, but many machines take or give FE only on some sides. If the machine has no FE on the connector's Attach As side, the Energy tab and the Wrench hologram show a red warning: `No FE on this side of the target. Change Attach As or move the connector.`
+
+**Machine readouts.** A machine's Jade tooltip and info panel count only connectors that actually move FE for it: the mode must match the direction, and the Attach As side must be one where the machine has FE. When those connectors carry less than the machine needs, it shows **Attached connector limits input energy**, or **Attached connector limits output energy** on a generator.
 
 ### Fluids
 
@@ -157,12 +165,12 @@ The {{ item('rngtech:wrench') }} manages links and shows connector settings.
 
 - Right-click a cable face that points at another Cable to switch that link off or on. Disabled links stay off after reloads.
 - Right-click a connector on a cable face to open its screen.
-- Hold the Wrench while looking at a Universal Connector, standalone or on a cable, to see a hologram of its settings. Direct Energy Connectors on a cable face show no hologram.
+- Hold the Wrench while looking at a Universal Connector, standalone or on a cable, to see a hologram of its settings. Direct Energy Connectors left on a cable face from older worlds show no hologram.
 - The hologram has Summary, Energy, Item, and Fluid pages. The Summary page also shows the bridge, such as `Bridge: AE2 ch 3`. Shift + right-click cycles the pages, and so does the **Cycle Wrench View** key. That key has no default binding; set it under Controls.
 
 ### Configurator
 
-The {{ item('rngtech:configurator') }} copies connector settings and pastes them onto other connectors. It works on standalone and cable-side Universal Connectors and on direct Energy Connectors on a cable face.
+The {{ item('rngtech:configurator') }} copies connector settings and pastes them onto other connectors. It works on standalone and cable-side Universal Connectors and on direct Energy Connectors left on a cable face from older worlds.
 
 Right-click a connector to open the Configurator menu:
 
@@ -185,11 +193,11 @@ The Configurator can also copy Machine Mastery builds. See [Machine Mastery](mac
 
 A Universal Connector's screen has five tabs:
 
-- **Energy**: the Energy Connector slot with mode, channel, Distribution, and Attach settings, plus FE in and out last tick.
+- **Energy**: the Energy Connector slot with mode, channel, Distribution, and Attach settings, plus FE in and out last tick and the red warning when the machine has no FE on the Attach As side.
 - **Fluid**: three Fluid Connector rows with mode, channel, Attach, and two filter slots each.
 - **Item**: three Item Connector rows with mode, channel, Attach, and two filter slots each.
 - **Bridge**: the network connector slot, bridge channel, and link status.
-- **Network**: a read-only overview of the whole cable network: cables, connectors, modules, and channels. The FE meter shows power actually delivered on this connector's energy channel, as In, Out, and Sum, averaged over 1, 5, or 15 minutes. It does not count demand that went unmet. Hover a value for the live rate. **Clear network cache** forces a rebuild.
+- **Network**: a read-only overview of the whole cable network: cables, connectors, modules, and channels. The FE meter shows power actually delivered on this connector's energy channel, as In and Out averaged over 1, 5, or 15 minutes, plus Max: the most the channel can move with its current connectors. It does not count demand that went unmet. Averages cover only the time measured so far, so a new network shows its real rate at once, and the history is kept when the network is rebuilt, extended, or merged. Hover In or Out for the live rate. **Clear network cache** forces a rebuild.
 
 ## Data values
 

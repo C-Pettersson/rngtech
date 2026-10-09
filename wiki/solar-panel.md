@@ -61,7 +61,7 @@ A panel generates FE only when all of these are true:
 
 Rain, snow, and thunderstorms drop a panel to its lower weather output. At night or under a roof it makes nothing.
 
-A standalone panel stores FE in a small internal buffer and pushes it out to adjacent blocks that accept FE, such as a [Universal Cable](universal-cable.md) or a [Battery Chassis](battery-chassis.md). Panels never accept FE from outside.
+A standalone panel stores FE in a small internal buffer and pushes it out to adjacent blocks that accept FE, such as a [Universal Cable](universal-cable.md) or a [Battery Chassis](battery-chassis.md). A panel does not limit its own output, so the receiver or connector tier decides how much FE moves each tick. Panels never accept FE from outside.
 
 ### Stages
 
@@ -90,7 +90,7 @@ While a controller owns a panel, that panel stops exporting on its own. The cont
 
 - **Set bonus.** If every panel spot in range holds a panel of the same stage, the array gets +20% output.
 - **Overlap.** A panel inside two controllers' ranges splits its output between them.
-- **Output cap.** The installed Energy Connector sets the controller's maximum FE/t export. Without one, it exports up to 128 FE/t.
+- **Output cap.** The installed Energy Connector sets the controller's maximum FE/t export. Without one, it exports up to 128 FE/t. The cap is per tick and shared by all sides.
 
 The Process tab has a button that toggles an in-world outline of the controller's range. The outline stays visible after you close the screen.
 

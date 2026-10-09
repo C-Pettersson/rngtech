@@ -72,7 +72,7 @@ The forge records how many times it has worked on each item, both in total and p
 
 ### Gear
 
-The Gear tab has one optional **Battery Cell** slot. Any Battery Cell fits. The forge also has a 2,000,000 FE internal buffer and accepts up to 65,536 FE/t. A large cell lets a long operation keep running when your supply cannot match the draw.
+The Gear tab has one optional **Battery Cell** slot. Any Battery Cell fits. The forge also has a 2,000,000 FE internal buffer and no input limit of its own: it takes FE as fast as its buffer and cell have room and your supply or connector tier allows. A large cell lets a long operation keep running when your supply cannot match the draw.
 
 ### Automation
 

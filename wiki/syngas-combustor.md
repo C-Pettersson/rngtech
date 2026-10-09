@@ -45,7 +45,7 @@ Pipe Syngas or Carbon Monoxide into the gas tank. The combustor needs no Gear to
 
 Carbon Monoxide is a by-product of the [Steam Methane Reformer](steam-methane-reformer.md). Burning it here is mainly a way to keep the reformer from backing up, not a power source.
 
-The combustor stops when its FE storage is full or when the Carbon Exhaust tank cannot fit the next cycle's exhaust. Drain both to keep it running. It pushes FE into neighbors on its four sides.
+The combustor stops when its FE storage is full or when the Carbon Exhaust tank cannot fit the next cycle's exhaust. Drain both to keep it running. It pushes FE into neighbors on its four sides, and does not limit its own output, so the receiver or connector tier decides how much FE moves each tick.
 
 ### Gear
 

@@ -37,7 +37,7 @@ Mine it with a pickaxe to get it back. Fuel and installed Gear drop as separate 
 
 Put fuel in the fuel slot on the Process tab. The generator burns one item at a time at about 8 FE/t before stats, so a fuel's FE value decides how long it burns. A Composted Biomass worth 1,600 FE burns for 200 ticks (10 seconds).
 
-Generated FE goes into a small internal buffer, plus any installed Battery Cell, and the generator pushes it out to adjacent blocks on its four sides, for example a [Universal Cable](universal-cable.md). When the buffer is full, the generator pauses and does not waste fuel. It never accepts FE from outside.
+Generated FE goes into a small internal buffer, plus any installed Battery Cell, and the generator pushes it out to adjacent blocks on its four sides, for example a [Universal Cable](universal-cable.md). The generator does not limit its own output, so the receiver or connector tier decides how much FE moves each tick. When the buffer is full, the generator pauses and does not waste fuel. It never accepts FE from outside.
 
 Golden Apples, Enchanted Golden Apples, and Golden Carrots are refused.
 

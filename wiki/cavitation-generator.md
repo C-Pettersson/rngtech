@@ -62,7 +62,7 @@ The {{ item('rngtech:aethergold_cavitation_rotor') }} is a Stage 7 sidegrade. It
 | Heat Core | No | Makes heat strain cool faster. Higher-stage cores cool faster; an Iron Heat Core adds nothing. |
 | Battery Cell | No | Adds FE storage. It does not raise the export rate. |
 | Servo | No | Stage 6+ Servos only ({{ item('rngtech:titanium_servo') }} and up). Speeds cycles and reduces wear and heat strain. |
-| Energy Connector | No | Sets how fast FE leaves the sides. Without one, the rotor and nozzle set a lower fallback rate. |
+| Energy Connector | No | Sets how fast FE leaves the sides. Without one, the rotor and nozzle set a lower fallback rate. Either way, the cap is per tick and shared by all sides. |
 
 Cavitation Rotors can roll flat and percent Durability affixes.
 

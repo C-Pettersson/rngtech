@@ -71,7 +71,7 @@ Placement, wrench, and Configurator use are on the player guide. Implementation 
 - The wrench hologram is a server snapshot (`WrenchOverlayServerHandler`) built only for standalone and cable-side Universal Connectors.
 - Configurator presets store Attach as a `RelativeDirection` (`NONE`, `DEFAULT`, or an absolute side); copying captures `DEFAULT` when the source Attach equals its default side.
 - Configurator Gear helper mode inserts through the machine's own Gear slot validation and does not expose Gear slots to item automation.
-- Energy Connectors are modules for a Universal Connector Energy tab or a supported machine Gear slot. Using an Energy Connector on a Cable opens a Universal Connector on the clicked face instead of placing a bare connector. Direct cable-face Energy Connectors from older worlds keep working and can be configured and mined, but new ones cannot be placed.
+- Energy Connectors are modules for a Universal Connector Energy tab or a supported machine Gear slot. Using an Energy Connector on a Cable places nothing: `CableBlock` passes it to the default interaction, which opens the aimed connector's menu if that face has one and otherwise does nothing. Direct cable-face Energy Connectors from older worlds keep working and can be configured and mined, but new ones cannot be placed.
 
 ## Recipes
 
