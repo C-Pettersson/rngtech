@@ -20,6 +20,7 @@ import com.rngtech.rpg.MachineType;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
@@ -78,7 +79,9 @@ public class AlgaePhotobioreactorBlockEntity extends BlockEntity
     private static final int DATA_MIN_LIGHT = 8;
     private static final int DATA_BIO_CONVERSION = 9;
     private static final int DATA_OUTPUT_BONUS_PROGRESS = 10;
-    private static final int DATA_COUNT = 11;
+    private static final int DATA_WATER_FLUID_ID = 11;
+    private static final int DATA_CARBON_FLUID_ID = 12;
+    private static final int DATA_COUNT = 13;
     private static final int STAT_SCALE = 100;
     private static final int OUTPUT_BONUS_PROGRESS_SCALE = 1000;
     private static final double EPSILON = 1.0E-9;
@@ -183,6 +186,8 @@ public class AlgaePhotobioreactorBlockEntity extends BlockEntity
                 case DATA_MIN_LIGHT -> recipe == null ? 0 : recipe.minimumLight();
                 case DATA_BIO_CONVERSION -> scaledStat(stats, MachineStat.FUEL_EFFICIENCY);
                 case DATA_OUTPUT_BONUS_PROGRESS -> scaledOutputBonusProgress();
+                case DATA_WATER_FLUID_ID -> BuiltInRegistries.FLUID.getId(waterTank.getFluid().getFluid());
+                case DATA_CARBON_FLUID_ID -> BuiltInRegistries.FLUID.getId(carbonTank.getFluid().getFluid());
                 default -> 0;
             };
         }

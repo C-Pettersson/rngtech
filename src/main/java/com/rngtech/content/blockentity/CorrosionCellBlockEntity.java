@@ -25,6 +25,7 @@ import com.rngtech.rpg.MachineType;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
@@ -94,6 +95,7 @@ public class CorrosionCellBlockEntity extends BaseMachineBlockEntity
     private static final int DATA_REFINEMENT_POTENTIAL = 18;
     private static final int DATA_FLAT_ENERGY_GENERATION = 19;
     private static final int DATA_BASE_ENERGY_GENERATION = 20;
+    private static final int DATA_ELECTROLYTE_FLUID_ID = 21;
     private static final int STAT_SCALE = 100;
     private static final int COMPONENT_STAGE = 4;
 
@@ -195,6 +197,7 @@ public class CorrosionCellBlockEntity extends BaseMachineBlockEntity
                 case DATA_PROCESSING_SPEED -> scaledStat(stats, MachineStat.PROCESSING_SPEED);
                 case DATA_STABILITY -> scaledStat(stats, MachineStat.STABILITY);
                 case DATA_REFINEMENT_POTENTIAL -> scaledStat(stats, MachineStat.REFINEMENT_POTENTIAL);
+                case DATA_ELECTROLYTE_FLUID_ID -> BuiltInRegistries.FLUID.getId(electrolyteTank.getFluid().getFluid());
                 default -> 0;
             };
         }
@@ -205,7 +208,7 @@ public class CorrosionCellBlockEntity extends BaseMachineBlockEntity
 
         @Override
         public int getCount() {
-            return DATA_BASE_ENERGY_GENERATION + 1;
+            return DATA_ELECTROLYTE_FLUID_ID + 1;
         }
     };
 

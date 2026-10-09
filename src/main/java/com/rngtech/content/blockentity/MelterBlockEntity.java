@@ -121,7 +121,9 @@ public class MelterBlockEntity extends BaseMachineBlockEntity
     private static final int DATA_FLUID_TRANSFER = 20;
     private static final int DATA_REFINEMENT_POTENTIAL = 21;
     private static final int DATA_BATCH_SIZE = DATA_REFINEMENT_POTENTIAL + 1;
-    private static final int DATA_MACHINE_PROGRESSION_START = DATA_BATCH_SIZE + 1;
+    private static final int DATA_INPUT_FLUID_ID = DATA_BATCH_SIZE + 1;
+    private static final int DATA_OUTPUT_FLUID_ID = DATA_INPUT_FLUID_ID + 1;
+    private static final int DATA_MACHINE_PROGRESSION_START = DATA_OUTPUT_FLUID_ID + 1;
     private static final int DATA_COUNT = DATA_MACHINE_PROGRESSION_START + MasteryMenuSupport.FIELD_COUNT;
     private static final int STAT_SCALE = 100;
 
@@ -245,6 +247,8 @@ public class MelterBlockEntity extends BaseMachineBlockEntity
                 case DATA_FLUID_TRANSFER -> effectiveFluidTransfer(stats);
                 case DATA_REFINEMENT_POTENTIAL -> scaledStat(stats, MachineStat.REFINEMENT_POTENTIAL);
                 case DATA_BATCH_SIZE -> BatchProcessing.statBatchSize(stats) * STAT_SCALE;
+                case DATA_INPUT_FLUID_ID -> BuiltInRegistries.FLUID.getId(inputTank.getFluid().getFluid());
+                case DATA_OUTPUT_FLUID_ID -> BuiltInRegistries.FLUID.getId(outputTank.getFluid().getFluid());
                 default -> 0;
             };
         }
