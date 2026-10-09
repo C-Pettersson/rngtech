@@ -21,6 +21,7 @@ import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.material.Fluid;
 import net.neoforged.neoforge.items.ItemStackHandler;
 import net.neoforged.neoforge.items.SlotItemHandler;
 
@@ -179,6 +180,22 @@ public class GasChemistryMenu extends AbstractContainerMenu {
 
     public int tankCapacity() {
         return data.get(DATA_TANK_CAPACITY);
+    }
+
+    public Fluid waterFluidType() {
+        return FluidMenuSupport.fluid(data.get(DATA_WATER_FLUID_ID));
+    }
+
+    public Fluid inputFluidType() {
+        return FluidMenuSupport.fluid(data.get(DATA_INPUT_FLUID_ID));
+    }
+
+    public Fluid outputFluidType() {
+        return FluidMenuSupport.fluid(data.get(DATA_OUTPUT_FLUID_ID));
+    }
+
+    public Fluid secondaryOutputFluidType() {
+        return FluidMenuSupport.fluid(data.get(DATA_SECONDARY_OUTPUT_FLUID_ID));
     }
 
     public Component waterFluidName() {

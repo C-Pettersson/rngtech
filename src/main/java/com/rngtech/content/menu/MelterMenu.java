@@ -27,6 +27,7 @@ import net.minecraft.world.inventory.SimpleContainerData;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.material.Fluid;
 import net.neoforged.neoforge.items.ItemStackHandler;
 import net.neoforged.neoforge.items.SlotItemHandler;
 
@@ -227,6 +228,14 @@ public class MelterMenu extends AbstractContainerMenu implements MasteryMenuView
 
     public int outputFluidCapacity() {
         return data.get(DATA_OUTPUT_FLUID_CAPACITY);
+    }
+
+    public Fluid inputFluidType() {
+        return FluidMenuSupport.fluid(data.get(DATA_INPUT_FLUID_ID));
+    }
+
+    public Fluid outputFluidType() {
+        return FluidMenuSupport.fluid(data.get(DATA_OUTPUT_FLUID_ID));
     }
 
     public Component inputFluidName() {

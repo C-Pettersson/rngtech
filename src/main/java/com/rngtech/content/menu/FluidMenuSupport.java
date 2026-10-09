@@ -10,11 +10,13 @@ final class FluidMenuSupport {
     private FluidMenuSupport() {
     }
 
-    static Component fluidName(int fluidId, Component emptyName) {
+    static Fluid fluid(int fluidId) {
         Fluid fluid = BuiltInRegistries.FLUID.byId(fluidId);
-        if (fluid == null || fluid == Fluids.EMPTY) {
-            return emptyName;
-        }
-        return new FluidStack(fluid, 1).getHoverName();
+        return fluid == null ? Fluids.EMPTY : fluid;
+    }
+
+    static Component fluidName(int fluidId, Component emptyName) {
+        Fluid fluid = fluid(fluidId);
+        return fluid == Fluids.EMPTY ? emptyName : new FluidStack(fluid, 1).getHoverName();
     }
 }

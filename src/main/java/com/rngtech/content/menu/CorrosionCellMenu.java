@@ -19,6 +19,7 @@ import net.minecraft.world.inventory.SimpleContainerData;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.material.Fluid;
 import net.neoforged.neoforge.items.ItemStackHandler;
 import net.neoforged.neoforge.items.SlotItemHandler;
 
@@ -191,6 +192,10 @@ public class CorrosionCellMenu extends AbstractContainerMenu {
 
     public int electrolyteFluidCapacity() {
         return data.get(DATA_ELECTROLYTE_FLUID_CAPACITY);
+    }
+
+    public Fluid electrolyteFluidType() {
+        return FluidMenuSupport.fluid(data.get(DATA_ELECTROLYTE_FLUID_ID));
     }
 
     public Component electrolyteFluidName() {

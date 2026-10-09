@@ -18,6 +18,7 @@ import net.minecraft.world.inventory.SimpleContainerData;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.material.Fluid;
 import net.neoforged.neoforge.items.ItemStackHandler;
 import net.neoforged.neoforge.items.SlotItemHandler;
 
@@ -159,6 +160,14 @@ public class AlgaePhotobioreactorMenu extends AbstractContainerMenu {
 
     public int carbonCapacity() {
         return data.get(DATA_CARBON_CAPACITY);
+    }
+
+    public Fluid waterFluidType() {
+        return FluidMenuSupport.fluid(data.get(DATA_WATER_FLUID_ID));
+    }
+
+    public Fluid carbonFluidType() {
+        return FluidMenuSupport.fluid(data.get(DATA_CARBON_FLUID_ID));
     }
 
     public Component waterFluidName() {

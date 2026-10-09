@@ -242,7 +242,9 @@ public class CompressorTankScreen extends AbstractContainerScreen<CompressorTank
 
         guiGraphics.fill(x + LOOSE_FLUID_BAR_X, y + BAR_Y, x + LOOSE_FLUID_BAR_X + BAR_WIDTH, y + BAR_Y + BAR_HEIGHT, 0xFF5F5F5F);
         int looseHeight = Math.round(BAR_FILL_HEIGHT * menu.looseFluidProgress());
-        guiGraphics.fill(
+        FluidBarRenderer.fill(
+                guiGraphics,
+                menu.looseFluidType(),
                 x + LOOSE_FLUID_BAR_X + 1,
                 y + BAR_Y + BAR_HEIGHT - 1 - looseHeight,
                 x + LOOSE_FLUID_BAR_X + BAR_WIDTH - 1,
@@ -253,7 +255,9 @@ public class CompressorTankScreen extends AbstractContainerScreen<CompressorTank
         if (menu.supportsCompression()) {
             guiGraphics.fill(x + COMPRESSED_FLUID_BAR_X, y + BAR_Y, x + COMPRESSED_FLUID_BAR_X + BAR_WIDTH, y + BAR_Y + BAR_HEIGHT, 0xFF5F5F5F);
             int compressedHeight = Math.round(BAR_FILL_HEIGHT * menu.compressedFluidProgress());
-            guiGraphics.fill(
+            FluidBarRenderer.fill(
+                    guiGraphics,
+                    menu.compressedFluidType(),
                     x + COMPRESSED_FLUID_BAR_X + 1,
                     y + BAR_Y + BAR_HEIGHT - 1 - compressedHeight,
                     x + COMPRESSED_FLUID_BAR_X + BAR_WIDTH - 1,
@@ -263,7 +267,9 @@ public class CompressorTankScreen extends AbstractContainerScreen<CompressorTank
 
             guiGraphics.fill(x + EQUIVALENT_FLUID_BAR_X, y + BAR_Y, x + EQUIVALENT_FLUID_BAR_X + BAR_WIDTH, y + BAR_Y + BAR_HEIGHT, 0xFF5F5F5F);
             int equivalentHeight = Math.round(BAR_FILL_HEIGHT * compressedEquivalentProgress());
-            guiGraphics.fill(
+            FluidBarRenderer.fill(
+                    guiGraphics,
+                    menu.compressedFluidType(),
                     x + EQUIVALENT_FLUID_BAR_X + 1,
                     y + BAR_Y + BAR_HEIGHT - 1 - equivalentHeight,
                     x + EQUIVALENT_FLUID_BAR_X + BAR_WIDTH - 1,
@@ -302,7 +308,9 @@ public class CompressorTankScreen extends AbstractContainerScreen<CompressorTank
         guiGraphics.fill(x, y, x + PLAIN_TANK_WIDTH, y + PLAIN_TANK_HEIGHT, 0xFF5F5F5F);
         guiGraphics.fill(x + 1, y + 1, x + PLAIN_TANK_WIDTH - 1, y + PLAIN_TANK_HEIGHT - 1, 0xFF2F4050);
         int fillHeight = Math.round(PLAIN_TANK_FILL_HEIGHT * menu.looseFluidProgress());
-        guiGraphics.fill(
+        FluidBarRenderer.fill(
+                guiGraphics,
+                menu.looseFluidType(),
                 x + 1,
                 y + PLAIN_TANK_HEIGHT - 1 - fillHeight,
                 x + 1 + PLAIN_TANK_FILL_WIDTH,
