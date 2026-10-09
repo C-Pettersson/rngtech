@@ -24,7 +24,7 @@ The default Nitrogen source is the Cavitation Generator's Stage 6 water separati
 | Machine | Slot | Required | Accepted item | Role |
 |---|---|---:|---|---|
 | Ammonia Synthesizer | Catalyst Bed | Yes | `rngtech:ammonia_catalyst_bed` | Gates synthesis recipes by stage. Its rolled Processing Speed and Energy Usage modifiers apply to the Synthesizer |
-| Ammonia Fuel Cell | Fuel Cell Membrane | Yes | `rngtech:fuel_cell_membrane` | Gates ammonia power recipes by stage. Its rolled Energy Generation, Energy Transfer, Processing Speed, and Efficiency modifiers apply to the Fuel Cell |
+| Ammonia Fuel Cell | Fuel Cell Membrane | Yes | `rngtech:fuel_cell_membrane` | Gates ammonia power recipes by stage. Its rolled Energy Generation, Processing Speed, and Efficiency modifiers apply to the Fuel Cell |
 | Ammonia Fuel Cell | Battery Cell | No | Stage 6+ Battery Cells | Adds portable FE capacity and output storage |
 
 Both parts have neutral base stats, so an unrolled part only gates recipes. Their rolled modifiers are local to the part, as on other machine parts. The machines do not currently read Stability or Fluid Transfer, and the Synthesizer does not read Efficiency or Instant Process chance, so those rolls have no effect yet.
@@ -37,6 +37,8 @@ Both parts have neutral base stats, so an unrolled part only gates recipes. Thei
 | Default power cycle | `1,000 mB` Ammonia | `216,000 FE` (`600 FE/t`) | `360` |
 
 Values are before part and machine rolls. After the synthesis cost the chain nets about `510 FE/t`.
+
+Energy contract: the Synthesizer, Coal Gasifier, and Steam Methane Reformer have no machine-side FE intake cap; intake is limited by free buffer or installed-cell space plus the source or attached Universal Connector. Coal Gasifier and Steam Methane Reformer fill their internal FE buffer first, then charge an installed Battery Cell. The Fuel Cell and Syngas Combustor have no machine-side export cap; they export whatever is stored, and the attached receiver or [Universal Connector tier](basic-wire.md#energy-transfer-limits) decides the rate.
 
 ## Related Pages
 

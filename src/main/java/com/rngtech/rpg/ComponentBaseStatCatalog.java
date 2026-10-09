@@ -465,7 +465,6 @@ public final class ComponentBaseStatCatalog {
     static Profile fuelCellMembrane() {
         return builder()
                 .more(MachineStat.ENERGY_GENERATION, 1.0)
-                .more(MachineStat.ENERGY_TRANSFER, 1.0)
                 .more(MachineStat.PROCESSING_SPEED, 1.0)
                 .more(MachineStat.EFFICIENCY, 1.0)
                 .more(MachineStat.STABILITY, 1.0)
@@ -495,7 +494,6 @@ public final class ComponentBaseStatCatalog {
         return builder()
                 .add(MachineStat.PROCESSING_LEVEL, material.stage())
                 .more(MachineStat.CALIBRATION_QUALITY, percentMultiplier(material.qualityPercent()))
-                .more(MachineStat.ENERGY_TRANSFER, percentMultiplier(material.energyTransferPercent()))
                 .more(MachineStat.ENERGY_USAGE, 1.0)
                 .more(MachineStat.PROCESSING_SPEED, resonanceCoilProcessingSpeed(material))
                 .build();

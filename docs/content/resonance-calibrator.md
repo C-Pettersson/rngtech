@@ -12,13 +12,13 @@ Calibration is separate from refinement. Calibration creates component validity 
 
 Chassis ids, with stage and base lanes: `rngtech:iron_resonance_calibrator_chassis` (1, 1 lane), `rngtech:copper_resonance_calibrator_chassis` (2, 1), `rngtech:steel_resonance_calibrator_chassis` (4, 1, output-guarded), `rngtech:lead_resonance_calibrator_chassis` (4, 2), `rngtech:titanium_resonance_calibrator_chassis` (6, 1), `rngtech:tungstensteel_resonance_calibrator_chassis` (7, 3), and `rngtech:nullite_resonance_calibrator_chassis` (7, 1).
 
-All chassis roll machine RPG traits, support placed-machine refinement, accept FE, and share one menu and screen.
+All chassis roll machine RPG traits, support placed-machine refinement, accept FE with no machine-side intake cap, and share one menu and screen.
 
 Placed chassis art follows [Machine Visual Design](../reference/machine-visual-design.md#resonance-calibrator-chassis). Resonance Calibrator blocks should use owned `textures/block/resonance_calibrator_chassis/<face>/<id>` face textures, keep `64x64` block-face frames, and show a front tuning cue such as a lens, coil ring, waveform meter, or alignment target. Bulk sidegrades should visibly communicate multiple calibration lanes, while Nullite should read as the precision branch.
 
 ## Gear
 
-Required Gear is a Resonance Coil (stage reach, quality, and FE transfer or speed from its base profile), a Control Board (precision, stability, and Refinement Potential outcomes), and an active pattern from the six-slot internal pattern storage. The Stabilizer Matrix (stability floor, quality consistency, catalyst efficiency) and Battery Cell are optional; without a cell the machine applies a speed and calibration-quality penalty. Control Boards and Stabilizer Matrices contribute through their source-local base profile plus stored affixes.
+Required Gear is a Resonance Coil (stage reach, quality, and speed from its base profile), a Control Board (precision, stability, and Refinement Potential outcomes), and an active pattern from the six-slot internal pattern storage. The Stabilizer Matrix (stability floor, quality consistency, catalyst efficiency) and Battery Cell are optional; without a cell the machine applies a speed and calibration-quality penalty. Control Boards and Stabilizer Matrices contribute through their source-local base profile plus stored affixes.
 
 ## Calibration Flow
 
@@ -68,7 +68,7 @@ Resonance Calibrator chassis recipes do not consume the previous Resonance Calib
 | Chassis | Structural body | Current recipe pressure | Reason |
 |---|---|---|---|
 | Iron | Furnace Machine Chassis | Energy Coil, Basic Electric Circuits, Iron, and Redstone. | First calibrator body, reached from ordinary early machine crafting. |
-| Copper | Machine Frame | Copper Resonance Coil, Basic Electric Circuits, and Copper. | Easy Stage 2 sidegrade that improves transfer and speed without consuming the Iron chassis. |
+| Copper | Machine Frame | Copper Resonance Coil, Basic Electric Circuits, and Copper. | Easy Stage 2 sidegrade that improves speed without consuming the Iron chassis. |
 | Steel | Reinforced Machine Frame | Steel Control Board, Steel Resonance Coil, Stage 1 structural component at `55` stability, and Stage 2 logic component at `55` stability. | Easy Stage 4 stability body that keeps the Iron chassis available for early calibration work. |
 | Lead | Reinforced Machine Frame | Iron Stabilizer Matrices, Stage 1 structural component at `45` stability, and Stage 2 storage component at `45` stability. | Easy Stage 4 bulk sidegrade that does not consume the optional Copper chassis. |
 | Titanium | Advanced Machine Frame | Titanium Control Board, Titanium Resonance Coil, Stage 2 structural component at `70` stability with `1` RP consumed, and Stage 2 conductive component at `70` stability. | Easy Stage 6 precision body that uses advanced-frame pressure instead of consuming the Steel chassis. |

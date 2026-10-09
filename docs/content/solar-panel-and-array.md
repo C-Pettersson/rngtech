@@ -30,6 +30,8 @@ Solar generation is server-authoritative.
 - The position above the panel must see sky, and generation requires daytime. Weather uses the weather output value.
 - Peak Solar multiplies that panel's clear or weather output before standalone storage/export or controller aggregation.
 
+Standalone panels store generated FE in their small internal buffer and have no machine-side export cap: the attached receiver or [Universal Connector tier](basic-wire.md#energy-transfer-limits) decides the rate. They do not accept external FE.
+
 ## Array Controller
 
 The controller scans a bounded horizontal area every 20 ticks:
@@ -81,6 +83,8 @@ Solar Array Controller modifiers include normal generator stats plus controller-
 
 Moonlit Conversion and Lunar Inverter share a mod group, so they cannot roll together. Every controller special uses roll weight `60`.
 
+Without an installed Energy Connector the controller exports at its base `128 FE/t`; with one, the connector tier is the cap. The cap is per tick and shared between the controller's own push to adjacent receivers and any connector pulls from its sides. The controller Stats tab reports this effective Energy Transfer value.
+
 ## Automation
 
 | Block | Energy capability | Item capability |
@@ -93,14 +97,14 @@ Moonlit Conversion and Lunar Inverter share a mod group, so they cannot roll tog
 
 Solar numeric identity is authored in `MachineBaseStatCatalog`:
 
-- Solar Panel base profiles define `ENERGY_GENERATION`, `ENERGY_CAPACITY`, `ENERGY_TRANSFER`, and `EFFICIENCY`.
+- Solar Panel base profiles define `ENERGY_GENERATION`, `ENERGY_CAPACITY`, and `EFFICIENCY`. The base profile still carries a legacy material `ENERGY_TRANSFER` value, but it no longer limits panel export and is not shown in the item summary.
 - Solar Array Controller base profile defines `ENERGY_GENERATION`, `ENERGY_CAPACITY`, fallback `ENERGY_TRANSFER`, `EFFICIENCY`, `STABILITY`, one Battery Cell slot, one Energy Connector slot, one Solar Array Extender slot, and solar array control stats.
 
 Solar modifiers use dedicated profiles:
 
 | Target | Rollable stats |
 |---|---|
-| Solar Panel | Flat `ENERGY_CAPACITY_FLAT`, increased `ENERGY_CAPACITY`, `EFFICIENCY`, `ENERGY_GENERATION`, `ENERGY_TRANSFER`, and Peak Solar |
+| Solar Panel | Flat `ENERGY_CAPACITY_FLAT`, increased `ENERGY_CAPACITY`, `EFFICIENCY`, `ENERGY_GENERATION`, and Peak Solar |
 | Solar Array Controller | Flat `ENERGY_CAPACITY_FLAT`, increased `ENERGY_CAPACITY`, `EFFICIENCY`, `ENERGY_GENERATION`, `STABILITY`, plus Array Expansion, Moonlit Conversion, Cloud Piercer, Lunar Inverter, Clear-Sky Amplifier, Panel Synchronizer, and Panel Arbitration |
 | Solar Array Extender | `ENERGY_GENERATION`, array range, Moonlit Conversion, Weather Recovery, and Clear-Sky Amplification |
 

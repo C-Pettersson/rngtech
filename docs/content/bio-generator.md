@@ -116,7 +116,7 @@ If a setup consumes a flat FE/t value for every adjusted tick and changes total 
 
 ## Ingredient Modifiers
 
-The Bio Generator profile can roll general generator stats such as `ENERGY_GENERATION`, `ENERGY_TRANSFER`, `ENERGY_CAPACITY`, `FUEL_EFFICIENCY`, and `EFFICIENCY`. On Bio Generators, `ENERGY_GENERATION` changes FE/t power, while fuel value and `FUEL_DURATION` control burn length.
+The Bio Generator profile can roll general generator stats such as `ENERGY_GENERATION`, `ENERGY_CAPACITY`, `FUEL_EFFICIENCY`, and `EFFICIENCY`. On Bio Generators, `ENERGY_GENERATION` changes FE/t power, while fuel value and `FUEL_DURATION` control burn length. The Bio Generator has no machine-side export cap, so it does not roll `ENERGY_TRANSFER`; the attached receiver or [Universal Connector tier](basic-wire.md#energy-transfer-limits) decides the export rate, and the Output readout shows the last tick's actual FE output.
 
 The Bio Chamber profile can roll generic suffix modifiers:
 

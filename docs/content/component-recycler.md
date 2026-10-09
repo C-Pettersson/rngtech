@@ -64,7 +64,7 @@ Rarity, modifier tier, modifier count, and Refinement Potential never improve Co
 | Bottom | Extract up to three output slots. |
 | Sides | Receive FE. |
 
-Gear slots and Refinement catalyst slots are not exposed through normal sided automation. The Crude Recycler has no FE capability; its top is occupied by the Hand Crank during normal use.
+Gear slots and Refinement catalyst slots are not exposed through normal sided automation. The powered Component Recycler has no machine-side FE intake cap; external intake is limited by free buffer or installed-cell space plus the source or attached Universal Connector. The Crude Recycler has no FE capability; its top is occupied by the Hand Crank during normal use.
 
 ## Related Pages
 

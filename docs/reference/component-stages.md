@@ -251,7 +251,7 @@ Resonance Calibrators intentionally do not use every material stage. They are a 
 | Stage | Chassis | Role |
 |---:|---|---|
 | 1 | Iron Resonance Calibrator Chassis | Stable baseline, one lane, broad early quality range. |
-| 2 | Copper Resonance Calibrator Chassis | Optional conductive early frame with faster work and better FE intake. |
+| 2 | Copper Resonance Calibrator Chassis | Optional conductive early frame with faster work. |
 | 4 | Steel Resonance Calibrator Chassis | Reinforced stability body with output guard behavior. |
 | 4 | Lead Resonance Calibrator Chassis | Dense sidegrade with two slower bulk lanes. |
 | 6 | Titanium Resonance Calibrator Chassis | Precision frame with better control and RP outcomes. |

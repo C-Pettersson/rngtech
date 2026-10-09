@@ -27,7 +27,7 @@ The placed machine uses `PotentialReactorBlockEntity`, `PotentialReactorMenu`, a
 
 ## Screen Contract
 
-The Potential Reactor screen follows the shared low-text machine UI rule in [Machine Guidelines](../reference/machine-guidelines.md): exact FE, progress ticks, recipe fuel value, status, generation rate, and output rate belong in hover details rather than permanent text rows.
+The Potential Reactor screen follows the shared low-text machine UI rule in [Machine Guidelines](../reference/machine-guidelines.md): exact FE, progress ticks, recipe fuel value, status, generation rate, and last-tick FE output belong in hover details rather than permanent text rows.
 
 ## RPG Energy Recycling
 
@@ -95,7 +95,7 @@ effective FE = recipe energy * ENERGY_GENERATION * EFFICIENCY * STABILITY
 
 For RPG-bearing targets, "recipe energy" is replaced by the computed RPG value. For explicit fuel recipes, the recipe `energy` field is still used.
 
-`PROCESSING_SPEED` shortens the processing time. Higher `ENERGY_GENERATION` therefore raises the visible FE/t and total recovered FE. `ENERGY_TRANSFER` controls side extraction from the internal FE buffer. `ENERGY_CAPACITY` controls the internal buffer size.
+`PROCESSING_SPEED` shortens the processing time. Higher `ENERGY_GENERATION` therefore raises the visible FE/t and total recovered FE. The reactor has no machine-side export cap: sides export whatever is stored, and the attached receiver or [Universal Connector tier](basic-wire.md#energy-transfer-limits) decides the rate. `ENERGY_CAPACITY` controls the internal buffer size.
 
 ## Gear
 
@@ -124,7 +124,7 @@ Gear slots and Refinement catalyst slots are not exposed through sided automatio
 | Modifier Source | Notes |
 |---|---|
 | Machine prefix | Can roll energy capacity and efficiency modifiers. |
-| Machine affixes | Can roll flat prefix `ENERGY_GENERATION`; suffix percent `ENERGY_GENERATION`, `ENERGY_TRANSFER`, `PROCESSING_SPEED`, and `STABILITY`. |
+| Machine affixes | Can roll flat prefix `ENERGY_GENERATION`; suffix percent `ENERGY_GENERATION`, `PROCESSING_SPEED`, and `STABILITY`. |
 | Reactor Chamber base profile | Provides authored `PROCESSING_LEVEL`, `ENERGY_GENERATION`, and `STABILITY`; `PROCESSING_LEVEL` remains a hard gate. |
 | Reactor Chamber rolled modifiers | Can roll flat prefix and percent suffix `ENERGY_GENERATION`, plus `PROCESSING_SPEED` and `STABILITY`. |
 | Recovery Filter rolled modifiers | Can roll `EFFICIENCY` and `PROCESSING_SPEED`. |

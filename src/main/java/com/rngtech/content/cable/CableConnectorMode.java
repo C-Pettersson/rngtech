@@ -38,6 +38,10 @@ public enum CableConnectorMode implements StringRepresentable {
         return "rngtech.cable_connector.mode." + serializedName;
     }
 
+    public String descriptionKey() {
+        return translationKey() + ".description";
+    }
+
     public static Optional<CableConnectorMode> bySerializedName(String name) {
         return Arrays.stream(values())
                 .filter(mode -> mode.serializedName.equals(name))

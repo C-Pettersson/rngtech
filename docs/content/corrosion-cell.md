@@ -13,7 +13,7 @@ The Corrosion Cell (`rngtech:corrosion_cell`) is a Stage 4 recipe-backed FE gene
 | Recipe type | `rngtech:corrosion_cell` |
 | Process inputs | One plate/anode/scrap slot, one electrolyte item slot, and an internal Electrolyte Solution tank |
 | Process output | One residue item slot |
-| FE output | Side block energy capability |
+| FE output | Side block energy capability with no machine-side export cap; the attached receiver or [Universal Connector tier](basic-wire.md#energy-transfer-limits) decides the rate, and the Output readout shows the last tick's actual FE output |
 | Fluid input | Side fluid fill for Electrolyte Solution when a Fluid Pump is installed |
 | Automation | Top inserts plates, sides insert plates or electrolyte items, sides fill Electrolyte Solution with a Fluid Pump installed, sides extract FE, bottom extracts residue |
 | Gear | Optional Battery Cell, Fluid Pump, and Cathode slots; not exposed through sided item automation |

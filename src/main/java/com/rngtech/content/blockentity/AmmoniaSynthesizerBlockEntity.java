@@ -96,7 +96,7 @@ public class AmmoniaSynthesizerBlockEntity extends BaseMachineBlockEntity
         }
     };
     private final MachineEnergyStorage energyStorage =
-            new MachineEnergyStorage(this::internalEnergyCapacity, this::effectiveMaxEnergyInput, () -> 0, this::setChanged);
+            new MachineEnergyStorage(this::internalEnergyCapacity, () -> Integer.MAX_VALUE, () -> 0, this::setChanged);
     private final EnergyTelemetry energyFlow = new EnergyTelemetry(this::getLevel);
     private final IEnergyStorage trackedEnergyStorage = energyFlow.track(energyStorage);
     private final FluidTank nitrogenTank = tank(ModFluids.NITROGEN_SOURCE.get());
@@ -215,7 +215,12 @@ public class AmmoniaSynthesizerBlockEntity extends BaseMachineBlockEntity
                 .status(statusKey(status))
                 .progress(progress, activeTicks)
                 .energy(energyStorage.getEnergyStored(), energyStorage.getMaxEnergyStored(), -energyDemand)
-                .energyTelemetry(energyFlow.lastInput(), energyFlow.lastOutput(), connector.transferRate(), MachineInfoSnapshot.EnergyBottleneck.NONE)
+                .energyTelemetry(
+                        energyFlow.lastInput(),
+                        energyFlow.lastOutput(),
+                        connector.transferRate(),
+                        AdjacentEnergyConnector.inputBottleneck(connector, energyDemand)
+                )
                 .output(status == STATUS_OUTPUT_FULL
                         ? MachineInfoSnapshot.OutputSummary.OUTPUT_FULL
                         : MachineInfoSnapshot.OutputSummary.NONE)
@@ -362,10 +367,6 @@ public class AmmoniaSynthesizerBlockEntity extends BaseMachineBlockEntity
 
     private int internalEnergyCapacity() {
         return Math.max(1, Mth.floor(effectiveStats().value(MachineStat.ENERGY_CAPACITY)));
-    }
-
-    private int effectiveMaxEnergyInput() {
-        return Math.max(1, Mth.floor(effectiveStats().value(MachineStat.ENERGY_TRANSFER)));
     }
 
     private MachineStatAccumulator effectiveStats() {

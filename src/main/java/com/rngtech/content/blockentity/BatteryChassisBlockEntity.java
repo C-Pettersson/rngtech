@@ -244,7 +244,7 @@ public class BatteryChassisBlockEntity extends BaseMachineBlockEntity implements
                 .energy(
                         energyStored(context),
                         energyCapacity(context),
-                        Math.max(effectiveInputRate(context), effectiveOutputRate(context))
+                        (long) lastEnergyInput() - lastEnergyOutput()
                 )
                 .energyTelemetry(
                         lastEnergyInput(),
@@ -384,7 +384,7 @@ public class BatteryChassisBlockEntity extends BaseMachineBlockEntity implements
             return 0;
         }
 
-        int accepted = Math.min(toReceive, Math.min(effectiveInputRate(context), availableCellSpace(context)));
+        int accepted = Math.min(toReceive, Math.min(remainingInputThisTick(context), availableCellSpace(context)));
         if (accepted <= 0) {
             return 0;
         }
@@ -413,7 +413,7 @@ public class BatteryChassisBlockEntity extends BaseMachineBlockEntity implements
         double efficiency = transferEfficiency(context);
         int cellDrawCeiling = Math.min(cellOutputCeiling(context), energyStored(context));
         int maxDeliveredByCells = deliveredAfterDischargeLoss(cellDrawCeiling, efficiency);
-        int delivered = Math.min(toExtract, Math.min(effectiveOutputRate(context), maxDeliveredByCells));
+        int delivered = Math.min(toExtract, Math.min(remainingOutputThisTick(context), maxDeliveredByCells));
         if (delivered <= 0) {
             return 0;
         }
@@ -650,10 +650,15 @@ public class BatteryChassisBlockEntity extends BaseMachineBlockEntity implements
             AdjacentEnergyConnector.Info sourceConnector,
             AdjacentEnergyConnector.Info sinkConnector
     ) {
-        if (sourceConnector.present() && effectiveOutputRate(context) > sourceConnector.transferRate()) {
+        // Only a connector running at its cap while the cells could move more is a real limit, not an idle bank.
+        if (sourceConnector.present()
+                && sourceConnector.lastInput() >= sourceConnector.transferRate()
+                && effectiveOutputRate(context) > sourceConnector.transferRate()) {
             return MachineInfoSnapshot.EnergyBottleneck.CONNECTOR_OUTPUT;
         }
-        if (sinkConnector.present() && effectiveInputRate(context) > sinkConnector.transferRate()) {
+        if (sinkConnector.present()
+                && sinkConnector.lastOutput() >= sinkConnector.transferRate()
+                && effectiveInputRate(context) > sinkConnector.transferRate()) {
             return MachineInfoSnapshot.EnergyBottleneck.CONNECTOR_INPUT;
         }
         return MachineInfoSnapshot.EnergyBottleneck.NONE;
@@ -667,6 +672,17 @@ public class BatteryChassisBlockEntity extends BaseMachineBlockEntity implements
     private int lastEnergyOutput() {
         beginEnergyTelemetryTick();
         return lastEnergyOutput;
+    }
+
+    /** Cell rates are per tick, shared by every side and connector that moves FE this tick. */
+    private int remainingInputThisTick(RuntimeContext context) {
+        beginEnergyTelemetryTick();
+        return Math.max(0, effectiveInputRate(context) - energyInputThisTick);
+    }
+
+    private int remainingOutputThisTick(RuntimeContext context) {
+        beginEnergyTelemetryTick();
+        return Math.max(0, effectiveOutputRate(context) - energyOutputThisTick);
     }
 
     private void recordEnergyInput(int amount) {

@@ -62,11 +62,11 @@ Purging the input tank by button or `rngtech:purge_bucket` resets active assembl
 | Bottom | Extract finished outputs from the output rack. |
 | Sides | Insert dry electrolyte or filled fluid containers, extract drained/non-input containers from the fluid slot, fill valid assembly fluids through the fluid capability, and receive FE. |
 
-Gear slots and the Refinement catalyst slot are manual UI equipment. The Gear tab exposes one optional Battery Cell slot; received FE fills the internal buffer before the cell, and processing spends the buffer before drawing from the cell.
+Gear slots and the Refinement catalyst slot are manual UI equipment. The Gear tab exposes one optional Battery Cell slot; received FE fills the internal buffer before the cell, and processing spends the buffer before drawing from the cell. External FE intake has no machine-side cap; it is limited by free buffer or installed-cell space plus the source or attached Universal Connector.
 
 ## Modifier Eligibility
 
-Component Assembler machine stacks and placed machines use the compatibility profile id `BATTERY_ASSEMBLER`. The profile can roll FE storage/input, item input/output, processing, stability, and fluid-input transfer modifiers. It can also roll the Assembly work-speed suffix, Overclocked, Instant Process, Super Output for stackable outputs, and Bulk Speed behavior.
+Component Assembler machine stacks and placed machines use the compatibility profile id `BATTERY_ASSEMBLER`. The profile can roll FE storage, energy usage, item input/output, processing, stability, and fluid-input transfer modifiers. It can also roll the Assembly work-speed suffix, Overclocked, Instant Process, Super Output for stackable outputs, and Bulk Speed behavior.
 
 ## Related Pages
 

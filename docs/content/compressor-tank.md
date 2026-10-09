@@ -81,11 +81,11 @@ Decompression costs `25%` of the compression FE per bucket and uses the same rat
 
 Iron, Copper, and Bronze Fluid Tanks expose no FE capability. Steel+ Compressor Tanks expose FE input only; they never expose FE extraction and are not battery blocks.
 
-FE received through the block energy capability fills the internal buffer first, then charges an installed Battery Cell when possible. Compression and decompression spend internal buffer FE first, then draw any remaining tick cost from the installed cell. Idle compressed storage costs `0 FE/t`.
+FE received through the block energy capability fills the internal buffer first, then charges an installed Battery Cell when possible. External FE intake has no machine-side cap; it is limited by free buffer or installed-cell space plus the source or attached Universal Connector. Compression and decompression spend internal buffer FE first, then draw any remaining tick cost from the installed cell. Idle compressed storage costs `0 FE/t`.
 
 ## Modifier Eligibility
 
-Iron, Copper, and Bronze Fluid Tank machine stacks and placed machines use the `FLUID_TANK` modifier eligibility profile and do not roll affixes in v1. Steel+ Compressor Tank machine stacks and placed machines use the `COMPRESSOR_TANK` profile, which can roll FE storage/input, fluid transfer, processing speed, energy usage, energy transfer, and stability modifiers.
+Iron, Copper, and Bronze Fluid Tank machine stacks and placed machines use the `FLUID_TANK` modifier eligibility profile and do not roll affixes in v1. Steel+ Compressor Tank machine stacks and placed machines use the `COMPRESSOR_TANK` profile, which can roll FE storage, fluid transfer, processing speed, energy usage, and stability modifiers.
 
 `FLUID_CAPACITY` and `COMPRESSION_RATIO` are authored/display stats in v1. They do not roll as normal affixes.
 

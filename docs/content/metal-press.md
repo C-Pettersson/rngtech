@@ -117,11 +117,11 @@ Metal Press machines choose between Die Keeper and Drop Forge when they use thei
 | Bottom | Extract output. |
 | Sides | Receive FE through the block energy capability. |
 
-Gear slots and the Refinement catalyst slot are not exposed through sided item automation. FE received through the block energy capability fills the internal buffer first, then charges an installed Battery Cell when possible. Processing draws spend internal buffer FE first and then draw any remaining tick cost from the installed cell.
+Gear slots and the Refinement catalyst slot are not exposed through sided item automation. FE received through the block energy capability fills the internal buffer first, then charges an installed Battery Cell when possible. External FE intake has no machine-side cap; it is limited by free buffer or installed-cell space plus the source or attached Universal Connector. Processing draws spend internal buffer FE first and then draw any remaining tick cost from the installed cell.
 
 ## Modifier Eligibility
 
-Crude and Steel Metal Press machine stacks and placed machines use the `METAL_PRESS` modifier eligibility profile. The profile can roll FE storage/input, processing, heat, warmup, cooling, power-grace, and stability modifiers that match the shared press implementation. Although the press bodies remain Stage 3 and Stage 4 progression content, they use Stage 8 modifier roll weighting and Refinement Potential ranges because Metal Press bodies are not part of a staged chassis upgrade ladder that preserves investment.
+Crude and Steel Metal Press machine stacks and placed machines use the `METAL_PRESS` modifier eligibility profile. The profile can roll FE storage, energy usage, processing, heat, warmup, cooling, power-grace, and stability modifiers that match the shared press implementation. Although the press bodies remain Stage 3 and Stage 4 progression content, they use Stage 8 modifier roll weighting and Refinement Potential ranges because Metal Press bodies are not part of a staged chassis upgrade ladder that preserves investment.
 
 The Steel Servo is a `SERVO` machine part for `MachineType.METAL_PRESS`. It has authored base stats for press speed, stability, temperature stability, and overheat tolerance, and it can roll processing, energy usage, heat-control, stability, temperature stability, overheat tolerance, and `POWER_GRACE` modifiers.
 

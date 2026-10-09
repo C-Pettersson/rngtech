@@ -50,6 +50,19 @@ Defaults, Attach behavior, and the Network tab are described on the player guide
 - Fluid and Item rows: Attach `None` disables a row without removing its module. Source rows are polled round-robin so a slowly filled source does not starve later rows or channels. `OUT` tier caps per-delivery insertion.
 - Installed modules drop with the block inventory.
 
+## Energy Transfer Limits
+
+An Energy Connector's tier is a per-tick cap in both directions. This applies to a Universal Connector energy module and to a direct cable-face Energy Connector:
+
+- Input: the connector takes at most its tier in FE/t from the attached block into the network.
+- Output: the connector delivers at most its tier in FE/t into the attached block. This budget is shared by every source on the network, so several generators cannot push more than the tier into one sink in a tick.
+
+Storage balancing: between two storage blocks behind `Both` connectors, FE only flows from the fuller block to the emptier one, by fill percentage, and stops once they are equally full. Gaps under 1% move nothing. A storage block is one that can both accept and supply FE at that moment, such as a [Battery Chassis](battery-chassis.md). Daisy-chained banks therefore pass charge along: a generator charges the first bank, and the first bank shares with the next. Two idle banks even out once instead of trading FE back and forth every tick and losing it to charge and discharge efficiency. Generators still charge batteries, and batteries still feed machines. A completely full bank sends its overflow onward freely, and an empty bank can receive FE until it holds some. To fill one bank from another regardless of fill, set the source bank's connector to `Input` or the destination bank's connector to `Output`.
+
+Connectors can be installed on any face. If the attached block exposes no FE on the connector's Attach As side, the Universal Connector Energy tab, the direct cable connector screen, and the wrench hologram show a red warning: `No FE on this side of the target. Change Attach As or move the connector.`
+
+Machine readouts in Jade and machine info count only connectors that actually move FE for that machine: the connector mode must match the direction, and its Attach As side must be one where the machine exposes FE. Both Universal Connector energy modules and direct cable-face Energy Connectors count. When the attached connectors carry less than the machine needs, processors report `Attached connector limits input energy` and generators report `Attached connector limits output energy`.
+
 ## Cable Management
 
 Placement, wrench, and Configurator use are on the player guide. Implementation notes:
@@ -58,6 +71,7 @@ Placement, wrench, and Configurator use are on the player guide. Implementation 
 - The wrench hologram is a server snapshot (`WrenchOverlayServerHandler`) built only for standalone and cable-side Universal Connectors.
 - Configurator presets store Attach as a `RelativeDirection` (`NONE`, `DEFAULT`, or an absolute side); copying captures `DEFAULT` when the source Attach equals its default side.
 - Configurator Gear helper mode inserts through the machine's own Gear slot validation and does not expose Gear slots to item automation.
+- Energy Connectors are modules for a Universal Connector Energy tab or a supported machine Gear slot. Using an Energy Connector on a Cable opens a Universal Connector on the clicked face instead of placing a bare connector. Direct cable-face Energy Connectors from older worlds keep working and can be configured and mined, but new ones cannot be placed.
 
 ## Recipes
 
@@ -78,7 +92,7 @@ Current runtime surface:
 - Menus and screens: `UniversalConnectorMenu` / `UniversalConnectorScreen`; cable-face connector configuration remains available through `CableConnectorMenu` / `CableConnectorScreen`; configurator actions use `ConfiguratorActionMenu` / `ConfiguratorActionScreen` and the advanced preset uses `ConfiguratorAdvancedMenu` / `ConfiguratorAdvancedScreen`.
 - Wrench hologram: read-only world-space Universal Connector settings view with Summary, Energy, Item, and Fluid pages while the wrench is held.
 - Slots: Universal Connector has Energy, Fluid, Item, Bridge, and Network tabs. The Energy tab has one functional Energy Connector slot, the Fluid tab has three functional Fluid Connector slots plus two ghost whitelist filter slots per row, the Item tab has three functional Item Connector slots plus two ghost item filter slots per row, Bridge has one AE2/Refined Storage Network Connector slot plus bridge channel controls and player inventory, and Network is inventory-free diagnostics with aggregate network snapshot metrics, selected-channel FE throughput, bridge diagnostics, and a Clear network cache action.
-- Energy capability: Universal Connector exposes energy capability only when an Energy Connector module is installed. Cable faces expose energy capability through either a direct Energy Connector or a side-mounted Universal Connector energy module. Energy input endpoints accept pushed FE and actively extract FE from output-capable attached targets, capped by the installed Energy Connector tier. Energy Distribution is source-side and supports Round Robin, Even, and First Available routing across same-channel outputs.
+- Energy capability: Universal Connector exposes energy capability only when an Energy Connector module is installed. Cable faces expose energy capability through either a direct Energy Connector or a side-mounted Universal Connector energy module. Energy input endpoints accept pushed FE and actively extract FE from output-capable attached targets. The installed Energy Connector tier caps input and output per tick, shared across all sources and calls, and storage balancing applies between storage blocks on `Both` connectors. Energy Distribution is source-side and supports Round Robin, Even, and First Available routing across same-channel outputs.
 - Fluid transfer: Universal Connector fluid modules actively move fluid shipments through connected cables to same-channel fluid modules. Cable blocks do not store fluid, but side-mounted Universal Connectors can expose a transient fluid capability on their attached face for same-channel insertion into the cable network. Fluid filters apply to active pulls, transient capability fills, and incoming cable shipments for the filtered row.
 - Item transfer: Universal Connector item modules actively move item shipments through connected cables to same-channel item modules. Cable blocks do not store items, but side-mounted Universal Connectors can expose a transient item capability on their attached face for same-channel insertion into the cable network. Item filters apply to active pulls, transient capability inserts, and incoming cable shipments for the filtered row. Advanced Item Filter deny entries are checked before any allow entries on the same row.
 - Network bridge capability: Universal Connector Bridge modules expose AE2 or Refined Storage network capabilities only when the matching optional mod is loaded. Matching same-mod Bridge endpoints on the same bridge channel are connected through the cable graph. AE2-to-Refined-Storage conversion and external storage exposure are not supported.
@@ -94,6 +108,9 @@ Implementation checks:
 - Universal Connectors without installed Energy Connectors should expose no FE capability.
 - FE inserted into a Universal Connector should route only to Universal Connectors on the same channel.
 - Connector modes should control whether a connector accepts network input, sends network output, or both.
+- A sink connector should receive at most its tier in FE per tick, even when several sources push into it.
+- Two storage blocks behind `Both` connectors on the same network should even out their fill and then stop; a daisy chain from a generator through one bank into another should charge both; switching one connector to `Input` or `Output` should allow deliberate one-way transfer.
+- A connector whose target exposes no FE on its Attach As side should show the no-FE warning.
 - Energy Distribution should control how a source connector selects same-channel output endpoints without adding cable storage.
 - Attach As should change the side used for the target block capability lookup.
 - Module install, replacement, configuration, and block-break drops should preserve installed connector items.
