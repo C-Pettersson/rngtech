@@ -1558,8 +1558,7 @@ public final class ModifierEligibilityProfiles {
                     MachineStat.EFFICIENCY,
                     MachineStat.PROCESSING_SPEED,
                     MachineStat.STABILITY
-            ),
-            PROCESSING_MACHINE_BEHAVIORS
+            )
     );
     public static final ModifierEligibilityProfile COMPONENT_RECYCLER = profile(
             "component_recycler",
@@ -1714,8 +1713,7 @@ public final class ModifierEligibilityProfiles {
                     MachineStat.PROCESSING_SPEED,
                     MachineStat.STABILITY,
                     MachineStat.FLUID_TRANSFER
-            ),
-            PROCESSING_MACHINE_BEHAVIORS
+            )
     );
     public static final ModifierEligibilityProfile STEAM_METHANE_REFORMER = profile(
             "steam_methane_reformer",
@@ -1771,8 +1769,7 @@ public final class ModifierEligibilityProfiles {
                     MachineStat.TEMPERATURE_STABILITY,
                     MachineStat.OUTPUT_AMOUNT,
                     MachineStat.FLUID_TRANSFER
-            ),
-            PROCESSING_MACHINE_BEHAVIORS
+            )
     );
     public static final ModifierEligibilityProfile AMMONIA_SYNTHESIZER = profile(
             "ammonia_synthesizer",
@@ -1823,8 +1820,7 @@ public final class ModifierEligibilityProfiles {
                     MachineStat.EFFICIENCY,
                     MachineStat.STABILITY,
                     MachineStat.FLUID_TRANSFER
-            ),
-            PROCESSING_MACHINE_BEHAVIORS
+            )
     );
     public static final ModifierEligibilityProfile COMPRESSOR_TANK = profile(
             "compressor_tank",
