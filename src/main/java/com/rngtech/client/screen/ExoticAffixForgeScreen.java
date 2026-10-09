@@ -550,7 +550,7 @@ public class ExoticAffixForgeScreen extends AbstractContainerScreen<ExoticAffixF
 
     private void renderPanelTooltips(GuiGraphics guiGraphics, int mouseX, int mouseY) {
         if (menu.selectedTab() == ExoticAffixForgeMenu.TAB_GEAR) {
-            if (hovered(mouseX, mouseY, 42, 31, 18, 18)) {
+            if (hovered(mouseX, mouseY, 42, 47, 18, 18) && (hoveredSlot == null || !hoveredSlot.hasItem())) {
                 guiGraphics.renderComponentTooltip(
                         font,
                         List.of(

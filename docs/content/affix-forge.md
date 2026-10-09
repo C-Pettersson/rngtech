@@ -28,8 +28,8 @@ Current runtime surface:
 - Menu and screen: `AffixForgeMenu` and `AffixForgeScreen`.
 - Slots: target slot, catalyst slot, focus slot, Affix Lens Array slot, Affix Modifier Socket slot, and Affix Resonance Matrix slot.
 - Target slot accepts current `RefinementTargets`: machine block items, machine parts, and Battery Cell items.
-- Catalyst slot accepts unlocked `RefinementConsumableItem` stacks.
-- Focus slot accepts either modifier lenses while an Affix Lens Array is installed or modifier crystals while an Affix Modifier Socket is installed. Lenses and crystals cannot be combined in one operation.
+- Catalyst slot accepts any `RefinementConsumableItem` stack. A catalyst whose upgrade is missing stays in the slot, the outcome panel names the missing upgrade, and Reforge refuses it without consuming anything.
+- Focus slot accepts modifier lenses and modifier crystals. A lens needs an installed Affix Lens Array and a crystal needs an installed Affix Modifier Socket; otherwise the outcome panel names the missing upgrade and Reforge refuses it. Lenses and crystals cannot be combined in one operation.
 - Upgrade slots are reusable Gear-style items saved with the block and dropped with the forge inventory.
 - Installed upgrades update placed block visuals through blockstate properties.
 - The block currently exposes no registered NeoForge item or energy capability. Interaction is through the menu.
@@ -41,8 +41,8 @@ Current runtime surface:
 
 Implementation checks:
 
-- Shift-clicking refinement consumables should prefer the catalyst slot when their required upgrade is installed.
-- Shift-clicking focus items should prefer the focus slot only when their matching upgrade is installed.
+- Shift-clicking refinement consumables should prefer the catalyst slot.
+- Shift-clicking modifier lenses and crystals should prefer the focus slot.
 - Shift-clicking forge upgrades should prefer their matching upgrade slots.
 - Shift-clicking valid targets should prefer the target slot.
 - Invalid targets, invalid catalysts, and failed refinement attempts must not consume items or Refinement Potential.
@@ -66,7 +66,7 @@ The base forge still supports Affix Injector, Affix Upgrader, and Nullifier Coil
 | Affix Upgrader | `rngtech:affix_modifier` | Upgrades one weighted random eligible rolled affix. Consumes `2-6` RP. |
 | Greater Affix Upgrader | `rngtech:affix_upgrade` | Requires an installed Affix Resonance Matrix. Upgrades one weighted random eligible rolled affix, or tunes a capped retunable affix. Consumes `6-10` RP. |
 | Ascension Catalyst | `rngtech:ascension_catalyst` | Requires a Magic target with at least `5` [Refinement Potential](../systems/progression.md#refinement-potential), consumes `4` RP, upgrades the target to Rare, and adds one legal affix using weighted family and tier selection. |
-| Ascension Matrix | `rngtech:ascension_matrix` | Consumes all remaining [Refinement Potential](../systems/progression.md#refinement-potential), upgrades Magic targets to Rare, adds weighted `1-4` modifiers capped by open legal slots and affordable tiers, and upgrades or retunes one pre-existing rolled affix. |
+| Ascension Matrix | `rngtech:ascension_matrix` | Requires a Magic target with at least one rolled affix. Consumes all remaining [Refinement Potential](../systems/progression.md#refinement-potential), upgrades the target to Rare, adds weighted `1-4` modifiers capped by open legal slots and affordable tiers, and upgrades one pre-existing rolled affix up to the normal upgrade tier cap, or retunes it if it is already capped. |
 | Nullifier Coil | `rngtech:nullifier_coil` | Removes one random non-implicit rolled modifier. |
 | Chaos Crystal | `rngtech:chaos_crystal` | Rerolls all current rolled affixes from the target's legal pools using weighted replacement families and tiers. |
 | Expansion Crystal | `rngtech:expansion_crystal` | Attempts to fill every legal open prefix/suffix slot using weighted family and tier selection, capped by affordable tiers for each added modifier. |

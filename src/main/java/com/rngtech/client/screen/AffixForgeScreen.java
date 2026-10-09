@@ -15,10 +15,11 @@ import com.rngtech.rpg.ModifierEligibilityProfile;
 import com.rngtech.rpg.ModifierLensTag;
 import com.rngtech.rpg.ModifierLensTargets;
 import com.rngtech.rpg.ModifierSlot;
-import com.rngtech.rpg.refinement.RefinementAction;
 import com.rngtech.rpg.refinement.RefinementEngine;
 import com.rngtech.rpg.refinement.RefinementModifier;
 import com.rngtech.rpg.refinement.RefinementOperation;
+import com.rngtech.rpg.refinement.RefinementResult;
+import com.rngtech.rpg.refinement.RefinementSelection;
 import com.rngtech.rpg.refinement.RefinementTargets;
 
 import net.minecraft.ChatFormatting;
@@ -26,6 +27,8 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.Component;
+import net.minecraft.util.FormattedCharSequence;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
 
@@ -69,6 +72,8 @@ public class AffixForgeScreen extends AbstractContainerScreen<AffixForgeMenu> {
     private static final int ROW_HEIGHT = 14;
     private static final int MAX_ROWS = 6;
     private static final int MAX_OUTCOME_LINES = 6;
+    private static final int OUTCOME_LINE_GAP = 4;
+    private static final String NO_POTENTIAL = "rngtech.refinement.failure.no_potential";
 
     public AffixForgeScreen(AffixForgeMenu menu, Inventory playerInventory, Component title) {
         super(menu, playerInventory, title);
@@ -189,18 +194,33 @@ public class AffixForgeScreen extends AbstractContainerScreen<AffixForgeMenu> {
     }
 
     private void drawOutcomeLabels(GuiGraphics guiGraphics) {
-        List<OutcomeLine> lines = outcomeLines();
-        for (int index = 0; index < lines.size() && index < MAX_OUTCOME_LINES; index++) {
-            OutcomeLine line = lines.get(index);
-            drawClipped(
-                    guiGraphics,
-                    line.text(),
-                    OUTCOME_PANEL_X + 3,
-                    OUTCOME_PANEL_Y + 4 + index * 14,
-                    OUTCOME_PANEL_WIDTH - 6,
-                    line.color()
-            );
+        for (OutcomeBlock block : outcomeLayout()) {
+            for (int row = 0; row < block.rows().size(); row++) {
+                guiGraphics.drawString(
+                        font,
+                        block.rows().get(row),
+                        OUTCOME_PANEL_X + 3,
+                        block.y() + row * font.lineHeight,
+                        block.line().color(),
+                        false
+                );
+            }
         }
+    }
+
+    private List<OutcomeBlock> outcomeLayout() {
+        List<OutcomeBlock> blocks = new ArrayList<>();
+        int y = OUTCOME_PANEL_Y + 4;
+        int bottom = OUTCOME_PANEL_Y + PANEL_HEIGHT - 5;
+        for (OutcomeLine line : outcomeLines()) {
+            List<FormattedCharSequence> rows = font.split(line.text(), OUTCOME_PANEL_WIDTH - 6);
+            if (y + rows.size() * font.lineHeight > bottom) {
+                break;
+            }
+            blocks.add(new OutcomeBlock(line, rows, y));
+            y += rows.size() * font.lineHeight + OUTCOME_LINE_GAP;
+        }
+        return blocks;
     }
 
     private List<SelectionRow> selectionRows() {
@@ -257,7 +277,7 @@ public class AffixForgeScreen extends AbstractContainerScreen<AffixForgeMenu> {
         }
         if (refinementModifier != RefinementModifier.NONE
                 && !refinementModifier.requiresRandomUpgrade()
-                && !canUseModifier(operation.action())) {
+                && !RefinementEngine.canUseModifier(operation.action())) {
             return List.of(
                     new OutcomeLine(Component.translatable("rngtech.refinement.failure.modifier_requires_add_or_upgrade"), TEXT_BAD),
                     modifierPreviewLine(refinementModifier)
@@ -270,7 +290,33 @@ public class AffixForgeScreen extends AbstractContainerScreen<AffixForgeMenu> {
             );
         }
 
+        RefinementResult dryRun = dryRun(target, operation, refinementModifier, lensTags);
+        if (!dryRun.success()) {
+            List<OutcomeLine> lines = focusFailureLines(dryRun.messageKey());
+            if (NO_POTENTIAL.equals(dryRun.messageKey()) && hasCostRange(operation)) {
+                lines.add(1, costRangeLine());
+            }
+            return lines;
+        }
         return crystalOutcomeLines(operation);
+    }
+
+    private static RefinementResult dryRun(
+            ItemStack target,
+            RefinementOperation operation,
+            RefinementModifier refinementModifier,
+            Set<ModifierLensTag> lensTags
+    ) {
+        return RefinementEngine.apply(
+                RefinementTargets.eligibilityProfile(target),
+                RefinementTargets.storedTraits(target),
+                operation,
+                RefinementTargets.modifierRollComponentStage(target),
+                RefinementSelection.none(),
+                refinementModifier,
+                lensTags,
+                RandomSource.create(0L)
+        );
     }
 
     private List<OutcomeLine> lockedOperationLines(String messageKey) {
@@ -635,10 +681,10 @@ public class AffixForgeScreen extends AbstractContainerScreen<AffixForgeMenu> {
         );
     }
 
-    private static boolean canUseModifier(RefinementAction action) {
-        return action == RefinementAction.RANDOM_ADD
-                || action == RefinementAction.SELECTED_UPGRADE
-                || action == RefinementAction.TARGETED_ADD_OR_UPGRADE;
+    private static boolean hasCostRange(RefinementOperation operation) {
+        return operation == RefinementOperation.ADD_MODIFIER
+                || operation == RefinementOperation.UPGRADE_RANDOM_MODIFIER
+                || operation == RefinementOperation.UPGRADE_SELECTED_MODIFIER;
     }
 
     private ItemStack targetStack() {
@@ -655,6 +701,9 @@ public class AffixForgeScreen extends AbstractContainerScreen<AffixForgeMenu> {
     }
 
     private void renderPanelTooltips(GuiGraphics guiGraphics, int mouseX, int mouseY) {
+        if (!menu.getCarried().isEmpty()) {
+            return;
+        }
         if (hoveredRpReadout(mouseX, mouseY)) {
             guiGraphics.renderTooltip(
                     font,
@@ -671,9 +720,20 @@ public class AffixForgeScreen extends AbstractContainerScreen<AffixForgeMenu> {
             return;
         }
 
+        Component inputTooltip = hoveredEmptyInputTooltip(mouseX, mouseY);
+        if (inputTooltip != null) {
+            guiGraphics.renderTooltip(font, inputTooltip, mouseX, mouseY);
+            return;
+        }
+
         SelectionRow selectionRow = hoveredSelectionRow(mouseX, mouseY);
         if (selectionRow != null) {
-            guiGraphics.renderTooltip(font, selectionRow.tooltip(), mouseX, mouseY);
+            guiGraphics.renderComponentTooltip(
+                    font,
+                    List.of(selectionRow.title(), selectionRow.tooltip().copy().withStyle(ChatFormatting.GRAY)),
+                    mouseX,
+                    mouseY
+            );
             return;
         }
 
@@ -705,6 +765,19 @@ public class AffixForgeScreen extends AbstractContainerScreen<AffixForgeMenu> {
         return null;
     }
 
+    private Component hoveredEmptyInputTooltip(int mouseX, int mouseY) {
+        if (hoveredSlot(mouseX, mouseY, 14, 32) && !menu.getSlot(AffixForgeBlockEntity.SLOT_TARGET).hasItem()) {
+            return Component.translatable("rngtech.refinement.failure.invalid_target");
+        }
+        if (hoveredSlot(mouseX, mouseY, 43, 32) && !menu.getSlot(AffixForgeBlockEntity.SLOT_CONSUMABLE).hasItem()) {
+            return Component.translatable("rngtech.refinement.failure.invalid_consumable");
+        }
+        if (hoveredSlot(mouseX, mouseY, 72, 32) && !menu.getSlot(AffixForgeBlockEntity.SLOT_MODIFIER).hasItem()) {
+            return Component.translatable("rngtech.refinement.failure.invalid_focus");
+        }
+        return null;
+    }
+
     private boolean hoveredSlot(int mouseX, int mouseY, int slotX, int slotY) {
         int x = leftPos + slotX;
         int y = topPos + slotY;
@@ -723,12 +796,12 @@ public class AffixForgeScreen extends AbstractContainerScreen<AffixForgeMenu> {
     }
 
     private OutcomeLine hoveredOutcomeLine(int mouseX, int mouseY) {
-        List<OutcomeLine> lines = outcomeLines();
-        for (int index = 0; index < lines.size() && index < MAX_OUTCOME_LINES; index++) {
-            int x = leftPos + OUTCOME_PANEL_X;
-            int y = topPos + OUTCOME_PANEL_Y + 4 + index * 14;
-            if (mouseX >= x && mouseX < x + OUTCOME_PANEL_WIDTH && mouseY >= y && mouseY < y + font.lineHeight) {
-                return lines.get(index);
+        int x = leftPos + OUTCOME_PANEL_X;
+        for (OutcomeBlock block : outcomeLayout()) {
+            int y = topPos + block.y();
+            int height = block.rows().size() * font.lineHeight;
+            if (mouseX >= x && mouseX < x + OUTCOME_PANEL_WIDTH && mouseY >= y && mouseY < y + height) {
+                return block.line();
             }
         }
         return null;
@@ -801,6 +874,9 @@ public class AffixForgeScreen extends AbstractContainerScreen<AffixForgeMenu> {
     }
 
     private record SelectionRow(Component title, Component tooltip, int y) {
+    }
+
+    private record OutcomeBlock(OutcomeLine line, List<FormattedCharSequence> rows, int y) {
     }
 
     private record OutcomeLine(Component text, List<Component> tooltip, int color) {
