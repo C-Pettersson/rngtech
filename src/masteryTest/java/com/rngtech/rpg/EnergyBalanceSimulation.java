@@ -15,6 +15,7 @@ import com.rngtech.content.energy.SolarPanelMaterial;
 import com.rngtech.content.energy.SolidFuelBurnerChassis;
 import com.rngtech.content.energy.VacuumCollapsePartMaterial;
 import com.rngtech.content.machine.ServoMaterial;
+import com.rngtech.content.recycling.RecyclingData;
 import com.rngtech.rpg.refinement.RefinementEngine;
 import com.rngtech.rpg.refinement.RefinementModifier;
 import com.rngtech.rpg.refinement.RefinementOperation;
@@ -623,12 +624,14 @@ public final class EnergyBalanceSimulation {
             double[] perItem = new double[trials];
             double[] fet = new double[trials];
             for (int trial = 0; trial < trials; trial++) {
-                int value = rpgEnergyValue(item.craft(random));
-                if (scenario.gearScale() != null) {
-                    value = (int) Math.round(value * scenario.gearScale().at(item.stage()));
-                }
-                if (scenario.mastery() != null) {
-                    value = (int) Math.round(value * scenario.mastery().at(item.masteryLevel(), item.sealTiers()));
+                int traitValue = rpgEnergyValue(item.craft(random));
+                int value;
+                if (scenario.gearScale() != null || scenario.mastery() != null) {
+                    double stageScale = scenario.gearScale() == null ? 1.0 : scenario.gearScale().at(item.stage());
+                    double masteryScale = scenario.mastery() == null ? 1.0 : scenario.mastery().at(item.masteryLevel(), item.sealTiers());
+                    value = (int) Math.round(traitValue * stageScale * masteryScale);
+                } else {
+                    value = RecyclingData.reactorFuelValue(traitValue, item.stage(), Math.max(0, item.masteryLevel() - 1), item.sealTiers());
                 }
                 int ticks = Math.max(100, Math.min(280, 80 + Math.max(1, item.stage()) * 15 + value / 240));
                 int adjusted = reactor.adjustedProcessingTicks(ticks);
@@ -1450,8 +1453,10 @@ public final class EnergyBalanceSimulation {
             Double aethergoldTransfer,
             Mastery mastery
     ) {
-        static final Scenario CURRENT = new Scenario("current", "Current", new JsonObject(), 0, Map.of(), Solar.CURRENT, null, null, null, false,
-                false, null, null);
+        /** PotentialReactorBlockEntity: 15 remembered burns, x0.75 per repeat, floor 10%. */
+        static final Fatigue CURRENT_FATIGUE = new Fatigue(16, 0.75, 0.10);
+        static final Scenario CURRENT = new Scenario("current", "Current", new JsonObject(), 0, Map.of(), Solar.CURRENT, null, CURRENT_FATIGUE,
+                null, false, false, null, null);
 
         /** Reactor gear-fuel bonus for a machine's Mastery: {@code (1 + level * perLevel) * (1 + sealTiers * perSealTier)}. */
         record Mastery(double perLevel, double perSealTier) {
@@ -1523,7 +1528,7 @@ public final class EnergyBalanceSimulation {
                             ChainCosts.Fuel.parse("corrosion_cell/" + recipeId, recipe)));
                 }
             }
-            Fatigue fatigue = null;
+            Fatigue fatigue = Scenario.CURRENT_FATIGUE;
             if (json.has("reactor_fatigue")) {
                 JsonObject value = json.getAsJsonObject("reactor_fatigue");
                 fatigue = new Fatigue(value.get("window").getAsInt(), value.get("factor_per_repeat").getAsDouble(), value.get("floor").getAsDouble());
