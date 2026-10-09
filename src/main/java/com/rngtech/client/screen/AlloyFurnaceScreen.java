@@ -51,16 +51,16 @@ public class AlloyFurnaceScreen extends AbstractContainerScreen<AlloyFurnaceMenu
     private static final int BAR_FILL_HEIGHT = 48;
     private static final int PROGRESS_X = 98;
     private static final int PROGRESS_Y = 51;
-    private static final int PROGRESS_WIDTH = 88;
+    private static final int PROGRESS_WIDTH = 86;
     private static final int PROGRESS_HEIGHT = 8;
-    private static final int STATUS_ICON_X = 129;
-    private static final int HEAT_ICON_X = 145;
+    private static final int STATUS_ICON_X = 127;
+    private static final int HEAT_ICON_X = 143;
     private static final int STATUS_ICON_Y = 63;
     private static final int STATUS_ICON_SIZE = 12;
     private static final int OUTPUT_SLOT_X = 204;
     private static final int OUTPUT_SLOT_Y = 42;
     private static final int[] INPUT_X = {50, 70, 50, 70};
-    private static final int[] INPUT_Y = {31, 31, 51, 51};
+    private static final int[] INPUT_Y = {29, 29, 49, 49};
     private static final String[] STAT_LABEL_KEYS = {
             "rngtech.stat.processing_speed",
             "rngtech.stat.energy_usage",
@@ -418,15 +418,15 @@ public class AlloyFurnaceScreen extends AbstractContainerScreen<AlloyFurnaceMenu
     }
 
     private void drawProcessingLabels(GuiGraphics guiGraphics) {
-        drawCentered(guiGraphics, Component.translatable("rngtech.processing.inputs"), 69, 78);
+        drawCentered(guiGraphics, Component.translatable("rngtech.processing.inputs"), 68, 78);
         drawCentered(guiGraphics, Component.translatable("rngtech.processing.output"), OUTPUT_SLOT_X + 8, 28);
     }
 
     private void drawGearLabels(GuiGraphics guiGraphics) {
-        drawGearLabel(guiGraphics, Component.translatable("rngtech.gear.heat_core.short"), 53);
-        drawGearLabel(guiGraphics, Component.translatable("rngtech.gear.crucible.short"), 101);
-        drawGearLabel(guiGraphics, Component.translatable("rngtech.gear.battery_cell.short"), 149);
-        drawGearLabel(guiGraphics, Component.translatable("rngtech.gear.servo.short"), 197);
+        drawGearLabel(guiGraphics, Component.translatable("rngtech.gear.heat_core.short"), 52);
+        drawGearLabel(guiGraphics, Component.translatable("rngtech.gear.crucible.short"), 100);
+        drawGearLabel(guiGraphics, Component.translatable("rngtech.gear.battery_cell.short"), 148);
+        drawGearLabel(guiGraphics, Component.translatable("rngtech.gear.servo.short"), 196);
     }
 
     private void drawStatsLabels(GuiGraphics guiGraphics) {

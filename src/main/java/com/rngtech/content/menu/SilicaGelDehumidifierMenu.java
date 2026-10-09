@@ -63,10 +63,10 @@ public class SilicaGelDehumidifierMenu extends AbstractContainerMenu {
 
         ItemStackHandler inventory = dehumidifier.getInventory();
         for (int lane = 0; lane < SilicaGelDehumidifierBlockEntity.LANE_COUNT; lane++) {
-            addSlot(new SlotItemHandler(inventory, SilicaGelDehumidifierBlockEntity.SLOT_DRY_START + lane, 40, 28 + lane * 24));
+            addSlot(new SlotItemHandler(inventory, SilicaGelDehumidifierBlockEntity.SLOT_DRY_START + lane, 41, 29 + lane * 24));
         }
         for (int lane = 0; lane < SilicaGelDehumidifierBlockEntity.LANE_COUNT; lane++) {
-            addSlot(new SlotItemHandler(inventory, SilicaGelDehumidifierBlockEntity.SLOT_SATURATED_START + lane, 150, 28 + lane * 24));
+            addSlot(new SlotItemHandler(inventory, SilicaGelDehumidifierBlockEntity.SLOT_SATURATED_START + lane, 151, 29 + lane * 24));
         }
 
         addPlayerInventory(playerInventory);

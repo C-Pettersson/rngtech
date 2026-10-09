@@ -29,9 +29,9 @@ public class SilicaGelDehumidifierScreen extends AbstractContainerScreen<SilicaG
     private static final int STATUS_X = 134;
     private static final int STATUS_SIZE = 12;
     private static final int WATER_GAUGE_X = 190;
-    private static final int WATER_GAUGE_Y = 24;
+    private static final int WATER_GAUGE_Y = 28;
     private static final int GAUGE_WIDTH = 28;
-    private static final int GAUGE_HEIGHT = 68;
+    private static final int GAUGE_HEIGHT = 66;
     private static final int STRUCTURE_X = 174;
     private static final int STRUCTURE_Y = 82;
 

@@ -80,7 +80,7 @@ public class AlloyFurnaceMenu extends AbstractContainerMenu implements MasteryMe
     private static final int PLAYER_INVENTORY_END = PLAYER_INVENTORY_START + 27;
     private static final int HOTBAR_END = PLAYER_INVENTORY_END + 9;
     private static final int[] INPUT_X = {50, 70, 50, 70};
-    private static final int[] INPUT_Y = {31, 31, 51, 51};
+    private static final int[] INPUT_Y = {29, 29, 49, 49};
 
     private final ContainerLevelAccess access;
     private final ContainerData data;

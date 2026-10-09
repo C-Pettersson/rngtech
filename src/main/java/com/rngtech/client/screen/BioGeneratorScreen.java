@@ -35,7 +35,7 @@ public class BioGeneratorScreen extends AbstractContainerScreen<BioGeneratorMenu
     private static final int GENERATION_ICON_X = 118;
     private static final int OUTPUT_ICON_X = 134;
     private static final int FUEL_VALUE_ICON_X = 150;
-    private static final int STATUS_ICON_Y = 61;
+    private static final int STATUS_ICON_Y = 60;
     private static final int ICON_SIZE = 12;
     private static final MachineScreenStyle.AffixLine[] EMPTY_AFFIX_LINES = new MachineScreenStyle.AffixLine[0];
     private static final String[] STAT_LABEL_KEYS = {
@@ -267,8 +267,8 @@ public class BioGeneratorScreen extends AbstractContainerScreen<BioGeneratorMenu
     }
 
     private void drawGearLabels(GuiGraphics guiGraphics) {
-        drawGearLabel(guiGraphics, Component.translatable("rngtech.gear.battery_cell.short"), 75);
-        drawGearLabel(guiGraphics, Component.translatable("rngtech.gear.bio_chamber.short"), 135);
+        drawGearLabel(guiGraphics, Component.translatable("rngtech.gear.battery_cell.short"), 74);
+        drawGearLabel(guiGraphics, Component.translatable("rngtech.gear.bio_chamber.short"), 134);
     }
 
     private void drawStatsLabels(GuiGraphics guiGraphics) {

@@ -38,10 +38,10 @@ public class VacuumCollapseGeneratorScreen extends AbstractContainerScreen<Vacuu
     private static final int PROGRESS_BAR_WIDTH = 66;
     private static final int PROGRESS_BAR_HEIGHT = 7;
     private static final int ICON_SIZE = 12;
-    private static final int STATUS_ICON_SPACING = 14;
+    private static final int STATUS_ICON_SPACING = 16;
     private static final int STATUS_ICON_ROW_WIDTH = ICON_SIZE + STATUS_ICON_SPACING * 3;
     private static final int STATUS_ICON_X = PROGRESS_BAR_X + (PROGRESS_BAR_WIDTH - STATUS_ICON_ROW_WIDTH) / 2;
-    private static final int STATUS_ICON_Y = PROGRESS_BAR_Y + PROGRESS_BAR_HEIGHT + 4;
+    private static final int STATUS_ICON_Y = PROGRESS_BAR_Y + PROGRESS_BAR_HEIGHT + 5;
     private static final int GENERATION_ICON_X = STATUS_ICON_X + STATUS_ICON_SPACING;
     private static final int OUTPUT_ICON_X = GENERATION_ICON_X + STATUS_ICON_SPACING;
     private static final int INSTABILITY_ICON_X = OUTPUT_ICON_X + STATUS_ICON_SPACING;
@@ -267,10 +267,14 @@ public class VacuumCollapseGeneratorScreen extends AbstractContainerScreen<Vacuu
     }
 
     private void drawGearLabels(GuiGraphics guiGraphics) {
-        guiGraphics.drawString(font, Component.translatable("rngtech.gear.void_chamber.short"), 16, 35, TEXT_MUTED, false);
-        guiGraphics.drawString(font, Component.translatable("rngtech.gear.collapse_nozzle.short"), 68, 35, TEXT_MUTED, false);
-        guiGraphics.drawString(font, Component.translatable("rngtech.gear.dimensional_stabilizer.short"), 104, 35, TEXT_MUTED, false);
-        guiGraphics.drawString(font, Component.translatable("rngtech.gear.energy_connector.short"), 171, 35, TEXT_MUTED, false);
+        drawGearLabel(guiGraphics, Component.translatable("rngtech.gear.void_chamber.short"), 33);
+        drawGearLabel(guiGraphics, Component.translatable("rngtech.gear.collapse_nozzle.short"), 83);
+        drawGearLabel(guiGraphics, Component.translatable("rngtech.gear.dimensional_stabilizer.short"), 133);
+        drawGearLabel(guiGraphics, Component.translatable("rngtech.gear.energy_connector.short"), 183);
+    }
+
+    private void drawGearLabel(GuiGraphics guiGraphics, Component label, int centerX) {
+        MachineScreenStyle.drawClippedCentered(guiGraphics, font, label, centerX, 35, 48, TEXT_MUTED);
     }
 
     private void drawStatsLabels(GuiGraphics guiGraphics) {

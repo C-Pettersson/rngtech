@@ -193,7 +193,7 @@ public class AlgaePhotobioreactorScreen extends AbstractContainerScreen<AlgaePho
     }
 
     private void drawGearLabels(GuiGraphics guiGraphics) {
-        guiGraphics.drawString(font, Component.translatable("rngtech.gear.bio_chamber.short"), 101, 35, TEXT_MUTED, false);
+        MachineScreenStyle.drawClippedCentered(guiGraphics, font, Component.translatable("rngtech.gear.bio_chamber.short"), 118, 35, 54, TEXT_MUTED);
     }
 
     private void drawStatsLabels(GuiGraphics guiGraphics) {

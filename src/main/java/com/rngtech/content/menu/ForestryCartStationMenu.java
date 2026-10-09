@@ -125,10 +125,10 @@ public class ForestryCartStationMenu extends AbstractContainerMenu {
         addSlot(new TabbedSlot(processInventory, ForestryCartStationBlockEntity.SLOT_TOOL_INPUT, TOOL_X, SUPPLY_ROW_Y, supply));
 
         ItemStackHandler connectorInventory = station.getConnectorInventory();
-        addSlot(new TabbedSlot(connectorInventory, ForestryCartStationBlockEntity.SLOT_STATION_BATTERY_CELL, 71, 52, () -> selectedTab == TAB_GEAR));
-        addSlot(new TabbedSlot(connectorInventory, ForestryCartStationBlockEntity.SLOT_ENERGY_CONNECTOR, 95, 52, () -> selectedTab == TAB_GEAR));
-        addSlot(new TabbedSlot(connectorInventory, ForestryCartStationBlockEntity.SLOT_ITEM_CONNECTOR, 119, 52, () -> selectedTab == TAB_GEAR));
-        addSlot(new TabbedSlot(connectorInventory, ForestryCartStationBlockEntity.SLOT_FLUID_CONNECTOR, 143, 52, () -> selectedTab == TAB_GEAR));
+        addSlot(new TabbedSlot(connectorInventory, ForestryCartStationBlockEntity.SLOT_STATION_BATTERY_CELL, 75, 52, () -> selectedTab == TAB_GEAR));
+        addSlot(new TabbedSlot(connectorInventory, ForestryCartStationBlockEntity.SLOT_ENERGY_CONNECTOR, 99, 52, () -> selectedTab == TAB_GEAR));
+        addSlot(new TabbedSlot(connectorInventory, ForestryCartStationBlockEntity.SLOT_ITEM_CONNECTOR, 123, 52, () -> selectedTab == TAB_GEAR));
+        addSlot(new TabbedSlot(connectorInventory, ForestryCartStationBlockEntity.SLOT_FLUID_CONNECTOR, 147, 52, () -> selectedTab == TAB_GEAR));
 
         addPlayerInventory(playerInventory);
         addDataSlots(data);

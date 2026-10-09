@@ -39,12 +39,12 @@ public class WoodenDehumidifierScreen extends AbstractContainerScreen<WoodenDehu
     private static final int SELECTOR_Y = 80;
     private static final int SELECTOR_SIZE = 14;
     private static final int PROGRESS_X = 88;
-    private static final int PROGRESS_Y = 56;
+    private static final int PROGRESS_Y = 59;
     private static final int PROGRESS_WIDTH = 66;
     private static final int PROGRESS_HEIGHT = 8;
-    private static final int STATUS_X = 92;
-    private static final int STRUCTURE_X = 108;
-    private static final int HUMIDITY_X = 124;
+    private static final int STATUS_X = 88;
+    private static final int STRUCTURE_X = 104;
+    private static final int HUMIDITY_X = 120;
     private static final int STATUS_Y = 38;
     private static final int STATUS_SIZE = 12;
 

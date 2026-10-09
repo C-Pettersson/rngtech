@@ -19,7 +19,7 @@ public class WoodenComposterScreen extends AbstractContainerScreen<WoodenCompost
     private static final int BAR_BACKING = 0xFF5F5F5F;
     private static final int INPUT_X = 8;
     private static final int INPUT_Y = 30;
-    private static final int OUTPUT_X = 194;
+    private static final int OUTPUT_X = 195;
     private static final int OUTPUT_Y = 48;
     private static final int WATER_INPUT_X = 184;
     private static final int WATER_INPUT_Y = 76;
@@ -29,10 +29,12 @@ public class WoodenComposterScreen extends AbstractContainerScreen<WoodenCompost
     private static final int PROGRESS_Y = 91;
     private static final int PROGRESS_WIDTH = 162;
     private static final int PROGRESS_HEIGHT = 8;
-    private static final int WATER_GAUGE_X = 184;
+    private static final int WATER_GAUGE_X = 183;
     private static final int WATER_GAUGE_Y = 30;
-    private static final int WATER_GAUGE_WIDTH = 38;
+    private static final int WATER_GAUGE_WIDTH = 28;
     private static final int WATER_GAUGE_HEIGHT = 8;
+    private static final int WATER_PURGE_X = 213;
+    private static final int WATER_PURGE_Y = 29;
     private static final int TAB_WIDTH = 54;
     private static final int TAB_SPACING = 56;
     private static final int STATUS_X = 118;
@@ -68,7 +70,7 @@ public class WoodenComposterScreen extends AbstractContainerScreen<WoodenCompost
         renderWaterGauge(guiGraphics);
         renderStatusIcon(guiGraphics);
         renderBonusStatusSquares(guiGraphics);
-        FluidPurgeButton.render(guiGraphics, leftPos, topPos, WATER_GAUGE_X + 14, WATER_GAUGE_Y + 10, menu.waterAmount() > 0);
+        FluidPurgeButton.render(guiGraphics, leftPos, topPos, WATER_PURGE_X, WATER_PURGE_Y, menu.waterAmount() > 0);
     }
 
     @Override
@@ -88,8 +90,8 @@ public class WoodenComposterScreen extends AbstractContainerScreen<WoodenCompost
                 topPos,
                 mouseX,
                 mouseY,
-                WATER_GAUGE_X + 14,
-                WATER_GAUGE_Y + 10,
+                WATER_PURGE_X,
+                WATER_PURGE_Y,
                 WoodenComposterBlockEntity.PURGE_WATER_TANK
         )) {
             return true;
@@ -207,8 +209,8 @@ public class WoodenComposterScreen extends AbstractContainerScreen<WoodenCompost
                 topPos,
                 mouseX,
                 mouseY,
-                WATER_GAUGE_X + 14,
-                WATER_GAUGE_Y + 10,
+                WATER_PURGE_X,
+                WATER_PURGE_Y,
                 Component.translatable("rngtech.purge.target.water_tank"),
                 menu.waterAmount() > 0 ? Component.translatable("block.minecraft.water") : Component.translatable("rngtech.purge.empty_fluid"),
                 menu.waterAmount(),

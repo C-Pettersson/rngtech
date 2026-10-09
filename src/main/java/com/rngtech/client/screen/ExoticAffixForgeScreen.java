@@ -64,7 +64,7 @@ public class ExoticAffixForgeScreen extends AbstractContainerScreen<ExoticAffixF
     private static final int ACTION_WIDTH = 112;
     private static final int ACTION_ROW_HEIGHT = 12;
     private static final int APPLY_BUTTON_X = 44;
-    private static final int APPLY_BUTTON_Y = 102;
+    private static final int APPLY_BUTTON_Y = 104;
     private static final int APPLY_BUTTON_WIDTH = 48;
     private static final int APPLY_BUTTON_HEIGHT = 16;
     private static final int SELECTION_X = 224;
@@ -113,7 +113,7 @@ public class ExoticAffixForgeScreen extends AbstractContainerScreen<ExoticAffixF
         guiGraphics.drawString(font, title, titleLabelX, titleLabelY, TEXT, false);
         guiGraphics.drawString(font, playerInventoryTitle, inventoryLabelX, inventoryLabelY, TEXT, false);
         if (menu.selectedTab() == ExoticAffixForgeMenu.TAB_PROCESSING) {
-            guiGraphics.drawString(font, Component.translatable("rngtech.refinement.target.short"), 13, 20, TEXT_MUTED, false);
+            guiGraphics.drawString(font, Component.translatable("rngtech.refinement.target.short"), 14, 20, TEXT_MUTED, false);
             guiGraphics.drawString(font, Component.translatable("rngtech.refinement.catalyst.short"), 43, 20, TEXT_MUTED, false);
             guiGraphics.drawString(font, Component.translatable("rngtech.processing.output.tiny"), 72, 20, TEXT_MUTED, false);
             guiGraphics.drawString(font, Component.translatable("rngtech.exotic_affix_forge.energy"), ENERGY_X - 1, ENERGY_Y - 11, TEXT_MUTED, false);
@@ -121,7 +121,7 @@ public class ExoticAffixForgeScreen extends AbstractContainerScreen<ExoticAffixF
             drawCentered(guiGraphics, Component.translatable("rngtech.refinement.modifiers"), SELECTION_X + SELECTION_WIDTH / 2, 18, TEXT_MUTED);
             drawProcessingLabels(guiGraphics);
         } else if (menu.selectedTab() == ExoticAffixForgeMenu.TAB_GEAR) {
-            drawCentered(guiGraphics, Component.translatable("rngtech.gear.battery_cell.short"), 52, 20, TEXT_MUTED);
+            drawCentered(guiGraphics, Component.translatable("rngtech.gear.battery_cell.short"), 51, 35, TEXT_MUTED);
             drawGearLabels(guiGraphics);
         } else {
             drawStatsLabels(guiGraphics);
@@ -205,7 +205,7 @@ public class ExoticAffixForgeScreen extends AbstractContainerScreen<ExoticAffixF
                     guiGraphics,
                     Component.translatable("rngtech.exotic_affix_forge.no_focus"),
                     SELECTION_X + 3,
-                    SELECTION_Y + 4,
+                    SELECTION_Y + 2,
                     SELECTION_WIDTH - 6,
                     TEXT_MUTED
             );
@@ -213,7 +213,7 @@ public class ExoticAffixForgeScreen extends AbstractContainerScreen<ExoticAffixF
         }
         for (SelectionRow row : rows) {
             int color = row.enabled() && !menu.craftActive() ? TEXT : TEXT_MUTED;
-            drawClipped(guiGraphics, row.title(), SELECTION_X + 3, row.y() + 1, SELECTION_WIDTH - 6, color);
+            drawClipped(guiGraphics, row.title(), SELECTION_X + 3, row.y() + 2, SELECTION_WIDTH - 6, color);
         }
     }
 
@@ -409,7 +409,7 @@ public class ExoticAffixForgeScreen extends AbstractContainerScreen<ExoticAffixF
             return rows;
         }
 
-        int y = SELECTION_Y + 4;
+        int y = SELECTION_Y;
         List<MachineModifier> affixes = affixes(targetTraits());
         for (int affixIndex = 0; affixIndex < affixes.size() && rows.size() < MAX_SELECTION_ROWS; affixIndex++) {
             MachineModifier modifier = affixes.get(affixIndex);

@@ -62,12 +62,12 @@ public class ToolBenchScreen extends AbstractContainerScreen<ToolBenchMenu> {
     private static final int TARGET_BUTTON_HEIGHT = 16;
     private static final int TARGET_HEAD_BUTTON_X = 13;
     private static final int TARGET_ROD_BUTTON_X = 56;
-    private static final int REFINE_BUTTON_X = 16;
+    private static final int REFINE_BUTTON_X = 13;
     private static final int REFINE_BUTTON_Y = 84;
-    private static final int REFINE_BUTTON_WIDTH = 64;
-    private static final int REFINE_RP_X = 16;
+    private static final int REFINE_BUTTON_WIDTH = 79;
+    private static final int REFINE_RP_X = 13;
     private static final int REFINE_RP_Y = 108;
-    private static final int REFINE_RP_WIDTH = 64;
+    private static final int REFINE_RP_WIDTH = 79;
     private static final int REFINE_RP_HEIGHT = 16;
     private static final int PLAYER_INVENTORY_X = 132;
     private static final int PLAYER_INVENTORY_Y = 143;
@@ -167,7 +167,7 @@ public class ToolBenchScreen extends AbstractContainerScreen<ToolBenchMenu> {
             guiGraphics.drawString(font, Component.translatable("rngtech.tool_bench.head"), 69, 18, TEXT_MUTED, false);
             guiGraphics.drawString(font, Component.translatable("rngtech.tool_bench.rod"), 72, 82, TEXT_MUTED, false);
             guiGraphics.drawString(font, Component.translatable("rngtech.tool_bench.cell"), 118, 30, TEXT_MUTED, false);
-            guiGraphics.drawString(font, Component.translatable("rngtech.tool_bench.repair"), 112, 59, TEXT_MUTED, false);
+            guiGraphics.drawString(font, Component.translatable("rngtech.tool_bench.repair"), 112, 60, TEXT_MUTED, false);
             drawCentered(guiGraphics, Component.translatable("rngtech.tool_bench.apply"), APPLY_X, APPLY_Y);
             drawCentered(guiGraphics, Component.translatable("rngtech.tool_bench.remove_cell"), REMOVE_X, REMOVE_Y);
             drawCentered(guiGraphics, Component.translatable("rngtech.tool_bench.disassemble"), DISASSEMBLE_X, DISASSEMBLE_Y);
@@ -849,7 +849,7 @@ public class ToolBenchScreen extends AbstractContainerScreen<ToolBenchMenu> {
                     statTooltip(tool, stat)
             );
         }
-        return statLines;
+        return MachineScreenStyle.fitStatLines(statLines, MachineScreenStyle.maxStatRows(STAT_PANEL_Y, imageHeight));
     }
 
     private MachineStat[] displayedToolStats(ItemStack tool, MachineStatAccumulator stats) {

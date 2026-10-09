@@ -231,7 +231,7 @@ public class BatteryChassisMenu extends AbstractContainerMenu {
     }
 
     public static int cellSlotX(int slot) {
-        return 45 + (slot % 5) * 30;
+        return 52 + (slot % 5) * 30;
     }
 
     public static int cellSlotY(int slot) {

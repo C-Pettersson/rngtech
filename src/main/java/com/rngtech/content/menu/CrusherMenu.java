@@ -125,7 +125,7 @@ public class CrusherMenu extends AbstractContainerMenu implements MasteryMenuVie
         this.addSlot(new TabbedSlot(inventory, CrusherBlockEntity.SLOT_INPUT_A, 56, 42, () -> selectedTab == TAB_PROCESSING));
         this.addSlot(new TabbedSlot(inventory, CrusherBlockEntity.SLOT_FUEL, 80, 48, () -> selectedTab == TAB_GEAR));
         this.addSlot(new TabbedSlot(inventory, CrusherBlockEntity.SLOT_CRUSH_HEAD, 44, 48, () -> selectedTab == TAB_GEAR));
-        this.addSlot(new TabbedSlot(inventory, CrusherBlockEntity.SLOT_OUTPUT, 170, 54, () -> selectedTab == TAB_PROCESSING));
+        this.addSlot(new TabbedSlot(inventory, CrusherBlockEntity.SLOT_OUTPUT, 170, 52, () -> selectedTab == TAB_PROCESSING));
         this.addSlot(RefinementMenuSupport.consumableSlot(
                 crusher.getRefinementInventory(),
                 0,

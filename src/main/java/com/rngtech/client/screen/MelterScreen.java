@@ -448,11 +448,11 @@ public class MelterScreen extends AbstractContainerScreen<MelterMenu> {
     }
 
     private void drawGearLabels(GuiGraphics guiGraphics) {
-        drawGearLabel(guiGraphics, Component.translatable("rngtech.gear.heat_core.short"), 29);
-        drawGearLabel(guiGraphics, Component.translatable("rngtech.gear.crush_head.short"), 77);
-        drawGearLabel(guiGraphics, Component.translatable("rngtech.gear.battery_cell.short"), 125);
-        drawGearLabel(guiGraphics, Component.translatable("rngtech.gear.servo.short"), 173);
-        drawGearLabel(guiGraphics, Component.translatable("rngtech.gear.fluid_pump.short"), 221);
+        drawGearLabel(guiGraphics, Component.translatable("rngtech.gear.heat_core.short"), 28);
+        drawGearLabel(guiGraphics, Component.translatable("rngtech.gear.crush_head.short"), 76);
+        drawGearLabel(guiGraphics, Component.translatable("rngtech.gear.battery_cell.short"), 124);
+        drawGearLabel(guiGraphics, Component.translatable("rngtech.gear.servo.short"), 172);
+        drawGearLabel(guiGraphics, Component.translatable("rngtech.gear.fluid_pump.short"), 220);
     }
 
     private void drawConfigurationLabels(GuiGraphics guiGraphics) {

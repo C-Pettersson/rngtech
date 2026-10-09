@@ -48,6 +48,16 @@ public class FurnaceScreen extends AbstractContainerScreen<FurnaceMenu> {
     private static final int BAR_WIDTH = 10;
     private static final int BAR_HEIGHT = 50;
     private static final int BAR_FILL_HEIGHT = 48;
+    private static final int ENERGY_BAR_X = 2;
+    private static final int HEAT_BAR_X = 14;
+    private static final int FAILURE_BAR_X = 26;
+    private static final int FUEL_FRAME_X = 55;
+    private static final int FUEL_FRAME_Y = 83;
+    private static final int BATTERY_FRAME_Y = 65;
+    private static final int FUEL_BAR_X = 86;
+    private static final int FUEL_BAR_Y = 90;
+    private static final int FUEL_BAR_WIDTH = 69;
+    private static final int FUEL_BAR_HEIGHT = 4;
     private static final int[] PROCESS_INPUT_X = {56, 38, 56, 38};
     private static final int[] PROCESS_INPUT_Y = {42, 42, 60, 60};
     private static final int[] PROCESS_OUTPUT_X = {164, 182, 164, 182};
@@ -330,9 +340,10 @@ public class FurnaceScreen extends AbstractContainerScreen<FurnaceMenu> {
 
     private void drawProcessingLabels(GuiGraphics guiGraphics) {
         Component input = Component.translatable(menu.activeProcessingSlots() > 1 ? "rngtech.processing.inputs" : "rngtech.processing.input");
-        guiGraphics.drawString(font, input, 56 - font.width(input) / 2, 28, TEXT_MUTED, false);
+        guiGraphics.drawString(font, input, 55 - font.width(input) / 2, 28, TEXT_MUTED, false);
         if (!menu.isElectric()) {
-            guiGraphics.drawString(font, Component.translatable("rngtech.processing.fuel"), 52, 76, TEXT_MUTED, false);
+            Component fuel = Component.translatable("rngtech.processing.fuel");
+            guiGraphics.drawString(font, fuel, FUEL_FRAME_X - 3 - font.width(fuel), FUEL_FRAME_Y + 5, TEXT_MUTED, false);
         }
         guiGraphics.drawString(font, Component.translatable("rngtech.processing.output"), 164, 28, TEXT_MUTED, false);
         drawProcessingTargetLabel(guiGraphics);
@@ -390,7 +401,7 @@ public class FurnaceScreen extends AbstractContainerScreen<FurnaceMenu> {
                 renderSlotFrame(guiGraphics, PROCESS_OUTPUT_X[slot] - 1, PROCESS_OUTPUT_Y[slot] - 1);
             }
             if (!menu.isElectric()) {
-                renderSlotFrame(guiGraphics, 55, 65);
+                renderSlotFrame(guiGraphics, FUEL_FRAME_X, FUEL_FRAME_Y);
             }
             renderSlotFrame(
                     guiGraphics,
@@ -402,7 +413,7 @@ public class FurnaceScreen extends AbstractContainerScreen<FurnaceMenu> {
                 renderSlotFrame(guiGraphics, GEAR_X[slot] - 1, GEAR_Y[slot] - 1);
             }
             if (menu.isElectric()) {
-                renderSlotFrame(guiGraphics, 55, 65);
+                renderSlotFrame(guiGraphics, FUEL_FRAME_X, BATTERY_FRAME_Y);
             }
         } else if (menu.selectedTab() == FurnaceMenu.TAB_REFINEMENT) {
             renderSlotFrame(guiGraphics, RefinementScreenStyle.TARGET_SLOT_X - 1, RefinementScreenStyle.SLOT_Y - 1);
@@ -437,18 +448,21 @@ public class FurnaceScreen extends AbstractContainerScreen<FurnaceMenu> {
         }
 
         if (menu.isElectric()) {
-            renderVerticalBar(guiGraphics, 14, menu.energyProgress(), ENERGY);
-            renderVerticalBar(guiGraphics, 26, menu.heatProgress(), HEAT);
-            if (menu.hasFailureRecipe()) {
-                renderVerticalBar(guiGraphics, 38, menu.failureProgress(), FAILURE);
-            }
-        } else {
-            renderVerticalBar(guiGraphics, 14, menu.heatProgress(), HEAT);
-            if (menu.hasFailureRecipe()) {
-                renderVerticalBar(guiGraphics, 26, menu.failureProgress(), FAILURE);
-            }
-            guiGraphics.fill(x + 86, y + 69, x + 155, y + 73, 0xFF5F5F5F);
-            guiGraphics.fill(x + 87, y + 70, x + 87 + Math.round(67 * menu.fuelProgress()), y + 72, FUEL);
+            renderVerticalBar(guiGraphics, ENERGY_BAR_X, menu.energyProgress(), ENERGY);
+        }
+        renderVerticalBar(guiGraphics, HEAT_BAR_X, menu.heatProgress(), HEAT);
+        if (menu.hasFailureRecipe()) {
+            renderVerticalBar(guiGraphics, FAILURE_BAR_X, menu.failureProgress(), FAILURE);
+        }
+        if (!menu.isElectric()) {
+            guiGraphics.fill(x + FUEL_BAR_X, y + FUEL_BAR_Y, x + FUEL_BAR_X + FUEL_BAR_WIDTH, y + FUEL_BAR_Y + FUEL_BAR_HEIGHT, 0xFF5F5F5F);
+            guiGraphics.fill(
+                    x + FUEL_BAR_X + 1,
+                    y + FUEL_BAR_Y + 1,
+                    x + FUEL_BAR_X + 1 + Math.round((FUEL_BAR_WIDTH - 2) * menu.fuelProgress()),
+                    y + FUEL_BAR_Y + FUEL_BAR_HEIGHT - 1,
+                    FUEL
+            );
         }
         renderStatusIcon(guiGraphics);
     }
@@ -514,14 +528,14 @@ public class FurnaceScreen extends AbstractContainerScreen<FurnaceMenu> {
 
     private void drawGearLabels(GuiGraphics guiGraphics) {
         Component label = Component.translatable(menu.usesHeatCores() ? "rngtech.gear.heat_core.short" : "rngtech.gear.component");
-        int gearGroupCenter = GEAR_X[0] + 9;
+        int gearGroupCenter = GEAR_X[0] + 8;
         if (menu.activeGearSlots() > 1) {
-            gearGroupCenter = (GEAR_X[0] + GEAR_X[menu.activeGearSlots() - 1]) / 2 + 9;
+            gearGroupCenter = (GEAR_X[0] + GEAR_X[menu.activeGearSlots() - 1]) / 2 + 8;
         }
         guiGraphics.drawString(font, label, gearGroupCenter - font.width(label) / 2, 54, TEXT_MUTED, false);
         if (menu.isElectric()) {
             Component batteryCell = Component.translatable("rngtech.gear.battery_cell.short");
-            guiGraphics.drawString(font, batteryCell, 65 - font.width(batteryCell) / 2, 54, TEXT_MUTED, false);
+            guiGraphics.drawString(font, batteryCell, FUEL_FRAME_X + 9 - font.width(batteryCell) / 2, 54, TEXT_MUTED, false);
         }
     }
 
@@ -553,14 +567,13 @@ public class FurnaceScreen extends AbstractContainerScreen<FurnaceMenu> {
                     topPos,
                     mouseX,
                     mouseY,
-                    14,
-                    28,
-                    10,
-                    50,
+                    ENERGY_BAR_X,
+                    BAR_Y,
+                    BAR_WIDTH,
+                    BAR_HEIGHT,
                     exactEnergyText()
             );
         }
-        int heatBarX = menu.isElectric() ? 26 : 14;
         CompactValueText.renderTooltipIfHovered(
                 guiGraphics,
                 font,
@@ -568,7 +581,7 @@ public class FurnaceScreen extends AbstractContainerScreen<FurnaceMenu> {
                 topPos,
                 mouseX,
                 mouseY,
-                heatBarX,
+                HEAT_BAR_X,
                 BAR_Y,
                 BAR_WIDTH,
                 BAR_HEIGHT,
@@ -582,7 +595,7 @@ public class FurnaceScreen extends AbstractContainerScreen<FurnaceMenu> {
                     topPos,
                     mouseX,
                     mouseY,
-                    menu.isElectric() ? 38 : 26,
+                    FAILURE_BAR_X,
                     BAR_Y,
                     BAR_WIDTH,
                     BAR_HEIGHT,
@@ -628,10 +641,10 @@ public class FurnaceScreen extends AbstractContainerScreen<FurnaceMenu> {
                     topPos,
                     mouseX,
                     mouseY,
-                    86,
-                    69,
-                    69,
-                    4,
+                    FUEL_BAR_X,
+                    FUEL_BAR_Y,
+                    FUEL_BAR_WIDTH,
+                    FUEL_BAR_HEIGHT,
                     fuelTooltip()
             );
         }
@@ -832,9 +845,9 @@ public class FurnaceScreen extends AbstractContainerScreen<FurnaceMenu> {
     }
 
     private void drawProcessingTargetLabel(GuiGraphics guiGraphics) {
-        Component target = Component.translatable("rngtech.processing.machine");
+        Component target = Component.translatable("rngtech.processing.machine.tiny");
         int x = RefinementScreenStyle.PROCESSING_TARGET_SLOT_X + 8 - font.width(target) / 2;
-        guiGraphics.drawString(font, target, x, 64, TEXT_MUTED, false);
+        guiGraphics.drawString(font, target, x, 28, TEXT_MUTED, false);
     }
 
     private void renderSlotFrame(GuiGraphics guiGraphics, int x, int y) {

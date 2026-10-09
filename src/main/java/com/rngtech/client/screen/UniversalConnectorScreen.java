@@ -334,11 +334,11 @@ public class UniversalConnectorScreen extends AbstractContainerScreen<UniversalC
                 menu.lastEnergyInput(),
                 menu.lastEnergyOutput()
         ).getString();
-        guiGraphics.drawString(font, Component.translatable("rngtech.universal_connector.module"), 16, 48, TEXT_MUTED, false);
-        guiGraphics.drawString(font, Component.translatable("rngtech.cable_connector.mode"), 76, 48, TEXT_MUTED, false);
-        guiGraphics.drawString(font, Component.translatable("rngtech.cable_connector.channel"), 126, 48, TEXT_MUTED, false);
-        guiGraphics.drawString(font, Component.translatable("rngtech.cable_connector.distribution.short"), 195, 48, TEXT_MUTED, false);
-        guiGraphics.drawString(font, Component.translatable("rngtech.universal_connector.attach"), 258, 48, TEXT_MUTED, false);
+        drawSlotLabel(guiGraphics, Component.translatable("rngtech.universal_connector.module"));
+        guiGraphics.drawString(font, Component.translatable("rngtech.cable_connector.mode"), ENERGY_MODE_X, 48, TEXT_MUTED, false);
+        guiGraphics.drawString(font, Component.translatable("rngtech.cable_connector.channel"), ENERGY_CHANNEL_DOWN_X, 48, TEXT_MUTED, false);
+        guiGraphics.drawString(font, Component.translatable("rngtech.cable_connector.distribution.short"), ENERGY_DISTRIBUTION_X, 48, TEXT_MUTED, false);
+        guiGraphics.drawString(font, Component.translatable("rngtech.universal_connector.attach"), ENERGY_ATTACH_X, 48, TEXT_MUTED, false);
         drawCentered(guiGraphics, modeName(), ENERGY_MODE_X, ENERGY_ROW_Y + 5, ENERGY_MODE_WIDTH, 0xFFFFFFFF);
         drawCentered(guiGraphics, Component.literal("-"), ENERGY_CHANNEL_DOWN_X, ENERGY_ROW_Y + 5, SMALL_BUTTON, 0xFFFFFFFF);
         drawCentered(guiGraphics, Component.literal("+"), ENERGY_CHANNEL_UP_X, ENERGY_ROW_Y + 5, SMALL_BUTTON, 0xFFFFFFFF);
@@ -371,11 +371,11 @@ public class UniversalConnectorScreen extends AbstractContainerScreen<UniversalC
     }
 
     private void drawModuleLabels(GuiGraphics guiGraphics) {
-        guiGraphics.drawString(font, Component.translatable(moduleLabelKey()), 16, 48, TEXT_MUTED, false);
-        guiGraphics.drawString(font, Component.translatable("rngtech.cable_connector.mode"), 76, 48, TEXT_MUTED, false);
-        guiGraphics.drawString(font, Component.translatable("rngtech.cable_connector.channel"), 126, 48, TEXT_MUTED, false);
-        guiGraphics.drawString(font, Component.translatable("rngtech.universal_connector.attach"), 199, 48, TEXT_MUTED, false);
-        guiGraphics.drawString(font, Component.translatable("rngtech.universal_connector.filter"), 247, 48, TEXT_MUTED, false);
+        drawSlotLabel(guiGraphics, Component.translatable(moduleLabelKey()));
+        guiGraphics.drawString(font, Component.translatable("rngtech.cable_connector.mode"), ITEM_MODE_X, 48, TEXT_MUTED, false);
+        guiGraphics.drawString(font, Component.translatable("rngtech.cable_connector.channel"), ITEM_CHANNEL_DOWN_X, 48, TEXT_MUTED, false);
+        guiGraphics.drawString(font, Component.translatable("rngtech.universal_connector.attach"), ITEM_ATTACH_X, 48, TEXT_MUTED, false);
+        guiGraphics.drawString(font, Component.translatable("rngtech.universal_connector.filter"), ITEM_FILTER_X, 48, TEXT_MUTED, false);
 
         for (int moduleIndex = 0; moduleIndex < moduleCount(); moduleIndex++) {
             int rowY = ITEM_SLOT_Y + moduleIndex * ITEM_ROW_GAP;
@@ -403,8 +403,8 @@ public class UniversalConnectorScreen extends AbstractContainerScreen<UniversalC
 
     private void drawBridgeLabels(GuiGraphics guiGraphics) {
         NetworkBridgeType bridgeType = menu.bridgeType();
-        guiGraphics.drawString(font, Component.translatable("rngtech.universal_connector.bridge_module"), 16, 48, TEXT_MUTED, false);
-        guiGraphics.drawString(font, Component.translatable("rngtech.cable_connector.channel"), 126, 48, TEXT_MUTED, false);
+        drawSlotLabel(guiGraphics, Component.translatable("rngtech.universal_connector.bridge_module"));
+        guiGraphics.drawString(font, Component.translatable("rngtech.cable_connector.channel"), BRIDGE_CHANNEL_DOWN_X, 48, TEXT_MUTED, false);
         drawCentered(guiGraphics, Component.literal("-"), BRIDGE_CHANNEL_DOWN_X, BRIDGE_ROW_Y + 5, SMALL_BUTTON, 0xFFFFFFFF);
         drawCentered(guiGraphics, Component.literal("+"), BRIDGE_CHANNEL_UP_X, BRIDGE_ROW_Y + 5, SMALL_BUTTON, 0xFFFFFFFF);
         drawCentered(
@@ -635,6 +635,10 @@ public class UniversalConnectorScreen extends AbstractContainerScreen<UniversalC
         guiGraphics.drawString(font, text, x + (width - font.width(text)) / 2, y, color, false);
     }
 
+    private void drawSlotLabel(GuiGraphics guiGraphics, Component text) {
+        guiGraphics.drawString(font, text, ITEM_SLOT_X + 9 - font.width(text) / 2, 48, TEXT_MUTED, false);
+    }
+
     private void drawCenteredClipped(GuiGraphics guiGraphics, Component text, int x, int y, int width, int color) {
         String clipped = font.plainSubstrByWidth(text.getString(), width - 4);
         guiGraphics.drawString(font, clipped, x + (width - font.width(clipped)) / 2, y, color, false);
@@ -728,7 +732,7 @@ public class UniversalConnectorScreen extends AbstractContainerScreen<UniversalC
                 ),
                 NETWORK_ENERGY_ROW_X + 172,
                 NETWORK_ENERGY_ROW_Y + 16,
-                82,
+                71,
                 sumColor(sum)
         );
     }

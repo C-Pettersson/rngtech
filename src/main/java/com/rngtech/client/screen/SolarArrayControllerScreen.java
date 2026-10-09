@@ -37,7 +37,7 @@ public class SolarArrayControllerScreen extends AbstractContainerScreen<SolarArr
     private static final int GENERATION_ICON_X = 142;
     private static final int OUTPUT_ICON_X = 158;
     private static final int PREVIEW_ICON_X = 174;
-    private static final int STATUS_ICON_Y = 28;
+    private static final int STATUS_ICON_Y = 30;
     private static final int ICON_SIZE = 12;
     private static final String[] STAT_LABEL_KEYS = {
             "rngtech.stat.energy_generation",

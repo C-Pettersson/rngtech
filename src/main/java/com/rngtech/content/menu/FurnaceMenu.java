@@ -94,7 +94,8 @@ public class FurnaceMenu extends AbstractContainerMenu implements MasteryMenuVie
     private static final int[] GEAR_X = {92, 116, 140, 164};
     private static final int[] GEAR_Y = {66, 66, 66, 66};
     private static final int FUEL_SLOT_X = 56;
-    private static final int FUEL_SLOT_Y = 66;
+    private static final int FUEL_SLOT_Y = 84;
+    private static final int BATTERY_SLOT_Y = 66;
 
     private final ContainerLevelAccess access;
     private final ContainerData data;
@@ -147,7 +148,7 @@ public class FurnaceMenu extends AbstractContainerMenu implements MasteryMenuVie
                 inventory,
                 FurnaceBlockEntity.SLOT_FUEL,
                 FUEL_SLOT_X,
-                FUEL_SLOT_Y,
+                furnace.isElectric() ? BATTERY_SLOT_Y : FUEL_SLOT_Y,
                 () -> selectedTab == (furnace.isElectric() ? TAB_GEAR : TAB_PROCESSING)
         ));
         for (int lane = 0; lane < MAX_PROCESSING_SLOTS; lane++) {

@@ -30,7 +30,7 @@ public class AmmoniaFuelCellScreen extends AbstractContainerScreen<AmmoniaFuelCe
     private static final int PROGRESS_WIDTH = 66;
     private static final int PROGRESS_HEIGHT = 8;
     private static final int RESIDUE_SLOT_X = 194;
-    private static final int RESIDUE_SLOT_Y = 54;
+    private static final int RESIDUE_SLOT_Y = 60;
     private static final int STATUS_X = 117;
     private static final int STATUS_Y = 60;
     private static final int STATUS_SIZE = 12;
@@ -81,7 +81,7 @@ public class AmmoniaFuelCellScreen extends AbstractContainerScreen<AmmoniaFuelCe
             slot(guiGraphics, 65, 47);
             slot(guiGraphics, 125, 47);
         } else if (menu.selectedTab() == AmmoniaFuelCellMenu.TAB_STATS) {
-            MachineScreenStyle.renderStatPanel(guiGraphics, leftPos, topPos, 8, 18, 224, 5, STAT_ACCENT);
+            MachineScreenStyle.renderStatPanel(guiGraphics, leftPos, topPos, 8, 18, 224, statLines().length, STAT_ACCENT);
         } else {
             slot(guiGraphics, RefinementScreenStyle.TARGET_SLOT_X - 1, RefinementScreenStyle.SLOT_Y - 1);
             slot(guiGraphics, RefinementScreenStyle.CONSUMABLE_SLOT_X - 1, RefinementScreenStyle.SLOT_Y - 1);
@@ -99,8 +99,8 @@ public class AmmoniaFuelCellScreen extends AbstractContainerScreen<AmmoniaFuelCe
             guiGraphics.drawString(font, playerInventoryTitle, inventoryLabelX, inventoryLabelY, TEXT, false);
         }
         if (menu.selectedTab() == AmmoniaFuelCellMenu.TAB_GEAR) {
-            drawGearLabel(guiGraphics, Component.translatable("rngtech.gear.fuel_cell_membrane.short"), 75);
-            drawGearLabel(guiGraphics, Component.translatable("rngtech.gear.battery_cell.short"), 135);
+            drawGearLabel(guiGraphics, Component.translatable("rngtech.gear.fuel_cell_membrane.short"), 74);
+            drawGearLabel(guiGraphics, Component.translatable("rngtech.gear.battery_cell.short"), 134);
         } else if (menu.selectedTab() == AmmoniaFuelCellMenu.TAB_STATS) {
             MachineScreenStyle.drawStatPanelLabels(guiGraphics, font, Component.translatable("rngtech.tab.stats"), statLines(), 8, 18, 224, STAT_ACCENT);
         } else if (menu.selectedTab() == AmmoniaFuelCellMenu.TAB_REFINEMENT) {

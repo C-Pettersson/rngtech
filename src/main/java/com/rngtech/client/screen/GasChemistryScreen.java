@@ -85,12 +85,12 @@ public class GasChemistryScreen extends AbstractContainerScreen<GasChemistryMenu
         }
         if (menu.selectedTab() == GasChemistryMenu.TAB_GEAR) {
             if (menu.machine() != GasChemistryMachine.SYNGAS_COMBUSTOR) {
-                drawGearLabel(guiGraphics, Component.translatable("rngtech.gear.heat_core.short"), 55);
+                drawGearLabel(guiGraphics, Component.translatable("rngtech.gear.heat_core.short"), 54);
             }
-            drawGearLabel(guiGraphics, Component.translatable("rngtech.gear.battery_cell.short"), 91);
-            drawGearLabel(guiGraphics, Component.translatable("rngtech.gear.servo.short"), 127);
+            drawGearLabel(guiGraphics, Component.translatable("rngtech.gear.battery_cell.short"), 90);
+            drawGearLabel(guiGraphics, Component.translatable("rngtech.gear.servo.short"), 126);
             if (menu.machine() == GasChemistryMachine.STEAM_METHANE_REFORMER) {
-                drawGearLabel(guiGraphics, Component.translatable("rngtech.gear.catalyst_bed.short"), 163);
+                drawGearLabel(guiGraphics, Component.translatable("rngtech.gear.catalyst_bed.short"), 162);
             }
         } else if (menu.selectedTab() == GasChemistryMenu.TAB_STATS) {
             MachineScreenStyle.drawStatPanelLabels(guiGraphics, font, Component.translatable("rngtech.tab.stats"), statLines(), 8, 18, 224, STAT_ACCENT);
@@ -142,7 +142,7 @@ public class GasChemistryScreen extends AbstractContainerScreen<GasChemistryMenu
         int progressWidth = menu.machine() == GasChemistryMachine.COAL_GASIFIER ? GASIFIER_PROGRESS_WIDTH : STANDARD_PROGRESS_WIDTH;
         guiGraphics.fill(leftPos + progressX, topPos + 54, leftPos + progressX + progressWidth, topPos + 62, DARK);
         guiGraphics.fill(leftPos + progressX + 1, topPos + 55, leftPos + progressX + 1 + Math.round((progressWidth - 2) * menu.progressFill()), topPos + 61, PROGRESS);
-        statusIcon(guiGraphics, 116, 70);
+        statusIcon(guiGraphics, 110, 66);
         renderPurgeButtons(guiGraphics);
     }
 
@@ -265,7 +265,7 @@ public class GasChemistryScreen extends AbstractContainerScreen<GasChemistryMenu
         int progressX = menu.machine() == GasChemistryMachine.COAL_GASIFIER ? GASIFIER_PROGRESS_X : STANDARD_PROGRESS_X;
         int progressWidth = menu.machine() == GasChemistryMachine.COAL_GASIFIER ? GASIFIER_PROGRESS_WIDTH : STANDARD_PROGRESS_WIDTH;
         CompactValueText.renderTooltipIfHovered(guiGraphics, font, leftPos, topPos, mouseX, mouseY, progressX, 54, progressWidth, 8, progressTooltip());
-        CompactValueText.renderTooltipIfHovered(guiGraphics, font, leftPos, topPos, mouseX, mouseY, 116, 70, 12, 12,
+        CompactValueText.renderTooltipIfHovered(guiGraphics, font, leftPos, topPos, mouseX, mouseY, 110, 66, 12, 12,
                 Component.translatable("rngtech.gas_chemistry.tooltip.status", statusComponent()));
     }
 
