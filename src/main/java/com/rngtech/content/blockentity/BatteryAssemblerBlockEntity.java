@@ -323,7 +323,12 @@ public class BatteryAssemblerBlockEntity extends BaseMachineBlockEntity
                 .status(statusKey(status))
                 .progress(progress, currentProcessingTicks(recipe, stats))
                 .energy(energyStored(), energyCapacity(), -energyDemand)
-                .energyTelemetry(energyFlow.lastInput(), energyFlow.lastOutput(), connector.transferRate(), MachineInfoSnapshot.EnergyBottleneck.NONE)
+                .energyTelemetry(
+                        energyFlow.lastInput(),
+                        energyFlow.lastOutput(),
+                        connector.transferRate(),
+                        AdjacentEnergyConnector.inputBottleneck(connector, energyDemand)
+                )
                 .gear(hasBatteryCell()
                         ? MachineInfoSnapshot.GearSummary.BATTERY_CELL_INSTALLED
                         : MachineInfoSnapshot.GearSummary.MISSING_BATTERY_CELL)
@@ -723,10 +728,6 @@ public class BatteryAssemblerBlockEntity extends BaseMachineBlockEntity
         return consumed;
     }
 
-    private int effectiveMaxEnergyInput() {
-        return Math.max(1, (int) Math.round(effectiveStats().value(MachineStat.ENERGY_TRANSFER)));
-    }
-
     private int effectiveFluidTransfer() {
         return Math.max(1, (int) Math.round(effectiveStats().value(MachineStat.FLUID_TRANSFER)));
     }
@@ -914,7 +915,7 @@ public class BatteryAssemblerBlockEntity extends BaseMachineBlockEntity
                 return 0;
             }
 
-            int remaining = Math.min(toReceive, effectiveMaxEnergyInput());
+            int remaining = toReceive;
             int received = receiveInternalEnergy(remaining, simulate);
             remaining -= received;
 

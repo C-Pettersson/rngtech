@@ -229,10 +229,6 @@ public class SolarPanelBlockEntity extends BaseMachineBlockEntity implements Mac
         return energyCapacity(effectiveStats());
     }
 
-    public int effectiveOutputRate() {
-        return effectiveOutputRate(effectiveStats());
-    }
-
     @Override
     protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.saveAdditional(tag, registries);
@@ -271,11 +267,11 @@ public class SolarPanelBlockEntity extends BaseMachineBlockEntity implements Mac
 
     private boolean exportEnergy(Level level, BlockPos pos) {
         MachineStatAccumulator stats = effectiveStats();
-        if (internalEnergyStored(stats) <= 0 || effectiveOutputRate(stats) <= 0) {
+        if (internalEnergyStored(stats) <= 0) {
             return false;
         }
 
-        int remainingOutput = Math.min(effectiveOutputRate(stats), internalEnergyStored(stats));
+        int remainingOutput = internalEnergyStored(stats);
         boolean exported = false;
         for (Direction direction : Direction.values()) {
             if (remainingOutput <= 0 || internalEnergyStored(stats) <= 0) {
@@ -316,7 +312,7 @@ public class SolarPanelBlockEntity extends BaseMachineBlockEntity implements Mac
         if (toExtract <= 0) {
             return 0;
         }
-        int extracted = Math.min(toExtract, Math.min(effectiveOutputRate(stats), internalEnergyStored(stats)));
+        int extracted = Math.min(toExtract, internalEnergyStored(stats));
         if (!simulate && extracted > 0) {
             internalEnergy = internalEnergyStored(stats) - extracted;
             setChanged();
@@ -330,10 +326,6 @@ public class SolarPanelBlockEntity extends BaseMachineBlockEntity implements Mac
 
     private int internalEnergyStored(MachineStatAccumulator stats) {
         return Mth.clamp(internalEnergy, 0, energyCapacity(stats));
-    }
-
-    private int effectiveOutputRate(MachineStatAccumulator stats) {
-        return Math.max(0, (int) Math.round(stats.value(MachineStat.ENERGY_TRANSFER)));
     }
 
     private void clampInternalEnergy() {
@@ -368,7 +360,7 @@ public class SolarPanelBlockEntity extends BaseMachineBlockEntity implements Mac
 
         @Override
         public boolean canExtract() {
-            return energyStored() > 0 && effectiveOutputRate() > 0;
+            return energyStored() > 0;
         }
 
         @Override

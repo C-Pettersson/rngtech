@@ -18,6 +18,7 @@ import com.rngtech.rpg.MachineStat;
 import com.rngtech.rpg.MachineStatAccumulator;
 import com.rngtech.rpg.MachineTraits;
 import com.rngtech.rpg.MachineType;
+import com.rngtech.util.TickTransferCounter;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -131,6 +132,7 @@ public class VacuumCollapseGeneratorBlockEntity extends BaseMachineBlockEntity i
     private final IItemHandler inputHandler = new InputItemHandler();
     private final IItemHandler residueHandler = new ResidueItemHandler();
     private final IEnergyStorage energyStorage = new GeneratorEnergyStorage();
+    private final TickTransferCounter exportBudget = new TickTransferCounter();
     private final EnergyTelemetry energyFlow = new EnergyTelemetry(this::getLevel);
     private final IEnergyStorage trackedEnergyStorage = energyFlow.track(energyStorage);
     private final ContainerData menuData = new ContainerData() {
@@ -568,12 +570,21 @@ public class VacuumCollapseGeneratorBlockEntity extends BaseMachineBlockEntity i
             return 0;
         }
 
-        int extracted = Math.min(toExtract, Math.min(clampInt(energyStored), effectiveOutputRate(stats)));
+        int extracted = Math.min(toExtract, Math.min(clampInt(energyStored), exportAllowance(stats)));
         if (!simulate && extracted > 0) {
             energyStored -= extracted;
+            recordExport(extracted);
             setChanged();
         }
         return extracted;
+    }
+
+    private int exportAllowance(MachineStatAccumulator stats) {
+        return exportBudget.remaining(level == null ? 0L : level.getGameTime(), effectiveOutputRate(stats));
+    }
+
+    private void recordExport(int amount) {
+        exportBudget.add(level == null ? 0L : level.getGameTime(), amount);
     }
 
     private boolean canMergeResidue(ItemStack residue) {

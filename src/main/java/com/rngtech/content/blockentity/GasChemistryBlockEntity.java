@@ -146,7 +146,7 @@ public class GasChemistryBlockEntity extends BaseMachineBlockEntity
         }
     };
     private final MachineEnergyStorage internalEnergy =
-            new MachineEnergyStorage(this::internalEnergyCapacity, this::effectiveEnergyTransfer, this::effectiveEnergyTransfer, this::setChanged);
+            new MachineEnergyStorage(this::internalEnergyCapacity, () -> Integer.MAX_VALUE, () -> Integer.MAX_VALUE, this::setChanged);
     private final FluidTank waterTank = new FluidTank(TANK_CAPACITY) {
         @Override
         public boolean isFluidValid(FluidStack stack) {
@@ -384,14 +384,25 @@ public class GasChemistryBlockEntity extends BaseMachineBlockEntity
                         energyFlow.lastInput(),
                         energyFlow.lastOutput(),
                         connector.transferRate(),
-                        generator && connector.present() && energyDelta > connector.transferRate()
-                                ? MachineInfoSnapshot.EnergyBottleneck.CONNECTOR_OUTPUT
-                                : MachineInfoSnapshot.EnergyBottleneck.NONE
+                        energyBottleneck(generator, connector, energyDelta)
                 )
                 .gear(gearSummary())
                 .output(outputSummary(status))
                 .refinement(machineTraits())
                 .build();
+    }
+
+    private static MachineInfoSnapshot.EnergyBottleneck energyBottleneck(
+            boolean generator,
+            AdjacentEnergyConnector.Info connector,
+            int energyDelta
+    ) {
+        if (!connector.present() || energyDelta <= connector.transferRate()) {
+            return MachineInfoSnapshot.EnergyBottleneck.NONE;
+        }
+        return generator
+                ? MachineInfoSnapshot.EnergyBottleneck.CONNECTOR_OUTPUT
+                : MachineInfoSnapshot.EnergyBottleneck.CONNECTOR_INPUT;
     }
 
     private static boolean hasEnergyRateStatus(int status, boolean generator) {
@@ -795,7 +806,7 @@ public class GasChemistryBlockEntity extends BaseMachineBlockEntity
     }
 
     private boolean exportEnergy(Level level, BlockPos pos) {
-        int remaining = effectiveEnergyTransfer();
+        int remaining = energyStored();
         boolean moved = false;
         for (Direction direction : Direction.Plane.HORIZONTAL) {
             if (remaining <= 0) {
@@ -860,10 +871,6 @@ public class GasChemistryBlockEntity extends BaseMachineBlockEntity
 
     private int internalEnergyCapacity() {
         return Math.max(1, Mth.floor(effectiveStats().value(MachineStat.ENERGY_CAPACITY)));
-    }
-
-    private int effectiveEnergyTransfer() {
-        return Math.max(1, Mth.floor(effectiveStats().value(MachineStat.ENERGY_TRANSFER)));
     }
 
     private IEnergyStorage batteryCellStorage() {
@@ -1067,7 +1074,7 @@ public class GasChemistryBlockEntity extends BaseMachineBlockEntity
     private final class ConsumerEnergyStorage implements IEnergyStorage {
         @Override
         public int receiveEnergy(int toReceive, boolean simulate) {
-            return internalEnergy.receiveEnergy(toReceive, simulate);
+            return storeEnergy(toReceive, simulate);
         }
 
         @Override
@@ -1092,7 +1099,7 @@ public class GasChemistryBlockEntity extends BaseMachineBlockEntity
 
         @Override
         public boolean canReceive() {
-            return true;
+            return energyStored() < energyCapacity();
         }
     }
 

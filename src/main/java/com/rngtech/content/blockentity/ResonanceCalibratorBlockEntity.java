@@ -372,7 +372,12 @@ public class ResonanceCalibratorBlockEntity extends BaseMachineBlockEntity
                 .status(statusKey(status))
                 .progress(progress, currentProcessingTicks(recipe, stats))
                 .energy(energyStored(), energyCapacity(), -energyDemand)
-                .energyTelemetry(energyFlow.lastInput(), energyFlow.lastOutput(), connector.transferRate(), MachineInfoSnapshot.EnergyBottleneck.NONE)
+                .energyTelemetry(
+                        energyFlow.lastInput(),
+                        energyFlow.lastOutput(),
+                        connector.transferRate(),
+                        AdjacentEnergyConnector.inputBottleneck(connector, energyDemand)
+                )
                 .output(status == STATUS_OUTPUT_FULL
                         ? MachineInfoSnapshot.OutputSummary.OUTPUT_FULL
                         : MachineInfoSnapshot.OutputSummary.NONE)
@@ -1005,10 +1010,6 @@ public class ResonanceCalibratorBlockEntity extends BaseMachineBlockEntity
         return consumed;
     }
 
-    private int effectiveMaxEnergyInput() {
-        return Math.max(1, (int) Math.round(effectiveStats().value(MachineStat.ENERGY_TRANSFER)));
-    }
-
     private boolean hasRequiredGear() {
         return hasResonanceCoil() && hasControlBoard();
     }
@@ -1188,7 +1189,7 @@ public class ResonanceCalibratorBlockEntity extends BaseMachineBlockEntity
             if (!canReceive() || toReceive <= 0) {
                 return 0;
             }
-            int remaining = Math.min(toReceive, effectiveMaxEnergyInput());
+            int remaining = toReceive;
             int received = receiveInternalEnergy(remaining, simulate);
             remaining -= received;
             IEnergyStorage cell = batteryCellEnergyStorage();

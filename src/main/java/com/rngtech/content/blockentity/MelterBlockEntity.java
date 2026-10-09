@@ -401,7 +401,12 @@ public class MelterBlockEntity extends BaseMachineBlockEntity
                 .status(statusKey(status), recipe == null ? 0 : recipe.minimumTemperature())
                 .progress(progress, currentProcessingTicks(recipe, stats))
                 .energy(energyStored(), energyCapacity(), -energyDemand)
-                .energyTelemetry(energyFlow.lastInput(), energyFlow.lastOutput(), connector.transferRate(), MachineInfoSnapshot.EnergyBottleneck.NONE)
+                .energyTelemetry(
+                        energyFlow.lastInput(),
+                        energyFlow.lastOutput(),
+                        connector.transferRate(),
+                        AdjacentEnergyConnector.inputBottleneck(connector, energyDemand)
+                )
                 .processingLevel(
                         processingLevel(stats),
                         recipe == null ? MachineInfoSnapshot.UNSET : recipe.requiredProcessingLevel()
@@ -965,10 +970,6 @@ public class MelterBlockEntity extends BaseMachineBlockEntity
         return consumed;
     }
 
-    private int effectiveMaxEnergyInput() {
-        return Math.max(1, (int) Math.round(effectiveStats().value(MachineStat.ENERGY_TRANSFER)));
-    }
-
     private void drainInputContainer() {
         ItemStack stack = processInventory.getStackInSlot(SLOT_FLUID_INPUT_CONTAINER);
         if (stack.isEmpty()) {
@@ -1195,7 +1196,7 @@ public class MelterBlockEntity extends BaseMachineBlockEntity
                 return 0;
             }
 
-            int remaining = Math.min(toReceive, effectiveMaxEnergyInput());
+            int remaining = toReceive;
             int received = receiveInternalEnergy(remaining, simulate);
             remaining -= received;
 

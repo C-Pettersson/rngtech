@@ -29,6 +29,7 @@ import com.rngtech.rpg.MachineTraits;
 import com.rngtech.rpg.MachineType;
 import com.rngtech.rpg.ModifierOperation;
 import com.rngtech.rpg.ModifierSlot;
+import com.rngtech.util.TickTransferCounter;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -203,6 +204,7 @@ public class CavitationGeneratorBlockEntity extends BaseMachineBlockEntity
     private final IItemHandler containerInputHandler = new ProcessItemHandler(SLOT_FLUID_INPUT_CONTAINER, SLOT_FLUID_INPUT_CONTAINER, true, false);
     private final IItemHandler damagedRotorHandler = new ProcessItemHandler(SLOT_DAMAGED_ROTOR, SLOT_DAMAGED_ROTOR, false, true);
     private final IEnergyStorage energyStorage = new GeneratorEnergyStorage();
+    private final TickTransferCounter exportBudget = new TickTransferCounter();
     private final EnergyTelemetry energyFlow = new EnergyTelemetry(this::getLevel);
     private final IEnergyStorage trackedEnergyStorage = energyFlow.track(energyStorage);
     private final IFluidHandler fluidHandler = new InputFluidHandler();
@@ -898,6 +900,7 @@ public class CavitationGeneratorBlockEntity extends BaseMachineBlockEntity
     }
 
     private int extractEnergyInternal(int toExtract, boolean simulate) {
+        toExtract = Math.min(toExtract, exportAllowance(effectiveStats()));
         if (toExtract <= 0) {
             return 0;
         }
@@ -915,7 +918,18 @@ public class CavitationGeneratorBlockEntity extends BaseMachineBlockEntity
                 setChanged();
             }
         }
+        if (!simulate) {
+            recordExport(extracted);
+        }
         return extracted;
+    }
+
+    private int exportAllowance(MachineStatAccumulator stats) {
+        return exportBudget.remaining(level == null ? 0L : level.getGameTime(), effectiveOutputRate(stats));
+    }
+
+    private void recordExport(int amount) {
+        exportBudget.add(level == null ? 0L : level.getGameTime(), amount);
     }
 
     private int energyStored() {
@@ -1157,7 +1171,7 @@ public class CavitationGeneratorBlockEntity extends BaseMachineBlockEntity
 
         @Override
         public int extractEnergy(int toExtract, boolean simulate) {
-            return extractEnergyInternal(Math.min(toExtract, effectiveOutputRate(effectiveStats())), simulate);
+            return extractEnergyInternal(toExtract, simulate);
         }
 
         @Override

@@ -81,6 +81,10 @@ public class CableConnectorMenu extends AbstractContainerMenu {
         return data.get(CableBlockEntity.dataTransferRateIndex());
     }
 
+    public boolean targetHasEnergyAccess() {
+        return data.get(CableBlockEntity.dataEnergyTargetAccessIndex()) != 0;
+    }
+
     @Override
     public boolean clickMenuButton(Player player, int id) {
         if (player.level().isClientSide) {

@@ -155,7 +155,7 @@ public class BioGeneratorBlockEntity extends BaseMachineBlockEntity implements M
                 case DATA_ENERGY -> energyStored();
                 case DATA_ENERGY_CAPACITY -> energyCapacity(stats);
                 case DATA_ENERGY_PER_TICK -> currentEnergyPerTick();
-                case DATA_MAX_OUTPUT -> effectiveOutputRate(stats);
+                case DATA_MAX_OUTPUT -> energyFlow.lastOutput();
                 case DATA_RECIPE_ENERGY -> currentRecipeEnergy(stats);
                 case DATA_STATUS -> statusCode(stats);
                 case DATA_ENERGY_GENERATION -> (int) Math.round(stats.effectiveEnergyGenerationMultiplier() * STAT_SCALE);
@@ -244,7 +244,12 @@ public class BioGeneratorBlockEntity extends BaseMachineBlockEntity implements M
                 )
                 .status(statusKey(status))
                 .energy(energyStored(), energyCapacity(stats), currentEnergyPerTick())
-                .energyTelemetry(energyFlow.lastInput(), energyFlow.lastOutput(), connector.transferRate(), MachineInfoSnapshot.EnergyBottleneck.NONE)
+                .energyTelemetry(
+                        energyFlow.lastInput(),
+                        energyFlow.lastOutput(),
+                        connector.transferRate(),
+                        AdjacentEnergyConnector.outputBottleneck(connector, currentEnergyPerTick())
+                )
                 .fuel(burnTime, totalBurnTime)
                 .output(status == STATUS_ENERGY_FULL
                         ? MachineInfoSnapshot.OutputSummary.ENERGY_FULL
@@ -552,11 +557,11 @@ public class BioGeneratorBlockEntity extends BaseMachineBlockEntity implements M
 
     private boolean exportEnergy(Level level, BlockPos pos) {
         MachineStatAccumulator stats = effectiveStats();
-        if (energyStored() <= 0 || effectiveOutputRate(stats) <= 0) {
+        if (energyStored() <= 0) {
             return false;
         }
 
-        int remainingOutput = Math.min(effectiveOutputRate(stats), energyStored());
+        int remainingOutput = energyStored();
         boolean exported = false;
         for (Direction direction : Direction.Plane.HORIZONTAL) {
             if (remainingOutput <= 0 || energyStored() <= 0) {
@@ -599,7 +604,7 @@ public class BioGeneratorBlockEntity extends BaseMachineBlockEntity implements M
             return 0;
         }
 
-        int remaining = Math.min(toExtract, effectiveOutputRate(stats));
+        int remaining = toExtract;
         int extracted = Math.min(internalEnergyStored(stats), remaining);
         if (!simulate && extracted > 0) {
             internalEnergy = internalEnergyStored(stats) - extracted;
@@ -681,10 +686,6 @@ public class BioGeneratorBlockEntity extends BaseMachineBlockEntity implements M
 
     private int internalEnergyStored(MachineStatAccumulator stats) {
         return Mth.clamp(internalEnergy, 0, internalEnergyCapacity(stats));
-    }
-
-    private int effectiveOutputRate(MachineStatAccumulator stats) {
-        return Math.max(0, (int) Math.round(stats.value(MachineStat.ENERGY_TRANSFER)));
     }
 
     private IEnergyStorage batteryCellEnergyStorage() {
@@ -811,7 +812,7 @@ public class BioGeneratorBlockEntity extends BaseMachineBlockEntity implements M
 
         @Override
         public boolean canExtract() {
-            return energyStored() > 0 && effectiveOutputRate(effectiveStats()) > 0;
+            return energyStored() > 0;
         }
 
         @Override

@@ -138,6 +138,8 @@ public class PotentialReactorBlockEntity extends BaseMachineBlockEntity implemen
     private final IItemHandler inputHandler = new InputItemHandler();
     private final IItemHandler residueHandler = new ResidueItemHandler();
     private final IEnergyStorage energyStorage = new ReactorEnergyStorage();
+    private final EnergyTelemetry energyFlow = new EnergyTelemetry(this::getLevel);
+    private final IEnergyStorage trackedEnergyStorage = energyFlow.track(energyStorage);
     private final ContainerData menuData = new ContainerData() {
         @Override
         public int get(int index) {
@@ -148,7 +150,7 @@ public class PotentialReactorBlockEntity extends BaseMachineBlockEntity implemen
                 case DATA_ENERGY -> energyStored();
                 case DATA_ENERGY_CAPACITY -> energyCapacity(stats);
                 case DATA_ENERGY_PER_TICK -> currentEnergyPerTick(stats);
-                case DATA_MAX_OUTPUT -> effectiveOutputRate(stats);
+                case DATA_MAX_OUTPUT -> energyFlow.lastOutput();
                 case DATA_RECIPE_ENERGY -> currentRecipeEnergy(stats);
                 case DATA_PROCESSING_LEVEL -> stats.intValue(MachineStat.PROCESSING_LEVEL);
                 case DATA_STATUS -> statusCode(stats);
@@ -232,11 +234,19 @@ public class PotentialReactorBlockEntity extends BaseMachineBlockEntity implemen
     public MachineInfoSnapshot machineInfo() {
         MachineStatAccumulator stats = effectiveStats();
         int status = statusCode(stats);
+        AdjacentEnergyConnector.Info connector = AdjacentEnergyConnector.forSource(level, worldPosition);
+        int generation = currentEnergyPerTick(stats);
         return MachineInfoSnapshot.builder("potential_reactor")
                 .stage(refinementComponentStage())
                 .state(machineInfoState(status), reactorBlockedReason(status))
                 .progress(progress, currentProcessingTicks(stats))
-                .energy(energyStored(), energyCapacity(stats), currentEnergyPerTick(stats))
+                .energy(energyStored(), energyCapacity(stats), generation)
+                .energyTelemetry(
+                        energyFlow.lastInput(),
+                        energyFlow.lastOutput(),
+                        connector.transferRate(),
+                        AdjacentEnergyConnector.outputBottleneck(connector, generation)
+                )
                 .processingLevel(stats.intValue(MachineStat.PROCESSING_LEVEL), currentRequiredProcessingLevel())
                 .gear(status == STATUS_MISSING_CHAMBER
                         ? MachineInfoSnapshot.GearSummary.MISSING_REACTOR_CHAMBER
@@ -247,7 +257,7 @@ public class PotentialReactorBlockEntity extends BaseMachineBlockEntity implemen
     }
 
     public IEnergyStorage getEnergyStorage(Direction side) {
-        return side == Direction.UP || side == Direction.DOWN ? null : energyStorage;
+        return side == Direction.UP || side == Direction.DOWN ? null : trackedEnergyStorage;
     }
 
     @Override
@@ -539,7 +549,7 @@ public class PotentialReactorBlockEntity extends BaseMachineBlockEntity implemen
         }
 
         MachineStatAccumulator stats = effectiveStats();
-        int remainingOutput = Math.min(effectiveOutputRate(stats), energyStored());
+        int remainingOutput = energyStored();
         boolean exported = false;
         for (Direction direction : Direction.Plane.HORIZONTAL) {
             if (remainingOutput <= 0 || energyStored() <= 0) {
@@ -558,6 +568,7 @@ public class PotentialReactorBlockEntity extends BaseMachineBlockEntity implemen
             int offered = extractEnergyInternal(remainingOutput, stats, true);
             int received = target.receiveEnergy(offered, false);
             int delivered = extractEnergyInternal(received, stats, false);
+            energyFlow.recordOutput(delivered);
             remainingOutput -= delivered;
             exported |= delivered > 0;
         }
@@ -582,7 +593,7 @@ public class PotentialReactorBlockEntity extends BaseMachineBlockEntity implemen
             return 0;
         }
 
-        int extracted = Math.min(toExtract, Math.min(energyStored(), effectiveOutputRate(stats)));
+        int extracted = Math.min(toExtract, energyStored());
         if (!simulate && extracted > 0) {
             internalEnergy = energyStored() - extracted;
             setChanged();
@@ -767,10 +778,6 @@ public class PotentialReactorBlockEntity extends BaseMachineBlockEntity implemen
         return Math.max(1, (int) Math.round(stats.value(MachineStat.ENERGY_CAPACITY)));
     }
 
-    private int effectiveOutputRate(MachineStatAccumulator stats) {
-        return Math.max(0, (int) Math.round(stats.value(MachineStat.ENERGY_TRANSFER)));
-    }
-
     private void clampInternalEnergy() {
         internalEnergy = Math.min(energyStored(), energyCapacity(effectiveStats()));
     }
@@ -906,7 +913,7 @@ public class PotentialReactorBlockEntity extends BaseMachineBlockEntity implemen
 
         @Override
         public boolean canExtract() {
-            return energyStored() > 0 && effectiveOutputRate(effectiveStats()) > 0;
+            return energyStored() > 0;
         }
 
         @Override

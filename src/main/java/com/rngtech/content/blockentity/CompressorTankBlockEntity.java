@@ -324,7 +324,12 @@ public class CompressorTankBlockEntity extends BaseMachineBlockEntity
                 )
                 .status(statusKey(status))
                 .energy(energyStored(), energyCapacity(), -energyDemand)
-                .energyTelemetry(energyFlow.lastInput(), energyFlow.lastOutput(), connector.transferRate(), MachineInfoSnapshot.EnergyBottleneck.NONE)
+                .energyTelemetry(
+                        energyFlow.lastInput(),
+                        energyFlow.lastOutput(),
+                        connector.transferRate(),
+                        AdjacentEnergyConnector.inputBottleneck(connector, energyDemand)
+                )
                 .gear(gearSummary())
                 .output(status == STATUS_COMPRESSED_FULL
                         ? MachineInfoSnapshot.OutputSummary.OUTPUT_FULL
@@ -812,13 +817,6 @@ public class CompressorTankBlockEntity extends BaseMachineBlockEntity
         return consumed;
     }
 
-    private int effectiveMaxEnergyInput() {
-        if (!supportsCompression()) {
-            return 0;
-        }
-        return Math.max(0, (int) Math.round(effectiveStats().value(MachineStat.ENERGY_TRANSFER)));
-    }
-
     private ItemStack batteryCellStack() {
         return gearInventory.getStackInSlot(SLOT_BATTERY_CELL);
     }
@@ -975,7 +973,7 @@ public class CompressorTankBlockEntity extends BaseMachineBlockEntity
                 return 0;
             }
 
-            int remaining = Math.min(toReceive, effectiveMaxEnergyInput());
+            int remaining = toReceive;
             int received = receiveInternalEnergy(remaining, simulate);
             remaining -= received;
 
@@ -1012,7 +1010,7 @@ public class CompressorTankBlockEntity extends BaseMachineBlockEntity
 
         @Override
         public boolean canReceive() {
-            if (effectiveMaxEnergyInput() <= 0) {
+            if (!supportsCompression()) {
                 return false;
             }
             if (internalEnergyStored() < internalEnergyCapacity()) {
