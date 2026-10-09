@@ -211,5 +211,5 @@ When a tag may not exist, the recipe should have a vanilla fallback, a datapack 
 - [Material Catalog Coverage](material-catalog-coverage.md)
 - [Component Stages](component-stages.md)
 - [Crafting and Upgrades](../systems/crafting.md)
-- [Battery Chassis](../content/battery-chassis.md)
-- [Battery Cells](../content/battery-cells.md)
+- [Battery Chassis](https://c-pettersson.github.io/rngtech/battery-chassis/)
+- [Battery Cells](https://c-pettersson.github.io/rngtech/battery-cells/)

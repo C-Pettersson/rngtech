@@ -12,7 +12,7 @@ These named affix definitions have `CAN_ROLL` and can be selected by normal roll
 | Battery Cell energy capacity | Prefix | `ADD ENERGY_CAPACITY_FLAT` | Uses the larger Battery Cell flat capacity range. |
 | Battery Chassis increased capacity | Prefix | `INCREASED_PERCENT ENERGY_CAPACITY` | Scales installed-cell capacity while cells remain in the chassis. |
 | Battery Chassis Charged Storage | Prefix | `MORE ENERGY_CAPACITY` | Untiered `100% more` installed-cell capacity after the placed chassis has held energy for `10` continuous minutes. |
-| [Battery Chassis Balance Mode](balance-mode.md) | Prefix | Behavioral `CHARGE_BALANCER` | Fills and drains installed Battery Cells evenly. Single-tier prefix. |
+| [Battery Chassis Balance Mode](https://c-pettersson.github.io/rngtech/rarity-and-affixes/#balance-mode) | Prefix | Behavioral `CHARGE_BALANCER` | Fills and drains installed Battery Cells evenly. Single-tier prefix. |
 | Battery Chassis Additional Battery Slots | Prefix | `ADD BATTERY_SLOTS` | Adds active Battery Cell slots using the Battery Chassis slot tier table. |
 | Durability | Prefix | `ADD DURABILITY` or `INCREASED_PERCENT DURABILITY` | Tool Heads, Tool Rods, and Cavitation Rotors can roll either flat or percent durability prefixes. |
 | Tool Self Repair | Prefix | `ADD SELF_REPAIR` | Tool Heads and Tool Rods can roll passive repair. Assembled tools restore durability every `7.5` seconds while idle in the hotbar or offhand; active mining or tool-use pauses it. |
@@ -38,8 +38,8 @@ These behavior definitions can be selected by normal machine rolls and Debug Rer
 
 | Modifier | Status | Notes |
 |---|---|---|
-| [Balance Mode](balance-mode.md) | Implemented | Battery Chassis prefix that enables `CHARGE_BALANCER`; fills and drains installed cells evenly. |
-| [Bulk Speed](bulk-speed.md) | Implemented | Ramps processing speed by `1%` per completed process, up to `100%`; higher speed raises powered machines' FE/t. It uses the `processing_speed` modifier group, so it cannot coexist with generic speed, processing-specific speed, or Overclocked. |
+| [Balance Mode](https://c-pettersson.github.io/rngtech/rarity-and-affixes/#balance-mode) | Implemented | Battery Chassis prefix that enables `CHARGE_BALANCER`; fills and drains installed cells evenly. |
+| [Bulk Speed](https://c-pettersson.github.io/rngtech/rarity-and-affixes/#bulk-speed) | Implemented | Ramps processing speed by `1%` per completed process, up to `100%`; higher speed raises powered machines' FE/t. It uses the `processing_speed` modifier group, so it cannot coexist with generic speed, processing-specific speed, or Overclocked. |
 
 ## Fixed Authored Implicit Modifiers
 
@@ -65,13 +65,13 @@ Named behavioral modifiers are documented as pages once they become concrete des
 | Modifier | Status | Page |
 |---|---|---|
 | Auto Balance | Planned | [Auto Balance](auto-balance.md) |
-| Balance Mode | Implemented | [Balance Mode](balance-mode.md) |
+| Balance Mode | Implemented | [Balance Mode](https://c-pettersson.github.io/rngtech/rarity-and-affixes/#balance-mode) |
 | Auto Eject | Planned | Eligibility matrix only |
 | Batch Start | Planned | Eligibility matrix only |
-| Bulk Speed | Implemented | [Bulk Speed](bulk-speed.md) |
+| Bulk Speed | Implemented | [Bulk Speed](https://c-pettersson.github.io/rngtech/rarity-and-affixes/#bulk-speed) |
 | Catalyst Saver | Deferred | Eligibility matrix only |
 | Energy category modifiers | Prototype | See code-backed stat modifiers above |
-| Fuel Governor | Prototype fixed behavior; rolled named modifier planned | [Fuel Governor](fuel-governor.md) |
+| Fuel Governor | Prototype fixed behavior; rolled named modifier planned | [Fuel Governor](https://c-pettersson.github.io/rngtech/rarity-and-affixes/#fuel-governor) |
 | Fuel Reserve | Planned | Eligibility matrix only |
 | Graceful Progress | Planned | Eligibility matrix only |
 | Input Filter | Planned | Eligibility matrix only |

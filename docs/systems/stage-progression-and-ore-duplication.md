@@ -2,20 +2,22 @@
 
 Status: Prototype
 
-This page includes planned progression targets; sections describing future stages are not registered gameplay.
+Player guide: [Stages](https://c-pettersson.github.io/rngtech/stages/)
 
-This page is a schema for how [Component Stages](../reference/component-stages.md), [Crafting and Upgrades](crafting.md), and the [Crusher](../content/crusher.md) connect. It does not replace those canonical rule pages.
+The component upgrade loop below is planned and not registered gameplay; the stage ladder and Crusher duplication path are implemented.
+
+This page is a schema for how [Component Stages](../reference/component-stages.md), [Crafting and Upgrades](crafting.md), and the [Crusher](https://c-pettersson.github.io/rngtech/crusher/) connect. It does not replace those canonical rule pages.
 
 ## Progression Schema
 
 ```mermaid
 flowchart TD
-    subgraph stages["Component stage ladder (planned)"]
+    subgraph stages["Component stage ladder (implemented)"]
         S0["0 Primitive Stage\nNo ore or ingot family\nNatural tier target 1"]
-        S1["1 Iron Stage\nFirst mechanical components\nNatural tier target 1"]
-        S2["2 Copper Stage\nFirst energy and heat transfer\nNatural tier target 1"]
-        S3["3 Bronze Stage\nFirst alloy pressure\nNatural tier target 2"]
-        S4["4 Steel Stage\nStable midgame machines\nNatural tier target 2"]
+        S1["1 Iron Stage\nFirst mechanical components\nNatural tier target 2"]
+        S2["2 Copper Stage\nFirst energy and heat transfer\nNatural tier target 2"]
+        S3["3 Bronze Stage\nFirst alloy pressure\nNatural tier target 3"]
+        S4["4 Steel Stage\nStable midgame machines\nNatural tier target 3"]
         S5["5 Aluminum Stage\nBetter control and transfer\nNatural tier target 3"]
         S6["6 Titanium Stage\nHigh heat and throughput\nNatural tier target 3"]
         S7["7 Tungstensteel Stage\nLate-game material pressure\nNatural tier target 4"]
@@ -127,21 +129,18 @@ flowchart TD
 
 ## Read This As
 
-- Component stages are planned material bands. They set base stat expectations, Refinement Potential expectations, and natural modifier tier weighting.
-- The current implemented crusher duplication path is recipe based: raw materials produce `2` crushed items, while Silk-Touched ore blocks produce `3` crushed items.
-- RNGTech-owned natural source ores are real blocks for Tin, Zinc, Nickel, Lead, Silver, Aluminum, Osmium, Titanium, Tungsten, Platinum, and Naquadah. Alloy families do not have RNGTech ore or raw forms. Source-ore hardness hard-gates world harvesting with Modular Picks and Hammers; Crusher `required_processing_level` remains separate machine recipe pressure.
-- The Crusher requires a valid installed Crush Head before it can process any recipe. That head provides `PROCESSING_LEVEL`; if it is below the recipe's `required_processing_level`, the recipe still runs with extra processing time, extra total FE cost, bonus/proc suppression, and jam risk.
-- `OUTPUT_AMOUNT` multiplies the recipe's base count. Fractional results fill the crusher output-bonus bank and produce one extra crushed item when the bank reaches a full item. Under-level Crusher recipes suppress positive `OUTPUT_AMOUNT` above base output.
-- `SUPER_OUTPUT_CHANCE` is a separate chance outcome. It can add one extra copy of the base stackable recipe output, but it does not multiply or drain the deterministic `OUTPUT_AMOUNT` bonus bank. Under-level Crusher recipes do not roll Super Output, Instant Process, or Crusher Salvage.
+- Component stages set base stat expectations, Refinement Potential expectations, and natural modifier tier weighting.
+- Crusher duplication is recipe based: raw materials produce `2` crushed items and Silk-Touched ore blocks produce `3`. Alloy families have no RNGTech ore or raw forms.
+- Source-ore hardness hard-gates world harvesting with Modular Picks and Hammers. Crusher `required_processing_level` is separate machine recipe pressure: an under-level Crush Head still runs the recipe with extra time, extra total FE, jam risk, and no bonus output. Under-level recipes suppress positive `OUTPUT_AMOUNT` above base and do not roll Super Output, Instant Process, or Crusher Salvage.
+- `OUTPUT_AMOUNT` multiplies the recipe's base count, and fractional results fill the output-bonus bank. `SUPER_OUTPUT_CHANCE` adds one extra base output copy without multiplying or draining that bank.
 - A Crusher without an installed Battery Cell applies a production penalty to `OUTPUT_AMOUNT`; the tiny internal buffer is an emergency working buffer, not the normal production path.
-- `PROCESSING_SPEED` affects throughput without lowering the recipe's base FE cost. `ENERGY_USAGE` affects FE cost, not the recipe's base duplication ratio.
-- Crushed items are intermediate outputs. Non-alloy crushed materials can be smelted directly in the `rngtech:furnace` at `600` ticks and `7,200 FE` for Stage 1-4 materials, with Stage 5-8 recipes using authored `2.0x`, `3.0x`, `4.0x`, and `6.0x` FE ramps before runtime high-heat rules.
-- Non-alloy crushed materials can also run through the Crusher again to become dust. That Crusher-to-Crusher-to-Furnace chain is faster and cheaper overall at `260` ticks and `6,000 FE` for Stage 1-4 materials, with the same Stage 5-8 authored FE ramps before runtime high-heat rules, while requiring the player to spend on a second processing step.
-- RNGTech currently defines manual crushed-to-dust recipes for iron, copper, tin, and gold, Crusher crushed-to-dust recipes for non-alloy crushed materials, source-ore Crusher recipes, and `rngtech:furnace` dust-to-ingot recipes for non-alloy staged material families. Alloy dusts are not part of the default public progression. Bronze has an early blend chain from three Copper Dust, one Tin Dust, and Coal Dust into two Bronze Blend, which then smelts into Bronze Ingots. The Bronze Alloy Furnace can make three Bronze Blend from the same dust ratio plus Charcoal at `900` heat, while the later direct-ingot Bronze recipe makes four Bronze Ingots from the `3:1` Copper/Tin ingot ratio plus Charcoal at `1100` heat.
+- `PROCESSING_SPEED` affects throughput without lowering the recipe's base FE cost. `ENERGY_USAGE` affects FE cost, not the base duplication ratio.
+- Balance anchors for Stage 1-4 materials: smelting crushed material directly costs `600` ticks and `7,200 FE`; the Crusher-to-Crusher-to-Furnace dust chain costs `260` ticks and `6,000 FE`, trading a second processing step for lower cost. Stage 5-8 recipes use authored `2.0x`, `3.0x`, `4.0x`, and `6.0x` FE ramps before runtime high-heat rules.
+- Default data defines manual crushed-to-dust recipes for iron, copper, tin, and gold, Crusher crushed-to-dust recipes for non-alloy crushed materials, source-ore Crusher recipes, and `rngtech:furnace` dust-to-ingot recipes for non-alloy staged materials. Alloy dusts are not part of the default public progression. Bronze has an early blend chain: three Copper Dust, one Tin Dust, and Coal Dust make two Bronze Blend; the Bronze Alloy Furnace makes three Bronze Blend from the same dust ratio plus Charcoal at `900` heat, and the direct-ingot recipe makes four Bronze Ingots from `3:1` Copper/Tin ingots plus Charcoal at `1100` heat.
 
 ## Related
 
 - [Component Stages](../reference/component-stages.md)
 - [Crafting and Upgrades](crafting.md)
-- [Crusher](../content/crusher.md)
+- [Crusher](https://c-pettersson.github.io/rngtech/crusher/)
 - [Machine Stats](../reference/machine-stats.md)

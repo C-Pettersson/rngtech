@@ -85,3 +85,4 @@ tools/moddex/generated/ascendancies.json
 .venv/
 venv/
 public-release/
+site-wiki/

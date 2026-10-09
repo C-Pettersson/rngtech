@@ -92,8 +92,8 @@ Before moving an idea into the Unique catalog, define:
 
 - [Unique Items PRD](../prds/uniques.md)
 - [Corruption PRD](../prds/corruption.md)
-- [Rarity](rarity.md)
+- [Rarity](https://c-pettersson.github.io/rngtech/rarity-and-affixes/)
 - [Modifier Eligibility](modifier-eligibility.md)
-- [Machine Parts](../content/machine-parts.md)
-- [Battery Cells](../content/battery-cells.md)
+- [Machine Parts](https://c-pettersson.github.io/rngtech/gear/)
+- [Battery Cells](https://c-pettersson.github.io/rngtech/battery-cells/)
 - [Crafting and Upgrades](../systems/crafting.md#unique-components)

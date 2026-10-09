@@ -14,15 +14,15 @@ const OUTPUT_PATH = path.join(__dirname, "generated", "ascendancies.json");
 const BLOCK_START = "<!-- ascendancy-trees:start -->";
 const BLOCK_END = "<!-- ascendancy-trees:end -->";
 
-/** Mastery families in display order, with the page that documents each family's ascendancies. */
+/** Mastery families in display order, with the player wiki page that carries each family's ascendancy trees. */
 export const FAMILIES = [
-    { id: "crusher", label: "Crusher", page: "docs/content/crusher.md" },
-    { id: "furnace", label: "Furnace", page: "docs/content/furnace.md" },
-    { id: "alloy_furnace", label: "Alloy Furnace", page: "docs/content/alloy-furnace.md" },
-    { id: "metal_press", label: "Metal Press", page: "docs/content/metal-press.md" },
-    { id: "resonance_calibrator", label: "Resonance Calibrator", page: "docs/content/resonance-calibrator.md" },
-    { id: "melter", label: "Melter", page: "docs/content/melter.md" },
-    { id: "forestry", label: "Forestry Companion", page: "docs/content/tree-farm-automation.md" }
+    { id: "crusher", label: "Crusher", page: "wiki/crusher.md" },
+    { id: "furnace", label: "Furnace", page: "wiki/furnace.md" },
+    { id: "alloy_furnace", label: "Alloy Furnace", page: "wiki/alloy-furnace.md" },
+    { id: "metal_press", label: "Metal Press", page: "wiki/metal-press.md" },
+    { id: "resonance_calibrator", label: "Resonance Calibrator", page: "wiki/resonance-calibrator.md" },
+    { id: "melter", label: "Melter", page: "wiki/melter.md" },
+    { id: "forestry", label: "Forestry Companion", page: "wiki/forestry-cart-station.md" }
 ];
 
 /** Stats whose added values are percentage points; others carry the unit shown here. */

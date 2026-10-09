@@ -29,11 +29,11 @@ Ascendancy nodes may add yield, but no ascendancy, alone or combined with other 
 - [Machine Stats](../reference/machine-stats.md)
 - [Component Stages](../reference/component-stages.md)
 - [Stage Progression and Ore Duplication](../systems/stage-progression-and-ore-duplication.md)
-- [Resonance Calibrator](../content/resonance-calibrator.md)
-- [Potential Reactor](../content/potential-reactor.md)
-- [Component Recycler](../content/component-recycler.md)
-- [Modular Field Tools](../content/modular-field-tools.md)
-- [Crusher](../content/crusher.md), [Furnace](../content/furnace.md), [Alloy Furnace](../content/alloy-furnace.md), [Metal Press](../content/metal-press.md), [Melter](../content/melter.md), [Tree Farm Automation](../content/tree-farm-automation.md)
+- [Resonance Calibrator](https://c-pettersson.github.io/rngtech/resonance-calibrator/)
+- [Potential Reactor](https://c-pettersson.github.io/rngtech/potential-reactor/)
+- [Component Recycler](https://c-pettersson.github.io/rngtech/component-recycler/)
+- [Modular Field Tools](https://c-pettersson.github.io/rngtech/tool-bench/)
+- [Crusher](https://c-pettersson.github.io/rngtech/crusher/), [Furnace](https://c-pettersson.github.io/rngtech/furnace/), [Alloy Furnace](https://c-pettersson.github.io/rngtech/alloy-furnace/), [Metal Press](https://c-pettersson.github.io/rngtech/metal-press/), [Melter](https://c-pettersson.github.io/rngtech/melter/), [Tree Farm Automation](https://c-pettersson.github.io/rngtech/forestry-cart-station/)
 
 Key existing code:
 

@@ -2,6 +2,8 @@
 
 Status: Prototype
 
+Player guide: [Stages](https://c-pettersson.github.io/rngtech/stages/)
+
 Component stages define the material progression for machine components. A stage uses ore and ingot families, such as Iron Stage, Copper Stage, and Steel Stage. Modifier tiers remain separate and only describe affix quality.
 
 RNGTech targets a medium-large modpack progression curve. The first release should support more stages than a simple vanilla tech mod, but it should not require GTNH-scale material depth.
@@ -20,7 +22,7 @@ Use stage for material progression. Use tier for modifier quality. Use rating wh
 
 - Component stage controls natural modifier tier weighting and Refinement Potential expectations, but ordinary affix tiers are not hard-capped by stage.
 - Upgrading a component can raise its component stage.
-- Upgrading a component does not grant new [Refinement Potential](../systems/progression.md#refinement-potential).
+- Upgrading a component does not grant new [Refinement Potential](https://c-pettersson.github.io/rngtech/rarity-and-affixes/#refinement-potential).
 - Breakthrough upgrades can raise a component one stage above the recipe target or raise a family rating.
 - Pack makers can disable stages, remap stages, or add higher stages through datapacks and configs.
 - Stages 0-3 teach processing through gating, pausing, speed penalties, or low output. They should not normally consume inputs into processing failures.
@@ -48,15 +50,15 @@ The advanced material checklist and recipe-form vocabulary live in [Materials Li
 
 ## Survival Stage List
 
-RNGTech starts with one primitive stage, seven core survival component stages, and one optional extension stage. Stage 8 Exotic is the top current code-backed scope; higher endgame ideas are outside this cut unless a future design reintroduces them as new content.
+RNGTech starts with one primitive stage, seven core survival component stages, and one optional extension stage. Stage 8 Exotic is the top current code-backed scope; higher endgame ideas are outside this cut unless a future design reintroduces them as new content. Natural tier targets follow `MachineTraitRoller.naturalMaxTier`; [Affix Generation](../systems/affix-generation.md) owns the weighting rules.
 
 | Stage | Name | Ore or Ingot Families | Natural Tier Target | Role |
 |---:|---|---|---:|---|
 | 0 | Primitive Stage | No ore or ingot stage | 1 if rollable | Manual or tutorial crafting. No serious component investment. Includes wooden machine bodies and flint crusher tooling. |
-| 1 | Iron Stage | Iron | 1 | First mechanical components, crude energy transfer, and early machine or battery chassis. |
-| 2 | Copper Stage | Copper | 1 | Stronger energy transfer, heat transfer, coils, and battery cells. |
-| 3 | Bronze Stage | Bronze, tin, zinc, gold | 2 | First alloy pressure and stronger early components. |
-| 4 | Steel Stage | Steel, invar, nickel, lead, silver | 2 | Stable midgame machines, heat processing, and the first recoverable processing failures. |
+| 1 | Iron Stage | Iron | 2 | First mechanical components, crude energy transfer, and early machine or battery chassis. |
+| 2 | Copper Stage | Copper | 2 | Stronger energy transfer, heat transfer, coils, and battery cells. |
+| 3 | Bronze Stage | Bronze, tin, zinc, gold | 3 | First alloy pressure and stronger early components. |
+| 4 | Steel Stage | Steel, invar, nickel, lead, silver | 3 | Stable midgame machines, heat processing, and the first recoverable processing failures. |
 | 5 | Aluminum Stage | Aluminum, sparksteel, osmium | 3 | Better control, higher transfer, cleaner recipes, and stronger failure mitigation. |
 | 6 | Titanium Stage | Titanium, arclite | 3 | High heat, high throughput, and pack bridge stage. |
 | 7 | Tungstensteel Stage | Tungstensteel, nullite, aethergold, platinum | 4 | Late-game material pressure and strong affix ceilings. |
@@ -113,7 +115,7 @@ These anchors should be rechecked when changing recipe energy, processing time, 
 
 Stage 4 is where normal machine processing first gains a real failure state. Earlier component stages should block invalid work, pause on missing power, run slowly, or produce modest output, but they should avoid consuming a player's input into a bad result during ordinary processing.
 
-Steel Stage machines can ask the player to manage stable FE, controlled heat, and precision parts. The current reference example is the [Metal Press](../content/metal-press.md): the pre-Steel Crude Press hard-blocks unsafe work without consuming inputs, while the Stage 4 Steel Press can produce recoverable failure outputs such as `rngtech:malformed_ingot` or `rngtech:broken_circuit` when heat overshoots the safe band, temperature stability is poor, power drops after work has started, or Servo control is weak.
+Steel Stage machines can ask the player to manage stable FE, controlled heat, and precision parts. The current reference example is the [Metal Press](https://c-pettersson.github.io/rngtech/metal-press/): the pre-Steel Crude Press hard-blocks unsafe work without consuming inputs, while the Stage 4 Steel Press can produce recoverable failure outputs such as `rngtech:malformed_ingot` or `rngtech:broken_circuit` when heat overshoots the safe band, temperature stability is poor, power drops after work has started, or Servo control is weak.
 
 Failure outputs should preserve recovery value. They should represent lost work or damaged material, not silent deletion. When a failure output needs source identity, prefer one generic failure item with a data component, such as `rngtech:malformed_ingot` with `rngtech:material = "steel"`, instead of per-material failure item ids.
 
@@ -292,7 +294,7 @@ Energy coils control energy transfer, generation, storage scaling, and loss rule
 
 Battery cells control item energy capacity, charge rate, discharge rate, and energy efficiency.
 
-Block storage should use [Battery Chassis](../content/battery-chassis.md) behavior around inserted [Battery Cells](../content/battery-cells.md) instead of treating the block material as the main capacity source.
+Block storage should use [Battery Chassis](https://c-pettersson.github.io/rngtech/battery-chassis/) behavior around inserted [Battery Cells](https://c-pettersson.github.io/rngtech/battery-cells/) instead of treating the block material as the main capacity source.
 
 | Stage | Example Cell | Expected Tags | Role |
 |---:|---|---|---|
@@ -380,8 +382,8 @@ Lucky components can cross one stage boundary. Natural tier weighting, no free R
 
 - [Crafting and Upgrades](../systems/crafting.md)
 - [Materials List](materials.md)
-- [Battery Chassis](../content/battery-chassis.md)
-- [Battery Cells](../content/battery-cells.md)
+- [Battery Chassis](https://c-pettersson.github.io/rngtech/battery-chassis/)
+- [Battery Cells](https://c-pettersson.github.io/rngtech/battery-cells/)
 - [Machine Stats](machine-stats.md)
 - [Modifier Eligibility](modifier-eligibility.md)
-- [Rarity](rarity.md)
+- [Rarity](https://c-pettersson.github.io/rngtech/rarity-and-affixes/)

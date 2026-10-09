@@ -1,0 +1,93 @@
+site_name: RNGTech Wiki
+site_description: Player guide to RNGTech's machines, Gear, rarity, and progression.
+site_url: https://c-pettersson.github.io/rngtech/
+repo_name: RNGTech
+repo_url: https://github.com/c-pettersson/rngtech
+docs_dir: wiki
+site_dir: site-wiki
+
+validation:
+  nav:
+    omitted_files: warn
+  links:
+    not_found: warn
+    anchors: warn
+
+hooks:
+  - tools/rngwiki/hook.py
+
+extra_css:
+  - assets/wiki.css
+
+extra_javascript:
+  - assets/wiki.js
+
+theme:
+  name: material
+  features:
+    - navigation.instant
+    - navigation.sections
+    - navigation.top
+    - search.highlight
+    - search.suggest
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - def_list
+  - md_in_html
+  - pymdownx.details
+  - pymdownx.tabbed:
+      alternate_style: true
+  - toc:
+      permalink: true
+
+nav:
+  - Main Page: index.md
+  - Guides:
+      - Getting Started: getting-started.md
+      - Stages: stages.md
+      - Rarity and Affixes: rarity-and-affixes.md
+      - Machine Mastery: machine-mastery.md
+      - Machine Stats: machine-stats.md
+      - Gear: gear.md
+      - Battery Cells: battery-cells.md
+  - Processing:
+      - Alloy Furnace: alloy-furnace.md
+      - Component Assembler: component-assembler.md
+      - Component Recycler: component-recycler.md
+      - Crusher: crusher.md
+      - Furnace: furnace.md
+      - Melter: melter.md
+      - Metal Press: metal-press.md
+      - Resonance Calibrator: resonance-calibrator.md
+      - Wooden Composter: wooden-composter.md
+  - Power generation:
+      - Ammonia Fuel Cell: ammonia-fuel-cell.md
+      - Bio Generator: bio-generator.md
+      - Cavitation Generator: cavitation-generator.md
+      - Corrosion Cell: corrosion-cell.md
+      - Potential Reactor: potential-reactor.md
+      - Solar Panel: solar-panel.md
+      - Solid Fuel Burner: solid-fuel-burner.md
+      - Syngas Combustor: syngas-combustor.md
+      - Vacuum Collapse Generator: vacuum-collapse-generator.md
+  - Energy storage:
+      - Battery Chassis: battery-chassis.md
+  - Fluids and gases:
+      - Algae Photobioreactor: algae-photobioreactor.md
+      - Ammonia Synthesizer: ammonia-synthesizer.md
+      - Coal Gasifier: coal-gasifier.md
+      - Fluid and Compressor Tanks: compressor-tank.md
+      - Silica Gel Dehumidifier: silica-gel-dehumidifier.md
+      - Steam Methane Reformer: steam-methane-reformer.md
+      - Wooden Dehumidifier: wooden-dehumidifier.md
+  - Refinement:
+      - Affix Forge: affix-forge.md
+      - Exotic Affix Forge: exotic-affix-forge.md
+  - Logistics:
+      - Universal Cable: universal-cable.md
+  - Tools:
+      - Forestry Cart Station: forestry-cart-station.md
+      - "Miner's Companion": miners-companion.md
+      - Tool Bench: tool-bench.md

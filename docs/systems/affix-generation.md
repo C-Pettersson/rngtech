@@ -1,5 +1,7 @@
 # Affix Generation
 
+Player guide: [Rarity and Affixes](https://c-pettersson.github.io/rngtech/rarity-and-affixes/)
+
 Affix generation describes how modifier-bearing item stacks and placed machines receive authored base profiles, implicit modifiers, prefix and suffix affixes, and refinement changes.
 
 Use [Modifiers](../modifiers/index.md) for the modifier inventory and [Modifier Eligibility](../reference/modifier-eligibility.md) for capability and profile eligibility.
@@ -365,7 +367,7 @@ Battery Cells use a separate high-capacity item table:
 | 6 | `350,000-600,000 FE` |
 | 7 | `800,000-1,000,000 FE` |
 
-The cell item table is intentionally larger at high tiers so rare rolls can matter against GTNH-style cell capacities. It applies to [Battery Cells](../content/battery-cells.md), not to Battery Chassis capacity prefixes. Battery Chassis capacity prefixes scale installed cells only while those cells remain inside the chassis.
+The cell item table is intentionally larger at high tiers so rare rolls can matter against GTNH-style cell capacities. It applies to [Battery Cells](https://c-pettersson.github.io/rngtech/battery-cells/), not to Battery Chassis capacity prefixes. Battery Chassis capacity prefixes scale installed cells only while those cells remain inside the chassis.
 
 Fixed authored modifiers do not use tier ranges unless a specific item stores one. Current fixed component and Battery Cell identity modifiers are `CAN_ROLL = No`, stored as implicit modifiers, and use exact values from the material or identity. Current machine and chassis numeric identity uses authored base stat profiles before modifiers are applied. Implicit modifiers are authored identity modifiers, not random affixes.
 
@@ -387,6 +389,6 @@ Some planned modifiers affect machine behavior directly instead of changing a nu
 
 Behavioral modifiers are presence/absence effects by default. If the modifier is present, the behavior is enabled; if it is absent, the behavior is disabled. They do not use a numeric tier range unless a specific behavioral modifier later needs scaled behavior.
 
-The current code-backed rollable behaviors are [Bulk Speed](../modifiers/bulk-speed.md) and [Balance Mode](../modifiers/balance-mode.md). Bulk Speed competes with suffix rolls on eligible processing-machine profiles and is stored as a behavior flag in `MachineTraits`. Balance Mode is a Battery Chassis prefix affix that enables `CHARGE_BALANCER` behavior and occupies a normal prefix slot.
+The current code-backed rollable behaviors are [Bulk Speed](https://c-pettersson.github.io/rngtech/rarity-and-affixes/#bulk-speed) and [Balance Mode](https://c-pettersson.github.io/rngtech/rarity-and-affixes/#balance-mode). Bulk Speed competes with suffix rolls on eligible processing-machine profiles and is stored as a behavior flag in `MachineTraits`. Balance Mode is a Battery Chassis prefix affix that enables `CHARGE_BALANCER` behavior and occupies a normal prefix slot.
 
 Behavioral modifiers should still have a dedicated modifier page that documents their trigger, eligibility, and interaction rules.

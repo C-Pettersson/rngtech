@@ -20,6 +20,7 @@ Machine implementation and balance work must follow [Machine Guidelines](docs/re
 - `src/main/resources/` contains assets, recipes, loot tables, language entries, and `META-INF/neoforge.mods.toml`.
 - `docs/` contains MkDocs design and reference documentation.
 - `mkdocs.yml` configures the documentation site.
+- `wiki/` and `mkdocs.wiki.yml` are the published player wiki; `tools/rngwiki/` is the MkDocs hook that renders its templates, icons, and recipe tables from mod resources.
 - `build.gradle`, `settings.gradle`, and `gradle.properties` define the Gradle/NeoForge setup.
 
 ## Requirements
@@ -83,12 +84,18 @@ Build docs:
 mkdocs build --strict
 ```
 
+Build the player wiki:
+
+```sh
+mkdocs build --strict -f mkdocs.wiki.yml
+```
+
 ## Verification Expectations
 
 - Run `quickCheck` after Java or resource changes when feasible.
 - Run `ciCheck` before larger handoffs or changes that affect build configuration, resources, or shared behavior.
 - `check` depends on `spotlessCheck`, so formatting failures are build failures.
-- Domain checks live in `src/masteryTest` and run through `masteryCheck`, included in `quickCheck` and `ciCheck`. Run `npm run moddex:check` for the source/data smoke checks and passive-tree validation. Run `npm run repo:check` and `mkdocs build --strict` for public repository and documentation changes. Gameplay still needs focused in-game checks.
+- Domain checks live in `src/masteryTest` and run through `masteryCheck`, included in `quickCheck` and `ciCheck`. Run `npm run moddex:check` for the source/data smoke checks and passive-tree validation. Run `npm run repo:check`, `mkdocs build --strict`, and `mkdocs build --strict -f mkdocs.wiki.yml` for public repository and documentation changes. Gameplay still needs focused in-game checks.
 
 ## Formatting and Style
 
@@ -116,7 +123,8 @@ mkdocs build --strict
 - Use status labels consistently: `Implemented`, `Prototype`, `Planned`, `Deferred`, and `Out of scope`.
 - Define each game concept once, then link to that canonical definition from other pages.
 - Do not promote example-only concepts into canonical docs until they become real RNGTech design.
-- Use `docs/page-templates/modifier.md` for modifier pages and `docs/page-templates/content.md` for content pages.
+- Docs do not restate shipped code. Shipped machine behavior lives in the code and on its wiki page; design intent and balance rules live in `docs/reference/machine-guidelines.md` (Machine Design Notes). Use `docs/page-templates/content.md` only for proposed (Planned) content and `docs/page-templates/modifier.md` for proposed modifiers; when a proposal ships, move its player behavior to the wiki, its design rules to the guidelines, and delete the proposal page.
+- The player wiki (`wiki/`) documents implemented behavior for players only: no planned content, no PRD/state content, no links into `docs/`. Follow `docs/reference/wiki-authoring.md` and `docs/page-templates/wiki.md`. When gameplay changes, update the affected wiki page too. Wiki icons for vanilla items need the Minecraft client jar; run `python tools/rngwiki/vanilla.py --fetch` once if no NeoGradle cache provides it.
 
 ## CI
 
@@ -126,4 +134,4 @@ GitHub Actions runs:
 ./gradlew ciCheck
 ```
 
-with Temurin Java 21 on Ubuntu. CI also runs `npm run repo:check`, `npm run moddex:check`, and `mkdocs build --strict`. Local changes should pass the relevant checks before handoff.
+with Temurin Java 21 on Ubuntu. CI also runs `npm run repo:check`, `npm run moddex:check`, `mkdocs build --strict`, and `mkdocs build --strict -f mkdocs.wiki.yml`. Local changes should pass the relevant checks before handoff.

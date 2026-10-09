@@ -46,7 +46,7 @@ A machine build is made from several long-lived pieces.
 
 The player should care about the specific component they made, not only the block it sits inside.
 
-The current prototype has registered [Machine Chassis](../content/machine-chassis.md) subtype items and Gear tabs on placed Crusher and Furnace machines. The Stage 0 Furnace recipe still crafts `rngtech:furnace` directly, while electric Furnace chassis use staged placed blocks. Current item-only chassis items do not carry RPG traits, so no chassis item data is preserved into a placed machine unless the result itself is a rollable machine block item.
+The current prototype has registered [Machine Chassis](https://c-pettersson.github.io/rngtech/stages/#machine-frames) subtype items and Gear tabs on placed Crusher and Furnace machines. The Stage 0 Furnace recipe still crafts `rngtech:furnace` directly, while electric Furnace chassis use staged placed blocks. Current item-only chassis items do not carry RPG traits, so no chassis item data is preserved into a placed machine unless the result itself is a rollable machine block item.
 
 The solid fuel-burning generator subtype exists as a chassis/category target only. It is not a placed machine block.
 
@@ -242,11 +242,11 @@ Recycling supports experimentation. A player can chase a better part without fil
 
 ## Related
 
-- [Progression](progression.md)
+- [Progression](https://c-pettersson.github.io/rngtech/rarity-and-affixes/)
 - [Affix Generation](affix-generation.md)
 - [Modifiers Overview](../modifiers/index.md)
-- [Machine Parts](../content/machine-parts.md)
+- [Machine Parts](https://c-pettersson.github.io/rngtech/gear/)
 - [Materials List](../reference/materials.md)
 - [Component Stages](../reference/component-stages.md)
 - [Machine Stats](../reference/machine-stats.md)
-- [Rarity](../reference/rarity.md)
+- [Rarity](https://c-pettersson.github.io/rngtech/rarity-and-affixes/)

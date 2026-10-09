@@ -1,6 +1,6 @@
 # PRD: Companion Rebalance
 
-> Design requirements, not a release status report. See [Current Implementation](../reference/current-implementation.md) and [Tree Farm Automation](../content/tree-farm-automation.md) for current behavior.
+> Design requirements, not a release status report. See [Current Implementation](../reference/current-implementation.md) and [Tree Farm Automation](https://c-pettersson.github.io/rngtech/forestry-cart-station/) for current behavior.
 
 PRD status: Accepted
 
@@ -33,7 +33,7 @@ Progress, decisions, and verification are tracked on [Companion Rebalance State]
 
 ## References
 
-- [Tree Farm Automation](../content/tree-farm-automation.md) and its [requirements](tree-farm-automation.md)
+- [Tree Farm Automation](https://c-pettersson.github.io/rngtech/forestry-cart-station/) and its [requirements](tree-farm-automation.md)
 - [Machine Ascendancies PRD](machine-ascendancies.md)
 - [Shared Machine Mega Passive Tree PRD](machine-mega-passive-tree.md)
 - [Passive Tree Design Rules](../reference/passive-tree-design-rules.md)

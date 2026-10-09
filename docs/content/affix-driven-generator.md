@@ -138,9 +138,9 @@ A future implementation should start with two or three condition families and ex
 ## Related Pages
 
 - [Current Implementation Matrix](../reference/current-implementation.md)
-- [Affix Forge](affix-forge.md)
-- [Battery Chassis](battery-chassis.md)
-- [Machine Chassis](machine-chassis.md)
+- [Affix Forge](https://c-pettersson.github.io/rngtech/affix-forge/)
+- [Battery Chassis](https://c-pettersson.github.io/rngtech/battery-chassis/)
+- [Machine Chassis](https://c-pettersson.github.io/rngtech/stages/#machine-frames)
 - [Machine Stats](../reference/machine-stats.md)
 - [Modifier Eligibility](../reference/modifier-eligibility.md)
 - [Affix Generation](../systems/affix-generation.md)

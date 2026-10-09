@@ -2,11 +2,13 @@
 
 Status: Planned
 
+Use this template for proposed content only. When it ships, player behavior moves to a wiki page, design rules move to Machine Design Notes in `docs/reference/machine-guidelines.md`, and this page is deleted.
+
 Resource id: `rngtech:example`
 
 ## Summary
 
-Describe the item, block, machine, component, or part in one or two paragraphs.
+Describe the design in one or two sentences. Player-facing usage, stages, Gear, automation, and screens belong on the wiki page, not here.
 
 ## Behavior
 

@@ -1,6 +1,6 @@
 # PRD: Passive Tree Framework
 
-> Design requirements, not a release status report. See [Current Implementation](../reference/current-implementation.md) and [Tree Farm Automation](../content/tree-farm-automation.md) for current behavior.
+> Design requirements, not a release status report. See [Current Implementation](../reference/current-implementation.md) and [Tree Farm Automation](https://c-pettersson.github.io/rngtech/forestry-cart-station/) for current behavior.
 
 
 PRD status: Draft
@@ -17,7 +17,7 @@ The framework is domain-only: a `PassiveNode` interface, a progression view abst
 
 ## References
 
-- [Progression System](../systems/progression.md)
+- [Progression System](https://c-pettersson.github.io/rngtech/rarity-and-affixes/)
 - [Machine Stats](../reference/machine-stats.md)
 - [Current Implementation Matrix](../reference/current-implementation.md)
 
