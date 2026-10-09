@@ -45,7 +45,9 @@ public class ExoticAffixForgeMenu extends AbstractContainerMenu {
     private static final int DATA_POWER_FAILURE = 11;
     private static final int DATA_CRAFT_ACTIVE = 12;
     private static final int DATA_CRAFT_FAILED = 13;
-    private static final int DATA_COUNT = 14;
+    private static final int DATA_SELECTED_ACTION = 14;
+    private static final int DATA_SELECTION = 15;
+    private static final int DATA_COUNT = 16;
     private static final int PROCESS_SLOT_COUNT = ExoticAffixForgeBlockEntity.PROCESS_SLOT_COUNT;
     private static final int GEAR_SLOT_START = PROCESS_SLOT_COUNT;
     private static final int MENU_MACHINE_SLOT_COUNT = PROCESS_SLOT_COUNT + ExoticAffixForgeBlockEntity.GEAR_SLOT_COUNT;
@@ -161,9 +163,13 @@ public class ExoticAffixForgeMenu extends AbstractContainerMenu {
     }
 
     public int selectionButtonId() {
-        return switch (selectedRefinement.kind()) {
-            case EXISTING_MODIFIER -> BUTTON_SELECTION_EXISTING_BASE + selectedRefinement.affixIndex();
-            case EMPTY_SLOT -> selectedRefinement.emptySlot() == ModifierSlot.PREFIX
+        return selectionCode(selectedRefinement);
+    }
+
+    public static int selectionCode(RefinementSelection selection) {
+        return switch (selection.kind()) {
+            case EXISTING_MODIFIER -> BUTTON_SELECTION_EXISTING_BASE + selection.affixIndex();
+            case EMPTY_SLOT -> selection.emptySlot() == ModifierSlot.PREFIX
                     ? BUTTON_SELECTION_EMPTY_PREFIX
                     : BUTTON_SELECTION_EMPTY_SUFFIX;
             case NONE -> BUTTON_SELECTION_NONE;
@@ -276,6 +282,16 @@ public class ExoticAffixForgeMenu extends AbstractContainerMenu {
         return false;
     }
 
+    @Override
+    public void setData(int id, int value) {
+        super.setData(id, value);
+        if (id == DATA_SELECTED_ACTION) {
+            selectedAction = ExoticAffixForgeAction.byOrdinal(value);
+        } else if (id == DATA_SELECTION) {
+            selectedRefinement = selectionFromButton(value);
+        }
+    }
+
     public int applyButtonId() {
         return BUTTON_APPLY;
     }
@@ -310,7 +326,13 @@ public class ExoticAffixForgeMenu extends AbstractContainerMenu {
                 return ItemStack.EMPTY;
             }
         } else if (BatteryCellItem.isBatteryCell(stack)) {
-            if (!moveItemStackTo(stack, GEAR_SLOT_START, GEAR_SLOT_START + 1, false)) {
+            if (!moveItemStackTo(stack, GEAR_SLOT_START, GEAR_SLOT_START + 1, false)
+                    && !(RefinementTargets.canRefine(stack) && moveItemStackTo(
+                            stack,
+                            ExoticAffixForgeBlockEntity.SLOT_TARGET,
+                            ExoticAffixForgeBlockEntity.SLOT_TARGET + 1,
+                            false
+                    ))) {
                 return ItemStack.EMPTY;
             }
         } else if (RefinementTargets.canRefine(stack)) {

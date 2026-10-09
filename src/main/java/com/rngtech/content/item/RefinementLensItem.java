@@ -31,6 +31,7 @@ public class RefinementLensItem extends Item {
         super.appendHoverText(stack, context, tooltipComponents, tooltipFlag);
         tooltipComponents.add(Component.translatable("rngtech.tooltip.modifier_lens").withStyle(ChatFormatting.GRAY));
         tooltipComponents.add(Component.translatable("rngtech.tooltip.modifier_lens.soft_bias").withStyle(ChatFormatting.DARK_GRAY));
+        tooltipComponents.add(Component.translatable("rngtech.tooltip.modifier_lens.requires_lens_array").withStyle(ChatFormatting.DARK_GRAY));
         lensTags.stream()
                 .map(ModifierLensTag::tooltipKey)
                 .map(Component::translatable)
