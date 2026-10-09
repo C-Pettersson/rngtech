@@ -148,7 +148,7 @@ effective input = min(cell input ceiling, offered FE, available cell space)
 
 This keeps high-stage chassis from making weak cells behave like high-output cells while allowing a broad bank of strong cells to charge and discharge at their combined rate.
 
-When an adjacent Universal Connector is present, the connector tier is the wiring cap. A low-tier connector can limit transfer below the cell sums; the UI and Jade readout report this as `Attached connector limits input energy` or `Attached connector limits output energy`. Two banks on one network with default `Both` connectors do not charge each other; see the [storage loop guard](basic-wire.md#energy-transfer-limits) for how to move FE between banks on purpose.
+When an adjacent Universal Connector is present, the connector tier is the wiring cap. A low-tier connector can limit transfer below the cell sums; the UI and Jade readout report this as `Attached connector limits input energy` or `Attached connector limits output energy`. Two banks on one network with default `Both` connectors even out their charge and then stop, so daisy-chained banks share charge without draining each other; see [storage balancing](basic-wire.md#energy-transfer-limits).
 
 ## Burst Transfer
 

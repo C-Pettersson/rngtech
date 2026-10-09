@@ -22,6 +22,7 @@ public final class EnergyTransferChecks {
         capResetsNextTick();
         lastTickIsOnlyThePreviousTick();
         bottlenecksNameTheConnector();
+        buffersEvenOutAndStop();
         uncappedMachinesDoNotRollEnergyTransfer();
         System.out.println("Energy transfer: " + checks + " checks passed");
     }
@@ -66,6 +67,24 @@ public final class EnergyTransferChecks {
         require(
                 AdjacentEnergyConnector.inputBottleneck(AdjacentEnergyConnector.Info.NONE, 1_000) == MachineInfoSnapshot.EnergyBottleneck.NONE,
                 "no connector is never a connector bottleneck"
+        );
+    }
+
+    private static void buffersEvenOutAndStop() {
+        require(CableBlockEntity.bufferEqualizationLimit(600, 1_000, 400, 1_000) == 100, "equal banks meet in the middle");
+        require(CableBlockEntity.bufferEqualizationLimit(400, 1_000, 600, 1_000) == 0, "the emptier bank never feeds the fuller one");
+        require(CableBlockEntity.bufferEqualizationLimit(500, 1_000, 1_000, 2_000) == 0, "equally full banks of any size stay put");
+        require(
+                CableBlockEntity.bufferEqualizationLimit(1_000, 1_000, 0, 3_000) == 750,
+                "a small full bank evens out with a large empty one by fill fraction"
+        );
+        require(CableBlockEntity.bufferEqualizationLimit(505, 1_000, 500, 1_000) == 0, "gaps under 1% move nothing");
+        int sent = CableBlockEntity.bufferEqualizationLimit(600, 1_000, 400, 1_000);
+        int drawn = (int) Math.ceil(sent / 0.92);
+        int stored = (int) Math.floor(sent * 0.92);
+        require(
+                CableBlockEntity.bufferEqualizationLimit(400 + stored, 1_000, 600 - drawn, 1_000) == 0,
+                "charge and discharge losses do not send FE back the other way"
         );
     }
 

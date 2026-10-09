@@ -230,8 +230,9 @@ public final class CableUniversalConnectorData implements UniversalConnectorAcce
         return mode;
     }
 
-    public boolean targetIsEnergyBuffer() {
-        return CableBlockEntity.isEnergyBuffer(targetEnergyStorage());
+    public IEnergyStorage targetEnergyBuffer() {
+        IEnergyStorage target = targetEnergyStorage();
+        return CableBlockEntity.isEnergyBuffer(target) ? target : null;
     }
 
     /** True when the attached block exposes FE on the side this connector attaches as. */
@@ -255,7 +256,7 @@ public final class CableUniversalConnectorData implements UniversalConnectorAcce
     private CableBlockEntity.TransferOrigin energySourceOrigin(IEnergyStorage source) {
         BlockPos ownerPos = owner.getBlockPos();
         return CableBlockEntity.TransferOrigin.endpoint(ownerPos, face, ownerPos.relative(face))
-                .withEnergyBuffer(mode == CableConnectorMode.BOTH && CableBlockEntity.isEnergyBuffer(source));
+                .withEnergyBuffer(mode == CableConnectorMode.BOTH ? source : null);
     }
 
     public int transferRateForChannel(int networkChannel) {
