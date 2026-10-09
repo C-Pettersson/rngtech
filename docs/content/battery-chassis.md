@@ -128,7 +128,7 @@ Steel applies a flat `0.02` Cell Leakage Damping reduction to installed cell idl
 
 ## Effective Transfer
 
-Chassis `ENERGY_TRANSFER` is a material bus rating, not a hard intake or output cap. Input and output are intentionally cell-led: installed Battery Cells decide how much FE the bank can accept or deliver, bounded by remaining space, stored FE, and any upstream connector, downstream connector, source, or sink limit.
+Chassis `ENERGY_TRANSFER` is a material bus rating, not a hard intake or output cap. Input and output are intentionally cell-led: installed Battery Cells decide how much FE the bank can accept or deliver, bounded by remaining space, stored FE, and any upstream connector, downstream connector, source, or sink limit. The summed cell input and output rates are per-tick budgets shared by every side and connector, so adding more connectors or sides does not raise the bank's throughput.
 
 The Status tab exposes the pieces separately: chassis transfer rating, summed cell input rate, summed cell output rate, effective input/output, attached connector cap, and last tick transfer. This is intentionally different from generators and processing machines: Battery Chassis is storage gameplay, so cell rate limits remain visible and meaningful.
 
@@ -148,7 +148,7 @@ effective input = min(cell input ceiling, offered FE, available cell space)
 
 This keeps high-stage chassis from making weak cells behave like high-output cells while allowing a broad bank of strong cells to charge and discharge at their combined rate.
 
-When an adjacent Universal Connector is present, the connector tier is the wiring cap. A low-tier connector can limit transfer below the cell sums; the UI and Jade readout report this as `Attached connector limits input energy` or `Attached connector limits output energy`.
+When an adjacent Universal Connector is present, the connector tier is the wiring cap. A low-tier connector can limit transfer below the cell sums; while it runs at its cap and the cells could move more, the UI and Jade readout report this as `Attached connector limits input energy` or `Attached connector limits output energy`. Two banks on one network with default `Both` connectors even out their charge and then stop, so daisy-chained banks share charge without draining each other; see [storage balancing](basic-wire.md#energy-transfer-limits).
 
 ## Burst Transfer
 

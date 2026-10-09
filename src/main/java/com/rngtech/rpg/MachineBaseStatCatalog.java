@@ -368,14 +368,12 @@ public final class MachineBaseStatCatalog {
                     MachineStat.PROCESSING_SPEED,
                     MachineStat.ENERGY_USAGE,
                     MachineStat.ENERGY_CAPACITY,
-                    MachineStat.ENERGY_TRANSFER,
                     MachineStat.INPUT_SLOTS
             );
         }
         if (item instanceof AlloyFurnaceChassisBlockItem) {
             return List.of(
                     MachineStat.ENERGY_CAPACITY,
-                    MachineStat.ENERGY_TRANSFER,
                     MachineStat.PROCESSING_SPEED,
                     MachineStat.ENERGY_USAGE,
                     MachineStat.HEAT_TRANSFER,
@@ -393,13 +391,12 @@ public final class MachineBaseStatCatalog {
             );
         }
         if (item instanceof SolidFuelBurnerBlockItem) {
-            return List.of(MachineStat.ENERGY_TRANSFER, MachineStat.STABILITY);
+            return List.of(MachineStat.STABILITY);
         }
         if (item instanceof SolarPanelBlockItem) {
             return List.of(
                     MachineStat.ENERGY_GENERATION,
                     MachineStat.ENERGY_CAPACITY,
-                    MachineStat.ENERGY_TRANSFER,
                     MachineStat.EFFICIENCY
             );
         }
@@ -421,7 +418,6 @@ public final class MachineBaseStatCatalog {
         if (item instanceof PotentialReactorBlockItem) {
             return List.of(
                     MachineStat.ENERGY_CAPACITY,
-                    MachineStat.ENERGY_TRANSFER,
                     MachineStat.PROCESSING_SPEED,
                     MachineStat.ENERGY_GENERATION,
                     MachineStat.STABILITY
@@ -430,7 +426,6 @@ public final class MachineBaseStatCatalog {
         if (item instanceof CorrosionCellBlockItem) {
             return List.of(
                     MachineStat.ENERGY_CAPACITY,
-                    MachineStat.ENERGY_TRANSFER,
                     MachineStat.PROCESSING_SPEED,
                     MachineStat.ENERGY_GENERATION,
                     MachineStat.EFFICIENCY,
@@ -440,7 +435,6 @@ public final class MachineBaseStatCatalog {
         if (item instanceof ComponentRecyclerBlockItem) {
             return List.of(
                     MachineStat.ENERGY_CAPACITY,
-                    MachineStat.ENERGY_TRANSFER,
                     MachineStat.PROCESSING_SPEED,
                     MachineStat.ENERGY_USAGE,
                     MachineStat.STABILITY
@@ -452,7 +446,6 @@ public final class MachineBaseStatCatalog {
         if (item instanceof ResonanceCalibratorBlockItem) {
             return List.of(
                     MachineStat.ENERGY_CAPACITY,
-                    MachineStat.ENERGY_TRANSFER,
                     MachineStat.BATCH_SIZE,
                     MachineStat.PROCESSING_SPEED,
                     MachineStat.ENERGY_USAGE,
@@ -463,7 +456,6 @@ public final class MachineBaseStatCatalog {
             return switch (machine.machineType()) {
                 case BIO_GENERATOR -> List.of(
                         MachineStat.ENERGY_CAPACITY,
-                        MachineStat.ENERGY_TRANSFER,
                         MachineStat.ENERGY_GENERATION,
                         MachineStat.FUEL_EFFICIENCY
                 );
@@ -479,7 +471,6 @@ public final class MachineBaseStatCatalog {
                 );
                 case CORROSION_CELL -> List.of(
                         MachineStat.ENERGY_CAPACITY,
-                        MachineStat.ENERGY_TRANSFER,
                         MachineStat.PROCESSING_SPEED,
                         MachineStat.ENERGY_GENERATION,
                         MachineStat.EFFICIENCY,
@@ -487,7 +478,6 @@ public final class MachineBaseStatCatalog {
                 );
                 case ALLOY_FURNACE -> List.of(
                         MachineStat.ENERGY_CAPACITY,
-                        MachineStat.ENERGY_TRANSFER,
                         MachineStat.PROCESSING_SPEED,
                         MachineStat.ENERGY_USAGE,
                         MachineStat.HEAT_TRANSFER,
@@ -497,7 +487,6 @@ public final class MachineBaseStatCatalog {
                 );
                 case METAL_PRESS -> List.of(
                         MachineStat.ENERGY_CAPACITY,
-                        MachineStat.ENERGY_TRANSFER,
                         MachineStat.PROCESSING_SPEED,
                         MachineStat.ENERGY_USAGE,
                         MachineStat.HEAT_TRANSFER,
@@ -507,7 +496,6 @@ public final class MachineBaseStatCatalog {
                 );
                 case MELTER -> List.of(
                         MachineStat.ENERGY_CAPACITY,
-                        MachineStat.ENERGY_TRANSFER,
                         MachineStat.PROCESSING_SPEED,
                         MachineStat.ENERGY_USAGE,
                         MachineStat.HEAT_TRANSFER,
@@ -515,7 +503,6 @@ public final class MachineBaseStatCatalog {
                 );
                 case BATTERY_ASSEMBLER -> List.of(
                         MachineStat.ENERGY_CAPACITY,
-                        MachineStat.ENERGY_TRANSFER,
                         MachineStat.PROCESSING_SPEED,
                         MachineStat.ENERGY_USAGE,
                         MachineStat.FLUID_TRANSFER,
@@ -524,7 +511,6 @@ public final class MachineBaseStatCatalog {
                 );
                 case COAL_GASIFIER, STEAM_METHANE_REFORMER -> List.of(
                         MachineStat.ENERGY_CAPACITY,
-                        MachineStat.ENERGY_TRANSFER,
                         MachineStat.PROCESSING_SPEED,
                         MachineStat.ENERGY_USAGE,
                         MachineStat.HEAT_TRANSFER,
@@ -532,7 +518,6 @@ public final class MachineBaseStatCatalog {
                 );
                 case SYNGAS_COMBUSTOR -> List.of(
                         MachineStat.ENERGY_CAPACITY,
-                        MachineStat.ENERGY_TRANSFER,
                         MachineStat.ENERGY_GENERATION,
                         MachineStat.EFFICIENCY,
                         MachineStat.PROCESSING_SPEED,
@@ -562,8 +547,7 @@ public final class MachineBaseStatCatalog {
                 MachineStat.FLUID_TRANSFER,
                 MachineStat.PROCESSING_SPEED,
                 MachineStat.ENERGY_USAGE,
-                MachineStat.ENERGY_CAPACITY,
-                MachineStat.ENERGY_TRANSFER
+                MachineStat.ENERGY_CAPACITY
         );
     }
 
@@ -574,7 +558,6 @@ public final class MachineBaseStatCatalog {
     private static List<MachineStat> crusherSummaryStats() {
         return List.of(
                 MachineStat.ENERGY_CAPACITY,
-                MachineStat.ENERGY_TRANSFER,
                 MachineStat.ENERGY_USAGE,
                 MachineStat.PROCESSING_SPEED,
                 MachineStat.OUTPUT_AMOUNT,

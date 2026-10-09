@@ -1465,8 +1465,7 @@ public final class ModifierEligibilityProfiles {
                     MachineStat.ENERGY_CAPACITY,
                     MachineStat.EFFICIENCY,
                     MachineStat.FUEL_EFFICIENCY,
-                    MachineStat.ENERGY_GENERATION,
-                    MachineStat.ENERGY_TRANSFER
+                    MachineStat.ENERGY_GENERATION
             )
     );
     public static final ModifierEligibilityProfile SOLAR_PANEL = profile(
@@ -1505,7 +1504,6 @@ public final class ModifierEligibilityProfiles {
                     MACHINE_ENERGY_CAPACITY_ADD,
                     MachineStat.ENERGY_CAPACITY,
                     MachineStat.ENERGY_GENERATION,
-                    MachineStat.ENERGY_TRANSFER,
                     MachineStat.EFFICIENCY,
                     MachineStat.PROCESSING_SPEED,
                     MachineStat.STABILITY
@@ -1530,7 +1528,6 @@ public final class ModifierEligibilityProfiles {
                     MACHINE_ENERGY_CAPACITY_ADD,
                     MachineStat.ENERGY_CAPACITY,
                     MachineStat.ENERGY_GENERATION,
-                    MachineStat.ENERGY_TRANSFER,
                     MachineStat.FLUID_TRANSFER,
                     MachineStat.EFFICIENCY,
                     MachineStat.PROCESSING_SPEED,
@@ -1575,7 +1572,6 @@ public final class ModifierEligibilityProfiles {
                     false,
                     List.of(MACHINE_ENERGY_CAPACITY_ADD, RECYCLER_PATTERN_MEMORY, RECYCLER_CLEAN_BREAK),
                     MachineStat.ENERGY_CAPACITY,
-                    MachineStat.ENERGY_TRANSFER,
                     MachineStat.ENERGY_USAGE,
                     MachineStat.PROCESSING_SPEED,
                     MachineStat.STABILITY
@@ -1598,7 +1594,6 @@ public final class ModifierEligibilityProfiles {
                     true,
                     MACHINE_ENERGY_CAPACITY_ADD,
                     MachineStat.ENERGY_CAPACITY,
-                    MachineStat.ENERGY_TRANSFER,
                     MachineStat.ENERGY_USAGE,
                     MachineStat.HEAT_TRANSFER,
                     MachineStat.MAX_TEMPERATURE,
@@ -1628,7 +1623,6 @@ public final class ModifierEligibilityProfiles {
                     false,
                     MACHINE_ENERGY_CAPACITY_ADD,
                     MachineStat.ENERGY_CAPACITY,
-                    MachineStat.ENERGY_TRANSFER,
                     MachineStat.ENERGY_USAGE,
                     MachineStat.HEAT_TRANSFER,
                     MachineStat.MAX_TEMPERATURE,
@@ -1654,7 +1648,6 @@ public final class ModifierEligibilityProfiles {
                     true,
                     MACHINE_ENERGY_CAPACITY_ADD,
                     MachineStat.ENERGY_CAPACITY,
-                    MachineStat.ENERGY_TRANSFER,
                     MachineStat.ENERGY_USAGE,
                     MachineStat.PROCESSING_SPEED,
                     MachineStat.FLUID_TRANSFER,
@@ -1681,7 +1674,6 @@ public final class ModifierEligibilityProfiles {
                     true,
                     MACHINE_ENERGY_CAPACITY_ADD,
                     MachineStat.ENERGY_CAPACITY,
-                    MachineStat.ENERGY_TRANSFER,
                     MachineStat.ENERGY_USAGE,
                     MachineStat.HEAT_TRANSFER,
                     MachineStat.MAX_TEMPERATURE,
@@ -1707,7 +1699,6 @@ public final class ModifierEligibilityProfiles {
                     "combusting",
                     MACHINE_ENERGY_CAPACITY_ADD,
                     MachineStat.ENERGY_CAPACITY,
-                    MachineStat.ENERGY_TRANSFER,
                     MachineStat.ENERGY_GENERATION,
                     MachineStat.EFFICIENCY,
                     MachineStat.PROCESSING_SPEED,
@@ -1732,7 +1723,6 @@ public final class ModifierEligibilityProfiles {
                     false,
                     MACHINE_ENERGY_CAPACITY_ADD,
                     MachineStat.ENERGY_CAPACITY,
-                    MachineStat.ENERGY_TRANSFER,
                     MachineStat.ENERGY_USAGE,
                     MachineStat.HEAT_TRANSFER,
                     MachineStat.MAX_TEMPERATURE,
@@ -1788,7 +1778,6 @@ public final class ModifierEligibilityProfiles {
                     false,
                     MACHINE_ENERGY_CAPACITY_ADD,
                     MachineStat.ENERGY_CAPACITY,
-                    MachineStat.ENERGY_TRANSFER,
                     MachineStat.ENERGY_USAGE,
                     MachineStat.PROCESSING_SPEED,
                     MachineStat.EFFICIENCY,
@@ -1814,7 +1803,6 @@ public final class ModifierEligibilityProfiles {
                     "ammonia",
                     MACHINE_ENERGY_CAPACITY_ADD,
                     MachineStat.ENERGY_CAPACITY,
-                    MachineStat.ENERGY_TRANSFER,
                     MachineStat.ENERGY_GENERATION,
                     MachineStat.PROCESSING_SPEED,
                     MachineStat.EFFICIENCY,
@@ -1836,7 +1824,6 @@ public final class ModifierEligibilityProfiles {
             affixes(
                     List.of(MACHINE_ENERGY_CAPACITY_ADD, TANK_RECAPTURE_SLEEVE, TANK_PRESSURE_SPLITTER),
                     MachineStat.ENERGY_CAPACITY,
-                    MachineStat.ENERGY_TRANSFER,
                     MachineStat.ENERGY_USAGE,
                     MachineStat.PROCESSING_SPEED,
                     MachineStat.FLUID_TRANSFER,
@@ -1898,7 +1885,6 @@ public final class ModifierEligibilityProfiles {
                     true,
                     MACHINE_ENERGY_CAPACITY_ADD,
                     MachineStat.ENERGY_CAPACITY,
-                    MachineStat.ENERGY_TRANSFER,
                     MachineStat.ENERGY_USAGE,
                     MachineStat.PROCESSING_SPEED,
                     MachineStat.STABILITY,
@@ -2230,7 +2216,6 @@ public final class ModifierEligibilityProfiles {
             processingStatAffixes(
                     "membrane",
                     MachineStat.ENERGY_GENERATION,
-                    MachineStat.ENERGY_TRANSFER,
                     MachineStat.PROCESSING_SPEED,
                     MachineStat.EFFICIENCY,
                     MachineStat.STABILITY,
@@ -2383,7 +2368,6 @@ public final class ModifierEligibilityProfiles {
                     false,
                     List.of(COIL_HARMONIC_LOCK, COIL_PHASE_TAP, COIL_RETURN_WINDING),
                     MachineStat.PROCESSING_SPEED,
-                    MachineStat.ENERGY_TRANSFER,
                     MachineStat.ENERGY_USAGE,
                     MachineStat.CALIBRATION_QUALITY
             )
@@ -3091,8 +3075,7 @@ public final class ModifierEligibilityProfiles {
                 MACHINE_ENERGY_CAPACITY_ADD,
                 MachineStat.ENERGY_CAPACITY,
                 MachineStat.EFFICIENCY,
-                MachineStat.ENERGY_GENERATION,
-                MachineStat.ENERGY_TRANSFER
+                MachineStat.ENERGY_GENERATION
         ));
         definitions.addAll(List.of(PEAK_SOLAR, SOLAR_HORIZON_CATCHER));
         return List.copyOf(definitions);

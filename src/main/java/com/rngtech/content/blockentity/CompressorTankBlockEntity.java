@@ -25,6 +25,7 @@ import com.rngtech.rpg.ModifierSlot;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
@@ -93,6 +94,8 @@ public class CompressorTankBlockEntity extends BaseMachineBlockEntity
     private static final int DATA_ENERGY_TRANSFER = 17;
     private static final int DATA_FLUID_TRANSFER = 18;
     private static final int DATA_REFINEMENT_POTENTIAL = 19;
+    private static final int DATA_LOOSE_FLUID_ID = 20;
+    private static final int DATA_COMPRESSED_FLUID_ID = 21;
     private static final int STAT_SCALE = 100;
 
     private final CompressorTankBlock block;
@@ -195,6 +198,8 @@ public class CompressorTankBlockEntity extends BaseMachineBlockEntity
                 case DATA_ENERGY_TRANSFER -> scaledStat(stats, MachineStat.ENERGY_TRANSFER);
                 case DATA_FLUID_TRANSFER -> scaledStat(stats, MachineStat.FLUID_TRANSFER);
                 case DATA_REFINEMENT_POTENTIAL -> scaledStat(stats, MachineStat.REFINEMENT_POTENTIAL);
+                case DATA_LOOSE_FLUID_ID -> BuiltInRegistries.FLUID.getId(looseTank.getFluid().getFluid());
+                case DATA_COMPRESSED_FLUID_ID -> BuiltInRegistries.FLUID.getId(compressedFluid.getFluid());
                 default -> 0;
             };
         }
@@ -205,7 +210,7 @@ public class CompressorTankBlockEntity extends BaseMachineBlockEntity
 
         @Override
         public int getCount() {
-            return DATA_REFINEMENT_POTENTIAL + 1;
+            return DATA_COMPRESSED_FLUID_ID + 1;
         }
     };
 
@@ -319,7 +324,12 @@ public class CompressorTankBlockEntity extends BaseMachineBlockEntity
                 )
                 .status(statusKey(status))
                 .energy(energyStored(), energyCapacity(), -energyDemand)
-                .energyTelemetry(energyFlow.lastInput(), energyFlow.lastOutput(), connector.transferRate(), MachineInfoSnapshot.EnergyBottleneck.NONE)
+                .energyTelemetry(
+                        energyFlow.lastInput(),
+                        energyFlow.lastOutput(),
+                        connector.transferRate(),
+                        AdjacentEnergyConnector.inputBottleneck(connector, energyDemand)
+                )
                 .gear(gearSummary())
                 .output(status == STATUS_COMPRESSED_FULL
                         ? MachineInfoSnapshot.OutputSummary.OUTPUT_FULL
@@ -807,13 +817,6 @@ public class CompressorTankBlockEntity extends BaseMachineBlockEntity
         return consumed;
     }
 
-    private int effectiveMaxEnergyInput() {
-        if (!supportsCompression()) {
-            return 0;
-        }
-        return Math.max(0, (int) Math.round(effectiveStats().value(MachineStat.ENERGY_TRANSFER)));
-    }
-
     private ItemStack batteryCellStack() {
         return gearInventory.getStackInSlot(SLOT_BATTERY_CELL);
     }
@@ -970,7 +973,7 @@ public class CompressorTankBlockEntity extends BaseMachineBlockEntity
                 return 0;
             }
 
-            int remaining = Math.min(toReceive, effectiveMaxEnergyInput());
+            int remaining = toReceive;
             int received = receiveInternalEnergy(remaining, simulate);
             remaining -= received;
 
@@ -1007,7 +1010,7 @@ public class CompressorTankBlockEntity extends BaseMachineBlockEntity
 
         @Override
         public boolean canReceive() {
-            if (effectiveMaxEnergyInput() <= 0) {
+            if (!supportsCompression()) {
                 return false;
             }
             if (internalEnergyStored() < internalEnergyCapacity()) {

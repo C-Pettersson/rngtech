@@ -425,6 +425,7 @@ public class MetalPressBlockEntity extends BaseMachineBlockEntity
         MetalPressRecipe recipe = nextRecipe();
         MachineStatAccumulator stats = routeStats(recipe, effectiveStats());
         int status = statusCode(recipe, stats);
+        int energyDemand = energyDemand(status, recipe, stats);
         AdjacentEnergyConnector.Info connector = AdjacentEnergyConnector.forSink(level, worldPosition);
         return MachineInfoSnapshot.builder("metal_press")
                 .state(
@@ -440,8 +441,13 @@ public class MetalPressBlockEntity extends BaseMachineBlockEntity
                         status == STATUS_WARMING ? currentTargetTemperature(recipe) : currentMinimumTemperature(recipe, stats)
                 )
                 .progress(progress, currentProcessingTicks(recipe, stats))
-                .energy(energyStored(), energyCapacity(), -energyDemand(status, recipe, stats))
-                .energyTelemetry(energyFlow.lastInput(), energyFlow.lastOutput(), connector.transferRate(), MachineInfoSnapshot.EnergyBottleneck.NONE)
+                .energy(energyStored(), energyCapacity(), -energyDemand)
+                .energyTelemetry(
+                        energyFlow.lastInput(),
+                        energyFlow.lastOutput(),
+                        connector.transferRate(),
+                        AdjacentEnergyConnector.inputBottleneck(connector, energyDemand)
+                )
                 .heat(currentTemperature, currentTargetTemperature(recipe))
                 .gear(hasHeatCore()
                         ? MachineInfoSnapshot.GearSummary.HEAT_CORE_INSTALLED
@@ -1257,10 +1263,6 @@ public class MetalPressBlockEntity extends BaseMachineBlockEntity
         return consumed;
     }
 
-    private int effectiveMaxEnergyInput() {
-        return Math.max(1, (int) Math.round(effectiveStats().value(MachineStat.ENERGY_TRANSFER)));
-    }
-
     private boolean hasRequiredComponents() {
         return hasHeatCore() && (isCrudePress() || hasServo()) && hasMold();
     }
@@ -1404,7 +1406,7 @@ public class MetalPressBlockEntity extends BaseMachineBlockEntity
                 return 0;
             }
 
-            int remaining = Math.min(toReceive, effectiveMaxEnergyInput());
+            int remaining = toReceive;
             int received = receiveInternalEnergy(remaining, simulate);
             remaining -= received;
 

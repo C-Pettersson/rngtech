@@ -19,7 +19,7 @@ The recipe type is `rngtech:vacuum_collapse`. Recipes declare catalyst input, mi
 | Void Chamber | Yes | Tungstensteel, Nullite, or Exotic Void Chambers | Sets `PROCESSING_LEVEL`, generation, and stability |
 | Collapse Nozzle | Yes | Steel through Exotic Collapse Nozzles | Tunes generation, transfer, speed, and stability. `rngtech:nitrogen_separation_nozzle` is rejected. |
 | Dimensional Stabilizer | Yes | Tungstensteel, Nullite, or Exotic Dimensional Stabilizers | Improves stability and efficiency |
-| Energy Connector | No | Existing Energy Connector items | Sets side FE export when installed; without one, export uses the machine's effective `ENERGY_TRANSFER` |
+| Energy Connector | No | Existing Energy Connector items | Sets side FE export when installed; without one, export uses the machine's effective `ENERGY_TRANSFER`. The cap is per tick, shared between the generator's own push and connector pulls |
 
 The current starter catalyst item is `rngtech:void_catalyst`; default recipes can produce `rngtech:collapse_residue`. Void Chamber stage remains the hard recipe gate. If the installed Collapse Nozzle stage is below a recipe's minimum chamber stage, each missing stage adds `+1.0` local instability pressure.
 
@@ -49,7 +49,7 @@ Void Chamber and Collapse Nozzle generation multiply each other, the nozzle stag
 ## Automation
 
 - Top inserts valid catalysts.
-- Sides extract FE, capped by the installed Energy Connector tier or by effective `ENERGY_TRANSFER` when no connector is installed.
+- Sides extract FE, capped by the installed Energy Connector tier or by effective `ENERGY_TRANSFER` when no connector is installed. The cap is per tick, shared between the generator's own push and connector pulls.
 - Bottom extracts residue.
 - Gear slots are manual UI equipment.
 - Redstone power pauses generation.

@@ -98,7 +98,6 @@ public class UniversalConnectorScreen extends AbstractContainerScreen<UniversalC
     private static final int COLOR_ITEM = 0xFF6C7658;
     private static final int COLOR_CHANNEL = 0xFF8A5E85;
     private static final int COLOR_BRIDGE = 0xFF7B5EA7;
-    private static final int COLOR_POSITIVE = 0xFF4F7F45;
     private static final int COLOR_NEGATIVE = 0xFFA14D4D;
 
     private static final String[] NETWORK_ENERGY_WINDOW_LABELS = {"1m", "5m", "15m"};
@@ -368,6 +367,10 @@ public class UniversalConnectorScreen extends AbstractContainerScreen<UniversalC
         );
         guiGraphics.drawString(font, font.plainSubstrByWidth(transfer, 170), 76, 84, TEXT_MUTED, false);
         guiGraphics.drawString(font, font.plainSubstrByWidth(live, 190), 76, 96, TEXT_MUTED, false);
+        if (menu.hasConnector() && !menu.targetHasEnergyAccess()) {
+            String warning = Component.translatable("rngtech.cable_connector.no_energy_access").getString();
+            guiGraphics.drawString(font, font.plainSubstrByWidth(warning, 226), 76, 110, COLOR_NEGATIVE, false);
+        }
     }
 
     private void drawModuleLabels(GuiGraphics guiGraphics) {
@@ -693,7 +696,6 @@ public class UniversalConnectorScreen extends AbstractContainerScreen<UniversalC
     private void drawNetworkEnergyText(GuiGraphics guiGraphics) {
         int input = selectedNetworkEnergyInput();
         int output = selectedNetworkEnergyOutput();
-        int sum = input - output;
         drawClipped(
                 guiGraphics,
                 Component.translatable("rngtech.universal_connector.network_energy.title", menu.channel()),
@@ -727,13 +729,13 @@ public class UniversalConnectorScreen extends AbstractContainerScreen<UniversalC
         drawClipped(
                 guiGraphics,
                 Component.translatable(
-                        "rngtech.universal_connector.network_energy.sum.short",
-                        signedEnergyRate(sum)
+                        "rngtech.universal_connector.network_energy.max.short",
+                        CompactValueText.energyRate(menu.networkEnergyChannelCap())
                 ),
                 NETWORK_ENERGY_ROW_X + 172,
                 NETWORK_ENERGY_ROW_Y + 16,
                 71,
-                sumColor(sum)
+                TEXT_MUTED
         );
     }
 
@@ -791,23 +793,6 @@ public class UniversalConnectorScreen extends AbstractContainerScreen<UniversalC
         };
     }
 
-    private static int sumColor(int sum) {
-        if (sum > 0) {
-            return COLOR_POSITIVE;
-        }
-        if (sum < 0) {
-            return COLOR_NEGATIVE;
-        }
-        return TEXT_MUTED;
-    }
-
-    private static String signedEnergyRate(int amount) {
-        return (amount > 0 ? "+" : "") + CompactValueText.energyRate(amount);
-    }
-
-    private static Component signedExactEnergyRate(int amount) {
-        return Component.literal((amount > 0 ? "+" : "") + CompactValueText.exactEnergyRate(amount).getString());
-    }
 
     private static String channelSummary(int channelMask) {
         if (channelMask == 0) {
@@ -841,10 +826,13 @@ public class UniversalConnectorScreen extends AbstractContainerScreen<UniversalC
     }
 
     private Component modeName() {
+        return Component.translatable(connectorMode().translationKey());
+    }
+
+    private CableConnectorMode connectorMode() {
         CableConnectorMode[] values = CableConnectorMode.values();
         int ordinal = menu.modeOrdinal();
-        CableConnectorMode mode = ordinal >= 0 && ordinal < values.length ? values[ordinal] : CableConnectorMode.BOTH;
-        return Component.translatable(mode.translationKey());
+        return ordinal >= 0 && ordinal < values.length ? values[ordinal] : CableConnectorMode.BOTH;
     }
 
     private EnergyDistributionMode distributionMode() {
@@ -870,6 +858,19 @@ public class UniversalConnectorScreen extends AbstractContainerScreen<UniversalC
             if (!tooltip.isEmpty()) {
                 guiGraphics.renderComponentTooltip(font, tooltip, mouseX, mouseY);
             }
+            return;
+        }
+        if (isEnergyTab() && inBounds(mouseX, mouseY, ENERGY_MODE_X, ENERGY_ROW_Y, ENERGY_MODE_WIDTH, SMALL_BUTTON)) {
+            CableConnectorMode connectorMode = connectorMode();
+            guiGraphics.renderComponentTooltip(
+                    font,
+                    List.of(
+                            Component.translatable(connectorMode.translationKey()),
+                            Component.translatable(connectorMode.descriptionKey())
+                    ),
+                    mouseX,
+                    mouseY
+            );
             return;
         }
         if (!isEnergyTab()
@@ -997,7 +998,7 @@ public class UniversalConnectorScreen extends AbstractContainerScreen<UniversalC
                     Component.translatable(
                             "rngtech.universal_connector.debug.energy_outputs.tooltip",
                             menu.networkEnergyEndpoints(),
-                            menu.networkEnergyTransferCap()
+                            CompactValueText.exactEnergyRate(menu.networkEnergyOutputCap())
                     )
             );
             case 3 -> List.of(
@@ -1017,10 +1018,12 @@ public class UniversalConnectorScreen extends AbstractContainerScreen<UniversalC
             case 0 -> List.of(
                     Component.translatable("rngtech.universal_connector.debug.energy"),
                     Component.translatable(
-                            "rngtech.universal_connector.debug.module.tooltip",
+                            "rngtech.universal_connector.debug.energy.tooltip",
                             menu.networkEnergyModules(),
                             channelSummary(menu.networkEnergyChannelsMask()),
-                            menu.networkEnergyTransferCap() + " FE/t"
+                            CompactValueText.exactEnergyRate(menu.networkEnergyTransferCap()),
+                            CompactValueText.exactEnergyRate(menu.networkEnergyInputCap()),
+                            CompactValueText.exactEnergyRate(menu.networkEnergyOutputCap())
                     )
             );
             case 1 -> List.of(
@@ -1058,10 +1061,8 @@ public class UniversalConnectorScreen extends AbstractContainerScreen<UniversalC
     private List<Component> networkEnergyTooltip() {
         int input = selectedNetworkEnergyInput();
         int output = selectedNetworkEnergyOutput();
-        int sum = input - output;
         int liveInput = menu.networkEnergyLiveInput();
         int liveOutput = menu.networkEnergyLiveOutput();
-        int liveSum = liveInput - liveOutput;
         return List.of(
                 Component.translatable(
                         "rngtech.universal_connector.network_energy.tooltip",
@@ -1079,9 +1080,8 @@ public class UniversalConnectorScreen extends AbstractContainerScreen<UniversalC
                         CompactValueText.exactEnergyRate(liveOutput)
                 ),
                 Component.translatable(
-                        "rngtech.universal_connector.network_energy.sum.tooltip",
-                        signedExactEnergyRate(sum),
-                        signedExactEnergyRate(liveSum)
+                        "rngtech.universal_connector.network_energy.max.tooltip",
+                        CompactValueText.exactEnergyRate(menu.networkEnergyChannelCap())
                 )
         );
     }

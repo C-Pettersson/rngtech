@@ -208,6 +208,10 @@ public class UniversalConnectorMenu extends AbstractContainerMenu {
         return data.get(UniversalConnectorBlockEntity.dataHasConnectorIndex()) != 0;
     }
 
+    public boolean targetHasEnergyAccess() {
+        return data.get(UniversalConnectorBlockEntity.dataEnergyTargetAccessIndex()) != 0;
+    }
+
     public int lastEnergyInput() {
         return data.get(UniversalConnectorBlockEntity.dataLastEnergyInputIndex());
     }
@@ -346,6 +350,18 @@ public class UniversalConnectorMenu extends AbstractContainerMenu {
 
     public int networkEnergyTransferCap() {
         return data.get(UniversalConnectorBlockEntity.dataNetworkEnergyTransferCapIndex());
+    }
+
+    public int networkEnergyInputCap() {
+        return data.get(UniversalConnectorBlockEntity.dataNetworkEnergyInputCapIndex());
+    }
+
+    public int networkEnergyOutputCap() {
+        return data.get(UniversalConnectorBlockEntity.dataNetworkEnergyOutputCapIndex());
+    }
+
+    public int networkEnergyChannelCap() {
+        return data.get(UniversalConnectorBlockEntity.dataNetworkEnergyChannelCapIndex());
     }
 
     public int networkFluidShipmentCap() {

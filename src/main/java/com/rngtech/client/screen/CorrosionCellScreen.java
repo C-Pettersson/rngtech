@@ -214,7 +214,9 @@ public class CorrosionCellScreen extends AbstractContainerScreen<CorrosionCellMe
         );
         int electrolyteHeight = Math.round((ELECTROLYTE_METER_HEIGHT - 4) * menu.electrolyteFluidProgress());
         int electrolyteBottom = y + ELECTROLYTE_METER_Y + ELECTROLYTE_METER_HEIGHT - 2;
-        guiGraphics.fill(
+        FluidBarRenderer.fill(
+                guiGraphics,
+                menu.electrolyteFluidType(),
                 x + ELECTROLYTE_METER_X + 2,
                 electrolyteBottom - electrolyteHeight,
                 x + ELECTROLYTE_METER_X + ELECTROLYTE_METER_WIDTH - 2,

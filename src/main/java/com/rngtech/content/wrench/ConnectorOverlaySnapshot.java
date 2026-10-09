@@ -26,6 +26,7 @@ public record ConnectorOverlaySnapshot(
         int energyTransferRate,
         int lastEnergyInput,
         int lastEnergyOutput,
+        boolean energyTargetAccess,
         int bridgeTypeId,
         int bridgeChannel,
         boolean bridgeModLoaded,
@@ -66,6 +67,7 @@ public record ConnectorOverlaySnapshot(
                 data.get(UniversalConnectorBlockEntity.dataTransferRateIndex()),
                 data.get(UniversalConnectorBlockEntity.dataLastEnergyInputIndex()),
                 data.get(UniversalConnectorBlockEntity.dataLastEnergyOutputIndex()),
+                data.get(UniversalConnectorBlockEntity.dataEnergyTargetAccessIndex()) != 0,
                 data.get(UniversalConnectorBlockEntity.dataBridgeTypeIndex()),
                 data.get(UniversalConnectorBlockEntity.dataBridgeChannelIndex()),
                 data.get(UniversalConnectorBlockEntity.dataBridgeModLoadedIndex()) != 0,
@@ -153,6 +155,7 @@ public record ConnectorOverlaySnapshot(
         buffer.writeVarInt(energyTransferRate);
         buffer.writeVarInt(lastEnergyInput);
         buffer.writeVarInt(lastEnergyOutput);
+        buffer.writeBoolean(energyTargetAccess);
         buffer.writeByte(bridgeTypeId);
         buffer.writeByte(bridgeChannel);
         buffer.writeBoolean(bridgeModLoaded);
@@ -172,6 +175,7 @@ public record ConnectorOverlaySnapshot(
         int energyTransferRate = buffer.readVarInt();
         int lastEnergyInput = buffer.readVarInt();
         int lastEnergyOutput = buffer.readVarInt();
+        boolean energyTargetAccess = buffer.readBoolean();
         int bridgeTypeId = buffer.readByte();
         int bridgeChannel = buffer.readByte();
         boolean bridgeModLoaded = buffer.readBoolean();
@@ -189,6 +193,7 @@ public record ConnectorOverlaySnapshot(
                 energyTransferRate,
                 lastEnergyInput,
                 lastEnergyOutput,
+                energyTargetAccess,
                 bridgeTypeId,
                 bridgeChannel,
                 bridgeModLoaded,

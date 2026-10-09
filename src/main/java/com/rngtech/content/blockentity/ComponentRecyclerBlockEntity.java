@@ -368,7 +368,12 @@ public class ComponentRecyclerBlockEntity extends BaseMachineBlockEntity impleme
                 .status(statusKey(status))
                 .progress(progress, currentProcessingTicks(recipe, stats))
                 .energy(manual ? 0 : energyStored(), manual ? 0 : energyCapacity(), -energyDemand)
-                .energyTelemetry(energyFlow.lastInput(), energyFlow.lastOutput(), manual ? 0 : connector.transferRate(), MachineInfoSnapshot.EnergyBottleneck.NONE)
+                .energyTelemetry(
+                        energyFlow.lastInput(),
+                        energyFlow.lastOutput(),
+                        manual ? 0 : connector.transferRate(),
+                        manual ? MachineInfoSnapshot.EnergyBottleneck.NONE : AdjacentEnergyConnector.inputBottleneck(connector, energyDemand)
+                )
                 .processingLevel(
                         stats.intValue(MachineStat.PROCESSING_LEVEL),
                         recipe == null ? MachineInfoSnapshot.UNSET : recipe.minimumProcessingLevel()
@@ -835,10 +840,6 @@ public class ComponentRecyclerBlockEntity extends BaseMachineBlockEntity impleme
         return consumed;
     }
 
-    private int effectiveMaxEnergyInput() {
-        return Math.max(1, (int) Math.round(effectiveStats().value(MachineStat.ENERGY_TRANSFER)));
-    }
-
     private IEnergyStorage batteryCellEnergyStorage() {
         ItemStack cell = batteryCellStack();
         return cell.isEmpty() ? null : cell.getCapability(Capabilities.EnergyStorage.ITEM);
@@ -956,7 +957,7 @@ public class ComponentRecyclerBlockEntity extends BaseMachineBlockEntity impleme
             if (!canReceive() || toReceive <= 0) {
                 return 0;
             }
-            int remaining = Math.min(toReceive, effectiveMaxEnergyInput());
+            int remaining = toReceive;
             int received = receiveInternalEnergy(remaining, simulate);
             remaining -= received;
             IEnergyStorage cell = batteryCellEnergyStorage();

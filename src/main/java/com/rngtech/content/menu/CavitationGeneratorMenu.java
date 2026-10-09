@@ -7,7 +7,6 @@ import com.rngtech.content.registry.ModMenus;
 import com.rngtech.rpg.MachineTraits;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
@@ -21,8 +20,6 @@ import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.material.Fluid;
-import net.minecraft.world.level.material.Fluids;
-import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.items.ItemStackHandler;
 import net.neoforged.neoforge.items.SlotItemHandler;
 
@@ -230,8 +227,16 @@ public class CavitationGeneratorMenu extends AbstractContainerMenu {
         return data.get(DATA_INPUT_FLUID_CAPACITY);
     }
 
+    public Fluid inputFluidType() {
+        return FluidMenuSupport.fluid(data.get(DATA_INPUT_FLUID_ID));
+    }
+
+    public Fluid outputFluidType() {
+        return FluidMenuSupport.fluid(data.get(DATA_OUTPUT_FLUID_ID));
+    }
+
     public Component inputFluidName() {
-        return fluidName(DATA_INPUT_FLUID_ID, Component.translatable("block.minecraft.water"));
+        return FluidMenuSupport.fluidName(data.get(DATA_INPUT_FLUID_ID), Component.translatable("block.minecraft.water"));
     }
 
     public int heatStrain() {
@@ -271,7 +276,7 @@ public class CavitationGeneratorMenu extends AbstractContainerMenu {
     }
 
     public Component outputFluidName() {
-        return fluidName(DATA_OUTPUT_FLUID_ID, Component.translatable("fluid.rngtech.nitrogen"));
+        return FluidMenuSupport.fluidName(data.get(DATA_OUTPUT_FLUID_ID), Component.translatable("fluid.rngtech.nitrogen"));
     }
 
     public int recipeFluidOutput() {
@@ -443,11 +448,6 @@ public class CavitationGeneratorMenu extends AbstractContainerMenu {
         for (int column = 0; column < 9; column++) {
             addSlot(new TabbedInventorySlot(playerInventory, column, 39 + column * 18, 174, () -> selectedTab != TAB_STATS));
         }
-    }
-
-    private Component fluidName(int dataIndex, Component emptyName) {
-        Fluid fluid = BuiltInRegistries.FLUID.byId(data.get(dataIndex));
-        return fluid == null || fluid == Fluids.EMPTY ? emptyName : new FluidStack(fluid, 1).getHoverName();
     }
 
     private static CavitationGeneratorBlockEntity blockEntity(Inventory playerInventory, BlockPos pos) {

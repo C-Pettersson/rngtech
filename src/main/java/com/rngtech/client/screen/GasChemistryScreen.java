@@ -9,6 +9,8 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.level.material.Fluid;
+import net.minecraft.world.level.material.Fluids;
 
 public class GasChemistryScreen extends AbstractContainerScreen<GasChemistryMenu> {
     private static final int PANEL = 0xFFC7C8C2;
@@ -121,18 +123,18 @@ public class GasChemistryScreen extends AbstractContainerScreen<GasChemistryMenu
 
     private void renderProcessing(GuiGraphics guiGraphics) {
         int energyX = menu.machine() == GasChemistryMachine.SYNGAS_COMBUSTOR ? COMBUSTOR_ENERGY_BAR_X : ENERGY_BAR_X;
-        bar(guiGraphics, energyX, 28, menu.energyFill(), ENERGY);
+        bar(guiGraphics, energyX, 28, menu.energyFill(), Fluids.EMPTY, ENERGY);
         if (menu.machine() != GasChemistryMachine.SYNGAS_COMBUSTOR) {
-            bar(guiGraphics, WATER_BAR_X, 28, menu.waterFill(), WATER);
+            bar(guiGraphics, WATER_BAR_X, 28, menu.waterFill(), menu.waterFluidType(), WATER);
         }
         if (menu.machine() != GasChemistryMachine.COAL_GASIFIER) {
             int inputX = menu.machine() == GasChemistryMachine.SYNGAS_COMBUSTOR ? COMBUSTOR_INPUT_BAR_X : INPUT_BAR_X;
-            bar(guiGraphics, inputX, 28, menu.inputFill(), GAS);
+            bar(guiGraphics, inputX, 28, menu.inputFill(), menu.inputFluidType(), GAS);
         }
         int outputX = menu.machine() == GasChemistryMachine.COAL_GASIFIER ? GASIFIER_OUTPUT_BAR_X : STANDARD_OUTPUT_BAR_X;
-        bar(guiGraphics, outputX, 28, menu.outputFill(), OUTPUT);
+        bar(guiGraphics, outputX, 28, menu.outputFill(), menu.outputFluidType(), OUTPUT);
         if (menu.machine() == GasChemistryMachine.STEAM_METHANE_REFORMER) {
-            bar(guiGraphics, SECONDARY_OUTPUT_BAR_X, 28, menu.secondaryOutputFill(), SECONDARY);
+            bar(guiGraphics, SECONDARY_OUTPUT_BAR_X, 28, menu.secondaryOutputFill(), menu.secondaryOutputFluidType(), SECONDARY);
         }
         if (menu.machine() == GasChemistryMachine.COAL_GASIFIER) {
             slot(guiGraphics, GASIFIER_INPUT_SLOT_X, 49);
@@ -202,10 +204,10 @@ public class GasChemistryScreen extends AbstractContainerScreen<GasChemistryMenu
         guiGraphics.drawString(font, label, x + (TAB_WIDTH - font.width(label)) / 2, y + 7, TEXT, false);
     }
 
-    private void bar(GuiGraphics guiGraphics, int x, int y, float fill, int color) {
+    private void bar(GuiGraphics guiGraphics, int x, int y, float fill, Fluid fluid, int color) {
         guiGraphics.fill(leftPos + x, topPos + y, leftPos + x + 10, topPos + y + 50, DARK);
         int height = Math.round(48 * fill);
-        guiGraphics.fill(leftPos + x + 1, topPos + y + 49 - height, leftPos + x + 9, topPos + y + 49, color);
+        FluidBarRenderer.fill(guiGraphics, fluid, leftPos + x + 1, topPos + y + 49 - height, leftPos + x + 9, topPos + y + 49, color);
     }
 
     private void statusIcon(GuiGraphics guiGraphics, int x, int y) {

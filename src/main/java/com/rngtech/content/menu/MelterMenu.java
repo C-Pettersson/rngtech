@@ -27,7 +27,7 @@ import net.minecraft.world.inventory.SimpleContainerData;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.neoforged.neoforge.fluids.FluidStack;
+import net.minecraft.world.level.material.Fluid;
 import net.neoforged.neoforge.items.ItemStackHandler;
 import net.neoforged.neoforge.items.SlotItemHandler;
 
@@ -64,7 +64,9 @@ public class MelterMenu extends AbstractContainerMenu implements MasteryMenuView
     private static final int DATA_FLUID_TRANSFER = 20;
     private static final int DATA_REFINEMENT_POTENTIAL = 21;
     private static final int DATA_BATCH_SIZE = DATA_REFINEMENT_POTENTIAL + 1;
-    private static final int DATA_MACHINE_PROGRESSION_START = DATA_BATCH_SIZE + 1;
+    private static final int DATA_INPUT_FLUID_ID = DATA_BATCH_SIZE + 1;
+    private static final int DATA_OUTPUT_FLUID_ID = DATA_INPUT_FLUID_ID + 1;
+    private static final int DATA_MACHINE_PROGRESSION_START = DATA_OUTPUT_FLUID_ID + 1;
     private static final int DATA_COUNT = DATA_MACHINE_PROGRESSION_START + MasteryMenuSupport.FIELD_COUNT;
     private static final int STAT_SCALE = 100;
     private static final int PROCESS_SLOT_COUNT = MelterBlockEntity.PROCESS_SLOT_COUNT;
@@ -228,14 +230,20 @@ public class MelterMenu extends AbstractContainerMenu implements MasteryMenuView
         return data.get(DATA_OUTPUT_FLUID_CAPACITY);
     }
 
+    public Fluid inputFluidType() {
+        return FluidMenuSupport.fluid(data.get(DATA_INPUT_FLUID_ID));
+    }
+
+    public Fluid outputFluidType() {
+        return FluidMenuSupport.fluid(data.get(DATA_OUTPUT_FLUID_ID));
+    }
+
     public Component inputFluidName() {
-        FluidStack stack = melter.getInputTank().getFluid();
-        return stack.isEmpty() ? Component.literal("Water") : stack.getHoverName();
+        return FluidMenuSupport.fluidName(data.get(DATA_INPUT_FLUID_ID), Component.translatable("block.minecraft.water"));
     }
 
     public Component outputFluidName() {
-        FluidStack stack = melter.getOutputTank().getFluid();
-        return stack.isEmpty() ? Component.literal("Melter Product") : stack.getHoverName();
+        return FluidMenuSupport.fluidName(data.get(DATA_OUTPUT_FLUID_ID), Component.translatable("rngtech.melter.product"));
     }
 
     public int fluidTransfer() {

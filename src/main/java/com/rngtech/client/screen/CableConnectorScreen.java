@@ -36,6 +36,8 @@ public class CableConnectorScreen extends AbstractContainerScreen<CableConnector
     private static final int ATTACH_X = 212;
     private static final int ATTACH_WIDTH = 48;
     private static final int TRANSFER_Y = 100;
+    private static final int WARNING_Y = 110;
+    private static final int WARNING = 0xFFA14D4D;
 
     public CableConnectorScreen(CableConnectorMenu menu, Inventory playerInventory, Component title) {
         super(menu, playerInventory, title);
@@ -92,6 +94,10 @@ public class CableConnectorScreen extends AbstractContainerScreen<CableConnector
                 TEXT_MUTED,
                 false
         );
+        if (!menu.targetHasEnergyAccess()) {
+            String warning = Component.translatable("rngtech.cable_connector.no_energy_access").getString();
+            guiGraphics.drawString(font, font.plainSubstrByWidth(warning, imageWidth - 16), 8, WARNING_Y, WARNING, false);
+        }
     }
 
     @Override
@@ -157,10 +163,13 @@ public class CableConnectorScreen extends AbstractContainerScreen<CableConnector
     }
 
     private Component modeName() {
+        return Component.translatable(connectorMode().translationKey());
+    }
+
+    private CableConnectorMode connectorMode() {
         CableConnectorMode[] values = CableConnectorMode.values();
         int ordinal = menu.modeOrdinal();
-        CableConnectorMode mode = ordinal >= 0 && ordinal < values.length ? values[ordinal] : CableConnectorMode.BOTH;
-        return Component.translatable(mode.translationKey());
+        return ordinal >= 0 && ordinal < values.length ? values[ordinal] : CableConnectorMode.BOTH;
     }
 
     private EnergyDistributionMode distributionMode() {
@@ -174,6 +183,16 @@ public class CableConnectorScreen extends AbstractContainerScreen<CableConnector
     }
 
     private void renderControlTooltip(GuiGraphics guiGraphics, int mouseX, int mouseY) {
+        if (inBounds(mouseX, mouseY, MODE_X, ROW_Y, MODE_WIDTH, SMALL_BUTTON)) {
+            CableConnectorMode mode = connectorMode();
+            guiGraphics.renderComponentTooltip(
+                    font,
+                    List.of(Component.translatable(mode.translationKey()), Component.translatable(mode.descriptionKey())),
+                    mouseX,
+                    mouseY
+            );
+            return;
+        }
         if (!inBounds(mouseX, mouseY, DISTRIBUTION_X, ROW_Y, DISTRIBUTION_WIDTH, SMALL_BUTTON)) {
             return;
         }

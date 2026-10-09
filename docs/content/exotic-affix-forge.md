@@ -82,7 +82,7 @@ The default `max_catalyst_count` is `16` for all six built-in action recipes. Da
 
 ## Gear
 
-The Gear tab exposes one optional Battery Cell slot. The forge has a `2,000,000 FE` internal buffer and `65,536 FE/t` block input. An installed Battery Cell acts as portable backing storage so very large operations can continue while FE is supplied over time.
+The Gear tab exposes one optional Battery Cell slot. The forge has a `2,000,000 FE` internal buffer and no machine-side FE intake cap; external intake is limited by free buffer or installed-cell space plus the source or attached Universal Connector. An installed Battery Cell acts as portable backing storage so very large operations can continue while FE is supplied over time.
 
 ## JEI
 

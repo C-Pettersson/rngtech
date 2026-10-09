@@ -1334,12 +1334,6 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
         return consumed;
     }
 
-    private int effectiveMaxEnergyInput() {
-        return isElectric()
-                ? Math.max(1, (int) Math.round(effectiveStats().value(MachineStat.ENERGY_TRANSFER)))
-                : 0;
-    }
-
     private MachineInfoSnapshot.EnergyBottleneck energyBottleneck(
             AdjacentEnergyConnector.Info connector,
             int energyDemand
