@@ -97,14 +97,11 @@ public class AffixForgeBlockEntity extends BlockEntity implements MenuProvider {
     }
 
     public boolean isRefinementConsumable(ItemStack stack) {
-        return stack.getItem() instanceof RefinementConsumableItem item
-                && item.operation() != null
-                && supportsOperation(item.operation());
+        return stack.getItem() instanceof RefinementConsumableItem item && item.operation() != null;
     }
 
     public boolean isFocusItem(ItemStack stack) {
-        return stack.getItem() instanceof RefinementLensItem && hasLensArray()
-                || stack.getItem() instanceof RefinementModifierItem && hasModifierSocket();
+        return stack.getItem() instanceof RefinementLensItem || stack.getItem() instanceof RefinementModifierItem;
     }
 
     public boolean supportsOperation(RefinementOperation operation) {

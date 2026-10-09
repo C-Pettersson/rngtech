@@ -27,5 +27,7 @@ public class RefinementModifierItem extends Item {
         super.appendHoverText(stack, context, tooltipComponents, tooltipFlag);
         tooltipComponents.add(Component.translatable("rngtech.tooltip.refinement_modifier").withStyle(ChatFormatting.GRAY));
         tooltipComponents.add(Component.translatable(modifier.tooltipKey()).withStyle(ChatFormatting.DARK_AQUA));
+        tooltipComponents.add(Component.translatable("rngtech.tooltip.refinement_modifier.requires_modifier_socket")
+                .withStyle(ChatFormatting.DARK_GRAY));
     }
 }

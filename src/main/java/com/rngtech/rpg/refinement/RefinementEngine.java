@@ -562,9 +562,10 @@ public final class RefinementEngine {
         return Math.min(costRange.max(), Math.max(costRange.min(), tierMinimum));
     }
 
-    private static boolean canUseModifier(RefinementAction action) {
+    public static boolean canUseModifier(RefinementAction action) {
         return action == RefinementAction.RANDOM_ADD
                 || action == RefinementAction.TARGETED_ADD_OR_UPGRADE
+                || action == RefinementAction.RANDOM_UPGRADE
                 || action == RefinementAction.SELECTED_UPGRADE;
     }
 
@@ -966,7 +967,8 @@ public final class RefinementEngine {
     private static int ascensionUpgradeTargetTier(MachineModifier current, ModifierDefinition definition) {
         int currentTier = Math.max(1, current.tier());
         int maxTier = Math.max(1, definition.maxTier());
-        return Math.min(maxTier, currentTier + 1);
+        int maxUpgradeTier = Math.min(maxTier, MachineTraitRoller.maxUpgradeTier());
+        return currentTier >= maxUpgradeTier ? Math.min(currentTier, maxTier) : currentTier + 1;
     }
 
     private static RefinementResult removeModifier(ModifierEligibilityProfile profile, MachineTraits traits, RandomSource random) {

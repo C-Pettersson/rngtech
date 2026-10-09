@@ -637,7 +637,7 @@ public final class RNGTechJeiPlugin implements IModPlugin {
                 JeiRecipeTypes.EXOTIC_AFFIX_FORGE,
                 0,
                 2,
-                3,
+                4,
                 36
         );
         registration.addRecipeTransferHandler(

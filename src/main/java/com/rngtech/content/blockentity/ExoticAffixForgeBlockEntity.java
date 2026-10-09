@@ -82,7 +82,9 @@ public class ExoticAffixForgeBlockEntity extends BlockEntity implements MenuProv
     private static final int DATA_POWER_FAILURE = 11;
     private static final int DATA_CRAFT_ACTIVE = 12;
     private static final int DATA_CRAFT_FAILED = 13;
-    private static final int DATA_COUNT = 14;
+    private static final int DATA_SELECTED_ACTION = 14;
+    private static final int DATA_SELECTION = 15;
+    private static final int DATA_COUNT = 16;
 
     private final ItemStackHandler processInventory = new ItemStackHandler(PROCESS_SLOT_COUNT) {
         @Override
@@ -110,7 +112,7 @@ public class ExoticAffixForgeBlockEntity extends BlockEntity implements MenuProv
 
         @Override
         protected void onContentsChanged(int slot) {
-            if (slot == SLOT_TARGET || slot == SLOT_CATALYST) {
+            if (slot == SLOT_TARGET) {
                 resetCycle();
             }
             setChanged();
@@ -164,6 +166,8 @@ public class ExoticAffixForgeBlockEntity extends BlockEntity implements MenuProv
                 case DATA_POWER_FAILURE -> powerFailure;
                 case DATA_CRAFT_ACTIVE -> craftActive ? 1 : 0;
                 case DATA_CRAFT_FAILED -> craftFailed ? 1 : 0;
+                case DATA_SELECTED_ACTION -> selectedAction.ordinal();
+                case DATA_SELECTION -> ExoticAffixForgeMenu.selectionCode(selectedRefinement);
                 default -> 0;
             };
         }
@@ -383,6 +387,7 @@ public class ExoticAffixForgeBlockEntity extends BlockEntity implements MenuProv
             case STATUS_ILLEGAL_OPERATION -> "illegal_operation";
             case STATUS_NO_POWER -> "no_power";
             case STATUS_OUTPUT_FULL -> "output_full";
+            case STATUS_WORKING -> "working";
             case STATUS_FAILED -> "failed";
             default -> "";
         };
