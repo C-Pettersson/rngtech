@@ -27,13 +27,13 @@ public class CavitationGeneratorScreen extends AbstractContainerScreen<Cavitatio
     private static final int STAT_PANEL_Y = 18;
     private static final int STAT_PANEL_WIDTH = 224;
     private static final int FLUID_METER_X = 8;
-    private static final int FLUID_METER_Y = 24;
+    private static final int FLUID_METER_Y = 27;
     private static final int FLUID_METER_WIDTH = 16;
     private static final int FLUID_METER_HEIGHT = 52;
     private static final int FLUID_SLOT_X = 28;
-    private static final int FLUID_SLOT_Y = 58;
+    private static final int FLUID_SLOT_Y = 61;
     private static final int OUTPUT_METER_X = 52;
-    private static final int OUTPUT_METER_Y = 24;
+    private static final int OUTPUT_METER_Y = 27;
     private static final int OUTPUT_METER_WIDTH = 16;
     private static final int OUTPUT_METER_HEIGHT = 52;
     private static final int ENERGY_METER_X = 176;
@@ -229,7 +229,7 @@ public class CavitationGeneratorScreen extends AbstractContainerScreen<Cavitatio
         );
         int fluidHeight = Math.round((FLUID_METER_HEIGHT - 4) * menu.fluidProgress());
         int fluidBottom = y + FLUID_METER_Y + FLUID_METER_HEIGHT - 2;
-        guiGraphics.fill(x + FLUID_METER_X + 2, fluidBottom - fluidHeight, x + FLUID_METER_X + FLUID_METER_WIDTH - 2, fluidBottom, FLUID);
+        FluidBarRenderer.fill(guiGraphics, menu.inputFluidType(), x + FLUID_METER_X + 2, fluidBottom - fluidHeight, x + FLUID_METER_X + FLUID_METER_WIDTH - 2, fluidBottom, FLUID);
 
         guiGraphics.fill(
                 x + OUTPUT_METER_X,
@@ -240,7 +240,7 @@ public class CavitationGeneratorScreen extends AbstractContainerScreen<Cavitatio
         );
         int outputHeight = Math.round((OUTPUT_METER_HEIGHT - 4) * menu.outputFluidProgress());
         int outputBottom = y + OUTPUT_METER_Y + OUTPUT_METER_HEIGHT - 2;
-        guiGraphics.fill(x + OUTPUT_METER_X + 2, outputBottom - outputHeight, x + OUTPUT_METER_X + OUTPUT_METER_WIDTH - 2, outputBottom, NITROGEN);
+        FluidBarRenderer.fill(guiGraphics, menu.outputFluidType(), x + OUTPUT_METER_X + 2, outputBottom - outputHeight, x + OUTPUT_METER_X + OUTPUT_METER_WIDTH - 2, outputBottom, NITROGEN);
 
         guiGraphics.fill(
                 x + ENERGY_METER_X,

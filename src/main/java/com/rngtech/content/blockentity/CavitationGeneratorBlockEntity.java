@@ -34,6 +34,7 @@ import com.rngtech.util.TickTransferCounter;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
@@ -124,6 +125,8 @@ public class CavitationGeneratorBlockEntity extends BaseMachineBlockEntity
     private static final int DATA_RECIPE_FLUID_OUTPUT = 30;
     private static final int DATA_FLAT_ENERGY_GENERATION = 31;
     private static final int DATA_BASE_ENERGY_GENERATION = 32;
+    private static final int DATA_INPUT_FLUID_ID = 33;
+    private static final int DATA_OUTPUT_FLUID_ID = 34;
     private static final int STAT_SCALE = 100;
 
     private final ItemStackHandler processInventory = new ItemStackHandler(PROCESS_SLOT_COUNT) {
@@ -244,6 +247,8 @@ public class CavitationGeneratorBlockEntity extends BaseMachineBlockEntity
                 case DATA_OUTPUT_FLUID -> outputTank.getFluidAmount();
                 case DATA_OUTPUT_FLUID_CAPACITY -> outputTank.getCapacity();
                 case DATA_RECIPE_FLUID_OUTPUT -> currentRecipeFluidOutput(stats);
+                case DATA_INPUT_FLUID_ID -> BuiltInRegistries.FLUID.getId(inputTank.getFluid().getFluid());
+                case DATA_OUTPUT_FLUID_ID -> BuiltInRegistries.FLUID.getId(outputTank.getFluid().getFluid());
                 default -> 0;
             };
         }
@@ -254,7 +259,7 @@ public class CavitationGeneratorBlockEntity extends BaseMachineBlockEntity
 
         @Override
         public int getCount() {
-            return DATA_BASE_ENERGY_GENERATION + 1;
+            return DATA_OUTPUT_FLUID_ID + 1;
         }
     };
 

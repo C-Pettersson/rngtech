@@ -124,13 +124,13 @@ public class MetalPressMenu extends AbstractContainerMenu implements MasteryMenu
 
         ItemStackHandler processInventory = press.getProcessInventory();
         addSlot(new TabbedSlot(processInventory, MetalPressBlockEntity.SLOT_INPUT, 56, 42, () -> selectedTab == TAB_PROCESSING));
-        addSlot(new TabbedSlot(processInventory, MetalPressBlockEntity.SLOT_OUTPUT, 170, 54, () -> selectedTab == TAB_PROCESSING));
+        addSlot(new TabbedSlot(processInventory, MetalPressBlockEntity.SLOT_OUTPUT, 170, 52, () -> selectedTab == TAB_PROCESSING));
 
         ItemStackHandler gearInventory = press.getGearInventory();
         addSlot(new TabbedSlot(gearInventory, MetalPressBlockEntity.SLOT_HEAT_CORE, 30, 48, () -> selectedTab == TAB_GEAR));
         addSlot(new TabbedSlot(gearInventory, MetalPressBlockEntity.SLOT_SERVO, 78, 48, () -> selectedTab == TAB_GEAR));
         for (int index = 0; index < MetalPressBlockEntity.MOLD_SLOT_COUNT; index++) {
-            addSlot(new TabbedSlot(gearInventory, MetalPressBlockEntity.SLOT_MOLD + index, 30 + index * 48, 76, () -> selectedTab == TAB_GEAR));
+            addSlot(new TabbedSlot(gearInventory, MetalPressBlockEntity.SLOT_MOLD + index, 24 + index * 44, 76, () -> selectedTab == TAB_GEAR));
         }
         addSlot(new TabbedSlot(gearInventory, MetalPressBlockEntity.SLOT_BATTERY_CELL, 126, 48, () -> selectedTab == TAB_GEAR));
 

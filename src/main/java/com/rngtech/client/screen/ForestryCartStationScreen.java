@@ -35,11 +35,11 @@ public class ForestryCartStationScreen extends AbstractContainerScreen<ForestryC
     private static final int WATER_GAUGE_WIDTH = 8;
     private static final int WATER = 0xFF3F76E4;
     private static final int GROUP_LABEL_Y = 21;
-    private static final int STATUS_ICON_X = 20;
+    private static final int STATUS_ICON_X = 19;
     private static final int STATUS_ICON_Y = 72;
-    private static final int ACTION_ICON_X = 36;
+    private static final int ACTION_ICON_X = 35;
     private static final int ACTION_ICON_Y = 72;
-    private static final int HOLD_BUTTON_X = 56;
+    private static final int HOLD_BUTTON_X = 55;
     private static final int HOLD_BUTTON_Y = 72;
     private static final int CONTROL_BUTTON_WIDTH = 30;
     private static final int CONTROL_BUTTON_HEIGHT = 12;
@@ -96,10 +96,10 @@ public class ForestryCartStationScreen extends AbstractContainerScreen<ForestryC
             drawGroupLabel(guiGraphics, "rngtech.forestry_station.group.refills", ForestryCartStationMenu.FERTILIZER_X, 3);
         } else if (menu.selectedTab() == ForestryCartStationMenu.TAB_GEAR) {
             MachineScreenStyle.drawClippedCentered(guiGraphics, font, Component.translatable("rngtech.forestry_station.station_gear"), 119, 22, 120, TEXT_MUTED);
-            MachineScreenStyle.drawClippedCentered(guiGraphics, font, Component.translatable("rngtech.forestry_station.station_cell.short"), 80, 40, 22, TEXT_MUTED);
-            MachineScreenStyle.drawClippedCentered(guiGraphics, font, Component.translatable("rngtech.forestry_station.energy_port.short"), 104, 40, 22, TEXT_MUTED);
-            MachineScreenStyle.drawClippedCentered(guiGraphics, font, Component.translatable("rngtech.forestry_station.item_port.short"), 128, 40, 22, TEXT_MUTED);
-            MachineScreenStyle.drawClippedCentered(guiGraphics, font, Component.translatable("rngtech.forestry_station.fluid_port.short"), 152, 40, 22, TEXT_MUTED);
+            MachineScreenStyle.drawClippedCentered(guiGraphics, font, Component.translatable("rngtech.forestry_station.station_cell.short"), 83, 40, 22, TEXT_MUTED);
+            MachineScreenStyle.drawClippedCentered(guiGraphics, font, Component.translatable("rngtech.forestry_station.energy_port.short"), 107, 40, 22, TEXT_MUTED);
+            MachineScreenStyle.drawClippedCentered(guiGraphics, font, Component.translatable("rngtech.forestry_station.item_port.short"), 131, 40, 22, TEXT_MUTED);
+            MachineScreenStyle.drawClippedCentered(guiGraphics, font, Component.translatable("rngtech.forestry_station.fluid_port.short"), 155, 40, 22, TEXT_MUTED);
         } else {
             drawStatsLabels(guiGraphics);
         }
@@ -185,10 +185,10 @@ public class ForestryCartStationScreen extends AbstractContainerScreen<ForestryC
             renderSlotFrame(guiGraphics, ForestryCartStationMenu.TOOL_X - 1, row);
             renderSlotFrame(guiGraphics, ForestryCartStationMenu.SHEARS_X - 1, row);
         } else if (menu.selectedTab() == ForestryCartStationMenu.TAB_GEAR) {
-            renderSlotFrame(guiGraphics, 70, 51);
-            renderSlotFrame(guiGraphics, 94, 51);
-            renderSlotFrame(guiGraphics, 118, 51);
-            renderSlotFrame(guiGraphics, 142, 51);
+            renderSlotFrame(guiGraphics, 74, 51);
+            renderSlotFrame(guiGraphics, 98, 51);
+            renderSlotFrame(guiGraphics, 122, 51);
+            renderSlotFrame(guiGraphics, 146, 51);
         }
 
         if (menu.selectedTab() == ForestryCartStationMenu.TAB_STATS) {

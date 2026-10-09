@@ -8,6 +8,7 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.level.material.Fluid;
 
 public class AlgaePhotobioreactorScreen extends AbstractContainerScreen<AlgaePhotobioreactorMenu> {
     private static final int PANEL = 0xFFC6C6C6;
@@ -171,8 +172,8 @@ public class AlgaePhotobioreactorScreen extends AbstractContainerScreen<AlgaePho
     }
 
     private void renderProcessing(GuiGraphics guiGraphics) {
-        renderGauge(guiGraphics, WATER_GAUGE_X, WATER_GAUGE_Y, menu.waterProgress(), WATER);
-        renderGauge(guiGraphics, CARBON_GAUGE_X, CARBON_GAUGE_Y, menu.carbonProgress(), CARBON);
+        renderGauge(guiGraphics, WATER_GAUGE_X, WATER_GAUGE_Y, menu.waterProgress(), menu.waterFluidType(), WATER);
+        renderGauge(guiGraphics, CARBON_GAUGE_X, CARBON_GAUGE_Y, menu.carbonProgress(), menu.carbonFluidType(), CARBON);
         renderProgress(guiGraphics);
         renderStatusSquare(guiGraphics, STATUS_X, STATUS_Y, statusColor());
         renderStatusSquare(guiGraphics, LIGHT_X, LIGHT_Y, menu.lightLevel() >= menu.minimumLight() ? LIGHT : PANEL_DARK);
@@ -193,7 +194,7 @@ public class AlgaePhotobioreactorScreen extends AbstractContainerScreen<AlgaePho
     }
 
     private void drawGearLabels(GuiGraphics guiGraphics) {
-        guiGraphics.drawString(font, Component.translatable("rngtech.gear.bio_chamber.short"), 101, 35, TEXT_MUTED, false);
+        MachineScreenStyle.drawClippedCentered(guiGraphics, font, Component.translatable("rngtech.gear.bio_chamber.short"), 118, 35, 54, TEXT_MUTED);
     }
 
     private void drawStatsLabels(GuiGraphics guiGraphics) {
@@ -209,13 +210,13 @@ public class AlgaePhotobioreactorScreen extends AbstractContainerScreen<AlgaePho
         );
     }
 
-    private void renderGauge(GuiGraphics guiGraphics, int gaugeX, int gaugeY, float fill, int color) {
+    private void renderGauge(GuiGraphics guiGraphics, int gaugeX, int gaugeY, float fill, Fluid fluid, int color) {
         int x = leftPos + gaugeX;
         int y = topPos + gaugeY;
         guiGraphics.fill(x, y, x + GAUGE_WIDTH, y + GAUGE_HEIGHT, BAR_BACKING);
         int filledHeight = Math.round((GAUGE_HEIGHT - 2) * fill);
         int bottom = y + GAUGE_HEIGHT - 1;
-        guiGraphics.fill(x + 1, bottom - filledHeight, x + GAUGE_WIDTH - 1, bottom, color);
+        FluidBarRenderer.fill(guiGraphics, fluid, x + 1, bottom - filledHeight, x + GAUGE_WIDTH - 1, bottom, color);
     }
 
     private void renderContainerArrow(GuiGraphics guiGraphics, int arrowX, int arrowY) {

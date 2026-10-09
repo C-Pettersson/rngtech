@@ -42,7 +42,7 @@ public class CompressorTankScreen extends AbstractContainerScreen<CompressorTank
     private static final int COMPRESSION_INDICATOR_Y = 38;
     private static final int COMPRESSION_INDICATOR_WIDTH = 28;
     private static final int COMPRESSION_INDICATOR_HEIGHT = 7;
-    private static final int PLAIN_TANK_X = 76;
+    private static final int PLAIN_TANK_X = 73;
     private static final int PLAIN_TANK_Y = BAR_Y;
     private static final int PLAIN_TANK_WIDTH = 72;
     private static final int PLAIN_TANK_HEIGHT = BAR_HEIGHT;
@@ -239,7 +239,9 @@ public class CompressorTankScreen extends AbstractContainerScreen<CompressorTank
 
         guiGraphics.fill(x + LOOSE_FLUID_BAR_X, y + BAR_Y, x + LOOSE_FLUID_BAR_X + BAR_WIDTH, y + BAR_Y + BAR_HEIGHT, 0xFF5F5F5F);
         int looseHeight = Math.round(BAR_FILL_HEIGHT * menu.looseFluidProgress());
-        guiGraphics.fill(
+        FluidBarRenderer.fill(
+                guiGraphics,
+                menu.looseFluidType(),
                 x + LOOSE_FLUID_BAR_X + 1,
                 y + BAR_Y + BAR_HEIGHT - 1 - looseHeight,
                 x + LOOSE_FLUID_BAR_X + BAR_WIDTH - 1,
@@ -250,7 +252,9 @@ public class CompressorTankScreen extends AbstractContainerScreen<CompressorTank
         if (menu.supportsCompression()) {
             guiGraphics.fill(x + COMPRESSED_FLUID_BAR_X, y + BAR_Y, x + COMPRESSED_FLUID_BAR_X + BAR_WIDTH, y + BAR_Y + BAR_HEIGHT, 0xFF5F5F5F);
             int compressedHeight = Math.round(BAR_FILL_HEIGHT * menu.compressedFluidProgress());
-            guiGraphics.fill(
+            FluidBarRenderer.fill(
+                    guiGraphics,
+                    menu.compressedFluidType(),
                     x + COMPRESSED_FLUID_BAR_X + 1,
                     y + BAR_Y + BAR_HEIGHT - 1 - compressedHeight,
                     x + COMPRESSED_FLUID_BAR_X + BAR_WIDTH - 1,
@@ -260,7 +264,9 @@ public class CompressorTankScreen extends AbstractContainerScreen<CompressorTank
 
             guiGraphics.fill(x + EQUIVALENT_FLUID_BAR_X, y + BAR_Y, x + EQUIVALENT_FLUID_BAR_X + BAR_WIDTH, y + BAR_Y + BAR_HEIGHT, 0xFF5F5F5F);
             int equivalentHeight = Math.round(BAR_FILL_HEIGHT * compressedEquivalentProgress());
-            guiGraphics.fill(
+            FluidBarRenderer.fill(
+                    guiGraphics,
+                    menu.compressedFluidType(),
                     x + EQUIVALENT_FLUID_BAR_X + 1,
                     y + BAR_Y + BAR_HEIGHT - 1 - equivalentHeight,
                     x + EQUIVALENT_FLUID_BAR_X + BAR_WIDTH - 1,
@@ -299,7 +305,9 @@ public class CompressorTankScreen extends AbstractContainerScreen<CompressorTank
         guiGraphics.fill(x, y, x + PLAIN_TANK_WIDTH, y + PLAIN_TANK_HEIGHT, 0xFF5F5F5F);
         guiGraphics.fill(x + 1, y + 1, x + PLAIN_TANK_WIDTH - 1, y + PLAIN_TANK_HEIGHT - 1, 0xFF2F4050);
         int fillHeight = Math.round(PLAIN_TANK_FILL_HEIGHT * menu.looseFluidProgress());
-        guiGraphics.fill(
+        FluidBarRenderer.fill(
+                guiGraphics,
+                menu.looseFluidType(),
                 x + 1,
                 y + PLAIN_TANK_HEIGHT - 1 - fillHeight,
                 x + 1 + PLAIN_TANK_FILL_WIDTH,
@@ -349,11 +357,11 @@ public class CompressorTankScreen extends AbstractContainerScreen<CompressorTank
         if (!menu.supportsCompression()) {
             return;
         }
-        drawGearLabel(guiGraphics, Component.translatable("rngtech.gear.battery_cell.short"), 41);
-        drawGearLabel(guiGraphics, Component.translatable("rngtech.gear.servo.short"), 77);
-        drawGearLabel(guiGraphics, Component.translatable("rngtech.gear.servo.short"), 113);
-        drawGearLabel(guiGraphics, Component.translatable("rngtech.gear.servo.short"), 149);
-        drawGearLabel(guiGraphics, Component.translatable("rngtech.gear.servo.short"), 185);
+        drawGearLabel(guiGraphics, Component.translatable("rngtech.gear.battery_cell.short"), 40);
+        drawGearLabel(guiGraphics, Component.translatable("rngtech.gear.servo.short"), 76);
+        drawGearLabel(guiGraphics, Component.translatable("rngtech.gear.servo.short"), 112);
+        drawGearLabel(guiGraphics, Component.translatable("rngtech.gear.servo.short"), 148);
+        drawGearLabel(guiGraphics, Component.translatable("rngtech.gear.servo.short"), 184);
     }
 
     private void drawStatLabels(GuiGraphics guiGraphics) {

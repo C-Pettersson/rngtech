@@ -23,7 +23,7 @@ final class RefinementScreenStyle {
     private static final int BUTTON = 0xFF9A9A9A;
     private static final int BUTTON_DARK = 0xFF5F5F5F;
     private static final int BUTTON_LIGHT = 0xFFE0E0E0;
-    private static final int APPLY_X = 24;
+    private static final int APPLY_X = 23;
     private static final int APPLY_Y = 68;
     private static final int APPLY_WIDTH = 62;
     private static final int APPLY_HEIGHT = 18;

@@ -19,7 +19,7 @@ import net.minecraft.world.inventory.SimpleContainerData;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.neoforged.neoforge.fluids.FluidStack;
+import net.minecraft.world.level.material.Fluid;
 import net.neoforged.neoforge.items.ItemStackHandler;
 import net.neoforged.neoforge.items.SlotItemHandler;
 
@@ -52,7 +52,8 @@ public class CorrosionCellMenu extends AbstractContainerMenu {
     private static final int DATA_REFINEMENT_POTENTIAL = 18;
     private static final int DATA_FLAT_ENERGY_GENERATION = 19;
     private static final int DATA_BASE_ENERGY_GENERATION = 20;
-    private static final int DATA_COUNT = 21;
+    private static final int DATA_ELECTROLYTE_FLUID_ID = 21;
+    private static final int DATA_COUNT = 22;
     private static final int STAT_SCALE = 100;
     private static final int PLATE_SLOT = 0;
     private static final int ELECTROLYTE_SLOT = 1;
@@ -193,9 +194,12 @@ public class CorrosionCellMenu extends AbstractContainerMenu {
         return data.get(DATA_ELECTROLYTE_FLUID_CAPACITY);
     }
 
+    public Fluid electrolyteFluidType() {
+        return FluidMenuSupport.fluid(data.get(DATA_ELECTROLYTE_FLUID_ID));
+    }
+
     public Component electrolyteFluidName() {
-        FluidStack stack = cell.getElectrolyteTank().getFluid();
-        return stack.isEmpty() ? Component.translatable("fluid.rngtech.electrolyte_solution") : stack.getHoverName();
+        return FluidMenuSupport.fluidName(data.get(DATA_ELECTROLYTE_FLUID_ID), Component.translatable("fluid.rngtech.electrolyte_solution"));
     }
 
     public int fluidTransfer() {

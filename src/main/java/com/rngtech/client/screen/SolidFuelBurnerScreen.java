@@ -31,12 +31,12 @@ public class SolidFuelBurnerScreen extends AbstractContainerScreen<SolidFuelBurn
     private static final int FUEL_BAR_Y = 48;
     private static final int FUEL_BAR_WIDTH = 58;
     private static final int FUEL_BAR_HEIGHT = 7;
-    private static final int STATUS_ICON_X = 115;
-    private static final int GENERATION_ICON_X = 131;
-    private static final int OUTPUT_ICON_X = 147;
-    private static final int STATUS_ICON_Y = 61;
-    private static final int TIER_ICON_X = 80;
-    private static final int FUEL_FORM_ICON_X = 96;
+    private static final int STATUS_ICON_X = 117;
+    private static final int GENERATION_ICON_X = 133;
+    private static final int OUTPUT_ICON_X = 149;
+    private static final int STATUS_ICON_Y = 60;
+    private static final int TIER_ICON_X = 79;
+    private static final int FUEL_FORM_ICON_X = 95;
     private static final int GEAR_INFO_ICON_Y = 78;
     private static final int ICON_SIZE = 12;
     private static final String[] STAT_LABEL_KEYS = {
@@ -261,9 +261,9 @@ public class SolidFuelBurnerScreen extends AbstractContainerScreen<SolidFuelBurn
     }
 
     private void drawGearLabels(GuiGraphics guiGraphics) {
-        drawGearLabel(guiGraphics, Component.translatable("rngtech.gear.heat_core.short"), 53);
-        drawGearLabel(guiGraphics, Component.translatable("rngtech.gear.battery_cell.short"), 89);
-        drawGearLabel(guiGraphics, Component.translatable("rngtech.gear.fuel_box.short"), 125);
+        drawGearLabel(guiGraphics, Component.translatable("rngtech.gear.heat_core.short"), 52);
+        drawGearLabel(guiGraphics, Component.translatable("rngtech.gear.battery_cell.short"), 88);
+        drawGearLabel(guiGraphics, Component.translatable("rngtech.gear.fuel_box.short"), 124);
     }
 
     private void drawStatsLabels(GuiGraphics guiGraphics) {

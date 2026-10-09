@@ -50,11 +50,11 @@ public class AffixForgeScreen extends AbstractContainerScreen<AffixForgeMenu> {
     private static final int BUTTON = 0xFF6C7658;
     private static final int BUTTON_DARK = 0xFF3E4634;
     private static final int BUTTON_LIGHT = 0xFFA5B17E;
-    private static final int REFORGE_X = 16;
+    private static final int REFORGE_X = 19;
     private static final int REFORGE_Y = 64;
     private static final int REFORGE_WIDTH = 64;
     private static final int REFORGE_HEIGHT = 18;
-    private static final int RP_X = 16;
+    private static final int RP_X = 19;
     private static final int RP_Y = 90;
     private static final int RP_WIDTH = 64;
     private static final int RP_HEIGHT = 16;
@@ -111,8 +111,8 @@ public class AffixForgeScreen extends AbstractContainerScreen<AffixForgeMenu> {
         guiGraphics.drawString(font, title, titleLabelX, titleLabelY, TEXT, false);
         guiGraphics.drawString(font, playerInventoryTitle, inventoryLabelX, inventoryLabelY, TEXT, false);
         guiGraphics.drawString(font, Component.translatable("rngtech.refinement.target.short"), 13, 20, TEXT_MUTED, false);
-        guiGraphics.drawString(font, Component.translatable("rngtech.refinement.catalyst.short"), 43, 20, TEXT_MUTED, false);
-        guiGraphics.drawString(font, Component.translatable("rngtech.refinement.modifier.short"), 73, 20, TEXT_MUTED, false);
+        guiGraphics.drawString(font, Component.translatable("rngtech.refinement.catalyst.short"), 42, 20, TEXT_MUTED, false);
+        guiGraphics.drawString(font, Component.translatable("rngtech.refinement.modifier.short"), 71, 20, TEXT_MUTED, false);
         guiGraphics.drawString(font, Component.translatable("rngtech.affix_forge.upgrades"), 13, 130, TEXT_MUTED, false);
         drawRpLabel(guiGraphics);
         guiGraphics.drawString(font, Component.translatable("rngtech.refinement.modifiers"), MOD_PANEL_X, 12, TEXT_MUTED, false);

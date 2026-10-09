@@ -48,11 +48,11 @@ public class CorrosionCellScreen extends AbstractContainerScreen<CorrosionCellMe
     private static final int ENERGY_METER_WIDTH = 12;
     private static final int ENERGY_METER_HEIGHT = 52;
     private static final int PROGRESS_BAR_X = 72;
-    private static final int PROGRESS_BAR_Y = 71;
+    private static final int PROGRESS_BAR_Y = 70;
     private static final int PROGRESS_BAR_WIDTH = 64;
     private static final int PROGRESS_BAR_HEIGHT = 7;
     private static final int STATUS_ICON_X = 72;
-    private static final int STATUS_ICON_Y = 53;
+    private static final int STATUS_ICON_Y = 55;
     private static final int GENERATION_ICON_X = 88;
     private static final int OUTPUT_ICON_X = 104;
     private static final int ICON_SIZE = 12;
@@ -122,9 +122,9 @@ public class CorrosionCellScreen extends AbstractContainerScreen<CorrosionCellMe
         if (menu.selectedTab() == CorrosionCellMenu.TAB_PROCESSING) {
             drawProcessingLabels(guiGraphics);
         } else if (menu.selectedTab() == CorrosionCellMenu.TAB_GEAR) {
-            drawCentered(guiGraphics, Component.translatable("rngtech.gear.battery_cell.short"), 62, 35);
-            drawCentered(guiGraphics, Component.translatable("rngtech.gear.fluid_pump.short"), 104, 35);
-            drawCentered(guiGraphics, Component.translatable("rngtech.gear.cathode.short"), 146, 35);
+            drawCentered(guiGraphics, Component.translatable("rngtech.gear.battery_cell.short"), 61, 35);
+            drawCentered(guiGraphics, Component.translatable("rngtech.gear.fluid_pump.short"), 103, 35);
+            drawCentered(guiGraphics, Component.translatable("rngtech.gear.cathode.short"), 145, 35);
         } else if (menu.selectedTab() == CorrosionCellMenu.TAB_STATS) {
             MachineScreenStyle.drawStatPanelLabels(guiGraphics, font, Component.translatable("rngtech.tab.stats"), statLines(), STAT_PANEL_X, STAT_PANEL_Y, STAT_PANEL_WIDTH, STAT_ACCENT);
         } else {
@@ -214,7 +214,9 @@ public class CorrosionCellScreen extends AbstractContainerScreen<CorrosionCellMe
         );
         int electrolyteHeight = Math.round((ELECTROLYTE_METER_HEIGHT - 4) * menu.electrolyteFluidProgress());
         int electrolyteBottom = y + ELECTROLYTE_METER_Y + ELECTROLYTE_METER_HEIGHT - 2;
-        guiGraphics.fill(
+        FluidBarRenderer.fill(
+                guiGraphics,
+                menu.electrolyteFluidType(),
                 x + ELECTROLYTE_METER_X + 2,
                 electrolyteBottom - electrolyteHeight,
                 x + ELECTROLYTE_METER_X + ELECTROLYTE_METER_WIDTH - 2,

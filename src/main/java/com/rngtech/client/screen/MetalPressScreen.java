@@ -48,24 +48,24 @@ public class MetalPressScreen extends AbstractContainerScreen<MetalPressMenu> {
     private static final int BAR_HEIGHT = 50;
     private static final int BAR_FILL_HEIGHT = 48;
     private static final int RISK_BAR_X = 86;
-    private static final int RISK_BAR_Y = 43;
+    private static final int RISK_BAR_Y = 41;
     private static final int RISK_BAR_WIDTH = 69;
     private static final int RISK_BAR_HEIGHT = 5;
     private static final int PROGRESS_BAR_X = 86;
     private static final int PROGRESS_BAR_Y = 51;
     private static final int PROGRESS_BAR_WIDTH = 69;
     private static final int PROGRESS_BAR_HEIGHT = 8;
-    private static final int STATUS_ICON_X = 110;
-    private static final int RISK_ICON_X = 126;
+    private static final int STATUS_ICON_X = 107;
+    private static final int RISK_ICON_X = 123;
     private static final int STATUS_ICON_Y = 63;
     private static final int STATUS_ICON_SIZE = 12;
     private static final int GEAR_HEAT_CORE_X = 29;
     private static final int GEAR_SERVO_X = 77;
     private static final int GEAR_BATTERY_X = 125;
     private static final int GEAR_TOP_ROW_Y = 47;
-    private static final int GEAR_MOLD_X = 29;
+    private static final int GEAR_MOLD_X = 23;
     private static final int GEAR_MOLD_Y = 75;
-    private static final int GEAR_MOLD_SPACING = 48;
+    private static final int GEAR_MOLD_SPACING = 44;
     private static final int MOLD_SELECTOR_Y = 98;
     private static final int MOLD_SELECTOR_WIDTH = 12;
     private static final int MOLD_SELECTOR_HEIGHT = 5;
@@ -357,7 +357,7 @@ public class MetalPressScreen extends AbstractContainerScreen<MetalPressMenu> {
     private void renderSlotFrames(GuiGraphics guiGraphics) {
         if (menu.selectedTab() == MetalPressMenu.TAB_PROCESSING) {
             renderSlotFrame(guiGraphics, 55, 41);
-            renderSlotFrame(guiGraphics, 169, 53);
+            renderSlotFrame(guiGraphics, 169, 51);
             renderSlotFrame(
                     guiGraphics,
                     RefinementScreenStyle.PROCESSING_TARGET_SLOT_X - 1,
@@ -466,9 +466,9 @@ public class MetalPressScreen extends AbstractContainerScreen<MetalPressMenu> {
     }
 
     private void drawGearLabels(GuiGraphics guiGraphics) {
-        drawGearLabel(guiGraphics, Component.translatable("rngtech.gear.heat_core.short"), 39, 35, 44);
-        drawGearLabel(guiGraphics, Component.translatable("rngtech.gear.servo.short"), 87, 35, 44);
-        drawGearLabel(guiGraphics, Component.translatable("rngtech.gear.battery_cell.short"), 135, 35, 44);
+        drawGearLabel(guiGraphics, Component.translatable("rngtech.gear.heat_core.short"), 38, 35, 44);
+        drawGearLabel(guiGraphics, Component.translatable("rngtech.gear.servo.short"), 86, 35, 44);
+        drawGearLabel(guiGraphics, Component.translatable("rngtech.gear.battery_cell.short"), 134, 35, 44);
     }
 
     private void drawConfigurationLabels(GuiGraphics guiGraphics) {

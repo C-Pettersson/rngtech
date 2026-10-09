@@ -386,7 +386,9 @@ public class MelterScreen extends AbstractContainerScreen<MelterMenu> {
 
         int outputHeight = Math.round(BAR_FILL_HEIGHT * menu.outputFluidProgress());
         guiGraphics.fill(x + OUTPUT_FLUID_BAR_X, y + BAR_Y, x + OUTPUT_FLUID_BAR_X + FLUID_BAR_WIDTH, y + BAR_Y + BAR_HEIGHT, 0xFF5F5F5F);
-        guiGraphics.fill(
+        FluidBarRenderer.fill(
+                guiGraphics,
+                menu.outputFluidType(),
                 x + OUTPUT_FLUID_BAR_X + 1,
                 y + BAR_Y + BAR_HEIGHT - 1 - outputHeight,
                 x + OUTPUT_FLUID_BAR_X + FLUID_BAR_WIDTH - 1,
@@ -396,7 +398,9 @@ public class MelterScreen extends AbstractContainerScreen<MelterMenu> {
 
         guiGraphics.fill(x + INPUT_FLUID_BAR_X, y + BAR_Y, x + INPUT_FLUID_BAR_X + FLUID_BAR_WIDTH, y + BAR_Y + BAR_HEIGHT, 0xFF5F5F5F);
         int inputHeight = Math.round(BAR_FILL_HEIGHT * menu.inputFluidProgress());
-        guiGraphics.fill(
+        FluidBarRenderer.fill(
+                guiGraphics,
+                menu.inputFluidType(),
                 x + INPUT_FLUID_BAR_X + 1,
                 y + BAR_Y + BAR_HEIGHT - 1 - inputHeight,
                 x + INPUT_FLUID_BAR_X + FLUID_BAR_WIDTH - 1,
@@ -448,11 +452,11 @@ public class MelterScreen extends AbstractContainerScreen<MelterMenu> {
     }
 
     private void drawGearLabels(GuiGraphics guiGraphics) {
-        drawGearLabel(guiGraphics, Component.translatable("rngtech.gear.heat_core.short"), 29);
-        drawGearLabel(guiGraphics, Component.translatable("rngtech.gear.crush_head.short"), 77);
-        drawGearLabel(guiGraphics, Component.translatable("rngtech.gear.battery_cell.short"), 125);
-        drawGearLabel(guiGraphics, Component.translatable("rngtech.gear.servo.short"), 173);
-        drawGearLabel(guiGraphics, Component.translatable("rngtech.gear.fluid_pump.short"), 221);
+        drawGearLabel(guiGraphics, Component.translatable("rngtech.gear.heat_core.short"), 28);
+        drawGearLabel(guiGraphics, Component.translatable("rngtech.gear.crush_head.short"), 76);
+        drawGearLabel(guiGraphics, Component.translatable("rngtech.gear.battery_cell.short"), 124);
+        drawGearLabel(guiGraphics, Component.translatable("rngtech.gear.servo.short"), 172);
+        drawGearLabel(guiGraphics, Component.translatable("rngtech.gear.fluid_pump.short"), 220);
     }
 
     private void drawConfigurationLabels(GuiGraphics guiGraphics) {

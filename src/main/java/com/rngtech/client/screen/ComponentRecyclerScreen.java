@@ -24,7 +24,7 @@ public class ComponentRecyclerScreen extends AbstractContainerScreen<ComponentRe
     private static final int STAT_PANEL_Y = 18;
     private static final int STAT_PANEL_WIDTH = 224;
     private static final int INPUT_SLOT_X = 44;
-    private static final int INPUT_SLOT_Y = 47;
+    private static final int INPUT_SLOT_Y = 51;
     private static final int OUTPUT_SLOT_X = 176;
     private static final int OUTPUT_PRIMARY_Y = 29;
     private static final int OUTPUT_SECONDARY_Y = 51;
@@ -34,12 +34,12 @@ public class ComponentRecyclerScreen extends AbstractContainerScreen<ComponentRe
     private static final int ENERGY_BAR_WIDTH = 12;
     private static final int ENERGY_BAR_HEIGHT = 52;
     private static final int PROGRESS_BAR_X = 84;
-    private static final int PROGRESS_BAR_Y = 50;
+    private static final int PROGRESS_BAR_Y = 56;
     private static final int PROGRESS_BAR_WIDTH = 76;
     private static final int PROGRESS_BAR_HEIGHT = 7;
-    private static final int STATUS_ICON_X = 105;
-    private static final int STATUS_ICON_Y = 62;
-    private static final int ENERGY_ICON_X = 121;
+    private static final int STATUS_ICON_X = 108;
+    private static final int STATUS_ICON_Y = 67;
+    private static final int ENERGY_ICON_X = 124;
     private static final int PROCESSING_LEVEL_ICON_X = 184;
     private static final int PROCESSING_LEVEL_ICON_Y = 78;
     private static final int PROCESSING_LEVEL_MAX = 8;
@@ -233,7 +233,8 @@ public class ComponentRecyclerScreen extends AbstractContainerScreen<ComponentRe
                 0xFF5F5F5F
         );
         int energyHeight = Math.round(48 * menu.energyProgress());
-        guiGraphics.fill(x + ENERGY_BAR_X + 2, y + 80 - energyHeight, x + ENERGY_BAR_X + 10, y + 80, ENERGY);
+        int energyBottom = y + ENERGY_BAR_Y + ENERGY_BAR_HEIGHT - 2;
+        guiGraphics.fill(x + ENERGY_BAR_X + 2, energyBottom - energyHeight, x + ENERGY_BAR_X + 10, energyBottom, ENERGY);
         renderProcessingIcons(guiGraphics);
     }
 
@@ -277,7 +278,7 @@ public class ComponentRecyclerScreen extends AbstractContainerScreen<ComponentRe
     }
 
     private void drawProcessingLabels(GuiGraphics guiGraphics) {
-        drawCentered(guiGraphics, Component.translatable("rngtech.processing.input.tiny"), 54, 35);
+        drawCentered(guiGraphics, Component.translatable("rngtech.processing.input.tiny"), INPUT_SLOT_X + 9, 39);
         drawCentered(guiGraphics, Component.translatable("rngtech.processing.output.tiny"), OUTPUT_SLOT_X + 9, 18);
     }
 

@@ -74,7 +74,7 @@ public class AmmoniaFuelCellMenu extends AbstractContainerMenu {
         this.data = data;
         this.fuelCell = fuelCell;
         RefinementMenuSupport.setMachineDisplay(refinementTarget, ModBlocks.AMMONIA_FUEL_CELL.get(), traits);
-        addSlot(new TabbedSlot(fuelCell.getProcessInventory(), AmmoniaFuelCellBlockEntity.SLOT_RESIDUE, 195, 55, () -> selectedTab == TAB_PROCESSING));
+        addSlot(new TabbedSlot(fuelCell.getProcessInventory(), AmmoniaFuelCellBlockEntity.SLOT_RESIDUE, 195, 61, () -> selectedTab == TAB_PROCESSING));
         addSlot(new TabbedSlot(fuelCell.getGearInventory(), AmmoniaFuelCellBlockEntity.SLOT_MEMBRANE, 66, 48, () -> selectedTab == TAB_GEAR));
         addSlot(new TabbedSlot(fuelCell.getGearInventory(), AmmoniaFuelCellBlockEntity.SLOT_BATTERY_CELL, 126, 48, () -> selectedTab == TAB_GEAR));
         addSlot(RefinementMenuSupport.consumableSlot(fuelCell.getRefinementInventory(), 0, RefinementMenuSupport.REFINEMENT_CONSUMABLE_SLOT_X, RefinementMenuSupport.REFINEMENT_SLOT_Y, () -> selectedTab == TAB_REFINEMENT));

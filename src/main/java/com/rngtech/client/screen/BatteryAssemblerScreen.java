@@ -34,13 +34,13 @@ public class BatteryAssemblerScreen extends AbstractContainerScreen<BatteryAssem
     private static final int FLUID_BAR_WIDTH = 16;
     private static final int BAR_HEIGHT = 50;
     private static final int BAR_FILL_HEIGHT = 48;
-    private static final int PROGRESS_X = 146;
+    private static final int PROGRESS_X = 147;
     private static final int PROGRESS_Y = 50;
     private static final int PROGRESS_WIDTH = 34;
     private static final int PROGRESS_HEIGHT = 8;
-    private static final int STATUS_X = 146;
-    private static final int TRANSFER_X = 162;
-    private static final int STATUS_Y = 65;
+    private static final int STATUS_X = 147;
+    private static final int TRANSFER_X = 163;
+    private static final int STATUS_Y = 66;
     private static final int STATUS_SIZE = 12;
     private static final int[] INPUT_SLOT_X = {56, 78, 100, 122};
     private static final int INPUT_SLOT_Y = 28;
@@ -258,7 +258,7 @@ public class BatteryAssemblerScreen extends AbstractContainerScreen<BatteryAssem
     }
 
     private void drawGearLabels(GuiGraphics guiGraphics) {
-        drawCentered(guiGraphics, Component.translatable("rngtech.gear.battery_cell.short"), 121, 35);
+        drawCentered(guiGraphics, Component.translatable("rngtech.gear.battery_cell.short"), 120, 35);
     }
 
     private void drawConfigurationLabels(GuiGraphics guiGraphics) {

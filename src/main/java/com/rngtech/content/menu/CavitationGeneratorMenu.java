@@ -19,7 +19,7 @@ import net.minecraft.world.inventory.SimpleContainerData;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.neoforged.neoforge.fluids.FluidStack;
+import net.minecraft.world.level.material.Fluid;
 import net.neoforged.neoforge.items.ItemStackHandler;
 import net.neoforged.neoforge.items.SlotItemHandler;
 
@@ -64,7 +64,9 @@ public class CavitationGeneratorMenu extends AbstractContainerMenu {
     private static final int DATA_RECIPE_FLUID_OUTPUT = 30;
     private static final int DATA_FLAT_ENERGY_GENERATION = 31;
     private static final int DATA_BASE_ENERGY_GENERATION = 32;
-    private static final int DATA_COUNT = 33;
+    private static final int DATA_INPUT_FLUID_ID = 33;
+    private static final int DATA_OUTPUT_FLUID_ID = 34;
+    private static final int DATA_COUNT = 35;
     private static final int STAT_SCALE = 100;
 
     private static final int FLUID_CONTAINER_SLOT = 0;
@@ -120,7 +122,7 @@ public class CavitationGeneratorMenu extends AbstractContainerMenu {
         RefinementMenuSupport.setMachineDisplay(refinementTarget, ModBlocks.CAVITATION_GENERATOR.get(), machineTraits);
 
         ItemStackHandler processInventory = generator.getProcessInventory();
-        addSlot(new TabbedSlot(processInventory, CavitationGeneratorBlockEntity.SLOT_FLUID_INPUT_CONTAINER, 29, 59, () -> selectedTab == TAB_PROCESSING));
+        addSlot(new TabbedSlot(processInventory, CavitationGeneratorBlockEntity.SLOT_FLUID_INPUT_CONTAINER, 29, 62, () -> selectedTab == TAB_PROCESSING));
         addSlot(new TabbedSlot(processInventory, CavitationGeneratorBlockEntity.SLOT_DAMAGED_ROTOR, 193, 62, () -> selectedTab == TAB_PROCESSING));
 
         ItemStackHandler gearInventory = generator.getGearInventory();
@@ -225,9 +227,16 @@ public class CavitationGeneratorMenu extends AbstractContainerMenu {
         return data.get(DATA_INPUT_FLUID_CAPACITY);
     }
 
+    public Fluid inputFluidType() {
+        return FluidMenuSupport.fluid(data.get(DATA_INPUT_FLUID_ID));
+    }
+
+    public Fluid outputFluidType() {
+        return FluidMenuSupport.fluid(data.get(DATA_OUTPUT_FLUID_ID));
+    }
+
     public Component inputFluidName() {
-        FluidStack stack = generator.getInputTank().getFluid();
-        return stack.isEmpty() ? Component.translatable("rngtech.purge.empty_fluid") : stack.getHoverName();
+        return FluidMenuSupport.fluidName(data.get(DATA_INPUT_FLUID_ID), Component.translatable("block.minecraft.water"));
     }
 
     public int heatStrain() {
@@ -267,8 +276,7 @@ public class CavitationGeneratorMenu extends AbstractContainerMenu {
     }
 
     public Component outputFluidName() {
-        FluidStack stack = generator.getOutputTank().getFluid();
-        return stack.isEmpty() ? Component.translatable("rngtech.purge.empty_fluid") : stack.getHoverName();
+        return FluidMenuSupport.fluidName(data.get(DATA_OUTPUT_FLUID_ID), Component.translatable("fluid.rngtech.nitrogen"));
     }
 
     public int recipeFluidOutput() {
