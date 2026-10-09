@@ -353,6 +353,11 @@ public final class WrenchOverlayClient {
                 snapshot.lastEnergyInput(),
                 snapshot.lastEnergyOutput()
         ).getString()), TEXT));
+        if (snapshot.hasEnergyConnector() && !snapshot.energyTargetAccess()) {
+            lines.add(new OverlayLine(clipped(font, Component.translatable(
+                    "rngtech.cable_connector.no_energy_access"
+            ).getString()), WARNING));
+        }
     }
 
     private static void moduleLines(

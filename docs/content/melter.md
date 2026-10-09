@@ -66,11 +66,11 @@ No RNGTech fluid pipes are implemented. Automation uses standard NeoForge fluid 
 | Bottom | Extract output containers after they are filled. |
 | Sides | Insert fluid containers, fill the input tank through the block fluid capability, and receive FE. With a Fluid Pump installed, sides also expose output-only fluid extraction. |
 
-Gear slots and the Refinement catalyst slot are not exposed through sided item automation. FE received through the block energy capability fills the internal buffer first, then charges an installed Battery Cell when possible. Processing draws spend internal buffer FE first and then draw any remaining tick cost from the installed cell.
+Gear slots and the Refinement catalyst slot are not exposed through sided item automation. FE received through the block energy capability fills the internal buffer first, then charges an installed Battery Cell when possible. External FE intake has no machine-side cap; it is limited by free buffer or installed-cell space plus the source or attached Universal Connector. Processing draws spend internal buffer FE first and then draw any remaining tick cost from the installed cell.
 
 ## Modifier Eligibility
 
-Melter machine stacks and placed machines use the `MELTER` modifier eligibility profile. The profile can roll FE storage/input, item input, processing, heat, and fluid transfer modifiers that match the machine's implemented behavior.
+Melter machine stacks and placed machines use the `MELTER` modifier eligibility profile. The profile can roll FE storage, energy usage, item input, processing, heat, and fluid transfer modifiers that match the machine's implemented behavior.
 
 Fluid Pumps are `FLUID_PUMP` machine parts for `MachineType.MELTER`. The Osmium Fluid Pump is the first pump tier at Stage 5 and gives the Melter its required fluid-output Gear. Each pump's authored base `FLUID_TRANSFER` value gates external extraction and output container filling rate.
 

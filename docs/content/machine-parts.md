@@ -29,7 +29,7 @@ Machine parts above primitive stage are intended to be long-term investments. St
 | `RECOVERY_FILTER` | Used by Potential Reactors to enable residue recovery and improve salvage efficiency or speed. Optional Miner's Companion Gear also uses Recovery Filter stage and efficiency for trace recovery recipes. |
 | `CONTAINMENT_LINING` | Used by Potential Reactors to improve stability. |
 | `AMMONIA_CATALYST_BED` | Used by Ammonia Synthesizers to gate synthesis recipes and tune energy usage, speed, efficiency, stability, and fluid transfer. |
-| `FUEL_CELL_MEMBRANE` | Used by Ammonia Fuel Cells to gate ammonia power recipes and tune generation, transfer, speed, efficiency, stability, and fluid transfer. |
+| `FUEL_CELL_MEMBRANE` | Used by Ammonia Fuel Cells to gate ammonia power recipes and tune generation, speed, efficiency, stability, and fluid transfer. |
 | `CAVITATION_ROTOR` | Used by Cavitation Generators to set rotor stage, generation scaling, wear resistance, durability, and nitrogen output identity. |
 | `VOID_CHAMBER` | Used by Vacuum Collapse Generators to set recipe stage reach, generation, and stability. |
 | `COLLAPSE_NOZZLE` | Used by Cavitation Generators and Vacuum Collapse Generators to focus output, stability behavior, and fluid-output handling. Ordinary Collapse Nozzles are shared by both machines; Nitrogen Separation Nozzle is Cavitation-only. |

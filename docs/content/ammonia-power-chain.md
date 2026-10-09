@@ -18,7 +18,7 @@ Ammonia synthesis uses the `rngtech:ammonia_synthesis` recipe type. Ammonia gene
 | Machine | Slot | Required | Accepted item | Role |
 |---|---|---:|---|---|
 | Ammonia Synthesizer | Catalyst Bed | Yes | `rngtech:ammonia_catalyst_bed` | Gates synthesis recipes by stage. Its rolled Processing Speed and Energy Usage modifiers apply to the Synthesizer |
-| Ammonia Fuel Cell | Fuel Cell Membrane | Yes | `rngtech:fuel_cell_membrane` | Gates ammonia power recipes by stage. Its rolled Energy Generation, Energy Transfer, Processing Speed, and Efficiency modifiers apply to the Fuel Cell |
+| Ammonia Fuel Cell | Fuel Cell Membrane | Yes | `rngtech:fuel_cell_membrane` | Gates ammonia power recipes by stage. Its rolled Energy Generation, Processing Speed, and Efficiency modifiers apply to the Fuel Cell |
 | Ammonia Fuel Cell | Battery Cell | No | Stage 6+ Battery Cells | Adds portable FE capacity and output storage |
 
 Both parts have neutral base stats, so an unrolled part only gates recipes. Their rolled modifiers are local to the part, as on other machine parts. The machines do not currently read Stability or Fluid Transfer, and the Synthesizer does not read Efficiency or Instant Process chance, so those rolls have no effect yet.
@@ -27,7 +27,7 @@ The ammonia synthesizer owns nitrogen, hydrogen, and ammonia tanks. The fuel cel
 
 The Process tabs have purge buttons beside the visible gas tanks. The craftable `rngtech:purge_bucket` can also right-click these placed machines to void up to `1000 mB`; normal use prefers input tanks, while sneak-use on the Synthesizer prefers the Ammonia output tank. Purging Synthesizer Nitrogen/Hydrogen or Fuel Cell Ammonia resets that machine's active work state before draining.
 
-Gas Chemistry machines follow the same purge rules. Coal Gasifier exposes Water and Syngas purge targets, Syngas Combustor exposes gas input and Carbon Exhaust purge targets, and Steam Methane Reformer exposes Water, gas input, Hydrogen output, and Carbon Monoxide output purge targets. The Syngas Combustor burns Syngas as its main Stage 5 gas-power fuel, `57,600 FE` per `1,000 mB` over `240` ticks (`240 FE/t` before Servo and rolls), and also accepts Carbon Monoxide as a weaker disposal fuel. Nullite Servo Auto Purge applies to Gas Chemistry output tanks when produced fluid overflows matching stored fluid, including the Syngas Combustor's Carbon Exhaust tank.
+Gas Chemistry machines follow the same purge rules. Coal Gasifier exposes Water and Syngas purge targets, Syngas Combustor exposes gas input and Carbon Exhaust purge targets, and Steam Methane Reformer exposes Water, gas input, Hydrogen output, and Carbon Monoxide output purge targets. The Syngas Combustor burns Syngas as its main Stage 5 gas-power fuel, `57,600 FE` per `1,000 mB` over `240` ticks (`240 FE/t` before Servo and rolls), and also accepts Carbon Monoxide as a weaker disposal fuel. Coal Gasifier and Steam Methane Reformer fill their internal FE buffer first, then charge an installed Battery Cell from external FE. Nullite Servo Auto Purge applies to Gas Chemistry output tanks when produced fluid overflows matching stored fluid, including the Syngas Combustor's Carbon Exhaust tank.
 
 ## Step-By-Step Guide
 
@@ -46,6 +46,7 @@ Gas Chemistry machines follow the same purge rules. Coal Gasifier exposes Water 
 - The synthesizer exposes its Catalyst Bed slot only from the top; normal item automation has no process item slots.
 - The fuel cell accepts ammonia through the fluid capability, extracts FE from the top or sides, and extracts residue from the bottom.
 - Gear slots are manual UI equipment except the synthesizer Catalyst Bed top handler.
+- The Synthesizer, Coal Gasifier, and Steam Methane Reformer have no machine-side FE intake cap; external intake is limited by free buffer or installed-cell space plus the source or attached Universal Connector. The Fuel Cell and Syngas Combustor have no machine-side export cap; they export whatever is stored, and the attached receiver or [Universal Connector tier](basic-wire.md#energy-transfer-limits) decides the rate.
 
 ## Related Pages
 

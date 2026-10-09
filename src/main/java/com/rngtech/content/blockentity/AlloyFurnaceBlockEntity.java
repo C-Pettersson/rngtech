@@ -1295,10 +1295,6 @@ public class AlloyFurnaceBlockEntity extends BaseMachineBlockEntity implements M
         return consumed;
     }
 
-    private int effectiveMaxEnergyInput() {
-        return Math.max(1, (int) Math.round(effectiveStats().value(MachineStat.ENERGY_TRANSFER)));
-    }
-
     private MachineInfoSnapshot.EnergyBottleneck connectorInputBottleneck(
             AdjacentEnergyConnector.Info connector,
             int energyDemand

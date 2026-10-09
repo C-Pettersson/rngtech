@@ -33,7 +33,7 @@ The placed machine uses `PotentialReactorBlockEntity`, `PotentialReactorMenu`, a
 
 ## Screen Contract
 
-The Potential Reactor screen follows the shared low-text machine UI rule. The Process tab should present the salvage input slot, residue output slot, internal FE bar, processing bar, and compact status/generation/output icons. Exact FE, progress ticks, recipe fuel value, current status, generation rate, and output rate belong in hover details rather than permanent text rows.
+The Potential Reactor screen follows the shared low-text machine UI rule. The Process tab should present the salvage input slot, residue output slot, internal FE bar, processing bar, and compact status/generation/output icons. Exact FE, progress ticks, recipe fuel value, current status, generation rate, and last-tick FE output belong in hover details rather than permanent text rows.
 
 The Gear tab should present the Reactor Chamber, Recovery Filter, and Containment Lining as equipment slots, plus a compact processing-level meter for the installed chamber. Persistent numeric stat rows belong in the Stats tab, and placed-machine trait/refinement details belong in the Refinement tab.
 
@@ -95,7 +95,7 @@ effective FE = recipe energy * ENERGY_GENERATION * EFFICIENCY * STABILITY
 
 For RPG-bearing targets, "recipe energy" is replaced by the computed RPG value. For explicit fuel recipes, the recipe `energy` field is still used.
 
-`PROCESSING_SPEED` shortens the processing time. Higher `ENERGY_GENERATION` therefore raises the visible FE/t and total recovered FE. `ENERGY_TRANSFER` controls side extraction from the internal FE buffer. `ENERGY_CAPACITY` controls the internal buffer size.
+`PROCESSING_SPEED` shortens the processing time. Higher `ENERGY_GENERATION` therefore raises the visible FE/t and total recovered FE. The reactor has no machine-side export cap: sides export whatever is stored, and the attached receiver or [Universal Connector tier](basic-wire.md#energy-transfer-limits) decides the rate. `ENERGY_CAPACITY` controls the internal buffer size.
 
 The reactor pauses while its internal buffer is full, so expensive salvage fuel is not consumed just to waste generated FE.
 
@@ -130,7 +130,7 @@ The block also supports simple redstone control. A powered Potential Reactor pau
 | Modifier Source | Notes |
 |---|---|
 | Machine prefix | Can roll energy capacity and efficiency modifiers. |
-| Machine affixes | Can roll flat prefix `ENERGY_GENERATION`; suffix percent `ENERGY_GENERATION`, `ENERGY_TRANSFER`, `PROCESSING_SPEED`, and `STABILITY`. |
+| Machine affixes | Can roll flat prefix `ENERGY_GENERATION`; suffix percent `ENERGY_GENERATION`, `PROCESSING_SPEED`, and `STABILITY`. |
 | Reactor Chamber base profile | Provides authored `PROCESSING_LEVEL`, `ENERGY_GENERATION`, and `STABILITY`; `PROCESSING_LEVEL` remains a hard gate. |
 | Reactor Chamber rolled modifiers | Can roll flat prefix and percent suffix `ENERGY_GENERATION`, plus `PROCESSING_SPEED` and `STABILITY`. |
 | Recovery Filter rolled modifiers | Can roll `EFFICIENCY` and `PROCESSING_SPEED`. |

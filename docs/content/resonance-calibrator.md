@@ -11,14 +11,14 @@ Calibration is separate from refinement. Calibration creates component validity 
 | Chassis | Stage | Identity | Runtime role |
 |---|---:|---|---|
 | Iron Resonance Calibrator Chassis | 1 | Stable frame | First calibrator body with one lane, broad output quality, and early Steel bootstrap reach. |
-| Copper Resonance Calibrator Chassis | 2 | Conductive tuning frame | Optional early acceleration sidegrade with better transfer and weaker stability control. |
+| Copper Resonance Calibrator Chassis | 2 | Conductive tuning frame | Optional early acceleration sidegrade with faster work and weaker stability control. |
 | Steel Resonance Calibrator Chassis | 4 | Reinforced stabilizer | Slower but more stable and output-guarded. |
 | Titanium Resonance Calibrator Chassis | 6 | Precision frame | Better speed, precision, stability, and RP outcomes. |
 | Lead Resonance Calibrator Chassis | 4 | Dense calibration bed | Two-lane bulk sidegrade with lower precision. |
 | Tungstensteel Resonance Calibrator Chassis | 7 | Dense resonance array | Three-lane endgame bulk branch. |
 | Nullite Resonance Calibrator Chassis | 7 | Phase precision frame | One-lane endgame precision branch with stronger quality and RP control. |
 
-All chassis are block items, roll machine RPG traits, support placed-machine refinement, expose FE input, and share the same Process, Gear, Stats, Refinement, and Mastery screen pattern.
+All chassis are block items, roll machine RPG traits, support placed-machine refinement, expose FE input with no machine-side intake cap, and share the same Process, Gear, Stats, Refinement, and Mastery screen pattern.
 
 Placed chassis art follows [Machine Visual Design](../reference/machine-visual-design.md#resonance-calibrator-chassis). Resonance Calibrator blocks should use owned `textures/block/resonance_calibrator_chassis/<face>/<id>` face textures, keep `64x64` block-face frames, and show a front tuning cue such as a lens, coil ring, waveform meter, or alignment target. Bulk sidegrades should visibly communicate multiple calibration lanes, while Nullite should read as the precision branch.
 
@@ -29,7 +29,7 @@ The Gear tab uses:
 | Gear slot | Required | Runtime role |
 |---|---|---|
 | Battery Cell | No | Adds portable FE storage. Without a cell, the machine keeps only its internal buffer and applies a speed and calibration-quality penalty. |
-| Resonance Coil | Yes | Sets calibration stage reach, improves quality, and contributes FE transfer or speed through its component base profile. |
+| Resonance Coil | Yes | Sets calibration stage reach, improves quality, and contributes speed through its component base profile. |
 | Control Board | Yes | Improves calibration precision, stability, and useful Refinement Potential outcomes through its source-local base profile plus stored affixes. |
 | Stabilizer Matrix | No | Improves stability floor, quality consistency, and catalyst efficiency through its source-local base profile plus stored affixes. |
 | Calibration Patterns | Yes | Stores all six reusable family patterns internally; one stored pattern is selected as the active recipe pattern from the Gear tab. |
@@ -91,7 +91,7 @@ Resonance Calibrator chassis recipes do not consume the previous Resonance Calib
 | Chassis | Structural body | Current recipe pressure | Reason |
 |---|---|---|---|
 | Iron | Furnace Machine Chassis | Energy Coil, Basic Electric Circuits, Iron, and Redstone. | First calibrator body, reached from ordinary early machine crafting. |
-| Copper | Machine Frame | Copper Resonance Coil, Basic Electric Circuits, and Copper. | Easy Stage 2 sidegrade that improves transfer and speed without consuming the Iron chassis. |
+| Copper | Machine Frame | Copper Resonance Coil, Basic Electric Circuits, and Copper. | Easy Stage 2 sidegrade that improves speed without consuming the Iron chassis. |
 | Steel | Reinforced Machine Frame | Steel Control Board, Steel Resonance Coil, Stage 1 structural component at `55` stability, and Stage 2 logic component at `55` stability. | Easy Stage 4 stability body that keeps the Iron chassis available for early calibration work. |
 | Lead | Reinforced Machine Frame | Iron Stabilizer Matrices, Stage 1 structural component at `45` stability, and Stage 2 storage component at `45` stability. | Easy Stage 4 bulk sidegrade that does not consume the optional Copper chassis. |
 | Titanium | Advanced Machine Frame | Titanium Control Board, Titanium Resonance Coil, Stage 2 structural component at `70` stability with `1` RP consumed, and Stage 2 conductive component at `70` stability. | Easy Stage 6 precision body that uses advanced-frame pressure instead of consuming the Steel chassis. |

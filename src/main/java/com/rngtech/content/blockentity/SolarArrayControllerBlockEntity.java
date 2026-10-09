@@ -16,6 +16,7 @@ import com.rngtech.rpg.MachineStat;
 import com.rngtech.rpg.MachineStatAccumulator;
 import com.rngtech.rpg.MachineTraits;
 import com.rngtech.rpg.MachineType;
+import com.rngtech.util.TickTransferCounter;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -125,6 +126,7 @@ public class SolarArrayControllerBlockEntity extends BaseMachineBlockEntity impl
     };
     private final IItemHandler emptyItemHandler = new EmptyItemHandler();
     private final IEnergyStorage energyStorage = new ControllerEnergyStorage();
+    private final TickTransferCounter exportBudget = new TickTransferCounter();
     private final EnergyTelemetry energyFlow = new EnergyTelemetry(this::getLevel);
     private final IEnergyStorage trackedEnergyStorage = energyFlow.track(energyStorage);
     private final ContainerData menuData = new ContainerData() {
@@ -601,7 +603,7 @@ public class SolarArrayControllerBlockEntity extends BaseMachineBlockEntity impl
             return 0;
         }
 
-        int remaining = Math.min(toExtract, effectiveOutputRate(stats));
+        int remaining = Math.min(toExtract, exportAllowance(stats));
         int extracted = Math.min(internalEnergyStored(stats), remaining);
         if (!simulate && extracted > 0) {
             internalEnergy = internalEnergyStored(stats) - extracted;
@@ -617,7 +619,18 @@ public class SolarArrayControllerBlockEntity extends BaseMachineBlockEntity impl
                 setChanged();
             }
         }
+        if (!simulate) {
+            recordExport(extracted);
+        }
         return extracted;
+    }
+
+    private int exportAllowance(MachineStatAccumulator stats) {
+        return exportBudget.remaining(level == null ? 0L : level.getGameTime(), effectiveOutputRate(stats));
+    }
+
+    private void recordExport(int amount) {
+        exportBudget.add(level == null ? 0L : level.getGameTime(), amount);
     }
 
     private int energyStored() {

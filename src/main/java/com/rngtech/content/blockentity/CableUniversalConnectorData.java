@@ -16,6 +16,7 @@ import com.rngtech.content.item.ItemConnectorItem;
 import com.rngtech.content.item.NetworkConnectorItem;
 import com.rngtech.content.itemfilter.ItemFilterMatcher;
 import com.rngtech.content.menu.UniversalConnectorAccess;
+import com.rngtech.util.TickTransferCounter;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -132,6 +133,7 @@ public final class CableUniversalConnectorData implements UniversalConnectorAcce
     private int energyOutputMovedThisTick;
     private int lastEnergyInputMoved;
     private int lastEnergyOutputMoved;
+    private final TickTransferCounter energyOutputBudget = new TickTransferCounter();
 
     public CableUniversalConnectorData(UniversalConnectorDataOwner owner, Direction face) {
         this.owner = owner;
@@ -208,11 +210,53 @@ public final class CableUniversalConnectorData implements UniversalConnectorAcce
         if (tier.isEmpty()) {
             return 0;
         }
-        int inserted = insertIntoTarget(Math.min(amount, tier.get().transferRate()), simulate);
+        Level level = owner.getLevel();
+        if (level == null) {
+            return 0;
+        }
+        int transferable = Math.min(amount, energyOutputBudget.remaining(level.getGameTime(), tier.get().transferRate()));
+        if (transferable <= 0) {
+            return 0;
+        }
+        int inserted = insertIntoTarget(transferable, simulate);
         if (!simulate) {
+            energyOutputBudget.add(level.getGameTime(), inserted);
             recordEnergyOutputTransfer(inserted);
         }
         return inserted;
+    }
+
+    public CableConnectorMode mode() {
+        return mode;
+    }
+
+    public IEnergyStorage targetEnergyBuffer() {
+        IEnergyStorage target = targetEnergyStorage();
+        return CableBlockEntity.isEnergyBuffer(target) ? target : null;
+    }
+
+    /** True when the attached block exposes FE on the side this connector attaches as. */
+    public boolean targetHasEnergyAccess() {
+        return targetEnergyStorage() != null;
+    }
+
+    private IEnergyStorage targetEnergyStorage() {
+        Level level = owner.getLevel();
+        if (level == null) {
+            return null;
+        }
+        BlockPos targetPos = owner.getBlockPos().relative(face);
+        BlockState targetState = level.getBlockState(targetPos);
+        if (targetState.getBlock() instanceof UniversalConnectorBlock || targetState.getBlock() instanceof CableBlock) {
+            return null;
+        }
+        return level.getCapability(Capabilities.EnergyStorage.BLOCK, targetPos, attachAs);
+    }
+
+    private CableBlockEntity.TransferOrigin energySourceOrigin(IEnergyStorage source) {
+        BlockPos ownerPos = owner.getBlockPos();
+        return CableBlockEntity.TransferOrigin.endpoint(ownerPos, face, ownerPos.relative(face))
+                .withEnergyBuffer(mode == CableConnectorMode.BOTH ? source : null);
     }
 
     public int transferRateForChannel(int networkChannel) {
@@ -225,6 +269,14 @@ public final class CableUniversalConnectorData implements UniversalConnectorAcce
     void addNetworkDebugStats(CableBlockEntity.NetworkDebugAccumulator accumulator) {
         if (connectorTier().isPresent()) {
             accumulator.addEnergyModule(channel);
+            accumulator.addEnergyConnector(
+                    channel,
+                    mode,
+                    transferRate(),
+                    targetEnergyStorage(),
+                    lastEnergyInput(),
+                    lastEnergyOutput()
+            );
         }
         for (int moduleIndex = 0; moduleIndex < UniversalConnectorBlockEntity.FLUID_MODULE_SLOT_COUNT; moduleIndex++) {
             FluidModuleState module = fluidModules[moduleIndex];
@@ -957,11 +1009,10 @@ public final class CableUniversalConnectorData implements UniversalConnectorAcce
             return 0;
         }
 
-        BlockPos ownerPos = owner.getBlockPos();
         int moved = CableBlockEntity.distributeEnergy(
                 level,
-                ownerPos,
-                CableBlockEntity.TransferOrigin.endpoint(ownerPos, face, ownerPos.relative(face)),
+                owner.getBlockPos(),
+                energySourceOrigin(targetEnergyStorage()),
                 channel,
                 transferable,
                 simulate,
@@ -1006,8 +1057,7 @@ public final class CableUniversalConnectorData implements UniversalConnectorAcce
         }
 
         BlockPos ownerPos = owner.getBlockPos();
-        CableBlockEntity.TransferOrigin sourceOrigin =
-                CableBlockEntity.TransferOrigin.endpoint(ownerPos, face, ownerPos.relative(face));
+        CableBlockEntity.TransferOrigin sourceOrigin = energySourceOrigin(source);
         int accepted = CableBlockEntity.distributeEnergy(
                 level,
                 ownerPos,
@@ -1432,6 +1482,18 @@ public final class CableUniversalConnectorData implements UniversalConnectorAcce
     }
 
     private int connectorData(int index) {
+        if (index == UniversalConnectorBlockEntity.dataEnergyTargetAccessIndex()) {
+            return targetHasEnergyAccess() ? 1 : 0;
+        }
+        if (index == UniversalConnectorBlockEntity.dataNetworkEnergyInputCapIndex()) {
+            return networkDebugSnapshot().energyInputCap();
+        }
+        if (index == UniversalConnectorBlockEntity.dataNetworkEnergyOutputCapIndex()) {
+            return networkDebugSnapshot().energyOutputCap();
+        }
+        if (index == UniversalConnectorBlockEntity.dataNetworkEnergyChannelCapIndex()) {
+            return networkDebugSnapshot().energyChannelCap(channel);
+        }
         if (UniversalConnectorBlockEntity.isNetworkDebugDataIndex(index)) {
             return UniversalConnectorBlockEntity.networkDebugData(index, networkDebugSnapshot());
         }
