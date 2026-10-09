@@ -2,7 +2,9 @@
 
 Status: Prototype
 
-The Bio Generator is an early organic-fuel FE generator registered as `rngtech:bio_generator`. It accepts crop and plant inputs directly, can install a Battery Cell for portable storage, and uses a Bio Chamber Gear part for ingredient-aware power modifiers.
+Player guide: [Bio Generator](https://c-pettersson.github.io/rngtech/bio-generator/)
+
+The Bio Generator is an early organic-fuel FE generator registered as `rngtech:bio_generator`. It burns crop and prepared biomass fuels and uses a Bio Chamber Gear part for ingredient-aware power modifiers.
 
 ## Current Runtime Surface
 
@@ -37,13 +39,13 @@ Fuel acceptance is tag-backed and server-authoritative.
 | Dense Algae Biomass | `rngtech:bio_generator/dense_algae_biomass` | `2,400 FE` |
 | Rich Biomass | `rngtech:bio_generator/rich_biomass` | `3,200 FE` |
 
-Golden foods are excluded through `rngtech:bio_generator/excluded_foods`.
-
-With JEI installed, Bio Generator fuels are exposed as a recipe-like Bio Generator Fuels category. Algae Biomass and Dense Algae Biomass have explicit fuel entries with their base values.
+Golden foods are excluded through `rngtech:bio_generator/excluded_foods`. JEI exposes the fuels as a recipe-like Bio Generator Fuels category.
 
 ## Wooden Composter
 
-The Stage 1-2 Bio Generator support path is the passive Wooden Composter. It has no FE input or output and turns low-value organic inputs into prepared Bio Generator fuel.
+Player guide: [Wooden Composter](https://c-pettersson.github.io/rngtech/wooden-composter/)
+
+The passive Wooden Composter is the Stage 1-2 Bio Generator support path. It has no FE input or output.
 
 Runtime behavior:
 
@@ -53,18 +55,14 @@ Runtime behavior:
 | Stage | Stage 1 support, with no FE input or output |
 | Inventory | `27` compostable input slots, one Composted Biomass output slot, one water-container input slot, and one container-remainder output slot |
 | Water | `4,000 mB` input-only water tank; filled by water containers or side fluid automation |
-| Fluid purge | Process-tab purge button and `rngtech:purge_bucket` support void up to `1000 mB` from the water tank |
 | Batch | `8` compost units produce `1` Composted Biomass; normal compostables count as `1` unit and prepared inputs count as `2` units |
 | Dry cycle | `2,400 ticks` |
 | Wet cycle | `1,200 ticks` and consumes `10 mB` water at batch start |
 | Bulk bonus | At least `200` compost units in the input buffer adds `+10%` composting speed |
 | Variety bonus | At least `5` different compostable item types in the input buffer adds `+10%` composting speed |
-| Automation | Top or sides insert compostable organic inputs and water containers; sides can supply water; bottom extracts Composted Biomass and empty containers |
 | Output role | Prepared Bio Generator fuel, not vanilla furnace or solid fuel-burning generator fuel |
 
-The Composter accepts the `rngtech:wooden_composter/inputs` tag plus items registered as compostable through the vanilla/NeoForge compostable data map. The default input tag is seeded with Bio Generator plant biomass, vanilla saplings, leaves, flowers, plantable seeds, mushrooms, vines, crop outputs, common low-value organic scraps, and `rngtech:compost_feedstock`. Items tagged `rngtech:wooden_composter/prepared_inputs` count as `2` compost units each.
-
-With JEI installed, Wooden Composter inputs are exposed as a recipe-like Wooden Composting category. It shows accepted compostable inputs, the `8` compost unit to `1` Composted Biomass batch ratio, dry processing time, and the faster wet processing time.
+The Composter accepts the `rngtech:wooden_composter/inputs` tag plus items registered as compostable through the vanilla/NeoForge compostable data map. Items tagged `rngtech:wooden_composter/prepared_inputs` count as `2` compost units each. JEI exposes a recipe-like Wooden Composting category.
 
 Prepared biomass fuels use Bio Generator-only tags and explicit values:
 
@@ -79,23 +77,7 @@ The default Rich Biomass catalyst tag includes Bone Meal, Organic Reagent, and G
 
 ## Algae Photobioreactor
 
-The Stage 3-4 greenhouse support path is the Algae Photobioreactor. It does not generate FE directly. It grows Algae Biomass from water, `rngtech:carbon_exhaust`, and light through the `rngtech:algae_growth` recipe type. Algae Biomass can be burned directly in the Bio Generator, crafted into more efficient Dense Algae Biomass, or sent to the Melter methane recipe.
-
-Runtime behavior:
-
-| Surface | Current behavior |
-|---|---|
-| Block id | `rngtech:algae_photobioreactor` |
-| Stage | Stage 3-4 support processor, with no FE input or output |
-| Inventory | One Algae Biomass output slot, vertically stacked water container input/remainder slots, and carbon-exhaust container input/remainder slots |
-| Fluids | `4,000 mB` water tank and `4,000 mB` carbon-exhaust tank; both are input-only |
-| Fluid purge | Process-tab purge buttons and `rngtech:purge_bucket` support void up to `1000 mB` from either input tank and reset active growth |
-| Light gate | Recipes declare a minimum light level; the sample recipe requires `12` light above the block |
-| Recipe exposure | JEI shows `rngtech:algae_growth` water input, carbon input, output, ticks, and light gate |
-| Gear | One Bio Chamber Gear slot; the installed chamber's fuel-efficiency contribution is shown as Bio Conversion and scales algae output |
-| Automation | Sides fill fluids, insert filled containers, or pre-stack Algae Biomass in the output slot; bottom extracts algae output and container remainders |
-
-`rngtech:carbon_exhaust` is an ordinary fluid tagged as `rngtech:gases` and `rngtech:chemical_gases`. It is the transported carbon input for the algae chain. Carbon Exhaust Buckets are crafted from a water bucket and Coal Dust, where Coal Dust comes from crushing coal. Direct adjacent burner capture and Fluid Pump requirements are not part of this MVP.
+The Stage 3-4 greenhouse support path is the [Algae Photobioreactor](algae-photobioreactor.md), which grows Algae Biomass for direct fuel, Dense Algae Biomass crafting, and Melter methane chemistry.
 
 ## Crusher Biomass
 
@@ -163,16 +145,12 @@ These multipliers apply only when the active fuel belongs to the matching tag fa
 
 ## Automation
 
-- Top item automation inserts accepted Bio Generator fuels.
-- Wooden Composter top or side item automation inserts `rngtech:wooden_composter/inputs` items and filled water containers.
-- Wooden Composter side fluid automation fills the input-only water tank.
-- Wooden Composter bottom item automation extracts Composted Biomass and empty container remainders.
-- Algae Photobioreactor side fluid automation fills water or carbon exhaust.
-- Algae Photobioreactor side item automation inserts filled water or carbon-exhaust containers and can pre-stack Algae Biomass in the output slot.
-- Algae Photobioreactor bottom item automation extracts Algae Biomass and empty container remainders.
-- Gear slots are player-managed through the UI.
-- Side energy capability extracts generated FE.
-- The machine does not accept external FE and does not expose item extraction.
+| Block | Item surface | Fluid surface | Energy surface |
+|---|---|---|---|
+| Bio Generator | Top inserts accepted fuels; no item extraction | None | Sides extract generated FE; no external FE input |
+| Wooden Composter | Top or sides insert `rngtech:wooden_composter/inputs` items and filled water containers; bottom extracts Composted Biomass and container remainders | Sides fill the input-only water tank | None |
+
+Gear slots are player-managed through the UI.
 
 ## Related Pages
 

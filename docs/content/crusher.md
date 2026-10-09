@@ -2,34 +2,27 @@
 
 Status: Prototype
 
+Player guide: [Crusher](https://c-pettersson.github.io/rngtech/crusher/)
 
-The crusher is the first implemented RNGTech processing machine family.
+The crusher is the first implemented RNGTech processing machine family and the reference implementation for processing-machine behavior. It turns ores and raw materials into crushed material, and non-alloy crushed material into dust.
 
-Current placed Crusher chassis ids:
+Current placed Crusher chassis ids, by stage:
 
-- `rngtech:wooden_crusher_chassis`
-- `rngtech:iron_crusher_chassis`
-- `rngtech:copper_crusher_chassis`
-- `rngtech:bronze_crusher_chassis`
-- `rngtech:steel_crusher_chassis`
-- `rngtech:aluminum_crusher_chassis`
-- `rngtech:titanium_crusher_chassis`
-- `rngtech:tungstensteel_crusher_chassis`
-- `rngtech:exotic_crusher_chassis`
+- `rngtech:wooden_crusher_chassis` (0)
+- `rngtech:iron_crusher_chassis` (1)
+- `rngtech:copper_crusher_chassis` (2)
+- `rngtech:bronze_crusher_chassis` (3)
+- `rngtech:steel_crusher_chassis` (4)
+- `rngtech:aluminum_crusher_chassis` (5)
+- `rngtech:titanium_crusher_chassis` (6)
+- `rngtech:tungstensteel_crusher_chassis` (7)
+- `rngtech:exotic_crusher_chassis` (8)
 
-The standalone legacy `rngtech:crusher` block and item are not registered. `rngtech:crusher` remains the Crusher recipe type id.
+The standalone legacy `rngtech:crusher` block and item are not registered. `rngtech:crusher` remains the Crusher recipe type id. Chassis identities (buffer, speed, energy, output, Output Guard, batch size) are authored in `MachineBaseStatCatalog` and `MachineImplicitCatalog`; Exotic's internal buffer scale is `75x` (`15,000 FE` at the default `crusher.internalEnergyCapacity`).
 
 ## Visual Design
 
 Crusher placed block art follows [Machine Visual Design](../reference/machine-visual-design.md). Staged chassis use owned `textures/block/crusher_chassis/<face>/<id>` face textures with jaw-and-roller fronts, side throughput panels, top feed hatches, and bottom output hatches. All Crusher block faces use `64x64` frames, and active states keep the motion cue localized to the front working face.
-
-## Behavior
-
-The crusher processes ore-related inputs into crushed outputs. Non-alloy crushed materials can run through a second Crusher pass to produce dust for the faster and cheaper smelting chain.
-
-It exposes NeoForge item and energy capabilities so hoppers and other modded automation can interact with it through standard APIs.
-
-The crusher screen has Processing, Gear, Stats, Refinement, and Mastery tabs. The Processing tab shows the input, output, energy bar, processing bar, banked output-bonus bar, a recipe-state status square, and a Battery Cell status square; hover text reports exact progress, per-job FE/t, total batch FE/t when applicable, projected FE per craft, under-hardness time and FE penalty, jam chance, output-bonus payout preview, status, and no-cell output penalties. The Gear tab exposes the crush-head component slot and Battery Cell slot. The Stats tab exposes Crusher-specific prefix stats such as output-guard grace, no-cell retention, high-hardness mitigation, input filtering, and salvage chance. The Refinement tab targets the placed crusher itself, accepts one refinement catalyst, and applies the shared refinement rules. The Mastery tab shows the placed Crusher chassis' machine-owned XP, level, unspent passive points, and a fixed passive tree inside a panning viewport. The tree starts from a green lower-left node, expands through layered clusters for energy capacity, energy use, bonus output, processing speed, and high-hardness stability, lets some paths cross between regions, and puts keystones on the outer layer as chase choices with tradeoffs.
 
 ## Implementation Contract
 
@@ -122,9 +115,7 @@ With JEI installed, Crusher recipes are exposed with their input, input count, o
 
 Machine stats still control effective output amount for eligible recipes, processing speed, and energy usage.
 
-Crusher chassis recipes are standalone by stage. Crafting a Copper or later Crusher Chassis does not consume an earlier Crusher Chassis, so players can keep older rolls and compare chassis side by side.
-
-Higher-stage chassis still use stage-appropriate materials and calibrated kinetic components as progression gates.
+Crusher chassis recipes are standalone by stage and do not consume an earlier chassis. Higher-stage chassis use stage-appropriate materials and calibrated kinetic components as progression gates.
 
 Crush Head recipes are also standalone by stage. They use current-stage plates as the primary jaw body, previous-stage plates or primitive flint as backing, a current-stage gear through Titanium, and calibrated kinetic components for Tungstensteel and Exotic instead of consuming the previous Crush Head stack.
 
@@ -191,22 +182,6 @@ Crush Head prefixes are stored on the installed part and contribute through the 
 | `crush_head_kinetic` | Quickened / Kinetic / Momentum-Driven / Impulse-Forged | Prefix-side `PROCESSING_SPEED` from the shared percent table; conflicts with other processing-speed affixes on the same head. | Kinetic |
 | `crush_head_scuffed` | Scuffed | Untiered `+6% NO_BATTERY_OUTPUT_RETENTION`; only softens the missing-Battery-Cell output penalty. | Control / Efficiency |
 | `crush_head_dust_groove` | Dust-Grooved | Untiered `+1 CRUSHER_INPUT_FILTER`; rejects non-recipe items from top automation. | Control |
-
-## Chassis Stages
-
-Crusher chassis are placed machine blocks. They roll Crusher machine traits when crafted and keep those traits when placed, refined, broken, and picked up. Each chassis recipe is independent of the other Crusher chassis, so one material branch does not consume or overwrite another machine.
-
-| Stage | Chassis | Identity |
-|---:|---|---|
-| 0 | Wooden | Primitive body, weak buffer, poor speed, and higher energy usage. |
-| 1 | Iron | Baseline powered Crusher body. |
-| 2 | Copper | Better energy usage, lighter buffer. |
-| 3 | Bronze | Better output amount with higher energy pressure. |
-| 4 | Steel | Durable and efficient, but slower. |
-| 5 | Aluminum | Fast and efficient, lighter buffer. |
-| 6 | Titanium | High throughput with stronger output. |
-| 7 | Tungstensteel | Heavy output-focused body with slower handling, Output Guard, and a batch of up to `4`. |
-| 8 | Exotic | Endgame body with Output Guard, a full-batch Naquadah working buffer, and a batch of up to `9`. |
 
 ## Balance Position
 

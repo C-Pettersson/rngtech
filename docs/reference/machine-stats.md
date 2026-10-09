@@ -1,18 +1,14 @@
 # Machine Stats
 
+Player guide: [Machine Stats](https://c-pettersson.github.io/rngtech/machine-stats/)
+
 Machine stats are the canonical values modified by RNGTech progression systems.
 
 Effective stats are built from machine-family defaults plus an authored machine or chassis base stat profile. Installable components and Battery Cells also have authored base profiles: a component's stored rolled affixes are evaluated against that component first, then the effective component contribution is merged into the host machine. Host rolled affixes, refinement changes, and runtime effects then scale or add to the assembled machine. Numeric rolled affixes carry a tier and value range, but base stat profiles do not have modifier tiers and are not removable modifiers.
 
 Slot counts, processing level, batch size, buffer size, and upgrade limit roll as whole numbers. Multiplier-style stats roll as decimal values.
 
-Modifier operations currently support:
-
-- Fixed addition: `ADD`, such as `+1 INPUT_SLOTS`.
-- Multiplier-style addition: `INCREASED_PERCENT`, such as `+20% PROCESSING_SPEED`.
-- Multiplier-style reduction: `DECREASED_PERCENT`, such as `20% reduced ENERGY_USAGE`.
-- Separate multiplier: `MORE`, such as `1.2x PROCESSING_SPEED`.
-- Separate multiplier reduction: `LESS`, such as `0.8x ENERGY_USAGE`.
+Modifier operations (`ADD`, `INCREASED_PERCENT`, `DECREASED_PERCENT`, `MORE`, `LESS`) and the final stat formula are defined in [Affix Generation](../systems/affix-generation.md#modifier-operations).
 
 | Stat | Status | Meaning |
 |---|---|---|

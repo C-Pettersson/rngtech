@@ -8,4 +8,4 @@ Progress from primitive tools and ore processing into alloying, power generation
 
 Universal Cables transfer energy, fluids, and items. Optional Network Connectors bridge matching AE2 or Refined Storage networks. JEI recipes and Jade machine overlays are optional integrations. Pack authors can install the separate FTB Quests extra.
 
-Many systems remain prototypes. See [Current Implementation](reference/current-implementation.md) for the shipped feature inventory and [Getting Started](getting-started.md) for setup. Planned design pages describe future work.
+Many systems remain prototypes. See [Current Implementation](reference/current-implementation.md) for the shipped feature inventory and [Getting Started](https://c-pettersson.github.io/rngtech/getting-started/) guide on the player wiki for setup. Planned design pages describe future work.

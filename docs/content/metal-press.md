@@ -2,23 +2,17 @@
 
 Status: Prototype
 
+Player guide: [Metal Press](https://c-pettersson.github.io/rngtech/metal-press/)
 
 Resource ids: `rngtech:crude_metal_press`, `rngtech:metal_press`
 
 ## Summary
 
-The press line is the powered forming path for material plates, material gears, selected material casings, and Electric Circuit tiers. Both placed blocks use the `rngtech:metal_press` recipe type, the same Process/Gear/Stats/Refinement/Mastery screen, and the same top input, bottom output, and side FE capability layout.
-
-The Crude Metal Press is the pre-Steel bootstrap press. It can make early circuits and material plates when its Heat Core, Mold, and optional control parts satisfy the recipe gates. The Steel Metal Press is the standalone Stage 4 press with mandatory Servo control and failure-output behavior; its body recipe uses the regular Machine Frame rather than consuming the Crude Metal Press.
+The press line is the powered forming path for material plates, gears, selected casings, Electric Circuits, and Energy Connectors. The Crude Metal Press is the pre-Steel bootstrap press that pauses instead of failing; the Steel Metal Press is the Stage 4 press with mandatory Servo control and failure outputs.
 
 ## Gear Requirements
 
-| Gear Slot | Crude Press | Steel Press | Runtime role |
-|---|---|---|---|
-| Heat Core | Required | Required | Provides effective forming temperature and heat stability. |
-| Servo | Optional | Required | Adds speed, stability, temperature stability, overheat tolerance, and power-drop grace behavior. |
-| Mold storage | Required | Required | Stores up to five molds internally. The Gear tab selector chooses the active mold used by recipes. Current molds are `rngtech:plate_mold`, `rngtech:casing_mold`, `rngtech:gear_mold`, `rngtech:circuit_mold`, and `rngtech:connector_mold`. |
-| Battery Cell | Optional | Optional | Adds portable FE storage. Without a cell, the press keeps only its small working buffer and has lower speed and stability. |
+Both presses share one menu and slot layout. Heat Core and an active mold from the five-slot internal mold storage are required on both; the Servo is required on the Steel press and optional on the Crude press; the Battery Cell is optional, and a press without one keeps only its small working buffer at lower speed and stability.
 
 ## Current Runtime Surface
 
@@ -44,23 +38,15 @@ Casing recipes consume four matching ingots, require the Casing Mold to be insta
 
 ## Circuit Flow
 
-1. Craft `rngtech:insulator` from mineral inputs: glass, quartz, clay, and smooth stone.
-2. Craft `rngtech:circuit_mold`; it is tagged as `rngtech:metal_press_molds`.
-3. Craft `rngtech:basic_circuit_blank` from Bronze/Copper conductive parts, mineral insulation, redstone, and quartz.
-4. Press Basic blanks with the Circuit Mold. A Bronze Heat Core is enough for the Basic heat and stability gates.
-5. Use Basic circuits to build Resonance Calibrator progression and produce `rngtech:calibrated_logic_component`.
-6. Craft higher blanks with alloy plates/coils, redstone logic inputs, mineral insulation, and calibrated logic gates: `55+` stability for Advanced, `80+` for Elite, and a Stage 6 calibrated diamond crystal at `85+` stability for Ultimate.
-7. Press each blank tier with the Circuit Mold. Advanced can be reached before the Steel Metal Press if the Crude Press is fitted with enough control. Elite and Ultimate expect the Steel Press or a strongly upgraded Crude Press.
+`rngtech:circuit_mold` is tagged `rngtech:metal_press_molds`. The player guide walks the blank chain and its calibration gates. Balance intent: a Bronze Heat Core meets the Basic heat and stability gates, Advanced is reachable on a well-controlled Crude Press, and Elite and Ultimate are balanced for the Steel Press or a strongly upgraded Crude Press. Higher blanks are `rngtech:calibrated_shaped` recipes whose calibration gates (`logic` family, stage, and `min_stability`) live in the recipe JSON.
 
 ## Failure Behavior
 
 Metal Press recipes support `target_temperature` and `power_sensitive` in addition to the existing `minimum_temperature`, `safe_maximum_temperature`, `required_temperature_stability`, and failure-output fields. `target_temperature` defaults to `minimum_temperature`; `power_sensitive` defaults to true for existing press recipes. `bonus_output` defaults to `true`; set it to `false` to turn off Super Output for a recipe that could otherwise form a loop. Pressing starts only after live stored heat reaches the target temperature. Warmup consumes the recipe's normal FE/t, while no FE during warmup pauses the machine and lets it cool.
 
-The Crude Metal Press hard-gates unsafe recipes. If its effective heat capacity is below the target, if live stored heat is above the safe maximum after overheat tolerance, or if temperature stability is below the recipe requirement, the machine pauses and leaves inputs untouched. A press that is too hot for the current recipe cools down before continuing. Power shortfalls also pause without converting inputs into failure outputs.
+The Crude Metal Press hard-gates unsafe recipes: insufficient heat capacity, stored heat above the safe maximum after overheat tolerance, low temperature stability, and FE shortfalls all pause the machine with inputs untouched.
 
-The Steel Metal Press uses the failure-strain model. Strain can come from live heat below the recipe minimum, heat above the safe maximum after overheat tolerance, temperature stability below the recipe requirement, low effective Servo stability, or FE shortfalls after progress has already started on power-sensitive recipes. `POWER_GRACE` halves press power-drop strain.
-
-When a Steel Press cycle fails, the input is consumed and the output slot receives the recipe failure output. Plate and casing failures produce `rngtech:malformed_ingot`; Furnace malformed-ingot recovery reads the stored material component and returns two matching nuggets through slow low-FE recipes. Circuit failures produce `rngtech:broken_circuit`. The Potential Reactor and Component Recycler can recover generic scrap from broken circuits.
+The Steel Metal Press uses the failure-strain model. Strain sources are heat outside the minimum/safe-maximum window (after overheat tolerance), temperature stability below the recipe requirement, low effective Servo stability, and FE shortfalls after progress starts on power-sensitive recipes. `POWER_GRACE` halves press power-drop strain. A failed cycle consumes the input and outputs the recipe's failure output: material-marked `rngtech:malformed_ingot` for plates and casings, read by Furnace malformed-ingot recovery, and `rngtech:broken_circuit` for circuits.
 
 ## Mastery
 

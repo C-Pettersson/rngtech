@@ -2,15 +2,15 @@
 
 Status: Implemented
 
-`BULK_SPEED` is a rollable behavioral modifier for processing machines. It rewards uninterrupted repeated processing by increasing effective `PROCESSING_SPEED` after each completed process.
+Player guide: [Bulk Speed](https://c-pettersson.github.io/rngtech/rarity-and-affixes/#bulk-speed)
+
+`BULK_SPEED` is a rollable behavioral modifier in the `processing_speed` group for processing machines.
 
 ## Effect
 
-Each completed process adds `1%` processing speed, up to `100%`.
+Each completed process adds `1%` processing speed, up to `100%`. The bonus is applied as an implicit `INCREASED_PERCENT PROCESSING_SPEED` modifier while the behavior is present. Powered machines keep recipe FE per craft, so FE/t rises with the ramp.
 
-The bonus is applied as an implicit increased-percent `PROCESSING_SPEED` modifier while the behavior is present. Powered processing machines preserve recipe FE-per-craft behavior, so the shorter processing time raises visible FE/t as the ramp grows.
-
-The ramp resets when the active process chain is interrupted by invalid input, missing required Gear, changed process ingredients, or other machine-specific cycle resets. A completed process keeps the ramp and improves the next process.
+The ramp resets on invalid input, missing required Gear, changed process ingredients, or other machine-specific cycle resets.
 
 ## Eligibility
 

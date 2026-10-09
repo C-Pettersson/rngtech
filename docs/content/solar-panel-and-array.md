@@ -2,8 +2,9 @@
 
 Status: Prototype
 
+Player guide: [Solar Panel](https://c-pettersson.github.io/rngtech/solar-panel/)
 
-Solar power is a passive FE generator path. It depends on daylight, sky access, weather, and storage planning instead of fuel.
+Solar power is a passive FE generator path that depends on daylight, sky access, and weather instead of fuel.
 
 ## Current Runtime Surface
 
@@ -19,20 +20,15 @@ Panels are registered blocks with block entities and FE extraction capability. T
 
 Upgraded Solar Panel recipes use the non-rollable `rngtech:solar_panel_frame` intermediate instead of consuming earlier Solar Panel stacks, so a well-rolled lower panel remains useful in standalone arrays.
 
-The Solar Array Controller has a compact screen with Process, Gear, Stats, and Refinement tabs. Its Gear tab accepts one Battery Cell for output smoothing and extra storage, one Energy Connector that sets maximum FE/t export, and one Solar Array Extender component that expands range and tunes generation behavior.
+The Solar Array Controller has Process, Gear, Stats, and Refinement tabs. Its Gear tab holds one Battery Cell, one Energy Connector, and one Solar Array Extender.
 
 ## Generation Rules
 
 Solar generation is server-authoritative.
 
-- The dimension must be enabled by common config. The Overworld is enabled by default; Nether, End, and other dimensions are disabled by default.
-- The panel position above the block must see sky. Transparent blocks that preserve sky visibility can allow generation.
-- Generation normally requires daytime.
-- Rain, snow from weather, or thunder uses the weather output value.
-- The Peak Solar suffix is a panel-local modifier. During the zenith window, from Minecraft time `4000` through `8000` each day, it multiplies that panel's clear or weather output before standalone storage/export or controller aggregation.
-- Night, blocked sky, or disabled dimensions produce `0 FE/t`.
-
-Standalone panels store generated FE in their small internal buffer and export through standard NeoForge energy capability. They do not accept external FE.
+- The dimension must be enabled by common config; only the Overworld is enabled by default.
+- The position above the panel must see sky, and generation requires daytime. Weather uses the weather output value.
+- Peak Solar multiplies that panel's clear or weather output before standalone storage/export or controller aggregation.
 
 ## Array Controller
 
@@ -44,15 +40,13 @@ The controller scans a bounded horizontal area every 20 ticks:
 | Maximum effective range | `2` |
 | Scan height | Same Y level as the controller |
 
-Range is a square radius around the controller. A range `1` controller can use the eight surrounding positions, range `2` can use a `5x5` field around the controller, and so on. The controller's own position is excluded. Panels must be connected to the controller through adjacent Solar Panels inside that square; disconnected panel islands inside the range are ignored.
+Range is a square radius that excludes the controller's own position. Panels must connect to the controller through adjacent Solar Panels inside that square.
 
-The Array Expansion modifier now increases controller range instead of panel count. The unmodified controller has range `1`; controller rolls can add up to `+2`; an installed Solar Array Extender adds `+1`; the final effective range is capped at `2`, so an array holds at most `24` panels.
+Array Expansion increases controller range rather than panel count: controller rolls can add up to `+2` and an installed Solar Array Extender adds `+1`, but the effective range is capped at `2` (at most `24` panels).
 
-Overlapping controllers share panel generation. If two controllers both cover the same panel, each receives half of that panel's generation for that tick.
+If two controllers cover the same panel, each receives half of that panel's generation for that tick. A panel owned by a controller has its standalone generation/export suppressed briefly so it does not double-generate. The controller applies its own generation modifiers, flat generation, and efficiency once to the summed array output, so a flat roll adds its FE/t once rather than once per panel.
 
-While a controller owns a panel for aggregation, the panel's standalone generation/export path is suppressed briefly so the same panel does not double-generate. The controller sums each selected panel's environment-adjusted generation, then applies its own generation modifiers, flat generation and efficiency once to the whole array, so a flat roll adds its FE/t once rather than once per panel. It stores FE internally or in the installed Battery Cell, then exports through its block energy capability.
-
-If every panel position inside the current range is filled by Solar Panels of the same stage, the controller applies a `20%` Set bonus. The Process tab has a single icon button that toggles a persistent client-side ghost range overlay for the placed controller. The overlay remains visible after the UI closes while the controller is loaded and the toggle is enabled. The Process tab also exposes tooltips for current FE/t, stored FE, connector-controlled max output, active panel count, blocked panel count, and daylight/weather state.
+A full range of same-stage panels applies a `20%` Set bonus. The range overlay is a persistent client-side toggle.
 
 ## Solar Array Extenders
 
@@ -61,7 +55,7 @@ If every panel position inside the current range is filled by Solar Panels of th
 | Sparksteel Solar Array Extender | `rngtech:sparksteel_solar_array_extender` | Clear-day bonus |
 | Aethergold Solar Array Extender | `rngtech:aethergold_solar_array_extender` | Nighttime bonus |
 
-Both extenders add `+1` array range and no generation multiplier. Their implicit identity decides whether the component leans toward daytime or nighttime output. Stored rolled affixes on the component also contribute while it is installed.
+Both extenders add `+1` array range and no generation multiplier. Stored rolled affixes on the component also contribute while it is installed.
 
 ## Solar Panel Modifiers
 
@@ -75,17 +69,17 @@ Solar Panel modifiers include normal generator stats plus the panel-specific Pea
 
 Solar Array Controller modifiers include normal generator stats plus controller-specific affixes:
 
-| Modifier | Slot | Effect |
-|---|---|---|
-| Array Expansion | Suffix | Adds controller range, up to `+2` from controller rolls. |
-| Moonlit Conversion | Suffix | Generates at `10-55%` of clear-day output at night, depending on tier and roll. |
-| Cloud Piercer | Suffix | Recovers more of the gap between weather output and clear-day output. |
-| Lunar Inverter | Suffix | Strong night conversion with a clear-day output penalty. Conflicts with Moonlit Conversion. |
-| Clear-Sky Amplifier | Suffix | Boosts clear-day output only. |
-| Panel Synchronizer | Prefix | Boosts generation when all controlled panels are the same material. |
-| Panel Arbitration | Prefix | Selects highest-output panels before nearest panels. |
+| Modifier | Slot | Mod group | Stat | Tier 1-4 roll ranges |
+|---|---|---|---|---|
+| Array Expansion | Suffix | `solar_array_size` | `SOLAR_PANEL_LIMIT` | `+1`, `+1`, `+2`, `+2` (effective range capped at `2`) |
+| Moonlit Conversion | Suffix | `solar_low_light` | `MOONLIGHT_CONVERSION` | `10-20`, `20-30`, `30-40`, `50-55` % of clear-day output at night |
+| Lunar Inverter | Suffix | `solar_low_light` | `LUNAR_INVERSION` | `30-40`, `41-55`, `56-70`, `71-85` % at night; clear-day output `x0.85` |
+| Cloud Piercer | Suffix | `solar_weather` | `WEATHER_RECOVERY` | `10-15`, `16-25`, `26-40`, `45-60` % of the weather gap; Stability adds `(STABILITY - 1) x 0.25` (max `0.5`), total capped at `0.85` |
+| Clear-Sky Amplifier | Suffix | `solar_clear_sky` | `CLEAR_SKY_AMPLIFICATION` | `5-10`, `11-20`, `21-35`, `40-50` % |
+| Panel Synchronizer | Prefix | `solar_panel_sync` | `SOLAR_PANEL_SYNCHRONIZATION` | `5-10`, `11-20`, `21-35`, `40-50` %, when more than one active panel shares one material |
+| Panel Arbitration | Prefix | `solar_panel_selection` | `SOLAR_PANEL_ARBITRATION` | Fixed `1`; sorts claimed panels by output before distance |
 
-Energy Connector transfer uses the existing connector tiers: Basic `128 FE/t`, Copper `512 FE/t`, Gold `2,048 FE/t`, Sparksteel `8,192 FE/t`, Arclite `32,768 FE/t`, and Debug `50,000,000 FE/t`. Without an installed connector, the controller uses its base `128 FE/t` output rate. The controller Stats tab reports this effective connector-controlled Energy Transfer value.
+Moonlit Conversion and Lunar Inverter share a mod group, so they cannot roll together. Every controller special uses roll weight `60`.
 
 ## Automation
 
@@ -94,7 +88,6 @@ Energy Connector transfer uses the existing connector tiers: Basic `128 FE/t`, C
 | Solar Panel | FE extraction only | None |
 | Solar Array Controller | FE extraction only | Battery Cell, Energy Connector, and Solar Array Extender slots are UI-managed Gear |
 
-The controller is the preferred automation surface. It exports to adjacent energy receivers and does not accept external FE.
 
 ## Traits And Base Stats
 

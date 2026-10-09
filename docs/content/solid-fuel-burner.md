@@ -2,6 +2,7 @@
 
 Status: Prototype
 
+Player guide: [Solid Fuel Burner](https://c-pettersson.github.io/rngtech/solid-fuel-burner/)
 
 Solid fuel burning is a machine category with concrete Stage 1-4 generator chassis. The category itself is still not registered as `rngtech:solid_fuel_burner`.
 
@@ -43,20 +44,11 @@ Fuel insertion must pass two tag-backed gates:
 
 Tagged fuels are the authored balance surface. In addition, ordinary vanilla burnable items that are not compact block fuels and do not leave a crafting remainder are accepted as Tier 1 item fuels, so fallback fuels such as extra wooden burnables work without listing every item. Logs are accepted but deliberately inefficient: burners use one quarter of their vanilla furnace burn time.
 
-Heat Cores set the highest fuel tier the burner can use. Fuel Boxes decide whether item fuels, compact block fuels, or both forms can be inserted. Compact block fuels include coal blocks, dried kelp blocks, and items tagged `c:storage_blocks/charcoal` when a pack provides charcoal blocks.
-
-Base component gates:
-
-| Stage | Heat Core max tier | Fuel Box forms | Fuel slots |
-|---:|---:|---|---:|
-| 1 | 1 | Item fuels | 1 |
-| 2 | 2 | Item fuels | 1 |
-| 3 | 3 | Item fuels | 2 |
-| 4 | 4 | Item fuels and compact block fuels | 2 |
+Heat Cores gate fuel tier and Fuel Boxes gate fuel form; see the part tables under [Base Stats](#base-stats). Compact block fuels include items tagged `c:storage_blocks/charcoal` when a pack provides charcoal blocks.
 
 Burners use the furnace fuel burn-time source with burner-specific adjustments such as the log penalty. Each fuel item holds `10 FE` per effective burn tick: `FUEL_DURATION`, `FUEL_EFFICIENCY`, and `EFFICIENCY` increase the effective burn ticks and so the FE in each item. The Heat Core and `ENERGY_GENERATION` set FE/t, so a stronger burner spends the same fuel faster rather than getting more FE from it. One Coal (`1,600` burn ticks) holds `16,000 FE` before fuel stats; a Steel Heat Core in a Steel Fuel Box spends about `20,000 FE` from it in roughly 10 seconds. Higher FE/t comes from Syngas at Stage 5, not from better burners. Generated FE is written directly into the installed Battery Cell stack, then exported to adjacent energy receivers through the block energy capability. The generator has no RNGTech machine-side export cap; adjacent receivers, Battery Chassis input limits, and Universal Connector tier caps decide how much FE actually moves each tick.
 
-With JEI installed, Solid Fuel Burning appears as a recipe-like category grouped by accepted fuel tier and item/block form. In the machine screen, clicking the Process tab fuel line opens the Solid Fuel Burning category.
+JEI shows a Solid Fuel Burning recipe-like category grouped by fuel tier and form.
 
 ## Base Stats
 
@@ -89,22 +81,15 @@ Fuel Box base stat contributors:
 
 ## Fuel Behaviors
 
-Copper, Bronze, and Steel Fuel Boxes have Fuel Governor behavior. When the installed Battery Cell is full, the burner does not start a new fuel item and does not decrement active burn time until space exists.
-
-Copper chassis, Copper Heat Cores, and Copper Fuel Boxes carry Quick Feed. Fuel Governor still controls full-buffer pausing when a governor-capable Fuel Box is installed.
-
-Bronze Fuel Boxes and Alloy Solid Fuel Burners carry Fuel Reserve. Fuel Reserve keeps the final accepted fuel item untouched, which makes automation loops less likely to drain themselves dry.
-
-Steel Fuel Boxes carry Block Feed, enabling compact block fuels when the fuel tier tags allow them.
-
-An Iron Fuel Box has no Fuel Governor, so fuel can continue burning and waste available fuel energy while the installed cell is full.
+- Fuel Governor: while the installed Battery Cell is full, the burner does not start a new fuel item and does not decrement active burn time.
+- Quick Feed: identity flag only; Fuel Governor still controls full-buffer pausing.
+- Fuel Reserve: keeps the final accepted fuel item untouched so automation loops do not drain dry.
+- Block Feed: enables compact block fuels when the fuel tier tags allow them.
 
 ## Automation
 
-- Fuel automation sees only the Fuel Box slots.
-- Gear components are player-managed and are not exposed through sided item automation.
-- Energy automation can extract FE through the standard NeoForge block energy capability. The burner offers stored FE without an internal output-rate cap; the receiver or attached Universal Connector controls the actual moved FE/t.
-- The burner does not accept external FE; the installed Battery Cell is charged only by generated fuel energy while installed.
+- The item capability exposes only the Fuel Box fuel slots; Gear components are not exposed.
+- The block energy capability is extract-only and has no internal output-rate cap.
 
 ## Modifier Eligibility
 

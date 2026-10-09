@@ -2,11 +2,11 @@
 
 Status: Prototype
 
+Player guide: [Exotic Affix Forge](https://c-pettersson.github.io/rngtech/exotic-affix-forge/)
+
 Resource id: `rngtech:exotic_affix_forge`
 
-The Exotic Affix Forge is the Stage 8 powered refinement station for item stacks that already participate in RNGTech's refinement system. It is an endgame upgrade over the normal Affix Forge: it spends large FE totals, consumes `rngtech:exotic_affix_catalyst`, and writes per-stack craft history that makes repeat work more expensive.
-
-It does not target placed machines in v1. Placed machines still use their own Refinement tabs.
+The Exotic Affix Forge is the Stage 8 powered, recipe-driven refinement station for item stacks. It consumes `rngtech:exotic_affix_catalyst` and FE, and writes per-stack craft history that makes repeat work more expensive. It does not target placed machines in v1.
 
 ## Current Runtime Surface
 
@@ -25,18 +25,14 @@ The forge itself is not rollable, not refinable, and has no station-side RPG tra
 
 ## Processing
 
-The Process tab owns:
+The Process tab owns the target slot (current `RefinementTargets`), the catalyst slot, the output slot, the optional rolled-affix or empty-slot selection panel, the six operation rows, and the Apply/Retry button with energy, power-failure, progress, cost, and status previews.
 
-- Target slot for current `RefinementTargets` item stacks.
-- Catalyst slot for `rngtech:exotic_affix_catalyst`.
-- Output slot for the refined result.
-- Optional rolled-affix or empty-slot selection panel.
-- Operation selector rows for the six default operations.
-- Apply/Retry button, energy, power-failure, progress, cost, and status previews.
+Contract:
 
-The forge does not auto-start. The selected operation begins only when Apply is clicked. While a craft is running, operation and selection controls are locked until the craft succeeds or fails. Successful crafts consume the target and catalyst, spend Refinement Potential, write target history, and place the refined stack in the output slot.
-
-FE is consumed during active processing. If the running craft cannot draw its per-tick FE cost, the power-failure meter fills. A full power-failure meter fails the craft, resets progress, plays an audible failure cue, and changes the button to Retry. Failure does not consume the target, catalyst, Refinement Potential, or target history, but any FE already spent during the failed attempt remains spent. Changing the selected operation or selection clears the failed state and returns the button to Apply. Invalid targets, Unique targets, stripped targets, missing selections, insufficient RP, missing catalyst, missing recipe data, full output, and illegal operations do not start or commit an operation.
+- No auto-start. The selected operation begins only when Apply is clicked, and operation and selection controls lock until the craft succeeds or fails.
+- Success consumes the target and catalyst, spends Refinement Potential, writes target history, and places the refined stack in the output slot.
+- FE is drawn per tick while active. When a tick's FE cannot be drawn, the power-failure meter fills; a full meter fails the craft, resets progress, plays the failure cue, and switches the button to Retry. Failure keeps the target, catalyst, Refinement Potential, and history; FE already spent stays spent. Changing the operation or selection clears the failed state.
+- Invalid targets, Unique targets, stripped targets, missing selections, insufficient RP, missing catalyst, missing recipe data, full output, and illegal operations do not start or commit an operation.
 
 ## Operations
 
@@ -82,7 +78,7 @@ The default `max_catalyst_count` is `16` for all six built-in action recipes. Da
 
 ## Gear
 
-The Gear tab exposes one optional Battery Cell slot. The forge has a `2,000,000 FE` internal buffer and `65,536 FE/t` block input. An installed Battery Cell acts as portable backing storage so very large operations can continue while FE is supplied over time.
+The Gear tab exposes one optional Battery Cell slot as backing storage. The forge has a `2,000,000 FE` internal buffer and `65,536 FE/t` block input.
 
 ## JEI
 

@@ -1,15 +1,17 @@
 # Rarity
 
-Rarity controls the rolled affix slot count for a machine or machine part. Modifier tier eligibility is controlled separately by global tier weights, modifier-family tier tables, component-stage weighting, and the Stage 8 Exotic tier 7 gate.
+Player guide: [Rarity and Affixes](https://c-pettersson.github.io/rngtech/rarity-and-affixes/)
+
+Rarity controls the rolled affix slot count for a machine or machine part. Modifier tier eligibility is controlled separately by global tier weights, modifier-family tier tables, component-stage weighting, and the Stage 8 Exotic tier 7 gate; see [Affix Generation](../systems/affix-generation.md).
 
 | Rarity | Status | Notes |
 |---|---|---|
-| `NORMAL` | Prototype | Baseline rarity. |
-| `MAGIC` | Prototype | Intermediate rarity with one prefix and one suffix modifier. |
-| `RARE` | Prototype | Higher rarity with up to three prefixes and three suffixes. Generated names use the first prefix and first suffix. |
-| `UNIQUE` | Prototype | Special fixed or heavily constrained drop/find-only behavior. Current code-backed example: `rngtech:unique_potato_battery_cell`, which can appear in village chest loot. |
+| `NORMAL` | Prototype | No rolled affixes. |
+| `MAGIC` | Prototype | One prefix and one suffix. |
+| `RARE` | Prototype | Up to three prefixes and three suffixes. Generated names use the first prefix and first suffix. |
+| `UNIQUE` | Prototype | Fixed or heavily constrained drop/find-only behavior. Current code-backed example: `rngtech:unique_potato_battery_cell`, in village chest loot. |
 
-Fixed identity behavior and authored base stat profiles are separate from rarity affix limits. They can exist on any rarity and do not count as Magic or Rare prefix/suffix modifiers. Machine, chassis, component, and Battery Cell base stat profiles are applied before affixes and do not consume affix slots.
+Authored base stat profiles and fixed identity behavior are applied before affixes, can exist on any rarity, and do not consume prefix or suffix slots.
 
 ## Refinement Rules
 

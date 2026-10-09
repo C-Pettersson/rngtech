@@ -1,5 +1,7 @@
 # Affix Generation
 
+Player guide: [Rarity and Affixes](https://c-pettersson.github.io/rngtech/rarity-and-affixes/)
+
 Affix generation describes how modifier-bearing item stacks and placed machines receive authored base profiles, implicit modifiers, prefix and suffix affixes, and refinement changes.
 
 Use [Modifiers](../modifiers/index.md) for the modifier inventory and [Modifier Eligibility](../reference/modifier-eligibility.md) for capability and profile eligibility.

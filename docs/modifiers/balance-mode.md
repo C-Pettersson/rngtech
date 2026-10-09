@@ -2,6 +2,8 @@
 
 Status: Implemented
 
+Player guide: [Balance Mode](https://c-pettersson.github.io/rngtech/rarity-and-affixes/#balance-mode)
+
 Balance Mode is a Battery Chassis prefix that enables `CHARGE_BALANCER` behavior.
 
 ## Effect

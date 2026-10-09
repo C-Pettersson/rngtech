@@ -32,6 +32,14 @@ unless the page being edited is the canonical definition of processing speed.
 
 Current implementation status belongs in [Current Implementation Matrix](reference/current-implementation.md). Start each content page with one status label so readers arriving through a direct link can distinguish working features from proposals. Label planned subsections when a page mixes current behavior and future design. Tie verification statements to the revision and configuration that were tested.
 
+## Wiki Pages
+
+Each fact has one home. Player-facing behavior (what a machine does, how to use it, stages, Gear, automation, screens, and concept explanations) lives only in the wiki. These docs keep what the wiki leaves out: implementation contracts, recipe and data formats, formulas, balance rationale, modifier eligibility, generated tables, and planned design. Content pages open with a `Player guide:` link to their wiki page instead of restating it.
+
+The player wiki lives in `wiki/` as its own MkDocs site (`mkdocs.wiki.yml`), laid out like [Minecraft Wiki](https://minecraft.wiki/w/Furnace) block pages, and is the only site published. It covers implemented behavior for players only. Keep design proposals, PRDs, and planned content out of it, and never link from it into `docs/`.
+
+Generate crafting grids, recipe tables, item links, and data values with the templates in [Wiki Authoring](reference/wiki-authoring.md) instead of hand-writing them, so they follow the mod's data. Start new pages from `docs/page-templates/wiki.md`.
+
 ## Modifier Pages
 
 Each modifier should have its own page when it becomes a concrete design or implementation target.

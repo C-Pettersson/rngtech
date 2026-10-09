@@ -1,5 +1,7 @@
 # Progression
 
+Player guide: [Refinement Potential](https://c-pettersson.github.io/rngtech/rarity-and-affixes/#refinement-potential), [Stages](https://c-pettersson.github.io/rngtech/stages/)
+
 RNGTech progression is based on machines, machine parts, rarity, modifiers, and Refinement Potential.
 
 ## Crafting and Upgrades
@@ -33,9 +35,7 @@ Status: Prototype
 
 Canonical stat: [REFINEMENT_POTENTIAL](../reference/machine-stats.md#refinement-potential)
 
-Generated starting modifiers and generated Refinement Potential are separate rolls. A crafted Magic or Rare item can start with legal affixes and still keep its full rolled RP budget. Current RP ranges come from component stage, not from starting rarity.
-
-Invalid refinement actions consume no catalyst and no Refinement Potential. Successful refinement consumes the catalyst and the operation's Refinement Potential cost.
+Starting modifiers and Refinement Potential are separate rolls; RP ranges come from component stage, not starting rarity (see [Affix Generation](affix-generation.md)). Invalid refinement actions consume no catalyst and no RP. Successful refinement consumes the catalyst and the operation's RP cost.
 
 Upgrading a component preserves its remaining Refinement Potential and does not add a fresh budget. A good component can move into later stages, but heavy early investment still matters.
 
@@ -83,14 +83,7 @@ Optional modifier crystals can be inserted in the Affix Forge focus slot after t
 
 ## Entry Points
 
-Current entry points:
-
-- [Affix Forge](../content/affix-forge.md) for inventory item stacks.
-- Exotic Affix Forge for powered recipe-driven item-stack operations.
-- [Tool Bench](../content/modular-field-tools.md) Refine tab for modular Tool Heads and Tool Rods, including installed parts inside assembled tools.
-- Machine screen Refinement tabs for placed machines.
-
-Placed-machine refinement happens through the machine screen tab. There is no placed-block right-click refinement path.
+Entry points are the [Affix Forge](../content/affix-forge.md), the Exotic Affix Forge, the [Tool Bench](../content/modular-field-tools.md) Refine tab (including parts inside assembled tools), and machine screen Refinement tabs. There is no placed-block right-click refinement path.
 
 ## Shared Implementation
 

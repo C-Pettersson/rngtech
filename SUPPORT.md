@@ -1,6 +1,6 @@
 # Support
 
-Start with [Getting Started](docs/getting-started.md), [Current Implementation](docs/reference/current-implementation.md), and JEI's recipe and Gear information. Check a feature's status before reporting missing behavior: Planned pages describe future work.
+Start with the [player wiki](https://c-pettersson.github.io/rngtech/) and its [Getting Started](https://c-pettersson.github.io/rngtech/getting-started/) guide, [Current Implementation](docs/reference/current-implementation.md), and JEI's recipe and Gear information. Check a feature's status before reporting missing behavior: Planned pages describe future work.
 
 Use the [issue forms](https://github.com/C-Pettersson/rngtech/issues/new/choose) for bugs, feature proposals, and questions. Search existing issues first. Include the RNGTech, Minecraft, NeoForge, and Java versions, whether you are playing on a server, and the steps that led to the problem. For integration issues, include the relevant mod names and versions.
 

@@ -2,17 +2,16 @@
 
 Status: Prototype
 
+Player guide: [Alloy Furnace](https://c-pettersson.github.io/rngtech/alloy-furnace/)
+
 Resource ids:
 
-- `rngtech:bronze_alloy_furnace_chassis`
-- `rngtech:steel_alloy_furnace_chassis`
-- `rngtech:titanium_alloy_furnace_chassis`
+- Chassis: `rngtech:bronze_alloy_furnace_chassis` (Stage 3), `rngtech:steel_alloy_furnace_chassis` (Stage 4), `rngtech:titanium_alloy_furnace_chassis` (Stage 6)
+- Alloy Crucibles: `rngtech:bronze_alloy_crucible` (Stage 3, 3 inputs), `rngtech:steel_alloy_crucible` (Stage 4, 3 inputs), `rngtech:titanium_alloy_crucible` (Stage 6, 4 inputs)
 
 ## Summary
 
-The Alloy Furnace is an FE-powered mixing machine for alloy blend and direct-ingot recipes. It consumes exact counted ratios from up to four input slots and outputs either material blend items or finished alloy ingots. Early access paths are deliberately slow, lossy, and additive-heavy, while stronger Alloy Furnace setups unlock cleaner direct-ingot recipes. The machine reports recipe FE/t demand; external FE intake is limited by free buffer or installed-cell space plus the source or attached Universal Connector.
-
-Bronze is the first Alloy Furnace tier. Higher chassis and crucibles improve heat transfer, processing speed, stability, heat control, and active input slots through authored base stat catalogs.
+The Alloy Furnace is an FE-powered mixing machine for counted alloy blend and direct-ingot recipes. Early access paths are deliberately slow, lossy, and additive-heavy, while stronger chassis and crucibles unlock cleaner direct-ingot recipes; external FE intake is limited by free buffer or installed-cell space plus the source or attached Universal Connector.
 
 ## Implementation Contract
 
@@ -30,21 +29,7 @@ Current runtime surface:
 
 Machine/chassis numeric identity is authored through `MachineBaseStatCatalog`. Alloy Crucible numeric identity is authored through `ComponentBaseStatCatalog`. Fixed identity behavior remains in `MachineImplicitCatalog`; Steel and Titanium Alloy Furnace chassis carry `OUTPUT_GUARD`.
 
-## Chassis
-
-| Stage | Block | Notes |
-|---:|---|---|
-| 3 | `rngtech:bronze_alloy_furnace_chassis` | First full-yield alloy chassis. |
-| 4 | `rngtech:steel_alloy_furnace_chassis` | Midgame chassis with output guard behavior. |
-| 6 | `rngtech:titanium_alloy_furnace_chassis` | Advanced controlled alloy chassis with output guard behavior. |
-
-## Alloy Crucibles
-
-| Stage | Item | Input slots | Notes |
-|---:|---|---:|---|
-| 3 | `rngtech:bronze_alloy_crucible` | 3 | First valid crucible and Bronze blend gear, crafted through the Bronze Casing path. |
-| 4 | `rngtech:steel_alloy_crucible` | 3 | Handles three-input layouts. |
-| 6 | `rngtech:titanium_alloy_crucible` | 4 | Full four-slot mixing. |
+Higher chassis and crucibles improve heat transfer, processing speed, stability, heat control, and active input slots through those catalogs. The Bronze Alloy Crucible is crafted through the Bronze Casing path.
 
 ## Recipe Use
 
@@ -101,16 +86,7 @@ Bronze Blend and Steel Blend are default progression items and are tagged as `rn
 
 Alloy Furnaces enter the [shared Machine Mastery tree](../systems/machine-mastery.md) at the Drive / Reserve start shared with the [Furnace](furnace.md). Base attributes are `0` Control, `10` Drive, and `10` Reserve. Besides the shared attribute conversions, each Control point grants `0.05%` increased Temperature Stability and each Reserve point grants `0.1%` increased Heat Isolation, as on the Furnace. Effects the Alloy Furnace cannot use, such as fuel duration, output amount, and batch size, stay selectable but are marked inactive. As a heated machine, it gains the [tagged](../systems/machine-mastery.md#tagged-payoffs) speed bonuses of Low Heat Specialist and Flash Annealing along with their temperature caps.
 
-Recipes may set `machine_xp` and an optional `machine_xp_band`; the band defaults from `target_temperature` on the same scale as Furnace recipes. XP is granted only after a completed craft merges its output. Failure outputs, stalled heat, blocked output, and power-starved ticks grant none.
-
-| Default XP | Recipes |
-|---:|---|
-| 2 | Bronze Blend, Steel Blend bootstrap, Invar bootstrap |
-| 3 | Bronze Ingot, Steel Blend, Steel Ingot from Coal Dust, Invar, Sparksteel, Arclite |
-| 4 | Steel Ingot from Coal |
-| 6 | Aethergold, Nullite, Tungstensteel |
-
-Supercharged Silica Gel Beads grant no XP.
+Recipes may set `machine_xp` and an optional `machine_xp_band`; the band defaults from `target_temperature` on the same scale as Furnace recipes. XP is granted only after a completed craft merges its output. Failure outputs, stalled heat, blocked output, and power-starved ticks grant none. Shipped recipes author `machine_xp` from `2` (blend bootstraps) through `3`-`4` (Bronze, Steel, Invar, Sparksteel, Arclite) to `6` (Aethergold, Nullite, Tungstensteel); Supercharged Silica Gel Beads grant none. The player wiki generates the per-recipe values from recipe data.
 
 ## Ascendancies
 

@@ -4,17 +4,11 @@ Resource id: `rngtech:potential_reactor`
 
 Status: Prototype
 
+Player guide: [Potential Reactor](https://c-pettersson.github.io/rngtech/potential-reactor/)
+
 ## Summary
 
-The Potential Reactor is the current code-backed Energy Recycler compatibility path. It consumes explicit RNGTech recycling inputs and converts them into FE, with optional residue recovery when a Recovery Filter is installed. It can also consume non-Unique machine, part, and Battery Cell stacks that still carry recyclable RPG data.
-
-When the input carries recyclable rarity, rolled prefixes or suffixes, or Refinement Potential, the Potential Reactor pays FE for that RPG value and outputs a `rngtech:recycling_stripped` copy of the original item. The stripped copy keeps enough item identity for [Component Recycler](component-recycler.md) recipes, but cannot be placed, refined, charged as a Battery Cell, or installed as Gear.
-
-This means the current survival chain is:
-
-```text
-Chest -> Potential Reactor -> Component Recycler -> chest or storage
-```
+The Potential Reactor is the current code-backed Energy Recycler compatibility path. It converts explicit salvage fuel recipes and RPG-bearing machine, part, and Battery Cell stacks into FE, and outputs a `rngtech:recycling_stripped` copy of RPG targets as [Component Recycler](component-recycler.md) feedstock.
 
 ## Current Runtime Surface
 
@@ -33,9 +27,7 @@ The placed machine uses `PotentialReactorBlockEntity`, `PotentialReactorMenu`, a
 
 ## Screen Contract
 
-The Potential Reactor screen follows the shared low-text machine UI rule. The Process tab should present the salvage input slot, residue output slot, internal FE bar, processing bar, and compact status/generation/output icons. Exact FE, progress ticks, recipe fuel value, current status, generation rate, and output rate belong in hover details rather than permanent text rows.
-
-The Gear tab should present the Reactor Chamber, Recovery Filter, and Containment Lining as equipment slots, plus a compact processing-level meter for the installed chamber. Persistent numeric stat rows belong in the Stats tab, and placed-machine trait/refinement details belong in the Refinement tab.
+The Potential Reactor screen follows the shared low-text machine UI rule in [Machine Guidelines](../reference/machine-guidelines.md): exact FE, progress ticks, recipe fuel value, status, generation rate, and output rate belong in hover details rather than permanent text rows.
 
 ## RPG Energy Recycling
 
@@ -57,9 +49,7 @@ The payout starts from rarity value, affix tier value, and Refinement Potential 
 
 Repeats lose value. The reactor remembers the item ids of its last 15 gear burns; each earlier burn of the same id multiplies the next one's FE by `0.75`, down to `10%`. Rotating 16 or more different items avoids the penalty. Explicit fuel recipes such as Broken Circuits are not affected.
 
-These factors apply before machine stat multipliers. The output is always a one-count stripped copy of the input item. This stripped output is the intended feedstock for the Component Recycler.
-
-Unique stacks are not accepted by this generic RPG-value path.
+These factors apply before machine stat multipliers. The output is always a one-count stripped copy of the input item.
 
 ## Fuel Recipes
 
@@ -71,19 +61,29 @@ Potential Reactor fuel is explicit recipe data. A recipe defines:
 - optional `residue`
 - optional `minimum_material_stage`
 
-With JEI installed, Potential Reactor fuel recipes are exposed with input, residue output when present, base FE, processing ticks, and minimum material stage. In the machine screen, clicking the Process tab recipe line opens the Potential Reactor recipe category.
+Example:
 
-Current starter recipes:
+```json
+{
+  "type": "rngtech:potential_reactor",
+  "ingredient": {
+    "item": "rngtech:fragment"
+  },
+  "energy": 4800,
+  "processing_ticks": 120,
+  "residue": {
+    "count": 1,
+    "id": "rngtech:scrap"
+  },
+  "minimum_material_stage": 2
+}
+```
 
-| Input | Base FE | Processing ticks | Minimum stage | Residue with Recovery Filter |
-|---|---:|---:|---:|---|
-| `rngtech:fragment` | `4800` | `120` | `2` | `rngtech:scrap` |
-| `rngtech:recycling_byproduct` | `7200` | `140` | `2` | `rngtech:scrap` |
-| `rngtech:spent_catalyst` | `12000` | `160` | `3` | `rngtech:scrap` |
+Starter recipes live in `data/rngtech/recipe/potential_reactor/`. JEI exposes them as a Potential Reactor recipe category.
 
-The Potential Reactor also has a built-in recovery recipe for `rngtech:malformed_ingot`, the generic Metal Press failure output. This recipe reads the stack's `rngtech:material` component. With a Recovery Filter installed, known material failures return two matching nuggets; malformed ingots without a known material component return two generic `rngtech:scrap`.
+The built-in `rngtech:malformed_ingot` recovery recipe reads the stack's `rngtech:material` component to choose matching nuggets, falling back to generic `rngtech:scrap`.
 
-Residue is only produced when a valid Recovery Filter is installed. Without a filter, the reactor can still process valid fuel, but byproducts are lost. The starter datapack keeps `rngtech:scrap` as residue-only material so recovered residue cannot be fed back into the reactor for more FE.
+Residue is only produced when a Recovery Filter is installed. The starter datapack keeps `rngtech:scrap` as residue-only material so recovered residue cannot be fed back into the reactor for more FE.
 
 ## Power Model
 
@@ -97,8 +97,6 @@ For RPG-bearing targets, "recipe energy" is replaced by the computed RPG value. 
 
 `PROCESSING_SPEED` shortens the processing time. Higher `ENERGY_GENERATION` therefore raises the visible FE/t and total recovered FE. `ENERGY_TRANSFER` controls side extraction from the internal FE buffer. `ENERGY_CAPACITY` controls the internal buffer size.
 
-The reactor pauses while its internal buffer is full, so expensive salvage fuel is not consumed just to waste generated FE.
-
 ## Gear
 
 The Potential Reactor exposes three Gear-tab slots:
@@ -109,11 +107,9 @@ The Potential Reactor exposes three Gear-tab slots:
 | Recovery Filter | No | Enables residue output and can improve `EFFICIENCY` and `PROCESSING_SPEED`. |
 | Containment Lining | No | Improves `STABILITY`, which currently modifies recovered FE deterministically. |
 
-Reactor Chamber stage is the current material gate. The starter salvage recipes require at least stage 2, and stronger chambers unlock higher-stage inputs.
+Reactor Chamber stage is the current material gate. Starter salvage recipes require stage `1` to `3`, and stronger chambers unlock higher-stage inputs.
 
 ## Automation
-
-The Potential Reactor uses standard NeoForge capabilities:
 
 | Side | Behavior |
 |---|---|
@@ -121,9 +117,7 @@ The Potential Reactor uses standard NeoForge capabilities:
 | Bottom | Extract residue or stripped target output. |
 | Sides | Extract FE. |
 
-Gear slots and Refinement catalyst slots are not exposed through normal sided automation.
-
-The block also supports simple redstone control. A powered Potential Reactor pauses processing and will not start or advance salvage fuel while the signal is present.
+Gear slots and Refinement catalyst slots are not exposed through sided automation. A redstone signal pauses processing.
 
 ## Modifier Eligibility
 

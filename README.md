@@ -25,7 +25,7 @@ The machines, progression, and resource chains remain grounded in Minecraft tech
 - JEI supplies recipe and Gear information; Jade supplies machine overlays. These integrations are optional. AE2 and Refined Storage are needed only for their respective network bridges.
 - FTB Quests is optional. Pack authors can install the [quest extra](extras/ftbquests/README.md); the mod JAR does not install a quest book.
 
-See [Getting Started](docs/getting-started.md) for the first tools and machines, and [Current Implementation](docs/reference/current-implementation.md) for feature status. Features marked **Prototype** exist but may change; **Planned** pages describe future work. Back up worlds before updating. The project has automated source/data checks, but no Java unit-test suite or exhaustive gameplay test suite.
+See the [player wiki](https://c-pettersson.github.io/rngtech/) and its [Getting Started](https://c-pettersson.github.io/rngtech/getting-started/) guide for the first tools and machines, and [Current Implementation](docs/reference/current-implementation.md) for feature status. Features marked **Prototype** exist but may change; **Planned** pages describe future work. Back up worlds before updating. The project has automated source/data checks, but no Java unit-test suite or exhaustive gameplay test suite.
 
 ## Build from source
 

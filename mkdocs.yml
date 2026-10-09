@@ -41,7 +41,6 @@ markdown_extensions:
 nav:
   - Home: index.md
   - Conventions: conventions.md
-  - Getting Started: getting-started.md
   - Systems:
       - Progression: systems/progression.md
       - Machine Mastery: systems/machine-mastery.md
@@ -114,6 +113,7 @@ nav:
       - Machine Guidelines: reference/machine-guidelines.md
       - Machine Visual Design: reference/machine-visual-design.md
       - Machine GUI Design: reference/machine-gui-design.md
+      - Wiki Authoring: reference/wiki-authoring.md
       - Passive Tree Design Rules: reference/passive-tree-design-rules.md
       - Rarity: reference/rarity.md
       - Materials List: reference/materials.md

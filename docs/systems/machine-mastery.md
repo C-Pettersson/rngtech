@@ -2,6 +2,8 @@
 
 Status: Prototype
 
+Player guide: [Machine Mastery](https://c-pettersson.github.io/rngtech/machine-mastery/)
+
 Machine Mastery is progression owned by each machine chassis. Machines share one passive graph and enter it at different starting positions. The [implementation matrix](../reference/current-implementation.md) records the current adapters; generator and storage adapters are deferred. Each family also has [ascendancies](#ascendancies): small specialization trees unlocked with Ascendancy Seals.
 
 ## Shared tree
@@ -45,7 +47,7 @@ Explicit attribute scaling is separate. A node can grant an authored percentage 
 
 Steady State grants 50% more Stability with 15% less Processing Speed. Singular Drive grants 50% more Drive with 50% less Control and Reserve. Lean Grid applies 30% less Energy Usage for machines with an energy buffer and 50% less Energy Capacity. Single Pass disables bonus output and grants 30% more Processing Speed for machines with bonus output. Family keystones are described on each machine page.
 
-Hover the machine's starting node to see current attribute totals. Tool Control retains its separate durability mechanic; these machine conversions do not change tools.
+Tool Control retains its separate durability mechanic; these machine conversions do not change tools.
 
 ## Tagged payoffs
 
@@ -91,21 +93,18 @@ Progression survives supported drops, pick-block, and replacement through `rngte
 
 ## Allocating, refunding, and copying
 
-Open Mastery to browse the tree. Drag to pan and scroll to zoom at the cursor; Shift-scroll pans sideways and Ctrl-scroll pans vertically. Toolbar controls expand the view, fit the tree, or return home. Find searches names, IDs, and stat effects, shows the match count, and rings every match so it stays visible when zoomed out; Enter cycles through matches. Matches and relevance highlights use a thick icy white-blue ring. Simulated protanopia, deuteranopia, and tritanopia left it the most distinct from every Mastery accent; red blends into the orange heat accents under red-green color blindness. Entering exactly `keystone`, `notable`, or `travel` (singular or plural) highlights every node of that type instead. The relevance control highlights useful nodes. Hover nodes for exact effects, constraints, and refund instructions.
+The player guide covers the Mastery screen workflow, controls, Bonus Summary, copying, and the Configurator. Implementation rules it leaves out:
 
-In the expanded view, the tab on the right edge of the tree opens the **Bonus Summary** drawer. It lists attribute totals, allocated keystones, and every allocated effect combined the way the stat pipeline combines it: increased and reduced add, and more and less multiply. Separate sections show inherent attribute conversions, attribute scaling, limits, special behaviors, and effects this machine does not use. Hover a line to see what the stat does, its current contribution, and the nodes behind it; hover a keystone for its full tooltip. Scroll inside the drawer when it overflows.
-
-Hovering an unallocated node previews the shortest path from your allocations and its point cost. Left-click allocates the whole path in one server action when you can afford it and installed Gear allows every node on it; otherwise nothing is allocated and the tooltip explains why. Allocation happens on release, so a drag that starts on a node only pans. Right-click an allocated node to refund it. Each removed node costs one **Mastery Refund**, crafted eight at a time from paper, redstone, and a copper ingot. Refunds must leave every remaining allocation connected and keep installed Gear legal. Shift-click Clear pays the same per-node price for the whole tree. Creative players do not consume refunds.
-
-Copy stores an ordered build code in the clipboard. Paste requires an empty tree with the same start. It allocates what the destination can afford, then follows the remaining order as that chassis earns points. Purple outlines show target nodes. Pause/Resume controls following. Gear conflicts pause before the illegal allocation; resolve the conflict and resume. Manual refunds pause following. Copying a machine already following a target copies the complete target.
-
-The Configurator has a dedicated Mastery mode. Sneak-use in air toggles between connector and Mastery modes. In Mastery mode, sneak-use a supported machine to copy and use normally to paste. Shift-click Copy in the Mastery screen stores the build on an inventory Configurator and selects Mastery mode. Entity companions use the same workflow.
+- Find matches and relevance highlights use a thick icy white-blue ring. Under simulated protanopia, deuteranopia, and tritanopia it stayed the most distinct from every Mastery accent; red blends into the orange heat accents under red-green color blindness.
+- A path allocation is one server action, so a partly affordable or partly Gear-illegal path allocates nothing.
+- A Gear conflict pauses build following before the illegal allocation. `MasteryBuildCode.copy` encodes the target build when one exists, otherwise the allocated nodes.
+- Shift-click Copy sends `copy_configurator`, which writes the build to the first Configurator in the player inventory and sets `MASTERY_CONFIGURATOR_MODE`. Entity hosts such as the Forestry Companion route Configurator use through `ConfiguratorItem.useMastery`.
 
 ## Ascendancies
 
 Status: Prototype. Ascendancies still need an in-game playtest, and their node values are subject to balance testing.
 
-An ascendancy is a family-specific specialization for one machine, modeled on Path of Exile ascendancy classes. Every Mastery family has two. A machine chooses one when it uses its first Ascendancy Seal, then spends ascendancy points in that ascendancy's small tree. Ascendancy points are separate from the shared tree's points and allocations.
+An ascendancy is a family-specific specialization for one machine, modeled on Path of Exile ascendancy classes. Every Mastery family has two; the Forestry Companion has three. A machine chooses one when it uses its first Ascendancy Seal, then spends ascendancy points in that ascendancy's small tree. Ascendancy points are separate from the shared tree's points and allocations.
 
 | Family | Ascendancies |
 | --- | --- |
@@ -119,29 +118,18 @@ An ascendancy is a family-specific specialization for one machine, modeled on Pa
 
 ### Seals and tiers
 
-Each Ascendancy Seal grants 2 ascendancy points to one machine, for at most 6 across three tiers. Seals are used in order, one tier at a time:
-
-| Seal | Recipe materials | Needs |
-| --- | --- | --- |
-| Ascendancy Seal I | Sparksteel, aluminum casings, advanced circuits, a Stage 5 calibrated conductive component, and a Primed Seal Core from the Component Assembler | Entry stage 4 or higher; chooses the ascendancy |
-| Ascendancy Seal II | Tungstensteel, nullite, elite circuits, a calibrated diamond crystal, and a Lubricated Seal Core | Seal I used on the same machine |
-| Ascendancy Seal III | Naquadah, an Exotic Machine Frame, ultimate circuits, a high-stability calibrated diamond crystal, and a Lubricated Seal Core | Seal II used on the same machine |
-
-The entry stage is the chassis stage for block machines. It is 3 for the Crude Metal Press and 4 for the Metal Press, and 6 for the Melter. The Forestry Companion has no chassis stage and always meets the gate, so crafting Seal I is its only requirement. The gate is checked only when Seal I is used.
+Each Ascendancy Seal grants 2 ascendancy points to one machine, for at most 6 across three ordered tiers. Seal I requires entry stage 4 or higher: the chassis stage for block machines, 3 for the Crude Metal Press, 4 for the Metal Press, and 6 for the Melter. The Forestry Companion has no chassis stage and always meets the gate. `AscendStatus` checks the gate only for tier 1.
 
 Seals carry no data, so Seals from loot tables, quests, or commands work the same as crafted ones. Pack makers can turn Seal recipes off with the `ascendancy.sealRecipesEnabled` common config key or the `rngtech:ascendancy_seal_recipes_enabled` recipe condition. Crafting the Seal is the only trial; there is no work requirement.
 
 ### Choosing, allocating, and switching
 
-The crest beside the machine's start node on the Mastery tab opens the **Ascendancy panel**. Its pips show earned Seal tiers, and it glows when a Seal can be used or points are unspent. The crest appears on families with ascendancies and on any machine that already earned a tier.
+The player guide covers the Ascendancy panel, crest, Ascend, refunds, Switch, Creative Seal use, and free re-choice after a retired ascendancy. Implementation notes:
 
-- **Ascend** uses the next Seal from your inventory. Seal I opens the choose dialog, which previews every ascendancy for the family with its tree and root effects. Creative players must carry the Seal but keep it.
-- The chosen ascendancy's root is allocated for free. Every other node costs one point. Small nodes lead to exactly one notable, and a deep notable sits behind a notable's small node, so 6 points reach at most three notables.
-- Click a node to allocate it and right-click to refund it. Each refunded node costs five Mastery Refunds, and nodes are refunded from the tips inward. The root cannot be refunded.
-- **Switch** changes to the family's other ascendancy. It needs an empty tree, apart from the root, and consumes a Seal I. Earned tiers and points stay.
-- If a machine's ascendancy is ever retired from the catalog, the machine keeps its tiers and chooses again for free.
+- `AscendancyPanel.available()` shows the crest when the family has catalog ascendancies or the state has earned tiers.
+- A tier without a valid catalog ascendancy reports `AscendStatus.FREE_CHOICE`, and `choose_ascendancy` then picks without consuming a Seal.
 
-Ascendancy effects use the same modifier rules and stat pipeline as the shared tree. Granted ascendancy stats appear on the machine's Stats tab only when they apply, and [Machine Stats](../reference/machine-stats.md#ascendancy-stats) defines each one. The Bonus Summary drawer has an Ascendancy section. Jade shows the ascendancy and its points while sneaking, and JEI has an information entry for the three Seals.
+Ascendancy effects use the same modifier rules and stat pipeline as the shared tree. Granted ascendancy stats appear on the Stats tab only when they apply, and [Machine Stats](../reference/machine-stats.md#ascendancy-stats) defines each one. Jade ascendancy lines and the JEI Seal information entry are described on the player guide.
 
 Ascendancy state lives in `rngtech:machine_progression`, so it survives drops, pick-block, and the Forestry Companion's item form. Like the rest of Mastery, it does not transfer to a newly crafted chassis. Build codes carry the ascendancy and its allocation order. Paste allocates ascendancy nodes only onto the same ascendancy with none allocated, as far as its earned points reach.
 

@@ -2,59 +2,36 @@
 
 Status: Prototype
 
-The Resonance Calibrator turns ordinary material forms into RNGTech-calibrated components. External or vanilla machines can still make plates, coils, casings, circuits, and other raw ingredients, but RNGTech recipes can require calibrated state before those ingredients count as internal machine components.
+Player guide: [Resonance Calibrator](https://c-pettersson.github.io/rngtech/resonance-calibrator/)
+
+The Resonance Calibrator turns ordinary material forms, which any machine can make, into calibrated components that RNGTech recipes can require before they count as internal machine components.
 
 Calibration is separate from refinement. Calibration creates component validity and quality state; refinement mutates rolled RPG traits on eligible machines and parts.
 
 ## Implemented Chassis
 
-| Chassis | Stage | Identity | Runtime role |
-|---|---:|---|---|
-| Iron Resonance Calibrator Chassis | 1 | Stable frame | First calibrator body with one lane, broad output quality, and early Steel bootstrap reach. |
-| Copper Resonance Calibrator Chassis | 2 | Conductive tuning frame | Optional early acceleration sidegrade with better transfer and weaker stability control. |
-| Steel Resonance Calibrator Chassis | 4 | Reinforced stabilizer | Slower but more stable and output-guarded. |
-| Titanium Resonance Calibrator Chassis | 6 | Precision frame | Better speed, precision, stability, and RP outcomes. |
-| Lead Resonance Calibrator Chassis | 4 | Dense calibration bed | Two-lane bulk sidegrade with lower precision. |
-| Tungstensteel Resonance Calibrator Chassis | 7 | Dense resonance array | Three-lane endgame bulk branch. |
-| Nullite Resonance Calibrator Chassis | 7 | Phase precision frame | One-lane endgame precision branch with stronger quality and RP control. |
+Chassis ids, with stage and base lanes: `rngtech:iron_resonance_calibrator_chassis` (1, 1 lane), `rngtech:copper_resonance_calibrator_chassis` (2, 1), `rngtech:steel_resonance_calibrator_chassis` (4, 1, output-guarded), `rngtech:lead_resonance_calibrator_chassis` (4, 2), `rngtech:titanium_resonance_calibrator_chassis` (6, 1), `rngtech:tungstensteel_resonance_calibrator_chassis` (7, 3), and `rngtech:nullite_resonance_calibrator_chassis` (7, 1).
 
-All chassis are block items, roll machine RPG traits, support placed-machine refinement, expose FE input, and share the same Process, Gear, Stats, Refinement, and Mastery screen pattern.
+All chassis roll machine RPG traits, support placed-machine refinement, accept FE, and share one menu and screen.
 
 Placed chassis art follows [Machine Visual Design](../reference/machine-visual-design.md#resonance-calibrator-chassis). Resonance Calibrator blocks should use owned `textures/block/resonance_calibrator_chassis/<face>/<id>` face textures, keep `64x64` block-face frames, and show a front tuning cue such as a lens, coil ring, waveform meter, or alignment target. Bulk sidegrades should visibly communicate multiple calibration lanes, while Nullite should read as the precision branch.
 
 ## Gear
 
-The Gear tab uses:
-
-| Gear slot | Required | Runtime role |
-|---|---|---|
-| Battery Cell | No | Adds portable FE storage. Without a cell, the machine keeps only its internal buffer and applies a speed and calibration-quality penalty. |
-| Resonance Coil | Yes | Sets calibration stage reach, improves quality, and contributes FE transfer or speed through its component base profile. |
-| Control Board | Yes | Improves calibration precision, stability, and useful Refinement Potential outcomes through its source-local base profile plus stored affixes. |
-| Stabilizer Matrix | No | Improves stability floor, quality consistency, and catalyst efficiency through its source-local base profile plus stored affixes. |
-| Calibration Patterns | Yes | Stores all six reusable family patterns internally; one stored pattern is selected as the active recipe pattern from the Gear tab. |
-
-Implemented Gear materials are Iron, Copper, Steel, Titanium, Tungstensteel, and Nullite.
+Required Gear is a Resonance Coil (stage reach, quality, and FE transfer or speed from its base profile), a Control Board (precision, stability, and Refinement Potential outcomes), and an active pattern from the six-slot internal pattern storage. The Stabilizer Matrix (stability floor, quality consistency, catalyst efficiency) and Battery Cell are optional; without a cell the machine applies a speed and calibration-quality penalty. Control Boards and Stabilizer Matrices contribute through their source-local base profile plus stored affixes.
 
 ## Calibration Flow
 
-1. Make ordinary material forms through vanilla, RNGTech, or external machines.
-2. Craft a Resonance Calibrator, a reusable family pattern, and the required Resonance Coil and Control Board.
-3. Install the Resonance Coil, Control Board, and reusable family patterns in the Gear tab, then select the active pattern.
-4. Put the raw input, catalyst, and optional recipe stabilizer in the Process tab.
-5. Supply FE directly or through the optional Battery Cell.
-6. The output becomes a broad calibrated component item with `rngtech:calibration_state`.
-
-Stored calibration state contains:
+Calibrated outputs carry `rngtech:calibration_state`, which contains:
 
 - Family: Structural, Kinetic, Thermal, Conductive, Storage, or Logic.
 - Stage: component-stage identity for downstream gates.
 - Stability: `0-100` quality value.
 - Refinement Potential: a consumable quality budget for downstream gated recipes.
 
-Patterns are reusable, stored internally in the Gear tab, and are not consumed. Catalysts are consumed unless catalyst efficiency preserves them. Recipe stabilizers are consumed when a calibration recipe declares one.
+Patterns are never consumed. Catalysts are consumed unless catalyst efficiency preserves them, and recipe stabilizers are consumed when a recipe declares one.
 
-Low-stability calibrated outputs are not dead ends. Current calibrated components have Component Recycler recipes that recover the main raw input, such as Iron Gear from a Calibrated Kinetic Component, so a failed stability roll can be recouped for another attempt. The recycler does not return the reusable pattern, consumed catalyst, consumed recipe stabilizer, calibration state, or Refinement Potential. Because the recovery returns the calibration input, the calibration recipe opts out of Super Output (see [Recipe Surface](#recipe-surface)) and the Component Recycler has none, so calibrating and recycling never returns more raw input than it consumed.
+Current calibrated components have Component Recycler recipes that recover the main raw input, so a low stability roll can be recouped. The recycler does not return the reusable pattern, consumed catalyst, consumed recipe stabilizer, calibration state, or Refinement Potential. Because the recovery returns the calibration input, the calibration recipe opts out of Super Output (see [Recipe Surface](#recipe-surface)) and the Component Recycler has none, so calibrating and recycling never returns more raw input than it consumed.
 
 ## Recipe Surface
 
@@ -104,7 +81,7 @@ When JEI is installed, `rngtech:calibration` recipes appear under a Resonance Ca
 
 ## Progression
 
-The player first uses normal processing to make raw forms, then calibrates the forms needed for RNGTech machine bodies and advanced components. Stage 3+ chassis now require calibrated components and frame-tier bodies, so external machines can speed up raw preprocessing but cannot bypass RNGTech's internal component gate.
+Stage 3+ chassis require calibrated components and frame-tier bodies, so external machines can speed up raw preprocessing but cannot bypass RNGTech's internal component gate.
 
 The late-game choice is intentionally split:
 

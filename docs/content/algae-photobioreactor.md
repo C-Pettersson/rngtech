@@ -2,38 +2,32 @@
 
 Status: Prototype
 
-The Algae Photobioreactor is a Stage 3-4 support processor registered as `rngtech:algae_photobioreactor`. It does not produce FE. It turns water, carbon-bearing gas inputs, and light into Algae Biomass for direct Bio Generator fuel, methane chemistry, or Dense Algae Biomass crafting.
+Player guide: [Algae Photobioreactor](https://c-pettersson.github.io/rngtech/algae-photobioreactor/)
+
+The Algae Photobioreactor (`rngtech:algae_photobioreactor`) is a Stage 3-4 no-FE support processor that turns water, a carbon-bearing gas, and light into Algae Biomass.
 
 ## Runtime Surface
 
 | Resource id | Block entity | Menu / screen | Capabilities | Refinement |
 |---|---|---|---|---|
-| `rngtech:algae_photobioreactor` | `AlgaePhotobioreactorBlockEntity` | `AlgaePhotobioreactorMenu` / `AlgaePhotobioreactorScreen` | Side fluid input, side filled-container input, bottom item output | No |
-
-The machine owns two input-only tanks:
+| `rngtech:algae_photobioreactor` | `AlgaePhotobioreactorBlockEntity` | `AlgaePhotobioreactorMenu` / `AlgaePhotobioreactorScreen` | Fluid input on every face except the bottom, top and side filled-container input, bottom item output | No |
 
 | Tank | Capacity | Accepted fluid |
 |---|---:|---|
 | Water | `4,000 mB` | `minecraft:water` |
 | Carbon | `4,000 mB` | `rngtech:carbon_exhaust`, `rngtech:syngas`, or `rngtech:carbon_monoxide` |
 
-The Process tab has separate purge buttons for the Water and Carbon tanks. The craftable `rngtech:purge_bucket` can also right-click the placed machine to void up to `1000 mB` from the first non-empty input tank. Purging either input tank resets active algae growth progress.
+Both tanks are input-only; fluid automation never extracts stored inputs. Side item automation may insert `rngtech:algae_biomass` into the output slot for pre-stacking, and the slot still behaves as an output for extraction. The machine has no FE capability, Battery Cell slot, generator stats, or Refinement tab. Purging either input tank resets active growth progress.
 
 ## Recipes
 
-Algae growth uses the `rngtech:algae_growth` recipe type. Recipes declare water input, carbon input, item output, processing ticks, and minimum light level.
+Algae growth uses the `rngtech:algae_growth` recipe type. Recipes declare water input, carbon input, item output, processing ticks, and minimum light level. JEI shows both fluid inputs, the output, processing time, the light gate, and the Bio Chamber note for output scaling.
 
-The starter recipe consumes `250 mB` water and `100 mB` Carbon Exhaust over `1,200 ticks` with at least light level `12`, producing one `rngtech:algae_biomass`. Syngas is a faster intermediate carbon input at `80 mB` over `900 ticks`. Carbon Monoxide is the high-throughput bulk sink at `500 mB` over `600 ticks`.
+The starter recipe consumes `250 mB` water and `100 mB` Carbon Exhaust over `1,200 ticks` at light level `12` or more, producing one `rngtech:algae_biomass`. Syngas is a faster intermediate carbon input at `80 mB` over `900 ticks`. Carbon Monoxide is the high-throughput bulk sink at `500 mB` over `600 ticks`.
 
-JEI exposes algae growth recipes with both fluid inputs, the algae output, processing time, the light gate, and the Bio Chamber note for output scaling.
-
-Players and side item automation can place `rngtech:algae_biomass` directly in the output slot to pre-stack or consolidate output. The slot still behaves as an output slot for extraction.
-
-`rngtech:carbon_exhaust_bucket` has a bootstrap crafting recipe from one water bucket and one Coal Dust. Coal Dust is produced by crushing coal in the Crusher.
+`rngtech:carbon_exhaust_bucket` has a bootstrap crafting recipe from one water bucket and one Coal Dust.
 
 ## Gear
-
-The Algae Photobioreactor has one Gear slot:
 
 | Slot | Accepted items | Runtime role |
 |---|---|---|
@@ -43,22 +37,12 @@ The Bio Chamber slot is manual equipment and is not exposed to sided item automa
 
 ## Fuel Chain
 
-`rngtech:algae_biomass` is direct Bio Generator fuel and methane chemistry feedstock, while `rngtech:dense_algae_biomass` is the more efficient Bio Generator algae fuel:
-
 | Fuel | Tag | Base FE |
 |---|---|---:|
 | Algae Biomass | `rngtech:bio_generator/algae_biomass` | `400 FE` |
 | Dense Algae Biomass | `rngtech:bio_generator/dense_algae_biomass` | `2,400 FE` |
 
-Dense Algae Biomass is crafted from four Algae Biomass, making dense fuel more effective than burning the same algae directly. Plain Algae Biomass also feeds the Melter methane recipe with Organic Reagent and water. Neither algae item is tagged as vanilla furnace fuel or solid fuel-burning generator fuel.
-
-## Automation
-
-- Sides fill water, Carbon Exhaust, Syngas, or Carbon Monoxide through the block fluid capability.
-- Sides insert filled water or supported carbon-gas containers, and may insert Algae Biomass into the output slot for pre-stacking.
-- Bottom extracts algae output and empty container remainders.
-- Fluid automation can fill water or supported carbon gases only. The machine never exposes stored input fluids for fluid extraction.
-- The machine has no FE capability, no Battery Cell slot, no generator stats, and no Refinement tab.
+Dense Algae Biomass is crafted from four Algae Biomass, so dense fuel beats burning the same algae directly. Neither algae item is tagged as vanilla furnace fuel or solid fuel-burning generator fuel.
 
 ## Related Pages
 

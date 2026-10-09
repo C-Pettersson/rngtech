@@ -2,16 +2,22 @@
 
 Status: Prototype
 
-The ammonia chain has two registered machines: `rngtech:ammonia_synthesizer` and `rngtech:ammonia_fuel_cell`. The synthesizer is a powered support processor that converts nitrogen and hydrogen into ammonia. The fuel cell is the generator that consumes ammonia for FE.
+Player guides: [Ammonia Synthesizer](https://c-pettersson.github.io/rngtech/ammonia-synthesizer/), [Ammonia Fuel Cell](https://c-pettersson.github.io/rngtech/ammonia-fuel-cell/). The upstream gas machines are covered in [Coal Gasifier](https://c-pettersson.github.io/rngtech/coal-gasifier/), [Syngas Combustor](https://c-pettersson.github.io/rngtech/syngas-combustor/), and [Steam Methane Reformer](https://c-pettersson.github.io/rngtech/steam-methane-reformer/).
+
+The ammonia chain has two registered machines: `rngtech:ammonia_synthesizer`, a powered processor that converts Nitrogen and Hydrogen into Ammonia, and `rngtech:ammonia_fuel_cell`, the Stage 6 generator that burns Ammonia for FE.
 
 ## Runtime Surface
 
 | Content | Resource id | Block entity | Menu / screen | Capabilities | Refinement |
 |---|---|---|---|---|---|
-| Ammonia Synthesizer | `rngtech:ammonia_synthesizer` | `AmmoniaSynthesizerBlockEntity` | `AmmoniaSynthesizerMenu` / `AmmoniaSynthesizerScreen` | Side FE input, fluid input, ammonia fluid output | Item stack and placed machine |
+| Ammonia Synthesizer | `rngtech:ammonia_synthesizer` | `AmmoniaSynthesizerBlockEntity` | `AmmoniaSynthesizerMenu` / `AmmoniaSynthesizerScreen` | Non-bottom FE input, fluid input, ammonia fluid output, top Catalyst Bed item handler | Item stack and placed machine |
 | Ammonia Fuel Cell | `rngtech:ammonia_fuel_cell` | `AmmoniaFuelCellBlockEntity` | `AmmoniaFuelCellMenu` / `AmmoniaFuelCellScreen` | Ammonia fluid input, top/side FE extraction, bottom residue extraction | Item stack and placed machine |
 
-Ammonia synthesis uses the `rngtech:ammonia_synthesis` recipe type. Ammonia generation uses the `rngtech:ammonia_power_cycle` recipe type. JEI exposes both categories. In the Ammonia Fuel Cell screen, clicking the Process tab recipe line opens the Ammonia Power Cycle recipe category.
+Ammonia synthesis uses the `rngtech:ammonia_synthesis` recipe type. Ammonia generation uses the `rngtech:ammonia_power_cycle` recipe type. JEI exposes both categories.
+
+The synthesizer owns Nitrogen, Hydrogen, and Ammonia tanks and has no process item slots; its only item handler is the top Catalyst Bed handler. The fuel cell owns one Ammonia input tank and one residue output slot; its Gear slots are not exposed to automation. Purging Synthesizer Nitrogen/Hydrogen or Fuel Cell Ammonia resets that machine's active work state before draining.
+
+The default Nitrogen source is the Cavitation Generator's Stage 6 water separation recipe with `rngtech:nitrogen_extraction_rotor` and `rngtech:nitrogen_separation_nozzle`; the default Hydrogen source is Steam Methane Reforming.
 
 ## Gear
 
@@ -23,29 +29,14 @@ Ammonia synthesis uses the `rngtech:ammonia_synthesis` recipe type. Ammonia gene
 
 Both parts have neutral base stats, so an unrolled part only gates recipes. Their rolled modifiers are local to the part, as on other machine parts. The machines do not currently read Stability or Fluid Transfer, and the Synthesizer does not read Efficiency or Instant Process chance, so those rolls have no effect yet.
 
-The ammonia synthesizer owns nitrogen, hydrogen, and ammonia tanks. The fuel cell owns one ammonia input tank and one residue output slot. The default code-backed Nitrogen source is the Cavitation Generator's Stage 6 water separation recipe with `rngtech:nitrogen_extraction_rotor` and `rngtech:nitrogen_separation_nozzle`; the default Hydrogen source is Steam Methane Reforming.
+## Balance
 
-The Process tabs have purge buttons beside the visible gas tanks. The craftable `rngtech:purge_bucket` can also right-click these placed machines to void up to `1000 mB`; normal use prefers input tanks, while sneak-use on the Synthesizer prefers the Ammonia output tank. Purging Synthesizer Nitrogen/Hydrogen or Fuel Cell Ammonia resets that machine's active work state before draining.
+| Recipe | Inputs | Output | Ticks |
+|---|---|---|---:|
+| Default synthesis | `500 mB` Nitrogen, `1,500 mB` Hydrogen, `12,000 FE` | `1,000 mB` Ammonia | `400` |
+| Default power cycle | `1,000 mB` Ammonia | `216,000 FE` (`600 FE/t`) | `360` |
 
-Gas Chemistry machines follow the same purge rules. Coal Gasifier exposes Water and Syngas purge targets, Syngas Combustor exposes gas input and Carbon Exhaust purge targets, and Steam Methane Reformer exposes Water, gas input, Hydrogen output, and Carbon Monoxide output purge targets. The Syngas Combustor burns Syngas as its main Stage 5 gas-power fuel, `57,600 FE` per `1,000 mB` over `240` ticks (`240 FE/t` before Servo and rolls), and also accepts Carbon Monoxide as a weaker disposal fuel. Nullite Servo Auto Purge applies to Gas Chemistry output tanks when produced fluid overflows matching stored fluid, including the Syngas Combustor's Carbon Exhaust tank.
-
-## Step-By-Step Guide
-
-1. Craft an Ammonia Catalyst Bed.
-2. Craft and place the Ammonia Synthesizer, then install the Catalyst Bed in its Gear tab.
-3. Feed Nitrogen from Cavitation and Hydrogen from Steam Methane Reforming into the Synthesizer fluid handler, then feed FE from a side. The default recipe consumes `500 mB` Nitrogen, `1,500 mB` Hydrogen, and `12,000 FE` to produce `1,000 mB` Ammonia.
-4. Craft a Fuel Cell Membrane.
-5. Craft and place the Ammonia Fuel Cell, then install the membrane in Gear.
-6. Optionally install a Stage 6+ Battery Cell in the Fuel Cell for output buffering.
-7. Move Ammonia from the Synthesizer to the Fuel Cell. The default power cycle burns `1,000 mB` Ammonia for `216,000 FE` over `360` ticks (`600 FE/t`) before membrane and machine rolls.
-8. Extract FE from Fuel Cell top or sides and residue from the bottom.
-
-## Automation
-
-- The synthesizer receives FE from non-bottom sides, fills nitrogen or hydrogen through the fluid capability, and drains ammonia from its output tank.
-- The synthesizer exposes its Catalyst Bed slot only from the top; normal item automation has no process item slots.
-- The fuel cell accepts ammonia through the fluid capability, extracts FE from the top or sides, and extracts residue from the bottom.
-- Gear slots are manual UI equipment except the synthesizer Catalyst Bed top handler.
+Values are before part and machine rolls. After the synthesis cost the chain nets about `510 FE/t`.
 
 ## Related Pages
 

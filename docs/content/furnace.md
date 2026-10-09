@@ -2,17 +2,16 @@
 
 Status: Prototype
 
+Player guide: [Furnace](https://c-pettersson.github.io/rngtech/furnace/)
 
 Resource ids:
 
-- Stage 0: `rngtech:furnace`
-- Electric stages: `rngtech:iron_furnace_chassis`, `rngtech:copper_furnace_chassis`, `rngtech:bronze_furnace_chassis`, `rngtech:steel_furnace_chassis`, `rngtech:lead_furnace_chassis`, `rngtech:aluminum_furnace_chassis`, `rngtech:titanium_furnace_chassis`, `rngtech:tungstensteel_furnace_chassis`, and `rngtech:exotic_furnace_chassis`
+- Stage 0 (solid fuel): `rngtech:furnace`
+- Electric stages 1-8: `rngtech:iron_furnace_chassis` (1), `rngtech:copper_furnace_chassis` (2), `rngtech:bronze_furnace_chassis` (3), `rngtech:steel_furnace_chassis` (4), `rngtech:lead_furnace_chassis` (4, four-lane sidegrade), `rngtech:aluminum_furnace_chassis` (5), `rngtech:titanium_furnace_chassis` (6), `rngtech:tungstensteel_furnace_chassis` (7), and `rngtech:exotic_furnace_chassis` (8)
 
 ## Summary
 
-Furnaces are heat-aware item smelting processors with RNGTech machine traits and shared placed-machine refinement.
-
-Stage 0 is the non-electric furnace. It burns standard furnace fuels in the Process tab, runs on a slow `0.533x` processing-speed profile, and reaches the early `800` heat band for Iron and Copper smelting. Stages 1-8 are electric furnace chassis blocks. They accept FE through a block energy capability, use a small internal working buffer, and can install a Battery Cell plus staged Heat Core in the Gear tab. Bronze carries `ALLOY_BLEND`, a behavior that speeds inputs tagged `rngtech:alloy_blend_smeltables`; default data tags Bronze Blend and Steel Blend for that path. Lead is a Stage 4 electric sidegrade built for bulk smelting: it has four active processing lanes and four Heat Core Gear slots, but carries a base `0.5x` processing-speed profile. Stage 5-8 metal-catalog Furnace recipes author higher FE costs, and electric recipes at or above the configured high-heat threshold cost extra FE. Furnace Mastery is machine-owned chassis progression; progression smelts grant XP, and passive nodes trade heat reach, throughput, control, and efficiency.
+Furnaces are heat-aware item smelting processors with RNGTech machine traits, shared placed-machine refinement, and machine-owned Mastery. Stage 0 burns solid fuel; Stages 1-8 are electric chassis.
 
 ## Implementation Contract
 
@@ -40,23 +39,6 @@ Implementation checks:
 - `rngtech:furnace` recipes should process with RNGTech timing, temperature, and stability gates.
 - Placed-machine refinement should persist after closing and reopening the screen.
 - Mastery unlocks should require one unspent passive point, and at least one linked unlocked node. Unlocking a node resets active cycles and failure strain but preserves inventory and current lane heat.
-
-## Stage Behavior
-
-| Stage | Block | Mode | Notes |
-|---:|---|---|---|
-| 0 | `rngtech:furnace` | Solid fuel | Primitive non-electric furnace with slow solid-fuel throughput. |
-| 1 | `rngtech:iron_furnace_chassis` | Electric | First FE-powered furnace chassis. |
-| 2 | `rngtech:copper_furnace_chassis` | Electric | Better early heat throughput and energy usage. |
-| 3 | `rngtech:bronze_furnace_chassis` | Electric | Alloy-smelting chassis with conditional speed for tagged Bronze and Steel blend inputs. |
-| 4 | `rngtech:steel_furnace_chassis` | Electric | More efficient midgame chassis. |
-| 4 | `rngtech:lead_furnace_chassis` | Electric | Four processing lanes and four Heat Core slots, with `50%` less base processing speed. |
-| 5 | `rngtech:aluminum_furnace_chassis` | Electric | Faster controlled chassis. |
-| 6 | `rngtech:titanium_furnace_chassis` | Electric | High-heat advanced chassis. |
-| 7 | `rngtech:tungstensteel_furnace_chassis` | Electric | Heavy late-game heat chassis. |
-| 8 | `rngtech:exotic_furnace_chassis` | Electric | Optional endgame chassis. |
-
-Electric furnace chassis preserve base FE per craft as speed and heat transfer increase. Faster chassis consume more FE per active tick unless reduced `ENERGY_USAGE` offsets the cost. Stage 5-8 metal-catalog recipes use authored FE ramps of `2.0x`, `3.0x`, `4.0x`, and `6.0x`. Recipes with `minimum_temperature >= 1750` also use the default `2.0x` high-heat FE multiplier before `ENERGY_USAGE` is applied. Electric chassis without an installed Battery Cell keep only their small internal buffer and apply a processing-speed penalty.
 
 ## Implemented Furnace Stats
 
@@ -162,10 +144,10 @@ Current stat behavior:
 - Bronze Furnace applies its identity speed bonus only when the active input is tagged `rngtech:alloy_blend_smeltables`. Default data tags Bronze Blend and Steel Blend; ordinary smelting does not receive that bonus.
 - Stage 0 uses `EFFICIENCY` and `FUEL_EFFICIENCY` to affect fuel duration, and its `0.533x PROCESSING_SPEED` base keeps solid-fuel smelting intentionally slow before traits.
 - Electric stages use recipe `energy` as the base FE per craft. `PROCESSING_SPEED` and `HEAT_TRANSFER` raise FE/t as they shorten the process; `ENERGY_USAGE` can change total FE per craft. External FE intake is limited by free buffer or installed-cell space plus the source or attached Universal Connector, while the screen reports FE/t demand per lane and total active demand for Lead Furnace.
-- If the combined visible FE store has enough energy but the installed Battery Cell cannot discharge enough FE/t for the current lane demand, the status reports Cell Rate Limited instead of No Power.
+- `laneEnergyStatus` reports `STATUS_POWER_LIMITED` when `energyStored()` covers the lane's cost but a simulated `consumeWorkingEnergy` cannot; the player guide names the status.
 - Stage 5-8 metal-catalog recipes author higher base FE costs, and electric recipes with `minimum_temperature >= 1750` cost another `2.0x` FE by default before `ENERGY_USAGE`. This means Tungsten, Tungstensteel, Platinum, Aethergold, Nullite, Naquadah, Netherite, and future Stage 7+ heat-band recipes stack the stage-authored cost with the high-heat rule. Stage 0 has no FE cost path and is unaffected.
 - Stage 0 has an authored `800` `MAX_TEMPERATURE` so standard fuel can process the first Iron and Copper recipes. Electric furnace chassis start at a `600` baseline before Heat Core and affix contribution. With unmodified Heat Cores, the effective electric ladder is Iron `800`, Copper `1000`, Bronze `1200`, Steel `1400`, Sparksteel `1600`, and Titanium `1800`. Aluminum is a Stage 5 speed sidegrade at `850` heat with `2.20x` Heat Core transfer; flat `MAX_TEMPERATURE` rolls can push it over early heat thresholds, but its base identity stays low-heat and fast. Iron-tier heat covers Iron and Copper smelting; Copper Heat Cores then open the `1000` band for Bronze ingredients and similar early metals. Higher-heat recipes require better components, `MAX_TEMPERATURE` affixes, or refinement.
-- Lead Furnace has base `INPUT_SLOTS` and `OUTPUT_SLOTS` values of `4` and a base `0.5x PROCESSING_SPEED` profile. Its Heat Core slots are lane-local for processing, so slot 1 controls lane 1, slot 2 controls lane 2, and so on. The Stats tab reports the strongest installed Heat Core as the displayed heat profile; the four cores do not add into one shared maximum-temperature ceiling.
+- Lead Furnace has base `INPUT_SLOTS` and `OUTPUT_SLOTS` values of `4` and a base `0.5x PROCESSING_SPEED` profile. Its Heat Core slots are lane-local for processing (`statsForLane`), so slot 1 controls lane 1, slot 2 controls lane 2, and so on. Display stats use `applyBestHeatCoreStats`, which picks the core with the highest effective `MAX_TEMPERATURE`.
 
 ## Mastery
 
@@ -228,10 +210,6 @@ Furnace machines choose between Crucible Keeper and Bloomer when they use their 
 | **Crusher Line** | Notable | Fed Line | Crushed inputs feed the Bloom Ledger twice. |
 
 <!-- ascendancy-trees:end -->
-
-## Screen Tabs
-
-The furnace screen has Processing, Gear, Stats, Refinement, and Mastery tabs. The Process tab adapts to the placed stage: Stage 0 shows a fuel slot and burn bar, electric single-lane stages show an energy bar and move the Battery Cell to Gear, and Lead shows four compact lane progress bars. The Process tab also shows live heat and, for failure-bearing recipes, failure strain; hover text exposes current heat, minimum, target, safe maximum, overheat limit, and power-drop strain status. The Refinement tab targets the placed furnace itself, accepts one refinement catalyst, and applies the shared refinement rules. The Mastery tab shows machine XP, level, unspent passive points, and the shared passive tree.
 
 ## Modifier Eligibility
 

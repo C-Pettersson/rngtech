@@ -2,13 +2,11 @@
 
 Status: Prototype
 
+Player guide: [Fuel Governor](https://c-pettersson.github.io/rngtech/rarity-and-affixes/#fuel-governor)
+
 ## Summary
 
-Fuel Governor prevents burnable fuel from being wasted while a fuel-burning energy generator has no internal energy storage space.
-
-When present, the machine pauses fuel use while its internal energy buffer is full.
-
-Current code note: Copper, Bronze, and Steel Fuel Boxes provide fixed Fuel Governor behavior for the concrete [Solid Fuel Burning](../content/solid-fuel-burner.md) generator chassis. Rolled named Fuel Governor modifiers are still planned.
+Fuel Governor pauses fuel use while a fuel-burning generator's internal energy buffer is full. Copper, Bronze, and Steel Fuel Boxes provide it as fixed behavior for the [Solid Fuel Burning](../content/solid-fuel-burner.md) generator chassis. Rolled named Fuel Governor modifiers are still planned.
 
 ## Applies To
 

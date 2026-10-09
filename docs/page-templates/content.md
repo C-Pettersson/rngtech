@@ -2,11 +2,13 @@
 
 Status: Planned
 
+Player guide: link the matching wiki page once the content is implemented, e.g. `https://c-pettersson.github.io/rngtech/<slug>/`.
+
 Resource id: `rngtech:example`
 
 ## Summary
 
-Describe the item, block, machine, component, or part in one or two paragraphs.
+Describe the design in one or two sentences. Player-facing usage, stages, Gear, automation, and screens belong on the wiki page, not here.
 
 ## Behavior
 

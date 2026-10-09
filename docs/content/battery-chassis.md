@@ -2,6 +2,7 @@
 
 Status: Prototype
 
+Player guide: [Battery Chassis](https://c-pettersson.github.io/rngtech/battery-chassis/)
 
 Gameplay resource ids:
 
@@ -20,9 +21,7 @@ The first implementation uses material-specific block ids so each variant can ha
 
 ## Summary
 
-The battery chassis is a stationary energy storage block that holds [Battery Cells](battery-cells.md).
-
-Inserted [Battery Cells](battery-cells.md) provide most or all stored FE and must support the actual charge or discharge rate. The chassis defines the maximum rate ceiling, charge balancing, burst release behavior, leakage damping, automation exposure, and global behavior.
+The battery chassis is a stationary energy storage block that holds [Battery Cells](battery-cells.md). Cells provide stored FE and the actual charge and discharge rate; the chassis defines slot count, charge balancing, burst identity, leakage damping, and global behavior.
 
 ## Behavior
 
@@ -46,7 +45,7 @@ Total storage is based on the inserted cells, then scaled by chassis capacity pr
 usable capacity = sum(installed cell capacities) * chassis ENERGY_CAPACITY multipliers
 ```
 
-The chassis does not create portable cell capacity. Capacity above a cell's own item limit is only available while that cell remains installed in the boosted chassis; removing or dropping the cell clamps it back to its intrinsic capacity.
+The chassis does not create portable cell capacity: removing or dropping a cell clamps it back to its intrinsic capacity, and it keeps no temporary chassis effects.
 
 Chassis material controls characteristics such as:
 
@@ -62,17 +61,11 @@ Chassis material controls characteristics such as:
 - Global modifier strength across inserted cells.
 - The rollable Balance Mode prefix, which enables even charge and discharge on chassis that do not already have the behavior.
 
-Removed cells keep their own stored FE, rarity, Refinement Potential, and item modifiers. They do not keep temporary effects from the chassis that held them.
-
-Directly touching Battery Chassis blocks slowly equalize by fill ratio. A fuller chassis feeds an adjacent lower-fill chassis through the normal cell-led transfer path, but each move is capped so the pair does not overshoot and bounce energy back on the next tick.
+Adjacent chassis equalize by fill ratio through the normal cell-led transfer path. Each move is capped so the pair does not overshoot and bounce energy back on the next tick.
 
 ## Gear Tab
 
-The battery chassis screen includes a Gear tab for installed cells. Future non-cell chassis components are still planned.
-
-The Gear tab should keep component installation separate from energy status, stats, and refinement controls. Battery cell slots should still use standard item capability rules for automation where appropriate, while non-cell chassis components can stay player-managed if they should not be exposed to hoppers or item pipes.
-
-Placed machine Gear tabs are already prototyped for Crusher and Furnace. The solid fuel-burning generator category is currently a chassis/category target only. Current Gear-tab status is tracked in [Machine Chassis](machine-chassis.md#gear-tabs).
+Planned: non-cell chassis components. Battery cell slots keep standard item capability rules for automation, while non-cell components can stay player-managed if they should not be exposed to hoppers or item pipes. Current Gear-tab status is tracked in [Machine Chassis](machine-chassis.md#gear-tabs).
 
 ## Chassis Roles
 
@@ -226,12 +219,7 @@ Global modifier power should have a budget. A chassis with many slots can spread
 
 ## Automation
 
-The chassis should use standard capabilities:
-
-- Energy capability for charging and discharging the bank.
-- Item capability for inserting and extracting compatible battery cells.
-
-Hoppers and modded automation should be able to interact with the battery slots through normal item rules. Battery banks use these capability handlers, including when connected through RNGTech Item Connectors. They do not provide a shared storage inventory.
+The chassis exposes the block energy capability for charging and discharging the bank and the block item capability for Battery Cell slots, including through RNGTech Item Connectors. It does not provide a shared storage inventory.
 
 ## Modifier Eligibility
 

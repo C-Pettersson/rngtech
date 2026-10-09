@@ -2,6 +2,7 @@
 
 Status: Prototype
 
+Player guide: [Stages](https://c-pettersson.github.io/rngtech/stages/#machine-frames)
 
 Resource ids:
 
@@ -32,9 +33,9 @@ Current runtime surface:
 - RPG traits: no for item-only chassis ingredients; yes for placed Crusher, Furnace, and Component Recycler chassis blocks.
 - Refinement target: no for item-only chassis ingredients; yes for placed Crusher, Furnace, and Component Recycler chassis blocks and placed machines.
 
-Crusher chassis blocks cover staged bodies from Wooden through Exotic. They roll Crusher machine traits when crafted, preserve those traits when placed, and apply material-specific base stats and fixed behavior while placed. Crusher chassis recipes do not consume earlier Crusher chassis, which keeps older rolls available for experimentation and side-by-side comparison.
+Crusher chassis blocks cover staged bodies from Wooden through Exotic. They roll Crusher machine traits when crafted, preserve those traits when placed, and apply material-specific base stats and fixed behavior while placed.
 
-The shared frame ladder is recipe-only. `rngtech:machine_frame` covers Stage 0-3 chassis, early support bodies, and the Steel Metal Press body. `rngtech:reinforced_machine_frame` gates most other Stage 4 Steel and Lead machine bodies. One Reinforced Machine Frame is built around the base Machine Frame with four Steel Plates, two Steel Casings, and two Basic Electric Circuits, adding `12` Steel Ingots and six Steel press operations before the surrounding chassis recipe. `rngtech:advanced_machine_frame` is used by Stage 5-6 chassis, and `rngtech:exotic_machine_frame` is used by Stage 7-8 chassis. Frame tier does not add machine stats, traits, or refinement behavior by itself.
+The shared frame ladder (`rngtech:machine_frame`, `rngtech:reinforced_machine_frame`, `rngtech:advanced_machine_frame`, `rngtech:exotic_machine_frame`) is recipe-only; the player guide lists which stage band uses each frame. One Reinforced Machine Frame adds `12` Steel Ingots and six Steel press operations before the surrounding chassis recipe. Frame tier does not add machine stats, traits, or refinement behavior by itself.
 
 Furnace stages use `rngtech:furnace` as the Stage 0 non-electric furnace. Electric Furnace chassis cover Stage 1-8 progression from Iron through Exotic, with Lead as a Stage 4 sidegrade. They roll electric Furnace machine traits when crafted, preserve those traits when placed, receive FE, and use Gear-tab Battery Cell and Heat Core slots for portable buffer capacity and heat tuning. Lead additionally exposes four processing lanes and four Heat Core Gear slots with slower per-lane base speed.
 
@@ -51,7 +52,7 @@ Current placed-machine Gear tab status:
 | Machine | Implemented component slots | Notes |
 |---|---|---|
 | Crusher chassis | Crush Head, Battery Cell | The crush-head slot and Battery Cell slot are shown in the Gear tab. A valid Crush Head is required for processing, must not exceed the chassis stage, and provides recipe hardness level. |
-| Furnace | Component on Stage 0; Battery Cell and Heat Core on electric stages; Lead has four Heat Core slots | Stage 0 burns fuel from Process. Electric chassis expose a Gear-tab Battery Cell slot, accept FE, and accept Heat Cores up to the chassis stage. Furnace recipes warm to target heat before processing and can require maximum temperature, temperature stability, failure output, and power sensitivity. Lead processes four paired input/output lanes; other electric chassis expose one Heat Core slot. |
+| Furnace | Component on Stage 0; Battery Cell and Heat Core on electric stages; Lead has four Heat Core slots | Stage 0 burns fuel from Process. Electric chassis accept Heat Cores up to the chassis stage. Lead has four lanes and four Heat Core slots; other electric chassis have one. |
 | Solid fuel-burning generators | Heat Core, Battery Cell, Fuel Box | Four placed chassis variants use `MachineType.SOLID_FUEL_BURNER`; the public category id `rngtech:solid_fuel_burner` remains unregistered. |
 | Battery Chassis | Material-defined Battery Cell slots | Implemented as material-specific blocks such as `rngtech:iron_battery_chassis`; future non-cell component slots are still planned. |
 | Component Recycler | Disassembly Head, Battery Cell, Recovery Filter | Disassembly Head is required and gates component recycling recipes. Recovery Filter unlocks filtered secondary outputs. |

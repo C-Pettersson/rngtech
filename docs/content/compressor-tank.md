@@ -2,31 +2,11 @@
 
 Status: Prototype
 
+Player guide: [Fluid and Compressor Tanks](https://c-pettersson.github.io/rngtech/compressor-tank/)
 
-Gameplay resource ids:
+Fluid and Compressor Tanks are staged single-fluid storage blocks. Iron, Copper, and Bronze are plain Fluid Tanks; Steel and later Compressor Tanks add an FE-driven compressed store that needs one compatible [Battery Cell](battery-cells.md) and at least one Servo.
 
-- `rngtech:iron_compressor_tank`
-- `rngtech:copper_compressor_tank`
-- `rngtech:bronze_compressor_tank`
-- `rngtech:steel_compressor_tank`
-- `rngtech:aluminum_compressor_tank`
-- `rngtech:titanium_compressor_tank`
-- `rngtech:tungstensteel_compressor_tank`
-- `rngtech:exotic_compressor_tank`
-
-## Summary
-
-Fluid and Compressor Tanks are staged fluid storage blocks. Iron, Copper, and Bronze display as plain Fluid Tanks and only provide ordinary fluid storage. Steel and later variants display as Compressor Tanks and become powered compressor tanks when fitted with one compatible [Battery Cell](battery-cells.md), at least one compatible Servo, and FE.
-
-The early Fluid Tank resource ids still use the original `*_compressor_tank` ids for save and recipe compatibility.
-
-Tank crafting uses non-rollable `rngtech:tank_frame` and `rngtech:pressure_tank_frame` intermediates instead of consuming earlier Fluid or Compressor Tank stacks. This keeps existing rolled or refined tanks usable after a player crafts later storage tiers.
-
-Compressed storage preserves the fluid amount. A Steel tank that compresses `100 B` still holds `100 B` of ordinary fluid, but the Process tab displays its compressed physical volume as about `10 B` because Steel uses a `10x` compression ratio.
-
-## Current Runtime Surface
-
-Registered content:
+## Implementation Contract
 
 | Content | Resource id |
 |---|---|
@@ -39,35 +19,39 @@ Registered content:
 | Tungstensteel Compressor Tank | `rngtech:tungstensteel_compressor_tank` |
 | Exotic Compressor Tank | `rngtech:exotic_compressor_tank` |
 
-The placed machine uses `CompressorTankBlockEntity`, `CompressorTankMenu`, and `CompressorTankScreen`. Plain Fluid Tanks support Process, Stats, and Refinement tabs. Steel+ Compressor Tanks also expose a Gear tab. No custom recipe type or JEI category is used in v1.
+The early Fluid Tank ids keep the original `*_compressor_tank` ids for save and recipe compatibility.
+
+The placed machine uses `CompressorTankBlockEntity`, `CompressorTankMenu`, and `CompressorTankScreen`. Plain Fluid Tanks support Process, Stats, and Refinement tabs; Steel+ tanks add a Gear tab. No custom recipe type or JEI category is used in v1.
+
+Tank crafting uses non-rollable `rngtech:tank_frame` and `rngtech:pressure_tank_frame` intermediates instead of consuming earlier tank stacks, so rolled or refined tanks stay usable after a player crafts later tiers.
+
+| Side | Behavior |
+|---|---|
+| Sides | Insert fluid-container items. Steel+ tanks also receive FE. Fluid capability accepts ordinary fluid into the loose tank and drains loose storage first. |
+| Bottom | Extracts filled fluid-container items. |
+| Gear and Refinement slots | Player-managed UI slots only. |
+
+Internal loose and compressed fluid contents are not portable in v1; breaking the block drops the machine item, saved Gear, and Refinement inventory.
 
 ## Storage Model
 
-Plain Fluid Tanks have one loose fluid store. Steel+ Compressor Tanks have two internal fluid stores:
+Plain Fluid Tanks have one loose fluid store. Steel+ Compressor Tanks have two:
 
 | Store | Meaning | External capability |
 |---|---|---|
 | Loose tank | Normal fluid volume. Insertions and unpowered drains use this store. | Exposed as ordinary fluid. |
 | Compressed store | Stored as decompressed-equivalent mB. UI also displays physical compressed volume as `equivalent / ratio`. | Drains as ordinary fluid only when compression Gear and FE are available. |
 
-The block never creates or exposes a custom compressed-fluid type. External automation sees ordinary NeoForge fluid handlers.
+The block never creates or exposes a custom compressed-fluid type; external automation sees ordinary NeoForge fluid handlers. Different fluids are rejected while either store contains another fluid. Missing power never leaks, deletes, or voids stored fluid. Compressed purging deletes stored decompressed-equivalent mB directly and does not require FE.
 
-Different fluids are rejected while either the loose tank or compressed store contains another fluid. Missing power never leaks, deletes, or voids stored fluid.
-
-The Process tab has purge controls for loose fluid and, on Steel+ Compressor Tanks, compressed fluid. The craftable `rngtech:purge_bucket` can also right-click the placed tank to void up to `1000 mB`; normal use prefers loose storage, while sneak-use prefers compressed storage when present. Compressed purging deletes stored decompressed-equivalent mB directly and does not require FE.
-
-## Gear Tab
-
-Iron, Copper, and Bronze Fluid Tanks have no active Gear tab and do not accept Battery Cells or Servos. Steel+ Compressor Tanks expose:
+## Gear
 
 | Gear Slot | Count | Runtime role |
 |---|---:|---|
-| Battery Cell | 1 | Required for compression and decompression. Provides extra stored FE but the Steel+ block still exposes FE input only. |
+| Battery Cell | 1 | Required for compression and decompression. Provides extra stored FE; the block still exposes FE input only. |
 | Servo | 4 | At least one is required for Steel+ compression. More Servos increase the compression rate. |
 
-Installed Gear must be at or below the tank chassis stage. The currently implemented Servos start at Stage 4 Steel, so compression starts with the Steel Compressor Tank.
-
-Servo count multipliers:
+Installed Gear must be at or below the tank chassis stage. Implemented Servos start at Stage 4 Steel, so compression starts with the Steel Compressor Tank.
 
 | Servos | Rate multiplier |
 |---:|---:|
@@ -95,27 +79,13 @@ Decompression costs `25%` of the compression FE per bucket and uses the same rat
 
 ## Energy Behavior
 
-Iron, Copper, and Bronze Fluid Tanks expose no FE capability. Steel+ Compressor Tanks expose FE input only. They never expose FE extraction and are not battery blocks.
+Iron, Copper, and Bronze Fluid Tanks expose no FE capability. Steel+ Compressor Tanks expose FE input only; they never expose FE extraction and are not battery blocks.
 
-For Steel+ tanks, FE received through the block energy capability fills the internal buffer first, then charges an installed Battery Cell when possible. During compression and decompression, work draws spend internal buffer FE first and then draw any remaining tick cost from the installed cell. Idle compressed storage costs `0 FE/t`.
-
-## Automation
-
-| Side | Behavior |
-|---|---|
-| Sides | Insert fluid-container items. Steel+ tanks also receive FE. Fluid capability accepts ordinary fluid into the loose tank and drains ordinary fluid from loose storage first. |
-| Bottom | Extract fluid-container items after they are filled. |
-| Gear and Refinement slots | Steel+ Gear slots and all Refinement slots are player-managed UI slots only. |
-
-The Process tab has manual fluid-container slots for filling and emptying compatible fluid-handler items. Loose fluid remains drainable without power. Draining compressed storage requires a valid Battery Cell, at least one valid Servo, and enough FE.
-
-## Drops
-
-Breaking the block drops the machine item, any saved Gear inventory, and Refinement inventory. Internal loose and compressed fluid contents are not portable in v1.
+FE received through the block energy capability fills the internal buffer first, then charges an installed Battery Cell when possible. Compression and decompression spend internal buffer FE first, then draw any remaining tick cost from the installed cell. Idle compressed storage costs `0 FE/t`.
 
 ## Modifier Eligibility
 
-Iron, Copper, and Bronze Fluid Tank machine stacks and placed machines use the `FLUID_TANK` modifier eligibility profile and do not roll affixes in v1. Steel+ Compressor Tank machine stacks and placed machines use the `COMPRESSOR_TANK` modifier eligibility profile. It can roll FE storage/input, fluid transfer, processing speed, energy usage, energy transfer, and stability modifiers.
+Iron, Copper, and Bronze Fluid Tank machine stacks and placed machines use the `FLUID_TANK` modifier eligibility profile and do not roll affixes in v1. Steel+ Compressor Tank machine stacks and placed machines use the `COMPRESSOR_TANK` profile, which can roll FE storage/input, fluid transfer, processing speed, energy usage, energy transfer, and stability modifiers.
 
 `FLUID_CAPACITY` and `COMPRESSION_RATIO` are authored/display stats in v1. They do not roll as normal affixes.
 
