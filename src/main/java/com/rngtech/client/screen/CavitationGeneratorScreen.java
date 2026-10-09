@@ -27,13 +27,13 @@ public class CavitationGeneratorScreen extends AbstractContainerScreen<Cavitatio
     private static final int STAT_PANEL_Y = 18;
     private static final int STAT_PANEL_WIDTH = 224;
     private static final int FLUID_METER_X = 8;
-    private static final int FLUID_METER_Y = 24;
+    private static final int FLUID_METER_Y = 27;
     private static final int FLUID_METER_WIDTH = 16;
     private static final int FLUID_METER_HEIGHT = 52;
     private static final int FLUID_SLOT_X = 28;
-    private static final int FLUID_SLOT_Y = 58;
+    private static final int FLUID_SLOT_Y = 61;
     private static final int OUTPUT_METER_X = 52;
-    private static final int OUTPUT_METER_Y = 24;
+    private static final int OUTPUT_METER_Y = 27;
     private static final int OUTPUT_METER_WIDTH = 16;
     private static final int OUTPUT_METER_HEIGHT = 52;
     private static final int ENERGY_METER_X = 176;
