@@ -244,7 +244,7 @@ public class BatteryChassisBlockEntity extends BaseMachineBlockEntity implements
                 .energy(
                         energyStored(context),
                         energyCapacity(context),
-                        Math.max(effectiveInputRate(context), effectiveOutputRate(context))
+                        (long) lastEnergyInput() - lastEnergyOutput()
                 )
                 .energyTelemetry(
                         lastEnergyInput(),
@@ -650,10 +650,15 @@ public class BatteryChassisBlockEntity extends BaseMachineBlockEntity implements
             AdjacentEnergyConnector.Info sourceConnector,
             AdjacentEnergyConnector.Info sinkConnector
     ) {
-        if (sourceConnector.present() && effectiveOutputRate(context) > sourceConnector.transferRate()) {
+        // Only a connector running at its cap while the cells could move more is a real limit, not an idle bank.
+        if (sourceConnector.present()
+                && sourceConnector.lastInput() >= sourceConnector.transferRate()
+                && effectiveOutputRate(context) > sourceConnector.transferRate()) {
             return MachineInfoSnapshot.EnergyBottleneck.CONNECTOR_OUTPUT;
         }
-        if (sinkConnector.present() && effectiveInputRate(context) > sinkConnector.transferRate()) {
+        if (sinkConnector.present()
+                && sinkConnector.lastOutput() >= sinkConnector.transferRate()
+                && effectiveInputRate(context) > sinkConnector.transferRate()) {
             return MachineInfoSnapshot.EnergyBottleneck.CONNECTOR_INPUT;
         }
         return MachineInfoSnapshot.EnergyBottleneck.NONE;
