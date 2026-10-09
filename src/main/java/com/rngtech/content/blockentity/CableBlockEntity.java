@@ -128,17 +128,6 @@ public class CableBlockEntity extends BlockEntity implements UniversalConnectorD
         return connectors.get(direction);
     }
 
-    public boolean installConnector(Direction direction, EnergyConnectorTier tier) {
-        if (hasAnyConnector(direction) || !tier.enabled()) {
-            return false;
-        }
-        connectors.put(direction, ConnectorData.defaults(tier, direction));
-        setChanged();
-        invalidateCableCapabilities();
-        invalidateNetworkCache();
-        return true;
-    }
-
     public ItemStack removeConnector(Direction direction) {
         ConnectorData removed = connectors.remove(direction);
         if (removed == null) {

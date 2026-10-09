@@ -1,7 +1,6 @@
 package com.rngtech.content.block;
 
 import com.rngtech.content.blockentity.CableBlockEntity;
-import com.rngtech.content.item.EnergyConnectorItem;
 import com.rngtech.content.menu.CableConnectorMenu;
 import com.rngtech.content.menu.UniversalConnectorMenu;
 import com.rngtech.content.registry.ModBlockEntities;
@@ -167,22 +166,6 @@ public class CableBlock extends Block implements EntityBlock {
         Direction direction = hitResult.getDirection();
         if (stack.is(ModItems.WRENCH.get())) {
             return useWrench(state, level, pos, player, hitResult);
-        }
-
-        if (stack.getItem() instanceof EnergyConnectorItem connector) {
-            if (!connector.tier().enabled()) {
-                return ItemInteractionResult.FAIL;
-            }
-            if (isValidConnectorTarget(level.getBlockState(pos.relative(direction)))
-                    && level.getBlockEntity(pos) instanceof CableBlockEntity cable
-                    && cable.hasAnyConnector(direction)) {
-                return ItemInteractionResult.FAIL;
-            }
-            Direction connectorDirection = resolveConnectorInstallDirection(level, pos, direction);
-            if (connectorDirection != null) {
-                return installConnector(stack, state, level, pos, player, connectorDirection, connector);
-            }
-            return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
         }
 
         if (stack.is(ModItems.UNIVERSAL_CONNECTOR.get())) {
@@ -400,25 +383,6 @@ public class CableBlock extends Block implements EntityBlock {
             case WEST -> CONNECTOR_WEST;
             case EAST -> CONNECTOR_EAST;
         };
-    }
-
-    private ItemInteractionResult installConnector(
-            ItemStack stack,
-            BlockState state,
-            Level level,
-            BlockPos pos,
-            Player player,
-            Direction direction,
-            EnergyConnectorItem connector
-    ) {
-        if (!level.isClientSide && level.getBlockEntity(pos) instanceof CableBlockEntity cable) {
-            if (!cable.installConnector(direction, connector.tier())) {
-                return ItemInteractionResult.FAIL;
-            }
-            level.setBlock(pos, state.setValue(connectorProperty(direction), true), Block.UPDATE_ALL);
-            stack.consume(1, player);
-        }
-        return ItemInteractionResult.sidedSuccess(level.isClientSide);
     }
 
     public static ItemInteractionResult installUniversalConnector(
@@ -699,38 +663,6 @@ public class CableBlock extends Block implements EntityBlock {
 
     private static boolean shouldDropConnectorForTarget(BlockState neighborState) {
         return !neighborState.isAir() && !isValidConnectorTarget(neighborState);
-    }
-
-    private static Direction resolveConnectorInstallDirection(Level level, BlockPos pos, Direction clickedDirection) {
-        if (canInstallConnectorOn(level, pos, clickedDirection)) {
-            return clickedDirection;
-        }
-
-        Direction target = null;
-        CableBlockEntity cable = level.getBlockEntity(pos) instanceof CableBlockEntity c ? c : null;
-        for (Direction direction : DIRECTIONS) {
-            if (direction == clickedDirection || !canInstallConnectorOn(level, pos, direction)) {
-                continue;
-            }
-
-            // Only auto-pick an unoccupied side when there is exactly one valid candidate. Exact-face clicks may still
-            // intentionally replace an existing connector, but ambiguous multi-connector blocks should not replace a
-            // random installed side.
-            if (cable != null && cable.hasConnector(direction)) {
-                continue;
-            }
-
-            if (target != null) {
-                return null;
-            }
-            target = direction;
-        }
-        return target;
-    }
-
-    private static boolean canInstallConnectorOn(Level level, BlockPos pos, Direction direction) {
-        return isValidConnectorTarget(level.getBlockState(pos.relative(direction)))
-                && (!(level.getBlockEntity(pos) instanceof CableBlockEntity cable) || !cable.hasAnyConnector(direction));
     }
 
     private static Direction resolveSingleInstalledConnector(CableBlockEntity cable) {

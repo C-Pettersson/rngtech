@@ -2776,7 +2776,7 @@
   "rngtech.tooltip.energy_connector.transfer": "Transfer: %s FE/t",
   "rngtech.tooltip.energy_connector.stage": "Component stage: %s",
   "rngtech.tooltip.energy_connector.debug": "Dev-only debug connector. Not survival content.",
-  "rngtech.tooltip.energy_connector.install": "Install in a Universal Connector module slot, directly on a Cable side, or in supported machine Gear slots.",
+  "rngtech.tooltip.energy_connector.install": "Install in a Universal Connector module slot or in supported machine Gear slots.",
   "rngtech.tooltip.fluid_connector.fluid": "Shipment: %s mB",
   "rngtech.tooltip.fluid_connector.wait": "Wait: %s ticks",
   "rngtech.tooltip.fluid_connector.jam": "Jam: %s%% chance, %ss pause",
