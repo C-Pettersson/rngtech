@@ -8,17 +8,22 @@ import com.rngtech.content.blockentity.UniversalConnectorBlockEntity;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.LayeredCauldronBlock;
 import net.minecraft.world.level.block.state.BlockState;
 
 import java.util.ArrayList;
@@ -42,8 +47,35 @@ public class CableItem extends BlockItem {
     @Override
     public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
         super.appendHoverText(stack, context, tooltipComponents, tooltipFlag);
+        DyeColor color = stack.get(DataComponents.BASE_COLOR);
+        if (color != null) {
+            tooltipComponents.add(Component.translatable(
+                    "rngtech.tooltip.cable.color",
+                    Component.translatable("color.minecraft." + color.getName())
+            ).withStyle(ChatFormatting.GRAY));
+        }
         tooltipComponents.add(Component.translatable("rngtech.tooltip.cable.universal").withStyle(ChatFormatting.GRAY));
         tooltipComponents.add(Component.translatable("rngtech.tooltip.cable.connectors").withStyle(ChatFormatting.DARK_GRAY));
+        tooltipComponents.add(Component.translatable("rngtech.tooltip.cable.dye").withStyle(ChatFormatting.DARK_GRAY));
+    }
+
+    /** A water cauldron washes the dye out of a whole stack of cable for one water level. */
+    public static ItemInteractionResult washInCauldron(
+            BlockState state,
+            Level level,
+            BlockPos pos,
+            Player player,
+            InteractionHand hand,
+            ItemStack stack
+    ) {
+        if (!stack.has(DataComponents.BASE_COLOR)) {
+            return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+        }
+        if (!level.isClientSide) {
+            stack.remove(DataComponents.BASE_COLOR);
+            LayeredCauldronBlock.lowerFillLevel(state, level, pos);
+        }
+        return ItemInteractionResult.sidedSuccess(level.isClientSide);
     }
 
     private InteractionResult tryMergeIntoUniversalConnector(UseOnContext context) {
@@ -95,7 +127,8 @@ public class CableItem extends BlockItem {
 
             CableBlock cableBlock = (CableBlock) getBlock();
             Direction firstSide = connectorTags.keySet().iterator().next();
-            BlockState cableState = cableBlock.stateForConnectorPlacement(level, pos, firstSide);
+            DyeColor color = context.getItemInHand().get(DataComponents.BASE_COLOR);
+            BlockState cableState = cableBlock.stateForConnectorPlacement(level, pos, firstSide, color);
             for (Direction connectorSide : connectorTags.keySet()) {
                 cableState = cableState.setValue(CableBlock.connectorProperty(connectorSide), true);
             }
@@ -104,6 +137,8 @@ public class CableItem extends BlockItem {
             if (!(level.getBlockEntity(pos) instanceof CableBlockEntity cable)) {
                 return InteractionResult.FAIL;
             }
+            cable.setColor(color);
+            CableBlock.refreshCableLinks(level, pos);
             for (Map.Entry<Direction, CompoundTag> entry : connectorTags.entrySet()) {
                 if (!cable.installUniversalConnector(entry.getKey(), entry.getValue(), level.registryAccess())) {
                     return InteractionResult.FAIL;

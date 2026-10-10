@@ -171,9 +171,23 @@ async function consumption(recipe, tags) {
     return consumed;
 }
 
+/** Flattens NeoForge compound and component ingredients into plain item and tag alternatives. */
+function plainIngredientAlternatives(entry) {
+    if (Array.isArray(entry)) {
+        return entry.flatMap(plainIngredientAlternatives);
+    }
+    if (entry?.type === "neoforge:compound") {
+        return plainIngredientAlternatives(entry.children ?? entry.ingredients ?? []);
+    }
+    if (entry?.type === "neoforge:components") {
+        return [entry.items].flat().map((id) => (id.startsWith("#") ? { tag: id.slice(1) } : { item: id }));
+    }
+    return [entry];
+}
+
 async function ingredientItems(ingredient, tags, recipeId) {
     const items = new Set();
-    for (const entry of [ingredient ?? []].flat()) {
+    for (const entry of plainIngredientAlternatives(ingredient ?? [])) {
         if (entry.item) {
             items.add(entry.item);
         } else if (entry.tag) {

@@ -15,6 +15,8 @@ import com.rngtech.util.TickTransferCounter;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.core.component.DataComponentMap;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.protocol.Packet;
@@ -22,8 +24,10 @@ import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.world.Containers;
 import net.minecraft.world.inventory.ContainerData;
+import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.capabilities.Capabilities;
@@ -73,6 +77,7 @@ public class CableBlockEntity extends BlockEntity implements UniversalConnectorD
     private final EnumMap<Direction, CableUniversalConnectorData> universalConnectors = new EnumMap<>(Direction.class);
     private final TickTransferCounter[] directEnergyInput = new TickTransferCounter[DIRECTIONS.length];
     private final TickTransferCounter[] directEnergyOutput = new TickTransferCounter[DIRECTIONS.length];
+    private DyeColor color;
 
     public CableBlockEntity(BlockPos pos, BlockState blockState) {
         super(ModBlockEntities.CABLE.get(), pos, blockState);
@@ -115,6 +120,27 @@ public class CableBlockEntity extends BlockEntity implements UniversalConnectorD
             setChanged();
             invalidateNetworkCache();
         }
+    }
+
+    /** Dyed cables only link to uncoloured cables and cables of the same colour; null means uncoloured. */
+    public DyeColor color() {
+        return color;
+    }
+
+    public void setColor(DyeColor color) {
+        if (this.color == color) {
+            return;
+        }
+        this.color = color;
+        setChanged();
+        invalidateNetworkCache();
+        if (level != null && !level.isClientSide) {
+            level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), Block.UPDATE_CLIENTS);
+        }
+    }
+
+    public static boolean colorsLink(DyeColor first, DyeColor second) {
+        return first == null || second == null || first == second;
     }
 
     public boolean hasConnector(Direction direction) {
@@ -2130,6 +2156,9 @@ public class CableBlockEntity extends BlockEntity implements UniversalConnectorD
     protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.saveAdditional(tag, registries);
         tag.putInt("DisabledLinks", disabledLinkMask());
+        if (color != null) {
+            tag.putString("Color", color.getSerializedName());
+        }
         CompoundTag connectorsTag = new CompoundTag();
         for (Direction direction : DIRECTIONS) {
             ConnectorData connector = connectors.get(direction);
@@ -2168,8 +2197,36 @@ public class CableBlockEntity extends BlockEntity implements UniversalConnectorD
     }
 
     @Override
+    protected void collectImplicitComponents(DataComponentMap.Builder components) {
+        super.collectImplicitComponents(components);
+        if (color != null) {
+            components.set(DataComponents.BASE_COLOR, color);
+        }
+    }
+
+    @Override
+    protected void applyImplicitComponents(BlockEntity.DataComponentInput componentInput) {
+        super.applyImplicitComponents(componentInput);
+        color = componentInput.get(DataComponents.BASE_COLOR);
+    }
+
+    @Override
+    @SuppressWarnings("deprecation")
+    public void removeComponentsFromTag(CompoundTag tag) {
+        super.removeComponentsFromTag(tag);
+        tag.remove("Color");
+    }
+
+    @Override
     protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.loadAdditional(tag, registries);
+        DyeColor previousColor = color;
+        color = tag.contains("Color", Tag.TAG_STRING) ? DyeColor.byName(tag.getString("Color"), null) : null;
+        if (color != previousColor && level != null && level.isClientSide) {
+            // Colour lives here rather than in the block state, so the client must re-mesh the tint itself.
+            level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), Block.UPDATE_CLIENTS);
+        }
+
         disabledLinks.clear();
         int mask = tag.getInt("DisabledLinks");
         for (Direction direction : DIRECTIONS) {

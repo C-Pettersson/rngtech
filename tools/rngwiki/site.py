@@ -267,6 +267,12 @@ class WikiSite:
         if isinstance(data, list):
             options = [o for d in data if (s := self.ingredient(d)) for o in s.options]
             return Stack(options, label=label)
+        if data.get("type") == "neoforge:compound":
+            children = self.ingredient(data.get("children", data.get("ingredients", [])), label)
+            return Stack(list(dict.fromkeys(children.options)), label=label) if children else None
+        if data.get("type") == "neoforge:components":
+            items = data["items"] if isinstance(data["items"], list) else [data["items"]]
+            return self.ingredient([{"tag": i[1:]} if i.startswith("#") else {"item": i} for i in items], label)
         if "ingredient" in data:
             stack = self.ingredient(data["ingredient"], label)
             if stack is None:
@@ -462,7 +468,9 @@ class WikiSite:
         found = []
         for resource_id in result_ids:
             for recipe_id, recipe in self.res.recipes.items():
-                if recipe.get("type") in _CRAFTING_TYPES and recipe.get("result", {}).get("id") == resource_id:
+                result = recipe.get("result", {})
+                # Component variants, such as dyed Cable, are described in page text instead of the item's table.
+                if recipe.get("type") in _CRAFTING_TYPES and result.get("id") == resource_id and "components" not in result:
                     found.append((recipe_id, recipe))
         return found
 
