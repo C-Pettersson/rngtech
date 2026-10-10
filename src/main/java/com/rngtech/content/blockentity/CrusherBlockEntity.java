@@ -214,6 +214,10 @@ public class CrusherBlockEntity extends BaseMachineBlockEntity implements MenuPr
 
     private final OutputAmountTracker outputAmountTracker = new OutputAmountTracker();
     private final BulkSpeedState bulkSpeed = new BulkSpeedState();
+    private static final int RECIPE_INPUT = 0;
+    private static final int RECIPE_CANDIDATE = 1;
+    private static final RecipeCache.Search<CrusherRecipe> RECIPE_SEARCH = (level, input, unused) -> CrusherRecipes.find(level, input);
+    private final RecipeCache<CrusherRecipe> recipes = new RecipeCache<>(2);
     private int progress;
     private int batchJobs;
     private ItemStack activeInput = ItemStack.EMPTY;
@@ -340,7 +344,7 @@ public class CrusherBlockEntity extends BaseMachineBlockEntity implements MenuPr
     public MachineInfoSnapshot machineInfo() {
         MachineStatAccumulator stats = effectiveStats();
         int status = statusCode(stats);
-        CrusherRecipe recipe = level == null ? null : CrusherRecipes.find(level, inventory.getStackInSlot(SLOT_INPUT_A)).orElse(null);
+        CrusherRecipe recipe = inputRecipe();
         int requiredLevel = recipe == null ? MachineInfoSnapshot.UNSET : recipe.requiredProcessingLevel();
         int energyDemand = isRunnableStatus(status) || status == STATUS_NO_POWER ? currentEnergyCostPerTick(stats) : 0;
         AdjacentEnergyConnector.Info connector = AdjacentEnergyConnector.forSink(level, worldPosition);
@@ -431,12 +435,25 @@ public class CrusherBlockEntity extends BaseMachineBlockEntity implements MenuPr
         if (level == null || !hasCrushHead()) {
             return null;
         }
-        ItemStack input = inventory.getStackInSlot(SLOT_INPUT_A);
-        CrusherRecipe recipe = CrusherRecipes.find(level, input).orElse(null);
+        CrusherRecipe recipe = inputRecipe();
         if (recipe != null && MegaPassiveTree.acceptsHardness(machineProgression(), recipe.requiredProcessingLevel()) && (!requireOutputSpace || canAcceptOutput(recipe, stats))) {
             return recipe;
         }
         return null;
+    }
+
+    /** How many recipe lookups searched the recipes instead of reusing a remembered result. */
+    public int recipeSearches() {
+        return recipes.searches();
+    }
+
+    private CrusherRecipe inputRecipe() {
+        return level == null ? null : recipes.find(RECIPE_INPUT, level, inventory.getStackInSlot(SLOT_INPUT_A), RECIPE_SEARCH);
+    }
+
+    /** A stack offered by a player or automation, cached apart from the input so repeated offers skip the search. */
+    private CrusherRecipe candidateRecipe(ItemStack stack) {
+        return level == null ? null : recipes.find(RECIPE_CANDIDATE, level, stack, RECIPE_SEARCH);
     }
 
     private int process(CrusherRecipe recipe, MachineStatAccumulator stats, Level level, int jobs) {
@@ -767,7 +784,7 @@ public class CrusherBlockEntity extends BaseMachineBlockEntity implements MenuPr
             return STATUS_NO_INPUT;
         }
 
-        CrusherRecipe recipe = CrusherRecipes.find(level, input).orElse(null);
+        CrusherRecipe recipe = inputRecipe();
         if (recipe == null) {
             return STATUS_INVALID_RECIPE;
         }
@@ -986,7 +1003,7 @@ public class CrusherBlockEntity extends BaseMachineBlockEntity implements MenuPr
         if (level == null || !hasCrushHead()) {
             return null;
         }
-        return CrusherRecipes.find(level, inventory.getStackInSlot(SLOT_INPUT_A)).orElse(null);
+        return inputRecipe();
     }
 
     /** Refiner's Oath gives up batching for Output Amount. */
@@ -1026,11 +1043,11 @@ public class CrusherBlockEntity extends BaseMachineBlockEntity implements MenuPr
     }
 
     public boolean isCrushable(ItemStack stack) {
-        return level != null && CrusherRecipes.find(level, stack).isPresent();
+        return candidateRecipe(stack) != null;
     }
 
     private boolean canAutomationInsertInput(ItemStack stack) {
-        CrusherRecipe recipe = level == null ? null : CrusherRecipes.find(level, stack).orElse(null);
+        CrusherRecipe recipe = candidateRecipe(stack);
         if (recipe == null) {
             return false;
         }

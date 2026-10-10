@@ -1,6 +1,7 @@
 package com.rngtech;
 
 import com.rngtech.content.blockentity.MachineStatsCache;
+import com.rngtech.content.blockentity.RecipeCache;
 import com.rngtech.content.command.RNGTechCommands;
 import com.rngtech.content.corruption.CorruptionDataEvents;
 import com.rngtech.content.item.CableItem;
@@ -67,7 +68,10 @@ public final class RNGTech {
         modBus.addListener(ModNetworking::register);
         modBus.addListener(ModConfigEvent.Loading.class, event -> MachineStatsCache.invalidateAll());
         modBus.addListener(ModConfigEvent.Reloading.class, event -> MachineStatsCache.invalidateAll());
-        NeoForge.EVENT_BUS.addListener(TagsUpdatedEvent.class, event -> MachineStatsCache.invalidateAll());
+        NeoForge.EVENT_BUS.addListener(TagsUpdatedEvent.class, event -> {
+            MachineStatsCache.invalidateAll();
+            RecipeCache.invalidateAll();
+        });
         NeoForge.EVENT_BUS.addListener(FieldToolEvents::onLeftClickBlock);
         NeoForge.EVENT_BUS.addListener(FieldToolEvents::onBreakSpeed);
         NeoForge.EVENT_BUS.addListener(FieldToolEvents::onBlockDrops);

@@ -244,6 +244,8 @@ public class MetalPressBlockEntity extends BaseMachineBlockEntity
     };
 
     private final BulkSpeedState bulkSpeed = new BulkSpeedState();
+    private static final RecipeCache.Search<MetalPressRecipe> RECIPE_SEARCH = MetalPressRecipes::find;
+    private final RecipeCache<MetalPressRecipe> recipes = new RecipeCache<>(MOLD_SLOT_COUNT);
     private int progress;
     private int internalEnergy;
     private int currentTemperature;
@@ -661,7 +663,21 @@ public class MetalPressBlockEntity extends BaseMachineBlockEntity
     private MetalPressRecipe nextRecipe() {
         return level == null
                 ? null
-                : MetalPressRecipes.find(level, inputStack(), moldStack()).filter(recipe -> !routeDisabled(recipe)).orElse(null);
+                : routeEnabled(moldRecipe(selectedMold));
+    }
+
+    /** How many recipe lookups searched the recipes instead of reusing a remembered result. */
+    public int recipeSearches() {
+        return recipes.searches();
+    }
+
+    /** The recipe for the input in one stored Mold, ignoring disabled routes; each Mold has its own lookup slot. */
+    private MetalPressRecipe moldRecipe(int moldIndex) {
+        return recipes.find(moldIndex, level, inputStack(), gearInventory.getStackInSlot(SLOT_MOLD + moldIndex), RECIPE_SEARCH);
+    }
+
+    private MetalPressRecipe routeEnabled(MetalPressRecipe recipe) {
+        return recipe == null || routeDisabled(recipe) ? null : recipe;
     }
 
     private static boolean isCircuit(MetalPressRecipe recipe) {
@@ -744,7 +760,7 @@ public class MetalPressBlockEntity extends BaseMachineBlockEntity
         int match = -1;
         for (int index = 0; index < MOLD_SLOT_COUNT && match < 0; index++) {
             ItemStack mold = gearInventory.getStackInSlot(SLOT_MOLD + index);
-            if (index != selectedMold && isMetalPressMold(mold) && MetalPressRecipes.find(level, inputStack(), mold).filter(recipe -> !routeDisabled(recipe)).isPresent()) {
+            if (index != selectedMold && isMetalPressMold(mold) && routeEnabled(moldRecipe(index)) != null) {
                 match = index;
             }
         }
@@ -990,7 +1006,7 @@ public class MetalPressBlockEntity extends BaseMachineBlockEntity
             return STATUS_NO_INPUT;
         }
         if (recipe == null) {
-            return level != null && MetalPressRecipes.find(level, inputStack(), moldStack()).isPresent() ? STATUS_ROUTE_DISABLED : STATUS_INVALID_RECIPE;
+            return level != null && moldRecipe(selectedMold) != null ? STATUS_ROUTE_DISABLED : STATUS_INVALID_RECIPE;
         }
         if (isCrudePress() && currentTemperature > effectiveSafeMaximumTemperature(recipe, stats)) {
             return STATUS_HEAT_HIGH;
