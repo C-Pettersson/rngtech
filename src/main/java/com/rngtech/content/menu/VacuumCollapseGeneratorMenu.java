@@ -45,22 +45,20 @@ public class VacuumCollapseGeneratorMenu extends AbstractContainerMenu implement
     private static final int DATA_INSTABILITY = 13;
     private static final int DATA_ENERGY_GENERATION = 14;
     private static final int DATA_ENERGY_CAPACITY_STAT = 15;
-    private static final int DATA_ENERGY_TRANSFER = 16;
-    private static final int DATA_EFFICIENCY = 17;
-    private static final int DATA_PROCESSING_SPEED = 18;
-    private static final int DATA_STABILITY = 19;
-    private static final int DATA_REFINEMENT_POTENTIAL = 20;
-    private static final int DATA_FLAT_ENERGY_GENERATION = 21;
-    private static final int DATA_BASE_ENERGY_GENERATION = 22;
-    private static final int DATA_COUNT = 23;
+    private static final int DATA_EFFICIENCY = 16;
+    private static final int DATA_PROCESSING_SPEED = 17;
+    private static final int DATA_STABILITY = 18;
+    private static final int DATA_REFINEMENT_POTENTIAL = 19;
+    private static final int DATA_FLAT_ENERGY_GENERATION = 20;
+    private static final int DATA_BASE_ENERGY_GENERATION = 21;
+    private static final int DATA_COUNT = 22;
     private static final int STAT_SCALE = 100;
     private static final int INPUT_SLOT = 0;
     private static final int RESIDUE_SLOT = 1;
     private static final int VOID_CHAMBER_SLOT = RESIDUE_SLOT + 1;
     private static final int COLLAPSE_NOZZLE_SLOT = VOID_CHAMBER_SLOT + 1;
     private static final int DIMENSIONAL_STABILIZER_SLOT = COLLAPSE_NOZZLE_SLOT + 1;
-    private static final int ENERGY_CONNECTOR_SLOT = DIMENSIONAL_STABILIZER_SLOT + 1;
-    private static final int REFINEMENT_CONSUMABLE_SLOT = ENERGY_CONNECTOR_SLOT + 1;
+    private static final int REFINEMENT_CONSUMABLE_SLOT = DIMENSIONAL_STABILIZER_SLOT + 1;
     private static final int REFINEMENT_TARGET_SLOT = REFINEMENT_CONSUMABLE_SLOT + 1;
     private static final int PLAYER_INVENTORY_START = REFINEMENT_TARGET_SLOT + 1;
     private static final int HOTBAR_END = PLAYER_INVENTORY_START + 36;
@@ -112,7 +110,6 @@ public class VacuumCollapseGeneratorMenu extends AbstractContainerMenu implement
         addSlot(new TabbedSlot(gearInventory, VacuumCollapseGeneratorBlockEntity.SLOT_VOID_CHAMBER, 25, 48, () -> selectedTab == TAB_GEAR));
         addSlot(new TabbedSlot(gearInventory, VacuumCollapseGeneratorBlockEntity.SLOT_COLLAPSE_NOZZLE, 75, 48, () -> selectedTab == TAB_GEAR));
         addSlot(new TabbedSlot(gearInventory, VacuumCollapseGeneratorBlockEntity.SLOT_DIMENSIONAL_STABILIZER, 125, 48, () -> selectedTab == TAB_GEAR));
-        addSlot(new TabbedSlot(gearInventory, VacuumCollapseGeneratorBlockEntity.SLOT_ENERGY_CONNECTOR, 175, 48, () -> selectedTab == TAB_GEAR));
 
         addSlot(RefinementMenuSupport.consumableSlot(
                 generator.getRefinementInventory(),
@@ -205,9 +202,6 @@ public class VacuumCollapseGeneratorMenu extends AbstractContainerMenu implement
         if (dataIndex == DATA_REFINEMENT_POTENTIAL) {
             return data.get(dataIndex);
         }
-        if (dataIndex == DATA_ENERGY_TRANSFER) {
-            return data.get(dataIndex);
-        }
         return data.get(dataIndex) / (double) STAT_SCALE;
     }
 
@@ -225,10 +219,6 @@ public class VacuumCollapseGeneratorMenu extends AbstractContainerMenu implement
 
     public static int energyCapacityDataIndex() {
         return DATA_ENERGY_CAPACITY_STAT;
-    }
-
-    public static int energyTransferDataIndex() {
-        return DATA_ENERGY_TRANSFER;
     }
 
     public static int efficiencyDataIndex() {
@@ -301,10 +291,6 @@ public class VacuumCollapseGeneratorMenu extends AbstractContainerMenu implement
             }
         } else if (generator.isDimensionalStabilizer(stack)) {
             if (!moveItemStackTo(stack, DIMENSIONAL_STABILIZER_SLOT, DIMENSIONAL_STABILIZER_SLOT + 1, false)) {
-                return ItemStack.EMPTY;
-            }
-        } else if (generator.isEnergyConnector(stack)) {
-            if (!moveItemStackTo(stack, ENERGY_CONNECTOR_SLOT, ENERGY_CONNECTOR_SLOT + 1, false)) {
                 return ItemStack.EMPTY;
             }
         } else if (generator.isKnownCatalyst(stack)) {

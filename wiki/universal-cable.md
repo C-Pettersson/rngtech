@@ -83,7 +83,7 @@ Mine Cables and Universal Connectors with a pickaxe. Aiming at a connector on a 
 
 One Cable can hold a connector on each of its six faces.
 
-Energy Connectors are modules: they go in a Universal Connector's Energy tab or in a machine's Gear slot. Right-clicking a Cable with one does not place it on the cable; if you aim at a connector, that connector's screen opens instead. Direct Energy Connectors on a cable face from older worlds keep working, and you can still configure and mine them, but you cannot place new ones.
+Energy Connectors are modules: they go in a Universal Connector's Energy tab, or in the Gear slot of a [Tool Bench](tool-bench.md) or [Forestry Cart Station](forestry-cart-station.md). Right-clicking a Cable with one does not place it on the cable; if you aim at a connector, that connector's screen opens instead. Direct Energy Connectors on a cable face from older worlds keep working, and you can still configure and mine them, but you cannot place new ones.
 
 #### Standalone plates
 
@@ -130,6 +130,8 @@ The Fluid tab has three rows, each with a Fluid Connector slot, its own mode, ch
 Each shipment can **jam**: the row pauses for a few seconds without losing any fluid. Several IN rows on the same machine side and channel run in parallel, so stacking rows raises throughput.
 
 A connector with an IN row also accepts fluid or items that its machine pushes out on its own, and sends them to that row's channel. Pushed shipments follow the same size, wait, jam, and filter rules.
+
+**Splitting shipments.** Each fluid or item shipment is split evenly between every connector with an OUT row on its channel that can take it, however far away each one is. If a machine is full or its filter rejects the shipment, its share goes to the others. When a shipment does not divide evenly, the extra goes to a different machine each time, so a Basic Item Connector feeding three Furnaces sends one item to each in turn.
 
 | Connector | Stage | Shipment | Every | Jam chance, pause |
 |---|---:|---:|---:|---:|

@@ -5,6 +5,7 @@ import com.rngtech.content.block.UniversalConnectorBlock;
 import com.rngtech.content.cable.CableConnectorMode;
 import com.rngtech.content.cable.EnergyConnectorTier;
 import com.rngtech.content.cable.EnergyDistributionMode;
+import com.rngtech.content.cable.EvenSplit;
 import com.rngtech.content.cable.NetworkBridgeType;
 import com.rngtech.content.menu.UniversalConnectorAccess;
 import com.rngtech.content.registry.ModBlockEntities;
@@ -34,6 +35,7 @@ import net.neoforged.neoforge.items.IItemHandler;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.EnumMap;
 import java.util.EnumSet;
 import java.util.HashMap;
@@ -944,28 +946,24 @@ public class CableBlockEntity extends BlockEntity implements UniversalConnectorD
             return stack.copy();
         }
 
-        ItemStack remaining = stack.copy();
-        int size = endpoints.size();
-        int startIndex = snapshot.itemCursor(channel, size);
-        int lastVisitedIndex = -1;
+        TransferOrigin origin = source;
+        EvenSplit.Result result = EvenSplit.distribute(
+                endpoints.size(),
+                snapshot.itemCursor(channel, endpoints.size()),
+                index -> origin.matches(endpoints.get(index).pos(), endpoints.get(index).side()),
+                stack.getCount(),
+                (index, amount, simulateShare) -> amount - endpoints.get(index)
+                        .receiveItem(level, channel, stack.copyWithCount(amount), simulateShare)
+                        .getCount(),
+                simulate
+        );
 
-        for (int i = 0; i < size && !remaining.isEmpty(); i++) {
-            int index = (startIndex + i) % size;
-            lastVisitedIndex = index;
-
-            UniversalEndpoint endpoint = endpoints.get(index);
-            if (source.matches(endpoint.pos(), endpoint.side())) {
-                continue;
-            }
-
-            remaining = endpoint.receiveItem(level, channel, remaining, simulate);
+        if (!simulate) {
+            snapshot.setItemCursor(channel, result.nextCursor());
         }
 
-        if (!simulate && lastVisitedIndex >= 0) {
-            snapshot.setItemCursor(channel, (lastVisitedIndex + 1) % size);
-        }
-
-        return remaining.isEmpty() ? ItemStack.EMPTY : remaining;
+        int remaining = stack.getCount() - result.moved();
+        return remaining <= 0 ? ItemStack.EMPTY : stack.copyWithCount(remaining);
     }
 
     public static FluidStack distributeFluids(
@@ -1031,28 +1029,24 @@ public class CableBlockEntity extends BlockEntity implements UniversalConnectorD
             return stack.copy();
         }
 
-        FluidStack remaining = stack.copy();
-        int size = endpoints.size();
-        int startIndex = snapshot.fluidCursor(channel, size);
-        int lastVisitedIndex = -1;
+        TransferOrigin origin = source;
+        EvenSplit.Result result = EvenSplit.distribute(
+                endpoints.size(),
+                snapshot.fluidCursor(channel, endpoints.size()),
+                index -> origin.matches(endpoints.get(index).pos(), endpoints.get(index).side()),
+                stack.getAmount(),
+                (index, amount, simulateShare) -> amount - endpoints.get(index)
+                        .receiveFluid(level, channel, stack.copyWithAmount(amount), simulateShare)
+                        .getAmount(),
+                simulate
+        );
 
-        for (int i = 0; i < size && !remaining.isEmpty(); i++) {
-            int index = (startIndex + i) % size;
-            lastVisitedIndex = index;
-
-            UniversalEndpoint endpoint = endpoints.get(index);
-            if (source.matches(endpoint.pos(), endpoint.side())) {
-                continue;
-            }
-
-            remaining = endpoint.receiveFluid(level, channel, remaining, simulate);
+        if (!simulate) {
+            snapshot.setFluidCursor(channel, result.nextCursor());
         }
 
-        if (!simulate && lastVisitedIndex >= 0) {
-            snapshot.setFluidCursor(channel, (lastVisitedIndex + 1) % size);
-        }
-
-        return remaining.isEmpty() ? FluidStack.EMPTY : remaining;
+        int remaining = stack.getAmount() - result.moved();
+        return remaining <= 0 ? FluidStack.EMPTY : stack.copyWithAmount(remaining);
     }
 
     private static boolean isValidChannel(int channel) {
@@ -1211,10 +1205,16 @@ public class CableBlockEntity extends BlockEntity implements UniversalConnectorD
                 gameTime,
                 cablePositions,
                 immutableEnergyBuckets(energyEndpoints),
-                immutableList(universalEndpoints),
+                immutableList(sortedUniversalEndpoints(universalEndpoints)),
                 immutableList(bridgeEndpoints),
-                cache.claimTelemetry(cablePositions, gameTime)
+                cache.claimState(cablePositions, gameTime)
         );
+    }
+
+    /** Orders endpoints by position so routing cursors mean the same endpoint whichever cable rebuilt the network. */
+    private static List<UniversalEndpoint> sortedUniversalEndpoints(List<UniversalEndpoint> endpoints) {
+        endpoints.sort(Comparator.comparing(UniversalEndpoint::pos).thenComparing(UniversalEndpoint::side));
+        return endpoints;
     }
 
     private static void collectCableNode(
@@ -1388,7 +1388,7 @@ public class CableBlockEntity extends BlockEntity implements UniversalConnectorD
         private static final long TELEMETRY_RETENTION_TICKS = 16L * 60L * 20L;
 
         private final Map<BlockPos, NetworkSnapshot> byCablePosition = new HashMap<>();
-        private final Map<BlockPos, NetworkEnergyTelemetry> telemetryByAnchor = new HashMap<>();
+        private final Map<BlockPos, NetworkState> stateByAnchor = new HashMap<>();
         private long lastPruneGameTime = Long.MIN_VALUE;
 
         private NetworkSnapshot getOrBuild(Level level, BlockPos startPos) {
@@ -1410,36 +1410,36 @@ public class CableBlockEntity extends BlockEntity implements UniversalConnectorD
         }
 
         /**
-         * Finds the throughput history for a rebuilt network. History is keyed by the network's lowest cable position,
-         * so it survives the per-tick rebuild, cache pruning and invalidation. A merged network keeps the history of
-         * every part, and the part of a split network that lost the old key starts fresh.
+         * Finds the throughput history and routing cursors for a rebuilt network. State is keyed by the network's
+         * lowest cable position, so it survives the per-tick rebuild, cache pruning and invalidation. A merged network
+         * keeps the history of every part, and the part of a split network that lost the old key starts fresh.
          */
-        private NetworkEnergyTelemetry claimTelemetry(List<BlockPos> cablePositions, long gameTime) {
+        private NetworkState claimState(List<BlockPos> cablePositions, long gameTime) {
             if (cablePositions.isEmpty()) {
-                return new NetworkEnergyTelemetry(gameTime);
+                return new NetworkState(gameTime);
             }
             BlockPos anchor = Collections.min(cablePositions);
-            NetworkEnergyTelemetry telemetry = telemetryByAnchor.get(anchor);
+            NetworkState state = stateByAnchor.get(anchor);
             for (BlockPos pos : cablePositions) {
                 if (pos.equals(anchor)) {
                     continue;
                 }
-                NetworkEnergyTelemetry other = telemetryByAnchor.remove(pos);
+                NetworkState other = stateByAnchor.remove(pos);
                 if (other == null) {
                     continue;
                 }
-                if (telemetry == null) {
-                    telemetry = other;
+                if (state == null) {
+                    state = other;
                 } else {
-                    telemetry.absorb(other);
+                    state.telemetry.absorb(other.telemetry);
                 }
             }
-            if (telemetry == null) {
-                telemetry = new NetworkEnergyTelemetry(gameTime);
+            if (state == null) {
+                state = new NetworkState(gameTime);
             }
-            telemetry.markUsed(gameTime);
-            telemetryByAnchor.put(anchor, telemetry);
-            return telemetry;
+            state.telemetry.markUsed(gameTime);
+            stateByAnchor.put(anchor, state);
+            return state;
         }
 
         private void invalidate(BlockPos pos) {
@@ -1468,7 +1468,18 @@ public class CableBlockEntity extends BlockEntity implements UniversalConnectorD
 
             lastPruneGameTime = gameTime;
             byCablePosition.entrySet().removeIf(entry -> !entry.getValue().isFresh(gameTime));
-            telemetryByAnchor.values().removeIf(telemetry -> telemetry.unusedFor(gameTime) > TELEMETRY_RETENTION_TICKS);
+            stateByAnchor.values().removeIf(state -> state.telemetry.unusedFor(gameTime) > TELEMETRY_RETENTION_TICKS);
+        }
+    }
+
+    private static final class NetworkState {
+        private final NetworkEnergyTelemetry telemetry;
+        private final int[] energyCursors = new int[MAX_CHANNEL + 1];
+        private final int[] itemCursors = new int[MAX_CHANNEL + 1];
+        private final int[] fluidCursors = new int[MAX_CHANNEL + 1];
+
+        private NetworkState(long gameTime) {
+            telemetry = new NetworkEnergyTelemetry(gameTime);
         }
     }
 
@@ -1479,9 +1490,9 @@ public class CableBlockEntity extends BlockEntity implements UniversalConnectorD
         private final List<UniversalEndpoint> universalEndpoints;
         private final List<BridgeEndpoint> bridgeEndpoints;
         private final NetworkEnergyTelemetry energyTelemetry;
-        private final int[] energyCursors = new int[MAX_CHANNEL + 1];
-        private final int[] itemCursors = new int[MAX_CHANNEL + 1];
-        private final int[] fluidCursors = new int[MAX_CHANNEL + 1];
+        private final int[] energyCursors;
+        private final int[] itemCursors;
+        private final int[] fluidCursors;
         private NetworkDebugSnapshot debugSnapshot;
 
         private NetworkSnapshot(
@@ -1490,14 +1501,17 @@ public class CableBlockEntity extends BlockEntity implements UniversalConnectorD
                 List<EnergyEndpoint>[] energyEndpoints,
                 List<UniversalEndpoint> universalEndpoints,
                 List<BridgeEndpoint> bridgeEndpoints,
-                NetworkEnergyTelemetry energyTelemetry
+                NetworkState state
         ) {
             this.gameTime = gameTime;
             this.cablePositions = cablePositions;
             this.energyEndpoints = energyEndpoints;
             this.universalEndpoints = universalEndpoints;
             this.bridgeEndpoints = bridgeEndpoints;
-            this.energyTelemetry = energyTelemetry;
+            this.energyTelemetry = state.telemetry;
+            this.energyCursors = state.energyCursors;
+            this.itemCursors = state.itemCursors;
+            this.fluidCursors = state.fluidCursors;
         }
 
         private boolean isFresh(long gameTime) {

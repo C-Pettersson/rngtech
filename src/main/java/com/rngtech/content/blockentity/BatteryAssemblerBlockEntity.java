@@ -11,6 +11,7 @@ import com.rngtech.content.recipe.BatteryAssemblyRecipeInput;
 import com.rngtech.content.registry.ModBlockEntities;
 import com.rngtech.content.registry.ModFluids;
 import com.rngtech.content.registry.ModItems;
+import com.rngtech.content.registry.ModRecipes;
 import com.rngtech.content.registry.ModTags;
 import com.rngtech.rpg.MachineBaseStatCatalog;
 import com.rngtech.rpg.MachineImplicitCatalog;
@@ -781,6 +782,12 @@ public class BatteryAssemblerBlockEntity extends BaseMachineBlockEntity
         }
     }
 
+    /** Assembly ingredients are positional, so a slot takes only what some recipe needs at that position. */
+    public boolean isAssemblyInput(int position, ItemStack stack) {
+        return RecipeInputFilter.anyAccepts(level, ModRecipes.BATTERY_ASSEMBLY_TYPE.get(), stack,
+                (recipe, item) -> position < recipe.ingredients().size() && recipe.ingredients().get(position).test(item));
+    }
+
     private final class RangedItemHandler implements IItemHandler {
         private final int firstSlot;
         private final int lastSlot;
@@ -806,7 +813,7 @@ public class BatteryAssemblerBlockEntity extends BaseMachineBlockEntity
 
         @Override
         public ItemStack insertItem(int slot, ItemStack stack, boolean simulate) {
-            return allowInsert ? processInventory.insertItem(mappedSlot(slot), stack, simulate) : stack;
+            return isItemValid(slot, stack) ? processInventory.insertItem(mappedSlot(slot), stack, simulate) : stack;
         }
 
         @Override
@@ -821,7 +828,9 @@ public class BatteryAssemblerBlockEntity extends BaseMachineBlockEntity
 
         @Override
         public boolean isItemValid(int slot, ItemStack stack) {
-            return allowInsert && processInventory.isItemValid(mappedSlot(slot), stack);
+            return allowInsert
+                    && processInventory.isItemValid(mappedSlot(slot), stack)
+                    && isAssemblyInput(mappedSlot(slot) - SLOT_INPUT_0, stack);
         }
 
         private int mappedSlot(int slot) {

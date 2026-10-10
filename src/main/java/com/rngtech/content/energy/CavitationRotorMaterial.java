@@ -9,7 +9,7 @@ public enum CavitationRotorMaterial {
     TITANIUM(6, 1.20, 0.85, 1.00, 16),
     NITROGEN_EXTRACTION(6, 0.35, 1.15, 1.75, 18, "nitrogen_extraction_rotor"),
     TUNGSTENSTEEL(7, 1.35, 0.70, 1.00, 18),
-    AETHERGOLD(7, 6.00, 5.00, 1.00, 4.00, 1.00, 20),
+    AETHERGOLD(7, 6.00, 5.00, 1.00, 4.00, 20),
     NULLITE(8, 1.60, 0.60, 1.00, 20);
 
     public static final int BASE_DURABILITY = 1000;
@@ -19,7 +19,6 @@ public enum CavitationRotorMaterial {
     private final double wearMultiplier;
     private final double outputMultiplier;
     private final double processingSpeedMultiplier;
-    private final double energyTransferMultiplier;
     private final int refinementPotential;
     private final String serializedName;
     private final String itemId;
@@ -31,7 +30,7 @@ public enum CavitationRotorMaterial {
             double outputMultiplier,
             int refinementPotential
     ) {
-        this(stage, generationMultiplier, wearMultiplier, outputMultiplier, 1.0, 1.0, refinementPotential, null);
+        this(stage, generationMultiplier, wearMultiplier, outputMultiplier, 1.0, refinementPotential, null);
     }
 
     CavitationRotorMaterial(
@@ -40,10 +39,9 @@ public enum CavitationRotorMaterial {
             double wearMultiplier,
             double outputMultiplier,
             double processingSpeedMultiplier,
-            double energyTransferMultiplier,
             int refinementPotential
     ) {
-        this(stage, generationMultiplier, wearMultiplier, outputMultiplier, processingSpeedMultiplier, energyTransferMultiplier, refinementPotential, null);
+        this(stage, generationMultiplier, wearMultiplier, outputMultiplier, processingSpeedMultiplier, refinementPotential, null);
     }
 
     CavitationRotorMaterial(
@@ -54,7 +52,7 @@ public enum CavitationRotorMaterial {
             int refinementPotential,
             String itemId
     ) {
-        this(stage, generationMultiplier, wearMultiplier, outputMultiplier, 1.0, 1.0, refinementPotential, itemId);
+        this(stage, generationMultiplier, wearMultiplier, outputMultiplier, 1.0, refinementPotential, itemId);
     }
 
     CavitationRotorMaterial(
@@ -63,7 +61,6 @@ public enum CavitationRotorMaterial {
             double wearMultiplier,
             double outputMultiplier,
             double processingSpeedMultiplier,
-            double energyTransferMultiplier,
             int refinementPotential,
             String itemId
     ) {
@@ -72,7 +69,6 @@ public enum CavitationRotorMaterial {
         this.wearMultiplier = wearMultiplier;
         this.outputMultiplier = outputMultiplier;
         this.processingSpeedMultiplier = processingSpeedMultiplier;
-        this.energyTransferMultiplier = energyTransferMultiplier;
         this.refinementPotential = refinementPotential;
         serializedName = name().toLowerCase(Locale.ROOT);
         this.itemId = itemId == null ? serializedName + "_cavitation_rotor" : itemId;
@@ -96,10 +92,6 @@ public enum CavitationRotorMaterial {
 
     public double processingSpeedMultiplier() {
         return processingSpeedMultiplier;
-    }
-
-    public double energyTransferMultiplier() {
-        return energyTransferMultiplier;
     }
 
     public int refinementPotential() {

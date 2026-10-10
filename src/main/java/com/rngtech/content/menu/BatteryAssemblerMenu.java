@@ -263,6 +263,16 @@ public class BatteryAssemblerMenu extends AbstractContainerMenu implements StatB
         );
     }
 
+    private boolean moveToAssemblyInputs(ItemStack stack) {
+        boolean moved = false;
+        for (int slot = BatteryAssemblerBlockEntity.SLOT_INPUT_0; slot <= BatteryAssemblerBlockEntity.SLOT_INPUT_3 && !stack.isEmpty(); slot++) {
+            if (assembler.isAssemblyInput(slot - BatteryAssemblerBlockEntity.SLOT_INPUT_0, stack)) {
+                moved |= moveItemStackTo(stack, slot, slot + 1, false);
+            }
+        }
+        return moved;
+    }
+
     @Override
     public ItemStack quickMoveStack(Player player, int index) {
         ItemStack moved = ItemStack.EMPTY;
@@ -295,7 +305,7 @@ public class BatteryAssemblerMenu extends AbstractContainerMenu implements StatB
             if (!moveItemStackTo(stack, BatteryAssemblerBlockEntity.SLOT_ELECTROLYTE_INPUT, BatteryAssemblerBlockEntity.SLOT_ELECTROLYTE_INPUT + 1, false)) {
                 return ItemStack.EMPTY;
             }
-        } else if (!moveItemStackTo(stack, BatteryAssemblerBlockEntity.SLOT_INPUT_0, BatteryAssemblerBlockEntity.SLOT_INPUT_3 + 1, false)) {
+        } else if (!moveToAssemblyInputs(stack)) {
             return ItemStack.EMPTY;
         }
 

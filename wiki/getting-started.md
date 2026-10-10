@@ -153,7 +153,7 @@ Early machines share power by touching. Once you are past the first Furnace, bui
 
 - The {{ item('rngtech:crude_energy_connector') }} is a simple crafting recipe. Basic and higher Energy, Fluid, and Item Connectors are pressed in a Metal Press with a {{ item('rngtech:connector_mold') }}.
 - Each module has a channel from 0 to 15, and connectors only exchange with others on the same channel.
-- An Energy Connector's tier caps the FE it moves each tick, in both directions. Most generators and machines do not limit their own FE, so the connector tier is usually what limits a power line.
+- An Energy Connector's tier caps the FE it moves each tick, in both directions. Generators and most machines do not limit their own FE, so the connector tier is usually what limits a power line.
 - A {{ item('rngtech:wrench') }} turns individual cable links on and off and shows a connector's settings. A {{ item('rngtech:configurator') }} copies one connector's settings onto others.
 - [Fluid and Compressor Tanks](compressor-tank.md) store fluids and gases.
 

@@ -113,7 +113,7 @@ The Stage 0 Furnace burns fuel from a slot on its Process tab and does not need 
 
 | Side | Behavior |
 |---|---|
-| Top | Inserts into the input lane(s). |
+| Top | Inserts into the input lane(s). Accepts only items with a Furnace recipe. |
 | Bottom | Extracts finished output. |
 | Sides | Fuel on Stage 0, Battery Cells on electric stages. |
 | Any | Electric stages accept FE, for example from a [Universal Cable](universal-cable.md). |

@@ -499,7 +499,7 @@ public class MetalPressMenu extends AbstractContainerMenu implements MasteryMenu
             if (!moveItemStackTo(stack, GEAR_SLOT_START + MetalPressBlockEntity.SLOT_BATTERY_CELL, GEAR_SLOT_START + MetalPressBlockEntity.SLOT_BATTERY_CELL + 1, false)) {
                 return ItemStack.EMPTY;
             }
-        } else if (!moveItemStackTo(stack, MetalPressBlockEntity.SLOT_INPUT, MetalPressBlockEntity.SLOT_INPUT + 1, false)) {
+        } else if (!press.isPressInput(stack) || !moveItemStackTo(stack, MetalPressBlockEntity.SLOT_INPUT, MetalPressBlockEntity.SLOT_INPUT + 1, false)) {
             return ItemStack.EMPTY;
         }
 

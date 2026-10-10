@@ -30,11 +30,11 @@ Processing machines should not hide large built-in FE storage unless they are ex
 - `ENERGY_USAGE` may change total FE per craft. `EFFICIENCY` is reserved for generators, fuel duration, batteries, storage loss, and other non-recipe efficiency behavior.
 - `ENERGY_GENERATION` belongs only on machines that actually generate FE and have the `HAS_FE_GENERATION` capability.
 - Processing machines should expose energy demand, not a machine-side external intake cap. External FE intake is limited by free buffer space and the source, normally a Universal Connector.
-- Generators should expose energy supply, not a machine-side export cap. Generator-installed Battery Cells are capacity buffers and should not cap generated FE/t or export FE/t.
+- Generators should expose energy supply, not a machine-side export cap. Generators have no Energy Connector Gear slot: the attached Universal Connector's Energy Connector is the export limit, so a second in-machine cap is never added. Generator-installed Battery Cells are capacity buffers and should not cap generated FE/t or export FE/t.
 - Universal Connector tier is the primary player-facing RNGTech wiring cap. UI read models should show connector cap, last FE in/out, and bottleneck warnings when the connector limits transfer.
 - Connector tiers are per-tick caps in both directions, shared across every source or sink using that connector. See [Universal Cable](https://c-pettersson.github.io/rngtech/universal-cable/#energy).
-- Any machine-side FE cap that remains, such as a connector-controlled generator's export or a Battery Chassis cell rate, must also be a per-tick budget shared by every side and connector, never a per-call limit.
-- FE transfer stats should remain meaningful for storage-like blocks, Battery Cells, Battery Chassis, and connector-controlled outputs such as Solar Array Controller, Cavitation Generator, and Vacuum Collapse Generator. Do not show `ENERGY_TRANSFER` on ordinary processors or generators where it no longer controls the real player-facing limit.
+- Any machine-side FE cap that remains, such as a Battery Chassis cell rate, must also be a per-tick budget shared by every side and connector, never a per-call limit.
+- FE transfer stats should remain meaningful for storage-like blocks, Battery Cells, and Battery Chassis. Do not show or roll `ENERGY_TRANSFER` on processors or generators, where it does not control the real player-facing limit.
 
 ## Output Amount
 
@@ -245,7 +245,7 @@ Design intent and balance rules behind shipped machines that the code does not s
 ### Cavitation Generator
 
 - Pressure is a recipe display and balance field only. There is no pressure network.
-- The Aethergold rotor is a short-lived burst sidegrade: faster cycles and more FE for much more wear. It does not raise the fallback export rate, so its burst needs a Sparksteel or better Energy Connector.
+- The Aethergold rotor is a short-lived burst sidegrade: faster cycles and more FE for much more wear. The generator has no export cap of its own, so the burst needs a Sparksteel or better Energy Connector on the attached Universal Connector; FE it cannot export is vented.
 - Worn rotors all become one generic pitted item, so recycling them returns only generic byproduct, never the source rotor material.
 
 ### Vacuum Collapse Generator

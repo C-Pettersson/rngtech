@@ -17,6 +17,7 @@ import com.rngtech.content.recipe.MelterRecipe;
 import com.rngtech.content.recipe.MelterRecipeInput;
 import com.rngtech.content.registry.ModBlockEntities;
 import com.rngtech.content.registry.ModFluids;
+import com.rngtech.content.registry.ModRecipes;
 import com.rngtech.content.registry.ModTags;
 import com.rngtech.rpg.BatchProcessing;
 import com.rngtech.rpg.ComponentBaseStatCatalog;
@@ -1077,6 +1078,11 @@ public class MelterBlockEntity extends BaseMachineBlockEntity
         }
     }
 
+    public boolean isMeltingInput(ItemStack stack) {
+        return RecipeInputFilter.anyAccepts(level, ModRecipes.MELTER_TYPE.get(), stack,
+                (recipe, item) -> recipe.primaryIngredient().test(item) || recipe.secondaryIngredient().test(item));
+    }
+
     private final class ProcessItemHandler implements IItemHandler {
         private final int firstSlot;
         private final int lastSlot;
@@ -1102,7 +1108,7 @@ public class MelterBlockEntity extends BaseMachineBlockEntity
 
         @Override
         public ItemStack insertItem(int slot, ItemStack stack, boolean simulate) {
-            if (!allowInsert) {
+            if (!isItemValid(slot, stack)) {
                 return stack;
             }
             return processInventory.insertItem(mappedSlot(slot), stack, simulate);
@@ -1123,7 +1129,10 @@ public class MelterBlockEntity extends BaseMachineBlockEntity
 
         @Override
         public boolean isItemValid(int slot, ItemStack stack) {
-            return allowInsert && processInventory.isItemValid(mappedSlot(slot), stack);
+            int target = mappedSlot(slot);
+            return allowInsert
+                    && processInventory.isItemValid(target, stack)
+                    && (target != SLOT_PRIMARY_INPUT && target != SLOT_SECONDARY_INPUT || isMeltingInput(stack));
         }
 
         private int mappedSlot(int slot) {

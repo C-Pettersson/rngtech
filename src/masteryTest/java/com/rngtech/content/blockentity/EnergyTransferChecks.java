@@ -90,14 +90,19 @@ public final class EnergyTransferChecks {
 
     /** These machines no longer read ENERGY_TRANSFER, so rolling it would be a dead affix. */
     private static void uncappedMachinesDoNotRollEnergyTransfer() {
-        Set<String> energyTransferIds = ModifierEligibilityProfiles.CAVITATION_GENERATOR.definitions().stream()
+        Set<String> energyTransferIds = ModifierEligibilityProfiles.BATTERY_CHASSIS.definitions().stream()
                 .filter(definition -> definition.stat() == MachineStat.ENERGY_TRANSFER)
                 .map(ModifierDefinition::id)
                 .collect(Collectors.toSet());
-        require(!energyTransferIds.isEmpty(), "connector-controlled generators still roll Energy Transfer");
+        require(!energyTransferIds.isEmpty(), "Battery Chassis still rolls Energy Transfer");
         List<ModifierEligibilityProfile> uncapped = List.of(
                 ModifierEligibilityProfiles.BIO_GENERATOR,
                 ModifierEligibilityProfiles.SOLAR_PANEL,
+                ModifierEligibilityProfiles.SOLAR_ARRAY_CONTROLLER,
+                ModifierEligibilityProfiles.CAVITATION_GENERATOR,
+                ModifierEligibilityProfiles.CAVITATION_ROTOR,
+                ModifierEligibilityProfiles.COLLAPSE_NOZZLE,
+                ModifierEligibilityProfiles.VACUUM_COLLAPSE_GENERATOR,
                 ModifierEligibilityProfiles.POTENTIAL_REACTOR,
                 ModifierEligibilityProfiles.CORROSION_CELL,
                 ModifierEligibilityProfiles.SYNGAS_COMBUSTOR,

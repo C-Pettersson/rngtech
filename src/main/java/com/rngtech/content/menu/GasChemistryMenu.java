@@ -341,7 +341,7 @@ public class GasChemistryMenu extends AbstractContainerMenu implements StatBreak
             if (!moveItemStackTo(stack, CATALYST_SLOT, CATALYST_SLOT + 1, false)) {
                 return ItemStack.EMPTY;
             }
-        } else if (gasChemistry.hasInputSlot()) {
+        } else if (gasChemistry.hasInputSlot() && gasChemistry.isGasificationInput(stack)) {
             if (!moveItemStackTo(stack, PROCESS_INPUT_SLOT, PROCESS_INPUT_SLOT + 1, false)) {
                 return ItemStack.EMPTY;
             }

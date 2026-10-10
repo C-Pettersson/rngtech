@@ -63,7 +63,7 @@ These come from Crusher prefixes and start at 0.
 | Output Guard Grace | Ticks the Crusher keeps its progress while the output is blocked. | Higher |
 | No-Cell Output Retention | How much of the output penalty for running without a Battery Cell you keep. | Higher |
 | Hardness Energy Mitigation | Cuts the extra FE that high-hardness recipes cost. It does not reduce the recipe's base cost. | Higher |
-| Crusher Input Filter | How strictly the top side filters automated input: recipe-valid only, then output space, then bonus-bank compatibility, then room for a full batch. It never rejects recipes above the Crush Head's hardness. | Higher |
+| Crusher Input Filter | How strictly the top side filters automated input. The top side always rejects items that cannot be crushed; from tier 2 it also checks output space, then bonus-bank compatibility, then room for a full batch. Tier 1 adds nothing beyond that default. It never rejects recipes above the Crush Head's hardness. | Higher |
 | Crusher Salvage | Chance to recover one extra base output item, on top of Bonus Output and Super Output. | Higher |
 
 ## Energy
@@ -72,7 +72,7 @@ These come from Crusher prefixes and start at 0.
 |---|---|---|---|
 | Energy Capacity | How much FE the machine can store in its own buffer. Processing machines keep only a small buffer; a [Battery Cell](battery-cells.md) gives real storage. On a [Battery Chassis](battery-chassis.md) it scales the installed cells while they stay inside. | Every FE machine, Battery Chassis, and Battery Cells. | Higher |
 | Flat Energy Capacity | Fixed FE added to the buffer before percentage bonuses. | Machines and Battery Cells that roll a flat capacity prefix. | Higher |
-| Energy Transfer | Rate FE can move through storage: a Battery Cell's input rate and a Battery Chassis's transfer rating. On a Cavitation or Vacuum Collapse Generator with no Energy Connector installed, it is the per-tick export cap. Other generators and processing machines have no FE limit of their own; the receiver or [connector tier](universal-cable.md#energy) sets the rate. | Battery Cells, Battery Chassis, [Cavitation Generator](cavitation-generator.md), [Vacuum Collapse Generator](vacuum-collapse-generator.md). | Higher |
+| Energy Transfer | Rate FE can move through storage: a Battery Cell's input rate and a Battery Chassis's transfer rating. Generators and processing machines have no FE limit of their own; the receiver or [connector tier](universal-cable.md#energy) sets the rate. | Battery Cells, Battery Chassis. | Higher |
 | Efficiency | More FE from the same fuel or recipe on generators, and less loss when a Battery Chassis or Cell charges and discharges. It does **not** cut the FE cost of processing recipes. | Generators, Battery Chassis, Battery Cells. | Higher |
 | Idle Loss | Stored FE lost while sitting idle. | Battery Cells, Battery Chassis. | Lower |
 | Battery Slots | Active Battery Cell slots. | [Battery Chassis](battery-chassis.md). | Higher |

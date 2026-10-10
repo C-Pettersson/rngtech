@@ -3,7 +3,6 @@ package com.rngtech.content.blockentity;
 import com.rngtech.content.block.BaseMachineBlock;
 import com.rngtech.content.block.VacuumCollapseGeneratorBlock;
 import com.rngtech.content.item.CollapseNozzleItem;
-import com.rngtech.content.item.EnergyConnectorItem;
 import com.rngtech.content.item.MachinePartItem;
 import com.rngtech.content.item.VacuumCollapsePartItem;
 import com.rngtech.content.menu.VacuumCollapseGeneratorMenu;
@@ -18,7 +17,6 @@ import com.rngtech.rpg.MachineStat;
 import com.rngtech.rpg.MachineStatAccumulator;
 import com.rngtech.rpg.MachineTraits;
 import com.rngtech.rpg.MachineType;
-import com.rngtech.util.TickTransferCounter;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -47,8 +45,8 @@ public class VacuumCollapseGeneratorBlockEntity extends BaseMachineBlockEntity i
     public static final int SLOT_VOID_CHAMBER = 0;
     public static final int SLOT_COLLAPSE_NOZZLE = 1;
     public static final int SLOT_DIMENSIONAL_STABILIZER = 2;
-    public static final int SLOT_ENERGY_CONNECTOR = 3;
-    public static final int GEAR_SLOT_COUNT = 4;
+    public static final int GEAR_SLOT_COUNT = 3;
+    private static final int LEGACY_SLOT_ENERGY_CONNECTOR = 3;
 
     public static final int STATUS_READY = 0;
     public static final int STATUS_MISSING_GEAR = 1;
@@ -76,13 +74,12 @@ public class VacuumCollapseGeneratorBlockEntity extends BaseMachineBlockEntity i
     private static final int DATA_INSTABILITY = 13;
     private static final int DATA_ENERGY_GENERATION = 14;
     private static final int DATA_ENERGY_CAPACITY_STAT = 15;
-    private static final int DATA_ENERGY_TRANSFER = 16;
-    private static final int DATA_EFFICIENCY = 17;
-    private static final int DATA_PROCESSING_SPEED = 18;
-    private static final int DATA_STABILITY = 19;
-    private static final int DATA_REFINEMENT_POTENTIAL = 20;
-    private static final int DATA_FLAT_ENERGY_GENERATION = 21;
-    private static final int DATA_BASE_ENERGY_GENERATION = 22;
+    private static final int DATA_EFFICIENCY = 16;
+    private static final int DATA_PROCESSING_SPEED = 17;
+    private static final int DATA_STABILITY = 18;
+    private static final int DATA_REFINEMENT_POTENTIAL = 19;
+    private static final int DATA_FLAT_ENERGY_GENERATION = 20;
+    private static final int DATA_BASE_ENERGY_GENERATION = 21;
     private static final int STAT_SCALE = 100;
     private static final int BASE_TRANSFER = 8192;
 
@@ -109,7 +106,6 @@ public class VacuumCollapseGeneratorBlockEntity extends BaseMachineBlockEntity i
                 case SLOT_VOID_CHAMBER -> isVoidChamber(stack);
                 case SLOT_COLLAPSE_NOZZLE -> isCollapseNozzle(stack);
                 case SLOT_DIMENSIONAL_STABILIZER -> isDimensionalStabilizer(stack);
-                case SLOT_ENERGY_CONNECTOR -> isEnergyConnector(stack);
                 default -> false;
             };
         }
@@ -132,7 +128,6 @@ public class VacuumCollapseGeneratorBlockEntity extends BaseMachineBlockEntity i
     private final IItemHandler inputHandler = new InputItemHandler();
     private final IItemHandler residueHandler = new ResidueItemHandler();
     private final IEnergyStorage energyStorage = new GeneratorEnergyStorage();
-    private final TickTransferCounter exportBudget = new TickTransferCounter();
     private final EnergyTelemetry energyFlow = new EnergyTelemetry(this::getLevel);
     private final IEnergyStorage trackedEnergyStorage = energyFlow.track(energyStorage);
     private final ContainerData menuData = new ContainerData() {
@@ -148,7 +143,7 @@ public class VacuumCollapseGeneratorBlockEntity extends BaseMachineBlockEntity i
                 case DATA_ENERGY_CAPACITY_HIGH -> highInt(energyCapacity(stats));
                 case DATA_ENERGY_PER_TICK_LOW -> lowInt(currentEnergyPerTick(stats));
                 case DATA_ENERGY_PER_TICK_HIGH -> highInt(currentEnergyPerTick(stats));
-                case DATA_MAX_OUTPUT -> effectiveOutputRate(stats);
+                case DATA_MAX_OUTPUT -> energyFlow.lastOutput();
                 case DATA_RECIPE_ENERGY_LOW -> lowInt(currentRecipeEnergy(stats));
                 case DATA_RECIPE_ENERGY_HIGH -> highInt(currentRecipeEnergy(stats));
                 case DATA_PROCESSING_LEVEL -> stats.intValue(MachineStat.PROCESSING_LEVEL);
@@ -158,7 +153,6 @@ public class VacuumCollapseGeneratorBlockEntity extends BaseMachineBlockEntity i
                 case DATA_FLAT_ENERGY_GENERATION -> (int) Math.round(stats.effectiveFlatEnergyGenerationBonus() * STAT_SCALE);
                 case DATA_BASE_ENERGY_GENERATION -> (int) Math.round(baseEnergyPerTick() * STAT_SCALE);
                 case DATA_ENERGY_CAPACITY_STAT -> scaledStat(stats, MachineStat.ENERGY_CAPACITY);
-                case DATA_ENERGY_TRANSFER -> effectiveOutputRate(stats);
                 case DATA_EFFICIENCY -> scaledStat(stats, MachineStat.EFFICIENCY);
                 case DATA_PROCESSING_SPEED -> scaledStat(stats, MachineStat.PROCESSING_SPEED);
                 case DATA_STABILITY -> scaledStat(stats, MachineStat.STABILITY);
@@ -202,6 +196,7 @@ public class VacuumCollapseGeneratorBlockEntity extends BaseMachineBlockEntity i
     }
 
     public static void serverTick(Level level, BlockPos pos, BlockState state, VacuumCollapseGeneratorBlockEntity generator) {
+        generator.dropRemovedGear(level);
         // Export first so downstream demand creates headroom before generation is capacity-gated.
         boolean exported = generator.exportEnergy(level, pos);
         boolean generated = generator.tickGenerator();
@@ -245,7 +240,12 @@ public class VacuumCollapseGeneratorBlockEntity extends BaseMachineBlockEntity i
                 .status(statusKey(status))
                 .progress(progress, currentProcessingTicks(stats))
                 .energy(energyStored, energyCapacity(stats), isWorking() ? currentEnergyPerTick(stats) : 0L)
-                .energyTelemetry(energyFlow.lastInput(), energyFlow.lastOutput(), connector.transferRate(), MachineInfoSnapshot.EnergyBottleneck.NONE)
+                .energyTelemetry(
+                        energyFlow.lastInput(),
+                        energyFlow.lastOutput(),
+                        connector.transferRate(),
+                        AdjacentEnergyConnector.outputBottleneck(connector, isWorking() ? clampInt(currentEnergyPerTick(stats)) : 0)
+                )
                 .processingLevel(
                         stats.intValue(MachineStat.PROCESSING_LEVEL),
                         recipe == null ? MachineInfoSnapshot.UNSET : recipe.minimumChamberStage()
@@ -324,6 +324,7 @@ public class VacuumCollapseGeneratorBlockEntity extends BaseMachineBlockEntity i
             Containers.dropItemStack(level, worldPosition.getX(), worldPosition.getY(), worldPosition.getZ(), pendingResidue.copy());
             pendingResidue = ItemStack.EMPTY;
         }
+        dropRemovedGear(level);
         dropRefinementInventory(level);
     }
 
@@ -342,10 +343,6 @@ public class VacuumCollapseGeneratorBlockEntity extends BaseMachineBlockEntity i
 
     public boolean isDimensionalStabilizer(ItemStack stack) {
         return isPart(stack, MachinePartType.DIMENSIONAL_STABILIZER);
-    }
-
-    public boolean isEnergyConnector(ItemStack stack) {
-        return stack.getItem() instanceof EnergyConnectorItem;
     }
 
     public MachineStatAccumulator effectiveStats() {
@@ -525,8 +522,7 @@ public class VacuumCollapseGeneratorBlockEntity extends BaseMachineBlockEntity i
             return false;
         }
 
-        MachineStatAccumulator stats = effectiveStats();
-        int remainingOutput = Math.min(effectiveOutputRate(stats), clampInt(energyStored));
+        int remainingOutput = clampInt(energyStored);
         boolean exported = false;
         for (Direction direction : Direction.Plane.HORIZONTAL) {
             if (remainingOutput <= 0 || energyStored <= 0L) {
@@ -542,9 +538,9 @@ public class VacuumCollapseGeneratorBlockEntity extends BaseMachineBlockEntity i
                 continue;
             }
 
-            int offered = extractEnergyInternal(remainingOutput, stats, true);
+            int offered = extractEnergyInternal(remainingOutput, true);
             int received = target.receiveEnergy(offered, false);
-            int delivered = extractEnergyInternal(received, stats, false);
+            int delivered = extractEnergyInternal(received, false);
             energyFlow.recordOutput(delivered);
             remainingOutput -= delivered;
             exported |= delivered > 0;
@@ -565,26 +561,17 @@ public class VacuumCollapseGeneratorBlockEntity extends BaseMachineBlockEntity i
         return received;
     }
 
-    private int extractEnergyInternal(int toExtract, MachineStatAccumulator stats, boolean simulate) {
+    private int extractEnergyInternal(int toExtract, boolean simulate) {
         if (toExtract <= 0) {
             return 0;
         }
 
-        int extracted = Math.min(toExtract, Math.min(clampInt(energyStored), exportAllowance(stats)));
+        int extracted = Math.min(toExtract, clampInt(energyStored));
         if (!simulate && extracted > 0) {
             energyStored -= extracted;
-            recordExport(extracted);
             setChanged();
         }
         return extracted;
-    }
-
-    private int exportAllowance(MachineStatAccumulator stats) {
-        return exportBudget.remaining(level == null ? 0L : level.getGameTime(), effectiveOutputRate(stats));
-    }
-
-    private void recordExport(int amount) {
-        exportBudget.add(level == null ? 0L : level.getGameTime(), amount);
     }
 
     private boolean canMergeResidue(ItemStack residue) {
@@ -713,14 +700,6 @@ public class VacuumCollapseGeneratorBlockEntity extends BaseMachineBlockEntity i
         return Math.max(1L, Math.round(stats.value(MachineStat.ENERGY_CAPACITY)));
     }
 
-    private int effectiveOutputRate(MachineStatAccumulator stats) {
-        ItemStack connectorStack = energyConnectorStack();
-        if (connectorStack.getItem() instanceof EnergyConnectorItem connector) {
-            return connector.tier().transferRate();
-        }
-        return Math.max(0, (int) Math.round(stats.value(MachineStat.ENERGY_TRANSFER)));
-    }
-
     private void clampInternalEnergy() {
         energyStored = Math.min(energyStored, energyCapacity(effectiveStats()));
     }
@@ -735,10 +714,6 @@ public class VacuumCollapseGeneratorBlockEntity extends BaseMachineBlockEntity i
 
     private ItemStack stabilizerStack() {
         return gearInventory.getStackInSlot(SLOT_DIMENSIONAL_STABILIZER);
-    }
-
-    private ItemStack energyConnectorStack() {
-        return gearInventory.getStackInSlot(SLOT_ENERGY_CONNECTOR);
     }
 
     private boolean isPart(ItemStack stack, MachinePartType partType) {
@@ -769,18 +744,7 @@ public class VacuumCollapseGeneratorBlockEntity extends BaseMachineBlockEntity i
     }
 
     private void loadGearInventory(CompoundTag gearTag, HolderLookup.Provider registries) {
-        int savedSize = gearTag.getInt("Size");
-        if (savedSize == GEAR_SLOT_COUNT) {
-            gearInventory.deserializeNBT(registries, gearTag);
-            return;
-        }
-
-        ItemStackHandler legacyGear = new ItemStackHandler(Math.max(0, savedSize));
-        legacyGear.deserializeNBT(registries, gearTag);
-        gearInventory.setSize(GEAR_SLOT_COUNT);
-        for (int slot = 0; slot < Math.min(legacyGear.getSlots(), GEAR_SLOT_COUNT); slot++) {
-            gearInventory.setStackInSlot(slot, legacyGear.getStackInSlot(slot));
-        }
+        loadGearWithoutSlot(gearInventory, gearTag, registries, LEGACY_SLOT_ENERGY_CONNECTOR);
     }
 
     private void dropSlot(Level level, ItemStackHandler inventory, int slot) {
@@ -889,7 +853,7 @@ public class VacuumCollapseGeneratorBlockEntity extends BaseMachineBlockEntity i
 
         @Override
         public int extractEnergy(int toExtract, boolean simulate) {
-            return extractEnergyInternal(toExtract, effectiveStats(), simulate);
+            return extractEnergyInternal(toExtract, simulate);
         }
 
         @Override
@@ -904,7 +868,7 @@ public class VacuumCollapseGeneratorBlockEntity extends BaseMachineBlockEntity i
 
         @Override
         public boolean canExtract() {
-            return energyStored > 0L && effectiveOutputRate(effectiveStats()) > 0;
+            return energyStored > 0L;
         }
 
         @Override

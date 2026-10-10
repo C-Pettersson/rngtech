@@ -4,7 +4,6 @@ import com.rngtech.content.block.BaseMachineBlock;
 import com.rngtech.content.item.BatteryCellItem;
 import com.rngtech.content.item.CavitationPartItem;
 import com.rngtech.content.item.CollapseNozzleItem;
-import com.rngtech.content.item.EnergyConnectorItem;
 import com.rngtech.content.item.MachinePartItem;
 import com.rngtech.content.item.ServoItem;
 import com.rngtech.content.item.SolidFuelBurnerPartItem;
@@ -29,7 +28,6 @@ import com.rngtech.rpg.MachineTraits;
 import com.rngtech.rpg.MachineType;
 import com.rngtech.rpg.ModifierOperation;
 import com.rngtech.rpg.ModifierSlot;
-import com.rngtech.util.TickTransferCounter;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -71,8 +69,8 @@ public class CavitationGeneratorBlockEntity extends BaseMachineBlockEntity
     public static final int SLOT_HEAT_CORE = 2;
     public static final int SLOT_BATTERY_CELL = 3;
     public static final int SLOT_SERVO = 4;
-    public static final int SLOT_ENERGY_CONNECTOR = 5;
-    public static final int GEAR_SLOT_COUNT = 6;
+    public static final int GEAR_SLOT_COUNT = 5;
+    private static final int LEGACY_SLOT_ENERGY_CONNECTOR = 5;
 
     public static final int STATUS_READY = 0;
     public static final int STATUS_MISSING_ROTOR = 1;
@@ -112,21 +110,20 @@ public class CavitationGeneratorBlockEntity extends BaseMachineBlockEntity
     private static final int DATA_RECIPE_WEAR = 17;
     private static final int DATA_ENERGY_GENERATION = 18;
     private static final int DATA_ENERGY_CAPACITY_STAT = 19;
-    private static final int DATA_ENERGY_TRANSFER = 20;
-    private static final int DATA_EFFICIENCY = 21;
-    private static final int DATA_PROCESSING_SPEED = 22;
-    private static final int DATA_STABILITY = 23;
-    private static final int DATA_TEMPERATURE_STABILITY = 24;
-    private static final int DATA_FLUID_TRANSFER = 25;
-    private static final int DATA_REFINEMENT_POTENTIAL = 26;
-    private static final int DATA_OUTPUT_AMOUNT = 27;
-    private static final int DATA_OUTPUT_FLUID = 28;
-    private static final int DATA_OUTPUT_FLUID_CAPACITY = 29;
-    private static final int DATA_RECIPE_FLUID_OUTPUT = 30;
-    private static final int DATA_FLAT_ENERGY_GENERATION = 31;
-    private static final int DATA_BASE_ENERGY_GENERATION = 32;
-    private static final int DATA_INPUT_FLUID_ID = 33;
-    private static final int DATA_OUTPUT_FLUID_ID = 34;
+    private static final int DATA_EFFICIENCY = 20;
+    private static final int DATA_PROCESSING_SPEED = 21;
+    private static final int DATA_STABILITY = 22;
+    private static final int DATA_TEMPERATURE_STABILITY = 23;
+    private static final int DATA_FLUID_TRANSFER = 24;
+    private static final int DATA_REFINEMENT_POTENTIAL = 25;
+    private static final int DATA_OUTPUT_AMOUNT = 26;
+    private static final int DATA_OUTPUT_FLUID = 27;
+    private static final int DATA_OUTPUT_FLUID_CAPACITY = 28;
+    private static final int DATA_RECIPE_FLUID_OUTPUT = 29;
+    private static final int DATA_FLAT_ENERGY_GENERATION = 30;
+    private static final int DATA_BASE_ENERGY_GENERATION = 31;
+    private static final int DATA_INPUT_FLUID_ID = 32;
+    private static final int DATA_OUTPUT_FLUID_ID = 33;
     private static final int STAT_SCALE = 100;
 
     private final ItemStackHandler processInventory = new ItemStackHandler(PROCESS_SLOT_COUNT) {
@@ -162,7 +159,6 @@ public class CavitationGeneratorBlockEntity extends BaseMachineBlockEntity
                 case SLOT_HEAT_CORE -> isHeatCore(stack);
                 case SLOT_BATTERY_CELL -> isBatteryCell(stack);
                 case SLOT_SERVO -> isServo(stack);
-                case SLOT_ENERGY_CONNECTOR -> isEnergyConnector(stack);
                 default -> false;
             };
         }
@@ -204,7 +200,6 @@ public class CavitationGeneratorBlockEntity extends BaseMachineBlockEntity
     private final IItemHandler containerInputHandler = new ProcessItemHandler(SLOT_FLUID_INPUT_CONTAINER, SLOT_FLUID_INPUT_CONTAINER, true, false);
     private final IItemHandler damagedRotorHandler = new ProcessItemHandler(SLOT_DAMAGED_ROTOR, SLOT_DAMAGED_ROTOR, false, true);
     private final IEnergyStorage energyStorage = new GeneratorEnergyStorage();
-    private final TickTransferCounter exportBudget = new TickTransferCounter();
     private final EnergyTelemetry energyFlow = new EnergyTelemetry(this::getLevel);
     private final IEnergyStorage trackedEnergyStorage = energyFlow.track(energyStorage);
     private final IFluidHandler fluidHandler = new InputFluidHandler();
@@ -219,7 +214,7 @@ public class CavitationGeneratorBlockEntity extends BaseMachineBlockEntity
                 case DATA_ENERGY -> energyStored();
                 case DATA_ENERGY_CAPACITY -> energyCapacity();
                 case DATA_ENERGY_PER_TICK -> currentEnergyPerTick(stats);
-                case DATA_MAX_OUTPUT -> effectiveOutputRate(stats);
+                case DATA_MAX_OUTPUT -> energyFlow.lastOutput();
                 case DATA_RECIPE_ENERGY -> currentRecipeEnergy(stats);
                 case DATA_PROCESSING_LEVEL -> rotorStage(stats);
                 case DATA_STATUS -> statusCode(stats);
@@ -236,7 +231,6 @@ public class CavitationGeneratorBlockEntity extends BaseMachineBlockEntity
                 case DATA_FLAT_ENERGY_GENERATION -> (int) Math.round(stats.effectiveFlatEnergyGenerationBonus() * STAT_SCALE);
                 case DATA_BASE_ENERGY_GENERATION -> (int) Math.round(baseEnergyPerTick() * STAT_SCALE);
                 case DATA_ENERGY_CAPACITY_STAT -> scaledStat(stats, MachineStat.ENERGY_CAPACITY);
-                case DATA_ENERGY_TRANSFER -> effectiveOutputRate(stats);
                 case DATA_EFFICIENCY -> scaledStat(stats, MachineStat.EFFICIENCY);
                 case DATA_PROCESSING_SPEED -> scaledStat(stats, MachineStat.PROCESSING_SPEED);
                 case DATA_STABILITY -> scaledStat(stats, MachineStat.STABILITY);
@@ -280,6 +274,7 @@ public class CavitationGeneratorBlockEntity extends BaseMachineBlockEntity
     }
 
     public static void serverTick(Level level, BlockPos pos, BlockState state, CavitationGeneratorBlockEntity generator) {
+        generator.dropRemovedGear(level);
         generator.drainInputContainer();
         boolean generated = generator.tickGenerator();
         boolean exported = generator.exportEnergy(level, pos);
@@ -358,7 +353,12 @@ public class CavitationGeneratorBlockEntity extends BaseMachineBlockEntity
                 .status(statusKey(status))
                 .progress(progress, currentProcessingTicks(stats))
                 .energy(energyStored(), energyCapacity(), isWorking() ? currentEnergyPerTick(stats) : 0)
-                .energyTelemetry(energyFlow.lastInput(), energyFlow.lastOutput(), connector.transferRate(), MachineInfoSnapshot.EnergyBottleneck.NONE)
+                .energyTelemetry(
+                        energyFlow.lastInput(),
+                        energyFlow.lastOutput(),
+                        connector.transferRate(),
+                        AdjacentEnergyConnector.outputBottleneck(connector, isWorking() ? currentEnergyPerTick(stats) : 0)
+                )
                 .processingLevel(
                         rotorStage(stats),
                         recipe == null ? MachineInfoSnapshot.UNSET : recipe.minimumRotorStage()
@@ -436,6 +436,7 @@ public class CavitationGeneratorBlockEntity extends BaseMachineBlockEntity
         for (int slot = 0; slot < gearInventory.getSlots(); slot++) {
             dropSlot(level, gearInventory, slot);
         }
+        dropRemovedGear(level);
         dropRefinementInventory(level);
     }
 
@@ -462,10 +463,6 @@ public class CavitationGeneratorBlockEntity extends BaseMachineBlockEntity
 
     public boolean isServo(ItemStack stack) {
         return stack.getItem() instanceof ServoItem servo && servo.stage() >= 6;
-    }
-
-    public boolean isEnergyConnector(ItemStack stack) {
-        return stack.getItem() instanceof EnergyConnectorItem;
     }
 
     public boolean isKnownFluidContainer(ItemStack stack) {
@@ -846,8 +843,7 @@ public class CavitationGeneratorBlockEntity extends BaseMachineBlockEntity
             return false;
         }
 
-        MachineStatAccumulator stats = effectiveStats();
-        int remainingOutput = Math.min(effectiveOutputRate(stats), energyStored());
+        int remainingOutput = energyStored();
         boolean exported = false;
         for (Direction direction : Direction.Plane.HORIZONTAL) {
             if (remainingOutput <= 0 || energyStored() <= 0) {
@@ -900,7 +896,6 @@ public class CavitationGeneratorBlockEntity extends BaseMachineBlockEntity
     }
 
     private int extractEnergyInternal(int toExtract, boolean simulate) {
-        toExtract = Math.min(toExtract, exportAllowance(effectiveStats()));
         if (toExtract <= 0) {
             return 0;
         }
@@ -918,18 +913,7 @@ public class CavitationGeneratorBlockEntity extends BaseMachineBlockEntity
                 setChanged();
             }
         }
-        if (!simulate) {
-            recordExport(extracted);
-        }
         return extracted;
-    }
-
-    private int exportAllowance(MachineStatAccumulator stats) {
-        return exportBudget.remaining(level == null ? 0L : level.getGameTime(), effectiveOutputRate(stats));
-    }
-
-    private void recordExport(int amount) {
-        exportBudget.add(level == null ? 0L : level.getGameTime(), amount);
     }
 
     private int energyStored() {
@@ -946,14 +930,6 @@ public class CavitationGeneratorBlockEntity extends BaseMachineBlockEntity
 
     private int internalEnergyStored() {
         return Math.max(0, Math.min(internalEnergy, internalEnergyCapacity()));
-    }
-
-    private int effectiveOutputRate(MachineStatAccumulator stats) {
-        ItemStack connectorStack = energyConnectorStack();
-        if (connectorStack.getItem() instanceof EnergyConnectorItem connector) {
-            return connector.tier().transferRate();
-        }
-        return Math.max(0, (int) Math.round(stats.value(MachineStat.ENERGY_TRANSFER)));
     }
 
     private int effectiveFluidTransfer(MachineStatAccumulator stats) {
@@ -987,10 +963,6 @@ public class CavitationGeneratorBlockEntity extends BaseMachineBlockEntity
 
     private ItemStack servoStack() {
         return gearInventory.getStackInSlot(SLOT_SERVO);
-    }
-
-    private ItemStack energyConnectorStack() {
-        return gearInventory.getStackInSlot(SLOT_ENERGY_CONNECTOR);
     }
 
     private boolean hasHeatCore() {
@@ -1043,18 +1015,7 @@ public class CavitationGeneratorBlockEntity extends BaseMachineBlockEntity
     }
 
     private void loadGearInventory(CompoundTag gearTag, HolderLookup.Provider registries) {
-        int savedSize = gearTag.getInt("Size");
-        if (savedSize == GEAR_SLOT_COUNT) {
-            gearInventory.deserializeNBT(registries, gearTag);
-            return;
-        }
-
-        ItemStackHandler legacyGear = new ItemStackHandler(Math.max(0, savedSize));
-        legacyGear.deserializeNBT(registries, gearTag);
-        gearInventory.setSize(GEAR_SLOT_COUNT);
-        for (int slot = 0; slot < Math.min(legacyGear.getSlots(), GEAR_SLOT_COUNT); slot++) {
-            gearInventory.setStackInSlot(slot, legacyGear.getStackInSlot(slot));
-        }
+        loadGearWithoutSlot(gearInventory, gearTag, registries, LEGACY_SLOT_ENERGY_CONNECTOR);
     }
 
     private void dropSlot(Level level, ItemStackHandler inventory, int slot) {
@@ -1188,7 +1149,7 @@ public class CavitationGeneratorBlockEntity extends BaseMachineBlockEntity
 
         @Override
         public boolean canExtract() {
-            return energyStored() > 0 && effectiveOutputRate(effectiveStats()) > 0;
+            return energyStored() > 0;
         }
 
         @Override

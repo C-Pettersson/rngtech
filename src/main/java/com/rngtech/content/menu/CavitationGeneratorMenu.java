@@ -52,22 +52,21 @@ public class CavitationGeneratorMenu extends AbstractContainerMenu implements St
     private static final int DATA_RECIPE_WEAR = 17;
     private static final int DATA_ENERGY_GENERATION = 18;
     private static final int DATA_ENERGY_CAPACITY_STAT = 19;
-    private static final int DATA_ENERGY_TRANSFER = 20;
-    private static final int DATA_EFFICIENCY = 21;
-    private static final int DATA_PROCESSING_SPEED = 22;
-    private static final int DATA_STABILITY = 23;
-    private static final int DATA_TEMPERATURE_STABILITY = 24;
-    private static final int DATA_FLUID_TRANSFER = 25;
-    private static final int DATA_REFINEMENT_POTENTIAL = 26;
-    private static final int DATA_OUTPUT_AMOUNT = 27;
-    private static final int DATA_OUTPUT_FLUID = 28;
-    private static final int DATA_OUTPUT_FLUID_CAPACITY = 29;
-    private static final int DATA_RECIPE_FLUID_OUTPUT = 30;
-    private static final int DATA_FLAT_ENERGY_GENERATION = 31;
-    private static final int DATA_BASE_ENERGY_GENERATION = 32;
-    private static final int DATA_INPUT_FLUID_ID = 33;
-    private static final int DATA_OUTPUT_FLUID_ID = 34;
-    private static final int DATA_COUNT = 35;
+    private static final int DATA_EFFICIENCY = 20;
+    private static final int DATA_PROCESSING_SPEED = 21;
+    private static final int DATA_STABILITY = 22;
+    private static final int DATA_TEMPERATURE_STABILITY = 23;
+    private static final int DATA_FLUID_TRANSFER = 24;
+    private static final int DATA_REFINEMENT_POTENTIAL = 25;
+    private static final int DATA_OUTPUT_AMOUNT = 26;
+    private static final int DATA_OUTPUT_FLUID = 27;
+    private static final int DATA_OUTPUT_FLUID_CAPACITY = 28;
+    private static final int DATA_RECIPE_FLUID_OUTPUT = 29;
+    private static final int DATA_FLAT_ENERGY_GENERATION = 30;
+    private static final int DATA_BASE_ENERGY_GENERATION = 31;
+    private static final int DATA_INPUT_FLUID_ID = 32;
+    private static final int DATA_OUTPUT_FLUID_ID = 33;
+    private static final int DATA_COUNT = 34;
     private static final int STAT_SCALE = 100;
 
     private static final int FLUID_CONTAINER_SLOT = 0;
@@ -77,10 +76,9 @@ public class CavitationGeneratorMenu extends AbstractContainerMenu implements St
     private static final int HEAT_CORE_SLOT = 4;
     private static final int BATTERY_CELL_SLOT = 5;
     private static final int SERVO_SLOT = 6;
-    private static final int ENERGY_CONNECTOR_SLOT = 7;
-    private static final int REFINEMENT_CONSUMABLE_SLOT = 8;
-    private static final int REFINEMENT_TARGET_SLOT = 9;
-    private static final int PLAYER_INVENTORY_START = 10;
+    private static final int REFINEMENT_CONSUMABLE_SLOT = 7;
+    private static final int REFINEMENT_TARGET_SLOT = 8;
+    private static final int PLAYER_INVENTORY_START = 9;
     private static final int HOTBAR_END = PLAYER_INVENTORY_START + 36;
 
     private final ContainerLevelAccess access;
@@ -132,7 +130,6 @@ public class CavitationGeneratorMenu extends AbstractContainerMenu implements St
         addSlot(new TabbedSlot(gearInventory, CavitationGeneratorBlockEntity.SLOT_HEAT_CORE, 87, 48, () -> selectedTab == TAB_GEAR));
         addSlot(new TabbedSlot(gearInventory, CavitationGeneratorBlockEntity.SLOT_BATTERY_CELL, 121, 48, () -> selectedTab == TAB_GEAR));
         addSlot(new TabbedSlot(gearInventory, CavitationGeneratorBlockEntity.SLOT_SERVO, 155, 48, () -> selectedTab == TAB_GEAR));
-        addSlot(new TabbedSlot(gearInventory, CavitationGeneratorBlockEntity.SLOT_ENERGY_CONNECTOR, 189, 48, () -> selectedTab == TAB_GEAR));
 
         addSlot(RefinementMenuSupport.consumableSlot(
                 generator.getRefinementInventory(),
@@ -300,9 +297,6 @@ public class CavitationGeneratorMenu extends AbstractContainerMenu implements St
         if (dataIndex == DATA_REFINEMENT_POTENTIAL) {
             return data.get(dataIndex);
         }
-        if (dataIndex == DATA_ENERGY_TRANSFER) {
-            return data.get(dataIndex);
-        }
         return data.get(dataIndex) / (double) STAT_SCALE;
     }
 
@@ -320,10 +314,6 @@ public class CavitationGeneratorMenu extends AbstractContainerMenu implements St
 
     public static int energyCapacityDataIndex() {
         return DATA_ENERGY_CAPACITY_STAT;
-    }
-
-    public static int energyTransferDataIndex() {
-        return DATA_ENERGY_TRANSFER;
     }
 
     public static int efficiencyDataIndex() {
@@ -419,10 +409,6 @@ public class CavitationGeneratorMenu extends AbstractContainerMenu implements St
             }
         } else if (generator.isServo(stack)) {
             if (!moveItemStackTo(stack, SERVO_SLOT, SERVO_SLOT + 1, false)) {
-                return ItemStack.EMPTY;
-            }
-        } else if (generator.isEnergyConnector(stack)) {
-            if (!moveItemStackTo(stack, ENERGY_CONNECTOR_SLOT, ENERGY_CONNECTOR_SLOT + 1, false)) {
                 return ItemStack.EMPTY;
             }
         } else if (generator.isKnownFluidContainer(stack)) {

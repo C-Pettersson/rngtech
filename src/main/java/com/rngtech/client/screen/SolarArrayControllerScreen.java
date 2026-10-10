@@ -41,7 +41,6 @@ public class SolarArrayControllerScreen extends AbstractContainerScreen<SolarArr
     private static final int ICON_SIZE = 12;
     private static final String[] STAT_LABEL_KEYS = {
             "rngtech.stat.energy_generation",
-            "rngtech.stat.energy_transfer",
             "rngtech.stat.solar_panel_limit",
             "rngtech.stat.moonlight_conversion",
             "rngtech.stat.weather_recovery",
@@ -51,7 +50,6 @@ public class SolarArrayControllerScreen extends AbstractContainerScreen<SolarArr
     };
     private static final int[] STAT_DATA_INDICES = {
             SolarArrayControllerMenu.energyGenerationDataIndex(),
-            SolarArrayControllerMenu.energyTransferDataIndex(),
             SolarArrayControllerMenu.panelLimitDataIndex(),
             SolarArrayControllerMenu.moonlightConversionDataIndex(),
             SolarArrayControllerMenu.weatherRecoveryDataIndex(),
@@ -61,7 +59,6 @@ public class SolarArrayControllerScreen extends AbstractContainerScreen<SolarArr
     };
     private static final MachineStat[] STAT_TYPES = {
             MachineStat.ENERGY_GENERATION,
-            MachineStat.ENERGY_TRANSFER,
             MachineStat.SOLAR_PANEL_LIMIT,
             MachineStat.MOONLIGHT_CONVERSION,
             MachineStat.WEATHER_RECOVERY,
@@ -191,7 +188,6 @@ public class SolarArrayControllerScreen extends AbstractContainerScreen<SolarArr
         if (menu.selectedTab() == SolarArrayControllerMenu.TAB_GEAR) {
             renderSlotFrame(guiGraphics, 56, 47);
             renderSlotFrame(guiGraphics, 92, 47);
-            renderSlotFrame(guiGraphics, 128, 47);
         } else if (menu.selectedTab() == SolarArrayControllerMenu.TAB_REFINEMENT) {
             renderSlotFrame(guiGraphics, RefinementScreenStyle.TARGET_SLOT_X - 1, RefinementScreenStyle.SLOT_Y - 1);
             renderSlotFrame(guiGraphics, RefinementScreenStyle.CONSUMABLE_SLOT_X - 1, RefinementScreenStyle.SLOT_Y - 1);
@@ -247,7 +243,6 @@ public class SolarArrayControllerScreen extends AbstractContainerScreen<SolarArr
     private void drawGearLabels(GuiGraphics guiGraphics) {
         guiGraphics.drawString(font, Component.translatable("rngtech.gear.solar_array_extender.short"), 52, 35, TEXT_MUTED, false);
         guiGraphics.drawString(font, Component.translatable("rngtech.gear.battery_cell.short"), 90, 35, TEXT_MUTED, false);
-        guiGraphics.drawString(font, Component.translatable("rngtech.gear.energy_connector.short"), 126, 35, TEXT_MUTED, false);
     }
 
     private void drawStatsLabels(GuiGraphics guiGraphics) {
@@ -445,15 +440,11 @@ public class SolarArrayControllerScreen extends AbstractContainerScreen<SolarArr
     }
 
     private boolean isIntegralStat(MachineStat stat) {
-        return stat == MachineStat.ENERGY_TRANSFER
-                || stat == MachineStat.SOLAR_PANEL_LIMIT
+        return stat == MachineStat.SOLAR_PANEL_LIMIT
                 || stat == MachineStat.SOLAR_PANEL_ARBITRATION;
     }
 
     private boolean isEnhancedStat(int dataIndex, double value) {
-        if (dataIndex == SolarArrayControllerMenu.energyTransferDataIndex()) {
-            return false;
-        }
         if (dataIndex == SolarArrayControllerMenu.panelLimitDataIndex()) {
             return value > 1.001;
         }

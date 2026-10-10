@@ -27,7 +27,6 @@ A full run at the defaults (1,000 fresh crafts and 500 crafts per other behavior
 - `corrosion_recipes`: a full replacement Corrosion Cell recipe list with chain costs.
 - `reactor_fatigue`, `reactor_gear_stage_scale`, `reactor_mastery`: Potential Reactor gear-fuel rules.
 - `cavitation_overflow`, `vacuum_collapse_overflow`: `vent` (the game's behavior) or `stall`.
-- `aethergold_transfer_multiplier`: the Aethergold rotor's export multiplier.
 
 Nothing in a scenario changes the game.
 

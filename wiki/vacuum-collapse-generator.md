@@ -13,7 +13,7 @@ wiki:
         "Type": "Generator",
         "Stages": "7",
         "Power": "FE generator",
-        "Gear": "{{ item('rngtech:tungstensteel_void_chamber', 'Void Chamber') }}, {{ item('rngtech:tungstensteel_collapse_nozzle', 'Collapse Nozzle') }}, {{ item('rngtech:tungstensteel_dimensional_stabilizer', 'Dimensional Stabilizer') }}, {{ item('rngtech:crude_energy_connector', 'Energy Connector') }}",
+        "Gear": "{{ item('rngtech:tungstensteel_void_chamber', 'Void Chamber') }}, {{ item('rngtech:tungstensteel_collapse_nozzle', 'Collapse Nozzle') }}, {{ item('rngtech:tungstensteel_dimensional_stabilizer', 'Dimensional Stabilizer') }}",
         "Mastery": "No",
     },
 ) }}
@@ -46,7 +46,7 @@ A collapse starts only when:
 - the machine's stability is at least the recipe's minimum (1.0 for Void Catalyst), and
 - the residue slot has room.
 
-Once a collapse starts it cannot pause for full storage. FE that the 20,000 FE internal buffer cannot hold is lost, so connect enough cables and storage to take each catalyst's output. A redstone signal pauses it, even in the middle of a collapse, which is the way to hold it while storage catches up.
+Once a collapse starts it cannot pause for full storage. FE that the 20,000 FE internal buffer cannot hold is lost, so connect enough cables and storage to take each catalyst's output. The generator does not limit its own output, so the receiver or connector tier decides how much FE moves each tick. A redstone signal pauses it, even in the middle of a collapse, which is the way to hold it while storage catches up.
 
 ### Instability
 
@@ -57,9 +57,8 @@ Every recipe adds instability, and higher stability reduces it. Instability make
 | Slot | Accepts | Role |
 |---|---|---|
 | Void Chamber | Tungstensteel, Nullite, or Exotic Void Chambers | Required. Sets the stage, generation, and stability. |
-| Collapse Nozzle | Steel through Exotic Collapse Nozzles. The Nitrogen Separation Nozzle is rejected. | Required. Tunes generation, transfer, speed, and stability. |
+| Collapse Nozzle | Steel through Exotic Collapse Nozzles. The Nitrogen Separation Nozzle is rejected. | Required. Tunes generation, speed, and stability. |
 | Dimensional Stabilizer | Tungstensteel, Nullite, or Exotic Dimensional Stabilizers | Raises stability and efficiency. Void Catalyst only leaves residue while one is installed. |
-| Energy Connector | Any Energy Connector | Optional. Sets how fast FE leaves the sides. Without one, the Gear's own transfer rate is used. Either way, the cap is per tick and shared by all sides. |
 
 Chamber and nozzle generation multiply each other. Unmodified Tungstensteel Gear reaches about 1,057 FE/t, and unmodified Exotic Gear about 3,000 FE/t. Rolled and refined parts push beyond that. See [Stages](stages.md) for the Stage 7 power band.
 
@@ -89,8 +88,8 @@ The Vacuum Collapse Generator uses its own recipe type, `rngtech:vacuum_collapse
 
 The Vacuum Collapse Generator screen has four tabs:
 
-- **Process**: the catalyst and residue slots, FE, cycle progress, and instability. The generation icon shows generated FE/t, and the output icon shows the side export cap. Click the recipe line to open its JEI category.
-- **Gear**: Void Chamber, Collapse Nozzle, Dimensional Stabilizer, and Energy Connector slots.
+- **Process**: the catalyst and residue slots, FE, cycle progress, and instability. The generation icon shows generated FE/t, and the output icon shows the FE exported last tick. Click the recipe line to open its JEI category.
+- **Gear**: Void Chamber, Collapse Nozzle, and Dimensional Stabilizer slots.
 - **Stats**: the machine's current stats, including traits and Gear.
 - **Refinement**: refine the placed generator's traits with a catalyst.
 
