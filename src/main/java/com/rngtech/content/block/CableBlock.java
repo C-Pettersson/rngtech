@@ -351,10 +351,22 @@ public class CableBlock extends Block implements EntityBlock {
         return true;
     }
 
+    /** Any new cable state (placed, links, connector faces) can merge or split networks, so they rebuild. */
+    @Override
+    protected void onPlace(BlockState state, Level level, BlockPos pos, BlockState oldState, boolean movedByPiston) {
+        super.onPlace(state, level, pos, oldState, movedByPiston);
+        if (state != oldState) {
+            CableBlockEntity.cableChanged(level, pos);
+        }
+    }
+
     @Override
     protected void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean movedByPiston) {
         if (!state.is(newState.getBlock()) && level.getBlockEntity(pos) instanceof CableBlockEntity cable) {
             cable.dropConnectors(level);
+        }
+        if (state != newState) {
+            CableBlockEntity.cableChanged(level, pos);
         }
         super.onRemove(state, level, pos, newState, movedByPiston);
     }

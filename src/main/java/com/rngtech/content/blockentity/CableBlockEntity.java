@@ -10,6 +10,7 @@ import com.rngtech.content.cable.EnergyConnectorTier;
 import com.rngtech.content.cable.EnergyDistributionMode;
 import com.rngtech.content.cable.EvenSplit;
 import com.rngtech.content.cable.NetworkBridgeType;
+import com.rngtech.content.cable.NetworkIndex;
 import com.rngtech.content.menu.UniversalConnectorAccess;
 import com.rngtech.content.registry.ModBlockEntities;
 import com.rngtech.content.registry.ModItems;
@@ -69,9 +70,8 @@ public class CableBlockEntity extends BlockEntity implements UniversalConnectorD
     /**
      * Per-level cache of connected cable components.
      *
-     * <p>The snapshot is intentionally valid for one game tick only. That keeps topology changes safe without needing
-     * every block-neighbour event to reach this class, while still turning many same-tick transfers from
-     * "BFS per transfer" into "BFS once per network per tick".</p>
+     * <p>A snapshot lives until a change invalidates it (see {@link NetworkIndex} for which events drop what), or for
+     * at most {@link LevelNetworkCache#SNAPSHOT_LIFETIME_TICKS} as a safety net for changes no event reports.</p>
      */
     private static final Map<Level, LevelNetworkCache> NETWORK_CACHES = new WeakHashMap<>();
     private static final Comparator<EnergyEndpoint> ENERGY_ENDPOINT_ORDER =
@@ -257,7 +257,15 @@ public class CableBlockEntity extends BlockEntity implements UniversalConnectorD
         super.onLoad();
         if (level != null && !level.isClientSide) {
             showLoadedConnectors();
+            cableChanged(level, worldPosition);
         }
+    }
+
+    /** Runs when the cable is broken and when its chunk unloads; either way its networks must rebuild. */
+    @Override
+    public void setRemoved() {
+        super.setRemoved();
+        cableChanged(level, worldPosition);
     }
 
     /**
@@ -442,6 +450,23 @@ public class CableBlockEntity extends BlockEntity implements UniversalConnectorD
         }
     }
 
+    /**
+     * Reports that the cable at {@code pos} was placed, broken, loaded, unloaded, or changed its block state, so its
+     * network and every network touching it rebuild.
+     */
+    public static void cableChanged(Level level, BlockPos pos) {
+        if (level == null || level.isClientSide || pos == null) {
+            return;
+        }
+        LevelNetworkCache cache;
+        synchronized (NETWORK_CACHES) {
+            cache = NETWORK_CACHES.get(level);
+        }
+        if (cache != null) {
+            cache.cableChanged(pos);
+        }
+    }
+
     public static void invalidateNetworkCache(Level level, BlockPos pos) {
         if (level == null || pos == null) {
             return;
@@ -469,7 +494,7 @@ public class CableBlockEntity extends BlockEntity implements UniversalConnectorD
         synchronized (NETWORK_CACHES) {
             cache = NETWORK_CACHES.get(level);
         }
-        return cache == null ? 0L : cache.epoch;
+        return cache == null ? 0L : cache.index.epoch();
     }
 
     private int receiveFromSide(Direction entrySide, int amount, boolean simulate) {
@@ -1324,11 +1349,12 @@ public class CableBlockEntity extends BlockEntity implements UniversalConnectorD
 
         for (Direction direction : DIRECTIONS) {
             BlockPos targetPos = pos.relative(direction);
-            if (!cable.hasAnyConnector(direction) || !view.isLoaded(targetPos)) {
-                // An unloaded chunk is the edge of the network until it loads again; reading it would load it.
+            if (!cable.hasAnyConnector(direction)) {
                 continue;
             }
-            BlockState targetState = view.state(targetPos);
+            // A target in an unloaded chunk is not read, which would load it. Its connector stays an endpoint, so it
+            // works as soon as the chunk loads; until then its capability cache reports nothing there.
+            BlockState targetState = view.isLoaded(targetPos) ? view.state(targetPos) : null;
 
             CableUniversalConnectorData universalConnector = cable.universalConnector(direction);
             if (universalConnector != null) {
@@ -1351,7 +1377,7 @@ public class CableBlockEntity extends BlockEntity implements UniversalConnectorD
                 continue;
             }
 
-            if (!CableBlock.isValidConnectorTarget(targetState) || isNetworkNode(targetState)) {
+            if (targetState != null && (!CableBlock.isValidConnectorTarget(targetState) || isNetworkNode(targetState))) {
                 continue;
             }
 
@@ -1377,7 +1403,7 @@ public class CableBlockEntity extends BlockEntity implements UniversalConnectorD
             Direction targetSide,
             BlockState targetState
     ) {
-        if (!CableBlock.isValidConnectorTarget(targetState)) {
+        if (targetState != null && !CableBlock.isValidConnectorTarget(targetState)) {
             return;
         }
         UniversalEndpoint endpoint = new UniversalEndpoint(
@@ -1497,30 +1523,26 @@ public class CableBlockEntity extends BlockEntity implements UniversalConnectorD
 
     private static final class LevelNetworkCache {
         private static final long PRUNE_INTERVAL_TICKS = 200L;
+        private static final long SNAPSHOT_LIFETIME_TICKS = 100L;
 
         private static final long TELEMETRY_RETENTION_TICKS = 16L * 60L * 20L;
 
-        private final Map<BlockPos, NetworkSnapshot> byCablePosition = new HashMap<>();
+        private final NetworkIndex<NetworkSnapshot> index = new NetworkIndex<>();
         private final Map<BlockPos, NetworkState> stateByAnchor = new HashMap<>();
         private final List<PendingEnergyPass> pendingEnergyPasses = new ArrayList<>();
         private long lastPruneGameTime = Long.MIN_VALUE;
-        private long epoch;
 
         private NetworkSnapshot getOrBuild(Level level, BlockPos startPos) {
             long gameTime = level.getGameTime();
             pruneStaleSnapshots(gameTime);
 
-            NetworkSnapshot snapshot = byCablePosition.get(startPos);
-            if (snapshot != null && snapshot.isFresh(gameTime)) {
+            NetworkSnapshot snapshot = index.get(startPos, gameTime, SNAPSHOT_LIFETIME_TICKS);
+            if (snapshot != null) {
                 return snapshot;
             }
 
-            if (snapshot != null) {
-                removeSnapshot(snapshot);
-            }
-
             snapshot = buildNetworkSnapshot(level, startPos, gameTime, this);
-            addSnapshot(snapshot);
+            index.put(snapshot, snapshot.cablePositions(), gameTime);
             return snapshot;
         }
 
@@ -1558,23 +1580,11 @@ public class CableBlockEntity extends BlockEntity implements UniversalConnectorD
         }
 
         private void invalidate(BlockPos pos) {
-            epoch++;
-            NetworkSnapshot snapshot = byCablePosition.remove(pos);
-            if (snapshot != null) {
-                removeSnapshot(snapshot);
-            }
+            index.connectorChanged(pos);
         }
 
-        private void addSnapshot(NetworkSnapshot snapshot) {
-            for (BlockPos cablePos : snapshot.cablePositions()) {
-                byCablePosition.put(cablePos, snapshot);
-            }
-        }
-
-        private void removeSnapshot(NetworkSnapshot snapshot) {
-            for (BlockPos cablePos : snapshot.cablePositions()) {
-                byCablePosition.remove(cablePos, snapshot);
-            }
+        private void cableChanged(BlockPos pos) {
+            index.cableChanged(pos);
         }
 
         private void pruneStaleSnapshots(long gameTime) {
@@ -1583,7 +1593,7 @@ public class CableBlockEntity extends BlockEntity implements UniversalConnectorD
             }
 
             lastPruneGameTime = gameTime;
-            byCablePosition.entrySet().removeIf(entry -> !entry.getValue().isFresh(gameTime));
+            index.prune(gameTime, SNAPSHOT_LIFETIME_TICKS);
             stateByAnchor.values().removeIf(state -> state.telemetry.unusedFor(gameTime) > TELEMETRY_RETENTION_TICKS);
         }
     }
@@ -1612,6 +1622,7 @@ public class CableBlockEntity extends BlockEntity implements UniversalConnectorD
         private final int[] fluidCursors;
         private final long[] energyPassTicks = new long[MAX_CHANNEL + 1];
         private NetworkDebugSnapshot debugSnapshot;
+        private long debugSnapshotTick = Long.MIN_VALUE;
 
         private NetworkSnapshot(
                 long gameTime,
@@ -1644,10 +1655,6 @@ public class CableBlockEntity extends BlockEntity implements UniversalConnectorD
             return true;
         }
 
-        private boolean isFresh(long gameTime) {
-            return this.gameTime == gameTime;
-        }
-
         private List<BlockPos> cablePositions() {
             return cablePositions;
         }
@@ -1668,9 +1675,11 @@ public class CableBlockEntity extends BlockEntity implements UniversalConnectorD
             return bridgeEndpoints;
         }
 
+        /** Connector readouts change every tick even while the network does not, so this is rebuilt once per tick. */
         private NetworkDebugSnapshot debugSnapshot(Level level) {
-            if (debugSnapshot == null) {
+            if (debugSnapshot == null || debugSnapshotTick != level.getGameTime()) {
                 debugSnapshot = buildNetworkDebugSnapshot(level, this);
+                debugSnapshotTick = level.getGameTime();
             }
             return debugSnapshot;
         }
