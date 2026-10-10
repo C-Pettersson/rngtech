@@ -314,7 +314,7 @@ Status color guidance:
 | Disabled by player/config | Gray/red icon plus tooltip.                                |
 | Environmental block       | Context icon, such as sun/cloud/obstruction, plus tooltip. |
 
-Never rely on color alone. Use an icon shape, symbol, or tooltip so colorblind players and small-screen players can still understand the state.
+Never rely on color alone. Use an icon shape, symbol, or tooltip so colorblind players and small-screen players can still understand the state. Timed-machine status icons draw one glyph per state class through `MachineScreenStyle.renderStatusGlyph`: a check for running, a dot for idle, a pause for waiting on an input or resource, `!` for blocked, and a cross for an error such as an invalid recipe.
 
 ## Layout Templates
 

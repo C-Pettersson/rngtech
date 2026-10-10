@@ -31,8 +31,6 @@ public class MelterScreen extends AbstractContainerScreen<MelterMenu> {
     private static final int INPUT_FLUID = 0xFF5C86C7;
     private static final int OUTPUT_FLUID = 0xFFB9A33F;
     private static final int STATUS_READY = 0xFF5F8A45;
-    private static final int STATUS_WARN = 0xFFAA7A31;
-    private static final int STATUS_ERROR = 0xFFB45B4A;
     private static final int STAT_ACCENT = 0xFFB86B28;
     private static final int START_NODE = 0xFF38D857;
     private static final int MASTERY_RING = 0xFF4A5A3A;
@@ -409,7 +407,7 @@ public class MelterScreen extends AbstractContainerScreen<MelterMenu> {
         );
 
         renderIconBox(guiGraphics, STATUS_X, STATUS_Y);
-        renderStatusGlyph(guiGraphics, STATUS_X, STATUS_Y);
+        MachineScreenStyle.renderStatusGlyph(guiGraphics, leftPos + STATUS_X, topPos + STATUS_Y, statusState());
         renderIconBox(guiGraphics, TRANSFER_X, STATUS_Y);
         renderTransferGlyph(guiGraphics, TRANSFER_X, STATUS_Y);
         renderPurgeButtons(guiGraphics);
@@ -603,14 +601,14 @@ public class MelterScreen extends AbstractContainerScreen<MelterMenu> {
     }
 
     private Component heatTooltip() {
-        return Component.literal("Heat: " + menu.heat() + " / " + menu.minimumTemperature() + " C");
+        return Component.translatable("rngtech.melter.tooltip.heat", menu.heat(), menu.minimumTemperature());
     }
 
     private Component progressTooltip() {
         int ticks = menu.processingTicks();
         return ticks <= 0
-                ? Component.literal("Progress: -- / --")
-                : Component.literal("Progress: " + menu.progress() + " / " + ticks);
+                ? Component.translatable("rngtech.melter.tooltip.progress.empty")
+                : Component.translatable("rngtech.melter.tooltip.progress", menu.progress(), ticks);
     }
 
     private Component inputFluidTooltip() {
@@ -618,13 +616,13 @@ public class MelterScreen extends AbstractContainerScreen<MelterMenu> {
     }
 
     private Component outputFluidTooltip() {
-        return FluidMeterTooltips.amount(menu.outputFluidName(), menu.outputFluid(), menu.outputFluidCapacity(), "transfer " + menu.fluidTransfer() + " mB/t");
+        return FluidMeterTooltips.amount(menu.outputFluidName(), menu.outputFluid(), menu.outputFluidCapacity(), Component.translatable("rngtech.melter.tooltip.transfer_detail", menu.fluidTransfer()));
     }
 
     private Component transferTooltip() {
         return menu.fluidTransfer() > 0
-                ? Component.literal("Output transfer: " + menu.fluidTransfer() + " mB/t")
-                : Component.literal("Output transfer: no Fluid Pump");
+                ? Component.translatable("rngtech.melter.tooltip.transfer", menu.fluidTransfer())
+                : Component.translatable("rngtech.melter.tooltip.transfer.none");
     }
 
     private Component processingLevelTooltip() {
@@ -742,15 +740,16 @@ public class MelterScreen extends AbstractContainerScreen<MelterMenu> {
         };
     }
 
-    private int statusColor() {
+    private MachineScreenStyle.StatusState statusState() {
         return switch (menu.status()) {
-            case MelterBlockEntity.STATUS_READY -> STATUS_READY;
+            case MelterBlockEntity.STATUS_READY -> MachineScreenStyle.StatusState.RUNNING;
             case MelterBlockEntity.STATUS_NO_POWER,
                     MelterBlockEntity.STATUS_NO_FLUID,
                     MelterBlockEntity.STATUS_NO_INPUT,
                     MelterBlockEntity.STATUS_MISSING_HEAT_CORE,
-                    MelterBlockEntity.STATUS_MISSING_CRUSH_HEAD -> STATUS_WARN;
-            default -> STATUS_ERROR;
+                    MelterBlockEntity.STATUS_MISSING_CRUSH_HEAD -> MachineScreenStyle.StatusState.WAITING;
+            case MelterBlockEntity.STATUS_INVALID_RECIPE -> MachineScreenStyle.StatusState.ERROR;
+            default -> MachineScreenStyle.StatusState.BLOCKED;
         };
     }
 
@@ -831,17 +830,6 @@ public class MelterScreen extends AbstractContainerScreen<MelterMenu> {
         guiGraphics.fill(leftPos + x, topPos + y, leftPos + x + STATUS_SIZE, topPos + y + STATUS_SIZE, 0xFF5F5F5F);
         guiGraphics.fill(leftPos + x + 1, topPos + y + 1, leftPos + x + STATUS_SIZE - 1, topPos + y + STATUS_SIZE - 1, PANEL_LIGHT);
         guiGraphics.fill(leftPos + x + 2, topPos + y + 2, leftPos + x + STATUS_SIZE - 2, topPos + y + STATUS_SIZE - 2, PANEL_DARK);
-    }
-
-    private void renderStatusGlyph(GuiGraphics guiGraphics, int x, int y) {
-        int left = leftPos + x;
-        int top = topPos + y;
-        int color = statusColor();
-        guiGraphics.fill(left + 3, top + 3, left + 9, top + 9, color);
-        if (menu.status() != MelterBlockEntity.STATUS_READY) {
-            guiGraphics.fill(left + 5, top + 3, left + 7, top + 7, 0xFF2F2F2F);
-            guiGraphics.fill(left + 5, top + 8, left + 7, top + 10, 0xFF2F2F2F);
-        }
     }
 
     private void renderTransferGlyph(GuiGraphics guiGraphics, int x, int y) {

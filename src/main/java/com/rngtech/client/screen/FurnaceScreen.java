@@ -35,7 +35,6 @@ public class FurnaceScreen extends AbstractContainerScreen<FurnaceMenu> {
     private static final int FAILURE = 0xFFB45B4A;
     private static final int LEDGER = 0xFFD3A33A;
     private static final int STAT_ACCENT = 0xFFD18A3C;
-    private static final int STATUS_ERROR = 0xFFB45B4A;
     private static final int STAT_PANEL_X = 8;
     private static final int STAT_PANEL_Y = 18;
     private static final int STAT_PANEL_WIDTH = 224;
@@ -493,13 +492,7 @@ public class FurnaceScreen extends AbstractContainerScreen<FurnaceMenu> {
 
     private void renderStatusIcon(GuiGraphics guiGraphics) {
         renderIconBox(guiGraphics, STATUS_ICON_X, STATUS_ICON_Y);
-        guiGraphics.fill(
-                leftPos + STATUS_ICON_X + 3,
-                topPos + STATUS_ICON_Y + 3,
-                leftPos + STATUS_ICON_X + 9,
-                topPos + STATUS_ICON_Y + 9,
-                statusColor()
-        );
+        MachineScreenStyle.renderStatusGlyph(guiGraphics, leftPos + STATUS_ICON_X, topPos + STATUS_ICON_Y, statusState());
     }
 
     private void renderConfiguration(GuiGraphics guiGraphics) {
@@ -744,17 +737,18 @@ public class FurnaceScreen extends AbstractContainerScreen<FurnaceMenu> {
         };
     }
 
-    private int statusColor() {
+    private MachineScreenStyle.StatusState statusState() {
         return switch (menu.statusCode()) {
-            case FurnaceBlockEntity.STATUS_READY -> PROGRESS;
-            case FurnaceBlockEntity.STATUS_NO_INPUT -> PANEL_DARK;
+            case FurnaceBlockEntity.STATUS_READY -> MachineScreenStyle.StatusState.RUNNING;
+            case FurnaceBlockEntity.STATUS_NO_INPUT -> MachineScreenStyle.StatusState.IDLE;
             case FurnaceBlockEntity.STATUS_NO_POWER,
                     FurnaceBlockEntity.STATUS_POWER_LIMITED,
                     FurnaceBlockEntity.STATUS_NO_FUEL,
                     FurnaceBlockEntity.STATUS_WARMING,
                     FurnaceBlockEntity.STATUS_POWER_DROP,
-                    FurnaceBlockEntity.STATUS_FAILURE_RISK -> FUEL;
-            default -> STATUS_ERROR;
+                    FurnaceBlockEntity.STATUS_FAILURE_RISK -> MachineScreenStyle.StatusState.WAITING;
+            case FurnaceBlockEntity.STATUS_INVALID_RECIPE -> MachineScreenStyle.StatusState.ERROR;
+            default -> MachineScreenStyle.StatusState.BLOCKED;
         };
     }
 

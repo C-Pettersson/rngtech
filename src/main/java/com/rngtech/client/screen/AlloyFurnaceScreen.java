@@ -31,9 +31,6 @@ public class AlloyFurnaceScreen extends AbstractContainerScreen<AlloyFurnaceMenu
     private static final int PROGRESS = 0xFFB87832;
     private static final int BLEND_LEDGER = 0xFFD3A33A;
     private static final int FLUX_LEDGER = 0xFF8FB4D8;
-    private static final int STATUS_READY = 0xFF5F8A45;
-    private static final int STATUS_WARN = 0xFFAA7A31;
-    private static final int STATUS_ERROR = 0xFFB45B4A;
     private static final int STAT_ACCENT = 0xFFB87832;
     private static final int MASTERY_START_NODE = 0xFF38D857;
     private static final int MASTERY_RING = 0xFF6D4A24;
@@ -395,9 +392,9 @@ public class AlloyFurnaceScreen extends AbstractContainerScreen<AlloyFurnaceMenu
         }
 
         renderIconBox(guiGraphics, STATUS_ICON_X, STATUS_ICON_Y);
-        guiGraphics.fill(x + STATUS_ICON_X + 3, y + STATUS_ICON_Y + 3, x + STATUS_ICON_X + 9, y + STATUS_ICON_Y + 9, statusColor());
+        MachineScreenStyle.renderStatusGlyph(guiGraphics, x + STATUS_ICON_X, y + STATUS_ICON_Y, statusState());
         renderIconBox(guiGraphics, HEAT_ICON_X, STATUS_ICON_Y);
-        guiGraphics.fill(x + HEAT_ICON_X + 3, y + STATUS_ICON_Y + 3, x + HEAT_ICON_X + 9, y + STATUS_ICON_Y + 9, heatGateColor());
+        MachineScreenStyle.renderStatusGlyph(guiGraphics, x + HEAT_ICON_X, y + STATUS_ICON_Y, heatGateState());
     }
 
     private void renderStats(GuiGraphics guiGraphics) {
@@ -597,9 +594,9 @@ public class AlloyFurnaceScreen extends AbstractContainerScreen<AlloyFurnaceMenu
         };
     }
 
-    private int statusColor() {
+    private MachineScreenStyle.StatusState statusState() {
         return switch (menu.status()) {
-            case AlloyFurnaceBlockEntity.STATUS_READY -> STATUS_READY;
+            case AlloyFurnaceBlockEntity.STATUS_READY -> MachineScreenStyle.StatusState.RUNNING;
             case AlloyFurnaceBlockEntity.STATUS_NO_POWER,
                     AlloyFurnaceBlockEntity.STATUS_NO_INPUT,
                     AlloyFurnaceBlockEntity.STATUS_MISSING_HEAT_CORE,
@@ -607,16 +604,17 @@ public class AlloyFurnaceScreen extends AbstractContainerScreen<AlloyFurnaceMenu
                     AlloyFurnaceBlockEntity.STATUS_HEAT_LOW,
                     AlloyFurnaceBlockEntity.STATUS_WARMING,
                     AlloyFurnaceBlockEntity.STATUS_POWER_DROP,
-                    AlloyFurnaceBlockEntity.STATUS_FAILURE_RISK -> STATUS_WARN;
-            default -> STATUS_ERROR;
+                    AlloyFurnaceBlockEntity.STATUS_FAILURE_RISK -> MachineScreenStyle.StatusState.WAITING;
+            case AlloyFurnaceBlockEntity.STATUS_INVALID_RECIPE -> MachineScreenStyle.StatusState.ERROR;
+            default -> MachineScreenStyle.StatusState.BLOCKED;
         };
     }
 
-    private int heatGateColor() {
+    private MachineScreenStyle.StatusState heatGateState() {
         return menu.targetTemperature() <= 0
                         || menu.heat() >= menu.targetTemperature()
-                ? STATUS_READY
-                : STATUS_WARN;
+                ? MachineScreenStyle.StatusState.RUNNING
+                : MachineScreenStyle.StatusState.WAITING;
     }
 
     private MachineScreenStyle.StatLine[] statLines() {
