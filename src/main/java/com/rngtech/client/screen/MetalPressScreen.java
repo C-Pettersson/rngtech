@@ -722,7 +722,7 @@ public class MetalPressScreen extends AbstractContainerScreen<MetalPressMenu> {
                             STAT_TYPES[index],
                             value
                     )
-            );
+            ).withStat(STAT_TYPES[index]);
         }
         return MachineScreenStyle.fitStatLines(
                 MachineScreenStyle.withAscendancyStats(statLines, menu.ascendancyStats()),

@@ -9,11 +9,13 @@ import com.rngtech.rpg.ModifierOperation;
 import com.rngtech.rpg.ModifierSlot;
 
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
 
 final class BulkSpeedState {
     private static final String TAG_BULK_SPEED_PROCESSES = "BulkSpeedProcesses";
     private static final int MAX_BONUS_PERCENT = 100;
+    private static final Component BULK_SPEED_SOURCE = Component.translatable(MachineBehavior.BULK_SPEED.translationKey());
 
     private int completedProcesses;
 
@@ -21,7 +23,7 @@ final class BulkSpeedState {
         if (!traits.hasBehavior(MachineBehavior.BULK_SPEED) || completedProcesses <= 0) {
             return;
         }
-        stats.apply(new MachineModifier(
+        stats.apply(BULK_SPEED_SOURCE, new MachineModifier(
                 ModifierSlot.IMPLICIT,
                 MachineStat.PROCESSING_SPEED,
                 ModifierOperation.INCREASED_PERCENT,

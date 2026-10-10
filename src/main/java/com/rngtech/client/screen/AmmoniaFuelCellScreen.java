@@ -159,7 +159,7 @@ public class AmmoniaFuelCellScreen extends AbstractContainerScreen<AmmoniaFuelCe
                 false,
                 value > 1.001,
                 MachineScreenStyle.statLayerTooltip(menu.getSlot(menu.refinementTargetSlot()).getItem(), stat, value)
-        );
+        ).withStat(stat);
     }
 
     private void renderTabs(GuiGraphics guiGraphics) {

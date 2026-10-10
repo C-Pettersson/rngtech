@@ -988,12 +988,14 @@ public class CavitationGeneratorBlockEntity extends BaseMachineBlockEntity
         if (contribution == null) {
             return;
         }
-        applyMoreStat(stats, MachineStat.HEAT_TRANSFER, contribution.value(MachineStat.HEAT_TRANSFER));
-        applyMoreStat(stats, MachineStat.HEAT_ISOLATION, contribution.value(MachineStat.HEAT_ISOLATION));
-        applyMoreStat(stats, MachineStat.COOLING_RATE, contribution.value(MachineStat.COOLING_RATE));
-        applyMoreStat(stats, MachineStat.TEMPERATURE_STABILITY, contribution.value(MachineStat.TEMPERATURE_STABILITY));
-        applyMoreStat(stats, MachineStat.OVERHEAT_TOLERANCE, contribution.value(MachineStat.OVERHEAT_TOLERANCE));
-        applyAddStat(stats, MachineStat.MAX_TEMPERATURE, contribution.value(MachineStat.MAX_TEMPERATURE));
+        try (MachineStatAccumulator.Source ignored = stats.source(stack.getHoverName())) {
+            applyMoreStat(stats, MachineStat.HEAT_TRANSFER, contribution.value(MachineStat.HEAT_TRANSFER));
+            applyMoreStat(stats, MachineStat.HEAT_ISOLATION, contribution.value(MachineStat.HEAT_ISOLATION));
+            applyMoreStat(stats, MachineStat.COOLING_RATE, contribution.value(MachineStat.COOLING_RATE));
+            applyMoreStat(stats, MachineStat.TEMPERATURE_STABILITY, contribution.value(MachineStat.TEMPERATURE_STABILITY));
+            applyMoreStat(stats, MachineStat.OVERHEAT_TOLERANCE, contribution.value(MachineStat.OVERHEAT_TOLERANCE));
+            applyAddStat(stats, MachineStat.MAX_TEMPERATURE, contribution.value(MachineStat.MAX_TEMPERATURE));
+        }
     }
 
     private void applyMoreStat(MachineStatAccumulator stats, MachineStat stat, double value) {

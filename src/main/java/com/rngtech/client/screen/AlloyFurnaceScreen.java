@@ -634,7 +634,7 @@ public class AlloyFurnaceScreen extends AbstractContainerScreen<AlloyFurnaceMenu
                             STAT_TYPES[index],
                             value
                     )
-            );
+            ).withStat(STAT_TYPES[index]);
         }
         return MachineScreenStyle.fitStatLines(
                 MachineScreenStyle.withAscendancyStats(statLines, menu.ascendancyStats()),

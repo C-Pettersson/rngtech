@@ -493,7 +493,7 @@ public class ComponentRecyclerScreen extends AbstractContainerScreen<ComponentRe
                             STAT_TYPES[index],
                             value
                     )
-            );
+            ).withStat(STAT_TYPES[index]);
         }
         return statLines;
     }

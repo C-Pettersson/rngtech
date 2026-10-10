@@ -643,7 +643,7 @@ public class CompressorTankScreen extends AbstractContainerScreen<CompressorTank
                             statTypes[index],
                             value
                     )
-            );
+            ).withStat(statTypes[index]);
         }
         return statLines;
     }

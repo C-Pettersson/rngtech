@@ -12,6 +12,8 @@ import com.rngtech.rpg.MachineStatAccumulator;
 import com.rngtech.rpg.ModifierOperation;
 import com.rngtech.rpg.ModifierSlot;
 import com.rngtech.rpg.PartGenerationChecks;
+import com.rngtech.rpg.StatBreakdown;
+import com.rngtech.rpg.StatBreakdownChecks;
 import com.rngtech.rpg.refinement.RefinementChecks;
 
 import com.google.gson.JsonParser;
@@ -26,6 +28,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /** Executable domain checks without launching a client or server. */
 public final class MasteryChecks {
@@ -42,10 +45,12 @@ public final class MasteryChecks {
         taggedPayoffs();
         keystonePayoffsNeedTheirCosts();
         bonusSummary();
+        statBreakdowns();
         iconTextures();
         checks += AscendancyChecks.run();
         checks += PartGenerationChecks.run();
         checks += RefinementChecks.run();
+        checks += StatBreakdownChecks.run();
         System.out.println("Machine mastery: " + checks + " checks passed");
         ForestryTreeScanChecks.run();
         ForestryCartRulesChecks.run();
@@ -404,6 +409,31 @@ public final class MasteryChecks {
         }
         for (String key : MegaPassiveTree.TREE.nodes().stream().map(MegaPassiveNode::masteryIconKey).collect(Collectors.toSet())) {
             require(MasteryChecks.class.getResource("/assets/rngtech/textures/gui/mastery/" + key + ".png") != null, "icon texture exists: " + key);
+        }
+    }
+
+    /** Shift-hover breakdowns of a passive build recombine to the pipeline's values and name the nodes behind them. */
+    private static void statBreakdowns() {
+        for (MachineMasteryFamily family : MachineMasteryFamily.values()) {
+            var state = build(family, "single_pass");
+            MachineStatAccumulator stats = MachineStatAccumulator.recording(() -> {
+                MachineStatAccumulator recorded = MachineStatAccumulator.componentBase(BASE_100);
+                MegaPassiveTree.applyStats(recorded, state, family);
+                return recorded;
+            });
+            for (StatBreakdown breakdown : stats.breakdowns()) {
+                near(breakdown.recompute(), stats.value(breakdown.stat()), family + " breakdown recombines " + breakdown.stat());
+                require(breakdown.terms().stream().noneMatch(term -> term.source().getString().equals("rngtech.stat.breakdown.source.machine")),
+                        family + " passive contributions all name their source for " + breakdown.stat());
+            }
+            String singlePass = MegaPassiveTree.node("single_pass").translationKey();
+            require(stats.breakdowns().stream().flatMap(breakdown -> breakdown.terms().stream())
+                    .anyMatch(term -> term.source().getString().equals(singlePass)) == family.has(MachineTag.BONUS_OUTPUT),
+                    family + " breakdown names the Single Pass node where it pays out");
+            require(Stream.of(MachineStat.CONTROL, MachineStat.DRIVE, MachineStat.RESERVE)
+                    .flatMap(attribute -> stats.breakdown(attribute).orElseThrow().terms().stream())
+                    .anyMatch(term -> term.source().getString().equals("rngtech.stat.breakdown.source.inherent")),
+                    family + " inherent attribute points are labelled Inherent");
         }
     }
 

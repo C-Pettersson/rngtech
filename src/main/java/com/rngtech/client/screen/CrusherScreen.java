@@ -738,7 +738,7 @@ public class CrusherScreen extends AbstractContainerScreen<CrusherMenu> {
                     isIntegralStat(STAT_DATA_INDICES[index]),
                     isEnhancedStat(STAT_DATA_INDICES[index], value),
                     tooltip
-            );
+            ).withStat(STAT_TYPES[index]);
         }
         return MachineScreenStyle.fitStatLines(
                 MachineScreenStyle.withAscendancyStats(MachineScreenStyle.withoutInactiveModifierStats(STAT_TYPES, statLines), menu.ascendancyStats()),

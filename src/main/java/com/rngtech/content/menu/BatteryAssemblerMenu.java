@@ -4,6 +4,7 @@ import com.rngtech.content.block.BatteryAssemblerBlock;
 import com.rngtech.content.blockentity.BatteryAssemblerBlockEntity;
 import com.rngtech.content.purge.FluidPurgeSupport;
 import com.rngtech.content.registry.ModMenus;
+import com.rngtech.rpg.MachineStatAccumulator;
 import com.rngtech.rpg.MachineTraits;
 
 import net.minecraft.core.BlockPos;
@@ -28,7 +29,7 @@ import net.neoforged.neoforge.items.SlotItemHandler;
 
 import java.util.function.BooleanSupplier;
 
-public class BatteryAssemblerMenu extends AbstractContainerMenu {
+public class BatteryAssemblerMenu extends AbstractContainerMenu implements StatBreakdownMenu {
     public static final int TAB_PROCESSING = 0;
     public static final int TAB_GEAR = 1;
     public static final int TAB_CONFIGURATION = 2;
@@ -246,6 +247,11 @@ public class BatteryAssemblerMenu extends AbstractContainerMenu {
             return true;
         }
         return RefinementMenuSupport.applyToMachine(player, assembler, refinementTarget, assembler.getBlockState().getBlock());
+    }
+
+    @Override
+    public MachineStatAccumulator breakdownStats() {
+        return assembler.effectiveStats();
     }
 
     @Override

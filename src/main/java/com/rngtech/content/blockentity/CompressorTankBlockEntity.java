@@ -74,6 +74,7 @@ public class CompressorTankBlockEntity extends BaseMachineBlockEntity
     public static final int PURGE_LOOSE_TANK = 0;
     public static final int PURGE_COMPRESSED_TANK = 1;
 
+    private static final Component SERVO_SOURCE = Component.translatable("rngtech.stat.breakdown.source.servos");
     private static final int DATA_LOOSE_FLUID = 0;
     private static final int DATA_LOOSE_FLUID_CAPACITY = 1;
     private static final int DATA_COMPRESSED_PHYSICAL = 2;
@@ -728,11 +729,11 @@ public class CompressorTankBlockEntity extends BaseMachineBlockEntity
         if (count <= 0) {
             return;
         }
-        stats.apply(new MachineModifier(ModifierSlot.IMPLICIT, MachineStat.PROCESSING_SPEED, ModifierOperation.MORE, processingSpeed / count));
-        stats.apply(new MachineModifier(ModifierSlot.IMPLICIT, MachineStat.ENERGY_USAGE, ModifierOperation.MORE, energyUsage / count));
-        stats.apply(new MachineModifier(ModifierSlot.IMPLICIT, MachineStat.STABILITY, ModifierOperation.MORE, stability / count));
+        stats.apply(SERVO_SOURCE, new MachineModifier(ModifierSlot.IMPLICIT, MachineStat.PROCESSING_SPEED, ModifierOperation.MORE, processingSpeed / count));
+        stats.apply(SERVO_SOURCE, new MachineModifier(ModifierSlot.IMPLICIT, MachineStat.ENERGY_USAGE, ModifierOperation.MORE, energyUsage / count));
+        stats.apply(SERVO_SOURCE, new MachineModifier(ModifierSlot.IMPLICIT, MachineStat.STABILITY, ModifierOperation.MORE, stability / count));
         if (refinementPotential > 0) {
-            stats.apply(new MachineModifier(
+            stats.apply(SERVO_SOURCE, new MachineModifier(
                     ModifierSlot.IMPLICIT,
                     MachineStat.REFINEMENT_POTENTIAL,
                     ModifierOperation.ADD,
