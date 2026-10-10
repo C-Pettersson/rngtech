@@ -222,7 +222,7 @@ public final class Ae2CableBridgeCompat {
         }
 
         private IGridConnection createConnection(Level level, IGridNode node, PeerKey peer) {
-            if (!(level.getBlockEntity(peer.pos()) instanceof CableBlockEntity cable)) {
+            if (!level.isLoaded(peer.pos()) || !(level.getBlockEntity(peer.pos()) instanceof CableBlockEntity cable)) {
                 return null;
             }
             IGridNode peerNode = host(cable).endpoint(peer.side()).gridNode(false);

@@ -246,6 +246,9 @@ public final class CableUniversalConnectorData implements UniversalConnectorAcce
             return null;
         }
         BlockPos targetPos = owner.getBlockPos().relative(face);
+        if (!level.isLoaded(targetPos)) {
+            return null;
+        }
         BlockState targetState = level.getBlockState(targetPos);
         if (targetState.getBlock() instanceof UniversalConnectorBlock || targetState.getBlock() instanceof CableBlock) {
             return null;
@@ -1041,6 +1044,9 @@ public final class CableUniversalConnectorData implements UniversalConnectorAcce
         }
 
         BlockPos targetPos = owner.getBlockPos().relative(face);
+        if (!level.isLoaded(targetPos)) {
+            return false;
+        }
         BlockState targetState = level.getBlockState(targetPos);
         if (targetState.getBlock() instanceof UniversalConnectorBlock || targetState.getBlock() instanceof CableBlock) {
             return false;
@@ -1163,6 +1169,9 @@ public final class CableUniversalConnectorData implements UniversalConnectorAcce
             return 0;
         }
         BlockPos targetPos = owner.getBlockPos().relative(face);
+        if (!level.isLoaded(targetPos)) {
+            return 0;
+        }
         BlockState targetState = level.getBlockState(targetPos);
         if (targetState.getBlock() instanceof UniversalConnectorBlock || targetState.getBlock() instanceof CableBlock) {
             return 0;
@@ -1212,6 +1221,9 @@ public final class CableUniversalConnectorData implements UniversalConnectorAcce
             return null;
         }
         BlockPos targetPos = owner.getBlockPos().relative(face);
+        if (!level.isLoaded(targetPos)) {
+            return null;
+        }
         BlockState targetState = level.getBlockState(targetPos);
         if (targetState.getBlock() instanceof UniversalConnectorBlock || targetState.getBlock() instanceof CableBlock) {
             return null;
@@ -1225,6 +1237,9 @@ public final class CableUniversalConnectorData implements UniversalConnectorAcce
             return null;
         }
         BlockPos targetPos = owner.getBlockPos().relative(face);
+        if (!level.isLoaded(targetPos)) {
+            return null;
+        }
         BlockState targetState = level.getBlockState(targetPos);
         if (targetState.getBlock() instanceof UniversalConnectorBlock || targetState.getBlock() instanceof CableBlock) {
             return null;
@@ -1371,7 +1386,8 @@ public final class CableUniversalConnectorData implements UniversalConnectorAcce
 
     public boolean hasValidAttachmentTarget() {
         Level level = owner.getLevel();
-        return level != null && CableBlock.isValidConnectorTarget(level.getBlockState(owner.getBlockPos().relative(face)));
+        BlockPos targetPos = owner.getBlockPos().relative(face);
+        return level != null && level.isLoaded(targetPos) && CableBlock.isValidConnectorTarget(level.getBlockState(targetPos));
     }
 
     private int sameChannelBridgeEndpointCount() {

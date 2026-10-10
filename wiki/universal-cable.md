@@ -83,6 +83,8 @@ Mine Cables and Universal Connectors with a pickaxe. Aiming at a connector on a 
 
 One Cable can hold a connector on each of its six faces.
 
+A network reaches only as far as the loaded world. Cables and machines in unloaded chunks drop out of the network and move nothing, and they join back in by themselves once their chunk loads again. Cables never keep chunks loaded.
+
 Energy Connectors are modules: they go in a Universal Connector's Energy tab, or in the Gear slot of a [Tool Bench](tool-bench.md) or [Forestry Cart Station](forestry-cart-station.md). Right-clicking a Cable with one does not place it on the cable; if you aim at a connector, that connector's screen opens instead. Direct Energy Connectors on a cable face from older worlds keep working, and you can still configure and mine them, but you cannot place new ones.
 
 #### Standalone plates
