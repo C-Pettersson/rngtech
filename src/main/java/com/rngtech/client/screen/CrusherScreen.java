@@ -720,10 +720,6 @@ public class CrusherScreen extends AbstractContainerScreen<CrusherMenu> {
         return String.format(Locale.ROOT, "%.2fx", value);
     }
 
-    private String formatPercent(double value) {
-        return String.format(Locale.ROOT, "+%.0f%%", value);
-    }
-
     private String formatPerThousandPercent(int value) {
         double percent = value / 10.0D;
         String pattern = percent == Math.rint(percent) ? "%.0f%%" : "%.1f%%";
@@ -734,7 +730,7 @@ public class CrusherScreen extends AbstractContainerScreen<CrusherMenu> {
         MachineScreenStyle.StatLine[] statLines = new MachineScreenStyle.StatLine[STAT_LABEL_KEYS.length];
         for (int index = 0; index < STAT_LABEL_KEYS.length; index++) {
             double value = menu.statValue(STAT_DATA_INDICES[index]);
-            List<Component> tooltip = statTooltip(index, value);
+            Component tooltip = statTooltip(index, value);
             statLines[index] = MachineScreenStyle.statLine(
                     Component.translatable(STAT_LABEL_KEYS[index]),
                     statValue(index),
@@ -750,26 +746,14 @@ public class CrusherScreen extends AbstractContainerScreen<CrusherMenu> {
         );
     }
 
-    private List<Component> statTooltip(int index, double value) {
-        Component description = MachineScreenStyle.statLayerTooltip(
+    private Component statTooltip(int index, double value) {
+        if (STAT_DATA_INDICES[index] == CrusherMenu.outputAmountDataIndex() && !menu.hasBatteryCell()) {
+            return Component.translatable("rngtech.crusher.tooltip.output_amount_no_battery", formatMultiplier(value));
+        }
+        return MachineScreenStyle.statLayerTooltip(
                 menu.getSlot(menu.refinementTargetSlot()).getItem(),
                 STAT_TYPES[index],
                 value
-        );
-        if (STAT_DATA_INDICES[index] != CrusherMenu.outputAmountDataIndex()) {
-            return List.of(description);
-        }
-        return List.of(
-                menu.hasBatteryCell()
-                        ? description
-                        : Component.translatable("rngtech.crusher.tooltip.output_amount_no_battery", formatMultiplier(value)),
-                Component.translatable(
-                        "rngtech.crusher.tooltip.yield_bucket",
-                        formatPercent(menu.yieldIncreasedPercent()),
-                        formatPercent(menu.yieldBonusPercent())
-                ).withStyle(ChatFormatting.GRAY),
-                Component.translatable("rngtech.crusher.tooltip.yield_time", String.format(Locale.ROOT, "%.0f%%", menu.yieldBonusPercent()))
-                        .withStyle(ChatFormatting.GRAY)
         );
     }
 

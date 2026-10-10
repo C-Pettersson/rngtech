@@ -38,6 +38,7 @@ public final class StatBreakdownText {
                 "rngtech.stat.breakdown.increased",
                 MachineStatDisplay.formatSignedPercentPoints(breakdown.increasedPercent())
         );
+        softCap(lines, breakdown);
         section(lines, breakdown, StatBreakdown.Kind.MORE, "rngtech.stat.breakdown.more", factor(breakdown.more()));
 
         if (hasScaling(breakdown)) {
@@ -47,13 +48,6 @@ public final class StatBreakdownText {
                     factor(breakdown.increasedScale()),
                     factor(breakdown.more()),
                     amount(stat, breakdown.ordinary())
-            ).withStyle(ChatFormatting.GRAY));
-        }
-        if (breakdown.lowest(StatBreakdown.Kind.SOFT_CAP) != null && breakdown.increasedPercent() > 0.0) {
-            lines.add(Component.translatable(
-                    "rngtech.stat.breakdown.soft_cap",
-                    MachineStatDisplay.formatSignedPercentPoints(breakdown.increasedPercent()),
-                    MachineStatDisplay.formatSignedPercentPoints(breakdown.paidIncreasedPercent())
             ).withStyle(ChatFormatting.GRAY));
         }
         if (breakdown.dividesReductions() && breakdown.reductionsPercent() > 0.0) {
@@ -69,6 +63,26 @@ public final class StatBreakdownText {
         override(lines, breakdown.lowest(StatBreakdown.Kind.FIXED), "rngtech.stat.breakdown.fixed", stat);
         override(lines, breakdown.lowest(StatBreakdown.Kind.CEILING), "rngtech.stat.breakdown.capped", stat);
         return lines;
+    }
+
+    /** Shows how the soft cap bends a positive increased bucket; on Crusher yield the paid share also lengthens cycles. */
+    private static void softCap(List<Component> lines, StatBreakdown breakdown) {
+        StatBreakdown.Term cap = breakdown.lowest(StatBreakdown.Kind.SOFT_CAP);
+        double increased = breakdown.increasedPercent();
+        if (cap == null || increased <= 0.0) {
+            return;
+        }
+        String bucket = MachineStatDisplay.formatNumber(increased);
+        String limit = MachineStatDisplay.formatNumber(cap.value());
+        String paid = MachineStatDisplay.formatSignedPercentPoints(breakdown.paidIncreasedPercent());
+        lines.add(Component.translatable("rngtech.stat.breakdown.soft_cap", bucket, limit, bucket, limit, paid)
+                .withStyle(ChatFormatting.GRAY));
+        if (breakdown.stat() == MachineStat.OUTPUT_AMOUNT) {
+            lines.add(Component.translatable(
+                    "rngtech.stat.breakdown.yield_time",
+                    MachineStatDisplay.formatNumber(Math.round(breakdown.paidIncreasedPercent())) + "%"
+            ).withStyle(ChatFormatting.GRAY));
+        }
     }
 
     private static void section(

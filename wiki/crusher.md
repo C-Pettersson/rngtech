@@ -196,7 +196,7 @@ The Crusher screen has five tabs:
 
 - **Process**: input, output, energy, progress, the bonus output bar, and status squares for the recipe and Battery Cell. Hover for FE per tick, FE per craft, hardness penalties, and jam chance.
 - **Gear**: Crush Head and Battery Cell slots.
-- **Stats**: the machine's current stats, including traits, Gear, and Mastery. Hover Bonus Output to see what your yield bonuses add up to, what that becomes after diminishing returns, and how much longer each cycle takes.
+- **Stats**: the machine's current stats, including traits, Gear, and Mastery. Hold Shift over Bonus Output to see what your yield bonuses add up to, the diminishing-returns math, and how much longer each cycle takes.
 - **Refinement**: refine the placed Crusher's traits with a catalyst.
 - **Mastery**: machine XP, level, and the passive tree.
 

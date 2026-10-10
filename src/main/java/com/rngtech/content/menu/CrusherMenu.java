@@ -73,9 +73,7 @@ public class CrusherMenu extends AbstractContainerMenu implements MasteryMenuVie
     private static final int DATA_BATTERY_SLOT_BLOCKED = DATA_MACHINE_PROGRESSION_START + MasteryMenuSupport.FIELD_COUNT;
     private static final int DATA_CRUSH_HEAD_MATCHING_STAGE_REQUIRED = DATA_BATTERY_SLOT_BLOCKED + 1;
     private static final int DATA_CHASSIS_STAGE = DATA_CRUSH_HEAD_MATCHING_STAGE_REQUIRED + 1;
-    private static final int DATA_YIELD_INCREASED = DATA_CHASSIS_STAGE + 1;
-    private static final int DATA_YIELD_BONUS = DATA_YIELD_INCREASED + 1;
-    private static final int DATA_COUNT = DATA_YIELD_BONUS + 1;
+    private static final int DATA_COUNT = DATA_CHASSIS_STAGE + 1;
     private static final int STAT_SCALE = 100;
     private static final int OUTPUT_BONUS_SCALE = 1000;
     private static final int MACHINE_SLOT_COUNT = CrusherBlockEntity.SLOT_COUNT;
@@ -229,16 +227,6 @@ public class CrusherMenu extends AbstractContainerMenu implements MasteryMenuVie
 
     public double underLevelPenaltyMultiplier() {
         return data.get(DATA_UNDER_LEVEL_PENALTY_MULTIPLIER) / (double) STAT_SCALE;
-    }
-
-    /** Summed increased Output Amount, in percent, before the soft cap. */
-    public double yieldIncreasedPercent() {
-        return data.get(DATA_YIELD_INCREASED) / (double) STAT_SCALE;
-    }
-
-    /** The soft-capped yield bonus in percent; cycles take this much longer. */
-    public double yieldBonusPercent() {
-        return data.get(DATA_YIELD_BONUS) / (double) STAT_SCALE;
     }
 
     public boolean hasBatteryCell() {

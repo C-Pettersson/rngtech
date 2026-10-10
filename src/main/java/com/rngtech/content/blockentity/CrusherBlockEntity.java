@@ -113,9 +113,7 @@ public class CrusherBlockEntity extends BaseMachineBlockEntity implements MenuPr
     private static final int DATA_BATTERY_SLOT_BLOCKED = DATA_MACHINE_PROGRESSION_START + MasteryMenuSupport.FIELD_COUNT;
     private static final int DATA_CRUSH_HEAD_MATCHING_STAGE_REQUIRED = DATA_BATTERY_SLOT_BLOCKED + 1;
     private static final int DATA_CHASSIS_STAGE = DATA_CRUSH_HEAD_MATCHING_STAGE_REQUIRED + 1;
-    private static final int DATA_YIELD_INCREASED = DATA_CHASSIS_STAGE + 1;
-    private static final int DATA_YIELD_BONUS = DATA_YIELD_INCREASED + 1;
-    private static final int DATA_COUNT = DATA_YIELD_BONUS + 1;
+    private static final int DATA_COUNT = DATA_CHASSIS_STAGE + 1;
     private static final int STAT_SCALE = 100;
 
     private final ItemStackHandler inventory = new ItemStackHandler(SLOT_COUNT) {
@@ -196,8 +194,6 @@ public class CrusherBlockEntity extends BaseMachineBlockEntity implements MenuPr
                 case DATA_BATTERY_SLOT_BLOCKED -> batteryCellSlotBlocked() ? 1 : 0;
                 case DATA_CRUSH_HEAD_MATCHING_STAGE_REQUIRED -> matchingStageCrushHeadRequired() ? 1 : 0;
                 case DATA_CHASSIS_STAGE -> chassisMaterial().stage();
-                case DATA_YIELD_INCREASED -> (int) Math.round(stats.increasedPercent(MachineStat.OUTPUT_AMOUNT) * STAT_SCALE);
-                case DATA_YIELD_BONUS -> (int) Math.round(CrusherYield.bonusPercent(stats, 0.0D) * STAT_SCALE);
                 default -> 0;
             };
         }
