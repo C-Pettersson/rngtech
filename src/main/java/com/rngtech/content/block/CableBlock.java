@@ -2,6 +2,7 @@ package com.rngtech.content.block;
 
 import com.rngtech.content.blockentity.CableBlockEntity;
 import com.rngtech.content.cable.CableArmTarget;
+import com.rngtech.content.cable.CableGraph;
 import com.rngtech.content.item.CableItem;
 import com.rngtech.content.menu.CableConnectorMenu;
 import com.rngtech.content.menu.UniversalConnectorMenu;
@@ -723,9 +724,12 @@ public class CableBlock extends Block implements EntityBlock {
             Direction direction
     ) {
         if (neighborState.getBlock() instanceof CableBlock) {
-            return !isDisabled(level, pos, direction)
-                    && !isDisabled(level, neighborPos, direction.getOpposite())
-                    && CableBlockEntity.colorsLink(color, colorAt(level, neighborPos));
+            return CableGraph.canLink(
+                    color,
+                    colorAt(level, neighborPos),
+                    isDisabled(level, pos, direction),
+                    isDisabled(level, neighborPos, direction.getOpposite())
+            );
         }
         if (neighborState.getBlock() instanceof UniversalConnectorBlock) {
             return !isDisabled(level, pos, direction)

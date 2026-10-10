@@ -2,6 +2,7 @@ package com.rngtech.rpg.progression;
 
 import com.rngtech.content.blockentity.EnergyTransferChecks;
 import com.rngtech.content.cable.CableArmTargetChecks;
+import com.rngtech.content.cable.CableGraphFuzzChecks;
 import com.rngtech.content.cable.CableRoutingChecks;
 import com.rngtech.content.cable.EnergyAllocatorChecks;
 import com.rngtech.content.entity.ForestryCartRulesChecks;
@@ -63,6 +64,7 @@ public final class MasteryChecks {
         EnergyTransferChecks.run();
         CableRoutingChecks.run();
         EnergyAllocatorChecks.run();
+        CableGraphFuzzChecks.run();
         CableArmTargetChecks.run();
         modifierProfilesLoad();
     }

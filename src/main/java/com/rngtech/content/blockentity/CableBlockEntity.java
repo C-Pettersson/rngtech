@@ -3,6 +3,7 @@ package com.rngtech.content.blockentity;
 import com.rngtech.content.block.BatteryChassisBlock;
 import com.rngtech.content.block.CableBlock;
 import com.rngtech.content.cable.CableConnectorMode;
+import com.rngtech.content.cable.CableGraph;
 import com.rngtech.content.cable.CableStats;
 import com.rngtech.content.cable.EnergyAllocator;
 import com.rngtech.content.cable.EnergyConnectorTier;
@@ -40,7 +41,6 @@ import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 import net.neoforged.neoforge.items.IItemHandler;
 
-import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -148,7 +148,7 @@ public class CableBlockEntity extends BlockEntity implements UniversalConnectorD
     }
 
     public static boolean colorsLink(DyeColor first, DyeColor second) {
-        return first == null || second == null || first == second;
+        return CableGraph.colorsLink(first, second);
     }
 
     public boolean hasConnector(Direction direction) {
@@ -1249,39 +1249,25 @@ public class CableBlockEntity extends BlockEntity implements UniversalConnectorD
             long gameTime,
             LevelNetworkCache cache
     ) {
-        ArrayDeque<BlockPos> queue = new ArrayDeque<>();
-        Set<BlockPos> visited = new HashSet<>();
-        List<BlockPos> networkPositions = new ArrayList<>();
+        LevelCableView view = new LevelCableView(level);
+        List<BlockPos> networkPositions = CableGraph.component(startPos, view);
         List<UniversalEndpoint> universalEndpoints = new ArrayList<>();
         Set<UniversalEndpoint> seenUniversalEndpoints = new HashSet<>();
         List<BridgeEndpoint> bridgeEndpoints = new ArrayList<>();
         Set<BridgeEndpoint> seenBridgeEndpoints = new HashSet<>();
         List<EnergyEndpoint>[] energyEndpoints = createEnergyEndpointBuckets();
 
-        if (level.isLoaded(startPos)) {
-            queue.addLast(startPos);
-            visited.add(startPos);
-        }
-
-        while (!queue.isEmpty()) {
-            BlockPos pos = queue.removeFirst();
-            BlockState state = level.getBlockState(pos);
-
-            if (state.getBlock() instanceof CableBlock) {
-                networkPositions.add(pos);
-                collectCableNode(
-                        level,
-                        pos,
-                        state,
-                        queue,
-                        visited,
-                        universalEndpoints,
-                        seenUniversalEndpoints,
-                        bridgeEndpoints,
-                        seenBridgeEndpoints,
-                        energyEndpoints
-                );
-            }
+        for (BlockPos pos : networkPositions) {
+            collectCableNode(
+                    level,
+                    view,
+                    pos,
+                    universalEndpoints,
+                    seenUniversalEndpoints,
+                    bridgeEndpoints,
+                    seenBridgeEndpoints,
+                    energyEndpoints
+            );
         }
 
         List<BlockPos> cablePositions = immutableList(networkPositions);
@@ -1324,42 +1310,28 @@ public class CableBlockEntity extends BlockEntity implements UniversalConnectorD
 
     private static void collectCableNode(
             Level level,
+            LevelCableView view,
             BlockPos pos,
-            BlockState state,
-            ArrayDeque<BlockPos> queue,
-            Set<BlockPos> visited,
             List<UniversalEndpoint> universalEndpoints,
             Set<UniversalEndpoint> seenUniversalEndpoints,
             List<BridgeEndpoint> bridgeEndpoints,
             Set<BridgeEndpoint> seenBridgeEndpoints,
             List<EnergyEndpoint>[] energyEndpoints
     ) {
-        CableBlockEntity cable = level.getBlockEntity(pos) instanceof CableBlockEntity c ? c : null;
+        if (!(level.getBlockEntity(pos) instanceof CableBlockEntity cable)) {
+            return;
+        }
 
         for (Direction direction : DIRECTIONS) {
             BlockPos targetPos = pos.relative(direction);
-            if (!level.isLoaded(targetPos)) {
+            if (!cable.hasAnyConnector(direction) || !view.isLoaded(targetPos)) {
                 // An unloaded chunk is the edge of the network until it loads again; reading it would load it.
                 continue;
             }
-            BlockState targetState = null;
-
-            if (CableBlock.hasCableConnection(state, direction)) {
-                targetState = level.getBlockState(targetPos);
-                if (canEnterNetworkNode(targetState, direction.getOpposite())) {
-                    addNetworkNode(targetPos, targetState, queue, visited);
-                }
-            }
-
-            if (cable == null) {
-                continue;
-            }
+            BlockState targetState = view.state(targetPos);
 
             CableUniversalConnectorData universalConnector = cable.universalConnector(direction);
             if (universalConnector != null) {
-                if (targetState == null) {
-                    targetState = level.getBlockState(targetPos);
-                }
                 addCableUniversalEndpoint(
                         universalEndpoints,
                         seenUniversalEndpoints,
@@ -1379,10 +1351,6 @@ public class CableBlockEntity extends BlockEntity implements UniversalConnectorD
                 continue;
             }
 
-            if (targetState == null) {
-                targetState = level.getBlockState(targetPos);
-            }
-
             if (!CableBlock.isValidConnectorTarget(targetState) || isNetworkNode(targetState)) {
                 continue;
             }
@@ -1394,12 +1362,6 @@ public class CableBlockEntity extends BlockEntity implements UniversalConnectorD
                     connector.mode(),
                     isBatteryChassis(targetState)
             ));
-        }
-    }
-
-    private static void addNetworkNode(BlockPos targetPos, BlockState targetState, ArrayDeque<BlockPos> queue, Set<BlockPos> visited) {
-        if (isNetworkNode(targetState) && visited.add(targetPos)) {
-            queue.addLast(targetPos);
         }
     }
 
@@ -1452,8 +1414,33 @@ public class CableBlockEntity extends BlockEntity implements UniversalConnectorD
         return state.getBlock() instanceof CableBlock;
     }
 
-    private static boolean canEnterNetworkNode(BlockState state, Direction side) {
-        return state.getBlock() instanceof CableBlock && CableBlock.hasCableConnection(state, side);
+    /** The world as {@link CableGraph} sees it, remembering each block state read during one rebuild. */
+    private static final class LevelCableView implements CableGraph.View {
+        private final Level level;
+        private final Map<BlockPos, BlockState> states = new HashMap<>();
+
+        private LevelCableView(Level level) {
+            this.level = level;
+        }
+
+        private BlockState state(BlockPos pos) {
+            return states.computeIfAbsent(pos, level::getBlockState);
+        }
+
+        @Override
+        public boolean isLoaded(BlockPos pos) {
+            return level.isLoaded(pos);
+        }
+
+        @Override
+        public boolean isCable(BlockPos pos) {
+            return isNetworkNode(state(pos));
+        }
+
+        @Override
+        public boolean hasLink(BlockPos pos, Direction direction) {
+            return CableBlock.hasCableConnection(state(pos), direction);
+        }
     }
 
     private static void addCableUniversalEnergyEndpoints(
