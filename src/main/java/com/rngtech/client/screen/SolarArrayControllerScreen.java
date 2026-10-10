@@ -427,7 +427,7 @@ public class SolarArrayControllerScreen extends AbstractContainerScreen<SolarArr
                             STAT_TYPES[index],
                             value
                     )
-            );
+            ).withStat(STAT_TYPES[index]);
         }
         MachineScreenStyle.withGenerationBreakdown(
                 STAT_TYPES,

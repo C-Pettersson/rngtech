@@ -3,6 +3,7 @@ package com.rngtech.content.menu;
 import com.rngtech.content.blockentity.VacuumCollapseGeneratorBlockEntity;
 import com.rngtech.content.registry.ModBlocks;
 import com.rngtech.content.registry.ModMenus;
+import com.rngtech.rpg.MachineStatAccumulator;
 import com.rngtech.rpg.MachineTraits;
 
 import net.minecraft.core.BlockPos;
@@ -22,7 +23,7 @@ import net.neoforged.neoforge.items.SlotItemHandler;
 
 import java.util.function.BooleanSupplier;
 
-public class VacuumCollapseGeneratorMenu extends AbstractContainerMenu {
+public class VacuumCollapseGeneratorMenu extends AbstractContainerMenu implements StatBreakdownMenu {
     public static final int TAB_PROCESSING = 0;
     public static final int TAB_GEAR = 1;
     public static final int TAB_STATS = 2;
@@ -249,6 +250,11 @@ public class VacuumCollapseGeneratorMenu extends AbstractContainerMenu {
             return true;
         }
         return RefinementMenuSupport.applyToMachine(player, generator, refinementTarget, ModBlocks.VACUUM_COLLAPSE_GENERATOR.get());
+    }
+
+    @Override
+    public MachineStatAccumulator breakdownStats() {
+        return generator.effectiveStats();
     }
 
     @Override

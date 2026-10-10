@@ -448,7 +448,7 @@ public class AlgaePhotobioreactorScreen extends AbstractContainerScreen<AlgaePho
                             statValue(index),
                             Math.round(menu.outputBonusProgress() * 100.0)
                     )
-            );
+            ).withStat(MachineStat.FUEL_EFFICIENCY);
         }
         return statLines;
     }

@@ -3,6 +3,7 @@ package com.rngtech.content.menu;
 import com.rngtech.content.block.ComponentRecyclerBlock;
 import com.rngtech.content.blockentity.ComponentRecyclerBlockEntity;
 import com.rngtech.content.registry.ModMenus;
+import com.rngtech.rpg.MachineStatAccumulator;
 import com.rngtech.rpg.MachineTraits;
 
 import net.minecraft.core.BlockPos;
@@ -22,7 +23,7 @@ import net.neoforged.neoforge.items.SlotItemHandler;
 
 import java.util.function.BooleanSupplier;
 
-public class ComponentRecyclerMenu extends AbstractContainerMenu {
+public class ComponentRecyclerMenu extends AbstractContainerMenu implements StatBreakdownMenu {
     public static final int TAB_PROCESSING = 0;
     public static final int TAB_GEAR = 1;
     public static final int TAB_STATS = 2;
@@ -240,6 +241,11 @@ public class ComponentRecyclerMenu extends AbstractContainerMenu {
             return true;
         }
         return RefinementMenuSupport.applyToMachine(player, recycler, refinementTarget, recycler.getBlockState().getBlock());
+    }
+
+    @Override
+    public MachineStatAccumulator breakdownStats() {
+        return recycler.effectiveStats();
     }
 
     @Override

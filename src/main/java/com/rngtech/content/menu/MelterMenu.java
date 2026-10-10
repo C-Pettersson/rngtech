@@ -5,6 +5,7 @@ import com.rngtech.content.blockentity.MelterBlockEntity;
 import com.rngtech.content.purge.FluidPurgeSupport;
 import com.rngtech.content.registry.ModMenus;
 import com.rngtech.rpg.MachineStat;
+import com.rngtech.rpg.MachineStatAccumulator;
 import com.rngtech.rpg.MachineTraits;
 import com.rngtech.rpg.progression.MachineMasteryFamily;
 import com.rngtech.rpg.progression.MachineMasteryHost;
@@ -34,7 +35,7 @@ import net.neoforged.neoforge.items.SlotItemHandler;
 import java.util.List;
 import java.util.function.BooleanSupplier;
 
-public class MelterMenu extends AbstractContainerMenu implements MasteryMenuView<MegaPassiveNode> {
+public class MelterMenu extends AbstractContainerMenu implements MasteryMenuView<MegaPassiveNode>, StatBreakdownMenu {
     public static final int TAB_PROCESSING = 0;
     public static final int TAB_GEAR = 1;
     public static final int TAB_CONFIGURATION = 2;
@@ -369,6 +370,11 @@ public class MelterMenu extends AbstractContainerMenu implements MasteryMenuView
             return true;
         }
         return RefinementMenuSupport.applyToMachine(player, melter, refinementTarget, melter.getBlockState().getBlock());
+    }
+
+    @Override
+    public MachineStatAccumulator breakdownStats() {
+        return melter.effectiveStats();
     }
 
     @Override

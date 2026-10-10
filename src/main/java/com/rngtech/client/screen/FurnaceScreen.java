@@ -800,7 +800,7 @@ public class FurnaceScreen extends AbstractContainerScreen<FurnaceMenu> {
                             statTypes[index],
                             value
                     )
-            );
+            ).withStat(statTypes[index]);
         }
         return MachineScreenStyle.fitStatLines(
                 MachineScreenStyle.withAscendancyStats(statLines, menu.ascendancyStats()),

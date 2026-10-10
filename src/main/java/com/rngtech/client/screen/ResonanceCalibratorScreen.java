@@ -744,7 +744,7 @@ public class ResonanceCalibratorScreen extends AbstractContainerScreen<Resonance
                             STAT_TYPES[index],
                             value
                     )
-            );
+            ).withStat(STAT_TYPES[index]);
         }
         return MachineScreenStyle.fitStatLines(
                 MachineScreenStyle.withAscendancyStats(MachineScreenStyle.withoutInactiveModifierStats(STAT_TYPES, statLines), menu.ascendancyStats()),

@@ -3,6 +3,7 @@ package com.rngtech.content.menu;
 import com.rngtech.content.blockentity.BioGeneratorBlockEntity;
 import com.rngtech.content.registry.ModBlocks;
 import com.rngtech.content.registry.ModMenus;
+import com.rngtech.rpg.MachineStatAccumulator;
 import com.rngtech.rpg.MachineTraits;
 
 import net.minecraft.core.BlockPos;
@@ -22,7 +23,7 @@ import net.neoforged.neoforge.items.SlotItemHandler;
 
 import java.util.function.BooleanSupplier;
 
-public class BioGeneratorMenu extends AbstractContainerMenu {
+public class BioGeneratorMenu extends AbstractContainerMenu implements StatBreakdownMenu {
     public static final int TAB_PROCESSING = 0;
     public static final int TAB_GEAR = 1;
     public static final int TAB_STATS = 2;
@@ -276,6 +277,11 @@ public class BioGeneratorMenu extends AbstractContainerMenu {
             return true;
         }
         return RefinementMenuSupport.applyToMachine(player, generator, refinementTarget, ModBlocks.BIO_GENERATOR.get().asItem());
+    }
+
+    @Override
+    public MachineStatAccumulator breakdownStats() {
+        return generator.effectiveStats();
     }
 
     @Override

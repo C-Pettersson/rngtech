@@ -97,6 +97,7 @@ Stats must be capability-driven. Do not show stats that cannot apply to the mach
 - Do not show heat stats unless heat affects behavior.
 - Use [Modifier Eligibility](modifier-eligibility.md) capability flags as the source for which stat families are relevant.
 - Prefer concise stat rows. Avoid explanatory text inside the machine screen.
+- Holding Shift over a stat row shows the server-recorded math behind it, with one line per source. New stat sources must apply inside a labelled `MachineStatAccumulator.source(...)` scope, or use `apply(source, modifier)`, so the breakdown names them. Affixes, Gear parts, and Mastery nodes are already labelled. Anything left unlabelled shows as "Machine".
 - Keep visible text to the minimum needed to identify the tab, slot, or stat.
 
 ## Process UI

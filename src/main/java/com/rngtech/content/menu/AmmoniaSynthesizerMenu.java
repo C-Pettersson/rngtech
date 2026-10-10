@@ -4,6 +4,7 @@ import com.rngtech.content.blockentity.AmmoniaSynthesizerBlockEntity;
 import com.rngtech.content.purge.FluidPurgeSupport;
 import com.rngtech.content.registry.ModBlocks;
 import com.rngtech.content.registry.ModMenus;
+import com.rngtech.rpg.MachineStatAccumulator;
 import com.rngtech.rpg.MachineTraits;
 
 import net.minecraft.core.BlockPos;
@@ -23,7 +24,7 @@ import net.neoforged.neoforge.items.SlotItemHandler;
 
 import java.util.function.BooleanSupplier;
 
-public class AmmoniaSynthesizerMenu extends AbstractContainerMenu {
+public class AmmoniaSynthesizerMenu extends AbstractContainerMenu implements StatBreakdownMenu {
     public static final int TAB_PROCESSING = 0;
     public static final int TAB_GEAR = 1;
     public static final int TAB_STATS = 2;
@@ -188,6 +189,11 @@ public class AmmoniaSynthesizerMenu extends AbstractContainerMenu {
             return false;
         }
         return player.level().isClientSide || RefinementMenuSupport.applyToMachine(player, synthesizer, refinementTarget, ModBlocks.AMMONIA_SYNTHESIZER.get());
+    }
+
+    @Override
+    public MachineStatAccumulator breakdownStats() {
+        return synthesizer.effectiveStats();
     }
 
     @Override

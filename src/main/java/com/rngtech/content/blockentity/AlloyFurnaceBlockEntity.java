@@ -476,13 +476,13 @@ public class AlloyFurnaceBlockEntity extends BaseMachineBlockEntity implements M
         applyGearStats(stats, crucibleStack());
         applyGearStats(stats, servoStack());
         if (!hasBatteryCell()) {
-            stats.apply(new MachineModifier(
+            stats.apply(MachineStatAccumulator.NO_BATTERY_SOURCE, new MachineModifier(
                     ModifierSlot.IMPLICIT,
                     MachineStat.PROCESSING_SPEED,
                     ModifierOperation.LESS,
                     NO_BATTERY_PROCESSING_SPEED
             ));
-            stats.apply(new MachineModifier(
+            stats.apply(MachineStatAccumulator.NO_BATTERY_SOURCE, new MachineModifier(
                     ModifierSlot.IMPLICIT,
                     MachineStat.STABILITY,
                     ModifierOperation.DECREASED_PERCENT,
@@ -678,7 +678,7 @@ public class AlloyFurnaceBlockEntity extends BaseMachineBlockEntity implements M
     /** Tempered Crucible's stability on blend recipes; recipe speed applies to processing time instead. */
     private MachineStatAccumulator routeStats(AlloyFurnaceRecipe recipe, MachineStatAccumulator stats) {
         if (recipe != null && blend(recipe) && hasMasteryBehavior("TEMPERED_CRUCIBLE")) {
-            stats.apply(new MachineModifier(ModifierSlot.IMPLICIT, MachineStat.TEMPERATURE_STABILITY, ModifierOperation.MORE, 1.4));
+            stats.apply(MegaPassiveTree.behaviorSource(machineProgression(), "TEMPERED_CRUCIBLE"), new MachineModifier(ModifierSlot.IMPLICIT, MachineStat.TEMPERATURE_STABILITY, ModifierOperation.MORE, 1.4));
         }
         return stats;
     }

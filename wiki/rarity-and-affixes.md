@@ -82,7 +82,7 @@ Base stats and fixed traits do not use affix slots, and refinement can never rem
 
 ### Reading the tooltip
 
-Hover an identified item to see its rarity, RP, and rolled affixes. Hold **Left Shift** for material and affix details, and **Left Alt** for each affix's tier and roll range.
+Hover an identified item to see its rarity, RP, and rolled affixes. Hold **Left Shift** for material and affix details, and **Left Alt** for each affix's tier and roll range. To see how affixes, Gear, and Mastery combine into a machine's final numbers, hold **Shift** over a row on its Stats tab. See [Machine Stats](machine-stats.md#how-stats-are-built).
 
 Affixes use four words:
 

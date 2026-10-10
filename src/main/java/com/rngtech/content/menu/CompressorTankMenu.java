@@ -4,6 +4,7 @@ import com.rngtech.content.block.CompressorTankBlock;
 import com.rngtech.content.blockentity.CompressorTankBlockEntity;
 import com.rngtech.content.purge.FluidPurgeSupport;
 import com.rngtech.content.registry.ModMenus;
+import com.rngtech.rpg.MachineStatAccumulator;
 import com.rngtech.rpg.MachineTraits;
 
 import net.minecraft.core.BlockPos;
@@ -25,7 +26,7 @@ import net.neoforged.neoforge.items.SlotItemHandler;
 
 import java.util.function.BooleanSupplier;
 
-public class CompressorTankMenu extends AbstractContainerMenu {
+public class CompressorTankMenu extends AbstractContainerMenu implements StatBreakdownMenu {
     public static final int TAB_PROCESSING = 0;
     public static final int TAB_GEAR = 1;
     public static final int TAB_STATS = 2;
@@ -303,6 +304,11 @@ public class CompressorTankMenu extends AbstractContainerMenu {
             return true;
         }
         return RefinementMenuSupport.applyToMachine(player, tank, refinementTarget, tank.getBlockState().getBlock());
+    }
+
+    @Override
+    public MachineStatAccumulator breakdownStats() {
+        return tank.effectiveStats();
     }
 
     @Override

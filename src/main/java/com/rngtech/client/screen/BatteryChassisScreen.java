@@ -440,7 +440,7 @@ public class BatteryChassisScreen extends AbstractContainerScreen<BatteryChassis
                             STAT_TYPES[index],
                             value
                     )
-            );
+            ).withStat(STAT_TYPES[index]);
         }
         return statLines;
     }

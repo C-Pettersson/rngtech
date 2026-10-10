@@ -369,7 +369,7 @@ public class AmmoniaSynthesizerBlockEntity extends BaseMachineBlockEntity
         return Math.max(1, Mth.floor(effectiveStats().value(MachineStat.ENERGY_CAPACITY)));
     }
 
-    private MachineStatAccumulator effectiveStats() {
+    public MachineStatAccumulator effectiveStats() {
         MachineStatAccumulator stats = MachineBaseStatCatalog.ammoniaSynthesizer();
         machineTraits().modifiers().forEach(stats::apply);
         if (isCatalystBed(catalystStack())) {

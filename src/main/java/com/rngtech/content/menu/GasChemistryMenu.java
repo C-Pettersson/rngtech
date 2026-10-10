@@ -5,6 +5,7 @@ import com.rngtech.content.chemistry.GasChemistryMachine;
 import com.rngtech.content.purge.FluidPurgeSupport;
 import com.rngtech.content.registry.ModBlocks;
 import com.rngtech.content.registry.ModMenus;
+import com.rngtech.rpg.MachineStatAccumulator;
 import com.rngtech.rpg.MachineTraits;
 
 import net.minecraft.core.BlockPos;
@@ -27,7 +28,7 @@ import net.neoforged.neoforge.items.SlotItemHandler;
 
 import java.util.function.BooleanSupplier;
 
-public class GasChemistryMenu extends AbstractContainerMenu {
+public class GasChemistryMenu extends AbstractContainerMenu implements StatBreakdownMenu {
     public static final int TAB_PROCESSING = 0;
     public static final int TAB_GEAR = 1;
     public static final int TAB_STATS = 2;
@@ -295,6 +296,11 @@ public class GasChemistryMenu extends AbstractContainerMenu {
             return false;
         }
         return player.level().isClientSide || RefinementMenuSupport.applyToMachine(player, gasChemistry, refinementTarget, machineBlock());
+    }
+
+    @Override
+    public MachineStatAccumulator breakdownStats() {
+        return gasChemistry.effectiveStats();
     }
 
     @Override

@@ -138,10 +138,12 @@ public final class ComponentBaseStatCatalog {
             return;
         }
 
-        applyContribution(target, profile, componentTraits(stack));
-        for (MachineModifier modifier : componentTraits(stack).modifiers()) {
-            if (modifier.slot().isAffix() && HOST_STATS.contains(modifier.stat())) {
-                target.apply(modifier);
+        try (MachineStatAccumulator.Source ignored = target.source(stack.getHoverName())) {
+            applyContribution(target, profile, componentTraits(stack));
+            for (MachineModifier modifier : componentTraits(stack).modifiers()) {
+                if (modifier.slot().isAffix() && HOST_STATS.contains(modifier.stat())) {
+                    target.apply(modifier);
+                }
             }
         }
     }
@@ -151,7 +153,9 @@ public final class ComponentBaseStatCatalog {
             return;
         }
 
-        applyContribution(target, vacuumCollapseNozzle(nozzle.material()), componentTraits(stack));
+        try (MachineStatAccumulator.Source ignored = target.source(stack.getHoverName())) {
+            applyContribution(target, vacuumCollapseNozzle(nozzle.material()), componentTraits(stack));
+        }
     }
 
     /** Registry-free part merge, shared with headless balance simulation. */

@@ -4,6 +4,7 @@ import com.rngtech.content.blockentity.AlgaePhotobioreactorBlockEntity;
 import com.rngtech.content.purge.FluidPurgeSupport;
 import com.rngtech.content.registry.ModBlocks;
 import com.rngtech.content.registry.ModMenus;
+import com.rngtech.rpg.MachineStatAccumulator;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.RegistryFriendlyByteBuf;
@@ -24,7 +25,7 @@ import net.neoforged.neoforge.items.SlotItemHandler;
 
 import java.util.function.BooleanSupplier;
 
-public class AlgaePhotobioreactorMenu extends AbstractContainerMenu {
+public class AlgaePhotobioreactorMenu extends AbstractContainerMenu implements StatBreakdownMenu {
     public static final int TAB_PROCESSING = 0;
     public static final int TAB_GEAR = 1;
     public static final int TAB_STATS = 2;
@@ -205,6 +206,11 @@ public class AlgaePhotobioreactorMenu extends AbstractContainerMenu {
     @Override
     public boolean clickMenuButton(Player player, int id) {
         return FluidPurgeSupport.handleMenuButton(player, reactor, id);
+    }
+
+    @Override
+    public MachineStatAccumulator breakdownStats() {
+        return reactor.effectiveStats();
     }
 
     @Override

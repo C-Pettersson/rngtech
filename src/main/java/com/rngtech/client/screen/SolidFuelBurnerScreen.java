@@ -486,7 +486,7 @@ public class SolidFuelBurnerScreen extends AbstractContainerScreen<SolidFuelBurn
                     isIntegralStat(STAT_TYPES[index]),
                     isEnhancedStat(STAT_DATA_INDICES[index], value),
                     statTooltip(index, value)
-            );
+            ).withStat(STAT_TYPES[index]);
         }
         return statLines;
     }
