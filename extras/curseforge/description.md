@@ -1,12 +1,12 @@
 ![A row of RNGTech machines](https://media.forgecdn.net/attachments/1709/665/overview-png.png)
 
-# Machines that drop like loot
+# Minecraft + Machines + ARPG
 
 RNGTech is a tech mod for Minecraft 1.21.1 on NeoForge where every machine you craft is a loot drop. Each one rolls a rarity and a set of affixes, like gear in Path of Exile or Last Epoch, so two Crushers from the same recipe rarely match. Keep the good rolls, refine them, and level them up as you work through nine material stages, from flint tools to exotic alloys.
 
 > **2.0 is in alpha.** This page describes 2.0. The passive tree and ascendancies are in the 2.0 alpha files on the Files tab; the default release file is still 1.2.0. Unique items and Corruption arrive later in 2.0.
 
-## Every craft is a roll
+## Itemization
 
 Machines, Gear parts, Battery Cells, tool parts, and companions come out of the crafting grid Unidentified. Identify one to see its rarity and its tiered prefixes and suffixes. A Magic furnace might come out as a *Hellish Iron Furnace Chassis of Smelting*.
 
@@ -32,7 +32,7 @@ Crushers, Furnaces, Alloy Furnaces, Metal Presses, Resonance Calibrators, Melter
 
 ## One cable for everything
 
-Universal Cable is cheap, with 12 per craft, and carries power, fluids, and items. The connector next to each machine decides what moves and how fast. To upgrade a network, you swap connector modules and leave the cable alone. With AE2 or Refined Storage installed, a network connector carries their networks over the same cable.
+Universal Cable is cheap, with 12 per craft, and carries power, fluids, and items. The connector next to each machine decides what moves and how fast. To upgrade a network, you swap connector modules and leave the cable alone. With AE2 or Refined Storage installed, a network connector can also carry their networks over the same cable.
 
 ![A Universal Connector](https://media.forgecdn.net/attachments/1709/668/universal_connector_item-png.png)
 
