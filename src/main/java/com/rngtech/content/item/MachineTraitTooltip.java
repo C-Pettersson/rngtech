@@ -18,6 +18,7 @@ import com.rngtech.rpg.Rarity;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.Style;
 import net.minecraft.world.item.ItemStack;
 
 import java.util.List;
@@ -119,7 +120,7 @@ final class MachineTraitTooltip {
         if (showRarity) {
             tooltipComponents.add(Component.translatable(
                     "rngtech.tooltip.rarity",
-                    Component.translatable(traits.rarity().translationKey()).withStyle(rarityColor(traits.rarity()))
+                    Component.translatable(traits.rarity().translationKey()).withStyle(style -> rarityStyle(style, traits.rarity()))
             ).withStyle(ChatFormatting.GRAY));
         }
         tooltipComponents.add(Component.translatable(
@@ -294,12 +295,12 @@ final class MachineTraitTooltip {
         };
     }
 
-    private static ChatFormatting rarityColor(Rarity rarity) {
+    private static Style rarityStyle(Style style, Rarity rarity) {
         return switch (rarity) {
-            case NORMAL -> ChatFormatting.WHITE;
-            case MAGIC -> ChatFormatting.AQUA;
-            case RARE -> ChatFormatting.GOLD;
-            case UNIQUE -> ChatFormatting.LIGHT_PURPLE;
+            case NORMAL -> style.withColor(ChatFormatting.WHITE);
+            case MAGIC -> style.withColor(ChatFormatting.AQUA);
+            case RARE -> style.withColor(ChatFormatting.GOLD);
+            case UNIQUE -> style.withColor(UniqueTooltip.UNIQUE_COLOR);
         };
     }
 

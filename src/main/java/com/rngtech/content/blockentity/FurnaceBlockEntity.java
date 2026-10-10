@@ -4,8 +4,10 @@ import com.rngtech.RNGTechConfig;
 import com.rngtech.content.block.BaseMachineBlock;
 import com.rngtech.content.block.FurnaceBlock;
 import com.rngtech.content.item.BatteryCellItem;
+import com.rngtech.content.item.GearParts;
 import com.rngtech.content.item.MachinePartItem;
-import com.rngtech.content.item.SolidFuelBurnerPartItem;
+import com.rngtech.content.loot.ChallengeContext;
+import com.rngtech.content.loot.ChallengeLoot;
 import com.rngtech.content.machine.FurnaceChassisMaterial;
 import com.rngtech.content.menu.FurnaceMenu;
 import com.rngtech.content.menu.MasteryMenuSupport;
@@ -674,9 +676,7 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
             return false;
         }
         if (usesHeatCores()) {
-            return stack.getItem() instanceof SolidFuelBurnerPartItem part
-                    && part.partType() == MachinePartType.HEAT_CORE
-                    && part.stage() <= furnaceMaterial().stage();
+            return GearParts.is(stack, MachinePartType.HEAT_CORE, furnaceMaterial().stage());
         }
         return stack.getItem() instanceof MachinePartItem part && part.machineType() == furnaceMaterial().machineType();
     }
@@ -1069,6 +1069,8 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
         mergeOutput(outputSlot, result);
         resetCycle(lane);
         resetBulkSpeed();
+        ChallengeLoot.reward(level, worldPosition, ChallengeLoot.HEAT_FAILURE,
+                ChallengeContext.of(this).withRecipeStage(recipe.machineXpBand()), inventory, outputSlot);
         setChanged();
         return true;
     }

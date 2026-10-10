@@ -31,6 +31,7 @@ Before publishing, record results from a disposable world:
 - Check protected Gear automation boundaries and intentional exceptions.
 - Confirm production builds disable debug sources, sinks, and connector modules.
 - Exercise Forestry Companion docking, cargo unloading, charging, harvesting, and mastery persistence.
+- Find, identify, install, and corrupt a Unique. Check its tooltip ranges, Shift roll quality, host dimming, and that refinement and recycling reject it.
 
 These are release checks to perform, not claims that the current revision has passed them. Include tested versions and integrations in the release notes.
 

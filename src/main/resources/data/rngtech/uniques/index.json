@@ -1,0 +1,14 @@
+{
+    "version": 1,
+    "uniques": [
+        "unique_potato_battery_cell.json",
+        "fortress_heater_element.json",
+        "igloo_basement_thermostat.json",
+        "mineshaft_worn_pick_jaw.json",
+        "crying_crucible.json",
+        "trial_vault_escapement.json",
+        "witch_bottle_reflux_pump.json",
+        "ancient_echo_control_board.json",
+        "bastion_coin_stack_capacitor.json"
+    ]
+}

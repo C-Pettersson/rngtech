@@ -8,9 +8,11 @@ import com.rngtech.content.calibration.CalibrationStreak;
 import com.rngtech.content.calibration.CalibrationValueRange;
 import com.rngtech.content.calibration.ResonanceCalibratorChassis;
 import com.rngtech.content.item.BatteryCellItem;
-import com.rngtech.content.item.CalibrationGearItem;
 import com.rngtech.content.item.CalibrationPatternItem;
+import com.rngtech.content.item.GearParts;
 import com.rngtech.content.item.MachinePartItem;
+import com.rngtech.content.loot.ChallengeContext;
+import com.rngtech.content.loot.ChallengeLoot;
 import com.rngtech.content.menu.MasteryMenuSupport;
 import com.rngtech.content.menu.ResonanceCalibratorMenu;
 import com.rngtech.content.recipe.CalibrationRecipe;
@@ -21,6 +23,7 @@ import com.rngtech.content.registry.ModRecipes;
 import com.rngtech.rpg.BatchProcessing;
 import com.rngtech.rpg.ComponentBaseStatCatalog;
 import com.rngtech.rpg.MachineBaseStatCatalog;
+import com.rngtech.rpg.MachineBehavior;
 import com.rngtech.rpg.MachineImplicitCatalog;
 import com.rngtech.rpg.MachineModifier;
 import com.rngtech.rpg.MachineNameGenerator;
@@ -246,6 +249,7 @@ public class ResonanceCalibratorBlockEntity extends BaseMachineBlockEntity
     private ItemStack activeCatalyst = ItemStack.EMPTY;
     private ItemStack activeStabilizer = ItemStack.EMPTY;
     private CalibrationStreak streak = CalibrationStreak.EMPTY;
+    private int lastStability;
     private boolean stabilizerSkip;
 
     public ResonanceCalibratorBlockEntity(BlockPos pos, BlockState blockState) {
@@ -538,15 +542,15 @@ public class ResonanceCalibratorBlockEntity extends BaseMachineBlockEntity
     }
 
     public static boolean isResonanceCoil(ItemStack stack) {
-        return stack.getItem() instanceof CalibrationGearItem gear && gear.partType() == MachinePartType.RESONANCE_COIL;
+        return GearParts.is(stack, MachinePartType.RESONANCE_COIL);
     }
 
     public static boolean isControlBoard(ItemStack stack) {
-        return stack.getItem() instanceof CalibrationGearItem gear && gear.partType() == MachinePartType.CONTROL_BOARD;
+        return GearParts.is(stack, MachinePartType.CONTROL_BOARD);
     }
 
     public static boolean isStabilizerMatrix(ItemStack stack) {
-        return stack.getItem() instanceof CalibrationGearItem gear && gear.partType() == MachinePartType.STABILIZER_MATRIX;
+        return GearParts.is(stack, MachinePartType.STABILIZER_MATRIX);
     }
 
     public static boolean isBatteryCell(ItemStack stack) {
@@ -571,6 +575,8 @@ public class ResonanceCalibratorBlockEntity extends BaseMachineBlockEntity
             return false;
         }
 
+        CalibrationStreak held = streak;
+        boolean echo = echoDetour(recipe);
         streak = streakBefore(recipe);
         int operations = operationsFor(recipe, stats);
         ItemStack baseResult = createOutput(recipe, stats, operations);
@@ -578,6 +584,9 @@ public class ResonanceCalibratorBlockEntity extends BaseMachineBlockEntity
         if (!canMergeOutput(result)) {
             result = baseResult;
             if (!canMergeOutput(result)) {
+                if (echo) {
+                    streak = held;
+                }
                 return false;
             }
         }
@@ -599,9 +608,13 @@ public class ResonanceCalibratorBlockEntity extends BaseMachineBlockEntity
         for (int index = 0; index < operations; index++) {
             grantRecipeXp(recipe);
         }
-        if (stats.value(MachineStat.STREAK_FLOOR) > 0.0) {
+        if (echo) {
+            streak = held.withEchoUsed();
+        } else if (stats.value(MachineStat.STREAK_FLOOR) > 0.0) {
             streak = streak.after(activePatternOrCurrent(), recipe.family().getSerializedName(), streak.harmonic());
         }
+        ChallengeLoot.reward(level, worldPosition, ChallengeLoot.CALIBRATION,
+                ChallengeContext.of(this).withRecipeStage(recipe.minimumStage()).withStability(lastStability), processInventory, SLOT_OUTPUT);
         resetCycle();
         setChanged();
         return true;
@@ -683,8 +696,9 @@ public class ResonanceCalibratorBlockEntity extends BaseMachineBlockEntity
                 stability = 100;
                 harmonic = 0;
             }
-            streak = new CalibrationStreak(streak.streak(), streak.family(), streak.pattern(), streak.swapUsed(), harmonic);
+            streak = streak.withHarmonic(harmonic);
         }
+        lastStability = stability;
         int rp = currentRefinementPotentialRange(recipe, stats).roll(level.random);
         ItemStack result = recipeResult.stackWithState(recipe.family(), stability, rp);
         result.setCount(Math.min(result.getMaxStackSize(), result.getCount() * operations));
@@ -719,7 +733,16 @@ public class ResonanceCalibratorBlockEntity extends BaseMachineBlockEntity
 
     /** The streak this calibration builds on: kept on the same family and pattern, or once more with Pattern Memory. */
     private CalibrationStreak streakBefore(CalibrationRecipe recipe) {
+        if (echoDetour(recipe)) {
+            return CalibrationStreak.EMPTY;
+        }
         return streak.before(activePatternOrCurrent(), recipe.family().getSerializedName(), hasMasteryBehavior("PATTERN_MEMORY"));
+    }
+
+    /** Echo Streak: one calibration of another family builds on nothing and leaves the streak waiting. */
+    private boolean echoDetour(CalibrationRecipe recipe) {
+        return MachineImplicitCatalog.hasBehavior(controlBoardStack(), MachineBehavior.ECHO_STREAK)
+                && streak.echoes(recipe.family().getSerializedName(), hasMasteryBehavior("PATTERN_MEMORY"));
     }
 
     private ItemStack activePatternOrCurrent() {
@@ -897,7 +920,7 @@ public class ResonanceCalibratorBlockEntity extends BaseMachineBlockEntity
 
     private int coilStage() {
         ItemStack stack = resonanceCoilStack();
-        return stack.getItem() instanceof CalibrationGearItem gear ? gear.stage() : 0;
+        return GearParts.is(stack, MachinePartType.RESONANCE_COIL) ? GearParts.stage(stack) : 0;
     }
 
     private void startCycleIfNeeded(CalibrationRecipe recipe, MachineStatAccumulator stats) {

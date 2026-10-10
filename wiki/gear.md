@@ -128,6 +128,8 @@ A few slots work differently:
 - Some slots take any stage. These are noted in the tables below.
 - On a Crusher, the Component Mount nodes in [Machine Mastery](machine-mastery.md) can raise the Crush Head limit by one stage per node.
 
+[Uniques](uniques.md) are found parts that count as a fixed stage, shown in their tooltip, for every one of these rules. They fit wherever a normal part of their type and stage fits.
+
 ## Rolls and refinement
 
 Each crafted part rolls its own rarity and affixes, and you can refine it in the [Affix Forge](affix-forge.md). Parts do not stack. A part's affixes are **local**: they scale that part's own stats, and the result is then added to the machine. Holding Shift on a tooltip marks these rolls "(Local)". Rolls without the mark, such as a Fluid Pump's Fluid Capacity, apply to the machine as they are.

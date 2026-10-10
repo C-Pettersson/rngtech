@@ -18,7 +18,11 @@ public interface MachineMasteryHost {
         MachineProgressionState next = MegaPassiveTree.follow(previous.withAddedScaledXp(amount, quarters), this::masteryGearAllows);
         setMachineProgression(next);
         if (!previous.allocatedNodes().equals(next.allocatedNodes())) { masteryChanged(); }
+        if (next.level() > previous.level()) { masteryLevelGained(next); }
     }
+
+    /** Runs after XP raises the Mastery level, such as to roll the Mastery level challenge loot. */
+    default void masteryLevelGained(MachineProgressionState state) { }
 
     default void applyMasteryState(MachineProgressionState state) {
         setMachineProgression(MegaPassiveTree.follow(state.forFamily(masteryFamily()), this::masteryGearAllows));

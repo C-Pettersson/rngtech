@@ -3,7 +3,7 @@ package com.rngtech.content.blockentity;
 import com.rngtech.content.block.BaseMachineBlock;
 import com.rngtech.content.item.BatteryCellItem;
 import com.rngtech.content.item.CathodeItem;
-import com.rngtech.content.item.FluidPumpItem;
+import com.rngtech.content.item.GearParts;
 import com.rngtech.content.item.MachinePartItem;
 import com.rngtech.content.menu.CorrosionCellMenu;
 import com.rngtech.content.purge.FluidPurgeRole;
@@ -17,6 +17,7 @@ import com.rngtech.rpg.ComponentBaseStatCatalog;
 import com.rngtech.rpg.MachineBaseStatCatalog;
 import com.rngtech.rpg.MachineImplicitCatalog;
 import com.rngtech.rpg.MachineNameGenerator;
+import com.rngtech.rpg.MachinePartType;
 import com.rngtech.rpg.MachineStat;
 import com.rngtech.rpg.MachineStatAccumulator;
 import com.rngtech.rpg.MachineTraits;
@@ -396,7 +397,7 @@ public class CorrosionCellBlockEntity extends BaseMachineBlockEntity
     }
 
     public static boolean isFluidPump(ItemStack stack) {
-        return stack.getItem() instanceof FluidPumpItem;
+        return GearParts.is(stack, MachinePartType.FLUID_PUMP);
     }
 
     public static boolean isCathode(ItemStack stack) {

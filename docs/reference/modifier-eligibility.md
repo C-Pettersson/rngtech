@@ -120,6 +120,7 @@ The rollable modifiers column lists active stat families and special named affix
 | Alloy Furnace block | `HAS_FE_STORAGE`, `HAS_FE_INPUT`, `HAS_INPUT_SLOT`, `HAS_OUTPUT_SLOT`, `HAS_PROCESSING`, `HAS_HEAT`, `HAS_STABILITY` | Flat energy capacity, increased energy capacity, energy usage, heat transfer, max temperature, heat isolation, reduced warmup time, reduced cooling rate, processing speed, stability, temperature stability, overheat tolerance, Alloying, Instant Process, Super Output, Overclocked, Bulk Speed behavior, and Power Grace behavior. Active input slots come from Alloy Crucible base profiles, not rolled machine affixes. |
 | Battery Cell | `HAS_FE_STORAGE`, `HAS_FE_INPUT`, `HAS_FE_OUTPUT`, `HAS_IDLE_LOSS` | Battery flat energy capacity, increased energy capacity, energy transfer, efficiency, idle loss. |
 | Unique Battery Cell | `HAS_FE_STORAGE`, `HAS_FE_INPUT`, `HAS_FE_OUTPUT`, `HAS_IDLE_LOSS` | None. Unique identity is authored through its base profile, fixed item identity, and `UNIQUE` rarity. |
+| Unique parts | The capabilities of the matching normal part profile, such as Heat Core or Servo | None. Each part type has its own `unique_<part>` profile; stats come from the Unique catalog. |
 | Battery Chassis | `HAS_FE_STORAGE`, `HAS_FE_INPUT`, `HAS_FE_OUTPUT`, `HAS_BATTERY_CELLS`, `HAS_BURST_TRANSFER`, `HAS_IDLE_LOSS`, `HAS_GLOBAL_MODIFIER_EFFECTS`, `HAS_STABILITY` | Increased energy capacity, Charged Storage, Balance Mode, Additional Battery Slots, efficiency, energy transfer, burst transfer, burst duration, stability, idle loss, global modifier strength. |
 | Miner's Companion | `HAS_MINERS_COMPANION` | Miner's Companion filter-slot prefixes and energy usage. Active filter slots start at `3` and are capped at ten by the item GUI. |
 | Forestry Companion | `HAS_FE_INPUT`, `HAS_PROCESSING` | Processing speed and energy usage. Processing speed adjusts the placed cart's work interval, and energy usage scales movement, scan, plant, and cut FE costs. |
@@ -172,7 +173,7 @@ Modifier lens tags are inferred from each modifier definition's stat/effect fami
 
 `UNIQUE` rarity is authored-only. Random rarity rolls do not create Unique items, and Unique targets cannot be refined, ascended, affix-injected, or debug-rerolled.
 
-Unique targets may use authored base profiles and fixed behaviors, but they do not have to. The current `rngtech:unique_potato_battery_cell` uses a Voltaic Spud base profile and `UNIQUE` rarity, rejects refinement, and does not roll removable affixes.
+Unique targets get their stats from the [Unique catalog](../prds/uniques.md#unique-catalog): an optional base material profile, fixed lines, and ranged lines rolled once on identification and stored in the `unique` modifier slot. That slot is kept only on Unique items, and no refinement operation reads or writes it. Uniques do not roll removable affixes.
 
 ## Category Matrix
 

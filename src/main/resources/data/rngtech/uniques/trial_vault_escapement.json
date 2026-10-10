@@ -1,0 +1,31 @@
+{
+    "id": "rngtech:trial_vault_escapement",
+    "host": "servo",
+    "slot_stage": 6,
+    "base_profile": "rngtech:titanium_servo",
+    "stats": {
+        "rngtech:escapement_speed": {
+            "operation": "flat",
+            "min": 50,
+            "max": 100,
+            "role": "signature"
+        },
+        "rngtech:mold_swap_time": {
+            "operation": "flat",
+            "min": -10,
+            "max": -25,
+            "role": "hook",
+            "ascendancy": "die_keeper"
+        },
+        "rngtech:processing_speed": {
+            "operation": "more",
+            "min": -0.15,
+            "max": -0.05,
+            "role": "drawback"
+        }
+    },
+    "behaviors": [
+        "rngtech:escapement"
+    ],
+    "source": "rngtech:unique_source.ominous_trial_vault"
+}

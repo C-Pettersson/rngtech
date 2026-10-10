@@ -41,12 +41,14 @@ import com.rngtech.client.screen.SilicaGelDehumidifierScreen;
 import com.rngtech.client.screen.SolarArrayControllerScreen;
 import com.rngtech.client.screen.SolidFuelBurnerScreen;
 import com.rngtech.client.screen.ToolBenchScreen;
+import com.rngtech.client.screen.UniqueHostReaders;
 import com.rngtech.client.screen.UniversalConnectorScreen;
 import com.rngtech.client.screen.VacuumCollapseGeneratorScreen;
 import com.rngtech.client.screen.WoodenComposterScreen;
 import com.rngtech.client.screen.WoodenDehumidifierScreen;
 import com.rngtech.client.sound.MachineSoundClient;
 import com.rngtech.client.wrench.WrenchOverlayClient;
+import com.rngtech.content.item.UniqueTooltip;
 import com.rngtech.content.registry.ModBlockEntities;
 import com.rngtech.content.registry.ModEntityTypes;
 import com.rngtech.content.registry.ModFluids;
@@ -93,6 +95,7 @@ public final class RNGTechClient {
         NeoForge.EVENT_BUS.addListener(MachineSoundClient::onClientTick);
         NeoForge.EVENT_BUS.addListener(MinersCompanionLampClient::onClientTick);
         container.registerExtensionPoint(IConfigScreenFactory.class, ConfigurationScreen::new);
+        UniqueTooltip.setOpenHost(UniqueHostReaders::current);
     }
 
     private void registerScreens(RegisterMenuScreensEvent event) {

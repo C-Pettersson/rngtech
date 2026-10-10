@@ -1,6 +1,7 @@
 import { startModdexServer } from "./serve.mjs";
 import { checkPassiveTreeData } from "./check-passive-tree.mjs";
 import { checkAscendancySeals } from "./check-ascendancy-seals.mjs";
+import { checkUniques } from "./check-uniques.mjs";
 import { checkAscendancyDocs } from "./export-ascendancy-data.mjs";
 import { checkRecipeLoopMutations, checkRecipeLoops } from "./check-recipe-loops.mjs";
 import { checkRecyclingReturns } from "./check-recycling-returns.mjs";
@@ -114,6 +115,7 @@ try {
     await checkRecipeLoopMutations();
     await checkRecyclingReturns();
     await checkAscendancySeals();
+    await checkUniques();
     await checkAscendancyView(url);
     await checkAscendancyDocs();
 

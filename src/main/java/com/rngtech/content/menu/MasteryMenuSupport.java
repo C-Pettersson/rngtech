@@ -10,12 +10,18 @@ import com.rngtech.rpg.progression.MachineProgressionState;
 import com.rngtech.rpg.progression.MasteryDeclarations;
 import com.rngtech.rpg.progression.MegaPassiveTree;
 import com.rngtech.rpg.progression.PassiveProgressionView;
+import com.rngtech.rpg.unique.UniqueCatalog;
+import com.rngtech.rpg.unique.UniqueStatLine;
 
 import net.minecraft.util.Mth;
 import net.minecraft.world.inventory.ContainerData;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.WeakHashMap;
 import java.util.function.IntPredicate;
 import java.util.function.IntSupplier;
 import java.util.function.Supplier;
@@ -34,6 +40,8 @@ public final class MasteryMenuSupport {
     public static final int GRANTED_STAT_SLOTS = 8;
     public static final int FIELD_COUNT = GRANTED_STATS_START + GRANTED_STAT_SLOTS * 2;
 
+    private static final Map<MachineMasteryHost, List<MachineStat>> SHOWN = Collections.synchronizedMap(new WeakHashMap<>());
+
     /** A declared stat the chosen ascendancy grants, with its current value. */
     public record GrantedStat(MachineStat stat, double value) {
     }
@@ -45,7 +53,10 @@ public final class MasteryMenuSupport {
         if (field == ENTRY_STAGE) { return host.ascendancyEntryStage(); }
         if (field >= GRANTED_STATS_START) {
             int slot = (field - GRANTED_STATS_START) / 2;
-            List<MachineStat> granted = AscendancyCatalog.grantedStats(host.masteryState(), host.masteryFamily());
+            // Sync reads fields in order, so the list is built once per pass, at the first granted-stat field.
+            List<MachineStat> granted = field == GRANTED_STATS_START || !SHOWN.containsKey(host)
+                    ? shownStats(host, stats) : SHOWN.get(host);
+            SHOWN.put(host, granted);
             if (slot >= granted.size()) { return 0; }
             MachineStat stat = granted.get(slot);
             return (field - GRANTED_STATS_START) % 2 == 0 ? stat.ordinal() + 1 : (int) Math.round(stats.get().value(stat) * 100);
@@ -53,11 +64,24 @@ public final class MasteryMenuSupport {
         return field >= ASCENDANCY ? ascendancyField(host.masteryState(), field) : get(host.machineProgression(), field);
     }
 
+    /** Ascendancy stats the chosen ascendancy grants, then Unique Gear stats the machine currently has. */
+    private static List<MachineStat> shownStats(MachineMasteryHost host, Supplier<MachineStatAccumulator> stats) {
+        List<MachineStat> shown = new ArrayList<>(AscendancyCatalog.grantedStats(host.masteryState(), host.masteryFamily()));
+        MachineStatAccumulator values = stats.get();
+        for (MachineStat stat : UniqueGearStats.STATS) {
+            if (!shown.contains(stat) && Math.abs(values.value(stat)) > 1.0E-9) {
+                shown.add(stat);
+            }
+        }
+        return shown.size() > GRANTED_STAT_SLOTS ? shown.subList(0, GRANTED_STAT_SLOTS) : shown;
+    }
+
     public static List<GrantedStat> grantedStats(ContainerData data, int base) {
         List<GrantedStat> granted = new ArrayList<>();
         for (int slot = 0; slot < GRANTED_STAT_SLOTS; slot++) {
             int id = data.get(base + GRANTED_STATS_START + slot * 2) - 1;
-            if (id >= 0 && id < MachineStat.values().length && MasteryDeclarations.declared(MachineStat.byId(id))) {
+            if (id >= 0 && id < MachineStat.values().length
+                    && (MasteryDeclarations.declared(MachineStat.byId(id)) || UniqueGearStats.STATS.contains(MachineStat.byId(id)))) {
                 granted.add(new GrantedStat(MachineStat.byId(id), data.get(base + GRANTED_STATS_START + slot * 2 + 1) / 100.0));
             }
         }
@@ -152,4 +176,14 @@ public final class MasteryMenuSupport {
         };
     }
     private MasteryMenuSupport() { }
+
+    /** Stats only Unique Gear grants outside an ascendancy, shown on the Stats tab while a machine has them. */
+    private static final class UniqueGearStats {
+        private static final Set<MachineStat> STATS = UniqueCatalog.all().stream()
+                .flatMap(unique -> unique.lines().stream())
+                .filter(line -> line.role() != UniqueStatLine.Role.HOOK)
+                .map(UniqueStatLine::stat)
+                .filter(stat -> MasteryDeclarations.declared(stat) || stat == MachineStat.CYCLE_JAM_CHANCE || stat == MachineStat.ESCAPEMENT_SPEED)
+                .collect(java.util.stream.Collectors.toCollection(() -> java.util.EnumSet.noneOf(MachineStat.class)));
+    }
 }

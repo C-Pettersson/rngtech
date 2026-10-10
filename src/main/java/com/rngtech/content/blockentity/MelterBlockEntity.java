@@ -2,11 +2,8 @@ package com.rngtech.content.blockentity;
 
 import com.rngtech.content.block.BaseMachineBlock;
 import com.rngtech.content.item.BatteryCellItem;
-import com.rngtech.content.item.CrushHeadItem;
-import com.rngtech.content.item.FluidPumpItem;
+import com.rngtech.content.item.GearParts;
 import com.rngtech.content.item.MachinePartItem;
-import com.rngtech.content.item.ServoItem;
-import com.rngtech.content.item.SolidFuelBurnerPartItem;
 import com.rngtech.content.menu.MasteryMenuSupport;
 import com.rngtech.content.menu.MelterMenu;
 import com.rngtech.content.purge.FluidOutputOverflow;
@@ -21,6 +18,7 @@ import com.rngtech.content.registry.ModRecipes;
 import com.rngtech.content.registry.ModTags;
 import com.rngtech.rpg.BatchProcessing;
 import com.rngtech.rpg.ComponentBaseStatCatalog;
+import com.rngtech.rpg.EscapementState;
 import com.rngtech.rpg.MachineBaseStatCatalog;
 import com.rngtech.rpg.MachineBehavior;
 import com.rngtech.rpg.MachineImplicitCatalog;
@@ -285,6 +283,7 @@ public class MelterBlockEntity extends BaseMachineBlockEntity
         melter.updateTankCapacity(stats);
         MelterRecipe recipe = melter.nextRecipe();
         if (recipe == null || !melter.hasRequiredComponents()) {
+            melter.escapement.idle();
             melter.resetCycleIfActive();
             BaseMachineBlock.setActive(level, pos, state, false);
             return;
@@ -293,6 +292,7 @@ public class MelterBlockEntity extends BaseMachineBlockEntity
             melter.resetCycle();
             melter.resetBulkSpeed();
         }
+        melter.escapement.observe(recipe);
         if (melter.effectiveHeat(stats) < recipe.minimumTemperature()
                 || melter.processingLevel(stats) < recipe.requiredProcessingLevel()
                 || !melter.canAcceptOutputFluid(melter.yieldedOutput(recipe, stats))) {
@@ -546,14 +546,14 @@ public class MelterBlockEntity extends BaseMachineBlockEntity
         clampInternalEnergy();
     }
 
+    private final EscapementState escapement = new EscapementState();
+
     public static boolean isHeatCore(ItemStack stack) {
-        return stack.getItem() instanceof SolidFuelBurnerPartItem part
-                && part.partType() == MachinePartType.HEAT_CORE
-                && part.stage() <= 6;
+        return GearParts.is(stack, MachinePartType.HEAT_CORE, 6);
     }
 
     public static boolean isCrushHead(ItemStack stack) {
-        return stack.getItem() instanceof CrushHeadItem;
+        return GearParts.is(stack, MachinePartType.CRUSH_HEAD);
     }
 
     public static boolean isBatteryCell(ItemStack stack) {
@@ -561,11 +561,11 @@ public class MelterBlockEntity extends BaseMachineBlockEntity
     }
 
     public static boolean isServo(ItemStack stack) {
-        return stack.getItem() instanceof ServoItem;
+        return GearParts.is(stack, MachinePartType.SERVO);
     }
 
     public static boolean isFluidPump(ItemStack stack) {
-        return stack.getItem() instanceof FluidPumpItem;
+        return GearParts.is(stack, MachinePartType.FLUID_PUMP);
     }
 
     public static boolean isFluidInputContainer(ItemStack stack) {
@@ -620,6 +620,9 @@ public class MelterBlockEntity extends BaseMachineBlockEntity
                 grantRecipeXp(recipe);
             }
             melted = true;
+        }
+        if (melted) {
+            escapement.completed();
         }
         resetCycle();
         if (!melted) {
@@ -754,9 +757,15 @@ public class MelterBlockEntity extends BaseMachineBlockEntity
     }
 
     private int processingTicks(MelterRecipe recipe, MachineStatAccumulator stats) {
-        int ticks = Math.max(1, (int) Math.ceil(stats.adjustedHeatProcessingTicks(recipe.processingTicks()) / meltSpeed(recipe, stats)));
+        int ticks = Math.max(1, (int) Math.ceil(stats.adjustedHeatProcessingTicks(recipe.processingTicks())
+                / (meltSpeed(recipe, stats) * escapementSpeed(stats))));
         return BatchProcessing.batchTicks(ticks, stats, parallelMelts(recipe, stats));
     }
+
+    private double escapementSpeed(MachineStatAccumulator stats) {
+        return escapement.speed(MachineImplicitCatalog.hasBehavior(servoStack(), MachineBehavior.ESCAPEMENT), stats);
+    }
+
 
     private int energyCostPerTick(MelterRecipe recipe, MachineStatAccumulator stats) {
         int adjustedTicks = processingTicks(recipe, stats);
@@ -881,7 +890,7 @@ public class MelterBlockEntity extends BaseMachineBlockEntity
 
     private void applyHeatCoreStats(MachineStatAccumulator stats) {
         ItemStack stack = heatCoreStack();
-        if (!(stack.getItem() instanceof SolidFuelBurnerPartItem part) || !isHeatCore(stack)) {
+        if (!isHeatCore(stack)) {
             return;
         }
         ComponentBaseStatCatalog.applyEffectiveContribution(stats, stack);

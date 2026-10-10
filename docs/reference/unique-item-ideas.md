@@ -2,7 +2,7 @@
 
 Status: Planned
 
-This page collects candidate Unique Gear and Battery Cells. Only the Voltaic Potato Battery Cell (`rngtech:unique_potato_battery_cell`) is implemented. The [Unique Items PRD](../prds/uniques.md) defines the catalog, sources, and launch set. Entries here are not current gameplay until that PRD or a later task promotes them.
+This page collects candidate Unique Gear and Battery Cells. The Voltaic Potato Battery Cell and the eight launch Uniques are implemented as a Prototype; see the [Current Implementation Matrix](current-implementation.md). The [Unique Items PRD](../prds/uniques.md) defines the catalog, sources, and launch set. Backlog entries are not current gameplay until a later task promotes them.
 
 A strong Unique comes from one exact place in the world, solves one odd build problem, and carries one real drawback. It is a sidegrade or a build-around piece, not a higher stage.
 
@@ -10,7 +10,7 @@ A strong Unique comes from one exact place in the world, solves one odd build pr
 
 - Uniques use `UNIQUE` rarity and 0 Refinement Potential. Their stat lines are fixed or ranged, and each copy rolls its ranged lines when identified, so copies can be well or poorly rolled. Uniques cannot be crafted, refined, or recycled. [Corruption](../prds/corruption.md) is the only way to change one.
 - Each Unique targets one Gear slot type and names a slot stage, which drives stage gates such as Crush Head ≤ chassis stage and the Metal Press and Melter Heat Core cap of 6.
-- Every stat on a Unique, including its drawback, must be read by at least one host it fits. Check [Machine Stats](machine-stats.md) and the host's block entity before using a stat. For example, `STABILITY` is not read by the Solid Fuel Burner, Battery Chassis, or Component Recycler, and `OUTPUT_AMOUNT` is read only by the Crusher and Cavitation Generator.
+- Every stat on a Unique, including its drawback, must be read by at least one host it fits. The catalog enforces this at load from the stat-reader table in `UniqueStatReaders`, so a new host stat needs a table entry first. For example, `STABILITY` is not read by the Solid Fuel Burner, Battery Chassis, or Component Recycler, and `OUTPUT_AMOUNT` is read only by the Crusher and Cavitation Generator.
 - A Unique should have one signature: a stat no normal part of its type provides, a behavior normal parts get only at a later stage, or a new `MachineBehavior`.
 - A Unique may grant an ascendancy stat as a build-around hook. Its tooltip names the ascendancy it needs.
 - No yield stats in 2.0. A Unique that adds Output Amount, Super Output, salvage, Fluid Yield, Ledger Rate, or residue needs loop-audit coverage first (see the [ascendancy loop rules](../prds/machine-ascendancies.md#loop-prevention)).
@@ -19,20 +19,24 @@ A strong Unique comes from one exact place in the world, solves one odd build pr
 
 ## Launch Set
 
-These eight are specified, with their ranges, in the [Unique Items PRD](../prds/uniques.md#launch-uniques).
+Status: Prototype
+
+These eight are implemented and specified, with their ranges, in the [Unique Items PRD](../prds/uniques.md#launch-uniques). Their shipped values live in the catalog under `data/rngtech/uniques/`.
 
 | Unique | Host | Slot stage | Source | Signature | Drawback |
 |---|---|---:|---|---|---|
-| Fortress Heater Element | Heat Core | 4 | Nether fortress chest | Titanium-class Maximum Temperature, 75% less Warmup Time, Overdrive Margin hook | More Energy Usage, less Temperature Stability, poor Solid Fuel Burner fuel efficiency |
+| Fortress Heater Element | Heat Core | 4 | Nether fortress chest | Sparksteel-class Maximum Temperature, 60–80% less Warmup Time, Overdrive Margin hook | More Energy Usage, less Overheat Tolerance, poor Solid Fuel Burner fuel efficiency |
 | Igloo Basement Thermostat | Heat Core | 2 | Igloo basement chest | Top Temperature Stability and Overheat Tolerance, early `POWER_GRACE`, Heat Window hook | Bronze-class Maximum Temperature cap, less Heat Transfer |
-| Mineshaft Worn Pick-Jaw | Crush Head | 2 | Mineshaft minecart chest | +1 Processing Level over slot stage, +1 to +3 Batch Size, Jam Recovery hook | Jam Chance on every cycle, less Output Amount |
-| Crying Crucible | Alloy Crucible | 3 | Ruined portal chest | Blend Speed and Blend Heat Reduction without Blendwright | Less Stability and Temperature Stability |
+| Mineshaft Worn Pick-Jaw | Crush Head | 2 | Mineshaft minecart chest | +1 Processing Level over slot stage, +1 to +2 Batch Size, Jam Recovery hook | Jam Chance on every cycle, more Energy Usage |
+| Crying Crucible | Alloy Crucible | 3 | Ruined portal chest | Blend Speed and Blend Heat Reduction without Blendwright | More Energy Usage, less Stability |
 | Trial Vault Escapement | Servo | 6 | Ominous trial vault | `ESCAPEMENT` first-cycle speed, Mold Swap Time hook | Slower sustained cycles, no `POWER_GRACE` |
 | Witch-Bottle Reflux Pump | Fluid Pump | 5 | Witch drop | Doubled host Fluid Capacity, `REFLUX` cheaper Sprinkler | Much less Fluid Transfer |
 | Ancient Echo Control Board | Control Board | 6 | Ancient city chest | Nullite-class Calibration Precision, `ECHO_STREAK` | Less Processing Speed, no Refinement Potential Bonus |
 | Bastion Coin-Stack Capacitor | Battery Cell | 4 | Bastion treasure chest | Doubled Burst Transfer and Duration in burst-capable chassis | High Idle Loss, weak steady output |
 
 ## Backlog
+
+Status: Planned
 
 Redesigned 2026-10-04 against current stats and Gear slots. Each entry lists what it needs beyond the Unique catalog.
 

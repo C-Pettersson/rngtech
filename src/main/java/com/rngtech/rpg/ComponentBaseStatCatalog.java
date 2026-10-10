@@ -35,6 +35,10 @@ import com.rngtech.content.machine.CrushHeadMaterial;
 import com.rngtech.content.machine.FluidPumpMaterial;
 import com.rngtech.content.machine.ServoMaterial;
 import com.rngtech.content.recycling.DisassemblyHeadMaterial;
+import com.rngtech.rpg.unique.UniqueDefinition;
+import com.rngtech.rpg.unique.UniqueHost;
+import com.rngtech.rpg.unique.UniqueItems;
+import com.rngtech.rpg.unique.UniqueStatLine;
 
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -66,12 +70,25 @@ public final class ComponentBaseStatCatalog {
         INCREASED
     }
 
+    /**
+     * A part's stats and how each reaches the host. {@code hostMore} multiplies a host stat that the part otherwise feeds
+     * through the increased bucket, and {@code gates} names the ascendancy a host needs before a stat applies.
+     */
     record Profile(
             MachineStatAccumulator baseStats,
             Map<MachineStat, MergeRule> mergeRules,
-            List<MachineStat> summaryStats
+            List<MachineStat> summaryStats,
+            Map<MachineStat, Double> hostMore,
+            Map<MachineStat, String> gates
     ) {
+        Profile(MachineStatAccumulator baseStats, Map<MachineStat, MergeRule> mergeRules, List<MachineStat> summaryStats) {
+            this(baseStats, mergeRules, summaryStats, Map.of(), Map.of());
+        }
     }
+
+    /** Stats a Battery Cell keeps for its own storage; anything else on a cell applies to the Battery Chassis holding it. */
+    private static final Set<MachineStat> CELL_STATS =
+            EnumSet.of(MachineStat.ENERGY_CAPACITY, MachineStat.ENERGY_TRANSFER, MachineStat.EFFICIENCY, MachineStat.IDLE_LOSS);
 
     public static MachineStatAccumulator baseStats(ItemStack stack) {
         Profile profile = profile(stack);
@@ -109,6 +126,12 @@ public final class ComponentBaseStatCatalog {
             }
         }
         return stats;
+    }
+
+    /** The ascendancy a host needs before {@code stat} on this part applies, or an empty string. */
+    public static String requiredAscendancy(ItemStack stack, MachineStat stat) {
+        Profile profile = profile(stack);
+        return profile == null ? "" : profile.gates().getOrDefault(stat, "");
     }
 
     /** Whether {@code stat} on this part joins the host's increased bucket, so its base reads as a percent. */
@@ -194,6 +217,9 @@ public final class ComponentBaseStatCatalog {
     ) {
         for (Map.Entry<MachineStat, MergeRule> entry : profile.mergeRules().entrySet()) {
             MachineStat stat = entry.getKey();
+            if (!target.hasAscendancy(profile.gates().getOrDefault(stat, ""))) {
+                continue;
+            }
             double value = contribution.value(stat);
             if (stat == MachineStat.ENERGY_GENERATION) {
                 target.applyPartEnergyGeneration(contribution, entry.getValue() == MergeRule.MORE);
@@ -205,6 +231,7 @@ public final class ComponentBaseStatCatalog {
                 case INCREASED -> applyIncreased(target, profile.baseStats().baseValue(stat), stat, traits);
             }
         }
+        profile.hostMore().forEach((stat, value) -> applyMore(target, stat, value));
 
         int refinementPotential = traits.refinementPotential();
         if (refinementPotential > 0) {
@@ -212,8 +239,140 @@ public final class ComponentBaseStatCatalog {
         }
     }
 
+    /** A Battery Cell's stats for the Battery Chassis that holds it, such as a Unique cell's Burst Transfer. */
+    public static void applyCellHostContribution(MachineStatAccumulator target, ItemStack stack) {
+        if (!(stack.getItem() instanceof BatteryCellItem) || UniqueItems.definition(stack.getItem()) == null) {
+            return;
+        }
+        Profile profile = profile(stack);
+        if (profile == null || profile.mergeRules().keySet().stream().allMatch(CELL_STATS::contains)) {
+            return;
+        }
+        Map<MachineStat, MergeRule> hostRules = new EnumMap<>(MachineStat.class);
+        profile.mergeRules().forEach((stat, rule) -> {
+            if (!CELL_STATS.contains(stat)) {
+                hostRules.put(stat, rule);
+            }
+        });
+        Profile hostProfile = new Profile(profile.baseStats(), hostRules, List.of(), profile.hostMore(), profile.gates());
+        try (MachineStatAccumulator.Source ignored = target.source(stack.getHoverName())) {
+            applyProfileContribution(target, hostProfile, effectiveStats(hostProfile, MachineTraits.EMPTY), MachineTraits.EMPTY);
+        }
+    }
+
     private static Profile profile(ItemStack stack) {
-        return stack.isEmpty() ? null : profile(stack.getItem());
+        if (stack.isEmpty()) {
+            return null;
+        }
+        UniqueDefinition unique = UniqueItems.definition(stack.getItem());
+        if (unique != null) {
+            return unique(unique, UniqueDefinition.storedRolls(componentTraits(stack).modifiers()));
+        }
+        return profile(stack.getItem());
+    }
+
+    /** A Unique's stats: its base profile, then every line at its fixed value, stored roll, or range midpoint. */
+    static Profile unique(UniqueDefinition definition, List<MachineModifier> storedRolls) {
+        ProfileBuilder builder = builder();
+        Profile base = uniqueBase(definition);
+        if (base != null) {
+            for (MachineStat stat : base.summaryStats()) {
+                builder.stat(stat, base.baseStats().baseValue(stat), base.mergeRules().get(stat));
+            }
+            base.mergeRules().forEach((stat, rule) -> {
+                if (!builder.values.containsKey(stat)) {
+                    builder.values.put(stat, base.baseStats().baseValue(stat));
+                    builder.mergeRules.put(stat, rule);
+                }
+            });
+        }
+        Map<MachineStat, Double> hostMore = new EnumMap<>(MachineStat.class);
+        Map<MachineStat, String> gates = new EnumMap<>(MachineStat.class);
+        for (UniqueStatLine line : definition.lines()) {
+            applyLine(builder, hostMore, line, line.engineValue(definition.value(line, storedRolls)));
+            if (line.role() == UniqueStatLine.Role.HOOK) {
+                gates.put(line.stat(), line.ascendancy());
+            }
+        }
+        Profile built = builder.build();
+        return new Profile(built.baseStats(), built.mergeRules(), built.summaryStats(), Map.copyOf(hostMore), Map.copyOf(gates));
+    }
+
+    private static void applyLine(ProfileBuilder builder, Map<MachineStat, Double> hostMore, UniqueStatLine line, double engine) {
+        MachineStat stat = line.stat();
+        MergeRule rule = builder.mergeRules.get(stat);
+        if (rule == null) {
+            switch (line.operation()) {
+                case FLAT -> builder.add(stat, engine);
+                case INCREASED -> builder.increased(stat, engine);
+                case MORE -> builder.more(stat, engine);
+            }
+            return;
+        }
+        double current = builder.values.get(stat);
+        switch (line.operation()) {
+            case FLAT -> builder.values.put(stat, current + engine);
+            case INCREASED -> builder.values.put(stat, rule == MergeRule.INCREASED ? current + engine : current * (1.0 + engine / 100.0));
+            case MORE -> {
+                if (rule == MergeRule.INCREASED) {
+                    hostMore.merge(stat, engine, (left, right) -> left * right);
+                } else {
+                    builder.values.put(stat, current * engine);
+                }
+            }
+        }
+    }
+
+    /** The profile a Unique starts from: its named base material, or a Unique Battery Cell's own material. */
+    static Profile uniqueBase(UniqueDefinition definition) {
+        if (!definition.baseProfile().isEmpty()) {
+            Enum<?> material = definition.host().material(definition.baseProfile());
+            return material == null ? null : materialProfile(definition.host(), material);
+        }
+        if (definition.host() == UniqueHost.BATTERY_CELL) {
+            BatteryCellMaterial material = UniqueItems.batteryCellMaterial(definition.id());
+            return material == null ? null : batteryCell(material);
+        }
+        return null;
+    }
+
+    /** The base profile of one normal material of {@code host}. */
+    static Profile materialProfile(UniqueHost host, Enum<?> material) {
+        return switch (host) {
+            case CRUSH_HEAD -> crushHead((CrushHeadMaterial) material);
+            case HEAT_CORE -> heatCore((HeatCoreMaterial) material);
+            case ALLOY_CRUCIBLE -> alloyCrucible((AlloyCrucibleMaterial) material);
+            case SERVO -> servo((ServoMaterial) material);
+            case FLUID_PUMP -> fluidPump((FluidPumpMaterial) material);
+            case CONTROL_BOARD -> controlBoard((CalibrationGearMaterial) material);
+            case BATTERY_CELL -> batteryCell((BatteryCellMaterial) material);
+        };
+    }
+
+    /** The highest {@code stat} any normal material of {@code host} at or below {@code maxStage} reaches. */
+    public static double normalMaximum(UniqueHost host, MachineStat stat, int maxStage) {
+        double maximum = Double.NEGATIVE_INFINITY;
+        for (Enum<?> material : host.materials()) {
+            if (host.stage(material) <= maxStage) {
+                maximum = Math.max(maximum, materialProfile(host, material).baseStats().baseValue(stat));
+            }
+        }
+        return maximum;
+    }
+
+    /** A Unique's own value for {@code stat} with its ranged lines at {@code storedRolls}, as the part reports it. */
+    public static MachineStatAccumulator uniqueStats(UniqueDefinition definition, List<MachineModifier> storedRolls) {
+        return unique(definition, storedRolls).baseStats();
+    }
+
+    /** Registry-free Unique merge into a host, shared with headless checks. */
+    public static void applyUniqueContribution(MachineStatAccumulator target, UniqueDefinition definition, List<MachineModifier> rolls) {
+        applyContribution(target, unique(definition, rolls), MachineTraits.EMPTY);
+    }
+
+    /** Whether a Unique's base profile resolves; a Unique without one must list every stat. */
+    public static boolean hasUniqueBase(UniqueDefinition definition) {
+        return uniqueBase(definition) != null;
     }
 
     private static Profile profile(Item item) {
@@ -290,7 +449,7 @@ public final class ComponentBaseStatCatalog {
         return null;
     }
 
-    private static Profile batteryCell(BatteryCellMaterial material) {
+    static Profile batteryCell(BatteryCellMaterial material) {
         return builder()
                 .add(MachineStat.ENERGY_CAPACITY, material.capacity())
                 .add(MachineStat.ENERGY_TRANSFER, material.inputRate())
@@ -328,7 +487,7 @@ public final class ComponentBaseStatCatalog {
         return builder.build();
     }
 
-    private static Profile alloyCrucible(AlloyCrucibleMaterial material) {
+    static Profile alloyCrucible(AlloyCrucibleMaterial material) {
         return builder()
                 .add(MachineStat.INPUT_SLOTS, material.inputSlots())
                 .more(MachineStat.STABILITY, material.stability())
@@ -468,7 +627,7 @@ public final class ComponentBaseStatCatalog {
                 .build();
     }
 
-    private static Profile fluidPump(FluidPumpMaterial material) {
+    static Profile fluidPump(FluidPumpMaterial material) {
         return builder()
                 .add(MachineStat.FLUID_TRANSFER, material.transferRate())
                 .build();
@@ -522,7 +681,7 @@ public final class ComponentBaseStatCatalog {
                 .build();
     }
 
-    private static Profile controlBoard(CalibrationGearMaterial material) {
+    static Profile controlBoard(CalibrationGearMaterial material) {
         return builder()
                 .more(MachineStat.CALIBRATION_PRECISION, percentMultiplier(material.precisionPercent()))
                 .more(MachineStat.STABILITY, percentMultiplier(Math.max(2, material.stage() * 2)))

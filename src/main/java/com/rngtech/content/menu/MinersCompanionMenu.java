@@ -1,7 +1,6 @@
 package com.rngtech.content.menu;
 
 import com.rngtech.content.item.BatteryCellItem;
-import com.rngtech.content.item.CrushHeadItem;
 import com.rngtech.content.item.MinersCompanionItem;
 import com.rngtech.content.minerscompanion.MinersCompanionState;
 import com.rngtech.content.registry.ModDataComponents;
@@ -265,7 +264,7 @@ public class MinersCompanionMenu extends AbstractContainerMenu {
             }
         } else if (index < PLAYER_INVENTORY_START) {
             return ItemStack.EMPTY;
-        } else if (stack.getItem() instanceof CrushHeadItem) {
+        } else if (MinersCompanionState.validCrushHead(stack)) {
             if (!moveItemStackTo(stack, SLOT_CRUSH_HEAD, SLOT_CRUSH_HEAD + 1, false)) {
                 return ItemStack.EMPTY;
             }
@@ -308,7 +307,7 @@ public class MinersCompanionMenu extends AbstractContainerMenu {
             @Override
             public boolean isItemValid(int slot, ItemStack stack) {
                 return switch (slot) {
-                    case SLOT_CRUSH_HEAD -> stack.getItem() instanceof CrushHeadItem;
+                    case SLOT_CRUSH_HEAD -> MinersCompanionState.validCrushHead(stack);
                     case SLOT_BATTERY_CELL -> BatteryCellItem.isBatteryCell(stack);
                     case SLOT_RECOVERY_FILTER -> MinersCompanionState.validRecoveryFilter(stack);
                     case SLOT_MAGNET -> MinersCompanionState.validMagnet(stack);

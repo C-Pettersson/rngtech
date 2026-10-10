@@ -80,6 +80,8 @@ public final class MachineStatDisplay {
             case BANK_MEMORY -> formatUnit(value, "input", "inputs");
             case JAM_CHANCE -> formatMultiplierDelta(value);
             case JAM_RECOVERY, UNDER_LEVEL_EFFICIENCY, AT_LEVEL_OUTPUT, OVERDRIVE_CAP, LEDGER_RATE, FLUX_RATE, BLEND_SPEED -> formatSignedPercentPoints(value);
+            case CYCLE_JAM_CHANCE -> formatSignedPercentPoints(value) + " chance";
+            case ESCAPEMENT_SPEED -> formatSignedPercentPoints(value);
             case BLEND_HEAT_REDUCTION -> formatNumber(value) + " \u00b0C";
             case MOLD_SWAP_TIME -> formatUnit(value, "tick", "ticks");
             case HEAT_WINDOW -> formatSignedPercentPoints(value);
@@ -220,6 +222,8 @@ public final class MachineStatDisplay {
             case HARDNESS_TOLERANCE -> formatSignedUnit(value, "level", "levels");
             case BANK_MEMORY -> formatSignedUnit(value, "input", "inputs");
             case JAM_RECOVERY, UNDER_LEVEL_EFFICIENCY, AT_LEVEL_OUTPUT, OVERDRIVE_CAP, LEDGER_RATE, FLUX_RATE, BLEND_SPEED -> formatSignedPercentPoints(value);
+            case CYCLE_JAM_CHANCE -> formatSignedPercentPoints(value) + " chance";
+            case ESCAPEMENT_SPEED -> formatSignedPercentPoints(value);
             case BLEND_HEAT_REDUCTION -> formatSignedNumber(value) + " \u00b0C";
             case MOLD_SWAP_TIME -> formatSignedUnit(value, "tick", "ticks");
             case HEAT_WINDOW -> formatSignedPercentPoints(value);
@@ -240,6 +244,13 @@ public final class MachineStatDisplay {
     private static String formatUnit(double value, String singular, String plural) {
         String unit = Math.abs(value - 1.0) <= EPSILON ? singular : plural;
         return formatNumber(value) + " " + unit;
+    }
+
+    /** The unit a flat {@code stat} value carries after its number, such as " °C" or " items", for range labels. */
+    public static String additiveUnit(MachineStat stat, double magnitude) {
+        String formatted = formatAdditiveEffectValue(stat, magnitude);
+        String number = formatSignedNumber(magnitude);
+        return formatted.startsWith(number) ? formatted.substring(number.length()) : "";
     }
 
     private static String formatSignedUnit(double value, String singular, String plural) {

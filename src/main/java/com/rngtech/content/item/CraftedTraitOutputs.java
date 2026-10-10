@@ -7,13 +7,13 @@ import com.rngtech.rpg.MachineTraitRoller;
 import com.rngtech.rpg.MachineTraits;
 import com.rngtech.rpg.MachineType;
 import com.rngtech.rpg.ModifierEligibilityProfiles;
-import com.rngtech.rpg.Rarity;
+import com.rngtech.rpg.unique.UniqueDefinition;
+import com.rngtech.rpg.unique.UniqueItems;
 
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.item.ItemStack;
 
-import java.util.List;
 import java.util.Locale;
 
 public final class CraftedTraitOutputs {
@@ -59,10 +59,16 @@ public final class CraftedTraitOutputs {
         return stack;
     }
 
+    /** A pending roll, or a Unique with ranged lines and no rolls yet, such as one from a command or quest reward. */
     public static boolean isUnidentified(ItemStack stack) {
-        return !stack.isEmpty()
-                && !stack.has(ModDataComponents.MACHINE_TRAITS.get())
-                && stack.has(ModDataComponents.UNIDENTIFIED_TRAIT_ROLL.get());
+        if (stack.isEmpty() || stack.has(ModDataComponents.MACHINE_TRAITS.get())) {
+            return false;
+        }
+        if (stack.has(ModDataComponents.UNIDENTIFIED_TRAIT_ROLL.get())) {
+            return true;
+        }
+        UniqueDefinition unique = UniqueItems.definition(stack);
+        return unique != null && unique.hasRangedLines() && !RecyclingData.isStripped(stack);
     }
 
     public static boolean canReceiveCraftedTraits(ItemStack stack) {
@@ -101,6 +107,11 @@ public final class CraftedTraitOutputs {
     }
 
     private static boolean applyRolledTraits(ItemStack stack, RandomSource random) {
+        UniqueDefinition unique = UniqueItems.definition(stack);
+        if (unique != null) {
+            stack.set(ModDataComponents.MACHINE_TRAITS.get(), unique.roll(random));
+            return true;
+        }
         if (stack.getItem() instanceof MachineBlockItem machine) {
             stack.set(
                     ModDataComponents.MACHINE_TRAITS.get(),
@@ -131,13 +142,7 @@ public final class CraftedTraitOutputs {
         if (stack.getItem() instanceof BatteryCellItem cell) {
             stack.set(
                     ModDataComponents.MACHINE_TRAITS.get(),
-                    cell.material().unique()
-                            ? new MachineTraits(Rarity.UNIQUE, 0, List.of())
-                            : MachineTraitRoller.roll(
-                                    ModifierEligibilityProfiles.forBatteryCell(false),
-                                    cell.material().stage(),
-                                    random
-                            )
+                    MachineTraitRoller.roll(ModifierEligibilityProfiles.forBatteryCell(false), cell.material().stage(), random)
             );
             return true;
         }
@@ -189,6 +194,9 @@ public final class CraftedTraitOutputs {
     }
 
     private static int componentStage(ItemStack stack) {
+        if (UniqueItems.definition(stack) != null) {
+            return UniqueItems.slotStage(stack);
+        }
         if (stack.getItem() instanceof BatteryCellItem cell) {
             return cell.material().stage();
         }
@@ -214,6 +222,10 @@ public final class CraftedTraitOutputs {
     }
 
     private static String targetKey(ItemStack stack) {
+        UniqueDefinition unique = UniqueItems.definition(stack);
+        if (unique != null) {
+            return "unique/" + unique.id();
+        }
         if (stack.getItem() instanceof BatteryCellItem cell) {
             return key(cell.machineType().name());
         }

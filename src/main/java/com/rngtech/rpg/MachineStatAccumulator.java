@@ -56,6 +56,7 @@ public final class MachineStatAccumulator {
     private final Map<MachineStat, List<StatBreakdown.Term>> recorded =
             RECORDING.get() ? new EnumMap<>(MachineStat.class) : null;
     private final Deque<Component> sources = new ArrayDeque<>();
+    private String ascendancy = "";
 
     /**
      * Runs {@code statsFactory} with breakdown recording on: every accumulator it creates remembers which labelled
@@ -83,6 +84,16 @@ public final class MachineStatAccumulator {
     public interface Source extends AutoCloseable {
         @Override
         void close();
+    }
+
+    /** Records the host's chosen ascendancy, so Gear stats that need one apply only on its machines. */
+    public void setAscendancy(String ascendancy) {
+        this.ascendancy = ascendancy == null ? "" : ascendancy;
+    }
+
+    /** Whether the host chose {@code required}; an empty requirement always holds. */
+    public boolean hasAscendancy(String required) {
+        return required.isEmpty() || required.equals(ascendancy);
     }
 
     public void setAbsolute(MachineStat stat, double value) {

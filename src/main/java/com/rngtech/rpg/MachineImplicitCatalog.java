@@ -74,6 +74,8 @@ import com.rngtech.content.machine.ServoMaterial;
 import com.rngtech.content.recycling.ComponentRecyclerChassis;
 import com.rngtech.content.recycling.DisassemblyHeadMaterial;
 import com.rngtech.content.registry.ModDataComponents;
+import com.rngtech.rpg.unique.UniqueDefinition;
+import com.rngtech.rpg.unique.UniqueItems;
 
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -102,6 +104,10 @@ public final class MachineImplicitCatalog {
     }
 
     public static Identity identity(Item item) {
+        UniqueDefinition unique = UniqueItems.definition(item);
+        if (unique != null) {
+            return unique(unique);
+        }
         if (item instanceof CrusherChassisBlockItem chassis) {
             return crusher(chassis.material());
         }
@@ -524,12 +530,12 @@ public final class MachineImplicitCatalog {
     }
 
     private static Identity batteryCell(BatteryCellMaterial material) {
-        return identity(
-                "battery_cell." + material.getSerializedName(),
-                material.unique() ? Rarity.UNIQUE : Rarity.NORMAL,
-                0,
-                List.of()
-        );
+        return identity("battery_cell." + material.getSerializedName(), Rarity.NORMAL, 0, List.of());
+    }
+
+    /** A Unique's identity: Unique rarity, no Refinement Potential, and its catalog behaviors. */
+    public static Identity unique(UniqueDefinition definition) {
+        return new Identity(definition.translationKey(), new MachineTraits(Rarity.UNIQUE, 0, List.of(), definition.behaviors()));
     }
 
     private static Identity solidFuelBurner(SolidFuelBurnerChassis chassis) {

@@ -5,6 +5,7 @@ import com.rngtech.content.block.BatteryChassisBlock;
 import com.rngtech.content.item.BatteryCellItem;
 import com.rngtech.content.menu.BatteryChassisMenu;
 import com.rngtech.content.registry.ModBlockEntities;
+import com.rngtech.rpg.ComponentBaseStatCatalog;
 import com.rngtech.rpg.MachineBaseStatCatalog;
 import com.rngtech.rpg.MachineBehavior;
 import com.rngtech.rpg.MachineImplicitCatalog;
@@ -309,6 +310,9 @@ public class BatteryChassisBlockEntity extends BaseMachineBlockEntity implements
     private MachineStatAccumulator effectiveStats(MachineTraits traits) {
         MachineStatAccumulator stats = MachineBaseStatCatalog.batteryChassis(block.material());
         stats.apply(traits);
+        for (int slot = 0; slot < inventory.getSlots(); slot++) {
+            ComponentBaseStatCatalog.applyCellHostContribution(stats, inventory.getStackInSlot(slot));
+        }
         return stats;
     }
 

@@ -1,6 +1,14 @@
 {
   "replace": false,
   "entries": [
-    "rngtech:add_unique_potato_battery_cell_to_village_chests"
+    "rngtech:add_unique_potato_battery_cell_to_village_chests",
+    "rngtech:add_fortress_heater_element",
+    "rngtech:add_igloo_basement_thermostat",
+    "rngtech:add_mineshaft_worn_pick_jaw",
+    "rngtech:add_crying_crucible",
+    "rngtech:add_trial_vault_escapement",
+    "rngtech:add_witch_bottle_reflux_pump",
+    "rngtech:add_ancient_echo_control_board",
+    "rngtech:add_bastion_coin_stack_capacitor"
   ]
 }

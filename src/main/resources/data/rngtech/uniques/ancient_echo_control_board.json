@@ -1,0 +1,30 @@
+{
+    "id": "rngtech:ancient_echo_control_board",
+    "host": "control_board",
+    "slot_stage": 6,
+    "base_profile": "rngtech:nullite_control_board",
+    "stats": {
+        "rngtech:streak_cap": {
+            "operation": "flat",
+            "min": 1,
+            "max": 3,
+            "role": "hook",
+            "ascendancy": "harmonist"
+        },
+        "rngtech:processing_speed": {
+            "operation": "more",
+            "min": -0.25,
+            "max": -0.1,
+            "role": "drawback"
+        },
+        "rngtech:refinement_potential_bonus": {
+            "operation": "more",
+            "value": -1.0,
+            "role": "drawback"
+        }
+    },
+    "behaviors": [
+        "rngtech:echo_streak"
+    ],
+    "source": "rngtech:unique_source.ancient_city"
+}

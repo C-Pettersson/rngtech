@@ -62,6 +62,8 @@ import com.rngtech.content.tool.PruningShearsMaterial;
 import com.rngtech.content.tool.ToolHeadFamily;
 import com.rngtech.rpg.MachineType;
 import com.rngtech.rpg.ModifierEligibilityProfiles;
+import com.rngtech.rpg.unique.UniqueDefinition;
+import com.rngtech.rpg.unique.UniqueHost;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -979,17 +981,17 @@ public final class GearSlotCatalog {
     }
 
     private static List<ItemStack> crushHeads(Predicate<CrushHeadMaterial> filter) {
-        return Arrays.stream(CrushHeadMaterial.values())
+        return withUniques(Arrays.stream(CrushHeadMaterial.values())
                 .filter(filter)
                 .map(material -> item(ModItems.crushHead(material).get()))
-                .toList();
+                .toList(), UniqueHost.CRUSH_HEAD, filter);
     }
 
     private static List<ItemStack> heatCores(Predicate<HeatCoreMaterial> filter) {
-        return Arrays.stream(HeatCoreMaterial.values())
+        return withUniques(Arrays.stream(HeatCoreMaterial.values())
                 .filter(filter)
                 .map(material -> item(ModItems.heatCore(material).get()))
-                .toList();
+                .toList(), UniqueHost.HEAT_CORE, filter);
     }
 
     private static List<ItemStack> fuelBoxes(Predicate<FuelBoxMaterial> filter) {
@@ -1045,10 +1047,10 @@ public final class GearSlotCatalog {
     }
 
     private static List<ItemStack> servos(Predicate<ServoMaterial> filter) {
-        return Arrays.stream(ServoMaterial.values())
+        return withUniques(Arrays.stream(ServoMaterial.values())
                 .filter(filter)
                 .map(material -> item(ModItems.servo(material).get()))
-                .toList();
+                .toList(), UniqueHost.SERVO, filter);
     }
 
     private static List<ItemStack> cathodes(Predicate<CathodeMaterial> filter) {
@@ -1059,17 +1061,17 @@ public final class GearSlotCatalog {
     }
 
     private static List<ItemStack> fluidPumps(Predicate<FluidPumpMaterial> filter) {
-        return Arrays.stream(FluidPumpMaterial.values())
+        return withUniques(Arrays.stream(FluidPumpMaterial.values())
                 .filter(filter)
                 .map(material -> item(ModItems.fluidPump(material).get()))
-                .toList();
+                .toList(), UniqueHost.FLUID_PUMP, filter);
     }
 
     private static List<ItemStack> alloyCrucibles(Predicate<AlloyCrucibleMaterial> filter) {
-        return Arrays.stream(AlloyCrucibleMaterial.values())
+        return withUniques(Arrays.stream(AlloyCrucibleMaterial.values())
                 .filter(filter)
                 .map(material -> item(ModItems.alloyCrucible(material).get()))
-                .toList();
+                .toList(), UniqueHost.ALLOY_CRUCIBLE, filter);
     }
 
     private static List<ItemStack> disassemblyHeads(Predicate<DisassemblyHeadMaterial> filter) {
@@ -1115,10 +1117,10 @@ public final class GearSlotCatalog {
     }
 
     private static List<ItemStack> controlBoards(Predicate<CalibrationGearMaterial> filter) {
-        return Arrays.stream(CalibrationGearMaterial.values())
+        return withUniques(Arrays.stream(CalibrationGearMaterial.values())
                 .filter(filter)
                 .map(material -> item(ModItems.controlBoard(material).get()))
-                .toList();
+                .toList(), UniqueHost.CONTROL_BOARD, filter);
     }
 
     private static List<ItemStack> stabilizerMatrices(Predicate<CalibrationGearMaterial> filter) {
@@ -1149,6 +1151,21 @@ public final class GearSlotCatalog {
                 item(ModItems.CIRCUIT_MOLD.get()),
                 item(ModItems.CONNECTOR_MOLD.get())
         );
+    }
+
+    /** Adds Unique parts of {@code host} whose slot stage passes {@code filter}, judged on a normal material of that stage. */
+    @SuppressWarnings("unchecked")
+    private static <M> List<ItemStack> withUniques(List<ItemStack> normal, UniqueHost host, Predicate<M> filter) {
+        List<ItemStack> stacks = new ArrayList<>(normal);
+        for (var unique : ModItems.UNIQUE_PARTS.values()) {
+            UniqueDefinition definition = unique.get().definition();
+            if (definition.host() == host && host.materials().stream()
+                    .filter(material -> host.stage(material) == definition.slotStage())
+                    .anyMatch(material -> filter.test((M) material))) {
+                stacks.add(item(unique.get()));
+            }
+        }
+        return List.copyOf(stacks);
     }
 
     private static Component anyStage() {
