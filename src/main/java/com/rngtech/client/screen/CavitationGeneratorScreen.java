@@ -63,7 +63,6 @@ public class CavitationGeneratorScreen extends AbstractContainerScreen<Cavitatio
     private static final String[] STAT_LABEL_KEYS = {
             "rngtech.stat.energy_generation",
             "rngtech.stat.energy_capacity",
-            "rngtech.stat.energy_transfer",
             "rngtech.stat.efficiency",
             "rngtech.stat.processing_speed",
             "rngtech.stat.processing_level",
@@ -75,7 +74,6 @@ public class CavitationGeneratorScreen extends AbstractContainerScreen<Cavitatio
     private static final int[] STAT_DATA_INDICES = {
             CavitationGeneratorMenu.energyGenerationDataIndex(),
             CavitationGeneratorMenu.energyCapacityDataIndex(),
-            CavitationGeneratorMenu.energyTransferDataIndex(),
             CavitationGeneratorMenu.efficiencyDataIndex(),
             CavitationGeneratorMenu.processingSpeedDataIndex(),
             CavitationGeneratorMenu.processingLevelDataIndex(),
@@ -87,7 +85,6 @@ public class CavitationGeneratorScreen extends AbstractContainerScreen<Cavitatio
     private static final MachineStat[] STAT_TYPES = {
             MachineStat.ENERGY_GENERATION,
             MachineStat.ENERGY_CAPACITY,
-            MachineStat.ENERGY_TRANSFER,
             MachineStat.EFFICIENCY,
             MachineStat.PROCESSING_SPEED,
             MachineStat.PROCESSING_LEVEL,
@@ -145,7 +142,6 @@ public class CavitationGeneratorScreen extends AbstractContainerScreen<Cavitatio
             guiGraphics.drawString(font, Component.translatable("rngtech.gear.heat_core.short"), 84, 35, TEXT_MUTED, false);
             guiGraphics.drawString(font, Component.translatable("rngtech.gear.battery_cell.short"), 118, 35, TEXT_MUTED, false);
             guiGraphics.drawString(font, Component.translatable("rngtech.gear.servo.short"), 150, 35, TEXT_MUTED, false);
-            guiGraphics.drawString(font, Component.translatable("rngtech.gear.energy_connector.short"), 185, 35, TEXT_MUTED, false);
         } else if (menu.selectedTab() == CavitationGeneratorMenu.TAB_STATS) {
             MachineScreenStyle.drawStatPanelLabels(guiGraphics, font, Component.translatable("rngtech.tab.stats"), statLines(), STAT_PANEL_X, STAT_PANEL_Y, STAT_PANEL_WIDTH, ENERGY);
         } else {
@@ -207,7 +203,6 @@ public class CavitationGeneratorScreen extends AbstractContainerScreen<Cavitatio
             renderSlotFrame(guiGraphics, 86, 47);
             renderSlotFrame(guiGraphics, 120, 47);
             renderSlotFrame(guiGraphics, 154, 47);
-            renderSlotFrame(guiGraphics, 188, 47);
         } else if (menu.selectedTab() == CavitationGeneratorMenu.TAB_REFINEMENT) {
             renderSlotFrame(guiGraphics, RefinementScreenStyle.TARGET_SLOT_X - 1, RefinementScreenStyle.SLOT_Y - 1);
             renderSlotFrame(guiGraphics, RefinementScreenStyle.CONSUMABLE_SLOT_X - 1, RefinementScreenStyle.SLOT_Y - 1);

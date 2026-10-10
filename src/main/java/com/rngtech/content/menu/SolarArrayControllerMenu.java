@@ -1,7 +1,6 @@
 package com.rngtech.content.menu;
 
 import com.rngtech.content.blockentity.SolarArrayControllerBlockEntity;
-import com.rngtech.content.item.EnergyConnectorItem;
 import com.rngtech.content.registry.ModBlocks;
 import com.rngtech.content.registry.ModMenus;
 import com.rngtech.rpg.MachineTraits;
@@ -38,28 +37,25 @@ public class SolarArrayControllerMenu extends AbstractContainerMenu {
     private static final int DATA_STATUS = 6;
     private static final int DATA_ENERGY_GENERATION = 7;
     private static final int DATA_ENERGY_CAPACITY_STAT = 8;
-    private static final int DATA_ENERGY_TRANSFER = 9;
-    private static final int DATA_EFFICIENCY = 10;
-    private static final int DATA_STABILITY = 11;
-    private static final int DATA_REFINEMENT_POTENTIAL = 12;
-    private static final int DATA_PANEL_LIMIT = 13;
-    private static final int DATA_MOONLIGHT_CONVERSION = 14;
-    private static final int DATA_WEATHER_RECOVERY = 15;
-    private static final int DATA_PANEL_SYNCHRONIZATION = 16;
-    private static final int DATA_OVERFLOW_SHUNTING = 17;
-    private static final int DATA_CLEAR_SKY_AMPLIFICATION = 18;
-    private static final int DATA_LUNAR_INVERSION = 19;
-    private static final int DATA_CONNECTOR_OUTPUT_CAP = 20;
-    private static final int DATA_PREVIEW_RANGE = 21;
-    private static final int DATA_PANEL_RANGE = 22;
-    private static final int DATA_FLAT_ENERGY_GENERATION = 23;
-    private static final int DATA_BASE_ENERGY_GENERATION = 24;
-    private static final int DATA_COUNT = 25;
+    private static final int DATA_EFFICIENCY = 9;
+    private static final int DATA_STABILITY = 10;
+    private static final int DATA_REFINEMENT_POTENTIAL = 11;
+    private static final int DATA_PANEL_LIMIT = 12;
+    private static final int DATA_MOONLIGHT_CONVERSION = 13;
+    private static final int DATA_WEATHER_RECOVERY = 14;
+    private static final int DATA_PANEL_SYNCHRONIZATION = 15;
+    private static final int DATA_OVERFLOW_SHUNTING = 16;
+    private static final int DATA_CLEAR_SKY_AMPLIFICATION = 17;
+    private static final int DATA_LUNAR_INVERSION = 18;
+    private static final int DATA_PREVIEW_RANGE = 19;
+    private static final int DATA_PANEL_RANGE = 20;
+    private static final int DATA_FLAT_ENERGY_GENERATION = 21;
+    private static final int DATA_BASE_ENERGY_GENERATION = 22;
+    private static final int DATA_COUNT = 23;
     private static final int STAT_SCALE = 100;
     public static final int BUTTON_TOGGLE_PREVIEW_RANGE = 10;
     private static final int BATTERY_CELL_SLOT = 0;
-    private static final int ENERGY_CONNECTOR_SLOT = BATTERY_CELL_SLOT + 1;
-    private static final int SOLAR_ARRAY_EXTENDER_SLOT = ENERGY_CONNECTOR_SLOT + 1;
+    private static final int SOLAR_ARRAY_EXTENDER_SLOT = BATTERY_CELL_SLOT + 1;
     private static final int REFINEMENT_CONSUMABLE_SLOT = SOLAR_ARRAY_EXTENDER_SLOT + 1;
     private static final int REFINEMENT_TARGET_SLOT = REFINEMENT_CONSUMABLE_SLOT + 1;
     private static final int PLAYER_INVENTORY_START = REFINEMENT_TARGET_SLOT + 1;
@@ -108,13 +104,6 @@ public class SolarArrayControllerMenu extends AbstractContainerMenu {
                 controller.getGearInventory(),
                 SolarArrayControllerBlockEntity.SLOT_BATTERY_CELL,
                 93,
-                48,
-                () -> selectedTab == TAB_GEAR
-        ));
-        addSlot(new TabbedSlot(
-                controller.getGearInventory(),
-                SolarArrayControllerBlockEntity.SLOT_ENERGY_CONNECTOR,
-                129,
                 48,
                 () -> selectedTab == TAB_GEAR
         ));
@@ -191,10 +180,6 @@ public class SolarArrayControllerMenu extends AbstractContainerMenu {
         return controller.getBlockPos();
     }
 
-    public int connectorOutputCap() {
-        return data.get(DATA_CONNECTOR_OUTPUT_CAP);
-    }
-
     public boolean previewRange() {
         return data.get(DATA_PREVIEW_RANGE) != 0;
     }
@@ -216,9 +201,7 @@ public class SolarArrayControllerMenu extends AbstractContainerMenu {
     }
 
     public double statValue(int dataIndex) {
-        if (dataIndex == DATA_REFINEMENT_POTENTIAL
-                || dataIndex == DATA_PANEL_RANGE
-                || dataIndex == DATA_ENERGY_TRANSFER) {
+        if (dataIndex == DATA_REFINEMENT_POTENTIAL || dataIndex == DATA_PANEL_RANGE) {
             return data.get(dataIndex);
         }
         return data.get(dataIndex) / (double) STAT_SCALE;
@@ -238,10 +221,6 @@ public class SolarArrayControllerMenu extends AbstractContainerMenu {
 
     public static int energyCapacityStatDataIndex() {
         return DATA_ENERGY_CAPACITY_STAT;
-    }
-
-    public static int energyTransferDataIndex() {
-        return DATA_ENERGY_TRANSFER;
     }
 
     public static int efficiencyDataIndex() {
@@ -332,10 +311,6 @@ public class SolarArrayControllerMenu extends AbstractContainerMenu {
             }
         } else if (controller.isBatteryCell(stack)) {
             if (!moveItemStackTo(stack, BATTERY_CELL_SLOT, BATTERY_CELL_SLOT + 1, false)) {
-                return ItemStack.EMPTY;
-            }
-        } else if (stack.getItem() instanceof EnergyConnectorItem) {
-            if (!moveItemStackTo(stack, ENERGY_CONNECTOR_SLOT, ENERGY_CONNECTOR_SLOT + 1, false)) {
                 return ItemStack.EMPTY;
             }
         } else if (controller.isSolarArrayExtender(stack)) {

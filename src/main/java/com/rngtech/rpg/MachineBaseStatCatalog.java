@@ -407,7 +407,6 @@ public final class MachineBaseStatCatalog {
             return List.of(
                     MachineStat.ENERGY_GENERATION,
                     MachineStat.ENERGY_CAPACITY,
-                    MachineStat.ENERGY_TRANSFER,
                     MachineStat.EFFICIENCY,
                     MachineStat.STABILITY,
                     MachineStat.SOLAR_PANEL_LIMIT,
@@ -461,7 +460,6 @@ public final class MachineBaseStatCatalog {
                 );
                 case SOLAR_ARRAY_CONTROLLER -> List.of(
                         MachineStat.ENERGY_CAPACITY,
-                        MachineStat.ENERGY_TRANSFER,
                         MachineStat.ENERGY_GENERATION,
                         MachineStat.EFFICIENCY,
                         MachineStat.STABILITY,
@@ -525,7 +523,6 @@ public final class MachineBaseStatCatalog {
                 );
                 case CAVITATION_GENERATOR -> List.of(
                         MachineStat.ENERGY_CAPACITY,
-                        MachineStat.ENERGY_TRANSFER,
                         MachineStat.ENERGY_GENERATION,
                         MachineStat.EFFICIENCY,
                         MachineStat.PROCESSING_SPEED,

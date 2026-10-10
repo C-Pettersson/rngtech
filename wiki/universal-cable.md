@@ -83,7 +83,7 @@ Mine Cables and Universal Connectors with a pickaxe. Aiming at a connector on a 
 
 One Cable can hold a connector on each of its six faces.
 
-Energy Connectors are modules: they go in a Universal Connector's Energy tab or in a machine's Gear slot. Right-clicking a Cable with one does not place it on the cable; if you aim at a connector, that connector's screen opens instead. Direct Energy Connectors on a cable face from older worlds keep working, and you can still configure and mine them, but you cannot place new ones.
+Energy Connectors are modules: they go in a Universal Connector's Energy tab, or in the Gear slot of a [Tool Bench](tool-bench.md) or [Forestry Cart Station](forestry-cart-station.md). Right-clicking a Cable with one does not place it on the cable; if you aim at a connector, that connector's screen opens instead. Direct Energy Connectors on a cable face from older worlds keep working, and you can still configure and mine them, but you cannot place new ones.
 
 #### Standalone plates
 

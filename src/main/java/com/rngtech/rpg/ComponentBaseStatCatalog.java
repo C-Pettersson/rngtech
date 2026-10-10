@@ -369,7 +369,6 @@ public final class ComponentBaseStatCatalog {
                     .build();
             case COLLAPSE_NOZZLE -> builder()
                     .more(MachineStat.ENERGY_GENERATION, material.generation())
-                    .more(MachineStat.ENERGY_TRANSFER, material.generation())
                     .more(MachineStat.PROCESSING_SPEED, 1.0 + (material.stage() - 6) * 0.05)
                     .more(MachineStat.STABILITY, material.stability())
                     .build();
@@ -386,7 +385,6 @@ public final class ComponentBaseStatCatalog {
                 .add(MachineStat.PROCESSING_LEVEL, material.stage())
                 .add(MachineStat.DURABILITY, CavitationRotorMaterial.BASE_DURABILITY)
                 .more(MachineStat.ENERGY_GENERATION, material.generationMultiplier())
-                .more(MachineStat.ENERGY_TRANSFER, material.energyTransferMultiplier())
                 .more(MachineStat.PROCESSING_SPEED, material.processingSpeedMultiplier())
                 .more(MachineStat.STABILITY, 1.0 / material.wearMultiplier())
                 .more(MachineStat.OUTPUT_AMOUNT, material.outputMultiplier())
@@ -396,7 +394,6 @@ public final class ComponentBaseStatCatalog {
     static Profile collapseNozzle(CollapseNozzleMaterial material) {
         return builder()
                 .more(MachineStat.ENERGY_GENERATION, material.generationMultiplier())
-                .more(MachineStat.ENERGY_TRANSFER, 1.0 + material.stage() * 0.04)
                 .more(MachineStat.TEMPERATURE_STABILITY, 1.0 / material.strainMultiplier())
                 .more(MachineStat.OUTPUT_AMOUNT, material.outputMultiplier())
                 .more(MachineStat.FLUID_TRANSFER, material.fluidTransferMultiplier())
@@ -406,7 +403,6 @@ public final class ComponentBaseStatCatalog {
     static Profile vacuumCollapseNozzle(CollapseNozzleMaterial material) {
         return builder()
                 .more(MachineStat.ENERGY_GENERATION, material.vacuumGenerationMultiplier())
-                .more(MachineStat.ENERGY_TRANSFER, material.vacuumGenerationMultiplier())
                 .more(MachineStat.PROCESSING_SPEED, material.vacuumProcessingSpeedMultiplier())
                 .more(MachineStat.STABILITY, material.vacuumStabilityMultiplier())
                 .build();
