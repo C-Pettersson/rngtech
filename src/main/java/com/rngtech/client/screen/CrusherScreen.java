@@ -720,6 +720,10 @@ public class CrusherScreen extends AbstractContainerScreen<CrusherMenu> {
         return String.format(Locale.ROOT, "%.2fx", value);
     }
 
+    private String formatPercent(double value) {
+        return String.format(Locale.ROOT, "+%.0f%%", value);
+    }
+
     private String formatPerThousandPercent(int value) {
         double percent = value / 10.0D;
         String pattern = percent == Math.rint(percent) ? "%.0f%%" : "%.1f%%";
@@ -747,8 +751,17 @@ public class CrusherScreen extends AbstractContainerScreen<CrusherMenu> {
     }
 
     private Component statTooltip(int index, double value) {
-        if (STAT_DATA_INDICES[index] == CrusherMenu.outputAmountDataIndex() && !menu.hasBatteryCell()) {
-            return Component.translatable("rngtech.crusher.tooltip.output_amount_no_battery", formatMultiplier(value));
+        if (STAT_DATA_INDICES[index] == CrusherMenu.outputAmountDataIndex()) {
+            Component yield = Component.translatable(
+                    "rngtech.crusher.tooltip.output_amount_yield",
+                    formatPercent(menu.yieldIncreasedPercent()),
+                    formatPercent(menu.yieldBonusPercent())
+            );
+            return menu.hasBatteryCell()
+                    ? MachineScreenStyle.statLayerTooltip(menu.getSlot(menu.refinementTargetSlot()).getItem(), STAT_TYPES[index], value)
+                            .copy().append(" ").append(yield)
+                    : Component.translatable("rngtech.crusher.tooltip.output_amount_no_battery", formatMultiplier(value))
+                            .append(" ").append(yield);
         }
         return MachineScreenStyle.statLayerTooltip(
                 menu.getSlot(menu.refinementTargetSlot()).getItem(),

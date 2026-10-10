@@ -18,10 +18,12 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
 import java.util.EnumMap;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Supplier;
+import java.util.Set;
 
 public final class MachineStatAccumulator {
     public static final double FURNACE_BASE_MAX_TEMPERATURE = 600.0;
@@ -33,10 +35,18 @@ public final class MachineStatAccumulator {
     private static final Component FALLBACK_SOURCE = Component.translatable("rngtech.stat.breakdown.source.machine");
     private static final Source NO_SOURCE = () -> {
     };
+    /** The Crusher's Output Amount bucket {@code B} pays {@code B * K / (B + K)} percent, so yield never passes +K%. */
+    public static final double CRUSHER_YIELD_SOFT_CAP = 100.0;
+    /** Two top-tier Super Output rolls plus the Assayer would reach 26%; the Crusher stops at 25%. */
+    public static final double CRUSHER_SUPER_OUTPUT_CEILING = 25.0;
+    /** Stats whose reductions divide instead of emptying the increased bucket, so no single roll reaches the floor. */
+    private static final Set<MachineStat> DIVIDING_REDUCTION_STATS = EnumSet.of(MachineStat.ENERGY_USAGE);
 
     private final Map<MachineStat, Double> baseValues = new EnumMap<>(MachineStat.class);
     private final Map<MachineStat, Double> additiveValues = new EnumMap<>(MachineStat.class);
     private final Map<MachineStat, Double> increasedPercentValues = new EnumMap<>(MachineStat.class);
+    private final Map<MachineStat, Double> reducedPercentValues = new EnumMap<>(MachineStat.class);
+    private final Map<MachineStat, Double> increasedSoftCaps = new EnumMap<>(MachineStat.class);
     private final Map<MachineStat, Double> moreValues = new EnumMap<>(MachineStat.class);
     private double flatEnergyGenerationBonus;
     private double partEnergyGenerationMore = 1.0;
@@ -138,6 +148,7 @@ public final class MachineStatAccumulator {
         stats.baseValues.put(MachineStat.ENERGY_USAGE, chassis.energyUsage());
         stats.baseValues.put(MachineStat.PROCESSING_SPEED, chassis.processingSpeed());
         stats.baseValues.put(MachineStat.OUTPUT_AMOUNT, chassis.outputAmount());
+        stats.withCrusherYieldRules();
         stats.baseValues.put(
                 MachineStat.BATCH_SIZE,
                 switch (chassis) {
@@ -147,6 +158,13 @@ public final class MachineStatAccumulator {
                 }
         );
         return stats;
+    }
+
+    /** The Crusher's yield rules: a soft-capped Output Amount bucket and a Super Output ceiling. */
+    MachineStatAccumulator withCrusherYieldRules() {
+        increasedSoftCaps.put(MachineStat.OUTPUT_AMOUNT, CRUSHER_YIELD_SOFT_CAP);
+        capAbsolute(MachineStat.SUPER_OUTPUT_CHANCE, CRUSHER_SUPER_OUTPUT_CEILING);
+        return this;
     }
 
     public static MachineStatAccumulator solidFuelBurnerBase(int transferRate, double stability) {
@@ -749,11 +767,36 @@ public final class MachineStatAccumulator {
         MachineStat resolvedStat = accumulationStat(stat);
         double base = baseValues.getOrDefault(resolvedStat, 0.0);
         double added = additiveValues.getOrDefault(resolvedStat, 0.0);
-        double increased = increasedPercentValues.getOrDefault(resolvedStat, 0.0) + extraPercent;
         double more = moreValues.getOrDefault(resolvedStat, 1.0);
-        double ordinary = (base + added) * Math.max(0.0, 1.0 + increased / 100.0) * more;
+        double ordinary = (base + added) * increasedScale(resolvedStat, extraPercent) * more;
         return Math.min(absoluteValues.getOrDefault(resolvedStat, ordinary),
                 absoluteCeilings.getOrDefault(resolvedStat, Double.POSITIVE_INFINITY));
+    }
+
+    /** The summed increased and reduced percent on {@code stat}, before any soft cap. */
+    public double increasedPercent(MachineStat stat) {
+        return increasedPercentValues.getOrDefault(accumulationStat(stat), 0.0);
+    }
+
+    /**
+     * The increased bucket on {@code stat} plus {@code extraPercent}, after the stat's soft cap: a positive bucket
+     * {@code B} pays {@code B * K / (B + K)}. Stats without a soft cap return the bucket unchanged.
+     */
+    public double effectiveIncreasedPercent(MachineStat stat, double extraPercent) {
+        MachineStat resolvedStat = accumulationStat(stat);
+        double increased = increasedPercentValues.getOrDefault(resolvedStat, 0.0) + extraPercent;
+        Double cap = increasedSoftCaps.get(resolvedStat);
+        return cap == null || increased <= 0.0 ? increased : increased * cap / (increased + cap);
+    }
+
+    /** Dividing stats scale by {@code (1 + increases) / (1 + reductions)}; the rest by {@code 1 + bucket}. */
+    private double increasedScale(MachineStat stat, double extraPercent) {
+        if (DIVIDING_REDUCTION_STATS.contains(stat)) {
+            double reduced = reducedPercentValues.getOrDefault(stat, 0.0) + Math.max(0.0, -extraPercent);
+            double increased = increasedPercentValues.getOrDefault(stat, 0.0) + extraPercent + reduced;
+            return (1.0 + increased / 100.0) / (1.0 + reduced / 100.0);
+        }
+        return Math.max(0.0, 1.0 + effectiveIncreasedPercent(stat, extraPercent) / 100.0);
     }
 
     public double generatedEnergyTotal(double baseEnergy, int processingTicks) {
@@ -871,6 +914,9 @@ public final class MachineStatAccumulator {
     private void addIncreasedPercent(MachineStat stat, double value) {
         increasedPercentValues.merge(accumulationStat(stat), value, Double::sum);
         record(StatBreakdown.Kind.INCREASED, stat, value);
+        if (value < 0.0) {
+            reducedPercentValues.merge(accumulationStat(stat), -value, Double::sum);
+        }
     }
 
     private void addMore(MachineStat stat, double value) {

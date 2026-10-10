@@ -193,7 +193,7 @@ Ore moves up a processing chain. Each step costs a machine and some FE, and pays
 
 Smelting crushed material directly is slow, which makes it an easy hopper chain. Crushing it into dust first is the better route: for Stage 1–4 metals, the dust route takes 260 ticks and 6,000 FE per ingot across both machines, against 600 ticks and 7,200 FE for crushed material.
 
-The Crusher's [Output Amount](crusher.md#output-amount) stat adds bonus crushed material on top of these numbers. Alloys skip this chain: they have no ore, raw, crushed, or dust form.
+The Crusher's [Output Amount](crusher.md#output-amount) stat adds bonus crushed material on the first crush, on top of these numbers. Alloys skip this chain: they have no ore, raw, crushed, or dust form.
 
 ### Smelting heat
 

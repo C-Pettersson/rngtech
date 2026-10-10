@@ -13,6 +13,7 @@
     "result": {
         "id": "rngtech:osmium_dust"
     },
+    "bonus_output": false,
     "processing_ticks": 60,
     "energy": 2400,
     "required_processing_level": 1,

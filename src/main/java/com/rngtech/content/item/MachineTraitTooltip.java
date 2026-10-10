@@ -10,7 +10,9 @@ import com.rngtech.rpg.MachineStat;
 import com.rngtech.rpg.MachineStatAccumulator;
 import com.rngtech.rpg.MachineTraitRoller;
 import com.rngtech.rpg.MachineTraits;
+import com.rngtech.rpg.ModifierOperation;
 import com.rngtech.rpg.ModifierSet;
+import com.rngtech.rpg.ModifierSlot;
 import com.rngtech.rpg.Rarity;
 
 import net.minecraft.ChatFormatting;
@@ -88,6 +90,12 @@ final class MachineTraitTooltip {
         tooltipComponents.add(Component.empty());
         tooltipComponents.add(Component.translatable("rngtech.tooltip.base_stats").withStyle(ChatFormatting.DARK_AQUA));
         for (MachineStat stat : stats) {
+            if (ComponentBaseStatCatalog.mergesAsIncreased(stack, stat)) {
+                tooltipComponents.add(MachineModifierText.tooltipLine(new MachineModifier(
+                        ModifierSlot.IMPLICIT, stat, ModifierOperation.INCREASED_PERCENT, baseStats.baseValue(stat)
+                )).withStyle(ChatFormatting.BLUE));
+                continue;
+            }
             tooltipComponents.add(Component.translatable(
                     "rngtech.tooltip.base_stat",
                     Component.translatable(stat.translationKey()),

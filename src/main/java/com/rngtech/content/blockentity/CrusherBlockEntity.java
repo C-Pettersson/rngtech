@@ -16,6 +16,7 @@ import com.rngtech.content.registry.ModBlockEntities;
 import com.rngtech.content.registry.ModDataComponents;
 import com.rngtech.rpg.BatchProcessing;
 import com.rngtech.rpg.ComponentBaseStatCatalog;
+import com.rngtech.rpg.CrusherYield;
 import com.rngtech.rpg.MachineBaseStatCatalog;
 import com.rngtech.rpg.MachineImplicitCatalog;
 import com.rngtech.rpg.MachineModifier;
@@ -112,7 +113,9 @@ public class CrusherBlockEntity extends BaseMachineBlockEntity implements MenuPr
     private static final int DATA_BATTERY_SLOT_BLOCKED = DATA_MACHINE_PROGRESSION_START + MasteryMenuSupport.FIELD_COUNT;
     private static final int DATA_CRUSH_HEAD_MATCHING_STAGE_REQUIRED = DATA_BATTERY_SLOT_BLOCKED + 1;
     private static final int DATA_CHASSIS_STAGE = DATA_CRUSH_HEAD_MATCHING_STAGE_REQUIRED + 1;
-    private static final int DATA_COUNT = DATA_CHASSIS_STAGE + 1;
+    private static final int DATA_YIELD_INCREASED = DATA_CHASSIS_STAGE + 1;
+    private static final int DATA_YIELD_BONUS = DATA_YIELD_INCREASED + 1;
+    private static final int DATA_COUNT = DATA_YIELD_BONUS + 1;
     private static final int STAT_SCALE = 100;
 
     private final ItemStackHandler inventory = new ItemStackHandler(SLOT_COUNT) {
@@ -193,6 +196,8 @@ public class CrusherBlockEntity extends BaseMachineBlockEntity implements MenuPr
                 case DATA_BATTERY_SLOT_BLOCKED -> batteryCellSlotBlocked() ? 1 : 0;
                 case DATA_CRUSH_HEAD_MATCHING_STAGE_REQUIRED -> matchingStageCrushHeadRequired() ? 1 : 0;
                 case DATA_CHASSIS_STAGE -> chassisMaterial().stage();
+                case DATA_YIELD_INCREASED -> (int) Math.round(stats.increasedPercent(MachineStat.OUTPUT_AMOUNT) * STAT_SCALE);
+                case DATA_YIELD_BONUS -> (int) Math.round(CrusherYield.bonusPercent(stats, 0.0D) * STAT_SCALE);
                 default -> 0;
             };
         }
@@ -288,7 +293,7 @@ public class CrusherBlockEntity extends BaseMachineBlockEntity implements MenuPr
         crusher.consumeWorkingEnergy(energyCost, false);
         crusher.progress++;
 
-        if (crusher.progress >= adjustedProcessingTicks(recipe, stats, jobs)) {
+        if (crusher.progress >= crusher.adjustedProcessingTicks(recipe, stats, jobs)) {
             int completed = crusher.process(recipe, stats, level, jobs);
             crusher.grantRecipeXp(recipe, completed);
             crusher.bulkSpeed.recordProcesses(crusher.activeTraits(), completed);
@@ -653,14 +658,6 @@ public class CrusherBlockEntity extends BaseMachineBlockEntity implements MenuPr
             ComponentBaseStatCatalog.applyEffectiveContribution(stats, crushHead);
         }
         CrusherPassiveTree.applyStats(stats, machineProgression());
-        if (hasMasteryBehavior("REFINERS_OATH")) {
-            stats.apply(MegaPassiveTree.behaviorSource(machineProgression(), "REFINERS_OATH"), new MachineModifier(
-                    ModifierSlot.IMPLICIT,
-                    MachineStat.OUTPUT_AMOUNT,
-                    ModifierOperation.MORE,
-                    AscendancyFormulas.refinersOathMultiplier(BatchProcessing.statBatchSize(stats))
-            ));
-        }
         if (!hasBatteryCell()) {
             stats.apply(MachineStatAccumulator.NO_BATTERY_SOURCE, new MachineModifier(
                     ModifierSlot.IMPLICIT,
@@ -821,8 +818,10 @@ public class CrusherBlockEntity extends BaseMachineBlockEntity implements MenuPr
         );
     }
 
-    private static int adjustedProcessingTicks(CrusherRecipe recipe, MachineStatAccumulator stats, int jobs) {
-        int baseTicks = BatchProcessing.batchTicks(stats.adjustedProcessingTicks(recipe.processingTicks()), stats, jobs);
+    /** Yield is paid in time: the effective yield bonus lengthens each job before batch overhead and under-level work. */
+    private int adjustedProcessingTicks(CrusherRecipe recipe, MachineStatAccumulator stats, int jobs) {
+        int jobTicks = CrusherYield.jobTicks(stats, recipe.processingTicks(), yieldBonusPercent(recipe, stats));
+        int baseTicks = BatchProcessing.batchTicks(jobTicks, stats, jobs);
         double multiplier = underLevelPenaltyMultiplier(recipe, stats);
         long adjustedTicks = (long) Math.ceil(baseTicks * multiplier);
         return (int) Math.max(1L, Math.min(Integer.MAX_VALUE, adjustedTicks));
@@ -868,15 +867,30 @@ public class CrusherBlockEntity extends BaseMachineBlockEntity implements MenuPr
         return multiplyEnergy(energyCostPerCraft(recipe, stats), jobs);
     }
 
-    /** At-Level Output adds to the increased bucket on recipes exactly at the Crush Head's hardness. */
+    /**
+     * Chassis base times one soft-capped yield bucket, times any less penalty. At-Level Output joins the bucket before
+     * the soft cap on recipes exactly at the Crush Head's hardness.
+     */
     private double outputAmountFor(CrusherRecipe recipe, MachineStatAccumulator stats) {
         if (!recipe.allowsBonusOutput()) {
             return 1.0D;
         }
-        double outputAmount = recipe.requiredProcessingLevel() == stats.intValue(MachineStat.PROCESSING_LEVEL)
-                ? stats.valueWithIncreased(MachineStat.OUTPUT_AMOUNT, stats.value(MachineStat.AT_LEVEL_OUTPUT))
-                : stats.value(MachineStat.OUTPUT_AMOUNT);
+        double outputAmount = stats.valueWithIncreased(MachineStat.OUTPUT_AMOUNT, atLevelOutputPercent(recipe, stats));
         return bonusSuppressed(recipe, stats) ? Math.min(1.0D, outputAmount) : outputAmount;
+    }
+
+    /** The soft-capped yield bonus this recipe pays, in percent; it also sets the recipe's time cost. */
+    private double yieldBonusPercent(CrusherRecipe recipe, MachineStatAccumulator stats) {
+        if (!recipe.allowsBonusOutput() || bonusSuppressed(recipe, stats)) {
+            return 0.0D;
+        }
+        return CrusherYield.bonusPercent(stats, atLevelOutputPercent(recipe, stats));
+    }
+
+    private static double atLevelOutputPercent(CrusherRecipe recipe, MachineStatAccumulator stats) {
+        return recipe.requiredProcessingLevel() == stats.intValue(MachineStat.PROCESSING_LEVEL)
+                ? stats.value(MachineStat.AT_LEVEL_OUTPUT)
+                : 0.0D;
     }
 
     private static boolean allowsOutputBonusEffects(CrusherRecipe recipe, MachineStatAccumulator stats) {

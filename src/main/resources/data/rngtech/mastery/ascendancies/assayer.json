@@ -149,6 +149,13 @@
             "parent": "oath_yield",
             "x": -2,
             "y": 4,
+            "effects": [
+                {
+                    "stat": "OUTPUT_AMOUNT",
+                    "operation": "INCREASED_PERCENT",
+                    "value": 20
+                }
+            ],
             "behaviors": [
                 "REFINERS_OATH"
             ]

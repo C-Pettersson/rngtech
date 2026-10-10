@@ -63,7 +63,7 @@ Typical recipes:
 
 - A raw metal item gives 2 crushed material.
 - An ore block gives 3 crushed material.
-- Crushed material (except alloys) gives 1 dust in a second pass.
+- Crushed material (except alloys) gives 1 dust in a second pass. This pass never gets bonus output, so Output Amount counts once per ore.
 - Ingots crush back into dust, but these recipes never get bonus output.
 - Coal gives {{ item('rngtech:coal_dust') }}, crops and plants give {{ item('rngtech:organic_reagent') }}, and seeds give {{ item('rngtech:compost_feedstock') }}.
 
@@ -73,7 +73,7 @@ Every recipe has a hardness level, and every Crush Head has a hardness level fro
 
 - the craft takes one extra recipe-length of time and costs one extra recipe's worth of FE,
 - the craft has a 5% chance to jam when it starts, which pauses the Crusher for a short time without using the input,
-- bonus output, Super Output, and salvage are switched off.
+- bonus output, Super Output, and salvage are switched off, and so is the time that yield costs.
 
 Recipes at hardness 7 or higher also cost twice the FE. Material recipes for Stage 5–8 metals cost 2×, 3×, 4×, and 6× the early FE baseline.
 
@@ -91,7 +91,16 @@ Recipes at hardness 7 or higher also cost twice the FE. Material recipes for Sta
 
 ### Output amount
 
+Output Amount sets how much extra crushed material an ore block or raw metal gives. Only that first crush counts: crushing crushed material into dust, or ingots back into dust, never gets bonus output.
+
+- The chassis sets a base multiplier. Everything else adds to one **increased** total: the Crush Head's own yield, its rolled affixes, Crusher affixes, Mastery nodes, ascendancy nodes, and At-Level Output on recipes at the head's hardness.
+- That total has diminishing returns. 50% increased pays about +33%, 100% increased pays +50%, and the bonus never reaches +100%.
+- **Yield costs time.** Each cycle takes longer by the same share the bonus pays, so +50% output means a 50% longer cycle. A yield Crusher gets more crushed material from each ore and spends less FE per item, but makes no more items per tick. Build more Crushers to keep up. FE per craft does not change.
+- Without a Battery Cell, Output Amount drops to 75% after all of this.
+
 Output Amount above 1× is banked: each craft adds its fractional share to a bonus bar, and you get an extra item when the bar fills. The bar resets when you change the input item. Hover the bar to preview the next payout.
+
+Super Output is a separate chance for one extra copy of the base output. On a Crusher it stops at 25%.
 
 ### Stages
 
@@ -169,7 +178,7 @@ Every node in this machine's ascendancies. See [Machine Mastery](machine-mastery
 | Ledger Pages | Small | Assay Ledger | +2 Bank Memory. |
 | **Wide Ledger** | Notable | Ledger Pages | +6 Bank Memory. Remembered bonus banks survive breaking and pick-block. |
 | Sworn Yield | Small | Wide Ledger | 4% increased Bonus Output. |
-| **Refiner’s Oath** | Deep notable | Sworn Yield | Batching is off. 5% more Output Amount per point of Batch Size, up to 50%. |
+| **Refiner’s Oath** | Deep notable | Sworn Yield | 20% increased Bonus Output. Batching is off. |
 | Rich Assay | Small | Assay Ledger | 4% increased Bonus Output. |
 | **Compound Yield** | Notable | Rich Assay | A bonus bank payout can also trigger Super Output. |
 | Vein Sense | Small | Compound Yield | +1% Super Output. |
@@ -187,7 +196,7 @@ The Crusher screen has five tabs:
 
 - **Process**: input, output, energy, progress, the bonus output bar, and status squares for the recipe and Battery Cell. Hover for FE per tick, FE per craft, hardness penalties, and jam chance.
 - **Gear**: Crush Head and Battery Cell slots.
-- **Stats**: the machine's current stats, including traits, Gear, and Mastery.
+- **Stats**: the machine's current stats, including traits, Gear, and Mastery. Hover Bonus Output to see your increased total, the bonus it pays after diminishing returns, and how much longer each cycle takes.
 - **Refinement**: refine the placed Crusher's traits with a catalyst.
 - **Mastery**: machine XP, level, and the passive tree.
 

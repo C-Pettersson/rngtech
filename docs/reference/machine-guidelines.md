@@ -59,6 +59,9 @@ Rules:
     - `tools/moddex/check-recycling-returns.mjs` compares every recycling recipe with every recipe that makes its input, resolving ingredient tags and alternatives. It fails when a return exceeds the craft's consumption, or when calibration Super Output could make a return match or exceed it. Add `--report --recycler-super-output` to list the recipes that recycler Super Output would break.
 - Machine-owned progression recipes should author `machine_xp` only on progression sources. For Furnace recipes, use positive `machine_xp` on ores, raw metals, crushed inputs, and alloy blends; leave reversible dust-to-ingot loops, malformed recovery, food, decorative blocks, and ordinary utility smelts at the default `0`. Omitted Furnace `machine_xp_band` values derive from `target_temperature`, or `minimum_temperature` when no target is authored.
 - Do not use random chance for routine fractional output. Randomness belongs in explicit special outcome systems.
+- Yield is paid in processing time. A yield bonus lengthens the cycle by the same factor it raises output, so it buys ore efficiency and lower FE per item, paid for in machine count, never items per tick. Use time or FE per craft as the cost, not both.
+- Output Amount applies once per ore. In a multi-step line, only the first step (ore or raw metal to crushed) is bonus-eligible; later steps set `bonus_output: false`.
+- Yield stacks additively. Every yield source joins one increased bucket, and only the chassis base multiplies it. Do not add `MORE` Output Amount effects; a separate multiplier per source compounds into runaway yield.
 
 ## Machine Tabs
 
@@ -84,7 +87,7 @@ Processing XP should be granted only after work actually completes and output is
 
 Passive nodes must go through the same effective-stat aggregation used by chassis, Gear, rarity, and modifiers. Slot-changing nodes must also participate in server-side slot validation and unlock validation; unlocking a node that blocks or limits an occupied Gear slot should fail unless the current gear is already compatible.
 
-All functional base-machine families should use the [shared Machine Mastery graph](../systems/machine-mastery.md); integrate new families through a start and capability adapter. Gear and cables are excluded. Attribute totals, inherent conversions, and explicit scaling are separate. Increased/reduced modifiers share an additive bucket; more/less factors multiply independently. Absolute ceilings resolve last.
+All functional base-machine families should use the [shared Machine Mastery graph](../systems/machine-mastery.md); integrate new families through a start and capability adapter. Gear and cables are excluded. Attribute totals, inherent conversions, and explicit scaling are separate. Increased/reduced modifiers share an additive bucket; more/less factors multiply independently. Energy Usage reductions divide instead of subtracting, and Crusher Output Amount soft-caps its bucket. Absolute ceilings resolve last.
 
 The Mastery graph deliberately includes irrelevant effects. Keep them visible and selectable, label applicability per effect, and apply supported penalties even when a benefit is inactive. Capability filtering still applies to the Stats tab. Refunds and copied targets must enforce connectivity, earned points, matching starts, and current Gear legality on the server. Old per-machine mask limits do not apply to the shared stable-ID graph.
 
@@ -157,6 +160,9 @@ Design intent and balance rules behind shipped machines that the code does not s
 ### Crusher
 
 - Under-level work multiplies processing time and total FE by the same factor, so FE/t stays at the optimal-hardness rate. The penalty is a slower, costlier craft, not a power spike.
+- Yield is anchored to other mods' ore multiplication: Fortune III gives about `2.2` ingots per ore, Create and Immersive Engineering or Thermal about `2`, and Mekanism `2` to `5` through added machines and chemicals. The unrolled Crusher line is already `3x`, so the best yield builds stop slightly above Mekanism's `5x` at Stage 8, and the edge costs cycle time one-for-one. Check changes with `./gradlew processingBalanceSim`.
+- Crush Head yield is not a local multiplier. The head's base yield and its yield rolls join the Crusher's increased bucket, so a strong head and strong Crusher affixes add instead of compounding.
+- Refiner's Oath trades batching for a flat increased yield bonus that joins the bucket like every other yield source. It does not scale with Batch Size.
 - Crush Head hardness applies only inside Crusher recipes. World ore harvesting uses a separate ore-hardness gate on the Modular Pick and Hammer.
 - Author an explicit `machine_xp_band` when a recipe's training value should follow the processed material rather than its hardness gate.
 
