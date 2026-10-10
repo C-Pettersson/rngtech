@@ -35,6 +35,36 @@ public final class ModifierEligibilityProfiles {
             new ModifierValueRange(80, 100, true),
             new ModifierValueRange(110, 140, true)
     );
+    /** Crusher yield prefixes: Output Amount shares one soft-capped bucket, so its tiers stay small. */
+    private static final List<ModifierValueRange> YIELD_TIER_RANGES = List.of(
+            new ModifierValueRange(2, 3, true),
+            new ModifierValueRange(4, 6, true),
+            new ModifierValueRange(7, 10, true),
+            new ModifierValueRange(11, 14, true),
+            new ModifierValueRange(15, 17, true),
+            new ModifierValueRange(18, 20, true),
+            new ModifierValueRange(22, 25, true)
+    );
+    /** The reduced Processing Speed that pays for a yield prefix; wider than the yield roll, so a light penalty is luck. */
+    private static final List<ModifierValueRange> YIELD_SPEED_PENALTY_RANGES = List.of(
+            new ModifierValueRange(1, 4, true),
+            new ModifierValueRange(3, 8, true),
+            new ModifierValueRange(5, 12, true),
+            new ModifierValueRange(8, 18, true),
+            new ModifierValueRange(11, 22, true),
+            new ModifierValueRange(14, 26, true),
+            new ModifierValueRange(17, 31, true)
+    );
+    /** The Crusher's penalty-free Output Amount suffix: about a quarter of a yield prefix. */
+    private static final List<ModifierValueRange> CLEAN_YIELD_TIER_RANGES = List.of(
+            new ModifierValueRange(1, 1, true),
+            new ModifierValueRange(1, 2, true),
+            new ModifierValueRange(2, 3, true),
+            new ModifierValueRange(3, 3, true),
+            new ModifierValueRange(4, 4, true),
+            new ModifierValueRange(4, 5, true),
+            new ModifierValueRange(6, 6, true)
+    );
     private static final List<ModifierValueRange> CHANCE_TIER_RANGES = List.of(
             new ModifierValueRange(1, 2, true),
             new ModifierValueRange(2, 3, true),
@@ -350,6 +380,18 @@ public final class ModifierEligibilityProfiles {
     private static final ModifierDefinition EFFICIENCY = percent(ModifierSlot.PREFIX, MachineStat.EFFICIENCY);
     private static final ModifierDefinition ENERGY_USAGE = percent(ModifierSlot.SUFFIX, MachineStat.ENERGY_USAGE);
     private static final ModifierDefinition OUTPUT_AMOUNT = percent(ModifierSlot.SUFFIX, MachineStat.OUTPUT_AMOUNT);
+    /**
+     * The Crusher and Crush Head roll a small, penalty-free {@code output_amount} suffix. Its own group lets it sit beside
+     * a yield prefix.
+     */
+    private static final ModifierDefinition CRUSHER_OUTPUT_AMOUNT = ModifierDefinition.rollable(
+            MachineStat.OUTPUT_AMOUNT.getSerializedName(),
+            "clean_output_amount",
+            ModifierSlot.SUFFIX,
+            MachineStat.OUTPUT_AMOUNT,
+            ModifierOperation.INCREASED_PERCENT,
+            CLEAN_YIELD_TIER_RANGES
+    );
     private static final ModifierDefinition HEAT_TRANSFER = percent(ModifierSlot.PREFIX, MachineStat.HEAT_TRANSFER);
     private static final ModifierDefinition MAX_TEMPERATURE = percent(ModifierSlot.PREFIX, MachineStat.MAX_TEMPERATURE);
     private static final ModifierDefinition MAX_TEMPERATURE_ADD = ModifierDefinition.rollable(
@@ -621,9 +663,10 @@ public final class ModifierEligibilityProfiles {
             "crusher_jaws",
             "increased_percent:output_amount",
             ModifierSlot.PREFIX,
-            MachineStat.OUTPUT_AMOUNT,
-            ModifierOperation.INCREASED_PERCENT,
-            PERCENT_TIER_RANGES
+            List.of(
+                    ModifierEffectDefinition.of(MachineStat.OUTPUT_AMOUNT, ModifierOperation.INCREASED_PERCENT, YIELD_TIER_RANGES),
+                    ModifierEffectDefinition.of(MachineStat.PROCESSING_SPEED, ModifierOperation.DECREASED_PERCENT, YIELD_SPEED_PENALTY_RANGES)
+            )
     ).withRollWeight(CRUSHER_PREFIX_WEIGHT);
     private static final ModifierDefinition CRUSHER_ORE_HANDLING = ModifierDefinition.rollable(
             "crusher_ore_handling",
@@ -685,9 +728,10 @@ public final class ModifierEligibilityProfiles {
             "crush_head_pulverizing",
             "increased_percent:output_amount",
             ModifierSlot.PREFIX,
-            MachineStat.OUTPUT_AMOUNT,
-            ModifierOperation.INCREASED_PERCENT,
-            PERCENT_TIER_RANGES
+            List.of(
+                    ModifierEffectDefinition.of(MachineStat.OUTPUT_AMOUNT, ModifierOperation.INCREASED_PERCENT, YIELD_TIER_RANGES),
+                    ModifierEffectDefinition.of(MachineStat.PROCESSING_SPEED, ModifierOperation.DECREASED_PERCENT, YIELD_SPEED_PENALTY_RANGES)
+            )
     ).withRollWeight(CRUSH_HEAD_PREFIX_WEIGHT);
     private static final ModifierDefinition CRUSH_HEAD_JAGGED = ModifierDefinition.rollable(
             "crush_head_jagged",
@@ -2689,13 +2733,13 @@ public final class ModifierEligibilityProfiles {
     }
 
     private static List<ModifierDefinition> crusherAffixes() {
-        LinkedHashSet<ModifierDefinition> definitions = new LinkedHashSet<>(poweredProcessingAffixes(
+        LinkedHashSet<ModifierDefinition> definitions = new LinkedHashSet<>(withYieldTiers(poweredProcessingAffixes(
                 "crushing",
                 true,
                 MachineStat.ENERGY_USAGE,
                 MachineStat.OUTPUT_AMOUNT,
                 MachineStat.PROCESSING_SPEED
-        ));
+        )));
         definitions.addAll(List.of(
                 CRUSHER_FRAME,
                 CRUSHER_KINETICS,
@@ -2711,13 +2755,17 @@ public final class ModifierEligibilityProfiles {
         return List.copyOf(definitions);
     }
 
+    private static List<ModifierDefinition> withYieldTiers(List<ModifierDefinition> definitions) {
+        return definitions.stream().map(definition -> definition == OUTPUT_AMOUNT ? CRUSHER_OUTPUT_AMOUNT : definition).toList();
+    }
+
     private static List<ModifierDefinition> crushHeadAffixes() {
-        LinkedHashSet<ModifierDefinition> definitions = new LinkedHashSet<>(processingAffixes(
+        LinkedHashSet<ModifierDefinition> definitions = new LinkedHashSet<>(withYieldTiers(processingAffixes(
                 "crushing",
                 true,
                 MachineStat.PROCESSING_SPEED,
                 MachineStat.OUTPUT_AMOUNT
-        ));
+        )));
         definitions.addAll(List.of(
                 CRUSH_HEAD_PULVERIZING,
                 CRUSH_HEAD_JAGGED,

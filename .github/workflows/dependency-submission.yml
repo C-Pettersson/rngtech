@@ -3,6 +3,12 @@ name: Gradle Dependency Graph
 on:
   push:
     branches: [main]
+    paths:
+      - 'build.gradle'
+      - 'settings.gradle'
+      - 'gradle.properties'
+      - 'gradle/**'
+      - '.github/workflows/dependency-submission.yml'
   workflow_dispatch:
 
 permissions:

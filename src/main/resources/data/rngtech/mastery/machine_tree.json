@@ -30714,8 +30714,8 @@
             "effects": [
                 {
                     "stat": "OUTPUT_AMOUNT",
-                    "operation": "MORE",
-                    "value": 1.1
+                    "operation": "INCREASED_PERCENT",
+                    "value": 10
                 },
                 {
                     "stat": "PROCESSING_SPEED",
@@ -30938,8 +30938,8 @@
             "effects": [
                 {
                     "stat": "OUTPUT_AMOUNT",
-                    "operation": "MORE",
-                    "value": 1.15
+                    "operation": "INCREASED_PERCENT",
+                    "value": 15
                 },
                 {
                     "stat": "ENERGY_USAGE",
