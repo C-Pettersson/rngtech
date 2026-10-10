@@ -653,14 +653,6 @@ public class CrusherBlockEntity extends BaseMachineBlockEntity implements MenuPr
             ComponentBaseStatCatalog.applyEffectiveContribution(stats, crushHead);
         }
         CrusherPassiveTree.applyStats(stats, machineProgression());
-        if (hasMasteryBehavior("REFINERS_OATH")) {
-            stats.apply(MegaPassiveTree.behaviorSource(machineProgression(), "REFINERS_OATH"), new MachineModifier(
-                    ModifierSlot.IMPLICIT,
-                    MachineStat.OUTPUT_AMOUNT,
-                    ModifierOperation.MORE,
-                    AscendancyFormulas.refinersOathMultiplier(BatchProcessing.statBatchSize(stats))
-            ));
-        }
         if (!hasBatteryCell()) {
             stats.apply(MachineStatAccumulator.NO_BATTERY_SOURCE, new MachineModifier(
                     ModifierSlot.IMPLICIT,
@@ -868,15 +860,22 @@ public class CrusherBlockEntity extends BaseMachineBlockEntity implements MenuPr
         return multiplyEnergy(energyCostPerCraft(recipe, stats), jobs);
     }
 
-    /** At-Level Output adds to the increased bucket on recipes exactly at the Crush Head's hardness. */
+    /**
+     * Chassis base times one soft-capped yield bucket, times any less penalty. At-Level Output joins the bucket before
+     * the soft cap on recipes exactly at the Crush Head's hardness.
+     */
     private double outputAmountFor(CrusherRecipe recipe, MachineStatAccumulator stats) {
         if (!recipe.allowsBonusOutput()) {
             return 1.0D;
         }
-        double outputAmount = recipe.requiredProcessingLevel() == stats.intValue(MachineStat.PROCESSING_LEVEL)
-                ? stats.valueWithIncreased(MachineStat.OUTPUT_AMOUNT, stats.value(MachineStat.AT_LEVEL_OUTPUT))
-                : stats.value(MachineStat.OUTPUT_AMOUNT);
+        double outputAmount = stats.valueWithIncreased(MachineStat.OUTPUT_AMOUNT, atLevelOutputPercent(recipe, stats));
         return bonusSuppressed(recipe, stats) ? Math.min(1.0D, outputAmount) : outputAmount;
+    }
+
+    private static double atLevelOutputPercent(CrusherRecipe recipe, MachineStatAccumulator stats) {
+        return recipe.requiredProcessingLevel() == stats.intValue(MachineStat.PROCESSING_LEVEL)
+                ? stats.value(MachineStat.AT_LEVEL_OUTPUT)
+                : 0.0D;
     }
 
     private static boolean allowsOutputBonusEffects(CrusherRecipe recipe, MachineStatAccumulator stats) {

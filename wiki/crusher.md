@@ -63,7 +63,7 @@ Typical recipes:
 
 - A raw metal item gives 2 crushed material.
 - An ore block gives 3 crushed material.
-- Crushed material (except alloys) gives 1 dust in a second pass.
+- Crushed material (except alloys) gives 1 dust in a second pass. This pass never gets bonus output, so Output Amount counts once per ore.
 - Ingots crush back into dust, but these recipes never get bonus output.
 - Coal gives {{ item('rngtech:coal_dust') }}, crops and plants give {{ item('rngtech:organic_reagent') }}, and seeds give {{ item('rngtech:compost_feedstock') }}.
 
@@ -91,7 +91,16 @@ Recipes at hardness 7 or higher also cost twice the FE. Material recipes for Sta
 
 ### Output amount
 
+Output Amount sets how much extra crushed material an ore block or raw metal gives. Only that first crush counts: crushing crushed material into dust, or ingots back into dust, never gets bonus output.
+
+- The chassis sets a base multiplier. Everything else adds to one **increased** total: the Crush Head's own yield, its rolled affixes, Crusher affixes, Mastery nodes, ascendancy nodes, and At-Level Output on recipes at the head's hardness.
+- That total has diminishing returns. Bonuses adding up to +50% give about +33% more output, +100% gives +50%, and the result never reaches +100%.
+- **Big yield affixes cost speed.** Crusher Jaws and Crush Head Pulverizing give the most Bonus Output, but each also rolls reduced Processing Speed, which slows every recipe. The Output Amount suffix is much smaller and has no penalty.
+- Without a Battery Cell, Output Amount drops to 75% after all of this.
+
 Output Amount above 1× is banked: each craft adds its fractional share to a bonus bar, and you get an extra item when the bar fills. The bar resets when you change the input item. Hover the bar to preview the next payout.
+
+Super Output is a separate chance for one extra copy of the base output. On a Crusher it stops at 25%.
 
 ### Stages
 
@@ -169,7 +178,7 @@ Every node in this machine's ascendancies. See [Machine Mastery](machine-mastery
 | Ledger Pages | Small | Assay Ledger | +2 Bank Memory. |
 | **Wide Ledger** | Notable | Ledger Pages | +6 Bank Memory. Remembered bonus banks survive breaking and pick-block. |
 | Sworn Yield | Small | Wide Ledger | 4% increased Bonus Output. |
-| **Refiner’s Oath** | Deep notable | Sworn Yield | Batching is off. 5% more Output Amount per point of Batch Size, up to 50%. |
+| **Refiner’s Oath** | Deep notable | Sworn Yield | 20% increased Bonus Output. Batching is off. |
 | Rich Assay | Small | Assay Ledger | 4% increased Bonus Output. |
 | **Compound Yield** | Notable | Rich Assay | A bonus bank payout can also trigger Super Output. |
 | Vein Sense | Small | Compound Yield | +1% Super Output. |
@@ -187,7 +196,7 @@ The Crusher screen has five tabs:
 
 - **Process**: input, output, energy, progress, the bonus output bar, and status squares for the recipe and Battery Cell. Hover for FE per tick, FE per craft, hardness penalties, and jam chance.
 - **Gear**: Crush Head and Battery Cell slots.
-- **Stats**: the machine's current stats, including traits, Gear, and Mastery.
+- **Stats**: the machine's current stats, including traits, Gear, and Mastery. Hold Shift over Bonus Output to see what your yield bonuses add up to and the diminishing-returns math.
 - **Refinement**: refine the placed Crusher's traits with a catalyst.
 - **Mastery**: machine XP, level, and the passive tree.
 

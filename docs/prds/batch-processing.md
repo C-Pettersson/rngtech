@@ -163,7 +163,7 @@ Refiner’s Oath and Fused Crucibles both turn batching off for a payoff. They s
 
 - The machine's batch is always 1. Batch Overhead never applies.
 - The payoff scales with the machine's Batch Size stat, base included, which is how both nodes count today.
-- Refiner’s Oath: 5% more Output Amount per point of Batch Size, up to 50%. Unchanged.
+- Refiner’s Oath: a flat 20% increased Output Amount that joins the Crusher's yield bucket. It no longer scales with Batch Size.
 - Fused Crucibles: 20% more Processing Speed per point of Batch Size. Second Crucible now adds 2 instead of 1 (see below), so the rate drops from 30% to keep today's 60% with Second Crucible alone.
 - Tooltips show the Batch Size given up and the resulting payoff.
 

@@ -18,13 +18,13 @@
     ],
     "types": {
         "rngtech:crusher": {
-            "maxOutputMultiplier": 12,
+            "maxOutputMultiplier": 6,
             "covers": [
                 "OUTPUT_AMOUNT", "SUPER_OUTPUT_CHANCE", "CRUSHER_SALVAGE_CHANCE",
                 "BANK_MEMORY", "AT_LEVEL_OUTPUT", "SUPER_OUTPUT_CADENCE",
                 "FAULT_LINES", "RUBBLE_RECLAIMER", "PERSISTENT_BANKS", "COMPOUND_YIELD", "TAILINGS_RECOVERY", "REFINERS_OATH"
             ],
-            "reason": "Output Amount has no hard cap. 12x is a deliberately generous bound above any chassis, Crush Head, affix, keystone, and ascendancy stack, including Refiner's Oath and At-Level Output, plus one Super Output copy, one Compound Yield copy, and salvage. Bank Memory, Wide Ledger, and Tailings Recovery only keep bonus progress the bound already counts."
+            "reason": "Output Amount is the chassis base (at most 1.25x) times one soft-capped yield bucket that never passes +100%, so it stays under 2.5x with every Crush Head, affix, keystone, Refiner's Oath, and At-Level Output. 6x covers that plus one Super Output copy, one Compound Yield copy, and salvage. Bank Memory, Wide Ledger, and Tailings Recovery only keep bonus progress the bound already counts."
         },
         "rngtech:furnace": {
             "maxOutputMultiplier": 3,

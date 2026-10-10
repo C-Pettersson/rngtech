@@ -126,7 +126,7 @@ const KEYSTONES = [
     { id: "dense_batching", name: "Dense Batching", effects: [effect("BATCH_SIZE", 2, "ADD"), effect("PROCESSING_SPEED", 0.75, "LESS"), effect("ENERGY_USAGE", 1.25, "MORE")] },
     { id: "precision_jaw_mount", name: "Precision Jaw Mount", behaviors: ["MATCHING_HEAD"], effects: [effect("OUTPUT_AMOUNT", 10), effect("CRUSHER_SALVAGE_CHANCE", 2, "ADD")] },
     { id: "soft_material_specialist", name: "Soft Material Specialist", recipeHardnessCeiling: 2, effects: [tagged("CRUSHING", effect("PROCESSING_SPEED", 3, "MORE")), effect("ENERGY_USAGE", 1.5, "MORE")] },
-    { id: "heavy_yield", name: "Heavy Yield", effects: [effect("OUTPUT_AMOUNT", 1.15, "MORE"), effect("ENERGY_USAGE", 1.5, "MORE")] },
+    { id: "heavy_yield", name: "Heavy Yield", effects: [effect("OUTPUT_AMOUNT", 15), effect("ENERGY_USAGE", 1.5, "MORE")] },
     // Heat limits are ceilings, so a weak heat source is never raised to the limit.
     { id: "flash_annealing", name: "Flash Annealing", ceilings: { MAX_TEMPERATURE: 600 }, effects: [tagged("HEATED", effect("PROCESSING_SPEED", 2, "MORE")), effect("ENERGY_USAGE", 1.5, "MORE")] },
     { id: "low_heat_specialist", name: "Low Heat Specialist", ceilings: { MAX_TEMPERATURE: 800 }, effects: [tagged("HEATED", effect("PROCESSING_SPEED", 2, "MORE"))] },
@@ -141,7 +141,7 @@ const KEYSTONES = [
     { id: "reserve_actuation", layer: "core", name: "Reserve Actuation", behaviors: ["NO_INHERENT_ATTRIBUTES"], scaling: [{ attribute: "RESERVE", stat: "PROCESSING_SPEED", operation: "INCREASED_PERCENT", perPoint: 0.5 }] },
     { id: "cold_standby", name: "Cold Standby", effects: [effect("IDLE_LOSS", 0.4, "LESS"), effect("ENERGY_TRANSFER", 0.5, "LESS")] },
     { id: "regulated_heat", name: "Regulated Heat", ceilings: { MAX_TEMPERATURE: 1000 }, effects: [effect("TEMPERATURE_STABILITY", 1.8, "MORE")] },
-    { id: "measured_recovery", name: "Measured Recovery", effects: [effect("OUTPUT_AMOUNT", 1.1, "MORE"), effect("PROCESSING_SPEED", 0.65, "LESS")] },
+    { id: "measured_recovery", name: "Measured Recovery", effects: [effect("OUTPUT_AMOUNT", 10), effect("PROCESSING_SPEED", 0.65, "LESS")] },
     { id: "single_pass", extra: "single_pass", name: "Single Pass", behaviors: ["NO_BONUS_OUTPUT"], effects: [tagged("BONUS_OUTPUT", effect("PROCESSING_SPEED", 1.3, "MORE"))] }
 ];
 

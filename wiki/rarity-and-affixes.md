@@ -86,7 +86,7 @@ Hover an identified item to see its rarity, RP, and rolled affixes. Hold **Left 
 
 Affixes use four words:
 
-- **increased** and **reduced** add together. Two "20% increased Processing Speed" affixes give 40%.
+- **increased** and **reduced** add together. Two "20% increased Processing Speed" affixes give 40%. Energy Use is the exception: its reductions add together and then divide the cost, so 100% reduced Energy Use halves it instead of removing it.
 - **more** and **less** multiply separately, after that, so they are worth more when stacked with increases.
 
 ### Affix tiers
@@ -102,6 +102,23 @@ Most affixes have a **tier** from 1 to 7. The tier sets the range, and the affix
 | 5 | 60–75% |
 | 6 | 80–100% |
 | 7 | 110–140% |
+
+Crusher yield affixes use smaller tables, because they all feed the Crusher's [Output Amount](crusher.md#output-amount) total, which already has diminishing returns.
+
+- **Crusher Jaws** and **Crush Head Pulverizing** (prefixes) give the most Bonus Output, but also roll reduced Processing Speed. The speed penalty rolls on its own, wider range, so a light penalty is a lucky roll.
+- The **Output Amount** suffix on Crushers and Crush Heads is small and has no penalty. It can sit beside Jaws or Pulverizing.
+
+| Tier | Jaws and Pulverizing: Bonus Output | Jaws and Pulverizing: reduced Processing Speed | Output Amount suffix |
+|---:|---:|---:|---:|
+| 1 | 2–3% | 1–4% | 1% |
+| 2 | 4–6% | 3–8% | 1–2% |
+| 3 | 7–10% | 5–12% | 2–3% |
+| 4 | 11–14% | 8–18% | 3% |
+| 5 | 15–17% | 11–22% | 4% |
+| 6 | 18–20% | 14–26% | 4–5% |
+| 7 | 22–25% | 17–31% | 6% |
+
+Older Crushers and Crush Heads can carry yield values from earlier, larger tables, without the speed penalty. They keep those values until you upgrade or reroll the affix, which then uses these tables.
 
 Some affixes use their own tables, such as flat FE, extra slots, or durability. A few are untiered and always roll the same value.
 
@@ -124,6 +141,7 @@ Where an affix sits changes what it affects:
 
 - **Affixes on the machine** apply to the whole machine.
 - **Affixes on an installed part are local.** They improve that part's own contribution first, and then the part's total is added to the machine. For example, a percentage Max Temperature affix on a Heat Core raises that core's heat, not the chassis's.
+- **Crush Head yield is the exception.** The head's own Output Amount and its yield affixes add straight to the Crusher's increased Output Amount total.
 
 Hold Left Shift on a part to see which of its affixes are marked **(Local)**. On generators, a part's generation affix scales the machine's base or recipe output once; it does not scale flat FE/t from other parts.
 

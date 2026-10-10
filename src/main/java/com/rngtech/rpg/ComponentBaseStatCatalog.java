@@ -56,9 +56,14 @@ public final class ComponentBaseStatCatalog {
      */
     private static final Set<MachineStat> HOST_STATS = Set.of(MachineStat.FLUID_CAPACITY);
 
+    /**
+     * How a part stat reaches the host. {@code INCREASED} joins the host's increased bucket: the part's base is a percent,
+     * and its rolls on that stat pass straight through instead of scaling the part locally.
+     */
     private enum MergeRule {
         ADD,
-        MORE
+        MORE,
+        INCREASED
     }
 
     record Profile(
@@ -88,11 +93,28 @@ public final class ComponentBaseStatCatalog {
     static MachineStatAccumulator effectiveStats(Profile profile, MachineTraits traits) {
         MachineStatAccumulator stats = profile.baseStats();
         for (MachineModifier modifier : traits.modifiers()) {
-            if (modifier.slot().isAffix() && !HARD_GATE_STATS.contains(modifier.stat())) {
+            if (!modifier.slot().isAffix() || HARD_GATE_STATS.contains(modifier.stat())) {
+                continue;
+            }
+            if (modifier.effects().stream().noneMatch(effect -> profile.mergeRules().get(effect.stat()) == MergeRule.INCREASED)) {
                 stats.apply(modifier);
+                continue;
+            }
+            // Effects that join the host's increased bucket pass through at merge; the rest stay local, such as a yield
+            // prefix's speed penalty.
+            for (MachineModifierEffect effect : modifier.effects()) {
+                if (profile.mergeRules().get(effect.stat()) != MergeRule.INCREASED) {
+                    stats.apply(new MachineModifier(ModifierSlot.IMPLICIT, effect.stat(), effect.operation(), effect.value()));
+                }
             }
         }
         return stats;
+    }
+
+    /** Whether {@code stat} on this part joins the host's increased bucket, so its base reads as a percent. */
+    public static boolean mergesAsIncreased(ItemStack stack, MachineStat stat) {
+        Profile profile = profile(stack);
+        return profile != null && profile.mergeRules().get(stat) == MergeRule.INCREASED;
     }
 
     /**
@@ -108,7 +130,8 @@ public final class ComponentBaseStatCatalog {
         List<MachineModifier> rolled = componentTraits(stack).modifiers();
         for (MachineModifierEffect effect : modifier.effects()) {
             MachineStat stat = effect.stat();
-            if (!profile.mergeRules().containsKey(stat) || HOST_STATS.contains(stat)) {
+            if (!profile.mergeRules().containsKey(stat) || HOST_STATS.contains(stat)
+                    || profile.mergeRules().get(stat) == MergeRule.INCREASED) {
                 continue;
             }
             if (isScaling(effect.operation()) || rolled.stream().anyMatch(other -> other != modifier && scalesStat(other, stat))) {
@@ -176,10 +199,10 @@ public final class ComponentBaseStatCatalog {
                 target.applyPartEnergyGeneration(contribution, entry.getValue() == MergeRule.MORE);
                 continue;
             }
-            if (entry.getValue() == MergeRule.ADD) {
-                applyAdd(target, stat, value);
-            } else {
-                applyMore(target, stat, value);
+            switch (entry.getValue()) {
+                case ADD -> applyAdd(target, stat, value);
+                case MORE -> applyMore(target, stat, value);
+                case INCREASED -> applyIncreased(target, profile.baseStats().baseValue(stat), stat, traits);
             }
         }
 
@@ -294,11 +317,11 @@ public final class ComponentBaseStatCatalog {
                 .buildWithoutSummary();
     }
 
-    private static Profile crushHead(CrushHeadMaterial material) {
+    static Profile crushHead(CrushHeadMaterial material) {
         ProfileBuilder builder = builder()
                 .add(MachineStat.PROCESSING_LEVEL, material.processingLevel())
                 .more(MachineStat.PROCESSING_SPEED, crushHeadProcessingSpeed(material))
-                .more(MachineStat.OUTPUT_AMOUNT, crushHeadOutputAmount(material))
+                .increased(MachineStat.OUTPUT_AMOUNT, crushHeadOutputPercent(material))
                 .add(MachineStat.INSTANT_PROCESS_CHANCE, 0.0)
                 .add(MachineStat.SUPER_OUTPUT_CHANCE, 0.0)
                 .add(MachineStat.CRUSHER_SALVAGE_CHANCE, 0.0);
@@ -540,14 +563,15 @@ public final class ComponentBaseStatCatalog {
         };
     }
 
-    private static double crushHeadOutputAmount(CrushHeadMaterial material) {
+    /** Percent the head adds to the Crusher's Output Amount bucket. */
+    private static double crushHeadOutputPercent(CrushHeadMaterial material) {
         return switch (material) {
-            case BRONZE -> 1.10;
-            case STEEL -> 1.05;
-            case TITANIUM -> 1.15;
-            case TUNGSTENSTEEL -> 1.30;
-            case EXOTIC -> 1.25;
-            default -> 1.0;
+            case BRONZE -> 10;
+            case STEEL -> 5;
+            case TITANIUM -> 15;
+            case TUNGSTENSTEEL -> 30;
+            case EXOTIC -> 25;
+            default -> 0;
         };
     }
 
@@ -564,6 +588,23 @@ public final class ComponentBaseStatCatalog {
     private static void applyAdd(MachineStatAccumulator target, MachineStat stat, double value) {
         if (Math.abs(value) > 0.0001) {
             target.apply(new MachineModifier(ModifierSlot.IMPLICIT, stat, ModifierOperation.ADD, value));
+        }
+    }
+
+    /** The part's base percent, then its rolls on {@code stat}, join the host's increased bucket unscaled. */
+    private static void applyIncreased(MachineStatAccumulator target, double basePercent, MachineStat stat, MachineTraits traits) {
+        if (Math.abs(basePercent) > 0.0001) {
+            target.apply(new MachineModifier(ModifierSlot.IMPLICIT, stat, ModifierOperation.INCREASED_PERCENT, basePercent));
+        }
+        for (MachineModifier modifier : traits.modifiers()) {
+            if (!modifier.slot().isAffix()) {
+                continue;
+            }
+            for (MachineModifierEffect effect : modifier.effects()) {
+                if (effect.stat() == stat) {
+                    target.apply(new MachineModifier(ModifierSlot.IMPLICIT, stat, effect.operation(), effect.value()));
+                }
+            }
         }
     }
 
@@ -588,6 +629,10 @@ public final class ComponentBaseStatCatalog {
 
         private ProfileBuilder more(MachineStat stat, double value) {
             return stat(stat, value, MergeRule.MORE);
+        }
+
+        private ProfileBuilder increased(MachineStat stat, double percent) {
+            return stat(stat, percent, MergeRule.INCREASED);
         }
 
         private ProfileBuilder stat(MachineStat stat, double value, MergeRule rule) {
