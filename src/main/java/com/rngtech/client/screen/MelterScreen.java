@@ -15,6 +15,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class MelterScreen extends AbstractContainerScreen<MelterMenu> {
@@ -544,7 +545,7 @@ public class MelterScreen extends AbstractContainerScreen<MelterMenu> {
                 PROGRESS_Y,
                 PROGRESS_WIDTH,
                 PROGRESS_HEIGHT,
-                progressTooltip()
+                progressTooltipLines()
         );
         CompactValueText.renderTooltipIfHovered(
                 guiGraphics,
@@ -602,6 +603,10 @@ public class MelterScreen extends AbstractContainerScreen<MelterMenu> {
 
     private Component heatTooltip() {
         return Component.translatable("rngtech.melter.tooltip.heat", menu.heat(), menu.minimumTemperature());
+    }
+
+    private List<Component> progressTooltipLines() {
+        return MachineScreenStyle.withTimeRemaining(progressTooltip(), menu.progress(), menu.processingTicks());
     }
 
     private Component progressTooltip() {

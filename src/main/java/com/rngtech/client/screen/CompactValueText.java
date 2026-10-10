@@ -4,6 +4,7 @@ import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 
+import java.util.List;
 import java.util.Locale;
 
 final class CompactValueText {
@@ -106,6 +107,26 @@ final class CompactValueText {
         int top = topPos + y;
         if (mouseX >= left && mouseX < left + width && mouseY >= top && mouseY < top + height) {
             guiGraphics.renderTooltip(font, tooltip, mouseX, mouseY);
+        }
+    }
+
+    static void renderTooltipIfHovered(
+            GuiGraphics guiGraphics,
+            Font font,
+            int leftPos,
+            int topPos,
+            int mouseX,
+            int mouseY,
+            int x,
+            int y,
+            int width,
+            int height,
+            List<Component> tooltip
+    ) {
+        int left = leftPos + x;
+        int top = topPos + y;
+        if (mouseX >= left && mouseX < left + width && mouseY >= top && mouseY < top + height) {
+            guiGraphics.renderComponentTooltip(font, tooltip, mouseX, mouseY);
         }
     }
 

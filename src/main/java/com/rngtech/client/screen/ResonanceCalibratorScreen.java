@@ -16,6 +16,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class ResonanceCalibratorScreen extends AbstractContainerScreen<ResonanceCalibratorMenu> {
@@ -566,7 +567,7 @@ public class ResonanceCalibratorScreen extends AbstractContainerScreen<Resonance
                 PROGRESS_BAR_Y,
                 PROGRESS_BAR_WIDTH,
                 PROGRESS_BAR_HEIGHT,
-                progressTooltip()
+                progressTooltipLines()
         );
         CompactValueText.renderTooltipIfHovered(
                 guiGraphics,
@@ -661,6 +662,10 @@ public class ResonanceCalibratorScreen extends AbstractContainerScreen<Resonance
                 ? Component.translatable("rngtech.calibration.no_family")
                 : Component.translatable(family.translationKey());
         return Component.translatable("rngtech.calibration.stability_range", familyName, menu.stabilityMin(), menu.stabilityMax());
+    }
+
+    private List<Component> progressTooltipLines() {
+        return MachineScreenStyle.withTimeRemaining(progressTooltip(), menu.progress(), menu.processingTicks());
     }
 
     private Component progressTooltip() {

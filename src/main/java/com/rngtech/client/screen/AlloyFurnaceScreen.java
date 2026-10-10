@@ -15,6 +15,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class AlloyFurnaceScreen extends AbstractContainerScreen<AlloyFurnaceMenu> {
@@ -499,7 +500,7 @@ public class AlloyFurnaceScreen extends AbstractContainerScreen<AlloyFurnaceMenu
                 PROGRESS_Y,
                 PROGRESS_WIDTH,
                 PROGRESS_HEIGHT,
-                progressTooltip()
+                progressTooltipLines()
         );
         CompactValueText.renderTooltipIfHovered(
                 guiGraphics,
@@ -545,6 +546,10 @@ public class AlloyFurnaceScreen extends AbstractContainerScreen<AlloyFurnaceMenu
         return menu.powerSensitiveActive()
                 ? base.copy().append(Component.literal(" ")).append(Component.translatable("rngtech.alloy_furnace.tooltip.power_drop"))
                 : base;
+    }
+
+    private List<Component> progressTooltipLines() {
+        return MachineScreenStyle.withTimeRemaining(progressTooltip(), menu.progress(), menu.processingTicks());
     }
 
     private Component progressTooltip() {

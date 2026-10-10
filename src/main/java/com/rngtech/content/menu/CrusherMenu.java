@@ -73,7 +73,8 @@ public class CrusherMenu extends AbstractContainerMenu implements MasteryMenuVie
     private static final int DATA_BATTERY_SLOT_BLOCKED = DATA_MACHINE_PROGRESSION_START + MasteryMenuSupport.FIELD_COUNT;
     private static final int DATA_CRUSH_HEAD_MATCHING_STAGE_REQUIRED = DATA_BATTERY_SLOT_BLOCKED + 1;
     private static final int DATA_CHASSIS_STAGE = DATA_CRUSH_HEAD_MATCHING_STAGE_REQUIRED + 1;
-    private static final int DATA_COUNT = DATA_CHASSIS_STAGE + 1;
+    private static final int DATA_OUTPUT_PER_MINUTE = DATA_CHASSIS_STAGE + 1;
+    private static final int DATA_COUNT = DATA_OUTPUT_PER_MINUTE + 1;
     private static final int STAT_SCALE = 100;
     private static final int OUTPUT_BONUS_SCALE = 1000;
     private static final int MACHINE_SLOT_COUNT = CrusherBlockEntity.SLOT_COUNT;
@@ -191,6 +192,11 @@ public class CrusherMenu extends AbstractContainerMenu implements MasteryMenuVie
 
     public int energyPerCraft() {
         return data.get(DATA_ENERGY_PER_CRAFT);
+    }
+
+    /** Expected items per minute for the current batch, in tenths. */
+    public int outputPerMinuteTenths() {
+        return data.get(DATA_OUTPUT_PER_MINUTE);
     }
 
     public int activeJobs() {

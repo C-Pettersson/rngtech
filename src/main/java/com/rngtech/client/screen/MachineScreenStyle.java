@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 
 final class MachineScreenStyle {
@@ -701,6 +702,21 @@ final class MachineScreenStyle {
                 12,
                 tooltip
         );
+    }
+
+    /** A progress line followed by how long the running cycle has left, in seconds. */
+    static List<Component> withTimeRemaining(Component progressLine, int progress, int ticks) {
+        List<Component> lines = new ArrayList<>();
+        lines.add(progressLine);
+        if (ticks > 0) {
+            lines.add(timeRemaining(progress, ticks));
+        }
+        return lines;
+    }
+
+    static Component timeRemaining(int progress, int ticks) {
+        int remaining = Math.max(0, ticks - Math.max(0, progress));
+        return Component.translatable("rngtech.tooltip.time_remaining", String.format(Locale.ROOT, "%.1f", remaining / 20.0D));
     }
 
     private static boolean isInactiveModifierStat(MachineStat stat, double value) {

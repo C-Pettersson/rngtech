@@ -187,6 +187,12 @@ public final class RNGTechJadePlugin implements IWailaPlugin {
                     value(info.progress()),
                     value(info.progressMax())
             ));
+            if (info.state() == MachineInfoSnapshot.WorkState.RUNNING) {
+                tooltip.add(Component.translatable(
+                        "rngtech.jade.machine_state.line.time_remaining",
+                        value(String.format(Locale.ROOT, "%.1f", Math.max(0, info.progressMax() - info.progress()) / 20.0D))
+                ));
+            }
         }
 
         private static void appendEnergy(ITooltip tooltip, MachineInfoSnapshot info, boolean details) {

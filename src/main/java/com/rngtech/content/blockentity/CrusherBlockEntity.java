@@ -115,7 +115,8 @@ public class CrusherBlockEntity extends BaseMachineBlockEntity implements MenuPr
     private static final int DATA_BATTERY_SLOT_BLOCKED = DATA_MACHINE_PROGRESSION_START + MasteryMenuSupport.FIELD_COUNT;
     private static final int DATA_CRUSH_HEAD_MATCHING_STAGE_REQUIRED = DATA_BATTERY_SLOT_BLOCKED + 1;
     private static final int DATA_CHASSIS_STAGE = DATA_CRUSH_HEAD_MATCHING_STAGE_REQUIRED + 1;
-    private static final int DATA_COUNT = DATA_CHASSIS_STAGE + 1;
+    private static final int DATA_OUTPUT_PER_MINUTE = DATA_CHASSIS_STAGE + 1;
+    private static final int DATA_COUNT = DATA_OUTPUT_PER_MINUTE + 1;
     private static final int STAT_SCALE = 100;
 
     private final ItemStackHandler inventory = new ItemStackHandler(SLOT_COUNT) {
@@ -196,6 +197,7 @@ public class CrusherBlockEntity extends BaseMachineBlockEntity implements MenuPr
                 case DATA_BATTERY_SLOT_BLOCKED -> batteryCellSlotBlocked() ? 1 : 0;
                 case DATA_CRUSH_HEAD_MATCHING_STAGE_REQUIRED -> matchingStageCrushHeadRequired() ? 1 : 0;
                 case DATA_CHASSIS_STAGE -> chassisMaterial().stage();
+                case DATA_OUTPUT_PER_MINUTE -> currentOutputPerMinuteTenths(stats);
                 default -> 0;
             };
         }
@@ -692,6 +694,18 @@ public class CrusherBlockEntity extends BaseMachineBlockEntity implements MenuPr
     private int currentProcessingTicks(MachineStatAccumulator stats) {
         CrusherRecipe recipe = findNextRecipe(stats);
         return recipe == null ? 0 : adjustedProcessingTicks(recipe, stats, Math.max(1, currentActiveJobs(stats)));
+    }
+
+    /** Expected items per minute for the current batch, in tenths: every modifier is in the cycle ticks and the Output Amount average. */
+    private int currentOutputPerMinuteTenths(MachineStatAccumulator stats) {
+        CrusherRecipe recipe = findNextRecipe(stats);
+        if (recipe == null) {
+            return 0;
+        }
+        int jobs = Math.max(1, currentActiveJobs(stats));
+        int ticks = adjustedProcessingTicks(recipe, stats, jobs);
+        double itemsPerCycle = jobs * recipe.baseOutputCount() * outputAmountFor(recipe, stats);
+        return (int) Math.min(Integer.MAX_VALUE, Math.round(itemsPerCycle * 12000.0D / ticks));
     }
 
     private int currentBonusOutputIncrement(MachineStatAccumulator stats) {

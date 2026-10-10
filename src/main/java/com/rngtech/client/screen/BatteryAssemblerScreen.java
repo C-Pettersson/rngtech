@@ -9,6 +9,8 @@ import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
 
+import java.util.List;
+
 public class BatteryAssemblerScreen extends AbstractContainerScreen<BatteryAssemblerMenu> {
     private static final int PANEL = 0xFFC6C6C6;
     private static final int PANEL_DARK = 0xFF8B8B8B;
@@ -344,7 +346,7 @@ public class BatteryAssemblerScreen extends AbstractContainerScreen<BatteryAssem
                 PROGRESS_Y,
                 PROGRESS_WIDTH,
                 PROGRESS_HEIGHT,
-                progressTooltip()
+                progressTooltipLines()
         );
         CompactValueText.renderTooltipIfHovered(
                 guiGraphics,
@@ -389,6 +391,10 @@ public class BatteryAssemblerScreen extends AbstractContainerScreen<BatteryAssem
                 BAR_Y + 2,
                 BatteryAssemblerBlockEntity.PURGE_ASSEMBLY_FLUID
         );
+    }
+
+    private List<Component> progressTooltipLines() {
+        return MachineScreenStyle.withTimeRemaining(progressTooltip(), menu.progress(), menu.processingTicks());
     }
 
     private Component progressTooltip() {
