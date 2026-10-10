@@ -21,9 +21,9 @@ on:
           - beta
           - release
       game_version_names:
-        description: 'Comma-separated CurseForge game version names for the mod jar.'
+        description: 'Comma-separated CurseForge game version names for the mod jar. Include at least one environment (Client, Server).'
         required: true
-        default: '1.21.1, NeoForge'
+        default: '1.21.1, NeoForge, Client, Server'
         type: string
       changelog:
         description: 'Markdown changelog for the CurseForge file. Leave blank for a generic release note.'

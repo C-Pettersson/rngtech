@@ -1,60 +1,60 @@
 ![A row of RNGTech machines](https://media.forgecdn.net/attachments/1709/665/overview-png.png)
 
-# A tech mod where your machines drop like loot
+# Machines that drop like loot
 
-RNGTech is a NeoForge tech mod for Minecraft 1.21.1. You build an ore-processing line, generate and store power, and climb nine material stages. The difference: every machine, part, and battery you craft rolls like an item from an action RPG. Two Crushers from the same recipe can come out with different strengths, and you choose which ones to keep, refine, and level up.
+RNGTech is a tech mod for Minecraft 1.21.1 on NeoForge. Machines you craft roll rarity and affixes the way gear does in Path of Exile and Last Epoch. Two Crushers from the same recipe rarely match: one might crush faster, another might use less power.
 
-The ideas come from **Path of Exile** and **Last Epoch**, applied to machines instead of characters.
+The rolls sit on a full tech progression across nine material stages, from flint tools at Stage 0 to exotic alloys at Stage 8.
 
 > **2.0 is in alpha.** This page describes 2.0. The passive tree and ascendancies are in the 2.0 alpha files on the Files tab; the default release file is still 1.2.0. Unique items and Corruption arrive later in 2.0.
 
-## Machines roll like loot
+## Every craft is a roll
 
-Machines, Gear parts, Battery Cells, tool parts, and companions come out of the crafting grid unidentified. Identify them to reveal Normal, Magic, or Rare rarity with tiered prefixes and suffixes, such as a faster Furnace, a Crusher with bonus yield, or a cell that holds more charge.
+Machines, Gear parts, Battery Cells, tool parts, and companions come out of the crafting grid Unidentified. Identify one to see its rarity and its tiered prefixes and suffixes. A Magic furnace might come out as a *Hellish Iron Furnace Chassis of Smelting*.
 
 ![Rolled stats on a Tungstensteel Furnace](https://media.forgecdn.net/attachments/1709/666/tungstensteel-furnace_stats-png.png)
 
-## Upgrade parts, not whole machines
+## Swap parts as you progress
 
-A machine's chassis sets its limits; the Gear installed inside it, such as Crush Heads, Heat Cores, and Servos, does the work. When you progress, swap a part instead of rebuilding the machine. Each part rolls its own affixes too.
+A machine's chassis sets its base stats and the highest Gear stage it accepts. The Gear inside, such as Crush Heads, Heat Cores, and Servos, does the work and rolls its own affixes. When you craft a better Crush Head, swap it in. The Crusher keeps its own rolls.
 
 ![Gear slots in the Metal Press](https://media.forgecdn.net/attachments/1709/663/metal-press_gear-png.png)
 
-## Crafting with a budget
+## Crafting has a budget
 
-Every item rolls **Refinement Potential**. At the Affix Forge, single-purpose crystals, catalysts, and coils add, upgrade, reroll, or remove affixes, or promote rarity. Each change spends RP, so every item can be improved only so far. Pick your best rolls carefully.
+Each item also rolls Refinement Potential (RP). At the Affix Forge, single-purpose crystals, catalysts, and coils add, upgrade, reroll, or remove affixes, or promote rarity. Every change spends RP. When it runs out, the item is finished.
 
 ![The Affix Forge](https://media.forgecdn.net/attachments/1709/662/affix-forge-png.png)
 
-## A passive tree for your machines
+## Machines level up
 
-Crushers, Furnaces, Alloy Furnaces, Metal Presses, Resonance Calibrators, Melters, and the Forestry Companion earn XP from the work they do. They spend points on a shared **1,346-node passive tree** with attributes, notables, and keystones that trade a cost for a strong payoff. **Ascendancy Seals** unlock a specialization for each machine family. Copy a build code from one machine and paste it into the next.
+Crushers, Furnaces, Alloy Furnaces, Metal Presses, Resonance Calibrators, Melters, and the Forestry Companion earn XP from their work, and harder jobs pay more. Points go into a shared 1,346-node passive tree. Keystones ask for a trade: Steady State gives 50% more Stability for 15% less Processing Speed. Ascendancy Seals unlock a specialization tree for each machine family, and a build code copies a finished tree to the next machine.
 
 ![The Machine Mastery tree](https://media.forgecdn.net/attachments/1733/353/passive-tree-rngtech-png.png)
 
 ## One cable for everything
 
-Universal Cable is cheap and carries power, fluids, and items. The connector modules on it decide what moves and how fast, so you upgrade a connector instead of replacing a whole network. Network connectors carry AE2 and Refined Storage over the same cable.
+Universal Cable is cheap, with 12 per craft, and carries power, fluids, and items. The connector next to each machine decides what moves and how fast. To upgrade a network, you swap connector modules and leave the cable alone. With AE2 or Refined Storage installed, a network connector carries their networks over the same cable.
 
 ![A Universal Connector](https://media.forgecdn.net/attachments/1709/668/universal_connector_item-png.png)
 
-## And more
+## More to build
 
-- Crushing, smelting, alloying, metal forming, recycling, calibration, and fluid and gas chemistry.
-- Nine kinds of generators, from Solid Fuel Burners and Solar Panels to the Potential Reactor, plus rolled Battery Cells and Battery Chassis.
-- Modular field tools: picks, 3×3 hammers, shovels, diggers, axes, and treefellers built from rolled heads and rods.
-- A Miner's Companion that deletes junk blocks, pulls in drops, and lights your way.
+- Ore processing, alloying, metal forming, recycling, calibration, and fluid and gas chemistry.
+- Nine generators, from the Solid Fuel Burner to the Potential Reactor, plus rolled Battery Cells and the Battery Chassis.
+- Modular field tools built from a rolled head and rod, including 3×3 hammers and treefellers.
+- A Miner's Companion that deletes cobblestone and other junk as you mine, pulls in drops, and lights the area around you.
 - A Forestry Companion cart that plants and harvests trees along a rail line.
 
 ![A modular hammer at the Tool Bench](https://media.forgecdn.net/attachments/1709/664/modular_tool_hammer-png.png)
 
 ## Compatibility
 
-- **Requires** Minecraft 1.21.1, NeoForge 21.1.228 or newer, and Java 21. Install on the client and the server.
-- **Optional:** JEI (recipes and Gear lookup), Jade (machine overlays), Applied Energistics 2 and Refined Storage (network bridges).
+- **Requires** Minecraft 1.21.1, NeoForge 21.1.228 or newer, and Java 21, on the client and the server.
+- **Optional:** JEI for recipes and Gear lookup, Jade for machine overlays, and Applied Energistics 2 or Refined Storage for network bridges.
 - **Pack authors:** an optional FTB Quests chapter set is available as an additional file.
 
-RNGTech is in active development. Back up your worlds before updating.
+Back up your worlds before updating.
 
 ## Links
 

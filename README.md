@@ -20,14 +20,14 @@
     <img src="https://media.forgecdn.net/attachments/1709/665/overview-png.png" alt="A row of RNGTech machines" width="820">
 </p>
 
-RNGTech is a **Minecraft 1.21.1 / NeoForge** technology mod. You build an ore-processing line, generate and store power, and climb nine material stages. The difference: every machine, part, and battery you craft rolls like an item from an action RPG. Two Crushers from the same recipe can come out with different strengths, and you choose which ones to keep, refine, and level up.
+RNGTech is a **Minecraft 1.21.1 / NeoForge** technology mod. Machines you craft roll rarity and affixes the way gear does in an action RPG. Two Crushers from the same recipe rarely match: one might crush faster, another might use less power. The rolls sit on a full tech progression across nine material stages, from flint tools to exotic alloys.
 
 ## What makes it different
 
 - **Machines roll like loot.** Machines, Gear parts, Battery Cells, tool parts, and companions roll Normal, Magic, or Rare rarity with tiered prefixes and suffixes. A machine's chassis sets its limits; the Gear installed inside it does the work. [Rarity and Affixes →](https://c-pettersson.github.io/rngtech/rarity-and-affixes/)
 - **Crafting with a budget.** Each item rolls Refinement Potential. Crystals, catalysts, and coils add, upgrade, reroll, or remove affixes, and every change spends RP, so no item can be pushed forever. [Affix Forge →](https://c-pettersson.github.io/rngtech/affix-forge/)
 - **A passive tree for your machines.** Machines earn XP from real work and spend points on a shared 1,346-node tree with attributes, notables, and keystones. Ascendancy Seals unlock a specialization per machine family, and build codes copy a tree to the next machine. [Machine Mastery →](https://c-pettersson.github.io/rngtech/machine-mastery/)
-- **Upgrade parts, not whole machines.** Swap a Crush Head or Heat Core instead of rebuilding a machine. One cheap Universal Cable carries power, fluids, and items, and the connector modules on it set the limits. [Universal Cable →](https://c-pettersson.github.io/rngtech/universal-cable/)
+- **Swap parts as you progress.** Put a better Crush Head or Heat Core into the machine you already have. One cheap Universal Cable carries power, fluids, and items, and the connector modules on it set the limits. [Universal Cable →](https://c-pettersson.github.io/rngtech/universal-cable/)
 - **Grounded tech progression.** Crushing, smelting, alloying, metal forming, recycling, calibration, fluid and gas chemistry, nine kinds of generators, modular field tools, a Miner's Companion, and a rail-riding Forestry Companion.
 
 The rarity, crafting currency, and passive-tree ideas come from **Path of Exile** and **Last Epoch**, applied to machines instead of characters. RNGTech uses its own names, mechanics, and artwork, and is not affiliated with or endorsed by Grinding Gear Games or Eleventh Hour Games.
