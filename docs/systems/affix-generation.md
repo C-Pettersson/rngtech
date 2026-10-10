@@ -198,7 +198,7 @@ Most current rollable stat effects use the shared percent tier table above:
 | Crusher Jaws | Prefix | `INCREASED_PERCENT OUTPUT_AMOUNT` | Shared percent table |
 | Crusher Ore Handling | Prefix | `ADD SUPER_OUTPUT_CHANCE` | Chance table |
 | Crusher Battery Link | Prefix | `ADD NO_BATTERY_OUTPUT_RETENTION` | `25%`, `50%`, `75%`, `100%` lost-multiplier retention |
-| Crusher Feed Control | Prefix | `ADD CRUSHER_INPUT_FILTER` | Filter tiers `1-4` |
+| Crusher Feed Control | Prefix | `ADD CRUSHER_INPUT_FILTER` | `+2`, `+3`, `+4` filter |
 | Crusher Compression | Prefix | `ADD HIGH_HARDNESS_ENERGY_MITIGATION` | `15%`, `30%`, `45%`, `60%` surcharge mitigation |
 | Crusher Vibration | Prefix | `DECREASED_PERCENT ENERGY_USAGE` | Shared percent table |
 | Crusher Throughput | Prefix | `ADD BATCH_SIZE` | `+1`, `+2`, `+3`, `+5` items |
@@ -207,7 +207,6 @@ Most current rollable stat effects use the shared percent tier table above:
 | Crush Head Jagged | Prefix | `ADD CRUSHER_SALVAGE_CHANCE` | Chance table |
 | Crush Head Kinetic | Prefix | `INCREASED_PERCENT PROCESSING_SPEED` | Shared percent table |
 | Crush Head Scuffed | Prefix | `ADD NO_BATTERY_OUTPUT_RETENTION` | Untiered `+6%` lost-multiplier retention |
-| Crush Head Dust Groove | Prefix | `ADD CRUSHER_INPUT_FILTER` | Untiered filter tier `1` |
 | Miner's Companion filter slots | Prefix | `ADD BLOCK_FILTER_SLOTS` | `+1`, `+1`, `+2`, `+3`, `+4`, `+5`, `+7`, capped at ten active filters |
 
 Flat energy-generation prefixes use a whole-number addition table:
