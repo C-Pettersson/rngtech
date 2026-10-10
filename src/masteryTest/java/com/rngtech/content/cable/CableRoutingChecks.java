@@ -16,6 +16,9 @@ public final class CableRoutingChecks {
         fullReceiversSpillToTheRest();
         simulationMatchesExecution();
         nothingToReceiveMovesNothing();
+        stalledRowsWaitAtMostOneSecond();
+        fastRowsWaitTheirOwnTime();
+        networkChangesWakeStalledRows();
         System.out.println("Cable routing: " + checks + " checks passed");
     }
 
@@ -92,6 +95,39 @@ public final class CableRoutingChecks {
             }
             return accepted;
         }
+    }
+
+    /** A Basic row (80-tick wait) that found nothing retries within a second, not every tick and not after 4 s. */
+    private static void stalledRowsWaitAtMostOneSecond() {
+        StallBackoff stall = new StallBackoff();
+        stall.start(5L, 80);
+        int skipped = 0;
+        while (stall.waiting(5L)) {
+            skipped++;
+        }
+        require(skipped == StallBackoff.MAX_RETRY_TICKS, "a stalled slow row skips one second, then retries");
+        require(!stall.active(), "after the wait the row tries again");
+    }
+
+    private static void fastRowsWaitTheirOwnTime() {
+        StallBackoff stall = new StallBackoff();
+        stall.start(0L, 4);
+        int skipped = 0;
+        while (stall.waiting(0L)) {
+            skipped++;
+        }
+        require(skipped == 4, "a fast row waits only its own tier wait");
+    }
+
+    private static void networkChangesWakeStalledRows() {
+        StallBackoff stall = new StallBackoff();
+        stall.start(1L, 80);
+        require(stall.waiting(1L), "an unchanged network keeps the row waiting");
+        require(!stall.waiting(2L), "a network change wakes the row at once");
+        require(!stall.active(), "a woken row stays awake");
+        stall.start(2L, 80);
+        stall.clear();
+        require(!stall.waiting(2L), "changing the row's settings wakes it");
     }
 
     private static void require(boolean condition, String label) {
