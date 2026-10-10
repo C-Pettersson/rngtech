@@ -1,0 +1,8 @@
+{
+    "id": "rngtech:unique_potato_battery_cell",
+    "host": "battery_cell",
+    "slot_stage": 0,
+    "stats": {},
+    "behaviors": [],
+    "source": "rngtech:unique_source.village"
+}

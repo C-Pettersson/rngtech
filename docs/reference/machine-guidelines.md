@@ -287,6 +287,17 @@ Design intent and balance rules behind shipped machines that the code does not s
 - Every refinement entry point must use the shared `com.rngtech.rpg.refinement` library so legality checks and results stay consistent.
 - The Exotic Affix Forge writes per-item history so repeat work on the same item gets more expensive.
 
+### Uniques
+
+- A Unique is a sidegrade or build-around piece from one place in the world, never a higher stage. The [Unique Items PRD](../prds/uniques.md) owns the catalog format and launch set; the catalog under `data/rngtech/uniques/` owns the numbers.
+- Its slot stage, not its base profile, drives every Gear stage gate. A recipe-gating stat such as Processing Level or input-slot count may reach at most one stage past the slot stage at its best roll.
+- Every line must be read by a host that accepts it, enforced at load from `UniqueStatReaders`. A new host stat or behavior needs a table entry, and the table must match `GearSlotCatalog`.
+- A signature stays a benefit at its worst roll, and a drawback stays a penalty at its best roll. Drawbacks are visible stat lines or missing behaviors, never hidden rules.
+- Ascendancy hooks apply only on a machine with that ascendancy. Gate them through the hook role, not through stats that only matter by coincidence.
+- No Unique adds yield until the recipe loop audit covers the Unique catalog. A yield penalty is allowed.
+- A pack can move a Unique to challenge loot, quests, or its own tables, or add its own Uniques from `config/rngtech/uniques/`; default sources stay vanilla structures and mobs, and the shipped challenge tables stay empty.
+- The catalog file format is a public API for packs. Keep old stat and behavior names working through aliases, and bump the format `version` for incompatible changes. Update `extras/uniques/README.md` with it.
+
 ## Documentation
 
 When adding or changing a machine:

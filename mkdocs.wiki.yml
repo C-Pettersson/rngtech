@@ -52,6 +52,7 @@ nav:
       - Machine Stats: machine-stats.md
       - Gear: gear.md
       - Battery Cells: battery-cells.md
+      - Uniques: uniques.md
   - Processing:
       - Alloy Furnace: alloy-furnace.md
       - Component Assembler: component-assembler.md

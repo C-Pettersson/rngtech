@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "rngtech:item/uniques/mineshaft_worn_pick_jaw"
+  }
+}

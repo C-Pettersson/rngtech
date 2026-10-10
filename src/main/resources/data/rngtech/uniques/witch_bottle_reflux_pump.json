@@ -1,0 +1,25 @@
+{
+    "id": "rngtech:witch_bottle_reflux_pump",
+    "host": "fluid_pump",
+    "slot_stage": 5,
+    "base_profile": "rngtech:osmium_fluid_pump",
+    "stats": {
+        "rngtech:fluid_capacity": {
+            "operation": "increased",
+            "min": 1.0,
+            "max": 1.5,
+            "role": "signature"
+        },
+        "rngtech:fluid_transfer": {
+            "operation": "more",
+            "min": -0.5,
+            "max": -0.3,
+            "role": "drawback"
+        }
+    },
+    "behaviors": [
+        "rngtech:side_fluid_output",
+        "rngtech:reflux"
+    ],
+    "source": "rngtech:unique_source.witch"
+}

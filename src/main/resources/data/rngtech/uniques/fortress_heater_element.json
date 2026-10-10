@@ -1,0 +1,40 @@
+{
+    "id": "rngtech:fortress_heater_element",
+    "host": "heat_core",
+    "slot_stage": 4,
+    "base_profile": "rngtech:sparksteel_heat_core",
+    "stats": {
+        "rngtech:warmup_time": {
+            "operation": "more",
+            "min": -0.6,
+            "max": -0.8,
+            "role": "signature"
+        },
+        "rngtech:overdrive_margin": {
+            "operation": "flat",
+            "min": 20,
+            "max": 40,
+            "role": "hook",
+            "ascendancy": "crucible_keeper"
+        },
+        "rngtech:energy_usage": {
+            "operation": "increased",
+            "min": 0.6,
+            "max": 0.4,
+            "role": "drawback"
+        },
+        "rngtech:overheat_tolerance": {
+            "operation": "more",
+            "min": -0.6,
+            "max": -0.4,
+            "role": "drawback"
+        },
+        "rngtech:fuel_efficiency": {
+            "operation": "more",
+            "value": -0.5,
+            "role": "drawback"
+        }
+    },
+    "behaviors": [],
+    "source": "rngtech:unique_source.nether_fortress"
+}

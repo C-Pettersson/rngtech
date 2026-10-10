@@ -161,6 +161,24 @@
 	]
 	quest.37A6C9E1284B5D12.quest_subtitle: "Stats can roll before you refine them."
 	quest.37A6C9E1284B5D12.title: "Read: Affixes"
+	quest.C029A39B5659FEE9.quest_desc: [
+		"&aRead:&r &6Uniques&r are find-only Gear with an orange-brown name. Each has a signature mechanic and a visible drawback, and some carry an ascendancy hook that only works with that ascendancy."
+		""
+		"Every copy has the same stat lines, but each copy rolls its own values inside the ranges shown on the item."
+		""
+		"Uniques cannot be crafted, refined, rerolled, or recycled."
+	]
+	quest.C029A39B5659FEE9.quest_subtitle: "Sidegrades you find, not craft."
+	quest.C029A39B5659FEE9.title: "Read: Uniques"
+	quest.1B2ED2616C7CD0DE.quest_desc: [
+		"&aFind:&r Look in structure chests: villages, mineshafts, ruined portals, igloo basements, Nether fortresses, bastions, ancient cities, and ominous trial vaults. Witches can drop one too."
+		""
+		"&aIdentify:&r A Unique drops unidentified. Put it alone in a crafting grid to roll its stats, then hold &eShift&r on it to see each roll's range and quality."
+		""
+		"&7&oTip: install it in a machine and hover it there; stats that machine does not use are greyed out.&r"
+	]
+	quest.1B2ED2616C7CD0DE.quest_subtitle: "Find one, then identify it."
+	quest.1B2ED2616C7CD0DE.title: "First Unique"
 	quest.37A6C9E1284B5D13.quest_desc: [
 		"To get started with bigger tools you need plats. Early game this done by using a &eForming Hammer&r"
 		""

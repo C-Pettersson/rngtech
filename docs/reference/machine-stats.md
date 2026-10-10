@@ -95,12 +95,12 @@ Modifier operations (`ADD`, `INCREASED_PERCENT`, `DECREASED_PERCENT`, `MORE`, `L
 
 ## Ascendancy Stats
 
-[Ascendancies](../systems/machine-mastery.md#ascendancies) introduce these stats. Each reaches only the families listed, and appears on a machine's Stats tab only when granted. Percent values are percentage points added to the stat. Yield stats are covered by the recipe loop audit.
+[Ascendancies](../systems/machine-mastery.md#ascendancies) introduce these stats. Each reaches only the families listed, and appears on a machine's Stats tab only when granted. A [Unique](../prds/uniques.md) can also grant some of them: as an ascendancy hook that applies only with that ascendancy, or as a signature such as the Crying Crucible's Blend Speed. Percent values are percentage points added to the stat. Yield stats are covered by the recipe loop audit.
 
 | Stat | Status | Meaning |
 |---|---|---|
 | `HARDNESS_TOLERANCE` | Prototype | Crusher. Missing Crush Head levels that add no time, FE, or jam risk. The machine still counts as under level, so bonus output stays off. |
-| `JAM_CHANCE` | Prototype | Crusher. Multiplier on the configured under-level jam chance; every Crusher starts at `1`. Lower is better. |
+| `JAM_CHANCE` | Prototype | Crusher. Multiplier on the configured under-level jam chance and on `CYCLE_JAM_CHANCE`; every Crusher starts at `1`. Lower is better. |
 | `JAM_RECOVERY` | Prototype | Crusher. Percent faster jam clearing. |
 | `UNDER_LEVEL_EFFICIENCY` | Prototype | Crusher. Percent reduction to the time and FE each missing hardness level adds, up to `90%`. |
 | `BANK_MEMORY` | Prototype | Crusher. Number of inputs whose Output Amount bonus banks are remembered when the input changes. Without it, a Crusher keeps one bank. Yield stat. |
@@ -126,11 +126,20 @@ Modifier operations (`ADD`, `INCREASED_PERCENT`, `DECREASED_PERCENT`, `MORE`, `L
 | `WORK_RANGE` | Prototype | Forestry Companion. Rows the cart works on each side of the rail, read as whole rows from `1` to `7`. Starts at `1`. Scan FE scales with it, and Verdant Surge and Rolling Harvest reach one row further. Granted by Grove Warden's Nursery and the shared tree's Far Rows and Outer Rows. |
 | `IDLE_CART_SPEED` | Prototype | Forestry Companion. Percent increased Cart Speed after `80` ticks (4 seconds) without a plant, cut, or crop harvest. Stacks with other increased Cart Speed. Granted by the shared tree's Open Track pocket. |
 
+## Unique Stats
+
+Only [Uniques](../prds/uniques.md) grant these. A machine's Stats tab lists them while it has them.
+
+| Stat | Status | Meaning |
+|---|---|---|
+| `CYCLE_JAM_CHANCE` | Prototype | Crusher. Percent jam chance on every cycle, at, above, or under level, added to the under-level chance before `JAM_CHANCE` scales it. A jam it causes on an at-level recipe lasts as long as a one-level jam. Lower is better. |
+| `ESCAPEMENT_SPEED` | Prototype | Metal Press, Alloy Furnace, and Melter with the `ESCAPEMENT` behavior. Percent faster first cycle after the machine idles or its recipe or mold changes. FE per craft is unchanged. |
+
 ## Behavior Flags
 
 Behavior flags enable runtime paths such as burst output, charge balancing, fuel reserve, side fluid output, alloy-only speed, or sustained-processing ramps.
 
-Most current behavior flags are fixed identity traits. They are shown separately from rolled numeric modifiers and are re-derived from the concrete item or block so refinement cannot remove them. [Bulk Speed](https://c-pettersson.github.io/rngtech/rarity-and-affixes/#bulk-speed) is code-backed rollable behavior on eligible processing-machine profiles and applies an implicit `PROCESSING_SPEED` bonus based on completed processes. [Balance Mode](https://c-pettersson.github.io/rngtech/rarity-and-affixes/#balance-mode) is a Battery Chassis prefix affix that enables `CHARGE_BALANCER` without changing a numeric stat.
+Most current behavior flags are fixed identity traits. Uniques add `ESCAPEMENT` (first-cycle speed), `REFLUX` (half Sprinkler water), and `ECHO_STREAK` (the calibration streak survives one off-family calibration). They are shown separately from rolled numeric modifiers and are re-derived from the concrete item or block so refinement cannot remove them. [Bulk Speed](https://c-pettersson.github.io/rngtech/rarity-and-affixes/#bulk-speed) is code-backed rollable behavior on eligible processing-machine profiles and applies an implicit `PROCESSING_SPEED` bonus based on completed processes. [Balance Mode](https://c-pettersson.github.io/rngtech/rarity-and-affixes/#balance-mode) is a Battery Chassis prefix affix that enables `CHARGE_BALANCER` without changing a numeric stat.
 
 ## Base Machine Range
 

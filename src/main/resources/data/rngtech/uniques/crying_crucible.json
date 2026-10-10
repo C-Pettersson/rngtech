@@ -1,0 +1,34 @@
+{
+    "id": "rngtech:crying_crucible",
+    "host": "alloy_crucible",
+    "slot_stage": 3,
+    "base_profile": "rngtech:bronze_alloy_crucible",
+    "stats": {
+        "rngtech:blend_speed": {
+            "operation": "flat",
+            "min": 20,
+            "max": 40,
+            "role": "signature"
+        },
+        "rngtech:blend_heat_reduction": {
+            "operation": "flat",
+            "min": 25,
+            "max": 50,
+            "role": "signature"
+        },
+        "rngtech:energy_usage": {
+            "operation": "increased",
+            "min": 0.4,
+            "max": 0.2,
+            "role": "drawback"
+        },
+        "rngtech:stability": {
+            "operation": "more",
+            "min": -0.4,
+            "max": -0.2,
+            "role": "drawback"
+        }
+    },
+    "behaviors": [],
+    "source": "rngtech:unique_source.ruined_portal"
+}

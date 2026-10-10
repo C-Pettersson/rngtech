@@ -44,9 +44,9 @@ Rarity sets how many affixes an item can hold.
 | **Normal** | 0 | 0 | Base stats only. |
 | **Magic** | 1 | 1 | Named after its affixes, for example "Hellish Iron Furnace Chassis of Smelting". |
 | **Rare** | up to 3 | up to 3 | Rolls three of each when crafted, if enough different affixes fit the item. The name uses its first prefix and first suffix. |
-| **Unique** | — | — | Found, not crafted. Fixed traits, no RP, and it cannot be refined. |
+| **Unique** | — | — | Found, not crafted. Rolled stat lines, no RP, and it cannot be refined. |
 
-The only Unique item is the Unique Potato Battery Cell, which can turn up in village chests.
+[Uniques](uniques.md) have their own page: where to find them, how their ranged stats roll, and what each one does.
 
 ### Rarity odds
 

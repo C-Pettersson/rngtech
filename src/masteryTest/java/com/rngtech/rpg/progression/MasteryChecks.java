@@ -17,6 +17,7 @@ import com.rngtech.rpg.PartGenerationChecks;
 import com.rngtech.rpg.StatBreakdown;
 import com.rngtech.rpg.StatBreakdownChecks;
 import com.rngtech.rpg.refinement.RefinementChecks;
+import com.rngtech.rpg.unique.UniqueChecks;
 
 import com.google.gson.JsonParser;
 import com.mojang.serialization.JsonOps;
@@ -54,6 +55,7 @@ public final class MasteryChecks {
         checks += CrusherYieldChecks.run();
         checks += RefinementChecks.run();
         checks += StatBreakdownChecks.run();
+        checks += UniqueChecks.run();
         System.out.println("Machine mastery: " + checks + " checks passed");
         ForestryTreeScanChecks.run();
         ForestryCartRulesChecks.run();

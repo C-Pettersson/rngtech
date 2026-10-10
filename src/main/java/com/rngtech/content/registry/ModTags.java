@@ -34,6 +34,9 @@ public final class ModTags {
         public static final TagKey<Item> BIO_GENERATOR_EXCLUDED_FOODS = bioGenerator("excluded_foods");
         public static final TagKey<Item> WOODEN_COMPOSTER_INPUTS = woodenComposter("inputs");
         public static final TagKey<Item> WOODEN_COMPOSTER_PREPARED_INPUTS = woodenComposter("prepared_inputs");
+        /** Unique items: never refined, rerolled, or recycled. Packs may add their own find-only items. */
+        public static final TagKey<Item> UNIQUES =
+                TagKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath(RNGTech.MOD_ID, "uniques"));
         public static final TagKey<Item> MALFORMED_INGOTS =
                 TagKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath(RNGTech.MOD_ID, "malformed_ingots"));
         public static final TagKey<Item> CRUSHED_MATERIALS =

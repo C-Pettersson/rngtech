@@ -2,11 +2,11 @@ package com.rngtech.content.blockentity;
 
 import com.rngtech.content.block.AlloyFurnaceBlock;
 import com.rngtech.content.block.BaseMachineBlock;
-import com.rngtech.content.item.AlloyCrucibleItem;
 import com.rngtech.content.item.BatteryCellItem;
+import com.rngtech.content.item.GearParts;
 import com.rngtech.content.item.MachinePartItem;
-import com.rngtech.content.item.ServoItem;
-import com.rngtech.content.item.SolidFuelBurnerPartItem;
+import com.rngtech.content.loot.ChallengeContext;
+import com.rngtech.content.loot.ChallengeLoot;
 import com.rngtech.content.machine.AlloyFurnaceChassisMaterial;
 import com.rngtech.content.menu.AlloyFurnaceMenu;
 import com.rngtech.content.menu.MasteryMenuSupport;
@@ -17,6 +17,7 @@ import com.rngtech.content.recipe.FurnaceRecipe;
 import com.rngtech.content.registry.ModBlockEntities;
 import com.rngtech.content.registry.ModRecipes;
 import com.rngtech.rpg.ComponentBaseStatCatalog;
+import com.rngtech.rpg.EscapementState;
 import com.rngtech.rpg.MachineBaseStatCatalog;
 import com.rngtech.rpg.MachineBehavior;
 import com.rngtech.rpg.MachineImplicitCatalog;
@@ -268,6 +269,7 @@ public class AlloyFurnaceBlockEntity extends BaseMachineBlockEntity implements M
         AlloyFurnaceRecipe recipe = furnace.nextRecipe();
         MachineStatAccumulator stats = furnace.routeStats(recipe, furnace.effectiveStats());
         if (recipe == null || !furnace.hasRequiredGear() || !furnace.meetsRecipeRequirements(recipe, stats)) {
+            furnace.escapement.idle();
             furnace.pourContinues = false;
             furnace.resetCycleIfActive();
             furnace.cool(stats);
@@ -279,6 +281,7 @@ public class AlloyFurnaceBlockEntity extends BaseMachineBlockEntity implements M
             furnace.resetCycle();
             furnace.resetBulkSpeed();
         }
+        furnace.escapement.observe(recipe);
         furnace.rememberHeatEnvelope(recipe, stats);
 
         if (!furnace.canMergeOutput(recipe.outputStack())) {
@@ -448,24 +451,24 @@ public class AlloyFurnaceBlockEntity extends BaseMachineBlockEntity implements M
         return BatteryCellItem.isBatteryCell(stack);
     }
 
+    private final EscapementState escapement = new EscapementState();
+
     public boolean isHeatCore(ItemStack stack) {
-        return stack.getItem() instanceof SolidFuelBurnerPartItem part
-                && part.partType() == MachinePartType.HEAT_CORE
-                && part.stage() <= chassis().stage();
+        return GearParts.is(stack, MachinePartType.HEAT_CORE, chassis().stage());
     }
 
     public boolean isAlloyCrucible(ItemStack stack) {
-        return stack.getItem() instanceof AlloyCrucibleItem crucible && crucible.stage() <= chassis().stage();
+        return GearParts.is(stack, MachinePartType.ALLOY_CRUCIBLE, chassis().stage());
     }
 
     public boolean isServo(ItemStack stack) {
-        return stack.getItem() instanceof ServoItem servo && servo.material().stage() <= chassis().stage();
+        return GearParts.is(stack, MachinePartType.SERVO, chassis().stage());
     }
 
     public static boolean isGearComponent(ItemStack stack) {
-        return (stack.getItem() instanceof SolidFuelBurnerPartItem part && part.partType() == MachinePartType.HEAT_CORE)
-                || stack.getItem() instanceof AlloyCrucibleItem
-                || stack.getItem() instanceof ServoItem;
+        return GearParts.is(stack, MachinePartType.HEAT_CORE)
+                || GearParts.is(stack, MachinePartType.ALLOY_CRUCIBLE)
+                || GearParts.is(stack, MachinePartType.SERVO);
     }
 
     public MachineStatAccumulator effectiveStats() {
@@ -580,6 +583,7 @@ public class AlloyFurnaceBlockEntity extends BaseMachineBlockEntity implements M
         mergeOutput(result);
         grantRecipeXp(recipe);
         lastRecipe = recipe;
+        escapement.completed();
         resetCycle();
         // Continuous Pour: the next blend craft starts without warming back up to its target.
         pourContinues = blend(recipe) && hasMasteryBehavior("CONTINUOUS_POUR");
@@ -853,6 +857,8 @@ public class AlloyFurnaceBlockEntity extends BaseMachineBlockEntity implements M
         pourContinues = false;
         resetCycle();
         resetBulkSpeed();
+        ChallengeLoot.reward(level, worldPosition, ChallengeLoot.HEAT_FAILURE,
+                ChallengeContext.of(this).withRecipeStage(recipe.minimumComponentStage()), processInventory, SLOT_OUTPUT);
         setChanged();
         return true;
     }
@@ -896,7 +902,7 @@ public class AlloyFurnaceBlockEntity extends BaseMachineBlockEntity implements M
     }
 
     private int crucibleStage() {
-        return crucibleStack().getItem() instanceof AlloyCrucibleItem crucible ? crucible.stage() : 0;
+        return GearParts.is(crucibleStack(), MachinePartType.ALLOY_CRUCIBLE) ? GearParts.stage(crucibleStack()) : 0;
     }
 
     private int effectiveHeat(MachineStatAccumulator stats) {
@@ -904,8 +910,14 @@ public class AlloyFurnaceBlockEntity extends BaseMachineBlockEntity implements M
     }
 
     private int processingTicks(AlloyFurnaceRecipe recipe, MachineStatAccumulator stats) {
-        return Math.max(1, (int) Math.ceil(stats.adjustedHeatProcessingTicks(recipe.processingTicks()) / routeSpeed(recipe, stats)));
+        return Math.max(1, (int) Math.ceil(stats.adjustedHeatProcessingTicks(recipe.processingTicks())
+                / (routeSpeed(recipe, stats) * escapementSpeed(stats))));
     }
+
+    private double escapementSpeed(MachineStatAccumulator stats) {
+        return escapement.speed(MachineImplicitCatalog.hasBehavior(servoStack(), MachineBehavior.ESCAPEMENT), stats);
+    }
+
 
     private int currentProcessingTicks(AlloyFurnaceRecipe recipe, MachineStatAccumulator stats) {
         return recipe == null || !meetsRecipeRequirements(recipe, stats) ? 0 : processingTicks(recipe, stats);

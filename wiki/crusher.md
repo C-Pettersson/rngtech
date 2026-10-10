@@ -75,6 +75,8 @@ Every recipe has a hardness level, and every Crush Head has a hardness level fro
 - the craft has a 5% chance to jam when it starts, which pauses the Crusher for a short time without using the input,
 - bonus output, Super Output, and salvage are switched off.
 
+A Crush Head with **Jam Chance per Cycle**, such as the {{ item('rngtech:mineshaft_worn_pick_jaw') }}, can also jam on recipes at or below its hardness. Such a jam lasts as long as a one-level jam.
+
 Recipes at hardness 7 or higher also cost twice the FE. Material recipes for Stage 5–8 metals cost 2×, 3×, 4×, and 6× the early FE baseline.
 
 | Crush Head | Stage | Hardness |

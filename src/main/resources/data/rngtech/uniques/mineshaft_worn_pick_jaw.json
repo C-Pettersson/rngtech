@@ -1,0 +1,40 @@
+{
+    "id": "rngtech:mineshaft_worn_pick_jaw",
+    "host": "crush_head",
+    "slot_stage": 2,
+    "base_profile": "rngtech:copper_crush_head",
+    "stats": {
+        "rngtech:processing_level": {
+            "operation": "flat",
+            "value": 1,
+            "role": "signature"
+        },
+        "rngtech:batch_size": {
+            "operation": "flat",
+            "min": 1,
+            "max": 2,
+            "role": "signature"
+        },
+        "rngtech:jam_recovery": {
+            "operation": "flat",
+            "min": 10,
+            "max": 30,
+            "role": "hook",
+            "ascendancy": "rockbreaker"
+        },
+        "rngtech:cycle_jam_chance": {
+            "operation": "flat",
+            "min": 8,
+            "max": 3,
+            "role": "drawback"
+        },
+        "rngtech:energy_usage": {
+            "operation": "increased",
+            "min": 0.3,
+            "max": 0.15,
+            "role": "drawback"
+        }
+    },
+    "behaviors": [],
+    "source": "rngtech:unique_source.mineshaft"
+}

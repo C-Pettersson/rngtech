@@ -1,0 +1,40 @@
+{
+  "type": "minecraft:entity",
+  "pools": [
+    {
+      "rolls": 1.0,
+      "bonus_rolls": 0.0,
+      "conditions": [
+        {
+          "condition": "rngtech:unique_loot_enabled",
+          "unique": "rngtech:witch_bottle_reflux_pump"
+        },
+        {
+          "condition": "minecraft:killed_by_player"
+        },
+        {
+          "condition": "minecraft:random_chance_with_enchanted_bonus",
+          "enchantment": "minecraft:looting",
+          "unenchanted_chance": 0.01,
+          "enchanted_chance": {
+            "type": "minecraft:linear",
+            "base": 0.015,
+            "per_level_above_first": 0.005
+          }
+        }
+      ],
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "rngtech:witch_bottle_reflux_pump",
+          "functions": [
+            {
+              "function": "rngtech:unidentified_unique"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "random_sequence": "rngtech:uniques/witch_bottle_reflux_pump"
+}

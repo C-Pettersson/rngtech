@@ -27,13 +27,18 @@ public final class AscendancyFormulas {
         return 1.0 + Math.max(0, penalizedDeficit) * Math.max(0.0, perLevel) * (1.0 - efficiency / 100.0);
     }
 
+    /** Jam chance in thousandths: the under-level chance plus any Jam Chance per Cycle, both scaled by Jam Chance. */
     public static int jamChancePerThousand(int penalizedDeficit, int perLevel, MachineStatAccumulator stats) {
-        double chance = Math.max(0, penalizedDeficit) * (double) Math.max(0, perLevel) * Math.max(0.0, stats.value(MachineStat.JAM_CHANCE));
+        double underLevel = Math.max(0, penalizedDeficit) * (double) Math.max(0, perLevel);
+        double everyCycle = Math.max(0.0, stats.value(MachineStat.CYCLE_JAM_CHANCE)) * 10.0;
+        double chance = (underLevel + everyCycle) * Math.max(0.0, stats.value(MachineStat.JAM_CHANCE));
         return (int) Math.max(0, Math.min(1000, Math.round(chance)));
     }
 
+    /** Jam length; a jam from Jam Chance per Cycle on an at-level recipe lasts as long as a one-level jam. */
     public static int jamTicks(int penalizedDeficit, int perLevel, MachineStatAccumulator stats) {
-        double ticks = Math.max(0, penalizedDeficit) * (double) Math.max(0, perLevel)
+        int levels = Math.max(Math.max(0, penalizedDeficit), stats.value(MachineStat.CYCLE_JAM_CHANCE) > 0.0 ? 1 : 0);
+        double ticks = levels * (double) Math.max(0, perLevel)
                 / (1.0 + Math.max(0.0, stats.value(MachineStat.JAM_RECOVERY)) / 100.0);
         return (int) Math.min(Integer.MAX_VALUE, Math.ceil(ticks));
     }
@@ -70,6 +75,14 @@ public final class AscendancyFormulas {
     /** The Resonant Streak's stability floor bonus: Streak Floor per earlier calibration, up to the Streak Cap. */
     public static int streakFloor(int streak, MachineStatAccumulator stats) {
         return (int) Math.min(Math.max(0.0, stats.value(MachineStat.STREAK_CAP)), Math.max(0, streak) * Math.max(0.0, stats.value(MachineStat.STREAK_FLOOR)));
+    }
+
+    /**
+     * Echo Streak: a calibration of another family is a detour the streak waits out, once per streak, unless Pattern
+     * Memory would carry the streak over instead.
+     */
+    public static boolean echoDetour(int streak, String family, String nextFamily, boolean echoUsed, boolean patternMemoryCarries) {
+        return streak > 0 && !echoUsed && !family.equals(nextFamily) && !patternMemoryCarries;
     }
 
     /** Fluid made by one melt: the recipe amount plus Fluid Yield, rounded down to whole millibuckets. */

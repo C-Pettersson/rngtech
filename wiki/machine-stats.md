@@ -178,12 +178,12 @@ All of these are better higher. See [Solar Panel](solar-panel.md).
 
 ## Ascendancy stats
 
-These come from [ascendancies](machine-mastery.md#ascendancies) and the shared Mastery tree. They appear on the Stats tab only once a machine has them. Percentages are added as percentage points.
+These come from [ascendancies](machine-mastery.md#ascendancies), the shared Mastery tree, and some [Uniques](uniques.md). They appear on the Stats tab only once a machine has them. Percentages are added as percentage points.
 
 | Stat | Machine | What it does | Better |
 |---|---|---|---|
 | Hardness Tolerance | Crusher | Missing Crush Head levels that add no time, FE, or jam risk. Bonus output stays off while under level. | Higher |
-| Jam Chance | Crusher | Multiplier on the under-level jam chance. Starts at 1. | Lower |
+| Jam Chance | Crusher | Multiplier on the jam chance, including Jam Chance per Cycle. Starts at 1. | Lower |
 | Jam Recovery | Crusher | Clears jams faster. | Higher |
 | Under-Level Efficiency | Crusher | Cuts the time and FE each missing hardness level adds, up to 90%. | Higher |
 | Bank Memory | Crusher | How many inputs keep their Bonus Output bank when you switch inputs. Without it, one. | Higher |
@@ -208,6 +208,15 @@ These come from [ascendancies](machine-mastery.md#ascendancies) and the shared M
 | Idle Cart Speed | Forestry Companion | Extra Cart Speed after 4 seconds without planting or harvesting. | Higher |
 | Growth Pulse | Forestry Companion | Bone meal applications per growth pulse. Each pulse uses one bone meal. | Higher |
 | Work Range | Forestry Companion | Rows the cart works on each side of the rail, 1 to 7. Wider rows cost more scan FE. | Higher |
+
+## Unique stats
+
+Only [Uniques](uniques.md) give these. They appear on the Stats tab while a Unique that gives them is installed.
+
+| Stat | Machine | What it does | Better |
+|---|---|---|---|
+| Jam Chance per Cycle | Crusher | Chance to jam when any craft starts, under-level or not. Adds to the under-level jam chance. | Lower |
+| Escapement Speed | Metal Press, Alloy Furnace, Melter | Speeds the first cycle after the machine idles or its recipe or mold changes. FE per craft is unchanged. | Higher |
 
 ## See also
 

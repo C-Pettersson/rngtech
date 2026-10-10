@@ -2555,6 +2555,24 @@ public final class ModifierEligibilityProfiles {
         return unique ? UNIQUE_BATTERY_CELL : BATTERY_CELL;
     }
 
+    /** A Unique part keeps its type's capabilities but rolls no affixes. */
+    public static ModifierEligibilityProfile forUniquePart(MachinePartType partType) {
+        return UniquePartProfiles.PROFILES.get(partType);
+    }
+
+    private static final class UniquePartProfiles {
+        private static final Map<MachinePartType, ModifierEligibilityProfile> PROFILES = build();
+
+        private static Map<MachinePartType, ModifierEligibilityProfile> build() {
+            Map<MachinePartType, ModifierEligibilityProfile> profiles = new EnumMap<>(MachinePartType.class);
+            for (MachinePartType partType : MachinePartType.values()) {
+                ModifierEligibilityProfile base = forMachinePart(partType, null);
+                profiles.put(partType, new ModifierEligibilityProfile("unique_" + base.id(), base.capabilities(), List.of()));
+            }
+            return profiles;
+        }
+    }
+
     public static ModifierEligibilityProfile forToolHead(boolean pickHead) {
         return pickHead ? PICK_HEAD : TOOL_HEAD;
     }

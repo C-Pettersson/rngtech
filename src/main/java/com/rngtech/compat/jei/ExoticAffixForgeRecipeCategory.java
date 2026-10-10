@@ -1,11 +1,11 @@
 package com.rngtech.compat.jei;
 
 import com.rngtech.RNGTech;
-import com.rngtech.content.item.BatteryCellItem;
 import com.rngtech.content.machine.CrusherChassisMaterial;
 import com.rngtech.content.recipe.ExoticAffixForgeRecipe;
 import com.rngtech.content.registry.ModItems;
 import com.rngtech.rpg.refinement.RefinementTargets;
+import com.rngtech.rpg.unique.UniqueItems;
 
 import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
 import mezz.jei.api.gui.builder.IRecipeSlotBuilder;
@@ -168,6 +168,6 @@ public final class ExoticAffixForgeRecipeCategory implements IRecipeCategory<Rec
     }
 
     private static boolean isNotUniqueBatteryCell(ItemStack stack) {
-        return !(stack.getItem() instanceof BatteryCellItem cell && cell.material().unique());
+        return !UniqueItems.isUnique(stack);
     }
 }

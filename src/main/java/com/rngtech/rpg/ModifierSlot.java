@@ -12,7 +12,9 @@ public enum ModifierSlot implements StringRepresentable {
     IMPLICIT,
     PREFIX,
     SUFFIX,
-    ENCHANT;
+    ENCHANT,
+    /** A Unique's rolled stat line; kept only on Unique items. */
+    UNIQUE;
 
     public static final Codec<ModifierSlot> CODEC = StringRepresentable.fromEnum(ModifierSlot::values);
     public static final StreamCodec<ByteBuf, ModifierSlot> STREAM_CODEC =

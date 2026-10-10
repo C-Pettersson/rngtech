@@ -1,0 +1,31 @@
+{
+  "type": "minecraft:chest",
+  "pools": [
+    {
+      "rolls": 1.0,
+      "bonus_rolls": 0.0,
+      "conditions": [
+        {
+          "condition": "rngtech:unique_loot_enabled",
+          "unique": "rngtech:mineshaft_worn_pick_jaw"
+        },
+        {
+          "condition": "minecraft:random_chance",
+          "chance": 0.04
+        }
+      ],
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "rngtech:mineshaft_worn_pick_jaw",
+          "functions": [
+            {
+              "function": "rngtech:unidentified_unique"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "random_sequence": "rngtech:uniques/mineshaft_worn_pick_jaw"
+}

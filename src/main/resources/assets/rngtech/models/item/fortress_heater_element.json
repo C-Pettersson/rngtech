@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "rngtech:item/uniques/fortress_heater_element"
+  }
+}

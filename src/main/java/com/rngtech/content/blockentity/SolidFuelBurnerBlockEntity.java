@@ -4,6 +4,7 @@ import com.rngtech.content.block.BaseMachineBlock;
 import com.rngtech.content.block.SolidFuelBurnerBlock;
 import com.rngtech.content.energy.SolidFuelBurnerFuelRules;
 import com.rngtech.content.item.BatteryCellItem;
+import com.rngtech.content.item.GearParts;
 import com.rngtech.content.item.MachinePartItem;
 import com.rngtech.content.item.SolidFuelBurnerPartItem;
 import com.rngtech.content.menu.SolidFuelBurnerMenu;
@@ -293,9 +294,7 @@ public class SolidFuelBurnerBlockEntity extends BaseMachineBlockEntity implement
     }
 
     public boolean isHeatCore(ItemStack stack) {
-        return stack.getItem() instanceof SolidFuelBurnerPartItem part
-                && part.partType() == MachinePartType.HEAT_CORE
-                && part.stage() <= block.chassis().maxPartStage();
+        return GearParts.is(stack, MachinePartType.HEAT_CORE, block.chassis().maxPartStage());
     }
 
     public boolean isFuelBox(ItemStack stack) {
@@ -646,8 +645,7 @@ public class SolidFuelBurnerBlockEntity extends BaseMachineBlockEntity implement
     }
 
     private int maxFuelTier() {
-        SolidFuelBurnerPartItem heatCore = heatCore();
-        return heatCore == null ? 0 : heatCore.maxFuelTier();
+        return GearParts.heatCoreFuelTier(heatCoreStack());
     }
 
     private int fuelFormsCode() {
@@ -746,14 +744,6 @@ public class SolidFuelBurnerBlockEntity extends BaseMachineBlockEntity implement
         if (stack.getItem() instanceof MachinePartItem part && part.machineType() == MachineType.SOLID_FUEL_BURNER) {
             ComponentBaseStatCatalog.applyEffectiveContribution(stats, stack);
         }
-    }
-
-    private SolidFuelBurnerPartItem heatCore() {
-        ItemStack stack = heatCoreStack();
-        return stack.getItem() instanceof SolidFuelBurnerPartItem part
-                && part.partType() == MachinePartType.HEAT_CORE
-                ? part
-                : null;
     }
 
     private SolidFuelBurnerPartItem fuelBox() {
