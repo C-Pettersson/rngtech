@@ -300,8 +300,12 @@ public final class WrenchOverlayClient {
 
     private static void summaryLines(Font font, ConnectorOverlaySnapshot snapshot, List<OverlayLine> lines) {
         String energy = snapshot.hasEnergyConnector()
-                ? "Yes C" + snapshot.energyChannel() + " " + energyModeName(snapshot.energyModeOrdinal())
-                : "No";
+                ? Component.translatable(
+                        "rngtech.wrench_overlay.summary.energy.on",
+                        snapshot.energyChannel(),
+                        energyModeName(snapshot.energyModeOrdinal())
+                ).getString()
+                : Component.translatable("rngtech.wrench_overlay.summary.energy.off").getString();
         lines.add(new OverlayLine(clipped(font, Component.translatable("rngtech.wrench_overlay.summary.energy", energy).getString()), TEXT));
         lines.add(new OverlayLine(clipped(font, Component.translatable(
                 "rngtech.wrench_overlay.summary.item",
@@ -326,7 +330,11 @@ public final class WrenchOverlayClient {
         if (type == NetworkBridgeType.NONE) {
             return Component.translatable("rngtech.wrench_overlay.none").getString();
         }
-        return Component.translatable(type.translationKey()).getString() + " ch " + snapshot.bridgeChannel();
+        return Component.translatable(
+                "rngtech.wrench_overlay.summary.bridge.channel",
+                Component.translatable(type.translationKey()),
+                snapshot.bridgeChannel()
+        ).getString();
     }
 
     private static void energyLines(Font font, ConnectorOverlaySnapshot snapshot, List<OverlayLine> lines) {
@@ -360,6 +368,8 @@ public final class WrenchOverlayClient {
             lines.add(new OverlayLine(clipped(font, Component.translatable(
                     "rngtech.cable_connector.no_energy_access"
             ).getString()), WARNING));
+        } else if (snapshot.hasEnergyConnector() && snapshot.energyLinkStatus().isProblem()) {
+            lines.add(new OverlayLine(clipped(font, Component.translatable(snapshot.energyLinkStatus().translationKey()).getString()), WARNING));
         }
     }
 
@@ -372,6 +382,12 @@ public final class WrenchOverlayClient {
         for (int index = 0; index < modules.size(); index++) {
             ConnectorOverlaySnapshot.ModuleSnapshot module = modules.get(index);
             lines.add(new OverlayLine(clipped(font, moduleLine(index, module, fluid)), module.installed() ? TEXT : WARNING));
+            if (module.installed() && module.linkStatus().isProblem()) {
+                lines.add(new OverlayLine(
+                        clipped(font, "  " + Component.translatable(module.linkStatus().translationKey()).getString()),
+                        WARNING
+                ));
+            }
         }
     }
 
@@ -390,15 +406,14 @@ public final class WrenchOverlayClient {
                 .append(shipment)
                 .append(' ')
                 .append(fluid ? fluidModeName(module.modeOrdinal()) : itemModeName(module.modeOrdinal()))
-                .append(" C")
-                .append(module.channel())
+                .append(Component.translatable("rngtech.wrench_overlay.module_channel", module.channel()).getString())
                 .append(' ')
                 .append(directionName(module.attachOrdinal()));
         if (module.cooldownTicks() > 0) {
-            line.append(" W").append(module.cooldownTicks());
+            line.append(' ').append(Component.translatable("rngtech.wrench_overlay.cooldown", module.cooldownTicks()).getString());
         }
         if (module.jamTicks() > 0) {
-            line.append(" J").append(module.jamTicks());
+            line.append(' ').append(Component.translatable("rngtech.wrench_overlay.jam", module.jamTicks()).getString());
         }
         return line.toString();
     }

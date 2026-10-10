@@ -27,6 +27,7 @@ public record ConnectorOverlaySnapshot(
         int lastEnergyInput,
         int lastEnergyOutput,
         boolean energyTargetAccess,
+        int energyLinkStatusOrdinal,
         int bridgeTypeId,
         int bridgeChannel,
         boolean bridgeModLoaded,
@@ -48,12 +49,12 @@ public record ConnectorOverlaySnapshot(
         ContainerData data = access.menuData();
         List<ModuleSnapshot> fluidModules = new ArrayList<>(UniversalConnectorBlockEntity.FLUID_MODULE_SLOT_COUNT);
         for (int moduleIndex = 0; moduleIndex < UniversalConnectorBlockEntity.FLUID_MODULE_SLOT_COUNT; moduleIndex++) {
-            fluidModules.add(fluidModule(inventory, data, moduleIndex));
+            fluidModules.add(fluidModule(access, inventory, data, moduleIndex));
         }
 
         List<ModuleSnapshot> itemModules = new ArrayList<>(UniversalConnectorBlockEntity.ITEM_MODULE_SLOT_COUNT);
         for (int moduleIndex = 0; moduleIndex < UniversalConnectorBlockEntity.ITEM_MODULE_SLOT_COUNT; moduleIndex++) {
-            itemModules.add(itemModule(inventory, data, moduleIndex));
+            itemModules.add(itemModule(access, inventory, data, moduleIndex));
         }
 
         return new ConnectorOverlaySnapshot(
@@ -68,6 +69,7 @@ public record ConnectorOverlaySnapshot(
                 data.get(UniversalConnectorBlockEntity.dataLastEnergyInputIndex()),
                 data.get(UniversalConnectorBlockEntity.dataLastEnergyOutputIndex()),
                 data.get(UniversalConnectorBlockEntity.dataEnergyTargetAccessIndex()) != 0,
+                access.energyLinkStatus().ordinal(),
                 data.get(UniversalConnectorBlockEntity.dataBridgeTypeIndex()),
                 data.get(UniversalConnectorBlockEntity.dataBridgeChannelIndex()),
                 data.get(UniversalConnectorBlockEntity.dataBridgeModLoadedIndex()) != 0,
@@ -75,6 +77,10 @@ public record ConnectorOverlaySnapshot(
                 fluidModules,
                 itemModules
         );
+    }
+
+    public LinkStatus energyLinkStatus() {
+        return LinkStatus.byOrdinal(energyLinkStatusOrdinal);
     }
 
     public boolean hasEnergyConnector() {
@@ -97,7 +103,12 @@ public record ConnectorOverlaySnapshot(
         return direction(mountedFaceOrdinal);
     }
 
-    private static ModuleSnapshot fluidModule(ItemStackHandler inventory, ContainerData data, int moduleIndex) {
+    private static ModuleSnapshot fluidModule(
+            UniversalConnectorAccess access,
+            ItemStackHandler inventory,
+            ContainerData data,
+            int moduleIndex
+    ) {
         ItemStack stack = inventory.getStackInSlot(UniversalConnectorBlockEntity.fluidConnectorSlot(moduleIndex));
         int shipment = stack.getItem() instanceof FluidConnectorItem connector ? connector.tier().fluidPerShipment() : 0;
         return new ModuleSnapshot(
@@ -107,11 +118,17 @@ public record ConnectorOverlaySnapshot(
                 data.get(UniversalConnectorBlockEntity.dataFluidAttachAsIndex(moduleIndex)),
                 data.get(UniversalConnectorBlockEntity.dataFluidCooldownIndex(moduleIndex)),
                 data.get(UniversalConnectorBlockEntity.dataFluidJamTicksIndex(moduleIndex)),
-                shipment
+                shipment,
+                access.fluidLinkStatus(moduleIndex).ordinal()
         );
     }
 
-    private static ModuleSnapshot itemModule(ItemStackHandler inventory, ContainerData data, int moduleIndex) {
+    private static ModuleSnapshot itemModule(
+            UniversalConnectorAccess access,
+            ItemStackHandler inventory,
+            ContainerData data,
+            int moduleIndex
+    ) {
         ItemStack stack = inventory.getStackInSlot(UniversalConnectorBlockEntity.itemConnectorSlot(moduleIndex));
         int shipment = stack.getItem() instanceof ItemConnectorItem connector ? connector.tier().itemsPerShipment() : 0;
         return new ModuleSnapshot(
@@ -121,7 +138,8 @@ public record ConnectorOverlaySnapshot(
                 data.get(UniversalConnectorBlockEntity.dataItemAttachAsIndex(moduleIndex)),
                 data.get(UniversalConnectorBlockEntity.dataItemCooldownIndex(moduleIndex)),
                 data.get(UniversalConnectorBlockEntity.dataItemJamTicksIndex(moduleIndex)),
-                shipment
+                shipment,
+                access.itemLinkStatus(moduleIndex).ordinal()
         );
     }
 
@@ -156,6 +174,7 @@ public record ConnectorOverlaySnapshot(
         buffer.writeVarInt(lastEnergyInput);
         buffer.writeVarInt(lastEnergyOutput);
         buffer.writeBoolean(energyTargetAccess);
+        buffer.writeByte(energyLinkStatusOrdinal);
         buffer.writeByte(bridgeTypeId);
         buffer.writeByte(bridgeChannel);
         buffer.writeBoolean(bridgeModLoaded);
@@ -176,6 +195,7 @@ public record ConnectorOverlaySnapshot(
         int lastEnergyInput = buffer.readVarInt();
         int lastEnergyOutput = buffer.readVarInt();
         boolean energyTargetAccess = buffer.readBoolean();
+        int energyLinkStatusOrdinal = buffer.readByte();
         int bridgeTypeId = buffer.readByte();
         int bridgeChannel = buffer.readByte();
         boolean bridgeModLoaded = buffer.readBoolean();
@@ -194,6 +214,7 @@ public record ConnectorOverlaySnapshot(
                 lastEnergyInput,
                 lastEnergyOutput,
                 energyTargetAccess,
+                energyLinkStatusOrdinal,
                 bridgeTypeId,
                 bridgeChannel,
                 bridgeModLoaded,
@@ -230,10 +251,15 @@ public record ConnectorOverlaySnapshot(
             int attachOrdinal,
             int cooldownTicks,
             int jamTicks,
-            int shipment
+            int shipment,
+            int linkStatusOrdinal
     ) {
         public boolean installed() {
             return !moduleKey.isBlank();
+        }
+
+        public LinkStatus linkStatus() {
+            return LinkStatus.byOrdinal(linkStatusOrdinal);
         }
 
         public Direction attachAs() {
@@ -248,6 +274,7 @@ public record ConnectorOverlaySnapshot(
             buffer.writeVarInt(cooldownTicks);
             buffer.writeVarInt(jamTicks);
             buffer.writeVarInt(shipment);
+            buffer.writeByte(linkStatusOrdinal);
         }
 
         private static ModuleSnapshot read(RegistryFriendlyByteBuf buffer) {
@@ -258,7 +285,8 @@ public record ConnectorOverlaySnapshot(
                     buffer.readByte(),
                     buffer.readVarInt(),
                     buffer.readVarInt(),
-                    buffer.readVarInt()
+                    buffer.readVarInt(),
+                    buffer.readByte()
             );
         }
     }
