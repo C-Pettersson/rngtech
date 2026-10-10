@@ -52,7 +52,7 @@ Mine a placed press with a pickaxe. It drops itself and keeps its rolled traits 
 
 ### Pressing
 
-Install a Heat Core and at least one Mold, select the Mold you want in the Gear tab, then put the input in the input slot and supply FE. The press warms up using the recipe's normal FE draw and starts pressing only once its heat reaches the recipe's target temperature. If it runs out of FE while warming up, it pauses and cools.
+Install a Heat Core and at least one Mold, select the Mold you want in the Gear tab, then put the input in the input slot and supply FE. The press warms up using the recipe's normal FE draw and starts pressing only once its heat reaches the recipe's target temperature. If it runs out of FE while warming up, it pauses and cools. Adding more of the same input keeps the current press going, so a hopper or Item Connector can feed it; swapping the input for a different item restarts it.
 
 Each recipe has a heat window and a temperature stability requirement. The two presses handle a bad window differently:
 

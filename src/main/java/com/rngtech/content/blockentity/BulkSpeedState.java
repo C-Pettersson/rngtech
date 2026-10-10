@@ -11,6 +11,7 @@ import com.rngtech.rpg.ModifierSlot;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
+import net.minecraft.world.item.ItemStack;
 
 final class BulkSpeedState {
     private static final String TAG_BULK_SPEED_PROCESSES = "BulkSpeedProcesses";
@@ -18,6 +19,17 @@ final class BulkSpeedState {
     private static final Component BULK_SPEED_SOURCE = Component.translatable(MachineBehavior.BULK_SPEED.translationKey());
 
     private int completedProcesses;
+    private Object chainRecipe;
+
+    /**
+     * Records the recipe of a craft that is starting. A different recipe than the last one breaks the chain. The recipe
+     * is not saved, so the first craft after a load keeps the loaded count.
+     */
+    boolean startRecipe(Object recipe) {
+        Object previous = chainRecipe;
+        chainRecipe = recipe;
+        return previous != null && !previous.equals(recipe) && reset();
+    }
 
     void apply(MachineStatAccumulator stats, MachineTraits traits) {
         if (!traits.hasBehavior(MachineBehavior.BULK_SPEED) || completedProcesses <= 0) {
@@ -61,5 +73,24 @@ final class BulkSpeedState {
 
     void load(CompoundTag tag) {
         completedProcesses = Mth.clamp(tag.getInt(TAG_BULK_SPEED_PROCESSES), 0, MAX_BONUS_PERCENT);
+    }
+
+    /** The last item seen in an input slot, so a top-up with the same item keeps the chain. */
+    static final class InputWatch {
+        private ItemStack last = ItemStack.EMPTY;
+
+        /** Whether {@code current} replaced a different item or components. */
+        boolean changedTo(ItemStack current) {
+            if (current.isEmpty() || ItemStack.isSameItemSameComponents(last, current)) {
+                return false;
+            }
+            boolean replaced = !last.isEmpty();
+            last = current.copyWithCount(1);
+            return replaced;
+        }
+
+        void prime(ItemStack current) {
+            last = current.isEmpty() ? ItemStack.EMPTY : current.copyWithCount(1);
+        }
     }
 }

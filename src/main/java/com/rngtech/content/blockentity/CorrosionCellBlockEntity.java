@@ -120,7 +120,8 @@ public class CorrosionCellBlockEntity extends BaseMachineBlockEntity
 
         @Override
         protected void onContentsChanged(int slot) {
-            if (slot == SLOT_PLATE || slot == SLOT_ELECTROLYTE) {
+            if (slot == SLOT_PLATE && plateWatch.changedTo(getStackInSlot(slot))
+                    || slot == SLOT_ELECTROLYTE && electrolyteWatch.changedTo(getStackInSlot(slot))) {
                 resetBulkSpeed();
             }
             setChanged();
@@ -214,6 +215,8 @@ public class CorrosionCellBlockEntity extends BaseMachineBlockEntity
     };
 
     private final BulkSpeedState bulkSpeed = new BulkSpeedState();
+    private final BulkSpeedState.InputWatch plateWatch = new BulkSpeedState.InputWatch();
+    private final BulkSpeedState.InputWatch electrolyteWatch = new BulkSpeedState.InputWatch();
     private int progress;
     private int activeProcessingTicks;
     private int internalEnergy;
@@ -439,6 +442,8 @@ public class CorrosionCellBlockEntity extends BaseMachineBlockEntity
     protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.loadAdditional(tag, registries);
         processInventory.deserializeNBT(registries, tag.getCompound("ProcessInventory"));
+        plateWatch.prime(processInventory.getStackInSlot(SLOT_PLATE));
+        electrolyteWatch.prime(processInventory.getStackInSlot(SLOT_ELECTROLYTE));
         loadGearInventory(tag.getCompound("GearInventory"), registries);
         electrolyteTank.readFromNBT(registries, tag.getCompound("ElectrolyteTank"));
         progress = tag.getInt("Progress");

@@ -7,3 +7,4 @@
 gradlew text eol=lf
 src/generated/**/.cache/* text eol=lf
 src/generated/**/*.json text eol=lf
+*.nbt binary

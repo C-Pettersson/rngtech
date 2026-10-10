@@ -99,7 +99,7 @@ public class PotentialReactorBlockEntity extends BaseMachineBlockEntity implemen
 
         @Override
         protected void onContentsChanged(int slot) {
-            if (slot == SLOT_INPUT) {
+            if (slot == SLOT_INPUT && inputWatch.changedTo(getStackInSlot(slot))) {
                 resetBulkSpeed();
             }
             setChanged();
@@ -178,6 +178,7 @@ public class PotentialReactorBlockEntity extends BaseMachineBlockEntity implemen
     };
 
     private final BulkSpeedState bulkSpeed = new BulkSpeedState();
+    private final BulkSpeedState.InputWatch inputWatch = new BulkSpeedState.InputWatch();
     private int progress;
     private int activeProcessingTicks;
     private int internalEnergy;
@@ -368,6 +369,7 @@ public class PotentialReactorBlockEntity extends BaseMachineBlockEntity implemen
     protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.loadAdditional(tag, registries);
         processInventory.deserializeNBT(registries, tag.getCompound("ProcessInventory"));
+        inputWatch.prime(processInventory.getStackInSlot(SLOT_INPUT));
         gearInventory.deserializeNBT(registries, tag.getCompound("GearInventory"));
         progress = tag.getInt("Progress");
         activeProcessingTicks = tag.getInt("ActiveProcessingTicks");

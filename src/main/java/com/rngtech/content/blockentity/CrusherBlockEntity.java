@@ -214,6 +214,8 @@ public class CrusherBlockEntity extends BaseMachineBlockEntity implements MenuPr
     private final BulkSpeedState bulkSpeed = new BulkSpeedState();
     private int progress;
     private int batchJobs;
+    private ItemStack activeInput = ItemStack.EMPTY;
+    private ItemStack activeCrushHead = ItemStack.EMPTY;
     private int internalEnergy;
     private int outputBlockedTicks;
     private int jawJamTicks;
@@ -253,6 +255,9 @@ public class CrusherBlockEntity extends BaseMachineBlockEntity implements MenuPr
         }
 
         crusher.outputBlockedTicks = 0;
+        if (!crusher.activeCraftMatches()) {
+            crusher.resetProgress();
+        }
 
         int jobs = crusher.prepareBatchJobs(recipe, stats);
         if (jobs <= 0) {
@@ -262,10 +267,18 @@ public class CrusherBlockEntity extends BaseMachineBlockEntity implements MenuPr
         }
 
         int energyCost = crusher.energyCostForProgress(recipe, stats, crusher.progress, jobs);
+        // Check power before the per-craft rolls, so a craft waiting for power never rolls them again.
+        if (crusher.consumeWorkingEnergy(energyCost, true) < energyCost) {
+            BaseMachineBlock.setActive(level, pos, state, false);
+            return;
+        }
         if (crusher.progress == 0 && crusher.rollUnderLevelJam(level, recipe, stats)) {
             BaseMachineBlock.setActive(level, pos, state, false);
             crusher.setChanged();
             return;
+        }
+        if (crusher.progress == 0) {
+            crusher.startCraft(recipe);
         }
 
         if (crusher.progress == 0 && !underLevel(recipe, stats) && ProcessingChance.rollInstant(level, stats)) {
@@ -276,15 +289,10 @@ public class CrusherBlockEntity extends BaseMachineBlockEntity implements MenuPr
                 int completed = crusher.process(recipe, stats, level, jobs);
                 crusher.grantRecipeXp(recipe, completed);
                 crusher.bulkSpeed.recordProcesses(crusher.activeTraits(), completed);
-                crusher.progress = 0;
-                crusher.batchJobs = 0;
+                crusher.finishCraft();
                 crusher.setChanged();
                 return;
             }
-        }
-        if (crusher.consumeWorkingEnergy(energyCost, true) < energyCost) {
-            BaseMachineBlock.setActive(level, pos, state, false);
-            return;
         }
 
         BaseMachineBlock.setActive(level, pos, state, true);
@@ -295,8 +303,7 @@ public class CrusherBlockEntity extends BaseMachineBlockEntity implements MenuPr
             int completed = crusher.process(recipe, stats, level, jobs);
             crusher.grantRecipeXp(recipe, completed);
             crusher.bulkSpeed.recordProcesses(crusher.activeTraits(), completed);
-            crusher.progress = 0;
-            crusher.batchJobs = 0;
+            crusher.finishCraft();
         }
         crusher.setChanged();
     }
@@ -391,6 +398,8 @@ public class CrusherBlockEntity extends BaseMachineBlockEntity implements MenuPr
         tag.putInt("BatchJobs", batchJobs);
         tag.putInt("OutputBlockedTicks", outputBlockedTicks);
         tag.putInt("JawJamTicks", jawJamTicks);
+        tag.put("ActiveInput", activeInput.saveOptional(registries));
+        tag.put("ActiveCrushHead", activeCrushHead.saveOptional(registries));
         bulkSpeed.save(tag);
         outputAmountTracker.save(tag, registries);
     }
@@ -405,6 +414,8 @@ public class CrusherBlockEntity extends BaseMachineBlockEntity implements MenuPr
         batchJobs = Math.max(0, tag.getInt("BatchJobs"));
         outputBlockedTicks = Math.max(0, tag.getInt("OutputBlockedTicks"));
         jawJamTicks = Math.max(0, tag.getInt("JawJamTicks"));
+        activeInput = ItemStack.parseOptional(registries, tag.getCompound("ActiveInput"));
+        activeCrushHead = ItemStack.parseOptional(registries, tag.getCompound("ActiveCrushHead"));
         bulkSpeed.load(tag);
         outputAmountTracker.load(tag, registries);
     }
@@ -1133,10 +1144,43 @@ public class CrusherBlockEntity extends BaseMachineBlockEntity implements MenuPr
             batchJobs = 0;
             changed = true;
         }
+        clearActiveCraft();
         changed |= bulkSpeed.reset();
         if (changed) {
             setChanged();
         }
+    }
+
+    /** Snapshots the input and Crush Head a craft starts with, so a swap restarts it. */
+    private void startCraft(CrusherRecipe recipe) {
+        activeInput = inventory.getStackInSlot(SLOT_INPUT_A).copyWithCount(1);
+        activeCrushHead = crushHeadStack().copyWithCount(1);
+        bulkSpeed.startRecipe(recipe);
+    }
+
+    private void finishCraft() {
+        progress = 0;
+        batchJobs = 0;
+        clearActiveCraft();
+    }
+
+    private void clearActiveCraft() {
+        activeInput = ItemStack.EMPTY;
+        activeCrushHead = ItemStack.EMPTY;
+    }
+
+    /** A craft saved before snapshots existed adopts the current input and Crush Head. */
+    private boolean activeCraftMatches() {
+        if (progress <= 0) {
+            return true;
+        }
+        if (activeInput.isEmpty() || activeCrushHead.isEmpty()) {
+            activeInput = inventory.getStackInSlot(SLOT_INPUT_A).copyWithCount(1);
+            activeCrushHead = crushHeadStack().copyWithCount(1);
+            return true;
+        }
+        return ItemStack.isSameItemSameComponents(activeInput, inventory.getStackInSlot(SLOT_INPUT_A))
+                && ItemStack.isSameItemSameComponents(activeCrushHead, crushHeadStack());
     }
 
     private void clampInternalEnergy() {

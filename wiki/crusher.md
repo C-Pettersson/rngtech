@@ -58,7 +58,7 @@ Mine a placed Crusher with a pickaxe. It drops itself and keeps its rolled trait
 
 ### Crushing
 
-Put items in the input slot and supply FE. The Crusher only runs with a Crush Head in its Gear tab. Each recipe uses a fixed amount of FE per craft; a faster Crusher finishes sooner but draws more FE per tick, so speed alone does not make crushing cheaper.
+Put items in the input slot and supply FE. The Crusher only runs with a Crush Head in its Gear tab. Each recipe uses a fixed amount of FE per craft; a faster Crusher finishes sooner but draws more FE per tick, so speed alone does not make crushing cheaper. Adding more of the same item keeps the current craft going, but swapping the input or the Crush Head for a different one mid-craft restarts it.
 
 Typical recipes:
 
@@ -73,7 +73,7 @@ Typical recipes:
 Every recipe has a hardness level, and every Crush Head has a hardness level from 1 to 8. The Crusher still runs a recipe that is harder than its head, but for each missing level:
 
 - the craft takes one extra recipe-length of time and costs one extra recipe's worth of FE,
-- the craft has a 5% chance to jam when it starts, which pauses the Crusher for a short time without using the input,
+- the craft has a 5% chance to jam when it starts, which pauses the Crusher for a short time without using the input. The chance is rolled once per craft, so waiting for power does not raise it,
 - bonus output, Super Output, and salvage are switched off.
 
 A Crush Head with **Jam Chance per Cycle**, such as the {{ item('rngtech:mineshaft_worn_pick_jaw') }}, can also jam on recipes at or below its hardness. Such a jam lasts as long as a one-level jam.

@@ -138,10 +138,6 @@ public class ResonanceCalibratorBlockEntity extends BaseMachineBlockEntity
 
         @Override
         protected void onContentsChanged(int slot) {
-            if (slot != SLOT_OUTPUT) {
-                resetCycle();
-                resetBulkSpeed();
-            }
             setChanged();
         }
     };
@@ -932,6 +928,9 @@ public class ResonanceCalibratorBlockEntity extends BaseMachineBlockEntity
         activePattern = singleCopy(patternStack());
         activeCatalyst = singleCopy(catalystStack());
         activeStabilizer = singleCopy(stabilizerStack());
+        if (bulkSpeed.startRecipe(recipe)) {
+            setChanged();
+        }
     }
 
     private boolean activeCycleMatches() {
