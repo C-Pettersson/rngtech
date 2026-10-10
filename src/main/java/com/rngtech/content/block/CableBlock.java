@@ -126,9 +126,13 @@ public class CableBlock extends Block implements EntityBlock {
         return new CableBlockEntity(pos, state);
     }
 
+    /**
+     * Only cables with a connector tick; a bare cable has nothing to do. Installing or removing a connector changes
+     * the state through {@code setBlock}, and the chunk then asks for the ticker again.
+     */
     @Override
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> blockEntityType) {
-        if (level.isClientSide) {
+        if (level.isClientSide || !hasAnyConnector(state)) {
             return null;
         }
         return createTickerHelper(
@@ -405,6 +409,18 @@ public class CableBlock extends Block implements EntityBlock {
 
     public static boolean hasConnector(BlockState state, Direction direction) {
         return state.getBlock() instanceof CableBlock && state.getValue(connectorProperty(direction));
+    }
+
+    public static boolean hasAnyConnector(BlockState state) {
+        if (!(state.getBlock() instanceof CableBlock)) {
+            return false;
+        }
+        for (Direction direction : DIRECTIONS) {
+            if (state.getValue(connectorProperty(direction))) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public static boolean isDisabled(LevelAccessor level, BlockPos pos, Direction direction) {
