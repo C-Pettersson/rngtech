@@ -82,7 +82,7 @@ The Gear tab has four slots. No Gear can be a higher stage than the chassis.
 
 | Side | Behavior |
 |---|---|
-| Top | Inserts into the active input slots. |
+| Top | Inserts into the active input slots. Accepts only Alloy Furnace recipe ingredients. |
 | Bottom | Extracts finished output. |
 | Sides | Accepts FE, for example from a [Universal Cable](universal-cable.md). |
 

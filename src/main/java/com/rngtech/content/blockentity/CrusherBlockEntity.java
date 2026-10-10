@@ -978,19 +978,17 @@ public class CrusherBlockEntity extends BaseMachineBlockEntity implements MenuPr
         return Math.max(0, Math.min(4, stats.intValue(MachineStat.CRUSHER_INPUT_FILTER)));
     }
 
+    public boolean isCrushable(ItemStack stack) {
+        return level != null && CrusherRecipes.find(level, stack).isPresent();
+    }
+
     private boolean canAutomationInsertInput(ItemStack stack) {
-        if (stack.isEmpty()) {
+        CrusherRecipe recipe = level == null ? null : CrusherRecipes.find(level, stack).orElse(null);
+        if (recipe == null) {
             return false;
         }
         MachineStatAccumulator stats = effectiveStats();
         int filterTier = inputFilterTier(stats);
-        if (filterTier <= 0 || level == null) {
-            return true;
-        }
-        CrusherRecipe recipe = CrusherRecipes.find(level, stack).orElse(null);
-        if (recipe == null) {
-            return false;
-        }
         if (filterTier >= 2 && !canAcceptCandidateOutput(recipe, stats, stack, 1)) {
             return false;
         }

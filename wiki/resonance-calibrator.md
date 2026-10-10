@@ -102,7 +102,7 @@ Coils, Control Boards, and Stabilizer Matrices come in Iron, Copper, Steel, Tita
 
 | Side | Behavior |
 |---|---|
-| Top and sides | Insert into the input, catalyst, and stabilizer slots. |
+| Top and sides | Insert into the input, catalyst, and stabilizer slots. Each slot accepts only items a calibration recipe uses there. |
 | Bottom | Extracts finished components. |
 | Any | Accepts FE, for example from a [Universal Cable](universal-cable.md). |
 

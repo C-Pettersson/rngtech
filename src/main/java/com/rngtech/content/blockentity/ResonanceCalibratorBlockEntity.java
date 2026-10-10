@@ -17,6 +17,7 @@ import com.rngtech.content.recipe.CalibrationRecipe;
 import com.rngtech.content.recipe.CalibrationRecipeInput;
 import com.rngtech.content.registry.ModBlockEntities;
 import com.rngtech.content.registry.ModDataComponents;
+import com.rngtech.content.registry.ModRecipes;
 import com.rngtech.rpg.BatchProcessing;
 import com.rngtech.rpg.ComponentBaseStatCatalog;
 import com.rngtech.rpg.MachineBaseStatCatalog;
@@ -1089,6 +1090,15 @@ public class ResonanceCalibratorBlockEntity extends BaseMachineBlockEntity
         }
     }
 
+    public boolean isCalibrationInput(int slot, ItemStack stack) {
+        return RecipeInputFilter.anyAccepts(level, ModRecipes.CALIBRATION_TYPE.get(), stack, (recipe, item) -> switch (slot) {
+            case SLOT_INPUT -> recipe.ingredient().test(item);
+            case SLOT_CATALYST -> recipe.catalyst().test(item);
+            case SLOT_STABILIZER -> recipe.stabilizer().filter(stabilizer -> stabilizer.test(item)).isPresent();
+            default -> false;
+        });
+    }
+
     private final class AutomationInputHandler implements IItemHandler {
         @Override
         public int getSlots() {
@@ -1102,6 +1112,9 @@ public class ResonanceCalibratorBlockEntity extends BaseMachineBlockEntity
 
         @Override
         public ItemStack insertItem(int slot, ItemStack stack, boolean simulate) {
+            if (!isItemValid(slot, stack)) {
+                return stack;
+            }
             return processInventory.insertItem(mappedSlot(slot), stack, simulate);
         }
 
@@ -1117,7 +1130,7 @@ public class ResonanceCalibratorBlockEntity extends BaseMachineBlockEntity
 
         @Override
         public boolean isItemValid(int slot, ItemStack stack) {
-            return processInventory.isItemValid(mappedSlot(slot), stack);
+            return processInventory.isItemValid(mappedSlot(slot), stack) && isCalibrationInput(mappedSlot(slot), stack);
         }
 
         private int mappedSlot(int slot) {

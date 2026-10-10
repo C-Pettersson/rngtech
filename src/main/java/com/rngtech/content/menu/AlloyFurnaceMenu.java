@@ -484,7 +484,7 @@ public class AlloyFurnaceMenu extends AbstractContainerMenu implements MasteryMe
             if (!moveItemStackTo(stack, GEAR_SLOT_START + AlloyFurnaceBlockEntity.SLOT_SERVO, GEAR_SLOT_START + AlloyFurnaceBlockEntity.SLOT_SERVO + 1, false)) {
                 return ItemStack.EMPTY;
             }
-        } else if (!moveItemStackTo(
+        } else if (!furnace.isAlloyInput(stack) || !moveItemStackTo(
                 stack,
                 AlloyFurnaceBlockEntity.SLOT_INPUT_START,
                 AlloyFurnaceBlockEntity.SLOT_INPUT_START + activeInputSlots(),

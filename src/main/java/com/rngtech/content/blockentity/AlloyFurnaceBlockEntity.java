@@ -734,6 +734,11 @@ public class AlloyFurnaceBlockEntity extends BaseMachineBlockEntity implements M
         });
     }
 
+    public boolean isAlloyInput(ItemStack stack) {
+        return RecipeInputFilter.anyAccepts(level, ModRecipes.ALLOY_FURNACE_TYPE.get(), stack,
+                (recipe, item) -> recipe.ingredients().stream().anyMatch(ingredient -> ingredient.test(item)));
+    }
+
     /**
      * Recipe Lock: automation may add only the current recipe's ingredients, or the last recipe's, each until it is one
      * craft ahead of the scarcest other ingredient.
@@ -1417,7 +1422,7 @@ public class AlloyFurnaceBlockEntity extends BaseMachineBlockEntity implements M
 
         @Override
         public ItemStack insertItem(int slot, ItemStack stack, boolean simulate) {
-            int allowed = recipeLockAllowance(stack);
+            int allowed = isAlloyInput(stack) ? recipeLockAllowance(stack) : 0;
             if (allowed <= 0) {
                 return stack;
             }
@@ -1440,7 +1445,7 @@ public class AlloyFurnaceBlockEntity extends BaseMachineBlockEntity implements M
 
         @Override
         public boolean isItemValid(int slot, ItemStack stack) {
-            return processInventory.isItemValid(mappedSlot(slot), stack) && recipeLockAllowance(stack) > 0;
+            return processInventory.isItemValid(mappedSlot(slot), stack) && isAlloyInput(stack) && recipeLockAllowance(stack) > 0;
         }
 
         private int mappedSlot(int slot) {

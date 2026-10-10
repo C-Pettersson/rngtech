@@ -557,7 +557,7 @@ public class FurnaceMenu extends AbstractContainerMenu implements MasteryMenuVie
             if (!moveItemStackTo(stack, FurnaceBlockEntity.SLOT_FUEL, FurnaceBlockEntity.SLOT_FUEL + 1, false)) {
                 return ItemStack.EMPTY;
             }
-        } else if (!moveItemStackTo(
+        } else if (!furnace.isSmeltable(stack) || !moveItemStackTo(
                 stack,
                 FurnaceBlockEntity.SLOT_INPUT_START,
                 FurnaceBlockEntity.SLOT_INPUT_START + MAX_PROCESSING_SLOTS,
