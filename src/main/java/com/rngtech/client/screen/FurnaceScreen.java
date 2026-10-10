@@ -607,7 +607,7 @@ public class FurnaceScreen extends AbstractContainerScreen<FurnaceMenu> {
                     51,
                     69,
                     8,
-                    progressTooltip(0)
+                    progressTooltipLines(0)
             );
         } else {
             for (int lane = 0; lane < menu.activeProcessingSlots(); lane++) {
@@ -622,7 +622,7 @@ public class FurnaceScreen extends AbstractContainerScreen<FurnaceMenu> {
                         MULTI_PROGRESS_Y[lane],
                         69,
                         5,
-                        progressTooltip(lane)
+                        progressTooltipLines(lane)
                 );
             }
         }
@@ -654,6 +654,10 @@ public class FurnaceScreen extends AbstractContainerScreen<FurnaceMenu> {
                 ICON_SIZE,
                 Component.translatable("rngtech.furnace.tooltip.status", statusComponent())
         );
+    }
+
+    private List<Component> progressTooltipLines(int lane) {
+        return MachineScreenStyle.withTimeRemaining(progressTooltip(lane), menu.progress(lane), menu.processingTicks(lane));
     }
 
     private Component progressTooltip(int lane) {
