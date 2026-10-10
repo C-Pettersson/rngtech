@@ -464,6 +464,20 @@ public class ResonanceCalibratorMenu extends AbstractContainerMenu implements Ma
         );
     }
 
+    private boolean moveToCalibrationInputs(ItemStack stack) {
+        boolean moved = false;
+        for (int slot : new int[] {
+                ResonanceCalibratorBlockEntity.SLOT_INPUT,
+                ResonanceCalibratorBlockEntity.SLOT_CATALYST,
+                ResonanceCalibratorBlockEntity.SLOT_STABILIZER
+        }) {
+            if (!stack.isEmpty() && calibrator.isCalibrationInput(slot, stack)) {
+                moved |= moveItemStackTo(stack, slot, slot + 1, false);
+            }
+        }
+        return moved;
+    }
+
     @Override
     public ItemStack quickMoveStack(Player player, int index) {
         ItemStack moved = ItemStack.EMPTY;
@@ -517,7 +531,7 @@ public class ResonanceCalibratorMenu extends AbstractContainerMenu implements Ma
             )) {
                 return ItemStack.EMPTY;
             }
-        } else if (!moveItemStackTo(stack, ResonanceCalibratorBlockEntity.SLOT_INPUT, ResonanceCalibratorBlockEntity.SLOT_STABILIZER + 1, false)) {
+        } else if (!moveToCalibrationInputs(stack)) {
             return ItemStack.EMPTY;
         }
 

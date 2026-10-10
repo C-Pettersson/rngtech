@@ -122,7 +122,7 @@ Crush Heads roll their own affixes, and their stats add to the Crusher's. See [G
 
 | Side | Behavior |
 |---|---|
-| Top | Inserts into the input slot. Some rolled affixes make the top side reject items that cannot be crushed or would not fit the output. |
+| Top | Inserts into the input slot. Accepts only items with a Crusher recipe; some rolled affixes also reject items that would not fit the output. |
 | Bottom | Extracts finished output. |
 | Sides | Inserts Battery Cells. |
 | Any | Accepts FE, for example from a [Universal Cable](universal-cable.md). |

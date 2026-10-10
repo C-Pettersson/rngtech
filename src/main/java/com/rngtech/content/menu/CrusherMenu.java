@@ -465,7 +465,7 @@ public class CrusherMenu extends AbstractContainerMenu implements MasteryMenuVie
             if (!moveItemStackTo(stack, CrusherBlockEntity.SLOT_FUEL, CrusherBlockEntity.SLOT_FUEL + 1, false)) {
                 return ItemStack.EMPTY;
             }
-        } else if (!moveItemStackTo(stack, CrusherBlockEntity.SLOT_INPUT_A, CrusherBlockEntity.SLOT_INPUT_A + 1, false)) {
+        } else if (!crusher.isCrushable(stack) || !moveItemStackTo(stack, CrusherBlockEntity.SLOT_INPUT_A, CrusherBlockEntity.SLOT_INPUT_A + 1, false)) {
             return ItemStack.EMPTY;
         }
 

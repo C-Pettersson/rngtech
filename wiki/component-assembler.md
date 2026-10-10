@@ -79,7 +79,7 @@ The Gear tab has one optional **Battery Cell** slot. FE you supply fills the mac
 
 | Side | Behavior |
 |---|---|
-| Top | Inserts into the four item input slots. |
+| Top | Inserts into the four item input slots. Each slot accepts only items a recipe needs in that position. |
 | Bottom | Extracts finished items from the output rack. |
 | Sides | Insert dry electrolyte or filled fluid containers into the fluid slot, and extract empty containers. |
 | Any | Accepts FE and assembly fluids, for example from a [Universal Cable](universal-cable.md). |
