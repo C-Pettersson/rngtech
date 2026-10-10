@@ -24,6 +24,8 @@ public final class StatBreakdownChecks {
         overridesRecombine();
         partContributionsCarryThePartLabel();
         flatCapacityFoldsIntoCapacity();
+        crusherYieldSoftCapRecombines();
+        energyUsageReductionsRecombine();
         textListsEverySource();
         return checks;
     }
@@ -149,6 +151,39 @@ public final class StatBreakdownChecks {
         near(breakdown.recompute(), 1500, "flat capacity adds to capacity");
         require(stats.breakdowns().stream().noneMatch(entry -> entry.stat() == MachineStat.ENERGY_CAPACITY_FLAT),
                 "flat capacity has no separate breakdown");
+    }
+
+    private static void crusherYieldSoftCapRecombines() {
+        MachineStatAccumulator stats = MachineStatAccumulator.recording(() -> {
+            MachineStatAccumulator recorded = MachineStatAccumulator.componentBase(Map.of(MachineStat.OUTPUT_AMOUNT, 1.2))
+                    .withCrusherYieldRules();
+            recorded.apply(Component.literal("Jaws"), new MachineModifier(ModifierSlot.IMPLICIT, MachineStat.OUTPUT_AMOUNT, ModifierOperation.INCREASED_PERCENT, 100));
+            recorded.apply(Component.literal("Tree"), new MachineModifier(ModifierSlot.IMPLICIT, MachineStat.OUTPUT_AMOUNT, ModifierOperation.INCREASED_PERCENT, 189));
+            return recorded;
+        });
+        StatBreakdown breakdown = stats.breakdown(MachineStat.OUTPUT_AMOUNT).orElseThrow();
+        near(breakdown.recompute(), stats.value(MachineStat.OUTPUT_AMOUNT), "the soft-capped yield bucket recombines");
+        near(breakdown.paidIncreasedPercent(), 289.0 * 100 / 389, "the breakdown pays the soft-capped bonus");
+        String text = StatBreakdownText.lines(breakdown).stream().map(Component::getString).collect(Collectors.joining("\n"));
+        require(text.contains("rngtech.stat.breakdown.soft_cap"),
+                "the breakdown shows the soft-cap math:\n" + text);
+    }
+
+    private static void energyUsageReductionsRecombine() {
+        MachineStatAccumulator stats = MachineStatAccumulator.recording(() -> {
+            MachineStatAccumulator recorded = MachineStatAccumulator.componentBase(Map.of(MachineStat.ENERGY_USAGE, 1.0));
+            try (MachineStatAccumulator.Source ignored = recorded.source(Component.literal("Mixed"))) {
+                recorded.apply(new MachineModifier(ModifierSlot.IMPLICIT, MachineStat.ENERGY_USAGE, ModifierOperation.DECREASED_PERCENT, 60));
+                recorded.apply(new MachineModifier(ModifierSlot.IMPLICIT, MachineStat.ENERGY_USAGE, ModifierOperation.INCREASED_PERCENT, 50));
+            }
+            recorded.apply(Component.literal("Keystone"), new MachineModifier(ModifierSlot.IMPLICIT, MachineStat.ENERGY_USAGE, ModifierOperation.MORE, 1.5));
+            return recorded;
+        });
+        StatBreakdown breakdown = stats.breakdown(MachineStat.ENERGY_USAGE).orElseThrow();
+        near(breakdown.recompute(), stats.value(MachineStat.ENERGY_USAGE), "dividing Energy Usage recombines");
+        near(breakdown.reductionsPercent(), 60, "one source keeps its reduction apart from its increase");
+        String text = StatBreakdownText.lines(breakdown).stream().map(Component::getString).collect(Collectors.joining("\n"));
+        require(text.contains("rngtech.stat.breakdown.divided"), "the breakdown explains dividing reductions:\n" + text);
     }
 
     private static void textListsEverySource() {

@@ -24,11 +24,10 @@ These named affix definitions have `CAN_ROLL` and can be selected by normal roll
 | Instant Process | Suffix | `ADD INSTANT_PROCESS_CHANCE` | Chance for eligible processing to complete instantly if the machine can pay the full up-front cost. |
 | Super Output | Suffix | `ADD SUPER_OUTPUT_CHANCE` | Chance for item-output processors to add one extra copy of the base stackable output. |
 | Fuel duration | Suffix | `INCREASED_PERCENT FUEL_DURATION` | Extends generator burn ticks for eligible fuel-burning generators and parts without increasing FE/t. |
-| Crush Head Pulverizing | Prefix | `INCREASED_PERCENT OUTPUT_AMOUNT` | Tiered Crush Head prefix using Coarse, Grinding, Pulverizing, and Micronizing display names. |
+| Crush Head Pulverizing | Prefix | `INCREASED_PERCENT OUTPUT_AMOUNT` plus `DECREASED_PERCENT PROCESSING_SPEED` | Tiered Crush Head prefix using Coarse, Grinding, Pulverizing, and Micronizing display names. |
 | Crush Head Jagged | Prefix | `ADD CRUSHER_SALVAGE_CHANCE` | Tiered Crush Head prefix using Nicked, Jagged, Serrated, and Rending display names. |
 | Crush Head Kinetic | Prefix | `INCREASED_PERCENT PROCESSING_SPEED` | Tiered Crush Head prefix using Quickened, Kinetic, Momentum-Driven, and Impulse-Forged display names. |
 | Crush Head Scuffed | Prefix | `ADD NO_BATTERY_OUTPUT_RETENTION` | Untiered low-impact filler prefix that barely softens the missing-Battery-Cell output penalty. |
-| Crush Head Dust Groove | Prefix | `ADD CRUSHER_INPUT_FILTER` | Untiered low-impact filler prefix at filter tier 1, which now matches the default recipe-valid top automation filter. |
 | Peak Solar | Suffix | `INCREASED_PERCENT PEAK_SOLAR_GENERATION` | Solar Panel-only zenith-window output bonus. |
 | Energy transfer, generation, efficiency, stability, heat, calibration, fluid, tool, and battery stats | Prefix or suffix | Active stat's normal operation | Rollable only on profiles whose current runtime logic consumes the stat. |
 

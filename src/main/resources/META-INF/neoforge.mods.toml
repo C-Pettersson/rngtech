@@ -11,7 +11,7 @@ logoFile="rngtech-logo.png"
 displayURL="https://www.curseforge.com/minecraft/mc-mods/rngtech"
 authors="C-Pettersson"
 description='''
-RNGTech is a NeoForge technology mod about staged survival machines, installable Gear parts, machine rarity, affixes, refinement potential, ore processing, alloying, energy generation, energy storage, and recovery-focused automation surfaces.
+A tech mod where your machines drop like loot. Machines, Gear parts, and Battery Cells roll rarity and affixes, Refinement Potential limits how far you can craft them, and machines level up on a shared passive tree with ascendancies. Build ore processing, alloying, power generation, and automation across nine material stages.
 '''
 
 [[dependencies.${mod_id}]]

@@ -322,6 +322,19 @@ tasks.register('energyBalanceSim', JavaExec) {
     doFirst { workingDir.mkdirs() }
 }
 
+tasks.register('processingBalanceSim', JavaExec) {
+    group = 'balance'
+    description = 'Models the Crusher to Furnace ore line per stage, Mastery level and build archetype.'
+    dependsOn tasks.named('masteryTestClasses')
+    classpath = sourceSets.masteryTest.runtimeClasspath
+    mainClass = 'com.rngtech.rpg.ProcessingBalanceSimulation'
+    javaLauncher = javaToolchains.launcherFor { languageVersion = JavaLanguageVersion.of(21) }
+    def output = layout.buildDirectory.file('processing-balance/processing-balance.json').get().asFile
+    args layout.projectDirectory.asFile.path, output.path
+    workingDir = layout.buildDirectory.dir('processing-balance').get().asFile
+    doFirst { workingDir.mkdirs() }
+}
+
 tasks.named('quickCheck') { dependsOn 'masteryCheck' }
 tasks.named('check') { dependsOn 'masteryCheck' }
 
