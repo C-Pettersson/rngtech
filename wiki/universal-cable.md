@@ -83,6 +83,8 @@ Mine Cables and Universal Connectors with a pickaxe. Aiming at a connector on a 
 
 One Cable can hold a connector on each of its six faces.
 
+A network reaches only as far as the loaded world. Cables and machines in unloaded chunks drop out of the network and move nothing, and they join back in by themselves once their chunk loads again. Cables never keep chunks loaded.
+
 Energy Connectors are modules: they go in a Universal Connector's Energy tab, or in the Gear slot of a [Tool Bench](tool-bench.md) or [Forestry Cart Station](forestry-cart-station.md). Right-clicking a Cable with one does not place it on the cable; if you aim at a connector, that connector's screen opens instead. Direct Energy Connectors on a cable face from older worlds keep working, and you can still configure and mine them, but you cannot place new ones.
 
 #### Standalone plates
@@ -106,7 +108,7 @@ A dyed Cable keeps its color when you mine it. The color shows on the cable's gl
 | Channel | 0–15. Connectors only exchange with the same channel. Energy, Fluid, Item, and Bridge channels are separate. |
 | Mode | Energy: Input takes FE from the machine into the cable, Output sends FE from the cable into the machine, and Both does both. Hover a mode button for its description. Fluid and Item rows: IN pulls from the machine into the cable, OUT pushes from the cable into the machine. |
 | Attach As | Which side of the machine the connector acts as. For example, a connector under a machine can insert as if it were on top. Set a Fluid or Item row to None to switch it off. |
-| Distribution | Energy only. Round Robin rotates between outputs, Even splits each transfer and then sends leftovers to outputs that can still take more, First Available fills outputs in order. |
+| Distribution | Energy only. How this connector splits the FE it gives each tick: Round Robin rotates between outputs, Even splits it evenly and then sends leftovers to outputs that can still take more, First Available fills outputs in order. |
 | Filters | Fluid and Item rows each have two ghost filter slots. Filters are copies and are never used up. |
 
 A new connector starts on channel 0, with Energy mode Both, Distribution Round Robin, and every Fluid and Item row set to IN. Attach As starts as the machine face the connector actually touches. Each Fluid and Item row has its own mode, channel, and Attach, and several rows can share a channel and side.
@@ -127,6 +129,15 @@ The Energy tab has one Energy Connector slot. The connector pulls FE from machin
 
 The tier is a per-tick cap in both directions. A connector takes at most its tier in FE/t from its machine, and delivers at most its tier in FE/t into its machine, however many generators feed the network. Most machines do not limit how fast they take or give FE, so the connector tier is usually what sets the rate.
 
+**Sharing the load.** Each tick, every energy channel moves its FE in one step, after all machines have run. Every Input or Both connector offers what its machine can give, every Output or Both connector asks for what its machine can take, and then the FE is shared out in this order:
+
+1. Generators feed machines. When generators offer more than the machines need, each generator gives the same share of what it offers, so they share the load instead of one doing all the work.
+2. Spare FE from generators charges storage blocks.
+3. Storage blocks cover what the machines still need.
+4. Storage blocks even out with each other (see below).
+
+Each connector's Distribution setting decides how its own share is split between the receiving connectors. The result does not depend on the order you placed things in. Machines that push FE into a connector on their own deliver it right away, by the same rules.
+
 **Storage balancing.** A storage block is any block that can both take and give FE at that moment, such as a [Battery Chassis](battery-chassis.md). Between two storage blocks whose connectors are both on Both, FE flows only from the fuller block to the emptier one, by fill percentage, and stops once they are equally full. Gaps under 1% move nothing, so idle banks do not trade FE back and forth and lose it to charge and discharge losses. Daisy-chained banks still pass charge along: a generator charges the first bank, and the first bank shares with the next. Generators still charge banks, and banks still feed machines. A completely full bank passes its overflow on freely, and a completely empty bank takes FE freely. To fill one bank from another regardless of fill, set the source bank's connector to Input or the destination bank's connector to Output.
 
 **No FE on this side.** You can put a connector on any face, but many machines take or give FE only on some sides. If the machine has no FE on the connector's Attach As side, the Energy tab and the Wrench hologram show a red warning: `No FE on this side of the target. Change Attach As or move the connector.`
@@ -138,6 +149,8 @@ The tier is a per-tick cap in both directions. A connector takes at most its tie
 The Fluid tab has three rows, each with a Fluid Connector slot, its own mode, channel, and Attach setting, and two filter slots. An IN row drains a shipment from the machine, waits, and repeats. An OUT row fills its machine from shipments arriving on its channel, up to its tier's shipment size. To filter a row, put a filled bucket or other fluid container in a filter slot.
 
 Each shipment can **jam**: the row pauses for a few seconds without losing any fluid. Several IN rows on the same machine side and channel run in parallel, so stacking rows raises throughput.
+
+An IN row that finds nothing it can send, because its machine is empty, no OUT row on its channel can take the shipment, or its filter matches nothing, waits before it looks again. It waits its tier's time between shipments, but never more than one second, and it looks again at once when cables, connectors, or their settings change. Item rows work the same way.
 
 A connector with an IN row also accepts fluid or items that its machine pushes out on its own, and sends them to that row's channel. Pushed shipments follow the same size, wait, jam, and filter rules.
 

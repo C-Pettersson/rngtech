@@ -33,6 +33,7 @@ Processing machines should not hide large built-in FE storage unless they are ex
 - Generators should expose energy supply, not a machine-side export cap. Generators have no Energy Connector Gear slot: the attached Universal Connector's Energy Connector is the export limit, so a second in-machine cap is never added. Generator-installed Battery Cells are capacity buffers and should not cap generated FE/t or export FE/t.
 - Universal Connector tier is the primary player-facing RNGTech wiring cap. UI read models should show connector cap, last FE in/out, and bottleneck warnings when the connector limits transfer.
 - Connector tiers are per-tick caps in both directions, shared across every source or sink using that connector. See [Universal Cable](https://c-pettersson.github.io/rngtech/universal-cable/#energy).
+- A cable channel moves FE in one pass per tick, planned before anything moves, so results never depend on block entity tick order. Generators share the load in proportion to what they offer, machines are served before storage, and storage only covers what generators cannot and evens out with other storage.
 - Any machine-side FE cap that remains, such as a Battery Chassis cell rate, must also be a per-tick budget shared by every side and connector, never a per-call limit.
 - FE transfer stats should remain meaningful for storage-like blocks, Battery Cells, and Battery Chassis. Do not show or roll `ENERGY_TRANSFER` on processors or generators, where it does not control the real player-facing limit.
 
