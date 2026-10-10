@@ -72,6 +72,14 @@ java.toolchain.languageVersion = JavaLanguageVersion.of(21)
 //minecraft.accessTransformers.file rootProject.file('src/main/resources/META-INF/accesstransformer.cfg')
 //minecraft.accessTransformers.entry public net.minecraft.client.Minecraft textureManager # textureManager
 
+// Dev-only tick benchmark; compiled for the tickBenchmark run and never part of the mod jar.
+sourceSets {
+    benchmark {
+        compileClasspath += sourceSets.main.output + sourceSets.main.compileClasspath
+        runtimeClasspath += sourceSets.main.output + sourceSets.main.runtimeClasspath
+    }
+}
+
 // Default run configurations.
 // A linked git worktree has a .git file that points into the main checkout's .git/worktrees/<name>. Its runs use the
 // main checkout's run directory, so every worktree launches with the same settings and worlds.
@@ -123,6 +131,22 @@ runs {
     // The gametest system is also enabled by default for other run configs under the /test command.
     gameTestServer {
         systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
+    }
+
+    // Builds a fixed scene and reports server ms/tick; see docs/reference/benchmarking.md. It has its own run directory,
+    // so it does not share the gameTestServer one.
+    create('tickBenchmark') {
+        runType 'gameTestServer'
+        systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
+        systemProperty 'rngtech.benchmark.output', layout.buildDirectory.file('tick-benchmark/result.json').get().asFile.path
+        systemProperty 'rngtech.benchmark.settle', (project.findProperty('benchmarkSettle') ?: '100').toString()
+        systemProperty 'rngtech.benchmark.warmup', (project.findProperty('benchmarkWarmup') ?: '200').toString()
+        systemProperty 'rngtech.benchmark.ticks', (project.findProperty('benchmarkTicks') ?: '400').toString()
+        if (project.hasProperty('benchmarkJfr')) {
+            // -PbenchmarkJfr records a Java Flight Recorder profile next to the result.
+            jvmArgument "-XX:StartFlightRecording=filename=${layout.buildDirectory.file('tick-benchmark/benchmark.jfr').get().asFile.path},settings=profile,dumponexit=true"
+        }
+        modSource project.sourceSets.benchmark
     }
 
     data {
@@ -335,8 +359,9 @@ tasks.register('processingBalanceSim', JavaExec) {
     doFirst { workingDir.mkdirs() }
 }
 
-tasks.named('quickCheck') { dependsOn 'masteryCheck' }
-tasks.named('check') { dependsOn 'masteryCheck' }
+// The tick benchmark is only compiled by the checks, so it cannot rot; running it takes minutes.
+tasks.named('quickCheck') { dependsOn 'masteryCheck', 'benchmarkClasses' }
+tasks.named('check') { dependsOn 'masteryCheck', 'benchmarkClasses' }
 
 def localFtbQuestsDir = layout.projectDirectory.dir('config/ftbquests')
 def devFtbQuestsDir = layout.projectDirectory.dir('run/client/config/ftbquests')
