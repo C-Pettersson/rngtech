@@ -87,7 +87,6 @@ public final class ModifierEligibilityProfiles {
             ModifierValueRange.fixed(100)
     );
     private static final List<ModifierValueRange> CRUSHER_INPUT_FILTER_RANGES = List.of(
-            ModifierValueRange.fixed(1),
             ModifierValueRange.fixed(2),
             ModifierValueRange.fixed(3),
             ModifierValueRange.fixed(4)
@@ -758,14 +757,6 @@ public final class ModifierEligibilityProfiles {
             ModifierOperation.ADD,
             ModifierValueRange.fixed(6)
     ).withRollWeight(CRUSH_HEAD_PREFIX_WEIGHT);
-    private static final ModifierDefinition CRUSH_HEAD_DUST_GROOVE = ModifierDefinition.rollableUntiered(
-            "crush_head_dust_groove",
-            "crusher_input_filter",
-            ModifierSlot.PREFIX,
-            MachineStat.CRUSHER_INPUT_FILTER,
-            ModifierOperation.ADD,
-            ModifierValueRange.fixed(1)
-    ).withRollWeight(CRUSH_HEAD_PREFIX_WEIGHT);
     private static final ModifierDefinition BATTERY_CHARGE_BACKPLANE = runtime(
             "charge_backplane",
             "charge_acceptance",
@@ -1321,7 +1312,6 @@ public final class ModifierEligibilityProfiles {
             CRUSHER_SALVAGE.id(),
             CRUSH_HEAD_JAGGED.id(),
             CRUSH_HEAD_SCUFFED.id(),
-            CRUSH_HEAD_DUST_GROOVE.id(),
             BATTERY_CHARGE_BACKPLANE.id(),
             BATTERY_LOW_CHARGE_RETENTION.id(),
             BATTERY_BROWNOUT_CUSHION.id(),
@@ -2780,8 +2770,7 @@ public final class ModifierEligibilityProfiles {
                 CRUSH_HEAD_PULVERIZING,
                 CRUSH_HEAD_JAGGED,
                 CRUSH_HEAD_KINETIC,
-                CRUSH_HEAD_SCUFFED,
-                CRUSH_HEAD_DUST_GROOVE
+                CRUSH_HEAD_SCUFFED
         ));
         return List.copyOf(definitions);
     }
@@ -3013,8 +3002,7 @@ public final class ModifierEligibilityProfiles {
                 CRUSHER_FEED_CONTROL,
                 CRUSHER_COMPRESSION,
                 CRUSHER_SALVAGE,
-                CRUSH_HEAD_SCUFFED,
-                CRUSH_HEAD_DUST_GROOVE
+                CRUSH_HEAD_SCUFFED
         );
         put(
                 definitions,
