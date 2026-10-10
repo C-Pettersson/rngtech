@@ -65,7 +65,7 @@ public final class StatBreakdownText {
         return lines;
     }
 
-    /** Shows how the soft cap bends a positive increased bucket; on Crusher yield the paid share also lengthens cycles. */
+    /** Shows how the soft cap bends a positive increased bucket. */
     private static void softCap(List<Component> lines, StatBreakdown breakdown) {
         StatBreakdown.Term cap = breakdown.lowest(StatBreakdown.Kind.SOFT_CAP);
         double increased = breakdown.increasedPercent();
@@ -77,12 +77,6 @@ public final class StatBreakdownText {
         String paid = MachineStatDisplay.formatSignedPercentPoints(breakdown.paidIncreasedPercent());
         lines.add(Component.translatable("rngtech.stat.breakdown.soft_cap", bucket, limit, bucket, limit, paid)
                 .withStyle(ChatFormatting.GRAY));
-        if (breakdown.stat() == MachineStat.OUTPUT_AMOUNT) {
-            lines.add(Component.translatable(
-                    "rngtech.stat.breakdown.yield_time",
-                    MachineStatDisplay.formatNumber(Math.round(breakdown.paidIncreasedPercent())) + "%"
-            ).withStyle(ChatFormatting.GRAY));
-        }
     }
 
     private static void section(

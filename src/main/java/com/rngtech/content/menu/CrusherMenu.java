@@ -421,7 +421,7 @@ public class CrusherMenu extends AbstractContainerMenu implements MasteryMenuVie
 
     @Override
     public MachineStatAccumulator breakdownStats() {
-        return crusher.effectiveStats();
+        return crusher.displayStats();
     }
 
     @Override

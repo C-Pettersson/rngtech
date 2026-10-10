@@ -168,7 +168,7 @@ public class CrusherBlockEntity extends BaseMachineBlockEntity implements MenuPr
                 case DATA_ENERGY_CAPACITY -> energyCapacity();
                 case DATA_INPUT_SLOTS -> getEffectiveInputSlots();
                 case DATA_OUTPUT_AMOUNT -> scaledStat(stats, MachineStat.OUTPUT_AMOUNT);
-                case DATA_PROCESSING_SPEED -> scaledStat(stats, MachineStat.PROCESSING_SPEED);
+                case DATA_PROCESSING_SPEED -> (int) Math.round(stats.value(MachineStat.PROCESSING_SPEED) * CrusherYield.speedFactor(stats) * STAT_SCALE);
                 case DATA_PROCESSING_LEVEL -> scaledStat(stats, MachineStat.PROCESSING_LEVEL);
                 case DATA_ENERGY_USAGE -> scaledStat(stats, MachineStat.ENERGY_USAGE);
                 case DATA_ENERGY_CAPACITY_STAT -> scaledStat(stats, MachineStat.ENERGY_CAPACITY);
@@ -663,6 +663,24 @@ public class CrusherBlockEntity extends BaseMachineBlockEntity implements MenuPr
             ));
         }
         bulkSpeed.apply(stats, activeTraits);
+        return stats;
+    }
+
+    /**
+     * Effective stats as the Stats tab shows them: the yield cost appears as less Processing Speed. Recipes apply it
+     * themselves, and only when they get bonus output, so it stays out of {@link #effectiveStats()}.
+     */
+    public MachineStatAccumulator displayStats() {
+        MachineStatAccumulator stats = effectiveStats();
+        double yieldCost = CrusherYield.speedFactor(stats);
+        if (yieldCost < 1.0D) {
+            stats.apply(CrusherYield.SPEED_SOURCE, new MachineModifier(
+                    ModifierSlot.IMPLICIT,
+                    MachineStat.PROCESSING_SPEED,
+                    ModifierOperation.LESS,
+                    yieldCost
+            ));
+        }
         return stats;
     }
 

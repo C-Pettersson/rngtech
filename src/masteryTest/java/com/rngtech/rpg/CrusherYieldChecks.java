@@ -90,6 +90,7 @@ public final class CrusherYieldChecks {
         near(crusher.value(MachineStat.OUTPUT_AMOUNT) / ticks, 1.0 / 120, "yield alone keeps items per tick at the bucket-free rate");
         increase(crusher, MachineStat.PROCESSING_SPEED, 100);
         require(CrusherYield.jobTicks(crusher, 120, bonus) == 90, "speed still shortens a yield cycle");
+        near(CrusherYield.speedFactor(crusher), 1 / 1.5, "the Stats tab shows the same cost as less Processing Speed");
 
         MachineStatAccumulator penalized = crusher(1.0);
         increase(penalized, MachineStat.OUTPUT_AMOUNT, -50);
