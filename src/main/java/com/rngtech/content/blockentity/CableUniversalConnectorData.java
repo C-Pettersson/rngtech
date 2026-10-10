@@ -17,6 +17,7 @@ import com.rngtech.content.item.ItemConnectorItem;
 import com.rngtech.content.item.NetworkConnectorItem;
 import com.rngtech.content.itemfilter.ItemFilterMatcher;
 import com.rngtech.content.menu.UniversalConnectorAccess;
+import com.rngtech.content.wrench.LinkStatus;
 import com.rngtech.util.TickTransferCounter;
 
 import net.minecraft.core.BlockPos;
@@ -302,6 +303,7 @@ public final class CableUniversalConnectorData implements UniversalConnectorAcce
             Optional<FluidConnectorTier> tier = fluidConnectorTier(moduleIndex);
             tier.ifPresent(connector -> accumulator.addFluidModule(
                     module.channel,
+                    module.mode,
                     connector.fluidPerShipment(),
                     module.attachAs != null
             ));
@@ -311,6 +313,7 @@ public final class CableUniversalConnectorData implements UniversalConnectorAcce
             Optional<ItemConnectorTier> tier = itemConnectorTier(moduleIndex);
             tier.ifPresent(connector -> accumulator.addItemModule(
                     module.channel,
+                    module.mode,
                     connector.itemsPerShipment(),
                     module.attachAs != null
             ));
@@ -1461,6 +1464,64 @@ public final class CableUniversalConnectorData implements UniversalConnectorAcce
             return UniversalConnectorBlockEntity.networkEnergyTelemetryData(index, networkEnergyTelemetrySnapshot());
         }
         return moduleData(index);
+    }
+
+    @Override
+    public LinkStatus energyLinkStatus() {
+        if (connectorTier().isEmpty()) {
+            return LinkStatus.OK;
+        }
+        IEnergyStorage target = targetEnergyStorage();
+        if (target == null) {
+            return LinkStatus.TARGET_BLOCKED;
+        }
+        int rate = transferRate();
+        return networkDebugSnapshot().links().status(
+                CableBlockEntity.LinkCounts.Kind.ENERGY,
+                channel,
+                mode.acceptsNetworkInput(),
+                mode.sendsNetworkOutput(),
+                CableBlockEntity.countsAsEnergySource(mode, rate, target, lastEnergyInput()),
+                CableBlockEntity.countsAsEnergySink(mode, rate, target, lastEnergyOutput())
+        );
+    }
+
+    @Override
+    public LinkStatus fluidLinkStatus(int moduleIndex) {
+        FluidModuleState module = fluidModule(moduleIndex);
+        if (module == null || fluidConnectorTier(moduleIndex).isEmpty()) {
+            return LinkStatus.OK;
+        }
+        if (module.attachAs == null) {
+            return LinkStatus.NOT_ATTACHED;
+        }
+        return networkDebugSnapshot().links().status(
+                CableBlockEntity.LinkCounts.Kind.FLUID,
+                module.channel,
+                module.mode.pullsFromTarget(),
+                module.mode.insertsIntoTarget(),
+                module.mode.pullsFromTarget(),
+                module.mode.insertsIntoTarget()
+        );
+    }
+
+    @Override
+    public LinkStatus itemLinkStatus(int moduleIndex) {
+        ItemModuleState module = itemModule(moduleIndex);
+        if (module == null || itemConnectorTier(moduleIndex).isEmpty()) {
+            return LinkStatus.OK;
+        }
+        if (module.attachAs == null) {
+            return LinkStatus.NOT_ATTACHED;
+        }
+        return networkDebugSnapshot().links().status(
+                CableBlockEntity.LinkCounts.Kind.ITEM,
+                module.channel,
+                module.mode.pullsFromTarget(),
+                module.mode.insertsIntoTarget(),
+                module.mode.pullsFromTarget(),
+                module.mode.insertsIntoTarget()
+        );
     }
 
     private CableBlockEntity.NetworkDebugSnapshot networkDebugSnapshot() {
