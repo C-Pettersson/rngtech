@@ -591,6 +591,71 @@ final class MachineScreenStyle {
         guiGraphics.fill(left + 2, top + 2, left + 10, top + 10, 0xFF2F2F2F);
     }
 
+    /**
+     * Machine states shown in a status icon. Each state has its own glyph so the icon reads without relying on colour.
+     */
+    enum StatusState {
+        RUNNING(0xFF7FBF5F),
+        IDLE(0xFFA8A8A8),
+        WAITING(0xFFE0A83A),
+        BLOCKED(0xFFE8765E),
+        ERROR(0xFFE8765E);
+
+        private static final int BACKING = 0xFF2F2F2F;
+        private final int color;
+
+        StatusState(int color) {
+            this.color = color;
+        }
+
+        int color() {
+            return color;
+        }
+    }
+
+    /**
+     * Draws the glyph for a status state inside a 12 x 12 icon box whose top-left corner is at ({@code left}, {@code top}).
+     * Running is a check, idle a dot, waiting a pause, blocked an exclamation mark, and error a cross.
+     */
+    static void renderStatusGlyph(GuiGraphics guiGraphics, int left, int top, StatusState state) {
+        guiGraphics.fill(left + 2, top + 2, left + 10, top + 10, StatusState.BACKING);
+        int x = left + 3;
+        int y = top + 3;
+        int color = state.color();
+        switch (state) {
+            case RUNNING -> {
+                glyphPixel(guiGraphics, x, y, 0, 3, color);
+                glyphPixel(guiGraphics, x, y, 1, 4, color);
+                glyphPixel(guiGraphics, x, y, 2, 5, color);
+                glyphPixel(guiGraphics, x, y, 3, 4, color);
+                glyphPixel(guiGraphics, x, y, 4, 3, color);
+                glyphPixel(guiGraphics, x, y, 5, 2, color);
+            }
+            case IDLE -> {
+                guiGraphics.fill(x + 2, y + 1, x + 4, y + 5, color);
+                guiGraphics.fill(x + 1, y + 2, x + 5, y + 4, color);
+            }
+            case WAITING -> {
+                guiGraphics.fill(x, y, x + 2, y + 6, color);
+                guiGraphics.fill(x + 4, y, x + 6, y + 6, color);
+            }
+            case BLOCKED -> {
+                guiGraphics.fill(x + 2, y, x + 4, y + 4, color);
+                guiGraphics.fill(x + 2, y + 5, x + 4, y + 6, color);
+            }
+            case ERROR -> {
+                for (int step = 0; step < 6; step++) {
+                    glyphPixel(guiGraphics, x, y, step, step, color);
+                    glyphPixel(guiGraphics, x, y, 5 - step, step, color);
+                }
+            }
+        }
+    }
+
+    private static void glyphPixel(GuiGraphics guiGraphics, int originX, int originY, int dx, int dy, int color) {
+        guiGraphics.fill(originX + dx, originY + dy, originX + dx + 1, originY + dy + 1, color);
+    }
+
     static void renderProcessingLevelSquare(
             GuiGraphics guiGraphics,
             int leftPos,

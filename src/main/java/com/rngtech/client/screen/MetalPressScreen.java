@@ -30,9 +30,6 @@ public class MetalPressScreen extends AbstractContainerScreen<MetalPressMenu> {
     private static final int HEAT = 0xFFE0712F;
     private static final int PROGRESS = 0xFF667F51;
     private static final int RISK = 0xFFC14332;
-    private static final int STATUS_READY = 0xFF5F8A45;
-    private static final int STATUS_WARN = 0xFFAA7A31;
-    private static final int STATUS_ERROR = 0xFFB45B4A;
     private static final int STAT_ACCENT = 0xFFB86B28;
     private static final int START_NODE = 0xFF38D857;
     private static final int MASTERY_RING = 0xFF4A5C3B;
@@ -417,9 +414,9 @@ public class MetalPressScreen extends AbstractContainerScreen<MetalPressMenu> {
         guiGraphics.fill(x + HEAT_BAR_X + 1, y + BAR_Y + BAR_HEIGHT - 1 - heatHeight, x + HEAT_BAR_X + BAR_WIDTH - 1, y + BAR_Y + BAR_HEIGHT - 1, HEAT);
 
         renderIconBox(guiGraphics, STATUS_ICON_X, STATUS_ICON_Y);
-        guiGraphics.fill(x + STATUS_ICON_X + 3, y + STATUS_ICON_Y + 3, x + STATUS_ICON_X + 9, y + STATUS_ICON_Y + 9, statusColor());
+        MachineScreenStyle.renderStatusGlyph(guiGraphics, x + STATUS_ICON_X, y + STATUS_ICON_Y, statusState());
         renderIconBox(guiGraphics, RISK_ICON_X, STATUS_ICON_Y);
-        guiGraphics.fill(x + RISK_ICON_X + 3, y + STATUS_ICON_Y + 3, x + RISK_ICON_X + 9, y + STATUS_ICON_Y + 9, riskColor());
+        MachineScreenStyle.renderStatusGlyph(guiGraphics, x + RISK_ICON_X, y + STATUS_ICON_Y, riskState());
     }
 
     private void renderGear(GuiGraphics guiGraphics) {
@@ -679,9 +676,9 @@ public class MetalPressScreen extends AbstractContainerScreen<MetalPressMenu> {
         };
     }
 
-    private int statusColor() {
+    private MachineScreenStyle.StatusState statusState() {
         return switch (menu.status()) {
-            case MetalPressBlockEntity.STATUS_READY -> STATUS_READY;
+            case MetalPressBlockEntity.STATUS_READY -> MachineScreenStyle.StatusState.RUNNING;
             case MetalPressBlockEntity.STATUS_NO_POWER,
                     MetalPressBlockEntity.STATUS_NO_INPUT,
                     MetalPressBlockEntity.STATUS_MISSING_HEAT_CORE,
@@ -689,16 +686,17 @@ public class MetalPressScreen extends AbstractContainerScreen<MetalPressMenu> {
                     MetalPressBlockEntity.STATUS_MISSING_MOLD,
                     MetalPressBlockEntity.STATUS_HEAT_LOW,
                     MetalPressBlockEntity.STATUS_SWAPPING_MOLD,
-                    MetalPressBlockEntity.STATUS_WARMING -> STATUS_WARN;
-            default -> STATUS_ERROR;
+                    MetalPressBlockEntity.STATUS_WARMING -> MachineScreenStyle.StatusState.WAITING;
+            case MetalPressBlockEntity.STATUS_INVALID_RECIPE -> MachineScreenStyle.StatusState.ERROR;
+            default -> MachineScreenStyle.StatusState.BLOCKED;
         };
     }
 
-    private int riskColor() {
+    private MachineScreenStyle.StatusState riskState() {
         if (menu.failureRisk() <= 0) {
-            return STATUS_READY;
+            return MachineScreenStyle.StatusState.RUNNING;
         }
-        return menu.failureRisk() < 50 ? STATUS_WARN : STATUS_ERROR;
+        return menu.failureRisk() < 50 ? MachineScreenStyle.StatusState.WAITING : MachineScreenStyle.StatusState.BLOCKED;
     }
 
     private String statValue(int index) {

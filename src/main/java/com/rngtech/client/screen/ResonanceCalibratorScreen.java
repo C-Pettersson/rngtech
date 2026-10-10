@@ -579,7 +579,7 @@ public class ResonanceCalibratorScreen extends AbstractContainerScreen<Resonance
                 STATUS_ICON_Y,
                 STATUS_ICON_SIZE,
                 STATUS_ICON_SIZE,
-                Component.literal("Status: ").append(statusText())
+                Component.translatable("rngtech.calibration.tooltip.status", statusText())
         );
     }
 
@@ -666,8 +666,8 @@ public class ResonanceCalibratorScreen extends AbstractContainerScreen<Resonance
     private Component progressTooltip() {
         int ticks = menu.processingTicks();
         Component progress = ticks <= 0
-                ? Component.literal("Progress: -- / --")
-                : Component.literal("Progress: " + menu.progress() + " / " + ticks);
+                ? Component.translatable("rngtech.calibration.tooltip.progress.empty")
+                : Component.translatable("rngtech.calibration.tooltip.progress", menu.progress(), ticks);
         return menu.streakFloor() <= 0 ? progress
                 : progress.copy().append(" ").append(Component.translatable("rngtech.calibration.tooltip.streak", menu.streakFloor()));
     }

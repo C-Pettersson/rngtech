@@ -332,7 +332,7 @@ public class VacuumCollapseGeneratorScreen extends AbstractContainerScreen<Vacuu
                 ENERGY_METER_Y,
                 ENERGY_METER_WIDTH,
                 ENERGY_METER_HEIGHT,
-                Component.literal("Energy: ").append(CompactValueText.exactEnergyAmountPair(menu.energy(), menu.energyCapacity()))
+                Component.translatable("rngtech.vacuum.tooltip.energy", CompactValueText.exactEnergyAmountPair(menu.energy(), menu.energyCapacity()))
         );
         CompactValueText.renderTooltipIfHovered(
                 guiGraphics,

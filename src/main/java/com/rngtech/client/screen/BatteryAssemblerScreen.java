@@ -18,9 +18,6 @@ public class BatteryAssemblerScreen extends AbstractContainerScreen<BatteryAssem
     private static final int ENERGY = 0xFFB43B28;
     private static final int FLUID = 0xFF55AFC0;
     private static final int PROGRESS = 0xFF667F51;
-    private static final int STATUS_READY = 0xFF5F8A45;
-    private static final int STATUS_WARN = 0xFFAA7A31;
-    private static final int STATUS_ERROR = 0xFFB45B4A;
     private static final int STAT_ACCENT = 0xFF4D92A3;
     private static final int STAT_PANEL_X = 8;
     private static final int STAT_PANEL_Y = 18;
@@ -228,9 +225,9 @@ public class BatteryAssemblerScreen extends AbstractContainerScreen<BatteryAssem
         );
 
         renderIconBox(guiGraphics, STATUS_X, STATUS_Y);
-        guiGraphics.fill(x + STATUS_X + 3, y + STATUS_Y + 3, x + STATUS_X + 9, y + STATUS_Y + 9, statusColor());
+        MachineScreenStyle.renderStatusGlyph(guiGraphics, x + STATUS_X, y + STATUS_Y, statusState());
         renderIconBox(guiGraphics, TRANSFER_X, STATUS_Y);
-        guiGraphics.fill(x + TRANSFER_X + 3, y + STATUS_Y + 3, x + TRANSFER_X + 9, y + STATUS_Y + 9, transferColor());
+        MachineScreenStyle.renderStatusGlyph(guiGraphics, x + TRANSFER_X, y + STATUS_Y, transferState());
         FluidPurgeButton.render(guiGraphics, leftPos, topPos, FLUID_BAR_X + 3, BAR_Y + 2, menu.fluid() > 0);
     }
 
@@ -397,8 +394,8 @@ public class BatteryAssemblerScreen extends AbstractContainerScreen<BatteryAssem
     private Component progressTooltip() {
         int ticks = menu.processingTicks();
         return ticks <= 0
-                ? Component.literal("Progress: -- / --")
-                : Component.literal("Progress: " + menu.progress() + " / " + ticks);
+                ? Component.translatable("rngtech.battery_assembler.tooltip.progress.empty")
+                : Component.translatable("rngtech.battery_assembler.tooltip.progress", menu.progress(), ticks);
     }
 
     private void renderStatTooltips(GuiGraphics guiGraphics, int mouseX, int mouseY) {
@@ -430,18 +427,19 @@ public class BatteryAssemblerScreen extends AbstractContainerScreen<BatteryAssem
         };
     }
 
-    private int statusColor() {
+    private MachineScreenStyle.StatusState statusState() {
         return switch (menu.status()) {
-            case BatteryAssemblerBlockEntity.STATUS_READY -> STATUS_READY;
+            case BatteryAssemblerBlockEntity.STATUS_READY -> MachineScreenStyle.StatusState.RUNNING;
             case BatteryAssemblerBlockEntity.STATUS_NO_POWER,
                     BatteryAssemblerBlockEntity.STATUS_NO_FLUID,
-                    BatteryAssemblerBlockEntity.STATUS_NO_INPUT -> STATUS_WARN;
-            default -> STATUS_ERROR;
+                    BatteryAssemblerBlockEntity.STATUS_NO_INPUT -> MachineScreenStyle.StatusState.WAITING;
+            case BatteryAssemblerBlockEntity.STATUS_INVALID_RECIPE -> MachineScreenStyle.StatusState.ERROR;
+            default -> MachineScreenStyle.StatusState.BLOCKED;
         };
     }
 
-    private int transferColor() {
-        return menu.fluidTransfer() > 0 ? STATUS_READY : STATUS_WARN;
+    private MachineScreenStyle.StatusState transferState() {
+        return menu.fluidTransfer() > 0 ? MachineScreenStyle.StatusState.RUNNING : MachineScreenStyle.StatusState.WAITING;
     }
 
     private String statValue(int index) {

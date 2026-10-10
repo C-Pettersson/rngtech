@@ -348,7 +348,7 @@ public class PotentialReactorScreen extends AbstractContainerScreen<PotentialRea
                 ENERGY_METER_Y,
                 ENERGY_METER_WIDTH,
                 ENERGY_METER_HEIGHT,
-                Component.literal("Energy: ").append(exactEnergyText())
+                Component.translatable("rngtech.reactor.tooltip.energy", exactEnergyText())
         );
         CompactValueText.renderTooltipIfHovered(
                 guiGraphics,

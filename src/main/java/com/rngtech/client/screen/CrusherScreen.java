@@ -34,7 +34,6 @@ public class CrusherScreen extends AbstractContainerScreen<CrusherMenu> {
     private static final int PROGRESS = 0xFF6F7F35;
     private static final int OUTPUT_BONUS = 0xFFD3A33A;
     private static final int STAT_ACCENT = 0xFF7F9ED7;
-    private static final int STATUS_ERROR = 0xFFB45B4A;
     private static final int START_NODE = 0xFF38D857;
     private static final int MASTERY_RING = 0xFF53591D;
     private static final int STAT_PANEL_X = 8;
@@ -381,23 +380,13 @@ public class CrusherScreen extends AbstractContainerScreen<CrusherMenu> {
 
     private void renderStatusIcons(GuiGraphics guiGraphics) {
         renderIconBox(guiGraphics, STATUS_ICON_X, STATUS_ICON_Y);
-        guiGraphics.fill(
-                leftPos + STATUS_ICON_X + 3,
-                topPos + STATUS_ICON_Y + 3,
-                leftPos + STATUS_ICON_X + 9,
-                topPos + STATUS_ICON_Y + 9,
-                statusColor()
-        );
+        MachineScreenStyle.renderStatusGlyph(guiGraphics, leftPos + STATUS_ICON_X, topPos + STATUS_ICON_Y, statusState());
 
         renderIconBox(guiGraphics, CELL_STATUS_ICON_X, STATUS_ICON_Y);
-        int cellColor = menu.batterySlotBlocked() ? STATUS_ERROR : menu.hasBatteryCell() ? STAT_ACCENT : OUTPUT_BONUS;
-        guiGraphics.fill(
-                leftPos + CELL_STATUS_ICON_X + 3,
-                topPos + STATUS_ICON_Y + 3,
-                leftPos + CELL_STATUS_ICON_X + 9,
-                topPos + STATUS_ICON_Y + 9,
-                cellColor
-        );
+        MachineScreenStyle.StatusState cellState = menu.batterySlotBlocked()
+                ? MachineScreenStyle.StatusState.BLOCKED
+                : menu.hasBatteryCell() ? MachineScreenStyle.StatusState.RUNNING : MachineScreenStyle.StatusState.WAITING;
+        MachineScreenStyle.renderStatusGlyph(guiGraphics, leftPos + CELL_STATUS_ICON_X, topPos + STATUS_ICON_Y, cellState);
         if (!menu.hasBatteryCell()) {
             int left = leftPos + CELL_STATUS_ICON_X;
             int top = topPos + STATUS_ICON_Y;
@@ -563,65 +552,63 @@ public class CrusherScreen extends AbstractContainerScreen<CrusherMenu> {
         int ticks = menu.processingTicks();
         int jobs = Math.max(1, menu.activeJobs());
         int perJobEnergy = Math.max(1, (int) Math.ceil(menu.energyPerTick() / (double) jobs));
-        String underLevelText = underLevelTooltipText();
-        return ticks <= 0
-                ? Component.literal("Progress: -- / --")
-                : Component.literal(
-                        "Progress: "
-                                + menu.progress()
-                                + " / "
-                                + ticks
-                                + ", "
-                                + CompactValueText.energyRate(perJobEnergy)
-                                + " per job"
-                                + (jobs > 1
-                                        ? ", " + CompactValueText.energyRate(menu.energyPerTick()) + " total"
-                                        : "")
-                                + ", "
-                                + CompactValueText.energyAmount(menu.energyPerCraft())
-                                + " per craft"
-                                + underLevelText
+        if (ticks <= 0) {
+            return Component.translatable("rngtech.crusher.tooltip.progress.empty");
+        }
+        Component progress = jobs > 1
+                ? Component.translatable(
+                        "rngtech.crusher.tooltip.progress.jobs",
+                        menu.progress(),
+                        ticks,
+                        CompactValueText.energyRate(perJobEnergy),
+                        CompactValueText.energyRate(menu.energyPerTick()),
+                        CompactValueText.energyAmount(menu.energyPerCraft())
+                )
+                : Component.translatable(
+                        "rngtech.crusher.tooltip.progress.job",
+                        menu.progress(),
+                        ticks,
+                        CompactValueText.energyRate(perJobEnergy),
+                        CompactValueText.energyAmount(menu.energyPerCraft())
                 );
+        Component underLevel = underLevelTooltipText();
+        return underLevel == null ? progress : Component.empty().append(progress).append(underLevel);
     }
 
-    private String underLevelTooltipText() {
+    private Component underLevelTooltipText() {
         if (menu.hardnessDeficit() <= 0) {
-            return menu.jamChancePerThousand() > 0 ? ", " + formatPerThousandPercent(menu.jamChancePerThousand()) + " jam" : "";
+            return menu.jamChancePerThousand() > 0
+                    ? Component.translatable("rngtech.crusher.tooltip.progress.jam", formatPerThousandPercent(menu.jamChancePerThousand()))
+                    : null;
         }
-        return ", hardness "
-                + menu.processingLevel()
-                + " / "
-                + menu.requiredProcessingLevel()
-                + ", "
-                + formatMultiplier(menu.underLevelPenaltyMultiplier())
-                + " time/FE, "
-                + "bonuses off, "
-                + formatPerThousandPercent(menu.jamChancePerThousand())
-                + " jam";
+        return Component.translatable(
+                "rngtech.crusher.tooltip.progress.under_level",
+                menu.processingLevel(),
+                menu.requiredProcessingLevel(),
+                formatMultiplier(menu.underLevelPenaltyMultiplier()),
+                formatPerThousandPercent(menu.jamChancePerThousand())
+        );
     }
 
     private Component outputBonusTooltip() {
         int progress = menu.outputBonusProgressRaw();
         int increment = menu.outputBonusIncrementRaw();
         int scale = menu.outputBonusScale();
-        String banked = "Bonus bank: " + formatBonusPercent(progress, scale);
+        String banked = formatBonusPercent(progress, scale);
         if (increment <= 0) {
-            return Component.literal(banked);
+            return Component.translatable("rngtech.crusher.tooltip.bonus.bank", banked);
         }
 
         int payouts = menu.outputBonusPayoutsNextCraft();
         if (payouts > 0) {
-            String items = payouts == 1 ? " item" : " items";
-            return Component.literal(
-                    banked
-                            + "; next craft +"
-                            + payouts
-                            + items
-                            + ", then "
-                            + formatBonusPercent(menu.outputBonusProgressAfterNextCraftRaw(), scale)
+            return Component.translatable(
+                    payouts == 1 ? "rngtech.crusher.tooltip.bonus.next_item" : "rngtech.crusher.tooltip.bonus.next_items",
+                    banked,
+                    payouts,
+                    formatBonusPercent(menu.outputBonusProgressAfterNextCraftRaw(), scale)
             );
         }
-        return Component.literal(banked + "; next craft adds " + formatBonusPercent(increment, scale));
+        return Component.translatable("rngtech.crusher.tooltip.bonus.next_adds", banked, formatBonusPercent(increment, scale));
     }
 
     private String formatBonusPercent(int value, int scale) {
@@ -648,14 +635,15 @@ public class CrusherScreen extends AbstractContainerScreen<CrusherMenu> {
         };
     }
 
-    private int statusColor() {
+    private MachineScreenStyle.StatusState statusState() {
         return switch (menu.statusCode()) {
-            case CrusherBlockEntity.STATUS_READY -> PROGRESS;
-            case CrusherBlockEntity.STATUS_NO_INPUT, CrusherBlockEntity.STATUS_MISSING_CRUSH_HEAD -> PANEL_DARK;
+            case CrusherBlockEntity.STATUS_READY -> MachineScreenStyle.StatusState.RUNNING;
+            case CrusherBlockEntity.STATUS_NO_INPUT, CrusherBlockEntity.STATUS_MISSING_CRUSH_HEAD -> MachineScreenStyle.StatusState.IDLE;
             case CrusherBlockEntity.STATUS_NO_POWER,
                     CrusherBlockEntity.STATUS_JAMMED,
-                    CrusherBlockEntity.STATUS_UNDER_LEVEL_PENALTY -> OUTPUT_BONUS;
-            default -> STATUS_ERROR;
+                    CrusherBlockEntity.STATUS_UNDER_LEVEL_PENALTY -> MachineScreenStyle.StatusState.WAITING;
+            case CrusherBlockEntity.STATUS_INVALID_RECIPE -> MachineScreenStyle.StatusState.ERROR;
+            default -> MachineScreenStyle.StatusState.BLOCKED;
         };
     }
 
