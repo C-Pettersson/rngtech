@@ -1,0 +1,1363 @@
+{
+    "levels": [
+        10,
+        30,
+        60
+    ],
+    "stages": [
+        {
+            "stage": 1,
+            "metal": "iron",
+            "crusherChassis": "iron",
+            "crushHead": "iron",
+            "batteryCell": "iron",
+            "furnace": {
+                "chassis": "iron",
+                "heatCore": "iron"
+            },
+            "connector": "basic",
+            "generatorFePerTick": 24,
+            "sealTiers": 0
+        },
+        {
+            "stage": 2,
+            "metal": "copper",
+            "crusherChassis": "copper",
+            "crushHead": "copper",
+            "batteryCell": "copper",
+            "furnace": {
+                "chassis": "copper",
+                "heatCore": "copper"
+            },
+            "connector": "copper",
+            "generatorFePerTick": 40,
+            "sealTiers": 0
+        },
+        {
+            "stage": 3,
+            "metal": "tin",
+            "crusherChassis": "bronze",
+            "crushHead": "bronze",
+            "batteryCell": "lead",
+            "furnace": {
+                "chassis": "bronze",
+                "heatCore": "bronze"
+            },
+            "connector": "gold",
+            "generatorFePerTick": 64,
+            "sealTiers": 0
+        },
+        {
+            "stage": 4,
+            "metal": "lead",
+            "crusherChassis": "steel",
+            "crushHead": "steel",
+            "batteryCell": "invar",
+            "furnace": {
+                "chassis": "steel",
+                "heatCore": "steel"
+            },
+            "connector": "gold",
+            "generatorFePerTick": 96,
+            "sealTiers": 0,
+            "furnaceVariants": [
+                {
+                    "id": "lead_four_steel_cores",
+                    "chassis": "lead",
+                    "heatCore": "steel"
+                }
+            ]
+        },
+        {
+            "stage": 5,
+            "metal": "aluminum",
+            "crusherChassis": "aluminum",
+            "crushHead": "aluminum",
+            "batteryCell": "sparksteel",
+            "furnace": {
+                "chassis": "aluminum",
+                "heatCore": "sparksteel"
+            },
+            "connector": "sparksteel",
+            "generatorFePerTick": 240,
+            "sealTiers": 1,
+            "furnaceVariants": [
+                {
+                    "id": "aluminum_with_aluminum_core",
+                    "chassis": "aluminum",
+                    "heatCore": "aluminum",
+                    "coreAffixes": [
+                        "prefix:max_temperature_flat",
+                        "suffix:temperature_stability"
+                    ]
+                }
+            ]
+        },
+        {
+            "stage": 6,
+            "metal": "titanium",
+            "crusherChassis": "titanium",
+            "crushHead": "titanium",
+            "batteryCell": "arclite",
+            "furnace": {
+                "chassis": "titanium",
+                "heatCore": "titanium"
+            },
+            "connector": "arclite",
+            "generatorFePerTick": 600,
+            "sealTiers": 1,
+            "furnaceVariants": [
+                {
+                    "id": "titanium_with_aluminum_core",
+                    "chassis": "titanium",
+                    "heatCore": "aluminum",
+                    "coreAffixes": [
+                        "prefix:max_temperature_flat",
+                        "suffix:temperature_stability"
+                    ]
+                }
+            ]
+        },
+        {
+            "stage": 7,
+            "metal": "tungsten",
+            "crusherChassis": "tungstensteel",
+            "crushHead": "tungstensteel",
+            "batteryCell": "nullite",
+            "furnace": {
+                "chassis": "tungstensteel",
+                "heatCore": "titanium"
+            },
+            "connector": "arclite",
+            "generatorFePerTick": 1057,
+            "sealTiers": 2
+        },
+        {
+            "stage": 8,
+            "metal": "naquadah",
+            "crusherChassis": "exotic",
+            "crushHead": "exotic",
+            "batteryCell": "exotic",
+            "furnace": {
+                "chassis": "exotic",
+                "heatCore": "exotic"
+            },
+            "connector": "exotic",
+            "generatorFePerTick": 3000,
+            "sealTiers": 3
+        }
+    ],
+    "archetypes": {
+        "unrolled": {
+            "crusher": {
+                "chassis": [],
+                "part": [],
+                "tree": "none"
+            },
+            "furnace": {
+                "chassis": [],
+                "part": [],
+                "tree": "none"
+            }
+        },
+        "bonus_output": {
+            "crusher": {
+                "chassis": [
+                    "prefix:crusher_jaws",
+                    "suffix:super_output"
+                ],
+                "part": [
+                    "prefix:crush_head_pulverizing",
+                    "suffix:super_output"
+                ],
+                "tree": "crusher_bonus_output",
+                "ascendancy": "assayer",
+                "ascendancyNodes": [
+                    "assay_yield",
+                    "compound_yield",
+                    "at_level_output",
+                    "matched_hardness",
+                    "super_assay",
+                    "lode_chance"
+                ]
+            },
+            "furnace": {
+                "chassis": [
+                    "prefix:heat_transfer",
+                    "suffix:super_output"
+                ],
+                "part": [
+                    "prefix:heat_transfer",
+                    "suffix:temperature_stability"
+                ],
+                "tree": "furnace_balanced",
+                "ascendancy": "bloomer",
+                "ascendancyNodes": [
+                    "rich_rate",
+                    "rich_blooms",
+                    "line_rate",
+                    "crusher_line",
+                    "patient_rate",
+                    "patient_bloom"
+                ]
+            }
+        },
+        "bonus_output_oath": {
+            "crusher": {
+                "chassis": [
+                    "prefix:crusher_jaws",
+                    "suffix:super_output"
+                ],
+                "part": [
+                    "prefix:crush_head_pulverizing",
+                    "suffix:super_output"
+                ],
+                "tree": "crusher_bonus_output",
+                "ascendancy": "assayer",
+                "ascendancyNodes": [
+                    "ledger_memory",
+                    "wide_ledger",
+                    "oath_yield",
+                    "refiners_oath",
+                    "assay_yield",
+                    "compound_yield"
+                ]
+            },
+            "furnace": {
+                "chassis": [
+                    "prefix:heat_transfer",
+                    "suffix:super_output"
+                ],
+                "part": [
+                    "prefix:heat_transfer",
+                    "suffix:temperature_stability"
+                ],
+                "tree": "furnace_balanced",
+                "ascendancy": "bloomer",
+                "ascendancyNodes": [
+                    "rich_rate",
+                    "rich_blooms",
+                    "line_rate",
+                    "crusher_line",
+                    "patient_rate",
+                    "patient_bloom"
+                ]
+            }
+        },
+        "super_output": {
+            "crusher": {
+                "chassis": [
+                    "prefix:crusher_ore_handling",
+                    "suffix:processing_speed"
+                ],
+                "part": [
+                    "prefix:crush_head_kinetic",
+                    "suffix:super_output"
+                ],
+                "tree": "crusher_speed",
+                "ascendancy": "assayer",
+                "ascendancyNodes": [
+                    "super_assay",
+                    "assay_yield",
+                    "compound_yield",
+                    "lode_chance",
+                    "mother_lode",
+                    "tailings_recovery"
+                ]
+            },
+            "furnace": {
+                "chassis": [
+                    "prefix:heat_transfer",
+                    "suffix:super_output"
+                ],
+                "part": [
+                    "prefix:heat_transfer",
+                    "suffix:temperature_stability"
+                ],
+                "tree": "furnace_speed",
+                "ascendancy": "crucible_keeper",
+                "ascendancyNodes": [
+                    "superheat_cap",
+                    "superheat",
+                    "heart_transfer",
+                    "crucible_heart",
+                    "hearth_heat",
+                    "shared_hearth"
+                ]
+            }
+        },
+        "speed": {
+            "crusher": {
+                "chassis": [
+                    "prefix:crusher_throughput",
+                    "suffix:processing_speed"
+                ],
+                "part": [
+                    "prefix:crush_head_kinetic",
+                    "suffix:instant_process"
+                ],
+                "tree": "crusher_speed",
+                "ascendancy": "rockbreaker",
+                "ascendancyNodes": [
+                    "lean_crushing",
+                    "shatter_point",
+                    "energy_mitigation",
+                    "fault_lines",
+                    "jam_recovery",
+                    "jam_breaker"
+                ]
+            },
+            "furnace": {
+                "chassis": [
+                    "prefix:heat_transfer",
+                    "suffix:processing_speed"
+                ],
+                "part": [
+                    "prefix:heat_transfer",
+                    "suffix:temperature_stability"
+                ],
+                "tree": "furnace_speed",
+                "ascendancy": "crucible_keeper",
+                "ascendancyNodes": [
+                    "superheat_cap",
+                    "superheat",
+                    "heart_transfer",
+                    "crucible_heart",
+                    "hearth_heat",
+                    "shared_hearth"
+                ]
+            }
+        },
+        "batch": {
+            "crusher": {
+                "chassis": [
+                    "prefix:crusher_throughput",
+                    "suffix:processing_speed"
+                ],
+                "part": [
+                    "prefix:crush_head_kinetic",
+                    "suffix:instant_process"
+                ],
+                "tree": "crusher_batch",
+                "ascendancy": "rockbreaker",
+                "ascendancyNodes": [
+                    "lean_crushing",
+                    "shatter_point",
+                    "energy_mitigation",
+                    "fault_lines",
+                    "jam_recovery",
+                    "jam_breaker"
+                ]
+            },
+            "furnace": {
+                "chassis": [
+                    "prefix:heat_transfer",
+                    "suffix:input_slots"
+                ],
+                "part": [
+                    "prefix:heat_transfer",
+                    "suffix:temperature_stability"
+                ],
+                "tree": "furnace_speed",
+                "ascendancy": "crucible_keeper",
+                "ascendancyNodes": [
+                    "superheat_cap",
+                    "superheat",
+                    "heart_transfer",
+                    "crucible_heart",
+                    "hearth_heat",
+                    "shared_hearth"
+                ]
+            }
+        },
+        "efficiency": {
+            "crusher": {
+                "chassis": [
+                    "prefix:crusher_vibration",
+                    "suffix:processing_speed"
+                ],
+                "part": [
+                    "prefix:crush_head_kinetic",
+                    "suffix:instant_process"
+                ],
+                "tree": "crusher_efficiency",
+                "ascendancy": "rockbreaker",
+                "ascendancyNodes": [
+                    "lean_crushing",
+                    "shatter_point",
+                    "energy_mitigation",
+                    "fault_lines",
+                    "jam_recovery",
+                    "jam_breaker"
+                ]
+            },
+            "furnace": {
+                "chassis": [
+                    "prefix:heat_transfer",
+                    "suffix:energy_usage"
+                ],
+                "part": [
+                    "prefix:heat_transfer",
+                    "suffix:temperature_stability"
+                ],
+                "tree": "furnace_efficiency",
+                "ascendancy": "crucible_keeper",
+                "ascendancyNodes": [
+                    "superheat_cap",
+                    "superheat",
+                    "heart_transfer",
+                    "crucible_heart",
+                    "hearth_heat",
+                    "shared_hearth"
+                ]
+            }
+        },
+        "bonus_output_tree_only": {
+            "crusher": {
+                "chassis": [],
+                "part": [],
+                "tree": "crusher_bonus_output",
+                "ascendancy": "assayer",
+                "ascendancyNodes": [
+                    "assay_yield",
+                    "compound_yield",
+                    "at_level_output",
+                    "matched_hardness",
+                    "super_assay",
+                    "lode_chance"
+                ]
+            },
+            "furnace": {
+                "chassis": [],
+                "part": [],
+                "tree": "furnace_balanced",
+                "ascendancy": "bloomer",
+                "ascendancyNodes": [
+                    "rich_rate",
+                    "rich_blooms",
+                    "line_rate",
+                    "crusher_line",
+                    "patient_rate",
+                    "patient_bloom"
+                ]
+            }
+        },
+        "speed_tree_only": {
+            "crusher": {
+                "chassis": [],
+                "part": [],
+                "tree": "crusher_speed",
+                "ascendancy": "rockbreaker",
+                "ascendancyNodes": [
+                    "lean_crushing",
+                    "shatter_point",
+                    "energy_mitigation",
+                    "fault_lines",
+                    "jam_recovery",
+                    "jam_breaker"
+                ]
+            },
+            "furnace": {
+                "chassis": [],
+                "part": [],
+                "tree": "furnace_speed",
+                "ascendancy": "crucible_keeper",
+                "ascendancyNodes": [
+                    "superheat_cap",
+                    "superheat",
+                    "heart_transfer",
+                    "crucible_heart",
+                    "hearth_heat",
+                    "shared_hearth"
+                ]
+            }
+        },
+        "master_of_all": {
+            "crusher": {
+                "chassis": [
+                    "prefix:crusher_vibration",
+                    "suffix:output_amount"
+                ],
+                "part": [
+                    "prefix:crush_head_pulverizing",
+                    "suffix:processing_speed"
+                ],
+                "tree": "crusher_balanced",
+                "ascendancy": "assayer",
+                "ascendancyNodes": [
+                    "assay_yield",
+                    "compound_yield",
+                    "at_level_output",
+                    "matched_hardness",
+                    "super_assay",
+                    "lode_chance"
+                ]
+            },
+            "furnace": {
+                "chassis": [
+                    "prefix:heat_transfer",
+                    "suffix:energy_usage"
+                ],
+                "part": [
+                    "prefix:heat_transfer",
+                    "suffix:temperature_stability"
+                ],
+                "tree": "furnace_balanced",
+                "ascendancy": "crucible_keeper",
+                "ascendancyNodes": [
+                    "superheat_cap",
+                    "superheat",
+                    "heart_transfer",
+                    "crucible_heart",
+                    "hearth_heat",
+                    "shared_hearth"
+                ]
+            }
+        }
+    },
+    "trees": {
+        "none": {
+            "10": [],
+            "30": [],
+            "60": []
+        },
+        "crusher_bonus_output": {
+            "10": [
+                "path_0214",
+                "path_0215",
+                "path_0211",
+                "path_0218",
+                "path_0219",
+                "path_0213",
+                "orchard_plan_1",
+                "orchard_plan_3",
+                "sample_tray"
+            ],
+            "30": [
+                "path_0214",
+                "path_0215",
+                "path_0211",
+                "path_0218",
+                "path_0219",
+                "path_0213",
+                "path_0223",
+                "path_0224",
+                "path_0225",
+                "path_0222",
+                "path_0382",
+                "path_0383",
+                "path_0379",
+                "path_0378",
+                "path_0377",
+                "path_0389",
+                "path_0390",
+                "path_0391",
+                "path_0392",
+                "path_0385",
+                "path_0578",
+                "conduction_fins_1",
+                "conduction_fins_2",
+                "conduction_fins",
+                "heavy_yield",
+                "orchard_plan_1",
+                "orchard_plan_3",
+                "sample_tray",
+                "orchard_plan_2"
+            ],
+            "60": [
+                "path_0214",
+                "path_0215",
+                "path_0211",
+                "path_0218",
+                "path_0219",
+                "path_0213",
+                "path_0223",
+                "path_0224",
+                "path_0225",
+                "path_0222",
+                "path_0382",
+                "path_0383",
+                "path_0379",
+                "path_0378",
+                "path_0377",
+                "path_0389",
+                "path_0390",
+                "path_0391",
+                "path_0392",
+                "path_0385",
+                "path_0578",
+                "conduction_fins_1",
+                "conduction_fins_2",
+                "conduction_fins",
+                "heavy_yield",
+                "path_0230",
+                "path_0231",
+                "path_0232",
+                "path_0233",
+                "heavy_flywheel_1",
+                "heavy_flywheel_2",
+                "heavy_flywheel",
+                "precision_jaw_mount",
+                "orchard_plan_1",
+                "orchard_plan_3",
+                "sample_tray",
+                "orchard_plan_2",
+                "path_0491",
+                "path_0490",
+                "path_0489",
+                "dust_recovery_1",
+                "dust_recovery_2",
+                "dust_recovery",
+                "dust_recovery_3",
+                "dust_recovery_4",
+                "dust_recovery_5",
+                "dust_recovery_9",
+                "sorting_rake",
+                "dust_recovery_8",
+                "dust_recovery_7",
+                "dust_recovery_6",
+                "path_0492",
+                "path_0493",
+                "path_0494",
+                "path_0495",
+                "path_0496",
+                "path_0497",
+                "path_0095",
+                "ore_sieve_1"
+            ]
+        },
+        "crusher_speed": {
+            "10": [
+                "path_0132",
+                "unbroken_cadence_1",
+                "unbroken_cadence_2",
+                "unbroken_cadence",
+                "unbroken_cadence_3",
+                "unbroken_cadence_4",
+                "spin_up",
+                "path_0133",
+                "path_0007"
+            ],
+            "30": [
+                "path_0132",
+                "unbroken_cadence_1",
+                "unbroken_cadence_2",
+                "unbroken_cadence",
+                "unbroken_cadence_3",
+                "unbroken_cadence_4",
+                "spin_up",
+                "path_0214",
+                "path_0215",
+                "path_0211",
+                "path_0230",
+                "path_0231",
+                "path_0232",
+                "path_0233",
+                "heavy_flywheel_1",
+                "heavy_flywheel_2",
+                "heavy_flywheel",
+                "path_0234",
+                "path_0229",
+                "path_0487",
+                "path_0486",
+                "path_0085",
+                "path_0485",
+                "path_0429",
+                "path_0431",
+                "path_0432",
+                "path_0433",
+                "redline_drive",
+                "path_0087"
+            ],
+            "60": [
+                "path_0132",
+                "unbroken_cadence_1",
+                "unbroken_cadence_2",
+                "unbroken_cadence",
+                "unbroken_cadence_3",
+                "unbroken_cadence_4",
+                "spin_up",
+                "path_0214",
+                "path_0215",
+                "path_0211",
+                "path_0230",
+                "path_0231",
+                "path_0232",
+                "path_0233",
+                "heavy_flywheel_1",
+                "heavy_flywheel_2",
+                "heavy_flywheel",
+                "path_0234",
+                "path_0229",
+                "path_0487",
+                "path_0486",
+                "path_0085",
+                "path_0485",
+                "path_0429",
+                "path_0431",
+                "path_0432",
+                "path_0433",
+                "redline_drive",
+                "path_0434",
+                "path_0435",
+                "path_0430",
+                "path_0566",
+                "path_0565",
+                "path_0564",
+                "path_0563",
+                "hair_triggers_1",
+                "hair_triggers_2",
+                "hair_triggers",
+                "hair_triggers_4",
+                "hair_triggers_3",
+                "short_stroke",
+                "path_0562",
+                "path_0561",
+                "snap_actuators_1",
+                "snap_actuators_2",
+                "snap_actuators",
+                "snap_actuators_3",
+                "servo_linkage",
+                "path_0567",
+                "path_0568",
+                "path_0569",
+                "path_0570",
+                "path_0571",
+                "charged_flywheel_1",
+                "charged_flywheel_2",
+                "charged_flywheel",
+                "charged_flywheel_4",
+                "charged_flywheel_3",
+                "inertial_drive"
+            ]
+        },
+        "crusher_batch": {
+            "10": [
+                "path_0132",
+                "unbroken_cadence_1",
+                "unbroken_cadence_2",
+                "unbroken_cadence",
+                "unbroken_cadence_3",
+                "unbroken_cadence_4",
+                "spin_up",
+                "path_0133",
+                "path_0007"
+            ],
+            "30": [
+                "path_0214",
+                "path_0215",
+                "path_0211",
+                "path_0226",
+                "path_0078",
+                "path_0210",
+                "path_0209",
+                "path_0175",
+                "path_0202",
+                "path_0203",
+                "driven_cadence_1",
+                "driven_cadence_2",
+                "driven_cadence",
+                "dense_batching",
+                "path_0204",
+                "path_0205",
+                "path_0206",
+                "path_0201",
+                "path_0483",
+                "path_0484",
+                "path_0429",
+                "path_0431",
+                "path_0432",
+                "path_0433",
+                "redline_drive",
+                "path_0132",
+                "unbroken_cadence_1",
+                "unbroken_cadence_2",
+                "unbroken_cadence"
+            ],
+            "60": [
+                "path_0132",
+                "unbroken_cadence_1",
+                "unbroken_cadence_2",
+                "unbroken_cadence",
+                "unbroken_cadence_3",
+                "unbroken_cadence_4",
+                "spin_up",
+                "path_0214",
+                "path_0215",
+                "path_0211",
+                "path_0230",
+                "path_0231",
+                "path_0232",
+                "path_0233",
+                "heavy_flywheel_1",
+                "heavy_flywheel_2",
+                "heavy_flywheel",
+                "path_0226",
+                "path_0078",
+                "path_0210",
+                "path_0209",
+                "path_0175",
+                "path_0202",
+                "path_0203",
+                "driven_cadence_1",
+                "driven_cadence_2",
+                "driven_cadence",
+                "dense_batching",
+                "path_0234",
+                "path_0229",
+                "path_0487",
+                "path_0486",
+                "path_0085",
+                "path_0485",
+                "path_0429",
+                "path_0431",
+                "path_0432",
+                "path_0433",
+                "redline_drive",
+                "path_0186",
+                "path_0185",
+                "quick_release_1",
+                "quick_release_2",
+                "quick_release",
+                "quick_release_4",
+                "quick_release_3",
+                "path_0216",
+                "path_0217",
+                "path_0212",
+                "path_0235",
+                "path_0236",
+                "path_0237",
+                "torque_conversion_1",
+                "torque_conversion_2",
+                "torque_conversion",
+                "path_0227",
+                "full_throttle_1",
+                "full_throttle_2",
+                "full_throttle"
+            ]
+        },
+        "crusher_efficiency": {
+            "10": [
+                "path_0132",
+                "path_0133",
+                "path_0007",
+                "path_0025",
+                "path_0024",
+                "path_0012",
+                "path_0023",
+                "path_0022",
+                "path_0021"
+            ],
+            "30": [
+                "path_0132",
+                "path_0133",
+                "path_0007",
+                "path_0056",
+                "path_0055",
+                "path_0054",
+                "path_0053",
+                "path_0003",
+                "path_0001",
+                "path_0004",
+                "path_0065",
+                "path_0066",
+                "path_0061",
+                "path_0062",
+                "path_0063",
+                "path_0064",
+                "path_0009",
+                "path_0137",
+                "path_0136",
+                "waste_not_1",
+                "waste_not_2",
+                "waste_not",
+                "waste_not_3",
+                "waste_not_4",
+                "trickle_charge",
+                "path_0067",
+                "path_0068",
+                "path_0010",
+                "path_0039"
+            ],
+            "60": [
+                "path_0132",
+                "path_0133",
+                "path_0007",
+                "path_0056",
+                "path_0055",
+                "path_0054",
+                "path_0053",
+                "path_0003",
+                "path_0001",
+                "path_0004",
+                "path_0065",
+                "path_0066",
+                "path_0067",
+                "path_0068",
+                "path_0010",
+                "path_0040",
+                "path_0041",
+                "path_0016",
+                "path_0120",
+                "path_0121",
+                "path_0122",
+                "path_0118",
+                "path_0123",
+                "path_0124",
+                "path_0119",
+                "path_0170",
+                "path_0169",
+                "path_0168",
+                "steady_bearings_1",
+                "steady_bearings_2",
+                "steady_bearings",
+                "deliberate_work",
+                "path_0039",
+                "path_0038",
+                "path_0037",
+                "path_0015",
+                "path_0110",
+                "path_0111",
+                "path_0108",
+                "path_0112",
+                "path_0113",
+                "path_0114",
+                "path_0109",
+                "path_0116",
+                "path_0117",
+                "path_0115",
+                "path_0414",
+                "path_0411",
+                "path_0410",
+                "path_0409",
+                "lean_grid",
+                "path_0036",
+                "path_0035",
+                "path_0009",
+                "path_0137",
+                "path_0136",
+                "waste_not_1",
+                "waste_not_2",
+                "waste_not"
+            ]
+        },
+        "crusher_balanced": {
+            "10": [
+                "path_0132",
+                "unbroken_cadence_1",
+                "unbroken_cadence_2",
+                "unbroken_cadence",
+                "unbroken_cadence_3",
+                "unbroken_cadence_4",
+                "spin_up",
+                "path_0133",
+                "path_0007"
+            ],
+            "30": [
+                "path_0132",
+                "unbroken_cadence_1",
+                "unbroken_cadence_2",
+                "unbroken_cadence",
+                "unbroken_cadence_3",
+                "unbroken_cadence_4",
+                "spin_up",
+                "path_0214",
+                "path_0215",
+                "path_0211",
+                "path_0230",
+                "path_0231",
+                "path_0232",
+                "path_0233",
+                "heavy_flywheel_1",
+                "heavy_flywheel_2",
+                "heavy_flywheel",
+                "precision_jaw_mount",
+                "path_0226",
+                "path_0078",
+                "path_0210",
+                "path_0209",
+                "path_0175",
+                "path_0186",
+                "path_0185",
+                "quick_release_1",
+                "quick_release_2",
+                "quick_release",
+                "quick_release_4"
+            ],
+            "60": [
+                "path_0132",
+                "path_0133",
+                "path_0007",
+                "path_0056",
+                "path_0055",
+                "path_0054",
+                "path_0053",
+                "path_0003",
+                "path_0001",
+                "path_0004",
+                "path_0061",
+                "path_0062",
+                "path_0063",
+                "path_0064",
+                "path_0009",
+                "path_0035",
+                "path_0036",
+                "path_0015",
+                "path_0110",
+                "path_0111",
+                "path_0108",
+                "path_0112",
+                "path_0113",
+                "path_0114",
+                "path_0109",
+                "path_0116",
+                "path_0117",
+                "path_0115",
+                "path_0414",
+                "path_0411",
+                "path_0410",
+                "path_0409",
+                "lean_grid",
+                "unbroken_cadence_1",
+                "unbroken_cadence_2",
+                "unbroken_cadence",
+                "unbroken_cadence_3",
+                "unbroken_cadence_4",
+                "spin_up",
+                "path_0214",
+                "path_0215",
+                "path_0211",
+                "path_0230",
+                "path_0231",
+                "path_0232",
+                "path_0233",
+                "heavy_flywheel_1",
+                "heavy_flywheel_2",
+                "heavy_flywheel",
+                "precision_jaw_mount",
+                "path_0137",
+                "path_0136",
+                "waste_not_1",
+                "waste_not_2",
+                "waste_not",
+                "waste_not_3",
+                "waste_not_4",
+                "trickle_charge",
+                "path_0002"
+            ]
+        },
+        "furnace_speed": {
+            "10": [
+                "path_0248",
+                "path_0249",
+                "path_0250",
+                "path_0239",
+                "path_0253",
+                "path_0254",
+                "path_0241",
+                "path_0257"
+            ],
+            "30": [
+                "path_0134",
+                "path_0135",
+                "path_0008",
+                "path_0030",
+                "path_0029",
+                "path_0028",
+                "path_0013",
+                "path_0027",
+                "path_0026",
+                "path_0007",
+                "path_0025",
+                "path_0024",
+                "path_0012",
+                "path_0080",
+                "path_0081",
+                "path_0082",
+                "path_0078",
+                "path_0083",
+                "path_0084",
+                "path_0079",
+                "path_0086",
+                "path_0087",
+                "path_0085",
+                "path_0485",
+                "path_0429",
+                "path_0431",
+                "path_0432",
+                "path_0433",
+                "redline_drive"
+            ],
+            "60": [
+                "path_0134",
+                "path_0135",
+                "path_0008",
+                "path_0060",
+                "path_0059",
+                "path_0058",
+                "path_0057",
+                "path_0003",
+                "path_0001",
+                "path_0004",
+                "path_0065",
+                "path_0066",
+                "path_0067",
+                "path_0068",
+                "path_0010",
+                "path_0040",
+                "path_0041",
+                "path_0016",
+                "raw_power_1",
+                "raw_power_2",
+                "raw_power",
+                "reserve_actuation",
+                "backup_supply_1",
+                "backup_supply_2",
+                "backup_supply",
+                "backup_supply_3",
+                "backup_supply_4",
+                "resilience",
+                "path_0002",
+                "path_0049",
+                "path_0050",
+                "stamina_cells_1",
+                "stamina_cells_2",
+                "stamina_cells",
+                "stamina_cells_3",
+                "stamina_cells_4",
+                "hoarded_charge",
+                "path_0051",
+                "path_0052",
+                "path_0006",
+                "path_0021",
+                "path_0022",
+                "path_0023",
+                "deep_reserves_1",
+                "deep_reserves_2",
+                "deep_reserves",
+                "attribute_transfiguration",
+                "path_0030",
+                "path_0029",
+                "path_0028",
+                "path_0031",
+                "path_0032",
+                "path_0014",
+                "path_0100",
+                "path_0101",
+                "forced_draft_1",
+                "forced_draft_2",
+                "forced_draft",
+                "forced_draft_3"
+            ]
+        },
+        "furnace_efficiency": {
+            "10": [
+                "path_0134",
+                "path_0135",
+                "path_0008",
+                "path_0031",
+                "path_0032",
+                "path_0014",
+                "guiding_hand_1",
+                "guiding_hand_2",
+                "guiding_hand"
+            ],
+            "30": [
+                "path_0251",
+                "path_0252",
+                "path_0240",
+                "path_0268",
+                "path_0269",
+                "path_0098",
+                "path_0303",
+                "path_0273",
+                "path_0282",
+                "path_0283",
+                "path_0284",
+                "path_0285",
+                "path_0275",
+                "path_0293",
+                "path_0294",
+                "path_0295",
+                "path_0296",
+                "path_0292",
+                "path_0520",
+                "path_0521",
+                "path_0115",
+                "path_0414",
+                "path_0411",
+                "path_0410",
+                "path_0409",
+                "lean_grid",
+                "path_0419",
+                "path_0420",
+                "path_0421"
+            ],
+            "60": [
+                "path_0134",
+                "path_0135",
+                "path_0008",
+                "path_0031",
+                "path_0032",
+                "path_0014",
+                "guiding_hand_1",
+                "guiding_hand_2",
+                "guiding_hand",
+                "singular_drive",
+                "path_0033",
+                "path_0034",
+                "path_0009",
+                "path_0035",
+                "path_0036",
+                "path_0015",
+                "path_0110",
+                "path_0111",
+                "path_0108",
+                "path_0112",
+                "path_0113",
+                "path_0114",
+                "path_0109",
+                "path_0116",
+                "path_0117",
+                "path_0115",
+                "path_0414",
+                "path_0411",
+                "path_0410",
+                "path_0409",
+                "lean_grid",
+                "path_0037",
+                "path_0038",
+                "path_0039",
+                "path_0010",
+                "path_0040",
+                "path_0041",
+                "path_0016",
+                "path_0120",
+                "path_0121",
+                "path_0122",
+                "path_0118",
+                "path_0123",
+                "path_0124",
+                "path_0119",
+                "path_0170",
+                "path_0169",
+                "path_0168",
+                "steady_bearings_1",
+                "steady_bearings_2",
+                "steady_bearings",
+                "deliberate_work",
+                "path_0137",
+                "path_0136",
+                "waste_not_1",
+                "waste_not_2",
+                "waste_not",
+                "waste_not_3",
+                "waste_not_4"
+            ]
+        },
+        "furnace_balanced": {
+            "10": [
+                "path_0248",
+                "path_0249",
+                "path_0250",
+                "path_0239",
+                "path_0253",
+                "path_0254",
+                "path_0241",
+                "path_0257"
+            ],
+            "30": [
+                "path_0251",
+                "path_0252",
+                "path_0240",
+                "path_0268",
+                "path_0269",
+                "path_0098",
+                "path_0303",
+                "path_0273",
+                "path_0282",
+                "path_0283",
+                "path_0284",
+                "path_0285",
+                "path_0275",
+                "path_0293",
+                "path_0294",
+                "path_0295",
+                "path_0296",
+                "path_0292",
+                "path_0520",
+                "path_0521",
+                "path_0115",
+                "path_0414",
+                "path_0411",
+                "path_0410",
+                "path_0409",
+                "lean_grid",
+                "path_0102",
+                "path_0101",
+                "forced_draft_1"
+            ],
+            "60": [
+                "path_0134",
+                "path_0135",
+                "path_0008",
+                "path_0060",
+                "path_0059",
+                "path_0058",
+                "path_0057",
+                "path_0003",
+                "path_0001",
+                "path_0004",
+                "path_0065",
+                "path_0066",
+                "path_0067",
+                "path_0068",
+                "path_0010",
+                "path_0040",
+                "path_0041",
+                "path_0016",
+                "raw_power_1",
+                "raw_power_2",
+                "raw_power",
+                "reserve_actuation",
+                "backup_supply_1",
+                "backup_supply_2",
+                "backup_supply",
+                "backup_supply_3",
+                "backup_supply_4",
+                "resilience",
+                "path_0002",
+                "path_0049",
+                "path_0050",
+                "stamina_cells_1",
+                "stamina_cells_2",
+                "stamina_cells",
+                "stamina_cells_3",
+                "stamina_cells_4",
+                "hoarded_charge",
+                "path_0051",
+                "path_0052",
+                "path_0006",
+                "path_0021",
+                "path_0022",
+                "path_0023",
+                "deep_reserves_1",
+                "deep_reserves_2",
+                "deep_reserves",
+                "attribute_transfiguration",
+                "path_0030",
+                "path_0029",
+                "path_0028",
+                "path_0031",
+                "path_0032",
+                "path_0014",
+                "path_0100",
+                "path_0101",
+                "forced_draft_1",
+                "forced_draft_2",
+                "forced_draft",
+                "forced_draft_3"
+            ]
+        }
+    }
+}

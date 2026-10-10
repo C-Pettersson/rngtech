@@ -45,3 +45,34 @@ Each scenario also has `gearFuel`: FE per item when crafted gear is burned in a 
 Rolls use `MachineTraitRoller`, part stats merge through `ComponentBaseStatCatalog`, and refinement uses `RefinementEngine`. Each generator's final FE formula is mirrored in `src/masteryTest/java/com/rngtech/rpg/EnergyBalanceSimulation.java` and names the block entity method it follows, so update it when that method changes. Recipe energy and ticks are read from the recipe JSON.
 
 `energy-chain-costs.json` lists the FE that base-stat machines spend producing each generator input, plus which inputs can be obtained and from which stage. Recheck it when a fuel chain recipe changes.
+
+## Ore line model
+
+`./gradlew processingBalanceSim` models the ore line, Crusher then Furnace, for each stage, Mastery level, and build archetype. It is deterministic: Output Amount, Super Output, salvage, and Instant Process are expected values per input, not rolls.
+
+```sh
+./gradlew processingBalanceSim
+```
+
+### Setups
+
+`processing-setups.json` defines the model:
+
+- `levels`: the Mastery levels to model. Each level `L` spends `L - 1` points.
+- `stages`: one row per stage. Each row names the stage's metal, the stage-matched Crusher chassis, Crush Head, Battery Cell, Furnace chassis and Heat Core, the Universal Connector, the stage's primary generator FE/t for comparison, and the Ascendancy Seal tiers assumed at that stage. `furnaceVariants` adds sidegrade Furnaces, such as the Lead Furnace or an Aluminum Heat Core with a flat Max Temperature roll.
+- `archetypes`: one build per archetype. Each machine lists its chassis and part affixes (`prefix:<id>` or `suffix:<id>`), a `tree` key, and optionally an ascendancy with nodes in allocation order. Seal tiers decide how many ascendancy nodes apply.
+- `trees`: shared Mastery tree allocations, by level, in a valid allocation order. They were chosen by a search over `machine_tree.json` that maximizes the archetype's stat, with recipe-blocking keystones (temperature and hardness caps, Single Pass, Cell Bypass) excluded.
+
+Every listed affix is a perfect crafted Magic roll: the highest tier refinement upgrades reach (`6`, or the family's top tier), at its maximum value. The task rejects affixes that a profile cannot roll or that share a mod group.
+
+### Output
+
+The task writes `build/processing-balance/processing-balance.json`. For each stage, archetype, and level it reports:
+
+- `crusher` and `furnace`: the effective stats and the Mastery build that applied.
+- `crushOre`, `crushDust`, `smeltDust`, `smeltCrushed`, `smeltOre`: one row per machine step with output per input, FE per input and per output, ticks per input, running FE/t, batch or lane count, and whether the stage's power supply limits it.
+- `routes`: ore to ingot through crushed and dust, through crushed only, or smelted directly. Each route has ingots per ore, FE per ingot, Crusher and Furnace ticks per ingot (raw and power-supplied), and Furnaces needed per Crusher.
+
+### Keeping it accurate
+
+Stats assemble through `MachineBaseStatCatalog`, `ComponentBaseStatCatalog`, and `MegaPassiveTree`, and RNGTech config defaults load headless. Ticks, FE, Output Amount, Super Output, batching, and Overdrive mirror `CrusherBlockEntity` and `FurnaceBlockEntity` in `src/masteryTest/java/com/rngtech/rpg/ProcessingBalanceSimulation.java`, so update it when those methods change. The model counts steady running only: Furnace warm-up, jams, and output-blocked waits are left out.

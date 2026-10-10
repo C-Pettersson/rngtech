@@ -294,7 +294,7 @@ public final class ComponentBaseStatCatalog {
                 .buildWithoutSummary();
     }
 
-    private static Profile crushHead(CrushHeadMaterial material) {
+    static Profile crushHead(CrushHeadMaterial material) {
         ProfileBuilder builder = builder()
                 .add(MachineStat.PROCESSING_LEVEL, material.processingLevel())
                 .more(MachineStat.PROCESSING_SPEED, crushHeadProcessingSpeed(material))
