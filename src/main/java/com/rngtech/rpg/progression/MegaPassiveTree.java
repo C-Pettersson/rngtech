@@ -86,6 +86,31 @@ public final class MegaPassiveTree {
         return true;
     }
 
+    /**
+     * The nodes of {@code order} that still form a legal build from {@code start}. Retired, duplicate and disconnected ids
+     * are dropped, so a node removed from the tree refunds its point instead of voiding the rest of the build.
+     */
+    public static List<String> salvage(String start, List<String> order) {
+        MegaPassiveNode root = node(start);
+        if (root == null || root.kind() != PassiveNodeKind.STARTER) { return List.of(); }
+        Set<String> connected = new HashSet<>(Set.of(start));
+        List<String> remaining = new ArrayList<>(order);
+        List<String> kept = new ArrayList<>();
+        boolean changed = true;
+        while (changed && kept.size() < MAX_ALLOCATIONS) {
+            changed = false;
+            for (var iterator = remaining.iterator(); iterator.hasNext() && kept.size() < MAX_ALLOCATIONS; ) {
+                String id = iterator.next();
+                MegaPassiveNode node = node(id);
+                if (node == null || node.kind() == PassiveNodeKind.STARTER || connected.contains(id)) { iterator.remove(); continue; }
+                if (node.links().stream().anyMatch(connected::contains)) {
+                    connected.add(id); kept.add(id); iterator.remove(); changed = true;
+                }
+            }
+        }
+        return List.copyOf(kept);
+    }
+
     public static boolean connected(String start, List<String> allocations) {
         Set<String> remaining = new HashSet<>(allocations);
         Set<String> reached = new HashSet<>(Set.of(start));

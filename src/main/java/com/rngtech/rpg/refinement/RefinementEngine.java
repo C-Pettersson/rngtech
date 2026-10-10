@@ -1863,7 +1863,7 @@ public final class RefinementEngine {
             int refinementPotential,
             List<MachineModifier> modifiers
     ) {
-        return new MachineTraits(rarity, refinementPotential, modifiers, traits.behaviors(), traits.corruption());
+        return new MachineTraits(rarity, refinementPotential, modifiers, traits.behaviors(), traits.corruption(), traits.retired());
     }
 
     private static int count(List<MachineModifier> modifiers, ModifierSlot slot) {

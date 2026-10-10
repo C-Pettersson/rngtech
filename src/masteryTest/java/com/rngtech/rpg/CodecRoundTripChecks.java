@@ -11,7 +11,6 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.mojang.serialization.Codec;
-import com.mojang.serialization.DataResult;
 import com.mojang.serialization.DynamicOps;
 import com.mojang.serialization.JsonOps;
 import io.netty.buffer.Unpooled;
@@ -92,36 +91,78 @@ public final class CodecRoundTripChecks {
         require(noBehaviors.behaviors().isEmpty(), "traits stored before behaviors existed load with none");
     }
 
-    /**
-     * Known gap, issue #81: a stat name that no longer exists fails the whole traits decode, so an item loses every roll,
-     * not only the one that names the missing stat.
-     */
+    /** A stat name that no longer exists retires that one modifier; every other roll still loads and the entry is written back. */
     private static void unknownStatNamesInTraits() {
-        JsonObject kept = modifierJson("prefix", "processing_speed", "increased_percent", 25);
         JsonObject retired = modifierJson("suffix", RETIRED, "add", 4);
-        JsonElement stored = traitsJson("rare", kept, retired);
-        DataResult<MachineTraits> parsed = MachineTraits.CODEC.parse(JsonOps.INSTANCE, stored);
-        require(parsed.result().isEmpty(), "known gap #81: an unknown stat name fails the whole traits decode");
+        JsonObject stored = storedWith(retired);
+        MachineTraits loaded = MachineTraits.CODEC.parse(JsonOps.INSTANCE, stored).getOrThrow();
+        require(loaded.rarity() == Rarity.RARE && loaded.modifiers().equals(knownTraits().modifiers()), "the other rolls survive an unknown stat name");
+        require(loaded.retired().modifiers().size() == 1, "the unknown stat is kept as a retired entry");
+        MachineStatAccumulator stats = new MachineStatAccumulator();
+        stats.apply(new MachineModifier(ModifierSlot.IMPLICIT, MachineStat.PROCESSING_SPEED, ModifierOperation.ADD, 100));
+        loaded.modifiers().forEach(stats::apply);
+        require(Math.abs(stats.value(MachineStat.PROCESSING_SPEED) - 125) < 1e-9, "stat building still applies the known roll");
+        require(stored.equals(MachineTraits.CODEC.encodeStart(JsonOps.INSTANCE, loaded).getOrThrow()), "saving again keeps the unknown entry unchanged");
+        require(!new MachineTraits(Rarity.NORMAL, 0, List.of(), List.of(), null, loaded.retired()).isEmpty(),
+                "traits holding only retired entries are not treated as empty");
+
+        JsonObject nested = modifierJson("suffix", "add", "add", 1);
+        JsonObject effect = JsonParser.parseString("{\"stat\":\"" + RETIRED + "\",\"operation\":\"add\","
+                + "\"range\":{\"min\":1,\"max\":2},\"value\":1}").getAsJsonObject();
+        JsonArray effects = new JsonArray();
+        effects.add(effect);
+        nested.add("effects", effects);
+        MachineTraits nestedLoaded = MachineTraits.CODEC.parse(JsonOps.INSTANCE, storedWith(nested)).getOrThrow();
+        require(nestedLoaded.modifiers().size() == 1 && nestedLoaded.retired().modifiers().size() == 1,
+                "an unknown stat inside a modifier's effects retires that modifier");
+
+        var nbt = MachineTraits.CODEC.encodeStart(NbtOps.INSTANCE, loaded).getOrThrow();
+        MachineTraits fromNbt = MachineTraits.CODEC.parse(NbtOps.INSTANCE, nbt).getOrThrow();
+        require(fromNbt.equals(MachineTraits.CODEC.parse(NbtOps.INSTANCE, nbt).getOrThrow()) && nbt.equals(MachineTraits.CODEC.encodeStart(NbtOps.INSTANCE, fromNbt).getOrThrow()),
+                "retired entries survive an NBT save and load");
+        require(stored.equals(MachineTraits.CODEC.encodeStart(JsonOps.INSTANCE, fromNbt).getOrThrow()),
+                "retired entries read from NBT are written back to JSON unchanged");
     }
 
-    /** Known gap, issue #81: the same failure for the other name-based enum codecs. */
+    /** The same leniency for the other name-based enum codecs. */
     private static void unknownSlotOperationBehaviorAndRarity() {
-        JsonObject kept = modifierJson("prefix", "processing_speed", "increased_percent", 25);
-        JsonObject badSlot = modifierJson(RETIRED, "processing_speed", "add", 1);
-        JsonObject badOperation = modifierJson("prefix", "processing_speed", RETIRED, 1);
-        require(MachineTraits.CODEC.parse(JsonOps.INSTANCE, traitsJson("rare", kept, badSlot)).result().isEmpty(),
-                "known gap #81: an unknown slot name fails the whole traits decode");
-        require(MachineTraits.CODEC.parse(JsonOps.INSTANCE, traitsJson("rare", kept, badOperation)).result().isEmpty(),
-                "known gap #81: an unknown operation name fails the whole traits decode");
-        require(MachineTraits.CODEC.parse(JsonOps.INSTANCE, traitsJson(RETIRED, kept)).result().isEmpty(),
-                "known gap #81: an unknown rarity name fails the whole traits decode");
-        JsonObject withBehavior = traitsJson("rare", kept);
+        for (JsonObject bad : List.of(modifierJson(RETIRED, "processing_speed", "add", 1),
+                modifierJson("prefix", "processing_speed", RETIRED, 1))) {
+            JsonObject stored = storedWith(bad);
+            MachineTraits loaded = MachineTraits.CODEC.parse(JsonOps.INSTANCE, stored).getOrThrow();
+            require(loaded.modifiers().equals(knownTraits().modifiers()) && loaded.retired().modifiers().size() == 1,
+                    "an unknown slot or operation retires one modifier");
+            require(stored.equals(MachineTraits.CODEC.encodeStart(JsonOps.INSTANCE, loaded).getOrThrow()),
+                    "an unknown slot or operation is written back unchanged");
+        }
+
+        JsonObject unknownRarity = storedWith();
+        unknownRarity.addProperty("rarity", RETIRED);
+        MachineTraits rarityLoaded = MachineTraits.CODEC.parse(JsonOps.INSTANCE, unknownRarity).getOrThrow();
+        require(rarityLoaded.rarity() == Rarity.NORMAL && rarityLoaded.modifiers().equals(knownTraits().modifiers()),
+                "an unknown rarity loads as Normal and keeps the rolls");
+        require(unknownRarity.equals(MachineTraits.CODEC.encodeStart(JsonOps.INSTANCE, rarityLoaded).getOrThrow()),
+                "an unknown rarity is written back unchanged");
+        MachineTraits upgraded = new MachineTraits(Rarity.MAGIC, rarityLoaded.refinementPotential(), rarityLoaded.modifiers(),
+                rarityLoaded.behaviors(), rarityLoaded.corruption(), rarityLoaded.retired());
+        require(MachineTraits.CODEC.encodeStart(JsonOps.INSTANCE, upgraded).getOrThrow().getAsJsonObject().get("rarity").getAsString()
+                .equals("magic"), "a rarity set after loading replaces the retired one");
+
+        JsonObject withBehavior = storedWith();
         JsonArray behaviors = new JsonArray();
         behaviors.add("quick_feed");
         behaviors.add(RETIRED);
         withBehavior.add("behaviors", behaviors);
-        require(MachineTraits.CODEC.parse(JsonOps.INSTANCE, withBehavior).result().isEmpty(),
-                "known gap #81: an unknown behavior name fails the whole traits decode");
+        MachineTraits behaviorLoaded = MachineTraits.CODEC.parse(JsonOps.INSTANCE, withBehavior).getOrThrow();
+        require(behaviorLoaded.behaviors().equals(List.of(MachineBehavior.QUICK_FEED))
+                        && behaviorLoaded.modifiers().equals(knownTraits().modifiers()),
+                "an unknown behavior name leaves the other behaviors and the rolls");
+        require(withBehavior.equals(MachineTraits.CODEC.encodeStart(JsonOps.INSTANCE, behaviorLoaded).getOrThrow()),
+                "an unknown behavior is written back unchanged");
+
+        JsonObject missing = storedWith();
+        missing.remove("refinement_potential");
+        require(MachineTraits.CODEC.parse(JsonOps.INSTANCE, missing).result().isEmpty(), "traits without a required field still fail to decode");
     }
 
     private static void progressionRoundTrip() {
@@ -145,19 +186,65 @@ public final class CodecRoundTripChecks {
         }
     }
 
-    /**
-     * An allocated node id that the tree no longer knows. Today the whole shared-tree allocation is dropped on load,
-     * which refunds every point, including those spent on nodes that still exist. Issue #81 keeps the valid nodes.
-     */
+    /** A node id the tree no longer knows refunds only its own point. Valid nodes keep working. */
     private static void unknownMasteryNodes() {
         MachineProgressionState plain = build(MachineMasteryFamily.CRUSHER);
-        JsonObject stored = MachineProgressionState.CODEC.encodeStart(JsonOps.INSTANCE, plain).getOrThrow().getAsJsonObject();
-        JsonArray nodes = stored.getAsJsonArray("allocated_nodes");
-        require(nodes.size() > 2, "the progression fixture spends several points");
-        nodes.add(RETIRED);
+        JsonObject stored = encodedProgression(plain);
+        require(stored.getAsJsonArray("allocated_nodes").size() > 3, "the progression fixture spends several points");
+        stored.getAsJsonArray("allocated_nodes").add(RETIRED);
         MachineProgressionState loaded = MachineProgressionState.CODEC.parse(JsonOps.INSTANCE, stored).getOrThrow();
-        require(loaded.allocatedNodes().isEmpty(), "known gap #81: an unknown node id drops the whole shared-tree allocation");
-        require(loaded.unspentPoints() == loaded.totalPoints(), "known gap #81: every point is refunded, valid nodes included");
+        require(loaded.allocatedNodes().equals(plain.allocatedNodes()), "valid nodes survive an unknown node id");
+        require(loaded.spentPoints() == plain.spentPoints() && loaded.unspentPoints() == plain.unspentPoints(),
+                "an unknown node id does not use a point");
+        require(loaded.equals(plain), "the loaded progression equals the one without the retired node");
+        require(!encodedProgression(loaded).toString().contains(RETIRED), "a retired node is refunded and not written back");
+
+        JsonObject retiredFirst = encodedProgression(plain);
+        JsonArray reordered = new JsonArray();
+        reordered.add(RETIRED);
+        retiredFirst.getAsJsonArray("allocated_nodes").forEach(reordered::add);
+        retiredFirst.add("allocated_nodes", reordered);
+        require(plain.equals(MachineProgressionState.CODEC.parse(JsonOps.INSTANCE, retiredFirst).getOrThrow()),
+                "an unknown node id ahead of the build changes nothing");
+
+        JsonObject gap = encodedProgression(plain);
+        JsonArray original = gap.getAsJsonArray("allocated_nodes");
+        JsonArray withoutThird = new JsonArray();
+        for (int i = 0; i < original.size(); i++) {
+            if (i != 2) {
+                withoutThird.add(original.get(i));
+            }
+        }
+        gap.add("allocated_nodes", withoutThird);
+        MachineProgressionState partial = MachineProgressionState.CODEC.parse(JsonOps.INSTANCE, gap).getOrThrow();
+        require(MegaPassiveTree.validBuild(plain.startNodeId(), partial.allocatedNodes()), "a build cut by a missing node loads as a legal build");
+        require(partial.allocatedNodes().size() >= 2 && partial.allocatedNodes().size() < plain.allocatedNodes().size(),
+                "nodes cut off by a missing node are refunded and the connected ones stay");
+        require(partial.allocatedNodes().subList(0, 2).equals(plain.allocatedNodes().subList(0, 2)), "the connected part keeps its order");
+
+        JsonObject target = encodedProgression(plain.withTarget(plain.allocatedNodes()));
+        target.getAsJsonArray("target_nodes").add(RETIRED);
+        MachineProgressionState withTarget = MachineProgressionState.CODEC.parse(JsonOps.INSTANCE, target).getOrThrow();
+        require(withTarget.targetNodes().equals(plain.allocatedNodes()) && withTarget.following(),
+                "an unknown node id in a target build is dropped");
+    }
+
+    private static JsonObject encodedProgression(MachineProgressionState state) {
+        return MachineProgressionState.CODEC.encodeStart(JsonOps.INSTANCE, state).getOrThrow().getAsJsonObject();
+    }
+
+    private static MachineTraits knownTraits() {
+        return new MachineTraits(Rarity.RARE, 1, List.of(
+                new MachineModifier(ModifierSlot.PREFIX, MachineStat.PROCESSING_SPEED, ModifierOperation.INCREASED_PERCENT, 25)));
+    }
+
+    /** Stored form of {@link #knownTraits()} with raw entries appended to its modifiers, as a later version would leave them. */
+    private static JsonObject storedWith(JsonObject... extraModifiers) {
+        JsonObject stored = MachineTraits.CODEC.encodeStart(JsonOps.INSTANCE, knownTraits()).getOrThrow().getAsJsonObject();
+        for (JsonObject extra : extraModifiers) {
+            stored.getAsJsonArray("modifiers").add(extra);
+        }
+        return stored;
     }
 
     private static MachineTraits sampleTraits() {

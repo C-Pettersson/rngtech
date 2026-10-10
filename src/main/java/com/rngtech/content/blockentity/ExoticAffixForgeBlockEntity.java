@@ -599,7 +599,8 @@ public class ExoticAffixForgeBlockEntity extends BlockEntity implements MenuProv
                 Math.max(0, traits.refinementPotential() - refinementPotentialCost),
                 traits.modifiers(),
                 traits.behaviors(),
-                traits.corruption()
+                traits.corruption(),
+                traits.retired()
         );
         return RefinementResult.success(
                 adjusted,
