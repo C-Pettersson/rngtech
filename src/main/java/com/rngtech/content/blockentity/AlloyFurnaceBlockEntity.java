@@ -143,10 +143,6 @@ public class AlloyFurnaceBlockEntity extends BaseMachineBlockEntity implements M
 
         @Override
         protected void onContentsChanged(int slot) {
-            if (isInputSlot(slot)) {
-                resetCycle();
-                resetBulkSpeed();
-            }
             setChanged();
         }
     };
@@ -319,7 +315,7 @@ public class AlloyFurnaceBlockEntity extends BaseMachineBlockEntity implements M
         if (furnace.progress == 0 && ProcessingChance.rollInstant(level, stats)) {
             int fullEnergyCost = furnace.energyCostPerCraft(recipe, stats);
             if (furnace.consumeWorkingEnergy(fullEnergyCost, true) >= fullEnergyCost) {
-                furnace.startCycleIfNeeded();
+                furnace.startCycleIfNeeded(recipe);
                 furnace.consumeWorkingEnergy(fullEnergyCost, false);
                 if (furnace.process(recipe, stats)) {
                     furnace.bulkSpeed.recordProcess(furnace.activeTraits());
@@ -340,7 +336,7 @@ public class AlloyFurnaceBlockEntity extends BaseMachineBlockEntity implements M
             return;
         }
 
-        furnace.startCycleIfNeeded();
+        furnace.startCycleIfNeeded(recipe);
         furnace.consumeWorkingEnergy(energyCost, false);
         furnace.updateFailureStrain(recipe, stats);
         if (furnace.failureStrain >= HeatControl.FAILURE_STRAIN_THRESHOLD) {
@@ -1185,7 +1181,7 @@ public class AlloyFurnaceBlockEntity extends BaseMachineBlockEntity implements M
         return consumeWorkingEnergy(energyCost, true) < energyCost;
     }
 
-    private void startCycleIfNeeded() {
+    private void startCycleIfNeeded(AlloyFurnaceRecipe recipe) {
         if (progress != 0) {
             return;
         }
@@ -1193,18 +1189,23 @@ public class AlloyFurnaceBlockEntity extends BaseMachineBlockEntity implements M
                 .map(AlloyFurnaceBlockEntity::singleCopy)
                 .toArray(ItemStack[]::new);
         failureStrain = 0;
+        if (bulkSpeed.startRecipe(recipe)) {
+            setChanged();
+        }
     }
 
+    /** Slot order does not matter, so a top-up that lands in another slot keeps the cycle. */
     private boolean activeCycleMatches() {
         if (progress == 0) {
             return true;
         }
         ItemStack[] current = inputStacks();
-        for (int slot = 0; slot < activeInputs.length; slot++) {
-            if (activeInputs[slot].isEmpty() != current[slot].isEmpty()) {
-                return false;
-            }
-            if (!activeInputs[slot].isEmpty() && !ItemStack.isSameItemSameComponents(activeInputs[slot], current[slot])) {
+        return everyStackMatchesOneOf(activeInputs, current) && everyStackMatchesOneOf(current, activeInputs);
+    }
+
+    private static boolean everyStackMatchesOneOf(ItemStack[] stacks, ItemStack[] candidates) {
+        for (ItemStack stack : stacks) {
+            if (!stack.isEmpty() && Arrays.stream(candidates).noneMatch(candidate -> ItemStack.isSameItemSameComponents(stack, candidate))) {
                 return false;
             }
         }
@@ -1407,10 +1408,6 @@ public class AlloyFurnaceBlockEntity extends BaseMachineBlockEntity implements M
         ItemStack copy = stack.copy();
         copy.setCount(1);
         return copy;
-    }
-
-    private static boolean isInputSlot(int slot) {
-        return slot >= SLOT_INPUT_START && slot < SLOT_INPUT_START + MAX_INPUT_SLOTS;
     }
 
     private void dropSlot(Level level, ItemStackHandler inventory, int slot) {

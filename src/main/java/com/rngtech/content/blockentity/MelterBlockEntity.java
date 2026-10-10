@@ -152,10 +152,6 @@ public class MelterBlockEntity extends BaseMachineBlockEntity
 
         @Override
         protected void onContentsChanged(int slot) {
-            if (slot == SLOT_PRIMARY_INPUT || slot == SLOT_SECONDARY_INPUT) {
-                resetCycle();
-                resetBulkSpeed();
-            }
             setChanged();
         }
     };
@@ -822,6 +818,9 @@ public class MelterBlockEntity extends BaseMachineBlockEntity
         activeSecondary = singleCopy(secondaryStack());
         activeFluid = inputTank.getFluid().copyWithAmount(recipe.fluidInput().amount());
         activeProcessingTicks = processingTicks(recipe, stats);
+        if (bulkSpeed.startRecipe(recipe)) {
+            setChanged();
+        }
     }
 
     private int activeCycleProcessingTicks(MelterRecipe recipe, MachineStatAccumulator stats) {

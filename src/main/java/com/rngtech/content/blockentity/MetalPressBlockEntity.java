@@ -142,10 +142,6 @@ public class MetalPressBlockEntity extends BaseMachineBlockEntity
 
         @Override
         protected void onContentsChanged(int slot) {
-            if (slot == SLOT_INPUT) {
-                resetCycle();
-                resetBulkSpeed();
-            }
             setChanged();
         }
     };
@@ -1146,6 +1142,9 @@ public class MetalPressBlockEntity extends BaseMachineBlockEntity
         activeMold = singleCopy(moldStack());
         failureStrain = 0;
         powerDropTicks = 0;
+        if (bulkSpeed.startRecipe(recipe)) {
+            setChanged();
+        }
     }
 
     private boolean activeCycleMatches() {

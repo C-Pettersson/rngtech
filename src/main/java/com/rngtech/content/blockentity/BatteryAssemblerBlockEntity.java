@@ -119,10 +119,6 @@ public class BatteryAssemblerBlockEntity extends BaseMachineBlockEntity
 
         @Override
         protected void onContentsChanged(int slot) {
-            if (slot >= SLOT_INPUT_0 && slot <= SLOT_INPUT_3) {
-                resetCycle();
-                resetBulkSpeed();
-            }
             setChanged();
         }
     };
@@ -593,6 +589,9 @@ public class BatteryAssemblerBlockEntity extends BaseMachineBlockEntity
         activeFluid = recipe.fluidInput()
                 .map(fluid -> inputTank.getFluid().copyWithAmount(fluid.amount()))
                 .orElse(FluidStack.EMPTY);
+        if (bulkSpeed.startRecipe(recipe)) {
+            setChanged();
+        }
     }
 
     private boolean activeCycleMatches() {
