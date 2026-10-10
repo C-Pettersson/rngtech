@@ -13,6 +13,8 @@ public enum ModifierSlot implements StringRepresentable {
     PREFIX,
     SUFFIX,
     ENCHANT,
+    /** A Unique's rolled stat line; kept only on Unique items. */
+    UNIQUE,
     /** A Volatile Catalyst implicit: one fixed value, outside the prefix and suffix limits, applied after affixes. */
     CORRUPTION;
 

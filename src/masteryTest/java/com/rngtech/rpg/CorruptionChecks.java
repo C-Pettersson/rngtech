@@ -14,6 +14,9 @@ import com.rngtech.rpg.refinement.RefinementModifier;
 import com.rngtech.rpg.refinement.RefinementOperation;
 import com.rngtech.rpg.refinement.RefinementResult;
 import com.rngtech.rpg.refinement.RefinementSelection;
+import com.rngtech.rpg.unique.UniqueCatalog;
+import com.rngtech.rpg.unique.UniqueDefinition;
+import com.rngtech.rpg.unique.UniqueStatLine;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
@@ -55,6 +58,7 @@ public final class CorruptionChecks {
         uniquesAcceptOnlyTheCatalyst();
         reforgedKeepsWhatItShould();
         warpedScalesAffixesWithinTheRange();
+        uniquesUseTheirPartPoolsAndRerollLines();
         corruptedTargetsHideRefinementPotential();
         defaultPoolsLoadAndCoverEveryHost();
         poolValidationRejectsForbiddenEntries();
@@ -355,6 +359,53 @@ public final class CorruptionChecks {
             RefinementResult result = RefinementEngine.apply(profile, yieldOnly, RefinementOperation.CORRUPT, STAGE, RandomSource.create(seed));
             require(result.traits().corruption().outcome() != CorruptionOutcome.WARPED, "Warped becomes Untouched with only yield affixes");
         }
+    }
+
+    private static void uniquesUseTheirPartPoolsAndRerollLines() {
+        CorruptionCatalog catalog = CorruptionCatalog.active();
+        for (MachinePartType part : MachinePartType.values()) {
+            ModifierEligibilityProfile unique = ModifierEligibilityProfiles.forUniquePart(part);
+            require(catalog.canCorrupt(unique.id()), unique.id() + " draws from its part's corruption pools");
+            require(catalog.entries(unique.id(), CorruptionOutcome.BLESSED)
+                            .equals(catalog.entries(ModifierEligibilityProfiles.forMachinePart(part, MachineType.CRUSHER).id(), CorruptionOutcome.BLESSED)),
+                    unique.id() + " has the same Blessed pool as its part");
+        }
+
+        UniqueDefinition heater = UniqueCatalog.get("fortress_heater_element");
+        require(heater != null && heater.hasRangedLines(), "the Fortress Heater Element has ranged lines");
+        ModifierEligibilityProfile profile = ModifierEligibilityProfiles.forUniquePart(MachinePartType.HEAT_CORE);
+        MachineTraits rolled = heater.roll(RandomSource.create(7L));
+        int reforged = 0;
+        boolean changed = false;
+        for (int seed = 0; seed < 600; seed++) {
+            RefinementResult result = RefinementEngine.apply(profile, rolled, RefinementOperation.CORRUPT, STAGE, RefinementSelection.none(),
+                    RefinementModifier.NONE, Set.of(), RandomSource.create(seed), heater);
+            MachineTraits traits = result.traits();
+            require(result.success() && traits.rarity() == Rarity.UNIQUE && traits.refinementPotential() == 0,
+                    "a corrupted Unique stays Unique with no RP");
+            require(traits.corruption().outcome() != CorruptionOutcome.WARPED, "Warped leaves Unique lines alone");
+            if (traits.corruption().outcome() != CorruptionOutcome.REFORGED) {
+                require(UniqueDefinition.storedRolls(traits.modifiers()).equals(UniqueDefinition.storedRolls(rolled.modifiers())),
+                        "only Reforged changes a Unique's rolls");
+                continue;
+            }
+            reforged++;
+            List<MachineModifier> rolls = UniqueDefinition.storedRolls(traits.modifiers());
+            require(rolls.size() == UniqueDefinition.storedRolls(rolled.modifiers()).size(), "Reforged rerolls every ranged line");
+            for (UniqueStatLine line : heater.lines()) {
+                if (!line.ranged()) {
+                    continue;
+                }
+                MachineModifier roll = rolls.stream().filter(line::matches).findFirst().orElseThrow();
+                double authored = line.authoredValue(roll.value());
+                require(Math.abs(line.clamp(authored) - authored) < 1e-6, "a rerolled " + line.stat() + " line stays inside its range");
+            }
+            changed |= !rolls.equals(UniqueDefinition.storedRolls(rolled.modifiers()));
+        }
+        require(reforged > 0 && changed, "Reforged rerolls a Unique's ranged lines");
+        require(CorruptionPreview.rows(catalog, profile.id(), rolled, false, heater).stream()
+                        .anyMatch(row -> row.outcome() == CorruptionOutcome.REFORGED && row.percent() > 0.0),
+                "the preview offers Reforged on a Unique with ranged lines");
     }
 
     private static void corruptedTargetsHideRefinementPotential() {

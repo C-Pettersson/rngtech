@@ -5,6 +5,7 @@ import com.rngtech.rpg.MachineTraits;
 import com.rngtech.rpg.ModifierSlot;
 import com.rngtech.rpg.Rarity;
 import com.rngtech.rpg.refinement.RefinementEngine;
+import com.rngtech.rpg.unique.UniqueDefinition;
 
 import java.util.ArrayList;
 import java.util.EnumMap;
@@ -13,7 +14,7 @@ import java.util.Map;
 
 /**
  * The outcome table a Volatile Catalyst rolls on one target, after the fallbacks the engine applies: Reforged or Warped
- * with nothing to change, and Blessed or Blighted with an empty pool, become Untouched.
+ * with nothing to change, and Blessed or Blighted with an empty pool, become Untouched. Warped never changes a Unique.
  */
 public final class CorruptionPreview {
     public record Row(CorruptionOutcome outcome, double percent, List<CorruptionCatalog.Entry> entries) {
@@ -23,11 +24,22 @@ public final class CorruptionPreview {
     }
 
     public static List<Row> rows(CorruptionCatalog catalog, String hostId, MachineTraits traits, boolean warded) {
+        return rows(catalog, hostId, traits, warded, null);
+    }
+
+    /** {@code unique} is the target's Unique definition, whose ranged lines Reforged rerolls, or null. */
+    public static List<Row> rows(
+            CorruptionCatalog catalog,
+            String hostId,
+            MachineTraits traits,
+            boolean warded,
+            UniqueDefinition unique
+    ) {
         Map<CorruptionOutcome, Integer> weights = catalog.weights(warded);
         Map<CorruptionOutcome, Integer> effective = new EnumMap<>(CorruptionOutcome.class);
         for (CorruptionOutcome outcome : CorruptionOutcome.values()) {
             int weight = weights.getOrDefault(outcome, 0);
-            CorruptionOutcome resolved = canResolve(catalog, hostId, traits, outcome) ? outcome : CorruptionOutcome.UNTOUCHED;
+            CorruptionOutcome resolved = canResolve(catalog, hostId, traits, outcome, unique) ? outcome : CorruptionOutcome.UNTOUCHED;
             effective.merge(resolved, weight, Integer::sum);
         }
         int total = effective.values().stream().mapToInt(Integer::intValue).sum();
@@ -46,12 +58,19 @@ public final class CorruptionPreview {
         return total <= 0 ? 0.0 : entry.weight() * 100.0 / total;
     }
 
-    private static boolean canResolve(CorruptionCatalog catalog, String hostId, MachineTraits traits, CorruptionOutcome outcome) {
+    private static boolean canResolve(
+            CorruptionCatalog catalog,
+            String hostId,
+            MachineTraits traits,
+            CorruptionOutcome outcome,
+            UniqueDefinition unique
+    ) {
         return switch (outcome) {
             case UNTOUCHED -> true;
             case BLESSED, BLIGHTED -> !catalog.entries(hostId, outcome).isEmpty();
-            case REFORGED -> traits.rarity() != Rarity.UNIQUE
-                    && traits.modifiers().stream().anyMatch(modifier -> modifier.slot() == ModifierSlot.PREFIX
+            case REFORGED -> traits.rarity() == Rarity.UNIQUE
+                    ? unique != null && unique.hasRangedLines()
+                    : traits.modifiers().stream().anyMatch(modifier -> modifier.slot() == ModifierSlot.PREFIX
                     || modifier.slot() == ModifierSlot.SUFFIX);
             case WARPED -> traits.rarity() != Rarity.UNIQUE
                     && traits.modifiers().stream().anyMatch(RefinementEngine::isWarpable);

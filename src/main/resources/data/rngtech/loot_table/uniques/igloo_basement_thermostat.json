@@ -1,0 +1,31 @@
+{
+  "type": "minecraft:chest",
+  "pools": [
+    {
+      "rolls": 1.0,
+      "bonus_rolls": 0.0,
+      "conditions": [
+        {
+          "condition": "rngtech:unique_loot_enabled",
+          "unique": "rngtech:igloo_basement_thermostat"
+        },
+        {
+          "condition": "minecraft:random_chance",
+          "chance": 0.1
+        }
+      ],
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "rngtech:igloo_basement_thermostat",
+          "functions": [
+            {
+              "function": "rngtech:unidentified_unique"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "random_sequence": "rngtech:uniques/igloo_basement_thermostat"
+}

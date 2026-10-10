@@ -4,10 +4,12 @@ import com.rngtech.content.blockentity.ForestryCartStationBlockEntity;
 import com.rngtech.content.blockentity.LedgerNbt;
 import com.rngtech.content.item.BatteryCellItem;
 import com.rngtech.content.item.ConfiguratorItem;
-import com.rngtech.content.item.FluidPumpItem;
 import com.rngtech.content.item.ForestryCartItem;
+import com.rngtech.content.item.GearParts;
 import com.rngtech.content.item.ModularToolItem;
 import com.rngtech.content.item.PruningShearsItem;
+import com.rngtech.content.loot.ChallengeContext;
+import com.rngtech.content.loot.ChallengeLoot;
 import com.rngtech.content.menu.ForestryCartMenu;
 import com.rngtech.content.menu.MasteryMenuSupport;
 import com.rngtech.content.registry.ModDataComponents;
@@ -17,7 +19,11 @@ import com.rngtech.content.registry.ModSounds;
 import com.rngtech.content.registry.ModTags;
 import com.rngtech.content.tool.ToolBaseStatCatalog;
 import com.rngtech.content.tool.ToolHeadFamily;
+import com.rngtech.content.tool.ToolHeadMaterial;
 import com.rngtech.rpg.ComponentBaseStatCatalog;
+import com.rngtech.rpg.MachineBehavior;
+import com.rngtech.rpg.MachineImplicitCatalog;
+import com.rngtech.rpg.MachinePartType;
 import com.rngtech.rpg.MachineStat;
 import com.rngtech.rpg.MachineStatAccumulator;
 import com.rngtech.rpg.MachineTraits;
@@ -418,6 +424,23 @@ public class ForestryCartEntity extends AbstractMinecart implements MenuProvider
 
     public boolean unlockPassiveNode(MegaPassiveNode node) {
         return allocateMastery(node);
+    }
+
+    /** Forestry harvest challenge loot goes into the cart; its context is the cutting tool's stage and the ascendancy. */
+    private void rollHarvestChallenge() {
+        ToolHeadMaterial head = ModularToolItem.assembly(toolStack()).headMaterial();
+        MachineProgressionState state = masteryState();
+        ChallengeContext context = new ChallengeContext("forestry", head == null ? 0 : head.stage(), 0, 0, 0, state.level(), state.ascendancy());
+        insertOutputs(ChallengeLoot.roll(level(), blockPosition(), ChallengeLoot.FORESTRY_HARVEST, context));
+    }
+
+    /** Mastery level challenge loot drops where the cart stands. */
+    @Override
+    public void masteryLevelGained(MachineProgressionState state) {
+        ChallengeContext context = new ChallengeContext("forestry", ascendancyEntryStage(), 0, 0, 0, state.level(), state.ascendancy());
+        for (ItemStack stack : ChallengeLoot.roll(level(), blockPosition(), ChallengeLoot.MASTERY_LEVEL, context)) {
+            Containers.dropItemStack(level(), getX(), getY() + 0.5D, getZ(), stack);
+        }
     }
 
     /** Work XP marks the cart as busy, which pauses Idle Cart Speed for the next 4 seconds. */
@@ -1307,7 +1330,7 @@ public class ForestryCartEntity extends AbstractMinecart implements MenuProvider
     }
 
     public static boolean isPumpCandidate(ItemStack stack) {
-        return stack.getItem() instanceof FluidPumpItem;
+        return GearParts.is(stack, MachinePartType.FLUID_PUMP);
     }
 
     public static boolean isBatteryCell(ItemStack stack) {
@@ -2005,6 +2028,7 @@ public class ForestryCartEntity extends AbstractMinecart implements MenuProvider
         feedLogLedger(expectedDrops, true);
         setCellState(cell, ManagedCell.STATE_HARVESTING);
         addMachineXp(LOG_HARVEST_MACHINE_XP * brokenCount);
+        rollHarvestChallenge();
         workCooldown = LOG_SETTLE_TICKS;
         setStatus(ForestryCartStationBlockEntity.STATUS_READY);
         playWorkSound(
@@ -2797,6 +2821,7 @@ public class ForestryCartEntity extends AbstractMinecart implements MenuProvider
         consumeEnergy(cost, false);
         insertOutputs(reserveFromDrops(cell, drops));
         addMachineXp(CROP_HARVEST_MACHINE_XP);
+        rollHarvestChallenge();
         workCooldown = plantIntervalTicks();
         setWorkflowState(WorkflowState.HARVESTING_LEAVES, ForestryCartStationBlockEntity.STATUS_READY, ForestryCartStationBlockEntity.ACTION_HARVESTING_CROP);
         playWorkSound(ModSounds.FORESTRY_COMPANION_LEAF_CUT.get(), 0.42F, 1.15F, WORK_SOUND_COOLDOWN_TICKS);
@@ -2816,6 +2841,9 @@ public class ForestryCartEntity extends AbstractMinecart implements MenuProvider
         }
         boolean irrigation = hasMasteryBehavior("IRRIGATION");
         int cost = irrigation ? SPRINKLER_WATER_MB / 2 : SPRINKLER_WATER_MB;
+        if (MachineImplicitCatalog.hasBehavior(pumpStack(), MachineBehavior.REFLUX)) {
+            cost /= 2;
+        }
         List<BlockPos> cells = new ArrayList<>(workRoots);
         if (irrigation && isForestryWorkRail(railPos)) {
             for (BlockPos root : ForestryCartRules.scanRoots(railPos, scanDirection(railPos), workRange() + 1)) {

@@ -12,6 +12,8 @@ import com.rngtech.rpg.MachineTraitRoller;
 import com.rngtech.rpg.MachineTraits;
 import com.rngtech.rpg.MachineType;
 import com.rngtech.rpg.Rarity;
+import com.rngtech.rpg.unique.UniqueDefinition;
+import com.rngtech.rpg.unique.UniqueItems;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
@@ -128,6 +130,10 @@ public class BatteryCellItem extends Item {
 
     @Override
     public Component getName(ItemStack stack) {
+        if (material.unique()) {
+            Component name = super.getName(stack);
+            return UniqueTooltip.name(CraftedTraitOutputs.isUnidentified(stack) ? CraftedTraitOutputs.unidentifiedName(name) : name);
+        }
         if (CraftedTraitOutputs.isUnidentified(stack)) {
             return CraftedTraitOutputs.unidentifiedName(super.getName(stack));
         }
@@ -168,11 +174,17 @@ public class BatteryCellItem extends Item {
         if (RecyclingData.isStripped(stack)) {
             tooltipComponents.add(Component.translatable("rngtech.tooltip.recycling_stripped").withStyle(ChatFormatting.GRAY));
         }
+        UniqueDefinition unique = UniqueItems.definition(stack);
+        if (unique != null) {
+            UniqueTooltip.append(stack, unique, tooltipComponents);
+            appendEnergyTooltip(stack, tooltipComponents);
+            return;
+        }
         MachineTraitTooltip.appendUnidentified(stack, tooltipComponents);
         MachineTraits traits = traits(stack);
         if (CraftedTraitOutputs.isUnidentified(stack)) {
             MachineTraitTooltip.appendUnrolledTraitHeader(MachineTraitRoller.refinementPotentialRange(material.stage()), tooltipComponents);
-        } else if (stack.has(ModDataComponents.MACHINE_TRAITS.get()) || RecyclingData.isStripped(stack) || material.unique()) {
+        } else if (stack.has(ModDataComponents.MACHINE_TRAITS.get()) || RecyclingData.isStripped(stack)) {
             MachineTraitTooltip.appendTraitHeader(traits, tooltipComponents, true);
         } else {
             MachineTraitTooltip.appendUnrolledTraitHeader(MachineTraitRoller.refinementPotentialRange(material.stage()), tooltipComponents);
@@ -183,6 +195,16 @@ public class BatteryCellItem extends Item {
                     Component.translatable(material.translationKey())
             ).withStyle(ChatFormatting.GRAY));
         }
+        appendEnergyTooltip(stack, tooltipComponents);
+        MachineTraitTooltip.appendIdentity(stack, tooltipComponents);
+        MachineTraitTooltip.appendComponentBaseStats(stack, tooltipComponents);
+        MachineTraitTooltip.appendTraitDetails(traits, tooltipComponents);
+        if (!RecyclingData.isStripped(stack)) {
+            MachineTraitTooltip.appendTraitKeyHints(tooltipComponents);
+        }
+    }
+
+    private static void appendEnergyTooltip(ItemStack stack, List<Component> tooltipComponents) {
         tooltipComponents.add(Component.translatable(
                 "rngtech.tooltip.battery.energy",
                 energyStored(stack),
@@ -202,12 +224,6 @@ public class BatteryCellItem extends Item {
                     "rngtech.tooltip.battery_cell.idle_loss",
                     decimal(idleLossPercentPerMinute(stack))
             ).withStyle(ChatFormatting.GRAY));
-        }
-        MachineTraitTooltip.appendIdentity(stack, tooltipComponents);
-        MachineTraitTooltip.appendComponentBaseStats(stack, tooltipComponents);
-        MachineTraitTooltip.appendTraitDetails(traits, tooltipComponents);
-        if (!RecyclingData.isStripped(stack)) {
-            MachineTraitTooltip.appendTraitKeyHints(tooltipComponents);
         }
     }
 

@@ -1,0 +1,31 @@
+{
+  "type": "minecraft:chest",
+  "pools": [
+    {
+      "rolls": 1.0,
+      "bonus_rolls": 0.0,
+      "conditions": [
+        {
+          "condition": "rngtech:unique_loot_enabled",
+          "unique": "rngtech:fortress_heater_element"
+        },
+        {
+          "condition": "minecraft:random_chance",
+          "chance": 0.08
+        }
+      ],
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "rngtech:fortress_heater_element",
+          "functions": [
+            {
+              "function": "rngtech:unidentified_unique"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "random_sequence": "rngtech:uniques/fortress_heater_element"
+}

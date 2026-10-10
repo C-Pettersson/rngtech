@@ -4,6 +4,8 @@ import com.rngtech.content.material.MaterialCatalog;
 import com.rngtech.content.material.MaterialFamily;
 import com.rngtech.content.material.OreCatalog;
 import com.rngtech.content.material.OreDefinition;
+import com.rngtech.rpg.unique.UniqueCatalog;
+import com.rngtech.rpg.unique.UniqueDefinition;
 
 import net.neoforged.neoforge.common.ModConfigSpec;
 
@@ -113,6 +115,10 @@ public final class RNGTechConfig {
     public static final ModConfigSpec.BooleanValue VOLATILE_CATALYST_RECIPES_ENABLED = BUILDER
             .comment("Whether the default Volatile Catalyst recipe loads. Disable it to award catalysts through quests, loot, or custom recipes instead.")
             .define("corruption.volatileCatalystRecipesEnabled", true);
+    private static final UniqueLootConfig UNIQUE_LOOT_CONFIG = defineUniqueLoot();
+    /** Gates every default Unique loot table; pack sources such as challenge tables and quests are unaffected. */
+    public static final ModConfigSpec.BooleanValue UNIQUE_LOOT_ENABLED = UNIQUE_LOOT_CONFIG.enabled();
+    public static final Map<String, ModConfigSpec.BooleanValue> UNIQUE_LOOT = UNIQUE_LOOT_CONFIG.uniques();
 
     public static final Map<String, ModConfigSpec.BooleanValue> MATERIALS = defineMaterials();
     private static final OreWorldgenConfig ORE_WORLDGEN_CONFIG = defineOreWorldgen();
@@ -132,6 +138,29 @@ public final class RNGTechConfig {
         }
         BUILDER.pop();
         return Collections.unmodifiableMap(values);
+    }
+
+    private static UniqueLootConfig defineUniqueLoot() {
+        BUILDER.push("uniques");
+        BUILDER.push("loot");
+        ModConfigSpec.BooleanValue enabled = BUILDER
+                .comment("Whether the default Unique loot tables, such as Nether fortress chests, can drop Uniques.")
+                .define("enabled", true);
+        Map<String, ModConfigSpec.BooleanValue> values = new LinkedHashMap<>();
+        for (UniqueDefinition unique : UniqueCatalog.all()) {
+            values.put(unique.id(), BUILDER
+                    .comment("Whether the default loot table can drop " + unique.id() + ".")
+                    .define(unique.id() + ".enabled", true));
+        }
+        BUILDER.pop();
+        BUILDER.pop();
+        return new UniqueLootConfig(enabled, Collections.unmodifiableMap(values));
+    }
+
+    /** Whether the default loot tables may drop {@code uniqueId}. */
+    public static boolean uniqueLootEnabled(String uniqueId) {
+        ModConfigSpec.BooleanValue unique = UNIQUE_LOOT.get(uniqueId);
+        return UNIQUE_LOOT_ENABLED.get() && (unique == null || unique.get());
     }
 
     private static OreWorldgenConfig defineOreWorldgen() {
@@ -159,6 +188,9 @@ public final class RNGTechConfig {
         EARLY_BRIDGE,
         VANILLA_TIER_MAPPING,
         MODULAR_ONLY
+    }
+
+    private record UniqueLootConfig(ModConfigSpec.BooleanValue enabled, Map<String, ModConfigSpec.BooleanValue> uniques) {
     }
 
     private record OreWorldgenConfig(

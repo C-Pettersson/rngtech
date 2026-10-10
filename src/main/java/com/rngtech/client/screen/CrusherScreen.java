@@ -2,8 +2,9 @@ package com.rngtech.client.screen;
 
 import com.rngtech.RNGTech;
 import com.rngtech.content.blockentity.CrusherBlockEntity;
-import com.rngtech.content.item.CrushHeadItem;
+import com.rngtech.content.item.GearParts;
 import com.rngtech.content.menu.CrusherMenu;
+import com.rngtech.rpg.MachinePartType;
 import com.rngtech.rpg.MachineStat;
 import com.rngtech.rpg.progression.CrusherPassiveTree;
 import com.rngtech.rpg.progression.MachineMasteryFamily;
@@ -585,7 +586,7 @@ public class CrusherScreen extends AbstractContainerScreen<CrusherMenu> {
 
     private String underLevelTooltipText() {
         if (menu.hardnessDeficit() <= 0) {
-            return "";
+            return menu.jamChancePerThousand() > 0 ? ", " + formatPerThousandPercent(menu.jamChancePerThousand()) + " jam" : "";
         }
         return ", hardness "
                 + menu.processingLevel()
@@ -684,8 +685,8 @@ public class CrusherScreen extends AbstractContainerScreen<CrusherMenu> {
             return true;
         }
         return menu.getSlot(CrusherBlockEntity.SLOT_CRUSH_HEAD).getItem().isEmpty()
-                || menu.getSlot(CrusherBlockEntity.SLOT_CRUSH_HEAD).getItem().getItem() instanceof CrushHeadItem head
-                        && head.material().stage() == menu.chassisStage();
+                || GearParts.is(menu.getSlot(CrusherBlockEntity.SLOT_CRUSH_HEAD).getItem(), MachinePartType.CRUSH_HEAD)
+                        && GearParts.stage(menu.getSlot(CrusherBlockEntity.SLOT_CRUSH_HEAD).getItem()) == menu.chassisStage();
     }
 
     private void renderStatTooltips(GuiGraphics guiGraphics, int mouseX, int mouseY) {

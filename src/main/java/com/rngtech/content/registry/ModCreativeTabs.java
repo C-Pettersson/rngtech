@@ -166,6 +166,7 @@ public final class ModCreativeTabs {
                         for (BatteryCellMaterial material : BatteryCellMaterial.values()) {
                             output.accept(ModItems.batteryCell(material).get());
                         }
+                        ModItems.UNIQUE_PARTS.values().forEach(unique -> output.accept(unique.get()));
                         for (BatteryChassisMaterial material : BatteryChassisMaterial.values()) {
                             output.accept(ModItems.batteryChassis(material).get());
                         }

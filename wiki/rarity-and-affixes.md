@@ -44,9 +44,9 @@ Rarity sets how many affixes an item can hold.
 | **Normal** | 0 | 0 | Base stats only. |
 | **Magic** | 1 | 1 | Named after its affixes, for example "Hellish Iron Furnace Chassis of Smelting". |
 | **Rare** | up to 3 | up to 3 | Rolls three of each when crafted, if enough different affixes fit the item. The name uses its first prefix and first suffix. |
-| **Unique** | — | — | Found, not crafted. Fixed traits, no RP, and only a [Volatile Catalyst](#corruption) can change it. |
+| **Unique** | — | — | Found, not crafted. Rolled stat lines, no RP, and only a [Volatile Catalyst](#corruption) can change it. |
 
-The only Unique item is the Unique Potato Battery Cell, which can turn up in village chests.
+[Uniques](uniques.md) have their own page: where to find them, how their ranged stats roll, and what each one does.
 
 ### Rarity odds
 
@@ -234,7 +234,7 @@ The catalyst rolls one outcome, and every outcome leaves the item **Corrupted**:
 | **Warped** | 20% | Each rolled affix moves by its own random amount from −15% to +15% of its value, past its tier's range. 100% increased Processing Speed can become anything from 85% to 115%. Tiers stay, and yield and RP affixes are not changed. |
 | **Blighted** | 20% | Adds one negative corruption implicit. |
 
-An outcome with nothing to do becomes Untouched: Reforged or Warped on an item without affixes it can change, or on a Unique, and Blessed or Blighted on an item with no implicit to draw. A Stabilization Crystal in the Affix Forge's focus slot removes Blighted, adds its chance to Untouched, and is used up. Pack makers can change these chances and the Warped range.
+On a Unique, Reforged rerolls every ranged stat line inside its range, and Blessed or Blighted draw from the pool of the Unique's part. An outcome with nothing to do becomes Untouched: Reforged or Warped on an item without affixes it can change, Reforged on a Unique with no ranged lines, Warped on any Unique, and Blessed or Blighted on an item with no implicit to draw. A Stabilization Crystal in the Affix Forge's focus slot removes Blighted, adds its chance to Untouched, and is used up. Pack makers can change these chances and the Warped range.
 
 A Warped affix uses one roll for all of its effects, so a drawback on a two-stat affix grows or shrinks with its benefit. Hold Left Alt to compare a Warped affix with its tier's normal range.
 

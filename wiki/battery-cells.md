@@ -4,7 +4,6 @@ wiki:
   icon: rngtech:iron_battery_cell
   ids:
     - rngtech:potato_battery_cell
-    - rngtech:unique_potato_battery_cell
     - rngtech:iron_battery_cell
     - rngtech:copper_battery_cell
     - rngtech:lead_battery_cell
@@ -45,9 +44,12 @@ Each tier stores more and moves FE faster. Values are before affixes.
 - The Potato Cell is a novelty starter with heavy leakage.
 - **Identity** is the cell's fixed material trait. Hold Left Shift over a cell to see it in the tooltip. It is a name only and changes nothing beyond the cell's base values.
 
-### Voltaic Potato Battery Cell
+### Unique cells
 
-The {{ item('rngtech:unique_potato_battery_cell') }} is a rare find in village chests. It cannot be crafted. It always has Unique rarity, cannot be refined, and stores 10,000 FE with 128 FE/t input, 64 FE/t output, and 6%/min idle loss. Its identity is Voltaic Spud.
+Two cells are [Uniques](uniques.md): found, never crafted, and never refined, though a [Volatile Catalyst](rarity-and-affixes.md#corruption) can corrupt them once.
+
+- The {{ item('rngtech:unique_potato_battery_cell') }} is a rare find in village chests. It stores 10,000 FE with 128 FE/t input, 64 FE/t output, and 6%/min idle loss.
+- The {{ item('rngtech:bastion_coin_stack_capacitor') }} comes from bastion treasure chests. It stores 40,000 FE with 512 FE/t input and 128 FE/t output, raises the Burst Transfer and Burst Duration of the [Battery Chassis](battery-chassis.md) it sits in, and leaks heavily while idle.
 
 ## Affixes
 

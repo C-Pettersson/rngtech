@@ -20,6 +20,7 @@ import com.rngtech.content.item.SolidFuelBurnerBlockItem;
 import com.rngtech.content.item.SolidFuelBurnerPartItem;
 import com.rngtech.content.item.ToolHeadItem;
 import com.rngtech.content.item.ToolRodItem;
+import com.rngtech.content.item.UniquePartItem;
 import com.rngtech.content.recycling.RecyclingData;
 import com.rngtech.content.registry.ModDataComponents;
 import com.rngtech.content.tool.ToolHeadFamily;
@@ -31,6 +32,7 @@ import com.rngtech.rpg.ModifierEligibilityProfile;
 import com.rngtech.rpg.ModifierEligibilityProfiles;
 import com.rngtech.rpg.Rarity;
 import com.rngtech.rpg.corruption.CorruptionCatalog;
+import com.rngtech.rpg.unique.UniqueItems;
 
 import net.minecraft.world.item.ItemStack;
 
@@ -91,6 +93,9 @@ public final class RefinementTargets {
     }
 
     public static ModifierEligibilityProfile eligibilityProfile(ItemStack stack) {
+        if (stack.getItem() instanceof UniquePartItem part) {
+            return ModifierEligibilityProfiles.forUniquePart(part.partType());
+        }
         if (stack.getItem() instanceof BatteryCellItem cell) {
             return ModifierEligibilityProfiles.forBatteryCell(cell.material().unique());
         }
@@ -209,8 +214,8 @@ public final class RefinementTargets {
 
     public static MachineTraits storedTraits(ItemStack stack) {
         MachineTraits traits = stack.get(ModDataComponents.MACHINE_TRAITS.get());
-        if (traits == null && stack.getItem() instanceof BatteryCellItem cell && cell.material().unique()) {
-            return new MachineTraits(com.rngtech.rpg.Rarity.UNIQUE, 0, java.util.List.of());
+        if (traits == null && UniqueItems.isUnique(stack)) {
+            return new MachineTraits(Rarity.UNIQUE, 0, List.of());
         }
         if (traits == null && stack.getItem() instanceof MinersCompanionItem) {
             return new MachineTraits(

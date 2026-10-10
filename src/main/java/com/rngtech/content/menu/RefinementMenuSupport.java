@@ -16,6 +16,7 @@ import com.rngtech.rpg.refinement.RefinementOperation;
 import com.rngtech.rpg.refinement.RefinementResult;
 import com.rngtech.rpg.refinement.RefinementSelection;
 import com.rngtech.rpg.refinement.RefinementTargets;
+import com.rngtech.rpg.unique.UniqueItems;
 
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Player;
@@ -148,7 +149,8 @@ public final class RefinementMenuSupport {
                 selection,
                 modifier(inventory),
                 lensTags(inventory),
-                player.level().random
+                player.level().random,
+                UniqueItems.definition(target)
         );
         if (!result.success()) {
             showFailure(player, result.messageKey());

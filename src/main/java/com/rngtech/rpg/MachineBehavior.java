@@ -25,7 +25,10 @@ public enum MachineBehavior implements StringRepresentable {
     POWER_GRACE,
     RESIDUE_SCREEN,
     SIDE_FLUID_OUTPUT,
-    AUTO_PURGE;
+    AUTO_PURGE,
+    ESCAPEMENT,
+    REFLUX,
+    ECHO_STREAK;
 
     public static final Codec<MachineBehavior> CODEC = StringRepresentable.fromEnum(MachineBehavior::values);
     public static final StreamCodec<ByteBuf, MachineBehavior> STREAM_CODEC =

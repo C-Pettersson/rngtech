@@ -4,11 +4,11 @@
 
 PRD status: Accepted
 
-Implementation status: Planned
+Implementation status: Prototype
 
 Release: 2.0
 
-Last updated: 2026-10-06
+Last updated: 2026-10-10
 
 ## Summary
 
@@ -16,7 +16,7 @@ Unique items are authored, find-only Gear with ranged stats, one signature mecha
 
 A Unique is a sidegrade or a build-around piece, not a higher stage. It comes from one exact place in the world, and the best Uniques make a Mastery build or an ascendancy work differently.
 
-`Rarity.UNIQUE` and one Unique item already exist: the Voltaic Potato Battery Cell found in village chests. Every Unique check outside the rarity enum is specific to Battery Cells, so this PRD adds a shared Unique catalog, moves the Potato cell onto it, and ships eight launch Uniques that cover every Mastery family.
+Before this PRD, `Rarity.UNIQUE` and one Unique item existed: the Voltaic Potato Battery Cell found in village chests, and every Unique check outside the rarity enum was specific to Battery Cells. This PRD adds a shared Unique catalog, moves the Potato cell onto it, and ships eight launch Uniques that cover every Mastery family.
 
 Uniques cannot be refined. [Corruption](corruption.md) is the only way to change one, and its Reforged outcome is the only way to reroll a Unique's values.
 
@@ -67,7 +67,7 @@ Key existing code:
 - No Unique machines or chassis. Uniques are installable Gear and Battery Cells.
 - No Unique modular tool heads or rods in 2.0. They use `ToolBaseStatCatalog`, a separate pipeline; see the [backlog](../reference/unique-item-ideas.md#backlog).
 - No recycling. Uniques stay rejected by the Potential Reactor and Component Recycler, as today.
-- No datapack override of Unique stats. The catalog is a classpath resource, like the ascendancy catalog. Loot tables and loot modifiers stay datapack data.
+- No datapack override of Unique stats. The built-in catalog is a classpath resource, like the ascendancy catalog, and packs add Uniques through `config/rngtech/uniques/` instead (see [Extensibility](#extensibility)). Loot tables and loot modifiers stay datapack data.
 - No new structures, bosses, or dimensions.
 
 ## Vocabulary
@@ -87,7 +87,7 @@ Key existing code:
 ## Player Flow
 
 1. The player finds an unidentified Unique in its source, such as a Nether fortress chest.
-2. The unidentified tooltip shows the Unique's name in light purple, its stat lines with their ranges, its signature, its drawback, and its source. JEI shows the same.
+2. The unidentified tooltip shows the Unique's name in the unique colour, its stat lines with their ranges, its signature, its drawback, and its source. JEI shows the same.
 3. The player identifies it by crafting it alone, the same way crafted parts are identified today. Every ranged line rolls.
 4. The identified tooltip shows the rolled values. Holding Shift shows each line's range and roll quality.
 5. The player installs it in a compatible Gear slot. The normal slot rules apply, including stage gates and Mastery Gear legality.
@@ -95,7 +95,7 @@ Key existing code:
 
 ## Unique Catalog
 
-Each Unique is one JSON file under `src/main/resources/data/rngtech/uniques/`, loaded at startup like the ascendancy catalog.
+Each Unique is one JSON file under `src/main/resources/data/rngtech/uniques/`, listed in that folder's `index.json` and loaded at startup like the ascendancy catalog.
 
 ```json
 {
@@ -104,20 +104,21 @@ Each Unique is one JSON file under `src/main/resources/data/rngtech/uniques/`, l
     "slot_stage": 4,
     "base_profile": "rngtech:titanium_heat_core",
     "stats": {
-        "rngtech:warmup_time": { "operation": "more", "min": -0.8, "max": -0.6 },
-        "rngtech:energy_usage": { "operation": "increased", "min": 0.6, "max": 0.4 },
-        "rngtech:temperature_stability": { "operation": "more", "min": -0.5, "max": -0.3 },
-        "rngtech:fuel_efficiency": { "operation": "more", "value": -0.5 },
-        "rngtech:overdrive_margin": { "operation": "flat", "min": 60, "max": 120 }
+        "rngtech:warmup_time": { "operation": "more", "min": -0.6, "max": -0.8, "role": "signature" },
+        "rngtech:overdrive_margin": { "operation": "flat", "min": 20, "max": 40, "role": "hook", "ascendancy": "crucible_keeper" },
+        "rngtech:energy_usage": { "operation": "increased", "min": 0.6, "max": 0.4, "role": "drawback" },
+        "rngtech:temperature_stability": { "operation": "more", "min": -0.5, "max": -0.3, "role": "drawback" },
+        "rngtech:fuel_efficiency": { "operation": "more", "value": -0.5, "role": "drawback" }
     },
     "behaviors": [],
     "source": "rngtech:unique_source.nether_fortress"
 }
 ```
 
-- `host` names a `MachinePartType`, or `battery_cell`.
-- `base_profile` starts from an existing part's base stats. `stats` then adjusts them with the same operations that Mastery uses. A Unique may also list every stat with no base profile.
-- A stat line has either `value` (fixed) or `min` and `max` (ranged). `min` is the worst roll and `max` the best, so a drawback range can run downward, as Energy Usage does above. Rolls are uniform across the range.
+- `host` names a part type with Unique support (`crush_head`, `heat_core`, `alloy_crucible`, `servo`, `fluid_pump`, or `control_board`), or `battery_cell`. A new host type needs code for its base profiles and Gear checks.
+- `base_profile` starts from an existing part's base stats, named by its item id. `stats` then adjusts them: `flat` adds, `increased` adds a fraction (`0.6` is 60% increased), and `more` multiplies by one plus the value (`-0.5` is 50% less). A stat the base profile lacks reaches the host the same way, so `increased` joins the host's increased bucket. A Unique may also list every stat with no base profile; a Unique Battery Cell without one starts from its own `BatteryCellMaterial`.
+- A stat line has either `value` (fixed) or `min` and `max` (ranged). `min` is the worst roll and `max` the best, so a drawback range can run downward, as Energy Usage does above. Rolls are uniform across the range, and non-integer rolls land on hundredths.
+- `role` is `identity`, `signature`, `hook`, or `drawback`. It drives the benefit and penalty checks and the tooltip sections. A `hook` names its `ascendancy`, and the host applies the line only while it has that ascendancy.
 - Integer stats roll whole numbers inclusive of both ends. For example, `"rngtech:parallel_jobs": { "operation": "flat", "min": 1, "max": 3 }` rolls 1, 2, or 3.
 - `behaviors` are `MachineBehavior` ids and never roll. New behaviors are declared in code, as ascendancy behaviors are.
 - `source` is a language key for the tooltip and JEI line. The loot table is separate data.
@@ -125,20 +126,21 @@ Each Unique is one JSON file under `src/main/resources/data/rngtech/uniques/`, l
 Load-time validation:
 
 - `host` is a known part type, and `slot_stage` lies in that type's stage range.
-- Every stat and behavior is known, and is read by at least one host machine that accepts the part type. A hand-maintained table of which machines read which stats backs this check and is checked against `GearSlotCatalog`.
+- Every stat and behavior is known, and is read by at least one host machine that accepts the part type. A hand-maintained table of which machines read which stats (`UniqueStatReaders`) backs this check, and its machine list must match `GearSlotCatalog`.
+- A hook names a known ascendancy, and the machine of that ascendancy's family reads the stat.
 - Integer stats use whole-number bounds. A drawback line is still a penalty at its best roll, and a signature line is still a benefit at its worst roll.
 - At its best roll, a recipe-gating stat such as Processing Level or input-slot count reaches at most one stage past the slot stage.
 - The catalog contains no yield stat (Output Amount, Super Output Chance, Crusher Salvage Chance, Fluid Yield, Ledger Rate, or any stat or behavior declared with a `yield` other than `none`). The one exception is a penalty, such as less Output Amount. A later Unique may add yield only after it gets loop-audit coverage (see [Loop Prevention](#loop-prevention)).
-- Every Unique has a language name, a description key, a texture, and at least one loot table that drops it.
+- Every Unique has a language name, a description key, a source key, an item model whose RNGTech textures exist, and a default loot table under `loot_table/uniques/`.
 
 ## Items, Identity, and Rolls
 
 - Unique parts use one `UniquePartItem` class, a `MachinePartItem` subclass that carries its catalog id. Unique Battery Cells stay `BatteryCellMaterial` entries, because a cell's output rate is a material field rather than a stat.
-- `MachineImplicitCatalog.identity()` and `ComponentBaseStatCatalog.profile()` check the Unique catalog first. The base profile and fixed lines form the Unique's base stats.
+- `MachineImplicitCatalog.identity()` and `ComponentBaseStatCatalog.profile()` check the Unique catalog first. The base profile, fixed lines, and stored rolls form the Unique's part stats, which merge into the host like any part's.
 - **Roll storage:** rolls are stored as modifiers in a new `ModifierSlot.UNIQUE` inside `rngtech:machine_traits`. `normalizedStored` keeps that slot when the identity is Unique and drops it otherwise. `withIdentity` keeps it while forcing `UNIQUE` and 0 RP. `effectiveStats` applies `UNIQUE` modifiers after the base profile, both on stacks and in installed hosts.
-- **Identification:** loot tables apply a `rngtech:unidentified_unique` loot function that sets the existing seeded `rngtech:unidentified_trait_roll` component. `CraftedTraitOutputs.applyRolledTraits` gains a Unique branch that rolls every ranged line from the catalog instead of rolling affixes. A Unique stack with no traits and no pending roll, such as one from `/give` or the creative tab, also counts as unidentified.
+- **Identification:** loot tables apply a `rngtech:unidentified_unique` loot function that sets the existing seeded `rngtech:unidentified_trait_roll` component. `CraftedTraitOutputs.applyRolledTraits` gains a Unique branch that rolls every ranged line from the catalog instead of rolling affixes. A Unique stack with ranged lines, no traits, and no pending roll, such as one from `/give` or the creative tab, also counts as unidentified. A Unique without ranged lines, such as the Potato cell, is never unidentified.
 - **Catalog changes:** when a range changes in a later version, stored rolls are clamped into the new range when read. A newly added ranged line on an old copy uses its range midpoint. A removed line's stored roll is ignored.
-- Uniques stack to 1, render with foil, and use vanilla `Rarity.EPIC` for a light-purple name that matches the light-purple rarity header in the tooltip.
+- Uniques stack to 1, render with foil, and show their name, rarity header, and flavour text in Path of Exile's unique colour, `#AF6025`. Purple and magenta stay free for a possible later Legendary rarity.
 - These checks are Battery-Cell-only today and move to one shared `UniqueItems.isUnique(ItemStack)` helper backed by the `rngtech:uniques` item tag:
     - `RefinementTargets` eligibility and the synthesized traits for component-less stacks;
     - `CraftedTraitOutputs`;
@@ -158,7 +160,7 @@ Uniques come from vanilla places by default. Pack makers can move them to RNGTec
     - common structures (village, ruined portal, mineshaft): 3–5% per chest;
     - uncommon structures (igloo basement, bastion treasure, Nether fortress): 8–10% per chest;
     - rare structures (ancient city): 4% per chest;
-    - trial vault rewards: in the ominous vault's rare pool only;
+    - trial vault rewards: 3% per ominous vault. A loot modifier cannot reach the vault's nested rare pool, so the Unique's table is added to the whole ominous reward table;
     - entity drops: 1% on a player kill, +0.5% per Looting level.
 
 ### Pack configuration
@@ -187,6 +189,7 @@ RNGTech rolls a loot table when certain machine events happen. Every table ships
 
 - Results go into the machine's output slots when they fit, or drop on top of the machine. Forestry results go into the cart's inventory. Mastery level results drop on top of the machine.
 - New loot item conditions read the context: `rngtech:machine_family`, `rngtech:machine_stage`, `rngtech:recipe_stage`, `rngtech:calibration_stability`, `rngtech:instability`, `rngtech:mastery_level`, and `rngtech:ascendancy`. Each takes an optional `min` and `max`, or an id.
+- The family is the Mastery family id, or `vacuum_collapse_generator`. The machine stage is the chassis stage, or the cutting tool head's stage for a Forestry harvest. The recipe stage is the recipe's XP band, the Alloy Furnace's minimum component stage, the calibration minimum stage, or a jam's recipe Processing Level. Instability is the Vacuum Collapse instability times 100.
 - The tables can hold anything, not only Uniques: catalysts, Seals, or pack items. Pack makers own the loop safety of what they add. RNGTech's shipped tables stay empty.
 
 Example datapack entry that moves the Fortress Heater Element from Nether fortress chests to Stage 4+ heat failures, after the pack sets `uniques.loot.fortress_heater_element.enabled=false`:
@@ -228,17 +231,17 @@ Ranges are draft targets, and fixed values are expressed against existing profil
 | Ancient Echo Control Board | Control Board | 6 | Ancient city chest | Resonance Calibrator |
 | Bastion Coin-Stack Capacitor | Battery Cell | 4 | Bastion treasure chest | Battery Chassis |
 
-The Voltaic Potato Battery Cell moves onto the catalog with fixed lines equal to its current stats, so existing cells are unchanged. It keeps its village source.
+The Voltaic Potato Battery Cell moves onto the catalog with no stat lines: it starts from its own `BatteryCellMaterial`, so existing cells are unchanged. It keeps its village source.
 
 ### Fortress Heater Element
 
 `rngtech:fortress_heater_element`, Unique Heat Core, slot stage 4.
 
-- **Identity:** fixed Titanium-class Maximum Temperature in a Stage 4 slot, so a Steel-stage Furnace, Alloy Furnace, Metal Press, or Melter meets late heat gates early.
+- **Identity:** fixed Sparksteel-class Maximum Temperature (+1000) in a Stage 4 slot, so a Steel-stage Furnace, Alloy Furnace, Metal Press, or Melter meets the next stage's heat gates early. A Steel Furnace reaches 1600, enough for Titanium recipes but not Tungsten. Titanium-class heat (+1200) would have reached Tungsten recipes, two stages early.
 - **Signature:** (60–80)% less Warmup Time.
-- **Ascendancy hook:** +(60–120) °C Overdrive Margin (Crucible Keeper).
-- **Drawback:** (60–40)% increased Energy Usage, (50–30)% less Temperature Stability, and a fixed 50% less Fuel Efficiency in a Solid Fuel Burner.
-- **Why:** it pays for heat reach with FE and failure strain on Stage 4+ failure-bearing recipes. It stays a sidegrade because PROCESSING_LEVEL and the other gates are unchanged.
+- **Ascendancy hook:** +(20–40) °C Overdrive Margin (Crucible Keeper). Crucible Keeper nodes grant +10 to +15 °C, so the draft +(60–120) °C would have dwarfed them.
+- **Drawback:** (60–40)% increased Energy Usage, (60–40)% less Overheat Tolerance, and a fixed 50% less Fuel Efficiency in a Solid Fuel Burner. The draft's less Temperature Stability was dropped: Furnace recipes without a failure output treat Temperature Stability as a hard gate, so the drawback blocked the very recipes the Unique was for.
+- **Why:** it pays for heat reach with FE and with strain when heat overshoots, which pulls against Crucible Keeper's Overdrive. It stays a sidegrade because Processing Level and the other gates are unchanged, and the load check now treats Heat Core Maximum Temperature as a recipe gate.
 
 ### Igloo Basement Thermostat
 
@@ -246,8 +249,8 @@ The Voltaic Potato Battery Cell moves onto the catalog with fixed lines equal to
 
 - **Identity:** precision heat for early and mid recipes.
 - **Signature:** (40–80)% more Temperature Stability and (40–80)% more Overheat Tolerance, beyond any normal core, and the `POWER_GRACE` behavior that normal parts only reach on Stage 6 Servos.
-- **Ascendancy hook:** +(5–15) °C Heat Window (Drop Forge).
-- **Drawback:** a fixed Maximum Temperature cap at the Bronze profile, and (50–30)% less Heat Transfer, which also slows the Melter.
+- **Ascendancy hook:** +(5–15)% Heat Window (Drop Forge). Heat Window is a percent of each recipe's window.
+- **Drawback:** a fixed Maximum Temperature cap at the Bronze profile, and (35–20)% less Heat Transfer, which slows heating and processing, including in the Melter.
 - **Why:** a cold-running core for presses and furnaces that punish instability. It is useless for hot alloys.
 
 ### Mineshaft Worn Pick-Jaw
@@ -255,19 +258,19 @@ The Voltaic Potato Battery Cell moves onto the catalog with fixed lines equal to
 `rngtech:mineshaft_worn_pick_jaw`, Unique Crush Head, slot stage 2.
 
 - **Identity:** a Stage 2 head that crushes one hardness level above its stage.
-- **Signature:** a fixed +1 Processing Level over its slot stage, and +(1–3) Batch Size. Chassis acceptance still uses slot stage 2, so it fits early Crushers and does not change stage-support keystones.
+- **Signature:** a fixed +1 Processing Level over its slot stage, and +(1–2) Batch Size. Normal batching starts with the Tungstensteel chassis, so this is already strong. Chassis acceptance still uses slot stage 2, so it fits early Crushers and does not change stage-support keystones.
 - **Ascendancy hook:** +(10–30)% Jam Recovery (Rockbreaker).
-- **Drawback:** +(8–3)% Jam Chance on every cycle, not only under-level cycles, and (25–15)% less Output Amount on the Crusher.
-- **Why:** an early exploration find for players who push wide, under-level crushing, and a natural Rockbreaker piece. Batch Size adds throughput, not yield, and the Output Amount line only lowers yield.
+- **Drawback:** +(8–3)% Jam Chance per Cycle, a new stat that can jam every cycle and not only under-level cycles, and (30–15)% increased Energy Usage. A jam on an at-level recipe lasts as long as a one-level jam. The draft's less Output Amount was dropped: it multiplied the Crusher's whole output, so it destroyed base ore instead of reducing bonus output.
+- **Why:** an early exploration find for players who push wide, under-level crushing, and a natural Rockbreaker piece. Batch Size adds throughput, not yield.
 
 ### Crying Crucible
 
 `rngtech:crying_crucible`, Unique Alloy Crucible, slot stage 3.
 
 - **Identity:** a Bronze-class crucible tuned for blend recipes. It has the same fixed input-slot count as the Bronze crucible, so it does not skip the Steel crucible.
-- **Signature:** +(15–30)% Blend Speed and (10–20)% Blend Heat Reduction, which normally come only from Blendwright.
+- **Signature:** +(20–40)% Blend Speed and +(25–50) °C Blend Heat Reduction, which normally come only from Blendwright. Blend Heat Reduction is in degrees; Blendwright's Cold Mixing grants 100 °C.
 - **Ascendancy hook:** the signature itself stacks with Blendwright.
-- **Drawback:** (40–20)% less Stability and (40–20)% less Temperature Stability, which raise failure strain on failure-bearing recipes.
+- **Drawback:** (40–20)% increased Energy Usage, and (40–20)% less Stability, which raises failure strain on failure-bearing recipes. The draft's less Temperature Stability was dropped: blend recipes need 0.9 Temperature Stability and have no failure output, so it blocked every blend.
 - **Why:** it opens a blend-recipe Alloy Furnace before the ascendancy, and rewards Blendwright players who accept more failures.
 
 ### Trial Vault Escapement
@@ -275,9 +278,9 @@ The Voltaic Potato Battery Cell moves onto the catalog with fixed lines equal to
 `rngtech:trial_vault_escapement`, Unique Servo, slot stage 6.
 
 - **Identity:** a stop-start servo for small batches.
-- **Signature:** new behavior `ESCAPEMENT`. The first cycle after the machine idles, or after its recipe or mold changes, is (30–60)% faster. FE per craft is unchanged, so speed never makes a craft cheaper.
+- **Signature:** new behavior `ESCAPEMENT` with a new stat, +(50–100)% Escapement Speed. The first cycle after the machine idles, or after its recipe or mold changes, is that much faster. FE per craft is unchanged, so speed never makes a craft cheaper. A reload counts as idling.
 - **Ascendancy hook:** −(10–25) ticks Mold Swap Time (Die Keeper).
-- **Drawback:** (25–15)% less Processing Speed on every cycle after the first, and no `POWER_GRACE`, which every normal Stage 6+ Servo provides.
+- **Drawback:** (15–5)% less Processing Speed, and no `POWER_GRACE`, which every normal Stage 6+ Servo provides. The penalty applies to every cycle, including the first, because it is part of the Servo's own Processing Speed; Escapement Speed outweighs it on the first cycle.
 - **Why:** it suits a Die Keeper press that swaps molds often, and hurts a press that runs one recipe all day.
 
 ### Witch-Bottle Reflux Pump
@@ -285,9 +288,9 @@ The Voltaic Potato Battery Cell moves onto the catalog with fixed lines equal to
 `rngtech:witch_bottle_reflux_pump`, Unique Fluid Pump, slot stage 5.
 
 - **Identity:** a pump that holds rather than moves.
-- **Signature:** (75–125)% increased host Fluid Capacity (Melter tanks, Forestry cart tank). New behavior `REFLUX`: the Field Hand Sprinkler spends half as much water, stacking with Irrigation.
+- **Signature:** (100–150)% increased host Fluid Capacity (Melter tanks, Forestry cart tank). New behavior `REFLUX`: the Field Hand Sprinkler spends half as much water, stacking with Irrigation.
 - **Ascendancy hook:** the Sprinkler half of the signature (Field Hand).
-- **Drawback:** (70–50)% less Fluid Transfer, which slows Melter container filling, side extraction, and station refills.
+- **Drawback:** (50–30)% less Fluid Transfer, which slows Melter container filling, side extraction, and station refills.
 - **Why:** a large buffer for slow or manual fluid handling, and a Field Hand piece.
 
 ### Ancient Echo Control Board
@@ -297,7 +300,7 @@ The Voltaic Potato Battery Cell moves onto the catalog with fixed lines equal to
 - **Identity:** fixed Nullite-class Calibration Precision in a Stage 6 slot.
 - **Signature:** new behavior `ECHO_STREAK`. The calibration streak survives one calibration of another family, as Pattern Memory lets it survive one change.
 - **Ascendancy hook:** +(1–3) Streak Cap (Harmonist).
-- **Drawback:** (40–20)% less Processing Speed, and no Refinement Potential Bonus, which every normal board provides.
+- **Drawback:** (25–10)% less Processing Speed, and no Refinement Potential Bonus, which every normal board provides.
 - **Why:** it is a Harmonist build-around, and it does not touch the RP economy.
 
 ### Bastion Coin-Stack Capacitor
@@ -306,7 +309,7 @@ The Voltaic Potato Battery Cell moves onto the catalog with fixed lines equal to
 
 - **Identity:** a burst cell for Battery Chassis with `BURST_RELEASE`.
 - **Signature:** (75–125)% increased host Burst Transfer and (75–125)% increased Burst Duration while installed in a burst-capable chassis.
-- **Drawback:** (150–100)% increased Idle Loss, and a fixed steady output rate at half the Steel cell's.
+- **Drawback:** (150–100)% increased Idle Loss on a 0.4%/min base, and a fixed steady output of 128 FE/t, half the Invar cell's. There is no Steel cell; Invar is the Stage 4 cell. Its `BatteryCellMaterial` holds 40,000 FE and takes 512 FE/t.
 - **Why:** it rewards a Copper, Gold, or later burst chassis and does little elsewhere.
 
 ## New Stats and Behaviors
@@ -316,6 +319,8 @@ The Voltaic Potato Battery Cell moves onto the catalog with fixed lines equal to
 | `ESCAPEMENT` | Behavior | Processing machines that read `PROCESSING_SPEED` and host Servos | None |
 | `REFLUX` | Behavior | Forestry cart Sprinkler | None |
 | `ECHO_STREAK` | Behavior | Resonance Calibrator streak | None |
+| `CYCLE_JAM_CHANCE` | Stat | Crusher jam roll | None |
+| `ESCAPEMENT_SPEED` | Stat | Machines with `ESCAPEMENT` | None |
 
 Every other Unique stat already exists. A Unique may grant an ascendancy stat. Without the ascendancy it has no effect, and the tooltip says which ascendancy it needs.
 
@@ -330,6 +335,8 @@ A new Unique with no new mechanic needs only:
 - an entry in the `rngtech:uniques` tag.
 
 Item registration iterates the catalog, so no Java registry edit is needed. A new signature mechanic adds a `MachineBehavior` and its host code, plus an entry in the stat-reader table.
+
+Packs add Uniques without touching the jar: each `*.json` in `config/rngtech/uniques/` is read after the built-in catalog, validated by the same rules, and registered under `rngtech`. Names, models, and textures come from a resource pack and loot from a datapack, so the asset and default-loot checks do not apply to pack files. A pack file that breaks a rule, uses a Battery Cell host, reuses an id, or names a newer format `version` is skipped with a logged error instead of stopping the game. The server and every client need the same files. The catalog file format is therefore a public API: renames need aliases, and format changes bump `version`. The pack-maker guide is `extras/uniques/README.md`.
 
 ## Interaction Rules
 
@@ -351,10 +358,10 @@ Launch Uniques carry no yield stats, apart from the Pick-Jaw's Output Amount pen
 ## UI
 
 - **Tooltip:**
-    - unidentified: a light-purple name, the Unique header, each stat line with its range, the signature, the drawback, any ascendancy hook with the ascendancy name, and the source line;
+    - unidentified: a name in the unique colour, the Unique header, each stat line with its range, the signature, the drawback, any ascendancy hook with the ascendancy name, and the source line;
     - identified: the same sections with rolled values instead of ranges;
     - Shift: each line's range and roll quality, plus the overall roll quality as the average of the ranged lines.
-- **Gear tab:** no layout change. When a stat is not read by the current host, it is dimmed, using the same table as the load check. An installed Unique gets the foil highlight.
+- **Gear tab:** no layout change. Inside a machine's screen, a Unique's tooltip dims each stat and behavior that machine does not read, greys out an ascendancy hook when that machine has not chosen the ascendancy, using the same table as the load check. Uniques always render with foil. A machine's Stats tab lists the non-hook stats Unique Gear gives it, such as Blend Speed, while it has them.
 - **JEI:** one information page per Unique with its ranges, source, and hosts, replacing the Potato-only page.
 - **Jade:** no change. Gear summaries already list installed parts.
 
@@ -440,6 +447,17 @@ In-game checks:
 - **Release gate:** the full in-game checklist in [Releasing](../releasing.md) runs once for 2.0 after every 2.0 feature lands. Add a "find, identify, install, and corrupt a Unique" line to it.
 
 ## Decisions
+
+Resolved 2026-10-10 during implementation:
+
+- Packs may add Uniques from `config/rngtech/uniques/`, reversing the classpath-only decision. Pack files fail soft, cannot be Battery Cells, register under `rngtech`, and carry a format `version`.
+
+- Catalog lines carry a `role`, so the benefit, penalty, and hook rules are explicit.
+- Pick-Jaw's every-cycle jam and Escapement's first-cycle speed need ranged magnitudes, so they became stats: `CYCLE_JAM_CHANCE` and `ESCAPEMENT_SPEED`.
+- Ascendancy hooks are gated on the host's stat accumulator: the passive tree records the chosen ascendancy before Gear merges, and a hook line applies only when it matches.
+- Ranges whose units did not match their stats were converted: Heat Window in percent, Blend Heat Reduction in °C, and Overdrive Margin scaled to the Crucible Keeper nodes.
+- The ominous trial vault source covers the whole reward table, because loot modifiers do not reach nested pools.
+- After a first balance review, the Fortress Heater Element and Crying Crucible lost their Temperature Stability drawbacks, which hard-blocked their own recipes; the Fortress dropped to Sparksteel-class heat; the Pick-Jaw's Output Amount drawback, which destroyed base ore, became increased Energy Usage and its Batch Size dropped to +(1–2); and the Escapement, Witch-Bottle Pump, Echo Board, and Igloo Thermostat got stronger signatures or softer drawbacks.
 
 Resolved 2026-10-05:
 

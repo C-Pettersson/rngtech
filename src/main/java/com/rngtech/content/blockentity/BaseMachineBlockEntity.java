@@ -20,9 +20,12 @@ import com.rngtech.content.block.SolarArrayControllerBlock;
 import com.rngtech.content.block.SolarPanelBlock;
 import com.rngtech.content.block.SolidFuelBurnerBlock;
 import com.rngtech.content.item.RefinementConsumableItem;
+import com.rngtech.content.loot.ChallengeContext;
+import com.rngtech.content.loot.ChallengeLoot;
 import com.rngtech.content.registry.ModDataComponents;
 import com.rngtech.rpg.MachineTraits;
 import com.rngtech.rpg.MachineType;
+import com.rngtech.rpg.progression.MachineMasteryHost;
 import com.rngtech.rpg.progression.MachineProgressionState;
 import com.rngtech.rpg.progression.MegaPassiveTree;
 
@@ -233,6 +236,13 @@ public abstract class BaseMachineBlockEntity extends BlockEntity implements Refi
     @Override
     public ItemStackHandler getRefinementInventory() {
         return refinementInventory;
+    }
+
+    /** Rolls the Mastery level challenge loot on top of the machine; this satisfies {@link MachineMasteryHost}. */
+    public void masteryLevelGained(MachineProgressionState state) {
+        if (this instanceof MachineMasteryHost host && level != null && !level.isClientSide) {
+            ChallengeLoot.drop(level, worldPosition, ChallengeLoot.MASTERY_LEVEL, ChallengeContext.of(host).withMasteryLevel(state.level()));
+        }
     }
 
     public void dropRefinementInventory(Level level) {

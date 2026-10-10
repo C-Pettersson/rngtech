@@ -3,6 +3,7 @@ package com.rngtech.content.blockentity;
 import com.rngtech.content.block.BaseMachineBlock;
 import com.rngtech.content.block.CompressorTankBlock;
 import com.rngtech.content.item.BatteryCellItem;
+import com.rngtech.content.item.GearParts;
 import com.rngtech.content.item.ServoItem;
 import com.rngtech.content.machine.CompressorTankMaterial;
 import com.rngtech.content.menu.CompressorTankMenu;
@@ -15,6 +16,7 @@ import com.rngtech.rpg.MachineBaseStatCatalog;
 import com.rngtech.rpg.MachineImplicitCatalog;
 import com.rngtech.rpg.MachineModifier;
 import com.rngtech.rpg.MachineNameGenerator;
+import com.rngtech.rpg.MachinePartType;
 import com.rngtech.rpg.MachineStat;
 import com.rngtech.rpg.MachineStatAccumulator;
 import com.rngtech.rpg.MachineTraits;
@@ -428,7 +430,7 @@ public class CompressorTankBlockEntity extends BaseMachineBlockEntity
     }
 
     public boolean isServo(ItemStack stack) {
-        return supportsCompression() && stack.getItem() instanceof ServoItem servo && servo.stage() <= material().stage();
+        return supportsCompression() && GearParts.is(stack, MachinePartType.SERVO, material().stage());
     }
 
     public static boolean isFluidInputContainer(ItemStack stack) {

@@ -25,6 +25,7 @@ import com.rngtech.rpg.refinement.RefinementOperation;
 import com.rngtech.rpg.refinement.RefinementResult;
 import com.rngtech.rpg.refinement.RefinementSelection;
 import com.rngtech.rpg.refinement.RefinementTargets;
+import com.rngtech.rpg.unique.UniqueItems;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
@@ -390,7 +391,8 @@ public class AffixForgeScreen extends AbstractContainerScreen<AffixForgeMenu> {
                 CorruptionCatalog.active(),
                 RefinementTargets.eligibilityProfile(target).id(),
                 RefinementTargets.storedTraits(target),
-                warded
+                warded,
+                UniqueItems.definition(target)
         )) {
             if (row.percent() <= 0.0 && !(warded && row.outcome() == CorruptionOutcome.BLIGHTED)) {
                 continue;

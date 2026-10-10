@@ -25,10 +25,10 @@ import com.rngtech.client.screen.VacuumCollapseGeneratorScreen;
 import com.rngtech.client.screen.WoodenComposterScreen;
 import com.rngtech.client.screen.WoodenDehumidifierScreen;
 import com.rngtech.content.calibration.ResonanceCalibratorChassis;
-import com.rngtech.content.energy.BatteryCellMaterial;
 import com.rngtech.content.energy.SolidFuelBurnerChassis;
 import com.rngtech.content.gear.GearMachineSpec;
 import com.rngtech.content.gear.GearSlotCatalog;
+import com.rngtech.content.item.UniqueTooltip;
 import com.rngtech.content.machine.AlloyFurnaceChassisMaterial;
 import com.rngtech.content.machine.CrusherChassisMaterial;
 import com.rngtech.content.machine.FurnaceChassisMaterial;
@@ -83,7 +83,12 @@ import com.rngtech.content.registry.ModItems;
 import com.rngtech.content.registry.ModMenus;
 import com.rngtech.content.registry.ModRecipes;
 import com.rngtech.rpg.CorruptionOutcome;
+import com.rngtech.rpg.MachineBehavior;
 import com.rngtech.rpg.corruption.CorruptionCatalog;
+import com.rngtech.rpg.unique.UniqueCatalog;
+import com.rngtech.rpg.unique.UniqueDefinition;
+import com.rngtech.rpg.unique.UniqueStatLine;
+import com.rngtech.rpg.unique.UniqueStatReaders;
 
 import mezz.jei.api.IModPlugin;
 import mezz.jei.api.JeiPlugin;
@@ -100,7 +105,9 @@ import mezz.jei.api.runtime.IRecipesGui;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.renderer.Rect2i;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -200,10 +207,9 @@ public final class RNGTechJeiPlugin implements IModPlugin {
                 ModItems.EXOTIC_AFFIX_FORGE.get(),
                 Component.translatable("rngtech.jei.exotic_affix_forge.info")
         );
-        registration.addItemStackInfo(
-                uniqueItemStacks(),
-                Component.translatable("rngtech.jei.unique.drop_find_only")
-        );
+        for (UniqueDefinition unique : UniqueCatalog.all()) {
+            registration.addItemStackInfo(List.of(uniqueStack(unique)), uniqueInfo(unique).toArray(Component[]::new));
+        }
         registration.addItemStackInfo(
                 ModItems.ASCENDANCY_SEALS.stream().map(seal -> new ItemStack(seal.get())).toList(),
                 Component.translatable("rngtech.jei.ascendancy_seal.info")
@@ -763,13 +769,44 @@ public final class RNGTechJeiPlugin implements IModPlugin {
         registration.addRecipeTransferHandler(new MetalPressRecipeTransferInfo());
     }
 
-    private static List<ItemStack> uniqueItemStacks() {
-        List<ItemStack> stacks = new ArrayList<>();
-        for (BatteryCellMaterial material : BatteryCellMaterial.values()) {
-            if (material.unique()) {
-                stacks.add(ModItems.batteryCell(material).get().getDefaultInstance());
-            }
+    private static ItemStack uniqueStack(UniqueDefinition unique) {
+        return new ItemStack(BuiltInRegistries.ITEM.get(RNGTech.id(unique.id())));
+    }
+
+    /** One information page per Unique: what it is, its ranges, where it works, and where it is found. */
+    private static List<Component> uniqueInfo(UniqueDefinition unique) {
+        List<Component> lines = new ArrayList<>();
+        lines.add(Component.translatable(
+                "rngtech.jei.unique.header",
+                Component.translatable(unique.translationKey()),
+                Component.translatable("rngtech.unique_host." + unique.host().serializedName()),
+                unique.slotStage()
+        ));
+        lines.add(Component.translatable(unique.descriptionKey()));
+        for (UniqueStatLine line : unique.lines()) {
+            lines.add(Component.literal("• ").append(UniqueTooltip.lineText(unique, line, null)));
         }
-        return stacks;
+        for (MachineBehavior behavior : unique.behaviors()) {
+            lines.add(Component.literal("• ").append(Component.translatable(
+                    "rngtech.tooltip.behavior",
+                    Component.translatable(behavior.translationKey()),
+                    Component.translatable(behavior.descriptionKey())
+            )));
+        }
+        MutableComponent hosts = Component.empty();
+        List<UniqueStatReaders.Reader> readers = UniqueStatReaders.readers(unique.host()).stream()
+                .filter(reader -> unique.lines().stream().anyMatch(line -> UniqueStatReaders.reads(reader, line.stat()))
+                        || unique.behaviors().stream().anyMatch(behavior -> UniqueStatReaders.reads(reader, behavior)))
+                .toList();
+        for (int index = 0; index < readers.size(); index++) {
+            if (index > 0) {
+                hosts.append(", ");
+            }
+            hosts.append(Component.translatable("rngtech.unique_reader." + readers.get(index).name().toLowerCase(java.util.Locale.ROOT)));
+        }
+        lines.add(Component.translatable("rngtech.jei.unique.hosts", hosts));
+        lines.add(Component.translatable("rngtech.jei.unique.source", Component.translatable(unique.sourceKey())));
+        lines.add(Component.translatable("rngtech.jei.unique.identify"));
+        return lines;
     }
 }

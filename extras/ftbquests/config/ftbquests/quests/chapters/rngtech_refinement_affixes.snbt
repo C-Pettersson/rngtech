@@ -11,6 +11,26 @@
 	quest_links: [ ]
 	quests: [
 		{
+			dependencies: ["37A6C9E1284B5D12"]
+			id: "C029A39B5659FEE9"
+			tasks: [{
+				id: "B110B4865E8713AF"
+				type: "checkmark"
+			}]
+			x: 0.0d
+			y: 2.5d
+		}
+		{
+			dependencies: ["C029A39B5659FEE9"]
+			id: "1B2ED2616C7CD0DE"
+			tasks: [{
+				id: "CF71266277760952"
+				type: "checkmark"
+			}]
+			x: 0.0d
+			y: 4.5d
+		}
+		{
 			dependencies: ["37A6C9E1284B5D10"]
 			id: "37A6C9E1284B5D12"
 			tasks: [{

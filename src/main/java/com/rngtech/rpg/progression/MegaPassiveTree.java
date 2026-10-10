@@ -165,6 +165,8 @@ public final class MegaPassiveTree {
             case MELTER -> new double[] {10, 0, 10};
         };
         MachineStat[] attributes = {MachineStat.CONTROL, MachineStat.DRIVE, MachineStat.RESERVE};
+        Ascendancy chosen = AscendancyCatalog.get(state.ascendancy());
+        stats.setAscendancy(chosen != null && chosen.family() == family ? chosen.id() : "");
         try (MachineStatAccumulator.Source ignored = stats.source(Component.translatable("rngtech.stat.breakdown.source.inherent"))) {
             for (int i = 0; i < attributes.length; i++) { apply(stats, attributes[i], ModifierOperation.ADD, base[i]); }
         }

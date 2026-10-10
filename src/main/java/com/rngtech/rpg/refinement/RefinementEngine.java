@@ -19,6 +19,7 @@ import com.rngtech.rpg.ModifierSlot;
 import com.rngtech.rpg.ModifierValueRange;
 import com.rngtech.rpg.Rarity;
 import com.rngtech.rpg.corruption.CorruptionCatalog;
+import com.rngtech.rpg.unique.UniqueDefinition;
 
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.item.ItemStack;
@@ -106,6 +107,21 @@ public final class RefinementEngine {
             Set<ModifierLensTag> lensTags,
             RandomSource random
     ) {
+        return apply(profile, traits, operation, componentStage, selection, modifier, lensTags, random, null);
+    }
+
+    /** {@code unique} is the target's Unique definition, which a Volatile Catalyst's Reforged outcome rerolls, or null. */
+    public static RefinementResult apply(
+            ModifierEligibilityProfile profile,
+            MachineTraits traits,
+            RefinementOperation operation,
+            int componentStage,
+            RefinementSelection selection,
+            RefinementModifier modifier,
+            Set<ModifierLensTag> lensTags,
+            RandomSource random,
+            UniqueDefinition unique
+    ) {
         if (traits.isCorrupted()) {
             return RefinementResult.failure(traits, CORRUPTED_FAILURE);
         }
@@ -172,7 +188,7 @@ public final class RefinementEngine {
             case TARGETED_ADD_OR_UPGRADE -> targetedAddOrUpgrade(profile, traits, operation, componentStage, selection, modifier, random);
             case FULL_REROLL -> fullReroll(profile, traits, componentStage, random);
             case FILL_OPEN_SLOTS -> fillOpenSlots(profile, traits, componentStage, random);
-            case CORRUPT -> corrupt(profile, traits, componentStage, modifier, random);
+            case CORRUPT -> corrupt(profile, traits, componentStage, modifier, unique, random);
         };
     }
 
@@ -1096,6 +1112,7 @@ public final class RefinementEngine {
             MachineTraits traits,
             int componentStage,
             RefinementModifier refinementModifier,
+            UniqueDefinition unique,
             RandomSource random
     ) {
         CorruptionCatalog catalog = CorruptionCatalog.active();
@@ -1114,7 +1131,9 @@ public final class RefinementEngine {
                 }
             }
             case REFORGED -> {
-                List<MachineModifier> reforged = reforgedModifiers(profile, traits, componentStage, random);
+                List<MachineModifier> reforged = traits.rarity() == Rarity.UNIQUE
+                        ? reforgedUniqueLines(traits, unique, random)
+                        : reforgedModifiers(profile, traits, componentStage, random);
                 if (reforged != null) {
                     corrupted = withModifiers(traits, traits.rarity(), traits.refinementPotential(), reforged);
                     corruption = MachineCorruption.of(CorruptionOutcome.REFORGED);
@@ -1141,8 +1160,7 @@ public final class RefinementEngine {
 
     /**
      * Rerolls every prefix and suffix from legal pools like a Chaos Crystal, keeping rarity, Refinement Potential and
-     * non-affix modifiers. Returns null when there is nothing to reroll. Uniques have no ranged stat lines until the
-     * Unique catalog lands, so they fall back to Untouched.
+     * non-affix modifiers. Returns null when there is nothing to reroll.
      */
     private static List<MachineModifier> reforgedModifiers(
             ModifierEligibilityProfile profile,
@@ -1166,6 +1184,21 @@ public final class RefinementEngine {
         if (count(modifiers, ModifierSlot.PREFIX) + count(modifiers, ModifierSlot.SUFFIX) == 0) {
             return null;
         }
+        return modifiers;
+    }
+
+    /**
+     * Rerolls every ranged line of a Unique inside its catalog range, as identification does. Fixed lines and behaviors
+     * stay. Returns null without a definition or with no ranged lines, so the outcome falls back to Untouched.
+     */
+    private static List<MachineModifier> reforgedUniqueLines(MachineTraits traits, UniqueDefinition unique, RandomSource random) {
+        if (unique == null || !unique.hasRangedLines()) {
+            return null;
+        }
+        List<MachineModifier> modifiers = new ArrayList<>(traits.modifiers().stream()
+                .filter(modifier -> modifier.slot() != ModifierSlot.UNIQUE)
+                .toList());
+        modifiers.addAll(unique.roll(random).modifiers());
         return modifiers;
     }
 

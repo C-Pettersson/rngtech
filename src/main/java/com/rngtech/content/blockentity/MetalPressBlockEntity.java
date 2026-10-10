@@ -3,9 +3,10 @@ package com.rngtech.content.blockentity;
 import com.rngtech.content.block.BaseMachineBlock;
 import com.rngtech.content.block.MetalPressBlock;
 import com.rngtech.content.item.BatteryCellItem;
+import com.rngtech.content.item.GearParts;
 import com.rngtech.content.item.MachinePartItem;
-import com.rngtech.content.item.ServoItem;
-import com.rngtech.content.item.SolidFuelBurnerPartItem;
+import com.rngtech.content.loot.ChallengeContext;
+import com.rngtech.content.loot.ChallengeLoot;
 import com.rngtech.content.menu.MasteryMenuSupport;
 import com.rngtech.content.menu.MetalPressMenu;
 import com.rngtech.content.recipe.MetalPressRecipe;
@@ -16,6 +17,7 @@ import com.rngtech.content.registry.ModRecipes;
 import com.rngtech.content.registry.ModTags;
 import com.rngtech.rpg.BatchProcessing;
 import com.rngtech.rpg.ComponentBaseStatCatalog;
+import com.rngtech.rpg.EscapementState;
 import com.rngtech.rpg.MachineBaseStatCatalog;
 import com.rngtech.rpg.MachineBehavior;
 import com.rngtech.rpg.MachineImplicitCatalog;
@@ -270,6 +272,7 @@ public class MetalPressBlockEntity extends BaseMachineBlockEntity
         MetalPressRecipe recipe = press.nextRecipe();
         MachineStatAccumulator stats = press.routeStats(recipe, press.effectiveStats());
         if (recipe == null || !press.hasRequiredComponents()) {
+            press.escapement.idle();
             boolean swapping = press.rackMolds(stats);
             press.resetCycleIfActive();
             // Quick Change keeps the press hot while Mold Rack swaps.
@@ -284,6 +287,7 @@ public class MetalPressBlockEntity extends BaseMachineBlockEntity
             press.resetBulkSpeed();
         }
         press.moldSwapTicks = 0;
+        press.escapement.observe(recipe);
         press.rememberHeatEnvelope(recipe, stats);
 
         if (press.effectiveHeat(stats) < recipe.targetTemperature()
@@ -621,13 +625,11 @@ public class MetalPressBlockEntity extends BaseMachineBlockEntity
     }
 
     public static boolean isHeatCore(ItemStack stack) {
-        return stack.getItem() instanceof SolidFuelBurnerPartItem part
-                && part.partType() == MachinePartType.HEAT_CORE
-                && part.stage() <= 6;
+        return GearParts.is(stack, MachinePartType.HEAT_CORE, 6);
     }
 
     public static boolean isServo(ItemStack stack) {
-        return stack.getItem() instanceof ServoItem;
+        return GearParts.is(stack, MachinePartType.SERVO);
     }
 
     public static boolean isPlateMold(ItemStack stack) {
@@ -788,6 +790,7 @@ public class MetalPressBlockEntity extends BaseMachineBlockEntity
         for (int job = 0; job < jobs; job++) {
             grantRecipeXp(recipe);
         }
+        escapement.completed();
         resetCycle();
         setChanged();
         return true;
@@ -873,6 +876,8 @@ public class MetalPressBlockEntity extends BaseMachineBlockEntity
         mergeOutput(failed);
         resetCycle();
         resetBulkSpeed();
+        ChallengeLoot.reward(level, worldPosition, ChallengeLoot.HEAT_FAILURE,
+                ChallengeContext.of(this).withRecipeStage(recipe.machineXpBand()), processInventory, SLOT_OUTPUT);
         setChanged();
         return true;
     }
@@ -918,9 +923,15 @@ public class MetalPressBlockEntity extends BaseMachineBlockEntity
     }
 
     private int processingTicks(MetalPressRecipe recipe, MachineStatAccumulator stats) {
-        int ticks = Math.max(1, (int) Math.ceil(stats.adjustedHeatProcessingTicks(recipe.processingTicks()) / routeSpeed(recipe, stats)));
+        int ticks = Math.max(1, (int) Math.ceil(stats.adjustedHeatProcessingTicks(recipe.processingTicks())
+                / (routeSpeed(recipe, stats) * escapementSpeed(stats))));
         return BatchProcessing.batchTicks(ticks, stats, batchJobs(recipe, stats));
     }
+
+    private double escapementSpeed(MachineStatAccumulator stats) {
+        return escapement.speed(MachineImplicitCatalog.hasBehavior(servoStack(), MachineBehavior.ESCAPEMENT), stats);
+    }
+
 
     private int energyCostPerTick(MetalPressRecipe recipe, MachineStatAccumulator stats) {
         int adjustedTicks = processingTicks(recipe, stats);
@@ -1147,6 +1158,8 @@ public class MetalPressBlockEntity extends BaseMachineBlockEntity
                 && ItemStack.isSameItemSameComponents(activeMold, moldStack());
     }
 
+    private final EscapementState escapement = new EscapementState();
+
     private void resetCycleIfActive() {
         if (progress != 0
                 || failureStrain != 0
@@ -1182,7 +1195,7 @@ public class MetalPressBlockEntity extends BaseMachineBlockEntity
 
     private void applyHeatCoreStats(MachineStatAccumulator stats) {
         ItemStack stack = heatCoreStack();
-        if (!(stack.getItem() instanceof SolidFuelBurnerPartItem part) || !isHeatCore(stack)) {
+        if (!isHeatCore(stack)) {
             return;
         }
         stats.apply(stack.getHoverName(), new MachineModifier(

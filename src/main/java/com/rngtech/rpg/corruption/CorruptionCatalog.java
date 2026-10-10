@@ -59,6 +59,8 @@ public final class CorruptionCatalog {
     private static final Set<MachineStat> STAGE_ACCEPTANCE_STATS =
             EnumSet.of(MachineStat.UPGRADE_LIMIT, MachineStat.MINING_LEVEL);
 
+    private static final String UNIQUE_PREFIX = "unique_";
+
     private static volatile CorruptionCatalog active;
 
     private final Map<CorruptionOutcome, Integer> weights;
@@ -206,7 +208,7 @@ public final class CorruptionCatalog {
 
     /** Whether the host has any implicit to grant. Hosts without a pool cannot be corrupted. */
     public boolean canCorrupt(String hostId) {
-        Pools pools = hosts.get(hostId);
+        Pools pools = hosts.get(poolHost(hostId));
         return pools != null && (!pools.blessed().isEmpty() || !pools.blighted().isEmpty());
     }
 
@@ -215,7 +217,7 @@ public final class CorruptionCatalog {
     }
 
     public List<Entry> entries(String hostId, CorruptionOutcome outcome) {
-        Pools pools = hosts.get(hostId);
+        Pools pools = hosts.get(poolHost(hostId));
         return pools == null ? List.of() : pools.entries(outcome);
     }
 
@@ -261,6 +263,14 @@ public final class CorruptionCatalog {
             }
         }
         return entries.getLast();
+    }
+
+    /** A Unique part's {@code unique_<part>} profile draws from its part's pools unless a pool names it directly. */
+    private String poolHost(String hostId) {
+        if (!hosts.containsKey(hostId) && hostId.startsWith(UNIQUE_PREFIX)) {
+            return hostId.substring(UNIQUE_PREFIX.length());
+        }
+        return hostId;
     }
 
     /** Why {@code stat} cannot appear in a 2.0 pool, or null when it can. */

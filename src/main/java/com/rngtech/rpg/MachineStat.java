@@ -123,7 +123,9 @@ public enum MachineStat implements StringRepresentable {
     GROWTH_PULSE,
     WORK_RANGE,
     IDLE_CART_SPEED,
-    BATCH_OVERHEAD;
+    BATCH_OVERHEAD,
+    CYCLE_JAM_CHANCE,
+    ESCAPEMENT_SPEED;
 
     public static final Codec<MachineStat> CODEC = Codec.STRING.comapFlatMap(
             name -> {

@@ -4,8 +4,10 @@ import com.rngtech.RNGTechConfig;
 import com.rngtech.content.block.BaseMachineBlock;
 import com.rngtech.content.block.CrusherBlock;
 import com.rngtech.content.item.BatteryCellItem;
-import com.rngtech.content.item.CrushHeadItem;
+import com.rngtech.content.item.GearParts;
 import com.rngtech.content.item.MachinePartItem;
+import com.rngtech.content.loot.ChallengeContext;
+import com.rngtech.content.loot.ChallengeLoot;
 import com.rngtech.content.machine.CrushHeadMaterial;
 import com.rngtech.content.machine.CrusherChassisMaterial;
 import com.rngtech.content.menu.CrusherMenu;
@@ -649,11 +651,11 @@ public class CrusherBlockEntity extends BaseMachineBlockEntity implements MenuPr
         MachineTraits activeTraits = MachineImplicitCatalog.effectiveTraits(machineTraits(), getBlockState().getBlock());
         stats.apply(activeTraits);
 
+        CrusherPassiveTree.applyStats(stats, machineProgression());
         ItemStack crushHead = crushHeadStack();
         if (isAllowedCrushHead(crushHead)) {
             ComponentBaseStatCatalog.applyEffectiveContribution(stats, crushHead);
         }
-        CrusherPassiveTree.applyStats(stats, machineProgression());
         if (!hasBatteryCell()) {
             stats.apply(MachineStatAccumulator.NO_BATTERY_SOURCE, new MachineModifier(
                     ModifierSlot.IMPLICIT,
@@ -913,6 +915,8 @@ public class CrusherBlockEntity extends BaseMachineBlockEntity implements MenuPr
         resetProgress();
         jawJamTicks = ticks;
         dropJamDebris(recipe);
+        ChallengeLoot.reward(level, worldPosition, ChallengeLoot.CRUSHER_JAM,
+                ChallengeContext.of(this).withRecipeStage(recipe.requiredProcessingLevel()), inventory, SLOT_OUTPUT);
         return true;
     }
 
@@ -1168,10 +1172,10 @@ public class CrusherBlockEntity extends BaseMachineBlockEntity implements MenuPr
     }
 
     private boolean isAllowedCrushHead(ItemStack stack) {
-        if (!(stack.getItem() instanceof CrushHeadItem head) || head.material().stage() > supportedCrushHeadStage()) {
+        if (!GearParts.is(stack, MachinePartType.CRUSH_HEAD, supportedCrushHeadStage())) {
             return false;
         }
-        return !matchingStageCrushHeadRequired() || head.material().stage() == chassisMaterial().stage();
+        return !matchingStageCrushHeadRequired() || GearParts.stage(stack) == chassisMaterial().stage();
     }
 
     private int supportedCrushHeadStage() {
@@ -1206,7 +1210,7 @@ public class CrusherBlockEntity extends BaseMachineBlockEntity implements MenuPr
         }
         ItemStack crushHead = crushHeadStack();
         return crushHead.isEmpty()
-                || crushHead.getItem() instanceof CrushHeadItem head && head.material().stage() == chassisMaterial().stage();
+                || GearParts.is(crushHead, MachinePartType.CRUSH_HEAD) && GearParts.stage(crushHead) == chassisMaterial().stage();
     }
 
     private static int clampLongToInt(long value) {
@@ -1347,8 +1351,8 @@ public class CrusherBlockEntity extends BaseMachineBlockEntity implements MenuPr
         if (MegaPassiveTree.has(state, "BLOCK_BATTERY") && isBatteryCell(inventory.getStackInSlot(SLOT_FUEL))) { return false; }
         ItemStack headStack = crushHeadStack();
         if (headStack.isEmpty()) { return true; }
-        if (!(headStack.getItem() instanceof CrushHeadItem head)) { return false; }
-        int stage = head.material().stage();
+        if (!GearParts.is(headStack, MachinePartType.CRUSH_HEAD)) { return false; }
+        int stage = GearParts.stage(headStack);
         return MegaPassiveTree.has(state, "MATCHING_HEAD") ? stage == chassisMaterial().stage()
                 : stage <= chassisMaterial().stage() + MegaPassiveTree.passive(state, PassiveStatType.COMPONENT_STAGE_SUPPORT);
     }

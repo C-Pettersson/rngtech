@@ -19,7 +19,9 @@ public enum BatteryCellMaterial implements StringRepresentable {
     NULLITE(7, 1600000, 4096, 2048, 1.02, 0.02),
     AETHERGOLD(7, 1200000, 6144, 3072, 1.03, 0.00),
     EXOTIC(8, 10000000, 8192, 4096, 1.06, 0.00),
-    UNIQUE_POTATO(0, 10000, 128, 64, 0.60, 6.00, true);
+    UNIQUE_POTATO(0, 10000, 128, 64, 0.60, 6.00, "unique_potato_battery_cell"),
+    /** A burst cell: steady output is half the Invar cell's, and its Unique lines feed the Battery Chassis. */
+    BASTION_COIN_STACK(4, 40000, 512, 128, 1.00, 0.40, "bastion_coin_stack_capacitor");
 
     public static final Codec<BatteryCellMaterial> CODEC = StringRepresentable.fromEnum(BatteryCellMaterial::values);
     public static final StreamCodec<ByteBuf, BatteryCellMaterial> STREAM_CODEC =
@@ -33,6 +35,7 @@ public enum BatteryCellMaterial implements StringRepresentable {
     private final double efficiency;
     private final double idleLossPercentPerMinute;
     private final boolean unique;
+    private final String itemId;
     private final String serializedName;
 
     BatteryCellMaterial(
@@ -43,7 +46,7 @@ public enum BatteryCellMaterial implements StringRepresentable {
             double efficiency,
             double idleLossPercentPerMinute
     ) {
-        this(stage, capacity, inputRate, outputRate, efficiency, idleLossPercentPerMinute, false);
+        this(stage, capacity, inputRate, outputRate, efficiency, idleLossPercentPerMinute, null);
     }
 
     BatteryCellMaterial(
@@ -53,7 +56,7 @@ public enum BatteryCellMaterial implements StringRepresentable {
             int outputRate,
             double efficiency,
             double idleLossPercentPerMinute,
-            boolean unique
+            String uniqueItemId
     ) {
         this.stage = stage;
         this.capacity = capacity;
@@ -61,8 +64,9 @@ public enum BatteryCellMaterial implements StringRepresentable {
         this.outputRate = outputRate;
         this.efficiency = efficiency;
         this.idleLossPercentPerMinute = idleLossPercentPerMinute;
-        this.unique = unique;
+        unique = uniqueItemId != null;
         serializedName = name().toLowerCase(Locale.ROOT);
+        itemId = unique ? uniqueItemId : serializedName + "_battery_cell";
     }
 
     public static BatteryCellMaterial byId(int id) {
@@ -98,7 +102,7 @@ public enum BatteryCellMaterial implements StringRepresentable {
     }
 
     public String itemId() {
-        return serializedName + "_battery_cell";
+        return itemId;
     }
 
     public String materialId() {

@@ -2,7 +2,7 @@
 
 Source: [draft design](corruption.md).
 
-Status: **Prototype** for the 2.0 release. The PRD was accepted on 2026-10-05. Phases 2 to 6 are in on `feature/corruption-prd-implementation-d6f800`, including the optional Jade, JEI, and filter work. Corrupting Uniques works on the one existing Unique; Reforged on a Unique waits for the Unique catalog. Everything still needs an in-game playtest.
+Status: **Prototype** for the 2.0 release. The PRD was accepted on 2026-10-05. Phases 2 to 6 are in on `feature/corruption-prd-implementation-d6f800`, including the optional Jade, JEI, and filter work. Merged with the Unique catalog: Uniques accept the catalyst, Reforged rerolls their ranged lines, and Unique parts draw implicits from their part's pools. Everything still needs an in-game playtest.
 
 ## Scope checklist
 
@@ -14,7 +14,7 @@ Status: **Prototype** for the 2.0 release. The PRD was accepted on 2026-10-05. P
 - [x] Item and sources: the Volatile Catalyst, `max_stability` on calibration requirements, the Malformed Ingot stage ingredient, Jam Debris and the Crusher jam drop, the Stage 5 catalyst recipe, and its config condition.
 - [x] UI: tooltips, the Affix Forge outcome preview, Refinement tab hover text, Jade, JEI, and optional filter matching.
 - [x] Documentation: Progression, Affix Forge, Exotic Affix Forge, Rarity, the implementation matrix, and quests.
-- [ ] Reforged on a Unique rerolls its ranged lines. Needs the Unique catalog; until then it falls back to Untouched.
+- [x] Reforged on a Unique rerolls its ranged lines inside their catalog ranges.
 - [ ] In-game playtest of every outcome on every station.
 
 ## Decisions
@@ -61,6 +61,7 @@ Recorded 2026-10-10 during implementation:
 - No Stage 5 kinetic calibration existed, so `calibration_kinetic_sparksteel_gear` makes one with a 20-60 stability roll. It recycles into an Iron Gear like the other kinetic components.
 - Jam Debris drops into the Crusher output slot only when the slot is empty or already holds debris. The loop audit counts one free debris per jam on a level 5+ recipe.
 - The Advanced Item Filter's Identity button gained Corrupt and Intact modes.
+- After the Uniques merge, `unique_<part>` profiles fall back to their part's pools, `RefinementEngine.apply` takes the target's `UniqueDefinition` so Reforged can reroll its lines, Warped leaves Unique lines alone, and the Unique tooltip shows the Corrupted line and implicit. Corruption keeps its own `CorruptionHostReaders` rather than the Unique stat-reader table, because pools are keyed by eligibility profile, not by host machine.
 - Warped skips any affix with a yield or Refinement Potential effect, so it cannot push yield past the loop-audit bounds. One factor applies to every effect of an affix, so drawbacks scale with benefits. Reductions stop short of 100%. Results round like a normal roll, to whole percents for percent, more, and less affixes and to the original's decimal places for flat ones, so Warped rarely changes a +1 Batch Size or slot affix. The Corrupted tooltip line now names the outcome, so Warped and Reforged items are recognizable.
 - Blessed pools now list 2 to 7 entries per host, with subset pools for Stability, Efficiency, Processing Speed, Fuel, and Energy Capacity where the host's affixes roll them.
 

@@ -911,7 +911,7 @@ async function knownComponentStageEntries() {
         stageEntry(`${entry.name}_compressor_tank`, javaNumber(entry.args[0]), "CompressorTankMaterial")
     ]);
     await appendEnumStages(entries, path.join(ENERGY_SRC, "BatteryCellMaterial.java"), (entry) => [
-        stageEntry(`${entry.name}_battery_cell`, javaNumber(entry.args[0]), "BatteryCellMaterial")
+        stageEntry(entry.args[6] ? javaString(entry.args[6]) : `${entry.name}_battery_cell`, javaNumber(entry.args[0]), "BatteryCellMaterial")
     ]);
     await appendEnumStages(entries, path.join(ENERGY_SRC, "BatteryChassisMaterial.java"), (entry) => [
         stageEntry(`${entry.name}_battery_chassis`, javaNumber(entry.args[0]), "BatteryChassisMaterial")
@@ -1787,7 +1787,7 @@ function modifierProfileIdForItem(id) {
     if (id.startsWith("rngtech:pseudo/")) {
         return null;
     }
-    if (local === "unique_potato_battery_cell") {
+    if (local === "unique_potato_battery_cell" || local === "bastion_coin_stack_capacitor") {
         return "unique_battery_cell";
     }
     if (local.endsWith("_battery_cell")) {

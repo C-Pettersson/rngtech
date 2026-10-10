@@ -2,9 +2,13 @@ package com.rngtech.content.minerscompanion;
 
 import com.rngtech.content.item.AdvancedItemFilterItem;
 import com.rngtech.content.item.BatteryCellItem;
-import com.rngtech.content.item.CrushHeadItem;
+import com.rngtech.content.item.GearParts;
 import com.rngtech.content.item.PotentialReactorPartItem;
 import com.rngtech.content.registry.ModItems;
+import com.rngtech.rpg.ComponentBaseStatCatalog;
+import com.rngtech.rpg.MachinePartType;
+import com.rngtech.rpg.MachineStat;
+import com.rngtech.rpg.MachineStatAccumulator;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
@@ -137,7 +141,8 @@ public record MinersCompanionState(
     }
 
     public int processingLevel() {
-        return crushHead.getItem() instanceof CrushHeadItem head ? head.material().processingLevel() : 0;
+        MachineStatAccumulator stats = validCrushHead(crushHead) ? ComponentBaseStatCatalog.effectiveStats(crushHead) : null;
+        return stats == null ? 0 : stats.intValue(MachineStat.PROCESSING_LEVEL);
     }
 
     public int recoveryFilterStage() {
@@ -147,7 +152,7 @@ public record MinersCompanionState(
     }
 
     public static boolean validCrushHead(ItemStack stack) {
-        return stack.getItem() instanceof CrushHeadItem;
+        return GearParts.is(stack, MachinePartType.CRUSH_HEAD);
     }
 
     public static boolean validRecoveryFilter(ItemStack stack) {

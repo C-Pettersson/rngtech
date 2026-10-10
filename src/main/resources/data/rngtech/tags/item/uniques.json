@@ -1,0 +1,14 @@
+{
+  "replace": false,
+  "values": [
+    "rngtech:unique_potato_battery_cell",
+    "rngtech:fortress_heater_element",
+    "rngtech:igloo_basement_thermostat",
+    "rngtech:mineshaft_worn_pick_jaw",
+    "rngtech:crying_crucible",
+    "rngtech:trial_vault_escapement",
+    "rngtech:witch_bottle_reflux_pump",
+    "rngtech:ancient_echo_control_board",
+    "rngtech:bastion_coin_stack_capacitor"
+  ]
+}

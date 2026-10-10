@@ -1,0 +1,37 @@
+{
+    "id": "rngtech:igloo_basement_thermostat",
+    "host": "heat_core",
+    "slot_stage": 2,
+    "base_profile": "rngtech:bronze_heat_core",
+    "stats": {
+        "rngtech:temperature_stability": {
+            "operation": "more",
+            "min": 0.4,
+            "max": 0.8,
+            "role": "signature"
+        },
+        "rngtech:overheat_tolerance": {
+            "operation": "more",
+            "min": 0.4,
+            "max": 0.8,
+            "role": "signature"
+        },
+        "rngtech:heat_window": {
+            "operation": "flat",
+            "min": 5,
+            "max": 15,
+            "role": "hook",
+            "ascendancy": "drop_forge"
+        },
+        "rngtech:heat_transfer": {
+            "operation": "more",
+            "min": -0.35,
+            "max": -0.2,
+            "role": "drawback"
+        }
+    },
+    "behaviors": [
+        "rngtech:power_grace"
+    ],
+    "source": "rngtech:unique_source.igloo_basement"
+}

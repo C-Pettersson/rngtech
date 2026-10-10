@@ -78,6 +78,7 @@ import com.rngtech.content.item.SolidFuelBurnerBlockItem;
 import com.rngtech.content.item.SolidFuelBurnerPartItem;
 import com.rngtech.content.item.ToolHeadItem;
 import com.rngtech.content.item.ToolRodItem;
+import com.rngtech.content.item.UniquePartItem;
 import com.rngtech.content.item.UniversalConnectorItem;
 import com.rngtech.content.item.VacuumCollapsePartItem;
 import com.rngtech.content.item.WrenchItem;
@@ -108,6 +109,9 @@ import com.rngtech.rpg.MachineType;
 import com.rngtech.rpg.ModifierLensTag;
 import com.rngtech.rpg.refinement.RefinementModifier;
 import com.rngtech.rpg.refinement.RefinementOperation;
+import com.rngtech.rpg.unique.UniqueCatalog;
+import com.rngtech.rpg.unique.UniqueDefinition;
+import com.rngtech.rpg.unique.UniqueHost;
 
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.BucketItem;
@@ -124,6 +128,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public final class ModItems {
     private static final DeferredRegister.Items ITEMS = DeferredRegister.createItems(RNGTech.MOD_ID);
@@ -795,6 +800,11 @@ public final class ModItems {
     public static final DeferredItem<Item> CRUSHED_IRON = materialItem("crushed_iron");
     public static final DeferredItem<Item> CRUSHED_GOLD = materialItem("crushed_gold");
     public static final DeferredItem<Item> CRUSHED_COPPER = materialItem("crushed_copper");
+    /**
+     * Every catalog Unique that is machine Gear, keyed by catalog id; Unique Battery Cells register as Battery Cells. Declared
+     * last, so a pack Unique whose id an RNGTech item already uses is found and skipped.
+     */
+    public static final Map<String, DeferredItem<UniquePartItem>> UNIQUE_PARTS = registerUniqueParts();
 
     public static List<DeferredItem<RefinementLensItem>> modifierLenses() {
         return List.of(
@@ -1232,6 +1242,24 @@ public final class ModItems {
                     () -> new BatteryCellItem(material, new Item.Properties().stacksTo(1))
             );
             items.put(material, item);
+        }
+        return Collections.unmodifiableMap(items);
+    }
+
+    private static Map<String, DeferredItem<UniquePartItem>> registerUniqueParts() {
+        Map<String, DeferredItem<UniquePartItem>> items = new LinkedHashMap<>();
+        Set<String> registered = ITEMS.getEntries().stream().map(entry -> entry.getId().getPath()).collect(Collectors.toSet());
+        for (UniqueDefinition definition : List.copyOf(UniqueCatalog.all())) {
+            if (UniqueCatalog.isExternal(definition.id()) && registered.contains(definition.id())) {
+                UniqueCatalog.rejectExternal(definition.id(), "an RNGTech item already uses this id");
+                continue;
+            }
+            if (definition.host() != UniqueHost.BATTERY_CELL) {
+                items.put(definition.id(), ITEMS.register(
+                        definition.id(),
+                        () -> new UniquePartItem(definition, new Item.Properties().stacksTo(1))
+                ));
+            }
         }
         return Collections.unmodifiableMap(items);
     }

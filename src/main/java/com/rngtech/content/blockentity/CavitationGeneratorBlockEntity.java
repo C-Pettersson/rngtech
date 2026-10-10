@@ -4,9 +4,8 @@ import com.rngtech.content.block.BaseMachineBlock;
 import com.rngtech.content.item.BatteryCellItem;
 import com.rngtech.content.item.CavitationPartItem;
 import com.rngtech.content.item.CollapseNozzleItem;
+import com.rngtech.content.item.GearParts;
 import com.rngtech.content.item.MachinePartItem;
-import com.rngtech.content.item.ServoItem;
-import com.rngtech.content.item.SolidFuelBurnerPartItem;
 import com.rngtech.content.menu.CavitationGeneratorMenu;
 import com.rngtech.content.purge.FluidOutputOverflow;
 import com.rngtech.content.purge.FluidPurgeRole;
@@ -452,9 +451,7 @@ public class CavitationGeneratorBlockEntity extends BaseMachineBlockEntity
     }
 
     public boolean isHeatCore(ItemStack stack) {
-        return stack.getItem() instanceof SolidFuelBurnerPartItem part
-                && part.partType() == MachinePartType.HEAT_CORE
-                && part.stage() <= 8;
+        return GearParts.is(stack, MachinePartType.HEAT_CORE, 8);
     }
 
     public boolean isBatteryCell(ItemStack stack) {
@@ -462,7 +459,7 @@ public class CavitationGeneratorBlockEntity extends BaseMachineBlockEntity
     }
 
     public boolean isServo(ItemStack stack) {
-        return stack.getItem() instanceof ServoItem servo && servo.stage() >= 6;
+        return GearParts.is(stack, MachinePartType.SERVO) && GearParts.stage(stack) >= 6;
     }
 
     public boolean isKnownFluidContainer(ItemStack stack) {
@@ -970,7 +967,7 @@ public class CavitationGeneratorBlockEntity extends BaseMachineBlockEntity
     }
 
     private int heatCoreStage() {
-        return heatCoreStack().getItem() instanceof SolidFuelBurnerPartItem part ? part.stage() : 0;
+        return GearParts.is(heatCoreStack(), MachinePartType.HEAT_CORE) ? GearParts.stage(heatCoreStack()) : 0;
     }
 
     private void applyPartStats(MachineStatAccumulator stats, ItemStack stack) {
@@ -980,8 +977,7 @@ public class CavitationGeneratorBlockEntity extends BaseMachineBlockEntity
     }
 
     private void applyHeatCoreStats(MachineStatAccumulator stats, ItemStack stack) {
-        if (!(stack.getItem() instanceof SolidFuelBurnerPartItem part)
-                || part.partType() != MachinePartType.HEAT_CORE) {
+        if (!GearParts.is(stack, MachinePartType.HEAT_CORE)) {
             return;
         }
         MachineStatAccumulator contribution = ComponentBaseStatCatalog.effectiveStats(stack);

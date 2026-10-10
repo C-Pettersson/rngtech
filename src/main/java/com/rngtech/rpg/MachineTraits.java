@@ -106,11 +106,12 @@ public record MachineTraits(
             return withCorruptionEffects(stored);
         }
 
-        Rarity rarity = identity.rarity() == Rarity.UNIQUE ? Rarity.UNIQUE : stored.rarity();
-        int refinementPotential = identity.rarity() == Rarity.UNIQUE ? 0 : stored.refinementPotential();
+        boolean unique = identity.rarity() == Rarity.UNIQUE;
+        Rarity rarity = unique ? Rarity.UNIQUE : stored.rarity();
+        int refinementPotential = unique ? 0 : stored.refinementPotential();
         List<MachineModifier> mergedModifiers = new ArrayList<>(identity.modifiers());
         mergedModifiers.addAll(stored.modifiers().stream()
-                .filter(modifier -> modifier.slot().isAffix())
+                .filter(modifier -> modifier.slot().isAffix() || unique && modifier.slot() == ModifierSlot.UNIQUE)
                 .toList());
         List<MachineBehavior> mergedBehaviors = new ArrayList<>(identity.behaviors());
         mergedBehaviors.addAll(stored.behaviors());
@@ -123,15 +124,16 @@ public record MachineTraits(
         ));
     }
 
+    /** Stored traits keep affixes, and a Unique's rolls only while the stored rarity is Unique. */
     public static MachineTraits normalizedStored(MachineTraits traits) {
-        if (traits.modifiers().stream().allMatch(modifier -> modifier.slot().isAffix())) {
+        if (traits.modifiers().stream().allMatch(modifier -> keepsStored(traits, modifier))) {
             return traits;
         }
         return new MachineTraits(
                 traits.rarity(),
                 traits.refinementPotential(),
                 traits.modifiers().stream()
-                        .filter(modifier -> modifier.slot().isAffix())
+                        .filter(modifier -> keepsStored(traits, modifier))
                         .toList(),
                 traits.behaviors(),
                 traits.corruption()
@@ -166,5 +168,9 @@ public record MachineTraits(
             Optional<MachineCorruption> corruption
     ) {
         return new MachineTraits(rarity, refinementPotential, modifiers, behaviors, corruption.orElse(null));
+    }
+
+    private static boolean keepsStored(MachineTraits traits, MachineModifier modifier) {
+        return modifier.slot().isAffix() || traits.rarity() == Rarity.UNIQUE && modifier.slot() == ModifierSlot.UNIQUE;
     }
 }

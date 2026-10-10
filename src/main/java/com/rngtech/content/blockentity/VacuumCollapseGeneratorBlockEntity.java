@@ -5,6 +5,8 @@ import com.rngtech.content.block.VacuumCollapseGeneratorBlock;
 import com.rngtech.content.item.CollapseNozzleItem;
 import com.rngtech.content.item.MachinePartItem;
 import com.rngtech.content.item.VacuumCollapsePartItem;
+import com.rngtech.content.loot.ChallengeContext;
+import com.rngtech.content.loot.ChallengeLoot;
 import com.rngtech.content.menu.VacuumCollapseGeneratorMenu;
 import com.rngtech.content.recipe.VacuumCollapseRecipe;
 import com.rngtech.content.registry.ModBlockEntities;
@@ -454,7 +456,12 @@ public class VacuumCollapseGeneratorBlockEntity extends BaseMachineBlockEntity i
             return;
         }
         mergeResidue(pendingResidue);
+        int instability = (int) Math.round(activeInstability * 100.0);
         clearActiveRecipe();
+        MachineStatAccumulator stats = effectiveStats();
+        ChallengeLoot.reward(level, worldPosition, ChallengeLoot.VACUUM_COLLAPSE,
+                new ChallengeContext("vacuum_collapse_generator", stats.intValue(MachineStat.PROCESSING_LEVEL), 0, 0, instability, 0, ""),
+                processInventory, SLOT_RESIDUE);
         setChanged();
     }
 

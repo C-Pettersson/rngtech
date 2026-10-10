@@ -1,5 +1,6 @@
 package com.rngtech;
 
+import com.rngtech.content.command.RNGTechCommands;
 import com.rngtech.content.corruption.CorruptionDataEvents;
 import com.rngtech.content.item.CableItem;
 import com.rngtech.content.minerscompanion.MinersCompanionEvents;
@@ -12,6 +13,7 @@ import com.rngtech.content.registry.ModDataComponents;
 import com.rngtech.content.registry.ModEntityTypes;
 import com.rngtech.content.registry.ModFluids;
 import com.rngtech.content.registry.ModItems;
+import com.rngtech.content.registry.ModLoot;
 import com.rngtech.content.registry.ModMenus;
 import com.rngtech.content.registry.ModNetworking;
 import com.rngtech.content.registry.ModRecipes;
@@ -54,6 +56,7 @@ public final class RNGTech {
         ModRecipes.register(modBus);
         ModSounds.register(modBus);
         ModConditions.register(modBus);
+        ModLoot.register(modBus);
         ModCreativeTabs.register(modBus);
 
         modBus.addListener(this::commonSetup);
@@ -68,6 +71,7 @@ public final class RNGTech {
         NeoForge.EVENT_BUS.addListener(MinersCompanionEvents::onPlayerTick);
         NeoForge.EVENT_BUS.addListener(CorruptionDataEvents::onAddReloadListeners);
         NeoForge.EVENT_BUS.addListener(CorruptionDataEvents::onDatapackSync);
+        NeoForge.EVENT_BUS.addListener(RNGTechCommands::register);
 
         modContainer.registerConfig(ModConfig.Type.COMMON, RNGTechConfig.SPEC);
     }
