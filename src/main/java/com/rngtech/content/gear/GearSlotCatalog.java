@@ -379,14 +379,6 @@ public final class GearSlotCatalog {
                         anyStage()
                 ),
                 slot(
-                        "rngtech.gear.energy_connector",
-                        false,
-                        GearSlotArea.GEAR,
-                        SolarArrayControllerBlockEntity.SLOT_ENERGY_CONNECTOR,
-                        energyConnectors(tier -> true),
-                        anyRegistered()
-                ),
-                slot(
                         "rngtech.gear.solar_array_extender",
                         false,
                         GearSlotArea.GEAR,
@@ -493,14 +485,6 @@ public final class GearSlotCatalog {
                         CavitationGeneratorBlockEntity.SLOT_SERVO,
                         servos(servo -> servo.stage() >= 6),
                         minStage(6)
-                ),
-                slot(
-                        "rngtech.gear.energy_connector",
-                        false,
-                        GearSlotArea.GEAR,
-                        CavitationGeneratorBlockEntity.SLOT_ENERGY_CONNECTOR,
-                        energyConnectors(tier -> true),
-                        anyRegistered()
                 )
         ));
         specs.add(spec(
@@ -560,14 +544,6 @@ public final class GearSlotCatalog {
                         GearSlotArea.GEAR,
                         VacuumCollapseGeneratorBlockEntity.SLOT_DIMENSIONAL_STABILIZER,
                         vacuumParts(ModItems.DIMENSIONAL_STABILIZERS, material -> true),
-                        anyRegistered()
-                ),
-                slot(
-                        "rngtech.gear.energy_connector",
-                        false,
-                        GearSlotArea.GEAR,
-                        VacuumCollapseGeneratorBlockEntity.SLOT_ENERGY_CONNECTOR,
-                        energyConnectors(tier -> true),
                         anyRegistered()
                 )
         ));

@@ -427,7 +427,7 @@ public final class EnergyBalanceSimulation {
     /**
      * CavitationGeneratorBlockEntity: water recipe with steady-state heat strain (#coolDown, #currentGenerationRate).
      * FE per input is FE per rotor, since water is free and the rotor wears out. Delivered metrics cap output at the
-     * installed connector, or the generator's own transfer stat without one (#effectiveOutputRate).
+     * attached connector's tier.
      */
     private void cavitationGenerators() throws IOException {
         Recipe water = recipe("cavitation", "water");
@@ -457,10 +457,6 @@ public final class EnergyBalanceSimulation {
                             stats.apply(roller.machine(MachineType.CAVITATION_GENERATOR, 5));
                             MachineTraits rotorTraits = roller.part(MachinePartType.CAVITATION_ROTOR, MachineType.CAVITATION_GENERATOR, rotor.stage(), rotor.refinementPotential());
                             part(stats, ComponentBaseStatCatalog.cavitationRotor(rotor), rotorTraits);
-                            if (rotor == CavitationRotorMaterial.AETHERGOLD && scenario.aethergoldTransfer() != null) {
-                                stats.apply(new MachineModifier(ModifierSlot.IMPLICIT, MachineStat.ENERGY_TRANSFER, ModifierOperation.MORE,
-                                        scenario.aethergoldTransfer() / rotor.energyTransferMultiplier()));
-                            }
                             int durability = Math.max(1, (int) Math.round(ComponentBaseStatCatalog.effectiveStats(
                                     ComponentBaseStatCatalog.cavitationRotor(rotor), rotorTraits).value(MachineStat.DURABILITY)));
                             part(stats, ComponentBaseStatCatalog.collapseNozzle(nozzle),
@@ -488,7 +484,7 @@ public final class EnergyBalanceSimulation {
                             Outcome outcome = Outcome.running(steady[0], steady[0], fePerRotor)
                                     .withMetric("strainPenalty", 1.0 - steady[0] / (energy / ticks))
                                     .withMetric("rotorSeconds", fePerRotor / steady[0] / 20.0);
-                            connectorMetrics(outcome, steady[0], fePerRotor, stats, scenario.cavitationVent());
+                            connectorMetrics(outcome, steady[0], fePerRotor, scenario.cavitationVent());
                             return outcome;
                         });
                     }
@@ -498,12 +494,10 @@ public final class EnergyBalanceSimulation {
     }
 
     /**
-     * Output kept per connector tier, or the generator's own transfer stat without one (#effectiveOutputRate). Stalling
-     * keeps every FE for later; venting loses what the connector cannot take while the input is still consumed.
+     * Output kept per attached connector tier. Stalling keeps every FE for later; venting loses what the connector cannot
+     * take while the input is still consumed.
      */
-    private static void connectorMetrics(Outcome outcome, double generation, double perInput, MachineStatAccumulator stats, boolean vent) {
-        double fallback = Math.max(0, Math.round(stats.value(MachineStat.ENERGY_TRANSFER)));
-        connectorMetric(outcome, "none", generation, perInput, fallback, vent);
+    private static void connectorMetrics(Outcome outcome, double generation, double perInput, boolean vent) {
         for (EnergyConnectorTier tier : REPORTED_CONNECTORS) {
             connectorMetric(outcome, name(tier), generation, perInput, tier.transferRate(), vent);
         }
@@ -564,7 +558,7 @@ public final class EnergyBalanceSimulation {
                                 * Math.max(0.1, stats.value(MachineStat.EFFICIENCY))
                                 * (1.0 - Math.min(0.35, pressure * 0.08))));
                         Outcome outcome = Outcome.recipe(catalyst, energy, ticks);
-                        connectorMetrics(outcome, energy / ticks, energy, stats, scenario.vacuumVent());
+                        connectorMetrics(outcome, energy / ticks, energy, scenario.vacuumVent());
                         return outcome;
                     });
                 }
@@ -1450,14 +1444,13 @@ public final class EnergyBalanceSimulation {
             GearScale gearScale,
             boolean cavitationVent,
             boolean vacuumVent,
-            Double aethergoldTransfer,
             Mastery mastery
     ) {
         /** PotentialReactorBlockEntity: 15 remembered burns, x0.75 per repeat, floor 10%. */
         static final Fatigue CURRENT_FATIGUE = new Fatigue(16, 0.75, 0.10);
         /** Cavitation and Vacuum Collapse vent FE their buffer cannot hold instead of pausing. */
         static final Scenario CURRENT = new Scenario("current", "Current", new JsonObject(), 0, Map.of(), Solar.CURRENT, null, CURRENT_FATIGUE,
-                null, true, true, null, null);
+                null, true, true, null);
 
         /** Reactor gear-fuel bonus for a machine's Mastery: {@code (1 + level * perLevel) * (1 + sealTiers * perSealTier)}. */
         record Mastery(double perLevel, double perSealTier) {
@@ -1551,7 +1544,6 @@ public final class EnergyBalanceSimulation {
                     gearScale,
                     !json.has("cavitation_overflow") || "vent".equals(json.get("cavitation_overflow").getAsString()),
                     !json.has("vacuum_collapse_overflow") || "vent".equals(json.get("vacuum_collapse_overflow").getAsString()),
-                    json.has("aethergold_transfer_multiplier") ? json.get("aethergold_transfer_multiplier").getAsDouble() : null,
                     json.has("reactor_mastery")
                             ? new Mastery(json.getAsJsonObject("reactor_mastery").get("per_level").getAsDouble(),
                                     json.getAsJsonObject("reactor_mastery").get("per_seal_tier").getAsDouble())

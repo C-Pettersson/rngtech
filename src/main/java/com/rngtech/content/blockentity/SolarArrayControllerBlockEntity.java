@@ -3,7 +3,6 @@ package com.rngtech.content.blockentity;
 import com.rngtech.content.block.BaseMachineBlock;
 import com.rngtech.content.energy.SolarPanelMaterial;
 import com.rngtech.content.item.BatteryCellItem;
-import com.rngtech.content.item.EnergyConnectorItem;
 import com.rngtech.content.item.MachinePartItem;
 import com.rngtech.content.menu.SolarArrayControllerMenu;
 import com.rngtech.content.registry.ModBlockEntities;
@@ -16,7 +15,6 @@ import com.rngtech.rpg.MachineStat;
 import com.rngtech.rpg.MachineStatAccumulator;
 import com.rngtech.rpg.MachineTraits;
 import com.rngtech.rpg.MachineType;
-import com.rngtech.util.TickTransferCounter;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -52,9 +50,9 @@ import java.util.Set;
 
 public class SolarArrayControllerBlockEntity extends BaseMachineBlockEntity implements MenuProvider, MachineInfoProvider {
     public static final int SLOT_BATTERY_CELL = 0;
-    public static final int SLOT_ENERGY_CONNECTOR = 1;
-    public static final int SLOT_SOLAR_ARRAY_EXTENDER = 2;
-    public static final int GEAR_SLOT_COUNT = 3;
+    public static final int SLOT_SOLAR_ARRAY_EXTENDER = 1;
+    public static final int GEAR_SLOT_COUNT = 2;
+    private static final int LEGACY_SLOT_ENERGY_CONNECTOR = 1;
 
     public static final int STATUS_CLEAR = 0;
     public static final int STATUS_WEATHER = 1;
@@ -75,22 +73,20 @@ public class SolarArrayControllerBlockEntity extends BaseMachineBlockEntity impl
     private static final int DATA_STATUS = 6;
     private static final int DATA_ENERGY_GENERATION = 7;
     private static final int DATA_ENERGY_CAPACITY_STAT = 8;
-    private static final int DATA_ENERGY_TRANSFER = 9;
-    private static final int DATA_EFFICIENCY = 10;
-    private static final int DATA_STABILITY = 11;
-    private static final int DATA_REFINEMENT_POTENTIAL = 12;
-    private static final int DATA_PANEL_LIMIT = 13;
-    private static final int DATA_MOONLIGHT_CONVERSION = 14;
-    private static final int DATA_WEATHER_RECOVERY = 15;
-    private static final int DATA_PANEL_SYNCHRONIZATION = 16;
-    private static final int DATA_OVERFLOW_SHUNTING = 17;
-    private static final int DATA_CLEAR_SKY_AMPLIFICATION = 18;
-    private static final int DATA_LUNAR_INVERSION = 19;
-    private static final int DATA_CONNECTOR_OUTPUT_CAP = 20;
-    private static final int DATA_PREVIEW_RANGE = 21;
-    private static final int DATA_PANEL_RANGE = 22;
-    private static final int DATA_FLAT_ENERGY_GENERATION = 23;
-    private static final int DATA_BASE_ENERGY_GENERATION = 24;
+    private static final int DATA_EFFICIENCY = 9;
+    private static final int DATA_STABILITY = 10;
+    private static final int DATA_REFINEMENT_POTENTIAL = 11;
+    private static final int DATA_PANEL_LIMIT = 12;
+    private static final int DATA_MOONLIGHT_CONVERSION = 13;
+    private static final int DATA_WEATHER_RECOVERY = 14;
+    private static final int DATA_PANEL_SYNCHRONIZATION = 15;
+    private static final int DATA_OVERFLOW_SHUNTING = 16;
+    private static final int DATA_CLEAR_SKY_AMPLIFICATION = 17;
+    private static final int DATA_LUNAR_INVERSION = 18;
+    private static final int DATA_PREVIEW_RANGE = 19;
+    private static final int DATA_PANEL_RANGE = 20;
+    private static final int DATA_FLAT_ENERGY_GENERATION = 21;
+    private static final int DATA_BASE_ENERGY_GENERATION = 22;
     private static final int STAT_SCALE = 100;
 
     private final ItemStackHandler gearInventory = new ItemStackHandler(GEAR_SLOT_COUNT) {
@@ -98,7 +94,6 @@ public class SolarArrayControllerBlockEntity extends BaseMachineBlockEntity impl
         public boolean isItemValid(int slot, ItemStack stack) {
             return switch (slot) {
                 case SLOT_BATTERY_CELL -> isBatteryCell(stack);
-                case SLOT_ENERGY_CONNECTOR -> isEnergyConnector(stack);
                 case SLOT_SOLAR_ARRAY_EXTENDER -> isSolarArrayExtender(stack);
                 default -> false;
             };
@@ -126,7 +121,6 @@ public class SolarArrayControllerBlockEntity extends BaseMachineBlockEntity impl
     };
     private final IItemHandler emptyItemHandler = new EmptyItemHandler();
     private final IEnergyStorage energyStorage = new ControllerEnergyStorage();
-    private final TickTransferCounter exportBudget = new TickTransferCounter();
     private final EnergyTelemetry energyFlow = new EnergyTelemetry(this::getLevel);
     private final IEnergyStorage trackedEnergyStorage = energyFlow.track(energyStorage);
     private final ContainerData menuData = new ContainerData() {
@@ -137,7 +131,7 @@ public class SolarArrayControllerBlockEntity extends BaseMachineBlockEntity impl
                 case DATA_ENERGY -> energyStored();
                 case DATA_ENERGY_CAPACITY -> energyCapacity(stats);
                 case DATA_ENERGY_PER_TICK -> lastEnergyPerTick;
-                case DATA_MAX_OUTPUT -> effectiveOutputRate(stats);
+                case DATA_MAX_OUTPUT -> energyFlow.lastOutput();
                 case DATA_ACTIVE_PANELS -> lastActivePanelCount;
                 case DATA_BLOCKED_PANELS -> lastBlockedPanelCount;
                 case DATA_STATUS -> lastStatus;
@@ -145,7 +139,6 @@ public class SolarArrayControllerBlockEntity extends BaseMachineBlockEntity impl
                 case DATA_FLAT_ENERGY_GENERATION -> (int) Math.round(stats.effectiveFlatEnergyGenerationBonus() * STAT_SCALE);
                 case DATA_BASE_ENERGY_GENERATION -> (int) Math.round(baseEnergyPerTick() * STAT_SCALE);
                 case DATA_ENERGY_CAPACITY_STAT -> scaledStat(stats, MachineStat.ENERGY_CAPACITY);
-                case DATA_ENERGY_TRANSFER -> effectiveOutputRate(stats);
                 case DATA_EFFICIENCY -> scaledStat(stats, MachineStat.EFFICIENCY);
                 case DATA_STABILITY -> scaledStat(stats, MachineStat.STABILITY);
                 case DATA_REFINEMENT_POTENTIAL -> scaledStat(stats, MachineStat.REFINEMENT_POTENTIAL);
@@ -156,7 +149,6 @@ public class SolarArrayControllerBlockEntity extends BaseMachineBlockEntity impl
                 case DATA_OVERFLOW_SHUNTING -> scaledStat(stats, MachineStat.OVERFLOW_SHUNTING);
                 case DATA_CLEAR_SKY_AMPLIFICATION -> scaledStat(stats, MachineStat.CLEAR_SKY_AMPLIFICATION);
                 case DATA_LUNAR_INVERSION -> scaledStat(stats, MachineStat.LUNAR_INVERSION);
-                case DATA_CONNECTOR_OUTPUT_CAP -> connectorOutputCap();
                 case DATA_PREVIEW_RANGE -> previewRange ? 1 : 0;
                 case DATA_PANEL_RANGE -> panelRange(stats);
                 default -> 0;
@@ -189,6 +181,7 @@ public class SolarArrayControllerBlockEntity extends BaseMachineBlockEntity impl
     }
 
     public static void serverTick(Level level, BlockPos pos, BlockState state, SolarArrayControllerBlockEntity controller) {
+        controller.dropRemovedGear(level);
         boolean generated = controller.generateFromPanels(level);
         boolean exported = controller.exportEnergy(level, pos);
         BaseMachineBlock.setActive(level, pos, state, controller.lastEnergyPerTick > 0 && controller.lastStatus != STATUS_FULL);
@@ -239,17 +232,13 @@ public class SolarArrayControllerBlockEntity extends BaseMachineBlockEntity impl
 
     public void dropInventory(Level level) {
         dropSlot(level, gearInventory, SLOT_BATTERY_CELL);
-        dropSlot(level, gearInventory, SLOT_ENERGY_CONNECTOR);
         dropSlot(level, gearInventory, SLOT_SOLAR_ARRAY_EXTENDER);
+        dropRemovedGear(level);
         dropRefinementInventory(level);
     }
 
     public boolean isBatteryCell(ItemStack stack) {
         return BatteryCellItem.isBatteryCell(stack);
-    }
-
-    public boolean isEnergyConnector(ItemStack stack) {
-        return stack.getItem() instanceof EnergyConnectorItem;
     }
 
     public boolean isSolarArrayExtender(ItemStack stack) {
@@ -305,7 +294,12 @@ public class SolarArrayControllerBlockEntity extends BaseMachineBlockEntity impl
                 )
                 .status(statusKey(status))
                 .energy(energyStored(stats), energyCapacity(stats), active ? lastEnergyPerTick : 0)
-                .energyTelemetry(energyFlow.lastInput(), energyFlow.lastOutput(), connector.transferRate(), MachineInfoSnapshot.EnergyBottleneck.NONE)
+                .energyTelemetry(
+                        energyFlow.lastInput(),
+                        energyFlow.lastOutput(),
+                        connector.transferRate(),
+                        AdjacentEnergyConnector.outputBottleneck(connector, active ? lastEnergyPerTick : 0)
+                )
                 .gear(BatteryCellItem.isBatteryCell(batteryCellStack())
                         ? MachineInfoSnapshot.GearSummary.BATTERY_CELL_INSTALLED
                         : MachineInfoSnapshot.GearSummary.NONE)
@@ -556,12 +550,11 @@ public class SolarArrayControllerBlockEntity extends BaseMachineBlockEntity impl
 
     private boolean exportEnergy(Level level, BlockPos pos) {
         MachineStatAccumulator stats = effectiveStats();
-        int outputRate = effectiveOutputRate(stats);
-        if (energyStored(stats) <= 0 || outputRate <= 0) {
+        if (energyStored(stats) <= 0) {
             return false;
         }
 
-        int remainingOutput = Math.min(outputRate, energyStored(stats));
+        int remainingOutput = energyStored(stats);
         boolean exported = false;
         for (Direction direction : Direction.values()) {
             if (remainingOutput <= 0 || energyStored(stats) <= 0) {
@@ -603,7 +596,7 @@ public class SolarArrayControllerBlockEntity extends BaseMachineBlockEntity impl
             return 0;
         }
 
-        int remaining = Math.min(toExtract, exportAllowance(stats));
+        int remaining = toExtract;
         int extracted = Math.min(internalEnergyStored(stats), remaining);
         if (!simulate && extracted > 0) {
             internalEnergy = internalEnergyStored(stats) - extracted;
@@ -619,18 +612,7 @@ public class SolarArrayControllerBlockEntity extends BaseMachineBlockEntity impl
                 setChanged();
             }
         }
-        if (!simulate) {
-            recordExport(extracted);
-        }
         return extracted;
-    }
-
-    private int exportAllowance(MachineStatAccumulator stats) {
-        return exportBudget.remaining(level == null ? 0L : level.getGameTime(), effectiveOutputRate(stats));
-    }
-
-    private void recordExport(int amount) {
-        exportBudget.add(level == null ? 0L : level.getGameTime(), amount);
     }
 
     private int energyStored() {
@@ -651,22 +633,6 @@ public class SolarArrayControllerBlockEntity extends BaseMachineBlockEntity impl
 
     private int internalEnergyStored(MachineStatAccumulator stats) {
         return Mth.clamp(internalEnergy, 0, internalEnergyCapacity(stats));
-    }
-
-    private int effectiveOutputRate(MachineStatAccumulator stats) {
-        ItemStack stack = gearInventory.getStackInSlot(SLOT_ENERGY_CONNECTOR);
-        if (stack.getItem() instanceof EnergyConnectorItem connector) {
-            return connector.tier().transferRate();
-        }
-        return MachineBaseStatCatalog.SOLAR_ARRAY_CONTROLLER_ENERGY_TRANSFER;
-    }
-
-    private int connectorOutputCap() {
-        ItemStack stack = gearInventory.getStackInSlot(SLOT_ENERGY_CONNECTOR);
-        if (stack.getItem() instanceof EnergyConnectorItem connector) {
-            return connector.tier().transferRate();
-        }
-        return MachineBaseStatCatalog.SOLAR_ARRAY_CONTROLLER_ENERGY_TRANSFER;
     }
 
     private int panelLimit(MachineStatAccumulator stats) {
@@ -816,18 +782,7 @@ public class SolarArrayControllerBlockEntity extends BaseMachineBlockEntity impl
     }
 
     private void loadGearInventory(CompoundTag gearTag, HolderLookup.Provider registries) {
-        int savedSize = gearTag.getInt("Size");
-        if (savedSize == GEAR_SLOT_COUNT) {
-            gearInventory.deserializeNBT(registries, gearTag);
-            return;
-        }
-
-        ItemStackHandler legacyGear = new ItemStackHandler(Math.max(0, savedSize));
-        legacyGear.deserializeNBT(registries, gearTag);
-        gearInventory.setSize(GEAR_SLOT_COUNT);
-        for (int slot = 0; slot < Math.min(legacyGear.getSlots(), GEAR_SLOT_COUNT); slot++) {
-            gearInventory.setStackInSlot(slot, legacyGear.getStackInSlot(slot));
-        }
+        loadGearWithoutSlot(gearInventory, gearTag, registries, LEGACY_SLOT_ENERGY_CONNECTOR);
     }
 
     private final class ControllerEnergyStorage implements IEnergyStorage {
@@ -853,7 +808,7 @@ public class SolarArrayControllerBlockEntity extends BaseMachineBlockEntity impl
 
         @Override
         public boolean canExtract() {
-            return energyStored() > 0 && effectiveOutputRate(effectiveStats()) > 0;
+            return energyStored() > 0;
         }
 
         @Override
