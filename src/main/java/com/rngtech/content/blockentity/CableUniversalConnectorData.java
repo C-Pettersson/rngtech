@@ -113,6 +113,8 @@ public final class CableUniversalConnectorData implements UniversalConnectorAcce
         }
     };
     private final IEnergyStorage energyStorage = new ConnectorEnergyStorage();
+    private final ConnectorTargetCache<IEnergyStorage> energyTarget =
+            new ConnectorTargetCache<>(Capabilities.EnergyStorage.BLOCK);
     private final IItemHandler itemHandler = new NetworkItemHandler();
     private final IFluidHandler fluidHandler = new NetworkFluidHandler();
     private final FluidModuleState[] fluidModules =
@@ -241,19 +243,7 @@ public final class CableUniversalConnectorData implements UniversalConnectorAcce
     }
 
     private IEnergyStorage targetEnergyStorage() {
-        Level level = owner.getLevel();
-        if (level == null) {
-            return null;
-        }
-        BlockPos targetPos = owner.getBlockPos().relative(face);
-        if (!level.isLoaded(targetPos)) {
-            return null;
-        }
-        BlockState targetState = level.getBlockState(targetPos);
-        if (targetState.getBlock() instanceof UniversalConnectorBlock || targetState.getBlock() instanceof CableBlock) {
-            return null;
-        }
-        return level.getCapability(Capabilities.EnergyStorage.BLOCK, targetPos, attachAs);
+        return energyTarget.get(owner.getLevel(), owner.getBlockPos().relative(face), attachAs);
     }
 
     private CableBlockEntity.TransferOrigin energySourceOrigin(IEnergyStorage source) {
@@ -1043,16 +1033,7 @@ public final class CableUniversalConnectorData implements UniversalConnectorAcce
             return false;
         }
 
-        BlockPos targetPos = owner.getBlockPos().relative(face);
-        if (!level.isLoaded(targetPos)) {
-            return false;
-        }
-        BlockState targetState = level.getBlockState(targetPos);
-        if (targetState.getBlock() instanceof UniversalConnectorBlock || targetState.getBlock() instanceof CableBlock) {
-            return false;
-        }
-
-        IEnergyStorage source = level.getCapability(Capabilities.EnergyStorage.BLOCK, targetPos, attachAs);
+        IEnergyStorage source = targetEnergyStorage();
         if (source == null || !source.canExtract()) {
             return false;
         }
@@ -1168,15 +1149,7 @@ public final class CableUniversalConnectorData implements UniversalConnectorAcce
         if (level == null || amount <= 0) {
             return 0;
         }
-        BlockPos targetPos = owner.getBlockPos().relative(face);
-        if (!level.isLoaded(targetPos)) {
-            return 0;
-        }
-        BlockState targetState = level.getBlockState(targetPos);
-        if (targetState.getBlock() instanceof UniversalConnectorBlock || targetState.getBlock() instanceof CableBlock) {
-            return 0;
-        }
-        IEnergyStorage target = level.getCapability(Capabilities.EnergyStorage.BLOCK, targetPos, attachAs);
+        IEnergyStorage target = targetEnergyStorage();
         if (target == null || !target.canReceive()) {
             return 0;
         }
