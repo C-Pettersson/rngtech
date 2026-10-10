@@ -164,7 +164,7 @@ Crusher-specific prefix stats default to `0` and become active only through roll
 | `OUTPUT_GUARD_GRACE` | `100-800 ticks` | Crusher Frame tiers preserve output-blocked progress for `100`, `200`, `400`, or `800` ticks. |
 | `NO_BATTERY_OUTPUT_RETENTION` | `25-100%` | Crusher Battery Link tiers retain `25%`, `50%`, `75%`, or `100%` of the no-cell lost multiplier. |
 | `HIGH_HARDNESS_ENERGY_MITIGATION` | `15-60%` | Crusher Compression tiers reduce only the high-hardness surcharge by `15%`, `30%`, `45%`, or `60%`. |
-| `CRUSHER_INPUT_FILTER` | `1-4` | Crusher Feed Control tiers filter top automation by output acceptance (from tier 2), bonus-bank compatibility, and dense-batch output acceptance. |
+| `CRUSHER_INPUT_FILTER` | `2-4` | Crusher Feed Control tiers add filter `+2`, `+3`, or `+4`: output acceptance, then bonus-bank compatibility, then dense-batch output acceptance. Filter `1` matches the default recipe check, so no roll grants it. |
 | `CRUSHER_SALVAGE_CHANCE` | `1-5%` | Crusher Salvage uses the shared chance table: `1-2%`, `2-3%`, `3-4%`, `4-5%`. |
 
 ## Crusher Yield
