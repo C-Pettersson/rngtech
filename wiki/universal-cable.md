@@ -131,6 +131,8 @@ Each shipment can **jam**: the row pauses for a few seconds without losing any f
 
 A connector with an IN row also accepts fluid or items that its machine pushes out on its own, and sends them to that row's channel. Pushed shipments follow the same size, wait, jam, and filter rules.
 
+**Splitting shipments.** Each fluid or item shipment is split evenly between every connector with an OUT row on its channel that can take it, however far away each one is. If a machine is full or its filter rejects the shipment, its share goes to the others. When a shipment does not divide evenly, the extra goes to a different machine each time, so a Basic Item Connector feeding three Furnaces sends one item to each in turn.
+
 | Connector | Stage | Shipment | Every | Jam chance, pause |
 |---|---:|---:|---:|---:|
 | {{ item('rngtech:basic_fluid_connector') }} | 1 | 100 mB | 4 s | 12%, 8 s |
