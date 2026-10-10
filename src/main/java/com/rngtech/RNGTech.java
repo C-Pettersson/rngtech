@@ -1,5 +1,6 @@
 package com.rngtech;
 
+import com.rngtech.content.blockentity.CableBlockEntity;
 import com.rngtech.content.blockentity.MachineStatsCache;
 import com.rngtech.content.blockentity.RecipeCache;
 import com.rngtech.content.command.RNGTechCommands;
@@ -82,6 +83,7 @@ public final class RNGTech {
         NeoForge.EVENT_BUS.addListener(CorruptionDataEvents::onAddReloadListeners);
         NeoForge.EVENT_BUS.addListener(CorruptionDataEvents::onDatapackSync);
         NeoForge.EVENT_BUS.addListener(RNGTechCommands::register);
+        NeoForge.EVENT_BUS.addListener(CableBlockEntity::onLevelTick);
 
         modContainer.registerConfig(ModConfig.Type.COMMON, RNGTechConfig.SPEC);
     }
