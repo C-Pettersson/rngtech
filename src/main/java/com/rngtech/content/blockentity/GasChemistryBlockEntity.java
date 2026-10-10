@@ -1171,7 +1171,7 @@ public class GasChemistryBlockEntity extends BaseMachineBlockEntity
         }
     }
 
-    private boolean isGasificationInput(ItemStack stack) {
+    public boolean isGasificationInput(ItemStack stack) {
         return RecipeInputFilter.anyAccepts(level, ModRecipes.COAL_GASIFICATION_TYPE.get(), stack,
                 (recipe, item) -> recipe.carbonInput().test(item));
     }

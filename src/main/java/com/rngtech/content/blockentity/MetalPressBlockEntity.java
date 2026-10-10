@@ -1346,7 +1346,7 @@ public class MetalPressBlockEntity extends BaseMachineBlockEntity
     }
 
     /** Any mold's recipe counts, since the press switches to whichever installed mold fits the input. */
-    private boolean isPressInput(ItemStack stack) {
+    public boolean isPressInput(ItemStack stack) {
         return RecipeInputFilter.anyAccepts(level, ModRecipes.METAL_PRESS_TYPE.get(), stack,
                 (recipe, item) -> recipe.ingredient().test(item));
     }

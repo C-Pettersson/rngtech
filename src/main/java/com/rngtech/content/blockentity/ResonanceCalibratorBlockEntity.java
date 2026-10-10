@@ -1090,7 +1090,7 @@ public class ResonanceCalibratorBlockEntity extends BaseMachineBlockEntity
         }
     }
 
-    private boolean isCalibrationInput(int slot, ItemStack stack) {
+    public boolean isCalibrationInput(int slot, ItemStack stack) {
         return RecipeInputFilter.anyAccepts(level, ModRecipes.CALIBRATION_TYPE.get(), stack, (recipe, item) -> switch (slot) {
             case SLOT_INPUT -> recipe.ingredient().test(item);
             case SLOT_CATALYST -> recipe.catalyst().test(item);

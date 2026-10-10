@@ -431,7 +431,8 @@ public class MelterMenu extends AbstractContainerMenu implements MasteryMenuView
             if (!moveItemStackTo(stack, MelterBlockEntity.SLOT_FLUID_OUTPUT_CONTAINER, MelterBlockEntity.SLOT_FLUID_OUTPUT_CONTAINER + 1, false)) {
                 return ItemStack.EMPTY;
             }
-        } else if (!moveItemStackTo(stack, MelterBlockEntity.SLOT_PRIMARY_INPUT, MelterBlockEntity.SLOT_PRIMARY_INPUT + 1, false)
+        } else if (!melter.isMeltingInput(stack)
+                || !moveItemStackTo(stack, MelterBlockEntity.SLOT_PRIMARY_INPUT, MelterBlockEntity.SLOT_PRIMARY_INPUT + 1, false)
                 && !moveItemStackTo(stack, MelterBlockEntity.SLOT_SECONDARY_INPUT, MelterBlockEntity.SLOT_SECONDARY_INPUT + 1, false)) {
             return ItemStack.EMPTY;
         }

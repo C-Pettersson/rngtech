@@ -783,7 +783,7 @@ public class BatteryAssemblerBlockEntity extends BaseMachineBlockEntity
     }
 
     /** Assembly ingredients are positional, so a slot takes only what some recipe needs at that position. */
-    private boolean isAssemblyInput(int position, ItemStack stack) {
+    public boolean isAssemblyInput(int position, ItemStack stack) {
         return RecipeInputFilter.anyAccepts(level, ModRecipes.BATTERY_ASSEMBLY_TYPE.get(), stack,
                 (recipe, item) -> position < recipe.ingredients().size() && recipe.ingredients().get(position).test(item));
     }

@@ -1078,7 +1078,7 @@ public class MelterBlockEntity extends BaseMachineBlockEntity
         }
     }
 
-    private boolean isMeltingInput(ItemStack stack) {
+    public boolean isMeltingInput(ItemStack stack) {
         return RecipeInputFilter.anyAccepts(level, ModRecipes.MELTER_TYPE.get(), stack,
                 (recipe, item) -> recipe.primaryIngredient().test(item) || recipe.secondaryIngredient().test(item));
     }

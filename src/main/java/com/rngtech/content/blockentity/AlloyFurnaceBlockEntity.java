@@ -734,7 +734,7 @@ public class AlloyFurnaceBlockEntity extends BaseMachineBlockEntity implements M
         });
     }
 
-    private boolean isAlloyInput(ItemStack stack) {
+    public boolean isAlloyInput(ItemStack stack) {
         return RecipeInputFilter.anyAccepts(level, ModRecipes.ALLOY_FURNACE_TYPE.get(), stack,
                 (recipe, item) -> recipe.ingredients().stream().anyMatch(ingredient -> ingredient.test(item)));
     }
