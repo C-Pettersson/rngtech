@@ -1,7 +1,9 @@
 {
+  "render_type": "minecraft:cutout",
   "textures": {
     "particle": "rngtech:block/cable",
-    "wire": "rngtech:block/cable"
+    "wire": "rngtech:block/cable",
+    "tint": "rngtech:block/cable_tint"
   },
   "elements": [
     {
@@ -14,6 +16,18 @@
         "south": { "texture": "#wire" },
         "west": { "texture": "#wire" },
         "east": { "texture": "#wire" }
+      }
+    },
+    {
+      "from": [6, 6, 0],
+      "to": [10, 10, 6],
+      "faces": {
+        "down": { "texture": "#tint", "tintindex": 0 },
+        "up": { "texture": "#tint", "tintindex": 0 },
+        "north": { "texture": "#tint", "tintindex": 0 },
+        "south": { "texture": "#tint", "tintindex": 0 },
+        "west": { "texture": "#tint", "tintindex": 0 },
+        "east": { "texture": "#tint", "tintindex": 0 }
       }
     }
   ]

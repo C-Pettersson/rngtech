@@ -1,5 +1,6 @@
 package com.rngtech;
 
+import com.rngtech.client.CableTintClient;
 import com.rngtech.client.MinersCompanionLampClient;
 import com.rngtech.client.configurator.ConfiguratorClient;
 import com.rngtech.client.renderer.BatteryChassisRenderer;
@@ -86,6 +87,8 @@ public final class RNGTechClient {
         modBus.addListener(this::registerRenderers);
         modBus.addListener(this::registerClientExtensions);
         modBus.addListener(this::registerKeyMappings);
+        modBus.addListener(CableTintClient::registerBlockColors);
+        modBus.addListener(CableTintClient::registerItemColors);
         NeoForge.EVENT_BUS.addListener(WrenchOverlayClient::onClientTick);
         NeoForge.EVENT_BUS.addListener(WrenchOverlayClient::onUseInput);
         NeoForge.EVENT_BUS.addListener(WrenchOverlayClient::onRenderLevel);

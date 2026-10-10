@@ -139,9 +139,12 @@ public final class WrenchOverlayClient {
         Vec3 camera = event.getCamera().getPosition();
         PoseStack poseStack = event.getPoseStack();
         poseStack.pushPose();
+        // AFTER_LEVEL runs once the level's view rotation is popped, so the panel has to apply it itself.
+        poseStack.mulPose(event.getModelViewMatrix());
         poseStack.translate(anchor.x - camera.x, anchor.y - camera.y, anchor.z - camera.z);
         poseStack.mulPose(event.getCamera().rotation());
-        poseStack.scale(-TEXT_SCALE, -TEXT_SCALE, TEXT_SCALE);
+        // Matches vanilla 1.21 name tags; a negative X here mirrors the panel away from the camera and it is culled.
+        poseStack.scale(TEXT_SCALE, -TEXT_SCALE, TEXT_SCALE);
 
         Font font = minecraft.font;
         int width = 0;
