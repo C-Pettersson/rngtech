@@ -21,7 +21,8 @@ public final class StatBreakdownCache {
     private static final long REFRESH_MILLIS = 1000L;
 
     private static int containerId = -1;
-    private static long requestedAt = Long.MIN_VALUE;
+    private static boolean requested;
+    private static long requestedAt;
     private static Map<MachineStat, StatBreakdown> breakdowns;
 
     private StatBreakdownCache() {
@@ -36,10 +37,11 @@ public final class StatBreakdownCache {
         if (openContainerId != containerId) {
             containerId = openContainerId;
             breakdowns = null;
-            requestedAt = Long.MIN_VALUE;
+            requested = false;
         }
         long now = Util.getMillis();
-        if (now - requestedAt >= REFRESH_MILLIS) {
+        if (!requested || now - requestedAt >= REFRESH_MILLIS) {
+            requested = true;
             requestedAt = now;
             PacketDistributor.sendToServer(new StatBreakdownRequestPayload(openContainerId));
         }
