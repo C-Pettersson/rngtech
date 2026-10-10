@@ -33,6 +33,7 @@ import com.rngtech.rpg.progression.MachineMasteryFamily;
 import com.rngtech.rpg.progression.MachineMasteryHost;
 import com.rngtech.rpg.progression.MachineProgressionState;
 import com.rngtech.rpg.progression.MegaPassiveNode;
+import com.rngtech.rpg.progression.MegaPassiveTree;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -616,7 +617,7 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
         stats.apply(activeTraits);
         FurnacePassiveTree.applyStats(stats, machineProgression());
         if (isElectric() && !hasBatteryCell()) {
-            stats.apply(new MachineModifier(
+            stats.apply(MachineStatAccumulator.NO_BATTERY_SOURCE, new MachineModifier(
                     ModifierSlot.IMPLICIT,
                     MachineStat.PROCESSING_SPEED,
                     ModifierOperation.LESS,
@@ -1219,11 +1220,11 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
         applyLaneGearStats(stats, lane);
         applySharedHearth(stats);
         if (hasMasteryBehavior("SLAG_RECLAIM") && inventory.getStackInSlot(inputSlot(lane)).is(ModTags.Items.MALFORMED_INGOTS)) {
-            stats.apply(new MachineModifier(ModifierSlot.IMPLICIT, MachineStat.PROCESSING_SPEED, ModifierOperation.MORE, 2.0));
-            stats.apply(new MachineModifier(ModifierSlot.IMPLICIT, MachineStat.ENERGY_USAGE, ModifierOperation.LESS, 0.5));
+            stats.apply(MegaPassiveTree.behaviorSource(machineProgression(), "SLAG_RECLAIM"), new MachineModifier(ModifierSlot.IMPLICIT, MachineStat.PROCESSING_SPEED, ModifierOperation.MORE, 2.0));
+            stats.apply(MegaPassiveTree.behaviorSource(machineProgression(), "SLAG_RECLAIM"), new MachineModifier(ModifierSlot.IMPLICIT, MachineStat.ENERGY_USAGE, ModifierOperation.LESS, 0.5));
         }
         if (alloyBlendActive(lane)) {
-            stats.apply(new MachineModifier(
+            stats.apply(Component.translatable(MachineBehavior.ALLOY_BLEND.translationKey()), new MachineModifier(
                     ModifierSlot.IMPLICIT,
                     MachineStat.PROCESSING_SPEED,
                     ModifierOperation.INCREASED_PERCENT,
@@ -1242,7 +1243,9 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
         applyBestHeatCoreStats(hottest);
         double shared = Math.floor(hottest.value(MachineStat.MAX_TEMPERATURE) * AscendancyFormulas.SHARED_HEARTH_SHARE);
         if (shared > stats.value(MachineStat.MAX_TEMPERATURE)) {
-            stats.setAbsolute(MachineStat.MAX_TEMPERATURE, shared);
+            try (MachineStatAccumulator.Source ignored = stats.source(MegaPassiveTree.behaviorSource(machineProgression(), "SHARED_HEARTH"))) {
+                stats.setAbsolute(MachineStat.MAX_TEMPERATURE, shared);
+            }
         }
     }
 

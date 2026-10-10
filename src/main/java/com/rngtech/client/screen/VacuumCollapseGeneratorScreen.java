@@ -465,7 +465,7 @@ public class VacuumCollapseGeneratorScreen extends AbstractContainerScreen<Vacuu
                     STAT_TYPES[index] == MachineStat.PROCESSING_LEVEL,
                     isEnhancedStat(STAT_DATA_INDICES[index], value),
                     MachineScreenStyle.statLayerTooltip(menu.getSlot(menu.refinementTargetSlot()).getItem(), STAT_TYPES[index], value)
-            );
+            ).withStat(STAT_TYPES[index]);
         }
         return MachineScreenStyle.withGenerationBreakdown(
                 STAT_TYPES,

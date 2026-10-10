@@ -11,6 +11,7 @@ import com.rngtech.rpg.MachineStatDisplay;
 import com.rngtech.rpg.MachineTraits;
 import com.rngtech.rpg.ModifierEligibilityProfiles;
 
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
@@ -512,7 +513,7 @@ final class MachineScreenStyle {
                 multiplier > 1.001,
                 Component.empty(),
                 MachineStatDisplay.generationBreakdown(finalPerTick, basePerTick, multiplier, flatPerTick)
-        );
+        ).withStat(line.stat);
     }
 
     /** Declared ascendancy stats follow the machine's own rows, highlighted, only while an allocated node grants them. */
@@ -527,7 +528,7 @@ final class MachineScreenStyle {
                     true,
                     true,
                     MachineStatDisplay.statTooltip(stat.stat(), stat.value())
-            );
+            ).withStat(stat.stat());
         }
         return all;
     }
@@ -1071,6 +1072,7 @@ final class MachineScreenStyle {
         private final boolean enhanced;
         private final Component tooltip;
         private final List<Component> tooltipLines;
+        private final MachineStat stat;
 
         private StatLine(Component label, String value, double strength, boolean integral, boolean enhanced, Component tooltip) {
             this(label, value, strength, integral, enhanced, tooltip, List.of());
@@ -1085,6 +1087,19 @@ final class MachineScreenStyle {
                 Component tooltip,
                 List<Component> tooltipLines
         ) {
+            this(label, value, strength, integral, enhanced, tooltip, tooltipLines, null);
+        }
+
+        private StatLine(
+                Component label,
+                String value,
+                double strength,
+                boolean integral,
+                boolean enhanced,
+                Component tooltip,
+                List<Component> tooltipLines,
+                MachineStat stat
+        ) {
             this.label = label;
             this.value = value;
             this.strength = strength;
@@ -1092,18 +1107,31 @@ final class MachineScreenStyle {
             this.enhanced = enhanced;
             this.tooltip = tooltip;
             this.tooltipLines = List.copyOf(tooltipLines);
+            this.stat = stat;
+        }
+
+        /** Binds the row to the stat it shows, so holding Shift over it explains the math behind the value. */
+        StatLine withStat(MachineStat stat) {
+            return new StatLine(label, value, strength, integral, enhanced, tooltip, tooltipLines, stat);
         }
 
         private boolean hasTooltip() {
-            return !tooltipLines.isEmpty() || !tooltip.getString().isEmpty();
+            return stat != null || !tooltipLines.isEmpty() || !tooltip.getString().isEmpty();
         }
 
         private void renderTooltip(GuiGraphics guiGraphics, Font font, int mouseX, int mouseY) {
-            if (tooltipLines.isEmpty()) {
-                guiGraphics.renderTooltip(font, tooltip, mouseX, mouseY);
-            } else {
-                guiGraphics.renderComponentTooltip(font, tooltipLines, mouseX, mouseY);
+            if (stat != null && Screen.hasShiftDown()) {
+                guiGraphics.renderComponentTooltip(font, StatBreakdownCache.tooltip(stat), mouseX, mouseY);
+                return;
             }
+            List<Component> lines = new ArrayList<>(tooltipLines);
+            if (lines.isEmpty() && !tooltip.getString().isEmpty()) {
+                lines.add(tooltip);
+            }
+            if (stat != null) {
+                lines.add(Component.translatable("rngtech.stat.breakdown.hint").withStyle(ChatFormatting.DARK_GRAY));
+            }
+            guiGraphics.renderComponentTooltip(font, lines, mouseX, mouseY);
         }
 
         private Component label() {

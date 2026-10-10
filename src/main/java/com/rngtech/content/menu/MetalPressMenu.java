@@ -4,6 +4,7 @@ import com.rngtech.content.block.MetalPressBlock;
 import com.rngtech.content.blockentity.MetalPressBlockEntity;
 import com.rngtech.content.registry.ModMenus;
 import com.rngtech.rpg.MachineStat;
+import com.rngtech.rpg.MachineStatAccumulator;
 import com.rngtech.rpg.MachineTraits;
 import com.rngtech.rpg.progression.MachineMasteryFamily;
 import com.rngtech.rpg.progression.MachineMasteryHost;
@@ -31,7 +32,7 @@ import net.neoforged.neoforge.items.SlotItemHandler;
 import java.util.List;
 import java.util.function.BooleanSupplier;
 
-public class MetalPressMenu extends AbstractContainerMenu implements MasteryMenuView<MegaPassiveNode> {
+public class MetalPressMenu extends AbstractContainerMenu implements MasteryMenuView<MegaPassiveNode>, StatBreakdownMenu {
     public static final int TAB_PROCESSING = 0;
     public static final int TAB_GEAR = 1;
     public static final int TAB_CONFIGURATION = 2;
@@ -433,6 +434,11 @@ public class MetalPressMenu extends AbstractContainerMenu implements MasteryMenu
             return RefinementMenuSupport.applyToMachine(player, press, refinementTarget, press.getBlockState().getBlock());
         }
         return false;
+    }
+
+    @Override
+    public MachineStatAccumulator breakdownStats() {
+        return press.effectiveStats();
     }
 
     @Override

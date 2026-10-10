@@ -2,6 +2,7 @@ package com.rngtech.content.menu;
 
 import com.rngtech.content.blockentity.BatteryChassisBlockEntity;
 import com.rngtech.content.registry.ModMenus;
+import com.rngtech.rpg.MachineStatAccumulator;
 import com.rngtech.rpg.MachineTraits;
 
 import net.minecraft.core.BlockPos;
@@ -21,7 +22,7 @@ import net.neoforged.neoforge.items.SlotItemHandler;
 
 import java.util.function.BooleanSupplier;
 
-public class BatteryChassisMenu extends AbstractContainerMenu {
+public class BatteryChassisMenu extends AbstractContainerMenu implements StatBreakdownMenu {
     public static final int TAB_STATUS = 0;
     public static final int TAB_GEAR = 1;
     public static final int TAB_STATS = 2;
@@ -283,6 +284,11 @@ public class BatteryChassisMenu extends AbstractContainerMenu {
             return true;
         }
         return RefinementMenuSupport.applyToMachine(player, chassis, refinementTarget, chassis.block().asItem());
+    }
+
+    @Override
+    public MachineStatAccumulator breakdownStats() {
+        return chassis.effectiveStats();
     }
 
     @Override

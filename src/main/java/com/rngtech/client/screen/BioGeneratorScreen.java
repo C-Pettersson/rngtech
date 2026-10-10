@@ -447,7 +447,7 @@ public class BioGeneratorScreen extends AbstractContainerScreen<BioGeneratorMenu
                             STAT_TYPES[index],
                             value
                     )
-            );
+            ).withStat(STAT_TYPES[index]);
         }
         return MachineScreenStyle.withGenerationBreakdown(
                 STAT_TYPES,

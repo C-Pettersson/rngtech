@@ -4,6 +4,7 @@ import com.rngtech.content.blockentity.SolarArrayControllerBlockEntity;
 import com.rngtech.content.item.EnergyConnectorItem;
 import com.rngtech.content.registry.ModBlocks;
 import com.rngtech.content.registry.ModMenus;
+import com.rngtech.rpg.MachineStatAccumulator;
 import com.rngtech.rpg.MachineTraits;
 
 import net.minecraft.core.BlockPos;
@@ -23,7 +24,7 @@ import net.neoforged.neoforge.items.SlotItemHandler;
 
 import java.util.function.BooleanSupplier;
 
-public class SolarArrayControllerMenu extends AbstractContainerMenu {
+public class SolarArrayControllerMenu extends AbstractContainerMenu implements StatBreakdownMenu {
     public static final int TAB_PROCESSING = 0;
     public static final int TAB_GEAR = 1;
     public static final int TAB_STATS = 2;
@@ -304,6 +305,11 @@ public class SolarArrayControllerMenu extends AbstractContainerMenu {
                 refinementTarget,
                 ModBlocks.SOLAR_ARRAY_CONTROLLER.get()
         );
+    }
+
+    @Override
+    public MachineStatAccumulator breakdownStats() {
+        return controller.effectiveStats();
     }
 
     @Override

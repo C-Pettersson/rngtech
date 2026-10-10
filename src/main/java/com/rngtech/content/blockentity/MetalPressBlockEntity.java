@@ -530,13 +530,13 @@ public class MetalPressBlockEntity extends BaseMachineBlockEntity
         applyHeatCoreStats(stats);
         applyServoStats(stats);
         if (!hasBatteryCell()) {
-            stats.apply(new MachineModifier(
+            stats.apply(MachineStatAccumulator.NO_BATTERY_SOURCE, new MachineModifier(
                     ModifierSlot.IMPLICIT,
                     MachineStat.PROCESSING_SPEED,
                     ModifierOperation.LESS,
                     NO_BATTERY_PROCESSING_SPEED
             ));
-            stats.apply(new MachineModifier(
+            stats.apply(MachineStatAccumulator.NO_BATTERY_SOURCE, new MachineModifier(
                     ModifierSlot.IMPLICIT,
                     MachineStat.STABILITY,
                     ModifierOperation.DECREASED_PERCENT,
@@ -688,8 +688,8 @@ public class MetalPressBlockEntity extends BaseMachineBlockEntity
     /** Circuit Discipline: circuit recipes gain Stability and use less FE. */
     private MachineStatAccumulator routeStats(MetalPressRecipe recipe, MachineStatAccumulator stats) {
         if (recipe != null && isCircuit(recipe) && hasMasteryBehavior("CIRCUIT_DISCIPLINE")) {
-            stats.apply(new MachineModifier(ModifierSlot.IMPLICIT, MachineStat.STABILITY, ModifierOperation.INCREASED_PERCENT, 20.0));
-            stats.apply(new MachineModifier(ModifierSlot.IMPLICIT, MachineStat.ENERGY_USAGE, ModifierOperation.LESS, 0.85));
+            stats.apply(MegaPassiveTree.behaviorSource(machineProgression(), "CIRCUIT_DISCIPLINE"), new MachineModifier(ModifierSlot.IMPLICIT, MachineStat.STABILITY, ModifierOperation.INCREASED_PERCENT, 20.0));
+            stats.apply(MegaPassiveTree.behaviorSource(machineProgression(), "CIRCUIT_DISCIPLINE"), new MachineModifier(ModifierSlot.IMPLICIT, MachineStat.ENERGY_USAGE, ModifierOperation.LESS, 0.85));
         }
         return stats;
     }
@@ -1184,7 +1184,7 @@ public class MetalPressBlockEntity extends BaseMachineBlockEntity
         if (!(stack.getItem() instanceof SolidFuelBurnerPartItem part) || !isHeatCore(stack)) {
             return;
         }
-        stats.apply(new MachineModifier(
+        stats.apply(stack.getHoverName(), new MachineModifier(
                 ModifierSlot.IMPLICIT,
                 MachineStat.MAX_TEMPERATURE,
                 ModifierOperation.ADD,

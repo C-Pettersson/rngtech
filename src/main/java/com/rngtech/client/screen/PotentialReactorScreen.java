@@ -487,7 +487,7 @@ public class PotentialReactorScreen extends AbstractContainerScreen<PotentialRea
                             STAT_TYPES[index],
                             value
                     )
-            );
+            ).withStat(STAT_TYPES[index]);
         }
         return MachineScreenStyle.withGenerationBreakdown(
                 STAT_TYPES,

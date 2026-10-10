@@ -9,6 +9,7 @@ import com.rngtech.rpg.ModifierSlot;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import net.minecraft.network.chat.Component;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -164,34 +165,62 @@ public final class MegaPassiveTree {
             case MELTER -> new double[] {10, 0, 10};
         };
         MachineStat[] attributes = {MachineStat.CONTROL, MachineStat.DRIVE, MachineStat.RESERVE};
-        for (int i = 0; i < attributes.length; i++) { apply(stats, attributes[i], ModifierOperation.ADD, base[i]); }
+        try (MachineStatAccumulator.Source ignored = stats.source(Component.translatable("rngtech.stat.breakdown.source.inherent"))) {
+            for (int i = 0; i < attributes.length; i++) { apply(stats, attributes[i], ModifierOperation.ADD, base[i]); }
+        }
         List<MasteryEffectSource> allocated = sources(state, family);
         for (MasteryEffectSource node : allocated) {
-            for (MachineModifierEffect effect : node.effects()) {
-                if (family.supports(effect.stat())) { apply(stats, effect.stat(), effect.operation(), effect.value()); }
+            try (MachineStatAccumulator.Source ignored = stats.source(Component.translatable(node.translationKey()))) {
+                for (MachineModifierEffect effect : node.effects()) {
+                    if (family.supports(effect.stat())) { apply(stats, effect.stat(), effect.operation(), effect.value()); }
+                }
+                for (MegaPassiveNode.TaggedEffect tagged : node.tagged()) {
+                    if (tagged.appliesTo(family)) { apply(stats, tagged.effect().stat(), tagged.effect().operation(), tagged.effect().value()); }
+                }
+                node.fixed().forEach((stat, value) -> { if (family.supportsAbsolute(stat)) { stats.setAbsolute(stat, value); } });
+                node.ceilings().forEach((stat, value) -> { if (family.supportsAbsolute(stat)) { stats.capAbsolute(stat, value); } });
             }
-            for (MegaPassiveNode.TaggedEffect tagged : node.tagged()) {
-                if (tagged.appliesTo(family)) { apply(stats, tagged.effect().stat(), tagged.effect().operation(), tagged.effect().value()); }
-            }
-            node.fixed().forEach((stat, value) -> { if (family.supportsAbsolute(stat)) { stats.setAbsolute(stat, value); } });
-            node.ceilings().forEach((stat, value) -> { if (family.supportsAbsolute(stat)) { stats.capAbsolute(stat, value); } });
         }
         if (has(state, "NO_BONUS_OUTPUT")) {
-            NO_BONUS_OUTPUT_CEILINGS.forEach((stat, value) -> { if (family.supportsAbsolute(stat)) { stats.capAbsolute(stat, value); } });
+            try (MachineStatAccumulator.Source ignored = stats.source(behaviorSource(allocated, "NO_BONUS_OUTPUT"))) {
+                NO_BONUS_OUTPUT_CEILINGS.forEach((stat, value) -> { if (family.supportsAbsolute(stat)) { stats.capAbsolute(stat, value); } });
+            }
         }
         if (!has(state, "NO_INHERENT_ATTRIBUTES")) {
             for (Conversion conversion : inherentConversions(family, stats.value(MachineStat.CONTROL), stats.value(MachineStat.DRIVE), stats.value(MachineStat.RESERVE))) {
                 MachineModifierEffect effect = conversion.effect();
-                apply(stats, effect.stat(), effect.operation(), effect.value());
+                try (MachineStatAccumulator.Source ignored = stats.source(Component.translatable(
+                        "rngtech.stat.breakdown.source.attribute", Component.translatable(conversion.attribute().translationKey())))) {
+                    apply(stats, effect.stat(), effect.operation(), effect.value());
+                }
             }
         }
         for (MasteryEffectSource node : allocated) {
             for (MegaPassiveNode.AttributeScaling scaling : node.scaling()) {
                 if (family.supports(scaling.stat())) {
-                    apply(stats, scaling.stat(), scaling.operation(), Math.max(0, stats.value(scaling.attribute())) * scaling.perPoint());
+                    try (MachineStatAccumulator.Source ignored = stats.source(Component.translatable(
+                            "rngtech.stat.breakdown.source.scaling",
+                            Component.translatable(node.translationKey()),
+                            Component.translatable(scaling.attribute().translationKey())))) {
+                        apply(stats, scaling.stat(), scaling.operation(), Math.max(0, stats.value(scaling.attribute())) * scaling.perPoint());
+                    }
                 }
             }
         }
+    }
+
+    /** The allocated node that grants {@code behavior}, as a stat breakdown source label. */
+    public static Component behaviorSource(MachineProgressionState state, String behavior) {
+        return behaviorSource(sources(state), behavior);
+    }
+
+    private static Component behaviorSource(List<MasteryEffectSource> allocated, String behavior) {
+        for (MasteryEffectSource node : allocated) {
+            if (node.behaviors().contains(behavior)) {
+                return Component.translatable(node.translationKey());
+            }
+        }
+        return Component.translatable("rngtech.stat.breakdown.source.machine");
     }
 
     /** An attribute's inherent contribution to one stat. */

@@ -4,6 +4,7 @@ import com.rngtech.content.blockentity.CorrosionCellBlockEntity;
 import com.rngtech.content.purge.FluidPurgeSupport;
 import com.rngtech.content.registry.ModBlocks;
 import com.rngtech.content.registry.ModMenus;
+import com.rngtech.rpg.MachineStatAccumulator;
 import com.rngtech.rpg.MachineTraits;
 
 import net.minecraft.core.BlockPos;
@@ -25,7 +26,7 @@ import net.neoforged.neoforge.items.SlotItemHandler;
 
 import java.util.function.BooleanSupplier;
 
-public class CorrosionCellMenu extends AbstractContainerMenu {
+public class CorrosionCellMenu extends AbstractContainerMenu implements StatBreakdownMenu {
     public static final int TAB_PROCESSING = 0;
     public static final int TAB_GEAR = 1;
     public static final int TAB_STATS = 2;
@@ -281,6 +282,11 @@ public class CorrosionCellMenu extends AbstractContainerMenu {
             return true;
         }
         return RefinementMenuSupport.applyToMachine(player, cell, refinementTarget, ModBlocks.CORROSION_CELL.get().asItem());
+    }
+
+    @Override
+    public MachineStatAccumulator breakdownStats() {
+        return cell.effectiveStats();
     }
 
     @Override

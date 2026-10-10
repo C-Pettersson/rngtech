@@ -403,7 +403,7 @@ public class BatteryAssemblerBlockEntity extends BaseMachineBlockEntity
         MachineStatAccumulator stats = MachineBaseStatCatalog.batteryAssembler();
         stats.apply(MachineImplicitCatalog.effectiveTraits(machineTraits(), getBlockState().getBlock()));
         if (!hasBatteryCell()) {
-            stats.apply(new MachineModifier(
+            stats.apply(MachineStatAccumulator.NO_BATTERY_SOURCE, new MachineModifier(
                     ModifierSlot.IMPLICIT,
                     MachineStat.PROCESSING_SPEED,
                     ModifierOperation.LESS,

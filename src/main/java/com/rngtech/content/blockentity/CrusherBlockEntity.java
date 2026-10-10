@@ -654,7 +654,7 @@ public class CrusherBlockEntity extends BaseMachineBlockEntity implements MenuPr
         }
         CrusherPassiveTree.applyStats(stats, machineProgression());
         if (hasMasteryBehavior("REFINERS_OATH")) {
-            stats.apply(new MachineModifier(
+            stats.apply(MegaPassiveTree.behaviorSource(machineProgression(), "REFINERS_OATH"), new MachineModifier(
                     ModifierSlot.IMPLICIT,
                     MachineStat.OUTPUT_AMOUNT,
                     ModifierOperation.MORE,
@@ -662,7 +662,7 @@ public class CrusherBlockEntity extends BaseMachineBlockEntity implements MenuPr
             ));
         }
         if (!hasBatteryCell()) {
-            stats.apply(new MachineModifier(
+            stats.apply(MachineStatAccumulator.NO_BATTERY_SOURCE, new MachineModifier(
                     ModifierSlot.IMPLICIT,
                     MachineStat.OUTPUT_AMOUNT,
                     ModifierOperation.LESS,

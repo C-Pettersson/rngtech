@@ -184,7 +184,7 @@ public final class MachineStatDisplay {
         return formatted;
     }
 
-    private static String formatAdditiveEffectValue(MachineStat stat, double value) {
+    static String formatAdditiveEffectValue(MachineStat stat, double value) {
         return switch (stat) {
             case ENERGY_CAPACITY, ENERGY_CAPACITY_FLAT, BUFFER_SIZE -> formatSignedNumber(value) + " FE";
             case ENERGY_GENERATION -> formatSignedNumber(value) + " FE/t";
@@ -251,11 +251,11 @@ public final class MachineStatDisplay {
         return formatSignedPercentPoints(Math.round((value - 1.0) * 100.0));
     }
 
-    private static String formatSignedPercentPoints(double value) {
+    static String formatSignedPercentPoints(double value) {
         return formatSignedNumber(value) + "%";
     }
 
-    private static String formatSignedNumber(double value) {
+    static String formatSignedNumber(double value) {
         if (Math.abs(value) <= EPSILON) {
             return formatNumber(0.0);
         }

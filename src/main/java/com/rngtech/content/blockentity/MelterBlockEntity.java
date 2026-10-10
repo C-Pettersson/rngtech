@@ -495,7 +495,7 @@ public class MelterBlockEntity extends BaseMachineBlockEntity
         applyServoStats(stats);
         applyFluidPumpStats(stats);
         if (!hasBatteryCell()) {
-            stats.apply(new MachineModifier(
+            stats.apply(MachineStatAccumulator.NO_BATTERY_SOURCE, new MachineModifier(
                     ModifierSlot.IMPLICIT,
                     MachineStat.PROCESSING_SPEED,
                     ModifierOperation.LESS,

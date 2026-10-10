@@ -4,6 +4,7 @@ import com.rngtech.content.block.CrusherBlock;
 import com.rngtech.content.blockentity.CrusherBlockEntity;
 import com.rngtech.content.registry.ModMenus;
 import com.rngtech.rpg.MachineStat;
+import com.rngtech.rpg.MachineStatAccumulator;
 import com.rngtech.rpg.MachineTraits;
 import com.rngtech.rpg.progression.CrusherPassiveTree;
 import com.rngtech.rpg.progression.MachineMasteryFamily;
@@ -32,7 +33,7 @@ import net.neoforged.neoforge.items.SlotItemHandler;
 import java.util.List;
 import java.util.function.BooleanSupplier;
 
-public class CrusherMenu extends AbstractContainerMenu implements MasteryMenuView<MegaPassiveNode> {
+public class CrusherMenu extends AbstractContainerMenu implements MasteryMenuView<MegaPassiveNode>, StatBreakdownMenu {
     public static final int TAB_PROCESSING = 0;
     public static final int TAB_GEAR = 1;
     public static final int TAB_CONFIGURATION = 2;
@@ -416,6 +417,11 @@ public class CrusherMenu extends AbstractContainerMenu implements MasteryMenuVie
             return RefinementMenuSupport.applyToMachine(player, crusher, refinementTarget, crusher.getBlockState().getBlock());
         }
         return false;
+    }
+
+    @Override
+    public MachineStatAccumulator breakdownStats() {
+        return crusher.effectiveStats();
     }
 
     @Override

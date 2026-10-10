@@ -4,6 +4,7 @@ import com.rngtech.content.block.AlloyFurnaceBlock;
 import com.rngtech.content.blockentity.AlloyFurnaceBlockEntity;
 import com.rngtech.content.registry.ModMenus;
 import com.rngtech.rpg.MachineStat;
+import com.rngtech.rpg.MachineStatAccumulator;
 import com.rngtech.rpg.MachineTraits;
 import com.rngtech.rpg.progression.MachineMasteryFamily;
 import com.rngtech.rpg.progression.MachineMasteryHost;
@@ -31,7 +32,7 @@ import net.neoforged.neoforge.items.SlotItemHandler;
 import java.util.List;
 import java.util.function.BooleanSupplier;
 
-public class AlloyFurnaceMenu extends AbstractContainerMenu implements MasteryMenuView<MegaPassiveNode> {
+public class AlloyFurnaceMenu extends AbstractContainerMenu implements MasteryMenuView<MegaPassiveNode>, StatBreakdownMenu {
     public static final int TAB_PROCESSING = 0;
     public static final int TAB_GEAR = 1;
     public static final int TAB_STATS = 2;
@@ -429,6 +430,11 @@ public class AlloyFurnaceMenu extends AbstractContainerMenu implements MasteryMe
             return true;
         }
         return RefinementMenuSupport.applyToMachine(player, furnace, refinementTarget, furnace.getBlockState().getBlock());
+    }
+
+    @Override
+    public MachineStatAccumulator breakdownStats() {
+        return furnace.effectiveStats();
     }
 
     @Override

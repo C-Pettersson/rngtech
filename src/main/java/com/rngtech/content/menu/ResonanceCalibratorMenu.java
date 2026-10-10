@@ -5,6 +5,7 @@ import com.rngtech.content.blockentity.ResonanceCalibratorBlockEntity;
 import com.rngtech.content.calibration.CalibrationFamily;
 import com.rngtech.content.registry.ModMenus;
 import com.rngtech.rpg.MachineStat;
+import com.rngtech.rpg.MachineStatAccumulator;
 import com.rngtech.rpg.MachineTraits;
 import com.rngtech.rpg.progression.MachineMasteryFamily;
 import com.rngtech.rpg.progression.MachineMasteryHost;
@@ -32,7 +33,7 @@ import net.neoforged.neoforge.items.SlotItemHandler;
 import java.util.List;
 import java.util.function.BooleanSupplier;
 
-public class ResonanceCalibratorMenu extends AbstractContainerMenu implements MasteryMenuView<MegaPassiveNode> {
+public class ResonanceCalibratorMenu extends AbstractContainerMenu implements MasteryMenuView<MegaPassiveNode>, StatBreakdownMenu {
     public static final int TAB_PROCESSING = 0;
     public static final int TAB_GEAR = 1;
     public static final int TAB_CONFIGURATION = 2;
@@ -453,6 +454,11 @@ public class ResonanceCalibratorMenu extends AbstractContainerMenu implements Ma
             return RefinementMenuSupport.applyToMachine(player, calibrator, refinementTarget, calibrator.getBlockState().getBlock());
         }
         return false;
+    }
+
+    @Override
+    public MachineStatAccumulator breakdownStats() {
+        return calibrator.effectiveStats();
     }
 
     @Override

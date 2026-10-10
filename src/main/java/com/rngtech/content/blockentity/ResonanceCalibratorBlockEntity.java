@@ -439,13 +439,13 @@ public class ResonanceCalibratorBlockEntity extends BaseMachineBlockEntity
         applyGearStats(stats, controlBoardStack());
         applyGearStats(stats, stabilizerMatrixStack());
         if (!hasBatteryCell()) {
-            stats.apply(new MachineModifier(
+            stats.apply(MachineStatAccumulator.NO_BATTERY_SOURCE, new MachineModifier(
                     ModifierSlot.IMPLICIT,
                     MachineStat.PROCESSING_SPEED,
                     ModifierOperation.LESS,
                     NO_BATTERY_PROCESSING_SPEED
             ));
-            stats.apply(new MachineModifier(
+            stats.apply(MachineStatAccumulator.NO_BATTERY_SOURCE, new MachineModifier(
                     ModifierSlot.IMPLICIT,
                     MachineStat.CALIBRATION_QUALITY,
                     ModifierOperation.DECREASED_PERCENT,

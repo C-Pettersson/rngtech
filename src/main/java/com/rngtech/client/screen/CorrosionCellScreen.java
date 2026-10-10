@@ -511,7 +511,7 @@ public class CorrosionCellScreen extends AbstractContainerScreen<CorrosionCellMe
                     isIntegralStat(STAT_DATA_INDICES[index]),
                     !isIntegralStat(STAT_DATA_INDICES[index]) && value > 1.001,
                     MachineScreenStyle.statLayerTooltip(menu.getSlot(menu.refinementTargetSlot()).getItem(), STAT_TYPES[index], value)
-            );
+            ).withStat(STAT_TYPES[index]);
         }
         return MachineScreenStyle.withGenerationBreakdown(
                 STAT_TYPES,

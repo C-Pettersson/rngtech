@@ -759,7 +759,7 @@ public class GasChemistryBlockEntity extends BaseMachineBlockEntity
         return hasServoGearSlot() && MachineImplicitCatalog.hasBehavior(servoStack(), MachineBehavior.AUTO_PURGE);
     }
 
-    private MachineStatAccumulator effectiveStats() {
+    public MachineStatAccumulator effectiveStats() {
         MachineStatAccumulator stats = switch (machine) {
             case COAL_GASIFIER -> MachineBaseStatCatalog.coalGasifier();
             case SYNGAS_COMBUSTOR -> MachineBaseStatCatalog.syngasCombustor();

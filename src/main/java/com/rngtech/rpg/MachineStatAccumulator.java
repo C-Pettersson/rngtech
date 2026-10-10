@@ -11,15 +11,28 @@ import com.rngtech.content.machine.CrusherChassisMaterial;
 import com.rngtech.content.machine.FurnaceChassisMaterial;
 import com.rngtech.content.recycling.ComponentRecyclerChassis;
 
+import net.minecraft.network.chat.Component;
 import net.minecraft.util.RandomSource;
 
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Deque;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.function.Supplier;
 
 public final class MachineStatAccumulator {
     public static final double FURNACE_BASE_MAX_TEMPERATURE = 600.0;
     public static final double PRIMITIVE_FURNACE_MAX_TEMPERATURE = 800.0;
+    public static final Component NO_BATTERY_SOURCE = Component.translatable("rngtech.stat.breakdown.source.no_battery");
+    private static final ThreadLocal<Boolean> RECORDING = ThreadLocal.withInitial(() -> false);
+    private static final Component BASE_SOURCE = Component.translatable("rngtech.stat.breakdown.source.base");
+    private static final Component RARITY_SOURCE = Component.translatable("rngtech.stat.breakdown.source.rarity");
+    private static final Component FALLBACK_SOURCE = Component.translatable("rngtech.stat.breakdown.source.machine");
+    private static final Source NO_SOURCE = () -> {
+    };
 
     private final Map<MachineStat, Double> baseValues = new EnumMap<>(MachineStat.class);
     private final Map<MachineStat, Double> additiveValues = new EnumMap<>(MachineStat.class);
@@ -29,13 +42,75 @@ public final class MachineStatAccumulator {
     private double partEnergyGenerationMore = 1.0;
     private final Map<MachineStat, Double> absoluteValues = new EnumMap<>(MachineStat.class);
     private final Map<MachineStat, Double> absoluteCeilings = new EnumMap<>(MachineStat.class);
+    private final Map<MachineStat, List<StatBreakdown.Term>> recorded =
+            RECORDING.get() ? new EnumMap<>(MachineStat.class) : null;
+    private final Deque<Component> sources = new ArrayDeque<>();
+
+    /**
+     * Runs {@code statsFactory} with breakdown recording on: every accumulator it creates remembers which labelled
+     * source contributed each term, so {@link #breakdown} can explain the final value.
+     */
+    public static MachineStatAccumulator recording(Supplier<MachineStatAccumulator> statsFactory) {
+        boolean previous = RECORDING.get();
+        RECORDING.set(true);
+        try {
+            return statsFactory.get();
+        } finally {
+            RECORDING.set(previous);
+        }
+    }
+
+    /** Labels every contribution made until the returned scope closes; the innermost label wins. */
+    public Source source(Component label) {
+        if (recorded == null) {
+            return NO_SOURCE;
+        }
+        sources.push(label);
+        return sources::pop;
+    }
+
+    public interface Source extends AutoCloseable {
+        @Override
+        void close();
+    }
 
     public void setAbsolute(MachineStat stat, double value) {
         absoluteValues.merge(accumulationStat(stat), value, Math::min);
+        record(StatBreakdown.Kind.FIXED, stat, value);
     }
 
     public void capAbsolute(MachineStat stat, double value) {
         absoluteCeilings.merge(accumulationStat(stat), value, Math::min);
+        record(StatBreakdown.Kind.CEILING, stat, value);
+    }
+
+    public Optional<StatBreakdown> breakdown(MachineStat stat) {
+        if (recorded == null) {
+            return Optional.empty();
+        }
+        MachineStat resolvedStat = accumulationStat(stat);
+        List<StatBreakdown.Term> terms = new ArrayList<>();
+        double base = baseValues.getOrDefault(resolvedStat, 0.0);
+        if (base != 0.0) {
+            terms.add(new StatBreakdown.Term(StatBreakdown.Kind.BASE, base, BASE_SOURCE));
+        }
+        terms.addAll(recorded.getOrDefault(resolvedStat, List.of()));
+        return Optional.of(new StatBreakdown(resolvedStat, terms, value(resolvedStat)));
+    }
+
+    /** Breakdowns for every stat with a base or a recorded contribution. */
+    public List<StatBreakdown> breakdowns() {
+        if (recorded == null) {
+            return List.of();
+        }
+        List<StatBreakdown> breakdowns = new ArrayList<>();
+        for (MachineStat stat : MachineStat.values()) {
+            if (stat == accumulationStat(stat)
+                    && (baseValues.getOrDefault(stat, 0.0) != 0.0 || recorded.containsKey(stat))) {
+                breakdown(stat).ifPresent(breakdowns::add);
+            }
+        }
+        return breakdowns;
     }
 
     public static MachineStatAccumulator fromRanges(List<MachineStatRange> ranges, RandomSource random) {
@@ -600,22 +675,59 @@ public final class MachineStatAccumulator {
 
     public void apply(ModifierSet set) {
         for (MachineModifier modifier : set.modifiers()) {
-            apply(modifier);
+            if (recorded == null || modifier.slot().isAffix()) {
+                apply(modifier);
+                continue;
+            }
+            try (Source ignored = source(MachineModifierText.slotLabel(modifier.slot()))) {
+                apply(modifier);
+            }
         }
-        add(MachineStat.REFINEMENT_POTENTIAL, set.refinementPotential());
+        try (Source ignored = source(RARITY_SOURCE)) {
+            add(MachineStat.REFINEMENT_POTENTIAL, set.refinementPotential());
+        }
     }
 
     public void apply(MachineTraits traits) {
         apply(traits.modifierSet());
     }
 
+    /** Applies {@code modifier} under {@code source}, so a stat breakdown names where it came from. */
+    public void apply(Component source, MachineModifier modifier) {
+        try (Source ignored = source(source)) {
+            apply(modifier);
+        }
+    }
+
     public void apply(MachineModifier modifier) {
-        for (MachineModifierEffect effect : modifier.effects()) {
-            apply(effect);
-            if (isFlatEnergyGenerationAffix(modifier, effect)) {
-                addFlatEnergyGenerationBonus(effect.value());
+        Component label = recorded == null ? null : modifierSource(modifier);
+        if (label != null) {
+            sources.push(label);
+        }
+        try {
+            for (MachineModifierEffect effect : modifier.effects()) {
+                apply(effect);
+                if (isFlatEnergyGenerationAffix(modifier, effect)) {
+                    addFlatEnergyGenerationBonus(effect.value());
+                }
+            }
+        } finally {
+            if (label != null) {
+                sources.pop();
             }
         }
+    }
+
+    /** Affixes name themselves; anonymous modifiers inherit the enclosing {@link #source} label. */
+    private static Component modifierSource(MachineModifier modifier) {
+        if (!modifier.slot().isAffix()) {
+            return null;
+        }
+        return Component.translatable(
+                "rngtech.stat.breakdown.source.affix",
+                MachineModifierText.displayName(modifier),
+                MachineModifierText.slotLabel(modifier.slot())
+        );
     }
 
     private void apply(MachineModifierEffect effect) {
@@ -753,14 +865,49 @@ public final class MachineStatAccumulator {
 
     private void add(MachineStat stat, double value) {
         additiveValues.merge(accumulationStat(stat), value, Double::sum);
+        record(StatBreakdown.Kind.ADD, stat, value);
     }
 
     private void addIncreasedPercent(MachineStat stat, double value) {
         increasedPercentValues.merge(accumulationStat(stat), value, Double::sum);
+        record(StatBreakdown.Kind.INCREASED, stat, value);
     }
 
     private void addMore(MachineStat stat, double value) {
         moreValues.merge(accumulationStat(stat), value, (current, next) -> current * next);
+        record(StatBreakdown.Kind.MORE, stat, value);
+    }
+
+    private void record(StatBreakdown.Kind kind, MachineStat stat, double value) {
+        if (recorded == null || isNeutral(kind, value)) {
+            return;
+        }
+        Component source = sources.isEmpty() ? FALLBACK_SOURCE : sources.peek();
+        List<StatBreakdown.Term> terms = recorded.computeIfAbsent(accumulationStat(stat), ignored -> new ArrayList<>());
+        for (int index = 0; index < terms.size(); index++) {
+            StatBreakdown.Term term = terms.get(index);
+            if (term.kind() == kind && term.source().equals(source)) {
+                terms.set(index, new StatBreakdown.Term(kind, merge(kind, term.value(), value), source));
+                return;
+            }
+        }
+        terms.add(new StatBreakdown.Term(kind, value, source));
+    }
+
+    private static boolean isNeutral(StatBreakdown.Kind kind, double value) {
+        return switch (kind) {
+            case ADD, INCREASED -> value == 0.0;
+            case MORE -> value == 1.0;
+            default -> false;
+        };
+    }
+
+    private static double merge(StatBreakdown.Kind kind, double current, double next) {
+        return switch (kind) {
+            case MORE -> current * next;
+            case FIXED, CEILING -> Math.min(current, next);
+            default -> current + next;
+        };
     }
 
     private double percentAndMore(MachineStat stat) {
@@ -770,7 +917,7 @@ public final class MachineStatAccumulator {
         return (1.0 + increased / 100.0) * more;
     }
 
-    private static MachineStat accumulationStat(MachineStat stat) {
+    public static MachineStat accumulationStat(MachineStat stat) {
         return stat == MachineStat.ENERGY_CAPACITY_FLAT ? MachineStat.ENERGY_CAPACITY : stat;
     }
 

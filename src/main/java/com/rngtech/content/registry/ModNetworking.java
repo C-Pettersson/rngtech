@@ -2,6 +2,8 @@ package com.rngtech.content.registry;
 
 import com.rngtech.content.network.OpenConfiguratorAdvancedPayload;
 import com.rngtech.content.network.OpenConfiguratorAdvancedServerHandler;
+import com.rngtech.content.network.StatBreakdownPayload;
+import com.rngtech.content.network.StatBreakdownRequestPayload;
 import com.rngtech.content.network.WrenchOverlayClientHandler;
 import com.rngtech.content.network.WrenchOverlayDataPayload;
 import com.rngtech.content.network.WrenchOverlayRequestPayload;
@@ -11,7 +13,7 @@ import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 
 public final class ModNetworking {
-    private static final String VERSION = "2";
+    private static final String VERSION = "3";
 
     private ModNetworking() {
     }
@@ -30,6 +32,16 @@ public final class ModNetworking {
                 OpenConfiguratorAdvancedPayload.TYPE,
                 OpenConfiguratorAdvancedPayload.STREAM_CODEC,
                 OpenConfiguratorAdvancedServerHandler::handle
+        );
+        registrar.playToServer(
+                StatBreakdownRequestPayload.TYPE,
+                StatBreakdownRequestPayload.STREAM_CODEC,
+                StatBreakdownRequestPayload::handle
+        );
+        registrar.playToClient(
+                StatBreakdownPayload.TYPE,
+                StatBreakdownPayload.STREAM_CODEC,
+                StatBreakdownPayload::handle
         );
         registrar.playToClient(
                 WrenchOverlayDataPayload.TYPE,

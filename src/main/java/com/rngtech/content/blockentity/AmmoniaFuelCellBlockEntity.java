@@ -515,7 +515,7 @@ public class AmmoniaFuelCellBlockEntity extends BaseMachineBlockEntity
         return Math.max(1L, Mth.lfloor(stats.generatedEnergyTotal(recipe.energy(), ticks) * stats.value(MachineStat.EFFICIENCY)));
     }
 
-    private MachineStatAccumulator effectiveStats() {
+    public MachineStatAccumulator effectiveStats() {
         MachineStatAccumulator stats = MachineBaseStatCatalog.ammoniaFuelCell();
         machineTraits().modifiers().forEach(stats::apply);
         ComponentBaseStatCatalog.applyEffectiveContribution(stats, membraneStack());

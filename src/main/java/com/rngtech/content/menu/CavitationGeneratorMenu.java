@@ -4,6 +4,7 @@ import com.rngtech.content.blockentity.CavitationGeneratorBlockEntity;
 import com.rngtech.content.purge.FluidPurgeSupport;
 import com.rngtech.content.registry.ModBlocks;
 import com.rngtech.content.registry.ModMenus;
+import com.rngtech.rpg.MachineStatAccumulator;
 import com.rngtech.rpg.MachineTraits;
 
 import net.minecraft.core.BlockPos;
@@ -25,7 +26,7 @@ import net.neoforged.neoforge.items.SlotItemHandler;
 
 import java.util.function.BooleanSupplier;
 
-public class CavitationGeneratorMenu extends AbstractContainerMenu {
+public class CavitationGeneratorMenu extends AbstractContainerMenu implements StatBreakdownMenu {
     public static final int TAB_PROCESSING = 0;
     public static final int TAB_GEAR = 1;
     public static final int TAB_STATS = 2;
@@ -369,6 +370,11 @@ public class CavitationGeneratorMenu extends AbstractContainerMenu {
             return true;
         }
         return RefinementMenuSupport.applyToMachine(player, generator, refinementTarget, ModBlocks.CAVITATION_GENERATOR.get());
+    }
+
+    @Override
+    public MachineStatAccumulator breakdownStats() {
+        return generator.effectiveStats();
     }
 
     @Override
