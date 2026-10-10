@@ -76,9 +76,11 @@ public class AffixForgeScreen extends AbstractContainerScreen<AffixForgeMenu> {
     private static final int PANEL_HEIGHT = 100;
     private static final int ROW_HEIGHT = 14;
     private static final int MAX_ROWS = 6;
-    private static final int MAX_OUTCOME_LINES = 6;
+    private static final int MAX_HIDDEN_TOOLTIP_LINES = 12;
     private static final int OUTCOME_LINE_GAP = 4;
     private static final String NO_POTENTIAL = "rngtech.refinement.failure.no_potential";
+
+    private int outcomeScroll;
 
     public AffixForgeScreen(AffixForgeMenu menu, Inventory playerInventory, Component title) {
         super(menu, playerInventory, title);
@@ -214,18 +216,66 @@ public class AffixForgeScreen extends AbstractContainerScreen<AffixForgeMenu> {
     }
 
     private List<OutcomeBlock> outcomeLayout() {
+        List<OutcomeLine> lines = outcomeLines();
+        int first = Math.max(0, Math.min(outcomeScroll, lines.size() - 1));
         List<OutcomeBlock> blocks = new ArrayList<>();
         int y = OUTCOME_PANEL_Y + 4;
         int bottom = OUTCOME_PANEL_Y + PANEL_HEIGHT - 5;
-        for (OutcomeLine line : outcomeLines()) {
+        if (first > 0) {
+            blocks.add(moreOutcomeBlock("rngtech.affix_forge.more_above", lines.subList(0, first), y));
+            y += font.lineHeight + OUTCOME_LINE_GAP;
+        }
+        for (int index = first; index < lines.size(); index++) {
+            OutcomeLine line = lines.get(index);
             List<FormattedCharSequence> rows = font.split(line.text(), OUTCOME_PANEL_WIDTH - 6);
-            if (y + rows.size() * font.lineHeight > bottom) {
+            int limit = index == lines.size() - 1 ? bottom : bottom - font.lineHeight - OUTCOME_LINE_GAP;
+            if (y + rows.size() * font.lineHeight > limit) {
+                if (blocks.isEmpty()) {
+                    rows = rows.subList(0, Math.max(1, Math.min(rows.size(), (limit - y) / font.lineHeight)));
+                    blocks.add(new OutcomeBlock(line, rows, y));
+                    y += rows.size() * font.lineHeight + OUTCOME_LINE_GAP;
+                    index++;
+                }
+                if (index < lines.size()) {
+                    blocks.add(moreOutcomeBlock("rngtech.affix_forge.more", lines.subList(index, lines.size()), y));
+                }
                 break;
             }
             blocks.add(new OutcomeBlock(line, rows, y));
             y += rows.size() * font.lineHeight + OUTCOME_LINE_GAP;
         }
         return blocks;
+    }
+
+    private OutcomeBlock moreOutcomeBlock(String key, List<OutcomeLine> hidden, int y) {
+        Component text = Component.translatable(key, hidden.size());
+        List<Component> tooltip = new ArrayList<>();
+        tooltip.add(text);
+        for (int index = 0; index < hidden.size() && index < MAX_HIDDEN_TOOLTIP_LINES; index++) {
+            tooltip.add(hidden.get(index).text().copy().withStyle(ChatFormatting.GRAY));
+        }
+        if (hidden.size() > MAX_HIDDEN_TOOLTIP_LINES) {
+            tooltip.add(Component.translatable("rngtech.affix_forge.more.rest", hidden.size() - MAX_HIDDEN_TOOLTIP_LINES)
+                    .withStyle(ChatFormatting.GRAY));
+        }
+        tooltip.add(Component.translatable("rngtech.affix_forge.more.scroll").withStyle(ChatFormatting.DARK_GRAY));
+        return new OutcomeBlock(new OutcomeLine(text, tooltip, TEXT_MUTED), font.split(text, OUTCOME_PANEL_WIDTH - 6), y);
+    }
+
+    @Override
+    public boolean mouseScrolled(double mouseX, double mouseY, double scrollX, double scrollY) {
+        int x = leftPos + OUTCOME_PANEL_X;
+        int y = topPos + OUTCOME_PANEL_Y;
+        if (scrollY != 0
+                && mouseX >= x
+                && mouseX < x + OUTCOME_PANEL_WIDTH
+                && mouseY >= y
+                && mouseY < y + PANEL_HEIGHT - 4) {
+            int last = Math.max(0, outcomeLines().size() - 1);
+            outcomeScroll = Math.max(0, Math.min(last, outcomeScroll + (scrollY < 0 ? 1 : -1)));
+            return true;
+        }
+        return super.mouseScrolled(mouseX, mouseY, scrollX, scrollY);
     }
 
     private List<SelectionRow> selectionRows() {
@@ -237,14 +287,25 @@ public class AffixForgeScreen extends AbstractContainerScreen<AffixForgeMenu> {
 
         int y = MOD_PANEL_Y + 4;
         List<MachineModifier> affixes = affixes(targetTraits());
-        for (int affixIndex = 0; affixIndex < affixes.size() && rows.size() < MAX_ROWS; affixIndex++) {
+        int shown = affixes.size() > MAX_ROWS ? MAX_ROWS - 1 : affixes.size();
+        for (int affixIndex = 0; affixIndex < shown; affixIndex++) {
             MachineModifier modifier = affixes.get(affixIndex);
+            Component title = MachineModifierText.displayName(modifier);
             rows.add(new SelectionRow(
-                    MachineModifierText.displayName(modifier),
-                    MachineModifierText.tooltipLine(modifier),
+                    title,
+                    List.of(title, MachineModifierText.tooltipLine(modifier).copy().withStyle(ChatFormatting.GRAY)),
                     y
             ));
             y += ROW_HEIGHT;
+        }
+        if (shown < affixes.size()) {
+            Component title = Component.translatable("rngtech.affix_forge.more", affixes.size() - shown);
+            List<Component> tooltip = new ArrayList<>();
+            tooltip.add(title);
+            for (int affixIndex = shown; affixIndex < affixes.size(); affixIndex++) {
+                tooltip.add(MachineModifierText.displayName(affixes.get(affixIndex)).copy().withStyle(ChatFormatting.GRAY));
+            }
+            rows.add(new SelectionRow(title, tooltip, y));
         }
         return rows;
     }
@@ -464,9 +525,6 @@ public class AffixForgeScreen extends AbstractContainerScreen<AffixForgeMenu> {
         lines.add(costRangeLine());
         addDefinitionFocusPreviewLine(lines, definitions);
         for (ModifierDefinition definition : previewDefinitions) {
-            if (lines.size() >= MAX_OUTCOME_LINES) {
-                break;
-            }
             int color = !lensTags.isEmpty()
                             ? (definition.matchesLensTags(lensTags) ? TEXT_GOOD : TEXT_MUTED)
                             : TEXT;
@@ -628,9 +686,6 @@ public class AffixForgeScreen extends AbstractContainerScreen<AffixForgeMenu> {
     }
 
     private void addFocusPreviewLine(List<OutcomeLine> lines) {
-        if (lines.size() >= MAX_OUTCOME_LINES) {
-            return;
-        }
         Set<ModifierLensTag> lensTags = lensTags();
         if (!lensTags.isEmpty()) {
             lines.add(lensBiasLine(
@@ -646,9 +701,6 @@ public class AffixForgeScreen extends AbstractContainerScreen<AffixForgeMenu> {
     }
 
     private void addDefinitionFocusPreviewLine(List<OutcomeLine> lines, List<ModifierDefinition> definitions) {
-        if (lines.size() >= MAX_OUTCOME_LINES) {
-            return;
-        }
         Set<ModifierLensTag> lensTags = lensTags();
         if (!lensTags.isEmpty()) {
             lines.add(lensBiasLine(
@@ -661,9 +713,6 @@ public class AffixForgeScreen extends AbstractContainerScreen<AffixForgeMenu> {
     }
 
     private void addModifierFocusPreviewLine(List<OutcomeLine> lines, List<MachineModifier> modifiers) {
-        if (lines.size() >= MAX_OUTCOME_LINES) {
-            return;
-        }
         Set<ModifierLensTag> lensTags = lensTags();
         if (!lensTags.isEmpty()) {
             ModifierEligibilityProfile profile = RefinementTargets.eligibilityProfile(targetStack());
@@ -788,12 +837,7 @@ public class AffixForgeScreen extends AbstractContainerScreen<AffixForgeMenu> {
 
         SelectionRow selectionRow = hoveredSelectionRow(mouseX, mouseY);
         if (selectionRow != null) {
-            guiGraphics.renderComponentTooltip(
-                    font,
-                    List.of(selectionRow.title(), selectionRow.tooltip().copy().withStyle(ChatFormatting.GRAY)),
-                    mouseX,
-                    mouseY
-            );
+            guiGraphics.renderComponentTooltip(font, selectionRow.tooltip(), mouseX, mouseY);
             return;
         }
 
@@ -937,7 +981,7 @@ public class AffixForgeScreen extends AbstractContainerScreen<AffixForgeMenu> {
         guiGraphics.fill(left + 2, top + 2, left + 16, top + 16, 0xFF8B8B8B);
     }
 
-    private record SelectionRow(Component title, Component tooltip, int y) {
+    private record SelectionRow(Component title, List<Component> tooltip, int y) {
     }
 
     private record OutcomeBlock(OutcomeLine line, List<FormattedCharSequence> rows, int y) {
