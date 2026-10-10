@@ -13,6 +13,7 @@
     "result": {
         "id": "rngtech:nickel_dust"
     },
+    "bonus_output": false,
     "processing_ticks": 60,
     "energy": 1200,
     "required_processing_level": 1,

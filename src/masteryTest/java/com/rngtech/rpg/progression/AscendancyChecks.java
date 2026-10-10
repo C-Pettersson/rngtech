@@ -451,6 +451,10 @@ final class AscendancyChecks {
         require(lode.intValue(MachineStat.SUPER_OUTPUT_CADENCE) == 16 && lode.intValue(MachineStat.BANK_MEMORY) == 4,
                 "Mother Lode fixes the cadence at 16 and the root remembers four inputs");
         require(MegaPassiveTree.has(assayer, "COMPOUND_YIELD") && !MegaPassiveTree.has(assayer, "REFINERS_OATH"), "allocated notables grant their behaviors");
+        var oath = ascended("assayer", List.of("ledger_memory", "wide_ledger", "oath_yield", "refiners_oath"), 2);
+        var sworn = MachineStatAccumulator.componentBase(Map.of(MachineStat.OUTPUT_AMOUNT, 1.0));
+        MegaPassiveTree.applyStats(sworn, oath, CRUSHER);
+        near(sworn.increasedPercent(MachineStat.OUTPUT_AMOUNT), 24, "Refiner's Oath adds a flat 20% to the yield bucket beside Sworn Yield");
         require(AscendancyCatalog.grantedStats(rockbreaker, CRUSHER).equals(List.of(MachineStat.HARDNESS_TOLERANCE, MachineStat.JAM_RECOVERY,
                 MachineStat.JAM_CHANCE, MachineStat.UNDER_LEVEL_EFFICIENCY)), "the Stats tab lists declared stats in node order, without shared stats");
         require(AscendancyCatalog.grantedStats(rockbreaker, MachineMasteryFamily.FURNACE).isEmpty(), "another family shows no ascendancy stats");
@@ -525,10 +529,6 @@ final class AscendancyChecks {
         near(AscendancyFormulas.underLevelPenaltyMultiplier(2, 1.0, stats), 1.2, "Under-Level Efficiency stops at 90%");
         require(AscendancyFormulas.jamChancePerThousand(2, 50, stats) == 50 && AscendancyFormulas.jamTicks(2, 40, stats) == 54,
                 "Jam Chance scales the chance and Jam Recovery shortens the jam");
-        near(AscendancyFormulas.refinersOathMultiplier(1), 1.05, "a one-job chassis gets 5% more Output Amount");
-        near(AscendancyFormulas.refinersOathMultiplier(4), 1.2, "Tungstensteel's four jobs give 20%");
-        near(AscendancyFormulas.refinersOathMultiplier(9), 1.45, "Exotic's nine jobs give 45%");
-        near(AscendancyFormulas.refinersOathMultiplier(20), 1.5, "Refiner's Oath stops at 50%");
         apply(stats, MachineStat.OUTPUT_AMOUNT, ModifierOperation.INCREASED_PERCENT, 10);
         near(stats.valueWithIncreased(MachineStat.OUTPUT_AMOUNT, 20), 1.3, "At-Level Output joins the increased bucket");
 
