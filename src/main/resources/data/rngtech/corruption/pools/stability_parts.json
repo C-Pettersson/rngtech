@@ -1,0 +1,37 @@
+{
+    "hosts": [
+        "fuel_box",
+        "recovery_filter",
+        "containment_lining",
+        "ammonia_catalyst_bed",
+        "reforming_catalyst_bed",
+        "dimensional_stabilizer",
+        "disassembly_head"
+    ],
+    "blessed": [
+        {
+            "id": "stability",
+            "weight": 100,
+            "modifiers": [
+                {
+                    "stat": "stability",
+                    "operation": "increased_percent",
+                    "value": 15
+                }
+            ]
+        }
+    ],
+    "blighted": [
+        {
+            "id": "stability",
+            "weight": 100,
+            "modifiers": [
+                {
+                    "stat": "stability",
+                    "operation": "less",
+                    "value": 0.85
+                }
+            ]
+        }
+    ]
+}

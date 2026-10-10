@@ -38,6 +38,7 @@ public record MachineInfoSnapshot(
         String refinementRarity,
         int refinementPotential,
         int affixCount,
+        boolean corrupted,
         String statusKey,
         List<String> statusArgs
 ) {
@@ -71,6 +72,7 @@ public record MachineInfoSnapshot(
         tag.putString("refinement_rarity", refinementRarity);
         tag.putInt("refinement_potential", refinementPotential);
         tag.putInt("affix_count", affixCount);
+        tag.putBoolean("corrupted", corrupted);
         if (!statusKey.isEmpty()) {
             tag.putString("status_key", statusKey);
             ListTag args = new ListTag();
@@ -108,6 +110,7 @@ public record MachineInfoSnapshot(
                 tag.getString("refinement_rarity"),
                 tag.getInt("refinement_potential"),
                 tag.getInt("affix_count"),
+                tag.getBoolean("corrupted"),
                 tag.getString("status_key"),
                 tag.getList("status_args", Tag.TAG_STRING).stream().map(Tag::getAsString).toList()
         );
@@ -257,6 +260,7 @@ public record MachineInfoSnapshot(
         private String refinementRarity = "normal";
         private int refinementPotential;
         private int affixCount;
+        private boolean corrupted;
         private String statusKey = "";
         private List<String> statusArgs = List.of();
 
@@ -337,7 +341,9 @@ public record MachineInfoSnapshot(
 
         public Builder refinement(MachineTraits traits) {
             refinementRarity = traits.rarity().getSerializedName();
-            refinementPotential = traits.refinementPotential();
+            corrupted = traits.isCorrupted();
+            // A Corrupted machine can never spend its Refinement Potential, so it is not reported.
+            refinementPotential = corrupted ? 0 : traits.refinementPotential();
             affixCount = (int) traits.modifiers().stream().filter(modifier -> modifier.slot().isAffix()).count();
             return this;
         }
@@ -376,6 +382,7 @@ public record MachineInfoSnapshot(
                     refinementRarity,
                     refinementPotential,
                     affixCount,
+                    corrupted,
                     statusKey,
                     statusArgs
             );

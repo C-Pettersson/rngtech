@@ -1555,6 +1555,20 @@
 	]
 	quest.B707E4F323CE4189.quest_subtitle: "Choose a path."
 	quest.B707E4F323CE4189.title: "Ascendancy Seal I"
+	quest.BAE00B9B83600445.quest_desc: [
+		"The &eVolatile Catalyst&r corrupts a finished part, Battery Cell, or placed machine: Untouched, Blessed, Reforged, Warped, or Blighted. A Corrupted item can never be refined again."
+		""
+		"&aCraft:&r"
+		"- A Stage 5 Calibrated Kinetic Component with stability between 20% and 35%: mistune your Calibrator."
+		"- Two Stage 5+ Malformed Ingots from failed press or Alloy Furnace cycles."
+		"- Two Jam Debris from Crusher jams on hardness 5+ ore."
+		""
+		"&aUse:&r"
+		"- Affix Forge with a Resonance Matrix, or a machine's Refinement tab."
+		"- A Stabilization Crystal in the focus slot removes Blighted."
+	]
+	quest.BAE00B9B83600445.quest_subtitle: "A one-way gamble."
+	quest.BAE00B9B83600445.title: "Volatile Catalyst"
 	quest.C3604160EA637458.quest_desc: [
 		"Craft &eMastery Refunds&r from paper, redstone, and a copper ingot, eight at a time."
 		""

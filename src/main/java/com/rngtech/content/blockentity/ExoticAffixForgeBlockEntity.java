@@ -63,6 +63,7 @@ public class ExoticAffixForgeBlockEntity extends BlockEntity implements MenuProv
     public static final int STATUS_WORKING = 11;
     public static final int STATUS_OUTPUT_FULL = 12;
     public static final int STATUS_FAILED = 13;
+    public static final int STATUS_CORRUPTED = 14;
 
     private static final int INTERNAL_ENERGY_CAPACITY = 2_000_000;
     private static final int POWER_FAILURE_THRESHOLD = 100;
@@ -389,6 +390,7 @@ public class ExoticAffixForgeBlockEntity extends BlockEntity implements MenuProv
             case STATUS_OUTPUT_FULL -> "output_full";
             case STATUS_WORKING -> "working";
             case STATUS_FAILED -> "failed";
+            case STATUS_CORRUPTED -> "corrupted";
             default -> "";
         };
         return name.isEmpty() ? "" : "rngtech.exotic_affix_forge.status." + name;
@@ -438,6 +440,9 @@ public class ExoticAffixForgeBlockEntity extends BlockEntity implements MenuProv
             return STATUS_INVALID_TARGET;
         }
         MachineTraits traits = RefinementTargets.storedTraits(target);
+        if (traits.isCorrupted()) {
+            return STATUS_CORRUPTED;
+        }
         if (traits.rarity() == Rarity.UNIQUE) {
             return STATUS_UNIQUE_TARGET;
         }
@@ -593,7 +598,8 @@ public class ExoticAffixForgeBlockEntity extends BlockEntity implements MenuProv
                 traits.rarity(),
                 Math.max(0, traits.refinementPotential() - refinementPotentialCost),
                 traits.modifiers(),
-                traits.behaviors()
+                traits.behaviors(),
+                traits.corruption()
         );
         return RefinementResult.success(
                 adjusted,

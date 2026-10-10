@@ -1,0 +1,38 @@
+{
+    "hosts": [
+        "bio_chamber",
+        "reactor_chamber",
+        "fuel_cell_membrane",
+        "cathode",
+        "cavitation_rotor",
+        "void_chamber",
+        "collapse_nozzle",
+        "solar_array_extender"
+    ],
+    "blessed": [
+        {
+            "id": "energy_generation",
+            "weight": 100,
+            "modifiers": [
+                {
+                    "stat": "energy_generation",
+                    "operation": "increased_percent",
+                    "value": 10
+                }
+            ]
+        }
+    ],
+    "blighted": [
+        {
+            "id": "energy_generation",
+            "weight": 100,
+            "modifiers": [
+                {
+                    "stat": "energy_generation",
+                    "operation": "less",
+                    "value": 0.9
+                }
+            ]
+        }
+    ]
+}

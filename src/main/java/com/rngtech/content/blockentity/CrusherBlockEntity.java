@@ -14,6 +14,7 @@ import com.rngtech.content.recipe.CrusherRecipe;
 import com.rngtech.content.recipe.ProcessingEnergyScaling;
 import com.rngtech.content.registry.ModBlockEntities;
 import com.rngtech.content.registry.ModDataComponents;
+import com.rngtech.content.registry.ModItems;
 import com.rngtech.rpg.BatchProcessing;
 import com.rngtech.rpg.ComponentBaseStatCatalog;
 import com.rngtech.rpg.MachineBaseStatCatalog;
@@ -911,7 +912,19 @@ public class CrusherBlockEntity extends BaseMachineBlockEntity implements MenuPr
         }
         resetProgress();
         jawJamTicks = ticks;
+        dropJamDebris(recipe);
         return true;
+    }
+
+    /** A jam on a recipe that needs Processing Level 5 or more leaves one Jam Debris in the output when it has room. */
+    private void dropJamDebris(CrusherRecipe recipe) {
+        if (!JamDebris.dropsFrom(recipe.requiredProcessingLevel())) {
+            return;
+        }
+        ItemStack debris = new ItemStack(ModItems.JAM_DEBRIS.get());
+        if (canMergeOutput(debris)) {
+            mergeOutput(debris);
+        }
     }
 
     private int currentRequiredProcessingLevel(MachineStatAccumulator stats) {

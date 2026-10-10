@@ -1,0 +1,29 @@
+{
+    "hosts": [
+        "fuel_box"
+    ],
+    "blessed": [
+        {
+            "id": "fuel_efficiency",
+            "weight": 100,
+            "modifiers": [
+                {
+                    "stat": "fuel_efficiency",
+                    "operation": "increased_percent",
+                    "value": 15
+                }
+            ]
+        },
+        {
+            "id": "fuel_duration",
+            "weight": 100,
+            "modifiers": [
+                {
+                    "stat": "fuel_duration",
+                    "operation": "increased_percent",
+                    "value": 15
+                }
+            ]
+        }
+    ]
+}

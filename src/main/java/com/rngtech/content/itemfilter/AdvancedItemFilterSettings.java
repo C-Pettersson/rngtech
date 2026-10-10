@@ -627,7 +627,9 @@ public record AdvancedItemFilterSettings(
     public enum IdentityMode implements StringRepresentable {
         ANY,
         IDENTIFIED,
-        UNIDENTIFIED;
+        UNIDENTIFIED,
+        CORRUPTED,
+        UNCORRUPTED;
 
         public static final Codec<IdentityMode> CODEC = StringRepresentable.fromEnum(IdentityMode::values);
         private static final IdentityMode[] VALUES = values();

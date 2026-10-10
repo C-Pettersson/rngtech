@@ -1,0 +1,65 @@
+{
+    "hosts": [
+        "battery_cell",
+        "unique_battery_cell"
+    ],
+    "blessed": [
+        {
+            "id": "energy_transfer",
+            "weight": 50,
+            "modifiers": [
+                {
+                    "stat": "energy_transfer",
+                    "operation": "increased_percent",
+                    "value": 20
+                }
+            ]
+        },
+        {
+            "id": "idle_loss",
+            "weight": 50,
+            "modifiers": [
+                {
+                    "stat": "idle_loss",
+                    "operation": "less",
+                    "value": 0.7
+                }
+            ]
+        },
+        {
+            "id": "energy_capacity",
+            "weight": 50,
+            "modifiers": [
+                {
+                    "stat": "energy_capacity",
+                    "operation": "increased_percent",
+                    "value": 15
+                }
+            ]
+        },
+        {
+            "id": "efficiency",
+            "weight": 50,
+            "modifiers": [
+                {
+                    "stat": "efficiency",
+                    "operation": "increased_percent",
+                    "value": 10
+                }
+            ]
+        }
+    ],
+    "blighted": [
+        {
+            "id": "idle_loss",
+            "weight": 100,
+            "modifiers": [
+                {
+                    "stat": "idle_loss",
+                    "operation": "more",
+                    "value": 2.0
+                }
+            ]
+        }
+    ]
+}

@@ -1119,7 +1119,9 @@ function staticStageEntries() {
         stageEntry("transmutation_crystal", 5, "static stage catalog"),
         stageEntry("resonance_crystal", 5, "static stage catalog"),
         stageEntry("destabilization_crystal", 5, "static stage catalog"),
-        stageEntry("stabilization_crystal", 5, "static stage catalog")
+        stageEntry("stabilization_crystal", 5, "static stage catalog"),
+        stageEntry("volatile_catalyst", 5, "static stage catalog"),
+        stageEntry("jam_debris", 5, "static stage catalog")
     ];
 }
 
@@ -2418,6 +2420,7 @@ function normalizeCalibrationRequirement(calibration) {
         family: calibration.family ?? "",
         minStage: numericOrNull(calibration.min_stage ?? calibration.minStage) ?? 0,
         minStability: numericOrNull(calibration.min_stability ?? calibration.minStability) ?? 0,
+        maxStability: numericOrNull(calibration.max_stability ?? calibration.maxStability) ?? 100,
         minRefinementPotential,
         consumeRefinementPotential: numericOrNull(calibration.consume_refinement_potential ?? calibration.consumeRefinementPotential) ?? 0
     };
@@ -2446,6 +2449,7 @@ function calibrationRequirementKey(calibration) {
         calibration.family,
         calibration.minStage,
         calibration.minStability,
+        calibration.maxStability,
         calibration.minRefinementPotential,
         calibration.consumeRefinementPotential
     ].join(":");
@@ -2462,7 +2466,9 @@ function calibrationRequirementText(calibration) {
     if (calibration.minStage) {
         parts.push(`stage ${calibration.minStage}+`);
     }
-    if (calibration.minStability) {
+    if (calibration.maxStability < 100) {
+        parts.push(`stability ${calibration.minStability}-${calibration.maxStability}`);
+    } else if (calibration.minStability) {
         parts.push(`stability ${calibration.minStability}+`);
     }
     if (calibration.minRefinementPotential) {
@@ -2484,6 +2490,7 @@ function recipeSatisfiesCalibrationRequirement(recipe, calibration) {
     }
     return output.stage >= calibration.minStage
         && output.stabilityMax >= calibration.minStability
+        && output.stabilityMin <= calibration.maxStability
         && output.refinementPotentialMax >= calibration.minRefinementPotential;
 }
 

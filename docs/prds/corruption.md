@@ -4,15 +4,15 @@
 
 PRD status: Accepted
 
-Implementation status: Planned
+Implementation status: Prototype
 
 Release: 2.0
 
-Last updated: 2026-10-06
+Last updated: 2026-10-10
 
 ## Summary
 
-Corruption is a one-way gamble on a finished item, modeled on Path of Exile's Vaal Orb. Using a Volatile Catalyst on a refinement target gives one weighted outcome: no change, a corruption implicit beyond normal affix limits, a full reroll, or a negative implicit. Corruption implicits have one fixed value each, with no tiers or ranges. Afterwards the item is **Corrupted** and can never be refined again.
+Corruption is a one-way gamble on a finished item, modeled on Path of Exile's Vaal Orb. Using a Volatile Catalyst on a refinement target gives one weighted outcome: no change, a corruption implicit beyond normal affix limits, a full reroll, a per-affix value warp past tier ranges, or a negative implicit. Corruption implicits have one fixed value each, with no tiers or ranges. Afterwards the item is **Corrupted** and can never be refined again.
 
 Corruption is also the only way to change a [Unique](uniques.md). That pairing is why both features ship together.
 
@@ -42,7 +42,7 @@ Key existing code:
 
 ## Goals
 
-- A Volatile Catalyst with four weighted outcomes, for ordinary targets and Uniques alike.
+- A Volatile Catalyst with five weighted outcomes, for ordinary targets and Uniques alike.
 - A stored, synced Corrupted state on item stacks and placed machines. Every refinement entry point rejects a Corrupted target.
 - Corruption implicits: one per item, drawn by weight from per-host pools, for effects that normal affixes cannot roll. Each has one fixed value, with no tiers or ranges.
 - The Stabilization Crystal removes the negative outcome when it is in the focus slot.
@@ -70,6 +70,7 @@ Key existing code:
 | Blessed | The outcome that adds a positive corruption implicit. |
 | Blighted | The outcome that adds a negative corruption implicit. |
 | Reforged | The outcome that rerolls every rolled affix, like a Chaos Crystal, while keeping rarity. On a Unique it rerolls every ranged stat line instead. |
+| Warped | The outcome that scales each rolled affix by its own random percent, -15% to +15% by default, past its tier range. |
 | Untouched | The outcome that only marks the target Corrupted. |
 
 ## Player Flow
@@ -84,19 +85,21 @@ Key existing code:
 
 | Outcome | Weight | With Stabilization Crystal |
 |---|---:|---|
-| Untouched | 25 | Gains the Blighted weight |
-| Blessed | 25 | Unchanged |
-| Reforged | 25 | Unchanged |
-| Blighted | 25 | Removed |
+| Untouched | 20 | Gains the Blighted weight |
+| Blessed | 20 | Unchanged |
+| Reforged | 20 | Unchanged |
+| Warped | 20 | Unchanged |
+| Blighted | 20 | Removed |
 
 - **Reforged** rerolls every rolled prefix and suffix from legal pools, keeps rarity and Refinement Potential, and leaves fixed identity and base profiles alone. On a Normal target with no affixes, Reforged becomes Untouched.
 - **Reforged on a Unique** rerolls every ranged stat line inside its catalog range, as identification does. Fixed lines and behaviors stay. On a Unique with no ranged lines, Reforged becomes Untouched.
+- **Warped** multiplies every effect of each rolled prefix and suffix by one factor rolled per affix from the warp range, so 100% increased Processing Speed becomes 85%-115%. More and less multipliers scale their distance from 1, and reductions stop short of 100%. Results round like a normal roll: whole percents for increases, reductions, more, and less, and the original's decimal places for flat values. Tiers, rarity, Refinement Potential, and fixed identity stay. Affixes with a yield or Refinement Potential effect are not warped, so Warped never adds yield. With nothing to warp, Warped becomes Untouched.
 - Refinement Potential stays stored but is hidden everywhere once the target is Corrupted, because it can no longer be spent.
-- Weights are datapack-tunable through one `data/rngtech/corruption/outcomes.json`, so hardcore packs can make corruption harsher.
+- Weights and the warp range are datapack-tunable through one `data/rngtech/corruption/outcomes.json`, so hardcore packs can make corruption harsher.
 
 ## Corruption Implicits
 
-Each host type has a Blessed pool and a Blighted pool in `data/rngtech/corruption/pools/<host>.json`. One entry is chosen by weight. Entries use the existing modifier operations and `MachineBehavior` ids. Each entry has one fixed value: a corruption implicit has no tiers, no range, and no roll, and no operation can upgrade it. Draft pools:
+Each host type has a Blessed pool and a Blighted pool in `data/rngtech/corruption/pools/*.json`; a pool file lists the eligibility profile ids it applies to, and a host draws from every pool that names it. One entry is chosen by weight. Entries use the existing modifier operations and `MachineBehavior` ids. Each entry has one fixed value: a corruption implicit has no tiers, no range, and no roll, and no operation can upgrade it. Draft pools:
 
 | Host | Blessed examples | Blighted examples |
 |---|---|---|
@@ -123,7 +126,7 @@ Pool rules, checked at load:
 ## Uniques
 
 - A Unique can be corrupted once, with the same outcome weights as other targets.
-- Reforged rerolls its ranged lines, so a poorly rolled Unique has a 25% chance of a new roll, with the same chance of a Blighted implicit.
+- Reforged rerolls its ranged lines, so a poorly rolled Unique has a 20% chance of a new roll, with the same chance of a Blighted implicit. Warped leaves Unique lines alone in 2.0.
 - A Unique stores its rolls and its corruption, and nothing else. `withIdentity` must keep both while forcing `UNIQUE` and 0 RP.
 - A Corrupted Unique stays unrecyclable.
 
@@ -223,7 +226,7 @@ ModDex checks (`npm run moddex:check`):
 
 In-game checks:
 
-- Corrupt a Rare part, a Unique, a Battery Cell, and a placed machine through each station. Check all four outcomes.
+- Corrupt a Rare part, a Unique, a Battery Cell, and a placed machine through each station. Check all five outcomes.
 - The Stabilization Crystal removes Blighted and is consumed.
 - Corrupted items are rejected by every station and the Debug Reroller.
 - A corrupted placed machine keeps its state through breaking and replacing it, and in multiplayer.
@@ -259,10 +262,15 @@ Resolved 2026-10-05:
 - The catalyst is named Volatile Catalyst.
 - Outcomes are weighted. A corruption implicit has one fixed value, with no tiers or ranges.
 - +1 Processing Level and +1 Batch Size are in the Blessed pools.
-- Uniques use the same four outcomes. Reforged rerolls their ranged lines.
+- Uniques use the same outcomes. Reforged rerolls their ranged lines.
 - A Corrupted item hides its Refinement Potential.
 
 Resolved 2026-10-06:
 
 - The catalyst is gated by RNGTech challenges only: a detuned calibration plus failure byproducts from two machine families. It has no vanilla loot and no vanilla-only ingredient.
 - The recipe sits at Stage 5, alongside Seal I.
+
+Resolved 2026-10-10:
+
+- A fifth outcome, Warped, scales each affix by -15% to +15% past its tier range. The five outcomes share equal weights.
+- Blessed pools get more entries than Blighted pools, so a Blessed roll offers more variety.

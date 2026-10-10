@@ -4,6 +4,7 @@ import com.rngtech.RNGTech;
 import com.rngtech.content.material.MaterialEnabledCondition;
 import com.rngtech.content.material.OreWorldgenEnabledCondition;
 import com.rngtech.content.recipe.AscendancySealRecipesEnabledCondition;
+import com.rngtech.content.recipe.VolatileCatalystRecipesEnabledCondition;
 
 import com.mojang.serialization.MapCodec;
 import net.neoforged.bus.api.IEventBus;
@@ -22,6 +23,8 @@ public final class ModConditions {
             CONDITIONS.register("ore_worldgen_enabled", () -> OreWorldgenEnabledCondition.CODEC);
     public static final DeferredHolder<MapCodec<? extends ICondition>, MapCodec<AscendancySealRecipesEnabledCondition>> ASCENDANCY_SEAL_RECIPES_ENABLED =
             CONDITIONS.register("ascendancy_seal_recipes_enabled", () -> AscendancySealRecipesEnabledCondition.CODEC);
+    public static final DeferredHolder<MapCodec<? extends ICondition>, MapCodec<VolatileCatalystRecipesEnabledCondition>> VOLATILE_CATALYST_RECIPES_ENABLED =
+            CONDITIONS.register("volatile_catalyst_recipes_enabled", () -> VolatileCatalystRecipesEnabledCondition.CODEC);
 
     public static void register(IEventBus bus) {
         CONDITIONS.register(bus);

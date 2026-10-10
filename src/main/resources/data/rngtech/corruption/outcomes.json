@@ -1,0 +1,13 @@
+{
+    "weights": {
+        "untouched": 20,
+        "blessed": 20,
+        "reforged": 20,
+        "warped": 20,
+        "blighted": 20
+    },
+    "warp": {
+        "min_percent": -15,
+        "max_percent": 15
+    }
+}

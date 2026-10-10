@@ -12,6 +12,7 @@ import com.rngtech.rpg.ModifierLensTag;
 import com.rngtech.rpg.refinement.RefinementAction;
 import com.rngtech.rpg.refinement.RefinementEngine;
 import com.rngtech.rpg.refinement.RefinementModifier;
+import com.rngtech.rpg.refinement.RefinementOperation;
 import com.rngtech.rpg.refinement.RefinementResult;
 import com.rngtech.rpg.refinement.RefinementSelection;
 import com.rngtech.rpg.refinement.RefinementTargets;
@@ -109,6 +110,12 @@ public final class RefinementMenuSupport {
         ItemStack consumable = inventory.getStackInSlot(SLOT_CONSUMABLE);
         if (!(consumable.getItem() instanceof RefinementConsumableItem refinementItem)) {
             showFailure(player, "rngtech.refinement.failure.invalid_consumable");
+            return false;
+        }
+        if (refinementItem.operation() == RefinementOperation.CORRUPT
+                && !RefinementTargets.storedTraits(target).isCorrupted()
+                && !RefinementTargets.canCorrupt(target)) {
+            showFailure(player, "rngtech.refinement.failure.cannot_corrupt");
             return false;
         }
         if (requireSelection && refinementItem.operation().requiresForgeSelection()) {

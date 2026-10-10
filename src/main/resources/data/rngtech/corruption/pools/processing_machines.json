@@ -1,0 +1,53 @@
+{
+    "hosts": [
+        "crusher",
+        "electric_furnace",
+        "alloy_furnace",
+        "metal_press",
+        "melter",
+        "component_recycler",
+        "battery_assembler",
+        "coal_gasifier",
+        "steam_methane_reformer",
+        "ammonia_synthesizer",
+        "resonance_calibrator",
+        "compressor_tank"
+    ],
+    "blessed": [
+        {
+            "id": "processing_speed",
+            "weight": 30,
+            "modifiers": [
+                {
+                    "stat": "processing_speed",
+                    "operation": "increased_percent",
+                    "value": 10
+                }
+            ]
+        },
+        {
+            "id": "energy_usage",
+            "weight": 30,
+            "modifiers": [
+                {
+                    "stat": "energy_usage",
+                    "operation": "decreased_percent",
+                    "value": 20
+                }
+            ]
+        }
+    ],
+    "blighted": [
+        {
+            "id": "energy_usage",
+            "weight": 30,
+            "modifiers": [
+                {
+                    "stat": "energy_usage",
+                    "operation": "increased_percent",
+                    "value": 25
+                }
+            ]
+        }
+    ]
+}

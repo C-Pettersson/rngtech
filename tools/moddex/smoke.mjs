@@ -4,6 +4,7 @@ import { checkAscendancySeals } from "./check-ascendancy-seals.mjs";
 import { checkAscendancyDocs } from "./export-ascendancy-data.mjs";
 import { checkRecipeLoopMutations, checkRecipeLoops } from "./check-recipe-loops.mjs";
 import { checkRecyclingReturns } from "./check-recycling-returns.mjs";
+import { checkVolatileCatalyst } from "./check-volatile-catalyst.mjs";
 
 const { server, url } = await startModdexServer({ port: 0, log: false });
 
@@ -114,6 +115,7 @@ try {
     await checkRecipeLoopMutations();
     await checkRecyclingReturns();
     await checkAscendancySeals();
+    await checkVolatileCatalyst();
     await checkAscendancyView(url);
     await checkAscendancyDocs();
 
@@ -596,5 +598,6 @@ function calibrationRecipeSatisfies(recipe, requirement) {
     return output.family === requirement.family
         && output.stage >= requirement.minStage
         && output.stabilityMax >= requirement.minStability
+        && output.stabilityMin <= (requirement.maxStability ?? 100)
         && output.refinementPotentialMax >= requirement.minRefinementPotential;
 }

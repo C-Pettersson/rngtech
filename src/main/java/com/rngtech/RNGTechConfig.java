@@ -110,6 +110,10 @@ public final class RNGTechConfig {
             .comment("Whether the default Ascendancy Seal and Seal Core recipes load. Disable them to award Seals through loot, quests, or custom recipes instead.")
             .define("ascendancy.sealRecipesEnabled", true);
 
+    public static final ModConfigSpec.BooleanValue VOLATILE_CATALYST_RECIPES_ENABLED = BUILDER
+            .comment("Whether the default Volatile Catalyst recipe loads. Disable it to award catalysts through quests, loot, or custom recipes instead.")
+            .define("corruption.volatileCatalystRecipesEnabled", true);
+
     public static final Map<String, ModConfigSpec.BooleanValue> MATERIALS = defineMaterials();
     private static final OreWorldgenConfig ORE_WORLDGEN_CONFIG = defineOreWorldgen();
     public static final ModConfigSpec.BooleanValue ORE_WORLDGEN_ENABLED = ORE_WORLDGEN_CONFIG.enabled();

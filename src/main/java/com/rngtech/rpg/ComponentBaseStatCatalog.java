@@ -108,7 +108,27 @@ public final class ComponentBaseStatCatalog {
                 }
             }
         }
+        // Corruption implicits apply after affixes and may move hard-gate stats such as Processing Level.
+        for (MachineModifier corrupted : corruptionEffects(traits)) {
+            MergeRule rule = profile.mergeRules().get(corrupted.stat());
+            if (rule != null && rule != MergeRule.INCREASED) {
+                stats.apply(corrupted);
+            }
+        }
         return stats;
+    }
+
+    /** Each corruption implicit effect as its own single-effect modifier. */
+    private static List<MachineModifier> corruptionEffects(MachineTraits traits) {
+        List<MachineModifier> effects = new ArrayList<>();
+        for (MachineModifier modifier : traits.modifiers()) {
+            if (modifier.slot().isCorruption()) {
+                modifier.effects().forEach(effect -> effects.add(
+                        new MachineModifier(ModifierSlot.CORRUPTION, effect.stat(), effect.operation(), effect.value())
+                ));
+            }
+        }
+        return effects;
     }
 
     /** Whether {@code stat} on this part joins the host's increased bucket, so its base reads as a percent. */
@@ -203,6 +223,13 @@ public final class ComponentBaseStatCatalog {
                 case ADD -> applyAdd(target, stat, value);
                 case MORE -> applyMore(target, stat, value);
                 case INCREASED -> applyIncreased(target, profile.baseStats().baseValue(stat), stat, traits);
+            }
+        }
+
+        // Corruption stats the part does not carry, such as a Crush Head's Jam Recovery, act on the host directly.
+        for (MachineModifier corrupted : corruptionEffects(traits)) {
+            if (!profile.mergeRules().containsKey(corrupted.stat())) {
+                target.apply(corrupted);
             }
         }
 
@@ -597,7 +624,7 @@ public final class ComponentBaseStatCatalog {
             target.apply(new MachineModifier(ModifierSlot.IMPLICIT, stat, ModifierOperation.INCREASED_PERCENT, basePercent));
         }
         for (MachineModifier modifier : traits.modifiers()) {
-            if (!modifier.slot().isAffix()) {
+            if (!modifier.slot().isAffix() && !modifier.slot().isCorruption()) {
                 continue;
             }
             for (MachineModifierEffect effect : modifier.effects()) {

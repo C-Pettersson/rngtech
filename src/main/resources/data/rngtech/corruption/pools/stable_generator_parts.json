@@ -1,0 +1,34 @@
+{
+    "hosts": [
+        "reactor_chamber",
+        "fuel_cell_membrane",
+        "cathode",
+        "cavitation_rotor",
+        "void_chamber",
+        "collapse_nozzle"
+    ],
+    "blessed": [
+        {
+            "id": "stability",
+            "weight": 100,
+            "modifiers": [
+                {
+                    "stat": "stability",
+                    "operation": "increased_percent",
+                    "value": 15
+                }
+            ]
+        },
+        {
+            "id": "processing_speed",
+            "weight": 100,
+            "modifiers": [
+                {
+                    "stat": "processing_speed",
+                    "operation": "increased_percent",
+                    "value": 10
+                }
+            ]
+        }
+    ]
+}

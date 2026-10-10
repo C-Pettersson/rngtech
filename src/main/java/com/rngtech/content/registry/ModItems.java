@@ -514,6 +514,11 @@ public final class ModItems {
             "malformed_ingot",
             () -> new MalformedIngotItem(new Item.Properties())
     );
+    /** Crusher jam byproduct from under-level crushing of recipes that need Processing Level 5 or more. */
+    public static final DeferredItem<Item> JAM_DEBRIS = ITEMS.register(
+            "jam_debris",
+            () -> new Item(new Item.Properties())
+    );
     public static final Map<EnergyConnectorTier, DeferredItem<EnergyConnectorItem>> ENERGY_CONNECTORS =
             registerEnergyConnectors();
     public static final Map<FluidConnectorTier, DeferredItem<FluidConnectorItem>> FLUID_CONNECTORS =
@@ -774,6 +779,10 @@ public final class ModItems {
     public static final DeferredItem<RefinementConsumableItem> NULL_CRYSTAL = ITEMS.register(
             "null_crystal",
             () -> new RefinementConsumableItem(RefinementOperation.NULL_CRYSTAL, new Item.Properties())
+    );
+    public static final DeferredItem<RefinementConsumableItem> VOLATILE_CATALYST = ITEMS.register(
+            "volatile_catalyst",
+            () -> new RefinementConsumableItem(RefinementOperation.CORRUPT, new Item.Properties())
     );
     public static final DeferredItem<Item> EXOTIC_AFFIX_CATALYST = ITEMS.register(
             "exotic_affix_catalyst",

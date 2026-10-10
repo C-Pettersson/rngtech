@@ -279,6 +279,7 @@ public final class ModCreativeTabs {
                         output.accept(ModItems.CIRCUIT_MOLD.get());
                         output.accept(ModItems.CONNECTOR_MOLD.get());
                         output.accept(ModItems.MALFORMED_INGOT.get());
+                        output.accept(ModItems.JAM_DEBRIS.get());
                         output.accept(ModItems.AFFIX_INJECTOR.get());
                         output.accept(ModItems.AFFIX_MODIFIER.get());
                         output.accept(ModItems.AFFIX_UPGRADE.get());
@@ -301,6 +302,7 @@ public final class ModCreativeTabs {
                         output.accept(ModItems.DESTABILIZATION_CRYSTAL.get());
                         output.accept(ModItems.STABILIZATION_CRYSTAL.get());
                         output.accept(ModItems.NULL_CRYSTAL.get());
+                        output.accept(ModItems.VOLATILE_CATALYST.get());
                         output.accept(ModItems.EXOTIC_AFFIX_CATALYST.get());
                         acceptMaterial(output, ModItems.CRUSHED_IRON);
                         acceptMaterial(output, ModItems.CRUSHED_GOLD);

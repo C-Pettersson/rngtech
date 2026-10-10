@@ -207,6 +207,10 @@ public final class ItemFilterMatcher {
             case ANY -> true;
             case IDENTIFIED -> isTraitTarget(candidate) && !CraftedTraitOutputs.isUnidentified(candidate);
             case UNIDENTIFIED -> CraftedTraitOutputs.isUnidentified(candidate);
+            case CORRUPTED -> isTraitTarget(candidate) && RefinementTargets.isCorrupted(candidate);
+            case UNCORRUPTED -> isTraitTarget(candidate)
+                    && !CraftedTraitOutputs.isUnidentified(candidate)
+                    && !RefinementTargets.isCorrupted(candidate);
         };
     }
 

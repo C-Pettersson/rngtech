@@ -517,7 +517,7 @@ public class AmmoniaFuelCellBlockEntity extends BaseMachineBlockEntity
 
     public MachineStatAccumulator effectiveStats() {
         MachineStatAccumulator stats = MachineBaseStatCatalog.ammoniaFuelCell();
-        machineTraits().modifiers().forEach(stats::apply);
+        machineTraits().activeModifiers().forEach(stats::apply);
         ComponentBaseStatCatalog.applyEffectiveContribution(stats, membraneStack());
         return stats;
     }

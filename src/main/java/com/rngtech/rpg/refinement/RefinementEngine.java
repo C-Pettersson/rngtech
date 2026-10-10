@@ -1,6 +1,8 @@
 package com.rngtech.rpg.refinement;
 
 import com.rngtech.content.item.MachinePartItem;
+import com.rngtech.rpg.CorruptionOutcome;
+import com.rngtech.rpg.MachineCorruption;
 import com.rngtech.rpg.MachineModifier;
 import com.rngtech.rpg.MachineModifierEffect;
 import com.rngtech.rpg.MachineStat;
@@ -12,9 +14,11 @@ import com.rngtech.rpg.ModifierEffectDefinition;
 import com.rngtech.rpg.ModifierEligibilityProfile;
 import com.rngtech.rpg.ModifierEligibilityProfiles;
 import com.rngtech.rpg.ModifierLensTag;
+import com.rngtech.rpg.ModifierOperation;
 import com.rngtech.rpg.ModifierSlot;
 import com.rngtech.rpg.ModifierValueRange;
 import com.rngtech.rpg.Rarity;
+import com.rngtech.rpg.corruption.CorruptionCatalog;
 
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.item.ItemStack;
@@ -38,6 +42,8 @@ public final class RefinementEngine {
     private static final int LENS_WEIGHT_MULTIPLIER = 3;
     private static final int ASCENSION_CATALYST_POTENTIAL_COST = 4;
     private static final int ASCENSION_CATALYST_MINIMUM_POTENTIAL = ASCENSION_CATALYST_POTENTIAL_COST + 1;
+    private static final String CORRUPTED_FAILURE = "rngtech.refinement.failure.corrupted";
+    private static final String UNIQUE_FAILURE = "rngtech.refinement.failure.unique";
 
     public static RefinementResult apply(
             MachineType machineType,
@@ -100,8 +106,11 @@ public final class RefinementEngine {
             Set<ModifierLensTag> lensTags,
             RandomSource random
     ) {
-        if (traits.rarity() == Rarity.UNIQUE) {
-            return RefinementResult.failure(traits, "rngtech.refinement.failure.unique");
+        if (traits.isCorrupted()) {
+            return RefinementResult.failure(traits, CORRUPTED_FAILURE);
+        }
+        if (traits.rarity() == Rarity.UNIQUE && operation != RefinementOperation.CORRUPT) {
+            return RefinementResult.failure(traits, UNIQUE_FAILURE);
         }
         lensTags = Set.copyOf(lensTags);
         if (!lensTags.isEmpty() && !operationSupportsLens(operation)) {
@@ -110,10 +119,16 @@ public final class RefinementEngine {
         if (!lensTags.isEmpty() && modifier != RefinementModifier.NONE) {
             return RefinementResult.failure(traits, "rngtech.refinement.failure.focus_conflict");
         }
+        if (modifier.requiresCorrupt() && operation != RefinementOperation.CORRUPT) {
+            return RefinementResult.failure(traits, "rngtech.refinement.failure.modifier_requires_corrupt");
+        }
         if (modifier.requiresRandomUpgrade() && operation != RefinementOperation.UPGRADE_RANDOM_MODIFIER) {
             return RefinementResult.failure(traits, "rngtech.refinement.failure.modifier_requires_affix_modifier");
         }
-        if (modifier != RefinementModifier.NONE && !modifier.requiresRandomUpgrade() && !canUseModifier(operation.action())) {
+        if (modifier != RefinementModifier.NONE
+                && !modifier.requiresRandomUpgrade()
+                && !modifier.requiresCorrupt()
+                && !canUseModifier(operation.action())) {
             return RefinementResult.failure(traits, "rngtech.refinement.failure.modifier_requires_add_or_upgrade");
         }
         if (modifier.requiresSelectedUpgrade() && operation != RefinementOperation.UPGRADE_SELECTED_MODIFIER) {
@@ -157,7 +172,19 @@ public final class RefinementEngine {
             case TARGETED_ADD_OR_UPGRADE -> targetedAddOrUpgrade(profile, traits, operation, componentStage, selection, modifier, random);
             case FULL_REROLL -> fullReroll(profile, traits, componentStage, random);
             case FILL_OPEN_SLOTS -> fillOpenSlots(profile, traits, componentStage, random);
+            case CORRUPT -> corrupt(profile, traits, componentStage, modifier, random);
         };
+    }
+
+    /** The failure for a target that no refinement may touch, or null. Uniques still accept a Volatile Catalyst. */
+    private static RefinementResult lockedTargetFailure(MachineTraits traits) {
+        if (traits.isCorrupted()) {
+            return RefinementResult.failure(traits, CORRUPTED_FAILURE);
+        }
+        if (traits.rarity() == Rarity.UNIQUE) {
+            return RefinementResult.failure(traits, UNIQUE_FAILURE);
+        }
+        return null;
     }
 
     public static int rollPotentialCost(RandomSource random) {
@@ -233,8 +260,9 @@ public final class RefinementEngine {
         }
 
         MachineTraits traits = RefinementTargets.storedTraits(target);
-        if (traits.rarity() == Rarity.UNIQUE) {
-            return RefinementResult.failure(traits, "rngtech.refinement.failure.unique");
+        RefinementResult locked = lockedTargetFailure(traits);
+        if (locked != null) {
+            return locked;
         }
 
         MachineTraits rolled = MachineTraitRoller.roll(
@@ -259,8 +287,9 @@ public final class RefinementEngine {
             int refinementPotentialCost,
             RandomSource random
     ) {
-        if (traits.rarity() == Rarity.UNIQUE) {
-            return RefinementResult.failure(traits, "rngtech.refinement.failure.unique");
+        RefinementResult locked = lockedTargetFailure(traits);
+        if (locked != null) {
+            return locked;
         }
         if (traits.refinementPotential() < refinementPotentialCost) {
             return RefinementResult.failure(traits, "rngtech.refinement.failure.no_potential");
@@ -296,8 +325,9 @@ public final class RefinementEngine {
             int refinementPotentialCost,
             RandomSource random
     ) {
-        if (traits.rarity() == Rarity.UNIQUE) {
-            return RefinementResult.failure(traits, "rngtech.refinement.failure.unique");
+        RefinementResult locked = lockedTargetFailure(traits);
+        if (locked != null) {
+            return locked;
         }
         if (selection.kind() != RefinementSelection.Kind.EXISTING_MODIFIER) {
             return RefinementResult.failure(traits, "rngtech.refinement.failure.select_modifier_or_slot");
@@ -355,8 +385,9 @@ public final class RefinementEngine {
             PotentialCostRange costRange,
             RandomSource random
     ) {
-        if (traits.rarity() == Rarity.UNIQUE) {
-            return RefinementResult.failure(traits, "rngtech.refinement.failure.unique");
+        RefinementResult locked = lockedTargetFailure(traits);
+        if (locked != null) {
+            return locked;
         }
         List<MachineModifier> upgradeable = upgradeableAffixes(profile, traits, true, false, costRange);
         if (allowTuning && upgradeable.isEmpty()) {
@@ -393,6 +424,10 @@ public final class RefinementEngine {
             RefinementModifier refinementModifier,
             RandomSource random
     ) {
+        RefinementResult locked = lockedTargetFailure(traits);
+        if (locked != null) {
+            return locked;
+        }
         if (refinementModifier.requiresRandomUpgrade()) {
             return RefinementResult.failure(traits, "rngtech.refinement.failure.modifier_requires_affix_modifier");
         }
@@ -422,6 +457,10 @@ public final class RefinementEngine {
             RefinementSelection selection,
             RandomSource random
     ) {
+        RefinementResult locked = lockedTargetFailure(traits);
+        if (locked != null) {
+            return locked;
+        }
         if (selection.kind() != RefinementSelection.Kind.EMPTY_SLOT) {
             return RefinementResult.failure(traits, "rngtech.refinement.failure.select_empty_slot");
         }
@@ -444,8 +483,9 @@ public final class RefinementEngine {
             RefinementSelection selection,
             int refinementPotentialCost
     ) {
-        if (traits.rarity() == Rarity.UNIQUE) {
-            return RefinementResult.failure(traits, "rngtech.refinement.failure.unique");
+        RefinementResult locked = lockedTargetFailure(traits);
+        if (locked != null) {
+            return locked;
         }
         if (selection.kind() != RefinementSelection.Kind.EXISTING_MODIFIER) {
             return RefinementResult.failure(traits, "rngtech.refinement.failure.select_modifier_or_slot");
@@ -1047,6 +1087,163 @@ public final class RefinementEngine {
         );
     }
 
+    /**
+     * Volatile Catalyst: rolls one outcome, costs no Refinement Potential, and always marks the target Corrupted. An
+     * outcome with nothing to do, such as Reforged on a target without affixes, falls back to Untouched.
+     */
+    private static RefinementResult corrupt(
+            ModifierEligibilityProfile profile,
+            MachineTraits traits,
+            int componentStage,
+            RefinementModifier refinementModifier,
+            RandomSource random
+    ) {
+        CorruptionCatalog catalog = CorruptionCatalog.active();
+        if (!catalog.canCorrupt(profile.id())) {
+            return RefinementResult.failure(traits, "rngtech.refinement.failure.cannot_corrupt");
+        }
+        boolean warded = refinementModifier == RefinementModifier.CORRUPTION_WARD;
+        CorruptionOutcome outcome = catalog.rollOutcome(warded, random);
+        MachineTraits corrupted = traits;
+        MachineCorruption corruption = MachineCorruption.of(CorruptionOutcome.UNTOUCHED);
+        switch (outcome) {
+            case BLESSED, BLIGHTED -> {
+                CorruptionCatalog.Entry entry = catalog.rollEntry(profile.id(), outcome, random);
+                if (entry != null) {
+                    corruption = entry.toCorruption(outcome);
+                }
+            }
+            case REFORGED -> {
+                List<MachineModifier> reforged = reforgedModifiers(profile, traits, componentStage, random);
+                if (reforged != null) {
+                    corrupted = withModifiers(traits, traits.rarity(), traits.refinementPotential(), reforged);
+                    corruption = MachineCorruption.of(CorruptionOutcome.REFORGED);
+                }
+            }
+            case WARPED -> {
+                List<MachineModifier> warped = warpedModifiers(traits, catalog.warp(), random);
+                if (warped != null) {
+                    corrupted = withModifiers(traits, traits.rarity(), traits.refinementPotential(), warped);
+                    corruption = MachineCorruption.of(CorruptionOutcome.WARPED);
+                }
+            }
+            case UNTOUCHED -> {
+            }
+        }
+        return RefinementResult.success(
+                corrupted.withCorruption(corruption),
+                0,
+                "rngtech.refinement.success.corrupt." + corruption.outcome().getSerializedName(),
+                true,
+                warded
+        );
+    }
+
+    /**
+     * Rerolls every prefix and suffix from legal pools like a Chaos Crystal, keeping rarity, Refinement Potential and
+     * non-affix modifiers. Returns null when there is nothing to reroll. Uniques have no ranged stat lines until the
+     * Unique catalog lands, so they fall back to Untouched.
+     */
+    private static List<MachineModifier> reforgedModifiers(
+            ModifierEligibilityProfile profile,
+            MachineTraits traits,
+            int componentStage,
+            RandomSource random
+    ) {
+        if (traits.rarity() == Rarity.UNIQUE) {
+            return null;
+        }
+        int prefixCount = count(traits.modifiers(), ModifierSlot.PREFIX);
+        int suffixCount = count(traits.modifiers(), ModifierSlot.SUFFIX);
+        if (prefixCount + suffixCount == 0) {
+            return null;
+        }
+        List<MachineModifier> modifiers = new ArrayList<>(traits.modifiers().stream()
+                .filter(modifier -> !modifier.slot().isAffix())
+                .toList());
+        rollSlotModifiers(profile, ModifierSlot.PREFIX, prefixCount, traits.rarity(), componentStage, Integer.MAX_VALUE, random, modifiers);
+        rollSlotModifiers(profile, ModifierSlot.SUFFIX, suffixCount, traits.rarity(), componentStage, Integer.MAX_VALUE, random, modifiers);
+        if (count(modifiers, ModifierSlot.PREFIX) + count(modifiers, ModifierSlot.SUFFIX) == 0) {
+            return null;
+        }
+        return modifiers;
+    }
+
+    /**
+     * Scales every rolled affix by its own random percent from the warp range, past its tier range, keeping its tier.
+     * Affixes with a yield or Refinement Potential effect stay as they are, so corruption never adds yield. Returns null
+     * when nothing can be warped.
+     */
+    private static List<MachineModifier> warpedModifiers(
+            MachineTraits traits,
+            CorruptionCatalog.WarpRange warp,
+            RandomSource random
+    ) {
+        if (traits.rarity() == Rarity.UNIQUE) {
+            return null;
+        }
+        List<MachineModifier> modifiers = new ArrayList<>();
+        boolean warped = false;
+        for (MachineModifier modifier : traits.modifiers()) {
+            if (!isWarpable(modifier)) {
+                modifiers.add(modifier);
+                continue;
+            }
+            modifiers.add(warpedModifier(modifier, 1.0 + warp.roll(random) / 100.0));
+            warped = true;
+        }
+        return warped ? modifiers : null;
+    }
+
+    public static boolean isWarpable(MachineModifier modifier) {
+        return modifier.slot().isAffix()
+                && modifier.effects().stream().allMatch(effect -> CorruptionCatalog.forbiddenReason(effect.stat()) == null);
+    }
+
+    /** One factor for the whole affix, so a drawback on a multi-stat affix scales with its benefit. */
+    static MachineModifier warpedModifier(MachineModifier modifier, double factor) {
+        List<MachineModifierEffect> effects = modifier.effects().stream()
+                .map(effect -> new MachineModifierEffect(effect.stat(), effect.operation(), effect.range(), warpedValue(effect, factor)))
+                .toList();
+        return new MachineModifier(
+                modifier.affixId(),
+                modifier.modGroup(),
+                modifier.slot(),
+                modifier.stat(),
+                modifier.operation(),
+                modifier.tier(),
+                modifier.range(),
+                effects.getFirst().value(),
+                effects
+        );
+    }
+
+    private static double warpedValue(MachineModifierEffect effect, double factor) {
+        double value = effect.value();
+        double warped = switch (effect.operation()) {
+            // More and less store multipliers, so the warp scales their distance from 1.
+            case MORE, LESS -> Math.max(0.01, 1.0 + (value - 1.0) * factor);
+            // A reduction past 100% would flip the stat's sign.
+            case DECREASED_PERCENT -> Math.min(value * factor, Math.max(value, 95.0));
+            default -> value * factor;
+        };
+        return roundLike(warped, value, effect.operation());
+    }
+
+    /**
+     * Keeps a warped value as tidy as a normal roll: percent increases and reductions land on whole percents, more and
+     * less on whole percent steps, and flat values keep the original's decimal places.
+     */
+    private static double roundLike(double warped, double original, ModifierOperation operation) {
+        double step = switch (operation) {
+            case INCREASED_PERCENT, DECREASED_PERCENT -> 1.0;
+            case MORE, LESS -> 0.01;
+            case ADD -> Math.abs(original - Math.rint(original)) < 1e-9 ? 1.0
+                    : Math.abs(original * 10.0 - Math.rint(original * 10.0)) < 1e-9 ? 0.1 : 0.01;
+        };
+        return Math.round(warped / step) * step;
+    }
+
     private static RefinementResult fillOpenSlots(
             ModifierEligibilityProfile profile,
             MachineTraits traits,
@@ -1633,7 +1830,7 @@ public final class RefinementEngine {
             int refinementPotential,
             List<MachineModifier> modifiers
     ) {
-        return new MachineTraits(rarity, refinementPotential, modifiers, traits.behaviors());
+        return new MachineTraits(rarity, refinementPotential, modifiers, traits.behaviors(), traits.corruption());
     }
 
     private static int count(List<MachineModifier> modifiers, ModifierSlot slot) {

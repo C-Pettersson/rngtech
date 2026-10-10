@@ -310,6 +310,15 @@ public final class RNGTechJadePlugin implements IWailaPlugin {
         }
 
         private static void appendRefinement(ITooltip tooltip, MachineInfoSnapshot info, boolean details) {
+            if (details && info.corrupted()) {
+                tooltip.add(Component.translatable(
+                        "rngtech.jade.machine_state.line.refinement_corrupted",
+                        Component.translatable("rngtech.rarity." + info.refinementRarity()),
+                        value(info.affixCount())
+                ));
+                tooltip.add(Component.translatable("rngtech.tooltip.corrupted").withStyle(ChatFormatting.DARK_RED));
+                return;
+            }
             if (!details
                     || info.refinementPotential() <= 0 && info.affixCount() <= 0 && "normal".equals(info.refinementRarity())) {
                 return;

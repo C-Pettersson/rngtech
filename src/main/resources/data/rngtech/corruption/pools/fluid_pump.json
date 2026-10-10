@@ -1,0 +1,42 @@
+{
+    "hosts": [
+        "fluid_pump"
+    ],
+    "blessed": [
+        {
+            "id": "fluid_capacity",
+            "weight": 100,
+            "modifiers": [
+                {
+                    "stat": "fluid_capacity",
+                    "operation": "increased_percent",
+                    "value": 50
+                }
+            ]
+        },
+        {
+            "id": "fluid_transfer",
+            "weight": 100,
+            "modifiers": [
+                {
+                    "stat": "fluid_transfer",
+                    "operation": "increased_percent",
+                    "value": 30
+                }
+            ]
+        }
+    ],
+    "blighted": [
+        {
+            "id": "fluid_transfer",
+            "weight": 100,
+            "modifiers": [
+                {
+                    "stat": "fluid_transfer",
+                    "operation": "less",
+                    "value": 0.7
+                }
+            ]
+        }
+    ]
+}

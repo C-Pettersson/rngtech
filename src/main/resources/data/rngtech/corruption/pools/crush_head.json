@@ -1,0 +1,75 @@
+{
+    "hosts": [
+        "crush_head"
+    ],
+    "blessed": [
+        {
+            "id": "processing_level",
+            "weight": 10,
+            "modifiers": [
+                {
+                    "stat": "processing_level",
+                    "operation": "add",
+                    "value": 1
+                }
+            ]
+        },
+        {
+            "id": "jam_recovery",
+            "weight": 45,
+            "modifiers": [
+                {
+                    "stat": "jam_recovery",
+                    "operation": "add",
+                    "value": 25
+                }
+            ]
+        },
+        {
+            "id": "processing_speed",
+            "weight": 45,
+            "modifiers": [
+                {
+                    "stat": "processing_speed",
+                    "operation": "increased_percent",
+                    "value": 10
+                }
+            ]
+        },
+        {
+            "id": "processing_speed_more",
+            "weight": 20,
+            "modifiers": [
+                {
+                    "stat": "processing_speed",
+                    "operation": "more",
+                    "value": 1.1
+                }
+            ]
+        }
+    ],
+    "blighted": [
+        {
+            "id": "jam_chance",
+            "weight": 50,
+            "modifiers": [
+                {
+                    "stat": "jam_chance",
+                    "operation": "more",
+                    "value": 1.25
+                }
+            ]
+        },
+        {
+            "id": "processing_speed",
+            "weight": 50,
+            "modifiers": [
+                {
+                    "stat": "processing_speed",
+                    "operation": "less",
+                    "value": 0.85
+                }
+            ]
+        }
+    ]
+}

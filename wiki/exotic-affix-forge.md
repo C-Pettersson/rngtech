@@ -41,7 +41,7 @@ Mine a placed Exotic Affix Forge with a pickaxe. It drops itself and everything 
 ### Running an operation
 
 1. Supply FE to any side of the forge.
-2. Put a refinable item in the **target** slot and Exotic Affix Catalysts in the **catalyst** slot. The forge accepts the same items as the [Affix Forge](affix-forge.md#how-refinement-works): machine items, machine parts, Battery Cells, and other identified, non-Unique gear.
+2. Put a refinable item in the **target** slot and Exotic Affix Catalysts in the **catalyst** slot. The forge accepts the same items as the [Affix Forge](affix-forge.md#how-refinement-works): machine items, machine parts, Battery Cells, and other identified gear that is neither Unique nor [Corrupted](rarity-and-affixes.md#corruption). The status readout shows Corrupted for a Corrupted target.
 3. Choose an operation. Operations that work on one affix or one empty slot also need you to select it.
 4. Click **Apply**. The forge does not start on its own.
 

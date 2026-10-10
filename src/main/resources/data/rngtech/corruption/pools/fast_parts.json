@@ -1,0 +1,22 @@
+{
+    "hosts": [
+        "recovery_filter",
+        "ammonia_catalyst_bed",
+        "reforming_catalyst_bed",
+        "dimensional_stabilizer",
+        "disassembly_head"
+    ],
+    "blessed": [
+        {
+            "id": "processing_speed",
+            "weight": 100,
+            "modifiers": [
+                {
+                    "stat": "processing_speed",
+                    "operation": "increased_percent",
+                    "value": 10
+                }
+            ]
+        }
+    ]
+}

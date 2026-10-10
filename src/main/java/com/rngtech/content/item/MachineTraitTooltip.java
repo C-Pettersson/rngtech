@@ -3,6 +3,7 @@ package com.rngtech.content.item;
 import com.rngtech.rpg.ComponentBaseStatCatalog;
 import com.rngtech.rpg.MachineBaseStatCatalog;
 import com.rngtech.rpg.MachineBehavior;
+import com.rngtech.rpg.MachineCorruption;
 import com.rngtech.rpg.MachineImplicitCatalog;
 import com.rngtech.rpg.MachineModifier;
 import com.rngtech.rpg.MachineModifierText;
@@ -122,6 +123,14 @@ final class MachineTraitTooltip {
                     Component.translatable(traits.rarity().translationKey()).withStyle(rarityColor(traits.rarity()))
             ).withStyle(ChatFormatting.GRAY));
         }
+        if (traits.isCorrupted()) {
+            // Refinement Potential stays stored but can never be spent, so it is hidden.
+            tooltipComponents.add(Component.translatable(
+                    "rngtech.tooltip.corrupted_outcome",
+                    Component.translatable(traits.corruption().outcome().translationKey())
+            ).withStyle(ChatFormatting.DARK_RED));
+            return true;
+        }
         tooltipComponents.add(Component.translatable(
                 "rngtech.tooltip.refinement_potential",
                 refinementPotentialValue(traits.refinementPotential())
@@ -135,6 +144,7 @@ final class MachineTraitTooltip {
 
     /** With Shift held, marks rolled modifiers that are local to {@code part}; an empty stack marks none. */
     static void appendTraitDetails(MachineTraits traits, List<Component> tooltipComponents, ItemStack part) {
+        appendCorruptionSection(traits, tooltipComponents);
         appendModifierSections(traits.modifierSet(), tooltipComponents, part);
         appendBehaviorSection(traits, tooltipComponents);
         if (TooltipKeyState.hasAltDown()) {
@@ -192,13 +202,13 @@ final class MachineTraitTooltip {
     }
 
     private static void appendModifierSections(ModifierSet modifierSet, List<Component> tooltipComponents, ItemStack part) {
-        boolean hasBaseModifiers = modifierSet.modifiers().stream().anyMatch(modifier -> !modifier.slot().isAffix());
+        boolean hasBaseModifiers = modifierSet.modifiers().stream().anyMatch(MachineTraitTooltip::isBaseModifier);
         boolean hasRolledModifiers = modifierSet.modifiers().stream().anyMatch(modifier -> modifier.slot().isAffix());
         if (hasBaseModifiers) {
             tooltipComponents.add(Component.empty());
             tooltipComponents.add(Component.translatable("rngtech.tooltip.base_modifiers").withStyle(ChatFormatting.DARK_AQUA));
             for (var modifier : modifierSet.modifiers()) {
-                if (!modifier.slot().isAffix()) {
+                if (isBaseModifier(modifier)) {
                     tooltipComponents.add(MachineModifierText.tooltipLine(modifier).withStyle(ChatFormatting.BLUE));
                     appendModifierDescriptionDetail(modifier, tooltipComponents);
                 }
@@ -213,6 +223,30 @@ final class MachineTraitTooltip {
                     appendModifierDescriptionDetail(modifier, tooltipComponents);
                 }
             }
+        }
+    }
+
+    private static boolean isBaseModifier(MachineModifier modifier) {
+        return !modifier.slot().isAffix() && !modifier.slot().isCorruption();
+    }
+
+    /** The corruption implicit, in red under the outcome that granted it. */
+    private static void appendCorruptionSection(MachineTraits traits, List<Component> tooltipComponents) {
+        MachineCorruption corruption = traits.corruption();
+        if (corruption == null || !corruption.hasImplicit()) {
+            return;
+        }
+        tooltipComponents.add(Component.empty());
+        tooltipComponents.add(Component.translatable(corruption.outcome().translationKey()).withStyle(ChatFormatting.DARK_RED));
+        for (MachineModifier modifier : corruption.modifiers()) {
+            tooltipComponents.add(MachineModifierText.tooltipLine(modifier).withStyle(ChatFormatting.RED));
+        }
+        for (MachineBehavior behavior : corruption.behaviors()) {
+            tooltipComponents.add(Component.translatable(
+                    "rngtech.tooltip.behavior",
+                    Component.translatable(behavior.translationKey()),
+                    Component.translatable(behavior.descriptionKey())
+            ).withStyle(ChatFormatting.RED));
         }
     }
 
@@ -232,12 +266,16 @@ final class MachineTraitTooltip {
     }
 
     private static void appendBehaviorSection(MachineTraits traits, List<Component> tooltipComponents) {
-        if (traits.behaviors().isEmpty()) {
+        List<MachineBehavior> corrupted = traits.corruption() == null ? List.of() : traits.corruption().behaviors();
+        List<MachineBehavior> behaviors = traits.behaviors().stream()
+                .filter(behavior -> !corrupted.contains(behavior))
+                .toList();
+        if (behaviors.isEmpty()) {
             return;
         }
         tooltipComponents.add(Component.empty());
         tooltipComponents.add(Component.translatable("rngtech.tooltip.base_behaviors").withStyle(ChatFormatting.DARK_AQUA));
-        for (MachineBehavior behavior : traits.behaviors()) {
+        for (MachineBehavior behavior : behaviors) {
             tooltipComponents.add(Component.translatable(
                     "rngtech.tooltip.behavior",
                     Component.translatable(behavior.translationKey()),

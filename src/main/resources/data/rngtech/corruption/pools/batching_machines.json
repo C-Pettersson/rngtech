@@ -1,0 +1,21 @@
+{
+    "hosts": [
+        "crusher",
+        "melter",
+        "metal_press",
+        "resonance_calibrator"
+    ],
+    "blessed": [
+        {
+            "id": "batch_size",
+            "weight": 10,
+            "modifiers": [
+                {
+                    "stat": "batch_size",
+                    "operation": "add",
+                    "value": 1
+                }
+            ]
+        }
+    ]
+}

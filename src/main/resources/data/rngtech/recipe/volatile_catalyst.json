@@ -1,0 +1,51 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "rngtech:volatile_catalyst_recipes_enabled"
+    },
+    {
+      "type": "rngtech:material_enabled",
+      "material": "sparksteel"
+    }
+  ],
+  "type": "rngtech:calibrated_shaped",
+  "category": "misc",
+  "pattern": [
+    "SJS",
+    "MKM",
+    "SJS"
+  ],
+  "key": {
+    "J": {
+      "ingredient": {
+        "item": "rngtech:jam_debris"
+      }
+    },
+    "K": {
+      "ingredient": {
+        "item": "rngtech:calibrated_kinetic_component"
+      },
+      "calibration": {
+        "family": "kinetic",
+        "min_stage": 5,
+        "min_stability": 20,
+        "max_stability": 35
+      }
+    },
+    "M": {
+      "ingredient": {
+        "type": "rngtech:malformed_ingot",
+        "min_stage": 5
+      }
+    },
+    "S": {
+      "ingredient": {
+        "item": "rngtech:sparksteel_plate"
+      }
+    }
+  },
+  "result": {
+    "count": 1,
+    "id": "rngtech:volatile_catalyst"
+  }
+}

@@ -1,5 +1,6 @@
 package com.rngtech;
 
+import com.rngtech.content.corruption.CorruptionDataEvents;
 import com.rngtech.content.minerscompanion.MinersCompanionEvents;
 import com.rngtech.content.registry.ModBlockEntities;
 import com.rngtech.content.registry.ModBlocks;
@@ -63,6 +64,8 @@ public final class RNGTech {
         NeoForge.EVENT_BUS.addListener(FieldToolEvents::onGrindstonePlace);
         NeoForge.EVENT_BUS.addListener(MinersCompanionEvents::onBlockDrops);
         NeoForge.EVENT_BUS.addListener(MinersCompanionEvents::onPlayerTick);
+        NeoForge.EVENT_BUS.addListener(CorruptionDataEvents::onAddReloadListeners);
+        NeoForge.EVENT_BUS.addListener(CorruptionDataEvents::onDatapackSync);
 
         modContainer.registerConfig(ModConfig.Type.COMMON, RNGTechConfig.SPEC);
     }

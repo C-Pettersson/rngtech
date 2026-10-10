@@ -60,6 +60,12 @@ public final class MaterialCatalog {
         return family;
     }
 
+    /** The material family's stage, or -1 for an unknown or blank id. */
+    public static int materialStage(String id) {
+        MaterialFamily family = id == null ? null : DATA.materialsById().get(id);
+        return family == null ? -1 : family.stage();
+    }
+
     public static MaterialItemDefinition itemDefinition(String itemId) {
         MaterialItemDefinition definition = DATA.itemsById().get(itemId);
         if (definition == null) {

@@ -9,5 +9,6 @@ public enum RefinementAction {
     RANDOM_REMOVE,
     TARGETED_ADD_OR_UPGRADE,
     FULL_REROLL,
-    FILL_OPEN_SLOTS
+    FILL_OPEN_SLOTS,
+    CORRUPT
 }

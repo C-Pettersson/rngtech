@@ -70,6 +70,8 @@ Only the Sparksteel Coil and Calibrated Diamond Crystal recipes can give Super O
 
 There are six patterns, one per family: {{ item('rngtech:structural_calibration_pattern') }}, {{ item('rngtech:kinetic_calibration_pattern') }}, {{ item('rngtech:thermal_calibration_pattern') }}, {{ item('rngtech:conductive_calibration_pattern') }}, {{ item('rngtech:storage_calibration_pattern') }}, and {{ item('rngtech:logic_calibration_pattern') }}. The Logic family also makes the {{ item('rngtech:calibrated_diamond_crystal') }}, a Stage 6 crystal needed for the Stage 7 chassis and late Stabilizer Matrices.
 
+The Stage 5 Kinetic recipe from a Sparksteel Gear rolls a low, wide stability range on purpose. The [Volatile Catalyst](affix-forge.md#crafting-the-consumables) needs one between 20% and 35%, which a well-built Calibrator overshoots.
+
 Several families have a "resonant" recipe that adds a Matrix and a Stabilization Catalyst. It needs Stage 4 reach and gives a higher and tighter stability range, for recipes that demand well-calibrated parts.
 
 ### Stages

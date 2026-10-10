@@ -57,7 +57,7 @@ Install a Heat Core and at least one Mold, select the Mold you want in the Gear 
 Each recipe has a heat window and a temperature stability requirement. The two presses handle a bad window differently:
 
 - The **Crude Metal Press** never fails. If its heat is too low or too high, its stability is too low, or it runs out of power, it pauses and leaves the input alone. A press that is too hot cools down before continuing.
-- The **Metal Press** builds up failure strain instead. Low or high heat, low stability, a weak Servo, or a power drop after pressing starts all add strain. When strain fills, the input is used up and the press outputs a failure item: a {{ item('rngtech:malformed_ingot') }} for plates and casings, or a {{ item('rngtech:broken_circuit') }} for circuits. Smelt Malformed Ingots in a [Furnace](furnace.md) to get two nuggets back. The [Potential Reactor](potential-reactor.md) and [Component Recycler](component-recycler.md) can recover scrap from Broken Circuits.
+- The **Metal Press** builds up failure strain instead. Low or high heat, low stability, a weak Servo, or a power drop after pressing starts all add strain. When strain fills, the input is used up and the press outputs a failure item: a {{ item('rngtech:malformed_ingot') }} for plates and casings, or a {{ item('rngtech:broken_circuit') }} for circuits. Smelt Malformed Ingots in a [Furnace](furnace.md) to get two nuggets back, or keep Stage 5 and higher ones for the [Volatile Catalyst](affix-forge.md#crafting-the-consumables). The [Potential Reactor](potential-reactor.md) and [Component Recycler](component-recycler.md) can recover scrap from Broken Circuits.
 
 ### Molds
 

@@ -1,7 +1,13 @@
 package com.rngtech.client.screen;
 
+import com.rngtech.content.item.RefinementConsumableItem;
 import com.rngtech.content.menu.RefinementMenuSupport;
 import com.rngtech.rpg.MachineTraits;
+import com.rngtech.rpg.corruption.CorruptionCatalog;
+import com.rngtech.rpg.corruption.CorruptionPreview;
+import com.rngtech.rpg.corruption.CorruptionText;
+import com.rngtech.rpg.refinement.RefinementOperation;
+import com.rngtech.rpg.refinement.RefinementTargets;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
@@ -9,6 +15,10 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.ItemStack;
+
+import java.util.List;
 
 final class RefinementScreenStyle {
     static final int REFINEMENT_TAB_INDEX = 3;
@@ -58,11 +68,16 @@ final class RefinementScreenStyle {
         MachineScreenStyle.drawAffixListPanelLabels(
                 guiGraphics,
                 font,
-                Component.translatable(
-                        "rngtech.refinement.summary",
-                        Component.translatable(traits.rarity().translationKey()),
-                        traits.refinementPotential()
-                ),
+                traits.isCorrupted()
+                        ? Component.translatable(
+                                "rngtech.refinement.summary_corrupted",
+                                Component.translatable(traits.rarity().translationKey())
+                        )
+                        : Component.translatable(
+                                "rngtech.refinement.summary",
+                                Component.translatable(traits.rarity().translationKey()),
+                                traits.refinementPotential()
+                        ),
                 affixLines,
                 AFFIX_PANEL_X,
                 AFFIX_PANEL_Y,
@@ -79,9 +94,15 @@ final class RefinementScreenStyle {
             int mouseX,
             int mouseY,
             boolean active,
-            MachineTraits traits
+            MachineTraits traits,
+            AbstractContainerMenu menu
     ) {
         if (!active) {
+            return;
+        }
+        List<Component> corruptionTable = corruptionTable(menu, traits);
+        if (!corruptionTable.isEmpty() && menu.getCarried().isEmpty() && overApplyButton(leftPos, topPos, mouseX, mouseY)) {
+            guiGraphics.renderComponentTooltip(font, corruptionTable, mouseX, mouseY);
             return;
         }
         MachineScreenStyle.renderAffixListPanelTooltip(
@@ -116,6 +137,41 @@ final class RefinementScreenStyle {
             minecraft.gameMode.handleInventoryButtonClick(menu.containerId, RefinementMenuSupport.BUTTON_APPLY);
         }
         return true;
+    }
+
+    /** The Volatile Catalyst outcome table for the placed machine, shown over Apply while a catalyst is inserted. */
+    private static List<Component> corruptionTable(AbstractContainerMenu menu, MachineTraits traits) {
+        ItemStack consumable = slotStack(menu, CONSUMABLE_SLOT_X);
+        ItemStack machine = slotStack(menu, TARGET_SLOT_X);
+        if (!(consumable.getItem() instanceof RefinementConsumableItem item)
+                || item.operation() != RefinementOperation.CORRUPT
+                || !RefinementTargets.canRefine(machine)) {
+            return List.of();
+        }
+        if (traits.isCorrupted()) {
+            return List.of(Component.translatable("rngtech.refinement.failure.corrupted"));
+        }
+        String host = RefinementTargets.eligibilityProfile(machine).id();
+        CorruptionCatalog catalog = CorruptionCatalog.active();
+        if (!catalog.canCorrupt(host)) {
+            return List.of(Component.translatable("rngtech.refinement.failure.cannot_corrupt"));
+        }
+        return CorruptionText.table(CorruptionPreview.rows(catalog, host, traits, false), false);
+    }
+
+    private static ItemStack slotStack(AbstractContainerMenu menu, int x) {
+        for (Slot slot : menu.slots) {
+            if (slot.isActive() && slot.x == x && slot.y == SLOT_Y) {
+                return slot.getItem();
+            }
+        }
+        return ItemStack.EMPTY;
+    }
+
+    private static boolean overApplyButton(int leftPos, int topPos, int mouseX, int mouseY) {
+        int x = leftPos + APPLY_X;
+        int y = topPos + APPLY_Y;
+        return mouseX >= x && mouseX < x + APPLY_WIDTH && mouseY >= y && mouseY < y + APPLY_HEIGHT;
     }
 
     private static MachineScreenStyle.AffixLine[] affixLines(MachineTraits traits) {
