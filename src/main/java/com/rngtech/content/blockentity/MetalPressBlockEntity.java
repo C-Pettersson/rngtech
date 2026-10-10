@@ -12,6 +12,7 @@ import com.rngtech.content.recipe.MetalPressRecipe;
 import com.rngtech.content.recipe.MetalPressRecipeInput;
 import com.rngtech.content.registry.ModBlockEntities;
 import com.rngtech.content.registry.ModItems;
+import com.rngtech.content.registry.ModRecipes;
 import com.rngtech.content.registry.ModTags;
 import com.rngtech.rpg.BatchProcessing;
 import com.rngtech.rpg.ComponentBaseStatCatalog;
@@ -1344,6 +1345,12 @@ public class MetalPressBlockEntity extends BaseMachineBlockEntity
         }
     }
 
+    /** Any mold's recipe counts, since the press switches to whichever installed mold fits the input. */
+    private boolean isPressInput(ItemStack stack) {
+        return RecipeInputFilter.anyAccepts(level, ModRecipes.METAL_PRESS_TYPE.get(), stack,
+                (recipe, item) -> recipe.ingredient().test(item));
+    }
+
     private final class ProcessItemHandler implements IItemHandler {
         private final int slot;
         private final boolean allowInsert;
@@ -1367,7 +1374,7 @@ public class MetalPressBlockEntity extends BaseMachineBlockEntity
 
         @Override
         public ItemStack insertItem(int slot, ItemStack stack, boolean simulate) {
-            if (!allowInsert) {
+            if (!isItemValid(slot, stack)) {
                 return stack;
             }
             return processInventory.insertItem(mappedSlot(slot), stack, simulate);
@@ -1388,7 +1395,9 @@ public class MetalPressBlockEntity extends BaseMachineBlockEntity
 
         @Override
         public boolean isItemValid(int slot, ItemStack stack) {
-            return allowInsert && processInventory.isItemValid(mappedSlot(slot), stack);
+            return allowInsert
+                    && processInventory.isItemValid(mappedSlot(slot), stack)
+                    && (mappedSlot(slot) != SLOT_INPUT || isPressInput(stack));
         }
 
         private int mappedSlot(int slot) {

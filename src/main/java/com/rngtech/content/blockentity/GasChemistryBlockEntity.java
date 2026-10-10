@@ -16,6 +16,7 @@ import com.rngtech.content.recipe.GasCombustionRecipe;
 import com.rngtech.content.recipe.GasReformingRecipe;
 import com.rngtech.content.registry.ModBlockEntities;
 import com.rngtech.content.registry.ModFluids;
+import com.rngtech.content.registry.ModRecipes;
 import com.rngtech.rpg.ComponentBaseStatCatalog;
 import com.rngtech.rpg.MachineBaseStatCatalog;
 import com.rngtech.rpg.MachineBehavior;
@@ -1148,6 +1149,9 @@ public class GasChemistryBlockEntity extends BaseMachineBlockEntity
 
         @Override
         public ItemStack insertItem(int slot, ItemStack stack, boolean simulate) {
+            if (!isItemValid(slot, stack)) {
+                return stack;
+            }
             return processInventory.insertItem(SLOT_PROCESS_INPUT, stack, simulate);
         }
 
@@ -1163,8 +1167,13 @@ public class GasChemistryBlockEntity extends BaseMachineBlockEntity
 
         @Override
         public boolean isItemValid(int slot, ItemStack stack) {
-            return processInventory.isItemValid(SLOT_PROCESS_INPUT, stack);
+            return processInventory.isItemValid(SLOT_PROCESS_INPUT, stack) && isGasificationInput(stack);
         }
+    }
+
+    private boolean isGasificationInput(ItemStack stack) {
+        return RecipeInputFilter.anyAccepts(level, ModRecipes.COAL_GASIFICATION_TYPE.get(), stack,
+                (recipe, item) -> recipe.carbonInput().test(item));
     }
 
     private final class OutputItemHandler implements IItemHandler {

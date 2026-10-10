@@ -69,7 +69,7 @@ The Gear tab has five slots:
 
 | Side | Behavior |
 |---|---|
-| Top | Inserts recipe items. |
+| Top | Inserts recipe items. Rejects items no Melter recipe uses. |
 | Bottom | Extracts filled output containers. |
 | Sides | Insert fluid containers and fill the input tank. With a Fluid Pump installed, sides also drain the output tank. |
 | Any | Accepts FE, for example from a [Universal Cable](universal-cable.md). |

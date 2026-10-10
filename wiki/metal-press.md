@@ -110,7 +110,7 @@ The Stability stat only matters on the Steel press, where low Stability adds fai
 
 | Side | Behavior |
 |---|---|
-| Top | Inserts recipe input. |
+| Top | Inserts recipe input. Rejects items no Mold can press. |
 | Bottom | Extracts finished output. |
 | Any | Accepts FE, for example from a [Universal Cable](universal-cable.md). |
 

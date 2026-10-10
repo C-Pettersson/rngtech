@@ -717,6 +717,10 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
         return input.isEmpty() ? null : FurnaceRecipes.find(level, input).orElse(null);
     }
 
+    private boolean hasFurnaceRecipe(ItemStack stack) {
+        return level != null && FurnaceRecipes.find(level, stack).isPresent();
+    }
+
     private boolean meetsRecipeRequirements(FurnaceRecipe recipe, MachineStatAccumulator stats, ItemStack input) {
         if (stats.intValue(MachineStat.MAX_TEMPERATURE) < targetTemperature(recipe)) {
             return false;
@@ -1726,7 +1730,7 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
 
         @Override
         public ItemStack insertItem(int slot, ItemStack stack, boolean simulate) {
-            if (!allowInsert) {
+            if (!isItemValid(slot, stack)) {
                 return stack;
             }
             return inventory.insertItem(mappedSlot(slot), stack, simulate);
@@ -1747,7 +1751,9 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
 
         @Override
         public boolean isItemValid(int slot, ItemStack stack) {
-            return allowInsert && inventory.isItemValid(mappedSlot(slot), stack);
+            return allowInsert
+                    && inventory.isItemValid(mappedSlot(slot), stack)
+                    && (!processingLaneSlots || hasFurnaceRecipe(stack));
         }
 
         private int mappedSlot(int slot) {
