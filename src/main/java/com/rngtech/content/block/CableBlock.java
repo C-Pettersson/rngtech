@@ -1,6 +1,8 @@
 package com.rngtech.content.block;
 
 import com.rngtech.content.blockentity.CableBlockEntity;
+import com.rngtech.content.cable.CableArmTarget;
+import com.rngtech.content.item.CableItem;
 import com.rngtech.content.menu.CableConnectorMenu;
 import com.rngtech.content.menu.UniversalConnectorMenu;
 import com.rngtech.content.registry.ModBlockEntities;
@@ -8,14 +10,19 @@ import com.rngtech.content.registry.ModItems;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.Containers;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.MenuProvider;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.DyeColor;
+import net.minecraft.world.item.DyeItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
@@ -135,22 +142,54 @@ public class CableBlock extends Block implements EntityBlock {
     public BlockState getStateForPlacement(BlockPlaceContext context) {
         Level level = context.getLevel();
         BlockPos pos = context.getClickedPos();
-        return stateWithCableLinks(level, pos, defaultBlockState());
+        DyeColor color = context.getItemInHand().get(DataComponents.BASE_COLOR);
+        return stateWithCableLinks(level, pos, defaultBlockState(), color);
     }
 
-    public BlockState stateForConnectorPlacement(LevelAccessor level, BlockPos pos, Direction connectorDirection) {
-        return stateWithCableLinks(level, pos, defaultBlockState().setValue(connectorProperty(connectorDirection), true));
+    public BlockState stateForConnectorPlacement(
+            LevelAccessor level,
+            BlockPos pos,
+            Direction connectorDirection,
+            DyeColor color
+    ) {
+        return stateWithCableLinks(level, pos, defaultBlockState().setValue(connectorProperty(connectorDirection), true), color);
     }
 
-    private BlockState stateWithCableLinks(LevelAccessor level, BlockPos pos, BlockState state) {
+    private BlockState stateWithCableLinks(LevelAccessor level, BlockPos pos, BlockState state, DyeColor color) {
         for (Direction direction : DIRECTIONS) {
             BlockPos neighborPos = pos.relative(direction);
             BlockState neighborState = level.getBlockState(neighborPos);
-            if (canConnectCable(level, pos, neighborPos, neighborState, direction)) {
+            if (canConnectCable(level, pos, color, neighborPos, neighborState, direction)) {
                 state = state.setValue(cableProperty(direction), true);
             }
         }
         return state;
+    }
+
+    /** Neighbours first see a new cable before its item colour is applied, so they re-check their links once it is. */
+    @Override
+    public void setPlacedBy(Level level, BlockPos pos, BlockState state, LivingEntity placer, ItemStack stack) {
+        super.setPlacedBy(level, pos, state, placer, stack);
+        refreshCableLinks(level, pos);
+    }
+
+    public static void refreshCableLinks(Level level, BlockPos pos) {
+        BlockState state = level.getBlockState(pos);
+        if (!(state.getBlock() instanceof CableBlock)) {
+            return;
+        }
+        BlockState updated = state;
+        for (Direction direction : DIRECTIONS) {
+            BlockPos neighborPos = pos.relative(direction);
+            updated = updated.setValue(
+                    cableProperty(direction),
+                    canConnectCable(level, pos, neighborPos, level.getBlockState(neighborPos), direction)
+            );
+        }
+        if (updated != state) {
+            level.setBlock(pos, updated, Block.UPDATE_ALL);
+        }
+        updated.updateNeighbourShapes(level, pos, Block.UPDATE_ALL);
     }
 
     @Override
@@ -178,27 +217,30 @@ public class CableBlock extends Block implements EntityBlock {
             return installUniversalConnector(stack, state, level, pos, player, direction);
         }
 
-        if (stack.getItem() instanceof BlockItem blockItem && blockItem.getBlock() instanceof CableBlock) {
-            BlockPos neighborPos = pos.relative(direction);
-            BlockState neighborState = level.getBlockState(neighborPos);
-            if (neighborState.getBlock() instanceof CableBlock && !state.getValue(cableProperty(direction))) {
-                if (!level.isClientSide) {
-                    setDisabledLink(level, pos, direction, false);
-                    setDisabledLink(level, neighborPos, direction.getOpposite(), false);
-                    level.setBlock(pos, state.setValue(cableProperty(direction), true), Block.UPDATE_ALL);
-                    level.setBlock(
-                            neighborPos,
-                            neighborState.setValue(cableProperty(direction.getOpposite()), true),
-                            Block.UPDATE_ALL
-                    );
-                }
-                return ItemInteractionResult.sidedSuccess(level.isClientSide);
-            }
+        if (stack.getItem() instanceof DyeItem dye) {
+            return dyeCable(stack, dye.getDyeColor(), level, pos, player);
+        }
+
+        if (stack.getItem() instanceof CableItem) {
             // Holding Cable means "build", so place it instead of opening a connector menu on this block.
+            // Only the Wrench turns a disabled link back on.
             return ItemInteractionResult.SKIP_DEFAULT_BLOCK_INTERACTION;
         }
 
         return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+    }
+
+    private static ItemInteractionResult dyeCable(ItemStack stack, DyeColor color, Level level, BlockPos pos, Player player) {
+        if (!(level.getBlockEntity(pos) instanceof CableBlockEntity cable) || cable.color() == color) {
+            return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+        }
+        if (!level.isClientSide) {
+            cable.setColor(color);
+            refreshCableLinks(level, pos);
+            level.playSound(null, pos, SoundEvents.DYE_USE, SoundSource.BLOCKS, 1.0F, 1.0F);
+            stack.consume(1, player);
+        }
+        return ItemInteractionResult.sidedSuccess(level.isClientSide);
     }
 
     @Override
@@ -253,7 +295,11 @@ public class CableBlock extends Block implements EntityBlock {
                 return new ItemStack(ModItems.energyConnector(cable.connector(direction).tier()).get());
             }
         }
-        return super.getCloneItemStack(state, target, level, pos, player);
+        ItemStack stack = super.getCloneItemStack(state, target, level, pos, player);
+        if (level.getBlockEntity(pos) instanceof CableBlockEntity cable && cable.color() != null) {
+            stack.set(DataComponents.BASE_COLOR, cable.color());
+        }
+        return stack;
     }
 
     @Override
@@ -470,21 +516,20 @@ public class CableBlock extends Block implements EntityBlock {
     }
 
     private ItemInteractionResult useWrench(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hitResult) {
-        Direction direction = hitResult.getDirection();
-        if (level.getBlockEntity(pos) instanceof CableBlockEntity cable) {
-            Direction connectorDirection = resolveInstalledConnectorDirection(state, hitResult, false);
-            if (connectorDirection != null) {
-                direction = connectorDirection;
-            }
+        Direction direction = resolveInstalledConnectorDirection(state, hitResult, false);
+        if (direction == null) {
+            // Aim decides the link: the top of an arm in a straight run still targets that arm, not the face above it.
+            Vec3 hit = hitResult.getLocation();
+            direction = CableArmTarget.armAt(hit.x - pos.getX(), hit.y - pos.getY(), hit.z - pos.getZ());
+        }
+        if (direction == null) {
+            direction = hitResult.getDirection();
         }
 
         BlockPos neighborPos = pos.relative(direction);
         BlockState neighborState = level.getBlockState(neighborPos);
         if (neighborState.getBlock() instanceof CableBlock) {
-            if (!level.isClientSide) {
-                toggleCableLink(level, pos, state, direction, neighborPos, neighborState);
-            }
-            return ItemInteractionResult.sidedSuccess(level.isClientSide);
+            return wrenchCableLink(level, pos, state, player, direction);
         }
         if (neighborState.getBlock() instanceof UniversalConnectorBlock) {
             if (!level.isClientSide) {
@@ -516,15 +561,19 @@ public class CableBlock extends Block implements EntityBlock {
             return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
         }
 
+        return wrenchCableLink(level, pos, state, player, cableDirection);
+    }
+
+    private ItemInteractionResult wrenchCableLink(Level level, BlockPos pos, BlockState state, Player player, Direction direction) {
+        BlockPos neighborPos = pos.relative(direction);
+        if (!state.getValue(cableProperty(direction)) && !colorsLink(level, pos, neighborPos)) {
+            if (level.isClientSide) {
+                player.displayClientMessage(Component.translatable("rngtech.cable.color_mismatch"), true);
+            }
+            return ItemInteractionResult.FAIL;
+        }
         if (!level.isClientSide) {
-            toggleCableLink(
-                    level,
-                    pos,
-                    state,
-                    cableDirection,
-                    pos.relative(cableDirection),
-                    level.getBlockState(pos.relative(cableDirection))
-            );
+            toggleCableLink(level, pos, state, direction, neighborPos, level.getBlockState(neighborPos));
         }
         return ItemInteractionResult.sidedSuccess(level.isClientSide);
     }
@@ -646,15 +695,35 @@ public class CableBlock extends Block implements EntityBlock {
             BlockState neighborState,
             Direction direction
     ) {
+        return canConnectCable(level, pos, colorAt(level, pos), neighborPos, neighborState, direction);
+    }
+
+    private static boolean canConnectCable(
+            LevelAccessor level,
+            BlockPos pos,
+            DyeColor color,
+            BlockPos neighborPos,
+            BlockState neighborState,
+            Direction direction
+    ) {
         if (neighborState.getBlock() instanceof CableBlock) {
             return !isDisabled(level, pos, direction)
-                    && !isDisabled(level, neighborPos, direction.getOpposite());
+                    && !isDisabled(level, neighborPos, direction.getOpposite())
+                    && CableBlockEntity.colorsLink(color, colorAt(level, neighborPos));
         }
         if (neighborState.getBlock() instanceof UniversalConnectorBlock) {
             return !isDisabled(level, pos, direction)
                     && UniversalConnectorBlock.canConnectNetworkFrom(neighborState, direction.getOpposite());
         }
         return false;
+    }
+
+    private static DyeColor colorAt(LevelAccessor level, BlockPos pos) {
+        return level.getBlockEntity(pos) instanceof CableBlockEntity cable ? cable.color() : null;
+    }
+
+    private static boolean colorsLink(LevelAccessor level, BlockPos pos, BlockPos neighborPos) {
+        return CableBlockEntity.colorsLink(colorAt(level, pos), colorAt(level, neighborPos));
     }
 
     public static boolean isValidConnectorTarget(BlockState neighborState) {

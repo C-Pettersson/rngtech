@@ -198,7 +198,7 @@ public class VacuumCollapseGeneratorBlockEntity extends BaseMachineBlockEntity i
     }
 
     public static void serverTick(Level level, BlockPos pos, BlockState state, VacuumCollapseGeneratorBlockEntity generator) {
-        generator.dropRemovedGear(level);
+        generator.releaseRemovedGear(level);
         // Export first so downstream demand creates headroom before generation is capacity-gated.
         boolean exported = generator.exportEnergy(level, pos);
         boolean generated = generator.tickGenerator();

@@ -273,7 +273,7 @@ public class CavitationGeneratorBlockEntity extends BaseMachineBlockEntity
     }
 
     public static void serverTick(Level level, BlockPos pos, BlockState state, CavitationGeneratorBlockEntity generator) {
-        generator.dropRemovedGear(level);
+        generator.releaseRemovedGear(level);
         generator.drainInputContainer();
         boolean generated = generator.tickGenerator();
         boolean exported = generator.exportEnergy(level, pos);

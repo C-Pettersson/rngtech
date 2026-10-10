@@ -1,6 +1,7 @@
 package com.rngtech;
 
 import com.rngtech.content.command.RNGTechCommands;
+import com.rngtech.content.item.CableItem;
 import com.rngtech.content.minerscompanion.MinersCompanionEvents;
 import com.rngtech.content.registry.ModBlockEntities;
 import com.rngtech.content.registry.ModBlocks;
@@ -19,6 +20,7 @@ import com.rngtech.content.registry.ModSounds;
 import com.rngtech.content.tool.FieldToolEvents;
 
 import com.mojang.logging.LogUtils;
+import net.minecraft.core.cauldron.CauldronInteraction;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
@@ -72,6 +74,7 @@ public final class RNGTech {
     }
 
     private void commonSetup(FMLCommonSetupEvent event) {
+        event.enqueueWork(() -> CauldronInteraction.WATER.map().put(ModItems.CABLE.get(), CableItem::washInCauldron));
         LOGGER.info("RNGTech loaded");
     }
 }

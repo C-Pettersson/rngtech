@@ -181,7 +181,7 @@ public class SolarArrayControllerBlockEntity extends BaseMachineBlockEntity impl
     }
 
     public static void serverTick(Level level, BlockPos pos, BlockState state, SolarArrayControllerBlockEntity controller) {
-        controller.dropRemovedGear(level);
+        controller.releaseRemovedGear(level);
         boolean generated = controller.generateFromPanels(level);
         boolean exported = controller.exportEnergy(level, pos);
         BaseMachineBlock.setActive(level, pos, state, controller.lastEnergyPerTick > 0 && controller.lastStatus != STATUS_FULL);

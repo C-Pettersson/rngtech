@@ -1,0 +1,128 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "redstone",
+  "group": "rngtech:dyed_cable",
+  "ingredients": [
+    {
+      "type": "neoforge:compound",
+      "children": [
+        {
+          "type": "neoforge:components",
+          "items": "rngtech:cable",
+          "components": {
+            "minecraft:base_color": "white"
+          }
+        },
+        {
+          "type": "neoforge:components",
+          "items": "rngtech:cable",
+          "components": {
+            "minecraft:base_color": "orange"
+          }
+        },
+        {
+          "type": "neoforge:components",
+          "items": "rngtech:cable",
+          "components": {
+            "minecraft:base_color": "magenta"
+          }
+        },
+        {
+          "type": "neoforge:components",
+          "items": "rngtech:cable",
+          "components": {
+            "minecraft:base_color": "light_blue"
+          }
+        },
+        {
+          "type": "neoforge:components",
+          "items": "rngtech:cable",
+          "components": {
+            "minecraft:base_color": "yellow"
+          }
+        },
+        {
+          "type": "neoforge:components",
+          "items": "rngtech:cable",
+          "components": {
+            "minecraft:base_color": "lime"
+          }
+        },
+        {
+          "type": "neoforge:components",
+          "items": "rngtech:cable",
+          "components": {
+            "minecraft:base_color": "pink"
+          }
+        },
+        {
+          "type": "neoforge:components",
+          "items": "rngtech:cable",
+          "components": {
+            "minecraft:base_color": "gray"
+          }
+        },
+        {
+          "type": "neoforge:components",
+          "items": "rngtech:cable",
+          "components": {
+            "minecraft:base_color": "light_gray"
+          }
+        },
+        {
+          "type": "neoforge:components",
+          "items": "rngtech:cable",
+          "components": {
+            "minecraft:base_color": "cyan"
+          }
+        },
+        {
+          "type": "neoforge:components",
+          "items": "rngtech:cable",
+          "components": {
+            "minecraft:base_color": "purple"
+          }
+        },
+        {
+          "type": "neoforge:components",
+          "items": "rngtech:cable",
+          "components": {
+            "minecraft:base_color": "blue"
+          }
+        },
+        {
+          "type": "neoforge:components",
+          "items": "rngtech:cable",
+          "components": {
+            "minecraft:base_color": "brown"
+          }
+        },
+        {
+          "type": "neoforge:components",
+          "items": "rngtech:cable",
+          "components": {
+            "minecraft:base_color": "green"
+          }
+        },
+        {
+          "type": "neoforge:components",
+          "items": "rngtech:cable",
+          "components": {
+            "minecraft:base_color": "red"
+          }
+        },
+        {
+          "type": "neoforge:components",
+          "items": "rngtech:cable",
+          "components": {
+            "minecraft:base_color": "black"
+          }
+        }
+      ]
+    }
+  ],
+  "result": {
+    "count": 1,
+    "id": "rngtech:cable"
+  }
+}
