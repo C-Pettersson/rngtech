@@ -39,6 +39,7 @@ public final class CodecRoundTripChecks {
         legacyStatNamesStillDecode();
         unknownStatNamesInTraits();
         unknownSlotOperationBehaviorAndRarity();
+        corruptionSurvivesUnknownNames();
         progressionRoundTrip();
         unknownMasteryNodes();
         return checks;
@@ -89,6 +90,21 @@ public final class CodecRoundTripChecks {
         require(loaded.modifiers().getFirst().stat() == MachineStat.BATCH_SIZE, "a stat stored under its old name loads as the renamed stat");
         MachineTraits noBehaviors = MachineTraits.CODEC.parse(JsonOps.INSTANCE, traitsJson("magic", modifier)).getOrThrow();
         require(noBehaviors.behaviors().isEmpty(), "traits stored before behaviors existed load with none");
+    }
+
+    /** Corrupted traits round-trip, and a corruption holding an unknown name is kept verbatim instead of being dropped. */
+    private static void corruptionSurvivesUnknownNames() {
+        MachineCorruption corruption = new MachineCorruption(CorruptionOutcome.BLESSED, List.of(
+                new MachineModifier(ModifierSlot.CORRUPTION, MachineStat.PROCESSING_SPEED, ModifierOperation.ADD, 5)), List.of());
+        MachineTraits corrupted = knownTraits().withCorruption(corruption);
+        roundTrip(MachineTraits.CODEC, corrupted, "corrupted traits");
+
+        JsonObject stored = MachineTraits.CODEC.encodeStart(JsonOps.INSTANCE, corrupted).getOrThrow().getAsJsonObject();
+        stored.getAsJsonObject("corruption").getAsJsonArray("modifiers").get(0).getAsJsonObject().addProperty("stat", RETIRED);
+        MachineTraits loaded = MachineTraits.CODEC.parse(JsonOps.INSTANCE, stored).getOrThrow();
+        require(loaded.modifiers().equals(knownTraits().modifiers()), "the other rolls survive an unknown name in the corruption");
+        require(!loaded.isCorrupted() && loaded.retired().corruption().isPresent(), "an unreadable corruption is kept as a retired entry");
+        require(stored.equals(MachineTraits.CODEC.encodeStart(JsonOps.INSTANCE, loaded).getOrThrow()), "saving again keeps the unreadable corruption unchanged");
     }
 
     /** A stat name that no longer exists retires that one modifier; every other roll still loads and the entry is written back. */
