@@ -59,10 +59,13 @@ public record MachineProgressionState(
         startNodeId = startNodeId == null ? "" : startNodeId;
         allocatedNodes = List.copyOf(allocatedNodes);
         targetNodes = List.copyOf(targetNodes);
-        if (!allocatedNodes.isEmpty() && (allocatedNodes.size() > level - 1 || !MegaPassiveTree.validBuild(startNodeId, allocatedNodes))) {
-            allocatedNodes = List.of();
+        if (!allocatedNodes.isEmpty() && !MegaPassiveTree.validBuild(startNodeId, allocatedNodes)) {
+            allocatedNodes = MegaPassiveTree.salvage(startNodeId, allocatedNodes);
         }
-        if (!targetNodes.isEmpty() && !MegaPassiveTree.validBuild(startNodeId, targetNodes)) { targetNodes = List.of(); }
+        if (allocatedNodes.size() > level - 1) { allocatedNodes = List.of(); }
+        if (!targetNodes.isEmpty() && !MegaPassiveTree.validBuild(startNodeId, targetNodes)) {
+            targetNodes = MegaPassiveTree.salvage(startNodeId, targetNodes);
+        }
         following = following && !targetNodes.isEmpty() && targetNodes.containsAll(allocatedNodes);
         sealTiers = Mth.clamp(sealTiers, 0, AscendancyCatalog.MAX_TIERS);
         Ascendancy chosen = sealTiers > 0 ? AscendancyCatalog.get(ascendancy) : null;
