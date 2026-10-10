@@ -22,8 +22,8 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.function.Supplier;
 import java.util.Set;
+import java.util.function.Supplier;
 
 public final class MachineStatAccumulator {
     public static final double FURNACE_BASE_MAX_TEMPERATURE = 600.0;
@@ -33,6 +33,7 @@ public final class MachineStatAccumulator {
     private static final Component BASE_SOURCE = Component.translatable("rngtech.stat.breakdown.source.base");
     private static final Component RARITY_SOURCE = Component.translatable("rngtech.stat.breakdown.source.rarity");
     private static final Component FALLBACK_SOURCE = Component.translatable("rngtech.stat.breakdown.source.machine");
+    private static final Component CRUSHER_SOURCE = Component.translatable("rngtech.stat.breakdown.source.crusher");
     private static final Source NO_SOURCE = () -> {
     };
     /** The Crusher's Output Amount bucket {@code B} pays {@code B * K / (B + K)} percent, so yield never passes +K%. */
@@ -162,9 +163,27 @@ public final class MachineStatAccumulator {
 
     /** The Crusher's yield rules: a soft-capped Output Amount bucket and a Super Output ceiling. */
     MachineStatAccumulator withCrusherYieldRules() {
-        increasedSoftCaps.put(MachineStat.OUTPUT_AMOUNT, CRUSHER_YIELD_SOFT_CAP);
-        capAbsolute(MachineStat.SUPER_OUTPUT_CHANCE, CRUSHER_SUPER_OUTPUT_CEILING);
+        try (Source ignored = source(CRUSHER_SOURCE)) {
+            increasedSoftCaps.put(MachineStat.OUTPUT_AMOUNT, CRUSHER_YIELD_SOFT_CAP);
+            record(StatBreakdown.Kind.SOFT_CAP, MachineStat.OUTPUT_AMOUNT, CRUSHER_YIELD_SOFT_CAP);
+            capAbsolute(MachineStat.SUPER_OUTPUT_CHANCE, CRUSHER_SUPER_OUTPUT_CEILING);
+        }
         return this;
+    }
+
+    /** Whether reductions on {@code stat} divide instead of subtracting from the increased bucket. */
+    public static boolean dividesReductions(MachineStat stat) {
+        return DIVIDING_REDUCTION_STATS.contains(accumulationStat(stat));
+    }
+
+    /** A positive increased bucket after a soft cap of {@code capPercent}: {@code B * K / (B + K)}. */
+    public static double softCapped(double increasedPercent, double capPercent) {
+        return increasedPercent <= 0.0 ? increasedPercent : increasedPercent * capPercent / (increasedPercent + capPercent);
+    }
+
+    /** The scale of a dividing stat: increases multiply, reductions divide. */
+    public static double dividedScale(double increasesPercent, double reductionsPercent) {
+        return (1.0 + increasesPercent / 100.0) / (1.0 + reductionsPercent / 100.0);
     }
 
     public static MachineStatAccumulator solidFuelBurnerBase(int transferRate, double stability) {
@@ -786,7 +805,7 @@ public final class MachineStatAccumulator {
         MachineStat resolvedStat = accumulationStat(stat);
         double increased = increasedPercentValues.getOrDefault(resolvedStat, 0.0) + extraPercent;
         Double cap = increasedSoftCaps.get(resolvedStat);
-        return cap == null || increased <= 0.0 ? increased : increased * cap / (increased + cap);
+        return cap == null ? increased : softCapped(increased, cap);
     }
 
     /** Dividing stats scale by {@code (1 + increases) / (1 + reductions)}; the rest by {@code 1 + bucket}. */
@@ -794,7 +813,7 @@ public final class MachineStatAccumulator {
         if (DIVIDING_REDUCTION_STATS.contains(stat)) {
             double reduced = reducedPercentValues.getOrDefault(stat, 0.0) + Math.max(0.0, -extraPercent);
             double increased = increasedPercentValues.getOrDefault(stat, 0.0) + extraPercent + reduced;
-            return (1.0 + increased / 100.0) / (1.0 + reduced / 100.0);
+            return dividedScale(increased, reduced);
         }
         return Math.max(0.0, 1.0 + effectiveIncreasedPercent(stat, extraPercent) / 100.0);
     }
@@ -932,12 +951,17 @@ public final class MachineStatAccumulator {
         List<StatBreakdown.Term> terms = recorded.computeIfAbsent(accumulationStat(stat), ignored -> new ArrayList<>());
         for (int index = 0; index < terms.size(); index++) {
             StatBreakdown.Term term = terms.get(index);
-            if (term.kind() == kind && term.source().equals(source)) {
+            if (term.kind() == kind && term.source().equals(source) && keepsSign(kind, stat, term.value(), value)) {
                 terms.set(index, new StatBreakdown.Term(kind, merge(kind, term.value(), value), source));
                 return;
             }
         }
         terms.add(new StatBreakdown.Term(kind, value, source));
+    }
+
+    /** A dividing stat keeps its increases and reductions in separate terms, so the breakdown can split them again. */
+    private static boolean keepsSign(StatBreakdown.Kind kind, MachineStat stat, double current, double next) {
+        return kind != StatBreakdown.Kind.INCREASED || !dividesReductions(stat) || (current < 0.0) == (next < 0.0);
     }
 
     private static boolean isNeutral(StatBreakdown.Kind kind, double value) {
@@ -951,7 +975,7 @@ public final class MachineStatAccumulator {
     private static double merge(StatBreakdown.Kind kind, double current, double next) {
         return switch (kind) {
             case MORE -> current * next;
-            case FIXED, CEILING -> Math.min(current, next);
+            case FIXED, CEILING, SOFT_CAP -> Math.min(current, next);
             default -> current + next;
         };
     }

@@ -484,6 +484,17 @@ final class MachineScreenStyle {
         return new StatLine(label, value, strength, integral, enhanced, tooltip);
     }
 
+    static StatLine statLine(
+            Component label,
+            String value,
+            double strength,
+            boolean integral,
+            boolean enhanced,
+            List<Component> tooltipLines
+    ) {
+        return new StatLine(label, value, strength, integral, enhanced, Component.empty(), tooltipLines);
+    }
+
     /**
      * Shows each Energy Generation row as the generator's final FE/t, with a hover that breaks it into sources. The
      * row's own value is the generation multiplier, which keeps driving its pips and highlight.

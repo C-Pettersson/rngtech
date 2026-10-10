@@ -31,7 +31,8 @@ public record StatBreakdown(MachineStat stat, List<Term> terms, double finalValu
         INCREASED,
         MORE,
         FIXED,
-        CEILING;
+        CEILING,
+        SOFT_CAP;
 
         static final StreamCodec<ByteBuf, Kind> STREAM_CODEC =
                 ByteBufCodecs.idMapper(index -> values()[index], Kind::ordinal);
@@ -75,7 +76,35 @@ public record StatBreakdown(MachineStat stat, List<Term> terms, double finalValu
 
     /** The ordinary result before any fixed value or ceiling. */
     public double ordinary() {
-        return (base() + added()) * Math.max(0.0, 1.0 + increasedPercent() / 100.0) * more();
+        return (base() + added()) * increasedScale() * more();
+    }
+
+    /** What the increased bucket multiplies by, after any soft cap or dividing reductions. */
+    public double increasedScale() {
+        if (dividesReductions()) {
+            return MachineStatAccumulator.dividedScale(increasesPercent(), reductionsPercent());
+        }
+        return Math.max(0.0, 1.0 + paidIncreasedPercent() / 100.0);
+    }
+
+    /** The increased bucket after this stat's soft cap, or the bucket itself when it has none. */
+    public double paidIncreasedPercent() {
+        Term cap = lowest(Kind.SOFT_CAP);
+        return cap == null ? increasedPercent() : MachineStatAccumulator.softCapped(increasedPercent(), cap.value());
+    }
+
+    public boolean dividesReductions() {
+        return MachineStatAccumulator.dividesReductions(stat);
+    }
+
+    /** The positive increased terms. */
+    public double increasesPercent() {
+        return terms(Kind.INCREASED).stream().mapToDouble(Term::value).filter(value -> value > 0.0).sum();
+    }
+
+    /** The reduced terms, as a positive percent. */
+    public double reductionsPercent() {
+        return -terms(Kind.INCREASED).stream().mapToDouble(Term::value).filter(value -> value < 0.0).sum();
     }
 
     /** The lowest term of {@code kind}, which is the one that wins, or null when there is none. */

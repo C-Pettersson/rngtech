@@ -44,12 +44,26 @@ public final class StatBreakdownText {
             lines.add(Component.translatable(
                     "rngtech.stat.breakdown.formula",
                     amount(stat, base + breakdown.added()),
-                    factor(Math.max(0.0, 1.0 + breakdown.increasedPercent() / 100.0)),
+                    factor(breakdown.increasedScale()),
                     factor(breakdown.more()),
                     amount(stat, breakdown.ordinary())
             ).withStyle(ChatFormatting.GRAY));
         }
-        if (1.0 + breakdown.increasedPercent() / 100.0 < 0.0) {
+        if (breakdown.lowest(StatBreakdown.Kind.SOFT_CAP) != null && breakdown.increasedPercent() > 0.0) {
+            lines.add(Component.translatable(
+                    "rngtech.stat.breakdown.soft_cap",
+                    MachineStatDisplay.formatSignedPercentPoints(breakdown.increasedPercent()),
+                    MachineStatDisplay.formatSignedPercentPoints(breakdown.paidIncreasedPercent())
+            ).withStyle(ChatFormatting.GRAY));
+        }
+        if (breakdown.dividesReductions() && breakdown.reductionsPercent() > 0.0) {
+            lines.add(Component.translatable(
+                    "rngtech.stat.breakdown.divided",
+                    factor(1.0 + breakdown.increasesPercent() / 100.0),
+                    MachineStatDisplay.formatNumber(1.0 + breakdown.reductionsPercent() / 100.0)
+            ).withStyle(ChatFormatting.GRAY));
+        }
+        if (!breakdown.dividesReductions() && 1.0 + breakdown.paidIncreasedPercent() / 100.0 < 0.0) {
             lines.add(Component.translatable("rngtech.stat.breakdown.clamped").withStyle(ChatFormatting.DARK_GRAY));
         }
         override(lines, breakdown.lowest(StatBreakdown.Kind.FIXED), "rngtech.stat.breakdown.fixed", stat);
