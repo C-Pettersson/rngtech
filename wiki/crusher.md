@@ -94,8 +94,8 @@ Recipes at hardness 7 or higher also cost twice the FE. Material recipes for Sta
 Output Amount sets how much extra crushed material an ore block or raw metal gives. Only that first crush counts: crushing crushed material into dust, or ingots back into dust, never gets bonus output.
 
 - The chassis sets a base multiplier. Everything else adds to one **increased** total: the Crush Head's own yield, its rolled affixes, Crusher affixes, Mastery nodes, ascendancy nodes, and At-Level Output on recipes at the head's hardness.
-- That total has diminishing returns. 50% increased pays about +33%, 100% increased pays +50%, and the bonus never reaches +100%.
-- **Yield costs time.** Each cycle takes longer by the same share the bonus pays, so +50% output means a 50% longer cycle. A yield Crusher gets more crushed material from each ore and spends less FE per item, but makes no more items per tick. Build more Crushers to keep up. FE per craft does not change.
+- That total has diminishing returns. Bonuses adding up to +50% give about +33% more output, +100% gives +50%, and the result never reaches +100%.
+- **Yield costs time.** Each cycle takes longer by the same share as the bonus you get, so +50% output means a 50% longer cycle. A yield Crusher gets more crushed material from each ore and spends less FE per item, but makes no more items per tick. Build more Crushers to keep up. FE per craft does not change.
 - Without a Battery Cell, Output Amount drops to 75% after all of this.
 
 Output Amount above 1× is banked: each craft adds its fractional share to a bonus bar, and you get an extra item when the bar fills. The bar resets when you change the input item. Hover the bar to preview the next payout.
@@ -196,7 +196,7 @@ The Crusher screen has five tabs:
 
 - **Process**: input, output, energy, progress, the bonus output bar, and status squares for the recipe and Battery Cell. Hover for FE per tick, FE per craft, hardness penalties, and jam chance.
 - **Gear**: Crush Head and Battery Cell slots.
-- **Stats**: the machine's current stats, including traits, Gear, and Mastery. Hover Bonus Output to see your increased total, the bonus it pays after diminishing returns, and how much longer each cycle takes.
+- **Stats**: the machine's current stats, including traits, Gear, and Mastery. Hover Bonus Output to see what your yield bonuses add up to, what that becomes after diminishing returns, and how much longer each cycle takes.
 - **Refinement**: refine the placed Crusher's traits with a catalyst.
 - **Mastery**: machine XP, level, and the passive tree.
 

@@ -768,7 +768,7 @@ public class CrusherScreen extends AbstractContainerScreen<CrusherMenu> {
                         formatPercent(menu.yieldIncreasedPercent()),
                         formatPercent(menu.yieldBonusPercent())
                 ).withStyle(ChatFormatting.GRAY),
-                Component.translatable("rngtech.crusher.tooltip.yield_time", formatPercent(menu.yieldBonusPercent()))
+                Component.translatable("rngtech.crusher.tooltip.yield_time", String.format(Locale.ROOT, "%.0f%%", menu.yieldBonusPercent()))
                         .withStyle(ChatFormatting.GRAY)
         );
     }
