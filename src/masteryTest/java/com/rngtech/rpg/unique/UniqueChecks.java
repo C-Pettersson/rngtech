@@ -228,6 +228,11 @@ public final class UniqueChecks {
         for (RefinementOperation operation : RefinementOperation.values()) {
             RefinementResult result = RefinementEngine.apply(
                     ModifierEligibilityProfiles.forUniquePart(UniqueHost.HEAT_CORE.partType()), traits, operation, RandomSource.create(1L));
+            if (operation == RefinementOperation.CORRUPT) {
+                require(result.success() && result.traits().rarity() == traits.rarity() && result.traits().isCorrupted(),
+                        "a Volatile Catalyst is the one operation that changes a Unique");
+                continue;
+            }
             require(!result.success() && result.traits().equals(traits), operation + " rejects a Unique and changes nothing");
         }
         require(ModifierEligibilityProfiles.forUniquePart(UniqueHost.SERVO.partType()).definitions().isEmpty(), "Unique part profiles roll no affixes");

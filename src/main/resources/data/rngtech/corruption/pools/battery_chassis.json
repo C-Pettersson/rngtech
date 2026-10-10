@@ -1,0 +1,53 @@
+{
+    "hosts": [
+        "battery_chassis"
+    ],
+    "blessed": [
+        {
+            "id": "battery_slots",
+            "weight": 100,
+            "modifiers": [
+                {
+                    "stat": "battery_slots",
+                    "operation": "add",
+                    "value": 1
+                }
+            ]
+        },
+        {
+            "id": "energy_capacity",
+            "weight": 100,
+            "modifiers": [
+                {
+                    "stat": "energy_capacity",
+                    "operation": "increased_percent",
+                    "value": 15
+                }
+            ]
+        },
+        {
+            "id": "energy_transfer",
+            "weight": 100,
+            "modifiers": [
+                {
+                    "stat": "energy_transfer",
+                    "operation": "increased_percent",
+                    "value": 20
+                }
+            ]
+        }
+    ],
+    "blighted": [
+        {
+            "id": "idle_loss",
+            "weight": 100,
+            "modifiers": [
+                {
+                    "stat": "idle_loss",
+                    "operation": "increased_percent",
+                    "value": 15
+                }
+            ]
+        }
+    ]
+}

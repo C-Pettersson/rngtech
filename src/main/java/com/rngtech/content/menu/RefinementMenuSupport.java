@@ -12,9 +12,11 @@ import com.rngtech.rpg.ModifierLensTag;
 import com.rngtech.rpg.refinement.RefinementAction;
 import com.rngtech.rpg.refinement.RefinementEngine;
 import com.rngtech.rpg.refinement.RefinementModifier;
+import com.rngtech.rpg.refinement.RefinementOperation;
 import com.rngtech.rpg.refinement.RefinementResult;
 import com.rngtech.rpg.refinement.RefinementSelection;
 import com.rngtech.rpg.refinement.RefinementTargets;
+import com.rngtech.rpg.unique.UniqueItems;
 
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Player;
@@ -111,6 +113,12 @@ public final class RefinementMenuSupport {
             showFailure(player, "rngtech.refinement.failure.invalid_consumable");
             return false;
         }
+        if (refinementItem.operation() == RefinementOperation.CORRUPT
+                && !RefinementTargets.storedTraits(target).isCorrupted()
+                && !RefinementTargets.canCorrupt(target)) {
+            showFailure(player, "rngtech.refinement.failure.cannot_corrupt");
+            return false;
+        }
         if (requireSelection && refinementItem.operation().requiresForgeSelection()) {
             RefinementAction action = refinementItem.operation().action();
             if (action == RefinementAction.RANDOM_ADD && selection.kind() != RefinementSelection.Kind.EMPTY_SLOT) {
@@ -141,7 +149,8 @@ public final class RefinementMenuSupport {
                 selection,
                 modifier(inventory),
                 lensTags(inventory),
-                player.level().random
+                player.level().random,
+                UniqueItems.definition(target)
         );
         if (!result.success()) {
             showFailure(player, result.messageKey());

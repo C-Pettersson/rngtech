@@ -82,7 +82,9 @@ import com.rngtech.content.recycling.ComponentRecyclerChassis;
 import com.rngtech.content.registry.ModItems;
 import com.rngtech.content.registry.ModMenus;
 import com.rngtech.content.registry.ModRecipes;
+import com.rngtech.rpg.CorruptionOutcome;
 import com.rngtech.rpg.MachineBehavior;
+import com.rngtech.rpg.corruption.CorruptionCatalog;
 import com.rngtech.rpg.unique.UniqueCatalog;
 import com.rngtech.rpg.unique.UniqueDefinition;
 import com.rngtech.rpg.unique.UniqueStatLine;
@@ -116,6 +118,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.function.Predicate;
 
@@ -170,6 +173,24 @@ public final class RNGTechJeiPlugin implements IModPlugin {
         );
     }
 
+    /** The default outcome weights as loaded, then how the Stabilization Crystal changes them. */
+    private static List<Component> volatileCatalystInfo() {
+        List<Component> lines = new java.util.ArrayList<>();
+        lines.add(Component.translatable("rngtech.jei.volatile_catalyst.info"));
+        Map<CorruptionOutcome, Integer> weights = CorruptionCatalog.active().weights(false);
+        int total = weights.values().stream().mapToInt(Integer::intValue).sum();
+        for (CorruptionOutcome outcome : CorruptionOutcome.values()) {
+            lines.add(Component.translatable(
+                    "rngtech.jei.volatile_catalyst.outcome",
+                    Component.translatable(outcome.translationKey()),
+                    total <= 0 ? 0 : Math.round(weights.getOrDefault(outcome, 0) * 100.0F / total),
+                    com.rngtech.rpg.corruption.CorruptionText.description(outcome)
+            ));
+        }
+        lines.add(Component.translatable("rngtech.jei.volatile_catalyst.stabilization"));
+        return lines;
+    }
+
     @Override
     public void registerRecipes(IRecipeRegistration registration) {
         registration.addRecipes(JeiRecipeTypes.MACHINE_GEAR, MachineGearJeiRecipe.recipes());
@@ -192,6 +213,14 @@ public final class RNGTechJeiPlugin implements IModPlugin {
         registration.addItemStackInfo(
                 ModItems.ASCENDANCY_SEALS.stream().map(seal -> new ItemStack(seal.get())).toList(),
                 Component.translatable("rngtech.jei.ascendancy_seal.info")
+        );
+        registration.addIngredientInfo(ModItems.VOLATILE_CATALYST.get(), volatileCatalystInfo().toArray(Component[]::new));
+        registration.addIngredientInfo(
+                ModItems.JAM_DEBRIS.get(),
+                Component.translatable(
+                        "rngtech.jei.jam_debris.info",
+                        com.rngtech.content.blockentity.JamDebris.MIN_PROCESSING_LEVEL
+                )
         );
 
         Level level = Minecraft.getInstance().level;

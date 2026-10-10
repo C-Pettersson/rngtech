@@ -16,6 +16,8 @@ const ITEM_THRESHOLD = 1e-4;
 const FE_THRESHOLD = 1;
 /** Fluids are measured in buckets so their coefficients stay comparable with item counts. */
 const MB_PER_BUCKET = 1000;
+/** A Crusher jam on a recipe that needs this Processing Level or more leaves one Jam Debris; see JamDebris.java. */
+const JAM_DEBRIS_MIN_LEVEL = 5;
 
 const SHAPED = new Set(["minecraft:crafting_shaped", "rngtech:trait_shaped", "rngtech:calibrated_shaped", "rngtech:tool_damage_shaped"]);
 const SHAPELESS = new Set(["minecraft:crafting_shapeless", "rngtech:tool_damage_shapeless"]);
@@ -138,7 +140,11 @@ export async function checkRecipeLoops({ log = true, report = false, mutate = nu
         console.log(`Recipe loop audit PASS: ${recipes.length} recipes, ${reactions.length} reactions, `
             + `${network.candidates.length} can run in a loop, no item or FE loop, ${allowed.size} allowlisted`);
     }
-    return { recipes: recipes.length, reactions: reactions.length };
+    return {
+        recipes: recipes.length,
+        reactions: reactions.length,
+        jamDebrisSources: reactions.filter((reaction) => reaction.id.endsWith("#jam")).length
+    };
 }
 
 /** Every declared yield stat or behavior must be covered by a bound, so a new yield source cannot skip the audit. */
@@ -203,6 +209,10 @@ async function recipeReactions(recipe, tags, bounds) {
     const failure = json.failure_output && recipeOutputs({ result: json.failure_output })[0];
     if (failure) {
         reactions.push({ id: `${id}#failure`, type, inputs, outputs: new Map([[failure.node, failure.count]]), fe: energy, bound: 1 });
+    }
+    // A jam keeps its input, so each jam on a high-level recipe is a free source of one Jam Debris.
+    if (type === "rngtech:crusher" && Number(json.required_processing_level ?? 0) >= JAM_DEBRIS_MIN_LEVEL) {
+        reactions.push({ id: `${id}#jam`, type, inputs: new Map(), outputs: new Map([["rngtech:jam_debris", 1]]), fe: 0, bound: 1 });
     }
     return reactions;
 }
@@ -285,6 +295,8 @@ async function ingredientNode(entry, count, tags, key, choices) {
     for (const alternative of plainIngredientAlternatives(entry)) {
         if (alternative.item) {
             items.push(alternative.item);
+        } else if (alternative.type === "rngtech:malformed_ingot") {
+            items.push("rngtech:malformed_ingot");
         } else if (alternative.tag) {
             items.push(...await tagItems(alternative.tag, tags));
         }
@@ -487,7 +499,7 @@ function optimize(candidates, free, kind, perturb) {
 
 function describeLoop(kind, loop) {
     const recipes = loop.recipes.map((entry) => `${entry.id}${entry.bound > 1 ? ` (x${entry.bound} bonus)` : ""} x${entry.runs.toPrecision(3)}`).join(", ");
-    const blamed = loop.blamed.id.replace(/#(failure|stripped)$/, "");
+    const blamed = loop.blamed.id.replace(/#(failure|stripped|jam)$/, "");
     const hint = loop.blamed.bound > 1 ? `set "bonus_output": false on ${blamed}` : `rebalance ${blamed}`;
     if (kind === "energy") {
         return `returns its inputs with ${loop.value.toFixed(1)} net FE per unit of runs (likely fix: ${hint}): ${recipes}`;
@@ -562,7 +574,7 @@ function maximize(objective, rows, limits, bland = false) {
 }
 
 function signatureOf(recipeIds) {
-    return [...new Set(recipeIds.map((id) => id.replace(/#(failure|stripped)$/, "")))].sort().join(",");
+    return [...new Set(recipeIds.map((id) => id.replace(/#(failure|stripped|jam)$/, "")))].sort().join(",");
 }
 
 function sameIngredient(entry, tool) {

@@ -84,5 +84,5 @@ Recorded 2026-10-10 during implementation:
 - Launch ranges, drop chances, and the Bastion cell's numbers are draft targets and need tuning in playtest.
 - The in-game checklist in the PRD's test plan is still open: tooltips, host dimming, Stats tab rows, JEI pages, each Unique in each host, the witch drop, the command, and multiplayer sync.
 - The stat-reader table is hand-maintained. Nothing yet checks it against `GearSlotCatalog` automatically, because that catalog needs registries.
-- [Corruption](corruption.md), including the Reforged reroll, is not implemented, so nothing can change a Unique yet.
+- [Corruption](corruption.md) landed in #61: a Volatile Catalyst is the one operation a Unique accepts, its Reforged outcome rerolls the ranged lines, and Unique parts draw implicits from their part's pools.
 - Escapement state is not saved, so a reload primes one fast cycle.

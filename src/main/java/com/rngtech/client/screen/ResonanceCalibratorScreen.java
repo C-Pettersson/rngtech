@@ -161,7 +161,7 @@ public class ResonanceCalibratorScreen extends AbstractContainerScreen<Resonance
         if (menu.selectedTab() == ResonanceCalibratorMenu.TAB_MASTERY) {
             masterySupport.renderTooltips(guiGraphics, font, leftPos, topPos, imageWidth, imageHeight, mouseX, mouseY);
         }
-        RefinementScreenStyle.renderTooltips(guiGraphics, font, leftPos, topPos, mouseX, mouseY, menu.selectedTab() == RefinementScreenStyle.REFINEMENT_TAB_INDEX, menu.machineTraits());
+        RefinementScreenStyle.renderTooltips(guiGraphics, font, leftPos, topPos, mouseX, mouseY, menu.selectedTab() == RefinementScreenStyle.REFINEMENT_TAB_INDEX, menu.machineTraits(), menu);
         renderLabelTooltips(guiGraphics, mouseX, mouseY);
         renderPatternSelectorTooltips(guiGraphics, mouseX, mouseY);
         GearSlotTooltips.render(this, guiGraphics, font, mouseX, mouseY);

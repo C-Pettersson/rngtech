@@ -1,0 +1,77 @@
+{
+    "hosts": [
+        "resonance_coil",
+        "control_board",
+        "stabilizer_matrix"
+    ],
+    "blessed": [
+        {
+            "id": "coil_reach",
+            "weight": 30,
+            "modifiers": [
+                {
+                    "stat": "coil_reach",
+                    "operation": "add",
+                    "value": 1
+                }
+            ]
+        },
+        {
+            "id": "catalyst_efficiency",
+            "weight": 70,
+            "modifiers": [
+                {
+                    "stat": "catalyst_efficiency",
+                    "operation": "increased_percent",
+                    "value": 10
+                }
+            ]
+        },
+        {
+            "id": "calibration_precision",
+            "weight": 50,
+            "modifiers": [
+                {
+                    "stat": "calibration_precision",
+                    "operation": "increased_percent",
+                    "value": 10
+                }
+            ]
+        },
+        {
+            "id": "processing_speed",
+            "weight": 50,
+            "modifiers": [
+                {
+                    "stat": "processing_speed",
+                    "operation": "increased_percent",
+                    "value": 10
+                }
+            ]
+        }
+    ],
+    "blighted": [
+        {
+            "id": "processing_speed",
+            "weight": 50,
+            "modifiers": [
+                {
+                    "stat": "processing_speed",
+                    "operation": "less",
+                    "value": 0.8
+                }
+            ]
+        },
+        {
+            "id": "calibration_precision",
+            "weight": 50,
+            "modifiers": [
+                {
+                    "stat": "calibration_precision",
+                    "operation": "less",
+                    "value": 0.9
+                }
+            ]
+        }
+    ]
+}

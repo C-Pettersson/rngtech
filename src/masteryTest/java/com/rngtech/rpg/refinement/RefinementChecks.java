@@ -60,7 +60,8 @@ public final class RefinementChecks {
 
         RefinementResult ward = apply(profile, traits, RefinementOperation.UPGRADE_RANDOM_MODIFIER,
                 RefinementModifier.CORRUPTION_WARD, 0);
-        require(ward.success() && !ward.consumeModifier(), "Stabilization Crystal is accepted and kept with Affix Upgrader");
+        require(!ward.success() && !ward.consumeModifier() && !ward.consumeCatalyst(),
+                "Stabilization Crystal is rejected with Affix Upgrader and consumes nothing");
     }
 
     private static void ascensionMatrixRespectsUpgradeCap() {

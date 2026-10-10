@@ -1,0 +1,53 @@
+{
+    "hosts": [
+        "furnace"
+    ],
+    "blessed": [
+        {
+            "id": "processing_speed",
+            "weight": 100,
+            "modifiers": [
+                {
+                    "stat": "processing_speed",
+                    "operation": "increased_percent",
+                    "value": 10
+                }
+            ]
+        },
+        {
+            "id": "fuel_efficiency",
+            "weight": 100,
+            "modifiers": [
+                {
+                    "stat": "fuel_efficiency",
+                    "operation": "increased_percent",
+                    "value": 15
+                }
+            ]
+        },
+        {
+            "id": "max_temperature",
+            "weight": 100,
+            "modifiers": [
+                {
+                    "stat": "max_temperature",
+                    "operation": "increased_percent",
+                    "value": 10
+                }
+            ]
+        }
+    ],
+    "blighted": [
+        {
+            "id": "fuel_efficiency",
+            "weight": 100,
+            "modifiers": [
+                {
+                    "stat": "fuel_efficiency",
+                    "operation": "less",
+                    "value": 0.8
+                }
+            ]
+        }
+    ]
+}

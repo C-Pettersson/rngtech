@@ -1,0 +1,51 @@
+{
+    "hosts": [
+        "solid_fuel_burner",
+        "bio_generator",
+        "solar_panel",
+        "solar_array_controller",
+        "potential_reactor",
+        "corrosion_cell",
+        "vacuum_collapse_generator",
+        "syngas_combustor",
+        "ammonia_fuel_cell",
+        "cavitation_generator"
+    ],
+    "blessed": [
+        {
+            "id": "energy_generation",
+            "weight": 100,
+            "modifiers": [
+                {
+                    "stat": "energy_generation",
+                    "operation": "increased_percent",
+                    "value": 10
+                }
+            ]
+        },
+        {
+            "id": "efficiency",
+            "weight": 100,
+            "modifiers": [
+                {
+                    "stat": "efficiency",
+                    "operation": "increased_percent",
+                    "value": 15
+                }
+            ]
+        }
+    ],
+    "blighted": [
+        {
+            "id": "efficiency",
+            "weight": 100,
+            "modifiers": [
+                {
+                    "stat": "efficiency",
+                    "operation": "less",
+                    "value": 0.8
+                }
+            ]
+        }
+    ]
+}

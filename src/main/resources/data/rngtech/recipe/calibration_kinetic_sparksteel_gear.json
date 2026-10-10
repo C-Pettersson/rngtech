@@ -1,0 +1,38 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "rngtech:material_enabled",
+      "material": "sparksteel"
+    }
+  ],
+  "type": "rngtech:calibration",
+  "family": "kinetic",
+  "ingredient": {
+    "item": "rngtech:sparksteel_gear"
+  },
+  "pattern": {
+    "item": "rngtech:kinetic_calibration_pattern"
+  },
+  "catalyst": {
+    "item": "rngtech:matrix"
+  },
+  "minimum_stage": 4,
+  "processing_ticks": 360,
+  "energy": 7200,
+  "machine_xp": 6,
+  "bonus_output": false,
+  "result": {
+    "stack": {
+      "id": "rngtech:calibrated_kinetic_component"
+    },
+    "stage": 5,
+    "stability": {
+      "min": 20,
+      "max": 60
+    },
+    "refinement_potential": {
+      "min": 1,
+      "max": 3
+    }
+  }
+}

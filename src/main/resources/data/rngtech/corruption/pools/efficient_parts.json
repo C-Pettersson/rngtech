@@ -1,0 +1,21 @@
+{
+    "hosts": [
+        "recovery_filter",
+        "ammonia_catalyst_bed",
+        "reforming_catalyst_bed",
+        "dimensional_stabilizer"
+    ],
+    "blessed": [
+        {
+            "id": "efficiency",
+            "weight": 100,
+            "modifiers": [
+                {
+                    "stat": "efficiency",
+                    "operation": "increased_percent",
+                    "value": 10
+                }
+            ]
+        }
+    ]
+}

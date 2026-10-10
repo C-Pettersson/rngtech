@@ -14,7 +14,9 @@ public enum ModifierSlot implements StringRepresentable {
     SUFFIX,
     ENCHANT,
     /** A Unique's rolled stat line; kept only on Unique items. */
-    UNIQUE;
+    UNIQUE,
+    /** A Volatile Catalyst implicit: one fixed value, outside the prefix and suffix limits, applied after affixes. */
+    CORRUPTION;
 
     public static final Codec<ModifierSlot> CODEC = StringRepresentable.fromEnum(ModifierSlot::values);
     public static final StreamCodec<ByteBuf, ModifierSlot> STREAM_CODEC =
@@ -33,6 +35,10 @@ public enum ModifierSlot implements StringRepresentable {
 
     public boolean isAffix() {
         return this == PREFIX || this == SUFFIX;
+    }
+
+    public boolean isCorruption() {
+        return this == CORRUPTION;
     }
 
     @Override

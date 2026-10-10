@@ -12,6 +12,7 @@ wiki:
     - rngtech:titanium_crusher_chassis
     - rngtech:tungstensteel_crusher_chassis
     - rngtech:exotic_crusher_chassis
+    - rngtech:jam_debris
 ---
 
 # Crusher
@@ -78,6 +79,10 @@ Every recipe has a hardness level, and every Crush Head has a hardness level fro
 A Crush Head with **Jam Chance per Cycle**, such as the {{ item('rngtech:mineshaft_worn_pick_jaw') }}, can also jam on recipes at or below its hardness. Such a jam lasts as long as a one-level jam.
 
 Recipes at hardness 7 or higher also cost twice the FE. Material recipes for Stage 5–8 metals cost 2×, 3×, 4×, and 6× the early FE baseline.
+
+#### Jam Debris
+
+A jam on a recipe of hardness 5 or higher drops one {{ item('rngtech:jam_debris') }} into the output slot, if the slot is empty or already holds Jam Debris. The jam still pauses the Crusher and keeps the input. Jam Debris is an ingredient of the [Volatile Catalyst](affix-forge.md#crafting-the-consumables), so to collect it, crush ore harder than your Crush Head on purpose and keep the output slot clear. Jam Chance and Jam Recovery change how fast it arrives.
 
 | Crush Head | Stage | Hardness |
 |---|---:|---:|

@@ -763,7 +763,7 @@ public class GasChemistryBlockEntity extends BaseMachineBlockEntity
             case SYNGAS_COMBUSTOR -> MachineBaseStatCatalog.syngasCombustor();
             case STEAM_METHANE_REFORMER -> MachineBaseStatCatalog.steamMethaneReformer();
         };
-        machineTraits().modifiers().forEach(stats::apply);
+        machineTraits().activeModifiers().forEach(stats::apply);
         if (hasHeatCoreGearSlot()) {
             ComponentBaseStatCatalog.applyEffectiveContribution(stats, heatCoreStack());
         }

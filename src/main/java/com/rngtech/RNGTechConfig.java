@@ -112,6 +112,9 @@ public final class RNGTechConfig {
             .comment("Whether the default Ascendancy Seal and Seal Core recipes load. Disable them to award Seals through loot, quests, or custom recipes instead.")
             .define("ascendancy.sealRecipesEnabled", true);
 
+    public static final ModConfigSpec.BooleanValue VOLATILE_CATALYST_RECIPES_ENABLED = BUILDER
+            .comment("Whether the default Volatile Catalyst recipe loads. Disable it to award catalysts through quests, loot, or custom recipes instead.")
+            .define("corruption.volatileCatalystRecipesEnabled", true);
     private static final UniqueLootConfig UNIQUE_LOOT_CONFIG = defineUniqueLoot();
     /** Gates every default Unique loot table; pack sources such as challenge tables and quests are unaffected. */
     public static final ModConfigSpec.BooleanValue UNIQUE_LOOT_ENABLED = UNIQUE_LOOT_CONFIG.enabled();

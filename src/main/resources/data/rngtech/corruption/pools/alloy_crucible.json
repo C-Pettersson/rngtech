@@ -1,0 +1,75 @@
+{
+    "hosts": [
+        "alloy_crucible"
+    ],
+    "blessed": [
+        {
+            "id": "blend_speed",
+            "weight": 50,
+            "modifiers": [
+                {
+                    "stat": "blend_speed",
+                    "operation": "add",
+                    "value": 15
+                }
+            ]
+        },
+        {
+            "id": "temperature_stability",
+            "weight": 50,
+            "modifiers": [
+                {
+                    "stat": "temperature_stability",
+                    "operation": "increased_percent",
+                    "value": 15
+                }
+            ]
+        },
+        {
+            "id": "processing_speed",
+            "weight": 50,
+            "modifiers": [
+                {
+                    "stat": "processing_speed",
+                    "operation": "increased_percent",
+                    "value": 10
+                }
+            ]
+        },
+        {
+            "id": "overheat_tolerance",
+            "weight": 50,
+            "modifiers": [
+                {
+                    "stat": "overheat_tolerance",
+                    "operation": "increased_percent",
+                    "value": 15
+                }
+            ]
+        },
+        {
+            "id": "warmup_time",
+            "weight": 50,
+            "modifiers": [
+                {
+                    "stat": "warmup_time",
+                    "operation": "decreased_percent",
+                    "value": 20
+                }
+            ]
+        }
+    ],
+    "blighted": [
+        {
+            "id": "stability",
+            "weight": 100,
+            "modifiers": [
+                {
+                    "stat": "stability",
+                    "operation": "less",
+                    "value": 0.8
+                }
+            ]
+        }
+    ]
+}

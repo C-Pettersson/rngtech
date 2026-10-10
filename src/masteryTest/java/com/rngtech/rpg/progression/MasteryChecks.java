@@ -6,6 +6,7 @@ import com.rngtech.content.cable.CableRoutingChecks;
 import com.rngtech.content.entity.ForestryCartRulesChecks;
 import com.rngtech.content.entity.ForestryTreeScanChecks;
 import com.rngtech.rpg.BatchProcessing;
+import com.rngtech.rpg.CorruptionChecks;
 import com.rngtech.rpg.CrusherYieldChecks;
 import com.rngtech.rpg.MachineModifier;
 import com.rngtech.rpg.MachineModifierEffect;
@@ -54,6 +55,8 @@ public final class MasteryChecks {
         checks += PartGenerationChecks.run();
         checks += CrusherYieldChecks.run();
         checks += RefinementChecks.run();
+        checks += CorruptionChecks.run();
+        checks += com.rngtech.content.item.CorruptionTooltipChecks.run();
         checks += StatBreakdownChecks.run();
         checks += UniqueChecks.run();
         System.out.println("Machine mastery: " + checks + " checks passed");

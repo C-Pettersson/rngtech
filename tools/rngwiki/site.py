@@ -283,7 +283,9 @@ class WikiSite:
                 stack.count = data["count"]
             if "calibration" in data:
                 c = data["calibration"]
-                stack.note = f"{c.get('family', 'any').title()} calibration, Stage {c.get('min_stage', 0)}+, stability {c.get('min_stability', 0)}+"
+                low, high = c.get("min_stability", 0), c.get("max_stability", 100)
+                stability = f"stability {low}-{high}" if high < 100 else f"stability {low}+"
+                stack.note = f"{c.get('family', 'any').title()} calibration, Stage {c.get('min_stage', 0)}+, {stability}"
             return stack
         if "fluid" in data:
             return Stack([data["fluid"]], count=data.get("amount", 1000), fluid=True, label=label)
@@ -291,6 +293,10 @@ class WikiSite:
             return Stack([data["item"]], count=data.get("count", 1), label=label)
         if "tag" in data:
             return Stack(list(self.res.tag_items(data["tag"])), count=data.get("count", 1), label=label, tag=data["tag"])
+        if data.get("type") == "rngtech:malformed_ingot":
+            stack = Stack(["rngtech:malformed_ingot"], count=data.get("count", 1), label=label)
+            stack.note = f"made from a Stage {data.get('min_stage', 0)}+ material"
+            return stack
         return None
 
     def result(self, data, label: str | None = None) -> Stack | None:

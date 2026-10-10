@@ -286,6 +286,10 @@ Design intent and balance rules behind shipped machines that the code does not s
 - Add and upgrade operations have no separate success chance. The rolled cost is capped by remaining Refinement Potential.
 - Every refinement entry point must use the shared `com.rngtech.rpg.refinement` library so legality checks and results stay consistent.
 - The Exotic Affix Forge writes per-item history so repeat work on the same item gets more expensive.
+- Corruption is a one-way gamble from the Volatile Catalyst only. No other operation corrupts, nothing removes it, and a Corrupted target rejects every refinement entry point.
+- No corruption outcome destroys an item or lowers its rarity; the worst result is a Blighted implicit. Corrupt costs no Refinement Potential, and Corrupted targets hide the RP they can no longer spend.
+- Corruption implicits have one fixed value, sit outside affix limits, and apply after affixes. Every pool entry must use a stat or behavior its host reads, and 2.0 pools carry no yield, Refinement Potential, or stage-acceptance stats; the pool loader enforces this. Pool weights, not values, control how often iconic entries such as +1 Processing Level appear.
+- The Volatile Catalyst is gated by RNGTech machine challenges (a detuned calibration and failure byproducts), never vanilla loot or vanilla-only items, and its recipe sits behind a config condition so packs can award it another way. The Stabilization Crystal, which deletes the Blighted outcome, costs about as much as the catalyst and is gated the opposite way, by a precisely tuned Stage 5 calibration.
 
 ### Uniques
 

@@ -29,6 +29,7 @@ wiki:
     - rngtech:resonance_crystal
     - rngtech:destabilization_crystal
     - rngtech:stabilization_crystal
+    - rngtech:volatile_catalyst
 ---
 
 # Affix Forge
@@ -68,7 +69,7 @@ Every refinable item has a [rarity](rarity-and-affixes.md) and a budget of [Refi
 - **Rarity** sets how many affixes the item can hold. Normal items have none, Magic items hold one prefix and one suffix, and Rare items hold up to three of each.
 - **RP** is spent by every successful operation. When an item runs out, you cannot refine it further, so plan where you spend it.
 
-A failed or illegal operation costs nothing: no catalyst and no RP. Identify an item before you refine it (see [Getting Started](getting-started.md)). Unique items, unidentified items, and recycled (stripped) items cannot be refined.
+A failed or illegal operation costs nothing: no catalyst and no RP. Identify an item before you refine it (see [Getting Started](getting-started.md)). Unidentified items, recycled (stripped) items, and [Corrupted](rarity-and-affixes.md#corruption) items cannot be refined. Unique items accept only a Volatile Catalyst.
 
 Affix and tier odds are weighted, not guaranteed. Tier 7 affixes can appear only on Stage 8 Exotic items, and only when an affix is added or rerolled. Upgrades and the Ascension catalysts stop at Tier 6. See [Rarity and Affixes](rarity-and-affixes.md#affix-tiers) for tiers and weights.
 
@@ -94,6 +95,7 @@ The modifier list shows the item's current affixes. You cannot pick which affix 
 | {{ item('rngtech:chaos_crystal') }} | Rerolls all of the item's current affixes. Rarity and the number of prefixes and suffixes stay the same. | 1–4 | Resonance Matrix |
 | {{ item('rngtech:expansion_crystal') }} | Adds affixes until every open slot is full or the RP runs out. A Normal item becomes Magic. | 1–18 per affix | Resonance Matrix |
 | {{ item('rngtech:null_crystal') }} | Removes one random rolled affix. | 1–4 | Resonance Matrix |
+| {{ item('rngtech:volatile_catalyst') }} | [Corrupts](rarity-and-affixes.md#corruption) a machine part or Battery Cell, Uniques included. The item can never be refined again. | None | Resonance Matrix |
 
 Stronger affixes cost more RP. Each tier above Tier 1 raises the lowest possible cost by 3 RP, up to the catalyst's maximum. For example, an Affix Injector that adds a Tier 3 affix costs 7–8 RP. The final cost is capped by what the item has left, so a low-RP item can still gamble, but may spend everything. The Affix Upgrader needs at least 2 RP to start, and the Greater Affix Upgrader at least 6.
 
@@ -111,7 +113,7 @@ The forge has three upgrade slots. Upgrades are reusable: they stay installed an
 |---|---|
 | {{ item('rngtech:affix_lens_array') }} | Modifier lenses in the focus slot. |
 | {{ item('rngtech:affix_modifier_socket') }} | Modifier crystals in the focus slot. |
-| {{ item('rngtech:affix_resonance_matrix') }} | Greater Affix Upgrader, Ascension Catalyst, Ascension Matrix, Chaos Crystal, Expansion Crystal, and Null Crystal. |
+| {{ item('rngtech:affix_resonance_matrix') }} | Greater Affix Upgrader, Ascension Catalyst, Ascension Matrix, Chaos Crystal, Expansion Crystal, Null Crystal, and Volatile Catalyst. |
 
 Without an upgrade, the forge still runs the Affix Injector, Affix Upgrader, and Nullifier Coil. If a catalyst or focus needs a missing upgrade, the outcome panel names it and Reforge refuses without using anything.
 
@@ -142,9 +144,17 @@ With an Affix Modifier Socket installed, a crystal in the focus slot changes how
 | {{ item('rngtech:transmutation_crystal') }} | Greater Affix Upgrader | Swaps the upgraded affix for a different one in the same prefix or suffix slot. |
 | {{ item('rngtech:resonance_crystal') }} | Greater Affix Upgrader | Keeps the upgraded affix's roll quality in its new tier. |
 | {{ item('rngtech:destabilization_crystal') }} | Greater Affix Upgrader | Rerolls the item's other affixes, at their current tiers, after the upgrade. |
-| {{ item('rngtech:stabilization_crystal') }} | Affix Injector, Affix Upgrader, Greater Affix Upgrader | Has no effect and is not used up. |
+| {{ item('rngtech:stabilization_crystal') }} | Volatile Catalyst | Removes the Blighted outcome; its chance goes to Untouched. |
 
-Every crystal except the Stabilization Crystal is used up on success. A crystal paired with a catalyst it does not work with blocks Reforge, and nothing is used.
+Every crystal is used up on success. A crystal paired with a catalyst it does not work with blocks Reforge, and nothing is used.
+
+### Corrupting with a Volatile Catalyst
+
+With a Resonance Matrix installed, a {{ item('rngtech:volatile_catalyst') }} in the catalyst slot turns the outcome panel into the [corruption](rarity-and-affixes.md#corruption) table for the item in the target slot: the chance of each outcome, with any that cannot happen folded into Untouched. Hover Blessed or Blighted to list every implicit the item can gain, with its odds. A Stabilization Crystal in the focus slot shows Blighted as removed.
+
+Click **Reforge** to roll. The catalyst is always used up, and so is a Stabilization Crystal. No RP is spent, and the RP readout shows Corrupted from then on.
+
+A placed machine's Refinement tab also accepts the catalyst, without a focus slot. Hover its **Apply** button with a catalyst inserted to see the same outcome table.
 
 ### Automation
 
@@ -156,6 +166,14 @@ Catalysts:
 
 {{ crafting("rngtech:affix_injector", "rngtech:affix_modifier", "rngtech:affix_upgrade", "rngtech:ascension_catalyst", "rngtech:ascension_matrix", "rngtech:nullifier_coil", "rngtech:chaos_crystal", "rngtech:expansion_crystal", "rngtech:null_crystal") }}
 
+The Volatile Catalyst asks you to make three machines go wrong on purpose:
+
+- a Stage 5 Calibrated Kinetic Component with stability between 20% and 35%. A well-built [Resonance Calibrator](resonance-calibrator.md) overshoots that band, so mistune it: a weaker Control Board, no Stabilizer Matrix, or no Battery Cell;
+- two Malformed Ingots of a Stage 5 or higher material, from failed [Metal Press](metal-press.md) or [Alloy Furnace](alloy-furnace.md) cycles;
+- two {{ item('rngtech:jam_debris') }} from [Crusher](crusher.md#jam-debris) jams.
+
+{{ crafting("rngtech:volatile_catalyst") }}
+
 Upgrades. The Resonance Matrix needs calibrated components from a [Resonance Calibrator](resonance-calibrator.md):
 
 {{ crafting("rngtech:affix_lens_array", "rngtech:affix_modifier_socket") }}
@@ -166,7 +184,7 @@ Lenses:
 
 {{ crafting("rngtech:power_modifier_lens", "rngtech:speed_modifier_lens", "rngtech:yield_modifier_lens", "rngtech:stability_modifier_lens", "rngtech:control_modifier_lens", "rngtech:kinetic_modifier_lens", "rngtech:efficiency_modifier_lens") }}
 
-Modifier crystals:
+Modifier crystals. The Stabilization Crystal asks for the opposite of the Volatile Catalyst's detuned part: a Stage 5 Calibrated Conductive Component with at least 85% stability, which takes a well-built [Resonance Calibrator](resonance-calibrator.md) with a strong Control Board and a Stabilizer Matrix:
 
 {{ crafting("rngtech:conservation_crystal", "rngtech:frugality_crystal", "rngtech:transmutation_crystal", "rngtech:resonance_crystal", "rngtech:destabilization_crystal", "rngtech:stabilization_crystal") }}
 

@@ -19,6 +19,7 @@ import com.rngtech.content.recipe.ExoticAffixForgeRecipe;
 import com.rngtech.content.recipe.FurnaceRecipe;
 import com.rngtech.content.recipe.GasCombustionRecipe;
 import com.rngtech.content.recipe.GasReformingRecipe;
+import com.rngtech.content.recipe.MalformedIngotIngredient;
 import com.rngtech.content.recipe.MelterRecipe;
 import com.rngtech.content.recipe.MetalPressRecipe;
 import com.rngtech.content.recipe.MinersCompanionRecoveryRecipe;
@@ -163,6 +164,16 @@ public final class ModRecipes {
                             () -> new IngredientType<>(
                                     UnidentifiedTraitIngredient.CODEC,
                                     UnidentifiedTraitIngredient.STREAM_CODEC
+                            )
+                    );
+
+    public static final DeferredHolder<IngredientType<?>, IngredientType<MalformedIngotIngredient>>
+            MALFORMED_INGOT_INGREDIENT_TYPE =
+                    INGREDIENT_TYPES.register(
+                            "malformed_ingot",
+                            () -> new IngredientType<>(
+                                    MalformedIngotIngredient.CODEC,
+                                    MalformedIngotIngredient.STREAM_CODEC
                             )
                     );
 

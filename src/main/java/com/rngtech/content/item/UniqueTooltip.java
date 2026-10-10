@@ -50,7 +50,15 @@ public final class UniqueTooltip {
 
     static void append(ItemStack stack, UniqueDefinition definition, List<Component> tooltip) {
         boolean unidentified = CraftedTraitOutputs.isUnidentified(stack);
-        tooltip.addAll(lines(definition, unidentified ? null : rolls(stack), unidentified, TooltipKeyState.hasShiftDown(), openHost.get()));
+        List<Component> lines = lines(definition, unidentified ? null : rolls(stack), unidentified, TooltipKeyState.hasShiftDown(), openHost.get());
+        MachineTraits stored = stack.get(ModDataComponents.MACHINE_TRAITS.get());
+        if (stored != null && stored.isCorrupted()) {
+            List<Component> corruption = new ArrayList<>();
+            MachineTraitTooltip.appendCorruptedLine(stored, corruption);
+            lines.addAll(1, corruption);
+            MachineTraitTooltip.appendCorruptionSection(stored, lines);
+        }
+        tooltip.addAll(lines);
     }
 
     /**

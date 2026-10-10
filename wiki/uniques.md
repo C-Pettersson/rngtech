@@ -57,7 +57,7 @@ Once identified, the tooltip shows each rolled value. Hold **Shift** to see each
 - Stats a Unique gives a machine, such as Blend Speed or Jam Chance per Cycle, appear on that machine's Stats tab while the Unique is installed. See [Machine Stats](machine-stats.md#unique-stats).
 - Uniques keep their rolls when you break the machine they are in.
 
-Uniques have no Refinement Potential and cannot be refined or rerolled: the [Affix Forge](affix-forge.md) and [Exotic Affix Forge](exotic-affix-forge.md) refuse them. The [Component Recycler](component-recycler.md) and [Potential Reactor](potential-reactor.md) will not take them either.
+Uniques have no Refinement Potential and cannot be refined: the [Affix Forge](affix-forge.md) and [Exotic Affix Forge](exotic-affix-forge.md) refuse every catalyst except the {{ item('rngtech:volatile_catalyst') }}. [Corruption](rarity-and-affixes.md#corruption) is the only way to change a Unique, once: Reforged rerolls every ranged stat line inside its range, Blessed and Blighted add an implicit from the Unique's part, and Warped leaves it unchanged. The [Component Recycler](component-recycler.md) and [Potential Reactor](potential-reactor.md) will not take them either.
 
 ## The Uniques
 

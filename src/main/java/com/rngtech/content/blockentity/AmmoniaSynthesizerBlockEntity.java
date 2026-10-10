@@ -371,7 +371,7 @@ public class AmmoniaSynthesizerBlockEntity extends BaseMachineBlockEntity
 
     public MachineStatAccumulator effectiveStats() {
         MachineStatAccumulator stats = MachineBaseStatCatalog.ammoniaSynthesizer();
-        machineTraits().modifiers().forEach(stats::apply);
+        machineTraits().activeModifiers().forEach(stats::apply);
         if (isCatalystBed(catalystStack())) {
             ComponentBaseStatCatalog.applyEffectiveContribution(stats, catalystStack());
         }

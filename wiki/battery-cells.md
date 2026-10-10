@@ -46,7 +46,7 @@ Each tier stores more and moves FE faster. Values are before affixes.
 
 ### Unique cells
 
-Two cells are [Uniques](uniques.md): found, never crafted, and never refined.
+Two cells are [Uniques](uniques.md): found, never crafted, and never refined, though a [Volatile Catalyst](rarity-and-affixes.md#corruption) can corrupt them once.
 
 - The {{ item('rngtech:unique_potato_battery_cell') }} is a rare find in village chests. It stores 10,000 FE with 128 FE/t input, 64 FE/t output, and 6%/min idle loss.
 - The {{ item('rngtech:bastion_coin_stack_capacitor') }} comes from bastion treasure chests. It stores 40,000 FE with 512 FE/t input and 128 FE/t output, raises the Burst Transfer and Burst Duration of the [Battery Chassis](battery-chassis.md) it sits in, and leaks heavily while idle.

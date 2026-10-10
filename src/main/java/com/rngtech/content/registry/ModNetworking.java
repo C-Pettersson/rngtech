@@ -13,7 +13,7 @@ import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 
 public final class ModNetworking {
-    private static final String VERSION = "3";
+    private static final String VERSION = "4";
 
     private ModNetworking() {
     }
@@ -42,6 +42,11 @@ public final class ModNetworking {
                 StatBreakdownPayload.TYPE,
                 StatBreakdownPayload.STREAM_CODEC,
                 StatBreakdownPayload::handle
+        );
+        registrar.playToClient(
+                com.rngtech.content.network.CorruptionCatalogPayload.TYPE,
+                com.rngtech.content.network.CorruptionCatalogPayload.STREAM_CODEC,
+                com.rngtech.content.network.CorruptionCatalogPayload::handle
         );
         registrar.playToClient(
                 WrenchOverlayDataPayload.TYPE,

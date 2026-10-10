@@ -489,6 +489,7 @@ public class ExoticAffixForgeScreen extends AbstractContainerScreen<ExoticAffixF
             case ExoticAffixForgeBlockEntity.STATUS_NO_TARGET -> "rngtech.exotic_affix_forge.status.no_target";
             case ExoticAffixForgeBlockEntity.STATUS_INVALID_TARGET -> "rngtech.exotic_affix_forge.status.invalid_target";
             case ExoticAffixForgeBlockEntity.STATUS_UNIQUE_TARGET -> "rngtech.exotic_affix_forge.status.unique";
+            case ExoticAffixForgeBlockEntity.STATUS_CORRUPTED -> "rngtech.exotic_affix_forge.status.corrupted";
             case ExoticAffixForgeBlockEntity.STATUS_MISSING_CATALYST -> "rngtech.exotic_affix_forge.status.missing_catalyst";
             case ExoticAffixForgeBlockEntity.STATUS_INVALID_RECIPE -> "rngtech.exotic_affix_forge.status.invalid_recipe";
             case ExoticAffixForgeBlockEntity.STATUS_INSUFFICIENT_CATALYST -> "rngtech.exotic_affix_forge.status.insufficient_catalyst";

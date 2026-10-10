@@ -3,6 +3,7 @@ package com.rngtech.compat.jei;
 import com.rngtech.RNGTech;
 import com.rngtech.content.machine.CrusherChassisMaterial;
 import com.rngtech.content.registry.ModItems;
+import com.rngtech.rpg.refinement.RefinementOperation;
 import com.rngtech.rpg.refinement.RefinementTargets;
 import com.rngtech.rpg.unique.UniqueItems;
 
@@ -80,12 +81,14 @@ public final class AffixForgeRecipeCategory implements IRecipeCategory<AffixForg
 
     @Override
     public void setRecipe(IRecipeLayoutBuilder builder, AffixForgeJeiRecipe recipe, IFocusGroup focuses) {
-        List<ItemStack> targets = refinementTargets();
+        List<ItemStack> targets = recipe.operation() == RefinementOperation.CORRUPT ? corruptionTargets() : refinementTargets();
         IRecipeSlotBuilder targetSlot = slot(builder, RecipeIngredientRole.INPUT, TARGET_X, SLOT_Y)
                 .addItemStacks(targets)
                 .addRichTooltipCallback((view, tooltip) -> {
                     tooltip.add(Component.translatable("rngtech.jei.affix_forge.target"));
-                    tooltip.add(Component.translatable("rngtech.jei.affix_forge.target.tooltip"));
+                    tooltip.add(Component.translatable(recipe.operation() == RefinementOperation.CORRUPT
+                            ? "rngtech.jei.affix_forge.target.corrupt.tooltip"
+                            : "rngtech.jei.affix_forge.target.tooltip"));
                 });
         slot(builder, RecipeIngredientRole.INPUT, CATALYST_X, SLOT_Y)
                 .addItemStack(recipe.catalyst())
@@ -153,6 +156,16 @@ public final class AffixForgeRecipeCategory implements IRecipeCategory<AffixForg
                 .filter(AffixForgeRecipeCategory::isNotUniqueBatteryCell)
                 .toList();
         return targets.isEmpty() ? List.of(new ItemStack(ModItems.crusherChassis(CrusherChassisMaterial.WOODEN).get())) : targets;
+    }
+
+    /** Parts and cells a Volatile Catalyst accepts, Uniques included. */
+    private static List<ItemStack> corruptionTargets() {
+        List<ItemStack> targets = BuiltInRegistries.ITEM.stream()
+                .filter(AffixForgeRecipeCategory::isRngTechItem)
+                .map(ItemStack::new)
+                .filter(RefinementTargets::canCorrupt)
+                .toList();
+        return targets.isEmpty() ? refinementTargets() : targets;
     }
 
     private static boolean isRngTechItem(Item item) {

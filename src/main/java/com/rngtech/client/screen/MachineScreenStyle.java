@@ -2,6 +2,7 @@ package com.rngtech.client.screen;
 
 import com.rngtech.content.menu.MasteryMenuSupport;
 import com.rngtech.rpg.MachineBehavior;
+import com.rngtech.rpg.MachineCorruption;
 import com.rngtech.rpg.MachineModifier;
 import com.rngtech.rpg.MachineModifierEffect;
 import com.rngtech.rpg.MachineModifierText;
@@ -39,6 +40,7 @@ final class MachineScreenStyle {
     private static final int TEXT_MUTED = 0xFF5F5F5F;
     private static final int TEXT_VALUE = 0xFF1F1F1F;
     private static final int TEXT_ENHANCED = 0xFF7B5B18;
+    private static final int TEXT_CORRUPTED = 0xFF8A2A2A;
     private static final int HEADER_HEIGHT = 14;
     private static final int ROW_TOP_OFFSET = 4;
     private static final int ROW_HEIGHT = 12;
@@ -438,6 +440,7 @@ final class MachineScreenStyle {
 
     static AffixLine[] machineAffixLines(MachineTraits traits) {
         List<AffixLine> affixLines = new ArrayList<>();
+        addCorruptionLines(affixLines, traits);
         addMachineAffixes(affixLines, traits);
         addEmptyAffixLineIfNeeded(affixLines, traits);
         return affixLines.toArray(AffixLine[]::new);
@@ -942,6 +945,38 @@ final class MachineScreenStyle {
         return Component.literal(text + suffix);
     }
 
+    /** The corruption implicit first, in red under its outcome; Untouched and Reforged show a bare Corrupted line. */
+    private static void addCorruptionLines(List<AffixLine> affixLines, MachineTraits traits) {
+        MachineCorruption corruption = traits.corruption();
+        if (corruption == null) {
+            return;
+        }
+        Component source = Component.translatable(corruption.outcome().translationKey());
+        if (!corruption.hasImplicit()) {
+            affixLines.add(new AffixLine(
+                    Component.translatable("rngtech.tooltip.corrupted"),
+                    source,
+                    com.rngtech.rpg.corruption.CorruptionText.description(corruption.outcome()),
+                    TEXT_CORRUPTED,
+                    true
+            ));
+            return;
+        }
+        for (MachineModifier modifier : corruption.modifiers()) {
+            Component effect = MachineModifierText.tooltipLine(modifier);
+            affixLines.add(new AffixLine(source, effect, effect, TEXT_CORRUPTED, true));
+        }
+        for (MachineBehavior behavior : corruption.behaviors()) {
+            affixLines.add(new AffixLine(
+                    source,
+                    Component.translatable(behavior.translationKey()),
+                    Component.translatable(behavior.descriptionKey()),
+                    TEXT_CORRUPTED,
+                    true
+            ));
+        }
+    }
+
     private static void addMachineAffixes(List<AffixLine> affixLines, MachineTraits traits) {
         for (MachineModifier modifier : traits.modifiers()) {
             if (!shouldShowModifier(modifier)) {
@@ -958,7 +993,11 @@ final class MachineScreenStyle {
                     modifierTooltip(source, name, modifier)
             ));
         }
+        List<MachineBehavior> corrupted = traits.corruption() == null ? List.of() : traits.corruption().behaviors();
         for (MachineBehavior behavior : traits.behaviors()) {
+            if (corrupted.contains(behavior)) {
+                continue;
+            }
             affixLines.add(new AffixLine(
                     Component.translatable("rngtech.configuration.source.behavior"),
                     Component.translatable(behavior.translationKey()),
@@ -976,7 +1015,9 @@ final class MachineScreenStyle {
         affixLines.add(new AffixLine(
                 Component.translatable("rngtech.configuration.source.forge"),
                 Component.translatable("rngtech.configuration.no_affixes"),
-                Component.translatable("rngtech.configuration.refinement_potential", traits.refinementPotential()),
+                traits.isCorrupted()
+                        ? Component.translatable("rngtech.tooltip.corrupted")
+                        : Component.translatable("rngtech.configuration.refinement_potential", traits.refinementPotential()),
                 TEXT_MUTED,
                 false
         ));

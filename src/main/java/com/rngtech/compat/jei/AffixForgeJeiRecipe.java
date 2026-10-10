@@ -32,8 +32,7 @@ public record AffixForgeJeiRecipe(
                 .map(item -> new ItemStack(item.get()))
                 .toList();
         List<ItemStack> addModifiers = List.of(
-                new ItemStack(ModItems.CONSERVATION_CRYSTAL.get()),
-                new ItemStack(ModItems.STABILIZATION_CRYSTAL.get())
+                new ItemStack(ModItems.CONSERVATION_CRYSTAL.get())
         );
         List<ItemStack> randomUpgradeModifiers = List.of(
                 new ItemStack(ModItems.FRUGALITY_CRYSTAL.get())
@@ -42,8 +41,7 @@ public record AffixForgeJeiRecipe(
                 new ItemStack(ModItems.CONSERVATION_CRYSTAL.get()),
                 new ItemStack(ModItems.TRANSMUTATION_CRYSTAL.get()),
                 new ItemStack(ModItems.RESONANCE_CRYSTAL.get()),
-                new ItemStack(ModItems.DESTABILIZATION_CRYSTAL.get()),
-                new ItemStack(ModItems.STABILIZATION_CRYSTAL.get())
+                new ItemStack(ModItems.DESTABILIZATION_CRYSTAL.get())
         );
 
         return List.of(
@@ -133,6 +131,17 @@ public record AffixForgeJeiRecipe(
                         "rngtech.jei.affix_forge.action.fill",
                         "rngtech.jei.affix_forge.selection.none",
                         "rngtech.jei.affix_forge.cost.each",
+                        "rngtech.jei.affix_forge.requirement.resonance_matrix"
+                ),
+                recipe(
+                        "volatile_catalyst",
+                        new ItemStack(ModItems.VOLATILE_CATALYST.get()),
+                        RefinementOperation.CORRUPT,
+                        new ItemStack(ModItems.AFFIX_RESONANCE_MATRIX.get()),
+                        List.of(new ItemStack(ModItems.STABILIZATION_CRYSTAL.get())),
+                        "rngtech.jei.affix_forge.action.corrupt",
+                        "rngtech.jei.affix_forge.selection.none",
+                        "rngtech.jei.affix_forge.cost.none",
                         "rngtech.jei.affix_forge.requirement.resonance_matrix"
                 ),
                 recipe(

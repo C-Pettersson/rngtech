@@ -5,6 +5,7 @@ import com.rngtech.content.item.RefinementConsumableItem;
 import com.rngtech.content.item.RefinementLensItem;
 import com.rngtech.content.item.RefinementModifierItem;
 import com.rngtech.content.menu.AffixForgeMenu;
+import com.rngtech.rpg.CorruptionOutcome;
 import com.rngtech.rpg.MachineModifier;
 import com.rngtech.rpg.MachineModifierText;
 import com.rngtech.rpg.MachineStat;
@@ -15,12 +16,16 @@ import com.rngtech.rpg.ModifierEligibilityProfile;
 import com.rngtech.rpg.ModifierLensTag;
 import com.rngtech.rpg.ModifierLensTargets;
 import com.rngtech.rpg.ModifierSlot;
+import com.rngtech.rpg.corruption.CorruptionCatalog;
+import com.rngtech.rpg.corruption.CorruptionPreview;
+import com.rngtech.rpg.corruption.CorruptionText;
 import com.rngtech.rpg.refinement.RefinementEngine;
 import com.rngtech.rpg.refinement.RefinementModifier;
 import com.rngtech.rpg.refinement.RefinementOperation;
 import com.rngtech.rpg.refinement.RefinementResult;
 import com.rngtech.rpg.refinement.RefinementSelection;
 import com.rngtech.rpg.refinement.RefinementTargets;
+import com.rngtech.rpg.unique.UniqueItems;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
@@ -266,8 +271,20 @@ public class AffixForgeScreen extends AbstractContainerScreen<AffixForgeMenu> {
 
         RefinementModifier refinementModifier = modifier();
         Set<ModifierLensTag> lensTags = lensTags();
+        if (targetTraits().isCorrupted()) {
+            return List.of(new OutcomeLine(Component.translatable("rngtech.refinement.failure.corrupted"), TEXT_BAD));
+        }
+        if (operation == RefinementOperation.CORRUPT && !RefinementTargets.canCorrupt(target)) {
+            return List.of(new OutcomeLine(Component.translatable("rngtech.refinement.failure.cannot_corrupt"), TEXT_BAD));
+        }
         if (!lensTags.isEmpty() && !RefinementEngine.operationSupportsLens(operation)) {
             return focusFailureLines("rngtech.refinement.failure.lens_requires_add_or_upgrade");
+        }
+        if (refinementModifier.requiresCorrupt() && operation != RefinementOperation.CORRUPT) {
+            return List.of(
+                    new OutcomeLine(Component.translatable("rngtech.refinement.failure.modifier_requires_corrupt"), TEXT_BAD),
+                    modifierPreviewLine(refinementModifier)
+            );
         }
         if (refinementModifier.requiresRandomUpgrade() && operation != RefinementOperation.UPGRADE_RANDOM_MODIFIER) {
             return List.of(
@@ -277,6 +294,7 @@ public class AffixForgeScreen extends AbstractContainerScreen<AffixForgeMenu> {
         }
         if (refinementModifier != RefinementModifier.NONE
                 && !refinementModifier.requiresRandomUpgrade()
+                && !refinementModifier.requiresCorrupt()
                 && !RefinementEngine.canUseModifier(operation.action())) {
             return List.of(
                     new OutcomeLine(Component.translatable("rngtech.refinement.failure.modifier_requires_add_or_upgrade"), TEXT_BAD),
@@ -360,6 +378,44 @@ public class AffixForgeScreen extends AbstractContainerScreen<AffixForgeMenu> {
                     costFixedLine(RefinementEngine.ascensionCatalystPotentialCost())
             );
             case TARGETED_ADD_OR_UPGRADE -> candidateLines(candidateDefinitions(operation.targetStats()));
+            case CORRUPT -> corruptionLines();
+        };
+    }
+
+    /** The Volatile Catalyst table for this target; hovering Blessed or Blighted lists the implicits its pool can grant. */
+    private List<OutcomeLine> corruptionLines() {
+        boolean warded = modifier() == RefinementModifier.CORRUPTION_WARD;
+        ItemStack target = targetStack();
+        List<OutcomeLine> lines = new ArrayList<>();
+        for (CorruptionPreview.Row row : CorruptionPreview.rows(
+                CorruptionCatalog.active(),
+                RefinementTargets.eligibilityProfile(target).id(),
+                RefinementTargets.storedTraits(target),
+                warded,
+                UniqueItems.definition(target)
+        )) {
+            if (row.percent() <= 0.0 && !(warded && row.outcome() == CorruptionOutcome.BLIGHTED)) {
+                continue;
+            }
+            lines.add(new OutcomeLine(
+                    CorruptionText.chance(row, warded),
+                    CorruptionText.outcomeTooltip(row, warded),
+                    corruptionColor(row, warded)
+            ));
+        }
+        lines.add(new OutcomeLine(Component.translatable("rngtech.corruption.preview.no_cost"), TEXT_MUTED));
+        return lines;
+    }
+
+    private static int corruptionColor(CorruptionPreview.Row row, boolean warded) {
+        if (warded && row.outcome() == CorruptionOutcome.BLIGHTED) {
+            return TEXT_MUTED;
+        }
+        return switch (row.outcome()) {
+            case UNTOUCHED -> TEXT_MUTED;
+            case BLESSED -> TEXT_GOOD;
+            case REFORGED, WARPED -> TEXT;
+            case BLIGHTED -> TEXT_BAD;
         };
     }
 
@@ -704,6 +760,10 @@ public class AffixForgeScreen extends AbstractContainerScreen<AffixForgeMenu> {
         if (!menu.getCarried().isEmpty()) {
             return;
         }
+        if (hoveredRpReadout(mouseX, mouseY) && targetTraits().isCorrupted()) {
+            guiGraphics.renderTooltip(font, Component.translatable("rngtech.tooltip.corrupted"), mouseX, mouseY);
+            return;
+        }
         if (hoveredRpReadout(mouseX, mouseY)) {
             guiGraphics.renderTooltip(
                     font,
@@ -839,6 +899,10 @@ public class AffixForgeScreen extends AbstractContainerScreen<AffixForgeMenu> {
     }
 
     private void drawRpLabel(GuiGraphics guiGraphics) {
+        if (targetTraits().isCorrupted()) {
+            drawClipped(guiGraphics, Component.translatable("rngtech.tooltip.corrupted"), RP_X + 4, RP_Y + 4, RP_WIDTH - 8, TEXT_BAD);
+            return;
+        }
         Component label = Component.translatable("rngtech.refinement.rp", targetTraits().refinementPotential());
         drawClipped(
                 guiGraphics,

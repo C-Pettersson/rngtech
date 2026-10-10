@@ -84,7 +84,13 @@ public final class CalibratedCraftingCategoryExtension implements ICraftingCateg
         if (requirement.minStage() > 0) {
             tooltip.add(Component.translatable("rngtech.jei.calibrated_crafting.min_stage", requirement.minStage()));
         }
-        if (requirement.minStability() > 0) {
+        if (requirement.hasStabilityCeiling()) {
+            tooltip.add(Component.translatable(
+                    "rngtech.jei.calibrated_crafting.stability_band",
+                    requirement.minStability(),
+                    requirement.maxStability()
+            ));
+        } else if (requirement.minStability() > 0) {
             tooltip.add(Component.translatable(
                     "rngtech.jei.calibrated_crafting.min_stability",
                     requirement.minStability()

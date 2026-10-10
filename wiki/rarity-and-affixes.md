@@ -44,7 +44,7 @@ Rarity sets how many affixes an item can hold.
 | **Normal** | 0 | 0 | Base stats only. |
 | **Magic** | 1 | 1 | Named after its affixes, for example "Hellish Iron Furnace Chassis of Smelting". |
 | **Rare** | up to 3 | up to 3 | Rolls three of each when crafted, if enough different affixes fit the item. The name uses its first prefix and first suffix. |
-| **Unique** | — | — | Found, not crafted. Rolled stat lines, no RP, and it cannot be refined. |
+| **Unique** | — | — | Found, not crafted. Rolled stat lines, no RP, and only a [Volatile Catalyst](#corruption) can change it. |
 
 [Uniques](uniques.md) have their own page: where to find them, how their ranged stats roll, and what each one does.
 
@@ -82,7 +82,7 @@ Base stats and fixed traits do not use affix slots, and refinement can never rem
 
 ### Reading the tooltip
 
-Hover an identified item to see its rarity, RP, and rolled affixes. Hold **Left Shift** for material and affix details, and **Left Alt** for each affix's tier and roll range. To see how affixes, Gear, and Mastery combine into a machine's final numbers, hold **Shift** over a row on its Stats tab. See [Machine Stats](machine-stats.md#how-stats-are-built).
+Hover an identified item to see its rarity, RP, and rolled affixes. A [Corrupted](#corruption) item shows a red Corrupted line instead of its RP, and any corruption implicit in red. Hold **Left Shift** for material and affix details, and **Left Alt** for each affix's tier and roll range. To see how affixes, Gear, and Mastery combine into a machine's final numbers, hold **Shift** over a row on its Stats tab. See [Machine Stats](machine-stats.md#how-stats-are-built).
 
 Affixes use four words:
 
@@ -185,7 +185,7 @@ A suffix that halves the failure strain a heat machine takes when its power drop
 
 ## Refinement Potential
 
-**Refinement Potential** (RP) is each item's budget for changing its affixes. Every successful refinement spends some. When RP runs out, the item is final, so spend it where it matters. The only way back is a Reforge in the [Exotic Affix Forge](exotic-affix-forge.md), which rerolls the whole item, RP included.
+**Refinement Potential** (RP) is each item's budget for changing its affixes. Every successful refinement spends some. When RP runs out, the item is final, so spend it where it matters. The only way back is a Reforge in the [Exotic Affix Forge](exotic-affix-forge.md), which rerolls the whole item, RP included. A [Corrupted](#corruption) item keeps its RP but can never spend it, so its RP is hidden.
 
 RP is rolled separately from rarity, and the starting affixes cost nothing. A Rare item keeps its full budget, just like a Normal one. Higher stages get bigger budgets:
 
@@ -209,6 +209,7 @@ Refinement changes an item's rolled affixes with a consumable **catalyst**. You 
 - **upgrade** a random affix to a higher tier, up to Tier 6.
 - **promote** a Magic item to Rare with an Ascension Catalyst or Ascension Matrix.
 - **remove** or **reroll** affixes.
+- **corrupt** a finished item with a {{ item('rngtech:volatile_catalyst') }}, a one-way gamble described in [Corruption](#corruption).
 
 You choose the catalyst, but the game picks which affix it adds or upgrades. In the Affix Forge, modifier lenses can tilt the odds towards a family you want.
 
@@ -218,6 +219,48 @@ Where to refine:
 - **Placed machines** in the Refinement tab of the machine's own screen.
 - **Tool Heads and Tool Rods**, even inside an assembled tool, in the [Tool Bench](tool-bench.md) Refine tab.
 - **Late-game powered operations** in the [Exotic Affix Forge](exotic-affix-forge.md).
+
+## Corruption
+
+A {{ item('rngtech:volatile_catalyst') }} corrupts a finished machine part or Battery Cell in the [Affix Forge](affix-forge.md#corrupting-with-a-volatile-catalyst), or a placed machine in its Refinement tab. It costs no RP, and it is the only thing that can change a Unique. Machine and chassis items, Tool Heads, Tool Rods, companions, and unidentified or stripped items cannot be corrupted as items; place a machine first and corrupt it from its Refinement tab.
+
+The catalyst rolls one outcome, and every outcome leaves the item **Corrupted**:
+
+| Outcome | Chance | Effect |
+|---|---:|---|
+| **Untouched** | 20% | Nothing else changes. |
+| **Blessed** | 20% | Adds one positive corruption implicit. |
+| **Reforged** | 20% | Rerolls every rolled affix from the item's legal pools, like a Chaos Crystal. Rarity, RP, base stats, and fixed traits stay. |
+| **Warped** | 20% | Each rolled affix moves by its own random amount from −15% to +15% of its value, past its tier's range. 100% increased Processing Speed can become anything from 85% to 115%. Tiers stay, and yield and RP affixes are not changed. |
+| **Blighted** | 20% | Adds one negative corruption implicit. |
+
+On a Unique, Reforged rerolls every ranged stat line inside its range, and Blessed or Blighted draw from the pool of the Unique's part. An outcome with nothing to do becomes Untouched: Reforged or Warped on an item without affixes it can change, Reforged on a Unique with no ranged lines, Warped on any Unique, and Blessed or Blighted on an item with no implicit to draw. A Stabilization Crystal in the Affix Forge's focus slot removes Blighted, adds its chance to Untouched, and is used up. Pack makers can change these chances and the Warped range.
+
+A Warped affix uses one roll for all of its effects, so a drawback on a two-stat affix grows or shrinks with its benefit. Hold Left Alt to compare a Warped affix with its tier's normal range.
+
+A **Corrupted** item can never be refined again: the Affix Forge, Exotic Affix Forge, Tool Bench, Refinement tabs, and a second Volatile Catalyst all refuse it, and nothing is used. Corruption cannot be removed. Nothing is ever destroyed or loses rarity; the worst result is a Blighted implicit. A placed machine keeps its corruption when you break and place it again.
+
+### Corruption implicits
+
+A corruption implicit is one fixed value, with no tier or range. It sits outside the prefix and suffix limits, and applies after the item's affixes. Each item draws one from its own pool, weighted:
+
+| Item | Blessed | Blighted |
+|---|---|---|
+| Heat Core | 10% increased Max Temperature, 15% increased Temperature Stability, 15% increased Overheat Tolerance, 10% increased Heat Transfer, 10% increased Fuel Efficiency, 20% reduced Warmup Time, or Power Grace | 20% less Temperature Stability, or 25% increased Warmup Time |
+| Crush Head | +1 Processing Level (rare), +25% Jam Recovery, 10% increased Processing Speed, or 10% more Processing Speed | 25% more Jam Chance, or 15% less Processing Speed |
+| Servo | Power Grace, Auto Purge, 15% increased Overheat Tolerance, 10% increased Processing Speed, 15% increased Stability, 15% reduced Energy Use, or 20% increased Fluid Transfer | 15% less Processing Speed, or 20% less Stability |
+| Alloy Crucible | +15% Blend Speed, 15% increased Temperature Stability, 10% increased Processing Speed, 15% increased Overheat Tolerance, or 20% reduced Warmup Time | 20% less Stability |
+| Fluid Pump | 50% increased Fluid Capacity, or 30% increased Fluid Transfer | 30% less Fluid Transfer |
+| Battery Cell | 20% increased Energy Transfer, 30% less Idle Loss, 15% increased Energy Capacity, or 10% increased Efficiency | Doubled Idle Loss |
+| Resonance Coil, Control Board, Stabilizer Matrix | +1 Coil Reach, 10% increased Catalyst Efficiency, 10% increased Calibration Precision, or 10% increased Processing Speed | 20% less Processing Speed, or 10% less Calibration Precision |
+| Bio Chamber, Fuel Box | 15% increased Fuel Efficiency, or 15% increased Fuel Duration; the Bio Chamber can also roll 10% increased Energy Generation, and the Fuel Box 15% increased Stability | 10% less Energy Generation on the Bio Chamber; 15% less Stability on the Fuel Box |
+| Other generator parts | 10% increased Energy Generation; most also roll 15% increased Stability or 10% increased Processing Speed | 10% less Energy Generation |
+| Other parts | 15% increased Stability; most also roll 10% increased Processing Speed or 10% increased Efficiency | 15% less Stability |
+| Placed processing machine | 10% increased Processing Speed, 20% reduced Energy Use, or 15% increased Stability where the machine has it; +1 Batch Size (rare) on the Crusher, Melter, Metal Press, and Resonance Calibrator; 15% increased Fuel Efficiency or 10% increased Max Temperature on the Furnace | 25% increased Energy Use; 20% less Fuel Efficiency on the Furnace |
+| Placed generator | 10% increased Energy Generation, 15% increased Efficiency, and where the machine has them 15% increased Stability or 25% increased Energy Capacity | 20% less Efficiency |
+| Battery Chassis | +1 Battery Slot, 15% increased Energy Capacity, or 20% increased Energy Transfer | 15% increased Idle Loss |
+
++1 Processing Level on a Crush Head lets it crush one level harder ore without jamming; it does not change which Gear the Crusher accepts. With a catalyst in the Affix Forge, hover Blessed or Blighted in the outcome panel to see the exact pool and odds for the item in the target slot. Corruption implicits never add yield or RP.
 
 ## See also
 

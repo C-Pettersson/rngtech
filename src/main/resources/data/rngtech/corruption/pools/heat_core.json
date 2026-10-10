@@ -1,0 +1,104 @@
+{
+    "hosts": [
+        "heat_core"
+    ],
+    "blessed": [
+        {
+            "id": "max_temperature",
+            "weight": 30,
+            "modifiers": [
+                {
+                    "stat": "max_temperature",
+                    "operation": "increased_percent",
+                    "value": 10
+                }
+            ]
+        },
+        {
+            "id": "temperature_stability",
+            "weight": 30,
+            "modifiers": [
+                {
+                    "stat": "temperature_stability",
+                    "operation": "increased_percent",
+                    "value": 15
+                }
+            ]
+        },
+        {
+            "id": "power_grace",
+            "weight": 20,
+            "behaviors": [
+                "power_grace"
+            ]
+        },
+        {
+            "id": "overheat_tolerance",
+            "weight": 30,
+            "modifiers": [
+                {
+                    "stat": "overheat_tolerance",
+                    "operation": "increased_percent",
+                    "value": 15
+                }
+            ]
+        },
+        {
+            "id": "heat_transfer",
+            "weight": 30,
+            "modifiers": [
+                {
+                    "stat": "heat_transfer",
+                    "operation": "increased_percent",
+                    "value": 10
+                }
+            ]
+        },
+        {
+            "id": "fuel_efficiency",
+            "weight": 30,
+            "modifiers": [
+                {
+                    "stat": "fuel_efficiency",
+                    "operation": "increased_percent",
+                    "value": 10
+                }
+            ]
+        },
+        {
+            "id": "warmup_time",
+            "weight": 30,
+            "modifiers": [
+                {
+                    "stat": "warmup_time",
+                    "operation": "decreased_percent",
+                    "value": 20
+                }
+            ]
+        }
+    ],
+    "blighted": [
+        {
+            "id": "temperature_stability",
+            "weight": 50,
+            "modifiers": [
+                {
+                    "stat": "temperature_stability",
+                    "operation": "less",
+                    "value": 0.8
+                }
+            ]
+        },
+        {
+            "id": "warmup_time",
+            "weight": 50,
+            "modifiers": [
+                {
+                    "stat": "warmup_time",
+                    "operation": "increased_percent",
+                    "value": 25
+                }
+            ]
+        }
+    ]
+}

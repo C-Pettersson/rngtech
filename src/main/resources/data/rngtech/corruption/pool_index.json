@@ -1,0 +1,26 @@
+{
+    "pools": [
+        "alloy_crucible",
+        "batching_machines",
+        "battery_cell",
+        "battery_chassis",
+        "bio_chamber",
+        "buffered_generators",
+        "calibration_gear",
+        "crush_head",
+        "efficient_parts",
+        "fast_parts",
+        "fluid_pump",
+        "fuel_box",
+        "furnace",
+        "generator_parts",
+        "generators",
+        "heat_core",
+        "processing_machines",
+        "servo",
+        "stability_parts",
+        "stable_generator_parts",
+        "stable_generators",
+        "stable_machines"
+    ]
+}

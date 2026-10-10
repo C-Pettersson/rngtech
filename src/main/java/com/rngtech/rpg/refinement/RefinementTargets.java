@@ -31,6 +31,7 @@ import com.rngtech.rpg.MachineType;
 import com.rngtech.rpg.ModifierEligibilityProfile;
 import com.rngtech.rpg.ModifierEligibilityProfiles;
 import com.rngtech.rpg.Rarity;
+import com.rngtech.rpg.corruption.CorruptionCatalog;
 import com.rngtech.rpg.unique.UniqueItems;
 
 import net.minecraft.world.item.ItemStack;
@@ -48,6 +49,22 @@ public final class RefinementTargets {
                 || stack.getItem() instanceof ForestryCartItem
                 || stack.getItem() instanceof ToolHeadItem
                 || stack.getItem() instanceof ToolRodItem);
+    }
+
+    /**
+     * Whether a Volatile Catalyst may target this stack: finished parts and cells with a corruption pool. Machine and
+     * chassis items, tool parts, companions, unidentified and recycling-stripped stacks are not corrupted as items;
+     * placed machines are corrupted through their Refinement tabs instead.
+     */
+    public static boolean canCorrupt(ItemStack stack) {
+        return canRefine(stack)
+                && (stack.getItem() instanceof MachinePartItem || stack.getItem() instanceof BatteryCellItem)
+                && CorruptionCatalog.active().canCorrupt(eligibilityProfile(stack).id());
+    }
+
+    public static boolean isCorrupted(ItemStack stack) {
+        MachineTraits traits = stack.get(ModDataComponents.MACHINE_TRAITS.get());
+        return traits != null && traits.isCorrupted();
     }
 
     public static MachineType machineType(ItemStack stack) {

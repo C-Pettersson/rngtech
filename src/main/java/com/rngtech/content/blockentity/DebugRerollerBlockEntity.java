@@ -57,6 +57,7 @@ public class DebugRerollerBlockEntity extends BlockEntity implements MenuProvide
     public static boolean canReroll(ItemStack stack) {
         return RNGTech.isDebugContentEnabled()
                 && RefinementTargets.canRefine(stack)
+                && !RefinementTargets.isCorrupted(stack)
                 && RefinementTargets.traits(stack).rarity() != Rarity.UNIQUE;
     }
 
@@ -79,6 +80,9 @@ public class DebugRerollerBlockEntity extends BlockEntity implements MenuProvide
 
     public String failureMessageKey() {
         ItemStack target = inventory.getStackInSlot(SLOT_TARGET);
+        if (RefinementTargets.canRefine(target) && RefinementTargets.isCorrupted(target)) {
+            return "rngtech.debug_reroller.failure.corrupted";
+        }
         if (RefinementTargets.canRefine(target) && RefinementTargets.traits(target).rarity() == Rarity.UNIQUE) {
             return "rngtech.debug_reroller.failure.unique";
         }

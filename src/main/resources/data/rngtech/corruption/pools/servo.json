@@ -1,0 +1,100 @@
+{
+    "hosts": [
+        "servo"
+    ],
+    "blessed": [
+        {
+            "id": "power_grace",
+            "weight": 30,
+            "behaviors": [
+                "power_grace"
+            ]
+        },
+        {
+            "id": "auto_purge",
+            "weight": 30,
+            "behaviors": [
+                "auto_purge"
+            ]
+        },
+        {
+            "id": "overheat_tolerance",
+            "weight": 40,
+            "modifiers": [
+                {
+                    "stat": "overheat_tolerance",
+                    "operation": "increased_percent",
+                    "value": 15
+                }
+            ]
+        },
+        {
+            "id": "processing_speed",
+            "weight": 40,
+            "modifiers": [
+                {
+                    "stat": "processing_speed",
+                    "operation": "increased_percent",
+                    "value": 10
+                }
+            ]
+        },
+        {
+            "id": "stability",
+            "weight": 40,
+            "modifiers": [
+                {
+                    "stat": "stability",
+                    "operation": "increased_percent",
+                    "value": 15
+                }
+            ]
+        },
+        {
+            "id": "energy_usage",
+            "weight": 40,
+            "modifiers": [
+                {
+                    "stat": "energy_usage",
+                    "operation": "decreased_percent",
+                    "value": 15
+                }
+            ]
+        },
+        {
+            "id": "fluid_transfer",
+            "weight": 30,
+            "modifiers": [
+                {
+                    "stat": "fluid_transfer",
+                    "operation": "increased_percent",
+                    "value": 20
+                }
+            ]
+        }
+    ],
+    "blighted": [
+        {
+            "id": "processing_speed",
+            "weight": 50,
+            "modifiers": [
+                {
+                    "stat": "processing_speed",
+                    "operation": "less",
+                    "value": 0.85
+                }
+            ]
+        },
+        {
+            "id": "stability",
+            "weight": 50,
+            "modifiers": [
+                {
+                    "stat": "stability",
+                    "operation": "less",
+                    "value": 0.8
+                }
+            ]
+        }
+    ]
+}

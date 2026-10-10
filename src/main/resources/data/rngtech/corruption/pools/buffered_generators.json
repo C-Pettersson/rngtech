@@ -1,0 +1,26 @@
+{
+    "hosts": [
+        "bio_generator",
+        "solar_panel",
+        "solar_array_controller",
+        "potential_reactor",
+        "corrosion_cell",
+        "vacuum_collapse_generator",
+        "syngas_combustor",
+        "ammonia_fuel_cell",
+        "cavitation_generator"
+    ],
+    "blessed": [
+        {
+            "id": "energy_capacity",
+            "weight": 100,
+            "modifiers": [
+                {
+                    "stat": "energy_capacity",
+                    "operation": "increased_percent",
+                    "value": 25
+                }
+            ]
+        }
+    ]
+}

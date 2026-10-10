@@ -51,7 +51,7 @@ Each recipe also has a minimum stage. Both the chassis and the installed Alloy C
 
 Your first Bronze does not need an Alloy Furnace. 3 Copper Dust, 1 Tin Dust, and 1 Coal Dust make 2 Bronze Blend in a crafting grid, in any arrangement. Once you have a Bronze Alloy Furnace, it makes more Bronze Blend from the same dusts plus Charcoal, and it can already make a slow Steel Blend bootstrap recipe.
 
-Stage 4 and higher recipes with a failure output build up failure strain when heat or stability is off, or when power drops mid-craft on power-sensitive recipes. When strain fills, the craft fails and outputs a recoverable {{ item('rngtech:malformed_ingot') }} instead of the alloy. Smelt it in a [Furnace](furnace.md) to get two nuggets back. Of the default recipes, only Nullite and Tungstensteel can fail.
+Stage 4 and higher recipes with a failure output build up failure strain when heat or stability is off, or when power drops mid-craft on power-sensitive recipes. When strain fills, the craft fails and outputs a recoverable {{ item('rngtech:malformed_ingot') }} instead of the alloy. Smelt it in a [Furnace](furnace.md) to get two nuggets back, or keep it for the [Volatile Catalyst](affix-forge.md#crafting-the-consumables). Of the default recipes, only Nullite and Tungstensteel can fail.
 
 ### Stages
 

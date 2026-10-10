@@ -345,5 +345,17 @@
 			x: 7.5d
 			y: 1.5d
 		}
+		{
+			dependencies: ["12A0A2EF0429FF13"]
+			id: "BAE00B9B83600445"
+			optional: true
+			tasks: [{
+				id: "BAB578BAE6F2C5E1"
+				item: { count: 1, id: "rngtech:volatile_catalyst" }
+				type: "item"
+			}]
+			x: 16.5d
+			y: 0.0d
+		}
 	]
 }
