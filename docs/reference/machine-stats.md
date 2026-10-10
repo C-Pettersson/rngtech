@@ -20,7 +20,7 @@ Modifier operations (`ADD`, `INCREASED_PERCENT`, `DECREASED_PERCENT`, `MORE`, `L
 | `OUTPUT_GUARD_GRACE` | Prototype | Crusher-only blocked-output progress grace in ticks. Crusher Frame prefixes add this value and enable Output Guard behavior. |
 | `NO_BATTERY_OUTPUT_RETENTION` | Prototype | Crusher-only percentage of the missing-Battery-Cell output penalty that is retained instead of lost. |
 | `HIGH_HARDNESS_ENERGY_MITIGATION` | Prototype | Crusher-only percentage reduction to the surcharge above `1.0x` from the high-hardness energy multiplier. It does not reduce the base recipe energy cost. |
-| `CRUSHER_INPUT_FILTER` | Prototype | Crusher-only top automation filter tier. Higher tiers require valid recipes, output acceptance, output-bonus-bank compatibility, and dense-batch output acceptance. It does not reject under-hardness Crusher recipes. |
+| `CRUSHER_INPUT_FILTER` | Prototype | Crusher-only top automation filter tier. Top automation always requires a valid recipe; higher tiers add output acceptance, output-bonus-bank compatibility, and dense-batch output acceptance. It does not reject under-hardness Crusher recipes. |
 | `CRUSHER_SALVAGE_CHANCE` | Prototype | Crusher-only percentage chance to add one extra copy of the base output item after deterministic output amount and Super Output have been evaluated. |
 | `BLOCK_FILTER_SLOTS` | Prototype | Portable Miner's Companion filter capacity. The base profile starts at `3`; Miner's Companion filter-slot prefixes can raise it to the ten-slot GUI cap. |
 | `MAGIC_FIND` | Deferred | Reserved for later special outcome systems; not shown as a core machine stat. |
@@ -164,7 +164,7 @@ Crusher-specific prefix stats default to `0` and become active only through roll
 | `OUTPUT_GUARD_GRACE` | `100-800 ticks` | Crusher Frame tiers preserve output-blocked progress for `100`, `200`, `400`, or `800` ticks. |
 | `NO_BATTERY_OUTPUT_RETENTION` | `25-100%` | Crusher Battery Link tiers retain `25%`, `50%`, `75%`, or `100%` of the no-cell lost multiplier. |
 | `HIGH_HARDNESS_ENERGY_MITIGATION` | `15-60%` | Crusher Compression tiers reduce only the high-hardness surcharge by `15%`, `30%`, `45%`, or `60%`. |
-| `CRUSHER_INPUT_FILTER` | `1-4` | Crusher Feed Control tiers filter top automation by recipe, output acceptance, bonus-bank compatibility, and dense-batch output acceptance. |
+| `CRUSHER_INPUT_FILTER` | `1-4` | Crusher Feed Control tiers filter top automation by output acceptance (from tier 2), bonus-bank compatibility, and dense-batch output acceptance. |
 | `CRUSHER_SALVAGE_CHANCE` | `1-5%` | Crusher Salvage uses the shared chance table: `1-2%`, `2-3%`, `3-4%`, `4-5%`. |
 
 ## Furnace Range
