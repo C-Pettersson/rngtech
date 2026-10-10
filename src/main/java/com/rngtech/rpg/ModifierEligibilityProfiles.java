@@ -1551,7 +1551,6 @@ public final class ModifierEligibilityProfiles {
                     MACHINE_ENERGY_CAPACITY_ADD,
                     MachineStat.ENERGY_CAPACITY,
                     MachineStat.ENERGY_GENERATION,
-                    MachineStat.ENERGY_TRANSFER,
                     MachineStat.EFFICIENCY,
                     MachineStat.PROCESSING_SPEED,
                     MachineStat.STABILITY
@@ -1751,7 +1750,6 @@ public final class ModifierEligibilityProfiles {
                     "cavitating",
                     MACHINE_ENERGY_CAPACITY_ADD,
                     MachineStat.ENERGY_CAPACITY,
-                    MachineStat.ENERGY_TRANSFER,
                     MachineStat.ENERGY_GENERATION,
                     MachineStat.EFFICIENCY,
                     MachineStat.PROCESSING_SPEED,
@@ -2287,7 +2285,6 @@ public final class ModifierEligibilityProfiles {
             processingStatAffixes(
                     "focusing",
                     MachineStat.ENERGY_GENERATION,
-                    MachineStat.ENERGY_TRANSFER,
                     MachineStat.TEMPERATURE_STABILITY,
                     MachineStat.OUTPUT_AMOUNT,
                     MachineStat.FLUID_TRANSFER,

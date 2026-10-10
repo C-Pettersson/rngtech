@@ -26,7 +26,7 @@ wiki:
         "Type": "Passive generator",
         "Stages": "1–3, 5 (panels); 4 (controller)",
         "Power": "Sunlight, generates FE",
-        "Gear": "Controller only: {{ item('rngtech:iron_battery_cell', 'Battery Cell') }}, {{ item('rngtech:basic_energy_connector', 'Energy Connector') }}, {{ item('rngtech:sparksteel_solar_array_extender', 'Solar Array Extender') }}",
+        "Gear": "Controller only: {{ item('rngtech:iron_battery_cell', 'Battery Cell') }}, {{ item('rngtech:sparksteel_solar_array_extender', 'Solar Array Extender') }}",
         "Mastery": "No",
     },
 ) }}
@@ -90,7 +90,7 @@ While a controller owns a panel, that panel stops exporting on its own. The cont
 
 - **Set bonus.** If every panel spot in range holds a panel of the same stage, the array gets +20% output.
 - **Overlap.** A panel inside two controllers' ranges splits its output between them.
-- **Output cap.** The installed Energy Connector sets the controller's maximum FE/t export. Without one, it exports up to 128 FE/t. The cap is per tick and shared by all sides.
+- **No output cap.** Like a standalone panel, the controller does not limit its own output, so the receiver or connector tier decides how much FE moves each tick.
 
 The Process tab has a button that toggles an in-world outline of the controller's range. The outline stays visible after you close the screen.
 
@@ -110,10 +110,9 @@ Besides the usual generator stats, a controller can roll these array affixes. Th
 
 ### Gear
 
-Panels have no Gear and no screen. The controller's Gear tab has three optional slots:
+Panels have no Gear and no screen. The controller's Gear tab has two optional slots:
 
 - **Battery Cell**: extra storage and smoother output.
-- **Energy Connector**: sets the maximum FE/t the controller exports. The caps per tier are listed under [Universal Cable energy](universal-cable.md#energy).
 - **Solar Array Extender**: adds +1 range.
 
 | Extender | Built-in bonus |
@@ -135,7 +134,7 @@ Extenders also roll their own affixes, which apply while installed.
 Panels have no screen. The Solar Array Controller screen has four tabs:
 
 - **Process**: stored FE, current FE/t, active and blocked panel counts, daylight and weather state, and the range-outline button. Hover for exact values.
-- **Gear**: Battery Cell, Energy Connector, and Solar Array Extender slots.
+- **Gear**: Battery Cell and Solar Array Extender slots.
 - **Stats**: the controller's current stats, including traits and Gear.
 - **Refinement**: refine the placed controller's traits with a catalyst.
 

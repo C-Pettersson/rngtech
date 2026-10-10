@@ -51,7 +51,6 @@ public class VacuumCollapseGeneratorScreen extends AbstractContainerScreen<Vacuu
     private static final String[] STAT_LABEL_KEYS = {
             "rngtech.stat.energy_generation",
             "rngtech.stat.energy_capacity",
-            "rngtech.stat.energy_transfer",
             "rngtech.stat.efficiency",
             "rngtech.stat.processing_speed",
             "rngtech.stat.processing_level",
@@ -60,7 +59,6 @@ public class VacuumCollapseGeneratorScreen extends AbstractContainerScreen<Vacuu
     private static final int[] STAT_DATA_INDICES = {
             VacuumCollapseGeneratorMenu.energyGenerationDataIndex(),
             VacuumCollapseGeneratorMenu.energyCapacityDataIndex(),
-            VacuumCollapseGeneratorMenu.energyTransferDataIndex(),
             VacuumCollapseGeneratorMenu.efficiencyDataIndex(),
             VacuumCollapseGeneratorMenu.processingSpeedDataIndex(),
             VacuumCollapseGeneratorMenu.processingLevelDataIndex(),
@@ -69,7 +67,6 @@ public class VacuumCollapseGeneratorScreen extends AbstractContainerScreen<Vacuu
     private static final MachineStat[] STAT_TYPES = {
             MachineStat.ENERGY_GENERATION,
             MachineStat.ENERGY_CAPACITY,
-            MachineStat.ENERGY_TRANSFER,
             MachineStat.EFFICIENCY,
             MachineStat.PROCESSING_SPEED,
             MachineStat.PROCESSING_LEVEL,
@@ -193,7 +190,6 @@ public class VacuumCollapseGeneratorScreen extends AbstractContainerScreen<Vacuu
             renderSlotFrame(guiGraphics, 24, 47);
             renderSlotFrame(guiGraphics, 74, 47);
             renderSlotFrame(guiGraphics, 124, 47);
-            renderSlotFrame(guiGraphics, 174, 47);
         } else if (menu.selectedTab() == VacuumCollapseGeneratorMenu.TAB_REFINEMENT) {
             renderSlotFrame(guiGraphics, RefinementScreenStyle.TARGET_SLOT_X - 1, RefinementScreenStyle.SLOT_Y - 1);
             renderSlotFrame(guiGraphics, RefinementScreenStyle.CONSUMABLE_SLOT_X - 1, RefinementScreenStyle.SLOT_Y - 1);
@@ -270,7 +266,6 @@ public class VacuumCollapseGeneratorScreen extends AbstractContainerScreen<Vacuu
         drawGearLabel(guiGraphics, Component.translatable("rngtech.gear.void_chamber.short"), 33);
         drawGearLabel(guiGraphics, Component.translatable("rngtech.gear.collapse_nozzle.short"), 83);
         drawGearLabel(guiGraphics, Component.translatable("rngtech.gear.dimensional_stabilizer.short"), 133);
-        drawGearLabel(guiGraphics, Component.translatable("rngtech.gear.energy_connector.short"), 183);
     }
 
     private void drawGearLabel(GuiGraphics guiGraphics, Component label, int centerX) {

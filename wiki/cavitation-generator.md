@@ -13,7 +13,7 @@ wiki:
         "Type": "Generator",
         "Stages": "5",
         "Power": "FE generator",
-        "Gear": "{{ item('rngtech:steel_cavitation_rotor', 'Cavitation Rotor') }}, {{ item('rngtech:steel_collapse_nozzle', 'Collapse Nozzle') }}, {{ item('rngtech:titanium_servo', 'Servo') }}, {{ item('rngtech:crude_energy_connector', 'Energy Connector') }}",
+        "Gear": "{{ item('rngtech:steel_cavitation_rotor', 'Cavitation Rotor') }}, {{ item('rngtech:steel_collapse_nozzle', 'Collapse Nozzle') }}, {{ item('rngtech:titanium_servo', 'Servo') }}",
         "Mastery": "No",
     },
 ) }}
@@ -43,7 +43,7 @@ Two things build up as it runs:
 - **Heat strain** rises after each cycle and cools off over time. The hotter the machine, the less FE each cycle makes, down to half at full strain. At full strain it waits to cool before starting another cycle.
 - **Rotor wear** is stored on the rotor itself, so pulling it out and putting it back does not reset it. When wear reaches the rotor's durability, the rotor is removed and a {{ item('rngtech:pitted_cavitation_rotor') }} drops into the output slot. Keep that slot empty, or the generator stops. Pitted rotors can be salvaged in a Stage 5 [Component Recycler](component-recycler.md) for byproduct only.
 
-The generator never pauses because its storage is full. FE that its 4,000 FE buffer and Battery Cell cannot hold is lost, so connect it to cables and storage that keep up. A redstone signal pauses it.
+The generator never pauses because its storage is full. FE that its 4,000 FE buffer and Battery Cell cannot hold is lost, so connect it to cables and storage that keep up. It does not limit its own output, so the receiver or connector tier decides how much FE moves each tick. A redstone signal pauses it.
 
 ### Nitrogen
 
@@ -51,7 +51,7 @@ Install a {{ item('rngtech:nitrogen_extraction_rotor') }} and a {{ item('rngtech
 
 ### Burst rotor
 
-The {{ item('rngtech:aethergold_cavitation_rotor') }} is a Stage 7 sidegrade. It runs cycles very fast and raises FE sharply, but wears out in a short time. It does not raise the export rate without a connector, so pair it with a Sparksteel or better Energy Connector or most of the burst is vented.
+The {{ item('rngtech:aethergold_cavitation_rotor') }} is a Stage 7 sidegrade. It runs cycles very fast and raises FE sharply, but wears out in a short time. Attach the generator through a Universal Connector with a Sparksteel or better Energy Connector, or most of the burst is vented.
 
 ### Gear
 
@@ -60,9 +60,8 @@ The {{ item('rngtech:aethergold_cavitation_rotor') }} is a Stage 7 sidegrade. It
 | Cavitation Rotor | Yes | Steel, Titanium, Tungstensteel, Aethergold, and Nullite Cavitation Rotors, or the Nitrogen Extraction Rotor. Sets the stage, generation, cycle speed, and durability. |
 | Collapse Nozzle | Yes | Steel through Exotic Collapse Nozzles, or the Nitrogen Separation Nozzle. Tunes FE, heat strain, and Nitrogen output. |
 | Heat Core | No | Makes heat strain cool faster. Higher-stage cores cool faster; an Iron Heat Core adds nothing. |
-| Battery Cell | No | Adds FE storage. It does not raise the export rate. |
+| Battery Cell | No | Adds FE storage. |
 | Servo | No | Stage 6+ Servos only ({{ item('rngtech:titanium_servo') }} and up). Speeds cycles and reduces wear and heat strain. The Nullite Servo instead halves cycle speed, in exchange for voiding excess Nitrogen. |
-| Energy Connector | No | Sets how fast FE leaves the sides. Without one, the rotor and nozzle set a lower fallback rate. Either way, the cap is per tick and shared by all sides. |
 
 Cavitation Rotors can roll flat and percent Durability affixes.
 
@@ -88,7 +87,7 @@ The Cavitation Generator uses its own recipe type, `rngtech:cavitation`. Pressur
 The Cavitation Generator screen has four tabs:
 
 - **Process**: the input tank and Nitrogen tank with purge buttons, the container slot, the pitted-rotor slot, and meters for FE, cycle progress, heat strain, and rotor wear. Click the recipe line to open its JEI category.
-- **Gear**: rotor, nozzle, Heat Core, Battery Cell, Servo, and Energy Connector slots.
+- **Gear**: rotor, nozzle, Heat Core, Battery Cell, and Servo slots.
 - **Stats**: the machine's current stats, including traits and Gear.
 - **Refinement**: refine the placed generator's traits with a catalyst.
 

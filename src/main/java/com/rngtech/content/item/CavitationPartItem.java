@@ -75,7 +75,6 @@ public class CavitationPartItem extends MachinePartItem {
                 "rngtech.tooltip.cavitation_rotor.profile",
                 decimal(rotor.generationMultiplier()),
                 decimal(rotor.processingSpeedMultiplier()),
-                decimal(rotor.energyTransferMultiplier()),
                 decimal(rotor.wearMultiplier()),
                 decimal(rotor.outputMultiplier())
         ).withStyle(ChatFormatting.GRAY));

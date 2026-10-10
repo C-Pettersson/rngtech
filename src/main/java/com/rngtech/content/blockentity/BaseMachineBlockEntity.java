@@ -31,6 +31,8 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.component.DataComponentMap;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.world.Containers;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -41,6 +43,8 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.ItemStackHandler;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 public abstract class BaseMachineBlockEntity extends BlockEntity implements RefinableMachine {
@@ -69,6 +73,7 @@ public abstract class BaseMachineBlockEntity extends BlockEntity implements Refi
             setChanged();
         }
     };
+    private final List<ItemStack> removedGear = new ArrayList<>();
 
     protected BaseMachineBlockEntity(
             BlockEntityType<?> blockEntityType,
@@ -232,16 +237,75 @@ public abstract class BaseMachineBlockEntity extends BlockEntity implements Refi
         }
     }
 
+    /**
+     * Loads a Gear inventory that may have been saved with one more slot, at {@code removedSlot}. Later slots shift
+     * down by one, and items with no slot left are held until {@link #dropRemovedGear}.
+     */
+    protected void loadGearWithoutSlot(
+            ItemStackHandler gearInventory,
+            CompoundTag gearTag,
+            HolderLookup.Provider registries,
+            int removedSlot
+    ) {
+        int slotCount = gearInventory.getSlots();
+        int savedSize = Math.max(0, gearTag.getInt("Size"));
+        if (savedSize == slotCount) {
+            gearInventory.deserializeNBT(registries, gearTag);
+            return;
+        }
+
+        boolean hasRemovedSlot = savedSize == slotCount + 1;
+        ItemStackHandler saved = new ItemStackHandler(savedSize);
+        saved.deserializeNBT(registries, gearTag);
+        ItemStackHandler current = new ItemStackHandler(slotCount);
+        for (int savedSlot = 0; savedSlot < savedSize; savedSlot++) {
+            ItemStack stack = saved.getStackInSlot(savedSlot);
+            int slot = hasRemovedSlot && savedSlot > removedSlot ? savedSlot - 1 : savedSlot;
+            if ((hasRemovedSlot && savedSlot == removedSlot) || slot >= slotCount) {
+                if (!stack.isEmpty()) {
+                    removedGear.add(stack);
+                }
+            } else {
+                current.setStackInSlot(slot, stack);
+            }
+        }
+        gearInventory.deserializeNBT(registries, current.serializeNBT(registries));
+    }
+
+    protected void dropRemovedGear(Level level) {
+        if (removedGear.isEmpty()) {
+            return;
+        }
+        for (ItemStack stack : removedGear) {
+            Containers.dropItemStack(level, worldPosition.getX(), worldPosition.getY(), worldPosition.getZ(), stack);
+        }
+        removedGear.clear();
+        setChanged();
+    }
+
     @Override
     protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.saveAdditional(tag, registries);
         tag.put("RefinementInventory", refinementInventory.serializeNBT(registries));
+        if (!removedGear.isEmpty()) {
+            ListTag removed = new ListTag();
+            removedGear.forEach(stack -> removed.add(stack.save(registries)));
+            tag.put("RemovedGear", removed);
+        }
     }
 
     @Override
     protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.loadAdditional(tag, registries);
         refinementInventory.deserializeNBT(registries, tag.getCompound("RefinementInventory"));
+        removedGear.clear();
+        ListTag removed = tag.getList("RemovedGear", Tag.TAG_COMPOUND);
+        for (int index = 0; index < removed.size(); index++) {
+            ItemStack stack = ItemStack.parseOptional(registries, removed.getCompound(index));
+            if (!stack.isEmpty()) {
+                removedGear.add(stack);
+            }
+        }
     }
 
     private final class SidedItemHandler implements IItemHandler {
