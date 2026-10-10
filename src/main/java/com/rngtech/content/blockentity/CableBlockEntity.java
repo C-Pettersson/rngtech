@@ -6,10 +6,13 @@ import com.rngtech.content.cable.CableConnectorMode;
 import com.rngtech.content.cable.EnergyConnectorTier;
 import com.rngtech.content.cable.EnergyDistributionMode;
 import com.rngtech.content.cable.EvenSplit;
+import com.rngtech.content.cable.FluidConnectorMode;
+import com.rngtech.content.cable.ItemConnectorMode;
 import com.rngtech.content.cable.NetworkBridgeType;
 import com.rngtech.content.menu.UniversalConnectorAccess;
 import com.rngtech.content.registry.ModBlockEntities;
 import com.rngtech.content.registry.ModItems;
+import com.rngtech.content.wrench.LinkStatus;
 import com.rngtech.util.TickTransferCounter;
 
 import net.minecraft.core.BlockPos;
@@ -1075,6 +1078,16 @@ public class CableBlockEntity extends BlockEntity implements UniversalConnectorD
         return remaining <= 0 ? FluidStack.EMPTY : stack.copyWithAmount(remaining);
     }
 
+    /** A connector counts as a source only when its target can move FE out now, or did last tick. */
+    static boolean countsAsEnergySource(CableConnectorMode mode, int transferRate, IEnergyStorage target, int lastInput) {
+        return target != null && transferRate > 0 && mode.acceptsNetworkInput() && (lastInput > 0 || target.canExtract());
+    }
+
+    /** A connector counts as a sink only when its target can take FE now, or did last tick. */
+    static boolean countsAsEnergySink(CableConnectorMode mode, int transferRate, IEnergyStorage target, int lastOutput) {
+        return target != null && transferRate > 0 && mode.sendsNetworkOutput() && (lastOutput > 0 || target.canReceive());
+    }
+
     private static boolean isValidChannel(int channel) {
         return channel >= 0 && channel <= MAX_CHANNEL;
     }
@@ -1638,7 +1651,8 @@ public class CableBlockEntity extends BlockEntity implements UniversalConnectorD
             int cacheAgeTicks,
             int energyInputCap,
             int energyOutputCap,
-            int[] energyChannelCaps
+            int[] energyChannelCaps,
+            LinkCounts links
     ) {
         public static final NetworkDebugSnapshot EMPTY = new NetworkDebugSnapshot(
                 0,
@@ -1661,12 +1675,62 @@ public class CableBlockEntity extends BlockEntity implements UniversalConnectorD
                 0,
                 0,
                 0,
-                new int[MAX_CHANNEL + 1]
+                new int[MAX_CHANNEL + 1],
+                LinkCounts.EMPTY
         );
 
         /** Most FE/t the channel can move: the smaller of its supplying and its accepting connector tiers. */
         public int energyChannelCap(int channel) {
             return isValidChannel(channel) ? energyChannelCaps[channel] : 0;
+        }
+    }
+
+    /** How many sources and sinks each channel has, by resource, for explaining why a connector is idle. */
+    public record LinkCounts(
+            int[] energySources,
+            int[] energySinks,
+            int[] itemSources,
+            int[] itemSinks,
+            int[] fluidSources,
+            int[] fluidSinks
+    ) {
+        public static final LinkCounts EMPTY = new LinkCounts(
+                new int[MAX_CHANNEL + 1],
+                new int[MAX_CHANNEL + 1],
+                new int[MAX_CHANNEL + 1],
+                new int[MAX_CHANNEL + 1],
+                new int[MAX_CHANNEL + 1],
+                new int[MAX_CHANNEL + 1]
+        );
+
+        public enum Kind {
+            ENERGY,
+            ITEM,
+            FLUID
+        }
+
+        public LinkStatus status(
+                Kind kind,
+                int channel,
+                boolean roleSource,
+                boolean roleSink,
+                boolean countedSource,
+                boolean countedSink
+        ) {
+            if (!isValidChannel(channel)) {
+                return LinkStatus.OK;
+            }
+            int[] sources = switch (kind) {
+                case ENERGY -> energySources;
+                case ITEM -> itemSources;
+                case FLUID -> fluidSources;
+            };
+            int[] sinks = switch (kind) {
+                case ENERGY -> energySinks;
+                case ITEM -> itemSinks;
+                case FLUID -> fluidSinks;
+            };
+            return LinkStatus.evaluate(sources[channel], sinks[channel], roleSource, roleSink, countedSource, countedSink);
         }
     }
 
@@ -1868,6 +1932,12 @@ public class CableBlockEntity extends BlockEntity implements UniversalConnectorD
         private int bridgeChannelsMask;
         private final long[] energyInputCaps = new long[MAX_CHANNEL + 1];
         private final long[] energyOutputCaps = new long[MAX_CHANNEL + 1];
+        private final int[] energySources = new int[MAX_CHANNEL + 1];
+        private final int[] energySinks = new int[MAX_CHANNEL + 1];
+        private final int[] itemSources = new int[MAX_CHANNEL + 1];
+        private final int[] itemSinks = new int[MAX_CHANNEL + 1];
+        private final int[] fluidSources = new int[MAX_CHANNEL + 1];
+        private final int[] fluidSinks = new int[MAX_CHANNEL + 1];
         private long fluidShipmentCap;
         private long itemShipmentCap;
         private final int cacheAgeTicks;
@@ -1901,31 +1971,49 @@ public class CableBlockEntity extends BlockEntity implements UniversalConnectorD
                 int lastInput,
                 int lastOutput
         ) {
-            if (!isValidChannel(channel) || target == null || transferRate <= 0) {
+            if (!isValidChannel(channel)) {
                 return;
             }
-            if (mode.acceptsNetworkInput() && (lastInput > 0 || target.canExtract())) {
+            if (countsAsEnergySource(mode, transferRate, target, lastInput)) {
                 energyInputCaps[channel] += transferRate;
+                energySources[channel]++;
             }
-            if (mode.sendsNetworkOutput() && (lastOutput > 0 || target.canReceive())) {
+            if (countsAsEnergySink(mode, transferRate, target, lastOutput)) {
                 energyEndpoints++;
                 energyOutputCaps[channel] += transferRate;
+                energySinks[channel]++;
             }
         }
 
-        void addFluidModule(int channel, int shipmentCap, boolean active) {
+        void addFluidModule(int channel, FluidConnectorMode mode, int shipmentCap, boolean active) {
             fluidModules++;
             if (active) {
                 fluidShipmentCap += Math.max(0, shipmentCap);
                 markFluidChannel(channel);
+                if (isValidChannel(channel)) {
+                    if (mode.pullsFromTarget()) {
+                        fluidSources[channel]++;
+                    }
+                    if (mode.insertsIntoTarget()) {
+                        fluidSinks[channel]++;
+                    }
+                }
             }
         }
 
-        void addItemModule(int channel, int shipmentCap, boolean active) {
+        void addItemModule(int channel, ItemConnectorMode mode, int shipmentCap, boolean active) {
             itemModules++;
             if (active) {
                 itemShipmentCap += Math.max(0, shipmentCap);
                 markItemChannel(channel);
+                if (isValidChannel(channel)) {
+                    if (mode.pullsFromTarget()) {
+                        itemSources[channel]++;
+                    }
+                    if (mode.insertsIntoTarget()) {
+                        itemSinks[channel]++;
+                    }
+                }
             }
         }
 
@@ -1975,7 +2063,15 @@ public class CableBlockEntity extends BlockEntity implements UniversalConnectorD
                     cacheAgeTicks,
                     saturatedInt(inputCap),
                     saturatedInt(outputCap),
-                    channelCaps
+                    channelCaps,
+                    new LinkCounts(
+                            energySources.clone(),
+                            energySinks.clone(),
+                            itemSources.clone(),
+                            itemSinks.clone(),
+                            fluidSources.clone(),
+                            fluidSinks.clone()
+                    )
             );
         }
 

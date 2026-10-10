@@ -368,6 +368,8 @@ public final class WrenchOverlayClient {
             lines.add(new OverlayLine(clipped(font, Component.translatable(
                     "rngtech.cable_connector.no_energy_access"
             ).getString()), WARNING));
+        } else if (snapshot.hasEnergyConnector() && snapshot.energyLinkStatus().isProblem()) {
+            lines.add(new OverlayLine(clipped(font, Component.translatable(snapshot.energyLinkStatus().translationKey()).getString()), WARNING));
         }
     }
 
@@ -380,6 +382,12 @@ public final class WrenchOverlayClient {
         for (int index = 0; index < modules.size(); index++) {
             ConnectorOverlaySnapshot.ModuleSnapshot module = modules.get(index);
             lines.add(new OverlayLine(clipped(font, moduleLine(index, module, fluid)), module.installed() ? TEXT : WARNING));
+            if (module.installed() && module.linkStatus().isProblem()) {
+                lines.add(new OverlayLine(
+                        clipped(font, "  " + Component.translatable(module.linkStatus().translationKey()).getString()),
+                        WARNING
+                ));
+            }
         }
     }
 
