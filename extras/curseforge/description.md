@@ -2,9 +2,7 @@
 
 # Machines that drop like loot
 
-RNGTech is a tech mod for Minecraft 1.21.1 on NeoForge. Machines you craft roll rarity and affixes the way gear does in Path of Exile and Last Epoch. Two Crushers from the same recipe rarely match: one might crush faster, another might use less power.
-
-The rolls sit on a full tech progression across nine material stages, from flint tools at Stage 0 to exotic alloys at Stage 8.
+RNGTech is a tech mod for Minecraft 1.21.1 on NeoForge where every machine you craft is a loot drop. Each one rolls a rarity and a set of affixes, like gear in Path of Exile or Last Epoch, so two Crushers from the same recipe rarely match. Keep the good rolls, refine them, and level them up as you work through nine material stages, from flint tools to exotic alloys.
 
 > **2.0 is in alpha.** This page describes 2.0. The passive tree and ascendancies are in the 2.0 alpha files on the Files tab; the default release file is still 1.2.0. Unique items and Corruption arrive later in 2.0.
 
@@ -14,9 +12,9 @@ Machines, Gear parts, Battery Cells, tool parts, and companions come out of the 
 
 ![Rolled stats on a Tungstensteel Furnace](https://media.forgecdn.net/attachments/1709/666/tungstensteel-furnace_stats-png.png)
 
-## Swap parts as you progress
+## Machines are built from parts
 
-A machine's chassis sets its base stats and the highest Gear stage it accepts. The Gear inside, such as Crush Heads, Heat Cores, and Servos, does the work and rolls its own affixes. When you craft a better Crush Head, swap it in. The Crusher keeps its own rolls.
+The chassis is the block you place. It sets base stats and caps how advanced its Gear can be. The Gear inside does the real work: the Crush Head decides how hard an ore a Crusher can break, and the Heat Core decides how hot a Furnace gets. Each part rolls its own rarity and affixes, separate from the chassis. When you craft a better part, swap it in. The machine keeps its own rolls and its Mastery progress.
 
 ![Gear slots in the Metal Press](https://media.forgecdn.net/attachments/1709/663/metal-press_gear-png.png)
 

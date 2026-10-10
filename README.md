@@ -20,7 +20,7 @@
     <img src="https://media.forgecdn.net/attachments/1709/665/overview-png.png" alt="A row of RNGTech machines" width="820">
 </p>
 
-RNGTech is a **Minecraft 1.21.1 / NeoForge** technology mod. Machines you craft roll rarity and affixes the way gear does in an action RPG. Two Crushers from the same recipe rarely match: one might crush faster, another might use less power. The rolls sit on a full tech progression across nine material stages, from flint tools to exotic alloys.
+RNGTech is a **Minecraft 1.21.1 / NeoForge** technology mod where every machine you craft is a loot drop. Each one rolls a rarity and a set of affixes, so two Crushers from the same recipe rarely match. Keep the good rolls, refine them, and level them up as you work through nine material stages, from flint tools to exotic alloys.
 
 ## What makes it different
 
