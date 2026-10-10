@@ -19,6 +19,11 @@ import java.util.Set;
  * <p>When every edit happens with its neighbours loaded, as a player's edits do, the networks must follow the link
  * rule itself. Edits next to an unloaded chunk leave that chunk's arms stale, as block states are; then the networks
  * must follow the arms both cables show.</p>
+ *
+ * <p>The model also keeps a {@link NetworkIndex} of snapshots that never expire and reports to it the events the
+ * cable block and block entity report: a cable placed, broken, loaded, unloaded, or changing its arms, and a dye or
+ * Wrench switch on a cable. Every cached snapshot must still match the brute-force network, so a change the
+ * invalidation rules miss fails here instead of leaving routing stale.</p>
  */
 public final class CableGraphFuzzChecks {
     private static final Direction[] DIRECTIONS = Direction.values();
@@ -77,6 +82,15 @@ public final class CableGraphFuzzChecks {
             }
             checks++;
         }
+        for (Map.Entry<BlockPos, Set<BlockPos>> entry : expected.entrySet()) {
+            Set<BlockPos> cached = world.cachedNetwork(entry.getKey(), step);
+            if (!cached.equals(entry.getValue())) {
+                throw new IllegalStateException("seed " + seed + " step " + step + " after " + operation
+                        + ": cached network at " + entry.getKey() + " has " + cached.size()
+                        + " cables, brute force " + entry.getValue().size());
+            }
+            checks++;
+        }
         BlockPos probe = world.randomPos(random);
         if (!world.isLoaded(probe) || !world.isCable(probe)) {
             require(CableGraph.component(probe, world).isEmpty(), "no network starts from an unloaded or empty space");
@@ -97,6 +111,7 @@ public final class CableGraphFuzzChecks {
     private static final class ModelWorld implements CableGraph.View {
         private final Map<BlockPos, Cable> cables = new HashMap<>();
         private final Set<Long> unloadedChunks = new HashSet<>();
+        private final NetworkIndex<Set<BlockPos>> index = new NetworkIndex<>();
         private final boolean borderEdits;
 
         private ModelWorld(boolean borderEdits) {
@@ -154,18 +169,35 @@ public final class CableGraphFuzzChecks {
             return "wrench " + pos + " " + direction;
         }
 
+        /** The snapshot the index holds for a cable, built and stored the way the network cache does on a miss. */
+        private Set<BlockPos> cachedNetwork(BlockPos pos, long tick) {
+            Set<BlockPos> cached = index.get(pos, tick, Long.MAX_VALUE);
+            if (cached == null) {
+                List<BlockPos> component = CableGraph.component(pos, this);
+                cached = new HashSet<>(component);
+                index.put(cached, component, tick);
+            }
+            return cached;
+        }
+
+        /** The block placed (onPlace) and its block entity loaded (onLoad). */
         private void place(BlockPos pos, int color) {
             cables.put(pos, new Cable(color == 0 ? null : color));
+            index.cableChanged(pos);
             refreshAround(pos);
         }
 
+        /** The block removed (onRemove) and its block entity removed (setRemoved). */
         private void breakCable(BlockPos pos) {
             cables.remove(pos);
+            index.cableChanged(pos);
             refreshAround(pos);
         }
 
+        /** Dyeing invalidates the cable (setColor), then refreshes its arms and its neighbours'. */
         private void dye(BlockPos pos, int color) {
             cables.get(pos).color = color == 0 ? null : color;
+            index.connectorChanged(pos);
             refreshAround(pos);
         }
 
@@ -183,17 +215,25 @@ public final class CableGraphFuzzChecks {
             }
             setDisabled(cable, direction, disable);
             setDisabled(neighbor, direction.getOpposite(), disable);
+            index.connectorChanged(pos);
+            index.connectorChanged(neighborPos);
             refresh(pos);
             refresh(neighborPos);
         }
 
+        /** Every cable block entity in the chunk is removed on unload (setRemoved) and loaded again (onLoad). */
         private String toggleChunk(Random random) {
             long key = chunkKey(randomPos(random));
-            if (!unloadedChunks.remove(key)) {
+            boolean load = unloadedChunks.remove(key);
+            if (!load) {
                 unloadedChunks.add(key);
-                return "unload chunk " + key;
             }
-            return "load chunk " + key;
+            for (BlockPos pos : cables.keySet()) {
+                if (chunkKey(pos) == key) {
+                    index.cableChanged(pos);
+                }
+            }
+            return (load ? "load chunk " : "unload chunk ") + key;
         }
 
         private void refreshAround(BlockPos pos) {
@@ -203,16 +243,21 @@ public final class CableGraphFuzzChecks {
             }
         }
 
+        /** Recomputes a loaded cable's arms; a changed block state reports itself (onRemove and onPlace). */
         private void refresh(BlockPos pos) {
             Cable cable = cables.get(pos);
             if (cable == null || !isLoaded(pos)) {
                 return;
             }
+            EnumSet<Direction> before = EnumSet.copyOf(cable.arms);
             cable.arms.clear();
             for (Direction direction : DIRECTIONS) {
                 if (linksByRule(pos, direction)) {
                     cable.arms.add(direction);
                 }
+            }
+            if (!cable.arms.equals(before)) {
+                index.cableChanged(pos);
             }
         }
 
