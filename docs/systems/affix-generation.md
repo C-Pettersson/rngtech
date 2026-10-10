@@ -172,7 +172,7 @@ Example: an energy-generation affix at tier 2 rolls one value from `4-10%`, such
 
 The code-backed source for modifier value ranges is `ModifierEligibilityProfiles`. Each `ModifierDefinition` owns its affix id, modifier group, slot, `CAN_ROLL` flag, family roll weight, optional tier weights, target effects, and tier ranges.
 
-Most current rollable stat effects use the shared percent tier table above. Crusher yield affixes use the smaller yield table (`YIELD_TIER_RANGES`), because they share one soft-capped bucket:
+Most current rollable stat effects use the shared percent tier table above. Crusher yield affixes use smaller tables, because they share one soft-capped bucket. Crusher Jaws and Crush Head Pulverizing are compound prefixes: Output Amount on the yield table (`YIELD_TIER_RANGES`) plus reduced Processing Speed on a wider penalty table (`YIELD_SPEED_PENALTY_RANGES`). The Crusher and Crush Head Output Amount suffix uses the penalty-free clean table (`CLEAN_YIELD_TIER_RANGES`) in its own `clean_output_amount` group:
 
 | Modifier definition | Slot | Operation | Tier table |
 |---|---|---|---|
@@ -182,7 +182,7 @@ Most current rollable stat effects use the shared percent tier table above. Crus
 | `HEAT_TRANSFER` | Prefix | `INCREASED_PERCENT` | Shared percent table |
 | `PROCESSING_SPEED` | Suffix | `INCREASED_PERCENT` | Shared percent table |
 | `ENERGY_USAGE` | Suffix | `DECREASED_PERCENT` | Shared percent table |
-| `OUTPUT_AMOUNT` | Suffix | `INCREASED_PERCENT` | Shared percent table; yield table on the Crusher and Crush Head |
+| `OUTPUT_AMOUNT` | Suffix | `INCREASED_PERCENT` | Shared percent table; clean yield table on the Crusher and Crush Head |
 | `INPUT_SLOTS` / fuel slots | Suffix | `ADD` | Flat slot table |
 | Battery Chassis Charged Storage | Prefix | `MORE ENERGY_CAPACITY` | Untiered fixed `2.0x` multiplier after `10` minutes with stored energy |
 | Battery Chassis Balance Mode | Prefix | Behavioral `CHARGE_BALANCER` | Single-tier charge-balancing behavior; fills and drains installed cells evenly |
@@ -200,7 +200,7 @@ Most current rollable stat effects use the shared percent tier table above. Crus
 | Tool Attack Speed | Suffix | `ADD ATTACK_SPEED` | Tool attack-speed table |
 | Crusher Frame | Prefix | `ADD OUTPUT_GUARD_GRACE` and enables `OUTPUT_GUARD` | `+100`, `+200`, `+400`, `+800` blocked-output grace ticks |
 | Crusher Kinetics | Prefix | `ADD ENERGY_CAPACITY_FLAT` | Flat machine buffer table |
-| Crusher Jaws | Prefix | `INCREASED_PERCENT OUTPUT_AMOUNT` | Yield table |
+| Crusher Jaws | Prefix | `INCREASED_PERCENT OUTPUT_AMOUNT` plus `DECREASED_PERCENT PROCESSING_SPEED` | Yield table and speed-penalty table |
 | Crusher Ore Handling | Prefix | `ADD SUPER_OUTPUT_CHANCE` | Chance table |
 | Crusher Battery Link | Prefix | `ADD NO_BATTERY_OUTPUT_RETENTION` | `25%`, `50%`, `75%`, `100%` lost-multiplier retention |
 | Crusher Feed Control | Prefix | `ADD CRUSHER_INPUT_FILTER` | Filter tiers `1-4` |
@@ -208,7 +208,7 @@ Most current rollable stat effects use the shared percent tier table above. Crus
 | Crusher Vibration | Prefix | `DECREASED_PERCENT ENERGY_USAGE` | Shared percent table |
 | Crusher Throughput | Prefix | `ADD BATCH_SIZE` | `+1`, `+2`, `+3`, `+5` items |
 | Crusher Salvage | Prefix | `ADD CRUSHER_SALVAGE_CHANCE` | Chance table |
-| Crush Head Pulverizing | Prefix | `INCREASED_PERCENT OUTPUT_AMOUNT` | Yield table |
+| Crush Head Pulverizing | Prefix | `INCREASED_PERCENT OUTPUT_AMOUNT` plus `DECREASED_PERCENT PROCESSING_SPEED` | Yield table and speed-penalty table |
 | Crush Head Jagged | Prefix | `ADD CRUSHER_SALVAGE_CHANCE` | Chance table |
 | Crush Head Kinetic | Prefix | `INCREASED_PERCENT PROCESSING_SPEED` | Shared percent table |
 | Crush Head Scuffed | Prefix | `ADD NO_BATTERY_OUTPUT_RETENTION` | Untiered `+6%` lost-multiplier retention |

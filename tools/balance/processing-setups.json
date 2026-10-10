@@ -244,6 +244,90 @@
                 ]
             }
         },
+        "yield_max": {
+            "crusher": {
+                "chassis": [
+                    "prefix:crusher_jaws",
+                    "suffix:output_amount"
+                ],
+                "part": [
+                    "prefix:crush_head_pulverizing",
+                    "suffix:output_amount"
+                ],
+                "tree": "crusher_bonus_output",
+                "ascendancy": "assayer",
+                "ascendancyNodes": [
+                    "assay_yield",
+                    "compound_yield",
+                    "at_level_output",
+                    "matched_hardness",
+                    "super_assay",
+                    "lode_chance"
+                ]
+            },
+            "furnace": {
+                "chassis": [
+                    "prefix:heat_transfer",
+                    "suffix:super_output"
+                ],
+                "part": [
+                    "prefix:heat_transfer",
+                    "suffix:temperature_stability"
+                ],
+                "tree": "furnace_balanced",
+                "ascendancy": "bloomer",
+                "ascendancyNodes": [
+                    "rich_rate",
+                    "rich_blooms",
+                    "line_rate",
+                    "crusher_line",
+                    "patient_rate",
+                    "patient_bloom"
+                ]
+            }
+        },
+        "yield_clean": {
+            "crusher": {
+                "chassis": [
+                    "prefix:crusher_ore_handling",
+                    "suffix:output_amount"
+                ],
+                "part": [
+                    "prefix:crush_head_kinetic",
+                    "suffix:output_amount"
+                ],
+                "tree": "crusher_bonus_output",
+                "ascendancy": "assayer",
+                "ascendancyNodes": [
+                    "assay_yield",
+                    "compound_yield",
+                    "at_level_output",
+                    "matched_hardness",
+                    "super_assay",
+                    "lode_chance"
+                ]
+            },
+            "furnace": {
+                "chassis": [
+                    "prefix:heat_transfer",
+                    "suffix:super_output"
+                ],
+                "part": [
+                    "prefix:heat_transfer",
+                    "suffix:temperature_stability"
+                ],
+                "tree": "furnace_balanced",
+                "ascendancy": "bloomer",
+                "ascendancyNodes": [
+                    "rich_rate",
+                    "rich_blooms",
+                    "line_rate",
+                    "crusher_line",
+                    "patient_rate",
+                    "patient_bloom"
+                ]
+            }
+        },
         "super_output": {
             "crusher": {
                 "chassis": [

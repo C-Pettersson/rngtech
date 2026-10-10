@@ -172,8 +172,8 @@ Crusher-specific prefix stats default to `0` and become active only through roll
 Crusher `OUTPUT_AMOUNT` works differently from the general formula:
 
 - One bucket. Every Crusher yield source adds percent to the increased bucket: Crush Head base yield and its rolls (the head merges them as increased percent, not as a local multiplier), Crusher affixes, Mastery keystones and nodes, ascendancy nodes, and At-Level Output on recipes at the head's hardness.
-- Soft cap. With `B` the summed increased percent as a fraction, the paid bonus is `B * K / (B + K)` with `K = 1.0`, so it never reaches `+100%`. Output Amount is then the chassis base times `(1 + paid bonus)` times any less penalty, such as the no-Battery-Cell multiplier. The Stats tab, its hover, and recipe previews show this effective value. The Stats tab shows the time cost as a less term on Processing Speed, though only bonus-eligible recipes pay it.
-- Time cost. The paid bonus also multiplies each job's ticks after Processing Speed and before batch overhead and the under-level multiplier. Yield therefore raises output per ore and lowers FE per item, but never raises items per tick above the same machine without yield. FE per craft does not change.
+- Soft cap. With `B` the summed increased percent as a fraction, the paid bonus is `B * K / (B + K)` with `K = 1.0`, so it never reaches `+100%`. Output Amount is then the chassis base times `(1 + paid bonus)` times any less penalty, such as the no-Battery-Cell multiplier. The Stats tab, its hover, and recipe previews show this effective value.
+- Speed trade. Crusher Jaws and Crush Head Pulverizing pair their Output Amount with reduced `PROCESSING_SPEED` on the same affix. The penalty is an ordinary speed effect, so it slows every recipe. The Output Amount suffix has no penalty and much lower rolls.
 - Once per ore. Only ore and raw-metal crushing is bonus-eligible; the crushed-to-dust step sets `bonus_output: false`.
 - `SUPER_OUTPUT_CHANCE` stays a separate chance stat with a Crusher ceiling of `25%`.
 

@@ -93,9 +93,19 @@ public final class ComponentBaseStatCatalog {
     static MachineStatAccumulator effectiveStats(Profile profile, MachineTraits traits) {
         MachineStatAccumulator stats = profile.baseStats();
         for (MachineModifier modifier : traits.modifiers()) {
-            if (modifier.slot().isAffix() && !HARD_GATE_STATS.contains(modifier.stat())
-                    && profile.mergeRules().get(modifier.stat()) != MergeRule.INCREASED) {
+            if (!modifier.slot().isAffix() || HARD_GATE_STATS.contains(modifier.stat())) {
+                continue;
+            }
+            if (modifier.effects().stream().noneMatch(effect -> profile.mergeRules().get(effect.stat()) == MergeRule.INCREASED)) {
                 stats.apply(modifier);
+                continue;
+            }
+            // Effects that join the host's increased bucket pass through at merge; the rest stay local, such as a yield
+            // prefix's speed penalty.
+            for (MachineModifierEffect effect : modifier.effects()) {
+                if (profile.mergeRules().get(effect.stat()) != MergeRule.INCREASED) {
+                    stats.apply(new MachineModifier(ModifierSlot.IMPLICIT, effect.stat(), effect.operation(), effect.value()));
+                }
             }
         }
         return stats;

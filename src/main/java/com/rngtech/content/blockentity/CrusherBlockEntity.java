@@ -16,7 +16,6 @@ import com.rngtech.content.registry.ModBlockEntities;
 import com.rngtech.content.registry.ModDataComponents;
 import com.rngtech.rpg.BatchProcessing;
 import com.rngtech.rpg.ComponentBaseStatCatalog;
-import com.rngtech.rpg.CrusherYield;
 import com.rngtech.rpg.MachineBaseStatCatalog;
 import com.rngtech.rpg.MachineImplicitCatalog;
 import com.rngtech.rpg.MachineModifier;
@@ -168,7 +167,7 @@ public class CrusherBlockEntity extends BaseMachineBlockEntity implements MenuPr
                 case DATA_ENERGY_CAPACITY -> energyCapacity();
                 case DATA_INPUT_SLOTS -> getEffectiveInputSlots();
                 case DATA_OUTPUT_AMOUNT -> scaledStat(stats, MachineStat.OUTPUT_AMOUNT);
-                case DATA_PROCESSING_SPEED -> (int) Math.round(stats.value(MachineStat.PROCESSING_SPEED) * CrusherYield.speedFactor(stats) * STAT_SCALE);
+                case DATA_PROCESSING_SPEED -> scaledStat(stats, MachineStat.PROCESSING_SPEED);
                 case DATA_PROCESSING_LEVEL -> scaledStat(stats, MachineStat.PROCESSING_LEVEL);
                 case DATA_ENERGY_USAGE -> scaledStat(stats, MachineStat.ENERGY_USAGE);
                 case DATA_ENERGY_CAPACITY_STAT -> scaledStat(stats, MachineStat.ENERGY_CAPACITY);
@@ -289,7 +288,7 @@ public class CrusherBlockEntity extends BaseMachineBlockEntity implements MenuPr
         crusher.consumeWorkingEnergy(energyCost, false);
         crusher.progress++;
 
-        if (crusher.progress >= crusher.adjustedProcessingTicks(recipe, stats, jobs)) {
+        if (crusher.progress >= adjustedProcessingTicks(recipe, stats, jobs)) {
             int completed = crusher.process(recipe, stats, level, jobs);
             crusher.grantRecipeXp(recipe, completed);
             crusher.bulkSpeed.recordProcesses(crusher.activeTraits(), completed);
@@ -666,24 +665,6 @@ public class CrusherBlockEntity extends BaseMachineBlockEntity implements MenuPr
         return stats;
     }
 
-    /**
-     * Effective stats as the Stats tab shows them: the yield cost appears as less Processing Speed. Recipes apply it
-     * themselves, and only when they get bonus output, so it stays out of {@link #effectiveStats()}.
-     */
-    public MachineStatAccumulator displayStats() {
-        MachineStatAccumulator stats = effectiveStats();
-        double yieldCost = CrusherYield.speedFactor(stats);
-        if (yieldCost < 1.0D) {
-            stats.apply(CrusherYield.SPEED_SOURCE, new MachineModifier(
-                    ModifierSlot.IMPLICIT,
-                    MachineStat.PROCESSING_SPEED,
-                    ModifierOperation.LESS,
-                    yieldCost
-            ));
-        }
-        return stats;
-    }
-
     private static double noBatteryOutputMultiplier(MachineStatAccumulator stats) {
         double baseMultiplier = RNGTechConfig.CRUSHER_NO_BATTERY_CELL_OUTPUT_MULTIPLIER.get();
         double retainedLoss = Math.max(0.0D, Math.min(100.0D, stats.value(MachineStat.NO_BATTERY_OUTPUT_RETENTION))) / 100.0D;
@@ -832,10 +813,8 @@ public class CrusherBlockEntity extends BaseMachineBlockEntity implements MenuPr
         );
     }
 
-    /** Yield is paid in time: the effective yield bonus lengthens each job before batch overhead and under-level work. */
-    private int adjustedProcessingTicks(CrusherRecipe recipe, MachineStatAccumulator stats, int jobs) {
-        int jobTicks = CrusherYield.jobTicks(stats, recipe.processingTicks(), yieldBonusPercent(recipe, stats));
-        int baseTicks = BatchProcessing.batchTicks(jobTicks, stats, jobs);
+    private static int adjustedProcessingTicks(CrusherRecipe recipe, MachineStatAccumulator stats, int jobs) {
+        int baseTicks = BatchProcessing.batchTicks(stats.adjustedProcessingTicks(recipe.processingTicks()), stats, jobs);
         double multiplier = underLevelPenaltyMultiplier(recipe, stats);
         long adjustedTicks = (long) Math.ceil(baseTicks * multiplier);
         return (int) Math.max(1L, Math.min(Integer.MAX_VALUE, adjustedTicks));
@@ -891,14 +870,6 @@ public class CrusherBlockEntity extends BaseMachineBlockEntity implements MenuPr
         }
         double outputAmount = stats.valueWithIncreased(MachineStat.OUTPUT_AMOUNT, atLevelOutputPercent(recipe, stats));
         return bonusSuppressed(recipe, stats) ? Math.min(1.0D, outputAmount) : outputAmount;
-    }
-
-    /** The soft-capped yield bonus this recipe pays, in percent; it also sets the recipe's time cost. */
-    private double yieldBonusPercent(CrusherRecipe recipe, MachineStatAccumulator stats) {
-        if (!recipe.allowsBonusOutput() || bonusSuppressed(recipe, stats)) {
-            return 0.0D;
-        }
-        return CrusherYield.bonusPercent(stats, atLevelOutputPercent(recipe, stats));
     }
 
     private static double atLevelOutputPercent(CrusherRecipe recipe, MachineStatAccumulator stats) {

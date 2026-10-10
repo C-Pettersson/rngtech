@@ -5,7 +5,7 @@ import com.rngtech.content.machine.CrushHeadMaterial;
 import java.util.List;
 import java.util.Map;
 
-/** Crusher yield: one soft-capped Output Amount bucket, the Crush Head merge, the time cost, and Energy Usage reductions. */
+/** Crusher yield: one soft-capped Output Amount bucket, the Crush Head merge, the yield affixes, and Energy Usage reductions. */
 public final class CrusherYieldChecks {
     private static int checks;
 
@@ -17,7 +17,7 @@ public final class CrusherYieldChecks {
         softCapBendsTheYieldBucket();
         crushHeadJoinsTheIncreasedBucket();
         yieldTiersStaySmall();
-        yieldCostsProcessingTime();
+        yieldPrefixesCostProcessingSpeed();
         energyUsageReductionsDivide();
         superOutputStopsAtTheCeiling();
         return checks;
@@ -52,11 +52,12 @@ public final class CrusherYieldChecks {
         ComponentBaseStatCatalog.applyContribution(crusher, ComponentBaseStatCatalog.crushHead(CrushHeadMaterial.EXOTIC), pulverizing);
         near(crusher.increasedPercent(MachineStat.OUTPUT_AMOUNT), 45, "the Exotic head's 25% and Pulverizing's 20% add to the bucket");
         near(crusher.value(MachineStat.OUTPUT_AMOUNT), 1.2 * (1 + 0.45 / 1.45), "the head is no longer a separate more multiplier");
+        near(crusher.value(MachineStat.PROCESSING_SPEED), 1.35 * (1 - 0.26), "Pulverizing's speed penalty stays local to the head");
 
         MachineTraits suffix = traits(head, "output_amount", 6);
         MachineStatAccumulator iron = crusher(1.0);
         ComponentBaseStatCatalog.applyContribution(iron, ComponentBaseStatCatalog.crushHead(CrushHeadMaterial.IRON), suffix);
-        near(iron.increasedPercent(MachineStat.OUTPUT_AMOUNT), 20, "a head with no base yield still passes its suffix through");
+        near(iron.increasedPercent(MachineStat.OUTPUT_AMOUNT), 5, "a head with no base yield still passes its suffix through");
         near(ComponentBaseStatCatalog.effectiveStats(ComponentBaseStatCatalog.crushHead(CrushHeadMaterial.EXOTIC), pulverizing)
                 .value(MachineStat.OUTPUT_AMOUNT), 25, "head yield rolls never scale the head locally");
     }
@@ -64,14 +65,22 @@ public final class CrusherYieldChecks {
     private static void yieldTiersStaySmall() {
         ModifierEligibilityProfile crusher = ModifierEligibilityProfiles.forMachine(MachineType.CRUSHER);
         ModifierEligibilityProfile head = ModifierEligibilityProfiles.forMachinePart(MachinePartType.CRUSH_HEAD, MachineType.CRUSHER);
-        for (ModifierDefinition definition : List.of(
-                definition(crusher, "crusher_jaws"),
-                definition(crusher, "output_amount"),
-                definition(head, "crush_head_pulverizing"),
-                definition(head, "output_amount")
-        )) {
-            near(definition.rangeForTier(6).max(), 20, definition.id() + " tops out at 20% on T6");
-            near(definition.rangeForTier(7).max(), 25, definition.id() + " tops out at 25% on T7");
+        for (ModifierDefinition prefix : List.of(definition(crusher, "crusher_jaws"), definition(head, "crush_head_pulverizing"))) {
+            near(prefix.effects().getFirst().rangeForTier(6).max(), 20, prefix.id() + " tops out at 20% on T6");
+            near(prefix.effects().getFirst().rangeForTier(7).max(), 25, prefix.id() + " tops out at 25% on T7");
+            ModifierEffectDefinition penalty = prefix.effects().get(1);
+            require(penalty.stat() == MachineStat.PROCESSING_SPEED && penalty.operation() == ModifierOperation.DECREASED_PERCENT,
+                    prefix.id() + " pays with reduced Processing Speed");
+            for (int tier = 1; tier <= 7; tier++) {
+                ModifierValueRange yield = prefix.effects().getFirst().rangeForTier(tier);
+                ModifierValueRange speed = penalty.rangeForTier(tier);
+                require(speed.min() < yield.min() && speed.max() > yield.max(), prefix.id() + " T" + tier + " penalty rolls wider than its yield");
+            }
+        }
+        for (ModifierDefinition suffix : List.of(definition(crusher, "output_amount"), definition(head, "output_amount"))) {
+            require(suffix.effects().size() == 1, "the Output Amount suffix carries no penalty");
+            near(suffix.rangeForTier(6).max(), 5, "the clean suffix tops out at 5% on T6");
+            require(!suffix.modGroup().equals(definition(crusher, "crusher_jaws").modGroup()), "the clean suffix can sit beside a yield prefix");
         }
         require(ModifierEligibilityProfiles.allProfiles().stream()
                 .filter(profile -> profile != crusher && profile != head)
@@ -80,21 +89,14 @@ public final class CrusherYieldChecks {
                 "other machines keep the shared percent table");
     }
 
-    private static void yieldCostsProcessingTime() {
+    private static void yieldPrefixesCostProcessingSpeed() {
+        ModifierEligibilityProfile profile = ModifierEligibilityProfiles.forMachine(MachineType.CRUSHER);
         MachineStatAccumulator crusher = crusher(1.0);
-        require(CrusherYield.jobTicks(crusher, 120, CrusherYield.bonusPercent(crusher, 0)) == 120, "no yield, no time cost");
-        increase(crusher, MachineStat.OUTPUT_AMOUNT, 100);
-        double bonus = CrusherYield.bonusPercent(crusher, 0);
-        int ticks = CrusherYield.jobTicks(crusher, 120, bonus);
-        require(ticks == 180, "a +50% yield bonus makes the cycle 50% longer: " + ticks);
-        near(crusher.value(MachineStat.OUTPUT_AMOUNT) / ticks, 1.0 / 120, "yield alone keeps items per tick at the bucket-free rate");
-        increase(crusher, MachineStat.PROCESSING_SPEED, 100);
-        require(CrusherYield.jobTicks(crusher, 120, bonus) == 90, "speed still shortens a yield cycle");
-        near(CrusherYield.speedFactor(crusher), 1 / 1.5, "the Stats tab shows the same cost as less Processing Speed");
-
-        MachineStatAccumulator penalized = crusher(1.0);
-        increase(penalized, MachineStat.OUTPUT_AMOUNT, -50);
-        near(CrusherYield.bonusPercent(penalized, 0), 0, "a yield penalty never buys speed");
+        increase(crusher, MachineStat.PROCESSING_SPEED, 120);
+        crusher.apply(traits(profile, "crusher_jaws", 6));
+        near(crusher.increasedPercent(MachineStat.OUTPUT_AMOUNT), 20, "Jaws adds its yield to the bucket");
+        near(crusher.value(MachineStat.PROCESSING_SPEED), 1 + (120 - 26) / 100.0, "Jaws' penalty joins the machine's speed bucket");
+        require(crusher.adjustedProcessingTicks(160) == (int) Math.ceil(160 / 1.94), "the penalty slows every recipe through Processing Speed");
     }
 
     private static void energyUsageReductionsDivide() {
@@ -142,12 +144,13 @@ public final class CrusherYieldChecks {
                 .orElseThrow(() -> new AssertionError(profile.id() + " has no " + id));
     }
 
-    /** A Magic item with one affix at {@code tier}'s maximum roll. */
+    /** A Magic item with one affix, every effect at {@code tier}'s maximum roll. */
     private static MachineTraits traits(ModifierEligibilityProfile profile, String id, int tier) {
         ModifierDefinition definition = definition(profile, id);
-        ModifierValueRange range = definition.rangeForTier(tier);
-        MachineModifier modifier = new MachineModifier(definition.id(), definition.modGroup(), definition.slot(), definition.stat(),
-                definition.operation(), tier, range, range.max(), List.of());
+        List<MachineModifierEffect> effects = definition.effects().stream()
+                .map(effect -> new MachineModifierEffect(effect.stat(), effect.operation(), effect.rangeForTier(tier), effect.rangeForTier(tier).max()))
+                .toList();
+        MachineModifier modifier = MachineModifier.roll(definition.id(), definition.modGroup(), definition.slot(), tier, effects);
         return new MachineTraits(Rarity.MAGIC, 0, List.of(modifier));
     }
 

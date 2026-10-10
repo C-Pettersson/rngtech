@@ -165,8 +165,8 @@ public final class StatBreakdownChecks {
         near(breakdown.recompute(), stats.value(MachineStat.OUTPUT_AMOUNT), "the soft-capped yield bucket recombines");
         near(breakdown.paidIncreasedPercent(), 289.0 * 100 / 389, "the breakdown pays the soft-capped bonus");
         String text = StatBreakdownText.lines(breakdown).stream().map(Component::getString).collect(Collectors.joining("\n"));
-        require(text.contains("rngtech.stat.breakdown.soft_cap") && !text.contains("yield_time"),
-                "the breakdown shows the soft-cap math without a time line:\n" + text);
+        require(text.contains("rngtech.stat.breakdown.soft_cap"),
+                "the breakdown shows the soft-cap math:\n" + text);
     }
 
     private static void energyUsageReductionsRecombine() {

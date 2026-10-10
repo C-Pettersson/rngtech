@@ -228,8 +228,7 @@ public final class ProcessingBalanceSimulation {
         }
 
         /**
-         * CrusherBlockEntity#adjustedProcessingTicks, #energyCostPerCraft, #outputAmountFor, #yieldBonusPercent, #process,
-         * #withSuperOutput.
+         * CrusherBlockEntity#adjustedProcessingTicks, #energyCostPerCraft, #outputAmountFor, #process, #withSuperOutput.
          */
         Step crush(Recipe recipe) {
             if (!MegaPassiveTree.acceptsHardness(state, recipe.level())) {
@@ -240,20 +239,13 @@ public final class ProcessingBalanceSimulation {
             double under = AscendancyFormulas.underLevelPenaltyMultiplier(penalized, RNGTechConfig.CRUSHER_UNDER_LEVEL_PENALTY_MULTIPLIER_PER_LEVEL.get(), stats);
             boolean bonus = recipe.bonusOutput() && deficit == 0;
 
-            // One soft-capped yield bucket; At-Level Output joins it before the cap. The bonus also lengthens the cycle.
+            // One soft-capped yield bucket; At-Level Output joins it before the cap.
             double outputAmount = 1.0;
-            double yieldBonus = 0.0;
             if (recipe.bonusOutput()) {
                 double atLevel = recipe.level() == stats.intValue(MachineStat.PROCESSING_LEVEL) ? stats.value(MachineStat.AT_LEVEL_OUTPUT) : 0.0;
                 outputAmount = stats.valueWithIncreased(MachineStat.OUTPUT_AMOUNT, atLevel);
                 if (deficit > 0 && !has("FAULT_LINES")) {
                     outputAmount = Math.min(1.0, outputAmount);
-                } else {
-                    yieldBonus = CrusherYield.bonusPercent(stats, atLevel) / 100.0;
-                    // Yield alone never beats the bucket-free machine's items per tick.
-                    if (outputAmount / (1 + yieldBonus) > stats.baseValue(MachineStat.OUTPUT_AMOUNT) + 1e-9) {
-                        throw new IllegalStateException("Yield raised items per tick above the chassis base on " + recipe.id());
-                    }
                 }
             }
             double scaled = Math.max(1.0, recipe.count() * Math.max(0, outputAmount));
@@ -270,7 +262,7 @@ public final class ProcessingBalanceSimulation {
             int limit = BatchProcessing.batchSize(stats, oath);
             int jobs = BatchProcessing.largestFitting(limit, n -> Math.ceil(n * scaled - 1e-9) <= OUTPUT_STACK);
             jobs = Math.max(1, jobs);
-            int single = CrusherYield.jobTicks(stats, recipe.ticks(), 100 * yieldBonus);
+            int single = stats.adjustedProcessingTicks(recipe.ticks());
             int cycle = (int) Math.max(1, Math.ceil(BatchProcessing.batchTicks(single, stats, jobs) * under));
             double instant = deficit == 0 ? clampChance(stats.value(MachineStat.INSTANT_PROCESS_CHANCE)) : 0.0;
             double expectedCycle = instant + (1 - instant) * cycle;
@@ -286,8 +278,8 @@ public final class ProcessingBalanceSimulation {
 
             return new Step(false, false, "", recipe.id(), recipe.count(), perCraft, perCraftFe, expectedCycle / jobs,
                     runningFePerTick, feSupply, jobs, cycle, deficit,
-                    Map.of("outputAmount", outputAmount, "yieldTimeMultiplier", 1 + yieldBonus, "superRate", superRate,
-                            "compound", compound, "salvage", salvage, "instant", instant));
+                    Map.of("outputAmount", outputAmount, "superRate", superRate, "compound", compound, "salvage", salvage,
+                            "instant", instant));
         }
 
         Map<String, Object> describe() {

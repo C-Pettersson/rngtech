@@ -2068,7 +2068,6 @@
   "rngtech.stat.breakdown.source.attribute": "%s (inherent)",
   "rngtech.stat.breakdown.source.base": "Base",
   "rngtech.stat.breakdown.source.crusher": "Crusher",
-  "rngtech.stat.breakdown.source.yield": "Yield cost (bonus-output recipes)",
   "rngtech.stat.breakdown.source.inherent": "Inherent attributes",
   "rngtech.stat.breakdown.source.machine": "Machine",
   "rngtech.stat.breakdown.source.no_battery": "No Battery Cell",

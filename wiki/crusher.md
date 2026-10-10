@@ -73,7 +73,7 @@ Every recipe has a hardness level, and every Crush Head has a hardness level fro
 
 - the craft takes one extra recipe-length of time and costs one extra recipe's worth of FE,
 - the craft has a 5% chance to jam when it starts, which pauses the Crusher for a short time without using the input,
-- bonus output, Super Output, and salvage are switched off, and so is the time that yield costs.
+- bonus output, Super Output, and salvage are switched off.
 
 Recipes at hardness 7 or higher also cost twice the FE. Material recipes for Stage 5–8 metals cost 2×, 3×, 4×, and 6× the early FE baseline.
 
@@ -95,7 +95,7 @@ Output Amount sets how much extra crushed material an ore block or raw metal giv
 
 - The chassis sets a base multiplier. Everything else adds to one **increased** total: the Crush Head's own yield, its rolled affixes, Crusher affixes, Mastery nodes, ascendancy nodes, and At-Level Output on recipes at the head's hardness.
 - That total has diminishing returns. Bonuses adding up to +50% give about +33% more output, +100% gives +50%, and the result never reaches +100%.
-- **Yield costs time.** Each cycle takes longer by the same share as the bonus you get, so +50% output means a 50% longer cycle. A yield Crusher gets more crushed material from each ore and spends less FE per item, but makes no more items per tick. Build more Crushers to keep up. FE per craft does not change.
+- **Big yield affixes cost speed.** Crusher Jaws and Crush Head Pulverizing give the most Bonus Output, but each also rolls reduced Processing Speed, which slows every recipe. The Output Amount suffix is much smaller and has no penalty.
 - Without a Battery Cell, Output Amount drops to 75% after all of this.
 
 Output Amount above 1× is banked: each craft adds its fractional share to a bonus bar, and you get an extra item when the bar fills. The bar resets when you change the input item. Hover the bar to preview the next payout.
@@ -196,7 +196,7 @@ The Crusher screen has five tabs:
 
 - **Process**: input, output, energy, progress, the bonus output bar, and status squares for the recipe and Battery Cell. Hover for FE per tick, FE per craft, hardness penalties, and jam chance.
 - **Gear**: Crush Head and Battery Cell slots.
-- **Stats**: the machine's current stats, including traits, Gear, and Mastery. Hold Shift over Bonus Output to see what your yield bonuses add up to and the diminishing-returns math. Processing Speed already includes the yield cost, as a less modifier; it only slows recipes that get bonus output.
+- **Stats**: the machine's current stats, including traits, Gear, and Mastery. Hold Shift over Bonus Output to see what your yield bonuses add up to and the diminishing-returns math.
 - **Refinement**: refine the placed Crusher's traits with a catalyst.
 - **Mastery**: machine XP, level, and the passive tree.
 
