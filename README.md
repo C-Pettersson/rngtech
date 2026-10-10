@@ -1,55 +1,58 @@
-# RNGTech
+<p align="center">
+    <img src="src/main/resources/rngtech-logo.png" alt="RNGTech" width="200">
+</p>
 
-[![Build](https://github.com/C-Pettersson/rngtech/actions/workflows/build.yml/badge.svg?branch=main)](https://github.com/C-Pettersson/rngtech/actions/workflows/build.yml)
+<p align="center">
+    <b>A tech mod where your machines drop like loot.</b><br>
+    Rarity, affixes, a crafting budget, and a passive tree for every machine in your factory.
+</p>
 
-RNGTech is a Minecraft **1.21.1 / NeoForge** technology mod with staged machines, installable parts, and action-RPG item rolls inspired by **Path of Exile** and **Last Epoch**. Machines and parts can have rarity, affixes, and a limited Refinement Potential budget for further changes.
+<p align="center">
+    <a href="https://www.curseforge.com/minecraft/mc-mods/rngtech"><img src="https://img.shields.io/curseforge/dt/1560481?logo=curseforge&label=CurseForge&color=f16436" alt="CurseForge downloads"></a>
+    <a href="https://www.curseforge.com/minecraft/mc-mods/rngtech/files"><img src="https://img.shields.io/curseforge/v/1560481?label=version" alt="Latest version"></a>
+    <img src="https://img.shields.io/badge/Minecraft-1.21.1-62b47a" alt="Minecraft 1.21.1">
+    <img src="https://img.shields.io/badge/NeoForge-21.1.228%2B-d7742f" alt="NeoForge 21.1.228+">
+    <a href="https://c-pettersson.github.io/rngtech/"><img src="https://img.shields.io/badge/wiki-player%20guide-4a7bd0" alt="Player wiki"></a>
+    <a href="https://github.com/C-Pettersson/rngtech/actions/workflows/build.yml"><img src="https://github.com/C-Pettersson/rngtech/actions/workflows/build.yml/badge.svg?branch=main" alt="Build"></a>
+</p>
 
-Build an ore-processing line, generate and store energy, then improve the machines and their Gear. The mod includes crushing, smelting, alloying, metal forming, recycling, calibration, fluid and gas processing, modular tools, and a rail-based Forestry Companion. Universal Cables transfer energy, fluids, and items; optional connectors bridge AE2 or Refined Storage networks.
+<p align="center">
+    <img src="https://media.forgecdn.net/attachments/1709/665/overview-png.png" alt="A row of RNGTech machines" width="820">
+</p>
 
-## Influences
+RNGTech is a **Minecraft 1.21.1 / NeoForge** technology mod. You build an ore-processing line, generate and store power, and climb nine material stages. The difference: every machine, part, and battery you craft rolls like an item from an action RPG. Two Crushers from the same recipe can come out with different strengths, and you choose which ones to keep, refine, and level up.
 
-RNGTech brings action-RPG loot and build planning to a tech mod. The ideas come mainly from Path of Exile and Last Epoch, but they apply to machines instead of characters:
+## What makes it different
 
-- **Rarity and affixes** (Path of Exile, Last Epoch). Machines, parts, and Battery Cells roll Normal, Magic, Rare, or Unique rarity, with tiered prefix and suffix modifiers. See [Rarity](https://c-pettersson.github.io/rngtech/rarity-and-affixes/) and [Affix generation](docs/systems/affix-generation.md).
-- **A limited crafting budget** (Last Epoch). Refinement Potential works like Forging Potential: each refinement spends a rolled amount, so every item can be improved only so far. See [Affixes and refinement](https://c-pettersson.github.io/rngtech/rarity-and-affixes/).
-- **Single-purpose crafting currency** (Path of Exile). Crystals, catalysts, and coils each add, upgrade, reroll, or remove affixes, or promote rarity, much like orbs.
-- **A shared passive tree** (Path of Exile). Machine Mastery gives each machine chassis its own points to spend on one large passive tree, with attribute roads, notables, and keystones that trade a cost for a strong payoff. See [Machine Mastery](docs/systems/machine-mastery.md).
-- **Ascendancies** (Path of Exile). Each Mastery family has two ascendancies: small specialization trees that a machine unlocks with Ascendancy Seals.
+- **Machines roll like loot.** Machines, Gear parts, Battery Cells, tool parts, and companions roll Normal, Magic, or Rare rarity with tiered prefixes and suffixes. A machine's chassis sets its limits; the Gear installed inside it does the work. [Rarity and Affixes →](https://c-pettersson.github.io/rngtech/rarity-and-affixes/)
+- **Crafting with a budget.** Each item rolls Refinement Potential. Crystals, catalysts, and coils add, upgrade, reroll, or remove affixes, and every change spends RP, so no item can be pushed forever. [Affix Forge →](https://c-pettersson.github.io/rngtech/affix-forge/)
+- **A passive tree for your machines.** Machines earn XP from real work and spend points on a shared 1,346-node tree with attributes, notables, and keystones. Ascendancy Seals unlock a specialization per machine family, and build codes copy a tree to the next machine. [Machine Mastery →](https://c-pettersson.github.io/rngtech/machine-mastery/)
+- **Upgrade parts, not whole machines.** Swap a Crush Head or Heat Core instead of rebuilding a machine. One cheap Universal Cable carries power, fluids, and items, and the connector modules on it set the limits. [Universal Cable →](https://c-pettersson.github.io/rngtech/universal-cable/)
+- **Grounded tech progression.** Crushing, smelting, alloying, metal forming, recycling, calibration, fluid and gas chemistry, nine kinds of generators, modular field tools, a Miner's Companion, and a rail-riding Forestry Companion.
 
-The machines, progression, and resource chains remain grounded in Minecraft tech mods. RNGTech uses its own names, mechanics, and artwork, and is not affiliated with or endorsed by Grinding Gear Games or Eleventh Hour Games.
+The rarity, crafting currency, and passive-tree ideas come from **Path of Exile** and **Last Epoch**, applied to machines instead of characters. RNGTech uses its own names, mechanics, and artwork, and is not affiliated with or endorsed by Grinding Gear Games or Eleventh Hour Games.
 
-## Install and play
+## Get started
 
-- Use Minecraft **1.21.1**, **NeoForge 21.1.228 or newer for 1.21.1**, and **Java 21**. Fabric and Forge are not supported loaders.
-- Download the mod JAR from [CurseForge](https://www.curseforge.com/minecraft/mc-mods/rngtech) or [GitHub Releases](https://github.com/c-pettersson/rngtech/releases), or build it from source. Put the JAR in the instance's `mods` directory on the client and server.
-- JEI supplies recipe and Gear information; Jade supplies machine overlays. These integrations are optional. AE2 and Refined Storage are needed only for their respective network bridges.
-- FTB Quests is optional. Pack authors can install the [quest extra](extras/ftbquests/README.md); the mod JAR does not install a quest book.
+1. Install Minecraft **1.21.1** with **NeoForge 21.1.228 or newer** and **Java 21**. Fabric and Forge are not supported.
+2. Download the JAR from [CurseForge](https://www.curseforge.com/minecraft/mc-mods/rngtech) and put it in the `mods` folder of the client and the server.
+3. Follow [Getting Started](https://c-pettersson.github.io/rngtech/getting-started/) on the player wiki.
 
-See the [player wiki](https://c-pettersson.github.io/rngtech/) and its [Getting Started](https://c-pettersson.github.io/rngtech/getting-started/) guide for the first tools and machines, and [Current Implementation](docs/reference/current-implementation.md) for feature status. Features marked **Prototype** exist but may change; **Planned** pages describe future work. Back up worlds before updating. The project has automated source/data checks, but no Java unit-test suite or exhaustive gameplay test suite.
+> [!NOTE]
+> **2.0 is in alpha.** The shared passive tree and ascendancies are in the 2.0 alpha files on CurseForge's Files tab; the default release file is still 1.2.0. Unique items and Corruption arrive later in 2.0.
 
-## Build from source
+RNGTech is in active development. Back up your worlds before updating.
 
-Install Java 21 and use the checked-in Gradle wrapper:
+**Optional integrations:** [JEI](https://www.curseforge.com/minecraft/mc-mods/jei) (recipes and Gear lookup), [Jade](https://www.curseforge.com/minecraft/mc-mods/jade) (machine overlays), [AE2](https://www.curseforge.com/minecraft/mc-mods/applied-energistics-2) and [Refined Storage](https://www.curseforge.com/minecraft/mc-mods/refined-storage) (network bridges over Universal Cable). Pack authors can add the [FTB Quests extra](extras/ftbquests/README.md).
 
-```sh
-./gradlew build
-```
+## Links
 
-The mod JAR appears at `build/libs/rngtech-<version>.jar`. Use `.\gradlew.bat` on Windows. Gradle downloads the development dependencies on the first run. The development client includes optional mods for integration testing; these are not required dependencies of the published mod.
-
-For contributions and verification commands, see [CONTRIBUTING.md](CONTRIBUTING.md). For release tooling and the manual gameplay checklist, see [Releasing](docs/releasing.md).
-
-## Documentation and tools
-
-- [Documentation index](docs/index.md)
-- [Machine and part stages](docs/reference/component-stages.md)
-- [Affixes and refinement](https://c-pettersson.github.io/rngtech/rarity-and-affixes/)
-- [ModDex source/data explorer](tools/moddex/README.md)
+- [Player wiki](https://c-pettersson.github.io/rngtech/)
+- [Bug reports and support](SUPPORT.md)
+- [Contributing](CONTRIBUTING.md), including building from source
+- [Design documentation](docs/index.md)
 - [Security reporting](SECURITY.md)
-- [Support and bug reports](SUPPORT.md)
-
-To build the documentation, install `requirements-docs.txt` and run `mkdocs build --strict`. Run `mkdocs serve` for a local preview, or `docker compose -f compose.docs.yml up` and open <http://localhost:8000>.
 
 ## License
 
-RNGTech uses the [MIT License](LICENSE). Minecraft, NeoForge, and optional mod dependencies retain their own licenses; they are not included in this grant.
+RNGTech uses the [MIT License](LICENSE). Minecraft, NeoForge, and optional mod dependencies keep their own licenses.

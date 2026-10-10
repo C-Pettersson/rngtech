@@ -19,7 +19,7 @@ python -m pip install -r requirements-docs.txt
 mkdocs build --strict
 ```
 
-The Gradle build checks formatting, compiles Java, processes resources, and packages the mod. There is no Java test source tree. ModDex checks selected source/data invariants and passive-tree geometry. The repository check checks local documentation links and common private-data patterns. None of these commands certifies all gameplay behavior or replaces a full secret scan of Git history.
+The Gradle build checks formatting, compiles Java, processes resources, runs the domain checks in `src/masteryTest`, and packages the mod. ModDex checks selected source/data invariants and passive-tree geometry. The repository check checks local documentation links and common private-data patterns. None of these commands certifies all gameplay behavior or replaces a full secret scan of Git history.
 
 Before publishing, record results from a disposable world:
 
@@ -52,6 +52,6 @@ This updates `mod_version`, runs `quickCheck`, commits the version change, creat
 
 Normal changes go through pull requests with passing CI and resolved review conversations. The repository administrator can bypass the pull-request rules for the release command's version commit. Keep that bypass limited to reviewed releases or recovery; it is not a substitute for the verification above. The separate rules against deleting or force-pushing `main` apply to administrators too.
 
-CurseForge publication uses the manual **Publish CurseForge Release** workflow. Configure `CURSEFORGE_API_TOKEN` as a repository secret and `CURSEFORGE_PROJECT_ID` as a repository variable. Select the target version and release type. The workflow can upload the optional quests as a child file. It does not run automatically from a Git tag.
+CurseForge publication uses the manual **Publish CurseForge Release** workflow. Configure `CURSEFORGE_API_TOKEN` as a repository secret and `CURSEFORGE_PROJECT_ID` as a repository variable. Select the target version and release type. The workflow can upload the optional quests as a child file. It does not run automatically from a Git tag. After the file is published, update the project page from [extras/curseforge](https://github.com/C-Pettersson/rngtech/tree/main/extras/curseforge), and remove any README note that says `main` is ahead of the CurseForge download.
 
 Branch and pull-request Actions artifacts expire and are intended for testing. Use release JARs for packs. Keep tokens in secret storage, and review the author name/email used by release commits before pushing.
