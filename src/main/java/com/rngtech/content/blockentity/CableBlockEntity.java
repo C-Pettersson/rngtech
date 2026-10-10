@@ -479,6 +479,9 @@ public class CableBlockEntity extends BlockEntity implements UniversalConnectorD
         }
 
         BlockPos sourcePos = worldPosition.relative(face);
+        if (!level.isLoaded(sourcePos)) {
+            return false;
+        }
         BlockState sourceState = level.getBlockState(sourcePos);
         if (isNetworkNode(sourceState)) {
             return false;
@@ -529,7 +532,7 @@ public class CableBlockEntity extends BlockEntity implements UniversalConnectorD
 
     private TransferOrigin directSourceOrigin(BlockPos sourcePos, ConnectorData connector) {
         TransferOrigin origin = TransferOrigin.endpoint(sourcePos, connector.attachAs());
-        if (level == null || connector.mode() != CableConnectorMode.BOTH) {
+        if (level == null || connector.mode() != CableConnectorMode.BOTH || !level.isLoaded(sourcePos)) {
             return origin;
         }
         IEnergyStorage source = level.getCapability(Capabilities.EnergyStorage.BLOCK, sourcePos, connector.attachAs());
@@ -548,6 +551,9 @@ public class CableBlockEntity extends BlockEntity implements UniversalConnectorD
         }
 
         BlockPos targetPos = worldPosition.relative(face);
+        if (!level.isLoaded(targetPos)) {
+            return 0;
+        }
         BlockState targetState = level.getBlockState(targetPos);
         if (targetState.getBlock() instanceof CableBlock || targetState.getBlock() instanceof UniversalConnectorBlock) {
             return 0;
@@ -575,6 +581,9 @@ public class CableBlockEntity extends BlockEntity implements UniversalConnectorD
             return null;
         }
         BlockPos targetPos = worldPosition.relative(face);
+        if (!level.isLoaded(targetPos)) {
+            return null;
+        }
         BlockState targetState = level.getBlockState(targetPos);
         if (isNetworkNode(targetState) || targetState.getBlock() instanceof UniversalConnectorBlock) {
             return null;
@@ -584,14 +593,11 @@ public class CableBlockEntity extends BlockEntity implements UniversalConnectorD
 
     private IEnergyStorage directTargetEnergyBuffer(Direction face) {
         ConnectorData connector = connectors.get(face);
-        if (level == null || connector == null) {
+        BlockPos targetPos = worldPosition.relative(face);
+        if (level == null || connector == null || !level.isLoaded(targetPos)) {
             return null;
         }
-        IEnergyStorage target = level.getCapability(
-                Capabilities.EnergyStorage.BLOCK,
-                worldPosition.relative(face),
-                connector.attachAs()
-        );
+        IEnergyStorage target = level.getCapability(Capabilities.EnergyStorage.BLOCK, targetPos, connector.attachAs());
         return isEnergyBuffer(target) ? target : null;
     }
 
@@ -1158,7 +1164,7 @@ public class CableBlockEntity extends BlockEntity implements UniversalConnectorD
     private static NetworkDebugSnapshot buildNetworkDebugSnapshot(Level level, NetworkSnapshot snapshot) {
         NetworkDebugAccumulator accumulator = new NetworkDebugAccumulator(cacheAgeTicks(level, snapshot));
         for (BlockPos pos : snapshot.cablePositions()) {
-            if (level.getBlockEntity(pos) instanceof CableBlockEntity cable) {
+            if (level.isLoaded(pos) && level.getBlockEntity(pos) instanceof CableBlockEntity cable) {
                 accumulator.addCableNode();
                 for (Map.Entry<Direction, ConnectorData> entry : cable.connectors.entrySet()) {
                     ConnectorData connector = entry.getValue();
@@ -1202,8 +1208,10 @@ public class CableBlockEntity extends BlockEntity implements UniversalConnectorD
         Set<BridgeEndpoint> seenBridgeEndpoints = new HashSet<>();
         List<EnergyEndpoint>[] energyEndpoints = createEnergyEndpointBuckets();
 
-        queue.addLast(startPos);
-        visited.add(startPos);
+        if (level.isLoaded(startPos)) {
+            queue.addLast(startPos);
+            visited.add(startPos);
+        }
 
         while (!queue.isEmpty()) {
             BlockPos pos = queue.removeFirst();
@@ -1259,6 +1267,10 @@ public class CableBlockEntity extends BlockEntity implements UniversalConnectorD
 
         for (Direction direction : DIRECTIONS) {
             BlockPos targetPos = pos.relative(direction);
+            if (!level.isLoaded(targetPos)) {
+                // An unloaded chunk is the edge of the network until it loads again; reading it would load it.
+                continue;
+            }
             BlockState targetState = null;
 
             if (CableBlock.hasCableConnection(state, direction)) {
@@ -2030,7 +2042,8 @@ public class CableBlockEntity extends BlockEntity implements UniversalConnectorD
     private record UniversalEndpoint(BlockPos pos, Direction side, UniversalEndpointType type) {
         private ItemStack receiveItem(Level level, int channel, ItemStack stack, boolean simulate) {
             return switch (type) {
-                case CABLE_SIDE -> level.getBlockEntity(pos) instanceof CableBlockEntity cable
+                case CABLE_SIDE -> level.isLoaded(pos)
+                        && level.getBlockEntity(pos) instanceof CableBlockEntity cable
                         && cable.universalConnector(side) != null
                                 ? cable.universalConnector(side).receiveItemFromCableNetwork(side, channel, stack, simulate)
                                 : stack;
@@ -2039,7 +2052,8 @@ public class CableBlockEntity extends BlockEntity implements UniversalConnectorD
 
         private FluidStack receiveFluid(Level level, int channel, FluidStack stack, boolean simulate) {
             return switch (type) {
-                case CABLE_SIDE -> level.getBlockEntity(pos) instanceof CableBlockEntity cable
+                case CABLE_SIDE -> level.isLoaded(pos)
+                        && level.getBlockEntity(pos) instanceof CableBlockEntity cable
                         && cable.universalConnector(side) != null
                                 ? cable.universalConnector(side).receiveFluidFromCableNetwork(side, channel, stack, simulate)
                                 : stack;
@@ -2113,7 +2127,12 @@ public class CableBlockEntity extends BlockEntity implements UniversalConnectorD
         }
 
         private static boolean isAdjacentBatteryChassisTransfer(Level level, BlockPos sourcePos, BlockPos targetPos) {
-            if (level == null || sourcePos == null || targetPos == null || !isFaceAdjacent(sourcePos, targetPos)) {
+            if (level == null
+                    || sourcePos == null
+                    || targetPos == null
+                    || !isFaceAdjacent(sourcePos, targetPos)
+                    || !level.isLoaded(sourcePos)
+                    || !level.isLoaded(targetPos)) {
                 return false;
             }
             return level.getBlockEntity(sourcePos) instanceof BatteryChassisBlockEntity
@@ -2128,7 +2147,7 @@ public class CableBlockEntity extends BlockEntity implements UniversalConnectorD
         }
 
         private IEnergyStorage targetEnergyBuffer(Level level) {
-            if (!(level.getBlockEntity(connectorPos) instanceof CableBlockEntity cable)) {
+            if (!level.isLoaded(connectorPos) || !(level.getBlockEntity(connectorPos) instanceof CableBlockEntity cable)) {
                 return null;
             }
             return switch (type) {
@@ -2140,7 +2159,7 @@ public class CableBlockEntity extends BlockEntity implements UniversalConnectorD
         }
 
         private int receive(Level level, int channel, int amount, boolean simulate) {
-            if (!(level.getBlockEntity(connectorPos) instanceof CableBlockEntity cable)) {
+            if (!level.isLoaded(connectorPos) || !(level.getBlockEntity(connectorPos) instanceof CableBlockEntity cable)) {
                 return 0;
             }
             return switch (type) {
