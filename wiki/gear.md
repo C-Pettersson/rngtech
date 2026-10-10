@@ -397,7 +397,7 @@ Battery Cells store FE inside a machine. Most powered machines have an optional 
 
 ### Energy Connectors
 
-Two machines take an Energy Connector module in a Gear slot so they can accept FE, up to the connector's tier: the [Tool Bench](tool-bench.md) and [Forestry Cart Station](forestry-cart-station.md). Generators have no Energy Connector slot; the Energy Connector in the attached [Universal Connector](universal-cable.md) sets how fast their FE moves. Any tier fits, from the {{ item('rngtech:crude_energy_connector') }} up to the {{ item('rngtech:exotic_energy_connector') }}. See [Universal Cable](universal-cable.md) for the tiers. In older worlds, an Energy Connector that sat in a Cavitation Generator, Vacuum Collapse Generator, or Solar Array Controller drops next to the machine when the world loads.
+Two machines take an Energy Connector module in a Gear slot so they can accept FE, up to the connector's tier: the [Tool Bench](tool-bench.md) and [Forestry Cart Station](forestry-cart-station.md). Generators have no Energy Connector slot; the Energy Connector in the attached [Universal Connector](universal-cable.md) sets how fast their FE moves. Any tier fits, from the {{ item('rngtech:crude_energy_connector') }} up to the {{ item('rngtech:exotic_energy_connector') }}. See [Universal Cable](universal-cable.md) for the tiers. In older worlds, an Energy Connector that sat in a Cavitation Generator, Vacuum Collapse Generator, or Solar Array Controller leaves the machine on its own. It goes into an adjacent chest or other item inventory if one has room. Otherwise the machine keeps it until a player comes within 16 blocks, then drops it next to the machine. Breaking the machine also drops it.
 
 ### Other Gear-tab items
 

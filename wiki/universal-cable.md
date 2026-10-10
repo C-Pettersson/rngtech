@@ -76,7 +76,7 @@ Mine Cables and Universal Connectors with a pickaxe. Aiming at a connector on a 
 
 ### Building a network
 
-1. Place Cables. Touching Cables link up on their own.
+1. Place Cables. Touching Cables link up on their own, unless they are dyed different colors (see [Dyed cables](#dyed-cables)).
 2. Use a Universal Connector on the cable face beside a machine. You can also use it on the machine itself when a Cable is next to it. The connector mounts on that face of the cable.
 3. Right-click the connector with an empty hand to open it, and install modules: an Energy Connector for FE, Fluid Connectors for fluids, Item Connectors for items.
 4. Set each module's channel and mode. Only connectors on the same channel exchange anything.
@@ -88,6 +88,16 @@ Energy Connectors are modules: they go in a Universal Connector's Energy tab, or
 #### Standalone plates
 
 A Universal Connector placed on its own, with no Cable, works as a standalone plate. Use another Universal Connector on a different face of the same space to add a second plate there. Plates join a network only once they sit on a Cable: use a Cable on the plate's space, or on the machine face behind it, and the space turns into a Cable. Every plate in it keeps its modules and settings.
+
+### Dyed cables
+
+Dye keeps two cable lines apart when they run side by side. A dyed Cable links only to Cables of its own color and to undyed Cables, so a red line and a blue line can touch along their whole length and stay two separate networks. Undyed Cable links to every color, and connectors and machines work the same on any color.
+
+- **Crafting**: surround a dye with eight Cables to get eight Cables of that color. Already dyed Cables can be dyed again this way.
+- **In place**: right-click a placed Cable with a dye to recolor it. This uses one dye.
+- **Removing dye**: put a dyed Cable in a crafting grid on its own to get an undyed Cable back. You can also use dyed Cables on a water cauldron to wash the whole stack, which uses one level of water.
+
+A dyed Cable keeps its color when you mine it. The color shows on the cable's glow strip and in its tooltip.
 
 ### Connector settings
 
@@ -167,7 +177,7 @@ The Bridge tab holds one {{ item('rngtech:ae2_network_connector') }} or {{ item(
 
 The {{ item('rngtech:wrench') }} manages links and shows connector settings.
 
-- Right-click a cable face that points at another Cable to switch that link off or on. Disabled links stay off after reloads.
+- Right-click the cable arm that leads to another Cable to switch that link off. To switch it back on, right-click the side of the cable core facing the other Cable. Disabled links stay off after reloads, and only the Wrench turns them back on. Cables dyed different colors cannot be linked.
 - Right-click a connector on a cable face to open its screen.
 - Hold the Wrench while looking at a Universal Connector, standalone or on a cable, to see a hologram of its settings. Direct Energy Connectors left on a cable face from older worlds show no hologram.
 - The hologram has Summary, Energy, Item, and Fluid pages. The Summary page also shows the bridge, such as `Bridge: AE2 ch 3`. Shift + right-click cycles the pages, and so does the **Cycle Wrench View** key. That key has no default binding; set it under Controls.

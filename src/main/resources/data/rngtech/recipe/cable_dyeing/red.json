@@ -1,0 +1,25 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "group": "rngtech:dyed_cable",
+  "pattern": [
+    "CCC",
+    "CDC",
+    "CCC"
+  ],
+  "key": {
+    "C": {
+      "item": "rngtech:cable"
+    },
+    "D": {
+      "item": "minecraft:red_dye"
+    }
+  },
+  "result": {
+    "count": 8,
+    "id": "rngtech:cable",
+    "components": {
+      "minecraft:base_color": "red"
+    }
+  }
+}

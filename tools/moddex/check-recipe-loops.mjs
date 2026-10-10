@@ -263,6 +263,20 @@ async function consumedInputs(json, tags, id, choices, freeKeys) {
 }
 
 /** One consumed node. An ingredient that accepts several items becomes an `any:` node that each accepted item converts into. */
+/** Flattens NeoForge compound and component ingredients into plain item and tag alternatives. */
+function plainIngredientAlternatives(entry) {
+    if (Array.isArray(entry)) {
+        return entry.flatMap(plainIngredientAlternatives);
+    }
+    if (entry?.type === "neoforge:compound") {
+        return plainIngredientAlternatives(entry.children ?? entry.ingredients ?? []);
+    }
+    if (entry?.type === "neoforge:components") {
+        return [entry.items].flat().map((id) => (id.startsWith("#") ? { tag: id.slice(1) } : { item: id }));
+    }
+    return [entry];
+}
+
 async function ingredientNode(entry, count, tags, key, choices) {
     if (!entry) {
         return null;
@@ -278,7 +292,7 @@ async function ingredientNode(entry, count, tags, key, choices) {
     }
     const effective = count * (entry.count ?? 1);
     const items = [];
-    for (const alternative of [entry].flat()) {
+    for (const alternative of plainIngredientAlternatives(entry)) {
         if (alternative.item) {
             items.push(alternative.item);
         } else if (alternative.type === "rngtech:malformed_ingot") {

@@ -40,14 +40,20 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.items.IItemHandler;
+import net.neoforged.neoforge.items.ItemHandlerHelper;
 import net.neoforged.neoforge.items.ItemStackHandler;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Set;
 
 public abstract class BaseMachineBlockEntity extends BlockEntity implements RefinableMachine {
+    private static final long REMOVED_GEAR_CHECK_INTERVAL = 20L;
+    private static final double REMOVED_GEAR_PLAYER_RANGE = 16.0D;
+
     private final IItemHandler topItemHandler;
     private final IItemHandler sideItemHandler;
     private final IItemHandler bottomItemHandler;
@@ -239,7 +245,7 @@ public abstract class BaseMachineBlockEntity extends BlockEntity implements Refi
 
     /**
      * Loads a Gear inventory that may have been saved with one more slot, at {@code removedSlot}. Later slots shift
-     * down by one, and items with no slot left are held until {@link #dropRemovedGear}.
+     * down by one, and items with no slot left are held until {@link #releaseRemovedGear} or {@link #dropRemovedGear}.
      */
     protected void loadGearWithoutSlot(
             ItemStackHandler gearInventory,
@@ -270,6 +276,60 @@ public abstract class BaseMachineBlockEntity extends BlockEntity implements Refi
             }
         }
         gearInventory.deserializeNBT(registries, current.serializeNBT(registries));
+    }
+
+    /**
+     * Moves held Gear from {@link #loadGearWithoutSlot} into an adjacent item handler, then drops the rest once a player
+     * is close enough to collect it before it despawns. Until then it stays saved on the machine.
+     */
+    protected void releaseRemovedGear(Level level) {
+        if (removedGear.isEmpty() || level.getGameTime() % REMOVED_GEAR_CHECK_INTERVAL != 0L) {
+            return;
+        }
+        boolean inserted = insertRemovedGearIntoNeighbors(level);
+        if (!removedGear.isEmpty() && level.hasNearbyAlivePlayer(
+                worldPosition.getX() + 0.5D,
+                worldPosition.getY() + 0.5D,
+                worldPosition.getZ() + 0.5D,
+                REMOVED_GEAR_PLAYER_RANGE
+        )) {
+            dropRemovedGear(level);
+        } else if (inserted) {
+            setChanged();
+        }
+    }
+
+    private boolean insertRemovedGearIntoNeighbors(Level level) {
+        boolean inserted = false;
+        for (Direction direction : Direction.values()) {
+            BlockPos neighbor = worldPosition.relative(direction);
+            // Machine inputs could consume the Gear, for example a Component Recycler.
+            if (level.getBlockEntity(neighbor) instanceof BaseMachineBlockEntity) {
+                continue;
+            }
+            IItemHandler handler = level.getCapability(Capabilities.ItemHandler.BLOCK, neighbor, direction.getOpposite());
+            if (handler == null) {
+                continue;
+            }
+            ListIterator<ItemStack> stacks = removedGear.listIterator();
+            while (stacks.hasNext()) {
+                ItemStack stack = stacks.next();
+                ItemStack remainder = ItemHandlerHelper.insertItemStacked(handler, stack.copy(), false);
+                if (remainder.getCount() == stack.getCount()) {
+                    continue;
+                }
+                inserted = true;
+                if (remainder.isEmpty()) {
+                    stacks.remove();
+                } else {
+                    stacks.set(remainder);
+                }
+            }
+            if (removedGear.isEmpty()) {
+                break;
+            }
+        }
+        return inserted;
     }
 
     protected void dropRemovedGear(Level level) {
