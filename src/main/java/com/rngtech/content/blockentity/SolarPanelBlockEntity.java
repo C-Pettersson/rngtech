@@ -35,6 +35,7 @@ public class SolarPanelBlockEntity extends BaseMachineBlockEntity implements Mac
     private static final long ZENITH_TICK = 6000L;
     private static final long PEAK_SOLAR_WINDOW_TICKS = 2000L;
     private static final int CONTROL_SUPPRESSION_TICKS = 2;
+    private static final int SKY_CHECK_INTERVAL_TICKS = 20;
 
     private final SolarPanelBlock block;
     private final ItemStackHandler emptyInventory = new ItemStackHandler(0);
@@ -45,6 +46,8 @@ public class SolarPanelBlockEntity extends BaseMachineBlockEntity implements Mac
     private int internalEnergy;
     private double generationCarry;
     private long lastControlledTick = Long.MIN_VALUE;
+    private long nextSkyCheckTick = Long.MIN_VALUE;
+    private boolean skyVisible;
 
     public SolarPanelBlockEntity(BlockPos pos, BlockState blockState) {
         super(ModBlockEntities.SOLAR_PANEL.get(), pos, blockState, MachineType.SOLAR_PANEL, 0, 0, 0);
@@ -144,7 +147,7 @@ public class SolarPanelBlockEntity extends BaseMachineBlockEntity implements Mac
         if (!isDimensionEnabled(level)) {
             return STATUS_BAD_DIMENSION;
         }
-        if (!level.canSeeSky(pos.above())) {
+        if (!canSeeSky(level, pos)) {
             return STATUS_NO_SKY;
         }
         if (!level.isDay()) {
@@ -154,6 +157,19 @@ public class SolarPanelBlockEntity extends BaseMachineBlockEntity implements Mac
             return STATUS_WEATHER;
         }
         return STATUS_CLEAR;
+    }
+
+    /** Sky access only changes when blocks change, so this panel checks it at most once a second. */
+    private boolean canSeeSky(Level level, BlockPos pos) {
+        if (!pos.equals(worldPosition)) {
+            return level.canSeeSky(pos.above());
+        }
+        long gameTime = level.getGameTime();
+        if (gameTime >= nextSkyCheckTick || nextSkyCheckTick - gameTime > SKY_CHECK_INTERVAL_TICKS) {
+            skyVisible = level.canSeeSky(worldPosition.above());
+            nextSkyCheckTick = gameTime + SKY_CHECK_INTERVAL_TICKS;
+        }
+        return skyVisible;
     }
 
     private static boolean isDaylightStatus(int sunlightStatus) {
