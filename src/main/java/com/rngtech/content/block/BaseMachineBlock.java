@@ -1,5 +1,8 @@
 package com.rngtech.content.block;
 
+import com.rngtech.content.blockentity.MachineInfoProvider;
+import com.rngtech.content.blockentity.MachineInfoSnapshot;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.item.context.BlockPlaceContext;
@@ -42,6 +45,28 @@ public abstract class BaseMachineBlock extends Block implements EntityBlock {
     @Override
     protected BlockState mirror(BlockState state, Mirror mirror) {
         return state.rotate(mirror.getRotation(state.getValue(FACING)));
+    }
+
+    @Override
+    protected boolean hasAnalogOutputSignal(BlockState state) {
+        return true;
+    }
+
+    /** Comparators read the machine's work state: blocked 15, running 8, paused 4, idle 1, and 0 for a machine without one. */
+    @Override
+    protected int getAnalogOutputSignal(BlockState state, Level level, BlockPos pos) {
+        return level.getBlockEntity(pos) instanceof MachineInfoProvider provider
+                ? comparatorSignal(provider.machineInfo().state())
+                : 0;
+    }
+
+    public static int comparatorSignal(MachineInfoSnapshot.WorkState state) {
+        return switch (state) {
+            case BLOCKED -> 15;
+            case RUNNING -> 8;
+            case PAUSED -> 4;
+            case IDLE -> 1;
+        };
     }
 
     public static void setActive(Level level, BlockPos pos, BlockState state, boolean active) {
