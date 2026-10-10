@@ -1,8 +1,8 @@
 package com.rngtech.content.blockentity;
 
 import com.rngtech.content.block.CableBlock;
-import com.rngtech.content.block.UniversalConnectorBlock;
 import com.rngtech.content.cable.CableConnectorMode;
+import com.rngtech.content.cable.CableStats;
 import com.rngtech.content.cable.EnergyConnectorTier;
 import com.rngtech.content.cable.EnergyDistributionMode;
 import com.rngtech.content.cable.FluidConnectorMode;
@@ -10,6 +10,7 @@ import com.rngtech.content.cable.FluidConnectorTier;
 import com.rngtech.content.cable.ItemConnectorMode;
 import com.rngtech.content.cable.ItemConnectorTier;
 import com.rngtech.content.cable.NetworkBridgeType;
+import com.rngtech.content.cable.StallBackoff;
 import com.rngtech.content.item.EnergyConnectorItem;
 import com.rngtech.content.item.FluidConnectorItem;
 import com.rngtech.content.item.ItemConnectorItem;
@@ -29,7 +30,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.energy.IEnergyStorage;
 import net.neoforged.neoforge.fluids.FluidStack;
@@ -115,6 +115,8 @@ public final class CableUniversalConnectorData implements UniversalConnectorAcce
     private final IEnergyStorage energyStorage = new ConnectorEnergyStorage();
     private final ConnectorTargetCache<IEnergyStorage> energyTarget =
             new ConnectorTargetCache<>(Capabilities.EnergyStorage.BLOCK);
+    private final List<ConnectorTargetCache<IItemHandler>> itemTargets = new ArrayList<>(DIRECTIONS.length);
+    private final List<ConnectorTargetCache<IFluidHandler>> fluidTargets = new ArrayList<>(DIRECTIONS.length);
     private final IItemHandler itemHandler = new NetworkItemHandler();
     private final IFluidHandler fluidHandler = new NetworkFluidHandler();
     private final FluidModuleState[] fluidModules =
@@ -146,6 +148,10 @@ public final class CableUniversalConnectorData implements UniversalConnectorAcce
         }
         for (int index = 0; index < itemModules.length; index++) {
             itemModules[index] = ItemModuleState.defaults(defaultAttachAs());
+        }
+        for (int side = 0; side < DIRECTIONS.length; side++) {
+            itemTargets.add(new ConnectorTargetCache<>(Capabilities.ItemHandler.BLOCK));
+            fluidTargets.add(new ConnectorTargetCache<>(Capabilities.FluidHandler.BLOCK));
         }
     }
 
@@ -221,6 +227,30 @@ public final class CableUniversalConnectorData implements UniversalConnectorAcce
         BlockPos ownerPos = owner.getBlockPos();
         return CableBlockEntity.TransferOrigin.endpoint(ownerPos, face, ownerPos.relative(face))
                 .withEnergyBuffer(mode == CableConnectorMode.BOTH ? source : null);
+    }
+
+    /** Bit mask of the item channels this connector inserts on: rows set to OUT with a module and an Attach side. */
+    int itemReceiveChannelMask() {
+        int mask = 0;
+        for (int moduleIndex = 0; moduleIndex < itemModules.length; moduleIndex++) {
+            ItemModuleState module = itemModules[moduleIndex];
+            if (module.attachAs != null && module.mode.insertsIntoTarget() && itemConnectorTier(moduleIndex).isPresent()) {
+                mask |= 1 << module.channel;
+            }
+        }
+        return mask;
+    }
+
+    /** Bit mask of the fluid channels this connector inserts on: rows set to OUT with a module and an Attach side. */
+    int fluidReceiveChannelMask() {
+        int mask = 0;
+        for (int moduleIndex = 0; moduleIndex < fluidModules.length; moduleIndex++) {
+            FluidModuleState module = fluidModules[moduleIndex];
+            if (module.attachAs != null && module.mode.insertsIntoTarget() && fluidConnectorTier(moduleIndex).isPresent()) {
+                mask |= 1 << module.channel;
+            }
+        }
+        return mask;
     }
 
     /** The energy channel this connector works on, or -1 without an Energy Connector installed. */
@@ -783,6 +813,12 @@ public final class CableUniversalConnectorData implements UniversalConnectorAcce
     }
 
     private void invalidateConnectorState() {
+        for (FluidModuleState module : fluidModules) {
+            module.stall.clear();
+        }
+        for (ItemModuleState module : itemModules) {
+            module.stall.clear();
+        }
         owner.universalConnectorStateChanged();
     }
 
@@ -810,12 +846,16 @@ public final class CableUniversalConnectorData implements UniversalConnectorAcce
                 changed = true;
                 continue;
             }
+            if (module.stall.active() && module.stall.waiting(CableBlockEntity.networkEpoch(level))) {
+                continue;
+            }
 
             Optional<FluidConnectorTier> tier = fluidConnectorTier(moduleIndex);
             if (tier.isEmpty() || !module.mode.pullsFromTarget()) {
                 continue;
             }
 
+            CableStats.increment(CableStats.Counter.MODULE_ATTEMPTS);
             int moved = tryTransferFluidModule(moduleIndex, tier.get());
             if (module.jamTicks > 0) {
                 changed = true;
@@ -824,6 +864,9 @@ public final class CableUniversalConnectorData implements UniversalConnectorAcce
             if (moved > 0) {
                 module.cooldownTicks = tier.get().waitTicks();
                 changed = true;
+            } else {
+                module.stall.start(CableBlockEntity.networkEpoch(level), tier.get().waitTicks());
+                CableStats.increment(CableStats.Counter.MODULE_BACKOFFS);
             }
         }
         fluidModuleTickCursor = (fluidModuleTickCursor + 1) % fluidModules.length;
@@ -903,12 +946,16 @@ public final class CableUniversalConnectorData implements UniversalConnectorAcce
                 changed = true;
                 continue;
             }
+            if (module.stall.active() && module.stall.waiting(CableBlockEntity.networkEpoch(level))) {
+                continue;
+            }
 
             Optional<ItemConnectorTier> tier = itemConnectorTier(moduleIndex);
             if (tier.isEmpty() || !module.mode.pullsFromTarget()) {
                 continue;
             }
 
+            CableStats.increment(CableStats.Counter.MODULE_ATTEMPTS);
             int moved = tryTransferItemModule(moduleIndex, tier.get());
             if (module.jamTicks > 0) {
                 changed = true;
@@ -917,6 +964,9 @@ public final class CableUniversalConnectorData implements UniversalConnectorAcce
             if (moved > 0) {
                 module.cooldownTicks = tier.get().waitTicks();
                 changed = true;
+            } else {
+                module.stall.start(CableBlockEntity.networkEpoch(level), tier.get().waitTicks());
+                CableStats.increment(CableStats.Counter.MODULE_BACKOFFS);
             }
         }
         itemModuleTickCursor = (itemModuleTickCursor + 1) % itemModules.length;
@@ -1128,35 +1178,17 @@ public final class CableUniversalConnectorData implements UniversalConnectorAcce
     }
 
     private IFluidHandler targetFluidHandler(Direction targetSide) {
-        Level level = owner.getLevel();
-        if (level == null || targetSide == null) {
+        if (targetSide == null) {
             return null;
         }
-        BlockPos targetPos = owner.getBlockPos().relative(face);
-        if (!level.isLoaded(targetPos)) {
-            return null;
-        }
-        BlockState targetState = level.getBlockState(targetPos);
-        if (targetState.getBlock() instanceof UniversalConnectorBlock || targetState.getBlock() instanceof CableBlock) {
-            return null;
-        }
-        return level.getCapability(Capabilities.FluidHandler.BLOCK, targetPos, targetSide);
+        return fluidTargets.get(targetSide.ordinal()).get(owner.getLevel(), owner.getBlockPos().relative(face), targetSide);
     }
 
     private IItemHandler targetItemHandler(Direction targetSide) {
-        Level level = owner.getLevel();
-        if (level == null || targetSide == null) {
+        if (targetSide == null) {
             return null;
         }
-        BlockPos targetPos = owner.getBlockPos().relative(face);
-        if (!level.isLoaded(targetPos)) {
-            return null;
-        }
-        BlockState targetState = level.getBlockState(targetPos);
-        if (targetState.getBlock() instanceof UniversalConnectorBlock || targetState.getBlock() instanceof CableBlock) {
-            return null;
-        }
-        return level.getCapability(Capabilities.ItemHandler.BLOCK, targetPos, targetSide);
+        return itemTargets.get(targetSide.ordinal()).get(owner.getLevel(), owner.getBlockPos().relative(face), targetSide);
     }
 
     private FluidStack insertFluidIntoTargetForModule(
@@ -1512,6 +1544,7 @@ public final class CableUniversalConnectorData implements UniversalConnectorAcce
     }
 
     private static final class FluidModuleState {
+        private final StallBackoff stall = new StallBackoff();
         private int channel;
         private Direction attachAs;
         private FluidConnectorMode mode;
@@ -1566,6 +1599,7 @@ public final class CableUniversalConnectorData implements UniversalConnectorAcce
     }
 
     private static final class ItemModuleState {
+        private final StallBackoff stall = new StallBackoff();
         private int channel;
         private Direction attachAs;
         private ItemConnectorMode mode;
