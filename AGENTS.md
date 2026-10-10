@@ -142,4 +142,6 @@ GitHub Actions runs:
 
 with Temurin Java 21 on Ubuntu. CI also runs `npm run repo:check`, `npm run moddex:check`, `mkdocs build --strict`, and `mkdocs build --strict -f mkdocs.wiki.yml`. Local changes should pass the relevant checks before handoff.
 
+A separate `gametest` job runs `./gradlew runGameTestServer` (the GameTests in `com.rngtech.gametest`); run it locally after changing machine behavior.
+
 The Build workflow runs on pull requests, not on pushes to `main`; the ruleset requires up-to-date branches, so the squashed commit was already tested. Its Gradle job is skipped for pull requests that only touch docs, wiki, or docs tooling files.
