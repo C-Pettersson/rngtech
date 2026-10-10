@@ -245,9 +245,38 @@ public class CableBlockEntity extends BlockEntity implements UniversalConnectorD
     }
 
     public static void serverTick(Level level, BlockPos pos, BlockState state, CableBlockEntity cable) {
+        CableStats.increment(CableStats.Counter.CABLE_TICKS);
         cable.requestDirectEnergyPasses();
         for (CableUniversalConnectorData connector : cable.universalConnectors.values()) {
             connector.serverTick();
+        }
+    }
+
+    @Override
+    public void onLoad() {
+        super.onLoad();
+        if (level != null && !level.isClientSide) {
+            showLoadedConnectors();
+        }
+    }
+
+    /**
+     * Older saves can hold a connector the block state does not show, such as a direct Energy Connector restored from
+     * NBT. Only cables whose state shows a connector tick, so the state is brought in line with what was loaded.
+     */
+    private void showLoadedConnectors() {
+        BlockState state = getBlockState();
+        if (!(state.getBlock() instanceof CableBlock)) {
+            return;
+        }
+        BlockState updated = state;
+        for (Direction direction : DIRECTIONS) {
+            if (hasAnyConnector(direction) && !updated.getValue(CableBlock.connectorProperty(direction))) {
+                updated = updated.setValue(CableBlock.connectorProperty(direction), true);
+            }
+        }
+        if (updated != state) {
+            level.setBlock(worldPosition, updated, Block.UPDATE_CLIENTS);
         }
     }
 

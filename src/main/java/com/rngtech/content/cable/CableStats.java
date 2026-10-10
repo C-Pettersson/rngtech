@@ -9,6 +9,7 @@ import java.util.Locale;
  */
 public final class CableStats {
     public enum Counter {
+        CABLE_TICKS("cable block entity ticks"),
         NETWORK_REBUILDS("network rebuilds"),
         CABLES_SCANNED("cables scanned by rebuilds"),
         TARGET_QUERIES("connector target queries"),
