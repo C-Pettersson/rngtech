@@ -187,6 +187,10 @@ public class ForestryCartStationBlockEntity extends BlockEntity implements MenuP
         @Override
         protected void onContentsChanged(int slot) {
             setChanged();
+            if (slot != SLOT_STATION_BATTERY_CELL && level != null && !level.isClientSide) {
+                // The connector slots decide which capabilities the station exposes, so cached lookups must refresh.
+                level.invalidateCapabilities(worldPosition);
+            }
         }
     };
     private final IItemHandler topItemHandler = new StationInputItemHandler();

@@ -1,5 +1,6 @@
 package com.rngtech;
 
+import com.rngtech.content.blockentity.CableBlockEntity;
 import com.rngtech.content.command.RNGTechCommands;
 import com.rngtech.content.item.CableItem;
 import com.rngtech.content.minerscompanion.MinersCompanionEvents;
@@ -69,6 +70,7 @@ public final class RNGTech {
         NeoForge.EVENT_BUS.addListener(MinersCompanionEvents::onBlockDrops);
         NeoForge.EVENT_BUS.addListener(MinersCompanionEvents::onPlayerTick);
         NeoForge.EVENT_BUS.addListener(RNGTechCommands::register);
+        NeoForge.EVENT_BUS.addListener(CableBlockEntity::onLevelTick);
 
         modContainer.registerConfig(ModConfig.Type.COMMON, RNGTechConfig.SPEC);
     }
