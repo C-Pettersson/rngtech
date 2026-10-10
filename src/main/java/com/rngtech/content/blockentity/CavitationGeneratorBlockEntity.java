@@ -270,6 +270,7 @@ public class CavitationGeneratorBlockEntity extends BaseMachineBlockEntity
 
     public CavitationGeneratorBlockEntity(BlockPos pos, BlockState blockState) {
         super(ModBlockEntities.CAVITATION_GENERATOR.get(), pos, blockState, MachineType.CAVITATION_GENERATOR, SLOT_FLUID_INPUT_CONTAINER, SLOT_FLUID_INPUT_CONTAINER, SLOT_DAMAGED_ROTOR);
+        trackStatSlots(gearInventory);
     }
 
     public static void serverTick(Level level, BlockPos pos, BlockState state, CavitationGeneratorBlockEntity generator) {
@@ -467,6 +468,11 @@ public class CavitationGeneratorBlockEntity extends BaseMachineBlockEntity
     }
 
     public MachineStatAccumulator effectiveStats() {
+        return cachedStats(0L);
+    }
+
+    @Override
+    protected MachineStatAccumulator buildStats() {
         MachineStatAccumulator stats = MachineBaseStatCatalog.cavitationGenerator();
         stats.apply(MachineImplicitCatalog.effectiveTraits(machineTraits(), getBlockState().getBlock()));
         applyPartStats(stats, rotorStack());

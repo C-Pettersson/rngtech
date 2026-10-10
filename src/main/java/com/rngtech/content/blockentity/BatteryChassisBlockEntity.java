@@ -178,6 +178,7 @@ public class BatteryChassisBlockEntity extends BaseMachineBlockEntity implements
                 syncInventoryToClient();
             }
         };
+        trackStatSlots(inventory);
         for (Direction direction : DIRECTIONS) {
             sidedEnergyStorages[direction.ordinal()] = new ChassisEnergyStorage(direction);
         }
@@ -300,6 +301,11 @@ public class BatteryChassisBlockEntity extends BaseMachineBlockEntity implements
     }
 
     public MachineStatAccumulator effectiveStats() {
+        return cachedStats(0L);
+    }
+
+    @Override
+    protected MachineStatAccumulator buildStats() {
         return effectiveStats(effectiveTraits());
     }
 
@@ -318,7 +324,7 @@ public class BatteryChassisBlockEntity extends BaseMachineBlockEntity implements
 
     private RuntimeContext runtimeContext() {
         MachineTraits traits = effectiveTraits();
-        MachineStatAccumulator stats = effectiveStats(traits);
+        MachineStatAccumulator stats = effectiveStats();
         return new RuntimeContext(
                 stats,
                 traits,

@@ -258,6 +258,7 @@ public class ResonanceCalibratorBlockEntity extends BaseMachineBlockEntity
                 SLOT_CATALYST,
                 SLOT_OUTPUT
         );
+        trackStatSlots(gearInventory);
     }
 
     public static void serverTick(Level level, BlockPos pos, BlockState state, ResonanceCalibratorBlockEntity calibrator) {
@@ -432,6 +433,11 @@ public class ResonanceCalibratorBlockEntity extends BaseMachineBlockEntity
     }
 
     public MachineStatAccumulator effectiveStats() {
+        return cachedStats(bulkSpeed.count());
+    }
+
+    @Override
+    protected MachineStatAccumulator buildStats() {
         ResonanceCalibratorChassis chassis = chassis();
         MachineStatAccumulator stats = MachineBaseStatCatalog.resonanceCalibrator(chassis);
         stats.apply(MachineImplicitCatalog.effectiveTraits(machineTraits(), getBlockState().getBlock()));

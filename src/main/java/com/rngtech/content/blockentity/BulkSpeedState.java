@@ -43,6 +43,11 @@ final class BulkSpeedState {
         ));
     }
 
+    /** The completed-process count, which keys cached stats. */
+    int count() {
+        return completedProcesses;
+    }
+
     boolean recordProcess(MachineTraits traits) {
         if (!traits.hasBehavior(MachineBehavior.BULK_SPEED) || completedProcesses >= MAX_BONUS_PERCENT) {
             return false;

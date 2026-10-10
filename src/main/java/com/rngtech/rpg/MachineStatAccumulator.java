@@ -57,6 +57,7 @@ public final class MachineStatAccumulator {
             RECORDING.get() ? new EnumMap<>(MachineStat.class) : null;
     private final Deque<Component> sources = new ArrayDeque<>();
     private String ascendancy = "";
+    private boolean frozen;
 
     /**
      * Runs {@code statsFactory} with breakdown recording on: every accumulator it creates remembers which labelled
@@ -69,6 +70,48 @@ public final class MachineStatAccumulator {
             return statsFactory.get();
         } finally {
             RECORDING.set(previous);
+        }
+    }
+
+    /** Whether a stat breakdown is recording on this thread, so cached stats would lose their sources. */
+    public static boolean isRecording() {
+        return RECORDING.get();
+    }
+
+    /** Makes these stats read-only, so a cached instance can be shared; any later change throws. */
+    public MachineStatAccumulator freeze() {
+        frozen = true;
+        return this;
+    }
+
+    /** A copy that can take more effects, for callers that add conditional effects to shared stats. */
+    public MachineStatAccumulator mutableCopy() {
+        MachineStatAccumulator copy = new MachineStatAccumulator();
+        copy.baseValues.putAll(baseValues);
+        copy.additiveValues.putAll(additiveValues);
+        copy.increasedPercentValues.putAll(increasedPercentValues);
+        copy.reducedPercentValues.putAll(reducedPercentValues);
+        copy.increasedSoftCaps.putAll(increasedSoftCaps);
+        copy.moreValues.putAll(moreValues);
+        copy.flatEnergyGenerationBonus = flatEnergyGenerationBonus;
+        copy.partEnergyGenerationMore = partEnergyGenerationMore;
+        copy.absoluteValues.putAll(absoluteValues);
+        copy.absoluteCeilings.putAll(absoluteCeilings);
+        if (copy.recorded != null && recorded != null) {
+            recorded.forEach((stat, terms) -> copy.recorded.put(stat, new ArrayList<>(terms)));
+        }
+        copy.ascendancy = ascendancy;
+        return copy;
+    }
+
+    /** These stats when they can take more effects, otherwise a {@link #mutableCopy}. */
+    public MachineStatAccumulator mutable() {
+        return frozen ? mutableCopy() : this;
+    }
+
+    private void checkMutable() {
+        if (frozen) {
+            throw new IllegalStateException("Cached machine stats are read-only; add effects to mutable() instead");
         }
     }
 
@@ -88,6 +131,7 @@ public final class MachineStatAccumulator {
 
     /** Records the host's chosen ascendancy, so Gear stats that need one apply only on its machines. */
     public void setAscendancy(String ascendancy) {
+        checkMutable();
         this.ascendancy = ascendancy == null ? "" : ascendancy;
     }
 
@@ -97,11 +141,13 @@ public final class MachineStatAccumulator {
     }
 
     public void setAbsolute(MachineStat stat, double value) {
+        checkMutable();
         absoluteValues.merge(accumulationStat(stat), value, Math::min);
         record(StatBreakdown.Kind.FIXED, stat, value);
     }
 
     public void capAbsolute(MachineStat stat, double value) {
+        checkMutable();
         absoluteCeilings.merge(accumulationStat(stat), value, Math::min);
         record(StatBreakdown.Kind.CEILING, stat, value);
     }
@@ -846,6 +892,7 @@ public final class MachineStatAccumulator {
      * part's own multiplier and flat FE/t, so neither is rescaled by this or any other part's multiplier here.
      */
     void applyPartEnergyGeneration(MachineStatAccumulator part, boolean multiplier) {
+        checkMutable();
         double generation = part.valueWithoutFlatEnergyGenerationBonus(MachineStat.ENERGY_GENERATION);
         if (!multiplier) {
             add(MachineStat.ENERGY_GENERATION, generation);
@@ -875,6 +922,7 @@ public final class MachineStatAccumulator {
     }
 
     private void addFlatEnergyGenerationBonus(double value) {
+        checkMutable();
         flatEnergyGenerationBonus += value;
     }
 
@@ -931,17 +979,20 @@ public final class MachineStatAccumulator {
     }
 
     public void rollBaseValues(List<MachineStatRange> ranges, RandomSource random) {
+        checkMutable();
         for (MachineStatRange range : ranges) {
             baseValues.put(range.stat(), range.roll(random));
         }
     }
 
     private void add(MachineStat stat, double value) {
+        checkMutable();
         additiveValues.merge(accumulationStat(stat), value, Double::sum);
         record(StatBreakdown.Kind.ADD, stat, value);
     }
 
     private void addIncreasedPercent(MachineStat stat, double value) {
+        checkMutable();
         increasedPercentValues.merge(accumulationStat(stat), value, Double::sum);
         record(StatBreakdown.Kind.INCREASED, stat, value);
         if (value < 0.0) {
@@ -950,6 +1001,7 @@ public final class MachineStatAccumulator {
     }
 
     private void addMore(MachineStat stat, double value) {
+        checkMutable();
         moreValues.merge(accumulationStat(stat), value, (current, next) -> current * next);
         record(StatBreakdown.Kind.MORE, stat, value);
     }

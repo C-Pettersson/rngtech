@@ -60,6 +60,10 @@ import net.neoforged.neoforge.energy.IEnergyStorage;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.ItemStackHandler;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Supplier;
+
 public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuProvider, MachineInfoProvider, MachineMasteryHost {
     public static final int MAX_PROCESSING_SLOTS = 4;
     public static final int MAX_GEAR_SLOTS = 4;
@@ -265,6 +269,10 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
     };
 
     private final BulkSpeedState bulkSpeed = new BulkSpeedState();
+    private final MachineStatsCache displayStatsCache = new MachineStatsCache();
+    private final Supplier<MachineStatAccumulator> displayStatsBuilder = this::buildDisplayStats;
+    private final MachineStatsCache[] laneStatsCaches = new MachineStatsCache[MAX_PROCESSING_SLOTS];
+    private final List<Supplier<MachineStatAccumulator>> laneStatsBuilders = new ArrayList<>(MAX_PROCESSING_SLOTS);
     private final int[] progress = new int[MAX_PROCESSING_SLOTS];
     private final int[] currentTemperature = new int[MAX_PROCESSING_SLOTS];
     private final int[] lastTargetTemperature = new int[MAX_PROCESSING_SLOTS];
@@ -282,6 +290,13 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
 
     public FurnaceBlockEntity(BlockPos pos, BlockState blockState) {
         super(ModBlockEntities.FURNACE.get(), pos, blockState, MachineType.FURNACE, SLOT_INPUT, SLOT_FUEL, SLOT_OUTPUT);
+        trackStatSlots(gearInventory);
+        trackStatSlots(inventory, SLOT_FUEL);
+        for (int lane = 0; lane < MAX_PROCESSING_SLOTS; lane++) {
+            int laneIndex = lane;
+            laneStatsCaches[lane] = new MachineStatsCache();
+            laneStatsBuilders.add(() -> buildLaneStats(laneIndex));
+        }
     }
 
     public static void serverTick(Level level, BlockPos pos, BlockState state, FurnaceBlockEntity furnace) {
@@ -608,12 +623,21 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
     }
 
     public MachineStatAccumulator effectiveStats() {
-        MachineStatAccumulator stats = baseEffectiveStats();
+        return displayStatsCache.get(baseEffectiveStats(), null, 0L, displayStatsBuilder);
+    }
+
+    private MachineStatAccumulator buildDisplayStats() {
+        MachineStatAccumulator stats = baseEffectiveStats().mutable();
         applyDisplayGearStats(stats);
         return stats;
     }
 
     private MachineStatAccumulator baseEffectiveStats() {
+        return cachedStats(bulkSpeed.count());
+    }
+
+    @Override
+    protected MachineStatAccumulator buildStats() {
         MachineStatAccumulator stats = MachineBaseStatCatalog.furnace(furnaceMaterial());
         MachineTraits activeTraits = MachineImplicitCatalog.effectiveTraits(machineTraits(), getBlockState().getBlock());
         stats.apply(activeTraits);
@@ -1221,8 +1245,14 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
         return stats.adjustedEnergyCost(ProcessingEnergyScaling.furnaceEnergy(recipe));
     }
 
+    /** Lane stats follow the base stats and the lane's input item, whose tags pick the lane bonuses. */
     private MachineStatAccumulator statsForLane(int lane) {
-        MachineStatAccumulator stats = baseEffectiveStats();
+        Item input = inventory.getStackInSlot(inputSlot(lane)).getItem();
+        return laneStatsCaches[lane].get(baseEffectiveStats(), input, 0L, laneStatsBuilders.get(lane));
+    }
+
+    private MachineStatAccumulator buildLaneStats(int lane) {
+        MachineStatAccumulator stats = baseEffectiveStats().mutable();
         applyLaneGearStats(stats, lane);
         applySharedHearth(stats);
         if (hasMasteryBehavior("SLAG_RECLAIM") && inventory.getStackInSlot(inputSlot(lane)).is(ModTags.Items.MALFORMED_INGOTS)) {
@@ -1245,7 +1275,7 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
         if (!usesHeatCores() || !hasMasteryBehavior("SHARED_HEARTH")) {
             return;
         }
-        MachineStatAccumulator hottest = baseEffectiveStats();
+        MachineStatAccumulator hottest = baseEffectiveStats().mutable();
         applyBestHeatCoreStats(hottest);
         double shared = Math.floor(hottest.value(MachineStat.MAX_TEMPERATURE) * AscendancyFormulas.SHARED_HEARTH_SHARE);
         if (shared > stats.value(MachineStat.MAX_TEMPERATURE)) {

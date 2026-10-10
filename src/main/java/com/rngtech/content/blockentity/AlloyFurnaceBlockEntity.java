@@ -258,6 +258,7 @@ public class AlloyFurnaceBlockEntity extends BaseMachineBlockEntity implements M
 
     public AlloyFurnaceBlockEntity(BlockPos pos, BlockState blockState) {
         super(ModBlockEntities.ALLOY_FURNACE.get(), pos, blockState, MachineType.ALLOY_FURNACE, SLOT_INPUT_START, SLOT_INPUT_START, SLOT_OUTPUT);
+        trackStatSlots(gearInventory);
     }
 
     public static void serverTick(Level level, BlockPos pos, BlockState state, AlloyFurnaceBlockEntity furnace) {
@@ -468,6 +469,11 @@ public class AlloyFurnaceBlockEntity extends BaseMachineBlockEntity implements M
     }
 
     public MachineStatAccumulator effectiveStats() {
+        return cachedStats(bulkSpeed.count());
+    }
+
+    @Override
+    protected MachineStatAccumulator buildStats() {
         MachineStatAccumulator stats = MachineBaseStatCatalog.alloyFurnace(chassis());
         stats.apply(activeTraits());
         MegaPassiveTree.applyStats(stats, machineProgression(), MachineMasteryFamily.ALLOY_FURNACE);
@@ -678,6 +684,7 @@ public class AlloyFurnaceBlockEntity extends BaseMachineBlockEntity implements M
     /** Tempered Crucible's stability on blend recipes; recipe speed applies to processing time instead. */
     private MachineStatAccumulator routeStats(AlloyFurnaceRecipe recipe, MachineStatAccumulator stats) {
         if (recipe != null && blend(recipe) && hasMasteryBehavior("TEMPERED_CRUCIBLE")) {
+            stats = stats.mutable();
             stats.apply(MegaPassiveTree.behaviorSource(machineProgression(), "TEMPERED_CRUCIBLE"), new MachineModifier(ModifierSlot.IMPLICIT, MachineStat.TEMPERATURE_STABILITY, ModifierOperation.MORE, 1.4));
         }
         return stats;

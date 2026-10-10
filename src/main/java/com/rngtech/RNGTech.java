@@ -1,5 +1,6 @@
 package com.rngtech;
 
+import com.rngtech.content.blockentity.MachineStatsCache;
 import com.rngtech.content.command.RNGTechCommands;
 import com.rngtech.content.corruption.CorruptionDataEvents;
 import com.rngtech.content.item.CableItem;
@@ -27,9 +28,11 @@ import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.config.ModConfig;
+import net.neoforged.fml.event.config.ModConfigEvent;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.fml.loading.FMLEnvironment;
 import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.event.TagsUpdatedEvent;
 import org.slf4j.Logger;
 
 @Mod(RNGTech.MOD_ID)
@@ -62,6 +65,9 @@ public final class RNGTech {
         modBus.addListener(this::commonSetup);
         modBus.addListener(ModCapabilities::register);
         modBus.addListener(ModNetworking::register);
+        modBus.addListener(ModConfigEvent.Loading.class, event -> MachineStatsCache.invalidateAll());
+        modBus.addListener(ModConfigEvent.Reloading.class, event -> MachineStatsCache.invalidateAll());
+        NeoForge.EVENT_BUS.addListener(TagsUpdatedEvent.class, event -> MachineStatsCache.invalidateAll());
         NeoForge.EVENT_BUS.addListener(FieldToolEvents::onLeftClickBlock);
         NeoForge.EVENT_BUS.addListener(FieldToolEvents::onBreakSpeed);
         NeoForge.EVENT_BUS.addListener(FieldToolEvents::onBlockDrops);

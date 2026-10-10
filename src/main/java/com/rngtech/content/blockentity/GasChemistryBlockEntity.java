@@ -258,6 +258,7 @@ public class GasChemistryBlockEntity extends BaseMachineBlockEntity
 
     public GasChemistryBlockEntity(BlockPos pos, BlockState blockState, GasChemistryMachine machine) {
         super(ModBlockEntities.GAS_CHEMISTRY.get(), pos, blockState, machine.machineType(), SLOT_PROCESS_INPUT, SLOT_PROCESS_INPUT, SLOT_PROCESS_OUTPUT);
+        trackStatSlots(gearInventory);
         this.machine = machine;
     }
 
@@ -758,6 +759,11 @@ public class GasChemistryBlockEntity extends BaseMachineBlockEntity
     }
 
     public MachineStatAccumulator effectiveStats() {
+        return cachedStats(0L);
+    }
+
+    @Override
+    protected MachineStatAccumulator buildStats() {
         MachineStatAccumulator stats = switch (machine) {
             case COAL_GASIFIER -> MachineBaseStatCatalog.coalGasifier();
             case SYNGAS_COMBUSTOR -> MachineBaseStatCatalog.syngasCombustor();

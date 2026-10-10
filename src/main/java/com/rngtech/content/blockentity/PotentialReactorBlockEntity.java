@@ -205,6 +205,7 @@ public class PotentialReactorBlockEntity extends BaseMachineBlockEntity implemen
 
     public PotentialReactorBlockEntity(BlockPos pos, BlockState blockState) {
         super(ModBlockEntities.POTENTIAL_REACTOR.get(), pos, blockState, MachineType.POTENTIAL_REACTOR, SLOT_INPUT, SLOT_INPUT, SLOT_RESIDUE);
+        trackStatSlots(gearInventory);
         if (!(blockState.getBlock() instanceof PotentialReactorBlock)) {
             throw new IllegalStateException("Potential reactor block entity created for non-reactor block: " + blockState);
         }
@@ -334,6 +335,11 @@ public class PotentialReactorBlockEntity extends BaseMachineBlockEntity implemen
     }
 
     public MachineStatAccumulator effectiveStats() {
+        return cachedStats(bulkSpeed.count());
+    }
+
+    @Override
+    protected MachineStatAccumulator buildStats() {
         MachineStatAccumulator stats = MachineBaseStatCatalog.potentialReactor();
         stats.apply(MachineImplicitCatalog.effectiveTraits(machineTraits(), getBlockState().getBlock()));
         applyPartStats(stats, chamberStack());

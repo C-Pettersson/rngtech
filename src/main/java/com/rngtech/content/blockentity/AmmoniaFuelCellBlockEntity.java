@@ -180,6 +180,7 @@ public class AmmoniaFuelCellBlockEntity extends BaseMachineBlockEntity
 
     public AmmoniaFuelCellBlockEntity(BlockPos pos, BlockState blockState) {
         super(ModBlockEntities.AMMONIA_FUEL_CELL.get(), pos, blockState, MachineType.AMMONIA_FUEL_CELL, SLOT_RESIDUE, SLOT_RESIDUE, SLOT_RESIDUE);
+        trackStatSlots(gearInventory);
     }
 
     public static void serverTick(Level level, BlockPos pos, BlockState state, AmmoniaFuelCellBlockEntity fuelCell) {
@@ -516,6 +517,11 @@ public class AmmoniaFuelCellBlockEntity extends BaseMachineBlockEntity
     }
 
     public MachineStatAccumulator effectiveStats() {
+        return cachedStats(0L);
+    }
+
+    @Override
+    protected MachineStatAccumulator buildStats() {
         MachineStatAccumulator stats = MachineBaseStatCatalog.ammoniaFuelCell();
         machineTraits().activeModifiers().forEach(stats::apply);
         ComponentBaseStatCatalog.applyEffectiveContribution(stats, membraneStack());

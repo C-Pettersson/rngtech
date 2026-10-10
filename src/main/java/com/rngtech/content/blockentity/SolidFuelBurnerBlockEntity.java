@@ -187,6 +187,7 @@ public class SolidFuelBurnerBlockEntity extends BaseMachineBlockEntity implement
 
     public SolidFuelBurnerBlockEntity(BlockPos pos, BlockState blockState) {
         super(ModBlockEntities.SOLID_FUEL_BURNER.get(), pos, blockState, MachineType.SOLID_FUEL_BURNER, SLOT_FUEL_0, SLOT_FUEL_0, SLOT_FUEL_0);
+        trackStatSlots(gearInventory);
         if (!(blockState.getBlock() instanceof SolidFuelBurnerBlock burnerBlock)) {
             throw new IllegalStateException("Solid fuel burner block entity created for non-burner block: " + blockState);
         }
@@ -312,6 +313,11 @@ public class SolidFuelBurnerBlockEntity extends BaseMachineBlockEntity implement
     }
 
     public MachineStatAccumulator effectiveStats() {
+        return cachedStats(0L);
+    }
+
+    @Override
+    protected MachineStatAccumulator buildStats() {
         MachineStatAccumulator stats = MachineBaseStatCatalog.solidFuelBurner(block.chassis());
         stats.apply(MachineImplicitCatalog.effectiveTraits(machineTraits(), getBlockState().getBlock()));
         applyPartStats(stats, gearInventory.getStackInSlot(SLOT_HEAT_CORE));
