@@ -37,6 +37,10 @@ Recorded 2026-10-10:
 - A fifth outcome, Warped, scales each affix by its own -15% to +15% past its tier range. All five outcomes weigh 20, and the range is set in `outcomes.json`.
 - Blessed pools were widened with more entries per host than Blighted pools.
 
+Recorded 2026-10-11:
+
+- The Stabilization Crystal's vanilla recipe (obsidian, quartz, gold, diamond) was too cheap for an item that deletes Blighted. It is now a `rngtech:calibrated_shaped` recipe: a Stage 5 Calibrated Conductive Component with 85+ stability, two Stabilization Catalysts, two Aluminum Casings, and four Sparksteel Plates. That puts it at Stage 5 beside the catalyst, gated by precision where the catalyst is gated by detuning. 85+ is a draft; the Sparksteel Coil calibration rolls 60-95 before Gear bonuses.
+
 Recorded 2026-10-06:
 
 - The catalyst is gated by RNGTech challenges only: a Stage 5+ Calibrated Kinetic Component inside a 20–35 stability band, two Stage 5+ Malformed Ingots from press or Alloy Furnace failures, and two Jam Debris from under-level Crusher jams. It has no vanilla loot and no vanilla-only ingredient such as Echo Shards.
@@ -82,6 +86,7 @@ Recorded 2026-10-10 during implementation:
 ## Handoff and limits
 
 - Outcome weights and pool values are draft targets. Check in playtest that the +1 Processing Level and +1 Batch Size weights feel rare enough.
+- The Stabilization Crystal's 85+ stability gate is a draft. Check in playtest that a well-built Stage 5 calibrator reaches it often enough.
 - The 20–35 stability band is a draft. Check in playtest that a Stage 5 calibrator can be mistuned into it reliably, and that a well-built one overshoots it.
 - Malformed Ingots carry a free-form material string. The stage ingredient looks it up with `MaterialCatalog.materialStage`, so an ingot with an unknown or missing material never counts.
 - The in-game checklist in the PRD's Test Plan has not been run. Jam Debris, the debris-into-output rule, and a jam keeping its input are covered only by code review and the pure `JamDebris` check.

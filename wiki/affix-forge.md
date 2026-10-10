@@ -184,7 +184,7 @@ Lenses:
 
 {{ crafting("rngtech:power_modifier_lens", "rngtech:speed_modifier_lens", "rngtech:yield_modifier_lens", "rngtech:stability_modifier_lens", "rngtech:control_modifier_lens", "rngtech:kinetic_modifier_lens", "rngtech:efficiency_modifier_lens") }}
 
-Modifier crystals:
+Modifier crystals. The Stabilization Crystal asks for the opposite of the Volatile Catalyst's detuned part: a Stage 5 Calibrated Conductive Component with at least 85% stability, which takes a well-built [Resonance Calibrator](resonance-calibrator.md) with a strong Control Board and a Stabilizer Matrix:
 
 {{ crafting("rngtech:conservation_crystal", "rngtech:frugality_crystal", "rngtech:transmutation_crystal", "rngtech:resonance_crystal", "rngtech:destabilization_crystal", "rngtech:stabilization_crystal") }}
 
