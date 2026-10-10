@@ -1,6 +1,7 @@
 package com.rngtech.content.command;
 
 import com.rngtech.RNGTech;
+import com.rngtech.content.cable.CableStats;
 import com.rngtech.rpg.unique.UniqueCatalog;
 import com.rngtech.rpg.unique.UniqueDefinition;
 
@@ -22,7 +23,10 @@ import net.neoforged.neoforge.event.RegisterCommandsEvent;
 
 import java.util.Collection;
 
-/** {@code /rngtech unique give <players> <id>}: gives each player an unidentified copy, as a quest reward would. */
+/**
+ * {@code /rngtech unique give <players> <id>}: gives each player an unidentified copy, as a quest reward would.
+ * {@code /rngtech cable stats [reset]}: prints how much work cable networks did per tick since the last reset.
+ */
 public final class RNGTechCommands {
     private static final DynamicCommandExceptionType UNKNOWN_UNIQUE =
             new DynamicCommandExceptionType(id -> Component.translatable("rngtech.command.unique.unknown", id));
@@ -45,7 +49,25 @@ public final class RNGTechCommands {
                                                         UniqueCatalog.all().stream().map(unique -> RNGTech.id(unique.id())),
                                                         builder
                                                 ))
-                                                .executes(RNGTechCommands::giveUnique))))));
+                                                .executes(RNGTechCommands::giveUnique)))))
+                .then(Commands.literal("cable")
+                        .then(Commands.literal("stats")
+                                .executes(RNGTechCommands::cableStats)
+                                .then(Commands.literal("reset")
+                                        .executes(RNGTechCommands::resetCableStats)))));
+    }
+
+    /** Debug readout of cable network work per tick, for comparing tick cost before and after a change. */
+    private static int cableStats(CommandContext<CommandSourceStack> context) {
+        String report = CableStats.report(context.getSource().getServer().getTickCount());
+        context.getSource().sendSuccess(() -> Component.literal(report), false);
+        return 1;
+    }
+
+    private static int resetCableStats(CommandContext<CommandSourceStack> context) {
+        CableStats.reset(context.getSource().getServer().getTickCount());
+        context.getSource().sendSuccess(() -> Component.literal("Cable stats reset"), false);
+        return 1;
     }
 
     private static int giveUnique(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
