@@ -306,6 +306,28 @@ COPPER = (184, 115, 51)
 AXIS_PX = ((16 - CX) * 4, (16 - CY) * 4)
 
 
+# Service-port colours shared with the Algae Photobioreactor faces, so ports read the same on every machine.
+PORT_FRAME = (21, 26, 28)
+PORT_PANEL = (34, 42, 45)
+PORT_PIPE = (105, 115, 118)
+PORT_FLUID_IN = (47, 143, 208)
+PORT_FLUID_OUT = (125, 137, 139)
+PORT_ENERGY = (199, 180, 81)
+
+
+def draw_service_ports(image) -> None:
+    """Water inlet (blue), energy output (yellow), and Nitrogen outlet (grey), joined by a pipe, Photobioreactor style."""
+    draw = ImageDraw.Draw(image)
+    draw.line([(18, 39), (45, 39)], fill=(*PORT_PIPE, 255))
+    for left, colour in ((12, PORT_FLUID_IN), (38, PORT_FLUID_OUT)):
+        draw.rectangle([left, 28, left + 13, 36], fill=(*PORT_FRAME, 255))
+        draw.rectangle([left + 2, 30, left + 11, 34], fill=(*colour, 255))
+        draw.line([(left + 6, 37), (left + 6, 38)], fill=(*PORT_PIPE, 255))
+    draw.rectangle([28, 26, 35, 37], fill=(*PORT_PANEL, 255))
+    draw.rectangle([30, 29, 33, 34], fill=(*PORT_ENERGY, 255))
+    draw.line([(31, 38), (32, 38)], fill=(*PORT_PIPE, 255))
+
+
 def write_textures() -> None:
     save(panel_seams(noisy(64, SLATE, "casing")), "casing")
 
@@ -392,9 +414,7 @@ def write_textures() -> None:
         for y in range(top, top + 5):
             for x in range(10, 54):
                 pixels[x, y] = (*shade(COPPER, 26 if y == top else (-26 if y == top + 4 else 0)), 255)
-    draw = ImageDraw.Draw(bus)
-    draw.rectangle([26, 27, 37, 38], fill=(*TEAL_DARK, 255), outline=(*shade(TEAL, 20), 255))
-    draw.rectangle([29, 30, 34, 35], fill=(12, 16, 22, 255))
+    draw_service_ports(bus)
     save(bus, "bus")
 
     gauge = Image.new("RGBA", (16, 16), (*SLATE_DARK, 255))
