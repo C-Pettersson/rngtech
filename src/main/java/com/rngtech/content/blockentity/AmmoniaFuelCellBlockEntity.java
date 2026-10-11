@@ -141,6 +141,7 @@ public class AmmoniaFuelCellBlockEntity extends BaseMachineBlockEntity
     private final IEnergyStorage energyView = new GeneratorEnergyStorage();
     private final EnergyTelemetry energyFlow = new EnergyTelemetry(this::getLevel);
     private final IEnergyStorage trackedEnergyView = energyFlow.track(energyView);
+    private final InstalledBatteryCell batteryCell = new InstalledBatteryCell(this::batteryCellStack);
     private final ContainerData menuData = new ContainerData() {
         @Override
         public int get(int index) {
@@ -511,8 +512,11 @@ public class AmmoniaFuelCellBlockEntity extends BaseMachineBlockEntity
     }
 
     private IEnergyStorage batteryCellStorage() {
-        ItemStack stack = gearInventory.getStackInSlot(SLOT_BATTERY_CELL);
-        return stack.getItem() instanceof BatteryCellItem ? BatteryCellItem.energyStorage(stack) : null;
+        return batteryCell.storage();
+    }
+
+    private ItemStack batteryCellStack() {
+        return gearInventory.getStackInSlot(SLOT_BATTERY_CELL);
     }
 
     private ItemStack membraneStack() {
