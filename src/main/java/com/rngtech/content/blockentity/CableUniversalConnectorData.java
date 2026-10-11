@@ -199,42 +199,13 @@ public final class CableUniversalConnectorData implements UniversalConnectorAcce
 
     public void serverTick() {
         beginEnergyTelemetryTick();
-        pullEnergyFromTarget();
+        requestNetworkEnergyPass();
         tickFluidModules();
         tickItemModules();
     }
 
-    public int receiveFromCableNetwork(Direction cableSide, int networkChannel, int amount, boolean simulate) {
-        if (amount <= 0 || cableSide != face || networkChannel != channel || !mode.sendsNetworkOutput()) {
-            return 0;
-        }
-        Optional<EnergyConnectorTier> tier = connectorTier();
-        if (tier.isEmpty()) {
-            return 0;
-        }
-        Level level = owner.getLevel();
-        if (level == null) {
-            return 0;
-        }
-        int transferable = Math.min(amount, energyOutputBudget.remaining(level.getGameTime(), tier.get().transferRate()));
-        if (transferable <= 0) {
-            return 0;
-        }
-        int inserted = insertIntoTarget(transferable, simulate);
-        if (!simulate) {
-            energyOutputBudget.add(level.getGameTime(), inserted);
-            recordEnergyOutputTransfer(inserted);
-        }
-        return inserted;
-    }
-
     public CableConnectorMode mode() {
         return mode;
-    }
-
-    public IEnergyStorage targetEnergyBuffer() {
-        IEnergyStorage target = targetEnergyStorage();
-        return CableBlockEntity.isEnergyBuffer(target) ? target : null;
     }
 
     /** True when the attached block exposes FE on the side this connector attaches as. */
@@ -242,7 +213,7 @@ public final class CableUniversalConnectorData implements UniversalConnectorAcce
         return targetEnergyStorage() != null;
     }
 
-    private IEnergyStorage targetEnergyStorage() {
+    IEnergyStorage targetEnergyStorage() {
         return energyTarget.get(owner.getLevel(), owner.getBlockPos().relative(face), attachAs);
     }
 
@@ -252,11 +223,36 @@ public final class CableUniversalConnectorData implements UniversalConnectorAcce
                 .withEnergyBuffer(mode == CableConnectorMode.BOTH ? source : null);
     }
 
-    public int transferRateForChannel(int networkChannel) {
-        if (networkChannel != channel || !mode.sendsNetworkOutput()) {
-            return 0;
+    /** The energy channel this connector works on, or -1 without an Energy Connector installed. */
+    int networkEnergyChannel() {
+        return transferRate() > 0 ? channel : -1;
+    }
+
+    EnergyDistributionMode energyDistributionMode() {
+        return distributionMode;
+    }
+
+    /** FE this connector may still take from its block into the network this tick. */
+    int networkEnergyInputBudget() {
+        return connectorTier().map(this::remainingEnergyInputBudget).orElse(0);
+    }
+
+    /** FE this connector may still deliver from the network into its block this tick. */
+    int networkEnergyOutputBudget() {
+        Level level = owner.getLevel();
+        return level == null ? 0 : energyOutputBudget.remaining(level.getGameTime(), transferRate());
+    }
+
+    void recordNetworkEnergyInput(int amount) {
+        recordEnergyInputTransfer(amount);
+    }
+
+    void recordNetworkEnergyOutput(int amount) {
+        Level level = owner.getLevel();
+        if (level != null && amount > 0) {
+            energyOutputBudget.add(level.getGameTime(), amount);
+            recordEnergyOutputTransfer(amount);
         }
-        return transferRate();
     }
 
     void addNetworkDebugStats(CableBlockEntity.NetworkDebugAccumulator accumulator) {
@@ -1017,63 +1013,18 @@ public final class CableUniversalConnectorData implements UniversalConnectorAcce
         return moved;
     }
 
-    private boolean pullEnergyFromTarget() {
+    /** An Input or Both connector asks for its network's energy pass, which pulls FE from every source at once. */
+    private void requestNetworkEnergyPass() {
         Level level = owner.getLevel();
-        if (level == null || level.isClientSide || !mode.acceptsNetworkInput()) {
-            return false;
+        // A standalone plate has no cable, so it has no network to run a pass on.
+        if (level == null
+                || level.isClientSide
+                || !(owner instanceof CableBlockEntity)
+                || !mode.acceptsNetworkInput()
+                || transferRate() <= 0) {
+            return;
         }
-
-        Optional<EnergyConnectorTier> tier = connectorTier();
-        if (tier.isEmpty()) {
-            return false;
-        }
-
-        int request = remainingEnergyInputBudget(tier.get());
-        if (request <= 0) {
-            return false;
-        }
-
-        IEnergyStorage source = targetEnergyStorage();
-        if (source == null || !source.canExtract()) {
-            return false;
-        }
-
-        int extractable = source.extractEnergy(request, true);
-        if (extractable <= 0) {
-            return false;
-        }
-
-        BlockPos ownerPos = owner.getBlockPos();
-        CableBlockEntity.TransferOrigin sourceOrigin = energySourceOrigin(source);
-        int accepted = CableBlockEntity.distributeEnergy(
-                level,
-                ownerPos,
-                sourceOrigin,
-                channel,
-                extractable,
-                true,
-                distributionMode
-        );
-        if (accepted <= 0) {
-            return false;
-        }
-
-        int extracted = source.extractEnergy(accepted, false);
-        if (extracted <= 0) {
-            return false;
-        }
-
-        int moved = CableBlockEntity.distributeEnergy(
-                level,
-                ownerPos,
-                sourceOrigin,
-                channel,
-                extracted,
-                false,
-                distributionMode
-        );
-        recordEnergyInputTransfer(moved);
-        return moved > 0;
+        CableBlockEntity.requestEnergyPass(level, owner.getBlockPos(), channel);
     }
 
     private int remainingEnergyInputBudget(EnergyConnectorTier tier) {
@@ -1142,18 +1093,6 @@ public final class CableUniversalConnectorData implements UniversalConnectorAcce
         lastEnergyOutputMoved = energyOutputMovedThisTick;
         energyInputMovedThisTick = 0;
         energyOutputMovedThisTick = 0;
-    }
-
-    private int insertIntoTarget(int amount, boolean simulate) {
-        Level level = owner.getLevel();
-        if (level == null || amount <= 0) {
-            return 0;
-        }
-        IEnergyStorage target = targetEnergyStorage();
-        if (target == null || !target.canReceive()) {
-            return 0;
-        }
-        return target.receiveEnergy(Math.min(amount, transferRate()), simulate);
     }
 
     private ItemStack distributeItemToNetwork(int itemChannel, ItemStack stack, boolean simulate) {

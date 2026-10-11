@@ -108,7 +108,7 @@ A dyed Cable keeps its color when you mine it. The color shows on the cable's gl
 | Channel | 0–15. Connectors only exchange with the same channel. Energy, Fluid, Item, and Bridge channels are separate. |
 | Mode | Energy: Input takes FE from the machine into the cable, Output sends FE from the cable into the machine, and Both does both. Hover a mode button for its description. Fluid and Item rows: IN pulls from the machine into the cable, OUT pushes from the cable into the machine. |
 | Attach As | Which side of the machine the connector acts as. For example, a connector under a machine can insert as if it were on top. Set a Fluid or Item row to None to switch it off. |
-| Distribution | Energy only. Round Robin rotates between outputs, Even splits each transfer and then sends leftovers to outputs that can still take more, First Available fills outputs in order. |
+| Distribution | Energy only. How this connector splits the FE it gives each tick: Round Robin rotates between outputs, Even splits it evenly and then sends leftovers to outputs that can still take more, First Available fills outputs in order. |
 | Filters | Fluid and Item rows each have two ghost filter slots. Filters are copies and are never used up. |
 
 A new connector starts on channel 0, with Energy mode Both, Distribution Round Robin, and every Fluid and Item row set to IN. Attach As starts as the machine face the connector actually touches. Each Fluid and Item row has its own mode, channel, and Attach, and several rows can share a channel and side.
@@ -128,6 +128,15 @@ The Energy tab has one Energy Connector slot. The connector pulls FE from machin
 | {{ item('rngtech:exotic_energy_connector') }} | 8 | 1,000,000 FE/t |
 
 The tier is a per-tick cap in both directions. A connector takes at most its tier in FE/t from its machine, and delivers at most its tier in FE/t into its machine, however many generators feed the network. Most machines do not limit how fast they take or give FE, so the connector tier is usually what sets the rate.
+
+**Sharing the load.** Each tick, every energy channel moves its FE in one step, after all machines have run. Every Input or Both connector offers what its machine can give, every Output or Both connector asks for what its machine can take, and then the FE is shared out in this order:
+
+1. Generators feed machines. When generators offer more than the machines need, each generator gives the same share of what it offers, so they share the load instead of one doing all the work.
+2. Spare FE from generators charges storage blocks.
+3. Storage blocks cover what the machines still need.
+4. Storage blocks even out with each other (see below).
+
+Each connector's Distribution setting decides how its own share is split between the receiving connectors. The result does not depend on the order you placed things in. Machines that push FE into a connector on their own deliver it right away, by the same rules.
 
 **Storage balancing.** A storage block is any block that can both take and give FE at that moment, such as a [Battery Chassis](battery-chassis.md). Between two storage blocks whose connectors are both on Both, FE flows only from the fuller block to the emptier one, by fill percentage, and stops once they are equally full. Gaps under 1% move nothing, so idle banks do not trade FE back and forth and lose it to charge and discharge losses. Daisy-chained banks still pass charge along: a generator charges the first bank, and the first bank shares with the next. Generators still charge banks, and banks still feed machines. A completely full bank passes its overflow on freely, and a completely empty bank takes FE freely. To fill one bank from another regardless of fill, set the source bank's connector to Input or the destination bank's connector to Output.
 

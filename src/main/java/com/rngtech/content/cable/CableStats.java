@@ -12,7 +12,10 @@ public final class CableStats {
         NETWORK_REBUILDS("network rebuilds"),
         CABLES_SCANNED("cables scanned by rebuilds"),
         TARGET_QUERIES("connector target queries"),
-        TARGET_LOOKUPS("connector target capability lookups");
+        TARGET_LOOKUPS("connector target capability lookups"),
+        ENERGY_PASSES("network energy passes"),
+        ENERGY_PORTS("energy connectors visited by passes"),
+        ENERGY_LOST("FE no block would take back");
 
         private final String label;
 
