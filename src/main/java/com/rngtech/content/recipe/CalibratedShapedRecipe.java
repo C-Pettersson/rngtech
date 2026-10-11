@@ -1,6 +1,8 @@
 package com.rngtech.content.recipe;
 
+import com.rngtech.content.calibration.CalibrationState;
 import com.rngtech.content.item.CraftedTraitOutputs;
+import com.rngtech.content.registry.ModDataComponents;
 import com.rngtech.content.registry.ModItems;
 import com.rngtech.content.registry.ModRecipes;
 
@@ -24,13 +26,15 @@ import net.minecraft.world.level.Level;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 public record CalibratedShapedRecipe(
         String group,
         CraftingBookCategory category,
         List<String> pattern,
         Map<String, CalibratedIngredient> key,
-        ItemStack result
+        ItemStack result,
+        String recordCalibration
 ) implements CraftingRecipe {
     public CalibratedShapedRecipe {
         pattern = List.copyOf(pattern);
@@ -54,7 +58,25 @@ public record CalibratedShapedRecipe(
 
     @Override
     public ItemStack assemble(CraftingInput input, HolderLookup.Provider registries) {
-        return CraftedTraitOutputs.seedIfMissing(result.copy(), RandomSource.create());
+        ItemStack output = CraftedTraitOutputs.seedIfMissing(result.copy(), RandomSource.create());
+        recordedCalibration(input).ifPresent(state -> output.set(ModDataComponents.SOURCE_CALIBRATION.get(), state));
+        return output;
+    }
+
+    /** The calibration state of the input under {@code record_calibration}, copied so the crafted result can read it. */
+    private Optional<CalibrationState> recordedCalibration(CraftingInput input) {
+        CalibratedIngredient recorded = key.get(recordCalibration);
+        if (recorded == null) {
+            return Optional.empty();
+        }
+        for (int slot = 0; slot < input.size(); slot++) {
+            ItemStack stack = input.getItem(slot);
+            CalibrationState state = stack.get(ModDataComponents.CALIBRATION_STATE.get());
+            if (state != null && recorded.test(stack)) {
+                return Optional.of(state);
+            }
+        }
+        return Optional.empty();
     }
 
     @Override
@@ -151,7 +173,8 @@ public record CalibratedShapedRecipe(
                         Codec.unboundedMap(Codec.STRING, CalibratedIngredient.CODEC)
                                 .fieldOf("key")
                                 .forGetter(CalibratedShapedRecipe::key),
-                        ItemStack.STRICT_CODEC.fieldOf("result").forGetter(CalibratedShapedRecipe::result)
+                        ItemStack.STRICT_CODEC.fieldOf("result").forGetter(CalibratedShapedRecipe::result),
+                        Codec.STRING.optionalFieldOf("record_calibration", "").forGetter(CalibratedShapedRecipe::recordCalibration)
                 )
                 .apply(instance, CalibratedShapedRecipe::new));
 
@@ -172,7 +195,8 @@ public record CalibratedShapedRecipe(
                             key.put(ByteBufCodecs.STRING_UTF8.decode(buffer), CalibratedIngredient.STREAM_CODEC.decode(buffer));
                         }
                         ItemStack result = ItemStack.STREAM_CODEC.decode(buffer);
-                        return new CalibratedShapedRecipe(group, category, pattern, key, result);
+                        String recordCalibration = ByteBufCodecs.STRING_UTF8.decode(buffer);
+                        return new CalibratedShapedRecipe(group, category, pattern, key, result, recordCalibration);
                     }
 
                     @Override
@@ -189,6 +213,7 @@ public record CalibratedShapedRecipe(
                             CalibratedIngredient.STREAM_CODEC.encode(buffer, entry.getValue());
                         }
                         ItemStack.STREAM_CODEC.encode(buffer, recipe.result);
+                        ByteBufCodecs.STRING_UTF8.encode(buffer, recipe.recordCalibration);
                     }
                 };
 

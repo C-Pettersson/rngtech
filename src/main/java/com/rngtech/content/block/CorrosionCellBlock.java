@@ -7,6 +7,8 @@ import com.rngtech.content.registry.ModDataComponents;
 import com.rngtech.rpg.MachineTraits;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -42,6 +44,35 @@ public class CorrosionCellBlock extends BaseMachineBlock {
             return null;
         }
         return createTickerHelper(blockEntityType, ModBlockEntities.CORROSION_CELL.get(), CorrosionCellBlockEntity::serverTick);
+    }
+
+    /** Hydrogen from the dissolving fuel vents as a faint mist from the stack, more of it at higher current. */
+    @Override
+    public void animateTick(BlockState state, Level level, BlockPos pos, RandomSource random) {
+        if (!(level.getBlockEntity(pos) instanceof CorrosionCellBlockEntity cell)) {
+            return;
+        }
+        float current = cell.visualState().current();
+        if (current <= 0.0F) {
+            return;
+        }
+        double x = 2.5 / 16.0 - 0.5;
+        double z = 11.75 / 16.0 - 0.5;
+        double angle = Math.toRadians(180.0 - state.getValue(FACING).toYRot());
+        double worldX = x * Math.cos(angle) + z * Math.sin(angle);
+        double worldZ = -x * Math.sin(angle) + z * Math.cos(angle);
+        int puffs = 1 + (random.nextFloat() < current ? 1 : 0);
+        for (int puff = 0; puff < puffs; puff++) {
+            level.addParticle(
+                    ParticleTypes.WHITE_SMOKE,
+                    pos.getX() + 0.5 + worldX + (random.nextDouble() - 0.5) * 0.05,
+                    pos.getY() + 15.9 / 16.0,
+                    pos.getZ() + 0.5 + worldZ + (random.nextDouble() - 0.5) * 0.05,
+                    0.0,
+                    0.02 + 0.03 * current,
+                    0.0
+            );
+        }
     }
 
     @Override

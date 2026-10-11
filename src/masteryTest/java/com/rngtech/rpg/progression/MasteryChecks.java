@@ -57,12 +57,14 @@ public final class MasteryChecks {
         checks += AscendancyChecks.run();
         checks += PartGenerationChecks.run();
         checks += CrusherYieldChecks.run();
+        checks += com.rngtech.content.energy.CorrosionCellLoadChecks.run();
         checks += RefinementChecks.run();
         checks += CorruptionChecks.run();
         checks += com.rngtech.content.item.CorruptionTooltipChecks.run();
         checks += StatBreakdownChecks.run();
         checks += UniqueChecks.run();
         checks += CodecRoundTripChecks.run();
+        checks += com.rngtech.content.energy.CavitationRotorChecks.run();
         checks += com.rngtech.content.blockentity.AlgaeCultureChecks.run();
         System.out.println("Machine mastery: " + checks + " checks passed");
         ForestryTreeScanChecks.run();
