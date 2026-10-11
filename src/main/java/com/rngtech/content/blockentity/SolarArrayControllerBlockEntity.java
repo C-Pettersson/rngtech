@@ -35,7 +35,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.energy.IEnergyStorage;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.ItemStackHandler;
@@ -179,6 +178,9 @@ public class SolarArrayControllerBlockEntity extends BaseMachineBlockEntity impl
     private int lastBlockedPanelCount;
     private int lastStatus = STATUS_NO_PANELS;
     private boolean previewRange;
+    private final InstalledCellStats cells = new InstalledCellStats();
+    private MachineStatAccumulator capacityStats;
+    private int internalCapacity;
 
     public SolarArrayControllerBlockEntity(BlockPos pos, BlockState blockState) {
         super(ModBlockEntities.SOLAR_ARRAY_CONTROLLER.get(), pos, blockState, MachineType.SOLAR_ARRAY_CONTROLLER, 0, 0, 0);
@@ -562,9 +564,8 @@ public class SolarArrayControllerBlockEntity extends BaseMachineBlockEntity impl
         int stored = receiveInternalEnergy(remaining, stats, false);
         remaining -= stored;
 
-        IEnergyStorage cell = batteryCellEnergyStorage();
-        if (cell != null && cell.canReceive() && remaining > 0) {
-            int cellStored = cell.receiveEnergy(remaining, false);
+        if (remaining > 0) {
+            int cellStored = BatteryCellItem.receiveEnergy(batteryCellStack(), cellStats(), remaining, false);
             if (cellStored > 0) {
                 stored += cellStored;
                 setChanged();
@@ -630,9 +631,8 @@ public class SolarArrayControllerBlockEntity extends BaseMachineBlockEntity impl
         }
         remaining -= extracted;
 
-        IEnergyStorage cell = batteryCellEnergyStorage();
-        if (cell != null && cell.canExtract() && remaining > 0) {
-            int cellExtracted = cell.extractEnergy(remaining, simulate);
+        if (remaining > 0) {
+            int cellExtracted = BatteryCellItem.extractEnergy(batteryCellStack(), cellStats(), remaining, simulate);
             extracted += cellExtracted;
             if (!simulate && cellExtracted > 0) {
                 setChanged();
@@ -646,15 +646,31 @@ public class SolarArrayControllerBlockEntity extends BaseMachineBlockEntity impl
     }
 
     private int energyStored(MachineStatAccumulator stats) {
-        return internalEnergyStored(stats) + BatteryCellItem.energyStored(batteryCellStack());
+        return internalEnergyStored(stats) + BatteryCellItem.energyStored(batteryCellStack(), cellStats().capacity());
     }
 
     private int energyCapacity(MachineStatAccumulator stats) {
-        return internalEnergyCapacity(stats) + BatteryCellItem.energyCapacity(batteryCellStack());
+        return internalEnergyCapacity(stats) + cellStats().capacity();
     }
 
+    /** The internal buffer's capacity, recomputed only when the stats are rebuilt. */
     private int internalEnergyCapacity(MachineStatAccumulator stats) {
-        return Math.max(1, (int) Math.round(stats.value(MachineStat.ENERGY_CAPACITY)));
+        if (stats != capacityStats) {
+            internalCapacity = Math.max(1, (int) Math.round(stats.value(MachineStat.ENERGY_CAPACITY)));
+            capacityStats = stats;
+        }
+        return internalCapacity;
+    }
+
+    /** The installed Battery Cell's stats, rebuilt only when the cell is swapped or refined. */
+    private BatteryCellItem.CellStats cellStats() {
+        cells.refresh(gearInventory);
+        return cells.get(SLOT_BATTERY_CELL);
+    }
+
+    /** How many times this controller built its Battery Cell's stats, for checks that a steady controller builds none. */
+    public int cellStatsBuilds() {
+        return cells.builds();
     }
 
     private int internalEnergyStored(MachineStatAccumulator stats) {
@@ -780,11 +796,6 @@ public class SolarArrayControllerBlockEntity extends BaseMachineBlockEntity impl
             }
         }
         return material != null;
-    }
-
-    private IEnergyStorage batteryCellEnergyStorage() {
-        ItemStack stack = batteryCellStack();
-        return stack.isEmpty() ? null : stack.getCapability(Capabilities.EnergyStorage.ITEM);
     }
 
     private ItemStack batteryCellStack() {
