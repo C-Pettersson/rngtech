@@ -77,8 +77,7 @@ public class MetalPressMenu extends AbstractContainerMenu implements MasteryMenu
     private static final int GEAR_SLOT_END = GEAR_SLOT_START + MetalPressBlockEntity.GEAR_SLOT_COUNT;
     private static final int REFINEMENT_CONSUMABLE_SLOT = GEAR_SLOT_END;
     private static final int REFINEMENT_TARGET_SLOT = REFINEMENT_CONSUMABLE_SLOT + 1;
-    private static final int PROCESSING_TARGET_SLOT = REFINEMENT_TARGET_SLOT + 1;
-    private static final int MENU_MACHINE_SLOT_COUNT = PROCESSING_TARGET_SLOT + 1;
+    private static final int MENU_MACHINE_SLOT_COUNT = REFINEMENT_TARGET_SLOT + 1;
     private static final int PLAYER_INVENTORY_START = MENU_MACHINE_SLOT_COUNT;
     private static final int PLAYER_INVENTORY_END = PLAYER_INVENTORY_START + 27;
     private static final int HOTBAR_END = PLAYER_INVENTORY_END + 9;
@@ -143,7 +142,6 @@ public class MetalPressMenu extends AbstractContainerMenu implements MasteryMenu
                 () -> selectedTab == TAB_REFINEMENT
         ));
         addSlot(RefinementMenuSupport.targetDisplaySlot(refinementTarget, RefinementMenuSupport.REFINEMENT_TARGET_SLOT_X, RefinementMenuSupport.REFINEMENT_SLOT_Y, () -> selectedTab == TAB_REFINEMENT));
-        addSlot(RefinementMenuSupport.targetDisplaySlot(refinementTarget, 204, 42, () -> selectedTab == TAB_PROCESSING));
 
         addPlayerInventory(playerInventory);
         addDataSlots(data);

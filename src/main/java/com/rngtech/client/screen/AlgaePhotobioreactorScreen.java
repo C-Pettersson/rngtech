@@ -1,14 +1,21 @@
 package com.rngtech.client.screen;
 
+import com.rngtech.content.blockentity.AlgaeCultureDynamics;
 import com.rngtech.content.blockentity.AlgaePhotobioreactorBlockEntity;
 import com.rngtech.content.menu.AlgaePhotobioreactorMenu;
 import com.rngtech.rpg.MachineStat;
 
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.Component;
+import net.minecraft.util.FastColor;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.level.material.Fluid;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
 
 public class AlgaePhotobioreactorScreen extends AbstractContainerScreen<AlgaePhotobioreactorMenu> {
     private static final int PANEL = 0xFFC6C6C6;
@@ -36,6 +43,22 @@ public class AlgaePhotobioreactorScreen extends AbstractContainerScreen<AlgaePho
     private static final int STATUS_SIZE = 12;
     private static final int LIGHT_X = 114;
     private static final int LIGHT_Y = 37;
+    private static final int CULTURE_X = 130;
+    private static final int CULTURE_Y = 37;
+    private static final int CULTURE_WIDTH = 26;
+    private static final int CULTURE_PALE = 0xFFD8EC8E;
+    private static final int CULTURE_DENSE = 0xFF48B83E;
+    private static final int AERATION_X = 98;
+    private static final int AERATION_Y = 21;
+    private static final int AERATION_WIDTH = 58;
+    private static final int AERATION_HEIGHT = 8;
+    private static final int AERATION_POINTER_HEIGHT = 3;
+    private static final int AERATION_LEAN_ZONE = 0xFF2E5A4A;
+    private static final int AERATION_RICH_ZONE = 0xFF6A5A2E;
+    private static final int AERATION_FILL = 0xFF8FE3C0;
+    private static final int AERATION_POINTER = 0xFFF2F2F2;
+    private static final int AERATION_COARSE_STEP = 5;
+    private static final int AERATION_NOTCH_STEP = 10;
     private static final int TAB_WIDTH = 54;
     private static final int TAB_SPACING = 56;
     private static final int OUTPUT_X = 138;
@@ -114,8 +137,41 @@ public class AlgaePhotobioreactorScreen extends AbstractContainerScreen<AlgaePho
             if (menu.selectedTab() == AlgaePhotobioreactorMenu.TAB_PROCESSING && handlePurgeButtonClick(mouseX, mouseY)) {
                 return true;
             }
+            if (menu.selectedTab() == AlgaePhotobioreactorMenu.TAB_PROCESSING && isOverAerationGauge(mouseX, mouseY)) {
+                double fraction = (mouseX - (leftPos + AERATION_X + 1)) / (AERATION_WIDTH - 2);
+                int span = AlgaeCultureDynamics.MAX_AERATION - AlgaeCultureDynamics.MIN_AERATION;
+                sendAeration(AlgaeCultureDynamics.MIN_AERATION + (int) Math.round(fraction * span));
+                return true;
+            }
         }
         return super.mouseClicked(mouseX, mouseY, button);
+    }
+
+    @Override
+    public boolean mouseScrolled(double mouseX, double mouseY, double scrollX, double scrollY) {
+        if (menu.selectedTab() == AlgaePhotobioreactorMenu.TAB_PROCESSING && isOverAerationGauge(mouseX, mouseY) && scrollY != 0.0) {
+            int step = hasShiftDown() ? AERATION_COARSE_STEP : 1;
+            sendAeration(menu.aeration() + (scrollY > 0.0 ? step : -step));
+            return true;
+        }
+        return super.mouseScrolled(mouseX, mouseY, scrollX, scrollY);
+    }
+
+    private void sendAeration(int aeration) {
+        int clamped = AlgaeCultureDynamics.clampAeration(aeration);
+        if (clamped == menu.aeration() || minecraft == null || minecraft.player == null || minecraft.gameMode == null) {
+            return;
+        }
+        int buttonId = AlgaePhotobioreactorMenu.aerationButtonId(clamped);
+        if (menu.clickMenuButton(minecraft.player, buttonId)) {
+            minecraft.gameMode.handleInventoryButtonClick(menu.containerId, buttonId);
+        }
+    }
+
+    private boolean isOverAerationGauge(double mouseX, double mouseY) {
+        int left = leftPos + AERATION_X;
+        int top = topPos + AERATION_Y;
+        return mouseX >= left && mouseX < left + AERATION_WIDTH && mouseY >= top && mouseY < top + AERATION_HEIGHT + AERATION_POINTER_HEIGHT;
     }
 
     private void renderPanel(GuiGraphics guiGraphics) {
@@ -177,7 +233,87 @@ public class AlgaePhotobioreactorScreen extends AbstractContainerScreen<AlgaePho
         renderProgress(guiGraphics);
         renderStatusSquare(guiGraphics, STATUS_X, STATUS_Y, statusColor());
         renderStatusSquare(guiGraphics, LIGHT_X, LIGHT_Y, menu.lightLevel() >= menu.minimumLight() ? LIGHT : PANEL_DARK);
+        renderCulture(guiGraphics);
+        renderAerationGauge(guiGraphics);
         renderPurgeButtons(guiGraphics);
+    }
+
+    private void renderCulture(GuiGraphics guiGraphics) {
+        int x = leftPos + CULTURE_X;
+        int y = topPos + CULTURE_Y;
+        guiGraphics.fill(x, y, x + CULTURE_WIDTH, y + STATUS_SIZE, 0xFF373737);
+        float density = (float) menu.cultureDensity();
+        int width = Math.round((CULTURE_WIDTH - 4) * density);
+        guiGraphics.fill(x + 2, y + 2, x + 2 + width, y + STATUS_SIZE - 2, cultureColor(density));
+    }
+
+    /** Pale yellow-green for a thin culture, deep green for a dense one, matching the placed block. */
+    private static int cultureColor(float density) {
+        return FastColor.ARGB32.lerp(density, CULTURE_PALE, CULTURE_DENSE);
+    }
+
+    /** Aeration from lean to rich, with the rated setting marked. The pointer marks the selected aeration. */
+    private void renderAerationGauge(GuiGraphics guiGraphics) {
+        int left = leftPos + AERATION_X;
+        int top = topPos + AERATION_Y;
+        int inner = AERATION_WIDTH - 2;
+        int rated = left + 1 + aerationOffset(AlgaeCultureDynamics.RATED_AERATION, inner);
+        int right = left + 1 + inner;
+        int bottom = top + AERATION_HEIGHT - 1;
+        guiGraphics.fill(left, top, left + AERATION_WIDTH, top + AERATION_HEIGHT, BAR_BACKING);
+        guiGraphics.fill(left + 1, top + 1, rated, bottom, AERATION_LEAN_ZONE);
+        guiGraphics.fill(rated, top + 1, right, bottom, AERATION_RICH_ZONE);
+        int pointer = Math.min(left + 1 + aerationOffset(menu.aeration(), inner), right - 1);
+        guiGraphics.fill(left + 1, top + 3, Math.max(left + 1, pointer), bottom - 2, AERATION_FILL);
+        for (int notch = AlgaeCultureDynamics.MIN_AERATION; notch <= AlgaeCultureDynamics.MAX_AERATION; notch += AERATION_NOTCH_STEP) {
+            int x = Math.min(left + 1 + aerationOffset(notch, inner), right - 1);
+            guiGraphics.fill(x, top + 1, x + 1, top + 2, PANEL_DARK);
+        }
+        guiGraphics.fill(rated, top + 1, rated + 1, bottom, PANEL_LIGHT);
+        int pointerTop = top + AERATION_HEIGHT;
+        guiGraphics.fill(pointer, pointerTop - 1, pointer + 1, pointerTop + AERATION_POINTER_HEIGHT, AERATION_POINTER);
+        guiGraphics.fill(pointer - 1, pointerTop + 1, pointer + 2, pointerTop + AERATION_POINTER_HEIGHT, AERATION_POINTER);
+    }
+
+    private static int aerationOffset(int aeration, int width) {
+        int span = AlgaeCultureDynamics.MAX_AERATION - AlgaeCultureDynamics.MIN_AERATION;
+        int clamped = AlgaeCultureDynamics.clampAeration(aeration) - AlgaeCultureDynamics.MIN_AERATION;
+        return (int) Math.round(clamped / (double) span * width);
+    }
+
+    private List<Component> aerationTooltip() {
+        int aeration = menu.aeration();
+        String regime = aeration < AlgaeCultureDynamics.RATED_AERATION
+                ? "lean"
+                : aeration == AlgaeCultureDynamics.RATED_AERATION ? "rated" : "rich";
+        List<Component> lines = new ArrayList<>();
+        lines.add(Component.translatable(
+                "rngtech.algae_photobioreactor.tooltip.aeration",
+                aeration,
+                Component.translatable("rngtech.algae_photobioreactor.aeration." + regime)
+        ));
+        lines.add(Component.translatable(
+                "rngtech.algae_photobioreactor.tooltip.aeration_effects",
+                multiplier(AlgaeCultureDynamics.growth(aeration)),
+                multiplier(AlgaeCultureDynamics.carbonPerBiomass(aeration))
+        ).withStyle(ChatFormatting.GRAY));
+        if (menu.carbonPerHarvest() > 0) {
+            lines.add(Component.translatable("rngtech.algae_photobioreactor.tooltip.carbon_per_harvest", menu.carbonPerHarvest())
+                    .withStyle(ChatFormatting.GRAY));
+        }
+        lines.add(Component.translatable("rngtech.algae_photobioreactor.tooltip.aeration_hint").withStyle(ChatFormatting.DARK_GRAY));
+        return lines;
+    }
+
+    private List<Component> cultureTooltip() {
+        return List.of(
+                Component.translatable("rngtech.algae_photobioreactor.tooltip.culture", Math.round(menu.cultureDensity() * 100.0)),
+                Component.translatable("rngtech.algae_photobioreactor.tooltip.culture_hint").withStyle(ChatFormatting.GRAY)
+        );
+    }
+
+    private static String multiplier(double value) {
+        return String.format(Locale.ROOT, "%.2f", value);
     }
 
     private void renderStats(GuiGraphics guiGraphics) {
@@ -268,6 +404,14 @@ public class AlgaePhotobioreactorScreen extends AbstractContainerScreen<AlgaePho
             return;
         }
         if (renderPurgeTooltips(guiGraphics, mouseX, mouseY)) {
+            return;
+        }
+        if (isOverAerationGauge(mouseX, mouseY)) {
+            guiGraphics.renderComponentTooltip(font, aerationTooltip(), mouseX, mouseY);
+            return;
+        }
+        if (isHovering(CULTURE_X, CULTURE_Y, CULTURE_WIDTH, STATUS_SIZE, mouseX, mouseY)) {
+            guiGraphics.renderComponentTooltip(font, cultureTooltip(), mouseX, mouseY);
             return;
         }
         CompactValueText.renderTooltipIfHovered(

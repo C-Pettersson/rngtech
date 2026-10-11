@@ -1,5 +1,6 @@
 package com.rngtech.content.menu;
 
+import com.rngtech.content.blockentity.AlgaeCultureDynamics;
 import com.rngtech.content.blockentity.AlgaePhotobioreactorBlockEntity;
 import com.rngtech.content.purge.FluidPurgeSupport;
 import com.rngtech.content.registry.ModBlocks;
@@ -43,7 +44,12 @@ public class AlgaePhotobioreactorMenu extends AbstractContainerMenu implements S
     private static final int DATA_OUTPUT_BONUS_PROGRESS = 10;
     private static final int DATA_WATER_FLUID_ID = 11;
     private static final int DATA_CARBON_FLUID_ID = 12;
-    private static final int DATA_COUNT = 13;
+    private static final int DATA_AERATION = 13;
+    private static final int DATA_DENSITY = 14;
+    private static final int DATA_CARBON_PER_HARVEST = 15;
+    private static final int DATA_COUNT = 16;
+    private static final int DENSITY_SCALE = 1000;
+    private static final int BUTTON_AERATION_BASE = 8000;
     private static final int STAT_SCALE = 100;
     private static final int OUTPUT_BONUS_PROGRESS_SCALE = 1000;
     private static final int BIO_CHAMBER_SLOT = 5;
@@ -203,9 +209,37 @@ public class AlgaePhotobioreactorMenu extends AbstractContainerMenu implements S
         return DATA_BIO_CONVERSION;
     }
 
+    public int aeration() {
+        return data.get(DATA_AERATION);
+    }
+
+    /** Culture density, 0 to 1. */
+    public double cultureDensity() {
+        return data.get(DATA_DENSITY) / (double) DENSITY_SCALE;
+    }
+
+    /** Carbon gas one Algae Biomass uses at the selected aeration; 0 without a recipe. */
+    public int carbonPerHarvest() {
+        return data.get(DATA_CARBON_PER_HARVEST);
+    }
+
+    public static int aerationButtonId(int aeration) {
+        return BUTTON_AERATION_BASE + AlgaeCultureDynamics.clampAeration(aeration);
+    }
+
     @Override
     public boolean clickMenuButton(Player player, int id) {
-        return FluidPurgeSupport.handleMenuButton(player, reactor, id);
+        if (FluidPurgeSupport.handleMenuButton(player, reactor, id)) {
+            return true;
+        }
+        int aeration = id - BUTTON_AERATION_BASE;
+        if (aeration >= AlgaeCultureDynamics.MIN_AERATION && aeration <= AlgaeCultureDynamics.MAX_AERATION) {
+            if (!player.level().isClientSide) {
+                reactor.setAeration(aeration);
+            }
+            return true;
+        }
+        return false;
     }
 
     @Override

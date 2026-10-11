@@ -4,6 +4,8 @@ import com.rngtech.content.blockentity.AlgaePhotobioreactorBlockEntity;
 import com.rngtech.content.registry.ModBlockEntities;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -43,6 +45,20 @@ public class AlgaePhotobioreactorBlock extends BaseMachineBlock {
                 ModBlockEntities.ALGAE_PHOTOBIOREACTOR.get(),
                 AlgaePhotobioreactorBlockEntity::serverTick
         );
+    }
+
+    /** Oxygen bubbles off the degassing vent while the culture grows. */
+    @Override
+    public void animateTick(BlockState state, Level level, BlockPos pos, RandomSource random) {
+        if (!state.getValue(ACTIVE) || random.nextInt(4) != 0) {
+            return;
+        }
+        double x = 2.5 / 16.0 - 0.5;
+        double z = 5.0 / 16.0 - 0.5;
+        double angle = Math.toRadians(180.0 - state.getValue(FACING).toYRot());
+        double worldX = x * Math.cos(angle) + z * Math.sin(angle);
+        double worldZ = -x * Math.sin(angle) + z * Math.cos(angle);
+        level.addParticle(ParticleTypes.BUBBLE_POP, pos.getX() + 0.5 + worldX, pos.getY() + 1.02, pos.getZ() + 0.5 + worldZ, 0.0, 0.02, 0.0);
     }
 
     @Override

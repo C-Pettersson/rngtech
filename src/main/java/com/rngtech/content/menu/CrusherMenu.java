@@ -80,8 +80,7 @@ public class CrusherMenu extends AbstractContainerMenu implements MasteryMenuVie
     private static final int MACHINE_SLOT_COUNT = CrusherBlockEntity.SLOT_COUNT;
     private static final int REFINEMENT_CONSUMABLE_SLOT = MACHINE_SLOT_COUNT;
     private static final int REFINEMENT_TARGET_SLOT = REFINEMENT_CONSUMABLE_SLOT + 1;
-    private static final int PROCESSING_TARGET_SLOT = REFINEMENT_TARGET_SLOT + 1;
-    private static final int MENU_MACHINE_SLOT_COUNT = PROCESSING_TARGET_SLOT + 1;
+    private static final int MENU_MACHINE_SLOT_COUNT = REFINEMENT_TARGET_SLOT + 1;
     private static final int PLAYER_INVENTORY_START = MENU_MACHINE_SLOT_COUNT;
     private static final int PLAYER_INVENTORY_END = PLAYER_INVENTORY_START + 27;
     private static final int HOTBAR_START = PLAYER_INVENTORY_END;
@@ -136,7 +135,6 @@ public class CrusherMenu extends AbstractContainerMenu implements MasteryMenuVie
                 () -> selectedTab == TAB_REFINEMENT
         ));
         this.addSlot(RefinementMenuSupport.targetDisplaySlot(refinementTarget, RefinementMenuSupport.REFINEMENT_TARGET_SLOT_X, RefinementMenuSupport.REFINEMENT_SLOT_Y, () -> selectedTab == TAB_REFINEMENT));
-        this.addSlot(RefinementMenuSupport.targetDisplaySlot(refinementTarget, 204, 42, () -> selectedTab == TAB_PROCESSING));
 
         addPlayerInventory(playerInventory);
         addDataSlots(data);

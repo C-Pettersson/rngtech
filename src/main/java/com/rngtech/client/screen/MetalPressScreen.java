@@ -355,11 +355,6 @@ public class MetalPressScreen extends AbstractContainerScreen<MetalPressMenu> {
         if (menu.selectedTab() == MetalPressMenu.TAB_PROCESSING) {
             renderSlotFrame(guiGraphics, 55, 41);
             renderSlotFrame(guiGraphics, 169, 51);
-            renderSlotFrame(
-                    guiGraphics,
-                    RefinementScreenStyle.PROCESSING_TARGET_SLOT_X - 1,
-                    RefinementScreenStyle.PROCESSING_TARGET_SLOT_Y - 1
-            );
         } else if (menu.selectedTab() == MetalPressMenu.TAB_GEAR) {
             renderSlotFrame(guiGraphics, GEAR_HEAT_CORE_X, GEAR_TOP_ROW_Y);
             renderSlotFrame(guiGraphics, GEAR_SERVO_X, GEAR_TOP_ROW_Y);
@@ -459,7 +454,6 @@ public class MetalPressScreen extends AbstractContainerScreen<MetalPressMenu> {
     private void drawProcessingLabels(GuiGraphics guiGraphics) {
         guiGraphics.drawString(font, Component.translatable("rngtech.processing.input"), 52, 28, TEXT_MUTED, false);
         guiGraphics.drawString(font, Component.translatable("rngtech.processing.output"), 164, 40, TEXT_MUTED, false);
-        drawProcessingTargetLabel(guiGraphics);
     }
 
     private void drawGearLabels(GuiGraphics guiGraphics) {
@@ -744,12 +738,6 @@ public class MetalPressScreen extends AbstractContainerScreen<MetalPressMenu> {
             return false;
         }
         return value > 1.001;
-    }
-
-    private void drawProcessingTargetLabel(GuiGraphics guiGraphics) {
-        Component target = Component.translatable("rngtech.processing.machine");
-        int x = RefinementScreenStyle.PROCESSING_TARGET_SLOT_X + 8 - font.width(target) / 2;
-        guiGraphics.drawString(font, target, x, 28, TEXT_MUTED, false);
     }
 
     private void drawCentered(GuiGraphics guiGraphics, Component label, int centerX, int y) {
