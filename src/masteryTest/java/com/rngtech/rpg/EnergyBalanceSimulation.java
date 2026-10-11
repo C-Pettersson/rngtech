@@ -354,7 +354,8 @@ public final class EnergyBalanceSimulation {
     /**
      * CorrosionCellBlockEntity#effectiveStats, #canProcessStage and #effectiveRecipeEnergy; the Fluid Pump has no
      * generation stats. One setup per player stage with that stage's Cathode installed, plus a plates-only setup
-     * without a Cathode, since later plates and anodes unlock better fuel for the same Stage 4 machine.
+     * without a Cathode, since later plates and anodes unlock better fuel for the same Stage 4 machine. Cells run at
+     * rated load, the default and their highest FE/t; a lighter load (CorrosionCellLoad) trades FE/t for FE per fuel.
      */
     private void corrosionCells() throws IOException {
         List<FuelRecipe> recipes;
