@@ -81,8 +81,8 @@ sourceSets {
 }
 
 // Default run configurations.
-// A linked git worktree has a .git file that points into the main checkout's .git/worktrees/<name>. Its runs use the
-// main checkout's run directory, so every worktree launches with the same settings and worlds.
+// A linked git worktree has a .git file that points into the main checkout's .git/worktrees/<name>. Its client, server
+// and data runs use the main checkout's run directory, so every worktree launches with the same settings and worlds.
 def sharedRunRoot = {
     def dotGit = project.file('.git')
     if (dotGit.isFile()) {
@@ -94,6 +94,8 @@ def sharedRunRoot = {
     }
     return project.file('run')
 }()
+// GameTest runs build a throwaway world, so each checkout keeps its own: two worktrees cannot meet on one world lock.
+def ownRunRoot = project.file('run')
 
 // These can be tweaked, removed, or duplicated as needed.
 runs {
@@ -130,6 +132,7 @@ runs {
     // By default, the server will crash when no gametests are provided.
     // The gametest system is also enabled by default for other run configs under the /test command.
     gameTestServer {
+        workingDirectory.set(new File(ownRunRoot, name))
         systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
     }
 
@@ -138,6 +141,7 @@ runs {
     // do not run next to the scene or share its measured ticks.
     create('tickBenchmark') {
         runType 'gameTestServer'
+        workingDirectory.set(new File(ownRunRoot, name))
         systemProperty 'neoforge.enabledGameTestNamespaces', 'rngtech_benchmark'
         systemProperty 'rngtech.benchmark.output', layout.buildDirectory.file('tick-benchmark/result.json').get().asFile.path
         systemProperty 'rngtech.benchmark.settle', (project.findProperty('benchmarkSettle') ?: '100').toString()
@@ -156,6 +160,64 @@ runs {
 
         // Specify the modid for data generation, where to output the resulting resource, and where to look for existing resources.
         arguments.addAll '--mod', project.mod_id, '--all', '--output', file('src/generated/resources/').getAbsolutePath(), '--existing', file('src/main/resources/').getAbsolutePath()
+    }
+}
+
+// A GameTest server that fails to start (a held world lock, a crash while loading) returns from main without running a
+// test, and the JVM then exits 0. These runs copy the server console to build/gametest/<task>.log and fail unless the
+// server exited 0 after reporting that at least one required test passed.
+tasks.matching { it.name in ['runGameTestServer', 'runTickBenchmark'] }.configureEach { JavaExec task ->
+    def console = layout.buildDirectory.file("gametest/${task.name}.log").get().asFile
+    task.ignoreExitValue = true
+    task.doFirst {
+        standardOutput = new ConsoleCopy(System.out, console)
+    }
+    task.doLast {
+        standardOutput.close()
+        int exitValue = executionResult.get().exitValue
+        if (exitValue != 0) {
+            throw new GradleException("The GameTest server exited with ${exitValue}; see ${console}")
+        }
+        def passed = console.getText('UTF-8') =~ /All (\d+) required tests passed/
+        if (!passed.find() || passed.group(1).toInteger() == 0) {
+            throw new GradleException("The GameTest server exited without running any tests; see ${console}")
+        }
+    }
+}
+
+/** Writes a run's console to Gradle's output and to a file; closing it closes only the file. */
+class ConsoleCopy extends OutputStream {
+    private final OutputStream console
+    private final OutputStream file
+
+    ConsoleCopy(OutputStream console, File file) {
+        file.parentFile.mkdirs()
+        this.console = console
+        this.file = new FileOutputStream(file)
+    }
+
+    @Override
+    void write(int b) {
+        console.write(b)
+        file.write(b)
+    }
+
+    @Override
+    void write(byte[] bytes, int offset, int length) {
+        console.write(bytes, offset, length)
+        file.write(bytes, offset, length)
+    }
+
+    @Override
+    void flush() {
+        console.flush()
+        file.flush()
+    }
+
+    @Override
+    void close() {
+        flush()
+        file.close()
     }
 }
 
