@@ -3,20 +3,28 @@ package com.rngtech.gametest;
 import static com.rngtech.gametest.MachineTestSupport.check;
 
 import com.rngtech.RNGTech;
+import com.rngtech.content.blockentity.ComponentRecyclerBlockEntity;
 import com.rngtech.content.blockentity.CrusherBlockEntity;
 import com.rngtech.content.blockentity.MachineInfoSnapshot;
 import com.rngtech.content.blockentity.MetalPressBlockEntity;
 import com.rngtech.content.energy.HeatCoreMaterial;
 import com.rngtech.content.machine.CrushHeadMaterial;
 import com.rngtech.content.machine.CrusherChassisMaterial;
+import com.rngtech.content.recycling.ComponentRecyclerChassis;
+import com.rngtech.content.recycling.DisassemblyHeadMaterial;
 import com.rngtech.content.registry.ModBlocks;
 import com.rngtech.content.registry.ModItems;
 import com.rngtech.rpg.MachineStat;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Blocks;
@@ -126,6 +134,94 @@ public final class CraftCycleGameTests {
             check(crusher.machineInfo().blockedReason() == MachineInfoSnapshot.BlockedReason.NO_POWER, "Expected the Crusher to wait for power");
             helper.succeed();
         });
+    }
+
+    /** A hopper tops up a stackable recycler input mid-craft; each craft must run its full length and Bulk Speed must climb. */
+    @GameTest(template = MachineTestSupport.EMPTY, timeoutTicks = 3000)
+    public static void hopperFedRecyclerKeepsItsCycle(GameTestHelper helper) {
+        BlockPos recyclerPos = new BlockPos(2, 1, 2);
+        ComponentRecyclerBlockEntity recycler = bulkSpeedRecycler(helper, recyclerPos);
+        BlockPos hopperPos = recyclerPos.above();
+        helper.setBlock(hopperPos, Blocks.HOPPER.defaultBlockState().setValue(HopperBlock.FACING, Direction.DOWN));
+        HopperBlockEntity hopper = helper.getBlockEntity(hopperPos);
+        MachineTestSupport.powerEachTick(helper, recycler.getEnergyStorage(null));
+
+        double baseSpeed = speed(recycler);
+        MachineTestSupport.CraftLog log = new MachineTestSupport.CraftLog(helper, recycler,
+                () -> recycler.getProcessInventory().getStackInSlot(ComponentRecyclerBlockEntity.SLOT_OUTPUT_PRIMARY).getCount());
+        helper.onEachTick(() -> {
+            // Refill the hopper only mid-craft, so its arrivals top up a running craft.
+            int input = recycler.getProcessInventory().getStackInSlot(ComponentRecyclerBlockEntity.SLOT_INPUT).getCount();
+            int queued = input + hopper.getItem(0).getCount();
+            if (queued < 3 && (input == 0 || recycler.machineInfo().progress() >= TOP_UP_PROGRESS)) {
+                hopper.setItem(0, new ItemStack(brokenCircuit(), hopper.getItem(0).getCount() + 1));
+            }
+            log.sample(speed(recycler));
+        });
+        helper.succeedWhen(() -> {
+            List<MachineTestSupport.Craft> crafts = log.crafts();
+            check(crafts.size() >= FED_CRAFTS, "Completed " + crafts.size() + " of " + FED_CRAFTS + " crafts; " + MachineTestSupport.describe(recycler));
+            double previousSpeed = baseSpeed;
+            for (MachineTestSupport.Craft craft : crafts) {
+                check(craft.ticks() == craft.expectedTicks(), "A craft took " + craft.ticks() + " ticks, expected " + craft.expectedTicks());
+                check(craft.speedAfter() > previousSpeed, "Bulk Speed did not rise: " + previousSpeed + " -> " + craft.speedAfter());
+                previousSpeed = craft.speedAfter();
+            }
+        });
+    }
+
+    /** Topping up keeps the recycler's craft; the same item with different components restarts it and resets Bulk Speed. */
+    @GameTest(template = MachineTestSupport.EMPTY, timeoutTicks = 1200)
+    public static void recyclerSwapRestartsTheCraft(GameTestHelper helper) {
+        ComponentRecyclerBlockEntity recycler = bulkSpeedRecycler(helper, new BlockPos(1, 1, 2));
+        ComponentRecyclerBlockEntity twin = bulkSpeedRecycler(helper, new BlockPos(3, 1, 2));
+        MachineTestSupport.powerEachTick(helper, recycler.getEnergyStorage(null));
+        recycler.getProcessInventory().setStackInSlot(ComponentRecyclerBlockEntity.SLOT_INPUT, new ItemStack(brokenCircuit(), 2));
+        ItemStack renamed = new ItemStack(brokenCircuit(), 2);
+        renamed.set(DataComponents.CUSTOM_NAME, Component.literal("Swapped"));
+        int[] marker = new int[1];
+
+        helper.startSequence()
+                .thenWaitUntil(() -> check(recyclerOutput(recycler) > 0, "Waiting for the first craft"))
+                .thenWaitUntil(() -> check(recycler.machineInfo().progress() >= SWAP_PROGRESS, "Waiting for the second craft"))
+                .thenExecute(() -> {
+                    check(speed(recycler) > speed(twin), "Bulk Speed did not build up");
+                    marker[0] = recycler.machineInfo().progress();
+                    recycler.getItemHandler(Direction.UP).insertItem(0, new ItemStack(brokenCircuit()), false);
+                })
+                .thenExecuteAfter(2, () -> {
+                    check(recycler.machineInfo().progress() > marker[0], "Topping up the input restarted the craft");
+                    check(speed(recycler) > speed(twin), "Topping up the input reset Bulk Speed");
+                    marker[0] = recycler.machineInfo().progress();
+                    recycler.getProcessInventory().setStackInSlot(ComponentRecyclerBlockEntity.SLOT_INPUT, renamed.copy());
+                })
+                .thenExecuteAfter(2, () -> {
+                    int progress = recycler.machineInfo().progress();
+                    check(progress <= 2, "Swapping the input kept progress " + progress + " from " + marker[0]);
+                    check(speed(recycler) == speed(twin), "Swapping the input kept Bulk Speed");
+                })
+                .thenSucceed();
+    }
+
+    private static ComponentRecyclerBlockEntity bulkSpeedRecycler(GameTestHelper helper, BlockPos pos) {
+        ComponentRecyclerBlockEntity recycler = MachineTestSupport.place(helper, pos,
+                ModBlocks.componentRecycler(ComponentRecyclerChassis.IRON).get(), ComponentRecyclerBlockEntity.class);
+        recycler.setMachineTraits(MachineTestSupport.BULK_SPEED);
+        recycler.getGearInventory().setStackInSlot(ComponentRecyclerBlockEntity.SLOT_DISASSEMBLY_HEAD,
+                new ItemStack(ModItems.disassemblyHead(DisassemblyHeadMaterial.IRON).get()));
+        return recycler;
+    }
+
+    private static Item brokenCircuit() {
+        return BuiltInRegistries.ITEM.get(ResourceLocation.fromNamespaceAndPath(RNGTech.MOD_ID, "broken_circuit"));
+    }
+
+    private static double speed(ComponentRecyclerBlockEntity recycler) {
+        return recycler.effectiveStats().value(MachineStat.PROCESSING_SPEED);
+    }
+
+    private static int recyclerOutput(ComponentRecyclerBlockEntity recycler) {
+        return recycler.getProcessInventory().getStackInSlot(ComponentRecyclerBlockEntity.SLOT_OUTPUT_PRIMARY).getCount();
     }
 
     private static CrusherBlockEntity bulkSpeedCrusher(GameTestHelper helper, BlockPos pos, CrushHeadMaterial head) {
