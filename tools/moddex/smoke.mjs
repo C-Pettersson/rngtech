@@ -438,12 +438,11 @@ try {
     if (!melterLayout?.elements?.some((element) => element.type === "FE_METER")) {
         throw new Error("GUI layout data did not include the Melter FE meter.");
     }
-    if (!melterLayout?.elements?.some((element) =>
-            element.tabId === "processing"
-            && element.type === "ITEM_SLOT"
-            && element.slotType === "MACHINE_SELF"
-            && element.slotRole === "MACHINE_SELF")) {
-        throw new Error("GUI layout data did not classify the Melter processing self machine slot.");
+    const melterSelfSlotTabs = (melterLayout?.elements ?? [])
+        .filter((element) => element.type === "ITEM_SLOT" && element.slotRole === "MACHINE_SELF")
+        .map((element) => element.tabId);
+    if (!melterSelfSlotTabs.includes("refinement") || melterSelfSlotTabs.includes("processing")) {
+        throw new Error("GUI layout data should show the Melter self machine slot on the Refinement tab only.");
     }
     if (!cavitationLayout?.elements?.some((element) => element.type === "FLUID_METER")
             || !cavitationLayout.elements.some((element) => element.type === "FE_METER")) {
