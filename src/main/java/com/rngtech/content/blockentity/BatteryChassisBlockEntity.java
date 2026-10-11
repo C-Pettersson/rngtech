@@ -38,7 +38,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.energy.IEnergyStorage;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.ItemStackHandler;
@@ -49,6 +48,7 @@ import java.util.EnumSet;
 import java.util.List;
 
 public class BatteryChassisBlockEntity extends BaseMachineBlockEntity implements MenuProvider, MachineInfoProvider {
+    private final EnergyExportTargets exportTargets = new EnergyExportTargets(this);
     private static final int DATA_ENERGY = 0;
     private static final int DATA_ENERGY_CAPACITY = 1;
     private static final int DATA_MAX_INPUT = 2;
@@ -980,6 +980,11 @@ public class BatteryChassisBlockEntity extends BaseMachineBlockEntity implements
         return capacity <= 0 ? 0.0 : cellEnergyStored(slot, context) / (double) capacity;
     }
 
+    /** How many times an energy export looked a neighbour up instead of reusing its cached capability. */
+    public int exportTargetLookups() {
+        return exportTargets.lookups();
+    }
+
     private boolean exportEnergy(Level level, BlockPos pos) {
         RuntimeContext context = runtimeContext();
         if (energyStored(context) <= 0) {
@@ -1005,11 +1010,7 @@ public class BatteryChassisBlockEntity extends BaseMachineBlockEntity implements
                 continue;
             }
 
-            IEnergyStorage target = level.getCapability(
-                    Capabilities.EnergyStorage.BLOCK,
-                    targetPos,
-                    direction.getOpposite()
-            );
+            IEnergyStorage target = exportTargets.get(level, pos, direction);
             if (target == null || !target.canReceive()) {
                 continue;
             }

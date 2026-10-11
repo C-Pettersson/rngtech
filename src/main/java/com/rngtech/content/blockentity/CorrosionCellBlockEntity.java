@@ -54,6 +54,7 @@ import java.util.List;
 
 public class CorrosionCellBlockEntity extends BaseMachineBlockEntity
         implements MenuProvider, PurgeableFluidStorage, MachineInfoProvider {
+    private final EnergyExportTargets exportTargets = new EnergyExportTargets(this);
     private static final RecipeCache.Search<CorrosionCellRecipe> RECIPE_SEARCH = CorrosionCellRecipes::find;
     private static final RecipeInputFilter<CorrosionCellRecipeInput, CorrosionCellRecipe> PLATE_FILTER = new RecipeInputFilter<>(
             ModRecipes.CORROSION_CELL_TYPE::get,
@@ -661,6 +662,11 @@ public class CorrosionCellBlockEntity extends BaseMachineBlockEntity
         return stored;
     }
 
+    /** How many times an energy export looked a neighbour up instead of reusing its cached capability. */
+    public int exportTargetLookups() {
+        return exportTargets.lookups();
+    }
+
     private boolean exportEnergy(Level level, BlockPos pos) {
         MachineStatAccumulator stats = effectiveStats();
         if (energyStored() <= 0) {
@@ -674,11 +680,7 @@ public class CorrosionCellBlockEntity extends BaseMachineBlockEntity
                 return exported;
             }
 
-            IEnergyStorage target = level.getCapability(
-                    Capabilities.EnergyStorage.BLOCK,
-                    pos.relative(direction),
-                    direction.getOpposite()
-            );
+            IEnergyStorage target = exportTargets.get(level, pos, direction);
             if (target == null || !target.canReceive()) {
                 continue;
             }

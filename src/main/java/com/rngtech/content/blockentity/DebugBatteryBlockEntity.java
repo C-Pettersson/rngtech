@@ -18,10 +18,10 @@ import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.energy.IEnergyStorage;
 
 public class DebugBatteryBlockEntity extends BlockEntity implements MenuProvider {
+    private final EnergyExportTargets exportTargets = new EnergyExportTargets(this);
     private static final int DATA_OUTPUT_RATE = 0;
     private static final int DEFAULT_OUTPUT_RATE = 1000;
 
@@ -109,6 +109,11 @@ public class DebugBatteryBlockEntity extends BlockEntity implements MenuProvider
         }
     }
 
+    /** How many times an energy export looked a neighbour up instead of reusing its cached capability. */
+    public int exportTargetLookups() {
+        return exportTargets.lookups();
+    }
+
     private void exportEnergy(Level level, BlockPos pos) {
         if (availableOutput(level) <= 0) {
             return;
@@ -119,11 +124,7 @@ public class DebugBatteryBlockEntity extends BlockEntity implements MenuProvider
             if (remaining <= 0) {
                 return;
             }
-            IEnergyStorage target = level.getCapability(
-                    Capabilities.EnergyStorage.BLOCK,
-                    pos.relative(direction),
-                    direction.getOpposite()
-            );
+            IEnergyStorage target = exportTargets.get(level, pos, direction);
             if (target == null || !target.canReceive()) {
                 continue;
             }
