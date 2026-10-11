@@ -346,6 +346,18 @@ public class CavitationGeneratorBlockEntity extends BaseMachineBlockEntity
         return animation;
     }
 
+    /**
+     * Generators saved while the block was a solid cube stored no light inside it, which leaves the renderer's rotor and
+     * tanks unlit. Rechecking the block's own light once on load fixes those saves.
+     */
+    @Override
+    public void onLoad() {
+        super.onLoad();
+        if (level != null && !level.isClientSide) {
+            level.getLightEngine().checkBlock(worldPosition);
+        }
+    }
+
     @Override
     public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
         return currentVisualState().save();
