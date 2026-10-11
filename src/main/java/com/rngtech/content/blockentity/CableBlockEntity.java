@@ -34,6 +34,7 @@ import net.minecraft.world.Containers;
 import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -1294,6 +1295,7 @@ public class CableBlockEntity extends BlockEntity implements UniversalConnectorD
         List<BridgeEndpoint> bridgeEndpoints = new ArrayList<>();
         Set<BridgeEndpoint> seenBridgeEndpoints = new HashSet<>();
         List<EnergyEndpoint>[] energyEndpoints = createEnergyEndpointBuckets();
+        Set<Long> unloadedTargetChunks = new HashSet<>();
 
         for (BlockPos pos : networkPositions) {
             collectCableNode(
@@ -1304,7 +1306,8 @@ public class CableBlockEntity extends BlockEntity implements UniversalConnectorD
                     seenUniversalEndpoints,
                     bridgeEndpoints,
                     seenBridgeEndpoints,
-                    energyEndpoints
+                    energyEndpoints,
+                    unloadedTargetChunks
             );
         }
 
@@ -1319,6 +1322,7 @@ public class CableBlockEntity extends BlockEntity implements UniversalConnectorD
                 receiversByChannel(universalEndpoints, true),
                 receiversByChannel(universalEndpoints, false),
                 immutableList(bridgeEndpoints),
+                unloadedTargetChunks.stream().mapToLong(Long::longValue).toArray(),
                 cache.claimState(cablePositions, gameTime)
         );
     }
@@ -1354,7 +1358,8 @@ public class CableBlockEntity extends BlockEntity implements UniversalConnectorD
             Set<UniversalEndpoint> seenUniversalEndpoints,
             List<BridgeEndpoint> bridgeEndpoints,
             Set<BridgeEndpoint> seenBridgeEndpoints,
-            List<EnergyEndpoint>[] energyEndpoints
+            List<EnergyEndpoint>[] energyEndpoints,
+            Set<Long> unloadedTargetChunks
     ) {
         if (!(level.getBlockEntity(pos) instanceof CableBlockEntity cable)) {
             return;
@@ -1366,8 +1371,12 @@ public class CableBlockEntity extends BlockEntity implements UniversalConnectorD
                 continue;
             }
             // A target in an unloaded chunk is not read, which would load it. Its connector stays an endpoint, so it
-            // works as soon as the chunk loads; until then its capability cache reports nothing there.
+            // works as soon as the chunk loads; until then its capability cache reports nothing there. A bridge needs
+            // its target loaded, so the snapshot watches that chunk and rebuilds once it loads.
             BlockState targetState = view.isLoaded(targetPos) ? view.state(targetPos) : null;
+            if (targetState == null && level.isInWorldBounds(targetPos)) {
+                unloadedTargetChunks.add(ChunkPos.asLong(targetPos));
+            }
 
             CableUniversalConnectorData universalConnector = cable.universalConnector(direction);
             if (universalConnector != null) {
@@ -1549,13 +1558,18 @@ public class CableBlockEntity extends BlockEntity implements UniversalConnectorD
             long gameTime = level.getGameTime();
             pruneStaleSnapshots(gameTime);
 
-            NetworkSnapshot snapshot = index.get(startPos, gameTime, SNAPSHOT_LIFETIME_TICKS);
+            NetworkSnapshot snapshot = index.get(
+                    startPos,
+                    gameTime,
+                    SNAPSHOT_LIFETIME_TICKS,
+                    chunk -> level.hasChunk(ChunkPos.getX(chunk), ChunkPos.getZ(chunk))
+            );
             if (snapshot != null) {
                 return snapshot;
             }
 
             snapshot = buildNetworkSnapshot(level, startPos, gameTime, this);
-            index.put(snapshot, snapshot.cablePositions(), gameTime);
+            index.put(snapshot, snapshot.cablePositions(), snapshot.unloadedTargetChunks, gameTime);
             return snapshot;
         }
 
@@ -1629,6 +1643,7 @@ public class CableBlockEntity extends BlockEntity implements UniversalConnectorD
         private final List<UniversalEndpoint>[] itemReceivers;
         private final List<UniversalEndpoint>[] fluidReceivers;
         private final List<BridgeEndpoint> bridgeEndpoints;
+        private final long[] unloadedTargetChunks;
         private final NetworkEnergyTelemetry energyTelemetry;
         private final int[] energyCursors;
         private final int[] itemCursors;
@@ -1644,6 +1659,7 @@ public class CableBlockEntity extends BlockEntity implements UniversalConnectorD
                 List<UniversalEndpoint>[] itemReceivers,
                 List<UniversalEndpoint>[] fluidReceivers,
                 List<BridgeEndpoint> bridgeEndpoints,
+                long[] unloadedTargetChunks,
                 NetworkState state
         ) {
             this.gameTime = gameTime;
@@ -1652,6 +1668,7 @@ public class CableBlockEntity extends BlockEntity implements UniversalConnectorD
             this.itemReceivers = itemReceivers;
             this.fluidReceivers = fluidReceivers;
             this.bridgeEndpoints = bridgeEndpoints;
+            this.unloadedTargetChunks = unloadedTargetChunks;
             this.energyTelemetry = state.telemetry;
             this.energyCursors = state.energyCursors;
             this.itemCursors = state.itemCursors;
