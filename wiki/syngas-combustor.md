@@ -18,7 +18,7 @@ wiki:
     },
 ) }}
 
-The **Syngas Combustor** is the Stage 5 gas-power generator. It burns Syngas from the [Coal Gasifier](coal-gasifier.md) for 240 FE/t before rolls, and turns the leftovers into Carbon Exhaust that you can feed to an [Algae Photobioreactor](algae-photobioreactor.md). It also burns Carbon Monoxide as a weak way to get rid of it.
+The **Syngas Combustor** is the Stage 5 gas-power generator. It burns Syngas from the [Coal Gasifier](coal-gasifier.md) for 240 FE/t before rolls, and turns the leftovers into Carbon Exhaust that you can feed to an [Algae Photobioreactor](algae-photobioreactor.md). It also burns Carbon Monoxide as a weak way to get rid of it. It is built like a small gas turbine: fuel gas feeds a combustion can, the hot gas turns a turbine, and the turbine's shaft drives an alternator at the back.
 
 Like every RNGTech machine, each Syngas Combustor you craft rolls its own [rarity and affixes](rarity-and-affixes.md).
 
@@ -36,7 +36,9 @@ Mine a placed Syngas Combustor with a pickaxe. It drops itself and keeps its rol
 
 ### Generating power
 
-Pipe Syngas or Carbon Monoxide into the gas tank. The combustor needs no Gear to run. Each cycle burns a batch of gas, generates FE over the cycle, and fills the Carbon Exhaust tank. Both tanks hold 8,000 mB.
+Pipe Syngas or Carbon Monoxide into the gas tank. The combustor needs no Gear to run. Each cycle burns a batch of gas, generates FE over the cycle, and fills the Carbon Exhaust tank. Both tanks hold 8,000 mB. Facing the front, the sight glass at the front right shows the fuel gas, and the one on the left side, beside the exhaust stack, shows the Carbon Exhaust.
+
+While the combustor burns, the flame shows through the two view ports on the front: orange on Syngas, blue on Carbon Monoxide. Smoke rises from the stack, the status lamp lights, and the shaft between the turbine and the alternator spins up. The tachometer on the front shows the shaft speed, and the shaft coasts down for a few seconds after the flame goes out.
 
 | Fuel | Per cycle | Time | FE/t (base) | Exhaust |
 |---|---:|---:|---:|---:|
@@ -54,6 +56,8 @@ The Gear tab has two optional slots:
 - **Battery Cell**: adds FE storage. Only Stage 5 and higher cells fit.
 - **Servo**: any Servo from {{ item('rngtech:steel_servo') }} up. It speeds up cycles. A {{ item('rngtech:nullite_servo') }} also voids Carbon Exhaust that would overflow a tank already holding Carbon Exhaust, so a full exhaust tank no longer stops the combustor. It runs at half speed, though.
 
+Installed Gear shows on the machine. The Servo mounts on the right side of the turbine as the fuel governor, its arm trimming back and forth while the combustor burns; a faster Servo spins the shaft faster. The Battery Cell sits in a cradle on the left side next to the alternator, with a window that shows its charge.
+
 ### Automation
 
 | Side | Behavior |
@@ -61,7 +65,7 @@ The Gear tab has two optional slots:
 | Top and sides | Output FE, for example into a [Universal Cable](universal-cable.md). |
 | Any | Fills the gas tank with Syngas or Carbon Monoxide, and drains Carbon Exhaust. |
 
-Gear slots are not reachable by automation.
+Gear slots are not reachable by automation. The back of the alternator has a port plate sized for a Universal Connector, the tidiest place to attach one.
 
 ### Gas combustion recipes
 

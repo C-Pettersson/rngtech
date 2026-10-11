@@ -5,6 +5,7 @@ import com.rngtech.content.chemistry.GasChemistryMachine;
 import com.rngtech.content.item.BatteryCellItem;
 import com.rngtech.content.item.GasChemistryPartItem;
 import com.rngtech.content.item.GearParts;
+import com.rngtech.content.item.ServoItem;
 import com.rngtech.content.menu.GasChemistryMenu;
 import com.rngtech.content.purge.FluidOutputOverflow;
 import com.rngtech.content.purge.FluidPurgeRole;
@@ -33,8 +34,12 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.Connection;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.game.ClientGamePacketListener;
+import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.util.Mth;
 import net.minecraft.world.Containers;
 import net.minecraft.world.MenuProvider;
@@ -44,6 +49,7 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.energy.IEnergyStorage;
 import net.neoforged.neoforge.fluids.FluidStack;
@@ -112,6 +118,7 @@ public class GasChemistryBlockEntity extends BaseMachineBlockEntity
     private static final int DATA_OUTPUT_FLUID_ID = 22;
     private static final int DATA_SECONDARY_OUTPUT_FLUID_ID = 23;
     private static final int STAT_SCALE = 100;
+    private static final int VISUAL_SYNC_INTERVAL = 5;
 
     private GasChemistryMachine machine;
     private final ItemStackHandler processInventory = new ItemStackHandler(2) {
@@ -263,6 +270,9 @@ public class GasChemistryBlockEntity extends BaseMachineBlockEntity
     private int activeTicks;
     private long activeEnergy;
     private double energyCarry;
+    private CombustorVisualState visualState = CombustorVisualState.IDLE;
+    private CombustorVisualState.Key lastSyncedVisual;
+    private final CombustorVisualState.Animation animation = new CombustorVisualState.Animation();
 
     public GasChemistryBlockEntity(BlockPos pos, BlockState blockState, GasChemistryMachine machine) {
         super(ModBlockEntities.GAS_CHEMISTRY.get(), pos, blockState, machine.machineType(), SLOT_PROCESS_INPUT, SLOT_PROCESS_INPUT, SLOT_PROCESS_OUTPUT);
@@ -277,6 +287,104 @@ public class GasChemistryBlockEntity extends BaseMachineBlockEntity
         if (worked || exported) {
             gasChemistry.setChanged();
         }
+        if (gasChemistry.isCombustor()) {
+            gasChemistry.syncVisualState(level);
+        }
+    }
+
+    private boolean isCombustor() {
+        return machine == GasChemistryMachine.SYNGAS_COMBUSTOR;
+    }
+
+    /**
+     * Combustors saved while the block was a solid cube stored no light inside it, which leaves the renderer's parts
+     * unlit. Rechecking the block's own light once on load fixes those saves.
+     */
+    @Override
+    public void onLoad() {
+        super.onLoad();
+        if (isCombustor() && level != null && !level.isClientSide) {
+            level.getLightEngine().checkBlock(worldPosition);
+        }
+    }
+
+    /** Client copy of the state the Syngas Combustor renderer draws; synced from the server in the update tag. */
+    public CombustorVisualState visualState() {
+        return visualState;
+    }
+
+    public CombustorVisualState.Animation animation() {
+        return animation;
+    }
+
+    @Override
+    public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
+        return isCombustor() ? currentVisualState().save() : super.getUpdateTag(registries);
+    }
+
+    @Override
+    public Packet<ClientGamePacketListener> getUpdatePacket() {
+        return isCombustor() ? ClientboundBlockEntityDataPacket.create(this) : super.getUpdatePacket();
+    }
+
+    @Override
+    public void handleUpdateTag(CompoundTag tag, HolderLookup.Provider registries) {
+        if (isCombustor()) {
+            visualState = CombustorVisualState.load(tag);
+        } else {
+            super.handleUpdateTag(tag, registries);
+        }
+    }
+
+    @Override
+    public void onDataPacket(Connection connection, ClientboundBlockEntityDataPacket packet, HolderLookup.Provider registries) {
+        if (isCombustor()) {
+            visualState = CombustorVisualState.load(packet.getTag());
+        } else {
+            super.onDataPacket(connection, packet, registries);
+        }
+    }
+
+    private void syncVisualState(Level level) {
+        if (level.getGameTime() % VISUAL_SYNC_INTERVAL != 0) {
+            return;
+        }
+        CombustorVisualState.Key key = currentVisualState().key();
+        if (!key.equals(lastSyncedVisual)) {
+            lastSyncedVisual = key;
+            level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), Block.UPDATE_CLIENTS);
+        }
+    }
+
+    CombustorVisualState currentVisualState() {
+        IEnergyStorage cell = batteryCellStorage();
+        return new CombustorVisualState(
+                isActive(),
+                (float) effectiveStats().value(MachineStat.PROCESSING_SPEED),
+                inputTank.getFluidAmount() / (float) inputTank.getCapacity(),
+                inputTank.getFluid().getFluid(),
+                outputTank.getFluidAmount() / (float) outputTank.getCapacity(),
+                outputTank.getFluid().getFluid(),
+                gearLook(servoStack()),
+                gearLook(batteryCellStack()),
+                cell == null || cell.getMaxEnergyStored() <= 0 ? 0.0F : cell.getEnergyStored() / (float) cell.getMaxEnergyStored()
+        );
+    }
+
+    private static String gearLook(ItemStack stack) {
+        if (stack.isEmpty()) {
+            return "";
+        }
+        if (GearParts.isUnique(stack)) {
+            return "unique";
+        }
+        if (stack.getItem() instanceof ServoItem servo) {
+            return servo.material().getSerializedName();
+        }
+        if (stack.getItem() instanceof BatteryCellItem cell) {
+            return cell.material().unique() ? "unique" : cell.material().getSerializedName();
+        }
+        return "";
     }
 
     public GasChemistryMachine machine() {
