@@ -66,6 +66,12 @@ Launch the client:
 
 In a linked git worktree, every run uses the main checkout's `run/` directory, so worktrees share its settings and worlds.
 
+Measure server ms/tick on the fixed benchmark scene (see [Tick Benchmark](docs/reference/benchmarking.md)):
+
+```sh
+./gradlew runTickBenchmark
+```
+
 Generate data resources:
 
 ```sh

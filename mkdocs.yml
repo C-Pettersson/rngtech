@@ -74,6 +74,7 @@ nav:
       - Heat Model State: prds/heat-model-state.md
   - Reference:
       - Releasing: releasing.md
+      - Tick Benchmark: reference/benchmarking.md
       - Current Implementation Matrix: reference/current-implementation.md
       - Machine Guidelines: reference/machine-guidelines.md
       - Machine Visual Design: reference/machine-visual-design.md
