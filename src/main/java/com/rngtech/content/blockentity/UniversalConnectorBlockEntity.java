@@ -8,6 +8,7 @@ import com.rngtech.content.cable.ItemConnectorMode;
 import com.rngtech.content.menu.UniversalConnectorAccess;
 import com.rngtech.content.menu.UniversalConnectorMenu;
 import com.rngtech.content.registry.ModBlockEntities;
+import com.rngtech.content.wrench.LinkStatus;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -195,6 +196,21 @@ public class UniversalConnectorBlockEntity extends BlockEntity
 
     public ContainerData menuData() {
         return primaryConnector().menuData();
+    }
+
+    @Override
+    public LinkStatus energyLinkStatus() {
+        return primaryConnector().energyLinkStatus();
+    }
+
+    @Override
+    public LinkStatus fluidLinkStatus(int moduleIndex) {
+        return primaryConnector().fluidLinkStatus(moduleIndex);
+    }
+
+    @Override
+    public LinkStatus itemLinkStatus(int moduleIndex) {
+        return primaryConnector().itemLinkStatus(moduleIndex);
     }
 
     public void universalConnectorStateChanged() {
