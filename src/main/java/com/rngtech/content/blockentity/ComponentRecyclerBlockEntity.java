@@ -103,10 +103,6 @@ public class ComponentRecyclerBlockEntity extends BaseMachineBlockEntity impleme
 
         @Override
         protected void onContentsChanged(int slot) {
-            if (slot == SLOT_INPUT) {
-                resetCycle();
-                resetBulkSpeed();
-            }
             setChanged();
         }
     };
@@ -188,6 +184,7 @@ public class ComponentRecyclerBlockEntity extends BaseMachineBlockEntity impleme
 
     private final BulkSpeedState bulkSpeed = new BulkSpeedState();
     private int progress;
+    private ItemStack activeInput = ItemStack.EMPTY;
     private int internalEnergy;
     private long nextManualCrankTick;
     private long lastManualCrankTick = Long.MIN_VALUE;
@@ -213,6 +210,7 @@ public class ComponentRecyclerBlockEntity extends BaseMachineBlockEntity impleme
             recycler.serverTickManual(level, pos, state);
             return;
         }
+        recycler.restartIfInputSwapped();
         MachineStatAccumulator stats = recycler.effectiveStats();
         ComponentRecyclingRecipe recipe = recycler.nextRecipe();
         if (recipe == null || !recycler.hasRequiredGear() || !recycler.canProcessStage(recipe, stats)) {
@@ -227,6 +225,9 @@ public class ComponentRecyclerBlockEntity extends BaseMachineBlockEntity impleme
             return;
         }
 
+        if (recycler.progress == 0) {
+            recycler.startCraft(recipe);
+        }
         int energyCost = recycler.energyCostPerTick(recipe, stats);
         if (recycler.progress == 0 && ProcessingChance.rollInstant(level, stats)) {
             int fullEnergyCost = recycler.energyCostPerCraft(recipe, stats);
@@ -258,6 +259,7 @@ public class ComponentRecyclerBlockEntity extends BaseMachineBlockEntity impleme
     }
 
     private void serverTickManual(Level level, BlockPos pos, BlockState state) {
+        restartIfInputSwapped();
         MachineStatAccumulator stats = effectiveStats();
         ComponentRecyclingRecipe recipe = nextRecipe();
         if (recipe == null || !hasHandCrank() || !canProcessStage(recipe, stats)) {
@@ -300,6 +302,7 @@ public class ComponentRecyclerBlockEntity extends BaseMachineBlockEntity impleme
             return false;
         }
 
+        restartIfInputSwapped();
         MachineStatAccumulator stats = effectiveStats();
         ComponentRecyclingRecipe recipe = nextRecipe();
         if (!canManualCrank(recipe, stats)) {
@@ -310,6 +313,9 @@ public class ComponentRecyclerBlockEntity extends BaseMachineBlockEntity impleme
 
         nextManualCrankTick = gameTime + MANUAL_CRANK_INTERVAL_TICKS;
         lastManualCrankTick = gameTime;
+        if (progress == 0) {
+            startCraft(recipe);
+        }
         int processingTicks = manualProcessingTicks(recipe);
         progress = Math.min(processingTicks, progress + MANUAL_CRANK_INTERVAL_TICKS);
         playManualGrindSound(crankPos);
@@ -483,6 +489,7 @@ public class ComponentRecyclerBlockEntity extends BaseMachineBlockEntity impleme
         tag.put("ProcessInventory", processInventory.serializeNBT(registries));
         tag.put("GearInventory", gearInventory.serializeNBT(registries));
         tag.putInt("Progress", progress);
+        tag.put("ActiveInput", activeInput.saveOptional(registries));
         tag.putInt("Energy", internalEnergyStored());
         bulkSpeed.save(tag);
     }
@@ -493,6 +500,7 @@ public class ComponentRecyclerBlockEntity extends BaseMachineBlockEntity impleme
         processInventory.deserializeNBT(registries, tag.getCompound("ProcessInventory"));
         gearInventory.deserializeNBT(registries, tag.getCompound("GearInventory"));
         progress = tag.getInt("Progress");
+        activeInput = ItemStack.parseOptional(registries, tag.getCompound("ActiveInput"));
         internalEnergy = Math.max(0, tag.getInt("Energy"));
         bulkSpeed.load(tag);
         clampInternalEnergy();
@@ -759,7 +767,7 @@ public class ComponentRecyclerBlockEntity extends BaseMachineBlockEntity impleme
 
     private void resetCycleIfActive() {
         boolean changed = false;
-        if (progress != 0) {
+        if (progress != 0 || !activeInput.isEmpty()) {
             resetCycle();
             changed = true;
         }
@@ -771,6 +779,35 @@ public class ComponentRecyclerBlockEntity extends BaseMachineBlockEntity impleme
 
     private void resetCycle() {
         progress = 0;
+        activeInput = ItemStack.EMPTY;
+    }
+
+    /** Snapshots the input a craft starts with, so a swap restarts it while a top-up keeps it. */
+    private void startCraft(ComponentRecyclingRecipe recipe) {
+        activeInput = inputStack().copyWithCount(1);
+        if (bulkSpeed.startRecipe(recipe)) {
+            setChanged();
+        }
+    }
+
+    private void restartIfInputSwapped() {
+        if (!activeCraftMatches()) {
+            resetCycle();
+            resetBulkSpeed();
+            setChanged();
+        }
+    }
+
+    /** A craft saved before snapshots existed adopts the current input. */
+    private boolean activeCraftMatches() {
+        if (progress <= 0) {
+            return true;
+        }
+        if (activeInput.isEmpty()) {
+            activeInput = inputStack().copyWithCount(1);
+            return true;
+        }
+        return ItemStack.isSameItemSameComponents(activeInput, inputStack());
     }
 
     private void resetBulkSpeed() {
