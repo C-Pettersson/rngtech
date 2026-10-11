@@ -22,8 +22,12 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.Connection;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.game.ClientGamePacketListener;
+import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.world.Containers;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
@@ -33,6 +37,7 @@ import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LightLayer;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Fluids;
@@ -82,10 +87,17 @@ public class AlgaePhotobioreactorBlockEntity extends BlockEntity
     private static final int DATA_OUTPUT_BONUS_PROGRESS = 10;
     private static final int DATA_WATER_FLUID_ID = 11;
     private static final int DATA_CARBON_FLUID_ID = 12;
-    private static final int DATA_COUNT = 13;
+    private static final int DATA_AERATION = 13;
+    private static final int DATA_DENSITY = 14;
+    private static final int DATA_CARBON_PER_HARVEST = 15;
+    private static final int DATA_COUNT = 16;
     private static final int STAT_SCALE = 100;
     private static final int OUTPUT_BONUS_PROGRESS_SCALE = 1000;
+    private static final int DENSITY_SCALE = 1000;
+    private static final int DEFAULT_MINIMUM_LIGHT = 12;
+    private static final int VISUAL_SYNC_INTERVAL = 5;
     private static final double EPSILON = 1.0E-9;
+    private static final double CARBON_EPSILON = 1.0E-6;
 
     private final ItemStackHandler inventory = new ItemStackHandler(SLOT_COUNT) {
         @Override
@@ -176,7 +188,7 @@ public class AlgaePhotobioreactorBlockEntity extends BlockEntity
             AlgaeGrowthRecipe recipe = nextRecipe();
             MachineStatAccumulator stats = effectiveStats();
             return switch (index) {
-                case DATA_PROGRESS -> progress;
+                case DATA_PROGRESS -> (int) progress;
                 case DATA_REQUIRED_TICKS -> recipe == null ? 0 : currentProcessingTicks(recipe, stats);
                 case DATA_WATER -> waterTank.getFluidAmount();
                 case DATA_WATER_CAPACITY -> waterTank.getCapacity();
@@ -189,6 +201,9 @@ public class AlgaePhotobioreactorBlockEntity extends BlockEntity
                 case DATA_OUTPUT_BONUS_PROGRESS -> scaledOutputBonusProgress();
                 case DATA_WATER_FLUID_ID -> BuiltInRegistries.FLUID.getId(waterTank.getFluid().getFluid());
                 case DATA_CARBON_FLUID_ID -> BuiltInRegistries.FLUID.getId(carbonTank.getFluid().getFluid());
+                case DATA_AERATION -> aeration;
+                case DATA_DENSITY -> (int) Math.round(density * DENSITY_SCALE);
+                case DATA_CARBON_PER_HARVEST -> recipe == null ? 0 : AlgaeCultureDynamics.carbonAmount(recipe.carbonInput().amount(), aeration);
                 default -> 0;
             };
         }
@@ -203,44 +218,163 @@ public class AlgaePhotobioreactorBlockEntity extends BlockEntity
         }
     };
 
-    private int progress;
+    private double progress;
     private FluidStack activeWater = FluidStack.EMPTY;
     private FluidStack activeCarbon = FluidStack.EMPTY;
     private double outputBonusProgress;
+    private double density;
+    private double carbonCharge;
+    private int aeration = AlgaeCultureDynamics.RATED_AERATION;
+    private AlgaeVisualState visualState = AlgaeVisualState.IDLE;
+    private AlgaeVisualState.Key lastSyncedVisual;
+    private final AlgaeVisualState.Animation animation = new AlgaeVisualState.Animation();
 
     public AlgaePhotobioreactorBlockEntity(BlockPos pos, BlockState blockState) {
         super(ModBlockEntities.ALGAE_PHOTOBIOREACTOR.get(), pos, blockState);
     }
 
+    /**
+     * Growth runs at culture density times the aeration factor. Without light, water or carbon gas the culture dies
+     * back toward the seed density; a full output only pauses the harvest. Neither discards harvest progress.
+     */
     public static void serverTick(Level level, BlockPos pos, BlockState state, AlgaePhotobioreactorBlockEntity reactor) {
         boolean changed = reactor.drainInputContainer(SLOT_WATER_INPUT_CONTAINER, SLOT_WATER_OUTPUT_CONTAINER, reactor.waterTank);
         changed |= reactor.drainInputContainer(SLOT_CARBON_INPUT_CONTAINER, SLOT_CARBON_OUTPUT_CONTAINER, reactor.carbonTank);
 
         MachineStatAccumulator stats = reactor.effectiveStats();
         AlgaeGrowthRecipe recipe = reactor.nextRecipe();
-        if (recipe == null || !reactor.hasRequiredLight(recipe) || !reactor.canAcceptOutput(recipe, stats)) {
-            changed |= reactor.resetCycleIfActive();
-            BaseMachineBlock.setActive(level, pos, state, false);
-            if (changed) {
-                reactor.setChanged();
-            }
-            return;
+        boolean fed = recipe != null && reactor.hasRequiredLight(recipe) && reactor.hasCarbonForHarvest(recipe, stats);
+        boolean growing = fed && reactor.canAcceptOutput(recipe, stats);
+        if (growing) {
+            changed |= reactor.grow(recipe, stats);
+        } else if (!fed) {
+            changed |= reactor.starve();
         }
-        if (!reactor.activeCycleMatches()) {
-            reactor.resetCycle();
-            changed = true;
-        }
-
-        reactor.startCycleIfNeeded(recipe);
-        reactor.progress++;
-        changed = true;
-        if (reactor.progress >= reactor.currentProcessingTicks(recipe, stats)) {
-            changed |= reactor.process(recipe, stats);
-        }
-        BaseMachineBlock.setActive(level, pos, state, true);
+        BaseMachineBlock.setActive(level, pos, state, growing);
         if (changed) {
             reactor.setChanged();
         }
+        reactor.syncVisualState(level);
+    }
+
+    private boolean grow(AlgaeGrowthRecipe recipe, MachineStatAccumulator stats) {
+        if (!activeCycleMatches()) {
+            resetCycle();
+        }
+        startCycleIfNeeded(recipe);
+        int ticks = currentProcessingTicks(recipe, stats);
+        double step = AlgaeCultureDynamics.progressPerTick(density, aeration);
+        progress += step;
+        density = AlgaeCultureDynamics.grow(density, aeration, ticks);
+        carbonCharge += carbonRate(recipe, ticks) * step;
+        if (progress >= ticks - EPSILON) {
+            process(recipe, stats, ticks);
+        }
+        return true;
+    }
+
+    /** Carbon gas fed per tick of harvest progress at the current aeration. */
+    private double carbonRate(AlgaeGrowthRecipe recipe, int ticks) {
+        return recipe.carbonInput().amount() * AlgaeCultureDynamics.carbonPerBiomass(aeration) / ticks;
+    }
+
+    /** The tank must hold the gas this harvest will have used by the end, at the current aeration. */
+    private boolean hasCarbonForHarvest(AlgaeGrowthRecipe recipe, MachineStatAccumulator stats) {
+        int ticks = currentProcessingTicks(recipe, stats);
+        double remaining = Math.max(0.0, ticks - progress) * carbonRate(recipe, ticks);
+        return carbonTank.getFluidAmount() >= (int) Math.ceil(carbonCharge + remaining - CARBON_EPSILON);
+    }
+
+    private boolean starve() {
+        double next = AlgaeCultureDynamics.dieBack(density);
+        if (next == density) {
+            return false;
+        }
+        density = next;
+        return true;
+    }
+
+    /**
+     * Reactors saved while the block was a solid cube stored no light inside it, which leaves the renderer's culture and
+     * tanks unlit. Rechecking the block's own light once on load fixes those saves.
+     */
+    @Override
+    public void onLoad() {
+        super.onLoad();
+        if (level != null && !level.isClientSide) {
+            level.getLightEngine().checkBlock(worldPosition);
+        }
+    }
+
+    public int aeration() {
+        return aeration;
+    }
+
+    public void setAeration(int aeration) {
+        int clamped = AlgaeCultureDynamics.clampAeration(aeration);
+        if (clamped != this.aeration) {
+            this.aeration = clamped;
+            setChanged();
+        }
+    }
+
+    public double cultureDensity() {
+        return density;
+    }
+
+    /** Client copy of the state the renderer draws; synced from the server in the block entity update tag. */
+    public AlgaeVisualState visualState() {
+        return visualState;
+    }
+
+    public AlgaeVisualState.Animation animation() {
+        return animation;
+    }
+
+    @Override
+    public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
+        return currentVisualState().save();
+    }
+
+    @Override
+    public Packet<ClientGamePacketListener> getUpdatePacket() {
+        return ClientboundBlockEntityDataPacket.create(this);
+    }
+
+    @Override
+    public void handleUpdateTag(CompoundTag tag, HolderLookup.Provider registries) {
+        visualState = AlgaeVisualState.load(tag);
+    }
+
+    @Override
+    public void onDataPacket(Connection connection, ClientboundBlockEntityDataPacket packet, HolderLookup.Provider registries) {
+        visualState = AlgaeVisualState.load(packet.getTag());
+    }
+
+    private void syncVisualState(Level level) {
+        if (level.getGameTime() % VISUAL_SYNC_INTERVAL != 0) {
+            return;
+        }
+        AlgaeVisualState.Key key = currentVisualState().key();
+        if (!key.equals(lastSyncedVisual)) {
+            lastSyncedVisual = key;
+            level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), Block.UPDATE_CLIENTS);
+        }
+    }
+
+    private AlgaeVisualState currentVisualState() {
+        AlgaeGrowthRecipe recipe = nextRecipe();
+        ItemStack output = inventory.getStackInSlot(SLOT_OUTPUT);
+        return new AlgaeVisualState(
+                (float) density,
+                aeration,
+                isActive(),
+                lightLevel() >= (recipe == null ? DEFAULT_MINIMUM_LIGHT : recipe.minimumLight()),
+                waterTank.getFluidAmount() / (float) waterTank.getCapacity(),
+                carbonTank.getFluidAmount() / (float) carbonTank.getCapacity(),
+                carbonTank.getFluid().getFluid(),
+                output.isEmpty() ? 0.0F : output.getCount() / (float) output.getMaxStackSize()
+        );
     }
 
     public ItemStackHandler getInventory() {
@@ -313,7 +447,7 @@ public class AlgaePhotobioreactorBlockEntity extends BlockEntity
                         MachineInfoSnapshot.BlockedReason.NONE
                 )
                 .status(statusKey(status))
-                .progress(progress, recipe == null ? 0 : currentProcessingTicks(recipe, stats))
+                .progress((int) progress, recipe == null ? 0 : currentProcessingTicks(recipe, stats))
                 .output(status == STATUS_OUTPUT_FULL
                         ? MachineInfoSnapshot.OutputSummary.OUTPUT_FULL
                         : MachineInfoSnapshot.OutputSummary.NONE)
@@ -403,10 +537,13 @@ public class AlgaePhotobioreactorBlockEntity extends BlockEntity
         tag.put("GearInventory", gearInventory.serializeNBT(registries));
         tag.put("WaterTank", waterTank.writeToNBT(registries, new CompoundTag()));
         tag.put("CarbonTank", carbonTank.writeToNBT(registries, new CompoundTag()));
-        tag.putInt("Progress", progress);
+        tag.putDouble("Progress", progress);
         tag.put("ActiveWater", activeWater.saveOptional(registries));
         tag.put("ActiveCarbon", activeCarbon.saveOptional(registries));
         tag.putDouble("OutputBonusProgress", outputBonusProgress);
+        tag.putDouble("Density", density);
+        tag.putDouble("CarbonCharge", carbonCharge);
+        tag.putInt("Aeration", aeration);
     }
 
     @Override
@@ -416,10 +553,14 @@ public class AlgaePhotobioreactorBlockEntity extends BlockEntity
         gearInventory.deserializeNBT(registries, tag.getCompound("GearInventory"));
         waterTank.readFromNBT(registries, tag.getCompound("WaterTank"));
         carbonTank.readFromNBT(registries, tag.getCompound("CarbonTank"));
-        progress = Math.max(0, tag.getInt("Progress"));
+        progress = Math.max(0.0, tag.getDouble("Progress"));
         activeWater = FluidStack.parseOptional(registries, tag.getCompound("ActiveWater"));
         activeCarbon = FluidStack.parseOptional(registries, tag.getCompound("ActiveCarbon"));
         outputBonusProgress = clampUnit(tag.getDouble("OutputBonusProgress"));
+        // Reactors saved before cultures existed were already growing, so they keep a full culture.
+        density = tag.contains("Density") ? clampUnit(tag.getDouble("Density")) : 1.0;
+        carbonCharge = Math.max(0.0, tag.getDouble("CarbonCharge"));
+        aeration = tag.contains("Aeration") ? AlgaeCultureDynamics.clampAeration(tag.getInt("Aeration")) : AlgaeCultureDynamics.RATED_AERATION;
     }
 
     private AlgaeGrowthRecipe nextRecipe() {
@@ -436,23 +577,27 @@ public class AlgaePhotobioreactorBlockEntity extends BlockEntity
         return recipes.searches();
     }
 
-    private boolean process(AlgaeGrowthRecipe recipe, MachineStatAccumulator stats) {
+    /** Harvests one cycle. Progress and fed carbon past the cycle carry into the next, so the rate stays exact. */
+    private void process(AlgaeGrowthRecipe recipe, MachineStatAccumulator stats, int ticks) {
         if (level == null || !recipe.matches(new AlgaeGrowthRecipeInput(waterTank.getFluid(), carbonTank.getFluid()), level)) {
-            return false;
+            return;
         }
         ItemStack output = effectiveOutput(recipe, stats, false);
-        if (!canAcceptOutput(output)) {
-            return false;
+        int carbon = (int) Math.floor(carbonCharge + CARBON_EPSILON);
+        if (!canAcceptOutput(output) || carbonTank.getFluidAmount() < carbon) {
+            return;
         }
         FluidStack drainedWater = waterTank.drain(recipe.waterInput().amount(), IFluidHandler.FluidAction.EXECUTE);
-        FluidStack drainedCarbon = carbonTank.drain(recipe.carbonInput().amount(), IFluidHandler.FluidAction.EXECUTE);
-        if (drainedWater.getAmount() < recipe.waterInput().amount() || drainedCarbon.getAmount() < recipe.carbonInput().amount()) {
+        FluidStack drainedCarbon = carbonTank.drain(carbon, IFluidHandler.FluidAction.EXECUTE);
+        if (drainedWater.getAmount() < recipe.waterInput().amount() || drainedCarbon.getAmount() < carbon) {
             resetCycle();
-            return true;
+            return;
         }
         addOutput(effectiveOutput(recipe, stats, true));
-        resetCycle();
-        return true;
+        progress = Math.max(0.0, progress - ticks);
+        carbonCharge = Math.max(0.0, carbonCharge - carbon);
+        activeWater = FluidStack.EMPTY;
+        activeCarbon = FluidStack.EMPTY;
     }
 
     private boolean canAcceptOutput(AlgaeGrowthRecipe recipe, MachineStatAccumulator stats) {
@@ -505,6 +650,9 @@ public class AlgaePhotobioreactorBlockEntity extends BlockEntity
         if (!hasRequiredLight(recipe)) {
             return STATUS_LOW_LIGHT;
         }
+        if (!hasCarbonForHarvest(recipe, stats)) {
+            return STATUS_NO_CARBON;
+        }
         if (!canAcceptOutput(recipe, stats)) {
             return STATUS_OUTPUT_FULL;
         }
@@ -512,35 +660,28 @@ public class AlgaePhotobioreactorBlockEntity extends BlockEntity
     }
 
     private void startCycleIfNeeded(AlgaeGrowthRecipe recipe) {
-        if (progress != 0) {
+        if (!activeWater.isEmpty()) {
             return;
         }
         activeWater = waterTank.getFluid().copyWithAmount(recipe.waterInput().amount());
         activeCarbon = carbonTank.getFluid().copyWithAmount(recipe.carbonInput().amount());
     }
 
+    /** A cycle keeps its progress only while the same water and carbon gas are still there to finish it. */
     private boolean activeCycleMatches() {
-        if (progress == 0) {
+        if (activeWater.isEmpty()) {
             return true;
         }
-        return !activeWater.isEmpty()
-                && !activeCarbon.isEmpty()
+        return !activeCarbon.isEmpty()
                 && FluidStack.isSameFluidSameComponents(activeWater, waterTank.getFluid())
                 && FluidStack.isSameFluidSameComponents(activeCarbon, carbonTank.getFluid())
                 && waterTank.getFluidAmount() >= activeWater.getAmount()
                 && carbonTank.getFluidAmount() >= activeCarbon.getAmount();
     }
 
-    private boolean resetCycleIfActive() {
-        if (progress == 0 && activeWater.isEmpty() && activeCarbon.isEmpty()) {
-            return false;
-        }
-        resetCycle();
-        return true;
-    }
-
     private void resetCycle() {
-        progress = 0;
+        progress = 0.0;
+        carbonCharge = 0.0;
         activeWater = FluidStack.EMPTY;
         activeCarbon = FluidStack.EMPTY;
     }
