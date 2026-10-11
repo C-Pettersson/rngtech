@@ -2,6 +2,7 @@ package com.rngtech.rpg;
 
 import com.rngtech.content.blockentity.SolidFuelBurnerBlockEntity;
 import com.rngtech.content.cable.EnergyConnectorTier;
+import com.rngtech.content.energy.BiogasDigestion;
 import com.rngtech.content.energy.CathodeMaterial;
 import com.rngtech.content.energy.CavitationRotorMaterial;
 import com.rngtech.content.energy.CollapseNozzleMaterial;
@@ -178,29 +179,41 @@ public final class EnergyBalanceSimulation {
         }
     }
 
-    /** BioGeneratorBlockEntity#effectiveGenerationRate, #effectiveFuelDurationTicks. */
+    /**
+     * BioGeneratorBlockEntity#ratedGeneration, #ratedFuelEnergy, #engineRate, and BiogasDigestion, at the rated retention
+     * and both ends of the retention dial. The engine runs at the digestion rate once the gas holder is primed.
+     */
     private void bioGenerators() {
         ChainCosts.Fuel fuel = chains.fuel("bio_generator");
         MachineStat powerStat = MachineStat.valueOf(fuel.stat());
-        for (boolean chamber : new boolean[] {false, true}) {
-            add("bio_generator", "Bio Generator", 2, List.of(chamber ? "bio_chamber:standard" : "bio_chamber:none"), fuel, roller -> {
-                MachineStatAccumulator stats = MachineBaseStatCatalog.bioGenerator();
-                stats.apply(roller.machine(MachineType.BIO_GENERATOR, 2));
-                if (chamber) {
-                    part(stats, ComponentBaseStatCatalog.bioChamber(),
-                            roller.part(MachinePartType.BIO_CHAMBER, MachineType.BIO_GENERATOR, 1, 0));
-                }
-                double multiplier = Math.max(0.1, stats.effectiveEnergyGenerationMultiplier());
-                double flat = Math.max(0.0, stats.effectiveFlatEnergyGenerationBonus());
-                int rate = Math.max(1, ceil(8 * multiplier + flat));
-                double baseEnergy = fuel.baseAmount()
-                        * Math.max(0.1, stats.value(powerStat))
-                        * Math.max(0.1, stats.value(MachineStat.FUEL_EFFICIENCY))
-                        * Math.max(0.1, stats.value(MachineStat.EFFICIENCY));
-                int baseTicks = Math.max(1, ceil(baseEnergy / 8.0));
-                int ticks = Math.max(1, ceil(baseTicks * Math.max(0.1, stats.value(MachineStat.FUEL_DURATION))));
-                return Outcome.running(rate, rate, (double) ticks * rate);
-            });
+        int[] retentions = {
+                BiogasDigestion.RATED_RETENTION_DAYS, BiogasDigestion.MIN_RETENTION_DAYS, BiogasDigestion.MAX_RETENTION_DAYS
+        };
+        for (int days : retentions) {
+            for (boolean chamber : new boolean[] {false, true}) {
+                add("bio_generator", "Bio Generator", 2, List.of(
+                        chamber ? "bio_chamber:standard" : "bio_chamber:none", "retention:" + days + "d"
+                ), fuel, roller -> {
+                    MachineStatAccumulator stats = MachineBaseStatCatalog.bioGenerator();
+                    stats.apply(roller.machine(MachineType.BIO_GENERATOR, 2));
+                    if (chamber) {
+                        part(stats, ComponentBaseStatCatalog.bioChamber(),
+                                roller.part(MachinePartType.BIO_CHAMBER, MachineType.BIO_GENERATOR, 1, 0));
+                    }
+                    double multiplier = Math.max(0.1, stats.effectiveEnergyGenerationMultiplier());
+                    double flat = Math.max(0.0, stats.effectiveFlatEnergyGenerationBonus());
+                    double ratedGeneration = 8 * multiplier + flat;
+                    int ratedRate = Math.max(1, ceil(ratedGeneration));
+                    double baseEnergy = fuel.baseAmount()
+                            * Math.max(0.1, stats.value(powerStat))
+                            * Math.max(0.1, stats.value(MachineStat.FUEL_EFFICIENCY))
+                            * Math.max(0.1, stats.value(MachineStat.EFFICIENCY));
+                    int baseTicks = Math.max(1, ceil(baseEnergy / 8.0));
+                    int ticks = Math.max(1, ceil(baseTicks * Math.max(0.1, stats.value(MachineStat.FUEL_DURATION))));
+                    int rate = BiogasDigestion.engineRate(ratedGeneration, days);
+                    return Outcome.running(rate, rate, (double) ticks * ratedRate * BiogasDigestion.gasYield(days));
+                });
+            }
         }
     }
 

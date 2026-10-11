@@ -181,6 +181,7 @@ public final class ModBlocks {
                     .mapColor(MapColor.PLANT)
                     .strength(2.5F)
                     .sound(SoundType.WOOD)
+                    .noOcclusion()
     );
     public static final DeferredBlock<AlgaePhotobioreactorBlock> ALGAE_PHOTOBIOREACTOR = BLOCKS.registerBlock(
             "algae_photobioreactor",

@@ -71,6 +71,7 @@ public final class MasteryChecks {
         EnergyAllocatorChecks.run();
         CableGraphFuzzChecks.run();
         CableArmTargetChecks.run();
+        com.rngtech.content.energy.BiogasDigestionChecks.run();
         modifierProfilesLoad();
     }
 
