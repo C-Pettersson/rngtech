@@ -6,7 +6,6 @@ import com.rngtech.content.block.SolarPanelBlock;
 import com.rngtech.content.energy.SolarPanelMaterial;
 import com.rngtech.content.registry.ModBlockEntities;
 import com.rngtech.rpg.MachineBaseStatCatalog;
-import com.rngtech.rpg.MachineImplicitCatalog;
 import com.rngtech.rpg.MachineStat;
 import com.rngtech.rpg.MachineStatAccumulator;
 import com.rngtech.rpg.MachineType;
@@ -18,12 +17,12 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.energy.IEnergyStorage;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.ItemStackHandler;
 
 public class SolarPanelBlockEntity extends BaseMachineBlockEntity implements MachineInfoProvider {
+    private final EnergyExportTargets exportTargets = new EnergyExportTargets(this);
     public static final int STATUS_CLEAR = 0;
     public static final int STATUS_WEATHER = 1;
     public static final int STATUS_NIGHT = 2;
@@ -96,7 +95,7 @@ public class SolarPanelBlockEntity extends BaseMachineBlockEntity implements Mac
     @Override
     protected MachineStatAccumulator buildStats() {
         MachineStatAccumulator stats = MachineBaseStatCatalog.solarPanel(block.material());
-        stats.apply(MachineImplicitCatalog.effectiveTraits(machineTraits(), getBlockState().getBlock()));
+        stats.apply(effectiveTraits());
         return stats;
     }
 
@@ -286,6 +285,11 @@ public class SolarPanelBlockEntity extends BaseMachineBlockEntity implements Mac
         return stored > 0;
     }
 
+    /** How many times an energy export looked a neighbour up instead of reusing its cached capability. */
+    public int exportTargetLookups() {
+        return exportTargets.lookups();
+    }
+
     private boolean exportEnergy(Level level, BlockPos pos) {
         MachineStatAccumulator stats = effectiveStats();
         if (internalEnergyStored(stats) <= 0) {
@@ -298,11 +302,7 @@ public class SolarPanelBlockEntity extends BaseMachineBlockEntity implements Mac
             if (remainingOutput <= 0 || internalEnergyStored(stats) <= 0) {
                 return exported;
             }
-            IEnergyStorage target = level.getCapability(
-                    Capabilities.EnergyStorage.BLOCK,
-                    pos.relative(direction),
-                    direction.getOpposite()
-            );
+            IEnergyStorage target = exportTargets.get(level, pos, direction);
             if (target == null || !target.canReceive()) {
                 continue;
             }

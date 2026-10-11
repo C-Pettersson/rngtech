@@ -11,6 +11,7 @@ import com.rngtech.content.machine.CrusherChassisMaterial;
 import com.rngtech.content.registry.ModBlocks;
 import com.rngtech.content.registry.ModItems;
 import com.rngtech.rpg.MachineBehavior;
+import com.rngtech.rpg.MachineImplicitCatalog;
 import com.rngtech.rpg.MachineModifier;
 import com.rngtech.rpg.MachineStat;
 import com.rngtech.rpg.MachineStatAccumulator;
@@ -24,6 +25,7 @@ import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.level.block.Block;
 import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
@@ -83,6 +85,9 @@ public final class StatsCacheGameTests {
         check(crusher.effectiveStats().value(MachineStat.PROCESSING_LEVEL) < ironLevel, "Crush Head swap kept the old Processing Level");
         assertMatchesFreshBuild(crusher, "after a Crush Head swap");
 
+        // The no-battery penalty only scales Output Amount above 1x, so give the Crusher some bonus to lose.
+        crusher.setMachineTraits(new MachineTraits(Rarity.MAGIC, 0, List.of(new MachineModifier(
+                ModifierSlot.SUFFIX, MachineStat.OUTPUT_AMOUNT, ModifierOperation.INCREASED_PERCENT, 20.0)), List.of()));
         double withoutBattery = crusher.effectiveStats().value(MachineStat.OUTPUT_AMOUNT);
         ItemStack cell = new ItemStack(ModItems.batteryCell(BatteryCellMaterial.IRON).get());
         check(crusher.canInstallBatteryCell(cell), "Crusher rejects the Battery Cell");
@@ -110,6 +115,32 @@ public final class StatsCacheGameTests {
         check(!recorded.breakdowns().isEmpty(), "A breakdown lost its sources");
         check(crusher.effectiveStats().mutable() != crusher.effectiveStats(), "Cached stats were handed out for changes");
         helper.succeed();
+    }
+
+    /** A running Crusher reuses one effective-traits instance every tick and picks up new traits on the next read. */
+    @GameTest(template = MachineTestSupport.EMPTY, timeoutTicks = RUN_TICKS + 100)
+    public static void effectiveTraitsAreReusedUntilTheTraitsChange(GameTestHelper helper) {
+        CrusherBlockEntity crusher = crusher(helper, new BlockPos(2, 1, 2));
+        crusher.getInventory().setStackInSlot(CrusherBlockEntity.SLOT_INPUT_A, new ItemStack(Items.RAW_IRON, 64));
+        MachineTestSupport.powerEachTick(helper, crusher.getEnergyStorage(null));
+        Block block = crusher.getBlockState().getBlock();
+        check(MachineImplicitCatalog.identity(block) == MachineImplicitCatalog.identity(block), "Block identity was rebuilt");
+        MachineTraits[] first = {crusher.effectiveTraits()};
+        helper.onEachTick(() -> {
+            if (helper.getTick() < RUN_TICKS / 2) {
+                readLikeAnOpenMenu(crusher);
+                check(crusher.effectiveTraits() == first[0], "Rebuilt effective traits at tick " + helper.getTick() + " with nothing changed");
+            }
+        });
+        helper.runAtTickTime(RUN_TICKS / 2, () -> {
+            check(!first[0].hasBehavior(MachineBehavior.BULK_SPEED), "Fresh Crusher already has Bulk Speed");
+            crusher.setMachineTraits(MachineTestSupport.BULK_SPEED);
+            MachineTraits updated = crusher.effectiveTraits();
+            check(updated != first[0] && updated.hasBehavior(MachineBehavior.BULK_SPEED), "New traits kept the old effective traits");
+            check(updated.equals(MachineImplicitCatalog.effectiveTraits(crusher.machineTraits(), block)), "Cached effective traits differ from a fresh build");
+            check(crusher.effectiveTraits() == updated, "Rebuilt effective traits right after an update");
+            helper.succeed();
+        });
     }
 
     private static CrusherBlockEntity crusher(GameTestHelper helper, BlockPos pos) {

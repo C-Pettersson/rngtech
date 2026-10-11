@@ -61,6 +61,9 @@ import net.neoforged.neoforge.items.ItemStackHandler;
 
 public class MetalPressBlockEntity extends BaseMachineBlockEntity
         implements MenuProvider, MachineMasteryHost, MachineInfoProvider {
+    private static final RecipeInputFilter<MetalPressRecipeInput, MetalPressRecipe> INPUT_FILTER = new RecipeInputFilter<>(
+            ModRecipes.METAL_PRESS_TYPE::get,
+            (recipe, item) -> recipe.ingredient().test(item));
     public static final int SLOT_INPUT = 0;
     public static final int SLOT_OUTPUT = 1;
     public static final int PROCESS_SLOT_COUNT = 2;
@@ -534,7 +537,7 @@ public class MetalPressBlockEntity extends BaseMachineBlockEntity
     @Override
     protected MachineStatAccumulator buildStats() {
         MachineStatAccumulator stats = MachineBaseStatCatalog.metalPress();
-        stats.apply(MachineImplicitCatalog.effectiveTraits(machineTraits(), getBlockState().getBlock()));
+        stats.apply(effectiveTraits());
         MegaPassiveTree.applyStats(stats, machineProgression(), MachineMasteryFamily.METAL_PRESS);
         applyHeatCoreStats(stats);
         applyServoStats(stats);
@@ -557,7 +560,7 @@ public class MetalPressBlockEntity extends BaseMachineBlockEntity
     }
 
     private MachineTraits activeTraits() {
-        return MachineImplicitCatalog.effectiveTraits(machineTraits(), getBlockState().getBlock());
+        return effectiveTraits();
     }
 
     @Override
@@ -1382,8 +1385,7 @@ public class MetalPressBlockEntity extends BaseMachineBlockEntity
 
     /** Any mold's recipe counts, since the press switches to whichever installed mold fits the input. */
     public boolean isPressInput(ItemStack stack) {
-        return RecipeInputFilter.anyAccepts(level, ModRecipes.METAL_PRESS_TYPE.get(), stack,
-                (recipe, item) -> recipe.ingredient().test(item));
+        return INPUT_FILTER.accepts(level, stack);
     }
 
     private final class ProcessItemHandler implements IItemHandler {

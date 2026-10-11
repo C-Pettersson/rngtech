@@ -21,9 +21,10 @@ import java.util.Arrays;
 
 /**
  * Builds {@link BenchmarkScene}, lets it settle, then times the server tick for a fixed number of ticks and writes the
- * result. It is registered only on the {@code tickBenchmark} run, never on {@code gameTestServer} or in the mod jar.
+ * result. It is registered only on the {@code tickBenchmark} run, never on {@code gameTestServer} or in the mod jar. Its
+ * own GameTest namespace lets that run enable this test alone, so no other GameTest shares the measured ticks.
  */
-@GameTestHolder("rngtech")
+@GameTestHolder("rngtech_benchmark")
 public final class TickBenchmark {
     private static final int SETTLE_TICKS = Integer.getInteger("rngtech.benchmark.settle", 100);
     private static final int WARMUP_TICKS = Integer.getInteger("rngtech.benchmark.warmup", 200);

@@ -103,7 +103,8 @@ Output Amount sets how much extra crushed material an ore block or raw metal giv
 - The chassis sets a base multiplier. Everything else adds to one **increased** total: the Crush Head's own yield, its rolled affixes, Crusher affixes, Mastery nodes, ascendancy nodes, and At-Level Output on recipes at the head's hardness.
 - That total has diminishing returns. Bonuses adding up to +50% give about +33% more output, +100% gives +50%, and the result never reaches +100%.
 - **Big yield affixes cost speed.** Crusher Jaws and Crush Head Pulverizing give the most Bonus Output, but each also rolls reduced Processing Speed, which slows every recipe. The Output Amount suffix is much smaller and has no penalty.
-- Without a Battery Cell, Output Amount drops to 75% after all of this.
+- Output Amount never drops below 1×, so a Crusher always makes at least the recipe's base output.
+- Without a Battery Cell, the Crusher keeps only 75% of its bonus above 1×. A 1.4× Crusher drops to 1.3×, and a 1× Crusher loses nothing.
 
 Output Amount above 1× is banked: each craft adds its fractional share to a bonus bar, and you get an extra item when the bar fills. The bar resets when you change the input item. Hover the bar to preview the next payout.
 
@@ -130,7 +131,7 @@ Output Guard keeps progress for a while when the output slot is full instead of 
 The Gear tab has two slots:
 
 - one **Crush Head** slot. A head is required. Its stage cannot be higher than the chassis stage, so a Wooden Crusher only takes a Flint Crush Head.
-- one **Battery Cell** slot. Without a cell, the Crusher keeps only a tiny internal buffer and makes 25% less output on average.
+- one **Battery Cell** slot. Without a cell, the Crusher keeps only a tiny internal buffer and loses a quarter of its bonus output.
 
 Crush Heads roll their own affixes, and their stats add to the Crusher's. See [Gear](gear.md) for how Gear works.
 

@@ -11,6 +11,7 @@ import com.rngtech.content.purge.FluidPurgeRole;
 import com.rngtech.content.purge.FluidPurgeTarget;
 import com.rngtech.content.purge.PurgeableFluidStorage;
 import com.rngtech.content.recipe.CoalGasificationRecipe;
+import com.rngtech.content.recipe.CoalGasificationRecipeInput;
 import com.rngtech.content.recipe.GasCombustionRecipe;
 import com.rngtech.content.recipe.GasReformingRecipe;
 import com.rngtech.content.registry.ModBlockEntities;
@@ -44,7 +45,6 @@ import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.energy.IEnergyStorage;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.capability.IFluidHandler;
@@ -57,6 +57,13 @@ import java.util.List;
 
 public class GasChemistryBlockEntity extends BaseMachineBlockEntity
         implements MenuProvider, PurgeableFluidStorage, MachineInfoProvider {
+    private final EnergyExportTargets exportTargets = new EnergyExportTargets(this);
+    private final RecipeCache<CoalGasificationRecipe> gasificationRecipes = new RecipeCache<>(1);
+    private final RecipeCache<GasCombustionRecipe> combustionRecipes = new RecipeCache<>(1);
+    private final RecipeCache<GasReformingRecipe> reformingRecipes = new RecipeCache<>(1);
+    private static final RecipeInputFilter<CoalGasificationRecipeInput, CoalGasificationRecipe> INPUT_FILTER = new RecipeInputFilter<>(
+            ModRecipes.COAL_GASIFICATION_TYPE::get,
+            (recipe, item) -> recipe.carbonInput().test(item));
     public static final int SLOT_PROCESS_INPUT = 0;
     public static final int SLOT_PROCESS_OUTPUT = 1;
     public static final int SLOT_HEAT_CORE = 0;
@@ -615,16 +622,37 @@ public class GasChemistryBlockEntity extends BaseMachineBlockEntity
     }
 
     private CoalGasificationRecipe currentGasificationRecipe() {
-        return GasChemistryRecipes.gasification(level, processInventory.getStackInSlot(SLOT_PROCESS_INPUT), waterTank.getFluid())
-                .orElse(null);
+        if (level == null) {
+            return null;
+        }
+        ItemStack carbon = processInventory.getStackInSlot(SLOT_PROCESS_INPUT);
+        FluidStack water = waterTank.getFluid();
+        return gasificationRecipes.lookup(0, level).item(carbon).fluid(water)
+                .find(() -> GasChemistryRecipes.gasification(level, carbon, water));
     }
 
     private GasCombustionRecipe currentCombustionRecipe() {
-        return GasChemistryRecipes.combustion(level, inputTank.getFluid()).orElse(null);
+        if (level == null) {
+            return null;
+        }
+        FluidStack gas = inputTank.getFluid();
+        return combustionRecipes.lookup(0, level).fluid(gas).find(() -> GasChemistryRecipes.combustion(level, gas));
     }
 
     private GasReformingRecipe currentReformingRecipe() {
-        return GasChemistryRecipes.reforming(level, catalystStack(), inputTank.getFluid(), waterTank.getFluid()).orElse(null);
+        if (level == null) {
+            return null;
+        }
+        ItemStack catalyst = catalystStack();
+        FluidStack feedGas = inputTank.getFluid();
+        FluidStack water = waterTank.getFluid();
+        return reformingRecipes.lookup(0, level).item(catalyst).fluid(feedGas).fluid(water)
+                .find(() -> GasChemistryRecipes.reforming(level, catalyst, feedGas, water));
+    }
+
+    /** How many recipe lookups searched the recipes instead of reusing a remembered result. */
+    public int recipeSearches() {
+        return gasificationRecipes.searches() + combustionRecipes.searches() + reformingRecipes.searches();
     }
 
     private boolean canRunGasification(CoalGasificationRecipe recipe) {
@@ -809,6 +837,11 @@ public class GasChemistryBlockEntity extends BaseMachineBlockEntity
         processInventory.setStackInSlot(SLOT_PROCESS_OUTPUT, merged);
     }
 
+    /** How many times an energy export looked a neighbour up instead of reusing its cached capability. */
+    public int exportTargetLookups() {
+        return exportTargets.lookups();
+    }
+
     private boolean exportEnergy(Level level, BlockPos pos) {
         int remaining = energyStored();
         boolean moved = false;
@@ -816,7 +849,7 @@ public class GasChemistryBlockEntity extends BaseMachineBlockEntity
             if (remaining <= 0) {
                 break;
             }
-            IEnergyStorage target = level.getCapability(Capabilities.EnergyStorage.BLOCK, pos.relative(direction), direction.getOpposite());
+            IEnergyStorage target = exportTargets.get(level, pos, direction);
             if (target == null || !target.canReceive()) {
                 continue;
             }
@@ -1175,8 +1208,7 @@ public class GasChemistryBlockEntity extends BaseMachineBlockEntity
     }
 
     public boolean isGasificationInput(ItemStack stack) {
-        return RecipeInputFilter.anyAccepts(level, ModRecipes.COAL_GASIFICATION_TYPE.get(), stack,
-                (recipe, item) -> recipe.carbonInput().test(item));
+        return INPUT_FILTER.accepts(level, stack);
     }
 
     private final class OutputItemHandler implements IItemHandler {

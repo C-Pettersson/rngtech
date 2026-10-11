@@ -8,7 +8,6 @@ import com.rngtech.content.registry.ModBlockEntities;
 import com.rngtech.content.registry.ModTags;
 import com.rngtech.rpg.ComponentBaseStatCatalog;
 import com.rngtech.rpg.MachineBaseStatCatalog;
-import com.rngtech.rpg.MachineImplicitCatalog;
 import com.rngtech.rpg.MachineNameGenerator;
 import com.rngtech.rpg.MachinePartType;
 import com.rngtech.rpg.MachineStat;
@@ -39,6 +38,7 @@ import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.ItemStackHandler;
 
 public class BioGeneratorBlockEntity extends BaseMachineBlockEntity implements MenuProvider, MachineInfoProvider {
+    private final EnergyExportTargets exportTargets = new EnergyExportTargets(this);
     public static final int SLOT_FUEL = 0;
     public static final int SLOT_BATTERY_CELL = 0;
     public static final int SLOT_BIO_CHAMBER = 1;
@@ -328,7 +328,7 @@ public class BioGeneratorBlockEntity extends BaseMachineBlockEntity implements M
     @Override
     protected MachineStatAccumulator buildStats() {
         MachineStatAccumulator stats = MachineBaseStatCatalog.bioGenerator();
-        stats.apply(MachineImplicitCatalog.effectiveTraits(machineTraits(), getBlockState().getBlock()));
+        stats.apply(effectiveTraits());
         ItemStack chamber = bioChamberStack();
         if (isBioChamber(chamber)) {
             ComponentBaseStatCatalog.applyEffectiveContribution(stats, chamber);
@@ -561,6 +561,11 @@ public class BioGeneratorBlockEntity extends BaseMachineBlockEntity implements M
         return stored;
     }
 
+    /** How many times an energy export looked a neighbour up instead of reusing its cached capability. */
+    public int exportTargetLookups() {
+        return exportTargets.lookups();
+    }
+
     private boolean exportEnergy(Level level, BlockPos pos) {
         MachineStatAccumulator stats = effectiveStats();
         if (energyStored() <= 0) {
@@ -574,11 +579,7 @@ public class BioGeneratorBlockEntity extends BaseMachineBlockEntity implements M
                 return exported;
             }
 
-            IEnergyStorage target = level.getCapability(
-                    Capabilities.EnergyStorage.BLOCK,
-                    pos.relative(direction),
-                    direction.getOpposite()
-            );
+            IEnergyStorage target = exportTargets.get(level, pos, direction);
             if (target == null || !target.canReceive()) {
                 continue;
             }
