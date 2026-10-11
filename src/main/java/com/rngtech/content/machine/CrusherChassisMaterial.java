@@ -5,7 +5,7 @@ import net.minecraft.util.StringRepresentable;
 import java.util.Locale;
 
 public enum CrusherChassisMaterial implements StringRepresentable {
-    WOODEN(0, 0.50, 0.25, 0.70, 1.25, 0.65, 0.85),
+    WOODEN(0, 0.50, 0.25, 0.70, 1.25, 0.65, 1.00),
     IRON(1, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00),
     COPPER(2, 0.85, 1.50, 1.08, 0.95, 1.08, 1.00),
     BRONZE(3, 1.10, 1.10, 0.98, 1.05, 0.95, 1.10),
