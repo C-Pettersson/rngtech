@@ -181,6 +181,7 @@ public final class ModBlocks {
                     .mapColor(MapColor.PLANT)
                     .strength(2.5F)
                     .sound(SoundType.WOOD)
+                    .noOcclusion()
     );
     public static final DeferredBlock<AlgaePhotobioreactorBlock> ALGAE_PHOTOBIOREACTOR = BLOCKS.registerBlock(
             "algae_photobioreactor",
@@ -269,6 +270,7 @@ public final class ModBlocks {
                     .mapColor(MapColor.METAL)
                     .strength(3.5F)
                     .sound(SoundType.METAL)
+                    .noOcclusion()
     );
     public static final DeferredBlock<VacuumCollapseGeneratorBlock> VACUUM_COLLAPSE_GENERATOR = BLOCKS.registerBlock(
             "vacuum_collapse_generator",
@@ -285,6 +287,7 @@ public final class ModBlocks {
                     .mapColor(MapColor.METAL)
                     .strength(3.5F)
                     .sound(SoundType.METAL)
+                    .noOcclusion()
     );
     public static final DeferredBlock<MetalPressBlock> CRUDE_METAL_PRESS = BLOCKS.registerBlock(
             "crude_metal_press",
@@ -360,6 +363,7 @@ public final class ModBlocks {
                     .mapColor(MapColor.METAL)
                     .strength(3.5F)
                     .sound(SoundType.METAL)
+                    .noOcclusion()
     );
     public static final Map<CompressorTankMaterial, DeferredBlock<CompressorTankBlock>> COMPRESSOR_TANKS =
             registerCompressorTankBlocks();

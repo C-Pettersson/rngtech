@@ -1,0 +1,97 @@
+{
+  "render_type": "minecraft:cutout",
+  "textures": {
+    "particle": "#culture",
+    "culture": "rngtech:block/bio_generator/culture",
+    "valve": "rngtech:block/bio_generator/valve"
+  },
+  "elements": [
+    {
+      "from": [
+        8.0,
+        2.1,
+        0.8
+      ],
+      "to": [
+        11.0,
+        3.3,
+        2.0
+      ],
+      "faces": {
+        "north": {
+          "texture": "#culture"
+        },
+        "south": {
+          "texture": "#culture"
+        },
+        "up": {
+          "texture": "#culture"
+        }
+      }
+    },
+    {
+      "from": [
+        7.5,
+        2.0,
+        0.7
+      ],
+      "to": [
+        8.0,
+        3.45,
+        2.1
+      ],
+      "faces": {
+        "north": {
+          "texture": "#valve"
+        },
+        "south": {
+          "texture": "#valve"
+        },
+        "east": {
+          "texture": "#valve"
+        },
+        "west": {
+          "texture": "#valve"
+        },
+        "up": {
+          "texture": "#valve"
+        },
+        "down": {
+          "texture": "#valve"
+        }
+      }
+    },
+    {
+      "from": [
+        11.0,
+        2.0,
+        0.7
+      ],
+      "to": [
+        11.5,
+        3.45,
+        2.1
+      ],
+      "faces": {
+        "north": {
+          "texture": "#valve"
+        },
+        "south": {
+          "texture": "#valve"
+        },
+        "east": {
+          "texture": "#valve"
+        },
+        "west": {
+          "texture": "#valve"
+        },
+        "up": {
+          "texture": "#valve"
+        },
+        "down": {
+          "texture": "#valve"
+        }
+      }
+    }
+  ]
+}

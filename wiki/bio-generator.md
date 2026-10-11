@@ -11,13 +11,13 @@ wiki:
 {{ infobox(
     fields={
         "Type": "Generator",
-        "Power": "Burns crops and biomass, generates FE",
+        "Power": "Digests crops and biomass into biogas, burns it for FE",
         "Gear": "{{ item('rngtech:bio_chamber', 'Bio Chamber') }}, {{ item('rngtech:iron_battery_cell', 'Battery Cell') }}",
         "Mastery": "No",
     },
 ) }}
 
-The **Bio Generator** is an early generator that burns food and plant matter instead of coal. Potatoes, carrots, bread, saplings, and seeds all work straight from the farm, and prepared biomass from the [Wooden Composter](wooden-composter.md) and [Algae Photobioreactor](algae-photobioreactor.md) burns for much longer.
+The **Bio Generator** is an early generator built like a small farm biogas plant. A feed hopper drops food and plant matter into a digester tank, where it rots into biogas. The gas collects under a membrane dome, and a small gas engine burns it for FE. Potatoes, carrots, bread, saplings, and seeds all work straight from the farm, and prepared biomass from the [Wooden Composter](wooden-composter.md) and [Algae Photobioreactor](algae-photobioreactor.md) lasts much longer.
 
 Each Bio Generator you craft rolls its own [rarity and affixes](rarity-and-affixes.md). It does not have Machine Mastery.
 
@@ -35,13 +35,35 @@ Mine it with a pickaxe to get it back. Fuel and installed Gear drop as separate 
 
 ### Generating power
 
-Put fuel in the fuel slot on the Process tab. The generator burns one item at a time at about 8 FE/t before stats, so a fuel's FE value decides how long it burns. A Composted Biomass worth 1,600 FE burns for 200 ticks (10 seconds).
+Put fuel in the fuel slot on the Process tab. Power comes in three steps, and you can watch each one on the block:
 
-Generated FE goes into a small internal buffer, plus any installed Battery Cell, and the generator pushes it out to adjacent blocks on its four sides, for example a [Universal Cable](universal-cable.md). The generator does not limit its own output, so the receiver or connector tier decides how much FE moves each tick. When the buffer is full, the generator pauses and does not waste fuel. It never accepts FE from outside.
+1. **Digester.** The digester takes one item at a time from the hopper and turns it into biogas at about 8 FE/t before stats. A fuel's FE value decides how long it digests: a Composted Biomass worth 1,600 FE takes 200 ticks (10 seconds). The sight glass on the tank shows the current item's slurry level falling, with bubbles while gas forms.
+2. **Gas holder.** Biogas collects under the dome on top of the tank, which swells as it fills. It holds 1,600 FE of gas.
+3. **Engine.** The gas engine starts once the holder has 400 FE of gas, then runs at the digester's pace until the holder is empty. Its flywheel spins and the stack puffs exhaust while it runs, and the lamp on the hopper lights. The gauge on the engine shows the holder's pressure, with the amber band below the start pressure.
+
+A freshly fed generator therefore waits a few seconds before the first FE while the gas pressure builds. The last of the gas still burns when the hopper runs dry, so no fuel is lost.
+
+Generated FE goes into a small internal buffer, plus any installed Battery Cell, and the generator pushes it out to adjacent blocks on every side, for example a [Universal Cable](universal-cable.md). The generator does not limit its own output, so the receiver or connector tier decides how much FE moves each tick. When the buffer is full, the engine idles and the digester keeps filling the gas holder. Once the holder is full too, the digester waits. Nothing is wasted. The generator never accepts FE from outside.
 
 Golden Apples, Enchanted Golden Apples, and Golden Carrots are refused.
 
+### Retention time
+
+The dial above the digestion bar on the Process tab sets the **retention time**: how many days the feed stays in the digester. Click or scroll it. Real digesters work the same way: a short stay pushes feed through faster but leaves gas undigested, and a long stay digests more of each load but makes gas slowly.
+
+| Retention | FE/t | FE per item | Unrolled generator | Rich Biomass |
+|---|---:|---:|---:|---:|
+| 10 days | 1.60x | 0.80x | 13 FE/t | 2,560 FE |
+| 15 days | 1.23x | 0.92x | 10 FE/t | 2,954 FE |
+| **20 days (rated)** | **1.00x** | **1.00x** | **8 FE/t** | **3,200 FE** |
+| 30 days | 0.73x | 1.09x | 6 FE/t | 3,491 FE |
+| 40 days | 0.57x | 1.14x | 5 FE/t | 3,657 FE |
+
+The rated 20 days gives every fuel exactly its listed FE at the listed rate. FE/t rounds up like the generator's normal rate. A new retention applies at once, including to the item already digesting. Hover the dial to see the numbers for the item in the hopper.
+
 ### Fuel
+
+Base FE is at the rated 20-day retention.
 
 | Fuel | Items | Base FE |
 |---|---|---:|
@@ -66,9 +88,9 @@ Burning crops directly is the simplest setup, but prepared fuels are worth much 
 - **Composted Biomass** comes from the [Wooden Composter](wooden-composter.md), which turns eight units of cheap organic scraps into one item worth 1,600 FE. Crushing seeds into Compost Feedstock in the [Crusher](crusher.md) first doubles their compost value and comes out well ahead even after the Crusher's power cost.
 - **Rich Biomass** is crafted from Composted Biomass plus Bone Meal, Gunpowder, or Organic Reagent, and is worth 3,200 FE.
 - **Algae Biomass** grows in the [Algae Photobioreactor](algae-photobioreactor.md). Craft four into Dense Algae Biomass for a better fuel.
-- **Organic Reagent** comes from crushing potatoes, carrots, and plant biomass. Crushing a potato costs 600 FE and the reagent burns for 546 FE, so this path loses a little power unless your Bio Chamber boosts reagent fuel.
+- **Organic Reagent** comes from crushing potatoes, carrots, and plant biomass. Crushing a potato costs 600 FE and the reagent gives 546 FE, so this path loses a little power unless your Bio Chamber boosts reagent fuel.
 
-Composted Biomass and Rich Biomass burn only in the Bio Generator. They are not furnace fuel and do not burn in the [Solid Fuel Burner](solid-fuel-burner.md).
+Composted Biomass and Rich Biomass are fuel only for the Bio Generator. They are not furnace fuel and do not burn in the [Solid Fuel Burner](solid-fuel-burner.md).
 
 {{ crafting("rngtech:rich_biomass", "rngtech:dense_algae_biomass") }}
 
@@ -77,17 +99,11 @@ Composted Biomass and Rich Biomass burn only in the Bio Generator. They are not 
 The Gear tab has two optional slots:
 
 - **Battery Cell**: adds FE storage on top of the internal buffer. Stage 0–3 cells fit, including the Voltaic Potato Battery Cell.
-- **Bio Chamber**: a {{ item('rngtech:bio_chamber') }} adds its rolled power modifiers. Besides generic FE/t and burn-duration bonuses, it can roll bonuses for one fuel family, such as potatoes, seeds, Composted Biomass, or algae. These apply only while that family is burning, and a specific family like saplings uses its own bonus rather than the general plant bonus.
-
-
+- **Bio Chamber**: a {{ item('rngtech:bio_chamber') }} adds its rolled power modifiers, and shows as a green culture canister in front of the sight glass. Besides generic FE/t and fuel-duration bonuses, it can roll bonuses for one fuel family, such as potatoes, seeds, Composted Biomass, or algae. These apply only while that family is digesting, and a specific family like saplings uses its own bonus rather than the general plant bonus.
 
 ### Automation
 
-| Side | Behavior |
-|---|---|
-| Top | Inserts fuel. |
-| Sides | Export FE to adjacent receivers. Does not accept FE. |
-| Bottom | Nothing. |
+Connectors work on any side: every face inserts fuel and exports FE to adjacent receivers, and no face accepts FE. The **automation port** on the back, the plant's grid-connection cabinet with a copper-pinned socket in its door and a copper conduit from the engine, marks the spot where a [Universal Cable](universal-cable.md) connector seats flush against the machine.
 
 Automation cannot extract items, and the Gear slots are installed by hand.
 
@@ -95,7 +111,7 @@ Automation cannot extract items, and the Gear slots are installed by hand.
 
 The Bio Generator screen has four tabs:
 
-- **Process**: fuel slot, burn progress, stored FE, and FE/t. Hover for exact values.
+- **Process**: fuel slot, the retention dial, digestion progress, the gas holder gauge with its engine start mark, stored FE, and status icons. Hover for exact values.
 - **Gear**: Battery Cell and Bio Chamber slots.
 - **Stats**: the generator's current stats, including traits and Gear.
 - **Refinement**: refine the placed generator's traits with a catalyst.
