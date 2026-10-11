@@ -115,6 +115,7 @@ public class SolarArrayControllerBlockEntity extends BaseMachineBlockEntity impl
         @Override
         protected void onContentsChanged(int slot) {
             clampInternalEnergy();
+            rescanSoon();
             setChanged();
             syncPreviewToClient();
         }
@@ -166,6 +167,9 @@ public class SolarArrayControllerBlockEntity extends BaseMachineBlockEntity impl
     };
 
     private final List<BlockPos> panelPositions = new ArrayList<>();
+    /** How many controllers share each panel in {@link #panelPositions}, counted on the last scan. */
+    private int[] panelClaims = new int[0];
+    private boolean setBonus;
     private int internalEnergy;
     private double generationCarry;
     private int scanCooldown;
@@ -280,6 +284,7 @@ public class SolarArrayControllerBlockEntity extends BaseMachineBlockEntity impl
     @Override
     public void setMachineTraits(MachineTraits traits) {
         super.setMachineTraits(traits);
+        rescanSoon();
         syncPreviewToClient();
     }
 
@@ -390,8 +395,8 @@ public class SolarArrayControllerBlockEntity extends BaseMachineBlockEntity impl
         int blocked = overflowPanelCount;
         double generatedThisTick = 0.0;
         SolarPanelMaterialState materialState = SolarPanelMaterialState.empty();
-        boolean setBonus = hasCompleteSetBonus(level, stats);
-        for (BlockPos panelPos : panelPositions) {
+        for (int index = 0; index < panelPositions.size(); index++) {
+            BlockPos panelPos = panelPositions.get(index);
             if (!(level.getBlockEntity(panelPos) instanceof SolarPanelBlockEntity panel)) {
                 blocked++;
                 materialState.markMixed();
@@ -400,7 +405,7 @@ public class SolarArrayControllerBlockEntity extends BaseMachineBlockEntity impl
 
             panel.markControlled(level.getGameTime());
             materialState.accept(panel);
-            double generation = panelGeneration(level, panel, stats) / controllerClaims(level, panelPos);
+            double generation = panelGeneration(level, panel, stats) / panelClaims[index];
             if (generation > 0.0) {
                 active++;
                 generatedThisTick += generation;
@@ -494,6 +499,10 @@ public class SolarArrayControllerBlockEntity extends BaseMachineBlockEntity impl
         return blocked > 0 ? STATUS_BLOCKED : STATUS_NO_PANELS;
     }
 
+    /**
+     * Rescans the array every {@link #SCAN_INTERVAL_TICKS}: the connected panels, how many controllers share each one,
+     * and the set bonus only change when blocks or Gear change, so placing or breaking a block shows within a second.
+     */
     private void refreshPanelCacheIfNeeded(Level level, MachineStatAccumulator stats) {
         if (scanCooldown > 0) {
             scanCooldown--;
@@ -513,7 +522,17 @@ public class SolarArrayControllerBlockEntity extends BaseMachineBlockEntity impl
         }
         panelPositions.clear();
         panelPositions.addAll(found);
+        panelClaims = new int[found.size()];
+        for (int index = 0; index < found.size(); index++) {
+            panelClaims[index] = controllerClaims(level, found.get(index));
+        }
+        setBonus = hasCompleteSetBonus(level, stats);
         overflowPanelCount = Math.max(0, expectedPanelSlots(stats) - found.size());
+    }
+
+    /** Rescans on the next tick, after Gear or traits that can change the range. */
+    private void rescanSoon() {
+        scanCooldown = 0;
     }
 
     private double arbitrationGenerationSortValue(Level level, BlockPos panelPos) {
