@@ -88,6 +88,8 @@ public class CableBlockEntity extends BlockEntity implements UniversalConnectorD
     private final EnumMap<Direction, CableUniversalConnectorData> universalConnectors = new EnumMap<>(Direction.class);
     private final TickTransferCounter[] directEnergyInput = new TickTransferCounter[DIRECTIONS.length];
     private final TickTransferCounter[] directEnergyOutput = new TickTransferCounter[DIRECTIONS.length];
+    /** The block next to each connector face as the network snapshot or the last neighbour update saw it; null if unknown. */
+    private final Block[] connectorTargetBlocks = new Block[DIRECTIONS.length];
     private DyeColor color;
 
     public CableBlockEntity(BlockPos pos, BlockState blockState) {
@@ -234,7 +236,17 @@ public class CableBlockEntity extends BlockEntity implements UniversalConnectorD
         invalidateNetworkCache();
     }
 
-    public void connectorTargetChanged() {
+    /**
+     * Reports the block next to a connector face after a neighbour update. Only a different block changes the network:
+     * a machine switching its working state, or any other state change of the same block, keeps the snapshot, and
+     * NeoForge's capability caches already follow its block entity.
+     */
+    public void connectorTargetChanged(Direction direction, Block target) {
+        Block previous = connectorTargetBlocks[direction.ordinal()];
+        connectorTargetBlocks[direction.ordinal()] = target;
+        if (previous == target) {
+            return;
+        }
         invalidateCableCapabilities();
         invalidateNetworkCache();
     }
@@ -487,18 +499,15 @@ public class CableBlockEntity extends BlockEntity implements UniversalConnectorD
     }
 
     /**
-     * Counts every cable network change in the level: links, connectors, their settings, and their targets. Stalled
-     * item and fluid rows retry early when it moves.
+     * Changes whenever the network through the cable at {@code pos} rebuilds: one of its cables, connectors, settings or
+     * connector targets changed, or its snapshot reached the safety lifetime. A change on another network leaves it
+     * alone. Stalled item and fluid rows retry early when it moves. Positions without a cable read 0.
      */
-    static long networkEpoch(Level level) {
-        if (level == null) {
+    public static long networkVersion(Level level, BlockPos pos) {
+        if (level == null || pos == null || !level.isLoaded(pos) || !isNetworkNode(level.getBlockState(pos))) {
             return 0L;
         }
-        LevelNetworkCache cache;
-        synchronized (NETWORK_CACHES) {
-            cache = NETWORK_CACHES.get(level);
-        }
-        return cache == null ? 0L : cache.index.epoch();
+        return networkSnapshot(level, pos).version;
     }
 
     private int receiveFromSide(Direction entrySide, int amount, boolean simulate) {
@@ -1316,6 +1325,7 @@ public class CableBlockEntity extends BlockEntity implements UniversalConnectorD
         CableStats.add(CableStats.Counter.CABLES_SCANNED, cablePositions.size());
         sortedUniversalEndpoints(universalEndpoints);
         return new NetworkSnapshot(
+                ++cache.lastVersion,
                 gameTime,
                 cablePositions,
                 immutableEnergyBuckets(energyEndpoints),
@@ -1377,6 +1387,7 @@ public class CableBlockEntity extends BlockEntity implements UniversalConnectorD
             if (targetState == null && level.isInWorldBounds(targetPos)) {
                 unloadedTargetChunks.add(ChunkPos.asLong(targetPos));
             }
+            cable.connectorTargetBlocks[direction.ordinal()] = targetState == null ? null : targetState.getBlock();
 
             CableUniversalConnectorData universalConnector = cable.universalConnector(direction);
             if (universalConnector != null) {
@@ -1553,6 +1564,7 @@ public class CableBlockEntity extends BlockEntity implements UniversalConnectorD
         private final Map<BlockPos, NetworkState> stateByAnchor = new HashMap<>();
         private final List<PendingEnergyPass> pendingEnergyPasses = new ArrayList<>();
         private long lastPruneGameTime = Long.MIN_VALUE;
+        private long lastVersion;
 
         private NetworkSnapshot getOrBuild(Level level, BlockPos startPos) {
             long gameTime = level.getGameTime();
@@ -1637,6 +1649,7 @@ public class CableBlockEntity extends BlockEntity implements UniversalConnectorD
     }
 
     private static final class NetworkSnapshot {
+        private final long version;
         private final long gameTime;
         private final List<BlockPos> cablePositions;
         private final List<EnergyEndpoint>[] energyEndpoints;
@@ -1653,6 +1666,7 @@ public class CableBlockEntity extends BlockEntity implements UniversalConnectorD
         private long debugSnapshotTick = Long.MIN_VALUE;
 
         private NetworkSnapshot(
+                long version,
                 long gameTime,
                 List<BlockPos> cablePositions,
                 List<EnergyEndpoint>[] energyEndpoints,
@@ -1662,6 +1676,7 @@ public class CableBlockEntity extends BlockEntity implements UniversalConnectorD
                 long[] unloadedTargetChunks,
                 NetworkState state
         ) {
+            this.version = version;
             this.gameTime = gameTime;
             this.cablePositions = cablePositions;
             this.energyEndpoints = energyEndpoints;

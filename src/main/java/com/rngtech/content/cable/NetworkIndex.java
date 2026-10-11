@@ -31,7 +31,6 @@ public final class NetworkIndex<S> {
     private static final long[] NO_CHUNKS = new long[0];
 
     private final Map<BlockPos, Entry<S>> byPosition = new HashMap<>();
-    private long epoch;
 
     /** Compared by identity: two builds of the same network are different entries. */
     private static final class Entry<S> {
@@ -80,7 +79,6 @@ public final class NetworkIndex<S> {
             return null;
         }
         if (unloadedChunkLoaded(entry, tick, chunkLoaded)) {
-            epoch++;
             remove(entry);
             return null;
         }
@@ -123,11 +121,6 @@ public final class NetworkIndex<S> {
         invalidate(pos);
     }
 
-    /** Counts every reported change, so stalled rows can tell that something on some network changed. */
-    public long epoch() {
-        return epoch;
-    }
-
     /** Drops every snapshot that outlived {@code lifetime}. */
     public void prune(long tick, long lifetime) {
         byPosition.values().removeIf(entry -> expired(entry, tick, lifetime));
@@ -138,7 +131,6 @@ public final class NetworkIndex<S> {
     }
 
     private void invalidate(BlockPos pos) {
-        epoch++;
         Entry<S> entry = byPosition.get(pos);
         if (entry != null) {
             remove(entry);
