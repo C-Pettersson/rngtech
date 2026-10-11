@@ -362,6 +362,7 @@ public final class ModBlocks {
                     .mapColor(MapColor.METAL)
                     .strength(3.5F)
                     .sound(SoundType.METAL)
+                    .noOcclusion()
     );
     public static final Map<CompressorTankMaterial, DeferredBlock<CompressorTankBlock>> COMPRESSOR_TANKS =
             registerCompressorTankBlocks();

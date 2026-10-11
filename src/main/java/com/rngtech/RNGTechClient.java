@@ -4,6 +4,7 @@ import com.rngtech.client.CableTintClient;
 import com.rngtech.client.MinersCompanionLampClient;
 import com.rngtech.client.configurator.ConfiguratorClient;
 import com.rngtech.client.renderer.AlgaePhotobioreactorRenderer;
+import com.rngtech.client.renderer.AmmoniaFuelCellRenderer;
 import com.rngtech.client.renderer.BatteryChassisRenderer;
 import com.rngtech.client.renderer.BioGeneratorRenderer;
 import com.rngtech.client.renderer.CavitationGeneratorRenderer;
@@ -157,6 +158,7 @@ public final class RNGTechClient {
         event.registerBlockEntityRenderer(ModBlockEntities.CAVITATION_GENERATOR.get(), CavitationGeneratorRenderer::new);
         event.registerBlockEntityRenderer(ModBlockEntities.CORROSION_CELL.get(), CorrosionCellRenderer::new);
         event.registerBlockEntityRenderer(ModBlockEntities.ALGAE_PHOTOBIOREACTOR.get(), AlgaePhotobioreactorRenderer::new);
+        event.registerBlockEntityRenderer(ModBlockEntities.AMMONIA_FUEL_CELL.get(), AmmoniaFuelCellRenderer::new);
         event.registerEntityRenderer(ModEntityTypes.FORESTRY_CART.get(), ForestryCartRenderer::new);
     }
 
