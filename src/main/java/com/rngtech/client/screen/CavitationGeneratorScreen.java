@@ -1,13 +1,18 @@
 package com.rngtech.client.screen;
 
 import com.rngtech.content.blockentity.CavitationGeneratorBlockEntity;
+import com.rngtech.content.energy.CavitationRotorDynamics;
 import com.rngtech.content.menu.CavitationGeneratorMenu;
 import com.rngtech.rpg.MachineStat;
 
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
+
+import java.util.List;
+import java.util.Locale;
 
 public class CavitationGeneratorScreen extends AbstractContainerScreen<CavitationGeneratorMenu> {
     private static final int PANEL = 0xFFC6C6C6;
@@ -53,6 +58,18 @@ public class CavitationGeneratorScreen extends AbstractContainerScreen<Cavitatio
     private static final int STRAIN_BAR_Y = 61;
     private static final int WEAR_BAR_Y = 73;
     private static final int STRAIN_WEAR_BAR_HEIGHT = 6;
+    private static final int SPEED_GAUGE_Y = 85;
+    private static final int SPEED_GAUGE_HEIGHT = 8;
+    private static final int SPEED_POINTER_HEIGHT = 3;
+    private static final int SPEED_DEAD_ZONE = 0xFF3A3A3A;
+    private static final int SPEED_RATED_ZONE = 0xFF2E5A66;
+    private static final int SPEED_SUPER_ZONE = 0xFF6A3A2E;
+    private static final int SPEED_FILL = 0xFF5FD0E8;
+    private static final int SPEED_SUPER_FILL = 0xFFF08A4B;
+    private static final int SPEED_POINTER = 0xFFF2F2F2;
+    private static final int THROTTLE_COARSE_STEP = 5;
+    private static final int THROTTLE_NOTCH_STEP = 10;
+    private static final double RESONANCE_HIGHLIGHT = 0.6;
     private static final int PITTED_LABEL_X = 192;
     private static final int PITTED_LABEL_Y = 47;
     private static final int PITTED_SLOT_X = 192;
@@ -165,8 +182,40 @@ public class CavitationGeneratorScreen extends AbstractContainerScreen<Cavitatio
             if (menu.selectedTab() == CavitationGeneratorMenu.TAB_PROCESSING && handlePurgeButtonClick(mouseX, mouseY)) {
                 return true;
             }
+            if (menu.selectedTab() == CavitationGeneratorMenu.TAB_PROCESSING && isOverSpeedGauge(mouseX, mouseY)) {
+                double fraction = (mouseX - (leftPos + PROGRESS_BAR_X + 1)) / (PROCESS_BAR_WIDTH - 2);
+                sendThrottle((int) Math.round(fraction * 100.0));
+                return true;
+            }
         }
         return super.mouseClicked(mouseX, mouseY, button);
+    }
+
+    @Override
+    public boolean mouseScrolled(double mouseX, double mouseY, double scrollX, double scrollY) {
+        if (menu.selectedTab() == CavitationGeneratorMenu.TAB_PROCESSING && isOverSpeedGauge(mouseX, mouseY) && scrollY != 0.0) {
+            int step = hasShiftDown() ? THROTTLE_COARSE_STEP : 1;
+            sendThrottle(menu.throttle() + (scrollY > 0.0 ? step : -step));
+            return true;
+        }
+        return super.mouseScrolled(mouseX, mouseY, scrollX, scrollY);
+    }
+
+    private void sendThrottle(int throttle) {
+        int clamped = CavitationRotorDynamics.clampThrottle(throttle);
+        if (clamped == menu.throttle() || minecraft == null || minecraft.player == null || minecraft.gameMode == null) {
+            return;
+        }
+        int buttonId = CavitationGeneratorMenu.throttleButtonId(clamped);
+        if (menu.clickMenuButton(minecraft.player, buttonId)) {
+            minecraft.gameMode.handleInventoryButtonClick(menu.containerId, buttonId);
+        }
+    }
+
+    private boolean isOverSpeedGauge(double mouseX, double mouseY) {
+        int left = leftPos + PROGRESS_BAR_X;
+        int top = topPos + SPEED_GAUGE_Y;
+        return mouseX >= left && mouseX < left + PROCESS_BAR_WIDTH && mouseY >= top && mouseY < top + SPEED_GAUGE_HEIGHT + SPEED_POINTER_HEIGHT;
     }
 
     private void renderPanel(GuiGraphics guiGraphics) {
@@ -251,6 +300,7 @@ public class CavitationGeneratorScreen extends AbstractContainerScreen<Cavitatio
         renderHorizontalMeter(guiGraphics, PROGRESS_BAR_X, PROGRESS_BAR_Y, PROCESS_BAR_WIDTH, PROGRESS_BAR_HEIGHT, menu.processingProgress(), PROGRESS);
         renderHorizontalMeter(guiGraphics, PROGRESS_BAR_X, STRAIN_BAR_Y, PROCESS_BAR_WIDTH, STRAIN_WEAR_BAR_HEIGHT, menu.strainProgress(), STRAIN);
         renderHorizontalMeter(guiGraphics, PROGRESS_BAR_X, WEAR_BAR_Y, PROCESS_BAR_WIDTH, STRAIN_WEAR_BAR_HEIGHT, menu.wearProgress(), WEAR);
+        renderSpeedGauge(guiGraphics);
         renderProcessingIcons(guiGraphics);
         renderPurgeButtons(guiGraphics);
     }
@@ -260,6 +310,87 @@ public class CavitationGeneratorScreen extends AbstractContainerScreen<Cavitatio
         int top = topPos + y;
         guiGraphics.fill(left, top, left + width, top + height, 0xFF5F5F5F);
         guiGraphics.fill(left + 1, top + 1, left + 1 + Math.round((width - 2) * progress), top + height - 1, color);
+    }
+
+    /** Rotor speed over its regimes: no cavitation, up to rated, and supercavitation. The pointer marks the throttle. */
+    private void renderSpeedGauge(GuiGraphics guiGraphics) {
+        int left = leftPos + PROGRESS_BAR_X;
+        int top = topPos + SPEED_GAUGE_Y;
+        int inner = PROCESS_BAR_WIDTH - 2;
+        int onset = left + 1 + speedOffset(CavitationRotorDynamics.ONSET_SPEED, inner);
+        int rated = left + 1 + speedOffset(CavitationRotorDynamics.RATED_SPEED, inner);
+        int right = left + 1 + inner;
+        int bottom = top + SPEED_GAUGE_HEIGHT - 1;
+        guiGraphics.fill(left, top, left + PROCESS_BAR_WIDTH, top + SPEED_GAUGE_HEIGHT, 0xFF5F5F5F);
+        guiGraphics.fill(left + 1, top + 1, onset, bottom, SPEED_DEAD_ZONE);
+        guiGraphics.fill(onset, top + 1, rated, bottom, SPEED_RATED_ZONE);
+        guiGraphics.fill(rated, top + 1, right, bottom, SPEED_SUPER_ZONE);
+
+        double speed = menu.rotorRpm() / (double) CavitationRotorDynamics.MAX_RPM;
+        int fill = left + 1 + speedOffset(speed, inner);
+        guiGraphics.fill(left + 1, top + 3, Math.min(fill, rated), bottom - 2, SPEED_FILL);
+        if (fill > rated) {
+            guiGraphics.fill(rated, top + 3, fill, bottom - 2, SPEED_SUPER_FILL);
+        }
+
+        for (int notch = CavitationRotorDynamics.MIN_THROTTLE; notch <= CavitationRotorDynamics.MAX_THROTTLE; notch += THROTTLE_NOTCH_STEP) {
+            int x = left + 1 + speedOffset(CavitationRotorDynamics.speedOf(notch), inner);
+            guiGraphics.fill(Math.min(x, right - 1), top + 1, Math.min(x, right - 1) + 1, top + 2, 0xFF8B8B8B);
+        }
+        int pointer = Math.min(left + 1 + speedOffset(CavitationRotorDynamics.targetSpeed(menu.throttle()), inner), right - 1);
+        int pointerTop = top + SPEED_GAUGE_HEIGHT;
+        guiGraphics.fill(pointer, pointerTop - 1, pointer + 1, pointerTop + SPEED_POINTER_HEIGHT, SPEED_POINTER);
+        guiGraphics.fill(pointer - 1, pointerTop + 1, pointer + 2, pointerTop + SPEED_POINTER_HEIGHT, SPEED_POINTER);
+    }
+
+    /** Strain against its cap, the FE it costs now and at the cap, and how fast it cools. */
+    private List<Component> strainTooltip() {
+        double maxPenalty = menu.maxStrainPenalty();
+        double penalty = menu.maxHeatStrain() <= 0 ? 0.0 : maxPenalty * Math.min(1.0, menu.heatStrain() / (double) menu.maxHeatStrain());
+        return List.of(
+                Component.translatable("rngtech.cavitation.tooltip.strain", menu.heatStrain(), menu.maxHeatStrain(), menu.recipeStrain()),
+                Component.translatable("rngtech.cavitation.tooltip.strain_penalty", percent(penalty), percent(maxPenalty)).withStyle(ChatFormatting.GRAY),
+                Component.translatable("rngtech.cavitation.tooltip.strain_cooling", multiplier(menu.coolingRate())).withStyle(ChatFormatting.GRAY)
+        );
+    }
+
+    private static String percent(double fraction) {
+        return String.format(Locale.ROOT, "%.0f", fraction * 100.0);
+    }
+
+    private boolean isOver(double mouseX, double mouseY, int x, int y, int width, int height) {
+        return mouseX >= leftPos + x && mouseX < leftPos + x + width && mouseY >= topPos + y && mouseY < topPos + y + height;
+    }
+
+    private static int speedOffset(double speed, int width) {
+        return (int) Math.round(Math.max(0.0, Math.min(1.0, speed)) * width);
+    }
+
+    private List<Component> speedGaugeTooltip() {
+        int throttle = menu.throttle();
+        double target = CavitationRotorDynamics.targetSpeed(throttle);
+        String regime = throttle < CavitationRotorDynamics.RATED_THROTTLE
+                ? "below_rated"
+                : throttle == CavitationRotorDynamics.RATED_THROTTLE ? "rated" : "supercavitation";
+        return List.of(
+                Component.translatable("rngtech.cavitation.tooltip.rotor_speed", menu.rotorRpm(), CavitationRotorDynamics.rpmOf(throttle)),
+                Component.translatable("rngtech.cavitation.tooltip.throttle", throttle, Component.translatable("rngtech.cavitation.throttle." + regime)),
+                Component.translatable("rngtech.cavitation.tooltip.live_wear", multiplier(menu.liveWear()))
+                        .withStyle(menu.liveResonance() < RESONANCE_HIGHLIGHT ? ChatFormatting.AQUA : ChatFormatting.WHITE),
+                Component.translatable(
+                        "rngtech.cavitation.tooltip.throttle_effects",
+                        multiplier(CavitationRotorDynamics.generation(target)),
+                        multiplier(CavitationRotorDynamics.heat(target)),
+                        multiplier(CavitationRotorDynamics.flow(target))
+                ).withStyle(ChatFormatting.GRAY),
+                Component.translatable("rngtech.cavitation.tooltip.heat_balance", multiplier(menu.throttleHeat()), multiplier(menu.coolingRate()))
+                        .withStyle(menu.throttleHeat() > menu.coolingRate() ? ChatFormatting.RED : ChatFormatting.GRAY),
+                Component.translatable("rngtech.cavitation.tooltip.onset", CavitationRotorDynamics.rpm(CavitationRotorDynamics.ONSET_SPEED)).withStyle(ChatFormatting.DARK_GRAY)
+        );
+    }
+
+    private static String multiplier(double value) {
+        return String.format(Locale.ROOT, "%.2f", value);
     }
 
     private void renderGear(GuiGraphics guiGraphics) {
@@ -312,7 +443,7 @@ public class CavitationGeneratorScreen extends AbstractContainerScreen<Cavitatio
 
     private int statusColor() {
         return switch (menu.statusCode()) {
-            case CavitationGeneratorBlockEntity.STATUS_READY -> FLUID;
+            case CavitationGeneratorBlockEntity.STATUS_READY, CavitationGeneratorBlockEntity.STATUS_SPOOLING -> FLUID;
             case CavitationGeneratorBlockEntity.STATUS_MISSING_ROTOR,
                     CavitationGeneratorBlockEntity.STATUS_MISSING_NOZZLE,
                     CavitationGeneratorBlockEntity.STATUS_NO_FLUID -> PANEL_DARK;
@@ -336,6 +467,7 @@ public class CavitationGeneratorScreen extends AbstractContainerScreen<Cavitatio
             case CavitationGeneratorBlockEntity.STATUS_OUTPUT_FULL -> Component.translatable("rngtech.cavitation.status.output_full");
             case CavitationGeneratorBlockEntity.STATUS_FLUID_OUTPUT_FULL -> Component.translatable("rngtech.cavitation.status.fluid_output_full");
             case CavitationGeneratorBlockEntity.STATUS_REDSTONE_DISABLED -> Component.translatable("rngtech.cavitation.status.redstone");
+            case CavitationGeneratorBlockEntity.STATUS_SPOOLING -> Component.translatable("rngtech.cavitation.status.spooling");
             default -> Component.translatable("rngtech.cavitation.status.ready");
         };
     }
@@ -361,18 +493,24 @@ public class CavitationGeneratorScreen extends AbstractContainerScreen<Cavitatio
         if (renderPurgeTooltips(guiGraphics, mouseX, mouseY)) {
             return;
         }
+        if (isOverSpeedGauge(mouseX, mouseY)) {
+            guiGraphics.renderComponentTooltip(font, speedGaugeTooltip(), mouseX, mouseY);
+            return;
+        }
         CompactValueText.renderTooltipIfHovered(guiGraphics, font, leftPos, topPos, mouseX, mouseY, FLUID_METER_X, FLUID_METER_Y, FLUID_METER_WIDTH, FLUID_METER_HEIGHT,
-                FluidMeterTooltips.amount(menu.inputFluidName(), menu.inputFluid(), menu.inputFluidCapacity()));
+                FluidMeterTooltips.amount(menu.inputFluidName(), menu.inputFluid(), menu.inputFluidCapacity(), "-" + menu.waterPerCycle() + " mB"));
         CompactValueText.renderTooltipIfHovered(guiGraphics, font, leftPos, topPos, mouseX, mouseY, OUTPUT_METER_X, OUTPUT_METER_Y, OUTPUT_METER_WIDTH, OUTPUT_METER_HEIGHT,
                 FluidMeterTooltips.amount(menu.outputFluidName(), menu.outputFluid(), menu.outputFluidCapacity(), "+" + menu.recipeFluidOutput() + " mB"));
         CompactValueText.renderTooltipIfHovered(guiGraphics, font, leftPos, topPos, mouseX, mouseY, ENERGY_METER_X, ENERGY_METER_Y, ENERGY_METER_WIDTH, ENERGY_METER_HEIGHT,
                 CompactValueText.exactEnergyAmountPair(menu.energy(), menu.energyCapacity()));
         CompactValueText.renderTooltipIfHovered(guiGraphics, font, leftPos, topPos, mouseX, mouseY, PROGRESS_BAR_X, PROGRESS_BAR_Y, PROCESS_BAR_WIDTH, PROGRESS_BAR_HEIGHT,
                 Component.translatable("rngtech.cavitation.tooltip.progress", menu.progress(), menu.processingTicks(), CompactValueText.energyAmount(menu.recipeEnergy())));
-        CompactValueText.renderTooltipIfHovered(guiGraphics, font, leftPos, topPos, mouseX, mouseY, PROGRESS_BAR_X, STRAIN_BAR_Y, PROCESS_BAR_WIDTH, STRAIN_WEAR_BAR_HEIGHT,
-                Component.translatable("rngtech.cavitation.tooltip.strain", menu.heatStrain(), menu.maxHeatStrain(), menu.recipeStrain()));
+        if (isOver(mouseX, mouseY, PROGRESS_BAR_X, STRAIN_BAR_Y, PROCESS_BAR_WIDTH, STRAIN_WEAR_BAR_HEIGHT)) {
+            guiGraphics.renderComponentTooltip(font, strainTooltip(), mouseX, mouseY);
+            return;
+        }
         CompactValueText.renderTooltipIfHovered(guiGraphics, font, leftPos, topPos, mouseX, mouseY, PROGRESS_BAR_X, WEAR_BAR_Y, PROCESS_BAR_WIDTH, STRAIN_WEAR_BAR_HEIGHT,
-                Component.translatable("rngtech.cavitation.tooltip.wear", menu.rotorWear(), menu.rotorWearLimit(), menu.recipeWear(), menu.pressureRating()));
+                Component.translatable("rngtech.cavitation.tooltip.wear", menu.rotorWear(), menu.rotorWearLimit(), String.format(Locale.ROOT, "%.1f", menu.recipeWear()), menu.ratedPressure()));
         CompactValueText.renderTooltipIfHovered(guiGraphics, font, leftPos, topPos, mouseX, mouseY, STATUS_ICON_X, STATUS_ICON_Y, ICON_SIZE, ICON_SIZE,
                 Component.translatable("rngtech.cavitation.tooltip.status", statusComponent()));
         CompactValueText.renderTooltipIfHovered(guiGraphics, font, leftPos, topPos, mouseX, mouseY, GENERATION_ICON_X, STATUS_ICON_Y, ICON_SIZE, ICON_SIZE,
@@ -380,7 +518,7 @@ public class CavitationGeneratorScreen extends AbstractContainerScreen<Cavitatio
         CompactValueText.renderTooltipIfHovered(guiGraphics, font, leftPos, topPos, mouseX, mouseY, OUTPUT_ICON_X, STATUS_ICON_Y, ICON_SIZE, ICON_SIZE,
                 Component.translatable("rngtech.cavitation.tooltip.output", CompactValueText.energyRate(menu.maxOutput())));
         CompactValueText.renderTooltipIfHovered(guiGraphics, font, leftPos, topPos, mouseX, mouseY, PRESSURE_ICON_X, STATUS_ICON_Y, ICON_SIZE, ICON_SIZE,
-                Component.translatable("rngtech.cavitation.tooltip.pressure", menu.pressureRating()));
+                Component.translatable("rngtech.cavitation.tooltip.pressure", menu.pressureRating(), menu.ratedPressure()));
     }
 
     private void renderPurgeButtons(GuiGraphics guiGraphics) {
@@ -449,22 +587,29 @@ public class CavitationGeneratorScreen extends AbstractContainerScreen<Cavitatio
         }
     }
 
+    /** Fluid Transfer only drains a fluid output, so it shows only while the recipe or the output tank has one. */
     private MachineScreenStyle.StatLine[] statLines() {
-        MachineScreenStyle.StatLine[] statLines = new MachineScreenStyle.StatLine[STAT_LABEL_KEYS.length];
+        boolean fluidOutput = menu.recipeFluidOutput() > 0 || menu.outputFluid() > 0;
+        List<MachineScreenStyle.StatLine> lines = new java.util.ArrayList<>();
+        List<MachineStat> shown = new java.util.ArrayList<>();
         for (int index = 0; index < STAT_LABEL_KEYS.length; index++) {
+            if (STAT_TYPES[index] == MachineStat.FLUID_TRANSFER && !fluidOutput) {
+                continue;
+            }
             double value = menu.statValue(STAT_DATA_INDICES[index]);
-            statLines[index] = MachineScreenStyle.statLine(
+            shown.add(STAT_TYPES[index]);
+            lines.add(MachineScreenStyle.statLine(
                     Component.translatable(STAT_LABEL_KEYS[index]),
                     statValue(index),
                     value,
                     STAT_TYPES[index] == MachineStat.PROCESSING_LEVEL,
                     value > 1.001,
                     MachineScreenStyle.statLayerTooltip(menu.getSlot(menu.refinementTargetSlot()).getItem(), STAT_TYPES[index], value)
-            ).withStat(STAT_TYPES[index]);
+            ).withStat(STAT_TYPES[index]));
         }
         return MachineScreenStyle.withGenerationBreakdown(
-                STAT_TYPES,
-                statLines,
+                shown.toArray(MachineStat[]::new),
+                lines.toArray(MachineScreenStyle.StatLine[]::new),
                 menu.energyPerTick(),
                 menu.statValue(CavitationGeneratorMenu.baseEnergyGenerationDataIndex()),
                 menu.statValue(CavitationGeneratorMenu.flatEnergyGenerationDataIndex())

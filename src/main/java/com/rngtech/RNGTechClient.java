@@ -5,6 +5,7 @@ import com.rngtech.client.MinersCompanionLampClient;
 import com.rngtech.client.configurator.ConfiguratorClient;
 import com.rngtech.client.renderer.AlgaePhotobioreactorRenderer;
 import com.rngtech.client.renderer.BatteryChassisRenderer;
+import com.rngtech.client.renderer.CavitationGeneratorRenderer;
 import com.rngtech.client.renderer.CorrosionCellRenderer;
 import com.rngtech.client.renderer.ForestryCartRenderer;
 import com.rngtech.client.renderer.ModularToolItemRenderer;
@@ -89,6 +90,7 @@ public final class RNGTechClient {
     public RNGTechClient(IEventBus modBus, ModContainer container) {
         modBus.addListener(this::registerScreens);
         modBus.addListener(this::registerRenderers);
+        modBus.addListener(CavitationGeneratorRenderer::registerModels);
         modBus.addListener(CorrosionCellRenderer::registerModels);
         modBus.addListener(this::registerClientExtensions);
         modBus.addListener(this::registerKeyMappings);
@@ -149,6 +151,7 @@ public final class RNGTechClient {
     private void registerRenderers(EntityRenderersEvent.RegisterRenderers event) {
         event.registerBlockEntityRenderer(ModBlockEntities.BATTERY_CHASSIS.get(), BatteryChassisRenderer::new);
         event.registerBlockEntityRenderer(ModBlockEntities.SOLAR_ARRAY_CONTROLLER.get(), SolarArrayControllerRenderer::new);
+        event.registerBlockEntityRenderer(ModBlockEntities.CAVITATION_GENERATOR.get(), CavitationGeneratorRenderer::new);
         event.registerBlockEntityRenderer(ModBlockEntities.CORROSION_CELL.get(), CorrosionCellRenderer::new);
         event.registerBlockEntityRenderer(ModBlockEntities.ALGAE_PHOTOBIOREACTOR.get(), AlgaePhotobioreactorRenderer::new);
         event.registerEntityRenderer(ModEntityTypes.FORESTRY_CART.get(), ForestryCartRenderer::new);

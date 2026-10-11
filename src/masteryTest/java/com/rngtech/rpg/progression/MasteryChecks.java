@@ -64,6 +64,7 @@ public final class MasteryChecks {
         checks += StatBreakdownChecks.run();
         checks += UniqueChecks.run();
         checks += CodecRoundTripChecks.run();
+        checks += com.rngtech.content.energy.CavitationRotorChecks.run();
         checks += com.rngtech.content.blockentity.AlgaeCultureChecks.run();
         System.out.println("Machine mastery: " + checks + " checks passed");
         ForestryTreeScanChecks.run();

@@ -692,6 +692,10 @@ public final class ModItems {
             "calibrated_diamond_crystal",
             () -> new CalibratedComponentItem(CalibrationFamily.LOGIC, new Item.Properties())
     );
+    public static final DeferredItem<CalibratedComponentItem> CAVITATION_ROTOR_HUB = ITEMS.register(
+            "cavitation_rotor_hub",
+            () -> new CalibratedComponentItem(CalibrationFamily.KINETIC, new Item.Properties())
+    );
 
     public static final Map<CrushHeadMaterial, DeferredItem<CrushHeadItem>> CRUSH_HEADS = registerCrushHeads();
     public static final DeferredItem<CrushHeadItem> FLINT_CRUSH_HEAD = crushHead(CrushHeadMaterial.FLINT);
