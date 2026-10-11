@@ -18,6 +18,8 @@ import com.rngtech.rpg.MachineStat;
 import com.rngtech.rpg.MachineStatAccumulator;
 import com.rngtech.rpg.MachineTraits;
 import com.rngtech.rpg.MachineType;
+import com.rngtech.rpg.Rarity;
+import com.rngtech.rpg.refinement.RefinementTargets;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -27,8 +29,12 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.StringTag;
 import net.minecraft.nbt.Tag;
+import net.minecraft.network.Connection;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.game.ClientGamePacketListener;
+import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.util.Mth;
 import net.minecraft.world.Containers;
 import net.minecraft.world.MenuProvider;
@@ -38,6 +44,7 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.energy.IEnergyStorage;
 import net.neoforged.neoforge.items.IItemHandler;
@@ -88,6 +95,7 @@ public class PotentialReactorBlockEntity extends BaseMachineBlockEntity implemen
     private static final int DATA_FLAT_ENERGY_GENERATION = 16;
     private static final int DATA_BASE_ENERGY_GENERATION = 17;
     private static final int STAT_SCALE = 100;
+    private static final int VISUAL_SYNC_INTERVAL = 5;
 
     private final ItemStackHandler processInventory = new ItemStackHandler(PROCESS_SLOT_COUNT) {
         @Override
@@ -192,6 +200,11 @@ public class PotentialReactorBlockEntity extends BaseMachineBlockEntity implemen
     private double remainingEnergy;
     private double generationCarry;
     private ItemStack pendingResidue = ItemStack.EMPTY;
+    /** What the active run burns, for the core colour: salvage fuel, or the rarity of the recycled item. */
+    private int burn = PotentialReactorVisualState.BURN_SALVAGE;
+    private PotentialReactorVisualState visualState = PotentialReactorVisualState.IDLE;
+    private PotentialReactorVisualState.Key lastSyncedVisual;
+    private final PotentialReactorVisualState.Animation animation = new PotentialReactorVisualState.Animation();
 
     private record ReactorWork(
             int energy,
@@ -199,7 +212,8 @@ public class PotentialReactorBlockEntity extends BaseMachineBlockEntity implemen
             int minimumMaterialStage,
             ItemStack residue,
             boolean requiresRecoveryFilter,
-            String gearId
+            String gearId,
+            Rarity rarity
     ) {
     }
 
@@ -224,6 +238,7 @@ public class PotentialReactorBlockEntity extends BaseMachineBlockEntity implemen
         if (generated || exported) {
             reactor.setChanged();
         }
+        reactor.syncVisualState(level);
     }
 
     public ItemStackHandler getProcessInventory() {
@@ -371,6 +386,7 @@ public class PotentialReactorBlockEntity extends BaseMachineBlockEntity implemen
         tag.putDouble("RemainingEnergy", remainingEnergy);
         tag.putDouble("GenerationCarry", generationCarry);
         tag.put("PendingResidue", pendingResidue.saveOptional(registries));
+        tag.putInt("Burn", burn);
         ListTag gear = new ListTag();
         recentGear.forEach(id -> gear.add(StringTag.valueOf(id)));
         tag.put("RecentGear", gear);
@@ -390,6 +406,7 @@ public class PotentialReactorBlockEntity extends BaseMachineBlockEntity implemen
         remainingEnergy = tag.getDouble("RemainingEnergy");
         generationCarry = tag.getDouble("GenerationCarry");
         pendingResidue = ItemStack.parseOptional(registries, tag.getCompound("PendingResidue"));
+        burn = tag.contains("Burn", Tag.TAG_INT) ? tag.getInt("Burn") : PotentialReactorVisualState.BURN_SALVAGE;
         recentGear.clear();
         ListTag gear = tag.getList("RecentGear", Tag.TAG_STRING);
         for (int index = 0; index < gear.size(); index++) {
@@ -432,6 +449,7 @@ public class PotentialReactorBlockEntity extends BaseMachineBlockEntity implemen
         }
         consumeInput();
         pendingResidue = residue;
+        burn = work.rarity() == null ? PotentialReactorVisualState.BURN_SALVAGE : work.rarity().ordinal();
         activeProcessingTicks = stats.adjustedProcessingTicks(work.processingTicks());
         activeTotalEnergy = effectiveRecipeEnergy(work, stats);
         remainingEnergy = activeTotalEnergy;
@@ -529,7 +547,8 @@ public class PotentialReactorBlockEntity extends BaseMachineBlockEntity implemen
             int energy = (int) Math.round(RecyclingData.reactorFuelValue(input) * gearFatigue(gearId));
             int stage = Math.max(1, RecyclingData.componentStage(input));
             int ticks = Mth.clamp(80 + stage * 15 + energy / 240, 100, 280);
-            return new ReactorWork(energy, ticks, 1, RecyclingData.strippedCopy(input), false, gearId);
+            Rarity rarity = RefinementTargets.storedTraits(input).rarity();
+            return new ReactorWork(energy, ticks, 1, RecyclingData.strippedCopy(input), false, gearId, rarity);
         }
         PotentialReactorRecipe recipe = nextRecipe();
         return recipe == null
@@ -540,6 +559,7 @@ public class PotentialReactorBlockEntity extends BaseMachineBlockEntity implemen
                         recipe.minimumMaterialStage(),
                         recipe.residue().copy(),
                         true,
+                        null,
                         null
                 );
     }
@@ -822,6 +842,92 @@ public class PotentialReactorBlockEntity extends BaseMachineBlockEntity implemen
 
     private int scaledStat(MachineStatAccumulator stats, MachineStat stat) {
         return (int) Math.round(stats.value(stat) * STAT_SCALE);
+    }
+
+    /**
+     * Reactors saved while the block was a solid cube stored no light inside it, which leaves the renderer's core
+     * assembly unlit. Rechecking the block's own light once on load fixes those saves.
+     */
+    @Override
+    public void onLoad() {
+        super.onLoad();
+        if (level != null && !level.isClientSide) {
+            level.getLightEngine().checkBlock(worldPosition);
+        }
+    }
+
+    /** Client copy of the state the renderer draws; synced from the server in the block entity update tag. */
+    public PotentialReactorVisualState visualState() {
+        return visualState;
+    }
+
+    public PotentialReactorVisualState.Animation animation() {
+        return animation;
+    }
+
+    @Override
+    public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
+        return currentVisualState().save();
+    }
+
+    @Override
+    public Packet<ClientGamePacketListener> getUpdatePacket() {
+        return ClientboundBlockEntityDataPacket.create(this);
+    }
+
+    @Override
+    public void handleUpdateTag(CompoundTag tag, HolderLookup.Provider registries) {
+        visualState = PotentialReactorVisualState.load(tag);
+    }
+
+    @Override
+    public void onDataPacket(Connection connection, ClientboundBlockEntityDataPacket packet, HolderLookup.Provider registries) {
+        visualState = PotentialReactorVisualState.load(packet.getTag());
+    }
+
+    private void syncVisualState(Level level) {
+        if (level.getGameTime() % VISUAL_SYNC_INTERVAL != 0) {
+            return;
+        }
+        PotentialReactorVisualState.Key key = currentVisualState().key();
+        if (!key.equals(lastSyncedVisual)) {
+            lastSyncedVisual = key;
+            level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), Block.UPDATE_CLIENTS);
+        }
+    }
+
+    /** The visual state the server would send now. */
+    public PotentialReactorVisualState currentVisualState() {
+        MachineStatAccumulator stats = effectiveStats();
+        int core = PotentialReactorVisualState.CORE_OFF;
+        if (isWorking()) {
+            core = statusCode(stats) == STATUS_READY ? PotentialReactorVisualState.CORE_REACTING : PotentialReactorVisualState.CORE_HELD;
+        }
+        ItemStack residue = processInventory.getStackInSlot(SLOT_RESIDUE);
+        int residueLimit = Math.max(1, Math.min(residue.getMaxStackSize(), processInventory.getSlotLimit(SLOT_RESIDUE)));
+        return new PotentialReactorVisualState(
+                installedMaterial(SLOT_REACTOR_CHAMBER),
+                installedMaterial(SLOT_RECOVERY_FILTER),
+                installedMaterial(SLOT_CONTAINMENT_LINING),
+                core,
+                burn,
+                core == PotentialReactorVisualState.CORE_OFF ? 0.0F : PotentialReactorVisualState.intensity(activeTotalEnergy / Math.max(1, activeProcessingTicks)),
+                (float) Mth.clamp(stats.value(MachineStat.STABILITY), 0.25, 1.50),
+                energyStored() / (float) energyCapacity(stats),
+                residue.isEmpty() ? 0.0F : Math.min(1.0F, residue.getCount() / (float) residueLimit)
+        );
+    }
+
+    /** The material of the part installed in a Gear slot, or an empty string when the slot holds none. */
+    private String installedMaterial(int slot) {
+        ItemStack stack = gearInventory.getStackInSlot(slot);
+        if (!gearInventory.isItemValid(slot, stack) || !(stack.getItem() instanceof PotentialReactorPartItem part)) {
+            return "";
+        }
+        if (part.chamberMaterial() != null) {
+            return part.chamberMaterial().getSerializedName();
+        }
+        return part.filterMaterial() != null ? part.filterMaterial().getSerializedName() : part.liningMaterial().getSerializedName();
     }
 
     private void dropSlot(Level level, ItemStackHandler inventory, int slot) {

@@ -7,6 +7,7 @@ import com.rngtech.client.renderer.AlgaePhotobioreactorRenderer;
 import com.rngtech.client.renderer.BatteryChassisRenderer;
 import com.rngtech.client.renderer.ForestryCartRenderer;
 import com.rngtech.client.renderer.ModularToolItemRenderer;
+import com.rngtech.client.renderer.PotentialReactorRenderer;
 import com.rngtech.client.renderer.SolarArrayControllerRenderer;
 import com.rngtech.client.screen.AdvancedItemFilterScreen;
 import com.rngtech.client.screen.AffixForgeScreen;
@@ -148,6 +149,7 @@ public final class RNGTechClient {
         event.registerBlockEntityRenderer(ModBlockEntities.BATTERY_CHASSIS.get(), BatteryChassisRenderer::new);
         event.registerBlockEntityRenderer(ModBlockEntities.SOLAR_ARRAY_CONTROLLER.get(), SolarArrayControllerRenderer::new);
         event.registerBlockEntityRenderer(ModBlockEntities.ALGAE_PHOTOBIOREACTOR.get(), AlgaePhotobioreactorRenderer::new);
+        event.registerBlockEntityRenderer(ModBlockEntities.POTENTIAL_REACTOR.get(), PotentialReactorRenderer::new);
         event.registerEntityRenderer(ModEntityTypes.FORESTRY_CART.get(), ForestryCartRenderer::new);
     }
 

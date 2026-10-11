@@ -19,6 +19,8 @@ wiki:
 
 The **Potential Reactor** turns salvage and old gear into FE. Feed it recycling byproducts, or any rolled machine, part, or Battery Cell you no longer need, and it pays out power for the item's rarity, affixes, and remaining Refinement Potential. The stripped item that comes out goes on to the [Component Recycler](component-recycler.md) for its materials.
 
+It is a containment vessel with a viewport on the front. Fuel drops in through the hopper on the lid, burns as a glowing core between two electrodes, and its residue falls through the filter cage on the side into a glass bin.
+
 Each Potential Reactor you craft rolls its own [rarity and affixes](rarity-and-affixes.md). It does not have Machine Mastery.
 
 ## Obtaining
@@ -77,6 +79,23 @@ Chest → Potential Reactor → Component Recycler → storage
 | 3 | {{ item('rngtech:bronze_reactor_chamber') }} | {{ item('rngtech:bronze_recovery_filter') }} | {{ item('rngtech:bronze_containment_lining') }} |
 | 4 | {{ item('rngtech:steel_reactor_chamber') }} | {{ item('rngtech:steel_recovery_filter') }} | {{ item('rngtech:steel_containment_lining') }} |
 
+### Reading the reactor
+
+The installed Gear is visible on the block, in its material's colour:
+
+- **Reactor Chamber**: the two electrodes inside the vessel. With no chamber the vessel is empty.
+- **Containment Lining**: a sleeve lining the inside of the vessel, behind the electrodes.
+- **Recovery Filter**: the cartridge in the open cage on the side, on the residue path.
+
+Through the viewport, the core shows what the reactor is doing:
+
+- **Colour**: violet on salvage fuel. Recycled gear burns in its rarity colour: white for Normal, aqua for Magic, and gold for Rare.
+- **Size and brightness**: follow the FE per tick of the current item, so high-value gear burns larger and brighter.
+- **Steadiness**: follows stability. Below 1.20 stability the core flickers, wanders, and arcs unevenly, and the relief valve on the lid vents smoke more often. Raise stability with a better Reactor Chamber or Containment Lining.
+- **Banked**: when the FE buffer or the residue slot is full, the item stays loaded and the core dims to a low glow until there is room.
+
+The dial on the front shows stability, from red (low) to green (high). The sight glass on the side shows the FE buffer, and the glass bin fills as the residue slot fills. A stripped item fills the bin on its own, since it does not stack: take it out to start the next one.
+
 Recovered residue is {{ item('rngtech:scrap') }}, which cannot be fed back in for more FE. The reactor also accepts {{ item('rngtech:malformed_ingot') }} from failed smelts and presses. It needs a Stage 4 (Steel) Reactor Chamber and pays 3,600 FE before stats. With a Recovery Filter, a malformed ingot of a known metal returns two matching nuggets, and an unknown one returns two Scrap.
 
 ### Automation
@@ -87,7 +106,7 @@ Recovered residue is {{ item('rngtech:scrap') }}, which cannot be fed back in fo
 | Bottom | Extracts residue and stripped items. |
 | Sides | Export FE to adjacent receivers. Do not accept FE. |
 
-Gear slots are installed by hand.
+Gear slots are installed by hand. The back of the reactor has a port plate sized for a Universal Connector, the tidiest place to attach one.
 
 ### Potential Reactor recipes
 
