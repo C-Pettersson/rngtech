@@ -62,14 +62,16 @@ Bulk sidegrades should visibly communicate multiple calibration lanes. Nullite s
 
 ## Shaped Models
 
-`Prototype`: the Cavitation Generator is the first machine with a shaped, non-cube model, the pilot for moving placed machines toward visible working parts.
+`Prototype`: the Cavitation Generator and the Algae Photobioreactor have shaped, non-cube models, part of moving placed machines toward visible working parts.
 
-- Show the working mechanism itself (a rotor behind a porthole, a fluid column in a sight glass, heat fins) instead of painting it on a cube face.
-- Keep the RNGTech palette: dark slate casing, teal accent bands and trim, and material colour on the parts that change with Gear.
-- Use 64x64 part textures, mapped by element position, for a constant 4 texels per model pixel. Small dials and lamps may map a whole texture to one face.
+- Show the working mechanism itself (culture columns, a rotor behind a porthole, a fluid column in a sight glass, heat fins) instead of painting it on a cube face.
+- Keep the RNGTech palette: dark slate casing, teal accent bands and trim, and steel pipework. Put teal only on deliberate band elements; textures mapped by element position must not carry accent stripes, which land at arbitrary spots.
+- Use 64x64 part textures, mapped by element position, for a constant 4 texels per model pixel. Small dials, lamps, and framed glass may map a fixed region of a texture to one face.
+- Frame glass that shows a level (sight glasses, rotameters) with visible rails, so a part-full tank still reads as a tube.
+- Give the machine one dedicated cable face: a flush port plate on the face centre, sized to the Universal Connector ring (4 to 12 on both axes) and backed by solid structure. Other faces may stay open.
 - Keep the collision shape a full block, and mark the block `noOcclusion` so neighbouring faces still render through the gaps.
-- Draw moving or state-driven parts (rotation, glow, fluid levels, the installed part's material and wear) in a block entity renderer from a small synced visual state. Keep blockstate model swaps for simple on/off cues such as a lamp.
-- Generate geometry that needs exact math (octagons, pitched blades) from a script under `tools/blockmodels/`, and keep the renderer's positions in step with it.
+- Draw moving or state-driven parts (fluid and culture levels, bubbles, glow, the installed part's material) in a block entity renderer from a small synced visual state. Keep blockstate model swaps for simple on/off cues such as a lamp.
+- Generate the model and textures from a script under `tools/blockmodels/`, and keep the renderer's positions in step with it.
 
 ## Active States
 

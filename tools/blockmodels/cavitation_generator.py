@@ -131,14 +131,15 @@ def housing_elements():
     elements.append(box((3.5, 3.0, 11.0), (12.5, 12.0, 15.0), "motor"))
     for x in FIN_XS:
         elements.append(box((x, 12.0, 11.5), (x + 0.5, 15.0, 14.75), "fins"))
-    # Rear power bus.
-    elements.append(box((2.0, 2.0, 15.0), (14.0, 13.0, 16.0), {"south": "bus", "*": "casing"}))
+    # Rear power bus, the generator's one cable face: a flush port plate sized to the Universal Connector ring.
+    elements.append(box((2.0, 2.0, 15.0), (14.0, 13.0, 15.75), {"south": "bus", "*": "casing"}))
+    elements.append(box(*PORT, {"south": "port", "*": "casing"}, uv={"south": [0, 0, 16, 16]}))
     # Sight glasses: Water on the west, output on the east.
     for x0 in (0.5, 13.5):
         x1 = x0 + 2.0
         elements.append(box((x0 - 0.25, 2.0, 8.0), (x1 + 0.25, 3.5, 11.0), "pipe"))
         elements.append(box((x0 - 0.25, 12.0, 8.0), (x1 + 0.25, 13.5, 11.0), "pipe"))
-        elements.append(box((x0, 3.5, 8.25), (x1, 12.0, 10.75), "glass_tube", faces=("north", "south", "east", "west")))
+        elements.append(box((x0, 3.5, 8.25), (x1, 12.0, 10.75), "sight_glass", faces=("north", "south", "east", "west"), uv=SIGHT_UV))
         inner_x0, inner_x1 = (x1, 4.5) if x0 < 8 else (11.5, x0)
         elements.append(box((inner_x0, 12.25, 9.0), (inner_x1, 13.25, 10.0), "pipe", faces=("north", "south", "up", "down")))
     # Pressure dial and status lamp on the plinth front.
@@ -151,6 +152,16 @@ def housing_elements():
 
 
 FIN_XS = [4.0 + i * 1.25 for i in range(7)]
+# Cable port on the rear bus, sized to the Universal Connector ring (4 to 12 on the face), as on the Photobioreactor.
+PORT = ((4.0, 4.0, 15.75), (12.0, 12.0, 16.0))
+# Sight-glass faces map a framed strip of the texture: the narrow (2 px) north and south faces use columns 0-15,
+# the wider (2.5 px) east and west faces use columns 32-51, matching the Photobioreactor's sight glasses.
+SIGHT_UV = {
+    "north": [0, 0, 4, 16],
+    "south": [0, 0, 4, 16],
+    "east": [8, 0, 13, 16],
+    "west": [8, 0, 13, 16],
+}
 
 
 def rotor_elements():
@@ -190,7 +201,8 @@ HOUSING_TEXTURES = {
     "flange": TEX + "flange",
     "bolt": TEX + "bolt",
     "glass": TEX + "glass",
-    "glass_tube": TEX + "glass_tube",
+    "sight_glass": TEX + "sight_glass",
+    "port": TEX + "port",
     "motor": TEX + "motor",
     "fins": TEX + "fins",
     "bus": TEX + "bus",
@@ -301,31 +313,11 @@ SLATE_DARK = (30, 35, 43)
 STEEL_BLUE = (82, 96, 112)
 TEAL = (47, 179, 194)
 TEAL_DARK = (22, 92, 104)
+STEEL = (98, 108, 120)
+GLINT = (206, 240, 250, 255)
 COPPER = (184, 115, 51)
 # Front-face UV of the chamber axis: u = 16 - x, v = 16 - y, at 4 px per unit.
 AXIS_PX = ((16 - CX) * 4, (16 - CY) * 4)
-
-
-# Service-port colours shared with the Algae Photobioreactor faces, so ports read the same on every machine.
-PORT_FRAME = (21, 26, 28)
-PORT_PANEL = (34, 42, 45)
-PORT_PIPE = (105, 115, 118)
-PORT_FLUID_IN = (47, 143, 208)
-PORT_FLUID_OUT = (125, 137, 139)
-PORT_ENERGY = (199, 180, 81)
-
-
-def draw_service_ports(image) -> None:
-    """Water inlet (blue), energy output (yellow), and Nitrogen outlet (grey), joined by a pipe, Photobioreactor style."""
-    draw = ImageDraw.Draw(image)
-    draw.line([(18, 39), (45, 39)], fill=(*PORT_PIPE, 255))
-    for left, colour in ((12, PORT_FLUID_IN), (38, PORT_FLUID_OUT)):
-        draw.rectangle([left, 28, left + 13, 36], fill=(*PORT_FRAME, 255))
-        draw.rectangle([left + 2, 30, left + 11, 34], fill=(*colour, 255))
-        draw.line([(left + 6, 37), (left + 6, 38)], fill=(*PORT_PIPE, 255))
-    draw.rectangle([28, 26, 35, 37], fill=(*PORT_PANEL, 255))
-    draw.rectangle([30, 29, 33, 34], fill=(*PORT_ENERGY, 255))
-    draw.line([(31, 38), (32, 38)], fill=(*PORT_PIPE, 255))
 
 
 def write_textures() -> None:
@@ -378,14 +370,25 @@ def write_textures() -> None:
     draw.line([(17, 26), (26, 17)], fill=(206, 240, 250, 255))
     draw.line([(18, 31), (21, 28)], fill=(206, 240, 250, 255))
     save(glass, "glass")
-    # Sight-glass tubes: one vertical glint per side face.
-    tube = Image.new("RGBA", (64, 64), (0, 0, 0, 0))
-    pixels = tube.load()
-    for x in (23, 35, 44, 53):
-        for y in range(18, 46, 1):
-            if y % 7 != 0:
-                pixels[x, y] = (206, 240, 250, 255)
-    save(tube, "glass_tube")
+    # Sight glass: clear between steel edge rails, with level ticks on one rail and a broken glint, so an empty or
+    # half-full tank still reads as a glass tube. Same strips as the Photobioreactor; see SIGHT_UV.
+    sight = Image.new("RGBA", (64, 64), (0, 0, 0, 0))
+    pixels = sight.load()
+    for left, right in ((0, 15), (32, 51)):
+        for y in range(64):
+            for x in (left, left + 1, right - 1, right):
+                edge = x in (left, right)
+                pixels[x, y] = (*shade(STEEL, 14 if edge else -12), 255)
+            if y % 8 == 4:
+                pixels[left + 2, y] = (222, 226, 210, 255)
+                pixels[left + 3, y] = (222, 226, 210, 255)
+            elif y % 16 == 12:
+                pixels[left + 2, y] = (222, 226, 210, 255)
+        glint = left + (right - left) * 2 // 3
+        for y in range(6, 58):
+            if (y // 6) % 3 != 2:
+                pixels[glint, y] = GLINT
+    save(sight, "sight_glass")
 
     motor = noisy(64, (52, 60, 72), "motor", amount=4)
     pixels = motor.load()
@@ -408,14 +411,21 @@ def write_textures() -> None:
     # Pipework: plain brushed steel. Teal stays on the deliberate bands, never on runs of pipe.
     save(noisy(64, (124, 134, 146), "pipe", amount=4, streak=5), "pipe")
 
-    bus = panel_seams(noisy(64, (34, 40, 48), "bus", amount=4), rivets=False)
-    pixels = bus.load()
-    for top in (18, 44):
-        for y in range(top, top + 5):
-            for x in range(10, 54):
-                pixels[x, y] = (*shade(COPPER, 26 if y == top else (-26 if y == top + 4 else 0)), 255)
-    draw_service_ports(bus)
-    save(bus, "bus")
+    # Rear bus: seamed casing; the cable port plate is its only fitting.
+    save(panel_seams(noisy(64, (34, 40, 48), "bus", amount=4), rivets=False), "bus")
+
+    # Cable port: the Photobioreactor's teal-ringed plate with a socket and four contacts, mapped whole onto the plate.
+    port = noisy(64, SLATE, "port", amount=4)
+    draw = ImageDraw.Draw(port)
+    draw.rectangle([0, 0, 63, 63], outline=(*SLATE_DARK, 255), width=2)
+    draw.rectangle([6, 6, 57, 57], outline=(*TEAL_DARK, 255), width=3)
+    draw.rectangle([8, 8, 55, 55], outline=(*shade(TEAL, 10), 255), width=1)
+    for x, y in ((3, 3), (58, 3), (3, 58), (58, 58)):
+        draw.rectangle([x, y, x + 2, y + 2], fill=(150, 158, 168, 255))
+    draw.rectangle([20, 20, 43, 43], fill=(14, 18, 24, 255), outline=(98, 108, 120, 255))
+    for x, y in ((24, 24), (37, 24), (24, 37), (37, 37)):
+        draw.rectangle([x, y, x + 2, y + 2], fill=(*COPPER, 255))
+    save(port, "port")
 
     gauge = Image.new("RGBA", (16, 16), (*SLATE_DARK, 255))
     draw = ImageDraw.Draw(gauge)

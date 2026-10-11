@@ -12,7 +12,8 @@
     "flange": "rngtech:block/cavitation_generator/flange",
     "bolt": "rngtech:block/cavitation_generator/bolt",
     "glass": "rngtech:block/cavitation_generator/glass",
-    "glass_tube": "rngtech:block/cavitation_generator/glass_tube",
+    "sight_glass": "rngtech:block/cavitation_generator/sight_glass",
+    "port": "rngtech:block/cavitation_generator/port",
     "motor": "rngtech:block/cavitation_generator/motor",
     "fins": "rngtech:block/cavitation_generator/fins",
     "bus": "rngtech:block/cavitation_generator/bus",
@@ -1382,7 +1383,7 @@
       "to": [
         14.0,
         13.0,
-        16.0
+        15.75
       ],
       "faces": {
         "north": {
@@ -1390,6 +1391,44 @@
         },
         "south": {
           "texture": "#bus"
+        },
+        "east": {
+          "texture": "#casing"
+        },
+        "west": {
+          "texture": "#casing"
+        },
+        "up": {
+          "texture": "#casing"
+        },
+        "down": {
+          "texture": "#casing"
+        }
+      }
+    },
+    {
+      "from": [
+        4.0,
+        4.0,
+        15.75
+      ],
+      "to": [
+        12.0,
+        12.0,
+        16.0
+      ],
+      "faces": {
+        "north": {
+          "texture": "#casing"
+        },
+        "south": {
+          "texture": "#port",
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ]
         },
         "east": {
           "texture": "#casing"
@@ -1482,16 +1521,40 @@
       ],
       "faces": {
         "north": {
-          "texture": "#glass_tube"
+          "texture": "#sight_glass",
+          "uv": [
+            0,
+            0,
+            4,
+            16
+          ]
         },
         "south": {
-          "texture": "#glass_tube"
+          "texture": "#sight_glass",
+          "uv": [
+            0,
+            0,
+            4,
+            16
+          ]
         },
         "east": {
-          "texture": "#glass_tube"
+          "texture": "#sight_glass",
+          "uv": [
+            8,
+            0,
+            13,
+            16
+          ]
         },
         "west": {
-          "texture": "#glass_tube"
+          "texture": "#sight_glass",
+          "uv": [
+            8,
+            0,
+            13,
+            16
+          ]
         }
       }
     },
@@ -1598,16 +1661,40 @@
       ],
       "faces": {
         "north": {
-          "texture": "#glass_tube"
+          "texture": "#sight_glass",
+          "uv": [
+            0,
+            0,
+            4,
+            16
+          ]
         },
         "south": {
-          "texture": "#glass_tube"
+          "texture": "#sight_glass",
+          "uv": [
+            0,
+            0,
+            4,
+            16
+          ]
         },
         "east": {
-          "texture": "#glass_tube"
+          "texture": "#sight_glass",
+          "uv": [
+            8,
+            0,
+            13,
+            16
+          ]
         },
         "west": {
-          "texture": "#glass_tube"
+          "texture": "#sight_glass",
+          "uv": [
+            8,
+            0,
+            13,
+            16
+          ]
         }
       }
     },
