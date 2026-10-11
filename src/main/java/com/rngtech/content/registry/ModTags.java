@@ -94,8 +94,6 @@ public final class ModTags {
                 TagKey.create(Registries.FLUID, ResourceLocation.fromNamespaceAndPath(RNGTech.MOD_ID, "gases"));
         public static final TagKey<Fluid> CHEMICAL_GASES =
                 TagKey.create(Registries.FLUID, ResourceLocation.fromNamespaceAndPath(RNGTech.MOD_ID, "chemical_gases"));
-        public static final TagKey<Fluid> COMBUSTIBLE_GASES =
-                TagKey.create(Registries.FLUID, ResourceLocation.fromNamespaceAndPath(RNGTech.MOD_ID, "combustible_gases"));
         private Fluids() {
         }
     }

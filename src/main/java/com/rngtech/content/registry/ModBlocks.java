@@ -190,6 +190,7 @@ public final class ModBlocks {
                     .mapColor(MapColor.PLANT)
                     .strength(2.5F)
                     .sound(SoundType.GLASS)
+                    .noOcclusion()
     );
     public static final DeferredBlock<WoodenComposterBlock> WOODEN_COMPOSTER = BLOCKS.registerBlock(
             "wooden_composter",
