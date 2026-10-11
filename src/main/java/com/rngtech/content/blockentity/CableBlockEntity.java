@@ -428,6 +428,21 @@ public class CableBlockEntity extends BlockEntity implements UniversalConnectorD
         }
     }
 
+    /**
+     * Counts every cable network change in the level: links, connectors, their settings, and their targets. Stalled
+     * item and fluid rows retry early when it moves.
+     */
+    static long networkEpoch(Level level) {
+        if (level == null) {
+            return 0L;
+        }
+        LevelNetworkCache cache;
+        synchronized (NETWORK_CACHES) {
+            cache = NETWORK_CACHES.get(level);
+        }
+        return cache == null ? 0L : cache.epoch;
+    }
+
     private int receiveFromSide(Direction entrySide, int amount, boolean simulate) {
         if (level == null || amount <= 0) {
             return 0;
@@ -973,7 +988,7 @@ public class CableBlockEntity extends BlockEntity implements UniversalConnectorD
         }
 
         NetworkSnapshot snapshot = networkSnapshot(level, startPos);
-        List<UniversalEndpoint> endpoints = snapshot.universalEndpoints();
+        List<UniversalEndpoint> endpoints = snapshot.itemReceivers(channel);
         if (endpoints.isEmpty()) {
             return stack.copy();
         }
@@ -984,9 +999,12 @@ public class CableBlockEntity extends BlockEntity implements UniversalConnectorD
                 snapshot.itemCursor(channel, endpoints.size()),
                 index -> origin.matches(endpoints.get(index).pos(), endpoints.get(index).side()),
                 stack.getCount(),
-                (index, amount, simulateShare) -> amount - endpoints.get(index)
-                        .receiveItem(level, channel, stack.copyWithCount(amount), simulateShare)
-                        .getCount(),
+                (index, amount, simulateShare) -> {
+                    CableStats.increment(CableStats.Counter.ITEM_RECEIVER_CHECKS);
+                    return amount - endpoints.get(index)
+                            .receiveItem(channel, stack.copyWithCount(amount), simulateShare)
+                            .getCount();
+                },
                 simulate
         );
 
@@ -1056,7 +1074,7 @@ public class CableBlockEntity extends BlockEntity implements UniversalConnectorD
         }
 
         NetworkSnapshot snapshot = networkSnapshot(level, startPos);
-        List<UniversalEndpoint> endpoints = snapshot.universalEndpoints();
+        List<UniversalEndpoint> endpoints = snapshot.fluidReceivers(channel);
         if (endpoints.isEmpty()) {
             return stack.copy();
         }
@@ -1067,9 +1085,12 @@ public class CableBlockEntity extends BlockEntity implements UniversalConnectorD
                 snapshot.fluidCursor(channel, endpoints.size()),
                 index -> origin.matches(endpoints.get(index).pos(), endpoints.get(index).side()),
                 stack.getAmount(),
-                (index, amount, simulateShare) -> amount - endpoints.get(index)
-                        .receiveFluid(level, channel, stack.copyWithAmount(amount), simulateShare)
-                        .getAmount(),
+                (index, amount, simulateShare) -> {
+                    CableStats.increment(CableStats.Counter.FLUID_RECEIVER_CHECKS);
+                    return amount - endpoints.get(index)
+                            .receiveFluid(channel, stack.copyWithAmount(amount), simulateShare)
+                            .getAmount();
+                },
                 simulate
         );
 
@@ -1237,11 +1258,13 @@ public class CableBlockEntity extends BlockEntity implements UniversalConnectorD
         List<BlockPos> cablePositions = immutableList(networkPositions);
         CableStats.increment(CableStats.Counter.NETWORK_REBUILDS);
         CableStats.add(CableStats.Counter.CABLES_SCANNED, cablePositions.size());
+        sortedUniversalEndpoints(universalEndpoints);
         return new NetworkSnapshot(
                 gameTime,
                 cablePositions,
                 immutableEnergyBuckets(energyEndpoints),
-                immutableList(sortedUniversalEndpoints(universalEndpoints)),
+                receiversByChannel(universalEndpoints, true),
+                receiversByChannel(universalEndpoints, false),
                 immutableList(bridgeEndpoints),
                 cache.claimState(cablePositions, gameTime)
         );
@@ -1251,6 +1274,23 @@ public class CableBlockEntity extends BlockEntity implements UniversalConnectorD
     private static List<UniversalEndpoint> sortedUniversalEndpoints(List<UniversalEndpoint> endpoints) {
         endpoints.sort(Comparator.comparing(UniversalEndpoint::pos).thenComparing(UniversalEndpoint::side));
         return endpoints;
+    }
+
+    /** Groups the connectors that insert items (or fluids) into their block by channel, keeping their order. */
+    private static List<UniversalEndpoint>[] receiversByChannel(List<UniversalEndpoint> endpoints, boolean items) {
+        @SuppressWarnings("unchecked")
+        List<UniversalEndpoint>[] buckets = (List<UniversalEndpoint>[]) new List<?>[MAX_CHANNEL + 1];
+        for (int channel = 0; channel <= MAX_CHANNEL; channel++) {
+            List<UniversalEndpoint> bucket = new ArrayList<>();
+            for (UniversalEndpoint endpoint : endpoints) {
+                int channels = items ? endpoint.itemChannels() : endpoint.fluidChannels();
+                if ((channels & (1 << channel)) != 0) {
+                    bucket.add(endpoint);
+                }
+            }
+            buckets[channel] = immutableList(bucket);
+        }
+        return buckets;
     }
 
     private static void collectCableNode(
@@ -1349,7 +1389,12 @@ public class CableBlockEntity extends BlockEntity implements UniversalConnectorD
         if (!CableBlock.isValidConnectorTarget(targetState)) {
             return;
         }
-        UniversalEndpoint endpoint = new UniversalEndpoint(targetPos, targetSide, UniversalEndpointType.CABLE_SIDE);
+        UniversalEndpoint endpoint = new UniversalEndpoint(
+                cable,
+                targetSide,
+                connector.itemReceiveChannelMask(),
+                connector.fluidReceiveChannelMask()
+        );
         if (seenUniversalEndpoints.add(endpoint)) {
             universalEndpoints.add(endpoint);
             addCableUniversalEnergyEndpoints(energyEndpoints, cable, connector, targetSide, isBatteryChassis(targetState));
@@ -1443,6 +1488,7 @@ public class CableBlockEntity extends BlockEntity implements UniversalConnectorD
         private final Map<BlockPos, NetworkState> stateByAnchor = new HashMap<>();
         private final List<PendingEnergyPass> pendingEnergyPasses = new ArrayList<>();
         private long lastPruneGameTime = Long.MIN_VALUE;
+        private long epoch;
 
         private NetworkSnapshot getOrBuild(Level level, BlockPos startPos) {
             long gameTime = level.getGameTime();
@@ -1496,6 +1542,7 @@ public class CableBlockEntity extends BlockEntity implements UniversalConnectorD
         }
 
         private void invalidate(BlockPos pos) {
+            epoch++;
             NetworkSnapshot snapshot = byCablePosition.remove(pos);
             if (snapshot != null) {
                 removeSnapshot(snapshot);
@@ -1540,7 +1587,8 @@ public class CableBlockEntity extends BlockEntity implements UniversalConnectorD
         private final long gameTime;
         private final List<BlockPos> cablePositions;
         private final List<EnergyEndpoint>[] energyEndpoints;
-        private final List<UniversalEndpoint> universalEndpoints;
+        private final List<UniversalEndpoint>[] itemReceivers;
+        private final List<UniversalEndpoint>[] fluidReceivers;
         private final List<BridgeEndpoint> bridgeEndpoints;
         private final NetworkEnergyTelemetry energyTelemetry;
         private final int[] energyCursors;
@@ -1553,14 +1601,16 @@ public class CableBlockEntity extends BlockEntity implements UniversalConnectorD
                 long gameTime,
                 List<BlockPos> cablePositions,
                 List<EnergyEndpoint>[] energyEndpoints,
-                List<UniversalEndpoint> universalEndpoints,
+                List<UniversalEndpoint>[] itemReceivers,
+                List<UniversalEndpoint>[] fluidReceivers,
                 List<BridgeEndpoint> bridgeEndpoints,
                 NetworkState state
         ) {
             this.gameTime = gameTime;
             this.cablePositions = cablePositions;
             this.energyEndpoints = energyEndpoints;
-            this.universalEndpoints = universalEndpoints;
+            this.itemReceivers = itemReceivers;
+            this.fluidReceivers = fluidReceivers;
             this.bridgeEndpoints = bridgeEndpoints;
             this.energyTelemetry = state.telemetry;
             this.energyCursors = state.energyCursors;
@@ -1590,8 +1640,12 @@ public class CableBlockEntity extends BlockEntity implements UniversalConnectorD
             return isValidChannel(channel) ? energyEndpoints[channel] : Collections.emptyList();
         }
 
-        private List<UniversalEndpoint> universalEndpoints() {
-            return universalEndpoints;
+        private List<UniversalEndpoint> itemReceivers(int channel) {
+            return isValidChannel(channel) ? itemReceivers[channel] : Collections.emptyList();
+        }
+
+        private List<UniversalEndpoint> fluidReceivers(int channel) {
+            return isValidChannel(channel) ? fluidReceivers[channel] : Collections.emptyList();
         }
 
         private List<BridgeEndpoint> bridgeEndpoints() {
@@ -2053,10 +2107,6 @@ public class CableBlockEntity extends BlockEntity implements UniversalConnectorD
         }
     }
 
-    private enum UniversalEndpointType {
-        CABLE_SIDE
-    }
-
     private enum EnergyEndpointType {
         DIRECT,
         CABLE_UNIVERSAL
@@ -2065,25 +2115,27 @@ public class CableBlockEntity extends BlockEntity implements UniversalConnectorD
     public record BridgeEndpoint(BlockPos pos, Direction side, NetworkBridgeType bridgeType, int channel) {
     }
 
-    private record UniversalEndpoint(BlockPos pos, Direction side, UniversalEndpointType type) {
-        private ItemStack receiveItem(Level level, int channel, ItemStack stack, boolean simulate) {
-            return switch (type) {
-                case CABLE_SIDE -> level.isLoaded(pos)
-                        && level.getBlockEntity(pos) instanceof CableBlockEntity cable
-                        && cable.universalConnector(side) != null
-                                ? cable.universalConnector(side).receiveItemFromCableNetwork(side, channel, stack, simulate)
-                                : stack;
-            };
+    /**
+     * A Universal Connector on a cable face, with the item and fluid channels it inserts on as bit masks. It keeps its
+     * cable, so delivering needs no block entity lookup.
+     */
+    private record UniversalEndpoint(CableBlockEntity cable, Direction side, int itemChannels, int fluidChannels) {
+        private BlockPos pos() {
+            return cable.getBlockPos();
         }
 
-        private FluidStack receiveFluid(Level level, int channel, FluidStack stack, boolean simulate) {
-            return switch (type) {
-                case CABLE_SIDE -> level.isLoaded(pos)
-                        && level.getBlockEntity(pos) instanceof CableBlockEntity cable
-                        && cable.universalConnector(side) != null
-                                ? cable.universalConnector(side).receiveFluidFromCableNetwork(side, channel, stack, simulate)
-                                : stack;
-            };
+        private CableUniversalConnectorData connector() {
+            return cable.isRemoved() ? null : cable.universalConnector(side);
+        }
+
+        private ItemStack receiveItem(int channel, ItemStack stack, boolean simulate) {
+            CableUniversalConnectorData connector = connector();
+            return connector == null ? stack : connector.receiveItemFromCableNetwork(side, channel, stack, simulate);
+        }
+
+        private FluidStack receiveFluid(int channel, FluidStack stack, boolean simulate) {
+            CableUniversalConnectorData connector = connector();
+            return connector == null ? stack : connector.receiveFluidFromCableNetwork(side, channel, stack, simulate);
         }
     }
 
