@@ -326,11 +326,6 @@ public class CrusherScreen extends AbstractContainerScreen<CrusherMenu> {
         if (menu.selectedTab() == CrusherMenu.TAB_PROCESSING) {
             renderSlotFrame(guiGraphics, 55, 41);
             renderSlotFrame(guiGraphics, 169, 51);
-            renderSlotFrame(
-                    guiGraphics,
-                    RefinementScreenStyle.PROCESSING_TARGET_SLOT_X - 1,
-                    RefinementScreenStyle.PROCESSING_TARGET_SLOT_Y - 1
-            );
         } else if (menu.selectedTab() == CrusherMenu.TAB_GEAR) {
             renderSlotFrame(guiGraphics, 43, 47);
             renderSlotFrame(guiGraphics, 79, 47);
@@ -428,7 +423,6 @@ public class CrusherScreen extends AbstractContainerScreen<CrusherMenu> {
     private void drawProcessingLabels(GuiGraphics guiGraphics) {
         guiGraphics.drawString(font, Component.translatable("rngtech.processing.input"), 52, 28, TEXT_MUTED, false);
         guiGraphics.drawString(font, Component.translatable("rngtech.processing.output"), 164, 40, TEXT_MUTED, false);
-        drawProcessingTargetLabel(guiGraphics);
     }
 
     private void drawConfigurationLabels(GuiGraphics guiGraphics) {
@@ -788,12 +782,6 @@ public class CrusherScreen extends AbstractContainerScreen<CrusherMenu> {
             return value > 1.001;
         }
         return value > 1.001;
-    }
-
-    private void drawProcessingTargetLabel(GuiGraphics guiGraphics) {
-        Component target = Component.translatable("rngtech.processing.machine");
-        int x = RefinementScreenStyle.PROCESSING_TARGET_SLOT_X + 8 - font.width(target) / 2;
-        guiGraphics.drawString(font, target, x, 28, TEXT_MUTED, false);
     }
 
     private void renderSlotFrame(GuiGraphics guiGraphics, int x, int y) {

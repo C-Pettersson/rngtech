@@ -341,11 +341,6 @@ public class MelterScreen extends AbstractContainerScreen<MelterMenu> {
             renderSlotFrame(guiGraphics, SECONDARY_INPUT_SLOT_FRAME_X, INPUT_SLOT_TOP_FRAME_Y);
             renderSlotFrame(guiGraphics, INPUT_FLUID_CONTAINER_SLOT_FRAME_X, FLUID_CONTAINER_SLOT_FRAME_Y);
             renderSlotFrame(guiGraphics, OUTPUT_FLUID_CONTAINER_SLOT_FRAME_X, FLUID_CONTAINER_SLOT_FRAME_Y);
-            renderSlotFrame(
-                    guiGraphics,
-                    RefinementScreenStyle.PROCESSING_TARGET_SLOT_X - 1,
-                    RefinementScreenStyle.PROCESSING_TARGET_SLOT_Y - 1
-            );
         } else if (menu.selectedTab() == MelterMenu.TAB_GEAR) {
             renderSlotFrame(guiGraphics, 19, 47);
             renderSlotFrame(guiGraphics, 67, 47);
@@ -447,7 +442,6 @@ public class MelterScreen extends AbstractContainerScreen<MelterMenu> {
     private void drawProcessingLabels(GuiGraphics guiGraphics) {
         drawCentered(guiGraphics, Component.translatable("rngtech.processing.inputs"), INPUT_GROUP_CENTER_X, 18);
         drawCentered(guiGraphics, Component.translatable("rngtech.processing.output"), OUTPUT_FLUID_BAR_X + FLUID_BAR_WIDTH / 2, 18);
-        drawProcessingTargetLabel(guiGraphics);
     }
 
     private void drawGearLabels(GuiGraphics guiGraphics) {
@@ -807,12 +801,6 @@ public class MelterScreen extends AbstractContainerScreen<MelterMenu> {
             return false;
         }
         return value > 1.001;
-    }
-
-    private void drawProcessingTargetLabel(GuiGraphics guiGraphics) {
-        Component target = Component.translatable("rngtech.processing.machine");
-        int x = RefinementScreenStyle.PROCESSING_TARGET_SLOT_X + 8 - font.width(target) / 2;
-        guiGraphics.drawString(font, target, x, 28, TEXT_MUTED, false);
     }
 
     private void drawCentered(GuiGraphics guiGraphics, Component label, int centerX, int y) {
