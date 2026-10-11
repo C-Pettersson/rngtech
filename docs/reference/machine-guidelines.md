@@ -224,6 +224,10 @@ Design intent and balance rules behind shipped machines that the code does not s
 - Crushing seeds into Compost Feedstock before composting is deliberately energy-positive, to reward the Crusher step.
 - Composted, Rich, and algae biomass are Bio Generator-only fuels. Do not tag them as vanilla furnace, Solid Fuel Burner, or broad modded fuel.
 - Specific fuel families beat broader tags for Bio Chamber power bonuses: saplings and seeds use their own stats, not Plant Power.
+- The Bio Generator is a small biogas plant: digester, gas holder, gas engine. Its rated `20`-day retention reproduces the pre-digester burner exactly, with the same FE/t and FE per item for every fuel and stat roll. Fuel tables, JEI values, and the energy balance anchors stay at rated.
+- Retention follows first-order digestion: the share of gas recovered is `kt / (1 + kt)`, with `kt = 3` at rated. Shorter retention trades FE per item for FE/t (`10` days: `1.6x` FE/t, `0.8x` FE per item); longer retention trades the reverse (`40` days: `0.57x` FE/t, `1.14x` FE per item). No setting beats rated on both, and the dial is the only way off rated. There is no automatic penalty such as culture death or souring.
+- The gas holder decouples digestion from the engine. The engine start pressure delays the first FE but never consumes gas, the last gas burns when feed runs out, and a full FE buffer lets the holder fill before digestion waits. Nothing in the process voids fuel.
+- Automation works on every face for compatibility: fuel insertion and FE export on all six. Visually there is one automation port, on the back, sized to the Universal Connector footprint so a connector seated there plugs into a plate. The front stays the machine's window (sight glass, gauge, flywheel), and the top stays the gas holder dome.
 
 ### Solid Fuel Burner
 
