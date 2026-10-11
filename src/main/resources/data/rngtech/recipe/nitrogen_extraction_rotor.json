@@ -1,29 +1,46 @@
 {
-  "neoforge:conditions": [
-    {
-      "type": "rngtech:material_enabled",
-      "material": "titanium"
-    }
-  ],
-  "type": "rngtech:trait_shaped",
-  "category": "misc",
-  "pattern": [
-    "PGP",
-    "GRG",
-    "PGP"
-  ],
-  "key": {
-    "G": {
-      "item": "rngtech:titanium_gear"
+    "neoforge:conditions": [
+        {
+            "type": "rngtech:material_enabled",
+            "material": "titanium"
+        }
+    ],
+    "type": "rngtech:calibrated_shaped",
+    "category": "misc",
+    "pattern": [
+        "PGP",
+        "GRG",
+        "PHP"
+    ],
+    "key": {
+        "G": {
+            "ingredient": {
+                "item": "rngtech:titanium_gear"
+            }
+        },
+        "H": {
+            "ingredient": {
+                "item": "rngtech:cavitation_rotor_hub"
+            },
+            "calibration": {
+                "family": "kinetic",
+                "min_stage": 5,
+                "min_stability": 35
+            }
+        },
+        "P": {
+            "ingredient": {
+                "item": "rngtech:titanium_plate"
+            }
+        },
+        "R": {
+            "ingredient": {
+                "item": "rngtech:reforming_catalyst_bed"
+            }
+        }
     },
-    "P": {
-      "item": "rngtech:titanium_plate"
-    },
-    "R": {
-      "item": "rngtech:reforming_catalyst_bed"
+    "record_calibration": "H",
+    "result": {
+        "id": "rngtech:nitrogen_extraction_rotor"
     }
-  },
-  "result": {
-    "id": "rngtech:nitrogen_extraction_rotor"
-  }
 }

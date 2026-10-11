@@ -1,5 +1,7 @@
 package com.rngtech.content.item;
 
+import com.rngtech.content.calibration.CalibrationState;
+import com.rngtech.content.energy.CavitationRotorDynamics;
 import com.rngtech.content.energy.CavitationRotorMaterial;
 import com.rngtech.content.registry.ModDataComponents;
 import com.rngtech.rpg.ComponentBaseStatCatalog;
@@ -12,6 +14,7 @@ import com.rngtech.rpg.MachineType;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 
@@ -63,9 +66,27 @@ public class CavitationPartItem extends MachinePartItem {
         return stage();
     }
 
+    /** The rotor's resonance as a whole throttle percent, or 0 before it has been rolled. */
+    public static int resonance(ItemStack stack) {
+        return stack.getItem() instanceof CavitationPartItem ? stack.getOrDefault(ModDataComponents.CAVITATION_ROTOR_RESONANCE.get(), 0) : 0;
+    }
+
+    /** Rolls a resonance once; a more precise Rotor Hub (recorded at craft) skews it toward higher speeds. */
+    public static void ensureResonance(ItemStack stack, RandomSource random) {
+        if (!(stack.getItem() instanceof CavitationPartItem) || stack.has(ModDataComponents.CAVITATION_ROTOR_RESONANCE.get())) {
+            return;
+        }
+        CalibrationState hub = stack.remove(ModDataComponents.SOURCE_CALIBRATION.get());
+        double precision = hub == null ? 0.0 : hub.stability() / 100.0;
+        stack.set(ModDataComponents.CAVITATION_ROTOR_RESONANCE.get(), CavitationRotorDynamics.rollResonance(random::nextDouble, precision));
+    }
+
     @Override
     public void onCraftedPostProcess(ItemStack stack, Level level) {
         super.onCraftedPostProcess(stack, level);
+        if (!level.isClientSide) {
+            ensureResonance(stack, level.random);
+        }
     }
 
     @Override

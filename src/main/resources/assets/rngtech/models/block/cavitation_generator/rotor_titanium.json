@@ -1,0 +1,7 @@
+{
+  "parent": "rngtech:block/cavitation_generator/rotor",
+  "textures": {
+    "blade": "rngtech:block/cavitation_generator/rotor/titanium",
+    "hub": "rngtech:block/cavitation_generator/rotor/hub"
+  }
+}

@@ -5,24 +5,41 @@
             "material": "tungstensteel"
         }
     ],
-    "type": "rngtech:trait_shaped",
+    "type": "rngtech:calibrated_shaped",
     "category": "misc",
     "pattern": [
         "PGP",
         "GCG",
-        "PGP"
+        "PHP"
     ],
     "key": {
         "C": {
-            "item": "rngtech:tungstensteel_casing"
+            "ingredient": {
+                "item": "rngtech:tungstensteel_casing"
+            }
         },
         "G": {
-            "item": "rngtech:tungstensteel_gear"
+            "ingredient": {
+                "item": "rngtech:tungstensteel_gear"
+            }
+        },
+        "H": {
+            "ingredient": {
+                "item": "rngtech:cavitation_rotor_hub"
+            },
+            "calibration": {
+                "family": "kinetic",
+                "min_stage": 5,
+                "min_stability": 50
+            }
         },
         "P": {
-            "item": "rngtech:tungstensteel_plate"
+            "ingredient": {
+                "item": "rngtech:tungstensteel_plate"
+            }
         }
     },
+    "record_calibration": "H",
     "result": {
         "id": "rngtech:tungstensteel_cavitation_rotor"
     }

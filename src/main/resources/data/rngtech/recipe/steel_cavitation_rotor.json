@@ -1,16 +1,30 @@
 {
-  "type": "rngtech:trait_shaped",
-  "category": "misc",
-  "pattern": [
-    " G ",
-    "GCG",
-    " G "
-  ],
-  "key": {
-    "C": { "item": "rngtech:steel_casing" },
-    "G": { "item": "rngtech:steel_gear" }
-  },
-  "result": {
-    "id": "rngtech:steel_cavitation_rotor"
-  }
+    "type": "rngtech:calibrated_shaped",
+    "category": "misc",
+    "pattern": [
+        " G ",
+        "GHG",
+        " G "
+    ],
+    "key": {
+        "G": {
+            "ingredient": {
+                "item": "rngtech:steel_gear"
+            }
+        },
+        "H": {
+            "ingredient": {
+                "item": "rngtech:cavitation_rotor_hub"
+            },
+            "calibration": {
+                "family": "kinetic",
+                "min_stage": 5,
+                "min_stability": 20
+            }
+        }
+    },
+    "record_calibration": "H",
+    "result": {
+        "id": "rngtech:steel_cavitation_rotor"
+    }
 }
