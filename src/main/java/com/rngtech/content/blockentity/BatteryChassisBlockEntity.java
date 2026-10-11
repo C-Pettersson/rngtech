@@ -90,6 +90,8 @@ public class BatteryChassisBlockEntity extends BaseMachineBlockEntity implements
     private int energyOutputThisTick;
     private int lastEnergyInput;
     private int lastEnergyOutput;
+    private final InstalledCellStats cells = new InstalledCellStats();
+    private RuntimeContext cachedRuntimeContext;
 
     private final ContainerData menuData = new ContainerData() {
         @Override
@@ -299,8 +301,9 @@ public class BatteryChassisBlockEntity extends BaseMachineBlockEntity implements
         dropRefinementInventory(level);
     }
 
+    /** The cell version keys the stats too, so a cell refined in its slot updates a Unique cell's chassis bonuses. */
     public MachineStatAccumulator effectiveStats() {
-        return cachedStats(0L);
+        return cachedStats(cells.refresh(inventory));
     }
 
     @Override
@@ -317,15 +320,46 @@ public class BatteryChassisBlockEntity extends BaseMachineBlockEntity implements
         return stats;
     }
 
+    /**
+     * The chassis stats, traits, and each cell's stats and effective capacity, rebuilt only when the stats, traits, a
+     * cell, or Charged Storage changes.
+     */
     private RuntimeContext runtimeContext() {
+        long cellVersion = cells.refresh(inventory);
         MachineTraits traits = effectiveTraits();
-        MachineStatAccumulator stats = effectiveStats();
-        return new RuntimeContext(
-                stats,
-                traits,
-                effectiveCellSlots(stats),
-                energyCapacityMultiplier(traits)
-        );
+        MachineStatAccumulator stats = cachedStats(cellVersion);
+        boolean chargedStorage = chargedStorageActive();
+        RuntimeContext context = cachedRuntimeContext;
+        if (context == null
+                || context.stats() != stats
+                || context.traits() != traits
+                || context.cellVersion() != cellVersion
+                || context.chargedStorage() != chargedStorage) {
+            context = buildRuntimeContext(stats, traits, cellVersion, chargedStorage);
+            cachedRuntimeContext = context;
+        }
+        return context;
+    }
+
+    private RuntimeContext buildRuntimeContext(MachineStatAccumulator stats, MachineTraits traits, long cellVersion, boolean chargedStorage) {
+        int activeSlots = effectiveCellSlots(stats);
+        double capacityMultiplier = energyCapacityMultiplier(traits, chargedStorage);
+        int slots = inventory.getSlots();
+        BatteryCellItem.CellStats[] cellStats = new BatteryCellItem.CellStats[slots];
+        int[] capacities = new int[slots];
+        for (int slot = 0; slot < slots; slot++) {
+            cellStats[slot] = cells.get(slot);
+            int baseCapacity = cellStats[slot].capacity();
+            capacities[slot] = baseCapacity <= 0 || slot >= activeSlots
+                    ? baseCapacity
+                    : Math.max(1, saturatedRoundToInt(baseCapacity * capacityMultiplier));
+        }
+        return new RuntimeContext(stats, traits, activeSlots, cellVersion, chargedStorage, cellStats, capacities);
+    }
+
+    /** How many times this chassis built a cell's stats, for checks that a steady chassis builds none. */
+    public int cellStatsBuilds() {
+        return cells.builds();
     }
 
     @Override
@@ -533,21 +567,16 @@ public class BatteryChassisBlockEntity extends BaseMachineBlockEntity implements
     }
 
     private int effectiveCellCapacity(int slot, RuntimeContext context) {
-        ItemStack stack = inventory.getStackInSlot(slot);
-        int baseCapacity = BatteryCellItem.energyCapacity(stack);
-        if (baseCapacity <= 0 || slot >= context.activeSlots()) {
-            return baseCapacity;
-        }
-        return Math.max(1, saturatedRoundToInt(baseCapacity * context.capacityMultiplier()));
+        return context.capacity(slot);
     }
 
-    private double energyCapacityMultiplier(MachineTraits traits) {
+    private double energyCapacityMultiplier(MachineTraits traits, boolean chargedStorage) {
         double base = 1.0;
         double added = 0.0;
         double increased = 0.0;
         double more = 1.0;
         for (MachineModifier modifier : traits.modifiers()) {
-            boolean inactiveChargedStorage = isChargedStorageModifier(modifier) && !chargedStorageActive();
+            boolean inactiveChargedStorage = isChargedStorageModifier(modifier) && !chargedStorage;
             if (inactiveChargedStorage) {
                 continue;
             }
@@ -615,11 +644,10 @@ public class BatteryChassisBlockEntity extends BaseMachineBlockEntity implements
         int ceiling = 0;
         int activeSlots = context.activeSlots();
         for (int slot = 0; slot < activeSlots; slot++) {
-            ItemStack stack = inventory.getStackInSlot(slot);
             int capacity = effectiveCellCapacity(slot, context);
             int stored = cellEnergyStored(slot, context);
             if (stored < capacity) {
-                ceiling = saturatedAdd(ceiling, Math.min(BatteryCellItem.maxInput(stack), capacity - stored));
+                ceiling = saturatedAdd(ceiling, Math.min(context.cell(slot).maxInput(), capacity - stored));
             }
         }
         return ceiling;
@@ -633,10 +661,9 @@ public class BatteryChassisBlockEntity extends BaseMachineBlockEntity implements
         int ceiling = 0;
         int activeSlots = context.activeSlots();
         for (int slot = 0; slot < activeSlots; slot++) {
-            ItemStack stack = inventory.getStackInSlot(slot);
             int stored = cellEnergyStored(slot, context);
             if (stored > 0) {
-                ceiling = saturatedAdd(ceiling, Math.min(BatteryCellItem.maxOutput(stack), stored));
+                ceiling = saturatedAdd(ceiling, Math.min(context.cell(slot).maxOutput(), stored));
             }
         }
         return ceiling;
@@ -775,7 +802,7 @@ public class BatteryChassisBlockEntity extends BaseMachineBlockEntity implements
             }
             int capacity = effectiveCellCapacity(slot, context);
             int stored = cellEnergyStored(slot, context);
-            int received = Math.min(remaining, Math.min(BatteryCellItem.maxInput(stack), capacity - stored));
+            int received = Math.min(remaining, Math.min(context.cell(slot).maxInput(), capacity - stored));
             if (received <= 0) {
                 continue;
             }
@@ -833,7 +860,7 @@ public class BatteryChassisBlockEntity extends BaseMachineBlockEntity implements
                 continue;
             }
             int stored = cellEnergyStored(slot, context);
-            int limit = respectTransferLimit ? Math.min(remaining, BatteryCellItem.maxOutput(stack)) : remaining;
+            int limit = respectTransferLimit ? Math.min(remaining, context.cell(slot).maxOutput()) : remaining;
             int extracted = Math.min(stored, limit);
             if (extracted > 0) {
                 BatteryCellItem.setEnergy(stack, stored - extracted, effectiveCellCapacity(slot, context));
@@ -890,7 +917,7 @@ public class BatteryChassisBlockEntity extends BaseMachineBlockEntity implements
             }
             int capacity = effectiveCellCapacity(slot, context);
             int stored = cellEnergyStored(slot, context);
-            int transferLimit = Math.min(BatteryCellItem.maxInput(stack), capacity - stored);
+            int transferLimit = Math.min(context.cell(slot).maxInput(), capacity - stored);
             if (transferLimit > 0) {
                 cells.add(new CellTransfer(slot, capacity, stored, transferLimit));
             }
@@ -914,7 +941,7 @@ public class BatteryChassisBlockEntity extends BaseMachineBlockEntity implements
             if (stored <= 0) {
                 continue;
             }
-            int transferLimit = respectTransferLimit ? Math.min(BatteryCellItem.maxOutput(stack), stored) : stored;
+            int transferLimit = respectTransferLimit ? Math.min(context.cell(slot).maxOutput(), stored) : stored;
             if (transferLimit > 0) {
                 cells.add(new CellTransfer(slot, effectiveCellCapacity(slot, context), stored, transferLimit));
             }
@@ -1136,12 +1163,11 @@ public class BatteryChassisBlockEntity extends BaseMachineBlockEntity implements
         double lossThisTick = 0.0;
         int activeSlots = context.activeSlots();
         for (int slot = 0; slot < activeSlots; slot++) {
-            ItemStack stack = inventory.getStackInSlot(slot);
             int stored = cellEnergyStored(slot, context);
             if (stored <= 0) {
                 continue;
             }
-            double cellLoss = effectiveCellIdleLoss(stack, context);
+            double cellLoss = effectiveCellIdleLoss(slot, context);
             lossThisTick += stored * ((cellLoss + chassisLoss) / 100.0) / LOSS_TICKS_PER_MINUTE;
         }
 
@@ -1177,14 +1203,12 @@ public class BatteryChassisBlockEntity extends BaseMachineBlockEntity implements
     private boolean clampCellEnergyToEffectiveCapacity() {
         RuntimeContext context = runtimeContext();
         boolean changed = false;
-        int activeSlots = context.activeSlots();
         for (int slot = 0; slot < inventory.getSlots(); slot++) {
             ItemStack stack = inventory.getStackInSlot(slot);
             if (!isCell(stack)) {
                 continue;
             }
-            int capacity = slot < activeSlots ? effectiveCellCapacity(slot, context) : BatteryCellItem.energyCapacity(stack);
-            changed |= BatteryCellItem.clampEnergy(stack, capacity);
+            changed |= BatteryCellItem.clampEnergy(stack, effectiveCellCapacity(slot, context));
         }
         return changed;
     }
@@ -1211,12 +1235,12 @@ public class BatteryChassisBlockEntity extends BaseMachineBlockEntity implements
         }
     }
 
-    private double effectiveCellIdleLoss(ItemStack stack) {
-        return effectiveCellIdleLoss(stack, runtimeContext());
+    private double effectiveCellIdleLoss(int slot) {
+        return effectiveCellIdleLoss(slot, runtimeContext());
     }
 
-    private double effectiveCellIdleLoss(ItemStack stack, RuntimeContext context) {
-        double loss = BatteryCellItem.idleLossPercentPerMinute(stack);
+    private double effectiveCellIdleLoss(int slot, RuntimeContext context) {
+        double loss = context.cell(slot).idleLossPercentPerMinute();
         if (context.hasBehavior(MachineBehavior.CELL_LEAKAGE_DAMPING)) {
             if (block.material().sealsCellLeakage()) {
                 return 0.0;
@@ -1284,10 +1308,22 @@ public class BatteryChassisBlockEntity extends BaseMachineBlockEntity implements
             MachineStatAccumulator stats,
             MachineTraits traits,
             int activeSlots,
-            double capacityMultiplier
+            long cellVersion,
+            boolean chargedStorage,
+            BatteryCellItem.CellStats[] cells,
+            int[] capacities
     ) {
         private boolean hasBehavior(MachineBehavior behavior) {
             return traits.hasBehavior(behavior);
+        }
+
+        private BatteryCellItem.CellStats cell(int slot) {
+            return slot >= 0 && slot < cells.length ? cells[slot] : BatteryCellItem.CellStats.NONE;
+        }
+
+        /** The cell's capacity in this chassis: scaled by the chassis in an active slot, its own in an inactive one. */
+        private int capacity(int slot) {
+            return slot >= 0 && slot < capacities.length ? capacities[slot] : 0;
         }
     }
 
