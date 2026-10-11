@@ -1,6 +1,7 @@
 package com.rngtech.content.entity;
 
 import com.rngtech.content.blockentity.ForestryCartStationBlockEntity;
+import com.rngtech.content.blockentity.InstalledBatteryCell;
 import com.rngtech.content.blockentity.LedgerNbt;
 import com.rngtech.content.item.BatteryCellItem;
 import com.rngtech.content.item.ConfiguratorItem;
@@ -94,7 +95,6 @@ import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.common.CommonHooks;
 import net.neoforged.neoforge.common.FarmlandWaterManager;
 import net.neoforged.neoforge.common.ItemAbilities;
@@ -253,6 +253,7 @@ public class ForestryCartEntity extends AbstractMinecart implements MenuProvider
             return isItemValid(slot, stack) ? super.insertItem(slot, stack, simulate) : stack;
         }
     };
+    private final InstalledBatteryCell batteryCell = new InstalledBatteryCell(this::batteryCellStack);
     private final FluidTank waterTank = new FluidTank(WATER_CAPACITY, stack -> stack.getFluid().isSame(Fluids.WATER));
     private final Map<BlockPos, ManagedCell> managedCells = new LinkedHashMap<>();
     private int rebootTicks;
@@ -3196,8 +3197,7 @@ public class ForestryCartEntity extends AbstractMinecart implements MenuProvider
     }
 
     private IEnergyStorage batteryEnergyStorage() {
-        ItemStack stack = batteryCellStack();
-        return stack.isEmpty() ? null : stack.getCapability(Capabilities.EnergyStorage.ITEM);
+        return batteryCell.storage();
     }
 
     private RailShape railShape(BlockPos railPos) {

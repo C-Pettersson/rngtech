@@ -35,24 +35,21 @@ final class InstalledCellStats {
             version++;
         }
         for (int slot = 0; slot < slots; slot++) {
-            ItemStack stack = inventory.getStackInSlot(slot);
-            Object stackTraits = stack.get(ModDataComponents.MACHINE_TRAITS.get());
-            Object stackStripped = stack.get(ModDataComponents.RECYCLING_STRIPPED.get());
-            if (stats[slot] != null
-                    && stack == stacks[slot]
-                    && stack.getCount() == counts[slot]
-                    && stackTraits == traits[slot]
-                    && stackStripped == stripped[slot]) {
-                continue;
-            }
-            stacks[slot] = stack;
-            counts[slot] = stack.getCount();
-            traits[slot] = stackTraits;
-            stripped[slot] = stackStripped;
-            stats[slot] = build(stack);
-            version++;
+            refreshSlot(slot, inventory.getStackInSlot(slot));
         }
         return version;
+    }
+
+    /** For a machine with one cell slot: brings that slot up to date with {@code stack}, its current stack, and returns its stats. */
+    CellStats refresh(ItemStack stack) {
+        int generation = MachineStatsCache.generation();
+        if (stacks.length != 1 || builtGeneration != generation) {
+            resize(1);
+            builtGeneration = generation;
+            version++;
+        }
+        refreshSlot(0, stack);
+        return stats[0];
     }
 
     /** The stats of {@code slot} as of the last {@link #refresh}. */
@@ -63,6 +60,24 @@ final class InstalledCellStats {
     /** How many cell stats were built, for checks that a steady machine builds none. */
     int builds() {
         return builds;
+    }
+
+    private void refreshSlot(int slot, ItemStack stack) {
+        Object stackTraits = stack.get(ModDataComponents.MACHINE_TRAITS.get());
+        Object stackStripped = stack.get(ModDataComponents.RECYCLING_STRIPPED.get());
+        if (stats[slot] != null
+                && stack == stacks[slot]
+                && stack.getCount() == counts[slot]
+                && stackTraits == traits[slot]
+                && stackStripped == stripped[slot]) {
+            return;
+        }
+        stacks[slot] = stack;
+        counts[slot] = stack.getCount();
+        traits[slot] = stackTraits;
+        stripped[slot] = stackStripped;
+        stats[slot] = build(stack);
+        version++;
     }
 
     private CellStats build(ItemStack stack) {

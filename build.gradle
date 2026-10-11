@@ -185,6 +185,12 @@ tasks.matching { it.name in ['runGameTestServer', 'runTickBenchmark'] }.configur
     }
 }
 
+// The JVM does not create the -PbenchmarkJfr recording's directory, so a clean build needs it made first.
+tasks.matching { it.name == 'runTickBenchmark' }.configureEach { task ->
+    def output = layout.buildDirectory.dir('tick-benchmark').get().asFile
+    task.doFirst { output.mkdirs() }
+}
+
 /** Writes a run's console to Gradle's output and to a file; closing it closes only the file. */
 class ConsoleCopy extends OutputStream {
     private final OutputStream console
