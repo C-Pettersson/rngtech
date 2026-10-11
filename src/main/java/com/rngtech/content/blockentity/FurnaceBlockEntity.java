@@ -269,6 +269,9 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
     };
 
     private final BulkSpeedState bulkSpeed = new BulkSpeedState();
+    private static final RecipeCache.Search<FurnaceRecipe> RECIPE_SEARCH = (level, input, unused) -> FurnaceRecipes.find(level, input);
+    /** One lookup slot per lane, plus one for stacks offered by players or automation. */
+    private final RecipeCache<FurnaceRecipe> recipes = new RecipeCache<>(MAX_PROCESSING_SLOTS + 1);
     private final MachineStatsCache displayStatsCache = new MachineStatsCache();
     private final Supplier<MachineStatAccumulator> displayStatsBuilder = this::buildDisplayStats;
     private final MachineStatsCache[] laneStatsCaches = new MachineStatsCache[MAX_PROCESSING_SLOTS];
@@ -727,11 +730,21 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
         if (input.isEmpty()) {
             return null;
         }
-        FurnaceRecipe recipe = FurnaceRecipes.find(level, input).orElse(null);
+        FurnaceRecipe recipe = laneRecipe(lane);
         if (recipe == null || !meetsRecipeRequirements(recipe, stats, input) || !canAcceptOutput(lane, recipe)) {
             return null;
         }
         return recipe;
+    }
+
+    /** How many recipe lookups searched the recipes instead of reusing a remembered result. */
+    public int recipeSearches() {
+        return recipes.searches();
+    }
+
+    /** The recipe for a lane's input, ignoring heat and output gates. */
+    private FurnaceRecipe laneRecipe(int lane) {
+        return level == null ? null : recipes.find(lane, level, inventory.getStackInSlot(inputSlot(lane)), RECIPE_SEARCH);
     }
 
     private FurnaceRecipe findRecipeWithoutGates(int lane) {
@@ -739,11 +752,11 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
             return null;
         }
         ItemStack input = inventory.getStackInSlot(inputSlot(lane));
-        return input.isEmpty() ? null : FurnaceRecipes.find(level, input).orElse(null);
+        return input.isEmpty() ? null : laneRecipe(lane);
     }
 
     public boolean isSmeltable(ItemStack stack) {
-        return level != null && FurnaceRecipes.find(level, stack).isPresent();
+        return level != null && recipes.find(MAX_PROCESSING_SLOTS, level, stack, RECIPE_SEARCH) != null;
     }
 
     private boolean meetsRecipeRequirements(FurnaceRecipe recipe, MachineStatAccumulator stats, ItemStack input) {
@@ -792,7 +805,7 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
             if (input.isEmpty()) {
                 continue;
             }
-            FurnaceRecipe recipe = level == null ? null : FurnaceRecipes.find(level, input).orElse(null);
+            FurnaceRecipe recipe = laneRecipe(lane);
             if (recipe == null) {
                 continue;
             }
@@ -817,7 +830,7 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
             hasInput = true;
 
             MachineStatAccumulator laneStats = statsForLane(lane);
-            FurnaceRecipe recipe = level == null ? null : FurnaceRecipes.find(level, input).orElse(null);
+            FurnaceRecipe recipe = laneRecipe(lane);
             if (recipe == null) {
                 blockedStatus = STATUS_INVALID_RECIPE;
                 continue;
@@ -1576,7 +1589,7 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
     }
 
     private boolean failureEnabled(int lane, MachineStatAccumulator stats) {
-        FurnaceRecipe recipe = level == null ? null : FurnaceRecipes.find(level, inventory.getStackInSlot(inputSlot(lane))).orElse(null);
+        FurnaceRecipe recipe = laneRecipe(lane);
         return recipe != null
                 && recipe.hasFailureOutput()
                 && furnaceMaterial().stage() >= 4
@@ -1585,7 +1598,7 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
     }
 
     private boolean powerSensitiveActive(int lane, MachineStatAccumulator stats) {
-        FurnaceRecipe recipe = level == null ? null : FurnaceRecipes.find(level, inventory.getStackInSlot(inputSlot(lane))).orElse(null);
+        FurnaceRecipe recipe = laneRecipe(lane);
         return recipe != null
                 && recipe.powerSensitive()
                 && progress[lane] > 0
