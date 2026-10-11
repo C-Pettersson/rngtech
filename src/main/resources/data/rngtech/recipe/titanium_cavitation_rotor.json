@@ -5,24 +5,41 @@
             "material": "titanium"
         }
     ],
-    "type": "rngtech:trait_shaped",
+    "type": "rngtech:calibrated_shaped",
     "category": "misc",
     "pattern": [
         "PGP",
         "GCG",
-        "PGP"
+        "PHP"
     ],
     "key": {
         "C": {
-            "item": "rngtech:titanium_casing"
+            "ingredient": {
+                "item": "rngtech:titanium_casing"
+            }
         },
         "G": {
-            "item": "rngtech:titanium_gear"
+            "ingredient": {
+                "item": "rngtech:titanium_gear"
+            }
+        },
+        "H": {
+            "ingredient": {
+                "item": "rngtech:cavitation_rotor_hub"
+            },
+            "calibration": {
+                "family": "kinetic",
+                "min_stage": 5,
+                "min_stability": 35
+            }
         },
         "P": {
-            "item": "rngtech:titanium_plate"
+            "ingredient": {
+                "item": "rngtech:titanium_plate"
+            }
         }
     },
+    "record_calibration": "H",
     "result": {
         "id": "rngtech:titanium_cavitation_rotor"
     }

@@ -7,6 +7,8 @@ import com.rngtech.content.registry.ModDataComponents;
 import com.rngtech.rpg.MachineTraits;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -42,6 +44,24 @@ public class CavitationGeneratorBlock extends BaseMachineBlock {
             return null;
         }
         return createTickerHelper(blockEntityType, ModBlockEntities.CAVITATION_GENERATOR.get(), CavitationGeneratorBlockEntity::serverTick);
+    }
+
+    /** Heat haze rises off the rear fins once heat strain passes 60%. */
+    @Override
+    public void animateTick(BlockState state, Level level, BlockPos pos, RandomSource random) {
+        if (!(level.getBlockEntity(pos) instanceof CavitationGeneratorBlockEntity generator)) {
+            return;
+        }
+        float strain = generator.visualState().strain();
+        if (strain < 0.6F || random.nextFloat() > strain) {
+            return;
+        }
+        double x = (4.0 + random.nextDouble() * 8.0) / 16.0 - 0.5;
+        double z = (11.5 + random.nextDouble() * 3.25) / 16.0 - 0.5;
+        double angle = Math.toRadians(180.0 - state.getValue(FACING).toYRot());
+        double worldX = x * Math.cos(angle) + z * Math.sin(angle);
+        double worldZ = -x * Math.sin(angle) + z * Math.cos(angle);
+        level.addParticle(ParticleTypes.SMOKE, pos.getX() + 0.5 + worldX, pos.getY() + 15.2 / 16.0, pos.getZ() + 0.5 + worldZ, 0.0, 0.03, 0.0);
     }
 
     @Override

@@ -15,6 +15,8 @@ import com.rngtech.rpg.ModifierOperation;
 import com.rngtech.rpg.ModifierSet;
 import com.rngtech.rpg.ModifierSlot;
 import com.rngtech.rpg.Rarity;
+import com.rngtech.rpg.unique.UniqueHost;
+import com.rngtech.rpg.unique.UniqueStatReaders;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
@@ -93,16 +95,16 @@ final class MachineTraitTooltip {
         tooltipComponents.add(Component.translatable("rngtech.tooltip.base_stats").withStyle(ChatFormatting.DARK_AQUA));
         for (MachineStat stat : stats) {
             if (ComponentBaseStatCatalog.mergesAsIncreased(stack, stat)) {
-                tooltipComponents.add(MachineModifierText.tooltipLine(new MachineModifier(
+                tooltipComponents.add(readHere(MachineModifierText.tooltipLine(new MachineModifier(
                         ModifierSlot.IMPLICIT, stat, ModifierOperation.INCREASED_PERCENT, baseStats.baseValue(stat)
-                )).withStyle(ChatFormatting.BLUE));
+                )), stack, stat));
                 continue;
             }
-            tooltipComponents.add(Component.translatable(
+            tooltipComponents.add(readHere(Component.translatable(
                     "rngtech.tooltip.base_stat",
                     Component.translatable(stat.translationKey()),
                     MachineModifierText.formatValue(baseStats.baseValue(stat))
-            ).withStyle(ChatFormatting.BLUE));
+            ), stack, stat));
         }
     }
 
@@ -144,7 +146,7 @@ final class MachineTraitTooltip {
     static void appendTraitDetails(MachineTraits traits, List<Component> tooltipComponents, ItemStack part) {
         appendCorruptionSection(traits, tooltipComponents);
         appendModifierSections(traits.modifierSet(), tooltipComponents, part);
-        appendBehaviorSection(traits, tooltipComponents);
+        appendBehaviorSection(traits, tooltipComponents, part);
         if (TooltipKeyState.hasAltDown()) {
             appendTierTooltip(tooltipComponents, traits.modifierSet());
         }
@@ -207,7 +209,7 @@ final class MachineTraitTooltip {
             tooltipComponents.add(Component.translatable("rngtech.tooltip.base_modifiers").withStyle(ChatFormatting.DARK_AQUA));
             for (var modifier : modifierSet.modifiers()) {
                 if (isBaseModifier(modifier)) {
-                    tooltipComponents.add(MachineModifierText.tooltipLine(modifier).withStyle(ChatFormatting.BLUE));
+                    tooltipComponents.add(readHere(MachineModifierText.tooltipLine(modifier), part, modifier.stat()));
                     appendModifierDescriptionDetail(modifier, tooltipComponents);
                 }
             }
@@ -256,11 +258,43 @@ final class MachineTraitTooltip {
     }
 
     private static Component rolledModifierLine(MachineModifier modifier, ItemStack part) {
-        MutableComponent line = MachineModifierText.tooltipLine(modifier).withStyle(ChatFormatting.BLUE);
+        MutableComponent line = MachineModifierText.tooltipLine(modifier);
         if (TooltipKeyState.hasShiftDown() && ComponentBaseStatCatalog.isLocalModifier(part, modifier)) {
             line.append(Component.translatable("rngtech.tooltip.modifier.local").withStyle(ChatFormatting.DARK_GRAY));
         }
-        return line;
+        return readHere(line, part, modifier.stat());
+    }
+
+    /** Blue when the open machine reads {@code stat} from this Gear, dimmed with "not used here" when it ignores it. */
+    private static MutableComponent readHere(MutableComponent line, ItemStack part, MachineStat stat) {
+        UniqueStatReaders.Reader reader = openReaderFor(part);
+        return reader == null || UniqueStatReaders.reads(reader, stat) ? line.withStyle(ChatFormatting.BLUE) : unread(line);
+    }
+
+    private static MutableComponent readHere(MutableComponent line, ItemStack part, MachineBehavior behavior) {
+        UniqueStatReaders.Reader reader = openReaderFor(part);
+        return reader == null || UniqueStatReaders.reads(reader, behavior) ? line.withStyle(ChatFormatting.BLUE) : unread(line);
+    }
+
+    private static MutableComponent unread(MutableComponent line) {
+        return Component.translatable("rngtech.tooltip.unique.unread", line).withStyle(ChatFormatting.DARK_GRAY);
+    }
+
+    /**
+     * The machine whose screen is open, when it accepts {@code part}'s Gear type; null elsewhere, so nothing dims. Only
+     * machines whose reader table has been audited against their code dim ordinary Gear.
+     */
+    private static UniqueStatReaders.Reader openReaderFor(ItemStack part) {
+        UniqueTooltip.OpenHost open = UniqueTooltip.openHost();
+        if (open == null || open.reader() != UniqueStatReaders.Reader.CAVITATION_GENERATOR || part.isEmpty()) {
+            return null;
+        }
+        for (UniqueHost host : UniqueHost.values()) {
+            if (GearParts.is(part, host.partType()) && UniqueStatReaders.readers(host).contains(open.reader())) {
+                return open.reader();
+            }
+        }
+        return null;
     }
 
     private static void appendModifierDescriptionDetail(MachineModifier modifier, List<Component> tooltipComponents) {
@@ -270,7 +304,7 @@ final class MachineTraitTooltip {
         tooltipComponents.add(MachineModifierText.customDescriptionDetail(modifier).withStyle(ChatFormatting.DARK_GRAY));
     }
 
-    private static void appendBehaviorSection(MachineTraits traits, List<Component> tooltipComponents) {
+    private static void appendBehaviorSection(MachineTraits traits, List<Component> tooltipComponents, ItemStack part) {
         List<MachineBehavior> corrupted = traits.corruption() == null ? List.of() : traits.corruption().behaviors();
         List<MachineBehavior> behaviors = traits.behaviors().stream()
                 .filter(behavior -> !corrupted.contains(behavior))
@@ -281,11 +315,11 @@ final class MachineTraitTooltip {
         tooltipComponents.add(Component.empty());
         tooltipComponents.add(Component.translatable("rngtech.tooltip.base_behaviors").withStyle(ChatFormatting.DARK_AQUA));
         for (MachineBehavior behavior : behaviors) {
-            tooltipComponents.add(Component.translatable(
+            tooltipComponents.add(readHere(Component.translatable(
                     "rngtech.tooltip.behavior",
                     Component.translatable(behavior.translationKey()),
                     Component.translatable(behavior.descriptionKey())
-            ).withStyle(ChatFormatting.BLUE));
+            ), part, behavior));
         }
     }
 
