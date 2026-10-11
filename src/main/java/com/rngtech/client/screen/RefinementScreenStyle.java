@@ -25,8 +25,6 @@ final class RefinementScreenStyle {
     static final int TARGET_SLOT_X = RefinementMenuSupport.REFINEMENT_TARGET_SLOT_X;
     static final int CONSUMABLE_SLOT_X = RefinementMenuSupport.REFINEMENT_CONSUMABLE_SLOT_X;
     static final int SLOT_Y = RefinementMenuSupport.REFINEMENT_SLOT_Y;
-    static final int PROCESSING_TARGET_SLOT_X = 204;
-    static final int PROCESSING_TARGET_SLOT_Y = 42;
 
     private static final int TEXT = 0xFF3F3F3F;
     private static final int TEXT_MUTED = 0xFF6B6B6B;

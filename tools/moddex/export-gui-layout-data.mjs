@@ -890,7 +890,7 @@ function rectScore(left, right) {
 
 function inferSlotRole(sourceText, tabId, screenClass, x, y) {
     const upper = sourceText.toUpperCase();
-    if (upper.includes("PROCESSING_TARGET_SLOT") || (upper.includes("TARGET_SLOT_X") && !upper.includes("CONSUMABLE"))) {
+    if (upper.includes("TARGET_SLOT_X") && !upper.includes("CONSUMABLE")) {
         return {
             kind: "ITEM_SLOT",
             slotType: "MACHINE_SELF",
