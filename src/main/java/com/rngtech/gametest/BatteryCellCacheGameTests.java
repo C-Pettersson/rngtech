@@ -6,8 +6,12 @@ import com.rngtech.RNGTech;
 import com.rngtech.content.blockentity.BatteryChassisBlockEntity;
 import com.rngtech.content.blockentity.CrusherBlockEntity;
 import com.rngtech.content.blockentity.SolarArrayControllerBlockEntity;
+import com.rngtech.content.blockentity.SolidFuelBurnerBlockEntity;
 import com.rngtech.content.energy.BatteryCellMaterial;
 import com.rngtech.content.energy.BatteryChassisMaterial;
+import com.rngtech.content.energy.FuelBoxMaterial;
+import com.rngtech.content.energy.HeatCoreMaterial;
+import com.rngtech.content.energy.SolidFuelBurnerChassis;
 import com.rngtech.content.item.BatteryCellItem;
 import com.rngtech.content.machine.CrushHeadMaterial;
 import com.rngtech.content.machine.CrusherChassisMaterial;
@@ -24,13 +28,18 @@ import com.rngtech.rpg.Rarity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
+import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.neoforged.neoforge.energy.IEnergyStorage;
 import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
+import net.neoforged.neoforge.items.ItemStackHandler;
 
 import java.util.List;
+import java.util.function.Consumer;
+import java.util.function.IntSupplier;
+import java.util.function.Supplier;
 
 /** Installed Battery Cells keep their stats until the cell changes, and the holder sees a change on the next tick. */
 @GameTestHolder(RNGTech.MOD_ID)
@@ -147,6 +156,75 @@ public final class BatteryCellCacheGameTests {
                 .thenSucceed();
     }
 
+    /** A Crusher running from its cell, read every tick like an open menu, builds the cell's stats once. */
+    @GameTest(template = MachineTestSupport.EMPTY, timeoutTicks = STEADY_TICKS + 100)
+    public static void steadyCrusherBuildsNoCellStats(GameTestHelper helper) {
+        CrusherBlockEntity crusher = runningCrusher(helper, new BlockPos(2, 1, 2));
+        crusher.getInventory().setStackInSlot(CrusherBlockEntity.SLOT_FUEL, chargedCell(BatteryCellMaterial.IRON));
+        IEnergyStorage storage = crusher.getEnergyStorage(null);
+        int[] builds = new int[1];
+        int[] energy = new int[1];
+        helper.startSequence()
+                .thenIdle(5)
+                .thenExecute(() -> {
+                    builds[0] = crusher.cellStatsBuilds();
+                    energy[0] = storage.getEnergyStored();
+                    check(builds[0] == 1, "Built cell stats " + builds[0] + " times for one cell");
+                })
+                .thenExecuteFor(STEADY_TICKS, () -> {
+                    readLikeAnOpenMenu(crusher.getMenuData());
+                    crusher.machineInfo();
+                    check(crusher.cellStatsBuilds() == builds[0],
+                            "Rebuilt cell stats at tick " + helper.getTick() + " with no cell changed");
+                })
+                .thenExecute(() -> check(storage.getEnergyStored() < energy[0], "The Crusher drew nothing from its cell"))
+                .thenSucceed();
+    }
+
+    /** Refining, emptying, or swapping a Crusher's cell shows in its capacity on the next tick. */
+    @GameTest(template = MachineTestSupport.EMPTY)
+    public static void crusherFollowsItsCellNextTick(GameTestHelper helper) {
+        CrusherBlockEntity crusher = runningCrusher(helper, new BlockPos(1, 1, 1));
+        ItemStackHandler inventory = crusher.getInventory();
+        followsTheCell(helper, crusher.getEnergyStorage(null), crusher::cellStatsBuilds,
+                cell -> inventory.setStackInSlot(CrusherBlockEntity.SLOT_FUEL, cell),
+                () -> inventory.getStackInSlot(CrusherBlockEntity.SLOT_FUEL));
+    }
+
+    /** A Solid Fuel Burner charging its cell and exporting to a Crusher, read like an open menu, builds the cell's stats once. */
+    @GameTest(template = MachineTestSupport.EMPTY, timeoutTicks = STEADY_TICKS + 100)
+    public static void steadySolidFuelBurnerBuildsNoCellStats(GameTestHelper helper) {
+        BlockPos burnerPos = new BlockPos(2, 1, 2);
+        SolidFuelBurnerBlockEntity burner = burningBurner(helper, burnerPos);
+        burner.getGearInventory().setStackInSlot(SolidFuelBurnerBlockEntity.SLOT_BATTERY_CELL, chargedCell(BatteryCellMaterial.IRON));
+        CrusherBlockEntity sink = runningCrusher(helper, burnerPos.east());
+        int[] builds = new int[1];
+        helper.startSequence()
+                .thenIdle(5)
+                .thenExecute(() -> {
+                    builds[0] = burner.cellStatsBuilds();
+                    check(builds[0] == 1, "Built cell stats " + builds[0] + " times for one cell");
+                })
+                .thenExecuteFor(STEADY_TICKS, () -> {
+                    readLikeAnOpenMenu(burner.getMenuData());
+                    burner.machineInfo();
+                    check(burner.cellStatsBuilds() == builds[0],
+                            "Rebuilt cell stats at tick " + helper.getTick() + " with no cell changed");
+                })
+                .thenExecute(() -> check(sink.machineInfo().energy() > 0, "The Crusher got no power from the burner"))
+                .thenSucceed();
+    }
+
+    /** Refining, emptying, or swapping a Solid Fuel Burner's cell shows in its capacity on the next tick. */
+    @GameTest(template = MachineTestSupport.EMPTY)
+    public static void solidFuelBurnerFollowsItsCellNextTick(GameTestHelper helper) {
+        SolidFuelBurnerBlockEntity burner = burningBurner(helper, new BlockPos(1, 1, 1));
+        ItemStackHandler gear = burner.getGearInventory();
+        followsTheCell(helper, burner.getEnergyStorage(null), burner::cellStatsBuilds,
+                cell -> gear.setStackInSlot(SolidFuelBurnerBlockEntity.SLOT_BATTERY_CELL, cell),
+                () -> gear.getStackInSlot(SolidFuelBurnerBlockEntity.SLOT_BATTERY_CELL));
+    }
+
     private static BatteryChassisBlockEntity chassis(GameTestHelper helper, BlockPos pos) {
         return MachineTestSupport.place(helper, pos, ModBlocks.batteryChassis(BatteryChassisMaterial.COPPER).get(), BatteryChassisBlockEntity.class);
     }
@@ -164,6 +242,64 @@ public final class BatteryCellCacheGameTests {
         crusher.getInventory().setStackInSlot(CrusherBlockEntity.SLOT_CRUSH_HEAD, new ItemStack(ModItems.crushHead(CrushHeadMaterial.IRON).get()));
         crusher.getInventory().setStackInSlot(CrusherBlockEntity.SLOT_INPUT_A, new ItemStack(Items.RAW_IRON, 64));
         return crusher;
+    }
+
+    /**
+     * Installs an iron cell, then refines it in place, empties the slot, and installs a copper cell, checking a tick
+     * after each that the holder's capacity is its own plus the installed cell's and that only a changed cell was built.
+     */
+    private static void followsTheCell(
+            GameTestHelper helper,
+            IEnergyStorage storage,
+            IntSupplier builds,
+            Consumer<ItemStack> install,
+            Supplier<ItemStack> installed
+    ) {
+        install.accept(chargedCell(BatteryCellMaterial.IRON));
+        int ironCapacity = BatteryCellItem.energyCapacity(installed.get());
+        int[] own = new int[1];
+        int[] built = new int[1];
+        helper.startSequence()
+                .thenIdle(2)
+                .thenExecute(() -> {
+                    own[0] = storage.getMaxEnergyStored() - ironCapacity;
+                    built[0] = builds.getAsInt();
+                    installed.get().set(ModDataComponents.MACHINE_TRAITS.get(), MORE_CAPACITY);
+                })
+                .thenExecuteAfter(1, () -> {
+                    int refinedCapacity = BatteryCellItem.energyCapacity(installed.get());
+                    check(refinedCapacity > ironCapacity, "The refinement did not raise the cell's capacity");
+                    check(storage.getMaxEnergyStored() == own[0] + refinedCapacity,
+                            "Capacity " + storage.getMaxEnergyStored() + " missed the refined cell's " + refinedCapacity);
+                    check(builds.getAsInt() == built[0] + 1, "A refined cell was not rebuilt exactly once");
+                    install.accept(ItemStack.EMPTY);
+                })
+                .thenExecuteAfter(1, () -> {
+                    check(storage.getMaxEnergyStored() == own[0], "An emptied slot kept capacity " + storage.getMaxEnergyStored());
+                    install.accept(chargedCell(BatteryCellMaterial.COPPER));
+                })
+                .thenExecuteAfter(1, () -> {
+                    int copperCapacity = BatteryCellItem.energyCapacity(installed.get());
+                    check(storage.getMaxEnergyStored() == own[0] + copperCapacity,
+                            "Capacity " + storage.getMaxEnergyStored() + " missed the swapped cell's " + copperCapacity);
+                    check(builds.getAsInt() == built[0] + 2, "The swapped cell was not built exactly once");
+                })
+                .thenSucceed();
+    }
+
+    private static SolidFuelBurnerBlockEntity burningBurner(GameTestHelper helper, BlockPos pos) {
+        SolidFuelBurnerBlockEntity burner = MachineTestSupport.place(
+                helper, pos, ModBlocks.solidFuelBurner(SolidFuelBurnerChassis.COPPER).get(), SolidFuelBurnerBlockEntity.class);
+        burner.getGearInventory().setStackInSlot(SolidFuelBurnerBlockEntity.SLOT_HEAT_CORE, new ItemStack(ModItems.heatCore(HeatCoreMaterial.IRON).get()));
+        burner.getGearInventory().setStackInSlot(SolidFuelBurnerBlockEntity.SLOT_FUEL_BOX, new ItemStack(ModItems.fuelBox(FuelBoxMaterial.IRON).get()));
+        burner.getFuelInventory().setStackInSlot(SolidFuelBurnerBlockEntity.SLOT_FUEL_0, new ItemStack(Items.COAL, 64));
+        return burner;
+    }
+
+    private static void readLikeAnOpenMenu(ContainerData data) {
+        for (int index = 0; index < data.getCount(); index++) {
+            data.get(index);
+        }
     }
 
     private static void readLikeAnOpenMenu(BatteryChassisBlockEntity chassis) {
