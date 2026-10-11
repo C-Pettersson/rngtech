@@ -63,31 +63,70 @@ public class BatteryCellItem extends Item {
     }
 
     public static int energyCapacity(ItemStack stack) {
-        BatteryCellItem cell = cellItem(stack);
-        if (cell == null) {
-            return 0;
-        }
-        return positiveSaturatedRound(effectiveStats(stack, cell.material).value(MachineStat.ENERGY_CAPACITY));
+        return stats(stack).capacity();
     }
 
     public static int maxInput(ItemStack stack) {
-        BatteryCellItem cell = cellItem(stack);
-        return cell == null ? 0 : inputRate(stack, cell.material);
+        return stats(stack).maxInput();
     }
 
     public static int maxOutput(ItemStack stack) {
-        BatteryCellItem cell = cellItem(stack);
-        return cell == null ? 0 : outputRate(stack, cell.material);
+        return stats(stack).maxOutput();
     }
 
     public static double efficiency(ItemStack stack) {
-        BatteryCellItem cell = cellItem(stack);
-        return cell == null ? 1.0 : effectiveStats(stack, cell.material).value(MachineStat.EFFICIENCY);
+        return stats(stack).efficiency();
     }
 
     public static double idleLossPercentPerMinute(ItemStack stack) {
+        return stats(stack).idleLossPercentPerMinute();
+    }
+
+    /**
+     * The cell's capacity, rates, efficiency, and idle loss from one stats build. They depend on the item, its traits
+     * component, and whether it is stripped, never on its charge, so a holder can keep them until one of those changes.
+     */
+    public static CellStats stats(ItemStack stack) {
         BatteryCellItem cell = cellItem(stack);
-        return cell == null ? 0.0 : Math.max(0.0, effectiveStats(stack, cell.material).value(MachineStat.IDLE_LOSS));
+        if (cell == null) {
+            return CellStats.NONE;
+        }
+        MachineStatAccumulator stats = effectiveStats(stack);
+        double transfer = stats.value(MachineStat.ENERGY_TRANSFER);
+        double outputScale = cell.material.inputRate() <= 0 ? 0.0 : transfer / cell.material.inputRate();
+        return new CellStats(
+                positiveSaturatedRound(stats.value(MachineStat.ENERGY_CAPACITY)),
+                positiveSaturatedRound(transfer),
+                positiveSaturatedRound(cell.material.outputRate() * outputScale),
+                stats.value(MachineStat.EFFICIENCY),
+                Math.max(0.0, stats.value(MachineStat.IDLE_LOSS))
+        );
+    }
+
+    /** Charges {@code stack} as its FE capability would, with stats read earlier. */
+    public static int receiveEnergy(ItemStack stack, CellStats stats, int toReceive, boolean simulate) {
+        if (stats.maxInput() <= 0 || toReceive <= 0) {
+            return 0;
+        }
+        int stored = energyStored(stack, stats.capacity());
+        int received = Math.min(stats.capacity() - stored, Math.min(stats.maxInput(), toReceive));
+        if (!simulate && received > 0) {
+            setEnergy(stack, stored + received, stats.capacity());
+        }
+        return received;
+    }
+
+    /** Drains {@code stack} as its FE capability would, with stats read earlier. */
+    public static int extractEnergy(ItemStack stack, CellStats stats, int toExtract, boolean simulate) {
+        if (stats.maxOutput() <= 0 || toExtract <= 0) {
+            return 0;
+        }
+        int stored = energyStored(stack, stats.capacity());
+        int extracted = Math.min(stored, Math.min(stats.maxOutput(), toExtract));
+        if (!simulate && extracted > 0) {
+            setEnergy(stack, stored - extracted, stats.capacity());
+        }
+        return extracted;
     }
 
     public static int removeEnergy(ItemStack stack, int amount) {
@@ -227,22 +266,9 @@ public class BatteryCellItem extends Item {
         }
     }
 
-    private static MachineStatAccumulator effectiveStats(ItemStack stack, BatteryCellMaterial material) {
+    private static MachineStatAccumulator effectiveStats(ItemStack stack) {
         MachineStatAccumulator stats = ComponentBaseStatCatalog.effectiveStats(stack);
         return stats == null ? MachineStatAccumulator.batteryCellBase() : stats;
-    }
-
-    private static int inputRate(ItemStack stack, BatteryCellMaterial material) {
-        MachineStatAccumulator stats = effectiveStats(stack, material);
-        return positiveSaturatedRound(stats.value(MachineStat.ENERGY_TRANSFER));
-    }
-
-    private static int outputRate(ItemStack stack, BatteryCellMaterial material) {
-        MachineStatAccumulator stats = effectiveStats(stack, material);
-        double inputScale = material.inputRate() <= 0
-                ? 0.0
-                : stats.value(MachineStat.ENERGY_TRANSFER) / material.inputRate();
-        return positiveSaturatedRound(material.outputRate() * inputScale);
     }
 
     public static void setEnergy(ItemStack stack, int energy, int capacity) {
@@ -297,28 +323,12 @@ public class BatteryCellItem extends Item {
 
         @Override
         public int receiveEnergy(int toReceive, boolean simulate) {
-            if (!canReceive() || toReceive <= 0) {
-                return 0;
-            }
-
-            int received = Math.min(energyCapacity(stack) - getEnergyStored(), Math.min(maxInput(stack), toReceive));
-            if (!simulate && received > 0) {
-                setEnergy(stack, getEnergyStored() + received);
-            }
-            return received;
+            return BatteryCellItem.receiveEnergy(stack, stats(stack), toReceive, simulate);
         }
 
         @Override
         public int extractEnergy(int toExtract, boolean simulate) {
-            if (!canExtract() || toExtract <= 0) {
-                return 0;
-            }
-
-            int extracted = Math.min(getEnergyStored(), Math.min(maxOutput(stack), toExtract));
-            if (!simulate && extracted > 0) {
-                setEnergy(stack, getEnergyStored() - extracted);
-            }
-            return extracted;
+            return BatteryCellItem.extractEnergy(stack, stats(stack), toExtract, simulate);
         }
 
         @Override
@@ -340,5 +350,10 @@ public class BatteryCellItem extends Item {
         public boolean canReceive() {
             return maxInput(stack) > 0;
         }
+    }
+
+    /** A cell's stats as its holder reads them; {@link #NONE} for a missing or stripped cell. */
+    public record CellStats(int capacity, int maxInput, int maxOutput, double efficiency, double idleLossPercentPerMinute) {
+        public static final CellStats NONE = new CellStats(0, 0, 0, 1.0, 0.0);
     }
 }
