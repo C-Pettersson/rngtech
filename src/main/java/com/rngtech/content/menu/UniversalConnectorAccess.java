@@ -4,6 +4,7 @@ import com.rngtech.content.cable.CableConnectorMode;
 import com.rngtech.content.cable.EnergyDistributionMode;
 import com.rngtech.content.cable.FluidConnectorMode;
 import com.rngtech.content.cable.ItemConnectorMode;
+import com.rngtech.content.wrench.LinkStatus;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -14,6 +15,19 @@ import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.items.ItemStackHandler;
 
 public interface UniversalConnectorAccess {
+    /** Why the energy connector is idle, or {@link LinkStatus#OK}. Only computed on the server. */
+    default LinkStatus energyLinkStatus() {
+        return LinkStatus.OK;
+    }
+
+    default LinkStatus fluidLinkStatus(int moduleIndex) {
+        return LinkStatus.OK;
+    }
+
+    default LinkStatus itemLinkStatus(int moduleIndex) {
+        return LinkStatus.OK;
+    }
+
     ItemStackHandler getInventory();
 
     ItemStackHandler getFilterInventory();
