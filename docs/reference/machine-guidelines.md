@@ -277,6 +277,7 @@ Design intent and balance rules behind shipped machines that the code does not s
 - The Algae Photobioreactor and both Dehumidifiers are no-FE support machines with no RPG traits.
 - Dense Algae Biomass beats burning the same algae directly, which rewards the crafting step.
 - The Silica Gel Dehumidifier ignores sky, biome, and weather. Bead consumption is its balancing cost.
+- Water rates assume a finite supply with no infinite water source. Machines still accept bucketed and piped water, so packs turn infinite water off themselves through the `waterSourceConversion` gamerule and by gating other mods' infinite-water blocks. The [Modpack Creators](https://c-pettersson.github.io/rngtech/modpack-creators/) wiki page tells pack makers how.
 
 ### Modular Field Tools
 
