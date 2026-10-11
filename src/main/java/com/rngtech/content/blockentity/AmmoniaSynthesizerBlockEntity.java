@@ -46,6 +46,7 @@ import java.util.List;
 
 public class AmmoniaSynthesizerBlockEntity extends BaseMachineBlockEntity
         implements MenuProvider, PurgeableFluidStorage, MachineInfoProvider {
+    private final RecipeCache<AmmoniaSynthesisRecipe> recipes = new RecipeCache<>(1);
     public static final int SLOT_CATALYST_BED = 0;
     public static final int GEAR_SLOT_COUNT = 1;
     public static final int STATUS_READY = 0;
@@ -313,7 +314,19 @@ public class AmmoniaSynthesizerBlockEntity extends BaseMachineBlockEntity
     }
 
     private AmmoniaSynthesisRecipe currentRecipe() {
-        return AmmoniaRecipes.synthesis(level, catalystStack(), nitrogenTank.getFluid(), hydrogenTank.getFluid()).orElse(null);
+        if (level == null) {
+            return null;
+        }
+        ItemStack catalyst = catalystStack();
+        FluidStack nitrogen = nitrogenTank.getFluid();
+        FluidStack hydrogen = hydrogenTank.getFluid();
+        return recipes.lookup(0, level).item(catalyst).fluid(nitrogen).fluid(hydrogen)
+                .find(() -> AmmoniaRecipes.synthesis(level, catalyst, nitrogen, hydrogen));
+    }
+
+    /** How many recipe lookups searched the recipes instead of reusing a remembered result. */
+    public int recipeSearches() {
+        return recipes.searches();
     }
 
     private boolean canRun(AmmoniaSynthesisRecipe recipe) {

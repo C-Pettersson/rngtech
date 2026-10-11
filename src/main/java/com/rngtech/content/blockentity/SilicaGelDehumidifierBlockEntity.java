@@ -42,6 +42,9 @@ import java.util.function.Predicate;
 
 public class SilicaGelDehumidifierBlockEntity extends BlockEntity
         implements MenuProvider, PurgeableFluidStorage, MachineInfoProvider {
+    private static final RecipeCache.Search<RecipeHolder<DesiccantAbsorptionRecipe>> RECIPE_SEARCH =
+            (level, input, unused) -> DesiccantAbsorptionRecipes.find(level, input);
+    private final RecipeCache<RecipeHolder<DesiccantAbsorptionRecipe>> recipes = new RecipeCache<>(LANE_COUNT + 1);
     public static final int LANE_COUNT = 3;
     public static final int SLOT_DRY_START = 0;
     public static final int SLOT_SATURATED_START = SLOT_DRY_START + LANE_COUNT;
@@ -303,7 +306,7 @@ public class SilicaGelDehumidifierBlockEntity extends BlockEntity
         if (level == null) {
             return stack.is(ModItems.SILICA_GEL_BEADS.get()) || stack.is(ModItems.SUPERCHARGED_SILICA_GEL_BEADS.get());
         }
-        return DesiccantAbsorptionRecipes.hasRecipe(level, stack);
+        return recipes.find(LANE_COUNT, level, stack, RECIPE_SEARCH) != null;
     }
 
     @Override
@@ -377,7 +380,14 @@ public class SilicaGelDehumidifierBlockEntity extends BlockEntity
     }
 
     private Optional<RecipeHolder<DesiccantAbsorptionRecipe>> nextRecipe(int lane) {
-        return level == null ? Optional.empty() : DesiccantAbsorptionRecipes.find(level, inventory.getStackInSlot(inputSlot(lane)));
+        return level == null
+                ? Optional.empty()
+                : Optional.ofNullable(recipes.find(lane, level, inventory.getStackInSlot(inputSlot(lane)), RECIPE_SEARCH));
+    }
+
+    /** How many recipe lookups searched the recipes instead of reusing a remembered result. */
+    public int recipeSearches() {
+        return recipes.searches();
     }
 
     private void completeLane(int lane, DesiccantAbsorptionRecipe recipe) {

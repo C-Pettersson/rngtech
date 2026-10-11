@@ -3,28 +3,48 @@ package com.rngtech.gametest;
 import static com.rngtech.gametest.MachineTestSupport.check;
 
 import com.rngtech.RNGTech;
+import com.rngtech.content.blockentity.ComponentRecyclerBlockEntity;
 import com.rngtech.content.blockentity.CrusherBlockEntity;
 import com.rngtech.content.blockentity.MetalPressBlockEntity;
 import com.rngtech.content.blockentity.RecipeCache;
 import com.rngtech.content.energy.HeatCoreMaterial;
 import com.rngtech.content.machine.CrushHeadMaterial;
 import com.rngtech.content.machine.CrusherChassisMaterial;
+import com.rngtech.content.recycling.ComponentRecyclerChassis;
+import com.rngtech.content.recycling.DisassemblyHeadMaterial;
 import com.rngtech.content.registry.ModBlocks;
 import com.rngtech.content.registry.ModItems;
 
+import com.mojang.logging.LogUtils;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
+import net.minecraft.gametest.framework.GameTestSequence;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.EntityBlock;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
+import org.slf4j.Logger;
+
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 
 /** Remembered recipe lookups: no search while the input stays the same, found or not, and a new search on any change. */
 @GameTestHolder(RNGTech.MOD_ID)
 @PrefixGameTestTemplate(false)
 public final class RecipeCacheGameTests {
+    private static final Logger LOGGER = LogUtils.getLogger();
     private static final int RUN_TICKS = 300;
+    private static final int EMPTY_TICKS = 5;
 
     private RecipeCacheGameTests() {
     }
@@ -98,6 +118,110 @@ public final class RecipeCacheGameTests {
         check(press.machineInfo().progressMax() == gearTicks, "A reload changed the recipe");
         check(press.recipeSearches() == searches + 1, "A reload did not search again");
         helper.succeed();
+    }
+
+    /** Every machine that caches lookups does no recipe search while it stands empty. */
+    @GameTest(template = MachineTestSupport.EMPTY, timeoutTicks = 4000)
+    public static void emptyMachinesNeverSearch(GameTestHelper helper) {
+        BlockPos pos = new BlockPos(2, 1, 2);
+        List<String> checked = new ArrayList<>();
+        GameTestSequence sequence = helper.startSequence();
+        for (Block block : machineBlocks()) {
+            sequence.thenExecute(() -> {
+                        helper.setBlock(pos, Blocks.AIR);
+                        helper.setBlock(pos, block);
+                    })
+                    .thenIdle(EMPTY_TICKS)
+                    .thenExecute(() -> {
+                        BlockEntity machine = helper.getBlockEntity(pos);
+                        int searches = recipeSearches(machine);
+                        if (searches >= 0) {
+                            check(searches == 0, BuiltInRegistries.BLOCK.getKey(block) + " searched recipes " + searches + " times while empty");
+                            checked.add(BuiltInRegistries.BLOCK.getKey(block).getPath());
+                        }
+                    });
+        }
+        sequence.thenExecute(() -> {
+            LOGGER.info("Empty machines: {} cache recipe lookups and did not search: {}", checked.size(), checked);
+            check(checked.size() >= 15, "Only checked " + checked);
+        }).thenSucceed();
+    }
+
+    /** A Component Recycler stops searching for an input with no recipe, and finds the recipe when the input changes. */
+    @GameTest(template = MachineTestSupport.EMPTY, timeoutTicks = 400)
+    public static void recyclerRemembersAFailedLookup(GameTestHelper helper) {
+        ComponentRecyclerBlockEntity recycler = recycler(helper);
+        recycler.getProcessInventory().setStackInSlot(ComponentRecyclerBlockEntity.SLOT_INPUT, new ItemStack(Items.BEDROCK));
+        MachineTestSupport.powerEachTick(helper, recycler.getEnergyStorage(null));
+        int[] settled = new int[1];
+        helper.startSequence()
+                .thenIdle(2)
+                .thenExecute(() -> settled[0] = recycler.recipeSearches())
+                .thenExecuteFor(100, () -> {
+                    readLikeAnOpenMenu(recycler);
+                    check(recycler.recipeSearches() == settled[0], "Searched again for an input with no recipe");
+                })
+                .thenExecute(() -> recycler.getProcessInventory().setStackInSlot(ComponentRecyclerBlockEntity.SLOT_INPUT, new ItemStack(brokenCircuit(), 4)))
+                .thenWaitUntil(() -> check(recycler.machineInfo().progress() > 0, "The new input never started recycling"))
+                .thenSucceed();
+    }
+
+    /** A recipe reload makes an idle machine with a cached lookup search again, once. */
+    @GameTest(template = MachineTestSupport.EMPTY, batch = "recipe_cache_reload")
+    public static void recyclerSearchesAgainAfterAReload(GameTestHelper helper) {
+        ComponentRecyclerBlockEntity recycler = recycler(helper);
+        recycler.getProcessInventory().setStackInSlot(ComponentRecyclerBlockEntity.SLOT_INPUT, new ItemStack(brokenCircuit(), 4));
+        int ticks = recycler.machineInfo().progressMax();
+        check(ticks > 0, "No recycling recipe for a Broken Circuit");
+        int searches = recycler.recipeSearches();
+        recycler.machineInfo();
+        check(recycler.recipeSearches() == searches, "Searched again with nothing changed");
+        RecipeCache.invalidateAll();
+        check(recycler.machineInfo().progressMax() == ticks, "A reload changed the recipe");
+        check(recycler.recipeSearches() == searches + 1, "A reload did not search again");
+        helper.succeed();
+    }
+
+    private static ComponentRecyclerBlockEntity recycler(GameTestHelper helper) {
+        ComponentRecyclerBlockEntity recycler = MachineTestSupport.place(helper, new BlockPos(2, 1, 2),
+                ModBlocks.componentRecycler(ComponentRecyclerChassis.IRON).get(), ComponentRecyclerBlockEntity.class);
+        recycler.getGearInventory().setStackInSlot(ComponentRecyclerBlockEntity.SLOT_DISASSEMBLY_HEAD,
+                new ItemStack(ModItems.disassemblyHead(DisassemblyHeadMaterial.IRON).get()));
+        return recycler;
+    }
+
+    private static void readLikeAnOpenMenu(ComponentRecyclerBlockEntity recycler) {
+        for (int index = 0; index < recycler.getMenuData().getCount(); index++) {
+            recycler.getMenuData().get(index);
+        }
+        recycler.machineInfo();
+    }
+
+    private static Item brokenCircuit() {
+        return BuiltInRegistries.ITEM.get(ResourceLocation.fromNamespaceAndPath(RNGTech.MOD_ID, "broken_circuit"));
+    }
+
+    private static List<Block> machineBlocks() {
+        return BuiltInRegistries.BLOCK.stream()
+                .filter(block -> BuiltInRegistries.BLOCK.getKey(block).getNamespace().equals(RNGTech.MOD_ID))
+                .filter(block -> block instanceof EntityBlock)
+                .sorted(Comparator.comparing(block -> BuiltInRegistries.BLOCK.getKey(block).toString()))
+                .toList();
+    }
+
+    /** The machine's {@code recipeSearches()}, or -1 when it does not cache recipe lookups. */
+    private static int recipeSearches(BlockEntity machine) {
+        if (machine == null) {
+            return -1;
+        }
+        try {
+            Method method = machine.getClass().getMethod("recipeSearches");
+            return (int) method.invoke(machine);
+        } catch (NoSuchMethodException exception) {
+            return -1;
+        } catch (ReflectiveOperationException exception) {
+            throw new IllegalStateException(exception);
+        }
     }
 
     private static CrusherBlockEntity crusher(GameTestHelper helper) {

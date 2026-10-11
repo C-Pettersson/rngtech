@@ -49,6 +49,7 @@ import java.util.List;
 
 public class AlgaePhotobioreactorBlockEntity extends BlockEntity
         implements MenuProvider, PurgeableFluidStorage, MachineInfoProvider {
+    private final RecipeCache<AlgaeGrowthRecipe> recipes = new RecipeCache<>(1);
     public static final int SLOT_OUTPUT = 0;
     public static final int SLOT_WATER_INPUT_CONTAINER = 1;
     public static final int SLOT_WATER_OUTPUT_CONTAINER = 2;
@@ -422,7 +423,17 @@ public class AlgaePhotobioreactorBlockEntity extends BlockEntity
     }
 
     private AlgaeGrowthRecipe nextRecipe() {
-        return level == null ? null : AlgaeGrowthRecipes.find(level, waterTank.getFluid(), carbonTank.getFluid()).orElse(null);
+        if (level == null) {
+            return null;
+        }
+        FluidStack water = waterTank.getFluid();
+        FluidStack carbon = carbonTank.getFluid();
+        return recipes.lookup(0, level).fluid(water).fluid(carbon).find(() -> AlgaeGrowthRecipes.find(level, water, carbon));
+    }
+
+    /** How many recipe lookups searched the recipes instead of reusing a remembered result. */
+    public int recipeSearches() {
+        return recipes.searches();
     }
 
     private boolean process(AlgaeGrowthRecipe recipe, MachineStatAccumulator stats) {

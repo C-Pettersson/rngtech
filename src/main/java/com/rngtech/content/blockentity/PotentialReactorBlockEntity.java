@@ -46,6 +46,11 @@ import net.neoforged.neoforge.items.ItemStackHandler;
 import java.util.ArrayDeque;
 
 public class PotentialReactorBlockEntity extends BaseMachineBlockEntity implements MenuProvider, MachineInfoProvider {
+    private static final int RECIPE_INPUT = 0;
+    private static final int RECIPE_CANDIDATE = 1;
+    private static final RecipeCache.Search<PotentialReactorRecipe> RECIPE_SEARCH =
+            (level, input, unused) -> PotentialReactorRecipes.find(level, input);
+    private final RecipeCache<PotentialReactorRecipe> recipes = new RecipeCache<>(2);
     public static final int SLOT_INPUT = 0;
     public static final int SLOT_RESIDUE = 1;
     public static final int PROCESS_SLOT_COUNT = 2;
@@ -313,7 +318,7 @@ public class PotentialReactorBlockEntity extends BaseMachineBlockEntity implemen
 
     public boolean isKnownReactorFuel(ItemStack stack) {
         return RecyclingData.hasRecyclableRpgValue(stack)
-                || level != null && PotentialReactorRecipes.find(level, stack).isPresent();
+                || level != null && recipes.find(RECIPE_CANDIDATE, level, stack, RECIPE_SEARCH) != null;
     }
 
     public boolean isReactorChamber(ItemStack stack) {
@@ -508,7 +513,12 @@ public class PotentialReactorBlockEntity extends BaseMachineBlockEntity implemen
     }
 
     private PotentialReactorRecipe nextRecipe() {
-        return level == null ? null : PotentialReactorRecipes.find(level, processInventory.getStackInSlot(SLOT_INPUT)).orElse(null);
+        return level == null ? null : recipes.find(RECIPE_INPUT, level, processInventory.getStackInSlot(SLOT_INPUT), RECIPE_SEARCH);
+    }
+
+    /** How many recipe lookups searched the recipes instead of reusing a remembered result. */
+    public int recipeSearches() {
+        return recipes.searches();
     }
 
     private ReactorWork nextWork() {

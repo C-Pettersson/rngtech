@@ -70,6 +70,10 @@ import java.util.List;
 
 public class MelterBlockEntity extends BaseMachineBlockEntity
         implements MenuProvider, PurgeableFluidStorage, MachineMasteryHost, MachineInfoProvider {
+    private final RecipeCache<MelterRecipe> recipes = new RecipeCache<>(1);
+    private static final RecipeInputFilter<MelterRecipeInput, MelterRecipe> INPUT_FILTER = new RecipeInputFilter<>(
+            ModRecipes.MELTER_TYPE::get,
+            (recipe, item) -> recipe.primaryIngredient().test(item) || recipe.secondaryIngredient().test(item));
     public static final int SLOT_PRIMARY_INPUT = 0;
     public static final int SLOT_SECONDARY_INPUT = 1;
     public static final int SLOT_FLUID_INPUT_CONTAINER = 2;
@@ -596,9 +600,19 @@ public class MelterBlockEntity extends BaseMachineBlockEntity
     }
 
     private MelterRecipe nextRecipe() {
-        return level == null
-                ? null
-                : MelterRecipes.find(level, primaryStack(), secondaryStack(), inputTank.getFluid()).orElse(null);
+        if (level == null) {
+            return null;
+        }
+        ItemStack primary = primaryStack();
+        ItemStack secondary = secondaryStack();
+        FluidStack fluid = inputTank.getFluid();
+        return recipes.lookup(0, level).item(primary).item(secondary).fluid(fluid)
+                .find(() -> MelterRecipes.find(level, primary, secondary, fluid));
+    }
+
+    /** How many recipe lookups searched the recipes instead of reusing a remembered result. */
+    public int recipeSearches() {
+        return recipes.searches();
     }
 
     private boolean process(MelterRecipe recipe, MachineStatAccumulator stats) {
@@ -1093,8 +1107,7 @@ public class MelterBlockEntity extends BaseMachineBlockEntity
     }
 
     public boolean isMeltingInput(ItemStack stack) {
-        return RecipeInputFilter.anyAccepts(level, ModRecipes.MELTER_TYPE.get(), stack,
-                (recipe, item) -> recipe.primaryIngredient().test(item) || recipe.secondaryIngredient().test(item));
+        return INPUT_FILTER.accepts(level, stack);
     }
 
     private final class ProcessItemHandler implements IItemHandler {

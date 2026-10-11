@@ -53,6 +53,7 @@ import java.util.function.Predicate;
 
 public class WoodenDehumidifierBlockEntity extends BlockEntity
         implements MenuProvider, PurgeableFluidStorage, MachineInfoProvider {
+    private final RecipeCache<RecipeHolder<WoodenDehumidifierConversionRecipe>> recipes = new RecipeCache<>(1);
     public static final int SLOT_CONVERSION_INPUT = 0;
     public static final int SLOT_EMPTY_CONTAINER = 1;
     public static final int SLOT_FILLED_CONTAINER = 2;
@@ -554,7 +555,15 @@ public class WoodenDehumidifierBlockEntity extends BlockEntity
         if (level == null) {
             return Optional.empty();
         }
-        return WoodenDehumidifierConversionRecipes.find(level, inventory.getStackInSlot(SLOT_CONVERSION_INPUT), waterTank.getFluid());
+        ItemStack ingredient = inventory.getStackInSlot(SLOT_CONVERSION_INPUT);
+        FluidStack water = waterTank.getFluid();
+        return Optional.ofNullable(recipes.lookup(0, level).item(ingredient).fluid(water)
+                .find(() -> WoodenDehumidifierConversionRecipes.find(level, ingredient, water)));
+    }
+
+    /** How many recipe lookups searched the recipes instead of reusing a remembered result. */
+    public int recipeSearches() {
+        return recipes.searches();
     }
 
     private boolean canRunConversion(WoodenDehumidifierConversionRecipe recipe) {
