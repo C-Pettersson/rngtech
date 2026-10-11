@@ -32,7 +32,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.energy.IEnergyStorage;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.ItemStackHandler;
@@ -145,6 +144,7 @@ public class BioGeneratorBlockEntity extends BaseMachineBlockEntity implements M
     private final IEnergyStorage energyStorage = new GeneratorEnergyStorage();
     private final EnergyTelemetry energyFlow = new EnergyTelemetry(this::getLevel);
     private final IEnergyStorage trackedEnergyStorage = energyFlow.track(energyStorage);
+    private final InstalledBatteryCell batteryCell = new InstalledBatteryCell(this::batteryCellStack);
     private final ContainerData menuData = new ContainerData() {
         @Override
         public int get(int index) {
@@ -680,11 +680,11 @@ public class BioGeneratorBlockEntity extends BaseMachineBlockEntity implements M
     }
 
     private int energyStored() {
-        return internalEnergyStored(effectiveStats()) + BatteryCellItem.energyStored(batteryCellStack());
+        return internalEnergyStored(effectiveStats()) + batteryCell.energyStored();
     }
 
     private int energyCapacity(MachineStatAccumulator stats) {
-        return internalEnergyCapacity(stats) + BatteryCellItem.energyCapacity(batteryCellStack());
+        return internalEnergyCapacity(stats) + batteryCell.capacity();
     }
 
     private int internalEnergyCapacity(MachineStatAccumulator stats) {
@@ -696,8 +696,7 @@ public class BioGeneratorBlockEntity extends BaseMachineBlockEntity implements M
     }
 
     private IEnergyStorage batteryCellEnergyStorage() {
-        ItemStack stack = batteryCellStack();
-        return stack.isEmpty() ? null : stack.getCapability(Capabilities.EnergyStorage.ITEM);
+        return batteryCell.storage();
     }
 
     private ItemStack batteryCellStack() {
