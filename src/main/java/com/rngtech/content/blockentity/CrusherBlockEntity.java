@@ -152,6 +152,8 @@ public class CrusherBlockEntity extends BaseMachineBlockEntity implements MenuPr
     private final IItemHandler filteredInputHandler = new CrusherInputItemHandler();
 
     private final InstalledBatteryCell batteryCell = new InstalledBatteryCell(this::batteryCellStack);
+    private MachineProgressionState blockedSlotProgression;
+    private boolean blockedSlot;
     private final ContainerData menuData = new ContainerData() {
         @Override
         public int get(int index) {
@@ -1271,8 +1273,14 @@ public class CrusherBlockEntity extends BaseMachineBlockEntity implements MenuPr
         return !batteryCellSlotBlocked() && isBatteryCell(stack);
     }
 
+    /** Every cell read asks this, so it is kept until the stored Mastery progression changes. */
     private boolean batteryCellSlotBlocked() {
-        return CrusherPassiveTree.blocksBatteryCell(machineProgression());
+        MachineProgressionState stored = super.machineProgression();
+        if (stored != blockedSlotProgression) {
+            blockedSlotProgression = stored;
+            blockedSlot = CrusherPassiveTree.blocksBatteryCell(machineProgression());
+        }
+        return blockedSlot;
     }
 
     private boolean matchingStageCrushHeadRequired() {
