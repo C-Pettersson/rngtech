@@ -277,6 +277,7 @@ public final class ModBlocks {
                     .mapColor(MapColor.COLOR_PURPLE)
                     .strength(4.5F)
                     .sound(SoundType.METAL)
+                    .noOcclusion()
     );
     public static final DeferredBlock<CorrosionCellBlock> CORROSION_CELL = BLOCKS.registerBlock(
             "corrosion_cell",

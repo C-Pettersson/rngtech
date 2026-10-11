@@ -20,6 +20,8 @@ wiki:
 
 The **Vacuum Collapse Generator** is RNGTech's Stage 7 primary generator. It collapses one {{ item('rngtech:void_catalyst') }} at a time into a huge batch of FE, about 1,000 FE/t before Gear, and can leave {{ item('rngtech:collapse_residue') }} behind. Its Gear decides how much it makes and how stable each collapse is.
 
+The generator is built around its Gear. The Void Chamber is the glass vessel in the middle, a Dimensional Stabilizer pylon stands on each side, and the Collapse Nozzle hangs over the chamber from the catalyst hopper's feed line. Each part shows in its own material, so you can tell the tier at a glance, and an empty Gear slot leaves an empty mount.
+
 Like every RNGTech machine, each Vacuum Collapse Generator you craft rolls its own [rarity and affixes](rarity-and-affixes.md).
 
 ## Obtaining
@@ -46,11 +48,13 @@ A collapse starts only when:
 - the machine's stability is at least the recipe's minimum (1.0 for Void Catalyst), and
 - the residue slot has room.
 
+During a collapse, a glowing core inside the chamber shrinks and darkens to black as the cycle runs, and the chamber's cap rims pulse faster toward the end. The stabilizer lenses glow and draw motes into the core.
+
 Once a collapse starts it cannot pause for full storage. FE that the 20,000 FE internal buffer cannot hold is lost, so connect enough cables and storage to take each catalyst's output. The generator does not limit its own output, so the receiver or connector tier decides how much FE moves each tick. A redstone signal pauses it, even in the middle of a collapse, which is the way to hold it while storage catches up.
 
 ### Instability
 
-Every recipe adds instability, and higher stability reduces it. Instability makes each collapse slower and yield less FE, and every full point of it adds an extra Collapse Residue. If the installed Collapse Nozzle's stage is lower than the recipe's minimum chamber stage, each missing stage adds a full point of instability.
+Every recipe adds instability, and higher stability reduces it. Instability makes each collapse slower and yield less FE, and every full point of it adds an extra Collapse Residue. If the installed Collapse Nozzle's stage is lower than the recipe's minimum chamber stage, each missing stage adds a full point of instability. An unstable collapse makes the chamber's rim light flicker instead of pulsing smoothly.
 
 ### Gear
 
@@ -72,7 +76,7 @@ The Collapse Nozzle is shared with the [Cavitation Generator](cavitation-generat
 | Bottom | Extracts Collapse Residue. |
 | Sides | Output FE, for example into a [Universal Cable](universal-cable.md). |
 
-Gear slots are not reachable by automation.
+Gear slots are not reachable by automation. The back of the machine has a port plate sized for a Universal Connector, the tidiest place to take FE from it.
 
 ### Void Catalyst
 
