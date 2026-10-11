@@ -39,7 +39,7 @@ public class BioGeneratorBlock extends BaseMachineBlock {
     @Override
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> blockEntityType) {
         if (level.isClientSide) {
-            return null;
+            return createTickerHelper(blockEntityType, ModBlockEntities.BIO_GENERATOR.get(), BioGeneratorBlockEntity::clientTick);
         }
         return createTickerHelper(blockEntityType, ModBlockEntities.BIO_GENERATOR.get(), BioGeneratorBlockEntity::serverTick);
     }
