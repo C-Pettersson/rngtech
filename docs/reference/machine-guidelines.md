@@ -253,6 +253,10 @@ Design intent and balance rules behind shipped machines that the code does not s
 
 - Anode FE/t stays below the same stage's main generator: the Syngas Combustor at Stage 5, the Ammonia Fuel Cell at Stage 6, and the Vacuum Collapse Generator at Stage 7 (and its all-Exotic setup at Stage 8).
 - Corrosion waste stays item-backed so recycling or chemistry recipes can consume it without a fluid slice.
+- The load dial is modelled on a metal-air cell: a fuel's charge is fixed (Faraday), so load sets the dissolve rate, and a linear polarization curve sets the voltage and so the FE per fuel. Rated load is the highest load and reproduces the recipe exactly, so recipe FE, JEI, and the energy balance simulation all describe a cell at rated load, and load can never lift Anode FE/t past the stage's main generator.
+- A lighter load is a capital-for-fuel trade, not a free gain: up to `1.15x` FE per fuel at `0.46x` FE/t, so stretching Anode supply costs more cells. Keep FE per fuel monotonic in load so no setting is a trap, and keep the curve linear so the wiki table is the whole rule.
+- Fuel only dissolves while the buffer has room, and a load change applies to the rest of the fuel in the bath, so pausing or retuning never loses FE.
+- Automation works on every face for compatibility: FE and, with a Fluid Pump, Electrolyte Solution on all six, with the per-face item rules. The shaped model shows one connector port, on the back, so the tank front and the blower stay clear.
 
 ### Cavitation Generator
 

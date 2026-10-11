@@ -1,6 +1,7 @@
 package com.rngtech.content.menu;
 
 import com.rngtech.content.blockentity.CorrosionCellBlockEntity;
+import com.rngtech.content.energy.CorrosionCellLoad;
 import com.rngtech.content.purge.FluidPurgeSupport;
 import com.rngtech.content.registry.ModBlocks;
 import com.rngtech.content.registry.ModMenus;
@@ -54,7 +55,10 @@ public class CorrosionCellMenu extends AbstractContainerMenu implements StatBrea
     private static final int DATA_FLAT_ENERGY_GENERATION = 19;
     private static final int DATA_BASE_ENERGY_GENERATION = 20;
     private static final int DATA_ELECTROLYTE_FLUID_ID = 21;
-    private static final int DATA_COUNT = 22;
+    private static final int DATA_LOAD = 22;
+    private static final int DATA_LIVE_LOAD = 23;
+    private static final int DATA_COUNT = 24;
+    private static final int BUTTON_LOAD_BASE = 8000;
     private static final int STAT_SCALE = 100;
     private static final int PLATE_SLOT = 0;
     private static final int ELECTROLYTE_SLOT = 1;
@@ -207,6 +211,20 @@ public class CorrosionCellMenu extends AbstractContainerMenu implements StatBrea
         return data.get(DATA_FLUID_TRANSFER);
     }
 
+    /** The selected load, in percent of rated current. */
+    public int load() {
+        return data.get(DATA_LOAD);
+    }
+
+    /** The current the cell drew last tick, in percent of rated; 0 while it waits. */
+    public int liveLoad() {
+        return data.get(DATA_LIVE_LOAD);
+    }
+
+    public static int loadButtonId(int load) {
+        return BUTTON_LOAD_BASE + CorrosionCellLoad.snap(load);
+    }
+
     public MachineTraits machineTraits() {
         return RefinementMenuSupport.displayTraits(getSlot(REFINEMENT_TARGET_SLOT).getItem());
     }
@@ -273,6 +291,13 @@ public class CorrosionCellMenu extends AbstractContainerMenu implements StatBrea
     @Override
     public boolean clickMenuButton(Player player, int id) {
         if (FluidPurgeSupport.handleMenuButton(player, cell, id)) {
+            return true;
+        }
+        int load = id - BUTTON_LOAD_BASE;
+        if (load >= CorrosionCellLoad.MIN_LOAD && load <= CorrosionCellLoad.MAX_LOAD) {
+            if (!player.level().isClientSide) {
+                cell.setLoad(load);
+            }
             return true;
         }
         if (id != RefinementMenuSupport.BUTTON_APPLY) {

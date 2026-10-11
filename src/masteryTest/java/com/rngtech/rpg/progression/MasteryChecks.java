@@ -57,6 +57,7 @@ public final class MasteryChecks {
         checks += AscendancyChecks.run();
         checks += PartGenerationChecks.run();
         checks += CrusherYieldChecks.run();
+        checks += com.rngtech.content.energy.CorrosionCellLoadChecks.run();
         checks += RefinementChecks.run();
         checks += CorruptionChecks.run();
         checks += com.rngtech.content.item.CorruptionTooltipChecks.run();
