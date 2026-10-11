@@ -4,4 +4,6 @@ This is the player guide to RNGTech's machines. Each page covers how to craft a 
 
 New to the mod? Start with [Getting Started](getting-started.md), then read the guides on [Stages](stages.md), [Rarity and Affixes](rarity-and-affixes.md), [Machine Mastery](machine-mastery.md), and [Gear](gear.md).
 
+Building a modpack? See [Modpack Creators](modpack-creators.md) for the energy and water balance and the settings you can change.
+
 {{ gallery() }}

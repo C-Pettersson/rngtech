@@ -365,11 +365,6 @@ public class ResonanceCalibratorScreen extends AbstractContainerScreen<Resonance
             renderSlotFrame(guiGraphics, PROCESS_CATALYST_FRAME_X, PROCESS_SLOT_FRAME_Y);
             renderSlotFrame(guiGraphics, PROCESS_STABILIZER_FRAME_X, PROCESS_SLOT_FRAME_Y);
             renderSlotFrame(guiGraphics, PROCESS_OUTPUT_FRAME_X, PROCESS_SLOT_FRAME_Y);
-            renderSlotFrame(
-                    guiGraphics,
-                    RefinementScreenStyle.PROCESSING_TARGET_SLOT_X - 1,
-                    RefinementScreenStyle.PROCESSING_TARGET_SLOT_Y - 1
-            );
         } else if (menu.selectedTab() == ResonanceCalibratorMenu.TAB_GEAR) {
             renderSlotFrame(guiGraphics, GEAR_BATTERY_X, GEAR_TOP_ROW_Y);
             renderSlotFrame(guiGraphics, GEAR_RESONANCE_COIL_X, GEAR_TOP_ROW_Y);
@@ -487,7 +482,6 @@ public class ResonanceCalibratorScreen extends AbstractContainerScreen<Resonance
         drawCentered(guiGraphics, Component.translatable("rngtech.calibration.catalyst.tiny"), 88, 28);
         drawCentered(guiGraphics, Component.translatable("rngtech.calibration.stabilizer.tiny"), 116, 28);
         drawCentered(guiGraphics, Component.translatable("rngtech.processing.output.tiny"), 184, 28);
-        drawProcessingTargetLabel(guiGraphics);
     }
 
     private void drawGearLabels(GuiGraphics guiGraphics) {
@@ -599,15 +593,6 @@ public class ResonanceCalibratorScreen extends AbstractContainerScreen<Resonance
         renderCenteredLabelTooltip(guiGraphics, mouseX, mouseY, 88, 28, 24, Component.translatable("rngtech.calibration.catalyst"));
         renderCenteredLabelTooltip(guiGraphics, mouseX, mouseY, 116, 28, 24, Component.translatable("rngtech.calibration.stabilizer"));
         renderCenteredLabelTooltip(guiGraphics, mouseX, mouseY, 184, 28, 24, Component.translatable("rngtech.processing.output"));
-        renderCenteredLabelTooltip(
-                guiGraphics,
-                mouseX,
-                mouseY,
-                RefinementScreenStyle.PROCESSING_TARGET_SLOT_X + 8,
-                28,
-                32,
-                Component.translatable("rngtech.processing.machine")
-        );
     }
 
     private void renderPatternSelectorTooltips(GuiGraphics guiGraphics, int mouseX, int mouseY) {
@@ -770,12 +755,6 @@ public class ResonanceCalibratorScreen extends AbstractContainerScreen<Resonance
             return false;
         }
         return value > 1.001;
-    }
-
-    private void drawProcessingTargetLabel(GuiGraphics guiGraphics) {
-        Component target = Component.translatable("rngtech.processing.machine.tiny");
-        int x = RefinementScreenStyle.PROCESSING_TARGET_SLOT_X + 8 - font.width(target) / 2;
-        guiGraphics.drawString(font, target, x, 28, TEXT_MUTED, false);
     }
 
     private void drawCentered(GuiGraphics guiGraphics, Component label, int centerX, int y) {

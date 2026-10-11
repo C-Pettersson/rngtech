@@ -345,7 +345,6 @@ public class FurnaceScreen extends AbstractContainerScreen<FurnaceMenu> {
             guiGraphics.drawString(font, fuel, FUEL_FRAME_X - 3 - font.width(fuel), FUEL_FRAME_Y + 5, TEXT_MUTED, false);
         }
         guiGraphics.drawString(font, Component.translatable("rngtech.processing.output"), 164, 28, TEXT_MUTED, false);
-        drawProcessingTargetLabel(guiGraphics);
     }
 
     private void drawConfigurationLabels(GuiGraphics guiGraphics) {
@@ -402,11 +401,6 @@ public class FurnaceScreen extends AbstractContainerScreen<FurnaceMenu> {
             if (!menu.isElectric()) {
                 renderSlotFrame(guiGraphics, FUEL_FRAME_X, FUEL_FRAME_Y);
             }
-            renderSlotFrame(
-                    guiGraphics,
-                    RefinementScreenStyle.PROCESSING_TARGET_SLOT_X - 1,
-                    RefinementScreenStyle.PROCESSING_TARGET_SLOT_Y - 1
-            );
         } else if (menu.selectedTab() == FurnaceMenu.TAB_GEAR) {
             for (int slot = 0; slot < menu.activeGearSlots(); slot++) {
                 renderSlotFrame(guiGraphics, GEAR_X[slot] - 1, GEAR_Y[slot] - 1);
@@ -840,12 +834,6 @@ public class FurnaceScreen extends AbstractContainerScreen<FurnaceMenu> {
             return value > baseTemperature;
         }
         return value > 1.001;
-    }
-
-    private void drawProcessingTargetLabel(GuiGraphics guiGraphics) {
-        Component target = Component.translatable("rngtech.processing.machine.tiny");
-        int x = RefinementScreenStyle.PROCESSING_TARGET_SLOT_X + 8 - font.width(target) / 2;
-        guiGraphics.drawString(font, target, x, 28, TEXT_MUTED, false);
     }
 
     private void renderSlotFrame(GuiGraphics guiGraphics, int x, int y) {

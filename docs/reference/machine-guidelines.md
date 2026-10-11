@@ -276,7 +276,10 @@ Design intent and balance rules behind shipped machines that the code does not s
 
 - The Algae Photobioreactor and both Dehumidifiers are no-FE support machines with no RPG traits.
 - Dense Algae Biomass beats burning the same algae directly, which rewards the crafting step.
+- The photobioreactor holds a living culture. Growth runs at culture density, so a fresh culture costs about one cycle of output to grow in, and a starving one (no light, water, or carbon gas) dies back toward the seed density instead of resetting progress. A full output only pauses harvesting.
+- Aeration is the photobioreactor's visible trade, modelled on Monod saturation: rated (70%) reproduces the recipe exactly, lean (down to 40%) saves about 29% carbon for 20% less speed, and rich (up to 100%) gains about 11% speed for 29% more carbon. Water per Algae Biomass never changes.
 - The Silica Gel Dehumidifier ignores sky, biome, and weather. Bead consumption is its balancing cost.
+- Water rates assume a finite supply with no infinite water source. Machines still accept bucketed and piped water, so packs turn infinite water off themselves through the `waterSourceConversion` gamerule and by gating other mods' infinite-water blocks. The [Modpack Creators](https://c-pettersson.github.io/rngtech/modpack-creators/) wiki page tells pack makers how.
 
 ### Modular Field Tools
 

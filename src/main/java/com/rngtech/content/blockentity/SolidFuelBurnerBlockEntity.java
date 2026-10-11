@@ -137,6 +137,7 @@ public class SolidFuelBurnerBlockEntity extends BaseMachineBlockEntity implement
     };
     private final IItemHandler sidedFuelHandler = new FuelItemHandler();
     private final IEnergyStorage energyStorage = new BurnerEnergyStorage();
+    private final InstalledBatteryCell batteryCell = new InstalledBatteryCell(this::cellStack);
     private final ContainerData menuData = new ContainerData() {
         @Override
         public int get(int index) {
@@ -314,6 +315,11 @@ public class SolidFuelBurnerBlockEntity extends BaseMachineBlockEntity implement
 
     public MachineStatAccumulator effectiveStats() {
         return cachedStats(0L);
+    }
+
+    /** How many times this machine built its Battery Cell's stats, for checks that a steady machine builds none. */
+    public int cellStatsBuilds() {
+        return batteryCell.builds();
     }
 
     @Override
@@ -586,11 +592,11 @@ public class SolidFuelBurnerBlockEntity extends BaseMachineBlockEntity implement
     }
 
     private int energyStored() {
-        return BatteryCellItem.energyStored(cellStack());
+        return batteryCell.energyStored();
     }
 
     private int energyCapacity() {
-        return BatteryCellItem.energyCapacity(cellStack());
+        return batteryCell.capacity();
     }
 
     private int availableCellSpace() {
@@ -598,10 +604,7 @@ public class SolidFuelBurnerBlockEntity extends BaseMachineBlockEntity implement
     }
 
     private int cellInputCeiling() {
-        ItemStack cell = cellStack();
-        return cell.isEmpty() || BatteryCellItem.energyStored(cell) >= BatteryCellItem.energyCapacity(cell)
-                ? 0
-                : BatteryCellItem.maxInput(cell);
+        return energyStored() >= energyCapacity() ? 0 : batteryCell.stats().maxInput();
     }
 
     private int effectiveOutputRate() {
