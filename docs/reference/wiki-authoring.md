@@ -52,7 +52,7 @@ Hover a slot to see its name, fluid amount, tag, role, or requirement. A yellow 
 
 ## Icons
 
-Icons are rendered by `tools/rngwiki/icons.py` from item and block models: block models render as inventory-angle cubes, and `item/generated` models render flat. Vanilla icons, names, and tags come from the Minecraft 1.21.1 client jar. The hook finds it through the `RNGTECH_MC_CLIENT_JAR` environment variable, `build/wiki/`, or the NeoGradle cache. If it is missing, run:
+Icons are rendered by `tools/rngwiki/icons.py` from item and block models: block models render at the inventory angle, including element rotation, so shaped models such as the Cavitation Generator draw as they look in game, and `item/generated` models render flat. Vanilla icons, names, and tags come from the Minecraft 1.21.1 client jar. The hook finds it through the `RNGTECH_MC_CLIENT_JAR` environment variable, `build/wiki/`, or the NeoGradle cache. If it is missing, run:
 
 ```sh
 python tools/rngwiki/vanilla.py --fetch

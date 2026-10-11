@@ -1,6 +1,8 @@
 package com.rngtech.content.blockentity;
 
 import com.rngtech.content.block.BaseMachineBlock;
+import com.rngtech.content.energy.CavitationHeat;
+import com.rngtech.content.energy.CavitationRotorDynamics;
 import com.rngtech.content.item.BatteryCellItem;
 import com.rngtech.content.item.CavitationPartItem;
 import com.rngtech.content.item.CollapseNozzleItem;
@@ -33,8 +35,12 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.Connection;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.game.ClientGamePacketListener;
+import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.util.Mth;
 import net.minecraft.world.Containers;
 import net.minecraft.world.MenuProvider;
@@ -44,6 +50,7 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.energy.IEnergyStorage;
@@ -83,12 +90,12 @@ public class CavitationGeneratorBlockEntity extends BaseMachineBlockEntity
     public static final int STATUS_OUTPUT_FULL = 9;
     public static final int STATUS_REDSTONE_DISABLED = 10;
     public static final int STATUS_FLUID_OUTPUT_FULL = 11;
+    public static final int STATUS_SPOOLING = 12;
     public static final int PURGE_INPUT_TANK = 0;
     public static final int PURGE_OUTPUT_TANK = 1;
 
     private static final int TANK_CAPACITY = FluidType.BUCKET_VOLUME * 4;
     private static final int OUTPUT_TANK_CAPACITY = FluidType.BUCKET_VOLUME * 8;
-    private static final int MAX_HEAT_STRAIN = 1000;
     private static final int DATA_PROGRESS = 0;
     private static final int DATA_PROCESSING_TICKS = 1;
     private static final int DATA_ENERGY = 2;
@@ -123,7 +130,17 @@ public class CavitationGeneratorBlockEntity extends BaseMachineBlockEntity
     private static final int DATA_BASE_ENERGY_GENERATION = 31;
     private static final int DATA_INPUT_FLUID_ID = 32;
     private static final int DATA_OUTPUT_FLUID_ID = 33;
+    private static final int DATA_ROTOR_RPM = 34;
+    private static final int DATA_THROTTLE = 35;
+    private static final int DATA_THROTTLE_HEAT = 36;
+    private static final int DATA_COOLING = 37;
+    private static final int DATA_RATED_PRESSURE = 38;
+    private static final int DATA_LIVE_WEAR = 39;
+    private static final int DATA_LIVE_RESONANCE = 40;
+    private static final int DATA_WATER_PER_CYCLE = 41;
+    private static final int DATA_MAX_PENALTY = 42;
     private static final int STAT_SCALE = 100;
+    private static final int VISUAL_SYNC_INTERVAL = 2;
 
     private final ItemStackHandler processInventory = new ItemStackHandler(PROCESS_SLOT_COUNT) {
         @Override
@@ -177,6 +194,10 @@ public class CavitationGeneratorBlockEntity extends BaseMachineBlockEntity
 
         @Override
         protected void onContentsChanged(int slot) {
+            if (slot == SLOT_ROTOR) {
+                rotorSpeed = 0.0;
+                wearCarry = 0.0;
+            }
             if (slot == SLOT_ROTOR || slot == SLOT_NOZZLE) {
                 clearActiveRecipe();
             }
@@ -208,7 +229,7 @@ public class CavitationGeneratorBlockEntity extends BaseMachineBlockEntity
             MachineStatAccumulator stats = effectiveStats();
             CavitationRecipe recipe = nextRecipe();
             return switch (index) {
-                case DATA_PROGRESS -> progress;
+                case DATA_PROGRESS -> (int) progress;
                 case DATA_PROCESSING_TICKS -> currentProcessingTicks(stats);
                 case DATA_ENERGY -> energyStored();
                 case DATA_ENERGY_CAPACITY -> energyCapacity();
@@ -219,13 +240,18 @@ public class CavitationGeneratorBlockEntity extends BaseMachineBlockEntity
                 case DATA_STATUS -> statusCode(stats);
                 case DATA_INPUT_FLUID -> inputTank.getFluidAmount();
                 case DATA_INPUT_FLUID_CAPACITY -> inputTank.getCapacity();
-                case DATA_HEAT_STRAIN -> heatStrain;
-                case DATA_MAX_HEAT_STRAIN -> MAX_HEAT_STRAIN;
+                case DATA_HEAT_STRAIN -> (int) Math.round(heatStrain);
+                case DATA_MAX_HEAT_STRAIN -> (int) Math.round(strainCap(stats));
                 case DATA_ROTOR_WEAR -> rotorWear();
                 case DATA_ROTOR_WEAR_LIMIT -> rotorWearLimit();
-                case DATA_PRESSURE_RATING -> recipe == null ? 0 : recipe.pressureRating();
+                case DATA_PRESSURE_RATING -> livePressure();
+                case DATA_RATED_PRESSURE -> ratedPressure();
+                case DATA_LIVE_WEAR -> (int) Math.round(liveWearFactor() * STAT_SCALE);
+                case DATA_LIVE_RESONANCE -> (int) Math.round(resonanceFactor() * STAT_SCALE);
+                case DATA_WATER_PER_CYCLE -> recipe == null ? 0 : waterPerCycle(recipe, stats);
+                case DATA_MAX_PENALTY -> (int) Math.round(CavitationHeat.maxPenalty(stats.value(MachineStat.MAX_TEMPERATURE)) * STAT_SCALE);
                 case DATA_RECIPE_STRAIN -> recipe == null ? 0 : recipe.heatStrain();
-                case DATA_RECIPE_WEAR -> recipe == null ? 0 : recipe.wear();
+                case DATA_RECIPE_WEAR -> (int) Math.round(recipeWearPerCycle(stats) * 10.0);
                 case DATA_ENERGY_GENERATION -> (int) Math.round(stats.effectiveEnergyGenerationMultiplier() * STAT_SCALE);
                 case DATA_FLAT_ENERGY_GENERATION -> (int) Math.round(stats.effectiveFlatEnergyGenerationBonus() * STAT_SCALE);
                 case DATA_BASE_ENERGY_GENERATION -> (int) Math.round(baseEnergyPerTick() * STAT_SCALE);
@@ -242,6 +268,10 @@ public class CavitationGeneratorBlockEntity extends BaseMachineBlockEntity
                 case DATA_RECIPE_FLUID_OUTPUT -> currentRecipeFluidOutput(stats);
                 case DATA_INPUT_FLUID_ID -> BuiltInRegistries.FLUID.getId(inputTank.getFluid().getFluid());
                 case DATA_OUTPUT_FLUID_ID -> BuiltInRegistries.FLUID.getId(outputTank.getFluid().getFluid());
+                case DATA_ROTOR_RPM -> CavitationRotorDynamics.rpm(rotorSpeed);
+                case DATA_THROTTLE -> throttle;
+                case DATA_THROTTLE_HEAT -> (int) Math.round(heatPerTick(stats, CavitationRotorDynamics.targetSpeed(throttle)) * STAT_SCALE);
+                case DATA_COOLING -> (int) Math.round(coolingPerTick() * STAT_SCALE);
                 default -> 0;
             };
         }
@@ -252,21 +282,26 @@ public class CavitationGeneratorBlockEntity extends BaseMachineBlockEntity
 
         @Override
         public int getCount() {
-            return DATA_OUTPUT_FLUID_ID + 1;
+            return DATA_MAX_PENALTY + 1;
         }
     };
 
-    private int progress;
+    private double progress;
     private int activeProcessingTicks;
     private int internalEnergy;
     private double activeTotalEnergy;
-    private double remainingEnergy;
     private double generationCarry;
+    private double wearCarry;
     private int activeHeatStrain;
     private int activeWear;
     private FluidStack activeFluid = FluidStack.EMPTY;
     private FluidStack activeFluidOutput = FluidStack.EMPTY;
-    private int heatStrain;
+    private double heatStrain;
+    private double rotorSpeed;
+    private int throttle = CavitationRotorDynamics.RATED_THROTTLE;
+    private CavitationVisualState visualState = CavitationVisualState.IDLE;
+    private CavitationVisualState.Key lastSyncedVisual;
+    private final CavitationVisualState.Animation animation = new CavitationVisualState.Animation();
 
     public CavitationGeneratorBlockEntity(BlockPos pos, BlockState blockState) {
         super(ModBlockEntities.CAVITATION_GENERATOR.get(), pos, blockState, MachineType.CAVITATION_GENERATOR, SLOT_FLUID_INPUT_CONTAINER, SLOT_FLUID_INPUT_CONTAINER, SLOT_DAMAGED_ROTOR);
@@ -282,6 +317,80 @@ public class CavitationGeneratorBlockEntity extends BaseMachineBlockEntity
         if (generated || exported) {
             generator.setChanged();
         }
+        generator.syncVisualState(level);
+    }
+
+    public int throttle() {
+        return throttle;
+    }
+
+    public void setThrottle(int throttle) {
+        int clamped = CavitationRotorDynamics.clampThrottle(throttle);
+        if (clamped != this.throttle) {
+            this.throttle = clamped;
+            setChanged();
+        }
+    }
+
+    public double rotorSpeed() {
+        return rotorSpeed;
+    }
+
+    /** Client copy of the state the renderer draws; synced from the server in the block entity update tag. */
+    public CavitationVisualState visualState() {
+        return visualState;
+    }
+
+    public CavitationVisualState.Animation animation() {
+        return animation;
+    }
+
+    @Override
+    public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
+        return currentVisualState().save();
+    }
+
+    @Override
+    public Packet<ClientGamePacketListener> getUpdatePacket() {
+        return ClientboundBlockEntityDataPacket.create(this);
+    }
+
+    @Override
+    public void handleUpdateTag(CompoundTag tag, HolderLookup.Provider registries) {
+        visualState = CavitationVisualState.load(tag);
+    }
+
+    @Override
+    public void onDataPacket(Connection connection, ClientboundBlockEntityDataPacket packet, HolderLookup.Provider registries) {
+        visualState = CavitationVisualState.load(packet.getTag());
+    }
+
+    private void syncVisualState(Level level) {
+        if (level.getGameTime() % VISUAL_SYNC_INTERVAL != 0) {
+            return;
+        }
+        CavitationVisualState.Key key = currentVisualState().key();
+        if (!key.equals(lastSyncedVisual)) {
+            lastSyncedVisual = key;
+            level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), Block.UPDATE_CLIENTS);
+        }
+    }
+
+    private CavitationVisualState currentVisualState() {
+        ItemStack rotor = rotorStack();
+        int wearLimit = rotorWearLimit();
+        return new CavitationVisualState(
+                (float) rotorSpeed,
+                rotor.getItem() instanceof CavitationPartItem part ? part.rotorMaterial().getSerializedName() : "",
+                wearLimit <= 0 ? 0.0F : rotorWear() / (float) wearLimit,
+                (float) (heatStrain / strainCap(effectiveStats())),
+                inputTank.getFluidAmount() / (float) inputTank.getCapacity(),
+                inputTank.getFluid().getFluid(),
+                outputTank.getFluidAmount() / (float) outputTank.getCapacity(),
+                outputTank.getFluid().getFluid(),
+                isWorking() && CavitationRotorDynamics.cavitating(rotorSpeed),
+                (float) ((1.0 - resonanceFactor()) / CavitationRotorDynamics.RESONANCE_DEPTH)
+        );
     }
 
     public ItemStackHandler getProcessInventory() {
@@ -344,14 +453,14 @@ public class CavitationGeneratorBlockEntity extends BaseMachineBlockEntity
         return MachineInfoSnapshot.builder("cavitation_generator")
                 .state(
                         MachineInfoSnapshot.workState(
-                                status == STATUS_READY,
+                                status == STATUS_READY || status == STATUS_SPOOLING,
                                 getBlockState().getValue(BaseMachineBlock.ACTIVE),
                                 status == STATUS_NO_FLUID
                         ),
                         MachineInfoSnapshot.BlockedReason.NONE
                 )
                 .status(statusKey(status))
-                .progress(progress, currentProcessingTicks(stats))
+                .progress((int) progress, currentProcessingTicks(stats))
                 .energy(energyStored(), energyCapacity(), isWorking() ? currentEnergyPerTick(stats) : 0)
                 .energyTelemetry(
                         energyFlow.lastInput(),
@@ -389,6 +498,7 @@ public class CavitationGeneratorBlockEntity extends BaseMachineBlockEntity
             case STATUS_OUTPUT_FULL -> "output_full";
             case STATUS_FLUID_OUTPUT_FULL -> "fluid_output_full";
             case STATUS_REDSTONE_DISABLED -> "redstone";
+            case STATUS_SPOOLING -> "spooling";
             default -> "";
         };
         return name.isEmpty() ? "" : "rngtech.cavitation.status." + name;
@@ -489,17 +599,19 @@ public class CavitationGeneratorBlockEntity extends BaseMachineBlockEntity
         tag.put("GearInventory", gearInventory.serializeNBT(registries));
         tag.put("InputTank", inputTank.writeToNBT(registries, new CompoundTag()));
         tag.put("OutputTank", outputTank.writeToNBT(registries, new CompoundTag()));
-        tag.putInt("Progress", progress);
+        tag.putDouble("Progress", progress);
         tag.putInt("ActiveProcessingTicks", activeProcessingTicks);
         tag.putInt("Energy", internalEnergyStored());
         tag.putDouble("ActiveTotalEnergy", activeTotalEnergy);
-        tag.putDouble("RemainingEnergy", remainingEnergy);
         tag.putDouble("GenerationCarry", generationCarry);
+        tag.putDouble("WearCarry", wearCarry);
         tag.putInt("ActiveHeatStrain", activeHeatStrain);
         tag.putInt("ActiveWear", activeWear);
         tag.put("ActiveFluid", activeFluid.saveOptional(registries));
         tag.put("ActiveFluidOutput", activeFluidOutput.saveOptional(registries));
-        tag.putInt("HeatStrain", heatStrain);
+        tag.putDouble("HeatStrain", heatStrain);
+        tag.putDouble("RotorSpeed", rotorSpeed);
+        tag.putInt("ThrottlePercent", throttle);
     }
 
     @Override
@@ -509,17 +621,19 @@ public class CavitationGeneratorBlockEntity extends BaseMachineBlockEntity
         loadGearInventory(tag.getCompound("GearInventory"), registries);
         inputTank.readFromNBT(registries, tag.getCompound("InputTank"));
         outputTank.readFromNBT(registries, tag.getCompound("OutputTank"));
-        progress = tag.getInt("Progress");
+        progress = tag.getDouble("Progress");
         activeProcessingTicks = tag.getInt("ActiveProcessingTicks");
         internalEnergy = Math.max(0, tag.getInt("Energy"));
         activeTotalEnergy = tag.getDouble("ActiveTotalEnergy");
-        remainingEnergy = tag.getDouble("RemainingEnergy");
         generationCarry = tag.getDouble("GenerationCarry");
+        wearCarry = tag.getDouble("WearCarry");
         activeHeatStrain = tag.getInt("ActiveHeatStrain");
         activeWear = tag.getInt("ActiveWear");
         activeFluid = FluidStack.parseOptional(registries, tag.getCompound("ActiveFluid"));
         activeFluidOutput = FluidStack.parseOptional(registries, tag.getCompound("ActiveFluidOutput"));
-        heatStrain = Mth.clamp(tag.getInt("HeatStrain"), 0, MAX_HEAT_STRAIN);
+        heatStrain = Math.max(0.0, tag.getDouble("HeatStrain"));
+        rotorSpeed = Mth.clamp(tag.getDouble("RotorSpeed"), 0.0, 1.0);
+        throttle = loadThrottle(tag);
         if (tag.contains("RotorWear")) {
             CavitationPartItem.setRotorWear(rotorStack(), tag.getInt("RotorWear"));
         }
@@ -528,6 +642,16 @@ public class CavitationGeneratorBlockEntity extends BaseMachineBlockEntity
 
     private boolean tickGenerator() {
         coolDown();
+        if (level != null && isRotor(rotorStack()) && CavitationPartItem.resonance(rotorStack()) == 0) {
+            CavitationPartItem.ensureResonance(rotorStack(), level.random);
+            setChanged();
+        }
+        boolean driven = driveRotor();
+        spinRotor(driven);
+        return driven && generateActiveRecipe();
+    }
+
+    private boolean driveRotor() {
         if (level == null || redstoneDisabled() || !hasRequiredComponents()) {
             return false;
         }
@@ -540,42 +664,60 @@ public class CavitationGeneratorBlockEntity extends BaseMachineBlockEntity
             return false;
         }
         normalizeActiveRecipeEnergy(stats);
-        return generateActiveRecipe(stats);
+        return true;
+    }
+
+    private void spinRotor(boolean driven) {
+        double previous = rotorSpeed;
+        rotorSpeed = isRotor(rotorStack())
+                ? CavitationRotorDynamics.step(
+                        rotorSpeed,
+                        CavitationRotorDynamics.targetSpeed(throttle),
+                        driven,
+                        effectiveStats().value(MachineStat.PROCESSING_SPEED)
+                )
+                : 0.0;
+        if (rotorSpeed != previous) {
+            setChanged();
+        }
     }
 
     private boolean tryStartRecipe(MachineStatAccumulator stats) {
         CavitationRecipe recipe = nextRecipe();
-        if (recipe == null || rotorStage(stats) < recipe.minimumRotorStage() || heatStrain >= MAX_HEAT_STRAIN) {
+        if (recipe == null || rotorStage(stats) < recipe.minimumRotorStage() || heatStrain >= strainCap(stats)) {
             clearInactiveProgress();
             return false;
         }
         FluidStack fluidOutput = scaledFluidOutput(recipe, stats);
-        if (inputTank.getFluidAmount() < recipe.fluidInput().amount()
+        int water = waterPerCycle(recipe, stats);
+        if (inputTank.getFluidAmount() < water
                 || !canAcceptFluidOutput(fluidOutput)) {
             return false;
         }
 
-        FluidStack drained = inputTank.drain(inputTank.getFluid().copyWithAmount(recipe.fluidInput().amount()), IFluidHandler.FluidAction.EXECUTE);
-        if (drained.getAmount() < recipe.fluidInput().amount()) {
+        FluidStack drained = inputTank.drain(inputTank.getFluid().copyWithAmount(water), IFluidHandler.FluidAction.EXECUTE);
+        if (drained.getAmount() < water) {
             return false;
         }
 
         activeFluid = drained.copy();
         activeProcessingTicks = stats.adjustedProcessingTicks(recipe.processingTicks());
         activeTotalEnergy = effectiveRecipeEnergy(recipe, stats);
-        remainingEnergy = activeTotalEnergy;
         generationCarry = 0.0;
         activeHeatStrain = effectiveHeatStrain(recipe, stats);
         activeWear = effectiveWear(recipe, stats);
         activeFluidOutput = fluidOutput;
         progress = 0;
         setChanged();
-        return remainingEnergy > 0.0;
+        return true;
     }
 
-    private boolean generateActiveRecipe(MachineStatAccumulator stats) {
-        double perTick = currentGenerationRate(activeTotalEnergy, activeProcessingTicks);
-        generationCarry += Math.min(perTick, remainingEnergy);
+    /** The cycle only advances while the rotor cavitates, so spooling up costs time but no Water. */
+    private boolean generateActiveRecipe() {
+        if (!CavitationRotorDynamics.cavitating(rotorSpeed)) {
+            return false;
+        }
+        generationCarry += currentGenerationRate(activeTotalEnergy, activeProcessingTicks) * CavitationRotorDynamics.generation(rotorSpeed);
         int wholeEnergy = (int) Math.floor(generationCarry);
         if (wholeEnergy > 0) {
             // Cavitation cannot pause: FE the buffer cannot hold is vented.
@@ -584,11 +726,14 @@ public class CavitationGeneratorBlockEntity extends BaseMachineBlockEntity
                 receiveGeneratedEnergy(Math.min(wholeEnergy, freeSpace), false);
             }
             generationCarry -= wholeEnergy;
-            remainingEnergy = Math.max(0.0, remainingEnergy - wholeEnergy);
         }
 
-        progress++;
-        if (progress >= activeProcessingTicks || remainingEnergy <= 0.0001) {
+        double ticks = Math.max(1, activeProcessingTicks);
+        heatStrain = Math.min(strainCap(effectiveStats()), heatStrain + activeHeatStrain / ticks * CavitationRotorDynamics.heat(rotorSpeed));
+        wearCarry += activeWear / ticks * CavitationRotorDynamics.wear(rotorSpeed) * resonanceFactor() * CavitationRotorDynamics.WEAR_SCALE;
+        // Flow follows rotor speed: the cycle's Water (and Nitrogen) moves faster or slower, FE per tick does not.
+        progress += CavitationRotorDynamics.flow(rotorSpeed);
+        if (progress >= activeProcessingTicks) {
             finishActiveRecipe();
         }
         return true;
@@ -598,8 +743,11 @@ public class CavitationGeneratorBlockEntity extends BaseMachineBlockEntity
         if (!activeFluidOutput.isEmpty()) {
             outputTank.fill(activeFluidOutput, IFluidHandler.FluidAction.EXECUTE);
         }
-        heatStrain = Mth.clamp(heatStrain + activeHeatStrain, 0, MAX_HEAT_STRAIN);
-        CavitationPartItem.setRotorWear(rotorStack(), rotorWear() + activeWear);
+        int wholeWear = (int) Math.floor(wearCarry);
+        if (wholeWear > 0) {
+            CavitationPartItem.setRotorWear(rotorStack(), rotorWear() + wholeWear);
+            wearCarry -= wholeWear;
+        }
         if (rotorWear() >= rotorWearLimit()) {
             ejectWornRotor();
         }
@@ -668,27 +816,37 @@ public class CavitationGeneratorBlockEntity extends BaseMachineBlockEntity
         return recipe == null || rotorStage(stats) < recipe.minimumRotorStage() ? 0 : stats.adjustedProcessingTicks(recipe.processingTicks());
     }
 
+    /** Live FE/t at the current rotor speed while a cycle runs, otherwise what the throttle would make once spooled up. */
     private int currentEnergyPerTick(MachineStatAccumulator stats) {
         if (hasActiveRecipe()) {
-            return visibleEnergyPerTick(activeTotalEnergyForDisplay(stats), activeProcessingTicks);
+            return visibleEnergyPerTick(activeTotalEnergyForDisplay(stats), activeProcessingTicks, CavitationRotorDynamics.generation(rotorSpeed));
         }
         CavitationRecipe recipe = nextRecipe();
         if (recipe == null || rotorStage(stats) < recipe.minimumRotorStage()) {
             return 0;
         }
-        return visibleEnergyPerTick(effectiveRecipeEnergy(recipe, stats), stats.adjustedProcessingTicks(recipe.processingTicks()));
+        return visibleEnergyPerTick(
+                effectiveRecipeEnergy(recipe, stats),
+                stats.adjustedProcessingTicks(recipe.processingTicks()),
+                CavitationRotorDynamics.generation(CavitationRotorDynamics.targetSpeed(throttle))
+        );
     }
 
     private double currentGenerationRate(double totalEnergy, int processingTicks) {
-        double strainPenalty = 1.0 - Math.min(0.50, heatStrain / (double) MAX_HEAT_STRAIN * 0.50);
+        MachineStatAccumulator stats = effectiveStats();
+        double strainPenalty = 1.0 - CavitationHeat.penalty(
+                heatStrain,
+                strainCap(stats),
+                CavitationHeat.maxPenalty(stats.value(MachineStat.MAX_TEMPERATURE))
+        );
         return totalEnergy * strainPenalty / Math.max(1, processingTicks);
     }
 
-    private int visibleEnergyPerTick(double totalEnergy, int processingTicks) {
-        if (totalEnergy <= 0.0 || processingTicks <= 0) {
+    private int visibleEnergyPerTick(double totalEnergy, int processingTicks, double speedFactor) {
+        if (totalEnergy <= 0.0 || processingTicks <= 0 || speedFactor <= 0.0) {
             return 0;
         }
-        return Math.max(1, (int) Math.round(currentGenerationRate(totalEnergy, processingTicks)));
+        return Math.max(1, (int) Math.round(currentGenerationRate(totalEnergy, processingTicks) * speedFactor));
     }
 
     private int currentRecipeEnergy(MachineStatAccumulator stats) {
@@ -715,10 +873,7 @@ public class CavitationGeneratorBlockEntity extends BaseMachineBlockEntity
         if (expectedTotal <= 0.0 || activeTotalEnergy <= expectedTotal + 0.0001) {
             return;
         }
-        double remainingRatio = Mth.clamp(remainingEnergy / activeTotalEnergy, 0.0, 1.0);
         activeTotalEnergy = expectedTotal;
-        remainingEnergy = Math.max(0.0, expectedTotal * remainingRatio);
-        generationCarry = Math.min(generationCarry, remainingEnergy);
         setChanged();
     }
 
@@ -751,8 +906,11 @@ public class CavitationGeneratorBlockEntity extends BaseMachineBlockEntity
         if (rotorWear() >= rotorWearLimit()) {
             return canMergeDamagedRotor() ? STATUS_ROTOR_WORN : STATUS_OUTPUT_FULL;
         }
-        if (heatStrain >= MAX_HEAT_STRAIN) {
+        if (heatStrain >= strainCap(stats) && !hasActiveRecipe()) {
             return STATUS_STRAIN_HIGH;
+        }
+        if (hasActiveRecipe() && !CavitationRotorDynamics.cavitating(rotorSpeed)) {
+            return STATUS_SPOOLING;
         }
         if (inputTank.isEmpty()) {
             return STATUS_NO_FLUID;
@@ -788,7 +946,7 @@ public class CavitationGeneratorBlockEntity extends BaseMachineBlockEntity
     }
 
     private boolean hasActiveRecipe() {
-        return activeProcessingTicks > 0 && remainingEnergy > 0.0001;
+        return activeProcessingTicks > 0;
     }
 
     private boolean isWorking() {
@@ -800,10 +958,92 @@ public class CavitationGeneratorBlockEntity extends BaseMachineBlockEntity
     }
 
     private void coolDown() {
-        int cooling = 1 + (hasHeatCore() ? Math.max(0, heatCoreStage() / 2) : 0);
         if (heatStrain > 0) {
-            heatStrain = Math.max(0, heatStrain - cooling);
+            heatStrain = Math.max(0, heatStrain - coolingPerTick());
         }
+    }
+
+    private double coolingPerTick() {
+        MachineStatAccumulator stats = effectiveStats();
+        return CavitationHeat.cooling(
+                hasHeatCore() ? heatCoreStage() : 0,
+                heatTransferBonus(stats),
+                stats.value(MachineStat.STRAIN_RECOVERY)
+        );
+    }
+
+    /** Heat Transfer beyond the installed Heat Core's own base, so only rolled Heat Transfer speeds cooling. */
+    private double heatTransferBonus(MachineStatAccumulator stats) {
+        MachineStatAccumulator coreBase = hasHeatCore() ? ComponentBaseStatCatalog.baseStats(heatCoreStack()) : null;
+        double base = coreBase == null ? 1.0 : coreBase.baseValue(MachineStat.HEAT_TRANSFER);
+        return stats.value(MachineStat.HEAT_TRANSFER) / (base > 0.0 ? base : 1.0);
+    }
+
+    private double strainCap(MachineStatAccumulator stats) {
+        return CavitationHeat.strainCap(stats.value(MachineStat.OVERHEAT_TOLERANCE));
+    }
+
+    /** Water one cycle draws: Bonus Output saves Water on recipes without a fluid output, which it scales instead. */
+    private int waterPerCycle(CavitationRecipe recipe, MachineStatAccumulator stats) {
+        int amount = recipe.fluidInput().amount();
+        return recipe.fluidOutputStack().isEmpty() ? CavitationHeat.waterPerCycle(amount, stats.value(MachineStat.OUTPUT_AMOUNT)) : amount;
+    }
+
+    /** Heat strain added per cavitating tick at {@code speed}, for the running cycle or the next one. */
+    private double heatPerTick(MachineStatAccumulator stats, double speed) {
+        if (hasActiveRecipe()) {
+            return activeHeatStrain / (double) Math.max(1, activeProcessingTicks) * CavitationRotorDynamics.heat(speed);
+        }
+        CavitationRecipe recipe = nextRecipe();
+        if (recipe == null) {
+            return 0.0;
+        }
+        return effectiveHeatStrain(recipe, stats) / (double) Math.max(1, stats.adjustedProcessingTicks(recipe.processingTicks()))
+                * CavitationRotorDynamics.heat(speed);
+    }
+
+    public double heatStrain() {
+        return heatStrain;
+    }
+
+    /** Wear multiplier from the installed rotor's resonance at the current speed. */
+    private double resonanceFactor() {
+        return CavitationRotorDynamics.resonance(rotorSpeed, CavitationPartItem.resonance(rotorStack()));
+    }
+
+    /** Wear relative to rated at the current speed, resonance included: the live readout players tune against. */
+    private double liveWearFactor() {
+        return CavitationRotorDynamics.wear(rotorSpeed) * resonanceFactor();
+    }
+
+    /** Rotor wear one cycle adds at rated speed off resonance. */
+    private double recipeWearPerCycle(MachineStatAccumulator stats) {
+        if (hasActiveRecipe()) {
+            return activeWear * CavitationRotorDynamics.WEAR_SCALE;
+        }
+        CavitationRecipe recipe = nextRecipe();
+        return recipe == null ? 0.0 : effectiveWear(recipe, stats) * CavitationRotorDynamics.WEAR_SCALE;
+    }
+
+    /** Throttle percent; generators saved before 1% steps stored tenths under "Throttle". */
+    private static int loadThrottle(CompoundTag tag) {
+        if (tag.contains("ThrottlePercent")) {
+            return CavitationRotorDynamics.clampThrottle(tag.getInt("ThrottlePercent"));
+        }
+        if (tag.contains("Throttle")) {
+            return CavitationRotorDynamics.clampThrottle(tag.getInt("Throttle") * 10);
+        }
+        return CavitationRotorDynamics.RATED_THROTTLE;
+    }
+
+    /** Display only: the recipe's pressure at rated speed, scaled by the current rotor speed. Read by the menu, not the tick. */
+    private int livePressure() {
+        return (int) Math.round(ratedPressure() * rotorSpeed / CavitationRotorDynamics.RATED_SPEED);
+    }
+
+    private int ratedPressure() {
+        CavitationRecipe recipe = hasActiveRecipe() ? activeRecipe() : nextRecipe();
+        return recipe == null ? 0 : recipe.pressureRating();
     }
 
     private void clearInactiveProgress() {
@@ -817,7 +1057,6 @@ public class CavitationGeneratorBlockEntity extends BaseMachineBlockEntity
         progress = 0;
         activeProcessingTicks = 0;
         activeTotalEnergy = 0.0;
-        remainingEnergy = 0.0;
         generationCarry = 0.0;
         activeHeatStrain = 0;
         activeWear = 0;
@@ -997,6 +1236,7 @@ public class CavitationGeneratorBlockEntity extends BaseMachineBlockEntity
             applyMoreStat(stats, MachineStat.TEMPERATURE_STABILITY, contribution.value(MachineStat.TEMPERATURE_STABILITY));
             applyMoreStat(stats, MachineStat.OVERHEAT_TOLERANCE, contribution.value(MachineStat.OVERHEAT_TOLERANCE));
             applyAddStat(stats, MachineStat.MAX_TEMPERATURE, contribution.value(MachineStat.MAX_TEMPERATURE));
+            applyAddStat(stats, MachineStat.STRAIN_RECOVERY, contribution.value(MachineStat.STRAIN_RECOVERY));
         }
     }
 

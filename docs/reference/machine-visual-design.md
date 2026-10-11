@@ -60,6 +60,17 @@ Resonance Calibrator blocks should use owned `textures/block/resonance_calibrato
 
 Bulk sidegrades should visibly communicate multiple calibration lanes. Nullite should read as the precision branch rather than a generic recolor.
 
+## Shaped Models
+
+`Prototype`: the Cavitation Generator is the first machine with a shaped, non-cube model, the pilot for moving placed machines toward visible working parts.
+
+- Show the working mechanism itself (a rotor behind a porthole, a fluid column in a sight glass, heat fins) instead of painting it on a cube face.
+- Keep the RNGTech palette: dark slate casing, teal accent bands and trim, and material colour on the parts that change with Gear.
+- Use 64x64 part textures, mapped by element position, for a constant 4 texels per model pixel. Small dials and lamps may map a whole texture to one face.
+- Keep the collision shape a full block, and mark the block `noOcclusion` so neighbouring faces still render through the gaps.
+- Draw moving or state-driven parts (rotation, glow, fluid levels, the installed part's material and wear) in a block entity renderer from a small synced visual state. Keep blockstate model swaps for simple on/off cues such as a lamp.
+- Generate geometry that needs exact math (octagons, pitched blades) from a script under `tools/blockmodels/`, and keep the renderer's positions in step with it.
+
 ## Active States
 
 Active textures should answer what changed:
