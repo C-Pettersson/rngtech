@@ -5,6 +5,7 @@ import com.rngtech.content.block.BaseMachineBlock;
 import com.rngtech.content.blockentity.CombustorVisualState;
 import com.rngtech.content.blockentity.GasChemistryBlockEntity;
 import com.rngtech.content.chemistry.GasChemistryMachine;
+import com.rngtech.content.energy.CombustionMixture;
 import com.rngtech.content.registry.ModFluids;
 
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -31,10 +32,10 @@ import java.util.Map;
 
 /**
  * Draws the working parts of the Syngas Combustor: the flame behind the view ports (orange on Syngas, blue on Carbon
- * Monoxide), the glow in the stack mouth, the shaft and coupling spinning at the processing speed, both sight-glass
- * levels, the tachometer needle, the installed Servo trimming the fuel, and the installed Battery Cell with its charge.
- * The Gasifier and Reformer share the block entity type but have no shaped model, so they draw nothing. Positions are in
- * model pixels and match tools/blockmodels/syngas_combustor.py.
+ * Monoxide; bluer when lean and yellower when rich), the glow in the stack mouth, the shaft and coupling spinning with
+ * the generated power, both sight-glass levels, the tachometer needle, the installed Servo trimming the fuel, and the
+ * installed Battery Cell with its charge. The Gasifier and Reformer share the block entity type but have no shaped model,
+ * so they draw nothing. Positions are in model pixels and match tools/blockmodels/syngas_combustor.py.
  */
 public class SyngasCombustorRenderer implements BlockEntityRenderer<GasChemistryBlockEntity> {
     private static final ResourceLocation FLAME = RNGTech.id("textures/block/syngas_combustor/fx/flame.png");
@@ -82,9 +83,13 @@ public class SyngasCombustorRenderer implements BlockEntityRenderer<GasChemistry
     private static final float DIAL_Y = 3.25F;
     private static final float DIAL_Z = 0.24F;
     /** The tachometer reads full scale at this processing speed. */
-    private static final float TACHOMETER_MAX = 1.6F;
+    private static final float TACHOMETER_MAX = 2.0F;
     private static final int SYNGAS_FLAME = 0xFF9A3C;
     private static final int MONOXIDE_FLAME = 0x5A8CFF;
+    private static final int LEAN_FLAME = 0x8CC8FF;
+    private static final int RICH_FLAME = 0xFFD25A;
+    /** How far the flame colour moves toward the lean or rich tint at the ends of the mixture range. */
+    private static final float MIXTURE_TINT = 0.65F;
     private static final int NEEDLE = 0xC43428;
     private static final Map<String, Integer> SERVO_COLORS = Map.of(
             "steel", 0x9AA2A6,
@@ -146,7 +151,7 @@ public class SyngasCombustorRenderer implements BlockEntityRenderer<GasChemistry
         renderTank(translucent, poseStack.last(), state.exhaustFluid(), state.exhaust(), EXHAUST_X, EXHAUST_Z0, EXHAUST_Z1, packedLight, packedOverlay);
 
         if (animation.flame > 0.01F) {
-            int flame = state.fuelFluid() == ModFluids.CARBON_MONOXIDE_SOURCE.get() ? MONOXIDE_FLAME : SYNGAS_FLAME;
+            int flame = flameColor(state.fuelFluid() == ModFluids.CARBON_MONOXIDE_SOURCE.get() ? MONOXIDE_FLAME : SYNGAS_FLAME, state.mixture());
             renderFlame(bufferSource.getBuffer(RenderType.eyes(FLAME)), poseStack.last(), flame, animation.flame, time, packedOverlay);
             renderStackGlow(bufferSource.getBuffer(RenderType.eyes(GLOW)), poseStack.last(), animation.flame, packedOverlay);
         }
@@ -159,10 +164,21 @@ public class SyngasCombustorRenderer implements BlockEntityRenderer<GasChemistry
         animation.lastTime = time;
         float flame = state.firing() ? 1.0F : 0.0F;
         animation.flame += (flame - animation.flame) * Math.min(1.0F, elapsed * 0.12F);
-        float spin = state.firing() ? Math.max(0.0F, state.speed()) : 0.0F;
+        float spin = state.firing() ? Math.max(0.0F, state.speed()) * (float) CombustionMixture.power(state.mixture()) : 0.0F;
         float rate = spin > animation.spin ? 0.06F : 0.02F;
         animation.spin += (spin - animation.spin) * Math.min(1.0F, elapsed * rate);
         animation.angle = (animation.angle + animation.spin * DEGREES_PER_TICK * elapsed) % 360.0F;
+    }
+
+    /** A lean flame burns bluer and a rich one yellower and sootier. */
+    private static int flameColor(int base, int mixture) {
+        int rated = CombustionMixture.RATED_MIXTURE;
+        if (mixture < rated) {
+            float lean = (rated - mixture) / (float) (rated - CombustionMixture.MIN_MIXTURE);
+            return lerpColor(Mth.clamp(lean, 0.0F, 1.0F) * MIXTURE_TINT, base, LEAN_FLAME);
+        }
+        float rich = (mixture - rated) / (float) (CombustionMixture.MAX_MIXTURE - rated);
+        return lerpColor(Mth.clamp(rich, 0.0F, 1.0F) * MIXTURE_TINT, base, RICH_FLAME);
     }
 
     /** Each view port flickers on its own, like a turbulent flame seen through two windows. */
@@ -358,6 +374,13 @@ public class SyngasCombustorRenderer implements BlockEntityRenderer<GasChemistry
 
     private static TextureAtlasSprite sprite(ResourceLocation id) {
         return Minecraft.getInstance().getTextureAtlas(InventoryMenu.BLOCK_ATLAS).apply(id);
+    }
+
+    private static int lerpColor(float t, int from, int to) {
+        int red = Math.round(Mth.lerp(t, from >> 16 & 0xFF, to >> 16 & 0xFF));
+        int green = Math.round(Mth.lerp(t, from >> 8 & 0xFF, to >> 8 & 0xFF));
+        int blue = Math.round(Mth.lerp(t, from & 0xFF, to & 0xFF));
+        return red << 16 | green << 8 | blue;
     }
 
     private static int scale(int color, float factor) {

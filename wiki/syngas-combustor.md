@@ -40,6 +40,8 @@ Pipe Syngas or Carbon Monoxide into the gas tank. The combustor needs no Gear to
 
 While the combustor burns, the flame shows through the two view ports on the front: orange on Syngas, blue on Carbon Monoxide. Smoke rises from the stack, the status lamp lights, and the shaft between the turbine and the alternator spins up. The tachometer on the front shows the shaft speed, and the shaft coasts down for a few seconds after the flame goes out.
 
+The times and amounts below are for the rated mixture.
+
 | Fuel | Per cycle | Time | FE/t (base) | Exhaust |
 |---|---:|---:|---:|---:|
 | Syngas | 1,000 mB for 57,600 FE | 12 s | 240 | 500 mB |
@@ -48,6 +50,22 @@ While the combustor burns, the flame shows through the two view ports on the fro
 Carbon Monoxide is a by-product of the [Steam Methane Reformer](steam-methane-reformer.md). Burning it here is mainly a way to keep the reformer from backing up, not a power source.
 
 The combustor stops when its FE storage is full or when the Carbon Exhaust tank cannot fit the next cycle's exhaust. Drain both to keep it running. It pushes FE into neighbors on its four sides, and does not limit its own output, so the receiver or connector tier decides how much FE moves each tick.
+
+### Mixture
+
+The mixture sets how much fuel the combustor feeds its flame. Set it from 70% to 140% by clicking or scrolling on the mixture gauge on the Process tab (hold Shift to step by 5). A rich mixture burns fuel faster than the air can burn it cleanly: more FE/t, but less FE from each mB of fuel and much more Carbon Exhaust. A lean mixture is the reverse.
+
+| Mixture | Fuel use | FE/t | FE per mB | Carbon Exhaust per mB |
+|---|---:|---:|---:|---:|
+| 70% (lean) | ×0.70 | ×0.77 | ×1.09 | ×0.49 |
+| 85% | ×0.85 | ×0.89 | ×1.04 | ×0.72 |
+| 100% (rated, default) | ×1.00 | ×1.00 | ×1.00 | ×1.00 |
+| 120% | ×1.20 | ×1.15 | ×0.96 | ×1.44 |
+| 140% (rich) | ×1.40 | ×1.29 | ×0.92 | ×1.96 |
+
+On Syngas, lean runs at 184 FE/t and gets 62,972 FE and 245 mB of Carbon Exhaust from each 1,000 mB; rich runs at 309 FE/t and gets 52,953 FE and 980 mB of Carbon Exhaust. Run lean when Syngas is scarce, and rich for peak power or to feed Carbon Exhaust to [Algae Photobioreactors](algae-photobioreactor.md). Exhaust is counted as the fuel burns, so switching mixture partway through a cycle charges each part at its own setting. Hover the gauge to see the exhaust one cycle leaves at the current setting.
+
+You can see the mixture on the machine: a lean flame burns bluer and the stack gives off only thin wisps, while a rich flame burns yellow and the stack pours out heavy black smoke. The shaft and tachometer follow the power.
 
 ### Gear
 
@@ -77,7 +95,7 @@ The Syngas Combustor uses its own recipe type, `rngtech:gas_combustion`.
 
 The Syngas Combustor screen has four tabs:
 
-- **Process**: the gas and Carbon Exhaust tanks with their purge buttons, FE, and cycle progress.
+- **Process**: the gas and Carbon Exhaust tanks with their purge buttons, FE, cycle progress, and the mixture gauge. Hover the gauge for what the setting does.
 - **Gear**: Battery Cell and Servo slots.
 - **Stats**: the machine's current stats, including traits and Gear.
 - **Refinement**: refine the placed combustor's traits with a catalyst.

@@ -1,5 +1,7 @@
 package com.rngtech.content.blockentity;
 
+import com.rngtech.content.energy.CombustionMixture;
+
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
@@ -8,12 +10,14 @@ import net.minecraft.world.level.material.Fluids;
 
 /**
  * What a Syngas Combustor shows in the world: whether it fires, how fast its shaft turns, both tank levels, and the
- * installed Servo and Battery Cell. Fractions run 0 to 1; {@code speed} is the processing speed multiplier. Gear is a
- * material name, {@code "unique"} for a Unique, or empty when the slot is empty.
+ * installed Servo and Battery Cell. Fractions run 0 to 1; {@code speed} is the processing speed multiplier and
+ * {@code mixture} the fuel mixture in percent. Gear is a material name, {@code "unique"} for a Unique, or empty when the
+ * slot is empty.
  */
 public record CombustorVisualState(
         boolean firing,
         float speed,
+        int mixture,
         float fuel,
         Fluid fuelFluid,
         float exhaust,
@@ -22,13 +26,14 @@ public record CombustorVisualState(
         String cell,
         float charge
 ) {
-    public static final CombustorVisualState IDLE = new CombustorVisualState(false, 1.0F, 0.0F, Fluids.EMPTY, 0.0F, Fluids.EMPTY, "", "", 0.0F);
+    public static final CombustorVisualState IDLE = new CombustorVisualState(false, 1.0F, CombustionMixture.RATED_MIXTURE, 0.0F, Fluids.EMPTY, 0.0F, Fluids.EMPTY, "", "", 0.0F);
 
     /** Quantized so slow drifts, such as a tank draining, do not send an update every tick. */
     public Key key() {
         return new Key(
                 firing,
                 Math.round(speed * 20.0F),
+                mixture,
                 Math.round(fuel * 32.0F),
                 fuelFluid,
                 Math.round(exhaust * 32.0F),
@@ -43,6 +48,7 @@ public record CombustorVisualState(
         CompoundTag tag = new CompoundTag();
         tag.putBoolean("Firing", firing);
         tag.putFloat("Speed", speed);
+        tag.putInt("Mixture", mixture);
         tag.putFloat("Fuel", fuel);
         tag.putString("FuelFluid", BuiltInRegistries.FLUID.getKey(fuelFluid).toString());
         tag.putFloat("Exhaust", exhaust);
@@ -60,6 +66,7 @@ public record CombustorVisualState(
         return new CombustorVisualState(
                 tag.getBoolean("Firing"),
                 tag.getFloat("Speed"),
+                tag.contains("Mixture") ? tag.getInt("Mixture") : CombustionMixture.RATED_MIXTURE,
                 tag.getFloat("Fuel"),
                 fluid(tag.getString("FuelFluid")),
                 tag.getFloat("Exhaust"),
@@ -78,6 +85,7 @@ public record CombustorVisualState(
     public record Key(
             boolean firing,
             int speed,
+            int mixture,
             int fuel,
             Fluid fuelFluid,
             int exhaust,

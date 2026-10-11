@@ -232,6 +232,12 @@ Design intent and balance rules behind shipped machines that the code does not s
 - Chassis accept lower-stage Gear so mixed setups can trade speed, efficiency, fuel queue size, and behavior.
 - Fuel Governor pauses only when the buffer cannot hold more generated FE. It never blocks export, and it never changes fuel cost, duration, or generation while there is room.
 
+### Syngas Combustor
+
+- Syngas is the Stage 5 FE/t step up over solid fuel; the combustor needs no Gear to run.
+- The fuel mixture is the combustor's visible trade: rated (100%) reproduces the recipe exactly; rich (up to 140%) burns fuel faster for diminishing FE/t gains (FE/t = mixture^0.75), so FE per mB falls and Carbon Exhaust per mB rises with the square of the mixture; lean (down to 70%) is the reverse. The richest Syngas mixture stays well below the Stage 6 Ammonia Fuel Cell.
+- Exhaust is charged as fuel burns, so changing the mixture mid-cycle cannot dodge the exhaust of fuel already burned.
+
 ### Potential Reactor
 
 - Payout scales with what the item was (stage, Machine Mastery, Ascendancy Seals), so the reactor recoups retired gear instead of paying for cheap crafts. Repeat burns of the same item lose value.

@@ -2,6 +2,7 @@ package com.rngtech.content.blockentity;
 
 import com.rngtech.content.block.BaseMachineBlock;
 import com.rngtech.content.chemistry.GasChemistryMachine;
+import com.rngtech.content.energy.CombustionMixture;
 import com.rngtech.content.item.BatteryCellItem;
 import com.rngtech.content.item.GasChemistryPartItem;
 import com.rngtech.content.item.GearParts;
@@ -117,8 +118,11 @@ public class GasChemistryBlockEntity extends BaseMachineBlockEntity
     private static final int DATA_INPUT_FLUID_ID = 21;
     private static final int DATA_OUTPUT_FLUID_ID = 22;
     private static final int DATA_SECONDARY_OUTPUT_FLUID_ID = 23;
+    private static final int DATA_MIXTURE = 24;
+    private static final int DATA_EXHAUST_PER_CYCLE = 25;
     private static final int STAT_SCALE = 100;
     private static final int VISUAL_SYNC_INTERVAL = 5;
+    private static final double EPSILON = 1.0E-9;
 
     private GasChemistryMachine machine;
     private final ItemStackHandler processInventory = new ItemStackHandler(2) {
@@ -252,6 +256,8 @@ public class GasChemistryBlockEntity extends BaseMachineBlockEntity
                 case DATA_INPUT_FLUID_ID -> BuiltInRegistries.FLUID.getId(inputTank.getFluid().getFluid());
                 case DATA_OUTPUT_FLUID_ID -> BuiltInRegistries.FLUID.getId(outputTank.getFluid().getFluid());
                 case DATA_SECONDARY_OUTPUT_FLUID_ID -> BuiltInRegistries.FLUID.getId(secondaryOutputTank.getFluid().getFluid());
+                case DATA_MIXTURE -> mixture;
+                case DATA_EXHAUST_PER_CYCLE -> exhaustPerCycle();
                 default -> 0;
             };
         }
@@ -262,7 +268,7 @@ public class GasChemistryBlockEntity extends BaseMachineBlockEntity
 
         @Override
         public int getCount() {
-            return DATA_SECONDARY_OUTPUT_FLUID_ID + 1;
+            return DATA_EXHAUST_PER_CYCLE + 1;
         }
     };
 
@@ -270,6 +276,9 @@ public class GasChemistryBlockEntity extends BaseMachineBlockEntity
     private int activeTicks;
     private long activeEnergy;
     private double energyCarry;
+    private int mixture = CombustionMixture.RATED_MIXTURE;
+    private double burnProgress;
+    private double exhaustCharge;
     private CombustorVisualState visualState = CombustorVisualState.IDLE;
     private CombustorVisualState.Key lastSyncedVisual;
     private final CombustorVisualState.Animation animation = new CombustorVisualState.Animation();
@@ -361,6 +370,7 @@ public class GasChemistryBlockEntity extends BaseMachineBlockEntity
         return new CombustorVisualState(
                 isActive(),
                 (float) effectiveStats().value(MachineStat.PROCESSING_SPEED),
+                mixture,
                 inputTank.getFluidAmount() / (float) inputTank.getCapacity(),
                 inputTank.getFluid().getFluid(),
                 outputTank.getFluidAmount() / (float) outputTank.getCapacity(),
@@ -692,18 +702,59 @@ public class GasChemistryBlockEntity extends BaseMachineBlockEntity
         }
         activeTicks = adjustedTicks(recipe.processingTicks());
         activeEnergy = adjustedGeneration(recipe.energy(), activeTicks);
-        int generated = generateEnergyThisTick();
+        int generated = generateEnergyThisTick(CombustionMixture.power(mixture));
         if (storeEnergy(generated, true) < generated) {
             return false;
         }
         storeEnergy(generated, false);
-        progress++;
-        if (progress >= activeTicks) {
+        double step = CombustionMixture.fuelRate(mixture);
+        burnProgress += step;
+        exhaustCharge += exhaustPerTick(recipe) * step;
+        if (burnProgress >= activeTicks - EPSILON) {
             inputTank.drain(recipe.gasInput().amount(), IFluidHandler.FluidAction.EXECUTE);
-            outputTank.fill(recipe.exhaustFluid(), IFluidHandler.FluidAction.EXECUTE);
-            finishRecipe();
+            int exhaust = (int) Math.floor(exhaustCharge + EPSILON);
+            if (exhaust > 0) {
+                outputTank.fill(recipe.exhaustFluid().copyWithAmount(exhaust), IFluidHandler.FluidAction.EXECUTE);
+            }
+            exhaustCharge = Math.max(0.0, exhaustCharge - exhaust);
+            burnProgress = Math.max(0.0, burnProgress - activeTicks);
+            energyCarry = 0.0D;
         }
+        progress = (int) burnProgress;
         return true;
+    }
+
+    /**
+     * Carbon Exhaust charged per rated tick of the cycle at the current mixture. Charging it as the fuel burns, not at the
+     * end, means switching mixture late in a cycle cannot dodge the exhaust of the fuel already burned.
+     */
+    private double exhaustPerTick(GasCombustionRecipe recipe) {
+        return recipe.exhaustFluid().getAmount() * CombustionMixture.exhaustPerFuel(mixture) / Math.max(1, activeTicks);
+    }
+
+    /** The exhaust this cycle will have made by its end, at the current mixture. */
+    private FluidStack projectedExhaust(GasCombustionRecipe recipe) {
+        int ticks = adjustedTicks(recipe.processingTicks());
+        double perTick = recipe.exhaustFluid().getAmount() * CombustionMixture.exhaustPerFuel(mixture) / ticks;
+        int amount = (int) Math.ceil(exhaustCharge + Math.max(0.0, ticks - burnProgress) * perTick - EPSILON);
+        return recipe.exhaustFluid().copyWithAmount(Math.max(1, amount));
+    }
+
+    private int exhaustPerCycle() {
+        GasCombustionRecipe recipe = isCombustor() ? currentCombustionRecipe() : null;
+        return recipe == null ? 0 : CombustionMixture.exhaustAmount(recipe.exhaustFluid().getAmount(), mixture);
+    }
+
+    public int mixture() {
+        return mixture;
+    }
+
+    public void setMixture(int mixture) {
+        int clamped = CombustionMixture.clamp(mixture);
+        if (clamped != this.mixture) {
+            this.mixture = clamped;
+            setChanged();
+        }
     }
 
     private boolean tickReforming() {
@@ -773,7 +824,7 @@ public class GasChemistryBlockEntity extends BaseMachineBlockEntity
 
     private boolean canRunCombustion(GasCombustionRecipe recipe) {
         return inputTank.getFluidAmount() >= recipe.gasInput().amount()
-                && canAcceptOutput(outputTank, recipe.exhaustFluid());
+                && canAcceptOutput(outputTank, projectedExhaust(recipe));
     }
 
     private boolean canRunReforming(GasReformingRecipe recipe) {
@@ -822,10 +873,10 @@ public class GasChemistryBlockEntity extends BaseMachineBlockEntity
         if (recipe == null) {
             return STATUS_NO_RECIPE;
         }
-        if (!canAcceptOutput(outputTank, recipe.exhaustFluid())) {
+        if (!canAcceptOutput(outputTank, projectedExhaust(recipe))) {
             return STATUS_OUTPUT_FULL;
         }
-        int generated = currentEnergyDelta(recipe.energy(), recipe.processingTicks(), true);
+        int generated = combustionEnergyDelta(recipe);
         return generated > 0 && storeEnergy(generated, true) < generated ? STATUS_ENERGY_FULL : STATUS_READY;
     }
 
@@ -859,7 +910,7 @@ public class GasChemistryBlockEntity extends BaseMachineBlockEntity
             }
             case SYNGAS_COMBUSTOR -> {
                 GasCombustionRecipe recipe = currentCombustionRecipe();
-                yield recipe == null ? 0 : currentEnergyDelta(recipe.energy(), recipe.processingTicks(), true);
+                yield recipe == null ? 0 : combustionEnergyDelta(recipe);
             }
             case STEAM_METHANE_REFORMER -> {
                 GasReformingRecipe recipe = currentReformingRecipe();
@@ -872,6 +923,12 @@ public class GasChemistryBlockEntity extends BaseMachineBlockEntity
         int adjustedTicks = adjustedTicks(ticks);
         long adjustedEnergy = generation ? adjustedGeneration(energy, adjustedTicks) : adjustedEnergy(energy);
         return Math.max(1, Mth.ceil(adjustedEnergy / (double) adjustedTicks));
+    }
+
+    /** FE/t at the current mixture. */
+    private int combustionEnergyDelta(GasCombustionRecipe recipe) {
+        int ticks = adjustedTicks(recipe.processingTicks());
+        return Math.max(1, Mth.ceil(adjustedGeneration(recipe.energy(), ticks) / (double) ticks * CombustionMixture.power(mixture)));
     }
 
     private int adjustedTicks(int baseTicks) {
@@ -1027,11 +1084,11 @@ public class GasChemistryBlockEntity extends BaseMachineBlockEntity
         return gearInventory.getStackInSlot(SLOT_BATTERY_CELL);
     }
 
-    private int generateEnergyThisTick() {
+    private int generateEnergyThisTick(double factor) {
         if (activeTicks <= 0 || activeEnergy <= 0) {
             return 0;
         }
-        double exact = activeEnergy / (double) activeTicks + energyCarry;
+        double exact = activeEnergy / (double) activeTicks * factor + energyCarry;
         int whole = Mth.floor(exact);
         energyCarry = exact - whole;
         return Math.max(1, whole);
@@ -1039,6 +1096,8 @@ public class GasChemistryBlockEntity extends BaseMachineBlockEntity
 
     private void resetActiveRecipe(int ticks, long energy) {
         progress = 0;
+        burnProgress = 0.0;
+        exhaustCharge = 0.0;
         activeTicks = ticks;
         activeEnergy = energy;
         energyCarry = 0.0D;
@@ -1095,6 +1154,11 @@ public class GasChemistryBlockEntity extends BaseMachineBlockEntity
         tag.putInt("ActiveTicks", activeTicks);
         tag.putLong("ActiveEnergy", activeEnergy);
         tag.putDouble("EnergyCarry", energyCarry);
+        if (isCombustor()) {
+            tag.putInt("Mixture", mixture);
+            tag.putDouble("BurnProgress", burnProgress);
+            tag.putDouble("ExhaustCharge", exhaustCharge);
+        }
     }
 
     @Override
@@ -1112,6 +1176,13 @@ public class GasChemistryBlockEntity extends BaseMachineBlockEntity
         activeTicks = tag.getInt("ActiveTicks");
         activeEnergy = tag.getLong("ActiveEnergy");
         energyCarry = tag.getDouble("EnergyCarry");
+        if (isCombustor()) {
+            mixture = tag.contains("Mixture") ? CombustionMixture.clamp(tag.getInt("Mixture")) : CombustionMixture.RATED_MIXTURE;
+            // Combustors saved before mixtures kept whole-tick progress and charged their exhaust at the end of the cycle.
+            burnProgress = tag.contains("BurnProgress") ? Math.max(0.0, tag.getDouble("BurnProgress")) : progress;
+            exhaustCharge = tag.contains("ExhaustCharge") ? Math.max(0.0, tag.getDouble("ExhaustCharge")) : 0.0;
+            progress = (int) burnProgress;
+        }
     }
 
     private void clearUnavailableTanks() {
@@ -1387,9 +1458,9 @@ public class GasChemistryBlockEntity extends BaseMachineBlockEntity
         }
     }
 
-    /** Generation before machine and part stats, for the Stats tab breakdown; 0 when unknown. */
+    /** Generation at the current mixture before machine and part stats, for the Stats tab breakdown; 0 when unknown. */
     private double baseEnergyPerTick() {
         GasCombustionRecipe recipe = currentCombustionRecipe();
-        return recipe == null ? 0.0 : recipe.energy() / (double) Math.max(1, recipe.processingTicks());
+        return recipe == null ? 0.0 : recipe.energy() / (double) Math.max(1, recipe.processingTicks()) * CombustionMixture.power(mixture);
     }
 }

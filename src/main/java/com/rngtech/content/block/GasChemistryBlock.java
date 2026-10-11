@@ -3,6 +3,7 @@ package com.rngtech.content.block;
 import com.rngtech.content.blockentity.BaseMachineBlockEntity;
 import com.rngtech.content.blockentity.GasChemistryBlockEntity;
 import com.rngtech.content.chemistry.GasChemistryMachine;
+import com.rngtech.content.energy.CombustionMixture;
 import com.rngtech.content.registry.ModBlockEntities;
 import com.rngtech.content.registry.ModDataComponents;
 import com.rngtech.rpg.MachineTraits;
@@ -54,10 +55,19 @@ public class GasChemistryBlock extends BaseMachineBlock {
         return createTickerHelper(blockEntityType, ModBlockEntities.GAS_CHEMISTRY.get(), GasChemistryBlockEntity::serverTick);
     }
 
-    /** A firing Syngas Combustor puffs smoke from its exhaust stack. */
+    /**
+     * A firing Syngas Combustor smokes from its exhaust stack: thin wisps when lean, heavy black smoke when rich.
+     */
     @Override
     public void animateTick(BlockState state, Level level, BlockPos pos, RandomSource random) {
-        if (machine != GasChemistryMachine.SYNGAS_COMBUSTOR || !state.getValue(ACTIVE) || random.nextInt(3) != 0) {
+        if (machine != GasChemistryMachine.SYNGAS_COMBUSTOR || !state.getValue(ACTIVE)) {
+            return;
+        }
+        int mixture = level.getBlockEntity(pos) instanceof GasChemistryBlockEntity combustor
+                ? combustor.visualState().mixture()
+                : CombustionMixture.RATED_MIXTURE;
+        double richness = (mixture - CombustionMixture.MIN_MIXTURE) / (double) (CombustionMixture.MAX_MIXTURE - CombustionMixture.MIN_MIXTURE);
+        if (random.nextDouble() > 0.15 + 0.6 * richness) {
             return;
         }
         double x = 8.0 / 16.0 - 0.5;
@@ -66,7 +76,9 @@ public class GasChemistryBlock extends BaseMachineBlock {
         double worldX = x * Math.cos(angle) + z * Math.sin(angle);
         double worldZ = -x * Math.sin(angle) + z * Math.cos(angle);
         double spread = (random.nextDouble() - 0.5) * 0.08;
-        level.addParticle(ParticleTypes.SMOKE, pos.getX() + 0.5 + worldX + spread, pos.getY() + 1.0, pos.getZ() + 0.5 + worldZ - spread, 0.0, 0.04, 0.0);
+        boolean heavy = mixture > CombustionMixture.RATED_MIXTURE && random.nextDouble() < richness;
+        level.addParticle(heavy ? ParticleTypes.LARGE_SMOKE : ParticleTypes.SMOKE,
+                pos.getX() + 0.5 + worldX + spread, pos.getY() + 1.0, pos.getZ() + 0.5 + worldZ - spread, 0.0, 0.04, 0.0);
     }
 
     @Override
