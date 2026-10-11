@@ -440,7 +440,7 @@ public class ResonanceCalibratorBlockEntity extends BaseMachineBlockEntity
     protected MachineStatAccumulator buildStats() {
         ResonanceCalibratorChassis chassis = chassis();
         MachineStatAccumulator stats = MachineBaseStatCatalog.resonanceCalibrator(chassis);
-        stats.apply(MachineImplicitCatalog.effectiveTraits(machineTraits(), getBlockState().getBlock()));
+        stats.apply(effectiveTraits());
         MegaPassiveTree.applyStats(stats, machineProgression(), masteryFamily());
         applyGearStats(stats, resonanceCoilStack());
         applyGearStats(stats, controlBoardStack());
@@ -464,7 +464,7 @@ public class ResonanceCalibratorBlockEntity extends BaseMachineBlockEntity
     }
 
     private MachineTraits activeTraits() {
-        return MachineImplicitCatalog.effectiveTraits(machineTraits(), getBlockState().getBlock());
+        return effectiveTraits();
     }
 
     @Override

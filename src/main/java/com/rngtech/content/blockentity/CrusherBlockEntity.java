@@ -20,7 +20,6 @@ import com.rngtech.content.registry.ModItems;
 import com.rngtech.rpg.BatchProcessing;
 import com.rngtech.rpg.ComponentBaseStatCatalog;
 import com.rngtech.rpg.MachineBaseStatCatalog;
-import com.rngtech.rpg.MachineImplicitCatalog;
 import com.rngtech.rpg.MachineNameGenerator;
 import com.rngtech.rpg.MachinePartType;
 import com.rngtech.rpg.MachineStat;
@@ -681,7 +680,7 @@ public class CrusherBlockEntity extends BaseMachineBlockEntity implements MenuPr
     @Override
     protected MachineStatAccumulator buildStats() {
         MachineStatAccumulator stats = MachineBaseStatCatalog.crusher(chassisMaterial());
-        MachineTraits activeTraits = MachineImplicitCatalog.effectiveTraits(machineTraits(), getBlockState().getBlock());
+        MachineTraits activeTraits = effectiveTraits();
         stats.apply(activeTraits);
 
         CrusherPassiveTree.applyStats(stats, machineProgression());
@@ -705,7 +704,7 @@ public class CrusherBlockEntity extends BaseMachineBlockEntity implements MenuPr
     }
 
     private MachineTraits activeTraits() {
-        return MachineImplicitCatalog.effectiveTraits(machineTraits(), getBlockState().getBlock());
+        return effectiveTraits();
     }
 
     private int currentProcessingTicks(MachineStatAccumulator stats) {

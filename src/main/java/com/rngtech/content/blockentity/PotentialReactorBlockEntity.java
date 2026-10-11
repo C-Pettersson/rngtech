@@ -341,7 +341,7 @@ public class PotentialReactorBlockEntity extends BaseMachineBlockEntity implemen
     @Override
     protected MachineStatAccumulator buildStats() {
         MachineStatAccumulator stats = MachineBaseStatCatalog.potentialReactor();
-        stats.apply(MachineImplicitCatalog.effectiveTraits(machineTraits(), getBlockState().getBlock()));
+        stats.apply(effectiveTraits());
         applyPartStats(stats, chamberStack());
         applyPartStats(stats, filterStack());
         applyPartStats(stats, liningStack());
@@ -350,7 +350,7 @@ public class PotentialReactorBlockEntity extends BaseMachineBlockEntity implemen
     }
 
     private MachineTraits activeTraits() {
-        return MachineImplicitCatalog.effectiveTraits(machineTraits(), getBlockState().getBlock());
+        return effectiveTraits();
     }
 
     @Override

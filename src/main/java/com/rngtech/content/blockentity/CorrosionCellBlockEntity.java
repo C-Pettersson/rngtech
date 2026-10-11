@@ -15,7 +15,6 @@ import com.rngtech.content.registry.ModItems;
 import com.rngtech.content.registry.ModTags;
 import com.rngtech.rpg.ComponentBaseStatCatalog;
 import com.rngtech.rpg.MachineBaseStatCatalog;
-import com.rngtech.rpg.MachineImplicitCatalog;
 import com.rngtech.rpg.MachineNameGenerator;
 import com.rngtech.rpg.MachinePartType;
 import com.rngtech.rpg.MachineStat;
@@ -415,7 +414,7 @@ public class CorrosionCellBlockEntity extends BaseMachineBlockEntity
     @Override
     protected MachineStatAccumulator buildStats() {
         MachineStatAccumulator stats = MachineBaseStatCatalog.corrosionCell();
-        stats.apply(MachineImplicitCatalog.effectiveTraits(machineTraits(), getBlockState().getBlock()));
+        stats.apply(effectiveTraits());
         applyFluidPumpStats(stats);
         if (isCathode(cathodeStack())) {
             ComponentBaseStatCatalog.applyEffectiveContribution(stats, cathodeStack());
@@ -425,7 +424,7 @@ public class CorrosionCellBlockEntity extends BaseMachineBlockEntity
     }
 
     private MachineTraits activeTraits() {
-        return MachineImplicitCatalog.effectiveTraits(machineTraits(), getBlockState().getBlock());
+        return effectiveTraits();
     }
 
     @Override

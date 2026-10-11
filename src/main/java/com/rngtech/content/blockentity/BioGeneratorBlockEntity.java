@@ -8,7 +8,6 @@ import com.rngtech.content.registry.ModBlockEntities;
 import com.rngtech.content.registry.ModTags;
 import com.rngtech.rpg.ComponentBaseStatCatalog;
 import com.rngtech.rpg.MachineBaseStatCatalog;
-import com.rngtech.rpg.MachineImplicitCatalog;
 import com.rngtech.rpg.MachineNameGenerator;
 import com.rngtech.rpg.MachinePartType;
 import com.rngtech.rpg.MachineStat;
@@ -328,7 +327,7 @@ public class BioGeneratorBlockEntity extends BaseMachineBlockEntity implements M
     @Override
     protected MachineStatAccumulator buildStats() {
         MachineStatAccumulator stats = MachineBaseStatCatalog.bioGenerator();
-        stats.apply(MachineImplicitCatalog.effectiveTraits(machineTraits(), getBlockState().getBlock()));
+        stats.apply(effectiveTraits());
         ItemStack chamber = bioChamberStack();
         if (isBioChamber(chamber)) {
             ComponentBaseStatCatalog.applyEffectiveContribution(stats, chamber);
