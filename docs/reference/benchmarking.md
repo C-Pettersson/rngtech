@@ -8,7 +8,7 @@ Performance changes (stat caching, cable snapshots, sleeping machines) are judge
 ./gradlew runTickBenchmark
 ```
 
-Use `.\gradlew.bat` on Windows. The run is a GameTest server with its own run directory (`run/tickBenchmark` in the main checkout), so it does not share files with `gameTestServer`. It builds the scene, lets it settle, times the server tick, prints the result and exits. The result is also written to `build/tick-benchmark/result.json`.
+Use `.\gradlew.bat` on Windows. The run is a GameTest server with its own run directory (`run/tickBenchmark` in the main checkout), so it does not share files with `gameTestServer`. It runs only the benchmark's own GameTest (namespace `rngtech_benchmark`), never the mod's other GameTests. It builds the scene, lets it settle, times the server tick, prints the result and exits. The result is also written to `build/tick-benchmark/result.json`.
 
 | Property | Default | Meaning |
 |---|---|---|
