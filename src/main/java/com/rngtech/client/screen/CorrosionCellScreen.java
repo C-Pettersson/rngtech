@@ -1,6 +1,7 @@
 package com.rngtech.client.screen;
 
 import com.rngtech.content.blockentity.CorrosionCellBlockEntity;
+import com.rngtech.content.energy.CorrosionCellLoad;
 import com.rngtech.content.item.CathodeItem;
 import com.rngtech.content.menu.CorrosionCellMenu;
 import com.rngtech.rpg.MachineStat;
@@ -14,6 +15,7 @@ import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 
 import java.util.List;
+import java.util.Locale;
 
 public class CorrosionCellScreen extends AbstractContainerScreen<CorrosionCellMenu> {
     private static final int PANEL = 0xFFC6C6C6;
@@ -56,6 +58,15 @@ public class CorrosionCellScreen extends AbstractContainerScreen<CorrosionCellMe
     private static final int GENERATION_ICON_X = 88;
     private static final int OUTPUT_ICON_X = 104;
     private static final int ICON_SIZE = 12;
+    private static final int LOAD_GAUGE_X = 72;
+    private static final int LOAD_GAUGE_Y = 84;
+    private static final int LOAD_GAUGE_WIDTH = 64;
+    private static final int LOAD_GAUGE_HEIGHT = 8;
+    private static final int LOAD_POINTER_HEIGHT = 3;
+    private static final int LOAD_TRACK = 0xFF2F2F2F;
+    private static final int LOAD_DIM = 0xFF2E5A66;
+    private static final int LOAD_FUEL_LINE = 0xFFD3A33A;
+    private static final int LOAD_POINTER = 0xFFF2F2F2;
     private static final String[] STAT_LABEL_KEYS = {
             "rngtech.stat.energy_generation",
             "rngtech.stat.energy_capacity",
@@ -148,8 +159,39 @@ public class CorrosionCellScreen extends AbstractContainerScreen<CorrosionCellMe
             if (menu.selectedTab() == CorrosionCellMenu.TAB_PROCESSING && handlePurgeButtonClick(mouseX, mouseY)) {
                 return true;
             }
+            if (menu.selectedTab() == CorrosionCellMenu.TAB_PROCESSING && isOverLoadGauge(mouseX, mouseY)) {
+                double fraction = (mouseX - (leftPos + LOAD_GAUGE_X + 1)) / (LOAD_GAUGE_WIDTH - 3);
+                sendLoad((int) Math.round(CorrosionCellLoad.MIN_LOAD + fraction * (CorrosionCellLoad.MAX_LOAD - CorrosionCellLoad.MIN_LOAD)));
+                return true;
+            }
         }
         return super.mouseClicked(mouseX, mouseY, button);
+    }
+
+    @Override
+    public boolean mouseScrolled(double mouseX, double mouseY, double scrollX, double scrollY) {
+        if (menu.selectedTab() == CorrosionCellMenu.TAB_PROCESSING && isOverLoadGauge(mouseX, mouseY) && scrollY != 0.0) {
+            sendLoad(menu.load() + (scrollY > 0.0 ? CorrosionCellLoad.STEP : -CorrosionCellLoad.STEP));
+            return true;
+        }
+        return super.mouseScrolled(mouseX, mouseY, scrollX, scrollY);
+    }
+
+    private void sendLoad(int load) {
+        int snapped = CorrosionCellLoad.snap(load);
+        if (snapped == menu.load() || minecraft == null || minecraft.player == null || minecraft.gameMode == null) {
+            return;
+        }
+        int buttonId = CorrosionCellMenu.loadButtonId(snapped);
+        if (menu.clickMenuButton(minecraft.player, buttonId)) {
+            minecraft.gameMode.handleInventoryButtonClick(menu.containerId, buttonId);
+        }
+    }
+
+    private boolean isOverLoadGauge(double mouseX, double mouseY) {
+        int left = leftPos + LOAD_GAUGE_X;
+        int top = topPos + LOAD_GAUGE_Y;
+        return mouseX >= left && mouseX < left + LOAD_GAUGE_WIDTH && mouseY >= top && mouseY < top + LOAD_GAUGE_HEIGHT + LOAD_POINTER_HEIGHT;
     }
 
     private void renderPanel(GuiGraphics guiGraphics) {
@@ -255,8 +297,76 @@ public class CorrosionCellScreen extends AbstractContainerScreen<CorrosionCellMe
                 y + PROGRESS_BAR_Y + PROGRESS_BAR_HEIGHT - 1,
                 PROGRESS
         );
+        renderLoadGauge(guiGraphics);
         renderProcessingIcons(guiGraphics);
         renderPurgeButtons(guiGraphics);
+    }
+
+    /**
+     * The load gauge draws the trade itself: the teal profile is FE/t at each load, lit up to the current the cell draws
+     * now, and the amber line is FE per fuel, highest at the lightest load. The pointer marks the selected load.
+     */
+    private void renderLoadGauge(GuiGraphics guiGraphics) {
+        int left = leftPos + LOAD_GAUGE_X;
+        int top = topPos + LOAD_GAUGE_Y;
+        int inner = LOAD_GAUGE_WIDTH - 2;
+        int innerHeight = LOAD_GAUGE_HEIGHT - 2;
+        int bottom = top + LOAD_GAUGE_HEIGHT - 1;
+        guiGraphics.fill(left, top, left + LOAD_GAUGE_WIDTH, top + LOAD_GAUGE_HEIGHT, 0xFF5F5F5F);
+        guiGraphics.fill(left + 1, top + 1, left + 1 + inner, bottom, LOAD_TRACK);
+        double maxBonus = CorrosionCellLoad.fePerFuel(CorrosionCellLoad.MIN_LOAD) - 1.0;
+        int live = menu.liveLoad();
+        for (int column = 0; column < inner; column++) {
+            int load = loadAtColumn(column, inner);
+            int x = left + 1 + column;
+            int height = Math.max(1, (int) Math.round(CorrosionCellLoad.fePerTick(load) * innerHeight));
+            guiGraphics.fill(x, bottom - height, x + 1, bottom, live > 0 && load <= live ? ENERGY : LOAD_DIM);
+            double bonus = maxBonus <= 0.0 ? 0.0 : (CorrosionCellLoad.fePerFuel(load) - 1.0) / maxBonus;
+            int lineY = top + 1 + (int) Math.round((1.0 - bonus) * (innerHeight - 1));
+            guiGraphics.fill(x, lineY, x + 1, lineY + 1, LOAD_FUEL_LINE);
+        }
+        int pointer = left + 1 + columnOfLoad(menu.load(), inner);
+        int pointerTop = top + LOAD_GAUGE_HEIGHT;
+        guiGraphics.fill(pointer, pointerTop - 1, pointer + 1, pointerTop + LOAD_POINTER_HEIGHT, LOAD_POINTER);
+        guiGraphics.fill(pointer - 1, pointerTop + 1, pointer + 2, pointerTop + LOAD_POINTER_HEIGHT, LOAD_POINTER);
+    }
+
+    private static int loadAtColumn(int column, int columns) {
+        double fraction = columns <= 1 ? 1.0 : column / (double) (columns - 1);
+        return (int) Math.round(CorrosionCellLoad.MIN_LOAD + fraction * (CorrosionCellLoad.MAX_LOAD - CorrosionCellLoad.MIN_LOAD));
+    }
+
+    private static int columnOfLoad(int load, int columns) {
+        double fraction = (CorrosionCellLoad.clamp(load) - CorrosionCellLoad.MIN_LOAD) / (double) (CorrosionCellLoad.MAX_LOAD - CorrosionCellLoad.MIN_LOAD);
+        return (int) Math.round(fraction * (columns - 1));
+    }
+
+    private List<Component> loadTooltip() {
+        int load = menu.load();
+        String regime = load >= CorrosionCellLoad.RATED_LOAD ? "rated" : "light";
+        int live = menu.liveLoad();
+        return List.of(
+                Component.translatable("rngtech.corrosion_cell.tooltip.load", load, Component.translatable("rngtech.corrosion_cell.load." + regime)),
+                Component.translatable(
+                        "rngtech.corrosion_cell.tooltip.load_effects",
+                        multiplier(CorrosionCellLoad.fePerTick(load)),
+                        multiplier(CorrosionCellLoad.fePerFuel(load)),
+                        multiplier(CorrosionCellLoad.cycleLength(load))
+                ).withStyle(ChatFormatting.GRAY),
+                Component.translatable(
+                        "rngtech.corrosion_cell.tooltip.load_voltage",
+                        String.format(Locale.ROOT, "%.2f", CorrosionCellLoad.volts(load)),
+                        String.format(Locale.ROOT, "%.2f", CorrosionCellLoad.RATED_VOLTS)
+                ).withStyle(ChatFormatting.GRAY),
+                live > 0
+                        ? Component.translatable("rngtech.corrosion_cell.tooltip.load_live", live).withStyle(ChatFormatting.GRAY)
+                        : Component.translatable("rngtech.corrosion_cell.tooltip.load_idle").withStyle(ChatFormatting.DARK_GRAY),
+                Component.translatable("rngtech.corrosion_cell.tooltip.load_hint").withStyle(ChatFormatting.DARK_GRAY)
+        );
+    }
+
+    private static String multiplier(double value) {
+        return String.format(Locale.ROOT, "%.2f", value);
     }
 
     private void renderStats(GuiGraphics guiGraphics) {
@@ -356,6 +466,10 @@ public class CorrosionCellScreen extends AbstractContainerScreen<CorrosionCellMe
             return;
         }
         if (renderPurgeTooltips(guiGraphics, mouseX, mouseY)) {
+            return;
+        }
+        if (isOverLoadGauge(mouseX, mouseY)) {
+            guiGraphics.renderComponentTooltip(font, loadTooltip(), mouseX, mouseY);
             return;
         }
         renderInputTooltips(guiGraphics, mouseX, mouseY);

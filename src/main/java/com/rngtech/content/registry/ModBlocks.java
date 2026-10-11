@@ -286,6 +286,7 @@ public final class ModBlocks {
                     .mapColor(MapColor.METAL)
                     .strength(3.5F)
                     .sound(SoundType.METAL)
+                    .noOcclusion()
     );
     public static final DeferredBlock<MetalPressBlock> CRUDE_METAL_PRESS = BLOCKS.registerBlock(
             "crude_metal_press",
