@@ -34,6 +34,11 @@ public final class MachineStatsCache {
         generation++;
     }
 
+    /** Changes on every {@link #invalidateAll}, for other caches of stat-derived values. */
+    static int generation() {
+        return generation;
+    }
+
     void track(ItemStackHandler inventory, int[] slots) {
         tracked.add(new TrackedSlots(inventory, slots));
         stats = null;

@@ -182,7 +182,7 @@ public final class OutputAmountTracker {
     }
 
     private static double scaledOutput(int baseCount, double outputAmount) {
-        return Math.max(1.0, Math.max(0, baseCount) * Math.max(0.0, outputAmount));
+        return Math.max(1.0, Math.max(0, baseCount) * Math.max(1.0, outputAmount));
     }
 
     private static int scaled(double value) {

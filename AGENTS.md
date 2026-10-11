@@ -64,7 +64,7 @@ Launch the client:
 ./gradlew runClient
 ```
 
-In a linked git worktree, every run uses the main checkout's `run/` directory, so worktrees share its settings and worlds.
+In a linked git worktree, the client, server and data runs use the main checkout's `run/` directory, so worktrees share its settings and worlds. The GameTest runs (`runGameTestServer`, `runTickBenchmark`) use the worktree's own `run/`, so parallel worktrees cannot collide on a world lock. Both fail unless the server reports that its tests passed; the console is kept in `build/gametest/<task>.log`.
 
 Measure server ms/tick on the fixed benchmark scene (see [Tick Benchmark](docs/reference/benchmarking.md)):
 
@@ -142,6 +142,6 @@ GitHub Actions runs:
 
 with Temurin Java 21 on Ubuntu. CI also runs `npm run repo:check`, `npm run moddex:check`, `mkdocs build --strict`, and `mkdocs build --strict -f mkdocs.wiki.yml`. Local changes should pass the relevant checks before handoff.
 
-A separate `gametest` job runs `./gradlew runGameTestServer` (the GameTests in `com.rngtech.gametest`); run it locally after changing machine behavior.
+A separate `gametest` job runs `./gradlew runGameTestServer` (the GameTests in `com.rngtech.gametest`), which fails when the server exits without running them; run it locally after changing machine behavior.
 
 The Build workflow runs on pull requests, not on pushes to `main`; the ruleset requires up-to-date branches, so the squashed commit was already tested. Its Gradle job is skipped for pull requests that only touch docs, wiki, or docs tooling files.

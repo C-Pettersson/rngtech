@@ -20,16 +20,12 @@ import com.rngtech.content.registry.ModItems;
 import com.rngtech.rpg.BatchProcessing;
 import com.rngtech.rpg.ComponentBaseStatCatalog;
 import com.rngtech.rpg.MachineBaseStatCatalog;
-import com.rngtech.rpg.MachineImplicitCatalog;
-import com.rngtech.rpg.MachineModifier;
 import com.rngtech.rpg.MachineNameGenerator;
 import com.rngtech.rpg.MachinePartType;
 import com.rngtech.rpg.MachineStat;
 import com.rngtech.rpg.MachineStatAccumulator;
 import com.rngtech.rpg.MachineTraits;
 import com.rngtech.rpg.MachineType;
-import com.rngtech.rpg.ModifierOperation;
-import com.rngtech.rpg.ModifierSlot;
 import com.rngtech.rpg.OutputAmountTracker;
 import com.rngtech.rpg.progression.AscendancyFormulas;
 import com.rngtech.rpg.progression.CrusherPassiveTree;
@@ -684,7 +680,7 @@ public class CrusherBlockEntity extends BaseMachineBlockEntity implements MenuPr
     @Override
     protected MachineStatAccumulator buildStats() {
         MachineStatAccumulator stats = MachineBaseStatCatalog.crusher(chassisMaterial());
-        MachineTraits activeTraits = MachineImplicitCatalog.effectiveTraits(machineTraits(), getBlockState().getBlock());
+        MachineTraits activeTraits = effectiveTraits();
         stats.apply(activeTraits);
 
         CrusherPassiveTree.applyStats(stats, machineProgression());
@@ -693,12 +689,9 @@ public class CrusherBlockEntity extends BaseMachineBlockEntity implements MenuPr
             ComponentBaseStatCatalog.applyEffectiveContribution(stats, crushHead);
         }
         if (!hasBatteryCell()) {
-            stats.apply(MachineStatAccumulator.NO_BATTERY_SOURCE, new MachineModifier(
-                    ModifierSlot.IMPLICIT,
-                    MachineStat.OUTPUT_AMOUNT,
-                    ModifierOperation.LESS,
-                    noBatteryOutputMultiplier(stats)
-            ));
+            try (MachineStatAccumulator.Source ignored = stats.source(MachineStatAccumulator.NO_BATTERY_SOURCE)) {
+                stats.scaleBonus(MachineStat.OUTPUT_AMOUNT, noBatteryOutputMultiplier(stats));
+            }
         }
         bulkSpeed.apply(stats, activeTraits);
         return stats;
@@ -711,7 +704,7 @@ public class CrusherBlockEntity extends BaseMachineBlockEntity implements MenuPr
     }
 
     private MachineTraits activeTraits() {
-        return MachineImplicitCatalog.effectiveTraits(machineTraits(), getBlockState().getBlock());
+        return effectiveTraits();
     }
 
     private int currentProcessingTicks(MachineStatAccumulator stats) {

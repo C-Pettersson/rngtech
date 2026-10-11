@@ -67,6 +67,10 @@ import java.util.Map;
 import java.util.Optional;
 
 public class AlloyFurnaceBlockEntity extends BaseMachineBlockEntity implements MenuProvider, MachineInfoProvider, MachineMasteryHost {
+    private final RecipeCache<AlloyFurnaceRecipe> recipes = new RecipeCache<>(1);
+    private static final RecipeInputFilter<AlloyFurnaceRecipeInput, AlloyFurnaceRecipe> INPUT_FILTER = new RecipeInputFilter<>(
+            ModRecipes.ALLOY_FURNACE_TYPE::get,
+            (recipe, item) -> recipe.ingredients().stream().anyMatch(ingredient -> ingredient.test(item)));
     public static final int MAX_INPUT_SLOTS = 4;
     public static final int SLOT_INPUT_START = 0;
     public static final int SLOT_OUTPUT = SLOT_INPUT_START + MAX_INPUT_SLOTS;
@@ -545,7 +549,7 @@ public class AlloyFurnaceBlockEntity extends BaseMachineBlockEntity implements M
     }
 
     private MachineTraits activeTraits() {
-        return MachineImplicitCatalog.effectiveTraits(machineTraits(), getBlockState().getBlock());
+        return effectiveTraits();
     }
 
     private AlloyFurnaceChassisMaterial chassis() {
@@ -555,7 +559,20 @@ public class AlloyFurnaceBlockEntity extends BaseMachineBlockEntity implements M
     }
 
     private AlloyFurnaceRecipe nextRecipe() {
-        return level == null ? null : AlloyFurnaceRecipes.find(level, inputStacks()).orElse(null);
+        if (level == null) {
+            return null;
+        }
+        ItemStack[] inputs = inputStacks();
+        RecipeCache.Lookup<AlloyFurnaceRecipe> lookup = recipes.lookup(0, level);
+        for (ItemStack input : inputs) {
+            lookup.item(input);
+        }
+        return lookup.find(() -> AlloyFurnaceRecipes.find(level, inputs));
+    }
+
+    /** How many recipe lookups searched the recipes instead of reusing a remembered result. */
+    public int recipeSearches() {
+        return recipes.searches();
     }
 
     private boolean process(AlloyFurnaceRecipe recipe, MachineStatAccumulator stats) {
@@ -742,8 +759,7 @@ public class AlloyFurnaceBlockEntity extends BaseMachineBlockEntity implements M
     }
 
     public boolean isAlloyInput(ItemStack stack) {
-        return RecipeInputFilter.anyAccepts(level, ModRecipes.ALLOY_FURNACE_TYPE.get(), stack,
-                (recipe, item) -> recipe.ingredients().stream().anyMatch(ingredient -> ingredient.test(item)));
+        return INPUT_FILTER.accepts(level, stack);
     }
 
     /**

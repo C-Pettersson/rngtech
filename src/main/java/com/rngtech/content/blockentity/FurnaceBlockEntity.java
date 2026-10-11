@@ -642,7 +642,7 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
     @Override
     protected MachineStatAccumulator buildStats() {
         MachineStatAccumulator stats = MachineBaseStatCatalog.furnace(furnaceMaterial());
-        MachineTraits activeTraits = MachineImplicitCatalog.effectiveTraits(machineTraits(), getBlockState().getBlock());
+        MachineTraits activeTraits = effectiveTraits();
         stats.apply(activeTraits);
         FurnacePassiveTree.applyStats(stats, machineProgression());
         if (isElectric() && !hasBatteryCell()) {
@@ -691,7 +691,7 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
     }
 
     private MachineTraits activeTraits() {
-        return MachineImplicitCatalog.effectiveTraits(machineTraits(), getBlockState().getBlock());
+        return effectiveTraits();
     }
 
     private int activeProcessingSlots(MachineStatAccumulator stats) {
@@ -1317,7 +1317,7 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
     }
 
     private boolean alloyBlendActive(int lane) {
-        if (!MachineImplicitCatalog.effectiveTraits(machineTraits(), getBlockState().getBlock())
+        if (!effectiveTraits()
                 .hasBehavior(MachineBehavior.ALLOY_BLEND)) {
             return false;
         }

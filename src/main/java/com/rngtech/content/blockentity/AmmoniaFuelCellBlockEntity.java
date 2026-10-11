@@ -47,6 +47,8 @@ import java.util.List;
 
 public class AmmoniaFuelCellBlockEntity extends BaseMachineBlockEntity
         implements MenuProvider, PurgeableFluidStorage, MachineInfoProvider {
+    private final EnergyExportTargets exportTargets = new EnergyExportTargets(this);
+    private final RecipeCache<AmmoniaPowerCycleRecipe> recipes = new RecipeCache<>(1);
     public static final int SLOT_RESIDUE = 0;
     public static final int SLOT_MEMBRANE = 0;
     public static final int SLOT_BATTERY_CELL = 1;
@@ -349,7 +351,17 @@ public class AmmoniaFuelCellBlockEntity extends BaseMachineBlockEntity
     }
 
     private AmmoniaPowerCycleRecipe currentRecipe() {
-        return AmmoniaRecipes.powerCycle(level, membraneStack(), ammoniaTank.getFluid()).orElse(null);
+        if (level == null) {
+            return null;
+        }
+        ItemStack membrane = membraneStack();
+        FluidStack ammonia = ammoniaTank.getFluid();
+        return recipes.lookup(0, level).item(membrane).fluid(ammonia).find(() -> AmmoniaRecipes.powerCycle(level, membrane, ammonia));
+    }
+
+    /** How many recipe lookups searched the recipes instead of reusing a remembered result. */
+    public int recipeSearches() {
+        return recipes.searches();
     }
 
     private boolean canRun(AmmoniaPowerCycleRecipe recipe) {
@@ -447,6 +459,11 @@ public class AmmoniaFuelCellBlockEntity extends BaseMachineBlockEntity
         return amount - remaining;
     }
 
+    /** How many times an energy export looked a neighbour up instead of reusing its cached capability. */
+    public int exportTargetLookups() {
+        return exportTargets.lookups();
+    }
+
     private boolean exportEnergy(Level level, BlockPos pos) {
         int remaining = energyStored();
         boolean moved = false;
@@ -454,7 +471,7 @@ public class AmmoniaFuelCellBlockEntity extends BaseMachineBlockEntity
             if (remaining <= 0) {
                 break;
             }
-            IEnergyStorage target = level.getCapability(net.neoforged.neoforge.capabilities.Capabilities.EnergyStorage.BLOCK, pos.relative(direction), direction.getOpposite());
+            IEnergyStorage target = exportTargets.get(level, pos, direction);
             if (target == null || !target.canReceive()) {
                 continue;
             }

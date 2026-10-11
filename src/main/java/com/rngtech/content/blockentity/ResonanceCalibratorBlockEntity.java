@@ -65,6 +65,16 @@ import net.neoforged.neoforge.items.ItemStackHandler;
 
 public class ResonanceCalibratorBlockEntity extends BaseMachineBlockEntity
         implements MenuProvider, MachineMasteryHost, MachineInfoProvider {
+    private final RecipeCache<CalibrationRecipe> recipes = new RecipeCache<>(1);
+    private static final RecipeInputFilter<CalibrationRecipeInput, CalibrationRecipe> INGREDIENT_FILTER = new RecipeInputFilter<>(
+            ModRecipes.CALIBRATION_TYPE::get,
+            (recipe, item) -> recipe.ingredient().test(item));
+    private static final RecipeInputFilter<CalibrationRecipeInput, CalibrationRecipe> CATALYST_FILTER = new RecipeInputFilter<>(
+            ModRecipes.CALIBRATION_TYPE::get,
+            (recipe, item) -> recipe.catalyst().test(item));
+    private static final RecipeInputFilter<CalibrationRecipeInput, CalibrationRecipe> STABILIZER_FILTER = new RecipeInputFilter<>(
+            ModRecipes.CALIBRATION_TYPE::get,
+            (recipe, item) -> recipe.stabilizer().filter(stabilizer -> stabilizer.test(item)).isPresent());
     public static final int SLOT_INPUT = 0;
     public static final int SLOT_PATTERN = 1;
     public static final int SLOT_CATALYST = 2;
@@ -440,7 +450,7 @@ public class ResonanceCalibratorBlockEntity extends BaseMachineBlockEntity
     protected MachineStatAccumulator buildStats() {
         ResonanceCalibratorChassis chassis = chassis();
         MachineStatAccumulator stats = MachineBaseStatCatalog.resonanceCalibrator(chassis);
-        stats.apply(MachineImplicitCatalog.effectiveTraits(machineTraits(), getBlockState().getBlock()));
+        stats.apply(effectiveTraits());
         MegaPassiveTree.applyStats(stats, machineProgression(), masteryFamily());
         applyGearStats(stats, resonanceCoilStack());
         applyGearStats(stats, controlBoardStack());
@@ -464,7 +474,7 @@ public class ResonanceCalibratorBlockEntity extends BaseMachineBlockEntity
     }
 
     private MachineTraits activeTraits() {
-        return MachineImplicitCatalog.effectiveTraits(machineTraits(), getBlockState().getBlock());
+        return effectiveTraits();
     }
 
     @Override
@@ -566,9 +576,20 @@ public class ResonanceCalibratorBlockEntity extends BaseMachineBlockEntity
     }
 
     private CalibrationRecipe nextRecipe() {
-        return level == null
-                ? null
-                : CalibrationRecipes.find(level, inputStack(), patternStack(), catalystStack(), stabilizerStack()).orElse(null);
+        if (level == null) {
+            return null;
+        }
+        ItemStack input = inputStack();
+        ItemStack pattern = patternStack();
+        ItemStack catalyst = catalystStack();
+        ItemStack stabilizer = stabilizerStack();
+        return recipes.lookup(0, level).item(input).item(pattern).item(catalyst).item(stabilizer)
+                .find(() -> CalibrationRecipes.find(level, input, pattern, catalyst, stabilizer));
+    }
+
+    /** How many recipe lookups searched the recipes instead of reusing a remembered result. */
+    public int recipeSearches() {
+        return recipes.searches();
     }
 
     private boolean process(CalibrationRecipe recipe, MachineStatAccumulator stats) {
@@ -1119,12 +1140,12 @@ public class ResonanceCalibratorBlockEntity extends BaseMachineBlockEntity
     }
 
     public boolean isCalibrationInput(int slot, ItemStack stack) {
-        return RecipeInputFilter.anyAccepts(level, ModRecipes.CALIBRATION_TYPE.get(), stack, (recipe, item) -> switch (slot) {
-            case SLOT_INPUT -> recipe.ingredient().test(item);
-            case SLOT_CATALYST -> recipe.catalyst().test(item);
-            case SLOT_STABILIZER -> recipe.stabilizer().filter(stabilizer -> stabilizer.test(item)).isPresent();
+        return switch (slot) {
+            case SLOT_INPUT -> INGREDIENT_FILTER.accepts(level, stack);
+            case SLOT_CATALYST -> CATALYST_FILTER.accepts(level, stack);
+            case SLOT_STABILIZER -> STABILIZER_FILTER.accepts(level, stack);
             default -> false;
-        });
+        };
     }
 
     private final class AutomationInputHandler implements IItemHandler {

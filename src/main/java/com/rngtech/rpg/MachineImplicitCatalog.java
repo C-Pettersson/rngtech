@@ -85,8 +85,13 @@ import net.minecraft.world.level.block.Block;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public final class MachineImplicitCatalog {
+    private static final Map<Item, Identity> ITEM_IDENTITIES = new ConcurrentHashMap<>();
+    private static final Map<Block, Identity> BLOCK_IDENTITIES = new ConcurrentHashMap<>();
+
     public record Identity(String translationKey, MachineTraits traits) {
         public static final Identity EMPTY = new Identity("", MachineTraits.EMPTY);
 
@@ -103,7 +108,32 @@ public final class MachineImplicitCatalog {
         return itemLike == null ? Identity.EMPTY : identity(itemLike.asItem());
     }
 
+    /** Identities depend only on the item or block, so each is built once. */
     public static Identity identity(Item item) {
+        if (item == null) {
+            return Identity.EMPTY;
+        }
+        Identity identity = ITEM_IDENTITIES.get(item);
+        if (identity == null) {
+            identity = buildIdentity(item);
+            ITEM_IDENTITIES.putIfAbsent(item, identity);
+        }
+        return identity;
+    }
+
+    public static Identity identity(Block block) {
+        if (block == null) {
+            return Identity.EMPTY;
+        }
+        Identity identity = BLOCK_IDENTITIES.get(block);
+        if (identity == null) {
+            identity = buildIdentity(block);
+            BLOCK_IDENTITIES.putIfAbsent(block, identity);
+        }
+        return identity;
+    }
+
+    private static Identity buildIdentity(Item item) {
         UniqueDefinition unique = UniqueItems.definition(item);
         if (unique != null) {
             return unique(unique);
@@ -238,7 +268,7 @@ public final class MachineImplicitCatalog {
         return Identity.EMPTY;
     }
 
-    public static Identity identity(Block block) {
+    private static Identity buildIdentity(Block block) {
         if (block instanceof CrusherBlock crusher) {
             return crusher(crusher.material());
         }
