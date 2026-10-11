@@ -150,6 +150,8 @@ The Fluid tab has three rows, each with a Fluid Connector slot, its own mode, ch
 
 Each shipment can **jam**: the row pauses for a few seconds without losing any fluid. Several IN rows on the same machine side and channel run in parallel, so stacking rows raises throughput.
 
+An IN row that finds nothing it can send, because its machine is empty, no OUT row on its channel can take the shipment, or its filter matches nothing, waits before it looks again. It waits its tier's time between shipments, but never more than one second, and it looks again at once when cables, connectors, or their settings change. Item rows work the same way.
+
 A connector with an IN row also accepts fluid or items that its machine pushes out on its own, and sends them to that row's channel. Pushed shipments follow the same size, wait, jam, and filter rules.
 
 **Splitting shipments.** Each fluid or item shipment is split evenly between every connector with an OUT row on its channel that can take it, however far away each one is. If a machine is full or its filter rejects the shipment, its share goes to the others. When a shipment does not divide evenly, the extra goes to a different machine each time, so a Basic Item Connector feeding three Furnaces sends one item to each in turn.

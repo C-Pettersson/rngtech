@@ -15,7 +15,11 @@ public final class CableStats {
         TARGET_LOOKUPS("connector target capability lookups"),
         ENERGY_PASSES("network energy passes"),
         ENERGY_PORTS("energy connectors visited by passes"),
-        ENERGY_LOST("FE no block would take back");
+        ENERGY_LOST("FE no block would take back"),
+        MODULE_ATTEMPTS("item and fluid row attempts"),
+        MODULE_BACKOFFS("item and fluid rows backing off"),
+        ITEM_RECEIVER_CHECKS("item receiver checks"),
+        FLUID_RECEIVER_CHECKS("fluid receiver checks");
 
         private final String label;
 
