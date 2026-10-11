@@ -192,6 +192,7 @@ public class VacuumCollapseGeneratorBlockEntity extends BaseMachineBlockEntity i
                 SLOT_INPUT,
                 SLOT_RESIDUE
         );
+        trackStatSlots(gearInventory);
         if (!(blockState.getBlock() instanceof VacuumCollapseGeneratorBlock)) {
             throw new IllegalStateException("Vacuum collapse generator block entity created for non-generator block: " + blockState);
         }
@@ -348,6 +349,11 @@ public class VacuumCollapseGeneratorBlockEntity extends BaseMachineBlockEntity i
     }
 
     public MachineStatAccumulator effectiveStats() {
+        return cachedStats(0L);
+    }
+
+    @Override
+    protected MachineStatAccumulator buildStats() {
         MachineStatAccumulator stats = MachineBaseStatCatalog.vacuumCollapseGenerator();
         stats.apply(MachineImplicitCatalog.effectiveTraits(machineTraits(), getBlockState().getBlock()));
         applyPartStats(stats, chamberStack());

@@ -210,6 +210,7 @@ public class BatteryAssemblerBlockEntity extends BaseMachineBlockEntity
                 SLOT_ELECTROLYTE_INPUT,
                 SLOT_OUTPUT_0
         );
+        trackStatSlots(gearInventory);
     }
 
     public static void serverTick(Level level, BlockPos pos, BlockState state, BatteryAssemblerBlockEntity assembler) {
@@ -397,6 +398,11 @@ public class BatteryAssemblerBlockEntity extends BaseMachineBlockEntity
     }
 
     public MachineStatAccumulator effectiveStats() {
+        return cachedStats(bulkSpeed.count());
+    }
+
+    @Override
+    protected MachineStatAccumulator buildStats() {
         MachineStatAccumulator stats = MachineBaseStatCatalog.batteryAssembler();
         stats.apply(MachineImplicitCatalog.effectiveTraits(machineTraits(), getBlockState().getBlock()));
         if (!hasBatteryCell()) {

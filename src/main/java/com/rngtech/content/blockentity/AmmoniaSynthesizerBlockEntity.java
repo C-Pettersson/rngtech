@@ -142,6 +142,7 @@ public class AmmoniaSynthesizerBlockEntity extends BaseMachineBlockEntity
 
     public AmmoniaSynthesizerBlockEntity(BlockPos pos, BlockState blockState) {
         super(ModBlockEntities.AMMONIA_SYNTHESIZER.get(), pos, blockState, MachineType.AMMONIA_SYNTHESIZER, 0, 0, 0);
+        trackStatSlots(gearInventory);
     }
 
     public static void serverTick(Level level, BlockPos pos, BlockState state, AmmoniaSynthesizerBlockEntity synthesizer) {
@@ -370,6 +371,11 @@ public class AmmoniaSynthesizerBlockEntity extends BaseMachineBlockEntity
     }
 
     public MachineStatAccumulator effectiveStats() {
+        return cachedStats(0L);
+    }
+
+    @Override
+    protected MachineStatAccumulator buildStats() {
         MachineStatAccumulator stats = MachineBaseStatCatalog.ammoniaSynthesizer();
         machineTraits().activeModifiers().forEach(stats::apply);
         if (isCatalystBed(catalystStack())) {

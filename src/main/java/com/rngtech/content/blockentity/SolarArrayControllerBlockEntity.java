@@ -178,6 +178,7 @@ public class SolarArrayControllerBlockEntity extends BaseMachineBlockEntity impl
 
     public SolarArrayControllerBlockEntity(BlockPos pos, BlockState blockState) {
         super(ModBlockEntities.SOLAR_ARRAY_CONTROLLER.get(), pos, blockState, MachineType.SOLAR_ARRAY_CONTROLLER, 0, 0, 0);
+        trackStatSlots(gearInventory);
     }
 
     public static void serverTick(Level level, BlockPos pos, BlockState state, SolarArrayControllerBlockEntity controller) {
@@ -262,6 +263,11 @@ public class SolarArrayControllerBlockEntity extends BaseMachineBlockEntity impl
     }
 
     public MachineStatAccumulator effectiveStats() {
+        return cachedStats(0L);
+    }
+
+    @Override
+    protected MachineStatAccumulator buildStats() {
         MachineStatAccumulator stats = MachineBaseStatCatalog.solarArrayController();
         stats.apply(MachineImplicitCatalog.effectiveTraits(machineTraits(), getBlockState().getBlock()));
         ItemStack extender = gearInventory.getStackInSlot(SLOT_SOLAR_ARRAY_EXTENDER);

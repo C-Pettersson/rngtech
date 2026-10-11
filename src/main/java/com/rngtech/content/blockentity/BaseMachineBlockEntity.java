@@ -23,6 +23,7 @@ import com.rngtech.content.item.RefinementConsumableItem;
 import com.rngtech.content.loot.ChallengeContext;
 import com.rngtech.content.loot.ChallengeLoot;
 import com.rngtech.content.registry.ModDataComponents;
+import com.rngtech.rpg.MachineStatAccumulator;
 import com.rngtech.rpg.MachineTraits;
 import com.rngtech.rpg.MachineType;
 import com.rngtech.rpg.progression.MachineMasteryHost;
@@ -52,6 +53,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Set;
+import java.util.function.Supplier;
 
 public abstract class BaseMachineBlockEntity extends BlockEntity implements RefinableMachine {
     private static final long REMOVED_GEAR_CHECK_INTERVAL = 20L;
@@ -83,6 +85,8 @@ public abstract class BaseMachineBlockEntity extends BlockEntity implements Refi
         }
     };
     private final List<ItemStack> removedGear = new ArrayList<>();
+    private final MachineStatsCache statsCache = new MachineStatsCache();
+    private final Supplier<MachineStatAccumulator> statsBuilder = this::buildStats;
 
     protected BaseMachineBlockEntity(
             BlockEntityType<?> blockEntityType,
@@ -134,6 +138,34 @@ public abstract class BaseMachineBlockEntity extends BlockEntity implements Refi
                 .build()
         );
         setChanged();
+    }
+
+    /** Builds this machine's stats from scratch. Machines that cache stats through {@link #cachedStats} override it. */
+    protected MachineStatAccumulator buildStats() {
+        throw new UnsupportedOperationException(getClass().getSimpleName() + " does not build cached stats");
+    }
+
+    /**
+     * {@link #buildStats}, rebuilt only when the traits, Mastery, a tracked stack, {@code localKey}, or the config or
+     * tags change. The result is read-only; add conditional effects to {@link MachineStatAccumulator#mutable()}.
+     */
+    protected final MachineStatAccumulator cachedStats(long localKey) {
+        return statsCache.get(
+                components().get(ModDataComponents.MACHINE_TRAITS.get()),
+                components().get(ModDataComponents.MACHINE_PROGRESSION.get()),
+                localKey,
+                statsBuilder
+        );
+    }
+
+    /** Rebuilds the stats when one of {@code slots} changes; no slots means the whole inventory. */
+    protected final void trackStatSlots(ItemStackHandler inventory, int... slots) {
+        statsCache.track(inventory, slots.length == 0 ? null : slots.clone());
+    }
+
+    /** How many times this machine built its cached stats, for checks that it does not rebuild them every tick. */
+    public final int statsBuilds() {
+        return statsCache.builds();
     }
 
     public MachineProgressionState machineProgression() {
@@ -367,6 +399,7 @@ public abstract class BaseMachineBlockEntity extends BlockEntity implements Refi
     @Override
     protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.loadAdditional(tag, registries);
+        statsCache.invalidate();
         refinementInventory.deserializeNBT(registries, tag.getCompound("RefinementInventory"));
         removedGear.clear();
         ListTag removed = tag.getList("RemovedGear", Tag.TAG_COMPOUND);

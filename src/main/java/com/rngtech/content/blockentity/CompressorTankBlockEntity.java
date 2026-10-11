@@ -223,6 +223,7 @@ public class CompressorTankBlockEntity extends BaseMachineBlockEntity
 
     public CompressorTankBlockEntity(BlockPos pos, BlockState blockState) {
         super(ModBlockEntities.COMPRESSOR_TANK.get(), pos, blockState, MachineType.COMPRESSOR_TANK, 0, 0, 0);
+        trackStatSlots(gearInventory);
         if (!(blockState.getBlock() instanceof CompressorTankBlock tankBlock)) {
             throw new IllegalStateException("Compressor tank block entity created for non-tank block: " + blockState);
         }
@@ -419,6 +420,11 @@ public class CompressorTankBlockEntity extends BaseMachineBlockEntity
     }
 
     public MachineStatAccumulator effectiveStats() {
+        return cachedStats(0L);
+    }
+
+    @Override
+    protected MachineStatAccumulator buildStats() {
         MachineStatAccumulator stats = MachineBaseStatCatalog.compressorTank(material());
         stats.apply(MachineImplicitCatalog.effectiveTraits(machineTraits(), getBlockState().getBlock()));
         applyAverageServoStats(stats);

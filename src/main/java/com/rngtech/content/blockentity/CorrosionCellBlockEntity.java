@@ -227,6 +227,7 @@ public class CorrosionCellBlockEntity extends BaseMachineBlockEntity
 
     public CorrosionCellBlockEntity(BlockPos pos, BlockState blockState) {
         super(ModBlockEntities.CORROSION_CELL.get(), pos, blockState, MachineType.CORROSION_CELL, SLOT_PLATE, SLOT_ELECTROLYTE, SLOT_RESIDUE);
+        trackStatSlots(gearInventory);
     }
 
     public static void serverTick(Level level, BlockPos pos, BlockState state, CorrosionCellBlockEntity cell) {
@@ -408,6 +409,11 @@ public class CorrosionCellBlockEntity extends BaseMachineBlockEntity
     }
 
     public MachineStatAccumulator effectiveStats() {
+        return cachedStats(bulkSpeed.count());
+    }
+
+    @Override
+    protected MachineStatAccumulator buildStats() {
         MachineStatAccumulator stats = MachineBaseStatCatalog.corrosionCell();
         stats.apply(MachineImplicitCatalog.effectiveTraits(machineTraits(), getBlockState().getBlock()));
         applyFluidPumpStats(stats);

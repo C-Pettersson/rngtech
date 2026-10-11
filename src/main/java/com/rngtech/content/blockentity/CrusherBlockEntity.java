@@ -227,6 +227,7 @@ public class CrusherBlockEntity extends BaseMachineBlockEntity implements MenuPr
 
     public CrusherBlockEntity(BlockPos pos, BlockState blockState) {
         super(ModBlockEntities.CRUSHER.get(), pos, blockState, MachineType.CRUSHER, SLOT_INPUT_A, SLOT_FUEL, SLOT_OUTPUT);
+        trackStatSlots(inventory, SLOT_FUEL, SLOT_CRUSH_HEAD);
     }
 
     public static void serverTick(Level level, BlockPos pos, BlockState state, CrusherBlockEntity crusher) {
@@ -660,6 +661,11 @@ public class CrusherBlockEntity extends BaseMachineBlockEntity implements MenuPr
     }
 
     public MachineStatAccumulator effectiveStats() {
+        return cachedStats(bulkSpeed.count());
+    }
+
+    @Override
+    protected MachineStatAccumulator buildStats() {
         MachineStatAccumulator stats = MachineBaseStatCatalog.crusher(chassisMaterial());
         MachineTraits activeTraits = MachineImplicitCatalog.effectiveTraits(machineTraits(), getBlockState().getBlock());
         stats.apply(activeTraits);

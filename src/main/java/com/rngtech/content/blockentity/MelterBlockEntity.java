@@ -269,6 +269,7 @@ public class MelterBlockEntity extends BaseMachineBlockEntity
 
     public MelterBlockEntity(BlockPos pos, BlockState blockState) {
         super(ModBlockEntities.MELTER.get(), pos, blockState, MachineType.MELTER, SLOT_PRIMARY_INPUT, SLOT_FLUID_INPUT_CONTAINER, SLOT_FLUID_OUTPUT_CONTAINER);
+        trackStatSlots(gearInventory);
     }
 
     public static void serverTick(Level level, BlockPos pos, BlockState state, MelterBlockEntity melter) {
@@ -484,6 +485,11 @@ public class MelterBlockEntity extends BaseMachineBlockEntity
     }
 
     public MachineStatAccumulator effectiveStats() {
+        return cachedStats(bulkSpeed.count());
+    }
+
+    @Override
+    protected MachineStatAccumulator buildStats() {
         MachineStatAccumulator stats = MachineBaseStatCatalog.melter();
         stats.apply(MachineImplicitCatalog.effectiveTraits(machineTraits(), getBlockState().getBlock()));
         MegaPassiveTree.applyStats(stats, machineProgression(), MachineMasteryFamily.MELTER);

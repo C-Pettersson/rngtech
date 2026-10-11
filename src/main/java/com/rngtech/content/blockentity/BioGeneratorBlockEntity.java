@@ -201,6 +201,7 @@ public class BioGeneratorBlockEntity extends BaseMachineBlockEntity implements M
 
     public BioGeneratorBlockEntity(BlockPos pos, BlockState blockState) {
         super(ModBlockEntities.BIO_GENERATOR.get(), pos, blockState, MachineType.BIO_GENERATOR, SLOT_FUEL, SLOT_FUEL, SLOT_FUEL);
+        trackStatSlots(gearInventory);
     }
 
     public static void serverTick(Level level, BlockPos pos, BlockState state, BioGeneratorBlockEntity generator) {
@@ -321,6 +322,11 @@ public class BioGeneratorBlockEntity extends BaseMachineBlockEntity implements M
     }
 
     public MachineStatAccumulator effectiveStats() {
+        return cachedStats(0L);
+    }
+
+    @Override
+    protected MachineStatAccumulator buildStats() {
         MachineStatAccumulator stats = MachineBaseStatCatalog.bioGenerator();
         stats.apply(MachineImplicitCatalog.effectiveTraits(machineTraits(), getBlockState().getBlock()));
         ItemStack chamber = bioChamberStack();

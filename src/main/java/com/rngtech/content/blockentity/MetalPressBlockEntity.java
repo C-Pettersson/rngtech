@@ -262,6 +262,7 @@ public class MetalPressBlockEntity extends BaseMachineBlockEntity
 
     public MetalPressBlockEntity(BlockPos pos, BlockState blockState) {
         super(ModBlockEntities.METAL_PRESS.get(), pos, blockState, MachineType.METAL_PRESS, SLOT_INPUT, SLOT_INPUT, SLOT_OUTPUT);
+        trackStatSlots(gearInventory);
     }
 
     public static void serverTick(Level level, BlockPos pos, BlockState state, MetalPressBlockEntity press) {
@@ -525,6 +526,11 @@ public class MetalPressBlockEntity extends BaseMachineBlockEntity
     }
 
     public MachineStatAccumulator effectiveStats() {
+        return cachedStats(bulkSpeed.count());
+    }
+
+    @Override
+    protected MachineStatAccumulator buildStats() {
         MachineStatAccumulator stats = MachineBaseStatCatalog.metalPress();
         stats.apply(MachineImplicitCatalog.effectiveTraits(machineTraits(), getBlockState().getBlock()));
         MegaPassiveTree.applyStats(stats, machineProgression(), MachineMasteryFamily.METAL_PRESS);
@@ -687,6 +693,7 @@ public class MetalPressBlockEntity extends BaseMachineBlockEntity
     /** Circuit Discipline: circuit recipes gain Stability and use less FE. */
     private MachineStatAccumulator routeStats(MetalPressRecipe recipe, MachineStatAccumulator stats) {
         if (recipe != null && isCircuit(recipe) && hasMasteryBehavior("CIRCUIT_DISCIPLINE")) {
+            stats = stats.mutable();
             stats.apply(MegaPassiveTree.behaviorSource(machineProgression(), "CIRCUIT_DISCIPLINE"), new MachineModifier(ModifierSlot.IMPLICIT, MachineStat.STABILITY, ModifierOperation.INCREASED_PERCENT, 20.0));
             stats.apply(MegaPassiveTree.behaviorSource(machineProgression(), "CIRCUIT_DISCIPLINE"), new MachineModifier(ModifierSlot.IMPLICIT, MachineStat.ENERGY_USAGE, ModifierOperation.LESS, 0.85));
         }

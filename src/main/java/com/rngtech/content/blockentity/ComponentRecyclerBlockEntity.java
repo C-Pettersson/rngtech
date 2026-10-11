@@ -202,6 +202,7 @@ public class ComponentRecyclerBlockEntity extends BaseMachineBlockEntity impleme
                 SLOT_INPUT,
                 SLOT_OUTPUT_PRIMARY
         );
+        trackStatSlots(gearInventory);
         if (!(blockState.getBlock() instanceof ComponentRecyclerBlock)) {
             throw new IllegalStateException("Component recycler block entity created for non-recycler block: " + blockState);
         }
@@ -456,6 +457,11 @@ public class ComponentRecyclerBlockEntity extends BaseMachineBlockEntity impleme
     }
 
     public MachineStatAccumulator effectiveStats() {
+        return cachedStats(bulkSpeed.count());
+    }
+
+    @Override
+    protected MachineStatAccumulator buildStats() {
         ComponentRecyclerChassis chassis = chassis();
         MachineStatAccumulator stats = MachineBaseStatCatalog.componentRecycler(chassis);
         stats.apply(MachineImplicitCatalog.effectiveTraits(machineTraits(), getBlockState().getBlock()));
