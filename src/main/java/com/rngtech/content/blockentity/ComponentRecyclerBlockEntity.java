@@ -47,6 +47,11 @@ import net.neoforged.neoforge.items.ItemStackHandler;
 import java.util.List;
 
 public class ComponentRecyclerBlockEntity extends BaseMachineBlockEntity implements MenuProvider, MachineInfoProvider {
+    private static final int RECIPE_INPUT = 0;
+    private static final int RECIPE_CANDIDATE = 1;
+    private static final RecipeCache.Search<ComponentRecyclingRecipe> RECIPE_SEARCH =
+            (level, input, unused) -> ComponentRecyclingRecipes.find(level, input);
+    private final RecipeCache<ComponentRecyclingRecipe> recipes = new RecipeCache<>(2);
     public static final int SLOT_INPUT = 0;
     public static final int SLOT_OUTPUT_PRIMARY = 1;
     public static final int SLOT_OUTPUT_SECONDARY = 2;
@@ -438,9 +443,8 @@ public class ComponentRecyclerBlockEntity extends BaseMachineBlockEntity impleme
         if (level == null) {
             return !isManual() || isManualInput(stack);
         }
-        return ComponentRecyclingRecipes.find(level, stack)
-                .filter(recipe -> !isManual() || isManualRecipeInput(stack, recipe))
-                .isPresent();
+        ComponentRecyclingRecipe recipe = recipes.find(RECIPE_CANDIDATE, level, stack, RECIPE_SEARCH);
+        return recipe != null && (!isManual() || isManualRecipeInput(stack, recipe));
     }
 
     public static boolean isBatteryCell(ItemStack stack) {
@@ -512,11 +516,13 @@ public class ComponentRecyclerBlockEntity extends BaseMachineBlockEntity impleme
     }
 
     private ComponentRecyclingRecipe nextRecipe() {
-        return level == null
-                ? null
-                : ComponentRecyclingRecipes.find(level, processInventory.getStackInSlot(SLOT_INPUT))
-                        .filter(recipe -> !isManual() || isManualRecipeInput(inputStack(), recipe))
-                        .orElse(null);
+        ComponentRecyclingRecipe recipe = level == null ? null : recipes.find(RECIPE_INPUT, level, inputStack(), RECIPE_SEARCH);
+        return recipe == null || isManual() && !isManualRecipeInput(inputStack(), recipe) ? null : recipe;
+    }
+
+    /** How many recipe lookups searched the recipes instead of reusing a remembered result. */
+    public int recipeSearches() {
+        return recipes.searches();
     }
 
     private boolean process(ComponentRecyclingRecipe recipe) {

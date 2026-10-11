@@ -10,8 +10,10 @@ import com.rngtech.content.purge.FluidPurgeRole;
 import com.rngtech.content.purge.FluidPurgeTarget;
 import com.rngtech.content.purge.PurgeableFluidStorage;
 import com.rngtech.content.recipe.CorrosionCellRecipe;
+import com.rngtech.content.recipe.CorrosionCellRecipeInput;
 import com.rngtech.content.registry.ModBlockEntities;
 import com.rngtech.content.registry.ModItems;
+import com.rngtech.content.registry.ModRecipes;
 import com.rngtech.content.registry.ModTags;
 import com.rngtech.rpg.ComponentBaseStatCatalog;
 import com.rngtech.rpg.MachineBaseStatCatalog;
@@ -52,6 +54,14 @@ import java.util.List;
 
 public class CorrosionCellBlockEntity extends BaseMachineBlockEntity
         implements MenuProvider, PurgeableFluidStorage, MachineInfoProvider {
+    private static final RecipeCache.Search<CorrosionCellRecipe> RECIPE_SEARCH = CorrosionCellRecipes::find;
+    private static final RecipeInputFilter<CorrosionCellRecipeInput, CorrosionCellRecipe> PLATE_FILTER = new RecipeInputFilter<>(
+            ModRecipes.CORROSION_CELL_TYPE::get,
+            (recipe, item) -> recipe.plate().test(item));
+    private static final RecipeInputFilter<CorrosionCellRecipeInput, CorrosionCellRecipe> ELECTROLYTE_FILTER = new RecipeInputFilter<>(
+            ModRecipes.CORROSION_CELL_TYPE::get,
+            (recipe, item) -> recipe.electrolyte().test(item));
+    private final RecipeCache<CorrosionCellRecipe> recipes = new RecipeCache<>(1);
     public static final int SLOT_PLATE = 0;
     public static final int SLOT_ELECTROLYTE = 1;
     public static final int SLOT_RESIDUE = 2;
@@ -385,14 +395,14 @@ public class CorrosionCellBlockEntity extends BaseMachineBlockEntity
         if (stack.isEmpty()) {
             return false;
         }
-        return level == null || CorrosionCellRecipes.isPlateInput(level, stack);
+        return level == null || PLATE_FILTER.accepts(level, stack);
     }
 
     public boolean isKnownElectrolyteInput(ItemStack stack) {
         if (stack.isEmpty()) {
             return false;
         }
-        return level == null || CorrosionCellRecipes.isElectrolyteInput(level, stack);
+        return level == null || ELECTROLYTE_FILTER.accepts(level, stack);
     }
 
     public boolean isBatteryCell(ItemStack stack) {
@@ -586,12 +596,12 @@ public class CorrosionCellBlockEntity extends BaseMachineBlockEntity
     private CorrosionCellRecipe nextRecipe() {
         return level == null
                 ? null
-                : CorrosionCellRecipes.find(
-                                level,
-                                processInventory.getStackInSlot(SLOT_PLATE),
-                                availableElectrolyteStack()
-                        )
-                        .orElse(null);
+                : recipes.find(0, level, processInventory.getStackInSlot(SLOT_PLATE), availableElectrolyteStack(), RECIPE_SEARCH);
+    }
+
+    /** How many recipe lookups searched the recipes instead of reusing a remembered result. */
+    public int recipeSearches() {
+        return recipes.searches();
     }
 
     private boolean canProcessStage(CorrosionCellRecipe recipe) {

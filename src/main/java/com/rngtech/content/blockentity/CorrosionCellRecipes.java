@@ -24,24 +24,6 @@ final class CorrosionCellRecipes {
                 .findFirst();
     }
 
-    static boolean isPlateInput(Level level, ItemStack stack) {
-        return !stack.isEmpty()
-                && level.getRecipeManager()
-                        .getAllRecipesFor(ModRecipes.CORROSION_CELL_TYPE.get())
-                        .stream()
-                        .map(RecipeHolder::value)
-                        .anyMatch(recipe -> recipe.plate().test(stack));
-    }
-
-    static boolean isElectrolyteInput(Level level, ItemStack stack) {
-        return !stack.isEmpty()
-                && level.getRecipeManager()
-                        .getAllRecipesFor(ModRecipes.CORROSION_CELL_TYPE.get())
-                        .stream()
-                        .map(RecipeHolder::value)
-                        .anyMatch(recipe -> recipe.electrolyte().test(stack));
-    }
-
     private CorrosionCellRecipes() {
     }
 }

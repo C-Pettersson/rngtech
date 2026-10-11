@@ -47,6 +47,7 @@ import java.util.List;
 
 public class AmmoniaFuelCellBlockEntity extends BaseMachineBlockEntity
         implements MenuProvider, PurgeableFluidStorage, MachineInfoProvider {
+    private final RecipeCache<AmmoniaPowerCycleRecipe> recipes = new RecipeCache<>(1);
     public static final int SLOT_RESIDUE = 0;
     public static final int SLOT_MEMBRANE = 0;
     public static final int SLOT_BATTERY_CELL = 1;
@@ -349,7 +350,17 @@ public class AmmoniaFuelCellBlockEntity extends BaseMachineBlockEntity
     }
 
     private AmmoniaPowerCycleRecipe currentRecipe() {
-        return AmmoniaRecipes.powerCycle(level, membraneStack(), ammoniaTank.getFluid()).orElse(null);
+        if (level == null) {
+            return null;
+        }
+        ItemStack membrane = membraneStack();
+        FluidStack ammonia = ammoniaTank.getFluid();
+        return recipes.lookup(0, level).item(membrane).fluid(ammonia).find(() -> AmmoniaRecipes.powerCycle(level, membrane, ammonia));
+    }
+
+    /** How many recipe lookups searched the recipes instead of reusing a remembered result. */
+    public int recipeSearches() {
+        return recipes.searches();
     }
 
     private boolean canRun(AmmoniaPowerCycleRecipe recipe) {
