@@ -20,6 +20,7 @@ public final class CrusherYieldChecks {
         yieldPrefixesCostProcessingSpeed();
         energyUsageReductionsDivide();
         superOutputStopsAtTheCeiling();
+        outputAmountNeverDropsBelowOne();
         return checks;
     }
 
@@ -36,9 +37,6 @@ public final class CrusherYieldChecks {
         MachineStatAccumulator atLevel = crusher(1.0);
         increase(atLevel, MachineStat.OUTPUT_AMOUNT, 80);
         near(atLevel.valueWithIncreased(MachineStat.OUTPUT_AMOUNT, 20), 1.5, "At-Level Output joins the bucket before the soft cap");
-
-        atLevel.apply(new MachineModifier(ModifierSlot.IMPLICIT, MachineStat.OUTPUT_AMOUNT, ModifierOperation.LESS, 0.75));
-        near(atLevel.value(MachineStat.OUTPUT_AMOUNT), 0.75 * (1 + 0.8 / 1.8), "the no-battery penalty stays a less multiplier");
 
         MachineStatAccumulator furnace = MachineStatAccumulator.componentBase(Map.of(MachineStat.OUTPUT_AMOUNT, 1.0));
         increase(furnace, MachineStat.OUTPUT_AMOUNT, 100);
@@ -124,6 +122,21 @@ public final class CrusherYieldChecks {
     }
 
     /** A Crusher with the chassis's base Output Amount; the chassis itself reads config, which checks do not load. */
+    private static void outputAmountNeverDropsBelowOne() {
+        MachineStatAccumulator reduced = crusher(1.0);
+        reduced.floorAbsolute(MachineStat.OUTPUT_AMOUNT, 1.0);
+        reduced.apply(new MachineModifier(ModifierSlot.IMPLICIT, MachineStat.OUTPUT_AMOUNT, ModifierOperation.DECREASED_PERCENT, 40));
+        near(reduced.value(MachineStat.OUTPUT_AMOUNT), 1.0, "reductions stop at 1x instead of taking base output");
+
+        MachineStatAccumulator noBattery = crusher(1.0);
+        noBattery.floorAbsolute(MachineStat.OUTPUT_AMOUNT, 1.0);
+        noBattery.scaleBonus(MachineStat.OUTPUT_AMOUNT, 0.75);
+        near(noBattery.value(MachineStat.OUTPUT_AMOUNT), 1.0, "the no-battery penalty takes nothing from a 1x Crusher");
+        increase(noBattery, MachineStat.OUTPUT_AMOUNT, 80);
+        near(noBattery.value(MachineStat.OUTPUT_AMOUNT), 1 + 0.75 * (0.8 / 1.8), "the no-battery penalty scales only the bonus");
+        near(noBattery.valueWithIncreased(MachineStat.OUTPUT_AMOUNT, 20), 1.375, "At-Level Output joins the bonus before the penalty");
+    }
+
     private static MachineStatAccumulator crusher(double outputAmount) {
         return MachineStatAccumulator.componentBase(Map.of(MachineStat.OUTPUT_AMOUNT, outputAmount, MachineStat.PROCESSING_SPEED, 1.0))
                 .withCrusherYieldRules();

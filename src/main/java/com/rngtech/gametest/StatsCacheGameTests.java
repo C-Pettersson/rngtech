@@ -83,6 +83,9 @@ public final class StatsCacheGameTests {
         check(crusher.effectiveStats().value(MachineStat.PROCESSING_LEVEL) < ironLevel, "Crush Head swap kept the old Processing Level");
         assertMatchesFreshBuild(crusher, "after a Crush Head swap");
 
+        // The no-battery penalty only scales Output Amount above 1x, so give the Crusher some bonus to lose.
+        crusher.setMachineTraits(new MachineTraits(Rarity.MAGIC, 0, List.of(new MachineModifier(
+                ModifierSlot.SUFFIX, MachineStat.OUTPUT_AMOUNT, ModifierOperation.INCREASED_PERCENT, 20.0)), List.of()));
         double withoutBattery = crusher.effectiveStats().value(MachineStat.OUTPUT_AMOUNT);
         ItemStack cell = new ItemStack(ModItems.batteryCell(BatteryCellMaterial.IRON).get());
         check(crusher.canInstallBatteryCell(cell), "Crusher rejects the Battery Cell");

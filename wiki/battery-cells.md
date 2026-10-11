@@ -69,7 +69,7 @@ The cell slot is optional on most processors, but leaving it empty has a cost. T
 
 | Machine | Without a cell |
 |---|---|
-| [Crusher](crusher.md) | Output Amount drops to 75%. Crusher Battery Link affixes, and weakly the Scuffed Crush Head affix, win some of that back. The Cell Bypass keystone in [Machine Mastery](machine-mastery.md) removes the penalty. |
+| [Crusher](crusher.md) | Keeps only 75% of its Bonus Output above 1×. Crusher Battery Link affixes, and weakly the Scuffed Crush Head affix, win some of that back. The Cell Bypass keystone in [Machine Mastery](machine-mastery.md) removes the penalty. |
 | Electric [Furnace](furnace.md) | 25% less Processing Speed. |
 | [Alloy Furnace](alloy-furnace.md) | 15% less Processing Speed and 10% reduced Stability. |
 | [Metal Press](metal-press.md) | 15% less Processing Speed and 20% reduced Stability. |

@@ -213,8 +213,8 @@ public final class ProcessingBalanceSimulation {
         boolean battery = !MegaPassiveTree.has(state, "BLOCK_BATTERY");
         if (!battery) {
             double retained = Math.max(0, Math.min(100, stats.value(MachineStat.NO_BATTERY_OUTPUT_RETENTION))) / 100.0;
-            stats.apply(new MachineModifier(ModifierSlot.IMPLICIT, MachineStat.OUTPUT_AMOUNT, ModifierOperation.LESS,
-                    RNGTechConfig.CRUSHER_NO_BATTERY_CELL_OUTPUT_MULTIPLIER.get() + (1 - RNGTechConfig.CRUSHER_NO_BATTERY_CELL_OUTPUT_MULTIPLIER.get()) * retained));
+            stats.scaleBonus(MachineStat.OUTPUT_AMOUNT,
+                    RNGTechConfig.CRUSHER_NO_BATTERY_CELL_OUTPUT_MULTIPLIER.get() + (1 - RNGTechConfig.CRUSHER_NO_BATTERY_CELL_OUTPUT_MULTIPLIER.get()) * retained);
         }
         // CrusherBlockEntity#consumeWorkingEnergy: one tick draws from the internal buffer plus the cell's output rate.
         double supply = Math.min(stats.value(MachineStat.ENERGY_CAPACITY) + (battery ? cell.outputRate() : 0), connector(stage));

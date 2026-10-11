@@ -648,7 +648,7 @@ public class CavitationGeneratorBlockEntity extends BaseMachineBlockEntity
         if (output.isEmpty()) {
             return FluidStack.EMPTY;
         }
-        int amount = Math.max(1, (int) Math.round(output.getAmount() * Math.max(0.1, stats.value(MachineStat.OUTPUT_AMOUNT))));
+        int amount = Math.max(1, (int) Math.round(output.getAmount() * Math.max(1.0, stats.value(MachineStat.OUTPUT_AMOUNT))));
         return output.copyWithAmount(amount);
     }
 
