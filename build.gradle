@@ -134,10 +134,11 @@ runs {
     }
 
     // Builds a fixed scene and reports server ms/tick; see docs/reference/benchmarking.md. It has its own run directory,
-    // so it does not share the gameTestServer one.
+    // so it does not share the gameTestServer one. Only the benchmark's own namespace is enabled, so the mod's GameTests
+    // do not run next to the scene or share its measured ticks.
     create('tickBenchmark') {
         runType 'gameTestServer'
-        systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
+        systemProperty 'neoforge.enabledGameTestNamespaces', 'rngtech_benchmark'
         systemProperty 'rngtech.benchmark.output', layout.buildDirectory.file('tick-benchmark/result.json').get().asFile.path
         systemProperty 'rngtech.benchmark.settle', (project.findProperty('benchmarkSettle') ?: '100').toString()
         systemProperty 'rngtech.benchmark.warmup', (project.findProperty('benchmarkWarmup') ?: '200').toString()
