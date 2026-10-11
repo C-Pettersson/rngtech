@@ -2,11 +2,13 @@ package com.rngtech.content.blockentity;
 
 import com.rngtech.content.block.BaseMachineBlock;
 import com.rngtech.content.block.SolidFuelBurnerBlock;
+import com.rngtech.content.energy.HeatCoreMaterial;
 import com.rngtech.content.energy.SolidFuelBurnerFuelRules;
 import com.rngtech.content.item.BatteryCellItem;
 import com.rngtech.content.item.GearParts;
 import com.rngtech.content.item.MachinePartItem;
 import com.rngtech.content.item.SolidFuelBurnerPartItem;
+import com.rngtech.content.item.UniquePartItem;
 import com.rngtech.content.menu.SolidFuelBurnerMenu;
 import com.rngtech.content.registry.ModBlockEntities;
 import com.rngtech.rpg.ComponentBaseStatCatalog;
@@ -24,8 +26,12 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.Connection;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.game.ClientGamePacketListener;
+import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.util.Mth;
 import net.minecraft.world.Containers;
 import net.minecraft.world.MenuProvider;
@@ -33,8 +39,11 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerData;
+import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.energy.IEnergyStorage;
 import net.neoforged.neoforge.items.IItemHandler;
@@ -85,6 +94,12 @@ public class SolidFuelBurnerBlockEntity extends BaseMachineBlockEntity implement
     private static final int DATA_CONNECTOR_CAP = 19;
     private static final int DATA_COUNT = 20;
     private static final int STAT_SCALE = 100;
+    private static final int VISUAL_SYNC_INTERVAL = 5;
+    /** The fire's full height: a Steel Heat Core's base output. */
+    private static final float VISUAL_RATE_REFERENCE = HeatCoreMaterial.STEEL.energyGeneration();
+    private static final int COAL_TINT = 0x2E2E32;
+    private static final int CHARCOAL_TINT = 0x3C3430;
+    private static final int WOOD_TINT = 0x9A7448;
 
     private final SolidFuelBurnerBlock block;
     private final ItemStackHandler fuelInventory = new ItemStackHandler(FUEL_SLOT_COUNT) {
@@ -185,6 +200,9 @@ public class SolidFuelBurnerBlockEntity extends BaseMachineBlockEntity implement
     private long energyTelemetryTick = Long.MIN_VALUE;
     private int energyOutputThisTick;
     private int lastEnergyOutput;
+    private SolidFuelBurnerVisualState visualState = SolidFuelBurnerVisualState.IDLE;
+    private SolidFuelBurnerVisualState.Key lastSyncedVisual;
+    private final SolidFuelBurnerVisualState.Animation animation = new SolidFuelBurnerVisualState.Animation();
 
     public SolidFuelBurnerBlockEntity(BlockPos pos, BlockState blockState) {
         super(ModBlockEntities.SOLID_FUEL_BURNER.get(), pos, blockState, MachineType.SOLID_FUEL_BURNER, SLOT_FUEL_0, SLOT_FUEL_0, SLOT_FUEL_0);
@@ -203,6 +221,108 @@ public class SolidFuelBurnerBlockEntity extends BaseMachineBlockEntity implement
         if (generated || exported) {
             burner.setChanged();
         }
+        burner.syncVisualState(level);
+    }
+
+    /**
+     * Burners saved while the block was a solid cube stored no light inside it, which leaves the renderer's fire, fins,
+     * and hopper unlit. Rechecking the block's own light once on load fixes those saves.
+     */
+    @Override
+    public void onLoad() {
+        super.onLoad();
+        if (level != null && !level.isClientSide) {
+            level.getLightEngine().checkBlock(worldPosition);
+        }
+    }
+
+    /** Client copy of the state the renderer draws; synced from the server in the block entity update tag. */
+    public SolidFuelBurnerVisualState visualState() {
+        return visualState;
+    }
+
+    public SolidFuelBurnerVisualState.Animation animation() {
+        return animation;
+    }
+
+    @Override
+    public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
+        return currentVisualState().save();
+    }
+
+    @Override
+    public Packet<ClientGamePacketListener> getUpdatePacket() {
+        return ClientboundBlockEntityDataPacket.create(this);
+    }
+
+    @Override
+    public void handleUpdateTag(CompoundTag tag, HolderLookup.Provider registries) {
+        visualState = SolidFuelBurnerVisualState.load(tag);
+    }
+
+    @Override
+    public void onDataPacket(Connection connection, ClientboundBlockEntityDataPacket packet, HolderLookup.Provider registries) {
+        visualState = SolidFuelBurnerVisualState.load(packet.getTag());
+    }
+
+    private void syncVisualState(Level level) {
+        if (level.getGameTime() % VISUAL_SYNC_INTERVAL != 0) {
+            return;
+        }
+        SolidFuelBurnerVisualState.Key key = currentVisualState().key();
+        if (!key.equals(lastSyncedVisual)) {
+            lastSyncedVisual = key;
+            level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), Block.UPDATE_CLIENTS);
+        }
+    }
+
+    /** What the burner shows right now, built on the server. */
+    public SolidFuelBurnerVisualState currentVisualState() {
+        int bins = activeFuelSlots();
+        ItemStack fuel0 = bins > 0 ? fuelInventory.getStackInSlot(SLOT_FUEL_0) : ItemStack.EMPTY;
+        ItemStack fuel1 = bins > 1 ? fuelInventory.getStackInSlot(SLOT_FUEL_1) : ItemStack.EMPTY;
+        SolidFuelBurnerPartItem box = fuelBox();
+        return new SolidFuelBurnerVisualState(
+                getBlockState().getValue(BaseMachineBlock.ACTIVE),
+                hasBurnTime() && totalBurnTime > 0 ? Mth.clamp(burnTime / (float) totalBurnTime, 0.0F, 1.0F) : 0.0F,
+                effectiveGeneration(effectiveStats()) / VISUAL_RATE_REFERENCE,
+                heatCoreKey(heatCoreStack()),
+                box == null ? "" : box.fuelBoxMaterial().getSerializedName(),
+                bins,
+                fill(fuel0),
+                fill(fuel1),
+                fuelTint(fuel0),
+                fuelTint(fuel1),
+                cellStack().isEmpty() || energyCapacity() <= 0 ? -1.0F : energyStored() / (float) energyCapacity()
+        );
+    }
+
+    private static String heatCoreKey(ItemStack stack) {
+        if (stack.getItem() instanceof SolidFuelBurnerPartItem part && part.heatCoreMaterial() != null) {
+            return part.heatCoreMaterial().getSerializedName();
+        }
+        return stack.getItem() instanceof UniquePartItem ? "unique" : "";
+    }
+
+    private static float fill(ItemStack stack) {
+        return stack.isEmpty() ? 0.0F : stack.getCount() / (float) stack.getMaxStackSize();
+    }
+
+    /** Coal and charcoal look like themselves, block fuels take their block's map colour, anything else looks like wood. */
+    private static int fuelTint(ItemStack stack) {
+        if (stack.isEmpty()) {
+            return 0;
+        }
+        if (stack.is(Items.COAL)) {
+            return COAL_TINT;
+        }
+        if (stack.is(Items.CHARCOAL)) {
+            return CHARCOAL_TINT;
+        }
+        if (stack.getItem() instanceof BlockItem blockItem) {
+            return blockItem.getBlock().defaultMapColor().col;
+        }
+        return WOOD_TINT;
     }
 
     public ItemStackHandler getFuelInventory() {

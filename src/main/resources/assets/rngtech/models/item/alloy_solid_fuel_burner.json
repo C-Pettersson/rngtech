@@ -1,3 +1,10 @@
 {
-  "parent": "rngtech:block/alloy_solid_fuel_burner"
+  "parent": "rngtech:item/solid_fuel_burner_template",
+  "textures": {
+    "particle": "rngtech:block/solid_fuel_burner/shell/alloy",
+    "shell": "rngtech:block/solid_fuel_burner/shell/alloy",
+    "trim": "rngtech:block/solid_fuel_burner/trim/alloy",
+    "core": "rngtech:block/solid_fuel_burner/heat_core/bronze",
+    "box": "rngtech:block/solid_fuel_burner/fuel_box/bronze"
+  }
 }
