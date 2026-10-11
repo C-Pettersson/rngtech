@@ -23,6 +23,7 @@ import com.rngtech.content.item.RefinementConsumableItem;
 import com.rngtech.content.loot.ChallengeContext;
 import com.rngtech.content.loot.ChallengeLoot;
 import com.rngtech.content.registry.ModDataComponents;
+import com.rngtech.rpg.MachineImplicitCatalog;
 import com.rngtech.rpg.MachineStatAccumulator;
 import com.rngtech.rpg.MachineTraits;
 import com.rngtech.rpg.MachineType;
@@ -87,6 +88,9 @@ public abstract class BaseMachineBlockEntity extends BlockEntity implements Refi
     private final List<ItemStack> removedGear = new ArrayList<>();
     private final MachineStatsCache statsCache = new MachineStatsCache();
     private final Supplier<MachineStatAccumulator> statsBuilder = this::buildStats;
+    private MachineTraits effectiveTraits;
+    private MachineTraits effectiveTraitsStored;
+    private Block effectiveTraitsBlock;
 
     protected BaseMachineBlockEntity(
             BlockEntityType<?> blockEntityType,
@@ -138,6 +142,21 @@ public abstract class BaseMachineBlockEntity extends BlockEntity implements Refi
                 .build()
         );
         setChanged();
+    }
+
+    /**
+     * The stored traits merged with this block's identity traits, rebuilt only when the stored traits component or the
+     * block changes.
+     */
+    public final MachineTraits effectiveTraits() {
+        MachineTraits stored = machineTraits();
+        Block block = getBlockState().getBlock();
+        if (effectiveTraits == null || stored != effectiveTraitsStored || block != effectiveTraitsBlock) {
+            effectiveTraits = MachineImplicitCatalog.effectiveTraits(stored, block);
+            effectiveTraitsStored = stored;
+            effectiveTraitsBlock = block;
+        }
+        return effectiveTraits;
     }
 
     /** Builds this machine's stats from scratch. Machines that cache stats through {@link #cachedStats} override it. */

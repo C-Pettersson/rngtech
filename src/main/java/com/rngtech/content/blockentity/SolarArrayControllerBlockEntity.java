@@ -8,7 +8,6 @@ import com.rngtech.content.menu.SolarArrayControllerMenu;
 import com.rngtech.content.registry.ModBlockEntities;
 import com.rngtech.rpg.ComponentBaseStatCatalog;
 import com.rngtech.rpg.MachineBaseStatCatalog;
-import com.rngtech.rpg.MachineImplicitCatalog;
 import com.rngtech.rpg.MachineNameGenerator;
 import com.rngtech.rpg.MachinePartType;
 import com.rngtech.rpg.MachineStat;
@@ -273,7 +272,7 @@ public class SolarArrayControllerBlockEntity extends BaseMachineBlockEntity impl
     @Override
     protected MachineStatAccumulator buildStats() {
         MachineStatAccumulator stats = MachineBaseStatCatalog.solarArrayController();
-        stats.apply(MachineImplicitCatalog.effectiveTraits(machineTraits(), getBlockState().getBlock()));
+        stats.apply(effectiveTraits());
         ItemStack extender = gearInventory.getStackInSlot(SLOT_SOLAR_ARRAY_EXTENDER);
         if (isSolarArrayExtender(extender)) {
             ComponentBaseStatCatalog.applyEffectiveContribution(stats, extender);

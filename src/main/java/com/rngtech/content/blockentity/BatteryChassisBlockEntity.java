@@ -8,7 +8,6 @@ import com.rngtech.content.registry.ModBlockEntities;
 import com.rngtech.rpg.ComponentBaseStatCatalog;
 import com.rngtech.rpg.MachineBaseStatCatalog;
 import com.rngtech.rpg.MachineBehavior;
-import com.rngtech.rpg.MachineImplicitCatalog;
 import com.rngtech.rpg.MachineModifier;
 import com.rngtech.rpg.MachineModifierEffect;
 import com.rngtech.rpg.MachineNameGenerator;
@@ -307,10 +306,6 @@ public class BatteryChassisBlockEntity extends BaseMachineBlockEntity implements
     @Override
     protected MachineStatAccumulator buildStats() {
         return effectiveStats(effectiveTraits());
-    }
-
-    private MachineTraits effectiveTraits() {
-        return MachineImplicitCatalog.effectiveTraits(machineTraits(), getBlockState().getBlock());
     }
 
     private MachineStatAccumulator effectiveStats(MachineTraits traits) {

@@ -474,7 +474,7 @@ public class CavitationGeneratorBlockEntity extends BaseMachineBlockEntity
     @Override
     protected MachineStatAccumulator buildStats() {
         MachineStatAccumulator stats = MachineBaseStatCatalog.cavitationGenerator();
-        stats.apply(MachineImplicitCatalog.effectiveTraits(machineTraits(), getBlockState().getBlock()));
+        stats.apply(effectiveTraits());
         applyPartStats(stats, rotorStack());
         applyPartStats(stats, nozzleStack());
         applyHeatCoreStats(stats, heatCoreStack());

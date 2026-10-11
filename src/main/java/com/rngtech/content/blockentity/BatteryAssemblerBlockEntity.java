@@ -14,7 +14,6 @@ import com.rngtech.content.registry.ModItems;
 import com.rngtech.content.registry.ModRecipes;
 import com.rngtech.content.registry.ModTags;
 import com.rngtech.rpg.MachineBaseStatCatalog;
-import com.rngtech.rpg.MachineImplicitCatalog;
 import com.rngtech.rpg.MachineModifier;
 import com.rngtech.rpg.MachineNameGenerator;
 import com.rngtech.rpg.MachineStat;
@@ -404,7 +403,7 @@ public class BatteryAssemblerBlockEntity extends BaseMachineBlockEntity
     @Override
     protected MachineStatAccumulator buildStats() {
         MachineStatAccumulator stats = MachineBaseStatCatalog.batteryAssembler();
-        stats.apply(MachineImplicitCatalog.effectiveTraits(machineTraits(), getBlockState().getBlock()));
+        stats.apply(effectiveTraits());
         if (!hasBatteryCell()) {
             stats.apply(MachineStatAccumulator.NO_BATTERY_SOURCE, new MachineModifier(
                     ModifierSlot.IMPLICIT,
@@ -441,7 +440,7 @@ public class BatteryAssemblerBlockEntity extends BaseMachineBlockEntity
     }
 
     private MachineTraits activeTraits() {
-        return MachineImplicitCatalog.effectiveTraits(machineTraits(), getBlockState().getBlock());
+        return effectiveTraits();
     }
 
     @Override

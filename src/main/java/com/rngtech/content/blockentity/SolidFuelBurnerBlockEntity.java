@@ -319,7 +319,7 @@ public class SolidFuelBurnerBlockEntity extends BaseMachineBlockEntity implement
     @Override
     protected MachineStatAccumulator buildStats() {
         MachineStatAccumulator stats = MachineBaseStatCatalog.solidFuelBurner(block.chassis());
-        stats.apply(MachineImplicitCatalog.effectiveTraits(machineTraits(), getBlockState().getBlock()));
+        stats.apply(effectiveTraits());
         applyPartStats(stats, gearInventory.getStackInSlot(SLOT_HEAT_CORE));
         applyPartStats(stats, gearInventory.getStackInSlot(SLOT_FUEL_BOX));
         return stats;
@@ -761,7 +761,7 @@ public class SolidFuelBurnerBlockEntity extends BaseMachineBlockEntity implement
     }
 
     private boolean hasBehavior(MachineBehavior behavior) {
-        return MachineImplicitCatalog.effectiveTraits(machineTraits(), getBlockState().getBlock()).hasBehavior(behavior)
+        return effectiveTraits().hasBehavior(behavior)
                 || MachineImplicitCatalog.hasBehavior(heatCoreStack(), behavior)
                 || MachineImplicitCatalog.hasBehavior(fuelBoxStack(), behavior);
     }

@@ -534,7 +534,7 @@ public class MetalPressBlockEntity extends BaseMachineBlockEntity
     @Override
     protected MachineStatAccumulator buildStats() {
         MachineStatAccumulator stats = MachineBaseStatCatalog.metalPress();
-        stats.apply(MachineImplicitCatalog.effectiveTraits(machineTraits(), getBlockState().getBlock()));
+        stats.apply(effectiveTraits());
         MegaPassiveTree.applyStats(stats, machineProgression(), MachineMasteryFamily.METAL_PRESS);
         applyHeatCoreStats(stats);
         applyServoStats(stats);
@@ -557,7 +557,7 @@ public class MetalPressBlockEntity extends BaseMachineBlockEntity
     }
 
     private MachineTraits activeTraits() {
-        return MachineImplicitCatalog.effectiveTraits(machineTraits(), getBlockState().getBlock());
+        return effectiveTraits();
     }
 
     @Override

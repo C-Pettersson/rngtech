@@ -6,7 +6,6 @@ import com.rngtech.content.block.SolarPanelBlock;
 import com.rngtech.content.energy.SolarPanelMaterial;
 import com.rngtech.content.registry.ModBlockEntities;
 import com.rngtech.rpg.MachineBaseStatCatalog;
-import com.rngtech.rpg.MachineImplicitCatalog;
 import com.rngtech.rpg.MachineStat;
 import com.rngtech.rpg.MachineStatAccumulator;
 import com.rngtech.rpg.MachineType;
@@ -96,7 +95,7 @@ public class SolarPanelBlockEntity extends BaseMachineBlockEntity implements Mac
     @Override
     protected MachineStatAccumulator buildStats() {
         MachineStatAccumulator stats = MachineBaseStatCatalog.solarPanel(block.material());
-        stats.apply(MachineImplicitCatalog.effectiveTraits(machineTraits(), getBlockState().getBlock()));
+        stats.apply(effectiveTraits());
         return stats;
     }
 

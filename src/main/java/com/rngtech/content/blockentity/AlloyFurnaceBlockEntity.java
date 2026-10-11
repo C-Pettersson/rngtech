@@ -545,7 +545,7 @@ public class AlloyFurnaceBlockEntity extends BaseMachineBlockEntity implements M
     }
 
     private MachineTraits activeTraits() {
-        return MachineImplicitCatalog.effectiveTraits(machineTraits(), getBlockState().getBlock());
+        return effectiveTraits();
     }
 
     private AlloyFurnaceChassisMaterial chassis() {

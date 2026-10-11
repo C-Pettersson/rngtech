@@ -12,7 +12,6 @@ import com.rngtech.content.recipe.VacuumCollapseRecipe;
 import com.rngtech.content.registry.ModBlockEntities;
 import com.rngtech.rpg.ComponentBaseStatCatalog;
 import com.rngtech.rpg.MachineBaseStatCatalog;
-import com.rngtech.rpg.MachineImplicitCatalog;
 import com.rngtech.rpg.MachineNameGenerator;
 import com.rngtech.rpg.MachinePartType;
 import com.rngtech.rpg.MachineStat;
@@ -355,7 +354,7 @@ public class VacuumCollapseGeneratorBlockEntity extends BaseMachineBlockEntity i
     @Override
     protected MachineStatAccumulator buildStats() {
         MachineStatAccumulator stats = MachineBaseStatCatalog.vacuumCollapseGenerator();
-        stats.apply(MachineImplicitCatalog.effectiveTraits(machineTraits(), getBlockState().getBlock()));
+        stats.apply(effectiveTraits());
         applyPartStats(stats, chamberStack());
         applyPartStats(stats, nozzleStack());
         applyPartStats(stats, stabilizerStack());
