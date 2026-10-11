@@ -11,6 +11,7 @@ import com.rngtech.rpg.refinement.RefinementEngine;
 import com.rngtech.rpg.refinement.RefinementSelection;
 import com.rngtech.rpg.refinement.RefinementTargets;
 
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
@@ -73,9 +74,12 @@ public class ExoticAffixForgeScreen extends AbstractContainerScreen<ExoticAffixF
     private static final int SELECTION_HEIGHT = 96;
     private static final int SELECTION_ROW_HEIGHT = 12;
     private static final int MAX_SELECTION_ROWS = 7;
+    private static final int MAX_HIDDEN_TOOLTIP_LINES = 12;
     private static final int STAT_PANEL_X = 14;
     private static final int STAT_PANEL_Y = 28;
     private static final int STAT_PANEL_WIDTH = 312;
+
+    private int selectionScroll;
 
     public ExoticAffixForgeScreen(ExoticAffixForgeMenu menu, Inventory playerInventory, Component title) {
         super(menu, playerInventory, title);
@@ -370,6 +374,9 @@ public class ExoticAffixForgeScreen extends AbstractContainerScreen<ExoticAffixF
             int x = leftPos + SELECTION_X;
             int y = topPos + row.y();
             if (mouseX >= x && mouseX < x + SELECTION_WIDTH && mouseY >= y && mouseY < y + SELECTION_ROW_HEIGHT) {
+                if (row.kind() == null) {
+                    return true;
+                }
                 if (row.kind() == RefinementSelection.Kind.EXISTING_MODIFIER) {
                     menu.selectExistingModifier(row.affixIndex());
                 } else if (row.kind() == RefinementSelection.Kind.EMPTY_SLOT) {
@@ -403,31 +410,99 @@ public class ExoticAffixForgeScreen extends AbstractContainerScreen<ExoticAffixF
     }
 
     private List<SelectionRow> selectionRows() {
+        List<SelectionRow> all = allSelectionRows();
+        int total = all.size();
+        List<SelectionRow> rows = new ArrayList<>();
+        if (total <= MAX_SELECTION_ROWS) {
+            for (int index = 0; index < total; index++) {
+                rows.add(all.get(index).at(SELECTION_Y + index * SELECTION_ROW_HEIGHT));
+            }
+            return rows;
+        }
+
+        int first = clampedSelectionScroll(total);
+        boolean hiddenAbove = first > 0;
+        int capacity = MAX_SELECTION_ROWS - (hiddenAbove ? 1 : 0);
+        boolean hiddenBelow = total - first > capacity;
+        if (hiddenBelow) {
+            capacity--;
+        }
+        int end = Math.min(total, first + capacity);
+
+        int y = SELECTION_Y;
+        if (hiddenAbove) {
+            rows.add(moreRow("rngtech.affix_forge.more_above", all.subList(0, first), y));
+            y += SELECTION_ROW_HEIGHT;
+        }
+        for (int index = first; index < end; index++) {
+            rows.add(all.get(index).at(y));
+            y += SELECTION_ROW_HEIGHT;
+        }
+        if (hiddenBelow) {
+            rows.add(moreRow("rngtech.affix_forge.more", all.subList(end, total), y));
+        }
+        return rows;
+    }
+
+    private int clampedSelectionScroll(int total) {
+        return Math.max(0, Math.min(selectionScroll, total - (MAX_SELECTION_ROWS - 1)));
+    }
+
+    private SelectionRow moreRow(String key, List<SelectionRow> hidden, int y) {
+        Component title = Component.translatable(key, hidden.size());
+        List<Component> tooltip = new ArrayList<>();
+        tooltip.add(title);
+        int listed = Math.min(hidden.size(), MAX_HIDDEN_TOOLTIP_LINES);
+        for (int index = 0; index < listed; index++) {
+            tooltip.add(hidden.get(index).title().copy().withStyle(ChatFormatting.GRAY));
+        }
+        if (hidden.size() > listed) {
+            tooltip.add(Component.translatable("rngtech.affix_forge.more.rest", hidden.size() - listed).withStyle(ChatFormatting.GRAY));
+        }
+        tooltip.add(Component.translatable("rngtech.affix_forge.more.scroll").withStyle(ChatFormatting.DARK_GRAY));
+        return new SelectionRow(null, -1, null, title, tooltip, false, false, y);
+    }
+
+    @Override
+    public boolean mouseScrolled(double mouseX, double mouseY, double scrollX, double scrollY) {
+        if (scrollY != 0
+                && menu.selectedTab() == ExoticAffixForgeMenu.TAB_PROCESSING
+                && hovered((int) mouseX, (int) mouseY, SELECTION_X - 2, SELECTION_Y - 2, SELECTION_WIDTH + 4, SELECTION_HEIGHT)) {
+            int total = allSelectionRows().size();
+            if (total > MAX_SELECTION_ROWS) {
+                int last = total - (MAX_SELECTION_ROWS - 1);
+                selectionScroll = Math.max(0, Math.min(last, clampedSelectionScroll(total) + (scrollY < 0 ? 1 : -1)));
+                return true;
+            }
+        }
+        return super.mouseScrolled(mouseX, mouseY, scrollX, scrollY);
+    }
+
+    private List<SelectionRow> allSelectionRows() {
         List<SelectionRow> rows = new ArrayList<>();
         ItemStack target = targetStack();
         if (!RefinementTargets.canRefine(target)) {
             return rows;
         }
 
-        int y = SELECTION_Y;
         List<MachineModifier> affixes = affixes(targetTraits());
-        for (int affixIndex = 0; affixIndex < affixes.size() && rows.size() < MAX_SELECTION_ROWS; affixIndex++) {
+        for (int affixIndex = 0; affixIndex < affixes.size(); affixIndex++) {
             MachineModifier modifier = affixes.get(affixIndex);
+            Component title = MachineModifierText.displayName(modifier);
             rows.add(new SelectionRow(
                     RefinementSelection.Kind.EXISTING_MODIFIER,
                     affixIndex,
                     modifier.slot(),
-                    MachineModifierText.displayName(modifier),
-                    MachineModifierText.tooltipLine(modifier),
+                    title,
+                    List.of(title, MachineModifierText.tooltipLine(modifier).copy().withStyle(ChatFormatting.GRAY)),
                     !menu.selectedAction().requiresEmptySlot(),
                     selectedExisting(affixIndex),
-                    y
+                    0
             ));
-            y += SELECTION_ROW_HEIGHT;
         }
 
         for (ModifierSlot slot : List.of(ModifierSlot.PREFIX, ModifierSlot.SUFFIX)) {
-            if (rows.size() >= MAX_SELECTION_ROWS || !hasOpenSlot(slot)) {
+            if (!hasOpenSlot(slot)) {
                 continue;
             }
             rows.add(new SelectionRow(
@@ -435,12 +510,11 @@ public class ExoticAffixForgeScreen extends AbstractContainerScreen<ExoticAffixF
                     -1,
                     slot,
                     Component.translatable("rngtech.refinement.empty_slot", MachineModifierText.slotLabel(slot)),
-                    Component.translatable("rngtech.refinement.select_empty_slot", MachineModifierText.slotLabel(slot)),
+                    List.of(Component.translatable("rngtech.refinement.select_empty_slot", MachineModifierText.slotLabel(slot))),
                     !menu.selectedAction().requiresExistingModifier(),
                     selectedEmpty(slot),
-                    y
+                    0
             ));
-            y += SELECTION_ROW_HEIGHT;
         }
         return rows;
     }
@@ -654,7 +728,7 @@ public class ExoticAffixForgeScreen extends AbstractContainerScreen<ExoticAffixF
         }
         SelectionRow row = hoveredSelectionRow(mouseX, mouseY);
         if (row != null) {
-            guiGraphics.renderTooltip(font, row.tooltip(), mouseX, mouseY);
+            guiGraphics.renderComponentTooltip(font, row.tooltip(), mouseX, mouseY);
         }
     }
 
@@ -760,10 +834,13 @@ public class ExoticAffixForgeScreen extends AbstractContainerScreen<ExoticAffixF
             int affixIndex,
             ModifierSlot emptySlot,
             Component title,
-            Component tooltip,
+            List<Component> tooltip,
             boolean enabled,
             boolean selected,
             int y
     ) {
+        private SelectionRow at(int rowY) {
+            return new SelectionRow(kind, affixIndex, emptySlot, title, tooltip, enabled, selected, rowY);
+        }
     }
 }
