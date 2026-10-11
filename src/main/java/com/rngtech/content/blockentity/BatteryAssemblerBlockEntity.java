@@ -14,7 +14,6 @@ import com.rngtech.content.registry.ModItems;
 import com.rngtech.content.registry.ModRecipes;
 import com.rngtech.content.registry.ModTags;
 import com.rngtech.rpg.MachineBaseStatCatalog;
-import com.rngtech.rpg.MachineImplicitCatalog;
 import com.rngtech.rpg.MachineModifier;
 import com.rngtech.rpg.MachineNameGenerator;
 import com.rngtech.rpg.MachineStat;
@@ -40,7 +39,6 @@ import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.energy.IEnergyStorage;
 import net.neoforged.neoforge.fluids.FluidActionResult;
 import net.neoforged.neoforge.fluids.FluidStack;
@@ -53,9 +51,17 @@ import net.neoforged.neoforge.items.ItemStackHandler;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.IntStream;
 
 public class BatteryAssemblerBlockEntity extends BaseMachineBlockEntity
         implements MenuProvider, PurgeableFluidStorage, MachineInfoProvider {
+    private final RecipeCache<BatteryAssemblyRecipe> recipes = new RecipeCache<>(1);
+    private static final List<RecipeInputFilter<BatteryAssemblyRecipeInput, BatteryAssemblyRecipe>> INPUT_FILTERS =
+            IntStream.rangeClosed(0, 3)
+                    .mapToObj(position -> new RecipeInputFilter<BatteryAssemblyRecipeInput, BatteryAssemblyRecipe>(
+                            ModRecipes.BATTERY_ASSEMBLY_TYPE::get,
+                            (recipe, item) -> position < recipe.ingredients().size() && recipe.ingredients().get(position).test(item)))
+                    .toList();
     public static final int SLOT_INPUT_0 = 0;
     public static final int SLOT_INPUT_1 = 1;
     public static final int SLOT_INPUT_2 = 2;
@@ -160,6 +166,7 @@ public class BatteryAssemblerBlockEntity extends BaseMachineBlockEntity
     private final EnergyTelemetry energyFlow = new EnergyTelemetry(this::getLevel);
     private final IEnergyStorage trackedEnergyStorage = energyFlow.track(energyStorage);
     private final IFluidHandler fluidHandler = new BatteryAssemblerFluidHandler();
+    private final InstalledBatteryCell batteryCell = new InstalledBatteryCell(this::batteryCellStack);
     private final ContainerData menuData = new ContainerData() {
         @Override
         public int get(int index) {
@@ -404,7 +411,7 @@ public class BatteryAssemblerBlockEntity extends BaseMachineBlockEntity
     @Override
     protected MachineStatAccumulator buildStats() {
         MachineStatAccumulator stats = MachineBaseStatCatalog.batteryAssembler();
-        stats.apply(MachineImplicitCatalog.effectiveTraits(machineTraits(), getBlockState().getBlock()));
+        stats.apply(effectiveTraits());
         if (!hasBatteryCell()) {
             stats.apply(MachineStatAccumulator.NO_BATTERY_SOURCE, new MachineModifier(
                     ModifierSlot.IMPLICIT,
@@ -441,7 +448,7 @@ public class BatteryAssemblerBlockEntity extends BaseMachineBlockEntity
     }
 
     private MachineTraits activeTraits() {
-        return MachineImplicitCatalog.effectiveTraits(machineTraits(), getBlockState().getBlock());
+        return effectiveTraits();
     }
 
     @Override
@@ -477,7 +484,21 @@ public class BatteryAssemblerBlockEntity extends BaseMachineBlockEntity
     }
 
     private BatteryAssemblyRecipe nextRecipe() {
-        return BatteryAssemblyRecipes.find(level, itemInputs(), inputTank.getFluid()).orElse(null);
+        if (level == null) {
+            return null;
+        }
+        ItemStack[] items = itemInputs();
+        FluidStack fluid = inputTank.getFluid();
+        RecipeCache.Lookup<BatteryAssemblyRecipe> lookup = recipes.lookup(0, level);
+        for (ItemStack item : items) {
+            lookup.item(item);
+        }
+        return lookup.fluid(fluid).find(() -> BatteryAssemblyRecipes.find(level, items, fluid));
+    }
+
+    /** How many recipe lookups searched the recipes instead of reusing a remembered result. */
+    public int recipeSearches() {
+        return recipes.searches();
     }
 
     private boolean process(BatteryAssemblyRecipe recipe) {
@@ -676,11 +697,11 @@ public class BatteryAssemblerBlockEntity extends BaseMachineBlockEntity
     }
 
     private int energyStored() {
-        return internalEnergyStored() + BatteryCellItem.energyStored(batteryCellStack());
+        return internalEnergyStored() + batteryCell.energyStored();
     }
 
     private int energyCapacity() {
-        return internalEnergyCapacity() + BatteryCellItem.energyCapacity(batteryCellStack());
+        return internalEnergyCapacity() + batteryCell.capacity();
     }
 
     private int internalEnergyCapacity() {
@@ -759,8 +780,7 @@ public class BatteryAssemblerBlockEntity extends BaseMachineBlockEntity
     }
 
     private IEnergyStorage batteryCellEnergyStorage() {
-        ItemStack cell = batteryCellStack();
-        return cell.isEmpty() ? null : cell.getCapability(Capabilities.EnergyStorage.ITEM);
+        return batteryCell.storage();
     }
 
     private void clampInternalEnergy() {
@@ -789,8 +809,7 @@ public class BatteryAssemblerBlockEntity extends BaseMachineBlockEntity
 
     /** Assembly ingredients are positional, so a slot takes only what some recipe needs at that position. */
     public boolean isAssemblyInput(int position, ItemStack stack) {
-        return RecipeInputFilter.anyAccepts(level, ModRecipes.BATTERY_ASSEMBLY_TYPE.get(), stack,
-                (recipe, item) -> position < recipe.ingredients().size() && recipe.ingredients().get(position).test(item));
+        return position >= 0 && position < INPUT_FILTERS.size() && INPUT_FILTERS.get(position).accepts(level, stack);
     }
 
     private final class RangedItemHandler implements IItemHandler {

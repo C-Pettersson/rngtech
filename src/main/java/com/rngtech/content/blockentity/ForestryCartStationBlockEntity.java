@@ -2,7 +2,6 @@ package com.rngtech.content.blockentity;
 
 import com.rngtech.content.block.BaseMachineBlock;
 import com.rngtech.content.entity.ForestryCartEntity;
-import com.rngtech.content.item.BatteryCellItem;
 import com.rngtech.content.item.EnergyConnectorItem;
 import com.rngtech.content.item.FluidConnectorItem;
 import com.rngtech.content.item.ItemConnectorItem;
@@ -32,7 +31,6 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.phys.AABB;
-import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.energy.IEnergyStorage;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.capability.IFluidHandler;
@@ -197,6 +195,7 @@ public class ForestryCartStationBlockEntity extends BlockEntity implements MenuP
     private final IItemHandler bottomItemHandler = new OutputItemHandler();
     private final IEnergyStorage energyStorage = new StationEnergyStorage();
     private final EnergyTelemetry energyFlow = new EnergyTelemetry(this::getLevel);
+    private final InstalledBatteryCell stationBatteryCell = new InstalledBatteryCell(this::stationBatteryCellStack);
     private final IEnergyStorage trackedEnergyStorage = energyFlow.track(energyStorage);
     private final FluidTank waterTank = new FluidTank(WATER_CAPACITY, stack -> stack.getFluid().isSame(Fluids.WATER)) {
         @Override
@@ -862,8 +861,7 @@ public class ForestryCartStationBlockEntity extends BlockEntity implements MenuP
     }
 
     private IEnergyStorage stationBatteryCellEnergyStorage() {
-        ItemStack stack = stationBatteryCellStack();
-        return stack.isEmpty() ? null : stack.getCapability(Capabilities.EnergyStorage.ITEM);
+        return stationBatteryCell.storage();
     }
 
     private boolean hasEnergyConnector() {
@@ -879,11 +877,11 @@ public class ForestryCartStationBlockEntity extends BlockEntity implements MenuP
     }
 
     private int energyStored() {
-        return internalEnergyStored() + BatteryCellItem.energyStored(stationBatteryCellStack());
+        return internalEnergyStored() + stationBatteryCell.energyStored();
     }
 
     private int energyCapacity() {
-        return internalEnergyCapacity() + BatteryCellItem.energyCapacity(stationBatteryCellStack());
+        return internalEnergyCapacity() + stationBatteryCell.capacity();
     }
 
     private int internalEnergyCapacity() {
@@ -903,7 +901,7 @@ public class ForestryCartStationBlockEntity extends BlockEntity implements MenuP
     }
 
     private int cartChargeTransferRate() {
-        return Math.max(energyConnectorTransferRate(), BatteryCellItem.maxOutput(stationBatteryCellStack()));
+        return Math.max(energyConnectorTransferRate(), stationBatteryCell.stats().maxOutput());
     }
 
     private int itemConnectorTransferLimit() {

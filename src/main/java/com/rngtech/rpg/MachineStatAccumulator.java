@@ -53,6 +53,8 @@ public final class MachineStatAccumulator {
     private double partEnergyGenerationMore = 1.0;
     private final Map<MachineStat, Double> absoluteValues = new EnumMap<>(MachineStat.class);
     private final Map<MachineStat, Double> absoluteCeilings = new EnumMap<>(MachineStat.class);
+    private final Map<MachineStat, Double> absoluteFloors = new EnumMap<>(MachineStat.class);
+    private final Map<MachineStat, Double> bonusMoreValues = new EnumMap<>(MachineStat.class);
     private final Map<MachineStat, List<StatBreakdown.Term>> recorded =
             RECORDING.get() ? new EnumMap<>(MachineStat.class) : null;
     private final Deque<Component> sources = new ArrayDeque<>();
@@ -97,6 +99,8 @@ public final class MachineStatAccumulator {
         copy.partEnergyGenerationMore = partEnergyGenerationMore;
         copy.absoluteValues.putAll(absoluteValues);
         copy.absoluteCeilings.putAll(absoluteCeilings);
+        copy.absoluteFloors.putAll(absoluteFloors);
+        copy.bonusMoreValues.putAll(bonusMoreValues);
         if (copy.recorded != null && recorded != null) {
             recorded.forEach((stat, terms) -> copy.recorded.put(stat, new ArrayList<>(terms)));
         }
@@ -150,6 +154,20 @@ public final class MachineStatAccumulator {
         checkMutable();
         absoluteCeilings.merge(accumulationStat(stat), value, Math::min);
         record(StatBreakdown.Kind.CEILING, stat, value);
+    }
+
+    /** Keeps {@code stat} at or above {@code value}; the part above the floor is the stat's bonus. */
+    public void floorAbsolute(MachineStat stat, double value) {
+        checkMutable();
+        absoluteFloors.merge(accumulationStat(stat), value, Math::max);
+        record(StatBreakdown.Kind.FLOOR, stat, value);
+    }
+
+    /** Scales only the part of {@code stat} above its floor, so a penalty can take away bonus but never the floor. */
+    public void scaleBonus(MachineStat stat, double factor) {
+        checkMutable();
+        bonusMoreValues.merge(accumulationStat(stat), factor, (current, next) -> current * next);
+        record(StatBreakdown.Kind.BONUS_MORE, stat, factor);
     }
 
     public Optional<StatBreakdown> breakdown(MachineStat stat) {
@@ -718,6 +736,9 @@ public final class MachineStatAccumulator {
         stats.baseValues.put(MachineStat.OUTPUT_SLOTS, 1.0);
         stats.baseValues.put(MachineStat.ADDON_SLOTS, 1.0);
         stats.baseValues.put(MachineStat.OUTPUT_AMOUNT, 1.0);
+        try (Source ignored = stats.source(BASE_SOURCE)) {
+            stats.floorAbsolute(MachineStat.OUTPUT_AMOUNT, 1.0);
+        }
         stats.baseValues.put(MachineStat.SUPER_OUTPUT_CHANCE, 0.0);
         stats.baseValues.put(MachineStat.PROCESSING_SPEED, 1.0);
         stats.baseValues.put(MachineStat.INSTANT_PROCESS_CHANCE, 0.0);
@@ -845,8 +866,14 @@ public final class MachineStatAccumulator {
         double added = additiveValues.getOrDefault(resolvedStat, 0.0);
         double more = moreValues.getOrDefault(resolvedStat, 1.0);
         double ordinary = (base + added) * increasedScale(resolvedStat, extraPercent) * more;
-        return Math.min(absoluteValues.getOrDefault(resolvedStat, ordinary),
+        double floored = floored(ordinary, absoluteFloors.get(resolvedStat), bonusMoreValues.getOrDefault(resolvedStat, 1.0));
+        return Math.min(absoluteValues.getOrDefault(resolvedStat, floored),
                 absoluteCeilings.getOrDefault(resolvedStat, Double.POSITIVE_INFINITY));
+    }
+
+    /** {@code ordinary} raised to {@code floor}, with only the bonus above the floor scaled by {@code bonusMore}. */
+    public static double floored(double ordinary, Double floor, double bonusMore) {
+        return floor == null ? ordinary * bonusMore : floor + Math.max(0.0, ordinary - floor) * bonusMore;
     }
 
     /** The summed increased and reduced percent on {@code stat}, before any soft cap. */
@@ -1030,7 +1057,7 @@ public final class MachineStatAccumulator {
     private static boolean isNeutral(StatBreakdown.Kind kind, double value) {
         return switch (kind) {
             case ADD, INCREASED -> value == 0.0;
-            case MORE -> value == 1.0;
+            case MORE, BONUS_MORE -> value == 1.0;
             default -> false;
         };
     }

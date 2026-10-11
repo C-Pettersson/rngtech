@@ -55,7 +55,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Fluids;
-import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.energy.IEnergyStorage;
 import net.neoforged.neoforge.fluids.FluidActionResult;
 import net.neoforged.neoforge.fluids.FluidStack;
@@ -70,6 +69,10 @@ import java.util.List;
 
 public class MelterBlockEntity extends BaseMachineBlockEntity
         implements MenuProvider, PurgeableFluidStorage, MachineMasteryHost, MachineInfoProvider {
+    private final RecipeCache<MelterRecipe> recipes = new RecipeCache<>(1);
+    private static final RecipeInputFilter<MelterRecipeInput, MelterRecipe> INPUT_FILTER = new RecipeInputFilter<>(
+            ModRecipes.MELTER_TYPE::get,
+            (recipe, item) -> recipe.primaryIngredient().test(item) || recipe.secondaryIngredient().test(item));
     public static final int SLOT_PRIMARY_INPUT = 0;
     public static final int SLOT_SECONDARY_INPUT = 1;
     public static final int SLOT_FLUID_INPUT_CONTAINER = 2;
@@ -210,6 +213,7 @@ public class MelterBlockEntity extends BaseMachineBlockEntity
     private final EnergyTelemetry energyFlow = new EnergyTelemetry(this::getLevel);
     private final IEnergyStorage trackedEnergyStorage = energyFlow.track(energyStorage);
     private final IFluidHandler fluidHandler = new MelterFluidHandler();
+    private final InstalledBatteryCell batteryCell = new InstalledBatteryCell(this::batteryCellStack);
     private final ContainerData menuData = new ContainerData() {
         @Override
         public int get(int index) {
@@ -491,7 +495,7 @@ public class MelterBlockEntity extends BaseMachineBlockEntity
     @Override
     protected MachineStatAccumulator buildStats() {
         MachineStatAccumulator stats = MachineBaseStatCatalog.melter();
-        stats.apply(MachineImplicitCatalog.effectiveTraits(machineTraits(), getBlockState().getBlock()));
+        stats.apply(effectiveTraits());
         MegaPassiveTree.applyStats(stats, machineProgression(), MachineMasteryFamily.MELTER);
         applyHeatCoreStats(stats);
         applyCrushHeadStats(stats);
@@ -510,7 +514,7 @@ public class MelterBlockEntity extends BaseMachineBlockEntity
     }
 
     private MachineTraits activeTraits() {
-        return MachineImplicitCatalog.effectiveTraits(machineTraits(), getBlockState().getBlock());
+        return effectiveTraits();
     }
 
     @Override
@@ -596,9 +600,19 @@ public class MelterBlockEntity extends BaseMachineBlockEntity
     }
 
     private MelterRecipe nextRecipe() {
-        return level == null
-                ? null
-                : MelterRecipes.find(level, primaryStack(), secondaryStack(), inputTank.getFluid()).orElse(null);
+        if (level == null) {
+            return null;
+        }
+        ItemStack primary = primaryStack();
+        ItemStack secondary = secondaryStack();
+        FluidStack fluid = inputTank.getFluid();
+        return recipes.lookup(0, level).item(primary).item(secondary).fluid(fluid)
+                .find(() -> MelterRecipes.find(level, primary, secondary, fluid));
+    }
+
+    /** How many recipe lookups searched the recipes instead of reusing a remembered result. */
+    public int recipeSearches() {
+        return recipes.searches();
     }
 
     private boolean process(MelterRecipe recipe, MachineStatAccumulator stats) {
@@ -927,11 +941,11 @@ public class MelterBlockEntity extends BaseMachineBlockEntity
     }
 
     private int energyStored() {
-        return internalEnergyStored() + BatteryCellItem.energyStored(batteryCellStack());
+        return internalEnergyStored() + batteryCell.energyStored();
     }
 
     private int energyCapacity() {
-        return internalEnergyCapacity() + BatteryCellItem.energyCapacity(batteryCellStack());
+        return internalEnergyCapacity() + batteryCell.capacity();
     }
 
     private int internalEnergyCapacity() {
@@ -1070,8 +1084,7 @@ public class MelterBlockEntity extends BaseMachineBlockEntity
     }
 
     private IEnergyStorage batteryCellEnergyStorage() {
-        ItemStack cell = batteryCellStack();
-        return cell.isEmpty() ? null : cell.getCapability(Capabilities.EnergyStorage.ITEM);
+        return batteryCell.storage();
     }
 
     private void clampInternalEnergy() {
@@ -1093,8 +1106,7 @@ public class MelterBlockEntity extends BaseMachineBlockEntity
     }
 
     public boolean isMeltingInput(ItemStack stack) {
-        return RecipeInputFilter.anyAccepts(level, ModRecipes.MELTER_TYPE.get(), stack,
-                (recipe, item) -> recipe.primaryIngredient().test(item) || recipe.secondaryIngredient().test(item));
+        return INPUT_FILTER.accepts(level, stack);
     }
 
     private final class ProcessItemHandler implements IItemHandler {

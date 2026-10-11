@@ -36,12 +36,12 @@ import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.energy.IEnergyStorage;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.ItemStackHandler;
 
 public class SolidFuelBurnerBlockEntity extends BaseMachineBlockEntity implements MenuProvider, MachineInfoProvider {
+    private final EnergyExportTargets exportTargets = new EnergyExportTargets(this);
     public static final int SLOT_FUEL_0 = 0;
     public static final int SLOT_FUEL_1 = 1;
     public static final int FUEL_SLOT_COUNT = 2;
@@ -137,6 +137,7 @@ public class SolidFuelBurnerBlockEntity extends BaseMachineBlockEntity implement
     };
     private final IItemHandler sidedFuelHandler = new FuelItemHandler();
     private final IEnergyStorage energyStorage = new BurnerEnergyStorage();
+    private final InstalledBatteryCell batteryCell = new InstalledBatteryCell(this::cellStack);
     private final ContainerData menuData = new ContainerData() {
         @Override
         public int get(int index) {
@@ -316,10 +317,15 @@ public class SolidFuelBurnerBlockEntity extends BaseMachineBlockEntity implement
         return cachedStats(0L);
     }
 
+    /** How many times this machine built its Battery Cell's stats, for checks that a steady machine builds none. */
+    public int cellStatsBuilds() {
+        return batteryCell.builds();
+    }
+
     @Override
     protected MachineStatAccumulator buildStats() {
         MachineStatAccumulator stats = MachineBaseStatCatalog.solidFuelBurner(block.chassis());
-        stats.apply(MachineImplicitCatalog.effectiveTraits(machineTraits(), getBlockState().getBlock()));
+        stats.apply(effectiveTraits());
         applyPartStats(stats, gearInventory.getStackInSlot(SLOT_HEAT_CORE));
         applyPartStats(stats, gearInventory.getStackInSlot(SLOT_FUEL_BOX));
         return stats;
@@ -519,6 +525,11 @@ public class SolidFuelBurnerBlockEntity extends BaseMachineBlockEntity implement
         return stored;
     }
 
+    /** How many times an energy export looked a neighbour up instead of reusing its cached capability. */
+    public int exportTargetLookups() {
+        return exportTargets.lookups();
+    }
+
     private boolean exportEnergy(Level level, BlockPos pos) {
         if (energyStored() <= 0) {
             return false;
@@ -531,11 +542,7 @@ public class SolidFuelBurnerBlockEntity extends BaseMachineBlockEntity implement
                 return exported;
             }
 
-            IEnergyStorage target = level.getCapability(
-                    Capabilities.EnergyStorage.BLOCK,
-                    pos.relative(direction),
-                    direction.getOpposite()
-            );
+            IEnergyStorage target = exportTargets.get(level, pos, direction);
             if (target == null || !target.canReceive()) {
                 continue;
             }
@@ -585,11 +592,11 @@ public class SolidFuelBurnerBlockEntity extends BaseMachineBlockEntity implement
     }
 
     private int energyStored() {
-        return BatteryCellItem.energyStored(cellStack());
+        return batteryCell.energyStored();
     }
 
     private int energyCapacity() {
-        return BatteryCellItem.energyCapacity(cellStack());
+        return batteryCell.capacity();
     }
 
     private int availableCellSpace() {
@@ -597,10 +604,7 @@ public class SolidFuelBurnerBlockEntity extends BaseMachineBlockEntity implement
     }
 
     private int cellInputCeiling() {
-        ItemStack cell = cellStack();
-        return cell.isEmpty() || BatteryCellItem.energyStored(cell) >= BatteryCellItem.energyCapacity(cell)
-                ? 0
-                : BatteryCellItem.maxInput(cell);
+        return energyStored() >= energyCapacity() ? 0 : batteryCell.stats().maxInput();
     }
 
     private int effectiveOutputRate() {
@@ -761,7 +765,7 @@ public class SolidFuelBurnerBlockEntity extends BaseMachineBlockEntity implement
     }
 
     private boolean hasBehavior(MachineBehavior behavior) {
-        return MachineImplicitCatalog.effectiveTraits(machineTraits(), getBlockState().getBlock()).hasBehavior(behavior)
+        return effectiveTraits().hasBehavior(behavior)
                 || MachineImplicitCatalog.hasBehavior(heatCoreStack(), behavior)
                 || MachineImplicitCatalog.hasBehavior(fuelBoxStack(), behavior);
     }

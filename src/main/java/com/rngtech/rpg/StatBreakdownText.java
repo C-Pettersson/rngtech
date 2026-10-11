@@ -60,6 +60,7 @@ public final class StatBreakdownText {
         if (!breakdown.dividesReductions() && 1.0 + breakdown.paidIncreasedPercent() / 100.0 < 0.0) {
             lines.add(Component.translatable("rngtech.stat.breakdown.clamped").withStyle(ChatFormatting.DARK_GRAY));
         }
+        floor(lines, breakdown);
         override(lines, breakdown.lowest(StatBreakdown.Kind.FIXED), "rngtech.stat.breakdown.fixed", stat);
         override(lines, breakdown.lowest(StatBreakdown.Kind.CEILING), "rngtech.stat.breakdown.capped", stat);
         return lines;
@@ -77,6 +78,30 @@ public final class StatBreakdownText {
         String paid = MachineStatDisplay.formatSignedPercentPoints(breakdown.paidIncreasedPercent());
         lines.add(Component.translatable("rngtech.stat.breakdown.soft_cap", bucket, limit, bucket, limit, paid)
                 .withStyle(ChatFormatting.GRAY));
+    }
+
+    /** Shows the floor when it lifts the value, and how bonus-only factors scale the part above it. */
+    private static void floor(List<Component> lines, StatBreakdown breakdown) {
+        Double floor = breakdown.floor();
+        if (floor == null) {
+            return;
+        }
+        MachineStat stat = breakdown.stat();
+        if (breakdown.ordinary() < floor - EPSILON) {
+            lines.add(Component.translatable("rngtech.stat.breakdown.floor", amount(stat, floor)).withStyle(ChatFormatting.DARK_GRAY));
+        }
+        if (breakdown.terms(StatBreakdown.Kind.BONUS_MORE).isEmpty()) {
+            return;
+        }
+        section(lines, breakdown, StatBreakdown.Kind.BONUS_MORE, "rngtech.stat.breakdown.bonus_more", factor(breakdown.bonusMore()));
+        lines.add(Component.translatable(
+                "rngtech.stat.breakdown.bonus_formula",
+                MachineStatDisplay.formatNumber(floor),
+                MachineStatDisplay.formatNumber(Math.max(floor, breakdown.ordinary())),
+                MachineStatDisplay.formatNumber(floor),
+                MachineStatDisplay.formatNumber(breakdown.bonusMore()),
+                MachineStatDisplay.formatNumber(breakdown.floored())
+        ).withStyle(ChatFormatting.GRAY));
     }
 
     private static void section(

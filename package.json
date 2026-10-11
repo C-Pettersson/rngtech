@@ -17,7 +17,7 @@
     },
     "devDependencies": {
         "@release-it/bumper": "8.0.1",
-        "release-it": "21.1.0"
+        "release-it": "21.1.1"
     },
     "engines": {
         "node": "^22.22.2 || ^24.15.0 || >=26.0.0"

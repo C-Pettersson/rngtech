@@ -10,12 +10,13 @@ import com.rngtech.content.purge.FluidPurgeRole;
 import com.rngtech.content.purge.FluidPurgeTarget;
 import com.rngtech.content.purge.PurgeableFluidStorage;
 import com.rngtech.content.recipe.CorrosionCellRecipe;
+import com.rngtech.content.recipe.CorrosionCellRecipeInput;
 import com.rngtech.content.registry.ModBlockEntities;
 import com.rngtech.content.registry.ModItems;
+import com.rngtech.content.registry.ModRecipes;
 import com.rngtech.content.registry.ModTags;
 import com.rngtech.rpg.ComponentBaseStatCatalog;
 import com.rngtech.rpg.MachineBaseStatCatalog;
-import com.rngtech.rpg.MachineImplicitCatalog;
 import com.rngtech.rpg.MachineNameGenerator;
 import com.rngtech.rpg.MachinePartType;
 import com.rngtech.rpg.MachineStat;
@@ -40,7 +41,6 @@ import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.energy.IEnergyStorage;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.FluidType;
@@ -53,6 +53,15 @@ import java.util.List;
 
 public class CorrosionCellBlockEntity extends BaseMachineBlockEntity
         implements MenuProvider, PurgeableFluidStorage, MachineInfoProvider {
+    private final EnergyExportTargets exportTargets = new EnergyExportTargets(this);
+    private static final RecipeCache.Search<CorrosionCellRecipe> RECIPE_SEARCH = CorrosionCellRecipes::find;
+    private static final RecipeInputFilter<CorrosionCellRecipeInput, CorrosionCellRecipe> PLATE_FILTER = new RecipeInputFilter<>(
+            ModRecipes.CORROSION_CELL_TYPE::get,
+            (recipe, item) -> recipe.plate().test(item));
+    private static final RecipeInputFilter<CorrosionCellRecipeInput, CorrosionCellRecipe> ELECTROLYTE_FILTER = new RecipeInputFilter<>(
+            ModRecipes.CORROSION_CELL_TYPE::get,
+            (recipe, item) -> recipe.electrolyte().test(item));
+    private final RecipeCache<CorrosionCellRecipe> recipes = new RecipeCache<>(1);
     public static final int SLOT_PLATE = 0;
     public static final int SLOT_ELECTROLYTE = 1;
     public static final int SLOT_RESIDUE = 2;
@@ -173,6 +182,7 @@ public class CorrosionCellBlockEntity extends BaseMachineBlockEntity
     private final EnergyTelemetry energyFlow = new EnergyTelemetry(this::getLevel);
     private final IEnergyStorage trackedEnergyStorage = energyFlow.track(energyStorage);
     private final IFluidHandler fluidHandler = new ElectrolyteFluidHandler();
+    private final InstalledBatteryCell batteryCell = new InstalledBatteryCell(this::batteryCellStack);
     private final ContainerData menuData = new ContainerData() {
         @Override
         public int get(int index) {
@@ -386,14 +396,14 @@ public class CorrosionCellBlockEntity extends BaseMachineBlockEntity
         if (stack.isEmpty()) {
             return false;
         }
-        return level == null || CorrosionCellRecipes.isPlateInput(level, stack);
+        return level == null || PLATE_FILTER.accepts(level, stack);
     }
 
     public boolean isKnownElectrolyteInput(ItemStack stack) {
         if (stack.isEmpty()) {
             return false;
         }
-        return level == null || CorrosionCellRecipes.isElectrolyteInput(level, stack);
+        return level == null || ELECTROLYTE_FILTER.accepts(level, stack);
     }
 
     public boolean isBatteryCell(ItemStack stack) {
@@ -415,7 +425,7 @@ public class CorrosionCellBlockEntity extends BaseMachineBlockEntity
     @Override
     protected MachineStatAccumulator buildStats() {
         MachineStatAccumulator stats = MachineBaseStatCatalog.corrosionCell();
-        stats.apply(MachineImplicitCatalog.effectiveTraits(machineTraits(), getBlockState().getBlock()));
+        stats.apply(effectiveTraits());
         applyFluidPumpStats(stats);
         if (isCathode(cathodeStack())) {
             ComponentBaseStatCatalog.applyEffectiveContribution(stats, cathodeStack());
@@ -425,7 +435,7 @@ public class CorrosionCellBlockEntity extends BaseMachineBlockEntity
     }
 
     private MachineTraits activeTraits() {
-        return MachineImplicitCatalog.effectiveTraits(machineTraits(), getBlockState().getBlock());
+        return effectiveTraits();
     }
 
     @Override
@@ -587,12 +597,12 @@ public class CorrosionCellBlockEntity extends BaseMachineBlockEntity
     private CorrosionCellRecipe nextRecipe() {
         return level == null
                 ? null
-                : CorrosionCellRecipes.find(
-                                level,
-                                processInventory.getStackInSlot(SLOT_PLATE),
-                                availableElectrolyteStack()
-                        )
-                        .orElse(null);
+                : recipes.find(0, level, processInventory.getStackInSlot(SLOT_PLATE), availableElectrolyteStack(), RECIPE_SEARCH);
+    }
+
+    /** How many recipe lookups searched the recipes instead of reusing a remembered result. */
+    public int recipeSearches() {
+        return recipes.searches();
     }
 
     private boolean canProcessStage(CorrosionCellRecipe recipe) {
@@ -652,6 +662,11 @@ public class CorrosionCellBlockEntity extends BaseMachineBlockEntity
         return stored;
     }
 
+    /** How many times an energy export looked a neighbour up instead of reusing its cached capability. */
+    public int exportTargetLookups() {
+        return exportTargets.lookups();
+    }
+
     private boolean exportEnergy(Level level, BlockPos pos) {
         MachineStatAccumulator stats = effectiveStats();
         if (energyStored() <= 0) {
@@ -665,11 +680,7 @@ public class CorrosionCellBlockEntity extends BaseMachineBlockEntity
                 return exported;
             }
 
-            IEnergyStorage target = level.getCapability(
-                    Capabilities.EnergyStorage.BLOCK,
-                    pos.relative(direction),
-                    direction.getOpposite()
-            );
+            IEnergyStorage target = exportTargets.get(level, pos, direction);
             if (target == null || !target.canReceive()) {
                 continue;
             }
@@ -850,11 +861,11 @@ public class CorrosionCellBlockEntity extends BaseMachineBlockEntity
     }
 
     private int energyStored() {
-        return internalEnergyStored(effectiveStats()) + BatteryCellItem.energyStored(batteryCellStack());
+        return internalEnergyStored(effectiveStats()) + batteryCell.energyStored();
     }
 
     private int energyCapacity(MachineStatAccumulator stats) {
-        return internalEnergyCapacity(stats) + BatteryCellItem.energyCapacity(batteryCellStack());
+        return internalEnergyCapacity(stats) + batteryCell.capacity();
     }
 
     private int internalEnergyCapacity(MachineStatAccumulator stats) {
@@ -877,8 +888,7 @@ public class CorrosionCellBlockEntity extends BaseMachineBlockEntity
     }
 
     private IEnergyStorage batteryCellEnergyStorage() {
-        ItemStack stack = batteryCellStack();
-        return stack.isEmpty() ? null : stack.getCapability(Capabilities.EnergyStorage.ITEM);
+        return batteryCell.storage();
     }
 
     private ItemStack batteryCellStack() {

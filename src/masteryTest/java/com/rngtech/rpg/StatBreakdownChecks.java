@@ -25,6 +25,7 @@ public final class StatBreakdownChecks {
         partContributionsCarryThePartLabel();
         flatCapacityFoldsIntoCapacity();
         crusherYieldSoftCapRecombines();
+        floorAndBonusScaleRecombine();
         energyUsageReductionsRecombine();
         textListsEverySource();
         return checks;
@@ -167,6 +168,35 @@ public final class StatBreakdownChecks {
         String text = StatBreakdownText.lines(breakdown).stream().map(Component::getString).collect(Collectors.joining("\n"));
         require(text.contains("rngtech.stat.breakdown.soft_cap"),
                 "the breakdown shows the soft-cap math:\n" + text);
+    }
+
+    private static void floorAndBonusScaleRecombine() {
+        MachineStatAccumulator stats = MachineStatAccumulator.recording(() -> {
+            MachineStatAccumulator recorded = MachineStatAccumulator.componentBase(Map.of(MachineStat.OUTPUT_AMOUNT, 1.0))
+                    .withCrusherYieldRules();
+            recorded.floorAbsolute(MachineStat.OUTPUT_AMOUNT, 1.0);
+            recorded.apply(Component.literal("Jaws"), new MachineModifier(ModifierSlot.IMPLICIT, MachineStat.OUTPUT_AMOUNT, ModifierOperation.INCREASED_PERCENT, 60));
+            try (MachineStatAccumulator.Source ignored = recorded.source(MachineStatAccumulator.NO_BATTERY_SOURCE)) {
+                recorded.scaleBonus(MachineStat.OUTPUT_AMOUNT, 0.75);
+            }
+            return recorded;
+        });
+        StatBreakdown breakdown = stats.breakdown(MachineStat.OUTPUT_AMOUNT).orElseThrow();
+        near(breakdown.recompute(), stats.value(MachineStat.OUTPUT_AMOUNT), "the floor and bonus scale recombine");
+        near(breakdown.recompute(), 1 + 0.75 * (60.0 / 160), "only the bonus above the floor scales");
+        String text = StatBreakdownText.lines(breakdown).stream().map(Component::getString).collect(Collectors.joining("\n"));
+        require(text.contains("rngtech.stat.breakdown.bonus_formula"), "the breakdown shows the bonus-only math:\n" + text);
+
+        MachineStatAccumulator floored = MachineStatAccumulator.recording(() -> {
+            MachineStatAccumulator recorded = MachineStatAccumulator.componentBase(Map.of(MachineStat.OUTPUT_AMOUNT, 1.0));
+            recorded.floorAbsolute(MachineStat.OUTPUT_AMOUNT, 1.0);
+            recorded.apply(Component.literal("Curse"), new MachineModifier(ModifierSlot.IMPLICIT, MachineStat.OUTPUT_AMOUNT, ModifierOperation.DECREASED_PERCENT, 30));
+            return recorded;
+        });
+        StatBreakdown flooredBreakdown = floored.breakdown(MachineStat.OUTPUT_AMOUNT).orElseThrow();
+        near(flooredBreakdown.recompute(), 1.0, "a reduced value recombines at the floor");
+        String flooredText = StatBreakdownText.lines(flooredBreakdown).stream().map(Component::getString).collect(Collectors.joining("\n"));
+        require(flooredText.contains("rngtech.stat.breakdown.floor"), "the breakdown says the floor lifted the value:\n" + flooredText);
     }
 
     private static void energyUsageReductionsRecombine() {

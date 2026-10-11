@@ -45,7 +45,6 @@ import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.energy.IEnergyStorage;
 import net.neoforged.neoforge.fluids.FluidActionResult;
 import net.neoforged.neoforge.fluids.FluidStack;
@@ -60,6 +59,7 @@ import java.util.List;
 
 public class CavitationGeneratorBlockEntity extends BaseMachineBlockEntity
         implements MenuProvider, PurgeableFluidStorage, MachineInfoProvider {
+    private final EnergyExportTargets exportTargets = new EnergyExportTargets(this);
     public static final int SLOT_FLUID_INPUT_CONTAINER = 0;
     public static final int SLOT_DAMAGED_ROTOR = 1;
     public static final int PROCESS_SLOT_COUNT = 2;
@@ -202,6 +202,7 @@ public class CavitationGeneratorBlockEntity extends BaseMachineBlockEntity
     private final EnergyTelemetry energyFlow = new EnergyTelemetry(this::getLevel);
     private final IEnergyStorage trackedEnergyStorage = energyFlow.track(energyStorage);
     private final IFluidHandler fluidHandler = new InputFluidHandler();
+    private final InstalledBatteryCell batteryCell = new InstalledBatteryCell(this::batteryCellStack);
     private final ContainerData menuData = new ContainerData() {
         @Override
         public int get(int index) {
@@ -474,7 +475,7 @@ public class CavitationGeneratorBlockEntity extends BaseMachineBlockEntity
     @Override
     protected MachineStatAccumulator buildStats() {
         MachineStatAccumulator stats = MachineBaseStatCatalog.cavitationGenerator();
-        stats.apply(MachineImplicitCatalog.effectiveTraits(machineTraits(), getBlockState().getBlock()));
+        stats.apply(effectiveTraits());
         applyPartStats(stats, rotorStack());
         applyPartStats(stats, nozzleStack());
         applyHeatCoreStats(stats, heatCoreStack());
@@ -648,7 +649,7 @@ public class CavitationGeneratorBlockEntity extends BaseMachineBlockEntity
         if (output.isEmpty()) {
             return FluidStack.EMPTY;
         }
-        int amount = Math.max(1, (int) Math.round(output.getAmount() * Math.max(0.1, stats.value(MachineStat.OUTPUT_AMOUNT))));
+        int amount = Math.max(1, (int) Math.round(output.getAmount() * Math.max(1.0, stats.value(MachineStat.OUTPUT_AMOUNT))));
         return output.copyWithAmount(amount);
     }
 
@@ -841,6 +842,11 @@ public class CavitationGeneratorBlockEntity extends BaseMachineBlockEntity
         return FluidUtil.getFluidContained(stack).isPresent();
     }
 
+    /** How many times an energy export looked a neighbour up instead of reusing its cached capability. */
+    public int exportTargetLookups() {
+        return exportTargets.lookups();
+    }
+
     private boolean exportEnergy(Level level, BlockPos pos) {
         if (energyStored() <= 0) {
             return false;
@@ -853,11 +859,7 @@ public class CavitationGeneratorBlockEntity extends BaseMachineBlockEntity
                 return exported;
             }
 
-            IEnergyStorage target = level.getCapability(
-                    Capabilities.EnergyStorage.BLOCK,
-                    pos.relative(direction),
-                    direction.getOpposite()
-            );
+            IEnergyStorage target = exportTargets.get(level, pos, direction);
             if (target == null || !target.canReceive()) {
                 continue;
             }
@@ -920,11 +922,11 @@ public class CavitationGeneratorBlockEntity extends BaseMachineBlockEntity
     }
 
     private int energyStored() {
-        return internalEnergyStored() + BatteryCellItem.energyStored(batteryCellStack());
+        return internalEnergyStored() + batteryCell.energyStored();
     }
 
     private int energyCapacity() {
-        return internalEnergyCapacity() + BatteryCellItem.energyCapacity(batteryCellStack());
+        return internalEnergyCapacity() + batteryCell.capacity();
     }
 
     private int internalEnergyCapacity() {
@@ -940,8 +942,7 @@ public class CavitationGeneratorBlockEntity extends BaseMachineBlockEntity
     }
 
     private IEnergyStorage batteryCellEnergyStorage() {
-        ItemStack cell = batteryCellStack();
-        return cell.isEmpty() ? null : cell.getCapability(Capabilities.EnergyStorage.ITEM);
+        return batteryCell.storage();
     }
 
     private void clampInternalEnergy() {

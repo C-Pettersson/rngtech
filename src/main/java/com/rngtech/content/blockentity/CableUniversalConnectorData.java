@@ -849,7 +849,7 @@ public final class CableUniversalConnectorData implements UniversalConnectorAcce
                 changed = true;
                 continue;
             }
-            if (module.stall.active() && module.stall.waiting(CableBlockEntity.networkEpoch(level))) {
+            if (module.stall.active() && module.stall.waiting(CableBlockEntity.networkVersion(level, owner.getBlockPos()))) {
                 continue;
             }
 
@@ -868,7 +868,7 @@ public final class CableUniversalConnectorData implements UniversalConnectorAcce
                 module.cooldownTicks = tier.get().waitTicks();
                 changed = true;
             } else {
-                module.stall.start(CableBlockEntity.networkEpoch(level), tier.get().waitTicks());
+                module.stall.start(CableBlockEntity.networkVersion(level, owner.getBlockPos()), tier.get().waitTicks());
                 CableStats.increment(CableStats.Counter.MODULE_BACKOFFS);
             }
         }
@@ -949,7 +949,7 @@ public final class CableUniversalConnectorData implements UniversalConnectorAcce
                 changed = true;
                 continue;
             }
-            if (module.stall.active() && module.stall.waiting(CableBlockEntity.networkEpoch(level))) {
+            if (module.stall.active() && module.stall.waiting(CableBlockEntity.networkVersion(level, owner.getBlockPos()))) {
                 continue;
             }
 
@@ -968,7 +968,7 @@ public final class CableUniversalConnectorData implements UniversalConnectorAcce
                 module.cooldownTicks = tier.get().waitTicks();
                 changed = true;
             } else {
-                module.stall.start(CableBlockEntity.networkEpoch(level), tier.get().waitTicks());
+                module.stall.start(CableBlockEntity.networkVersion(level, owner.getBlockPos()), tier.get().waitTicks());
                 CableStats.increment(CableStats.Counter.MODULE_BACKOFFS);
             }
         }

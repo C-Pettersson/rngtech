@@ -32,7 +32,9 @@ public record StatBreakdown(MachineStat stat, List<Term> terms, double finalValu
         MORE,
         FIXED,
         CEILING,
-        SOFT_CAP;
+        SOFT_CAP,
+        FLOOR,
+        BONUS_MORE;
 
         static final StreamCodec<ByteBuf, Kind> STREAM_CODEC =
                 ByteBufCodecs.idMapper(index -> values()[index], Kind::ordinal);
@@ -79,6 +81,25 @@ public record StatBreakdown(MachineStat stat, List<Term> terms, double finalValu
         return (base() + added()) * increasedScale() * more();
     }
 
+    /** The floor that wins, which is the highest one, or null when the stat has none. */
+    public Double floor() {
+        return terms(Kind.FLOOR).stream().map(Term::value).max(Double::compare).orElse(null);
+    }
+
+    /** The product of the factors that scale only the part above the floor. */
+    public double bonusMore() {
+        double more = 1.0;
+        for (Term term : terms(Kind.BONUS_MORE)) {
+            more *= term.value();
+        }
+        return more;
+    }
+
+    /** The ordinary result after the floor and the bonus factors, before any fixed value or ceiling. */
+    public double floored() {
+        return MachineStatAccumulator.floored(ordinary(), floor(), bonusMore());
+    }
+
     /** What the increased bucket multiplies by, after any soft cap or dividing reductions. */
     public double increasedScale() {
         if (dividesReductions()) {
@@ -122,7 +143,7 @@ public record StatBreakdown(MachineStat stat, List<Term> terms, double finalValu
     public double recompute() {
         Term fixed = lowest(Kind.FIXED);
         Term ceiling = lowest(Kind.CEILING);
-        double value = fixed == null ? ordinary() : fixed.value();
+        double value = fixed == null ? floored() : fixed.value();
         return ceiling == null ? value : Math.min(value, ceiling.value());
     }
 

@@ -20,16 +20,12 @@ import com.rngtech.content.registry.ModItems;
 import com.rngtech.rpg.BatchProcessing;
 import com.rngtech.rpg.ComponentBaseStatCatalog;
 import com.rngtech.rpg.MachineBaseStatCatalog;
-import com.rngtech.rpg.MachineImplicitCatalog;
-import com.rngtech.rpg.MachineModifier;
 import com.rngtech.rpg.MachineNameGenerator;
 import com.rngtech.rpg.MachinePartType;
 import com.rngtech.rpg.MachineStat;
 import com.rngtech.rpg.MachineStatAccumulator;
 import com.rngtech.rpg.MachineTraits;
 import com.rngtech.rpg.MachineType;
-import com.rngtech.rpg.ModifierOperation;
-import com.rngtech.rpg.ModifierSlot;
 import com.rngtech.rpg.OutputAmountTracker;
 import com.rngtech.rpg.progression.AscendancyFormulas;
 import com.rngtech.rpg.progression.CrusherPassiveTree;
@@ -57,7 +53,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.energy.IEnergyStorage;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.ItemStackHandler;
@@ -156,6 +151,9 @@ public class CrusherBlockEntity extends BaseMachineBlockEntity implements MenuPr
     private final IEnergyStorage energy = new CrusherEnergyStorage();
     private final IItemHandler filteredInputHandler = new CrusherInputItemHandler();
 
+    private final InstalledBatteryCell batteryCell = new InstalledBatteryCell(this::batteryCellStack);
+    private MachineProgressionState blockedSlotProgression;
+    private boolean blockedSlot;
     private final ContainerData menuData = new ContainerData() {
         @Override
         public int get(int index) {
@@ -681,10 +679,15 @@ public class CrusherBlockEntity extends BaseMachineBlockEntity implements MenuPr
         return cachedStats(bulkSpeed.count());
     }
 
+    /** How many times this machine built its Battery Cell's stats, for checks that a steady machine builds none. */
+    public int cellStatsBuilds() {
+        return batteryCell.builds();
+    }
+
     @Override
     protected MachineStatAccumulator buildStats() {
         MachineStatAccumulator stats = MachineBaseStatCatalog.crusher(chassisMaterial());
-        MachineTraits activeTraits = MachineImplicitCatalog.effectiveTraits(machineTraits(), getBlockState().getBlock());
+        MachineTraits activeTraits = effectiveTraits();
         stats.apply(activeTraits);
 
         CrusherPassiveTree.applyStats(stats, machineProgression());
@@ -693,12 +696,9 @@ public class CrusherBlockEntity extends BaseMachineBlockEntity implements MenuPr
             ComponentBaseStatCatalog.applyEffectiveContribution(stats, crushHead);
         }
         if (!hasBatteryCell()) {
-            stats.apply(MachineStatAccumulator.NO_BATTERY_SOURCE, new MachineModifier(
-                    ModifierSlot.IMPLICIT,
-                    MachineStat.OUTPUT_AMOUNT,
-                    ModifierOperation.LESS,
-                    noBatteryOutputMultiplier(stats)
-            ));
+            try (MachineStatAccumulator.Source ignored = stats.source(MachineStatAccumulator.NO_BATTERY_SOURCE)) {
+                stats.scaleBonus(MachineStat.OUTPUT_AMOUNT, noBatteryOutputMultiplier(stats));
+            }
         }
         bulkSpeed.apply(stats, activeTraits);
         return stats;
@@ -711,7 +711,7 @@ public class CrusherBlockEntity extends BaseMachineBlockEntity implements MenuPr
     }
 
     private MachineTraits activeTraits() {
-        return MachineImplicitCatalog.effectiveTraits(machineTraits(), getBlockState().getBlock());
+        return effectiveTraits();
     }
 
     private int currentProcessingTicks(MachineStatAccumulator stats) {
@@ -1073,11 +1073,11 @@ public class CrusherBlockEntity extends BaseMachineBlockEntity implements MenuPr
     }
 
     private int energyStored() {
-        return internalEnergyStored() + BatteryCellItem.energyStored(batteryCellStack());
+        return internalEnergyStored() + batteryCell.energyStored();
     }
 
     private int energyCapacity() {
-        return internalEnergyCapacity() + BatteryCellItem.energyCapacity(batteryCellStack());
+        return internalEnergyCapacity() + batteryCell.capacity();
     }
 
     private int internalEnergyCapacity() {
@@ -1244,8 +1244,7 @@ public class CrusherBlockEntity extends BaseMachineBlockEntity implements MenuPr
     }
 
     private IEnergyStorage batteryCellEnergyStorage() {
-        ItemStack cell = batteryCellStack();
-        return cell.isEmpty() ? null : cell.getCapability(Capabilities.EnergyStorage.ITEM);
+        return batteryCell.storage();
     }
 
     public static boolean isGearComponent(ItemStack stack) {
@@ -1274,8 +1273,14 @@ public class CrusherBlockEntity extends BaseMachineBlockEntity implements MenuPr
         return !batteryCellSlotBlocked() && isBatteryCell(stack);
     }
 
+    /** Every cell read asks this, so it is kept until the stored Mastery progression changes. */
     private boolean batteryCellSlotBlocked() {
-        return CrusherPassiveTree.blocksBatteryCell(machineProgression());
+        MachineProgressionState stored = super.machineProgression();
+        if (stored != blockedSlotProgression) {
+            blockedSlotProgression = stored;
+            blockedSlot = CrusherPassiveTree.blocksBatteryCell(machineProgression());
+        }
+        return blockedSlot;
     }
 
     private boolean matchingStageCrushHeadRequired() {

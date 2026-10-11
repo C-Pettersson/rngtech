@@ -15,7 +15,6 @@ import com.rngtech.content.registry.ModBlockEntities;
 import com.rngtech.content.registry.ModTags;
 import com.rngtech.rpg.ComponentBaseStatCatalog;
 import com.rngtech.rpg.MachineBaseStatCatalog;
-import com.rngtech.rpg.MachineImplicitCatalog;
 import com.rngtech.rpg.MachineNameGenerator;
 import com.rngtech.rpg.MachinePartType;
 import com.rngtech.rpg.MachineStat;
@@ -40,7 +39,6 @@ import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.energy.IEnergyStorage;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.ItemStackHandler;
@@ -48,6 +46,11 @@ import net.neoforged.neoforge.items.ItemStackHandler;
 import java.util.List;
 
 public class ComponentRecyclerBlockEntity extends BaseMachineBlockEntity implements MenuProvider, MachineInfoProvider {
+    private static final int RECIPE_INPUT = 0;
+    private static final int RECIPE_CANDIDATE = 1;
+    private static final RecipeCache.Search<ComponentRecyclingRecipe> RECIPE_SEARCH =
+            (level, input, unused) -> ComponentRecyclingRecipes.find(level, input);
+    private final RecipeCache<ComponentRecyclingRecipe> recipes = new RecipeCache<>(2);
     public static final int SLOT_INPUT = 0;
     public static final int SLOT_OUTPUT_PRIMARY = 1;
     public static final int SLOT_OUTPUT_SECONDARY = 2;
@@ -103,10 +106,6 @@ public class ComponentRecyclerBlockEntity extends BaseMachineBlockEntity impleme
 
         @Override
         protected void onContentsChanged(int slot) {
-            if (slot == SLOT_INPUT) {
-                resetCycle();
-                resetBulkSpeed();
-            }
             setChanged();
         }
     };
@@ -152,6 +151,7 @@ public class ComponentRecyclerBlockEntity extends BaseMachineBlockEntity impleme
     private final IEnergyStorage energyStorage = new RecyclerEnergyStorage();
     private final EnergyTelemetry energyFlow = new EnergyTelemetry(this::getLevel);
     private final IEnergyStorage trackedEnergyStorage = energyFlow.track(energyStorage);
+    private final InstalledBatteryCell batteryCell = new InstalledBatteryCell(this::batteryCellStack);
     private final ContainerData menuData = new ContainerData() {
         @Override
         public int get(int index) {
@@ -188,6 +188,7 @@ public class ComponentRecyclerBlockEntity extends BaseMachineBlockEntity impleme
 
     private final BulkSpeedState bulkSpeed = new BulkSpeedState();
     private int progress;
+    private ItemStack activeInput = ItemStack.EMPTY;
     private int internalEnergy;
     private long nextManualCrankTick;
     private long lastManualCrankTick = Long.MIN_VALUE;
@@ -213,6 +214,7 @@ public class ComponentRecyclerBlockEntity extends BaseMachineBlockEntity impleme
             recycler.serverTickManual(level, pos, state);
             return;
         }
+        recycler.restartIfInputSwapped();
         MachineStatAccumulator stats = recycler.effectiveStats();
         ComponentRecyclingRecipe recipe = recycler.nextRecipe();
         if (recipe == null || !recycler.hasRequiredGear() || !recycler.canProcessStage(recipe, stats)) {
@@ -227,6 +229,9 @@ public class ComponentRecyclerBlockEntity extends BaseMachineBlockEntity impleme
             return;
         }
 
+        if (recycler.progress == 0) {
+            recycler.startCraft(recipe);
+        }
         int energyCost = recycler.energyCostPerTick(recipe, stats);
         if (recycler.progress == 0 && ProcessingChance.rollInstant(level, stats)) {
             int fullEnergyCost = recycler.energyCostPerCraft(recipe, stats);
@@ -258,6 +263,7 @@ public class ComponentRecyclerBlockEntity extends BaseMachineBlockEntity impleme
     }
 
     private void serverTickManual(Level level, BlockPos pos, BlockState state) {
+        restartIfInputSwapped();
         MachineStatAccumulator stats = effectiveStats();
         ComponentRecyclingRecipe recipe = nextRecipe();
         if (recipe == null || !hasHandCrank() || !canProcessStage(recipe, stats)) {
@@ -300,6 +306,7 @@ public class ComponentRecyclerBlockEntity extends BaseMachineBlockEntity impleme
             return false;
         }
 
+        restartIfInputSwapped();
         MachineStatAccumulator stats = effectiveStats();
         ComponentRecyclingRecipe recipe = nextRecipe();
         if (!canManualCrank(recipe, stats)) {
@@ -310,6 +317,9 @@ public class ComponentRecyclerBlockEntity extends BaseMachineBlockEntity impleme
 
         nextManualCrankTick = gameTime + MANUAL_CRANK_INTERVAL_TICKS;
         lastManualCrankTick = gameTime;
+        if (progress == 0) {
+            startCraft(recipe);
+        }
         int processingTicks = manualProcessingTicks(recipe);
         progress = Math.min(processingTicks, progress + MANUAL_CRANK_INTERVAL_TICKS);
         playManualGrindSound(crankPos);
@@ -433,9 +443,8 @@ public class ComponentRecyclerBlockEntity extends BaseMachineBlockEntity impleme
         if (level == null) {
             return !isManual() || isManualInput(stack);
         }
-        return ComponentRecyclingRecipes.find(level, stack)
-                .filter(recipe -> !isManual() || isManualRecipeInput(stack, recipe))
-                .isPresent();
+        ComponentRecyclingRecipe recipe = recipes.find(RECIPE_CANDIDATE, level, stack, RECIPE_SEARCH);
+        return recipe != null && (!isManual() || isManualRecipeInput(stack, recipe));
     }
 
     public static boolean isBatteryCell(ItemStack stack) {
@@ -464,7 +473,7 @@ public class ComponentRecyclerBlockEntity extends BaseMachineBlockEntity impleme
     protected MachineStatAccumulator buildStats() {
         ComponentRecyclerChassis chassis = chassis();
         MachineStatAccumulator stats = MachineBaseStatCatalog.componentRecycler(chassis);
-        stats.apply(MachineImplicitCatalog.effectiveTraits(machineTraits(), getBlockState().getBlock()));
+        stats.apply(effectiveTraits());
         if (!chassis.manual()) {
             applyGearStats(stats, headStack());
             applyGearStats(stats, filterStack());
@@ -474,7 +483,7 @@ public class ComponentRecyclerBlockEntity extends BaseMachineBlockEntity impleme
     }
 
     private MachineTraits activeTraits() {
-        return MachineImplicitCatalog.effectiveTraits(machineTraits(), getBlockState().getBlock());
+        return effectiveTraits();
     }
 
     @Override
@@ -483,6 +492,7 @@ public class ComponentRecyclerBlockEntity extends BaseMachineBlockEntity impleme
         tag.put("ProcessInventory", processInventory.serializeNBT(registries));
         tag.put("GearInventory", gearInventory.serializeNBT(registries));
         tag.putInt("Progress", progress);
+        tag.put("ActiveInput", activeInput.saveOptional(registries));
         tag.putInt("Energy", internalEnergyStored());
         bulkSpeed.save(tag);
     }
@@ -493,6 +503,7 @@ public class ComponentRecyclerBlockEntity extends BaseMachineBlockEntity impleme
         processInventory.deserializeNBT(registries, tag.getCompound("ProcessInventory"));
         gearInventory.deserializeNBT(registries, tag.getCompound("GearInventory"));
         progress = tag.getInt("Progress");
+        activeInput = ItemStack.parseOptional(registries, tag.getCompound("ActiveInput"));
         internalEnergy = Math.max(0, tag.getInt("Energy"));
         bulkSpeed.load(tag);
         clampInternalEnergy();
@@ -505,11 +516,13 @@ public class ComponentRecyclerBlockEntity extends BaseMachineBlockEntity impleme
     }
 
     private ComponentRecyclingRecipe nextRecipe() {
-        return level == null
-                ? null
-                : ComponentRecyclingRecipes.find(level, processInventory.getStackInSlot(SLOT_INPUT))
-                        .filter(recipe -> !isManual() || isManualRecipeInput(inputStack(), recipe))
-                        .orElse(null);
+        ComponentRecyclingRecipe recipe = level == null ? null : recipes.find(RECIPE_INPUT, level, inputStack(), RECIPE_SEARCH);
+        return recipe == null || isManual() && !isManualRecipeInput(inputStack(), recipe) ? null : recipe;
+    }
+
+    /** How many recipe lookups searched the recipes instead of reusing a remembered result. */
+    public int recipeSearches() {
+        return recipes.searches();
     }
 
     private boolean process(ComponentRecyclingRecipe recipe) {
@@ -759,7 +772,7 @@ public class ComponentRecyclerBlockEntity extends BaseMachineBlockEntity impleme
 
     private void resetCycleIfActive() {
         boolean changed = false;
-        if (progress != 0) {
+        if (progress != 0 || !activeInput.isEmpty()) {
             resetCycle();
             changed = true;
         }
@@ -771,6 +784,35 @@ public class ComponentRecyclerBlockEntity extends BaseMachineBlockEntity impleme
 
     private void resetCycle() {
         progress = 0;
+        activeInput = ItemStack.EMPTY;
+    }
+
+    /** Snapshots the input a craft starts with, so a swap restarts it while a top-up keeps it. */
+    private void startCraft(ComponentRecyclingRecipe recipe) {
+        activeInput = inputStack().copyWithCount(1);
+        if (bulkSpeed.startRecipe(recipe)) {
+            setChanged();
+        }
+    }
+
+    private void restartIfInputSwapped() {
+        if (!activeCraftMatches()) {
+            resetCycle();
+            resetBulkSpeed();
+            setChanged();
+        }
+    }
+
+    /** A craft saved before snapshots existed adopts the current input. */
+    private boolean activeCraftMatches() {
+        if (progress <= 0) {
+            return true;
+        }
+        if (activeInput.isEmpty()) {
+            activeInput = inputStack().copyWithCount(1);
+            return true;
+        }
+        return ItemStack.isSameItemSameComponents(activeInput, inputStack());
     }
 
     private void resetBulkSpeed() {
@@ -790,11 +832,11 @@ public class ComponentRecyclerBlockEntity extends BaseMachineBlockEntity impleme
     }
 
     private int energyStored() {
-        return internalEnergyStored() + BatteryCellItem.energyStored(batteryCellStack());
+        return internalEnergyStored() + batteryCell.energyStored();
     }
 
     private int energyCapacity() {
-        return internalEnergyCapacity() + BatteryCellItem.energyCapacity(batteryCellStack());
+        return internalEnergyCapacity() + batteryCell.capacity();
     }
 
     private int internalEnergyCapacity() {
@@ -847,8 +889,7 @@ public class ComponentRecyclerBlockEntity extends BaseMachineBlockEntity impleme
     }
 
     private IEnergyStorage batteryCellEnergyStorage() {
-        ItemStack cell = batteryCellStack();
-        return cell.isEmpty() ? null : cell.getCapability(Capabilities.EnergyStorage.ITEM);
+        return batteryCell.storage();
     }
 
     private void clampInternalEnergy() {

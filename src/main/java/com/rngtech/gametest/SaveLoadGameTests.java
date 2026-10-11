@@ -22,14 +22,15 @@ import com.mojang.logging.LogUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.gametest.framework.GameTest;
+import net.minecraft.gametest.framework.GameTestGenerator;
 import net.minecraft.gametest.framework.GameTestHelper;
+import net.minecraft.gametest.framework.TestFunction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Rotation;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.neoforged.neoforge.capabilities.BlockCapability;
 import net.neoforged.neoforge.capabilities.Capabilities;
@@ -43,13 +44,11 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.TreeSet;
 import java.util.function.Consumer;
 
 /**
@@ -66,10 +65,12 @@ public final class SaveLoadGameTests {
     private static final Logger LOGGER = LogUtils.getLogger();
     private static final int VARIANTS = 3;
     private static final int STOCK_COUNT = 16;
-    private static final int RUN_BEFORE_SAVE = 200;
+    /** Off a round number, so a craft whose length divides it is mid-way rather than just finished when saved. */
+    private static final int RUN_BEFORE_SAVE = 205;
     private static final int RUN_AFTER_LOAD = 80;
-    private static final int SPACING = 4;
-    private static final int ROW_LENGTH = 12;
+    /** Originals stand at z 0 and their copies at z 4, the far edge of the 5x5x5 template. */
+    private static final int COPY_OFFSET = 4;
+    private static final String BATCH = "defaultBatch";
     private static final Set<String> POSITION_KEYS = Set.of("x", "y", "z");
     private static final MachineTraits TRAITS = new MachineTraits(Rarity.RARE, 2, List.of(
             new MachineModifier(ModifierSlot.PREFIX, MachineStat.PROCESSING_SPEED, ModifierOperation.INCREASED_PERCENT, 40),
@@ -97,30 +98,49 @@ public final class SaveLoadGameTests {
     private SaveLoadGameTests() {
     }
 
-    /** Every Machine Block, in several stockings, saved mid-run and loaded into a twin, ticks on to the same state. */
-    @GameTest(template = MachineTestSupport.EMPTY, timeoutTicks = RUN_BEFORE_SAVE + RUN_AFTER_LOAD + 40)
-    public static void everyMachineSurvivesSaveAndLoad(GameTestHelper helper) {
-        List<Block> blocks = machineBlocks();
+    /**
+     * One test per Machine Block, so each runs inside its own template: every Machine Block, in several stockings, saved
+     * mid-run and loaded into a twin, ticks on to the same state.
+     */
+    @GameTestGenerator
+    public static List<TestFunction> everyMachineSurvivesSaveAndLoad() {
+        List<TestFunction> tests = new ArrayList<>();
+        for (Block block : machineBlocks()) {
+            tests.add(new TestFunction(
+                    BATCH,
+                    "saveloadgametests.survivessaveandload_" + BuiltInRegistries.BLOCK.getKey(block).getPath(),
+                    RNGTech.MOD_ID + ":" + MachineTestSupport.EMPTY,
+                    Rotation.NONE,
+                    RUN_BEFORE_SAVE + RUN_AFTER_LOAD + 40,
+                    0L,
+                    true,
+                    helper -> survivesSaveAndLoad(helper, block)
+            ));
+        }
+        return tests;
+    }
+
+    /** Originals stand on the template's near row and their copies on the far row, a free block between any two machines. */
+    private static void survivesSaveAndLoad(GameTestHelper helper, Block block) {
+        String name = BuiltInRegistries.BLOCK.getKey(block).getPath();
         List<Pair> pairs = new ArrayList<>();
-        forceLoad(helper, blocks.size() * VARIANTS);
-        int index = 0;
-        for (Block block : blocks) {
-            for (int variant = 0; variant < VARIANTS; variant++) {
-                BlockPos original = new BlockPos((index % ROW_LENGTH) * SPACING, 1, (index / ROW_LENGTH) * SPACING * 2);
-                pairs.add(new Pair(block, variant, original, original.offset(0, 0, SPACING)));
-                index++;
-            }
+        for (int variant = 0; variant < VARIANTS; variant++) {
+            BlockPos original = new BlockPos(variant * 2, 1, 0);
+            pairs.add(new Pair(block, variant, original, original.offset(0, 0, COPY_OFFSET)));
         }
 
-        Map<Block, List<List<ItemStack>>> accepted = new HashMap<>();
+        List<List<ItemStack>> accepted = null;
         for (Pair pair : pairs) {
             helper.setBlock(pair.original(), pair.block());
             BlockEntity machine = helper.getBlockEntity(pair.original());
             if (machine instanceof BaseMachineBlockEntity base) {
                 base.setMachineTraits(TRAITS);
             }
-            stock(machine, pair.variant(), accepted.computeIfAbsent(pair.block(), ignored -> acceptedItems(machine)));
-            Consumer<BlockEntity> scenario = SCENARIOS.get(BuiltInRegistries.BLOCK.getKey(pair.block()).getPath());
+            if (accepted == null) {
+                accepted = acceptedItems(machine);
+            }
+            stock(machine, pair.variant(), accepted);
+            Consumer<BlockEntity> scenario = SCENARIOS.get(name);
             if (scenario != null && pair.variant() == 0) {
                 scenario.accept(machine);
             }
@@ -146,33 +166,21 @@ public final class SaveLoadGameTests {
         });
         helper.runAfterDelay(RUN_BEFORE_SAVE + RUN_AFTER_LOAD, () -> {
             List<String> failures = new ArrayList<>();
-            Set<String> crafting = new TreeSet<>();
+            List<Integer> crafting = new ArrayList<>();
             for (Pair pair : pairs) {
-                String name = BuiltInRegistries.BLOCK.getKey(pair.block()).getPath();
                 if (pair.crafting) {
-                    crafting.add(name);
+                    crafting.add(pair.variant());
                 }
                 String difference = difference(helper, pair);
                 if (difference != null) {
                     failures.add(name + " variant " + pair.variant() + ": " + difference);
                 }
             }
-            LOGGER.info("Save and load: {} of {} machine blocks were mid-craft when saved: {}", crafting.size(), blocks.size(), crafting);
+            LOGGER.info("Save and load: {} variants mid-craft when saved: {}", name, crafting);
             check(failures.isEmpty(), failures.size() + " of " + pairs.size() + " machines differ after a save and load:\n"
                     + String.join("\n", failures));
             helper.succeed();
         });
-    }
-
-    /** Block entities only tick in loaded chunks that are being simulated, and the layout reaches beyond the test's own chunk. */
-    private static void forceLoad(GameTestHelper helper, int machines) {
-        ChunkPos from = new ChunkPos(helper.absolutePos(BlockPos.ZERO));
-        ChunkPos to = new ChunkPos(helper.absolutePos(new BlockPos(ROW_LENGTH * SPACING, 0, (machines / ROW_LENGTH + 1) * SPACING * 2)));
-        for (int x = from.x; x <= to.x; x++) {
-            for (int z = from.z; z <= to.z; z++) {
-                helper.getLevel().setChunkForced(x, z, true);
-            }
-        }
     }
 
     private static List<Block> machineBlocks() {

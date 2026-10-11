@@ -55,7 +55,6 @@ import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.item.crafting.SingleRecipeInput;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.energy.IEnergyStorage;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.ItemStackHandler;
@@ -186,6 +185,7 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
     private final IItemHandler bottomItemHandler = new FurnaceSidedItemHandler(SLOT_OUTPUT_START, false, true, true);
     private final IEnergyStorage energy = new FurnaceEnergyStorage();
 
+    private final InstalledBatteryCell batteryCell = new InstalledBatteryCell(this::batteryCellStack);
     private final ContainerData menuData = new ContainerData() {
         @Override
         public int get(int index) {
@@ -642,7 +642,7 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
     @Override
     protected MachineStatAccumulator buildStats() {
         MachineStatAccumulator stats = MachineBaseStatCatalog.furnace(furnaceMaterial());
-        MachineTraits activeTraits = MachineImplicitCatalog.effectiveTraits(machineTraits(), getBlockState().getBlock());
+        MachineTraits activeTraits = effectiveTraits();
         stats.apply(activeTraits);
         FurnacePassiveTree.applyStats(stats, machineProgression());
         if (isElectric() && !hasBatteryCell()) {
@@ -691,7 +691,7 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
     }
 
     private MachineTraits activeTraits() {
-        return MachineImplicitCatalog.effectiveTraits(machineTraits(), getBlockState().getBlock());
+        return effectiveTraits();
     }
 
     private int activeProcessingSlots(MachineStatAccumulator stats) {
@@ -1317,7 +1317,7 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
     }
 
     private boolean alloyBlendActive(int lane) {
-        if (!MachineImplicitCatalog.effectiveTraits(machineTraits(), getBlockState().getBlock())
+        if (!effectiveTraits()
                 .hasBehavior(MachineBehavior.ALLOY_BLEND)) {
             return false;
         }
@@ -1325,11 +1325,11 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
     }
 
     private int energyStored() {
-        return internalEnergyStored() + BatteryCellItem.energyStored(batteryCellStack());
+        return internalEnergyStored() + batteryCell.energyStored();
     }
 
     private int energyCapacity() {
-        return internalEnergyCapacity() + BatteryCellItem.energyCapacity(batteryCellStack());
+        return internalEnergyCapacity() + batteryCell.capacity();
     }
 
     private int internalEnergyCapacity() {
@@ -1679,8 +1679,7 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
     }
 
     private IEnergyStorage batteryCellEnergyStorage() {
-        ItemStack cell = batteryCellStack();
-        return cell.isEmpty() ? null : cell.getCapability(Capabilities.EnergyStorage.ITEM);
+        return batteryCell.storage();
     }
 
     private FurnaceChassisMaterial furnaceMaterial() {

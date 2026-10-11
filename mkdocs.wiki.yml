@@ -53,6 +53,7 @@ nav:
       - Gear: gear.md
       - Battery Cells: battery-cells.md
       - Uniques: uniques.md
+      - Modpack Creators: modpack-creators.md
   - Processing:
       - Alloy Furnace: alloy-furnace.md
       - Component Assembler: component-assembler.md

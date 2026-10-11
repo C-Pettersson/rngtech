@@ -19,10 +19,6 @@ final class DesiccantAbsorptionRecipes {
                 .getRecipeFor(ModRecipes.DESICCANT_ABSORPTION_TYPE.get(), new DesiccantAbsorptionRecipeInput(dryInput), level);
     }
 
-    static boolean hasRecipe(Level level, ItemStack dryInput) {
-        return find(level, dryInput).isPresent();
-    }
-
     private DesiccantAbsorptionRecipes() {
     }
 }

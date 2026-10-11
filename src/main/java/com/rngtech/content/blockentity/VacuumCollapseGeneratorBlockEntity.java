@@ -12,7 +12,6 @@ import com.rngtech.content.recipe.VacuumCollapseRecipe;
 import com.rngtech.content.registry.ModBlockEntities;
 import com.rngtech.rpg.ComponentBaseStatCatalog;
 import com.rngtech.rpg.MachineBaseStatCatalog;
-import com.rngtech.rpg.MachineImplicitCatalog;
 import com.rngtech.rpg.MachineNameGenerator;
 import com.rngtech.rpg.MachinePartType;
 import com.rngtech.rpg.MachineStat;
@@ -41,6 +40,12 @@ import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.ItemStackHandler;
 
 public class VacuumCollapseGeneratorBlockEntity extends BaseMachineBlockEntity implements MenuProvider, MachineInfoProvider {
+    private final EnergyExportTargets exportTargets = new EnergyExportTargets(this);
+    private static final int RECIPE_INPUT = 0;
+    private static final int RECIPE_CANDIDATE = 1;
+    private static final RecipeCache.Search<VacuumCollapseRecipe> RECIPE_SEARCH =
+            (level, input, unused) -> VacuumCollapseRecipes.find(level, input);
+    private final RecipeCache<VacuumCollapseRecipe> recipes = new RecipeCache<>(2);
     public static final int SLOT_INPUT = 0;
     public static final int SLOT_RESIDUE = 1;
     public static final int PROCESS_SLOT_COUNT = 2;
@@ -332,7 +337,7 @@ public class VacuumCollapseGeneratorBlockEntity extends BaseMachineBlockEntity i
     }
 
     public boolean isKnownCatalyst(ItemStack stack) {
-        return level != null && VacuumCollapseRecipes.find(level, stack).isPresent();
+        return level != null && recipes.find(RECIPE_CANDIDATE, level, stack, RECIPE_SEARCH) != null;
     }
 
     public boolean isVoidChamber(ItemStack stack) {
@@ -355,7 +360,7 @@ public class VacuumCollapseGeneratorBlockEntity extends BaseMachineBlockEntity i
     @Override
     protected MachineStatAccumulator buildStats() {
         MachineStatAccumulator stats = MachineBaseStatCatalog.vacuumCollapseGenerator();
-        stats.apply(MachineImplicitCatalog.effectiveTraits(machineTraits(), getBlockState().getBlock()));
+        stats.apply(effectiveTraits());
         applyPartStats(stats, chamberStack());
         applyPartStats(stats, nozzleStack());
         applyPartStats(stats, stabilizerStack());
@@ -485,7 +490,12 @@ public class VacuumCollapseGeneratorBlockEntity extends BaseMachineBlockEntity i
     }
 
     private VacuumCollapseRecipe nextRecipe() {
-        return level == null ? null : VacuumCollapseRecipes.find(level, processInventory.getStackInSlot(SLOT_INPUT)).orElse(null);
+        return level == null ? null : recipes.find(RECIPE_INPUT, level, processInventory.getStackInSlot(SLOT_INPUT), RECIPE_SEARCH);
+    }
+
+    /** How many recipe lookups searched the recipes instead of reusing a remembered result. */
+    public int recipeSearches() {
+        return recipes.searches();
     }
 
     private boolean canProcessRecipe(VacuumCollapseRecipe recipe, MachineStatAccumulator stats) {
@@ -530,6 +540,11 @@ public class VacuumCollapseGeneratorBlockEntity extends BaseMachineBlockEntity i
         return Math.max(0.0, recipe.instability() / stability) + nozzleStagePenalty(recipe);
     }
 
+    /** How many times an energy export looked a neighbour up instead of reusing its cached capability. */
+    public int exportTargetLookups() {
+        return exportTargets.lookups();
+    }
+
     private boolean exportEnergy(Level level, BlockPos pos) {
         if (energyStored <= 0L) {
             return false;
@@ -542,11 +557,7 @@ public class VacuumCollapseGeneratorBlockEntity extends BaseMachineBlockEntity i
                 return exported;
             }
 
-            IEnergyStorage target = level.getCapability(
-                    net.neoforged.neoforge.capabilities.Capabilities.EnergyStorage.BLOCK,
-                    pos.relative(direction),
-                    direction.getOpposite()
-            );
+            IEnergyStorage target = exportTargets.get(level, pos, direction);
             if (target == null || !target.canReceive()) {
                 continue;
             }

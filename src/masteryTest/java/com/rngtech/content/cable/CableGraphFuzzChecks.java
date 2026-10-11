@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Randomised checks for cable connectivity. A model world places, breaks, dyes, and wrenches cables and loads and
@@ -24,6 +25,11 @@ import java.util.Set;
  * cable block and block entity report: a cable placed, broken, loaded, unloaded, or changing its arms, and a dye or
  * Wrench switch on a cable. Every cached snapshot must still match the brute-force network, so a change the
  * invalidation rules miss fails here instead of leaving routing stale.</p>
+ *
+ * <p>Cables also carry connectors pointing at neighbouring blocks, standing in for AE2 or Refined Storage bridges, which
+ * only join while their target is loaded. A chunk loading reports nothing to cables outside it, so every connector
+ * whose target is loaded must be in its cached snapshot by the next tick. A target that unloaded since may linger
+ * until the snapshot rebuilds.</p>
  */
 public final class CableGraphFuzzChecks {
     private static final Direction[] DIRECTIONS = Direction.values();
@@ -83,11 +89,24 @@ public final class CableGraphFuzzChecks {
             checks++;
         }
         for (Map.Entry<BlockPos, Set<BlockPos>> entry : expected.entrySet()) {
-            Set<BlockPos> cached = world.cachedNetwork(entry.getKey(), step);
-            if (!cached.equals(entry.getValue())) {
+            Snapshot cached = world.cachedNetwork(entry.getKey(), step);
+            if (!cached.cables().equals(entry.getValue())) {
                 throw new IllegalStateException("seed " + seed + " step " + step + " after " + operation
-                        + ": cached network at " + entry.getKey() + " has " + cached.size()
+                        + ": cached network at " + entry.getKey() + " has " + cached.cables().size()
                         + " cables, brute force " + entry.getValue().size());
+            }
+            checks++;
+            Set<Target> installed = world.targets(entry.getValue());
+            for (Target target : installed) {
+                if (world.isLoaded(target.targetPos()) && !cached.joinedTargets().contains(target)) {
+                    throw new IllegalStateException("seed " + seed + " step " + step + " after " + operation
+                            + ": connector " + target + " has a loaded target but is missing from the cached network");
+                }
+                checks++;
+            }
+            if (!installed.containsAll(cached.joinedTargets())) {
+                throw new IllegalStateException("seed " + seed + " step " + step + " after " + operation
+                        + ": cached network at " + entry.getKey() + " lists a removed connector");
             }
             checks++;
         }
@@ -111,7 +130,7 @@ public final class CableGraphFuzzChecks {
     private static final class ModelWorld implements CableGraph.View {
         private final Map<BlockPos, Cable> cables = new HashMap<>();
         private final Set<Long> unloadedChunks = new HashSet<>();
-        private final NetworkIndex<Set<BlockPos>> index = new NetworkIndex<>();
+        private final NetworkIndex<Snapshot> index = new NetworkIndex<>();
         private final boolean borderEdits;
 
         private ModelWorld(boolean borderEdits) {
@@ -160,24 +179,56 @@ public final class CableGraphFuzzChecks {
                 breakCable(pos);
                 return "break " + pos;
             }
-            if (roll < 55) {
+            if (roll < 50) {
                 dye(pos, random.nextInt(COLORS + 1));
                 return "dye " + pos;
             }
             Direction direction = DIRECTIONS[random.nextInt(DIRECTIONS.length)];
+            if (roll < 70) {
+                return toggleConnector(pos, direction) ? "connector " + pos + " " + direction : "nothing (no target)";
+            }
             wrench(pos, direction);
             return "wrench " + pos + " " + direction;
         }
 
         /** The snapshot the index holds for a cable, built and stored the way the network cache does on a miss. */
-        private Set<BlockPos> cachedNetwork(BlockPos pos, long tick) {
-            Set<BlockPos> cached = index.get(pos, tick, Long.MAX_VALUE);
+        private Snapshot cachedNetwork(BlockPos pos, long tick) {
+            Snapshot cached = index.get(pos, tick, Long.MAX_VALUE, chunk -> !unloadedChunks.contains(chunk));
             if (cached == null) {
                 List<BlockPos> component = CableGraph.component(pos, this);
-                cached = new HashSet<>(component);
-                index.put(cached, component, tick);
+                Set<BlockPos> cables = new HashSet<>(component);
+                Set<Target> joined = new HashSet<>();
+                Set<Long> unloadedTargetChunks = new HashSet<>();
+                for (Target target : targets(cables)) {
+                    if (isLoaded(target.targetPos())) {
+                        joined.add(target);
+                    } else {
+                        unloadedTargetChunks.add(chunkKey(target.targetPos()));
+                    }
+                }
+                cached = new Snapshot(cables, joined);
+                index.put(cached, component, unloadedTargetChunks.stream().mapToLong(Long::longValue).toArray(), tick);
             }
             return cached;
+        }
+
+        private Set<Target> targets(Set<BlockPos> network) {
+            return network.stream()
+                    .flatMap(pos -> cables.get(pos).connectors.stream().map(direction -> new Target(pos, direction)))
+                    .collect(Collectors.toSet());
+        }
+
+        /** Installing or removing a connector reports a connector change (universalConnectorStateChanged). */
+        private boolean toggleConnector(BlockPos pos, Direction direction) {
+            if (!inBounds(pos.relative(direction))) {
+                return false;
+            }
+            Cable cable = cables.get(pos);
+            if (!cable.connectors.remove(direction)) {
+                cable.connectors.add(direction);
+            }
+            index.connectorChanged(pos);
+            return true;
         }
 
         /** The block placed (onPlace) and its block entity loaded (onLoad). */
@@ -374,9 +425,20 @@ public final class CableGraphFuzzChecks {
         }
     }
 
+    /** A cached network: its cables and the connectors whose targets were loaded when it was built. */
+    private record Snapshot(Set<BlockPos> cables, Set<Target> joinedTargets) {
+    }
+
+    private record Target(BlockPos pos, Direction side) {
+        private BlockPos targetPos() {
+            return pos.relative(side);
+        }
+    }
+
     private static final class Cable {
         private final EnumSet<Direction> arms = EnumSet.noneOf(Direction.class);
         private final EnumSet<Direction> disabled = EnumSet.noneOf(Direction.class);
+        private final EnumSet<Direction> connectors = EnumSet.noneOf(Direction.class);
         private Integer color;
 
         private Cable(Integer color) {

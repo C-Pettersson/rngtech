@@ -279,7 +279,7 @@ public class CableBlock extends Block implements EntityBlock {
                 && level instanceof Level realLevel
                 && !realLevel.isClientSide
                 && realLevel.getBlockEntity(pos) instanceof CableBlockEntity cable) {
-            cable.connectorTargetChanged();
+            cable.connectorTargetChanged(direction, neighborState.getBlock());
         }
         return updatedState;
     }

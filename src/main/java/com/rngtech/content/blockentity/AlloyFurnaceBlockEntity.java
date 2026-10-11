@@ -55,7 +55,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.energy.IEnergyStorage;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.ItemStackHandler;
@@ -67,6 +66,10 @@ import java.util.Map;
 import java.util.Optional;
 
 public class AlloyFurnaceBlockEntity extends BaseMachineBlockEntity implements MenuProvider, MachineInfoProvider, MachineMasteryHost {
+    private final RecipeCache<AlloyFurnaceRecipe> recipes = new RecipeCache<>(1);
+    private static final RecipeInputFilter<AlloyFurnaceRecipeInput, AlloyFurnaceRecipe> INPUT_FILTER = new RecipeInputFilter<>(
+            ModRecipes.ALLOY_FURNACE_TYPE::get,
+            (recipe, item) -> recipe.ingredients().stream().anyMatch(ingredient -> ingredient.test(item)));
     public static final int MAX_INPUT_SLOTS = 4;
     public static final int SLOT_INPUT_START = 0;
     public static final int SLOT_OUTPUT = SLOT_INPUT_START + MAX_INPUT_SLOTS;
@@ -184,6 +187,7 @@ public class AlloyFurnaceBlockEntity extends BaseMachineBlockEntity implements M
     private final IItemHandler inputHandler = new InputItemHandler();
     private final IItemHandler outputHandler = new OutputItemHandler();
     private final IEnergyStorage energyStorage = new AlloyFurnaceEnergyStorage();
+    private final InstalledBatteryCell batteryCell = new InstalledBatteryCell(this::batteryCellStack);
     private final ContainerData menuData = new ContainerData() {
         @Override
         public int get(int index) {
@@ -545,7 +549,7 @@ public class AlloyFurnaceBlockEntity extends BaseMachineBlockEntity implements M
     }
 
     private MachineTraits activeTraits() {
-        return MachineImplicitCatalog.effectiveTraits(machineTraits(), getBlockState().getBlock());
+        return effectiveTraits();
     }
 
     private AlloyFurnaceChassisMaterial chassis() {
@@ -555,7 +559,20 @@ public class AlloyFurnaceBlockEntity extends BaseMachineBlockEntity implements M
     }
 
     private AlloyFurnaceRecipe nextRecipe() {
-        return level == null ? null : AlloyFurnaceRecipes.find(level, inputStacks()).orElse(null);
+        if (level == null) {
+            return null;
+        }
+        ItemStack[] inputs = inputStacks();
+        RecipeCache.Lookup<AlloyFurnaceRecipe> lookup = recipes.lookup(0, level);
+        for (ItemStack input : inputs) {
+            lookup.item(input);
+        }
+        return lookup.find(() -> AlloyFurnaceRecipes.find(level, inputs));
+    }
+
+    /** How many recipe lookups searched the recipes instead of reusing a remembered result. */
+    public int recipeSearches() {
+        return recipes.searches();
     }
 
     private boolean process(AlloyFurnaceRecipe recipe, MachineStatAccumulator stats) {
@@ -742,8 +759,7 @@ public class AlloyFurnaceBlockEntity extends BaseMachineBlockEntity implements M
     }
 
     public boolean isAlloyInput(ItemStack stack) {
-        return RecipeInputFilter.anyAccepts(level, ModRecipes.ALLOY_FURNACE_TYPE.get(), stack,
-                (recipe, item) -> recipe.ingredients().stream().anyMatch(ingredient -> ingredient.test(item)));
+        return INPUT_FILTER.accepts(level, stack);
     }
 
     /**
@@ -1263,11 +1279,11 @@ public class AlloyFurnaceBlockEntity extends BaseMachineBlockEntity implements M
     }
 
     private int energyStored() {
-        return internalEnergyStored() + BatteryCellItem.energyStored(batteryCellStack());
+        return internalEnergyStored() + batteryCell.energyStored();
     }
 
     private int energyCapacity() {
-        return internalEnergyCapacity() + BatteryCellItem.energyCapacity(batteryCellStack());
+        return internalEnergyCapacity() + batteryCell.capacity();
     }
 
     private int internalEnergyCapacity() {
@@ -1356,8 +1372,7 @@ public class AlloyFurnaceBlockEntity extends BaseMachineBlockEntity implements M
     }
 
     private IEnergyStorage batteryCellEnergyStorage() {
-        ItemStack cell = batteryCellStack();
-        return cell.isEmpty() ? null : cell.getCapability(Capabilities.EnergyStorage.ITEM);
+        return batteryCell.storage();
     }
 
     private void clampInternalEnergy() {

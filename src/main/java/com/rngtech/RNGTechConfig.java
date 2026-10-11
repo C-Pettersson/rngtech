@@ -29,7 +29,7 @@ public final class RNGTechConfig {
             .defineInRange("crusher.maxEnergyInput", 500, 1, Integer.MAX_VALUE);
 
     public static final ModConfigSpec.DoubleValue CRUSHER_NO_BATTERY_CELL_OUTPUT_MULTIPLIER = BUILDER
-            .comment("Output amount multiplier applied while a crusher has no Battery Cell installed.")
+            .comment("Share of Bonus Output (Output Amount above 1x) a crusher keeps while it has no Battery Cell installed.")
             .defineInRange("crusher.noBatteryCellOutputMultiplier", 0.75D, 0.01D, 1.0D);
 
     public static final ModConfigSpec.IntValue CRUSHER_HIGH_HARDNESS_ENERGY_THRESHOLD = BUILDER
