@@ -45,7 +45,6 @@ import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.energy.IEnergyStorage;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.capability.IFluidHandler;
@@ -58,6 +57,7 @@ import java.util.List;
 
 public class GasChemistryBlockEntity extends BaseMachineBlockEntity
         implements MenuProvider, PurgeableFluidStorage, MachineInfoProvider {
+    private final EnergyExportTargets exportTargets = new EnergyExportTargets(this);
     private final RecipeCache<CoalGasificationRecipe> gasificationRecipes = new RecipeCache<>(1);
     private final RecipeCache<GasCombustionRecipe> combustionRecipes = new RecipeCache<>(1);
     private final RecipeCache<GasReformingRecipe> reformingRecipes = new RecipeCache<>(1);
@@ -837,6 +837,11 @@ public class GasChemistryBlockEntity extends BaseMachineBlockEntity
         processInventory.setStackInSlot(SLOT_PROCESS_OUTPUT, merged);
     }
 
+    /** How many times an energy export looked a neighbour up instead of reusing its cached capability. */
+    public int exportTargetLookups() {
+        return exportTargets.lookups();
+    }
+
     private boolean exportEnergy(Level level, BlockPos pos) {
         int remaining = energyStored();
         boolean moved = false;
@@ -844,7 +849,7 @@ public class GasChemistryBlockEntity extends BaseMachineBlockEntity
             if (remaining <= 0) {
                 break;
             }
-            IEnergyStorage target = level.getCapability(Capabilities.EnergyStorage.BLOCK, pos.relative(direction), direction.getOpposite());
+            IEnergyStorage target = exportTargets.get(level, pos, direction);
             if (target == null || !target.canReceive()) {
                 continue;
             }

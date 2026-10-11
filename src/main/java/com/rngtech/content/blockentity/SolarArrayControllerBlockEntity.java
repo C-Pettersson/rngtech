@@ -48,6 +48,7 @@ import java.util.List;
 import java.util.Set;
 
 public class SolarArrayControllerBlockEntity extends BaseMachineBlockEntity implements MenuProvider, MachineInfoProvider {
+    private final EnergyExportTargets exportTargets = new EnergyExportTargets(this);
     public static final int SLOT_BATTERY_CELL = 0;
     public static final int SLOT_SOLAR_ARRAY_EXTENDER = 1;
     public static final int GEAR_SLOT_COUNT = 2;
@@ -572,6 +573,11 @@ public class SolarArrayControllerBlockEntity extends BaseMachineBlockEntity impl
         return stored;
     }
 
+    /** How many times an energy export looked a neighbour up instead of reusing its cached capability. */
+    public int exportTargetLookups() {
+        return exportTargets.lookups();
+    }
+
     private boolean exportEnergy(Level level, BlockPos pos) {
         MachineStatAccumulator stats = effectiveStats();
         if (energyStored(stats) <= 0) {
@@ -584,11 +590,7 @@ public class SolarArrayControllerBlockEntity extends BaseMachineBlockEntity impl
             if (remainingOutput <= 0 || energyStored(stats) <= 0) {
                 return exported;
             }
-            IEnergyStorage target = level.getCapability(
-                    Capabilities.EnergyStorage.BLOCK,
-                    pos.relative(direction),
-                    direction.getOpposite()
-            );
+            IEnergyStorage target = exportTargets.get(level, pos, direction);
             if (target == null || !target.canReceive()) {
                 continue;
             }

@@ -40,6 +40,7 @@ import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.ItemStackHandler;
 
 public class VacuumCollapseGeneratorBlockEntity extends BaseMachineBlockEntity implements MenuProvider, MachineInfoProvider {
+    private final EnergyExportTargets exportTargets = new EnergyExportTargets(this);
     private static final int RECIPE_INPUT = 0;
     private static final int RECIPE_CANDIDATE = 1;
     private static final RecipeCache.Search<VacuumCollapseRecipe> RECIPE_SEARCH =
@@ -539,6 +540,11 @@ public class VacuumCollapseGeneratorBlockEntity extends BaseMachineBlockEntity i
         return Math.max(0.0, recipe.instability() / stability) + nozzleStagePenalty(recipe);
     }
 
+    /** How many times an energy export looked a neighbour up instead of reusing its cached capability. */
+    public int exportTargetLookups() {
+        return exportTargets.lookups();
+    }
+
     private boolean exportEnergy(Level level, BlockPos pos) {
         if (energyStored <= 0L) {
             return false;
@@ -551,11 +557,7 @@ public class VacuumCollapseGeneratorBlockEntity extends BaseMachineBlockEntity i
                 return exported;
             }
 
-            IEnergyStorage target = level.getCapability(
-                    net.neoforged.neoforge.capabilities.Capabilities.EnergyStorage.BLOCK,
-                    pos.relative(direction),
-                    direction.getOpposite()
-            );
+            IEnergyStorage target = exportTargets.get(level, pos, direction);
             if (target == null || !target.canReceive()) {
                 continue;
             }

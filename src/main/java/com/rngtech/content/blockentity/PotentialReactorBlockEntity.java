@@ -46,6 +46,7 @@ import net.neoforged.neoforge.items.ItemStackHandler;
 import java.util.ArrayDeque;
 
 public class PotentialReactorBlockEntity extends BaseMachineBlockEntity implements MenuProvider, MachineInfoProvider {
+    private final EnergyExportTargets exportTargets = new EnergyExportTargets(this);
     private static final int RECIPE_INPUT = 0;
     private static final int RECIPE_CANDIDATE = 1;
     private static final RecipeCache.Search<PotentialReactorRecipe> RECIPE_SEARCH =
@@ -561,6 +562,11 @@ public class PotentialReactorBlockEntity extends BaseMachineBlockEntity implemen
         return Math.max(1.0, stats.generatedEnergyTotal(work.energy(), ticks) * efficiency * stability);
     }
 
+    /** How many times an energy export looked a neighbour up instead of reusing its cached capability. */
+    public int exportTargetLookups() {
+        return exportTargets.lookups();
+    }
+
     private boolean exportEnergy(Level level, BlockPos pos) {
         if (energyStored() <= 0) {
             return false;
@@ -574,11 +580,7 @@ public class PotentialReactorBlockEntity extends BaseMachineBlockEntity implemen
                 return exported;
             }
 
-            IEnergyStorage target = level.getCapability(
-                    net.neoforged.neoforge.capabilities.Capabilities.EnergyStorage.BLOCK,
-                    pos.relative(direction),
-                    direction.getOpposite()
-            );
+            IEnergyStorage target = exportTargets.get(level, pos, direction);
             if (target == null || !target.canReceive()) {
                 continue;
             }
