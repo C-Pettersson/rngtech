@@ -61,6 +61,19 @@ public final class AutomationInputGameTests {
         helper.succeed();
     }
 
+    /** Ender Pearls take one slot, since Pearl and Pearl melts from it, and leave the other for Collapse Residue. */
+    @GameTest(template = MachineTestSupport.EMPTY)
+    public static void melterKeepsASlotForCollapseResidue(GameTestHelper helper) {
+        MelterBlockEntity melter = MachineTestSupport.place(helper, new BlockPos(2, 1, 2), ModBlocks.MELTER.get(), MelterBlockEntity.class);
+        IItemHandler top = melter.getItemHandler(Direction.UP);
+
+        flood(top, new ItemStack(Items.ENDER_PEARL, 16), 4);
+        check(slots(top).equals("[16 ender_pearl, 0 air]"), "Ender Pearls took the residue's slot: " + slots(top));
+        flood(top, item("rngtech:collapse_residue", 8), 1);
+        check(slots(top).equals("[16 ender_pearl, 8 collapse_residue]"), "Collapse Residue could not join the pearls: " + slots(top));
+        helper.succeed();
+    }
+
     /** Two items from the same ingredient tag cannot fill both slots, since the recipe still needs its other item. */
     @GameTest(template = MachineTestSupport.EMPTY)
     public static void melterRejectsASecondItemForTheSameIngredient(GameTestHelper helper) {

@@ -23,6 +23,7 @@ An arriving ingredient never takes a slot another ingredient of the recipe still
 The [Melter](melter.md) and [Alloy Furnace](alloy-furnace.md) ignore slot order. A recipe that needs two of an item takes both from one slot. An item gets a second slot only if every recipe it could still make keeps an empty slot for each missing ingredient.
 
 - A Melter fed only {{ item('minecraft:sugar') }} fills one slot and keeps the other for the {{ item('minecraft:redstone') }} in Electrolyte Solution.
+- A Melter fed only {{ item('minecraft:ender_pearl') }} keeps one slot for {{ item('rngtech:collapse_residue') }}. Ender Slurry from pearls alone takes both pearls from that one slot.
 - A three-slot Alloy Furnace fed only {{ item('minecraft:copper_ingot') }} keeps two slots for Bronze's tin and charcoal.
 - Two Lubricant bases cannot fill both Melter slots, because the additive needs one.
 
