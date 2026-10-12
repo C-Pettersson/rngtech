@@ -12,7 +12,7 @@ import java.util.Optional;
 
 final class MelterRecipes {
     static Optional<MelterRecipe> find(Level level, ItemStack primary, ItemStack secondary, FluidStack fluid) {
-        if (level == null || primary.isEmpty() || secondary.isEmpty() || fluid.isEmpty()) {
+        if (level == null || primary.isEmpty() && secondary.isEmpty() || fluid.isEmpty()) {
             return Optional.empty();
         }
         MelterRecipeInput input = new MelterRecipeInput(primary, secondary, fluid);
