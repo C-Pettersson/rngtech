@@ -1,5 +1,7 @@
 package com.rngtech.content.blockentity;
 
+import com.rngtech.content.energy.SolidFuelBurnerStoke;
+
 import net.minecraft.nbt.CompoundTag;
 
 /**
@@ -11,6 +13,7 @@ import net.minecraft.nbt.CompoundTag;
  * @param burn      the share of the current fuel item left to burn
  * @param rate      FE/t against a Steel Heat Core, so a stronger core burns visibly hotter
  * @param fuelTints colours for the fuel in each bin, as 0xRRGGBB
+ * @param stoke     the stoke setting, which opens the ash-pit draught slots
  */
 public record SolidFuelBurnerVisualState(
         boolean burning,
@@ -23,9 +26,11 @@ public record SolidFuelBurnerVisualState(
         float fuel1,
         int fuelTint0,
         int fuelTint1,
-        float charge
+        float charge,
+        int stoke
 ) {
-    public static final SolidFuelBurnerVisualState IDLE = new SolidFuelBurnerVisualState(false, 0.0F, 0.0F, "", "", 0, 0.0F, 0.0F, 0, 0, -1.0F);
+    public static final SolidFuelBurnerVisualState IDLE =
+            new SolidFuelBurnerVisualState(false, 0.0F, 0.0F, "", "", 0, 0.0F, 0.0F, 0, 0, -1.0F, SolidFuelBurnerStoke.RATED_STOKE);
     public static final int CHARGE_SEGMENTS = 8;
 
     public float fuel(int bin) {
@@ -54,7 +59,8 @@ public record SolidFuelBurnerVisualState(
                 Math.round(fuel1 * 16.0F),
                 fuelTint0,
                 fuelTint1,
-                charge < 0.0F ? -1 : chargeSegments()
+                charge < 0.0F ? -1 : chargeSegments(),
+                stoke
         );
     }
 
@@ -71,6 +77,7 @@ public record SolidFuelBurnerVisualState(
         tag.putInt("FuelTint0", fuelTint0);
         tag.putInt("FuelTint1", fuelTint1);
         tag.putFloat("Charge", charge);
+        tag.putInt("Stoke", stoke);
         return tag;
     }
 
@@ -89,7 +96,8 @@ public record SolidFuelBurnerVisualState(
                 tag.getFloat("Fuel1"),
                 tag.getInt("FuelTint0"),
                 tag.getInt("FuelTint1"),
-                tag.getFloat("Charge")
+                tag.getFloat("Charge"),
+                tag.contains("Stoke") ? tag.getInt("Stoke") : SolidFuelBurnerStoke.RATED_STOKE
         );
     }
 
@@ -104,7 +112,8 @@ public record SolidFuelBurnerVisualState(
             int fuel1,
             int fuelTint0,
             int fuelTint1,
-            int charge
+            int charge,
+            int stoke
     ) {
     }
 

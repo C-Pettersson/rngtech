@@ -1,13 +1,18 @@
 package com.rngtech.client.screen;
 
 import com.rngtech.content.blockentity.SolidFuelBurnerBlockEntity;
+import com.rngtech.content.energy.SolidFuelBurnerStoke;
 import com.rngtech.content.menu.SolidFuelBurnerMenu;
 import com.rngtech.rpg.MachineStat;
 
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
+
+import java.util.List;
+import java.util.Locale;
 
 public class SolidFuelBurnerScreen extends AbstractContainerScreen<SolidFuelBurnerMenu> {
     private static final int PANEL = 0xFFC6C6C6;
@@ -39,6 +44,15 @@ public class SolidFuelBurnerScreen extends AbstractContainerScreen<SolidFuelBurn
     private static final int FUEL_FORM_ICON_X = 95;
     private static final int GEAR_INFO_ICON_Y = 78;
     private static final int ICON_SIZE = 12;
+    private static final int STOKE_X = 110;
+    private static final int STOKE_Y = 28;
+    private static final int STOKE_WIDTH = 58;
+    private static final int STOKE_HEIGHT = 8;
+    private static final int STOKE_POINTER_HEIGHT = 3;
+    private static final int STOKE_TRACK = 0xFF4A3A2A;
+    private static final int STOKE_POINTER = 0xFFF2F2F2;
+    private static final int STOKE_COARSE_STEP = 5;
+    private static final int STOKE_NOTCH_STEP = 25;
     private static final String[] STAT_LABEL_KEYS = {
             "rngtech.stat.energy_generation",
             "rngtech.stat.efficiency",
@@ -138,8 +152,41 @@ public class SolidFuelBurnerScreen extends AbstractContainerScreen<SolidFuelBurn
                     && RefinementScreenStyle.handleApplyClick(this, menu, mouseX, mouseY)) {
                 return true;
             }
+            if (menu.selectedTab() == SolidFuelBurnerMenu.TAB_PROCESSING && isOverStokeGauge(mouseX, mouseY)) {
+                double fraction = (mouseX - (leftPos + STOKE_X + 1)) / (STOKE_WIDTH - 2);
+                int span = SolidFuelBurnerStoke.MAX_STOKE - SolidFuelBurnerStoke.MIN_STOKE;
+                sendStoke(SolidFuelBurnerStoke.MIN_STOKE + (int) Math.round(fraction * span));
+                return true;
+            }
         }
         return super.mouseClicked(mouseX, mouseY, button);
+    }
+
+    @Override
+    public boolean mouseScrolled(double mouseX, double mouseY, double scrollX, double scrollY) {
+        if (menu.selectedTab() == SolidFuelBurnerMenu.TAB_PROCESSING && isOverStokeGauge(mouseX, mouseY) && scrollY != 0.0) {
+            int step = hasShiftDown() ? STOKE_COARSE_STEP : 1;
+            sendStoke(menu.stoke() + (scrollY > 0.0 ? step : -step));
+            return true;
+        }
+        return super.mouseScrolled(mouseX, mouseY, scrollX, scrollY);
+    }
+
+    private void sendStoke(int stoke) {
+        int clamped = SolidFuelBurnerStoke.clamp(stoke);
+        if (clamped == menu.stoke() || minecraft == null || minecraft.player == null || minecraft.gameMode == null) {
+            return;
+        }
+        int buttonId = SolidFuelBurnerMenu.stokeButtonId(clamped);
+        if (menu.clickMenuButton(minecraft.player, buttonId)) {
+            minecraft.gameMode.handleInventoryButtonClick(menu.containerId, buttonId);
+        }
+    }
+
+    private boolean isOverStokeGauge(double mouseX, double mouseY) {
+        int left = leftPos + STOKE_X;
+        int top = topPos + STOKE_Y;
+        return mouseX >= left && mouseX < left + STOKE_WIDTH && mouseY >= top && mouseY < top + STOKE_HEIGHT + STOKE_POINTER_HEIGHT;
     }
 
     private void renderPanel(GuiGraphics guiGraphics) {
@@ -221,6 +268,48 @@ public class SolidFuelBurnerScreen extends AbstractContainerScreen<SolidFuelBurn
                 FUEL
         );
         renderProcessingIcons(guiGraphics);
+        renderStokeGauge(guiGraphics);
+    }
+
+    /** Stoke from a banked fire to rated, with the rated FE/t at the right end. The pointer marks the selected stoke. */
+    private void renderStokeGauge(GuiGraphics guiGraphics) {
+        int left = leftPos + STOKE_X;
+        int top = topPos + STOKE_Y;
+        int inner = STOKE_WIDTH - 2;
+        int right = left + 1 + inner;
+        int bottom = top + STOKE_HEIGHT - 1;
+        guiGraphics.fill(left, top, left + STOKE_WIDTH, top + STOKE_HEIGHT, 0xFF5F5F5F);
+        guiGraphics.fill(left + 1, top + 1, right, bottom, STOKE_TRACK);
+        int pointer = Math.min(left + 1 + stokeOffset(menu.stoke(), inner), right - 1);
+        guiGraphics.fill(left + 1, top + 3, Math.max(left + 1, pointer), bottom - 2, FUEL);
+        for (int notch = SolidFuelBurnerStoke.MIN_STOKE; notch <= SolidFuelBurnerStoke.MAX_STOKE; notch += STOKE_NOTCH_STEP) {
+            int x = Math.min(left + 1 + stokeOffset(notch, inner), right - 1);
+            guiGraphics.fill(x, top + 1, x + 1, top + 2, PANEL_DARK);
+        }
+        int pointerTop = top + STOKE_HEIGHT;
+        guiGraphics.fill(pointer, pointerTop - 1, pointer + 1, pointerTop + STOKE_POINTER_HEIGHT, STOKE_POINTER);
+        guiGraphics.fill(pointer - 1, pointerTop + 1, pointer + 2, pointerTop + STOKE_POINTER_HEIGHT, STOKE_POINTER);
+    }
+
+    private static int stokeOffset(int stoke, int width) {
+        int span = SolidFuelBurnerStoke.MAX_STOKE - SolidFuelBurnerStoke.MIN_STOKE;
+        int clamped = SolidFuelBurnerStoke.clamp(stoke) - SolidFuelBurnerStoke.MIN_STOKE;
+        return (int) Math.round(clamped / (double) span * width);
+    }
+
+    private List<Component> stokeTooltip() {
+        int stoke = menu.stoke();
+        int rated = menu.ratedGeneration();
+        return List.of(
+                Component.translatable("rngtech.burner.tooltip.stoke", stoke),
+                Component.translatable(
+                        "rngtech.burner.tooltip.stoke_effects",
+                        CompactValueText.energyRate(SolidFuelBurnerStoke.generation(rated, stoke)),
+                        CompactValueText.energyRate(rated),
+                        String.format(Locale.ROOT, "%.2f", SolidFuelBurnerStoke.fuelEconomy(stoke))
+                ).withStyle(ChatFormatting.GRAY),
+                Component.translatable("rngtech.burner.tooltip.stoke_hint").withStyle(ChatFormatting.DARK_GRAY)
+        );
     }
 
     private void renderGear(GuiGraphics guiGraphics) {
@@ -355,6 +444,10 @@ public class SolidFuelBurnerScreen extends AbstractContainerScreen<SolidFuelBurn
             return;
         }
         if (menu.selectedTab() != SolidFuelBurnerMenu.TAB_PROCESSING) {
+            return;
+        }
+        if (isOverStokeGauge(mouseX, mouseY)) {
+            guiGraphics.renderComponentTooltip(font, stokeTooltip(), mouseX, mouseY);
             return;
         }
         CompactValueText.renderTooltipIfHovered(

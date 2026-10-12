@@ -3,12 +3,14 @@ package com.rngtech.gametest;
 import static com.rngtech.gametest.MachineTestSupport.check;
 
 import com.rngtech.RNGTech;
+import com.rngtech.content.blockentity.MachineInfoSnapshot;
 import com.rngtech.content.blockentity.SolidFuelBurnerBlockEntity;
 import com.rngtech.content.blockentity.SolidFuelBurnerVisualState;
 import com.rngtech.content.energy.BatteryCellMaterial;
 import com.rngtech.content.energy.FuelBoxMaterial;
 import com.rngtech.content.energy.HeatCoreMaterial;
 import com.rngtech.content.energy.SolidFuelBurnerChassis;
+import com.rngtech.content.energy.SolidFuelBurnerStoke;
 import com.rngtech.content.item.BatteryCellItem;
 import com.rngtech.content.registry.ModBlocks;
 import com.rngtech.content.registry.ModItems;
@@ -16,13 +18,17 @@ import com.rngtech.content.registry.ModItems;
 import net.minecraft.core.BlockPos;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Blocks;
 import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
-/** The world view of a Solid Fuel Burner: installed Gear, fuel, fire, and charge reach the synced visual state. */
+/**
+ * The world view of a Solid Fuel Burner (installed Gear, fuel, fire, and charge reach the synced visual state) and its
+ * stoke, which trades FE/t for FE per fuel item.
+ */
 @GameTestHolder(RNGTech.MOD_ID)
 @PrefixGameTestTemplate(false)
 public final class SolidFuelBurnerGameTests {
@@ -113,6 +119,66 @@ public final class SolidFuelBurnerGameTests {
             check(!state.burning() && state.burn() == 0.0F, "Without a cell nothing burns: " + state);
             helper.succeed();
         });
+    }
+
+    /** The minimum stoke runs at a quarter of the Heat Core's FE/t and gets 20% more FE from each Coal. */
+    @GameTest(template = MachineTestSupport.EMPTY)
+    public static void lowStokeTradesRateForFuel(GameTestHelper helper) {
+        SolidFuelBurnerBlockEntity rated = burner(helper, new BlockPos(1, 1, 2), SolidFuelBurnerChassis.STEEL,
+                HeatCoreMaterial.STEEL, FuelBoxMaterial.IRON, new ItemStack(Items.COAL, 8));
+        SolidFuelBurnerBlockEntity banked = burner(helper, new BlockPos(3, 1, 2), SolidFuelBurnerChassis.STEEL,
+                HeatCoreMaterial.STEEL, FuelBoxMaterial.IRON, new ItemStack(Items.COAL, 8));
+        banked.setStoke(SolidFuelBurnerStoke.MIN_STOKE);
+        helper.runAfterDelay(10, () -> {
+            MachineInfoSnapshot full = rated.machineInfo();
+            MachineInfoSnapshot low = banked.machineInfo();
+            check(low.energyRate() == SolidFuelBurnerStoke.generation((int) full.energyRate(), SolidFuelBurnerStoke.MIN_STOKE),
+                    "Minimum stoke should run at a quarter of " + full.energyRate() + " FE/t, ran at " + low.energyRate());
+            double ratio = (low.fuelMax() * (double) low.energyRate()) / (full.fuelMax() * (double) full.energyRate());
+            check(Math.abs(ratio - 1.2) < 0.02, "Minimum stoke should get 20% more FE per Coal, got x" + ratio);
+            check(banked.currentVisualState().rate() < rated.currentVisualState().rate(), "A low stoke should burn with a smaller fire");
+            helper.succeed();
+        });
+    }
+
+    /** Turning the stoke down mid-item keeps the item's burned share and revalues what is left at the new economy. */
+    @GameTest(template = MachineTestSupport.EMPTY)
+    public static void stokeChangeKeepsTheBurningItemsShare(GameTestHelper helper) {
+        SolidFuelBurnerBlockEntity burner = burner(helper, new BlockPos(2, 1, 2), SolidFuelBurnerChassis.STEEL,
+                HeatCoreMaterial.STEEL, FuelBoxMaterial.IRON, new ItemStack(Items.COAL, 8));
+        helper.runAfterDelay(40, () -> {
+            MachineInfoSnapshot before = burner.machineInfo();
+            burner.setStoke(50);
+            MachineInfoSnapshot after = burner.machineInfo();
+            double shareBefore = before.fuel() / (double) before.fuelMax();
+            double shareAfter = after.fuel() / (double) after.fuelMax();
+            check(Math.abs(shareBefore - shareAfter) < 0.01, "The burned share should stay put: " + shareBefore + " vs " + shareAfter);
+            double left = before.fuel() * (double) before.energyRate();
+            double revalued = after.fuel() * (double) after.energyRate();
+            double expected = left * SolidFuelBurnerStoke.fuelEconomy(50);
+            check(Math.abs(revalued - expected) <= 2.0 * before.energyRate(), "The rest of the Coal should be worth " + expected + " FE, was " + revalued);
+            helper.succeed();
+        });
+    }
+
+    /** Stoke clamps to its range, syncs to the world view, and survives a save. */
+    @GameTest(template = MachineTestSupport.EMPTY)
+    public static void stokeClampsAndSaves(GameTestHelper helper) {
+        SolidFuelBurnerBlockEntity burner = MachineTestSupport.place(helper, new BlockPos(1, 1, 2),
+                ModBlocks.solidFuelBurner(SolidFuelBurnerChassis.CRUDE).get(), SolidFuelBurnerBlockEntity.class);
+        check(burner.stoke() == SolidFuelBurnerStoke.RATED_STOKE, "A new burner should start at the rated stoke");
+        burner.setStoke(5);
+        check(burner.stoke() == SolidFuelBurnerStoke.MIN_STOKE, "Stoke should clamp to its minimum, was " + burner.stoke());
+        burner.setStoke(500);
+        check(burner.stoke() == SolidFuelBurnerStoke.MAX_STOKE, "Stoke should clamp to its maximum, was " + burner.stoke());
+        burner.setStoke(60);
+        check(burner.currentVisualState().stoke() == 60, "The world view should show the stoke");
+        CompoundTag saved = burner.saveWithoutMetadata(helper.getLevel().registryAccess());
+        SolidFuelBurnerBlockEntity copy = MachineTestSupport.place(helper, new BlockPos(3, 1, 2),
+                ModBlocks.solidFuelBurner(SolidFuelBurnerChassis.CRUDE).get(), SolidFuelBurnerBlockEntity.class);
+        copy.loadWithComponents(saved, helper.getLevel().registryAccess());
+        check(copy.stoke() == 60, "Stoke should survive a save, was " + copy.stoke());
+        helper.succeed();
     }
 
     private static SolidFuelBurnerBlockEntity burner(

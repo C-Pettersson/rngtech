@@ -532,7 +532,7 @@ def write_textures() -> None:
     # Pipework: plain brushed steel. Teal stays on the deliberate bands, never on runs of pipe.
     save(noisy(64, (124, 134, 146), "pipe", amount=4, streak=5), "pipe")
 
-    # Ash-pit door, mapped as a 4:1 strip: a sliding draught damper with three slots.
+    # Ash-pit door, mapped as a 4:1 strip: three draught slots. SolidFuelBurnerRenderer slides shutters over them by stoke.
     door = Image.new("RGBA", (64, 64), (0, 0, 0, 0))
     door.paste(noisy(64, (70, 74, 80), "ash_door", amount=5).crop((0, 0, 64, 16)), (0, 0))
     draw = ImageDraw.Draw(door)

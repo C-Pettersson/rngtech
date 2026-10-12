@@ -228,6 +228,7 @@ Design intent and balance rules behind shipped machines that the code does not s
 ### Solid Fuel Burner
 
 - Each fuel item holds a fixed FE (`10 FE` per effective burn tick). Better Heat Cores and Energy Generation spend fuel faster rather than extracting more FE from it. Higher FE/t comes from Syngas at Stage 5, not from better burners.
+- Stoke is the burner's visible trade, set on a 25-100% gauge. Rated (100%) is the unstoked burner: the Heat Core's FE/t and each item's full FE, so the energy balance simulation describes a rated burner. Lower stoke scales FE/t in proportion and raises FE per item linearly to `1.20x` at 25%. Stoke never raises FE/t above the Heat Core's rating, so coal-tier burners still fail on rate. A mid-item change revalues the item's remaining FE at the new economy, so switching neither gains nor loses fuel.
 - Logs burn for a quarter of their vanilla burn time on purpose.
 - Chassis accept lower-stage Gear so mixed setups can trade speed, efficiency, fuel queue size, and behavior.
 - Fuel Governor pauses only when the buffer cannot hold more generated FE. It never blocks export, and it never changes fuel cost, duration, or generation while there is room.

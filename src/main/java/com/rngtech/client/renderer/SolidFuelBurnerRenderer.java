@@ -6,6 +6,7 @@ import com.rngtech.content.blockentity.SolidFuelBurnerBlockEntity;
 import com.rngtech.content.blockentity.SolidFuelBurnerVisualState;
 import com.rngtech.content.energy.FuelBoxMaterial;
 import com.rngtech.content.energy.HeatCoreMaterial;
+import com.rngtech.content.energy.SolidFuelBurnerStoke;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
@@ -34,9 +35,9 @@ import java.util.Map;
 
 /**
  * Draws the working parts of a Solid Fuel Burner: the installed Heat Core fins and Fuel Box hopper in their materials,
- * the fuel in each hopper bin, the fuel bed and flames in the firebox with firelight on the brick, and the Battery
- * Cell charge meter. The flames stand taller with a stronger Heat Core, which
- * spends the same fuel faster. Positions are in model pixels and match tools/blockmodels/solid_fuel_burner.py.
+ * the fuel in each hopper bin, the fuel bed and flames in the firebox with firelight on the brick, the ash-pit draught
+ * shutters set by stoke, and the Battery Cell charge meter. The flames stand taller at a higher FE/t, from a stronger
+ * Heat Core or a higher stoke. Positions are in model pixels and match tools/blockmodels/solid_fuel_burner.py.
  */
 public class SolidFuelBurnerRenderer implements BlockEntityRenderer<SolidFuelBurnerBlockEntity> {
     private static final Map<String, ModelResourceLocation> HEAT_CORE_MODELS = new HashMap<>();
@@ -45,6 +46,7 @@ public class SolidFuelBurnerRenderer implements BlockEntityRenderer<SolidFuelBur
     private static final ResourceLocation FUEL = RNGTech.id("block/solid_fuel_burner/fx/fuel");
     private static final ResourceLocation EMBERS = RNGTech.id("block/solid_fuel_burner/fx/embers");
     private static final ResourceLocation LED = RNGTech.id("block/solid_fuel_burner/fx/led");
+    private static final ResourceLocation SHUTTER = RNGTech.id("block/solid_fuel_burner/grille");
     private static final ResourceLocation FLAME = RNGTech.id("textures/block/solid_fuel_burner/fx/flame.png");
     private static final ResourceLocation GLOW = RNGTech.id("textures/block/solid_fuel_burner/fx/glow.png");
     // Hopper bins inside the Fuel Box walls.
@@ -71,6 +73,14 @@ public class SolidFuelBurnerRenderer implements BlockEntityRenderer<SolidFuelBur
     private static final float CAVITY_Z1 = 8.5F;
     private static final float[] FLAME_ROWS = {2.5F, 4.25F, 6.0F, 7.5F};
     private static final int FLAMES_PER_ROW = 4;
+    // Draught slots in the ash-pit door, west edges; the shutters slide over them from the west.
+    private static final float[] DRAUGHT_SLOT_X0 = {5.59375F, 7.34375F, 9.09375F};
+    private static final float DRAUGHT_SLOT_WIDTH = 1.3125F;
+    private static final float DRAUGHT_SLOT_Y0 = 2.8F;
+    private static final float DRAUGHT_SLOT_Y1 = 3.55F;
+    private static final float DOOR_FRONT = 0.5F;
+    /** The share of each slot left open at the minimum stoke, so a banked fire still draws air. */
+    private static final float MIN_DRAUGHT = 0.2F;
     // Charge meter on the east side of the converter cabinet.
     private static final float METER_X = 14.0F;
     private static final float METER_Y0 = 3.0F;
@@ -150,6 +160,7 @@ public class SolidFuelBurnerRenderer implements BlockEntityRenderer<SolidFuelBur
         if (state.charge() >= 0.0F) {
             renderCharge(cutout, pose, state.chargeSegments(), packedOverlay);
         }
+        renderDraught(cutout, pose, state.stoke(), packedLight, packedOverlay);
         if (animation.fire > 0.01F) {
             renderFirelight(bufferSource.getBuffer(RenderType.eyes(GLOW)), pose, animation, time, packedOverlay);
             renderFlames(bufferSource.getBuffer(RenderType.eyes(FLAME)), pose, state, animation, time, packedOverlay);
@@ -254,6 +265,21 @@ public class SolidFuelBurnerRenderer implements BlockEntityRenderer<SolidFuelBur
         quad(consumer, pose, new Vector3f(0.0F, -1.0F, 0.0F), color, 255, LightTexture.FULL_BRIGHT, overlay,
                 new float[] {CAVITY_X0, crown, CAVITY_Z0, 0.0F, 0.0F}, new float[] {CAVITY_X1, crown, CAVITY_Z0, 1.0F, 0.0F},
                 new float[] {CAVITY_X1, crown, CAVITY_Z1, 1.0F, 1.0F}, new float[] {CAVITY_X0, crown, CAVITY_Z1, 0.0F, 1.0F});
+    }
+
+    /** Shutters over the ash-pit draught slots: wide open at rated stoke, nearly closed at the minimum. */
+    private static void renderDraught(VertexConsumer consumer, PoseStack.Pose pose, int stoke, int light, int overlay) {
+        float span = SolidFuelBurnerStoke.MAX_STOKE - SolidFuelBurnerStoke.MIN_STOKE;
+        float open = MIN_DRAUGHT + (1.0F - MIN_DRAUGHT) * (SolidFuelBurnerStoke.clamp(stoke) - SolidFuelBurnerStoke.MIN_STOKE) / span;
+        float covered = DRAUGHT_SLOT_WIDTH * (1.0F - open);
+        if (covered <= 0.01F) {
+            return;
+        }
+        TextureAtlasSprite sprite = sprite(SHUTTER);
+        for (float x0 : DRAUGHT_SLOT_X0) {
+            cube(consumer, pose, sprite, 16.0F, x0 - 0.1F, DRAUGHT_SLOT_Y0, DOOR_FRONT - 0.12F, x0 + covered, DRAUGHT_SLOT_Y1, DOOR_FRONT,
+                    0xFFFFFF, 255, light, overlay);
+        }
     }
 
     /** Lit segments of the charge meter, bottom up. */
