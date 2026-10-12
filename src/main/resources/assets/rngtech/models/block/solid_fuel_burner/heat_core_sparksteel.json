@@ -1,0 +1,6 @@
+{
+  "parent": "rngtech:block/solid_fuel_burner/heat_core",
+  "textures": {
+    "core": "rngtech:block/solid_fuel_burner/heat_core/sparksteel"
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "textures": {
+    "particle": "#box"
+  },
+  "elements": [
+    {
+      "from": [
+        0.875,
+        5.5,
+        5.0625
+      ],
+      "to": [
+        2.625,
+        12.25,
+        5.4375
+      ],
+      "faces": {
+        "north": {
+          "texture": "#box"
+        },
+        "south": {
+          "texture": "#box"
+        },
+        "up": {
+          "texture": "#box"
+        }
+      }
+    }
+  ]
+}
