@@ -6,13 +6,17 @@ import com.rngtech.RNGTech;
 import com.rngtech.content.block.SolarPanelBlock;
 import com.rngtech.content.blockentity.SolarArrayControllerBlockEntity;
 import com.rngtech.content.blockentity.SolarPanelBlockEntity;
+import com.rngtech.content.energy.BatteryCellMaterial;
+import com.rngtech.content.energy.SolarArrayExtenderMaterial;
 import com.rngtech.content.energy.SolarPanelMaterial;
 import com.rngtech.content.energy.SolarTracker;
 import com.rngtech.content.registry.ModBlocks;
+import com.rngtech.content.registry.ModItems;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Blocks;
 import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
@@ -92,6 +96,48 @@ public final class SolarArrayGameTests {
                     check(tracker(helper, upper) != SolarTracker.STOWED, "The generating panel stayed stowed");
                 })
                 .thenSucceed();
+    }
+
+    /**
+     * Installed Gear survives the array map updates a working controller sends (panels claimed, day to night), and
+     * the update a client receives carries it.
+     */
+    @GameTest(template = MachineTestSupport.EMPTY, timeoutTicks = 200, batch = "solar_gear")
+    public static void controllerKeepsGearThroughMapUpdates(GameTestHelper helper) {
+        helper.getLevel().setDayTime(6000L);
+        helper.getLevel().setWeatherParameters(6000, 0, false, false);
+        BlockPos centre = new BlockPos(2, 1, 2);
+        for (int x = 1; x <= 3; x++) {
+            for (int z = 1; z <= 3; z++) {
+                if (x != 2 || z != 2) {
+                    helper.setBlock(new BlockPos(x, 1, z), ModBlocks.solarPanel(SolarPanelMaterial.CRUDE).get());
+                }
+            }
+        }
+        SolarArrayControllerBlockEntity controller = MachineTestSupport.place(helper, centre, ModBlocks.SOLAR_ARRAY_CONTROLLER.get(), SolarArrayControllerBlockEntity.class);
+        ItemStack cell = new ItemStack(ModItems.batteryCell(BatteryCellMaterial.IRON).get());
+        ItemStack extender = new ItemStack(ModItems.solarArrayExtender(SolarArrayExtenderMaterial.SPARKSTEEL).get());
+        check(controller.getGearInventory().insertItem(SolarArrayControllerBlockEntity.SLOT_BATTERY_CELL, cell, false).isEmpty(), "The Battery Cell was not accepted");
+        check(controller.getGearInventory().insertItem(SolarArrayControllerBlockEntity.SLOT_SOLAR_ARRAY_EXTENDER, extender, false).isEmpty(), "The extender was not accepted");
+        helper.startSequence()
+                .thenIdle(RESCAN_TICKS)
+                .thenExecute(() -> {
+                    checkGear(controller, "at noon");
+                    helper.getLevel().setDayTime(14000L);
+                })
+                .thenIdle(RESCAN_TICKS)
+                .thenExecute(() -> {
+                    checkGear(controller, "at night");
+                    SolarArrayControllerBlockEntity client = new SolarArrayControllerBlockEntity(controller.getBlockPos(), controller.getBlockState());
+                    client.loadWithComponents(controller.getUpdateTag(helper.getLevel().registryAccess()), helper.getLevel().registryAccess());
+                    checkGear(client, "in the client update");
+                })
+                .thenSucceed();
+    }
+
+    private static void checkGear(SolarArrayControllerBlockEntity controller, String when) {
+        check(!controller.getGearInventory().getStackInSlot(SolarArrayControllerBlockEntity.SLOT_BATTERY_CELL).isEmpty(), "The Battery Cell was lost " + when);
+        check(!controller.getGearInventory().getStackInSlot(SolarArrayControllerBlockEntity.SLOT_SOLAR_ARRAY_EXTENDER).isEmpty(), "The extender was lost " + when);
     }
 
     private static SolarPanelBlockEntity panel(GameTestHelper helper, BlockPos pos) {
