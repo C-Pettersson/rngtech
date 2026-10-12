@@ -1780,7 +1780,51 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
             if (!isItemValid(slot, stack)) {
                 return stack;
             }
+            if (processingLaneSlots && hasMasteryBehavior("EVEN_FEED")) {
+                return insertEvenly(stack, simulate);
+            }
             return inventory.insertItem(mappedSlot(slot), stack, simulate);
+        }
+
+        /**
+         * Even Feed ignores the offered lane: each item goes to the emptiest active lane that can take it, so a trickle
+         * or a bulk shipment spreads across every lane instead of filling lane 1 first.
+         */
+        private ItemStack insertEvenly(ItemStack stack, boolean simulate) {
+            int lanes = activeProcessingSlots();
+            int[] counts = new int[lanes];
+            int[] room = new int[lanes];
+            for (int lane = 0; lane < lanes; lane++) {
+                int slot = firstSlot + lane;
+                ItemStack existing = inventory.getStackInSlot(slot);
+                counts[lane] = existing.getCount();
+                if (existing.isEmpty() || ItemStack.isSameItemSameComponents(existing, stack)) {
+                    room[lane] = Math.max(0, Math.min(inventory.getSlotLimit(slot), stack.getMaxStackSize()) - existing.getCount());
+                }
+            }
+            int[] added = new int[lanes];
+            int remaining = stack.getCount();
+            while (remaining > 0) {
+                int best = -1;
+                for (int lane = 0; lane < lanes; lane++) {
+                    if (added[lane] < room[lane] && (best < 0 || counts[lane] + added[lane] < counts[best] + added[best])) {
+                        best = lane;
+                    }
+                }
+                if (best < 0) {
+                    break;
+                }
+                added[best]++;
+                remaining--;
+            }
+            if (!simulate) {
+                for (int lane = 0; lane < lanes; lane++) {
+                    if (added[lane] > 0) {
+                        inventory.insertItem(firstSlot + lane, stack.copyWithCount(added[lane]), false);
+                    }
+                }
+            }
+            return remaining == stack.getCount() ? stack : stack.copyWithCount(remaining);
         }
 
         @Override
