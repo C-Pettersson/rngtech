@@ -74,7 +74,8 @@ public class FurnaceScreen extends AbstractContainerScreen<FurnaceMenu> {
             "rngtech.stat.temperature_stability",
             "rngtech.stat.overheat_tolerance",
             "rngtech.stat.input_slots",
-            "rngtech.stat.fuel_efficiency"
+            "rngtech.stat.fuel_efficiency",
+            "rngtech.stat.fuel_duration"
     };
     private static final int[] FUEL_STAT_DATA_INDICES = {
             FurnaceMenu.processingSpeedDataIndex(),
@@ -86,7 +87,8 @@ public class FurnaceScreen extends AbstractContainerScreen<FurnaceMenu> {
             FurnaceMenu.temperatureStabilityDataIndex(),
             FurnaceMenu.overheatToleranceDataIndex(),
             FurnaceMenu.inputSlotsDataIndex(),
-            FurnaceMenu.fuelEfficiencyDataIndex()
+            FurnaceMenu.fuelEfficiencyDataIndex(),
+            FurnaceMenu.fuelDurationDataIndex()
     };
     private static final MachineStat[] FUEL_STAT_TYPES = {
             MachineStat.PROCESSING_SPEED,
@@ -98,7 +100,8 @@ public class FurnaceScreen extends AbstractContainerScreen<FurnaceMenu> {
             MachineStat.TEMPERATURE_STABILITY,
             MachineStat.OVERHEAT_TOLERANCE,
             MachineStat.INPUT_SLOTS,
-            MachineStat.FUEL_EFFICIENCY
+            MachineStat.FUEL_EFFICIENCY,
+            MachineStat.FUEL_DURATION
     };
     private static final String[] ELECTRIC_STAT_LABEL_KEYS = {
             "rngtech.stat.processing_speed",

@@ -2273,7 +2273,7 @@
   "rngtech.stat.rich_biomass_power": "Rich Biomass Power",
   "rngtech.stat.rich_biomass_power.description": "Changes FE gained from rich biomass fuel by %s.",
   "rngtech.stat.fuel_duration": "Fuel Duration",
-  "rngtech.stat.fuel_duration.description": "Extends generator burn time by %s without increasing FE/t.",
+  "rngtech.stat.fuel_duration.description": "Extends each fuel item's burn time by %s. Generators keep the same FE/t.",
   "rngtech.stat.solar_panel_limit": "Array Range",
   "rngtech.stat.solar_panel_limit.description": "Controls up to %s.",
   "rngtech.stat.moonlight_conversion": "Moonlight Conversion",
