@@ -61,7 +61,11 @@ public class SolarArrayControllerBlockEntity extends BaseMachineBlockEntity impl
     public static final int STATUS_FULL = 5;
     public static final int STATUS_BLOCKED = 6;
 
-    private static final int MAX_RANGE = 2;
+    public static final int MAX_RANGE = 2;
+    public static final int MAP_CLAIMED = 1;
+    public static final int MAP_GENERATING = 2;
+    /** Client-only: the top display's array map, sent with block updates and never saved. */
+    private static final String PANEL_MAP_TAG = "PanelMap";
     private static final int SCAN_INTERVAL_TICKS = 20;
     private static final int DATA_ENERGY = 0;
     private static final int DATA_ENERGY_CAPACITY = 1;
@@ -178,6 +182,7 @@ public class SolarArrayControllerBlockEntity extends BaseMachineBlockEntity impl
     private int lastBlockedPanelCount;
     private int lastStatus = STATUS_NO_PANELS;
     private boolean previewRange;
+    private long panelMap;
     private final InstalledCellStats cells = new InstalledCellStats();
     private MachineStatAccumulator capacityStats;
     private int internalCapacity;
@@ -367,6 +372,9 @@ public class SolarArrayControllerBlockEntity extends BaseMachineBlockEntity impl
         lastBlockedPanelCount = tag.getInt("LastBlockedPanelCount");
         lastStatus = tag.getInt("LastStatus");
         previewRange = tag.getBoolean("PreviewRange");
+        if (tag.contains(PANEL_MAP_TAG)) {
+            panelMap = tag.getLong(PANEL_MAP_TAG);
+        }
         clampInternalEnergy();
     }
 
@@ -377,7 +385,44 @@ public class SolarArrayControllerBlockEntity extends BaseMachineBlockEntity impl
 
     @Override
     public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
-        return saveWithoutMetadata(registries);
+        CompoundTag tag = saveWithoutMetadata(registries);
+        tag.putLong(PANEL_MAP_TAG, panelMap);
+        return tag;
+    }
+
+    /** Controllers saved as solid cubes stored no light inside their block; recheck it once so the open model is lit. */
+    @Override
+    public void onLoad() {
+        super.onLoad();
+        if (level != null && !level.isClientSide && level.getRawBrightness(worldPosition, 0) == 0) {
+            level.getLightEngine().checkBlock(worldPosition);
+        }
+    }
+
+    /**
+     * What the top display shows for the panel spot {@code dx}, {@code dz} blocks from the controller (each within
+     * {@link #MAX_RANGE}): {@link #MAP_CLAIMED} and {@link #MAP_GENERATING} flags, or 0 for no claimed panel.
+     */
+    public int panelMapState(int dx, int dz) {
+        return (int) (panelMap >>> mapShift(dx, dz)) & (MAP_CLAIMED | MAP_GENERATING);
+    }
+
+    private long mapBits(BlockPos panelPos, boolean generating) {
+        int shift = mapShift(panelPos.getX() - worldPosition.getX(), panelPos.getZ() - worldPosition.getZ());
+        return (long) (MAP_CLAIMED | (generating ? MAP_GENERATING : 0)) << shift;
+    }
+
+    private static int mapShift(int dx, int dz) {
+        int width = MAX_RANGE * 2 + 1;
+        return ((dx + MAX_RANGE) * width + dz + MAX_RANGE) * 2;
+    }
+
+    /** Sends the map only when a panel is claimed, released, or starts or stops generating. */
+    private void updatePanelMap(long map) {
+        if (map != panelMap) {
+            panelMap = map;
+            syncPreviewToClient();
+        }
     }
 
     private boolean generateFromPanels(Level level) {
@@ -390,12 +435,14 @@ public class SolarArrayControllerBlockEntity extends BaseMachineBlockEntity impl
             lastActivePanelCount = 0;
             lastBlockedPanelCount = overflowPanelCount;
             lastStatus = SolarPanelBlockEntity.isDimensionEnabled(level) ? STATUS_NO_PANELS : STATUS_BAD_DIMENSION;
+            updatePanelMap(0L);
             return false;
         }
 
         int active = 0;
         int blocked = overflowPanelCount;
         double generatedThisTick = 0.0;
+        long map = 0L;
         SolarPanelMaterialState materialState = SolarPanelMaterialState.empty();
         for (int index = 0; index < panelPositions.size(); index++) {
             BlockPos panelPos = panelPositions.get(index);
@@ -405,9 +452,10 @@ public class SolarArrayControllerBlockEntity extends BaseMachineBlockEntity impl
                 continue;
             }
 
-            panel.markControlled(level.getGameTime());
             materialState.accept(panel);
             double generation = panelGeneration(level, panel, stats) / panelClaims[index];
+            panel.markControlled(level.getGameTime(), generation > 0.0);
+            map |= mapBits(panelPos, generation > 0.0);
             if (generation > 0.0) {
                 active++;
                 generatedThisTick += generation;
@@ -415,6 +463,7 @@ public class SolarArrayControllerBlockEntity extends BaseMachineBlockEntity impl
                 blocked++;
             }
         }
+        updatePanelMap(map);
 
         if (generatedThisTick > 0.0) {
             double controllerEfficiency = Math.max(0.01, stats.value(MachineStat.EFFICIENCY));

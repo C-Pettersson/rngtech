@@ -296,6 +296,12 @@ Design intent and balance rules behind shipped machines that the code does not s
 - The Silica Gel Dehumidifier ignores sky, biome, and weather. Bead consumption is its balancing cost.
 - Water rates assume a finite supply with no infinite water source. Machines still accept bucketed and piped water, so packs turn infinite water off themselves through the `waterSourceConversion` gamerule and by gating other mods' infinite-water blocks. The [Modpack Creators](https://c-pettersson.github.io/rngtech/modpack-creators/) wiki page tells pack makers how.
 
+### Solar Panels and Array Controller
+
+- Tracking is the panel's working cue: a panel tilts toward the sun only while it generates and lies flat otherwise, so a field shows which panels work without lamps or text. Claimed panels follow the moon only when their controller converts moonlight.
+- Panels stay cheap at hundreds per field. The server stores only which half of the sky the tracked body is in and changes it twice a day; clients turn the deck from the world time. Large fields can fall back to baked stepped models through the client config.
+- A panel shades everything below it whatever its model: open solar blocks still block straight-down sky light, so stacking panels, with or without a gap, never doubles a column's output.
+
 ### Modular Field Tools
 
 - Assembled tools are blank carriers. All rolls live on the installed head and rod, and the assembled tool is never a refinement target.

@@ -1,3 +1,6 @@
 {
-  "parent": "rngtech:block/solar_array_controller"
+  "parent": "rngtech:block/solar_array_controller",
+  "textures": {
+    "display": "rngtech:block/solar_array_controller/display_item"
+  }
 }

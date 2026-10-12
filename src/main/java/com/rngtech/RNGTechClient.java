@@ -12,6 +12,8 @@ import com.rngtech.client.renderer.CorrosionCellRenderer;
 import com.rngtech.client.renderer.ForestryCartRenderer;
 import com.rngtech.client.renderer.ModularToolItemRenderer;
 import com.rngtech.client.renderer.SolarArrayControllerRenderer;
+import com.rngtech.client.renderer.SolarPanelModels;
+import com.rngtech.client.renderer.SolarPanelRenderer;
 import com.rngtech.client.renderer.SolidFuelBurnerRenderer;
 import com.rngtech.client.renderer.SyngasCombustorRenderer;
 import com.rngtech.client.screen.AdvancedItemFilterScreen;
@@ -70,7 +72,9 @@ import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
+import net.neoforged.fml.config.ModConfig;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
+import net.neoforged.neoforge.client.event.ModelEvent;
 import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
 import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
 import net.neoforged.neoforge.client.extensions.common.IClientFluidTypeExtensions;
@@ -99,6 +103,8 @@ public final class RNGTechClient {
         modBus.addListener(SolidFuelBurnerRenderer::registerModels);
         modBus.addListener(this::registerClientExtensions);
         modBus.addListener(this::registerKeyMappings);
+        modBus.addListener(ModelEvent.RegisterAdditional.class, SolarPanelModels::registerAdditional);
+        modBus.addListener(ModelEvent.ModifyBakingResult.class, SolarPanelModels::modifyBakingResult);
         modBus.addListener(CableTintClient::registerBlockColors);
         modBus.addListener(CableTintClient::registerItemColors);
         modBus.addListener(BioGeneratorRenderer::registerModels);
@@ -108,6 +114,7 @@ public final class RNGTechClient {
         NeoForge.EVENT_BUS.addListener(ConfiguratorClient::onClientTick);
         NeoForge.EVENT_BUS.addListener(MachineSoundClient::onClientTick);
         NeoForge.EVENT_BUS.addListener(MinersCompanionLampClient::onClientTick);
+        container.registerConfig(ModConfig.Type.CLIENT, RNGTechClientConfig.SPEC);
         container.registerExtensionPoint(IConfigScreenFactory.class, ConfigurationScreen::new);
         UniqueTooltip.setOpenHost(UniqueHostReaders::current);
     }
@@ -157,6 +164,7 @@ public final class RNGTechClient {
     private void registerRenderers(EntityRenderersEvent.RegisterRenderers event) {
         event.registerBlockEntityRenderer(ModBlockEntities.BATTERY_CHASSIS.get(), BatteryChassisRenderer::new);
         event.registerBlockEntityRenderer(ModBlockEntities.SOLAR_ARRAY_CONTROLLER.get(), SolarArrayControllerRenderer::new);
+        event.registerBlockEntityRenderer(ModBlockEntities.SOLAR_PANEL.get(), SolarPanelRenderer::new);
         event.registerBlockEntityRenderer(ModBlockEntities.BIO_GENERATOR.get(), BioGeneratorRenderer::new);
         event.registerBlockEntityRenderer(ModBlockEntities.CAVITATION_GENERATOR.get(), CavitationGeneratorRenderer::new);
         event.registerBlockEntityRenderer(ModBlockEntities.CORROSION_CELL.get(), CorrosionCellRenderer::new);

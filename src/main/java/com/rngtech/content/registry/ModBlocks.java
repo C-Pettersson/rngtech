@@ -241,6 +241,7 @@ public final class ModBlocks {
                     .mapColor(MapColor.METAL)
                     .strength(3.0F)
                     .sound(SoundType.METAL)
+                    .noOcclusion()
     );
     public static final Map<ResonanceCalibratorChassis, DeferredBlock<ResonanceCalibratorBlock>> RESONANCE_CALIBRATORS =
             registerResonanceCalibratorBlocks();
@@ -634,6 +635,7 @@ public final class ModBlocks {
                             .mapColor(MapColor.METAL)
                             .strength(2.0F)
                             .sound(SoundType.GLASS)
+                            .noOcclusion()
             );
             blocks.put(material, block);
         }

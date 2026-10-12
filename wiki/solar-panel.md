@@ -33,6 +33,8 @@ wiki:
 
 **Solar Panels** generate FE from daylight with no fuel at all. Place one under open sky and it charges whatever is next to it. Once you have a few, a **Solar Array Controller** gathers a connected field of panels into one output with a shared buffer and its own bonuses.
 
+Each panel is a low tracker on a ground pad: a deck of cells on a torque tube. While it generates, the deck tilts toward the sun and follows it across the sky, east in the morning and west in the afternoon. When it can't generate it lies flat, so you can tell at a glance which panels are working. Panels are a little over a third of a block tall, so you can walk across a field of them.
+
 Each panel and controller you craft rolls its own [rarity and affixes](rarity-and-affixes.md). Solar blocks do not have Machine Mastery.
 
 ## Obtaining
@@ -59,9 +61,13 @@ A panel generates FE only when all of these are true:
 - The block above the panel can see the sky. Transparent blocks that keep sky visibility are fine.
 - You are in the Overworld. Other dimensions are disabled by default in the common config.
 
-Rain, snow, and thunderstorms drop a panel to its lower weather output. At night or under a roof it makes nothing.
+Rain, snow, and thunderstorms drop a panel to its lower weather output. At night or under a roof it makes nothing. Anything above a panel blocks it, including another panel, even with a gap between them.
 
 A standalone panel stores FE in a small internal buffer and pushes it out to adjacent blocks that accept FE, such as a [Universal Cable](universal-cable.md) or a [Battery Chassis](battery-chassis.md). A panel does not limit its own output, so the receiver or connector tier decides how much FE moves each tick. Panels never accept FE from outside.
+
+The cable port sits on the underside of the ground pad. Run a cable one block down, under the panels, and the pads cover it. A cable beside a panel connects too.
+
+A standalone panel with a full buffer has nowhere to send its FE, so it stops and lies flat until something takes the FE.
 
 ### Stages
 
@@ -86,13 +92,22 @@ Place the controller on the same level as your panels. Every 20 ticks it scans a
 
 The controller starts at range 1. Range rolls on the controller and an installed Solar Array Extender raise it, up to a maximum of 2.
 
-While a controller owns a panel, that panel stops exporting on its own. The controller adds up its panels' output, applies its own stats once to the total, stores the FE, and exports it to adjacent blocks. A few more rules:
+While a controller owns a panel, that panel stops exporting on its own. The controller adds up its panels' output, applies its own stats once to the total, stores the FE, and exports it to adjacent blocks. Its cable port is also on the underside of its pad. A few more rules:
 
 - **Set bonus.** If every panel spot in range holds a panel of the same stage, the array gets +20% output.
 - **Overlap.** A panel inside two controllers' ranges splits its output between them.
 - **No output cap.** Like a standalone panel, the controller does not limit its own output, so the receiver or connector tier decides how much FE moves each tick.
 
 The Process tab has a button that toggles an in-world outline of the controller's range. The outline stays visible after you close the screen.
+
+The controller shows the state of its array without opening the screen:
+
+- **Array map.** The display on top has one light for each panel spot in range, laid out like the field with north at the top. The controller's own spot is mint. A panel it owns is amber while it generates in sunlight, pale blue while it generates in moonlight, and dim when it isn't generating. An empty spot is dark.
+- **Battery bay.** An installed Battery Cell shows behind the glass on the front.
+- **Extender.** An installed Solar Array Extender sits on the bracket at the back.
+- **Status lamp.** The lamp on the front lights while the array generates.
+
+A controller that converts moonlight (Moonlit Conversion, Lunar Inverter, or the Aethergold extender) keeps its panels tracking at night, following the moon.
 
 #### Controller affixes
 
@@ -126,8 +141,10 @@ Extenders also roll their own affixes, which apply while installed.
 
 | Block | Behavior |
 |---|---|
-| Solar Panel | Exports FE on every side. Does not accept FE or items. |
-| Solar Array Controller | Exports FE on every side. Does not accept FE. Gear is installed by hand. |
+| Solar Panel | Exports FE on every side. The cable port is under its pad. Does not accept FE or items. |
+| Solar Array Controller | Exports FE on every side. The cable port is under its pad. Does not accept FE. Gear is installed by hand. |
+
+If a very large field slows your game down, turn off animated solar panels in RNGTech's client config. Panels then tilt in steps instead of turning smoothly.
 
 ## Screen
 
