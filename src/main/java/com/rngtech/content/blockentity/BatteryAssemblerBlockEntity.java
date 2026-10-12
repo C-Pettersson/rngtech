@@ -530,12 +530,20 @@ public class BatteryAssemblerBlockEntity extends BaseMachineBlockEntity
             ItemStack remainder = input.getCraftingRemainingItem();
             input.shrink(1);
             if (!remainder.isEmpty()) {
-                if (input.isEmpty()) {
-                    processInventory.setStackInSlot(slot, remainder);
-                } else if (level != null) {
-                    Containers.dropItemStack(level, worldPosition.getX(), worldPosition.getY(), worldPosition.getZ(), remainder);
-                }
+                placeRemainder(slot, remainder);
             }
+        }
+    }
+
+    /**
+     * A remainder a recipe uses at this slot's position refills the emptied slot; any other would jam automated input, so
+     * it leaves the machine.
+     */
+    private void placeRemainder(int slot, ItemStack remainder) {
+        if (processInventory.getStackInSlot(slot).isEmpty() && isAssemblyInput(slot - SLOT_INPUT_0, remainder)) {
+            processInventory.setStackInSlot(slot, remainder);
+        } else {
+            ejectBelowOrDrop(remainder);
         }
     }
 

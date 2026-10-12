@@ -1081,11 +1081,16 @@ public class AlloyFurnaceBlockEntity extends BaseMachineBlockEntity implements M
         ItemStack remainder = input.getCraftingRemainingItem();
         input.shrink(1);
         if (!remainder.isEmpty()) {
-            if (input.isEmpty()) {
-                processInventory.setStackInSlot(slot, remainder);
-            } else if (level != null) {
-                Containers.dropItemStack(level, worldPosition.getX(), worldPosition.getY(), worldPosition.getZ(), remainder);
-            }
+            placeRemainder(slot, remainder);
+        }
+    }
+
+    /** A remainder an alloy recipe uses refills its emptied slot; any other would jam automated input, so it leaves. */
+    private void placeRemainder(int slot, ItemStack remainder) {
+        if (processInventory.getStackInSlot(slot).isEmpty() && isAlloyInput(remainder)) {
+            processInventory.setStackInSlot(slot, remainder);
+        } else {
+            ejectBelowOrDrop(remainder);
         }
     }
 

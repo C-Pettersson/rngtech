@@ -80,9 +80,11 @@ The Gear tab has one optional **Battery Cell** slot. FE you supply fills the mac
 | Side | Behavior |
 |---|---|
 | Top | Inserts into the four item input slots. Each slot accepts only items a recipe needs in that position. |
-| Bottom | Extracts finished items from the output rack. |
+| Bottom | Extracts finished items from the output rack. Ingredient leftovers are pushed into the inventory below. |
 | Sides | Insert dry electrolyte or filled fluid containers into the fluid slot, and extract empty containers. |
 | Any | Accepts FE and assembly fluids, for example from a [Universal Cable](universal-cable.md). |
+
+No default recipe uses an ingredient that leaves an item behind. If your modpack adds one, such as a {{ item('minecraft:honey_bottle') }} that leaves a Glass Bottle, the leftover goes back into its input slot only when a recipe uses it. Any other leftover goes into the inventory directly below, such as a hopper or chest, or drops on the ground if there is none, so it never blocks the input slots.
 
 Gear slots are not reachable by automation.
 
