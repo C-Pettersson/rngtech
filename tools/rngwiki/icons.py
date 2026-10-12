@@ -11,7 +11,16 @@ from .resources import Resources, split_id
 SIZE = 128
 _SUPERSAMPLE = 2
 _FOLIAGE_TINT = (124, 189, 107)
-_SHADE = {"up": 1.0, "north": 0.8, "west": 0.6}
+# Direction toward the viewer: the projection collapses (1, -top/side, 1), and the viewer sits on the up-north-west side.
+_VIEW = (-1.0, math.sqrt(2) / (2 * math.cos(math.radians(30))), -1.0)
+_NORMALS = {
+    "up": (0.0, 1.0, 0.0),
+    "down": (0.0, -1.0, 0.0),
+    "north": (0.0, 0.0, -1.0),
+    "south": (0.0, 0.0, 1.0),
+    "west": (-1.0, 0.0, 0.0),
+    "east": (1.0, 0.0, 0.0),
+}
 
 
 def _resolve_model(resources: Resources, model_id: str) -> tuple[dict, list | None, list[str]]:
@@ -135,6 +144,57 @@ def _draw_face(canvas: Image.Image, source: Image.Image, origin, u_end, v_end, s
     canvas.alpha_composite(face)
 
 
+def _shade(normal: tuple[float, float, float]) -> float:
+    """Minecraft's directional face shading, so rotated faces shade between their neighbours."""
+    nx, ny, nz = normal
+    return nx * nx * 0.6 + nz * nz * 0.8 + ny * ny * (1.0 if ny > 0 else 0.5)
+
+
+def _rotator(rotation: dict | None):
+    """A point rotation for an element's "rotation" block: origin, axis, angle, and optional rescale."""
+    if not rotation:
+        return lambda point, is_vector=False: point
+    angle = math.radians(rotation.get("angle", 0.0))
+    axis = rotation.get("axis", "y")
+    origin = rotation.get("origin", [8, 8, 8])
+    cos, sin = math.cos(angle), math.sin(angle)
+    scale = 1.0 / cos if rotation.get("rescale") and abs(cos) > 1e-6 else 1.0
+
+    def rotate(point, is_vector=False):
+        x, y, z = (point[i] - (0 if is_vector else origin[i]) for i in range(3))
+        if axis == "x":
+            y, z = y * cos - z * sin, y * sin + z * cos
+            if not is_vector:
+                y, z = y * scale, z * scale
+        elif axis == "y":
+            x, z = x * cos + z * sin, -x * sin + z * cos
+            if not is_vector:
+                x, z = x * scale, z * scale
+        else:
+            x, y = x * cos - y * sin, x * sin + y * cos
+            if not is_vector:
+                x, y = x * scale, y * scale
+        if is_vector:
+            return (x, y, z)
+        return (x + origin[0], y + origin[1], z + origin[2])
+
+    return rotate
+
+
+def _face_geometry(element: dict) -> dict:
+    """Per face: default UV, then the texture's top-left, top-right, and bottom-left corners in model space."""
+    (x1, y1, z1), (x2, y2, z2) = element["from"], element["to"]
+    (a1, b1, c1), (a2, b2, c2) = element.get("uv_box", (element["from"], element["to"]))
+    return {
+        "up": ((a1, c1, a2, c2), (x1, y2, z1), (x2, y2, z1), (x1, y2, z2)),
+        "down": ((a1, 16 - c2, a2, 16 - c1), (x1, y1, z2), (x2, y1, z2), (x1, y1, z1)),
+        "north": ((16 - a2, 16 - b2, 16 - a1, 16 - b1), (x2, y2, z1), (x1, y2, z1), (x2, y1, z1)),
+        "south": ((a1, 16 - b2, a2, 16 - b1), (x1, y2, z2), (x2, y2, z2), (x1, y1, z2)),
+        "west": ((c1, 16 - b2, c2, 16 - b1), (x1, y2, z1), (x1, y2, z2), (x1, y1, z1)),
+        "east": ((16 - c2, 16 - b2, 16 - c1, 16 - b1), (x2, y2, z2), (x2, y2, z1), (x2, y1, z2)),
+    }
+
+
 def _fit_small_model(elements: list) -> list:
     """Enlarge small models such as cable cores so they stay readable at slot size."""
     lows = [min(e["from"][i] for e in elements) for i in range(3)]
@@ -148,7 +208,13 @@ def _fit_small_model(elements: list) -> list:
     def move(point):
         return [8 + (point[i] - centre[i]) * scale for i in range(3)]
 
-    return [{**e, "from": move(e["from"]), "to": move(e["to"]), "uv_box": (e["from"], e["to"])} for e in elements]
+    def moved(element):
+        fitted = {**element, "from": move(element["from"]), "to": move(element["to"]), "uv_box": (element["from"], element["to"])}
+        if element.get("rotation"):
+            fitted["rotation"] = {**element["rotation"], "origin": move(element["rotation"].get("origin", [8, 8, 8]))}
+        return fitted
+
+    return [moved(e) for e in elements]
 
 
 def _block_icon(resources: Resources, textures: dict, elements: list, tint: bool) -> Image.Image | None:
@@ -159,33 +225,30 @@ def _block_icon(resources: Resources, textures: dict, elements: list, tint: bool
 
     def depth(element):
         (x1, y1, z1), (x2, y2, z2) = element["from"], element["to"]
-        return (x1 + x2) + (z1 + z2) - (y1 + y2)
+        x, y, z = _rotator(element.get("rotation"))(((x1 + x2) / 2, (y1 + y2) / 2, (z1 + z2) / 2))
+        return 2 * x + 2 * z - 2 * y
 
     drawn = False
     for element in sorted(elements, key=depth, reverse=True):
-        (x1, y1, z1), (x2, y2, z2) = element["from"], element["to"]
         faces = element.get("faces", {})
-        (a1, b1, c1), (a2, b2, c2) = element.get("uv_box", (element["from"], element["to"]))
-        p = projection.point
-        geometry = {
-            "up": ((a1, c1, a2, c2), p(x1, y2, z1), p(x2, y2, z1), p(x1, y2, z2)),
-            "north": ((16 - a2, 16 - b2, 16 - a1, 16 - b1), p(x2, y2, z1), p(x1, y2, z1), p(x2, y1, z1)),
-            "west": ((c1, 16 - b2, c2, 16 - b1), p(x1, y2, z1), p(x1, y2, z2), p(x1, y1, z1)),
-        }
-        for name in ("up", "north", "west"):
+        rotate = _rotator(element.get("rotation"))
+        for name, (default_uv, origin, u_end, v_end) in _face_geometry(element).items():
             face = faces.get(name)
             if not face:
+                continue
+            normal = rotate(_NORMALS[name], is_vector=True)
+            if sum(n * v for n, v in zip(normal, _VIEW)) <= 1e-6:
                 continue
             texture = resources.texture(_texture_ref(textures, face.get("texture")) or "")
             if texture is None:
                 continue
-            default_uv, origin, u_end, v_end = geometry[name]
             source = _face_source(texture, face.get("uv", list(default_uv)), face.get("rotation", 0))
             if source is None:
                 continue
             if tint and "tintindex" in face:
                 source = _tinted(source, _FOLIAGE_TINT)
-            _draw_face(canvas, source, origin, u_end, v_end, _SHADE[name])
+            corners = [projection.point(*rotate(corner)) for corner in (origin, u_end, v_end)]
+            _draw_face(canvas, source, *corners, _shade(normal))
             drawn = True
     if not drawn:
         return None

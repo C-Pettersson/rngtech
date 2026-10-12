@@ -7,6 +7,8 @@ import com.rngtech.content.registry.ModDataComponents;
 import com.rngtech.rpg.MachineTraits;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -42,6 +44,20 @@ public class AmmoniaFuelCellBlock extends BaseMachineBlock {
             return null;
         }
         return createTickerHelper(blockEntityType, ModBlockEntities.AMMONIA_FUEL_CELL.get(), AmmoniaFuelCellBlockEntity::serverTick);
+    }
+
+    /** Nitrogen and water vapour leave the vent stack above the residue trap while the cell runs. */
+    @Override
+    public void animateTick(BlockState state, Level level, BlockPos pos, RandomSource random) {
+        if (!state.getValue(ACTIVE) || random.nextInt(3) != 0) {
+            return;
+        }
+        double x = 14.625 / 16.0 - 0.5;
+        double z = 14.625 / 16.0 - 0.5;
+        double angle = Math.toRadians(180.0 - state.getValue(FACING).toYRot());
+        double worldX = x * Math.cos(angle) + z * Math.sin(angle);
+        double worldZ = -x * Math.sin(angle) + z * Math.cos(angle);
+        level.addParticle(ParticleTypes.WHITE_SMOKE, pos.getX() + 0.5 + worldX, pos.getY() + 15.5 / 16.0, pos.getZ() + 0.5 + worldZ, 0.0, 0.03, 0.0);
     }
 
     @Override

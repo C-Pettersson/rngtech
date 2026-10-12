@@ -5,27 +5,46 @@
             "material": "nullite"
         }
     ],
-    "type": "rngtech:trait_shaped",
+    "type": "rngtech:calibrated_shaped",
     "category": "misc",
     "pattern": [
         "PGP",
         "GCG",
-        "PUP"
+        "HUP"
     ],
     "key": {
         "C": {
-            "item": "rngtech:nullite_coil"
+            "ingredient": {
+                "item": "rngtech:nullite_coil"
+            }
         },
         "G": {
-            "item": "rngtech:nullite_gear"
+            "ingredient": {
+                "item": "rngtech:nullite_gear"
+            }
+        },
+        "H": {
+            "ingredient": {
+                "item": "rngtech:cavitation_rotor_hub"
+            },
+            "calibration": {
+                "family": "kinetic",
+                "min_stage": 5,
+                "min_stability": 65
+            }
         },
         "P": {
-            "item": "rngtech:nullite_plate"
+            "ingredient": {
+                "item": "rngtech:nullite_plate"
+            }
         },
         "U": {
-            "tag": "c:circuits/ultimate"
+            "ingredient": {
+                "tag": "c:circuits/ultimate"
+            }
         }
     },
+    "record_calibration": "H",
     "result": {
         "id": "rngtech:nullite_cavitation_rotor"
     }

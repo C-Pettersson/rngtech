@@ -3,13 +3,20 @@ package com.rngtech.gametest;
 import static com.rngtech.gametest.MachineTestSupport.check;
 
 import com.rngtech.RNGTech;
+import com.rngtech.content.block.SolarPanelBlock;
 import com.rngtech.content.blockentity.SolarArrayControllerBlockEntity;
+import com.rngtech.content.blockentity.SolarPanelBlockEntity;
+import com.rngtech.content.energy.BatteryCellMaterial;
+import com.rngtech.content.energy.SolarArrayExtenderMaterial;
 import com.rngtech.content.energy.SolarPanelMaterial;
+import com.rngtech.content.energy.SolarTracker;
 import com.rngtech.content.registry.ModBlocks;
+import com.rngtech.content.registry.ModItems;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Blocks;
 import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
@@ -51,6 +58,7 @@ public final class SolarArrayGameTests {
                     RNGTech.LOGGER.info("Solar GameTest: tiled controllers output {} and {} FE/t", output(left), output(right));
                     check(shared[0] > 0, "The array generated nothing");
                     check(output(right) == shared[0], "Mirrored controllers generated " + shared[0] + " and " + output(right));
+                    check(tracker(helper, new BlockPos(0, 1, 1)) != SolarTracker.STOWED, "A claimed panel stayed stowed at noon");
                     helper.setBlock(RIGHT, ModBlocks.solarPanel(SolarPanelMaterial.CRUDE).get());
                 })
                 .thenIdle(RESCAN_TICKS)
@@ -63,6 +71,84 @@ public final class SolarArrayGameTests {
                 .thenIdle(RESCAN_TICKS)
                 .thenExecute(() -> check(output(left) < alone[0], "Covering a panel kept its output: " + output(left)))
                 .thenSucceed();
+    }
+
+    /**
+     * Panels have an open model but still shade what is under them: a panel two blocks below another sees no sky and
+     * stays stowed, while the top panel generates and tracks the sun.
+     */
+    @GameTest(template = MachineTestSupport.EMPTY, timeoutTicks = 100, batch = "solar_noon")
+    public static void panelsShadeThePanelBelow(GameTestHelper helper) {
+        helper.getLevel().setDayTime(6000L);
+        helper.getLevel().setWeatherParameters(6000, 0, false, false);
+        BlockPos lower = new BlockPos(2, 1, 2);
+        BlockPos upper = new BlockPos(2, 3, 2);
+        helper.setBlock(lower, ModBlocks.solarPanel(SolarPanelMaterial.CRUDE).get());
+        helper.setBlock(upper, ModBlocks.solarPanel(SolarPanelMaterial.CRUDE).get());
+        helper.startSequence()
+                .thenIdle(RESCAN_TICKS + 4)
+                .thenExecute(() -> {
+                    SolarPanelBlockEntity shaded = panel(helper, lower);
+                    SolarPanelBlockEntity open = panel(helper, upper);
+                    check(shaded.currentGeneration() == 0, "A panel under another panel generated " + shaded.currentGeneration() + " FE/t");
+                    check(open.currentGeneration() > 0, "The top panel generated nothing");
+                    check(tracker(helper, lower) == SolarTracker.STOWED, "The shaded panel tracked the sun");
+                    check(tracker(helper, upper) != SolarTracker.STOWED, "The generating panel stayed stowed");
+                })
+                .thenSucceed();
+    }
+
+    /**
+     * Installed Gear survives the array map updates a working controller sends (panels claimed, day to night), and
+     * the update a client receives carries it.
+     */
+    @GameTest(template = MachineTestSupport.EMPTY, timeoutTicks = 200, batch = "solar_gear")
+    public static void controllerKeepsGearThroughMapUpdates(GameTestHelper helper) {
+        helper.getLevel().setDayTime(6000L);
+        helper.getLevel().setWeatherParameters(6000, 0, false, false);
+        BlockPos centre = new BlockPos(2, 1, 2);
+        for (int x = 1; x <= 3; x++) {
+            for (int z = 1; z <= 3; z++) {
+                if (x != 2 || z != 2) {
+                    helper.setBlock(new BlockPos(x, 1, z), ModBlocks.solarPanel(SolarPanelMaterial.CRUDE).get());
+                }
+            }
+        }
+        SolarArrayControllerBlockEntity controller = MachineTestSupport.place(helper, centre, ModBlocks.SOLAR_ARRAY_CONTROLLER.get(), SolarArrayControllerBlockEntity.class);
+        ItemStack cell = new ItemStack(ModItems.batteryCell(BatteryCellMaterial.IRON).get());
+        ItemStack extender = new ItemStack(ModItems.solarArrayExtender(SolarArrayExtenderMaterial.SPARKSTEEL).get());
+        check(controller.getGearInventory().insertItem(SolarArrayControllerBlockEntity.SLOT_BATTERY_CELL, cell, false).isEmpty(), "The Battery Cell was not accepted");
+        check(controller.getGearInventory().insertItem(SolarArrayControllerBlockEntity.SLOT_SOLAR_ARRAY_EXTENDER, extender, false).isEmpty(), "The extender was not accepted");
+        helper.startSequence()
+                .thenIdle(RESCAN_TICKS)
+                .thenExecute(() -> {
+                    checkGear(controller, "at noon");
+                    helper.getLevel().setDayTime(14000L);
+                })
+                .thenIdle(RESCAN_TICKS)
+                .thenExecute(() -> {
+                    checkGear(controller, "at night");
+                    SolarArrayControllerBlockEntity client = new SolarArrayControllerBlockEntity(controller.getBlockPos(), controller.getBlockState());
+                    client.loadWithComponents(controller.getUpdateTag(helper.getLevel().registryAccess()), helper.getLevel().registryAccess());
+                    checkGear(client, "in the client update");
+                })
+                .thenSucceed();
+    }
+
+    private static void checkGear(SolarArrayControllerBlockEntity controller, String when) {
+        check(!controller.getGearInventory().getStackInSlot(SolarArrayControllerBlockEntity.SLOT_BATTERY_CELL).isEmpty(), "The Battery Cell was lost " + when);
+        check(!controller.getGearInventory().getStackInSlot(SolarArrayControllerBlockEntity.SLOT_SOLAR_ARRAY_EXTENDER).isEmpty(), "The extender was lost " + when);
+    }
+
+    private static SolarPanelBlockEntity panel(GameTestHelper helper, BlockPos pos) {
+        if (helper.getBlockEntity(pos) instanceof SolarPanelBlockEntity panel) {
+            return panel;
+        }
+        throw new IllegalStateException("No Solar Panel at " + pos);
+    }
+
+    private static SolarTracker tracker(GameTestHelper helper, BlockPos pos) {
+        return helper.getBlockState(pos).getValue(SolarPanelBlock.TRACKER);
     }
 
     private static int output(SolarArrayControllerBlockEntity controller) {

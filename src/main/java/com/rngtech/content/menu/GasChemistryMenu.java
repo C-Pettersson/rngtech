@@ -2,6 +2,7 @@ package com.rngtech.content.menu;
 
 import com.rngtech.content.blockentity.GasChemistryBlockEntity;
 import com.rngtech.content.chemistry.GasChemistryMachine;
+import com.rngtech.content.energy.CombustionMixture;
 import com.rngtech.content.purge.FluidPurgeSupport;
 import com.rngtech.content.registry.ModBlocks;
 import com.rngtech.content.registry.ModMenus;
@@ -57,7 +58,10 @@ public class GasChemistryMenu extends AbstractContainerMenu implements StatBreak
     private static final int DATA_INPUT_FLUID_ID = 21;
     private static final int DATA_OUTPUT_FLUID_ID = 22;
     private static final int DATA_SECONDARY_OUTPUT_FLUID_ID = 23;
-    private static final int DATA_COUNT = 24;
+    private static final int DATA_MIXTURE = 24;
+    private static final int DATA_EXHAUST_PER_CYCLE = 25;
+    private static final int DATA_COUNT = 26;
+    private static final int BUTTON_MIXTURE_BASE = 8000;
     private static final int STAT_SCALE = 100;
     private static final int PROCESS_INPUT_SLOT = 0;
     private static final int PROCESS_OUTPUT_SLOT = 1;
@@ -145,6 +149,20 @@ public class GasChemistryMenu extends AbstractContainerMenu implements StatBreak
 
     public float secondaryOutputFill() {
         return fill(DATA_SECONDARY_OUTPUT, DATA_TANK_CAPACITY);
+    }
+
+    /** The Syngas Combustor's fuel mixture, in percent. */
+    public int mixture() {
+        return data.get(DATA_MIXTURE);
+    }
+
+    /** Carbon Exhaust one cycle leaves at the selected mixture; 0 without a recipe. */
+    public int exhaustPerCycle() {
+        return data.get(DATA_EXHAUST_PER_CYCLE);
+    }
+
+    public static int mixtureButtonId(int mixture) {
+        return BUTTON_MIXTURE_BASE + CombustionMixture.clamp(mixture);
     }
 
     public int progress() {
@@ -290,6 +308,15 @@ public class GasChemistryMenu extends AbstractContainerMenu implements StatBreak
     @Override
     public boolean clickMenuButton(Player player, int id) {
         if (FluidPurgeSupport.handleMenuButton(player, gasChemistry, id)) {
+            return true;
+        }
+        int mixture = id - BUTTON_MIXTURE_BASE;
+        if (gasChemistry.machine() == GasChemistryMachine.SYNGAS_COMBUSTOR
+                && mixture >= CombustionMixture.MIN_MIXTURE
+                && mixture <= CombustionMixture.MAX_MIXTURE) {
+            if (!player.level().isClientSide) {
+                gasChemistry.setMixture(mixture);
+            }
             return true;
         }
         if (id != RefinementMenuSupport.BUTTON_APPLY) {

@@ -1,6 +1,7 @@
 package com.rngtech.content.blockentity;
 
 import com.rngtech.content.block.BaseMachineBlock;
+import com.rngtech.content.energy.CorrosionCellLoad;
 import com.rngtech.content.item.BatteryCellItem;
 import com.rngtech.content.item.CathodeItem;
 import com.rngtech.content.item.GearParts;
@@ -29,8 +30,12 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.Connection;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.game.ClientGamePacketListener;
+import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.util.Mth;
 import net.minecraft.world.Containers;
 import net.minecraft.world.MenuProvider;
@@ -40,6 +45,7 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.energy.IEnergyStorage;
 import net.neoforged.neoforge.fluids.FluidStack;
@@ -106,8 +112,11 @@ public class CorrosionCellBlockEntity extends BaseMachineBlockEntity
     private static final int DATA_FLAT_ENERGY_GENERATION = 19;
     private static final int DATA_BASE_ENERGY_GENERATION = 20;
     private static final int DATA_ELECTROLYTE_FLUID_ID = 21;
+    private static final int DATA_LOAD = 22;
+    private static final int DATA_LIVE_LOAD = 23;
     private static final int STAT_SCALE = 100;
     private static final int COMPONENT_STAGE = 4;
+    private static final int VISUAL_SYNC_INTERVAL = 2;
 
     private final ItemStackHandler processInventory = new ItemStackHandler(PROCESS_SLOT_COUNT) {
         @Override
@@ -188,7 +197,7 @@ public class CorrosionCellBlockEntity extends BaseMachineBlockEntity
         public int get(int index) {
             MachineStatAccumulator stats = effectiveStats();
             return switch (index) {
-                case DATA_PROGRESS -> progress;
+                case DATA_PROGRESS -> displayProgress();
                 case DATA_PROCESSING_TICKS -> currentProcessingTicks(stats);
                 case DATA_ENERGY -> energyStored();
                 case DATA_ENERGY_CAPACITY -> energyCapacity(stats);
@@ -210,6 +219,8 @@ public class CorrosionCellBlockEntity extends BaseMachineBlockEntity
                 case DATA_STABILITY -> scaledStat(stats, MachineStat.STABILITY);
                 case DATA_REFINEMENT_POTENTIAL -> scaledStat(stats, MachineStat.REFINEMENT_POTENTIAL);
                 case DATA_ELECTROLYTE_FLUID_ID -> BuiltInRegistries.FLUID.getId(electrolyteTank.getFluid().getFluid());
+                case DATA_LOAD -> load;
+                case DATA_LIVE_LOAD -> (int) Math.round(liveCurrent * 100.0);
                 default -> 0;
             };
         }
@@ -220,20 +231,26 @@ public class CorrosionCellBlockEntity extends BaseMachineBlockEntity
 
         @Override
         public int getCount() {
-            return DATA_ELECTROLYTE_FLUID_ID + 1;
+            return DATA_LIVE_LOAD + 1;
         }
     };
 
     private final BulkSpeedState bulkSpeed = new BulkSpeedState();
     private final BulkSpeedState.InputWatch plateWatch = new BulkSpeedState.InputWatch();
     private final BulkSpeedState.InputWatch electrolyteWatch = new BulkSpeedState.InputWatch();
-    private int progress;
+    /** Rated ticks of the active fuel already dissolved; the cycle ends at {@code activeProcessingTicks}. */
+    private double progress;
     private int activeProcessingTicks;
     private int internalEnergy;
     private double activeTotalEnergy;
-    private double remainingEnergy;
     private double generationCarry;
     private ItemStack pendingResidue = ItemStack.EMPTY;
+    private String activeFuel = "";
+    private int load = CorrosionCellLoad.RATED_LOAD;
+    private double liveCurrent;
+    private CorrosionVisualState visualState = CorrosionVisualState.IDLE;
+    private CorrosionVisualState.Key lastSyncedVisual;
+    private final CorrosionVisualState.Animation animation = new CorrosionVisualState.Animation();
 
     public CorrosionCellBlockEntity(BlockPos pos, BlockState blockState) {
         super(ModBlockEntities.CORROSION_CELL.get(), pos, blockState, MachineType.CORROSION_CELL, SLOT_PLATE, SLOT_ELECTROLYTE, SLOT_RESIDUE);
@@ -247,6 +264,76 @@ public class CorrosionCellBlockEntity extends BaseMachineBlockEntity
         if (generated || exported) {
             cell.setChanged();
         }
+        cell.syncVisualState(level);
+    }
+
+    /** The selected share of rated current, in percent. */
+    public int load() {
+        return load;
+    }
+
+    public void setLoad(int load) {
+        int snapped = CorrosionCellLoad.snap(load);
+        if (snapped != this.load) {
+            this.load = snapped;
+            setChanged();
+        }
+    }
+
+    /** Client copy of the state the renderer draws; synced from the server in the block entity update tag. */
+    public CorrosionVisualState visualState() {
+        return visualState;
+    }
+
+    public CorrosionVisualState.Animation animation() {
+        return animation;
+    }
+
+    @Override
+    public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
+        return currentVisualState().save();
+    }
+
+    @Override
+    public Packet<ClientGamePacketListener> getUpdatePacket() {
+        return ClientboundBlockEntityDataPacket.create(this);
+    }
+
+    @Override
+    public void handleUpdateTag(CompoundTag tag, HolderLookup.Provider registries) {
+        visualState = CorrosionVisualState.load(tag);
+    }
+
+    @Override
+    public void onDataPacket(Connection connection, ClientboundBlockEntityDataPacket packet, HolderLookup.Provider registries) {
+        visualState = CorrosionVisualState.load(packet.getTag());
+    }
+
+    private void syncVisualState(Level level) {
+        if (level.getGameTime() % VISUAL_SYNC_INTERVAL != 0) {
+            return;
+        }
+        CorrosionVisualState.Key key = currentVisualState().key();
+        if (!key.equals(lastSyncedVisual)) {
+            lastSyncedVisual = key;
+            level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), Block.UPDATE_CLIENTS);
+        }
+    }
+
+    /** What the renderer shows, computed on the server. */
+    public CorrosionVisualState currentVisualState() {
+        ItemStack residue = processInventory.getStackInSlot(SLOT_RESIDUE);
+        boolean active = hasActiveRecipe();
+        return new CorrosionVisualState(
+                active ? activeFuel : "",
+                active ? (float) Mth.clamp(1.0 - progress / activeProcessingTicks, 0.0, 1.0) : 0.0F,
+                (float) liveCurrent,
+                cathodeStack().getItem() instanceof CathodeItem cathode ? cathode.material().getSerializedName() : "",
+                active || !processInventory.getStackInSlot(SLOT_ELECTROLYTE).isEmpty() || hasFluidElectrolyte(),
+                electrolyteTank.getFluidAmount() / (float) Math.max(1, electrolyteTank.getCapacity()),
+                electrolyteTank.getFluid().getFluid(),
+                residue.isEmpty() ? 0.0F : Mth.clamp(residue.getCount() / (float) residue.getMaxStackSize(), 0.0F, 1.0F)
+        );
     }
 
     public ItemStackHandler getProcessInventory() {
@@ -265,12 +352,14 @@ public class CorrosionCellBlockEntity extends BaseMachineBlockEntity
         return menuData;
     }
 
+    /** FE leaves through every face, so a connector can attach on any side. */
     public IEnergyStorage getEnergyStorage(Direction side) {
-        return side == Direction.UP || side == Direction.DOWN ? null : trackedEnergyStorage;
+        return trackedEnergyStorage;
     }
 
+    /** With a Fluid Pump installed, Electrolyte Solution fills through every face. */
     public IFluidHandler getFluidHandler(Direction side) {
-        return side != null && side.getAxis().isHorizontal() && hasFluidPump() ? fluidHandler : null;
+        return hasFluidPump() ? fluidHandler : null;
     }
 
     @Override
@@ -303,7 +392,7 @@ public class CorrosionCellBlockEntity extends BaseMachineBlockEntity
                         MachineInfoSnapshot.BlockedReason.NONE
                 )
                 .status(statusKey(status), recipe == null ? 0 : recipe.minimumMaterialStage())
-                .progress(progress, currentProcessingTicks(stats))
+                .progress(displayProgress(), currentProcessingTicks(stats))
                 .energy(energyStored(), energyCapacity(stats), isWorking() ? currentEnergyPerTick(stats) : 0)
                 .energyTelemetry(
                         energyFlow.lastInput(),
@@ -444,13 +533,14 @@ public class CorrosionCellBlockEntity extends BaseMachineBlockEntity
         tag.put("ProcessInventory", processInventory.serializeNBT(registries));
         tag.put("GearInventory", gearInventory.serializeNBT(registries));
         tag.put("ElectrolyteTank", electrolyteTank.writeToNBT(registries, new CompoundTag()));
-        tag.putInt("Progress", progress);
+        tag.putDouble("Progress", progress);
         tag.putInt("ActiveProcessingTicks", activeProcessingTicks);
         tag.putInt("Energy", internalEnergy);
         tag.putDouble("ActiveTotalEnergy", activeTotalEnergy);
-        tag.putDouble("RemainingEnergy", remainingEnergy);
         tag.putDouble("GenerationCarry", generationCarry);
         tag.put("PendingResidue", pendingResidue.saveOptional(registries));
+        tag.putString("ActiveFuel", activeFuel);
+        tag.putInt("LoadPercent", load);
         bulkSpeed.save(tag);
     }
 
@@ -462,13 +552,14 @@ public class CorrosionCellBlockEntity extends BaseMachineBlockEntity
         electrolyteWatch.prime(processInventory.getStackInSlot(SLOT_ELECTROLYTE));
         loadGearInventory(tag.getCompound("GearInventory"), registries);
         electrolyteTank.readFromNBT(registries, tag.getCompound("ElectrolyteTank"));
-        progress = tag.getInt("Progress");
-        activeProcessingTicks = tag.getInt("ActiveProcessingTicks");
+        progress = Math.max(0.0, tag.getDouble("Progress"));
+        activeProcessingTicks = Math.max(0, tag.getInt("ActiveProcessingTicks"));
         internalEnergy = Math.max(0, tag.getInt("Energy"));
         activeTotalEnergy = tag.getDouble("ActiveTotalEnergy");
-        remainingEnergy = tag.getDouble("RemainingEnergy");
         generationCarry = tag.getDouble("GenerationCarry");
         pendingResidue = ItemStack.parseOptional(registries, tag.getCompound("PendingResidue"));
+        activeFuel = tag.getString("ActiveFuel");
+        load = tag.contains("LoadPercent") ? CorrosionCellLoad.snap(tag.getInt("LoadPercent")) : CorrosionCellLoad.RATED_LOAD;
         bulkSpeed.load(tag);
         clampInternalEnergy();
     }
@@ -482,6 +573,7 @@ public class CorrosionCellBlockEntity extends BaseMachineBlockEntity
     }
 
     private boolean tickCell() {
+        liveCurrent = 0.0;
         if (level == null) {
             resetBulkSpeed();
             return false;
@@ -494,9 +586,6 @@ public class CorrosionCellBlockEntity extends BaseMachineBlockEntity
         }
 
         if (!hasActiveRecipe() && !tryStartRecipe(stats)) {
-            return false;
-        }
-        if (energyStored() >= energyCapacity(stats)) {
             return false;
         }
         return generateActiveRecipe(stats);
@@ -514,51 +603,60 @@ public class CorrosionCellBlockEntity extends BaseMachineBlockEntity
             return false;
         }
 
+        activeFuel = BuiltInRegistries.ITEM.getKey(processInventory.getStackInSlot(SLOT_PLATE).getItem()).toString();
         consumeSlot(SLOT_PLATE);
         consumeElectrolyte(recipe);
         pendingResidue = residue;
-        activeProcessingTicks = stats.adjustedProcessingTicks(recipe.processingTicks());
+        activeProcessingTicks = Math.max(1, stats.adjustedProcessingTicks(recipe.processingTicks()));
         activeTotalEnergy = effectiveRecipeEnergy(recipe, stats);
-        remainingEnergy = activeTotalEnergy;
         generationCarry = 0.0;
-        progress = 0;
+        progress = 0.0;
         setChanged();
-        return remainingEnergy > 0.0;
+        return true;
     }
 
+    /**
+     * Dissolves the fuel at the selected load: the load sets how much of the cycle passes this tick, and the cell voltage
+     * at that load sets the FE it is worth. Only as much fuel dissolves as the buffer can take, so a full buffer pauses the
+     * cycle without losing FE. At rated load this is one tick of the recipe per tick, at the recipe's FE/t.
+     */
     private boolean generateActiveRecipe(MachineStatAccumulator stats) {
         if (!hasActiveRecipe() || !canMergeResidue(pendingResidue)) {
             return false;
         }
-
-        int capacity = energyCapacity(stats);
-        int freeSpace = capacity - energyStored();
-        if (freeSpace <= 0) {
-            return false;
-        }
-
-        double perTick = activeTotalEnergy / Math.max(1, activeProcessingTicks);
-        generationCarry += Math.min(perTick, remainingEnergy);
-        int wholeEnergy = Math.min((int) Math.floor(generationCarry), freeSpace);
-        if (wholeEnergy <= 0) {
-            progress++;
+        if (CorrosionCellLoad.finished(progress, activeProcessingTicks)) {
             finishIfComplete();
             return true;
         }
 
-        int stored = storeGeneratedEnergy(wholeEnergy, stats);
-        if (stored <= 0) {
+        int freeSpace = energyCapacity(stats) - energyStored();
+        if (freeSpace <= 0) {
             return false;
         }
-        generationCarry -= stored;
-        remainingEnergy = Math.max(0.0, remainingEnergy - stored);
-        progress++;
+
+        double step = CorrosionCellLoad.dissolve(progress, activeProcessingTicks, load);
+        double energy = activeTotalEnergy / activeProcessingTicks * CorrosionCellLoad.fePerFuel(load) * step;
+        double room = Math.max(0.0, freeSpace - generationCarry);
+        if (energy > room) {
+            step = energy <= 0.0 ? 0.0 : step * room / energy;
+            energy = room;
+        }
+        generationCarry += energy;
+        int wholeEnergy = Math.min((int) Math.floor(generationCarry), freeSpace);
+        if (wholeEnergy > 0) {
+            generationCarry -= storeGeneratedEnergy(wholeEnergy, stats);
+        }
+        if (step <= 0.0) {
+            return wholeEnergy > 0;
+        }
+        progress += step;
+        liveCurrent = step;
         finishIfComplete();
         return true;
     }
 
     private void finishIfComplete() {
-        if (progress < activeProcessingTicks && remainingEnergy > 0.0001) {
+        if (!CorrosionCellLoad.finished(progress, activeProcessingTicks)) {
             return;
         }
         if (!canMergeResidue(pendingResidue)) {
@@ -675,7 +773,7 @@ public class CorrosionCellBlockEntity extends BaseMachineBlockEntity
 
         int remainingOutput = energyStored();
         boolean exported = false;
-        for (Direction direction : Direction.Plane.HORIZONTAL) {
+        for (Direction direction : Direction.values()) {
             if (remainingOutput <= 0 || energyStored() <= 0) {
                 return exported;
             }
@@ -758,31 +856,43 @@ public class CorrosionCellBlockEntity extends BaseMachineBlockEntity
         processInventory.setStackInSlot(SLOT_RESIDUE, merged);
     }
 
+    /** Cycle length at the selected load, for the active fuel or the next one. */
     private int currentProcessingTicks(MachineStatAccumulator stats) {
         if (hasActiveRecipe()) {
-            return activeProcessingTicks;
+            return CorrosionCellLoad.displayTicks(activeProcessingTicks, load);
         }
         CorrosionCellRecipe recipe = nextRecipe();
-        return recipe == null || !canProcessStage(recipe) ? 0 : stats.adjustedProcessingTicks(recipe.processingTicks());
+        return recipe == null || !canProcessStage(recipe)
+                ? 0
+                : CorrosionCellLoad.displayTicks(stats.adjustedProcessingTicks(recipe.processingTicks()), load);
     }
 
+    private int displayProgress() {
+        return hasActiveRecipe() ? (int) Math.floor(progress / CorrosionCellLoad.current(load) + 1.0e-6) : 0;
+    }
+
+    /** FE/t at the selected load. */
     private int currentEnergyPerTick(MachineStatAccumulator stats) {
         if (hasActiveRecipe()) {
-            return Math.max(0, (int) Math.round(activeTotalEnergy / Math.max(1, activeProcessingTicks)));
+            return Math.max(0, (int) Math.round(activeTotalEnergy / activeProcessingTicks * CorrosionCellLoad.fePerTick(load)));
         }
         CorrosionCellRecipe recipe = nextRecipe();
         if (recipe == null || !canProcessStage(recipe)) {
             return 0;
         }
-        return Math.max(1, (int) Math.round(effectiveRecipeEnergy(recipe, stats) / Math.max(1, stats.adjustedProcessingTicks(recipe.processingTicks()))));
+        double ratedPerTick = effectiveRecipeEnergy(recipe, stats) / Math.max(1, stats.adjustedProcessingTicks(recipe.processingTicks()));
+        return Math.max(1, (int) Math.round(ratedPerTick * CorrosionCellLoad.fePerTick(load)));
     }
 
+    /** FE the active or next fuel is worth at the selected load. */
     private int currentRecipeEnergy(MachineStatAccumulator stats) {
         if (hasActiveRecipe()) {
-            return Math.max(0, (int) Math.round(activeTotalEnergy));
+            return Math.max(0, (int) Math.round(activeTotalEnergy * CorrosionCellLoad.fePerFuel(load)));
         }
         CorrosionCellRecipe recipe = nextRecipe();
-        return recipe == null || !canProcessStage(recipe) ? 0 : Math.max(1, (int) Math.round(effectiveRecipeEnergy(recipe, stats)));
+        return recipe == null || !canProcessStage(recipe)
+                ? 0
+                : Math.max(1, (int) Math.round(effectiveRecipeEnergy(recipe, stats) * CorrosionCellLoad.fePerFuel(load)));
     }
 
     private int currentMinimumStage() {
@@ -825,12 +935,13 @@ public class CorrosionCellBlockEntity extends BaseMachineBlockEntity
         return energyStored() >= energyCapacity(stats) ? STATUS_ENERGY_FULL : STATUS_READY;
     }
 
+    /** A fuel is in the bath; a finished one stays until its residue fits the output. */
     private boolean hasActiveRecipe() {
-        return activeProcessingTicks > 0 && remainingEnergy > 0.0001;
+        return activeProcessingTicks > 0;
     }
 
     private boolean isWorking() {
-        return hasActiveRecipe() && !redstoneDisabled();
+        return hasActiveRecipe() && !CorrosionCellLoad.finished(progress, activeProcessingTicks) && !redstoneDisabled();
     }
 
     private boolean redstoneDisabled() {
@@ -839,19 +950,19 @@ public class CorrosionCellBlockEntity extends BaseMachineBlockEntity
 
     private void resetInactiveProgress() {
         resetBulkSpeed();
-        if (!hasActiveRecipe() && progress != 0) {
-            progress = 0;
+        if (!hasActiveRecipe() && progress != 0.0) {
+            progress = 0.0;
             setChanged();
         }
     }
 
     private void clearActiveRecipe() {
-        progress = 0;
+        progress = 0.0;
         activeProcessingTicks = 0;
         activeTotalEnergy = 0.0;
-        remainingEnergy = 0.0;
         generationCarry = 0.0;
         pendingResidue = ItemStack.EMPTY;
+        activeFuel = "";
     }
 
     private void resetBulkSpeed() {

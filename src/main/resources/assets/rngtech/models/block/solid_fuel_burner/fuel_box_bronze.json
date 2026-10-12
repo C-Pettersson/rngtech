@@ -1,0 +1,6 @@
+{
+  "parent": "rngtech:block/solid_fuel_burner/fuel_box",
+  "textures": {
+    "box": "rngtech:block/solid_fuel_burner/fuel_box/bronze"
+  }
+}
