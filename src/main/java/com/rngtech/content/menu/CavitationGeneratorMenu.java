@@ -1,6 +1,7 @@
 package com.rngtech.content.menu;
 
 import com.rngtech.content.blockentity.CavitationGeneratorBlockEntity;
+import com.rngtech.content.energy.CavitationRotorDynamics;
 import com.rngtech.content.purge.FluidPurgeSupport;
 import com.rngtech.content.registry.ModBlocks;
 import com.rngtech.content.registry.ModMenus;
@@ -66,7 +67,17 @@ public class CavitationGeneratorMenu extends AbstractContainerMenu implements St
     private static final int DATA_BASE_ENERGY_GENERATION = 31;
     private static final int DATA_INPUT_FLUID_ID = 32;
     private static final int DATA_OUTPUT_FLUID_ID = 33;
-    private static final int DATA_COUNT = 34;
+    private static final int DATA_ROTOR_RPM = 34;
+    private static final int DATA_THROTTLE = 35;
+    private static final int DATA_THROTTLE_HEAT = 36;
+    private static final int DATA_COOLING = 37;
+    private static final int DATA_RATED_PRESSURE = 38;
+    private static final int DATA_LIVE_WEAR = 39;
+    private static final int DATA_LIVE_RESONANCE = 40;
+    private static final int DATA_WATER_PER_CYCLE = 41;
+    private static final int DATA_MAX_PENALTY = 42;
+    private static final int DATA_COUNT = 43;
+    private static final int BUTTON_THROTTLE_BASE = 8000;
     private static final int STAT_SCALE = 100;
 
     private static final int FLUID_CONTAINER_SLOT = 0;
@@ -253,16 +264,43 @@ public class CavitationGeneratorMenu extends AbstractContainerMenu implements St
         return data.get(DATA_ROTOR_WEAR_LIMIT);
     }
 
+    /** Live pressure, following rotor speed. */
     public int pressureRating() {
         return data.get(DATA_PRESSURE_RATING);
+    }
+
+    /** The recipe's pressure at rated speed. */
+    public int ratedPressure() {
+        return data.get(DATA_RATED_PRESSURE);
     }
 
     public int recipeStrain() {
         return data.get(DATA_RECIPE_STRAIN);
     }
 
-    public int recipeWear() {
-        return data.get(DATA_RECIPE_WEAR);
+    /** Rotor wear one cycle adds at rated speed, off resonance. */
+    public double recipeWear() {
+        return data.get(DATA_RECIPE_WEAR) / 10.0;
+    }
+
+    /** Wear relative to rated at the rotor's current speed, resonance included. */
+    public double liveWear() {
+        return data.get(DATA_LIVE_WEAR) / (double) STAT_SCALE;
+    }
+
+    /** Water the next or current cycle draws, after Bonus Output. */
+    public int waterPerCycle() {
+        return data.get(DATA_WATER_PER_CYCLE);
+    }
+
+    /** FE fraction lost at the heat strain cap. */
+    public double maxStrainPenalty() {
+        return data.get(DATA_MAX_PENALTY) / (double) STAT_SCALE;
+    }
+
+    /** The resonance part of {@link #liveWear()}: 1 off resonance, lowest exactly on it. */
+    public double liveResonance() {
+        return data.get(DATA_LIVE_RESONANCE) / (double) STAT_SCALE;
     }
 
     public int outputFluid() {
@@ -279,6 +317,27 @@ public class CavitationGeneratorMenu extends AbstractContainerMenu implements St
 
     public int recipeFluidOutput() {
         return data.get(DATA_RECIPE_FLUID_OUTPUT);
+    }
+
+    public int rotorRpm() {
+        return data.get(DATA_ROTOR_RPM);
+    }
+
+    public int throttle() {
+        return data.get(DATA_THROTTLE);
+    }
+
+    /** Heat strain per tick the selected throttle adds while cavitating. */
+    public double throttleHeat() {
+        return data.get(DATA_THROTTLE_HEAT) / (double) STAT_SCALE;
+    }
+
+    public double coolingRate() {
+        return data.get(DATA_COOLING) / (double) STAT_SCALE;
+    }
+
+    public static int throttleButtonId(int throttle) {
+        return BUTTON_THROTTLE_BASE + CavitationRotorDynamics.clampThrottle(throttle);
     }
 
     public MachineTraits machineTraits() {
@@ -351,6 +410,13 @@ public class CavitationGeneratorMenu extends AbstractContainerMenu implements St
     @Override
     public boolean clickMenuButton(Player player, int id) {
         if (FluidPurgeSupport.handleMenuButton(player, generator, id)) {
+            return true;
+        }
+        int throttle = id - BUTTON_THROTTLE_BASE;
+        if (throttle >= CavitationRotorDynamics.MIN_THROTTLE && throttle <= CavitationRotorDynamics.MAX_THROTTLE) {
+            if (!player.level().isClientSide) {
+                generator.setThrottle(throttle);
+            }
             return true;
         }
         if (id != RefinementMenuSupport.BUTTON_APPLY) {

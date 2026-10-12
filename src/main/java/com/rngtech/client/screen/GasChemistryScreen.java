@@ -2,15 +2,21 @@ package com.rngtech.client.screen;
 
 import com.rngtech.content.blockentity.GasChemistryBlockEntity;
 import com.rngtech.content.chemistry.GasChemistryMachine;
+import com.rngtech.content.energy.CombustionMixture;
 import com.rngtech.content.menu.GasChemistryMenu;
 import com.rngtech.rpg.MachineStat;
 
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.Fluids;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
 
 public class GasChemistryScreen extends AbstractContainerScreen<GasChemistryMenu> {
     private static final int PANEL = 0xFFC7C8C2;
@@ -40,6 +46,19 @@ public class GasChemistryScreen extends AbstractContainerScreen<GasChemistryMenu
     private static final int SECONDARY_OUTPUT_BAR_X = 174;
     private static final int STANDARD_PROGRESS_X = 92;
     private static final int STANDARD_PROGRESS_WIDTH = 48;
+    private static final int MIXTURE_X = 72;
+    private static final int MIXTURE_Y = 32;
+    private static final int MIXTURE_WIDTH = 72;
+    private static final int MIXTURE_HEIGHT = 8;
+    private static final int MIXTURE_POINTER_HEIGHT = 3;
+    private static final int MIXTURE_LEAN_ZONE = 0xFF2E4A5E;
+    private static final int MIXTURE_RICH_ZONE = 0xFF6A4A2E;
+    private static final int MIXTURE_FILL = 0xFFF0A860;
+    private static final int MIXTURE_POINTER = 0xFFF2F2F2;
+    private static final int MIXTURE_NOTCH = 0xFF3A3C3E;
+    private static final int MIXTURE_RATED_MARK = 0xFFE6E6E0;
+    private static final int MIXTURE_COARSE_STEP = 5;
+    private static final int MIXTURE_NOTCH_STEP = 10;
 
     public GasChemistryScreen(GasChemistryMenu menu, Inventory playerInventory, Component title) {
         super(menu, playerInventory, title);
@@ -117,8 +136,106 @@ public class GasChemistryScreen extends AbstractContainerScreen<GasChemistryMenu
             if (menu.selectedTab() == GasChemistryMenu.TAB_PROCESSING && handlePurgeButtonClick(mouseX, mouseY)) {
                 return true;
             }
+            if (isOverMixtureGauge(mouseX, mouseY)) {
+                double fraction = (mouseX - (leftPos + MIXTURE_X + 1)) / (MIXTURE_WIDTH - 2);
+                int span = CombustionMixture.MAX_MIXTURE - CombustionMixture.MIN_MIXTURE;
+                sendMixture(CombustionMixture.MIN_MIXTURE + (int) Math.round(fraction * span));
+                return true;
+            }
         }
         return super.mouseClicked(mouseX, mouseY, button);
+    }
+
+    @Override
+    public boolean mouseScrolled(double mouseX, double mouseY, double scrollX, double scrollY) {
+        if (isOverMixtureGauge(mouseX, mouseY) && scrollY != 0.0) {
+            int step = hasShiftDown() ? MIXTURE_COARSE_STEP : 1;
+            sendMixture(menu.mixture() + (scrollY > 0.0 ? step : -step));
+            return true;
+        }
+        return super.mouseScrolled(mouseX, mouseY, scrollX, scrollY);
+    }
+
+    private void sendMixture(int mixture) {
+        int clamped = CombustionMixture.clamp(mixture);
+        if (clamped == menu.mixture() || minecraft == null || minecraft.player == null || minecraft.gameMode == null) {
+            return;
+        }
+        int buttonId = GasChemistryMenu.mixtureButtonId(clamped);
+        if (menu.clickMenuButton(minecraft.player, buttonId)) {
+            minecraft.gameMode.handleInventoryButtonClick(menu.containerId, buttonId);
+        }
+    }
+
+    private boolean isOverMixtureGauge(double mouseX, double mouseY) {
+        if (menu.machine() != GasChemistryMachine.SYNGAS_COMBUSTOR || menu.selectedTab() != GasChemistryMenu.TAB_PROCESSING) {
+            return false;
+        }
+        int left = leftPos + MIXTURE_X;
+        int top = topPos + MIXTURE_Y;
+        return mouseX >= left && mouseX < left + MIXTURE_WIDTH && mouseY >= top && mouseY < top + MIXTURE_HEIGHT + MIXTURE_POINTER_HEIGHT;
+    }
+
+    /** The fuel mixture from lean to rich, with the rated mixture marked. The pointer marks the selected mixture. */
+    private void renderMixtureGauge(GuiGraphics guiGraphics) {
+        int left = leftPos + MIXTURE_X;
+        int top = topPos + MIXTURE_Y;
+        int inner = MIXTURE_WIDTH - 2;
+        int rated = left + 1 + mixtureOffset(CombustionMixture.RATED_MIXTURE, inner);
+        int right = left + 1 + inner;
+        int bottom = top + MIXTURE_HEIGHT - 1;
+        guiGraphics.fill(left, top, left + MIXTURE_WIDTH, top + MIXTURE_HEIGHT, DARK);
+        guiGraphics.fill(left + 1, top + 1, rated, bottom, MIXTURE_LEAN_ZONE);
+        guiGraphics.fill(rated, top + 1, right, bottom, MIXTURE_RICH_ZONE);
+        int pointer = Math.min(left + 1 + mixtureOffset(menu.mixture(), inner), right - 1);
+        guiGraphics.fill(left + 1, top + 3, Math.max(left + 1, pointer), bottom - 2, MIXTURE_FILL);
+        for (int notch = CombustionMixture.MIN_MIXTURE; notch <= CombustionMixture.MAX_MIXTURE; notch += MIXTURE_NOTCH_STEP) {
+            int x = Math.min(left + 1 + mixtureOffset(notch, inner), right - 1);
+            guiGraphics.fill(x, top + 1, x + 1, top + 2, MIXTURE_NOTCH);
+        }
+        guiGraphics.fill(rated, top + 1, rated + 1, bottom, MIXTURE_RATED_MARK);
+        int pointerTop = top + MIXTURE_HEIGHT;
+        guiGraphics.fill(pointer, pointerTop - 1, pointer + 1, pointerTop + MIXTURE_POINTER_HEIGHT, MIXTURE_POINTER);
+        guiGraphics.fill(pointer - 1, pointerTop + 1, pointer + 2, pointerTop + MIXTURE_POINTER_HEIGHT, MIXTURE_POINTER);
+    }
+
+    private static int mixtureOffset(int mixture, int width) {
+        int span = CombustionMixture.MAX_MIXTURE - CombustionMixture.MIN_MIXTURE;
+        int clamped = CombustionMixture.clamp(mixture) - CombustionMixture.MIN_MIXTURE;
+        return (int) Math.round(clamped / (double) span * width);
+    }
+
+    private List<Component> mixtureTooltip() {
+        int mixture = menu.mixture();
+        String regime = mixture < CombustionMixture.RATED_MIXTURE
+                ? "lean"
+                : mixture == CombustionMixture.RATED_MIXTURE ? "rated" : "rich";
+        List<Component> lines = new ArrayList<>();
+        lines.add(Component.translatable(
+                "rngtech.syngas_combustor.tooltip.mixture",
+                mixture,
+                Component.translatable("rngtech.syngas_combustor.mixture." + regime)
+        ));
+        lines.add(Component.translatable(
+                "rngtech.syngas_combustor.tooltip.mixture_effects",
+                multiplier(CombustionMixture.fuelRate(mixture)),
+                multiplier(CombustionMixture.power(mixture)),
+                multiplier(CombustionMixture.energyPerFuel(mixture))
+        ).withStyle(ChatFormatting.GRAY));
+        lines.add(Component.translatable(
+                "rngtech.syngas_combustor.tooltip.mixture_exhaust",
+                multiplier(CombustionMixture.exhaustPerFuel(mixture))
+        ).withStyle(ChatFormatting.GRAY));
+        if (menu.exhaustPerCycle() > 0) {
+            lines.add(Component.translatable("rngtech.syngas_combustor.tooltip.exhaust_per_cycle", menu.exhaustPerCycle())
+                    .withStyle(ChatFormatting.GRAY));
+        }
+        lines.add(Component.translatable("rngtech.syngas_combustor.tooltip.mixture_hint").withStyle(ChatFormatting.DARK_GRAY));
+        return lines;
+    }
+
+    private static String multiplier(double value) {
+        return String.format(Locale.ROOT, "%.2f", value);
     }
 
     private void renderProcessing(GuiGraphics guiGraphics) {
@@ -146,6 +263,9 @@ public class GasChemistryScreen extends AbstractContainerScreen<GasChemistryMenu
         guiGraphics.fill(leftPos + progressX + 1, topPos + 55, leftPos + progressX + 1 + Math.round((progressWidth - 2) * menu.progressFill()), topPos + 61, PROGRESS);
         statusIcon(guiGraphics, 110, 66);
         renderPurgeButtons(guiGraphics);
+        if (menu.machine() == GasChemistryMachine.SYNGAS_COMBUSTOR) {
+            renderMixtureGauge(guiGraphics);
+        }
     }
 
     private void renderGear(GuiGraphics guiGraphics) {
@@ -243,6 +363,10 @@ public class GasChemistryScreen extends AbstractContainerScreen<GasChemistryMenu
             return;
         }
         if (renderPurgeTooltips(guiGraphics, mouseX, mouseY)) {
+            return;
+        }
+        if (isOverMixtureGauge(mouseX, mouseY)) {
+            guiGraphics.renderComponentTooltip(font, mixtureTooltip(), mouseX, mouseY);
             return;
         }
         int energyX = menu.machine() == GasChemistryMachine.SYNGAS_COMBUSTOR ? COMBUSTOR_ENERGY_BAR_X : ENERGY_BAR_X;

@@ -14,6 +14,7 @@
         "rngtech:calibrated_storage_component",
         "rngtech:calibrated_structural_component",
         "rngtech:calibrated_thermal_component",
+        "rngtech:cavitation_rotor_hub",
         "rngtech:pitted_cavitation_rotor"
     ],
     "types": {

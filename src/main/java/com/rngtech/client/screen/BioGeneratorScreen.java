@@ -1,13 +1,19 @@
 package com.rngtech.client.screen;
 
 import com.rngtech.content.blockentity.BioGeneratorBlockEntity;
+import com.rngtech.content.energy.BiogasDigestion;
 import com.rngtech.content.menu.BioGeneratorMenu;
 import com.rngtech.rpg.MachineStat;
 
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
 
 public class BioGeneratorScreen extends AbstractContainerScreen<BioGeneratorMenu> {
     private static final int PANEL = 0xFFC6C6C6;
@@ -37,6 +43,23 @@ public class BioGeneratorScreen extends AbstractContainerScreen<BioGeneratorMenu
     private static final int FUEL_VALUE_ICON_X = 150;
     private static final int STATUS_ICON_Y = 60;
     private static final int ICON_SIZE = 12;
+    private static final int RETENTION_DIAL_X = 96;
+    private static final int RETENTION_DIAL_Y = 30;
+    private static final int RETENTION_DIAL_WIDTH = 72;
+    private static final int RETENTION_DIAL_HEIGHT = 7;
+    private static final int RETENTION_POINTER_HEIGHT = 3;
+    private static final int RETENTION_NOTCH_STEP = 5;
+    private static final int RETENTION_COARSE_STEP = 5;
+    private static final int RETENTION_SHORT_ZONE = 0xFFA8824A;
+    private static final int RETENTION_RATED_NOTCH = 0xFFE9E9E9;
+    private static final int RETENTION_LONG_ZONE = 0xFF5E8A6A;
+    private static final int RETENTION_POINTER = 0xFF2F2F2F;
+    private static final int GAS_GAUGE_X = 170;
+    private static final int GAS_GAUGE_Y = 30;
+    private static final int GAS_GAUGE_WIDTH = 10;
+    private static final int GAS_GAUGE_HEIGHT = 52;
+    private static final int GAS = 0xFFC2C76A;
+    private static final int GAS_START_MARK = 0xFF2F2F2F;
     private static final MachineScreenStyle.AffixLine[] EMPTY_AFFIX_LINES = new MachineScreenStyle.AffixLine[0];
     private static final String[] STAT_LABEL_KEYS = {
             "rngtech.stat.energy_generation",
@@ -162,8 +185,49 @@ public class BioGeneratorScreen extends AbstractContainerScreen<BioGeneratorMenu
                     && RefinementScreenStyle.handleApplyClick(this, menu, mouseX, mouseY)) {
                 return true;
             }
+            if (menu.selectedTab() == BioGeneratorMenu.TAB_PROCESSING && isOverRetentionDial(mouseX, mouseY)) {
+                double fraction = (mouseX - (leftPos + RETENTION_DIAL_X + 1)) / (RETENTION_DIAL_WIDTH - 2);
+                sendRetention(BiogasDigestion.MIN_RETENTION_DAYS + (int) Math.round(fraction * retentionSpan()));
+                return true;
+            }
         }
         return super.mouseClicked(mouseX, mouseY, button);
+    }
+
+    @Override
+    public boolean mouseScrolled(double mouseX, double mouseY, double scrollX, double scrollY) {
+        if (menu.selectedTab() == BioGeneratorMenu.TAB_PROCESSING && isOverRetentionDial(mouseX, mouseY) && scrollY != 0.0) {
+            int step = hasShiftDown() ? RETENTION_COARSE_STEP : 1;
+            sendRetention(menu.retentionDays() + (scrollY > 0.0 ? step : -step));
+            return true;
+        }
+        return super.mouseScrolled(mouseX, mouseY, scrollX, scrollY);
+    }
+
+    private void sendRetention(int days) {
+        int clamped = BiogasDigestion.clampRetention(days);
+        if (clamped == menu.retentionDays() || minecraft == null || minecraft.player == null || minecraft.gameMode == null) {
+            return;
+        }
+        int buttonId = BioGeneratorMenu.retentionButtonId(clamped);
+        if (menu.clickMenuButton(minecraft.player, buttonId)) {
+            minecraft.gameMode.handleInventoryButtonClick(menu.containerId, buttonId);
+        }
+    }
+
+    private boolean isOverRetentionDial(double mouseX, double mouseY) {
+        int left = leftPos + RETENTION_DIAL_X;
+        int top = topPos + RETENTION_DIAL_Y;
+        return mouseX >= left && mouseX < left + RETENTION_DIAL_WIDTH
+                && mouseY >= top && mouseY < top + RETENTION_DIAL_HEIGHT + RETENTION_POINTER_HEIGHT;
+    }
+
+    private static int retentionSpan() {
+        return BiogasDigestion.MAX_RETENTION_DAYS - BiogasDigestion.MIN_RETENTION_DAYS;
+    }
+
+    private static int retentionOffset(int days, int width) {
+        return Math.round((BiogasDigestion.clampRetention(days) - BiogasDigestion.MIN_RETENTION_DAYS) * width / (float) retentionSpan());
     }
 
     private void renderPanel(GuiGraphics guiGraphics) {
@@ -241,7 +305,45 @@ public class BioGeneratorScreen extends AbstractContainerScreen<BioGeneratorMenu
                 y + FUEL_BAR_Y + FUEL_BAR_HEIGHT - 1,
                 FUEL
         );
+        renderGasHolder(guiGraphics);
+        renderRetentionDial(guiGraphics);
         renderProcessingIcons(guiGraphics);
+    }
+
+    /** Gas holder fill, with a mark at the pressure the engine needs to start. */
+    private void renderGasHolder(GuiGraphics guiGraphics) {
+        int left = leftPos + GAS_GAUGE_X;
+        int top = topPos + GAS_GAUGE_Y;
+        int inner = GAS_GAUGE_HEIGHT - 4;
+        int bottom = top + GAS_GAUGE_HEIGHT - 2;
+        guiGraphics.fill(left, top, left + GAS_GAUGE_WIDTH, top + GAS_GAUGE_HEIGHT, 0xFF5F5F5F);
+        int gasHeight = Math.round(inner * menu.gasProgress());
+        guiGraphics.fill(left + 2, bottom - gasHeight, left + GAS_GAUGE_WIDTH - 2, bottom, GAS);
+        int capacity = Math.max(1, menu.gasCapacity());
+        int mark = bottom - Math.round(inner * BiogasDigestion.ENGINE_START_GAS / (float) capacity);
+        guiGraphics.fill(left + 1, mark, left + GAS_GAUGE_WIDTH - 1, mark + 1, GAS_START_MARK);
+    }
+
+    /** Retention from short to long: the rated notch keeps the listed fuel values, and the pointer marks the setting. */
+    private void renderRetentionDial(GuiGraphics guiGraphics) {
+        int left = leftPos + RETENTION_DIAL_X;
+        int top = topPos + RETENTION_DIAL_Y;
+        int inner = RETENTION_DIAL_WIDTH - 2;
+        int rated = left + 1 + retentionOffset(BiogasDigestion.RATED_RETENTION_DAYS, inner);
+        int right = left + 1 + inner;
+        int bottom = top + RETENTION_DIAL_HEIGHT - 1;
+        guiGraphics.fill(left, top, left + RETENTION_DIAL_WIDTH, top + RETENTION_DIAL_HEIGHT, 0xFF5F5F5F);
+        guiGraphics.fill(left + 1, top + 1, rated, bottom, RETENTION_SHORT_ZONE);
+        guiGraphics.fill(rated + 1, top + 1, right, bottom, RETENTION_LONG_ZONE);
+        for (int days = BiogasDigestion.MIN_RETENTION_DAYS; days <= BiogasDigestion.MAX_RETENTION_DAYS; days += RETENTION_NOTCH_STEP) {
+            int x = Math.min(left + 1 + retentionOffset(days, inner), right - 1);
+            guiGraphics.fill(x, top + 1, x + 1, top + 2, 0xFF8B8B8B);
+        }
+        guiGraphics.fill(rated, top + 1, rated + 1, bottom, RETENTION_RATED_NOTCH);
+        int pointer = Math.min(left + 1 + retentionOffset(menu.retentionDays(), inner), right - 1);
+        int pointerTop = top + RETENTION_DIAL_HEIGHT;
+        guiGraphics.fill(pointer, pointerTop - 1, pointer + 1, pointerTop + RETENTION_POINTER_HEIGHT, RETENTION_POINTER);
+        guiGraphics.fill(pointer - 1, pointerTop + 1, pointer + 2, pointerTop + RETENTION_POINTER_HEIGHT, RETENTION_POINTER);
     }
 
     private void renderStats(GuiGraphics guiGraphics) {
@@ -295,6 +397,7 @@ public class BioGeneratorScreen extends AbstractContainerScreen<BioGeneratorMenu
             case BioGeneratorBlockEntity.STATUS_NO_FUEL -> Component.translatable("rngtech.bio_generator.status.no_fuel");
             case BioGeneratorBlockEntity.STATUS_INVALID_FUEL -> Component.translatable("rngtech.bio_generator.status.invalid_fuel");
             case BioGeneratorBlockEntity.STATUS_ENERGY_FULL -> Component.translatable("rngtech.bio_generator.status.energy_full");
+            case BioGeneratorBlockEntity.STATUS_PRIMING -> Component.translatable("rngtech.bio_generator.status.priming");
             default -> Component.translatable("rngtech.bio_generator.status.ready");
         };
     }
@@ -304,8 +407,63 @@ public class BioGeneratorScreen extends AbstractContainerScreen<BioGeneratorMenu
             case BioGeneratorBlockEntity.STATUS_NO_FUEL -> PANEL_DARK;
             case BioGeneratorBlockEntity.STATUS_ENERGY_FULL -> 0xFFD3A33A;
             case BioGeneratorBlockEntity.STATUS_INVALID_FUEL -> 0xFFB45B4A;
+            case BioGeneratorBlockEntity.STATUS_PRIMING -> GAS;
             default -> FUEL;
         };
+    }
+
+    private List<Component> retentionTooltip() {
+        int days = menu.retentionDays();
+        String regime = days < BiogasDigestion.RATED_RETENTION_DAYS
+                ? "short"
+                : days == BiogasDigestion.RATED_RETENTION_DAYS ? "rated" : "long";
+        List<Component> lines = new ArrayList<>();
+        lines.add(Component.translatable(
+                "rngtech.bio_generator.tooltip.retention",
+                days,
+                Component.translatable("rngtech.bio_generator.retention." + regime)
+        ));
+        lines.add(Component.translatable(
+                "rngtech.bio_generator.tooltip.retention_effects",
+                multiplier(BiogasDigestion.digestionRate(days)),
+                multiplier(BiogasDigestion.gasYield(days))
+        ).withStyle(ChatFormatting.GRAY));
+        if (menu.feedEnergy() > 0) {
+            lines.add(Component.translatable(
+                    "rngtech.bio_generator.tooltip.retention_item",
+                    CompactValueText.energyRate(menu.engineRate()),
+                    CompactValueText.energyAmount((int) Math.round(menu.feedEnergy() * BiogasDigestion.gasYield(days)))
+            ).withStyle(ChatFormatting.GRAY));
+        }
+        lines.add(Component.translatable(
+                "rngtech.bio_generator.tooltip.retention_digested",
+                percent(BiogasDigestion.digestedShare(days))
+        ).withStyle(ChatFormatting.DARK_GRAY));
+        lines.add(Component.translatable("rngtech.bio_generator.tooltip.retention_hint", BiogasDigestion.RATED_RETENTION_DAYS)
+                .withStyle(ChatFormatting.DARK_GRAY));
+        return lines;
+    }
+
+    private List<Component> gasTooltip() {
+        return List.of(
+                Component.translatable(
+                        "rngtech.bio_generator.tooltip.gas",
+                        CompactValueText.energyAmount(menu.gas()),
+                        CompactValueText.energyAmount(menu.gasCapacity())
+                ),
+                (menu.engineRunning()
+                        ? Component.translatable("rngtech.bio_generator.tooltip.engine_running", CompactValueText.energyRate(menu.engineRate()))
+                        : Component.translatable("rngtech.bio_generator.tooltip.engine_start", CompactValueText.energyAmount(BiogasDigestion.ENGINE_START_GAS)))
+                        .withStyle(ChatFormatting.GRAY)
+        );
+    }
+
+    private static String multiplier(double value) {
+        return String.format(Locale.ROOT, "%.2f", value);
+    }
+
+    private static String percent(double fraction) {
+        return String.format(Locale.ROOT, "%.0f", fraction * 100.0);
     }
 
     private Component exactEnergyText() {
@@ -314,6 +472,14 @@ public class BioGeneratorScreen extends AbstractContainerScreen<BioGeneratorMenu
 
     private void renderValueTooltips(GuiGraphics guiGraphics, int mouseX, int mouseY) {
         if (menu.selectedTab() != BioGeneratorMenu.TAB_PROCESSING) {
+            return;
+        }
+        if (isOverRetentionDial(mouseX, mouseY)) {
+            guiGraphics.renderComponentTooltip(font, retentionTooltip(), mouseX, mouseY);
+            return;
+        }
+        if (isOver(mouseX, mouseY, GAS_GAUGE_X, GAS_GAUGE_Y, GAS_GAUGE_WIDTH, GAS_GAUGE_HEIGHT)) {
+            guiGraphics.renderComponentTooltip(font, gasTooltip(), mouseX, mouseY);
             return;
         }
         CompactValueText.renderTooltipIfHovered(
@@ -525,6 +691,10 @@ public class BioGeneratorScreen extends AbstractContainerScreen<BioGeneratorMenu
         guiGraphics.fill(left, top, left + 18, top + 18, 0xFF373737);
         guiGraphics.fill(left + 1, top + 1, left + 17, top + 17, 0xFFE0E0E0);
         guiGraphics.fill(left + 2, top + 2, left + 16, top + 16, 0xFF8B8B8B);
+    }
+
+    private boolean isOver(double mouseX, double mouseY, int x, int y, int width, int height) {
+        return mouseX >= leftPos + x && mouseX < leftPos + x + width && mouseY >= topPos + y && mouseY < topPos + y + height;
     }
 
     private boolean isOverTab(double mouseX, double mouseY, int index) {
