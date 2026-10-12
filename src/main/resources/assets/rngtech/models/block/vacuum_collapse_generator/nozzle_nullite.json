@@ -1,0 +1,7 @@
+{
+  "parent": "rngtech:block/vacuum_collapse_generator/nozzle",
+  "textures": {
+    "part": "rngtech:block/vacuum_collapse_generator/part/nullite",
+    "tip": "rngtech:block/vacuum_collapse_generator/tip/nullite"
+  }
+}

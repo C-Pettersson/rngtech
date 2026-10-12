@@ -283,6 +283,9 @@ Design intent and balance rules behind shipped machines that the code does not s
 
 - It is the Stage 7 primary generator. It uses its own Dimensional Stabilizer instead of sharing Potential Reactor Containment Linings.
 - The Void Chamber stage is the hard recipe gate. An under-stage Collapse Nozzle adds instability pressure instead of blocking the recipe.
+- A collapse follows a curve: output starts low and peaks at the end of the cycle (0.4x to 2x its average at rated depth), and the total FE never changes. Its cost is absorbing that peak; FE the network cannot take is vented, as for Cavitation.
+- Collapse depth (50-150%) is the visible trade: deeper draws more FE per catalyst (depth^0.6) over a longer cycle (depth^0.5), so the average FE/t moves only a few percent, but it peaks harder (0.6 + 1.4 x depth times the average) and multiplies recipe instability by depth^2. Catalysts cost Echo Shards, so depth trades them against burst handling. Rated depth reproduces the recipe exactly, and a collapse keeps the depth it started with.
+- Void Catalyst is renewable and its recipe shows what it is: Ender Pearls dissolved in Ammonia into Ender Slurry, poured by the Component Assembler over a Nullite core in a Tungstensteel casing. No vanilla loot is involved, and Stage 7 builds on the Stage 6 ammonia chain. Collapse Residue melts with one Ender Pearl into twice the slurry from the same Ammonia, but only at 1,600 heat, above the 1,200 an unrolled Melter reaches, so the Residue loop rewards a well-rolled Melter with half the Ammonia per catalyst. One catalyst is a two-minute, 2.4M FE collapse. Counting the Ammonia at what an Ammonia Fuel Cell would make from it, a catalyst still returns about 8:1 with Tungstensteel Gear (13:1 with Residue) and over 20:1 with Exotic Gear, so feeding ammonia to the generator always beats burning it. The chain cost lives in `tools/balance/energy-chain-costs.json`.
 
 ### Ammonia Chain
 

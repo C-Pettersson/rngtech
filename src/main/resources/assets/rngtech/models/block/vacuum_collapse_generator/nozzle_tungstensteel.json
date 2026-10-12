@@ -1,0 +1,7 @@
+{
+  "parent": "rngtech:block/vacuum_collapse_generator/nozzle",
+  "textures": {
+    "part": "rngtech:block/vacuum_collapse_generator/part/tungstensteel",
+    "tip": "rngtech:block/vacuum_collapse_generator/tip/tungstensteel"
+  }
+}

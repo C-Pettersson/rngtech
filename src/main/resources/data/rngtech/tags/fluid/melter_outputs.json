@@ -3,6 +3,8 @@
   "values": [
     "#rngtech:lubricants",
     "#rngtech:electrolytes",
+    "rngtech:ender_slurry",
+    "rngtech:flowing_ender_slurry",
     "rngtech:methane",
     "rngtech:flowing_methane",
     "minecraft:lava",

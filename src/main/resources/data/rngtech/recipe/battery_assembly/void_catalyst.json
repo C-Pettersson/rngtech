@@ -1,0 +1,39 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "rngtech:material_enabled",
+      "material": "nullite"
+    },
+    {
+      "type": "rngtech:material_enabled",
+      "material": "tungstensteel"
+    }
+  ],
+  "type": "rngtech:battery_assembly",
+  "group": "component_assembly_void_catalyst",
+  "ingredients": [
+    {
+      "ingredient": {
+        "tag": "c:ingots/nullite"
+      }
+    },
+    {
+      "ingredient": {
+        "item": "rngtech:tungstensteel_plate"
+      }
+    }
+  ],
+  "fluid_input": {
+    "ingredient": {
+      "fluid": "rngtech:ender_slurry"
+    },
+    "amount": 1000
+  },
+  "result": {
+    "count": 1,
+    "id": "rngtech:void_catalyst"
+  },
+  "processing_ticks": 300,
+  "energy": 7200,
+  "roll_result_traits": false
+}
