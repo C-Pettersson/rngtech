@@ -52,9 +52,31 @@ During a collapse, a glowing core inside the chamber shrinks and darkens to blac
 
 Once a collapse starts it cannot pause for full storage. FE that the 20,000 FE internal buffer cannot hold is lost, so connect enough cables and storage to take each catalyst's output. The generator does not limit its own output, so the receiver or connector tier decides how much FE moves each tick. A redstone signal pauses it, even in the middle of a collapse, which is the way to hold it while storage catches up.
 
+### The collapse curve
+
+A collapse does not make its FE evenly. Output starts low and climbs to a peak at the very end of the cycle. At rated depth it starts at 0.4 times the collapse's average FE/t and ends at twice the average. Every collapse still makes all of its FE, but your connector and storage have to take the peak, or the part they cannot take is lost.
+
+The Process tab draws the curve above the progress bar. The lit part is what the running collapse has already made, and the faint line marks its average. Hover it to see the starting and peak FE/t. While a collapse runs, the generation icon shows the FE/t at that moment.
+
+### Collapse depth
+
+The depth gauge under the status icons sets how deep each collapse goes, from 50% to 150%. Click or scroll on it (hold Shift to step by 5). A collapse keeps the depth it started with, so a change applies from the next catalyst.
+
+Deeper collapses draw more FE from each catalyst, but they take longer, peak harder, and multiply the recipe's instability. Shallow collapses spend catalysts faster for a flatter, gentler curve. Depth hardly changes the average FE/t, so the choice is catalysts against how hard a burst your network can take.
+
+| Depth | FE per catalyst | Cycle | Instability | Start | Peak |
+|---|---:|---:|---:|---:|---:|
+| 50% (shallow) | ×0.66 | ×0.71 | ×0.25 | 0.7× average | 1.3× average |
+| 75% | ×0.84 | ×0.87 | ×0.56 | 0.55× average | 1.65× average |
+| 100% (rated, default) | ×1.00 | ×1.00 | ×1.00 | 0.4× average | 2× average |
+| 125% | ×1.14 | ×1.12 | ×1.56 | 0.25× average | 2.35× average |
+| 150% (deep) | ×1.28 | ×1.22 | ×2.25 | 0.1× average | 2.7× average |
+
+Better stability takes the edge off deep collapses, since stability divides the recipe's instability after depth multiplies it. Hover the gauge to see the effects of the current setting.
+
 ### Instability
 
-Every recipe adds instability, and higher stability reduces it. Instability makes each collapse slower and yield less FE, and every full point of it adds an extra Collapse Residue. If the installed Collapse Nozzle's stage is lower than the recipe's minimum chamber stage, each missing stage adds a full point of instability. An unstable collapse makes the chamber's rim light flicker instead of pulsing smoothly.
+Every recipe adds instability, collapse depth multiplies it, and higher stability reduces it. Instability makes each collapse slower and yield less FE, and every full point of it adds an extra Collapse Residue. If the installed Collapse Nozzle's stage is lower than the recipe's minimum chamber stage, each missing stage adds a full point of instability. An unstable collapse makes the chamber's rim light flicker instead of pulsing smoothly.
 
 ### Gear
 
@@ -92,7 +114,7 @@ The Vacuum Collapse Generator uses its own recipe type, `rngtech:vacuum_collapse
 
 The Vacuum Collapse Generator screen has four tabs:
 
-- **Process**: the catalyst and residue slots, FE, cycle progress, and instability. The generation icon shows generated FE/t, and the output icon shows the FE exported last tick. Click the recipe line to open its JEI category.
+- **Process**: the catalyst and residue slots, FE, the collapse curve, cycle progress, instability, and the depth gauge. The generation icon shows the FE/t generated right now, and the output icon shows the FE exported last tick. Hover the curve and the gauge for details. Click the recipe line to open its JEI category.
 - **Gear**: Void Chamber, Collapse Nozzle, and Dimensional Stabilizer slots.
 - **Stats**: the machine's current stats, including traits and Gear.
 - **Refinement**: refine the placed generator's traits with a catalyst.

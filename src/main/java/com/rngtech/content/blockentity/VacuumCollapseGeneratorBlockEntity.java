@@ -92,6 +92,12 @@ public class VacuumCollapseGeneratorBlockEntity extends BaseMachineBlockEntity i
     private static final int DATA_REFINEMENT_POTENTIAL = 19;
     private static final int DATA_FLAT_ENERGY_GENERATION = 20;
     private static final int DATA_BASE_ENERGY_GENERATION = 21;
+    private static final int DATA_DEPTH = 22;
+    private static final int DATA_CURVE_DEPTH = 23;
+    private static final int DATA_PEAK_LOW = 24;
+    private static final int DATA_PEAK_HIGH = 25;
+    private static final int DATA_AVERAGE_LOW = 26;
+    private static final int DATA_AVERAGE_HIGH = 27;
     private static final int STAT_SCALE = 100;
     private static final int BASE_TRANSFER = 8192;
     private static final int VISUAL_SYNC_INTERVAL = 5;
@@ -170,6 +176,12 @@ public class VacuumCollapseGeneratorBlockEntity extends BaseMachineBlockEntity i
                 case DATA_PROCESSING_SPEED -> scaledStat(stats, MachineStat.PROCESSING_SPEED);
                 case DATA_STABILITY -> scaledStat(stats, MachineStat.STABILITY);
                 case DATA_REFINEMENT_POTENTIAL -> scaledStat(stats, MachineStat.REFINEMENT_POTENTIAL);
+                case DATA_DEPTH -> depth;
+                case DATA_CURVE_DEPTH -> curveDepth();
+                case DATA_PEAK_LOW -> lowInt(peakEnergyPerTick(stats));
+                case DATA_PEAK_HIGH -> highInt(peakEnergyPerTick(stats));
+                case DATA_AVERAGE_LOW -> lowInt(collapseAverageEnergyPerTick(stats));
+                case DATA_AVERAGE_HIGH -> highInt(collapseAverageEnergyPerTick(stats));
                 default -> 0;
             };
         }
@@ -180,7 +192,7 @@ public class VacuumCollapseGeneratorBlockEntity extends BaseMachineBlockEntity i
 
         @Override
         public int getCount() {
-            return DATA_BASE_ENERGY_GENERATION + 1;
+            return DATA_AVERAGE_HIGH + 1;
         }
     };
 
@@ -189,8 +201,9 @@ public class VacuumCollapseGeneratorBlockEntity extends BaseMachineBlockEntity i
     private long energyStored;
     private long activeTotalEnergy;
     private long remainingEnergy;
-    private double generationCarry;
     private double activeInstability;
+    private int depth = VacuumCollapseDynamics.RATED_DEPTH;
+    private int activeDepth = VacuumCollapseDynamics.RATED_DEPTH;
     private ItemStack pendingResidue = ItemStack.EMPTY;
     private VacuumCollapseVisualState visualState = VacuumCollapseVisualState.IDLE;
     private VacuumCollapseVisualState.Key lastSyncedVisual;
@@ -455,7 +468,8 @@ public class VacuumCollapseGeneratorBlockEntity extends BaseMachineBlockEntity i
         tag.putLong("Energy", energyStored);
         tag.putLong("ActiveTotalEnergy", activeTotalEnergy);
         tag.putLong("RemainingEnergy", remainingEnergy);
-        tag.putDouble("GenerationCarry", generationCarry);
+        tag.putInt("Depth", depth);
+        tag.putInt("ActiveDepth", activeDepth);
         tag.putDouble("ActiveInstability", activeInstability);
         tag.put("PendingResidue", pendingResidue.saveOptional(registries));
     }
@@ -470,7 +484,8 @@ public class VacuumCollapseGeneratorBlockEntity extends BaseMachineBlockEntity i
         energyStored = Math.max(0L, tag.getLong("Energy"));
         activeTotalEnergy = Math.max(0L, tag.getLong("ActiveTotalEnergy"));
         remainingEnergy = Math.max(0L, tag.getLong("RemainingEnergy"));
-        generationCarry = tag.getDouble("GenerationCarry");
+        depth = tag.contains("Depth") ? VacuumCollapseDynamics.clampDepth(tag.getInt("Depth")) : VacuumCollapseDynamics.RATED_DEPTH;
+        activeDepth = tag.contains("ActiveDepth") ? VacuumCollapseDynamics.clampDepth(tag.getInt("ActiveDepth")) : VacuumCollapseDynamics.RATED_DEPTH;
         activeInstability = tag.getDouble("ActiveInstability");
         pendingResidue = ItemStack.parseOptional(registries, tag.getCompound("PendingResidue"));
         clampInternalEnergy();
@@ -498,18 +513,18 @@ public class VacuumCollapseGeneratorBlockEntity extends BaseMachineBlockEntity i
             resetInactiveProgress();
             return false;
         }
-        ItemStack residue = residueFor(recipe);
+        ItemStack residue = residueFor(recipe, depth);
         if (!canMergeResidue(residue)) {
             return false;
         }
 
         consumeInput();
+        activeDepth = depth;
         pendingResidue = residue;
-        activeProcessingTicks = adjustedProcessingTicks(recipe, stats);
-        activeTotalEnergy = effectiveRecipeEnergy(recipe, stats);
+        activeProcessingTicks = adjustedProcessingTicks(recipe, stats, activeDepth);
+        activeTotalEnergy = effectiveRecipeEnergy(recipe, stats, activeDepth);
         remainingEnergy = activeTotalEnergy;
-        generationCarry = 0.0;
-        activeInstability = instabilityPressure(recipe, stats);
+        activeInstability = instabilityPressure(recipe, stats, activeDepth);
         progress = 0;
         setChanged();
         return remainingEnergy > 0L;
@@ -520,17 +535,20 @@ public class VacuumCollapseGeneratorBlockEntity extends BaseMachineBlockEntity i
             return false;
         }
 
-        double perTick = activeTotalEnergy / (double) Math.max(1, activeProcessingTicks);
-        generationCarry += Math.min(perTick, remainingEnergy);
-        long wholeEnergy = (long) Math.floor(generationCarry);
+        // Output follows the collapse curve: low at the start, peaking at the end.
+        int ticks = Math.max(1, activeProcessingTicks);
+        long generated = activeTotalEnergy - remainingEnergy;
+        long due = progress + 1 >= ticks
+                ? remainingEnergy
+                : (long) Math.floor(activeTotalEnergy * VacuumCollapseDynamics.cumulative(activeDepth, (progress + 1) / (double) ticks)) - generated;
+        long wholeEnergy = Math.min(remainingEnergy, Math.max(0L, due));
         if (wholeEnergy > 0L) {
             // A collapse cannot pause: FE the buffer cannot hold is vented.
             long freeSpace = Math.max(0L, energyCapacity(stats) - energyStored);
             if (freeSpace > 0L) {
                 receiveInternalEnergy(Math.min(wholeEnergy, freeSpace), stats, false);
             }
-            generationCarry -= wholeEnergy;
-            remainingEnergy = Math.max(0L, remainingEnergy - wholeEnergy);
+            remainingEnergy -= wholeEnergy;
         }
         progress++;
         finishIfComplete();
@@ -584,7 +602,7 @@ public class VacuumCollapseGeneratorBlockEntity extends BaseMachineBlockEntity i
         return stats.value(MachineStat.STABILITY) >= recipe.minimumStability();
     }
 
-    private ItemStack residueFor(VacuumCollapseRecipe recipe) {
+    private ItemStack residueFor(VacuumCollapseRecipe recipe, int depth) {
         if (recipe.residue().isEmpty()) {
             return ItemStack.EMPTY;
         }
@@ -592,7 +610,7 @@ public class VacuumCollapseGeneratorBlockEntity extends BaseMachineBlockEntity i
             return ItemStack.EMPTY;
         }
         ItemStack residue = recipe.residue().copy();
-        double instability = instabilityPressure(recipe, effectiveStats());
+        double instability = instabilityPressure(recipe, effectiveStats(), depth);
         int extra = (int) Math.floor(instability);
         if (extra > 0) {
             residue.grow(Math.min(extra, residue.getMaxStackSize() - residue.getCount()));
@@ -600,22 +618,25 @@ public class VacuumCollapseGeneratorBlockEntity extends BaseMachineBlockEntity i
         return residue;
     }
 
-    private long effectiveRecipeEnergy(VacuumCollapseRecipe recipe, MachineStatAccumulator stats) {
+    private long effectiveRecipeEnergy(VacuumCollapseRecipe recipe, MachineStatAccumulator stats, int depth) {
         double efficiency = Math.max(0.1, stats.value(MachineStat.EFFICIENCY));
-        double instabilityPenalty = 1.0 - Math.min(0.35, instabilityPressure(recipe, stats) * 0.08);
-        int ticks = adjustedProcessingTicks(recipe, stats);
-        return Math.max(1L, Math.round(stats.generatedEnergyTotal(recipe.energy(), ticks) * efficiency * instabilityPenalty));
+        double instabilityPenalty = 1.0 - Math.min(0.35, instabilityPressure(recipe, stats, depth) * 0.08);
+        int ticks = adjustedProcessingTicks(recipe, stats, depth);
+        double baseEnergy = recipe.energy() * VacuumCollapseDynamics.energy(depth);
+        return Math.max(1L, Math.round(stats.generatedEnergyTotal(baseEnergy, ticks) * efficiency * instabilityPenalty));
     }
 
-    private int adjustedProcessingTicks(VacuumCollapseRecipe recipe, MachineStatAccumulator stats) {
-        int baseTicks = stats.adjustedProcessingTicks(recipe.processingTicks());
-        double instability = instabilityPressure(recipe, stats);
+    private int adjustedProcessingTicks(VacuumCollapseRecipe recipe, MachineStatAccumulator stats, int depth) {
+        int depthTicks = Math.max(1, (int) Math.round(recipe.processingTicks() * VacuumCollapseDynamics.duration(depth)));
+        int baseTicks = stats.adjustedProcessingTicks(depthTicks);
+        double instability = instabilityPressure(recipe, stats, depth);
         return Math.max(1, (int) Math.round(baseTicks * (1.0 + Math.min(0.75, instability * 0.10))));
     }
 
-    private double instabilityPressure(VacuumCollapseRecipe recipe, MachineStatAccumulator stats) {
+    /** Depth multiplies the recipe's instability before stability divides it; an under-stage nozzle adds on top. */
+    private double instabilityPressure(VacuumCollapseRecipe recipe, MachineStatAccumulator stats, int depth) {
         double stability = Math.max(0.1, stats.value(MachineStat.STABILITY));
-        return Math.max(0.0, recipe.instability() / stability) + nozzleStagePenalty(recipe);
+        return Math.max(0.0, recipe.instability() * VacuumCollapseDynamics.instability(depth) / stability) + nozzleStagePenalty(recipe);
     }
 
     /** How many times an energy export looked a neighbour up instead of reusing its cached capability. */
@@ -708,18 +729,56 @@ public class VacuumCollapseGeneratorBlockEntity extends BaseMachineBlockEntity i
             return activeProcessingTicks;
         }
         VacuumCollapseRecipe recipe = nextRecipe();
-        return recipe == null || !canProcessRecipe(recipe, stats) ? 0 : adjustedProcessingTicks(recipe, stats);
+        return recipe == null || !canProcessRecipe(recipe, stats) ? 0 : adjustedProcessingTicks(recipe, stats, depth);
     }
 
+    /** The FE/t at this point of the running collapse, or the next collapse's average while idle. */
     private long currentEnergyPerTick(MachineStatAccumulator stats) {
         if (hasActiveRecipe()) {
-            return Math.max(0L, Math.round(activeTotalEnergy / (double) Math.max(1, activeProcessingTicks)));
+            int ticks = Math.max(1, activeProcessingTicks);
+            double rate = VacuumCollapseDynamics.rate(activeDepth, progress / (double) ticks);
+            return Math.max(0L, Math.round(activeTotalEnergy / (double) ticks * rate));
         }
+        return averageEnergyPerTick(stats);
+    }
+
+    /** The FE/t the running or next collapse reaches at its end. */
+    private long peakEnergyPerTick(MachineStatAccumulator stats) {
+        return Math.round(collapseAverageEnergyPerTick(stats) * VacuumCollapseDynamics.peakRate(curveDepth()));
+    }
+
+    /** The running collapse's average FE/t, or the next collapse's while idle. */
+    private long collapseAverageEnergyPerTick(MachineStatAccumulator stats) {
+        if (hasActiveRecipe()) {
+            return Math.round(activeTotalEnergy / (double) Math.max(1, activeProcessingTicks));
+        }
+        return averageEnergyPerTick(stats);
+    }
+
+    private long averageEnergyPerTick(MachineStatAccumulator stats) {
         VacuumCollapseRecipe recipe = nextRecipe();
         if (recipe == null || !canProcessRecipe(recipe, stats)) {
             return 0L;
         }
-        return Math.max(1L, Math.round(effectiveRecipeEnergy(recipe, stats) / (double) Math.max(1, adjustedProcessingTicks(recipe, stats))));
+        return Math.max(1L, Math.round(effectiveRecipeEnergy(recipe, stats, depth) / (double) Math.max(1, adjustedProcessingTicks(recipe, stats, depth))));
+    }
+
+    /** The depth whose curve the screen shows: the running collapse's, else the selected depth. */
+    private int curveDepth() {
+        return hasActiveRecipe() ? activeDepth : depth;
+    }
+
+    public int depth() {
+        return depth;
+    }
+
+    /** Sets the depth for the next collapse; a running collapse keeps the depth it started with. */
+    public void setDepth(int depth) {
+        int clamped = VacuumCollapseDynamics.clampDepth(depth);
+        if (clamped != this.depth) {
+            this.depth = clamped;
+            setChanged();
+        }
     }
 
     private long currentRecipeEnergy(MachineStatAccumulator stats) {
@@ -727,7 +786,7 @@ public class VacuumCollapseGeneratorBlockEntity extends BaseMachineBlockEntity i
             return activeTotalEnergy;
         }
         VacuumCollapseRecipe recipe = nextRecipe();
-        return recipe == null || !canProcessRecipe(recipe, stats) ? 0L : effectiveRecipeEnergy(recipe, stats);
+        return recipe == null || !canProcessRecipe(recipe, stats) ? 0L : effectiveRecipeEnergy(recipe, stats, depth);
     }
 
     private int statusCode(MachineStatAccumulator stats) {
@@ -759,7 +818,7 @@ public class VacuumCollapseGeneratorBlockEntity extends BaseMachineBlockEntity i
         if (!hasMinimumStability(recipe, stats)) {
             return STATUS_LOW_STABILITY;
         }
-        if (!canMergeResidue(residueFor(recipe))) {
+        if (!canMergeResidue(residueFor(recipe, depth))) {
             return STATUS_OUTPUT_FULL;
         }
         return energyStored >= energyCapacity(stats) ? STATUS_ENERGY_FULL : STATUS_READY;
@@ -793,7 +852,6 @@ public class VacuumCollapseGeneratorBlockEntity extends BaseMachineBlockEntity i
         activeProcessingTicks = 0;
         activeTotalEnergy = 0L;
         remainingEnergy = 0L;
-        generationCarry = 0.0;
         activeInstability = 0.0;
         pendingResidue = ItemStack.EMPTY;
     }

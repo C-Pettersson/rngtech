@@ -1,6 +1,7 @@
 package com.rngtech.rpg;
 
 import com.rngtech.content.blockentity.SolidFuelBurnerBlockEntity;
+import com.rngtech.content.blockentity.VacuumCollapseDynamics;
 import com.rngtech.content.cable.EnergyConnectorTier;
 import com.rngtech.content.energy.CathodeMaterial;
 import com.rngtech.content.energy.CavitationRotorMaterial;
@@ -503,6 +504,16 @@ public final class EnergyBalanceSimulation {
         }
     }
 
+    /** Like {@link #connectorMetrics}, but output follows the rated collapse curve instead of a flat rate. */
+    private static void collapseConnectorMetrics(Outcome outcome, double average, double perInput, boolean vent) {
+        int depth = VacuumCollapseDynamics.RATED_DEPTH;
+        for (EnergyConnectorTier tier : REPORTED_CONNECTORS) {
+            double kept = 1.0 - VacuumCollapseDynamics.fractionAbove(depth, average, tier.transferRate());
+            outcome.withMetric("delivered_" + name(tier), average * kept);
+            outcome.withMetric("perInput_" + name(tier), vent ? perInput * kept : perInput);
+        }
+    }
+
     private static void connectorMetric(Outcome outcome, String key, double generation, double perInput, double cap, boolean vent) {
         outcome.withMetric("delivered_" + key, Math.min(generation, cap));
         outcome.withMetric("perInput_" + key, vent && generation > cap ? perInput * cap / generation : perInput);
@@ -523,7 +534,10 @@ public final class EnergyBalanceSimulation {
         });
     }
 
-    /** VacuumCollapseGeneratorBlockEntity#effectiveRecipeEnergy, #adjustedProcessingTicks, #instabilityPressure. */
+    /**
+     * VacuumCollapseGeneratorBlockEntity#effectiveRecipeEnergy, #adjustedProcessingTicks, #instabilityPressure, at rated
+     * depth. Connector metrics follow the collapse curve, whose end-of-cycle peak a connector may not take.
+     */
     private void vacuumCollapseGenerators() throws IOException {
         FuelRecipe catalyst = FuelRecipe.of(recipe("vacuum_collapse", "void_catalyst"), chains.fuel("vacuum_collapse_generator/void_catalyst"));
         JsonObject catalystJson = recipeJson("vacuum_collapse", "void_catalyst");
@@ -558,7 +572,7 @@ public final class EnergyBalanceSimulation {
                                 * Math.max(0.1, stats.value(MachineStat.EFFICIENCY))
                                 * (1.0 - Math.min(0.35, pressure * 0.08))));
                         Outcome outcome = Outcome.recipe(catalyst, energy, ticks);
-                        connectorMetrics(outcome, energy / ticks, energy, scenario.vacuumVent());
+                        collapseConnectorMetrics(outcome, energy / ticks, energy, scenario.vacuumVent());
                         return outcome;
                     });
                 }
