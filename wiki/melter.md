@@ -40,6 +40,8 @@ Mine a placed Melter with a pickaxe. It drops itself and keeps its rolled traits
 
 Fill the input tank with water, put the two recipe items in the input slots, and supply FE. The two items can go in either slot. Each melt uses 1,000 mB of water and puts 1,000 mB of the product into the output tank.
 
+Some ingredients leave an item behind, such as the Glass Bottle from a {{ item('minecraft:honey_bottle') }}. A leftover that can hold the product goes into an empty output container slot. Any other leftover goes into the inventory directly below the Melter, such as a hopper or chest, or drops on the ground if there is none, so it never blocks the input slots.
+
 Every default recipe needs at least 1,200 heat (methane needs 1,400) and hardness level 6, so you need a hot enough Heat Core and a Titanium or better Crush Head. Unlike the [Crusher](crusher.md), the Melter does not run recipes above its hardness at all.
 
 Methane takes plain {{ item('rngtech:algae_biomass') }}. {{ item('rngtech:dense_algae_biomass') }} does not work in the Melter; burn it in a [Bio Generator](bio-generator.md) instead.
@@ -70,7 +72,7 @@ The Gear tab has five slots:
 | Side | Behavior |
 |---|---|
 | Top | Inserts recipe items. Rejects items no Melter recipe uses. |
-| Bottom | Extracts filled output containers. |
+| Bottom | Extracts filled output containers. Ingredient leftovers are pushed into the inventory below. |
 | Sides | Insert fluid containers and fill the input tank. With a Fluid Pump installed, sides also drain the output tank. |
 | Any | Accepts FE, for example from a [Universal Cable](universal-cable.md). |
 

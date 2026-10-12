@@ -55,6 +55,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Fluids;
+import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.energy.IEnergyStorage;
 import net.neoforged.neoforge.fluids.FluidActionResult;
 import net.neoforged.neoforge.fluids.FluidStack;
@@ -63,6 +64,7 @@ import net.neoforged.neoforge.fluids.FluidUtil;
 import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 import net.neoforged.neoforge.fluids.capability.templates.FluidTank;
 import net.neoforged.neoforge.items.IItemHandler;
+import net.neoforged.neoforge.items.ItemHandlerHelper;
 import net.neoforged.neoforge.items.ItemStackHandler;
 
 import java.util.List;
@@ -758,11 +760,32 @@ public class MelterBlockEntity extends BaseMachineBlockEntity
         ItemStack remainder = input.getCraftingRemainingItem();
         input.shrink(1);
         if (!remainder.isEmpty()) {
-            if (input.isEmpty()) {
-                processInventory.setStackInSlot(slot, remainder);
-            } else if (level != null) {
-                Containers.dropItemStack(level, worldPosition.getX(), worldPosition.getY(), worldPosition.getZ(), remainder);
-            }
+            placeRemainder(slot, remainder);
+        }
+    }
+
+    /**
+     * A remainder that can hold Melter output goes to the output container slot, and one a recipe uses refills its emptied
+     * input slot. Any other remainder would jam automated input, so it goes into the inventory below or drops.
+     */
+    private void placeRemainder(int slot, ItemStack remainder) {
+        ItemStack rest = processInventory.insertItem(SLOT_FLUID_OUTPUT_CONTAINER, remainder, false);
+        if (rest.isEmpty()) {
+            return;
+        }
+        if (processInventory.getStackInSlot(slot).isEmpty() && isMeltingInput(rest)) {
+            processInventory.setStackInSlot(slot, rest);
+            return;
+        }
+        if (level == null) {
+            return;
+        }
+        IItemHandler below = level.getCapability(Capabilities.ItemHandler.BLOCK, worldPosition.below(), Direction.UP);
+        if (below != null) {
+            rest = ItemHandlerHelper.insertItemStacked(below, rest, false);
+        }
+        if (!rest.isEmpty()) {
+            Containers.dropItemStack(level, worldPosition.getX(), worldPosition.getY(), worldPosition.getZ(), rest);
         }
     }
 

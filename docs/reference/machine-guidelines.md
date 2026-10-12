@@ -144,6 +144,7 @@ Use standard NeoForge capabilities for item and energy automation.
 
 - Existing Universal Cables support item, fluid, and energy transfer. Do not expand them into a shared storage system or storage-network replacement unless project scope changes.
 - Keep automation surfaces predictable and machine-local.
+- Automated input must never jam a machine. Input filters reject items no recipe uses, and crafting remainders an input leaves behind must not stay in an input slot unless a recipe uses them; route them to a container slot or out of the machine.
 - Sided handlers should expose only the slots that make sense for ordinary automation.
 - Gear automation is opt-in per slot type, not automatic for every Gear slot.
 
