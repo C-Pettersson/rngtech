@@ -38,7 +38,7 @@ Mine a placed Melter with a pickaxe. It drops itself and keeps its rolled traits
 
 ### Melting
 
-Fill the input tank with the recipe's fluid, put the two recipe items in the input slots, and supply FE. The two items can go in either slot. Each melt uses 1,000 mB of fluid and puts 1,000 mB of the product into the output tank, except Ender Slurry from Collapse Residue, which makes 2,000 mB. Ender Slurry dissolves its items in [Ammonia](ammonia-synthesizer.md); every other default recipe uses water.
+Fill the input tank with the recipe's fluid, put the two recipe items in the input slots, and supply FE. The two items can go in either slot, and a recipe that needs two of the same item takes both from one slot. Each melt uses 1,000 mB of fluid and puts 1,000 mB of the product into the output tank, except Ender Slurry from Collapse Residue, which makes 2,000 mB. Ender Slurry dissolves its items in [Ammonia](ammonia-synthesizer.md); every other default recipe uses water.
 
 Every default recipe needs at least 1,200 heat (methane needs 1,400, and Ender Slurry from Collapse Residue needs 1,600) and hardness level 6, so you need a hot enough Heat Core and a Titanium or better Crush Head. Unlike the [Crusher](crusher.md), the Melter does not run recipes above its hardness at all.
 
@@ -69,7 +69,7 @@ The Gear tab has five slots:
 
 | Side | Behavior |
 |---|---|
-| Top | Inserts recipe items. Rejects items no Melter recipe uses. |
+| Top | Inserts recipe items. Rejects items no Melter recipe uses, and never lets one ingredient fill the slot the other one needs; see [Automation](automation.md). |
 | Bottom | Extracts filled output containers. |
 | Sides | Insert fluid containers and fill the input tank. With a Fluid Pump installed, sides also drain the output tank. |
 | Any | Accepts FE, for example from a [Universal Cable](universal-cable.md). |

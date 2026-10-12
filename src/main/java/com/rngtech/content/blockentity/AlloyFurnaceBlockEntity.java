@@ -70,6 +70,9 @@ public class AlloyFurnaceBlockEntity extends BaseMachineBlockEntity implements M
     private static final RecipeInputFilter<AlloyFurnaceRecipeInput, AlloyFurnaceRecipe> INPUT_FILTER = new RecipeInputFilter<>(
             ModRecipes.ALLOY_FURNACE_TYPE::get,
             (recipe, item) -> recipe.ingredients().stream().anyMatch(ingredient -> ingredient.test(item)));
+    private static final InputSlotPlanner<AlloyFurnaceRecipeInput, AlloyFurnaceRecipe> SLOT_PLANNER = InputSlotPlanner.shapeless(
+            ModRecipes.ALLOY_FURNACE_TYPE::get,
+            recipe -> recipe.ingredients().stream().map(CountedIngredient::ingredient).toList());
     public static final int MAX_INPUT_SLOTS = 4;
     public static final int SLOT_INPUT_START = 0;
     public static final int SLOT_OUTPUT = SLOT_INPUT_START + MAX_INPUT_SLOTS;
@@ -760,6 +763,12 @@ public class AlloyFurnaceBlockEntity extends BaseMachineBlockEntity implements M
 
     public boolean isAlloyInput(ItemStack stack) {
         return INPUT_FILTER.accepts(level, stack);
+    }
+
+    /** Automation keeps one ingredient from taking the input slots another ingredient of a recipe still needs. */
+    public boolean acceptsAutomatedInput(int slot, ItemStack stack) {
+        ItemStack[] active = Arrays.copyOf(inputStacks(), activeInputSlots());
+        return isAlloyInput(stack) && SLOT_PLANNER.accepts(level, active, slot - SLOT_INPUT_START, stack);
     }
 
     /**
@@ -1453,7 +1462,7 @@ public class AlloyFurnaceBlockEntity extends BaseMachineBlockEntity implements M
 
         @Override
         public ItemStack insertItem(int slot, ItemStack stack, boolean simulate) {
-            int allowed = isAlloyInput(stack) ? recipeLockAllowance(stack) : 0;
+            int allowed = acceptsAutomatedInput(mappedSlot(slot), stack) ? recipeLockAllowance(stack) : 0;
             if (allowed <= 0) {
                 return stack;
             }
@@ -1476,7 +1485,9 @@ public class AlloyFurnaceBlockEntity extends BaseMachineBlockEntity implements M
 
         @Override
         public boolean isItemValid(int slot, ItemStack stack) {
-            return processInventory.isItemValid(mappedSlot(slot), stack) && isAlloyInput(stack) && recipeLockAllowance(stack) > 0;
+            return processInventory.isItemValid(mappedSlot(slot), stack)
+                    && acceptsAutomatedInput(mappedSlot(slot), stack)
+                    && recipeLockAllowance(stack) > 0;
         }
 
         private int mappedSlot(int slot) {

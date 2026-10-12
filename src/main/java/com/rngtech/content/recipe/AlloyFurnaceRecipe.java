@@ -20,7 +20,6 @@ import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.Level;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -73,14 +72,7 @@ public record AlloyFurnaceRecipe(
     }
 
     public Optional<Match> match(AlloyFurnaceRecipeInput input) {
-        if (!allNonEmptyStacksAreEligible(input.stacks())) {
-            return Optional.empty();
-        }
-        int[] remaining = Arrays.stream(input.stacks()).mapToInt(ItemStack::getCount).toArray();
-        int[] consumed = new int[input.size()];
-        return matchIngredient(0, input.stacks(), remaining, consumed)
-                ? Optional.of(new Match(Arrays.copyOf(consumed, consumed.length)))
-                : Optional.empty();
+        return Optional.ofNullable(ShapelessMatch.consumed(ingredients, input.stacks(), 1)).map(Match::new);
     }
 
     @Override
@@ -135,53 +127,6 @@ public record AlloyFurnaceRecipe(
     @Override
     public RecipeType<?> getType() {
         return ModRecipes.ALLOY_FURNACE_TYPE.get();
-    }
-
-    private boolean matchIngredient(int ingredientIndex, ItemStack[] stacks, int[] remaining, int[] consumed) {
-        if (ingredientIndex >= ingredients.size()) {
-            return true;
-        }
-        CountedIngredient ingredient = ingredients.get(ingredientIndex);
-        return consumeIngredient(ingredient, ingredient.count(), 0, stacks, remaining, consumed, ingredientIndex);
-    }
-
-    private boolean allNonEmptyStacksAreEligible(ItemStack[] stacks) {
-        for (ItemStack stack : stacks) {
-            if (!stack.isEmpty() && ingredients.stream().noneMatch(ingredient -> ingredient.test(stack))) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    private boolean consumeIngredient(
-            CountedIngredient ingredient,
-            int needed,
-            int slot,
-            ItemStack[] stacks,
-            int[] remaining,
-            int[] consumed,
-            int ingredientIndex
-    ) {
-        if (needed <= 0) {
-            return matchIngredient(ingredientIndex + 1, stacks, remaining, consumed);
-        }
-        if (slot >= stacks.length) {
-            return false;
-        }
-
-        int available = ingredient.test(stacks[slot]) ? remaining[slot] : 0;
-        int maximum = Math.min(available, needed);
-        for (int amount = maximum; amount >= 0; amount--) {
-            remaining[slot] -= amount;
-            consumed[slot] += amount;
-            if (consumeIngredient(ingredient, needed - amount, slot + 1, stacks, remaining, consumed, ingredientIndex)) {
-                return true;
-            }
-            consumed[slot] -= amount;
-            remaining[slot] += amount;
-        }
-        return false;
     }
 
     private static int defaultSafeMaximumTemperature(int targetTemperature) {
