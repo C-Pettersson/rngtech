@@ -102,13 +102,18 @@ Gear slots are not reachable by automation. The back of the machine has a port p
 
 ### Void Catalyst
 
-Void Catalyst is made in a Titanium [Alloy Furnace](alloy-furnace.md) from 2 Nullite Ingots and 2 Tungstensteel Ingots, which needs a hot, steady furnace. Add a Collapse Residue to the batch and it makes 2 catalysts instead of 1.
+A Void Catalyst is Ender Slurry sealed around a Nullite core in a Tungstensteel casing. It takes two machines:
 
-Each collapse with a Dimensional Stabilizer installed leaves at least one Collapse Residue, and a batch needs only one per 2 catalysts. Once a generator is running, it supplies its own Residue with some to spare, so only the first catalysts cost the full batch.
+1. **Ender Slurry**: a [Melter](melter.md) turns 2 Ender Pearls and 1,000 mB of water into 1,000 mB of {{ item('rngtech:ender_slurry_bucket', 'Ender Slurry') }}. A Melter hot enough to reach 1,600 heat can melt 1 Ender Pearl with 1 {{ item('rngtech:collapse_residue') }} instead, which makes 2,000 mB. An unrolled Melter tops out at 1,200 heat, so this needs Max Temperature affixes on the Melter or its Heat Core.
+2. **Assembly**: a [Component Assembler](component-assembler.md) pours 500 mB of Ender Slurry over a Nullite Ingot (first slot) and a Tungstensteel Plate (second slot) to make one Void Catalyst.
+
+Each collapse with a Dimensional Stabilizer installed leaves at least one Collapse Residue, and one Residue makes slurry for four catalysts, so a running generator with a hot Melter has Residue to spare.
 
 A Void Catalyst lasts one collapse of 2,400 ticks (two minutes) at rated depth, so a generator running nonstop uses about 30 an hour.
 
-{{ processing("alloy_furnace", output="rngtech:void_catalyst", columns=["processing_ticks", "energy", "minimum_component_stage", "minimum_temperature", "required_temperature_stability"]) }}
+{{ processing("melter", output="rngtech:ender_slurry") }}
+
+{{ processing("battery_assembly", output="rngtech:void_catalyst") }}
 
 ### Vacuum Collapse recipes
 

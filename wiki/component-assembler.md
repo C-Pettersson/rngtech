@@ -22,7 +22,7 @@ wiki:
     },
 ) }}
 
-The **Component Assembler** is a powered workbench that combines items with a fluid. It makes {{ item('rngtech:battery_cell') }}s and the material Battery Cells built from them, Corrosion Cell Anodes, and late-game Servos and frame parts that need Lubricant.
+The **Component Assembler** is a powered workbench that combines items with a fluid. It makes {{ item('rngtech:battery_cell') }}s and the material Battery Cells built from them, Corrosion Cell Anodes, late-game Servos and frame parts that need Lubricant, and {{ item('rngtech:void_catalyst') }}.
 
 It started life as the Battery Assembler, which is why its resource id is still `battery_assembler`. Each Component Assembler you craft rolls its own [rarity and affixes](rarity-and-affixes.md).
 
@@ -46,6 +46,7 @@ The tank holds 4,000 mB of one assembly fluid at a time:
 
 - **Electrolyte Solution** for Primed Cell Cores, Anodes, and the Primed Seal Core.
 - **Lubricant** for Servos, the Lubricated Seal Core, and the {{ item('rngtech:lubricated_frame_coupling') }}.
+- **Ender Slurry** for Void Catalyst.
 
 You can fill the tank three ways:
 
@@ -69,6 +70,7 @@ The finished cell starts empty and rolls its own traits when assembly completes.
 - **Anodes**: two Aluminum, Titanium, Tungstensteel, or Naquadah plates and 250 mB of Electrolyte Solution make one Anode, the fuel for a [Corrosion Cell](corrosion-cell.md).
 - **Servos**: Titanium and higher Servos are assembled with Lubricant.
 - **Lubricated Frame Coupling**: a Tungstensteel Casing and 1,000 mB of Lubricant, used to craft the Exotic Machine Frame.
+- **Void Catalyst**: a Nullite Ingot, a Tungstensteel Plate, and 500 mB of Ender Slurry make the [Vacuum Collapse Generator](vacuum-collapse-generator.md)'s fuel.
 - **Seal Cores**: the Primed and Lubricated Seal Cores used to craft Ascendancy Seals. See [Machine Mastery](machine-mastery.md#ascendancies).
 
 ### Gear
@@ -108,7 +110,7 @@ The Component Assembler screen has four tabs:
 ## See also
 
 - [Battery Cells](battery-cells.md)
-- [Melter](melter.md), for bulk Electrolyte Solution and Lubricant.
+- [Melter](melter.md), for bulk Electrolyte Solution, Lubricant, and Ender Slurry.
 - [Corrosion Cell](corrosion-cell.md)
 - [Battery Chassis](battery-chassis.md)
 

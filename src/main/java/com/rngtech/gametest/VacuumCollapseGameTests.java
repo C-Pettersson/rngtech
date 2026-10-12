@@ -3,12 +3,14 @@ package com.rngtech.gametest;
 import static com.rngtech.gametest.MachineTestSupport.check;
 
 import com.rngtech.RNGTech;
+import com.rngtech.content.blockentity.BatteryAssemblerBlockEntity;
 import com.rngtech.content.blockentity.VacuumCollapseDynamics;
 import com.rngtech.content.blockentity.VacuumCollapseGeneratorBlockEntity;
 import com.rngtech.content.blockentity.VacuumCollapseVisualState;
 import com.rngtech.content.energy.CollapseNozzleMaterial;
 import com.rngtech.content.energy.VacuumCollapsePartMaterial;
 import com.rngtech.content.registry.ModBlocks;
+import com.rngtech.content.registry.ModFluids;
 import com.rngtech.content.registry.ModItems;
 
 import net.minecraft.core.BlockPos;
@@ -17,6 +19,8 @@ import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.energy.IEnergyStorage;
+import net.neoforged.neoforge.fluids.FluidStack;
+import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
@@ -117,6 +121,24 @@ public final class VacuumCollapseGameTests {
             check(state.stabilizer().isEmpty(), "A removed stabilizer should leave its mount empty, was " + state);
             check(state.collapsing() && state.chamber().equals("tungstensteel"), "The collapse should keep running, was " + state);
             helper.succeed();
+        });
+    }
+
+    /** The Component Assembler takes Ender Slurry into its tank and pours it over a Nullite Ingot and a Tungstensteel Plate. */
+    @GameTest(template = MachineTestSupport.EMPTY, timeoutTicks = 600)
+    public static void componentAssemblerPoursEnderSlurryIntoAVoidCatalyst(GameTestHelper helper) {
+        BatteryAssemblerBlockEntity assembler = MachineTestSupport.place(
+                helper, GENERATOR, ModBlocks.BATTERY_ASSEMBLER.get(), BatteryAssemblerBlockEntity.class);
+        assembler.getProcessInventory().setStackInSlot(BatteryAssemblerBlockEntity.SLOT_INPUT_0, new ItemStack(ModItems.materialItem("nullite_ingot").get()));
+        assembler.getProcessInventory().setStackInSlot(BatteryAssemblerBlockEntity.SLOT_INPUT_1, new ItemStack(ModItems.materialItem("tungstensteel_plate").get()));
+        // The tank's own validator decides which fluids the Assembler accepts; pipes then fill it at the tank's rate.
+        int filled = assembler.getInputTank().fill(new FluidStack(ModFluids.ENDER_SLURRY_SOURCE.get(), 500), IFluidHandler.FluidAction.EXECUTE);
+        check(filled == 500, "The assembly tank should take Ender Slurry, took " + filled + " mB");
+        MachineTestSupport.powerEachTick(helper, assembler.getEnergyStorage(Direction.NORTH));
+        helper.succeedWhen(() -> {
+            ItemStack output = assembler.getProcessInventory().getStackInSlot(BatteryAssemblerBlockEntity.SLOT_OUTPUT_0);
+            check(output.is(ModItems.VOID_CATALYST.get()), "Expected a Void Catalyst, " + MachineTestSupport.describe(assembler));
+            check(assembler.getInputTank().isEmpty(), "The assembly should use all 500 mB of Ender Slurry");
         });
     }
 

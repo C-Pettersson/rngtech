@@ -65,6 +65,7 @@ public final class MasteryChecks {
         checks += CodecRoundTripChecks.run();
         checks += com.rngtech.content.blockentity.AlgaeCultureChecks.run();
         checks += com.rngtech.content.blockentity.VacuumCollapseChecks.run();
+        checks += com.rngtech.rpg.VoidCatalystChainChecks.run();
         System.out.println("Machine mastery: " + checks + " checks passed");
         ForestryTreeScanChecks.run();
         ForestryCartRulesChecks.run();

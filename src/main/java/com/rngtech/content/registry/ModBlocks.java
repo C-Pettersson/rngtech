@@ -374,6 +374,11 @@ public final class ModBlocks {
             properties -> new LiquidBlock(ModFluids.ELECTROLYTE_SOLUTION_SOURCE.get(), properties),
             BlockBehaviour.Properties.ofFullCopy(Blocks.WATER).noLootTable()
     );
+    public static final DeferredBlock<LiquidBlock> ENDER_SLURRY_BLOCK = BLOCKS.registerBlock(
+            "ender_slurry",
+            properties -> new LiquidBlock(ModFluids.ENDER_SLURRY_SOURCE.get(), properties),
+            BlockBehaviour.Properties.ofFullCopy(Blocks.WATER).noLootTable()
+    );
     public static final DeferredBlock<LiquidBlock> CARBON_EXHAUST_BLOCK = BLOCKS.registerBlock(
             "carbon_exhaust",
             properties -> new LiquidBlock(ModFluids.CARBON_EXHAUST_SOURCE.get(), properties),

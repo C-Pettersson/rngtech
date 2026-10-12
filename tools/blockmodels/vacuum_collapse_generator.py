@@ -5,7 +5,8 @@ The design is a void chamber held between two Dimensional Stabilizer pylons. The
 vessel itself, capped and railed in its material; the Collapse Nozzle hangs from the catalyst feed line and injects
 through the chamber's top cap; a rear control cabinet carries the cable port and the catalyst hopper. The housing is a
 static block model. The installed parts (one model per material), the collapsing core, the pulsing cap rims, and the
-stabilizer lens glow are drawn by VacuumCollapseGeneratorRenderer, whose constants match the geometry here.
+stabilizer lens glow are drawn by VacuumCollapseGeneratorRenderer, whose constants match the geometry here. The script
+also draws the generator's item icons: the Void Catalyst ampoule, Collapse Residue, and the Ender Slurry bucket.
 Run from the repository root:
 
     python tools/blockmodels/vacuum_collapse_generator.py
@@ -24,6 +25,7 @@ ROOT = Path(__file__).resolve().parents[2]
 ASSETS = ROOT / "src/main/resources/assets/rngtech"
 MODELS = ASSETS / "models"
 TEXTURES = ASSETS / "textures/block/vacuum_collapse_generator"
+ITEM_TEXTURES = ASSETS / "textures/item"
 TEX = "rngtech:block/vacuum_collapse_generator/"
 PART_MODEL = "rngtech:block/vacuum_collapse_generator/"
 FACES = ("north", "south", "east", "west", "up", "down")
@@ -482,10 +484,115 @@ def write_textures() -> None:
     save(lens, "fx/lens")
 
 
+# ---------------------------------------------------------------- item icons
+
+OUTLINE = (18, 12, 28, 255)
+TUNGSTEN = {"dark": (33, 37, 42, 255), "body": (74, 82, 93, 255), "light": (115, 128, 144, 255), "shine": (149, 166, 185, 255)}
+SLURRY = {"deep": (38, 20, 66, 255), "body": (66, 36, 112, 255), "swirl": (122, 76, 196, 255), "speck": (206, 176, 255, 255)}
+NULLITE = {"dark": (20, 13, 31, 255), "edge": (96, 70, 150, 255)}
+
+
+def paint(image, pixels, color):
+    for x, y in pixels:
+        image.putpixel((x, y), color)
+
+
+def rows(x0, x1, y0, y1):
+    return [(x, y) for y in range(y0, y1 + 1) for x in range(x0, x1 + 1)]
+
+
+def outline(icon, shape):
+    """A dark outline around every pixel of the shape that borders empty space."""
+    for x, y in shape:
+        for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1)):
+            nx, ny = x + dx, y + dy
+            if (nx, ny) not in shape and 0 <= nx < 16 and 0 <= ny < 16:
+                icon.putpixel((nx, ny), OUTLINE)
+
+
+def write_void_catalyst() -> None:
+    """A Tungstensteel-capped glass ampoule of Ender Slurry around a Nullite core: the catalyst's own ingredients."""
+    icon = Image.new("RGBA", (16, 16), (0, 0, 0, 0))
+    cap = rows(6, 9, 1, 3)
+    bulb = rows(4, 11, 6, 12) + rows(5, 10, 5, 5) + rows(5, 10, 13, 13) + rows(3, 12, 7, 11)
+    foot = rows(6, 9, 14, 14)
+    shape = set(cap + bulb + foot)
+    outline(icon, shape)
+    # Slurry fills the bulb, darker toward the bottom.
+    paint(icon, bulb, SLURRY["body"])
+    paint(icon, rows(4, 11, 11, 12) + rows(5, 10, 13, 13), SLURRY["deep"])
+    paint(icon, [(5, 6), (6, 5), (10, 7), (11, 8), (10, 11), (5, 11), (4, 9)], SLURRY["swirl"])
+    paint(icon, [(9, 6), (11, 10), (5, 12)], SLURRY["speck"])
+    # Nullite core.
+    paint(icon, rows(7, 8, 7, 11), NULLITE["dark"])
+    paint(icon, [(7, 7), (8, 11)], NULLITE["edge"])
+    # Glass glint.
+    paint(icon, [(4, 7), (4, 8), (5, 7)], (224, 236, 255, 255))
+    # Tungstensteel cap and foot.
+    paint(icon, cap + foot, TUNGSTEN["body"])
+    paint(icon, [(x, 1) for x in range(6, 10)], TUNGSTEN["light"])
+    paint(icon, [(x, 3) for x in range(6, 10)] + [(9, 14)], TUNGSTEN["dark"])
+    paint(icon, [(6, 1), (6, 14)], TUNGSTEN["shine"])
+    icon.save(ITEM_TEXTURES / "void_catalyst.png")
+
+
+def shard(start, end, width):
+    """Pixels of a crystal shard from start to end, widest a third of the way up and pointed at both ends."""
+    (x0, y0), (x1, y1) = start, end
+    length = math.hypot(x1 - x0, y1 - y0)
+    ux, uy = (x1 - x0) / length, (y1 - y0) / length
+    pixels = {}
+    for y in range(16):
+        for x in range(16):
+            px, py = x + 0.5 - x0, y + 0.5 - y0
+            along = px * ux + py * uy
+            across = px * -uy + py * ux
+            t = along / length
+            if not 0.0 <= t <= 1.0:
+                continue
+            half = width * (t / 0.35 if t < 0.35 else (1.0 - t) / 0.65)
+            if abs(across) <= half:
+                pixels[(x, y)] = across
+    return pixels
+
+
+def write_collapse_residue() -> None:
+    """Shards of collapsed void: near-black crystal, lit on one face, with violet flecks."""
+    icon = Image.new("RGBA", (16, 16), (0, 0, 0, 0))
+    shards = [shard((4.0, 14.0), (11.5, 1.5), 2.6), shard((9.5, 14.5), (14.0, 7.0), 1.6), shard((2.0, 13.5), (2.5, 8.0), 1.1)]
+    shape = set()
+    for pixels in shards:
+        shape.update(pixels)
+    outline(icon, shape)
+    for pixels in shards:
+        for (x, y), across in pixels.items():
+            icon.putpixel((x, y), (78, 62, 110, 255) if across < -0.4 else (22, 16, 33, 255) if across > 0.6 else (40, 30, 58, 255))
+    paint(icon, [(7, 8), (9, 4), (12, 10), (6, 11)], (160, 92, 255, 255))
+    paint(icon, [(8, 6), (11, 9)], (206, 176, 255, 255))
+    icon.save(ITEM_TEXTURES / "collapse_residue.png")
+
+
+def write_ender_slurry_bucket() -> None:
+    """The liquid overlay for the Ender Slurry Bucket, drawn over the vanilla water bucket like the other buckets."""
+    icon = Image.new("RGBA", (16, 16), (0, 0, 0, 0))
+    deep = (58, 32, 100, 225)
+    light = (146, 96, 218, 235)
+    paint(icon, rows(5, 10, 8, 11) + [(5, 7), (10, 7)] + rows(6, 9, 12, 12), deep)
+    paint(icon, [(6, 7), (7, 7), (8, 7), (9, 7), (7, 10)], light)
+    icon.save(ITEM_TEXTURES / "ender_slurry_bucket.png")
+
+
+def write_item_textures() -> None:
+    write_void_catalyst()
+    write_collapse_residue()
+    write_ender_slurry_bucket()
+
+
 def main() -> None:
     write_models()
     write_textures()
     write_material_textures()
+    write_item_textures()
 
 
 if __name__ == "__main__":

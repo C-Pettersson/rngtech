@@ -204,6 +204,22 @@ public final class RNGTechClient {
         event.registerFluidType(new IClientFluidTypeExtensions() {
             @Override
             public ResourceLocation getStillTexture() {
+                return LUBRICANT_STILL_TEXTURE;
+            }
+
+            @Override
+            public ResourceLocation getFlowingTexture() {
+                return LUBRICANT_FLOWING_TEXTURE;
+            }
+
+            @Override
+            public int getTintColor() {
+                return 0xFF4A2A78;
+            }
+        }, ModFluids.ENDER_SLURRY_TYPE.get());
+        event.registerFluidType(new IClientFluidTypeExtensions() {
+            @Override
+            public ResourceLocation getStillTexture() {
                 return CARBON_EXHAUST_STILL_TEXTURE;
             }
 

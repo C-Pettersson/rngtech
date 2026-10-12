@@ -112,8 +112,8 @@
         },
         "vacuum_collapse_generator/void_catalyst": {
             "input": "1 void catalyst",
-            "chain_fe": 81980,
-            "chain": "Alloy Furnace batch with Collapse Residue, which makes 2 catalysts: 2 Nullite ingots (each half of a batch: 3 raw lead 14,400, raw platinum 19,200, alloy 22,880) 56,480 + 2 Tungstensteel ingots (each half of a batch: 2 tungsten 38,400, steel 24,480, coal dust 600, alloy 22,880) 86,360 + alloy 21,120 = 163,960, halved. Without Residue the same batch makes 1 catalyst. Each collapse with a Dimensional Stabilizer returns the Residue. Ender pearls carry no FE."
+            "chain_fe": 83420,
+            "chain": "Component Assembler 7,200 + Nullite ingot (half of an Alloy Furnace batch: 3 raw lead 14,400, raw platinum 19,200, alloy 22,880) 28,240 + Tungstensteel plate (Metal Press 2,400 + half of a batch: 2 tungsten 38,400, steel 24,480, coal dust 600, alloy 22,880) 45,580 + 500 mB Ender Slurry 2,400 (Melter 4,800 per 1,000 mB from 2 ender pearls, or 9,600 per 2,000 mB from an ender pearl and a Collapse Residue). Ender pearls carry no FE."
         }
     }
 }

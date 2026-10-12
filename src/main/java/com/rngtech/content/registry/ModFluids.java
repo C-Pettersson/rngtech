@@ -44,6 +44,19 @@ public final class ModFluids {
             FLUIDS.register("electrolyte_solution", () -> new BaseFlowingFluid.Source(electrolyteSolutionProperties()));
     public static final DeferredHolder<Fluid, BaseFlowingFluid.Flowing> ELECTROLYTE_SOLUTION_FLOWING =
             FLUIDS.register("flowing_electrolyte_solution", () -> new BaseFlowingFluid.Flowing(electrolyteSolutionProperties()));
+    public static final DeferredHolder<FluidType, FluidType> ENDER_SLURRY_TYPE =
+            FLUID_TYPES.register("ender_slurry", () -> new FluidType(FluidType.Properties.create()
+                    .descriptionId("fluid.rngtech.ender_slurry")
+                    .density(1400)
+                    .viscosity(2400)
+                    .temperature(310)
+                    .sound(SoundActions.BUCKET_FILL, SoundEvents.BUCKET_FILL)
+                    .sound(SoundActions.BUCKET_EMPTY, SoundEvents.BUCKET_EMPTY)
+            ));
+    public static final DeferredHolder<Fluid, BaseFlowingFluid.Source> ENDER_SLURRY_SOURCE =
+            FLUIDS.register("ender_slurry", () -> new BaseFlowingFluid.Source(enderSlurryProperties()));
+    public static final DeferredHolder<Fluid, BaseFlowingFluid.Flowing> ENDER_SLURRY_FLOWING =
+            FLUIDS.register("flowing_ender_slurry", () -> new BaseFlowingFluid.Flowing(enderSlurryProperties()));
     public static final DeferredHolder<FluidType, FluidType> CARBON_EXHAUST_TYPE =
             FLUID_TYPES.register("carbon_exhaust", () -> gasType("fluid.rngtech.carbon_exhaust", 900, 300));
     public static final DeferredHolder<Fluid, BaseFlowingFluid.Source> CARBON_EXHAUST_SOURCE =
@@ -112,6 +125,15 @@ public final class ModFluids {
                 .slopeFindDistance(3)
                 .levelDecreasePerBlock(2)
                 .tickRate(8);
+    }
+
+    private static BaseFlowingFluid.Properties enderSlurryProperties() {
+        return new BaseFlowingFluid.Properties(ENDER_SLURRY_TYPE, ENDER_SLURRY_SOURCE, ENDER_SLURRY_FLOWING)
+                .bucket(ModItems.ENDER_SLURRY_BUCKET)
+                .block(ModBlocks.ENDER_SLURRY_BLOCK)
+                .slopeFindDistance(2)
+                .levelDecreasePerBlock(2)
+                .tickRate(15);
     }
 
     private static FluidType gasType(String descriptionId, int density, int temperature) {

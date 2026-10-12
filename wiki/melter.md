@@ -18,7 +18,7 @@ wiki:
     },
 ) }}
 
-The **Melter** is a Stage 6 machine that turns two items and water into a fluid. Its main job is making Lubricant, which later Servo and frame recipes need. It also makes Electrolyte Solution in bulk for the [Component Assembler](component-assembler.md), methane from algae for gas chemistry, and lava.
+The **Melter** is a Stage 6 machine that turns two items and water into a fluid. Its main job is making Lubricant, which later Servo and frame recipes need. It also makes Electrolyte Solution in bulk for the [Component Assembler](component-assembler.md), methane from algae for gas chemistry, lava, and Ender Slurry for the [Vacuum Collapse Generator](vacuum-collapse-generator.md)'s Void Catalyst.
 
 The Melter runs on FE and needs a Heat Core, a Crush Head, and a Fluid Pump installed. Like every RNGTech machine, each Melter you craft rolls its own [rarity and affixes](rarity-and-affixes.md), and it can level up through [Machine Mastery](machine-mastery.md).
 
@@ -38,9 +38,9 @@ Mine a placed Melter with a pickaxe. It drops itself and keeps its rolled traits
 
 ### Melting
 
-Fill the input tank with water, put the two recipe items in the input slots, and supply FE. The two items can go in either slot. Each melt uses 1,000 mB of water and puts 1,000 mB of the product into the output tank.
+Fill the input tank with water, put the two recipe items in the input slots, and supply FE. The two items can go in either slot. Each melt uses 1,000 mB of water and puts 1,000 mB of the product into the output tank, except Ender Slurry from Collapse Residue, which makes 2,000 mB.
 
-Every default recipe needs at least 1,200 heat (methane needs 1,400) and hardness level 6, so you need a hot enough Heat Core and a Titanium or better Crush Head. Unlike the [Crusher](crusher.md), the Melter does not run recipes above its hardness at all.
+Every default recipe needs at least 1,200 heat (methane needs 1,400, and Ender Slurry from Collapse Residue needs 1,600) and hardness level 6, so you need a hot enough Heat Core and a Titanium or better Crush Head. Unlike the [Crusher](crusher.md), the Melter does not run recipes above its hardness at all.
 
 Methane takes plain {{ item('rngtech:algae_biomass') }}. {{ item('rngtech:dense_algae_biomass') }} does not work in the Melter; burn it in a [Bio Generator](bio-generator.md) instead.
 
