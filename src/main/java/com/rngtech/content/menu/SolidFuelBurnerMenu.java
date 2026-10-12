@@ -1,6 +1,7 @@
 package com.rngtech.content.menu;
 
 import com.rngtech.content.blockentity.SolidFuelBurnerBlockEntity;
+import com.rngtech.content.energy.SolidFuelBurnerStoke;
 import com.rngtech.content.registry.ModMenus;
 import com.rngtech.rpg.MachineStatAccumulator;
 import com.rngtech.rpg.MachineTraits;
@@ -48,7 +49,10 @@ public class SolidFuelBurnerMenu extends AbstractContainerMenu implements StatBr
     private static final int DATA_REFINEMENT_POTENTIAL = 17;
     private static final int DATA_LAST_OUTPUT = 18;
     private static final int DATA_CONNECTOR_CAP = 19;
-    private static final int DATA_COUNT = 20;
+    private static final int DATA_STOKE = 20;
+    private static final int DATA_RATED_GENERATION = 21;
+    private static final int DATA_COUNT = 22;
+    private static final int BUTTON_STOKE_BASE = 8000;
     private static final int STAT_SCALE = 100;
     private static final int FUEL_SLOT_START = 0;
     private static final int HEAT_CORE_SLOT = FUEL_SLOT_START + SolidFuelBurnerBlockEntity.FUEL_SLOT_COUNT;
@@ -169,6 +173,19 @@ public class SolidFuelBurnerMenu extends AbstractContainerMenu implements StatBr
         return data.get(DATA_CONNECTOR_CAP);
     }
 
+    public int stoke() {
+        return data.get(DATA_STOKE);
+    }
+
+    /** FE/t at the rated stoke, the most this burner can make. */
+    public int ratedGeneration() {
+        return data.get(DATA_RATED_GENERATION);
+    }
+
+    public static int stokeButtonId(int stoke) {
+        return BUTTON_STOKE_BASE + SolidFuelBurnerStoke.clamp(stoke);
+    }
+
     public int activeFuelSlots() {
         return data.get(DATA_ACTIVE_FUEL_SLOTS);
     }
@@ -242,6 +259,13 @@ public class SolidFuelBurnerMenu extends AbstractContainerMenu implements StatBr
 
     @Override
     public boolean clickMenuButton(Player player, int id) {
+        int stoke = id - BUTTON_STOKE_BASE;
+        if (stoke >= SolidFuelBurnerStoke.MIN_STOKE && stoke <= SolidFuelBurnerStoke.MAX_STOKE) {
+            if (!player.level().isClientSide) {
+                burner.setStoke(stoke);
+            }
+            return true;
+        }
         if (id != RefinementMenuSupport.BUTTON_APPLY) {
             return false;
         }

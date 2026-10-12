@@ -62,7 +62,7 @@ Bulk sidegrades should visibly communicate multiple calibration lanes. Nullite s
 
 ## Shaped Models
 
-`Prototype`: the Cavitation Generator, the Algae Photobioreactor, the Ammonia Fuel Cell, and the Syngas Combustor have shaped, non-cube models, part of moving placed machines toward visible working parts.
+`Prototype`: the Cavitation Generator, the Algae Photobioreactor, the Ammonia Fuel Cell, the Syngas Combustor, and the Solid Fuel Burners have shaped, non-cube models, part of moving placed machines toward visible working parts.
 
 - Show the working mechanism itself (culture columns, a rotor behind a porthole, a fluid column in a sight glass, heat fins) instead of painting it on a cube face.
 - Keep the RNGTech palette: dark slate casing, teal accent bands and trim, and steel pipework. Put teal only on deliberate band elements; textures mapped by element position must not carry accent stripes, which land at arbitrary spots.

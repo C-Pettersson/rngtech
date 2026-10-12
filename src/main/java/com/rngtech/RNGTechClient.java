@@ -12,6 +12,7 @@ import com.rngtech.client.renderer.CorrosionCellRenderer;
 import com.rngtech.client.renderer.ForestryCartRenderer;
 import com.rngtech.client.renderer.ModularToolItemRenderer;
 import com.rngtech.client.renderer.SolarArrayControllerRenderer;
+import com.rngtech.client.renderer.SolidFuelBurnerRenderer;
 import com.rngtech.client.renderer.SyngasCombustorRenderer;
 import com.rngtech.client.screen.AdvancedItemFilterScreen;
 import com.rngtech.client.screen.AffixForgeScreen;
@@ -95,6 +96,7 @@ public final class RNGTechClient {
         modBus.addListener(this::registerRenderers);
         modBus.addListener(CavitationGeneratorRenderer::registerModels);
         modBus.addListener(CorrosionCellRenderer::registerModels);
+        modBus.addListener(SolidFuelBurnerRenderer::registerModels);
         modBus.addListener(this::registerClientExtensions);
         modBus.addListener(this::registerKeyMappings);
         modBus.addListener(CableTintClient::registerBlockColors);
@@ -161,6 +163,7 @@ public final class RNGTechClient {
         event.registerBlockEntityRenderer(ModBlockEntities.ALGAE_PHOTOBIOREACTOR.get(), AlgaePhotobioreactorRenderer::new);
         event.registerBlockEntityRenderer(ModBlockEntities.AMMONIA_FUEL_CELL.get(), AmmoniaFuelCellRenderer::new);
         event.registerBlockEntityRenderer(ModBlockEntities.GAS_CHEMISTRY.get(), SyngasCombustorRenderer::new);
+        event.registerBlockEntityRenderer(ModBlockEntities.SOLID_FUEL_BURNER.get(), SolidFuelBurnerRenderer::new);
         event.registerEntityRenderer(ModEntityTypes.FORESTRY_CART.get(), ForestryCartRenderer::new);
     }
 
