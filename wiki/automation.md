@@ -43,6 +43,10 @@ The [Resonance Calibrator](resonance-calibrator.md) and [Corrosion Cell](corrosi
 
 A Furnace with several smelting lanes, such as the Lead Furnace's four, fills them in order: lane 1 takes a full stack before lane 2 gets anything. A slow feed keeps one lane busy while the rest sit idle. The **Even Feed** keystone on the [Machine Mastery](machine-mastery.md) tree sends each arriving item to the emptiest lane that can hold it instead, so a trickle or a full stack from a cable spreads across every lane. See [Furnace](furnace.md#automation).
 
+## Ingredient leftovers
+
+Some items leave another item behind when a recipe uses them, such as the Glass Bottle from a {{ item('minecraft:honey_bottle') }}. No default Alloy Furnace or Component Assembler recipe takes one, but a modpack can add such recipes. In these machines, a leftover goes back into its emptied input slot only if automation would put it there itself. Any other leftover goes into the inventory directly below, such as a hopper or chest, or drops on the ground if there is none, so it never blocks the input slots.
+
 ## Building a chain
 
 - Give each recipe its own machine. When an item fits several recipes, the next matching ingredient to arrive picks the recipe. Use Item Connector filter rows or an {{ item('rngtech:advanced_item_filter') }} to keep other recipes' items out.
