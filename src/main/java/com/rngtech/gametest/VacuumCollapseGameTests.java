@@ -132,13 +132,13 @@ public final class VacuumCollapseGameTests {
         assembler.getProcessInventory().setStackInSlot(BatteryAssemblerBlockEntity.SLOT_INPUT_0, new ItemStack(ModItems.materialItem("nullite_ingot").get()));
         assembler.getProcessInventory().setStackInSlot(BatteryAssemblerBlockEntity.SLOT_INPUT_1, new ItemStack(ModItems.materialItem("tungstensteel_plate").get()));
         // The tank's own validator decides which fluids the Assembler accepts; pipes then fill it at the tank's rate.
-        int filled = assembler.getInputTank().fill(new FluidStack(ModFluids.ENDER_SLURRY_SOURCE.get(), 500), IFluidHandler.FluidAction.EXECUTE);
-        check(filled == 500, "The assembly tank should take Ender Slurry, took " + filled + " mB");
+        int filled = assembler.getInputTank().fill(new FluidStack(ModFluids.ENDER_SLURRY_SOURCE.get(), 1000), IFluidHandler.FluidAction.EXECUTE);
+        check(filled == 1000, "The assembly tank should take Ender Slurry, took " + filled + " mB");
         MachineTestSupport.powerEachTick(helper, assembler.getEnergyStorage(Direction.NORTH));
         helper.succeedWhen(() -> {
             ItemStack output = assembler.getProcessInventory().getStackInSlot(BatteryAssemblerBlockEntity.SLOT_OUTPUT_0);
             check(output.is(ModItems.VOID_CATALYST.get()), "Expected a Void Catalyst, " + MachineTestSupport.describe(assembler));
-            check(assembler.getInputTank().isEmpty(), "The assembly should use all 500 mB of Ender Slurry");
+            check(assembler.getInputTank().isEmpty(), "The assembly should use all 1,000 mB of Ender Slurry");
         });
     }
 

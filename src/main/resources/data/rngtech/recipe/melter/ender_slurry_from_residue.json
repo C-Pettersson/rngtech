@@ -15,7 +15,7 @@
   },
   "fluid_input": {
     "ingredient": {
-      "fluid": "minecraft:water"
+      "fluid": "rngtech:ammonia"
     },
     "amount": 1000
   },

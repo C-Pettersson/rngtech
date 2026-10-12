@@ -27,7 +27,7 @@
     "ingredient": {
       "fluid": "rngtech:ender_slurry"
     },
-    "amount": 500
+    "amount": 1000
   },
   "result": {
     "count": 1,
