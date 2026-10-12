@@ -31,7 +31,7 @@ The **Solid Fuel Burner** is RNGTech's first real generator. It burns coal, char
 
 Each burner you craft rolls its own [rarity and affixes](rarity-and-affixes.md). Burners do not have Machine Mastery.
 
-You can read a burner from the outside. Facing its front, the hopper on the right is the installed Fuel Box, split into two bins when it has two fuel slots, and shows the fuel waiting in each. The current fuel item burns on the grate behind the front grille. The Heat Core sits on top as a row of fins that glow red at their base while the fire runs. A stronger Heat Core burns hotter, with taller flames, because it spends the same fuel faster. A burner paused by its Fuel Governor keeps a dull, banked fire with no flames. The meter on the left side shows how full the Battery Cell is, and smoke rises from the chimney while fuel burns. Each chassis has its own casing: cast iron for Crude, copper for Copper, bronze for Alloy, and blued steel for Steel.
+You can read a burner from the outside. Facing its front, the hopper on the right is the installed Fuel Box, split into two bins when it has two fuel slots, and shows the fuel waiting in each. The current fuel item burns on the grate behind the front grille. The Heat Core sits on top as a row of fins in the core's material. A stronger Heat Core burns hotter, with taller flames, because it spends the same fuel faster. A burner paused by its Fuel Governor keeps a dull, banked fire with no flames. The meter on the left side shows how full the Battery Cell is, and smoke rises from the chimney while fuel burns. Each chassis has its own casing: cast iron for Crude, copper for Copper, bronze for Alloy, and blued steel for Steel.
 
 ## Obtaining
 

@@ -108,10 +108,9 @@ public record SolidFuelBurnerVisualState(
     ) {
     }
 
-    /** Client-side easing between updates, so the fire and the fin heat rise and fall smoothly. */
+    /** Client-side easing between updates, so the fire rises and falls smoothly. */
     public static final class Animation {
         public float fire;
-        public float heat;
         public double lastTime = Double.NaN;
     }
 }

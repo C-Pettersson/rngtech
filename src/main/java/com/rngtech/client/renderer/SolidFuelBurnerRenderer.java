@@ -34,8 +34,8 @@ import java.util.Map;
 
 /**
  * Draws the working parts of a Solid Fuel Burner: the installed Heat Core fins and Fuel Box hopper in their materials,
- * the fuel in each hopper bin, the fuel bed and flames in the firebox with firelight on the brick, the fins glowing
- * hot at their base, and the Battery Cell charge meter. The flames stand taller with a stronger Heat Core, which
+ * the fuel in each hopper bin, the fuel bed and flames in the firebox with firelight on the brick, and the Battery
+ * Cell charge meter. The flames stand taller with a stronger Heat Core, which
  * spends the same fuel faster. Positions are in model pixels and match tools/blockmodels/solid_fuel_burner.py.
  */
 public class SolidFuelBurnerRenderer implements BlockEntityRenderer<SolidFuelBurnerBlockEntity> {
@@ -47,7 +47,6 @@ public class SolidFuelBurnerRenderer implements BlockEntityRenderer<SolidFuelBur
     private static final ResourceLocation LED = RNGTech.id("block/solid_fuel_burner/fx/led");
     private static final ResourceLocation FLAME = RNGTech.id("textures/block/solid_fuel_burner/fx/flame.png");
     private static final ResourceLocation GLOW = RNGTech.id("textures/block/solid_fuel_burner/fx/glow.png");
-    private static final ResourceLocation HEAT = RNGTech.id("textures/block/solid_fuel_burner/fx/heat.png");
     // Hopper bins inside the Fuel Box walls.
     private static final float BIN_X0 = 0.875F;
     private static final float BIN_X1 = 2.625F;
@@ -72,15 +71,6 @@ public class SolidFuelBurnerRenderer implements BlockEntityRenderer<SolidFuelBur
     private static final float CAVITY_Z1 = 8.5F;
     private static final float[] FLAME_ROWS = {2.5F, 4.25F, 6.0F, 7.5F};
     private static final int FLAMES_PER_ROW = 4;
-    // Heat Core fins.
-    private static final int FIN_COUNT = 8;
-    private static final float FIN_X0 = 3.75F;
-    private static final float FIN_X1 = 12.25F;
-    private static final float FIN_WIDTH = 0.5F;
-    private static final float FIN_Y0 = 12.0F;
-    private static final float FIN_Z0 = 2.0F;
-    private static final float FIN_Z1 = 8.0F;
-    private static final float FIN_GLOW_HEIGHT = 1.75F;
     // Charge meter on the east side of the converter cabinet.
     private static final float METER_X = 14.0F;
     private static final float METER_Y0 = 3.0F;
@@ -164,20 +154,15 @@ public class SolidFuelBurnerRenderer implements BlockEntityRenderer<SolidFuelBur
             renderFirelight(bufferSource.getBuffer(RenderType.eyes(GLOW)), pose, animation, time, packedOverlay);
             renderFlames(bufferSource.getBuffer(RenderType.eyes(FLAME)), pose, state, animation, time, packedOverlay);
         }
-        if (animation.heat > 0.01F && HEAT_CORE_MODELS.containsKey(state.heatCore())) {
-            renderFinHeat(bufferSource.getBuffer(RenderType.eyes(HEAT)), pose, animation.heat, packedOverlay);
-        }
         poseStack.popPose();
     }
 
-    /** The fire flares up quickly and dies down slowly; the fins heat and cool slower still. */
+    /** The fire flares up quickly and dies down slowly. */
     private static void animate(SolidFuelBurnerVisualState.Animation animation, SolidFuelBurnerVisualState state, float time) {
         float elapsed = Double.isNaN(animation.lastTime) ? 0.0F : Mth.clamp((float) (time - animation.lastTime), 0.0F, 10.0F);
         animation.lastTime = time;
         float fire = state.burning() ? 1.0F : 0.0F;
         animation.fire += (fire - animation.fire) * Math.min(1.0F, elapsed * (fire > animation.fire ? 0.15F : 0.05F));
-        float heat = state.burning() ? Mth.clamp(0.35F + 0.65F * state.rate(), 0.0F, 1.0F) : 0.0F;
-        animation.heat += (heat - animation.heat) * Math.min(1.0F, elapsed * (heat > animation.heat ? 0.02F : 0.008F));
     }
 
     private void renderPart(PoseStack poseStack, VertexConsumer consumer, ModelResourceLocation location, int light, int overlay) {
@@ -269,29 +254,6 @@ public class SolidFuelBurnerRenderer implements BlockEntityRenderer<SolidFuelBur
         quad(consumer, pose, new Vector3f(0.0F, -1.0F, 0.0F), color, 255, LightTexture.FULL_BRIGHT, overlay,
                 new float[] {CAVITY_X0, crown, CAVITY_Z0, 0.0F, 0.0F}, new float[] {CAVITY_X1, crown, CAVITY_Z0, 1.0F, 0.0F},
                 new float[] {CAVITY_X1, crown, CAVITY_Z1, 1.0F, 1.0F}, new float[] {CAVITY_X0, crown, CAVITY_Z1, 0.0F, 1.0F});
-    }
-
-    /** Each fin glows red-hot at its root while the fire runs and cools slowly after. */
-    private static void renderFinHeat(VertexConsumer consumer, PoseStack.Pose pose, float heat, int overlay) {
-        int intensity = Math.round(255.0F * Mth.clamp(heat, 0.0F, 1.0F));
-        int color = intensity << 16 | intensity << 8 | intensity;
-        float pitch = (FIN_X1 - FIN_X0 - FIN_WIDTH) / (FIN_COUNT - 1);
-        float y0 = FIN_Y0;
-        float y1 = FIN_Y0 + FIN_GLOW_HEIGHT;
-        for (int i = 0; i < FIN_COUNT; i++) {
-            float x0 = FIN_X0 + pitch * i - SURFACE;
-            float x1 = FIN_X0 + pitch * i + FIN_WIDTH + SURFACE;
-            for (float x : new float[] {x0, x1}) {
-                Vector3f normal = new Vector3f(x == x0 ? -1.0F : 1.0F, 0.0F, 0.0F);
-                quad(consumer, pose, normal, color, 255, LightTexture.FULL_BRIGHT, overlay,
-                        new float[] {x, y0, FIN_Z0, 0.0F, 1.0F}, new float[] {x, y0, FIN_Z1, 1.0F, 1.0F},
-                        new float[] {x, y1, FIN_Z1, 1.0F, 0.0F}, new float[] {x, y1, FIN_Z0, 0.0F, 0.0F});
-            }
-            float front = FIN_Z0 - SURFACE;
-            quad(consumer, pose, new Vector3f(0.0F, 0.0F, -1.0F), color, 255, LightTexture.FULL_BRIGHT, overlay,
-                    new float[] {x0, y0, front, 0.0F, 1.0F}, new float[] {x1, y0, front, 1.0F, 1.0F},
-                    new float[] {x1, y1, front, 1.0F, 0.0F}, new float[] {x0, y1, front, 0.0F, 0.0F});
-        }
     }
 
     /** Lit segments of the charge meter, bottom up. */

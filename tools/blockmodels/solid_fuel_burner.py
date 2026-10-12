@@ -8,7 +8,7 @@ the firebox; the flue gas leaves through a duct and chimney on top of the cabine
 chassis share one shape and differ by their shell and trim material.
 
 The housing is a static block model. The installed Heat Core fins and Fuel Box hopper are
-standalone part models; they, the fuel levels, the fire, the fin heat glow, and the charge
+standalone part models; they, the fuel levels, the fire, and the charge
 meter are drawn by SolidFuelBurnerRenderer, whose constants match the geometry here. Run from
 the repository root:
 
@@ -628,7 +628,7 @@ def write_textures() -> None:
 
 
 def write_fx_textures() -> None:
-    """Renderer textures: tintable fuel, embers, flame tongue, firelight, fin heat, and LED."""
+    """Renderer textures: tintable fuel, embers, flame tongue, firelight, and LED."""
     # Fuel lumps in light neutral greys; the renderer tints them by the fuel item.
     fuel = Image.new("RGBA", (16, 16))
     pixels = fuel.load()
@@ -678,15 +678,6 @@ def write_fx_textures() -> None:
             strength = (1.0 - distance) ** 1.4
             pixels[x, y] = (clamp(255 * strength), clamp(120 * strength), clamp(30 * strength), 255)
     save(glow, "fx/glow")
-
-    # Fin heat: red-hot at the base (bottom of the texture), fading out up the fin.
-    heat = Image.new("RGBA", (16, 16))
-    pixels = heat.load()
-    for y in range(16):
-        strength = ((y + 0.5) / 16) ** 1.8
-        for x in range(16):
-            pixels[x, y] = (clamp(255 * strength), clamp(70 * strength ** 1.5), clamp(20 * strength ** 2), 255)
-    save(heat, "fx/heat")
 
     led = Image.new("RGBA", (16, 16), (236, 236, 236, 255))
     draw = ImageDraw.Draw(led)
