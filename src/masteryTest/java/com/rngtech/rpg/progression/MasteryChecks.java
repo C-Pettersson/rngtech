@@ -323,8 +323,11 @@ public final class MasteryChecks {
 
     private static void taggedPayoffs() {
         for (MachineMasteryFamily family : MachineMasteryFamily.values()) {
-            double lowHeat = speedGain(family, "low_heat_specialist");
-            near(lowHeat, family.has(MachineTag.HEATED) ? 2 : 1, family + " gains Low Heat Specialist speed only when it is a heated machine");
+            boolean heated = family.has(MachineTag.HEATED);
+            near(speedGain(family, "flash_annealing"), heated ? 2 : 1, family + " gains Flash Annealing speed only when it is a heated machine");
+            near(speedGain(family, "low_heat_specialist"), 1, family + " gains no speed from Low Heat Specialist");
+            near(statGain(family, "low_heat_specialist", MachineStat.ENERGY_USAGE), heated ? 0.5 : 1, family + " gains Low Heat Specialist energy savings only when it is a heated machine");
+            near(statGain(family, "low_heat_specialist", MachineStat.FUEL_EFFICIENCY), family == MachineMasteryFamily.FURNACE ? 2 : 1, family + " gains Low Heat Specialist fuel savings only as a fuel Furnace");
             near(speedGain(family, "soft_material_specialist"), family == MachineMasteryFamily.CRUSHER ? 3 : 1, family + " gains Soft Material Specialist speed only as a Crusher");
             near(speedGain(family, "single_pass"), family.has(MachineTag.BONUS_OUTPUT) ? 1.3 : 1, family + " gains Single Pass speed only with bonus output to give up");
         }
@@ -335,6 +338,12 @@ public final class MasteryChecks {
         var weakHeat = new MachineStatAccumulator(); MegaPassiveTree.applyStats(weakHeat, furnace, MachineMasteryFamily.FURNACE);
         effect(weakHeat, ModifierOperation.ADD, 300);
         near(weakHeat.value(MachineStat.MAX_TEMPERATURE), 300, "a heat ceiling never raises a weak heat source to its limit");
+        var flash = build(MachineMasteryFamily.METAL_PRESS, "flash_annealing");
+        var flashHeat = new MachineStatAccumulator(); MegaPassiveTree.applyStats(flashHeat, flash, MachineMasteryFamily.METAL_PRESS);
+        effect(flashHeat, ModifierOperation.ADD, 4000);
+        near(flashHeat.value(MachineStat.MAX_TEMPERATURE), 1000, "Flash Annealing caps heat at early-metal targets");
+        near(statGain(MachineMasteryFamily.METAL_PRESS, "flash_annealing", MachineStat.ENERGY_USAGE), 1.5, "Flash Annealing pays for its speed with Energy Usage");
+        near(statGain(MachineMasteryFamily.FURNACE, "flash_annealing", MachineStat.FUEL_EFFICIENCY), 0.5, "Flash Annealing's speed does not also save a fuel Furnace's fuel");
 
         var crusher = build(MachineMasteryFamily.CRUSHER, "single_pass");
         var output = MachineStatAccumulator.componentBase(Map.of(MachineStat.OUTPUT_AMOUNT, 1.0, MachineStat.SUPER_OUTPUT_CHANCE, 0.0, MachineStat.CRUSHER_SALVAGE_CHANCE, 0.0));
@@ -356,12 +365,17 @@ public final class MasteryChecks {
 
     /** Speed multiplier the destination keystone adds on top of the route that reaches it. */
     private static double speedGain(MachineMasteryFamily family, String keystone) {
+        return statGain(family, keystone, MachineStat.PROCESSING_SPEED);
+    }
+
+    /** Multiplier the destination keystone applies to {@code stat} on top of the route that reaches it. */
+    private static double statGain(MachineMasteryFamily family, String keystone, MachineStat stat) {
         var with = build(family, keystone);
-        var withStats = MachineStatAccumulator.componentBase(Map.of(MachineStat.PROCESSING_SPEED, 1.0));
-        var withoutStats = MachineStatAccumulator.componentBase(Map.of(MachineStat.PROCESSING_SPEED, 1.0));
+        var withStats = MachineStatAccumulator.componentBase(Map.of(stat, 1.0));
+        var withoutStats = MachineStatAccumulator.componentBase(Map.of(stat, 1.0));
         MegaPassiveTree.applyStats(withStats, with, family);
         MegaPassiveTree.applyStats(withoutStats, with.withoutNode(keystone), family);
-        return withStats.value(MachineStat.PROCESSING_SPEED) / withoutStats.value(MachineStat.PROCESSING_SPEED);
+        return withStats.value(stat) / withoutStats.value(stat);
     }
 
     private static final Map<MachineStat, Double> BASE_100 = Arrays.stream(MachineStat.values()).collect(Collectors.toMap(stat -> stat, stat -> 100.0));
@@ -378,14 +392,18 @@ public final class MasteryChecks {
             List<String> violations = payoffWithoutCost(keystone);
             require(violations.isEmpty(), "keystone payoffs follow their costs: " + violations);
         }
-        // Before tags, Low Heat Specialist doubled every non-heat machine's speed for free.
-        MegaPassiveNode lowHeat = MegaPassiveTree.node("low_heat_specialist");
-        var untagged = new MegaPassiveNode(lowHeat.index(), lowHeat.id(), lowHeat.name(), lowHeat.kind(), lowHeat.x(), lowHeat.y(), lowHeat.links(),
-                lowHeat.tagged().stream().map(MegaPassiveNode.TaggedEffect::effect).toList(), List.of(), lowHeat.behaviors(),
-                Map.of(MachineStat.MAX_TEMPERATURE, 800.0), Map.of(), lowHeat.scaling(), lowHeat.passive(), 0);
-        List<String> caught = payoffWithoutCost(untagged);
-        require(caught.stream().anyMatch(v -> v.contains("CRUSHER")) && caught.stream().anyMatch(v -> v.contains("MELTER"))
-                && caught.stream().noneMatch(v -> v.contains("FURNACE")), "audit catches an untagged heat payoff: " + caught);
+        // Before tags, Low Heat Specialist doubled every non-heat machine's speed for free. Untagged, either heat
+        // keystone would still pay machines that never feel its limit.
+        for (String id : List.of("low_heat_specialist", "flash_annealing")) {
+            MegaPassiveNode heat = MegaPassiveTree.node(id);
+            List<MachineModifierEffect> untaggedEffects = new ArrayList<>(heat.effects());
+            heat.tagged().forEach(tagged -> untaggedEffects.add(tagged.effect()));
+            var untagged = new MegaPassiveNode(heat.index(), heat.id(), heat.name(), heat.kind(), heat.x(), heat.y(), heat.links(),
+                    untaggedEffects, List.of(), heat.behaviors(), heat.fixed(), heat.ceilings(), heat.scaling(), heat.passive(), 0);
+            List<String> caught = payoffWithoutCost(untagged);
+            require(caught.stream().anyMatch(v -> v.contains("CRUSHER")) && caught.stream().anyMatch(v -> v.contains("MELTER"))
+                    && caught.stream().noneMatch(v -> v.contains("FURNACE")), "audit catches an untagged " + id + " payoff: " + caught);
+        }
     }
 
     private static List<String> payoffWithoutCost(MegaPassiveNode keystone) {

@@ -82,7 +82,7 @@ Each completed melt earns Melter Mastery XP, and you spend the points on the sha
 
 A melt whose whole output a Nullite Servo voids earns no XP. Changing your Mastery allocation restarts the current melt, but keeps items, tanks, and Gear.
 
-The Melter has no Stability or Super Output, so those effects and the Single Pass keystone do nothing on it. It does not get the speed bonus of heat keystones such as Low Heat Specialist and Flash Annealing, and their max-heat caps do not apply to it, but their other penalties do. Fluid Yield is rounded down to whole millibuckets on each melt.
+The Melter has no Stability or Super Output, so those effects and the Single Pass keystone do nothing on it. It gets nothing from the heat keystones Flash Annealing and Low Heat Specialist, and their max-heat caps do not apply to it, but Flash Annealing's Energy Usage penalty does. Fluid Yield is rounded down to whole millibuckets on each melt.
 
 ### Melter recipes
 

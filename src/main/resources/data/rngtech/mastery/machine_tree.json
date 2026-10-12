@@ -30614,12 +30614,17 @@
                     "stat": "ENERGY_USAGE",
                     "operation": "MORE",
                     "value": 1.5
+                },
+                {
+                    "stat": "FUEL_EFFICIENCY",
+                    "operation": "LESS",
+                    "value": 0.5
                 }
             ],
             "behaviors": [],
             "fixed": {},
             "ceilings": {
-                "MAX_TEMPERATURE": 600
+                "MAX_TEMPERATURE": 1000
             },
             "scaling": [],
             "passive": {},
@@ -30779,7 +30784,13 @@
         {
             "effects": [
                 {
-                    "stat": "PROCESSING_SPEED",
+                    "stat": "ENERGY_USAGE",
+                    "operation": "LESS",
+                    "value": 0.5,
+                    "tag": "HEATED"
+                },
+                {
+                    "stat": "FUEL_EFFICIENCY",
                     "operation": "MORE",
                     "value": 2,
                     "tag": "HEATED"
