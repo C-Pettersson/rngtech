@@ -40,7 +40,7 @@ Mine a placed Melter with a pickaxe. It drops itself and keeps its rolled traits
 
 Fill the input tank with the recipe's fluid, put the two recipe items in the input slots, and supply FE. The two items can go in either slot, and a recipe that needs two of the same item takes both from one slot. Each melt uses 1,000 mB of fluid and puts 1,000 mB of the product into the output tank, except Ender Slurry from Collapse Residue, which makes 2,000 mB. Ender Slurry dissolves its items in [Ammonia](ammonia-synthesizer.md); every other default recipe uses water.
 
-Some ingredients leave an item behind, such as the Glass Bottle from a {{ item('minecraft:honey_bottle') }}. A leftover that can hold the product goes into an empty output container slot. Any other leftover goes into the inventory directly below the Melter, such as a hopper or chest, or drops on the ground if there is none, so it never blocks the input slots.
+Some ingredients leave an item behind, such as the Glass Bottle from a {{ item('minecraft:honey_bottle') }}. A leftover the Melter cannot use goes into an empty output container slot if it can hold the product, and otherwise into the inventory directly below the Melter, such as a hopper or chest, or onto the ground if there is none. It never blocks the input slots; see [Automation](automation.md#ingredient-leftovers).
 
 Every default recipe needs at least 1,200 heat (methane needs 1,400, and Ender Slurry from Collapse Residue needs 1,600) and hardness level 6, so you need a hot enough Heat Core and a Titanium or better Crush Head. Unlike the [Crusher](crusher.md), the Melter does not run recipes above its hardness at all.
 
@@ -72,7 +72,7 @@ The Gear tab has five slots:
 | Side | Behavior |
 |---|---|
 | Top | Inserts recipe items. Rejects items no Melter recipe uses, and never lets one ingredient fill the slot the other one needs; see [Automation](automation.md). |
-| Bottom | Extracts filled output containers. Ingredient leftovers are pushed into the inventory below. |
+| Bottom | Extracts filled output containers. Ingredient leftovers are pushed into the inventory below; see [Automation](automation.md#ingredient-leftovers). |
 | Sides | Insert fluid containers and fill the input tank. With a Fluid Pump installed, sides also drain the output tank. |
 | Any | Accepts FE, for example from a [Universal Cable](universal-cable.md). |
 

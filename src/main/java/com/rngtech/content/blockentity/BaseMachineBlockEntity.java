@@ -404,6 +404,18 @@ public abstract class BaseMachineBlockEntity extends BlockEntity implements Refi
         setChanged();
     }
 
+    /** Moves an item out of the machine: into the inventory below, like a hopper or chest, or onto the ground. */
+    protected void ejectBelowOrDrop(ItemStack stack) {
+        if (level == null || stack.isEmpty()) {
+            return;
+        }
+        IItemHandler below = level.getCapability(Capabilities.ItemHandler.BLOCK, worldPosition.below(), Direction.UP);
+        ItemStack rest = below == null ? stack : ItemHandlerHelper.insertItemStacked(below, stack, false);
+        if (!rest.isEmpty()) {
+            Containers.dropItemStack(level, worldPosition.getX(), worldPosition.getY(), worldPosition.getZ(), rest);
+        }
+    }
+
     @Override
     protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.saveAdditional(tag, registries);

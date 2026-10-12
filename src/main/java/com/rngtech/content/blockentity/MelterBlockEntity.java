@@ -56,7 +56,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Fluids;
-import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.energy.IEnergyStorage;
 import net.neoforged.neoforge.fluids.FluidActionResult;
 import net.neoforged.neoforge.fluids.FluidStack;
@@ -65,7 +64,6 @@ import net.neoforged.neoforge.fluids.FluidUtil;
 import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 import net.neoforged.neoforge.fluids.capability.templates.FluidTank;
 import net.neoforged.neoforge.items.IItemHandler;
-import net.neoforged.neoforge.items.ItemHandlerHelper;
 import net.neoforged.neoforge.items.ItemStackHandler;
 
 import java.util.List;
@@ -633,8 +631,7 @@ public class MelterBlockEntity extends BaseMachineBlockEntity
             if (!canAcceptOutputFluid(output)) {
                 break;
             }
-            consumeInput(SLOT_PRIMARY_INPUT, consumed[0]);
-            consumeInput(SLOT_SECONDARY_INPUT, consumed[1]);
+            consumeInputs(consumed);
             FluidStack drained = inputTank.drain(inputTank.getFluid().copyWithAmount(recipe.fluidInput().amount()), IFluidHandler.FluidAction.EXECUTE);
             if (drained.getAmount() < recipe.fluidInput().amount()) {
                 break;
@@ -760,43 +757,47 @@ public class MelterBlockEntity extends BaseMachineBlockEntity
         setChanged();
     }
 
-    private void consumeInput(int slot, int amount) {
-        for (int unit = 0; unit < amount; unit++) {
-            ItemStack input = processInventory.getStackInSlot(slot);
-            if (input.isEmpty()) {
-                return;
+    /** Remainders are placed once both slots are consumed, so the slot planner sees what the melt left behind. */
+    private void consumeInputs(int[] consumed) {
+        ItemStack[] remainders = {ItemStack.EMPTY, ItemStack.EMPTY};
+        for (int slot = 0; slot < remainders.length; slot++) {
+            for (int unit = 0; unit < consumed[slot]; unit++) {
+                ItemStack input = processInventory.getStackInSlot(SLOT_PRIMARY_INPUT + slot);
+                if (input.isEmpty()) {
+                    break;
+                }
+                ItemStack remainder = input.getCraftingRemainingItem();
+                input.shrink(1);
+                if (remainders[slot].isEmpty()) {
+                    remainders[slot] = remainder;
+                } else {
+                    releaseRemainder(remainder);
+                }
             }
-            ItemStack remainder = input.getCraftingRemainingItem();
-            input.shrink(1);
-            if (!remainder.isEmpty()) {
-                placeRemainder(slot, remainder);
-            }
+        }
+        for (int slot = 0; slot < remainders.length; slot++) {
+            placeRemainder(SLOT_PRIMARY_INPUT + slot, remainders[slot]);
         }
     }
 
     /**
-     * A remainder that can hold Melter output goes to the output container slot, and one a recipe uses refills its emptied
-     * input slot. Any other remainder would jam automated input, so it goes into the inventory below or drops.
+     * A remainder refills its emptied slot only where automation would insert it itself; any other would jam automated
+     * input, so it leaves.
      */
     private void placeRemainder(int slot, ItemStack remainder) {
-        ItemStack rest = processInventory.insertItem(SLOT_FLUID_OUTPUT_CONTAINER, remainder, false);
-        if (rest.isEmpty()) {
+        if (remainder.isEmpty()) {
             return;
         }
-        if (processInventory.getStackInSlot(slot).isEmpty() && isMeltingInput(rest)) {
-            processInventory.setStackInSlot(slot, rest);
-            return;
+        if (processInventory.getStackInSlot(slot).isEmpty() && acceptsAutomatedInput(slot, remainder)) {
+            processInventory.setStackInSlot(slot, remainder);
+        } else {
+            releaseRemainder(remainder);
         }
-        if (level == null) {
-            return;
-        }
-        IItemHandler below = level.getCapability(Capabilities.ItemHandler.BLOCK, worldPosition.below(), Direction.UP);
-        if (below != null) {
-            rest = ItemHandlerHelper.insertItemStacked(below, rest, false);
-        }
-        if (!rest.isEmpty()) {
-            Containers.dropItemStack(level, worldPosition.getX(), worldPosition.getY(), worldPosition.getZ(), rest);
-        }
+    }
+
+    /** A remainder that can hold Melter output waits in the output container slot; anything else leaves the machine. */
+    private void releaseRemainder(ItemStack remainder) {
+        ejectBelowOrDrop(processInventory.insertItem(SLOT_FLUID_OUTPUT_CONTAINER, remainder, false));
     }
 
     /** Sealed Lines never vents excess output, so a full tank pauses the melt instead. */
