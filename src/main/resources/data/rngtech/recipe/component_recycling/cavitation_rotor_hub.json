@@ -1,0 +1,18 @@
+{
+    "type": "rngtech:component_recycling",
+    "ingredient": {
+        "item": "rngtech:cavitation_rotor_hub"
+    },
+    "minimum_processing_level": 5,
+    "processing_ticks": 80,
+    "energy": 900,
+    "outputs": [
+        {
+            "stack": {
+                "id": "rngtech:steel_casing",
+                "count": 1
+            },
+            "requires_filter": false
+        }
+    ]
+}

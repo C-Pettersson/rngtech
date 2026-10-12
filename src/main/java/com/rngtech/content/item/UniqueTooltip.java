@@ -48,6 +48,11 @@ public final class UniqueTooltip {
         openHost = host;
     }
 
+    /** The machine whose screen is open, or null; ordinary Gear tooltips dim what it does not read too. */
+    static OpenHost openHost() {
+        return openHost.get();
+    }
+
     static void append(ItemStack stack, UniqueDefinition definition, List<Component> tooltip) {
         boolean unidentified = CraftedTraitOutputs.isUnidentified(stack);
         List<Component> lines = lines(definition, unidentified ? null : rolls(stack), unidentified, TooltipKeyState.hasShiftDown(), openHost.get());

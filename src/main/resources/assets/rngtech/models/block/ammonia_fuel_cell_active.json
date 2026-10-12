@@ -1,12 +1,6 @@
 {
-  "parent": "minecraft:block/cube",
+  "parent": "rngtech:block/ammonia_fuel_cell",
   "textures": {
-    "down": "rngtech:block/ammonia_power_chain/bottom/ammonia_fuel_cell",
-    "up": "rngtech:block/ammonia_power_chain/top/ammonia_fuel_cell",
-    "north": "rngtech:block/ammonia_power_chain/front/ammonia_fuel_cell_active",
-    "south": "rngtech:block/ammonia_power_chain/side/ammonia_fuel_cell",
-    "east": "rngtech:block/ammonia_power_chain/side/ammonia_fuel_cell",
-    "west": "rngtech:block/ammonia_power_chain/side/ammonia_fuel_cell",
-    "particle": "rngtech:block/ammonia_power_chain/front/ammonia_fuel_cell_active"
+    "lamp": "rngtech:block/ammonia_fuel_cell/lamp_on"
   }
 }

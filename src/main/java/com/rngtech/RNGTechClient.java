@@ -4,11 +4,16 @@ import com.rngtech.client.CableTintClient;
 import com.rngtech.client.MinersCompanionLampClient;
 import com.rngtech.client.configurator.ConfiguratorClient;
 import com.rngtech.client.renderer.AlgaePhotobioreactorRenderer;
+import com.rngtech.client.renderer.AmmoniaFuelCellRenderer;
 import com.rngtech.client.renderer.BatteryChassisRenderer;
+import com.rngtech.client.renderer.BioGeneratorRenderer;
+import com.rngtech.client.renderer.CavitationGeneratorRenderer;
+import com.rngtech.client.renderer.CorrosionCellRenderer;
 import com.rngtech.client.renderer.ForestryCartRenderer;
 import com.rngtech.client.renderer.ModularToolItemRenderer;
 import com.rngtech.client.renderer.SolarArrayControllerRenderer;
 import com.rngtech.client.renderer.SolidFuelBurnerRenderer;
+import com.rngtech.client.renderer.SyngasCombustorRenderer;
 import com.rngtech.client.screen.AdvancedItemFilterScreen;
 import com.rngtech.client.screen.AffixForgeScreen;
 import com.rngtech.client.screen.AlgaePhotobioreactorScreen;
@@ -89,11 +94,14 @@ public final class RNGTechClient {
     public RNGTechClient(IEventBus modBus, ModContainer container) {
         modBus.addListener(this::registerScreens);
         modBus.addListener(this::registerRenderers);
+        modBus.addListener(CavitationGeneratorRenderer::registerModels);
+        modBus.addListener(CorrosionCellRenderer::registerModels);
         modBus.addListener(SolidFuelBurnerRenderer::registerModels);
         modBus.addListener(this::registerClientExtensions);
         modBus.addListener(this::registerKeyMappings);
         modBus.addListener(CableTintClient::registerBlockColors);
         modBus.addListener(CableTintClient::registerItemColors);
+        modBus.addListener(BioGeneratorRenderer::registerModels);
         NeoForge.EVENT_BUS.addListener(WrenchOverlayClient::onClientTick);
         NeoForge.EVENT_BUS.addListener(WrenchOverlayClient::onUseInput);
         NeoForge.EVENT_BUS.addListener(WrenchOverlayClient::onRenderLevel);
@@ -149,7 +157,12 @@ public final class RNGTechClient {
     private void registerRenderers(EntityRenderersEvent.RegisterRenderers event) {
         event.registerBlockEntityRenderer(ModBlockEntities.BATTERY_CHASSIS.get(), BatteryChassisRenderer::new);
         event.registerBlockEntityRenderer(ModBlockEntities.SOLAR_ARRAY_CONTROLLER.get(), SolarArrayControllerRenderer::new);
+        event.registerBlockEntityRenderer(ModBlockEntities.BIO_GENERATOR.get(), BioGeneratorRenderer::new);
+        event.registerBlockEntityRenderer(ModBlockEntities.CAVITATION_GENERATOR.get(), CavitationGeneratorRenderer::new);
+        event.registerBlockEntityRenderer(ModBlockEntities.CORROSION_CELL.get(), CorrosionCellRenderer::new);
         event.registerBlockEntityRenderer(ModBlockEntities.ALGAE_PHOTOBIOREACTOR.get(), AlgaePhotobioreactorRenderer::new);
+        event.registerBlockEntityRenderer(ModBlockEntities.AMMONIA_FUEL_CELL.get(), AmmoniaFuelCellRenderer::new);
+        event.registerBlockEntityRenderer(ModBlockEntities.GAS_CHEMISTRY.get(), SyngasCombustorRenderer::new);
         event.registerBlockEntityRenderer(ModBlockEntities.SOLID_FUEL_BURNER.get(), SolidFuelBurnerRenderer::new);
         event.registerEntityRenderer(ModEntityTypes.FORESTRY_CART.get(), ForestryCartRenderer::new);
     }

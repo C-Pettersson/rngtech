@@ -72,8 +72,11 @@ public final class UniqueStatReaders {
                 MachineStat.FLUID_TRANSFER, MachineStat.ESCAPEMENT_SPEED);
         stats(Reader.SOLID_FUEL_BURNER, Set.of(), MachineStat.ENERGY_GENERATION, MachineStat.FUEL_EFFICIENCY, MachineStat.HEAT_ISOLATION,
                 MachineStat.STABILITY, MachineStat.INPUT_SLOTS, MachineStat.EFFICIENCY, MachineStat.FUEL_DURATION);
-        stats(Reader.CAVITATION_GENERATOR, HEAT_CONTROL, MachineStat.PROCESSING_SPEED, MachineStat.STABILITY, MachineStat.EFFICIENCY,
-                MachineStat.FLUID_TRANSFER, MachineStat.OUTPUT_AMOUNT);
+        // Heat strain reads Heat Transfer, Strain Recovery, Overheat Tolerance, and Max Temperature; it has no warmup,
+        // isolation, or idle cooling, so those Heat Core stats stay unread.
+        stats(Reader.CAVITATION_GENERATOR, Set.of(), MachineStat.PROCESSING_SPEED, MachineStat.STABILITY, MachineStat.EFFICIENCY,
+                MachineStat.FLUID_TRANSFER, MachineStat.OUTPUT_AMOUNT, MachineStat.TEMPERATURE_STABILITY, MachineStat.HEAT_TRANSFER,
+                MachineStat.STRAIN_RECOVERY, MachineStat.OVERHEAT_TOLERANCE, MachineStat.MAX_TEMPERATURE);
         stats(Reader.GAS_CHEMISTRY, Set.of(), MachineStat.MAX_TEMPERATURE, MachineStat.PROCESSING_SPEED, MachineStat.ENERGY_USAGE,
                 MachineStat.EFFICIENCY);
         stats(Reader.COMPRESSOR_TANK, Set.of(), MachineStat.PROCESSING_SPEED, MachineStat.ENERGY_USAGE, MachineStat.STABILITY,
