@@ -2,11 +2,14 @@ package com.rngtech.content.block;
 
 import com.rngtech.content.blockentity.BaseMachineBlockEntity;
 import com.rngtech.content.blockentity.PotentialReactorBlockEntity;
+import com.rngtech.content.blockentity.PotentialReactorVisualState;
 import com.rngtech.content.registry.ModBlockEntities;
 import com.rngtech.content.registry.ModDataComponents;
 import com.rngtech.rpg.MachineTraits;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -42,6 +45,27 @@ public class PotentialReactorBlock extends BaseMachineBlock {
             return null;
         }
         return createTickerHelper(blockEntityType, ModBlockEntities.POTENTIAL_REACTOR.get(), PotentialReactorBlockEntity::serverTick);
+    }
+
+    /** The relief valve on the lid vents while the core reacts, more often when the reactor is less stable. */
+    @Override
+    public void animateTick(BlockState state, Level level, BlockPos pos, RandomSource random) {
+        if (!state.getValue(ACTIVE) || !(level.getBlockEntity(pos) instanceof PotentialReactorBlockEntity reactor)) {
+            return;
+        }
+        PotentialReactorVisualState visual = reactor.visualState();
+        if (visual.core() != PotentialReactorVisualState.CORE_REACTING) {
+            return;
+        }
+        if (random.nextFloat() > 0.12F + 0.5F * visual.instability()) {
+            return;
+        }
+        double x = 4.25 / 16.0 - 0.5;
+        double z = 10.5 / 16.0 - 0.5;
+        double angle = Math.toRadians(180.0 - state.getValue(FACING).toYRot());
+        double worldX = x * Math.cos(angle) + z * Math.sin(angle);
+        double worldZ = -x * Math.sin(angle) + z * Math.cos(angle);
+        level.addParticle(ParticleTypes.SMOKE, pos.getX() + 0.5 + worldX, pos.getY() + 1.0, pos.getZ() + 0.5 + worldZ, 0.0, 0.03, 0.0);
     }
 
     @Override

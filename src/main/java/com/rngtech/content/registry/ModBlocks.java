@@ -263,6 +263,7 @@ public final class ModBlocks {
                     .mapColor(MapColor.METAL)
                     .strength(3.5F)
                     .sound(SoundType.METAL)
+                    .noOcclusion()
     );
     public static final DeferredBlock<CavitationGeneratorBlock> CAVITATION_GENERATOR = BLOCKS.registerBlock(
             "cavitation_generator",

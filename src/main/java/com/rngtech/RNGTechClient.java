@@ -11,6 +11,7 @@ import com.rngtech.client.renderer.CavitationGeneratorRenderer;
 import com.rngtech.client.renderer.CorrosionCellRenderer;
 import com.rngtech.client.renderer.ForestryCartRenderer;
 import com.rngtech.client.renderer.ModularToolItemRenderer;
+import com.rngtech.client.renderer.PotentialReactorRenderer;
 import com.rngtech.client.renderer.SolarArrayControllerRenderer;
 import com.rngtech.client.renderer.SolarPanelModels;
 import com.rngtech.client.renderer.SolarPanelRenderer;
@@ -172,6 +173,7 @@ public final class RNGTechClient {
         event.registerBlockEntityRenderer(ModBlockEntities.AMMONIA_FUEL_CELL.get(), AmmoniaFuelCellRenderer::new);
         event.registerBlockEntityRenderer(ModBlockEntities.GAS_CHEMISTRY.get(), SyngasCombustorRenderer::new);
         event.registerBlockEntityRenderer(ModBlockEntities.SOLID_FUEL_BURNER.get(), SolidFuelBurnerRenderer::new);
+        event.registerBlockEntityRenderer(ModBlockEntities.POTENTIAL_REACTOR.get(), PotentialReactorRenderer::new);
         event.registerEntityRenderer(ModEntityTypes.FORESTRY_CART.get(), ForestryCartRenderer::new);
     }
 
