@@ -147,6 +147,7 @@ Use standard NeoForge capabilities for item and energy automation.
 - Sided handlers should expose only the slots that make sense for ordinary automation.
 - Gear automation is opt-in per slot type, not automatic for every Gear slot.
 - Automated input must never jam a machine. Factory chains with hoppers and cables are the intended way to autocraft, so a stream of one ingredient must never take an input slot another ingredient of the recipe still needs. The rule depends only on what the slots hold, never on which item arrives first.
+- A crafting remainder an ingredient leaves behind must not stay in an input slot unless a recipe uses it. Route it to a container slot it can fill, or out of the machine.
 - Multi-item recipes are shapeless by default: slot order does not matter, and a recipe that needs two of an item takes both from one slot. A shapeless machine lets an item open another input slot only while every recipe still possible before keeps an empty slot for each ingredient it lacks.
 - Make a recipe type positional only when the order carries meaning, as in the Component Assembler. A positional slot takes only what a recipe that agrees with the other filled slots needs at that position. When a recipe needs the same item in several positions, automation fills them evenly.
 - Shift-click follows the same slot rule as automation. Placing an item by hand stays free.

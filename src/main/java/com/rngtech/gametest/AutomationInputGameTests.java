@@ -10,6 +10,7 @@ import com.rngtech.content.blockentity.RecipeCache;
 import com.rngtech.content.energy.HeatCoreMaterial;
 import com.rngtech.content.machine.AlloyCrucibleMaterial;
 import com.rngtech.content.machine.AlloyFurnaceChassisMaterial;
+import com.rngtech.content.machine.CrushHeadMaterial;
 import com.rngtech.content.recipe.MelterRecipe;
 import com.rngtech.content.recipe.MelterRecipeInput;
 import com.rngtech.content.registry.ModBlocks;
@@ -38,6 +39,7 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.HopperBlockEntity;
 import net.minecraft.world.level.material.Fluids;
 import net.neoforged.neoforge.fluids.FluidStack;
+import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 import net.neoforged.neoforge.fluids.crafting.SizedFluidIngredient;
 import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
@@ -58,6 +60,7 @@ public final class AutomationInputGameTests {
     private static final String PACK_RECIPES = "automation_remainders";
     private static final BlockPos MACHINE = new BlockPos(2, 2, 2);
     private static final int CRAFT_TIMEOUT = 2400;
+    private static final int MELT_TIMEOUT = 3000;
     private static List<RecipeHolder<?>> defaultRecipes = List.of();
 
     private AutomationInputGameTests() {
@@ -278,6 +281,38 @@ public final class AutomationInputGameTests {
                 .thenSucceed();
     }
 
+    /** Glass Bottles left by Honey Bottles in the default Lubricant recipe go into the hopper below. */
+    @GameTest(template = MachineTestSupport.EMPTY, timeoutTicks = MELT_TIMEOUT)
+    public static void melterPassesRemaindersToTheInventoryBelow(GameTestHelper helper) {
+        helper.setBlock(MACHINE.below(), Blocks.HOPPER);
+        HopperBlockEntity hopper = (HopperBlockEntity) helper.getBlockEntity(MACHINE.below());
+        MelterBlockEntity melter = lubricantMelter(helper, 2);
+        helper.startSequence()
+                .thenWaitUntil(() -> check(count(hopper, Items.GLASS_BOTTLE) == 2,
+                        "Expected 2 Glass Bottles in the hopper, found " + count(hopper, Items.GLASS_BOTTLE) + "; "
+                                + MachineTestSupport.describe(melter)))
+                .thenExecute(() -> {
+                    assertNoInputHolds(melter.getProcessInventory(), MelterBlockEntity.SLOT_SECONDARY_INPUT + 1, Items.GLASS_BOTTLE);
+                    assertAccepts(melter.getItemHandler(Direction.UP), new ItemStack(Items.HONEY_BOTTLE));
+                })
+                .thenSucceed();
+    }
+
+    /** With no inventory below, the Melter's Glass Bottle drops instead of sitting in the input slot. */
+    @GameTest(template = MachineTestSupport.EMPTY, timeoutTicks = MELT_TIMEOUT)
+    public static void melterDropsRemaindersWithNoInventoryBelow(GameTestHelper helper) {
+        MelterBlockEntity melter = lubricantMelter(helper, 1);
+        helper.startSequence()
+                .thenWaitUntil(() -> check(melter.getOutputTank().getFluidAmount() >= 1000,
+                        "The Honey Bottle never melted; " + MachineTestSupport.describe(melter)))
+                .thenExecute(() -> {
+                    helper.assertItemEntityPresent(Items.GLASS_BOTTLE, MACHINE, 3.0D);
+                    assertNoInputHolds(melter.getProcessInventory(), MelterBlockEntity.SLOT_SECONDARY_INPUT + 1, Items.GLASS_BOTTLE);
+                    assertAccepts(melter.getItemHandler(Direction.UP), new ItemStack(Items.HONEY_BOTTLE));
+                })
+                .thenSucceed();
+    }
+
     /** Offers a stack to every slot in order, the way hoppers and Universal Cables do, {@code rounds} times. */
     private static void flood(IItemHandler handler, ItemStack stack, int rounds) {
         for (int round = 0; round < rounds; round++) {
@@ -300,6 +335,18 @@ public final class AutomationInputGameTests {
 
     private static ItemStack item(String id, int count) {
         return new ItemStack(BuiltInRegistries.ITEM.get(ResourceLocation.parse(id)), count);
+    }
+
+    private static MelterBlockEntity lubricantMelter(GameTestHelper helper, int honeyBottles) {
+        MelterBlockEntity melter = MachineTestSupport.place(helper, MACHINE, ModBlocks.MELTER.get(), MelterBlockEntity.class);
+        melter.getGearInventory().setStackInSlot(MelterBlockEntity.SLOT_HEAT_CORE, new ItemStack(ModItems.heatCore(HeatCoreMaterial.TITANIUM).get()));
+        melter.getGearInventory().setStackInSlot(MelterBlockEntity.SLOT_CRUSH_HEAD, new ItemStack(ModItems.crushHead(CrushHeadMaterial.TITANIUM).get()));
+        melter.getInputTank().fill(new FluidStack(Fluids.WATER, 4000), IFluidHandler.FluidAction.EXECUTE);
+        IItemHandler top = melter.getItemHandler(Direction.UP);
+        insertAll(top, new ItemStack(Items.HONEY_BOTTLE, honeyBottles));
+        insertAll(top, item("rngtech:plant_reagent", 4));
+        MachineTestSupport.powerEachTick(helper, melter.getEnergyStorage(null));
+        return melter;
     }
 
     private static MelterRecipe melterRecipe(Ingredient primary, Ingredient secondary) {
