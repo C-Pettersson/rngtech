@@ -1,8 +1,8 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="1829 1536 4369 4769" width="1200" height="1310" role="img" aria-labelledby="title description">
 <title id="title">RNGTech shared machine passive tree</title>
-<desc id="description">1315 nodes, six starts, 1464 links. Control in green, Drive in copper, Reserve in blue. White notables and violet keystones. Each machine earns 99 points by level 100.</desc>
+<desc id="description">1347 nodes, six starts, 1500 links. Control in green, Drive in copper, Reserve in blue. White notables and violet keystones. Each machine earns 99 points by level 100.</desc>
 <rect x="1829" y="1536" width="4369" height="4769" fill="#111820"/>
-<g font-family="sans-serif" fill="#e5ecf3"><text x="1909" y="1686" font-size="96">Machine Mastery</text><text x="1914" y="1806" font-size="58" fill="#a9b9c9">1315 nodes · 6 starts · 3 attributes · 99 points at level 100</text></g>
+<g font-family="sans-serif" fill="#e5ecf3"><text x="1909" y="1686" font-size="96">Machine Mastery</text><text x="1914" y="1806" font-size="58" fill="#a9b9c9">1347 nodes · 6 starts · 3 attributes · 99 points at level 100</text></g>
 <g stroke="#66727d" stroke-width="5" opacity="0.65">
 <path d="M4000,4000 L3939,3895"/>
 <path d="M4000,4000 L4122,3998"/>
@@ -1468,6 +1468,42 @@
 <path d="M2634,4427 L2613,4488"/>
 <path d="M2634,4427 L2592,4379"/>
 <path d="M2671,3516 L2638,3606"/>
+<path d="M3946,2972 L3892,2957"/>
+<path d="M3892,2957 L3845,2934"/>
+<path d="M3845,2934 L3802,2901"/>
+<path d="M3802,2901 L3765,2862"/>
+<path d="M3765,2862 L3736,2817"/>
+<path d="M3736,2817 L3717,2766"/>
+<path d="M4092,2674 L4111,2625"/>
+<path d="M4111,2625 L4074,2579"/>
+<path d="M4074,2579 L4096,2524"/>
+<path d="M4096,2524 L4154,2515"/>
+<path d="M4154,2515 L4191,2561"/>
+<path d="M4191,2561 L4169,2616"/>
+<path d="M4169,2616 L4111,2625"/>
+<path d="M4132,2570 L4096,2524"/>
+<path d="M4132,2570 L4191,2561"/>
+<path d="M3636,2730 L3587,2696"/>
+<path d="M3587,2696 L3523,2696"/>
+<path d="M3587,2696 L3565,2637"/>
+<path d="M3523,2696 L3500,2636"/>
+<path d="M3565,2637 L3500,2636"/>
+<path d="M4786,2500 L4730,2479"/>
+<path d="M4730,2479 L4668,2496"/>
+<path d="M4730,2479 L4693,2428"/>
+<path d="M4668,2496 L4630,2443"/>
+<path d="M4693,2428 L4630,2443"/>
+<path d="M3663,2355 L3622,2391"/>
+<path d="M3622,2391 L3616,2448"/>
+<path d="M3616,2448 L3602,2505"/>
+<path d="M3622,2391 L3564,2390"/>
+<path d="M3564,2390 L3507,2397"/>
+<path d="M2953,4583 L3001,4555"/>
+<path d="M3001,4555 L3018,4500"/>
+<path d="M3018,4500 L3043,4448"/>
+<path d="M3001,4555 L3057,4567"/>
+<path d="M3057,4567 L3115,4572"/>
+<path d="M5336,4211 L5242,4192"/>
 </g>
 <circle cx="3388" cy="3633" r="20" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>control (start_control)</title></circle>
 <circle cx="4000" cy="3310" r="20" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>control / drive (start_control_drive)</title></circle>
@@ -2753,6 +2789,37 @@
 <circle cx="2592" cy="4379" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Recovery (fine_screens_5)</title></circle>
 <circle cx="2655" cy="4367" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Recovery (fine_screens_6)</title></circle>
 <circle cx="2634" cy="4427" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Fine Screens (fine_screens)</title></circle>
+<circle cx="3892" cy="2957" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Rail Pace (greased_rails_1)</title></circle>
+<circle cx="3845" cy="2934" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Rail Pace (greased_rails_2)</title></circle>
+<circle cx="3802" cy="2901" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Greased Rails (greased_rails)</title></circle>
+<circle cx="3765" cy="2862" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Rail Pace (greased_rails_3)</title></circle>
+<circle cx="3736" cy="2817" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Rail Pace (greased_rails_4)</title></circle>
+<circle cx="3717" cy="2766" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Driven Wheels (driven_wheels)</title></circle>
+<circle cx="4111" cy="2625" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Open Track (open_track_1)</title></circle>
+<circle cx="4074" cy="2579" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Open Track (open_track_2)</title></circle>
+<circle cx="4096" cy="2524" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Open Track (open_track_3)</title></circle>
+<circle cx="4154" cy="2515" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Open Track (open_track_4)</title></circle>
+<circle cx="4191" cy="2561" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Open Track (open_track_5)</title></circle>
+<circle cx="4169" cy="2616" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Open Track (open_track_6)</title></circle>
+<circle cx="4132" cy="2570" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Open Track (open_track)</title></circle>
+<circle cx="3587" cy="2696" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Rowcraft (far_rows_1)</title></circle>
+<circle cx="3523" cy="2696" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Rowcraft (far_rows_2)</title></circle>
+<circle cx="3565" cy="2637" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Rowcraft (far_rows_3)</title></circle>
+<circle cx="3500" cy="2636" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Far Rows (far_rows)</title></circle>
+<circle cx="4730" cy="2479" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Rowcraft (outer_rows_1)</title></circle>
+<circle cx="4668" cy="2496" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Rowcraft (outer_rows_2)</title></circle>
+<circle cx="4693" cy="2428" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Rowcraft (outer_rows_3)</title></circle>
+<circle cx="4630" cy="2443" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Outer Rows (outer_rows)</title></circle>
+<circle cx="3622" cy="2391" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Reservoirs (holding_tanks_1)</title></circle>
+<circle cx="3616" cy="2448" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Reservoirs (holding_tanks_2)</title></circle>
+<circle cx="3602" cy="2505" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Holding Tanks (holding_tanks)</title></circle>
+<circle cx="3564" cy="2390" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Reservoirs (holding_tanks_3)</title></circle>
+<circle cx="3507" cy="2397" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Cistern Walls (cistern_walls)</title></circle>
+<circle cx="3001" cy="4555" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Reservoirs (deep_tanks_1)</title></circle>
+<circle cx="3018" cy="4500" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Reservoirs (deep_tanks_2)</title></circle>
+<circle cx="3043" cy="4448" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Deep Tanks (deep_tanks)</title></circle>
+<circle cx="3057" cy="4567" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Reservoirs (deep_tanks_3)</title></circle>
+<circle cx="3115" cy="4572" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Bulk Reservoir (bulk_reservoir)</title></circle>
 <circle cx="4047" cy="3916" r="24" fill="#c79dea" stroke="#111820" stroke-width="3"><title>Silent Operation (silent_operation)</title></circle>
 <circle cx="2579" cy="3318" r="24" fill="#c79dea" stroke="#111820" stroke-width="3"><title>Manual Throttle (manual_throttle)</title></circle>
 <circle cx="3900" cy="2301" r="24" fill="#c79dea" stroke="#111820" stroke-width="3"><title>Seedling Magnet (seedling_magnet)</title></circle>
@@ -2784,6 +2851,7 @@
 <circle cx="4789" cy="5720" r="24" fill="#c79dea" stroke="#111820" stroke-width="3"><title>Thermal Reservoir (thermal_reservoir)</title></circle>
 <circle cx="2537" cy="5446" r="24" fill="#c79dea" stroke="#111820" stroke-width="3"><title>Cold Standby (cold_standby)</title></circle>
 <circle cx="2638" cy="3606" r="24" fill="#c79dea" stroke="#111820" stroke-width="3"><title>Single Pass (single_pass)</title></circle>
+<circle cx="5242" cy="4192" r="24" fill="#c79dea" stroke="#111820" stroke-width="3"><title>Even Feed (even_feed)</title></circle>
 <g font-family="sans-serif" fill="#e5ecf3" font-size="44" text-anchor="middle">
 <text x="3388" y="3588">control</text>
 <text x="4000" y="3265">control / drive</text>
