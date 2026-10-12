@@ -102,7 +102,13 @@ Gear slots are not reachable by automation. The back of the machine has a port p
 
 ### Void Catalyst
 
-{{ crafting('rngtech:void_catalyst') }}
+Void Catalyst is made in a Titanium [Alloy Furnace](alloy-furnace.md) from 2 Nullite Ingots and 2 Tungstensteel Ingots, which needs a hot, steady furnace. Add a Collapse Residue to the batch and it makes 2 catalysts instead of 1.
+
+Each collapse with a Dimensional Stabilizer installed leaves at least one Collapse Residue, and a batch needs only one per 2 catalysts. Once a generator is running, it supplies its own Residue with some to spare, so only the first catalysts cost the full batch.
+
+A Void Catalyst lasts one collapse of 2,400 ticks (two minutes) at rated depth, so a generator running nonstop uses about 30 an hour.
+
+{{ processing("alloy_furnace", output="rngtech:void_catalyst", columns=["processing_ticks", "energy", "minimum_component_stage", "minimum_temperature", "required_temperature_stability"]) }}
 
 ### Vacuum Collapse recipes
 

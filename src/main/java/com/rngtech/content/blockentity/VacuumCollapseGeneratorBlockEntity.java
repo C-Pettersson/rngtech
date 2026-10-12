@@ -772,6 +772,11 @@ public class VacuumCollapseGeneratorBlockEntity extends BaseMachineBlockEntity i
         return depth;
     }
 
+    /** FE the running collapse makes in total, or the next one at the selected depth; 0 without a usable catalyst. */
+    public long collapseEnergy() {
+        return currentRecipeEnergy(effectiveStats());
+    }
+
     /** Sets the depth for the next collapse; a running collapse keeps the depth it started with. */
     public void setDepth(int depth) {
         int clamped = VacuumCollapseDynamics.clampDepth(depth);

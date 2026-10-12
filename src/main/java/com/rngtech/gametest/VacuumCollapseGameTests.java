@@ -28,64 +28,60 @@ import java.util.List;
 @PrefixGameTestTemplate(false)
 public final class VacuumCollapseGameTests {
     private static final BlockPos GENERATOR = new BlockPos(2, 1, 2);
-    private static final int[] DEPTHS = {VacuumCollapseDynamics.RATED_DEPTH, VacuumCollapseDynamics.MAX_DEPTH, VacuumCollapseDynamics.MIN_DEPTH};
-
     private VacuumCollapseGameTests() {
     }
 
     /**
-     * One catalyst at each depth, drained every tick so nothing is vented. Each collapse climbs from a low start to a
-     * peak at its end and delivers all of its FE; a deep collapse draws about 1.25x the rated FE from its catalyst over
-     * a longer cycle, and a shallow one about two thirds over a shorter cycle.
+     * A rated collapse, drained every tick so nothing is vented, climbs from a low start to a peak at its end and
+     * delivers exactly the FE it promised when it started.
      */
-    @GameTest(template = MachineTestSupport.EMPTY, timeoutTicks = 2400)
-    public static void collapsesClimbToTheirPeakAndDepthTradesFePerCatalyst(GameTestHelper helper) {
+    @GameTest(template = MachineTestSupport.EMPTY, timeoutTicks = 2800)
+    public static void ratedCollapseClimbsToItsPeakAndDeliversEveryFe(GameTestHelper helper) {
         VacuumCollapseGeneratorBlockEntity generator = tungstensteelGenerator(helper, CollapseNozzleMaterial.TUNGSTENSTEEL);
         IEnergyStorage storage = generator.getEnergyStorage(Direction.NORTH);
+        generator.getProcessInventory().setStackInSlot(VacuumCollapseGeneratorBlockEntity.SLOT_INPUT, new ItemStack(ModItems.VOID_CATALYST.get()));
+        long promised = generator.collapseEnergy();
         List<Long> perTick = new ArrayList<>();
-        List<Long> totals = new ArrayList<>();
-        List<Integer> durations = new ArrayList<>();
-        int[] collapse = {0};
-        boolean[] fed = {false};
         helper.onEachTick(() -> {
-            if (!fed[0]) {
-                generator.setDepth(DEPTHS[collapse[0]]);
-                generator.getProcessInventory().setStackInSlot(VacuumCollapseGeneratorBlockEntity.SLOT_INPUT, new ItemStack(ModItems.VOID_CATALYST.get()));
-                fed[0] = true;
-                return;
-            }
             perTick.add((long) storage.extractEnergy(Integer.MAX_VALUE, false));
             if (generator.getProcessInventory().getStackInSlot(VacuumCollapseGeneratorBlockEntity.SLOT_RESIDUE).isEmpty()) {
                 return;
             }
             perTick.add((long) storage.extractEnergy(Integer.MAX_VALUE, false));
-            checkCurve(DEPTHS[collapse[0]], perTick);
-            totals.add(perTick.stream().mapToLong(Long::longValue).sum());
-            durations.add(perTick.size());
-            perTick.clear();
-            generator.getProcessInventory().setStackInSlot(VacuumCollapseGeneratorBlockEntity.SLOT_RESIDUE, ItemStack.EMPTY);
-            fed[0] = false;
-            if (++collapse[0] < DEPTHS.length) {
-                return;
-            }
-            double deep = totals.get(1) / (double) totals.get(0);
-            double shallow = totals.get(2) / (double) totals.get(0);
-            check(deep > 1.2 && deep < 1.3, "A 150% collapse drew " + deep + "x the rated FE per catalyst");
-            check(shallow > 0.6 && shallow < 0.7, "A 50% collapse drew " + shallow + "x the rated FE per catalyst");
-            check(durations.get(1) > durations.get(0) && durations.get(2) < durations.get(0),
-                    "Deeper collapses should run longer: " + durations);
+            long delivered = perTick.stream().mapToLong(Long::longValue).sum();
+            check(promised > 0L && delivered == promised, "The collapse promised " + promised + " FE and delivered " + delivered);
+            int tenth = Math.max(1, perTick.size() / 10);
+            double average = delivered / (double) perTick.size();
+            double start = perTick.subList(0, tenth).stream().mapToLong(Long::longValue).average().orElse(0.0);
+            double end = perTick.subList(perTick.size() - tenth, perTick.size()).stream().mapToLong(Long::longValue).average().orElse(0.0);
+            check(start < average * 0.6, "The collapse started at " + start + " FE/t against an average of " + average);
+            check(end > average * 1.6, "The collapse ended at " + end + " FE/t against an average of " + average);
             helper.succeed();
         });
     }
 
-    /** The first tenth of a collapse runs well below its average and the last tenth well above it. */
-    private static void checkCurve(int depth, List<Long> perTick) {
-        int tenth = Math.max(1, perTick.size() / 10);
-        double average = perTick.stream().mapToLong(Long::longValue).average().orElse(0.0);
-        double start = perTick.subList(0, tenth).stream().mapToLong(Long::longValue).average().orElse(0.0);
-        double end = perTick.subList(perTick.size() - tenth, perTick.size()).stream().mapToLong(Long::longValue).average().orElse(0.0);
-        check(start < average * 0.8, depth + "% collapse started at " + start + " FE/t against an average of " + average);
-        check(end > average * 1.2, depth + "% collapse ended at " + end + " FE/t against an average of " + average);
+    /**
+     * Before a catalyst starts, the generator previews the next collapse at the selected depth: deep draws about 1.25x
+     * the rated FE from the catalyst over a longer cycle, and shallow about two thirds over a shorter one.
+     */
+    @GameTest(template = MachineTestSupport.EMPTY)
+    public static void depthTradesFePerCatalystAgainstCycleLength(GameTestHelper helper) {
+        VacuumCollapseGeneratorBlockEntity generator = tungstensteelGenerator(helper, CollapseNozzleMaterial.TUNGSTENSTEEL);
+        generator.getProcessInventory().setStackInSlot(VacuumCollapseGeneratorBlockEntity.SLOT_INPUT, new ItemStack(ModItems.VOID_CATALYST.get()));
+        long[] energy = new long[3];
+        int[] ticks = new int[3];
+        int[] depths = {VacuumCollapseDynamics.RATED_DEPTH, VacuumCollapseDynamics.MAX_DEPTH, VacuumCollapseDynamics.MIN_DEPTH};
+        for (int index = 0; index < depths.length; index++) {
+            generator.setDepth(depths[index]);
+            energy[index] = generator.collapseEnergy();
+            ticks[index] = generator.machineInfo().progressMax();
+        }
+        double deep = energy[1] / (double) energy[0];
+        double shallow = energy[2] / (double) energy[0];
+        check(deep > 1.2 && deep < 1.3, "A 150% collapse would draw " + deep + "x the rated FE per catalyst");
+        check(shallow > 0.6 && shallow < 0.7, "A 50% collapse would draw " + shallow + "x the rated FE per catalyst");
+        check(ticks[1] > ticks[0] && ticks[2] < ticks[0], "Deeper collapses should run longer: " + ticks[0] + ", " + ticks[1] + ", " + ticks[2]);
+        helper.succeed();
     }
 
     /**

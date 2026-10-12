@@ -262,6 +262,7 @@ Design intent and balance rules behind shipped machines that the code does not s
 - The Void Chamber stage is the hard recipe gate. An under-stage Collapse Nozzle adds instability pressure instead of blocking the recipe.
 - A collapse follows a curve: output starts low and peaks at the end of the cycle (0.4x to 2x its average at rated depth), and the total FE never changes. Its cost is absorbing that peak; FE the network cannot take is vented, as for Cavitation.
 - Collapse depth (50-150%) is the visible trade: deeper draws more FE per catalyst (depth^0.6) over a longer cycle (depth^0.5), so the average FE/t moves only a few percent, but it peaks harder (0.6 + 1.4 x depth times the average) and multiplies recipe instability by depth^2. Catalysts cost Echo Shards, so depth trades them against burst handling. Rated depth reproduces the recipe exactly, and a collapse keeps the depth it started with.
+- Void Catalyst is renewable and gated by RNGTech production, not vanilla loot: a Titanium Alloy Furnace batch of 2 Nullite and 2 Tungstensteel ingots. Collapse Residue doubles the batch, and each stabilized collapse returns one, so a running generator feeds itself while its first catalysts cost double. One catalyst is a two-minute, 2.4M FE collapse: about 30:1 FE returned over its production chain with Residue (15:1 without), above Syngas and Ammonia, because the generator's limits are its Gear, the burst, and ore logistics rather than fuel FE. The chain cost lives in `tools/balance/energy-chain-costs.json`.
 
 ### Ammonia Chain
 
