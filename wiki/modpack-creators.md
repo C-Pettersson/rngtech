@@ -92,6 +92,7 @@ You cannot change these without code: connector caps, Battery Cell sizes, Heat C
 !!! warning "Recipe gotchas"
     - If `energy` holds an invalid value, such as `0` or a negative number, most recipe types fall back to their default without an error. RNGTech ignores misspelled fields. Check the value in JEI after `/reload`.
     - A craft in progress keeps its old FE cost until it finishes.
+    - Melter and Alloy Furnace recipes are shapeless: slot order does not matter, and a Melter recipe whose `primary_ingredient` and `secondary_ingredient` both match one item takes two of it from one slot. Component Assembler `ingredients` are ordered, one input slot per entry.
 
 ## Water
 

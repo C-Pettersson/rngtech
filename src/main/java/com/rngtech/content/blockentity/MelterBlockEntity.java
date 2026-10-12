@@ -12,6 +12,7 @@ import com.rngtech.content.purge.FluidPurgeTarget;
 import com.rngtech.content.purge.PurgeableFluidStorage;
 import com.rngtech.content.recipe.MelterRecipe;
 import com.rngtech.content.recipe.MelterRecipeInput;
+import com.rngtech.content.recipe.ShapelessMatch;
 import com.rngtech.content.registry.ModBlockEntities;
 import com.rngtech.content.registry.ModFluids;
 import com.rngtech.content.registry.ModRecipes;
@@ -73,6 +74,9 @@ public class MelterBlockEntity extends BaseMachineBlockEntity
     private static final RecipeInputFilter<MelterRecipeInput, MelterRecipe> INPUT_FILTER = new RecipeInputFilter<>(
             ModRecipes.MELTER_TYPE::get,
             (recipe, item) -> recipe.primaryIngredient().test(item) || recipe.secondaryIngredient().test(item));
+    private static final InputSlotPlanner<MelterRecipeInput, MelterRecipe> SLOT_PLANNER = InputSlotPlanner.shapeless(
+            ModRecipes.MELTER_TYPE::get,
+            recipe -> List.of(recipe.primaryIngredient(), recipe.secondaryIngredient()));
     public static final int SLOT_PRIMARY_INPUT = 0;
     public static final int SLOT_SECONDARY_INPUT = 1;
     public static final int SLOT_FLUID_INPUT_CONTAINER = 2;
@@ -619,15 +623,16 @@ public class MelterBlockEntity extends BaseMachineBlockEntity
         int jobs = parallelMelts(recipe, stats);
         boolean melted = false;
         for (int job = 0; job < jobs; job++) {
-            if (level == null || !recipe.matches(new MelterRecipeInput(primaryStack(), secondaryStack(), inputTank.getFluid()), level)) {
+            int[] consumed = level == null ? null : recipe.consumed(currentInput(), 1);
+            if (consumed == null || !recipe.fluidInput().test(inputTank.getFluid())) {
                 break;
             }
             FluidStack output = yieldedOutput(recipe, stats);
             if (!canAcceptOutputFluid(output)) {
                 break;
             }
-            consumeInput(SLOT_PRIMARY_INPUT);
-            consumeInput(SLOT_SECONDARY_INPUT);
+            consumeInput(SLOT_PRIMARY_INPUT, consumed[0]);
+            consumeInput(SLOT_SECONDARY_INPUT, consumed[1]);
             FluidStack drained = inputTank.drain(inputTank.getFluid().copyWithAmount(recipe.fluidInput().amount()), IFluidHandler.FluidAction.EXECUTE);
             if (drained.getAmount() < recipe.fluidInput().amount()) {
                 break;
@@ -670,7 +675,7 @@ public class MelterBlockEntity extends BaseMachineBlockEntity
     /** Each batched melt needs its own inputs, fluid, and tank room. Fused Crucibles gives up batching. */
     private int availableMelts(MelterRecipe recipe, MachineStatAccumulator stats) {
         int limit = BatchProcessing.batchSize(stats, hasMasteryBehavior("FUSED_CRUCIBLES"));
-        limit = Math.min(limit, Math.min(primaryStack().getCount(), secondaryStack().getCount()));
+        limit = ShapelessMatch.crafts(recipe.itemIngredients(), new ItemStack[] {primaryStack(), secondaryStack()}, limit);
         limit = Math.min(limit, inputTank.getFluidAmount() / Math.max(1, recipe.fluidInput().amount()));
         FluidStack output = yieldedOutput(recipe, stats);
         return Math.max(1, BatchProcessing.largestFitting(limit, batch -> batch == 1 || canAcceptOutputFluid(output.copyWithAmount(output.getAmount() * batch))));
@@ -753,15 +758,20 @@ public class MelterBlockEntity extends BaseMachineBlockEntity
         setChanged();
     }
 
-    private void consumeInput(int slot) {
-        ItemStack input = processInventory.getStackInSlot(slot);
-        ItemStack remainder = input.getCraftingRemainingItem();
-        input.shrink(1);
-        if (!remainder.isEmpty()) {
+    private void consumeInput(int slot, int amount) {
+        for (int unit = 0; unit < amount; unit++) {
+            ItemStack input = processInventory.getStackInSlot(slot);
             if (input.isEmpty()) {
-                processInventory.setStackInSlot(slot, remainder);
-            } else if (level != null) {
-                Containers.dropItemStack(level, worldPosition.getX(), worldPosition.getY(), worldPosition.getZ(), remainder);
+                return;
+            }
+            ItemStack remainder = input.getCraftingRemainingItem();
+            input.shrink(1);
+            if (!remainder.isEmpty()) {
+                if (input.isEmpty()) {
+                    processInventory.setStackInSlot(slot, remainder);
+                } else if (level != null) {
+                    Containers.dropItemStack(level, worldPosition.getX(), worldPosition.getY(), worldPosition.getZ(), remainder);
+                }
             }
         }
     }
@@ -807,7 +817,7 @@ public class MelterBlockEntity extends BaseMachineBlockEntity
         if (!hasCrushHead()) {
             return STATUS_MISSING_CRUSH_HEAD;
         }
-        if (primaryStack().isEmpty() || secondaryStack().isEmpty()) {
+        if (recipe == null && (primaryStack().isEmpty() || secondaryStack().isEmpty())) {
             return STATUS_NO_INPUT;
         }
         if (inputTank.isEmpty()) {
@@ -854,13 +864,23 @@ public class MelterBlockEntity extends BaseMachineBlockEntity
         if (progress == 0) {
             return true;
         }
-        return !activePrimary.isEmpty()
-                && !activeSecondary.isEmpty()
+        return (!activePrimary.isEmpty() || !activeSecondary.isEmpty())
                 && !activeFluid.isEmpty()
-                && ItemStack.isSameItemSameComponents(activePrimary, primaryStack())
-                && ItemStack.isSameItemSameComponents(activeSecondary, secondaryStack())
+                && sameItemKinds(activePrimary, activeSecondary, primaryStack(), secondaryStack())
                 && FluidStack.isSameFluidSameComponents(activeFluid, inputTank.getFluid())
                 && inputTank.getFluidAmount() >= activeFluid.getAmount();
+    }
+
+    /** Slot order does not matter, so a top-up that lands in the other slot keeps the melt. */
+    private static boolean sameItemKinds(ItemStack activeA, ItemStack activeB, ItemStack currentA, ItemStack currentB) {
+        return isOneOf(activeA, currentA, currentB) && isOneOf(activeB, currentA, currentB)
+                && isOneOf(currentA, activeA, activeB) && isOneOf(currentB, activeA, activeB);
+    }
+
+    private static boolean isOneOf(ItemStack stack, ItemStack first, ItemStack second) {
+        return stack.isEmpty()
+                || ItemStack.isSameItemSameComponents(stack, first)
+                || ItemStack.isSameItemSameComponents(stack, second);
     }
 
     private void resetCycleIfActive() {
@@ -1055,6 +1075,10 @@ public class MelterBlockEntity extends BaseMachineBlockEntity
         return MachineImplicitCatalog.hasBehavior(servoStack(), MachineBehavior.AUTO_PURGE);
     }
 
+    private MelterRecipeInput currentInput() {
+        return new MelterRecipeInput(primaryStack(), secondaryStack(), inputTank.getFluid());
+    }
+
     private ItemStack primaryStack() {
         return processInventory.getStackInSlot(SLOT_PRIMARY_INPUT);
     }
@@ -1109,6 +1133,12 @@ public class MelterBlockEntity extends BaseMachineBlockEntity
         return INPUT_FILTER.accepts(level, stack);
     }
 
+    /** Automation keeps one ingredient from taking both input slots while a recipe still needs another item. */
+    public boolean acceptsAutomatedInput(int slot, ItemStack stack) {
+        return isMeltingInput(stack)
+                && SLOT_PLANNER.accepts(level, new ItemStack[] {primaryStack(), secondaryStack()}, slot - SLOT_PRIMARY_INPUT, stack);
+    }
+
     private final class ProcessItemHandler implements IItemHandler {
         private final int firstSlot;
         private final int lastSlot;
@@ -1158,7 +1188,7 @@ public class MelterBlockEntity extends BaseMachineBlockEntity
             int target = mappedSlot(slot);
             return allowInsert
                     && processInventory.isItemValid(target, stack)
-                    && (target != SLOT_PRIMARY_INPUT && target != SLOT_SECONDARY_INPUT || isMeltingInput(stack));
+                    && (target != SLOT_PRIMARY_INPUT && target != SLOT_SECONDARY_INPUT || acceptsAutomatedInput(target, stack));
         }
 
         private int mappedSlot(int slot) {
