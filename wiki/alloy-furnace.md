@@ -82,11 +82,9 @@ The Gear tab has four slots. No Gear can be a higher stage than the chassis.
 
 | Side | Behavior |
 |---|---|
-| Top | Inserts into the active input slots. Accepts only Alloy Furnace recipe ingredients. |
-| Bottom | Extracts finished output. Ingredient leftovers are pushed into the inventory below. |
+| Top | Inserts into the active input slots. Accepts only Alloy Furnace recipe ingredients, and never lets one ingredient fill a slot another ingredient needs; see [Automation](automation.md). |
+| Bottom | Extracts finished output. Ingredient leftovers are pushed into the inventory below; see [Automation](automation.md#ingredient-leftovers). |
 | Sides | Accepts FE, for example from a [Universal Cable](universal-cable.md). |
-
-No default recipe uses an ingredient that leaves an item behind. If your modpack adds one, such as a {{ item('minecraft:honey_bottle') }} that leaves a Glass Bottle, the leftover goes back into its input slot only when a recipe uses it. Any other leftover goes into the inventory directly below, such as a hopper or chest, or drops on the ground if there is none, so it never blocks the input slots.
 
 Gear slots cannot be filled by automation.
 

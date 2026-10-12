@@ -6,8 +6,8 @@
   },
   "minimum_chamber_stage": 7,
   "minimum_stability": 1.0,
-  "energy": 600000,
-  "processing_ticks": 600,
+  "energy": 2400000,
+  "processing_ticks": 2400,
   "instability": 0.18,
   "residue": {
     "id": "rngtech:collapse_residue"

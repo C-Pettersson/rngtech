@@ -146,6 +146,11 @@ Use standard NeoForge capabilities for item and energy automation.
 - Keep automation surfaces predictable and machine-local.
 - Sided handlers should expose only the slots that make sense for ordinary automation.
 - Gear automation is opt-in per slot type, not automatic for every Gear slot.
+- Automated input must never jam a machine. Factory chains with hoppers and cables are the intended way to autocraft, so a stream of one ingredient must never take an input slot another ingredient of the recipe still needs. The rule depends only on what the slots hold, never on which item arrives first.
+- Multi-item recipes are shapeless by default: slot order does not matter, and a recipe that needs two of an item takes both from one slot. A shapeless machine lets an item open another input slot only while every recipe still possible before keeps an empty slot for each ingredient it lacks.
+- Make a recipe type positional only when the order carries meaning, as in the Component Assembler. A positional slot takes only what a recipe that agrees with the other filled slots needs at that position. When a recipe needs the same item in several positions, automation fills them evenly.
+- Shift-click follows the same slot rule as automation. Placing an item by hand stays free.
+- The planner keeps slots available without balancing ingredient amounts. Rationing how far one ingredient may run ahead of the others is a choice players earn, such as the Alloy Furnace's Recipe Lock.
 
 ## Machine Design Notes
 
@@ -282,6 +287,9 @@ Design intent and balance rules behind shipped machines that the code does not s
 
 - It is the Stage 7 primary generator. It uses its own Dimensional Stabilizer instead of sharing Potential Reactor Containment Linings.
 - The Void Chamber stage is the hard recipe gate. An under-stage Collapse Nozzle adds instability pressure instead of blocking the recipe.
+- A collapse follows a curve: output starts low and peaks at the end of the cycle (0.4x to 2x its average at rated depth), and the total FE never changes. Its cost is absorbing that peak; FE the network cannot take is vented, as for Cavitation.
+- Collapse depth (50-150%) is the visible trade: deeper draws more FE per catalyst (depth^0.6) over a longer cycle (depth^0.5), so the average FE/t moves only a few percent, but it peaks harder (0.6 + 1.4 x depth times the average) and multiplies recipe instability by depth^2. Catalysts cost Echo Shards, so depth trades them against burst handling. Rated depth reproduces the recipe exactly, and a collapse keeps the depth it started with.
+- Void Catalyst is renewable and its recipe shows what it is: Ender Pearls dissolved in Ammonia into Ender Slurry, poured by the Component Assembler over a Nullite core in a Tungstensteel casing. No vanilla loot is involved, and Stage 7 builds on the Stage 6 ammonia chain. Collapse Residue melts with one Ender Pearl into twice the slurry from the same Ammonia, but only at 1,600 heat, above the 1,200 an unrolled Melter reaches, so the Residue loop rewards a well-rolled Melter with half the Ammonia per catalyst. One catalyst is a two-minute, 2.4M FE collapse. Counting the Ammonia at what an Ammonia Fuel Cell would make from it, a catalyst still returns about 8:1 with Tungstensteel Gear (13:1 with Residue) and over 20:1 with Exotic Gear, so feeding ammonia to the generator always beats burning it. The chain cost lives in `tools/balance/energy-chain-costs.json`.
 
 ### Ammonia Chain
 

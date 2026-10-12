@@ -70,6 +70,9 @@ public class AlloyFurnaceBlockEntity extends BaseMachineBlockEntity implements M
     private static final RecipeInputFilter<AlloyFurnaceRecipeInput, AlloyFurnaceRecipe> INPUT_FILTER = new RecipeInputFilter<>(
             ModRecipes.ALLOY_FURNACE_TYPE::get,
             (recipe, item) -> recipe.ingredients().stream().anyMatch(ingredient -> ingredient.test(item)));
+    private static final InputSlotPlanner<AlloyFurnaceRecipeInput, AlloyFurnaceRecipe> SLOT_PLANNER = InputSlotPlanner.shapeless(
+            ModRecipes.ALLOY_FURNACE_TYPE::get,
+            recipe -> recipe.ingredients().stream().map(CountedIngredient::ingredient).toList());
     public static final int MAX_INPUT_SLOTS = 4;
     public static final int SLOT_INPUT_START = 0;
     public static final int SLOT_OUTPUT = SLOT_INPUT_START + MAX_INPUT_SLOTS;
@@ -762,6 +765,12 @@ public class AlloyFurnaceBlockEntity extends BaseMachineBlockEntity implements M
         return INPUT_FILTER.accepts(level, stack);
     }
 
+    /** Automation keeps one ingredient from taking the input slots another ingredient of a recipe still needs. */
+    public boolean acceptsAutomatedInput(int slot, ItemStack stack) {
+        ItemStack[] active = Arrays.copyOf(inputStacks(), activeInputSlots());
+        return isAlloyInput(stack) && SLOT_PLANNER.accepts(level, active, slot - SLOT_INPUT_START, stack);
+    }
+
     /**
      * Recipe Lock: automation may add only the current recipe's ingredients, or the last recipe's, each until it is one
      * craft ahead of the scarcest other ingredient.
@@ -1068,26 +1077,43 @@ public class AlloyFurnaceBlockEntity extends BaseMachineBlockEntity implements M
         processInventory.setStackInSlot(SLOT_OUTPUT, merged);
     }
 
+    /** Remainders are placed once every slot is consumed, so the slot planner sees what the craft left behind. */
     private void consumeInputs(int[] consumed) {
+        ItemStack[] remainders = new ItemStack[MAX_INPUT_SLOTS];
+        Arrays.fill(remainders, ItemStack.EMPTY);
         for (int slot = 0; slot < Math.min(consumed.length, MAX_INPUT_SLOTS); slot++) {
             for (int count = 0; count < consumed[slot]; count++) {
-                consumeOne(slot);
+                ItemStack remainder = consumeOne(slot);
+                if (remainders[slot].isEmpty()) {
+                    remainders[slot] = remainder;
+                } else {
+                    ejectBelowOrDrop(remainder);
+                }
             }
+        }
+        for (int slot = 0; slot < MAX_INPUT_SLOTS; slot++) {
+            placeRemainder(slot, remainders[slot]);
         }
     }
 
-    private void consumeOne(int slot) {
+    private ItemStack consumeOne(int slot) {
         ItemStack input = processInventory.getStackInSlot(slot);
         ItemStack remainder = input.getCraftingRemainingItem();
         input.shrink(1);
-        if (!remainder.isEmpty()) {
-            placeRemainder(slot, remainder);
-        }
+        return remainder;
     }
 
-    /** A remainder an alloy recipe uses refills its emptied slot; any other would jam automated input, so it leaves. */
+    /**
+     * A remainder refills its emptied slot only where automation would insert it itself; any other would jam automated
+     * input, so it leaves.
+     */
     private void placeRemainder(int slot, ItemStack remainder) {
-        if (processInventory.getStackInSlot(slot).isEmpty() && isAlloyInput(remainder)) {
+        if (remainder.isEmpty()) {
+            return;
+        }
+        if (processInventory.getStackInSlot(slot).isEmpty()
+                && acceptsAutomatedInput(slot, remainder)
+                && recipeLockAllowance(remainder) > 0) {
             processInventory.setStackInSlot(slot, remainder);
         } else {
             ejectBelowOrDrop(remainder);
@@ -1458,7 +1484,7 @@ public class AlloyFurnaceBlockEntity extends BaseMachineBlockEntity implements M
 
         @Override
         public ItemStack insertItem(int slot, ItemStack stack, boolean simulate) {
-            int allowed = isAlloyInput(stack) ? recipeLockAllowance(stack) : 0;
+            int allowed = acceptsAutomatedInput(mappedSlot(slot), stack) ? recipeLockAllowance(stack) : 0;
             if (allowed <= 0) {
                 return stack;
             }
@@ -1481,7 +1507,9 @@ public class AlloyFurnaceBlockEntity extends BaseMachineBlockEntity implements M
 
         @Override
         public boolean isItemValid(int slot, ItemStack stack) {
-            return processInventory.isItemValid(mappedSlot(slot), stack) && isAlloyInput(stack) && recipeLockAllowance(stack) > 0;
+            return processInventory.isItemValid(mappedSlot(slot), stack)
+                    && acceptsAutomatedInput(mappedSlot(slot), stack)
+                    && recipeLockAllowance(stack) > 0;
         }
 
         private int mappedSlot(int slot) {

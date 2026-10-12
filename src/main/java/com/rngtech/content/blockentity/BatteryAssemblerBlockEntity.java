@@ -8,6 +8,7 @@ import com.rngtech.content.purge.FluidPurgeTarget;
 import com.rngtech.content.purge.PurgeableFluidStorage;
 import com.rngtech.content.recipe.BatteryAssemblyRecipe;
 import com.rngtech.content.recipe.BatteryAssemblyRecipeInput;
+import com.rngtech.content.recipe.CountedIngredient;
 import com.rngtech.content.registry.ModBlockEntities;
 import com.rngtech.content.registry.ModFluids;
 import com.rngtech.content.registry.ModItems;
@@ -62,6 +63,10 @@ public class BatteryAssemblerBlockEntity extends BaseMachineBlockEntity
                             ModRecipes.BATTERY_ASSEMBLY_TYPE::get,
                             (recipe, item) -> position < recipe.ingredients().size() && recipe.ingredients().get(position).test(item)))
                     .toList();
+    private static final InputSlotPlanner<BatteryAssemblyRecipeInput, BatteryAssemblyRecipe> SLOT_PLANNER =
+            InputSlotPlanner.positional(
+                    ModRecipes.BATTERY_ASSEMBLY_TYPE::get,
+                    recipe -> recipe.ingredients().stream().map(CountedIngredient::ingredient).toList());
     public static final int SLOT_INPUT_0 = 0;
     public static final int SLOT_INPUT_1 = 1;
     public static final int SLOT_INPUT_2 = 2;
@@ -439,12 +444,8 @@ public class BatteryAssemblerBlockEntity extends BaseMachineBlockEntity
         return FluidUtil.getFluidContained(stack).map(BatteryAssemblerBlockEntity::isValidAssemblyFluid).orElse(false);
     }
 
-    private static boolean isValidElectrolyte(FluidStack stack) {
-        return !stack.isEmpty() && stack.is(ModTags.Fluids.ELECTROLYTES);
-    }
-
     private static boolean isValidAssemblyFluid(FluidStack stack) {
-        return isValidElectrolyte(stack) || (!stack.isEmpty() && stack.is(ModTags.Fluids.LUBRICANTS));
+        return !stack.isEmpty() && stack.is(ModTags.Fluids.COMPONENT_ASSEMBLER_FLUIDS);
     }
 
     private MachineTraits activeTraits() {
@@ -514,8 +515,13 @@ public class BatteryAssemblerBlockEntity extends BaseMachineBlockEntity
             return false;
         }
 
+        ItemStack[] remainders = new ItemStack[recipe.ingredients().size()];
         for (int slot = 0; slot < recipe.ingredients().size(); slot++) {
-            consumeInput(slot, recipe.ingredients().get(slot).count());
+            remainders[slot] = consumeInput(slot, recipe.ingredients().get(slot).count());
+        }
+        // Placed once every slot is consumed, so the position check sees what the craft left behind.
+        for (int slot = 0; slot < remainders.length; slot++) {
+            placeRemainder(slot, remainders[slot]);
         }
         recipe.consumeFluid(inputTank);
         addOutput(result);
@@ -524,22 +530,30 @@ public class BatteryAssemblerBlockEntity extends BaseMachineBlockEntity
         return true;
     }
 
-    private void consumeInput(int slot, int count) {
+    /** Uses up {@code count} items from the slot and returns the first remainder; any further ones leave the machine. */
+    private ItemStack consumeInput(int slot, int count) {
+        ItemStack kept = ItemStack.EMPTY;
         for (int index = 0; index < count; index++) {
             ItemStack input = processInventory.getStackInSlot(slot);
             ItemStack remainder = input.getCraftingRemainingItem();
             input.shrink(1);
-            if (!remainder.isEmpty()) {
-                placeRemainder(slot, remainder);
+            if (kept.isEmpty()) {
+                kept = remainder;
+            } else {
+                ejectBelowOrDrop(remainder);
             }
         }
+        return kept;
     }
 
     /**
-     * A remainder a recipe uses at this slot's position refills the emptied slot; any other would jam automated input, so
-     * it leaves the machine.
+     * A remainder refills its emptied slot only where automation would insert it itself; any other would jam automated
+     * input, so it leaves the machine.
      */
     private void placeRemainder(int slot, ItemStack remainder) {
+        if (remainder.isEmpty()) {
+            return;
+        }
         if (processInventory.getStackInSlot(slot).isEmpty() && isAssemblyInput(slot - SLOT_INPUT_0, remainder)) {
             processInventory.setStackInSlot(slot, remainder);
         } else {
@@ -815,9 +829,37 @@ public class BatteryAssemblerBlockEntity extends BaseMachineBlockEntity
         }
     }
 
-    /** Assembly ingredients are positional, so a slot takes only what some recipe needs at that position. */
+    /** Assembly ingredients are positional, so a slot takes only what a recipe that fits the other slots needs there. */
     public boolean isAssemblyInput(int position, ItemStack stack) {
-        return position >= 0 && position < INPUT_FILTERS.size() && INPUT_FILTERS.get(position).accepts(level, stack);
+        return assemblyAllowance(position, stack) > 0;
+    }
+
+    /**
+     * How many of {@code stack} automation may add at {@code position}. An item a recipe needs in several positions
+     * fills them evenly, so the first craft can start before one slot fills up.
+     */
+    private int assemblyAllowance(int position, ItemStack stack) {
+        if (position < 0 || position >= INPUT_FILTERS.size() || !INPUT_FILTERS.get(position).accepts(level, stack)) {
+            return 0;
+        }
+        ItemStack[] inputs = itemInputs();
+        if (!SLOT_PLANNER.accepts(level, inputs, position, stack)) {
+            return 0;
+        }
+        ItemStack[] placed = inputs.clone();
+        placed[position] = stack;
+        int fewestElsewhere = Integer.MAX_VALUE;
+        for (int other = 0; other < inputs.length; other++) {
+            if (other != position
+                    && (inputs[other].isEmpty() || ItemStack.isSameItemSameComponents(inputs[other], stack))
+                    && SLOT_PLANNER.accepts(level, placed, other, stack)) {
+                fewestElsewhere = Math.min(fewestElsewhere, inputs[other].getCount());
+            }
+        }
+        if (fewestElsewhere == Integer.MAX_VALUE) {
+            return stack.getCount();
+        }
+        return Math.max(0, Math.min(stack.getCount(), fewestElsewhere + 1 - inputs[position].getCount()));
     }
 
     private final class RangedItemHandler implements IItemHandler {
@@ -845,7 +887,18 @@ public class BatteryAssemblerBlockEntity extends BaseMachineBlockEntity
 
         @Override
         public ItemStack insertItem(int slot, ItemStack stack, boolean simulate) {
-            return isItemValid(slot, stack) ? processInventory.insertItem(mappedSlot(slot), stack, simulate) : stack;
+            if (!allowInsert || stack.isEmpty() || !processInventory.isItemValid(mappedSlot(slot), stack)) {
+                return stack;
+            }
+            int allowed = assemblyAllowance(mappedSlot(slot) - SLOT_INPUT_0, stack);
+            if (allowed <= 0) {
+                return stack;
+            }
+            if (allowed >= stack.getCount()) {
+                return processInventory.insertItem(mappedSlot(slot), stack, simulate);
+            }
+            ItemStack rejected = processInventory.insertItem(mappedSlot(slot), stack.copyWithCount(allowed), simulate);
+            return stack.copyWithCount(stack.getCount() - allowed + rejected.getCount());
         }
 
         @Override

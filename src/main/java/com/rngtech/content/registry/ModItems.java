@@ -446,6 +446,13 @@ public final class ModItems {
                     new Item.Properties().craftRemainder(Items.BUCKET).stacksTo(1)
             )
     );
+    public static final DeferredItem<BucketItem> ENDER_SLURRY_BUCKET = ITEMS.register(
+            "ender_slurry_bucket",
+            () -> new BucketItem(
+                    ModFluids.ENDER_SLURRY_SOURCE.get(),
+                    new Item.Properties().craftRemainder(Items.BUCKET).stacksTo(1)
+            )
+    );
     public static final DeferredItem<BucketItem> CARBON_EXHAUST_BUCKET = ITEMS.register(
             "carbon_exhaust_bucket",
             () -> new BucketItem(
