@@ -2066,6 +2066,12 @@ function normalizeResult(json) {
     if (json.type === "rngtech:vacuum_collapse" && json.residue) {
         return stackResult(json.residue);
     }
+    if ((json.type === "rngtech:ammonia_synthesis" || json.type === "rngtech:coal_gasification") && json.output) {
+        return fluidResult(json.output);
+    }
+    if (json.type === "rngtech:gas_reforming" && json.hydrogen_output) {
+        return fluidResult(json.hydrogen_output);
+    }
     if (!json.result) {
         return null;
     }
@@ -2151,6 +2157,33 @@ function normalizeRecipeInputs(json) {
                 ...vacuumCollapseProcessInputs(json),
                 ...normalizeIngredient(json.ingredient, 1)
             ];
+        case "rngtech:ammonia_synthesis":
+            return [
+                ...machineInput("rngtech:ammonia_synthesizer", "Ammonia Synthesizer"),
+                ...normalizeIngredient(json.catalyst, 1, { reusable: true, role: "gear", note: "Catalyst Bed" }),
+                ...normalizeSizedFluidIngredient(json.nitrogen_input, { role: "fluid", note: "Nitrogen input" }),
+                ...normalizeSizedFluidIngredient(json.hydrogen_input, { role: "fluid", note: "Hydrogen input" })
+            ];
+        case "rngtech:gas_reforming":
+            return [
+                ...machineInput("rngtech:steam_methane_reformer", "Steam Methane Reformer"),
+                ...normalizeIngredient(json.catalyst, 1, { reusable: true, role: "gear", note: "Catalyst Bed" }),
+                ...normalizeSizedFluidIngredient(json.gas_input, { role: "fluid", note: "Gas input" }),
+                ...normalizeSizedFluidIngredient(json.water_input, { role: "fluid", note: "Water input" })
+            ];
+        case "rngtech:coal_gasification":
+            return [
+                ...machineInput("rngtech:coal_gasifier", "Coal Gasifier"),
+                ...normalizeIngredient(json.carbon_input, 1),
+                ...normalizeSizedFluidIngredient(json.water_input, { role: "fluid", note: "Water input" })
+            ];
+        case "rngtech:cavitation":
+            return [
+                ...machineInput("rngtech:cavitation_generator", "Cavitation Generator"),
+                ...normalizeIngredient(json.rotor, 1, { reusable: true, role: "gear", note: "Cavitation Rotor" }),
+                ...normalizeIngredient(json.nozzle, 1, { reusable: true, role: "gear", note: "Collapse Nozzle" }),
+                ...normalizeSizedFluidIngredient(json.fluid_input, { role: "fluid", note: "Cavitation fluid input" })
+            ];
         case "rngtech:calibration":
             return [
                 ...normalizeIngredient(json.ingredient, 1),
@@ -2161,6 +2194,11 @@ function normalizeRecipeInputs(json) {
         default:
             return [];
     }
+}
+
+/** The machine a process recipe runs in, as a reusable input. */
+function machineInput(id, note) {
+    return normalizeIngredient({ item: id }, 1, { reusable: true, role: "machine", note });
 }
 
 function shapedInputs(json, reusableTool) {

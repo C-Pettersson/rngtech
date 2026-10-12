@@ -444,12 +444,8 @@ public class BatteryAssemblerBlockEntity extends BaseMachineBlockEntity
         return FluidUtil.getFluidContained(stack).map(BatteryAssemblerBlockEntity::isValidAssemblyFluid).orElse(false);
     }
 
-    private static boolean isValidElectrolyte(FluidStack stack) {
-        return !stack.isEmpty() && stack.is(ModTags.Fluids.ELECTROLYTES);
-    }
-
     private static boolean isValidAssemblyFluid(FluidStack stack) {
-        return isValidElectrolyte(stack) || (!stack.isEmpty() && stack.is(ModTags.Fluids.LUBRICANTS));
+        return !stack.isEmpty() && stack.is(ModTags.Fluids.COMPONENT_ASSEMBLER_FLUIDS);
     }
 
     private MachineTraits activeTraits() {

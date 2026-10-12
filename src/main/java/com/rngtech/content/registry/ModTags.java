@@ -86,6 +86,8 @@ public final class ModTags {
                 TagKey.create(Registries.FLUID, ResourceLocation.fromNamespaceAndPath(RNGTech.MOD_ID, "lubricants"));
         public static final TagKey<Fluid> ELECTROLYTES =
                 TagKey.create(Registries.FLUID, ResourceLocation.fromNamespaceAndPath(RNGTech.MOD_ID, "electrolytes"));
+        public static final TagKey<Fluid> COMPONENT_ASSEMBLER_FLUIDS =
+                TagKey.create(Registries.FLUID, ResourceLocation.fromNamespaceAndPath(RNGTech.MOD_ID, "component_assembler_fluids"));
         public static final TagKey<Fluid> MELTER_OUTPUTS =
                 TagKey.create(Registries.FLUID, ResourceLocation.fromNamespaceAndPath(RNGTech.MOD_ID, "melter_outputs"));
         public static final TagKey<Fluid> COMMON_LUBRICANTS =
