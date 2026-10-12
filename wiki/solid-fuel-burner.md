@@ -31,6 +31,8 @@ The **Solid Fuel Burner** is RNGTech's first real generator. It burns coal, char
 
 Each burner you craft rolls its own [rarity and affixes](rarity-and-affixes.md). Burners do not have Machine Mastery.
 
+You can read a burner from the outside. Facing its front, the hopper on the right is the installed Fuel Box, split into two bins when it has two fuel slots, and shows the fuel waiting in each. The current fuel item burns on the grate behind the front grille. The Heat Core sits on top as a row of fins in the core's material. The flames stand taller at a higher FE/t, from a stronger Heat Core or a higher stoke, and the draught slots in the ash-pit door below the grille open and close with the stoke. A burner paused by its Fuel Governor keeps a dull, banked fire with no flames. The meter on the left side shows how full the Battery Cell is, and smoke rises from the chimney while fuel burns. Each chassis has its own casing: cast iron for Crude, copper for Copper, bronze for Alloy, and blued steel for Steel.
+
 ## Obtaining
 
 ### Crafting
@@ -54,6 +56,21 @@ The burner writes generated FE straight into the installed Battery Cell and push
 Each fuel item holds a fixed amount of energy: 10 FE per tick of its furnace burn time. One Coal holds 16,000 FE before fuel stats. A stronger Heat Core does not get more FE from that Coal. It spends the same Coal faster, at a higher FE/t. Fuel efficiency and fuel duration stats are what make each item worth more. For example, a Steel Heat Core in a Steel Fuel Box gets about 20,000 FE from one Coal and burns through it in about 10 seconds.
 
 Logs are accepted but burn for only a quarter of their furnace burn time, so turn them into planks first.
+
+### Stoke
+
+Stoke sets how hard the fire is driven. Set it from 25% to 100% by clicking or scrolling on the stoke gauge on the Process tab (hold Shift to step by 5). New burners start at 100%, which runs at the Heat Core's full FE/t. Stoke can never make a burner faster than that.
+
+Turning the stoke down lowers FE/t in proportion, but the slower burn gets more FE from each fuel item:
+
+| Stoke | FE/t | FE per fuel item |
+|---|---:|---:|
+| 100% (rated, default) | ×1.00 | ×1.00 |
+| 75% | ×0.75 | ×1.07 |
+| 50% | ×0.50 | ×1.13 |
+| 25% | ×0.25 | ×1.20 |
+
+Run at full stoke when you need the power, and turn it down to stretch your fuel when demand is low or your fuel supply is slow. Changing the stoke while an item burns is fair both ways: the part of the item already burned keeps its value, and the rest is worth what the new stoke gives. Hover the gauge to see the FE/t and the FE per fuel item at the current setting.
 
 ### Fuel
 
@@ -131,13 +148,13 @@ What the behaviors do:
 | Any | Inserts fuel into the Fuel Box fuel slots. |
 | Any | Exports FE to adjacent receivers. Does not accept FE. |
 
-Heat Cores, Fuel Boxes, and Battery Cells are installed by hand. Automation cannot reach the Gear slots.
+Heat Cores, Fuel Boxes, and Battery Cells are installed by hand. Automation cannot reach the Gear slots. The back of the burner has a port plate sized for a Universal Connector, the tidiest place to attach one.
 
 ## Screen
 
 The burner screen has four tabs:
 
-- **Process**: fuel slots, burn progress, stored FE, and FE/t. Hover for exact values.
+- **Process**: fuel slots, burn progress, the stoke gauge, stored FE, and FE/t. Hover for exact values.
 - **Gear**: Heat Core, Fuel Box, and Battery Cell slots.
 - **Stats**: the burner's current stats, including traits and installed Gear.
 - **Refinement**: refine the placed burner's traits with a catalyst.

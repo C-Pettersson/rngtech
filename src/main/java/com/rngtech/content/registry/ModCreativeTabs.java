@@ -275,6 +275,7 @@ public final class ModCreativeTabs {
                             output.accept(ModItems.calibratedComponent(family).get());
                         }
                         output.accept(ModItems.CALIBRATED_DIAMOND_CRYSTAL.get());
+                        output.accept(ModItems.CAVITATION_ROTOR_HUB.get());
                         output.accept(ModItems.PLATE_MOLD.get());
                         output.accept(ModItems.CASING_MOLD.get());
                         output.accept(ModItems.GEAR_MOLD.get());

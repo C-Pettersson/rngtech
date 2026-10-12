@@ -3,7 +3,10 @@ package com.rngtech.rpg;
 import com.rngtech.content.blockentity.SolidFuelBurnerBlockEntity;
 import com.rngtech.content.blockentity.VacuumCollapseDynamics;
 import com.rngtech.content.cable.EnergyConnectorTier;
+import com.rngtech.content.energy.BiogasDigestion;
 import com.rngtech.content.energy.CathodeMaterial;
+import com.rngtech.content.energy.CavitationHeat;
+import com.rngtech.content.energy.CavitationRotorDynamics;
 import com.rngtech.content.energy.CavitationRotorMaterial;
 import com.rngtech.content.energy.CollapseNozzleMaterial;
 import com.rngtech.content.energy.ContainmentLiningMaterial;
@@ -179,29 +182,41 @@ public final class EnergyBalanceSimulation {
         }
     }
 
-    /** BioGeneratorBlockEntity#effectiveGenerationRate, #effectiveFuelDurationTicks. */
+    /**
+     * BioGeneratorBlockEntity#ratedGeneration, #ratedFuelEnergy, #engineRate, and BiogasDigestion, at the rated retention
+     * and both ends of the retention dial. The engine runs at the digestion rate once the gas holder is primed.
+     */
     private void bioGenerators() {
         ChainCosts.Fuel fuel = chains.fuel("bio_generator");
         MachineStat powerStat = MachineStat.valueOf(fuel.stat());
-        for (boolean chamber : new boolean[] {false, true}) {
-            add("bio_generator", "Bio Generator", 2, List.of(chamber ? "bio_chamber:standard" : "bio_chamber:none"), fuel, roller -> {
-                MachineStatAccumulator stats = MachineBaseStatCatalog.bioGenerator();
-                stats.apply(roller.machine(MachineType.BIO_GENERATOR, 2));
-                if (chamber) {
-                    part(stats, ComponentBaseStatCatalog.bioChamber(),
-                            roller.part(MachinePartType.BIO_CHAMBER, MachineType.BIO_GENERATOR, 1, 0));
-                }
-                double multiplier = Math.max(0.1, stats.effectiveEnergyGenerationMultiplier());
-                double flat = Math.max(0.0, stats.effectiveFlatEnergyGenerationBonus());
-                int rate = Math.max(1, ceil(8 * multiplier + flat));
-                double baseEnergy = fuel.baseAmount()
-                        * Math.max(0.1, stats.value(powerStat))
-                        * Math.max(0.1, stats.value(MachineStat.FUEL_EFFICIENCY))
-                        * Math.max(0.1, stats.value(MachineStat.EFFICIENCY));
-                int baseTicks = Math.max(1, ceil(baseEnergy / 8.0));
-                int ticks = Math.max(1, ceil(baseTicks * Math.max(0.1, stats.value(MachineStat.FUEL_DURATION))));
-                return Outcome.running(rate, rate, (double) ticks * rate);
-            });
+        int[] retentions = {
+                BiogasDigestion.RATED_RETENTION_DAYS, BiogasDigestion.MIN_RETENTION_DAYS, BiogasDigestion.MAX_RETENTION_DAYS
+        };
+        for (int days : retentions) {
+            for (boolean chamber : new boolean[] {false, true}) {
+                add("bio_generator", "Bio Generator", 2, List.of(
+                        chamber ? "bio_chamber:standard" : "bio_chamber:none", "retention:" + days + "d"
+                ), fuel, roller -> {
+                    MachineStatAccumulator stats = MachineBaseStatCatalog.bioGenerator();
+                    stats.apply(roller.machine(MachineType.BIO_GENERATOR, 2));
+                    if (chamber) {
+                        part(stats, ComponentBaseStatCatalog.bioChamber(),
+                                roller.part(MachinePartType.BIO_CHAMBER, MachineType.BIO_GENERATOR, 1, 0));
+                    }
+                    double multiplier = Math.max(0.1, stats.effectiveEnergyGenerationMultiplier());
+                    double flat = Math.max(0.0, stats.effectiveFlatEnergyGenerationBonus());
+                    double ratedGeneration = 8 * multiplier + flat;
+                    int ratedRate = Math.max(1, ceil(ratedGeneration));
+                    double baseEnergy = fuel.baseAmount()
+                            * Math.max(0.1, stats.value(powerStat))
+                            * Math.max(0.1, stats.value(MachineStat.FUEL_EFFICIENCY))
+                            * Math.max(0.1, stats.value(MachineStat.EFFICIENCY));
+                    int baseTicks = Math.max(1, ceil(baseEnergy / 8.0));
+                    int ticks = Math.max(1, ceil(baseTicks * Math.max(0.1, stats.value(MachineStat.FUEL_DURATION))));
+                    int rate = BiogasDigestion.engineRate(ratedGeneration, days);
+                    return Outcome.running(rate, rate, (double) ticks * ratedRate * BiogasDigestion.gasYield(days));
+                });
+            }
         }
     }
 
@@ -355,7 +370,8 @@ public final class EnergyBalanceSimulation {
     /**
      * CorrosionCellBlockEntity#effectiveStats, #canProcessStage and #effectiveRecipeEnergy; the Fluid Pump has no
      * generation stats. One setup per player stage with that stage's Cathode installed, plus a plates-only setup
-     * without a Cathode, since later plates and anodes unlock better fuel for the same Stage 4 machine.
+     * without a Cathode, since later plates and anodes unlock better fuel for the same Stage 4 machine. Cells run at
+     * rated load, the default and their highest FE/t; a lighter load (CorrosionCellLoad) trades FE/t for FE per fuel.
      */
     private void corrosionCells() throws IOException {
         List<FuelRecipe> recipes;
@@ -426,7 +442,9 @@ public final class EnergyBalanceSimulation {
     }
 
     /**
-     * CavitationGeneratorBlockEntity: water recipe with steady-state heat strain (#coolDown, #currentGenerationRate).
+     * CavitationGeneratorBlockEntity: water recipe at the rated throttle with steady-state heat strain (#coolDown,
+     * #currentGenerationRate). Other throttles trade FE against wear and heat through CavitationRotorDynamics. Rotor
+     * life is the untuned rated life; tuning to a rotor's resonance stretches it about threefold and is not simulated.
      * FE per input is FE per rotor, since water is free and the rotor wears out. Delivered metrics cap output at the
      * attached connector's tier.
      */
@@ -477,10 +495,17 @@ public final class EnergyBalanceSimulation {
                             double energy = Math.max(1.0, stats.generatedEnergyTotal(water.energy(), ticks)
                                     * Math.max(0.1, stats.value(MachineStat.EFFICIENCY)));
                             int strain = Math.max(0, (int) Math.round(heatStrain / Math.max(0.25, stats.value(MachineStat.TEMPERATURE_STABILITY))));
-                            int cooling = 1 + (core == null ? 0 : Math.max(0, core.stage() / 2));
-                            double[] steady = cavitationSteadyState(energy, ticks, strain, cooling);
-                            int wear = Math.max(1, (int) Math.round(rotorWear / Math.max(0.25, stats.value(MachineStat.STABILITY))));
-                            int recipesPerRotor = ceil(durability / (double) wear);
+                            double cooling = CavitationHeat.cooling(
+                                    core == null ? 0 : core.stage(),
+                                    stats.value(MachineStat.HEAT_TRANSFER) / (core == null ? 1.0 : core.heatTransfer()),
+                                    stats.value(MachineStat.STRAIN_RECOVERY)
+                            );
+                            double[] steady = cavitationSteadyState(energy, ticks, strain, cooling,
+                                    CavitationHeat.strainCap(stats.value(MachineStat.OVERHEAT_TOLERANCE)),
+                                    CavitationHeat.maxPenalty(stats.value(MachineStat.MAX_TEMPERATURE)));
+                            double wear = Math.max(1, (int) Math.round(rotorWear / Math.max(0.25, stats.value(MachineStat.STABILITY))))
+                                    * CavitationRotorDynamics.WEAR_SCALE;
+                            int recipesPerRotor = ceil(durability / wear);
                             double fePerRotor = steady[1] * recipesPerRotor;
                             Outcome outcome = Outcome.running(steady[0], steady[0], fePerRotor)
                                     .withMetric("strainPenalty", 1.0 - steady[0] / (energy / ticks))
@@ -757,33 +782,20 @@ public final class EnergyBalanceSimulation {
     }
 
     /**
-     * Runs recipes back to back until heat strain settles. Cooling happens before generation each tick, strain is
-     * added when a recipe finishes, and a recipe cannot start at the strain cap.
+     * Steady state at the rated throttle, once the rotor has spooled up. Each tick cools first, generates at the cooled
+     * strain, then adds the recipe's strain spread over its ticks. When cooling keeps up the generated strain cools off
+     * within the tick; otherwise strain settles at the cap (raised by Overheat Tolerance), where the next recipe starts
+     * right after one tick of cooling. Max Temperature softens the penalty at the cap.
      *
-     * @return average FE/t including cooling waits, and FE per recipe
+     * @return average FE/t and FE per recipe
      */
-    private static double[] cavitationSteadyState(double recipeEnergy, int ticks, int strainPerRecipe, int cooling) {
-        double strain = 0.0;
-        double energy = 0.0;
-        long elapsed = 0;
-        int recipes = 0;
-        for (int cycle = 0; cycle < 400; cycle++) {
-            long wait = 0;
-            if (strain >= 1000) {
-                wait = (long) Math.ceil((strain - 999) / cooling);
-                strain = Math.max(0.0, strain - wait * cooling);
-            }
-            int coolingTicks = (int) Math.min(ticks, Math.floor(strain / cooling));
-            double strainSum = coolingTicks * strain - cooling * coolingTicks * (coolingTicks + 1) / 2.0;
-            double delivered = recipeEnergy / ticks * (ticks - strainSum / 2000.0);
-            strain = Math.min(1000.0, Math.max(0.0, strain - (double) cooling * ticks) + strainPerRecipe);
-            if (cycle >= 200) {
-                energy += delivered;
-                elapsed += ticks + wait;
-                recipes++;
-            }
-        }
-        return new double[] {energy / elapsed, energy / recipes};
+    private static double[] cavitationSteadyState(
+            double recipeEnergy, int ticks, int strainPerRecipe, double cooling, double strainCap, double maxPenalty) {
+        double perTick = recipeEnergy / ticks;
+        double strainPerTick = strainPerRecipe / (double) ticks;
+        double cooled = strainPerTick <= cooling ? 0.0 : Math.max(0.0, strainCap - cooling);
+        double rate = perTick * (1.0 - CavitationHeat.penalty(cooled, strainCap, maxPenalty));
+        return new double[] {rate, rate * ticks};
     }
 
     private interface RecipeEnergy {

@@ -1,0 +1,28 @@
+{
+    "type": "rngtech:calibration",
+    "family": "kinetic",
+    "ingredient": {
+        "item": "rngtech:steel_casing"
+    },
+    "pattern": {
+        "item": "rngtech:kinetic_calibration_pattern"
+    },
+    "catalyst": {
+        "item": "rngtech:matrix"
+    },
+    "minimum_stage": 5,
+    "processing_ticks": 360,
+    "energy": 7200,
+    "machine_xp": 6,
+    "bonus_output": false,
+    "result": {
+        "stack": {
+            "id": "rngtech:cavitation_rotor_hub"
+        },
+        "stage": 5,
+        "stability": {
+            "min": 20,
+            "max": 80
+        }
+    }
+}

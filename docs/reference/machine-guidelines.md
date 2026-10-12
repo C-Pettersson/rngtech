@@ -224,13 +224,24 @@ Design intent and balance rules behind shipped machines that the code does not s
 - Crushing seeds into Compost Feedstock before composting is deliberately energy-positive, to reward the Crusher step.
 - Composted, Rich, and algae biomass are Bio Generator-only fuels. Do not tag them as vanilla furnace, Solid Fuel Burner, or broad modded fuel.
 - Specific fuel families beat broader tags for Bio Chamber power bonuses: saplings and seeds use their own stats, not Plant Power.
+- The Bio Generator is a small biogas plant: digester, gas holder, gas engine. Its rated `20`-day retention reproduces the pre-digester burner exactly, with the same FE/t and FE per item for every fuel and stat roll. Fuel tables, JEI values, and the energy balance anchors stay at rated.
+- Retention follows first-order digestion: the share of gas recovered is `kt / (1 + kt)`, with `kt = 3` at rated. Shorter retention trades FE per item for FE/t (`10` days: `1.6x` FE/t, `0.8x` FE per item); longer retention trades the reverse (`40` days: `0.57x` FE/t, `1.14x` FE per item). No setting beats rated on both, and the dial is the only way off rated. There is no automatic penalty such as culture death or souring.
+- The gas holder decouples digestion from the engine. The engine start pressure delays the first FE but never consumes gas, the last gas burns when feed runs out, and a full FE buffer lets the holder fill before digestion waits. Nothing in the process voids fuel.
+- Automation works on every face for compatibility: fuel insertion and FE export on all six. Visually there is one automation port, on the back, sized to the Universal Connector footprint so a connector seated there plugs into a plate. The front stays the machine's window (sight glass, gauge, flywheel), and the top stays the gas holder dome.
 
 ### Solid Fuel Burner
 
 - Each fuel item holds a fixed FE (`10 FE` per effective burn tick). Better Heat Cores and Energy Generation spend fuel faster rather than extracting more FE from it. Higher FE/t comes from Syngas at Stage 5, not from better burners.
+- Stoke is the burner's visible trade, set on a 25-100% gauge. Rated (100%) is the unstoked burner: the Heat Core's FE/t and each item's full FE, so the energy balance simulation describes a rated burner. Lower stoke scales FE/t in proportion and raises FE per item linearly to `1.20x` at 25%. Stoke never raises FE/t above the Heat Core's rating, so coal-tier burners still fail on rate. A mid-item change revalues the item's remaining FE at the new economy, so switching neither gains nor loses fuel.
 - Logs burn for a quarter of their vanilla burn time on purpose.
 - Chassis accept lower-stage Gear so mixed setups can trade speed, efficiency, fuel queue size, and behavior.
 - Fuel Governor pauses only when the buffer cannot hold more generated FE. It never blocks export, and it never changes fuel cost, duration, or generation while there is room.
+
+### Syngas Combustor
+
+- Syngas is the Stage 5 FE/t step up over solid fuel; the combustor needs no Gear to run.
+- The fuel mixture is the combustor's visible trade: rated (100%) reproduces the recipe exactly; rich (up to 140%) burns fuel faster for diminishing FE/t gains (FE/t = mixture^0.75), so FE per mB falls and Carbon Exhaust per mB rises with the square of the mixture; lean (down to 70%) is the reverse. The richest Syngas mixture stays well below the Stage 6 Ammonia Fuel Cell.
+- Exhaust is charged as fuel burns, so changing the mixture mid-cycle cannot dodge the exhaust of fuel already burned.
 
 ### Potential Reactor
 
@@ -249,10 +260,21 @@ Design intent and balance rules behind shipped machines that the code does not s
 
 - Anode FE/t stays below the same stage's main generator: the Syngas Combustor at Stage 5, the Ammonia Fuel Cell at Stage 6, and the Vacuum Collapse Generator at Stage 7 (and its all-Exotic setup at Stage 8).
 - Corrosion waste stays item-backed so recycling or chemistry recipes can consume it without a fluid slice.
+- The load dial is modelled on a metal-air cell: a fuel's charge is fixed (Faraday), so load sets the dissolve rate, and a linear polarization curve sets the voltage and so the FE per fuel. Rated load is the highest load and reproduces the recipe exactly, so recipe FE, JEI, and the energy balance simulation all describe a cell at rated load, and load can never lift Anode FE/t past the stage's main generator.
+- A lighter load is a capital-for-fuel trade, not a free gain: up to `1.15x` FE per fuel at `0.46x` FE/t, so stretching Anode supply costs more cells. Keep FE per fuel monotonic in load so no setting is a trap, and keep the curve linear so the wiki table is the whole rule.
+- Fuel only dissolves while the buffer has room, and a load change applies to the rest of the fuel in the bath, so pausing or retuning never loses FE.
+- Automation works on every face for compatibility: FE and, with a Fluid Pump, Electrolyte Solution on all six, with the per-face item rules. The shaped model shows one connector port, on the back, so the tank front and the blower stay clear.
 
 ### Cavitation Generator
 
-- Pressure is a recipe display and balance field only. There is no pressure network.
+- Pressure is a recipe display and balance field only. There is no pressure network. The Process tab scales the recipe pressure by rotor speed, computed only for the open screen, so it stays a readout and costs no tick time.
+- The rated throttle reproduces the recipe exactly, so recipe FE, wear, and heat strain, and the energy balance simulation, describe a generator at rated speed. Every other throttle is a visible trade chosen on the gauge: below rated buys rotor life with FE/t, and supercavitation buys at most `1.35x` FE/t with steeply rising wear and heat. Keep supercavitation worse per rotor than rated, and make heat, not a hidden cap, the limit on sustaining it. Heat rises with the eighth power of speed so that Heat Core stage and Temperature Stability set the highest sustainable throttle; Heat Core Cooling Rate rolls stay out of it, because on furnaces reduced cooling is the benefit.
+- Rotors are tuned parts that run for hours, not consumables. Longevity comes from `WEAR_SCALE` on wear, not from a higher base durability, so the flat Durability affix (shared with tools) keeps its relative value. Wear carries fractions across cycles instead of rounding each one.
+- Each rotor's resonance is a hidden, fixed throttle percent found by tuning against the live wear readout and the steadier glow. Throttle and resonance share one 1% grid and one conversion, so the exact setting is always reachable. Resonance lowers wear only; it never touches FE or heat, and it never drifts, so a tuned rotor can be left alone.
+- The Cavitation Rotor Hub is the rotor cost and the calibration skill check. Higher tiers ask for higher hub stability instead of a higher stage, and hub precision skews resonance upward, raising a rotor's tuned FE ceiling, never its stage.
+- Water flow follows rotor speed: the cycle clock advances at speed over rated, while FE, wear, and heat stay per tick. Rated is therefore the most FE per bucket, which matters on dehumidifier Water (a Stage 5 Silica Gel Dehumidifier makes about 3 buckets/min against 5 for one rated generator).
+- Every stat the generator or its Gear can roll must change a visible number here. Heat Core and Servo stats keep their furnace meanings (Heat Transfer and Strain Recovery shed strain, Overheat Tolerance raises the strain cap, Max Temperature softens the cap penalty); only Heat Transfer above the core's own base counts, so an unrolled core keeps its stage cooling. Bonus Output saves Water on recipes without a fluid output. Stats that stay unread (Cooling Rate, Heat Isolation, Warmup Time, the Heat Core's Energy Generation) are dimmed on Gear tooltips through `UniqueStatReaders`.
+- Spool-up is the cost of interruption. The cycle only advances while the rotor cavitates, so starting cold or after a pause costs time but never Water, and a steady supply is the reward.
 - The Aethergold rotor is a short-lived burst sidegrade: faster cycles and more FE for much more wear. The generator has no export cap of its own, so the burst needs a Sparksteel or better Energy Connector on the attached Universal Connector; FE it cannot export is vented.
 - Worn rotors all become one generic pitted item, so recycling them returns only generic byproduct, never the source rotor material.
 
@@ -276,6 +298,12 @@ Design intent and balance rules behind shipped machines that the code does not s
 - Aeration is the photobioreactor's visible trade, modelled on Monod saturation: rated (70%) reproduces the recipe exactly, lean (down to 40%) saves about 29% carbon for 20% less speed, and rich (up to 100%) gains about 11% speed for 29% more carbon. Water per Algae Biomass never changes.
 - The Silica Gel Dehumidifier ignores sky, biome, and weather. Bead consumption is its balancing cost.
 - Water rates assume a finite supply with no infinite water source. Machines still accept bucketed and piped water, so packs turn infinite water off themselves through the `waterSourceConversion` gamerule and by gating other mods' infinite-water blocks. The [Modpack Creators](https://c-pettersson.github.io/rngtech/modpack-creators/) wiki page tells pack makers how.
+
+### Solar Panels and Array Controller
+
+- Tracking is the panel's working cue: a panel tilts toward the sun only while it generates and lies flat otherwise, so a field shows which panels work without lamps or text. Claimed panels follow the moon only when their controller converts moonlight.
+- Panels stay cheap at hundreds per field. The server stores only which half of the sky the tracked body is in and changes it twice a day; clients turn the deck from the world time. Large fields can fall back to baked stepped models through the client config.
+- A panel shades everything below it whatever its model: open solar blocks still block straight-down sky light, so stacking panels, with or without a gap, never doubles a column's output.
 
 ### Modular Field Tools
 

@@ -163,6 +163,26 @@ public final class ModDataComponents {
                             .cacheEncoding()
             );
 
+    /** Resonance as a whole throttle percent; deliberately absent from tooltips so players find it by tuning. */
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Integer>> CAVITATION_ROTOR_RESONANCE =
+            DATA_COMPONENTS.registerComponentType(
+                    "cavitation_rotor_resonance",
+                    builder -> builder
+                            .persistent(Codec.INT)
+                            .networkSynchronized(ByteBufCodecs.VAR_INT)
+                            .cacheEncoding()
+            );
+
+    /** A calibrated recipe input's state, recorded on a crafted result until its post-craft roll reads it. */
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<CalibrationState>> SOURCE_CALIBRATION =
+            DATA_COMPONENTS.registerComponentType(
+                    "source_calibration",
+                    builder -> builder
+                            .persistent(CalibrationState.CODEC)
+                            .networkSynchronized(CalibrationState.STREAM_CODEC)
+                            .cacheEncoding()
+            );
+
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<Integer>> FIELD_TOOL_WEAR =
             DATA_COMPONENTS.registerComponentType(
                     "field_tool_wear",

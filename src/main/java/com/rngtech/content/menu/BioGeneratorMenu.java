@@ -1,6 +1,7 @@
 package com.rngtech.content.menu;
 
 import com.rngtech.content.blockentity.BioGeneratorBlockEntity;
+import com.rngtech.content.energy.BiogasDigestion;
 import com.rngtech.content.registry.ModBlocks;
 import com.rngtech.content.registry.ModMenus;
 import com.rngtech.rpg.MachineStatAccumulator;
@@ -56,7 +57,14 @@ public class BioGeneratorMenu extends AbstractContainerMenu implements StatBreak
     private static final int DATA_REFINEMENT_POTENTIAL = 24;
     private static final int DATA_FLAT_ENERGY_GENERATION = 25;
     private static final int DATA_BASE_ENERGY_GENERATION = 26;
-    private static final int DATA_COUNT = 27;
+    private static final int DATA_GAS = 27;
+    private static final int DATA_GAS_CAPACITY = 28;
+    private static final int DATA_RETENTION = 29;
+    private static final int DATA_ENGINE_RATE = 30;
+    private static final int DATA_ENGINE_RUNNING = 31;
+    private static final int DATA_FEED_ENERGY = 32;
+    private static final int DATA_COUNT = 33;
+    private static final int BUTTON_RETENTION_BASE = 9000;
     private static final int STAT_SCALE = 100;
     private static final int FUEL_SLOT = 0;
     private static final int BATTERY_CELL_SLOT = 1;
@@ -173,6 +181,41 @@ public class BioGeneratorMenu extends AbstractContainerMenu implements StatBreak
         return data.get(DATA_STATUS);
     }
 
+    public int gas() {
+        return data.get(DATA_GAS);
+    }
+
+    public int gasCapacity() {
+        return data.get(DATA_GAS_CAPACITY);
+    }
+
+    public float gasProgress() {
+        int capacity = gasCapacity();
+        return capacity <= 0 ? 0.0F : Mth.clamp((float) gas() / (float) capacity, 0.0F, 1.0F);
+    }
+
+    public int retentionDays() {
+        return data.get(DATA_RETENTION);
+    }
+
+    /** Digestion and engine FE/t at the selected retention. */
+    public int engineRate() {
+        return data.get(DATA_ENGINE_RATE);
+    }
+
+    public boolean engineRunning() {
+        return data.get(DATA_ENGINE_RUNNING) != 0;
+    }
+
+    /** Rated FE of the item digesting, or of the next item; 0 when there is none. */
+    public int feedEnergy() {
+        return data.get(DATA_FEED_ENERGY);
+    }
+
+    public static int retentionButtonId(int days) {
+        return BUTTON_RETENTION_BASE + BiogasDigestion.clampRetention(days);
+    }
+
     public MachineTraits machineTraits() {
         return RefinementMenuSupport.displayTraits(getSlot(REFINEMENT_TARGET_SLOT).getItem());
     }
@@ -270,6 +313,13 @@ public class BioGeneratorMenu extends AbstractContainerMenu implements StatBreak
 
     @Override
     public boolean clickMenuButton(Player player, int id) {
+        int days = id - BUTTON_RETENTION_BASE;
+        if (days >= BiogasDigestion.MIN_RETENTION_DAYS && days <= BiogasDigestion.MAX_RETENTION_DAYS) {
+            if (!player.level().isClientSide) {
+                generator.setRetentionDays(days);
+            }
+            return true;
+        }
         if (id != RefinementMenuSupport.BUTTON_APPLY) {
             return false;
         }
