@@ -3034,6 +3034,16 @@
             "theme": "Reservoirs",
             "region": "reserve_control",
             "layer": "home"
+        },
+        {
+            "id": "reward_398",
+            "x": 5242,
+            "y": 4192,
+            "role": "reward",
+            "shape": "keyDirect",
+            "gate": "path_0499",
+            "region": "drive_reserve",
+            "layer": "home"
         }
     ],
     "nodes": [
@@ -31031,6 +31041,22 @@
             "x": 2638,
             "y": 3606,
             "group": "reward_391"
+        },
+        {
+            "effects": [],
+            "behaviors": [
+                "EVEN_FEED"
+            ],
+            "fixed": {},
+            "ceilings": {},
+            "scaling": [],
+            "passive": {},
+            "id": "even_feed",
+            "kind": "KEYSTONE",
+            "name": "Even Feed",
+            "x": 5242,
+            "y": 4192,
+            "group": "reward_398"
         }
     ],
     "links": [
@@ -37029,6 +37055,10 @@
         [
             "deep_tanks_3",
             "bulk_reservoir"
+        ],
+        [
+            "path_0499",
+            "even_feed"
         ]
     ]
 }

@@ -152,6 +152,7 @@ Use standard NeoForge capabilities for item and energy automation.
 - Make a recipe type positional only when the order carries meaning, as in the Component Assembler. A positional slot takes only what a recipe that agrees with the other filled slots needs at that position. When a recipe needs the same item in several positions, automation fills them evenly.
 - Shift-click follows the same slot rule as automation. Placing an item by hand stays free.
 - The planner keeps slots available without balancing ingredient amounts. Rationing how far one ingredient may run ahead of the others is a choice players earn, such as the Alloy Furnace's Recipe Lock.
+- Multi-lane inputs fill in slot order by default, as hoppers and cables offer them. Even lane fill is something the player earns through the Even Feed Mastery keystone, not default behavior. It may change only the lane an item lands in, never which items a machine accepts.
 
 ## Machine Design Notes
 
