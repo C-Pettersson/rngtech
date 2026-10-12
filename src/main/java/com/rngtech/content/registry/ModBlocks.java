@@ -281,6 +281,7 @@ public final class ModBlocks {
                     .mapColor(MapColor.COLOR_PURPLE)
                     .strength(4.5F)
                     .sound(SoundType.METAL)
+                    .noOcclusion()
     );
     public static final DeferredBlock<CorrosionCellBlock> CORROSION_CELL = BLOCKS.registerBlock(
             "corrosion_cell",
@@ -378,6 +379,11 @@ public final class ModBlocks {
     public static final DeferredBlock<LiquidBlock> ELECTROLYTE_SOLUTION_BLOCK = BLOCKS.registerBlock(
             "electrolyte_solution",
             properties -> new LiquidBlock(ModFluids.ELECTROLYTE_SOLUTION_SOURCE.get(), properties),
+            BlockBehaviour.Properties.ofFullCopy(Blocks.WATER).noLootTable()
+    );
+    public static final DeferredBlock<LiquidBlock> ENDER_SLURRY_BLOCK = BLOCKS.registerBlock(
+            "ender_slurry",
+            properties -> new LiquidBlock(ModFluids.ENDER_SLURRY_SOURCE.get(), properties),
             BlockBehaviour.Properties.ofFullCopy(Blocks.WATER).noLootTable()
     );
     public static final DeferredBlock<LiquidBlock> CARBON_EXHAUST_BLOCK = BLOCKS.registerBlock(

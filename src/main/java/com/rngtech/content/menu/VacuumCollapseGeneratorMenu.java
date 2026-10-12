@@ -1,5 +1,6 @@
 package com.rngtech.content.menu;
 
+import com.rngtech.content.blockentity.VacuumCollapseDynamics;
 import com.rngtech.content.blockentity.VacuumCollapseGeneratorBlockEntity;
 import com.rngtech.content.registry.ModBlocks;
 import com.rngtech.content.registry.ModMenus;
@@ -51,7 +52,14 @@ public class VacuumCollapseGeneratorMenu extends AbstractContainerMenu implement
     private static final int DATA_REFINEMENT_POTENTIAL = 19;
     private static final int DATA_FLAT_ENERGY_GENERATION = 20;
     private static final int DATA_BASE_ENERGY_GENERATION = 21;
-    private static final int DATA_COUNT = 22;
+    private static final int DATA_DEPTH = 22;
+    private static final int DATA_CURVE_DEPTH = 23;
+    private static final int DATA_PEAK_LOW = 24;
+    private static final int DATA_PEAK_HIGH = 25;
+    private static final int DATA_AVERAGE_LOW = 26;
+    private static final int DATA_AVERAGE_HIGH = 27;
+    private static final int DATA_COUNT = 28;
+    private static final int BUTTON_DEPTH_BASE = 9000;
     private static final int STAT_SCALE = 100;
     private static final int INPUT_SLOT = 0;
     private static final int RESIDUE_SLOT = 1;
@@ -186,6 +194,30 @@ public class VacuumCollapseGeneratorMenu extends AbstractContainerMenu implement
         return data.get(DATA_INSTABILITY) / (double) STAT_SCALE;
     }
 
+    /** The depth set for the next collapse. */
+    public int depth() {
+        return data.get(DATA_DEPTH);
+    }
+
+    /** The depth of the running collapse, or the selected depth while idle. */
+    public int curveDepth() {
+        return data.get(DATA_CURVE_DEPTH);
+    }
+
+    /** The FE/t the running or next collapse reaches at its end; 0 without a recipe. */
+    public long peakEnergyPerTick() {
+        return composeLong(DATA_PEAK_LOW, DATA_PEAK_HIGH);
+    }
+
+    /** The running or next collapse's average FE/t; the curve swings around it. */
+    public long averageEnergyPerTick() {
+        return composeLong(DATA_AVERAGE_LOW, DATA_AVERAGE_HIGH);
+    }
+
+    public static int depthButtonId(int depth) {
+        return BUTTON_DEPTH_BASE + VacuumCollapseDynamics.clampDepth(depth);
+    }
+
     public MachineTraits machineTraits() {
         return RefinementMenuSupport.displayTraits(getSlot(REFINEMENT_TARGET_SLOT).getItem());
     }
@@ -243,6 +275,13 @@ public class VacuumCollapseGeneratorMenu extends AbstractContainerMenu implement
 
     @Override
     public boolean clickMenuButton(Player player, int id) {
+        int depth = id - BUTTON_DEPTH_BASE;
+        if (depth >= VacuumCollapseDynamics.MIN_DEPTH && depth <= VacuumCollapseDynamics.MAX_DEPTH) {
+            if (!player.level().isClientSide) {
+                generator.setDepth(depth);
+            }
+            return true;
+        }
         if (id != RefinementMenuSupport.BUTTON_APPLY) {
             return false;
         }
