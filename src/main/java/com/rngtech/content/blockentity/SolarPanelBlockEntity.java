@@ -4,6 +4,7 @@ import com.rngtech.RNGTechConfig;
 import com.rngtech.content.block.BaseMachineBlock;
 import com.rngtech.content.block.SolarPanelBlock;
 import com.rngtech.content.energy.SolarPanelMaterial;
+import com.rngtech.content.energy.SolarTracker;
 import com.rngtech.content.registry.ModBlockEntities;
 import com.rngtech.rpg.MachineBaseStatCatalog;
 import com.rngtech.rpg.MachineStat;
@@ -35,6 +36,7 @@ public class SolarPanelBlockEntity extends BaseMachineBlockEntity implements Mac
     private static final long PEAK_SOLAR_WINDOW_TICKS = 2000L;
     private static final int CONTROL_SUPPRESSION_TICKS = 2;
     private static final int SKY_CHECK_INTERVAL_TICKS = 20;
+    private static final float TRACK_DEGREES_PER_TICK = 1.0F;
 
     private final SolarPanelBlock block;
     private final ItemStackHandler emptyInventory = new ItemStackHandler(0);
@@ -47,6 +49,9 @@ public class SolarPanelBlockEntity extends BaseMachineBlockEntity implements Mac
     private long lastControlledTick = Long.MIN_VALUE;
     private long nextSkyCheckTick = Long.MIN_VALUE;
     private boolean skyVisible;
+    private boolean controlledGenerating;
+    private float trackAngle = Float.NaN;
+    private float trackTime;
 
     public SolarPanelBlockEntity(BlockPos pos, BlockState blockState) {
         super(ModBlockEntities.SOLAR_PANEL.get(), pos, blockState, MachineType.SOLAR_PANEL, 0, 0, 0);
@@ -60,10 +65,36 @@ public class SolarPanelBlockEntity extends BaseMachineBlockEntity implements Mac
         boolean controlled = panel.isControlled(level);
         boolean generated = !controlled && panel.generateFromSunlight();
         boolean exported = !controlled && panel.exportEnergy(level, pos);
-        BaseMachineBlock.setActive(level, pos, state, !controlled && panel.currentGeneration() > 0 && panel.energyStored() < panel.energyCapacity());
+        boolean active = !controlled && panel.currentGeneration() > 0 && panel.energyStored() < panel.energyCapacity();
+        boolean tracking = controlled ? panel.controlledGenerating : active;
+        SolarPanelBlock.setStatus(level, pos, state, active, tracking ? SolarTracker.tracking(level.getDayTime()) : SolarTracker.STOWED);
         if (generated || exported) {
             panel.setChanged();
         }
+    }
+
+    /** Panels saved as solid cubes stored no light inside their block; recheck it once so the open model is lit. */
+    @Override
+    public void onLoad() {
+        super.onLoad();
+        if (level != null && !level.isClientSide && level.getRawBrightness(worldPosition, 0) == 0) {
+            level.getLightEngine().checkBlock(worldPosition);
+        }
+    }
+
+    /**
+     * Eases the drawn deck toward {@code target} degrees at a fixed turn rate, so stowing and unstowing sweep rather
+     * than snap. Client only; {@code time} is the game time plus the partial tick.
+     */
+    public float easeTrackAngle(float target, float time) {
+        if (Float.isNaN(trackAngle)) {
+            trackAngle = target;
+        } else {
+            float step = TRACK_DEGREES_PER_TICK * Mth.clamp(time - trackTime, 0.0F, 20.0F);
+            trackAngle += Mth.clamp(target - trackAngle, -step, step);
+        }
+        trackTime = time;
+        return trackAngle;
     }
 
     public SolarPanelMaterial material() {
@@ -99,8 +130,10 @@ public class SolarPanelBlockEntity extends BaseMachineBlockEntity implements Mac
         return stats;
     }
 
-    public void markControlled(long gameTime) {
+    /** A controller claims this panel for the tick and reports whether it generated, which sets the tracker. */
+    public void markControlled(long gameTime, boolean generating) {
         lastControlledTick = gameTime;
+        controlledGenerating = generating;
     }
 
     public int currentGeneration() {
