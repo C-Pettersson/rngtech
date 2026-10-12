@@ -384,6 +384,19 @@ public class MelterMenu extends AbstractContainerMenu implements MasteryMenuView
         );
     }
 
+    /** Tops up a held stack first, then opens an empty slot only where automation could. */
+    private boolean moveToMeltInputs(ItemStack stack) {
+        boolean moved = false;
+        for (int pass = 0; pass < 2; pass++) {
+            for (int input = MelterBlockEntity.SLOT_PRIMARY_INPUT; input <= MelterBlockEntity.SLOT_SECONDARY_INPUT && !stack.isEmpty(); input++) {
+                if (slots.get(input).hasItem() == (pass == 0) && melter.acceptsAutomatedInput(input, stack)) {
+                    moved |= moveItemStackTo(stack, input, input + 1, false);
+                }
+            }
+        }
+        return moved;
+    }
+
     @Override
     public ItemStack quickMoveStack(Player player, int index) {
         ItemStack moved = ItemStack.EMPTY;
@@ -435,9 +448,7 @@ public class MelterMenu extends AbstractContainerMenu implements MasteryMenuView
             if (!moveItemStackTo(stack, MelterBlockEntity.SLOT_FLUID_OUTPUT_CONTAINER, MelterBlockEntity.SLOT_FLUID_OUTPUT_CONTAINER + 1, false)) {
                 return ItemStack.EMPTY;
             }
-        } else if (!melter.isMeltingInput(stack)
-                || !moveItemStackTo(stack, MelterBlockEntity.SLOT_PRIMARY_INPUT, MelterBlockEntity.SLOT_PRIMARY_INPUT + 1, false)
-                && !moveItemStackTo(stack, MelterBlockEntity.SLOT_SECONDARY_INPUT, MelterBlockEntity.SLOT_SECONDARY_INPUT + 1, false)) {
+        } else if (!moveToMeltInputs(stack)) {
             return ItemStack.EMPTY;
         }
 

@@ -157,7 +157,7 @@ Early machines share power by touching. Once you are past the first Furnace, bui
 - A {{ item('rngtech:wrench') }} turns individual cable links on and off and shows a connector's settings. A {{ item('rngtech:configurator') }} copies one connector's settings onto others.
 - [Fluid and Compressor Tanks](compressor-tank.md) store fluids and gases.
 
-Automation reaches a machine's process slots, not its installed Gear. Battery Cells are the common exception: many machines accept them through a side. Each machine page lists its sides under Automation.
+Automation reaches a machine's process slots, not its installed Gear. Battery Cells are the common exception: many machines accept them through a side. Each machine page lists its sides under Automation. Factory chains are the intended way to autocraft; [Automation](automation.md) explains how machines with several ingredients take them without jamming.
 
 ## Refinement
 

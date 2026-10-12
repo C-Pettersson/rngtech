@@ -112,8 +112,8 @@
         },
         "vacuum_collapse_generator/void_catalyst": {
             "input": "1 void catalyst",
-            "chain_fe": 45600,
-            "chain": "Tungstensteel plate: Metal Press 2,400 + half of Alloy Furnace batch (2 tungsten 38,400, steel 24,480, coal dust 600, alloy 22,880). Ender pearl and echo shard carry no FE."
+            "chain_fe": 118292,
+            "chain": "Component Assembler 7,200 + Nullite ingot (half of an Alloy Furnace batch: 3 raw lead 14,400, raw platinum 19,200, alloy 22,880) 28,240 + Tungstensteel plate (Metal Press 2,400 + half of a batch: 2 tungsten 38,400, steel 24,480, coal dust 600, alloy 22,880) 45,580 + 1,000 mB Ender Slurry from 2 ender pearls (Melter 4,800 + 1,000 mB ammonia 32,472). With an ender pearl and a Collapse Residue a 1,600-heat Melter makes 2,000 mB from the same ammonia, which brings the catalyst to 102,056. Ender pearls carry no FE. Valued instead at what an Ammonia Fuel Cell makes from it, the ammonia is worth 216,000 FE per catalyst, or 108,000 with Residue."
         }
     }
 }

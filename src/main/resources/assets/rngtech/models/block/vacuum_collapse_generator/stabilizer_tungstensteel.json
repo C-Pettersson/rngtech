@@ -1,0 +1,7 @@
+{
+  "parent": "rngtech:block/vacuum_collapse_generator/stabilizer",
+  "textures": {
+    "part": "rngtech:block/vacuum_collapse_generator/part/tungstensteel",
+    "lens": "rngtech:block/vacuum_collapse_generator/lens/tungstensteel"
+  }
+}

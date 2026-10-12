@@ -48,6 +48,8 @@ These numbers use freshly crafted parts and no Mastery. Rolled affixes and Maste
 | 7 | [Vacuum Collapse Generator](vacuum-collapse-generator.md) | about 1,057 | 512–3,072 FE/t |
 | 8 | Vacuum Collapse Generator, Exotic parts | about 3,000 | 2,048–8,192 FE/t |
 
+Vacuum Collapse figures are averages at the default rated depth. Each collapse climbs to twice its average at the end of the cycle, and players can trade Void Catalyst for a harder peak with the collapse depth setting.
+
 [Solar Panels](solar-panel.md), the [Bio Generator](bio-generator.md), the [Corrosion Cell](corrosion-cell.md), and the [Cavitation Generator](cavitation-generator.md) add power on the side. The [Potential Reactor](potential-reactor.md) turns retired Gear into FE; count it as a bonus.
 
 ### Energy per ingot
@@ -90,6 +92,7 @@ You cannot change these without code: connector caps, Battery Cell sizes, Heat C
 !!! warning "Recipe gotchas"
     - If `energy` holds an invalid value, such as `0` or a negative number, most recipe types fall back to their default without an error. RNGTech ignores misspelled fields. Check the value in JEI after `/reload`.
     - A craft in progress keeps its old FE cost until it finishes.
+    - Melter and Alloy Furnace recipes are shapeless: slot order does not matter, and a Melter recipe whose `primary_ingredient` and `secondary_ingredient` both match one item takes two of it from one slot. Component Assembler `ingredients` are ordered, one input slot per entry.
 
 ## Water
 

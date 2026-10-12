@@ -17,6 +17,7 @@ import com.rngtech.client.renderer.SolarPanelModels;
 import com.rngtech.client.renderer.SolarPanelRenderer;
 import com.rngtech.client.renderer.SolidFuelBurnerRenderer;
 import com.rngtech.client.renderer.SyngasCombustorRenderer;
+import com.rngtech.client.renderer.VacuumCollapseGeneratorRenderer;
 import com.rngtech.client.screen.AdvancedItemFilterScreen;
 import com.rngtech.client.screen.AffixForgeScreen;
 import com.rngtech.client.screen.AlgaePhotobioreactorScreen;
@@ -102,6 +103,7 @@ public final class RNGTechClient {
         modBus.addListener(CavitationGeneratorRenderer::registerModels);
         modBus.addListener(CorrosionCellRenderer::registerModels);
         modBus.addListener(SolidFuelBurnerRenderer::registerModels);
+        modBus.addListener(VacuumCollapseGeneratorRenderer::registerModels);
         modBus.addListener(this::registerClientExtensions);
         modBus.addListener(this::registerKeyMappings);
         modBus.addListener(ModelEvent.RegisterAdditional.class, SolarPanelModels::registerAdditional);
@@ -174,6 +176,7 @@ public final class RNGTechClient {
         event.registerBlockEntityRenderer(ModBlockEntities.GAS_CHEMISTRY.get(), SyngasCombustorRenderer::new);
         event.registerBlockEntityRenderer(ModBlockEntities.SOLID_FUEL_BURNER.get(), SolidFuelBurnerRenderer::new);
         event.registerBlockEntityRenderer(ModBlockEntities.POTENTIAL_REACTOR.get(), PotentialReactorRenderer::new);
+        event.registerBlockEntityRenderer(ModBlockEntities.VACUUM_COLLAPSE_GENERATOR.get(), VacuumCollapseGeneratorRenderer::new);
         event.registerEntityRenderer(ModEntityTypes.FORESTRY_CART.get(), ForestryCartRenderer::new);
     }
 
@@ -224,6 +227,22 @@ public final class RNGTechClient {
                 return 0xFF63D4C4;
             }
         }, ModFluids.ELECTROLYTE_SOLUTION_TYPE.get());
+        event.registerFluidType(new IClientFluidTypeExtensions() {
+            @Override
+            public ResourceLocation getStillTexture() {
+                return LUBRICANT_STILL_TEXTURE;
+            }
+
+            @Override
+            public ResourceLocation getFlowingTexture() {
+                return LUBRICANT_FLOWING_TEXTURE;
+            }
+
+            @Override
+            public int getTintColor() {
+                return 0xFF4A2A78;
+            }
+        }, ModFluids.ENDER_SLURRY_TYPE.get());
         event.registerFluidType(new IClientFluidTypeExtensions() {
             @Override
             public ResourceLocation getStillTexture() {

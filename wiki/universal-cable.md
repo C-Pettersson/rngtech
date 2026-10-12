@@ -166,7 +166,7 @@ A connector with an IN row also accepts fluid or items that its machine pushes o
 
 ### Items
 
-The Item tab works the same way as the Fluid tab, with three Item Connector rows. Put an item in a row's filter slot to allow only that item.
+The Item tab works the same way as the Fluid tab, with three Item Connector rows. Put an item in a row's filter slot to allow only that item. See [Automation](automation.md) for how machines sort the items you send them into their input slots.
 
 | Connector | Stage | Shipment | Every | Jam chance, pause |
 |---|---:|---:|---:|---:|
