@@ -118,6 +118,8 @@ The Stage 0 Furnace burns fuel from a slot on its Process tab and does not need 
 | Sides | Fuel on Stage 0, Battery Cells on electric stages. |
 | Any | Electric stages accept FE, for example from a [Universal Cable](universal-cable.md). |
 
+Automation fills the input lanes in order: lane 1 takes a full stack before lane 2 gets anything, so a slow feed into a Lead Furnace keeps one lane busy while the others sit idle. The **Even Feed** keystone on the [Machine Mastery](machine-mastery.md) tree changes that. With it, each item that arrives through automation goes to the emptiest lane that can hold it, so a hopper trickle or a full stack from a cable spreads across every lane. It does not change which items the Furnace accepts, and a lane never holds two kinds of item. Items you place by hand still go where you put them. Even Feed sits right on a road, 15 points from the Furnace start, and has no downside beyond the points it costs.
+
 ### Mastery and Ascendancies
 
 Smelting ores, raw metals, crushed ores, and alloy blends earns Furnace Mastery XP, and you spend the points on the shared [Machine Mastery](machine-mastery.md) tree. Reversible dust-to-ingot smelts, food, and decorative blocks earn no XP. Furnaces choose between the **Crucible Keeper** and **Bloomer** [ascendancies](machine-mastery.md#ascendancies).

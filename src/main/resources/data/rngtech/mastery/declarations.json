@@ -303,6 +303,13 @@
             "yield": "none"
         },
         {
+            "id": "EVEN_FEED",
+            "families": [
+                "furnace"
+            ],
+            "yield": "none"
+        },
+        {
             "id": "REACTIVE_FLUX",
             "families": [
                 "alloy_furnace"

@@ -146,6 +146,7 @@ Use standard NeoForge capabilities for item and energy automation.
 - Keep automation surfaces predictable and machine-local.
 - Sided handlers should expose only the slots that make sense for ordinary automation.
 - Gear automation is opt-in per slot type, not automatic for every Gear slot.
+- Multi-lane inputs fill in slot order by default, as hoppers and cables offer them. Even lane fill is something the player earns through the Even Feed Mastery keystone, not default behavior. It may change only the lane an item lands in, never which items a machine accepts.
 
 ## Machine Design Notes
 
