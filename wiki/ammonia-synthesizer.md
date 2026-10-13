@@ -25,6 +25,8 @@ wiki:
 
 The **Ammonia Synthesizer** combines Nitrogen and Hydrogen into Ammonia using FE. It is the first half of the ammonia power chain: the Ammonia it makes fuels the [Ammonia Fuel Cell](ammonia-fuel-cell.md), a strong late-game generator.
 
+It is built as an ammonia loop: a compressor pushes the mixed gases into a thick-walled converter that holds the catalyst, and the hot gas passes through a frosted condenser into a glass Ammonia receiver.
+
 Each Synthesizer you craft rolls its own [rarity and affixes](rarity-and-affixes.md), and you can refine the placed machine.
 
 ## Obtaining
@@ -49,6 +51,13 @@ Mine the Synthesizer with a pickaxe. It drops itself with its rolled traits, plu
 
 Each cycle turns 500 mB of Nitrogen and 1,500 mB of Hydrogen into 1,000 mB of Ammonia, using 12,000 FE over 400 ticks. The Ammonia collects in an 8,000 mB output tank; pipe it out to your Fuel Cells. The machine stops when the output tank is full.
 
+You can read the Synthesizer from the outside. Facing the front:
+
+- The windows on the converter show the installed Catalyst Bed as three packed layers, which glow while the Synthesizer runs. With no bed, they show an empty mesh.
+- The compressor flywheel on the right turns while it runs, and the pressure gauge on the left rises with it.
+- The two glasses at the back right show the Nitrogen and Hydrogen levels, and the receiver at the back left the Ammonia level.
+- Frost drifts off the condenser on top while it runs, and the lamp at the front lights.
+
 Synthesis uses the `rngtech:ammonia_synthesis` recipe type.
 
 {{ processing("ammonia_synthesis") }}
@@ -72,7 +81,7 @@ An unrolled Catalyst Bed only unlocks recipes. Its rolled Processing Speed and E
 | Sides | Accept FE. |
 | Any | Fills Nitrogen and Hydrogen, and drains Ammonia. |
 
-There are no process item slots to automate. To throw gas away, use the purge buttons beside each tank, or right-click the machine with a {{ item('rngtech:purge_bucket') }} to void up to 1,000 mB. A normal right-click empties Nitrogen or Hydrogen first, and sneaking empties the Ammonia tank first. Purging Nitrogen or Hydrogen resets the cycle in progress.
+There are no process item slots to automate. The back cabinet has a port plate sized for a Universal Connector, the tidiest place to attach one. To throw gas away, use the purge buttons beside each tank, or right-click the machine with a {{ item('rngtech:purge_bucket') }} to void up to 1,000 mB. A normal right-click empties Nitrogen or Hydrogen first, and sneaking empties the Ammonia tank first. Purging Nitrogen or Hydrogen resets the cycle in progress.
 
 ## Screen
 

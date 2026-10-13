@@ -34,8 +34,8 @@ import java.util.Map;
  * Draws the working parts of the Syngas Combustor: the flame behind the view ports (orange on Syngas, blue on Carbon
  * Monoxide; bluer when lean and yellower when rich), the glow in the stack mouth, the shaft and coupling spinning with
  * the generated power, both sight-glass levels, the tachometer needle, the installed Servo trimming the fuel, and the
- * installed Battery Cell with its charge. The Gasifier and Reformer share the block entity type but have no shaped model,
- * so they draw nothing. Positions are in model pixels and match tools/blockmodels/syngas_combustor.py.
+ * installed Battery Cell with its charge. GasChemistryRenderer routes only combustors here. Positions are in model pixels
+ * and match tools/blockmodels/syngas_combustor.py.
  */
 public class SyngasCombustorRenderer implements BlockEntityRenderer<GasChemistryBlockEntity> {
     private static final ResourceLocation FLAME = RNGTech.id("textures/block/syngas_combustor/fx/flame.png");

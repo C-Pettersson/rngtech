@@ -9,6 +9,7 @@ import com.rngtech.content.registry.ModDataComponents;
 import com.rngtech.rpg.MachineTraits;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionResult;
@@ -56,11 +57,27 @@ public class GasChemistryBlock extends BaseMachineBlock {
     }
 
     /**
-     * A firing Syngas Combustor smokes from its exhaust stack: thin wisps when lean, heavy black smoke when rich.
+     * A firing Syngas Combustor smokes from its exhaust stack: thin wisps when lean, heavy black smoke when rich. A running
+     * Coal Gasifier steams off its residue bin, and a running Steam Methane Reformer smokes from its flue stack.
      */
     @Override
     public void animateTick(BlockState state, Level level, BlockPos pos, RandomSource random) {
-        if (machine != GasChemistryMachine.SYNGAS_COMBUSTOR || !state.getValue(ACTIVE)) {
+        if (!state.getValue(ACTIVE)) {
+            return;
+        }
+        if (machine == GasChemistryMachine.COAL_GASIFIER) {
+            if (random.nextFloat() < 0.2F) {
+                addModelParticle(level, pos, state, ParticleTypes.WHITE_SMOKE, 8.0, 4.0, 3.25, 0.02);
+            }
+            return;
+        }
+        if (machine == GasChemistryMachine.STEAM_METHANE_REFORMER) {
+            if (random.nextInt(3) == 0) {
+                addModelParticle(level, pos, state, ParticleTypes.SMOKE, 14.625, 16.1, 12.875, 0.04);
+            }
+            return;
+        }
+        if (machine != GasChemistryMachine.SYNGAS_COMBUSTOR) {
             return;
         }
         int mixture = level.getBlockEntity(pos) instanceof GasChemistryBlockEntity combustor
@@ -79,6 +96,18 @@ public class GasChemistryBlock extends BaseMachineBlock {
         boolean heavy = mixture > CombustionMixture.RATED_MIXTURE && random.nextDouble() < richness;
         level.addParticle(heavy ? ParticleTypes.LARGE_SMOKE : ParticleTypes.SMOKE,
                 pos.getX() + 0.5 + worldX + spread, pos.getY() + 1.0, pos.getZ() + 0.5 + worldZ - spread, 0.0, 0.04, 0.0);
+    }
+
+    /** Spawns a particle at a model position in pixels, front facing north, turned with the block's facing. */
+    private static void addModelParticle(
+            Level level, BlockPos pos, BlockState state, ParticleOptions particle, double x, double y, double z, double rise
+    ) {
+        double localX = x / 16.0 - 0.5;
+        double localZ = z / 16.0 - 0.5;
+        double angle = Math.toRadians(180.0 - state.getValue(FACING).toYRot());
+        double worldX = localX * Math.cos(angle) + localZ * Math.sin(angle);
+        double worldZ = -localX * Math.sin(angle) + localZ * Math.cos(angle);
+        level.addParticle(particle, pos.getX() + 0.5 + worldX, pos.getY() + y / 16.0, pos.getZ() + 0.5 + worldZ, 0.0, rise, 0.0);
     }
 
     @Override

@@ -7,6 +7,8 @@ import com.rngtech.content.registry.ModDataComponents;
 import com.rngtech.rpg.MachineTraits;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -42,6 +44,20 @@ public class AmmoniaSynthesizerBlock extends BaseMachineBlock {
             return null;
         }
         return createTickerHelper(blockEntityType, ModBlockEntities.AMMONIA_SYNTHESIZER.get(), AmmoniaSynthesizerBlockEntity::serverTick);
+    }
+
+    /** Frost vapour drifts down off the condenser while the Synthesizer runs. */
+    @Override
+    public void animateTick(BlockState state, Level level, BlockPos pos, RandomSource random) {
+        if (!state.getValue(ACTIVE) || random.nextInt(3) != 0) {
+            return;
+        }
+        double x = (4.5 + random.nextDouble() * 7.0) / 16.0 - 0.5;
+        double z = (11.25 + random.nextDouble() * 4.0) / 16.0 - 0.5;
+        double angle = Math.toRadians(180.0 - state.getValue(FACING).toYRot());
+        double worldX = x * Math.cos(angle) + z * Math.sin(angle);
+        double worldZ = -x * Math.sin(angle) + z * Math.cos(angle);
+        level.addParticle(ParticleTypes.SNOWFLAKE, pos.getX() + 0.5 + worldX, pos.getY() + 13.9 / 16.0, pos.getZ() + 0.5 + worldZ, 0.0, -0.01, 0.0);
     }
 
     @Override
