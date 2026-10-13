@@ -12,7 +12,7 @@ import java.util.List;
 public record MachineProgressionState(
         long xp, int xpRemainder, int level, List<String> allocatedNodes,
         String startNodeId, List<String> targetNodes, boolean following,
-        String ascendancy, List<String> ascendancyNodes, int sealTiers
+        String ascendancy, List<String> ascendancyNodes, int sealTiers, boolean freeReset
 ) implements PassiveProgressionView {
     public static final int MIN_LEVEL = 1;
     public static final int MAX_LEVEL = 100;
@@ -32,23 +32,28 @@ public record MachineProgressionState(
             Codec.BOOL.optionalFieldOf("following", false).forGetter(MachineProgressionState::following),
             Codec.STRING.optionalFieldOf("ascendancy", "").forGetter(MachineProgressionState::ascendancy),
             ASCENDANCY_NODES_CODEC.optionalFieldOf("ascendancy_nodes", List.of()).forGetter(MachineProgressionState::ascendancyNodes),
-            Codec.INT.optionalFieldOf("seal_tiers", 0).forGetter(MachineProgressionState::sealTiers)
-    ).apply(instance, (version, xp, remainder, level, nodes, start, target, following, ascendancy, ascendancyNodes, sealTiers) -> new MachineProgressionState(
-            xp, remainder, level, version == MegaPassiveTree.VERSION ? nodes : List.of(), start,
-            version == MegaPassiveTree.VERSION ? target : List.of(), version == MegaPassiveTree.VERSION && following,
-            ascendancy, ascendancyNodes, sealTiers)));
+            Codec.INT.optionalFieldOf("seal_tiers", 0).forGetter(MachineProgressionState::sealTiers),
+            Codec.BOOL.optionalFieldOf("free_reset", false).forGetter(MachineProgressionState::freeReset)
+    ).apply(instance, (version, xp, remainder, level, nodes, start, target, following, ascendancy, ascendancyNodes, sealTiers, freeReset) -> {
+        // A migrated catalog keeps the build where nodes kept their place, and grants one free Full Reset to rebuild.
+        boolean migrated = version != MegaPassiveTree.VERSION && !nodes.isEmpty() && MegaPassiveTree.migrates(version);
+        return new MachineProgressionState(xp, remainder, level, MegaPassiveTree.migrate(version, nodes), start,
+                MegaPassiveTree.migrate(version, target), MegaPassiveTree.migrates(version) && following,
+                ascendancy, ascendancyNodes, sealTiers, freeReset || migrated);
+    }));
 
     public static final StreamCodec<RegistryFriendlyByteBuf, MachineProgressionState> STREAM_CODEC = new StreamCodec<>() {
         @Override public MachineProgressionState decode(RegistryFriendlyByteBuf buffer) {
             return new MachineProgressionState(buffer.readVarLong(), buffer.readVarInt(), buffer.readVarInt(),
                     readNodes(buffer, MegaPassiveTree.MAX_ALLOCATIONS), buffer.readUtf(80), readNodes(buffer, MegaPassiveTree.MAX_ALLOCATIONS), buffer.readBoolean(),
-                    buffer.readUtf(80), readNodes(buffer, AscendancyCatalog.MAX_NODES), buffer.readVarInt());
+                    buffer.readUtf(80), readNodes(buffer, AscendancyCatalog.MAX_NODES), buffer.readVarInt(), buffer.readBoolean());
         }
         @Override public void encode(RegistryFriendlyByteBuf buffer, MachineProgressionState state) {
             buffer.writeVarLong(state.xp); buffer.writeVarInt(state.xpRemainder); buffer.writeVarInt(state.level);
             writeNodes(buffer, state.allocatedNodes); buffer.writeUtf(state.startNodeId, 80);
             writeNodes(buffer, state.targetNodes); buffer.writeBoolean(state.following);
             buffer.writeUtf(state.ascendancy, 80); writeNodes(buffer, state.ascendancyNodes); buffer.writeVarInt(state.sealTiers);
+            buffer.writeBoolean(state.freeReset);
         }
     };
 
@@ -79,6 +84,11 @@ public record MachineProgressionState(
         this(xp, xpRemainder, level, allocatedNodes, startNodeId, targetNodes, following, "", List.of(), 0);
     }
 
+    public MachineProgressionState(long xp, int xpRemainder, int level, List<String> allocatedNodes, String startNodeId,
+            List<String> targetNodes, boolean following, String ascendancy, List<String> ascendancyNodes, int sealTiers) {
+        this(xp, xpRemainder, level, allocatedNodes, startNodeId, targetNodes, following, ascendancy, ascendancyNodes, sealTiers, false);
+    }
+
     /** Resets the shared tree for a different start, and drops an ascendancy that belongs to another family. Earned Seal tiers stay. */
     public MachineProgressionState forFamily(MachineMasteryFamily family) {
         Ascendancy chosen = AscendancyCatalog.get(ascendancy);
@@ -86,7 +96,8 @@ public record MachineProgressionState(
         boolean foreign = chosen != null && chosen.family() != family;
         if (sameStart && !foreign) { return this; }
         return new MachineProgressionState(xp, xpRemainder, level, sameStart ? allocatedNodes : List.of(), family.startNodeId(),
-                sameStart ? targetNodes : List.of(), sameStart && following, foreign ? "" : ascendancy, foreign ? List.of() : ascendancyNodes, sealTiers);
+                sameStart ? targetNodes : List.of(), sameStart && following, foreign ? "" : ascendancy, foreign ? List.of() : ascendancyNodes, sealTiers,
+                sameStart && freeReset);
     }
 
     public MachineProgressionState withAddedXp(long amount) { return withAddedScaledXp(amount, XP_REMAINDER_SCALE); }
@@ -112,15 +123,17 @@ public record MachineProgressionState(
         if (!MegaPassiveTree.connected(startNodeId, nodes)) { return this; }
         return shared(xp, xpRemainder, MegaPassiveTree.allocationOrder(startNodeId, nodes), targetNodes, false);
     }
-    /** Clears the shared tree; the ascendancy is untouched. */
-    public MachineProgressionState cleared() { return shared(xp, xpRemainder, List.of(), List.of(), false); }
+    /** Clears the shared tree and uses up any free Full Reset; the ascendancy is untouched. */
+    public MachineProgressionState cleared() {
+        return new MachineProgressionState(xp, xpRemainder, level, List.of(), startNodeId, List.of(), false, ascendancy, ascendancyNodes, sealTiers, false);
+    }
 
     private MachineProgressionState shared(long xp, int xpRemainder, List<String> allocated, List<String> target, boolean following) {
-        return new MachineProgressionState(xp, xpRemainder, level, allocated, startNodeId, target, following, ascendancy, ascendancyNodes, sealTiers);
+        return new MachineProgressionState(xp, xpRemainder, level, allocated, startNodeId, target, following, ascendancy, ascendancyNodes, sealTiers, freeReset);
     }
 
     private MachineProgressionState ascendant(String ascendancy, List<String> nodes, int tiers) {
-        return new MachineProgressionState(xp, xpRemainder, level, allocatedNodes, startNodeId, targetNodes, following, ascendancy, nodes, tiers);
+        return new MachineProgressionState(xp, xpRemainder, level, allocatedNodes, startNodeId, targetNodes, following, ascendancy, nodes, tiers, freeReset);
     }
 
     public int ascendancyPoints() { return sealTiers * AscendancyCatalog.POINTS_PER_TIER; }

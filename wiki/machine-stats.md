@@ -153,7 +153,7 @@ All of these are better higher. See [Solar Panel](solar-panel.md).
 
 ## Mastery attributes
 
-**Control**, **Drive**, and **Reserve** are Machine Mastery attributes: precision, actuation, and capacity. Each machine family turns its points into its own stats, such as speed or buffer size. See [Machine Mastery](machine-mastery.md). On a Tool Rod, Control also spends FE to protect durability.
+**Control**, **Drive**, and **Reserve** are Machine Mastery attributes: precision, actuation, and capacity. Points come from the Mastery tree and from [attribute suffixes](rarity-and-affixes.md#attribute-suffixes) on the machine and its Gear. Each machine family turns its points into its own stats, such as speed or buffer size. See [Machine Mastery](machine-mastery.md). On a Tool Rod, Control also spends FE to protect durability.
 
 ## Tools and companions
 

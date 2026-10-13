@@ -171,6 +171,11 @@ public enum MachineStat implements StringRepresentable {
         return stat;
     }
 
+    /** Control, Drive, and Reserve: the Mastery attributes. */
+    public static boolean isAttribute(MachineStat stat) {
+        return stat == CONTROL || stat == DRIVE || stat == RESERVE;
+    }
+
     public String translationKey() {
         return "rngtech.stat." + serializedName;
     }

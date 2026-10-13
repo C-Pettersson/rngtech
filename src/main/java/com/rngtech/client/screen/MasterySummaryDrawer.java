@@ -310,6 +310,7 @@ final class MasterySummaryDrawer {
         description(tooltip, attribute, MachineStatDisplay.statValue(attribute, view.masteryAttribute(attribute)));
         lines.stream().filter(line -> line.kind() == MasteryBonusSummary.Kind.CONVERSION && line.active() && line.attribute() == attribute)
                 .forEach(line -> tooltip.add(MachineStatDisplay.effectText(line.effect()).withStyle(ChatFormatting.AQUA)));
+        MasteryScreenSupport.attributeSources(tooltip, attribute);
         return tooltip;
     }
 

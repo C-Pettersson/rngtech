@@ -86,6 +86,8 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
     public static final int STATUS_FAILURE_RISK = 10;
     public static final int STATUS_POWER_LIMITED = 11;
 
+    /** Share of an electric recipe's FE that Closed Loop Recuperator returns to the internal buffer. */
+    private static final double CLOSED_LOOP_REFUND = 0.25D;
     private static final int DATA_PROGRESS_START = 0;
     private static final int DATA_PROCESSING_TICKS_START = DATA_PROGRESS_START + MAX_PROCESSING_SLOTS;
     private static final int DATA_ENERGY_PER_TICK_START = DATA_PROCESSING_TICKS_START + MAX_PROCESSING_SLOTS;
@@ -646,7 +648,16 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
         MachineStatAccumulator stats = MachineBaseStatCatalog.furnace(furnaceMaterial());
         MachineTraits activeTraits = effectiveTraits();
         stats.apply(activeTraits);
-        FurnacePassiveTree.applyStats(stats, machineProgression());
+        MegaPassiveTree.applyNodeStats(stats, machineProgression(), MachineMasteryFamily.FURNACE);
+        // Each lane applies only its own Heat Core, but attributes from every installed core belong to the whole Furnace.
+        int gearSlots = usesHeatCores() ? activeGearSlots() : gearInventory.getSlots();
+        for (int slot = 0; slot < gearSlots; slot++) {
+            ItemStack gear = gearInventory.getStackInSlot(slot);
+            if (isAllowedGearComponent(slot, gear)) {
+                ComponentBaseStatCatalog.applyAttributeAffixes(stats, gear);
+            }
+        }
+        MegaPassiveTree.applyAttributeStats(stats, machineProgression(), MachineMasteryFamily.FURNACE);
         if (isElectric() && !hasBatteryCell()) {
             stats.apply(MachineStatAccumulator.NO_BATTERY_SOURCE, new MachineModifier(
                     ModifierSlot.IMPLICIT,
@@ -1045,7 +1056,7 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
         if (!isElectric() || !FurnacePassiveTree.usesClosedLoopRecuperator(machineProgression())) {
             return;
         }
-        int refund = Math.max(1, (int) Math.ceil(energyCostPerCraft(recipe, stats) * 0.05D));
+        int refund = Math.max(1, (int) Math.ceil(energyCostPerCraft(recipe, stats) * CLOSED_LOOP_REFUND));
         int stored = internalEnergyStored();
         int capacity = internalEnergyCapacity();
         if (stored >= capacity) {
@@ -1507,7 +1518,7 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
         if (hasMasteryBehavior("HOLD_THE_FIRE") && findRecipeWithoutGates(lane) != null) {
             return false;
         }
-        int nextTemperature = Math.max(HeatControl.AMBIENT_TEMPERATURE, currentTemperature[lane] - HeatControl.coolingRate(stats));
+        int nextTemperature = Math.max(HeatControl.AMBIENT_TEMPERATURE, currentTemperature[lane] - HeatControl.coolingStep(stats, level == null ? 0L : level.getGameTime()));
         boolean changed = false;
         if (nextTemperature != currentTemperature[lane]) {
             currentTemperature[lane] = nextTemperature;
@@ -1564,8 +1575,8 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
                 recipe.requiredTemperatureStability(),
                 stats
         );
-        if (addedStrain > 0 && FurnacePassiveTree.usesQuenchProtocol(machineProgression())) {
-            addedStrain = Math.max(1, (int) Math.ceil(addedStrain * 0.5D));
+        if (FurnacePassiveTree.usesQuenchProtocol(machineProgression())) {
+            addedStrain = HeatControl.quenched(addedStrain);
         }
         if (addedStrain > 0) {
             failureStrain[lane] = Math.min(HeatControl.FAILURE_STRAIN_THRESHOLD, failureStrain[lane] + addedStrain);

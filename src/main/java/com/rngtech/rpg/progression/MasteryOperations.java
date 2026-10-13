@@ -38,7 +38,9 @@ public final class MasteryOperations {
                 MachineProgressionState next = action.equals("clear") ? state.cleared() : state.withoutNode(value);
                 int cost = state.spentPoints() - next.spentPoints();
                 if (cost <= 0 || !host.masteryGearAllows(next)) { return fail(player, "refund_failed"); }
-                if (!consumeRefunds(player, cost)) { return fail(player, "refund_cost"); }
+                // A catalog migration grants one free Full Reset; Clear spends it instead of Mastery Refunds.
+                boolean free = action.equals("clear") && state.freeReset();
+                if (!free && !consumeRefunds(player, cost)) { return fail(player, "refund_cost"); }
                 host.applyMasteryState(next); return true;
             case "copy_configurator":
                 for (int slot = 0; slot < player.getInventory().getContainerSize(); slot++) {

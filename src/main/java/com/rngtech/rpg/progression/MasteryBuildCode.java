@@ -36,10 +36,13 @@ public record MasteryBuildCode(String start, List<String> nodes, String ascendan
         if (text.length() > MAX_LENGTH) { throw new IllegalArgumentException("Build code too large"); }
         try {
             JsonObject object = JsonParser.parseString(text).getAsJsonObject();
+            int version = object.get("version").getAsInt();
             if (!object.get("tree").getAsString().equals("rngtech:machine_mastery")
-                    || object.get("version").getAsInt() != MegaPassiveTree.VERSION) { throw new IllegalArgumentException("Different tree version"); }
+                    || !MegaPassiveTree.migrates(version)) { throw new IllegalArgumentException("Different tree version"); }
             String start = object.get("start").getAsString();
-            List<String> nodes = new ArrayList<>(); object.getAsJsonArray("nodes").forEach(e -> nodes.add(e.getAsString()));
+            List<String> saved = new ArrayList<>(); object.getAsJsonArray("nodes").forEach(e -> saved.add(e.getAsString()));
+            // An older catalog's code keeps what still connects after its nodes are renamed or dropped.
+            List<String> nodes = version == MegaPassiveTree.VERSION ? saved : MegaPassiveTree.salvage(start, MegaPassiveTree.migrate(version, saved));
             if (!MegaPassiveTree.validBuild(start, nodes)) { throw new IllegalArgumentException("Invalid or disconnected build"); }
             Ascendancy ascendancy = object.has("ascendancy") ? AscendancyCatalog.get(object.get("ascendancy").getAsString()) : null;
             List<String> order = new ArrayList<>();

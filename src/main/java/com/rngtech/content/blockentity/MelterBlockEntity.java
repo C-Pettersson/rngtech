@@ -500,11 +500,12 @@ public class MelterBlockEntity extends BaseMachineBlockEntity
     protected MachineStatAccumulator buildStats() {
         MachineStatAccumulator stats = MachineBaseStatCatalog.melter();
         stats.apply(effectiveTraits());
-        MegaPassiveTree.applyStats(stats, machineProgression(), MachineMasteryFamily.MELTER);
+        MegaPassiveTree.applyNodeStats(stats, machineProgression(), MachineMasteryFamily.MELTER);
         applyHeatCoreStats(stats);
         applyCrushHeadStats(stats);
         applyServoStats(stats);
         applyFluidPumpStats(stats);
+        MegaPassiveTree.applyAttributeStats(stats, machineProgression(), MachineMasteryFamily.MELTER);
         if (!hasBatteryCell()) {
             stats.apply(MachineStatAccumulator.NO_BATTERY_SOURCE, new MachineModifier(
                     ModifierSlot.IMPLICIT,
@@ -957,12 +958,14 @@ public class MelterBlockEntity extends BaseMachineBlockEntity
             return;
         }
         ComponentBaseStatCatalog.applyEffectiveContribution(stats, stack);
+        ComponentBaseStatCatalog.applyAttributeAffixes(stats, stack);
     }
 
     private void applyCrushHeadStats(MachineStatAccumulator stats) {
         ItemStack stack = crushHeadStack();
         if (isCrushHead(stack) && stack.getItem() instanceof MachinePartItem part) {
             ComponentBaseStatCatalog.applyEffectiveContribution(stats, stack);
+            ComponentBaseStatCatalog.applyAttributeAffixes(stats, stack);
         }
     }
 
@@ -970,6 +973,7 @@ public class MelterBlockEntity extends BaseMachineBlockEntity
         ItemStack stack = servoStack();
         if (isServo(stack) && stack.getItem() instanceof MachinePartItem part) {
             ComponentBaseStatCatalog.applyEffectiveContribution(stats, stack);
+            ComponentBaseStatCatalog.applyAttributeAffixes(stats, stack);
         }
     }
 
@@ -977,6 +981,7 @@ public class MelterBlockEntity extends BaseMachineBlockEntity
         ItemStack stack = fluidPumpStack();
         if (isFluidPump(stack) && stack.getItem() instanceof MachinePartItem part) {
             ComponentBaseStatCatalog.applyEffectiveContribution(stats, stack);
+            ComponentBaseStatCatalog.applyAttributeAffixes(stats, stack);
         }
     }
 

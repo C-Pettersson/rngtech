@@ -116,7 +116,8 @@ public final class MasteryMenuSupport {
             case 3 -> (int) Math.min(Integer.MAX_VALUE, state.xpInCurrentLevel());
             case 4 -> (int) Math.min(Integer.MAX_VALUE, state.xpNeededForNextLevel());
             case 5 -> state.unspentPoints();
-            case FOLLOWING -> state.following() ? 1 : 0;
+            // Bit 1 is following a target build; bit 2 is an unused free Full Reset.
+            case FOLLOWING -> (state.following() ? 1 : 0) | (state.freeReset() ? 2 : 0);
             default -> 0;
         };
     }
@@ -156,8 +157,8 @@ public final class MasteryMenuSupport {
             if (node != null) { ascendancyNodes.add(node.id()); }
         }
         return new MachineProgressionState(machineXp(data, base), 0, machineLevel(data, base),
-                readNodes(data, base + ALLOCATED_START), family.startNodeId(), readNodes(data, base + TARGET_START), data.get(base + FOLLOWING) != 0,
-                chosen == null ? "" : chosen.id(), ascendancyNodes, data.get(base + SEAL_TIERS));
+                readNodes(data, base + ALLOCATED_START), family.startNodeId(), readNodes(data, base + TARGET_START), (data.get(base + FOLLOWING) & 1) != 0,
+                chosen == null ? "" : chosen.id(), ascendancyNodes, data.get(base + SEAL_TIERS), (data.get(base + FOLLOWING) & 2) != 0);
     }
     private static List<String> readNodes(ContainerData data, int base) {
         List<String> result = new ArrayList<>();

@@ -63,8 +63,8 @@ public final class MasteryBonusSummary {
                         .thenComparing(entry -> entry.getKey().bucket()))
                 .forEach(entry -> combined(entry.getKey().stat(), entry.getKey().bucket(), entry.getValue().value)
                         .ifPresent(effect -> lines.add(line(Kind.EFFECT, entry.getKey().active(), effect, entry.getValue()))));
-        if (!behaviors.containsKey("NO_INHERENT_ATTRIBUTES")) {
-            for (MegaPassiveTree.Conversion conversion : MegaPassiveTree.inherentConversions(machine.masteryFamily(), control, drive, reserve)) {
+        for (MegaPassiveTree.Conversion conversion : MegaPassiveTree.inherentConversions(machine.masteryFamily(), control, drive, reserve)) {
+            if (!MegaPassiveTree.suppressesInherent(behaviors.keySet(), conversion.attribute())) {
                 if (Math.abs(conversion.effect().value()) > EPSILON) {
                     lines.add(new Line(Kind.CONVERSION, machine.masterySupports(conversion.effect().stat()), conversion.effect(), conversion.attribute(), null, null, 0, List.of()));
                 }

@@ -83,9 +83,9 @@ After level 30, each level needs 10% more total XP than the one before.
 
 ## The passive tree
 
-All seven families share one passive tree of 1,346 nodes. Each family enters at its own **start**, shown in the table above. Your machine can only grow outward from its own start, and it cannot pass through another family's start.
+All seven families share one passive tree of 1,348 nodes. Each family enters at its own **start**, shown in the table above. Your machine can only grow outward from its own start, and it cannot pass through another family's start.
 
-The tree has three **attributes**: **Control** (teal), **Drive** (gold), and **Reserve** (red). Each start gives 20 points of its attribute, split 10 and 10 on mixed starts. Travel nodes along the tree's roads add more. Attributes give bonuses on their own:
+The tree has three **attributes**: **Control** (teal), **Drive** (gold), and **Reserve** (red). Each start gives 20 points of its attribute, split 10 and 10 on mixed starts. Travel nodes along the tree's roads add more, and machines and Gear can roll [attribute suffixes](rarity-and-affixes.md#attribute-suffixes). Attributes give bonuses on their own:
 
 | Attribute | Every machine | Family bonus |
 |---|---|---|
@@ -97,13 +97,28 @@ A bonus only matters where the machine uses that stat. For example, the Stage 0 
 
 Hover your start node to see your current attribute totals.
 
+### Attribute scaling
+
+Some notables turn an attribute into a stat beyond its own bonuses, such as **Torque Conversion** (Processing Speed per Drive), **Governed Draw** (reduced Energy Usage per Control), or **Driven Bellows** (Heat Transfer per Drive). They grow with every attribute point, so they reward stacking one attribute from the tree and from Gear. The **% increased** attribute nodes are weak on their own and strong in such a build.
+
+A few keystones build on this:
+
+- **Attribute Transfiguration**: 100% more Control, Drive, and Reserve, but attributes lose their own bonuses. Only attribute scaling uses the points.
+- **Reserve Actuation**: 0.4% increased Processing Speed per point of Reserve, but Reserve loses its own bonuses.
+- **Governed Actuation**: 0.35% increased Processing Speed per point of Control, but Control loses its own bonuses.
+- **Singular Drive** and **Deep Reserve**: 50% more of one attribute and 50% less of the other two.
+
+Hold Shift while hovering an attribute total, on your start node or in the Bonus Summary, to see where its points come from: your start, tree nodes, and each Gear part.
+
+**Surge Cycling** trades steady speed for luck. Your increased Processing Speed stops speeding the machine up and becomes Instant Process chance instead: 0.3% per 1% increased, up to 75%. Reduced speed and "less" penalties still apply. With 200% increased speed you get 60% Instant Process. Instant Process suffixes and the Surge nodes push it toward the cap.
+
 ### Node types
 
 - **Travel nodes** sit along the roads and grant attribute points.
 - **Ordinary nodes** and **notables** branch off the roads into reward clusters. Notables are the stronger nodes at the end or center of a cluster, at least three points in from the road.
 - **Keystones** are big commitments, at least 10 points from every start. Most are trade-offs: **Steady State** gives 50% more Stability but 15% less Processing Speed, and **Single Pass** turns off bonus output for 30% more Processing Speed. A few only change how the machine works, and cost nothing but the points to reach them: **Silent Operation** mutes the machine, and **Even Feed** makes automation fill a [Furnace](furnace.md#automation)'s input lanes evenly.
 
-Every node is visible to every family. A node can have no effect on your machine: a Crusher can take a heat node and gain nothing from it. Any penalty on that node still applies, and the tooltip marks which effects are inactive. Some keystone payoffs only work on the machines that actually pay their cost; the tooltip lists which machines those are. For example, **Flash Annealing** and **Low Heat Specialist** cap Max Temperature, so their payoffs work only on the [Furnace](furnace.md#mastery-and-ascendancies), [Alloy Furnace](alloy-furnace.md#mastery-and-ascendancies), and [Metal Press](metal-press.md#mastery-and-ascendancies). Use the relevance control to highlight nodes that matter for your machine.
+Every node is visible to every family. A node can have no effect on your machine: a Crusher can take a heat node and gain nothing from it. Any penalty on that node still applies, and the tooltip marks which effects are inactive. Some keystone payoffs only work on the machines that actually pay their cost; the tooltip lists which machines those are. For example, **Flash Annealing** caps Max Temperature, so its payoff works only on the [Furnace](furnace.md#mastery-and-ascendancies), [Alloy Furnace](alloy-furnace.md#mastery-and-ascendancies), and [Metal Press](metal-press.md#mastery-and-ascendancies). **Low Heat Specialist**'s cap is below most alloy and press recipes, so its payoff works only on the Furnace. Use the relevance control to highlight nodes that matter for your machine.
 
 Stat terms like "increased" and "more" are explained in [Rarity and Affixes](rarity-and-affixes.md), and each stat is defined in [Machine Stats](machine-stats.md).
 
@@ -118,7 +133,7 @@ Spending and refunding points:
 
 - **Allocate**: hover any unallocated node to preview the shortest path to it and its cost, then click to buy the whole path in one go. The path is bought only if you can afford all of it and your Gear allows every node on it; otherwise nothing is bought. The purchase happens when you release the click, so a drag that starts on a node only pans. Every node costs one point and must connect back to your start.
 - **Gear limits**: some nodes restrict which Gear you can install. You cannot take a node your installed Gear breaks; the tooltip says why.
-- **Refund**: right-click an allocated node to remove it. Each removed node costs one {{ item('rngtech:mastery_refund') }}. A refund must leave the rest of your tree connected and your Gear legal. Shift-click **Clear** to refund the whole tree at the same price per node.
+- **Refund**: right-click an allocated node to remove it. Each removed node costs one {{ item('rngtech:mastery_refund') }}. A refund must leave the rest of your tree connected and your Gear legal. Shift-click **Clear** to refund the whole tree at the same price per node. After an update that changes the tree, each machine's build is kept wherever it still fits, and its next Clear is free (the Clear button says so).
 
 In the expanded view, the tab on the right edge opens the **Bonus Summary**: your attribute totals, keystones, and every allocated effect combined the way the machine actually adds them up. It has sections for your Ascendancy, bonuses that come from attributes, attribute scaling, limits, special behaviors, and effects this machine does not use. Hover a line to see the stat, its current contribution, and which nodes it comes from.
 

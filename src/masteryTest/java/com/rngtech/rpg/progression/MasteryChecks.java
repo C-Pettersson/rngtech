@@ -51,7 +51,9 @@ public final class MasteryChecks {
         familyAdapters();
         taggedPayoffs();
         keystonePayoffsNeedTheirCosts();
+        checks += TreeAuditChecks.run();
         fuelFurnaceReadsFuelDuration();
+        gearAttributesFeedConversions();
         bonusSummary();
         statBreakdowns();
         iconTextures();
@@ -164,10 +166,37 @@ public final class MasteryChecks {
         require(MachineProgressionState.progressionBand(25) == MachineProgressionState.MAX_LEVEL - 2, "top legacy band trains toward the level cap");
         var stale = JsonParser.parseString("{\"tree_version\":1,\"xp\":100,\"level\":2,\"allocated_nodes\":[\"r0_drive_0_0\"],\"start\":\"start_drive\"}");
         require(MachineProgressionState.CODEC.parse(JsonOps.INSTANCE, stale).getOrThrow().allocatedNodes().isEmpty(), "previous tree version refunds allocations");
+        catalogTwoMigrates();
+    }
+
+    /** Version 2 saves and build codes keep their shape under renamed nodes; a replaced keystone is cut off and refunded. */
+    private static void catalogTwoMigrates() {
+        Map<String, String> back = new HashMap<>();
+        MasteryNodeJson.resource("/data/rngtech/mastery/migrations.json").getAsJsonObject("migrations").getAsJsonObject("2")
+                .getAsJsonObject("renamed").entrySet().forEach(entry -> back.put(entry.getValue().getAsString(), entry.getKey()));
+        for (String keystone : List.of("deep_reserve", "governed_actuation")) {
+            MachineProgressionState current = build(MachineMasteryFamily.MELTER, keystone);
+            List<String> saved = current.allocatedNodes().stream().map(id -> id.equals("governed_actuation") ? "cold_standby" : back.getOrDefault(id, id)).toList();
+            require(!saved.equals(current.allocatedNodes()), "the " + keystone + " route crosses renamed nodes");
+            var json = new com.google.gson.JsonObject();
+            json.addProperty("tree_version", 2); json.addProperty("xp", current.xp()); json.addProperty("level", current.level());
+            json.addProperty("start", current.startNodeId());
+            var nodes = new com.google.gson.JsonArray(); saved.forEach(nodes::add); json.add("allocated_nodes", nodes);
+            MachineProgressionState loaded = MachineProgressionState.CODEC.parse(JsonOps.INSTANCE, json).getOrThrow();
+            List<String> expected = keystone.equals("governed_actuation") ? current.allocatedNodes().subList(0, current.allocatedNodes().size() - 1) : current.allocatedNodes();
+            require(loaded.allocatedNodes().equals(expected), "a version 2 build toward " + keystone + " migrates by position: " + loaded.allocatedNodes());
+            require(loaded.freeReset(), "a migrated build grants a free Full Reset");
+            require(!loaded.cleared().freeReset() && !loaded.withUnlockedNode(0).equals(loaded.cleared()), "clearing spends the free Full Reset");
+            String code = "{\"tree\":\"rngtech:machine_mastery\",\"version\":2,\"start\":\"" + current.startNodeId() + "\",\"nodes\":"
+                    + new com.google.gson.Gson().toJson(saved) + "}";
+            require(MasteryBuildCode.decode(code).nodes().equals(expected), "a version 2 build code pastes its migrated nodes");
+        }
+        var json = MachineProgressionState.CODEC.encodeStart(JsonOps.INSTANCE, build(MachineMasteryFamily.CRUSHER, "single_pass")).getOrThrow();
+        require(!MachineProgressionState.CODEC.parse(JsonOps.INSTANCE, json).getOrThrow().freeReset(), "a current save gets no free Full Reset");
     }
 
     private static void graphAndBuilds() {
-        require(MegaPassiveTree.TREE.nodes().size() == 1347, "full shared catalog");
+        require(MegaPassiveTree.TREE.nodes().size() == 1348, "full shared catalog");
         for (MegaPassiveNode root : MegaPassiveTree.TREE.nodes().stream().filter(n -> n.kind() == PassiveNodeKind.STARTER).toList()) {
             require(root.links().size() == 3, "three exits per starter");
             for (MegaPassiveNode key : MegaPassiveTree.TREE.nodes().stream().filter(n -> n.kind() == PassiveNodeKind.KEYSTONE).toList()) {
@@ -329,7 +358,7 @@ public final class MasteryChecks {
             boolean heated = family.has(MachineTag.HEATED);
             near(speedGain(family, "flash_annealing"), heated ? 2 : 1, family + " gains Flash Annealing speed only when it is a heated machine");
             near(speedGain(family, "low_heat_specialist"), 1, family + " gains no speed from Low Heat Specialist");
-            near(statGain(family, "low_heat_specialist", MachineStat.ENERGY_USAGE), heated ? 0.5 : 1, family + " gains Low Heat Specialist energy savings only when it is a heated machine");
+            near(statGain(family, "low_heat_specialist", MachineStat.ENERGY_USAGE), family == MachineMasteryFamily.FURNACE ? 0.5 : 1, family + " gains Low Heat Specialist energy savings only as a Furnace");
             near(statGain(family, "low_heat_specialist", MachineStat.FUEL_EFFICIENCY), family == MachineMasteryFamily.FURNACE ? 2 : 1, family + " gains Low Heat Specialist fuel savings only as a fuel Furnace");
             near(speedGain(family, "soft_material_specialist"), family == MachineMasteryFamily.CRUSHER ? 3 : 1, family + " gains Soft Material Specialist speed only as a Crusher");
             near(speedGain(family, "single_pass"), family.has(MachineTag.BONUS_OUTPUT) ? 1.3 : 1, family + " gains Single Pass speed only with bonus output to give up");
@@ -364,6 +393,16 @@ public final class MasteryChecks {
         var pressOutput = MachineStatAccumulator.componentBase(Map.of(MachineStat.SUPER_OUTPUT_CHANCE, 10.0));
         MegaPassiveTree.applyStats(pressOutput, press, MachineMasteryFamily.METAL_PRESS);
         near(pressOutput.value(MachineStat.SUPER_OUTPUT_CHANCE), 0, "Single Pass removes a Metal Press's Super Output");
+        // Ascendancy yield must not slip past Single Pass while it pays out the speed.
+        var cadence = MachineStatAccumulator.componentBase(Map.of(MachineStat.SUPER_OUTPUT_CADENCE, 16.0, MachineStat.LEDGER_RATE, 20.0));
+        MegaPassiveTree.applyStats(cadence, crusher, MachineMasteryFamily.CRUSHER);
+        near(cadence.value(MachineStat.SUPER_OUTPUT_CADENCE), 0, "Single Pass removes Super Output Cadence");
+        var faultLines = crusher.withSealTier(1, MachineMasteryFamily.CRUSHER, 8, "rockbreaker").withAscendancyNode("energy_mitigation").withAscendancyNode("fault_lines");
+        require(MegaPassiveTree.has(faultLines.withoutNode("single_pass"), "FAULT_LINES") && !MegaPassiveTree.has(faultLines, "FAULT_LINES"),
+                "Single Pass drops declared output-yield behaviors");
+        for (MachineMasteryFamily family : MachineMasteryFamily.values()) {
+            require(family.supportsBehavior("QUENCH_PROTOCOL") == family.has(MachineTag.HEATED), family + " quenches strain only as a heated machine");
+        }
 
         // Even Feed is earned without a lead-up arm: it hangs straight off a road and only the Furnace has lanes to fill.
         MegaPassiveNode evenFeed = MegaPassiveTree.node("even_feed");
@@ -395,7 +434,8 @@ public final class MasteryChecks {
     private static final Map<MachineStat, Double> BASE_100 = Arrays.stream(MachineStat.values()).collect(Collectors.toMap(stat -> stat, stat -> 100.0));
     private static final Set<MachineStat> LOWER_IS_BETTER = Set.of(
             MachineStat.ENERGY_USAGE, MachineStat.WARMUP_TIME, MachineStat.COOLING_RATE, MachineStat.IDLE_LOSS);
-    private static final Set<String> COST_BEHAVIORS = Set.of("BLOCK_BATTERY", "MATCHING_HEAD", "NO_BONUS_OUTPUT", "NO_INHERENT_ATTRIBUTES");
+    private static final Set<String> COST_BEHAVIORS = Set.of("BLOCK_BATTERY", "MATCHING_HEAD", "NO_BONUS_OUTPUT",
+            "NO_INHERENT_ATTRIBUTES", "NO_INHERENT_CONTROL", "NO_INHERENT_DRIVE", "NO_INHERENT_RESERVE");
 
     /**
      * A keystone's payoff must never reach a machine that escapes its cost. Limits and restricting behaviors are the
@@ -418,6 +458,41 @@ public final class MasteryChecks {
             require(caught.stream().anyMatch(v -> v.contains("CRUSHER")) && caught.stream().anyMatch(v -> v.contains("MELTER"))
                     && caught.stream().noneMatch(v -> v.contains("FURNACE")), "audit catches an untagged " + id + " payoff: " + caught);
         }
+    }
+
+    /** Attribute points from Gear, applied between the node and attribute phases, feed the inherent conversions. */
+    private static void gearAttributesFeedConversions() {
+        var state = MachineProgressionState.EMPTY.forFamily(MachineMasteryFamily.CRUSHER);
+        var bare = MachineStatAccumulator.componentBase(Map.of(MachineStat.PROCESSING_SPEED, 1.0));
+        MegaPassiveTree.applyStats(bare, state, MachineMasteryFamily.CRUSHER);
+        var geared = MachineStatAccumulator.componentBase(Map.of(MachineStat.PROCESSING_SPEED, 1.0));
+        MegaPassiveTree.applyNodeStats(geared, state, MachineMasteryFamily.CRUSHER);
+        geared.apply(new MachineModifier(ModifierSlot.SUFFIX, MachineStat.DRIVE, ModifierOperation.ADD, 100));
+        MegaPassiveTree.applyAttributeStats(geared, state, MachineMasteryFamily.CRUSHER);
+        near(geared.value(MachineStat.DRIVE), 120, "Gear Drive adds to the start's Drive");
+        near(geared.value(MachineStat.PROCESSING_SPEED) - bare.value(MachineStat.PROCESSING_SPEED), 0.15, "100 Gear Drive converts into 15% increased Processing Speed");
+        // Reserve Actuation turns off only Reserve's own bonuses; Drive keeps converting into speed.
+        var actuated = build(MachineMasteryFamily.FURNACE, "reserve_actuation");
+        require(!MegaPassiveTree.has(actuated, "NO_INHERENT_ATTRIBUTES") && MegaPassiveTree.has(actuated, "NO_INHERENT_RESERVE"), "Reserve Actuation suppresses only Reserve");
+        var lines = MasteryBonusSummary.of(actuated, MasteryApplicability.of(MachineMasteryFamily.FURNACE), 0, 100, 100);
+        require(lines.stream().anyMatch(line -> line.kind() == MasteryBonusSummary.Kind.CONVERSION && line.attribute() == MachineStat.DRIVE)
+                && lines.stream().noneMatch(line -> line.kind() == MasteryBonusSummary.Kind.CONVERSION && line.attribute() == MachineStat.RESERVE),
+                "the summary keeps Drive conversions and drops Reserve's under Reserve Actuation");
+        // Surge Cycling turns increased speed into Instant Process chance, applied after the tree as Gear would be.
+        var surge = build(MachineMasteryFamily.CRUSHER, "surge_cycling");
+        var cycled = MachineStatAccumulator.componentBase(Map.of(MachineStat.PROCESSING_SPEED, 1.0, MachineStat.INSTANT_PROCESS_CHANCE, 0.0));
+        MegaPassiveTree.applyStats(cycled, surge, MachineMasteryFamily.CRUSHER);
+        double treeSpeed = cycled.increasedPercent(MachineStat.PROCESSING_SPEED);
+        cycled.apply(new MachineModifier(ModifierSlot.SUFFIX, MachineStat.PROCESSING_SPEED, ModifierOperation.INCREASED_PERCENT, 100));
+        cycled.apply(new MachineModifier(ModifierSlot.SUFFIX, MachineStat.PROCESSING_SPEED, ModifierOperation.LESS, 0.5));
+        near(cycled.value(MachineStat.PROCESSING_SPEED), 0.5, "Surge Cycling removes increased speed but keeps less multipliers");
+        near(cycled.value(MachineStat.INSTANT_PROCESS_CHANCE), Math.min(75, (treeSpeed + 100) * MegaPassiveTree.SURGE_CYCLING_RATE), "Surge Cycling converts increased speed into Instant Process");
+        cycled.apply(new MachineModifier(ModifierSlot.SUFFIX, MachineStat.PROCESSING_SPEED, ModifierOperation.INCREASED_PERCENT, 1000));
+        near(cycled.value(MachineStat.INSTANT_PROCESS_CHANCE), 75, "Surge Cycling caps Instant Process at 75%");
+        var forestry = MachineStatAccumulator.componentBase(Map.of(MachineStat.PROCESSING_SPEED, 1.0));
+        MegaPassiveTree.applyStats(forestry, build(MachineMasteryFamily.FORESTRY, "surge_cycling"), MachineMasteryFamily.FORESTRY);
+        forestry.apply(new MachineModifier(ModifierSlot.SUFFIX, MachineStat.PROCESSING_SPEED, ModifierOperation.INCREASED_PERCENT, 100));
+        require(forestry.value(MachineStat.PROCESSING_SPEED) > 1.5, "Surge Cycling leaves a machine without Instant Process its speed");
     }
 
     /** The Furnace claims Fuel Duration, so High Flux's cost must shorten its Stage 0 burn. */
@@ -499,8 +574,9 @@ public final class MasteryChecks {
             }
             String singlePass = MegaPassiveTree.node("single_pass").translationKey();
             require(stats.breakdowns().stream().flatMap(breakdown -> breakdown.terms().stream())
-                    .anyMatch(term -> term.source().getString().equals(singlePass)) == family.has(MachineTag.BONUS_OUTPUT),
-                    family + " breakdown names the Single Pass node where it pays out");
+                    .anyMatch(term -> term.source().getString().equals(singlePass))
+                            == (family.has(MachineTag.BONUS_OUTPUT) || MegaPassiveTree.NO_BONUS_OUTPUT_CEILINGS.keySet().stream().anyMatch(family::supportsAbsolute)),
+                    family + " breakdown names the Single Pass node where it pays out or disables bonus output");
             require(Stream.of(MachineStat.CONTROL, MachineStat.DRIVE, MachineStat.RESERVE)
                     .flatMap(attribute -> stats.breakdown(attribute).orElseThrow().terms().stream())
                     .anyMatch(term -> term.source().getString().equals("rngtech.stat.breakdown.source.inherent")),

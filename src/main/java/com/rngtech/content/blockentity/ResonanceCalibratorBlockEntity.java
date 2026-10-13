@@ -451,10 +451,11 @@ public class ResonanceCalibratorBlockEntity extends BaseMachineBlockEntity
         ResonanceCalibratorChassis chassis = chassis();
         MachineStatAccumulator stats = MachineBaseStatCatalog.resonanceCalibrator(chassis);
         stats.apply(effectiveTraits());
-        MegaPassiveTree.applyStats(stats, machineProgression(), masteryFamily());
+        MegaPassiveTree.applyNodeStats(stats, machineProgression(), masteryFamily());
         applyGearStats(stats, resonanceCoilStack());
         applyGearStats(stats, controlBoardStack());
         applyGearStats(stats, stabilizerMatrixStack());
+        MegaPassiveTree.applyAttributeStats(stats, machineProgression(), masteryFamily());
         if (!hasBatteryCell()) {
             stats.apply(MachineStatAccumulator.NO_BATTERY_SOURCE, new MachineModifier(
                     ModifierSlot.IMPLICIT,
@@ -996,6 +997,7 @@ public class ResonanceCalibratorBlockEntity extends BaseMachineBlockEntity
     private void applyGearStats(MachineStatAccumulator stats, ItemStack stack) {
         if (stack.getItem() instanceof MachinePartItem part) {
             ComponentBaseStatCatalog.applyEffectiveContribution(stats, stack);
+            ComponentBaseStatCatalog.applyAttributeAffixes(stats, stack);
         }
     }
 

@@ -55,6 +55,8 @@ public final class MachineStatAccumulator {
     private final Map<MachineStat, Double> absoluteCeilings = new EnumMap<>(MachineStat.class);
     private final Map<MachineStat, Double> absoluteFloors = new EnumMap<>(MachineStat.class);
     private final Map<MachineStat, Double> bonusMoreValues = new EnumMap<>(MachineStat.class);
+    /** Stats whose positive increased bucket pays into another stat instead, keyed by the converted stat. */
+    private final Map<MachineStat, IncreasedConversion> increasedConversions = new EnumMap<>(MachineStat.class);
     private final Map<MachineStat, List<StatBreakdown.Term>> recorded =
             RECORDING.get() ? new EnumMap<>(MachineStat.class) : null;
     private final Deque<Component> sources = new ArrayDeque<>();
@@ -101,6 +103,7 @@ public final class MachineStatAccumulator {
         copy.absoluteCeilings.putAll(absoluteCeilings);
         copy.absoluteFloors.putAll(absoluteFloors);
         copy.bonusMoreValues.putAll(bonusMoreValues);
+        copy.increasedConversions.putAll(increasedConversions);
         if (copy.recorded != null && recorded != null) {
             recorded.forEach((stat, terms) -> copy.recorded.put(stat, new ArrayList<>(terms)));
         }
@@ -170,6 +173,32 @@ public final class MachineStatAccumulator {
         record(StatBreakdown.Kind.BONUS_MORE, stat, factor);
     }
 
+    /**
+     * Converts the positive part of {@code from}'s increased bucket into flat {@code to}: {@code perPercent} of {@code to}
+     * for each 1% increased. Reductions on {@code from} still apply. The conversion reads the bucket when a value is
+     * asked for, so increases applied after this call are converted too.
+     */
+    public void convertIncreased(MachineStat from, MachineStat to, double perPercent) {
+        checkMutable();
+        Component source = sources.isEmpty() ? FALLBACK_SOURCE : sources.peek();
+        increasedConversions.put(accumulationStat(from), new IncreasedConversion(accumulationStat(to), perPercent, source));
+        record(StatBreakdown.Kind.CONVERTED, from, perPercent);
+    }
+
+    private record IncreasedConversion(MachineStat to, double perPercent, Component source) {
+    }
+
+    /** What every conversion into {@code to} adds to it. */
+    private double convertedInto(MachineStat to) {
+        double converted = 0.0;
+        for (Map.Entry<MachineStat, IncreasedConversion> entry : increasedConversions.entrySet()) {
+            if (entry.getValue().to() == to) {
+                converted += entry.getValue().perPercent() * Math.max(0.0, increasedPercentValues.getOrDefault(entry.getKey(), 0.0));
+            }
+        }
+        return converted;
+    }
+
     public Optional<StatBreakdown> breakdown(MachineStat stat) {
         if (recorded == null) {
             return Optional.empty();
@@ -181,6 +210,12 @@ public final class MachineStatAccumulator {
             terms.add(new StatBreakdown.Term(StatBreakdown.Kind.BASE, base, BASE_SOURCE));
         }
         terms.addAll(recorded.getOrDefault(resolvedStat, List.of()));
+        increasedConversions.forEach((from, conversion) -> {
+            double converted = conversion.perPercent() * Math.max(0.0, increasedPercentValues.getOrDefault(from, 0.0));
+            if (conversion.to() == resolvedStat && converted != 0.0) {
+                terms.add(new StatBreakdown.Term(StatBreakdown.Kind.ADD, converted, conversion.source()));
+            }
+        });
         return Optional.of(new StatBreakdown(resolvedStat, terms, value(resolvedStat)));
     }
 
@@ -864,7 +899,7 @@ public final class MachineStatAccumulator {
     public double valueWithIncreased(MachineStat stat, double extraPercent) {
         MachineStat resolvedStat = accumulationStat(stat);
         double base = baseValues.getOrDefault(resolvedStat, 0.0);
-        double added = additiveValues.getOrDefault(resolvedStat, 0.0);
+        double added = additiveValues.getOrDefault(resolvedStat, 0.0) + convertedInto(resolvedStat);
         double more = moreValues.getOrDefault(resolvedStat, 1.0);
         double ordinary = (base + added) * increasedScale(resolvedStat, extraPercent) * more;
         double floored = floored(ordinary, absoluteFloors.get(resolvedStat), bonusMoreValues.getOrDefault(resolvedStat, 1.0));
@@ -889,6 +924,9 @@ public final class MachineStatAccumulator {
     public double effectiveIncreasedPercent(MachineStat stat, double extraPercent) {
         MachineStat resolvedStat = accumulationStat(stat);
         double increased = increasedPercentValues.getOrDefault(resolvedStat, 0.0) + extraPercent;
+        if (increasedConversions.containsKey(resolvedStat)) {
+            increased = Math.min(0.0, increased);
+        }
         Double cap = increasedSoftCaps.get(resolvedStat);
         return cap == null ? increased : softCapped(increased, cap);
     }

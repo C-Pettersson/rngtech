@@ -76,6 +76,7 @@ Initial v1 family weights are static Java metadata:
 | Crusher-specific prefix families | `65` |
 | Crush Head prefix families | `65` |
 | Miner's Companion filter slots | `60` |
+| Control, Drive, and Reserve attribute suffixes | `50` each |
 
 Old saved modifiers that only have stat, operation, value, and slot still decode. They receive a default group derived from operation and stat so legacy stat-only data remains valid and still participates in duplicate checks.
 
@@ -92,6 +93,7 @@ Current slot rule of thumb:
 | Processing speed | Suffix |
 | Energy generation and energy usage | Suffix |
 | Input, output, and addon slots | Suffix |
+| Control, Drive, and Reserve attribute points | Suffix on Mastery machines and their Gear |
 | Output amount | Suffix |
 | Heat insulation | Implicit when authored onto a concrete item or part identity; not randomly rolled |
 | Instant Process and Super Output chance | Suffix |
@@ -167,6 +169,26 @@ The current percent-scaling table is:
 | 7 | `110-140%` increased or reduced |
 
 Example: an energy-generation affix at tier 2 rolls one value from `4-10%`, such as `7% increased ENERGY_GENERATION`.
+
+## Attribute suffixes
+
+Status: Prototype
+
+Machines with [Machine Mastery](machine-mastery.md#attributes) and the Gear they accept roll flat Control, Drive, and Reserve suffixes through the `HAS_MASTERY_ATTRIBUTES` capability: the Crusher, Furnace, electric Furnace, Alloy Furnace, Metal Press, Melter, Resonance Calibrator, and Forestry Companion, and Crush Heads, Heat Cores, Servos, Fluid Pumps, Alloy Crucibles, Resonance Coils, Control Boards, and Stabilizer Matrices. Each attribute is its own modifier group with roll weight `50`, so one item can hold up to three attribute suffixes but never two of one attribute.
+
+| Tier | Flat attribute points |
+|---:|---:|
+| 1 | `3-5` |
+| 2 | `6-9` |
+| 3 | `10-14` |
+| 4 | `15-20` |
+| 5 | `21-27` |
+| 6 | `28-35` |
+| 7 | `36-45` |
+
+A Tier 3 roll is worth about six travel nodes. Attribute points are machine-wide even on a part: they skip the part's local scaling, and the machine adds them before its Mastery attribute conversions. A part installed in a machine without Mastery rolls them but gains nothing.
+
+The design follows Path of Exile's split between regular gearing and attribute stacking. A direct stat suffix is better for a machine that only has travel points. An attribute suffix is better for a build that takes increased-attribute nodes, attribute scaling notables, or an actuation keystone.
 
 ## Code-Backed Modifier Ranges
 

@@ -214,6 +214,24 @@ public final class ComponentBaseStatCatalog {
         }
     }
 
+    /**
+     * Control, Drive, and Reserve rolled on a part. They describe the machine rather than the part, and the machine adds
+     * them before its Mastery attribute conversions, separately from {@link #applyEffectiveContribution}, because the
+     * Furnace applies each Heat Core to one lane while attributes belong to the whole machine.
+     */
+    public static void applyAttributeAffixes(MachineStatAccumulator target, ItemStack stack) {
+        if (profile(stack) == null) {
+            return;
+        }
+        try (MachineStatAccumulator.Source ignored = target.source(stack.getHoverName())) {
+            for (MachineModifier modifier : componentTraits(stack).modifiers()) {
+                if (modifier.slot().isAffix() && MachineStat.isAttribute(modifier.stat())) {
+                    target.apply(modifier);
+                }
+            }
+        }
+    }
+
     public static void applyVacuumCollapseNozzleContribution(MachineStatAccumulator target, ItemStack stack) {
         if (!(stack.getItem() instanceof CollapseNozzleItem nozzle) || !nozzle.material().vacuumCollapseCompatible()) {
             return;

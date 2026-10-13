@@ -59,9 +59,9 @@
             "y": 1,
             "effects": [
                 {
-                    "stat": "HEAT_TRANSFER",
+                    "stat": "MAX_TEMPERATURE",
                     "operation": "INCREASED_PERCENT",
-                    "value": 8
+                    "value": 4
                 }
             ]
         },
@@ -73,9 +73,9 @@
             "y": 2,
             "effects": [
                 {
-                    "stat": "HEAT_TRANSFER",
+                    "stat": "PROCESSING_SPEED",
                     "operation": "INCREASED_PERCENT",
-                    "value": 40
+                    "value": 20
                 }
             ]
         },
@@ -163,9 +163,9 @@
             "y": 3,
             "effects": [
                 {
-                    "stat": "HEAT_TRANSFER",
+                    "stat": "MAX_TEMPERATURE",
                     "operation": "INCREASED_PERCENT",
-                    "value": 8
+                    "value": 4
                 }
             ]
         },

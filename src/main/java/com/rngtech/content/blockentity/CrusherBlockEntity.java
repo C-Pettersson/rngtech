@@ -690,11 +690,13 @@ public class CrusherBlockEntity extends BaseMachineBlockEntity implements MenuPr
         MachineTraits activeTraits = effectiveTraits();
         stats.apply(activeTraits);
 
-        CrusherPassiveTree.applyStats(stats, machineProgression());
+        MegaPassiveTree.applyNodeStats(stats, machineProgression(), MachineMasteryFamily.CRUSHER);
         ItemStack crushHead = crushHeadStack();
         if (isAllowedCrushHead(crushHead)) {
             ComponentBaseStatCatalog.applyEffectiveContribution(stats, crushHead);
+            ComponentBaseStatCatalog.applyAttributeAffixes(stats, crushHead);
         }
+        MegaPassiveTree.applyAttributeStats(stats, machineProgression(), MachineMasteryFamily.CRUSHER);
         if (!hasBatteryCell()) {
             try (MachineStatAccumulator.Source ignored = stats.source(MachineStatAccumulator.NO_BATTERY_SOURCE)) {
                 stats.scaleBonus(MachineStat.OUTPUT_AMOUNT, noBatteryOutputMultiplier(stats));

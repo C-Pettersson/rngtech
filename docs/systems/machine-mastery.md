@@ -8,9 +8,9 @@ Machine Mastery is progression owned by each machine chassis. Machines share one
 
 ## Shared tree
 
-The catalog contains 1347 nodes: six starts, 634 attribute travel nodes, 480 ordinary nodes, 195 notables, and 32 keystones, joined by 1500 links. It is built in layers. Inside the six starts, a central junction splits three ways to a core ring, so every machine can path through the middle and reaches the center for the same number of points. Each start opens into a home region with its own road shape between two boundary spokes. A middle ring leads through outer star hubs and climbs to the perimeter road.
+The catalog contains 1348 nodes: six starts, 634 attribute travel nodes, 480 ordinary nodes, 195 notables, and 33 keystones, joined by 1501 links. It is built in layers. Inside the six starts, a central junction splits three ways to a core ring, so every machine can path through the middle and reaches the center for the same number of points. Each start opens into a home region with its own road shape between two boundary spokes. A middle ring leads through outer star hubs and climbs to the perimeter road.
 
-Optional reward constellations branch from single road gates: arcs, forks, diamonds, pearl chains, horseshoes, rings, wheels, lattices, crowns, and hexagram stars. Distinct constellations are separated by travel steps. Each notable requires at least three reward allocations from its road gate, and constellations cannot shortcut between roads. Keystones are spread through every layer, either directly on a road or at the end of a reward arm, and always at least 10 points from every start. Silent Operation sits on the center junction, 10 points from every start. Attribute Transfiguration, Singular Drive, and Reserve Actuation sit around the core, where any start can path inward to them. Family keystones sit in the home regions, outer field, and perimeter near their family's start; Even Feed hangs directly off a road in the Furnace's home region. Output constellations appear on both sides of the tree: Material Memory and Fine Screens mirror the Drive region's Recovery wheels on the Control and Reserve / Control side, with Single Pass on the road between them.
+Optional reward constellations branch from single road gates: arcs, forks, diamonds, pearl chains, horseshoes, rings, wheels, lattices, crowns, and hexagram stars. Distinct constellations are separated by travel steps. Each notable requires at least three reward allocations from its road gate, and constellations cannot shortcut between roads. Keystones are spread through every layer, either directly on a road or at the end of a reward arm, and always at least 10 points from every start. Silent Operation sits on the center junction, 10 points from every start. Attribute Transfiguration, Singular Drive, and Reserve Actuation sit around the core, where any start can path inward to them; Governed Actuation sits on the perimeter between the Melter and Reserve starts. Family keystones sit in the home regions, outer field, and perimeter near their family's start; Even Feed hangs directly off a road in the Furnace's home region, and Surge Cycling off the outer road beside the Reserve region's Surge pockets. Output constellations appear on both sides of the tree: Material Memory and Fine Screens mirror the Drive region's Recovery wheels on the Control and Reserve / Control side, with Single Pass on the road between them.
 
 Every paid allocation costs one point and must connect to the machine's start through allocated nodes. Foreign starts cannot be allocated or used as shortcuts. Nodes have no individual level or chassis-stage gates.
 
@@ -33,6 +33,8 @@ All nodes remain visible and selectable regardless of machine family. Applicabil
 
 Control, Drive, and Reserve are point totals. Travel nodes grant flat points; dedicated clusters increase individual attributes or all three attributes. Attribute increases use the same modifier rules as other stats.
 
+Machines with Mastery and the Gear they accept can also roll flat attribute suffixes, one modifier group per attribute; [Affix Generation](affix-generation.md#attribute-suffixes) owns their tiers and weights. Attribute points are machine-wide even on a part, so the Furnace counts every installed Heat Core's points although each lane applies only its own core. Machines apply the tree's node effects, then Gear, then the conversions and explicit scaling below, so Gear points feed both.
+
 Inherent conversions use final, nonnegative attribute totals:
 
 | Attribute | Shared conversion | Family conversion |
@@ -43,9 +45,29 @@ Inherent conversions use final, nonnegative attribute totals:
 
 Conversions only have a gameplay effect where the receiving stat is used. For example, the primitive fuel Furnace has no FE buffer to benefit from Reserve's energy capacity conversion. Gear and chassis remain the main sources of processing capability.
 
-Explicit attribute scaling is separate. A node can grant an authored percentage per attribute point in addition to inherent conversions. **Attributes grant no inherent bonuses** removes only the conversions in the table: totals, attribute modifiers, and explicit scaling remain. Attribute Transfiguration grants 100% more of each attribute with that restriction. Reserve Actuation uses the same restriction and grants 0.5% increased Processing Speed per Reserve.
+Explicit attribute scaling is separate. A node can grant an authored percentage per attribute point in addition to inherent conversions. **Attributes grant no inherent bonuses** removes only the conversions in the table: totals, attribute modifiers, and explicit scaling remain.
 
-Steady State grants 50% more Stability with 15% less Processing Speed. Singular Drive grants 50% more Drive with 50% less Control and Reserve. Lean Grid applies 30% less Energy Usage for machines with an energy buffer and 50% less Energy Capacity. Single Pass disables bonus output and grants 30% more Processing Speed for machines with bonus output. Even Feed makes automation fill a Furnace's input lanes evenly and has no penalty beyond its allocation. Family keystones are described on each machine page.
+| Source | Scaling per point |
+| --- | --- |
+| Governed Draw, Measured Hand (home) | Control: 0.03% reduced Energy Usage |
+| Torque Conversion, Driven Cadence (home) | Drive: 0.08% increased Processing Speed |
+| Stored Momentum, Deep Cell Tap (home) | Reserve: 0.02% reduced Energy Usage |
+| Disciplined Pace (outer, Control) | Control: 0.04% increased Processing Speed |
+| Thermal Discipline (outer, Reserve / Control) | Control: 0.1% increased Temperature Stability |
+| Kinetic Feed (outer, Control / Drive) | Drive: +0.01% Instant Process chance |
+| Driven Bellows (outer, Drive / Reserve) | Drive: 0.15% increased Heat Transfer |
+| Banked Heat (outer, Reserve) | Reserve: 0.15% increased Heat Isolation |
+| Deep Firebox (outer, Drive / Reserve) | Reserve: 0.15% increased Fuel Duration |
+| Reserve Actuation (keystone; Reserve loses its inherent bonuses) | Reserve: 0.4% increased Processing Speed |
+| Governed Actuation (keystone; Control loses its inherent bonuses) | Control: 0.35% increased Processing Speed |
+
+Each scaling notable also grants 10% increased of its attribute. Attribute Transfiguration grants 100% more of each attribute with no inherent bonuses, so it only pays a build whose explicit scaling outweighs the inherent conversions, such as an actuation keystone fed by attribute suffixes. Singular Drive and Deep Reserve grant 50% more of one attribute with 50% less of the other two.
+
+This is the attribute-stacking trade-off. Increased-attribute nodes (4% on small nodes, 12% plus 5 flat on notables, 6% of all three on the Integrated notables, and 8% on Convergence) are weaker than direct stat nodes for a machine that only has travel points, and stronger once scaling notables and Gear suffixes raise the base. An attribute suffix spends a slot that could hold a direct stat. In a greedy 99-point speed build, a Drive/Reserve Furnace reaches about 180% increased Processing Speed with ordinary nodes; Reserve Actuation reaches about 135%, or about 190% with 60 Reserve from Gear; adding Attribute Transfiguration reaches about 255%, or about 370% with that Gear. These numbers are prototype targets for playtesting.
+
+Surge Cycling trades guaranteed speed for random speed. On every machine that has Instant Process, the positive increased Processing Speed bucket becomes Instant Process chance instead, 0.3% per 1% increased, and Instant Process cannot exceed 75%. Reduced Processing Speed and more or less multipliers still apply. The conversion reads the bucket after Gear and every later increase, so speed suffixes still matter under it. A plain build at 200% increased Processing Speed runs three times as fast; under Surge Cycling the same build gets 60% Instant Process, about 2.5 times as fast, and Instant Process suffixes, Surge nodes, and Kinetic Feed take it to the 75% cap, four times as fast.
+
+Steady State grants 50% more Stability with 15% less Processing Speed. Lean Grid applies 30% less Energy Usage for machines with an energy buffer and 50% less Energy Capacity. Single Pass disables bonus output and grants 30% more Processing Speed for machines with bonus output. Even Feed makes automation fill a Furnace's input lanes evenly and has no penalty beyond its allocation. Family keystones are described on each machine page.
 
 Tool Control retains its separate durability mechanic; these machine conversions do not change tools.
 
@@ -55,18 +77,21 @@ A tagged effect applies only to machines in its group, and only where the machin
 
 | Tag | Machines | Used by |
 | --- | --- | --- |
-| Heated machines | Furnace, Alloy Furnace, Metal Press | Flash Annealing speed; Low Heat Specialist Energy Usage and Fuel Efficiency |
+| Heated machines | Furnace, Alloy Furnace, Metal Press | Flash Annealing speed |
+| Furnaces | Furnace | Low Heat Specialist Energy Usage and Fuel Efficiency |
 | Crushers | Crusher | Soft Material Specialist speed, Cell Bypass Energy Capacity |
 | Machines with bonus output | Crusher, Furnace, Alloy Furnace, Metal Press, Resonance Calibrator | Single Pass speed |
 | Machines with an energy buffer | Every family except the Forestry Companion | Lean Grid Energy Usage reduction |
 
-Group membership follows each machine's real stat surface. Heated machines are those whose maximum temperature accepts absolute limits; the Melter is excluded because every Melter recipe needs more heat than those limits allow. Machines with bonus output use Output Amount or Super Output. Only the Crusher reads Output Amount; the other members produce bonus output through Super Output.
+Group membership follows each machine's real stat surface. Heated machines are those whose maximum temperature accepts absolute limits; the Melter is excluded because every Melter recipe needs more heat than those limits allow. Low Heat Specialist pays only the Furnace, because its 800 cap leaves no Alloy Furnace recipe and three Metal Press recipes. Machines with bonus output use Output Amount or Super Output. Only the Crusher reads Output Amount; the other members produce bonus output through Super Output.
 
-Single Pass disables bonus output: Output Amount cannot exceed the base output, and Super Output and Crusher salvage chances drop to zero. It never raises a penalized Output Amount, such as a Crusher running without a Battery Cell.
+Single Pass disables bonus output: Output Amount cannot exceed the base output, and Super Output and Crusher salvage chances drop to zero. Every stat and behavior declared as output yield also drops out, including ascendancy cadences, ledgers, Fluid Yield, and yield behaviors such as Fault Lines, on every family, while only machines with bonus output gain its speed. It never raises a penalized Output Amount, such as a Crusher running without a Battery Cell.
 
 The two heat keystones split one choice under a heat cap: Flash Annealing (1000) buys throughput with more FE or fuel per item, and Low Heat Specialist (800) halves FE or fuel per item at the same speed. A fuel Furnace burns fuel per working tick, so Flash Annealing also carries less Fuel Efficiency; without it, its speed alone would halve fuel per item and beat Low Heat Specialist on a Stage 0 Furnace.
 
 Untagged penalties still apply everywhere. Flash Annealing's 50% more Energy Usage and Soft Material Specialist's 50% more Energy Usage reach every machine that allocates them, as the Closed Loop Recuperator's speed penalty does.
+
+The Stage 0 Furnace burns fuel instead of FE, so a keystone that pays the Furnace carries a fuel cost beside any Energy Usage cost: Flash Annealing and Redline Drive reduce Fuel Efficiency, and High Flux reduces Fuel Duration.
 
 ## Modifier keywords and hard constraints
 
@@ -74,7 +99,9 @@ The canonical operation definitions are in [Affix Generation](affix-generation.m
 
 Two 50% reduced modifiers add to 100% reduced. Two 50% less modifiers leave 25%. A 100% less modifier leaves zero even with increased modifiers. “More” and “less” are written as percentages in tooltips and stored as factors in the catalog: `1.5` means 50% more; `0.75` means 25% less.
 
-Fixed values and hard ceilings resolve after ordinary modifiers, including Gear. A fixed maximum temperature of 800 sets it to 800; a ceiling of 800 only prevents exceeding 800. The lower value wins when absolute maximum values conflict. Keystone heat limits are ceilings, so Flash Annealing (1000) and Low Heat Specialist (800) never raise a weaker heat source to their limit. A recipe hardness ceiling rejects harder Crusher recipes regardless of installed head or processing level; ordinary under-level recipes retain their existing penalty behavior when no hard ceiling forbids them.
+Fixed values and hard ceilings resolve after ordinary modifiers, including Gear. A fixed maximum temperature of 800 sets it to 800; a ceiling of 800 only prevents exceeding 800. The lower value wins when absolute maximum values conflict. Keystone heat limits are ceilings, so Flash Annealing (1000) and Low Heat Specialist (800) never raise a weaker heat source to their limit.
+
+Idle heat machines lose `2 × Cooling Rate / Heat Isolation` degrees per tick, at least 0.25. The fractional part is spread over ticks rather than rounded, so every Insulation, Thermal Inertia, and Thermal Reservoir bonus slows cooling. A recipe hardness ceiling rejects harder Crusher recipes regardless of installed head or processing level; ordinary under-level recipes retain their existing penalty behavior when no hard ceiling forbids them.
 
 ## XP and chassis ownership
 
@@ -91,7 +118,7 @@ Successful work grants `base machine_xp × (1 + floor(band² / 20))`, followed b
 
 Quarter-XP remainders persist. Positive-XP Crusher recipes derive bands from hardness, and Melter recipes from required processing level on the same scale. Furnace, Alloy Furnace, and Metal Press recipes derive them from target heat, and calibration recipes from the required calibrator stage. Their old 1–25 bands map to 1–98 with `min(98, 1 + floor((oldBand − 1) × 97 / 24))`. An explicitly authored `machine_xp_band` uses the new level scale directly. Forestry uses `min(98, 12 + floor(sqrt(Tree Fell Limit)) × 10)` for completed planting, leaf cleanup, and harvesting actions. Stronger work capability raises its training ceiling. Work in band 98 can eventually reach level 100.
 
-Progression survives supported drops, pick-block, and replacement through `rngtech:machine_progression`. It does not transfer to independently crafted higher-stage chassis. Existing saves preserve XP and earned levels while refunding old machine-specific allocations. New saves store versioned stable node IDs and ordered target builds instead of two node masks. Catalog version 2 replaced the version 1 layout, so version 1 allocations and target builds are refunded and version 1 build codes are rejected.
+Progression survives supported drops, pick-block, and replacement through `rngtech:machine_progression`. It does not transfer to independently crafted higher-stage chassis. Existing saves preserve XP and earned levels while refunding old machine-specific allocations. New saves store versioned stable node IDs and ordered target builds instead of two node masks. Catalog version 2 replaced the version 1 layout, so version 1 allocations and target builds are refunded and version 1 build codes are rejected. Catalog version 3 keeps the version 2 layout but renames retired themes and keystones. `data/rngtech/mastery/migrations.json` maps each version 2 node to the version 3 node in the same position, so version 2 saves and build codes keep their shape. Cold Standby, now Governed Actuation, is dropped and refunded, and anything a dropped node disconnects is cut off. A migrated machine gets one free Full Reset: its next Clear costs no Mastery Refunds.
 
 ## Allocating, refunding, and copying
 
@@ -143,7 +170,7 @@ No mix of recipes may return every consumed input while gaining items or produci
 
 The checked-in runtime catalog is `src/main/resources/data/rngtech/mastery/machine_tree.json`. `tools/moddex/layout-mega-tree.mjs` deterministically lays out the road layers, keystone placements, and reward constellations without crossings; `author-mega-tree.mjs` assigns attributes, themes, notable names, special notables, and keystones, then writes the catalog and language entries. Later additions go in its `EXTRAS` list, which the layout places after the original fill so existing node IDs, positions, and links stay stable. ModDex reads this catalog directly; its JSON draft and Java layout exports remain authoring views rather than runtime catalog writers. Follow [Passive Tree Design Rules](../reference/passive-tree-design-rules.md) when changing geometry or connections.
 
-Run `node tools/moddex/check-mega-tree.mjs --report` to refresh the [audit report](../reference/machine-mega-tree-audit.json). It includes paths from all starts and representative 99-point builds combining local investment with distant keystones. `masteryCheck`, included in `quickCheck` and `ciCheck`, checks modifier math, migration, build ordering, connectivity, point budgets, attribute suppression, hard constraints, tagged payoffs, the bonus summary, and a keystone audit that fails when a payoff reaches a machine that escapes the keystone's cost. `npm run moddex:check` checks catalog geometry and export consistency.
+Run `node tools/moddex/check-mega-tree.mjs --report` to refresh the [audit report](../reference/machine-mega-tree-audit.json). It includes paths from all starts and representative 99-point builds combining local investment with distant keystones. `masteryCheck`, included in `quickCheck` and `ciCheck`, checks modifier math, migration, build ordering, connectivity, point budgets, attribute suppression, hard constraints, tagged payoffs, the bonus summary, and a keystone audit that fails when a payoff reaches a machine that escapes the keystone's cost. `TreeAuditChecks` adds the balance audits in [Passive Tree Design Rules](../reference/passive-tree-design-rules.md#keep-every-node-live): claimed stats are read by the machine, every node pays some machine, the fuel Furnace pays for its payoffs, heat limits leave recipes, no keystone is dominated, and Single Pass disables declared yield. `npm run moddex:check` checks catalog geometry and export consistency.
 
 Ascendancies are data-driven. `data/rngtech/mastery/ascendancies/index.json` lists one file per ascendancy in display order, and each file holds its family and nodes. New stats and behaviors are declared, with the families they reach and their yield kind, in `data/rngtech/mastery/declarations.json`. The catalog validates tree shape and family support on load and is not datapack-overridable. `masteryCheck` validates every shipped ascendancy, runs test-only fixture ascendancies, and checks language keys and icons. `node tools/moddex/export-ascendancy-data.mjs --write-docs` regenerates the node tables on each family page, and `npm run moddex:check` fails when they are stale or a declared stat has no [Machine Stats](../reference/machine-stats.md#ascendancy-stats) row.
 

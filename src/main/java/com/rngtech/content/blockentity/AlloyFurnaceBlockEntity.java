@@ -483,10 +483,11 @@ public class AlloyFurnaceBlockEntity extends BaseMachineBlockEntity implements M
     protected MachineStatAccumulator buildStats() {
         MachineStatAccumulator stats = MachineBaseStatCatalog.alloyFurnace(chassis());
         stats.apply(activeTraits());
-        MegaPassiveTree.applyStats(stats, machineProgression(), MachineMasteryFamily.ALLOY_FURNACE);
+        MegaPassiveTree.applyNodeStats(stats, machineProgression(), MachineMasteryFamily.ALLOY_FURNACE);
         applyGearStats(stats, heatCoreStack());
         applyGearStats(stats, crucibleStack());
         applyGearStats(stats, servoStack());
+        MegaPassiveTree.applyAttributeStats(stats, machineProgression(), MachineMasteryFamily.ALLOY_FURNACE);
         if (!hasBatteryCell()) {
             stats.apply(MachineStatAccumulator.NO_BATTERY_SOURCE, new MachineModifier(
                     ModifierSlot.IMPLICIT,
@@ -1164,7 +1165,7 @@ public class AlloyFurnaceBlockEntity extends BaseMachineBlockEntity implements M
     }
 
     private void cool(MachineStatAccumulator stats) {
-        currentTemperature = Math.max(HeatControl.AMBIENT_TEMPERATURE, currentTemperature - HeatControl.coolingRate(stats));
+        currentTemperature = Math.max(HeatControl.AMBIENT_TEMPERATURE, currentTemperature - HeatControl.coolingStep(stats, level == null ? 0L : level.getGameTime()));
         if (currentTemperature <= HeatControl.AMBIENT_TEMPERATURE) {
             clearHeatEnvelope();
         }
@@ -1204,6 +1205,9 @@ public class AlloyFurnaceBlockEntity extends BaseMachineBlockEntity implements M
                 recipe.requiredTemperatureStability(),
                 stats
         );
+        if (hasMasteryBehavior("QUENCH_PROTOCOL")) {
+            addedStrain = HeatControl.quenched(addedStrain);
+        }
         if (addedStrain > 0) {
             failureStrain = Math.min(HeatControl.FAILURE_STRAIN_THRESHOLD, failureStrain + addedStrain);
             return;
@@ -1294,6 +1298,7 @@ public class AlloyFurnaceBlockEntity extends BaseMachineBlockEntity implements M
     private void applyGearStats(MachineStatAccumulator stats, ItemStack stack) {
         if (stack.getItem() instanceof MachinePartItem) {
             ComponentBaseStatCatalog.applyEffectiveContribution(stats, stack);
+            ComponentBaseStatCatalog.applyAttributeAffixes(stats, stack);
         }
     }
 
