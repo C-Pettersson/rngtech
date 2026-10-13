@@ -55,7 +55,7 @@ A tagged effect applies only to machines in its group, and only where the machin
 
 | Tag | Machines | Used by |
 | --- | --- | --- |
-| Heated machines | Furnace, Alloy Furnace, Metal Press | Low Heat Specialist and Flash Annealing speed |
+| Heated machines | Furnace, Alloy Furnace, Metal Press | Flash Annealing speed; Low Heat Specialist Energy Usage and Fuel Efficiency |
 | Crushers | Crusher | Soft Material Specialist speed, Cell Bypass Energy Capacity |
 | Machines with bonus output | Crusher, Furnace, Alloy Furnace, Metal Press, Resonance Calibrator | Single Pass speed |
 | Machines with an energy buffer | Every family except the Forestry Companion | Lean Grid Energy Usage reduction |
@@ -63,6 +63,8 @@ A tagged effect applies only to machines in its group, and only where the machin
 Group membership follows each machine's real stat surface. Heated machines are those whose maximum temperature accepts absolute limits; the Melter is excluded because every Melter recipe needs more heat than those limits allow. Machines with bonus output use Output Amount or Super Output. Only the Crusher reads Output Amount; the other members produce bonus output through Super Output.
 
 Single Pass disables bonus output: Output Amount cannot exceed the base output, and Super Output and Crusher salvage chances drop to zero. It never raises a penalized Output Amount, such as a Crusher running without a Battery Cell.
+
+The two heat keystones split one choice under a heat cap: Flash Annealing (1000) buys throughput with more FE or fuel per item, and Low Heat Specialist (800) halves FE or fuel per item at the same speed. A fuel Furnace burns fuel per working tick, so Flash Annealing also carries less Fuel Efficiency; without it, its speed alone would halve fuel per item and beat Low Heat Specialist on a Stage 0 Furnace.
 
 Untagged penalties still apply everywhere. Flash Annealing's 50% more Energy Usage and Soft Material Specialist's 50% more Energy Usage reach every machine that allocates them, as the Closed Loop Recuperator's speed penalty does.
 
@@ -72,7 +74,7 @@ The canonical operation definitions are in [Affix Generation](affix-generation.m
 
 Two 50% reduced modifiers add to 100% reduced. Two 50% less modifiers leave 25%. A 100% less modifier leaves zero even with increased modifiers. “More” and “less” are written as percentages in tooltips and stored as factors in the catalog: `1.5` means 50% more; `0.75` means 25% less.
 
-Fixed values and hard ceilings resolve after ordinary modifiers, including Gear. A fixed maximum temperature of 800 sets it to 800; a ceiling of 800 only prevents exceeding 800. The lower value wins when absolute maximum values conflict. Keystone heat limits are ceilings, so Low Heat Specialist (800) and Flash Annealing (600) never raise a weaker heat source to their limit. A recipe hardness ceiling rejects harder Crusher recipes regardless of installed head or processing level; ordinary under-level recipes retain their existing penalty behavior when no hard ceiling forbids them.
+Fixed values and hard ceilings resolve after ordinary modifiers, including Gear. A fixed maximum temperature of 800 sets it to 800; a ceiling of 800 only prevents exceeding 800. The lower value wins when absolute maximum values conflict. Keystone heat limits are ceilings, so Flash Annealing (1000) and Low Heat Specialist (800) never raise a weaker heat source to their limit. A recipe hardness ceiling rejects harder Crusher recipes regardless of installed head or processing level; ordinary under-level recipes retain their existing penalty behavior when no hard ceiling forbids them.
 
 ## XP and chassis ownership
 

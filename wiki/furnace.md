@@ -124,6 +124,11 @@ Automation fills the input lanes in order: lane 1 takes a full stack before lane
 
 Smelting ores, raw metals, crushed ores, and alloy blends earns Furnace Mastery XP, and you spend the points on the shared [Machine Mastery](machine-mastery.md) tree. Reversible dust-to-ingot smelts, food, and decorative blocks earn no XP. Furnaces choose between the **Crucible Keeper** and **Bloomer** [ascendancies](machine-mastery.md#ascendancies).
 
+Two keystones cap your heat in exchange for speed or savings. Each cap only stops Gear from going higher; it never raises a weaker Heat Core. Compare the caps with the heat column in the [recipe table](#furnace-recipes).
+
+- **Flash Annealing** caps Max Temperature at 1,000 heat. It gives 100% more Processing Speed, with 50% more Energy Usage and 50% less Fuel Efficiency. An electric Furnace smelts twice as fast, and each smelt costs 1.5 times the FE. A Stage 0 Furnace smelts twice as fast for the same fuel per smelt.
+- **Low Heat Specialist** caps Max Temperature at 800 heat, enough for Iron and Copper. It gives 50% less Energy Usage and 100% more Fuel Efficiency, so each smelt costs half the FE or fuel at the same speed.
+
 ### Furnace recipes
 
 The Furnace uses its own recipe type, `rngtech:furnace`, which covers vanilla smelting as well as RNGTech metals, alloy blends, and malformed-ingot recovery.

@@ -127,9 +127,11 @@ const KEYSTONES = [
     { id: "precision_jaw_mount", name: "Precision Jaw Mount", behaviors: ["MATCHING_HEAD"], effects: [effect("OUTPUT_AMOUNT", 10), effect("CRUSHER_SALVAGE_CHANCE", 2, "ADD")] },
     { id: "soft_material_specialist", name: "Soft Material Specialist", recipeHardnessCeiling: 2, effects: [tagged("CRUSHING", effect("PROCESSING_SPEED", 3, "MORE")), effect("ENERGY_USAGE", 1.5, "MORE")] },
     { id: "heavy_yield", name: "Heavy Yield", effects: [effect("OUTPUT_AMOUNT", 15), effect("ENERGY_USAGE", 1.5, "MORE")] },
-    // Heat limits are ceilings, so a weak heat source is never raised to the limit.
-    { id: "flash_annealing", name: "Flash Annealing", ceilings: { MAX_TEMPERATURE: 600 }, effects: [tagged("HEATED", effect("PROCESSING_SPEED", 2, "MORE")), effect("ENERGY_USAGE", 1.5, "MORE")] },
-    { id: "low_heat_specialist", name: "Low Heat Specialist", ceilings: { MAX_TEMPERATURE: 800 }, effects: [tagged("HEATED", effect("PROCESSING_SPEED", 2, "MORE"))] },
+    // Heat limits are ceilings, so a weak heat source is never raised to the limit. Flash Annealing buys throughput
+    // with FE or fuel per item up to early-metal heat; Low Heat Specialist halves FE or fuel per item under a lower cap.
+    // A fuel Furnace burns per working tick, so Flash Annealing's fuel cost keeps its speed from also saving fuel.
+    { id: "flash_annealing", name: "Flash Annealing", ceilings: { MAX_TEMPERATURE: 1000 }, effects: [tagged("HEATED", effect("PROCESSING_SPEED", 2, "MORE")), effect("ENERGY_USAGE", 1.5, "MORE"), effect("FUEL_EFFICIENCY", 0.5, "LESS")] },
+    { id: "low_heat_specialist", name: "Low Heat Specialist", ceilings: { MAX_TEMPERATURE: 800 }, effects: [tagged("HEATED", effect("ENERGY_USAGE", 0.5, "LESS")), tagged("HEATED", effect("FUEL_EFFICIENCY", 2, "MORE"))] },
     { id: "quench_protocol", name: "Quench Protocol", behaviors: ["QUENCH_PROTOCOL"], effects: [effect("HEAT_TRANSFER", 0.75, "LESS")] },
     { id: "closed_loop_recuperator", name: "Closed Loop Recuperator", behaviors: ["CLOSED_LOOP_RECUPERATOR"], effects: [effect("PROCESSING_SPEED", 0.85, "LESS")] },
     { id: "kiln_discipline", name: "Kiln Discipline", effects: [effect("TEMPERATURE_STABILITY", 1.6, "MORE"), effect("WARMUP_TIME", 1.4, "MORE")] },
