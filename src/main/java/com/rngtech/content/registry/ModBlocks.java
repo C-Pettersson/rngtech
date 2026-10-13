@@ -333,6 +333,7 @@ public final class ModBlocks {
                     .mapColor(MapColor.METAL)
                     .strength(3.5F)
                     .sound(SoundType.METAL)
+                    .noOcclusion()
     );
     public static final DeferredBlock<GasChemistryBlock> SYNGAS_COMBUSTOR = BLOCKS.registerBlock(
             "syngas_combustor",
@@ -350,6 +351,7 @@ public final class ModBlocks {
                     .mapColor(MapColor.METAL)
                     .strength(3.5F)
                     .sound(SoundType.METAL)
+                    .noOcclusion()
     );
     public static final DeferredBlock<AmmoniaSynthesizerBlock> AMMONIA_SYNTHESIZER = BLOCKS.registerBlock(
             "ammonia_synthesizer",
@@ -358,6 +360,7 @@ public final class ModBlocks {
                     .mapColor(MapColor.METAL)
                     .strength(3.5F)
                     .sound(SoundType.METAL)
+                    .noOcclusion()
     );
     public static final DeferredBlock<AmmoniaFuelCellBlock> AMMONIA_FUEL_CELL = BLOCKS.registerBlock(
             "ammonia_fuel_cell",
