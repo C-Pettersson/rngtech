@@ -82,8 +82,8 @@ The Gear tab has four slots. No Gear can be a higher stage than the chassis.
 
 | Side | Behavior |
 |---|---|
-| Top | Inserts into the active input slots. Accepts only Alloy Furnace recipe ingredients. |
-| Bottom | Extracts finished output. |
+| Top | Inserts into the active input slots. Accepts only Alloy Furnace recipe ingredients, and never lets one ingredient fill a slot another ingredient needs; see [Automation](automation.md). |
+| Bottom | Extracts finished output. Ingredient leftovers are pushed into the inventory below; see [Automation](automation.md#ingredient-leftovers). |
 | Sides | Accepts FE, for example from a [Universal Cable](universal-cable.md). |
 
 Gear slots cannot be filled by automation.

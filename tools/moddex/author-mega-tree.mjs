@@ -144,12 +144,15 @@ const KEYSTONES = [
     { id: "cold_standby", name: "Cold Standby", effects: [effect("IDLE_LOSS", 0.4, "LESS"), effect("ENERGY_TRANSFER", 0.5, "LESS")] },
     { id: "regulated_heat", name: "Regulated Heat", ceilings: { MAX_TEMPERATURE: 1000 }, effects: [effect("TEMPERATURE_STABILITY", 1.8, "MORE")] },
     { id: "measured_recovery", name: "Measured Recovery", effects: [effect("OUTPUT_AMOUNT", 10), effect("PROCESSING_SPEED", 0.65, "LESS")] },
-    { id: "single_pass", extra: "single_pass", name: "Single Pass", behaviors: ["NO_BONUS_OUTPUT"], effects: [tagged("BONUS_OUTPUT", effect("PROCESSING_SPEED", 1.3, "MORE"))] }
+    { id: "single_pass", extra: "single_pass", name: "Single Pass", behaviors: ["NO_BONUS_OUTPUT"], effects: [tagged("BONUS_OUTPUT", effect("PROCESSING_SPEED", 1.3, "MORE"))] },
+    // Quality of life, like Silent Operation: the points spent reaching it are the cost.
+    { id: "even_feed", extra: "even_feed", name: "Even Feed", behaviors: ["EVEN_FEED"] }
 ];
 
 // Additions placed after the original fill, in design coordinates. Output constellations mirror Clean Dust Ledge on the
 // left, and Single Pass sits between them so trading bonus output for speed is a local choice. The Forestry Companion
 // pockets sit around its start; the two Work Range notables are on opposite sides so taking both costs a detour.
+// Even Feed hangs directly off a road in the outer half of the Furnace's home region.
 // An extra may replace its pocket's notables in order; a null entry keeps the themed notable.
 const EXTRAS = [
     { id: "left_recovery_upper", angle: -122, radius: 3250, shapes: ["wheel"], theme: "recovery" },
@@ -163,7 +166,8 @@ const EXTRAS = [
     { id: "forestry_outer_rows", angle: -70, radius: 3150, shapes: ["diamond"], theme: "rowcraft",
         notables: [{ name: "Outer Rows", effects: [effect("WORK_RANGE", 1, "ADD")] }] },
     { id: "forestry_reservoirs", angle: -112, radius: 2900, shapes: ["fork"], theme: "reservoirs" },
-    { id: "melter_reservoirs", angle: 150, radius: 2500, shapes: ["fork"], theme: "reservoirs" }
+    { id: "melter_reservoirs", angle: 150, radius: 2500, shapes: ["fork"], theme: "reservoirs" },
+    { id: "even_feed", angle: 9, radius: 2167, shapes: ["keyDirect"], keystone: true, layer: "home" }
 ];
 
 const regionAt = angle => {

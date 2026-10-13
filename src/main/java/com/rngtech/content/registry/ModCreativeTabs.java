@@ -148,6 +148,7 @@ public final class ModCreativeTabs {
                         }
                         output.accept(ModItems.LUBRICANT_BUCKET.get());
                         output.accept(ModItems.ELECTROLYTE_SOLUTION_BUCKET.get());
+                        output.accept(ModItems.ENDER_SLURRY_BUCKET.get());
                         output.accept(ModItems.CARBON_EXHAUST_BUCKET.get());
                         output.accept(ModItems.SYNGAS_BUCKET.get());
                         output.accept(ModItems.METHANE_BUCKET.get());

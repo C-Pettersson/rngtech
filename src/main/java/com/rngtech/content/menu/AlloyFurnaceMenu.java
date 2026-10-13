@@ -446,6 +446,20 @@ public class AlloyFurnaceMenu extends AbstractContainerMenu implements MasteryMe
         );
     }
 
+    /** Tops up a held stack first, then opens an empty slot only where automation could. */
+    private boolean moveToAlloyInputs(ItemStack stack) {
+        boolean moved = false;
+        int end = AlloyFurnaceBlockEntity.SLOT_INPUT_START + activeInputSlots();
+        for (int pass = 0; pass < 2; pass++) {
+            for (int input = AlloyFurnaceBlockEntity.SLOT_INPUT_START; input < end && !stack.isEmpty(); input++) {
+                if (slots.get(input).hasItem() == (pass == 0) && furnace.acceptsAutomatedInput(input, stack)) {
+                    moved |= moveItemStackTo(stack, input, input + 1, false);
+                }
+            }
+        }
+        return moved;
+    }
+
     @Override
     public ItemStack quickMoveStack(Player player, int index) {
         ItemStack moved = ItemStack.EMPTY;
@@ -490,12 +504,7 @@ public class AlloyFurnaceMenu extends AbstractContainerMenu implements MasteryMe
             if (!moveItemStackTo(stack, GEAR_SLOT_START + AlloyFurnaceBlockEntity.SLOT_SERVO, GEAR_SLOT_START + AlloyFurnaceBlockEntity.SLOT_SERVO + 1, false)) {
                 return ItemStack.EMPTY;
             }
-        } else if (!furnace.isAlloyInput(stack) || !moveItemStackTo(
-                stack,
-                AlloyFurnaceBlockEntity.SLOT_INPUT_START,
-                AlloyFurnaceBlockEntity.SLOT_INPUT_START + activeInputSlots(),
-                false
-        )) {
+        } else if (!moveToAlloyInputs(stack)) {
             return ItemStack.EMPTY;
         }
 

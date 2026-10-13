@@ -107,7 +107,7 @@ Electric Furnaces have a Gear tab with:
 - one **Heat Core** slot (four on the Lead Furnace, one per lane). The core's stage cannot exceed the chassis stage. On the Lead Furnace each lane heats with its own core, and the four cores do not combine. The Stats tab shows the strongest core, the one with the highest maximum temperature.
 - one **Battery Cell** slot. Without a cell, the Furnace keeps only a small internal buffer and smelts more slowly. If the Furnace has enough FE stored but the cell cannot hand it over fast enough for the current work, the status reads **Cell Rate Limited** instead of No Power. A cell with a higher Output rate fixes it.
 
-The Stage 0 Furnace burns fuel from a slot on its Process tab and does not need Gear to run.
+The Stage 0 Furnace burns fuel from a slot on its Process tab and does not need Gear to run. Its Efficiency, Fuel Efficiency, and Fuel Duration stats all make each fuel item burn longer, so one item smelts more.
 
 ### Automation
 
@@ -117,6 +117,8 @@ The Stage 0 Furnace burns fuel from a slot on its Process tab and does not need 
 | Bottom | Extracts finished output. |
 | Sides | Fuel on Stage 0, Battery Cells on electric stages. |
 | Any | Electric stages accept FE, for example from a [Universal Cable](universal-cable.md). |
+
+Automation fills the input lanes in order: lane 1 takes a full stack before lane 2 gets anything, so a slow feed into a Lead Furnace keeps one lane busy while the others sit idle. The **Even Feed** keystone on the [Machine Mastery](machine-mastery.md) tree changes that. With it, each item that arrives through automation goes to the emptiest lane that can hold it, so a hopper trickle or a full stack from a cable spreads across every lane. It does not change which items the Furnace accepts, and a lane never holds two kinds of item. Items you place by hand still go where you put them. Even Feed sits right on a road, 15 points from the Furnace start, and has no downside beyond the points it costs.
 
 ### Mastery and Ascendancies
 

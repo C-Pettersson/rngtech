@@ -7,6 +7,8 @@ import com.rngtech.content.registry.ModDataComponents;
 import com.rngtech.rpg.MachineTraits;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -45,6 +47,33 @@ public class VacuumCollapseGeneratorBlock extends BaseMachineBlock {
                 blockEntityType,
                 ModBlockEntities.VACUUM_COLLAPSE_GENERATOR.get(),
                 VacuumCollapseGeneratorBlockEntity::serverTick
+        );
+    }
+
+    /** While a collapse runs, each Dimensional Stabilizer lens draws motes into the core. */
+    @Override
+    public void animateTick(BlockState state, Level level, BlockPos pos, RandomSource random) {
+        if (!state.getValue(ACTIVE) || random.nextInt(3) != 0
+                || !(level.getBlockEntity(pos) instanceof VacuumCollapseGeneratorBlockEntity generator)
+                || generator.visualState().stabilizer().isEmpty()) {
+            return;
+        }
+        double lensX = (random.nextBoolean() ? 3.9 : 12.1) / 16.0 - 0.5;
+        double coreZ = 6.5 / 16.0 - 0.5;
+        double angle = Math.toRadians(180.0 - state.getValue(FACING).toYRot());
+        double coreWorldX = coreZ * Math.sin(angle);
+        double coreWorldZ = coreZ * Math.cos(angle);
+        double offsetX = lensX * Math.cos(angle);
+        double offsetZ = -lensX * Math.sin(angle);
+        // Portal particles travel from their offset back to their spawn point, so they spawn at the core.
+        level.addParticle(
+                ParticleTypes.PORTAL,
+                pos.getX() + 0.5 + coreWorldX,
+                pos.getY() + 7.75 / 16.0,
+                pos.getZ() + 0.5 + coreWorldZ,
+                offsetX,
+                (random.nextDouble() - 0.5) * 0.1,
+                offsetZ
         );
     }
 

@@ -21,6 +21,7 @@ import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.crafting.SizedFluidIngredient;
 
+import java.util.List;
 import java.util.Optional;
 
 public record MelterRecipe(
@@ -47,11 +48,19 @@ public record MelterRecipe(
         return fluidOutput.copy();
     }
 
+    /** Both items, matched shapeless: either slot may hold either one, and one slot may hold both when they match. */
+    public List<CountedIngredient> itemIngredients() {
+        return List.of(new CountedIngredient(primaryIngredient, 1), new CountedIngredient(secondaryIngredient, 1));
+    }
+
+    /** Units each input slot gives to {@code melts} melts, or {@code null} when the slots cannot pay for them. */
+    public int[] consumed(MelterRecipeInput input, int melts) {
+        return ShapelessMatch.consumed(itemIngredients(), new ItemStack[] {input.primary(), input.secondary()}, melts);
+    }
+
     @Override
     public boolean matches(MelterRecipeInput input, Level level) {
-        boolean direct = primaryIngredient.test(input.primary()) && secondaryIngredient.test(input.secondary());
-        boolean swapped = primaryIngredient.test(input.secondary()) && secondaryIngredient.test(input.primary());
-        return (direct || swapped) && fluidInput.test(input.fluid());
+        return consumed(input, 1) != null && fluidInput.test(input.fluid());
     }
 
     @Override

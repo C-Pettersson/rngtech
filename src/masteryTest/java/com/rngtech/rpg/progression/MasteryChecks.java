@@ -51,6 +51,7 @@ public final class MasteryChecks {
         familyAdapters();
         taggedPayoffs();
         keystonePayoffsNeedTheirCosts();
+        fuelFurnaceReadsFuelDuration();
         bonusSummary();
         statBreakdowns();
         iconTextures();
@@ -68,6 +69,8 @@ public final class MasteryChecks {
         checks += com.rngtech.content.blockentity.AlgaeCultureChecks.run();
         checks += com.rngtech.content.energy.CombustionMixtureChecks.run();
         checks += com.rngtech.content.energy.SolidFuelBurnerStokeChecks.run();
+        checks += com.rngtech.content.blockentity.VacuumCollapseChecks.run();
+        checks += com.rngtech.rpg.VoidCatalystChainChecks.run();
         System.out.println("Machine mastery: " + checks + " checks passed");
         ForestryTreeScanChecks.run();
         ForestryCartRulesChecks.run();
@@ -164,7 +167,7 @@ public final class MasteryChecks {
     }
 
     private static void graphAndBuilds() {
-        require(MegaPassiveTree.TREE.nodes().size() == 1346, "full shared catalog");
+        require(MegaPassiveTree.TREE.nodes().size() == 1347, "full shared catalog");
         for (MegaPassiveNode root : MegaPassiveTree.TREE.nodes().stream().filter(n -> n.kind() == PassiveNodeKind.STARTER).toList()) {
             require(root.links().size() == 3, "three exits per starter");
             for (MegaPassiveNode key : MegaPassiveTree.TREE.nodes().stream().filter(n -> n.kind() == PassiveNodeKind.KEYSTONE).toList()) {
@@ -361,6 +364,17 @@ public final class MasteryChecks {
         var pressOutput = MachineStatAccumulator.componentBase(Map.of(MachineStat.SUPER_OUTPUT_CHANCE, 10.0));
         MegaPassiveTree.applyStats(pressOutput, press, MachineMasteryFamily.METAL_PRESS);
         near(pressOutput.value(MachineStat.SUPER_OUTPUT_CHANCE), 0, "Single Pass removes a Metal Press's Super Output");
+
+        // Even Feed is earned without a lead-up arm: it hangs straight off a road and only the Furnace has lanes to fill.
+        MegaPassiveNode evenFeed = MegaPassiveTree.node("even_feed");
+        require(evenFeed.kind() == PassiveNodeKind.KEYSTONE && evenFeed.behaviors().equals(Set.of("EVEN_FEED")) && evenFeed.effects().isEmpty(),
+                "Even Feed is a behavior-only keystone");
+        require(evenFeed.links().size() == 1 && MegaPassiveTree.node(evenFeed.links().getFirst()).kind() == PassiveNodeKind.TRAVEL,
+                "Even Feed attaches directly to a travel node");
+        for (MachineMasteryFamily family : MachineMasteryFamily.values()) {
+            require(family.supportsBehavior("EVEN_FEED") == (family == MachineMasteryFamily.FURNACE), family + " fills lanes evenly only as a Furnace");
+        }
+        require(MegaPassiveTree.has(build(MachineMasteryFamily.FURNACE, "even_feed"), "EVEN_FEED"), "a Furnace build reaching Even Feed grants it");
     }
 
     /** Speed multiplier the destination keystone adds on top of the route that reaches it. */
@@ -404,6 +418,24 @@ public final class MasteryChecks {
             require(caught.stream().anyMatch(v -> v.contains("CRUSHER")) && caught.stream().anyMatch(v -> v.contains("MELTER"))
                     && caught.stream().noneMatch(v -> v.contains("FURNACE")), "audit catches an untagged " + id + " payoff: " + caught);
         }
+    }
+
+    /** The Furnace claims Fuel Duration, so High Flux's cost must shorten its Stage 0 burn. */
+    private static void fuelFurnaceReadsFuelDuration() {
+        require(MachineMasteryFamily.FURNACE.supports(MachineStat.FUEL_DURATION), "the Furnace claims Fuel Duration");
+        List<String> withKeystone = path(MachineMasteryFamily.FURNACE.startNodeId(), "high_flux");
+        int without = fuelTicks(withKeystone.subList(0, withKeystone.size() - 1));
+        int with = fuelTicks(withKeystone);
+        require(Math.abs(with - Math.ceil(without * 0.6)) <= 1, "High Flux burns Furnace fuel 40% shorter: " + without + " -> " + with);
+    }
+
+    private static int fuelTicks(List<String> allocated) {
+        MachineMasteryFamily family = MachineMasteryFamily.FURNACE;
+        MachineStatAccumulator stats = MachineStatAccumulator.componentBase(
+                Map.of(MachineStat.FUEL_EFFICIENCY, 1.0, MachineStat.EFFICIENCY, 1.0, MachineStat.FUEL_DURATION, 1.0));
+        MegaPassiveTree.applyStats(stats, new MachineProgressionState(MachineProgressionState.xpForLevel(MachineProgressionState.MAX_LEVEL), 0,
+                MachineProgressionState.MAX_LEVEL, allocated, family.startNodeId(), List.of(), false), family);
+        return stats.adjustedFuelTicks(16_000);
     }
 
     private static List<String> payoffWithoutCost(MegaPassiveNode keystone) {

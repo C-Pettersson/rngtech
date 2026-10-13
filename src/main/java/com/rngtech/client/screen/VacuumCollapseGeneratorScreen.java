@@ -1,14 +1,17 @@
 package com.rngtech.client.screen;
 
+import com.rngtech.content.blockentity.VacuumCollapseDynamics;
 import com.rngtech.content.blockentity.VacuumCollapseGeneratorBlockEntity;
 import com.rngtech.content.menu.VacuumCollapseGeneratorMenu;
 import com.rngtech.rpg.MachineStat;
 
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
 
+import java.util.List;
 import java.util.Locale;
 
 public class VacuumCollapseGeneratorScreen extends AbstractContainerScreen<VacuumCollapseGeneratorMenu> {
@@ -48,6 +51,26 @@ public class VacuumCollapseGeneratorScreen extends AbstractContainerScreen<Vacuu
     private static final int PROCESSING_LEVEL_ICON_X = 184;
     private static final int PROCESSING_LEVEL_ICON_Y = 78;
     private static final int PROCESSING_LEVEL_MAX = 8;
+    private static final int CURVE_X = PROGRESS_BAR_X;
+    private static final int CURVE_Y = 20;
+    private static final int CURVE_WIDTH = PROGRESS_BAR_WIDTH;
+    private static final int CURVE_HEIGHT = 24;
+    private static final int CURVE_DONE = 0xFF9C88E0;
+    private static final int CURVE_AHEAD = 0xFF4A3F6B;
+    private static final int CURVE_AVERAGE = 0xFF6B6B6B;
+    private static final int CURVE_MARKER = 0xFFF2F2F2;
+    private static final int DEPTH_X = PROGRESS_BAR_X;
+    private static final int DEPTH_Y = 80;
+    private static final int DEPTH_WIDTH = PROGRESS_BAR_WIDTH;
+    private static final int DEPTH_HEIGHT = 8;
+    private static final int DEPTH_POINTER_HEIGHT = 3;
+    private static final int DEPTH_SHALLOW_ZONE = 0xFF2E4A5A;
+    private static final int DEPTH_DEEP_ZONE = 0xFF4A2E6A;
+    private static final int DEPTH_FILL = 0xFFB59CF0;
+    private static final int DEPTH_POINTER = 0xFFF2F2F2;
+    private static final int DEPTH_COARSE_STEP = 5;
+    private static final int DEPTH_NOTCH_STEP = 25;
+    private static final int BAR_BACKING = 0xFF373737;
     private static final String[] STAT_LABEL_KEYS = {
             "rngtech.stat.energy_generation",
             "rngtech.stat.energy_capacity",
@@ -147,8 +170,41 @@ public class VacuumCollapseGeneratorScreen extends AbstractContainerScreen<Vacuu
                     && RefinementScreenStyle.handleApplyClick(this, menu, mouseX, mouseY)) {
                 return true;
             }
+            if (menu.selectedTab() == VacuumCollapseGeneratorMenu.TAB_PROCESSING && isOverDepthGauge(mouseX, mouseY)) {
+                double fraction = (mouseX - (leftPos + DEPTH_X + 1)) / (DEPTH_WIDTH - 2);
+                int span = VacuumCollapseDynamics.MAX_DEPTH - VacuumCollapseDynamics.MIN_DEPTH;
+                sendDepth(VacuumCollapseDynamics.MIN_DEPTH + (int) Math.round(fraction * span));
+                return true;
+            }
         }
         return super.mouseClicked(mouseX, mouseY, button);
+    }
+
+    @Override
+    public boolean mouseScrolled(double mouseX, double mouseY, double scrollX, double scrollY) {
+        if (menu.selectedTab() == VacuumCollapseGeneratorMenu.TAB_PROCESSING && isOverDepthGauge(mouseX, mouseY) && scrollY != 0.0) {
+            int step = hasShiftDown() ? DEPTH_COARSE_STEP : 1;
+            sendDepth(menu.depth() + (scrollY > 0.0 ? step : -step));
+            return true;
+        }
+        return super.mouseScrolled(mouseX, mouseY, scrollX, scrollY);
+    }
+
+    private void sendDepth(int depth) {
+        int clamped = VacuumCollapseDynamics.clampDepth(depth);
+        if (clamped == menu.depth() || minecraft == null || minecraft.player == null || minecraft.gameMode == null) {
+            return;
+        }
+        int buttonId = VacuumCollapseGeneratorMenu.depthButtonId(clamped);
+        if (menu.clickMenuButton(minecraft.player, buttonId)) {
+            minecraft.gameMode.handleInventoryButtonClick(menu.containerId, buttonId);
+        }
+    }
+
+    private boolean isOverDepthGauge(double mouseX, double mouseY) {
+        int left = leftPos + DEPTH_X;
+        int top = topPos + DEPTH_Y;
+        return mouseX >= left && mouseX < left + DEPTH_WIDTH && mouseY >= top && mouseY < top + DEPTH_HEIGHT + DEPTH_POINTER_HEIGHT;
     }
 
     private void renderPanel(GuiGraphics guiGraphics) {
@@ -234,6 +290,107 @@ public class VacuumCollapseGeneratorScreen extends AbstractContainerScreen<Vacuu
                 PROGRESS
         );
         renderProcessingIcons(guiGraphics);
+        renderCurve(guiGraphics);
+        renderDepthGauge(guiGraphics);
+    }
+
+    /**
+     * The collapse curve: FE/t across the cycle, on one scale for every depth so deep curves read as taller. The part
+     * already generated is lit, a faint line marks the average, and a marker shows where the running collapse is.
+     */
+    private void renderCurve(GuiGraphics guiGraphics) {
+        int left = leftPos + CURVE_X;
+        int top = topPos + CURVE_Y;
+        guiGraphics.fill(left, top, left + CURVE_WIDTH, top + CURVE_HEIGHT, BAR_BACKING);
+        int innerWidth = CURVE_WIDTH - 2;
+        int innerHeight = CURVE_HEIGHT - 2;
+        int bottom = top + CURVE_HEIGHT - 1;
+        double scale = VacuumCollapseDynamics.peakRate(VacuumCollapseDynamics.MAX_DEPTH);
+        int depth = menu.curveDepth();
+        boolean running = menu.processingTicks() > 0 && menu.progress() > 0;
+        float progress = running ? menu.processingProgress() : 0.0F;
+        for (int column = 0; column < innerWidth; column++) {
+            double x = (column + 0.5) / innerWidth;
+            int height = Math.max(1, (int) Math.round(VacuumCollapseDynamics.rate(depth, x) / scale * innerHeight));
+            int color = running && x <= progress ? CURVE_DONE : CURVE_AHEAD;
+            guiGraphics.fill(left + 1 + column, bottom - height, left + 2 + column, bottom, color);
+        }
+        int average = bottom - (int) Math.round(innerHeight / scale);
+        guiGraphics.fill(left + 1, average, left + 1 + innerWidth, average + 1, CURVE_AVERAGE);
+        if (running) {
+            int marker = left + 1 + Math.min(innerWidth - 1, Math.round(innerWidth * progress));
+            guiGraphics.fill(marker, top + 1, marker + 1, bottom, CURVE_MARKER);
+        }
+    }
+
+    /** Depth from shallow to deep, with the rated depth marked. The pointer marks the depth for the next collapse. */
+    private void renderDepthGauge(GuiGraphics guiGraphics) {
+        int left = leftPos + DEPTH_X;
+        int top = topPos + DEPTH_Y;
+        int inner = DEPTH_WIDTH - 2;
+        int rated = left + 1 + depthOffset(VacuumCollapseDynamics.RATED_DEPTH, inner);
+        int right = left + 1 + inner;
+        int bottom = top + DEPTH_HEIGHT - 1;
+        guiGraphics.fill(left, top, left + DEPTH_WIDTH, top + DEPTH_HEIGHT, BAR_BACKING);
+        guiGraphics.fill(left + 1, top + 1, rated, bottom, DEPTH_SHALLOW_ZONE);
+        guiGraphics.fill(rated, top + 1, right, bottom, DEPTH_DEEP_ZONE);
+        int pointer = Math.min(left + 1 + depthOffset(menu.depth(), inner), right - 1);
+        guiGraphics.fill(left + 1, top + 3, Math.max(left + 1, pointer), bottom - 2, DEPTH_FILL);
+        for (int notch = VacuumCollapseDynamics.MIN_DEPTH; notch <= VacuumCollapseDynamics.MAX_DEPTH; notch += DEPTH_NOTCH_STEP) {
+            int x = Math.min(left + 1 + depthOffset(notch, inner), right - 1);
+            guiGraphics.fill(x, top + 1, x + 1, top + 2, PANEL_DARK);
+        }
+        guiGraphics.fill(rated, top + 1, rated + 1, bottom, PANEL_LIGHT);
+        int pointerTop = top + DEPTH_HEIGHT;
+        guiGraphics.fill(pointer, pointerTop - 1, pointer + 1, pointerTop + DEPTH_POINTER_HEIGHT, DEPTH_POINTER);
+        guiGraphics.fill(pointer - 1, pointerTop + 1, pointer + 2, pointerTop + DEPTH_POINTER_HEIGHT, DEPTH_POINTER);
+    }
+
+    private static int depthOffset(int depth, int width) {
+        int span = VacuumCollapseDynamics.MAX_DEPTH - VacuumCollapseDynamics.MIN_DEPTH;
+        int clamped = VacuumCollapseDynamics.clampDepth(depth) - VacuumCollapseDynamics.MIN_DEPTH;
+        return (int) Math.round(clamped / (double) span * width);
+    }
+
+    private List<Component> depthTooltip() {
+        int depth = menu.depth();
+        String regime = depth < VacuumCollapseDynamics.RATED_DEPTH
+                ? "shallow"
+                : depth == VacuumCollapseDynamics.RATED_DEPTH ? "rated" : "deep";
+        return List.of(
+                Component.translatable("rngtech.collapse.tooltip.depth", depth, Component.translatable("rngtech.collapse.depth." + regime)),
+                Component.translatable(
+                        "rngtech.collapse.tooltip.depth_effects",
+                        multiplier(VacuumCollapseDynamics.energy(depth)),
+                        multiplier(VacuumCollapseDynamics.duration(depth)),
+                        multiplier(VacuumCollapseDynamics.instability(depth))
+                ).withStyle(ChatFormatting.GRAY),
+                Component.translatable("rngtech.collapse.tooltip.depth_peak", multiplier(VacuumCollapseDynamics.peakRate(depth)))
+                        .withStyle(ChatFormatting.GRAY),
+                Component.translatable("rngtech.collapse.tooltip.depth_hint").withStyle(ChatFormatting.DARK_GRAY)
+        );
+    }
+
+    private List<Component> curveTooltip() {
+        int depth = menu.curveDepth();
+        long peak = menu.peakEnergyPerTick();
+        if (peak <= 0L) {
+            return List.of(
+                    Component.translatable("rngtech.collapse.tooltip.curve", depth),
+                    Component.translatable("rngtech.collapse.tooltip.curve_hint").withStyle(ChatFormatting.GRAY)
+            );
+        }
+        long start = Math.round(peak * VacuumCollapseDynamics.startRate(depth) / VacuumCollapseDynamics.peakRate(depth));
+        return List.of(
+                Component.translatable("rngtech.collapse.tooltip.curve", depth),
+                Component.translatable("rngtech.collapse.tooltip.curve_rates", CompactValueText.energyRate(start), CompactValueText.energyRate(peak))
+                        .withStyle(ChatFormatting.GRAY),
+                Component.translatable("rngtech.collapse.tooltip.curve_hint").withStyle(ChatFormatting.GRAY)
+        );
+    }
+
+    private static String multiplier(double value) {
+        return String.format(Locale.ROOT, "%.2f", value);
     }
 
     private void renderStats(GuiGraphics guiGraphics) {
@@ -319,6 +476,14 @@ public class VacuumCollapseGeneratorScreen extends AbstractContainerScreen<Vacuu
             return;
         }
         if (menu.selectedTab() != VacuumCollapseGeneratorMenu.TAB_PROCESSING) {
+            return;
+        }
+        if (isOverDepthGauge(mouseX, mouseY)) {
+            guiGraphics.renderComponentTooltip(font, depthTooltip(), mouseX, mouseY);
+            return;
+        }
+        if (isHovering(CURVE_X, CURVE_Y, CURVE_WIDTH, CURVE_HEIGHT, mouseX, mouseY)) {
+            guiGraphics.renderComponentTooltip(font, curveTooltip(), mouseX, mouseY);
             return;
         }
         CompactValueText.renderTooltipIfHovered(
@@ -465,7 +630,7 @@ public class VacuumCollapseGeneratorScreen extends AbstractContainerScreen<Vacuu
         return MachineScreenStyle.withGenerationBreakdown(
                 STAT_TYPES,
                 statLines,
-                menu.energyPerTick(),
+                menu.averageEnergyPerTick(),
                 menu.statValue(VacuumCollapseGeneratorMenu.baseEnergyGenerationDataIndex()),
                 menu.statValue(VacuumCollapseGeneratorMenu.flatEnergyGenerationDataIndex())
         );
