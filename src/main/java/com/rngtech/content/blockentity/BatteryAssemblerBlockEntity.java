@@ -515,8 +515,13 @@ public class BatteryAssemblerBlockEntity extends BaseMachineBlockEntity
             return false;
         }
 
+        ItemStack[] remainders = new ItemStack[recipe.ingredients().size()];
         for (int slot = 0; slot < recipe.ingredients().size(); slot++) {
-            consumeInput(slot, recipe.ingredients().get(slot).count());
+            remainders[slot] = consumeInput(slot, recipe.ingredients().get(slot).count());
+        }
+        // Placed once every slot is consumed, so the position check sees what the craft left behind.
+        for (int slot = 0; slot < remainders.length; slot++) {
+            placeRemainder(slot, remainders[slot]);
         }
         recipe.consumeFluid(inputTank);
         addOutput(result);
@@ -525,18 +530,34 @@ public class BatteryAssemblerBlockEntity extends BaseMachineBlockEntity
         return true;
     }
 
-    private void consumeInput(int slot, int count) {
+    /** Uses up {@code count} items from the slot and returns the first remainder; any further ones leave the machine. */
+    private ItemStack consumeInput(int slot, int count) {
+        ItemStack kept = ItemStack.EMPTY;
         for (int index = 0; index < count; index++) {
             ItemStack input = processInventory.getStackInSlot(slot);
             ItemStack remainder = input.getCraftingRemainingItem();
             input.shrink(1);
-            if (!remainder.isEmpty()) {
-                if (input.isEmpty()) {
-                    processInventory.setStackInSlot(slot, remainder);
-                } else if (level != null) {
-                    Containers.dropItemStack(level, worldPosition.getX(), worldPosition.getY(), worldPosition.getZ(), remainder);
-                }
+            if (kept.isEmpty()) {
+                kept = remainder;
+            } else {
+                ejectBelowOrDrop(remainder);
             }
+        }
+        return kept;
+    }
+
+    /**
+     * A remainder refills its emptied slot only where automation would insert it itself; any other would jam automated
+     * input, so it leaves the machine.
+     */
+    private void placeRemainder(int slot, ItemStack remainder) {
+        if (remainder.isEmpty()) {
+            return;
+        }
+        if (processInventory.getStackInSlot(slot).isEmpty() && isAssemblyInput(slot - SLOT_INPUT_0, remainder)) {
+            processInventory.setStackInSlot(slot, remainder);
+        } else {
+            ejectBelowOrDrop(remainder);
         }
     }
 

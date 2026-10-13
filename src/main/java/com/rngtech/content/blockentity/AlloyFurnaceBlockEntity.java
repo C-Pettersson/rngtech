@@ -1077,24 +1077,46 @@ public class AlloyFurnaceBlockEntity extends BaseMachineBlockEntity implements M
         processInventory.setStackInSlot(SLOT_OUTPUT, merged);
     }
 
+    /** Remainders are placed once every slot is consumed, so the slot planner sees what the craft left behind. */
     private void consumeInputs(int[] consumed) {
+        ItemStack[] remainders = new ItemStack[MAX_INPUT_SLOTS];
+        Arrays.fill(remainders, ItemStack.EMPTY);
         for (int slot = 0; slot < Math.min(consumed.length, MAX_INPUT_SLOTS); slot++) {
             for (int count = 0; count < consumed[slot]; count++) {
-                consumeOne(slot);
+                ItemStack remainder = consumeOne(slot);
+                if (remainders[slot].isEmpty()) {
+                    remainders[slot] = remainder;
+                } else {
+                    ejectBelowOrDrop(remainder);
+                }
             }
+        }
+        for (int slot = 0; slot < MAX_INPUT_SLOTS; slot++) {
+            placeRemainder(slot, remainders[slot]);
         }
     }
 
-    private void consumeOne(int slot) {
+    private ItemStack consumeOne(int slot) {
         ItemStack input = processInventory.getStackInSlot(slot);
         ItemStack remainder = input.getCraftingRemainingItem();
         input.shrink(1);
-        if (!remainder.isEmpty()) {
-            if (input.isEmpty()) {
-                processInventory.setStackInSlot(slot, remainder);
-            } else if (level != null) {
-                Containers.dropItemStack(level, worldPosition.getX(), worldPosition.getY(), worldPosition.getZ(), remainder);
-            }
+        return remainder;
+    }
+
+    /**
+     * A remainder refills its emptied slot only where automation would insert it itself; any other would jam automated
+     * input, so it leaves.
+     */
+    private void placeRemainder(int slot, ItemStack remainder) {
+        if (remainder.isEmpty()) {
+            return;
+        }
+        if (processInventory.getStackInSlot(slot).isEmpty()
+                && acceptsAutomatedInput(slot, remainder)
+                && recipeLockAllowance(remainder) > 0) {
+            processInventory.setStackInSlot(slot, remainder);
+        } else {
+            ejectBelowOrDrop(remainder);
         }
     }
 

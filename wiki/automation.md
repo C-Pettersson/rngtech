@@ -39,6 +39,14 @@ When a recipe needs one item in two positions, such as an Anode's two plates, au
 
 The [Resonance Calibrator](resonance-calibrator.md) and [Corrosion Cell](corrosion-cell.md) give each slot a single role. The [Furnace](furnace.md), [Crusher](crusher.md), and [Metal Press](metal-press.md) run one-item recipes. Nothing on these machines competes for a slot.
 
+## Smelting lanes
+
+A Furnace with several smelting lanes, such as the Lead Furnace's four, fills them in order: lane 1 takes a full stack before lane 2 gets anything. A slow feed keeps one lane busy while the rest sit idle. The **Even Feed** keystone on the [Machine Mastery](machine-mastery.md) tree sends each arriving item to the emptiest lane that can hold it instead, so a trickle or a full stack from a cable spreads across every lane. See [Furnace](furnace.md#automation).
+
+## Ingredient leftovers
+
+Some items leave another item behind when a recipe uses them, such as the Glass Bottle from a {{ item('minecraft:honey_bottle') }} in the [Melter](melter.md)'s Lubricant. No default Alloy Furnace or Component Assembler recipe takes one, but a modpack can add such recipes. In the Melter, Alloy Furnace, and Component Assembler, a leftover goes back into its emptied input slot only if automation would put it there itself. On the Melter, a leftover that can hold the product goes into an empty output container slot instead. Any other leftover goes into the inventory directly below, such as a hopper or chest, or drops on the ground if there is none, so it never blocks the input slots.
+
 ## Building a chain
 
 - Give each recipe its own machine. When an item fits several recipes, the next matching ingredient to arrive picks the recipe. Use Item Connector filter rows or an {{ item('rngtech:advanced_item_filter') }} to keep other recipes' items out.
