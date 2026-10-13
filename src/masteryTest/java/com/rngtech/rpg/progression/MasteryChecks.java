@@ -51,6 +51,7 @@ public final class MasteryChecks {
         familyAdapters();
         taggedPayoffs();
         keystonePayoffsNeedTheirCosts();
+        fuelFurnaceReadsFuelDuration();
         bonusSummary();
         statBreakdowns();
         iconTextures();
@@ -399,6 +400,24 @@ public final class MasteryChecks {
         List<String> caught = payoffWithoutCost(untagged);
         require(caught.stream().anyMatch(v -> v.contains("CRUSHER")) && caught.stream().anyMatch(v -> v.contains("MELTER"))
                 && caught.stream().noneMatch(v -> v.contains("FURNACE")), "audit catches an untagged heat payoff: " + caught);
+    }
+
+    /** The Furnace claims Fuel Duration, so High Flux's cost must shorten its Stage 0 burn. */
+    private static void fuelFurnaceReadsFuelDuration() {
+        require(MachineMasteryFamily.FURNACE.supports(MachineStat.FUEL_DURATION), "the Furnace claims Fuel Duration");
+        List<String> withKeystone = path(MachineMasteryFamily.FURNACE.startNodeId(), "high_flux");
+        int without = fuelTicks(withKeystone.subList(0, withKeystone.size() - 1));
+        int with = fuelTicks(withKeystone);
+        require(Math.abs(with - Math.ceil(without * 0.6)) <= 1, "High Flux burns Furnace fuel 40% shorter: " + without + " -> " + with);
+    }
+
+    private static int fuelTicks(List<String> allocated) {
+        MachineMasteryFamily family = MachineMasteryFamily.FURNACE;
+        MachineStatAccumulator stats = MachineStatAccumulator.componentBase(
+                Map.of(MachineStat.FUEL_EFFICIENCY, 1.0, MachineStat.EFFICIENCY, 1.0, MachineStat.FUEL_DURATION, 1.0));
+        MegaPassiveTree.applyStats(stats, new MachineProgressionState(MachineProgressionState.xpForLevel(MachineProgressionState.MAX_LEVEL), 0,
+                MachineProgressionState.MAX_LEVEL, allocated, family.startNodeId(), List.of(), false), family);
+        return stats.adjustedFuelTicks(16_000);
     }
 
     private static List<String> payoffWithoutCost(MegaPassiveNode keystone) {

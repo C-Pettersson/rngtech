@@ -652,6 +652,7 @@ public final class MachineStatAccumulator {
         );
         stats.baseValues.put(MachineStat.EFFICIENCY, chassis.electric() ? 1.0 : chassis.efficiency());
         stats.baseValues.put(MachineStat.FUEL_EFFICIENCY, chassis.fuelEfficiency());
+        stats.baseValues.put(MachineStat.FUEL_DURATION, 1.0);
         stats.baseValues.put(MachineStat.ENERGY_CAPACITY, chassis.electric() ? (double) chassis.energyCapacity() : 0.0);
         stats.baseValues.put(MachineStat.ENERGY_TRANSFER, chassis.electric() ? (double) chassis.energyTransfer() : 0.0);
         stats.baseValues.put(MachineStat.ENERGY_USAGE, chassis.energyUsage());
@@ -1002,7 +1003,8 @@ public final class MachineStatAccumulator {
     public int adjustedFuelTicks(int baseFuelTicks) {
         double fuelEfficiency = Math.max(0.1, value(MachineStat.FUEL_EFFICIENCY));
         double efficiency = Math.max(0.1, value(MachineStat.EFFICIENCY));
-        return Math.max(1, (int) Math.ceil(baseFuelTicks * fuelEfficiency * efficiency));
+        double fuelDuration = Math.max(0.1, value(MachineStat.FUEL_DURATION));
+        return Math.max(1, (int) Math.ceil(baseFuelTicks * fuelEfficiency * efficiency * fuelDuration));
     }
 
     public void rollBaseValues(List<MachineStatRange> ranges, RandomSource random) {

@@ -54,7 +54,8 @@ public class FurnaceMenu extends AbstractContainerMenu implements MasteryMenuVie
     private static final int DATA_MAX_TEMPERATURE = DATA_HEAT_TRANSFER + 1;
     private static final int DATA_TEMPERATURE_STABILITY = DATA_MAX_TEMPERATURE + 1;
     private static final int DATA_FUEL_EFFICIENCY = DATA_TEMPERATURE_STABILITY + 1;
-    private static final int DATA_REFINEMENT_POTENTIAL = DATA_FUEL_EFFICIENCY + 1;
+    private static final int DATA_FUEL_DURATION = DATA_FUEL_EFFICIENCY + 1;
+    private static final int DATA_REFINEMENT_POTENTIAL = DATA_FUEL_DURATION + 1;
     private static final int DATA_ENERGY = DATA_REFINEMENT_POTENTIAL + 1;
     private static final int DATA_ENERGY_CAPACITY = DATA_ENERGY + 1;
     private static final int DATA_ENERGY_USAGE = DATA_ENERGY_CAPACITY + 1;
@@ -448,6 +449,10 @@ public class FurnaceMenu extends AbstractContainerMenu implements MasteryMenuVie
 
     public static int fuelEfficiencyDataIndex() {
         return DATA_FUEL_EFFICIENCY;
+    }
+
+    public static int fuelDurationDataIndex() {
+        return DATA_FUEL_DURATION;
     }
 
     public static int refinementPotentialDataIndex() {

@@ -98,7 +98,8 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
     private static final int DATA_MAX_TEMPERATURE = DATA_HEAT_TRANSFER + 1;
     private static final int DATA_TEMPERATURE_STABILITY = DATA_MAX_TEMPERATURE + 1;
     private static final int DATA_FUEL_EFFICIENCY = DATA_TEMPERATURE_STABILITY + 1;
-    private static final int DATA_REFINEMENT_POTENTIAL = DATA_FUEL_EFFICIENCY + 1;
+    private static final int DATA_FUEL_DURATION = DATA_FUEL_EFFICIENCY + 1;
+    private static final int DATA_REFINEMENT_POTENTIAL = DATA_FUEL_DURATION + 1;
     private static final int DATA_ENERGY = DATA_REFINEMENT_POTENTIAL + 1;
     private static final int DATA_ENERGY_CAPACITY = DATA_ENERGY + 1;
     private static final int DATA_ENERGY_USAGE = DATA_ENERGY_CAPACITY + 1;
@@ -241,6 +242,7 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
                 case DATA_MAX_TEMPERATURE -> scaledStat(stats, MachineStat.MAX_TEMPERATURE);
                 case DATA_TEMPERATURE_STABILITY -> scaledStat(stats, MachineStat.TEMPERATURE_STABILITY);
                 case DATA_FUEL_EFFICIENCY -> scaledStat(stats, MachineStat.FUEL_EFFICIENCY);
+                case DATA_FUEL_DURATION -> scaledStat(stats, MachineStat.FUEL_DURATION);
                 case DATA_REFINEMENT_POTENTIAL -> scaledStat(stats, MachineStat.REFINEMENT_POTENTIAL);
                 case DATA_ENERGY -> energyStored();
                 case DATA_ENERGY_CAPACITY -> energyCapacity();
