@@ -22,6 +22,8 @@ wiki:
 
 The **Steam Methane Reformer** reacts a gas with water to make **Hydrogen** and **Carbon Monoxide**. It is the Stage 6 Hydrogen source for the [Ammonia Synthesizer](ammonia-synthesizer.md). Methane is its main feed. Syngas from the [Coal Gasifier](coal-gasifier.md) also works, at a lower Hydrogen yield.
 
+It is built as a fired tubular reformer: burners under a firebox heat a row of catalyst-filled tubes, and a steam drum on top feeds them water.
+
 Like other RNGTech machines, each Steam Methane Reformer you craft rolls its own [rarity and affixes](rarity-and-affixes.md).
 
 ## Obtaining
@@ -48,6 +50,14 @@ Each run uses 1,000 mB of gas and 500 mB of water. Methane makes 1,500 mB of Hyd
 
 All four tanks hold 8,000 mB. The Reformer stops when either output tank is full, so drain both.
 
+You can read the Reformer from the outside. Facing the front:
+
+- The window shows four reformer tubes. An installed Catalyst Bed shows as pellets packed inside them, and the tubes glow red-orange while the Reformer runs.
+- The installed Heat Core sits in the burner bay under the firebox, in its material's colour, and blue burner flames light under the tubes while it runs.
+- The three glasses on the right show the feed gas, Hydrogen, and Carbon Monoxide levels. The glass on the steam drum shows the water level, and the gauge beside it rises while the Reformer runs.
+- The Servo works the feed valve above the feed glass, and the Battery Cell sits at the front left with a charge window.
+- Smoke rises from the flue stack at the back while it runs, and the lamp at the front lights.
+
 The screen's status line tells you what is missing: Heat Core, catalyst, fluid, power, or output space. You can empty any tank with the purge buttons on the Process tab, or by right-clicking the Reformer with a {{ item('rngtech:purge_bucket') }}. Each purge voids up to 1,000 mB.
 
 ### Where the products go
@@ -73,7 +83,7 @@ The Gear tab has four slots:
 | Sides | Accept FE. |
 | Any | Fill water and Methane or Syngas, and drain Hydrogen and Carbon Monoxide, through any face. |
 
-The Reformer has no item automation. Gear slots are manual only.
+The Reformer has no item automation. Gear slots are manual only. The back cabinet has a port plate sized for a Universal Connector, the tidiest place to attach one.
 
 ### Gas reforming recipes
 
