@@ -186,7 +186,7 @@ Machines with [Machine Mastery](machine-mastery.md#attributes) and the Gear they
 | 6 | `28-35` |
 | 7 | `36-45` |
 
-A Tier 3 roll is worth about six travel nodes. Attribute points are machine-wide even on a part: they skip the part's local scaling, and the machine adds them before its Mastery attribute conversions. A part installed in a machine without Mastery rolls them but gains nothing.
+A Tier 3 roll is worth about six travel nodes. Corruption's Blessed outcome can also add 10% increased Control, Drive, or Reserve to the same hosts (the `mastery_attributes` pool, weight `10` each), the one percent attribute source outside the tree. Attribute points are machine-wide even on a part: they skip the part's local scaling, and the machine adds them before its Mastery attribute conversions. A part installed in a machine without Mastery rolls them but gains nothing.
 
 The design follows Path of Exile's split between regular gearing and attribute stacking. A direct stat suffix is better for a machine that only has travel points. An attribute suffix is better for a build that takes increased-attribute nodes, attribute scaling notables, or an actuation keystone.
 

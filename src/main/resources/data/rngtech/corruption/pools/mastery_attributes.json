@@ -1,0 +1,54 @@
+{
+    "hosts": [
+        "crusher",
+        "furnace",
+        "electric_furnace",
+        "alloy_furnace",
+        "metal_press",
+        "melter",
+        "resonance_calibrator",
+        "crush_head",
+        "heat_core",
+        "servo",
+        "fluid_pump",
+        "alloy_crucible",
+        "resonance_coil",
+        "control_board",
+        "stabilizer_matrix"
+    ],
+    "blessed": [
+        {
+            "id": "increased_control",
+            "weight": 10,
+            "modifiers": [
+                {
+                    "stat": "control",
+                    "operation": "increased_percent",
+                    "value": 10
+                }
+            ]
+        },
+        {
+            "id": "increased_drive",
+            "weight": 10,
+            "modifiers": [
+                {
+                    "stat": "drive",
+                    "operation": "increased_percent",
+                    "value": 10
+                }
+            ]
+        },
+        {
+            "id": "increased_reserve",
+            "weight": 10,
+            "modifiers": [
+                {
+                    "stat": "reserve",
+                    "operation": "increased_percent",
+                    "value": 10
+                }
+            ]
+        }
+    ]
+}

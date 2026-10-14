@@ -266,6 +266,8 @@ A corruption implicit is one fixed value, with no tier or range. It sits outside
 | Placed generator | 10% increased Energy Generation, 15% increased Efficiency, and where the machine has them 15% increased Stability or 25% increased Energy Capacity | 20% less Efficiency |
 | Battery Chassis | +1 Battery Slot, 15% increased Energy Capacity, or 20% increased Energy Transfer | 15% increased Idle Loss |
 
+Machines with [Machine Mastery](machine-mastery.md) and the Gear they take (Crush Heads, Heat Cores, Servos, Fluid Pumps, Alloy Crucibles, Resonance Coils, Control Boards, and Stabilizer Matrices) can also be Blessed with 10% increased Control, Drive, or Reserve. Like [attribute suffixes](#attribute-suffixes), it counts for the whole machine.
+
 +1 Processing Level on a Crush Head lets it crush one level harder ore without jamming; it does not change which Gear the Crusher accepts. With a catalyst in the Affix Forge, hover Blessed or Blighted in the outcome panel to see the exact pool and odds for the item in the target slot. Corruption implicits never add yield or RP.
 
 ## See also

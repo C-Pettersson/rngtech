@@ -471,6 +471,14 @@ public final class MasteryChecks {
         MegaPassiveTree.applyAttributeStats(geared, state, MachineMasteryFamily.CRUSHER);
         near(geared.value(MachineStat.DRIVE), 120, "Gear Drive adds to the start's Drive");
         near(geared.value(MachineStat.PROCESSING_SPEED) - bare.value(MachineStat.PROCESSING_SPEED), 0.15, "100 Gear Drive converts into 15% increased Processing Speed");
+        // Blessed corruption can add percent attributes to Mastery machines and their Gear, never to generator-only parts.
+        var corruption = com.rngtech.rpg.corruption.CorruptionCatalog.defaults();
+        for (String host : List.of("crusher", "furnace", "heat_core", "crush_head", "servo", "control_board")) {
+            require(corruption.entries(host, com.rngtech.rpg.CorruptionOutcome.BLESSED).stream().anyMatch(entry -> entry.id().equals("increased_drive")),
+                    host + " can be Blessed with increased Drive");
+        }
+        require(corruption.entries("cathode", com.rngtech.rpg.CorruptionOutcome.BLESSED).stream().noneMatch(entry -> entry.id().startsWith("increased_")),
+                "generator-only parts get no attribute corruption");
         // Reserve Actuation turns off only Reserve's own bonuses; Drive keeps converting into speed.
         var actuated = build(MachineMasteryFamily.FURNACE, "reserve_actuation");
         require(!MegaPassiveTree.has(actuated, "NO_INHERENT_ATTRIBUTES") && MegaPassiveTree.has(actuated, "NO_INHERENT_RESERVE"), "Reserve Actuation suppresses only Reserve");
