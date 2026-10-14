@@ -18,5 +18,10 @@
     "experience": 0.7,
     "minimum_temperature": 2000,
     "required_temperature_stability": 1.05,
+    "failure_output": {
+        "count": 1,
+        "id": "rngtech:malformed_ingot"
+    },
+    "failure_material": "naquadah",
     "machine_xp": 8
 }

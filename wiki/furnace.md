@@ -81,7 +81,7 @@ Crushed material smelts straight into ingots, which is handy for simple hopper l
 
 There is no Steel Dust smelting recipe. Steel comes from Steel Blend, which you make in the [Alloy Furnace](alloy-furnace.md) and then smelt here.
 
-Stage 4 and higher recipes also need temperature stability. On recipes that have a failure output, poor stability, overheating, or a power drop mid-cycle builds up failure strain. When strain fills, the input becomes a recoverable failure item such as a {{ item('rngtech:malformed_ingot') }}. Smelt it again to get two nuggets back.
+Stage 4 and higher metal recipes also need temperature stability. A Stage 0–3 Furnace will not start one without enough stability. A Stage 4 or higher Furnace starts it anyway, but poor stability or heat above the recipe's safe maximum builds up failure strain. A lane left above the recipe's overheat temperature by a hotter recipe cools down to it before smelting, so switching to a cooler metal costs time instead of ingots. Higher Overheat Tolerance shortens that wait. When strain fills, the input becomes a {{ item('rngtech:malformed_ingot') }} of that metal. Smelt it again to get two nuggets back. Ancient Debris never fails.
 
 ### Stages
 

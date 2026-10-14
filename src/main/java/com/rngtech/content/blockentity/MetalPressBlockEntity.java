@@ -293,7 +293,8 @@ public class MetalPressBlockEntity extends BaseMachineBlockEntity
         press.rememberHeatEnvelope(recipe, stats);
 
         if (press.effectiveHeat(stats) < recipe.targetTemperature()
-                || press.crudePressBlocksUnsafeRecipe(recipe, stats)
+                || press.tooHot(recipe, stats)
+                || press.crudePressBlocksUnstableRecipe(recipe, stats)
                 || !press.canMergeOutput(recipe.outputStack())) {
             if (press.cool(stats)) {
                 press.setChanged();
@@ -1011,7 +1012,7 @@ public class MetalPressBlockEntity extends BaseMachineBlockEntity
         if (recipe == null) {
             return level != null && moldRecipe(selectedMold) != null ? STATUS_ROUTE_DISABLED : STATUS_INVALID_RECIPE;
         }
-        if (isCrudePress() && currentTemperature > effectiveSafeMaximumTemperature(recipe, stats)) {
+        if (tooHot(recipe, stats)) {
             return STATUS_HEAT_HIGH;
         }
         if (effectiveHeat(stats) < recipe.targetTemperature()) {
@@ -1037,10 +1038,13 @@ public class MetalPressBlockEntity extends BaseMachineBlockEntity
         return consumeWorkingEnergy(energyCost, true) < energyCost ? STATUS_NO_POWER : STATUS_READY;
     }
 
-    private boolean crudePressBlocksUnsafeRecipe(MetalPressRecipe recipe, MachineStatAccumulator stats) {
-        return isCrudePress()
-                && (currentTemperature > effectiveSafeMaximumTemperature(recipe, stats)
-                        || stats.value(MachineStat.TEMPERATURE_STABILITY) < recipe.requiredTemperatureStability());
+    /** Heat left from a hotter recipe cools to this recipe's overheat line before either press works it. */
+    private boolean tooHot(MetalPressRecipe recipe, MachineStatAccumulator stats) {
+        return currentTemperature > effectiveSafeMaximumTemperature(recipe, stats);
+    }
+
+    private boolean crudePressBlocksUnstableRecipe(MetalPressRecipe recipe, MachineStatAccumulator stats) {
+        return isCrudePress() && stats.value(MachineStat.TEMPERATURE_STABILITY) < recipe.requiredTemperatureStability();
     }
 
     private int requiredTemperatureForProgress(MetalPressRecipe recipe, MachineStatAccumulator stats) {

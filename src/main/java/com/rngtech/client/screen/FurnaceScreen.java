@@ -726,6 +726,7 @@ public class FurnaceScreen extends AbstractContainerScreen<FurnaceMenu> {
             case FurnaceBlockEntity.STATUS_NO_INPUT -> Component.translatable("rngtech.furnace.status.no_input");
             case FurnaceBlockEntity.STATUS_INVALID_RECIPE -> Component.translatable("rngtech.furnace.status.invalid_recipe");
             case FurnaceBlockEntity.STATUS_HEAT_LOW -> Component.translatable("rngtech.furnace.status.heat_low", menu.minimumTemperature());
+            case FurnaceBlockEntity.STATUS_HEAT_HIGH -> Component.translatable("rngtech.furnace.status.heat_high");
             case FurnaceBlockEntity.STATUS_STABILITY_LOW -> Component.translatable("rngtech.furnace.status.stability_low");
             case FurnaceBlockEntity.STATUS_OUTPUT_FULL -> Component.translatable("rngtech.furnace.status.output_full");
             case FurnaceBlockEntity.STATUS_NO_POWER -> Component.translatable("rngtech.furnace.status.no_power");
@@ -746,6 +747,7 @@ public class FurnaceScreen extends AbstractContainerScreen<FurnaceMenu> {
                     FurnaceBlockEntity.STATUS_POWER_LIMITED,
                     FurnaceBlockEntity.STATUS_NO_FUEL,
                     FurnaceBlockEntity.STATUS_WARMING,
+                    FurnaceBlockEntity.STATUS_HEAT_HIGH,
                     FurnaceBlockEntity.STATUS_POWER_DROP,
                     FurnaceBlockEntity.STATUS_FAILURE_RISK -> MachineScreenStyle.StatusState.WAITING;
             case FurnaceBlockEntity.STATUS_INVALID_RECIPE -> MachineScreenStyle.StatusState.ERROR;

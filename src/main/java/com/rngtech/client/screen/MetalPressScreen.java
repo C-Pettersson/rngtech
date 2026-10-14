@@ -679,6 +679,7 @@ public class MetalPressScreen extends AbstractContainerScreen<MetalPressMenu> {
                     MetalPressBlockEntity.STATUS_MISSING_SERVO,
                     MetalPressBlockEntity.STATUS_MISSING_MOLD,
                     MetalPressBlockEntity.STATUS_HEAT_LOW,
+                    MetalPressBlockEntity.STATUS_HEAT_HIGH,
                     MetalPressBlockEntity.STATUS_SWAPPING_MOLD,
                     MetalPressBlockEntity.STATUS_WARMING -> MachineScreenStyle.StatusState.WAITING;
             case MetalPressBlockEntity.STATUS_INVALID_RECIPE -> MachineScreenStyle.StatusState.ERROR;

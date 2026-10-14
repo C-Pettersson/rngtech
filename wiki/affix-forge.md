@@ -169,7 +169,7 @@ Catalysts:
 The Volatile Catalyst asks you to make three machines go wrong on purpose:
 
 - a Stage 5 Calibrated Kinetic Component with stability between 20% and 35%. A well-built [Resonance Calibrator](resonance-calibrator.md) overshoots that band, so mistune it: a weaker Control Board, no Stabilizer Matrix, or no Battery Cell;
-- two Malformed Ingots of a Stage 5 or higher material, from failed [Metal Press](metal-press.md) or [Alloy Furnace](alloy-furnace.md) cycles;
+- two Malformed Ingots of a Stage 5 or higher material, from failed [Furnace](furnace.md), [Metal Press](metal-press.md), or [Alloy Furnace](alloy-furnace.md) cycles;
 - two {{ item('rngtech:jam_debris') }} from [Crusher](crusher.md#jam-debris) jams.
 
 {{ crafting("rngtech:volatile_catalyst") }}

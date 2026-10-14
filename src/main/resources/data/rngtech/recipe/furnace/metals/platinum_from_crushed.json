@@ -18,5 +18,10 @@
     "experience": 0.7,
     "minimum_temperature": 1750,
     "required_temperature_stability": 1,
+    "failure_output": {
+        "count": 1,
+        "id": "rngtech:malformed_ingot"
+    },
+    "failure_material": "platinum",
     "machine_xp": 6
 }
