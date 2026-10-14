@@ -65,6 +65,7 @@ Typical recipes:
 - A raw metal item gives 2 crushed material.
 - An ore block gives 3 crushed material.
 - Crushed material (except alloys) gives 1 dust in a second pass. This pass never gets bonus output, so Output Amount counts once per ore.
+- Harder metals take longer to crush: Lead and Tin crush twice as fast as Iron, Titanium and Tungsten take three times as long, and Naquadah four times.
 - Ingots crush back into dust, but these recipes never get bonus output.
 - Coal gives {{ item('rngtech:coal_dust') }}, crops and plants give {{ item('rngtech:organic_reagent') }}, and seeds give {{ item('rngtech:compost_feedstock') }}.
 

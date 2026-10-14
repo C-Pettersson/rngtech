@@ -13,7 +13,7 @@
     "count": 3,
     "id": "rngtech:crushed_platinum"
   },
-  "processing_ticks": 200,
+  "processing_ticks": 300,
   "energy": 38400,
   "required_processing_level": 6,
   "machine_xp": 6

@@ -13,7 +13,7 @@
     "count": 3,
     "id": "rngtech:crushed_osmium"
   },
-  "processing_ticks": 200,
+  "processing_ticks": 400,
   "energy": 19200,
   "required_processing_level": 4,
   "machine_xp": 4

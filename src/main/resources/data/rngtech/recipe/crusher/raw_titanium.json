@@ -13,7 +13,7 @@
     "count": 2,
     "id": "rngtech:crushed_titanium"
   },
-  "processing_ticks": 120,
+  "processing_ticks": 360,
   "energy": 17280,
   "required_processing_level": 5,
   "machine_xp": 5

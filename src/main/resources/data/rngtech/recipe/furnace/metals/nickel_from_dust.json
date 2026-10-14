@@ -13,7 +13,7 @@
     "result": {
         "id": "rngtech:nickel_ingot"
     },
-    "processing_ticks": 200,
+    "processing_ticks": 250,
     "energy": 4800,
     "experience": 0.7,
     "minimum_temperature": 1100,

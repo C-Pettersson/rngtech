@@ -13,7 +13,7 @@
     "count": 2,
     "id": "rngtech:crushed_silver"
   },
-  "processing_ticks": 120,
+  "processing_ticks": 90,
   "energy": 5760,
   "required_processing_level": 3,
   "machine_xp": 3

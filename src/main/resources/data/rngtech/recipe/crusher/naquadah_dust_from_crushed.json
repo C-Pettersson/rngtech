@@ -14,7 +14,7 @@
         "id": "rngtech:naquadah_dust"
     },
     "bonus_output": false,
-    "processing_ticks": 60,
+    "processing_ticks": 240,
     "energy": 7200,
     "required_processing_level": 1,
     "machine_xp": 1
