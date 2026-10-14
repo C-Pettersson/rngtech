@@ -4,13 +4,54 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 
 public final class MachineStatDisplay {
     private static final double EPSILON = 0.0001;
+    private static final Set<MachineStat> MULTIPLIER_STATS = EnumSet.of(
+            MachineStat.OUTPUT_AMOUNT,
+            MachineStat.PROCESSING_SPEED,
+            MachineStat.EFFICIENCY,
+            MachineStat.STABILITY,
+            MachineStat.HEAT_TRANSFER,
+            MachineStat.HEAT_ISOLATION,
+            MachineStat.TEMPERATURE_STABILITY,
+            MachineStat.FUEL_EFFICIENCY,
+            MachineStat.WARMUP_TIME,
+            MachineStat.COOLING_RATE,
+            MachineStat.OVERHEAT_TOLERANCE,
+            MachineStat.GLOBAL_MODIFIER_STRENGTH,
+            MachineStat.CALIBRATION_QUALITY,
+            MachineStat.CALIBRATION_PRECISION,
+            MachineStat.CATALYST_EFFICIENCY,
+            MachineStat.POTATO_POWER,
+            MachineStat.CARROT_POWER,
+            MachineStat.BREAD_POWER,
+            MachineStat.SAPLING_POWER,
+            MachineStat.SEED_POWER,
+            MachineStat.PLANT_POWER,
+            MachineStat.ORGANIC_REAGENT_POWER,
+            MachineStat.COMPOSTED_BIOMASS_POWER,
+            MachineStat.ALGAE_POWER,
+            MachineStat.RICH_BIOMASS_POWER,
+            MachineStat.FUEL_DURATION,
+            MachineStat.PEAK_SOLAR_GENERATION,
+            MachineStat.MINING_SPEED,
+            MachineStat.ATTACK_SPEED,
+            MachineStat.ORE_BURST_SPEED,
+            MachineStat.JAM_CHANCE,
+            MachineStat.CART_SPEED,
+            MachineStat.ENERGY_USAGE,
+            MachineStat.FE_USAGE
+    );
 
     public static String statValue(MachineStat stat, double value) {
+        if (isMultiplier(stat)) {
+            return formatMultiplierDelta(value) + (stat == MachineStat.ENERGY_USAGE || stat == MachineStat.FE_USAGE ? " FE/craft" : "");
+        }
         return switch (stat) {
             case INPUT_SLOTS, OUTPUT_SLOTS, ADDON_SLOTS, BLOCK_FILTER_SLOTS -> formatUnit(value, "slot", "slots");
             case CONTROL, DRIVE, RESERVE -> formatUnit(value, "point", "points");
@@ -21,7 +62,6 @@ public final class MachineStatDisplay {
             case ENERGY_CAPACITY, ENERGY_CAPACITY_FLAT, BUFFER_SIZE -> formatNumber(value) + " FE";
             case ENERGY_GENERATION -> formatNumber(value) + " FE/t";
             case ENERGY_TRANSFER, BURST_TRANSFER, FE_TRANSFER -> formatNumber(value) + " FE/t";
-            case ENERGY_USAGE, FE_USAGE -> formatMultiplierDelta(value) + " FE/craft";
             case FLUID_CAPACITY -> formatNumber(value) + " mB";
             case FLUID_TRANSFER -> formatNumber(value) + " mB/t";
             case COMPRESSION_RATIO -> formatNumber(value) + ":1";
@@ -44,41 +84,10 @@ public final class MachineStatDisplay {
                     HIGH_HARDNESS_ENERGY_MITIGATION -> formatSignedPercentPoints(value);
             case OUTPUT_GUARD_GRACE -> formatSignedNumber(value) + " ticks";
             case REFINEMENT_POTENTIAL_BONUS -> formatSignedNumber(value) + " RP";
-            case OUTPUT_AMOUNT,
-                    PROCESSING_SPEED,
-                    EFFICIENCY,
-                    STABILITY,
-                    HEAT_TRANSFER,
-                    HEAT_ISOLATION,
-                    TEMPERATURE_STABILITY,
-                    FUEL_EFFICIENCY,
-                    WARMUP_TIME,
-                    COOLING_RATE,
-                    OVERHEAT_TOLERANCE,
-                    GLOBAL_MODIFIER_STRENGTH,
-                    CALIBRATION_QUALITY,
-                    CALIBRATION_PRECISION,
-                    CATALYST_EFFICIENCY,
-                    POTATO_POWER,
-                    CARROT_POWER,
-                    BREAD_POWER,
-                    SAPLING_POWER,
-                    SEED_POWER,
-                    PLANT_POWER,
-                    ORGANIC_REAGENT_POWER,
-                    COMPOSTED_BIOMASS_POWER,
-                    ALGAE_POWER,
-                    RICH_BIOMASS_POWER,
-                    FUEL_DURATION,
-                    PEAK_SOLAR_GENERATION,
-                    MINING_SPEED,
-                    ATTACK_SPEED,
-                    ORE_BURST_SPEED -> formatMultiplierDelta(value);
             case BATTERY_SUPPORT -> "stage " + formatNumber(value);
             case SOLAR_PANEL_LIMIT -> formatUnit(value, "panel", "panels");
             case HARDNESS_TOLERANCE -> formatUnit(value, "level", "levels");
             case BANK_MEMORY -> formatUnit(value, "input", "inputs");
-            case JAM_CHANCE -> formatMultiplierDelta(value);
             case JAM_RECOVERY, UNDER_LEVEL_EFFICIENCY, AT_LEVEL_OUTPUT, OVERDRIVE_CAP, LEDGER_RATE, FLUX_RATE, BLEND_SPEED -> formatSignedPercentPoints(value);
             case CYCLE_JAM_CHANCE -> formatSignedPercentPoints(value) + " chance";
             case ESCAPEMENT_SPEED -> formatSignedPercentPoints(value);
@@ -88,7 +97,6 @@ public final class MachineStatDisplay {
             case STREAK_FLOOR, STREAK_CAP -> formatNumber(value) + " stability";
             case COIL_REACH -> formatUnit(value, "stage", "stages");
             case FLUID_YIELD, OVERLEVEL_SPEED -> formatSignedPercentPoints(value);
-            case CART_SPEED -> formatMultiplierDelta(value);
             case GROWTH_PULSE -> formatNumber(value) + " bone meal";
             case WORK_RANGE -> formatUnit(value, "row", "rows");
             case IDLE_CART_SPEED -> formatSignedPercentPoints(value);
@@ -256,6 +264,11 @@ public final class MachineStatDisplay {
     private static String formatSignedUnit(double value, String singular, String plural) {
         String unit = Math.abs(Math.abs(value) - 1.0) <= EPSILON ? singular : plural;
         return formatSignedNumber(value) + " " + unit;
+    }
+
+    /** Whether {@code stat} is a multiplier shown as its change from ×1, so ×1.2 reads as +20%. */
+    static boolean isMultiplier(MachineStat stat) {
+        return MULTIPLIER_STATS.contains(stat);
     }
 
     private static String formatMultiplierDelta(double value) {
