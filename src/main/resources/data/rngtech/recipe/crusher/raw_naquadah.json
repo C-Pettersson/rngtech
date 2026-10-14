@@ -13,7 +13,7 @@
     "count": 2,
     "id": "rngtech:crushed_naquadah"
   },
-  "processing_ticks": 120,
+  "processing_ticks": 480,
   "energy": 34560,
   "required_processing_level": 8,
   "machine_xp": 8

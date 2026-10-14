@@ -61,6 +61,8 @@ Mine a placed Furnace with a pickaxe. It drops itself and keeps its rolled trait
 
 Put items in the top input slot. The Furnace heats up at a rate set by its Heat Transfer and Warmup Time stats, and starts smelting only once the lane reaches the recipe's target temperature. While the lane is blocked, out of input, or out of power, it cools down.
 
+Each metal smelts at its own pace: low-melting Lead and Tin in half the time of Iron, high-melting Osmium, Titanium, and Tungsten in two and a half to four times as long. The FE per smelt does not change.
+
 Heat decides your progress. Unmodified electric chassis reach about:
 
 | Heat Core | Max temperature | Unlocks |
