@@ -22,7 +22,7 @@ public final class StatBreakdownText {
         lines.add(Component.translatable(
                 "rngtech.stat.breakdown.title",
                 Component.translatable(stat.translationKey()),
-                amount(stat, breakdown.finalValue())
+                isRate(stat) ? MachineStatDisplay.statValue(stat, breakdown.finalValue()) : amount(stat, breakdown.finalValue())
         ));
         if (stat == MachineStat.ENERGY_GENERATION) {
             lines.add(Component.translatable("rngtech.stat.breakdown.generation_multiplier").withStyle(ChatFormatting.DARK_GRAY));
@@ -30,7 +30,7 @@ public final class StatBreakdownText {
 
         double base = breakdown.base();
         if (Math.abs(base) > EPSILON) {
-            lines.add(header("rngtech.stat.breakdown.base", amount(stat, base)));
+            lines.add(header(isRate(stat) ? "rngtech.stat.breakdown.chassis_base" : "rngtech.stat.breakdown.base", amount(stat, base)));
         }
         section(lines, breakdown, StatBreakdown.Kind.ADD, "rngtech.stat.breakdown.added", signedAmount(stat, breakdown.added()));
         StatBreakdown.Term converted = breakdown.lowest(StatBreakdown.Kind.CONVERTED);
@@ -164,9 +164,17 @@ public final class StatBreakdownText {
 
     /** Energy Generation is a multiplier in the accumulator, so it skips the FE/t unit of its displayed row. */
     private static String amount(MachineStat stat, double value) {
+        if (isRate(stat)) {
+            return factor(value);
+        }
         return stat == MachineStat.ENERGY_GENERATION
                 ? MachineStatDisplay.formatNumber(value)
                 : MachineStatDisplay.statValue(stat, value);
+    }
+
+    /** Stats shown as a multiplier on a listed time, like attack speed: the math multiplies a chassis base. */
+    private static boolean isRate(MachineStat stat) {
+        return stat == MachineStat.PROCESSING_SPEED;
     }
 
     private static String signedAmount(MachineStat stat, double value) {

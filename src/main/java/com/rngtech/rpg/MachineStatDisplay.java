@@ -44,8 +44,10 @@ public final class MachineStatDisplay {
                     HIGH_HARDNESS_ENERGY_MITIGATION -> formatSignedPercentPoints(value);
             case OUTPUT_GUARD_GRACE -> formatSignedNumber(value) + " ticks";
             case REFINEMENT_POTENTIAL_BONUS -> formatSignedNumber(value) + " RP";
-            // A rate, like attack speed: a 1.25x chassis base times its bonuses, not a percent bonus over 1.
-            case PROCESSING_SPEED -> formatNumber(value) + "×";
+            // How much faster than a recipe's listed time; the breakdown shows the rate math behind it.
+            case PROCESSING_SPEED -> value >= 1.0
+                    ? formatMultiplierDelta(value) + " faster"
+                    : formatNumber((1.0 - value) * 100.0) + "% slower";
             case OUTPUT_AMOUNT,
                     EFFICIENCY,
                     STABILITY,

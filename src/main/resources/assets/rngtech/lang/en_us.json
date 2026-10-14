@@ -2139,6 +2139,7 @@
   "rngtech.stat.breakdown.none": "Nothing contributes to this stat.",
   "rngtech.stat.breakdown.generation_multiplier": "Generation multiplier, before base FE/t",
   "rngtech.stat.breakdown.base": "Base: %s",
+  "rngtech.stat.breakdown.chassis_base": "Chassis base: %s",
   "rngtech.stat.breakdown.added": "Added: %s",
   "rngtech.stat.breakdown.increased": "Increased: %s",
   "rngtech.stat.breakdown.more": "More: %s",
