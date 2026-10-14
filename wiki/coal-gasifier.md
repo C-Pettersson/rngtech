@@ -20,6 +20,8 @@ wiki:
 
 The **Coal Gasifier** turns Coal Dust and water into **Syngas**, the Stage 5 step up from burning coal directly. Burn the Syngas in a [Syngas Combustor](syngas-combustor.md) for power, or reform it in a [Steam Methane Reformer](steam-methane-reformer.md). Each run also leaves a {{ item('rngtech:gasification_residue') }} behind.
 
+It is built as a gasifier tower: a feed hopper on top drops Coal Dust through a rotary valve into a tall reactor vessel, and ash falls out of the bottom into a residue bin.
+
 Like other RNGTech machines, each Coal Gasifier you craft rolls its own [rarity and affixes](rarity-and-affixes.md).
 
 ## Obtaining
@@ -44,6 +46,15 @@ Mine a placed Coal Gasifier with a pickaxe. It drops itself with its rolled trai
 4. Supply FE.
 
 Each run uses one Coal Dust, 500 mB of water, and 6,000 FE over 12 seconds, and makes 1,000 mB of Syngas plus one Gasification Residue. The water and Syngas tanks hold 8,000 mB each. The Gasifier stops when the Syngas tank or the residue slot is full, so pipe both away.
+
+You can read the Gasifier from the outside. Facing the front:
+
+- The hopper on top shows how much Coal Dust is loaded, and the rotary valve under it turns while the Gasifier runs.
+- The view port on the vessel glows while it runs, and the gauge beside the Syngas line rises with it.
+- The glass on the right shows the water level and the glass on the left the Syngas level.
+- Residue piles up in the bin under the vessel, and steam rises from it while the Gasifier runs.
+- The installed Heat Core sits in a socket on the right side of the vessel, the Servo beside the valve, and the Battery Cell on the back cabinet, each in its material's colour.
+- The lamp at the front lights while it runs.
 
 The screen's status line tells you what is missing: Heat Core, input, fluid, power, or output space. You can empty the water or Syngas tank with the purge buttons on the Process tab, or by right-clicking the Gasifier with a {{ item('rngtech:purge_bucket') }}. Each purge voids up to 1,000 mB.
 
@@ -71,7 +82,7 @@ The stats and rolled affixes of installed Gear add to the Gasifier's own.
 | Sides | Accept FE. |
 | Any | Fill water and drain Syngas through any face. |
 
-Gear slots are manual only.
+Gear slots are manual only. The back cabinet has a port plate sized for a Universal Connector, the tidiest place to attach one.
 
 ### Coal gasification recipes
 

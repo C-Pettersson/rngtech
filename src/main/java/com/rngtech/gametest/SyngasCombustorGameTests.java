@@ -16,7 +16,6 @@ import net.minecraft.core.Direction;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.block.Block;
 import net.neoforged.neoforge.energy.IEnergyStorage;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.capability.IFluidHandler;
@@ -25,14 +24,12 @@ import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
 /**
  * The Syngas Combustor's fuel mixture trades fuel and exhaust for power, and the shaped combustor syncs what its renderer
- * draws; the Gasifier and Reformer that share its block entity stay cubes.
+ * draws.
  */
 @GameTestHolder(RNGTech.MOD_ID)
 @PrefixGameTestTemplate(false)
 public final class SyngasCombustorGameTests {
     private static final BlockPos COMBUSTOR = new BlockPos(2, 1, 2);
-    private static final BlockPos GASIFIER = new BlockPos(1, 1, 1);
-    private static final BlockPos REFORMER = new BlockPos(3, 1, 3);
     private static final int SYNGAS = 4000;
     private static final int TANK = 8000;
     private static final BlockPos RICH = new BlockPos(1, 1, 2);
@@ -142,18 +139,5 @@ public final class SyngasCombustorGameTests {
     private static int drain(GasChemistryBlockEntity combustor) {
         IEnergyStorage storage = combustor.getEnergyStorage(Direction.NORTH);
         return storage.extractEnergy(Integer.MAX_VALUE, false);
-    }
-
-    /** The Gasifier and Reformer share the combustor's block entity but keep their cube models and default sync. */
-    @GameTest(template = MachineTestSupport.EMPTY, timeoutTicks = 20)
-    public static void gasifierAndReformerStayCubes(GameTestHelper helper) {
-        for (BlockPos pos : new BlockPos[] {GASIFIER, REFORMER}) {
-            Block block = pos.equals(GASIFIER) ? ModBlocks.COAL_GASIFIER.get() : ModBlocks.STEAM_METHANE_REFORMER.get();
-            GasChemistryBlockEntity machine = MachineTestSupport.place(helper, pos, block, GasChemistryBlockEntity.class);
-            check(machine.getBlockState().canOcclude(), machine.machine() + " should stay a full occluding cube");
-            check(machine.getUpdatePacket() == null, machine.machine() + " should not send combustor visual updates");
-            check(!machine.getUpdateTag(helper.getLevel().registryAccess()).contains("Firing"), machine.machine() + " should not sync a combustor visual state");
-        }
-        helper.succeed();
     }
 }

@@ -1,12 +1,6 @@
 {
-  "parent": "minecraft:block/cube",
+  "parent": "rngtech:block/coal_gasifier",
   "textures": {
-    "down": "rngtech:block/melter/bottom/melter",
-    "up": "rngtech:block/melter/top/melter",
-    "north": "rngtech:block/melter/front/melter_active",
-    "south": "rngtech:block/melter/side/melter",
-    "east": "rngtech:block/melter/side/melter",
-    "west": "rngtech:block/melter/side/melter",
-    "particle": "rngtech:block/melter/front/melter_active"
+    "lamp": "rngtech:block/coal_gasifier/lamp_on"
   }
 }

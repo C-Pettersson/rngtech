@@ -7,6 +7,7 @@ import com.rngtech.content.item.BatteryCellItem;
 import com.rngtech.content.item.GasChemistryPartItem;
 import com.rngtech.content.item.GearParts;
 import com.rngtech.content.item.ServoItem;
+import com.rngtech.content.item.SolidFuelBurnerPartItem;
 import com.rngtech.content.menu.GasChemistryMenu;
 import com.rngtech.content.purge.FluidOutputOverflow;
 import com.rngtech.content.purge.FluidPurgeRole;
@@ -282,6 +283,9 @@ public class GasChemistryBlockEntity extends BaseMachineBlockEntity
     private CombustorVisualState visualState = CombustorVisualState.IDLE;
     private CombustorVisualState.Key lastSyncedVisual;
     private final CombustorVisualState.Animation animation = new CombustorVisualState.Animation();
+    private GasProcessorVisualState processorVisualState = GasProcessorVisualState.IDLE;
+    private GasProcessorVisualState.Key lastSyncedProcessorVisual;
+    private final GasProcessorVisualState.Animation processorAnimation = new GasProcessorVisualState.Animation();
 
     public GasChemistryBlockEntity(BlockPos pos, BlockState blockState, GasChemistryMachine machine) {
         super(ModBlockEntities.GAS_CHEMISTRY.get(), pos, blockState, machine.machineType(), SLOT_PROCESS_INPUT, SLOT_PROCESS_INPUT, SLOT_PROCESS_OUTPUT);
@@ -296,9 +300,7 @@ public class GasChemistryBlockEntity extends BaseMachineBlockEntity
         if (worked || exported) {
             gasChemistry.setChanged();
         }
-        if (gasChemistry.isCombustor()) {
-            gasChemistry.syncVisualState(level);
-        }
+        gasChemistry.syncVisualState(level);
     }
 
     private boolean isCombustor() {
@@ -306,13 +308,13 @@ public class GasChemistryBlockEntity extends BaseMachineBlockEntity
     }
 
     /**
-     * Combustors saved while the block was a solid cube stored no light inside it, which leaves the renderer's parts
-     * unlit. Rechecking the block's own light once on load fixes those saves.
+     * Machines saved while the block was a solid cube stored no light inside it, which leaves the renderer's parts unlit.
+     * Rechecking the block's own light once on load fixes those saves.
      */
     @Override
     public void onLoad() {
         super.onLoad();
-        if (isCombustor() && level != null && !level.isClientSide) {
+        if (level != null && !level.isClientSide) {
             level.getLightEngine().checkBlock(worldPosition);
         }
     }
@@ -326,31 +328,40 @@ public class GasChemistryBlockEntity extends BaseMachineBlockEntity
         return animation;
     }
 
+    /** Client copy of the state the Coal Gasifier and Steam Methane Reformer renderers draw. */
+    public GasProcessorVisualState processorVisualState() {
+        return processorVisualState;
+    }
+
+    public GasProcessorVisualState.Animation processorAnimation() {
+        return processorAnimation;
+    }
+
     @Override
     public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
-        return isCombustor() ? currentVisualState().save() : super.getUpdateTag(registries);
+        return isCombustor() ? currentVisualState().save() : currentProcessorVisualState().save();
     }
 
     @Override
     public Packet<ClientGamePacketListener> getUpdatePacket() {
-        return isCombustor() ? ClientboundBlockEntityDataPacket.create(this) : super.getUpdatePacket();
+        return ClientboundBlockEntityDataPacket.create(this);
     }
 
     @Override
     public void handleUpdateTag(CompoundTag tag, HolderLookup.Provider registries) {
-        if (isCombustor()) {
-            visualState = CombustorVisualState.load(tag);
-        } else {
-            super.handleUpdateTag(tag, registries);
-        }
+        loadVisualState(tag);
     }
 
     @Override
     public void onDataPacket(Connection connection, ClientboundBlockEntityDataPacket packet, HolderLookup.Provider registries) {
+        loadVisualState(packet.getTag());
+    }
+
+    private void loadVisualState(CompoundTag tag) {
         if (isCombustor()) {
-            visualState = CombustorVisualState.load(packet.getTag());
+            visualState = CombustorVisualState.load(tag);
         } else {
-            super.onDataPacket(connection, packet, registries);
+            processorVisualState = GasProcessorVisualState.load(tag);
         }
     }
 
@@ -358,11 +369,45 @@ public class GasChemistryBlockEntity extends BaseMachineBlockEntity
         if (level.getGameTime() % VISUAL_SYNC_INTERVAL != 0) {
             return;
         }
-        CombustorVisualState.Key key = currentVisualState().key();
-        if (!key.equals(lastSyncedVisual)) {
+        boolean changed;
+        if (isCombustor()) {
+            CombustorVisualState.Key key = currentVisualState().key();
+            changed = !key.equals(lastSyncedVisual);
             lastSyncedVisual = key;
+        } else {
+            GasProcessorVisualState.Key key = currentProcessorVisualState().key();
+            changed = !key.equals(lastSyncedProcessorVisual);
+            lastSyncedProcessorVisual = key;
+        }
+        if (changed) {
             level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), Block.UPDATE_CLIENTS);
         }
+    }
+
+    GasProcessorVisualState currentProcessorVisualState() {
+        IEnergyStorage cell = batteryCellStorage();
+        float capacity = TANK_CAPACITY;
+        return new GasProcessorVisualState(
+                isActive(),
+                (float) effectiveStats().value(MachineStat.PROCESSING_SPEED),
+                activeTicks <= 0 ? 0.0F : Mth.clamp(progress / (float) activeTicks, 0.0F, 1.0F),
+                waterTank.getFluidAmount() / capacity,
+                inputTank.getFluidAmount() / capacity,
+                inputTank.getFluid().getFluid(),
+                outputTank.getFluidAmount() / capacity,
+                secondaryOutputTank.getFluidAmount() / capacity,
+                fill(processInventory.getStackInSlot(SLOT_PROCESS_INPUT)),
+                fill(processInventory.getStackInSlot(SLOT_PROCESS_OUTPUT)),
+                gearLook(heatCoreStack()),
+                gearLook(servoStack()),
+                gearLook(batteryCellStack()),
+                cell == null || cell.getMaxEnergyStored() <= 0 ? 0.0F : cell.getEnergyStored() / (float) cell.getMaxEnergyStored(),
+                hasCatalystGearSlot() && isReformingCatalyst(catalystStack())
+        );
+    }
+
+    private static float fill(ItemStack stack) {
+        return stack.isEmpty() ? 0.0F : stack.getCount() / (float) stack.getMaxStackSize();
     }
 
     CombustorVisualState currentVisualState() {
@@ -393,6 +438,9 @@ public class GasChemistryBlockEntity extends BaseMachineBlockEntity
         }
         if (stack.getItem() instanceof BatteryCellItem cell) {
             return cell.material().unique() ? "unique" : cell.material().getSerializedName();
+        }
+        if (stack.getItem() instanceof SolidFuelBurnerPartItem part && part.heatCoreMaterial() != null) {
+            return part.heatCoreMaterial().getSerializedName();
         }
         return "";
     }
