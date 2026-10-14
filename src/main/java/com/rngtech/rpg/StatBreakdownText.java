@@ -57,10 +57,10 @@ public final class StatBreakdownText {
         if (hasScaling(breakdown)) {
             lines.add(Component.translatable(
                     "rngtech.stat.breakdown.formula",
-                    amount(stat, base + breakdown.added()),
-                    factor(breakdown.increasedScale()),
-                    factor(breakdown.more()),
-                    amount(stat, breakdown.ordinary())
+                    operand(stat, base + breakdown.added()),
+                    MachineStatDisplay.formatNumber(breakdown.increasedScale()),
+                    MachineStatDisplay.formatNumber(breakdown.more()),
+                    result(stat, breakdown.ordinary())
             ).withStyle(ChatFormatting.GRAY));
         }
         if (breakdown.dividesReductions() && breakdown.reductionsPercent() > 0.0) {
@@ -179,6 +179,17 @@ public final class StatBreakdownText {
     /** Stats shown as a multiplier on a listed time, like attack speed: the math multiplies a chassis base. */
     private static boolean isRate(MachineStat stat) {
         return stat == MachineStat.PROCESSING_SPEED;
+    }
+
+    /** A multiplier stat enters the formula as its factor, so ×1.2 reads as 1.2 rather than +20%. */
+    private static String operand(MachineStat stat, double value) {
+        return MachineStatDisplay.isMultiplier(stat) ? MachineStatDisplay.formatNumber(value) : amount(stat, value);
+    }
+
+    private static String result(MachineStat stat, double value) {
+        return MachineStatDisplay.isMultiplier(stat)
+                ? MachineStatDisplay.formatNumber(value) + " (" + MachineStatDisplay.statValue(stat, value) + ")"
+                : amount(stat, value);
     }
 
     private static String signedAmount(MachineStat stat, double value) {

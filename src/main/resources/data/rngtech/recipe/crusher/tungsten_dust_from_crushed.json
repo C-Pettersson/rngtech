@@ -14,7 +14,7 @@
         "id": "rngtech:tungsten_dust"
     },
     "bonus_output": false,
-    "processing_ticks": 60,
+    "processing_ticks": 180,
     "energy": 4800,
     "required_processing_level": 1,
     "machine_xp": 1

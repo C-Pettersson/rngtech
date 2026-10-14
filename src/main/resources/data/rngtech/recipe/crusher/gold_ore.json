@@ -7,7 +7,7 @@
         "count": 3,
         "id": "rngtech:crushed_gold"
     },
-    "processing_ticks": 160,
+    "processing_ticks": 120,
     "energy": 7680,
     "required_processing_level": 2,
     "machine_xp": 2

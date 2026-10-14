@@ -3,7 +3,9 @@ package com.rngtech.rpg;
 import com.rngtech.content.energy.HeatCoreMaterial;
 
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.contents.TranslatableContents;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -25,6 +27,7 @@ public final class StatBreakdownChecks {
         partContributionsCarryThePartLabel();
         flatCapacityFoldsIntoCapacity();
         crusherYieldSoftCapRecombines();
+        multiplierFormulaUsesFactors();
         floorAndBonusScaleRecombine();
         energyUsageReductionsRecombine();
         textListsEverySource();
@@ -209,6 +212,25 @@ public final class StatBreakdownChecks {
         String text = StatBreakdownText.lines(breakdown).stream().map(Component::getString).collect(Collectors.joining("\n"));
         require(text.contains("rngtech.stat.breakdown.soft_cap"),
                 "the breakdown shows the soft-cap math:\n" + text);
+    }
+
+    private static void multiplierFormulaUsesFactors() {
+        MachineStatAccumulator stats = MachineStatAccumulator.recording(() -> {
+            MachineStatAccumulator recorded = MachineStatAccumulator.componentBase(Map.of(MachineStat.OUTPUT_AMOUNT, 1.2))
+                    .withCrusherYieldRules();
+            recorded.apply(Component.literal("Crush Head"), new MachineModifier(ModifierSlot.IMPLICIT, MachineStat.OUTPUT_AMOUNT, ModifierOperation.INCREASED_PERCENT, 25));
+            return recorded;
+        });
+        StatBreakdown breakdown = stats.breakdown(MachineStat.OUTPUT_AMOUNT).orElseThrow();
+        near(breakdown.recompute(), 1.44, "a soft-capped +25% increased scales a ×1.2 yield to ×1.44");
+        Component formula = StatBreakdownText.lines(breakdown).stream()
+                .filter(line -> line.getContents() instanceof TranslatableContents contents
+                        && contents.getKey().equals("rngtech.stat.breakdown.formula"))
+                .findFirst()
+                .orElseThrow();
+        List<String> operands = Arrays.stream(((TranslatableContents) formula.getContents()).getArgs()).map(String::valueOf).toList();
+        require(operands.equals(List.of("1.2", "1.2", "1", "1.44 (+44%)")),
+                "a multiplier stat's formula multiplies factors, not its +20% display: " + operands);
     }
 
     private static void floorAndBonusScaleRecombine() {
