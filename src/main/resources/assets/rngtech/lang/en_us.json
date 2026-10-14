@@ -2147,7 +2147,7 @@
   "rngtech.stat.breakdown.soft_cap": "Diminishing returns: %s × %s ÷ (%s + %s) = %s",
   "rngtech.stat.breakdown.divided": "Reductions divide: %s ÷ %s.",
   "rngtech.stat.breakdown.fixed": "Fixed at %s by %s",
-  "rngtech.stat.breakdown.converted": "%s applies these increases and reductions to another stat instead.",
+  "rngtech.stat.breakdown.converted": "%s applies this stat's %s increased to another stat instead.",
   "rngtech.stat.breakdown.capped": "Capped at %s by %s",
   "rngtech.stat.breakdown.floor": "Never below %s.",
   "rngtech.stat.breakdown.bonus_more": "Bonus kept: %s",

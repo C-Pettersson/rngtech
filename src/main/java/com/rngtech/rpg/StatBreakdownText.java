@@ -33,17 +33,20 @@ public final class StatBreakdownText {
             lines.add(header("rngtech.stat.breakdown.base", amount(stat, base)));
         }
         section(lines, breakdown, StatBreakdown.Kind.ADD, "rngtech.stat.breakdown.added", signedAmount(stat, breakdown.added()));
-        section(
-                lines,
-                breakdown,
-                StatBreakdown.Kind.INCREASED,
-                "rngtech.stat.breakdown.increased",
-                MachineStatDisplay.formatSignedPercentPoints(breakdown.increasedPercent())
-        );
-        softCap(lines, breakdown);
         StatBreakdown.Term converted = breakdown.lowest(StatBreakdown.Kind.CONVERTED);
-        if (converted != null && breakdown.increasedPercent() != 0.0) {
-            lines.add(Component.translatable("rngtech.stat.breakdown.converted", converted.source()).withStyle(ChatFormatting.GOLD));
+        if (converted == null) {
+            section(
+                    lines,
+                    breakdown,
+                    StatBreakdown.Kind.INCREASED,
+                    "rngtech.stat.breakdown.increased",
+                    MachineStatDisplay.formatSignedPercentPoints(breakdown.increasedPercent())
+            );
+            softCap(lines, breakdown);
+        } else if (breakdown.increasedPercent() != 0.0) {
+            // The converted bucket is listed under the stat it now feeds, not here as well.
+            lines.add(Component.translatable("rngtech.stat.breakdown.converted", converted.source(),
+                    MachineStatDisplay.formatSignedPercentPoints(breakdown.increasedPercent())).withStyle(ChatFormatting.GOLD));
         }
         section(lines, breakdown, StatBreakdown.Kind.MORE, "rngtech.stat.breakdown.more", factor(breakdown.more()));
 
