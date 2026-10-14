@@ -16,6 +16,7 @@
         "generator_parts",
         "generators",
         "heat_core",
+        "mastery_attributes",
         "processing_machines",
         "servo",
         "stability_parts",

@@ -192,6 +192,29 @@ public abstract class BaseMachineBlockEntity extends BlockEntity implements Refi
         return progression == null ? MachineProgressionState.EMPTY : progression;
     }
 
+    /** Synced in place of a job's progress while the Process tab flashes a skipped job. */
+    public static final int INSTANT_FLASH_PROGRESS = -1;
+    /** How long the Process tab's progress bar flashes after an Instant Process. */
+    private static final int INSTANT_FLASH_TICKS = 10;
+    private final long[] instantFlashUntil = new long[4];
+
+    /** Records an Instant Process so the Process tab can flash the bar of {@code lane}. */
+    protected final void markInstantProcess(int lane) {
+        if (level != null && lane >= 0 && lane < instantFlashUntil.length) {
+            instantFlashUntil[lane] = level.getGameTime() + INSTANT_FLASH_TICKS;
+        }
+    }
+
+    protected final void markInstantProcess() {
+        markInstantProcess(0);
+    }
+
+    /** {@code progress}, or the flash marker while {@code lane} just finished a job instantly. */
+    protected final int syncedProgress(int lane, int progress) {
+        return level != null && lane >= 0 && lane < instantFlashUntil.length && level.getGameTime() < instantFlashUntil[lane]
+                ? INSTANT_FLASH_PROGRESS : progress;
+    }
+
     /** Whether allocated Mastery grants {@code behavior}, cached until the progression changes. */
     protected boolean hasMasteryBehavior(String behavior) {
         MachineProgressionState state = machineProgression();

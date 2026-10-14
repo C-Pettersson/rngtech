@@ -26,8 +26,8 @@
             "y": 1,
             "effects": [
                 {
-                    "stat": "STABILITY",
-                    "operation": "INCREASED_PERCENT",
+                    "stat": "ENERGY_USAGE",
+                    "operation": "DECREASED_PERCENT",
                     "value": 8
                 }
             ]
@@ -106,8 +106,8 @@
             "y": 1,
             "effects": [
                 {
-                    "stat": "STABILITY",
-                    "operation": "INCREASED_PERCENT",
+                    "stat": "ENERGY_USAGE",
+                    "operation": "DECREASED_PERCENT",
                     "value": 8
                 }
             ]

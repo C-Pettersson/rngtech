@@ -49,6 +49,10 @@ public final class MachineStatDisplay {
     );
 
     public static String statValue(MachineStat stat, double value) {
+        // How much faster than a recipe's listed time; the breakdown shows the rate math behind it.
+        if (stat == MachineStat.PROCESSING_SPEED) {
+            return value >= 1.0 ? formatMultiplierDelta(value) + " faster" : formatNumber((1.0 - value) * 100.0) + "% slower";
+        }
         if (isMultiplier(stat)) {
             return formatMultiplierDelta(value) + (stat == MachineStat.ENERGY_USAGE || stat == MachineStat.FE_USAGE ? " FE/craft" : "");
         }

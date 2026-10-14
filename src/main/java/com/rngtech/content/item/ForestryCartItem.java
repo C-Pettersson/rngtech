@@ -3,14 +3,16 @@ package com.rngtech.content.item;
 import com.rngtech.content.entity.ForestryCartEntity;
 import com.rngtech.content.recycling.RecyclingData;
 import com.rngtech.content.registry.ModDataComponents;
+import com.rngtech.rpg.ComponentBaseStatCatalog;
 import com.rngtech.rpg.MachineNameGenerator;
 import com.rngtech.rpg.MachineStatAccumulator;
 import com.rngtech.rpg.MachineTraitRoller;
 import com.rngtech.rpg.MachineTraits;
 import com.rngtech.rpg.MachineType;
 import com.rngtech.rpg.ModifierEligibilityProfiles;
-import com.rngtech.rpg.progression.ForestryCompanionPassiveTree;
+import com.rngtech.rpg.progression.MachineMasteryFamily;
 import com.rngtech.rpg.progression.MachineProgressionState;
+import com.rngtech.rpg.progression.MegaPassiveTree;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
@@ -58,9 +60,18 @@ public class ForestryCartItem extends Item {
     }
 
     public static MachineStatAccumulator effectiveStats(MachineTraits traits, MachineProgressionState progression) {
+        return effectiveStats(traits, progression, ItemStack.EMPTY);
+    }
+
+    /** Cart stats with the attribute points rolled on an installed Fluid Pump, which feed the Mastery conversions. */
+    public static MachineStatAccumulator effectiveStats(MachineTraits traits, MachineProgressionState progression, ItemStack pump) {
         MachineStatAccumulator stats = MachineStatAccumulator.forestryCompanionBase();
         stats.apply(traits);
-        ForestryCompanionPassiveTree.applyStats(stats, progression);
+        MegaPassiveTree.applyNodeStats(stats, progression, MachineMasteryFamily.FORESTRY);
+        if (!pump.isEmpty()) {
+            ComponentBaseStatCatalog.applyAttributeAffixes(stats, pump);
+        }
+        MegaPassiveTree.applyAttributeStats(stats, progression, MachineMasteryFamily.FORESTRY);
         return stats;
     }
 

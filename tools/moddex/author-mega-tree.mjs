@@ -3,7 +3,7 @@ import { fileURLToPath } from "node:url";
 import { CENTER, START_ANGLES, layoutMegaTree } from "./layout-mega-tree.mjs";
 
 // Deterministic authoring source. Runtime and ModDex read the same checked-in catalog.
-export const TREE_VERSION = 2;
+export const TREE_VERSION = 3;
 // Nodes placed by the original fill; EXTRAS append after it, so the catalog holds more.
 export const TOTAL_NODES = 1300;
 const ATTRIBUTES = ["CONTROL", "DRIVE", "RESERVE"];
@@ -45,10 +45,10 @@ const THEMES = {
         ["Slow Burn", "Banked Coals", "Clean Combustion", "Air Dampers", "Ember Keeper", "Fuel Metering", "Long Grate", "Charcoal Bed", "Lean Mixture", "Afterburner Loop", "Stoking Rhythm", "Coke Oven"]),
     reserves: theme("Reserves", ["ENERGY_CAPACITY", "INCREASED_PERCENT"], 3, 9, effect("RESERVE", 4, "ADD"),
         ["Frame Reservoir", "Buffer Laminate", "Massive Buffer", "Battery Shell", "Auxiliary Bank", "Deep Cells", "Capacitor Trace", "Copper Plates", "Stacked Cells", "Charge Vault", "Spare Capacity", "Reservoir Tanks"]),
-    chargeTransfer: theme("Charge Transfer", ["ENERGY_TRANSFER", "INCREASED_PERCENT"], 3, 9, effect("ENERGY_CAPACITY", 3),
-        ["Reserve Channels", "Internal Bus", "Recovery Bus", "Wide Busbars", "Cell Contacts", "Buffered Discharge", "Low Ohm Paths", "Split Feeds", "Trunk Lines", "Relay Mesh", "Surge Gates", "Charge Ladders"]),
-    powerSupply: theme("Power Supply", ["ENERGY_GENERATION", "INCREASED_PERCENT"], 2, 6, effect("FUEL_DURATION", 2),
-        ["Induction Coils", "Dynamo Windings", "Field Magnets", "Turbine Blades", "Stator Rings", "Exciter Loop", "Generator Tuning", "Rotor Balance", "Phase Matching", "Peak Output", "Brush Contacts", "Armature Wrap"]),
+    heatMargin: theme("Heat Margin", ["OVERHEAT_TOLERANCE", "INCREASED_PERCENT"], 2, 6, effect("TEMPERATURE_STABILITY", 2),
+        ["Safety Valve", "Spill Plates", "Thermal Fuse", "Margin Liner", "Overrun Guard", "Hot Spot Baffles", "Relief Vents", "Flame Arrestor", "Tempered Walls", "Heat Buffer", "Firebox Margin", "Blowoff Ports"]),
+    surge: theme("Surge", ["INSTANT_PROCESS_CHANCE", "ADD"], 1, 3, effect("PROCESSING_SPEED", 2),
+        ["Discharge Pulse", "Snap Release", "Spark Bridge", "Flash Cycle", "Capacitor Kick", "Pulse Train", "Arc Trigger", "Peak Burst", "Quick Discharge", "Overcharge Tap", "Burst Relay", "Surge Gates"]),
     conservation: theme("Conservation", ["ENERGY_USAGE", "DECREASED_PERCENT"], 1, 3, effect("ENERGY_CAPACITY", 3),
         ["Energy Governor", "Standby Mode", "Sleep Timers", "Regenerative Brakes", "Heat Recapture", "Waste Not", "Trickle Charge", "Night Shift", "Load Shedding", "Power Budget", "Idle Cutoff", "Quiet Hours"]),
     insulation: theme("Insulation", ["HEAT_ISOLATION", "INCREASED_PERCENT"], 3, 9, effect("TEMPERATURE_STABILITY", 2),
@@ -61,32 +61,34 @@ const THEMES = {
         ["Wide Pipes", "Pump Impellers", "Smooth Bore", "Pressure Seals", "Flow Valves", "Siphon Loops", "Check Valves", "Manifold Taps", "Quick Couplers", "Bilge Pumps", "Header Tanks", "Gravity Feed"]),
     catalysis: theme("Catalysis", ["CATALYST_EFFICIENCY", "INCREASED_PERCENT"], 2, 6, effect("STABILITY", 2),
         ["Active Sites", "Porous Beds", "Reagent Dosing", "Clean Catalyst", "Surface Area", "Promoter Salts", "Reaction Bed", "Spent Recovery", "Selective Media", "Contact Time", "Mixing Vanes", "Dwell Chamber"]),
-    control: theme("Control", ["CONTROL", "INCREASED_PERCENT"], 5, 15, effect("CONTROL", 5, "ADD"),
+    control: theme("Control", ["CONTROL", "INCREASED_PERCENT"], 4, 12, effect("CONTROL", 5, "ADD"),
         ["Guiding Hand", "Mindful Operation", "Composure", "Fine Control", "Command Logic", "Oversight", "Discipline", "Steady Nerves", "Watchful Eye", "Clear Signals"]),
-    drive: theme("Drive", ["DRIVE", "INCREASED_PERCENT"], 5, 15, effect("DRIVE", 5, "ADD"),
+    drive: theme("Drive", ["DRIVE", "INCREASED_PERCENT"], 4, 12, effect("DRIVE", 5, "ADD"),
         ["Raw Power", "Torque Surge", "Driving Force", "Horsepower", "Brute Gearing", "Engine Heart", "Full Throttle", "Pulling Power", "Iron Will", "Hard Push"]),
-    reserve: theme("Reserve", ["RESERVE", "INCREASED_PERCENT"], 5, 15, effect("RESERVE", 5, "ADD"),
+    reserve: theme("Reserve", ["RESERVE", "INCREASED_PERCENT"], 4, 12, effect("RESERVE", 5, "ADD"),
         ["Deep Reserves", "Stockpile", "Endurance", "Stamina Cells", "Hoarded Charge", "Backup Supply", "Resilience", "Staying Power", "Held Breath", "Second Wind"]),
-    // Forestry Companion themes used only by EXTRAS, so they never join a region's theme rotation.
+    // Forestry Companion themes. Rail Pace also replaces Stability in the Forestry home region, where nothing reads it.
     railPace: theme("Rail Pace", ["CART_SPEED", "INCREASED_PERCENT"], 4, 12, effect("DRIVE", 4, "ADD"),
-        ["Greased Rails", "Smooth Bogies", "Rail Runner", "Quick Couplings", "Track Glide", "Spoked Wheels"]),
+        ["Greased Rails", "Smooth Bogies", "Rail Runner", "Quick Couplings", "Track Glide", "Spoked Wheels", "Rolling Stock", "Wheel Flanges",
+            "Ballast Bed", "Switch Points", "Signal Clear", "Coupler Slack", "Rail Grease", "Bogie Springs"]),
     openTrack: theme("Open Track", ["IDLE_CART_SPEED", "ADD"], 8, 25, effect("CART_SPEED", 4),
         ["Open Track", "Clear Line", "Free Running", "Long Straight", "Empty Run", "Loose Coupling"]),
     rowcraft: theme("Rowcraft", ["TREE_FELL_LIMIT", "ADD"], 1, 2, effect("PROCESSING_SPEED", 3),
         ["Row Markers", "Field Lines", "Survey Stakes", "Plot Chains"]),
-    // Fluid Capacity for the Melter's tanks and the Forestry Companion's sprinkler tank; also used only by EXTRAS.
+    // Fluid Capacity for the Melter's tanks and the Forestry Companion's sprinkler tank; also in the Melter's home region.
     reservoirs: theme("Reservoirs", ["FLUID_CAPACITY", "INCREASED_PERCENT"], 10, 30, effect("RESERVE", 4, "ADD"),
-        ["Holding Tanks", "Cistern Walls", "Deep Tanks", "Bulk Reservoir", "Header Cisterns", "Overflow Basin"])
+        ["Holding Tanks", "Cistern Walls", "Deep Tanks", "Bulk Reservoir", "Header Cisterns", "Overflow Basin", "Settling Tanks", "Sump Pits",
+            "Standpipes", "Catch Basins", "Tank Farms", "Spill Trays"])
 };
 
 // Home regions carry their start's identity; outer pockets blend a region with its nearest neighbor.
 const REGION_THEMES = {
     control: ["precision", "economy", "calibration", "control"],
-    control_drive: ["fieldWork", "actuation", "precision"],
+    control_drive: ["fieldWork", "actuation", "railPace"],
     drive: ["momentum", "hardness", "recovery", "drive"],
     drive_reserve: ["thermalReach", "heatFlow", "startup", "fuelEconomy"],
-    reserve: ["reserves", "chargeTransfer", "powerSupply", "conservation", "reserve"],
-    reserve_control: ["insulation", "regulation", "thermalInertia", "fluidHandling", "catalysis"]
+    reserve: ["reserves", "heatMargin", "surge", "conservation", "reserve"],
+    reserve_control: ["insulation", "regulation", "thermalInertia", "fluidHandling", "catalysis", "reservoirs"]
 };
 const CORE_THEMES = ["control", "drive", "reserve"];
 
@@ -101,10 +103,21 @@ const SPECIAL_NOTABLES = {
     componentMount: [["Component Mount", "drive"], ["Reinforced Mount", "drive"], ["Stage Adapter", "drive_reserve"], ["Universal Bracket", "control_drive"]],
     managedTerritory: [["Managed Territory", "control_drive"], ["Wide Canopy", "control_drive"], ["Grove Survey", "control"], ["Orchard Plan", "drive"]]
 };
+const scaling = (attribute, stat, perPoint, operation = "INCREASED_PERCENT") => ({ attribute, stat, operation, perPoint });
+// Home-region application notables, two per attribute.
 const SCALING = [
-    { attribute: "CONTROL", stat: "ENERGY_USAGE", operation: "DECREASED_PERCENT", perPoint: 0.01 },
-    { attribute: "DRIVE", stat: "PROCESSING_SPEED", operation: "INCREASED_PERCENT", perPoint: 0.08 },
-    { attribute: "RESERVE", stat: "ENERGY_CAPACITY", operation: "INCREASED_PERCENT", perPoint: 0.08 }
+    scaling("CONTROL", "ENERGY_USAGE", 0.03, "DECREASED_PERCENT"),
+    scaling("DRIVE", "PROCESSING_SPEED", 0.08),
+    scaling("RESERVE", "ENERGY_USAGE", 0.02, "DECREASED_PERCENT")
+];
+// Outer cross-scaling notables: each turns an attribute into a stat outside its inherent conversions.
+const CROSS_SCALING = [
+    { name: "Disciplined Pace", attribute: 0, region: "control", scaling: scaling("CONTROL", "PROCESSING_SPEED", 0.04) },
+    { name: "Thermal Discipline", attribute: 0, region: "reserve_control", scaling: scaling("CONTROL", "TEMPERATURE_STABILITY", 0.1) },
+    { name: "Kinetic Feed", attribute: 1, region: "control_drive", scaling: scaling("DRIVE", "INSTANT_PROCESS_CHANCE", 0.01, "ADD") },
+    { name: "Driven Bellows", attribute: 1, region: "drive_reserve", scaling: scaling("DRIVE", "HEAT_TRANSFER", 0.15) },
+    { name: "Banked Heat", attribute: 2, region: "reserve", scaling: scaling("RESERVE", "HEAT_ISOLATION", 0.15) },
+    { name: "Deep Firebox", attribute: 2, region: "drive_reserve", scaling: scaling("RESERVE", "FUEL_DURATION", 0.15) }
 ];
 
 // The center keystone is equally far from every start; core keystones reward any start that paths inward. The rest
@@ -114,15 +127,17 @@ const KEYSTONES = [
     { id: "attribute_transfiguration", layer: "core", name: "Attribute Transfiguration", effects: ATTRIBUTES.map(a => effect(a, 2, "MORE")), behaviors: ["NO_INHERENT_ATTRIBUTES"] },
     { id: "silent_operation", layer: "center", name: "Silent Operation", behaviors: ["MUTE_MACHINE_SOUND"] },
     { id: "steady_state", name: "Steady State", effects: [effect("STABILITY", 1.5, "MORE"), effect("PROCESSING_SPEED", 0.85, "LESS")] },
-    { id: "deliberate_work", name: "Deliberate Work", effects: [effect("ENERGY_USAGE", 0.75, "LESS"), effect("PROCESSING_SPEED", 0.7, "LESS")] },
+    { id: "deliberate_work", name: "Deliberate Work", effects: [effect("ENERGY_USAGE", 0.6, "LESS"), effect("PROCESSING_SPEED", 0.75, "LESS")] },
     { id: "manual_throttle", name: "Manual Throttle", behaviors: ["MANUAL_THROTTLE"] },
     { id: "coasting_clutch", name: "Coasting Clutch", behaviors: ["COASTING_CLUTCH"] },
     { id: "serrated_leaf_protocol", name: "Serrated Leaf Protocol", behaviors: ["SERRATED_LEAF_PROTOCOL"] },
     { id: "magnet_mode", name: "Magnet Mode", behaviors: ["MAGNET_MODE"] },
-    { id: "seedling_magnet", name: "Seedling Magnet", behaviors: ["MAGNET_MODE", "SEEDLING_MAGNET"] },
+    // Routes what Magnet Mode picks up, so it needs Magnet Mode too.
+    { id: "seedling_magnet", name: "Seedling Magnet", behaviors: ["SEEDLING_MAGNET"] },
     { id: "clear_cutting", name: "Clear Cutting", effects: [effect("TREE_FELL_LIMIT", 10, "ADD"), effect("PROCESSING_SPEED", 0.8, "LESS")] },
     { id: "singular_drive", layer: "core", name: "Singular Drive", effects: [effect("DRIVE", 1.5, "MORE"), effect("CONTROL", 0.5, "LESS"), effect("RESERVE", 0.5, "LESS")] },
-    { id: "redline_drive", name: "Redline Drive", effects: [effect("PROCESSING_SPEED", 1.5, "MORE"), effect("ENERGY_USAGE", 1.8, "MORE")] },
+    // The fuel Furnace pays no FE, so a matching fuel cost keeps its speed from being free there.
+    { id: "redline_drive", name: "Redline Drive", effects: [effect("PROCESSING_SPEED", 1.5, "MORE"), effect("ENERGY_USAGE", 1.8, "MORE"), effect("FUEL_EFFICIENCY", 0.55, "LESS")] },
     { id: "dense_batching", name: "Dense Batching", effects: [effect("BATCH_SIZE", 2, "ADD"), effect("PROCESSING_SPEED", 0.75, "LESS"), effect("ENERGY_USAGE", 1.25, "MORE")] },
     { id: "precision_jaw_mount", name: "Precision Jaw Mount", behaviors: ["MATCHING_HEAD"], effects: [effect("OUTPUT_AMOUNT", 10), effect("CRUSHER_SALVAGE_CHANCE", 2, "ADD")] },
     { id: "soft_material_specialist", name: "Soft Material Specialist", recipeHardnessCeiling: 2, effects: [tagged("CRUSHING", effect("PROCESSING_SPEED", 3, "MORE")), effect("ENERGY_USAGE", 1.5, "MORE")] },
@@ -131,20 +146,24 @@ const KEYSTONES = [
     // with FE or fuel per item up to early-metal heat; Low Heat Specialist halves FE or fuel per item under a lower cap.
     // A fuel Furnace burns per working tick, so Flash Annealing's fuel cost keeps its speed from also saving fuel.
     { id: "flash_annealing", name: "Flash Annealing", ceilings: { MAX_TEMPERATURE: 1000 }, effects: [tagged("HEATED", effect("PROCESSING_SPEED", 2, "MORE")), effect("ENERGY_USAGE", 1.5, "MORE"), effect("FUEL_EFFICIENCY", 0.5, "LESS")] },
-    { id: "low_heat_specialist", name: "Low Heat Specialist", ceilings: { MAX_TEMPERATURE: 800 }, effects: [tagged("HEATED", effect("ENERGY_USAGE", 0.5, "LESS")), tagged("HEATED", effect("FUEL_EFFICIENCY", 2, "MORE"))] },
+    // Only the Furnace has many recipes at or below 800, so only the Furnace gets the payoff.
+    { id: "low_heat_specialist", name: "Low Heat Specialist", ceilings: { MAX_TEMPERATURE: 800 }, effects: [tagged("SMELTING", effect("ENERGY_USAGE", 0.5, "LESS")), tagged("SMELTING", effect("FUEL_EFFICIENCY", 2, "MORE"))] },
     { id: "quench_protocol", name: "Quench Protocol", behaviors: ["QUENCH_PROTOCOL"], effects: [effect("HEAT_TRANSFER", 0.75, "LESS")] },
     { id: "closed_loop_recuperator", name: "Closed Loop Recuperator", behaviors: ["CLOSED_LOOP_RECUPERATOR"], effects: [effect("PROCESSING_SPEED", 0.85, "LESS")] },
     { id: "kiln_discipline", name: "Kiln Discipline", effects: [effect("TEMPERATURE_STABILITY", 1.6, "MORE"), effect("WARMUP_TIME", 1.4, "MORE")] },
-    { id: "thermal_reservoir", name: "Thermal Reservoir", effects: [effect("COOLING_RATE", 0.4, "LESS"), effect("HEAT_TRANSFER", 0.5, "LESS")] },
-    { id: "high_flux", name: "High Flux", effects: [effect("ENERGY_GENERATION", 1.5, "MORE"), effect("FUEL_DURATION", 0.6, "LESS")] },
+    // Holds heat between jobs at the price of a slower cold start.
+    { id: "thermal_reservoir", name: "Thermal Reservoir", effects: [effect("COOLING_RATE", 0.4, "LESS"), effect("WARMUP_TIME", 1.25, "MORE")] },
+    { id: "high_flux", name: "High Flux", effects: [effect("HEAT_TRANSFER", 2, "MORE"), effect("ENERGY_USAGE", 1.25, "MORE"), effect("FUEL_DURATION", 0.6, "LESS")] },
     { id: "cell_bypass", name: "Cell Bypass", behaviors: ["BLOCK_BATTERY"], effects: [tagged("CRUSHING", effect("ENERGY_CAPACITY", 100)), effect("NO_BATTERY_OUTPUT_RETENTION", 100, "ADD"), effect("ENERGY_USAGE", 1.1, "MORE")] },
-    { id: "deep_reserve", name: "Deep Reserve", effects: [effect("ENERGY_CAPACITY", 2, "MORE"), effect("PROCESSING_SPEED", 0.7, "LESS")] },
+    { id: "deep_reserve", name: "Deep Reserve", effects: [effect("RESERVE", 1.5, "MORE"), effect("CONTROL", 0.5, "LESS"), effect("DRIVE", 0.5, "LESS")] },
     { id: "lean_grid", name: "Lean Grid", effects: [tagged("ENERGY_BUFFER", effect("ENERGY_USAGE", 0.7, "LESS")), effect("ENERGY_CAPACITY", 0.5, "LESS")] },
-    { id: "reserve_actuation", layer: "core", name: "Reserve Actuation", behaviors: ["NO_INHERENT_ATTRIBUTES"], scaling: [{ attribute: "RESERVE", stat: "PROCESSING_SPEED", operation: "INCREASED_PERCENT", perPoint: 0.5 }] },
-    { id: "cold_standby", name: "Cold Standby", effects: [effect("IDLE_LOSS", 0.4, "LESS"), effect("ENERGY_TRANSFER", 0.5, "LESS")] },
-    { id: "regulated_heat", name: "Regulated Heat", ceilings: { MAX_TEMPERATURE: 1000 }, effects: [effect("TEMPERATURE_STABILITY", 1.8, "MORE")] },
-    { id: "measured_recovery", name: "Measured Recovery", effects: [effect("OUTPUT_AMOUNT", 10), effect("PROCESSING_SPEED", 0.65, "LESS")] },
+    { id: "reserve_actuation", layer: "core", name: "Reserve Actuation", behaviors: ["NO_INHERENT_RESERVE"], scaling: [scaling("RESERVE", "PROCESSING_SPEED", 0.4)] },
+    { id: "governed_actuation", name: "Governed Actuation", behaviors: ["NO_INHERENT_CONTROL"], scaling: [scaling("CONTROL", "PROCESSING_SPEED", 0.35)] },
+    { id: "regulated_heat", name: "Regulated Heat", effects: [effect("TEMPERATURE_STABILITY", 1.8, "MORE"), effect("PROCESSING_SPEED", 0.8, "LESS")] },
+    { id: "measured_recovery", name: "Measured Recovery", effects: [effect("OUTPUT_AMOUNT", 10), effect("PROCESSING_SPEED", 0.85, "LESS")] },
     { id: "single_pass", extra: "single_pass", name: "Single Pass", behaviors: ["NO_BONUS_OUTPUT"], effects: [tagged("BONUS_OUTPUT", effect("PROCESSING_SPEED", 1.3, "MORE"))] },
+    // Trades guaranteed speed for random speed: increased Processing Speed becomes Instant Process chance, under a cap.
+    { id: "surge_cycling", extra: "surge_cycling", name: "Surge Cycling", behaviors: ["SURGE_CYCLING"], ceilings: { INSTANT_PROCESS_CHANCE: 75 } },
     // Quality of life, like Silent Operation: the points spent reaching it are the cost.
     { id: "even_feed", extra: "even_feed", name: "Even Feed", behaviors: ["EVEN_FEED"] }
 ];
@@ -167,7 +186,9 @@ const EXTRAS = [
         notables: [{ name: "Outer Rows", effects: [effect("WORK_RANGE", 1, "ADD")] }] },
     { id: "forestry_reservoirs", angle: -112, radius: 2900, shapes: ["fork"], theme: "reservoirs" },
     { id: "melter_reservoirs", angle: 150, radius: 2500, shapes: ["fork"], theme: "reservoirs" },
-    { id: "even_feed", angle: 9, radius: 2167, shapes: ["keyDirect"], keystone: true, layer: "home" }
+    { id: "even_feed", angle: 9, radius: 2167, shapes: ["keyDirect"], keystone: true, layer: "home" },
+    // Surge Cycling sits on the outer road beside the Surge (Instant Process) pockets it feeds.
+    { id: "surge_cycling", angle: 96, radius: 2300, shapes: ["keyDirect"], keystone: true, layer: "outer" }
 ];
 
 const regionAt = angle => {
@@ -243,11 +264,13 @@ export function createMegaTree() {
         usedNames.add(entry.name);
     };
     const center = pockets.filter(p => p.layer === "core" && p.nodes.some(id => byId.get(id).kind === "NOTABLE")).sort((a, b) => a.radius - b.radius)[0];
-    claim(p => p === center, { name: "Convergence", effects: ATTRIBUTES.map(a => effect(a, 10)) });
+    claim(p => p === center, { name: "Convergence", effects: ATTRIBUTES.map(a => effect(a, 8)) });
     SPECIAL_NOTABLES.application.forEach(({ name, attribute, region }) => claim(p => p.layer === "home" && p.region === region,
         { name, effects: [effect(ATTRIBUTES[attribute], 10)], scaling: [SCALING[attribute]] }));
     SPECIAL_NOTABLES.integrated.forEach(([name, layer, region]) => claim(p => p !== center && p.layer === layer && (!region || p.region === region),
-        { name, effects: ATTRIBUTES.map(a => effect(a, 8)) }));
+        { name, effects: ATTRIBUTES.map(a => effect(a, 6)) }));
+    CROSS_SCALING.forEach(({ name, attribute, region, scaling }) => claim(p => p.layer === "outer" && p.region === region,
+        { name, effects: [effect(ATTRIBUTES[attribute], 10)], scaling: [scaling] }));
     SPECIAL_NOTABLES.componentMount.forEach(([name, region]) => claim(p => p.layer === "outer" && p.region === region,
         { name, effects: [effect("HIGH_HARDNESS_ENERGY_MITIGATION", 2, "ADD")], passive: { COMPONENT_STAGE_SUPPORT: 1 } }));
     SPECIAL_NOTABLES.managedTerritory.forEach(([name, region]) => claim(p => (p.layer === "home" || p.layer === "outer") && p.region === region,

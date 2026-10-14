@@ -274,7 +274,7 @@ Stored affixes keep their physical meaning:
 | Shared Hearth (Crucible Keeper) | Lanes share heat: each load dip is split across all active lanes. |
 | Hold the Fire (Crucible Keeper) | Unchanged: a lane with smeltable input never cools. |
 | Kiln Discipline | Its Warmup Time cost becomes more Thermal Mass. |
-| Regulated Heat, Low Heat Specialist, Flash Annealing | Their Max Temperature caps also cap the setpoint. |
+| Low Heat Specialist, Flash Annealing | Their Max Temperature caps also cap the setpoint. |
 | Quench Protocol | Its Heat Transfer cost stays. Quench's strain halving keeps its rule. |
 | Hot Stamping (Metal Press) | Unchanged; Hot mode makes it easier to trigger. |
 | Heat Window (Drop Forge and others) | Applies to the safe band, so it also widens or narrows the Balanced and Hot setpoints. |

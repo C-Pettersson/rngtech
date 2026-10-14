@@ -178,7 +178,7 @@ public class BatteryAssemblerBlockEntity extends BaseMachineBlockEntity
             MachineStatAccumulator stats = effectiveStats();
             BatteryAssemblyRecipe recipe = nextRecipe();
             return switch (index) {
-                case DATA_PROGRESS -> progress;
+                case DATA_PROGRESS -> syncedProgress(0, progress);
                 case DATA_PROCESSING_TICKS -> currentProcessingTicks(recipe, stats);
                 case DATA_ENERGY -> energyStored();
                 case DATA_ENERGY_CAPACITY -> energyCapacity();
@@ -249,6 +249,7 @@ public class BatteryAssemblerBlockEntity extends BaseMachineBlockEntity
         if (assembler.progress == 0 && ProcessingChance.rollInstant(level, stats)) {
             int fullEnergyCost = assembler.energyCostPerCraft(recipe, stats);
             if (assembler.consumeWorkingEnergy(fullEnergyCost, true) >= fullEnergyCost) {
+                assembler.markInstantProcess();
                 assembler.startCycleIfNeeded(recipe);
                 assembler.consumeWorkingEnergy(fullEnergyCost, false);
                 if (assembler.process(recipe)) {

@@ -1,6 +1,7 @@
 package com.rngtech.content.menu;
 
 import com.rngtech.content.block.MetalPressBlock;
+import com.rngtech.content.blockentity.BaseMachineBlockEntity;
 import com.rngtech.content.blockentity.MetalPressBlockEntity;
 import com.rngtech.content.registry.ModMenus;
 import com.rngtech.rpg.MachineStat;
@@ -168,6 +169,9 @@ public class MetalPressMenu extends AbstractContainerMenu implements MasteryMenu
     }
 
     public float processingProgress() {
+        if (instantFlash()) {
+            return 1.0F;
+        }
         int ticks = data.get(DATA_PROCESSING_TICKS);
         return ticks <= 0 ? 0.0F : Mth.clamp((float) data.get(DATA_PROGRESS) / (float) ticks, 0.0F, 1.0F);
     }
@@ -186,8 +190,13 @@ public class MetalPressMenu extends AbstractContainerMenu implements MasteryMenu
         return Mth.clamp(data.get(DATA_FAILURE_RISK) / 100.0F, 0.0F, 1.0F);
     }
 
+    /** Whether the bar should flash for a job that just finished instantly. */
+    public boolean instantFlash() {
+        return data.get(DATA_PROGRESS) == BaseMachineBlockEntity.INSTANT_FLASH_PROGRESS;
+    }
+
     public int progress() {
-        return data.get(DATA_PROGRESS);
+        return Math.max(0, data.get(DATA_PROGRESS));
     }
 
     public int processingTicks() {

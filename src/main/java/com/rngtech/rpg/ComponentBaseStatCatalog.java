@@ -214,6 +214,30 @@ public final class ComponentBaseStatCatalog {
         }
     }
 
+    /**
+     * Control, Drive, and Reserve rolled or corrupted on a part. They describe the machine rather than the part, and the machine adds
+     * them before its Mastery attribute conversions, separately from {@link #applyEffectiveContribution}, because the
+     * Furnace applies each Heat Core to one lane while attributes belong to the whole machine.
+     */
+    public static void applyAttributeAffixes(MachineStatAccumulator target, ItemStack stack) {
+        if (profile(stack) == null) {
+            return;
+        }
+        try (MachineStatAccumulator.Source ignored = target.source(stack.getHoverName())) {
+            MachineTraits traits = componentTraits(stack);
+            for (MachineModifier modifier : traits.modifiers()) {
+                if (modifier.slot().isAffix() && MachineStat.isAttribute(modifier.stat())) {
+                    target.apply(modifier);
+                }
+            }
+            for (MachineModifier corrupted : corruptionEffects(traits)) {
+                if (MachineStat.isAttribute(corrupted.stat())) {
+                    target.apply(corrupted);
+                }
+            }
+        }
+    }
+
     public static void applyVacuumCollapseNozzleContribution(MachineStatAccumulator target, ItemStack stack) {
         if (!(stack.getItem() instanceof CollapseNozzleItem nozzle) || !nozzle.material().vacuumCollapseCompatible()) {
             return;
@@ -255,7 +279,7 @@ public final class ComponentBaseStatCatalog {
 
         // Corruption stats the part does not carry, such as a Crush Head's Jam Recovery, act on the host directly.
         for (MachineModifier corrupted : corruptionEffects(traits)) {
-            if (!profile.mergeRules().containsKey(corrupted.stat())) {
+            if (!profile.mergeRules().containsKey(corrupted.stat()) && !MachineStat.isAttribute(corrupted.stat())) {
                 target.apply(corrupted);
             }
         }

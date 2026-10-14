@@ -84,7 +84,7 @@ Each completed melt earns Melter Mastery XP, and you spend the points on the sha
 
 A melt whose whole output a Nullite Servo voids earns no XP. Changing your Mastery allocation restarts the current melt, but keeps items, tanks, and Gear.
 
-The Melter has no Stability or Super Output, so those effects and the Single Pass keystone do nothing on it. It gets nothing from the heat keystones Flash Annealing and Low Heat Specialist, and their max-heat caps do not apply to it, but Flash Annealing's Energy Usage penalty does. Fluid Yield is rounded down to whole millibuckets on each melt.
+The Melter has no Stability or Super Output, so those effects do nothing on it. Single Pass gives the Melter no speed, but still turns off Fluid Yield, Methane Trap, and Brine Loop. It gets nothing from the heat keystones Flash Annealing and Low Heat Specialist, and their max-heat caps do not apply to it, but Flash Annealing's Energy Usage penalty does. Fluid Yield is rounded down to whole millibuckets on each melt.
 
 ### Melter recipes
 
@@ -123,9 +123,9 @@ Every node in this machine's ascendancies. See [Machine Mastery](machine-mastery
 | **Second Crucible** | Root | — | +2 Batch Size; 15% more Energy Use. Each batched melt needs its own inputs, fluid, and tank room. |
 | Steady Feed | Small | Second Crucible | 8% increased Processing Speed. |
 | **Crush Feed** | Notable | Steady Feed | +10% Overlevel Speed. |
-| Hot Walls | Small | Second Crucible | 8% increased Heat Transfer. |
-| **Flash Point** | Notable | Hot Walls | 40% increased Heat Transfer. |
-| Fused Walls | Small | Flash Point | 8% increased Heat Transfer. |
+| Hot Walls | Small | Second Crucible | 4% increased Max Temperature. |
+| **Flash Point** | Notable | Hot Walls | 20% increased Processing Speed. |
+| Fused Walls | Small | Flash Point | 4% increased Max Temperature. |
 | **Fused Crucibles** | Deep notable | Fused Walls | Batching is off; 20% more Processing Speed per point of Batch Size. |
 | Lean Burn | Small | Second Crucible | 5% reduced Energy Use. |
 | **Shared Heat** | Notable | Lean Burn | Batched melts after the first use 20% less FE. |

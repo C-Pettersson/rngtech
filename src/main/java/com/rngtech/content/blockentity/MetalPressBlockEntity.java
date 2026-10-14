@@ -203,7 +203,7 @@ public class MetalPressBlockEntity extends BaseMachineBlockEntity
             MetalPressRecipe recipe = nextRecipe();
             MachineStatAccumulator stats = routeStats(recipe, effectiveStats());
             return switch (index) {
-                case DATA_PROGRESS -> progress;
+                case DATA_PROGRESS -> syncedProgress(0, progress);
                 case DATA_PROCESSING_TICKS -> currentProcessingTicks(recipe, stats);
                 case DATA_ENERGY -> energyStored();
                 case DATA_ENERGY_CAPACITY -> energyCapacity();
@@ -330,6 +330,7 @@ public class MetalPressBlockEntity extends BaseMachineBlockEntity
         if (press.progress == 0 && ProcessingChance.rollInstant(level, stats)) {
             int fullEnergyCost = press.energyCostPerCraft(recipe, stats) * press.batchJobs(recipe, stats);
             if (press.consumeWorkingEnergy(fullEnergyCost, true) >= fullEnergyCost) {
+                press.markInstantProcess();
                 press.startCycleIfNeeded(recipe, stats);
                 press.consumeWorkingEnergy(fullEnergyCost, false);
                 press.decayPowerDrop();
@@ -538,9 +539,10 @@ public class MetalPressBlockEntity extends BaseMachineBlockEntity
     protected MachineStatAccumulator buildStats() {
         MachineStatAccumulator stats = MachineBaseStatCatalog.metalPress();
         stats.apply(effectiveTraits());
-        MegaPassiveTree.applyStats(stats, machineProgression(), MachineMasteryFamily.METAL_PRESS);
+        MegaPassiveTree.applyNodeStats(stats, machineProgression(), MachineMasteryFamily.METAL_PRESS);
         applyHeatCoreStats(stats);
         applyServoStats(stats);
+        MegaPassiveTree.applyAttributeStats(stats, machineProgression(), MachineMasteryFamily.METAL_PRESS);
         if (!hasBatteryCell()) {
             stats.apply(MachineStatAccumulator.NO_BATTERY_SOURCE, new MachineModifier(
                     ModifierSlot.IMPLICIT,
@@ -1063,7 +1065,7 @@ public class MetalPressBlockEntity extends BaseMachineBlockEntity
     }
 
     private boolean cool(MachineStatAccumulator stats) {
-        int nextTemperature = Math.max(HeatControl.AMBIENT_TEMPERATURE, currentTemperature - HeatControl.coolingRate(stats));
+        int nextTemperature = Math.max(HeatControl.AMBIENT_TEMPERATURE, currentTemperature - HeatControl.coolingStep(stats, level == null ? 0L : level.getGameTime()));
         boolean changed = false;
         if (nextTemperature != currentTemperature) {
             currentTemperature = nextTemperature;
@@ -1120,6 +1122,9 @@ public class MetalPressBlockEntity extends BaseMachineBlockEntity
         );
         if (hasMasteryBehavior("TOLERANCE_MAP")) {
             addedStrain = (int) Math.round(addedStrain * 0.6);
+        }
+        if (hasMasteryBehavior("QUENCH_PROTOCOL")) {
+            addedStrain = HeatControl.quenched(addedStrain);
         }
         double servoInstability = masterDie ? 0.0 : Math.max(0.0, 1.0 - stats.value(MachineStat.STABILITY));
         addedStrain += Math.max(0, (int) Math.round(servoInstability * 50.0));
@@ -1230,12 +1235,14 @@ public class MetalPressBlockEntity extends BaseMachineBlockEntity
                 FORMING_BED_TEMPERATURE
         ));
         ComponentBaseStatCatalog.applyEffectiveContribution(stats, stack);
+        ComponentBaseStatCatalog.applyAttributeAffixes(stats, stack);
     }
 
     private void applyServoStats(MachineStatAccumulator stats) {
         ItemStack stack = servoStack();
         if (isServo(stack) && stack.getItem() instanceof MachinePartItem part) {
             ComponentBaseStatCatalog.applyEffectiveContribution(stats, stack);
+            ComponentBaseStatCatalog.applyAttributeAffixes(stats, stack);
         }
     }
 

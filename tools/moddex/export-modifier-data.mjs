@@ -3592,6 +3592,11 @@ function parseProfiles(source, definitions, behaviorLists, ranges, constants, la
         const id = unquote(args[0]);
         const capabilities = enumRefs(args[1], "ModifierCapability");
         const resolvedDefinitions = resolveProfileDefinitions(args[2], definitions, ranges, constants);
+        // Mirrors profile(): Mastery machines and their Gear also roll the attribute suffixes.
+        if (capabilities.includes("HAS_MASTERY_ATTRIBUTES")) {
+            resolvedDefinitions.push(...["MASTERY_CONTROL", "MASTERY_DRIVE", "MASTERY_RESERVE"]
+                .map((name) => mustGet(definitions, name, `definition ${name}`)));
+        }
         const rollableBehaviors = args[3] ? resolveBehaviorList(args[3], behaviorLists) : [];
         profiles[id] = {
             id,

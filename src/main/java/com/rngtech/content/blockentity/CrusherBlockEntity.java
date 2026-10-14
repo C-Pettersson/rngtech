@@ -163,7 +163,7 @@ public class CrusherBlockEntity extends BaseMachineBlockEntity implements MenuPr
             }
             MachineStatAccumulator stats = effectiveStats();
             return switch (index) {
-                case DATA_PROGRESS -> progress;
+                case DATA_PROGRESS -> syncedProgress(0, progress);
                 case DATA_PROCESSING_TICKS -> currentProcessingTicks(stats);
                 case DATA_ENERGY -> energyStored();
                 case DATA_ENERGY_CAPACITY -> energyCapacity();
@@ -289,6 +289,7 @@ public class CrusherBlockEntity extends BaseMachineBlockEntity implements MenuPr
         if (crusher.progress == 0 && !underLevel(recipe, stats) && ProcessingChance.rollInstant(level, stats)) {
             int fullEnergyCost = crusher.energyCostPerBatch(recipe, stats, jobs);
             if (crusher.consumeWorkingEnergy(fullEnergyCost, true) >= fullEnergyCost) {
+                crusher.markInstantProcess();
                 BaseMachineBlock.setActive(level, pos, state, true);
                 crusher.consumeWorkingEnergy(fullEnergyCost, false);
                 int completed = crusher.process(recipe, stats, level, jobs);
@@ -690,11 +691,13 @@ public class CrusherBlockEntity extends BaseMachineBlockEntity implements MenuPr
         MachineTraits activeTraits = effectiveTraits();
         stats.apply(activeTraits);
 
-        CrusherPassiveTree.applyStats(stats, machineProgression());
+        MegaPassiveTree.applyNodeStats(stats, machineProgression(), MachineMasteryFamily.CRUSHER);
         ItemStack crushHead = crushHeadStack();
         if (isAllowedCrushHead(crushHead)) {
             ComponentBaseStatCatalog.applyEffectiveContribution(stats, crushHead);
+            ComponentBaseStatCatalog.applyAttributeAffixes(stats, crushHead);
         }
+        MegaPassiveTree.applyAttributeStats(stats, machineProgression(), MachineMasteryFamily.CRUSHER);
         if (!hasBatteryCell()) {
             try (MachineStatAccumulator.Source ignored = stats.source(MachineStatAccumulator.NO_BATTERY_SOURCE)) {
                 stats.scaleBonus(MachineStat.OUTPUT_AMOUNT, noBatteryOutputMultiplier(stats));

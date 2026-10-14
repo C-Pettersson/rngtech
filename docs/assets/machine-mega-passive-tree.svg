@@ -1,8 +1,8 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="1829 1536 4369 4769" width="1200" height="1310" role="img" aria-labelledby="title description">
 <title id="title">RNGTech shared machine passive tree</title>
-<desc id="description">1347 nodes, six starts, 1500 links. Control in green, Drive in copper, Reserve in blue. White notables and violet keystones. Each machine earns 99 points by level 100.</desc>
+<desc id="description">1348 nodes, six starts, 1501 links. Control in green, Drive in copper, Reserve in blue. White notables and violet keystones. Each machine earns 99 points by level 100.</desc>
 <rect x="1829" y="1536" width="4369" height="4769" fill="#111820"/>
-<g font-family="sans-serif" fill="#e5ecf3"><text x="1909" y="1686" font-size="96">Machine Mastery</text><text x="1914" y="1806" font-size="58" fill="#a9b9c9">1347 nodes · 6 starts · 3 attributes · 99 points at level 100</text></g>
+<g font-family="sans-serif" fill="#e5ecf3"><text x="1909" y="1686" font-size="96">Machine Mastery</text><text x="1914" y="1806" font-size="58" fill="#a9b9c9">1348 nodes · 6 starts · 3 attributes · 99 points at level 100</text></g>
 <g stroke="#66727d" stroke-width="5" opacity="0.65">
 <path d="M4000,4000 L3939,3895"/>
 <path d="M4000,4000 L4122,3998"/>
@@ -1504,6 +1504,7 @@
 <path d="M3001,4555 L3057,4567"/>
 <path d="M3057,4567 L3115,4572"/>
 <path d="M5336,4211 L5242,4192"/>
+<path d="M3829,5247 L3839,5343"/>
 </g>
 <circle cx="3388" cy="3633" r="20" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>control (start_control)</title></circle>
 <circle cx="4000" cy="3310" r="20" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>control / drive (start_control_drive)</title></circle>
@@ -2177,20 +2178,20 @@
 <circle cx="4323" cy="5052" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Reserves (stored_momentum_1)</title></circle>
 <circle cx="4275" cy="5039" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Reserves (stored_momentum_2)</title></circle>
 <circle cx="4221" cy="5011" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Stored Momentum (stored_momentum)</title></circle>
-<circle cx="3606" cy="4971" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Charge Transfer (reserve_channels_1)</title></circle>
-<circle cx="3662" cy="4988" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Charge Transfer (reserve_channels_2)</title></circle>
-<circle cx="3716" cy="5012" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Reserve Channels (reserve_channels)</title></circle>
-<circle cx="3595" cy="5030" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Charge Transfer (reserve_channels_3)</title></circle>
-<circle cx="3604" cy="5088" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Internal Bus (internal_bus)</title></circle>
-<circle cx="3037" cy="3014" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Calibration (reference_gauges_1)</title></circle>
-<circle cx="3015" cy="2965" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Calibration (reference_gauges_2)</title></circle>
-<circle cx="3001" cy="2900" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Reference Gauges (reference_gauges)</title></circle>
+<circle cx="3606" cy="4971" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Heat Margin (safety_valve_1)</title></circle>
+<circle cx="3662" cy="4988" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Heat Margin (safety_valve_2)</title></circle>
+<circle cx="3716" cy="5012" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Safety Valve (safety_valve)</title></circle>
+<circle cx="3595" cy="5030" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Heat Margin (safety_valve_3)</title></circle>
+<circle cx="3604" cy="5088" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Spill Plates (spill_plates)</title></circle>
+<circle cx="3037" cy="3014" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Calibration (grove_survey_1)</title></circle>
+<circle cx="3015" cy="2965" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Calibration (grove_survey_2)</title></circle>
+<circle cx="3001" cy="2900" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Grove Survey (grove_survey)</title></circle>
 <circle cx="5416" cy="3964" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Recovery (ore_sieve_1)</title></circle>
 <circle cx="5468" cy="3978" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Recovery (ore_sieve_2)</title></circle>
 <circle cx="5527" cy="4009" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Ore Sieve (ore_sieve)</title></circle>
-<circle cx="4196" cy="5498" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Power Supply (induction_coils_1)</title></circle>
-<circle cx="4245" cy="5520" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Power Supply (induction_coils_2)</title></circle>
-<circle cx="4299" cy="5559" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Induction Coils (induction_coils)</title></circle>
+<circle cx="4196" cy="5498" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Surge (discharge_pulse_1)</title></circle>
+<circle cx="4245" cy="5520" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Surge (discharge_pulse_2)</title></circle>
+<circle cx="4299" cy="5559" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Discharge Pulse (discharge_pulse)</title></circle>
 <circle cx="2506" cy="4177" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Insulation (mineral_wool_1)</title></circle>
 <circle cx="2528" cy="4128" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Insulation (mineral_wool_2)</title></circle>
 <circle cx="2568" cy="4075" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Mineral Wool (mineral_wool)</title></circle>
@@ -2207,18 +2208,18 @@
 <circle cx="2727" cy="5483" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Thermostat Loop (thermostat_loop)</title></circle>
 <circle cx="2662" cy="5367" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Regulation (thermostat_loop_3)</title></circle>
 <circle cx="2607" cy="5400" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Bimetal Switch (bimetal_switch)</title></circle>
-<circle cx="5533" cy="4865" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Startup (stage_adapter_1)</title></circle>
-<circle cx="5472" cy="4861" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Startup (stage_adapter_2)</title></circle>
-<circle cx="5439" cy="4912" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Stage Adapter (stage_adapter)</title></circle>
-<circle cx="5412" cy="4857" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Startup (stage_adapter_3)</title></circle>
-<circle cx="5351" cy="4853" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Startup (stage_adapter_4)</title></circle>
-<circle cx="5385" cy="4803" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Startup (stage_adapter_5)</title></circle>
+<circle cx="5533" cy="4865" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Startup (driven_bellows_1)</title></circle>
+<circle cx="5472" cy="4861" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Startup (driven_bellows_2)</title></circle>
+<circle cx="5439" cy="4912" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Driven Bellows (driven_bellows)</title></circle>
+<circle cx="5412" cy="4857" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Startup (driven_bellows_3)</title></circle>
+<circle cx="5351" cy="4853" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Startup (driven_bellows_4)</title></circle>
+<circle cx="5385" cy="4803" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Startup (driven_bellows_5)</title></circle>
 <circle cx="5358" cy="4748" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Preheater Coils (preheater_coils)</title></circle>
-<circle cx="5419" cy="4752" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Startup (stage_adapter_6)</title></circle>
-<circle cx="5452" cy="4702" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Startup (stage_adapter_7)</title></circle>
-<circle cx="5479" cy="4756" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Startup (stage_adapter_8)</title></circle>
+<circle cx="5419" cy="4752" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Startup (driven_bellows_6)</title></circle>
+<circle cx="5452" cy="4702" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Startup (driven_bellows_7)</title></circle>
+<circle cx="5479" cy="4756" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Startup (driven_bellows_8)</title></circle>
 <circle cx="5540" cy="4760" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Pilot Flame (pilot_flame)</title></circle>
-<circle cx="5506" cy="4811" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Startup (stage_adapter_9)</title></circle>
+<circle cx="5506" cy="4811" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Startup (driven_bellows_9)</title></circle>
 <circle cx="3799" cy="5665" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Conservation (energy_governor_1)</title></circle>
 <circle cx="3757" cy="5612" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Conservation (energy_governor_2)</title></circle>
 <circle cx="3717" cy="5550" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Conservation (energy_governor_3)</title></circle>
@@ -2238,24 +2239,24 @@
 <circle cx="2445" cy="4463" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Heat Battery (heat_battery)</title></circle>
 <circle cx="2475" cy="4517" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Thick Hearth (thick_hearth)</title></circle>
 <circle cx="2481" cy="4578" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Stone Mass (stone_mass)</title></circle>
-<circle cx="4285" cy="2647" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Field Work (timber_rigging_1)</title></circle>
-<circle cx="4235" cy="2606" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Field Work (timber_rigging_2)</title></circle>
-<circle cx="4245" cy="2543" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Field Work (timber_rigging_3)</title></circle>
-<circle cx="4305" cy="2521" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Field Work (timber_rigging_4)</title></circle>
-<circle cx="4355" cy="2561" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Field Work (timber_rigging_5)</title></circle>
-<circle cx="4345" cy="2624" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Field Work (timber_rigging_6)</title></circle>
-<circle cx="4295" cy="2584" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Timber Rigging (timber_rigging)</title></circle>
+<circle cx="4285" cy="2647" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Rail Pace (universal_bracket_1)</title></circle>
+<circle cx="4235" cy="2606" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Rail Pace (universal_bracket_2)</title></circle>
+<circle cx="4245" cy="2543" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Rail Pace (universal_bracket_3)</title></circle>
+<circle cx="4305" cy="2521" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Rail Pace (universal_bracket_4)</title></circle>
+<circle cx="4355" cy="2561" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Rail Pace (universal_bracket_5)</title></circle>
+<circle cx="4345" cy="2624" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Rail Pace (universal_bracket_6)</title></circle>
+<circle cx="4295" cy="2584" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Universal Bracket (universal_bracket)</title></circle>
 <circle cx="4656" cy="5184" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Fuel Economy (slow_burn_1)</title></circle>
 <circle cx="4707" cy="5216" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Fuel Economy (slow_burn_2)</title></circle>
 <circle cx="4761" cy="5187" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Slow Burn (slow_burn)</title></circle>
 <circle cx="4759" cy="5248" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Fuel Economy (slow_burn_3)</title></circle>
 <circle cx="4811" cy="5279" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Fuel Economy (slow_burn_4)</title></circle>
 <circle cx="4758" cy="5308" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Fuel Economy (slow_burn_5)</title></circle>
-<circle cx="4756" cy="5369" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Banked Coals (banked_coals)</title></circle>
+<circle cx="4756" cy="5369" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Banked Heat (banked_heat)</title></circle>
 <circle cx="4704" cy="5337" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Fuel Economy (slow_burn_6)</title></circle>
 <circle cx="4651" cy="5366" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Fuel Economy (slow_burn_7)</title></circle>
 <circle cx="4653" cy="5305" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Fuel Economy (slow_burn_8)</title></circle>
-<circle cx="4601" cy="5274" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Clean Combustion (clean_combustion)</title></circle>
+<circle cx="4601" cy="5274" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Banked Coals (banked_coals)</title></circle>
 <circle cx="4654" cy="5245" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Fuel Economy (slow_burn_9)</title></circle>
 <circle cx="5718" cy="4527" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Heat Flow (radiant_plates_1)</title></circle>
 <circle cx="5658" cy="4557" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Heat Flow (radiant_plates_2)</title></circle>
@@ -2295,16 +2296,16 @@
 <circle cx="2372" cy="3826" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Fluid Handling (wide_pipes_8)</title></circle>
 <circle cx="2318" cy="3798" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Smooth Bore (smooth_bore)</title></circle>
 <circle cx="2369" cy="3765" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Fluid Handling (wide_pipes_9)</title></circle>
-<circle cx="3332" cy="2440" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Precision (unified_frame_1)</title></circle>
-<circle cx="3394" cy="2467" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Precision (unified_frame_2)</title></circle>
-<circle cx="3459" cy="2504" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Precision (unified_frame_3)</title></circle>
+<circle cx="3332" cy="2440" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Field Work (unified_frame_1)</title></circle>
+<circle cx="3394" cy="2467" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Field Work (unified_frame_2)</title></circle>
+<circle cx="3459" cy="2504" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Field Work (unified_frame_3)</title></circle>
 <circle cx="3492" cy="2566" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Unified Frame (unified_frame)</title></circle>
-<circle cx="3440" cy="2605" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Precision (unified_frame_4)</title></circle>
-<circle cx="3406" cy="2663" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>True Alignment (true_alignment)</title></circle>
-<circle cx="3345" cy="2636" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Precision (unified_frame_5)</title></circle>
-<circle cx="3280" cy="2637" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Balanced Rotors (balanced_rotors)</title></circle>
-<circle cx="3269" cy="2567" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Precision (unified_frame_6)</title></circle>
-<circle cx="3299" cy="2499" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Precision (unified_frame_7)</title></circle>
+<circle cx="3440" cy="2605" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Field Work (unified_frame_4)</title></circle>
+<circle cx="3406" cy="2663" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Timber Rigging (timber_rigging)</title></circle>
+<circle cx="3345" cy="2636" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Field Work (unified_frame_5)</title></circle>
+<circle cx="3280" cy="2637" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Long Reach Saws (long_reach_saws)</title></circle>
+<circle cx="3269" cy="2567" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Field Work (unified_frame_6)</title></circle>
+<circle cx="3299" cy="2499" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Field Work (unified_frame_7)</title></circle>
 <circle cx="3108" cy="5057" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Catalysis (active_sites_1)</title></circle>
 <circle cx="3056" cy="5033" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Catalysis (active_sites_2)</title></circle>
 <circle cx="3014" cy="4996" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Catalysis (active_sites_3)</title></circle>
@@ -2314,13 +2315,13 @@
 <circle cx="3036" cy="5175" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Active Sites (active_sites)</title></circle>
 <circle cx="2979" cy="5152" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Porous Beds (porous_beds)</title></circle>
 <circle cx="2935" cy="5110" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Reagent Dosing (reagent_dosing)</title></circle>
-<circle cx="2646" cy="2857" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Economy (efficient_windings_1)</title></circle>
-<circle cx="2708" cy="2842" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Economy (efficient_windings_2)</title></circle>
-<circle cx="2752" cy="2889" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Economy (efficient_windings_3)</title></circle>
-<circle cx="2733" cy="2950" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Economy (efficient_windings_4)</title></circle>
-<circle cx="2670" cy="2965" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Economy (efficient_windings_5)</title></circle>
-<circle cx="2627" cy="2918" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Economy (efficient_windings_6)</title></circle>
-<circle cx="2689" cy="2903" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Efficient Windings (efficient_windings)</title></circle>
+<circle cx="2646" cy="2857" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Precision (true_alignment_1)</title></circle>
+<circle cx="2708" cy="2842" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Precision (true_alignment_2)</title></circle>
+<circle cx="2752" cy="2889" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Precision (true_alignment_3)</title></circle>
+<circle cx="2733" cy="2950" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Precision (true_alignment_4)</title></circle>
+<circle cx="2670" cy="2965" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Precision (true_alignment_5)</title></circle>
+<circle cx="2627" cy="2918" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Precision (true_alignment_6)</title></circle>
+<circle cx="2689" cy="2903" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>True Alignment (true_alignment)</title></circle>
 <circle cx="4991" cy="3170" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Recovery (dust_recovery_1)</title></circle>
 <circle cx="5012" cy="3113" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Recovery (dust_recovery_2)</title></circle>
 <circle cx="4974" cy="3066" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Dust Recovery (dust_recovery)</title></circle>
@@ -2333,28 +2334,28 @@
 <circle cx="5111" cy="3150" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Recovery (dust_recovery_8)</title></circle>
 <circle cx="5089" cy="3207" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Sorting Rake (sorting_rake)</title></circle>
 <circle cx="5051" cy="3160" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Recovery (dust_recovery_9)</title></circle>
-<circle cx="2921" cy="3248" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Calibration (zeroed_dials_1)</title></circle>
-<circle cx="2857" cy="3270" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Calibration (zeroed_dials_2)</title></circle>
-<circle cx="2785" cy="3287" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Calibration (zeroed_dials_3)</title></circle>
-<circle cx="2718" cy="3264" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Zeroed Dials (zeroed_dials)</title></circle>
-<circle cx="2730" cy="3200" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Calibration (zeroed_dials_4)</title></circle>
-<circle cx="2715" cy="3134" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Tuned Resonators (tuned_resonators)</title></circle>
-<circle cx="2778" cy="3112" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Calibration (zeroed_dials_5)</title></circle>
-<circle cx="2826" cy="3068" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Vernier Scales (vernier_scales)</title></circle>
-<circle cx="2881" cy="3112" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Calibration (zeroed_dials_6)</title></circle>
-<circle cx="2905" cy="3182" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Calibration (zeroed_dials_7)</title></circle>
+<circle cx="2921" cy="3248" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Economy (efficient_windings_1)</title></circle>
+<circle cx="2857" cy="3270" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Economy (efficient_windings_2)</title></circle>
+<circle cx="2785" cy="3287" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Economy (efficient_windings_3)</title></circle>
+<circle cx="2718" cy="3264" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Efficient Windings (efficient_windings)</title></circle>
+<circle cx="2730" cy="3200" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Economy (efficient_windings_4)</title></circle>
+<circle cx="2715" cy="3134" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Low Loss Bus (low_loss_bus)</title></circle>
+<circle cx="2778" cy="3112" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Economy (efficient_windings_5)</title></circle>
+<circle cx="2826" cy="3068" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Current Trim (current_trim)</title></circle>
+<circle cx="2881" cy="3112" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Economy (efficient_windings_6)</title></circle>
+<circle cx="2905" cy="3182" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Economy (efficient_windings_7)</title></circle>
 <circle cx="5220" cy="3576" r="9" fill="#e6ab73" stroke="#111820" stroke-width="3"><title>Drive (torque_surge_1)</title></circle>
 <circle cx="5282" cy="3531" r="9" fill="#e6ab73" stroke="#111820" stroke-width="3"><title>Drive (torque_surge_2)</title></circle>
 <circle cx="5355" cy="3551" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Torque Surge (torque_surge)</title></circle>
 <circle cx="5385" cy="3621" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Driving Force (driving_force)</title></circle>
 <circle cx="5349" cy="3688" r="9" fill="#e6ab73" stroke="#111820" stroke-width="3"><title>Drive (torque_surge_3)</title></circle>
 <circle cx="5274" cy="3702" r="9" fill="#e6ab73" stroke="#111820" stroke-width="3"><title>Drive (torque_surge_4)</title></circle>
-<circle cx="5038" cy="4822" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Thermal Reach (blast_nozzles_1)</title></circle>
-<circle cx="5076" cy="4860" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Thermal Reach (blast_nozzles_2)</title></circle>
-<circle cx="5106" cy="4904" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Blast Nozzles (blast_nozzles)</title></circle>
-<circle cx="5129" cy="4953" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Thermal Reach (blast_nozzles_3)</title></circle>
-<circle cx="5142" cy="5005" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Thermal Reach (blast_nozzles_4)</title></circle>
-<circle cx="5144" cy="5059" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Firebrick Walls (firebrick_walls)</title></circle>
+<circle cx="5038" cy="4822" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Thermal Reach (deep_firebox_1)</title></circle>
+<circle cx="5076" cy="4860" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Thermal Reach (deep_firebox_2)</title></circle>
+<circle cx="5106" cy="4904" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Deep Firebox (deep_firebox)</title></circle>
+<circle cx="5129" cy="4953" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Thermal Reach (deep_firebox_3)</title></circle>
+<circle cx="5142" cy="5005" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Thermal Reach (deep_firebox_4)</title></circle>
+<circle cx="5144" cy="5059" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Blast Nozzles (blast_nozzles)</title></circle>
 <circle cx="5160" cy="4330" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Startup (quick_ignition_1)</title></circle>
 <circle cx="5096" cy="4331" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Startup (quick_ignition_2)</title></circle>
 <circle cx="5063" cy="4276" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Startup (quick_ignition_3)</title></circle>
@@ -2367,50 +2368,50 @@
 <circle cx="4492" cy="5368" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Frame Reservoir (frame_reservoir)</title></circle>
 <circle cx="4363" cy="5347" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Reserves (frame_reservoir_3)</title></circle>
 <circle cx="4341" cy="5406" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Buffer Laminate (buffer_laminate)</title></circle>
-<circle cx="4717" cy="2871" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Hardness (arc_pressure_drive_1)</title></circle>
-<circle cx="4697" cy="2810" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Hardness (arc_pressure_drive_2)</title></circle>
-<circle cx="4740" cy="2762" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Hardness (arc_pressure_drive_3)</title></circle>
-<circle cx="4802" cy="2775" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Hardness (arc_pressure_drive_4)</title></circle>
-<circle cx="4822" cy="2836" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Hardness (arc_pressure_drive_5)</title></circle>
-<circle cx="4780" cy="2884" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Hardness (arc_pressure_drive_6)</title></circle>
-<circle cx="4760" cy="2823" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Arc Pressure Drive (arc_pressure_drive)</title></circle>
-<circle cx="2662" cy="5147" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Insulation (double_walls_1)</title></circle>
-<circle cx="2698" cy="5114" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Insulation (double_walls_2)</title></circle>
-<circle cx="2727" cy="5074" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Double Walls (double_walls)</title></circle>
-<circle cx="2749" cy="5029" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Insulation (double_walls_3)</title></circle>
-<circle cx="2762" cy="4982" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Insulation (double_walls_4)</title></circle>
-<circle cx="2766" cy="4932" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Ceramic Jackets (ceramic_jackets)</title></circle>
-<circle cx="3975" cy="2399" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Field Work (universal_bracket_1)</title></circle>
-<circle cx="4031" cy="2367" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Field Work (universal_bracket_2)</title></circle>
-<circle cx="4086" cy="2399" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Field Work (universal_bracket_3)</title></circle>
-<circle cx="4085" cy="2463" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Field Work (universal_bracket_4)</title></circle>
-<circle cx="4030" cy="2495" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Field Work (universal_bracket_5)</title></circle>
-<circle cx="3975" cy="2463" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Field Work (universal_bracket_6)</title></circle>
-<circle cx="4030" cy="2431" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Universal Bracket (universal_bracket)</title></circle>
-<circle cx="5031" cy="3474" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Hardness (carbide_teeth_1)</title></circle>
-<circle cx="5073" cy="3538" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Hardness (carbide_teeth_2)</title></circle>
-<circle cx="5049" cy="3610" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Carbide Teeth (carbide_teeth)</title></circle>
-<circle cx="4977" cy="3637" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Tempered Jaws (tempered_jaws)</title></circle>
-<circle cx="4912" cy="3597" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Hardness (carbide_teeth_3)</title></circle>
-<circle cx="4902" cy="3522" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Hardness (carbide_teeth_4)</title></circle>
-<circle cx="4206" cy="3223" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Actuation (quick_release_1)</title></circle>
-<circle cx="4259" cy="3278" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Actuation (quick_release_2)</title></circle>
-<circle cx="4249" cy="3353" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Quick Release (quick_release)</title></circle>
+<circle cx="4717" cy="2871" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Rail Pace (greased_rails_1)</title></circle>
+<circle cx="4697" cy="2810" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Rail Pace (greased_rails_2)</title></circle>
+<circle cx="4740" cy="2762" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Rail Pace (greased_rails_3)</title></circle>
+<circle cx="4802" cy="2775" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Rail Pace (greased_rails_4)</title></circle>
+<circle cx="4822" cy="2836" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Rail Pace (greased_rails_5)</title></circle>
+<circle cx="4780" cy="2884" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Rail Pace (greased_rails_6)</title></circle>
+<circle cx="4760" cy="2823" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Greased Rails (greased_rails)</title></circle>
+<circle cx="2662" cy="5147" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Reservoirs (holding_tanks_1)</title></circle>
+<circle cx="2698" cy="5114" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Reservoirs (holding_tanks_2)</title></circle>
+<circle cx="2727" cy="5074" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Holding Tanks (holding_tanks)</title></circle>
+<circle cx="2749" cy="5029" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Reservoirs (holding_tanks_3)</title></circle>
+<circle cx="2762" cy="4982" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Reservoirs (holding_tanks_4)</title></circle>
+<circle cx="2766" cy="4932" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Cistern Walls (cistern_walls)</title></circle>
+<circle cx="3975" cy="2399" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Actuation (kinetic_feed_1)</title></circle>
+<circle cx="4031" cy="2367" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Actuation (kinetic_feed_2)</title></circle>
+<circle cx="4086" cy="2399" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Actuation (kinetic_feed_3)</title></circle>
+<circle cx="4085" cy="2463" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Actuation (kinetic_feed_4)</title></circle>
+<circle cx="4030" cy="2495" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Actuation (kinetic_feed_5)</title></circle>
+<circle cx="3975" cy="2463" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Actuation (kinetic_feed_6)</title></circle>
+<circle cx="4030" cy="2431" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Kinetic Feed (kinetic_feed)</title></circle>
+<circle cx="5031" cy="3474" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Hardness (arc_pressure_drive_1)</title></circle>
+<circle cx="5073" cy="3538" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Hardness (arc_pressure_drive_2)</title></circle>
+<circle cx="5049" cy="3610" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Arc Pressure Drive (arc_pressure_drive)</title></circle>
+<circle cx="4977" cy="3637" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Carbide Teeth (carbide_teeth)</title></circle>
+<circle cx="4912" cy="3597" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Hardness (arc_pressure_drive_3)</title></circle>
+<circle cx="4902" cy="3522" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Hardness (arc_pressure_drive_4)</title></circle>
+<circle cx="4206" cy="3223" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Rail Pace (smooth_bogies_1)</title></circle>
+<circle cx="4259" cy="3278" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Rail Pace (smooth_bogies_2)</title></circle>
+<circle cx="4249" cy="3353" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Smooth Bogies (smooth_bogies)</title></circle>
 <circle cx="4184" cy="3393" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Wide Canopy (wide_canopy)</title></circle>
-<circle cx="4113" cy="3367" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Actuation (quick_release_3)</title></circle>
-<circle cx="4088" cy="3295" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Actuation (quick_release_4)</title></circle>
-<circle cx="3336" cy="3944" r="9" fill="#72bda7" stroke="#111820" stroke-width="3"><title>Control (mindful_operation_1)</title></circle>
-<circle cx="3346" cy="3892" r="9" fill="#72bda7" stroke="#111820" stroke-width="3"><title>Control (mindful_operation_2)</title></circle>
-<circle cx="3366" cy="3842" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Mindful Operation (mindful_operation)</title></circle>
-<circle cx="3394" cy="3796" r="9" fill="#72bda7" stroke="#111820" stroke-width="3"><title>Control (mindful_operation_3)</title></circle>
-<circle cx="3430" cy="3756" r="9" fill="#72bda7" stroke="#111820" stroke-width="3"><title>Control (mindful_operation_4)</title></circle>
-<circle cx="3474" cy="3724" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Composure (composure)</title></circle>
-<circle cx="3116" cy="3442" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Economy (governed_draw_1)</title></circle>
-<circle cx="3173" cy="3414" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Economy (governed_draw_2)</title></circle>
-<circle cx="3226" cy="3450" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Economy (governed_draw_3)</title></circle>
-<circle cx="3222" cy="3514" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Economy (governed_draw_4)</title></circle>
-<circle cx="3164" cy="3542" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Economy (governed_draw_5)</title></circle>
-<circle cx="3111" cy="3506" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Economy (governed_draw_6)</title></circle>
+<circle cx="4113" cy="3367" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Rail Pace (smooth_bogies_3)</title></circle>
+<circle cx="4088" cy="3295" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Rail Pace (smooth_bogies_4)</title></circle>
+<circle cx="3336" cy="3944" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Calibration (reference_gauges_1)</title></circle>
+<circle cx="3346" cy="3892" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Calibration (reference_gauges_2)</title></circle>
+<circle cx="3366" cy="3842" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Reference Gauges (reference_gauges)</title></circle>
+<circle cx="3394" cy="3796" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Calibration (reference_gauges_3)</title></circle>
+<circle cx="3430" cy="3756" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Calibration (reference_gauges_4)</title></circle>
+<circle cx="3474" cy="3724" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Zeroed Dials (zeroed_dials)</title></circle>
+<circle cx="3116" cy="3442" r="9" fill="#72bda7" stroke="#111820" stroke-width="3"><title>Control (governed_draw_1)</title></circle>
+<circle cx="3173" cy="3414" r="9" fill="#72bda7" stroke="#111820" stroke-width="3"><title>Control (governed_draw_2)</title></circle>
+<circle cx="3226" cy="3450" r="9" fill="#72bda7" stroke="#111820" stroke-width="3"><title>Control (governed_draw_3)</title></circle>
+<circle cx="3222" cy="3514" r="9" fill="#72bda7" stroke="#111820" stroke-width="3"><title>Control (governed_draw_4)</title></circle>
+<circle cx="3164" cy="3542" r="9" fill="#72bda7" stroke="#111820" stroke-width="3"><title>Control (governed_draw_5)</title></circle>
+<circle cx="3111" cy="3506" r="9" fill="#72bda7" stroke="#111820" stroke-width="3"><title>Control (governed_draw_6)</title></circle>
 <circle cx="3169" cy="3478" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Governed Draw (governed_draw)</title></circle>
 <circle cx="3781" cy="4407" r="9" fill="#829bdb" stroke="#111820" stroke-width="3"><title>Reserve (stockpile_1)</title></circle>
 <circle cx="3762" cy="4347" r="9" fill="#829bdb" stroke="#111820" stroke-width="3"><title>Reserve (stockpile_2)</title></circle>
@@ -2424,37 +2425,37 @@
 <circle cx="4361" cy="3948" r="9" fill="#72bda7" stroke="#111820" stroke-width="3"><title>Control (balanced_chassis_5)</title></circle>
 <circle cx="4425" cy="3943" r="9" fill="#72bda7" stroke="#111820" stroke-width="3"><title>Control (balanced_chassis_6)</title></circle>
 <circle cx="4397" cy="4000" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Balanced Chassis (balanced_chassis)</title></circle>
-<circle cx="3561" cy="5263" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Power Supply (dynamo_windings_1)</title></circle>
-<circle cx="3558" cy="5315" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Power Supply (dynamo_windings_2)</title></circle>
-<circle cx="3565" cy="5369" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Dynamo Windings (dynamo_windings)</title></circle>
-<circle cx="3581" cy="5420" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Power Supply (dynamo_windings_3)</title></circle>
-<circle cx="3607" cy="5468" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Power Supply (dynamo_windings_4)</title></circle>
+<circle cx="3561" cy="5263" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Surge (snap_release_1)</title></circle>
+<circle cx="3558" cy="5315" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Surge (snap_release_2)</title></circle>
+<circle cx="3565" cy="5369" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Snap Release (snap_release)</title></circle>
+<circle cx="3581" cy="5420" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Surge (snap_release_3)</title></circle>
+<circle cx="3607" cy="5468" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Surge (snap_release_4)</title></circle>
 <circle cx="3642" cy="5509" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Tri Phase Design (tri_phase_design)</title></circle>
-<circle cx="3210" cy="4753" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Regulation (measured_hand_1)</title></circle>
-<circle cx="3228" cy="4815" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Regulation (measured_hand_2)</title></circle>
-<circle cx="3184" cy="4861" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Regulation (measured_hand_3)</title></circle>
-<circle cx="3122" cy="4846" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Regulation (measured_hand_4)</title></circle>
-<circle cx="3104" cy="4784" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Regulation (measured_hand_5)</title></circle>
-<circle cx="3148" cy="4738" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Regulation (measured_hand_6)</title></circle>
+<circle cx="3210" cy="4753" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Insulation (measured_hand_1)</title></circle>
+<circle cx="3228" cy="4815" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Insulation (measured_hand_2)</title></circle>
+<circle cx="3184" cy="4861" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Insulation (measured_hand_3)</title></circle>
+<circle cx="3122" cy="4846" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Insulation (measured_hand_4)</title></circle>
+<circle cx="3104" cy="4784" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Insulation (measured_hand_5)</title></circle>
+<circle cx="3148" cy="4738" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Insulation (measured_hand_6)</title></circle>
 <circle cx="3166" cy="4800" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Measured Hand (measured_hand)</title></circle>
-<circle cx="5895" cy="4096" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Fuel Economy (air_dampers_1)</title></circle>
-<circle cx="5970" cy="4084" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Fuel Economy (air_dampers_2)</title></circle>
-<circle cx="6027" cy="4135" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Air Dampers (air_dampers)</title></circle>
-<circle cx="6023" cy="4211" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Ember Keeper (ember_keeper)</title></circle>
-<circle cx="5960" cy="4255" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Fuel Economy (air_dampers_3)</title></circle>
-<circle cx="5887" cy="4234" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Fuel Economy (air_dampers_4)</title></circle>
-<circle cx="5400" cy="5182" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Charge Transfer (recovery_bus_1)</title></circle>
-<circle cx="5467" cy="5217" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Charge Transfer (recovery_bus_2)</title></circle>
-<circle cx="5481" cy="5292" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Recovery Bus (recovery_bus)</title></circle>
-<circle cx="5431" cy="5350" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Wide Busbars (wide_busbars)</title></circle>
-<circle cx="5355" cy="5347" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Charge Transfer (recovery_bus_3)</title></circle>
-<circle cx="5310" cy="5286" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Charge Transfer (recovery_bus_4)</title></circle>
-<circle cx="2289" cy="4788" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Insulation (vacuum_gaps_1)</title></circle>
-<circle cx="2237" cy="4799" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Insulation (vacuum_gaps_2)</title></circle>
-<circle cx="2184" cy="4801" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Vacuum Gaps (vacuum_gaps)</title></circle>
-<circle cx="2130" cy="4793" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Insulation (vacuum_gaps_3)</title></circle>
-<circle cx="2079" cy="4776" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Insulation (vacuum_gaps_4)</title></circle>
-<circle cx="2032" cy="4748" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Reflective Foil (reflective_foil)</title></circle>
+<circle cx="5895" cy="4096" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Fuel Economy (clean_combustion_1)</title></circle>
+<circle cx="5970" cy="4084" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Fuel Economy (clean_combustion_2)</title></circle>
+<circle cx="6027" cy="4135" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Clean Combustion (clean_combustion)</title></circle>
+<circle cx="6023" cy="4211" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Air Dampers (air_dampers)</title></circle>
+<circle cx="5960" cy="4255" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Fuel Economy (clean_combustion_3)</title></circle>
+<circle cx="5887" cy="4234" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Fuel Economy (clean_combustion_4)</title></circle>
+<circle cx="5400" cy="5182" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Heat Margin (thermal_fuse_1)</title></circle>
+<circle cx="5467" cy="5217" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Heat Margin (thermal_fuse_2)</title></circle>
+<circle cx="5481" cy="5292" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Thermal Fuse (thermal_fuse)</title></circle>
+<circle cx="5431" cy="5350" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Margin Liner (margin_liner)</title></circle>
+<circle cx="5355" cy="5347" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Heat Margin (thermal_fuse_3)</title></circle>
+<circle cx="5310" cy="5286" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Heat Margin (thermal_fuse_4)</title></circle>
+<circle cx="2289" cy="4788" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Insulation (double_walls_1)</title></circle>
+<circle cx="2237" cy="4799" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Insulation (double_walls_2)</title></circle>
+<circle cx="2184" cy="4801" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Double Walls (double_walls)</title></circle>
+<circle cx="2130" cy="4793" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Insulation (double_walls_3)</title></circle>
+<circle cx="2079" cy="4776" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Insulation (double_walls_4)</title></circle>
+<circle cx="2032" cy="4748" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Ceramic Jackets (ceramic_jackets)</title></circle>
 <circle cx="2127" cy="4101" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Regulation (feedback_controller_1)</title></circle>
 <circle cx="2101" cy="4160" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Regulation (feedback_controller_2)</title></circle>
 <circle cx="2037" cy="4167" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Regulation (feedback_controller_3)</title></circle>
@@ -2462,24 +2463,24 @@
 <circle cx="2025" cy="4057" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Regulation (feedback_controller_5)</title></circle>
 <circle cx="2089" cy="4050" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Regulation (feedback_controller_6)</title></circle>
 <circle cx="2063" cy="4108" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Feedback Controller (feedback_controller)</title></circle>
-<circle cx="2673" cy="2710" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Economy (low_loss_bus_1)</title></circle>
-<circle cx="2614" cy="2661" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Economy (low_loss_bus_2)</title></circle>
-<circle cx="2616" cy="2585" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Low Loss Bus (low_loss_bus)</title></circle>
-<circle cx="2677" cy="2539" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Current Trim (current_trim)</title></circle>
-<circle cx="2751" cy="2557" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Economy (low_loss_bus_3)</title></circle>
-<circle cx="2783" cy="2627" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Economy (low_loss_bus_4)</title></circle>
+<circle cx="2673" cy="2710" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Precision (balanced_rotors_1)</title></circle>
+<circle cx="2614" cy="2661" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Precision (balanced_rotors_2)</title></circle>
+<circle cx="2616" cy="2585" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Balanced Rotors (balanced_rotors)</title></circle>
+<circle cx="2677" cy="2539" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Fine Tolerances (fine_tolerances)</title></circle>
+<circle cx="2751" cy="2557" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Precision (balanced_rotors_3)</title></circle>
+<circle cx="2783" cy="2627" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Precision (balanced_rotors_4)</title></circle>
 <circle cx="4257" cy="5770" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Reserves (massive_buffer_1)</title></circle>
 <circle cx="4276" cy="5844" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Reserves (massive_buffer_2)</title></circle>
 <circle cx="4230" cy="5905" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Massive Buffer (massive_buffer)</title></circle>
 <circle cx="4154" cy="5907" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Battery Shell (battery_shell)</title></circle>
 <circle cx="4105" cy="5848" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Reserves (massive_buffer_3)</title></circle>
 <circle cx="4120" cy="5773" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Reserves (massive_buffer_4)</title></circle>
-<circle cx="3778" cy="2209" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Field Work (long_reach_saws_1)</title></circle>
-<circle cx="3779" cy="2156" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Field Work (long_reach_saws_2)</title></circle>
-<circle cx="3790" cy="2103" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Long Reach Saws (long_reach_saws)</title></circle>
-<circle cx="3809" cy="2053" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Field Work (long_reach_saws_3)</title></circle>
-<circle cx="3838" cy="2007" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Field Work (long_reach_saws_4)</title></circle>
-<circle cx="3875" cy="1968" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Grove Sweeps (grove_sweeps)</title></circle>
+<circle cx="3778" cy="2209" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Actuation (quick_release_1)</title></circle>
+<circle cx="3779" cy="2156" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Actuation (quick_release_2)</title></circle>
+<circle cx="3790" cy="2103" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Quick Release (quick_release)</title></circle>
+<circle cx="3809" cy="2053" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Actuation (quick_release_3)</title></circle>
+<circle cx="3838" cy="2007" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Actuation (quick_release_4)</title></circle>
+<circle cx="3875" cy="1968" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Pneumatic Rams (pneumatic_rams)</title></circle>
 <circle cx="5625" cy="3095" r="9" fill="#e6ab73" stroke="#111820" stroke-width="3"><title>Drive (horsepower_1)</title></circle>
 <circle cx="5618" cy="3031" r="9" fill="#e6ab73" stroke="#111820" stroke-width="3"><title>Drive (horsepower_2)</title></circle>
 <circle cx="5669" cy="2993" r="9" fill="#e6ab73" stroke="#111820" stroke-width="3"><title>Drive (horsepower_3)</title></circle>
@@ -2487,24 +2488,24 @@
 <circle cx="5735" cy="3083" r="9" fill="#e6ab73" stroke="#111820" stroke-width="3"><title>Drive (horsepower_5)</title></circle>
 <circle cx="5683" cy="3121" r="9" fill="#e6ab73" stroke="#111820" stroke-width="3"><title>Drive (horsepower_6)</title></circle>
 <circle cx="5676" cy="3057" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Horsepower (horsepower)</title></circle>
-<circle cx="3157" cy="5578" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Thermal Inertia (slow_cooling_1)</title></circle>
-<circle cx="3143" cy="5653" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Thermal Inertia (slow_cooling_2)</title></circle>
-<circle cx="3075" cy="5689" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Slow Cooling (slow_cooling)</title></circle>
-<circle cx="3005" cy="5658" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Retained Warmth (retained_warmth)</title></circle>
-<circle cx="2986" cy="5584" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Thermal Inertia (slow_cooling_3)</title></circle>
-<circle cx="3031" cy="5523" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Thermal Inertia (slow_cooling_4)</title></circle>
-<circle cx="2266" cy="3226" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Precision (fine_tolerances_1)</title></circle>
-<circle cx="2190" cy="3212" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Precision (fine_tolerances_2)</title></circle>
-<circle cx="2155" cy="3145" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Fine Tolerances (fine_tolerances)</title></circle>
-<circle cx="2185" cy="3075" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Dampened Frame (dampened_frame)</title></circle>
-<circle cx="2259" cy="3055" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Precision (fine_tolerances_3)</title></circle>
-<circle cx="2320" cy="3100" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Precision (fine_tolerances_4)</title></circle>
-<circle cx="3478" cy="2290" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Actuation (pneumatic_rams_1)</title></circle>
-<circle cx="3473" cy="2237" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Actuation (pneumatic_rams_2)</title></circle>
-<circle cx="3478" cy="2184" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Pneumatic Rams (pneumatic_rams)</title></circle>
-<circle cx="3492" cy="2132" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Actuation (pneumatic_rams_3)</title></circle>
-<circle cx="3516" cy="2083" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Actuation (pneumatic_rams_4)</title></circle>
-<circle cx="3549" cy="2040" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Rapid Cycling (rapid_cycling)</title></circle>
+<circle cx="3157" cy="5578" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Reservoirs (deep_tanks_1)</title></circle>
+<circle cx="3143" cy="5653" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Reservoirs (deep_tanks_2)</title></circle>
+<circle cx="3075" cy="5689" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Deep Tanks (deep_tanks)</title></circle>
+<circle cx="3005" cy="5658" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Bulk Reservoir (bulk_reservoir)</title></circle>
+<circle cx="2986" cy="5584" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Reservoirs (deep_tanks_3)</title></circle>
+<circle cx="3031" cy="5523" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Reservoirs (deep_tanks_4)</title></circle>
+<circle cx="2266" cy="3226" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Calibration (tuned_resonators_1)</title></circle>
+<circle cx="2190" cy="3212" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Calibration (tuned_resonators_2)</title></circle>
+<circle cx="2155" cy="3145" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Tuned Resonators (tuned_resonators)</title></circle>
+<circle cx="2185" cy="3075" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Vernier Scales (vernier_scales)</title></circle>
+<circle cx="2259" cy="3055" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Calibration (tuned_resonators_3)</title></circle>
+<circle cx="2320" cy="3100" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Calibration (tuned_resonators_4)</title></circle>
+<circle cx="3478" cy="2290" r="9" fill="#72bda7" stroke="#111820" stroke-width="3"><title>Control (mindful_operation_1)</title></circle>
+<circle cx="3473" cy="2237" r="9" fill="#72bda7" stroke="#111820" stroke-width="3"><title>Control (mindful_operation_2)</title></circle>
+<circle cx="3478" cy="2184" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Mindful Operation (mindful_operation)</title></circle>
+<circle cx="3492" cy="2132" r="9" fill="#72bda7" stroke="#111820" stroke-width="3"><title>Control (mindful_operation_3)</title></circle>
+<circle cx="3516" cy="2083" r="9" fill="#72bda7" stroke="#111820" stroke-width="3"><title>Control (mindful_operation_4)</title></circle>
+<circle cx="3549" cy="2040" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Composure (composure)</title></circle>
 <circle cx="5485" cy="2927" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Momentum (hopper_rhythm_1)</title></circle>
 <circle cx="5471" cy="2865" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Momentum (hopper_rhythm_2)</title></circle>
 <circle cx="5517" cy="2821" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Momentum (hopper_rhythm_3)</title></circle>
@@ -2512,288 +2513,288 @@
 <circle cx="5593" cy="2902" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Momentum (hopper_rhythm_5)</title></circle>
 <circle cx="5547" cy="2946" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Momentum (hopper_rhythm_6)</title></circle>
 <circle cx="5532" cy="2883" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Hopper Rhythm (hopper_rhythm)</title></circle>
-<circle cx="4811" cy="3467" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Recovery (orchard_plan_1)</title></circle>
-<circle cx="4781" cy="3412" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Recovery (orchard_plan_2)</title></circle>
+<circle cx="4811" cy="3467" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Hardness (orchard_plan_1)</title></circle>
+<circle cx="4781" cy="3412" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Hardness (orchard_plan_2)</title></circle>
 <circle cx="4757" cy="3354" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Orchard Plan (orchard_plan)</title></circle>
-<circle cx="4862" cy="3432" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Recovery (orchard_plan_3)</title></circle>
-<circle cx="4909" cy="3389" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Sample Tray (sample_tray)</title></circle>
-<circle cx="2953" cy="2495" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Calibration (trim_pots_1)</title></circle>
-<circle cx="2889" cy="2494" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Calibration (trim_pots_2)</title></circle>
-<circle cx="2858" cy="2438" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Calibration (trim_pots_3)</title></circle>
-<circle cx="2890" cy="2383" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Calibration (trim_pots_4)</title></circle>
-<circle cx="2954" cy="2384" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Calibration (trim_pots_5)</title></circle>
-<circle cx="2986" cy="2440" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Calibration (trim_pots_6)</title></circle>
-<circle cx="2922" cy="2439" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Trim Pots (trim_pots)</title></circle>
-<circle cx="3386" cy="5672" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Power Supply (field_magnets_1)</title></circle>
-<circle cx="3364" cy="5720" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Power Supply (field_magnets_2)</title></circle>
-<circle cx="3333" cy="5764" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Field Magnets (field_magnets)</title></circle>
-<circle cx="3295" cy="5803" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Power Supply (field_magnets_3)</title></circle>
-<circle cx="3251" cy="5833" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Power Supply (field_magnets_4)</title></circle>
-<circle cx="3200" cy="5854" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Turbine Blades (turbine_blades)</title></circle>
-<circle cx="3219" cy="4209" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Fluid Handling (pressure_seals_1)</title></circle>
-<circle cx="3218" cy="4145" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Fluid Handling (pressure_seals_2)</title></circle>
-<circle cx="3273" cy="4112" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Fluid Handling (pressure_seals_3)</title></circle>
-<circle cx="3329" cy="4143" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Fluid Handling (pressure_seals_4)</title></circle>
-<circle cx="3330" cy="4207" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Fluid Handling (pressure_seals_5)</title></circle>
-<circle cx="3275" cy="4240" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Fluid Handling (pressure_seals_6)</title></circle>
-<circle cx="3274" cy="4176" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Pressure Seals (pressure_seals)</title></circle>
+<circle cx="4862" cy="3432" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Hardness (orchard_plan_3)</title></circle>
+<circle cx="4909" cy="3389" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Tempered Jaws (tempered_jaws)</title></circle>
+<circle cx="2953" cy="2495" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Precision (dampened_frame_1)</title></circle>
+<circle cx="2889" cy="2494" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Precision (dampened_frame_2)</title></circle>
+<circle cx="2858" cy="2438" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Precision (dampened_frame_3)</title></circle>
+<circle cx="2890" cy="2383" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Precision (dampened_frame_4)</title></circle>
+<circle cx="2954" cy="2384" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Precision (dampened_frame_5)</title></circle>
+<circle cx="2986" cy="2440" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Precision (dampened_frame_6)</title></circle>
+<circle cx="2922" cy="2439" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Dampened Frame (dampened_frame)</title></circle>
+<circle cx="3386" cy="5672" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Surge (spark_bridge_1)</title></circle>
+<circle cx="3364" cy="5720" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Surge (spark_bridge_2)</title></circle>
+<circle cx="3333" cy="5764" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Spark Bridge (spark_bridge)</title></circle>
+<circle cx="3295" cy="5803" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Surge (spark_bridge_3)</title></circle>
+<circle cx="3251" cy="5833" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Surge (spark_bridge_4)</title></circle>
+<circle cx="3200" cy="5854" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Flash Cycle (flash_cycle)</title></circle>
+<circle cx="3219" cy="4209" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Regulation (setpoint_hold_1)</title></circle>
+<circle cx="3218" cy="4145" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Regulation (setpoint_hold_2)</title></circle>
+<circle cx="3273" cy="4112" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Regulation (setpoint_hold_3)</title></circle>
+<circle cx="3329" cy="4143" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Regulation (setpoint_hold_4)</title></circle>
+<circle cx="3330" cy="4207" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Regulation (setpoint_hold_5)</title></circle>
+<circle cx="3275" cy="4240" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Regulation (setpoint_hold_6)</title></circle>
+<circle cx="3274" cy="4176" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Setpoint Hold (setpoint_hold)</title></circle>
 <circle cx="5178" cy="5413" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Conservation (regenerative_brakes_1)</title></circle>
 <circle cx="5238" cy="5460" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Conservation (regenerative_brakes_2)</title></circle>
 <circle cx="5239" cy="5536" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Regenerative Brakes (regenerative_brakes)</title></circle>
 <circle cx="5180" cy="5585" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Heat Recapture (heat_recapture)</title></circle>
 <circle cx="5105" cy="5568" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Conservation (regenerative_brakes_3)</title></circle>
 <circle cx="5071" cy="5500" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Conservation (regenerative_brakes_4)</title></circle>
-<circle cx="3539" cy="4593" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Catalysis (clean_catalyst_1)</title></circle>
-<circle cx="3522" cy="4532" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Catalysis (clean_catalyst_2)</title></circle>
-<circle cx="3590" cy="4556" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Catalysis (clean_catalyst_3)</title></circle>
-<circle cx="3574" cy="4493" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Clean Catalyst (clean_catalyst)</title></circle>
-<circle cx="4697" cy="2318" r="9" fill="#e6ab73" stroke="#111820" stroke-width="3"><title>Drive (brute_gearing_1)</title></circle>
-<circle cx="4726" cy="2274" r="9" fill="#e6ab73" stroke="#111820" stroke-width="3"><title>Drive (brute_gearing_2)</title></circle>
-<circle cx="4764" cy="2236" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Brute Gearing (brute_gearing)</title></circle>
-<circle cx="4807" cy="2204" r="9" fill="#e6ab73" stroke="#111820" stroke-width="3"><title>Drive (brute_gearing_3)</title></circle>
-<circle cx="4856" cy="2181" r="9" fill="#e6ab73" stroke="#111820" stroke-width="3"><title>Drive (brute_gearing_4)</title></circle>
-<circle cx="4909" cy="2168" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Engine Heart (engine_heart)</title></circle>
+<circle cx="3539" cy="4593" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Thermal Inertia (slow_cooling_1)</title></circle>
+<circle cx="3522" cy="4532" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Thermal Inertia (slow_cooling_2)</title></circle>
+<circle cx="3590" cy="4556" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Thermal Inertia (slow_cooling_3)</title></circle>
+<circle cx="3574" cy="4493" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Slow Cooling (slow_cooling)</title></circle>
+<circle cx="4697" cy="2318" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Field Work (grove_sweeps_1)</title></circle>
+<circle cx="4726" cy="2274" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Field Work (grove_sweeps_2)</title></circle>
+<circle cx="4764" cy="2236" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Grove Sweeps (grove_sweeps)</title></circle>
+<circle cx="4807" cy="2204" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Field Work (grove_sweeps_3)</title></circle>
+<circle cx="4856" cy="2181" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Field Work (grove_sweeps_4)</title></circle>
+<circle cx="4909" cy="2168" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Canopy Hooks (canopy_hooks)</title></circle>
 <circle cx="4011" cy="3732" r="9" fill="#829bdb" stroke="#111820" stroke-width="3"><title>Reserve (stamina_cells_1)</title></circle>
 <circle cx="4060" cy="3737" r="9" fill="#829bdb" stroke="#111820" stroke-width="3"><title>Reserve (stamina_cells_2)</title></circle>
 <circle cx="4107" cy="3752" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Stamina Cells (stamina_cells)</title></circle>
 <circle cx="4151" cy="3775" r="9" fill="#829bdb" stroke="#111820" stroke-width="3"><title>Reserve (stamina_cells_3)</title></circle>
 <circle cx="4191" cy="3805" r="9" fill="#829bdb" stroke="#111820" stroke-width="3"><title>Reserve (stamina_cells_4)</title></circle>
 <circle cx="4223" cy="3843" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Hoarded Charge (hoarded_charge)</title></circle>
-<circle cx="5658" cy="3441" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Thermal Reach (reinforced_mount_1)</title></circle>
-<circle cx="5684" cy="3497" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Thermal Reach (reinforced_mount_2)</title></circle>
+<circle cx="5658" cy="3441" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Recovery (reinforced_mount_1)</title></circle>
+<circle cx="5684" cy="3497" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Recovery (reinforced_mount_2)</title></circle>
 <circle cx="5703" cy="3557" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Reinforced Mount (reinforced_mount)</title></circle>
-<circle cx="5604" cy="3472" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Thermal Reach (reinforced_mount_3)</title></circle>
-<circle cx="5554" cy="3511" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Oxygen Feed (oxygen_feed)</title></circle>
-<circle cx="3437" cy="3546" r="9" fill="#72bda7" stroke="#111820" stroke-width="3"><title>Control (fine_control_1)</title></circle>
-<circle cx="3483" cy="3503" r="9" fill="#72bda7" stroke="#111820" stroke-width="3"><title>Control (fine_control_2)</title></circle>
-<circle cx="3493" cy="3575" r="9" fill="#72bda7" stroke="#111820" stroke-width="3"><title>Control (fine_control_3)</title></circle>
-<circle cx="3542" cy="3531" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Fine Control (fine_control)</title></circle>
-<circle cx="4487" cy="5763" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Charge Transfer (cell_contacts_1)</title></circle>
-<circle cx="4487" cy="5816" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Charge Transfer (cell_contacts_2)</title></circle>
-<circle cx="4476" cy="5868" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Cell Contacts (cell_contacts)</title></circle>
-<circle cx="4458" cy="5919" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Charge Transfer (cell_contacts_3)</title></circle>
-<circle cx="4430" cy="5965" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Charge Transfer (cell_contacts_4)</title></circle>
-<circle cx="4393" cy="6005" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Buffered Discharge (buffered_discharge)</title></circle>
-<circle cx="2117" cy="3805" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Regulation (setpoint_hold_1)</title></circle>
-<circle cx="2082" cy="3859" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Regulation (setpoint_hold_2)</title></circle>
-<circle cx="2018" cy="3856" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Regulation (setpoint_hold_3)</title></circle>
-<circle cx="1989" cy="3799" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Regulation (setpoint_hold_4)</title></circle>
-<circle cx="2023" cy="3745" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Regulation (setpoint_hold_5)</title></circle>
-<circle cx="2087" cy="3748" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Regulation (setpoint_hold_6)</title></circle>
-<circle cx="2053" cy="3802" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Setpoint Hold (setpoint_hold)</title></circle>
-<circle cx="4365" cy="4550" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Heat Flow (forced_draft_1)</title></circle>
-<circle cx="4388" cy="4492" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Heat Flow (forced_draft_2)</title></circle>
-<circle cx="4419" cy="4437" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Forced Draft (forced_draft)</title></circle>
-<circle cx="4425" cy="4567" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Heat Flow (forced_draft_3)</title></circle>
-<circle cx="4488" cy="4576" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Heat Pipes (heat_pipes)</title></circle>
-<circle cx="5214" cy="2676" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Momentum (charged_flywheel_1)</title></circle>
-<circle cx="5255" cy="2611" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Momentum (charged_flywheel_2)</title></circle>
-<circle cx="5331" cy="2603" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Charged Flywheel (charged_flywheel)</title></circle>
-<circle cx="5385" cy="2657" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Inertial Drive (inertial_drive)</title></circle>
-<circle cx="5376" cy="2733" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Momentum (charged_flywheel_3)</title></circle>
-<circle cx="5311" cy="2773" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Momentum (charged_flywheel_4)</title></circle>
-<circle cx="3579" cy="5723" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Fluid Handling (flow_valves_1)</title></circle>
-<circle cx="3555" cy="5770" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Fluid Handling (flow_valves_2)</title></circle>
-<circle cx="3522" cy="5813" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Flow Valves (flow_valves)</title></circle>
-<circle cx="3482" cy="5849" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Fluid Handling (flow_valves_3)</title></circle>
-<circle cx="3436" cy="5877" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Fluid Handling (flow_valves_4)</title></circle>
-<circle cx="3385" cy="5896" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Siphon Loops (siphon_loops)</title></circle>
-<circle cx="2176" cy="3424" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Catalysis (surface_area_1)</title></circle>
-<circle cx="2131" cy="3469" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Catalysis (surface_area_2)</title></circle>
-<circle cx="2069" cy="3453" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Catalysis (surface_area_3)</title></circle>
-<circle cx="2052" cy="3391" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Catalysis (surface_area_4)</title></circle>
-<circle cx="2098" cy="3346" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Catalysis (surface_area_5)</title></circle>
-<circle cx="2159" cy="3362" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Catalysis (surface_area_6)</title></circle>
-<circle cx="2114" cy="3408" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Surface Area (surface_area)</title></circle>
-<circle cx="2504" cy="5099" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Insulation (clay_packing_1)</title></circle>
-<circle cx="2456" cy="5158" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Insulation (clay_packing_2)</title></circle>
-<circle cx="2379" cy="5157" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Clay Packing (clay_packing)</title></circle>
-<circle cx="2332" cy="5097" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Sealed Doors (sealed_doors)</title></circle>
-<circle cx="2350" cy="5022" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Insulation (clay_packing_3)</title></circle>
-<circle cx="2420" cy="4990" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Insulation (clay_packing_4)</title></circle>
-<circle cx="2204" cy="4460" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Regulation (damped_swing_1)</title></circle>
-<circle cx="2134" cy="4491" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Regulation (damped_swing_2)</title></circle>
-<circle cx="2067" cy="4455" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Damped Swing (damped_swing)</title></circle>
-<circle cx="2053" cy="4380" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Feedback Valve (feedback_valve)</title></circle>
-<circle cx="2102" cy="4322" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Regulation (damped_swing_3)</title></circle>
-<circle cx="2179" cy="4325" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Regulation (damped_swing_4)</title></circle>
-<circle cx="5732" cy="4752" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Startup (glow_plugs_1)</title></circle>
-<circle cx="5774" cy="4785" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Startup (glow_plugs_2)</title></circle>
-<circle cx="5809" cy="4826" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Glow Plugs (glow_plugs)</title></circle>
-<circle cx="5837" cy="4872" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Startup (glow_plugs_3)</title></circle>
-<circle cx="5855" cy="4922" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Startup (glow_plugs_4)</title></circle>
-<circle cx="5864" cy="4976" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Warm Standby (warm_standby)</title></circle>
-<circle cx="4069" cy="3059" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Field Work (canopy_hooks_1)</title></circle>
-<circle cx="4027" cy="3092" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Field Work (canopy_hooks_2)</title></circle>
-<circle cx="3979" cy="3117" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Canopy Hooks (canopy_hooks)</title></circle>
-<circle cx="3928" cy="3133" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Field Work (canopy_hooks_3)</title></circle>
-<circle cx="3874" cy="3139" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Field Work (canopy_hooks_4)</title></circle>
+<circle cx="5604" cy="3472" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Recovery (reinforced_mount_3)</title></circle>
+<circle cx="5554" cy="3511" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Sample Tray (sample_tray)</title></circle>
+<circle cx="3437" cy="3546" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Economy (soft_starter_1)</title></circle>
+<circle cx="3483" cy="3503" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Economy (soft_starter_2)</title></circle>
+<circle cx="3493" cy="3575" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Economy (soft_starter_3)</title></circle>
+<circle cx="3542" cy="3531" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Soft Starter (soft_starter)</title></circle>
+<circle cx="4487" cy="5763" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Heat Margin (overrun_guard_1)</title></circle>
+<circle cx="4487" cy="5816" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Heat Margin (overrun_guard_2)</title></circle>
+<circle cx="4476" cy="5868" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Overrun Guard (overrun_guard)</title></circle>
+<circle cx="4458" cy="5919" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Heat Margin (overrun_guard_3)</title></circle>
+<circle cx="4430" cy="5965" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Heat Margin (overrun_guard_4)</title></circle>
+<circle cx="4393" cy="6005" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Hot Spot Baffles (hot_spot_baffles)</title></circle>
+<circle cx="2117" cy="3805" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Fluid Handling (pressure_seals_1)</title></circle>
+<circle cx="2082" cy="3859" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Fluid Handling (pressure_seals_2)</title></circle>
+<circle cx="2018" cy="3856" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Fluid Handling (pressure_seals_3)</title></circle>
+<circle cx="1989" cy="3799" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Fluid Handling (pressure_seals_4)</title></circle>
+<circle cx="2023" cy="3745" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Fluid Handling (pressure_seals_5)</title></circle>
+<circle cx="2087" cy="3748" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Fluid Handling (pressure_seals_6)</title></circle>
+<circle cx="2053" cy="3802" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Pressure Seals (pressure_seals)</title></circle>
+<circle cx="4365" cy="4550" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Thermal Reach (firebrick_walls_1)</title></circle>
+<circle cx="4388" cy="4492" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Thermal Reach (firebrick_walls_2)</title></circle>
+<circle cx="4419" cy="4437" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Firebrick Walls (firebrick_walls)</title></circle>
+<circle cx="4425" cy="4567" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Thermal Reach (firebrick_walls_3)</title></circle>
+<circle cx="4488" cy="4576" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Oxygen Feed (oxygen_feed)</title></circle>
+<circle cx="5214" cy="2676" r="9" fill="#e6ab73" stroke="#111820" stroke-width="3"><title>Drive (brute_gearing_1)</title></circle>
+<circle cx="5255" cy="2611" r="9" fill="#e6ab73" stroke="#111820" stroke-width="3"><title>Drive (brute_gearing_2)</title></circle>
+<circle cx="5331" cy="2603" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Brute Gearing (brute_gearing)</title></circle>
+<circle cx="5385" cy="2657" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Engine Heart (engine_heart)</title></circle>
+<circle cx="5376" cy="2733" r="9" fill="#e6ab73" stroke="#111820" stroke-width="3"><title>Drive (brute_gearing_3)</title></circle>
+<circle cx="5311" cy="2773" r="9" fill="#e6ab73" stroke="#111820" stroke-width="3"><title>Drive (brute_gearing_4)</title></circle>
+<circle cx="3579" cy="5723" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Catalysis (clean_catalyst_1)</title></circle>
+<circle cx="3555" cy="5770" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Catalysis (clean_catalyst_2)</title></circle>
+<circle cx="3522" cy="5813" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Clean Catalyst (clean_catalyst)</title></circle>
+<circle cx="3482" cy="5849" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Catalysis (clean_catalyst_3)</title></circle>
+<circle cx="3436" cy="5877" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Catalysis (clean_catalyst_4)</title></circle>
+<circle cx="3385" cy="5896" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Surface Area (surface_area)</title></circle>
+<circle cx="2176" cy="3424" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Insulation (vacuum_gaps_1)</title></circle>
+<circle cx="2131" cy="3469" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Insulation (vacuum_gaps_2)</title></circle>
+<circle cx="2069" cy="3453" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Insulation (vacuum_gaps_3)</title></circle>
+<circle cx="2052" cy="3391" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Insulation (vacuum_gaps_4)</title></circle>
+<circle cx="2098" cy="3346" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Insulation (vacuum_gaps_5)</title></circle>
+<circle cx="2159" cy="3362" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Insulation (vacuum_gaps_6)</title></circle>
+<circle cx="2114" cy="3408" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Vacuum Gaps (vacuum_gaps)</title></circle>
+<circle cx="2504" cy="5099" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Regulation (damped_swing_1)</title></circle>
+<circle cx="2456" cy="5158" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Regulation (damped_swing_2)</title></circle>
+<circle cx="2379" cy="5157" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Damped Swing (damped_swing)</title></circle>
+<circle cx="2332" cy="5097" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Feedback Valve (feedback_valve)</title></circle>
+<circle cx="2350" cy="5022" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Regulation (damped_swing_3)</title></circle>
+<circle cx="2420" cy="4990" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Regulation (damped_swing_4)</title></circle>
+<circle cx="2204" cy="4460" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Thermal Inertia (retained_warmth_1)</title></circle>
+<circle cx="2134" cy="4491" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Thermal Inertia (retained_warmth_2)</title></circle>
+<circle cx="2067" cy="4455" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Retained Warmth (retained_warmth)</title></circle>
+<circle cx="2053" cy="4380" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Cast Iron Body (cast_iron_body)</title></circle>
+<circle cx="2102" cy="4322" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Thermal Inertia (retained_warmth_3)</title></circle>
+<circle cx="2179" cy="4325" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Thermal Inertia (retained_warmth_4)</title></circle>
+<circle cx="5732" cy="4752" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Heat Flow (forced_draft_1)</title></circle>
+<circle cx="5774" cy="4785" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Heat Flow (forced_draft_2)</title></circle>
+<circle cx="5809" cy="4826" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Forced Draft (forced_draft)</title></circle>
+<circle cx="5837" cy="4872" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Heat Flow (forced_draft_3)</title></circle>
+<circle cx="5855" cy="4922" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Heat Flow (forced_draft_4)</title></circle>
+<circle cx="5864" cy="4976" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Heat Pipes (heat_pipes)</title></circle>
+<circle cx="4069" cy="3059" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Rail Pace (rail_runner_1)</title></circle>
+<circle cx="4027" cy="3092" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Rail Pace (rail_runner_2)</title></circle>
+<circle cx="3979" cy="3117" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Rail Runner (rail_runner)</title></circle>
+<circle cx="3928" cy="3133" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Rail Pace (rail_runner_3)</title></circle>
+<circle cx="3874" cy="3139" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Rail Pace (rail_runner_4)</title></circle>
 <circle cx="3820" cy="3135" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Managed Territory (managed_territory)</title></circle>
-<circle cx="2754" cy="4602" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Thermal Inertia (cast_iron_body_1)</title></circle>
-<circle cx="2723" cy="4656" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Thermal Inertia (cast_iron_body_2)</title></circle>
-<circle cx="2684" cy="4706" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Cast Iron Body (cast_iron_body)</title></circle>
-<circle cx="2697" cy="4576" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Thermal Inertia (cast_iron_body_3)</title></circle>
-<circle cx="2637" cy="4558" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Ember Bed (ember_bed)</title></circle>
-<circle cx="4683" cy="4239" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Fuel Economy (fuel_metering_1)</title></circle>
-<circle cx="4625" cy="4212" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Fuel Economy (fuel_metering_2)</title></circle>
-<circle cx="4687" cy="4175" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Fuel Economy (fuel_metering_3)</title></circle>
-<circle cx="4629" cy="4147" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Fuel Metering (fuel_metering)</title></circle>
-<circle cx="5742" cy="3279" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Hardness (impact_plates_1)</title></circle>
-<circle cx="5792" cy="3262" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Hardness (impact_plates_2)</title></circle>
-<circle cx="5845" cy="3255" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Impact Plates (impact_plates)</title></circle>
-<circle cx="5899" cy="3256" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Hardness (impact_plates_3)</title></circle>
-<circle cx="5952" cy="3268" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Hardness (impact_plates_4)</title></circle>
-<circle cx="6001" cy="3290" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Diamond Edges (diamond_edges)</title></circle>
-<circle cx="4969" cy="2458" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Recovery (clean_dust_ledge_1)</title></circle>
-<circle cx="4939" cy="2401" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Recovery (clean_dust_ledge_2)</title></circle>
-<circle cx="4974" cy="2347" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Recovery (clean_dust_ledge_3)</title></circle>
-<circle cx="5038" cy="2350" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Recovery (clean_dust_ledge_4)</title></circle>
-<circle cx="5067" cy="2407" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Recovery (clean_dust_ledge_5)</title></circle>
-<circle cx="5033" cy="2461" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Recovery (clean_dust_ledge_6)</title></circle>
-<circle cx="5003" cy="2404" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Clean Dust Ledge (clean_dust_ledge)</title></circle>
-<circle cx="2361" cy="4168" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Catalysis (integrated_attributes_1)</title></circle>
-<circle cx="2328" cy="4115" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Catalysis (integrated_attributes_2)</title></circle>
+<circle cx="2754" cy="4602" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Fluid Handling (flow_valves_1)</title></circle>
+<circle cx="2723" cy="4656" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Fluid Handling (flow_valves_2)</title></circle>
+<circle cx="2684" cy="4706" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Flow Valves (flow_valves)</title></circle>
+<circle cx="2697" cy="4576" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Fluid Handling (flow_valves_3)</title></circle>
+<circle cx="2637" cy="4558" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Siphon Loops (siphon_loops)</title></circle>
+<circle cx="4683" cy="4239" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Startup (glow_plugs_1)</title></circle>
+<circle cx="4625" cy="4212" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Startup (glow_plugs_2)</title></circle>
+<circle cx="4687" cy="4175" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Startup (glow_plugs_3)</title></circle>
+<circle cx="4629" cy="4147" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Glow Plugs (glow_plugs)</title></circle>
+<circle cx="5742" cy="3279" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Momentum (charged_flywheel_1)</title></circle>
+<circle cx="5792" cy="3262" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Momentum (charged_flywheel_2)</title></circle>
+<circle cx="5845" cy="3255" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Charged Flywheel (charged_flywheel)</title></circle>
+<circle cx="5899" cy="3256" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Momentum (charged_flywheel_3)</title></circle>
+<circle cx="5952" cy="3268" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Momentum (charged_flywheel_4)</title></circle>
+<circle cx="6001" cy="3290" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Inertial Drive (inertial_drive)</title></circle>
+<circle cx="4969" cy="2458" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Actuation (rapid_cycling_1)</title></circle>
+<circle cx="4939" cy="2401" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Actuation (rapid_cycling_2)</title></circle>
+<circle cx="4974" cy="2347" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Actuation (rapid_cycling_3)</title></circle>
+<circle cx="5038" cy="2350" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Actuation (rapid_cycling_4)</title></circle>
+<circle cx="5067" cy="2407" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Actuation (rapid_cycling_5)</title></circle>
+<circle cx="5033" cy="2461" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Actuation (rapid_cycling_6)</title></circle>
+<circle cx="5003" cy="2404" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Rapid Cycling (rapid_cycling)</title></circle>
+<circle cx="2361" cy="4168" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Reservoirs (integrated_attributes_1)</title></circle>
+<circle cx="2328" cy="4115" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Reservoirs (integrated_attributes_2)</title></circle>
 <circle cx="2301" cy="4058" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Integrated Attributes (integrated_attributes)</title></circle>
-<circle cx="2411" cy="4130" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Catalysis (integrated_attributes_3)</title></circle>
-<circle cx="2455" cy="4085" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Promoter Salts (promoter_salts)</title></circle>
-<circle cx="4963" cy="5606" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Reserves (auxiliary_bank_1)</title></circle>
-<circle cx="5020" cy="5633" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Reserves (auxiliary_bank_2)</title></circle>
-<circle cx="4957" cy="5669" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Reserves (auxiliary_bank_3)</title></circle>
-<circle cx="5015" cy="5698" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Auxiliary Bank (auxiliary_bank)</title></circle>
-<circle cx="4429" cy="2253" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Actuation (hair_triggers_1)</title></circle>
-<circle cx="4434" cy="2176" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Actuation (hair_triggers_2)</title></circle>
-<circle cx="4496" cy="2132" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Hair Triggers (hair_triggers)</title></circle>
-<circle cx="4570" cy="2153" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Short Stroke (short_stroke)</title></circle>
-<circle cx="4599" cy="2224" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Actuation (hair_triggers_3)</title></circle>
-<circle cx="4562" cy="2291" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Actuation (hair_triggers_4)</title></circle>
-<circle cx="3987" cy="2184" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Precision (level_mounting_1)</title></circle>
-<circle cx="3994" cy="2131" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Precision (level_mounting_2)</title></circle>
-<circle cx="4011" cy="2080" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Level Mounting (level_mounting)</title></circle>
-<circle cx="4036" cy="2033" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Precision (level_mounting_3)</title></circle>
-<circle cx="4070" cy="1990" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Precision (level_mounting_4)</title></circle>
-<circle cx="4111" cy="1956" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Vibration Sinks (vibration_sinks)</title></circle>
-<circle cx="4713" cy="3812" r="9" fill="#e6ab73" stroke="#111820" stroke-width="3"><title>Drive (full_throttle_1)</title></circle>
-<circle cx="4664" cy="3850" r="9" fill="#e6ab73" stroke="#111820" stroke-width="3"><title>Drive (full_throttle_2)</title></circle>
-<circle cx="4609" cy="3882" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Full Throttle (full_throttle)</title></circle>
-<circle cx="4671" cy="3767" r="9" fill="#e6ab73" stroke="#111820" stroke-width="3"><title>Drive (full_throttle_3)</title></circle>
-<circle cx="4623" cy="3726" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Pulling Power (pulling_power)</title></circle>
-<circle cx="3839" cy="3282" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Field Work (feller_heads_1)</title></circle>
-<circle cx="3843" cy="3345" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Field Work (feller_heads_2)</title></circle>
-<circle cx="3781" cy="3307" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Field Work (feller_heads_3)</title></circle>
-<circle cx="3784" cy="3372" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Feller Heads (feller_heads)</title></circle>
-<circle cx="3778" cy="3610" r="9" fill="#72bda7" stroke="#111820" stroke-width="3"><title>Control (command_logic_1)</title></circle>
-<circle cx="3780" cy="3663" r="9" fill="#72bda7" stroke="#111820" stroke-width="3"><title>Control (command_logic_2)</title></circle>
-<circle cx="3758" cy="3729" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Command Logic (command_logic)</title></circle>
-<circle cx="4510" cy="3638" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Momentum (unbroken_cadence_1)</title></circle>
-<circle cx="4483" cy="3598" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Momentum (unbroken_cadence_2)</title></circle>
-<circle cx="4464" cy="3552" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Unbroken Cadence (unbroken_cadence)</title></circle>
-<circle cx="4452" cy="3504" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Momentum (unbroken_cadence_3)</title></circle>
-<circle cx="4449" cy="3455" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Momentum (unbroken_cadence_4)</title></circle>
-<circle cx="4457" cy="3405" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Spin Up (spin_up)</title></circle>
-<circle cx="3261" cy="5267" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Power Supply (stator_rings_1)</title></circle>
-<circle cx="3198" cy="5264" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Power Supply (stator_rings_2)</title></circle>
-<circle cx="3136" cy="5252" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Stator Rings (stator_rings)</title></circle>
-<circle cx="3258" cy="5205" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Power Supply (stator_rings_3)</title></circle>
-<circle cx="3248" cy="5143" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Exciter Loop (exciter_loop)</title></circle>
+<circle cx="2411" cy="4130" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Reservoirs (integrated_attributes_3)</title></circle>
+<circle cx="2455" cy="4085" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Header Cisterns (header_cisterns)</title></circle>
+<circle cx="4963" cy="5606" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Startup (warm_standby_1)</title></circle>
+<circle cx="5020" cy="5633" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Startup (warm_standby_2)</title></circle>
+<circle cx="4957" cy="5669" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Startup (warm_standby_3)</title></circle>
+<circle cx="5015" cy="5698" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Warm Standby (warm_standby)</title></circle>
+<circle cx="4429" cy="2253" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Field Work (feller_heads_1)</title></circle>
+<circle cx="4434" cy="2176" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Field Work (feller_heads_2)</title></circle>
+<circle cx="4496" cy="2132" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Feller Heads (feller_heads)</title></circle>
+<circle cx="4570" cy="2153" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Root Pullers (root_pullers)</title></circle>
+<circle cx="4599" cy="2224" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Field Work (feller_heads_3)</title></circle>
+<circle cx="4562" cy="2291" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Field Work (feller_heads_4)</title></circle>
+<circle cx="3987" cy="2184" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Actuation (hair_triggers_1)</title></circle>
+<circle cx="3994" cy="2131" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Actuation (hair_triggers_2)</title></circle>
+<circle cx="4011" cy="2080" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Hair Triggers (hair_triggers)</title></circle>
+<circle cx="4036" cy="2033" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Actuation (hair_triggers_3)</title></circle>
+<circle cx="4070" cy="1990" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Actuation (hair_triggers_4)</title></circle>
+<circle cx="4111" cy="1956" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Short Stroke (short_stroke)</title></circle>
+<circle cx="4713" cy="3812" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Hardness (impact_plates_1)</title></circle>
+<circle cx="4664" cy="3850" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Hardness (impact_plates_2)</title></circle>
+<circle cx="4609" cy="3882" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Impact Plates (impact_plates)</title></circle>
+<circle cx="4671" cy="3767" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Hardness (impact_plates_3)</title></circle>
+<circle cx="4623" cy="3726" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Diamond Edges (diamond_edges)</title></circle>
+<circle cx="3839" cy="3282" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Rail Pace (quick_couplings_1)</title></circle>
+<circle cx="3843" cy="3345" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Rail Pace (quick_couplings_2)</title></circle>
+<circle cx="3781" cy="3307" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Rail Pace (quick_couplings_3)</title></circle>
+<circle cx="3784" cy="3372" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Quick Couplings (quick_couplings)</title></circle>
+<circle cx="3778" cy="3610" r="9" fill="#72bda7" stroke="#111820" stroke-width="3"><title>Control (fine_control_1)</title></circle>
+<circle cx="3780" cy="3663" r="9" fill="#72bda7" stroke="#111820" stroke-width="3"><title>Control (fine_control_2)</title></circle>
+<circle cx="3758" cy="3729" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Fine Control (fine_control)</title></circle>
+<circle cx="4510" cy="3638" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Recovery (clean_dust_ledge_1)</title></circle>
+<circle cx="4483" cy="3598" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Recovery (clean_dust_ledge_2)</title></circle>
+<circle cx="4464" cy="3552" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Clean Dust Ledge (clean_dust_ledge)</title></circle>
+<circle cx="4452" cy="3504" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Recovery (clean_dust_ledge_3)</title></circle>
+<circle cx="4449" cy="3455" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Recovery (clean_dust_ledge_4)</title></circle>
+<circle cx="4457" cy="3405" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Material Memory (material_memory)</title></circle>
+<circle cx="3261" cy="5267" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Insulation (reflective_foil_1)</title></circle>
+<circle cx="3198" cy="5264" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Insulation (reflective_foil_2)</title></circle>
+<circle cx="3136" cy="5252" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Reflective Foil (reflective_foil)</title></circle>
+<circle cx="3258" cy="5205" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Insulation (reflective_foil_3)</title></circle>
+<circle cx="3248" cy="5143" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Clay Packing (clay_packing)</title></circle>
 <circle cx="3846" cy="4078" r="9" fill="#829bdb" stroke="#111820" stroke-width="3"><title>Reserve (convergence_1)</title></circle>
 <circle cx="3794" cy="4042" r="9" fill="#829bdb" stroke="#111820" stroke-width="3"><title>Reserve (convergence_2)</title></circle>
 <circle cx="3862" cy="4017" r="9" fill="#829bdb" stroke="#111820" stroke-width="3"><title>Reserve (convergence_3)</title></circle>
 <circle cx="3810" cy="3979" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Convergence (convergence)</title></circle>
-<circle cx="2150" cy="3683" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Economy (soft_starter_1)</title></circle>
-<circle cx="2074" cy="3688" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Economy (soft_starter_2)</title></circle>
-<circle cx="2023" cy="3631" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Soft Starter (soft_starter)</title></circle>
-<circle cx="2035" cy="3556" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Load Smoothing (load_smoothing)</title></circle>
-<circle cx="2101" cy="3518" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Economy (soft_starter_3)</title></circle>
-<circle cx="2172" cy="3547" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Economy (soft_starter_4)</title></circle>
-<circle cx="3956" cy="4630" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Conservation (waste_not_1)</title></circle>
-<circle cx="3908" cy="4626" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Conservation (waste_not_2)</title></circle>
-<circle cx="3858" cy="4631" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Waste Not (waste_not)</title></circle>
-<circle cx="3811" cy="4644" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Conservation (waste_not_3)</title></circle>
-<circle cx="3766" cy="4666" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Conservation (waste_not_4)</title></circle>
-<circle cx="3727" cy="4697" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Trickle Charge (trickle_charge)</title></circle>
-<circle cx="3120" cy="2406" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Calibration (calibrated_feed_1)</title></circle>
-<circle cx="3063" cy="2381" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Calibration (calibrated_feed_2)</title></circle>
-<circle cx="3008" cy="2349" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Calibrated Feed (calibrated_feed)</title></circle>
-<circle cx="3139" cy="2346" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Calibration (calibrated_feed_3)</title></circle>
-<circle cx="3150" cy="2284" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Test Bench (test_bench)</title></circle>
-<circle cx="4157" cy="4711" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Reserves (deep_cells_1)</title></circle>
-<circle cx="4139" cy="4651" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Reserves (deep_cells_2)</title></circle>
-<circle cx="4207" cy="4672" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Reserves (deep_cells_3)</title></circle>
-<circle cx="4189" cy="4610" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Deep Cells (deep_cells)</title></circle>
-<circle cx="5150" cy="4613" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Thermal Reach (crucible_glaze_1)</title></circle>
-<circle cx="5222" cy="4640" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Thermal Reach (crucible_glaze_2)</title></circle>
-<circle cx="5245" cy="4713" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Crucible Glaze (crucible_glaze)</title></circle>
-<circle cx="5202" cy="4777" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Arc Chamber (arc_chamber)</title></circle>
-<circle cx="5126" cy="4783" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Thermal Reach (crucible_glaze_3)</title></circle>
-<circle cx="5074" cy="4728" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Thermal Reach (crucible_glaze_4)</title></circle>
-<circle cx="2445" cy="3131" r="9" fill="#72bda7" stroke="#111820" stroke-width="3"><title>Control (oversight_1)</title></circle>
-<circle cx="2483" cy="3101" r="9" fill="#72bda7" stroke="#111820" stroke-width="3"><title>Control (oversight_2)</title></circle>
-<circle cx="2515" cy="3063" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Oversight (oversight)</title></circle>
-<circle cx="2541" cy="3020" r="9" fill="#72bda7" stroke="#111820" stroke-width="3"><title>Control (oversight_3)</title></circle>
-<circle cx="2558" cy="2974" r="9" fill="#72bda7" stroke="#111820" stroke-width="3"><title>Control (oversight_4)</title></circle>
-<circle cx="2565" cy="2924" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Grove Survey (grove_survey)</title></circle>
-<circle cx="5884" cy="4372" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Heat Flow (flame_spreaders_1)</title></circle>
-<circle cx="5940" cy="4344" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Heat Flow (flame_spreaders_2)</title></circle>
-<circle cx="5999" cy="4322" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Flame Spreaders (flame_spreaders)</title></circle>
-<circle cx="5918" cy="4425" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Heat Flow (flame_spreaders_3)</title></circle>
-<circle cx="5958" cy="4473" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Convection Loops (convection_loops)</title></circle>
-<circle cx="3514" cy="2851" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Field Work (root_pullers_1)</title></circle>
-<circle cx="3568" cy="2884" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Field Work (root_pullers_2)</title></circle>
-<circle cx="3502" cy="2913" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Field Work (root_pullers_3)</title></circle>
-<circle cx="3557" cy="2948" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Root Pullers (root_pullers)</title></circle>
-<circle cx="2892" cy="5480" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Fluid Handling (check_valves_1)</title></circle>
-<circle cx="2890" cy="5533" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Fluid Handling (check_valves_2)</title></circle>
-<circle cx="2913" cy="5599" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Check Valves (check_valves)</title></circle>
-<circle cx="4146" cy="4092" r="9" fill="#829bdb" stroke="#111820" stroke-width="3"><title>Reserve (backup_supply_1)</title></circle>
-<circle cx="4120" cy="4138" r="9" fill="#829bdb" stroke="#111820" stroke-width="3"><title>Reserve (backup_supply_2)</title></circle>
-<circle cx="4103" cy="4189" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Backup Supply (backup_supply)</title></circle>
-<circle cx="4095" cy="4242" r="9" fill="#829bdb" stroke="#111820" stroke-width="3"><title>Reserve (backup_supply_3)</title></circle>
-<circle cx="4096" cy="4296" r="9" fill="#829bdb" stroke="#111820" stroke-width="3"><title>Reserve (backup_supply_4)</title></circle>
-<circle cx="4109" cy="4349" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Resilience (resilience)</title></circle>
-<circle cx="5508" cy="5095" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Startup (kindling_tray_1)</title></circle>
-<circle cx="5570" cy="5092" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Startup (kindling_tray_2)</title></circle>
-<circle cx="5633" cy="5098" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Kindling Tray (kindling_tray)</title></circle>
-<circle cx="5516" cy="5157" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Startup (kindling_tray_3)</title></circle>
-<circle cx="5533" cy="5218" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Spark Gap (spark_gap)</title></circle>
-<circle cx="2521" cy="4787" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Insulation (thermal_blankets_1)</title></circle>
-<circle cx="2462" cy="4763" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Insulation (thermal_blankets_2)</title></circle>
-<circle cx="2522" cy="4724" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Insulation (thermal_blankets_3)</title></circle>
-<circle cx="2463" cy="4698" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Thermal Blankets (thermal_blankets)</title></circle>
-<circle cx="4810" cy="4502" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Fuel Economy (deep_cell_tap_1)</title></circle>
-<circle cx="4864" cy="4547" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Fuel Economy (deep_cell_tap_2)</title></circle>
+<circle cx="2150" cy="3683" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Precision (level_mounting_1)</title></circle>
+<circle cx="2074" cy="3688" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Precision (level_mounting_2)</title></circle>
+<circle cx="2023" cy="3631" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Level Mounting (level_mounting)</title></circle>
+<circle cx="2035" cy="3556" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Vibration Sinks (vibration_sinks)</title></circle>
+<circle cx="2101" cy="3518" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Precision (level_mounting_3)</title></circle>
+<circle cx="2172" cy="3547" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Precision (level_mounting_4)</title></circle>
+<circle cx="3956" cy="4630" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Reserves (auxiliary_bank_1)</title></circle>
+<circle cx="3908" cy="4626" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Reserves (auxiliary_bank_2)</title></circle>
+<circle cx="3858" cy="4631" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Auxiliary Bank (auxiliary_bank)</title></circle>
+<circle cx="3811" cy="4644" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Reserves (auxiliary_bank_3)</title></circle>
+<circle cx="3766" cy="4666" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Reserves (auxiliary_bank_4)</title></circle>
+<circle cx="3727" cy="4697" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Deep Cells (deep_cells)</title></circle>
+<circle cx="3120" cy="2406" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Economy (load_smoothing_1)</title></circle>
+<circle cx="3063" cy="2381" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Economy (load_smoothing_2)</title></circle>
+<circle cx="3008" cy="2349" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Load Smoothing (load_smoothing)</title></circle>
+<circle cx="3139" cy="2346" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Economy (load_smoothing_3)</title></circle>
+<circle cx="3150" cy="2284" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Frugal Circuits (frugal_circuits)</title></circle>
+<circle cx="4157" cy="4711" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Surge (capacitor_kick_1)</title></circle>
+<circle cx="4139" cy="4651" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Surge (capacitor_kick_2)</title></circle>
+<circle cx="4207" cy="4672" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Surge (capacitor_kick_3)</title></circle>
+<circle cx="4189" cy="4610" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Capacitor Kick (capacitor_kick)</title></circle>
+<circle cx="5150" cy="4613" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Fuel Economy (stage_adapter_1)</title></circle>
+<circle cx="5222" cy="4640" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Fuel Economy (stage_adapter_2)</title></circle>
+<circle cx="5245" cy="4713" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Stage Adapter (stage_adapter)</title></circle>
+<circle cx="5202" cy="4777" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Ember Keeper (ember_keeper)</title></circle>
+<circle cx="5126" cy="4783" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Fuel Economy (stage_adapter_3)</title></circle>
+<circle cx="5074" cy="4728" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Fuel Economy (stage_adapter_4)</title></circle>
+<circle cx="2445" cy="3131" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Calibration (trim_pots_1)</title></circle>
+<circle cx="2483" cy="3101" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Calibration (trim_pots_2)</title></circle>
+<circle cx="2515" cy="3063" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Trim Pots (trim_pots)</title></circle>
+<circle cx="2541" cy="3020" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Calibration (trim_pots_3)</title></circle>
+<circle cx="2558" cy="2974" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Calibration (trim_pots_4)</title></circle>
+<circle cx="2565" cy="2924" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Disciplined Pace (disciplined_pace)</title></circle>
+<circle cx="5884" cy="4372" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Thermal Reach (crucible_glaze_1)</title></circle>
+<circle cx="5940" cy="4344" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Thermal Reach (crucible_glaze_2)</title></circle>
+<circle cx="5999" cy="4322" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Crucible Glaze (crucible_glaze)</title></circle>
+<circle cx="5918" cy="4425" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Thermal Reach (crucible_glaze_3)</title></circle>
+<circle cx="5958" cy="4473" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Arc Chamber (arc_chamber)</title></circle>
+<circle cx="3514" cy="2851" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Rail Pace (track_glide_1)</title></circle>
+<circle cx="3568" cy="2884" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Rail Pace (track_glide_2)</title></circle>
+<circle cx="3502" cy="2913" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Rail Pace (track_glide_3)</title></circle>
+<circle cx="3557" cy="2948" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Track Glide (track_glide)</title></circle>
+<circle cx="2892" cy="5480" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Catalysis (promoter_salts_1)</title></circle>
+<circle cx="2890" cy="5533" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Catalysis (promoter_salts_2)</title></circle>
+<circle cx="2913" cy="5599" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Promoter Salts (promoter_salts)</title></circle>
+<circle cx="4146" cy="4092" r="9" fill="#72bda7" stroke="#111820" stroke-width="3"><title>Control (command_logic_1)</title></circle>
+<circle cx="4120" cy="4138" r="9" fill="#72bda7" stroke="#111820" stroke-width="3"><title>Control (command_logic_2)</title></circle>
+<circle cx="4103" cy="4189" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Command Logic (command_logic)</title></circle>
+<circle cx="4095" cy="4242" r="9" fill="#72bda7" stroke="#111820" stroke-width="3"><title>Control (command_logic_3)</title></circle>
+<circle cx="4096" cy="4296" r="9" fill="#72bda7" stroke="#111820" stroke-width="3"><title>Control (command_logic_4)</title></circle>
+<circle cx="4109" cy="4349" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Oversight (oversight)</title></circle>
+<circle cx="5508" cy="5095" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Heat Flow (flame_spreaders_1)</title></circle>
+<circle cx="5570" cy="5092" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Heat Flow (flame_spreaders_2)</title></circle>
+<circle cx="5633" cy="5098" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Flame Spreaders (flame_spreaders)</title></circle>
+<circle cx="5516" cy="5157" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Heat Flow (flame_spreaders_3)</title></circle>
+<circle cx="5533" cy="5218" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Convection Loops (convection_loops)</title></circle>
+<circle cx="2521" cy="4787" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Regulation (thermal_discipline_1)</title></circle>
+<circle cx="2462" cy="4763" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Regulation (thermal_discipline_2)</title></circle>
+<circle cx="2522" cy="4724" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Regulation (thermal_discipline_3)</title></circle>
+<circle cx="2463" cy="4698" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Thermal Discipline (thermal_discipline)</title></circle>
+<circle cx="4810" cy="4502" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Startup (deep_cell_tap_1)</title></circle>
+<circle cx="4864" cy="4547" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Startup (deep_cell_tap_2)</title></circle>
 <circle cx="4863" cy="4617" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Deep Cell Tap (deep_cell_tap)</title></circle>
-<circle cx="4807" cy="4660" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Long Grate (long_grate)</title></circle>
-<circle cx="4739" cy="4643" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Fuel Economy (deep_cell_tap_3)</title></circle>
-<circle cx="4709" cy="4579" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Fuel Economy (deep_cell_tap_4)</title></circle>
-<circle cx="3988" cy="5792" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Charge Transfer (low_ohm_paths_1)</title></circle>
-<circle cx="3975" cy="5843" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Charge Transfer (low_ohm_paths_2)</title></circle>
-<circle cx="3953" cy="5892" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Low Ohm Paths (low_ohm_paths)</title></circle>
-<circle cx="3922" cy="5937" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Charge Transfer (low_ohm_paths_3)</title></circle>
-<circle cx="3884" cy="5975" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Charge Transfer (low_ohm_paths_4)</title></circle>
-<circle cx="3839" cy="6005" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Split Feeds (split_feeds)</title></circle>
-<circle cx="3702" cy="2545" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Economy (frugal_circuits_1)</title></circle>
-<circle cx="3689" cy="2607" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Economy (frugal_circuits_2)</title></circle>
-<circle cx="3640" cy="2554" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Economy (frugal_circuits_3)</title></circle>
-<circle cx="3625" cy="2618" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Frugal Circuits (frugal_circuits)</title></circle>
-<circle cx="3118" cy="2615" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Recovery (material_memory_1)</title></circle>
-<circle cx="3088" cy="2564" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Recovery (material_memory_2)</title></circle>
-<circle cx="3117" cy="2513" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Recovery (material_memory_3)</title></circle>
-<circle cx="3176" cy="2512" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Recovery (material_memory_4)</title></circle>
-<circle cx="3206" cy="2563" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Recovery (material_memory_5)</title></circle>
-<circle cx="3177" cy="2614" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Recovery (material_memory_6)</title></circle>
-<circle cx="3147" cy="2564" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Material Memory (material_memory)</title></circle>
-<circle cx="2697" cy="4416" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Recovery (fine_screens_1)</title></circle>
-<circle cx="2676" cy="4476" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Recovery (fine_screens_2)</title></circle>
-<circle cx="2613" cy="4488" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Recovery (fine_screens_3)</title></circle>
-<circle cx="2571" cy="4439" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Recovery (fine_screens_4)</title></circle>
-<circle cx="2592" cy="4379" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Recovery (fine_screens_5)</title></circle>
-<circle cx="2655" cy="4367" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Recovery (fine_screens_6)</title></circle>
-<circle cx="2634" cy="4427" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Fine Screens (fine_screens)</title></circle>
-<circle cx="3892" cy="2957" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Rail Pace (greased_rails_1)</title></circle>
-<circle cx="3845" cy="2934" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Rail Pace (greased_rails_2)</title></circle>
-<circle cx="3802" cy="2901" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Greased Rails (greased_rails)</title></circle>
-<circle cx="3765" cy="2862" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Rail Pace (greased_rails_3)</title></circle>
-<circle cx="3736" cy="2817" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Rail Pace (greased_rails_4)</title></circle>
+<circle cx="4807" cy="4660" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Kindling Tray (kindling_tray)</title></circle>
+<circle cx="4739" cy="4643" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Startup (deep_cell_tap_3)</title></circle>
+<circle cx="4709" cy="4579" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Startup (deep_cell_tap_4)</title></circle>
+<circle cx="3988" cy="5792" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Conservation (waste_not_1)</title></circle>
+<circle cx="3975" cy="5843" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Conservation (waste_not_2)</title></circle>
+<circle cx="3953" cy="5892" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Waste Not (waste_not)</title></circle>
+<circle cx="3922" cy="5937" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Conservation (waste_not_3)</title></circle>
+<circle cx="3884" cy="5975" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Conservation (waste_not_4)</title></circle>
+<circle cx="3839" cy="6005" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Trickle Charge (trickle_charge)</title></circle>
+<circle cx="3702" cy="2545" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Precision (trued_shafts_1)</title></circle>
+<circle cx="3689" cy="2607" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Precision (trued_shafts_2)</title></circle>
+<circle cx="3640" cy="2554" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Precision (trued_shafts_3)</title></circle>
+<circle cx="3625" cy="2618" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Trued Shafts (trued_shafts)</title></circle>
+<circle cx="3118" cy="2615" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Recovery (fine_screens_1)</title></circle>
+<circle cx="3088" cy="2564" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Recovery (fine_screens_2)</title></circle>
+<circle cx="3117" cy="2513" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Recovery (fine_screens_3)</title></circle>
+<circle cx="3176" cy="2512" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Recovery (fine_screens_4)</title></circle>
+<circle cx="3206" cy="2563" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Recovery (fine_screens_5)</title></circle>
+<circle cx="3177" cy="2614" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Recovery (fine_screens_6)</title></circle>
+<circle cx="3147" cy="2564" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Fine Screens (fine_screens)</title></circle>
+<circle cx="2697" cy="4416" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Recovery (tailings_pass_1)</title></circle>
+<circle cx="2676" cy="4476" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Recovery (tailings_pass_2)</title></circle>
+<circle cx="2613" cy="4488" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Recovery (tailings_pass_3)</title></circle>
+<circle cx="2571" cy="4439" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Recovery (tailings_pass_4)</title></circle>
+<circle cx="2592" cy="4379" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Recovery (tailings_pass_5)</title></circle>
+<circle cx="2655" cy="4367" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Recovery (tailings_pass_6)</title></circle>
+<circle cx="2634" cy="4427" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Tailings Pass (tailings_pass)</title></circle>
+<circle cx="3892" cy="2957" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Rail Pace (spoked_wheels_1)</title></circle>
+<circle cx="3845" cy="2934" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Rail Pace (spoked_wheels_2)</title></circle>
+<circle cx="3802" cy="2901" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Spoked Wheels (spoked_wheels)</title></circle>
+<circle cx="3765" cy="2862" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Rail Pace (spoked_wheels_3)</title></circle>
+<circle cx="3736" cy="2817" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Rail Pace (spoked_wheels_4)</title></circle>
 <circle cx="3717" cy="2766" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Driven Wheels (driven_wheels)</title></circle>
 <circle cx="4111" cy="2625" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Open Track (open_track_1)</title></circle>
 <circle cx="4074" cy="2579" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Open Track (open_track_2)</title></circle>
@@ -2810,16 +2811,16 @@
 <circle cx="4668" cy="2496" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Rowcraft (outer_rows_2)</title></circle>
 <circle cx="4693" cy="2428" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Rowcraft (outer_rows_3)</title></circle>
 <circle cx="4630" cy="2443" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Outer Rows (outer_rows)</title></circle>
-<circle cx="3622" cy="2391" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Reservoirs (holding_tanks_1)</title></circle>
-<circle cx="3616" cy="2448" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Reservoirs (holding_tanks_2)</title></circle>
-<circle cx="3602" cy="2505" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Holding Tanks (holding_tanks)</title></circle>
-<circle cx="3564" cy="2390" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Reservoirs (holding_tanks_3)</title></circle>
-<circle cx="3507" cy="2397" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Cistern Walls (cistern_walls)</title></circle>
-<circle cx="3001" cy="4555" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Reservoirs (deep_tanks_1)</title></circle>
-<circle cx="3018" cy="4500" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Reservoirs (deep_tanks_2)</title></circle>
-<circle cx="3043" cy="4448" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Deep Tanks (deep_tanks)</title></circle>
-<circle cx="3057" cy="4567" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Reservoirs (deep_tanks_3)</title></circle>
-<circle cx="3115" cy="4572" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Bulk Reservoir (bulk_reservoir)</title></circle>
+<circle cx="3622" cy="2391" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Reservoirs (overflow_basin_1)</title></circle>
+<circle cx="3616" cy="2448" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Reservoirs (overflow_basin_2)</title></circle>
+<circle cx="3602" cy="2505" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Overflow Basin (overflow_basin)</title></circle>
+<circle cx="3564" cy="2390" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Reservoirs (overflow_basin_3)</title></circle>
+<circle cx="3507" cy="2397" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Settling Tanks (settling_tanks)</title></circle>
+<circle cx="3001" cy="4555" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Reservoirs (sump_pits_1)</title></circle>
+<circle cx="3018" cy="4500" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Reservoirs (sump_pits_2)</title></circle>
+<circle cx="3043" cy="4448" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Sump Pits (sump_pits)</title></circle>
+<circle cx="3057" cy="4567" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Reservoirs (sump_pits_3)</title></circle>
+<circle cx="3115" cy="4572" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Standpipes (standpipes)</title></circle>
 <circle cx="4047" cy="3916" r="24" fill="#c79dea" stroke="#111820" stroke-width="3"><title>Silent Operation (silent_operation)</title></circle>
 <circle cx="2579" cy="3318" r="24" fill="#c79dea" stroke="#111820" stroke-width="3"><title>Manual Throttle (manual_throttle)</title></circle>
 <circle cx="3900" cy="2301" r="24" fill="#c79dea" stroke="#111820" stroke-width="3"><title>Seedling Magnet (seedling_magnet)</title></circle>
@@ -2849,9 +2850,10 @@
 <circle cx="4420" cy="2027" r="24" fill="#c79dea" stroke="#111820" stroke-width="3"><title>Clear Cutting (clear_cutting)</title></circle>
 <circle cx="6038" cy="3534" r="24" fill="#c79dea" stroke="#111820" stroke-width="3"><title>Heavy Yield (heavy_yield)</title></circle>
 <circle cx="4789" cy="5720" r="24" fill="#c79dea" stroke="#111820" stroke-width="3"><title>Thermal Reservoir (thermal_reservoir)</title></circle>
-<circle cx="2537" cy="5446" r="24" fill="#c79dea" stroke="#111820" stroke-width="3"><title>Cold Standby (cold_standby)</title></circle>
+<circle cx="2537" cy="5446" r="24" fill="#c79dea" stroke="#111820" stroke-width="3"><title>Governed Actuation (governed_actuation)</title></circle>
 <circle cx="2638" cy="3606" r="24" fill="#c79dea" stroke="#111820" stroke-width="3"><title>Single Pass (single_pass)</title></circle>
 <circle cx="5242" cy="4192" r="24" fill="#c79dea" stroke="#111820" stroke-width="3"><title>Even Feed (even_feed)</title></circle>
+<circle cx="3839" cy="5343" r="24" fill="#c79dea" stroke="#111820" stroke-width="3"><title>Surge Cycling (surge_cycling)</title></circle>
 <g font-family="sans-serif" fill="#e5ecf3" font-size="44" text-anchor="middle">
 <text x="3388" y="3588">control</text>
 <text x="4000" y="3265">control / drive</text>

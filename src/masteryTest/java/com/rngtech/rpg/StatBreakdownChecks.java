@@ -31,6 +31,8 @@ public final class StatBreakdownChecks {
         floorAndBonusScaleRecombine();
         energyUsageReductionsRecombine();
         textListsEverySource();
+        sameNamedSourcesShareALine();
+        conversionNamesWhatItFeeds();
         return checks;
     }
 
@@ -155,6 +157,45 @@ public final class StatBreakdownChecks {
         near(breakdown.recompute(), 1500, "flat capacity adds to capacity");
         require(stats.breakdowns().stream().noneMatch(entry -> entry.stat() == MachineStat.ENERGY_CAPACITY_FLAT),
                 "flat capacity has no separate breakdown");
+    }
+
+    /** A converted bucket shows once, as the amount it feeds into the target stat, not in both breakdowns. */
+    private static void conversionNamesWhatItFeeds() {
+        MachineStatAccumulator stats = MachineStatAccumulator.recording(() -> {
+            MachineStatAccumulator recorded = MachineStatAccumulator.componentBase(Map.of(MachineStat.PROCESSING_SPEED, 1.25, MachineStat.INSTANT_PROCESS_CHANCE, 0.0));
+            recorded.apply(Component.literal("Gear"), new MachineModifier(ModifierSlot.IMPLICIT, MachineStat.PROCESSING_SPEED, ModifierOperation.INCREASED_PERCENT, 10));
+            try (MachineStatAccumulator.Source ignored = recorded.source(Component.literal("Surge"))) {
+                recorded.convertIncreased(MachineStat.PROCESSING_SPEED, MachineStat.INSTANT_PROCESS_CHANCE, 0.3);
+            }
+            return recorded;
+        });
+        StatBreakdown speed = stats.breakdown(MachineStat.PROCESSING_SPEED).orElseThrow();
+        near(speed.recompute(), 1.25, "converted increases leave speed at its base");
+        String text = StatBreakdownText.lines(speed).stream().map(Component::getString).collect(Collectors.joining("\n"));
+        require(text.contains("rngtech.stat.breakdown.converted") && !text.contains("rngtech.stat.breakdown.increased"),
+                "the speed breakdown lists the conversion, not the increases:\n" + text);
+        StatBreakdown instant = stats.breakdown(MachineStat.INSTANT_PROCESS_CHANCE).orElseThrow();
+        near(instant.recompute(), 3.0, "the conversion feeds Instant Process");
+        require(speed.terms(StatBreakdown.Kind.CONVERTED).getFirst().targetStat() == MachineStat.INSTANT_PROCESS_CHANCE, "the conversion names its target");
+    }
+
+    /** Dozens of travel nodes share a display name; the text sums them on one line instead of listing each. */
+    private static void sameNamedSourcesShareALine() {
+        MachineStatAccumulator stats = MachineStatAccumulator.recording(() -> {
+            MachineStatAccumulator recorded = MachineStatAccumulator.componentBase(Map.of(MachineStat.DRIVE, 0.0));
+            recorded.apply(Component.literal("Drive"), new MachineModifier(ModifierSlot.IMPLICIT, MachineStat.DRIVE, ModifierOperation.ADD, 2));
+            recorded.apply(Component.literal("Drive").withStyle(net.minecraft.ChatFormatting.ITALIC),
+                    new MachineModifier(ModifierSlot.IMPLICIT, MachineStat.DRIVE, ModifierOperation.ADD, 2));
+            recorded.apply(Component.literal("Drive").withStyle(net.minecraft.ChatFormatting.BOLD),
+                    new MachineModifier(ModifierSlot.IMPLICIT, MachineStat.DRIVE, ModifierOperation.ADD, 2));
+            return recorded;
+        });
+        StatBreakdown breakdown = stats.breakdown(MachineStat.DRIVE).orElseThrow();
+        require(breakdown.terms(StatBreakdown.Kind.ADD).size() == 3, "the breakdown keeps each node as its own term");
+        List<String> lines = StatBreakdownText.lines(breakdown).stream().map(Component::getString).toList();
+        require(lines.stream().filter(line -> line.contains("Drive") && line.contains("×3")).count() == 1
+                        && lines.stream().noneMatch(line -> line.trim().startsWith("+2")),
+                "same-named sources share one summed line: " + lines);
     }
 
     private static void crusherYieldSoftCapRecombines() {

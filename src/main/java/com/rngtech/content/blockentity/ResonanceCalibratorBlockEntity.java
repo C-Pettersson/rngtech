@@ -209,7 +209,7 @@ public class ResonanceCalibratorBlockEntity extends BaseMachineBlockEntity
             CalibrationRecipe recipe = nextRecipe();
             CalibrationValueRange range = currentStabilityRange(recipe, stats);
             return switch (index) {
-                case DATA_PROGRESS -> progress;
+                case DATA_PROGRESS -> syncedProgress(0, progress);
                 case DATA_PROCESSING_TICKS -> currentProcessingTicks(recipe, stats);
                 case DATA_ENERGY -> energyStored();
                 case DATA_ENERGY_CAPACITY -> energyCapacity();
@@ -292,6 +292,7 @@ public class ResonanceCalibratorBlockEntity extends BaseMachineBlockEntity
         if (calibrator.progress == 0 && ProcessingChance.rollInstant(level, stats)) {
             int fullEnergyCost = calibrator.energyCostPerBatch(recipe, stats);
             if (calibrator.consumeWorkingEnergy(fullEnergyCost, true) >= fullEnergyCost) {
+                calibrator.markInstantProcess();
                 calibrator.startCycleIfNeeded(recipe, stats);
                 calibrator.consumeWorkingEnergy(fullEnergyCost, false);
                 if (calibrator.process(recipe, stats)) {
@@ -451,10 +452,11 @@ public class ResonanceCalibratorBlockEntity extends BaseMachineBlockEntity
         ResonanceCalibratorChassis chassis = chassis();
         MachineStatAccumulator stats = MachineBaseStatCatalog.resonanceCalibrator(chassis);
         stats.apply(effectiveTraits());
-        MegaPassiveTree.applyStats(stats, machineProgression(), masteryFamily());
+        MegaPassiveTree.applyNodeStats(stats, machineProgression(), masteryFamily());
         applyGearStats(stats, resonanceCoilStack());
         applyGearStats(stats, controlBoardStack());
         applyGearStats(stats, stabilizerMatrixStack());
+        MegaPassiveTree.applyAttributeStats(stats, machineProgression(), masteryFamily());
         if (!hasBatteryCell()) {
             stats.apply(MachineStatAccumulator.NO_BATTERY_SOURCE, new MachineModifier(
                     ModifierSlot.IMPLICIT,
@@ -996,6 +998,7 @@ public class ResonanceCalibratorBlockEntity extends BaseMachineBlockEntity
     private void applyGearStats(MachineStatAccumulator stats, ItemStack stack) {
         if (stack.getItem() instanceof MachinePartItem part) {
             ComponentBaseStatCatalog.applyEffectiveContribution(stats, stack);
+            ComponentBaseStatCatalog.applyAttributeAffixes(stats, stack);
         }
     }
 

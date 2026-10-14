@@ -1,6 +1,7 @@
 package com.rngtech.content.menu;
 
 import com.rngtech.content.block.BatteryAssemblerBlock;
+import com.rngtech.content.blockentity.BaseMachineBlockEntity;
 import com.rngtech.content.blockentity.BatteryAssemblerBlockEntity;
 import com.rngtech.content.purge.FluidPurgeSupport;
 import com.rngtech.content.registry.ModMenus;
@@ -141,6 +142,9 @@ public class BatteryAssemblerMenu extends AbstractContainerMenu implements StatB
     }
 
     public float processingProgress() {
+        if (instantFlash()) {
+            return 1.0F;
+        }
         int ticks = data.get(DATA_PROCESSING_TICKS);
         return ticks <= 0 ? 0.0F : Mth.clamp((float) data.get(DATA_PROGRESS) / (float) ticks, 0.0F, 1.0F);
     }
@@ -155,8 +159,13 @@ public class BatteryAssemblerMenu extends AbstractContainerMenu implements StatB
         return capacity <= 0 ? 0.0F : Mth.clamp((float) data.get(DATA_FLUID) / (float) capacity, 0.0F, 1.0F);
     }
 
+    /** Whether the bar should flash for a job that just finished instantly. */
+    public boolean instantFlash() {
+        return data.get(DATA_PROGRESS) == BaseMachineBlockEntity.INSTANT_FLASH_PROGRESS;
+    }
+
     public int progress() {
-        return data.get(DATA_PROGRESS);
+        return Math.max(0, data.get(DATA_PROGRESS));
     }
 
     public int processingTicks() {

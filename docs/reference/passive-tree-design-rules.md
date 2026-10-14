@@ -1,4 +1,4 @@
-# Passive Tree Design Rules v8
+# Passive Tree Design Rules v9
 
 Status: Implemented
 
@@ -34,6 +34,8 @@ Version 3 rewarded density and produced tangled links. Version 4 added a fitted-
 Version 7 moves the starts outward to leave room for core pathing, builds the road network in distinct layers with varied travel between them, adds larger reward constellations, and spreads keystones through every layer, directly on roads or at the end of reward arms, away from the starts. The catalog grows to 1300 nodes, and machines reach level 100.
 
 Version 8 ties keystone payoffs to their costs with machine tags, after Low Heat Specialist doubled the speed of machines that could never feel its heat limit. It also appends new content after the original fill instead of relaying the tree.
+
+Version 9 keeps every node live, after Flash Annealing turned out to be strictly worse than Low Heat Specialist under a heat cap almost no recipe fit. A final pass then found more of the same: High Flux and Cold Standby paid stats no Mastery machine reads, three themes (about 10% of the reward nodes) did the same, Single Pass let ascendancy yield through, and the family stat claims counted display-only stats as supported. The rules below and their `masteryCheck` audits now reject each of these. A content pass like this one keeps the layout, so `migrations.json` carries old builds over by node position instead of refunding them.
 
 ## Runtime and topology constraints
 
@@ -100,6 +102,16 @@ Every node stays selectable on every machine, and an irrelevant benefit leaves i
 
 A keystone that only changes how a machine works, such as Silent Operation muting it or Even Feed spreading automation across a Furnace's lanes, needs no penalty. The points spent reaching it are the commitment. Keystones that grant stat power still carry a visible cost.
 
+### Keep every node live
+
+A family supports a stat only when its machine reads that stat outside the menu sync, directly or through a shared helper. Display-only reads do not count. Every reward node and keystone must benefit at least one machine family. A theme whose primary stat no machine reads is a trap and must be replaced.
+
+Check each keystone against the recipes it limits. A maximum-temperature limit must leave at least 20% of the recipes of every family that receives its payoff; tag the payoff more narrowly when a limit locks a family out. The Stage 0 Furnace burns fuel instead of FE, so a keystone that pays the Furnace and costs Energy Usage also needs a fuel cost.
+
+No keystone may be strictly worse than another on every family it pays: equal or smaller payoffs, equal or larger costs, no extra benefit behavior, and an equal or lower limit. A keystone that only completes another, such as Seedling Magnet routing what Magnet Mode picks up, grants only its own behavior.
+
+Single Pass disables every stat and behavior declared as output yield. Declare new yield in `declarations.json` and it is covered automatically.
+
 ### Place keystones as commitments
 
 Distribute keystones across the layers: a few in the core for any start that paths inward, some in each home region's outer half, more in the outer field and on outer star hubs, and only a few on the perimeter. Stagger their angles between layers so commitments do not line up along spokes. General keystones belong in the core. A keystone on the center junction is equally far from every start; when distances tie, it faces the Crusher's Drive start. Family keystones sit near the start whose family they suit. A keystone may sit directly on a road, but it must stay at least 10 allocations from every start. All starting archetypes must be able to reach each keystone within the level-100 budget. Check representative builds that combine a nearby commitment with a distant specialty.
@@ -114,7 +126,7 @@ Use the median cross-group link length for the fitted long-chord threshold: max(
 
 Endpoints should occupy at least five of eight angular sectors, with no empty arc larger than 120 degrees. Do not add a seventh synthetic starter when importing the catalog.
 
-The current catalog has 1347 nodes and 1500 links: 6 starts, 634 travel nodes, 480 ordinary nodes, 195 notables, and 32 keystones. Its cycle rank is 154. Reward constellations use 129 road gates: 20 wheels, 4 stars, 4 crowns, 3 lattices, 6 rings, 11 horseshoes, 22 chains, 14 forks, 12 diamonds, 2 arcs, and 18 keystone arms. Fourteen more keystones sit directly on roads, outer star hubs, or the center junction. By radius, 4 keystones are in the core, 10 in home regions, 10 in the outer field, 4 on the perimeter road, and 4 beyond it. The original 1300-node fill is unchanged. Appended after it: two left-side Recovery wheels, the Single Pass keystone, four Forestry Companion pockets around its start (Rail Pace, Open Track, Far Rows, and Outer Rows), two Reservoirs pockets of Fluid Capacity, one near the Forestry start and one near the Melter's, and the Even Feed keystone directly on a road in the outer half of the Furnace's home region. Notables cost three to seven reward points from their gates. Keystones are 10 to 46 points from each start; Silent Operation, on the center junction, is exactly 10 from every start. The [generated audit](machine-mega-tree-audit.json) records the exact geometry, distances, and representative 99-point builds.
+The current catalog has 1348 nodes and 1501 links: 6 starts, 634 travel nodes, 480 ordinary nodes, 195 notables, and 33 keystones. Its cycle rank is 154. Reward constellations use 129 road gates: 20 wheels, 4 stars, 4 crowns, 3 lattices, 6 rings, 11 horseshoes, 22 chains, 14 forks, 12 diamonds, 2 arcs, and 18 keystone arms. Fifteen more keystones sit directly on roads, outer star hubs, or the center junction. By radius, 4 keystones are in the core, 10 in home regions, 10 in the outer field, 4 on the perimeter road, and 4 beyond it. The original 1300-node fill is unchanged. Appended after it: two left-side Recovery wheels, the Single Pass keystone, four Forestry Companion pockets around its start (Rail Pace, Open Track, Far Rows, and Outer Rows), two Reservoirs pockets of Fluid Capacity, one near the Forestry start and one near the Melter's, the Even Feed keystone directly on a road in the outer half of the Furnace's home region, and the Surge Cycling keystone on the outer road beside the Surge pockets, 14 to 34 points from the starts. Notables cost three to seven reward points from their gates. Keystones are 10 to 46 points from each start; Silent Operation, on the center junction, is exactly 10 from every start. The [generated audit](machine-mega-tree-audit.json) records the exact geometry, distances, and representative 99-point builds.
 
 The legacy small-tree review ranges remain useful for the historical reference only: node cycle rank 15–30%, bridge edges up to 20% excluding keystone endpoints, degree-two corridors up to five nodes, and articulation review above 25%. For its 25–35 groups, review cross-group ratios of 25–40%, group cycle rank at least max(8, ceil(groupCount * 0.25)), group articulation up to 35%, group bridges up to 20%, and low-degree group corridors up to three groups. These are not shared-tree targets.
 

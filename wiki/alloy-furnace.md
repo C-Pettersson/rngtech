@@ -92,7 +92,9 @@ Gear slots cannot be filled by automation.
 
 Completed alloy crafts earn Alloy Furnace Mastery XP, and you spend the points on the shared [Machine Mastery](machine-mastery.md) tree, starting from the same point as the Furnace. Failures, stalled heat, blocked output, and power-starved ticks earn nothing. Alloy Furnaces choose between the **Metallurgist** and **Blendwright** [ascendancies](machine-mastery.md#ascendancies).
 
-The heat keystones cap Max Temperature, and every alloy needs at least 900 heat. **Flash Annealing** caps it at 1,000 heat, which leaves four recipes in the [recipe table](#alloy-furnace-recipes), and gives 100% more Processing Speed with 50% more Energy Usage. **Low Heat Specialist** caps it at 800 heat, which is below every alloy, so an Alloy Furnace with it allocated cannot craft anything.
+The heat keystones cap Max Temperature, and every alloy needs at least 900 heat. **Flash Annealing** caps it at 1,000 heat, which leaves four recipes in the [recipe table](#alloy-furnace-recipes), and gives 100% more Processing Speed with 50% more Energy Usage. **Low Heat Specialist** caps it at 800 heat, which is below every alloy, and its savings only work on the Furnace, so an Alloy Furnace with it allocated cannot craft anything.
+
+**Quench Protocol** halves the temperature failure strain the Alloy Furnace takes, for 25% less Heat Transfer.
 
 Metallurgist Flux only saves a unit of an ingredient the recipe needs two or more of, so every input is still used. On a tie, it saves the ingredient listed first in the recipe.
 
@@ -121,7 +123,7 @@ Every node in this machine's ascendancies. See [Machine Mastery](machine-mastery
 | **Recipe Lock** | Notable | Steady Measure | Automation inserts only the current recipe’s inputs, one craft ahead at most. |
 | Lucky Pour | Small | Recipe Lock | +1% Super Output. |
 | **Unbroken Pour** | Deep notable | Lucky Pour | Super Output Cadence fixed at 32 cycles. |
-| Skimmed Melt | Small | Flux Ledger | 8% increased Stability. |
+| Skimmed Melt | Small | Flux Ledger | 8% increased Temperature Stability. |
 | **Dross Skimming** | Notable | Skimmed Melt | A failure keeps one unit of the recipe’s largest input. |
 | Banked Heat | Small | Flux Ledger | 5% reduced Energy Use. |
 | **Heat Economy** | Notable | Banked Heat | Warmup costs 30% less FE. |
@@ -141,7 +143,7 @@ Every node in this machine's ascendancies. See [Machine Mastery](machine-mastery
 | **Master Blend** | Deep notable | Measured Pace | 100% more Ledger Rate. Direct-ingot recipes are disabled. |
 | Even Heat | Small | Blend Reversal | 8% increased Temperature Stability. |
 | **Tempered Crucible** | Notable | Even Heat | 40% more Temperature Stability on blend recipes. |
-| Sure Footing | Small | Blend Reversal | 8% increased Stability. |
+| Sure Footing | Small | Blend Reversal | 8% increased Temperature Stability. |
 | **Steady Supply** | Notable | Sure Footing | Power-drop failure strain is halved. |
 
 <!-- ascendancy-trees:end -->
