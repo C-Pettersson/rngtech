@@ -1040,6 +1040,9 @@ public final class MasteryScreenSupport<N extends PassiveNode> {
                         tooltip.add(Component.translatable("rngtech.mastery.attribute_sources_hint").withStyle(ChatFormatting.DARK_GRAY));
                     }
                     tooltip.add(Component.translatable("rngtech.mastery.tooltip.unlocked").withStyle(ChatFormatting.GREEN));
+                    if (view.masterySnapshot().freeReset()) {
+                        tooltip.add(Component.translatable("rngtech.mastery.free_reset").withStyle(ChatFormatting.GREEN));
+                    }
                     if (ascendancy.available()) {
                         tooltip.add(Component.translatable("rngtech.mastery.ascendancy.start_hint").withStyle(ChatFormatting.GOLD));
                     }

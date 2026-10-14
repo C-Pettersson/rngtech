@@ -179,7 +179,8 @@ final class MasterySummaryDrawer {
     private List<Row> rows() {
         var snapshot = view.masterySnapshot();
         double[] attributes = ATTRIBUTES.stream().mapToDouble(view::masteryAttribute).toArray();
-        Object key = List.of(snapshot.allocatedNodes(), snapshot.ascendancy(), snapshot.ascendancyNodes(), view.masteryFamily(), Arrays.toString(attributes));
+        Object key = List.of(snapshot.allocatedNodes(), snapshot.ascendancy(), snapshot.ascendancyNodes(), view.masteryFamily(), Arrays.toString(attributes),
+                snapshot.freeReset());
         if (!key.equals(rowsKey)) {
             rowsKey = key;
             rows = buildRows(snapshot, attributes);
@@ -207,6 +208,9 @@ final class MasterySummaryDrawer {
         built.add(new Row(Component.translatable("rngtech.mastery.summary.title"), TITLE, 0, 0, null));
         built.add(new Row(allocatedIds.isEmpty() && ascendancy.isEmpty() ? Component.translatable("rngtech.mastery.summary.empty")
                 : Component.translatable("rngtech.mastery.summary.allocated", allocatedIds.size()), INACTIVE, 0, 0, null));
+        if (snapshot.freeReset()) {
+            built.add(new Row(Component.translatable("rngtech.mastery.free_reset"), ATTRIBUTE, 0, 0, null));
+        }
         for (int index = 0; index < ATTRIBUTES.size(); index++) {
             MachineStat attribute = ATTRIBUTES.get(index);
             double total = attributes[index];

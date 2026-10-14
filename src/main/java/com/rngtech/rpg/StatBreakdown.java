@@ -35,7 +35,7 @@ public record StatBreakdown(MachineStat stat, List<Term> terms, double finalValu
         SOFT_CAP,
         FLOOR,
         BONUS_MORE,
-        /** The positive increased bucket is converted into another stat; only reductions remain. */
+        /** The increased and reduced bucket is converted into another stat and no longer scales this one. */
         CONVERTED;
 
         static final StreamCodec<ByteBuf, Kind> STREAM_CODEC =
@@ -112,7 +112,7 @@ public record StatBreakdown(MachineStat stat, List<Term> terms, double finalValu
 
     /** The increased bucket after this stat's soft cap, or the bucket itself when it has none. */
     public double paidIncreasedPercent() {
-        double increased = terms(Kind.CONVERTED).isEmpty() ? increasedPercent() : Math.min(0.0, increasedPercent());
+        double increased = terms(Kind.CONVERTED).isEmpty() ? increasedPercent() : 0.0;
         Term cap = lowest(Kind.SOFT_CAP);
         return cap == null ? increased : MachineStatAccumulator.softCapped(increased, cap.value());
     }

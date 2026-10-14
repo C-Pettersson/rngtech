@@ -110,7 +110,7 @@ A few keystones build on this:
 
 Hold Shift while hovering an attribute total, on your start node or in the Bonus Summary, to see where its points come from: your start, tree nodes, and each Gear part.
 
-**Surge Cycling** trades steady speed for luck. Your increased Processing Speed stops speeding the machine up and becomes Instant Process chance instead: 0.3% per 1% increased, up to 75%. Reduced speed and "less" penalties still apply. With 200% increased speed you get 60% Instant Process. Instant Process suffixes and the Surge nodes push it toward the cap.
+**Surge Cycling** trades steady speed for luck. Increased and reduced Processing Speed stop changing how fast the machine runs and apply to Instant Process chance instead, at 30% of their value, up to 75%. "More" and "less" speed effects still apply. Your Instant Process chance shows on the Stats tab; Shift-hover it to see where it comes from. With 200% increased speed you get 60% Instant Process. Instant Process suffixes and the Surge nodes push it toward the cap.
 
 ### Node types
 
@@ -133,7 +133,7 @@ Spending and refunding points:
 
 - **Allocate**: hover any unallocated node to preview the shortest path to it and its cost, then click to buy the whole path in one go. The path is bought only if you can afford all of it and your Gear allows every node on it; otherwise nothing is bought. The purchase happens when you release the click, so a drag that starts on a node only pans. Every node costs one point and must connect back to your start.
 - **Gear limits**: some nodes restrict which Gear you can install. You cannot take a node your installed Gear breaks; the tooltip says why.
-- **Refund**: right-click an allocated node to remove it. Each removed node costs one {{ item('rngtech:mastery_refund') }}. A refund must leave the rest of your tree connected and your Gear legal. Shift-click **Clear** to refund the whole tree at the same price per node. After an update that changes the tree, each machine's build is kept wherever it still fits, and its next Clear is free (the Clear button says so).
+- **Refund**: right-click an allocated node to remove it. Each removed node costs one {{ item('rngtech:mastery_refund') }}. A refund must leave the rest of your tree connected and your Gear legal. Shift-click **Clear** to refund the whole tree at the same price per node. After an update that changes the tree, each machine's build is kept wherever it still fits, and its next Clear is free. The Bonus Summary, the start node, and the Clear button say so while it is available.
 
 In the expanded view, the tab on the right edge opens the **Bonus Summary**: your attribute totals, keystones, and every allocated effect combined the way the machine actually adds them up. It has sections for your Ascendancy, bonuses that come from attributes, attribute scaling, limits, special behaviors, and effects this machine does not use. Hover a line to see the stat, its current contribution, and which nodes it comes from.
 

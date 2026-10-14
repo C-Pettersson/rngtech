@@ -40,7 +40,7 @@ public final class StatBreakdownText {
         );
         softCap(lines, breakdown);
         StatBreakdown.Term converted = breakdown.lowest(StatBreakdown.Kind.CONVERTED);
-        if (converted != null && breakdown.increasedPercent() > 0.0) {
+        if (converted != null && breakdown.increasedPercent() != 0.0) {
             lines.add(Component.translatable("rngtech.stat.breakdown.converted", converted.source()).withStyle(ChatFormatting.GOLD));
         }
         section(lines, breakdown, StatBreakdown.Kind.MORE, "rngtech.stat.breakdown.more", factor(breakdown.more()));

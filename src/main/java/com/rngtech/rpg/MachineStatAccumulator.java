@@ -55,7 +55,7 @@ public final class MachineStatAccumulator {
     private final Map<MachineStat, Double> absoluteCeilings = new EnumMap<>(MachineStat.class);
     private final Map<MachineStat, Double> absoluteFloors = new EnumMap<>(MachineStat.class);
     private final Map<MachineStat, Double> bonusMoreValues = new EnumMap<>(MachineStat.class);
-    /** Stats whose positive increased bucket pays into another stat instead, keyed by the converted stat. */
+    /** Stats whose increased and reduced bucket pays into another stat instead, keyed by the converted stat. */
     private final Map<MachineStat, IncreasedConversion> increasedConversions = new EnumMap<>(MachineStat.class);
     private final Map<MachineStat, List<StatBreakdown.Term>> recorded =
             RECORDING.get() ? new EnumMap<>(MachineStat.class) : null;
@@ -174,9 +174,9 @@ public final class MachineStatAccumulator {
     }
 
     /**
-     * Converts the positive part of {@code from}'s increased bucket into flat {@code to}: {@code perPercent} of {@code to}
-     * for each 1% increased. Reductions on {@code from} still apply. The conversion reads the bucket when a value is
-     * asked for, so increases applied after this call are converted too.
+     * Converts {@code from}'s whole increased and reduced bucket into flat {@code to}: {@code perPercent} of {@code to}
+     * for each net 1% increased, or less of it for a net reduction. The conversion reads the bucket when a value is
+     * asked for, so increases and reductions applied after this call are converted too.
      */
     public void convertIncreased(MachineStat from, MachineStat to, double perPercent) {
         checkMutable();
@@ -193,7 +193,7 @@ public final class MachineStatAccumulator {
         double converted = 0.0;
         for (Map.Entry<MachineStat, IncreasedConversion> entry : increasedConversions.entrySet()) {
             if (entry.getValue().to() == to) {
-                converted += entry.getValue().perPercent() * Math.max(0.0, increasedPercentValues.getOrDefault(entry.getKey(), 0.0));
+                converted += entry.getValue().perPercent() * increasedPercentValues.getOrDefault(entry.getKey(), 0.0);
             }
         }
         return converted;
@@ -211,7 +211,7 @@ public final class MachineStatAccumulator {
         }
         terms.addAll(recorded.getOrDefault(resolvedStat, List.of()));
         increasedConversions.forEach((from, conversion) -> {
-            double converted = conversion.perPercent() * Math.max(0.0, increasedPercentValues.getOrDefault(from, 0.0));
+            double converted = conversion.perPercent() * increasedPercentValues.getOrDefault(from, 0.0);
             if (conversion.to() == resolvedStat && converted != 0.0) {
                 terms.add(new StatBreakdown.Term(StatBreakdown.Kind.ADD, converted, conversion.source()));
             }
@@ -925,7 +925,7 @@ public final class MachineStatAccumulator {
         MachineStat resolvedStat = accumulationStat(stat);
         double increased = increasedPercentValues.getOrDefault(resolvedStat, 0.0) + extraPercent;
         if (increasedConversions.containsKey(resolvedStat)) {
-            increased = Math.min(0.0, increased);
+            increased = 0.0;
         }
         Double cap = increasedSoftCaps.get(resolvedStat);
         return cap == null ? increased : softCapped(increased, cap);

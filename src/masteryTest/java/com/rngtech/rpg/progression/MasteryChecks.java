@@ -494,7 +494,9 @@ public final class MasteryChecks {
         cycled.apply(new MachineModifier(ModifierSlot.SUFFIX, MachineStat.PROCESSING_SPEED, ModifierOperation.INCREASED_PERCENT, 100));
         cycled.apply(new MachineModifier(ModifierSlot.SUFFIX, MachineStat.PROCESSING_SPEED, ModifierOperation.LESS, 0.5));
         near(cycled.value(MachineStat.PROCESSING_SPEED), 0.5, "Surge Cycling removes increased speed but keeps less multipliers");
-        near(cycled.value(MachineStat.INSTANT_PROCESS_CHANCE), Math.min(75, (treeSpeed + 100) * MegaPassiveTree.SURGE_CYCLING_RATE), "Surge Cycling converts increased speed into Instant Process");
+        cycled.apply(new MachineModifier(ModifierSlot.SUFFIX, MachineStat.PROCESSING_SPEED, ModifierOperation.DECREASED_PERCENT, 40));
+        near(cycled.value(MachineStat.PROCESSING_SPEED), 0.5, "Surge Cycling moves reduced speed off the speed stat too");
+        near(cycled.value(MachineStat.INSTANT_PROCESS_CHANCE), Math.min(75, (treeSpeed + 60) * MegaPassiveTree.SURGE_CYCLING_RATE), "reductions lower the converted Instant Process");
         cycled.apply(new MachineModifier(ModifierSlot.SUFFIX, MachineStat.PROCESSING_SPEED, ModifierOperation.INCREASED_PERCENT, 1000));
         near(cycled.value(MachineStat.INSTANT_PROCESS_CHANCE), 75, "Surge Cycling caps Instant Process at 75%");
         var forestry = MachineStatAccumulator.componentBase(Map.of(MachineStat.PROCESSING_SPEED, 1.0));
