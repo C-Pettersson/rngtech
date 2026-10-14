@@ -45,8 +45,12 @@ public final class StatBreakdownText {
             softCap(lines, breakdown);
         } else if (breakdown.increasedPercent() != 0.0) {
             // The converted bucket is listed under the stat it now feeds, not here as well.
+            MachineStat target = converted.targetStat();
+            double fed = breakdown.increasedPercent() * converted.value();
             lines.add(Component.translatable("rngtech.stat.breakdown.converted", converted.source(),
-                    MachineStatDisplay.formatSignedPercentPoints(breakdown.increasedPercent())).withStyle(ChatFormatting.GOLD));
+                    MachineStatDisplay.formatSignedPercentPoints(breakdown.increasedPercent()), Component.translatable(stat.translationKey()),
+                    target == null ? MachineStatDisplay.formatSignedNumber(fed) : MachineStatDisplay.formatAdditiveEffectValue(target, fed),
+                    target == null ? Component.empty() : Component.translatable(target.translationKey())).withStyle(ChatFormatting.GOLD));
         }
         section(lines, breakdown, StatBreakdown.Kind.MORE, "rngtech.stat.breakdown.more", factor(breakdown.more()));
 

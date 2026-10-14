@@ -182,7 +182,10 @@ public final class MachineStatAccumulator {
         checkMutable();
         Component source = sources.isEmpty() ? FALLBACK_SOURCE : sources.peek();
         increasedConversions.put(accumulationStat(from), new IncreasedConversion(accumulationStat(to), perPercent, source));
-        record(StatBreakdown.Kind.CONVERTED, from, perPercent);
+        if (recorded != null) {
+            recorded.computeIfAbsent(accumulationStat(from), ignored -> new ArrayList<>())
+                    .add(new StatBreakdown.Term(StatBreakdown.Kind.CONVERTED, perPercent, source, accumulationStat(to).ordinal()));
+        }
     }
 
     private record IncreasedConversion(MachineStat to, double perPercent, Component source) {

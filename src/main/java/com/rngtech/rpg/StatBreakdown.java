@@ -42,7 +42,8 @@ public record StatBreakdown(MachineStat stat, List<Term> terms, double finalValu
                 ByteBufCodecs.idMapper(index -> values()[index], Kind::ordinal);
     }
 
-    public record Term(Kind kind, double value, Component source) {
+    /** One contribution; {@code target} is the stat a {@link Kind#CONVERTED} term feeds, as its ordinal, or -1. */
+    public record Term(Kind kind, double value, Component source, int target) {
         public static final StreamCodec<RegistryFriendlyByteBuf, Term> STREAM_CODEC = StreamCodec.composite(
                 Kind.STREAM_CODEC,
                 Term::kind,
@@ -50,8 +51,19 @@ public record StatBreakdown(MachineStat stat, List<Term> terms, double finalValu
                 Term::value,
                 ComponentSerialization.TRUSTED_STREAM_CODEC,
                 Term::source,
+                ByteBufCodecs.VAR_INT,
+                Term::target,
                 Term::new
         );
+
+        public Term(Kind kind, double value, Component source) {
+            this(kind, value, source, -1);
+        }
+
+        /** The stat a conversion feeds, or null for every other term. */
+        public MachineStat targetStat() {
+            return target >= 0 && target < MachineStat.values().length ? MachineStat.byId(target) : null;
+        }
     }
 
     public List<Term> terms(Kind kind) {

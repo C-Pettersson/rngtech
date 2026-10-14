@@ -29,6 +29,7 @@ public final class StatBreakdownChecks {
         energyUsageReductionsRecombine();
         textListsEverySource();
         sameNamedSourcesShareALine();
+        conversionNamesWhatItFeeds();
         return checks;
     }
 
@@ -153,6 +154,26 @@ public final class StatBreakdownChecks {
         near(breakdown.recompute(), 1500, "flat capacity adds to capacity");
         require(stats.breakdowns().stream().noneMatch(entry -> entry.stat() == MachineStat.ENERGY_CAPACITY_FLAT),
                 "flat capacity has no separate breakdown");
+    }
+
+    /** A converted bucket shows once, as the amount it feeds into the target stat, not in both breakdowns. */
+    private static void conversionNamesWhatItFeeds() {
+        MachineStatAccumulator stats = MachineStatAccumulator.recording(() -> {
+            MachineStatAccumulator recorded = MachineStatAccumulator.componentBase(Map.of(MachineStat.PROCESSING_SPEED, 1.25, MachineStat.INSTANT_PROCESS_CHANCE, 0.0));
+            recorded.apply(Component.literal("Gear"), new MachineModifier(ModifierSlot.IMPLICIT, MachineStat.PROCESSING_SPEED, ModifierOperation.INCREASED_PERCENT, 10));
+            try (MachineStatAccumulator.Source ignored = recorded.source(Component.literal("Surge"))) {
+                recorded.convertIncreased(MachineStat.PROCESSING_SPEED, MachineStat.INSTANT_PROCESS_CHANCE, 0.3);
+            }
+            return recorded;
+        });
+        StatBreakdown speed = stats.breakdown(MachineStat.PROCESSING_SPEED).orElseThrow();
+        near(speed.recompute(), 1.25, "converted increases leave speed at its base");
+        String text = StatBreakdownText.lines(speed).stream().map(Component::getString).collect(Collectors.joining("\n"));
+        require(text.contains("rngtech.stat.breakdown.converted") && !text.contains("rngtech.stat.breakdown.increased"),
+                "the speed breakdown lists the conversion, not the increases:\n" + text);
+        StatBreakdown instant = stats.breakdown(MachineStat.INSTANT_PROCESS_CHANCE).orElseThrow();
+        near(instant.recompute(), 3.0, "the conversion feeds Instant Process");
+        require(speed.terms(StatBreakdown.Kind.CONVERTED).getFirst().targetStat() == MachineStat.INSTANT_PROCESS_CHANCE, "the conversion names its target");
     }
 
     /** Dozens of travel nodes share a display name; the text sums them on one line instead of listing each. */
