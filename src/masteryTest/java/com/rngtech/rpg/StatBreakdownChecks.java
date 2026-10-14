@@ -3,7 +3,9 @@ package com.rngtech.rpg;
 import com.rngtech.content.energy.HeatCoreMaterial;
 
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.contents.TranslatableContents;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -25,9 +27,12 @@ public final class StatBreakdownChecks {
         partContributionsCarryThePartLabel();
         flatCapacityFoldsIntoCapacity();
         crusherYieldSoftCapRecombines();
+        multiplierFormulaUsesFactors();
         floorAndBonusScaleRecombine();
         energyUsageReductionsRecombine();
         textListsEverySource();
+        sameNamedSourcesShareALine();
+        conversionNamesWhatItFeeds();
         return checks;
     }
 
@@ -154,6 +159,45 @@ public final class StatBreakdownChecks {
                 "flat capacity has no separate breakdown");
     }
 
+    /** A converted bucket shows once, as the amount it feeds into the target stat, not in both breakdowns. */
+    private static void conversionNamesWhatItFeeds() {
+        MachineStatAccumulator stats = MachineStatAccumulator.recording(() -> {
+            MachineStatAccumulator recorded = MachineStatAccumulator.componentBase(Map.of(MachineStat.PROCESSING_SPEED, 1.25, MachineStat.INSTANT_PROCESS_CHANCE, 0.0));
+            recorded.apply(Component.literal("Gear"), new MachineModifier(ModifierSlot.IMPLICIT, MachineStat.PROCESSING_SPEED, ModifierOperation.INCREASED_PERCENT, 10));
+            try (MachineStatAccumulator.Source ignored = recorded.source(Component.literal("Surge"))) {
+                recorded.convertIncreased(MachineStat.PROCESSING_SPEED, MachineStat.INSTANT_PROCESS_CHANCE, 0.3);
+            }
+            return recorded;
+        });
+        StatBreakdown speed = stats.breakdown(MachineStat.PROCESSING_SPEED).orElseThrow();
+        near(speed.recompute(), 1.25, "converted increases leave speed at its base");
+        String text = StatBreakdownText.lines(speed).stream().map(Component::getString).collect(Collectors.joining("\n"));
+        require(text.contains("rngtech.stat.breakdown.converted") && !text.contains("rngtech.stat.breakdown.increased"),
+                "the speed breakdown lists the conversion, not the increases:\n" + text);
+        StatBreakdown instant = stats.breakdown(MachineStat.INSTANT_PROCESS_CHANCE).orElseThrow();
+        near(instant.recompute(), 3.0, "the conversion feeds Instant Process");
+        require(speed.terms(StatBreakdown.Kind.CONVERTED).getFirst().targetStat() == MachineStat.INSTANT_PROCESS_CHANCE, "the conversion names its target");
+    }
+
+    /** Dozens of travel nodes share a display name; the text sums them on one line instead of listing each. */
+    private static void sameNamedSourcesShareALine() {
+        MachineStatAccumulator stats = MachineStatAccumulator.recording(() -> {
+            MachineStatAccumulator recorded = MachineStatAccumulator.componentBase(Map.of(MachineStat.DRIVE, 0.0));
+            recorded.apply(Component.literal("Drive"), new MachineModifier(ModifierSlot.IMPLICIT, MachineStat.DRIVE, ModifierOperation.ADD, 2));
+            recorded.apply(Component.literal("Drive").withStyle(net.minecraft.ChatFormatting.ITALIC),
+                    new MachineModifier(ModifierSlot.IMPLICIT, MachineStat.DRIVE, ModifierOperation.ADD, 2));
+            recorded.apply(Component.literal("Drive").withStyle(net.minecraft.ChatFormatting.BOLD),
+                    new MachineModifier(ModifierSlot.IMPLICIT, MachineStat.DRIVE, ModifierOperation.ADD, 2));
+            return recorded;
+        });
+        StatBreakdown breakdown = stats.breakdown(MachineStat.DRIVE).orElseThrow();
+        require(breakdown.terms(StatBreakdown.Kind.ADD).size() == 3, "the breakdown keeps each node as its own term");
+        List<String> lines = StatBreakdownText.lines(breakdown).stream().map(Component::getString).toList();
+        require(lines.stream().filter(line -> line.contains("Drive") && line.contains("×3")).count() == 1
+                        && lines.stream().noneMatch(line -> line.trim().startsWith("+2")),
+                "same-named sources share one summed line: " + lines);
+    }
+
     private static void crusherYieldSoftCapRecombines() {
         MachineStatAccumulator stats = MachineStatAccumulator.recording(() -> {
             MachineStatAccumulator recorded = MachineStatAccumulator.componentBase(Map.of(MachineStat.OUTPUT_AMOUNT, 1.2))
@@ -168,6 +212,25 @@ public final class StatBreakdownChecks {
         String text = StatBreakdownText.lines(breakdown).stream().map(Component::getString).collect(Collectors.joining("\n"));
         require(text.contains("rngtech.stat.breakdown.soft_cap"),
                 "the breakdown shows the soft-cap math:\n" + text);
+    }
+
+    private static void multiplierFormulaUsesFactors() {
+        MachineStatAccumulator stats = MachineStatAccumulator.recording(() -> {
+            MachineStatAccumulator recorded = MachineStatAccumulator.componentBase(Map.of(MachineStat.OUTPUT_AMOUNT, 1.2))
+                    .withCrusherYieldRules();
+            recorded.apply(Component.literal("Crush Head"), new MachineModifier(ModifierSlot.IMPLICIT, MachineStat.OUTPUT_AMOUNT, ModifierOperation.INCREASED_PERCENT, 25));
+            return recorded;
+        });
+        StatBreakdown breakdown = stats.breakdown(MachineStat.OUTPUT_AMOUNT).orElseThrow();
+        near(breakdown.recompute(), 1.44, "a soft-capped +25% increased scales a ×1.2 yield to ×1.44");
+        Component formula = StatBreakdownText.lines(breakdown).stream()
+                .filter(line -> line.getContents() instanceof TranslatableContents contents
+                        && contents.getKey().equals("rngtech.stat.breakdown.formula"))
+                .findFirst()
+                .orElseThrow();
+        List<String> operands = Arrays.stream(((TranslatableContents) formula.getContents()).getArgs()).map(String::valueOf).toList();
+        require(operands.equals(List.of("1.2", "1.2", "1", "1.44 (+44%)")),
+                "a multiplier stat's formula multiplies factors, not its +20% display: " + operands);
     }
 
     private static void floorAndBonusScaleRecombine() {

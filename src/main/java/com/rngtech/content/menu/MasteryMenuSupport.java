@@ -64,12 +64,20 @@ public final class MasteryMenuSupport {
         return field >= ASCENDANCY ? ascendancyField(host.masteryState(), field) : get(host.machineProgression(), field);
     }
 
-    /** Ascendancy stats the chosen ascendancy grants, then Unique Gear stats the machine currently has. */
+    /** Stats shown on the Stats tab only while the machine has them, such as Instant Process from Mastery. */
+    private static final Set<MachineStat> WHEN_PRESENT = java.util.EnumSet.of(MachineStat.INSTANT_PROCESS_CHANCE);
+
+    /** Ascendancy stats the chosen ascendancy grants, then Unique Gear stats and present stats the machine has. */
     private static List<MachineStat> shownStats(MachineMasteryHost host, Supplier<MachineStatAccumulator> stats) {
         List<MachineStat> shown = new ArrayList<>(AscendancyCatalog.grantedStats(host.masteryState(), host.masteryFamily()));
         MachineStatAccumulator values = stats.get();
         for (MachineStat stat : UniqueGearStats.STATS) {
             if (!shown.contains(stat) && Math.abs(values.value(stat)) > 1.0E-9) {
+                shown.add(stat);
+            }
+        }
+        for (MachineStat stat : WHEN_PRESENT) {
+            if (!shown.contains(stat) && host.masteryFamily().supports(stat) && values.value(stat) > 1.0E-9) {
                 shown.add(stat);
             }
         }
@@ -81,7 +89,8 @@ public final class MasteryMenuSupport {
         for (int slot = 0; slot < GRANTED_STAT_SLOTS; slot++) {
             int id = data.get(base + GRANTED_STATS_START + slot * 2) - 1;
             if (id >= 0 && id < MachineStat.values().length
-                    && (MasteryDeclarations.declared(MachineStat.byId(id)) || UniqueGearStats.STATS.contains(MachineStat.byId(id)))) {
+                    && (MasteryDeclarations.declared(MachineStat.byId(id)) || UniqueGearStats.STATS.contains(MachineStat.byId(id))
+                            || WHEN_PRESENT.contains(MachineStat.byId(id)))) {
                 granted.add(new GrantedStat(MachineStat.byId(id), data.get(base + GRANTED_STATS_START + slot * 2 + 1) / 100.0));
             }
         }
@@ -116,7 +125,8 @@ public final class MasteryMenuSupport {
             case 3 -> (int) Math.min(Integer.MAX_VALUE, state.xpInCurrentLevel());
             case 4 -> (int) Math.min(Integer.MAX_VALUE, state.xpNeededForNextLevel());
             case 5 -> state.unspentPoints();
-            case FOLLOWING -> state.following() ? 1 : 0;
+            // Bit 1 is following a target build; bit 2 is an unused free Full Reset.
+            case FOLLOWING -> (state.following() ? 1 : 0) | (state.freeReset() ? 2 : 0);
             default -> 0;
         };
     }
@@ -156,8 +166,8 @@ public final class MasteryMenuSupport {
             if (node != null) { ascendancyNodes.add(node.id()); }
         }
         return new MachineProgressionState(machineXp(data, base), 0, machineLevel(data, base),
-                readNodes(data, base + ALLOCATED_START), family.startNodeId(), readNodes(data, base + TARGET_START), data.get(base + FOLLOWING) != 0,
-                chosen == null ? "" : chosen.id(), ascendancyNodes, data.get(base + SEAL_TIERS));
+                readNodes(data, base + ALLOCATED_START), family.startNodeId(), readNodes(data, base + TARGET_START), (data.get(base + FOLLOWING) & 1) != 0,
+                chosen == null ? "" : chosen.id(), ascendancyNodes, data.get(base + SEAL_TIERS), (data.get(base + FOLLOWING) & 2) != 0);
     }
     private static List<String> readNodes(ContainerData data, int base) {
         List<String> result = new ArrayList<>();

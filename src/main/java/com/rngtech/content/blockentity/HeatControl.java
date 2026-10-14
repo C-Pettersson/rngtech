@@ -12,6 +12,8 @@ final class HeatControl {
     static final int AMBIENT_TEMPERATURE = 20;
     static final int FAILURE_STRAIN_THRESHOLD = 6000;
     static final int POWER_DROP_STRAIN = 1400;
+    private static final double MIN_COOLING_PER_TICK = 0.25;
+    private static final double GOLDEN_RATIO_CONJUGATE = 0.6180339887498949;
 
     static int warmupRate(MachineStatAccumulator stats) {
         double heatTransfer = Math.max(0.1, stats.value(MachineStat.HEAT_TRANSFER));
@@ -19,10 +21,27 @@ final class HeatControl {
         return Math.max(1, (int) Math.round(10.0 * heatTransfer / warmupTime));
     }
 
-    static int coolingRate(MachineStatAccumulator stats) {
+    /** Degrees lost per idle tick on average; Heat Isolation and Cooling Rate reach down to an eighth of the base 2. */
+    static double coolingPerTick(MachineStatAccumulator stats) {
         double coolingRate = Math.max(0.1, stats.value(MachineStat.COOLING_RATE));
         double heatIsolation = Math.max(0.25, stats.value(MachineStat.HEAT_ISOLATION));
-        return Math.max(1, (int) Math.round(2.0 * coolingRate / heatIsolation));
+        return Math.max(MIN_COOLING_PER_TICK, 2.0 * coolingRate / heatIsolation);
+    }
+
+    /**
+     * Whole degrees lost this tick. The fractional part is spread over ticks, so every Heat Isolation and Cooling Rate
+     * bonus slows cooling instead of rounding away.
+     */
+    static int coolingStep(MachineStatAccumulator stats, long gameTime) {
+        double rate = coolingPerTick(stats);
+        int whole = (int) Math.floor(rate);
+        double phase = (gameTime * GOLDEN_RATIO_CONJUGATE) % 1.0;
+        return whole + (phase < rate - whole ? 1 : 0);
+    }
+
+    /** Halves temperature failure strain for Quench Protocol, keeping at least one point. */
+    static int quenched(int addedStrain) {
+        return addedStrain > 0 ? Math.max(1, (int) Math.ceil(addedStrain * 0.5D)) : addedStrain;
     }
 
     static int defaultSafeMaximumTemperature(int targetTemperature) {

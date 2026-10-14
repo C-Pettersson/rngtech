@@ -29,7 +29,7 @@ In the tables below, **Better** says which direction you want.
 
 | Stat | What it does | Used by | Better |
 |---|---|---|---|
-| Processing Speed | How fast a recipe or work cycle runs. 1.0 is normal; 1.5 finishes in two thirds of the time. | Every recipe machine, including generators that run recipes, and the Forestry Companion's work interval. | Higher |
+| Processing Speed | How fast a recipe or work cycle runs, shown as how much faster than the recipe's listed time: +50% faster finishes in two thirds of it. Better chassis start above the listed time; Shift-hover shows the chassis base multiplied by the bonuses. | Every recipe machine, including generators that run recipes, and the Forestry Companion's work interval. | Higher |
 | Energy Use | Multiplier on the FE each craft costs. Increases multiply it; reductions add together and then divide it, so 100% reduced halves the cost. | Powered processing machines, such as the [Crusher](crusher.md), [Furnace](furnace.md), [Alloy Furnace](alloy-furnace.md), [Melter](melter.md), [Metal Press](metal-press.md), [Component Assembler](component-assembler.md), [Component Recycler](component-recycler.md), [Resonance Calibrator](resonance-calibrator.md), and Steel and higher [Compressor Tanks](compressor-tank.md). | Lower |
 | Processing Level | The hardness or tier an installed part lets the machine handle. Shown as **Hardness** on the Crusher. Set by Crush Heads, Reactor Chambers, and Disassembly Heads; affixes never raise it. | [Crusher](crusher.md), [Melter](melter.md), [Potential Reactor](potential-reactor.md), [Component Recycler](component-recycler.md), and others with a level gate. | Higher |
 | Batch Size | How many items from one input stack the machine works in a single cycle. Each item still pays its own FE and earns its own XP. Starts at 1, up to 16. | [Crusher](crusher.md), [Melter](melter.md), [Metal Press](metal-press.md), [Resonance Calibrator](resonance-calibrator.md). | Higher |
@@ -153,7 +153,7 @@ All of these are better higher. See [Solar Panel](solar-panel.md).
 
 ## Mastery attributes
 
-**Control**, **Drive**, and **Reserve** are Machine Mastery attributes: precision, actuation, and capacity. Each machine family turns its points into its own stats, such as speed or buffer size. See [Machine Mastery](machine-mastery.md). On a Tool Rod, Control also spends FE to protect durability.
+**Control**, **Drive**, and **Reserve** are Machine Mastery attributes: precision, actuation, and capacity. Points come from the Mastery tree and from [attribute suffixes](rarity-and-affixes.md#attribute-suffixes) on the machine and its Gear. Each machine family turns its points into its own stats, such as speed or buffer size. See [Machine Mastery](machine-mastery.md). On a Tool Rod, Control also spends FE to protect durability.
 
 ## Tools and companions
 

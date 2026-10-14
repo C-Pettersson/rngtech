@@ -201,7 +201,7 @@ public class AlloyFurnaceBlockEntity extends BaseMachineBlockEntity implements M
             AlloyFurnaceRecipe recipe = nextRecipe();
             MachineStatAccumulator stats = routeStats(recipe, effectiveStats());
             return switch (index) {
-                case DATA_PROGRESS -> progress;
+                case DATA_PROGRESS -> syncedProgress(0, progress);
                 case DATA_PROCESSING_TICKS -> currentProcessingTicks(recipe, stats);
                 case DATA_ENERGY -> energyStored();
                 case DATA_ENERGY_CAPACITY -> energyCapacity();
@@ -323,6 +323,7 @@ public class AlloyFurnaceBlockEntity extends BaseMachineBlockEntity implements M
         if (furnace.progress == 0 && ProcessingChance.rollInstant(level, stats)) {
             int fullEnergyCost = furnace.energyCostPerCraft(recipe, stats);
             if (furnace.consumeWorkingEnergy(fullEnergyCost, true) >= fullEnergyCost) {
+                furnace.markInstantProcess();
                 furnace.startCycleIfNeeded(recipe);
                 furnace.consumeWorkingEnergy(fullEnergyCost, false);
                 if (furnace.process(recipe, stats)) {
@@ -483,10 +484,11 @@ public class AlloyFurnaceBlockEntity extends BaseMachineBlockEntity implements M
     protected MachineStatAccumulator buildStats() {
         MachineStatAccumulator stats = MachineBaseStatCatalog.alloyFurnace(chassis());
         stats.apply(activeTraits());
-        MegaPassiveTree.applyStats(stats, machineProgression(), MachineMasteryFamily.ALLOY_FURNACE);
+        MegaPassiveTree.applyNodeStats(stats, machineProgression(), MachineMasteryFamily.ALLOY_FURNACE);
         applyGearStats(stats, heatCoreStack());
         applyGearStats(stats, crucibleStack());
         applyGearStats(stats, servoStack());
+        MegaPassiveTree.applyAttributeStats(stats, machineProgression(), MachineMasteryFamily.ALLOY_FURNACE);
         if (!hasBatteryCell()) {
             stats.apply(MachineStatAccumulator.NO_BATTERY_SOURCE, new MachineModifier(
                     ModifierSlot.IMPLICIT,
@@ -1164,7 +1166,7 @@ public class AlloyFurnaceBlockEntity extends BaseMachineBlockEntity implements M
     }
 
     private void cool(MachineStatAccumulator stats) {
-        currentTemperature = Math.max(HeatControl.AMBIENT_TEMPERATURE, currentTemperature - HeatControl.coolingRate(stats));
+        currentTemperature = Math.max(HeatControl.AMBIENT_TEMPERATURE, currentTemperature - HeatControl.coolingStep(stats, level == null ? 0L : level.getGameTime()));
         if (currentTemperature <= HeatControl.AMBIENT_TEMPERATURE) {
             clearHeatEnvelope();
         }
@@ -1204,6 +1206,9 @@ public class AlloyFurnaceBlockEntity extends BaseMachineBlockEntity implements M
                 recipe.requiredTemperatureStability(),
                 stats
         );
+        if (hasMasteryBehavior("QUENCH_PROTOCOL")) {
+            addedStrain = HeatControl.quenched(addedStrain);
+        }
         if (addedStrain > 0) {
             failureStrain = Math.min(HeatControl.FAILURE_STRAIN_THRESHOLD, failureStrain + addedStrain);
             return;
@@ -1294,6 +1299,7 @@ public class AlloyFurnaceBlockEntity extends BaseMachineBlockEntity implements M
     private void applyGearStats(MachineStatAccumulator stats, ItemStack stack) {
         if (stack.getItem() instanceof MachinePartItem) {
             ComponentBaseStatCatalog.applyEffectiveContribution(stats, stack);
+            ComponentBaseStatCatalog.applyAttributeAffixes(stats, stack);
         }
     }
 

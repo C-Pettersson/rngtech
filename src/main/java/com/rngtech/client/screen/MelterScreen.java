@@ -367,7 +367,7 @@ public class MelterScreen extends AbstractContainerScreen<MelterMenu> {
                 y + PROGRESS_Y + 1,
                 x + PROGRESS_X + 1 + Math.round((PROGRESS_WIDTH - 2) * menu.processingProgress()),
                 y + PROGRESS_Y + PROGRESS_HEIGHT - 1,
-                PROGRESS
+                (menu.instantFlash() ? MachineScreenStyle.INSTANT_FLASH : PROGRESS)
         );
 
         guiGraphics.fill(x + ENERGY_BAR_X, y + BAR_Y, x + ENERGY_BAR_X + BAR_WIDTH, y + BAR_Y + BAR_HEIGHT, 0xFF5F5F5F);

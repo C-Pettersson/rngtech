@@ -426,7 +426,8 @@ public class FurnaceScreen extends AbstractContainerScreen<FurnaceMenu> {
         int y = topPos;
         if (menu.activeProcessingSlots() == 1) {
             guiGraphics.fill(x + 86, y + 51, x + 155, y + 59, 0xFF5F5F5F);
-            guiGraphics.fill(x + 87, y + 52, x + 87 + Math.round(67 * menu.processingProgress()), y + 58, PROGRESS);
+            guiGraphics.fill(x + 87, y + 52, x + 87 + Math.round(67 * menu.processingProgress()), y + 58,
+                    menu.instantFlash(0) ? MachineScreenStyle.INSTANT_FLASH : PROGRESS);
             renderLedgerBar(guiGraphics, 0, 58);
         } else {
             for (int lane = 0; lane < menu.activeProcessingSlots(); lane++) {
@@ -437,7 +438,7 @@ public class FurnaceScreen extends AbstractContainerScreen<FurnaceMenu> {
                         y + barY + 1,
                         x + 87 + Math.round(67 * menu.processingProgress(lane)),
                         y + barY + 4,
-                        PROGRESS
+                        menu.instantFlash(lane) ? MachineScreenStyle.INSTANT_FLASH : PROGRESS
                 );
                 renderLedgerBar(guiGraphics, lane, barY + 4);
             }

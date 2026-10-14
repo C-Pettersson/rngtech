@@ -26,5 +26,7 @@ public enum ModifierCapability {
     HAS_SOLAR_ARRAY,
     HAS_SOLAR_PANEL,
     HAS_CRUSHER_SPECIALS,
-    HAS_MINERS_COMPANION
+    HAS_MINERS_COMPANION,
+    /** Gear and bodies of machines with Machine Mastery, which can roll Control, Drive, and Reserve. */
+    HAS_MASTERY_ATTRIBUTES
 }

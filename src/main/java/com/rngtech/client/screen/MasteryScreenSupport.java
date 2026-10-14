@@ -358,7 +358,11 @@ public final class MasteryScreenSupport<N extends PassiveNode> {
     ) {
         int tool = toolbarIndex(leftPos, topPos, mouseX, mouseY);
         if (tool >= 0) {
-            guiGraphics.renderComponentTooltip(font, List.of(Component.translatable("rngtech.mastery.toolbar." + tool)), mouseX, mouseY);
+            List<Component> tooltip = new ArrayList<>(List.of(Component.translatable("rngtech.mastery.toolbar." + tool)));
+            if (tool == 3 && view.masterySnapshot().freeReset()) {
+                tooltip.add(Component.translatable("rngtech.mastery.toolbar.free_reset").withStyle(ChatFormatting.GREEN));
+            }
+            guiGraphics.renderComponentTooltip(font, tooltip, mouseX, mouseY);
             return;
         }
         if (!searchFocused && isOverSearch(leftPos, topPos, imageWidth, mouseX, mouseY)) {
@@ -1028,8 +1032,17 @@ public final class MasteryScreenSupport<N extends PassiveNode> {
                 if (shared.id().equals(view.masteryFamily().startNodeId())) {
                     for (var attribute : List.of(MachineStat.CONTROL, MachineStat.DRIVE, MachineStat.RESERVE)) {
                         tooltip.add(Component.translatable("rngtech.mastery.attribute_total", Component.translatable(attribute.translationKey()), MachineStatDisplay.formatNumber(view.masteryAttribute(attribute))).withStyle(ChatFormatting.AQUA));
+                        if (Screen.hasShiftDown()) {
+                            attributeSources(tooltip, attribute);
+                        }
+                    }
+                    if (!Screen.hasShiftDown()) {
+                        tooltip.add(Component.translatable("rngtech.mastery.attribute_sources_hint").withStyle(ChatFormatting.DARK_GRAY));
                     }
                     tooltip.add(Component.translatable("rngtech.mastery.tooltip.unlocked").withStyle(ChatFormatting.GREEN));
+                    if (view.masterySnapshot().freeReset()) {
+                        tooltip.add(Component.translatable("rngtech.mastery.free_reset").withStyle(ChatFormatting.GREEN));
+                    }
                     if (ascendancy.available()) {
                         tooltip.add(Component.translatable("rngtech.mastery.ascendancy.start_hint").withStyle(ChatFormatting.GOLD));
                     }
@@ -1166,6 +1179,17 @@ public final class MasteryScreenSupport<N extends PassiveNode> {
         return best;
     }
 
+    /** Where an attribute's points come from and how they combine, from the server breakdown, while Shift is held. */
+    static void attributeSources(List<Component> tooltip, MachineStat attribute) {
+        if (!Screen.hasShiftDown()) {
+            tooltip.add(Component.translatable("rngtech.mastery.attribute_sources_hint").withStyle(ChatFormatting.DARK_GRAY));
+            return;
+        }
+        List<Component> breakdown = StatBreakdownCache.tooltip(attribute);
+        // The first line repeats the attribute name.
+        tooltip.addAll(breakdown.size() > 1 ? breakdown.subList(1, breakdown.size()) : breakdown);
+    }
+
     /** The Ascendancy crest sits beside the start node, at the upper right unless links or nodes need that space. */
     private Badge badge(int leftPos, int topPos) {
         int starterPosition = position(starter);
@@ -1233,7 +1257,9 @@ public final class MasteryScreenSupport<N extends PassiveNode> {
         String[] labels = {"C", "P", snapshot.following() ? "||" : ">", "X", "H", "F", "R"};
         for (int i = 0; i < labels.length; i++) {
             int x = left + 8 + i * 20;
-            graphics.fill(x, top + 42, x + 18, top + 54, i == 6 && highlightRelevant ? 0xFF596035 : 0xFF343E49);
+            // Relevance highlighting lights R; an unused free Full Reset lights X (Clear) green.
+            boolean lit = i == 6 && highlightRelevant || i == 3 && snapshot.freeReset();
+            graphics.fill(x, top + 42, x + 18, top + 54, lit ? 0xFF596035 : 0xFF343E49);
             graphics.drawString(font, labels[i], x + 5, top + 44, 0xFFE7DDC0, false);
         }
         int searchLeft = left + MASTERY_SEARCH_X;

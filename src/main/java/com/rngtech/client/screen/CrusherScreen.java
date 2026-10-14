@@ -364,7 +364,7 @@ public class CrusherScreen extends AbstractContainerScreen<CrusherMenu> {
         }
 
         guiGraphics.fill(x + 86, y + 51, x + 155, y + 59, 0xFF5F5F5F);
-        guiGraphics.fill(x + 87, y + 52, x + 87 + Math.round(67 * menu.processingProgress()), y + 58, PROGRESS);
+        guiGraphics.fill(x + 87, y + 52, x + 87 + Math.round(67 * menu.processingProgress()), y + 58, (menu.instantFlash() ? MachineScreenStyle.INSTANT_FLASH : PROGRESS));
 
         guiGraphics.fill(x + 22, y + 28, x + 32, y + 78, 0xFF5F5F5F);
         int energyHeight = Math.round(48 * menu.energyProgress());

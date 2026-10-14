@@ -11,6 +11,8 @@ import java.util.Locale;
 public enum MachineTag {
     /** Furnace, Alloy Furnace, and Metal Press: heat machines whose maximum temperature accepts absolute limits. */
     HEATED,
+    /** The Furnace alone: the heat machine with recipes below the lowest heat limits. */
+    SMELTING,
     CRUSHING,
     /** Machines that can produce bonus output through Output Amount, Super Output, or salvage. */
     BONUS_OUTPUT,

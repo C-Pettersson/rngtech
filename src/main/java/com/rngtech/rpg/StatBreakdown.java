@@ -34,13 +34,16 @@ public record StatBreakdown(MachineStat stat, List<Term> terms, double finalValu
         CEILING,
         SOFT_CAP,
         FLOOR,
-        BONUS_MORE;
+        BONUS_MORE,
+        /** The increased and reduced bucket is converted into another stat and no longer scales this one. */
+        CONVERTED;
 
         static final StreamCodec<ByteBuf, Kind> STREAM_CODEC =
                 ByteBufCodecs.idMapper(index -> values()[index], Kind::ordinal);
     }
 
-    public record Term(Kind kind, double value, Component source) {
+    /** One contribution; {@code target} is the stat a {@link Kind#CONVERTED} term feeds, as its ordinal, or -1. */
+    public record Term(Kind kind, double value, Component source, int target) {
         public static final StreamCodec<RegistryFriendlyByteBuf, Term> STREAM_CODEC = StreamCodec.composite(
                 Kind.STREAM_CODEC,
                 Term::kind,
@@ -48,8 +51,19 @@ public record StatBreakdown(MachineStat stat, List<Term> terms, double finalValu
                 Term::value,
                 ComponentSerialization.TRUSTED_STREAM_CODEC,
                 Term::source,
+                ByteBufCodecs.VAR_INT,
+                Term::target,
                 Term::new
         );
+
+        public Term(Kind kind, double value, Component source) {
+            this(kind, value, source, -1);
+        }
+
+        /** The stat a conversion feeds, or null for every other term. */
+        public MachineStat targetStat() {
+            return target >= 0 && target < MachineStat.values().length ? MachineStat.byId(target) : null;
+        }
     }
 
     public List<Term> terms(Kind kind) {
@@ -110,8 +124,9 @@ public record StatBreakdown(MachineStat stat, List<Term> terms, double finalValu
 
     /** The increased bucket after this stat's soft cap, or the bucket itself when it has none. */
     public double paidIncreasedPercent() {
+        double increased = terms(Kind.CONVERTED).isEmpty() ? increasedPercent() : 0.0;
         Term cap = lowest(Kind.SOFT_CAP);
-        return cap == null ? increasedPercent() : MachineStatAccumulator.softCapped(increasedPercent(), cap.value());
+        return cap == null ? increased : MachineStatAccumulator.softCapped(increased, cap.value());
     }
 
     public boolean dividesReductions() {

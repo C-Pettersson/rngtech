@@ -454,7 +454,7 @@ public class ForestryCartEntity extends AbstractMinecart implements MenuProvider
     }
 
     public MachineStatAccumulator effectiveStats() {
-        return ForestryCartItem.effectiveStats(machineTraits, machineProgression);
+        return ForestryCartItem.effectiveStats(machineTraits, machineProgression, hasPump() ? pumpStack() : ItemStack.EMPTY);
     }
 
     private int coreStatPoints(MachineStat stat) {
@@ -500,7 +500,7 @@ public class ForestryCartEntity extends AbstractMinecart implements MenuProvider
 
     public int maxManagedCells() {
         return BASE_MAX_MANAGED_CELLS + ForestryCompanionPassiveTree.managedCellBonus(machineProgression)
-                + (MegaPassiveTree.has(machineProgression, "NO_INHERENT_ATTRIBUTES") ? 0 : coreStatPoints(MachineStat.RESERVE) / 4);
+                + (MegaPassiveTree.suppressesInherent(MegaPassiveTree.behaviors(machineProgression), MachineStat.RESERVE) ? 0 : coreStatPoints(MachineStat.RESERVE) / 4);
     }
 
     public boolean manualSpeedUnlocked() {

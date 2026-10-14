@@ -5,7 +5,9 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 /** Tooltip lines that show how a {@link StatBreakdown} reaches its final value, one labelled source per line. */
 public final class StatBreakdownText {
@@ -20,7 +22,7 @@ public final class StatBreakdownText {
         lines.add(Component.translatable(
                 "rngtech.stat.breakdown.title",
                 Component.translatable(stat.translationKey()),
-                amount(stat, breakdown.finalValue())
+                isRate(stat) ? MachineStatDisplay.statValue(stat, breakdown.finalValue()) : amount(stat, breakdown.finalValue())
         ));
         if (stat == MachineStat.ENERGY_GENERATION) {
             lines.add(Component.translatable("rngtech.stat.breakdown.generation_multiplier").withStyle(ChatFormatting.DARK_GRAY));
@@ -28,26 +30,37 @@ public final class StatBreakdownText {
 
         double base = breakdown.base();
         if (Math.abs(base) > EPSILON) {
-            lines.add(header("rngtech.stat.breakdown.base", amount(stat, base)));
+            lines.add(header(isRate(stat) ? "rngtech.stat.breakdown.chassis_base" : "rngtech.stat.breakdown.base", amount(stat, base)));
         }
         section(lines, breakdown, StatBreakdown.Kind.ADD, "rngtech.stat.breakdown.added", signedAmount(stat, breakdown.added()));
-        section(
-                lines,
-                breakdown,
-                StatBreakdown.Kind.INCREASED,
-                "rngtech.stat.breakdown.increased",
-                MachineStatDisplay.formatSignedPercentPoints(breakdown.increasedPercent())
-        );
-        softCap(lines, breakdown);
+        StatBreakdown.Term converted = breakdown.lowest(StatBreakdown.Kind.CONVERTED);
+        if (converted == null) {
+            section(
+                    lines,
+                    breakdown,
+                    StatBreakdown.Kind.INCREASED,
+                    "rngtech.stat.breakdown.increased",
+                    MachineStatDisplay.formatSignedPercentPoints(breakdown.increasedPercent())
+            );
+            softCap(lines, breakdown);
+        } else if (breakdown.increasedPercent() != 0.0) {
+            // The converted bucket is listed under the stat it now feeds, not here as well.
+            MachineStat target = converted.targetStat();
+            double fed = breakdown.increasedPercent() * converted.value();
+            lines.add(Component.translatable("rngtech.stat.breakdown.converted", converted.source(),
+                    MachineStatDisplay.formatSignedPercentPoints(breakdown.increasedPercent()), Component.translatable(stat.translationKey()),
+                    target == null ? MachineStatDisplay.formatSignedNumber(fed) : MachineStatDisplay.formatAdditiveEffectValue(target, fed),
+                    target == null ? Component.empty() : Component.translatable(target.translationKey())).withStyle(ChatFormatting.GOLD));
+        }
         section(lines, breakdown, StatBreakdown.Kind.MORE, "rngtech.stat.breakdown.more", factor(breakdown.more()));
 
         if (hasScaling(breakdown)) {
             lines.add(Component.translatable(
                     "rngtech.stat.breakdown.formula",
-                    amount(stat, base + breakdown.added()),
-                    factor(breakdown.increasedScale()),
-                    factor(breakdown.more()),
-                    amount(stat, breakdown.ordinary())
+                    operand(stat, base + breakdown.added()),
+                    MachineStatDisplay.formatNumber(breakdown.increasedScale()),
+                    MachineStatDisplay.formatNumber(breakdown.more()),
+                    result(stat, breakdown.ordinary())
             ).withStyle(ChatFormatting.GRAY));
         }
         if (breakdown.dividesReductions() && breakdown.reductionsPercent() > 0.0) {
@@ -116,13 +129,25 @@ public final class StatBreakdownText {
             return;
         }
         lines.add(header(headerKey, total));
+        // Terms from identically named sources, such as dozens of +2 Drive travel nodes, combine into one line.
+        Map<String, List<StatBreakdown.Term>> bySource = new LinkedHashMap<>();
         for (StatBreakdown.Term term : terms) {
+            bySource.computeIfAbsent(term.source().getString(), ignored -> new ArrayList<>()).add(term);
+        }
+        for (List<StatBreakdown.Term> group : bySource.values()) {
+            double combined = kind == StatBreakdown.Kind.ADD || kind == StatBreakdown.Kind.INCREASED
+                    ? group.stream().mapToDouble(StatBreakdown.Term::value).sum()
+                    : group.stream().mapToDouble(StatBreakdown.Term::value).reduce(1.0, (a, b) -> a * b);
             String value = switch (kind) {
-                case ADD -> signedAmount(breakdown.stat(), term.value());
-                case INCREASED -> MachineStatDisplay.formatSignedPercentPoints(term.value());
-                default -> factor(term.value());
+                case ADD -> signedAmount(breakdown.stat(), combined);
+                case INCREASED -> MachineStatDisplay.formatSignedPercentPoints(combined);
+                default -> factor(combined);
             };
-            lines.add(Component.literal("  " + value + "  ").append(term.source().copy().withStyle(ChatFormatting.GRAY)));
+            MutableComponent line = Component.literal("  " + value + "  ").append(group.getFirst().source().copy().withStyle(ChatFormatting.GRAY));
+            if (group.size() > 1) {
+                line.append(Component.literal(" ×" + group.size()).withStyle(ChatFormatting.DARK_GRAY));
+            }
+            lines.add(line);
         }
     }
 
@@ -143,9 +168,28 @@ public final class StatBreakdownText {
 
     /** Energy Generation is a multiplier in the accumulator, so it skips the FE/t unit of its displayed row. */
     private static String amount(MachineStat stat, double value) {
+        if (isRate(stat)) {
+            return factor(value);
+        }
         return stat == MachineStat.ENERGY_GENERATION
                 ? MachineStatDisplay.formatNumber(value)
                 : MachineStatDisplay.statValue(stat, value);
+    }
+
+    /** Stats shown as a multiplier on a listed time, like attack speed: the math multiplies a chassis base. */
+    private static boolean isRate(MachineStat stat) {
+        return stat == MachineStat.PROCESSING_SPEED;
+    }
+
+    /** A multiplier stat enters the formula as its factor, so ×1.2 reads as 1.2 rather than +20%. */
+    private static String operand(MachineStat stat, double value) {
+        return MachineStatDisplay.isMultiplier(stat) ? MachineStatDisplay.formatNumber(value) : amount(stat, value);
+    }
+
+    private static String result(MachineStat stat, double value) {
+        return MachineStatDisplay.isMultiplier(stat)
+                ? MachineStatDisplay.formatNumber(value) + " (" + MachineStatDisplay.statValue(stat, value) + ")"
+                : amount(stat, value);
     }
 
     private static String signedAmount(MachineStat stat, double value) {

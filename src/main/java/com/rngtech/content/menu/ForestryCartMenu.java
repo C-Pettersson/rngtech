@@ -6,6 +6,7 @@ import com.rngtech.content.item.FluidConnectorItem;
 import com.rngtech.content.item.ItemConnectorItem;
 import com.rngtech.content.registry.ModMenus;
 import com.rngtech.rpg.MachineStat;
+import com.rngtech.rpg.MachineStatAccumulator;
 import com.rngtech.rpg.progression.ForestryCompanionPassiveTree;
 import com.rngtech.rpg.progression.MachineMasteryFamily;
 import com.rngtech.rpg.progression.MachineMasteryHost;
@@ -30,7 +31,7 @@ import net.neoforged.neoforge.items.SlotItemHandler;
 import java.util.List;
 import java.util.function.BooleanSupplier;
 
-public class ForestryCartMenu extends AbstractContainerMenu implements MasteryMenuView<MegaPassiveNode> {
+public class ForestryCartMenu extends AbstractContainerMenu implements MasteryMenuView<MegaPassiveNode>, StatBreakdownMenu {
     public static final int TAB_CART = 0;
     public static final int TAB_STATS = 1;
     public static final int TAB_MASTERY = 2;
@@ -466,6 +467,11 @@ public class ForestryCartMenu extends AbstractContainerMenu implements MasteryMe
             return cart.resetManagedCells();
         }
         return false;
+    }
+
+    @Override
+    public MachineStatAccumulator breakdownStats() {
+        return cart.effectiveStats();
     }
 
     @Override

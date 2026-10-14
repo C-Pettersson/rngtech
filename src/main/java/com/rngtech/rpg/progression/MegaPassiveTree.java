@@ -21,13 +21,19 @@ import java.util.Set;
 import java.util.function.Predicate;
 
 public final class MegaPassiveTree {
-    public static final int VERSION = 2;
+    public static final int VERSION = 3;
     /** Levels grant 99 points; the remaining capacity is reserved for future non-level point sources. */
     public static final int MAX_ALLOCATIONS = 120;
-    /** Disabled bonus output: Output Amount cannot exceed the base 1x, and duplication chances drop to zero. */
-    public static final Map<MachineStat, Double> NO_BONUS_OUTPUT_CEILINGS = Map.of(
-            MachineStat.OUTPUT_AMOUNT, 1.0, MachineStat.SUPER_OUTPUT_CHANCE, 0.0, MachineStat.CRUSHER_SALVAGE_CHANCE, 0.0);
+    /** Surge Cycling: Instant Process chance, in percent, for each 1% increased Processing Speed it converts. */
+    public static final double SURGE_CYCLING_RATE = 0.3;
+    /**
+     * Disabled bonus output: Output Amount cannot exceed the base 1x, and duplication chances drop to zero. Every stat
+     * declared as output yield also drops to zero, and {@link #behaviors} drops behaviors declared as output yield.
+     */
+    public static final Map<MachineStat, Double> NO_BONUS_OUTPUT_CEILINGS = noBonusOutputCeilings();
     private static final Map<String, MegaPassiveNode> CATALOG = load();
+    /** Node renames and drops from each older catalog version, from {@code migrations.json}. */
+    private static final Map<Integer, Migration> MIGRATIONS = loadMigrations();
     public static final PassiveTree<MegaPassiveNode> TREE = new PassiveTree<>(List.copyOf(CATALOG.values()));
 
     private MegaPassiveTree() { }
@@ -53,15 +59,31 @@ public final class MegaPassiveTree {
         return sources;
     }
 
-    /** Every behavior granted by allocated shared-tree and ascendancy nodes. */
+    /** Every behavior granted by allocated shared-tree and ascendancy nodes; disabled bonus output removes output yield. */
     public static Set<String> behaviors(MachineProgressionState state) {
         Set<String> behaviors = new HashSet<>();
         sources(state).forEach(source -> behaviors.addAll(source.behaviors()));
+        if (behaviors.contains("NO_BONUS_OUTPUT")) {
+            behaviors.removeIf(behavior -> MasteryDeclarations.yield(behavior) == MasteryDeclarations.Yield.OUTPUT);
+        }
         return Set.copyOf(behaviors);
     }
 
     public static boolean has(MachineProgressionState state, String behavior) {
-        return sources(state).stream().anyMatch(source -> source.behaviors().contains(behavior));
+        return behaviors(state).contains(behavior);
+    }
+
+    private static Map<MachineStat, Double> noBonusOutputCeilings() {
+        Map<MachineStat, Double> ceilings = new LinkedHashMap<>();
+        ceilings.put(MachineStat.OUTPUT_AMOUNT, 1.0);
+        ceilings.put(MachineStat.SUPER_OUTPUT_CHANCE, 0.0);
+        ceilings.put(MachineStat.CRUSHER_SALVAGE_CHANCE, 0.0);
+        for (MachineStat stat : MachineStat.values()) {
+            if (MasteryDeclarations.declared(stat) && MasteryDeclarations.yield(stat) == MasteryDeclarations.Yield.OUTPUT) {
+                ceilings.put(stat, 0.0);
+            }
+        }
+        return Map.copyOf(ceilings);
     }
 
     public static int passive(MachineProgressionState state, PassiveStatType stat) {
@@ -181,7 +203,17 @@ public final class MegaPassiveTree {
         return state;
     }
 
+    /** The whole Mastery contribution for a machine with no Gear attributes; see {@link #applyNodeStats}. */
     public static void applyStats(MachineStatAccumulator stats, MachineProgressionState state, MachineMasteryFamily family) {
+        applyNodeStats(stats, state, family);
+        applyAttributeStats(stats, state, family);
+    }
+
+    /**
+     * Inherent attribute points and allocated node effects. A machine applies its Gear after this and then calls
+     * {@link #applyAttributeStats}, so attribute points rolled on Gear feed the conversions and explicit scaling.
+     */
+    public static void applyNodeStats(MachineStatAccumulator stats, MachineProgressionState state, MachineMasteryFamily family) {
         double[] base = switch (family) {
             case CRUSHER -> new double[] {0, 20, 0};
             case FURNACE, ALLOY_FURNACE -> new double[] {0, 10, 10};
@@ -213,8 +245,19 @@ public final class MegaPassiveTree {
                 NO_BONUS_OUTPUT_CEILINGS.forEach((stat, value) -> { if (family.supportsAbsolute(stat)) { stats.capAbsolute(stat, value); } });
             }
         }
-        if (!has(state, "NO_INHERENT_ATTRIBUTES")) {
-            for (Conversion conversion : inherentConversions(family, stats.value(MachineStat.CONTROL), stats.value(MachineStat.DRIVE), stats.value(MachineStat.RESERVE))) {
+        if (has(state, "SURGE_CYCLING") && family.supportsBehavior("SURGE_CYCLING")) {
+            try (MachineStatAccumulator.Source ignored = stats.source(behaviorSource(allocated, "SURGE_CYCLING"))) {
+                stats.convertIncreased(MachineStat.PROCESSING_SPEED, MachineStat.INSTANT_PROCESS_CHANCE, SURGE_CYCLING_RATE);
+            }
+        }
+    }
+
+    /** Inherent conversions and explicit scaling, read from the attribute totals the machine has reached so far. */
+    public static void applyAttributeStats(MachineStatAccumulator stats, MachineProgressionState state, MachineMasteryFamily family) {
+        List<MasteryEffectSource> allocated = sources(state, family);
+        Set<String> behaviors = behaviors(state);
+        for (Conversion conversion : inherentConversions(family, stats.value(MachineStat.CONTROL), stats.value(MachineStat.DRIVE), stats.value(MachineStat.RESERVE))) {
+            if (!suppressesInherent(behaviors, conversion.attribute())) {
                 MachineModifierEffect effect = conversion.effect();
                 try (MachineStatAccumulator.Source ignored = stats.source(Component.translatable(
                         "rngtech.stat.breakdown.source.attribute", Component.translatable(conversion.attribute().translationKey())))) {
@@ -234,6 +277,50 @@ public final class MegaPassiveTree {
                 }
             }
         }
+    }
+
+    /**
+     * Whether {@code attribute} loses its inherent conversions: every attribute under {@code NO_INHERENT_ATTRIBUTES}, or
+     * one attribute under {@code NO_INHERENT_CONTROL}, {@code NO_INHERENT_DRIVE}, or {@code NO_INHERENT_RESERVE}.
+     */
+    public static boolean suppressesInherent(Set<String> behaviors, MachineStat attribute) {
+        return behaviors.contains("NO_INHERENT_ATTRIBUTES") || behaviors.contains("NO_INHERENT_" + attribute.name());
+    }
+
+    /** How an older catalog version's node IDs map onto this one: a rename keeps the node's position. */
+    private record Migration(Map<String, String> renamed, Set<String> dropped) {
+    }
+
+    /** Whether nodes saved under {@code version} can be carried into this catalog. */
+    public static boolean migrates(int version) {
+        return version == VERSION || MIGRATIONS.containsKey(version);
+    }
+
+    /**
+     * {@code nodes} from catalog {@code version} in this catalog's IDs. Renamed nodes keep their place, dropped nodes are
+     * left out, and an unknown version keeps nothing. Callers salvage the result, so a build cut by a dropped node stops
+     * there.
+     */
+    public static List<String> migrate(int version, List<String> nodes) {
+        if (version == VERSION) { return nodes; }
+        Migration migration = MIGRATIONS.get(version);
+        if (migration == null) { return List.of(); }
+        return nodes.stream().filter(id -> !migration.dropped().contains(id)).map(id -> migration.renamed().getOrDefault(id, id)).toList();
+    }
+
+    private static Map<Integer, Migration> loadMigrations() {
+        JsonObject data = MasteryNodeJson.resource("/data/rngtech/mastery/migrations.json");
+        Map<Integer, Migration> migrations = new HashMap<>();
+        if (data == null) { return migrations; }
+        data.getAsJsonObject("migrations").entrySet().forEach(entry -> {
+            JsonObject raw = entry.getValue().getAsJsonObject();
+            Map<String, String> renamed = new HashMap<>();
+            raw.getAsJsonObject("renamed").entrySet().forEach(rename -> renamed.put(rename.getKey(), rename.getValue().getAsString()));
+            Set<String> dropped = new HashSet<>();
+            MasteryNodeJson.array(raw, "dropped").forEach(id -> dropped.add(id.getAsString()));
+            migrations.put(Integer.parseInt(entry.getKey()), new Migration(Map.copyOf(renamed), Set.copyOf(dropped)));
+        });
+        return Map.copyOf(migrations);
     }
 
     /** The allocated node that grants {@code behavior}, as a stat breakdown source label. */

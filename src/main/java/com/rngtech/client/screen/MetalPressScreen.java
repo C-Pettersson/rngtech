@@ -390,7 +390,7 @@ public class MetalPressScreen extends AbstractContainerScreen<MetalPressMenu> {
                 y + PROGRESS_BAR_Y + 1,
                 x + PROGRESS_BAR_X + 1 + Math.round((PROGRESS_BAR_WIDTH - 2) * menu.processingProgress()),
                 y + PROGRESS_BAR_Y + PROGRESS_BAR_HEIGHT - 1,
-                PROGRESS
+                (menu.instantFlash() ? MachineScreenStyle.INSTANT_FLASH : PROGRESS)
         );
         float ledger = menu.ledgerProgress();
         if (ledger >= 0.0F) {

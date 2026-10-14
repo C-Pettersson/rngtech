@@ -13,7 +13,7 @@
     "count": 3,
     "id": "rngtech:crushed_tin"
   },
-  "processing_ticks": 200,
+  "processing_ticks": 100,
   "energy": 9600,
   "required_processing_level": 2,
   "machine_xp": 2

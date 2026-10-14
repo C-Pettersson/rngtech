@@ -61,6 +61,8 @@ Mine a placed Furnace with a pickaxe. It drops itself and keeps its rolled trait
 
 Put items in the top input slot. The Furnace heats up at a rate set by its Heat Transfer and Warmup Time stats, and starts smelting only once the lane reaches the recipe's target temperature. While the lane is blocked, out of input, or out of power, it cools down.
 
+Each metal smelts at its own pace: low-melting Lead and Tin in half the time of Iron, high-melting Osmium, Titanium, and Tungsten in two and a half to four times as long. The FE per smelt does not change.
+
 Heat decides your progress. Unmodified electric chassis reach about:
 
 | Heat Core | Max temperature | Unlocks |
@@ -129,6 +131,13 @@ Two keystones cap your heat in exchange for speed or savings. Each cap only stop
 - **Flash Annealing** caps Max Temperature at 1,000 heat. It gives 100% more Processing Speed, with 50% more Energy Usage and 50% less Fuel Efficiency. An electric Furnace smelts twice as fast, and each smelt costs 1.5 times the FE. A Stage 0 Furnace smelts twice as fast for the same fuel per smelt.
 - **Low Heat Specialist** caps Max Temperature at 800 heat, enough for Iron and Copper. It gives 50% less Energy Usage and 100% more Fuel Efficiency, so each smelt costs half the FE or fuel at the same speed.
 
+Other Furnace keystones:
+
+- **Quench Protocol** halves temperature failure strain, for 25% less Heat Transfer.
+- **Closed Loop Recuperator** returns 25% of each electric smelt's FE to the internal buffer, for 15% less Processing Speed.
+- **Thermal Reservoir** gives 60% less Cooling Rate, so the Furnace keeps its heat between jobs, but 25% more Warmup Time from cold.
+- **High Flux** gives 100% more Heat Transfer for 25% more Energy Usage and 40% less Fuel Duration.
+
 ### Furnace recipes
 
 The Furnace uses its own recipe type, `rngtech:furnace`, which covers vanilla smelting as well as RNGTech metals, alloy blends, and malformed-ingot recovery.
@@ -170,7 +179,7 @@ Every node in this machine's ascendancies. See [Machine Mastery](machine-mastery
 | **Patient Bloom** | Deep notable | Slow Growth | 50% more Ledger Rate; 30% less Processing Speed. |
 | Flux Bed | Small | Bloom Ledger | 8% increased Temperature Stability. |
 | **Fluxed Blend** | Notable | Flux Bed | Blend smelts need 100 °C less. |
-| Skimmed Slag | Small | Bloom Ledger | 8% increased Stability. |
+| Skimmed Slag | Small | Bloom Ledger | 8% increased Temperature Stability. |
 | **Slag Reclaim** | Notable | Skimmed Slag | Malformed-ingot recovery takes half the time and half the FE. |
 | Clean Pour | Small | Slag Reclaim | 8% increased Temperature Stability. |
 | **Clean Bloom** | Deep notable | Clean Pour | Ore, raw, and crushed smelts never produce failure outputs. Low stability pauses the lane instead. |

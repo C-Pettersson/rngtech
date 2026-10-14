@@ -117,6 +117,7 @@ Process screens should stay compact and readable.
 - For fluid-capable Process screens, bucket or other fluid-container slots should sit directly below their corresponding fluid meter or bar, centered on that meter when space allows.
 - Fluid tanks that can trap a wrong fluid should expose a small purge control beside the visible tank meter. Purging voids up to `1000 mB`, never returns fluid, and should identify the tank and current fluid in hover text.
 - Keep inappropriate machine concepts out of the view. A Crusher does not display generation, burn time, or fuel text.
+- A job that finishes through Instant Process flashes its progress bar full and gold for half a second, so a skipped job is visible without text.
 
 ## Fluid Purging
 
@@ -164,6 +165,7 @@ Design intent and balance rules behind shipped machines that the code does not s
 - Stage 0 Gear, such as the Flint Crush Head, is disposable starter tooling. Gear above Stage 0 is a long-term investment.
 - Machine Frame tier is a recipe cost only. It adds no stats, traits, or refinement behavior.
 - Stage 5-8 material-form recipes on the Crusher and Furnace author `2x`, `3x`, `4x`, and `6x` the early FE baseline. The Crusher high-hardness and Furnace high-heat surcharges stack on top of that ramp.
+- Ore-line times follow the metal, not the stage: crushing (ore, raw, and crushed-to-dust) scales with hardness and smelting (ore, raw, crushed, and dust) with melting point, against an Iron and Copper baseline. Lead and Tin run at `0.5x`; Zinc `0.75x`; Gold and Silver crush at `0.75x`; Aluminum smelts at `0.75x`; Nickel `1.25x`; Platinum `1.5x`; Osmium crushes at `2x` and smelts at `2.5x`; Titanium and Netherite `3x`; Tungsten crushes at `3x` and smelts at `4x`; Naquadah `4x`. Titanium is slower than its melting point suggests because it is notoriously hard to refine. FE and Mastery XP per craft do not change, so a slow metal draws fewer FE/t and trains a machine more slowly.
 - Cables and connector modules never roll modifiers. Transfer is fixed by the endpoint item.
 
 ### Crusher

@@ -1,5 +1,6 @@
 package com.rngtech.rpg;
 
+import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -306,6 +307,16 @@ public final class ModifierEligibilityProfiles {
             new ModifierValueRange(4500, 6500, true),
             new ModifierValueRange(6500, 9000, true)
     );
+    /** Flat Mastery attribute points; a Tier 3 roll is worth about six travel nodes. */
+    private static final List<ModifierValueRange> MASTERY_ATTRIBUTE_ADD_RANGES = List.of(
+            new ModifierValueRange(3, 5, true),
+            new ModifierValueRange(6, 9, true),
+            new ModifierValueRange(10, 14, true),
+            new ModifierValueRange(15, 20, true),
+            new ModifierValueRange(21, 27, true),
+            new ModifierValueRange(28, 35, true),
+            new ModifierValueRange(36, 45, true)
+    );
     private static final List<ModifierValueRange> ENERGY_GENERATION_ADD_RANGES = List.of(
             new ModifierValueRange(5, 10, true),
             new ModifierValueRange(10, 20, true),
@@ -431,6 +442,33 @@ public final class ModifierEligibilityProfiles {
             ModifierOperation.ADD,
             FLUID_CAPACITY_ADD_RANGES
     );
+    private static final int MASTERY_ATTRIBUTE_WEIGHT = 50;
+    private static final ModifierDefinition MASTERY_CONTROL = ModifierDefinition.rollable(
+            "mastery_control",
+            "mastery_control",
+            ModifierSlot.SUFFIX,
+            MachineStat.CONTROL,
+            ModifierOperation.ADD,
+            MASTERY_ATTRIBUTE_ADD_RANGES
+    ).withRollWeight(MASTERY_ATTRIBUTE_WEIGHT);
+    private static final ModifierDefinition MASTERY_DRIVE = ModifierDefinition.rollable(
+            "mastery_drive",
+            "mastery_drive",
+            ModifierSlot.SUFFIX,
+            MachineStat.DRIVE,
+            ModifierOperation.ADD,
+            MASTERY_ATTRIBUTE_ADD_RANGES
+    ).withRollWeight(MASTERY_ATTRIBUTE_WEIGHT);
+    private static final ModifierDefinition MASTERY_RESERVE = ModifierDefinition.rollable(
+            "mastery_reserve",
+            "mastery_reserve",
+            ModifierSlot.SUFFIX,
+            MachineStat.RESERVE,
+            ModifierOperation.ADD,
+            MASTERY_ATTRIBUTE_ADD_RANGES
+    ).withRollWeight(MASTERY_ATTRIBUTE_WEIGHT);
+    /** One suffix per attribute, so an item can roll both Control and Drive but never two Drive suffixes. */
+    private static final List<ModifierDefinition> MASTERY_ATTRIBUTES = List.of(MASTERY_CONTROL, MASTERY_DRIVE, MASTERY_RESERVE);
     private static final ModifierDefinition FUEL_EFFICIENCY = percent(ModifierSlot.PREFIX, MachineStat.FUEL_EFFICIENCY);
     private static final ModifierDefinition STABILITY = percent(ModifierSlot.SUFFIX, MachineStat.STABILITY);
     private static final ModifierDefinition TEMPERATURE_STABILITY =
@@ -1382,6 +1420,7 @@ public final class ModifierEligibilityProfiles {
     public static final ModifierEligibilityProfile CRUSHER = profile(
             "crusher",
             Set.of(
+                    ModifierCapability.HAS_MASTERY_ATTRIBUTES,
                     ModifierCapability.HAS_FE_STORAGE,
                     ModifierCapability.HAS_FE_INPUT,
                     ModifierCapability.HAS_INPUT_SLOT,
@@ -1403,6 +1442,7 @@ public final class ModifierEligibilityProfiles {
     public static final ModifierEligibilityProfile FORESTRY_COMPANION = profile(
             "forestry_companion",
             Set.of(
+                    ModifierCapability.HAS_MASTERY_ATTRIBUTES,
                     ModifierCapability.HAS_FE_INPUT,
                     ModifierCapability.HAS_PROCESSING
             ),
@@ -1415,6 +1455,7 @@ public final class ModifierEligibilityProfiles {
     public static final ModifierEligibilityProfile FURNACE = profile(
             "furnace",
             Set.of(
+                    ModifierCapability.HAS_MASTERY_ATTRIBUTES,
                     ModifierCapability.HAS_INPUT_SLOT,
                     ModifierCapability.HAS_OUTPUT_SLOT,
                     ModifierCapability.HAS_PROCESSING,
@@ -1440,6 +1481,7 @@ public final class ModifierEligibilityProfiles {
     public static final ModifierEligibilityProfile ELECTRIC_FURNACE = profile(
             "electric_furnace",
             Set.of(
+                    ModifierCapability.HAS_MASTERY_ATTRIBUTES,
                     ModifierCapability.HAS_FE_STORAGE,
                     ModifierCapability.HAS_FE_INPUT,
                     ModifierCapability.HAS_INPUT_SLOT,
@@ -1614,6 +1656,7 @@ public final class ModifierEligibilityProfiles {
     public static final ModifierEligibilityProfile METAL_PRESS = profile(
             "metal_press",
             Set.of(
+                    ModifierCapability.HAS_MASTERY_ATTRIBUTES,
                     ModifierCapability.HAS_FE_STORAGE,
                     ModifierCapability.HAS_FE_INPUT,
                     ModifierCapability.HAS_INPUT_SLOT,
@@ -1642,6 +1685,7 @@ public final class ModifierEligibilityProfiles {
     public static final ModifierEligibilityProfile MELTER = profile(
             "melter",
             Set.of(
+                    ModifierCapability.HAS_MASTERY_ATTRIBUTES,
                     ModifierCapability.HAS_FE_STORAGE,
                     ModifierCapability.HAS_FE_INPUT,
                     ModifierCapability.HAS_INPUT_SLOT,
@@ -1874,6 +1918,7 @@ public final class ModifierEligibilityProfiles {
     public static final ModifierEligibilityProfile ALLOY_FURNACE = profile(
             "alloy_furnace",
             Set.of(
+                    ModifierCapability.HAS_MASTERY_ATTRIBUTES,
                     ModifierCapability.HAS_FE_STORAGE,
                     ModifierCapability.HAS_FE_INPUT,
                     ModifierCapability.HAS_INPUT_SLOT,
@@ -1903,6 +1948,7 @@ public final class ModifierEligibilityProfiles {
     public static final ModifierEligibilityProfile RESONANCE_CALIBRATOR = profile(
             "resonance_calibrator",
             Set.of(
+                    ModifierCapability.HAS_MASTERY_ATTRIBUTES,
                     ModifierCapability.HAS_FE_STORAGE,
                     ModifierCapability.HAS_FE_INPUT,
                     ModifierCapability.HAS_INPUT_SLOT,
@@ -2035,6 +2081,7 @@ public final class ModifierEligibilityProfiles {
     public static final ModifierEligibilityProfile CRUSH_HEAD = profile(
             "crush_head",
             Set.of(
+                    ModifierCapability.HAS_MASTERY_ATTRIBUTES,
                     ModifierCapability.HAS_GEAR_STATS,
                     ModifierCapability.HAS_PROCESSING,
                     ModifierCapability.HAS_OUTPUT_SLOT,
@@ -2045,6 +2092,7 @@ public final class ModifierEligibilityProfiles {
     public static final ModifierEligibilityProfile ALLOY_CRUCIBLE = profile(
             "alloy_crucible",
             Set.of(
+                    ModifierCapability.HAS_MASTERY_ATTRIBUTES,
                     ModifierCapability.HAS_GEAR_STATS,
                     ModifierCapability.HAS_INPUT_SLOT,
                     ModifierCapability.HAS_PROCESSING,
@@ -2069,6 +2117,7 @@ public final class ModifierEligibilityProfiles {
     public static final ModifierEligibilityProfile HEAT_CORE = profile(
             "heat_core",
             Set.of(
+                    ModifierCapability.HAS_MASTERY_ATTRIBUTES,
                     ModifierCapability.HAS_GEAR_STATS,
                     ModifierCapability.HAS_FE_GENERATION,
                     ModifierCapability.HAS_FUEL_SLOT,
@@ -2091,6 +2140,7 @@ public final class ModifierEligibilityProfiles {
     public static final ModifierEligibilityProfile SERVO = profile(
             "servo",
             Set.of(
+                    ModifierCapability.HAS_MASTERY_ATTRIBUTES,
                     ModifierCapability.HAS_GEAR_STATS,
                     ModifierCapability.HAS_FE_INPUT,
                     ModifierCapability.HAS_PROCESSING,
@@ -2359,6 +2409,7 @@ public final class ModifierEligibilityProfiles {
     public static final ModifierEligibilityProfile FLUID_PUMP = profile(
             "fluid_pump",
             Set.of(
+                    ModifierCapability.HAS_MASTERY_ATTRIBUTES,
                     ModifierCapability.HAS_GEAR_STATS,
                     ModifierCapability.HAS_FLUID_STORAGE,
                     ModifierCapability.HAS_FLUID_INPUT,
@@ -2389,6 +2440,7 @@ public final class ModifierEligibilityProfiles {
     public static final ModifierEligibilityProfile RESONANCE_COIL = profile(
             "resonance_coil",
             Set.of(
+                    ModifierCapability.HAS_MASTERY_ATTRIBUTES,
                     ModifierCapability.HAS_GEAR_STATS,
                     ModifierCapability.HAS_FE_INPUT,
                     ModifierCapability.HAS_PROCESSING,
@@ -2406,6 +2458,7 @@ public final class ModifierEligibilityProfiles {
     public static final ModifierEligibilityProfile CONTROL_BOARD = profile(
             "control_board",
             Set.of(
+                    ModifierCapability.HAS_MASTERY_ATTRIBUTES,
                     ModifierCapability.HAS_GEAR_STATS,
                     ModifierCapability.HAS_PROCESSING,
                     ModifierCapability.HAS_STABILITY,
@@ -2421,6 +2474,7 @@ public final class ModifierEligibilityProfiles {
     public static final ModifierEligibilityProfile STABILIZER_MATRIX = profile(
             "stabilizer_matrix",
             Set.of(
+                    ModifierCapability.HAS_MASTERY_ATTRIBUTES,
                     ModifierCapability.HAS_GEAR_STATS,
                     ModifierCapability.HAS_FE_INPUT,
                     ModifierCapability.HAS_STABILITY,
@@ -2647,6 +2701,10 @@ public final class ModifierEligibilityProfiles {
             List<ModifierDefinition> definitions,
             List<MachineBehavior> rollableBehaviors
     ) {
+        if (capabilities.contains(ModifierCapability.HAS_MASTERY_ATTRIBUTES)) {
+            definitions = new ArrayList<>(definitions);
+            definitions.addAll(MASTERY_ATTRIBUTES);
+        }
         ModifierEligibilityProfile profile = new ModifierEligibilityProfile(id, capabilities, definitions, rollableBehaviors);
         validateProfile(profile);
         return profile;
@@ -2968,6 +3026,7 @@ public final class ModifierEligibilityProfiles {
         put(definitions, ModifierCapability.HAS_GLOBAL_MODIFIER_EFFECTS, GLOBAL_MODIFIER_STRENGTH);
         put(definitions, ModifierCapability.HAS_STABILITY, STABILITY);
         put(definitions, ModifierCapability.HAS_FLUID_STORAGE, FLUID_CAPACITY_ADD, FLUID_CAPACITY);
+        put(definitions, ModifierCapability.HAS_MASTERY_ATTRIBUTES, MASTERY_CONTROL, MASTERY_DRIVE, MASTERY_RESERVE);
         put(definitions, ModifierCapability.HAS_FLUID_INPUT, FLUID_TRANSFER);
         put(definitions, ModifierCapability.HAS_FLUID_OUTPUT, FLUID_TRANSFER);
         put(

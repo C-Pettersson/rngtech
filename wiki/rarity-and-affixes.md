@@ -147,6 +147,12 @@ Hold Left Shift on a part to see which of its affixes are marked **(Local)**. On
 
 Machine affixes, together with [Machine Mastery](machine-mastery.md) passives, are what scale the whole machine.
 
+### Attribute suffixes
+
+Machines with [Machine Mastery](machine-mastery.md) and the Gear they take can roll **+Control** (of Command), **+Drive** (of Impetus), and **+Reserve** (of Reserves). Each is a flat number of points, from 3–5 at Tier 1 to 36–45 at Tier 7. Unlike other part affixes, these points count for the whole machine, and they feed the attribute bonuses and attribute scaling exactly like points from the tree. Each attribute is its own group, so one item can roll both +Control and +Drive but never two +Drive.
+
+They roll on the Crusher, Furnace, Alloy Furnace, Metal Press, Melter, Resonance Calibrator, and Forestry Companion, and on Crush Heads, Heat Cores, Servos, Fluid Pumps, Alloy Crucibles, Resonance Coils, Control Boards, and Stabilizer Matrices. A part that sits in a machine without Mastery, such as a Heat Core in a Solid Fuel Burner, gets nothing from them.
+
 ## Notable affixes
 
 Most affixes simply raise or lower a [stat](machine-stats.md). A few change how the machine behaves.
@@ -176,7 +182,7 @@ A suffix that halves the failure strain a heat machine takes when its power drop
 | Affix | Effect |
 |---|---|
 | Overclocked | More Processing Speed, but also more Energy Use. |
-| Instant Process | A small chance for a process to finish the moment it starts. Powered machines need enough FE for the whole craft up front. |
+| Instant Process | A small chance for a process to finish the moment it starts. Powered machines need enough FE for the whole craft up front. The progress bar flashes gold when it happens. |
 | Super Output | A small chance to add one extra copy of the recipe's base output. |
 | Charged Storage | Battery Chassis only. 100% more installed-cell capacity after the chassis has held energy for 10 minutes straight. |
 | Additional Battery Slots | Battery Chassis only. Unlocks up to four extra cell slots. |
@@ -259,6 +265,8 @@ A corruption implicit is one fixed value, with no tier or range. It sits outside
 | Placed processing machine | 10% increased Processing Speed, 20% reduced Energy Use, or 15% increased Stability where the machine has it; +1 Batch Size (rare) on the Crusher, Melter, Metal Press, and Resonance Calibrator; 15% increased Fuel Efficiency or 10% increased Max Temperature on the Furnace | 25% increased Energy Use; 20% less Fuel Efficiency on the Furnace |
 | Placed generator | 10% increased Energy Generation, 15% increased Efficiency, and where the machine has them 15% increased Stability or 25% increased Energy Capacity | 20% less Efficiency |
 | Battery Chassis | +1 Battery Slot, 15% increased Energy Capacity, or 20% increased Energy Transfer | 15% increased Idle Loss |
+
+Machines with [Machine Mastery](machine-mastery.md) and the Gear they take (Crush Heads, Heat Cores, Servos, Fluid Pumps, Alloy Crucibles, Resonance Coils, Control Boards, and Stabilizer Matrices) can also be Blessed with 10% increased Control, Drive, or Reserve. Like [attribute suffixes](#attribute-suffixes), it counts for the whole machine.
 
 +1 Processing Level on a Crush Head lets it crush one level harder ore without jamming; it does not change which Gear the Crusher accepts. With a catalyst in the Affix Forge, hover Blessed or Blighted in the outcome panel to see the exact pool and odds for the item in the target slot. Corruption implicits never add yield or RP.
 

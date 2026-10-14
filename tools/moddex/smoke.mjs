@@ -505,7 +505,7 @@ try {
     const woodenCrusher = stagePreview?.items?.find((item) => item.id === "rngtech:wooden_crusher_chassis");
     if (woodenCrusher?.modifierCoverage?.profileId !== "crusher"
             || woodenCrusher.modifierCoverage.prefixGroups !== 10
-            || woodenCrusher.modifierCoverage.suffixGroups !== 5) {
+            || woodenCrusher.modifierCoverage.suffixGroups !== 8) {
         throw new Error("Stage preview did not include expected modifier coverage for Wooden Crusher Chassis.");
     }
     const fuelBox = stagePreview?.items?.find((item) => item.id === "rngtech:copper_fuel_box");

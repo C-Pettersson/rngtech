@@ -361,7 +361,7 @@ public class AlloyFurnaceScreen extends AbstractContainerScreen<AlloyFurnaceMenu
                 y + PROGRESS_Y + 1,
                 x + PROGRESS_X + 1 + Math.round((PROGRESS_WIDTH - 2) * menu.processingProgress()),
                 y + PROGRESS_Y + PROGRESS_HEIGHT - 1,
-                PROGRESS
+                (menu.instantFlash() ? MachineScreenStyle.INSTANT_FLASH : PROGRESS)
         );
         float ledger = menu.ledgerProgress();
         if (ledger >= 0.0F) {
