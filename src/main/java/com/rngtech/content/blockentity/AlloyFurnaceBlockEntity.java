@@ -201,7 +201,7 @@ public class AlloyFurnaceBlockEntity extends BaseMachineBlockEntity implements M
             AlloyFurnaceRecipe recipe = nextRecipe();
             MachineStatAccumulator stats = routeStats(recipe, effectiveStats());
             return switch (index) {
-                case DATA_PROGRESS -> progress;
+                case DATA_PROGRESS -> syncedProgress(0, progress);
                 case DATA_PROCESSING_TICKS -> currentProcessingTicks(recipe, stats);
                 case DATA_ENERGY -> energyStored();
                 case DATA_ENERGY_CAPACITY -> energyCapacity();
@@ -323,6 +323,7 @@ public class AlloyFurnaceBlockEntity extends BaseMachineBlockEntity implements M
         if (furnace.progress == 0 && ProcessingChance.rollInstant(level, stats)) {
             int fullEnergyCost = furnace.energyCostPerCraft(recipe, stats);
             if (furnace.consumeWorkingEnergy(fullEnergyCost, true) >= fullEnergyCost) {
+                furnace.markInstantProcess();
                 furnace.startCycleIfNeeded(recipe);
                 furnace.consumeWorkingEnergy(fullEnergyCost, false);
                 if (furnace.process(recipe, stats)) {

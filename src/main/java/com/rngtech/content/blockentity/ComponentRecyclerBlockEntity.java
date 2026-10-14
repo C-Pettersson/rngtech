@@ -158,7 +158,7 @@ public class ComponentRecyclerBlockEntity extends BaseMachineBlockEntity impleme
             MachineStatAccumulator stats = effectiveStats();
             ComponentRecyclingRecipe recipe = nextRecipe();
             return switch (index) {
-                case DATA_PROGRESS -> progress;
+                case DATA_PROGRESS -> syncedProgress(0, progress);
                 case DATA_PROCESSING_TICKS -> currentProcessingTicks(recipe, stats);
                 case DATA_ENERGY -> isManual() ? 0 : energyStored();
                 case DATA_ENERGY_CAPACITY -> isManual() ? 0 : energyCapacity();
@@ -236,6 +236,7 @@ public class ComponentRecyclerBlockEntity extends BaseMachineBlockEntity impleme
         if (recycler.progress == 0 && ProcessingChance.rollInstant(level, stats)) {
             int fullEnergyCost = recycler.energyCostPerCraft(recipe, stats);
             if (recycler.consumeWorkingEnergy(fullEnergyCost, true) >= fullEnergyCost) {
+                recycler.markInstantProcess();
                 recycler.consumeWorkingEnergy(fullEnergyCost, false);
                 if (recycler.process(recipe)) {
                     recycler.bulkSpeed.recordProcess(recycler.activeTraits());

@@ -227,7 +227,7 @@ public class MelterBlockEntity extends BaseMachineBlockEntity
             MachineStatAccumulator stats = effectiveStats();
             MelterRecipe recipe = nextRecipe();
             return switch (index) {
-                case DATA_PROGRESS -> progress;
+                case DATA_PROGRESS -> syncedProgress(0, progress);
                 case DATA_PROCESSING_TICKS -> currentProcessingTicks(recipe, stats);
                 case DATA_ENERGY -> energyStored();
                 case DATA_ENERGY_CAPACITY -> energyCapacity();
@@ -309,6 +309,7 @@ public class MelterBlockEntity extends BaseMachineBlockEntity
         if (melter.progress == 0 && ProcessingChance.rollInstant(level, stats)) {
             int fullEnergyCost = melter.scaledForJobs(melter.energyCostPerCraft(recipe, stats), recipe, stats);
             if (melter.consumeWorkingEnergy(fullEnergyCost, true) >= fullEnergyCost) {
+                melter.markInstantProcess();
                 melter.startCycleIfNeeded(recipe, stats);
                 melter.consumeWorkingEnergy(fullEnergyCost, false);
                 if (melter.process(recipe, stats)) {

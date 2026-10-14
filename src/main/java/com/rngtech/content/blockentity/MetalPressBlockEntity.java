@@ -203,7 +203,7 @@ public class MetalPressBlockEntity extends BaseMachineBlockEntity
             MetalPressRecipe recipe = nextRecipe();
             MachineStatAccumulator stats = routeStats(recipe, effectiveStats());
             return switch (index) {
-                case DATA_PROGRESS -> progress;
+                case DATA_PROGRESS -> syncedProgress(0, progress);
                 case DATA_PROCESSING_TICKS -> currentProcessingTicks(recipe, stats);
                 case DATA_ENERGY -> energyStored();
                 case DATA_ENERGY_CAPACITY -> energyCapacity();
@@ -330,6 +330,7 @@ public class MetalPressBlockEntity extends BaseMachineBlockEntity
         if (press.progress == 0 && ProcessingChance.rollInstant(level, stats)) {
             int fullEnergyCost = press.energyCostPerCraft(recipe, stats) * press.batchJobs(recipe, stats);
             if (press.consumeWorkingEnergy(fullEnergyCost, true) >= fullEnergyCost) {
+                press.markInstantProcess();
                 press.startCycleIfNeeded(recipe, stats);
                 press.consumeWorkingEnergy(fullEnergyCost, false);
                 press.decayPowerDrop();

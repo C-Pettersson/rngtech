@@ -117,6 +117,7 @@ Process screens should stay compact and readable.
 - For fluid-capable Process screens, bucket or other fluid-container slots should sit directly below their corresponding fluid meter or bar, centered on that meter when space allows.
 - Fluid tanks that can trap a wrong fluid should expose a small purge control beside the visible tank meter. Purging voids up to `1000 mB`, never returns fluid, and should identify the tank and current fluid in hover text.
 - Keep inappropriate machine concepts out of the view. A Crusher does not display generation, burn time, or fuel text.
+- A job that finishes through Instant Process flashes its progress bar full and gold for half a second, so a skipped job is visible without text.
 
 ## Fluid Purging
 

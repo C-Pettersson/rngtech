@@ -5466,7 +5466,7 @@
   "rngtech.mastery.toolbar.1": "Paste build onto a cleared tree. Future points follow the saved order.",
   "rngtech.mastery.toolbar.2": "Pause or resume automatic allocation. A Gear conflict pauses the build.",
   "rngtech.mastery.toolbar.3": "Shift-click to clear the tree. Costs 1 Mastery Refund per allocated node.",
-  "rngtech.mastery.free_reset": "Free Full Reset available: Shift-click Clear to refund the whole tree at no cost.",
+  "rngtech.mastery.free_reset": "Free Full Reset available: Shift-click X (Clear) in the toolbar to refund the whole tree at no cost.",
   "rngtech.mastery.toolbar.free_reset": "Free Full Reset: the tree changed in an update, so this clear costs nothing.",
   "rngtech.mastery.toolbar.4": "Center on this machine’s start.",
   "rngtech.mastery.toolbar.5": "Fit the entire shared tree.",

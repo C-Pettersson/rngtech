@@ -521,6 +521,9 @@ final class MachineScreenStyle {
     }
 
     /** Declared ascendancy stats follow the machine's own rows, highlighted, only while an allocated node grants them. */
+    /** The Process tab's progress-bar color while it flashes a job that finished instantly. */
+    static final int INSTANT_FLASH = 0xFFE8C24A;
+
     static StatLine[] withAscendancyStats(StatLine[] statLines, List<MasteryMenuSupport.GrantedStat> granted) {
         StatLine[] all = Arrays.copyOf(statLines, statLines.length + granted.size());
         for (int index = 0; index < granted.size(); index++) {

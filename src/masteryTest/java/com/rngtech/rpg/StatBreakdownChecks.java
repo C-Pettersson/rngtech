@@ -28,6 +28,7 @@ public final class StatBreakdownChecks {
         floorAndBonusScaleRecombine();
         energyUsageReductionsRecombine();
         textListsEverySource();
+        sameNamedSourcesShareALine();
         return checks;
     }
 
@@ -152,6 +153,25 @@ public final class StatBreakdownChecks {
         near(breakdown.recompute(), 1500, "flat capacity adds to capacity");
         require(stats.breakdowns().stream().noneMatch(entry -> entry.stat() == MachineStat.ENERGY_CAPACITY_FLAT),
                 "flat capacity has no separate breakdown");
+    }
+
+    /** Dozens of travel nodes share a display name; the text sums them on one line instead of listing each. */
+    private static void sameNamedSourcesShareALine() {
+        MachineStatAccumulator stats = MachineStatAccumulator.recording(() -> {
+            MachineStatAccumulator recorded = MachineStatAccumulator.componentBase(Map.of(MachineStat.DRIVE, 0.0));
+            recorded.apply(Component.literal("Drive"), new MachineModifier(ModifierSlot.IMPLICIT, MachineStat.DRIVE, ModifierOperation.ADD, 2));
+            recorded.apply(Component.literal("Drive").withStyle(net.minecraft.ChatFormatting.ITALIC),
+                    new MachineModifier(ModifierSlot.IMPLICIT, MachineStat.DRIVE, ModifierOperation.ADD, 2));
+            recorded.apply(Component.literal("Drive").withStyle(net.minecraft.ChatFormatting.BOLD),
+                    new MachineModifier(ModifierSlot.IMPLICIT, MachineStat.DRIVE, ModifierOperation.ADD, 2));
+            return recorded;
+        });
+        StatBreakdown breakdown = stats.breakdown(MachineStat.DRIVE).orElseThrow();
+        require(breakdown.terms(StatBreakdown.Kind.ADD).size() == 3, "the breakdown keeps each node as its own term");
+        List<String> lines = StatBreakdownText.lines(breakdown).stream().map(Component::getString).toList();
+        require(lines.stream().filter(line -> line.contains("Drive") && line.contains("×3")).count() == 1
+                        && lines.stream().noneMatch(line -> line.trim().startsWith("+2")),
+                "same-named sources share one summed line: " + lines);
     }
 
     private static void crusherYieldSoftCapRecombines() {

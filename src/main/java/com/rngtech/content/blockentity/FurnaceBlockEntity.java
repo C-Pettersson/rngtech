@@ -194,7 +194,7 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
         public int get(int index) {
             MachineStatAccumulator stats = effectiveStats();
             if (index >= DATA_PROGRESS_START && index < DATA_PROGRESS_START + MAX_PROCESSING_SLOTS) {
-                return progress[index - DATA_PROGRESS_START];
+                return syncedProgress(index - DATA_PROGRESS_START, progress[index - DATA_PROGRESS_START]);
             }
             if (index >= DATA_PROCESSING_TICKS_START && index < DATA_PROCESSING_TICKS_START + MAX_PROCESSING_SLOTS) {
                 return currentProcessingTicks(index - DATA_PROCESSING_TICKS_START);
@@ -351,6 +351,7 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
                 if (furnace.progress[lane] == 0 && ProcessingChance.rollInstant(level, laneStats)) {
                     int fullEnergyCost = furnace.energyCostPerCraft(recipe, laneStats);
                     if (furnace.consumeWorkingEnergy(fullEnergyCost, true) >= fullEnergyCost) {
+                        furnace.markInstantProcess(lane);
                         furnace.startCycleIfNeeded(lane);
                         furnace.consumeWorkingEnergy(fullEnergyCost, false);
                         if (furnace.process(lane, recipe, laneStats)) {
@@ -377,6 +378,7 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
                 }
                 furnace.burnTime--;
                 if (furnace.progress[lane] == 0 && ProcessingChance.rollInstant(level, laneStats)) {
+                    furnace.markInstantProcess(lane);
                     furnace.startCycleIfNeeded(lane);
                     if (furnace.process(lane, recipe, laneStats)) {
                         changed |= furnace.bulkSpeed.recordProcess(furnace.activeTraits());

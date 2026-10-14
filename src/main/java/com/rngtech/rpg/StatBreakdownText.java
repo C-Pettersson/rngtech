@@ -5,7 +5,9 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 /** Tooltip lines that show how a {@link StatBreakdown} reaches its final value, one labelled source per line. */
 public final class StatBreakdownText {
@@ -120,13 +122,25 @@ public final class StatBreakdownText {
             return;
         }
         lines.add(header(headerKey, total));
+        // Terms from identically named sources, such as dozens of +2 Drive travel nodes, combine into one line.
+        Map<String, List<StatBreakdown.Term>> bySource = new LinkedHashMap<>();
         for (StatBreakdown.Term term : terms) {
+            bySource.computeIfAbsent(term.source().getString(), ignored -> new ArrayList<>()).add(term);
+        }
+        for (List<StatBreakdown.Term> group : bySource.values()) {
+            double combined = kind == StatBreakdown.Kind.ADD || kind == StatBreakdown.Kind.INCREASED
+                    ? group.stream().mapToDouble(StatBreakdown.Term::value).sum()
+                    : group.stream().mapToDouble(StatBreakdown.Term::value).reduce(1.0, (a, b) -> a * b);
             String value = switch (kind) {
-                case ADD -> signedAmount(breakdown.stat(), term.value());
-                case INCREASED -> MachineStatDisplay.formatSignedPercentPoints(term.value());
-                default -> factor(term.value());
+                case ADD -> signedAmount(breakdown.stat(), combined);
+                case INCREASED -> MachineStatDisplay.formatSignedPercentPoints(combined);
+                default -> factor(combined);
             };
-            lines.add(Component.literal("  " + value + "  ").append(term.source().copy().withStyle(ChatFormatting.GRAY)));
+            MutableComponent line = Component.literal("  " + value + "  ").append(group.getFirst().source().copy().withStyle(ChatFormatting.GRAY));
+            if (group.size() > 1) {
+                line.append(Component.literal(" ×" + group.size()).withStyle(ChatFormatting.DARK_GRAY));
+            }
+            lines.add(line);
         }
     }
 

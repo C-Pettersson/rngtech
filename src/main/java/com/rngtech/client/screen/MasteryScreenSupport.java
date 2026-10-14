@@ -1257,7 +1257,9 @@ public final class MasteryScreenSupport<N extends PassiveNode> {
         String[] labels = {"C", "P", snapshot.following() ? "||" : ">", "X", "H", "F", "R"};
         for (int i = 0; i < labels.length; i++) {
             int x = left + 8 + i * 20;
-            graphics.fill(x, top + 42, x + 18, top + 54, i == 6 && highlightRelevant ? 0xFF596035 : 0xFF343E49);
+            // Relevance highlighting lights R; an unused free Full Reset lights X (Clear) green.
+            boolean lit = i == 6 && highlightRelevant || i == 3 && snapshot.freeReset();
+            graphics.fill(x, top + 42, x + 18, top + 54, lit ? 0xFF596035 : 0xFF343E49);
             graphics.drawString(font, labels[i], x + 5, top + 44, 0xFFE7DDC0, false);
         }
         int searchLeft = left + MASTERY_SEARCH_X;

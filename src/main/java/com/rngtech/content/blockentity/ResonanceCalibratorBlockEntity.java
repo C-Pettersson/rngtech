@@ -209,7 +209,7 @@ public class ResonanceCalibratorBlockEntity extends BaseMachineBlockEntity
             CalibrationRecipe recipe = nextRecipe();
             CalibrationValueRange range = currentStabilityRange(recipe, stats);
             return switch (index) {
-                case DATA_PROGRESS -> progress;
+                case DATA_PROGRESS -> syncedProgress(0, progress);
                 case DATA_PROCESSING_TICKS -> currentProcessingTicks(recipe, stats);
                 case DATA_ENERGY -> energyStored();
                 case DATA_ENERGY_CAPACITY -> energyCapacity();
@@ -292,6 +292,7 @@ public class ResonanceCalibratorBlockEntity extends BaseMachineBlockEntity
         if (calibrator.progress == 0 && ProcessingChance.rollInstant(level, stats)) {
             int fullEnergyCost = calibrator.energyCostPerBatch(recipe, stats);
             if (calibrator.consumeWorkingEnergy(fullEnergyCost, true) >= fullEnergyCost) {
+                calibrator.markInstantProcess();
                 calibrator.startCycleIfNeeded(recipe, stats);
                 calibrator.consumeWorkingEnergy(fullEnergyCost, false);
                 if (calibrator.process(recipe, stats)) {

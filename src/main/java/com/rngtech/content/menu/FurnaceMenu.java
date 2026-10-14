@@ -1,6 +1,7 @@
 package com.rngtech.content.menu;
 
 import com.rngtech.content.block.FurnaceBlock;
+import com.rngtech.content.blockentity.BaseMachineBlockEntity;
 import com.rngtech.content.blockentity.FurnaceBlockEntity;
 import com.rngtech.content.registry.ModMenus;
 import com.rngtech.rpg.MachineStat;
@@ -204,6 +205,9 @@ public class FurnaceMenu extends AbstractContainerMenu implements MasteryMenuVie
     }
 
     public float processingProgress(int lane) {
+        if (instantFlash(lane)) {
+            return 1.0F;
+        }
         int ticks = processingTicks(lane);
         return ticks <= 0 ? 0.0F : Mth.clamp((float) progress(lane) / (float) ticks, 0.0F, 1.0F);
     }
@@ -248,7 +252,13 @@ public class FurnaceMenu extends AbstractContainerMenu implements MasteryMenuVie
     }
 
     public int progress(int lane) {
-        return data.get(DATA_PROGRESS_START + Mth.clamp(lane, 0, MAX_PROCESSING_SLOTS - 1));
+        return Math.max(0, data.get(DATA_PROGRESS_START + Mth.clamp(lane, 0, MAX_PROCESSING_SLOTS - 1)));
+    }
+
+    /** Whether {@code lane}'s bar should flash for a job that just finished instantly. */
+    public boolean instantFlash(int lane) {
+        return data.get(DATA_PROGRESS_START + Mth.clamp(lane, 0, MAX_PROCESSING_SLOTS - 1))
+                == BaseMachineBlockEntity.INSTANT_FLASH_PROGRESS;
     }
 
     public int processingTicks() {
