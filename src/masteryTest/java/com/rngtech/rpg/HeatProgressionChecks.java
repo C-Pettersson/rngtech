@@ -199,8 +199,11 @@ public final class HeatProgressionChecks {
         int maximum = stats.intValue(MachineStat.MAX_TEMPERATURE);
         HeatEngine.Envelope locked = HeatEngine.envelope(800, 800, 920, 0.0, true, false, stats, 1.0, Integer.MAX_VALUE);
         require(locked.setpoint() == 920, "without Blast Draft the slider stops at the safe maximum, not " + locked.setpoint());
-        HeatEngine.Envelope half = HeatEngine.envelope(800, 800, 920, 0.0, true, false, stats, 0.5, Integer.MAX_VALUE);
-        require(half.setpoint() == 860, "the slider spans the reachable band, so 50% is halfway to the safe maximum");
+        double low = 0.05;
+        HeatEngine.Envelope lockedLow = HeatEngine.envelope(800, 800, 920, 0.0, true, false, stats, low, Integer.MAX_VALUE);
+        HeatEngine.Envelope unlockedLow = HeatEngine.envelope(800, 800, 920, 0.0, true, true, stats, low, Integer.MAX_VALUE);
+        require(lockedLow.setpoint() < 920 && lockedLow.setpoint() == unlockedLow.setpoint(),
+                "Blast Draft never moves a setpoint the lane could already hold, not " + lockedLow.setpoint() + " to " + unlockedLow.setpoint());
         HeatEngine.Envelope cannotFail = HeatEngine.envelope(800, 800, 920, 0.0, false, true, stats, 1.0, Integer.MAX_VALUE);
         require(cannotFail.setpoint() == cannotFail.overheat(), "Blast Draft takes a recipe that cannot fail only to its overheat temperature");
         HeatEngine.Envelope canFail = HeatEngine.envelope(800, 800, 920, 0.0, true, true, stats, 1.0, Integer.MAX_VALUE);

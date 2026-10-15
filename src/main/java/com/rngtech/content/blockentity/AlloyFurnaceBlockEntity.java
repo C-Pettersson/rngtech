@@ -317,10 +317,11 @@ public class AlloyFurnaceBlockEntity extends BaseMachineBlockEntity implements M
         furnace.escapement.observe(recipe);
         furnace.rememberHeatEnvelope(recipe, stats);
 
-        // A blocked output keeps the chamber's heat, so the next craft starts where this one stopped.
+        // A blocked output keeps the chamber at its setpoint, so the next craft starts where this one stopped.
         if (!furnace.canMergeOutput(recipe.outputStack()) || furnace.waitsForFullBatch(recipe, stats)) {
             furnace.tooHot = false;
             furnace.starved = false;
+            HeatEngine.hold(furnace.heat, furnace.envelope(recipe, stats), stats, furnace.heatSupply(stats));
             BaseMachineBlock.setActive(level, pos, state, false);
             return;
         }
@@ -552,7 +553,7 @@ public class AlloyFurnaceBlockEntity extends BaseMachineBlockEntity implements M
         CompoundTag heatTag = new CompoundTag();
         heat.save(heatTag);
         tag.put("Heat", heatTag);
-        tag.putInt("HeatSlider", heatSlider);
+        tag.putInt("HeatTrack", heatSlider);
         tag.putInt("LockedBatch", lockedBatch);
         tag.putInt("Energy", internalEnergyStored());
         tag.putInt("LastTargetTemperature", lastTargetTemperature);
@@ -580,7 +581,7 @@ public class AlloyFurnaceBlockEntity extends BaseMachineBlockEntity implements M
             heat.resetCycle();
             heat.setTemperature(tag.getInt("CurrentTemperature"));
         }
-        heatSlider = Math.max(0, Math.min(100, tag.getInt("HeatSlider")));
+        heatSlider = Math.max(0, Math.min(100, tag.getInt("HeatTrack")));
         lockedBatch = Math.max(0, tag.getInt("LockedBatch"));
         internalEnergy = Math.max(0, tag.getInt("Energy"));
         lastTargetTemperature = Math.max(0, tag.getInt("LastTargetTemperature"));

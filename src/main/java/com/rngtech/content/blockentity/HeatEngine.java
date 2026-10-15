@@ -105,10 +105,14 @@ public final class HeatEngine {
         int burn(int ticks);
     }
 
-    /** The slider runs from the target (0) to the highest setpoint the lane may reach (1). */
-    public static int setpoint(int target, int reach, double slider) {
-        int ceiling = Math.max(target, reach);
-        return target + (int) Math.round(Math.max(0.0, Math.min(1.0, slider)) * (ceiling - target));
+    /**
+     * The slider is a position on a track from the target (0) to Max Temperature (1), held back at the highest setpoint
+     * the lane may reach. Unlocking more reach never moves a setpoint the lane could already hold.
+     */
+    public static int setpoint(int target, int maximum, int reach, double slider) {
+        int top = Math.max(Math.max(target, maximum), reach);
+        int wanted = target + (int) Math.round(Math.max(0.0, Math.min(1.0, slider)) * (top - target));
+        return Math.max(target, Math.min(reach, wanted));
     }
 
     /**
@@ -137,7 +141,7 @@ public final class HeatEngine {
         int safe = Math.max(target, safeMaximum);
         int overheat = overheatTemperature(safe, stats);
         int reach = Math.max(target, reach(safe, overheat, canFail, pushPastSafe, stats, setpointCeiling));
-        int setpoint = setpoint(target, reach, slider);
+        int setpoint = setpoint(target, stats.intValue(MachineStat.MAX_TEMPERATURE), reach, slider);
         return new Envelope(Math.min(minimum, target), target, safe, overheat, requiredStability, setpoint, canFail, false, reach);
     }
 
@@ -255,6 +259,22 @@ public final class HeatEngine {
         lane.work += load.workPerTick() * factor * share;
         record(lane, delivered, holding, absorbed);
         return new Tick(false, factor > 0.0, factor, workTemperature, delivered + 1.0E-6 < Math.min(wanted, sustain));
+    }
+
+    /**
+     * A lane waiting for output room: the heater keeps it at the setpoint, paying the wall loss, and no work is done, so
+     * clearing the output resumes at once.
+     */
+    public static void hold(HeatLane lane, Envelope envelope, MachineStatAccumulator stats, HeatSupply supply) {
+        double capacity = heatCapacity(stats);
+        double holding = holdingHeat(lane.temperature, stats);
+        double setpoint = Math.min(envelope.setpoint(), envelope.ceilingFor(lane));
+        double wanted = lane.temperature < setpoint
+                ? holding + Math.min(approach(lane.temperature, stats), (setpoint - lane.temperature) * capacity)
+                : Math.max(0.0, holding - (lane.temperature - setpoint) * capacity);
+        double delivered = wanted <= 0.0 ? 0.0 : Math.min(wanted, supply.deliver(wanted));
+        lane.temperature = Math.max(AMBIENT, lane.temperature + (delivered - holding) / capacity);
+        record(lane, delivered, holding, 0.0);
     }
 
     /** An idle lane: the heater is off and the walls leak heat, unless something holds it. */

@@ -331,9 +331,18 @@ public class MelterBlockEntity extends BaseMachineBlockEntity
             melter.resetBulkSpeed();
         }
         melter.escapement.observe(recipe);
+        // A full output tank keeps the crucible at its setpoint, so melting resumes as soon as there is room.
+        if (melter.effectiveHeat(stats) >= recipe.minimumTemperature()
+                && melter.processingLevel(stats) >= recipe.requiredProcessingLevel()
+                && !melter.canAcceptOutputFluid(melter.yieldedOutput(recipe, stats))) {
+            melter.tooHot = false;
+            melter.starved = false;
+            HeatEngine.hold(melter.heat, melter.envelope(recipe, stats), stats, HeatEngine.electric(melter.heat, stats, melter::drawEnergy));
+            BaseMachineBlock.setActive(level, pos, state, false);
+            return;
+        }
         if (melter.effectiveHeat(stats) < recipe.minimumTemperature()
                 || melter.processingLevel(stats) < recipe.requiredProcessingLevel()
-                || !melter.canAcceptOutputFluid(melter.yieldedOutput(recipe, stats))
                 || melter.waitsForFullBatch(recipe, stats)) {
             melter.idle(stats);
             BaseMachineBlock.setActive(level, pos, state, false);
@@ -605,7 +614,7 @@ public class MelterBlockEntity extends BaseMachineBlockEntity
         CompoundTag heatTag = new CompoundTag();
         heat.save(heatTag);
         tag.put("Heat", heatTag);
-        tag.putInt("HeatSlider", heatSlider);
+        tag.putInt("HeatTrack", heatSlider);
         tag.putDouble("ActiveMeltSpeed", activeMeltSpeed);
         tag.putInt("LockedBatch", lockedBatch);
         tag.putInt("Energy", internalEnergyStored());
@@ -626,7 +635,7 @@ public class MelterBlockEntity extends BaseMachineBlockEntity
         if (tag.contains("Heat")) {
             heat.load(tag.getCompound("Heat"));
         }
-        heatSlider = Math.max(0, Math.min(100, tag.getInt("HeatSlider")));
+        heatSlider = Math.max(0, Math.min(100, tag.getInt("HeatTrack")));
         activeMeltSpeed = Math.max(0.0, tag.getDouble("ActiveMeltSpeed"));
         lockedBatch = Math.max(0, tag.getInt("LockedBatch"));
         internalEnergy = Math.max(0, tag.getInt("Energy"));

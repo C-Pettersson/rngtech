@@ -35,13 +35,12 @@ final class HeatReadout {
             return target > 0;
         }
 
-        /** The heat bar's top: the hottest the lane can be pushed, with a little headroom, or the current heat. */
+        /** The heat bar's top: the machine's Max Temperature, so a temperature always sits at the same height. */
         int scale() {
-            if (!hasRecipe()) {
+            if (maximum > 0) {
                 return Math.max(heat, maximum);
             }
-            int top = Math.max(Math.max(reach, overheat), setpoint + wobble);
-            return Math.max(heat, (int) Math.round(top * 1.08));
+            return Math.max(heat, (int) Math.round(Math.max(Math.max(reach, overheat), setpoint + wobble) * 1.08));
         }
 
         /** The band a temperature falls in: below the minimum, working, past the safe maximum, past overheating. */

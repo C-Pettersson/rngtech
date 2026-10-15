@@ -54,7 +54,8 @@ final class HeatSlider {
         int x0 = left + x;
         int y0 = top + y;
         guiGraphics.fill(x0, y0, x0 + width, y0 + HEIGHT, TRACK);
-        int setpoint = bands.target() + Math.round((bands.reach() - bands.target()) * shown / 100.0F);
+        int trackTop = Math.max(bands.maximum(), bands.reach());
+        int setpoint = Math.min(bands.reach(), bands.target() + Math.round((trackTop - bands.target()) * shown / 100.0F));
         // The reachable band, dim, then the part up to the setpoint, bright.
         segment(guiGraphics, x0, y0, bands.target(), bands.reach(), bands, true);
         segment(guiGraphics, x0, y0, bands.target(), setpoint, bands, false);
@@ -158,13 +159,13 @@ final class HeatSlider {
 
     private void send(double mouseX, int left, int containerId) {
         double fraction = (mouseX - (left + x + 1)) / Math.max(1, width - 2);
-        if (banded(bands)) {
-            // The track spans the target to Max Temperature, but the percent is a share of the reachable band.
-            int top = Math.max(bands.maximum(), bands.reach());
-            double temperature = bands.target() + fraction * (top - bands.target());
-            fraction = (temperature - bands.target()) / Math.max(1, bands.reach() - bands.target());
-        }
         int percent = (int) Math.round(Math.max(0.0, Math.min(1.0, fraction)) * 100.0 / STEP) * STEP;
+        if (banded(bands)) {
+            // The knob stops where the locked part starts, so unlocking more reach later never moves the setpoint.
+            int top = Math.max(bands.maximum(), bands.reach());
+            int reachPercent = (int) Math.floor(100.0 * (bands.reach() - bands.target()) / Math.max(1, top - bands.target()));
+            percent = Math.min(percent, reachPercent);
+        }
         if (percent == pending) {
             return;
         }

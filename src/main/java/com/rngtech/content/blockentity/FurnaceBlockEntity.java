@@ -359,7 +359,8 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
             HeatLane heat = furnace.heat[lane];
             if (recipe == null) {
                 changed |= furnace.resetCycle(lane);
-                changed |= furnace.idleLane(lane, laneStats);
+                FurnaceRecipe blocked = furnace.outputBlockedRecipe(lane, laneStats);
+                changed |= blocked != null ? furnace.holdLane(lane, blocked, laneStats) : furnace.idleLane(lane, laneStats);
                 continue;
             }
             if (!furnace.activeCycleMatches(lane)) {
@@ -571,7 +572,7 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
             lanes.add(laneTag);
         }
         tag.put("HeatLanes", lanes);
-        tag.putInt("HeatSlider", heatSlider);
+        tag.putInt("HeatTrack", heatSlider);
         tag.putIntArray("LockedBatches", lockedBatch);
         tag.putIntArray("LastTargetTemperatures", lastTargetTemperature);
         tag.putIntArray("LastSafeMaximumTemperatures", lastSafeMaximumTemperature);
@@ -604,7 +605,7 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
                 heat[lane].setTemperature(legacyTemperatures[lane]);
             }
         }
-        heatSlider = Math.max(0, Math.min(100, tag.getInt("HeatSlider")));
+        heatSlider = Math.max(0, Math.min(100, tag.getInt("HeatTrack")));
         int[] savedBatches = tag.getIntArray("LockedBatches");
         for (int lane = 0; lane < lockedBatch.length; lane++) {
             lockedBatch[lane] = lane < savedBatches.length ? Math.max(0, savedBatches[lane]) : 0;
@@ -1582,6 +1583,20 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
     }
 
     /** An idle lane leaks heat; Hold the Fire keeps it while the lane holds an input it could smelt. */
+    /** The lane's recipe when only a full output stops it, so the lane holds its heat instead of cooling. */
+    private FurnaceRecipe outputBlockedRecipe(int lane, MachineStatAccumulator stats) {
+        ItemStack input = inventory.getStackInSlot(inputSlot(lane));
+        FurnaceRecipe recipe = input.isEmpty() ? null : laneRecipe(lane);
+        return recipe != null && meetsRecipeRequirements(recipe, stats, input) && !canAcceptOutput(lane, recipe) ? recipe : null;
+    }
+
+    private boolean holdLane(int lane, FurnaceRecipe recipe, MachineStatAccumulator stats) {
+        tooHotLane[lane] = false;
+        starved[lane] = false;
+        HeatEngine.hold(heat[lane], envelope(lane, recipe, stats), stats, heatSupply(lane, stats));
+        return true;
+    }
+
     private boolean idleLane(int lane, MachineStatAccumulator stats) {
         tooHotLane[lane] = false;
         starved[lane] = false;

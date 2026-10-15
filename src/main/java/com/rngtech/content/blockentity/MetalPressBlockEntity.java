@@ -316,9 +316,19 @@ public class MetalPressBlockEntity extends BaseMachineBlockEntity
         press.escapement.observe(recipe);
         press.rememberHeatEnvelope(recipe, stats);
 
+        // A blocked output keeps the forming bed at its setpoint, so pressing resumes as soon as there is room.
+        if (press.effectiveHeat(stats) >= recipe.targetTemperature()
+                && !press.crudePressBlocksUnstableRecipe(recipe, stats)
+                && !press.canMergeOutput(recipe.outputStack())) {
+            press.tooHot = false;
+            press.starved = false;
+            HeatEngine.hold(press.heat, press.envelope(recipe, stats), stats, HeatEngine.electric(press.heat, stats, press::drawEnergy));
+            press.setChanged();
+            BaseMachineBlock.setActive(level, pos, state, false);
+            return;
+        }
         if (press.effectiveHeat(stats) < recipe.targetTemperature()
                 || press.crudePressBlocksUnstableRecipe(recipe, stats)
-                || !press.canMergeOutput(recipe.outputStack())
                 || press.waitsForFullBatch(recipe, stats)) {
             if (press.idle(stats, false)) {
                 press.setChanged();
@@ -600,7 +610,7 @@ public class MetalPressBlockEntity extends BaseMachineBlockEntity
         CompoundTag heatTag = new CompoundTag();
         heat.save(heatTag);
         tag.put("Heat", heatTag);
-        tag.putInt("HeatSlider", heatSlider);
+        tag.putInt("HeatTrack", heatSlider);
         tag.putInt("Energy", internalEnergyStored());
         tag.putInt("LastMinimumTemperature", lastMinimumTemperature);
         tag.putInt("LastTargetTemperature", lastTargetTemperature);
@@ -633,7 +643,7 @@ public class MetalPressBlockEntity extends BaseMachineBlockEntity
             heat.resetCycle();
             heat.setTemperature(tag.getInt("CurrentTemperature"));
         }
-        heatSlider = Math.max(0, Math.min(100, tag.getInt("HeatSlider")));
+        heatSlider = Math.max(0, Math.min(100, tag.getInt("HeatTrack")));
         internalEnergy = Math.max(0, tag.getInt("Energy"));
         lastMinimumTemperature = Math.max(0, tag.getInt("LastMinimumTemperature"));
         lastTargetTemperature = Math.max(0, tag.getInt("LastTargetTemperature"));

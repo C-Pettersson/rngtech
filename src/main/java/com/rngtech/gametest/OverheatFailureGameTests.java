@@ -19,6 +19,7 @@ import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
@@ -52,6 +53,23 @@ public final class OverheatFailureGameTests {
         helper.succeedWhen(() -> {
             check(drained[1] == 0, "The safe maximum ruined " + drained[1] + " ingots");
             check(drained[0] >= 8, "Only " + drained[0] + " tin ingots so far; " + MachineTestSupport.describe(furnace));
+        });
+    }
+
+    /** A lane whose output is blocked holds its setpoint instead of cooling, so it can resume at once. */
+    @GameTest(template = MachineTestSupport.EMPTY, timeoutTicks = 1200)
+    public static void blockedOutputHoldsHeat(GameTestHelper helper) {
+        FurnaceBlockEntity furnace = MachineTestSupport.place(helper, MACHINE,
+                ModBlocks.furnaceChassis(FurnaceChassisMaterial.STEEL).get(), FurnaceBlockEntity.class);
+        furnace.getGearInventory().setStackInSlot(0, new ItemStack(ModItems.heatCore(HeatCoreMaterial.STEEL).get()));
+        furnace.getInventory().setStackInSlot(FurnaceBlockEntity.SLOT_INPUT_START,
+                new ItemStack(BuiltInRegistries.ITEM.get(ResourceLocation.fromNamespaceAndPath(RNGTech.MOD_ID, "iron_dust")), 4));
+        furnace.getInventory().setStackInSlot(FurnaceBlockEntity.SLOT_OUTPUT_START, new ItemStack(Items.COBBLESTONE));
+        MachineTestSupport.powerEachTick(helper, furnace.getEnergyStorage(null));
+        helper.runAfterDelay(1000, () -> {
+            check(furnace.machineInfo().heat() >= 790, "A blocked lane let its heat fall to " + furnace.machineInfo().heat() + " C");
+            check(furnace.getInventory().getStackInSlot(FurnaceBlockEntity.SLOT_INPUT_START).getCount() == 4, "A blocked lane used its input");
+            helper.succeed();
         });
     }
 

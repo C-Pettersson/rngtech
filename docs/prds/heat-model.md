@@ -218,8 +218,8 @@ Every heated machine gets an overheat slider on its Process tab, stored on the m
 
 ```text
 reach    = safe maximum; with Blast Draft or Overdrive, Max Temperature (or the overheat temperature if the recipe cannot fail)
-slider   = 0% to 100% of the band from the target to reach
-setpoint = target + slider × (reach − target)
+slider   = 0% to 100% of the track from the target to Max Temperature
+setpoint = min(reach, target + slider × (Max Temperature − target))
 ```
 
 - At 0%, the default, the lane holds the recipe target: lowest FE, base speed, and no wobble beyond a Stability shortfall.
