@@ -2,18 +2,18 @@
 
 Source: [Heat Model PRD](heat-model.md).
 
-Status: **Planned** for the 2.0 release. The PRD is a draft; no code has changed.
+Status: **Prototype** for the 2.0 release. All four slices are implemented together with batching slices 3 and 4 and pass the automated checks. The in-game playtest decides whether the direction stays.
 
 ## Scope checklist
 
 - [x] Survey current heat math on the Furnace, Alloy Furnace, Metal Press, and Melter.
 - [x] Draft the PRD and this state page.
 - [x] Quest path audit.
-- [ ] Resolve the PRD's open questions.
-- [ ] Slice 1: shared heat engine, new stats, Heat Mode, emergent FE, `HeatProgressionChecks`.
-- [ ] Slice 2: Heat Core and chassis profiles, affix eligibility, stored-affix conversion.
-- [ ] Slice 3: passive tree and ascendancy changes.
-- [ ] Slice 4: UI, Jade, language, and canonical docs.
+- [ ] Resolve the PRD's open questions. Constants have first values; the redstone slider question stays open.
+- [x] Slice 1: shared heat engine, new stats, overheat slider, emergent FE, `HeatProgressionChecks`.
+- [x] Slice 2: Heat Core and chassis profiles, affix eligibility. Stored affixes are not rewritten; see the decisions below.
+- [x] Slice 3: passive tree and ascendancy changes.
+- [x] Slice 4: UI, Jade, language, and canonical docs.
 - [ ] In-game playtest.
 
 ## Decisions
@@ -37,8 +37,27 @@ Recorded 2026-10-14:
 - Progress starts once the lane reaches the recipe minimum, slower until the target and faster above it.
 - Every Stage 4+ Furnace metal smelt now has a failure output, and a Furnace lane or Metal Press left above a cooler recipe's overheat temperature cools before working. Both land ahead of the engine; active cooling generalizes the second rule.
 
+Recorded 2026-10-15, during implementation:
+
+- First constants: wall loss `3 HU/t` at 1,000 °C over ambient with exponent 3, heater approach `30 HU/t`, `2 HU/°C` heat capacity, load dip `5%` of the target's rise per batched item, active cooling `8 °C/t`, wobble `0.5` of the target per unit of slider push and up to `0.25` from a Stability shortfall, an 80-tick wobble period, `1 FE` per HU, and `7 HU` per Stage 0 burn tick. Wobble and strain constants are placeholders for the playtest.
+- The heater pays wall loss and input absorption before raising the chamber, so loss never caps the reachable temperature; the reachability rule becomes a power rule (holding heat at base gear stays under half the Battery Cell transfer).
+- Legacy recipe `energy` converts at `0.6 HU` per FE, doubled for Furnace recipes at `1750+` heat, which absorbs the retired high-heat surcharge and its config keys. All shipped heated recipes now author `heat`.
+- Cooling Rate is converted where it is read, not in stored items: on a heated machine every reduction counts as an increase of the same size. Old items still say "reduced", which the playtest should judge. `WARMUP_TIME` is renamed `THERMAL_MASS` and keeps the `warmup_time` id, so stored affixes, Uniques, and data decode unchanged.
+- Heat Transfer no longer shortens crafts. Thermal Conductivity carries crafting speed and raises wall loss with it, so FE per craft stays about the same while FE/t rises.
+- Shared Hearth splits each load dip across every Lead Furnace lane that is smelting. Crucible Heart is +1 Batch Size while a lane runs at twice the recipe target. Heat Economy pays 30% less heat before the cycle starts; Continuous Pour skips the load dip.
+- The Melter has no separate target: its recipe minimum is the target, with a safe maximum of 1.15× the minimum.
+- `HeatProgressionChecks` runs the 18 quest steps tick by tick on Normal, unrolled gear and holds time and FE per craft within 0.5–2× of the old model. Its per-step table prints with `-Drngtech.heatReport`.
+
 ## Progress log
 
 - 2026-10-06: Surveyed current heat math and wrote the PRD and this state page.
 - 2026-10-06: Audited heated-recipe quest steps. Found two steps blocked today (Steel Blend smelt, Methane) and an `invar_blend` quest item with no recipe.
 - 2026-10-14: Replaced Heat Mode with the overheat slider, added wobble and active cooling, and moved the progress start to the recipe minimum.
+- 2026-10-15, all slices:
+    - `HeatEngine` and `HeatLane` run the Furnace lanes, Alloy Furnace, Metal Press, and Melter. Lanes save their temperature, work, and fuel debt; older Furnace saves load from their old temperatures.
+    - 247 recipe JSONs and the material generator moved from `energy` to `heat`. JEI shows HU.
+    - `THERMAL_CONDUCTIVITY` and `THERMAL_MASS` are on Heat Cores, Alloy Crucibles, and Servos, roll as affixes, and show on the Stats tabs.
+    - The overheat slider sits on each Process tab. The heat bar marks the target, the setpoint, and the wobble band, and its hover splits FE into heating and wall loss. Jade shows the setpoint.
+    - The heat tree: Heat Flow and Startup nodes reduce Thermal Mass, Thermal Inertia gives Heat Isolation and Cooling Rate, and Kiln Discipline and Thermal Reservoir trade Thermal Mass. Node IDs and positions are unchanged.
+    - New wiki Heat guide; machine pages, Machine Stats, and the reference docs describe the model.
+    - Not done: unit checks for wobble, load-dip clamping, and active cooling beyond what the quest path exercises.

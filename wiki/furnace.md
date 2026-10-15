@@ -59,7 +59,7 @@ Mine a placed Furnace with a pickaxe. It drops itself and keeps its rolled trait
 
 ### Smelting
 
-Put items in the top input slot. The Furnace heats up at a rate set by its Heat Transfer and Warmup Time stats, and starts smelting only once the lane reaches the recipe's target temperature. While the lane is blocked, out of input, or out of power, it cools down.
+Put items in the top input slot. Each lane heats up and starts smelting once it reaches the recipe's temperature, and leaks heat while it has nothing to smelt. The Furnace pays FE, or fuel, for the heat it puts in, including what its walls lose, so a hotter lane costs more per smelt. See [Heat](heat.md) for how lanes heat and the overheat slider on the Process tab.
 
 Each metal smelts at its own pace: low-melting Lead and Tin in half the time of Iron, high-melting Osmium, Titanium, and Tungsten in two and a half to four times as long. The FE per smelt does not change.
 
@@ -100,11 +100,11 @@ Stage 4 and higher metal recipes also need temperature stability. A Stage 0–3 
 | 7 | {{ item('rngtech:tungstensteel_furnace_chassis') }} | Heavy late-game heat chassis. |
 | 8 | {{ item('rngtech:exotic_furnace_chassis') }} | Optional endgame chassis. |
 
-Higher-stage metal recipes cost more FE: Stage 5–8 recipes cost 2×, 3×, 4× and 6× the early baseline. Recipes needing 1,750 heat or more cost another 2× on electric Furnaces.
+Higher-stage metal recipes need more heat: Stage 5–8 recipes take 2×, 3×, 4× and 6× the early baseline, and recipes needing 1,750 heat or more twice that again.
 
 ### Batching
 
-With a Batch Size above 1, each lane smelts several items from its input stack in one cycle. A batch takes as many items as the stack and the lane's free output space allow, up to the Batch Size, and keeps that count until the cycle ends. Each extra item makes the cycle longer by the Batch Overhead, 25% of one item's time to start with. Every item still pays its own FE, or its own burn time on the Stage 0 Furnace, and earns its own XP. Heating a lane costs the same however many items it batches. If a batch fails, every item in it becomes a {{ item('rngtech:malformed_ingot') }}.
+With a Batch Size above 1, each lane smelts several items from its input stack in one cycle. A batch takes as many items as the stack and the lane's free output space allow, up to the Batch Size, and keeps that count until the cycle ends. Each extra item makes the cycle longer by the Batch Overhead, 25% of one item's time to start with. Every item still absorbs its own heat, paid in FE or burn time, and earns its own XP. A bigger batch takes a bigger heat dip from the lane when it goes in. If a batch fails, every item in it becomes a {{ item('rngtech:malformed_ingot') }}.
 
 ### Gear
 
@@ -139,7 +139,7 @@ Other Furnace keystones:
 
 - **Quench Protocol** halves temperature failure strain, for 25% less Heat Transfer.
 - **Closed Loop Recuperator** returns 25% of each electric smelt's FE to the internal buffer, for 15% less Processing Speed.
-- **Thermal Reservoir** gives 60% less Cooling Rate, so the Furnace keeps its heat between jobs, but 25% more Warmup Time from cold.
+- **Thermal Reservoir** gives 40% more Heat Insulation and 50% more Thermal Mass, so the Furnace keeps its heat between jobs and through load dips, but warms up more slowly from cold.
 - **High Flux** gives 100% more Heat Transfer for 25% more Energy Usage and 40% less Fuel Duration.
 
 ### Furnace recipes

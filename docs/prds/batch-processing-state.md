@@ -2,7 +2,7 @@
 
 Source: [Batch Processing PRD](batch-processing.md).
 
-Status: **Prototype** for the 2.0 release. Slice 1 is merged and passed an in-game check on 2026-10-06. Slice 2 passed an in-game check on 2026-10-15 and merged as #164. Slice 3 passes the automated checks. Slice 4 remains.
+Status: **Prototype** for the 2.0 release. Slice 1 is merged and passed an in-game check on 2026-10-06. Slice 2 passed an in-game check on 2026-10-15 and merged as #164. Slices 3 and 4 pass the automated checks and ship with the [Heat Model](heat-model.md) prototype for one playtest.
 
 ## Scope checklist
 
@@ -12,7 +12,7 @@ Status: **Prototype** for the 2.0 release. Slice 1 is merged and passed an in-ga
 - [x] Slice 1: Batch Size, Batch Overhead, shared batch helper, `DENSE_PARALLEL` removal, Single Charge, Calibrator lanes to Batch Size.
 - [x] Slice 2: Lead Furnace shared Heat Core, Furnace and Alloy Furnace batching.
 - [x] Slice 3: Dense Batching, Batch Overhead path, and ascendancy values.
-- [ ] Slice 4: stat display, hover text, progress pips, Jade, language, and canonical docs.
+- [x] Slice 4: stat display, hover text, Jade, language, and canonical docs. Progress pips are not done.
 - [ ] In-game playtest.
 
 ## Decisions
@@ -77,3 +77,8 @@ Recorded 2026-10-15, during slice 3:
     - The Batch Overhead path adds two Batching nodes (8% reduced Batch Overhead each) and Even Loading (15% reduced Batch Overhead, +1 Batch Size).
     - Drop Hammer's Heat Window drawback is −15%; Second Crucible no longer costs 15% more Energy Use.
     - A GameTest covers the full-batch wait on the Furnace.
+- 2026-10-15, slice 4:
+    - Jade shows each batching machine's locked batch.
+    - Lane Sync, Shared Field, and Wide Tolerance no longer say "lanes".
+    - Under the heat model a batch charges each item's heat and takes a larger load dip, replacing slice 2's one-item warmup rate.
+    - Batch progress pips are not done; the progress bar covers the whole batch.

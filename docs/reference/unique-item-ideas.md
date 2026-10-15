@@ -25,7 +25,7 @@ These eight are implemented and specified, with their ranges, in the [Unique Ite
 
 | Unique | Host | Slot stage | Source | Signature | Drawback |
 |---|---|---:|---|---|---|
-| Fortress Heater Element | Heat Core | 4 | Nether fortress chest | Sparksteel-class Maximum Temperature, 60–80% less Warmup Time, Overdrive Margin hook | More Energy Usage, less Overheat Tolerance, poor Solid Fuel Burner fuel efficiency |
+| Fortress Heater Element | Heat Core | 4 | Nether fortress chest | Sparksteel-class Maximum Temperature, 60–80% less Thermal Mass, Overdrive Margin hook | More Energy Usage, less Overheat Tolerance, poor Solid Fuel Burner fuel efficiency |
 | Igloo Basement Thermostat | Heat Core | 2 | Igloo basement chest | Top Temperature Stability and Overheat Tolerance, early `POWER_GRACE`, Heat Window hook | Bronze-class Maximum Temperature cap, less Heat Transfer |
 | Mineshaft Worn Pick-Jaw | Crush Head | 2 | Mineshaft minecart chest | +1 Processing Level over slot stage, +1 to +2 Batch Size, Jam Recovery hook | Jam Chance on every cycle, more Energy Usage |
 | Crying Crucible | Alloy Crucible | 3 | Ruined portal chest | Blend Speed and Blend Heat Reduction without Blendwright | More Energy Usage, less Stability |

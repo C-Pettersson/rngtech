@@ -97,9 +97,9 @@ These anchors should be rechecked when changing recipe energy, processing time, 
 |---|---:|
 | Stage 0 Crusher biomass recipes | `5 FE/t` |
 | Crusher raw, stone, and deepslate ore recipes | Stage 1-4: `48 FE/t`; Stage 5-8 material-form outputs author `96`, `144`, `192`, and `288 FE/t` before high-hardness surcharges |
-| Furnace recipes | Early/common recipes: `15-36 FE/t`; Stage 5-8 material smelting authors higher FE, and Stage 7+ heat-band recipes can reach roughly `96-288 FE/t` before machine `ENERGY_USAGE` |
-| Alloy Furnace recipes | `10-19 FE/t` |
-| Metal Press recipes | `10-20 FE/t` |
+| Furnace recipes | Recipe `heat` in HU, `1 FE` per HU before `ENERGY_USAGE`, plus wall loss; FE/t follows the lane's temperature, Heat Core, and overheat slider. Stage 5-8 material smelting authors `2x`-`6x` the early heat, doubled again at `1750+` heat |
+| Alloy Furnace recipes | Recipe `heat` in HU, paid the same way |
+| Metal Press recipes | Recipe `heat` in HU, paid the same way |
 | Melter lubricant recipes | `20 FE/t` |
 | Melter lava recipe | about `27 FE/t` |
 | Resonance Calibration recipes | `7-8 FE/t` |

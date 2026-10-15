@@ -285,6 +285,7 @@
             "path_0223",
             "orchard_plan_1",
             "path_0081",
+            "even_loading_1",
             "path_0084",
             "path_0209",
             "path_0233",
@@ -301,8 +302,7 @@
             "balanced_chassis_2",
             "balanced_chassis_6",
             "path_0224",
-            "orchard_plan_2",
-            "orchard_plan_3"
+            "orchard_plan_2"
         ],
         "start_drive_reserve": [
             "path_0134",
@@ -609,7 +609,7 @@
         ]
     },
     "metrics": {
-        "nodes": 1348,
+        "nodes": 1351,
         "starts": 6,
         "startPositions": {
             "start_control": {
@@ -640,17 +640,17 @@
         "kinds": {
             "STARTER": 6,
             "TRAVEL": 634,
-            "NODE": 480,
-            "NOTABLE": 195,
+            "NODE": 482,
+            "NOTABLE": 196,
             "KEYSTONE": 33
         },
-        "groups": 400,
-        "edges": 1501,
+        "groups": 401,
+        "edges": 1504,
         "cycleRank": 154,
         "investment": {
             "travelNodes": 634,
-            "rewardPockets": 131,
-            "rewardComponents": 142,
+            "rewardPockets": 132,
+            "rewardComponents": 143,
             "minimumGateTravel": 2,
             "notablePointsFromRoad": {
                 "min": 3,
@@ -664,7 +664,7 @@
         "overlaps": 0,
         "throughNodes": 0,
         "crossings": 0,
-        "medianLength": 72.00694410957877,
+        "medianLength": 71.8679344353238,
         "p90Length": 95.88013350011566,
         "distances": {
             "start_control": {

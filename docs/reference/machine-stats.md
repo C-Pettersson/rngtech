@@ -52,8 +52,9 @@ Modifier operations (`ADD`, `INCREASED_PERCENT`, `DECREASED_PERCENT`, `MORE`, `L
 | `BATTERY_SLOTS` | Prototype | Number of battery cell slots available in a battery chassis. Material identity sets the base count, and Battery Chassis slot prefixes can activate additional cell slots. |
 | `GLOBAL_MODIFIER_STRENGTH` | Prototype | Scalar for global chassis modifier effects applied to inserted cells. Current code exposes the stat for chassis traits and UI; broad cell-global behavior remains future work. |
 | `MAX_TEMPERATURE` | Prototype | Highest effective operating temperature. Furnace, Alloy Furnace, Metal Press, and Melter compare this against recipe temperature gates. Electric Furnace and Alloy Furnace chassis gain additional effective temperature from installed Heat Cores. Metal Press requires an installed Heat Core, then combines the forming bed baseline with the Heat Core contribution. Cavitation Generator: softens the FE lost at the heat strain cap, `0.5 * 1000 / (1000 + Max Temperature / 4)`. |
-| `HEAT_TRANSFER` | Prototype | How quickly the machine applies or receives heat. It affects Furnace, Alloy Furnace, and Metal Press warmup speed and still contributes to heat-processing time scaling. Cavitation Generator: Heat Transfer beyond the installed Heat Core's own base multiplies the core's stage cooling of heat strain. |
-| `HEAT_ISOLATION` | Prototype | How well the machine retains heat. Furnace, Alloy Furnace, and Metal Press cooling use it to slow heat loss while blocked, out of fuel, or out of FE. |
+| `HEAT_TRANSFER` | Prototype | Heater power on the Furnace, Alloy Furnace, Metal Press, and Melter: the heat a lane can add per tick on top of what it loses and what the input absorbs, `30 HU/t x HEAT_TRANSFER`, falling to half near Max Temperature. Faster warmup and recovery and higher FE/t while heating; it no longer shortens crafts. Cavitation Generator: Heat Transfer beyond the installed Heat Core's own base multiplies the core's stage cooling of heat strain. |
+| `THERMAL_CONDUCTIVITY` | Prototype | Furnace, Alloy Furnace, Metal Press, and Melter: how fast heat reaches the input. It multiplies processing speed and wall loss, so FE/t rises and FE per craft stays about the same. Heat Cores and Alloy Crucibles carry it; the base is `1.0`. |
+| `HEAT_ISOLATION` | Prototype | Wall insulation on the Furnace, Alloy Furnace, Metal Press, and Melter: wall loss is `3 x THERMAL_CONDUCTIVITY x ((T - 20) / 1000)^3 / HEAT_ISOLATION` HU/t, paid by the heater while working and drained from the lane while idle. Higher means cheaper crafts and slower idle cooling. |
 | `TEMPERATURE_STABILITY` | Prototype | Precision of temperature control. Normal Furnace and Alloy Furnace recipes can require a minimum value. Failure-bearing Stage 4+ heat recipes use low stability as failure strain instead of a hard block after work starts. Metal Press also compares it against recipe requirements while accumulating forming failure risk when it is too low. Cavitation Generator: divides heat strain per cycle. |
 | `FUEL_EFFICIENCY` | Prototype | Fuel-specific efficiency for burnable or heat-producing recipes. Bio Generators apply it to total fuel FE. |
 | `POTATO_POWER` | Prototype | Ingredient-aware Bio Generator multiplier for fuels tagged `rngtech:bio_generator/potato_fuels`. |
@@ -67,8 +68,8 @@ Modifier operations (`ADD`, `INCREASED_PERCENT`, `DECREASED_PERCENT`, `MORE`, `L
 | `ALGAE_POWER` | Prototype | Ingredient-aware Bio Generator multiplier for fuels tagged `rngtech:bio_generator/algae_biomass` or `rngtech:bio_generator/dense_algae_biomass`. |
 | `RICH_BIOMASS_POWER` | Prototype | Ingredient-aware Bio Generator multiplier for fuels tagged `rngtech:bio_generator/rich_biomass`. |
 | `FUEL_DURATION` | Prototype | Generator burn-time multiplier for Bio Generators and solid fuel-burning generators. It increases the number of burn ticks without increasing FE/t. |
-| `WARMUP_TIME` | Prototype | Time needed before the machine reaches target temperature. Lower is better. Furnace, Alloy Furnace, and Metal Press warmup rate is `max(1, round(10 * HEAT_TRANSFER / max(0.25, WARMUP_TIME)))` C/t. |
-| `COOLING_RATE` | Prototype | How quickly stored heat is lost. Lower is better for retained heat. Furnace, Alloy Furnace, and Metal Press cooling is `max(1, round(2 * COOLING_RATE / max(0.25, HEAT_ISOLATION)))` C/t. |
+| `THERMAL_MASS` | Prototype | Heat stored per degree on the Furnace, Alloy Furnace, Metal Press, and Melter: `2 HU/°C x THERMAL_MASS`. Higher means smaller load dips, less wobble, and slower idle cooling, but slower warmup and recovery. Serialized as `warmup_time`, which older items and data still use. |
+| `COOLING_RATE` | Prototype | Active cooling on the Furnace, Alloy Furnace, Metal Press, and Melter: a lane above the heat its next recipe or slider allows sheds `8 x COOLING_RATE` °C/t on top of wall loss. Higher is better; reductions from older rolls and nodes count as increases there. Other machines do not read it. |
 | `OVERHEAT_TOLERANCE` | Prototype | How far the machine can exceed safe heat before penalties apply. Furnace, Alloy Furnace, and Metal Press use it to widen a recipe's safe maximum temperature before overheat failure risk accumulates. Cavitation Generator: multiplies the 1,000 heat strain cap. |
 | `REFINEMENT_POTENTIAL` | Prototype | Remaining crafting or rerolling budget. |
 | `MINING_SPEED` | Prototype | Modular Field Tool block-breaking speed. Head and rod base profiles and stored part affixes combine directly; assembled tools carry no own affixes. |
@@ -192,13 +193,14 @@ Furnaces use authored base processing stats and heat stats. Stage 0 uses fuel st
 
 | Stat | Base Range | Notes |
 |---|---:|---|
-| `HEAT_TRANSFER` | `0.8-1.2` | Faster warmup and heat application. |
-| `HEAT_ISOLATION` | `0.8-1.2` | Heat retention while cooling. |
+| `HEAT_TRANSFER` | `1.08-2.0`, from the Heat Core | Heater power: warmup and recovery. |
+| `THERMAL_CONDUCTIVITY` | `1.08-1.64`, from the Heat Core | Crafting speed, with matching wall loss. |
+| `HEAT_ISOLATION` | `0.8-1.2` | Wall loss and idle cooling. |
 | `MAX_TEMPERATURE` | Stage 0 `800`; electric chassis `600` baseline plus Heat Core and affix contribution | Recipe temperature gate. |
 | `TEMPERATURE_STABILITY` | `0.85-1.18x` from Heat Cores before affixes | Precision recipes prefer higher values. |
 | `FUEL_EFFICIENCY` | `0.9-1.1` | Fuel cost multiplier support. |
-| `WARMUP_TIME` | `0.9-1.2` | Lower means reaching heat faster. |
-| `COOLING_RATE` | `0.8-1.2` | Lower means retaining heat longer. |
+| `THERMAL_MASS` | `0.65-1.4`, from the Heat Core | Load dips and wobble against warmup speed. |
+| `COOLING_RATE` | `1.0x` neutral before affixes | Active cooling when a lane is too hot. |
 | `OVERHEAT_TOLERANCE` | `1.0-1.25` | Safety margin above intended heat. |
 
 ## Alloy Furnace Range
@@ -213,10 +215,11 @@ Alloy Furnaces use authored chassis base stats plus required Heat Core and Alloy
 | `ENERGY_CAPACITY` | `900-2200 FE` internal buffer | Supplemented by an optional installed Battery Cell. |
 | `PROCESSING_SPEED` | `1.0-1.22x` chassis before Gear | Alloy Crucibles, Servos, and Bulk Speed can raise the effective value. |
 | `ENERGY_USAGE` | `0.88-1.08x` | Scales total recipe FE cost. |
-| `HEAT_TRANSFER` | `0.95-1.22x` | Reduces alloy processing time together with processing speed. |
+| `HEAT_TRANSFER` | `0.95-1.22x` | Heater power: warmup and recovery. |
+| `THERMAL_CONDUCTIVITY` | Alloy Crucible heat transfer | Crafting speed, with matching wall loss. |
 | `MAX_TEMPERATURE` | Heat Core-authored | Must meet the recipe's `target_temperature`, defaulting to `minimum_temperature`. |
-| `WARMUP_TIME` | `1.0x` neutral before affixes | Lower reaches target heat faster. |
-| `COOLING_RATE` | `1.0x` neutral before affixes | Lower retains heat longer. |
+| `THERMAL_MASS` | `1.0x` neutral before affixes | Load dips and wobble against warmup speed. |
+| `COOLING_RATE` | `1.0x` neutral before affixes | Active cooling when the chamber is too hot. |
 | `TEMPERATURE_STABILITY` | `0.9-1.18x` from crucibles and Gear | Must meet recipe `required_temperature_stability` unless the active Stage 4+ recipe carries a failure output. |
 | `OVERHEAT_TOLERANCE` | `1.0x+` from Servo or affixes | Widens the safe heat band before overheat strain. |
 | `STABILITY` | `0.95-1.18x` chassis before Gear | General mixing reliability and modifier target. |

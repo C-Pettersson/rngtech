@@ -82,7 +82,7 @@ RNGTech has no global FE multiplier. To scale the whole mod, multiply generator 
 | Solid Fuel Burner FE per item | Each fuel gives 10 FE per burn tick (Coal: 16,000 FE). Change the burn time in NeoForge's `furnace_fuels` data map. This also changes vanilla furnaces. |
 | Other mods' fuels in the Solid Fuel Burner | Add the item to a tier tag `rngtech:solid_fuel/tier_1` to `tier_4`, plus `rngtech:solid_fuel/item_fuels` or `block_fuels`. |
 | Bio Generator fuels | Add the item to a `rngtech:bio_generator/*` tag. It gives that category's fixed FE, such as `potato_fuels` (120 FE). |
-| Surcharge on the hardest ores and hottest smelts | `crusher.highHardnessEnergyMultiplier` and `furnace.highHeatEnergyMultiplier` (default 2.0). |
+| Surcharge on the hardest ores | `crusher.highHardnessEnergyMultiplier` (default 2.0). Heated recipes carry their own `heat` in heat units instead; a datapack recipe that still sets `energy` in FE loads with 0.6 heat per FE. |
 | Resonance Calibrator cost | `calibration.energyMultiplier` and `calibration.timeMultiplier`. |
 | Exotic Affix Forge cost | `exoticAffixForge.energyMultiplier` and `exoticAffixForge.timeMultiplier`. |
 | Solar in other dimensions | `solar.dimensions.overworld`, `nether`, `end`, `other`. The Overworld is the default. |
