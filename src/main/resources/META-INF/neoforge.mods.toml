@@ -35,6 +35,13 @@ ordering="AFTER"
 side="BOTH"
 
 [[dependencies.${mod_id}]]
+modId="guideme"
+type="optional"
+versionRange="[21.1.1,)"
+ordering="NONE"
+side="BOTH"
+
+[[dependencies.${mod_id}]]
 modId="refinedstorage"
 type="optional"
 ordering="AFTER"

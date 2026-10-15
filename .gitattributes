@@ -8,3 +8,6 @@ gradlew text eol=lf
 src/generated/**/.cache/* text eol=lf
 src/generated/**/*.json text eol=lf
 *.nbt binary
+
+# The in-game guide is generated from wiki/ by tools/rngwiki/guideme.py.
+src/guide/** linguist-generated=true

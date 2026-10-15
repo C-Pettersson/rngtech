@@ -1,0 +1,13 @@
+{
+    "item_settings": {
+        "display_name": {
+            "text": "RNGTech Guide"
+        },
+        "tooltip_lines": [
+            {
+                "text": "Machines, Gear, and recipes",
+                "color": "gray"
+            }
+        ]
+    }
+}

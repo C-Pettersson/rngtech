@@ -49,7 +49,7 @@ Universal Cable is cheap, with 12 per craft, and carries power, fluids, and item
 ## Compatibility
 
 - **Requires** Minecraft 1.21.1, NeoForge 21.1.228 or newer, and Java 21, on the client and the server.
-- **Optional:** JEI for recipes and Gear lookup, Jade for machine overlays, and Applied Energistics 2 or Refined Storage for network bridges.
+- **Optional:** JEI for recipes and Gear lookup, Jade for machine overlays, GuideME for the wiki as an in-game guide, and Applied Energistics 2 or Refined Storage for network bridges.
 - **Pack authors:** an optional FTB Quests chapter set is available as an additional file.
 
 Back up your worlds before updating.

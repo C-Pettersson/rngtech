@@ -43,7 +43,7 @@ The rarity, crafting currency, and passive-tree ideas come from **Path of Exile*
 
 RNGTech is in active development. Back up your worlds before updating.
 
-**Optional integrations:** [JEI](https://www.curseforge.com/minecraft/mc-mods/jei) (recipes and Gear lookup), [Jade](https://www.curseforge.com/minecraft/mc-mods/jade) (machine overlays), [AE2](https://www.curseforge.com/minecraft/mc-mods/applied-energistics-2) and [Refined Storage](https://www.curseforge.com/minecraft/mc-mods/refined-storage) (network bridges over Universal Cable). Pack authors can add the [FTB Quests extra](extras/ftbquests/README.md).
+**Optional integrations:** [JEI](https://www.curseforge.com/minecraft/mc-mods/jei) (recipes and Gear lookup), [Jade](https://www.curseforge.com/minecraft/mc-mods/jade) (machine overlays), [GuideME](https://www.curseforge.com/minecraft/mc-mods/guideme) (the wiki as an in-game guide), [AE2](https://www.curseforge.com/minecraft/mc-mods/applied-energistics-2) and [Refined Storage](https://www.curseforge.com/minecraft/mc-mods/refined-storage) (network bridges over Universal Cable). Pack authors can add the [FTB Quests extra](extras/ftbquests/README.md).
 
 ## Links
 

@@ -26,6 +26,7 @@ These mods are optional. RNGTech works without them and adds extra features when
 |---|---|
 | [JEI](https://www.curseforge.com/minecraft/mc-mods/jei) | Recipe categories for every RNGTech machine, a Gear lookup that shows which parts fit each machine, and ore generation pages with depth and hardness. |
 | [Jade](https://www.curseforge.com/minecraft/mc-mods/jade) | Machine overlays when you look at a placed RNGTech block. |
+| [GuideME](https://www.curseforge.com/minecraft/mc-mods/guideme) | This wiki as an in-game guide. Hover an RNGTech item and hold the guide key to open its page. |
 | [Applied Energistics 2](https://www.curseforge.com/minecraft/mc-mods/applied-energistics-2) | A bridge connector that links AE2 networks through [Universal Cable](universal-cable.md). |
 | [Refined Storage](https://www.curseforge.com/minecraft/mc-mods/refined-storage) | A bridge connector that links Refined Storage networks through Universal Cable. |
 

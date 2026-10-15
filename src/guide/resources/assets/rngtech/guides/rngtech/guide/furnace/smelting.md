@@ -1,0 +1,35 @@
+---
+navigation:
+  title: "Smelting"
+  parent: furnace.md
+  position: 0
+  icon: rngtech:furnace
+---
+
+# Smelting
+
+Put items in the top input slot. The Furnace heats up at a rate set by its Heat Transfer and Warmup Time stats, and starts smelting only once the lane reaches the recipe's target temperature. While the lane is blocked, out of input, or out of power, it cools down.
+
+Each metal smelts at its own pace: low-melting Lead and Tin in half the time of Iron, high-melting Osmium, Titanium, and Tungsten in two and a half to four times as long. The FE per smelt does not change.
+
+Heat decides your progress. Unmodified electric chassis reach about:
+
+| Heat Core | Max temperature | Unlocks |
+|---|---:|---|
+| Stage 0 Furnace (no core) | 800 | Iron and Copper |
+| <ItemLink id="rngtech:iron_heat_core" /> | 800 | Iron and Copper |
+| <ItemLink id="rngtech:copper_heat_core" /> | 1,000 | Bronze ingredients and other early metals |
+| <ItemLink id="rngtech:bronze_heat_core" /> | 1,200 | Mid-tier metals |
+| <ItemLink id="rngtech:steel_heat_core" /> | 1,400 | Stage 4 metals |
+| <ItemLink id="rngtech:sparksteel_heat_core" /> | 1,600 | High-heat metals |
+| <ItemLink id="rngtech:titanium_heat_core" /> | 1,800 | Late-game metals |
+| <ItemLink id="rngtech:exotic_heat_core" /> | 2,200 | Every metal recipe |
+| <ItemLink id="rngtech:aluminum_heat_core" /> | 850 | Low-heat Stage 5 sidegrade that heats up much faster |
+
+Vanilla ores and raw metals go through the same heat gates as RNGTech metals, so you cannot skip heat progression by smelting them directly.
+
+Crushed material smelts straight into ingots, which is handy for simple hopper lines, but it takes three times as long and costs 50% more FE than smelting dust. Crush it into dust first for faster, cheaper smelting.
+
+There is no Steel Dust smelting recipe. Steel comes from Steel Blend, which you make in the [Alloy Furnace](rngtech:alloy-furnace.md) and then smelt here.
+
+Stage 4 and higher metal recipes also need temperature stability. A Stage 0–3 Furnace will not start one without enough stability. A Stage 4 or higher Furnace starts it anyway, but poor stability or heat above the recipe's safe maximum builds up failure strain. A lane left above the recipe's overheat temperature by a hotter recipe cools down to it before smelting, so switching to a cooler metal costs time instead of ingots. Higher Overheat Tolerance shortens that wait. When strain fills, the input becomes a **Malformed Ingot** of that metal. Smelt it again to get two nuggets back. Ancient Debris never fails.

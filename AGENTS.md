@@ -21,6 +21,7 @@ Machine implementation and balance work must follow [Machine Guidelines](docs/re
 - `docs/` contains MkDocs design and reference documentation.
 - `mkdocs.yml` configures the documentation site.
 - `wiki/` and `mkdocs.wiki.yml` are the published player wiki; `tools/rngwiki/` is the MkDocs hook that renders its templates, icons, and recipe tables from mod resources.
+- `src/guide/resources` is the GuideME in-game guide, generated from `wiki/` by `tools/rngwiki/guideme.py`. Never edit it by hand.
 - `build.gradle`, `settings.gradle`, and `gradle.properties` define the Gradle/NeoForge setup.
 
 ## Requirements
@@ -130,7 +131,7 @@ mkdocs build --strict -f mkdocs.wiki.yml
 - Define each game concept once, then link to that canonical definition from other pages.
 - Do not promote example-only concepts into canonical docs until they become real RNGTech design.
 - Docs do not restate shipped code. Shipped machine behavior lives in the code and on its wiki page; design intent and balance rules live in `docs/reference/machine-guidelines.md` (Machine Design Notes). Use `docs/page-templates/content.md` only for proposed (Planned) content and `docs/page-templates/modifier.md` for proposed modifiers; when a proposal ships, move its player behavior to the wiki, its design rules to the guidelines, and delete the proposal page.
-- The player wiki (`wiki/`) documents implemented behavior for players only: no planned content, no PRD/state content, no links into `docs/`. Follow `docs/reference/wiki-authoring.md` and `docs/page-templates/wiki.md`. When gameplay changes, update the affected wiki page too. Wiki icons for vanilla items need the Minecraft client jar; run `python tools/rngwiki/vanilla.py --fetch` once if no NeoGradle cache provides it.
+- The player wiki (`wiki/`) documents implemented behavior for players only: no planned content, no PRD/state content, no links into `docs/`. Follow `docs/reference/wiki-authoring.md` and `docs/page-templates/wiki.md`. When gameplay changes, update the affected wiki page too, then run `python tools/rngwiki/guideme.py` and commit the regenerated in-game guide. Wiki icons for vanilla items need the Minecraft client jar; run `python tools/rngwiki/vanilla.py --fetch` once if no NeoGradle cache provides it.
 
 ## CI
 
@@ -140,7 +141,7 @@ GitHub Actions runs:
 ./gradlew ciCheck
 ```
 
-with Temurin Java 21 on Ubuntu. CI also runs `npm run repo:check`, `npm run moddex:check`, `mkdocs build --strict`, and `mkdocs build --strict -f mkdocs.wiki.yml`. Local changes should pass the relevant checks before handoff.
+with Temurin Java 21 on Ubuntu. CI also runs `npm run repo:check`, `npm run moddex:check`, `mkdocs build --strict`, `mkdocs build --strict -f mkdocs.wiki.yml`, and `python tools/rngwiki/guideme.py --check`. Local changes should pass the relevant checks before handoff.
 
 A separate `gametest` job runs `./gradlew runGameTestServer` (the GameTests in `com.rngtech.gametest`), which fails when the server exits without running them; run it locally after changing machine behavior.
 

@@ -1,0 +1,26 @@
+---
+navigation:
+  title: "Refining"
+  parent: rarity-and-affixes.md
+  position: 11
+  icon: rngtech:affix_injector
+---
+
+# Refining
+
+Refinement changes an item's rolled affixes with a consumable **catalyst**. You can:
+
+- **add** an affix (<ItemLink id="rngtech:affix_injector" />). A Normal item becomes Magic, a Magic item fills its missing prefix or suffix, and a Rare item keeps adding until full.
+- **upgrade** a random affix to a higher tier, up to Tier 6.
+- **promote** a Magic item to Rare with an Ascension Catalyst or Ascension Matrix.
+- **remove** or **reroll** affixes.
+- **corrupt** a finished item with a <ItemLink id="rngtech:volatile_catalyst" />, a one-way gamble described in [Corruption](rngtech:rarity-and-affixes.md#corruption).
+
+You choose the catalyst, but the game picks which affix it adds or upgrades. In the Affix Forge, modifier lenses can tilt the odds towards a family you want.
+
+Where to refine:
+
+- **Items** in the [Affix Forge](rngtech:affix-forge.md). Its [catalyst table](rngtech:affix-forge/catalysts.md) lists every operation and its RP cost.
+- **Placed machines** in the Refinement tab of the machine's own screen.
+- **Tool Heads and Tool Rods**, even inside an assembled tool, in the [Tool Bench](rngtech:tool-bench.md) Refine tab.
+- **Late-game powered operations** in the [Exotic Affix Forge](rngtech:exotic-affix-forge.md).

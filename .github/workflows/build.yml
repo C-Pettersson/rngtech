@@ -90,6 +90,9 @@ jobs:
           mkdocs build --strict
           mkdocs build --strict -f mkdocs.wiki.yml
 
+      - name: Check the in-game guide matches the wiki
+        run: python tools/rngwiki/guideme.py --check
+
   gametest:
     needs: changes
     if: needs.changes.outputs.gradle == 'true'
