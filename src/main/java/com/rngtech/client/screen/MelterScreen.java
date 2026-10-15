@@ -73,6 +73,7 @@ public class MelterScreen extends AbstractContainerScreen<MelterMenu> {
             "rngtech.stat.energy_usage",
             "rngtech.stat.energy_capacity",
             "rngtech.stat.heat_transfer",
+            "rngtech.stat.thermal_conductivity",
             "rngtech.stat.max_temperature",
             "rngtech.stat.fluid_transfer"
     };
@@ -82,6 +83,7 @@ public class MelterScreen extends AbstractContainerScreen<MelterMenu> {
             MelterMenu.energyUsageDataIndex(),
             MelterMenu.energyCapacityStatDataIndex(),
             MelterMenu.heatTransferDataIndex(),
+            MelterMenu.thermalConductivityDataIndex(),
             MelterMenu.maxTemperatureDataIndex(),
             MelterMenu.fluidTransferDataIndex()
     };
@@ -91,6 +93,7 @@ public class MelterScreen extends AbstractContainerScreen<MelterMenu> {
             MachineStat.ENERGY_USAGE,
             MachineStat.ENERGY_CAPACITY,
             MachineStat.HEAT_TRANSFER,
+            MachineStat.THERMAL_CONDUCTIVITY,
             MachineStat.MAX_TEMPERATURE,
             MachineStat.FLUID_TRANSFER
     };
@@ -388,6 +391,8 @@ public class MelterScreen extends AbstractContainerScreen<MelterMenu> {
         guiGraphics.fill(x + HEAT_BAR_X, y + BAR_Y, x + HEAT_BAR_X + BAR_WIDTH, y + BAR_Y + BAR_HEIGHT, 0xFF5F5F5F);
         int heatHeight = Math.round(BAR_FILL_HEIGHT * menu.heatProgress());
         guiGraphics.fill(x + HEAT_BAR_X + 1, y + BAR_Y + BAR_HEIGHT - 1 - heatHeight, x + HEAT_BAR_X + BAR_WIDTH - 1, y + BAR_Y + BAR_HEIGHT - 1, HEAT);
+        HeatReadout.renderMarkers(guiGraphics, leftPos + HEAT_BAR_X, topPos + BAR_Y, BAR_WIDTH, BAR_HEIGHT, BAR_FILL_HEIGHT,
+                menu.heatScale(), menu.minimumTemperature(), menu.setpoint(), menu.wobble());
 
         int outputHeight = Math.round(BAR_FILL_HEIGHT * menu.outputFluidProgress());
         guiGraphics.fill(x + OUTPUT_FLUID_BAR_X, y + BAR_Y, x + OUTPUT_FLUID_BAR_X + FLUID_BAR_WIDTH, y + BAR_Y + BAR_HEIGHT, 0xFF5F5F5F);
@@ -541,7 +546,7 @@ public class MelterScreen extends AbstractContainerScreen<MelterMenu> {
                 BAR_Y,
                 BAR_WIDTH,
                 BAR_HEIGHT,
-                heatTooltip()
+                heatTooltipLines()
         );
         CompactValueText.renderTooltipIfHovered(
                 guiGraphics,
@@ -608,6 +613,11 @@ public class MelterScreen extends AbstractContainerScreen<MelterMenu> {
                 STATUS_SIZE,
                 transferTooltip()
         );
+    }
+
+    private List<Component> heatTooltipLines() {
+        return HeatReadout.lines(heatTooltip(), menu.heatSlider(), menu.minimumTemperature(), menu.setpoint(), menu.heatFactor(), menu.wobble(),
+                menu.heatingEnergy(), menu.holdingEnergy(), true);
     }
 
     private Component heatTooltip() {

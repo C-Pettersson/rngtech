@@ -130,7 +130,12 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
     private static final int DATA_BATCH_SIZE = DATA_LEDGER_START + MAX_PROCESSING_SLOTS;
     private static final int DATA_HEAT_SLIDER = DATA_BATCH_SIZE + 1;
     private static final int DATA_SETPOINT_START = DATA_HEAT_SLIDER + 1;
-    private static final int DATA_MACHINE_PROGRESSION_START = DATA_SETPOINT_START + MAX_PROCESSING_SLOTS;
+    private static final int DATA_THERMAL_CONDUCTIVITY = DATA_SETPOINT_START + MAX_PROCESSING_SLOTS;
+    private static final int DATA_HOLDING_ENERGY = DATA_THERMAL_CONDUCTIVITY + 1;
+    private static final int DATA_HEATING_ENERGY = DATA_HOLDING_ENERGY + 1;
+    private static final int DATA_HEAT_FACTOR = DATA_HEATING_ENERGY + 1;
+    private static final int DATA_WOBBLE = DATA_HEAT_FACTOR + 1;
+    private static final int DATA_MACHINE_PROGRESSION_START = DATA_WOBBLE + 1;
     private static final int DATA_COUNT = DATA_MACHINE_PROGRESSION_START + MasteryMenuSupport.FIELD_COUNT;
     private static final int STAT_SCALE = 100;
 
@@ -268,6 +273,11 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
                 case DATA_INPUT_SLOTS -> scaledStat(stats, MachineStat.INPUT_SLOTS);
                 case DATA_BATCH_SIZE -> BatchProcessing.statBatchSize(stats) * STAT_SCALE;
                 case DATA_HEAT_SLIDER -> heatSlider;
+                case DATA_THERMAL_CONDUCTIVITY -> scaledStat(stats, MachineStat.THERMAL_CONDUCTIVITY);
+                case DATA_HOLDING_ENERGY -> heatEnergy(true);
+                case DATA_HEATING_ENERGY -> heatEnergy(false);
+                case DATA_HEAT_FACTOR -> heatFactorDisplay();
+                case DATA_WOBBLE -> wobbleDisplay();
                 case DATA_GEAR_SLOTS -> activeGearSlots();
                 case DATA_MIN_TEMPERATURE -> currentMinimumTemperature(stats);
                 case DATA_STATUS -> statusCode(stats);
@@ -491,6 +501,8 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
                 )
                 .fuel(burnTime, totalBurnTime)
                 .heat(lane < 0 ? 0 : heat[lane].temperature(), lane < 0 ? 0 : currentTargetTemperature(lane))
+                .setpoint(lane < 0 ? 0 : currentSetpoint(lane))
+                .batch(lane < 0 || recipe == null ? 0 : laneBatch(lane, recipe, statsForLane(lane)))
                 .slots(activeProcessingSlots(baseStats), MAX_PROCESSING_SLOTS)
                 .gear(furnaceGearSummary())
                 .output(status == STATUS_OUTPUT_FULL
@@ -1145,6 +1157,37 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
         }
         MachineStatAccumulator stats = statsForLane(lane);
         return HeatEngine.elapsedTicks(heat[lane], load(lane, recipe, stats, 1), envelope(lane, recipe, stats));
+    }
+
+    /** FE/t the lanes' heaters spent last tick: on wall loss when {@code holding}, otherwise on heating chambers and inputs. */
+    private int heatEnergy(boolean holding) {
+        if (!isElectric()) {
+            return 0;
+        }
+        double total = 0.0;
+        for (int lane = 0; lane < activeProcessingSlots(); lane++) {
+            double holdingPaid = Math.min(heat[lane].lastHolding(), heat[lane].lastHeat());
+            double spent = holding ? holdingPaid : heat[lane].lastHeat() - holdingPaid;
+            total += spent * HeatEngine.energyRate(statsForLane(lane));
+        }
+        return (int) Math.ceil(total);
+    }
+
+    private int heatFactorDisplay() {
+        int lane = machineInfoLane(baseEffectiveStats());
+        FurnaceRecipe recipe = lane < 0 ? null : findNextRecipe(lane);
+        return recipe == null ? 0 : (int) Math.round(100.0 * HeatEngine.heatFactor(heat[lane].exactTemperature(),
+                envelope(lane, recipe, statsForLane(lane))));
+    }
+
+    private int wobbleDisplay() {
+        int lane = machineInfoLane(baseEffectiveStats());
+        FurnaceRecipe recipe = lane < 0 ? null : findNextRecipe(lane);
+        if (recipe == null) {
+            return 0;
+        }
+        MachineStatAccumulator stats = statsForLane(lane);
+        return (int) Math.round(HeatEngine.wobbleAmplitude(envelope(lane, recipe, stats), stats));
     }
 
     private int currentSetpoint(int lane) {

@@ -135,7 +135,12 @@ public class MelterBlockEntity extends BaseMachineBlockEntity
     private static final int DATA_OUTPUT_FLUID_ID = DATA_INPUT_FLUID_ID + 1;
     private static final int DATA_HEAT_SLIDER = DATA_OUTPUT_FLUID_ID + 1;
     private static final int DATA_SETPOINT = DATA_HEAT_SLIDER + 1;
-    private static final int DATA_MACHINE_PROGRESSION_START = DATA_SETPOINT + 1;
+    private static final int DATA_THERMAL_CONDUCTIVITY = DATA_SETPOINT + 1;
+    private static final int DATA_HOLDING_ENERGY = DATA_THERMAL_CONDUCTIVITY + 1;
+    private static final int DATA_HEATING_ENERGY = DATA_HOLDING_ENERGY + 1;
+    private static final int DATA_HEAT_FACTOR = DATA_HEATING_ENERGY + 1;
+    private static final int DATA_WOBBLE = DATA_HEAT_FACTOR + 1;
+    private static final int DATA_MACHINE_PROGRESSION_START = DATA_WOBBLE + 1;
     private static final int DATA_COUNT = DATA_MACHINE_PROGRESSION_START + MasteryMenuSupport.FIELD_COUNT;
     private static final int STAT_SCALE = 100;
 
@@ -240,6 +245,11 @@ public class MelterBlockEntity extends BaseMachineBlockEntity
                 case DATA_HEAT -> heat.temperature();
                 case DATA_MIN_TEMPERATURE -> recipe == null ? 0 : recipe.minimumTemperature();
                 case DATA_HEAT_SLIDER -> heatSlider;
+                case DATA_THERMAL_CONDUCTIVITY -> scaledStat(stats, MachineStat.THERMAL_CONDUCTIVITY);
+                case DATA_HOLDING_ENERGY -> heatEnergy(true);
+                case DATA_HEATING_ENERGY -> heatEnergy(false);
+                case DATA_HEAT_FACTOR -> heatFactorDisplay();
+                case DATA_WOBBLE -> wobbleDisplay();
                 case DATA_SETPOINT -> recipe == null || !hasRequiredComponents() ? 0 : envelope(recipe, stats).setpoint();
                 case DATA_PROCESSING_LEVEL -> processingLevel(stats);
                 case DATA_REQUIRED_PROCESSING_LEVEL -> recipe == null ? 0 : recipe.requiredProcessingLevel();
@@ -357,6 +367,25 @@ public class MelterBlockEntity extends BaseMachineBlockEntity
         }
     }
 
+    /** FE/t the heater spent last tick: on wall loss when {@code holding}, otherwise on heating the chamber and input. */
+    private int heatEnergy(boolean holding) {
+        double holdingPaid = Math.min(heat.lastHolding(), heat.lastHeat());
+        double spent = holding ? holdingPaid : heat.lastHeat() - holdingPaid;
+        return (int) Math.ceil(spent * HeatEngine.energyRate(effectiveStats()));
+    }
+
+    private int heatFactorDisplay() {
+        MelterRecipe recipe = nextRecipe();
+        MachineStatAccumulator stats = effectiveStats();
+        return recipe == null || !(hasRequiredComponents()) ? 0 : (int) Math.round(100.0 * HeatEngine.heatFactor(heat.exactTemperature(), envelope(recipe, stats)));
+    }
+
+    private int wobbleDisplay() {
+        MelterRecipe recipe = nextRecipe();
+        MachineStatAccumulator stats = effectiveStats();
+        return recipe == null || !(hasRequiredComponents()) ? 0 : (int) Math.round(HeatEngine.wobbleAmplitude(envelope(recipe, stats), stats));
+    }
+
     public int heatSlider() {
         return heatSlider;
     }
@@ -451,6 +480,8 @@ public class MelterBlockEntity extends BaseMachineBlockEntity
                         recipe == null ? MachineInfoSnapshot.UNSET : recipe.requiredProcessingLevel()
                 )
                 .heat(heat.temperature(), recipe == null ? 0 : recipe.minimumTemperature())
+                .setpoint(recipe == null || !hasRequiredComponents() ? 0 : envelope(recipe, stats).setpoint())
+                .batch(recipe == null ? 0 : parallelMelts(recipe, stats))
                 .gear(hasHeatCore()
                         ? MachineInfoSnapshot.GearSummary.HEAT_CORE_INSTALLED
                         : MachineInfoSnapshot.GearSummary.MISSING_HEAT_CORE)

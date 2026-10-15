@@ -375,6 +375,7 @@ public class ResonanceCalibratorBlockEntity extends BaseMachineBlockEntity
         AdjacentEnergyConnector.Info connector = AdjacentEnergyConnector.forSink(level, worldPosition);
         return MachineInfoSnapshot.builder("resonance_calibrator")
                 .stage(chassis().stage())
+                .batch(recipe == null ? 0 : operationsFor(recipe, stats))
                 .state(
                         MachineInfoSnapshot.workState(
                                 status == STATUS_READY,

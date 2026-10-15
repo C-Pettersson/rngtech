@@ -38,8 +38,7 @@ const DECREASED_PERCENT_STATS = new Set([
     "FE_USAGE",
     "ORE_BURST_FE_USAGE",
     "IDLE_LOSS",
-    "WARMUP_TIME",
-    "COOLING_RATE"
+    "THERMAL_MASS"
 ]);
 
 const LEGACY_AFFIX_VARIANT_SUFFIXES = ["tuned", "reinforced", "harmonic", "focused", "amplified"];
@@ -2593,6 +2592,9 @@ function recipeMetadata(json) {
     if (json.energy) {
         metadata.push(`Energy ${json.energy}`);
     }
+    if (json.heat) {
+        metadata.push(`Heat ${json.heat} HU`);
+    }
     if (json.processing_ticks) {
         metadata.push(`Ticks ${json.processing_ticks}`);
     }
@@ -3471,7 +3473,7 @@ function addLensTags(tags, stat) {
     }
     if ([
         "PROCESSING_SPEED", "INSTANT_PROCESS_CHANCE", "MINING_SPEED", "ATTACK_SPEED", "ORE_BURST_SPEED",
-        "WARMUP_TIME", "COOLING_RATE", "PROCESSING_LEVEL", "MINING_LEVEL", "BATCH_SIZE"
+        "THERMAL_MASS", "THERMAL_CONDUCTIVITY", "COOLING_RATE", "PROCESSING_LEVEL", "MINING_LEVEL", "BATCH_SIZE"
     ].includes(stat)) {
         tags.add("SPEED");
     }
@@ -3798,9 +3800,10 @@ function definitionForStat(stat, definitions) {
         ENERGY_USAGE: "ENERGY_USAGE",
         OUTPUT_AMOUNT: "OUTPUT_AMOUNT",
         HEAT_TRANSFER: "HEAT_TRANSFER",
+        THERMAL_CONDUCTIVITY: "THERMAL_CONDUCTIVITY",
         MAX_TEMPERATURE: "MAX_TEMPERATURE",
         HEAT_ISOLATION: "HEAT_ISOLATION",
-        WARMUP_TIME: "WARMUP_TIME",
+        THERMAL_MASS: "THERMAL_MASS",
         COOLING_RATE: "COOLING_RATE",
         INPUT_SLOTS: "FUEL_SLOTS",
         ENERGY_GENERATION: "ENERGY_GENERATION",

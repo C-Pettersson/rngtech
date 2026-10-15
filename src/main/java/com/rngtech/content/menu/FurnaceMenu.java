@@ -80,7 +80,12 @@ public class FurnaceMenu extends AbstractContainerMenu implements MasteryMenuVie
     private static final int DATA_BATCH_SIZE = DATA_LEDGER_START + MAX_PROCESSING_SLOTS;
     private static final int DATA_HEAT_SLIDER = DATA_BATCH_SIZE + 1;
     private static final int DATA_SETPOINT_START = DATA_HEAT_SLIDER + 1;
-    private static final int DATA_MACHINE_PROGRESSION_START = DATA_SETPOINT_START + MAX_PROCESSING_SLOTS;
+    private static final int DATA_THERMAL_CONDUCTIVITY = DATA_SETPOINT_START + MAX_PROCESSING_SLOTS;
+    private static final int DATA_HOLDING_ENERGY = DATA_THERMAL_CONDUCTIVITY + 1;
+    private static final int DATA_HEATING_ENERGY = DATA_HOLDING_ENERGY + 1;
+    private static final int DATA_HEAT_FACTOR = DATA_HEATING_ENERGY + 1;
+    private static final int DATA_WOBBLE = DATA_HEAT_FACTOR + 1;
+    private static final int DATA_MACHINE_PROGRESSION_START = DATA_WOBBLE + 1;
     private static final int DATA_COUNT = DATA_MACHINE_PROGRESSION_START + MasteryMenuSupport.FIELD_COUNT;
     private static final int STAT_SCALE = 100;
     private static final int MACHINE_SLOT_COUNT = FurnaceBlockEntity.SLOT_COUNT;
@@ -512,6 +517,30 @@ public class FurnaceMenu extends AbstractContainerMenu implements MasteryMenuVie
 
     public static int inputSlotsDataIndex() {
         return DATA_INPUT_SLOTS;
+    }
+
+    public static int thermalConductivityDataIndex() {
+        return DATA_THERMAL_CONDUCTIVITY;
+    }
+
+    /** FE/t the heater spent last tick replacing heat lost through the walls. */
+    public int holdingEnergy() {
+        return data.get(DATA_HOLDING_ENERGY);
+    }
+
+    /** FE/t the heater spent last tick heating the chamber and the input. */
+    public int heatingEnergy() {
+        return data.get(DATA_HEATING_ENERGY);
+    }
+
+    /** How fast the input takes heat at the current temperature, in percent. */
+    public int heatFactor() {
+        return data.get(DATA_HEAT_FACTOR);
+    }
+
+    /** How far the working temperature swings around the lane temperature, in degrees. */
+    public int wobble() {
+        return data.get(DATA_WOBBLE);
     }
 
     public static int batchSizeDataIndex() {

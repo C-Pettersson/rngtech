@@ -43,7 +43,7 @@ One casing recipe makes two casings, which is exactly one column.
 
 {{ item('rngtech:supercharged_silica_gel_beads') }} hold more than three times as much water as normal beads. Make them in an [Alloy Furnace](alloy-furnace.md) with Stage 6 parts at 1,450 heat:
 
-{{ processing("alloy_furnace", output="rngtech:supercharged_silica_gel_beads", columns=["processing_ticks", "energy", "minimum_temperature", "minimum_component_stage"]) }}
+{{ processing("alloy_furnace", output="rngtech:supercharged_silica_gel_beads", columns=["processing_ticks", "heat", "minimum_temperature", "minimum_component_stage"]) }}
 
 ### Breaking
 

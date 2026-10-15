@@ -135,7 +135,12 @@ public class AlloyFurnaceBlockEntity extends BaseMachineBlockEntity implements M
     private static final int DATA_BATCH_SIZE = 29;
     private static final int DATA_HEAT_SLIDER = 30;
     private static final int DATA_SETPOINT = 31;
-    private static final int DATA_MACHINE_PROGRESSION_START = 32;
+    private static final int DATA_THERMAL_CONDUCTIVITY = 32;
+    private static final int DATA_HOLDING_ENERGY = DATA_THERMAL_CONDUCTIVITY + 1;
+    private static final int DATA_HEATING_ENERGY = DATA_HOLDING_ENERGY + 1;
+    private static final int DATA_HEAT_FACTOR = DATA_HEATING_ENERGY + 1;
+    private static final int DATA_WOBBLE = DATA_HEAT_FACTOR + 1;
+    private static final int DATA_MACHINE_PROGRESSION_START = DATA_WOBBLE + 1;
     private static final int DATA_COUNT = DATA_MACHINE_PROGRESSION_START + MasteryMenuSupport.FIELD_COUNT;
     private static final int STAT_SCALE = 100;
 
@@ -238,6 +243,11 @@ public class AlloyFurnaceBlockEntity extends BaseMachineBlockEntity implements M
                 case DATA_LEDGER_BLEND -> recipe != null && blendLedgerActive(recipe, stats) ? 1 : 0;
                 case DATA_BATCH_SIZE -> BatchProcessing.statBatchSize(stats) * STAT_SCALE;
                 case DATA_HEAT_SLIDER -> heatSlider;
+                case DATA_THERMAL_CONDUCTIVITY -> scaledStat(stats, MachineStat.THERMAL_CONDUCTIVITY);
+                case DATA_HOLDING_ENERGY -> heatEnergy(true);
+                case DATA_HEATING_ENERGY -> heatEnergy(false);
+                case DATA_HEAT_FACTOR -> heatFactorDisplay();
+                case DATA_WOBBLE -> wobbleDisplay();
                 case DATA_SETPOINT -> recipe == null ? 0 : envelope(recipe, stats).setpoint();
                 default -> 0;
             };
@@ -352,6 +362,25 @@ public class AlloyFurnaceBlockEntity extends BaseMachineBlockEntity implements M
         }
     }
 
+    /** FE/t the heater spent last tick: on wall loss when {@code holding}, otherwise on heating the chamber and input. */
+    private int heatEnergy(boolean holding) {
+        double holdingPaid = Math.min(heat.lastHolding(), heat.lastHeat());
+        double spent = holding ? holdingPaid : heat.lastHeat() - holdingPaid;
+        return (int) Math.ceil(spent * HeatEngine.energyRate(effectiveStats()));
+    }
+
+    private int heatFactorDisplay() {
+        AlloyFurnaceRecipe recipe = nextRecipe();
+        MachineStatAccumulator stats = routeStats(recipe, effectiveStats());
+        return recipe == null || !(hasRequiredGear() && meetsRecipeRequirements(recipe, stats)) ? 0 : (int) Math.round(100.0 * HeatEngine.heatFactor(heat.exactTemperature(), envelope(recipe, stats)));
+    }
+
+    private int wobbleDisplay() {
+        AlloyFurnaceRecipe recipe = nextRecipe();
+        MachineStatAccumulator stats = routeStats(recipe, effectiveStats());
+        return recipe == null || !(hasRequiredGear() && meetsRecipeRequirements(recipe, stats)) ? 0 : (int) Math.round(HeatEngine.wobbleAmplitude(envelope(recipe, stats), stats));
+    }
+
     public int heatSlider() {
         return heatSlider;
     }
@@ -400,6 +429,8 @@ public class AlloyFurnaceBlockEntity extends BaseMachineBlockEntity implements M
                         connectorInputBottleneck(connector, energyDemand)
                 )
                 .heat(heat.temperature(), currentTargetTemperature(recipe, stats))
+                .setpoint(recipe == null ? 0 : envelope(recipe, stats).setpoint())
+                .batch(recipe == null ? 0 : batch(recipe, stats))
                 .slots(activeInputSlots(stats), MAX_INPUT_SLOTS)
                 .gear(alloyGearSummary(status))
                 .output(status == STATUS_OUTPUT_FULL

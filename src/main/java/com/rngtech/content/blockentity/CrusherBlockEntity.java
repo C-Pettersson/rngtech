@@ -352,6 +352,7 @@ public class CrusherBlockEntity extends BaseMachineBlockEntity implements MenuPr
                 .stage(chassisMaterial().stage())
                 .state(machineInfoState(status), crusherBlockedReason(status))
                 .progress(progress, currentProcessingTicks(stats))
+                .batch(currentActiveJobs(stats))
                 .energy(energyStored(), energyCapacity(), energyDemand > 0 ? -energyDemand : 0)
                 .energyTelemetry(
                         lastEnergyInput(),

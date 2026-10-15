@@ -68,6 +68,7 @@ public class FurnaceScreen extends AbstractContainerScreen<FurnaceMenu> {
             "rngtech.stat.processing_speed",
             "rngtech.stat.efficiency",
             "rngtech.stat.heat_transfer",
+            "rngtech.stat.thermal_conductivity",
             "rngtech.stat.max_temperature",
             "rngtech.stat.thermal_mass",
             "rngtech.stat.cooling_rate",
@@ -82,6 +83,7 @@ public class FurnaceScreen extends AbstractContainerScreen<FurnaceMenu> {
             FurnaceMenu.processingSpeedDataIndex(),
             FurnaceMenu.efficiencyDataIndex(),
             FurnaceMenu.heatTransferDataIndex(),
+            FurnaceMenu.thermalConductivityDataIndex(),
             FurnaceMenu.maxTemperatureDataIndex(),
             FurnaceMenu.warmupTimeDataIndex(),
             FurnaceMenu.coolingRateDataIndex(),
@@ -96,6 +98,7 @@ public class FurnaceScreen extends AbstractContainerScreen<FurnaceMenu> {
             MachineStat.PROCESSING_SPEED,
             MachineStat.EFFICIENCY,
             MachineStat.HEAT_TRANSFER,
+            MachineStat.THERMAL_CONDUCTIVITY,
             MachineStat.MAX_TEMPERATURE,
             MachineStat.THERMAL_MASS,
             MachineStat.COOLING_RATE,
@@ -109,6 +112,7 @@ public class FurnaceScreen extends AbstractContainerScreen<FurnaceMenu> {
     private static final String[] ELECTRIC_STAT_LABEL_KEYS = {
             "rngtech.stat.processing_speed",
             "rngtech.stat.heat_transfer",
+            "rngtech.stat.thermal_conductivity",
             "rngtech.stat.max_temperature",
             "rngtech.stat.thermal_mass",
             "rngtech.stat.cooling_rate",
@@ -122,6 +126,7 @@ public class FurnaceScreen extends AbstractContainerScreen<FurnaceMenu> {
     private static final int[] ELECTRIC_STAT_DATA_INDICES = {
             FurnaceMenu.processingSpeedDataIndex(),
             FurnaceMenu.heatTransferDataIndex(),
+            FurnaceMenu.thermalConductivityDataIndex(),
             FurnaceMenu.maxTemperatureDataIndex(),
             FurnaceMenu.warmupTimeDataIndex(),
             FurnaceMenu.coolingRateDataIndex(),
@@ -135,6 +140,7 @@ public class FurnaceScreen extends AbstractContainerScreen<FurnaceMenu> {
     private static final MachineStat[] ELECTRIC_STAT_TYPES = {
             MachineStat.PROCESSING_SPEED,
             MachineStat.HEAT_TRANSFER,
+            MachineStat.THERMAL_CONDUCTIVITY,
             MachineStat.MAX_TEMPERATURE,
             MachineStat.THERMAL_MASS,
             MachineStat.COOLING_RATE,
@@ -465,6 +471,8 @@ public class FurnaceScreen extends AbstractContainerScreen<FurnaceMenu> {
             renderVerticalBar(guiGraphics, ENERGY_BAR_X, menu.energyProgress(), ENERGY);
         }
         renderVerticalBar(guiGraphics, HEAT_BAR_X, menu.heatProgress(), HEAT);
+        HeatReadout.renderMarkers(guiGraphics, leftPos + HEAT_BAR_X, topPos + BAR_Y, BAR_WIDTH, BAR_HEIGHT, BAR_FILL_HEIGHT,
+                menu.overheatTemperature(), menu.targetTemperature(), menu.setpoint(), menu.wobble());
         if (menu.hasFailureRecipe()) {
             renderVerticalBar(guiGraphics, FAILURE_BAR_X, menu.failureProgress(), FAILURE);
         }
@@ -597,7 +605,7 @@ public class FurnaceScreen extends AbstractContainerScreen<FurnaceMenu> {
                 BAR_Y,
                 BAR_WIDTH,
                 BAR_HEIGHT,
-                heatTooltip()
+                heatTooltipLines()
         );
         if (menu.hasFailureRecipe()) {
             CompactValueText.renderTooltipIfHovered(
@@ -723,6 +731,11 @@ public class FurnaceScreen extends AbstractContainerScreen<FurnaceMenu> {
         return totalBurnTime <= 0
                 ? Component.translatable("rngtech.furnace.tooltip.fuel.empty")
                 : Component.translatable("rngtech.furnace.tooltip.fuel", menu.burnTime(), totalBurnTime);
+    }
+
+    private List<Component> heatTooltipLines() {
+        return HeatReadout.lines(heatTooltip(), menu.heatSlider(), menu.targetTemperature(), menu.setpoint(), menu.heatFactor(), menu.wobble(),
+                menu.heatingEnergy(), menu.holdingEnergy(), menu.isElectric());
     }
 
     private Component heatTooltip() {

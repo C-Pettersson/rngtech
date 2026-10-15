@@ -104,7 +104,7 @@ Metallurgist Flux only saves a unit of an ingredient the recipe needs two or mor
 
 The Alloy Furnace uses its own recipe type, `rngtech:alloy_furnace`. Mode tells you whether a recipe makes a blend or a finished ingot. The desiccant recipe makes Supercharged Silica Gel Beads for the [Silica Gel Dehumidifier](silica-gel-dehumidifier.md).
 
-{{ processing("alloy_furnace", columns=["mode", "processing_ticks", "energy", "minimum_component_stage", "minimum_temperature", "required_temperature_stability", "machine_xp"]) }}
+{{ processing("alloy_furnace", columns=["mode", "processing_ticks", "heat", "minimum_component_stage", "minimum_temperature", "required_temperature_stability", "machine_xp"]) }}
 
 ## Ascendancy trees
 

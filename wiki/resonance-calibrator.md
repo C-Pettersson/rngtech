@@ -152,17 +152,17 @@ Every node in this machine's ascendancies. See [Machine Mastery](machine-mastery
 
 | Node | Type | After | Effect |
 |---|---|---|---|
-| **Shared Field** | Root | — | One catalyst per cycle however many lanes run; the stability ceiling drops by 10. |
+| **Shared Field** | Root | — | One catalyst per cycle however large the batch; the stability ceiling drops by 10. |
 | Brisk Field | Small | Shared Field | 8% increased Processing Speed. |
 | **Stabilizer Economy** | Notable | Brisk Field | Recipe stabilizers are consumed every other cycle. |
 | Tight Field | Small | Shared Field | 8% increased Calibration Precision. |
-| **Lane Sync** | Notable | Tight Field | 15% more Processing Speed while more than one lane runs. |
+| **Lane Sync** | Notable | Tight Field | 15% more Processing Speed while a cycle calibrates more than one item. |
 | Focused Array | Small | Lane Sync | 8% increased Calibration Precision. |
 | **Resonance Array** | Deep notable | Focused Array | 100% increased Batch Size. The stability ceiling drops by another 15. |
 | Lean Field | Small | Shared Field | 5% reduced Energy Use. |
 | **Catalytic Surplus** | Notable | Lean Field | 25% increased Catalyst Efficiency. |
 | Broad Field | Small | Shared Field | 8% increased Stability. |
-| **Wide Tolerance** | Notable | Broad Field | +5 stability floor on a multi-lane chassis. |
+| **Wide Tolerance** | Notable | Broad Field | +5 stability floor on a chassis with a base Batch Size above 1. |
 | Steady Reach | Small | Wide Tolerance | 8% increased Stability. |
 | **Overreach** | Deep notable | Steady Reach | +1 Coil Reach; 20% less Calibration Precision. |
 

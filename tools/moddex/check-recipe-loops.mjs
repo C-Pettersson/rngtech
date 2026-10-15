@@ -200,7 +200,8 @@ async function recipeReactions(recipe, tags, bounds) {
     const choices = [];
     const inputs = await consumedInputs(json, tags, id, choices, new Set(bounds.freeInputKeys ?? []));
     const bound = json.bonus_output === false ? 1 : bounds.types?.[type]?.maxOutputMultiplier ?? 1;
-    const energy = Number(json.energy ?? 0) * (FE_PRODUCERS.has(type) ? 1 : FE_CONSUMERS.has(type) ? -1 : 0);
+    // Heated recipes declare heat units; every craft pays at least its heat at 1 FE per HU, a safe lower bound on FE.
+    const energy = Number(json.energy ?? json.heat ?? 0) * (FE_PRODUCERS.has(type) ? 1 : FE_CONSUMERS.has(type) ? -1 : 0);
     const outputs = new Map();
     for (const output of recipeOutputs(json)) {
         outputs.set(output.node, (outputs.get(output.node) ?? 0) + output.count * bound);

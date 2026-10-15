@@ -44,10 +44,11 @@ _CRAFTING_TYPES = {
 }
 _IGNORED_KEYS = {"type", "group", "category", "neoforge:conditions", "input_count", "catalyst_count", "show_notification"}
 _OUTPUT_KEYS = {"result", "results", "output", "outputs", "residue", "failure_output", "saturated_output"}
-_LEADING_COLUMNS = ["processing_ticks", "energy"]
+_LEADING_COLUMNS = ["processing_ticks", "energy", "heat"]
 _COLUMN_LABELS = {
     "processing_ticks": "Time",
     "energy": "Energy",
+    "heat": "Heat",
     "machine_xp": "Mastery XP",
     "experience": "Player XP",
     "bonus_output": "Bonus output",
@@ -90,6 +91,8 @@ def _format_cell(key: str, value) -> str:
         return f"{value / 20:g} s"
     if key == "energy" and isinstance(value, (int, float)):
         return f"{_format_number(value)} FE"
+    if key == "heat" and isinstance(value, (int, float)):
+        return f"{_format_number(value)} HU"
     if isinstance(value, dict) and set(value) == {"min", "max"}:
         return f"{_format_number(value['min'])}–{_format_number(value['max'])}"
     if isinstance(value, str):

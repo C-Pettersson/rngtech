@@ -64,6 +64,7 @@ public class AlloyFurnaceScreen extends AbstractContainerScreen<AlloyFurnaceMenu
             "rngtech.stat.energy_usage",
             "rngtech.stat.energy_capacity",
             "rngtech.stat.heat_transfer",
+            "rngtech.stat.thermal_conductivity",
             "rngtech.stat.max_temperature",
             "rngtech.stat.thermal_mass",
             "rngtech.stat.cooling_rate",
@@ -78,6 +79,7 @@ public class AlloyFurnaceScreen extends AbstractContainerScreen<AlloyFurnaceMenu
             AlloyFurnaceMenu.energyUsageDataIndex(),
             AlloyFurnaceMenu.energyCapacityStatDataIndex(),
             AlloyFurnaceMenu.heatTransferDataIndex(),
+            AlloyFurnaceMenu.thermalConductivityDataIndex(),
             AlloyFurnaceMenu.maxTemperatureDataIndex(),
             AlloyFurnaceMenu.warmupTimeDataIndex(),
             AlloyFurnaceMenu.coolingRateDataIndex(),
@@ -92,6 +94,7 @@ public class AlloyFurnaceScreen extends AbstractContainerScreen<AlloyFurnaceMenu
             MachineStat.ENERGY_USAGE,
             MachineStat.ENERGY_CAPACITY,
             MachineStat.HEAT_TRANSFER,
+            MachineStat.THERMAL_CONDUCTIVITY,
             MachineStat.MAX_TEMPERATURE,
             MachineStat.THERMAL_MASS,
             MachineStat.COOLING_RATE,
@@ -393,6 +396,8 @@ public class AlloyFurnaceScreen extends AbstractContainerScreen<AlloyFurnaceMenu
         guiGraphics.fill(x + HEAT_BAR_X, y + BAR_Y, x + HEAT_BAR_X + BAR_WIDTH, y + BAR_Y + BAR_HEIGHT, 0xFF5F5F5F);
         int heatHeight = Math.round(BAR_FILL_HEIGHT * menu.heatProgress());
         guiGraphics.fill(x + HEAT_BAR_X + 1, y + BAR_Y + BAR_HEIGHT - 1 - heatHeight, x + HEAT_BAR_X + BAR_WIDTH - 1, y + BAR_Y + BAR_HEIGHT - 1, HEAT);
+        HeatReadout.renderMarkers(guiGraphics, leftPos + HEAT_BAR_X, topPos + BAR_Y, BAR_WIDTH, BAR_HEIGHT, BAR_FILL_HEIGHT,
+                menu.overheatTemperature(), menu.targetTemperature(), menu.setpoint(), menu.wobble());
 
         if (menu.hasFailureRecipe()) {
             guiGraphics.fill(x + FAILURE_BAR_X, y + BAR_Y, x + FAILURE_BAR_X + BAR_WIDTH, y + BAR_Y + BAR_HEIGHT, 0xFF5F5F5F);
@@ -490,7 +495,7 @@ public class AlloyFurnaceScreen extends AbstractContainerScreen<AlloyFurnaceMenu
                 BAR_Y,
                 BAR_WIDTH,
                 BAR_HEIGHT,
-                heatTooltip()
+                heatTooltipLines()
         );
         if (menu.hasFailureRecipe()) {
             CompactValueText.renderTooltipIfHovered(
@@ -546,6 +551,11 @@ public class AlloyFurnaceScreen extends AbstractContainerScreen<AlloyFurnaceMenu
                 STATUS_ICON_SIZE,
                 heatTooltip()
         );
+    }
+
+    private List<Component> heatTooltipLines() {
+        return HeatReadout.lines(heatTooltip(), menu.heatSlider(), menu.targetTemperature(), menu.setpoint(), menu.heatFactor(), menu.wobble(),
+                menu.heatingEnergy(), menu.holdingEnergy(), true);
     }
 
     private Component heatTooltip() {

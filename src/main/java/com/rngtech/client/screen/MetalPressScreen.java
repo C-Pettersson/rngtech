@@ -72,6 +72,7 @@ public class MetalPressScreen extends AbstractContainerScreen<MetalPressMenu> {
             "rngtech.stat.energy_usage",
             "rngtech.stat.energy_capacity",
             "rngtech.stat.heat_transfer",
+            "rngtech.stat.thermal_conductivity",
             "rngtech.stat.max_temperature",
             "rngtech.stat.thermal_mass",
             "rngtech.stat.cooling_rate",
@@ -85,6 +86,7 @@ public class MetalPressScreen extends AbstractContainerScreen<MetalPressMenu> {
             MetalPressMenu.energyUsageDataIndex(),
             MetalPressMenu.energyCapacityStatDataIndex(),
             MetalPressMenu.heatTransferDataIndex(),
+            MetalPressMenu.thermalConductivityDataIndex(),
             MetalPressMenu.maxTemperatureDataIndex(),
             MetalPressMenu.warmupTimeDataIndex(),
             MetalPressMenu.coolingRateDataIndex(),
@@ -98,6 +100,7 @@ public class MetalPressScreen extends AbstractContainerScreen<MetalPressMenu> {
             MachineStat.ENERGY_USAGE,
             MachineStat.ENERGY_CAPACITY,
             MachineStat.HEAT_TRANSFER,
+            MachineStat.THERMAL_CONDUCTIVITY,
             MachineStat.MAX_TEMPERATURE,
             MachineStat.THERMAL_MASS,
             MachineStat.COOLING_RATE,
@@ -418,6 +421,8 @@ public class MetalPressScreen extends AbstractContainerScreen<MetalPressMenu> {
         guiGraphics.fill(x + HEAT_BAR_X, y + BAR_Y, x + HEAT_BAR_X + BAR_WIDTH, y + BAR_Y + BAR_HEIGHT, 0xFF5F5F5F);
         int heatHeight = Math.round(BAR_FILL_HEIGHT * menu.heatProgress());
         guiGraphics.fill(x + HEAT_BAR_X + 1, y + BAR_Y + BAR_HEIGHT - 1 - heatHeight, x + HEAT_BAR_X + BAR_WIDTH - 1, y + BAR_Y + BAR_HEIGHT - 1, HEAT);
+        HeatReadout.renderMarkers(guiGraphics, leftPos + HEAT_BAR_X, topPos + BAR_Y, BAR_WIDTH, BAR_HEIGHT, BAR_FILL_HEIGHT,
+                menu.overheatTemperature(), menu.targetTemperature(), menu.setpoint(), menu.wobble());
 
         renderIconBox(guiGraphics, STATUS_ICON_X, STATUS_ICON_Y);
         MachineScreenStyle.renderStatusGlyph(guiGraphics, x + STATUS_ICON_X, y + STATUS_ICON_Y, statusState());
@@ -534,7 +539,7 @@ public class MetalPressScreen extends AbstractContainerScreen<MetalPressMenu> {
                 BAR_Y,
                 BAR_WIDTH,
                 BAR_HEIGHT,
-                heatTooltip()
+                heatTooltipLines()
         );
         CompactValueText.renderTooltipIfHovered(
                 guiGraphics,
@@ -590,6 +595,11 @@ public class MetalPressScreen extends AbstractContainerScreen<MetalPressMenu> {
                 ? Component.translatable("rngtech.press.tooltip.active_mold")
                 : Component.translatable("rngtech.press.tooltip.select_mold");
         guiGraphics.renderTooltip(font, tooltip, mouseX, mouseY);
+    }
+
+    private List<Component> heatTooltipLines() {
+        return HeatReadout.lines(heatTooltip(), menu.heatSlider(), menu.targetTemperature(), menu.setpoint(), menu.heatFactor(), menu.wobble(),
+                menu.heatingEnergy(), menu.holdingEnergy(), true);
     }
 
     private Component heatTooltip() {
