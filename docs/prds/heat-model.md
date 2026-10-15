@@ -223,7 +223,7 @@ setpoint = target + slider × (reach − target)
 
 - At 0%, the default, the lane holds the recipe target: lowest FE, base speed, and no wobble beyond a Stability shortfall.
 - Higher settings run hotter and faster and cost more FE, because heat loss grows faster than linearly with temperature.
-- Past the safe maximum, the lane is overheating on purpose. That needs the Blast Draft keystone, 10 points from the Drive/Reserve start, so maxing the slider is not the default early. Every metal smelt has a failure output, and on any chassis wobble spikes above the overheat temperature build strain; recipes that cannot fail stop at their overheat temperature.
+- Past the safe maximum, the lane is overheating on purpose. That needs the Blast Draft keystone, 10 points from the Drive/Reserve start, so maxing the slider is not the default early. The Cool Headed keystone on the same node does the opposite: every new input waits for the chamber to cool to the target. Every metal smelt has a failure output, and on any chassis wobble spikes above the overheat temperature build strain; recipes that cannot fail stop at their overheat temperature.
 - The slider is a fraction of each lane's own band, so one setting works for every recipe. A lane always works with its current recipe's target and Max Temperature.
 - The slider is set in the UI. Automation does not change it.
 

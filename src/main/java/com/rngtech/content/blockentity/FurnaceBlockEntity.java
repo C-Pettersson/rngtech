@@ -366,7 +366,7 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
 
             if (!heat.started()
                     && heat.exactTemperature() >= envelope.minimum()
-                    && heat.exactTemperature() <= envelope.workCeiling()
+                    && heat.exactTemperature() <= envelope.ceilingFor(heat)
                     && ProcessingChance.rollInstant(level, laneStats)
                     && furnace.payInstant(lane, recipe, laneStats, supply)) {
                 furnace.markInstantProcess(lane);
@@ -1278,7 +1278,7 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
                 stats,
                 heatSlider / 100.0,
                 ceiling
-        );
+        ).coolingFirst(hasMasteryBehavior("COOL_HEADED"));
     }
 
     /** Reference ticks a cycle needs: the recipe's time, longer for every extra item in the batch. */

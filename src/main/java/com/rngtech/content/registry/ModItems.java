@@ -645,6 +645,10 @@ public final class ModItems {
             "collapse_residue",
             () -> new Item(new Item.Properties())
     );
+    public static final DeferredItem<Item> ASH = ITEMS.register(
+            "ash",
+            () -> new Item(new Item.Properties())
+    );
     public static final Map<ResonanceCalibratorChassis, DeferredItem<ResonanceCalibratorBlockItem>> RESONANCE_CALIBRATORS =
             registerResonanceCalibratorItems();
     public static final Map<ComponentRecyclerChassis, DeferredItem<ComponentRecyclerBlockItem>> COMPONENT_RECYCLERS =

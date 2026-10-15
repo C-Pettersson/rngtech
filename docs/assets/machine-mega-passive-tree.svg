@@ -1,8 +1,8 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="1829 1536 4369 4769" width="1200" height="1310" role="img" aria-labelledby="title description">
 <title id="title">RNGTech shared machine passive tree</title>
-<desc id="description">1352 nodes, six starts, 1505 links. Control in green, Drive in copper, Reserve in blue. White notables and violet keystones. Each machine earns 99 points by level 100.</desc>
+<desc id="description">1353 nodes, six starts, 1506 links. Control in green, Drive in copper, Reserve in blue. White notables and violet keystones. Each machine earns 99 points by level 100.</desc>
 <rect x="1829" y="1536" width="4369" height="4769" fill="#111820"/>
-<g font-family="sans-serif" fill="#e5ecf3"><text x="1909" y="1686" font-size="96">Machine Mastery</text><text x="1914" y="1806" font-size="58" fill="#a9b9c9">1352 nodes · 6 starts · 3 attributes · 99 points at level 100</text></g>
+<g font-family="sans-serif" fill="#e5ecf3"><text x="1909" y="1686" font-size="96">Machine Mastery</text><text x="1914" y="1806" font-size="58" fill="#a9b9c9">1353 nodes · 6 starts · 3 attributes · 99 points at level 100</text></g>
 <g stroke="#66727d" stroke-width="5" opacity="0.65">
 <path d="M4000,4000 L3939,3895"/>
 <path d="M4000,4000 L4122,3998"/>
@@ -1508,7 +1508,8 @@
 <path d="M4411,3383 L4359,3359"/>
 <path d="M4359,3359 L4331,3319"/>
 <path d="M4331,3319 L4316,3257"/>
-<path d="M4966,4622 L4976,4527"/>
+<path d="M4966,4456 L4875,4402"/>
+<path d="M4966,4456 L4965,4350"/>
 </g>
 <circle cx="3388" cy="3633" r="20" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>control (start_control)</title></circle>
 <circle cx="4000" cy="3310" r="20" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>control / drive (start_control_drive)</title></circle>
@@ -2861,7 +2862,8 @@
 <circle cx="2638" cy="3606" r="24" fill="#c79dea" stroke="#111820" stroke-width="3"><title>Single Pass (single_pass)</title></circle>
 <circle cx="5242" cy="4192" r="24" fill="#c79dea" stroke="#111820" stroke-width="3"><title>Even Feed (even_feed)</title></circle>
 <circle cx="3839" cy="5343" r="24" fill="#c79dea" stroke="#111820" stroke-width="3"><title>Surge Cycling (surge_cycling)</title></circle>
-<circle cx="4976" cy="4527" r="24" fill="#c79dea" stroke="#111820" stroke-width="3"><title>Blast Draft (blast_draft)</title></circle>
+<circle cx="4875" cy="4402" r="24" fill="#c79dea" stroke="#111820" stroke-width="3"><title>Blast Draft (blast_draft)</title></circle>
+<circle cx="4965" cy="4350" r="24" fill="#c79dea" stroke="#111820" stroke-width="3"><title>Cool Headed (cool_headed)</title></circle>
 <g font-family="sans-serif" fill="#e5ecf3" font-size="44" text-anchor="middle">
 <text x="3388" y="3588">control</text>
 <text x="4000" y="3265">control / drive</text>

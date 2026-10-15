@@ -220,6 +220,7 @@ public final class ModCreativeTabs {
                         output.accept(ModItems.GASIFICATION_RESIDUE.get());
                         output.accept(ModItems.VOID_CATALYST.get());
                         output.accept(ModItems.COLLAPSE_RESIDUE.get());
+                        output.accept(ModItems.ASH.get());
                         for (CrushHeadMaterial material : CrushHeadMaterial.values()) {
                             output.accept(ModItems.crushHead(material).get());
                         }

@@ -326,7 +326,7 @@ public class MetalPressBlockEntity extends BaseMachineBlockEntity
         HeatLane heat = press.heat;
         if (!heat.started()
                 && heat.exactTemperature() >= envelope.minimum()
-                && heat.exactTemperature() <= envelope.workCeiling()
+                && heat.exactTemperature() <= envelope.ceilingFor(heat)
                 && ProcessingChance.rollInstant(level, stats)
                 && press.payInstant(recipe, stats, supply)) {
             press.markInstantProcess();
@@ -1000,7 +1000,7 @@ public class MetalPressBlockEntity extends BaseMachineBlockEntity
                 stats,
                 heatSlider / 100.0,
                 Integer.MAX_VALUE
-        );
+        ).coolingFirst(hasMasteryBehavior("COOL_HEADED"));
     }
 
     /** Reference ticks a cycle needs: the recipe's time, longer for every extra item in the batch. */

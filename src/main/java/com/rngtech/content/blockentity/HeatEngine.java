@@ -19,7 +19,7 @@ public final class HeatEngine {
     /** Loss grows with the cube of the temperature rise, so running hotter costs more FE per craft than it saves. */
     static final double LOSS_EXPONENT = 3.0;
     /** Heater power above holding heat at base Heat Transfer, in HU per tick, when the chamber is cold. */
-    static final double APPROACH_PER_TICK = 30.0;
+    static final double APPROACH_PER_TICK = 10.0;
     /** HU that raise the chamber 1 °C at base Thermal Mass. */
     static final double HEAT_CAPACITY = 2.0;
     /** Share of the target's rise above ambient a cold item takes from the chamber when its cycle starts. */
@@ -37,10 +37,29 @@ public final class HeatEngine {
     }
 
     /** The recipe's heat band on this lane and the temperature the heater holds. */
-    public record Envelope(int minimum, int target, int safeMaximum, int overheat, double requiredStability, int setpoint, boolean canFail) {
+    public record Envelope(
+            int minimum,
+            int target,
+            int safeMaximum,
+            int overheat,
+            double requiredStability,
+            int setpoint,
+            boolean canFail,
+            boolean coolHeaded
+    ) {
         /** A lane hotter than this cools before it works: a hotter recipe's leftover heat, or a lowered slider. */
         public int workCeiling() {
             return Math.max(setpoint, overheat);
+        }
+
+        /** Cool Headed: a lane that has not started its cycle cools to the recipe target before it begins. */
+        public Envelope coolingFirst(boolean coolHeaded) {
+            return coolHeaded == this.coolHeaded || ungated() ? this
+                    : new Envelope(minimum, target, safeMaximum, overheat, requiredStability, setpoint, canFail, coolHeaded);
+        }
+
+        public int ceilingFor(HeatLane lane) {
+            return coolHeaded && !lane.started ? target : workCeiling();
         }
 
         /** A recipe without a temperature requirement: it works at any heat and never runs too hot. */
@@ -113,12 +132,12 @@ public final class HeatEngine {
             int setpointCeiling
     ) {
         if (target <= AMBIENT) {
-            return new Envelope(AMBIENT, AMBIENT, AMBIENT, Integer.MAX_VALUE, requiredStability, AMBIENT, false);
+            return new Envelope(AMBIENT, AMBIENT, AMBIENT, Integer.MAX_VALUE, requiredStability, AMBIENT, false, false);
         }
         int safe = Math.max(target, safeMaximum);
         int overheat = overheatTemperature(safe, stats);
         int setpoint = setpoint(target, reach(safe, overheat, canFail, pushPastSafe, stats, setpointCeiling), slider);
-        return new Envelope(Math.min(minimum, target), target, safe, overheat, requiredStability, setpoint, canFail);
+        return new Envelope(Math.min(minimum, target), target, safe, overheat, requiredStability, setpoint, canFail, false);
     }
 
     /** The safe maximum stretched by Overheat Tolerance: above it, a recipe that can fail builds strain. */
@@ -202,8 +221,9 @@ public final class HeatEngine {
     public static Tick work(HeatLane lane, Envelope envelope, MachineStatAccumulator stats, Load load, HeatSupply supply, long time, int salt) {
         double capacity = heatCapacity(stats);
         double holding = holdingHeat(lane.temperature, stats);
-        if (lane.temperature > envelope.workCeiling() + 0.5) {
-            lane.temperature = Math.max(envelope.workCeiling(), lane.temperature - holding / capacity - activeCooling(stats));
+        int ceiling = envelope.ceilingFor(lane);
+        if (lane.temperature > ceiling + 0.5) {
+            lane.temperature = Math.max(ceiling, lane.temperature - holding / capacity - activeCooling(stats));
             record(lane, 0.0, holding, 0.0);
             return new Tick(true, false, 0.0, lane.temperature, false);
         }
@@ -225,8 +245,13 @@ public final class HeatEngine {
                 ? sustain + Math.min(approach(lane.temperature, stats), (envelope.setpoint() - lane.temperature) * capacity)
                 : Math.max(0.0, sustain - (lane.temperature - envelope.setpoint()) * capacity);
         double delivered = wanted <= 0.0 ? 0.0 : Math.min(wanted, supply.deliver(wanted));
-        lane.temperature = Math.max(AMBIENT, lane.temperature + (delivered - sustain) / capacity);
-        lane.work += load.workPerTick() * factor;
+        // Short of heat, the input takes only what the walls leave and works that much slower; the chamber does not sag.
+        // Heat stored above the setpoint counts as available, so leftover heat still pays.
+        double available = delivered + Math.max(0.0, (lane.temperature - envelope.setpoint()) * capacity);
+        double share = absorbed <= 0.0 || available >= sustain ? 1.0 : Math.max(0.0, available - holding) / absorbed;
+        absorbed *= share;
+        lane.temperature = Math.max(AMBIENT, lane.temperature + (delivered - holding - absorbed) / capacity);
+        lane.work += load.workPerTick() * factor * share;
         record(lane, delivered, holding, absorbed);
         return new Tick(false, factor > 0.0, factor, workTemperature, delivered + 1.0E-6 < Math.min(wanted, sustain));
     }

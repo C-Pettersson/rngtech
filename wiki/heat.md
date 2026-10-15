@@ -10,13 +10,14 @@ The [Furnace](furnace.md), [Alloy Furnace](alloy-furnace.md), [Metal Press](meta
 
 ## How a lane heats
 
-- **Warming up.** A cold lane heats toward its setpoint. Heat Transfer sets how hard the heater pushes, and Thermal Mass sets how much heat the chamber has to take before its temperature moves.
+- **Warming up.** A cold lane heats toward its setpoint. Heat Transfer sets how hard the heater pushes, and Thermal Mass sets how much heat the chamber has to take before its temperature moves. Unrolled gear climbs about 100 °C a second, so an Iron Furnace takes about 10 seconds to reach 800 °C; the fastest Heat Cores still take a few seconds.
 - **Starting.** A cycle starts once the lane reaches the recipe's minimum temperature. Most recipes have no separate minimum, so they start at the target. A cold batch takes some heat from the chamber when it goes in. The lane never drops below the minimum because of it, and a bigger batch takes a bigger dip.
 - **Working.** Below the target the input takes heat more slowly; above it, faster. The heat bar's hover shows this as the **heat factor**: ×1 at the target, ×1.3 at the default safe maximum. Thermal Conductivity and Processing Speed multiply it.
+- **Short of power.** When FE or fuel cannot keep up, the input takes only the heat left after the walls, so crafting slows down. The lane keeps its temperature.
 - **Idle.** With nothing to work on, the heater turns off and the walls slowly leak the heat away. Heat Insulation and Thermal Mass keep it longer.
-- **Too hot.** A lane hotter than its next recipe allows, after a hotter recipe or when you lower the slider, stops and cools first. The status reads **Too Hot**. Cooling Rate makes that wait shorter.
+- **Too hot.** A lane hotter than its next recipe allows, after a hotter recipe or when you lower the slider, stops and cools first. The status reads **Too Hot**. Cooling Rate makes that wait shorter. With the **Cool Headed** keystone, every new input waits until the lane has cooled to the recipe target, so a cycle never starts on leftover or pushed heat.
 
-Recipes with no temperature requirement, such as food or recharging Silica Gel Beads, work at any heat at their normal speed, and a lane still hot from an earlier recipe pays for them with that leftover heat.
+Recipes with no temperature requirement, such as food, work at any heat at their normal speed, and a lane still hot from an earlier recipe pays for them with that leftover heat.
 
 Heat loss grows quickly with temperature, so running hotter is faster but costs more FE per craft. Every craft pays at least its recipe's heat; JEI and the recipe tables list it in heat units (HU). On an electric machine each HU costs 1 FE before Energy Usage.
 

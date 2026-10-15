@@ -197,7 +197,7 @@ public final class MasteryChecks {
     }
 
     private static void graphAndBuilds() {
-        require(MegaPassiveTree.TREE.nodes().size() == 1352, "full shared catalog");
+        require(MegaPassiveTree.TREE.nodes().size() == 1353, "full shared catalog");
         for (MegaPassiveNode root : MegaPassiveTree.TREE.nodes().stream().filter(n -> n.kind() == PassiveNodeKind.STARTER).toList()) {
             require(root.links().size() == 3, "three exits per starter");
             for (MegaPassiveNode key : MegaPassiveTree.TREE.nodes().stream().filter(n -> n.kind() == PassiveNodeKind.KEYSTONE).toList()) {
@@ -427,6 +427,15 @@ public final class MasteryChecks {
                     family + " pushes the overheat slider only as a heated machine");
         }
         require(MegaPassiveTree.has(build(MachineMasteryFamily.FURNACE, "blast_draft"), "BLAST_DRAFT"), "a Furnace build reaching Blast Draft grants it");
+
+        // Cool Headed shares Blast Draft's road node: the same early heat choice, in the other direction.
+        MegaPassiveNode coolHeaded = MegaPassiveTree.node("cool_headed");
+        require(coolHeaded.kind() == PassiveNodeKind.KEYSTONE && coolHeaded.behaviors().equals(Set.of("COOL_HEADED")) && coolHeaded.effects().isEmpty(),
+                "Cool Headed is a behavior-only keystone");
+        require(coolHeaded.links().size() == 1 && coolHeaded.links().equals(blastDraft.links()), "Cool Headed hangs from Blast Draft's travel node");
+        for (MachineMasteryFamily family : MachineMasteryFamily.values()) {
+            require(family.supportsBehavior("COOL_HEADED") == family.supportsBehavior("BLAST_DRAFT"), family + " cools first only as a heated machine");
+        }
     }
 
     /** Speed multiplier the destination keystone adds on top of the route that reaches it. */

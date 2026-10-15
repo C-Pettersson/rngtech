@@ -337,7 +337,7 @@ public class MelterBlockEntity extends BaseMachineBlockEntity
         HeatLane heat = melter.heat;
         if (!heat.started()
                 && heat.exactTemperature() >= envelope.minimum()
-                && heat.exactTemperature() <= envelope.workCeiling()
+                && heat.exactTemperature() <= envelope.ceilingFor(heat)
                 && ProcessingChance.rollInstant(level, stats)
                 && melter.payInstant(recipe, stats, supply)) {
             melter.markInstantProcess();
@@ -897,7 +897,7 @@ public class MelterBlockEntity extends BaseMachineBlockEntity
     private HeatEngine.Envelope envelope(MelterRecipe recipe, MachineStatAccumulator stats) {
         int target = recipe.minimumTemperature();
         return HeatEngine.envelope(target, target, HeatControl.defaultSafeMaximumTemperature(target), 0.0, false,
-                HeatEngine.pushPastSafe(hasMasteryBehavior("BLAST_DRAFT"), stats), stats, heatSlider / 100.0, Integer.MAX_VALUE);
+                HeatEngine.pushPastSafe(hasMasteryBehavior("BLAST_DRAFT"), stats), stats, heatSlider / 100.0, Integer.MAX_VALUE).coolingFirst(hasMasteryBehavior("COOL_HEADED"));
     }
 
     /** Reference ticks a melt needs: the recipe's time, longer for every extra melt in the batch. */

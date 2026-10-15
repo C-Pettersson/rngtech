@@ -77,7 +77,7 @@ The absorption recipes use the `rngtech:desiccant_absorption` recipe type.
 
 ### Recharging beads
 
-Smelt saturated beads in an RNGTech [Furnace](furnace.md) to dry them out again. Recharging gives back exactly the bead you put in, never a bonus bead.
+Smelt saturated beads in an RNGTech [Furnace](furnace.md) to dry them out again. They dry at 120 °C, like real silica gel. Recharging gives back exactly the bead you put in, never a bonus bead. Beads pushed past their overheat temperature with the [overheat slider](heat.md#the-overheat-slider) can burn to {{ item('rngtech:ash') }}, which you can put in a Composter.
 
 {{ processing("furnace", input="rngtech:saturated_silica_gel_beads", hide=["experience", "bonus_output"]) }}
 

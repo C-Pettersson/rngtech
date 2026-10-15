@@ -3068,11 +3068,11 @@
         },
         {
             "id": "reward_401",
-            "x": 4976,
-            "y": 4527,
+            "x": 4920,
+            "y": 4376,
             "role": "reward",
-            "shape": "keyDirect",
-            "gate": "path_0243",
+            "shape": "keyPair",
+            "gate": "path_0245",
             "region": "drive_reserve",
             "layer": "home"
         }
@@ -31214,8 +31214,24 @@
             "id": "blast_draft",
             "kind": "KEYSTONE",
             "name": "Blast Draft",
-            "x": 4976,
-            "y": 4527,
+            "x": 4875,
+            "y": 4402,
+            "group": "reward_401"
+        },
+        {
+            "effects": [],
+            "behaviors": [
+                "COOL_HEADED"
+            ],
+            "fixed": {},
+            "ceilings": {},
+            "scaling": [],
+            "passive": {},
+            "id": "cool_headed",
+            "kind": "KEYSTONE",
+            "name": "Cool Headed",
+            "x": 4965,
+            "y": 4350,
             "group": "reward_401"
         }
     ],
@@ -37237,8 +37253,12 @@
             "even_loading"
         ],
         [
-            "path_0243",
+            "path_0245",
             "blast_draft"
+        ],
+        [
+            "path_0245",
+            "cool_headed"
         ]
     ]
 }

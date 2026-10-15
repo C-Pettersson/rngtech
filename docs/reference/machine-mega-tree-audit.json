@@ -12,41 +12,35 @@
             "path_0002",
             "path_0001",
             "silent_operation",
-            "path_0146",
-            "path_0147",
-            "path_0141",
-            "path_0166",
-            "path_0167",
-            "path_0069",
-            "path_0208",
-            "path_0207",
-            "path_0174",
-            "path_0196",
-            "path_0197",
-            "path_0198",
-            "path_0199",
-            "path_0200",
-            "path_0195",
-            "path_0477",
-            "path_0478",
-            "path_0368",
-            "path_0369",
-            "path_0365",
-            "path_0364",
-            "path_0374",
-            "path_0375",
-            "path_0376",
-            "path_0371",
-            "path_0560",
-            "path_0561",
-            "snap_actuators_1",
-            "snap_actuators_3",
-            "servo_linkage",
-            "clear_cutting",
+            "path_0003",
+            "path_0053",
+            "path_0054",
+            "path_0055",
+            "path_0056",
+            "path_0007",
+            "path_0026",
+            "path_0027",
+            "path_0013",
+            "path_0090",
+            "path_0091",
+            "path_0088",
+            "path_0267",
+            "path_0266",
+            "path_0239",
+            "path_0253",
+            "path_0254",
+            "path_0241",
+            "path_0257",
+            "path_0244",
+            "path_0245",
+            "blast_draft",
             "path_0144",
+            "path_0146",
             "path_0145",
+            "path_0147",
             "soft_starter_1",
             "path_0140",
+            "path_0141",
             "soft_starter_2",
             "soft_starter_3",
             "path_0017",
@@ -54,17 +48,20 @@
             "path_0148",
             "path_0163",
             "path_0150",
+            "path_0166",
             "soft_starter",
             "path_0018",
             "path_0043",
             "path_0149",
             "path_0164",
             "path_0151",
+            "path_0167",
             "path_0011",
             "path_0042",
             "path_0142",
             "path_0165",
             "path_0143",
+            "path_0069",
             "path_0019",
             "path_0071",
             "fine_control_1",
@@ -78,6 +75,7 @@
             "path_0171",
             "path_0072",
             "path_0073",
+            "path_0208",
             "path_0020",
             "fine_control_2",
             "path_0041",
@@ -95,12 +93,14 @@
             "path_0172",
             "lean_draw_1",
             "path_0074",
+            "path_0207",
             "path_0006",
             "fine_control",
             "path_0040",
             "path_0121",
             "raw_power_2",
-            "path_0049"
+            "path_0049",
+            "path_0154"
         ],
         "start_control_drive": [
             "path_0130",
@@ -609,7 +609,7 @@
         ]
     },
     "metrics": {
-        "nodes": 1352,
+        "nodes": 1353,
         "starts": 6,
         "startPositions": {
             "start_control": {
@@ -642,15 +642,15 @@
             "TRAVEL": 634,
             "NODE": 482,
             "NOTABLE": 196,
-            "KEYSTONE": 34
+            "KEYSTONE": 35
         },
         "groups": 402,
-        "edges": 1505,
+        "edges": 1506,
         "cycleRank": 154,
         "investment": {
             "travelNodes": 634,
             "rewardPockets": 133,
-            "rewardComponents": 144,
+            "rewardComponents": 145,
             "minimumGateTravel": 2,
             "notablePointsFromRoad": {
                 "min": 3,
@@ -664,7 +664,7 @@
         "overlaps": 0,
         "throughNodes": 0,
         "crossings": 0,
-        "medianLength": 71.8679344353238,
+        "medianLength": 72.00694410957877,
         "p90Length": 95.88013350011566,
         "distances": {
             "start_control": {
@@ -701,7 +701,8 @@
                 "single_pass": 13,
                 "even_feed": 32,
                 "surge_cycling": 30,
-                "blast_draft": 31
+                "blast_draft": 31,
+                "cool_headed": 31
             },
             "start_control_drive": {
                 "silent_operation": 10,
@@ -737,7 +738,8 @@
                 "single_pass": 26,
                 "even_feed": 27,
                 "surge_cycling": 34,
-                "blast_draft": 26
+                "blast_draft": 26,
+                "cool_headed": 26
             },
             "start_drive": {
                 "silent_operation": 10,
@@ -773,7 +775,8 @@
                 "single_pass": 35,
                 "even_feed": 15,
                 "surge_cycling": 31,
-                "blast_draft": 16
+                "blast_draft": 16,
+                "cool_headed": 16
             },
             "start_drive_reserve": {
                 "silent_operation": 10,
@@ -809,7 +812,8 @@
                 "single_pass": 36,
                 "even_feed": 15,
                 "surge_cycling": 20,
-                "blast_draft": 10
+                "blast_draft": 10,
+                "cool_headed": 10
             },
             "start_reserve": {
                 "silent_operation": 10,
@@ -845,7 +849,8 @@
                 "single_pass": 31,
                 "even_feed": 22,
                 "surge_cycling": 14,
-                "blast_draft": 16
+                "blast_draft": 16,
+                "cool_headed": 16
             },
             "start_reserve_control": {
                 "silent_operation": 10,
@@ -881,7 +886,8 @@
                 "single_pass": 20,
                 "even_feed": 32,
                 "surge_cycling": 20,
-                "blast_draft": 27
+                "blast_draft": 27,
+                "cool_headed": 27
             }
         }
     }

@@ -10,5 +10,10 @@
   "processing_ticks": 2400,
   "heat": 34560,
   "bonus_output": false,
-  "experience": 0.0
+  "experience": 0.0,
+  "minimum_temperature": 120,
+  "failure_output": {
+    "count": 1,
+    "id": "rngtech:ash"
+  }
 }

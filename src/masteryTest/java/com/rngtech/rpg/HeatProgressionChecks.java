@@ -28,7 +28,9 @@ import java.util.function.Supplier;
 public final class HeatProgressionChecks {
     private static final double LOWER = 0.5;
     private static final double UPPER = 2.0;
-    private static final int MAX_TICKS = 40_000;
+    private static final int MAX_TICKS = 200_000;
+    /** A quest step is a run of crafts, so the first craft's warmup counts once. */
+    private static final int QUEST_CRAFTS = 8;
     private static final Path RECIPES = Path.of("src/main/resources/data/rngtech/recipe");
     /** Stage 0 fuel: every burn tick of coal and the like supplies this much heat. */
     private static final int FORMING_BED_TEMPERATURE = 800;
@@ -48,6 +50,7 @@ public final class HeatProgressionChecks {
         stageZeroCoalSmeltsIronAndCopper(root);
         ungatedRecipesWorkAtAnyHeat();
         sliderStopsAtTheSafeMaximumWithoutBlastDraft();
+        warmupFeelsLikeAFurnace();
         return checks;
     }
 
@@ -205,6 +208,41 @@ public final class HeatProgressionChecks {
         require(HeatEngine.pushPastSafe(false, stats) == stats.value(MachineStat.OVERDRIVE_SPEED) > 0.0, "only Overdrive pushes past the safe maximum without Blast Draft");
     }
 
+    /**
+     * Heating should look like a furnace heating: unrolled gear climbs about 100 C a second and takes seconds to reach its
+     * target, and even the fastest cores take a few seconds.
+     */
+    private static void warmupFeelsLikeAFurnace() {
+        record Gear(String name, MachineStatAccumulator stats, int target) {
+        }
+        List<Gear> gears = List.of(
+                new Gear("Stage0 furnace, 800", furnace(FurnaceChassisMaterial.values()[0], null), 800),
+                new Gear("Iron furnace+iron core, 800", furnace(FurnaceChassisMaterial.IRON, HeatCoreMaterial.IRON), 800),
+                new Gear("Steel furnace+steel core, 1100", furnace(FurnaceChassisMaterial.STEEL, HeatCoreMaterial.STEEL), 1100),
+                new Gear("Aluminum furnace+aluminum core, 800", furnace(FurnaceChassisMaterial.ALUMINUM, HeatCoreMaterial.ALUMINUM), 800),
+                new Gear("Titanium furnace+titanium core, 1450", furnace(FurnaceChassisMaterial.TITANIUM, HeatCoreMaterial.TITANIUM), 1450),
+                new Gear("Tungstensteel furnace+exotic core, 800", furnace(FurnaceChassisMaterial.TUNGSTENSTEEL, HeatCoreMaterial.EXOTIC), 800),
+                new Gear("Bronze alloy, 900", alloyFurnace(AlloyFurnaceChassisMaterial.BRONZE, HeatCoreMaterial.BRONZE, AlloyCrucibleMaterial.BRONZE), 900),
+                new Gear("Crude press bronze core, 1000", press(HeatCoreMaterial.BRONZE, null), 1000),
+                new Gear("Melter titanium core, 1200", melter(HeatCoreMaterial.TITANIUM), 1200));
+        for (Gear gear : gears) {
+            MachineStatAccumulator stats = gear.stats();
+            HeatEngine.Envelope envelope = HeatEngine.envelope(gear.target(), gear.target(), gear.target(), 0.0, false, false, stats, 0.0, Integer.MAX_VALUE);
+            HeatLane lane = new HeatLane();
+            int tick = 0;
+            for (; tick < 20_000 && lane.exactTemperature() < gear.target() - 1; tick++) {
+                HeatEngine.work(lane, envelope, stats, new HeatEngine.Load(0.0, 0.0, 1), heat -> heat, tick, 0);
+            }
+            if (Boolean.getBoolean("rngtech.heatReport")) {
+                System.out.printf(Locale.ROOT, "%-42s %d ticks (%.1f s)%n", gear.name(), tick, tick / 20.0);
+            }
+            require(tick >= 40, gear.name() + " takes at least two seconds to reach its target, not " + tick + " ticks");
+            if (gear.name().startsWith("Iron furnace")) {
+                require(tick >= 160 && tick <= 300, "unrolled Iron gear reaches 800 C in 8 to 15 seconds, not " + tick + " ticks");
+            }
+        }
+    }
+
     /** A recipe without a temperature requirement works from cold or hot at its own pace, and never waits as Too Hot. */
     private static void ungatedRecipesWorkAtAnyHeat() {
         MachineStatAccumulator stats = furnace(FurnaceChassisMaterial.STEEL, HeatCoreMaterial.STEEL);
@@ -257,10 +295,14 @@ public final class HeatProgressionChecks {
             return delivered;
         };
         HeatLane lane = new HeatLane();
+        int crafts = 0;
         for (int tick = 1; tick <= MAX_TICKS; tick++) {
             HeatEngine.work(lane, envelope, stats, load, supply, tick, 0);
             if (HeatEngine.finished(lane, recipe.ticks())) {
-                return new Run(tick, fuel ? paid[0] / HeatEngine.HEAT_PER_BURN_TICK : paid[0] * rate);
+                lane.resetCycle();
+                if (++crafts == QUEST_CRAFTS) {
+                    return new Run(tick, fuel ? paid[0] / HeatEngine.HEAT_PER_BURN_TICK : paid[0] * rate);
+                }
             }
         }
         return new Run(MAX_TICKS, Double.MAX_VALUE);
@@ -276,7 +318,7 @@ public final class HeatProgressionChecks {
         double heatTransfer = Math.max(0.1, stats.value(MachineStat.THERMAL_CONDUCTIVITY));
         int warmup = (int) Math.ceil((recipe.target() - HeatEngine.AMBIENT) / (double) Math.max(1, Math.round(10.0 * heatTransfer)));
         int crafting = Math.max(1, (int) Math.ceil(stats.adjustedProcessingTicks(recipe.ticks()) / heatTransfer));
-        int ticks = warmup + crafting;
+        int ticks = warmup + crafting * QUEST_CRAFTS;
         if (fuel) {
             return new Run(ticks, ticks);
         }
@@ -284,7 +326,7 @@ public final class HeatProgressionChecks {
         int perTick = Math.max(1, (int) Math.ceil(energy / (double) crafting));
         // FE intake past the transfer stretches today's craft the same way it throttles the heater.
         double throttle = Math.max(1.0, perTick / (double) energyTransfer);
-        return new Run((int) Math.ceil(warmup + crafting * throttle), perTick * (double) ticks);
+        return new Run((int) Math.ceil(warmup + crafting * QUEST_CRAFTS * throttle), perTick * (double) ticks);
     }
 
     private static HeatEngine.Load load(Recipe recipe, MachineStatAccumulator stats) {

@@ -171,7 +171,9 @@ const KEYSTONES = [
     // Quality of life, like Silent Operation: the points spent reaching it are the cost.
     { id: "even_feed", extra: "even_feed", name: "Even Feed", behaviors: ["EVEN_FEED"] },
     // Unlocks the overheat slider past the safe maximum. The risk is the player's: recipes that can fail build strain.
-    { id: "blast_draft", extra: "blast_draft", name: "Blast Draft", behaviors: ["BLAST_DRAFT"] }
+    { id: "blast_draft", extra: "blast_draft", name: "Blast Draft", behaviors: ["BLAST_DRAFT"] },
+    // Its counterpart on the same road node: every new input starts at the recipe target, never on leftover heat.
+    { id: "cool_headed", extra: "cool_headed", name: "Cool Headed", behaviors: ["COOL_HEADED"] }
 ];
 
 // Additions placed after the original fill, in design coordinates. Output constellations mirror Clean Dust Ledge on the
@@ -197,8 +199,8 @@ const EXTRAS = [
     { id: "surge_cycling", angle: 96, radius: 2300, shapes: ["keyDirect"], keystone: true, layer: "outer" },
     // The Batch Overhead path sits beside Dense Batching, which it leads to.
     { id: "batch_overhead", angle: -62, radius: 1250, shapes: ["arc"], theme: "batching" },
-    // Blast Draft hangs off a road close to the Furnace's start, so pushing the slider is an early choice, not a default.
-    { id: "blast_draft", angle: 40, radius: 1550, shapes: ["keyDirect"], keystone: true, layer: "home" }
+    // Blast Draft and Cool Headed share a road node close to the Furnace's start, so how to run heat is an early choice.
+    { id: "blast_draft", keystones: ["blast_draft", "cool_headed"], angle: 40, radius: 1550, shapes: ["keyPair"], keystone: true, layer: "home" }
 ];
 
 const regionAt = angle => {

@@ -727,6 +727,16 @@
                 "melter"
             ],
             "yield": "none"
+        },
+        {
+            "id": "COOL_HEADED",
+            "families": [
+                "furnace",
+                "alloy_furnace",
+                "metal_press",
+                "melter"
+            ],
+            "yield": "none"
         }
     ]
 }

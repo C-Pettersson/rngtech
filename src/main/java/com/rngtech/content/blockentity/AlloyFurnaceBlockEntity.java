@@ -324,7 +324,7 @@ public class AlloyFurnaceBlockEntity extends BaseMachineBlockEntity implements M
         HeatLane heat = furnace.heat;
         if (!heat.started()
                 && heat.exactTemperature() >= envelope.minimum()
-                && heat.exactTemperature() <= envelope.workCeiling()
+                && heat.exactTemperature() <= envelope.ceilingFor(heat)
                 && ProcessingChance.rollInstant(level, stats)
                 && furnace.payInstant(recipe, stats, supply)) {
             furnace.markInstantProcess();
@@ -999,7 +999,7 @@ public class AlloyFurnaceBlockEntity extends BaseMachineBlockEntity implements M
                 stats,
                 heatSlider / 100.0,
                 Integer.MAX_VALUE
-        );
+        ).coolingFirst(hasMasteryBehavior("COOL_HEADED"));
     }
 
     /** Reference ticks a cycle needs: the recipe's time, longer for every extra recipe set in the batch. */
