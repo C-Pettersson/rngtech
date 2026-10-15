@@ -2,7 +2,7 @@
 
 Source: [Batch Processing PRD](batch-processing.md).
 
-Status: **Prototype** for the 2.0 release. Slice 1 is merged and passed an in-game check on 2026-10-06. Slice 2 passes the automated checks and awaits an in-game check. Slices 3–4 remain.
+Status: **Prototype** for the 2.0 release. Slice 1 is merged and passed an in-game check on 2026-10-06. Slice 2 passes the automated checks and passed an in-game check on 2026-10-15. Slices 3–4 remain.
 
 ## Scope checklist
 
@@ -65,4 +65,4 @@ Recorded 2026-10-15, during slice 2:
     - Furnace and Alloy Furnace families read Batch Size, so Dense Batching, Uniques, and Corruption reach them. Both Stats tabs show Batch Size.
     - GameTests cover one core running four Lead Furnace lanes, a Furnace batch, an Alloy Furnace recipe-set batch, and a four-core Lead Furnace moving its extra cores out.
     - Wiki, Machine Stats, Current Implementation, and the generated ascendancy tables are updated.
-    - In-game check pending: Lead Furnace with one core, a batched Furnace and Alloy Furnace, and a world saved with a four-core Lead Furnace.
+    - In-game check passed: Lead Furnace with one core, a batched Furnace and Alloy Furnace, and a world saved with a four-core Lead Furnace.
