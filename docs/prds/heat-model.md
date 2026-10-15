@@ -8,7 +8,7 @@ Implementation status: Planned
 
 Release: 2.0
 
-Last updated: 2026-10-06
+Last updated: 2026-10-14
 
 ## Summary
 
@@ -28,13 +28,13 @@ This PRD replaces that with a shared heat engine for the Furnace, Alloy Furnace,
 - Each lane has a live temperature that heat flows into and out of.
 - FE is fully emergent: machines pay for the heat they put in, including what leaks away. A slow, well-insulated kiln is cheap per craft; a hot, fast blast furnace costs more.
 - Every heat stat has an upside and a cost.
-- A per-machine **Heat Mode** (Eco, Balanced, Hot) lets players choose how hard a machine runs.
+- A per-machine **overheat slider** sets how far above the recipe target a machine runs, up to its Max Temperature. Running hotter is faster, and Temperature Stability decides how far you can push before the temperature wobbles out of the safe band.
 
 Quest progression is a hard constraint. The new model may make steps slower or faster, but it must never block one. The [Progression safety](#progression-safety) rules below are requirements, and an automated check enforces them.
 
 The work lands in four slices. Each slice passes every check on its own.
 
-1. Shared heat engine, recipe heat units, stats, and Heat Mode on all four machines, plus the progression check.
+1. Shared heat engine, recipe heat units, stats, and the overheat slider on all four machines, plus the progression check.
 2. Heat Core and chassis profiles, affix eligibility, and stored-affix migration.
 3. Passive tree and ascendancy rework.
 4. UI, Jade, documentation, and language.
@@ -63,7 +63,7 @@ Key existing code:
 ## Goals
 
 - Every heat stat matters while a machine is running, and each one has a cost.
-- Gear, Heat Mode, and passive choices produce distinct machines: a kiln that is slow but cheap per craft, a blast furnace that is fast but costs more FE, or a precise build that runs right at the edge.
+- Gear, slider, and passive choices produce distinct machines: a kiln that is slow but cheap per craft, a blast furnace that is fast but costs more FE, or a precise build that runs right at the edge.
 - One heat engine for all four heated machines, with one set of stat meanings.
 - Players choose how hard each machine runs.
 - No quest, recipe, or stage gate becomes harder to reach than it is today.
@@ -79,15 +79,16 @@ Key existing code:
 
 | Stat | Status | Meaning | Upside | Cost |
 |---|---|---|---|---|
-| `MAX_TEMPERATURE` | Kept | How hot the heater can drive the chamber | Unlocks hotter recipes. Heats faster when far below its maximum | Hotter chambers wobble more, so they need Stability |
+| `MAX_TEMPERATURE` | Kept | How hot the heater can drive the chamber | Unlocks hotter recipes, raises how far the slider can go, and heats faster when far below its maximum | Pushing the slider toward it widens the wobble, so it needs Stability |
 | `HEAT_TRANSFER` | Meaning changes | How fast the heater pushes heat in | Fast warmup, fast recovery after load dips | Higher FE/t peaks, so Battery Cell rate and energy transfer matter |
 | `THERMAL_CONDUCTIVITY` | New | How freely heat moves from the chamber into the input, and through the walls | Faster processing | More heat leaks through the walls, so FE/t rises. FE per craft stays about the same, because the craft also finishes sooner |
-| `HEAT_ISOLATION` | Kept | How well the walls hold heat in | Less heat lost, so lower FE per craft: the kiln stat | Traps heat: the lane cools slowly when it must drop to a cooler recipe's safe band |
+| `HEAT_ISOLATION` | Kept | How well the walls hold heat in | Less heat lost, so lower FE per craft: the kiln stat | Heat Core profiles trade it against Thermal Conductivity: well-insulated cores conduct less |
 | `THERMAL_MASS` | Renamed from `WARMUP_TIME` | How much heat the chamber stores | Smaller load dips, smoother temperature, holds heat while idle | Slow first warmup and slow recovery |
-| `TEMPERATURE_STABILITY` | Meaning changes | How precisely the controller holds temperature | Smaller wobble, so Balanced and Hot modes run closer to the safe maximum | Uses up a stat roll that could have been raw power |
-| `OVERHEAT_TOLERANCE` | Kept | Extra room above the recipe's safe maximum before strain starts | Safer Hot mode and Overdrive | — |
+| `TEMPERATURE_STABILITY` | Meaning changes | How tightly the lane holds its setpoint | Smaller wobble, so the slider can run further past the target before dips fall below the minimum or spikes cross the overheat temperature | Uses up a stat roll that could have been raw power |
+| `COOLING_RATE` | Meaning changes on heated machines | How fast the lane actively sheds heat when it must drop: a cooler recipe or a lowered slider | Short waits when switching, for example from Titanium plates to Iron plates | Uses up a stat roll |
+| `OVERHEAT_TOLERANCE` | Kept | Extra room above the recipe's safe maximum before strain starts | The slider can run hotter before wobble spikes build strain; shorter cool-downs before a cooler recipe | — |
 
-- On heated machines, `COOLING_RATE` is retired; idle cooling comes from heat loss and Thermal Mass. Generators keep reading `COOLING_RATE` and `HEAT_ISOLATION` as they do today.
+- On heated machines, idle cooling comes from heat loss and Thermal Mass. `COOLING_RATE` applies only while a lane is above the heat it is allowed to work at (see [Active cooling](#active-cooling)), so good insulation never makes recipe switches slow. Generators keep reading `COOLING_RATE` and `HEAT_ISOLATION` as they do today.
 - `HEAT_TRANSFER` no longer divides processing time. Conductivity and temperature above the target now set processing speed.
 - `ENERGY_USAGE` on heated machines becomes FE per heat unit, so it scales every HU the heater supplies.
 - All base values are 1.0 except temperatures.
@@ -109,7 +110,7 @@ The engine runs every tick, for each lane. One shared class serves all four mach
 ### Temperature
 
 ```text
-setpoint     = from Heat Mode (see below), never above Max Temperature
+setpoint     = from the overheat slider (see below), never above Max Temperature
 holding heat = Thermal Conductivity × k_loss × ((T − ambient) / 1000)^p / Heat Isolation
 approach     = Heat Transfer × k_heat × (0.5 + 0.5 × (Max Temperature − T) / (Max Temperature − ambient))
 heater power = holding heat + approach, limited by available FE or fuel
@@ -117,10 +118,40 @@ T change     = (heater power − holding heat − heat absorbed by the input) / 
 ```
 
 - The heater always pays for holding heat first, so heat loss costs FE but never lowers the temperature the lane can reach.
-- Heat loss grows faster than linearly with temperature (`p` > 1, as radiant loss does in real furnaces). Running hotter is faster, but the extra loss costs more FE per craft than the speed saves. This is what makes Hot mode and blast builds expensive.
+- Heat loss grows faster than linearly with temperature (`p` > 1, as radiant loss does in real furnaces). Running hotter is faster, but the extra loss costs more FE per craft than the speed saves. This is what makes a high slider and blast builds expensive.
 - The approach term is at least half its full value, even at Max Temperature. A lane can always reach a setpoint equal to its Max Temperature.
 - A hotter heater (more Max Temperature headroom) approaches a low setpoint faster.
-- While idle, the heater is off and the lane cools by `holding heat / Thermal Mass`. This replaces Cooling Rate and Heat Isolation. Hold the Fire keeps its rule.
+- While idle, the heater is off and the lane cools by `holding heat / Thermal Mass`. Hold the Fire keeps its rule.
+
+### Active cooling
+
+A lane can be hotter than it may work at: after a hotter recipe, or when the slider is lowered.
+
+```text
+work ceiling = max(setpoint, overheat temperature)       overheat temperature = safe maximum × Overheat Tolerance
+active cool  = k_cool × Cooling Rate                     degrees per tick, on top of passive heat loss
+```
+
+- Above the work ceiling, the heater is off, progress pauses, and the lane cools by passive loss plus active cooling, stopping at the ceiling. The status reads Too Hot.
+- Active cooling costs no FE; the heat already paid for is simply lost.
+- Hold the Fire never keeps heat above the work ceiling.
+- This generalizes the current cool-down rule, under which a Furnace lane or Metal Press left above a cooler recipe's overheat temperature waits and cools before it works.
+
+### Wobble
+
+The lane's working temperature wobbles around the setpoint:
+
+```text
+push      = max(0, setpoint − target) / target
+shortfall = max(0, required Temperature Stability − Temperature Stability)
+amplitude = target × (k_wobble × push / (Temperature Stability × Thermal Mass) + min(0.25, 0.12 × shortfall))
+T_work    = T + wobble, a deterministic wave within ± amplitude
+```
+
+- At the default slider (setpoint at the target), only a Stability shortfall wobbles, as today.
+- Pushing the slider widens the wobble; Stability and Thermal Mass narrow it. Players see the predicted band on the heat bar before they commit.
+- Ticks where `T_work` is below the minimum make no progress.
+- On recipes that can fail, ticks where `T_work` is above the overheat temperature build strain, using today's overheat strain rule.
 
 ### Load dip
 
@@ -145,7 +176,8 @@ absorbed HU = (recipe heat / processing_ticks) × Processing Speed × Thermal Co
 progress    = absorbed HU so far / recipe heat
 ```
 
-- A cycle still starts only once the lane first reaches the target. After that, a lane running between the minimum and the target is slower instead of stopped.
+- Progress uses `T_work`, so wobble speeds up and slows down each tick.
+- A cycle starts as soon as the lane reaches the minimum. Between the minimum and the target it runs slower.
 - Above the target, running hotter is faster. At the default safe maximum (target × 1.15), the heat factor is 1.3.
 - When the minimum equals the target, which is the default, the middle band is empty.
 
@@ -159,13 +191,13 @@ FE per craft = (recipe heat + holding heat during the cycle + share of warmup an
 ```
 
 - Every craft pays its recipe heat. Gear, mode, and passives change only what's paid on top.
-- Calibration targets, compared with base gear in Balanced mode:
+- Calibration targets, compared with base gear at the default slider:
 
 | Build | Setup | Speed | FE per craft |
 |---|---|---|---|
-| Base | Base gear, Balanced | 1× | 1×, of which about 40% is holding heat |
-| Kiln | Eco mode, high Heat Isolation and Thermal Mass | about 0.6–0.7× | about 0.7× |
-| Blast | Hot mode, high Thermal Conductivity and Heat Transfer | about 1.6× | about 1.5× |
+| Base | Base gear, default slider | 1× | 1×, of which about 40% is holding heat |
+| Kiln | Slider at the target, high Heat Isolation and Thermal Mass | about 0.6–0.7× | about 0.7× |
+| Blast | Slider near the safe maximum, high Thermal Conductivity and Heat Transfer | about 1.6× | about 1.5× |
 
 - If FE intake is short, the heater throttles. The lane heats slower or drops toward the minimum, and progress slows. It never deadlocks while any FE arrives. Cell Rate Limited stays a status, not a stop.
 
@@ -179,24 +211,20 @@ FE per craft = (recipe heat + holding heat during the cycle + share of warmup an
 
 The Melter gains a live temperature with the same engine. Its recipes have only a minimum temperature, which is used as the target. Its single crucible is one lane.
 
-## Heat Mode
+## Overheat slider
 
-Every heated machine gets a three-way Heat Mode, stored on the machine and kept when it's broken and placed again. Lanes on a Lead Furnace share the mode.
-
-| Mode | Setpoint | Feel |
-|---|---|---|
-| Eco | The recipe target | Lowest FE, base speed |
-| Balanced (default) | Target + half the safe band | Moderate speed and FE |
-| Hot | The safe maximum | Fastest, most FE |
+Every heated machine gets an overheat slider on its Process tab, stored on the machine and kept when it's broken and placed again. Lanes on a Lead Furnace share it.
 
 ```text
-wobble margin = how far the temperature wobbles, from Temperature Stability and Thermal Mass
-setpoint      = clamp(mode setpoint, target, safe maximum − wobble margin), never above Max Temperature
+slider   = 0% to 100% of the band from the target to Max Temperature
+setpoint = target + slider × (Max Temperature − target)
 ```
 
-- Poor Stability pulls the Balanced and Hot setpoints down toward the target, so the controller itself never wobbles into the overheat band. Stability becomes speed.
-- Machines placed before the change, and new machines, start in Balanced.
-- Heat Mode is set in the UI. Automation does not change it.
+- At 0%, the default, the lane holds the recipe target: lowest FE, base speed, and no wobble beyond a Stability shortfall.
+- Higher settings run hotter and faster and cost more FE, because heat loss grows faster than linearly with temperature.
+- Past the safe maximum, the lane is overheating on purpose. Wobble spikes above the overheat temperature build strain on recipes that can fail; recipes that cannot fail just run fast and expensive.
+- The slider is a fraction of each lane's own band, so one setting works for every recipe. A lane always works with its current recipe's target and Max Temperature.
+- The slider is set in the UI. Automation does not change it.
 
 ## Progression safety
 
@@ -207,8 +235,8 @@ These rules are requirements. Slice 1 adds a `masteryCheck` simulation, `HeatPro
 1. **No new gates.** A recipe starts if, and only if, it starts today: Max Temperature reaches the target, and any required Temperature Stability is met. These thresholds and every Heat Core's Max Temperature bonus do not change.
 2. **Always reachable.** With any gear and mode, a lane reaches every setpoint up to its Max Temperature while FE or fuel arrives. Heat loss costs FE but never caps temperature. Recipes whose target equals the gear's Max Temperature therefore stay reachable.
 3. **No power deadlocks.** Short FE slows heating and processing and never stops them for good. At base gear, holding heat at the highest target a stage can run uses at most half the chassis's base energy transfer.
-4. **No new failure strain at base gear.** In Eco and Balanced, base gear on its own stage's failure-bearing recipes builds no more strain than today. Load dips stop at the minimum, so they never add underheat strain. Hot mode and Overdrive may add risk.
-5. **Quest-order run.** For every quest that needs a heated recipe, the gear the quest line expects at that point (unrolled, no Mastery) completes the recipe in Balanced mode at base energy transfer, within 0.5×–2× of today's time and FE or fuel. The bounds only catch calibration mistakes; tedium inside them is acceptable.
+4. **No new failure strain at base gear.** At the default slider, base gear on its own stage's failure-bearing recipes builds no more strain than today. Load dips stop at the minimum, so they never add underheat strain. Pushing the slider and Overdrive may add risk.
+5. **Quest-order run.** For every quest that needs a heated recipe, the gear the quest line expects at that point (unrolled, no Mastery) completes the recipe at the default slider and base energy transfer, within 0.5×–2× of today's time and FE or fuel. The bounds only catch calibration mistakes; tedium inside them is acceptable.
     - **Roll-expected steps** are the exception. On these steps the quest line accepts that players roll or refine gear, or use Mastery. For each one, the check uses the smallest Max Temperature or Stability bonus that starts the recipe today, and requires that the same bonus still completes it.
     - Roll-expected steps today: the Steel Blend smelt and Methane from Biomass.
 6. **Stage 0 bootstrap.** Coal in the Stage 0 furnace reaches 800 °C and smelts Iron and Copper.
@@ -258,34 +286,34 @@ Stored affixes keep their physical meaning:
 |---|---|
 | Warmup Time | Thermal Mass, same value |
 | Heat Isolation | Unchanged |
-| Cooling Rate increased or reduced by x% | Heat Isolation reduced or increased by x% |
+| Cooling Rate reduced by x% | Cooling Rate increased by x%, so the roll stays an upside under the new meaning |
 
 - The stat codec accepts `warmup_time` as `THERMAL_MASS`.
 - Cooling Rate rolls are converted when a heated-machine item or Heat Core is read. On generators they stay as they are.
 - Converted rolls can change from a pure upside to a trade-off. Players can reroll them through refinement as usual.
-- Affix eligibility for heated machines swaps Cooling Rate for Thermal Conductivity.
+- Affix eligibility for heated machines adds Thermal Conductivity. Cooling Rate rolls there become increased rolls.
 
 ## Passive tree and ascendancies
 
 | Node | Change |
 |---|---|
-| Overdrive Lanes (Crucible Keeper) | Hot mode is the new baseline for running above the target. Overdrive lets the setpoint go past the safe maximum, up to the overheat temperature (safe maximum × Overheat Tolerance) minus the wobble margin, and its Overdrive Cap and Speed keep raising the heat factor there. Overdrive Margin and Safe Overdrive keep their meaning. |
+| Overdrive Lanes (Crucible Keeper) | The slider is the new baseline for running above the target. Overdrive Cap and Speed add heat factor on top of the normal bonus above the safe maximum. Overdrive Margin caps the slider that far below the safe maximum, and Safe Overdrive caps wobble spikes at the overheat temperature. |
 | Crucible Heart (Crucible Keeper) | +1 [Batch Size](batch-processing.md) while the lane runs at twice the recipe target or hotter. This replaces its own two-inputs rule. |
 | Shared Hearth (Crucible Keeper) | Lanes share heat: each load dip is split across all active lanes. |
 | Hold the Fire (Crucible Keeper) | Unchanged: a lane with smeltable input never cools. |
 | Kiln Discipline | Its Warmup Time cost becomes more Thermal Mass. |
 | Low Heat Specialist, Flash Annealing | Their Max Temperature caps also cap the setpoint. |
 | Quench Protocol | Its Heat Transfer cost stays. Quench's strain halving keeps its rule. |
-| Hot Stamping (Metal Press) | Unchanged; Hot mode makes it easier to trigger. |
-| Heat Window (Drop Forge and others) | Applies to the safe band, so it also widens or narrows the Balanced and Hot setpoints. |
+| Hot Stamping (Metal Press) | Unchanged; a higher slider makes it easier to trigger. |
+| Heat Window (Drop Forge and others) | Applies to the safe band, so it moves the overheat temperature and with it how far the slider can go before spikes build strain. |
 | Shared-tree Heat Transfer, Warmup, Cooling, and Isolation nodes | Mapped to the new stats as in the affix migration table. |
 
 ## UI
 
 Follows [Machine GUI Design](../reference/machine-gui-design.md).
 
-- The Process tab gets a Heat Mode button: a flame icon with three states. Hover text names the mode and its setpoint.
-- The heat bar marks the minimum, target, setpoint, safe maximum, and overheat temperature.
+- The Process tab gets the overheat slider. Hover text shows the setpoint and the predicted wobble band.
+- The heat bar marks the minimum, target, setpoint, safe maximum, and overheat temperature, and shades the predicted wobble band.
 - Hover text shows:
     - current temperature and setpoint;
     - the heat factor;
@@ -293,22 +321,22 @@ Follows [Machine GUI Design](../reference/machine-gui-design.md).
     - FE/t split into input heat and holding heat;
     - predicted FE per craft.
 - The Stats tab shows the new stats with one-line explanations of their upside and cost.
-- Jade shows the mode, temperature, and setpoint.
+- Jade shows the temperature and setpoint.
 
 ## Migration
 
 - Lanes keep their current temperature on load.
-- Machines start in Balanced.
-- `warmup_time` decodes as `THERMAL_MASS`. Cooling Rate rolls on heated-machine items convert as described above.
+- Machines start with the slider at 0%.
+- `warmup_time` decodes as `THERMAL_MASS`. Reduced Cooling Rate rolls on heated-machine items convert as described above.
 - Heated recipes migrate from `energy` to `heat`; legacy `energy` still loads.
 - Mastery allocations stay. No node IDs change.
 
 ## Slices
 
-1. **Heat engine.** Shared engine, recipe `heat` with data migration and legacy `energy` support, `THERMAL_CONDUCTIVITY`, `THERMAL_MASS`, Heat Mode, emergent FE, and fuel heat. Move the Furnace, Alloy Furnace, Metal Press, and Melter onto it with today's gear values mapped across. Add `HeatProgressionChecks` with the quest path cases.
+1. **Heat engine.** Shared engine, recipe `heat` with data migration and legacy `energy` support, `THERMAL_CONDUCTIVITY`, `THERMAL_MASS`, the overheat slider, wobble, active cooling, emergent FE, and fuel heat. Move the Furnace, Alloy Furnace, Metal Press, and Melter onto it with today's gear values mapped across. Add `HeatProgressionChecks` with the quest path cases.
 2. **Profiles and affixes.** Author Heat Core and chassis profiles, the affix eligibility swap, and stored-affix conversion.
 3. **Passive tree.** The node changes above.
-4. **Presentation.** Heat Mode button, heat bar markers, hover text, Jade, language, and the canonical docs: Machine Stats, Machine Guidelines, the four machine pages, Component Stages, and Current Implementation.
+4. **Presentation.** Overheat slider, heat bar markers and wobble band, hover text, Jade, language, and the canonical docs: Machine Stats, Machine Guidelines, the four machine pages, Component Stages, and Current Implementation.
 
 ## Verification
 
@@ -317,19 +345,22 @@ Follows [Machine GUI Design](../reference/machine-gui-design.md).
     - the engine's formulas;
     - the reachability floor;
     - load dip clamping at the minimum;
-    - Heat Mode setpoints with poor and good Stability;
+    - slider setpoints and wobble with poor and good Stability;
+    - active cooling down to the work ceiling, including with Hold the Fire;
     - stored-affix conversion.
 - `quickCheck` after each slice; `ciCheck`, `npm run moddex:check` (including the recipe loop audit), `npm run repo:check`, and `mkdocs build --strict` before handoff.
 - In-game checks:
     - Stage 0 coal smelting;
     - one quest step per stage chapter;
-    - a Lead Furnace running four lanes in each mode;
-    - a Stage 4+ failure recipe in Hot mode;
+    - a Lead Furnace running four lanes at 0%, 50%, and 100% slider;
+    - a Stage 4+ failure recipe with the slider past the safe maximum;
+    - switching a Metal Press from Titanium to Iron plates;
     - Overdrive past the safe maximum;
     - a world saved before the change loads with its machines and affixes intact.
 
 ## Open questions
 
 - **Constants:** `k_loss`, `k_heat`, `k_dip`, `p`, and the FE-per-HU rate are set during slice 1 calibration, against progression rule 5 and the build targets.
-- **Heat Mode on automated lines:** whether a redstone signal should be able to switch the mode. The current proposal is UI only.
+- **Slider on automated lines:** whether a redstone signal should be able to set the slider. The current proposal is UI only.
+- **Wobble constants:** `k_wobble` and `k_cool` are set in slice 1 calibration. At 100% slider with base Stability, spikes should cross the overheat temperature often enough to matter on Stage 4+ recipes.
 - **Order with batching:** this PRD and [Batch Processing](batch-processing.md) both touch Furnace lanes. The current plan lands batching first.
