@@ -18,5 +18,10 @@
   "experience": 0.7,
   "minimum_temperature": 1100,
   "required_temperature_stability": 0.95,
+  "failure_output": {
+    "count": 1,
+    "id": "rngtech:malformed_ingot"
+  },
+  "failure_material": "silver",
   "machine_xp": 3
 }

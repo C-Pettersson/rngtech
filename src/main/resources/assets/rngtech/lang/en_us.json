@@ -1925,6 +1925,7 @@
   "rngtech.furnace.status.no_input": "No Input",
   "rngtech.furnace.status.invalid_recipe": "Invalid Recipe",
   "rngtech.furnace.status.heat_low": "Needs %s C Heat",
+  "rngtech.furnace.status.heat_high": "Too Hot",
   "rngtech.furnace.status.stability_low": "Unstable",
   "rngtech.furnace.status.output_full": "Output Full",
   "rngtech.furnace.status.no_power": "No Power",
