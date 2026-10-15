@@ -85,6 +85,7 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
     public static final int STATUS_POWER_DROP = 9;
     public static final int STATUS_FAILURE_RISK = 10;
     public static final int STATUS_POWER_LIMITED = 11;
+    public static final int STATUS_HEAT_HIGH = 12;
 
     /** Share of an electric recipe's FE that Closed Loop Recuperator returns to the internal buffer. */
     private static final double CLOSED_LOOP_REFUND = 0.25D;
@@ -326,6 +327,10 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
                 changed |= furnace.resetBulkSpeed();
             }
             changed |= furnace.rememberHeatEnvelope(lane, recipe);
+            if (furnace.tooHot(lane, recipe, laneStats)) {
+                changed |= furnace.shedHeat(lane, recipe, laneStats);
+                continue;
+            }
 
             if (furnace.progress[lane] == 0 && furnace.currentTemperature[lane] < furnace.targetTemperature(recipe)) {
                 furnace.targetReached[lane] = false;
@@ -869,6 +874,10 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
                 blockedStatus = STATUS_OUTPUT_FULL;
                 continue;
             }
+            if (tooHot(lane, recipe, laneStats)) {
+                blockedStatus = STATUS_HEAT_HIGH;
+                continue;
+            }
             if (powerSensitiveActive(lane, laneStats)) {
                 blockedStatus = STATUS_POWER_DROP;
                 continue;
@@ -923,7 +932,7 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
     }
 
     private MachineInfoSnapshot.WorkState machineInfoState(int status) {
-        if (status == STATUS_READY || status == STATUS_WARMING || status == STATUS_FAILURE_RISK) {
+        if (status == STATUS_READY || status == STATUS_WARMING || status == STATUS_HEAT_HIGH || status == STATUS_FAILURE_RISK) {
             return getBlockState().getValue(BaseMachineBlock.ACTIVE)
                     ? MachineInfoSnapshot.WorkState.RUNNING
                     : MachineInfoSnapshot.WorkState.IDLE;
@@ -1259,7 +1268,7 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
 
     /** Overdrive keeps heating a working lane past the recipe target; each step costs another heat tick. */
     private boolean overdrive(int lane, FurnaceRecipe recipe, MachineStatAccumulator stats) {
-        if (stats.value(MachineStat.OVERDRIVE_CAP) <= 0.0 || stats.value(MachineStat.OVERDRIVE_SPEED) <= 0.0) {
+        if (!hasOverdrive(stats)) {
             return false;
         }
         int target = overdriveTarget(recipe, stats);
@@ -1267,6 +1276,31 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
             return false;
         }
         return warmLane(lane, recipe, stats, target);
+    }
+
+    private static boolean hasOverdrive(MachineStatAccumulator stats) {
+        return stats.value(MachineStat.OVERDRIVE_CAP) > 0.0 && stats.value(MachineStat.OVERDRIVE_SPEED) > 0.0;
+    }
+
+    /** Heat left from a hotter recipe cools to this recipe's overheat line before a smelt that can fail. */
+    private boolean tooHot(int lane, FurnaceRecipe recipe, MachineStatAccumulator stats) {
+        return failureEnabled(lane, stats) && currentTemperature[lane] > heatCeiling(recipe, stats);
+    }
+
+    /** Overdrive keeps the heat it adds on purpose, so its target raises the ceiling. */
+    private int heatCeiling(FurnaceRecipe recipe, MachineStatAccumulator stats) {
+        int overheat = HeatControl.effectiveOverheatTemperature(safeMaximumTemperature(recipe), stats);
+        return hasOverdrive(stats) ? Math.max(overheat, overdriveTarget(recipe, stats)) : overheat;
+    }
+
+    /** Unlike an idle lane, Hold the Fire does not keep this heat, so a too-hot lane always cools. */
+    private boolean shedHeat(int lane, FurnaceRecipe recipe, MachineStatAccumulator stats) {
+        int nextTemperature = Math.max(heatCeiling(recipe, stats), currentTemperature[lane] - HeatControl.coolingStep(stats, level == null ? 0L : level.getGameTime()));
+        if (nextTemperature == currentTemperature[lane]) {
+            return false;
+        }
+        currentTemperature[lane] = nextTemperature;
+        return true;
     }
 
     private int energyCostPerCraft(FurnaceRecipe recipe, MachineStatAccumulator stats) {
