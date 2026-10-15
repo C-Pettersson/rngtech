@@ -170,6 +170,19 @@ class Resources:
             items.extend(self._guess_common_tag(tag_id))
         return tuple(items)
 
+    def tag_contains(self, tag_id: str, resource_id: str) -> bool:
+        """Membership from the tag files alone, so it holds without the vanilla jar's item models."""
+        seen: set[str] = set()
+
+        def visit(tag: str) -> bool:
+            if tag in seen:
+                return False
+            seen.add(tag)
+            values = self._raw_item_tags.get(tag, [])
+            return resource_id in values or any(v.startswith("#") and visit(v[1:]) for v in values)
+
+        return visit(tag_id) or resource_id in self.tag_items(tag_id)
+
     def _guess_common_tag(self, tag_id: str) -> list[str]:
         namespace, path = split_id(tag_id)
         form, _, material = path.partition("/")

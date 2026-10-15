@@ -31,7 +31,7 @@ wiki:
     },
 ) }}
 
-**Solar Panels** generate FE from daylight with no fuel at all. Place one under open sky and it charges whatever is next to it. Once you have a few, a **Solar Array Controller** gathers a connected field of panels into one output with a shared buffer and its own bonuses.
+**Solar Panels** generate FE from daylight with no fuel at all. Place one under open sky and it charges whatever is next to it. Once you have a few, a **Solar Array Controller** gathers a connected field of panels into one output with a shared buffer and its own bonuses. See [Power Chains](power-chains.md#solar) for how panels fit beside the main generators.
 
 Each panel is a low tracker on a ground pad: a deck of cells on a torque tube. While it generates, the deck tilts toward the sun and follows it across the sky, east in the morning and west in the afternoon. When it can't generate it lies flat, so you can tell at a glance which panels are working. Panels are a little over a third of a block tall, so you can walk across a field of them.
 
