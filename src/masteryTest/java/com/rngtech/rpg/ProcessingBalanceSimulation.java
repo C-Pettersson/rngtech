@@ -359,7 +359,7 @@ public final class ProcessingBalanceSimulation {
             int temperature = overdrive ? settled : recipe.temperature();
             int safeMaximum = (int) Math.round(SAFE_MAXIMUM_SCALE * recipe.temperature());
             HeatEngine.Envelope envelope = new HeatEngine.Envelope(recipe.temperature(), recipe.temperature(), safeMaximum, safeMaximum,
-                    recipe.stability(), temperature, false, false);
+                    recipe.stability(), temperature, false, false, temperature);
             double overdriveMultiplier = AscendancyFormulas.overdriveSpeedMultiplier(temperature, safeMaximum, stats);
             // Crucible Heart adds an item to each batch while the lane runs at twice the target.
             int crafts = has("CRUCIBLE_HEART") && temperature >= 2 * recipe.temperature() ? 2 : 1;

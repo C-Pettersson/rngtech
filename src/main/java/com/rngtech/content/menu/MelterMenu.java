@@ -75,7 +75,10 @@ public class MelterMenu extends AbstractContainerMenu implements MasteryMenuView
     private static final int DATA_HEATING_ENERGY = DATA_HOLDING_ENERGY + 1;
     private static final int DATA_HEAT_FACTOR = DATA_HEATING_ENERGY + 1;
     private static final int DATA_WOBBLE = DATA_HEAT_FACTOR + 1;
-    private static final int DATA_MACHINE_PROGRESSION_START = DATA_WOBBLE + 1;
+    private static final int DATA_HEAT_REACH = DATA_WOBBLE + 1;
+    private static final int DATA_HEAT_MAXIMUM = DATA_HEAT_REACH + 1;
+    private static final int DATA_OVERHEAT_TEMPERATURE = DATA_HEAT_MAXIMUM + 1;
+    private static final int DATA_MACHINE_PROGRESSION_START = DATA_OVERHEAT_TEMPERATURE + 1;
     private static final int DATA_COUNT = DATA_MACHINE_PROGRESSION_START + MasteryMenuSupport.FIELD_COUNT;
     private static final int STAT_SCALE = 100;
     private static final int PROCESS_SLOT_COUNT = MelterBlockEntity.PROCESS_SLOT_COUNT;
@@ -389,6 +392,21 @@ public class MelterMenu extends AbstractContainerMenu implements MasteryMenuView
     /** How far the working temperature swings around the lane temperature, in degrees. */
     public int wobble() {
         return data.get(DATA_WOBBLE);
+    }
+
+    /** The highest setpoint the slider reaches for the current recipe: its 100%. */
+    public int heatReach() {
+        return data.get(DATA_HEAT_REACH);
+    }
+
+    /** The machine's Max Temperature, the top of the slider track. */
+    public int heatMaximum() {
+        return data.get(DATA_HEAT_MAXIMUM);
+    }
+
+    /** The melt's overheat temperature: its safe maximum stretched by Overheat Tolerance. */
+    public int overheatTemperature() {
+        return data.get(DATA_OVERHEAT_TEMPERATURE);
     }
 
     public static int batchSizeDataIndex() {

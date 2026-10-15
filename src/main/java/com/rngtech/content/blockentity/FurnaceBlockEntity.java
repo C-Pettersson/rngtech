@@ -135,7 +135,9 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
     private static final int DATA_HEATING_ENERGY = DATA_HOLDING_ENERGY + 1;
     private static final int DATA_HEAT_FACTOR = DATA_HEATING_ENERGY + 1;
     private static final int DATA_WOBBLE = DATA_HEAT_FACTOR + 1;
-    private static final int DATA_MACHINE_PROGRESSION_START = DATA_WOBBLE + 1;
+    private static final int DATA_HEAT_REACH = DATA_WOBBLE + 1;
+    private static final int DATA_HEAT_MAXIMUM = DATA_HEAT_REACH + 1;
+    private static final int DATA_MACHINE_PROGRESSION_START = DATA_HEAT_MAXIMUM + 1;
     private static final int DATA_COUNT = DATA_MACHINE_PROGRESSION_START + MasteryMenuSupport.FIELD_COUNT;
     private static final int STAT_SCALE = 100;
 
@@ -278,6 +280,8 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
                 case DATA_HEATING_ENERGY -> heatEnergy(false);
                 case DATA_HEAT_FACTOR -> heatFactorDisplay();
                 case DATA_WOBBLE -> wobbleDisplay();
+                case DATA_HEAT_REACH -> reachDisplay();
+                case DATA_HEAT_MAXIMUM -> baseEffectiveStats().intValue(MachineStat.MAX_TEMPERATURE);
                 case DATA_GEAR_SLOTS -> activeGearSlots();
                 case DATA_MIN_TEMPERATURE -> currentMinimumTemperature(stats);
                 case DATA_STATUS -> statusCode(stats);
@@ -1171,6 +1175,12 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
             total += spent * HeatEngine.energyRate(statsForLane(lane));
         }
         return (int) Math.ceil(total);
+    }
+
+    private int reachDisplay() {
+        int lane = machineInfoLane(baseEffectiveStats());
+        FurnaceRecipe recipe = lane < 0 ? null : findNextRecipe(lane);
+        return recipe == null ? 0 : envelope(lane, recipe, statsForLane(lane)).reach();
     }
 
     private int heatFactorDisplay() {

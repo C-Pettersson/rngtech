@@ -386,7 +386,7 @@ public class MetalPressScreen extends AbstractContainerScreen<MetalPressMenu> {
 
     private void renderProcessing(GuiGraphics guiGraphics) {
         heatSlider.sync(menu.heatSlider());
-        heatSlider.render(guiGraphics, leftPos, topPos, menu.heatSlider());
+        heatSlider.render(guiGraphics, font, leftPos, topPos, menu.heatSlider(), heatBands());
         int x = leftPos;
         int y = topPos;
         guiGraphics.fill(x + RISK_BAR_X, y + RISK_BAR_Y, x + RISK_BAR_X + RISK_BAR_WIDTH, y + RISK_BAR_Y + RISK_BAR_HEIGHT, 0xFF5F5F5F);
@@ -418,11 +418,7 @@ public class MetalPressScreen extends AbstractContainerScreen<MetalPressMenu> {
         int energyHeight = Math.round(BAR_FILL_HEIGHT * menu.energyProgress());
         guiGraphics.fill(x + ENERGY_BAR_X + 1, y + BAR_Y + BAR_HEIGHT - 1 - energyHeight, x + ENERGY_BAR_X + BAR_WIDTH - 1, y + BAR_Y + BAR_HEIGHT - 1, ENERGY);
 
-        guiGraphics.fill(x + HEAT_BAR_X, y + BAR_Y, x + HEAT_BAR_X + BAR_WIDTH, y + BAR_Y + BAR_HEIGHT, 0xFF5F5F5F);
-        int heatHeight = Math.round(BAR_FILL_HEIGHT * menu.heatProgress());
-        guiGraphics.fill(x + HEAT_BAR_X + 1, y + BAR_Y + BAR_HEIGHT - 1 - heatHeight, x + HEAT_BAR_X + BAR_WIDTH - 1, y + BAR_Y + BAR_HEIGHT - 1, HEAT);
-        HeatReadout.renderMarkers(guiGraphics, leftPos + HEAT_BAR_X, topPos + BAR_Y, BAR_WIDTH, BAR_HEIGHT, BAR_FILL_HEIGHT,
-                menu.overheatTemperature(), menu.targetTemperature(), menu.setpoint(), menu.wobble());
+        HeatReadout.renderBar(guiGraphics, leftPos + HEAT_BAR_X, topPos + BAR_Y, BAR_WIDTH, BAR_HEIGHT, BAR_FILL_HEIGHT, heatBands());
 
         renderIconBox(guiGraphics, STATUS_ICON_X, STATUS_ICON_Y);
         MachineScreenStyle.renderStatusGlyph(guiGraphics, x + STATUS_ICON_X, y + STATUS_ICON_Y, statusState());
@@ -595,6 +591,11 @@ public class MetalPressScreen extends AbstractContainerScreen<MetalPressMenu> {
                 ? Component.translatable("rngtech.press.tooltip.active_mold")
                 : Component.translatable("rngtech.press.tooltip.select_mold");
         guiGraphics.renderTooltip(font, tooltip, mouseX, mouseY);
+    }
+
+    private HeatReadout.Bands heatBands() {
+        return new HeatReadout.Bands(menu.heat(), menu.minimumTemperature(), menu.targetTemperature(), menu.safeMaximumTemperature(),
+                menu.overheatTemperature(), menu.setpoint(), menu.heatReach(), menu.heatMaximum(), menu.wobble());
     }
 
     private List<Component> heatTooltipLines() {

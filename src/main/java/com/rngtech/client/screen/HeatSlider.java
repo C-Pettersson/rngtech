@@ -3,14 +3,16 @@ package com.rngtech.client.screen;
 import com.rngtech.content.menu.HeatSliderSupport;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 
 import java.util.List;
 
 /**
- * The Process tab's overheat slider: a short track from the recipe target (left) to Max Temperature (right). Clicking or
- * dragging sets it in steps of 5%.
+ * The Process tab's overheat slider: a track from the recipe target (left) to Max Temperature (right), colored by heat
+ * band. The knob moves over the part the lane may reach; the rest shows as locked. Clicking or dragging sets it in steps of
+ * 5% of the reachable band, and the setpoint is written beside the track.
  */
 final class HeatSlider {
     private static final int HEIGHT = 6;
@@ -18,17 +20,77 @@ final class HeatSlider {
     private static final int TRACK = 0xFF5F5F5F;
     private static final int FILL = 0xFFE0712F;
     private static final int KNOB = 0xFFF2F2F2;
+    private static final int LOCKED = 0xFF3C3C3C;
+    private static final int LOCKED_HATCH = 0xFF4A4A4A;
+    private static final int LABEL = 0xFF3F3F3F;
 
     private final int x;
     private final int y;
     private final int width;
+    private final boolean labelLeft;
     private boolean dragging;
     private int pending = -1;
+    private HeatReadout.Bands bands;
 
     HeatSlider(int x, int y, int width) {
+        this(x, y, width, false);
+    }
+
+    HeatSlider(int x, int y, int width, boolean labelLeft) {
         this.x = x;
         this.y = y;
         this.width = width;
+        this.labelLeft = labelLeft;
+    }
+
+    /** Draws the track by band, the locked part past the reach, the knob, and the setpoint label. */
+    void render(GuiGraphics guiGraphics, Font font, int left, int top, int percent, HeatReadout.Bands bands) {
+        this.bands = bands;
+        if (!banded(bands)) {
+            render(guiGraphics, left, top, percent);
+            return;
+        }
+        int shown = pending >= 0 ? pending : percent;
+        int x0 = left + x;
+        int y0 = top + y;
+        guiGraphics.fill(x0, y0, x0 + width, y0 + HEIGHT, TRACK);
+        int setpoint = bands.target() + Math.round((bands.reach() - bands.target()) * shown / 100.0F);
+        // The reachable band, dim, then the part up to the setpoint, bright.
+        segment(guiGraphics, x0, y0, bands.target(), bands.reach(), bands, true);
+        segment(guiGraphics, x0, y0, bands.target(), setpoint, bands, false);
+        int reachX = position(bands, bands.reach());
+        int end = width - 1;
+        for (int px = reachX; px < end; px++) {
+            guiGraphics.fill(x0 + px, y0 + 1, x0 + px + 1, y0 + HEIGHT - 1, (px + y0) % 3 == 0 ? LOCKED_HATCH : LOCKED);
+        }
+        int knob = x0 + Math.min(width - 3, position(bands, setpoint));
+        guiGraphics.fill(knob, y0 - 1, knob + 2, y0 + HEIGHT + 1, KNOB);
+        String label = String.format(java.util.Locale.ROOT, "%,d°C", setpoint);
+        int labelX = labelLeft ? x0 - 3 - font.width(label) : x0 + width + 3;
+        guiGraphics.drawString(font, label, labelX, y0 - 1, LABEL, false);
+    }
+
+    private static boolean banded(HeatReadout.Bands bands) {
+        return bands != null && bands.hasRecipe() && bands.reach() > bands.target();
+    }
+
+    /** The pixel offset of a temperature on the track, which spans the target to Max Temperature. */
+    private int position(HeatReadout.Bands bands, int temperature) {
+        int top = Math.max(bands.maximum(), bands.reach());
+        double share = (temperature - bands.target()) / (double) Math.max(1, top - bands.target());
+        return 1 + (int) Math.round(Math.max(0.0, Math.min(1.0, share)) * (width - 2));
+    }
+
+    private void segment(GuiGraphics guiGraphics, int x0, int y0, int from, int to, HeatReadout.Bands bands, boolean dim) {
+        int[][] zones = {
+                {from, Math.min(to, bands.safe()), dim ? HeatReadout.TINT_WORK : HeatReadout.ZONE_WORK},
+                {Math.max(from, bands.safe()), Math.min(to, bands.overheat()), dim ? HeatReadout.TINT_HOT : HeatReadout.ZONE_HOT},
+                {Math.max(from, bands.overheat()), to, dim ? HeatReadout.TINT_OVER : HeatReadout.ZONE_OVER}};
+        for (int[] zone : zones) {
+            if (zone[1] > zone[0]) {
+                guiGraphics.fill(x0 + position(bands, zone[0]), y0 + 1, x0 + position(bands, zone[1]), y0 + HEIGHT - 1, zone[2]);
+            }
+        }
     }
 
     void render(GuiGraphics guiGraphics, int left, int top, int percent) {
@@ -83,6 +145,12 @@ final class HeatSlider {
 
     private void send(double mouseX, int left, int containerId) {
         double fraction = (mouseX - (left + x + 1)) / Math.max(1, width - 2);
+        if (banded(bands)) {
+            // The track spans the target to Max Temperature, but the percent is a share of the reachable band.
+            int top = Math.max(bands.maximum(), bands.reach());
+            double temperature = bands.target() + fraction * (top - bands.target());
+            fraction = (temperature - bands.target()) / Math.max(1, bands.reach() - bands.target());
+        }
         int percent = (int) Math.round(Math.max(0.0, Math.min(1.0, fraction)) * 100.0 / STEP) * STEP;
         if (percent == pending) {
             return;

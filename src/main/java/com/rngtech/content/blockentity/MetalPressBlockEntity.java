@@ -131,7 +131,9 @@ public class MetalPressBlockEntity extends BaseMachineBlockEntity
     private static final int DATA_HEATING_ENERGY = DATA_HOLDING_ENERGY + 1;
     private static final int DATA_HEAT_FACTOR = DATA_HEATING_ENERGY + 1;
     private static final int DATA_WOBBLE = DATA_HEAT_FACTOR + 1;
-    private static final int DATA_MACHINE_PROGRESSION_START = DATA_WOBBLE + 1;
+    private static final int DATA_HEAT_REACH = DATA_WOBBLE + 1;
+    private static final int DATA_HEAT_MAXIMUM = DATA_HEAT_REACH + 1;
+    private static final int DATA_MACHINE_PROGRESSION_START = DATA_HEAT_MAXIMUM + 1;
     private static final int DATA_COUNT = DATA_MACHINE_PROGRESSION_START + MasteryMenuSupport.FIELD_COUNT;
     private static final int STAT_SCALE = 100;
     private static final int LEGACY_SLOT_BATTERY_CELL = 3;
@@ -246,6 +248,8 @@ public class MetalPressBlockEntity extends BaseMachineBlockEntity
                 case DATA_HEAT_FACTOR -> heatFactorDisplay();
                 case DATA_WOBBLE -> wobbleDisplay();
                 case DATA_SETPOINT -> recipe == null ? 0 : envelope(recipe, stats).setpoint();
+                case DATA_HEAT_REACH -> recipe == null ? 0 : envelope(recipe, stats).reach();
+                case DATA_HEAT_MAXIMUM -> stats.intValue(MachineStat.MAX_TEMPERATURE);
                 case DATA_LEDGER -> recipe == null || !ledgerActive(recipe, stats) ? -1 : LedgerNbt.permille(batchLedger.progress(recipe.outputStack().getItem()));
                 default -> 0;
             };

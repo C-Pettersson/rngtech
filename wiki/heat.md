@@ -31,7 +31,9 @@ The slider under the progress bars on the Process tab sets how far past each rec
 - Wobble that dips below the recipe's minimum pauses the work for that moment. On recipes that can fail, wobble that spikes past the overheat temperature builds failure strain.
 - At 0% only a shortfall in Temperature Stability makes a lane wobble.
 
-The heat bar marks the recipe target with a white line and the setpoint with a yellow one. Hover it for the setpoint, heat factor, wobble, and how much of the FE goes into heating and how much the walls lose.
+The heat bar reaches up to the hottest the lane can be pushed. A strip on its inner edge, and the tint of its empty part, show the recipe's bands: grey below the minimum, green for the working band up to the safe maximum, amber up to the overheat temperature, and red past it. The fill turns red once the lane is overheating. A white line marks the recipe target, a yellow line the setpoint, and a pale band the wobble. Hover it for the setpoint, heat factor, wobble, and how much of the FE goes into heating and how much the walls lose.
+
+The slider's track uses the same colors and runs from the recipe target to the machine's Max Temperature. The part you cannot reach yet, without **Blast Draft**, is dark and hatched. The setpoint is written beside it in °C.
 
 ## Heat stats
 

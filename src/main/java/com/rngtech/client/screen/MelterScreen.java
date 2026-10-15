@@ -100,7 +100,7 @@ public class MelterScreen extends AbstractContainerScreen<MelterMenu> {
     private static final Map<MegaPassiveNode, ResourceLocation> MASTERY_ICON_TEXTURES = createMasteryIconTextures();
 
     private final MasteryScreenSupport<MegaPassiveNode> masterySupport;
-    private final HeatSlider heatSlider = new HeatSlider(104, 81, 58);
+    private final HeatSlider heatSlider = new HeatSlider(104, 81, 58, true);
 
     private static Map<MegaPassiveNode, ResourceLocation> createMasteryIconTextures() {
         Map<MegaPassiveNode, ResourceLocation> textures = new HashMap<>();
@@ -371,7 +371,7 @@ public class MelterScreen extends AbstractContainerScreen<MelterMenu> {
 
     private void renderProcessing(GuiGraphics guiGraphics) {
         heatSlider.sync(menu.heatSlider());
-        heatSlider.render(guiGraphics, leftPos, topPos, menu.heatSlider());
+        heatSlider.render(guiGraphics, font, leftPos, topPos, menu.heatSlider(), heatBands());
         int x = leftPos;
         int y = topPos;
 
@@ -388,11 +388,7 @@ public class MelterScreen extends AbstractContainerScreen<MelterMenu> {
         int energyHeight = Math.round(BAR_FILL_HEIGHT * menu.energyProgress());
         guiGraphics.fill(x + ENERGY_BAR_X + 1, y + BAR_Y + BAR_HEIGHT - 1 - energyHeight, x + ENERGY_BAR_X + BAR_WIDTH - 1, y + BAR_Y + BAR_HEIGHT - 1, ENERGY);
 
-        guiGraphics.fill(x + HEAT_BAR_X, y + BAR_Y, x + HEAT_BAR_X + BAR_WIDTH, y + BAR_Y + BAR_HEIGHT, 0xFF5F5F5F);
-        int heatHeight = Math.round(BAR_FILL_HEIGHT * menu.heatProgress());
-        guiGraphics.fill(x + HEAT_BAR_X + 1, y + BAR_Y + BAR_HEIGHT - 1 - heatHeight, x + HEAT_BAR_X + BAR_WIDTH - 1, y + BAR_Y + BAR_HEIGHT - 1, HEAT);
-        HeatReadout.renderMarkers(guiGraphics, leftPos + HEAT_BAR_X, topPos + BAR_Y, BAR_WIDTH, BAR_HEIGHT, BAR_FILL_HEIGHT,
-                menu.heatScale(), menu.minimumTemperature(), menu.setpoint(), menu.wobble());
+        HeatReadout.renderBar(guiGraphics, leftPos + HEAT_BAR_X, topPos + BAR_Y, BAR_WIDTH, BAR_HEIGHT, BAR_FILL_HEIGHT, heatBands());
 
         int outputHeight = Math.round(BAR_FILL_HEIGHT * menu.outputFluidProgress());
         guiGraphics.fill(x + OUTPUT_FLUID_BAR_X, y + BAR_Y, x + OUTPUT_FLUID_BAR_X + FLUID_BAR_WIDTH, y + BAR_Y + BAR_HEIGHT, 0xFF5F5F5F);
@@ -613,6 +609,13 @@ public class MelterScreen extends AbstractContainerScreen<MelterMenu> {
                 STATUS_SIZE,
                 transferTooltip()
         );
+    }
+
+    /** The Melter's melting point is its target; its safe maximum is 15% above. */
+    private HeatReadout.Bands heatBands() {
+        int melt = menu.minimumTemperature();
+        return new HeatReadout.Bands(menu.heat(), melt, melt, Math.round(melt * 1.15F), menu.overheatTemperature(), menu.setpoint(),
+                menu.heatReach(), menu.heatMaximum(), menu.wobble());
     }
 
     private List<Component> heatTooltipLines() {

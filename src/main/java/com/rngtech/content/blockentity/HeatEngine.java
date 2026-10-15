@@ -45,7 +45,8 @@ public final class HeatEngine {
             double requiredStability,
             int setpoint,
             boolean canFail,
-            boolean coolHeaded
+            boolean coolHeaded,
+            int reach
     ) {
         /** A lane hotter than this cools before it works: a hotter recipe's leftover heat, or a lowered slider. */
         public int workCeiling() {
@@ -55,7 +56,7 @@ public final class HeatEngine {
         /** Cool Headed: a lane that has not started its cycle cools to the recipe target before it begins. */
         public Envelope coolingFirst(boolean coolHeaded) {
             return coolHeaded == this.coolHeaded || ungated() ? this
-                    : new Envelope(minimum, target, safeMaximum, overheat, requiredStability, setpoint, canFail, coolHeaded);
+                    : new Envelope(minimum, target, safeMaximum, overheat, requiredStability, setpoint, canFail, coolHeaded, reach);
         }
 
         public int ceilingFor(HeatLane lane) {
@@ -132,12 +133,13 @@ public final class HeatEngine {
             int setpointCeiling
     ) {
         if (target <= AMBIENT) {
-            return new Envelope(AMBIENT, AMBIENT, AMBIENT, Integer.MAX_VALUE, requiredStability, AMBIENT, false, false);
+            return new Envelope(AMBIENT, AMBIENT, AMBIENT, Integer.MAX_VALUE, requiredStability, AMBIENT, false, false, AMBIENT);
         }
         int safe = Math.max(target, safeMaximum);
         int overheat = overheatTemperature(safe, stats);
-        int setpoint = setpoint(target, reach(safe, overheat, canFail, pushPastSafe, stats, setpointCeiling), slider);
-        return new Envelope(Math.min(minimum, target), target, safe, overheat, requiredStability, setpoint, canFail, false);
+        int reach = Math.max(target, reach(safe, overheat, canFail, pushPastSafe, stats, setpointCeiling));
+        int setpoint = setpoint(target, reach, slider);
+        return new Envelope(Math.min(minimum, target), target, safe, overheat, requiredStability, setpoint, canFail, false, reach);
     }
 
     /** The safe maximum stretched by Overheat Tolerance: above it, a recipe that can fail builds strain. */

@@ -444,7 +444,7 @@ public class FurnaceScreen extends AbstractContainerScreen<FurnaceMenu> {
 
     private void renderProcessing(GuiGraphics guiGraphics) {
         heatSlider.sync(menu.heatSlider());
-        heatSlider.render(guiGraphics, leftPos, topPos, menu.heatSlider());
+        heatSlider.render(guiGraphics, font, leftPos, topPos, menu.heatSlider(), heatBands());
         int x = leftPos;
         int y = topPos;
         if (menu.activeProcessingSlots() == 1) {
@@ -470,9 +470,7 @@ public class FurnaceScreen extends AbstractContainerScreen<FurnaceMenu> {
         if (menu.isElectric()) {
             renderVerticalBar(guiGraphics, ENERGY_BAR_X, menu.energyProgress(), ENERGY);
         }
-        renderVerticalBar(guiGraphics, HEAT_BAR_X, menu.heatProgress(), HEAT);
-        HeatReadout.renderMarkers(guiGraphics, leftPos + HEAT_BAR_X, topPos + BAR_Y, BAR_WIDTH, BAR_HEIGHT, BAR_FILL_HEIGHT,
-                menu.overheatTemperature(), menu.targetTemperature(), menu.setpoint(), menu.wobble());
+        HeatReadout.renderBar(guiGraphics, leftPos + HEAT_BAR_X, topPos + BAR_Y, BAR_WIDTH, BAR_HEIGHT, BAR_FILL_HEIGHT, heatBands());
         if (menu.hasFailureRecipe()) {
             renderVerticalBar(guiGraphics, FAILURE_BAR_X, menu.failureProgress(), FAILURE);
         }
@@ -731,6 +729,11 @@ public class FurnaceScreen extends AbstractContainerScreen<FurnaceMenu> {
         return totalBurnTime <= 0
                 ? Component.translatable("rngtech.furnace.tooltip.fuel.empty")
                 : Component.translatable("rngtech.furnace.tooltip.fuel", menu.burnTime(), totalBurnTime);
+    }
+
+    private HeatReadout.Bands heatBands() {
+        return new HeatReadout.Bands(menu.heat(), menu.minimumTemperature(), menu.targetTemperature(), menu.safeMaximumTemperature(),
+                menu.overheatTemperature(), menu.setpoint(), menu.heatReach(), menu.heatMaximum(), menu.wobble());
     }
 
     private List<Component> heatTooltipLines() {
