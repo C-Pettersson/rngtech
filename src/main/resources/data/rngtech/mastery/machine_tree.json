@@ -17064,7 +17064,7 @@
                     "value": 6
                 },
                 {
-                    "stat": "WARMUP_TIME",
+                    "stat": "THERMAL_MASS",
                     "operation": "DECREASED_PERCENT",
                     "value": 2
                 }
@@ -17194,7 +17194,7 @@
         {
             "effects": [
                 {
-                    "stat": "WARMUP_TIME",
+                    "stat": "THERMAL_MASS",
                     "operation": "DECREASED_PERCENT",
                     "value": 2
                 }
@@ -17214,7 +17214,7 @@
         {
             "effects": [
                 {
-                    "stat": "WARMUP_TIME",
+                    "stat": "THERMAL_MASS",
                     "operation": "DECREASED_PERCENT",
                     "value": 2
                 }
@@ -17261,7 +17261,7 @@
         {
             "effects": [
                 {
-                    "stat": "WARMUP_TIME",
+                    "stat": "THERMAL_MASS",
                     "operation": "DECREASED_PERCENT",
                     "value": 2
                 }
@@ -17281,7 +17281,7 @@
         {
             "effects": [
                 {
-                    "stat": "WARMUP_TIME",
+                    "stat": "THERMAL_MASS",
                     "operation": "DECREASED_PERCENT",
                     "value": 2
                 }
@@ -17301,7 +17301,7 @@
         {
             "effects": [
                 {
-                    "stat": "WARMUP_TIME",
+                    "stat": "THERMAL_MASS",
                     "operation": "DECREASED_PERCENT",
                     "value": 2
                 }
@@ -17321,7 +17321,7 @@
         {
             "effects": [
                 {
-                    "stat": "WARMUP_TIME",
+                    "stat": "THERMAL_MASS",
                     "operation": "DECREASED_PERCENT",
                     "value": 6
                 },
@@ -17346,7 +17346,7 @@
         {
             "effects": [
                 {
-                    "stat": "WARMUP_TIME",
+                    "stat": "THERMAL_MASS",
                     "operation": "DECREASED_PERCENT",
                     "value": 2
                 }
@@ -17366,7 +17366,7 @@
         {
             "effects": [
                 {
-                    "stat": "WARMUP_TIME",
+                    "stat": "THERMAL_MASS",
                     "operation": "DECREASED_PERCENT",
                     "value": 2
                 }
@@ -17386,7 +17386,7 @@
         {
             "effects": [
                 {
-                    "stat": "WARMUP_TIME",
+                    "stat": "THERMAL_MASS",
                     "operation": "DECREASED_PERCENT",
                     "value": 2
                 }
@@ -17406,7 +17406,7 @@
         {
             "effects": [
                 {
-                    "stat": "WARMUP_TIME",
+                    "stat": "THERMAL_MASS",
                     "operation": "DECREASED_PERCENT",
                     "value": 6
                 },
@@ -17431,7 +17431,7 @@
         {
             "effects": [
                 {
-                    "stat": "WARMUP_TIME",
+                    "stat": "THERMAL_MASS",
                     "operation": "DECREASED_PERCENT",
                     "value": 2
                 }
@@ -17666,8 +17666,8 @@
         {
             "effects": [
                 {
-                    "stat": "COOLING_RATE",
-                    "operation": "DECREASED_PERCENT",
+                    "stat": "HEAT_ISOLATION",
+                    "operation": "INCREASED_PERCENT",
                     "value": 2
                 }
             ],
@@ -17686,8 +17686,8 @@
         {
             "effects": [
                 {
-                    "stat": "COOLING_RATE",
-                    "operation": "DECREASED_PERCENT",
+                    "stat": "HEAT_ISOLATION",
+                    "operation": "INCREASED_PERCENT",
                     "value": 2
                 }
             ],
@@ -17706,8 +17706,8 @@
         {
             "effects": [
                 {
-                    "stat": "COOLING_RATE",
-                    "operation": "DECREASED_PERCENT",
+                    "stat": "HEAT_ISOLATION",
+                    "operation": "INCREASED_PERCENT",
                     "value": 2
                 }
             ],
@@ -17726,8 +17726,8 @@
         {
             "effects": [
                 {
-                    "stat": "COOLING_RATE",
-                    "operation": "DECREASED_PERCENT",
+                    "stat": "HEAT_ISOLATION",
+                    "operation": "INCREASED_PERCENT",
                     "value": 2
                 }
             ],
@@ -17746,8 +17746,8 @@
         {
             "effects": [
                 {
-                    "stat": "COOLING_RATE",
-                    "operation": "DECREASED_PERCENT",
+                    "stat": "HEAT_ISOLATION",
+                    "operation": "INCREASED_PERCENT",
                     "value": 2
                 }
             ],
@@ -17766,8 +17766,8 @@
         {
             "effects": [
                 {
-                    "stat": "COOLING_RATE",
-                    "operation": "DECREASED_PERCENT",
+                    "stat": "HEAT_ISOLATION",
+                    "operation": "INCREASED_PERCENT",
                     "value": 2
                 }
             ],
@@ -17786,12 +17786,12 @@
         {
             "effects": [
                 {
-                    "stat": "COOLING_RATE",
-                    "operation": "DECREASED_PERCENT",
+                    "stat": "HEAT_ISOLATION",
+                    "operation": "INCREASED_PERCENT",
                     "value": 6
                 },
                 {
-                    "stat": "HEAT_ISOLATION",
+                    "stat": "COOLING_RATE",
                     "operation": "INCREASED_PERCENT",
                     "value": 3
                 }
@@ -17811,12 +17811,12 @@
         {
             "effects": [
                 {
-                    "stat": "COOLING_RATE",
-                    "operation": "DECREASED_PERCENT",
+                    "stat": "HEAT_ISOLATION",
+                    "operation": "INCREASED_PERCENT",
                     "value": 6
                 },
                 {
-                    "stat": "HEAT_ISOLATION",
+                    "stat": "COOLING_RATE",
                     "operation": "INCREASED_PERCENT",
                     "value": 3
                 }
@@ -17836,12 +17836,12 @@
         {
             "effects": [
                 {
-                    "stat": "COOLING_RATE",
-                    "operation": "DECREASED_PERCENT",
+                    "stat": "HEAT_ISOLATION",
+                    "operation": "INCREASED_PERCENT",
                     "value": 6
                 },
                 {
-                    "stat": "HEAT_ISOLATION",
+                    "stat": "COOLING_RATE",
                     "operation": "INCREASED_PERCENT",
                     "value": 3
                 }
@@ -18325,7 +18325,7 @@
                     "value": 6
                 },
                 {
-                    "stat": "WARMUP_TIME",
+                    "stat": "THERMAL_MASS",
                     "operation": "DECREASED_PERCENT",
                     "value": 2
                 }
@@ -18370,7 +18370,7 @@
                     "value": 6
                 },
                 {
-                    "stat": "WARMUP_TIME",
+                    "stat": "THERMAL_MASS",
                     "operation": "DECREASED_PERCENT",
                     "value": 2
                 }
@@ -20364,7 +20364,7 @@
         {
             "effects": [
                 {
-                    "stat": "WARMUP_TIME",
+                    "stat": "THERMAL_MASS",
                     "operation": "DECREASED_PERCENT",
                     "value": 2
                 }
@@ -20384,7 +20384,7 @@
         {
             "effects": [
                 {
-                    "stat": "WARMUP_TIME",
+                    "stat": "THERMAL_MASS",
                     "operation": "DECREASED_PERCENT",
                     "value": 2
                 }
@@ -20404,7 +20404,7 @@
         {
             "effects": [
                 {
-                    "stat": "WARMUP_TIME",
+                    "stat": "THERMAL_MASS",
                     "operation": "DECREASED_PERCENT",
                     "value": 2
                 }
@@ -20424,7 +20424,7 @@
         {
             "effects": [
                 {
-                    "stat": "WARMUP_TIME",
+                    "stat": "THERMAL_MASS",
                     "operation": "DECREASED_PERCENT",
                     "value": 2
                 }
@@ -20444,7 +20444,7 @@
         {
             "effects": [
                 {
-                    "stat": "WARMUP_TIME",
+                    "stat": "THERMAL_MASS",
                     "operation": "DECREASED_PERCENT",
                     "value": 2
                 }
@@ -20464,7 +20464,7 @@
         {
             "effects": [
                 {
-                    "stat": "WARMUP_TIME",
+                    "stat": "THERMAL_MASS",
                     "operation": "DECREASED_PERCENT",
                     "value": 2
                 }
@@ -20484,7 +20484,7 @@
         {
             "effects": [
                 {
-                    "stat": "WARMUP_TIME",
+                    "stat": "THERMAL_MASS",
                     "operation": "DECREASED_PERCENT",
                     "value": 6
                 },
@@ -24379,8 +24379,8 @@
         {
             "effects": [
                 {
-                    "stat": "COOLING_RATE",
-                    "operation": "DECREASED_PERCENT",
+                    "stat": "HEAT_ISOLATION",
+                    "operation": "INCREASED_PERCENT",
                     "value": 2
                 }
             ],
@@ -24399,8 +24399,8 @@
         {
             "effects": [
                 {
-                    "stat": "COOLING_RATE",
-                    "operation": "DECREASED_PERCENT",
+                    "stat": "HEAT_ISOLATION",
+                    "operation": "INCREASED_PERCENT",
                     "value": 2
                 }
             ],
@@ -24419,8 +24419,8 @@
         {
             "effects": [
                 {
-                    "stat": "COOLING_RATE",
-                    "operation": "DECREASED_PERCENT",
+                    "stat": "HEAT_ISOLATION",
+                    "operation": "INCREASED_PERCENT",
                     "value": 2
                 }
             ],
@@ -24439,12 +24439,12 @@
         {
             "effects": [
                 {
-                    "stat": "COOLING_RATE",
-                    "operation": "DECREASED_PERCENT",
+                    "stat": "HEAT_ISOLATION",
+                    "operation": "INCREASED_PERCENT",
                     "value": 6
                 },
                 {
-                    "stat": "HEAT_ISOLATION",
+                    "stat": "COOLING_RATE",
                     "operation": "INCREASED_PERCENT",
                     "value": 3
                 }
@@ -25836,8 +25836,8 @@
         {
             "effects": [
                 {
-                    "stat": "COOLING_RATE",
-                    "operation": "DECREASED_PERCENT",
+                    "stat": "HEAT_ISOLATION",
+                    "operation": "INCREASED_PERCENT",
                     "value": 2
                 }
             ],
@@ -25856,8 +25856,8 @@
         {
             "effects": [
                 {
-                    "stat": "COOLING_RATE",
-                    "operation": "DECREASED_PERCENT",
+                    "stat": "HEAT_ISOLATION",
+                    "operation": "INCREASED_PERCENT",
                     "value": 2
                 }
             ],
@@ -25876,12 +25876,12 @@
         {
             "effects": [
                 {
-                    "stat": "COOLING_RATE",
-                    "operation": "DECREASED_PERCENT",
+                    "stat": "HEAT_ISOLATION",
+                    "operation": "INCREASED_PERCENT",
                     "value": 6
                 },
                 {
-                    "stat": "HEAT_ISOLATION",
+                    "stat": "COOLING_RATE",
                     "operation": "INCREASED_PERCENT",
                     "value": 3
                 }
@@ -25901,12 +25901,12 @@
         {
             "effects": [
                 {
-                    "stat": "COOLING_RATE",
-                    "operation": "DECREASED_PERCENT",
+                    "stat": "HEAT_ISOLATION",
+                    "operation": "INCREASED_PERCENT",
                     "value": 6
                 },
                 {
-                    "stat": "HEAT_ISOLATION",
+                    "stat": "COOLING_RATE",
                     "operation": "INCREASED_PERCENT",
                     "value": 3
                 }
@@ -25926,8 +25926,8 @@
         {
             "effects": [
                 {
-                    "stat": "COOLING_RATE",
-                    "operation": "DECREASED_PERCENT",
+                    "stat": "HEAT_ISOLATION",
+                    "operation": "INCREASED_PERCENT",
                     "value": 2
                 }
             ],
@@ -25946,8 +25946,8 @@
         {
             "effects": [
                 {
-                    "stat": "COOLING_RATE",
-                    "operation": "DECREASED_PERCENT",
+                    "stat": "HEAT_ISOLATION",
+                    "operation": "INCREASED_PERCENT",
                     "value": 2
                 }
             ],
@@ -26011,7 +26011,7 @@
                     "value": 6
                 },
                 {
-                    "stat": "WARMUP_TIME",
+                    "stat": "THERMAL_MASS",
                     "operation": "DECREASED_PERCENT",
                     "value": 2
                 }
@@ -26076,7 +26076,7 @@
                     "value": 6
                 },
                 {
-                    "stat": "WARMUP_TIME",
+                    "stat": "THERMAL_MASS",
                     "operation": "DECREASED_PERCENT",
                     "value": 2
                 }
@@ -26333,7 +26333,7 @@
         {
             "effects": [
                 {
-                    "stat": "WARMUP_TIME",
+                    "stat": "THERMAL_MASS",
                     "operation": "DECREASED_PERCENT",
                     "value": 2
                 }
@@ -26353,7 +26353,7 @@
         {
             "effects": [
                 {
-                    "stat": "WARMUP_TIME",
+                    "stat": "THERMAL_MASS",
                     "operation": "DECREASED_PERCENT",
                     "value": 2
                 }
@@ -26373,7 +26373,7 @@
         {
             "effects": [
                 {
-                    "stat": "WARMUP_TIME",
+                    "stat": "THERMAL_MASS",
                     "operation": "DECREASED_PERCENT",
                     "value": 2
                 }
@@ -26393,7 +26393,7 @@
         {
             "effects": [
                 {
-                    "stat": "WARMUP_TIME",
+                    "stat": "THERMAL_MASS",
                     "operation": "DECREASED_PERCENT",
                     "value": 6
                 },
@@ -26808,7 +26808,7 @@
         {
             "effects": [
                 {
-                    "stat": "WARMUP_TIME",
+                    "stat": "THERMAL_MASS",
                     "operation": "DECREASED_PERCENT",
                     "value": 2
                 }
@@ -26828,7 +26828,7 @@
         {
             "effects": [
                 {
-                    "stat": "WARMUP_TIME",
+                    "stat": "THERMAL_MASS",
                     "operation": "DECREASED_PERCENT",
                     "value": 2
                 }
@@ -26848,7 +26848,7 @@
         {
             "effects": [
                 {
-                    "stat": "WARMUP_TIME",
+                    "stat": "THERMAL_MASS",
                     "operation": "DECREASED_PERCENT",
                     "value": 2
                 }
@@ -26868,7 +26868,7 @@
         {
             "effects": [
                 {
-                    "stat": "WARMUP_TIME",
+                    "stat": "THERMAL_MASS",
                     "operation": "DECREASED_PERCENT",
                     "value": 6
                 },
@@ -28892,7 +28892,7 @@
                     "value": 6
                 },
                 {
-                    "stat": "WARMUP_TIME",
+                    "stat": "THERMAL_MASS",
                     "operation": "DECREASED_PERCENT",
                     "value": 2
                 }
@@ -28937,7 +28937,7 @@
                     "value": 6
                 },
                 {
-                    "stat": "WARMUP_TIME",
+                    "stat": "THERMAL_MASS",
                     "operation": "DECREASED_PERCENT",
                     "value": 2
                 }
@@ -29044,7 +29044,7 @@
         {
             "effects": [
                 {
-                    "stat": "WARMUP_TIME",
+                    "stat": "THERMAL_MASS",
                     "operation": "DECREASED_PERCENT",
                     "value": 2
                 }
@@ -29064,7 +29064,7 @@
         {
             "effects": [
                 {
-                    "stat": "WARMUP_TIME",
+                    "stat": "THERMAL_MASS",
                     "operation": "DECREASED_PERCENT",
                     "value": 2
                 }
@@ -29111,7 +29111,7 @@
         {
             "effects": [
                 {
-                    "stat": "WARMUP_TIME",
+                    "stat": "THERMAL_MASS",
                     "operation": "DECREASED_PERCENT",
                     "value": 6
                 },
@@ -29136,7 +29136,7 @@
         {
             "effects": [
                 {
-                    "stat": "WARMUP_TIME",
+                    "stat": "THERMAL_MASS",
                     "operation": "DECREASED_PERCENT",
                     "value": 2
                 }
@@ -29156,7 +29156,7 @@
         {
             "effects": [
                 {
-                    "stat": "WARMUP_TIME",
+                    "stat": "THERMAL_MASS",
                     "operation": "DECREASED_PERCENT",
                     "value": 2
                 }
@@ -30483,7 +30483,7 @@
                     "value": 1.6
                 },
                 {
-                    "stat": "WARMUP_TIME",
+                    "stat": "THERMAL_MASS",
                     "operation": "MORE",
                     "value": 1.4
                 }
@@ -31090,14 +31090,14 @@
         {
             "effects": [
                 {
-                    "stat": "COOLING_RATE",
-                    "operation": "LESS",
-                    "value": 0.4
+                    "stat": "HEAT_ISOLATION",
+                    "operation": "MORE",
+                    "value": 1.4
                 },
                 {
-                    "stat": "WARMUP_TIME",
+                    "stat": "THERMAL_MASS",
                     "operation": "MORE",
-                    "value": 1.25
+                    "value": 1.5
                 }
             ],
             "behaviors": [],

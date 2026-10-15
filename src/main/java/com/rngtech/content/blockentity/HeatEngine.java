@@ -15,7 +15,7 @@ public final class HeatEngine {
     public static final double HEAT_PER_BURN_TICK = 7.0;
 
     /** Wall loss in HU per tick at 1,000 °C above ambient, base Thermal Conductivity and Heat Insulation. */
-    static final double LOSS_PER_TICK = 4.0;
+    static final double LOSS_PER_TICK = 3.0;
     /** Loss grows with the cube of the temperature rise, so running hotter costs more FE per craft than it saves. */
     static final double LOSS_EXPONENT = 3.0;
     /** Heater power above holding heat at base Heat Transfer, in HU per tick, when the chamber is cold. */

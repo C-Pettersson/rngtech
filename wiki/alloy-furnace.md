@@ -128,7 +128,7 @@ Every node in this machine's ascendancies. See [Machine Mastery](machine-mastery
 | Skimmed Melt | Small | Flux Ledger | 8% increased Temperature Stability. |
 | **Dross Skimming** | Notable | Skimmed Melt | A failure keeps one unit of the recipe’s largest input. |
 | Banked Heat | Small | Flux Ledger | 5% reduced Energy Use. |
-| **Heat Economy** | Notable | Banked Heat | Warmup costs 30% less FE. |
+| **Heat Economy** | Notable | Banked Heat | Heat put in before a craft starts costs 30% less FE. |
 
 ### Blendwright
 
@@ -138,7 +138,7 @@ Every node in this machine's ascendancies. See [Machine Mastery](machine-mastery
 | Quick Blend | Small | Blend Reversal | +5% Blend Speed. |
 | **Cold Mixing** | Notable | Quick Blend | +100 °C Blend Heat Reduction. |
 | Warm Mix | Small | Cold Mixing | +5% Blend Speed. |
-| **Continuous Pour** | Deep notable | Warm Mix | Back-to-back blend crafts skip re-warmup. |
+| **Continuous Pour** | Deep notable | Warm Mix | Back-to-back blend crafts take no load dip. |
 | Steady Pace | Small | Blend Reversal | 6% increased Processing Speed. |
 | **Blend Ledger** | Notable | Steady Pace | +25% Ledger Rate. |
 | Measured Pace | Small | Blend Ledger | 6% increased Processing Speed. |

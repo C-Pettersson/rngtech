@@ -77,7 +77,7 @@ public final class ProcessingBalanceSimulation {
      * Loads RNGTechConfig defaults the way FML builds a fresh config file, so stat bases and recipe scaling read the real
      * values headless. {@code LoadedConfig} is FML-internal; with a corrected config, accepting it never saves.
      */
-    private static void loadDefaultConfig() {
+    static void loadDefaultConfig() {
         CommentedConfig config = CommentedConfig.inMemory();
         RNGTechConfig.SPEC.correct(config);
         try {

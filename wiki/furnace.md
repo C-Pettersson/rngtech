@@ -162,15 +162,15 @@ Every node in this machine's ascendancies. See [Machine Mastery](machine-mastery
 | Hotter Lanes | Small | Overdrive Lanes | +5% Overdrive Cap. |
 | **Superheat** | Notable | Hotter Lanes | +15% Overdrive Cap. |
 | Deep Draft | Small | Superheat | 10% increased Heat Transfer. |
-| **Crucible Heart** | Deep notable | Deep Draft | Recipes whose target is at most half the lane’s temperature finish two inputs per cycle at twice the FE. |
+| **Crucible Heart** | Deep notable | Deep Draft | +1 Batch Size while a lane runs at twice the recipe target or hotter. |
 | Banked Coals | Small | Overdrive Lanes | 10% increased Heat Insulation. |
 | **Hold the Fire** | Notable | Banked Coals | A lane does not cool while its input slot holds a smeltable input. |
 | Watchful Gauge | Small | Overdrive Lanes | +10 °C Overdrive Margin. |
-| **Safe Margin** | Notable | Watchful Gauge | +15 °C Overdrive Margin. Overdrive never enters a recipe’s overheat band. |
+| **Safe Margin** | Notable | Watchful Gauge | +15 °C Overdrive Margin. The overheat slider stops at the recipe’s safe maximum, and wobble never spikes past the overheat temperature. |
 | Steady Hands | Small | Safe Margin | +2 Strain Recovery. |
 | **Strain Bleed** | Deep notable | Steady Hands | +10 Strain Recovery. |
 | Stoked Hearth | Small | Overdrive Lanes | 4% increased Max Temperature. |
-| **Shared Hearth** | Notable | Stoked Hearth | A lane warming up starts at the hottest working lane’s temperature, up to its own target. |
+| **Shared Hearth** | Notable | Stoked Hearth | Each load dip is split across every lane that is smelting. |
 
 ### Bloomer
 
