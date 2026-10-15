@@ -1295,7 +1295,7 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
 
     /** Unlike an idle lane, Hold the Fire does not keep this heat, so a too-hot lane always cools. */
     private boolean shedHeat(int lane, FurnaceRecipe recipe, MachineStatAccumulator stats) {
-        int nextTemperature = Math.max(heatCeiling(recipe, stats), currentTemperature[lane] - HeatControl.coolingRate(stats));
+        int nextTemperature = Math.max(heatCeiling(recipe, stats), currentTemperature[lane] - HeatControl.coolingStep(stats, level == null ? 0L : level.getGameTime()));
         if (nextTemperature == currentTemperature[lane]) {
             return false;
         }
