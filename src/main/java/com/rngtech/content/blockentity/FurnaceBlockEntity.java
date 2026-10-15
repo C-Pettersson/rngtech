@@ -1291,7 +1291,8 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
      */
     private HeatEngine.Load load(int lane, FurnaceRecipe recipe, MachineStatAccumulator stats, int heatedLanes) {
         int batch = laneBatch(lane, recipe, stats);
-        double overdrive = AscendancyFormulas.overdriveSpeedMultiplier(heat[lane].temperature(), safeMaximumTemperature(recipe), stats);
+        int safeMaximum = safeMaximumTemperature(recipe);
+        double overdrive = safeMaximum <= 0 ? 1.0 : AscendancyFormulas.overdriveSpeedMultiplier(heat[lane].temperature(), safeMaximum, stats);
         double workPerTick = HeatEngine.speed(stats) * overdrive;
         double heatPerTick = recipe.heat() * (double) batch * workPerTick / cycleWork(lane, recipe, stats);
         double dipShare = hasMasteryBehavior("SHARED_HEARTH") && heatedLanes > 1 ? 1.0 / heatedLanes : 1.0;

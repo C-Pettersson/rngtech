@@ -111,7 +111,7 @@ public class MetalPressScreen extends AbstractContainerScreen<MetalPressMenu> {
     private static final Map<MegaPassiveNode, ResourceLocation> MASTERY_ICON_TEXTURES = createMasteryIconTextures();
 
     private final MasteryScreenSupport<MegaPassiveNode> masterySupport;
-    private final HeatSlider heatSlider = new HeatSlider(86, 86, 69);
+    private final HeatSlider heatSlider = new HeatSlider(86, 81, 69);
 
     private static Map<MegaPassiveNode, ResourceLocation> createMasteryIconTextures() {
         Map<MegaPassiveNode, ResourceLocation> textures = new HashMap<>();

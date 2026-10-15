@@ -46,6 +46,7 @@ public final class HeatProgressionChecks {
         holdingHeatLeavesTransferHeadroom();
         baseGearBuildsNoNewStrain(root);
         stageZeroCoalSmeltsIronAndCopper(root);
+        ungatedRecipesWorkAtAnyHeat();
         return checks;
     }
 
@@ -182,6 +183,31 @@ public final class HeatProgressionChecks {
                 }
             }
             require(HeatEngine.finished(lane, recipe.ticks()), strainCase.name() + " finishes");
+        }
+    }
+
+    /** A recipe without a temperature requirement works from cold or hot at its own pace, and never waits as Too Hot. */
+    private static void ungatedRecipesWorkAtAnyHeat() {
+        MachineStatAccumulator stats = furnace(FurnaceChassisMaterial.STEEL, HeatCoreMaterial.STEEL);
+        HeatEngine.Envelope envelope = HeatEngine.envelope(0, 0, 0, 0.0, false, stats, 1.0, Integer.MAX_VALUE);
+        require(envelope.ungated() && envelope.setpoint() == HeatEngine.AMBIENT, "an ungated recipe ignores the slider");
+        int ticks = 1_200;
+        double recipeHeat = 17_280.0;
+        HeatEngine.Load load = new HeatEngine.Load(recipeHeat / ticks, 1.0, 1);
+        for (int start : new int[] {HeatEngine.AMBIENT, 900}) {
+            HeatLane lane = new HeatLane();
+            lane.setTemperature(start);
+            double[] paid = {0.0};
+            int tick = 0;
+            for (; tick < 2 * ticks && !HeatEngine.finished(lane, ticks); tick++) {
+                HeatEngine.Tick result = HeatEngine.work(lane, envelope, stats, load, heat -> {
+                    paid[0] += heat;
+                    return heat;
+                }, tick, 0);
+                require(!result.tooHot() && result.heatFactor() == 1.0, "an ungated recipe works at " + fmt(lane.exactTemperature()) + " C");
+            }
+            require(tick == ticks, "an ungated recipe from " + start + " C takes its recipe time, not " + tick + " ticks");
+            require(paid[0] <= recipeHeat + 1.0, "an ungated recipe from " + start + " C pays at most its recipe heat, not " + fmt(paid[0]));
         }
     }
 

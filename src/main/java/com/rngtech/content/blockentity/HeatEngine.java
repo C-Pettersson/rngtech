@@ -42,6 +42,11 @@ public final class HeatEngine {
         public int workCeiling() {
             return Math.max(setpoint, overheat);
         }
+
+        /** A recipe without a temperature requirement: it works at any heat and never runs too hot. */
+        public boolean ungated() {
+            return overheat == Integer.MAX_VALUE;
+        }
     }
 
     /** Heat a lane's batch needs, and how fast it works, at a heat factor of 1. {@code dipShare} is the part of the load dip it takes. */
@@ -89,6 +94,9 @@ public final class HeatEngine {
             double slider,
             int setpointCeiling
     ) {
+        if (target <= AMBIENT) {
+            return new Envelope(AMBIENT, AMBIENT, AMBIENT, Integer.MAX_VALUE, requiredStability, AMBIENT, false);
+        }
         int setpoint = Math.max(target, Math.min(setpointCeiling, setpoint(target, stats, slider)));
         int safe = Math.max(target, safeMaximum);
         return new Envelope(Math.min(minimum, target), target, safe, overheatTemperature(safe, stats), requiredStability, setpoint, canFail);
@@ -132,6 +140,9 @@ public final class HeatEngine {
 
     /** How fast the input takes heat: nothing below the minimum, slower up to the target, faster above it. */
     public static double heatFactor(double temperature, Envelope envelope) {
+        if (envelope.ungated()) {
+            return 1.0;
+        }
         if (temperature < envelope.minimum()) {
             return 0.0;
         }

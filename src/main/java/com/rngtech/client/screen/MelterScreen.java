@@ -100,7 +100,7 @@ public class MelterScreen extends AbstractContainerScreen<MelterMenu> {
     private static final Map<MegaPassiveNode, ResourceLocation> MASTERY_ICON_TEXTURES = createMasteryIconTextures();
 
     private final MasteryScreenSupport<MegaPassiveNode> masterySupport;
-    private final HeatSlider heatSlider = new HeatSlider(104, 94, 58);
+    private final HeatSlider heatSlider = new HeatSlider(104, 81, 58);
 
     private static Map<MegaPassiveNode, ResourceLocation> createMasteryIconTextures() {
         Map<MegaPassiveNode, ResourceLocation> textures = new HashMap<>();
