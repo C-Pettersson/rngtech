@@ -457,6 +457,15 @@ class WikiSite:
         return "".join(parts)
 
     def _tool_row(self, ids: list[str]) -> str | None:
+        tool = self.mining_tool(ids)
+        if tool is None:
+            return None
+        if not tool:
+            return "<tr><th>Tool</th><td>Any tool</td></tr>"
+        return f"<tr><th>Tool</th><td>{self.t_item(tool[0], tool[1])}</td></tr>"
+
+    def mining_tool(self, ids: list[str]) -> tuple[str, str] | tuple | None:
+        """The (tool item id, label) that mines every block in ids, () for any tool, or None for no blocks."""
         blocks = [i for i in ids if self.res.is_block(i)]
         if not blocks:
             return None
@@ -467,8 +476,8 @@ class WikiSite:
                 for level in ("stone", "iron", "diamond"):
                     if all(b in self.res.block_tag_values(f"minecraft:needs_{level}_tool") for b in blocks):
                         tier = level
-                return f"<tr><th>Tool</th><td>{self.t_item(f'minecraft:{tier}_{tool}', tool.title())}</td></tr>"
-        return "<tr><th>Tool</th><td>Any tool</td></tr>"
+                return f"minecraft:{tier}_{tool}", tool.title()
+        return ()
 
     # Templates: recipes
 
@@ -548,8 +557,9 @@ class WikiSite:
     def _matches(self, stacks: list[Stack], resource_id: str | None) -> bool:
         return resource_id is None or any(resource_id in s.options for s in stacks)
 
-    def t_processing(self, type: str, input: str | None = None, output: str | None = None,
-                     columns: list[str] | None = None, hide: list[str] | None = None, limit: int | None = None) -> str:
+    def processing_rows(self, type: str, input: str | None = None, output: str | None = None,
+                        columns: list[str] | None = None, hide: list[str] | None = None, limit: int | None = None):
+        """The matching (recipe id, inputs, outputs, scalars) rows of a recipe type and their scalar column keys."""
         recipe_type = type if ":" in type else f"{MOD_ID}:{type}"
         rows = []
         for recipe_id, recipe in self.res.recipes.items():
@@ -558,8 +568,6 @@ class WikiSite:
             inputs, outputs, scalars = self.split_recipe(recipe)
             if self._matches(inputs, input) and self._matches(outputs, output):
                 rows.append((recipe_id, inputs, outputs, scalars))
-        if not rows:
-            return '<p class="rw-empty">No recipes.</p>'
         if limit:
             rows = rows[:limit]
         keys: list[str] = []
@@ -569,6 +577,13 @@ class WikiSite:
         if columns:
             keys = [k for k in columns if k in keys]
         keys = [k for k in keys if k not in (hide or [])]
+        return rows, keys
+
+    def t_processing(self, type: str, input: str | None = None, output: str | None = None,
+                     columns: list[str] | None = None, hide: list[str] | None = None, limit: int | None = None) -> str:
+        rows, keys = self.processing_rows(type, input, output, columns, hide, limit)
+        if not rows:
+            return '<p class="rw-empty">No recipes.</p>'
         self.table_counter += 1
         table_id = f"rw-table-{self.table_counter}"
         head = "<tr><th>Input</th><th></th><th>Output</th>" + "".join(f"<th>{_esc(_label(k))}</th>" for k in keys) + "</tr>"
@@ -615,6 +630,12 @@ class WikiSite:
         return page.title if page else self.res.name(resource_id)
 
     def t_chain(self, *steps, edges: list | None = None, caption: str | None = None) -> str:
+        chain = self.chain_model(steps, edges)
+        self.chain_counter += 1
+        return ChainRenderer(self, chain, f"rw-chain-{self.chain_counter}").html(caption)
+
+    def chain_model(self, steps: tuple, edges: list | None) -> chains.Chain:
+        """The checked chain behind a chain() call; its errors are logged as build warnings."""
         raw = []
         if steps:
             if len(steps) < 3 or len(steps) % 2 == 0:
@@ -625,8 +646,7 @@ class WikiSite:
         chain = builder.build(raw)
         for error in chain.errors:
             log.warning("%s: chain: %s", self.page.file.src_uri, error)
-        self.chain_counter += 1
-        return ChainRenderer(self, chain, f"rw-chain-{self.chain_counter}").html(caption)
+        return chain
 
     # Templates: reference tables and navigation
 
@@ -726,6 +746,18 @@ def _pair(made: str, used: str) -> str:
         if made.endswith(unit) and used.endswith(unit):
             return f"{made[:-len(unit)]} → {used}"
     return f"{made} → {used}"
+
+
+def flow_label(edge: chains.Edge) -> tuple[str, str]:
+    """An edge's amount per run and rate, written once when both machines agree, e.g. ("500 → 100 mB", "")."""
+    made, used = _flow_text(edge.made), _flow_text(edge.used)
+    if not made[0] or made == used:
+        return used if not made[0] else made
+    if not used[0]:
+        return made
+    amount = made[0] if made[0] == used[0] else _pair(made[0], used[0])
+    rate = _pair(made[1], used[1]) if made[1] and used[1] else made[1] or used[1]
+    return amount, rate
 
 
 class ChainRenderer:
@@ -853,14 +885,7 @@ class ChainRenderer:
         return self.site._fluid_icon(resource) if self.site._is_fluid(resource) else resource
 
     def label_lines(self, edge: chains.Edge, broken: bool) -> list[str]:
-        made, used = _flow_text(edge.made), _flow_text(edge.used)
-        if not made[0] or made == used:
-            amount, rate = used if not made[0] else made
-        elif not used[0]:
-            amount, rate = made
-        else:
-            amount = made[0] if made[0] == used[0] else _pair(made[0], used[0])
-            rate = _pair(made[1], used[1]) if made[1] and used[1] else made[1] or used[1]
+        amount, rate = flow_label(edge)
         lines = [self.site.res.name(edge.resource), *(t for t in (amount, rate) if t)]
         if broken:
             lines.append("not in the recipes")

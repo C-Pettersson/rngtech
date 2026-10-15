@@ -39,7 +39,7 @@ class _DirSource:
         base = self.root / prefix
         if not base.is_dir():
             return []
-        return [p.relative_to(self.root).as_posix() for p in base.rglob("*") if p.is_file()]
+        return sorted(p.relative_to(self.root).as_posix() for p in base.rglob("*") if p.is_file())
 
 
 class _ZipSource:
@@ -51,7 +51,7 @@ class _ZipSource:
         return self.zip.read(path) if path in self.names else None
 
     def list(self, prefix: str) -> list[str]:
-        return [n for n in self.names if n.startswith(prefix) and not n.endswith("/")]
+        return sorted(n for n in self.names if n.startswith(prefix) and not n.endswith("/"))
 
 
 def split_id(resource_id: str) -> tuple[str, str]:

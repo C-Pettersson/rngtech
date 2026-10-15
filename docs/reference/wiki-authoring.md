@@ -86,6 +86,31 @@ python tools/rngwiki/vanilla.py --fetch
 
 That downloads the jar from Mojang and checks its SHA-1 against Mojang's manifest. Without it, vanilla items render as `?` placeholders.
 
+## In-game guide
+
+Status: Implemented
+
+The wiki also ships in the mod jar as an in-game guide for [GuideME](https://www.curseforge.com/minecraft/mc-mods/guideme), an optional dependency. Without GuideME the guide files are never read. `tools/rngwiki/guideme.py` renders every wiki page except the front page and `modpack-creators.md` into GuideME Markdown under `src/guide/resources`, which Gradle adds to the jar's resources. Those files are generated: never edit them, and commit them with the wiki change that produced them.
+
+```sh
+python tools/rngwiki/guideme.py
+```
+
+CI runs `python tools/rngwiki/guideme.py --check` and fails when the committed guide no longer matches the wiki. The exporter needs the client jar (see [Icons](#icons)), because vanilla names and tags would otherwise change its output.
+
+The exporter reshapes pages the way the AE2 guide reads, so a wiki page needs no guide-specific markup:
+
+- Machine pages open with a 3D render of the page icon and a row of their variants.
+- Sections the game already shows are left out: full `processing()` tables (JEI), ascendancy trees (the Mastery tab), `data_values()`, and See also. Filtered `processing()` tables stay.
+- A section heavier than about 1,000 characters of text, or a run of crafting grids, moves to a child page, and a page made of many mid-sized sections splits its heaviest ones until it fits. Long child pages split again.
+- Each wiki category becomes an index page; the guide's front page lists them.
+- `chain()` draws its machines layer by layer with a table of every flow, because GuideME cannot draw arrows.
+- Wiki links follow sections to their child pages. Links to pages outside the guide become plain text.
+
+A section that describes the web page itself, such as how to read the diagrams, gets guide wording from `_GUIDE_SECTIONS` in the exporter, keyed by page and heading id.
+
+The client run reads the pages straight from `src/guide/resources`, so re-running the exporter updates an open guide. `./gradlew runClient -PguideStartup` opens the guide on the title screen and logs every page error, without loading a world.
+
 ## Content rules
 
 The wiki is for players. It describes the game as it is today.
@@ -98,4 +123,4 @@ The wiki is for players. It describes the game as it is today.
 
 ## Writing a page
 
-Copy `docs/page-templates/wiki.md` into `wiki/`, add it to the nav in `mkdocs.wiki.yml`, and follow `wiki/furnace.md`. Preview with `mkdocs serve -f mkdocs.wiki.yml`, and check with `mkdocs build --strict -f mkdocs.wiki.yml`.
+Copy `docs/page-templates/wiki.md` into `wiki/`, add it to the nav in `mkdocs.wiki.yml`, and follow `wiki/furnace.md`. Preview with `mkdocs serve -f mkdocs.wiki.yml`, and check with `mkdocs build --strict -f mkdocs.wiki.yml`. Then regenerate the [in-game guide](#in-game-guide).
