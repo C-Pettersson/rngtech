@@ -145,7 +145,7 @@ Typical generators by stage, before rolls and Gear bonuses:
 | 6 | [Ammonia Fuel Cell](ammonia-fuel-cell.md) | 600 FE/t |
 | 7 | [Vacuum Collapse Generator](vacuum-collapse-generator.md) | About 1,000 FE/t |
 
-The [Potential Reactor](potential-reactor.md) and [Cavitation Generator](cavitation-generator.md) also generate FE. See each page for details.
+The [Potential Reactor](potential-reactor.md) and [Cavitation Generator](cavitation-generator.md) also generate FE. See each page for details, and [Power Chains](power-chains.md) for how each generator connects to the machines that fuel it.
 
 ## Logistics basics
 

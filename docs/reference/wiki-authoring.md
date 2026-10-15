@@ -35,6 +35,7 @@ wiki:
 | `item(id, text=None, link=True)` | `{{BlockLink}}` / `{{ItemLink}}` | Inline 16 px icon and name, linked to its wiki page. |
 | `slot(id, count=1)` | `{{Slot}}` | One inventory slot. |
 | `tag(tag, cycle=False)` | — | One slot per item in an item tag, e.g. a fuel tag. `cycle=True` shows a single slot that cycles through the members instead, for large tags. |
+| `chain(*steps, edges=None, caption=None)` | — | Flow diagram of machines linked by the items and fluids they pass on, with every link checked against the recipes. See [Chains](#chains). |
 | `navbox()` | `{{Navbox blocks}}` | Navigation box of all wiki pages by category. End every machine page with it. |
 | `gallery()` | — | Icon card grid of all wiki pages; used on the main page. |
 
@@ -49,6 +50,31 @@ Hover a slot to see its name, fluid amount, tag, role, or requirement. A yellow 
 ```md
 ```
 
+
+## Chains
+
+`chain()` draws a production chain top to bottom: machines as boxes, the resources they pass on as arrows. `wiki/power-chains.md` uses it.
+
+```md
+{{ chain("rngtech:iron_crusher_chassis", "rngtech:coal_dust", "rngtech:coal_gasifier", "rngtech:syngas", "rngtech:syngas_combustor") }}
+
+{{ chain(edges=[
+    [None, "minecraft:coal", "rngtech:crude_solid_fuel_burner"],
+    ["rngtech:melter", "rngtech:ender_slurry", "rngtech:battery_assembler", {"from": "melter/ender_slurry"}],
+    ["rngtech:vacuum_collapse_generator", "rngtech:collapse_residue", "rngtech:melter"],
+]) }}
+```
+
+- Positional `steps` alternate machine, resource, machine, and so on, for a straight line. `edges` takes `[from, resource, to]` triples for branches and loops; both can be combined.
+- A machine is any id listed on a machine's wiki page. Append `#2` to an id to draw a second, separate box for the same machine.
+- `None` as `from` draws a dashed box for something the player supplies; `None` as `to` draws one for a product that leaves the chain.
+- An edge that points back upstream is drawn as a dashed loop on the right.
+- Every edge is checked: the `from` machine's recipe types must output the resource, and the `to` machine's recipe types must take it. A failed check is a build warning, so `mkdocs build --strict` fails and the diagram cannot drift from the recipes.
+- Labels show the amount per run and the rate at base speed, from the recipe's amounts and `processing_ticks`. When a machine has several matching recipes, the one that matches most of that machine's other edges in the chain wins. A fourth element `{"from": recipe, "to": recipe}` pins either side to one recipe id.
+
+`MACHINES` in `tools/rngwiki/chains.py` maps each machine to its recipe types. It also lists what a machine's code handles without recipe JSON: fuel tags (Solid Fuel Burner, Bio Generator, Wooden Composter), inputs (Electrolyte Solution in the Corrosion Cell), and outputs (water from the Wooden Dehumidifier, Composted Biomass). Add a machine there before using it in a chain, and update it when a machine's code starts taking or making something new.
+
+The chain model in `chains.py` (nodes, edges, checked flows, and the layered layout) holds no HTML, so another exporter can draw the same chains.
 
 ## Icons
 

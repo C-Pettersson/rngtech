@@ -17,7 +17,7 @@ wiki:
     },
 ) }}
 
-The **Potential Reactor** turns salvage and old gear into FE. Feed it recycling byproducts, or any rolled machine, part, or Battery Cell you no longer need, and it pays out power for the item's rarity, affixes, and remaining Refinement Potential. The stripped item that comes out goes on to the [Component Recycler](component-recycler.md) for its materials.
+The **Potential Reactor** turns salvage and old gear into FE. Feed it recycling byproducts, or any rolled machine, part, or Battery Cell you no longer need, and it pays out power for the item's rarity, affixes, and remaining Refinement Potential. The stripped item that comes out goes on to the [Component Recycler](component-recycler.md) for its materials. See [Power Chains](power-chains.md#potential-reactor) for its place in your power supply.
 
 It is a containment vessel with a viewport on the front. Fuel drops in through the hopper on the lid, burns as a glowing core between two electrodes, and its residue falls through the filter cage on the side into a glass bin.
 
