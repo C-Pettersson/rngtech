@@ -14,7 +14,7 @@
     "id": "rngtech:nickel_ingot"
   },
   "processing_ticks": 375,
-  "heat": 4320,
+  "heat": 5573,
   "experience": 0.7,
   "minimum_temperature": 1100,
   "required_temperature_stability": 0.95,

@@ -185,7 +185,7 @@ public record MetalPressRecipe(
                             mold,
                             result,
                             processingTicks,
-                            heatFields.resolve(2400, 1.0),
+                            heatFields.resolve(2400, RecipeHeat.PRESS_HEAT_SCALE * RecipeHeat.temperatureScale(resolvedTarget)),
                             minimumTemperature,
                             resolvedTarget,
                             safeMaximumTemperature,

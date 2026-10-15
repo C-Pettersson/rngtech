@@ -31,7 +31,7 @@
         "id": "rngtech:steel_ingot"
     },
     "processing_ticks": 1200,
-    "heat": 14400,
+    "heat": 21235,
     "minimum_component_stage": 3,
     "minimum_temperature": 1300,
     "required_temperature_stability": 0.9,

@@ -19,7 +19,7 @@
     "id": "rngtech:platinum_gear"
   },
   "processing_ticks": 300,
-  "heat": 2160,
+  "heat": 2424,
   "minimum_temperature": 1750,
   "safe_maximum_temperature": 2050,
   "required_temperature_stability": 1.0,

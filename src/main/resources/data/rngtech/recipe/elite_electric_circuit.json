@@ -23,7 +23,7 @@
     "id": "rngtech:elite_electric_circuit"
   },
   "processing_ticks": 300,
-  "heat": 3000,
+  "heat": 3134,
   "minimum_temperature": 1600,
   "safe_maximum_temperature": 1900,
   "required_temperature_stability": 1.1,

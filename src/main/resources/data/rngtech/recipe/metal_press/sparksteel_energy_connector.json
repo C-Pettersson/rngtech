@@ -19,7 +19,7 @@
     "id": "rngtech:sparksteel_energy_connector"
   },
   "processing_ticks": 200,
-  "heat": 2160,
+  "heat": 1672,
   "minimum_temperature": 1100,
   "safe_maximum_temperature": 1500,
   "required_temperature_stability": 1.0,

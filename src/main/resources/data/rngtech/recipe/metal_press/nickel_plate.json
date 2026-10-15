@@ -18,7 +18,7 @@
     "id": "rngtech:nickel_plate"
   },
   "processing_ticks": 200,
-  "heat": 1440,
+  "heat": 1114,
   "minimum_temperature": 1100,
   "safe_maximum_temperature": 1400,
   "required_temperature_stability": 1.0,

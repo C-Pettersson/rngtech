@@ -100,6 +100,11 @@ def load_ore_catalog() -> dict:
         return json.load(handle, object_pairs_hook=OrderedDict)
 
 
+def scaled_heat(heat: int, target: int) -> int:
+    """Recipe heat at 800 C scaled to the recipe's temperature, as RecipeHeat.temperatureScale does."""
+    return round(heat * (max(800, target) / 800) ** 0.8)
+
+
 def write_json(path: Path, data: dict) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     with path.open("w", encoding="utf-8", newline="\n") as handle:
@@ -601,7 +606,7 @@ def generate_ore_furnace_recipe(catalog: dict, material: dict) -> None:
         ("ingredient", OrderedDict([("tag", f"c:ores/{material_id}")])),
         ("result", OrderedDict([("id", primary_material_item_id(catalog, forms["ingot"], material))])),
         ("processing_ticks", 300),
-        ("heat", 4320),
+        ("heat", scaled_heat(4320, 1000)),
         ("experience", 0.7),
         ("minimum_temperature", 1000),
         ("failure_output", OrderedDict([("count", 1), ("id", "rngtech:malformed_ingot")])),
@@ -663,7 +668,7 @@ def generate_raw_material_recipes(catalog: dict, ore_catalog: dict) -> None:
             ("ingredient", OrderedDict([("tag", raw_tag)])),
             ("result", OrderedDict([("id", primary_material_item_id(catalog, forms["ingot"], material))])),
             ("processing_ticks", 200),
-            ("heat", 2880),
+            ("heat", scaled_heat(2880, 1000)),
             ("experience", 0.7),
             ("minimum_temperature", 1000),
             ("failure_output", OrderedDict([("count", 1), ("id", "rngtech:malformed_ingot")])),

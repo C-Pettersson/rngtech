@@ -13,6 +13,12 @@ import java.util.Optional;
 public final class RecipeHeat {
     /** Share of an old FE cost that is the input's own heat; the rest now comes from the chamber's heat loss. */
     public static final double HEAT_PER_LEGACY_FE = 0.6;
+    /** Recipes at or below this temperature keep their heat; hotter ones scale up with {@link #temperatureScale}. */
+    public static final int TEMPERATURE_SCALE_BASE = 800;
+    /** How steeply a hotter recipe's input heat grows: 1.6x at 1,450 °C, 2.1x at 2,000 °C. */
+    public static final double TEMPERATURE_SCALE_EXPONENT = 0.8;
+    /** Metal Press heat after the move to heat units, which had left forming above its old FE. */
+    public static final double PRESS_HEAT_SCALE = 0.6;
 
     public static final MapCodec<Fields> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
             Codec.intRange(1, Integer.MAX_VALUE).optionalFieldOf("heat").forGetter(Fields::heat),
@@ -24,6 +30,14 @@ public final class RecipeHeat {
 
     public static Fields of(int heat) {
         return new Fields(Optional.of(heat), Optional.empty());
+    }
+
+    /**
+     * How much more heat an input needs at a recipe temperature than at 800 °C: heating metal hotter takes more heat.
+     * Shipped recipes have it built into their {@code heat}; legacy {@code energy} recipes get it on conversion.
+     */
+    public static double temperatureScale(int target) {
+        return Math.pow(Math.max(TEMPERATURE_SCALE_BASE, target) / (double) TEMPERATURE_SCALE_BASE, TEMPERATURE_SCALE_EXPONENT);
     }
 
     public static int fromLegacyEnergy(int energy, double multiplier) {

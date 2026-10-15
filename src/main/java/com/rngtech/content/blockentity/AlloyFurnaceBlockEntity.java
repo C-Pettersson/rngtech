@@ -142,7 +142,8 @@ public class AlloyFurnaceBlockEntity extends BaseMachineBlockEntity implements M
     private static final int DATA_WOBBLE = DATA_HEAT_FACTOR + 1;
     private static final int DATA_HEAT_REACH = DATA_WOBBLE + 1;
     private static final int DATA_HEAT_MAXIMUM = DATA_HEAT_REACH + 1;
-    private static final int DATA_MACHINE_PROGRESSION_START = DATA_HEAT_MAXIMUM + 1;
+    private static final int DATA_INPUT_ENERGY = DATA_HEAT_MAXIMUM + 1;
+    private static final int DATA_MACHINE_PROGRESSION_START = DATA_INPUT_ENERGY + 1;
     private static final int DATA_COUNT = DATA_MACHINE_PROGRESSION_START + MasteryMenuSupport.FIELD_COUNT;
     private static final int STAT_SCALE = 100;
 
@@ -246,8 +247,9 @@ public class AlloyFurnaceBlockEntity extends BaseMachineBlockEntity implements M
                 case DATA_BATCH_SIZE -> BatchProcessing.statBatchSize(stats) * STAT_SCALE;
                 case DATA_HEAT_SLIDER -> heatSlider;
                 case DATA_THERMAL_CONDUCTIVITY -> scaledStat(stats, MachineStat.THERMAL_CONDUCTIVITY);
-                case DATA_HOLDING_ENERGY -> heatEnergy(true);
-                case DATA_HEATING_ENERGY -> heatEnergy(false);
+                case DATA_HOLDING_ENERGY -> heatEnergy(0);
+                case DATA_INPUT_ENERGY -> heatEnergy(1);
+                case DATA_HEATING_ENERGY -> heatEnergy(2);
                 case DATA_HEAT_FACTOR -> heatFactorDisplay();
                 case DATA_WOBBLE -> wobbleDisplay();
                 case DATA_SETPOINT -> recipe == null ? 0 : envelope(recipe, stats).setpoint();
@@ -367,10 +369,8 @@ public class AlloyFurnaceBlockEntity extends BaseMachineBlockEntity implements M
     }
 
     /** FE/t the heater spent last tick: on wall loss when {@code holding}, otherwise on heating the chamber and input. */
-    private int heatEnergy(boolean holding) {
-        double holdingPaid = Math.min(heat.lastHolding(), heat.lastHeat());
-        double spent = holding ? holdingPaid : heat.lastHeat() - holdingPaid;
-        return (int) Math.ceil(spent * HeatEngine.energyRate(effectiveStats()));
+    private int heatEnergy(int part) {
+        return (int) Math.ceil(HeatEngine.heatSplit(heat)[part] * HeatEngine.energyRate(effectiveStats()));
     }
 
     private int heatFactorDisplay() {
@@ -999,7 +999,7 @@ public class AlloyFurnaceBlockEntity extends BaseMachineBlockEntity implements M
                 safeMaximumTemperature(recipe, stats),
                 recipe.requiredTemperatureStability(),
                 failureEnabled(recipe, stats),
-                HeatEngine.pushPastSafe(hasMasteryBehavior("BLAST_DRAFT"), stats),
+                hasMasteryBehavior("BLAST_DRAFT"),
                 stats,
                 heatSlider / 100.0,
                 Integer.MAX_VALUE

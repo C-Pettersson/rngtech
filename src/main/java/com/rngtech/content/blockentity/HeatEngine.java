@@ -80,6 +80,13 @@ public final class HeatEngine {
     public record Tick(boolean tooHot, boolean working, double heatFactor, double workTemperature, boolean starved) {
     }
 
+    /** Splits a lane's FE last tick into heat lost through the walls (0), taken by the input (1), and warming the chamber (2). */
+    public static double[] heatSplit(HeatLane lane) {
+        double walls = Math.min(lane.lastHolding(), lane.lastHeat());
+        double input = Math.min(lane.lastAbsorbed(), lane.lastHeat() - walls);
+        return new double[] {walls, input, Math.max(0.0, lane.lastHeat() - walls - input)};
+    }
+
     /** Hands the heater up to {@code heat} HU and returns what it could pay for. */
     @FunctionalInterface
     public interface HeatSupply {
@@ -102,14 +109,6 @@ public final class HeatEngine {
     public static int setpoint(int target, int reach, double slider) {
         int ceiling = Math.max(target, reach);
         return target + (int) Math.round(Math.max(0.0, Math.min(1.0, slider)) * (ceiling - target));
-    }
-
-    /**
-     * Whether the slider may push past the safe maximum: Blast Draft unlocks it, and Overdrive, whose speed only counts
-     * past the safe maximum, needs it.
-     */
-    public static boolean pushPastSafe(boolean blastDraft, MachineStatAccumulator stats) {
-        return blastDraft || stats.value(MachineStat.OVERDRIVE_SPEED) > 0.0;
     }
 
     /**

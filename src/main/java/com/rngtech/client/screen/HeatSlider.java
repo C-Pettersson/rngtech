@@ -135,12 +135,25 @@ final class HeatSlider {
         }
     }
 
+    /** The setpoint in degrees and how far past the target it is, the band the slider covers, and what is still locked. */
     List<Component> tooltip(int percent, int setpoint) {
-        Component value = setpoint > 0
-                ? Component.translatable("rngtech.heat_slider.tooltip.setpoint", percent, setpoint)
-                : Component.translatable("rngtech.heat_slider.tooltip.idle", percent);
-        return List.of(Component.translatable("rngtech.heat_slider.tooltip.title"), value,
-                Component.translatable("rngtech.heat_slider.tooltip.hint"));
+        List<Component> lines = new java.util.ArrayList<>();
+        lines.add(Component.translatable("rngtech.heat_slider.tooltip.title"));
+        if (!banded(bands)) {
+            lines.add(Component.translatable("rngtech.heat_slider.tooltip.idle"));
+        } else {
+            lines.add(Component.translatable("rngtech.heat_slider.tooltip.setpoint", degrees(setpoint), degrees(setpoint - bands.target())));
+            lines.add(Component.translatable("rngtech.heat_slider.tooltip.range", degrees(bands.target()), degrees(bands.reach())));
+            if (bands.reach() < bands.maximum()) {
+                lines.add(Component.translatable("rngtech.heat_slider.tooltip.locked", degrees(bands.reach())));
+            }
+        }
+        lines.add(Component.translatable("rngtech.heat_slider.tooltip.hint"));
+        return lines;
+    }
+
+    private static String degrees(int temperature) {
+        return String.format(java.util.Locale.ROOT, "%,d", temperature);
     }
 
     private void send(double mouseX, int left, int containerId) {

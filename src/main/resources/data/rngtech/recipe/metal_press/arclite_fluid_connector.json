@@ -19,7 +19,7 @@
     "id": "rngtech:arclite_fluid_connector"
   },
   "processing_ticks": 180,
-  "heat": 1920,
+  "heat": 1266,
   "minimum_temperature": 900,
   "safe_maximum_temperature": 1300,
   "required_temperature_stability": 1.0,

@@ -100,6 +100,7 @@ Heated recipes declare `heat`, the heat units (HU) the input must absorb, instea
 - `processing_ticks` stays. It is the reference time: how long the recipe takes at its target temperature with base Processing Speed and Thermal Conductivity. Authors keep control of pacing separately from heat cost. Today's FE per tick varies about 12× across recipes in the same heat band, so deriving time from heat alone would change many recipe times.
 - A one-time data migration converts `energy` to `heat` at a fixed FE-per-HU rate. Stage 5–8 FE multipliers and the ≥ 1750 °C 2× rule are folded into the authored `heat` values, so the runtime rule goes away.
 - The recipe codec still reads a legacy `energy` field and converts it, so third-party datapacks keep loading.
+- Input heat grows with the recipe temperature: shipped `heat` values are scaled by `(max(800, target) / 800)^0.8` (1.6× at 1,450 °C, 2.1× at 2,000 °C), and legacy `energy` conversions apply the same scale. Metal Press heat is also trimmed to 0.6×, which brings forming back near its pre-PRD FE.
 - The same `heat` value covers electric and fuel furnaces. Stage 0 gets a real heat cost per recipe for the first time.
 - `check-recipe-loops.mjs` reads `heat` × the FE-per-HU rate. Every craft pays at least its recipe heat, so that is a safe lower bound on FE.
 
@@ -223,7 +224,7 @@ setpoint = target + slider × (reach − target)
 
 - At 0%, the default, the lane holds the recipe target: lowest FE, base speed, and no wobble beyond a Stability shortfall.
 - Higher settings run hotter and faster and cost more FE, because heat loss grows faster than linearly with temperature.
-- Past the safe maximum, the lane is overheating on purpose. That needs the Blast Draft keystone, 10 points from the Drive/Reserve start, so maxing the slider is not the default early. The Cool Headed keystone on the same node does the opposite: every new input waits for the chamber to cool to the target. Every metal smelt has a failure output, and on any chassis wobble spikes above the overheat temperature build strain; recipes that cannot fail stop at their overheat temperature.
+- Past the safe maximum, the lane is overheating on purpose. That needs the Blast Draft keystone (Overdrive does not unlock it on its own), 10 points from the Drive/Reserve start, so maxing the slider is not the default early. The Cool Headed keystone on the same node does the opposite: every new input waits for the chamber to cool to the target. Every metal smelt has a failure output, and on any chassis wobble spikes above the overheat temperature build strain; recipes that cannot fail stop at their overheat temperature.
 - The slider is a fraction of each lane's own band, so one setting works for every recipe. A lane always works with its current recipe's target and Max Temperature.
 - The slider is set in the UI. Automation does not change it.
 

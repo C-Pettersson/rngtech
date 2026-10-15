@@ -41,7 +41,7 @@
         "id": "rngtech:bronze_blend"
     },
     "processing_ticks": 200,
-    "heat": 1440,
+    "heat": 1582,
     "minimum_component_stage": 3,
     "minimum_temperature": 900,
     "required_temperature_stability": 0.9,

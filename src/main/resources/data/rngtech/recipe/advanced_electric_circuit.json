@@ -19,7 +19,7 @@
     "id": "rngtech:advanced_electric_circuit"
   },
   "processing_ticks": 240,
-  "heat": 1800,
+  "heat": 1593,
   "minimum_temperature": 1300,
   "safe_maximum_temperature": 1550,
   "required_temperature_stability": 1.05,

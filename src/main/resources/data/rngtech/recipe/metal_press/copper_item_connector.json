@@ -19,7 +19,7 @@
     "id": "rngtech:copper_item_connector"
   },
   "processing_ticks": 120,
-  "heat": 720,
+  "heat": 474,
   "minimum_temperature": 900,
   "safe_maximum_temperature": 1300,
   "required_temperature_stability": 1.0,

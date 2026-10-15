@@ -156,7 +156,7 @@ public record MelterRecipe(
                         fluidInput,
                         fluidOutput,
                         processingTicks,
-                        heatFields.resolve(4800, 1.0),
+                        heatFields.resolve(4800, RecipeHeat.temperatureScale(minimumTemperature)),
                         minimumTemperature,
                         requiredProcessingLevel,
                         allowsBonusOutput,

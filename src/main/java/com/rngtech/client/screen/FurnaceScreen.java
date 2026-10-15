@@ -738,7 +738,7 @@ public class FurnaceScreen extends AbstractContainerScreen<FurnaceMenu> {
 
     private List<Component> heatTooltipLines() {
         return HeatReadout.lines(heatTooltip(), menu.heatSlider(), menu.targetTemperature(), menu.setpoint(), menu.heatFactor(), menu.wobble(),
-                menu.heatingEnergy(), menu.holdingEnergy(), menu.isElectric());
+                menu.inputEnergy(), menu.heatingEnergy(), menu.holdingEnergy(), menu.isElectric());
     }
 
     private Component heatTooltip() {

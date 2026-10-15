@@ -19,7 +19,7 @@
     "id": "rngtech:iron_casing"
   },
   "processing_ticks": 300,
-  "heat": 2880,
+  "heat": 1728,
   "minimum_temperature": 800,
   "safe_maximum_temperature": 1100,
   "required_temperature_stability": 1.0,

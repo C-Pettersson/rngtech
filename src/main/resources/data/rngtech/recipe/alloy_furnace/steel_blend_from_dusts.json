@@ -37,7 +37,7 @@
         "id": "rngtech:steel_blend"
     },
     "processing_ticks": 1200,
-    "heat": 14400,
+    "heat": 18578,
     "minimum_component_stage": 3,
     "minimum_temperature": 1100,
     "required_temperature_stability": 0.9,

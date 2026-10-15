@@ -138,6 +138,7 @@ final class HeatReadout {
             int setpoint,
             int heatFactor,
             int wobble,
+            int input,
             int heating,
             int holding,
             boolean electric
@@ -145,7 +146,7 @@ final class HeatReadout {
         List<Component> lines = new ArrayList<>();
         lines.add(heat);
         if (setpoint > target) {
-            lines.add(Component.translatable("rngtech.heat.tooltip.setpoint", setpoint, slider));
+            lines.add(Component.translatable("rngtech.heat.tooltip.setpoint", setpoint, setpoint - target));
         }
         if (heatFactor > 0) {
             lines.add(Component.translatable("rngtech.heat.tooltip.heat_factor", String.format(Locale.ROOT, "%.2f", heatFactor / 100.0)));
@@ -153,8 +154,8 @@ final class HeatReadout {
         if (wobble > 0) {
             lines.add(Component.translatable("rngtech.heat.tooltip.wobble", wobble));
         }
-        if (electric && heating + holding > 0) {
-            lines.add(Component.translatable("rngtech.heat.tooltip.energy", heating, holding));
+        if (electric && input + heating + holding > 0) {
+            lines.add(Component.translatable("rngtech.heat.tooltip.energy", input, heating, holding));
         }
         return lines;
     }

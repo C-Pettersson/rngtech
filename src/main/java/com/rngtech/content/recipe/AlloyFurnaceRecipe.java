@@ -219,7 +219,7 @@ public record AlloyFurnaceRecipe(
                             ingredients,
                             result,
                             processingTicks,
-                            heatFields.resolve(1800, 1.0),
+                            heatFields.resolve(1800, RecipeHeat.temperatureScale(resolvedTarget)),
                             minimumComponentStage,
                             minimumTemperature,
                             requiredTemperatureStability,

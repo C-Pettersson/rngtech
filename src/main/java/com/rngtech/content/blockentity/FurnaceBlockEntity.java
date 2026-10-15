@@ -137,7 +137,8 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
     private static final int DATA_WOBBLE = DATA_HEAT_FACTOR + 1;
     private static final int DATA_HEAT_REACH = DATA_WOBBLE + 1;
     private static final int DATA_HEAT_MAXIMUM = DATA_HEAT_REACH + 1;
-    private static final int DATA_MACHINE_PROGRESSION_START = DATA_HEAT_MAXIMUM + 1;
+    private static final int DATA_INPUT_ENERGY = DATA_HEAT_MAXIMUM + 1;
+    private static final int DATA_MACHINE_PROGRESSION_START = DATA_INPUT_ENERGY + 1;
     private static final int DATA_COUNT = DATA_MACHINE_PROGRESSION_START + MasteryMenuSupport.FIELD_COUNT;
     private static final int STAT_SCALE = 100;
 
@@ -276,8 +277,9 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
                 case DATA_BATCH_SIZE -> BatchProcessing.statBatchSize(stats) * STAT_SCALE;
                 case DATA_HEAT_SLIDER -> heatSlider;
                 case DATA_THERMAL_CONDUCTIVITY -> scaledStat(stats, MachineStat.THERMAL_CONDUCTIVITY);
-                case DATA_HOLDING_ENERGY -> heatEnergy(true);
-                case DATA_HEATING_ENERGY -> heatEnergy(false);
+                case DATA_HOLDING_ENERGY -> heatEnergy(0);
+                case DATA_INPUT_ENERGY -> heatEnergy(1);
+                case DATA_HEATING_ENERGY -> heatEnergy(2);
                 case DATA_HEAT_FACTOR -> heatFactorDisplay();
                 case DATA_WOBBLE -> wobbleDisplay();
                 case DATA_HEAT_REACH -> reachDisplay();
@@ -1164,15 +1166,13 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
     }
 
     /** FE/t the lanes' heaters spent last tick: on wall loss when {@code holding}, otherwise on heating chambers and inputs. */
-    private int heatEnergy(boolean holding) {
+    private int heatEnergy(int part) {
         if (!isElectric()) {
             return 0;
         }
         double total = 0.0;
         for (int lane = 0; lane < activeProcessingSlots(); lane++) {
-            double holdingPaid = Math.min(heat[lane].lastHolding(), heat[lane].lastHeat());
-            double spent = holding ? holdingPaid : heat[lane].lastHeat() - holdingPaid;
-            total += spent * HeatEngine.energyRate(statsForLane(lane));
+            total += HeatEngine.heatSplit(heat[lane])[part] * HeatEngine.energyRate(statsForLane(lane));
         }
         return (int) Math.ceil(total);
     }
@@ -1215,7 +1215,9 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
 
     private int laneEnergyStatus(int lane) {
         if (isElectric()) {
-            return !starved[lane] ? STATUS_READY : energyStored() > 0 ? STATUS_POWER_LIMITED : STATUS_NO_POWER;
+            // A lane still taking heat while short of power is underpowered, not out of power.
+            return !starved[lane] ? STATUS_READY
+                    : energyStored() > 0 || heat[lane].lastAbsorbed() > 0.0 ? STATUS_POWER_LIMITED : STATUS_NO_POWER;
         }
         return hasBurnTime() || isFuel(inventory.getStackInSlot(SLOT_FUEL)) ? STATUS_READY : STATUS_NO_FUEL;
     }
@@ -1284,7 +1286,7 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
                 safeMaximumTemperature(recipe),
                 recipe.requiredTemperatureStability(),
                 overheatFailureEnabled(lane, stats),
-                HeatEngine.pushPastSafe(hasMasteryBehavior("BLAST_DRAFT"), stats),
+                hasMasteryBehavior("BLAST_DRAFT"),
                 stats,
                 heatSlider / 100.0,
                 ceiling

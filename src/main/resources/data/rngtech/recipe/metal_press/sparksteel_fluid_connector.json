@@ -19,7 +19,7 @@
     "id": "rngtech:sparksteel_fluid_connector"
   },
   "processing_ticks": 160,
-  "heat": 1440,
+  "heat": 950,
   "minimum_temperature": 900,
   "safe_maximum_temperature": 1300,
   "required_temperature_stability": 1.0,

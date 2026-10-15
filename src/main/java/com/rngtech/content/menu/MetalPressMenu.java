@@ -78,7 +78,8 @@ public class MetalPressMenu extends AbstractContainerMenu implements MasteryMenu
     private static final int DATA_WOBBLE = DATA_HEAT_FACTOR + 1;
     private static final int DATA_HEAT_REACH = DATA_WOBBLE + 1;
     private static final int DATA_HEAT_MAXIMUM = DATA_HEAT_REACH + 1;
-    private static final int DATA_MACHINE_PROGRESSION_START = DATA_HEAT_MAXIMUM + 1;
+    private static final int DATA_INPUT_ENERGY = DATA_HEAT_MAXIMUM + 1;
+    private static final int DATA_MACHINE_PROGRESSION_START = DATA_INPUT_ENERGY + 1;
     private static final int DATA_COUNT = DATA_MACHINE_PROGRESSION_START + MasteryMenuSupport.FIELD_COUNT;
     private static final int STAT_SCALE = 100;
     public static final int BUTTON_SELECT_MOLD_BASE = 100;
@@ -426,9 +427,14 @@ public class MetalPressMenu extends AbstractContainerMenu implements MasteryMenu
         return data.get(DATA_HOLDING_ENERGY);
     }
 
-    /** FE/t the heater spent last tick heating the chamber and the input. */
+    /** FE/t the heater spent last tick raising the chamber's temperature. */
     public int heatingEnergy() {
         return data.get(DATA_HEATING_ENERGY);
+    }
+
+    /** FE/t the input took last tick: the heat the recipe consumes. */
+    public int inputEnergy() {
+        return data.get(DATA_INPUT_ENERGY);
     }
 
     /** How fast the input takes heat at the current temperature, in percent. */

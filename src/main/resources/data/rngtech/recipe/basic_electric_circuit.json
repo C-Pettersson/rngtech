@@ -23,7 +23,7 @@
     "id": "rngtech:basic_electric_circuit"
   },
   "processing_ticks": 180,
-  "heat": 960,
+  "heat": 849,
   "minimum_temperature": 1300,
   "safe_maximum_temperature": 1500,
   "required_temperature_stability": 0.95,

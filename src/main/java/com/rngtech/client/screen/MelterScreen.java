@@ -620,7 +620,7 @@ public class MelterScreen extends AbstractContainerScreen<MelterMenu> {
 
     private List<Component> heatTooltipLines() {
         return HeatReadout.lines(heatTooltip(), menu.heatSlider(), menu.minimumTemperature(), menu.setpoint(), menu.heatFactor(), menu.wobble(),
-                menu.heatingEnergy(), menu.holdingEnergy(), true);
+                menu.inputEnergy(), menu.heatingEnergy(), menu.holdingEnergy(), true);
     }
 
     private Component heatTooltip() {

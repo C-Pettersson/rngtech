@@ -24,7 +24,7 @@
     "amount": 2000
   },
   "processing_ticks": 360,
-  "heat": 5760,
+  "heat": 10029,
   "minimum_temperature": 1600,
   "required_processing_level": 6,
   "machine_xp": 8

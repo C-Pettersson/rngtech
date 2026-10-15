@@ -205,7 +205,6 @@ public final class HeatProgressionChecks {
         require(cannotFail.setpoint() == cannotFail.overheat(), "Blast Draft takes a recipe that cannot fail only to its overheat temperature");
         HeatEngine.Envelope canFail = HeatEngine.envelope(800, 800, 920, 0.0, true, true, stats, 1.0, Integer.MAX_VALUE);
         require(maximum > canFail.overheat() && canFail.setpoint() == maximum, "Blast Draft takes a recipe that can fail to Max Temperature");
-        require(HeatEngine.pushPastSafe(false, stats) == stats.value(MachineStat.OVERDRIVE_SPEED) > 0.0, "only Overdrive pushes past the safe maximum without Blast Draft");
     }
 
     /**
@@ -322,7 +321,7 @@ public final class HeatProgressionChecks {
         if (fuel) {
             return new Run(ticks, ticks);
         }
-        int energy = stats.adjustedEnergyCost((int) Math.round(recipe.heat() / RecipeHeat.HEAT_PER_LEGACY_FE));
+        int energy = stats.adjustedEnergyCost((int) Math.round(recipe.heat() / recipe.legacyScale() / RecipeHeat.HEAT_PER_LEGACY_FE));
         int perTick = Math.max(1, (int) Math.ceil(energy / (double) crafting));
         // FE intake past the transfer stretches today's craft the same way it throttles the heater.
         double throttle = Math.max(1.0, perTick / (double) energyTransfer);
@@ -409,7 +408,8 @@ public final class HeatProgressionChecks {
     }
 
     /** The heat fields of a recipe file, with each recipe type's codec defaults. */
-    private record Recipe(int ticks, int heat, int minimum, int target, int safeMaximum, double stability) {
+    /** {@code legacyScale} undoes the temperature scale (and the Press trim) that shipped recipes have built into their heat. */
+    private record Recipe(int ticks, int heat, int minimum, int target, int safeMaximum, double stability, double legacyScale) {
         static Recipe read(Path root, String id) {
             Path path = root.resolve(RECIPES).resolve(id + ".json");
             JsonObject json;
@@ -431,8 +431,9 @@ public final class HeatProgressionChecks {
             int safe = Math.max(target, intOr(json, "safe_maximum_temperature", defaultSafe));
             double defaultStability = type.equals("rngtech:metal_press") ? 1.0 : 0.0;
             double stability = json.has("required_temperature_stability") ? json.get("required_temperature_stability").getAsDouble() : defaultStability;
+            double legacyScale = RecipeHeat.temperatureScale(target) * (type.equals("rngtech:metal_press") ? RecipeHeat.PRESS_HEAT_SCALE : 1.0);
             return new Recipe(intOr(json, "processing_ticks", 200), intOr(json, "heat", 1), minimum, target, safe,
-                    type.equals("rngtech:melter") ? 0.0 : stability);
+                    type.equals("rngtech:melter") ? 0.0 : stability, legacyScale);
         }
 
         HeatEngine.Envelope envelope(MachineStatAccumulator stats, double slider) {

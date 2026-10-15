@@ -26,7 +26,7 @@
     "id": "rngtech:sparksteel_ingot"
   },
   "processing_ticks": 1200,
-  "heat": 14400,
+  "heat": 16522,
   "minimum_component_stage": 4,
   "minimum_temperature": 950,
   "required_temperature_stability": 1.0,
