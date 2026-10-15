@@ -9,8 +9,6 @@ public final class AscendancyFormulas {
     public static final double MAX_UNDER_LEVEL_EFFICIENCY = 90.0;
     /** Fused Crucibles turns batching off for this much Processing Speed per point of Batch Size. */
     public static final double FUSED_CRUCIBLES_SPEED_PER_BATCH = 0.2;
-    /** Shared Hearth gives every lane this share of the hottest installed Heat Core's maximum. */
-    public static final double SHARED_HEARTH_SHARE = 0.9;
     /** Fluxed Blend lowers blend smelt temperatures by this many degrees. */
     public static final int FLUXED_BLEND_DEGREES = 100;
 

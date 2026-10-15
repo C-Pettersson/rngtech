@@ -16,6 +16,7 @@ import com.rngtech.content.recipe.CountedIngredient;
 import com.rngtech.content.recipe.FurnaceRecipe;
 import com.rngtech.content.registry.ModBlockEntities;
 import com.rngtech.content.registry.ModRecipes;
+import com.rngtech.rpg.BatchProcessing;
 import com.rngtech.rpg.ComponentBaseStatCatalog;
 import com.rngtech.rpg.EscapementState;
 import com.rngtech.rpg.MachineBaseStatCatalog;
@@ -129,7 +130,8 @@ public class AlloyFurnaceBlockEntity extends BaseMachineBlockEntity implements M
     private static final int DATA_OVERHEAT_TOLERANCE = 26;
     private static final int DATA_LEDGER = 27;
     private static final int DATA_LEDGER_BLEND = 28;
-    private static final int DATA_MACHINE_PROGRESSION_START = 29;
+    private static final int DATA_BATCH_SIZE = 29;
+    private static final int DATA_MACHINE_PROGRESSION_START = 30;
     private static final int DATA_COUNT = DATA_MACHINE_PROGRESSION_START + MasteryMenuSupport.FIELD_COUNT;
     private static final int STAT_SCALE = 100;
 
@@ -230,6 +232,7 @@ public class AlloyFurnaceBlockEntity extends BaseMachineBlockEntity implements M
                 case DATA_OVERHEAT_TOLERANCE -> scaledStat(stats, MachineStat.OVERHEAT_TOLERANCE);
                 case DATA_LEDGER -> ledgerDisplay(recipe, stats);
                 case DATA_LEDGER_BLEND -> recipe != null && blendLedgerActive(recipe, stats) ? 1 : 0;
+                case DATA_BATCH_SIZE -> BatchProcessing.statBatchSize(stats) * STAT_SCALE;
                 default -> 0;
             };
         }
@@ -246,6 +249,7 @@ public class AlloyFurnaceBlockEntity extends BaseMachineBlockEntity implements M
 
     private final BulkSpeedState bulkSpeed = new BulkSpeedState();
     private int progress;
+    private int lockedBatch;
     private int internalEnergy;
     private int currentTemperature;
     private int lastTargetTemperature;
@@ -321,10 +325,10 @@ public class AlloyFurnaceBlockEntity extends BaseMachineBlockEntity implements M
 
         int energyCost = furnace.energyCostPerTick(recipe, stats);
         if (furnace.progress == 0 && ProcessingChance.rollInstant(level, stats)) {
-            int fullEnergyCost = furnace.energyCostPerCraft(recipe, stats);
+            int fullEnergyCost = furnace.energyCostPerCraft(recipe, stats) * furnace.batch(recipe, stats);
             if (furnace.consumeWorkingEnergy(fullEnergyCost, true) >= fullEnergyCost) {
                 furnace.markInstantProcess();
-                furnace.startCycleIfNeeded(recipe);
+                furnace.startCycleIfNeeded(recipe, stats);
                 furnace.consumeWorkingEnergy(fullEnergyCost, false);
                 if (furnace.process(recipe, stats)) {
                     furnace.bulkSpeed.recordProcess(furnace.activeTraits());
@@ -345,7 +349,7 @@ public class AlloyFurnaceBlockEntity extends BaseMachineBlockEntity implements M
             return;
         }
 
-        furnace.startCycleIfNeeded(recipe);
+        furnace.startCycleIfNeeded(recipe, stats);
         furnace.consumeWorkingEnergy(energyCost, false);
         furnace.updateFailureStrain(recipe, stats);
         if (furnace.failureStrain >= HeatControl.FAILURE_STRAIN_THRESHOLD) {
@@ -513,6 +517,7 @@ public class AlloyFurnaceBlockEntity extends BaseMachineBlockEntity implements M
         tag.put("ProcessInventory", processInventory.serializeNBT(registries));
         tag.put("GearInventory", gearInventory.serializeNBT(registries));
         tag.putInt("Progress", progress);
+        tag.putInt("LockedBatch", lockedBatch);
         tag.putInt("Energy", internalEnergyStored());
         tag.putInt("CurrentTemperature", currentTemperature);
         tag.putInt("LastTargetTemperature", lastTargetTemperature);
@@ -535,6 +540,7 @@ public class AlloyFurnaceBlockEntity extends BaseMachineBlockEntity implements M
         processInventory.deserializeNBT(registries, tag.getCompound("ProcessInventory"));
         gearInventory.deserializeNBT(registries, tag.getCompound("GearInventory"));
         progress = tag.getInt("Progress");
+        lockedBatch = Math.max(0, tag.getInt("LockedBatch"));
         internalEnergy = Math.max(0, tag.getInt("Energy"));
         currentTemperature = Math.max(0, tag.getInt("CurrentTemperature"));
         lastTargetTemperature = Math.max(0, tag.getInt("LastTargetTemperature"));
@@ -586,26 +592,32 @@ public class AlloyFurnaceBlockEntity extends BaseMachineBlockEntity implements M
         }
         ItemStack[] stacks = inputStacks();
         AlloyFurnaceRecipeInput input = new AlloyFurnaceRecipeInput(stacks);
-        AlloyFurnaceRecipe.Match match = recipe.match(input).orElse(null);
+        int batch = batch(recipe, stats);
+        AlloyFurnaceRecipe.Match match = recipe.match(input, batch).orElse(null);
         if (match == null || !recipe.matches(input, level)) {
             return false;
         }
 
         ItemStack baseResult = recipe.outputStack();
-        ItemStack result = withSuperOutput(recipe, stats, baseResult);
+        ItemStack result = baseResult.copyWithCount(baseResult.getCount() * batch);
         if (!canMergeOutput(result)) {
-            result = baseResult;
-            if (!canMergeOutput(result)) {
-                return false;
-            }
+            return false;
         }
 
-        result = withBlendLedger(recipe, stats, result);
+        // Super Output, the ledgers, and machine XP count every recipe set in the batch.
         int[] consumed = match.consumed().clone();
-        applyFlux(recipe, stats, stacks, consumed);
+        for (int item = 0; item < batch; item++) {
+            int bonus = withSuperOutput(recipe, stats, baseResult).getCount() - baseResult.getCount();
+            ItemStack grown = ProcessingChance.grow(result, baseResult, bonus);
+            if (canMergeOutput(grown)) {
+                result = grown;
+            }
+            result = withBlendLedger(recipe, stats, result);
+            applyFlux(recipe, stats, stacks, consumed);
+            grantRecipeXp(recipe);
+        }
         consumeInputs(consumed);
         mergeOutput(result);
-        grantRecipeXp(recipe);
         lastRecipe = recipe;
         escapement.completed();
         resetCycle();
@@ -865,12 +877,15 @@ public class AlloyFurnaceBlockEntity extends BaseMachineBlockEntity implements M
         }
         ItemStack[] stacks = inputStacks();
         AlloyFurnaceRecipeInput input = new AlloyFurnaceRecipeInput(stacks);
-        AlloyFurnaceRecipe.Match match = recipe.match(input).orElse(null);
+        // A failed batch ruins every recipe set in it.
+        int batch = batch(recipe, effectiveStats());
+        AlloyFurnaceRecipe.Match match = recipe.match(input, batch).orElse(null);
         if (match == null || !recipe.matches(input, level)) {
             return false;
         }
 
-        ItemStack result = failureResult(recipe);
+        ItemStack failure = failureResult(recipe);
+        ItemStack result = failure.copyWithCount(failure.getCount() * batch);
         if (!canMergeOutput(result)) {
             return false;
         }
@@ -940,8 +955,27 @@ public class AlloyFurnaceBlockEntity extends BaseMachineBlockEntity implements M
     }
 
     private int processingTicks(AlloyFurnaceRecipe recipe, MachineStatAccumulator stats) {
-        return Math.max(1, (int) Math.ceil(stats.adjustedHeatProcessingTicks(recipe.processingTicks())
+        return processingTicks(recipe, stats, batch(recipe, stats));
+    }
+
+    private int processingTicks(AlloyFurnaceRecipe recipe, MachineStatAccumulator stats, int batch) {
+        int ticks = Math.max(1, (int) Math.ceil(stats.adjustedHeatProcessingTicks(recipe.processingTicks())
                 / (routeSpeed(recipe, stats) * escapementSpeed(stats))));
+        return BatchProcessing.batchTicks(ticks, stats, batch);
+    }
+
+    /** The batch locked when the cycle started, shrunk only if its input has since gone. */
+    private int batch(AlloyFurnaceRecipe recipe, MachineStatAccumulator stats) {
+        int available = availableBatch(recipe, stats);
+        return progress > 0 && lockedBatch > 0 ? Math.min(lockedBatch, available) : available;
+    }
+
+    /** A batch takes whole recipe sets, as far as the input slots hold them and the output has room for their base output. */
+    private int availableBatch(AlloyFurnaceRecipe recipe, MachineStatAccumulator stats) {
+        int limit = recipe.crafts(new AlloyFurnaceRecipeInput(inputStacks()), BatchProcessing.batchSize(stats, false));
+        ItemStack output = recipe.outputStack();
+        return Math.max(1, BatchProcessing.largestFitting(limit,
+                batch -> batch == 1 || canMergeOutput(output.copyWithCount(output.getCount() * batch))));
     }
 
     private double escapementSpeed(MachineStatAccumulator stats) {
@@ -953,9 +987,14 @@ public class AlloyFurnaceBlockEntity extends BaseMachineBlockEntity implements M
         return recipe == null || !meetsRecipeRequirements(recipe, stats) ? 0 : processingTicks(recipe, stats);
     }
 
+    /** Every recipe set in a batch pays its own FE, spread over the batch's longer cycle. */
     private int energyCostPerTick(AlloyFurnaceRecipe recipe, MachineStatAccumulator stats) {
-        int adjustedTicks = processingTicks(recipe, stats);
-        int totalEnergy = stats.adjustedEnergyCost(recipe.energy());
+        return energyCostPerTick(recipe, stats, batch(recipe, stats));
+    }
+
+    private int energyCostPerTick(AlloyFurnaceRecipe recipe, MachineStatAccumulator stats, int batch) {
+        int adjustedTicks = processingTicks(recipe, stats, batch);
+        int totalEnergy = stats.adjustedEnergyCost(recipe.energy()) * batch;
         return Math.max(1, (int) Math.ceil(totalEnergy / (double) adjustedTicks));
     }
 
@@ -1172,9 +1211,9 @@ public class AlloyFurnaceBlockEntity extends BaseMachineBlockEntity implements M
         }
     }
 
-    /** Heat Economy makes warmup ticks 30% cheaper. */
+    /** Heating costs one recipe set's FE rate, however large the batch; Heat Economy makes it 30% cheaper. */
     private boolean payHeatTick(AlloyFurnaceRecipe recipe, MachineStatAccumulator stats) {
-        int energyCost = energyCostPerTick(recipe, stats);
+        int energyCost = energyCostPerTick(recipe, stats, 1);
         if (hasMasteryBehavior("HEAT_ECONOMY")) {
             energyCost = Math.max(1, (int) Math.ceil(energyCost * 0.7));
         }
@@ -1240,10 +1279,11 @@ public class AlloyFurnaceBlockEntity extends BaseMachineBlockEntity implements M
         return consumeWorkingEnergy(energyCost, true) < energyCost;
     }
 
-    private void startCycleIfNeeded(AlloyFurnaceRecipe recipe) {
+    private void startCycleIfNeeded(AlloyFurnaceRecipe recipe, MachineStatAccumulator stats) {
         if (progress != 0) {
             return;
         }
+        lockedBatch = availableBatch(recipe, stats);
         activeInputs = Arrays.stream(inputStacks())
                 .map(AlloyFurnaceBlockEntity::singleCopy)
                 .toArray(ItemStack[]::new);
@@ -1273,7 +1313,7 @@ public class AlloyFurnaceBlockEntity extends BaseMachineBlockEntity implements M
 
     private void resetCycleIfActive() {
         boolean changed = false;
-        if (progress != 0 || failureStrain != 0 || targetReached || hasActiveInputSnapshot()) {
+        if (progress != 0 || lockedBatch != 0 || failureStrain != 0 || targetReached || hasActiveInputSnapshot()) {
             resetCycle();
             changed = true;
         }
@@ -1285,6 +1325,7 @@ public class AlloyFurnaceBlockEntity extends BaseMachineBlockEntity implements M
 
     private void resetCycle() {
         progress = 0;
+        lockedBatch = 0;
         failureStrain = 0;
         targetReached = false;
         activeInputs = emptyInputs();

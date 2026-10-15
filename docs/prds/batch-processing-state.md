@@ -2,7 +2,7 @@
 
 Source: [Batch Processing PRD](batch-processing.md).
 
-Status: **Prototype** for the 2.0 release. Slice 1 is in on `feature/batch-processing`, passes the automated checks, and passed an in-game check on 2026-10-06. Slices 2–4 remain.
+Status: **Prototype** for the 2.0 release. Slice 1 is merged and passed an in-game check on 2026-10-06. Slice 2 passes the automated checks and passed an in-game check on 2026-10-15. Slices 3–4 remain.
 
 ## Scope checklist
 
@@ -10,7 +10,7 @@ Status: **Prototype** for the 2.0 release. Slice 1 is in on `feature/batch-proce
 - [x] Draft the PRD and this state page.
 - [ ] Resolve the PRD's open questions.
 - [x] Slice 1: Batch Size, Batch Overhead, shared batch helper, `DENSE_PARALLEL` removal, Single Charge, Calibrator lanes to Batch Size.
-- [ ] Slice 2: Lead Furnace shared Heat Core, Furnace and Alloy Furnace batching.
+- [x] Slice 2: Lead Furnace shared Heat Core, Furnace and Alloy Furnace batching.
 - [ ] Slice 3: Dense Batching, Batch Overhead path, and ascendancy values.
 - [ ] Slice 4: stat display, hover text, progress pips, Jade, language, and canonical docs.
 - [ ] In-game playtest.
@@ -37,6 +37,16 @@ Recorded 2026-10-06, during slice 1:
 - Machines that recomputed their batch every tick (Metal Press, Melter, Resonance Calibrator) now lock it at cycle start, like the Crusher. A locked batch shrinks only if its input has gone.
 - `DENSE_PARALLEL` stays as an enum constant so stored traits decode; nothing grants or reads it. The Crusher Throughput affix keeps its `dense_parallel` mod group ID.
 
+Recorded 2026-10-15, during slice 2:
+
+- Shared Hearth gets an interim rule until the [Heat Model](heat-model.md) replaces it: a Lead Furnace lane warming up starts at the hottest working lane's temperature, up to its own target. With one shared core, its old 90%-of-the-hottest-core rule had nothing left to share.
+- Every Furnace has one Gear slot. The Heat Core's stats apply to the whole Furnace, so the per-lane and "strongest core" stat paths are gone. Gear stats now come before attribute conversions on the Furnace, as on the other machines.
+- Heating a lane, and Overdrive's extra heat ticks, cost one item's FE rate however large the batch. Working ticks pay per item.
+- The Stage 0 Furnace burns one item's burn time per batched item, spread over the longer cycle in thousandths of a tick. Fuel per item does not change.
+- A failed batch ruins every item in it, as on the Metal Press. Crucible Heart keeps its rule: one extra item after the batch when the lane runs at twice the target.
+- A batch keeps output room for its base items, so Super Output or a ledger payout never strands a paid-for item.
+- The Corruption `batching_machines` pool now includes the Furnace, Electric Furnace, and Alloy Furnace.
+
 ## Progress log
 
 - 2026-10-05: Surveyed current behavior and wrote the PRD and this state page.
@@ -49,3 +59,10 @@ Recorded 2026-10-06, during slice 1:
     - The Resonance Calibrator, Metal Press, and Melter Stats tabs show Batch Size. The Press and Melter never showed Parallel Jobs, so batches from Drop Forge, Twin Crucible, or Dense Batching were invisible there. The Calibrator chassis tooltip names its base Batch Size.
     - In-game check passed: Crusher, Metal Press, Melter, and Resonance Calibrator batching, plus the new Stats tab rows.
     - Still open for slice 4: Lane Sync, Shared Field, and Wide Tolerance still say "lanes".
+- 2026-10-15, slice 2:
+    - Lead Furnace has one Heat Core slot for all four lanes. Cores saved in the three retired slots move to an adjacent inventory, or drop once a player is near.
+    - Furnace lanes and the Alloy Furnace lock a batch at cycle start, scale cycle time by Batch Overhead, and pay FE and grant XP per item. The Alloy Furnace batches whole recipe sets.
+    - Furnace and Alloy Furnace families read Batch Size, so Dense Batching, Uniques, and Corruption reach them. Both Stats tabs show Batch Size.
+    - GameTests cover one core running four Lead Furnace lanes, a Furnace batch, an Alloy Furnace recipe-set batch, and a four-core Lead Furnace moving its extra cores out.
+    - Wiki, Machine Stats, Current Implementation, and the generated ascendancy tables are updated.
+    - In-game check passed: Lead Furnace with one core, a batched Furnace and Alloy Furnace, and a world saved with a four-core Lead Furnace.

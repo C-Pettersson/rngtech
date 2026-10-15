@@ -312,7 +312,7 @@ public final class ProcessingBalanceSimulation {
         BatteryCellMaterial cell = BatteryCellMaterial.valueOf(upper(stage, "batteryCell"));
         MachineProgressionState state = progression(MachineMasteryFamily.FURNACE, stage, build, level);
 
-        // FurnaceBlockEntity#baseEffectiveStats then #statsForLane. Every lane gets the same core, so lanes share stats.
+        // FurnaceBlockEntity#baseEffectiveStats then #statsForLane. Every lane shares the one core, so lanes share stats.
         MachineStatAccumulator stats = MachineBaseStatCatalog.furnace(chassis);
         JsonArray chassisAffixes = setup.has("chassisAffixes") ? setup.getAsJsonArray("chassisAffixes") : build.getAsJsonArray("chassis");
         stats.apply(traits(ModifierEligibilityProfiles.forMachine(chassis.machineType()), chassisAffixes));
@@ -321,13 +321,12 @@ public final class ProcessingBalanceSimulation {
         JsonArray coreAffixes = setup.has("coreAffixes") ? setup.getAsJsonArray("coreAffixes") : build.getAsJsonArray("part");
         ComponentBaseStatCatalog.applyContribution(stats, ComponentBaseStatCatalog.heatCore(core),
                 traits(ModifierEligibilityProfiles.forMachinePart(MachinePartType.HEAT_CORE, MachineType.SOLID_FUEL_BURNER), coreAffixes));
-        int coresNeeded = chassis.heatCoreSlots() > 1 ? Math.min(lanes, chassis.heatCoreSlots()) : 1;
         // FurnaceBlockEntity#consumeWorkingEnergy runs per lane, so each lane can draw the cell's output rate.
         double supply = Math.min(stats.value(MachineStat.ENERGY_CAPACITY) + cell.outputRate() * lanes, connector(stage));
-        return new Furnace(stats, state, lanes, coresNeeded, supply);
+        return new Furnace(stats, state, lanes, supply);
     }
 
-    private record Furnace(MachineStatAccumulator stats, MachineProgressionState state, int lanes, int coresNeeded, double feSupply) {
+    private record Furnace(MachineStatAccumulator stats, MachineProgressionState state, int lanes, double feSupply) {
         boolean has(String behavior) {
             return MegaPassiveTree.has(state, behavior);
         }
@@ -389,7 +388,6 @@ public final class ProcessingBalanceSimulation {
             row.put("superOutputChance", stats.value(MachineStat.SUPER_OUTPUT_CHANCE));
             row.put("ledgerRate", stats.value(MachineStat.LEDGER_RATE));
             row.put("lanes", lanes);
-            row.put("heatCores", coresNeeded);
             row.put("feSupplyPerTick", feSupply);
             row.put("mastery", masterySummary(state));
             return row;

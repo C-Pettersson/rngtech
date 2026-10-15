@@ -70,7 +70,8 @@ public class AlloyFurnaceScreen extends AbstractContainerScreen<AlloyFurnaceMenu
             "rngtech.stat.temperature_stability",
             "rngtech.stat.overheat_tolerance",
             "rngtech.stat.stability",
-            "rngtech.stat.input_slots"
+            "rngtech.stat.input_slots",
+            "rngtech.stat.batch_size"
     };
     private static final int[] STAT_DATA_INDICES = {
             AlloyFurnaceMenu.processingSpeedDataIndex(),
@@ -83,7 +84,8 @@ public class AlloyFurnaceScreen extends AbstractContainerScreen<AlloyFurnaceMenu
             AlloyFurnaceMenu.temperatureStabilityDataIndex(),
             AlloyFurnaceMenu.overheatToleranceDataIndex(),
             AlloyFurnaceMenu.stabilityDataIndex(),
-            AlloyFurnaceMenu.inputSlotsDataIndex()
+            AlloyFurnaceMenu.inputSlotsDataIndex(),
+            AlloyFurnaceMenu.batchSizeDataIndex()
     };
     private static final MachineStat[] STAT_TYPES = {
             MachineStat.PROCESSING_SPEED,
@@ -96,7 +98,8 @@ public class AlloyFurnaceScreen extends AbstractContainerScreen<AlloyFurnaceMenu
             MachineStat.TEMPERATURE_STABILITY,
             MachineStat.OVERHEAT_TOLERANCE,
             MachineStat.STABILITY,
-            MachineStat.INPUT_SLOTS
+            MachineStat.INPUT_SLOTS,
+            MachineStat.BATCH_SIZE
     };
     private static final Map<MegaPassiveNode, ResourceLocation> MASTERY_ICON_TEXTURES = createMasteryIconTextures();
 
@@ -654,7 +657,8 @@ public class AlloyFurnaceScreen extends AbstractContainerScreen<AlloyFurnaceMenu
     private boolean isIntegralStat(int dataIndex) {
         return dataIndex == AlloyFurnaceMenu.energyCapacityStatDataIndex()
                 || dataIndex == AlloyFurnaceMenu.maxTemperatureDataIndex()
-                || dataIndex == AlloyFurnaceMenu.inputSlotsDataIndex();
+                || dataIndex == AlloyFurnaceMenu.inputSlotsDataIndex()
+                || dataIndex == AlloyFurnaceMenu.batchSizeDataIndex();
     }
 
     private boolean isEnhancedStat(int dataIndex, double value) {

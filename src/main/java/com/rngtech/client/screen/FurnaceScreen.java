@@ -74,6 +74,7 @@ public class FurnaceScreen extends AbstractContainerScreen<FurnaceMenu> {
             "rngtech.stat.temperature_stability",
             "rngtech.stat.overheat_tolerance",
             "rngtech.stat.input_slots",
+            "rngtech.stat.batch_size",
             "rngtech.stat.fuel_efficiency",
             "rngtech.stat.fuel_duration"
     };
@@ -87,6 +88,7 @@ public class FurnaceScreen extends AbstractContainerScreen<FurnaceMenu> {
             FurnaceMenu.temperatureStabilityDataIndex(),
             FurnaceMenu.overheatToleranceDataIndex(),
             FurnaceMenu.inputSlotsDataIndex(),
+            FurnaceMenu.batchSizeDataIndex(),
             FurnaceMenu.fuelEfficiencyDataIndex(),
             FurnaceMenu.fuelDurationDataIndex()
     };
@@ -100,6 +102,7 @@ public class FurnaceScreen extends AbstractContainerScreen<FurnaceMenu> {
             MachineStat.TEMPERATURE_STABILITY,
             MachineStat.OVERHEAT_TOLERANCE,
             MachineStat.INPUT_SLOTS,
+            MachineStat.BATCH_SIZE,
             MachineStat.FUEL_EFFICIENCY,
             MachineStat.FUEL_DURATION
     };
@@ -112,6 +115,7 @@ public class FurnaceScreen extends AbstractContainerScreen<FurnaceMenu> {
             "rngtech.stat.temperature_stability",
             "rngtech.stat.overheat_tolerance",
             "rngtech.stat.input_slots",
+            "rngtech.stat.batch_size",
             "rngtech.stat.energy_usage",
             "rngtech.stat.energy_capacity"
     };
@@ -124,6 +128,7 @@ public class FurnaceScreen extends AbstractContainerScreen<FurnaceMenu> {
             FurnaceMenu.temperatureStabilityDataIndex(),
             FurnaceMenu.overheatToleranceDataIndex(),
             FurnaceMenu.inputSlotsDataIndex(),
+            FurnaceMenu.batchSizeDataIndex(),
             FurnaceMenu.energyUsageDataIndex(),
             FurnaceMenu.energyCapacityStatDataIndex()
     };
@@ -136,6 +141,7 @@ public class FurnaceScreen extends AbstractContainerScreen<FurnaceMenu> {
             MachineStat.TEMPERATURE_STABILITY,
             MachineStat.OVERHEAT_TOLERANCE,
             MachineStat.INPUT_SLOTS,
+            MachineStat.BATCH_SIZE,
             MachineStat.ENERGY_USAGE,
             MachineStat.ENERGY_CAPACITY
     };
@@ -821,7 +827,8 @@ public class FurnaceScreen extends AbstractContainerScreen<FurnaceMenu> {
     private boolean isIntegralStat(int dataIndex) {
         return dataIndex == FurnaceMenu.energyCapacityStatDataIndex()
                 || dataIndex == FurnaceMenu.maxTemperatureDataIndex()
-                || dataIndex == FurnaceMenu.inputSlotsDataIndex();
+                || dataIndex == FurnaceMenu.inputSlotsDataIndex()
+                || dataIndex == FurnaceMenu.batchSizeDataIndex();
     }
 
     private boolean isEnhancedStat(int dataIndex, double value) {

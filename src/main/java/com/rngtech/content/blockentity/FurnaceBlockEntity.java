@@ -15,6 +15,7 @@ import com.rngtech.content.recipe.FurnaceRecipe;
 import com.rngtech.content.recipe.ProcessingEnergyScaling;
 import com.rngtech.content.registry.ModBlockEntities;
 import com.rngtech.content.registry.ModTags;
+import com.rngtech.rpg.BatchProcessing;
 import com.rngtech.rpg.ComponentBaseStatCatalog;
 import com.rngtech.rpg.MachineBaseStatCatalog;
 import com.rngtech.rpg.MachineBehavior;
@@ -65,7 +66,8 @@ import java.util.function.Supplier;
 
 public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuProvider, MachineInfoProvider, MachineMasteryHost {
     public static final int MAX_PROCESSING_SLOTS = 4;
-    public static final int MAX_GEAR_SLOTS = 4;
+    /** Every lane shares the furnace's one Gear slot, so one Heat Core drives a whole Lead Furnace. */
+    public static final int MAX_GEAR_SLOTS = 1;
     public static final int SLOT_INPUT_START = 0;
     public static final int SLOT_INPUT = SLOT_INPUT_START;
     public static final int SLOT_FUEL = SLOT_INPUT_START + MAX_PROCESSING_SLOTS;
@@ -123,7 +125,8 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
     private static final int DATA_FAILURE_ENABLED_START = DATA_FAILURE_STRAIN_START + MAX_PROCESSING_SLOTS;
     private static final int DATA_POWER_SENSITIVE_START = DATA_FAILURE_ENABLED_START + MAX_PROCESSING_SLOTS;
     private static final int DATA_LEDGER_START = DATA_POWER_SENSITIVE_START + MAX_PROCESSING_SLOTS;
-    private static final int DATA_MACHINE_PROGRESSION_START = DATA_LEDGER_START + MAX_PROCESSING_SLOTS;
+    private static final int DATA_BATCH_SIZE = DATA_LEDGER_START + MAX_PROCESSING_SLOTS;
+    private static final int DATA_MACHINE_PROGRESSION_START = DATA_BATCH_SIZE + 1;
     private static final int DATA_COUNT = DATA_MACHINE_PROGRESSION_START + MasteryMenuSupport.FIELD_COUNT;
     private static final int STAT_SCALE = 100;
 
@@ -256,6 +259,7 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
                 case DATA_COOLING_RATE -> scaledStat(stats, MachineStat.COOLING_RATE);
                 case DATA_OVERHEAT_TOLERANCE -> scaledStat(stats, MachineStat.OVERHEAT_TOLERANCE);
                 case DATA_INPUT_SLOTS -> scaledStat(stats, MachineStat.INPUT_SLOTS);
+                case DATA_BATCH_SIZE -> BatchProcessing.statBatchSize(stats) * STAT_SCALE;
                 case DATA_GEAR_SLOTS -> activeGearSlots();
                 case DATA_MIN_TEMPERATURE -> currentMinimumTemperature(stats);
                 case DATA_STATUS -> statusCode(stats);
@@ -277,11 +281,10 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
     private static final RecipeCache.Search<FurnaceRecipe> RECIPE_SEARCH = (level, input, unused) -> FurnaceRecipes.find(level, input);
     /** One lookup slot per lane, plus one for stacks offered by players or automation. */
     private final RecipeCache<FurnaceRecipe> recipes = new RecipeCache<>(MAX_PROCESSING_SLOTS + 1);
-    private final MachineStatsCache displayStatsCache = new MachineStatsCache();
-    private final Supplier<MachineStatAccumulator> displayStatsBuilder = this::buildDisplayStats;
     private final MachineStatsCache[] laneStatsCaches = new MachineStatsCache[MAX_PROCESSING_SLOTS];
     private final List<Supplier<MachineStatAccumulator>> laneStatsBuilders = new ArrayList<>(MAX_PROCESSING_SLOTS);
     private final int[] progress = new int[MAX_PROCESSING_SLOTS];
+    private final int[] lockedBatch = new int[MAX_PROCESSING_SLOTS];
     private final int[] currentTemperature = new int[MAX_PROCESSING_SLOTS];
     private final int[] lastTargetTemperature = new int[MAX_PROCESSING_SLOTS];
     private final int[] lastSafeMaximumTemperature = new int[MAX_PROCESSING_SLOTS];
@@ -291,6 +294,8 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
     private final OutputLedger<Item> bloomLedger = new OutputLedger<>();
     private int burnTime;
     private int totalBurnTime;
+    /** Burn time owed by batched smelts, in thousandths of a tick. */
+    private int burnCarry;
     private int internalEnergy;
     private long energyTelemetryTick = Long.MIN_VALUE;
     private int energyInputThisTick;
@@ -309,6 +314,7 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
 
     public static void serverTick(Level level, BlockPos pos, BlockState state, FurnaceBlockEntity furnace) {
         furnace.beginEnergyTelemetryTick();
+        furnace.releaseRemovedGear(level);
         MachineStatAccumulator baseStats = furnace.baseEffectiveStats();
         int activeLanes = furnace.activeProcessingSlots(baseStats);
         boolean running = false;
@@ -337,6 +343,9 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
             }
             int requiredTemperature = furnace.requiredTemperatureForProgress(lane, recipe);
             if (furnace.currentTemperature[lane] < requiredTemperature) {
+                changed |= furnace.shareHearthHeat(lane, recipe, laneStats, activeLanes);
+            }
+            if (furnace.currentTemperature[lane] < requiredTemperature) {
                 if (furnace.payHeatTick(lane, recipe, laneStats)) {
                     changed |= furnace.warmLane(lane, recipe, laneStats, requiredTemperature);
                     running = true;
@@ -354,10 +363,10 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
             if (furnace.isElectric()) {
                 int energyCost = furnace.energyCostForProgress(lane, recipe, laneStats);
                 if (furnace.progress[lane] == 0 && ProcessingChance.rollInstant(level, laneStats)) {
-                    int fullEnergyCost = furnace.energyCostPerCraft(recipe, laneStats);
+                    int fullEnergyCost = furnace.energyCostPerCraft(recipe, laneStats) * furnace.laneBatch(lane, recipe, laneStats);
                     if (furnace.consumeWorkingEnergy(fullEnergyCost, true) >= fullEnergyCost) {
                         furnace.markInstantProcess(lane);
-                        furnace.startCycleIfNeeded(lane);
+                        furnace.startCycleIfNeeded(lane, recipe, laneStats);
                         furnace.consumeWorkingEnergy(fullEnergyCost, false);
                         if (furnace.process(lane, recipe, laneStats)) {
                             changed |= furnace.bulkSpeed.recordProcess(furnace.activeTraits());
@@ -377,14 +386,13 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
                 }
                 furnace.consumeWorkingEnergy(energyCost, false);
             } else {
-                if (!furnace.hasBurnTime() && !furnace.tryStartBurningFuel()) {
+                if (!furnace.burnWorkingFuel(lane, recipe, laneStats)) {
                     changed |= furnace.coolLane(lane, laneStats);
                     continue;
                 }
-                furnace.burnTime--;
                 if (furnace.progress[lane] == 0 && ProcessingChance.rollInstant(level, laneStats)) {
                     furnace.markInstantProcess(lane);
-                    furnace.startCycleIfNeeded(lane);
+                    furnace.startCycleIfNeeded(lane, recipe, laneStats);
                     if (furnace.process(lane, recipe, laneStats)) {
                         changed |= furnace.bulkSpeed.recordProcess(furnace.activeTraits());
                     }
@@ -394,7 +402,7 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
                 }
             }
 
-            furnace.startCycleIfNeeded(lane);
+            furnace.startCycleIfNeeded(lane, recipe, laneStats);
             changed |= furnace.updateFailureStrain(lane, recipe, laneStats);
             if (furnace.failureStrain[lane] >= HeatControl.FAILURE_STRAIN_THRESHOLD) {
                 changed |= furnace.tryFailCycle(lane, recipe);
@@ -548,6 +556,7 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
         tag.put("Inventory", inventory.serializeNBT(registries));
         tag.put("GearInventory", gearInventory.serializeNBT(registries));
         tag.putIntArray("Progresses", progress);
+        tag.putIntArray("LockedBatches", lockedBatch);
         tag.putIntArray("CurrentTemperatures", currentTemperature);
         tag.putIntArray("LastTargetTemperatures", lastTargetTemperature);
         tag.putIntArray("LastSafeMaximumTemperatures", lastSafeMaximumTemperature);
@@ -558,6 +567,7 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
         tag.putInt("Progress", progress[0]);
         tag.putInt("BurnTime", burnTime);
         tag.putInt("TotalBurnTime", totalBurnTime);
+        tag.putInt("BurnCarry", burnCarry);
         tag.putInt("Energy", internalEnergyStored());
         bulkSpeed.save(tag);
         LedgerNbt.save(tag, "BloomLedger", bloomLedger);
@@ -575,6 +585,10 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
             System.arraycopy(savedProgress, 0, progress, 0, Math.min(savedProgress.length, progress.length));
         } else {
             progress[0] = tag.getInt("Progress");
+        }
+        int[] savedBatches = tag.getIntArray("LockedBatches");
+        for (int lane = 0; lane < lockedBatch.length; lane++) {
+            lockedBatch[lane] = lane < savedBatches.length ? Math.max(0, savedBatches[lane]) : 0;
         }
         int[] savedTemperatures = tag.getIntArray("CurrentTemperatures");
         if (savedTemperatures.length > 0) {
@@ -615,6 +629,7 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
         }
         burnTime = tag.getInt("BurnTime");
         totalBurnTime = tag.getInt("TotalBurnTime");
+        burnCarry = Math.max(0, tag.getInt("BurnCarry"));
         internalEnergy = Math.max(0, tag.getInt("Energy"));
         bulkSpeed.load(tag);
         clampInternalEnergy();
@@ -637,13 +652,7 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
     }
 
     public MachineStatAccumulator effectiveStats() {
-        return displayStatsCache.get(baseEffectiveStats(), null, 0L, displayStatsBuilder);
-    }
-
-    private MachineStatAccumulator buildDisplayStats() {
-        MachineStatAccumulator stats = baseEffectiveStats().mutable();
-        applyDisplayGearStats(stats);
-        return stats;
+        return baseEffectiveStats();
     }
 
     private MachineStatAccumulator baseEffectiveStats() {
@@ -656,11 +665,10 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
         MachineTraits activeTraits = effectiveTraits();
         stats.apply(activeTraits);
         MegaPassiveTree.applyNodeStats(stats, machineProgression(), MachineMasteryFamily.FURNACE);
-        // Each lane applies only its own Heat Core, but attributes from every installed core belong to the whole Furnace.
-        int gearSlots = usesHeatCores() ? activeGearSlots() : gearInventory.getSlots();
-        for (int slot = 0; slot < gearSlots; slot++) {
+        for (int slot = 0; slot < gearInventory.getSlots(); slot++) {
             ItemStack gear = gearInventory.getStackInSlot(slot);
             if (isAllowedGearComponent(slot, gear)) {
+                ComponentBaseStatCatalog.applyEffectiveContribution(stats, gear);
                 ComponentBaseStatCatalog.applyAttributeAffixes(stats, gear);
             }
         }
@@ -675,39 +683,6 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
         }
         bulkSpeed.apply(stats, activeTraits);
         return stats;
-    }
-
-    private void applyDisplayGearStats(MachineStatAccumulator stats) {
-        if (usesHeatCores()) {
-            applyBestHeatCoreStats(stats);
-            return;
-        }
-        for (int slot = 0; slot < gearInventory.getSlots(); slot++) {
-            applyGearStats(stats, slot);
-        }
-    }
-
-    private void applyBestHeatCoreStats(MachineStatAccumulator stats) {
-        ItemStack bestCore = ItemStack.EMPTY;
-        double bestTemperature = Double.NEGATIVE_INFINITY;
-        for (int slot = 0; slot < activeGearSlots(); slot++) {
-            ItemStack gear = gearInventory.getStackInSlot(slot);
-            if (!isAllowedGearComponent(slot, gear)) {
-                continue;
-            }
-            MachineStatAccumulator gearStats = ComponentBaseStatCatalog.effectiveStats(gear);
-            if (gearStats == null) {
-                continue;
-            }
-            double temperature = gearStats.value(MachineStat.MAX_TEMPERATURE);
-            if (temperature > bestTemperature) {
-                bestTemperature = temperature;
-                bestCore = gear;
-            }
-        }
-        if (!bestCore.isEmpty()) {
-            ComponentBaseStatCatalog.applyEffectiveContribution(stats, bestCore);
-        }
     }
 
     private MachineTraits activeTraits() {
@@ -973,7 +948,17 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
     }
 
     private boolean process(int lane, FurnaceRecipe recipe, MachineStatAccumulator stats) {
-        if (level == null || !craft(lane, recipe, stats)) {
+        if (level == null) {
+            return false;
+        }
+        int batch = laneBatch(lane, recipe, stats);
+        int itemOutput = recipe.outputStack().getCount();
+        int crafted = 0;
+        // Each item keeps room for the base output of the items after it, so a bonus never strands a paid-for item.
+        while (crafted < batch && craft(lane, recipe, stats, (batch - crafted - 1) * itemOutput)) {
+            crafted++;
+        }
+        if (crafted == 0) {
             return false;
         }
         // Crucible Heart finishes a second input when the lane runs at twice the recipe target or hotter.
@@ -982,14 +967,14 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
                 && recipe.matches(new SingleRecipeInput(inventory.getStackInSlot(inputSlot(lane))), level)
                 && canMergeOutput(outputSlot(lane), recipe.outputStack())
                 && payExtraCraft(lane, recipe, stats)) {
-            craft(lane, recipe, stats);
+            craft(lane, recipe, stats, 0);
         }
         resetCycle(lane);
         setChanged();
         return true;
     }
 
-    private boolean craft(int lane, FurnaceRecipe recipe, MachineStatAccumulator stats) {
+    private boolean craft(int lane, FurnaceRecipe recipe, MachineStatAccumulator stats, int reserved) {
         ItemStack input = inventory.getStackInSlot(inputSlot(lane));
         if (!recipe.matches(new SingleRecipeInput(input), level)) {
             return false;
@@ -998,14 +983,14 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
         ItemStack baseResult = recipe.outputStack();
         ItemStack result = ProcessingChance.applySuperOutput(level, stats, recipe, baseResult, baseResult);
         int outputSlot = outputSlot(lane);
-        if (!canMergeOutput(outputSlot, result)) {
+        if (!canMergeOutput(outputSlot, result, reserved)) {
             result = baseResult;
-            if (!canMergeOutput(outputSlot, result)) {
+            if (!canMergeOutput(outputSlot, result, reserved)) {
                 return false;
             }
         }
 
-        result = withLedger(recipe, stats, input, result, outputSlot);
+        result = withLedger(recipe, stats, input, result, outputSlot, reserved);
         input.shrink(1);
         mergeOutput(outputSlot, result);
         grantRecipeXp(recipe);
@@ -1014,7 +999,14 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
     }
 
     /** The Bloom Ledger banks a share of each eligible smelt and pays whole items once the output has room. */
-    private ItemStack withLedger(FurnaceRecipe recipe, MachineStatAccumulator stats, ItemStack input, ItemStack result, int outputSlot) {
+    private ItemStack withLedger(
+            FurnaceRecipe recipe,
+            MachineStatAccumulator stats,
+            ItemStack input,
+            ItemStack result,
+            int outputSlot,
+            int reserved
+    ) {
         if (!ledgerEligible(recipe, input, stats)) {
             return result;
         }
@@ -1024,7 +1016,7 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
         bloomLedger.add(item, AscendancyFormulas.ledgerShare(stats, base.getCount(), crushed));
         int payable = bloomLedger.payable(item);
         ItemStack paid = ProcessingChance.grow(result, base, payable);
-        if (paid == result || !canMergeOutput(outputSlot, paid)) {
+        if (paid == result || !canMergeOutput(outputSlot, paid, reserved)) {
             return result;
         }
         bloomLedger.pay(item, payable);
@@ -1055,7 +1047,7 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
             consumeWorkingEnergy(cost, false);
             return true;
         }
-        int ticks = processingTicks(lane, recipe, stats);
+        int ticks = processingTicks(lane, recipe, stats, 1);
         if (burnTime < ticks) {
             return false;
         }
@@ -1120,13 +1112,16 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
             return false;
         }
 
-        ItemStack result = recipe.failureStack();
+        // A failed batch ruins every item in it.
+        int batch = laneBatch(lane, recipe, statsForLane(lane));
+        ItemStack failure = recipe.failureStack();
+        ItemStack result = failure.copyWithCount(failure.getCount() * batch);
         int outputSlot = outputSlot(lane);
         if (!canMergeOutput(outputSlot, result)) {
             return false;
         }
 
-        input.shrink(1);
+        input.shrink(batch);
         mergeOutput(outputSlot, result);
         resetCycle(lane);
         resetBulkSpeed();
@@ -1144,20 +1139,29 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
     }
 
     private boolean canAcceptFailureOutput(int lane, FurnaceRecipe recipe) {
-        return recipe.hasFailureOutput() && canMergeOutput(outputSlot(lane), recipe.failureStack());
+        if (!recipe.hasFailureOutput()) {
+            return false;
+        }
+        ItemStack failure = recipe.failureStack();
+        return canMergeOutput(outputSlot(lane), failure.copyWithCount(failure.getCount() * laneBatch(lane, recipe, statsForLane(lane))));
     }
 
     private boolean canMergeOutput(int slot, ItemStack result) {
+        return canMergeOutput(slot, result, 0);
+    }
+
+    /** Whether {@code result} fits while still leaving room for {@code reserved} more of it. */
+    private boolean canMergeOutput(int slot, ItemStack result, int reserved) {
         if (result.isEmpty()) {
             return false;
         }
         ItemStack output = inventory.getStackInSlot(slot);
         int slotLimit = Math.min(result.getMaxStackSize(), inventory.getSlotLimit(slot));
         if (output.isEmpty()) {
-            return result.getCount() <= slotLimit;
+            return result.getCount() + reserved <= slotLimit;
         }
         return ItemStack.isSameItemSameComponents(output, result)
-                && output.getCount() + result.getCount() <= slotLimit;
+                && output.getCount() + result.getCount() + reserved <= slotLimit;
     }
 
     private void mergeOutput(int slot, ItemStack result) {
@@ -1244,16 +1248,48 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
         return HeatControl.effectiveOverheatTemperature(safeMaximumTemperature, statsForLane(lane));
     }
 
-    /** Overdrive shortens a lane's cycle while it runs above the recipe target; the cycle's FE stays the same. */
     private int processingTicks(int lane, FurnaceRecipe recipe, MachineStatAccumulator stats) {
-        int ticks = stats.adjustedHeatProcessingTicks(recipe.processingTicks());
+        return processingTicks(lane, recipe, stats, laneBatch(lane, recipe, stats));
+    }
+
+    /** Overdrive shortens a lane's cycle while it runs above the recipe target; the cycle's FE stays the same. */
+    private int processingTicks(int lane, FurnaceRecipe recipe, MachineStatAccumulator stats, int batch) {
+        int ticks = BatchProcessing.batchTicks(stats.adjustedHeatProcessingTicks(recipe.processingTicks()), stats, batch);
         double overdrive = AscendancyFormulas.overdriveSpeedMultiplier(currentTemperature[lane], targetTemperature(recipe), stats);
         return Math.max(1, (int) Math.ceil(ticks / overdrive));
     }
 
+    /** Every item in a batch pays its own FE, spread over the batch's longer cycle. */
     private int energyCostForProgress(int lane, FurnaceRecipe recipe, MachineStatAccumulator stats) {
-        int adjustedTicks = processingTicks(lane, recipe, stats);
-        return stats.adjustedEnergyCostForProgress(ProcessingEnergyScaling.furnaceEnergy(recipe), adjustedTicks, progress[lane]);
+        int batch = laneBatch(lane, recipe, stats);
+        return stats.adjustedEnergyCostForProgress(
+                ProcessingEnergyScaling.furnaceEnergy(recipe) * batch,
+                processingTicks(lane, recipe, stats, batch),
+                progress[lane]
+        );
+    }
+
+    /** Heating the lane costs one item's FE rate, however large the batch. */
+    private int heatTickEnergyCost(int lane, FurnaceRecipe recipe, MachineStatAccumulator stats) {
+        return stats.adjustedEnergyCostForProgress(
+                ProcessingEnergyScaling.furnaceEnergy(recipe),
+                processingTicks(lane, recipe, stats, 1),
+                progress[lane]
+        );
+    }
+
+    /** The batch locked when the lane's cycle started, shrunk only if its input has since gone. */
+    private int laneBatch(int lane, FurnaceRecipe recipe, MachineStatAccumulator stats) {
+        int available = availableBatch(lane, recipe, stats);
+        return progress[lane] > 0 && lockedBatch[lane] > 0 ? Math.min(lockedBatch[lane], available) : available;
+    }
+
+    /** A lane batches items from its input stack, as far as its output slot has room for their base output. */
+    private int availableBatch(int lane, FurnaceRecipe recipe, MachineStatAccumulator stats) {
+        int limit = Math.min(BatchProcessing.batchSize(stats, false), inventory.getStackInSlot(inputSlot(lane)).getCount());
+        ItemStack output = recipe.outputStack();
+        return Math.max(1, BatchProcessing.largestFitting(limit,
+                batch -> batch == 1 || canMergeOutput(outputSlot(lane), output.copyWithCount(output.getCount() * batch))));
     }
 
     /** Overdrive heats toward the lane maximum, or stops Overdrive Margin below the recipe's safe maximum. */
@@ -1315,8 +1351,6 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
 
     private MachineStatAccumulator buildLaneStats(int lane) {
         MachineStatAccumulator stats = baseEffectiveStats().mutable();
-        applyLaneGearStats(stats, lane);
-        applySharedHearth(stats);
         if (hasMasteryBehavior("SLAG_RECLAIM") && inventory.getStackInSlot(inputSlot(lane)).is(ModTags.Items.MALFORMED_INGOTS)) {
             stats.apply(MegaPassiveTree.behaviorSource(machineProgression(), "SLAG_RECLAIM"), new MachineModifier(ModifierSlot.IMPLICIT, MachineStat.PROCESSING_SPEED, ModifierOperation.MORE, 2.0));
             stats.apply(MegaPassiveTree.behaviorSource(machineProgression(), "SLAG_RECLAIM"), new MachineModifier(ModifierSlot.IMPLICIT, MachineStat.ENERGY_USAGE, ModifierOperation.LESS, 0.5));
@@ -1332,37 +1366,26 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
         return stats;
     }
 
-    /** Shared Hearth: on a Heat Core furnace, every lane reaches at least 90% of the hottest core's maximum. */
-    private void applySharedHearth(MachineStatAccumulator stats) {
-        if (!usesHeatCores() || !hasMasteryBehavior("SHARED_HEARTH")) {
-            return;
+    /** Shared Hearth: a lane warming up starts from the hottest working lane's heat, up to its own target. */
+    private boolean shareHearthHeat(int lane, FurnaceRecipe recipe, MachineStatAccumulator stats, int activeLanes) {
+        if (!hasMasteryBehavior("SHARED_HEARTH")) {
+            return false;
         }
-        MachineStatAccumulator hottest = baseEffectiveStats().mutable();
-        applyBestHeatCoreStats(hottest);
-        double shared = Math.floor(hottest.value(MachineStat.MAX_TEMPERATURE) * AscendancyFormulas.SHARED_HEARTH_SHARE);
-        if (shared > stats.value(MachineStat.MAX_TEMPERATURE)) {
-            try (MachineStatAccumulator.Source ignored = stats.source(MegaPassiveTree.behaviorSource(machineProgression(), "SHARED_HEARTH"))) {
-                stats.setAbsolute(MachineStat.MAX_TEMPERATURE, shared);
+        int shared = 0;
+        for (int other = 0; other < activeLanes; other++) {
+            if (other != lane && targetReached[other]) {
+                shared = Math.max(shared, currentTemperature[other]);
             }
         }
-    }
-
-    private void applyLaneGearStats(MachineStatAccumulator stats, int lane) {
-        if (!usesHeatCores()) {
-            for (int slot = 0; slot < gearInventory.getSlots(); slot++) {
-                applyGearStats(stats, slot);
-            }
-            return;
+        int nextTemperature = Math.min(shared, Math.min(targetTemperature(recipe), stats.intValue(MachineStat.MAX_TEMPERATURE)));
+        if (nextTemperature <= currentTemperature[lane]) {
+            return false;
         }
-        int slot = Math.max(0, Math.min(lane, activeGearSlots() - 1));
-        applyGearStats(stats, slot);
-    }
-
-    private void applyGearStats(MachineStatAccumulator stats, int slot) {
-        ItemStack gear = gearInventory.getStackInSlot(slot);
-        if (isAllowedGearComponent(slot, gear)) {
-            ComponentBaseStatCatalog.applyEffectiveContribution(stats, gear);
+        currentTemperature[lane] = nextTemperature;
+        if (nextTemperature >= targetTemperature(recipe)) {
+            targetReached[lane] = true;
         }
+        return true;
     }
 
     private boolean alloyBlendActive(int lane) {
@@ -1568,7 +1591,7 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
 
     private boolean payHeatTick(int lane, FurnaceRecipe recipe, MachineStatAccumulator stats) {
         if (isElectric()) {
-            int energyCost = energyCostForProgress(lane, recipe, stats);
+            int energyCost = heatTickEnergyCost(lane, recipe, stats);
             if (consumeWorkingEnergy(energyCost, true) < energyCost) {
                 return false;
             }
@@ -1579,6 +1602,27 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
             return false;
         }
         burnTime--;
+        return true;
+    }
+
+    /**
+     * A working fuel lane burns one item's burn time per item it smelts: a batch spreads that over its longer cycle, so
+     * each tick burns batch ÷ the Batch Overhead multiplier, carried over in thousandths.
+     */
+    private boolean burnWorkingFuel(int lane, FurnaceRecipe recipe, MachineStatAccumulator stats) {
+        if (!hasBurnTime() && !tryStartBurningFuel()) {
+            return false;
+        }
+        int batch = laneBatch(lane, recipe, stats);
+        int burns = 1;
+        if (batch > 1) {
+            burnCarry += (int) Math.round(1000.0 * batch / BatchProcessing.timeMultiplier(stats, batch));
+            burns = burnCarry / 1000;
+            burnCarry %= 1000;
+        }
+        for (int burn = 0; burn < burns && (hasBurnTime() || tryStartBurningFuel()); burn++) {
+            burnTime--;
+        }
         return true;
     }
 
@@ -1632,7 +1676,7 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
         }
         failureStrain[lane] = Math.min(
                 HeatControl.FAILURE_STRAIN_THRESHOLD,
-                failureStrain[lane] + (hasPowerGrace(lane) ? HeatControl.POWER_DROP_STRAIN / 2 : HeatControl.POWER_DROP_STRAIN)
+                failureStrain[lane] + (hasPowerGrace() ? HeatControl.POWER_DROP_STRAIN / 2 : HeatControl.POWER_DROP_STRAIN)
         );
         return true;
     }
@@ -1655,26 +1699,23 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
                 && !canPayLaneEnergy(lane, recipe, stats);
     }
 
-    private boolean hasPowerGrace(int lane) {
+    private boolean hasPowerGrace() {
         if (activeTraits().hasBehavior(MachineBehavior.POWER_GRACE)) {
             return true;
         }
-        if (!usesHeatCores()) {
-            for (int slot = 0; slot < gearInventory.getSlots(); slot++) {
-                if (MachineImplicitCatalog.hasBehavior(gearInventory.getStackInSlot(slot), MachineBehavior.POWER_GRACE)) {
-                    return true;
-                }
+        for (int slot = 0; slot < gearInventory.getSlots(); slot++) {
+            if (MachineImplicitCatalog.hasBehavior(gearInventory.getStackInSlot(slot), MachineBehavior.POWER_GRACE)) {
+                return true;
             }
-            return false;
         }
-        int slot = Math.max(0, Math.min(lane, activeGearSlots() - 1));
-        return MachineImplicitCatalog.hasBehavior(gearInventory.getStackInSlot(slot), MachineBehavior.POWER_GRACE);
+        return false;
     }
 
-    private void startCycleIfNeeded(int lane) {
+    private void startCycleIfNeeded(int lane, FurnaceRecipe recipe, MachineStatAccumulator stats) {
         if (progress[lane] != 0) {
             return;
         }
+        lockedBatch[lane] = availableBatch(lane, recipe, stats);
         activeInputs[lane] = singleCopy(inventory.getStackInSlot(inputSlot(lane)));
         failureStrain[lane] = 0;
     }
@@ -1688,8 +1729,13 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
     }
 
     private boolean resetCycle(int lane) {
-        boolean changed = progress[lane] != 0 || failureStrain[lane] != 0 || targetReached[lane] || !activeInputs[lane].isEmpty();
+        boolean changed = progress[lane] != 0
+                || lockedBatch[lane] != 0
+                || failureStrain[lane] != 0
+                || targetReached[lane]
+                || !activeInputs[lane].isEmpty();
         progress[lane] = 0;
+        lockedBatch[lane] = 0;
         failureStrain[lane] = 0;
         targetReached[lane] = false;
         activeInputs[lane] = ItemStack.EMPTY;
@@ -1765,10 +1811,19 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
             return;
         }
 
+        // Furnaces once had four Gear slots, one Heat Core per Lead Furnace lane. The first item keeps the slot; the rest leave.
         ItemStackHandler legacyGear = new ItemStackHandler(Math.max(0, savedSize));
         legacyGear.deserializeNBT(registries, gearTag);
-        for (int slot = 0; slot < Math.min(legacyGear.getSlots(), MAX_GEAR_SLOTS); slot++) {
-            gearInventory.setStackInSlot(slot, legacyGear.getStackInSlot(slot));
+        for (int slot = 0; slot < legacyGear.getSlots(); slot++) {
+            ItemStack stack = legacyGear.getStackInSlot(slot);
+            if (stack.isEmpty()) {
+                continue;
+            }
+            if (gearInventory.getStackInSlot(0).isEmpty()) {
+                gearInventory.setStackInSlot(0, stack);
+            } else {
+                holdRemovedGear(stack);
+            }
         }
     }
 
