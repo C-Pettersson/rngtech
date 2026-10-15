@@ -88,6 +88,7 @@ public class MetalPressBlockEntity extends BaseMachineBlockEntity
     public static final int STATUS_WARMING = 12;
     public static final int STATUS_ROUTE_DISABLED = 13;
     public static final int STATUS_SWAPPING_MOLD = 14;
+    public static final int STATUS_FILLING_BATCH = 15;
 
     private static final double NO_BATTERY_PROCESSING_SPEED = 0.85;
     private static final int NO_BATTERY_STABILITY_PENALTY = 20;
@@ -295,7 +296,8 @@ public class MetalPressBlockEntity extends BaseMachineBlockEntity
         if (press.effectiveHeat(stats) < recipe.targetTemperature()
                 || press.tooHot(recipe, stats)
                 || press.crudePressBlocksUnstableRecipe(recipe, stats)
-                || !press.canMergeOutput(recipe.outputStack())) {
+                || !press.canMergeOutput(recipe.outputStack())
+                || press.waitsForFullBatch(recipe, stats)) {
             if (press.cool(stats)) {
                 press.setChanged();
             }
@@ -441,7 +443,7 @@ public class MetalPressBlockEntity extends BaseMachineBlockEntity
                         MachineInfoSnapshot.workState(
                                 status == STATUS_READY || status == STATUS_WARMING,
                                 getBlockState().getValue(BaseMachineBlock.ACTIVE),
-                                status == STATUS_NO_INPUT
+                                status == STATUS_NO_INPUT || status == STATUS_FILLING_BATCH
                         ),
                         MachineInfoSnapshot.BlockedReason.NONE
                 )
@@ -495,6 +497,7 @@ public class MetalPressBlockEntity extends BaseMachineBlockEntity
             case STATUS_WARMING -> "warming";
             case STATUS_ROUTE_DISABLED -> "route_disabled";
             case STATUS_SWAPPING_MOLD -> "swapping_mold";
+            case STATUS_FILLING_BATCH -> "filling_batch";
             default -> "";
         };
         return name.isEmpty() ? "" : "rngtech.press.status." + name;
@@ -738,6 +741,18 @@ public class MetalPressBlockEntity extends BaseMachineBlockEntity
     private int batchJobs(MetalPressRecipe recipe, MachineStatAccumulator stats) {
         int available = availableBatch(recipe, stats);
         return progress > 0 && lockedBatch > 0 ? Math.min(lockedBatch, available) : available;
+    }
+
+    /** Dense Batching: an idle press waits until its stack and output room fit a full batch. */
+    private boolean waitsForFullBatch(MetalPressRecipe recipe, MachineStatAccumulator stats) {
+        return progress == 0 && hasMasteryBehavior("DENSE_BATCHING") && availableBatch(recipe, stats) < fullBatch(recipe, stats);
+    }
+
+    private int fullBatch(MetalPressRecipe recipe, MachineStatAccumulator stats) {
+        if (isCircuit(recipe) || !(isPlate(recipe) || isGearOrCasing(recipe))) {
+            return 1;
+        }
+        return BatchProcessing.fullBatch(stats, false, inputStack().getMaxStackSize() / Math.max(1, recipe.inputCount()));
     }
 
     /** Plates, gears, and casings press one input set per batched item, as far as input and output allow. Circuits never batch. */
@@ -1028,6 +1043,11 @@ public class MetalPressBlockEntity extends BaseMachineBlockEntity
                         && failureStrain >= FAILURE_STRAIN_THRESHOLD
                         && !canMergeOutput(recipe.failureStack()))) {
             return STATUS_OUTPUT_FULL;
+        }
+        if (waitsForFullBatch(recipe, stats)) {
+            return inputStack().getCount() / Math.max(1, recipe.inputCount()) < fullBatch(recipe, stats)
+                    ? STATUS_FILLING_BATCH
+                    : STATUS_OUTPUT_FULL;
         }
         if (powerDropTicks > 0) {
             return STATUS_POWER_DROP;

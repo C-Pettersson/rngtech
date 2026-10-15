@@ -10,6 +10,7 @@ import com.rngtech.content.purge.FluidOutputOverflow;
 import com.rngtech.content.purge.FluidPurgeRole;
 import com.rngtech.content.purge.FluidPurgeTarget;
 import com.rngtech.content.purge.PurgeableFluidStorage;
+import com.rngtech.content.recipe.CountedIngredient;
 import com.rngtech.content.recipe.MelterRecipe;
 import com.rngtech.content.recipe.MelterRecipeInput;
 import com.rngtech.content.recipe.ShapelessMatch;
@@ -99,6 +100,7 @@ public class MelterBlockEntity extends BaseMachineBlockEntity
     public static final int STATUS_OUTPUT_TANK_FULL = 7;
     public static final int STATUS_NO_POWER = 8;
     public static final int STATUS_NO_FLUID = 9;
+    public static final int STATUS_FILLING_BATCH = 10;
     public static final int PURGE_INPUT_TANK = 0;
     public static final int PURGE_OUTPUT_TANK = 1;
 
@@ -300,7 +302,8 @@ public class MelterBlockEntity extends BaseMachineBlockEntity
         melter.escapement.observe(recipe);
         if (melter.effectiveHeat(stats) < recipe.minimumTemperature()
                 || melter.processingLevel(stats) < recipe.requiredProcessingLevel()
-                || !melter.canAcceptOutputFluid(melter.yieldedOutput(recipe, stats))) {
+                || !melter.canAcceptOutputFluid(melter.yieldedOutput(recipe, stats))
+                || melter.waitsForFullBatch(recipe, stats)) {
             BaseMachineBlock.setActive(level, pos, state, false);
             return;
         }
@@ -401,7 +404,7 @@ public class MelterBlockEntity extends BaseMachineBlockEntity
                         MachineInfoSnapshot.workState(
                                 status == STATUS_READY,
                                 getBlockState().getValue(BaseMachineBlock.ACTIVE),
-                                status == STATUS_NO_INPUT
+                                status == STATUS_NO_INPUT || status == STATUS_FILLING_BATCH
                         ),
                         MachineInfoSnapshot.BlockedReason.NONE
                 )
@@ -440,6 +443,7 @@ public class MelterBlockEntity extends BaseMachineBlockEntity
             case STATUS_OUTPUT_TANK_FULL -> "output_full";
             case STATUS_NO_POWER -> "no_power";
             case STATUS_NO_FLUID -> "no_fluid";
+            case STATUS_FILLING_BATCH -> "filling_batch";
             default -> "";
         };
         return name.isEmpty() ? "" : "rngtech.melter.status." + name;
@@ -673,6 +677,19 @@ public class MelterBlockEntity extends BaseMachineBlockEntity
         return progress > 0 && lockedBatch > 0 ? Math.min(lockedBatch, available) : available;
     }
 
+    /** Dense Batching: an idle Melter waits until its inputs, fluid, and tank room fit a full batch. */
+    private boolean waitsForFullBatch(MelterRecipe recipe, MachineStatAccumulator stats) {
+        return progress == 0 && hasMasteryBehavior("DENSE_BATCHING") && availableMelts(recipe, stats) < fullBatch(recipe, stats);
+    }
+
+    /** The two input slots and the input tank must hold every ingredient of the full batch at once. */
+    private int fullBatch(MelterRecipe recipe, MachineStatAccumulator stats) {
+        int units = recipe.itemIngredients().stream().mapToInt(CountedIngredient::count).sum();
+        int slotLimit = units <= 0 ? BatchProcessing.MAX_BATCH_SIZE : 2 * 64 / units;
+        slotLimit = Math.min(slotLimit, inputTank.getCapacity() / Math.max(1, recipe.fluidInput().amount()));
+        return BatchProcessing.fullBatch(stats, hasMasteryBehavior("FUSED_CRUCIBLES"), slotLimit);
+    }
+
     /** Each batched melt needs its own inputs, fluid, and tank room. Fused Crucibles gives up batching. */
     private int availableMelts(MelterRecipe recipe, MachineStatAccumulator stats) {
         int limit = BatchProcessing.batchSize(stats, hasMasteryBehavior("FUSED_CRUCIBLES"));
@@ -860,6 +877,11 @@ public class MelterBlockEntity extends BaseMachineBlockEntity
         }
         if (!canAcceptOutputFluid(yieldedOutput(recipe, stats))) {
             return STATUS_OUTPUT_TANK_FULL;
+        }
+        if (waitsForFullBatch(recipe, stats)) {
+            int loaded = ShapelessMatch.crafts(recipe.itemIngredients(), new ItemStack[] {primaryStack(), secondaryStack()}, BatchProcessing.MAX_BATCH_SIZE);
+            loaded = Math.min(loaded, inputTank.getFluidAmount() / Math.max(1, recipe.fluidInput().amount()));
+            return loaded < fullBatch(recipe, stats) ? STATUS_FILLING_BATCH : STATUS_OUTPUT_TANK_FULL;
         }
         int energyCost = energyCostPerTick(recipe, stats);
         return consumeWorkingEnergy(energyCost, true) < energyCost ? STATUS_NO_POWER : STATUS_READY;

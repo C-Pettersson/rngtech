@@ -16,7 +16,7 @@
                 {
                     "stat": "HEAT_WINDOW",
                     "operation": "ADD",
-                    "value": -25
+                    "value": -15
                 }
             ],
             "behaviors": [

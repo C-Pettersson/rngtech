@@ -76,6 +76,8 @@ const THEMES = {
     rowcraft: theme("Rowcraft", ["TREE_FELL_LIMIT", "ADD"], 1, 2, effect("PROCESSING_SPEED", 3),
         ["Row Markers", "Field Lines", "Survey Stakes", "Plot Chains"]),
     // Fluid Capacity for the Melter's tanks and the Forestry Companion's sprinkler tank; also in the Melter's home region.
+    // The Batch Overhead path that leads to Dense Batching.
+    batching: theme("Batching", ["BATCH_OVERHEAD", "DECREASED_PERCENT"], 8, 15, effect("BATCH_SIZE", 1, "ADD"), ["Even Loading"]),
     reservoirs: theme("Reservoirs", ["FLUID_CAPACITY", "INCREASED_PERCENT"], 10, 30, effect("RESERVE", 4, "ADD"),
         ["Holding Tanks", "Cistern Walls", "Deep Tanks", "Bulk Reservoir", "Header Cisterns", "Overflow Basin", "Settling Tanks", "Sump Pits",
             "Standpipes", "Catch Basins", "Tank Farms", "Spill Trays"])
@@ -138,7 +140,8 @@ const KEYSTONES = [
     { id: "singular_drive", layer: "core", name: "Singular Drive", effects: [effect("DRIVE", 1.5, "MORE"), effect("CONTROL", 0.5, "LESS"), effect("RESERVE", 0.5, "LESS")] },
     // The fuel Furnace pays no FE, so a matching fuel cost keeps its speed from being free there.
     { id: "redline_drive", name: "Redline Drive", effects: [effect("PROCESSING_SPEED", 1.5, "MORE"), effect("ENERGY_USAGE", 1.8, "MORE"), effect("FUEL_EFFICIENCY", 0.55, "LESS")] },
-    { id: "dense_batching", name: "Dense Batching", effects: [effect("BATCH_SIZE", 2, "ADD"), effect("PROCESSING_SPEED", 0.75, "LESS"), effect("ENERGY_USAGE", 1.25, "MORE")] },
+    // Batch Overhead already makes big batches slower, so the cost is waiting for a full batch.
+    { id: "dense_batching", name: "Dense Batching", behaviors: ["DENSE_BATCHING"], effects: [effect("BATCH_SIZE", 3, "ADD")] },
     { id: "precision_jaw_mount", name: "Precision Jaw Mount", behaviors: ["MATCHING_HEAD"], effects: [effect("OUTPUT_AMOUNT", 10), effect("CRUSHER_SALVAGE_CHANCE", 2, "ADD")] },
     { id: "soft_material_specialist", name: "Soft Material Specialist", recipeHardnessCeiling: 2, effects: [tagged("CRUSHING", effect("PROCESSING_SPEED", 3, "MORE")), effect("ENERGY_USAGE", 1.5, "MORE")] },
     { id: "heavy_yield", name: "Heavy Yield", effects: [effect("OUTPUT_AMOUNT", 15), effect("ENERGY_USAGE", 1.5, "MORE")] },
@@ -188,7 +191,9 @@ const EXTRAS = [
     { id: "melter_reservoirs", angle: 150, radius: 2500, shapes: ["fork"], theme: "reservoirs" },
     { id: "even_feed", angle: 9, radius: 2167, shapes: ["keyDirect"], keystone: true, layer: "home" },
     // Surge Cycling sits on the outer road beside the Surge (Instant Process) pockets it feeds.
-    { id: "surge_cycling", angle: 96, radius: 2300, shapes: ["keyDirect"], keystone: true, layer: "outer" }
+    { id: "surge_cycling", angle: 96, radius: 2300, shapes: ["keyDirect"], keystone: true, layer: "outer" },
+    // The Batch Overhead path sits beside Dense Batching, which it leads to.
+    { id: "batch_overhead", angle: -62, radius: 1250, shapes: ["arc"], theme: "batching" }
 ];
 
 const regionAt = angle => {

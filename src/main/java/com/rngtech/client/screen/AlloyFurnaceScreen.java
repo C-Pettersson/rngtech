@@ -598,6 +598,7 @@ public class AlloyFurnaceScreen extends AbstractContainerScreen<AlloyFurnaceMenu
             case AlloyFurnaceBlockEntity.STATUS_WARMING -> Component.translatable("rngtech.alloy_furnace.status.warming", menu.targetTemperature());
             case AlloyFurnaceBlockEntity.STATUS_POWER_DROP -> Component.translatable("rngtech.alloy_furnace.status.power_drop");
             case AlloyFurnaceBlockEntity.STATUS_FAILURE_RISK -> Component.translatable("rngtech.alloy_furnace.status.failure_risk", menu.failureStrain());
+            case AlloyFurnaceBlockEntity.STATUS_FILLING_BATCH -> Component.translatable("rngtech.machine.status.filling_batch");
             default -> Component.translatable("rngtech.alloy_furnace.status.ready");
         };
     }
@@ -607,6 +608,7 @@ public class AlloyFurnaceScreen extends AbstractContainerScreen<AlloyFurnaceMenu
             case AlloyFurnaceBlockEntity.STATUS_READY -> MachineScreenStyle.StatusState.RUNNING;
             case AlloyFurnaceBlockEntity.STATUS_NO_POWER,
                     AlloyFurnaceBlockEntity.STATUS_NO_INPUT,
+                    AlloyFurnaceBlockEntity.STATUS_FILLING_BATCH,
                     AlloyFurnaceBlockEntity.STATUS_MISSING_HEAT_CORE,
                     AlloyFurnaceBlockEntity.STATUS_MISSING_CRUCIBLE,
                     AlloyFurnaceBlockEntity.STATUS_HEAT_LOW,

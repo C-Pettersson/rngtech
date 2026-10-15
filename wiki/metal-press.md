@@ -178,7 +178,7 @@ Every node in this machine's ascendancies. See [Machine Mastery](machine-mastery
 
 | Node | Type | After | Effect |
 |---|---|---|---|
-| **Drop Hammer** | Root | — | +4 Batch Size; −25% Heat Window. Plate, gear, and casing recipes batch; circuits never do. |
+| **Drop Hammer** | Root | — | +4 Batch Size; −15% Heat Window. Plate, gear, and casing recipes batch; circuits never do. |
 | Heavy Blows | Small | Drop Hammer | 8% increased Processing Speed. |
 | **Anvil Mass** | Notable | Heavy Blows | +2 Batch Size. |
 | Fast Line | Small | Anvil Mass | 8% increased Processing Speed. |

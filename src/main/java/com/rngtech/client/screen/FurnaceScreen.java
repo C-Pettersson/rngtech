@@ -742,6 +742,7 @@ public class FurnaceScreen extends AbstractContainerScreen<FurnaceMenu> {
             case FurnaceBlockEntity.STATUS_WARMING -> Component.translatable("rngtech.furnace.status.warming", menu.targetTemperature());
             case FurnaceBlockEntity.STATUS_POWER_DROP -> Component.translatable("rngtech.furnace.status.power_drop");
             case FurnaceBlockEntity.STATUS_FAILURE_RISK -> Component.translatable("rngtech.furnace.status.failure_risk", menu.failureStrain());
+            case FurnaceBlockEntity.STATUS_FILLING_BATCH -> Component.translatable("rngtech.machine.status.filling_batch");
             default -> Component.translatable("rngtech.furnace.status.ready");
         };
     }
@@ -749,7 +750,7 @@ public class FurnaceScreen extends AbstractContainerScreen<FurnaceMenu> {
     private MachineScreenStyle.StatusState statusState() {
         return switch (menu.statusCode()) {
             case FurnaceBlockEntity.STATUS_READY -> MachineScreenStyle.StatusState.RUNNING;
-            case FurnaceBlockEntity.STATUS_NO_INPUT -> MachineScreenStyle.StatusState.IDLE;
+            case FurnaceBlockEntity.STATUS_NO_INPUT, FurnaceBlockEntity.STATUS_FILLING_BATCH -> MachineScreenStyle.StatusState.IDLE;
             case FurnaceBlockEntity.STATUS_NO_POWER,
                     FurnaceBlockEntity.STATUS_POWER_LIMITED,
                     FurnaceBlockEntity.STATUS_NO_FUEL,

@@ -2,7 +2,7 @@
 
 Source: [Batch Processing PRD](batch-processing.md).
 
-Status: **Prototype** for the 2.0 release. Slice 1 is merged and passed an in-game check on 2026-10-06. Slice 2 passes the automated checks and passed an in-game check on 2026-10-15. Slices 3–4 remain.
+Status: **Prototype** for the 2.0 release. Slice 1 is merged and passed an in-game check on 2026-10-06. Slice 2 passed an in-game check on 2026-10-15 and merged as #164. Slice 3 passes the automated checks. Slice 4 remains.
 
 ## Scope checklist
 
@@ -11,7 +11,7 @@ Status: **Prototype** for the 2.0 release. Slice 1 is merged and passed an in-ga
 - [ ] Resolve the PRD's open questions.
 - [x] Slice 1: Batch Size, Batch Overhead, shared batch helper, `DENSE_PARALLEL` removal, Single Charge, Calibrator lanes to Batch Size.
 - [x] Slice 2: Lead Furnace shared Heat Core, Furnace and Alloy Furnace batching.
-- [ ] Slice 3: Dense Batching, Batch Overhead path, and ascendancy values.
+- [x] Slice 3: Dense Batching, Batch Overhead path, and ascendancy values.
 - [ ] Slice 4: stat display, hover text, progress pips, Jade, language, and canonical docs.
 - [ ] In-game playtest.
 
@@ -47,6 +47,12 @@ Recorded 2026-10-15, during slice 2:
 - A batch keeps output room for its base items, so Super Output or a ledger payout never strands a paid-for item.
 - The Corruption `batching_machines` pool now includes the Furnace, Electric Furnace, and Alloy Furnace.
 
+Recorded 2026-10-15, during slice 3:
+
+- Dense Batching's wait applies on every batching machine through a `DENSE_BATCHING` behavior. A full batch is the batch the machine may lock, capped by what its input slots (and the Melter's tank) can hold, so a recipe that cannot batch, such as a Metal Press circuit, or a batching opt-out never waits.
+- A machine waiting for its batch shows **Filling Batch**; one with enough input but not enough output room for the batch shows its usual output-full status.
+- The Batch Overhead path is an `arc` extra pocket beside Dense Batching. Existing node IDs and positions are unchanged; the catalog grows from 1,348 to 1,351 nodes.
+
 ## Progress log
 
 - 2026-10-05: Surveyed current behavior and wrote the PRD and this state page.
@@ -66,3 +72,8 @@ Recorded 2026-10-15, during slice 2:
     - GameTests cover one core running four Lead Furnace lanes, a Furnace batch, an Alloy Furnace recipe-set batch, and a four-core Lead Furnace moving its extra cores out.
     - Wiki, Machine Stats, Current Implementation, and the generated ascendancy tables are updated.
     - In-game check passed: Lead Furnace with one core, a batched Furnace and Alloy Furnace, and a world saved with a four-core Lead Furnace.
+- 2026-10-15, slice 3:
+    - Dense Batching is +3 Batch Size and a full-batch wait, with its speed and Energy Usage costs removed.
+    - The Batch Overhead path adds two Batching nodes (8% reduced Batch Overhead each) and Even Loading (15% reduced Batch Overhead, +1 Batch Size).
+    - Drop Hammer's Heat Window drawback is −15%; Second Crucible no longer costs 15% more Energy Use.
+    - A GameTest covers the full-batch wait on the Furnace.

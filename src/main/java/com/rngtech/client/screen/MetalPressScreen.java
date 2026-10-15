@@ -666,6 +666,7 @@ public class MetalPressScreen extends AbstractContainerScreen<MetalPressMenu> {
             case MetalPressBlockEntity.STATUS_WARMING -> Component.translatable("rngtech.press.status.warming", menu.targetTemperature());
             case MetalPressBlockEntity.STATUS_ROUTE_DISABLED -> Component.translatable("rngtech.press.status.route_disabled");
             case MetalPressBlockEntity.STATUS_SWAPPING_MOLD -> Component.translatable("rngtech.press.status.swapping_mold");
+            case MetalPressBlockEntity.STATUS_FILLING_BATCH -> Component.translatable("rngtech.press.status.filling_batch");
             default -> Component.translatable("rngtech.press.status.ready");
         };
     }
@@ -675,6 +676,7 @@ public class MetalPressScreen extends AbstractContainerScreen<MetalPressMenu> {
             case MetalPressBlockEntity.STATUS_READY -> MachineScreenStyle.StatusState.RUNNING;
             case MetalPressBlockEntity.STATUS_NO_POWER,
                     MetalPressBlockEntity.STATUS_NO_INPUT,
+                    MetalPressBlockEntity.STATUS_FILLING_BATCH,
                     MetalPressBlockEntity.STATUS_MISSING_HEAT_CORE,
                     MetalPressBlockEntity.STATUS_MISSING_SERVO,
                     MetalPressBlockEntity.STATUS_MISSING_MOLD,

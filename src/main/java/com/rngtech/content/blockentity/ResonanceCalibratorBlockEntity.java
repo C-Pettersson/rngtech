@@ -98,6 +98,7 @@ public class ResonanceCalibratorBlockEntity extends BaseMachineBlockEntity
     public static final int STATUS_INSUFFICIENT_STAGE = 7;
     public static final int STATUS_OUTPUT_FULL = 8;
     public static final int STATUS_NO_POWER = 9;
+    public static final int STATUS_FILLING_BATCH = 10;
 
     private static final double NO_BATTERY_PROCESSING_SPEED = 0.85;
     private static final int NO_BATTERY_QUALITY_PENALTY = 10;
@@ -283,7 +284,7 @@ public class ResonanceCalibratorBlockEntity extends BaseMachineBlockEntity
             calibrator.resetCycle();
             calibrator.resetBulkSpeed();
         }
-        if (!calibrator.canMergeOutput(recipe.outputStack())) {
+        if (!calibrator.canMergeOutput(recipe.outputStack()) || calibrator.waitsForFullBatch(recipe, stats)) {
             BaseMachineBlock.setActive(level, pos, state, false);
             return;
         }
@@ -378,7 +379,7 @@ public class ResonanceCalibratorBlockEntity extends BaseMachineBlockEntity
                         MachineInfoSnapshot.workState(
                                 status == STATUS_READY,
                                 getBlockState().getValue(BaseMachineBlock.ACTIVE),
-                                status == STATUS_NO_INPUT
+                                status == STATUS_NO_INPUT || status == STATUS_FILLING_BATCH
                         ),
                         MachineInfoSnapshot.BlockedReason.NONE
                 )
@@ -408,6 +409,7 @@ public class ResonanceCalibratorBlockEntity extends BaseMachineBlockEntity
             case STATUS_INVALID_RECIPE -> "invalid_recipe";
             case STATUS_INSUFFICIENT_STAGE -> "insufficient_stage";
             case STATUS_OUTPUT_FULL -> "output_full";
+            case STATUS_FILLING_BATCH -> "filling_batch";
             case STATUS_NO_POWER -> "no_power";
             default -> "";
         };
@@ -736,6 +738,12 @@ public class ResonanceCalibratorBlockEntity extends BaseMachineBlockEntity
         return progress > 0 && lockedBatch > 0 ? Math.min(lockedBatch, available) : available;
     }
 
+    /** Dense Batching: an idle Calibrator waits until its input, catalyst, and stabilizer stacks fill a full batch. */
+    private boolean waitsForFullBatch(CalibrationRecipe recipe, MachineStatAccumulator stats) {
+        return progress == 0 && hasMasteryBehavior("DENSE_BATCHING")
+                && availableOperations(recipe, stats) < BatchProcessing.fullBatch(stats, false, inputStack().getMaxStackSize());
+    }
+
     /** One calibration per point of Batch Size, as far as the input, catalyst, and stabilizer stacks allow. */
     private int availableOperations(CalibrationRecipe recipe, MachineStatAccumulator stats) {
         return Math.max(1, Math.min(BatchProcessing.batchSize(stats, false), maximumOperations(recipe)));
@@ -933,6 +941,9 @@ public class ResonanceCalibratorBlockEntity extends BaseMachineBlockEntity
         }
         if (!canMergeOutput(recipe.outputStack())) {
             return STATUS_OUTPUT_FULL;
+        }
+        if (waitsForFullBatch(recipe, stats)) {
+            return STATUS_FILLING_BATCH;
         }
         int energyCost = energyCostPerTick(recipe, stats);
         return consumeWorkingEnergy(energyCost, true) < energyCost ? STATUS_NO_POWER : STATUS_READY;

@@ -98,6 +98,7 @@ public class AlloyFurnaceBlockEntity extends BaseMachineBlockEntity implements M
     public static final int STATUS_POWER_DROP = 11;
     public static final int STATUS_FAILURE_RISK = 12;
     public static final int STATUS_ROUTE_DISABLED = 13;
+    public static final int STATUS_FILLING_BATCH = 14;
 
     private static final double NO_BATTERY_PROCESSING_SPEED = 0.85;
     private static final int NO_BATTERY_STABILITY_PENALTY = 10;
@@ -292,7 +293,7 @@ public class AlloyFurnaceBlockEntity extends BaseMachineBlockEntity implements M
         furnace.escapement.observe(recipe);
         furnace.rememberHeatEnvelope(recipe, stats);
 
-        if (!furnace.canMergeOutput(recipe.outputStack())) {
+        if (!furnace.canMergeOutput(recipe.outputStack()) || furnace.waitsForFullBatch(recipe, stats)) {
             BaseMachineBlock.setActive(level, pos, state, false);
             return;
         }
@@ -970,6 +971,17 @@ public class AlloyFurnaceBlockEntity extends BaseMachineBlockEntity implements M
         return progress > 0 && lockedBatch > 0 ? Math.min(lockedBatch, available) : available;
     }
 
+    /** Dense Batching: an idle Alloy Furnace waits until its inputs and output room fit a full batch of recipe sets. */
+    private boolean waitsForFullBatch(AlloyFurnaceRecipe recipe, MachineStatAccumulator stats) {
+        return progress == 0 && hasMasteryBehavior("DENSE_BATCHING") && availableBatch(recipe, stats) < fullBatch(recipe, stats);
+    }
+
+    /** The active input slots must hold every ingredient of the full batch at once. */
+    private int fullBatch(AlloyFurnaceRecipe recipe, MachineStatAccumulator stats) {
+        int units = recipe.ingredients().stream().mapToInt(CountedIngredient::count).sum();
+        return BatchProcessing.fullBatch(stats, false, activeInputSlots(stats) * 64 / Math.max(1, units));
+    }
+
     /** A batch takes whole recipe sets, as far as the input slots hold them and the output has room for their base output. */
     private int availableBatch(AlloyFurnaceRecipe recipe, MachineStatAccumulator stats) {
         int limit = recipe.crafts(new AlloyFurnaceRecipeInput(inputStacks()), BatchProcessing.batchSize(stats, false));
@@ -1031,6 +1043,10 @@ public class AlloyFurnaceBlockEntity extends BaseMachineBlockEntity implements M
         if (!canMergeOutput(recipe.outputStack())) {
             return STATUS_OUTPUT_FULL;
         }
+        if (waitsForFullBatch(recipe, stats)) {
+            int sets = recipe.crafts(new AlloyFurnaceRecipeInput(inputStacks()), BatchProcessing.MAX_BATCH_SIZE);
+            return sets < fullBatch(recipe, stats) ? STATUS_FILLING_BATCH : STATUS_OUTPUT_FULL;
+        }
         if (failureEnabled(recipe, stats)
                 && failureStrain >= HeatControl.FAILURE_STRAIN_THRESHOLD
                 && !canMergeOutput(recipe.failureStack())) {
@@ -1055,7 +1071,7 @@ public class AlloyFurnaceBlockEntity extends BaseMachineBlockEntity implements M
             case STATUS_READY, STATUS_WARMING, STATUS_FAILURE_RISK -> getBlockState().getValue(BaseMachineBlock.ACTIVE)
                     ? MachineInfoSnapshot.WorkState.RUNNING
                     : MachineInfoSnapshot.WorkState.IDLE;
-            case STATUS_NO_INPUT -> MachineInfoSnapshot.WorkState.IDLE;
+            case STATUS_NO_INPUT, STATUS_FILLING_BATCH -> MachineInfoSnapshot.WorkState.IDLE;
             case STATUS_POWER_DROP -> MachineInfoSnapshot.WorkState.PAUSED;
             default -> MachineInfoSnapshot.WorkState.BLOCKED;
         };

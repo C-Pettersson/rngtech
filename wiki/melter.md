@@ -120,7 +120,7 @@ Every node in this machine's ascendancies. See [Machine Mastery](machine-mastery
 
 | Node | Type | After | Effect |
 |---|---|---|---|
-| **Second Crucible** | Root | — | +2 Batch Size; 15% more Energy Use. Each batched melt needs its own inputs, fluid, and tank room. |
+| **Second Crucible** | Root | — | +2 Batch Size. Each batched melt needs its own inputs, fluid, and tank room. |
 | Steady Feed | Small | Second Crucible | 8% increased Processing Speed. |
 | **Crush Feed** | Notable | Steady Feed | +10% Overlevel Speed. |
 | Hot Walls | Small | Second Crucible | 4% increased Max Temperature. |

@@ -3054,6 +3054,17 @@
             "gate": "path_0518",
             "region": "reserve",
             "layer": "outer"
+        },
+        {
+            "id": "reward_400",
+            "x": 4335,
+            "y": 3312,
+            "role": "reward",
+            "shape": "arc",
+            "gate": "path_0082",
+            "theme": "Batching",
+            "region": "control_drive",
+            "layer": "home"
         }
     ],
     "nodes": [
@@ -30325,6 +30336,71 @@
             "group": "reward_397"
         },
         {
+            "effects": [
+                {
+                    "stat": "BATCH_OVERHEAD",
+                    "operation": "DECREASED_PERCENT",
+                    "value": 8
+                }
+            ],
+            "behaviors": [],
+            "fixed": {},
+            "ceilings": {},
+            "scaling": [],
+            "passive": {},
+            "id": "even_loading_1",
+            "name": "Batching",
+            "kind": "NODE",
+            "x": 4359,
+            "y": 3359,
+            "group": "reward_400"
+        },
+        {
+            "effects": [
+                {
+                    "stat": "BATCH_OVERHEAD",
+                    "operation": "DECREASED_PERCENT",
+                    "value": 8
+                }
+            ],
+            "behaviors": [],
+            "fixed": {},
+            "ceilings": {},
+            "scaling": [],
+            "passive": {},
+            "id": "even_loading_2",
+            "name": "Batching",
+            "kind": "NODE",
+            "x": 4331,
+            "y": 3319,
+            "group": "reward_400"
+        },
+        {
+            "effects": [
+                {
+                    "stat": "BATCH_OVERHEAD",
+                    "operation": "DECREASED_PERCENT",
+                    "value": 15
+                },
+                {
+                    "stat": "BATCH_SIZE",
+                    "operation": "ADD",
+                    "value": 1
+                }
+            ],
+            "behaviors": [],
+            "fixed": {},
+            "ceilings": {},
+            "scaling": [],
+            "passive": {},
+            "id": "even_loading",
+            "kind": "NOTABLE",
+            "name": "Even Loading",
+            "x": 4316,
+            "y": 3257,
+            "group": "reward_400"
+        },
+        {
             "effects": [],
             "behaviors": [
                 "MUTE_MACHINE_SOUND"
@@ -30581,20 +30657,12 @@
                 {
                     "stat": "BATCH_SIZE",
                     "operation": "ADD",
-                    "value": 2
-                },
-                {
-                    "stat": "PROCESSING_SPEED",
-                    "operation": "LESS",
-                    "value": 0.75
-                },
-                {
-                    "stat": "ENERGY_USAGE",
-                    "operation": "MORE",
-                    "value": 1.25
+                    "value": 3
                 }
             ],
-            "behaviors": [],
+            "behaviors": [
+                "DENSE_BATCHING"
+            ],
             "fixed": {},
             "ceilings": {},
             "scaling": [],
@@ -37129,6 +37197,18 @@
         [
             "path_0518",
             "surge_cycling"
+        ],
+        [
+            "path_0082",
+            "even_loading_1"
+        ],
+        [
+            "even_loading_1",
+            "even_loading_2"
+        ],
+        [
+            "even_loading_2",
+            "even_loading"
         ]
     ]
 }

@@ -88,6 +88,7 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
     public static final int STATUS_FAILURE_RISK = 10;
     public static final int STATUS_POWER_LIMITED = 11;
     public static final int STATUS_HEAT_HIGH = 12;
+    public static final int STATUS_FILLING_BATCH = 13;
 
     /** Share of an electric recipe's FE that Closed Loop Recuperator returns to the internal buffer. */
     private static final double CLOSED_LOOP_REFUND = 0.25D;
@@ -726,7 +727,8 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
             return null;
         }
         FurnaceRecipe recipe = laneRecipe(lane);
-        if (recipe == null || !meetsRecipeRequirements(recipe, stats, input) || !canAcceptOutput(lane, recipe)) {
+        if (recipe == null || !meetsRecipeRequirements(recipe, stats, input) || !canAcceptOutput(lane, recipe)
+                || waitsForFullBatch(lane, recipe, stats)) {
             return null;
         }
         return recipe;
@@ -843,6 +845,10 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
                 blockedStatus = STATUS_OUTPUT_FULL;
                 continue;
             }
+            if (waitsForFullBatch(lane, recipe, laneStats)) {
+                blockedStatus = input.getCount() < fullBatch(lane, laneStats) ? STATUS_FILLING_BATCH : STATUS_OUTPUT_FULL;
+                continue;
+            }
             if (failureEnabled(lane, laneStats)
                     && failureStrain[lane] >= HeatControl.FAILURE_STRAIN_THRESHOLD
                     && !canAcceptFailureOutput(lane, recipe)) {
@@ -912,7 +918,9 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
                     ? MachineInfoSnapshot.WorkState.RUNNING
                     : MachineInfoSnapshot.WorkState.IDLE;
         }
-        return status == STATUS_NO_INPUT ? MachineInfoSnapshot.WorkState.IDLE : MachineInfoSnapshot.WorkState.BLOCKED;
+        return status == STATUS_NO_INPUT || status == STATUS_FILLING_BATCH
+                ? MachineInfoSnapshot.WorkState.IDLE
+                : MachineInfoSnapshot.WorkState.BLOCKED;
     }
 
     private static boolean hasEnergyDemandStatus(int status) {
@@ -1282,6 +1290,15 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
     private int laneBatch(int lane, FurnaceRecipe recipe, MachineStatAccumulator stats) {
         int available = availableBatch(lane, recipe, stats);
         return progress[lane] > 0 && lockedBatch[lane] > 0 ? Math.min(lockedBatch[lane], available) : available;
+    }
+
+    /** Dense Batching: an idle lane waits until its stack and output room fit a full batch. */
+    private boolean waitsForFullBatch(int lane, FurnaceRecipe recipe, MachineStatAccumulator stats) {
+        return progress[lane] == 0 && hasMasteryBehavior("DENSE_BATCHING") && availableBatch(lane, recipe, stats) < fullBatch(lane, stats);
+    }
+
+    private int fullBatch(int lane, MachineStatAccumulator stats) {
+        return BatchProcessing.fullBatch(stats, false, inventory.getStackInSlot(inputSlot(lane)).getMaxStackSize());
     }
 
     /** A lane batches items from its input stack, as far as its output slot has room for their base output. */
