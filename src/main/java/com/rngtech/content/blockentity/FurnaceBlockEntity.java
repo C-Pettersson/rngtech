@@ -953,7 +953,7 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
         if (crafted == 0) {
             return false;
         }
-        resetCycle(lane);
+        completeCycle(lane);
         setChanged();
         return true;
     }
@@ -1609,6 +1609,7 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
                 fullFailure ? recipe.requiredTemperatureStability() : 0.0,
                 stats
         );
+        addedStrain = HeatControl.paced(addedStrain, workTemperature, envelope);
         if (FurnacePassiveTree.usesQuenchProtocol(machineProgression())) {
             addedStrain = HeatControl.quenched(addedStrain);
         }
@@ -1676,7 +1677,6 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
         }
         lockedBatch[lane] = availableBatch(lane, recipe, stats);
         activeInputs[lane] = singleCopy(inventory.getStackInSlot(inputSlot(lane)));
-        failureStrain[lane] = 0;
     }
 
     private boolean activeCycleMatches(int lane) {
@@ -1696,6 +1696,13 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
         failureStrain[lane] = 0;
         activeInputs[lane] = ItemStack.EMPTY;
         return changed;
+    }
+
+    /** A finished cycle keeps its lane's strain: only time in the safe band drains it, so short cycles cannot dodge it. */
+    private void completeCycle(int lane) {
+        int strain = failureStrain[lane];
+        resetCycle(lane);
+        failureStrain[lane] = strain;
     }
 
     private void resetAllCycles() {

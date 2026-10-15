@@ -856,7 +856,7 @@ public class MetalPressBlockEntity extends BaseMachineBlockEntity
             grantRecipeXp(recipe);
         }
         escapement.completed();
-        resetCycle();
+        completeCycle();
         setChanged();
         return true;
     }
@@ -1175,6 +1175,7 @@ public class MetalPressBlockEntity extends BaseMachineBlockEntity
                 requiredStability,
                 stats
         );
+        addedStrain = HeatControl.paced(addedStrain, workTemperature, envelope);
         if (hasMasteryBehavior("TOLERANCE_MAP")) {
             addedStrain = (int) Math.round(addedStrain * 0.6);
         }
@@ -1226,7 +1227,6 @@ public class MetalPressBlockEntity extends BaseMachineBlockEntity
         lockedBatch = availableBatch(recipe, stats);
         activeInput = singleCopy(inputStack());
         activeMold = singleCopy(moldStack());
-        failureStrain = 0;
         powerDropTicks = 0;
         if (bulkSpeed.startRecipe(recipe)) {
             setChanged();
@@ -1265,6 +1265,13 @@ public class MetalPressBlockEntity extends BaseMachineBlockEntity
         powerDropTicks = 0;
         activeInput = ItemStack.EMPTY;
         activeMold = ItemStack.EMPTY;
+    }
+
+    /** A finished cycle keeps its strain: only time in the safe band drains it, so short cycles cannot dodge it. */
+    private void completeCycle() {
+        int strain = failureStrain;
+        resetCycle();
+        failureStrain = strain;
     }
 
     private void resetBulkSpeed() {

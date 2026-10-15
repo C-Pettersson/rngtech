@@ -655,7 +655,7 @@ public class AlloyFurnaceBlockEntity extends BaseMachineBlockEntity implements M
         mergeOutput(result);
         lastRecipe = recipe;
         escapement.completed();
-        resetCycle();
+        completeCycle();
         // Continuous Pour: the next blend craft starts without warming back up to its target.
         pourContinues = blend(recipe) && hasMasteryBehavior("CONTINUOUS_POUR");
         setChanged();
@@ -1302,6 +1302,7 @@ public class AlloyFurnaceBlockEntity extends BaseMachineBlockEntity implements M
                 recipe.requiredTemperatureStability(),
                 stats
         );
+        addedStrain = HeatControl.paced(addedStrain, workTemperature, envelope);
         if (hasMasteryBehavior("QUENCH_PROTOCOL")) {
             addedStrain = HeatControl.quenched(addedStrain);
         }
@@ -1340,7 +1341,6 @@ public class AlloyFurnaceBlockEntity extends BaseMachineBlockEntity implements M
         activeInputs = Arrays.stream(inputStacks())
                 .map(AlloyFurnaceBlockEntity::singleCopy)
                 .toArray(ItemStack[]::new);
-        failureStrain = 0;
         if (bulkSpeed.startRecipe(recipe)) {
             setChanged();
         }
@@ -1381,6 +1381,13 @@ public class AlloyFurnaceBlockEntity extends BaseMachineBlockEntity implements M
         lockedBatch = 0;
         failureStrain = 0;
         activeInputs = emptyInputs();
+    }
+
+    /** A finished cycle keeps its strain: only time in the safe band drains it, so short cycles cannot dodge it. */
+    private void completeCycle() {
+        int strain = failureStrain;
+        resetCycle();
+        failureStrain = strain;
     }
 
     private void resetBulkSpeed() {

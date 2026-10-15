@@ -95,6 +95,14 @@ final class HeatControl {
         return Mth.clamp((int) Math.round(risk), 0, 100);
     }
 
+    /**
+     * Temperature strain per tick scaled by the heat factor, so strain is counted per unit of work: running hotter speeds
+     * crafting up, and must not outrun its own risk.
+     */
+    static int paced(int addedStrain, double workTemperature, HeatEngine.Envelope envelope) {
+        return (int) Math.round(addedStrain * Math.max(1.0, HeatEngine.heatFactor(workTemperature, envelope)));
+    }
+
     /** Strain drained per tick inside the safe band; Strain Recovery adds to it. */
     static int strainRecovery(MachineStatAccumulator stats) {
         return Math.max(4, (int) Math.round(6.0 * Math.max(0.25, stats.value(MachineStat.TEMPERATURE_STABILITY))))
