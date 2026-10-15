@@ -62,9 +62,10 @@ public final class UniqueStatReaders {
         stats(Reader.MINERS_COMPANION, Set.of(), MachineStat.PROCESSING_LEVEL);
         stats(Reader.FURNACE, HEAT_CONTROL, MachineStat.ENERGY_USAGE, MachineStat.FUEL_EFFICIENCY, MachineStat.FUEL_DURATION,
                 MachineStat.PROCESSING_SPEED, MachineStat.EFFICIENCY, MachineStat.OVERDRIVE_MARGIN, MachineStat.OVERDRIVE_CAP,
-                MachineStat.OVERDRIVE_SPEED);
+                MachineStat.OVERDRIVE_SPEED, MachineStat.BATCH_SIZE, MachineStat.BATCH_OVERHEAD);
         stats(Reader.ALLOY_FURNACE, HEAT_CONTROL, MachineStat.ENERGY_USAGE, MachineStat.PROCESSING_SPEED, MachineStat.STABILITY,
-                MachineStat.INPUT_SLOTS, MachineStat.BLEND_SPEED, MachineStat.BLEND_HEAT_REDUCTION, MachineStat.ESCAPEMENT_SPEED);
+                MachineStat.INPUT_SLOTS, MachineStat.BLEND_SPEED, MachineStat.BLEND_HEAT_REDUCTION, MachineStat.ESCAPEMENT_SPEED,
+                MachineStat.BATCH_SIZE, MachineStat.BATCH_OVERHEAD);
         stats(Reader.METAL_PRESS, HEAT_CONTROL, MachineStat.ENERGY_USAGE, MachineStat.PROCESSING_SPEED, MachineStat.STABILITY,
                 MachineStat.EFFICIENCY, MachineStat.MOLD_SWAP_TIME, MachineStat.HEAT_WINDOW, MachineStat.ESCAPEMENT_SPEED,
                 MachineStat.BATCH_SIZE, MachineStat.BATCH_OVERHEAD);

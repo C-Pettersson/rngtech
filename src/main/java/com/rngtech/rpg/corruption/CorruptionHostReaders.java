@@ -25,15 +25,18 @@ public final class CorruptionHostReaders {
             MachineStat.CALIBRATION_PRECISION
     );
     private static final Set<MachineStat> BATCHING_EXTRAS = EnumSet.of(MachineStat.BATCH_SIZE);
-    private static final Map<String, Set<MachineStat>> EXTRA_STATS = Map.of(
-            "crush_head", EnumSet.of(MachineStat.PROCESSING_LEVEL, MachineStat.JAM_CHANCE, MachineStat.JAM_RECOVERY),
-            "alloy_crucible", EnumSet.of(MachineStat.BLEND_SPEED),
-            "resonance_coil", CALIBRATION_GEAR_EXTRAS,
-            "control_board", CALIBRATION_GEAR_EXTRAS,
-            "stabilizer_matrix", CALIBRATION_GEAR_EXTRAS,
-            "melter", BATCHING_EXTRAS,
-            "metal_press", BATCHING_EXTRAS,
-            "resonance_calibrator", BATCHING_EXTRAS
+    private static final Map<String, Set<MachineStat>> EXTRA_STATS = Map.ofEntries(
+            Map.entry("crush_head", EnumSet.of(MachineStat.PROCESSING_LEVEL, MachineStat.JAM_CHANCE, MachineStat.JAM_RECOVERY)),
+            Map.entry("alloy_crucible", EnumSet.of(MachineStat.BLEND_SPEED)),
+            Map.entry("resonance_coil", CALIBRATION_GEAR_EXTRAS),
+            Map.entry("control_board", CALIBRATION_GEAR_EXTRAS),
+            Map.entry("stabilizer_matrix", CALIBRATION_GEAR_EXTRAS),
+            Map.entry("furnace", BATCHING_EXTRAS),
+            Map.entry("electric_furnace", BATCHING_EXTRAS),
+            Map.entry("alloy_furnace", BATCHING_EXTRAS),
+            Map.entry("melter", BATCHING_EXTRAS),
+            Map.entry("metal_press", BATCHING_EXTRAS),
+            Map.entry("resonance_calibrator", BATCHING_EXTRAS)
     );
     private static final Map<String, Set<MachineBehavior>> EXTRA_BEHAVIORS = Map.of(
             "servo", EnumSet.of(MachineBehavior.AUTO_PURGE)

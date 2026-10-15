@@ -72,7 +72,17 @@ public record AlloyFurnaceRecipe(
     }
 
     public Optional<Match> match(AlloyFurnaceRecipeInput input) {
-        return Optional.ofNullable(ShapelessMatch.consumed(ingredients, input.stacks(), 1)).map(Match::new);
+        return match(input, 1);
+    }
+
+    /** The units each slot gives to {@code crafts} whole recipe sets at once. */
+    public Optional<Match> match(AlloyFurnaceRecipeInput input, int crafts) {
+        return Optional.ofNullable(ShapelessMatch.consumed(ingredients, input.stacks(), crafts)).map(Match::new);
+    }
+
+    /** The most whole recipe sets, up to {@code limit}, that the input slots hold. */
+    public int crafts(AlloyFurnaceRecipeInput input, int limit) {
+        return ShapelessMatch.crafts(ingredients, input.stacks(), limit);
     }
 
     @Override

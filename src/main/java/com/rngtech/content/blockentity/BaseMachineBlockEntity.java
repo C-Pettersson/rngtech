@@ -362,6 +362,13 @@ public abstract class BaseMachineBlockEntity extends BlockEntity implements Refi
         gearInventory.deserializeNBT(registries, current.serializeNBT(registries));
     }
 
+    /** Holds Gear that lost its slot on load until {@link #releaseRemovedGear} moves it out. */
+    protected void holdRemovedGear(ItemStack stack) {
+        if (!stack.isEmpty()) {
+            removedGear.add(stack);
+        }
+    }
+
     /**
      * Moves held Gear from {@link #loadGearWithoutSlot} into an adjacent item handler, then drops the rest once a player
      * is close enough to collect it before it despawns. Until then it stays saved on the machine.

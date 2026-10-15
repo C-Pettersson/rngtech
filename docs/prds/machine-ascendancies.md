@@ -410,7 +410,7 @@ Refiner's Oath counts Parallel Jobs from every source: chassis, Crusher Throughp
 | +5% Overdrive Cap → **Superheat** | +15% Overdrive Cap. | S → S |
 | 10% increased Heat Isolation → **Hold the Fire** | A lane does not cool while its input slot holds a valid input. | S → H |
 | +10 °C Overdrive Margin → **Safe Margin** | +15 °C Overdrive Margin; Overdrive never enters a recipe's overheat band. | S → H |
-| 4% increased Max Temperature → **Shared Hearth** | Lead Furnace: every lane uses the hottest installed Heat Core's maximum at 90%. | S → H |
+| 4% increased Max Temperature → **Shared Hearth** | Lead Furnace: a lane warming up starts at the hottest working lane's temperature, up to its own target. | S → H |
 | 10% increased Heat Transfer → ★ **Crucible Heart** (after Superheat) | Recipes whose target is at most half the lane's temperature finish two inputs per cycle at twice the FE. | N |
 | +2 Strain Recovery → ★ **Strain Bleed** (after Safe Margin) | +10 Strain Recovery: failure strain drains 10 per tick while a lane is inside its safe band. | S |
 

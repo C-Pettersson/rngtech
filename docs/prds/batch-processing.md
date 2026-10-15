@@ -145,7 +145,7 @@ Chassis that are built around bulk work can author a lower base Batch Overhead a
 - Lanes come only from chassis identity (`INPUT_SLOTS` on the Lead Furnace). Affixes, refinement, and Mastery never change lane count.
 - Each lane runs its own recipe and locks its own batch.
 - Gear is shared. One Heat Core drives every Lead Furnace lane, so one core is enough for full throughput.
-- The Lead Furnace's three extra Heat Core slots are removed. On load, cores in the removed slots drop at the block, as they would if it were broken.
+- The Lead Furnace's three extra Heat Core slots are removed. On load, cores in the removed slots move to an adjacent inventory, or drop at the block once a player is near, like other retired Gear slots.
 - Total throughput is lanes × the batch each lane runs.
 
 The Resonance Calibrator's "lanes" all draw from one input slot, so they are a batch size rather than lanes. Lead and Tungstensteel chassis author a base Batch Size of 2 and 3 instead of a lane count. Lane-worded nodes and text (Lane Sync, Wide Tolerance, Shared Field) are reworded to batch terms with the same thresholds.
@@ -204,7 +204,7 @@ Today's code counted these nodes as `1 + Parallel Jobs` on top of a base of 1, s
 Crucible Heart and Shared Hearth depend on how Furnace heat works, so they move to a separate Furnace heat model PRD. Until that lands:
 
 - Crucible Heart keeps its current rule.
-- Shared Hearth does nothing on a Lead Furnace with one shared Heat Core. Its new effect is decided in the heat model PRD.
+- Shared Hearth gets an interim rule: a lane warming up starts at the hottest working lane's temperature, up to its own target. The heat model PRD replaces it.
 
 ## UI
 
@@ -226,7 +226,7 @@ Follows [Machine GUI Design](../reference/machine-gui-design.md).
 
 - `parallel_jobs` decodes as `BATCH_SIZE` in the stat codec. Datapacks and stored modifiers keep working.
 - `DENSE_PARALLEL` decodes and is ignored.
-- Lead Furnace cores in removed Gear slots drop at the block on load.
+- Lead Furnace cores in removed Gear slots move to an adjacent inventory on load, or drop once a player is near.
 - Mastery allocations stay. Node IDs do not change. New nodes use new IDs in a new pocket.
 
 ## Slices

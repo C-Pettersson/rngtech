@@ -94,7 +94,7 @@ Stage 4 and higher metal recipes also need temperature stability. A Stage 0–3 
 | 2 | {{ item('rngtech:copper_furnace_chassis') }} | Better early heat throughput and energy use. |
 | 3 | {{ item('rngtech:bronze_furnace_chassis') }} | Smelts Bronze Blend and Steel Blend faster. |
 | 4 | {{ item('rngtech:steel_furnace_chassis') }} | More efficient midgame chassis. |
-| 4 | {{ item('rngtech:lead_furnace_chassis') }} | Four smelting lanes and four Heat Core slots, at half the base speed. |
+| 4 | {{ item('rngtech:lead_furnace_chassis') }} | Four smelting lanes sharing one Heat Core, at half the base speed. |
 | 5 | {{ item('rngtech:aluminum_furnace_chassis') }} | Fast, efficient body with quick heat transfer. |
 | 6 | {{ item('rngtech:titanium_furnace_chassis') }} | High-heat advanced chassis. |
 | 7 | {{ item('rngtech:tungstensteel_furnace_chassis') }} | Heavy late-game heat chassis. |
@@ -102,11 +102,15 @@ Stage 4 and higher metal recipes also need temperature stability. A Stage 0–3 
 
 Higher-stage metal recipes cost more FE: Stage 5–8 recipes cost 2×, 3×, 4× and 6× the early baseline. Recipes needing 1,750 heat or more cost another 2× on electric Furnaces.
 
+### Batching
+
+With a Batch Size above 1, each lane smelts several items from its input stack in one cycle. A batch takes as many items as the stack and the lane's free output space allow, up to the Batch Size, and keeps that count until the cycle ends. Each extra item makes the cycle longer by the Batch Overhead, 25% of one item's time to start with. Every item still pays its own FE, or its own burn time on the Stage 0 Furnace, and earns its own XP. Heating a lane costs the same however many items it batches. If a batch fails, every item in it becomes a {{ item('rngtech:malformed_ingot') }}.
+
 ### Gear
 
 Electric Furnaces have a Gear tab with:
 
-- one **Heat Core** slot (four on the Lead Furnace, one per lane). The core's stage cannot exceed the chassis stage. On the Lead Furnace each lane heats with its own core, and the four cores do not combine. The Stats tab shows the strongest core, the one with the highest maximum temperature.
+- one **Heat Core** slot. The core's stage cannot exceed the chassis stage. On the Lead Furnace one core heats all four lanes. A Lead Furnace built before lanes shared their core keeps its first core; the others go into an inventory beside it, or drop once a player is nearby.
 - one **Battery Cell** slot. Without a cell, the Furnace keeps only a small internal buffer and smelts more slowly. If the Furnace has enough FE stored but the cell cannot hand it over fast enough for the current work, the status reads **Cell Rate Limited** instead of No Power. A cell with a higher Output rate fixes it.
 
 The Stage 0 Furnace burns fuel from a slot on its Process tab and does not need Gear to run. Its Efficiency, Fuel Efficiency, and Fuel Duration stats all make each fuel item burn longer, so one item smelts more.
@@ -166,7 +170,7 @@ Every node in this machine's ascendancies. See [Machine Mastery](machine-mastery
 | Steady Hands | Small | Safe Margin | +2 Strain Recovery. |
 | **Strain Bleed** | Deep notable | Steady Hands | +10 Strain Recovery. |
 | Stoked Hearth | Small | Overdrive Lanes | 4% increased Max Temperature. |
-| **Shared Hearth** | Notable | Stoked Hearth | Every lane uses the hottest installed Heat Core’s maximum at 90%. |
+| **Shared Hearth** | Notable | Stoked Hearth | A lane warming up starts at the hottest working lane’s temperature, up to its own target. |
 
 ### Bloomer
 

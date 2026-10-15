@@ -12,7 +12,7 @@ public enum FurnaceChassisMaterial implements StringRepresentable {
     COPPER("copper_furnace_chassis", 2, true, 500, 72, 1.08, 1.05, 1.02, 1.05, 1.0, 1, 1),
     BRONZE("bronze_furnace_chassis", 3, true, 700, 64, 1.15, 1.08, 1.06, 1.00, 1.0, 1, 1),
     STEEL("steel_furnace_chassis", 4, true, 900, 96, 1.20, 1.12, 1.10, 0.92, 1.0, 1, 1),
-    LEAD("lead_furnace_chassis", 4, true, 1100, 128, 1.05, 0.50, 0.95, 1.20, 1.0, 4, 4),
+    LEAD("lead_furnace_chassis", 4, true, 1100, 128, 1.05, 0.50, 0.95, 1.20, 1.0, 4, 1),
     ALUMINUM("aluminum_furnace_chassis", 5, true, 800, 128, 1.30, 1.18, 1.08, 0.90, 1.0, 1, 1),
     TITANIUM("titanium_furnace_chassis", 6, true, 1200, 144, 1.40, 1.22, 1.14, 0.86, 1.0, 1, 1),
     TUNGSTENSTEEL("tungstensteel_furnace_chassis", 7, true, 1600, 112, 1.55, 1.15, 1.22, 0.82, 1.0, 1, 1),

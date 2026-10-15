@@ -46,7 +46,6 @@ public class FurnaceChassisBlockItem extends MachineBlockItem {
             tooltipComponents.add(Component.translatable(
                     "rngtech.tooltip.furnace_chassis.multi_lane",
                     material.processingSlots(),
-                    material.heatCoreSlots(),
                     material.processingSpeed()
             ).withStyle(ChatFormatting.GRAY));
         }

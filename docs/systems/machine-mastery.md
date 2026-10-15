@@ -33,7 +33,7 @@ All nodes remain visible and selectable regardless of machine family. Applicabil
 
 Control, Drive, and Reserve are point totals. Travel nodes grant flat points; dedicated clusters increase individual attributes or all three attributes. Attribute increases use the same modifier rules as other stats.
 
-Machines with Mastery and the Gear they accept can also roll flat attribute suffixes, one modifier group per attribute; [Affix Generation](affix-generation.md#attribute-suffixes) owns their tiers and weights. Attribute points are machine-wide even on a part, so the Furnace counts every installed Heat Core's points although each lane applies only its own core. Machines apply the tree's node effects, then Gear, then the conversions and explicit scaling below, so Gear points feed both.
+Machines with Mastery and the Gear they accept can also roll flat attribute suffixes, one modifier group per attribute; [Affix Generation](affix-generation.md#attribute-suffixes) owns their tiers and weights. Attribute points are machine-wide even on a part. Machines apply the tree's node effects, then Gear, then the conversions and explicit scaling below, so Gear points feed both.
 
 Inherent conversions use final, nonnegative attribute totals:
 

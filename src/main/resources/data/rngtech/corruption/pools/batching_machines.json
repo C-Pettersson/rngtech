@@ -1,6 +1,9 @@
 {
     "hosts": [
         "crusher",
+        "furnace",
+        "electric_furnace",
+        "alloy_furnace",
         "melter",
         "metal_press",
         "resonance_calibrator"

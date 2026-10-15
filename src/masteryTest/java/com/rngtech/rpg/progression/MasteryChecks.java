@@ -349,8 +349,10 @@ public final class MasteryChecks {
         near(melterHeat.value(MachineStat.MAX_TEMPERATURE), 4000, "a temperature ceiling cannot strand a Melter below its recipes");
         require(MachineMasteryFamily.MELTER.supports(MachineStat.MAX_TEMPERATURE) && MachineMasteryFamily.FURNACE.supportsAbsolute(MachineStat.MAX_TEMPERATURE),
                 "the Melter keeps ordinary heat bonuses while other heat machines keep absolute constraints");
-        require(!MachineMasteryFamily.FURNACE.supports(MachineStat.OUTPUT_AMOUNT) && !MachineMasteryFamily.FURNACE.supports(MachineStat.BATCH_SIZE)
-                && MachineMasteryFamily.FURNACE.supports(MachineStat.SUPER_OUTPUT_CHANCE), "only the Crusher reads Output Amount and Parallel Jobs");
+        require(!MachineMasteryFamily.FURNACE.supports(MachineStat.OUTPUT_AMOUNT)
+                && MachineMasteryFamily.FURNACE.supports(MachineStat.SUPER_OUTPUT_CHANCE), "only the Crusher reads Output Amount");
+        require(MachineMasteryFamily.FURNACE.supports(MachineStat.BATCH_SIZE) && MachineMasteryFamily.ALLOY_FURNACE.supports(MachineStat.BATCH_SIZE)
+                && !MachineMasteryFamily.FORESTRY.supports(MachineStat.BATCH_SIZE), "every recipe machine batches; Forestry does not");
     }
 
     private static void taggedPayoffs() {

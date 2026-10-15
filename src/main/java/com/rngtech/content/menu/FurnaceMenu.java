@@ -77,7 +77,8 @@ public class FurnaceMenu extends AbstractContainerMenu implements MasteryMenuVie
     private static final int DATA_FAILURE_ENABLED_START = DATA_FAILURE_STRAIN_START + MAX_PROCESSING_SLOTS;
     private static final int DATA_POWER_SENSITIVE_START = DATA_FAILURE_ENABLED_START + MAX_PROCESSING_SLOTS;
     private static final int DATA_LEDGER_START = DATA_POWER_SENSITIVE_START + MAX_PROCESSING_SLOTS;
-    private static final int DATA_MACHINE_PROGRESSION_START = DATA_LEDGER_START + MAX_PROCESSING_SLOTS;
+    private static final int DATA_BATCH_SIZE = DATA_LEDGER_START + MAX_PROCESSING_SLOTS;
+    private static final int DATA_MACHINE_PROGRESSION_START = DATA_BATCH_SIZE + 1;
     private static final int DATA_COUNT = DATA_MACHINE_PROGRESSION_START + MasteryMenuSupport.FIELD_COUNT;
     private static final int STAT_SCALE = 100;
     private static final int MACHINE_SLOT_COUNT = FurnaceBlockEntity.SLOT_COUNT;
@@ -495,6 +496,10 @@ public class FurnaceMenu extends AbstractContainerMenu implements MasteryMenuVie
 
     public static int inputSlotsDataIndex() {
         return DATA_INPUT_SLOTS;
+    }
+
+    public static int batchSizeDataIndex() {
+        return DATA_BATCH_SIZE;
     }
 
     @Override

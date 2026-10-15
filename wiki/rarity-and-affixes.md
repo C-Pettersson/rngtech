@@ -262,7 +262,7 @@ A corruption implicit is one fixed value, with no tier or range. It sits outside
 | Bio Chamber, Fuel Box | 15% increased Fuel Efficiency, or 15% increased Fuel Duration; the Bio Chamber can also roll 10% increased Energy Generation, and the Fuel Box 15% increased Stability | 10% less Energy Generation on the Bio Chamber; 15% less Stability on the Fuel Box |
 | Other generator parts | 10% increased Energy Generation; most also roll 15% increased Stability or 10% increased Processing Speed | 10% less Energy Generation |
 | Other parts | 15% increased Stability; most also roll 10% increased Processing Speed or 10% increased Efficiency | 15% less Stability |
-| Placed processing machine | 10% increased Processing Speed, 20% reduced Energy Use, or 15% increased Stability where the machine has it; +1 Batch Size (rare) on the Crusher, Melter, Metal Press, and Resonance Calibrator; 15% increased Fuel Efficiency or 10% increased Max Temperature on the Furnace | 25% increased Energy Use; 20% less Fuel Efficiency on the Furnace |
+| Placed processing machine | 10% increased Processing Speed, 20% reduced Energy Use, or 15% increased Stability where the machine has it; +1 Batch Size (rare) on the Crusher, Furnace, Alloy Furnace, Melter, Metal Press, and Resonance Calibrator; 15% increased Fuel Efficiency or 10% increased Max Temperature on the Furnace | 25% increased Energy Use; 20% less Fuel Efficiency on the Furnace |
 | Placed generator | 10% increased Energy Generation, 15% increased Efficiency, and where the machine has them 15% increased Stability or 25% increased Energy Capacity | 20% less Efficiency |
 | Battery Chassis | +1 Battery Slot, 15% increased Energy Capacity, or 20% increased Energy Transfer | 15% increased Idle Loss |
 

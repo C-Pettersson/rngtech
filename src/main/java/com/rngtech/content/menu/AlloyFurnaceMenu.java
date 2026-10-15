@@ -69,7 +69,8 @@ public class AlloyFurnaceMenu extends AbstractContainerMenu implements MasteryMe
     private static final int DATA_OVERHEAT_TOLERANCE = 26;
     private static final int DATA_LEDGER = 27;
     private static final int DATA_LEDGER_BLEND = 28;
-    private static final int DATA_MACHINE_PROGRESSION_START = 29;
+    private static final int DATA_BATCH_SIZE = 29;
+    private static final int DATA_MACHINE_PROGRESSION_START = 30;
     private static final int DATA_COUNT = DATA_MACHINE_PROGRESSION_START + MasteryMenuSupport.FIELD_COUNT;
     private static final int STAT_SCALE = 100;
     private static final int PROCESS_SLOT_COUNT = AlloyFurnaceBlockEntity.PROCESS_SLOT_COUNT;
@@ -405,6 +406,10 @@ public class AlloyFurnaceMenu extends AbstractContainerMenu implements MasteryMe
 
     public static int inputSlotsDataIndex() {
         return DATA_INPUT_SLOTS;
+    }
+
+    public static int batchSizeDataIndex() {
+        return DATA_BATCH_SIZE;
     }
 
     public static int refinementPotentialDataIndex() {
