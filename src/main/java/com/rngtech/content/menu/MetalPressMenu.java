@@ -59,7 +59,7 @@ public class MetalPressMenu extends AbstractContainerMenu implements MasteryMenu
     private static final int DATA_HEAT_TRANSFER = 16;
     private static final int DATA_MAX_TEMPERATURE = 17;
     private static final int DATA_TEMPERATURE_STABILITY = 18;
-    private static final int DATA_WARMUP_TIME = 19;
+    private static final int DATA_THERMAL_MASS = 19;
     private static final int DATA_COOLING_RATE = 20;
     private static final int DATA_OVERHEAT_TOLERANCE = 21;
     private static final int DATA_STABILITY = 22;
@@ -69,7 +69,9 @@ public class MetalPressMenu extends AbstractContainerMenu implements MasteryMenu
     private static final int DATA_ENERGY_PER_CRAFT = 26;
     private static final int DATA_LEDGER = DATA_ENERGY_PER_CRAFT + 1;
     private static final int DATA_BATCH_SIZE = DATA_LEDGER + 1;
-    private static final int DATA_MACHINE_PROGRESSION_START = DATA_BATCH_SIZE + 1;
+    private static final int DATA_HEAT_SLIDER = DATA_BATCH_SIZE + 1;
+    private static final int DATA_SETPOINT = DATA_HEAT_SLIDER + 1;
+    private static final int DATA_MACHINE_PROGRESSION_START = DATA_SETPOINT + 1;
     private static final int DATA_COUNT = DATA_MACHINE_PROGRESSION_START + MasteryMenuSupport.FIELD_COUNT;
     private static final int STAT_SCALE = 100;
     public static final int BUTTON_SELECT_MOLD_BASE = 100;
@@ -217,6 +219,15 @@ public class MetalPressMenu extends AbstractContainerMenu implements MasteryMenu
 
     public int energyPerCraft() {
         return data.get(DATA_ENERGY_PER_CRAFT);
+    }
+
+    /** The overheat slider, 0 to 100 percent of the band from the recipe target to Max Temperature. */
+    public int heatSlider() {
+        return data.get(DATA_HEAT_SLIDER);
+    }
+
+    public int setpoint() {
+        return data.get(DATA_SETPOINT);
     }
 
     public int heat() {
@@ -388,7 +399,7 @@ public class MetalPressMenu extends AbstractContainerMenu implements MasteryMenu
     }
 
     public static int warmupTimeDataIndex() {
-        return DATA_WARMUP_TIME;
+        return DATA_THERMAL_MASS;
     }
 
     public static int coolingRateDataIndex() {
@@ -421,6 +432,9 @@ public class MetalPressMenu extends AbstractContainerMenu implements MasteryMenu
 
     @Override
     public boolean clickMenuButton(Player player, int id) {
+        if (HeatSliderSupport.handle(player, id, press::setHeatSlider)) {
+            return true;
+        }
         if (id >= BUTTON_SELECT_MOLD_BASE && id < BUTTON_SELECT_MOLD_BASE + MetalPressBlockEntity.MOLD_SLOT_COUNT) {
             int selectedMold = id - BUTTON_SELECT_MOLD_BASE;
             data.set(DATA_SELECTED_MOLD, selectedMold);

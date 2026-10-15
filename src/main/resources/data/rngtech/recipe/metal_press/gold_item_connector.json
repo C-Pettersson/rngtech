@@ -19,7 +19,7 @@
     "id": "rngtech:gold_item_connector"
   },
   "processing_ticks": 140,
-  "energy": 1800,
+  "heat": 1080,
   "minimum_temperature": 900,
   "safe_maximum_temperature": 1300,
   "required_temperature_stability": 1.0,

@@ -18,7 +18,7 @@
     "id": "rngtech:netherite_plate"
   },
   "processing_ticks": 200,
-  "energy": 2400,
+  "heat": 1440,
   "minimum_temperature": 2000,
   "safe_maximum_temperature": 2300,
   "required_temperature_stability": 1.05,

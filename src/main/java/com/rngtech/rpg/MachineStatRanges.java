@@ -26,7 +26,7 @@ public final class MachineStatRanges {
             new MachineStatRange(MachineStat.MAX_TEMPERATURE, 800.0, 1200.0),
             new MachineStatRange(MachineStat.TEMPERATURE_STABILITY, 0.85, 1.15),
             new MachineStatRange(MachineStat.FUEL_EFFICIENCY, 0.9, 1.1),
-            new MachineStatRange(MachineStat.WARMUP_TIME, 0.9, 1.2),
+            new MachineStatRange(MachineStat.THERMAL_MASS, 0.9, 1.2),
             new MachineStatRange(MachineStat.COOLING_RATE, 0.8, 1.2),
             new MachineStatRange(MachineStat.OVERHEAT_TOLERANCE, 1.0, 1.25)
     );

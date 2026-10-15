@@ -14,7 +14,7 @@
         "id": "rngtech:zinc_ingot"
     },
     "processing_ticks": 450,
-    "energy": 7200,
+    "heat": 4320,
     "experience": 0.7,
     "minimum_temperature": 1000,
     "machine_xp": 2

@@ -601,7 +601,7 @@ def generate_ore_furnace_recipe(catalog: dict, material: dict) -> None:
         ("ingredient", OrderedDict([("tag", f"c:ores/{material_id}")])),
         ("result", OrderedDict([("id", primary_material_item_id(catalog, forms["ingot"], material))])),
         ("processing_ticks", 300),
-        ("energy", 7200),
+        ("heat", 4320),
         ("experience", 0.7),
         ("minimum_temperature", 1000),
     ]))
@@ -661,7 +661,7 @@ def generate_raw_material_recipes(catalog: dict, ore_catalog: dict) -> None:
             ("ingredient", OrderedDict([("tag", raw_tag)])),
             ("result", OrderedDict([("id", primary_material_item_id(catalog, forms["ingot"], material))])),
             ("processing_ticks", 200),
-            ("energy", 4800),
+            ("heat", 2880),
             ("experience", 0.7),
             ("minimum_temperature", 1000),
         ]))

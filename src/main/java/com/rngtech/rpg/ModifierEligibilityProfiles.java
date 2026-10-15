@@ -414,8 +414,25 @@ public final class ModifierEligibilityProfiles {
             MAX_TEMPERATURE_ADD_RANGES
     );
     private static final ModifierDefinition HEAT_ISOLATION = percent(ModifierSlot.PREFIX, MachineStat.HEAT_ISOLATION);
-    private static final ModifierDefinition WARMUP_TIME = reducedPercent(ModifierSlot.PREFIX, MachineStat.WARMUP_TIME);
-    private static final ModifierDefinition COOLING_RATE = reducedPercent(ModifierSlot.PREFIX, MachineStat.COOLING_RATE);
+    private static final ModifierDefinition THERMAL_CONDUCTIVITY = percent(ModifierSlot.PREFIX, MachineStat.THERMAL_CONDUCTIVITY);
+    // Thermal Mass was Warmup Time; the old ID and group keep stored rolls matching their definition.
+    private static final ModifierDefinition THERMAL_MASS = ModifierDefinition.rollable(
+            "warmup_time",
+            "decreased_percent:warmup_time",
+            ModifierSlot.PREFIX,
+            MachineStat.THERMAL_MASS,
+            ModifierOperation.DECREASED_PERCENT,
+            PERCENT_TIER_RANGES
+    );
+    // Cooling Rate is active cooling on heated machines, so new rolls raise it; reduced rolls stored before still count there as increases.
+    private static final ModifierDefinition COOLING_RATE = ModifierDefinition.rollable(
+            "cooling_rate",
+            "increased_percent:cooling_rate",
+            ModifierSlot.PREFIX,
+            MachineStat.COOLING_RATE,
+            ModifierOperation.INCREASED_PERCENT,
+            PERCENT_TIER_RANGES
+    );
     private static final ModifierDefinition FUEL_SLOTS = ModifierDefinition.rollable(
             ModifierSlot.SUFFIX,
             MachineStat.INPUT_SLOTS,
@@ -1466,9 +1483,10 @@ public final class ModifierEligibilityProfiles {
                     "smelting",
                     true,
                     MachineStat.HEAT_TRANSFER,
+                    MachineStat.THERMAL_CONDUCTIVITY,
                     MachineStat.MAX_TEMPERATURE,
                     MachineStat.HEAT_ISOLATION,
-                    MachineStat.WARMUP_TIME,
+                    MachineStat.THERMAL_MASS,
                     MachineStat.COOLING_RATE,
                     MachineStat.EFFICIENCY,
                     MachineStat.FUEL_EFFICIENCY,
@@ -1496,9 +1514,10 @@ public final class ModifierEligibilityProfiles {
                     MachineStat.ENERGY_CAPACITY,
                     MachineStat.ENERGY_USAGE,
                     MachineStat.HEAT_TRANSFER,
+                    MachineStat.THERMAL_CONDUCTIVITY,
                     MachineStat.MAX_TEMPERATURE,
                     MachineStat.HEAT_ISOLATION,
-                    MachineStat.WARMUP_TIME,
+                    MachineStat.THERMAL_MASS,
                     MachineStat.COOLING_RATE,
                     MachineStat.PROCESSING_SPEED,
                     MachineStat.TEMPERATURE_STABILITY,
@@ -1672,8 +1691,9 @@ public final class ModifierEligibilityProfiles {
                     MachineStat.ENERGY_CAPACITY,
                     MachineStat.ENERGY_USAGE,
                     MachineStat.HEAT_TRANSFER,
+                    MachineStat.THERMAL_CONDUCTIVITY,
                     MachineStat.MAX_TEMPERATURE,
-                    MachineStat.WARMUP_TIME,
+                    MachineStat.THERMAL_MASS,
                     MachineStat.COOLING_RATE,
                     MachineStat.PROCESSING_SPEED,
                     MachineStat.STABILITY,
@@ -1702,6 +1722,7 @@ public final class ModifierEligibilityProfiles {
                     MachineStat.ENERGY_CAPACITY,
                     MachineStat.ENERGY_USAGE,
                     MachineStat.HEAT_TRANSFER,
+                    MachineStat.THERMAL_CONDUCTIVITY,
                     MachineStat.MAX_TEMPERATURE,
                     MachineStat.PROCESSING_SPEED,
                     MachineStat.FLUID_TRANSFER
@@ -1934,9 +1955,10 @@ public final class ModifierEligibilityProfiles {
                     MachineStat.ENERGY_CAPACITY,
                     MachineStat.ENERGY_USAGE,
                     MachineStat.HEAT_TRANSFER,
+                    MachineStat.THERMAL_CONDUCTIVITY,
                     MachineStat.MAX_TEMPERATURE,
                     MachineStat.HEAT_ISOLATION,
-                    MachineStat.WARMUP_TIME,
+                    MachineStat.THERMAL_MASS,
                     MachineStat.COOLING_RATE,
                     MachineStat.PROCESSING_SPEED,
                     MachineStat.STABILITY,
@@ -2105,8 +2127,9 @@ public final class ModifierEligibilityProfiles {
                     true,
                     MachineStat.PROCESSING_SPEED,
                     MachineStat.HEAT_TRANSFER,
+                    MachineStat.THERMAL_CONDUCTIVITY,
                     MachineStat.HEAT_ISOLATION,
-                    MachineStat.WARMUP_TIME,
+                    MachineStat.THERMAL_MASS,
                     MachineStat.COOLING_RATE,
                     MachineStat.TEMPERATURE_STABILITY,
                     MachineStat.OVERHEAT_TOLERANCE,
@@ -2128,8 +2151,9 @@ public final class ModifierEligibilityProfiles {
                     MachineStat.FUEL_EFFICIENCY,
                     MachineStat.HEAT_ISOLATION,
                     MachineStat.HEAT_TRANSFER,
+                    MachineStat.THERMAL_CONDUCTIVITY,
                     MachineStat.MAX_TEMPERATURE,
-                    MachineStat.WARMUP_TIME,
+                    MachineStat.THERMAL_MASS,
                     MachineStat.COOLING_RATE,
                     MachineStat.TEMPERATURE_STABILITY,
                     MachineStat.OVERHEAT_TOLERANCE,
@@ -2154,8 +2178,9 @@ public final class ModifierEligibilityProfiles {
                     MachineStat.PROCESSING_SPEED,
                     MachineStat.ENERGY_USAGE,
                     MachineStat.HEAT_TRANSFER,
+                    MachineStat.THERMAL_CONDUCTIVITY,
                     MachineStat.HEAT_ISOLATION,
-                    MachineStat.WARMUP_TIME,
+                    MachineStat.THERMAL_MASS,
                     MachineStat.COOLING_RATE,
                     MachineStat.STABILITY,
                     MachineStat.TEMPERATURE_STABILITY,
@@ -3012,10 +3037,11 @@ public final class ModifierEligibilityProfiles {
                 definitions,
                 ModifierCapability.HAS_HEAT,
                 HEAT_TRANSFER,
+                THERMAL_CONDUCTIVITY,
                 MAX_TEMPERATURE,
                 MAX_TEMPERATURE_ADD,
                 HEAT_ISOLATION,
-                WARMUP_TIME,
+                THERMAL_MASS,
                 COOLING_RATE,
                 TEMPERATURE_STABILITY,
                 OVERHEAT_TOLERANCE
@@ -3116,7 +3142,8 @@ public final class ModifierEligibilityProfiles {
             case HEAT_TRANSFER -> HEAT_TRANSFER;
             case MAX_TEMPERATURE -> MAX_TEMPERATURE;
             case HEAT_ISOLATION -> HEAT_ISOLATION;
-            case WARMUP_TIME -> WARMUP_TIME;
+            case THERMAL_CONDUCTIVITY -> THERMAL_CONDUCTIVITY;
+            case THERMAL_MASS -> THERMAL_MASS;
             case COOLING_RATE -> COOLING_RATE;
             case INPUT_SLOTS -> FUEL_SLOTS;
             case BATTERY_SLOTS -> BATTERY_CHASSIS_BATTERY_SLOTS;
@@ -3247,8 +3274,7 @@ public final class ModifierEligibilityProfiles {
                 || stat == MachineStat.FE_USAGE
                 || stat == MachineStat.ORE_BURST_FE_USAGE
                 || stat == MachineStat.IDLE_LOSS
-                || stat == MachineStat.WARMUP_TIME
-                || stat == MachineStat.COOLING_RATE
+                || stat == MachineStat.THERMAL_MASS
                 ? ModifierOperation.DECREASED_PERCENT
                 : ModifierOperation.INCREASED_PERCENT;
     }

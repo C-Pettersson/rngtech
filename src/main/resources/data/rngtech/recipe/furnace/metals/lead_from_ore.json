@@ -14,7 +14,7 @@
     "id": "rngtech:lead_ingot"
   },
   "processing_ticks": 150,
-  "energy": 7200,
+  "heat": 4320,
   "experience": 0.7,
   "minimum_temperature": 1100,
   "required_temperature_stability": 0.95,

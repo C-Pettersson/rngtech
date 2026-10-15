@@ -29,7 +29,7 @@ public record MetalPressRecipe(
         Ingredient mold,
         ItemStack result,
         int processingTicks,
-        int energy,
+        int heat,
         int minimumTemperature,
         int targetTemperature,
         int safeMaximumTemperature,
@@ -132,10 +132,7 @@ public record MetalPressRecipe(
                                 .fieldOf("processing_ticks")
                                 .orElse(200)
                                 .forGetter(MetalPressRecipe::processingTicks),
-                        Codec.intRange(1, Integer.MAX_VALUE)
-                                .fieldOf("energy")
-                                .orElse(2400)
-                                .forGetter(MetalPressRecipe::energy),
+                        RecipeHeat.CODEC.forGetter(recipe -> RecipeHeat.of(recipe.heat())),
                         Codec.intRange(1, Integer.MAX_VALUE)
                                 .fieldOf("minimum_temperature")
                                 .orElse(1100)
@@ -169,7 +166,7 @@ public record MetalPressRecipe(
                         mold,
                         result,
                         processingTicks,
-                        energy,
+                        heatFields,
                         minimumTemperature,
                         targetTemperature,
                         safeMaximumTemperature,
@@ -188,7 +185,7 @@ public record MetalPressRecipe(
                             mold,
                             result,
                             processingTicks,
-                            energy,
+                            heatFields.resolve(2400, 1.0),
                             minimumTemperature,
                             resolvedTarget,
                             safeMaximumTemperature,
@@ -235,7 +232,7 @@ public record MetalPressRecipe(
                         Ingredient.CONTENTS_STREAM_CODEC.encode(buffer, recipe.mold);
                         ItemStack.STREAM_CODEC.encode(buffer, recipe.result);
                         ByteBufCodecs.VAR_INT.encode(buffer, recipe.processingTicks);
-                        ByteBufCodecs.VAR_INT.encode(buffer, recipe.energy);
+                        ByteBufCodecs.VAR_INT.encode(buffer, recipe.heat);
                         ByteBufCodecs.VAR_INT.encode(buffer, recipe.minimumTemperature);
                         ByteBufCodecs.VAR_INT.encode(buffer, recipe.targetTemperature);
                         ByteBufCodecs.VAR_INT.encode(buffer, recipe.safeMaximumTemperature);

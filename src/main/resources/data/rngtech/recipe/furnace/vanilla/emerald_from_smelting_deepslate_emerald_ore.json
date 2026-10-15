@@ -8,7 +8,7 @@
         "id": "minecraft:emerald"
     },
     "processing_ticks": 200,
-    "energy": 4800,
+    "heat": 2880,
     "experience": 1,
     "machine_xp": 1
 }

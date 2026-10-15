@@ -31,7 +31,7 @@
     "id": "rngtech:ultimate_electric_circuit"
   },
   "processing_ticks": 400,
-  "energy": 8000,
+  "heat": 4800,
   "minimum_temperature": 2000,
   "safe_maximum_temperature": 2450,
   "required_temperature_stability": 1.15,

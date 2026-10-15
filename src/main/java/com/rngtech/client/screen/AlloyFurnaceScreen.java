@@ -65,7 +65,7 @@ public class AlloyFurnaceScreen extends AbstractContainerScreen<AlloyFurnaceMenu
             "rngtech.stat.energy_capacity",
             "rngtech.stat.heat_transfer",
             "rngtech.stat.max_temperature",
-            "rngtech.stat.warmup_time",
+            "rngtech.stat.thermal_mass",
             "rngtech.stat.cooling_rate",
             "rngtech.stat.temperature_stability",
             "rngtech.stat.overheat_tolerance",
@@ -93,7 +93,7 @@ public class AlloyFurnaceScreen extends AbstractContainerScreen<AlloyFurnaceMenu
             MachineStat.ENERGY_CAPACITY,
             MachineStat.HEAT_TRANSFER,
             MachineStat.MAX_TEMPERATURE,
-            MachineStat.WARMUP_TIME,
+            MachineStat.THERMAL_MASS,
             MachineStat.COOLING_RATE,
             MachineStat.TEMPERATURE_STABILITY,
             MachineStat.OVERHEAT_TOLERANCE,
@@ -104,6 +104,7 @@ public class AlloyFurnaceScreen extends AbstractContainerScreen<AlloyFurnaceMenu
     private static final Map<MegaPassiveNode, ResourceLocation> MASTERY_ICON_TEXTURES = createMasteryIconTextures();
 
     private final MasteryScreenSupport<MegaPassiveNode> masterySupport;
+    private final HeatSlider heatSlider = new HeatSlider(98, 92, 86);
 
     public AlloyFurnaceScreen(AlloyFurnaceMenu menu, Inventory playerInventory, Component title) {
         super(menu, playerInventory, title);
@@ -204,6 +205,10 @@ public class AlloyFurnaceScreen extends AbstractContainerScreen<AlloyFurnaceMenu
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        if (menu.selectedTab() == AlloyFurnaceMenu.TAB_PROCESSING
+                && heatSlider.mouseClicked(mouseX, mouseY, button, leftPos, topPos, menu.containerId)) {
+            return true;
+        }
         if (button == 0) {
             if (isOverTab(mouseX, mouseY, 0)) {
                 selectTab(AlloyFurnaceMenu.TAB_PROCESSING);
@@ -239,6 +244,9 @@ public class AlloyFurnaceScreen extends AbstractContainerScreen<AlloyFurnaceMenu
 
     @Override
     public boolean mouseDragged(double mouseX, double mouseY, int button, double dragX, double dragY) {
+        if (heatSlider.mouseDragged(mouseX, button, leftPos, menu.containerId)) {
+            return true;
+        }
         if (menu.selectedTab() == AlloyFurnaceMenu.TAB_MASTERY
                 && masterySupport.mouseDragged(mouseX, mouseY, button, imageWidth, imageHeight)) {
             return true;
@@ -248,6 +256,7 @@ public class AlloyFurnaceScreen extends AbstractContainerScreen<AlloyFurnaceMenu
 
     @Override
     public boolean mouseReleased(double mouseX, double mouseY, int button) {
+        heatSlider.mouseReleased();
         if (masterySupport.mouseReleased(mouseX, mouseY, button, leftPos, topPos, imageWidth, imageHeight)) {
             return true;
         }
@@ -356,6 +365,8 @@ public class AlloyFurnaceScreen extends AbstractContainerScreen<AlloyFurnaceMenu
     }
 
     private void renderProcessing(GuiGraphics guiGraphics) {
+        heatSlider.sync(menu.heatSlider());
+        heatSlider.render(guiGraphics, leftPos, topPos, menu.heatSlider());
         int x = leftPos;
         int y = topPos;
         guiGraphics.fill(x + PROGRESS_X, y + PROGRESS_Y, x + PROGRESS_X + PROGRESS_WIDTH, y + PROGRESS_Y + PROGRESS_HEIGHT, 0xFF5F5F5F);
@@ -449,6 +460,10 @@ public class AlloyFurnaceScreen extends AbstractContainerScreen<AlloyFurnaceMenu
 
     private void renderValueTooltips(GuiGraphics guiGraphics, int mouseX, int mouseY) {
         if (menu.selectedTab() != AlloyFurnaceMenu.TAB_PROCESSING) {
+            return;
+        }
+        if (heatSlider.isOver(mouseX, mouseY, leftPos, topPos)) {
+            guiGraphics.renderComponentTooltip(font, heatSlider.tooltip(menu.heatSlider(), menu.setpoint()), mouseX, mouseY);
             return;
         }
         CompactValueText.renderTooltipIfHovered(
@@ -599,6 +614,7 @@ public class AlloyFurnaceScreen extends AbstractContainerScreen<AlloyFurnaceMenu
             case AlloyFurnaceBlockEntity.STATUS_POWER_DROP -> Component.translatable("rngtech.alloy_furnace.status.power_drop");
             case AlloyFurnaceBlockEntity.STATUS_FAILURE_RISK -> Component.translatable("rngtech.alloy_furnace.status.failure_risk", menu.failureStrain());
             case AlloyFurnaceBlockEntity.STATUS_FILLING_BATCH -> Component.translatable("rngtech.machine.status.filling_batch");
+            case AlloyFurnaceBlockEntity.STATUS_HEAT_HIGH -> Component.translatable("rngtech.alloy_furnace.status.heat_high");
             default -> Component.translatable("rngtech.alloy_furnace.status.ready");
         };
     }
@@ -613,6 +629,7 @@ public class AlloyFurnaceScreen extends AbstractContainerScreen<AlloyFurnaceMenu
                     AlloyFurnaceBlockEntity.STATUS_MISSING_CRUCIBLE,
                     AlloyFurnaceBlockEntity.STATUS_HEAT_LOW,
                     AlloyFurnaceBlockEntity.STATUS_WARMING,
+                    AlloyFurnaceBlockEntity.STATUS_HEAT_HIGH,
                     AlloyFurnaceBlockEntity.STATUS_POWER_DROP,
                     AlloyFurnaceBlockEntity.STATUS_FAILURE_RISK -> MachineScreenStyle.StatusState.WAITING;
             case AlloyFurnaceBlockEntity.STATUS_INVALID_RECIPE -> MachineScreenStyle.StatusState.ERROR;

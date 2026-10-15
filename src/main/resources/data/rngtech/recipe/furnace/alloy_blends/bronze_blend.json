@@ -15,7 +15,7 @@
     },
     "bonus_output": false,
     "processing_ticks": 160,
-    "energy": 2400,
+    "heat": 1440,
     "experience": 0.7,
     "minimum_temperature": 700,
     "machine_xp": 1

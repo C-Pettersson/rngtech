@@ -18,7 +18,7 @@
     "id": "rngtech:tungstensteel_plate"
   },
   "processing_ticks": 200,
-  "energy": 2400,
+  "heat": 1440,
   "minimum_temperature": 1750,
   "safe_maximum_temperature": 2050,
   "required_temperature_stability": 1.0,

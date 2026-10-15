@@ -73,7 +73,7 @@ public class MetalPressScreen extends AbstractContainerScreen<MetalPressMenu> {
             "rngtech.stat.energy_capacity",
             "rngtech.stat.heat_transfer",
             "rngtech.stat.max_temperature",
-            "rngtech.stat.warmup_time",
+            "rngtech.stat.thermal_mass",
             "rngtech.stat.cooling_rate",
             "rngtech.stat.temperature_stability",
             "rngtech.stat.overheat_tolerance",
@@ -99,7 +99,7 @@ public class MetalPressScreen extends AbstractContainerScreen<MetalPressMenu> {
             MachineStat.ENERGY_CAPACITY,
             MachineStat.HEAT_TRANSFER,
             MachineStat.MAX_TEMPERATURE,
-            MachineStat.WARMUP_TIME,
+            MachineStat.THERMAL_MASS,
             MachineStat.COOLING_RATE,
             MachineStat.TEMPERATURE_STABILITY,
             MachineStat.OVERHEAT_TOLERANCE,
@@ -108,6 +108,7 @@ public class MetalPressScreen extends AbstractContainerScreen<MetalPressMenu> {
     private static final Map<MegaPassiveNode, ResourceLocation> MASTERY_ICON_TEXTURES = createMasteryIconTextures();
 
     private final MasteryScreenSupport<MegaPassiveNode> masterySupport;
+    private final HeatSlider heatSlider = new HeatSlider(86, 86, 69);
 
     private static Map<MegaPassiveNode, ResourceLocation> createMasteryIconTextures() {
         Map<MegaPassiveNode, ResourceLocation> textures = new HashMap<>();
@@ -213,6 +214,10 @@ public class MetalPressScreen extends AbstractContainerScreen<MetalPressMenu> {
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        if (menu.selectedTab() == MetalPressMenu.TAB_PROCESSING
+                && heatSlider.mouseClicked(mouseX, mouseY, button, leftPos, topPos, menu.containerId)) {
+            return true;
+        }
         if (button == 0) {
             if (isOverTab(mouseX, mouseY, 0)) {
                 selectTab(MetalPressMenu.TAB_PROCESSING);
@@ -254,6 +259,9 @@ public class MetalPressScreen extends AbstractContainerScreen<MetalPressMenu> {
 
     @Override
     public boolean mouseDragged(double mouseX, double mouseY, int button, double dragX, double dragY) {
+        if (heatSlider.mouseDragged(mouseX, button, leftPos, menu.containerId)) {
+            return true;
+        }
         if (menu.selectedTab() == MetalPressMenu.TAB_MASTERY
                 && masterySupport.mouseDragged(mouseX, mouseY, button, imageWidth, imageHeight)) {
             return true;
@@ -263,6 +271,7 @@ public class MetalPressScreen extends AbstractContainerScreen<MetalPressMenu> {
 
     @Override
     public boolean mouseReleased(double mouseX, double mouseY, int button) {
+        heatSlider.mouseReleased();
         if (masterySupport.mouseReleased(mouseX, mouseY, button, leftPos, topPos, imageWidth, imageHeight)) {
             return true;
         }
@@ -373,6 +382,8 @@ public class MetalPressScreen extends AbstractContainerScreen<MetalPressMenu> {
     }
 
     private void renderProcessing(GuiGraphics guiGraphics) {
+        heatSlider.sync(menu.heatSlider());
+        heatSlider.render(guiGraphics, leftPos, topPos, menu.heatSlider());
         int x = leftPos;
         int y = topPos;
         guiGraphics.fill(x + RISK_BAR_X, y + RISK_BAR_Y, x + RISK_BAR_X + RISK_BAR_WIDTH, y + RISK_BAR_Y + RISK_BAR_HEIGHT, 0xFF5F5F5F);
@@ -492,6 +503,10 @@ public class MetalPressScreen extends AbstractContainerScreen<MetalPressMenu> {
 
     private void renderValueTooltips(GuiGraphics guiGraphics, int mouseX, int mouseY) {
         if (menu.selectedTab() != MetalPressMenu.TAB_PROCESSING) {
+            return;
+        }
+        if (heatSlider.isOver(mouseX, mouseY, leftPos, topPos)) {
+            guiGraphics.renderComponentTooltip(font, heatSlider.tooltip(menu.heatSlider(), menu.setpoint()), mouseX, mouseY);
             return;
         }
 

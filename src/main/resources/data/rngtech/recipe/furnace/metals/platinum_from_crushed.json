@@ -14,7 +14,7 @@
         "id": "rngtech:platinum_ingot"
     },
     "processing_ticks": 900,
-    "energy": 28800,
+    "heat": 34560,
     "experience": 0.7,
     "minimum_temperature": 1750,
     "required_temperature_stability": 1,

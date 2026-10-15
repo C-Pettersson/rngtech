@@ -8,7 +8,7 @@
         "id": "minecraft:gold_ingot"
     },
     "processing_ticks": 200,
-    "energy": 4800,
+    "heat": 2880,
     "experience": 1,
     "minimum_temperature": 1000,
     "machine_xp": 2

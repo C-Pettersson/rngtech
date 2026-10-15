@@ -97,6 +97,7 @@ public class MelterScreen extends AbstractContainerScreen<MelterMenu> {
     private static final Map<MegaPassiveNode, ResourceLocation> MASTERY_ICON_TEXTURES = createMasteryIconTextures();
 
     private final MasteryScreenSupport<MegaPassiveNode> masterySupport;
+    private final HeatSlider heatSlider = new HeatSlider(104, 94, 58);
 
     private static Map<MegaPassiveNode, ResourceLocation> createMasteryIconTextures() {
         Map<MegaPassiveNode, ResourceLocation> textures = new HashMap<>();
@@ -201,6 +202,10 @@ public class MelterScreen extends AbstractContainerScreen<MelterMenu> {
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        if (menu.selectedTab() == MelterMenu.TAB_PROCESSING
+                && heatSlider.mouseClicked(mouseX, mouseY, button, leftPos, topPos, menu.containerId)) {
+            return true;
+        }
         if (button == 0) {
             if (isOverTab(mouseX, mouseY, 0)) {
                 selectTab(MelterMenu.TAB_PROCESSING);
@@ -239,6 +244,9 @@ public class MelterScreen extends AbstractContainerScreen<MelterMenu> {
 
     @Override
     public boolean mouseDragged(double mouseX, double mouseY, int button, double dragX, double dragY) {
+        if (heatSlider.mouseDragged(mouseX, button, leftPos, menu.containerId)) {
+            return true;
+        }
         if (menu.selectedTab() == MelterMenu.TAB_MASTERY
                 && masterySupport.mouseDragged(mouseX, mouseY, button, imageWidth, imageHeight)) {
             return true;
@@ -248,6 +256,7 @@ public class MelterScreen extends AbstractContainerScreen<MelterMenu> {
 
     @Override
     public boolean mouseReleased(double mouseX, double mouseY, int button) {
+        heatSlider.mouseReleased();
         if (masterySupport.mouseReleased(mouseX, mouseY, button, leftPos, topPos, imageWidth, imageHeight)) {
             return true;
         }
@@ -358,6 +367,8 @@ public class MelterScreen extends AbstractContainerScreen<MelterMenu> {
     }
 
     private void renderProcessing(GuiGraphics guiGraphics) {
+        heatSlider.sync(menu.heatSlider());
+        heatSlider.render(guiGraphics, leftPos, topPos, menu.heatSlider());
         int x = leftPos;
         int y = topPos;
 
@@ -496,6 +507,10 @@ public class MelterScreen extends AbstractContainerScreen<MelterMenu> {
             return;
         }
         if (menu.selectedTab() != MelterMenu.TAB_PROCESSING) {
+            return;
+        }
+        if (heatSlider.isOver(mouseX, mouseY, leftPos, topPos)) {
+            guiGraphics.renderComponentTooltip(font, heatSlider.tooltip(menu.heatSlider(), menu.setpoint()), mouseX, mouseY);
             return;
         }
         if (renderPurgeTooltips(guiGraphics, mouseX, mouseY)) {
@@ -736,6 +751,8 @@ public class MelterScreen extends AbstractContainerScreen<MelterMenu> {
             case MelterBlockEntity.STATUS_NO_POWER -> Component.translatable("rngtech.melter.status.no_power");
             case MelterBlockEntity.STATUS_NO_FLUID -> Component.translatable("rngtech.melter.status.no_fluid");
             case MelterBlockEntity.STATUS_FILLING_BATCH -> Component.translatable("rngtech.melter.status.filling_batch");
+            case MelterBlockEntity.STATUS_WARMING -> Component.translatable("rngtech.melter.status.warming", menu.minimumTemperature());
+            case MelterBlockEntity.STATUS_HEAT_HIGH -> Component.translatable("rngtech.melter.status.heat_high");
             default -> Component.translatable("rngtech.melter.status.ready");
         };
     }
@@ -747,6 +764,8 @@ public class MelterScreen extends AbstractContainerScreen<MelterMenu> {
                     MelterBlockEntity.STATUS_NO_FLUID,
                     MelterBlockEntity.STATUS_NO_INPUT,
                     MelterBlockEntity.STATUS_FILLING_BATCH,
+                    MelterBlockEntity.STATUS_WARMING,
+                    MelterBlockEntity.STATUS_HEAT_HIGH,
                     MelterBlockEntity.STATUS_MISSING_HEAT_CORE,
                     MelterBlockEntity.STATUS_MISSING_CRUSH_HEAD -> MachineScreenStyle.StatusState.WAITING;
             case MelterBlockEntity.STATUS_INVALID_RECIPE -> MachineScreenStyle.StatusState.ERROR;

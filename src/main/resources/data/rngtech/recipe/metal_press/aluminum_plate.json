@@ -18,7 +18,7 @@
     "id": "rngtech:aluminum_plate"
   },
   "processing_ticks": 200,
-  "energy": 2400,
+  "heat": 1440,
   "minimum_temperature": 1300,
   "safe_maximum_temperature": 1600,
   "required_temperature_stability": 0.95,

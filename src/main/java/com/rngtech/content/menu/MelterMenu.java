@@ -68,7 +68,9 @@ public class MelterMenu extends AbstractContainerMenu implements MasteryMenuView
     private static final int DATA_BATCH_SIZE = DATA_REFINEMENT_POTENTIAL + 1;
     private static final int DATA_INPUT_FLUID_ID = DATA_BATCH_SIZE + 1;
     private static final int DATA_OUTPUT_FLUID_ID = DATA_INPUT_FLUID_ID + 1;
-    private static final int DATA_MACHINE_PROGRESSION_START = DATA_OUTPUT_FLUID_ID + 1;
+    private static final int DATA_HEAT_SLIDER = DATA_OUTPUT_FLUID_ID + 1;
+    private static final int DATA_SETPOINT = DATA_HEAT_SLIDER + 1;
+    private static final int DATA_MACHINE_PROGRESSION_START = DATA_SETPOINT + 1;
     private static final int DATA_COUNT = DATA_MACHINE_PROGRESSION_START + MasteryMenuSupport.FIELD_COUNT;
     private static final int STAT_SCALE = 100;
     private static final int PROCESS_SLOT_COUNT = MelterBlockEntity.PROCESS_SLOT_COUNT;
@@ -204,6 +206,15 @@ public class MelterMenu extends AbstractContainerMenu implements MasteryMenuView
 
     public int energyCapacity() {
         return data.get(DATA_ENERGY_CAPACITY);
+    }
+
+    /** The overheat slider, 0 to 100 percent of the band from the recipe target to Max Temperature. */
+    public int heatSlider() {
+        return data.get(DATA_HEAT_SLIDER);
+    }
+
+    public int setpoint() {
+        return data.get(DATA_SETPOINT);
     }
 
     public int heat() {
@@ -360,6 +371,9 @@ public class MelterMenu extends AbstractContainerMenu implements MasteryMenuView
 
     @Override
     public boolean clickMenuButton(Player player, int id) {
+        if (HeatSliderSupport.handle(player, id, melter::setHeatSlider)) {
+            return true;
+        }
         if (FluidPurgeSupport.handleMenuButton(player, melter, id)) {
             return true;
         }

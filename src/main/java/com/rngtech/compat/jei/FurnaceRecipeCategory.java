@@ -2,7 +2,6 @@ package com.rngtech.compat.jei;
 
 import com.rngtech.content.item.MalformedIngotItem;
 import com.rngtech.content.recipe.FurnaceRecipe;
-import com.rngtech.content.recipe.ProcessingEnergyScaling;
 import com.rngtech.content.registry.ModItems;
 
 import mezz.jei.api.constants.VanillaTypes;
@@ -105,11 +104,7 @@ public final class FurnaceRecipeCategory implements IRecipeCategory<RecipeHolder
         JeiCategoryUi.drawLine(
                 guiGraphics,
                 font,
-                JeiCategoryUi.energyCost(
-                        ProcessingEnergyScaling.furnaceEnergy(recipe),
-                        recipe.processingTicks(),
-                        ProcessingEnergyScaling.furnaceEnergyMultiplier(recipe)
-                ),
+                JeiCategoryUi.heatCost(recipe.heat(), recipe.processingTicks()),
                 52,
                 JeiCategoryUi.MUTED_TEXT_COLOR
         );

@@ -110,7 +110,7 @@ public final class AlloyFurnaceRecipeCategory implements IRecipeCategory<RecipeH
         JeiCategoryUi.drawLine(
                 guiGraphics,
                 font,
-                JeiCategoryUi.energyCost(recipe.energy(), recipe.processingTicks()),
+                JeiCategoryUi.heatCost(recipe.heat(), recipe.processingTicks()),
                 86,
                 JeiCategoryUi.TEXT_COLOR
         );

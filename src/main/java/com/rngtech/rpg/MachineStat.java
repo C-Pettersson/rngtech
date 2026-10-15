@@ -31,10 +31,11 @@ public enum MachineStat implements StringRepresentable {
     UPGRADE_LIMIT,
     MAX_TEMPERATURE,
     HEAT_TRANSFER,
+    THERMAL_CONDUCTIVITY,
     HEAT_ISOLATION,
     TEMPERATURE_STABILITY,
     FUEL_EFFICIENCY,
-    WARMUP_TIME,
+    THERMAL_MASS,
     COOLING_RATE,
     OVERHEAT_TOLERANCE,
     REFINEMENT_POTENTIAL,
@@ -158,6 +159,7 @@ public enum MachineStat implements StringRepresentable {
         }
         return switch (key) {
             case "parallel_jobs" -> BATCH_SIZE;
+            case "warmup_time" -> THERMAL_MASS;
             default -> null;
         };
     }

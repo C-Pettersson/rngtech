@@ -62,8 +62,8 @@ public class FurnaceMenu extends AbstractContainerMenu implements MasteryMenuVie
     private static final int DATA_ENERGY_USAGE = DATA_ENERGY_CAPACITY + 1;
     private static final int DATA_ENERGY_CAPACITY_STAT = DATA_ENERGY_USAGE + 1;
     private static final int DATA_ENERGY_TRANSFER = DATA_ENERGY_CAPACITY_STAT + 1;
-    private static final int DATA_WARMUP_TIME = DATA_ENERGY_TRANSFER + 1;
-    private static final int DATA_COOLING_RATE = DATA_WARMUP_TIME + 1;
+    private static final int DATA_THERMAL_MASS = DATA_ENERGY_TRANSFER + 1;
+    private static final int DATA_COOLING_RATE = DATA_THERMAL_MASS + 1;
     private static final int DATA_OVERHEAT_TOLERANCE = DATA_COOLING_RATE + 1;
     private static final int DATA_INPUT_SLOTS = DATA_OVERHEAT_TOLERANCE + 1;
     private static final int DATA_GEAR_SLOTS = DATA_INPUT_SLOTS + 1;
@@ -78,7 +78,9 @@ public class FurnaceMenu extends AbstractContainerMenu implements MasteryMenuVie
     private static final int DATA_POWER_SENSITIVE_START = DATA_FAILURE_ENABLED_START + MAX_PROCESSING_SLOTS;
     private static final int DATA_LEDGER_START = DATA_POWER_SENSITIVE_START + MAX_PROCESSING_SLOTS;
     private static final int DATA_BATCH_SIZE = DATA_LEDGER_START + MAX_PROCESSING_SLOTS;
-    private static final int DATA_MACHINE_PROGRESSION_START = DATA_BATCH_SIZE + 1;
+    private static final int DATA_HEAT_SLIDER = DATA_BATCH_SIZE + 1;
+    private static final int DATA_SETPOINT_START = DATA_HEAT_SLIDER + 1;
+    private static final int DATA_MACHINE_PROGRESSION_START = DATA_SETPOINT_START + MAX_PROCESSING_SLOTS;
     private static final int DATA_COUNT = DATA_MACHINE_PROGRESSION_START + MasteryMenuSupport.FIELD_COUNT;
     private static final int STAT_SCALE = 100;
     private static final int MACHINE_SLOT_COUNT = FurnaceBlockEntity.SLOT_COUNT;
@@ -306,6 +308,20 @@ public class FurnaceMenu extends AbstractContainerMenu implements MasteryMenuVie
         return data.get(DATA_MIN_TEMPERATURE);
     }
 
+    /** The overheat slider, 0 to 100 percent of the band from the recipe target to Max Temperature. */
+    public int heatSlider() {
+        return data.get(DATA_HEAT_SLIDER);
+    }
+
+    /** The hottest setpoint among the active lanes; each lane holds its own recipe's. */
+    public int setpoint() {
+        int setpoint = 0;
+        for (int lane = 0; lane < activeProcessingSlots(); lane++) {
+            setpoint = Math.max(setpoint, data.get(DATA_SETPOINT_START + lane));
+        }
+        return setpoint;
+    }
+
     public int heat() {
         int heat = 0;
         for (int lane = 0; lane < activeProcessingSlots(); lane++) {
@@ -483,7 +499,7 @@ public class FurnaceMenu extends AbstractContainerMenu implements MasteryMenuVie
     }
 
     public static int warmupTimeDataIndex() {
-        return DATA_WARMUP_TIME;
+        return DATA_THERMAL_MASS;
     }
 
     public static int coolingRateDataIndex() {
@@ -504,6 +520,9 @@ public class FurnaceMenu extends AbstractContainerMenu implements MasteryMenuVie
 
     @Override
     public boolean clickMenuButton(Player player, int id) {
+        if (HeatSliderSupport.handle(player, id, furnace::setHeatSlider)) {
+            return true;
+        }
         MegaPassiveNode passiveNode = MegaPassiveTree.byButtonId(id);
         if (passiveNode != null) {
             if (player.level().isClientSide) {

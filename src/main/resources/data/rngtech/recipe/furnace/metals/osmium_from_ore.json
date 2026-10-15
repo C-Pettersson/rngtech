@@ -14,7 +14,7 @@
     "id": "rngtech:osmium_ingot"
   },
   "processing_ticks": 750,
-  "energy": 14400,
+  "heat": 8640,
   "experience": 0.7,
   "minimum_temperature": 1300,
   "required_temperature_stability": 0.95,

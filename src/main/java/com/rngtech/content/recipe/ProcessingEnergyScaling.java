@@ -27,16 +27,6 @@ public final class ProcessingEnergyScaling {
                 : 1.0D;
     }
 
-    public static int furnaceEnergy(FurnaceRecipe recipe) {
-        return scaledEnergy(recipe.energy(), furnaceEnergyMultiplier(recipe));
-    }
-
-    public static double furnaceEnergyMultiplier(FurnaceRecipe recipe) {
-        return recipe.minimumTemperature() >= RNGTechConfig.FURNACE_HIGH_HEAT_ENERGY_THRESHOLD.get()
-                ? RNGTechConfig.FURNACE_HIGH_HEAT_ENERGY_MULTIPLIER.get()
-                : 1.0D;
-    }
-
     private static int scaledEnergy(int baseEnergy, double multiplier) {
         long scaled = Math.round(Math.max(1, baseEnergy) * Math.max(0.01D, multiplier));
         return (int) Math.max(1, Math.min(Integer.MAX_VALUE, scaled));

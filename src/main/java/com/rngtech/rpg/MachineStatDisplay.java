@@ -17,10 +17,11 @@ public final class MachineStatDisplay {
             MachineStat.EFFICIENCY,
             MachineStat.STABILITY,
             MachineStat.HEAT_TRANSFER,
+            MachineStat.THERMAL_CONDUCTIVITY,
             MachineStat.HEAT_ISOLATION,
             MachineStat.TEMPERATURE_STABILITY,
             MachineStat.FUEL_EFFICIENCY,
-            MachineStat.WARMUP_TIME,
+            MachineStat.THERMAL_MASS,
             MachineStat.COOLING_RATE,
             MachineStat.OVERHEAT_TOLERANCE,
             MachineStat.GLOBAL_MODIFIER_STRENGTH,
@@ -304,10 +305,11 @@ public final class MachineStatDisplay {
             case STABILITY -> "rngtech.tooltip.stat_effect.stability";
             case MAX_TEMPERATURE -> "rngtech.tooltip.stat_effect.max_temperature";
             case HEAT_TRANSFER -> "rngtech.tooltip.stat_effect.heat_transfer";
+            case THERMAL_CONDUCTIVITY -> "rngtech.tooltip.stat_effect.thermal_conductivity";
             case HEAT_ISOLATION -> "rngtech.tooltip.stat_effect.heat_isolation";
             case TEMPERATURE_STABILITY -> "rngtech.tooltip.stat_effect.temperature_stability";
             case FUEL_EFFICIENCY -> "rngtech.tooltip.stat_effect.fuel_efficiency";
-            case WARMUP_TIME -> "rngtech.tooltip.stat_effect.warmup_time";
+            case THERMAL_MASS -> "rngtech.tooltip.stat_effect.thermal_mass";
             case COOLING_RATE -> "rngtech.tooltip.stat_effect.cooling_rate";
             case OVERHEAT_TOLERANCE -> "rngtech.tooltip.stat_effect.overheat_tolerance";
             case REFINEMENT_POTENTIAL_BONUS -> "rngtech.tooltip.stat_effect.refinement_potential_bonus";

@@ -117,7 +117,7 @@ public final class MelterRecipeCategory implements IRecipeCategory<RecipeHolder<
         JeiCategoryUi.drawLine(
                 guiGraphics,
                 font,
-                JeiCategoryUi.energyCost(recipe.energy(), recipe.processingTicks()),
+                JeiCategoryUi.heatCost(recipe.heat(), recipe.processingTicks()),
                 66,
                 JeiCategoryUi.TEXT_COLOR
         );

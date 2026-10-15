@@ -60,14 +60,6 @@ public final class RNGTechConfig {
             .comment("Processing speed multiplier applied to electric furnace chassis without an installed Battery Cell.")
             .defineInRange("furnace.noBatteryCellProcessingSpeedMultiplier", 0.75D, 0.01D, 1.0D);
 
-    public static final ModConfigSpec.IntValue FURNACE_HIGH_HEAT_ENERGY_THRESHOLD = BUILDER
-            .comment("Furnace recipes at or above this minimum temperature use the high-heat energy multiplier.")
-            .defineInRange("furnace.highHeatEnergyThreshold", 1750, 0, Integer.MAX_VALUE);
-
-    public static final ModConfigSpec.DoubleValue FURNACE_HIGH_HEAT_ENERGY_MULTIPLIER = BUILDER
-            .comment("Energy multiplier applied to Furnace recipes at or above the high-heat threshold.")
-            .defineInRange("furnace.highHeatEnergyMultiplier", 2.0D, 0.01D, 100.0D);
-
     public static final ModConfigSpec.DoubleValue CALIBRATION_ENERGY_MULTIPLIER = BUILDER
             .comment("Multiplier applied to Resonance Calibrator recipe FE costs.")
             .defineInRange("calibration.energyMultiplier", 1.0D, 0.01D, 100.0D);

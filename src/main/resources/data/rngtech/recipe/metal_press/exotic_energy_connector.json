@@ -19,7 +19,7 @@
     "id": "rngtech:exotic_energy_connector"
   },
   "processing_ticks": 800,
-  "energy": 64000,
+  "heat": 38400,
   "minimum_temperature": 2100,
   "safe_maximum_temperature": 2500,
   "required_temperature_stability": 1.2,

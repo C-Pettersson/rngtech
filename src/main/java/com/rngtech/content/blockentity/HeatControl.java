@@ -17,7 +17,7 @@ final class HeatControl {
 
     static int warmupRate(MachineStatAccumulator stats) {
         double heatTransfer = Math.max(0.1, stats.value(MachineStat.HEAT_TRANSFER));
-        double warmupTime = Math.max(0.25, stats.value(MachineStat.WARMUP_TIME));
+        double warmupTime = Math.max(0.25, stats.value(MachineStat.THERMAL_MASS));
         return Math.max(1, (int) Math.round(10.0 * heatTransfer / warmupTime));
     }
 

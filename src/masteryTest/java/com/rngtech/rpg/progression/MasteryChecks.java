@@ -435,7 +435,7 @@ public final class MasteryChecks {
 
     private static final Map<MachineStat, Double> BASE_100 = Arrays.stream(MachineStat.values()).collect(Collectors.toMap(stat -> stat, stat -> 100.0));
     private static final Set<MachineStat> LOWER_IS_BETTER = Set.of(
-            MachineStat.ENERGY_USAGE, MachineStat.WARMUP_TIME, MachineStat.COOLING_RATE, MachineStat.IDLE_LOSS);
+            MachineStat.ENERGY_USAGE, MachineStat.THERMAL_MASS, MachineStat.COOLING_RATE, MachineStat.IDLE_LOSS);
     private static final Set<String> COST_BEHAVIORS = Set.of("BLOCK_BATTERY", "MATCHING_HEAD", "NO_BONUS_OUTPUT",
             "NO_INHERENT_ATTRIBUTES", "NO_INHERENT_CONTROL", "NO_INHERENT_DRIVE", "NO_INHERENT_RESERVE");
 

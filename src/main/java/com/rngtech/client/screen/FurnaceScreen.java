@@ -69,7 +69,7 @@ public class FurnaceScreen extends AbstractContainerScreen<FurnaceMenu> {
             "rngtech.stat.efficiency",
             "rngtech.stat.heat_transfer",
             "rngtech.stat.max_temperature",
-            "rngtech.stat.warmup_time",
+            "rngtech.stat.thermal_mass",
             "rngtech.stat.cooling_rate",
             "rngtech.stat.temperature_stability",
             "rngtech.stat.overheat_tolerance",
@@ -97,7 +97,7 @@ public class FurnaceScreen extends AbstractContainerScreen<FurnaceMenu> {
             MachineStat.EFFICIENCY,
             MachineStat.HEAT_TRANSFER,
             MachineStat.MAX_TEMPERATURE,
-            MachineStat.WARMUP_TIME,
+            MachineStat.THERMAL_MASS,
             MachineStat.COOLING_RATE,
             MachineStat.TEMPERATURE_STABILITY,
             MachineStat.OVERHEAT_TOLERANCE,
@@ -110,7 +110,7 @@ public class FurnaceScreen extends AbstractContainerScreen<FurnaceMenu> {
             "rngtech.stat.processing_speed",
             "rngtech.stat.heat_transfer",
             "rngtech.stat.max_temperature",
-            "rngtech.stat.warmup_time",
+            "rngtech.stat.thermal_mass",
             "rngtech.stat.cooling_rate",
             "rngtech.stat.temperature_stability",
             "rngtech.stat.overheat_tolerance",
@@ -136,7 +136,7 @@ public class FurnaceScreen extends AbstractContainerScreen<FurnaceMenu> {
             MachineStat.PROCESSING_SPEED,
             MachineStat.HEAT_TRANSFER,
             MachineStat.MAX_TEMPERATURE,
-            MachineStat.WARMUP_TIME,
+            MachineStat.THERMAL_MASS,
             MachineStat.COOLING_RATE,
             MachineStat.TEMPERATURE_STABILITY,
             MachineStat.OVERHEAT_TOLERANCE,
@@ -148,6 +148,7 @@ public class FurnaceScreen extends AbstractContainerScreen<FurnaceMenu> {
     private static final Map<MegaPassiveNode, ResourceLocation> MASTERY_ICON_TEXTURES = createMasteryIconTextures();
 
     private final MasteryScreenSupport<MegaPassiveNode> masterySupport;
+    private final HeatSlider heatSlider = new HeatSlider(86, 100, 69);
 
     private static Map<MegaPassiveNode, ResourceLocation> createMasteryIconTextures() {
         Map<MegaPassiveNode, ResourceLocation> textures = new java.util.HashMap<>();
@@ -263,6 +264,10 @@ public class FurnaceScreen extends AbstractContainerScreen<FurnaceMenu> {
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        if (menu.selectedTab() == FurnaceMenu.TAB_PROCESSING
+                && heatSlider.mouseClicked(mouseX, mouseY, button, leftPos, topPos, menu.containerId)) {
+            return true;
+        }
         if (button == 0) {
             if (isOverTab(mouseX, mouseY, 0)) {
                 selectTab(FurnaceMenu.TAB_PROCESSING);
@@ -298,6 +303,9 @@ public class FurnaceScreen extends AbstractContainerScreen<FurnaceMenu> {
 
     @Override
     public boolean mouseDragged(double mouseX, double mouseY, int button, double dragX, double dragY) {
+        if (heatSlider.mouseDragged(mouseX, button, leftPos, menu.containerId)) {
+            return true;
+        }
         if (menu.selectedTab() == FurnaceMenu.TAB_MASTERY
                 && masterySupport.mouseDragged(mouseX, mouseY, button, imageWidth, imageHeight)) {
             return true;
@@ -307,6 +315,7 @@ public class FurnaceScreen extends AbstractContainerScreen<FurnaceMenu> {
 
     @Override
     public boolean mouseReleased(double mouseX, double mouseY, int button) {
+        heatSlider.mouseReleased();
         if (masterySupport.mouseReleased(mouseX, mouseY, button, leftPos, topPos, imageWidth, imageHeight)) {
             return true;
         }
@@ -428,6 +437,8 @@ public class FurnaceScreen extends AbstractContainerScreen<FurnaceMenu> {
     }
 
     private void renderProcessing(GuiGraphics guiGraphics) {
+        heatSlider.sync(menu.heatSlider());
+        heatSlider.render(guiGraphics, leftPos, topPos, menu.heatSlider());
         int x = leftPos;
         int y = topPos;
         if (menu.activeProcessingSlots() == 1) {
@@ -553,6 +564,10 @@ public class FurnaceScreen extends AbstractContainerScreen<FurnaceMenu> {
 
     private void renderValueTooltips(GuiGraphics guiGraphics, int mouseX, int mouseY) {
         if (menu.selectedTab() != FurnaceMenu.TAB_PROCESSING) {
+            return;
+        }
+        if (heatSlider.isOver(mouseX, mouseY, leftPos, topPos)) {
+            guiGraphics.renderComponentTooltip(font, heatSlider.tooltip(menu.heatSlider(), menu.setpoint()), mouseX, mouseY);
             return;
         }
 

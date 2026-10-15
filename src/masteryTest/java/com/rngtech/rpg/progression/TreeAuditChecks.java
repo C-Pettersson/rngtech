@@ -27,7 +27,7 @@ import java.util.stream.Stream;
  */
 final class TreeAuditChecks {
     private static final Set<MachineStat> LOWER_IS_BETTER = Set.of(
-            MachineStat.ENERGY_USAGE, MachineStat.WARMUP_TIME, MachineStat.COOLING_RATE, MachineStat.IDLE_LOSS, MachineStat.BATCH_OVERHEAD);
+            MachineStat.ENERGY_USAGE, MachineStat.THERMAL_MASS, MachineStat.COOLING_RATE, MachineStat.IDLE_LOSS, MachineStat.BATCH_OVERHEAD);
     /** Dense Batching's cost is waiting for a full batch. */
     private static final Set<String> COST_BEHAVIORS = Set.of("BLOCK_BATTERY", "MATCHING_HEAD", "NO_BONUS_OUTPUT", "DENSE_BATCHING",
             "NO_INHERENT_ATTRIBUTES", "NO_INHERENT_CONTROL", "NO_INHERENT_DRIVE", "NO_INHERENT_RESERVE");
@@ -52,7 +52,8 @@ final class TreeAuditChecks {
             "MachineStat.ENERGY_CAPACITY)", Set.of(MachineStat.ENERGY_CAPACITY_FLAT));
     /** Static helper classes whose methods read stats for the machine that calls them. */
     private static final List<String> HELPER_CLASSES = List.of(
-            "content/blockentity/HeatControl.java", "content/blockentity/ProcessingChance.java", "rpg/BatchProcessing.java",
+            "content/blockentity/HeatControl.java", "content/blockentity/HeatEngine.java", "content/blockentity/ProcessingChance.java",
+            "rpg/BatchProcessing.java",
             "content/recipe/ProcessingEnergyScaling.java", "rpg/progression/AscendancyFormulas.java");
     private static final Pattern STATIC_METHOD = Pattern.compile("(?m)^\\s+(?:public |private |protected )?static\\s+[\\w<>\\[\\], ?]+\\s+(\\w+)\\s*\\(");
     private static final Pattern STAT_REFERENCE = Pattern.compile("MachineStat\\.([A-Z_]+)\\b");
