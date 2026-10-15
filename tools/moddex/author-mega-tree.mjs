@@ -169,7 +169,9 @@ const KEYSTONES = [
     // Trades guaranteed speed for random speed: increased Processing Speed becomes Instant Process chance, under a cap.
     { id: "surge_cycling", extra: "surge_cycling", name: "Surge Cycling", behaviors: ["SURGE_CYCLING"], ceilings: { INSTANT_PROCESS_CHANCE: 75 } },
     // Quality of life, like Silent Operation: the points spent reaching it are the cost.
-    { id: "even_feed", extra: "even_feed", name: "Even Feed", behaviors: ["EVEN_FEED"] }
+    { id: "even_feed", extra: "even_feed", name: "Even Feed", behaviors: ["EVEN_FEED"] },
+    // Unlocks the overheat slider past the safe maximum. The risk is the player's: recipes that can fail build strain.
+    { id: "blast_draft", extra: "blast_draft", name: "Blast Draft", behaviors: ["BLAST_DRAFT"] }
 ];
 
 // Additions placed after the original fill, in design coordinates. Output constellations mirror Clean Dust Ledge on the
@@ -194,7 +196,9 @@ const EXTRAS = [
     // Surge Cycling sits on the outer road beside the Surge (Instant Process) pockets it feeds.
     { id: "surge_cycling", angle: 96, radius: 2300, shapes: ["keyDirect"], keystone: true, layer: "outer" },
     // The Batch Overhead path sits beside Dense Batching, which it leads to.
-    { id: "batch_overhead", angle: -62, radius: 1250, shapes: ["arc"], theme: "batching" }
+    { id: "batch_overhead", angle: -62, radius: 1250, shapes: ["arc"], theme: "batching" },
+    // Blast Draft hangs off a road close to the Furnace's start, so pushing the slider is an early choice, not a default.
+    { id: "blast_draft", angle: 40, radius: 1550, shapes: ["keyDirect"], keystone: true, layer: "home" }
 ];
 
 const regionAt = angle => {

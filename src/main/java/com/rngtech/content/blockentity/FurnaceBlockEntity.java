@@ -235,7 +235,7 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
             }
             if (index >= DATA_FAILURE_ENABLED_START && index < DATA_FAILURE_ENABLED_START + MAX_PROCESSING_SLOTS) {
                 int lane = index - DATA_FAILURE_ENABLED_START;
-                return failureEnabled(lane, statsForLane(lane)) ? 1 : 0;
+                return overheatFailureEnabled(lane, statsForLane(lane)) ? 1 : 0;
             }
             if (index >= DATA_POWER_SENSITIVE_START && index < DATA_POWER_SENSITIVE_START + MAX_PROCESSING_SLOTS) {
                 int lane = index - DATA_POWER_SENSITIVE_START;
@@ -853,7 +853,7 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
                 blockedStatus = input.getCount() < fullBatch(lane, laneStats) ? STATUS_FILLING_BATCH : STATUS_OUTPUT_FULL;
                 continue;
             }
-            if (failureEnabled(lane, laneStats)
+            if (overheatFailureEnabled(lane, laneStats)
                     && failureStrain[lane] >= HeatControl.FAILURE_STRAIN_THRESHOLD
                     && !canAcceptFailureOutput(lane, recipe)) {
                 blockedStatus = STATUS_OUTPUT_FULL;
@@ -867,7 +867,7 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
                 blockedStatus = STATUS_POWER_DROP;
                 continue;
             }
-            if (failureStrain[lane] > 0 && failureEnabled(lane, laneStats)) {
+            if (failureStrain[lane] > 0 && overheatFailureEnabled(lane, laneStats)) {
                 blockedStatus = STATUS_FAILURE_RISK;
                 continue;
             }
@@ -1070,7 +1070,7 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
     }
 
     private boolean tryFailCycle(int lane, FurnaceRecipe recipe) {
-        if (!failureEnabled(lane, statsForLane(lane)) || level == null) {
+        if (!overheatFailureEnabled(lane, statsForLane(lane)) || level == null) {
             return false;
         }
         ItemStack input = inventory.getStackInSlot(inputSlot(lane));
@@ -1273,7 +1273,8 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
                 targetTemperature(recipe),
                 safeMaximumTemperature(recipe),
                 recipe.requiredTemperatureStability(),
-                failureEnabled(lane, stats),
+                overheatFailureEnabled(lane, stats),
+                HeatEngine.pushPastSafe(hasMasteryBehavior("BLAST_DRAFT"), stats),
                 stats,
                 heatSlider / 100.0,
                 ceiling
@@ -1600,11 +1601,12 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
         if (hasMasteryBehavior("SAFE_OVERDRIVE")) {
             simulatedTemperature = Math.min(simulatedTemperature, envelope.overheat());
         }
+        boolean fullFailure = failureEnabled(lane, stats);
         int addedStrain = HeatControl.failureStrainFromTemperature(
                 simulatedTemperature,
-                envelope.minimum(),
+                fullFailure ? envelope.minimum() : 0,
                 envelope.overheat(),
-                recipe.requiredTemperatureStability(),
+                fullFailure ? recipe.requiredTemperatureStability() : 0.0,
                 stats
         );
         if (FurnacePassiveTree.usesQuenchProtocol(machineProgression())) {
@@ -1633,11 +1635,16 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
         return true;
     }
 
+    /** Stage 4+ chassis: underheat, instability, overheating, and sensitive power drops all build strain. */
     private boolean failureEnabled(int lane, MachineStatAccumulator stats) {
+        return furnaceMaterial().stage() >= 4 && overheatFailureEnabled(lane, stats);
+    }
+
+    /** Any chassis: a recipe with a failure output builds strain when its lane runs past the overheat temperature. */
+    private boolean overheatFailureEnabled(int lane, MachineStatAccumulator stats) {
         FurnaceRecipe recipe = laneRecipe(lane);
         return recipe != null
                 && recipe.hasFailureOutput()
-                && furnaceMaterial().stage() >= 4
                 && !cleanBloom(inventory.getStackInSlot(inputSlot(lane)))
                 && stats.intValue(MachineStat.MAX_TEMPERATURE) >= targetTemperature(recipe);
     }

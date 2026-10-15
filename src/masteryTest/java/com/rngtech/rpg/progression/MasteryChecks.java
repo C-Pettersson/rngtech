@@ -197,7 +197,7 @@ public final class MasteryChecks {
     }
 
     private static void graphAndBuilds() {
-        require(MegaPassiveTree.TREE.nodes().size() == 1351, "full shared catalog");
+        require(MegaPassiveTree.TREE.nodes().size() == 1352, "full shared catalog");
         for (MegaPassiveNode root : MegaPassiveTree.TREE.nodes().stream().filter(n -> n.kind() == PassiveNodeKind.STARTER).toList()) {
             require(root.links().size() == 3, "three exits per starter");
             for (MegaPassiveNode key : MegaPassiveTree.TREE.nodes().stream().filter(n -> n.kind() == PassiveNodeKind.KEYSTONE).toList()) {
@@ -417,6 +417,16 @@ public final class MasteryChecks {
             require(family.supportsBehavior("EVEN_FEED") == (family == MachineMasteryFamily.FURNACE), family + " fills lanes evenly only as a Furnace");
         }
         require(MegaPassiveTree.has(build(MachineMasteryFamily.FURNACE, "even_feed"), "EVEN_FEED"), "a Furnace build reaching Even Feed grants it");
+
+        // Blast Draft unlocks the overheat slider past the safe maximum; it is cheap from the Furnace's start and has no downside.
+        MegaPassiveNode blastDraft = MegaPassiveTree.node("blast_draft");
+        require(blastDraft.kind() == PassiveNodeKind.KEYSTONE && blastDraft.behaviors().equals(Set.of("BLAST_DRAFT")) && blastDraft.effects().isEmpty(),
+                "Blast Draft is a behavior-only keystone");
+        for (MachineMasteryFamily family : MachineMasteryFamily.values()) {
+            require(family.supportsBehavior("BLAST_DRAFT") == (family.has(MachineTag.HEATED) || family == MachineMasteryFamily.MELTER),
+                    family + " pushes the overheat slider only as a heated machine");
+        }
+        require(MegaPassiveTree.has(build(MachineMasteryFamily.FURNACE, "blast_draft"), "BLAST_DRAFT"), "a Furnace build reaching Blast Draft grants it");
     }
 
     /** Speed multiplier the destination keystone adds on top of the route that reaches it. */

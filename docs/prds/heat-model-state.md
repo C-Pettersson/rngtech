@@ -46,6 +46,8 @@ Recorded 2026-10-15, during implementation:
 - Heat Transfer no longer shortens crafts. Thermal Conductivity carries crafting speed and raises wall loss with it, so FE per craft stays about the same while FE/t rises.
 - Shared Hearth splits each load dip across every Lead Furnace lane that is smelting. Crucible Heart is +1 Batch Size while a lane runs at twice the recipe target. Heat Economy pays 30% less heat before the cycle starts; Continuous Pour skips the load dip.
 - The Melter has no separate target: its recipe minimum is the target, with a safe maximum of 1.15× the minimum.
+- Playtest 2026-10-15: a recipe with no temperature requirement (Silica Gel recharge) flickered between Too Hot and Ready, because 20 °C was above its 0 °C envelope. Ungated recipes now work at any heat at base speed, ignore the slider, and use a lane's leftover heat first.
+- Playtest 2026-10-15: overheating Iron Dust at 100% never failed, since only Stage 4+ smelts had failure outputs. Every metal smelt now has its malformed ingot as a failure output. Below a Stage 4 chassis only overheating builds strain, so the failure is always self-inflicted. To keep maxing the slider from being the default, it stops at the safe maximum until the Blast Draft keystone (no downside, 10 points from the Drive/Reserve start) or Overdrive unlocks it; recipes that cannot fail then stop at their overheat temperature. The slider spans whatever band the machine can reach.
 - `HeatProgressionChecks` runs the 18 quest steps tick by tick on Normal, unrolled gear and holds time and FE per craft within 0.5–2× of the old model. Its per-step table prints with `-Drngtech.heatReport`.
 
 ## Progress log

@@ -996,6 +996,7 @@ public class MetalPressBlockEntity extends BaseMachineBlockEntity
                 safeMaximumTemperature(recipe, stats),
                 requiredStability,
                 failureEnabled(recipe),
+                HeatEngine.pushPastSafe(hasMasteryBehavior("BLAST_DRAFT"), stats),
                 stats,
                 heatSlider / 100.0,
                 Integer.MAX_VALUE

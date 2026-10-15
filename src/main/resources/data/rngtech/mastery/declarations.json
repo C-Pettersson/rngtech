@@ -717,6 +717,16 @@
                 "resonance_calibrator"
             ],
             "yield": "none"
+        },
+        {
+            "id": "BLAST_DRAFT",
+            "families": [
+                "furnace",
+                "alloy_furnace",
+                "metal_press",
+                "melter"
+            ],
+            "yield": "none"
         }
     ]
 }

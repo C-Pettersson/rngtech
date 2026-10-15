@@ -896,8 +896,8 @@ public class MelterBlockEntity extends BaseMachineBlockEntity
     /** Melter recipes only name a melting point, which is both the minimum and the target; nothing can fail. */
     private HeatEngine.Envelope envelope(MelterRecipe recipe, MachineStatAccumulator stats) {
         int target = recipe.minimumTemperature();
-        return HeatEngine.envelope(target, target, HeatControl.defaultSafeMaximumTemperature(target), 0.0, false, stats,
-                heatSlider / 100.0, Integer.MAX_VALUE);
+        return HeatEngine.envelope(target, target, HeatControl.defaultSafeMaximumTemperature(target), 0.0, false,
+                HeatEngine.pushPastSafe(hasMasteryBehavior("BLAST_DRAFT"), stats), stats, heatSlider / 100.0, Integer.MAX_VALUE);
     }
 
     /** Reference ticks a melt needs: the recipe's time, longer for every extra melt in the batch. */

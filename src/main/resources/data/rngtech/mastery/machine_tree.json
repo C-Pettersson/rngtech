@@ -3065,6 +3065,16 @@
             "theme": "Batching",
             "region": "control_drive",
             "layer": "home"
+        },
+        {
+            "id": "reward_401",
+            "x": 4976,
+            "y": 4527,
+            "role": "reward",
+            "shape": "keyDirect",
+            "gate": "path_0243",
+            "region": "drive_reserve",
+            "layer": "home"
         }
     ],
     "nodes": [
@@ -31191,6 +31201,22 @@
             "x": 3839,
             "y": 5343,
             "group": "reward_399"
+        },
+        {
+            "effects": [],
+            "behaviors": [
+                "BLAST_DRAFT"
+            ],
+            "fixed": {},
+            "ceilings": {},
+            "scaling": [],
+            "passive": {},
+            "id": "blast_draft",
+            "kind": "KEYSTONE",
+            "name": "Blast Draft",
+            "x": 4976,
+            "y": 4527,
+            "group": "reward_401"
         }
     ],
     "links": [
@@ -37209,6 +37235,10 @@
         [
             "even_loading_2",
             "even_loading"
+        ],
+        [
+            "path_0243",
+            "blast_draft"
         ]
     ]
 }

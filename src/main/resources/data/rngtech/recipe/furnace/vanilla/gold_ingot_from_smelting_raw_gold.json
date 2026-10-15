@@ -11,5 +11,10 @@
   "heat": 2880,
   "experience": 1,
   "minimum_temperature": 1000,
-  "machine_xp": 2
+  "machine_xp": 2,
+  "failure_output": {
+    "count": 1,
+    "id": "rngtech:malformed_ingot"
+  },
+  "failure_material": "gold"
 }

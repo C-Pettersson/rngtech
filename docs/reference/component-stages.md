@@ -26,7 +26,7 @@ Use stage for material progression. Use tier for modifier quality. Use rating wh
 - Breakthrough upgrades can raise a component one stage above the recipe target or raise a family rating.
 - Pack makers can disable stages, remap stages, or add higher stages through datapacks and configs.
 - Stages 0-3 teach processing through gating, pausing, speed penalties, or low output. They should not normally consume inputs into processing failures.
-- Stage 4 is the first default failure-bearing component stage. Machines at this stage can turn active work into recoverable failure outputs when control conditions are bad.
+- Stage 4 is the first default failure-bearing component stage. Machines at this stage can turn active work into recoverable failure outputs when control conditions are bad. Earlier machines fail only when the player pushes a metal smelt past its overheat temperature with the overheat slider.
 - Stage 5+ components should improve failure mitigation through better control, stability, and recovery rather than simply increasing raw throughput.
 
 ## Compatibility Policy
@@ -373,7 +373,7 @@ Lucky components can cross one stage boundary. Natural tier weighting, no free R
 - Keep material stage, family rating, and modifier tier separate in data.
 - Keep battery cell capacity separate from battery chassis behavior.
 - Let battery chassis materials define slot count and global behavior, not large hidden storage.
-- Treat Stage 4 as the first normal machine-processing failure band; earlier processing should prefer blocking, pausing, or slowing instead of consuming inputs into failed outputs.
+- Treat Stage 4 as the first normal machine-processing failure band; earlier processing should prefer blocking, pausing, or slowing instead of consuming inputs into failed outputs. Self-inflicted failure, such as overheating a smelt on purpose, is allowed at any stage.
 - Keep Stage 4 failure outputs recoverable and data-driven when source material matters.
 - Let datapacks remap material tags into component stages.
 - Keep Unique components outside the normal material ladder unless a pack defines a specific unique upgrade chain.

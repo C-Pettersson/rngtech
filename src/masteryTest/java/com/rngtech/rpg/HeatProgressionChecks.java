@@ -47,6 +47,7 @@ public final class HeatProgressionChecks {
         baseGearBuildsNoNewStrain(root);
         stageZeroCoalSmeltsIronAndCopper(root);
         ungatedRecipesWorkAtAnyHeat();
+        sliderStopsAtTheSafeMaximumWithoutBlastDraft();
         return checks;
     }
 
@@ -126,7 +127,7 @@ public final class HeatProgressionChecks {
             }
             MachineStatAccumulator stats = step.gear().get();
             int maximum = stats.intValue(MachineStat.MAX_TEMPERATURE);
-            HeatEngine.Envelope envelope = HeatEngine.envelope(maximum / 2, maximum / 2, maximum / 2, 0.0, false, stats, 1.0, Integer.MAX_VALUE);
+            HeatEngine.Envelope envelope = HeatEngine.envelope(maximum / 2, maximum / 2, maximum / 2, 0.0, true, true, stats, 1.0, Integer.MAX_VALUE);
             HeatLane lane = new HeatLane();
             HeatEngine.Load idle = new HeatEngine.Load(0.0, 0.0, 1);
             for (int tick = 0; tick < 6_000 && lane.exactTemperature() < maximum - 1; tick++) {
@@ -186,10 +187,28 @@ public final class HeatProgressionChecks {
         }
     }
 
+    /**
+     * The slider reaches the safe maximum on its own. Blast Draft takes it to Max Temperature on recipes that can fail,
+     * and to the overheat temperature on recipes that cannot.
+     */
+    private static void sliderStopsAtTheSafeMaximumWithoutBlastDraft() {
+        MachineStatAccumulator stats = furnace(FurnaceChassisMaterial.TUNGSTENSTEEL, HeatCoreMaterial.TITANIUM);
+        int maximum = stats.intValue(MachineStat.MAX_TEMPERATURE);
+        HeatEngine.Envelope locked = HeatEngine.envelope(800, 800, 920, 0.0, true, false, stats, 1.0, Integer.MAX_VALUE);
+        require(locked.setpoint() == 920, "without Blast Draft the slider stops at the safe maximum, not " + locked.setpoint());
+        HeatEngine.Envelope half = HeatEngine.envelope(800, 800, 920, 0.0, true, false, stats, 0.5, Integer.MAX_VALUE);
+        require(half.setpoint() == 860, "the slider spans the reachable band, so 50% is halfway to the safe maximum");
+        HeatEngine.Envelope cannotFail = HeatEngine.envelope(800, 800, 920, 0.0, false, true, stats, 1.0, Integer.MAX_VALUE);
+        require(cannotFail.setpoint() == cannotFail.overheat(), "Blast Draft takes a recipe that cannot fail only to its overheat temperature");
+        HeatEngine.Envelope canFail = HeatEngine.envelope(800, 800, 920, 0.0, true, true, stats, 1.0, Integer.MAX_VALUE);
+        require(maximum > canFail.overheat() && canFail.setpoint() == maximum, "Blast Draft takes a recipe that can fail to Max Temperature");
+        require(HeatEngine.pushPastSafe(false, stats) == stats.value(MachineStat.OVERDRIVE_SPEED) > 0.0, "only Overdrive pushes past the safe maximum without Blast Draft");
+    }
+
     /** A recipe without a temperature requirement works from cold or hot at its own pace, and never waits as Too Hot. */
     private static void ungatedRecipesWorkAtAnyHeat() {
         MachineStatAccumulator stats = furnace(FurnaceChassisMaterial.STEEL, HeatCoreMaterial.STEEL);
-        HeatEngine.Envelope envelope = HeatEngine.envelope(0, 0, 0, 0.0, false, stats, 1.0, Integer.MAX_VALUE);
+        HeatEngine.Envelope envelope = HeatEngine.envelope(0, 0, 0, 0.0, false, true, stats, 1.0, Integer.MAX_VALUE);
         require(envelope.ungated() && envelope.setpoint() == HeatEngine.AMBIENT, "an ungated recipe ignores the slider");
         int ticks = 1_200;
         double recipeHeat = 17_280.0;
@@ -375,7 +394,7 @@ public final class HeatProgressionChecks {
         }
 
         HeatEngine.Envelope envelope(MachineStatAccumulator stats, double slider) {
-            return HeatEngine.envelope(minimum, target, safeMaximum, stability, false, stats, slider, Integer.MAX_VALUE);
+            return HeatEngine.envelope(minimum, target, safeMaximum, stability, false, false, stats, slider, Integer.MAX_VALUE);
         }
 
         private static int intOr(JsonObject json, String key, int fallback) {

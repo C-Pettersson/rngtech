@@ -78,10 +78,27 @@ public final class HeatEngine {
         int burn(int ticks);
     }
 
-    /** The slider runs from the target (0) to the lane's Max Temperature (1). */
-    public static int setpoint(int target, MachineStatAccumulator stats, double slider) {
-        int ceiling = Math.max(target, stats.intValue(MachineStat.MAX_TEMPERATURE));
+    /** The slider runs from the target (0) to the highest setpoint the lane may reach (1). */
+    public static int setpoint(int target, int reach, double slider) {
+        int ceiling = Math.max(target, reach);
         return target + (int) Math.round(Math.max(0.0, Math.min(1.0, slider)) * (ceiling - target));
+    }
+
+    /**
+     * Whether the slider may push past the safe maximum: Blast Draft unlocks it, and Overdrive, whose speed only counts
+     * past the safe maximum, needs it.
+     */
+    public static boolean pushPastSafe(boolean blastDraft, MachineStatAccumulator stats) {
+        return blastDraft || stats.value(MachineStat.OVERDRIVE_SPEED) > 0.0;
+    }
+
+    /**
+     * The highest setpoint the slider reaches. Without {@code pushPastSafe} it stops at the safe maximum; with it, a
+     * recipe that can fail goes up to Max Temperature and one that cannot stops at its overheat temperature.
+     */
+    public static int reach(int safeMaximum, int overheat, boolean canFail, boolean pushPastSafe, MachineStatAccumulator stats, int setpointCeiling) {
+        int reach = !pushPastSafe ? safeMaximum : canFail ? Integer.MAX_VALUE : overheat;
+        return Math.min(stats.intValue(MachineStat.MAX_TEMPERATURE), Math.min(setpointCeiling, reach));
     }
 
     public static Envelope envelope(
@@ -90,6 +107,7 @@ public final class HeatEngine {
             int safeMaximum,
             double requiredStability,
             boolean canFail,
+            boolean pushPastSafe,
             MachineStatAccumulator stats,
             double slider,
             int setpointCeiling
@@ -97,9 +115,10 @@ public final class HeatEngine {
         if (target <= AMBIENT) {
             return new Envelope(AMBIENT, AMBIENT, AMBIENT, Integer.MAX_VALUE, requiredStability, AMBIENT, false);
         }
-        int setpoint = Math.max(target, Math.min(setpointCeiling, setpoint(target, stats, slider)));
         int safe = Math.max(target, safeMaximum);
-        return new Envelope(Math.min(minimum, target), target, safe, overheatTemperature(safe, stats), requiredStability, setpoint, canFail);
+        int overheat = overheatTemperature(safe, stats);
+        int setpoint = setpoint(target, reach(safe, overheat, canFail, pushPastSafe, stats, setpointCeiling), slider);
+        return new Envelope(Math.min(minimum, target), target, safe, overheat, requiredStability, setpoint, canFail);
     }
 
     /** The safe maximum stretched by Overheat Tolerance: above it, a recipe that can fail builds strain. */

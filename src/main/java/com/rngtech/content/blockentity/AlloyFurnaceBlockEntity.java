@@ -995,6 +995,7 @@ public class AlloyFurnaceBlockEntity extends BaseMachineBlockEntity implements M
                 safeMaximumTemperature(recipe, stats),
                 recipe.requiredTemperatureStability(),
                 failureEnabled(recipe, stats),
+                HeatEngine.pushPastSafe(hasMasteryBehavior("BLAST_DRAFT"), stats),
                 stats,
                 heatSlider / 100.0,
                 Integer.MAX_VALUE

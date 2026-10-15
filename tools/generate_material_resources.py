@@ -604,6 +604,8 @@ def generate_ore_furnace_recipe(catalog: dict, material: dict) -> None:
         ("heat", 4320),
         ("experience", 0.7),
         ("minimum_temperature", 1000),
+        ("failure_output", OrderedDict([("count", 1), ("id", "rngtech:malformed_ingot")])),
+        ("failure_material", material_id),
     ]))
 
 
@@ -664,6 +666,8 @@ def generate_raw_material_recipes(catalog: dict, ore_catalog: dict) -> None:
             ("heat", 2880),
             ("experience", 0.7),
             ("minimum_temperature", 1000),
+            ("failure_output", OrderedDict([("count", 1), ("id", "rngtech:malformed_ingot")])),
+            ("failure_material", material_id),
         ]))
         write_json(DATA_ROOT / f"rngtech/recipe/crusher/raw_{material_id}.json", OrderedDict([
             ("neoforge:conditions", [

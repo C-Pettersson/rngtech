@@ -216,13 +216,14 @@ The Melter gains a live temperature with the same engine. Its recipes have only 
 Every heated machine gets an overheat slider on its Process tab, stored on the machine and kept when it's broken and placed again. Lanes on a Lead Furnace share it.
 
 ```text
-slider   = 0% to 100% of the band from the target to Max Temperature
-setpoint = target + slider × (Max Temperature − target)
+reach    = safe maximum; with Blast Draft or Overdrive, Max Temperature (or the overheat temperature if the recipe cannot fail)
+slider   = 0% to 100% of the band from the target to reach
+setpoint = target + slider × (reach − target)
 ```
 
 - At 0%, the default, the lane holds the recipe target: lowest FE, base speed, and no wobble beyond a Stability shortfall.
 - Higher settings run hotter and faster and cost more FE, because heat loss grows faster than linearly with temperature.
-- Past the safe maximum, the lane is overheating on purpose. Wobble spikes above the overheat temperature build strain on recipes that can fail; recipes that cannot fail just run fast and expensive.
+- Past the safe maximum, the lane is overheating on purpose. That needs the Blast Draft keystone, 10 points from the Drive/Reserve start, so maxing the slider is not the default early. Every metal smelt has a failure output, and on any chassis wobble spikes above the overheat temperature build strain; recipes that cannot fail stop at their overheat temperature.
 - The slider is a fraction of each lane's own band, so one setting works for every recipe. A lane always works with its current recipe's target and Max Temperature.
 - The slider is set in the UI. Automation does not change it.
 

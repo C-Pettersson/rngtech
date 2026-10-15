@@ -16,13 +16,16 @@ The [Furnace](furnace.md), [Alloy Furnace](alloy-furnace.md), [Metal Press](meta
 - **Idle.** With nothing to work on, the heater turns off and the walls slowly leak the heat away. Heat Insulation and Thermal Mass keep it longer.
 - **Too hot.** A lane hotter than its next recipe allows, after a hotter recipe or when you lower the slider, stops and cools first. The status reads **Too Hot**. Cooling Rate makes that wait shorter.
 
+Recipes with no temperature requirement, such as food or recharging Silica Gel Beads, work at any heat at their normal speed, and a lane still hot from an earlier recipe pays for them with that leftover heat.
+
 Heat loss grows quickly with temperature, so running hotter is faster but costs more FE per craft. Every craft pays at least its recipe's heat; JEI and the recipe tables list it in heat units (HU). On an electric machine each HU costs 1 FE before Energy Usage.
 
 ## The overheat slider
 
-The slider under the progress bar on the Process tab sets how far past each recipe's target the lanes run, from 0% (the target, the default) to 100% (the machine's Max Temperature). One setting works for every recipe, because it is a share of each recipe's own range. All lanes of a Lead Furnace share it.
+The slider under the progress bars on the Process tab sets how far past each recipe's target the lanes run, from 0% (the target, the default) to 100%. On its own, 100% is the recipe's safe maximum. The **Blast Draft** keystone on the [Machine Mastery](machine-mastery.md) tree lets 100% reach the machine's Max Temperature, and Overdrive does the same; a recipe that cannot fail still stops at its overheat temperature. One setting works for every recipe, because it is a share of each recipe's own range. All lanes of a Lead Furnace share it.
 
 - Higher is faster and costs more FE per craft.
+- Running hot is your risk. Every metal smelt can fail: when wobble spikes past the overheat temperature, failure strain builds, and a full strain bar turns the batch into {{ item('rngtech:malformed_ingot') }}s of that metal. Smelt them again to get two nuggets back.
 - Pushing past the target makes the temperature **wobble**. The heat bar shades the wobble band around the setpoint. Temperature Stability and Thermal Mass narrow it.
 - Wobble that dips below the recipe's minimum pauses the work for that moment. On recipes that can fail, wobble that spikes past the overheat temperature builds failure strain.
 - At 0% only a shortfall in Temperature Stability makes a lane wobble.
