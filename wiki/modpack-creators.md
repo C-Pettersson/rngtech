@@ -106,7 +106,7 @@ You cannot change these without code: connector caps, Battery Cell sizes, Heat C
 
 | Source | Stage | Water | Cost |
 |---|---:|---:|---|
-| [Wooden Dehumidifier](wooden-dehumidifier.md) | 2–3 | Up to 1.25 mB/t (25 frames), less in dry biomes | No FE; needs sky access and room for its frames |
+| [Wooden Dehumidifier](wooden-dehumidifier.md) | 2–3 | Up to 1.25 mB/t, less in dry biomes | No FE; needs sky access and room for its 3×3×3 frame cube |
 | [Silica Gel Dehumidifier](silica-gel-dehumidifier.md), Silica Gel Beads | 5 | 2.5 mB/t (3 lanes) | About 30 FE per mB to recharge beads |
 | Silica Gel Dehumidifier, Supercharged Beads | 6 | 8.3 mB/t (3 lanes) | About 18 FE per mB to recharge beads |
 

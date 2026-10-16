@@ -8,19 +8,11 @@ navigation:
 
 # Building the structure
 
-The structure is a controller plus at least four frames:
+The structure is a hollow 3×3×3 cube of 25 <ItemLink id="rngtech:wooden_dehumidifier_frame" /> blocks, with the <ItemLink id="rngtech:wooden_dehumidifier" /> controller in the middle of one side:
 
-1. Place the <ItemLink id="rngtech:wooden_dehumidifier" /> controller.
-2. Place <ItemLink id="rngtech:wooden_dehumidifier_frame" /> blocks so that at least one touches a face of the controller, and the rest touch each other face to face. Diagonal contact does not count.
-3. Keep every frame within 4 blocks of the controller on each axis. Frames further out are ignored.
+1. Build the cube from frames, leaving the middle block of one side out and the centre of the cube empty.
+2. Place the controller in the gap in that side, facing out.
 
-Any shape works, such as a ring or barrel around the controller. Once the controller finds four or more connected frames, they all switch to their formed look and the machine starts working. With fewer than four, it stops and shows an invalid-structure status.
+Once the cube is complete, every frame switches to its formed look and the machine starts working. A missing frame, a block in the centre, or frames in any other shape leave the structure invalid, and the screen shows how many of the 25 frames it found. Frames outside the cube do nothing.
 
-More frames make a bigger and faster machine, up to 25 frames:
-
-| Frames | Water tank | Converted-output tank | Base water rate |
-|---:|---:|---:|---:|
-| 4 | 4,000 mB | 4,000 mB | 240 mB/min |
-| 25 | 25,000 mB | 25,000 mB | 1,500 mB/min |
-
-Each frame adds 1,000 mB to each tank and 60 mB/min to the base rate. Frames beyond 25 still count as part of the structure but add nothing.
+The complete structure has a 25,000 mB water tank, a 25,000 mB converted-output tank, and a base water rate of 1,500 mB/min.

@@ -116,7 +116,7 @@ Every gas chain runs on water: the Coal Gasifier, Algae Photobioreactor, Melter,
 
 **What to build.** A [Wooden Dehumidifier](wooden-dehumidifier.md) first. It needs no power and fills itself from the air while it can see the sky, faster in wet biomes and in rain. From Stage 5, a [Silica Gel Dehumidifier](silica-gel-dehumidifier.md) gives steady water anywhere, including underground and in the Nether. Its saturated beads go back through a [Furnace](furnace.md) to dry, so the beads loop between the two machines and only the Furnace's FE is spent.
 
-**Bottleneck.** Water runs short sooner than you expect. Even a full-size Wooden Dehumidifier in the rain makes less water than one Coal Gasifier uses, and the Melter and the Cavitation Generator each use more than the Gasifier. Build several Wooden Dehumidifiers early, and move the thirsty machines onto Silica Gel Dehumidifiers.
+**Bottleneck.** Water runs short sooner than you expect. Even a Wooden Dehumidifier in the rain makes less water than one Coal Gasifier uses, and the Melter and the Cavitation Generator each use more than the Gasifier. Build several Wooden Dehumidifiers early, and move the thirsty machines onto Silica Gel Dehumidifiers.
 
 **Next upgrade.** Supercharged beads, made in the [Alloy Furnace](alloy-furnace.md), hold more than three times as much water per bead.
 

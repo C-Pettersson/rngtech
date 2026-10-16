@@ -3583,7 +3583,7 @@
   "rngtech.wooden_dehumidifier.structure.invalid": "invalid",
   "rngtech.wooden_dehumidifier.tooltip.progress": "Conversion: %s / %s ticks",
   "rngtech.wooden_dehumidifier.tooltip.status": "Status: %s",
-  "rngtech.wooden_dehumidifier.tooltip.structure": "Structure: %s detected frames, %s, 25 effective max",
+  "rngtech.wooden_dehumidifier.tooltip.structure": "Structure: %s of 25 frames, %s",
   "rngtech.wooden_dehumidifier.tooltip.humidity": "Humidity: %s, %s, %s, %s mB/min",
   "rngtech.wooden_dehumidifier.tooltip.selected_output": "Selected output: %s",
   "rngtech.jei.category.wooden_dehumidifier_conversion": "Wooden Dehumidifier Conversion",

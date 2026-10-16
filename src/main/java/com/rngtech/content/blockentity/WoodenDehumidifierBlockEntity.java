@@ -43,7 +43,6 @@ import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.ItemStackHandler;
 
-import java.util.ArrayDeque;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -89,12 +88,12 @@ public class WoodenDehumidifierBlockEntity extends BlockEntity
     private static final int DATA_STATUS = 14;
     private static final int DATA_COUNT = 15;
 
-    private static final int MIN_FRAMES = 4;
-    private static final int MAX_FRAMES = 25;
-    private static final int SCAN_RADIUS = 4;
+    /** The structure is a hollow 3x3x3 cube of frames; the controller takes the middle block of one side. */
+    private static final int STRUCTURE_FRAMES = 25;
+    private static final int SCAN_RADIUS = 2;
     private static final int RESCAN_INTERVAL = 80;
-    private static final int WATER_PER_FRAME_CAPACITY = FluidType.BUCKET_VOLUME;
-    private static final int BASE_WATER_PER_MINUTE_PER_FRAME = 60;
+    private static final int TANK_CAPACITY = STRUCTURE_FRAMES * FluidType.BUCKET_VOLUME;
+    private static final int BASE_WATER_PER_MINUTE = 1500;
     private static final int MAX_WATER_PER_MINUTE = 1500;
 
     private final ItemStackHandler inventory = new ItemStackHandler(SLOT_COUNT) {
@@ -287,6 +286,14 @@ public class WoodenDehumidifierBlockEntity extends BlockEntity
         rescanRequested = true;
     }
 
+    public boolean isStructureValid() {
+        return structureValid;
+    }
+
+    public int frameCount() {
+        return frameCount;
+    }
+
     public boolean ownsFrame(BlockPos framePos) {
         return structureValid && formedFramePositions.contains(framePos);
     }
@@ -420,12 +427,12 @@ public class WoodenDehumidifierBlockEntity extends BlockEntity
             return false;
         }
         rescanRequested = false;
-        Set<BlockPos> countedFrames = connectedFrames();
+        CubeScan scan = bestCube();
         int previousCount = frameCount;
         boolean previousValid = structureValid;
-        frameCount = countedFrames.size();
-        structureValid = frameCount >= MIN_FRAMES;
-        updateFormedFrameStates(countedFrames);
+        frameCount = scan.frames().size();
+        structureValid = scan.complete();
+        updateFormedFrameStates(scan.frames());
         applyCapacity(structureValid);
         if (!outputOptions().contains(selectedOutput)) {
             selectedOutput = Fluids.WATER;
@@ -433,47 +440,50 @@ public class WoodenDehumidifierBlockEntity extends BlockEntity
         return previousCount != frameCount || previousValid != structureValid;
     }
 
-    private Set<BlockPos> connectedFrames() {
-        Set<BlockPos> counted = new LinkedHashSet<>();
-        Set<BlockPos> visited = new HashSet<>();
-        ArrayDeque<BlockPos> queue = new ArrayDeque<>();
-        for (Direction direction : Direction.values()) {
-            BlockPos neighbor = worldPosition.relative(direction);
-            if (isFrameWithinScan(neighbor)) {
-                queue.add(neighbor.immutable());
+    /** The cube behind the controller's front, or else on another horizontal side; a partial cube reports its frames. */
+    private CubeScan bestCube() {
+        Direction front = getBlockState().hasProperty(BaseMachineBlock.FACING)
+                ? getBlockState().getValue(BaseMachineBlock.FACING)
+                : Direction.NORTH;
+        CubeScan best = scanCube(worldPosition.relative(front.getOpposite()));
+        for (Direction side : Direction.Plane.HORIZONTAL) {
+            if (best.complete()) {
+                return best;
             }
-        }
-        while (!queue.isEmpty()) {
-            BlockPos current = queue.removeFirst();
-            if (!visited.add(current) || !isFrameWithinScan(current)) {
-                continue;
-            }
-            counted.add(current);
-            for (Direction direction : Direction.values()) {
-                BlockPos neighbor = current.relative(direction);
-                if (!visited.contains(neighbor) && isFrameWithinScan(neighbor)) {
-                    queue.add(neighbor.immutable());
+            if (side != front.getOpposite()) {
+                CubeScan scan = scanCube(worldPosition.relative(side));
+                if (scan.complete() || scan.frames().size() > best.frames().size()) {
+                    best = scan;
                 }
             }
         }
-        return counted;
+        return best;
     }
 
-    private boolean isFrameWithinScan(BlockPos pos) {
-        if (level == null || Math.abs(pos.getX() - worldPosition.getX()) > SCAN_RADIUS
-                || Math.abs(pos.getY() - worldPosition.getY()) > SCAN_RADIUS
-                || Math.abs(pos.getZ() - worldPosition.getZ()) > SCAN_RADIUS) {
-            return false;
+    private CubeScan scanCube(BlockPos center) {
+        Set<BlockPos> frames = new LinkedHashSet<>();
+        for (BlockPos pos : BlockPos.betweenClosed(center.offset(-1, -1, -1), center.offset(1, 1, 1))) {
+            if (!pos.equals(center) && !pos.equals(worldPosition) && isFrame(pos)) {
+                frames.add(pos.immutable());
+            }
         }
-        return level.getBlockState(pos).is(ModBlocks.WOODEN_DEHUMIDIFIER_FRAME.get());
+        boolean complete = level != null && frames.size() == STRUCTURE_FRAMES && level.getBlockState(center).isAir();
+        return new CubeScan(frames, complete);
     }
 
-    private void updateFormedFrameStates(Set<BlockPos> countedFrames) {
+    private boolean isFrame(BlockPos pos) {
+        return level != null && level.getBlockState(pos).is(ModBlocks.WOODEN_DEHUMIDIFIER_FRAME.get());
+    }
+
+    private record CubeScan(Set<BlockPos> frames, boolean complete) {
+    }
+
+    private void updateFormedFrameStates(Set<BlockPos> cubeFrames) {
         if (level == null) {
             return;
         }
         Set<BlockPos> previousFormed = Set.copyOf(formedFramePositions);
-        Set<BlockPos> nextFormed = structureValid ? Set.copyOf(countedFrames) : Set.of();
+        Set<BlockPos> nextFormed = structureValid ? Set.copyOf(cubeFrames) : Set.of();
         for (BlockPos framePos : previousFormed) {
             if (!nextFormed.contains(framePos)) {
                 setFrameFormed(framePos, false);
@@ -502,13 +512,9 @@ public class WoodenDehumidifierBlockEntity extends BlockEntity
     }
 
     private void applyCapacity(boolean clamp) {
-        int nextCapacity = structureValid ? effectiveFrameCount() * WATER_PER_FRAME_CAPACITY : preservedCapacity();
+        int nextCapacity = structureValid ? TANK_CAPACITY : preservedCapacity();
         waterTank.setCapacity(nextCapacity, clamp);
         convertedOutputTank.setCapacity(nextCapacity, clamp);
-    }
-
-    private int effectiveFrameCount() {
-        return Math.min(MAX_FRAMES, frameCount);
     }
 
     private int preservedCapacity() {
@@ -646,15 +652,14 @@ public class WoodenDehumidifierBlockEntity extends BlockEntity
     }
 
     private int productionRatePerMinute() {
-        int effectiveFrames = effectiveFrameCount();
-        if (!structureValid || effectiveFrames <= 0 || !hasSolarAccess()) {
+        if (!structureValid || !hasSolarAccess()) {
             return 0;
         }
         double multiplier = humidityMultiplier();
         if (multiplier <= 0.0D) {
             return 0;
         }
-        return Math.min(MAX_WATER_PER_MINUTE, (int) Math.round(BASE_WATER_PER_MINUTE_PER_FRAME * effectiveFrames * multiplier));
+        return Math.min(MAX_WATER_PER_MINUTE, (int) Math.round(BASE_WATER_PER_MINUTE * multiplier));
     }
 
     private boolean hasSolarAccess() {
