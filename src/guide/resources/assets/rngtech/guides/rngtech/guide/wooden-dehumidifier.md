@@ -65,4 +65,4 @@ The Wooden Dehumidifier has a single screen with the conversion slot, the contai
 
 ### Breaking
 
-Break the controller or a frame with any tool, or by hand. Each block drops itself. Breaking the controller also drops the items in its slots. Removing frames shrinks the structure, and the controller updates its frame count.
+Break the controller or a frame with any tool, or by hand. Each block drops itself. Breaking the controller also drops the items in its slots. Removing any frame stops the machine until you put it back.
