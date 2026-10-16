@@ -271,6 +271,7 @@ public class FurnaceScreen extends AbstractContainerScreen<FurnaceMenu> {
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         if (menu.selectedTab() == FurnaceMenu.TAB_PROCESSING
+                && menu.isElectric()
                 && heatSlider.mouseClicked(mouseX, mouseY, button, leftPos, topPos, menu.containerId)) {
             return true;
         }
@@ -443,8 +444,11 @@ public class FurnaceScreen extends AbstractContainerScreen<FurnaceMenu> {
     }
 
     private void renderProcessing(GuiGraphics guiGraphics) {
-        heatSlider.sync(menu.heatSlider());
-        heatSlider.render(guiGraphics, font, leftPos, topPos, menu.heatSlider(), heatBands());
+        // The Stage 0 fuel Furnace has no overheat slider: it always holds the recipe target.
+        if (menu.isElectric()) {
+            heatSlider.sync(menu.heatSlider());
+            heatSlider.render(guiGraphics, font, leftPos, topPos, menu.heatSlider(), heatBands());
+        }
         int x = leftPos;
         int y = topPos;
         if (menu.activeProcessingSlots() == 1) {
@@ -572,7 +576,7 @@ public class FurnaceScreen extends AbstractContainerScreen<FurnaceMenu> {
         if (menu.selectedTab() != FurnaceMenu.TAB_PROCESSING) {
             return;
         }
-        if (heatSlider.isOver(mouseX, mouseY, leftPos, topPos)) {
+        if (menu.isElectric() && heatSlider.isOver(mouseX, mouseY, leftPos, topPos)) {
             guiGraphics.renderComponentTooltip(font, heatSlider.tooltip(menu.heatSlider(), menu.setpoint()), mouseX, mouseY);
             return;
         }

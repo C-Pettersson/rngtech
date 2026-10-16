@@ -1289,7 +1289,7 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
                 overheatFailureEnabled(lane, stats),
                 hasMasteryBehavior("BLAST_DRAFT"),
                 stats,
-                heatSlider / 100.0,
+                isElectric() ? heatSlider / 100.0 : 0.0,
                 ceiling
         ).coolingFirst(hasMasteryBehavior("COOL_HEADED"));
     }
