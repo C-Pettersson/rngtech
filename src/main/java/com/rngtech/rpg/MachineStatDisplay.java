@@ -70,7 +70,7 @@ public final class MachineStatDisplay {
             case FLUID_CAPACITY -> formatNumber(value) + " mB";
             case FLUID_TRANSFER -> formatNumber(value) + " mB/t";
             case COMPRESSION_RATIO -> formatNumber(value) + ":1";
-            case MAX_TEMPERATURE -> formatNumber(value) + " heat";
+            case MAX_TEMPERATURE -> formatNumber(Math.round(value)) + " heat";
             case BURST_DURATION, ORE_BURST_DURATION, ORE_BURST_COOLDOWN -> formatUnit(value, "tick", "ticks");
             case DURABILITY -> formatNumber(value) + " durability";
             case SELF_REPAIR -> formatNumber(value) + " durability";
@@ -212,7 +212,7 @@ public final class MachineStatDisplay {
             case BATCH_OVERHEAD -> formatSignedPercentPoints(value) + " per extra item";
             case FLUID_CAPACITY -> formatSignedNumber(value) + " mB";
             case FLUID_TRANSFER -> formatSignedNumber(value) + " mB/t";
-            case MAX_TEMPERATURE -> formatSignedNumber(value) + " heat";
+            case MAX_TEMPERATURE -> formatSignedNumber(Math.round(value)) + " heat";
             case BURST_DURATION, ORE_BURST_DURATION, ORE_BURST_COOLDOWN -> formatSignedUnit(value, "tick", "ticks");
             case DURABILITY, SELF_REPAIR -> formatSignedNumber(value) + " durability";
             case AREA_WIDTH, AREA_HEIGHT, TREE_FELL_LIMIT, VEIN_MINE_LIMIT -> formatSignedUnit(value, "block", "blocks");
