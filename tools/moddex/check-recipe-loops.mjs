@@ -42,7 +42,7 @@ const INPUT_KEYS = [
 const REUSABLE_KEYS = new Map([["rngtech:ammonia_synthesis", new Set(["catalyst"])], ["rngtech:gas_reforming", new Set(["catalyst"])]]);
 const OUTPUT_KEYS = [
     "result", "outputs", "output", "fluid_output", "residue", "saturated_output",
-    "water_output", "exhaust_output", "hydrogen_output", "carbon_monoxide_output"
+    "water_output", "exhaust_output", "hydrogen_output", "carbon_monoxide_output", "byproduct_output"
 ];
 const FLUID_BUCKETS = ["ammonia", "carbon_exhaust", "carbon_monoxide", "electrolyte_solution", "hydrogen", "lubricant", "methane", "nitrogen", "syngas"];
 const WOODS = ["oak", "spruce", "birch", "jungle", "acacia", "dark_oak", "mangrove", "cherry", "bamboo", "crimson", "warped"];

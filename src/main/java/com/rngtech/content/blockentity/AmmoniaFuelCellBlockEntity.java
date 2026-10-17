@@ -82,6 +82,7 @@ public class AmmoniaFuelCellBlockEntity extends BaseMachineBlockEntity
     private static final int DATA_REFINEMENT_POTENTIAL = 12;
     private static final int DATA_FLAT_ENERGY_GENERATION = 13;
     private static final int DATA_BASE_ENERGY_GENERATION = 14;
+    private static final int DATA_FUEL_HYDROGEN = 15;
     private static final int STAT_SCALE = 100;
     private static final int VISUAL_SYNC_INTERVAL = 5;
     private static final Direction[] ENERGY_OUTPUT_DIRECTIONS = {
@@ -133,7 +134,7 @@ public class AmmoniaFuelCellBlockEntity extends BaseMachineBlockEntity
     private final FluidTank ammoniaTank = new FluidTank(TANK_CAPACITY) {
         @Override
         public boolean isFluidValid(FluidStack stack) {
-            return stack.is(ModFluids.AMMONIA_SOURCE.get());
+            return stack.is(ModFluids.AMMONIA_SOURCE.get()) || stack.is(ModFluids.HYDROGEN_SOURCE.get());
         }
 
         @Override
@@ -159,6 +160,7 @@ public class AmmoniaFuelCellBlockEntity extends BaseMachineBlockEntity
                 case DATA_ENERGY_CAPACITY -> energyCapacity();
                 case DATA_AMMONIA -> ammoniaTank.getFluidAmount();
                 case DATA_TANK_CAPACITY -> TANK_CAPACITY;
+                case DATA_FUEL_HYDROGEN -> burnsHydrogen() ? 1 : 0;
                 case DATA_STATUS -> statusCode();
                 case DATA_ENERGY_PER_TICK -> currentEnergyPerTick();
                 case DATA_ENERGY_GENERATION -> (int) Math.round(stats.effectiveEnergyGenerationMultiplier() * STAT_SCALE);
@@ -178,7 +180,7 @@ public class AmmoniaFuelCellBlockEntity extends BaseMachineBlockEntity
 
         @Override
         public int getCount() {
-            return DATA_BASE_ENERGY_GENERATION + 1;
+            return DATA_FUEL_HYDROGEN + 1;
         }
     };
 
@@ -257,8 +259,14 @@ public class AmmoniaFuelCellBlockEntity extends BaseMachineBlockEntity
         return new AmmoniaFuelCellVisualState(
                 isMembrane(membraneStack()),
                 ammoniaTank.getFluidAmount() / (float) TANK_CAPACITY,
-                residue.isEmpty() ? 0.0F : residue.getCount() / (float) Math.min(residue.getMaxStackSize(), processInventory.getSlotLimit(SLOT_RESIDUE))
+                residue.isEmpty() ? 0.0F : residue.getCount() / (float) Math.min(residue.getMaxStackSize(), processInventory.getSlotLimit(SLOT_RESIDUE)),
+                burnsHydrogen()
         );
+    }
+
+    /** The tank holds one fuel at a time: Ammonia, or Hydrogen at a much lower FE per mB. */
+    private boolean burnsHydrogen() {
+        return ammoniaTank.getFluid().is(ModFluids.HYDROGEN_SOURCE.get());
     }
 
     public ItemStackHandler getProcessInventory() {
@@ -285,7 +293,7 @@ public class AmmoniaFuelCellBlockEntity extends BaseMachineBlockEntity
     public List<FluidPurgeTarget> fluidPurgeTargets() {
         return List.of(FluidPurgeTarget.of(
                 PURGE_AMMONIA_TANK,
-                Component.translatable("rngtech.purge.target.ammonia_tank"),
+                Component.translatable("rngtech.purge.target.fuel_tank"),
                 FluidPurgeRole.INPUT,
                 ammoniaTank::getFluid,
                 ammoniaTank::drain,

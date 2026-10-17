@@ -89,8 +89,8 @@ public final class GasReformingRecipeCategory implements IRecipeCategory<RecipeH
                 .setFluidRenderer(recipe.hydrogenOutput().getAmount(), false, 16, 16)
                 .addIngredient(NeoForgeTypes.FLUID_STACK, recipe.hydrogenFluid());
         JeiCategoryUi.slot(builder, RecipeIngredientRole.OUTPUT, CARBON_MONOXIDE_X, SLOT_Y)
-                .setFluidRenderer(recipe.carbonMonoxideOutput().getAmount(), false, 16, 16)
-                .addIngredient(NeoForgeTypes.FLUID_STACK, recipe.carbonMonoxideFluid());
+                .setFluidRenderer(recipe.byproductOutput().getAmount(), false, 16, 16)
+                .addIngredient(NeoForgeTypes.FLUID_STACK, recipe.byproductFluid());
     }
 
     @Override
@@ -112,6 +112,6 @@ public final class GasReformingRecipeCategory implements IRecipeCategory<RecipeH
                 62,
                 JeiCategoryUi.MUTED_TEXT_COLOR
         );
-        JeiCategoryUi.drawLine(guiGraphics, font, Component.translatable("rngtech.jei.hydrogen_and_carbon_monoxide"), 74, JeiCategoryUi.MUTED_TEXT_COLOR);
+        JeiCategoryUi.drawLine(guiGraphics, font, Component.translatable("rngtech.jei.hydrogen_and_byproduct", recipe.byproductFluid().getHoverName()), 74, JeiCategoryUi.MUTED_TEXT_COLOR);
     }
 }
