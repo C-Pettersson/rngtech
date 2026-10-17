@@ -1,5 +1,7 @@
 package com.rngtech.content.itemfilter;
 
+import com.rngtech.util.ItemStackValues;
+
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.network.RegistryFriendlyByteBuf;
@@ -15,6 +17,7 @@ import java.util.Comparator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.Set;
 
 public record AdvancedItemFilterSettings(
@@ -596,6 +599,49 @@ public record AdvancedItemFilterSettings(
                 .sorted()
                 .limit(maxNamespaces)
                 .toList();
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        return other instanceof AdvancedItemFilterSettings that
+                && mode == that.mode
+                && exactItemsEnabled == that.exactItemsEnabled
+                && tagEnabled == that.tagEnabled
+                && namespaceEnabled == that.namespaceEnabled
+                && stageEnabled == that.stageEnabled
+                && stabilityEnabled == that.stabilityEnabled
+                && strictComponents == that.strictComponents
+                && identityMode == that.identityMode
+                && rarityMode == that.rarityMode
+                && minStage == that.minStage
+                && maxStage == that.maxStage
+                && minStability == that.minStability
+                && maxStability == that.maxStability
+                && ItemStackValues.matches(samples, that.samples)
+                && tags.equals(that.tags)
+                && namespaces.equals(that.namespaces);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(
+                mode,
+                exactItemsEnabled,
+                tagEnabled,
+                namespaceEnabled,
+                stageEnabled,
+                stabilityEnabled,
+                strictComponents,
+                identityMode,
+                rarityMode,
+                minStage,
+                maxStage,
+                minStability,
+                maxStability,
+                ItemStackValues.hash(samples),
+                tags,
+                namespaces
+        );
     }
 
     public enum Mode implements StringRepresentable {
