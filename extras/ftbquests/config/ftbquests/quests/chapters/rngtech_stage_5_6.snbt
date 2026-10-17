@@ -634,10 +634,10 @@
 		}
 		{
 			dependencies: ["7106E7A1B10F0070"]
-			id: "C1A37BFEBEEA6F43"
+			id: "36290C98154741A7"
 			optional: true
 			tasks: [{
-				id: "F22E43395EC97A3B"
+				id: "1EDE0958D7048E66"
 				item: { count: 1, id: "rngtech:urea" }
 				type: "item"
 			}]

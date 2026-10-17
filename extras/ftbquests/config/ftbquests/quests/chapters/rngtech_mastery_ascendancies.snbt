@@ -12,7 +12,7 @@
 	quests: [
 		{
 			dependencies: ["37A6C9E1284B5D10"]
-			id: "FB45A90F15D87663"
+			id: "7983B2FDA710DE9A"
 			rewards: [{
 				count: 4
 				id: "6FBEF4B53CFBAFF9"
@@ -23,18 +23,18 @@
 				type: "item"
 			}]
 			tasks: [{
-				id: "F18C924AA3036AD7"
+				id: "6F87BE735ED4690B"
 				type: "checkmark"
 			}]
 			x: 0.0d
 			y: 0.0d
 		}
 		{
-			dependencies: ["FB45A90F15D87663"]
-			id: "C3604160EA637458"
+			dependencies: ["7983B2FDA710DE9A"]
+			id: "117EDD2049951ECF"
 			optional: true
 			tasks: [{
-				id: "845B3E56F44FD779"
+				id: "5AB8C6C5A3A7C394"
 				item: { count: 1, id: "rngtech:mastery_refund" }
 				type: "item"
 			}]
@@ -42,11 +42,11 @@
 			y: 2.0d
 		}
 		{
-			dependencies: ["FB45A90F15D87663", "44B6B0AADE341E23"]
-			id: "FAEF4E1A8753B3FE"
+			dependencies: ["7983B2FDA710DE9A", "44B6B0AADE341E23"]
+			id: "1B2846DF3677C5FF"
 			optional: true
 			tasks: [{
-				id: "813482CED295DB6A"
+				id: "69CA9B49F32E87C0"
 				item: { count: 1, id: "rngtech:configurator" }
 				type: "item"
 			}]
@@ -54,8 +54,8 @@
 			y: 2.0d
 		}
 		{
-			dependencies: ["FB45A90F15D87663"]
-			id: "9978E0313902657D"
+			dependencies: ["7983B2FDA710DE9A"]
+			id: "66BFDC3B5C785D23"
 			tasks: [{
 				id: "76125B34AF53AD84"
 				type: "checkmark"
@@ -64,8 +64,8 @@
 			y: 0.0d
 		}
 		{
-			dependencies: ["9978E0313902657D", "4CC5AA5185C3D06B"]
-			id: "866D43F46AC8E5BE"
+			dependencies: ["66BFDC3B5C785D23", "4CC5AA5185C3D06B"]
+			id: "53AD85A55402A1A2"
 			tasks: [{
 				id: "59E417C8998BC7C5"
 				item: { count: 1, id: "rngtech:primed_seal_core" }
@@ -75,8 +75,8 @@
 			y: 0.0d
 		}
 		{
-			dependencies: ["866D43F46AC8E5BE"]
-			id: "B707E4F323CE4189"
+			dependencies: ["53AD85A55402A1A2"]
+			id: "2395BFD1C7ACB809"
 			rewards: [{
 				count: 8
 				id: "732A30C958ECC304"
@@ -95,10 +95,10 @@
 			y: 0.0d
 		}
 		{
-			dependencies: ["B707E4F323CE4189", "46A1F2C0DE100040", "7C968747D63F427E"]
-			id: "83437B2BE1852F4E"
+			dependencies: ["2395BFD1C7ACB809", "46A1F2C0DE100040", "7C968747D63F427E"]
+			id: "4D576FB3BBF8C6D4"
 			tasks: [{
-				id: "F45D6DB5DD6EB973"
+				id: "5078EE4095615D86"
 				item: { count: 1, id: "rngtech:lubricated_seal_core" }
 				type: "item"
 			}]
@@ -106,10 +106,10 @@
 			y: 0.0d
 		}
 		{
-			dependencies: ["83437B2BE1852F4E", "17E4A9571BBF913F"]
+			dependencies: ["4D576FB3BBF8C6D4", "17E4A9571BBF913F"]
 			id: "49D6781084057122"
 			tasks: [{
-				id: "86A7A7B9EF255B39"
+				id: "42BBF00801016A4E"
 				item: { count: 1, id: "rngtech:ascendancy_seal_2" }
 				type: "item"
 			}]
@@ -133,7 +133,7 @@
 			id: "4DE87D2F3D084228"
 			optional: true
 			tasks: [{
-				id: "B41B11006D1536E3"
+				id: "56781575DBAD2AB9"
 				type: "checkmark"
 			}]
 			x: 12.5d

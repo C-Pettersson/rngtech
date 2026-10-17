@@ -26,6 +26,12 @@ for (const file of files) {
     for (const [kind, pattern] of patterns) {
         if (pattern.test(text)) issues.push(`${file}: possible ${kind} (value withheld)`);
     }
+    if (file.startsWith('extras/ftbquests/') && file.endsWith('.snbt')) {
+        // FTB Quests replaces ids it reads as negative 64-bit numbers, which orphans their lang text.
+        for (const match of text.matchAll(/\bid: "([89A-F][0-9A-F]{15})"/g)) {
+            issues.push(`${file}: FTB Quests id ${match[1]} must start with 0-7, or FTB replaces it on load`);
+        }
+    }
     if (!file.endsWith('.md')) continue;
     const prose = text.replace(/^\s*```[^\n]*\n[\s\S]*?^\s*```\s*$/gm, '');
     for (const match of prose.matchAll(/!?\[[^\]]*\]\(([^)]+)\)/g)) {
