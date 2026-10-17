@@ -1,3 +1,11 @@
 {
-  "parent": "rngtech:block/exotic_compressor_tank"
+  "parent": "rngtech:item/compressor_tank_template_4",
+  "textures": {
+    "particle": "rngtech:block/compressor_tank/shell/exotic",
+    "shell": "rngtech:block/compressor_tank/shell/exotic",
+    "trim": "rngtech:block/compressor_tank/trim/exotic",
+    "cap": "rngtech:block/compressor_tank/cap/exotic",
+    "servo": "rngtech:block/compressor_tank/servo/exotic",
+    "accent": "rngtech:block/compressor_tank/servo/exotic_accent"
+  }
 }

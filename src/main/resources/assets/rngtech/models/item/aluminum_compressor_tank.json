@@ -1,3 +1,11 @@
 {
-  "parent": "rngtech:block/aluminum_compressor_tank"
+  "parent": "rngtech:item/compressor_tank_template_2",
+  "textures": {
+    "particle": "rngtech:block/compressor_tank/shell/aluminum",
+    "shell": "rngtech:block/compressor_tank/shell/aluminum",
+    "trim": "rngtech:block/compressor_tank/trim/aluminum",
+    "cap": "rngtech:block/compressor_tank/cap/aluminum",
+    "servo": "rngtech:block/compressor_tank/servo/steel",
+    "accent": "rngtech:block/compressor_tank/servo/steel_accent"
+  }
 }

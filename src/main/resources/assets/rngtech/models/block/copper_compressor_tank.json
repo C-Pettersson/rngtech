@@ -1,12 +1,9 @@
 {
-  "parent": "minecraft:block/cube",
+  "parent": "rngtech:block/compressor_tank/fluid_tank",
   "textures": {
-    "down": "rngtech:block/compressor_tank/bottom/copper_compressor_tank",
-    "up": "rngtech:block/compressor_tank/top/copper_compressor_tank",
-    "north": "rngtech:block/compressor_tank/front/copper_compressor_tank",
-    "south": "rngtech:block/compressor_tank/side/copper_compressor_tank",
-    "east": "rngtech:block/compressor_tank/side/copper_compressor_tank",
-    "west": "rngtech:block/compressor_tank/side/copper_compressor_tank",
-    "particle": "rngtech:block/compressor_tank/front/copper_compressor_tank"
+    "particle": "rngtech:block/compressor_tank/shell/copper",
+    "shell": "rngtech:block/compressor_tank/shell/copper",
+    "trim": "rngtech:block/compressor_tank/trim/copper",
+    "cap": "rngtech:block/compressor_tank/cap/copper"
   }
 }

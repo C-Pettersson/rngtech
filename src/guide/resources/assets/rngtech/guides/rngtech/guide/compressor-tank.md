@@ -45,6 +45,10 @@ item_ids:
 - **Fluid Tanks** (Iron, Copper, Bronze) are plain tanks. They need no power or Gear.
 - **Compressor Tanks** (Steel and later) also have a second, compressed store. With a Battery Cell, at least one Servo, and FE, they squeeze fluid into it, so a small block holds far more fluid.
 
+You can read a tank from the outside. A Fluid Tank is a glass box in a frame of its metal, so you see the fluid and its level through the glass. A Compressor Tank is built around its compressed store, a pressure vessel with more reinforcing hoops the higher the tank's compression ratio. The armoured window on the vessel's front fills with the compressed fluid, drawn darker than the loose fluid, and the gauge above it reads how full the compressed store is. The loose fluid shows in the glass feed tubes at the four corners. Each installed Servo is a pump on top of a feed tube, in its own metal with a band of its accent colour, and the Battery Cell lies in a cradle behind the vessel. While the tank compresses, the pumps stroke, the impeller on top of the vessel spins, bubbles rise in the window, the gauge needle kicks with each stroke, and the lamp beside the gauge glows.
+
+A side facing a cable connector or a [Universal Connector](rngtech:universal-cable.md) shows a connector port, on top and underneath too. Sides with nothing attached stay open.
+
 Each tank you craft rolls its own [rarity and affixes](rngtech:rarity-and-affixes.md) where its tier allows it. Fluid Tanks do not roll affixes. Compressor Tank affixes improve FE storage, FE use, speed, fluid transfer, and stability. Tank capacity and compression ratio never roll.
 
 ## Usage
@@ -55,16 +59,7 @@ Pipe fluid into any side, or use the container slots on the Process tab to fill 
 
 - [Compression](rngtech:compressor-tank/compression.md)
 - [Stages](rngtech:compressor-tank/stages.md)
-
-### Gear
-
-Fluid Tanks have no Gear. Compressor Tanks have a Gear tab with:
-
-- one **Battery Cell** slot. A cell is required for compression and adds FE storage.
-- four **Servo** slots. At least one is required. More Servos compress faster: 1.75× with two, 2.5× with three, and 3.5× with four. Better Servos also help, based on their average speed rolls.
-
-Installed Gear cannot be from a higher stage than the tank. Servos start at Stage 4, which is why compression starts with the Steel tank.
-
+- [Gear](rngtech:compressor-tank/gear.md)
 - [Automation](rngtech:compressor-tank/automation.md)
 
 ## Screen

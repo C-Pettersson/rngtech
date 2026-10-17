@@ -1,0 +1,6 @@
+{
+  "parent": "rngtech:block/compressor_tank/port_flat",
+  "textures": {
+    "trim": "rngtech:block/compressor_tank/trim/copper"
+  }
+}
