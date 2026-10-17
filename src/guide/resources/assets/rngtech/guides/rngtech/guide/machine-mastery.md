@@ -12,6 +12,7 @@ item_ids:
   - rngtech:ascendancy_seal_3
   - rngtech:primed_seal_core
   - rngtech:lubricated_seal_core
+  - rngtech:soul_transfer
 ---
 
 # Machine Mastery
@@ -82,7 +83,9 @@ In the expanded view, the tab on the right edge opens the **Bonus Summary**: you
 
 Breaking a Mastery machine with the right tool drops it with its XP, level, tree, and ascendancy intact. Pick-block in Creative keeps them too, and the Forestry Companion keeps its progress in item form.
 
-Progress belongs to that one machine. Crafting a higher-stage chassis starts a fresh machine at level 1.
+Progress belongs to that one machine. Crafting a higher-stage chassis starts a fresh machine at level 1. To carry your progress over, use a Soul Transfer.
+
+- [Soul Transfer](rngtech:machine-mastery/soul-transfer.md)
 
 ## Ascendancies
 

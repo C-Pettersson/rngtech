@@ -11,6 +11,7 @@ import com.rngtech.content.tool.FieldToolAssembly;
 import com.rngtech.rpg.MachineTraits;
 import com.rngtech.rpg.OutputAmountTracker;
 import com.rngtech.rpg.progression.MachineProgressionState;
+import com.rngtech.rpg.progression.SoulTransfer;
 import com.rngtech.rpg.refinement.ExoticAffixForgeHistory;
 
 import com.mojang.serialization.Codec;
@@ -173,7 +174,7 @@ public final class ModDataComponents {
                             .cacheEncoding()
             );
 
-    /** A calibrated recipe input's state, recorded on a crafted result until its post-craft roll reads it. */
+    /** A calibrated recipe input's state, recorded on a crafted result for a post-craft roll or, on a Soul Transfer, its success chance. */
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<CalibrationState>> SOURCE_CALIBRATION =
             DATA_COMPONENTS.registerComponentType(
                     "source_calibration",
@@ -182,6 +183,10 @@ public final class ModDataComponents {
                             .networkSynchronized(CalibrationState.STREAM_CODEC)
                             .cacheEncoding()
             );
+
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<SoulTransfer.Charge>> SOUL_CHARGE =
+            DATA_COMPONENTS.registerComponentType("soul_charge", builder -> builder
+                    .persistent(SoulTransfer.Charge.CODEC).networkSynchronized(SoulTransfer.Charge.STREAM_CODEC).cacheEncoding());
 
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<Integer>> FIELD_TOOL_WEAR =
             DATA_COMPONENTS.registerComponentType(

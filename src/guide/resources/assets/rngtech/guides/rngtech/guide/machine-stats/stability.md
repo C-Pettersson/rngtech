@@ -18,4 +18,4 @@ Stability means something different on each machine:
 | [Metal Press](rngtech:metal-press.md) | Less forming failure. |
 | [Resonance Calibrator](rngtech:resonance-calibrator.md) | Higher stability floor on calibrated outputs. |
 | [Solar Panel](rngtech:solar-panel.md) Array Controller | Recovers part of the weather penalty. |
-| Modular tools ([Tool Bench](rngtech:tool-bench.md)) | Above 1.0, a per-block chance to skip both the durability and FE cost. 1.10 is a 10% chance. |
+| [Modular tools](rngtech:modular-tools.md) | Above 1.0, a per-block chance to skip both the durability and FE cost. 1.10 is a 10% chance. |

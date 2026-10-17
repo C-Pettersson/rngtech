@@ -1,0 +1,40 @@
+{
+  "type": "rngtech:calibrated_shaped",
+  "category": "misc",
+  "pattern": [
+    " D ",
+    "GLG",
+    " A "
+  ],
+  "key": {
+    "A": {
+      "ingredient": {
+        "item": "minecraft:amethyst_shard"
+      }
+    },
+    "D": {
+      "ingredient": {
+        "item": "minecraft:diamond"
+      }
+    },
+    "G": {
+      "ingredient": {
+        "item": "minecraft:gold_ingot"
+      }
+    },
+    "L": {
+      "ingredient": {
+        "item": "rngtech:calibrated_logic_component"
+      },
+      "calibration": {
+        "family": "logic",
+        "min_stage": 2
+      }
+    }
+  },
+  "record_calibration": "L",
+  "result": {
+    "count": 1,
+    "id": "rngtech:soul_transfer"
+  }
+}

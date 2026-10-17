@@ -1,5 +1,7 @@
 package com.rngtech.rpg;
 
+import com.rngtech.util.ItemStackValues;
+
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.HolderLookup;
@@ -10,6 +12,7 @@ import net.minecraft.world.item.ItemStack;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public final class OutputAmountTracker {
     public static final int PROGRESS_SCALE = 1000;
@@ -25,6 +28,19 @@ public final class OutputAmountTracker {
                 Codec.INT.optionalFieldOf("cycles", 0).forGetter(SavedBank::cycles)
         ).apply(instance, SavedBank::new));
         public static final Codec<List<SavedBank>> LIST_CODEC = CODEC.sizeLimitedListOf(64);
+
+        @Override
+        public boolean equals(Object other) {
+            return other instanceof SavedBank that
+                    && ItemStackValues.matches(input, that.input)
+                    && Double.compare(progress, that.progress) == 0
+                    && cycles == that.cycles;
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(ItemStackValues.hash(input), progress, cycles);
+        }
     }
 
     /** Items produced by one craft, and how many of them the bank paid. */

@@ -52,7 +52,7 @@ Stability means something different on each machine:
 | [Metal Press](metal-press.md) | Less forming failure. |
 | [Resonance Calibrator](resonance-calibrator.md) | Higher stability floor on calibrated outputs. |
 | [Solar Panel](solar-panel.md) Array Controller | Recovers part of the weather penalty. |
-| Modular tools ([Tool Bench](tool-bench.md)) | Above 1.0, a per-block chance to skip both the durability and FE cost. 1.10 is a 10% chance. |
+| [Modular tools](modular-tools.md) | Above 1.0, a per-block chance to skip both the durability and FE cost. 1.10 is a 10% chance. |
 
 ### Crusher stats
 

@@ -2,7 +2,7 @@
   "parent": "builtin/entity",
   "gui_light": "front",
   "textures": {
-    "particle": "minecraft:item/iron_shovel"
+    "particle": "rngtech:item/modular_tool/shovel"
   },
   "display": {
     "thirdperson_righthand": {

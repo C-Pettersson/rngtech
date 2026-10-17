@@ -156,11 +156,16 @@ These live in `config/rngtech-common.toml`.
 | `worldgen.ores.<material>.enabled` | on | One ore's generation. |
 | `worldgen.ores.vanillaToolBridgePolicy` | `EARLY_BRIDGE` | How far vanilla pickaxes reach on RNGTech ores (see below). |
 | `ascendancy.sealRecipesEnabled` | on | Turn off to hand out Ascendancy Seals by quest or loot instead. |
+| `soulTransfer.alwaysSucceeds` | off | Turn on so every [Soul Transfer](machine-mastery.md#soul-transfer) absorb succeeds, whatever its calibration. A Soul Transfer from a quest, loot, or `/give` has no calibration and always succeeds anyway. |
+| `soulTransfer.failureXpLossPercent` | 0 | Percent of a machine's Mastery XP lost when a Soul Transfer absorb fails. Late levels need far more XP than early ones, so a high-level machine loses only a few levels unless this is near 100. |
+| `soulTransfer.failureLevelLoss` | 0 | Mastery levels lost when a Soul Transfer absorb fails, applied after any XP loss. |
 | `corruption.volatileCatalystRecipesEnabled` | on | Turn off to hand out Volatile Catalysts by quest or loot instead. |
+
+When a failed Soul Transfer costs levels, the machine refunds its latest-allocated nodes first. It skips any node the rest of the tree or the installed Gear still needs, so the tree stays connected and the Gear stays legal. If no node can safely go, the machine keeps the level its tree needs. The old build becomes the machine's followed build, so it fills back in as the machine earns XP again.
 
 Each player also has `config/rngtech-client.toml`. Its `solar.animatedPanels` (default on) turns [Solar Panel](solar-panel.md) decks smoothly with the sun; turn it off for panels that tilt in steps, which is lighter on very large fields. It takes effect after a resource reload (F3 + T).
 
-**Vanilla pickaxes and ore hardness.** Each metal ore has an ore hardness: 1 for Iron and Copper, 2 for Gold, Tin, and Zinc, and up to 8 for Naquadah. The [Modular Pick](tool-bench.md) reaches every level. The policy sets how far vanilla pickaxes reach:
+**Vanilla pickaxes and ore hardness.** Each metal ore has an ore hardness: 1 for Iron and Copper, 2 for Gold, Tin, and Zinc, and up to 8 for Naquadah. The [Modular Pick](modular-tools.md) reaches every level. The policy sets how far vanilla pickaxes reach:
 
 | Policy | Vanilla pickaxes can mine |
 |---|---|
