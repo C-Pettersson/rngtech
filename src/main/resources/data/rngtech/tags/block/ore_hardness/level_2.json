@@ -6,6 +6,18 @@
     "rngtech:zinc_ore",
     "rngtech:deepslate_zinc_ore",
     "minecraft:gold_ore",
-    "minecraft:deepslate_gold_ore"
+    "minecraft:deepslate_gold_ore",
+    {
+      "id": "#c:ores/gold",
+      "required": false
+    },
+    {
+      "id": "#c:ores/tin",
+      "required": false
+    },
+    {
+      "id": "#c:ores/zinc",
+      "required": false
+    }
   ]
 }

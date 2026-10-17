@@ -1,7 +1,13 @@
 {
     "type": "rngtech:crusher",
     "ingredient": {
-        "item": "minecraft:iron_ore"
+        "type": "neoforge:difference",
+        "base": {
+            "tag": "c:ores/iron"
+        },
+        "subtracted": {
+            "tag": "c:ores_in_ground/deepslate"
+        }
     },
     "result": {
         "count": 3,

@@ -7,7 +7,13 @@
   ],
   "type": "rngtech:crusher",
   "ingredient": {
-    "item": "rngtech:titanium_ore"
+    "type": "neoforge:difference",
+    "base": {
+      "tag": "c:ores/titanium"
+    },
+    "subtracted": {
+      "tag": "c:ores_in_ground/deepslate"
+    }
   },
   "result": {
     "count": 3,

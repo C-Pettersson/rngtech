@@ -7,7 +7,13 @@
   ],
   "type": "rngtech:crusher",
   "ingredient": {
-    "item": "rngtech:osmium_ore"
+    "type": "neoforge:difference",
+    "base": {
+      "tag": "c:ores/osmium"
+    },
+    "subtracted": {
+      "tag": "c:ores_in_ground/deepslate"
+    }
   },
   "result": {
     "count": 3,

@@ -1,7 +1,15 @@
 {
     "type": "rngtech:crusher",
     "ingredient": {
-        "item": "minecraft:deepslate_copper_ore"
+        "type": "neoforge:intersection",
+        "children": [
+            {
+                "tag": "c:ores/copper"
+            },
+            {
+                "tag": "c:ores_in_ground/deepslate"
+            }
+        ]
     },
     "result": {
         "count": 3,

@@ -2360,6 +2360,8 @@ function alloyFurnaceSetupForStage(requiredStage) {
     return setups.find((setup) => setup.stage >= requiredStage) ?? setups.at(-1);
 }
 
+const NEOFORGE_INGREDIENT_TYPES = new Set(["neoforge:compound", "neoforge:components", "neoforge:intersection", "neoforge:difference"]);
+
 /** Flattens NeoForge compound and component ingredients into plain item and tag alternatives. */
 function plainIngredientAlternatives(entry) {
     if (Array.isArray(entry)) {
@@ -2371,6 +2373,13 @@ function plainIngredientAlternatives(entry) {
     if (entry?.type === "neoforge:components") {
         return [entry.items].flat().map((id) => (id.startsWith("#") ? { tag: id.slice(1) } : { item: id }));
     }
+    // Shown as their widest part: the first intersected child, or the base before subtraction.
+    if (entry?.type === "neoforge:intersection") {
+        return plainIngredientAlternatives(entry.children[0]);
+    }
+    if (entry?.type === "neoforge:difference") {
+        return plainIngredientAlternatives(entry.base);
+    }
     return [entry];
 }
 
@@ -2378,7 +2387,7 @@ function normalizeIngredient(entry, count = 1, options = {}) {
     if (!entry) {
         return [];
     }
-    if (entry.type === "neoforge:compound" || entry.type === "neoforge:components") {
+    if (NEOFORGE_INGREDIENT_TYPES.has(entry.type)) {
         return normalizeIngredient(plainIngredientAlternatives(entry), count, options);
     }
     if (Array.isArray(entry)) {
@@ -2896,7 +2905,7 @@ function craftingIngredientAlternatives(entry, inheritedCalibration = null) {
     if (!entry) {
         return [];
     }
-    if (Array.isArray(entry) || entry.type === "neoforge:compound" || entry.type === "neoforge:components") {
+    if (Array.isArray(entry) || NEOFORGE_INGREDIENT_TYPES.has(entry.type)) {
         return plainIngredientAlternatives(entry)
                 .flatMap((alternative) => craftingIngredientAlternatives(alternative, inheritedCalibration));
     }

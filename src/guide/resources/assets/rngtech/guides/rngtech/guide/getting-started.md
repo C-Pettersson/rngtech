@@ -44,7 +44,7 @@ You gather your own materials, so the first job is a set of tools. RNGTech tools
 
 ### Ore hardness
 
-RNGTech ores have a **hardness** from 1 to 8, separate from vanilla mining tiers. A Modular Pick or Hammer can only mine ores up to its head's hardness. Flint heads reach hardness 1, which covers Iron and Copper ore, and better heads reach further. See [Ore hardness](rngtech:modular-tools.md#ore-hardness) on the Modular Tools page for every head's reach.
+RNGTech ores have a **hardness** from 1 to 8, separate from vanilla mining tiers. A Modular Pick or Hammer can only mine ores up to its head's hardness. Flint heads reach hardness 1, which covers Iron and Copper ore, and better heads reach further. See [Ore hardness](rngtech:modular-tools/ore-hardness.md) on the Modular Tools page for every head's reach.
 
 ## More
 

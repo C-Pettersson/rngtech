@@ -3,6 +3,7 @@ package com.rngtech.content.tool;
 import com.rngtech.RNGTech;
 import com.rngtech.RNGTechConfig;
 import com.rngtech.content.item.ModularToolItem;
+import com.rngtech.content.registry.ModDataMaps;
 
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
@@ -10,6 +11,7 @@ import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 
 import java.util.ArrayList;
@@ -41,18 +43,23 @@ public final class OreHardness {
 
     public static boolean canHarvest(ItemStack stack, BlockState state) {
         int level = level(state);
-        if (level <= 0) {
-            return true;
-        }
-        if (stack.getItem() instanceof ModularToolItem) {
-            return ToolBaseStatCatalog.miningLevel(stack) >= level;
-        }
-        return vanillaBridgeReach(stack) >= level;
+        return level <= 0 || oreReach(stack) >= level;
     }
 
+    /**
+     * Modular tools reach their head's mining level. Other items use their {@code rngtech:ore_reach} data map entry,
+     * or else the vanilla bridge policy applied to the vanilla tier they harvest at.
+     */
     public static int oreReach(ItemStack stack) {
         if (stack.getItem() instanceof ModularToolItem) {
             return ToolBaseStatCatalog.miningLevel(stack);
+        }
+        if (RestrictedTools.useless(stack)) {
+            return 0;
+        }
+        OreReach reach = stack.getItemHolder().getData(ModDataMaps.ORE_REACH);
+        if (reach != null) {
+            return reach.level();
         }
         return vanillaBridgeReach(stack);
     }
@@ -81,20 +88,24 @@ public final class OreHardness {
         };
     }
 
-    private static int vanillaPickTier(ItemStack stack) {
+    /**
+     * The vanilla pickaxe tier an item harvests at, read from the vanilla blocks it can drop: 1 stone, 2 iron,
+     * 3 diamond, 4 netherite. Vanilla has no block only netherite harvests, so only the Netherite Pickaxe reads as 4.
+     */
+    public static int vanillaPickTier(ItemStack stack) {
         if (stack.is(Items.NETHERITE_PICKAXE)) {
             return 4;
         }
-        if (stack.is(Items.DIAMOND_PICKAXE)) {
+        if (!stack.isCorrectToolForDrops(Blocks.IRON_ORE.defaultBlockState())) {
+            return 0;
+        }
+        if (stack.isCorrectToolForDrops(Blocks.OBSIDIAN.defaultBlockState())) {
             return 3;
         }
-        if (stack.is(Items.IRON_PICKAXE)) {
+        if (stack.isCorrectToolForDrops(Blocks.DIAMOND_ORE.defaultBlockState())) {
             return 2;
         }
-        if (stack.is(Items.STONE_PICKAXE)) {
-            return 1;
-        }
-        return 0;
+        return 1;
     }
 
     private static List<TagKey<Block>> createHardnessTags() {
