@@ -46,6 +46,10 @@ The **Battery Chassis** is a placed energy bank that holds [Battery Cells](rngte
 
 Each chassis you craft rolls its own [rarity and affixes](rngtech:rarity-and-affixes.md). Battery Chassis do not have Machine Mastery.
 
+You can read a chassis from the outside. Each active cell slot is a socket on the floor of the rack, and every installed cell stands in its socket, so you can see which cells are in and which slots are empty. The window on each cell fills up with that cell's charge. The lights on the corner posts show the whole bank's charge, the bottom two warning orange and red. While the bank charges, the light above the charge blinks and the lamps on the lid glow green; while it discharges, the top light pulses and the lamps glow amber. Teal lamps mean FE passes through in about equal amounts, and dark lamps mean nothing is moving. The bus rails under the lid and the straps over the cells are in the chassis's metal.
+
+Each side, top and bottom included, shows what it touches. A side facing a cable connector or a [Universal Connector](rngtech:universal-cable.md) shows a connector port. A side against another FE block, such as a machine or another chassis, is closed with a solid, smooth contact wall. A side with nothing attached stays open, or plain on the lid and base. The <ItemLink id="rngtech:wooden_battery_chassis" /> is a plain plank crate instead: its cells sit in the crate, wired to a copper bar, and its redstone lamp glows while FE flows in or out. Slow leakage alone does not light it.
+
 ## Usage
 
 - [Storing power](rngtech:battery-chassis/storing-power.md)

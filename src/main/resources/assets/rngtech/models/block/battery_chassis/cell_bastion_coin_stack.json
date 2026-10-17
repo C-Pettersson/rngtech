@@ -1,0 +1,639 @@
+{
+  "textures": {
+    "particle": "rngtech:block/battery_chassis/cell/coin_edge",
+    "coin_edge": "rngtech:block/battery_chassis/cell/coin_edge",
+    "coin_face": "rngtech:block/battery_chassis/cell/coin_face"
+  },
+  "elements": [
+    {
+      "from": [
+        5.25,
+        0.0,
+        6.25
+      ],
+      "to": [
+        10.75,
+        0.75,
+        9.75
+      ],
+      "faces": {
+        "north": {
+          "texture": "#coin_edge"
+        },
+        "south": {
+          "texture": "#coin_edge"
+        },
+        "east": {
+          "texture": "#coin_edge"
+        },
+        "west": {
+          "texture": "#coin_edge"
+        }
+      }
+    },
+    {
+      "from": [
+        6.25,
+        0.0,
+        5.25
+      ],
+      "to": [
+        9.75,
+        0.75,
+        10.75
+      ],
+      "faces": {
+        "north": {
+          "texture": "#coin_edge"
+        },
+        "south": {
+          "texture": "#coin_edge"
+        },
+        "east": {
+          "texture": "#coin_edge"
+        },
+        "west": {
+          "texture": "#coin_edge"
+        }
+      }
+    },
+    {
+      "from": [
+        5.5,
+        0.75,
+        6.1
+      ],
+      "to": [
+        11.0,
+        1.5,
+        9.6
+      ],
+      "faces": {
+        "north": {
+          "texture": "#coin_edge"
+        },
+        "south": {
+          "texture": "#coin_edge"
+        },
+        "east": {
+          "texture": "#coin_edge"
+        },
+        "west": {
+          "texture": "#coin_edge"
+        }
+      }
+    },
+    {
+      "from": [
+        6.5,
+        0.75,
+        5.1
+      ],
+      "to": [
+        10.0,
+        1.5,
+        10.6
+      ],
+      "faces": {
+        "north": {
+          "texture": "#coin_edge"
+        },
+        "south": {
+          "texture": "#coin_edge"
+        },
+        "east": {
+          "texture": "#coin_edge"
+        },
+        "west": {
+          "texture": "#coin_edge"
+        }
+      }
+    },
+    {
+      "from": [
+        5.05,
+        1.5,
+        6.37
+      ],
+      "to": [
+        10.55,
+        2.25,
+        9.87
+      ],
+      "faces": {
+        "north": {
+          "texture": "#coin_edge"
+        },
+        "south": {
+          "texture": "#coin_edge"
+        },
+        "east": {
+          "texture": "#coin_edge"
+        },
+        "west": {
+          "texture": "#coin_edge"
+        }
+      }
+    },
+    {
+      "from": [
+        6.05,
+        1.5,
+        5.37
+      ],
+      "to": [
+        9.55,
+        2.25,
+        10.87
+      ],
+      "faces": {
+        "north": {
+          "texture": "#coin_edge"
+        },
+        "south": {
+          "texture": "#coin_edge"
+        },
+        "east": {
+          "texture": "#coin_edge"
+        },
+        "west": {
+          "texture": "#coin_edge"
+        }
+      }
+    },
+    {
+      "from": [
+        5.4,
+        2.25,
+        6.16
+      ],
+      "to": [
+        10.9,
+        3.0,
+        9.66
+      ],
+      "faces": {
+        "north": {
+          "texture": "#coin_edge"
+        },
+        "south": {
+          "texture": "#coin_edge"
+        },
+        "east": {
+          "texture": "#coin_edge"
+        },
+        "west": {
+          "texture": "#coin_edge"
+        }
+      }
+    },
+    {
+      "from": [
+        6.4,
+        2.25,
+        5.16
+      ],
+      "to": [
+        9.9,
+        3.0,
+        10.66
+      ],
+      "faces": {
+        "north": {
+          "texture": "#coin_edge"
+        },
+        "south": {
+          "texture": "#coin_edge"
+        },
+        "east": {
+          "texture": "#coin_edge"
+        },
+        "west": {
+          "texture": "#coin_edge"
+        }
+      }
+    },
+    {
+      "from": [
+        4.95,
+        3.0,
+        6.43
+      ],
+      "to": [
+        10.45,
+        3.75,
+        9.93
+      ],
+      "faces": {
+        "north": {
+          "texture": "#coin_edge"
+        },
+        "south": {
+          "texture": "#coin_edge"
+        },
+        "east": {
+          "texture": "#coin_edge"
+        },
+        "west": {
+          "texture": "#coin_edge"
+        }
+      }
+    },
+    {
+      "from": [
+        5.95,
+        3.0,
+        5.43
+      ],
+      "to": [
+        9.45,
+        3.75,
+        10.93
+      ],
+      "faces": {
+        "north": {
+          "texture": "#coin_edge"
+        },
+        "south": {
+          "texture": "#coin_edge"
+        },
+        "east": {
+          "texture": "#coin_edge"
+        },
+        "west": {
+          "texture": "#coin_edge"
+        }
+      }
+    },
+    {
+      "from": [
+        5.45,
+        3.75,
+        6.13
+      ],
+      "to": [
+        10.95,
+        4.5,
+        9.63
+      ],
+      "faces": {
+        "north": {
+          "texture": "#coin_edge"
+        },
+        "south": {
+          "texture": "#coin_edge"
+        },
+        "east": {
+          "texture": "#coin_edge"
+        },
+        "west": {
+          "texture": "#coin_edge"
+        }
+      }
+    },
+    {
+      "from": [
+        6.45,
+        3.75,
+        5.13
+      ],
+      "to": [
+        9.95,
+        4.5,
+        10.63
+      ],
+      "faces": {
+        "north": {
+          "texture": "#coin_edge"
+        },
+        "south": {
+          "texture": "#coin_edge"
+        },
+        "east": {
+          "texture": "#coin_edge"
+        },
+        "west": {
+          "texture": "#coin_edge"
+        }
+      }
+    },
+    {
+      "from": [
+        5.15,
+        4.5,
+        6.31
+      ],
+      "to": [
+        10.65,
+        5.25,
+        9.81
+      ],
+      "faces": {
+        "north": {
+          "texture": "#coin_edge"
+        },
+        "south": {
+          "texture": "#coin_edge"
+        },
+        "east": {
+          "texture": "#coin_edge"
+        },
+        "west": {
+          "texture": "#coin_edge"
+        }
+      }
+    },
+    {
+      "from": [
+        6.15,
+        4.5,
+        5.31
+      ],
+      "to": [
+        9.65,
+        5.25,
+        10.81
+      ],
+      "faces": {
+        "north": {
+          "texture": "#coin_edge"
+        },
+        "south": {
+          "texture": "#coin_edge"
+        },
+        "east": {
+          "texture": "#coin_edge"
+        },
+        "west": {
+          "texture": "#coin_edge"
+        }
+      }
+    },
+    {
+      "from": [
+        5.55,
+        5.25,
+        6.07
+      ],
+      "to": [
+        11.05,
+        6.0,
+        9.57
+      ],
+      "faces": {
+        "north": {
+          "texture": "#coin_edge"
+        },
+        "south": {
+          "texture": "#coin_edge"
+        },
+        "east": {
+          "texture": "#coin_edge"
+        },
+        "west": {
+          "texture": "#coin_edge"
+        }
+      }
+    },
+    {
+      "from": [
+        6.55,
+        5.25,
+        5.07
+      ],
+      "to": [
+        10.05,
+        6.0,
+        10.57
+      ],
+      "faces": {
+        "north": {
+          "texture": "#coin_edge"
+        },
+        "south": {
+          "texture": "#coin_edge"
+        },
+        "east": {
+          "texture": "#coin_edge"
+        },
+        "west": {
+          "texture": "#coin_edge"
+        }
+      }
+    },
+    {
+      "from": [
+        5.25,
+        6.0,
+        6.25
+      ],
+      "to": [
+        10.75,
+        6.75,
+        9.75
+      ],
+      "faces": {
+        "north": {
+          "texture": "#coin_edge"
+        },
+        "south": {
+          "texture": "#coin_edge"
+        },
+        "east": {
+          "texture": "#coin_edge"
+        },
+        "west": {
+          "texture": "#coin_edge"
+        }
+      }
+    },
+    {
+      "from": [
+        6.25,
+        6.0,
+        5.25
+      ],
+      "to": [
+        9.75,
+        6.75,
+        10.75
+      ],
+      "faces": {
+        "north": {
+          "texture": "#coin_edge"
+        },
+        "south": {
+          "texture": "#coin_edge"
+        },
+        "east": {
+          "texture": "#coin_edge"
+        },
+        "west": {
+          "texture": "#coin_edge"
+        }
+      }
+    },
+    {
+      "from": [
+        5.05,
+        6.75,
+        6.37
+      ],
+      "to": [
+        10.55,
+        7.5,
+        9.87
+      ],
+      "faces": {
+        "north": {
+          "texture": "#coin_edge"
+        },
+        "south": {
+          "texture": "#coin_edge"
+        },
+        "east": {
+          "texture": "#coin_edge"
+        },
+        "west": {
+          "texture": "#coin_edge"
+        }
+      }
+    },
+    {
+      "from": [
+        6.05,
+        6.75,
+        5.37
+      ],
+      "to": [
+        9.55,
+        7.5,
+        10.87
+      ],
+      "faces": {
+        "north": {
+          "texture": "#coin_edge"
+        },
+        "south": {
+          "texture": "#coin_edge"
+        },
+        "east": {
+          "texture": "#coin_edge"
+        },
+        "west": {
+          "texture": "#coin_edge"
+        }
+      }
+    },
+    {
+      "from": [
+        5.35,
+        7.5,
+        6.19
+      ],
+      "to": [
+        10.85,
+        8.25,
+        9.69
+      ],
+      "faces": {
+        "north": {
+          "texture": "#coin_edge"
+        },
+        "south": {
+          "texture": "#coin_edge"
+        },
+        "east": {
+          "texture": "#coin_edge"
+        },
+        "west": {
+          "texture": "#coin_edge"
+        }
+      }
+    },
+    {
+      "from": [
+        6.35,
+        7.5,
+        5.19
+      ],
+      "to": [
+        9.85,
+        8.25,
+        10.69
+      ],
+      "faces": {
+        "north": {
+          "texture": "#coin_edge"
+        },
+        "south": {
+          "texture": "#coin_edge"
+        },
+        "east": {
+          "texture": "#coin_edge"
+        },
+        "west": {
+          "texture": "#coin_edge"
+        }
+      }
+    },
+    {
+      "from": [
+        5.0,
+        8.25,
+        6.4
+      ],
+      "to": [
+        10.5,
+        9.0,
+        9.9
+      ],
+      "faces": {
+        "north": {
+          "texture": "#coin_edge"
+        },
+        "south": {
+          "texture": "#coin_edge"
+        },
+        "east": {
+          "texture": "#coin_edge"
+        },
+        "west": {
+          "texture": "#coin_edge"
+        },
+        "up": {
+          "texture": "#coin_face"
+        }
+      }
+    },
+    {
+      "from": [
+        6.0,
+        8.25,
+        5.4
+      ],
+      "to": [
+        9.5,
+        9.0,
+        10.9
+      ],
+      "faces": {
+        "north": {
+          "texture": "#coin_edge"
+        },
+        "south": {
+          "texture": "#coin_edge"
+        },
+        "east": {
+          "texture": "#coin_edge"
+        },
+        "west": {
+          "texture": "#coin_edge"
+        },
+        "up": {
+          "texture": "#coin_face"
+        }
+      }
+    }
+  ]
+}

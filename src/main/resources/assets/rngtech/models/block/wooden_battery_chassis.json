@@ -1,12 +1,295 @@
 {
-  "parent": "minecraft:block/cube",
+  "parent": "minecraft:block/block",
+  "render_type": "minecraft:cutout",
   "textures": {
-    "down": "rngtech:block/battery_chassis/bottom/wooden_battery_chassis",
-    "up": "rngtech:block/battery_chassis/top/wooden_battery_chassis",
-    "north": "rngtech:block/battery_chassis/front/wooden_battery_chassis",
-    "south": "rngtech:block/battery_chassis/side/wooden_battery_chassis",
-    "east": "rngtech:block/battery_chassis/side/wooden_battery_chassis",
-    "west": "rngtech:block/battery_chassis/side/wooden_battery_chassis",
-    "particle": "rngtech:block/battery_chassis/side/wooden_battery_chassis"
-  }
+    "particle": "rngtech:block/battery_chassis/crate/side",
+    "crate_side": "rngtech:block/battery_chassis/crate/side",
+    "crate_rim": "rngtech:block/battery_chassis/crate/rim",
+    "crate_floor": "rngtech:block/battery_chassis/crate/floor",
+    "lamp": "rngtech:block/battery_chassis/crate/lamp_off",
+    "wire": "rngtech:block/battery_chassis/crate/bar"
+  },
+  "elements": [
+    {
+      "from": [
+        0,
+        0,
+        0
+      ],
+      "to": [
+        16,
+        1.0,
+        16
+      ],
+      "faces": {
+        "north": {
+          "texture": "#crate_side"
+        },
+        "south": {
+          "texture": "#crate_side"
+        },
+        "east": {
+          "texture": "#crate_side"
+        },
+        "west": {
+          "texture": "#crate_side"
+        },
+        "up": {
+          "texture": "#crate_floor"
+        },
+        "down": {
+          "texture": "#crate_floor"
+        }
+      }
+    },
+    {
+      "from": [
+        0,
+        1.0,
+        0
+      ],
+      "to": [
+        16,
+        8.0,
+        1.0
+      ],
+      "faces": {
+        "north": {
+          "texture": "#crate_side"
+        },
+        "south": {
+          "texture": "#crate_side"
+        },
+        "east": {
+          "texture": "#crate_side"
+        },
+        "west": {
+          "texture": "#crate_side"
+        },
+        "up": {
+          "texture": "#crate_rim"
+        }
+      }
+    },
+    {
+      "from": [
+        0,
+        1.0,
+        15.0
+      ],
+      "to": [
+        16,
+        8.0,
+        16
+      ],
+      "faces": {
+        "north": {
+          "texture": "#crate_side"
+        },
+        "south": {
+          "texture": "#crate_side"
+        },
+        "east": {
+          "texture": "#crate_side"
+        },
+        "west": {
+          "texture": "#crate_side"
+        },
+        "up": {
+          "texture": "#crate_rim"
+        }
+      }
+    },
+    {
+      "from": [
+        0,
+        1.0,
+        1.0
+      ],
+      "to": [
+        1.0,
+        8.0,
+        15.0
+      ],
+      "faces": {
+        "east": {
+          "texture": "#crate_side"
+        },
+        "west": {
+          "texture": "#crate_side"
+        },
+        "up": {
+          "texture": "#crate_rim"
+        }
+      }
+    },
+    {
+      "from": [
+        15.0,
+        1.0,
+        1.0
+      ],
+      "to": [
+        16,
+        8.0,
+        15.0
+      ],
+      "faces": {
+        "east": {
+          "texture": "#crate_side"
+        },
+        "west": {
+          "texture": "#crate_side"
+        },
+        "up": {
+          "texture": "#crate_rim"
+        }
+      }
+    },
+    {
+      "from": [
+        0.0,
+        8.0,
+        6.5
+      ],
+      "to": [
+        1.5,
+        9.5,
+        9.5
+      ],
+      "faces": {
+        "north": {
+          "texture": "#crate_rim"
+        },
+        "south": {
+          "texture": "#crate_rim"
+        },
+        "east": {
+          "texture": "#crate_rim"
+        },
+        "west": {
+          "texture": "#crate_rim"
+        }
+      }
+    },
+    {
+      "from": [
+        14.5,
+        8.0,
+        6.5
+      ],
+      "to": [
+        16.0,
+        9.5,
+        9.5
+      ],
+      "faces": {
+        "north": {
+          "texture": "#crate_rim"
+        },
+        "south": {
+          "texture": "#crate_rim"
+        },
+        "east": {
+          "texture": "#crate_rim"
+        },
+        "west": {
+          "texture": "#crate_rim"
+        }
+      }
+    },
+    {
+      "from": [
+        0.0,
+        9.5,
+        7.25
+      ],
+      "to": [
+        16.0,
+        10.5,
+        8.75
+      ],
+      "faces": {
+        "north": {
+          "texture": "#wire"
+        },
+        "south": {
+          "texture": "#wire"
+        },
+        "east": {
+          "texture": "#wire"
+        },
+        "west": {
+          "texture": "#wire"
+        },
+        "up": {
+          "texture": "#wire"
+        },
+        "down": {
+          "texture": "#wire"
+        }
+      }
+    },
+    {
+      "from": [
+        10.5,
+        8.0,
+        0.25
+      ],
+      "to": [
+        12.5,
+        9.25,
+        1.75
+      ],
+      "faces": {
+        "north": {
+          "texture": "#lamp"
+        },
+        "south": {
+          "texture": "#lamp"
+        },
+        "east": {
+          "texture": "#lamp"
+        },
+        "west": {
+          "texture": "#lamp"
+        },
+        "up": {
+          "texture": "#lamp"
+        },
+        "down": {
+          "texture": "#lamp"
+        }
+      }
+    },
+    {
+      "from": [
+        3.5,
+        8.0,
+        0.5
+      ],
+      "to": [
+        4.5,
+        9.0,
+        1.5
+      ],
+      "faces": {
+        "north": {
+          "texture": "#wire"
+        },
+        "south": {
+          "texture": "#wire"
+        },
+        "east": {
+          "texture": "#wire"
+        },
+        "west": {
+          "texture": "#wire"
+        },
+        "up": {
+          "texture": "#wire"
+        }
+      }
+    }
+  ]
 }
