@@ -2,7 +2,7 @@
 navigation:
   title: "Ascendancy Seals"
   parent: machine-mastery.md
-  position: 7
+  position: 8
   icon: rngtech:ascendancy_seal_1
 ---
 

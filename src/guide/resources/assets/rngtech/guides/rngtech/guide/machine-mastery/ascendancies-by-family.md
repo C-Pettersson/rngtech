@@ -2,7 +2,7 @@
 navigation:
   title: "Ascendancies by family"
   parent: machine-mastery.md
-  position: 9
+  position: 10
   icon: rngtech:ascendancy_seal_1
 ---
 

@@ -9,6 +9,7 @@ wiki:
     - rngtech:ascendancy_seal_3
     - rngtech:primed_seal_core
     - rngtech:lubricated_seal_core
+    - rngtech:soul_transfer
 ---
 
 # Machine Mastery
@@ -157,7 +158,26 @@ The {{ item('rngtech:configurator') }} has a Mastery mode for copying without th
 
 Breaking a Mastery machine with the right tool drops it with its XP, level, tree, and ascendancy intact. Pick-block in Creative keeps them too, and the Forestry Companion keeps its progress in item form.
 
-Progress belongs to that one machine. Crafting a higher-stage chassis starts a fresh machine at level 1.
+Progress belongs to that one machine. Crafting a higher-stage chassis starts a fresh machine at level 1. To carry your progress over, use a Soul Transfer.
+
+### Soul Transfer
+
+A {{ item('rngtech:soul_transfer') }} moves a machine's whole Mastery into another machine of the same kind, such as from an Iron Crusher to a Steel Crusher. It carries everything: XP, level, tree, followed build, ascendancy, and Seal tiers.
+
+1. Use it on the old machine to absorb its soul. The old machine drops back to level 1 with no Seal tiers, and the Soul Transfer glows and shows what it holds.
+2. Use it on the new machine to release the soul. The Soul Transfer is used up.
+
+Absorbing can fail. Its tooltip shows the **success chance**, which is the stability of the calibrated logic component you crafted it with. A failed absorb uses up the Soul Transfer, and the machine keeps its Mastery. A better-calibrated component from the [Resonance Calibrator](resonance-calibrator.md) gives a safer Soul Transfer. Releasing always succeeds.
+
+Each Soul Transfer moves one soul to one machine:
+
+- The soul only fits the same kind of machine. A Furnace soul cannot go into an Alloy Furnace, even though they share build codes.
+- A soul with an ascendancy needs a Stage 4 or higher machine, the same as Seal I.
+- If the new machine already has Mastery, the first use only warns you. Sneak-use to release anyway; the new machine's own Mastery is lost.
+
+It works on the Forestry Companion cart too.
+
+{{ crafting('rngtech:soul_transfer') }}
 
 ## Ascendancies
 

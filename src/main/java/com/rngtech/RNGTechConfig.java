@@ -112,6 +112,18 @@ public final class RNGTechConfig {
             .comment("Whether the default Ascendancy Seal and Seal Core recipes load. Disable them to award Seals through loot, quests, or custom recipes instead.")
             .define("ascendancy.sealRecipesEnabled", true);
 
+    public static final ModConfigSpec.BooleanValue SOUL_TRANSFER_ALWAYS_SUCCEEDS = BUILDER
+            .comment("Whether every Soul Transfer absorbs a machine's Mastery. When false, the stability of the Calibrated Logic Component it was crafted with is the success chance.")
+            .define("soulTransfer.alwaysSucceeds", false);
+
+    public static final ModConfigSpec.IntValue SOUL_TRANSFER_FAILURE_XP_LOSS = BUILDER
+            .comment("Percent of the machine's Mastery XP lost when a Soul Transfer fails. Late levels need far more XP than early ones, so this costs high-level machines few levels unless it is near 100.")
+            .defineInRange("soulTransfer.failureXpLossPercent", 0, 0, 100);
+
+    public static final ModConfigSpec.IntValue SOUL_TRANSFER_FAILURE_LEVEL_LOSS = BUILDER
+            .comment("Mastery levels lost when a Soul Transfer fails, after any XP loss. Refunds the latest nodes the tree and installed Gear can spare; never drops below the level the build still needs.")
+            .defineInRange("soulTransfer.failureLevelLoss", 0, 0, 99);
+
     public static final ModConfigSpec.BooleanValue VOLATILE_CATALYST_RECIPES_ENABLED = BUILDER
             .comment("Whether the default Volatile Catalyst recipe loads. Disable it to award catalysts through quests, loot, or custom recipes instead.")
             .define("corruption.volatileCatalystRecipesEnabled", true);

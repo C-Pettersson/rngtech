@@ -2,7 +2,7 @@
 navigation:
   title: "Choosing and spending points"
   parent: machine-mastery.md
-  position: 8
+  position: 9
   icon: rngtech:ascendancy_seal_1
 ---
 
