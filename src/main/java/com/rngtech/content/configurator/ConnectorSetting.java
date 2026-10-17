@@ -1,6 +1,7 @@
 package com.rngtech.content.configurator;
 
 import com.rngtech.content.blockentity.UniversalConnectorBlockEntity;
+import com.rngtech.util.ItemStackValues;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
@@ -13,6 +14,7 @@ import net.minecraft.world.item.ItemStack;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public record ConnectorSetting(
         boolean present,
@@ -180,5 +182,30 @@ public record ConnectorSetting(
             }
         }
         return normalizeFilters(filters);
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        return other instanceof ConnectorSetting that
+                && present == that.present
+                && channel == that.channel
+                && modeOrdinal == that.modeOrdinal
+                && distributionOrdinal == that.distributionOrdinal
+                && attachAs.equals(that.attachAs)
+                && ItemStackValues.matches(module, that.module)
+                && ItemStackValues.matches(filters, that.filters);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(
+                present,
+                channel,
+                modeOrdinal,
+                distributionOrdinal,
+                attachAs,
+                ItemStackValues.hash(module),
+                ItemStackValues.hash(filters)
+        );
     }
 }

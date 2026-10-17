@@ -24,8 +24,15 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.Connection;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.game.ClientGamePacketListener;
+import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.TickTask;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.Containers;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
@@ -51,8 +58,15 @@ public class ToolBenchBlockEntity extends BlockEntity implements MenuProvider {
     public static final int SLOT_ENERGY_CONNECTOR = 7;
     public static final int SLOT_COUNT = 8;
 
-    private boolean suppressAnvilStateSync;
+    private static final String DISPLAY_TOOL = "DisplayTool";
+    private static final String DISPLAY_HEAD = "DisplayHead";
+    private static final String DISPLAY_ROD = "DisplayRod";
+
+    private boolean suppressGearStateSync;
     private final IEnergyStorage energyStorage = new ToolBenchEnergyStorage();
+    private ItemStack displayTool = ItemStack.EMPTY;
+    private ItemStack displayHead = ItemStack.EMPTY;
+    private ItemStack displayRod = ItemStack.EMPTY;
 
     private final ItemStackHandler inventory = new ItemStackHandler(SLOT_COUNT) {
         @Override
@@ -87,9 +101,12 @@ public class ToolBenchBlockEntity extends BlockEntity implements MenuProvider {
         protected void onContentsChanged(int slot) {
             setChanged();
             if (slot == SLOT_TINY_ANVIL) {
-                syncAnvilBlockState();
+                syncGearBlockState();
             } else if (slot == SLOT_ENERGY_CONNECTOR) {
+                syncGearBlockState();
                 invalidateEnergyCapability();
+            } else if (slot == SLOT_TOOL || slot == SLOT_HEAD || slot == SLOT_ROD) {
+                syncDisplay();
             }
         }
     };
@@ -227,7 +244,7 @@ public class ToolBenchBlockEntity extends BlockEntity implements MenuProvider {
     }
 
     public void dropInventory(Level level) {
-        suppressAnvilStateSync = true;
+        suppressGearStateSync = true;
         try {
             for (int slot = 0; slot < inventory.getSlots(); slot++) {
                 ItemStack stack = inventory.getStackInSlot(slot);
@@ -237,7 +254,7 @@ public class ToolBenchBlockEntity extends BlockEntity implements MenuProvider {
                 }
             }
         } finally {
-            suppressAnvilStateSync = false;
+            suppressGearStateSync = false;
         }
     }
 
@@ -256,21 +273,95 @@ public class ToolBenchBlockEntity extends BlockEntity implements MenuProvider {
             inventoryTag.putInt("Size", SLOT_COUNT);
         }
         inventory.deserializeNBT(registries, inventoryTag);
-        syncAnvilBlockState();
+        syncGearBlockState();
         invalidateEnergyCapability();
     }
 
-    private void syncAnvilBlockState() {
-        if (suppressAnvilStateSync || level == null || level.isClientSide) {
+    /**
+     * Benches saved while the block was a solid cube stored no light inside it, which leaves the shaped model and the
+     * tool on the top unlit, and benches saved before the connector blockstate hide an installed Energy Connector.
+     * Rechecking the block's own light and Gear blockstate once on load fixes those saves; the blockstate waits for
+     * the next server tick so the chunk is not changed while it loads.
+     */
+    @Override
+    public void onLoad() {
+        super.onLoad();
+        if (level instanceof ServerLevel serverLevel) {
+            serverLevel.getLightEngine().checkBlock(worldPosition);
+            MinecraftServer server = serverLevel.getServer();
+            server.tell(new TickTask(server.getTickCount(), () -> {
+                if (!isRemoved()) {
+                    syncGearBlockState();
+                }
+            }));
+        }
+    }
+
+    /** Client copy of the Tool slot, drawn on the worktop by ToolBenchRenderer. */
+    public ItemStack displayTool() {
+        return displayTool;
+    }
+
+    /** Client copy of the loose Tool Head, drawn when the Tool slot is empty. */
+    public ItemStack displayHead() {
+        return displayHead;
+    }
+
+    /** Client copy of the loose Tool Rod, drawn when the Tool slot is empty. */
+    public ItemStack displayRod() {
+        return displayRod;
+    }
+
+    @Override
+    public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
+        CompoundTag tag = new CompoundTag();
+        tag.put(DISPLAY_TOOL, inventory.getStackInSlot(SLOT_TOOL).saveOptional(registries));
+        tag.put(DISPLAY_HEAD, inventory.getStackInSlot(SLOT_HEAD).saveOptional(registries));
+        tag.put(DISPLAY_ROD, inventory.getStackInSlot(SLOT_ROD).saveOptional(registries));
+        return tag;
+    }
+
+    @Override
+    public Packet<ClientGamePacketListener> getUpdatePacket() {
+        return ClientboundBlockEntityDataPacket.create(this);
+    }
+
+    @Override
+    public void handleUpdateTag(CompoundTag tag, HolderLookup.Provider registries) {
+        loadDisplay(tag, registries);
+    }
+
+    @Override
+    public void onDataPacket(Connection connection, ClientboundBlockEntityDataPacket packet, HolderLookup.Provider registries) {
+        loadDisplay(packet.getTag(), registries);
+    }
+
+    private void loadDisplay(CompoundTag tag, HolderLookup.Provider registries) {
+        displayTool = ItemStack.parseOptional(registries, tag.getCompound(DISPLAY_TOOL));
+        displayHead = ItemStack.parseOptional(registries, tag.getCompound(DISPLAY_HEAD));
+        displayRod = ItemStack.parseOptional(registries, tag.getCompound(DISPLAY_ROD));
+    }
+
+    private void syncDisplay() {
+        if (level != null && !level.isClientSide) {
+            level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), Block.UPDATE_CLIENTS);
+        }
+    }
+
+    /** The blockstate shows installed Gear: the Tiny Anvil on the worktop and the cable port of an Energy Connector. */
+    private void syncGearBlockState() {
+        if (suppressGearStateSync || level == null || level.isClientSide) {
             return;
         }
         BlockState state = level.getBlockState(worldPosition);
-        if (!state.hasProperty(ToolBenchBlock.HAS_TINY_ANVIL)) {
+        if (!state.is(getBlockState().getBlock())) {
             return;
         }
-        boolean hasTinyAnvil = hasTinyAnvil();
-        if (state.getValue(ToolBenchBlock.HAS_TINY_ANVIL) != hasTinyAnvil) {
-            level.setBlock(worldPosition, state.setValue(ToolBenchBlock.HAS_TINY_ANVIL, hasTinyAnvil), Block.UPDATE_ALL);
+        BlockState synced = state
+                .setValue(ToolBenchBlock.HAS_TINY_ANVIL, hasTinyAnvil())
+                .setValue(ToolBenchBlock.HAS_ENERGY_CONNECTOR, hasEnergyConnector());
+        if (synced != state) {
+            level.setBlock(worldPosition, synced, Block.UPDATE_ALL);
         }
     }
 

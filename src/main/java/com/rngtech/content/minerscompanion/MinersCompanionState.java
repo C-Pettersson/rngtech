@@ -9,6 +9,7 @@ import com.rngtech.rpg.ComponentBaseStatCatalog;
 import com.rngtech.rpg.MachinePartType;
 import com.rngtech.rpg.MachineStat;
 import com.rngtech.rpg.MachineStatAccumulator;
+import com.rngtech.util.ItemStackValues;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
@@ -20,6 +21,7 @@ import net.minecraft.world.item.ItemStack;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public record MinersCompanionState(
         boolean blockChewEnabled,
@@ -243,5 +245,34 @@ public record MinersCompanionState(
             }
         }
         return normalizeFilters(filters);
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        return other instanceof MinersCompanionState that
+                && blockChewEnabled == that.blockChewEnabled
+                && magnetEnabled == that.magnetEnabled
+                && miningLampEnabled == that.miningLampEnabled
+                && ItemStackValues.matches(crushHead, that.crushHead)
+                && ItemStackValues.matches(batteryCell, that.batteryCell)
+                && ItemStackValues.matches(recoveryFilter, that.recoveryFilter)
+                && ItemStackValues.matches(magnet, that.magnet)
+                && ItemStackValues.matches(miningLamp, that.miningLamp)
+                && ItemStackValues.matches(filters, that.filters);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(
+                blockChewEnabled,
+                magnetEnabled,
+                miningLampEnabled,
+                ItemStackValues.hash(crushHead),
+                ItemStackValues.hash(batteryCell),
+                ItemStackValues.hash(recoveryFilter),
+                ItemStackValues.hash(magnet),
+                ItemStackValues.hash(miningLamp),
+                ItemStackValues.hash(filters)
+        );
     }
 }

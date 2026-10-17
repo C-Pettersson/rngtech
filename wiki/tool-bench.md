@@ -26,6 +26,8 @@ The **Tool Bench** is where you build and maintain RNGTech's [Modular Tools](mod
 
 It needs no iron to craft, so it is one of the first things you build.
 
+The placed bench faces you, with a bed of gravel between its legs. A tool in its Tool slot lies on the worktop, or the loose head and rod when there is no tool. An installed Tiny Anvil sits on the front corner of the worktop, and an installed Energy Connector adds a back panel with a cable port.
+
 ## Obtaining
 
 ### Crafting
@@ -71,7 +73,7 @@ The Refine tab applies an {{ item('rngtech:affix_injector') }}, {{ item('rngtech
 
 ### Automation
 
-The Tool Bench has no item automation. With an Energy Connector installed, it accepts FE from any side, for example from a [Universal Cable](universal-cable.md).
+The Tool Bench has no item automation. With an Energy Connector installed, it accepts FE from any side, for example from a [Universal Cable](universal-cable.md). The cable port appears on the back of the bench once a connector is installed.
 
 ## Screen
 
@@ -81,6 +83,8 @@ The Tool Bench screen has four tabs:
 - **Gear**: the Tiny Anvil and Energy Connector slots.
 - **Stats**: the inserted tool's effective stats. Hover a stat for an explanation.
 - **Refine**: Tool, Head, Rod, and catalyst slots for refining tool parts.
+
+Hover an empty slot to see what it takes.
 
 ## Data values
 

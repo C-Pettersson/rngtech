@@ -18,6 +18,7 @@ import com.rngtech.client.renderer.SolarArrayControllerRenderer;
 import com.rngtech.client.renderer.SolarPanelModels;
 import com.rngtech.client.renderer.SolarPanelRenderer;
 import com.rngtech.client.renderer.SolidFuelBurnerRenderer;
+import com.rngtech.client.renderer.ToolBenchRenderer;
 import com.rngtech.client.renderer.VacuumCollapseGeneratorRenderer;
 import com.rngtech.client.screen.AdvancedItemFilterScreen;
 import com.rngtech.client.screen.AffixForgeScreen;
@@ -179,6 +180,7 @@ public final class RNGTechClient {
         event.registerBlockEntityRenderer(ModBlockEntities.SOLID_FUEL_BURNER.get(), SolidFuelBurnerRenderer::new);
         event.registerBlockEntityRenderer(ModBlockEntities.POTENTIAL_REACTOR.get(), PotentialReactorRenderer::new);
         event.registerBlockEntityRenderer(ModBlockEntities.VACUUM_COLLAPSE_GENERATOR.get(), VacuumCollapseGeneratorRenderer::new);
+        event.registerBlockEntityRenderer(ModBlockEntities.TOOL_BENCH.get(), ToolBenchRenderer::new);
         event.registerEntityRenderer(ModEntityTypes.FORESTRY_CART.get(), ForestryCartRenderer::new);
     }
 
