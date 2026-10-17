@@ -32,6 +32,8 @@ To work on the documentation, run `mkdocs serve` for the design docs or `mkdocs 
 
 Use `./gradlew runClient` for in-game checks, `./gradlew runServer` for a development server, and `./gradlew spotlessApply` for formatting. The development runs include optional integration mods. Report which integrations and client/server configurations you tested.
 
+For a multiplayer check, set `online-mode=false` in `run/server/server.properties`, since development clients do not sign in, and join `localhost` from two clients. Start the second with `./gradlew runClient -Pplayer=Dev2`. It logs in as Dev2 from its own `run/client-Dev2` directory, so it does not kick the default Dev client.
+
 ## Scope and documentation
 
 Follow [AGENTS.md](AGENTS.md), the [current implementation reference](docs/reference/current-implementation.md), and [machine guidelines](docs/reference/machine-guidelines.md). Describe the problem, resulting behavior, and validation in a pull request. Keep unrelated refactors separate.

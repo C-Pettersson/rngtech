@@ -130,6 +130,13 @@ runs {
             systemProperty 'guideme.validateAtStartup', 'rngtech:guide'
             systemProperty 'guideme.showOnStartup', 'rngtech:guide'
         }
+        if (project.hasProperty('player')) {
+            // -Pplayer=<name> logs in under that name from its own run directory, so a second client can join a
+            // server next to the default Dev client without sharing its options, logs or offline UUID.
+            def player = project.property('player').toString()
+            arguments.addAll '--username', player
+            workingDirectory.set(new File(sharedRunRoot, "client-${player}"))
+        }
     }
 
     server {
