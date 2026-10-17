@@ -14,9 +14,10 @@
     "id": "rngtech:aluminum_ingot"
   },
   "processing_ticks": 150,
-  "heat": 6886,
+  "heat": 8494,
   "experience": 0.7,
-  "minimum_temperature": 1000,
+  "minimum_temperature": 1300,
+  "required_temperature_stability": 0.95,
   "machine_xp": 2,
   "failure_output": {
     "count": 1,
