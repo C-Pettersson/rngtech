@@ -1,12 +1,9 @@
 {
-  "parent": "minecraft:block/cube",
+  "parent": "rngtech:block/compressor_tank/compressor_tank_1",
   "textures": {
-    "down": "rngtech:block/compressor_tank/bottom/steel_compressor_tank",
-    "up": "rngtech:block/compressor_tank/top/steel_compressor_tank",
-    "north": "rngtech:block/compressor_tank/front/steel_compressor_tank",
-    "south": "rngtech:block/compressor_tank/side/steel_compressor_tank",
-    "east": "rngtech:block/compressor_tank/side/steel_compressor_tank",
-    "west": "rngtech:block/compressor_tank/side/steel_compressor_tank",
-    "particle": "rngtech:block/compressor_tank/front/steel_compressor_tank"
+    "particle": "rngtech:block/compressor_tank/shell/steel",
+    "shell": "rngtech:block/compressor_tank/shell/steel",
+    "trim": "rngtech:block/compressor_tank/trim/steel",
+    "cap": "rngtech:block/compressor_tank/cap/steel"
   }
 }

@@ -2,7 +2,7 @@
 navigation:
   title: "Automation"
   parent: compressor-tank.md
-  position: 2
+  position: 3
   icon: rngtech:steel_compressor_tank
 ---
 
