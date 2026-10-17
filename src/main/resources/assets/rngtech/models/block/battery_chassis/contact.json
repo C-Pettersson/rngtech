@@ -1,0 +1,35 @@
+{
+  "textures": {
+    "particle": "#wire",
+    "casing": "rngtech:block/battery_chassis/casing",
+    "contact": "rngtech:block/battery_chassis/contact"
+  },
+  "elements": [
+    {
+      "from": [
+        2.0,
+        2.0,
+        0.0
+      ],
+      "to": [
+        14.0,
+        14.0,
+        0.5
+      ],
+      "faces": {
+        "north": {
+          "texture": "#contact",
+          "uv": [
+            2.0,
+            2.0,
+            14.0,
+            14.0
+          ]
+        },
+        "south": {
+          "texture": "#casing"
+        }
+      }
+    }
+  ]
+}

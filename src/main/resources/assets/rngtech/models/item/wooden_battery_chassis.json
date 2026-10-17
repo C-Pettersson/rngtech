@@ -1,3 +1,747 @@
 {
-  "parent": "rngtech:block/wooden_battery_chassis"
+  "parent": "minecraft:block/block",
+  "render_type": "minecraft:cutout",
+  "textures": {
+    "particle": "rngtech:block/battery_chassis/crate/side",
+    "crate_side": "rngtech:block/battery_chassis/crate/side",
+    "crate_rim": "rngtech:block/battery_chassis/crate/rim",
+    "crate_floor": "rngtech:block/battery_chassis/crate/floor",
+    "lamp": "rngtech:block/battery_chassis/crate/lamp_off",
+    "wire": "rngtech:block/battery_chassis/crate/bar",
+    "potato_skin": "rngtech:block/battery_chassis/cell/potato",
+    "potato_electrode_copper": "rngtech:block/battery_chassis/cell/electrode_copper",
+    "potato_electrode_zinc": "rngtech:block/battery_chassis/cell/electrode_zinc"
+  },
+  "elements": [
+    {
+      "from": [
+        5.0,
+        1.0,
+        6.0
+      ],
+      "to": [
+        11.0,
+        4.4,
+        10.0
+      ],
+      "faces": {
+        "north": {
+          "texture": "#potato_skin",
+          "uv": [
+            5.0,
+            12.0,
+            11.0,
+            16.0
+          ]
+        },
+        "south": {
+          "texture": "#potato_skin",
+          "uv": [
+            5.0,
+            12.0,
+            11.0,
+            16.0
+          ]
+        },
+        "east": {
+          "texture": "#potato_skin",
+          "uv": [
+            6.0,
+            12.0,
+            10.0,
+            16.0
+          ]
+        },
+        "west": {
+          "texture": "#potato_skin",
+          "uv": [
+            6.0,
+            12.0,
+            10.0,
+            16.0
+          ]
+        },
+        "up": {
+          "texture": "#potato_skin",
+          "uv": [
+            5.0,
+            6.0,
+            11.0,
+            10.0
+          ]
+        },
+        "down": {
+          "texture": "#potato_skin",
+          "uv": [
+            5.0,
+            6.0,
+            11.0,
+            10.0
+          ]
+        }
+      }
+    },
+    {
+      "from": [
+        6.0,
+        1.0,
+        5.0
+      ],
+      "to": [
+        10.0,
+        4.4,
+        11.0
+      ],
+      "faces": {
+        "north": {
+          "texture": "#potato_skin",
+          "uv": [
+            6.0,
+            12.0,
+            10.0,
+            16.0
+          ]
+        },
+        "south": {
+          "texture": "#potato_skin",
+          "uv": [
+            6.0,
+            12.0,
+            10.0,
+            16.0
+          ]
+        },
+        "east": {
+          "texture": "#potato_skin",
+          "uv": [
+            5.0,
+            12.0,
+            11.0,
+            16.0
+          ]
+        },
+        "west": {
+          "texture": "#potato_skin",
+          "uv": [
+            5.0,
+            12.0,
+            11.0,
+            16.0
+          ]
+        },
+        "up": {
+          "texture": "#potato_skin",
+          "uv": [
+            6.0,
+            5.0,
+            10.0,
+            11.0
+          ]
+        },
+        "down": {
+          "texture": "#potato_skin",
+          "uv": [
+            6.0,
+            5.0,
+            10.0,
+            11.0
+          ]
+        }
+      }
+    },
+    {
+      "from": [
+        5.75,
+        3.975,
+        6.25
+      ],
+      "to": [
+        10.25,
+        5.25,
+        9.75
+      ],
+      "faces": {
+        "north": {
+          "texture": "#potato_skin",
+          "uv": [
+            5.75,
+            11.0,
+            10.25,
+            12.5
+          ]
+        },
+        "south": {
+          "texture": "#potato_skin",
+          "uv": [
+            5.75,
+            11.0,
+            10.25,
+            12.5
+          ]
+        },
+        "east": {
+          "texture": "#potato_skin",
+          "uv": [
+            6.25,
+            11.0,
+            9.75,
+            12.5
+          ]
+        },
+        "west": {
+          "texture": "#potato_skin",
+          "uv": [
+            6.25,
+            11.0,
+            9.75,
+            12.5
+          ]
+        },
+        "up": {
+          "texture": "#potato_skin",
+          "uv": [
+            5.75,
+            6.25,
+            10.25,
+            9.75
+          ]
+        }
+      }
+    },
+    {
+      "from": [
+        6.25,
+        4.6125,
+        7.5
+      ],
+      "to": [
+        6.75,
+        7.375,
+        8.0
+      ],
+      "faces": {
+        "north": {
+          "texture": "#potato_electrode_copper",
+          "uv": [
+            9.25,
+            8.5,
+            9.75,
+            11.75
+          ]
+        },
+        "south": {
+          "texture": "#potato_electrode_copper",
+          "uv": [
+            6.25,
+            8.5,
+            6.75,
+            11.75
+          ]
+        },
+        "east": {
+          "texture": "#potato_electrode_copper",
+          "uv": [
+            8.0,
+            8.5,
+            8.5,
+            11.75
+          ]
+        },
+        "west": {
+          "texture": "#potato_electrode_copper",
+          "uv": [
+            7.5,
+            8.5,
+            8.0,
+            11.75
+          ]
+        },
+        "up": {
+          "texture": "#potato_electrode_copper",
+          "uv": [
+            6.25,
+            7.5,
+            6.75,
+            8.0
+          ]
+        }
+      }
+    },
+    {
+      "from": [
+        9.25,
+        4.6125,
+        7.5
+      ],
+      "to": [
+        9.75,
+        7.375,
+        8.0
+      ],
+      "faces": {
+        "north": {
+          "texture": "#potato_electrode_zinc",
+          "uv": [
+            6.25,
+            8.5,
+            6.75,
+            11.75
+          ]
+        },
+        "south": {
+          "texture": "#potato_electrode_zinc",
+          "uv": [
+            9.25,
+            8.5,
+            9.75,
+            11.75
+          ]
+        },
+        "east": {
+          "texture": "#potato_electrode_zinc",
+          "uv": [
+            8.0,
+            8.5,
+            8.5,
+            11.75
+          ]
+        },
+        "west": {
+          "texture": "#potato_electrode_zinc",
+          "uv": [
+            7.5,
+            8.5,
+            8.0,
+            11.75
+          ]
+        },
+        "up": {
+          "texture": "#potato_electrode_zinc",
+          "uv": [
+            9.25,
+            7.5,
+            9.75,
+            8.0
+          ]
+        }
+      }
+    },
+    {
+      "from": [
+        6.0,
+        6.95,
+        7.25
+      ],
+      "to": [
+        7.0,
+        7.375,
+        8.25
+      ],
+      "faces": {
+        "north": {
+          "texture": "#potato_electrode_copper",
+          "uv": [
+            9.0,
+            8.5,
+            10.0,
+            9.0
+          ]
+        },
+        "south": {
+          "texture": "#potato_electrode_copper",
+          "uv": [
+            6.0,
+            8.5,
+            7.0,
+            9.0
+          ]
+        },
+        "east": {
+          "texture": "#potato_electrode_copper",
+          "uv": [
+            7.75,
+            8.5,
+            8.75,
+            9.0
+          ]
+        },
+        "west": {
+          "texture": "#potato_electrode_copper",
+          "uv": [
+            7.25,
+            8.5,
+            8.25,
+            9.0
+          ]
+        },
+        "up": {
+          "texture": "#potato_electrode_copper",
+          "uv": [
+            6.0,
+            7.25,
+            7.0,
+            8.25
+          ]
+        },
+        "down": {
+          "texture": "#potato_electrode_copper",
+          "uv": [
+            6.0,
+            7.75,
+            7.0,
+            8.75
+          ]
+        }
+      }
+    },
+    {
+      "from": [
+        9.0,
+        6.95,
+        7.25
+      ],
+      "to": [
+        10.0,
+        7.375,
+        8.25
+      ],
+      "faces": {
+        "north": {
+          "texture": "#potato_electrode_zinc",
+          "uv": [
+            6.0,
+            8.5,
+            7.0,
+            9.0
+          ]
+        },
+        "south": {
+          "texture": "#potato_electrode_zinc",
+          "uv": [
+            9.0,
+            8.5,
+            10.0,
+            9.0
+          ]
+        },
+        "east": {
+          "texture": "#potato_electrode_zinc",
+          "uv": [
+            7.75,
+            8.5,
+            8.75,
+            9.0
+          ]
+        },
+        "west": {
+          "texture": "#potato_electrode_zinc",
+          "uv": [
+            7.25,
+            8.5,
+            8.25,
+            9.0
+          ]
+        },
+        "up": {
+          "texture": "#potato_electrode_zinc",
+          "uv": [
+            9.0,
+            7.25,
+            10.0,
+            8.25
+          ]
+        },
+        "down": {
+          "texture": "#potato_electrode_zinc",
+          "uv": [
+            9.0,
+            7.75,
+            10.0,
+            8.75
+          ]
+        }
+      }
+    },
+    {
+      "from": [
+        0,
+        0,
+        0
+      ],
+      "to": [
+        16,
+        1.0,
+        16
+      ],
+      "faces": {
+        "north": {
+          "texture": "#crate_side"
+        },
+        "south": {
+          "texture": "#crate_side"
+        },
+        "east": {
+          "texture": "#crate_side"
+        },
+        "west": {
+          "texture": "#crate_side"
+        },
+        "up": {
+          "texture": "#crate_floor"
+        },
+        "down": {
+          "texture": "#crate_floor"
+        }
+      }
+    },
+    {
+      "from": [
+        0,
+        1.0,
+        0
+      ],
+      "to": [
+        16,
+        8.0,
+        1.0
+      ],
+      "faces": {
+        "north": {
+          "texture": "#crate_side"
+        },
+        "south": {
+          "texture": "#crate_side"
+        },
+        "east": {
+          "texture": "#crate_side"
+        },
+        "west": {
+          "texture": "#crate_side"
+        },
+        "up": {
+          "texture": "#crate_rim"
+        }
+      }
+    },
+    {
+      "from": [
+        0,
+        1.0,
+        15.0
+      ],
+      "to": [
+        16,
+        8.0,
+        16
+      ],
+      "faces": {
+        "north": {
+          "texture": "#crate_side"
+        },
+        "south": {
+          "texture": "#crate_side"
+        },
+        "east": {
+          "texture": "#crate_side"
+        },
+        "west": {
+          "texture": "#crate_side"
+        },
+        "up": {
+          "texture": "#crate_rim"
+        }
+      }
+    },
+    {
+      "from": [
+        0,
+        1.0,
+        1.0
+      ],
+      "to": [
+        1.0,
+        8.0,
+        15.0
+      ],
+      "faces": {
+        "east": {
+          "texture": "#crate_side"
+        },
+        "west": {
+          "texture": "#crate_side"
+        },
+        "up": {
+          "texture": "#crate_rim"
+        }
+      }
+    },
+    {
+      "from": [
+        15.0,
+        1.0,
+        1.0
+      ],
+      "to": [
+        16,
+        8.0,
+        15.0
+      ],
+      "faces": {
+        "east": {
+          "texture": "#crate_side"
+        },
+        "west": {
+          "texture": "#crate_side"
+        },
+        "up": {
+          "texture": "#crate_rim"
+        }
+      }
+    },
+    {
+      "from": [
+        0.0,
+        8.0,
+        6.5
+      ],
+      "to": [
+        1.5,
+        9.5,
+        9.5
+      ],
+      "faces": {
+        "north": {
+          "texture": "#crate_rim"
+        },
+        "south": {
+          "texture": "#crate_rim"
+        },
+        "east": {
+          "texture": "#crate_rim"
+        },
+        "west": {
+          "texture": "#crate_rim"
+        }
+      }
+    },
+    {
+      "from": [
+        14.5,
+        8.0,
+        6.5
+      ],
+      "to": [
+        16.0,
+        9.5,
+        9.5
+      ],
+      "faces": {
+        "north": {
+          "texture": "#crate_rim"
+        },
+        "south": {
+          "texture": "#crate_rim"
+        },
+        "east": {
+          "texture": "#crate_rim"
+        },
+        "west": {
+          "texture": "#crate_rim"
+        }
+      }
+    },
+    {
+      "from": [
+        0.0,
+        9.5,
+        7.25
+      ],
+      "to": [
+        16.0,
+        10.5,
+        8.75
+      ],
+      "faces": {
+        "north": {
+          "texture": "#wire"
+        },
+        "south": {
+          "texture": "#wire"
+        },
+        "east": {
+          "texture": "#wire"
+        },
+        "west": {
+          "texture": "#wire"
+        },
+        "up": {
+          "texture": "#wire"
+        },
+        "down": {
+          "texture": "#wire"
+        }
+      }
+    },
+    {
+      "from": [
+        10.5,
+        8.0,
+        0.25
+      ],
+      "to": [
+        12.5,
+        9.25,
+        1.75
+      ],
+      "faces": {
+        "north": {
+          "texture": "#lamp"
+        },
+        "south": {
+          "texture": "#lamp"
+        },
+        "east": {
+          "texture": "#lamp"
+        },
+        "west": {
+          "texture": "#lamp"
+        },
+        "up": {
+          "texture": "#lamp"
+        },
+        "down": {
+          "texture": "#lamp"
+        }
+      }
+    },
+    {
+      "from": [
+        3.5,
+        8.0,
+        0.5
+      ],
+      "to": [
+        4.5,
+        9.0,
+        1.5
+      ],
+      "faces": {
+        "north": {
+          "texture": "#wire"
+        },
+        "south": {
+          "texture": "#wire"
+        },
+        "east": {
+          "texture": "#wire"
+        },
+        "west": {
+          "texture": "#wire"
+        },
+        "up": {
+          "texture": "#wire"
+        }
+      }
+    }
+  ]
 }

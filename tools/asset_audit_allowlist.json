@@ -184,11 +184,10 @@
     {
       "check": "unused_png",
       "subject_globs": [
-        "src/main/resources/assets/rngtech/textures/block/battery_chassis/*.png",
-        "src/main/resources/assets/rngtech/textures/block/battery_chassis/slotted/*.png",
-        "src/main/resources/assets/rngtech/textures/block/battery_chassis/slot_overlays/*.png"
+        "src/main/resources/assets/rngtech/textures/block/battery_chassis/fx/led.png",
+        "src/main/resources/assets/rngtech/textures/block/battery_chassis/crate/lamp_on.png"
       ],
-      "reason": "Battery chassis slotted and slot-overlay textures are retained for renderer/runtime use rather than model JSON texture slots."
+      "reason": "The Battery Chassis meter and lamp lenses and the lit Wooden crate lamp are drawn only by BatteryChassisRenderer, by flow."
     },
     {
       "check": "unused_png",
