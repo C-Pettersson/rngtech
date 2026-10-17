@@ -23,6 +23,7 @@ import com.rngtech.content.registry.ModMenus;
 import com.rngtech.content.registry.ModNetworking;
 import com.rngtech.content.registry.ModRecipes;
 import com.rngtech.content.registry.ModSounds;
+import com.rngtech.content.registry.ModStructures;
 import com.rngtech.content.tool.FieldToolEvents;
 
 import com.mojang.logging.LogUtils;
@@ -64,6 +65,7 @@ public final class RNGTech {
         ModSounds.register(modBus);
         ModConditions.register(modBus);
         ModLoot.register(modBus);
+        ModStructures.register(modBus);
         ModCreativeTabs.register(modBus);
 
         modBus.addListener(this::commonSetup);

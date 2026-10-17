@@ -36,6 +36,7 @@ public final class DormantChecks {
         generatedBuilds();
         namedTargets();
         rejectsBadData();
+        topStages();
         return checks;
     }
 
@@ -43,12 +44,12 @@ public final class DormantChecks {
         require(sites.keySet().equals(new HashSet<>(List.of("collapsed_workshop", "abandoned_cart_siding", "buried_calibration_vault",
                 "flooded_foundry", "nether_smeltworks", "end_relay"))), "the six default sites ship, got " + sites.keySet());
         DormantSite workshop = sites.get("collapsed_workshop");
-        require(workshop.minWakeFe() == 35_000 && workshop.maxWakeFe() == 100_000 && workshop.releaseStage() == 1,
-                "the Collapsed Workshop is sized for carried cells");
+        require(workshop.minWakeFe() == 35_000 && workshop.maxWakeFe() == 100_000, "the Collapsed Workshop is sized for carried cells");
         DormantSite end = sites.get("end_relay");
         require(end.minLevel() == 40 && end.maxLevel() == 70 && end.minWakeFe() == 10_000_000 && end.maxWakeFe() == 60_000_000
-                && end.wakeInput() == 250_000 && end.releaseStage() == 7, "the End Relay carries the proposal's numbers");
+                && end.wakeInput() == 250_000, "the End Relay carries the proposal's numbers");
         for (DormantSite site : sites.values()) {
+            require(site.releaseStage() == 0, site.id() + " lets its souls go into any machine of their family; the wake cost is the gate");
             require(site.wakeFe(site.maxLevel()) / site.wakeInput() <= 20 * 20, site.id() + " wakes in under 20 seconds at its input rate");
         }
     }
@@ -73,7 +74,8 @@ public final class DormantChecks {
                 require(site.families().containsKey(soul.family()), site.id() + " rolls only its own families");
                 require(soul.level() >= site.minLevel() && soul.level() <= site.maxLevel(), site.id() + " rolls a level in its band");
                 require(soul.wakeFe() == site.wakeFe(soul.level()) && soul.wakeInput() == site.wakeInput()
-                        && soul.releaseStage() == site.releaseStage(), site.id() + " prices the soul from the site");
+                        && soul.releaseStage() == Math.min(site.releaseStage(), soul.family().topStage()), site.id() + " prices the soul from the site");
+                require(soul.releaseStage() <= soul.family().topStage(), site.id() + " never rolls a soul its family cannot take");
                 require(soul.state().freeReset() && soul.state().sealTiers() == 0 && soul.state().ascendancy().isEmpty(),
                         site.id() + " souls carry a free Full Reset and no ascendancy");
                 require(soul.state().spentPoints() == soul.level() - 1, site.id() + " souls spend every point, got "
@@ -109,6 +111,24 @@ public final class DormantChecks {
         List<String> build = DormantArchetype.through(MachineMasteryFamily.CRUSHER, List.of(notable.id()), 99);
         require(!build.isEmpty() && build.getLast().equals(notable.id()), "a named target ends the build's path to it");
         require(MegaPassiveTree.validBuild(MachineMasteryFamily.CRUSHER.startNodeId(), build), "a named-target build connects");
+    }
+
+    /** Each family's top stage matches its highest chassis, so a capped release stage always has a machine to go into. */
+    private static void topStages() {
+        require(MachineMasteryFamily.CRUSHER.topStage() == maxStage(com.rngtech.content.machine.CrusherChassisMaterial.values(),
+                com.rngtech.content.machine.CrusherChassisMaterial::stage), "the Crusher's top stage is its highest chassis");
+        require(MachineMasteryFamily.FURNACE.topStage() == maxStage(com.rngtech.content.machine.FurnaceChassisMaterial.values(),
+                com.rngtech.content.machine.FurnaceChassisMaterial::stage), "the Furnace's top stage is its highest chassis");
+        require(MachineMasteryFamily.ALLOY_FURNACE.topStage() == maxStage(com.rngtech.content.machine.AlloyFurnaceChassisMaterial.values(),
+                com.rngtech.content.machine.AlloyFurnaceChassisMaterial::stage), "the Alloy Furnace's top stage is its highest chassis");
+        require(MachineMasteryFamily.RESONANCE_CALIBRATOR.topStage() == maxStage(com.rngtech.content.calibration.ResonanceCalibratorChassis.values(),
+                com.rngtech.content.calibration.ResonanceCalibratorChassis::stage), "the Resonance Calibrator's top stage is its highest chassis");
+        require(MachineMasteryFamily.FORESTRY.topStage() == com.rngtech.rpg.progression.AscendancyCatalog.ENTRY_STAGE,
+                "the Forestry Companion's top stage is the ascendancy entry stage it reports");
+    }
+
+    private static <T> int maxStage(T[] values, java.util.function.ToIntFunction<T> stage) {
+        return java.util.Arrays.stream(values).mapToInt(stage).max().orElseThrow();
     }
 
     private static void rejectsBadData() {

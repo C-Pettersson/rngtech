@@ -1,6 +1,7 @@
 package com.rngtech.content.block;
 
 import com.rngtech.content.blockentity.DormantMachineBlockEntity;
+import com.rngtech.content.dormant.DormantCore;
 import com.rngtech.content.dormant.DormantPhase;
 import com.rngtech.content.registry.ModBlockEntities;
 
@@ -67,8 +68,8 @@ public class DormantMachineBlock extends Block implements EntityBlock {
     @Override
     protected void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean movedByPiston) {
         if (!state.is(newState.getBlock()) && level.getBlockEntity(pos) instanceof DormantMachineBlockEntity machine) {
-            for (int slot = 0; slot < DormantMachineBlockEntity.CELL_SLOTS; slot++) {
-                Containers.dropItemStack(level, pos.getX(), pos.getY(), pos.getZ(), machine.cells().getStackInSlot(slot));
+            for (int slot = 0; slot < DormantCore.CELL_SLOTS; slot++) {
+                Containers.dropItemStack(level, pos.getX(), pos.getY(), pos.getZ(), machine.core().cells().getStackInSlot(slot));
             }
         }
         super.onRemove(state, level, pos, newState, movedByPiston);
@@ -85,7 +86,10 @@ public class DormantMachineBlock extends Block implements EntityBlock {
             return InteractionResult.PASS;
         }
         if (!level.isClientSide && level.getBlockEntity(pos) instanceof DormantMachineBlockEntity machine) {
-            player.openMenu(machine, buffer -> buffer.writeBlockPos(pos));
+            player.openMenu(machine, buffer -> {
+                buffer.writeBoolean(false);
+                buffer.writeBlockPos(pos);
+            });
         }
         return InteractionResult.sidedSuccess(level.isClientSide);
     }

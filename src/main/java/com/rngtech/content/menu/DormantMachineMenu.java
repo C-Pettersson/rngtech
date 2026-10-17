@@ -2,25 +2,28 @@ package com.rngtech.content.menu;
 
 import com.rngtech.RNGTechConfig;
 import com.rngtech.content.blockentity.DormantMachineBlockEntity;
+import com.rngtech.content.dormant.DormantCore;
 import com.rngtech.content.dormant.DormantPhase;
+import com.rngtech.content.entity.DerelictCartEntity;
 import com.rngtech.content.item.BatteryCellItem;
-import com.rngtech.content.registry.ModBlocks;
 import com.rngtech.content.registry.ModMenus;
 import com.rngtech.rpg.progression.MachineMasteryFamily;
 
-import net.minecraft.core.BlockPos;
 import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerData;
-import net.minecraft.world.inventory.ContainerLevelAccess;
 import net.minecraft.world.inventory.SimpleContainerData;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.ItemStackHandler;
 import net.neoforged.neoforge.items.SlotItemHandler;
+
+import java.util.function.Predicate;
 
 /** Nine Battery Cell sockets over the player inventory, plus the wake state the screen draws. */
 public class DormantMachineMenu extends AbstractContainerMenu {
@@ -31,24 +34,25 @@ public class DormantMachineMenu extends AbstractContainerMenu {
     public static final int INVENTORY_Y = 114;
     public static final int HOTBAR_Y = 172;
 
-    private static final int PLAYER_START = DormantMachineBlockEntity.CELL_SLOTS;
+    private static final int PLAYER_START = DormantCore.CELL_SLOTS;
     private static final int PLAYER_END = PLAYER_START + 36;
 
-    private final ContainerLevelAccess access;
+    private final Predicate<Player> valid;
     private final ContainerData data;
     private final IItemHandler cells;
 
+    /** Client side: the buffer names either a block position or a derelict cart's entity id. */
     public DormantMachineMenu(int containerId, Inventory inventory, RegistryFriendlyByteBuf extraData) {
-        this(containerId, inventory, blockEntity(inventory, extraData.readBlockPos()), new SimpleContainerData(DormantMachineBlockEntity.DATA_COUNT));
+        this(containerId, inventory, clientCore(inventory, extraData), new SimpleContainerData(DormantCore.DATA_COUNT), player -> true);
     }
 
-    public DormantMachineMenu(int containerId, Inventory inventory, DormantMachineBlockEntity machine, ContainerData data) {
+    public DormantMachineMenu(int containerId, Inventory inventory, DormantCore core, ContainerData data, Predicate<Player> valid) {
         super(ModMenus.DORMANT_MACHINE.get(), containerId);
-        checkContainerDataCount(data, DormantMachineBlockEntity.DATA_COUNT);
-        this.access = machine == null ? ContainerLevelAccess.NULL : ContainerLevelAccess.create(machine.getLevel(), machine.getBlockPos());
+        checkContainerDataCount(data, DormantCore.DATA_COUNT);
+        this.valid = valid;
         this.data = data;
-        this.cells = machine == null ? new ItemStackHandler(DormantMachineBlockEntity.CELL_SLOTS) : machine.cells();
-        for (int slot = 0; slot < DormantMachineBlockEntity.CELL_SLOTS; slot++) {
+        this.cells = core == null ? new ItemStackHandler(DormantCore.CELL_SLOTS) : core.cells();
+        for (int slot = 0; slot < DormantCore.CELL_SLOTS; slot++) {
             addSlot(new SlotItemHandler(cells, slot, CELL_X + slot % 3 * CELL_SPACING, CELL_Y + slot / 3 * CELL_SPACING) {
                 @Override
                 public boolean mayPlace(ItemStack stack) {
@@ -68,11 +72,11 @@ public class DormantMachineMenu extends AbstractContainerMenu {
     }
 
     public long charge() {
-        return Integer.toUnsignedLong(data.get(DormantMachineBlockEntity.DATA_CHARGE));
+        return Integer.toUnsignedLong(data.get(DormantCore.DATA_CHARGE));
     }
 
     public long wakeFe() {
-        return Integer.toUnsignedLong(data.get(DormantMachineBlockEntity.DATA_WAKE_FE));
+        return Integer.toUnsignedLong(data.get(DormantCore.DATA_WAKE_FE));
     }
 
     public float chargeFraction() {
@@ -81,33 +85,33 @@ public class DormantMachineMenu extends AbstractContainerMenu {
     }
 
     public int lastInput() {
-        return data.get(DormantMachineBlockEntity.DATA_LAST_INPUT);
+        return data.get(DormantCore.DATA_LAST_INPUT);
     }
 
     public int wakeInput() {
-        return data.get(DormantMachineBlockEntity.DATA_WAKE_INPUT);
+        return data.get(DormantCore.DATA_WAKE_INPUT);
     }
 
     public DormantPhase phase() {
-        int ordinal = data.get(DormantMachineBlockEntity.DATA_PHASE);
+        int ordinal = data.get(DormantCore.DATA_PHASE);
         return DormantPhase.values()[Math.clamp(ordinal, 0, DormantPhase.values().length - 1)];
     }
 
     public int soulLevel() {
-        return data.get(DormantMachineBlockEntity.DATA_LEVEL);
+        return data.get(DormantCore.DATA_LEVEL);
     }
 
     public int releaseStage() {
-        return data.get(DormantMachineBlockEntity.DATA_RELEASE_STAGE);
+        return data.get(DormantCore.DATA_RELEASE_STAGE);
     }
 
     public MachineMasteryFamily family() {
-        int ordinal = data.get(DormantMachineBlockEntity.DATA_FAMILY);
+        int ordinal = data.get(DormantCore.DATA_FAMILY);
         return ordinal < 0 || ordinal >= MachineMasteryFamily.values().length ? null : MachineMasteryFamily.values()[ordinal];
     }
 
     public RNGTechConfig.DormantFailedAbsorb failedAbsorb() {
-        int ordinal = data.get(DormantMachineBlockEntity.DATA_FAILED_ABSORB);
+        int ordinal = data.get(DormantCore.DATA_FAILED_ABSORB);
         RNGTechConfig.DormantFailedAbsorb[] values = RNGTechConfig.DormantFailedAbsorb.values();
         return values[Math.clamp(ordinal, 0, values.length - 1)];
     }
@@ -115,7 +119,7 @@ public class DormantMachineMenu extends AbstractContainerMenu {
     /** FE per tick the installed cells can give together. */
     public int cellOutput() {
         int total = 0;
-        for (int slot = 0; slot < DormantMachineBlockEntity.CELL_SLOTS; slot++) {
+        for (int slot = 0; slot < DormantCore.CELL_SLOTS; slot++) {
             ItemStack cell = cells.getStackInSlot(slot);
             if (BatteryCellItem.isBatteryCell(cell) && BatteryCellItem.energyStored(cell) > 0) {
                 total += BatteryCellItem.maxOutput(cell);
@@ -126,7 +130,7 @@ public class DormantMachineMenu extends AbstractContainerMenu {
 
     @Override
     public boolean stillValid(Player player) {
-        return stillValid(access, player, ModBlocks.DORMANT_MACHINE.get());
+        return valid.test(player);
     }
 
     @Override
@@ -152,7 +156,15 @@ public class DormantMachineMenu extends AbstractContainerMenu {
         return moved;
     }
 
-    private static DormantMachineBlockEntity blockEntity(Inventory inventory, BlockPos pos) {
-        return inventory.player.level().getBlockEntity(pos) instanceof DormantMachineBlockEntity machine ? machine : null;
+    public static Component siteName(ResourceLocation site) {
+        return Component.translatable("rngtech.dormant_site." + site.getNamespace() + "." + site.getPath());
+    }
+
+    private static DormantCore clientCore(Inventory inventory, RegistryFriendlyByteBuf buffer) {
+        var level = inventory.player.level();
+        if (buffer.readBoolean()) {
+            return level.getEntity(buffer.readVarInt()) instanceof DerelictCartEntity cart ? cart.core() : null;
+        }
+        return level.getBlockEntity(buffer.readBlockPos()) instanceof DormantMachineBlockEntity machine ? machine.core() : null;
     }
 }

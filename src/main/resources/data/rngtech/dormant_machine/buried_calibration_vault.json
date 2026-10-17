@@ -11,6 +11,5 @@
         "max": 3000000
     },
     "wake_curve": 2.0,
-    "wake_input": 25000,
-    "release_stage": 4
+    "wake_input": 25000
 }

@@ -106,6 +106,10 @@ final class SoulTransferChecks {
         require(SoulTransfer.release(dormant, MachineMasteryFamily.CRUSHER, 5, empty, false) == SoulTransfer.Release.RELEASE,
                 "a Dormant Machine soul releases at its release stage");
         require(charge.releaseStage() == 0, "a soul taken from a machine fits any stage");
+        var melter = new SoulTransfer.Charge(MachineMasteryFamily.MELTER, built(20).forFamily(MachineMasteryFamily.MELTER), 7);
+        require(melter.effectiveReleaseStage() == 6 && SoulTransfer.release(melter, MachineMasteryFamily.MELTER, 6,
+                MachineProgressionState.EMPTY.forFamily(MachineMasteryFamily.MELTER), false) == SoulTransfer.Release.RELEASE,
+                "a soul whose release stage is above its family's top stage still fits that family's top machine");
     }
 
     private static void chargeCodec() {

@@ -45,18 +45,21 @@ public final class DormantSiteIndex extends SavedData {
         }
     }
 
-    public record Entry(GlobalPos pos, ResourceLocation site, State state, long salt, boolean pending) {
+    /** One site. {@code entity} marks a derelict Forestry Companion rather than a block. */
+    public record Entry(GlobalPos pos, ResourceLocation site, State state, long salt, boolean pending, boolean entity) {
         static final Codec<Entry> CODEC = RecordCodecBuilder.create(instance -> instance.group(
                 GlobalPos.CODEC.fieldOf("pos").forGetter(Entry::pos),
                 ResourceLocation.CODEC.fieldOf("site").forGetter(Entry::site),
                 State.CODEC.fieldOf("state").forGetter(Entry::state),
                 Codec.LONG.optionalFieldOf("salt", 0L).forGetter(Entry::salt),
-                Codec.BOOL.optionalFieldOf("pending", false).forGetter(Entry::pending)
+                Codec.BOOL.optionalFieldOf("pending", false).forGetter(Entry::pending),
+                Codec.BOOL.optionalFieldOf("entity", false).forGetter(Entry::entity)
         ).apply(instance, Entry::new));
 
-        Entry with(State next) { return new Entry(pos, site, next, salt, pending); }
-        Entry rerolled(long nextSalt) { return new Entry(pos, site, state, nextSalt, true); }
-        Entry applied() { return new Entry(pos, site, State.UNTOUCHED, salt, false); }
+        Entry with(State next) { return new Entry(pos, site, next, salt, pending, entity); }
+        Entry rerolled(long nextSalt) { return new Entry(pos, site, state, nextSalt, true, entity); }
+        Entry applied() { return new Entry(pos, site, State.UNTOUCHED, salt, false, entity); }
+        Entry settled() { return new Entry(pos, site, state, salt, false, entity); }
     }
 
     private final Map<GlobalPos, Entry> entries = new LinkedHashMap<>();
@@ -76,10 +79,10 @@ public final class DormantSiteIndex extends SavedData {
     }
 
     /** Adds a site the first time it loads. An existing entry is kept, including its salt and any pending reroll. */
-    public Entry register(GlobalPos pos, ResourceLocation site, State state) {
+    public Entry register(GlobalPos pos, ResourceLocation site, State state, boolean entity) {
         Entry existing = entries.get(pos);
         if (existing != null) { return existing; }
-        Entry entry = new Entry(pos, site, state, 0L, false);
+        Entry entry = new Entry(pos, site, state, 0L, false, entity);
         entries.put(pos, entry);
         setDirty();
         return entry;
@@ -107,7 +110,7 @@ public final class DormantSiteIndex extends SavedData {
         Entry entry = entries.get(pos);
         if (entry != null && entry.pending()) {
             pendingCount--;
-            entries.put(pos, new Entry(entry.pos(), entry.site(), entry.state(), entry.salt(), false));
+            entries.put(pos, entry.settled());
             setDirty();
         }
     }

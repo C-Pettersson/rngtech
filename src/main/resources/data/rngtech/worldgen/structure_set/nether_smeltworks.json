@@ -1,0 +1,19 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "rngtech:dormant_sites_enabled"
+    }
+  ],
+  "structures": [
+    {
+      "structure": "rngtech:nether_smeltworks",
+      "weight": 1
+    }
+  ],
+  "placement": {
+    "type": "minecraft:random_spread",
+    "spacing": 40,
+    "separation": 15,
+    "salt": 714282615
+  }
+}

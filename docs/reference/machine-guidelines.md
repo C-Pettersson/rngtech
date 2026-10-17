@@ -351,11 +351,12 @@ Design intent and balance rules behind shipped machines that the code does not s
 
 - A dormant soul is an accelerant, never a gate. No recipe, stage, Seal, or other progression item may need one; a player who never finds one only levels more slowly.
 - Taking a soul costs RNGTech work: FE to wake the machine and a calibrated Soul Transfer to absorb it. No vanilla item or structure loot is an ingredient.
-- Wake cost, success chance, release stage, and any failed-absorb risk show before the player commits. The failed-absorb outcome is a pack choice; the default only uses up the Soul Transfer.
+- Wake cost, success chance, and any failed-absorb risk show before the player commits. The failed-absorb outcome is a pack choice; the default only uses up the Soul Transfer.
 - Souls carry no ascendancy and no Seal tiers, so Seals stay the only ascendancy source.
-- A soul never lifts a machine past what its own work could train. Keep each site's top level within the training reach of its release stage; there is no automatic audit of this yet.
+- The wake cost is the gate for high souls, not the target's stage. Default sites set no release stage, so any soul goes into any machine of its family. A pack-set `release_stage` is capped at the family's top stage so every soul has a machine it fits.
 - Early sites are sized for a handful of carried cells. Later sites need a generator on site or a large bank of high-stage cells. The wake input rate is generous so the machine itself is never the bottleneck.
 - Machines have no owner or claim. Stealing a half-woken machine is part of the game.
+- Sites are occasional finds, one machine each: the Collapsed Workshop about as common as a ruined portal, the End Relay rarer than an End city. The derelict Forestry Companion takes power only from its cells, since cables cannot reach an entity; its site is sized for that.
 - Generated builds take only notables whose every effect the family reads, never keystones, so a found soul carries no hidden trade-off.
 - The screen is a deliberate exception to the gray panel in [Machine GUI Design](machine-gui-design.md#visual-style): worn gunmetal with a light magic touch, keeping the left-to-right flow, the bottom inventory, shape-coded status, and exact values in tooltips. Soul light is pale cyan-white, never purple or magenta.
 

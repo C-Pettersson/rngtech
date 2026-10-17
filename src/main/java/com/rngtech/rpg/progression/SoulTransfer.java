@@ -42,6 +42,11 @@ public final class SoulTransfer {
         public Charge(MachineMasteryFamily family, MachineProgressionState state) {
             this(family, state, 0);
         }
+
+        /** The recorded release stage, never above the highest stage the family reaches, so every soul has a home. */
+        public int effectiveReleaseStage() {
+            return Math.min(releaseStage, family.topStage());
+        }
     }
 
     private SoulTransfer() { }
@@ -113,7 +118,7 @@ public final class SoulTransfer {
     public static Release release(Charge charge, MachineMasteryFamily family, int entryStage, MachineProgressionState target, boolean confirmed) {
         if (charge.family() != family) { return Release.WRONG_FAMILY; }
         if (charge.state().sealTiers() > 0 && entryStage < AscendancyCatalog.ENTRY_STAGE) { return Release.ENTRY_STAGE; }
-        if (entryStage < charge.releaseStage()) { return Release.RELEASE_STAGE; }
+        if (entryStage < charge.effectiveReleaseStage()) { return Release.RELEASE_STAGE; }
         if (hasSoul(target) && !confirmed) { return Release.CONFIRM_OVERWRITE; }
         return Release.RELEASE;
     }

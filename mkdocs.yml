@@ -51,7 +51,6 @@ nav:
       - Overview: design-proposals.md
       - Crafting and Upgrades: systems/crafting.md
       - Affix-Driven Generator: content/affix-driven-generator.md
-      - Dormant Machines: content/dormant-machines.md
       - Entropy Cell: content/entropy-cell.md
       - Ore Slurry Turbine: content/ore-slurry-turbine.md
       - Auto Balance: modifiers/auto-balance.md

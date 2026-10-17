@@ -7,6 +7,7 @@ categories:
   - "Guides"
 item_ids:
   - rngtech:dormant_machine
+  - rngtech:derelict_cart
 ---
 
 # Dormant Machines
@@ -38,7 +39,7 @@ Dormant Machines have no owner. Anyone can add power to one, and whoever absorbs
 
 ## Spent husks
 
-A spent husk breaks with a pickaxe and drops **Scrap**. Cells left in its sockets drop too.
+A spent husk breaks with a pickaxe and drops **Scrap**. A spent derelict cart breaks with a hit and drops Scrap too. Cells left in their sockets drop with them.
 
 ## Automation
 

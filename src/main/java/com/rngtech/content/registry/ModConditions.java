@@ -1,6 +1,7 @@
 package com.rngtech.content.registry;
 
 import com.rngtech.RNGTech;
+import com.rngtech.content.dormant.DormantSitesEnabledCondition;
 import com.rngtech.content.material.MaterialEnabledCondition;
 import com.rngtech.content.material.OreWorldgenEnabledCondition;
 import com.rngtech.content.recipe.AscendancySealRecipesEnabledCondition;
@@ -25,6 +26,9 @@ public final class ModConditions {
             CONDITIONS.register("ascendancy_seal_recipes_enabled", () -> AscendancySealRecipesEnabledCondition.CODEC);
     public static final DeferredHolder<MapCodec<? extends ICondition>, MapCodec<VolatileCatalystRecipesEnabledCondition>> VOLATILE_CATALYST_RECIPES_ENABLED =
             CONDITIONS.register("volatile_catalyst_recipes_enabled", () -> VolatileCatalystRecipesEnabledCondition.CODEC);
+
+    public static final DeferredHolder<MapCodec<? extends ICondition>, MapCodec<DormantSitesEnabledCondition>> DORMANT_SITES_ENABLED =
+            CONDITIONS.register("dormant_sites_enabled", () -> DormantSitesEnabledCondition.CODEC);
 
     public static void register(IEventBus bus) {
         CONDITIONS.register(bus);

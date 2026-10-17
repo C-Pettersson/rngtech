@@ -234,6 +234,7 @@
   "container.rngtech.ammonia_fuel_cell": "Ammonia Fuel Cell",
   "container.rngtech.cavitation_generator": "Cavitation Generator",
   "entity.rngtech.forestry_cart": "Forestry Companion",
+  "entity.rngtech.derelict_cart": "Derelict Forestry Companion",
   "container.rngtech.vacuum_collapse_generator": "Vacuum Collapse Generator",
   "container.rngtech.crude_metal_press": "Crude Metal Press",
   "container.rngtech.metal_press": "Metal Press",

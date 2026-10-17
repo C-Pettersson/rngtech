@@ -52,7 +52,7 @@ public record DormantSoul(MachineMasteryFamily family, MachineProgressionState s
         MachineProgressionState state = new MachineProgressionState(MachineProgressionState.xpForLevel(level), 0, level, List.of(),
                 family.startNodeId(), build, true, "", List.of(), 0, true);
         state = MegaPassiveTree.follow(state, candidate -> true);
-        return new DormantSoul(family, state, site.wakeFe(level), site.wakeInput(), site.releaseStage());
+        return new DormantSoul(family, state, site.wakeFe(level), site.wakeInput(), Math.min(site.releaseStage(), family.topStage()));
     }
 
     private static List<String> build(DormantSite site, MachineMasteryFamily family, RandomGenerator random) {

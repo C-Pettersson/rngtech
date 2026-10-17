@@ -16,6 +16,6 @@ The soul carries:
 - One free Full Reset, so you can clear that build without spending Mastery Refunds.
 - No ascendancy and no Seal tiers.
 
-A soul from a Dormant Machine only goes into a machine of its own family at or above the site's stage. The Soul Transfer's tooltip shows that stage.
+A soul goes into any machine of its own family, even an early one. Your modpack may require a minimum stage; when it does, the Soul Transfer's tooltip shows it.
 
 A failed absorb always uses up the Soul Transfer. By default the machine keeps its soul and stays awake, so you can try again. Your modpack may make a failure destroy the soul, or blow the machine apart. When it does, a striped warning plate shows on the machine's screen.

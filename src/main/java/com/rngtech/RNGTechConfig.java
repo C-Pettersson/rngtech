@@ -124,6 +124,10 @@ public final class RNGTechConfig {
             .comment("Mastery levels lost when a Soul Transfer fails, after any XP loss. Refunds the latest nodes the tree and installed Gear can spare; never drops below the level the build still needs.")
             .defineInRange("soulTransfer.failureLevelLoss", 0, 0, 99);
 
+    public static final ModConfigSpec.BooleanValue DORMANT_SITES_ENABLED = BUILDER
+            .comment("Whether RNGTech generates Dormant Machine sites in new chunks. Placed and already generated machines keep working.")
+            .define("dormantMachines.enabled", true);
+
     public static final ModConfigSpec.EnumValue<DormantFailedAbsorb> DORMANT_FAILED_ABSORB = BUILDER
             .comment("What a failed Soul Transfer absorb does to a Dormant Machine. The Soul Transfer is always used up. NOTHING keeps the soul, and the soulTransfer failure loss settings still apply to it; HUSK loses the soul; EXPLODE loses it in a TNT-strength explosion that leaves the husk.")
             .defineEnum("dormantMachines.failedAbsorb", DormantFailedAbsorb.NOTHING);

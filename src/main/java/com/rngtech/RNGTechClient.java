@@ -10,6 +10,7 @@ import com.rngtech.client.renderer.BatteryChassisRenderer;
 import com.rngtech.client.renderer.BioGeneratorRenderer;
 import com.rngtech.client.renderer.CavitationGeneratorRenderer;
 import com.rngtech.client.renderer.CorrosionCellRenderer;
+import com.rngtech.client.renderer.DerelictCartRenderer;
 import com.rngtech.client.renderer.ForestryCartRenderer;
 import com.rngtech.client.renderer.GasChemistryRenderer;
 import com.rngtech.client.renderer.ModularToolItemRenderer;
@@ -184,6 +185,7 @@ public final class RNGTechClient {
         event.registerBlockEntityRenderer(ModBlockEntities.VACUUM_COLLAPSE_GENERATOR.get(), VacuumCollapseGeneratorRenderer::new);
         event.registerBlockEntityRenderer(ModBlockEntities.TOOL_BENCH.get(), ToolBenchRenderer::new);
         event.registerEntityRenderer(ModEntityTypes.FORESTRY_CART.get(), ForestryCartRenderer::new);
+        event.registerEntityRenderer(ModEntityTypes.DERELICT_CART.get(), DerelictCartRenderer::new);
     }
 
     private void registerKeyMappings(RegisterKeyMappingsEvent event) {

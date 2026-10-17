@@ -1,0 +1,19 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "rngtech:dormant_sites_enabled"
+    }
+  ],
+  "structures": [
+    {
+      "structure": "rngtech:buried_calibration_vault",
+      "weight": 1
+    }
+  ],
+  "placement": {
+    "type": "minecraft:random_spread",
+    "spacing": 56,
+    "separation": 20,
+    "salt": 714282613
+  }
+}

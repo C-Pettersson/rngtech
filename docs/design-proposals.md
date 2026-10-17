@@ -4,7 +4,6 @@ These pages describe proposed systems or requirements beyond the implemented fea
 
 - [Crafting and Upgrades](systems/crafting.md): assembly and refinement context, plus planned breakthrough and strain systems.
 - [Affix-Driven Generator](content/affix-driven-generator.md), [Entropy Cell](content/entropy-cell.md), and [Ore Slurry Turbine](content/ore-slurry-turbine.md): unregistered generator concepts.
-- [Dormant Machines](content/dormant-machines.md): world generation for the Dormant Machine sites and the derelict Forestry Companion.
 - [Auto Balance](modifiers/auto-balance.md) and [Packer](modifiers/packer.md): planned modifiers. Implemented [Balance Mode](https://c-pettersson.github.io/rngtech/rarity-and-affixes/#balance-mode) is a separate Battery Chassis affix.
 - [Unique Item Ideas](reference/unique-item-ideas.md): candidate items, not registered content.
 - [Unique Items requirements](prds/uniques.md): accepted 2.0 design for a shared Unique catalog, ranged rolls, and eight launch Uniques.
@@ -54,6 +53,12 @@ Future work on machines that already ship. Design intent for their current behav
 
 - The Coal Gasifier, Steam Methane Reformer, and Ammonia Synthesizer roll Bulk Speed but do not apply it. Wire it in or drop it from their profiles.
 - Stability and Fluid Transfer rolls on the Ammonia Catalyst Bed and Fuel Cell Membrane have no effect, and the Synthesizer ignores Efficiency and Instant Process. Wire them in or stop rolling them.
+
+### Dormant Machines
+
+- Whether the End Relay or Nether Smeltworks should carry a Seal I tier with an ascendancy already chosen. The default keeps Seals as the only ascendancy source.
+- Whether waking should draw hostile mobs, such as a wave once the charge passes half. It would turn the expedition into a fight, but it is an automatic cost the player cannot shape with Gear or Mastery.
+- Whether the Soul Transfer tooltip should warn about the pack's failed-absorb setting. The setting is common config, which is not synced to clients, so only the machine's screen shows the warning.
 
 ### Furnace and Machine Chassis
 
