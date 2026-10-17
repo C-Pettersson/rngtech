@@ -3,11 +3,13 @@ package com.rngtech.gametest;
 import static com.rngtech.gametest.MachineTestSupport.check;
 
 import com.rngtech.RNGTech;
+import com.rngtech.content.block.BaseMachineBlock;
 import com.rngtech.content.blockentity.AlgaePhotobioreactorBlockEntity;
 import com.rngtech.content.blockentity.AmmoniaFuelCellBlockEntity;
 import com.rngtech.content.blockentity.AmmoniaSynthesizerBlockEntity;
 import com.rngtech.content.blockentity.GasChemistryBlockEntity;
 import com.rngtech.content.blockentity.InertAtmosphere;
+import com.rngtech.content.blockentity.MachineInfoSnapshot;
 import com.rngtech.content.blockentity.MetalPressBlockEntity;
 import com.rngtech.content.energy.HeatCoreMaterial;
 import com.rngtech.content.item.CraftedTraitOutputs;
@@ -75,6 +77,29 @@ public final class HydrogenChemistryGameTests {
         int filled = cell.getFluidHandler(Direction.NORTH).fill(new FluidStack(ModFluids.HYDROGEN_SOURCE.get(), FILL), IFluidHandler.FluidAction.EXECUTE);
         check(filled == FILL, "The Fuel Cell took only " + filled + " mB of Hydrogen");
         helper.succeedWhen(() -> check(cell.machineInfo().energy() > 0, "No FE from Hydrogen yet; " + MachineTestSupport.describe(cell)));
+    }
+
+    /**
+     * A Fuel Cell whose buffer is full runs only on the ticks after a consumer drains some FE. Its lamp must stay lit
+     * through those gaps instead of flashing.
+     */
+    @GameTest(template = MachineTestSupport.EMPTY, timeoutTicks = 1200)
+    public static void fullFuelCellLampDoesNotFlash(GameTestHelper helper) {
+        AmmoniaFuelCellBlockEntity cell = MachineTestSupport.place(helper, MACHINE, ModBlocks.AMMONIA_FUEL_CELL.get(), AmmoniaFuelCellBlockEntity.class);
+        cell.getGearInventory().setStackInSlot(AmmoniaFuelCellBlockEntity.SLOT_MEMBRANE, new ItemStack(ModItems.FUEL_CELL_MEMBRANE.get()));
+        cell.getFluidHandler(Direction.NORTH).fill(new FluidStack(ModFluids.HYDROGEN_SOURCE.get(), FILL), IFluidHandler.FluidAction.EXECUTE);
+        int[] fullTicks = new int[1];
+        helper.onEachTick(() -> {
+            cell.getEnergyStorage(Direction.NORTH).extractEnergy(50, false);
+            if (cell.machineInfo().outputSummary() == MachineInfoSnapshot.OutputSummary.ENERGY_FULL) {
+                fullTicks[0]++;
+            }
+            if (fullTicks[0] > 0) {
+                check(cell.getBlockState().getValue(BaseMachineBlock.ACTIVE), "The lamp went out while the full cell kept running; "
+                        + MachineTestSupport.describe(cell));
+            }
+        });
+        helper.succeedWhen(() -> check(fullTicks[0] >= 100, "The cell has been full for only " + fullTicks[0] + " ticks"));
     }
 
     /** Ammonia piped into a synthesizer with Carbon Exhaust makes Urea, which only comes out. */

@@ -67,6 +67,8 @@ public class AmmoniaFuelCellBlockEntity extends BaseMachineBlockEntity
     public static final int PURGE_AMMONIA_TANK = 0;
 
     private static final int TANK_CAPACITY = 8000;
+    /** Ticks the lamp stays lit after the last tick that made FE. */
+    private static final int LAMP_HOLD_TICKS = 20;
     private static final int DATA_PROGRESS = 0;
     private static final int DATA_PROCESSING_TICKS = 1;
     private static final int DATA_ENERGY = 2;
@@ -185,6 +187,7 @@ public class AmmoniaFuelCellBlockEntity extends BaseMachineBlockEntity
     };
 
     private int progress;
+    private long lastWorkedTick = -LAMP_HOLD_TICKS;
     private int activeTicks;
     private long activeEnergy;
     private double energyCarry;
@@ -199,7 +202,11 @@ public class AmmoniaFuelCellBlockEntity extends BaseMachineBlockEntity
     public static void serverTick(Level level, BlockPos pos, BlockState state, AmmoniaFuelCellBlockEntity fuelCell) {
         boolean worked = fuelCell.tickRecipe();
         boolean exported = fuelCell.exportEnergy(level, pos);
-        BaseMachineBlock.setActive(level, pos, state, worked);
+        if (worked) {
+            fuelCell.lastWorkedTick = level.getGameTime();
+        }
+        // A full buffer lets the cell run only on ticks after its cables drain some FE; the lamp holds through those gaps.
+        BaseMachineBlock.setActive(level, pos, state, level.getGameTime() - fuelCell.lastWorkedTick < LAMP_HOLD_TICKS);
         if (worked || exported) {
             fuelCell.setChanged();
         }
