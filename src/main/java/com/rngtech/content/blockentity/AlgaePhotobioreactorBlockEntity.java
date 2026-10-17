@@ -563,7 +563,10 @@ public class AlgaePhotobioreactorBlockEntity extends BlockEntity
     @Override
     protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.loadAdditional(tag, registries);
-        inventory.deserializeNBT(registries, tag.getCompound("Inventory"));
+        // Reactors saved before the Urea slot load with their old five slots, grown to today's size.
+        CompoundTag inventoryTag = tag.getCompound("Inventory").copy();
+        inventoryTag.putInt("Size", Math.max(SLOT_COUNT, inventoryTag.getInt("Size")));
+        inventory.deserializeNBT(registries, inventoryTag);
         gearInventory.deserializeNBT(registries, tag.getCompound("GearInventory"));
         waterTank.readFromNBT(registries, tag.getCompound("WaterTank"));
         carbonTank.readFromNBT(registries, tag.getCompound("CarbonTank"));

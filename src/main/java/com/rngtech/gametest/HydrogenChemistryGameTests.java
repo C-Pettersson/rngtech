@@ -3,6 +3,7 @@ package com.rngtech.gametest;
 import static com.rngtech.gametest.MachineTestSupport.check;
 
 import com.rngtech.RNGTech;
+import com.rngtech.content.blockentity.AlgaePhotobioreactorBlockEntity;
 import com.rngtech.content.blockentity.AmmoniaFuelCellBlockEntity;
 import com.rngtech.content.blockentity.AmmoniaSynthesizerBlockEntity;
 import com.rngtech.content.blockentity.GasChemistryBlockEntity;
@@ -17,9 +18,11 @@ import com.rngtech.rpg.progression.MachineProgressionState;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -88,6 +91,20 @@ public final class HydrogenChemistryGameTests {
                 "Automation must not insert into the Urea slot");
         helper.succeedWhen(() -> check(synthesizer.getUreaOutput().getStackInSlot(AmmoniaSynthesizerBlockEntity.SLOT_UREA).is(ModItems.UREA.get()),
                 "No Urea yet; " + MachineTestSupport.describe(synthesizer)));
+    }
+
+    /** A Photobioreactor saved before the Urea slot loads with its old five slots grown, and keeps ticking. */
+    @GameTest(template = MachineTestSupport.EMPTY, timeoutTicks = 40)
+    public static void photobioreactorSavedBeforeUreaLoads(GameTestHelper helper) {
+        AlgaePhotobioreactorBlockEntity reactor =
+                MachineTestSupport.place(helper, MACHINE, ModBlocks.ALGAE_PHOTOBIOREACTOR.get(), AlgaePhotobioreactorBlockEntity.class);
+        HolderLookup.Provider registries = helper.getLevel().registryAccess();
+        CompoundTag tag = reactor.saveWithFullMetadata(registries);
+        tag.getCompound("Inventory").putInt("Size", AlgaePhotobioreactorBlockEntity.SLOT_UREA);
+        reactor.loadWithComponents(tag, registries);
+        check(reactor.getInventory().getSlots() == AlgaePhotobioreactorBlockEntity.SLOT_COUNT,
+                "An old reactor loaded with " + reactor.getInventory().getSlots() + " slots");
+        helper.runAfterDelay(20, helper::succeed);
     }
 
     /** Without Bright Anneal or Hydrogen Quench, the Metal Press tank refuses Hydrogen. */
