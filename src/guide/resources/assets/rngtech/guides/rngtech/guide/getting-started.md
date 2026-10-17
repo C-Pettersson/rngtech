@@ -33,10 +33,10 @@ Crafted machines, Gear parts, tool parts, and Battery Cells come out **unidentif
 
 ## Start: tools
 
-You gather your own materials, so the first job is a set of tools. RNGTech tools are **Modular Field Tools** built from a separate head and rod, and each part keeps its own roll. See [Tool Bench](rngtech:tool-bench.md) for the full details.
+You gather your own materials, so the first job is a set of tools. RNGTech tools are **Modular Field Tools** built from a separate head and rod, and each part keeps its own roll. See [Modular Tools](rngtech:modular-tools.md) for the full details and [Tool Bench](rngtech:tool-bench.md) for building them.
 
 1. Craft a <ItemLink id="rngtech:tool_bench" />. It needs no iron.
-2. Craft a **Flint Pick Head** and a **Wooden Tool Rod**, and assemble a <ItemLink id="rngtech:modular_pick" /> in the bench's Build tab.
+2. Craft a <ItemLink id="rngtech:flint_pick_head" /> and a <ItemLink id="rngtech:wooden_tool_rod" />, and assemble a <ItemLink id="rngtech:modular_pick" /> in the bench's Build tab.
 3. Add Flint Shovel and Axe heads when you want them. You can swap a head onto an existing rod instead of building a new tool.
 4. Install a <ItemLink id="rngtech:tiny_anvil" /> in the bench's Gear tab. It is never used up and unlocks the heavy tools: Hammers break a 3×3 area, Diggers clear 3×3 of dirt or sand, and Treefellers fell whole trees.
 5. Craft a **Forming Hammer** and hammer iron and copper ingots into plates. Plates lead to Iron and Copper heads, which mine faster than flint.
@@ -44,7 +44,7 @@ You gather your own materials, so the first job is a set of tools. RNGTech tools
 
 ### Ore hardness
 
-RNGTech ores have a **hardness** from 1 to 8, separate from vanilla mining tiers. A Modular Pick or Hammer can only mine ores up to its head's hardness. Flint heads reach hardness 1, which covers Iron and Copper ore, and better heads reach further. See [Ore hardness](rngtech:tool-bench/ore-hardness.md) on the Tool Bench page for every head's reach.
+RNGTech ores have a **hardness** from 1 to 8, separate from vanilla mining tiers. A Modular Pick or Hammer can only mine ores up to its head's hardness. Flint heads reach hardness 1, which covers Iron and Copper ore, and better heads reach further. See [Ore hardness](rngtech:modular-tools.md#ore-hardness) on the Modular Tools page for every head's reach.
 
 ## More
 

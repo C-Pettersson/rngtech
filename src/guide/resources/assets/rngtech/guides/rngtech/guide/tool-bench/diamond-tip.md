@@ -2,7 +2,7 @@
 navigation:
   title: "Diamond Tip"
   parent: tool-bench.md
-  position: 4
+  position: 1
   icon: rngtech:tool_bench
 ---
 

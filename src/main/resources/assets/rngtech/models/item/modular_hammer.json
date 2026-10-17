@@ -2,7 +2,7 @@
   "parent": "builtin/entity",
   "gui_light": "front",
   "textures": {
-    "particle": "minecraft:item/mace"
+    "particle": "rngtech:item/modular_tool/hammer"
   },
   "display": {
     "thirdperson_righthand": {

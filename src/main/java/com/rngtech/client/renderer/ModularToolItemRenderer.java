@@ -4,6 +4,8 @@ import com.rngtech.content.item.ModularToolItem;
 import com.rngtech.content.registry.ModItems;
 import com.rngtech.content.tool.FieldToolAssembly;
 import com.rngtech.content.tool.ToolHeadFamily;
+import com.rngtech.content.tool.ToolHeadMaterial;
+import com.rngtech.content.tool.ToolRodMaterial;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
@@ -12,18 +14,19 @@ import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.ItemRenderer;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
 
 public class ModularToolItemRenderer extends BlockEntityWithoutLevelRenderer {
     private static final float STACK_RENDER_ORIGIN = 0.5F;
-    private static final float HEAD_Z_OFFSET = 0.015F;
-    private static final PartTransform ROD_TRANSFORM = new PartTransform(0.0F, 0.0F, 1.0F);
-    private static final PartTransform PICK_HEAD_TRANSFORM = new PartTransform(0.125F, 0.063F, 0.875F);
-    private static final PartTransform HAMMER_HEAD_TRANSFORM = new PartTransform(0.125F, 0.063F, 0.9F);
-    private static final PartTransform SHOVEL_HEAD_TRANSFORM = new PartTransform(0.125F, 0.063F, 0.875F);
-    private static final PartTransform DIGGER_HEAD_TRANSFORM = new PartTransform(0.125F, 0.063F, 0.9F);
-    private static final PartTransform AXE_HEAD_TRANSFORM = new PartTransform(0.125F, 0.063F, 0.9F);
-    private static final PartTransform TREEFELLER_HEAD_TRANSFORM = new PartTransform(0.094F, 0.063F, 0.9F);
+    private static final float ROD_DEPTH = 1.0F;
+    private static final float HEAD_DEPTH = 1.5F;
+    // Whole-pixel shifts generated with the head textures by tools/itemmodels/tool_heads.py.
+    private static final PartTransform ROD_TRANSFORM = new PartTransform(-0.0625F, -0.0625F, 1.0F);
+    private static final PartTransform PICK_HEAD_TRANSFORM = new PartTransform(0.0625F, -0.0625F, 1.0F);
+    private static final PartTransform HAMMER_HEAD_TRANSFORM = new PartTransform(0.1875F, 0.125F, 1.0F);
+    private static final PartTransform SHOVEL_HEAD_TRANSFORM = new PartTransform(0.25F, 0.125F, 1.0F);
+    private static final PartTransform DIGGER_HEAD_TRANSFORM = new PartTransform(0.25F, 0.125F, 1.0F);
+    private static final PartTransform AXE_HEAD_TRANSFORM = new PartTransform(0.0F, 0.1875F, 1.0F);
+    private static final PartTransform TREEFELLER_HEAD_TRANSFORM = new PartTransform(0.125F, 0.0625F, 1.0F);
 
     public ModularToolItemRenderer() {
         super(Minecraft.getInstance().getBlockEntityRenderDispatcher(), Minecraft.getInstance().getEntityModels());
@@ -43,13 +46,11 @@ public class ModularToolItemRenderer extends BlockEntityWithoutLevelRenderer {
         }
 
         FieldToolAssembly assembly = ModularToolItem.assembly(stack);
-        if (!assembly.isValidFor(tool.family())) {
-            renderStack(fallbackStack(tool.family()), poseStack, buffer, packedLight, packedOverlay, 0.0F, ROD_TRANSFORM);
-            return;
-        }
-
-        renderStack(assembly.rod(), poseStack, buffer, packedLight, packedOverlay, 0.0F, ROD_TRANSFORM);
-        renderStack(assembly.head(), poseStack, buffer, packedLight, packedOverlay, HEAD_Z_OFFSET, headTransform(tool.family()));
+        boolean assembled = assembly.isValidFor(tool.family());
+        ItemStack rod = assembled ? assembly.rod() : new ItemStack(ModItems.toolRod(ToolRodMaterial.WOODEN).get());
+        ItemStack head = assembled ? assembly.head() : new ItemStack(ModItems.toolHead(tool.family(), ToolHeadMaterial.IRON).get());
+        renderStack(rod, poseStack, buffer, packedLight, packedOverlay, ROD_DEPTH, ROD_TRANSFORM);
+        renderStack(head, poseStack, buffer, packedLight, packedOverlay, HEAD_DEPTH, headTransform(tool.family()));
     }
 
     private void renderStack(
@@ -58,28 +59,19 @@ public class ModularToolItemRenderer extends BlockEntityWithoutLevelRenderer {
             MultiBufferSource buffer,
             int packedLight,
             int packedOverlay,
-            float zOffset,
+            float depth,
             PartTransform transform
     ) {
         if (stack.isEmpty()) {
             return;
         }
         poseStack.pushPose();
-        poseStack.translate(STACK_RENDER_ORIGIN, STACK_RENDER_ORIGIN, STACK_RENDER_ORIGIN + zOffset);
-        poseStack.translate(transform.x(), transform.y(), 0.0F);
-        poseStack.scale(transform.scale(), transform.scale(), 1.0F);
+        poseStack.translate(STACK_RENDER_ORIGIN + transform.x(), STACK_RENDER_ORIGIN + transform.y(), STACK_RENDER_ORIGIN);
+        // A head thicker than the rod encloses the rod's end from both sides instead of z-fighting with it.
+        poseStack.scale(transform.scale(), transform.scale(), depth);
         ItemRenderer renderer = Minecraft.getInstance().getItemRenderer();
         renderer.renderStatic(stack, ItemDisplayContext.NONE, packedLight, packedOverlay, poseStack, buffer, null, 0);
         poseStack.popPose();
-    }
-
-    private ItemStack fallbackStack(ToolHeadFamily family) {
-        return switch (family) {
-            case PICK -> new ItemStack(Items.IRON_PICKAXE);
-            case HAMMER -> new ItemStack(ModItems.FORMING_HAMMER.get());
-            case SHOVEL, DIGGER -> new ItemStack(Items.IRON_SHOVEL);
-            case AXE, TREEFELLER -> new ItemStack(Items.IRON_AXE);
-        };
     }
 
     private PartTransform headTransform(ToolHeadFamily family) {

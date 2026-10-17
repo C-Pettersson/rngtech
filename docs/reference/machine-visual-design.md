@@ -75,6 +75,16 @@ Bulk sidegrades should visibly communicate multiple calibration lanes. Nullite s
 - Draw moving or state-driven parts (fluid and culture levels, bubbles, glow, the installed part's material) in a block entity renderer from a small synced visual state. Keep blockstate model swaps for simple on/off cues such as a lamp. For blocks placed by the hundred, draw only the moving part from a pre-baked model, derive its motion on the client from world time, and offer a baked fallback.
 - Generate the model and textures from a script under `tools/blockmodels/`, and keep the renderer's positions in step with it.
 
+## Modular Tool Items
+
+`Implemented`: an assembled Modular Field Tool draws its installed Tool Rod and Tool Head as one item.
+
+- Give every head family its own silhouette, readable at 16x16 in any material: a classic double-pointed Pick, a sledge Hammer with flared faces, a rounded Shovel spade, a broad flat-fronted Digger scoop, a single-bit Axe, and a double-bit Treefeller. Material changes only the palette.
+- Draw heads as flat item sprites in the vanilla tool style: a full one-pixel outline, darkest on the bottom and right, a bright line inside the top and left edges, and no faked depth. Keep each head mirror-symmetric about the handle, except the Axe's single blade, so it never looks crooked.
+- Draw each head in the assembled tool's frame around the shared rod tip, and centre the loose head item by a whole-pixel shift that the renderer undoes. Keep every part transform at scale 1 so texels stay on the pixel grid.
+- Every Tool Rod texture uses the same rod shape, so one head position fits every rod.
+- Generate the head textures and the renderer's part transforms with `tools/itemmodels/tool_heads.py`. Check the result with `tools/itemmodels/modular_tool_preview.py --check`, which renders every head on every rod outside the game.
+
 ## Active States
 
 Active textures should answer what changed:
