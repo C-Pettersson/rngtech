@@ -339,3 +339,123 @@
     height: 64px;
     margin-bottom: 0.3rem;
 }
+
+/* Production chains */
+
+.md-typeset .rw-chain {
+    clear: both;
+    margin: 1rem 0;
+}
+
+.md-typeset .rw-chain-scroll {
+    overflow-x: auto;
+}
+
+.md-typeset .rw-chain-canvas {
+    position: relative;
+    margin: 0 auto;
+}
+
+.md-typeset .rw-chain-edges {
+    position: absolute;
+    top: 0;
+    left: 0;
+    overflow: visible;
+}
+
+.md-typeset .rw-chain-edge {
+    fill: none;
+    stroke: var(--md-default-fg-color--light);
+    stroke-width: 2;
+}
+
+.md-typeset .rw-chain-edges marker path {
+    fill: var(--md-default-fg-color--light);
+    fill: context-stroke;
+}
+
+.md-typeset .rw-chain-edge.rw-chain-loop {
+    stroke: var(--md-accent-fg-color);
+    stroke-dasharray: 6 4;
+}
+
+.md-typeset .rw-chain-edge.rw-chain-broken {
+    stroke: var(--md-typeset-del-color, #c00);
+}
+
+.md-typeset .rw-chain-node {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.2rem;
+    box-sizing: border-box;
+    padding: 0.3rem;
+    border: 1px solid var(--md-default-fg-color--lighter);
+    border-radius: 0.2rem;
+    background: var(--md-default-bg-color);
+    color: var(--md-default-fg-color);
+    font-size: 0.6rem;
+    line-height: 1.2;
+    text-align: center;
+}
+
+.md-typeset a.rw-chain-node:hover {
+    border-color: var(--md-accent-fg-color);
+}
+
+.md-typeset .rw-chain-node img {
+    width: 32px;
+    height: 32px;
+}
+
+.md-typeset .rw-chain-external {
+    padding: 0;
+    border-style: dashed;
+}
+
+.md-typeset .rw-chain-external img {
+    width: 28px;
+    height: 28px;
+}
+
+.md-typeset .rw-chain-flow {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.1rem 0.3rem;
+    border-radius: 0.2rem;
+    background: var(--md-default-bg-color);
+    color: var(--md-default-fg-color--light);
+    font-size: 0.6rem;
+    line-height: 1.25;
+    white-space: nowrap;
+    transform: translate(-50%, -50%);
+}
+
+.md-typeset .rw-chain-flow img {
+    width: 20px;
+    height: 20px;
+}
+
+.md-typeset .rw-chain-text {
+    display: flex;
+    flex-direction: column;
+}
+
+.md-typeset .rw-chain-text > span:first-child {
+    color: var(--md-default-fg-color);
+    font-weight: 700;
+}
+
+.md-typeset .rw-chain-flow.rw-chain-broken {
+    color: var(--md-typeset-del-color, #c00);
+}
+
+.md-typeset .rw-chain figcaption {
+    max-width: none;
+    color: var(--md-default-fg-color--light);
+    font-size: 0.65rem;
+}

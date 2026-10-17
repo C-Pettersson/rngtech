@@ -18,7 +18,7 @@ wiki:
     },
 ) }}
 
-The **Syngas Combustor** is the Stage 5 gas-power generator. It burns Syngas from the [Coal Gasifier](coal-gasifier.md) for 240 FE/t before rolls, and turns the leftovers into Carbon Exhaust that you can feed to an [Algae Photobioreactor](algae-photobioreactor.md). It also burns Carbon Monoxide as a weak way to get rid of it. It is built like a small gas turbine: fuel gas feeds a combustion can, the hot gas turns a turbine, and the turbine's shaft drives an alternator at the back.
+The **Syngas Combustor** is the Stage 5 gas-power generator. It burns Syngas from the [Coal Gasifier](coal-gasifier.md) for 240 FE/t before rolls, and turns the leftovers into Carbon Exhaust that you can feed to an [Algae Photobioreactor](algae-photobioreactor.md). It also burns Carbon Monoxide as a weak way to get rid of it. It is built like a small gas turbine: fuel gas feeds a combustion can, the hot gas turns a turbine, and the turbine's shaft drives an alternator at the back. See [Power Chains](power-chains.md#syngas) for the whole chain around it.
 
 Like every RNGTech machine, each Syngas Combustor you craft rolls its own [rarity and affixes](rarity-and-affixes.md).
 

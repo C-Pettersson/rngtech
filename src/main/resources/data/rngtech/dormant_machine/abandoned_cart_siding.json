@@ -1,0 +1,15 @@
+{
+    "families": {
+        "forestry": 1
+    },
+    "level": {
+        "min": 10,
+        "max": 25
+    },
+    "wake_fe": {
+        "min": 35000,
+        "max": 100000
+    },
+    "wake_curve": 2.0,
+    "wake_input": 2000
+}

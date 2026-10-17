@@ -2,6 +2,8 @@ package com.rngtech.content.command;
 
 import com.rngtech.RNGTech;
 import com.rngtech.content.cable.CableStats;
+import com.rngtech.content.dormant.DormantSiteIndex;
+import com.rngtech.content.dormant.DormantSites;
 import com.rngtech.rpg.unique.UniqueCatalog;
 import com.rngtech.rpg.unique.UniqueDefinition;
 
@@ -14,6 +16,7 @@ import net.minecraft.commands.Commands;
 import net.minecraft.commands.SharedSuggestionProvider;
 import net.minecraft.commands.arguments.EntityArgument;
 import net.minecraft.commands.arguments.ResourceLocationArgument;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -22,10 +25,13 @@ import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
 
 import java.util.Collection;
+import java.util.stream.Collectors;
 
 /**
  * {@code /rngtech unique give <players> <id>}: gives each player an unidentified copy, as a quest reward would.
  * {@code /rngtech cable stats [reset]}: prints how much work cable networks did per tick since the last reset.
+ * {@code /rngtech dormant reset [force]}: rolls new souls for untouched Dormant Machines, or with {@code force} also for
+ * charged ones. {@code /rngtech dormant restore <same|random>}: brings every site back, husks included.
  */
 public final class RNGTechCommands {
     private static final DynamicCommandExceptionType UNKNOWN_UNIQUE =
@@ -54,7 +60,17 @@ public final class RNGTechCommands {
                         .then(Commands.literal("stats")
                                 .executes(RNGTechCommands::cableStats)
                                 .then(Commands.literal("reset")
-                                        .executes(RNGTechCommands::resetCableStats)))));
+                                        .executes(RNGTechCommands::resetCableStats))))
+                .then(Commands.literal("dormant")
+                        .then(Commands.literal("reset")
+                                .executes(context -> resetDormant(context, false))
+                                .then(Commands.literal("force")
+                                        .executes(context -> resetDormant(context, true))))
+                        .then(Commands.literal("restore")
+                                .then(Commands.literal("same")
+                                        .executes(context -> restoreDormant(context, false)))
+                                .then(Commands.literal("random")
+                                        .executes(context -> restoreDormant(context, true))))));
     }
 
     /** Debug readout of cable network work per tick, for comparing tick cost before and after a change. */
@@ -68,6 +84,28 @@ public final class RNGTechCommands {
         CableStats.reset(context.getSource().getServer().getTickCount());
         context.getSource().sendSuccess(() -> Component.literal("Cable stats reset"), false);
         return 1;
+    }
+
+    private static int resetDormant(CommandContext<CommandSourceStack> context, boolean force) {
+        CommandSourceStack source = context.getSource();
+        int marked = DormantSiteIndex.get(source.getServer()).reset(force, source.getLevel().getRandom());
+        return reportDormant(source, marked);
+    }
+
+    private static int restoreDormant(CommandContext<CommandSourceStack> context, boolean randomSoul) {
+        CommandSourceStack source = context.getSource();
+        int marked = DormantSiteIndex.get(source.getServer()).restore(randomSoul, source.getLevel().getRandom());
+        return reportDormant(source, marked);
+    }
+
+    private static int reportDormant(CommandSourceStack source, int marked) {
+        DormantSites.Outcome outcome = DormantSites.applyLoaded(source.getServer());
+        source.sendSuccess(() -> Component.translatable("rngtech.command.dormant.result", marked, outcome.changed(), outcome.waiting()), true);
+        if (!outcome.skipped().isEmpty()) {
+            String positions = outcome.skipped().stream().map(BlockPos::toShortString).collect(Collectors.joining("; "));
+            source.sendSuccess(() -> Component.translatable("rngtech.command.dormant.skipped", outcome.skipped().size(), positions), false);
+        }
+        return marked;
     }
 
     private static int giveUnique(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {

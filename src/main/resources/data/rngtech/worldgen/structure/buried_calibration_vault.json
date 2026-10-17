@@ -1,0 +1,9 @@
+{
+  "type": "rngtech:dormant_site",
+  "biomes": "#rngtech:has_structure/buried_calibration_vault",
+  "spawn_overrides": {},
+  "step": "underground_structures",
+  "terrain_adaptation": "none",
+  "site": "rngtech:buried_calibration_vault",
+  "layout": "vault"
+}

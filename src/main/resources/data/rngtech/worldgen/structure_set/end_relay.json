@@ -1,0 +1,19 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "rngtech:dormant_sites_enabled"
+    }
+  ],
+  "structures": [
+    {
+      "structure": "rngtech:end_relay",
+      "weight": 1
+    }
+  ],
+  "placement": {
+    "type": "minecraft:random_spread",
+    "spacing": 36,
+    "separation": 14,
+    "salt": 714282616
+  }
+}

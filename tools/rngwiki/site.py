@@ -17,7 +17,7 @@ from mkdocs.structure.pages import Page
 from mkdocs.utils import get_relative_url
 from mkdocs.utils.meta import get_data
 
-from . import icons
+from . import chains, icons
 from .resources import MOD_ID, Resources, split_id
 from .vanilla import find_client_jar
 
@@ -136,6 +136,7 @@ class WikiSite:
         self.page: Page | None = None
         self.used_icons: set[str] = set()
         self.table_counter = 0
+        self.chain_counter = 0
 
     # Page registry
 
@@ -159,6 +160,7 @@ class WikiSite:
     def render_page(self, markdown: str, page: Page) -> str:
         self.page = page
         self.table_counter = 0
+        self.chain_counter = 0
         stash: list[str] = []
 
         def hide(match):
@@ -458,6 +460,15 @@ class WikiSite:
         return "".join(parts)
 
     def _tool_row(self, ids: list[str]) -> str | None:
+        tool = self.mining_tool(ids)
+        if tool is None:
+            return None
+        if not tool:
+            return "<tr><th>Tool</th><td>Any tool</td></tr>"
+        return f"<tr><th>Tool</th><td>{self.t_item(tool[0], tool[1])}</td></tr>"
+
+    def mining_tool(self, ids: list[str]) -> tuple[str, str] | tuple | None:
+        """The (tool item id, label) that mines every block in ids, () for any tool, or None for no blocks."""
         blocks = [i for i in ids if self.res.is_block(i)]
         if not blocks:
             return None
@@ -468,8 +479,8 @@ class WikiSite:
                 for level in ("stone", "iron", "diamond"):
                     if all(b in self.res.block_tag_values(f"minecraft:needs_{level}_tool") for b in blocks):
                         tier = level
-                return f"<tr><th>Tool</th><td>{self.t_item(f'minecraft:{tier}_{tool}', tool.title())}</td></tr>"
-        return "<tr><th>Tool</th><td>Any tool</td></tr>"
+                return f"minecraft:{tier}_{tool}", tool.title()
+        return ()
 
     # Templates: recipes
 
@@ -549,8 +560,9 @@ class WikiSite:
     def _matches(self, stacks: list[Stack], resource_id: str | None) -> bool:
         return resource_id is None or any(resource_id in s.options for s in stacks)
 
-    def t_processing(self, type: str, input: str | None = None, output: str | None = None,
-                     columns: list[str] | None = None, hide: list[str] | None = None, limit: int | None = None) -> str:
+    def processing_rows(self, type: str, input: str | None = None, output: str | None = None,
+                        columns: list[str] | None = None, hide: list[str] | None = None, limit: int | None = None):
+        """The matching (recipe id, inputs, outputs, scalars) rows of a recipe type and their scalar column keys."""
         recipe_type = type if ":" in type else f"{MOD_ID}:{type}"
         rows = []
         for recipe_id, recipe in self.res.recipes.items():
@@ -559,8 +571,6 @@ class WikiSite:
             inputs, outputs, scalars = self.split_recipe(recipe)
             if self._matches(inputs, input) and self._matches(outputs, output):
                 rows.append((recipe_id, inputs, outputs, scalars))
-        if not rows:
-            return '<p class="rw-empty">No recipes.</p>'
         if limit:
             rows = rows[:limit]
         keys: list[str] = []
@@ -570,6 +580,13 @@ class WikiSite:
         if columns:
             keys = [k for k in columns if k in keys]
         keys = [k for k in keys if k not in (hide or [])]
+        return rows, keys
+
+    def t_processing(self, type: str, input: str | None = None, output: str | None = None,
+                     columns: list[str] | None = None, hide: list[str] | None = None, limit: int | None = None) -> str:
+        rows, keys = self.processing_rows(type, input, output, columns, hide, limit)
+        if not rows:
+            return '<p class="rw-empty">No recipes.</p>'
         self.table_counter += 1
         table_id = f"rw-table-{self.table_counter}"
         head = "<tr><th>Input</th><th></th><th>Output</th>" + "".join(f"<th>{_esc(_label(k))}</th>" for k in keys) + "</tr>"
@@ -602,6 +619,37 @@ class WikiSite:
             return '<p class="rw-empty">Not used in any crafting recipe.</p>'
         return (f'<div class="rw-recipes"><table><thead><tr><th>Result</th><th>Crafting recipe</th></tr></thead>'
                 f'<tbody>{"".join(rows)}</tbody></table></div>')
+
+    # Templates: production chains
+
+    def _chain_machine(self, resource_id: str) -> str | None:
+        if resource_id in chains.MACHINES:
+            return resource_id
+        page = self.id_pages.get(resource_id)
+        return next((i for i in page.ids if i in chains.MACHINES), None) if page else None
+
+    def _chain_name(self, resource_id: str) -> str:
+        page = self.id_pages.get(resource_id)
+        return page.title if page else self.res.name(resource_id)
+
+    def t_chain(self, *steps, edges: list | None = None, caption: str | None = None) -> str:
+        chain = self.chain_model(steps, edges)
+        self.chain_counter += 1
+        return ChainRenderer(self, chain, f"rw-chain-{self.chain_counter}").html(caption)
+
+    def chain_model(self, steps: tuple, edges: list | None) -> chains.Chain:
+        """The checked chain behind a chain() call; its errors are logged as build warnings."""
+        raw = []
+        if steps:
+            if len(steps) < 3 or len(steps) % 2 == 0:
+                raise ValueError("steps alternate machine, resource, machine, ... and end on a machine")
+            raw += [[steps[i], steps[i + 1], steps[i + 2]] for i in range(0, len(steps) - 2, 2)]
+        raw += list(edges or [])
+        builder = chains.ChainBuilder(self.res, self.split_recipe, self._chain_machine, self._is_fluid)
+        chain = builder.build(raw)
+        for error in chain.errors:
+            log.warning("%s: chain: %s", self.page.file.src_uri, error)
+        return chain
 
     # Templates: reference tables and navigation
 
@@ -673,3 +721,232 @@ def _icon_png(resources: Resources, resource_id: str) -> bytes:
         image.save(buffer, "PNG", optimize=True)
         _ICON_CACHE[resource_id] = buffer.getvalue()
     return _ICON_CACHE[resource_id]
+
+
+def _rate(value: float) -> str:
+    if value >= 100:
+        return f"{value:,.0f}"
+    return f"{value:.3g}"
+
+
+def _flow_text(flow: chains.Flow | None) -> tuple[str, str]:
+    """Per-craft amount and per-time rate, e.g. ("1,000 mB", "83.3 mB/s") or ("1", "2/min")."""
+    if flow is None or flow.amount is None:
+        return "", ""
+    amount = f"{flow.amount:,} mB" if flow.fluid else f"{flow.amount:,}"
+    rate = flow.per_second()
+    if rate is None:
+        return amount, ""
+    if flow.fluid:
+        return amount, f"{_rate(rate)} mB/s"
+    return amount, f"{_rate(rate)}/s" if rate >= 1 else f"{_rate(rate * 60)}/min"
+
+
+
+def _pair(made: str, used: str) -> str:
+    """"500 mB" and "100 mB" -> "500 → 100 mB"; units are written once when both sides share them."""
+    for unit in (" mB/s", " mB", "/min", "/s"):
+        if made.endswith(unit) and used.endswith(unit):
+            return f"{made[:-len(unit)]} → {used}"
+    return f"{made} → {used}"
+
+
+def flow_label(edge: chains.Edge) -> tuple[str, str]:
+    """An edge's amount per run and rate, written once when both machines agree, e.g. ("500 → 100 mB", "")."""
+    made, used = _flow_text(edge.made), _flow_text(edge.used)
+    if not made[0] or made == used:
+        return used if not made[0] else made
+    if not used[0]:
+        return made
+    amount = made[0] if made[0] == used[0] else _pair(made[0], used[0])
+    rate = _pair(made[1], used[1]) if made[1] and used[1] else made[1] or used[1]
+    return amount, rate
+
+
+class ChainRenderer:
+    """Draws a Chain top to bottom as positioned HTML nodes and labels over an SVG of curved arrows.
+
+    Loop edges leave a machine's right side and climb a lane to the right of the diagram.
+    """
+
+    SLOT = 168
+    LAYER = 160
+    NODE_W = 112
+    NODE_H = 64
+    EXTERNAL = 44
+    PAD = 12
+    LANE = 120
+    LOOP_TOP = 20
+
+    def __init__(self, site: WikiSite, chain: chains.Chain, dom_id: str):
+        self.site = site
+        self.chain = chain
+        self.id = dom_id
+        self.layout = chains.layout(chain)
+        self.top = self.PAD + (self.LOOP_TOP if any(e.loop for e in chain.edges) else 0)
+        forward = [e for e in chain.edges if not e.loop]
+        self.fan_out = {n.key: sum(e.source is n for e in forward) for n in chain.nodes}
+        self.fan_in = {n.key: sum(e.target is n for e in forward) for n in chain.nodes}
+
+    def center(self, cell: tuple[int, float]) -> tuple[float, float]:
+        layer, slot = cell
+        return self.PAD + slot * self.SLOT + self.SLOT / 2, self.top + layer * self.LAYER + self.NODE_H / 2
+
+    def half(self, node: chains.Node) -> tuple[float, float]:
+        if node.external:
+            return self.EXTERNAL / 2, self.EXTERNAL / 2
+        return self.NODE_W / 2, self.NODE_H / 2
+
+    def html(self, caption: str | None) -> str:
+        loops = [e for e in self.chain.edges if e.loop]
+        right = self.PAD + self.layout.slots * self.SLOT
+        width = right + len(loops) * self.LANE + self.PAD
+        height = self.top + self.PAD + (self.layout.layers - 1) * self.LAYER + self.NODE_H
+        paths, labels = [], []
+        for index, edge in enumerate(self.chain.edges):
+            if edge.loop:
+                path, point = self.loop_path(edge, right + self.LANE * (loops.index(edge) + 0.5))
+            else:
+                path, point = self.forward_path(index, edge)
+            broken = (not edge.source.external and edge.made is None) or (not edge.target.external and edge.used is None)
+            classes = "rw-chain-edge" + (" rw-chain-loop" if edge.loop else "") + (" rw-chain-broken" if broken else "")
+            paths.append(f'<path class="{classes}" d="{path}" marker-end="url(#{self.id}-arrow)"/>')
+            labels.append([edge, point, broken, self.label_lines(edge, broken)])
+        _spread([label for label in labels if not label[0].loop])
+        labels = [self.label(*label) for label in labels]
+        nodes = [self.node(n) for n in self.chain.nodes]
+        svg = (f'<svg class="rw-chain-edges" width="{width:.0f}" height="{height:.0f}" aria-hidden="true">'
+               f'<defs><marker id="{self.id}-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" '
+               f'markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z"/></marker></defs>'
+               f'{"".join(paths)}</svg>')
+        figcaption = f"<figcaption>{self.site._inline(caption)}</figcaption>" if caption else ""
+        return (f'<figure class="rw-chain" id="{self.id}"><div class="rw-chain-scroll">'
+                f'<div class="rw-chain-canvas" style="width:{width:.0f}px;height:{height:.0f}px">'
+                f'{svg}{"".join(nodes)}{"".join(labels)}</div></div>{figcaption}</figure>')
+
+    def forward_path(self, index: int, edge: chains.Edge) -> tuple[str, tuple[float, float]]:
+        sx, sy = self.center(self.layout.cells[edge.source.key])
+        tx, ty = self.center(self.layout.cells[edge.target.key])
+        points = [(sx, sy + self.half(edge.source)[1])]
+        route = self.layout.routes.get(index, [])
+        for cell in route:
+            cx, cy = self.center(cell)
+            points += [(cx, cy - self.NODE_H / 2), (cx, cy + self.NODE_H / 2)]
+        points.append((tx, ty - self.half(edge.target)[1]))
+        d = f"M{points[0][0]:.1f},{points[0][1]:.1f}"
+        segments = []
+        for i in range(0, len(points) - 1, 2):
+            (ax, ay), (bx, by) = points[i], points[i + 1]
+            bend = (by - ay) / 2
+            segment = ((ax, ay), (ax, ay + bend), (bx, by - bend), (bx, by))
+            segments.append(segment)
+            d += " C" + " ".join(f"{x:.1f},{y:.1f}" for x, y in segment[1:])
+            if i + 2 < len(points):
+                d += f" L{points[i + 2][0]:.1f},{points[i + 2][1]:.1f}"
+        if route:
+            return d, self.center(route[(len(route) - 1) // 2])
+        # Put the label where the arrows spread out, not where they bunch together at a shared machine.
+        out, into = self.fan_out[edge.source.key], self.fan_in[edge.target.key]
+        t = 0.7 if out > into else 0.3 if into > out else 0.5
+        x, y = _bezier(segments[0], t)
+        top, bottom = points[0][1] + 28, points[-1][1] - 28
+        return d, (x, min(max(y, top), bottom) if top <= bottom else (top + bottom) / 2)
+
+    def loop_path(self, edge: chains.Edge, lane: float) -> tuple[str, tuple[float, float]]:
+        """Out of the source's right side, up a lane, then over and down into the target's top."""
+        sx, sy = self.center(self.layout.cells[edge.source.key])
+        tx, ty = self.center(self.layout.cells[edge.target.key])
+        start = (sx + self.half(edge.source)[0], sy)
+        top = ty - self.half(edge.target)[1]
+        over = top - self.LOOP_TOP + 4
+        r = 12
+        d = (f"M{start[0]:.1f},{start[1]:.1f} L{lane - r:.1f},{start[1]:.1f} Q{lane:.1f},{start[1]:.1f} {lane:.1f},{start[1] - r:.1f}"
+             f" L{lane:.1f},{over + r:.1f} Q{lane:.1f},{over:.1f} {lane - r:.1f},{over:.1f}"
+             f" L{tx + r:.1f},{over:.1f} Q{tx:.1f},{over:.1f} {tx:.1f},{over + r:.1f} L{tx:.1f},{top:.1f}")
+        return d, (lane, (start[1] + over) / 2)
+
+    def node(self, node: chains.Node) -> str:
+        cx, cy = self.center(self.layout.cells[node.key])
+        if node.external:
+            w = h = self.EXTERNAL
+            name = self.site.res.name(node.resource)
+            href = self.site.page_href(node.resource)
+            inner = f'<img src="{self.site.icon_url(self.icon(node.resource))}" alt="{_esc(name)}">'
+            classes = "rw-chain-node rw-chain-external"
+        else:
+            w, h = self.NODE_W, self.NODE_H
+            machine = chains.machine_id(node.key)
+            name = self.site._chain_name(machine)
+            href = self.site.page_href(machine)
+            inner = f'<img src="{self.site.icon_url(machine)}" alt=""><span>{_esc(name)}</span>'
+            classes = "rw-chain-node"
+        style = f"left:{cx - w / 2:.0f}px;top:{cy - h / 2:.0f}px;width:{w}px;height:{h}px"
+        tag, link = ("a", f' href="{_esc(href)}"') if href else ("span", "")
+        return f'<{tag} class="{classes}"{link} style="{style}" title="{_esc(name)}">{inner}</{tag}>'
+
+    def icon(self, resource: str) -> str:
+        return self.site._fluid_icon(resource) if self.site._is_fluid(resource) else resource
+
+    def label_lines(self, edge: chains.Edge, broken: bool) -> list[str]:
+        amount, rate = flow_label(edge)
+        lines = [self.site.res.name(edge.resource), *(t for t in (amount, rate) if t)]
+        if broken:
+            lines.append("not in the recipes")
+        return lines
+
+    def label(self, edge: chains.Edge, point: tuple[float, float], broken: bool, lines: list[str]) -> str:
+        # A supplied input or a product leaving the chain already shows its icon in its own box.
+        external = edge.source.external or edge.target.external
+        icon = "" if external else f'<img src="{self.site.icon_url(self.icon(edge.resource))}" alt="">'
+        text = "".join(f"<span>{_esc(line)}</span>" for line in lines)
+        classes = "rw-chain-flow" + (" rw-chain-broken" if broken else "")
+        return (f'<div class="{classes}" style="left:{point[0]:.0f}px;top:{point[1]:.0f}px" '
+                f'title="{_esc(self.title(edge))}">{icon}<span class="rw-chain-text">{text}</span></div>')
+
+    def title(self, edge: chains.Edge) -> str:
+        name = self.site.res.name(edge.resource)
+        parts = []
+        for flow, node, verb in ((edge.made, edge.source, "makes"), (edge.used, edge.target, "uses")):
+            if node.external or flow is None:
+                continue
+            who = self.site._chain_name(chains.machine_id(node.key))
+            if flow.amount is None:
+                parts.append(f"{who} {'burns' if flow.via == 'fuel' else verb} {name}")
+                continue
+            amount, rate = _flow_text(flow)
+            every = f" every {flow.ticks / 20:g} s" if flow.ticks else ""
+            parts.append(f"{who} {verb} {amount} {name}{every}" + (f" ({rate})" if rate else ""))
+        return "; ".join(parts) or name
+
+
+def _label_width(lines: list[str]) -> float:
+    """Rough rendered width of an edge label: 0.6rem text, a 20 px icon, and padding."""
+    return max(len(line) for line in lines) * 6.4 + 40
+
+
+def _spread(labels: list[list]) -> None:
+    """Push apart labels that share a gap between layers, keeping each group centred where it was."""
+    labels = sorted(labels, key=lambda label: (label[1][1], label[1][0]))
+    groups: list[list[list]] = []
+    for label in labels:
+        if groups and abs(groups[-1][-1][1][1] - label[1][1]) < 40:
+            groups[-1].append(label)
+        else:
+            groups.append([label])
+    for group in groups:
+        group.sort(key=lambda label: label[1][0])
+        xs = [label[1][0] for label in group]
+        for i in range(1, len(group)):
+            gap = (_label_width(group[i - 1][3]) + _label_width(group[i][3])) / 2 + 4
+            xs[i] = max(xs[i], xs[i - 1] + gap)
+        shift = (sum(label[1][0] for label in group) - sum(xs)) / len(group)
+        shift = max(shift, _label_width(group[0][3]) / 2 - xs[0])
+        for label, x in zip(group, xs):
+            label[1] = (x + shift, label[1][1])
+
+
+def _bezier(segment, t: float) -> tuple[float, float]:
+    (x0, y0), (x1, y1), (x2, y2), (x3, y3) = segment
+    u = 1 - t
+    return (u ** 3 * x0 + 3 * u * u * t * x1 + 3 * u * t * t * x2 + t ** 3 * x3,
+            u ** 3 * y0 + 3 * u * u * t * y1 + 3 * u * t * t * y2 + t ** 3 * y3)

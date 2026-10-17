@@ -1,0 +1,49 @@
+{
+  "variants": {
+    "facing=north,phase=asleep": {
+      "model": "rngtech:block/dormant_machine_asleep"
+    },
+    "facing=north,phase=awake": {
+      "model": "rngtech:block/dormant_machine_awake"
+    },
+    "facing=north,phase=spent": {
+      "model": "rngtech:block/dormant_machine_spent"
+    },
+    "facing=east,phase=asleep": {
+      "model": "rngtech:block/dormant_machine_asleep",
+      "y": 90
+    },
+    "facing=east,phase=awake": {
+      "model": "rngtech:block/dormant_machine_awake",
+      "y": 90
+    },
+    "facing=east,phase=spent": {
+      "model": "rngtech:block/dormant_machine_spent",
+      "y": 90
+    },
+    "facing=south,phase=asleep": {
+      "model": "rngtech:block/dormant_machine_asleep",
+      "y": 180
+    },
+    "facing=south,phase=awake": {
+      "model": "rngtech:block/dormant_machine_awake",
+      "y": 180
+    },
+    "facing=south,phase=spent": {
+      "model": "rngtech:block/dormant_machine_spent",
+      "y": 180
+    },
+    "facing=west,phase=asleep": {
+      "model": "rngtech:block/dormant_machine_asleep",
+      "y": 270
+    },
+    "facing=west,phase=awake": {
+      "model": "rngtech:block/dormant_machine_awake",
+      "y": 270
+    },
+    "facing=west,phase=spent": {
+      "model": "rngtech:block/dormant_machine_spent",
+      "y": 270
+    }
+  }
+}

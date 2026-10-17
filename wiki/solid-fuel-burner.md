@@ -27,7 +27,7 @@ wiki:
     },
 ) }}
 
-The **Solid Fuel Burner** is RNGTech's first real generator. It burns coal, charcoal, wood, and other furnace fuels and turns them into FE. The chassis decides which Gear you can install, and the Gear decides how fast it generates, which fuels it accepts, and how carefully it spends them.
+The **Solid Fuel Burner** is RNGTech's first real generator. It burns coal, charcoal, wood, and other furnace fuels and turns them into FE. The chassis decides which Gear you can install, and the Gear decides how fast it generates, which fuels it accepts, and how carefully it spends them. See [Power Chains](power-chains.md#coal) for where it fits and what replaces it.
 
 Each burner you craft rolls its own [rarity and affixes](rarity-and-affixes.md). Burners do not have Machine Mastery.
 

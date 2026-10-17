@@ -1,0 +1,15 @@
+{
+    "families": {
+        "resonance_calibrator": 1
+    },
+    "level": {
+        "min": 20,
+        "max": 40
+    },
+    "wake_fe": {
+        "min": 750000,
+        "max": 3000000
+    },
+    "wake_curve": 2.0,
+    "wake_input": 25000
+}

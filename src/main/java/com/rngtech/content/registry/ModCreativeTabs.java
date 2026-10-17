@@ -81,6 +81,7 @@ public final class ModCreativeTabs {
                         acceptDebug(output, ModItems.DEBUG_TRASHCAN);
                         acceptDebug(output, ModItems.DEBUG_TANK);
                         acceptDebug(output, ModItems.DEBUG_BATTERY);
+                        acceptDebug(output, ModItems.DORMANT_MACHINE);
                         output.accept(ModItems.FURNACE.get());
                         output.accept(ModItems.CABLE.get());
                         output.accept(ModItems.UNIVERSAL_CONNECTOR.get());
@@ -110,6 +111,7 @@ public final class ModCreativeTabs {
                         ModItems.ASCENDANCY_SEALS.forEach(seal -> output.accept(seal.get()));
                         output.accept(ModItems.PRIMED_SEAL_CORE.get());
                         output.accept(ModItems.LUBRICATED_SEAL_CORE.get());
+                        output.accept(ModItems.SOUL_TRANSFER.get());
                         output.accept(ModItems.ADVANCED_ITEM_FILTER.get());
                         output.accept(ModItems.MINERS_COMPANION.get());
                         output.accept(ModItems.MINERS_COMPANION_MAGNET.get());

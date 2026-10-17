@@ -10,6 +10,7 @@ import com.rngtech.client.renderer.BatteryChassisRenderer;
 import com.rngtech.client.renderer.BioGeneratorRenderer;
 import com.rngtech.client.renderer.CavitationGeneratorRenderer;
 import com.rngtech.client.renderer.CorrosionCellRenderer;
+import com.rngtech.client.renderer.DerelictCartRenderer;
 import com.rngtech.client.renderer.ForestryCartRenderer;
 import com.rngtech.client.renderer.GasChemistryRenderer;
 import com.rngtech.client.renderer.ModularToolItemRenderer;
@@ -18,6 +19,7 @@ import com.rngtech.client.renderer.SolarArrayControllerRenderer;
 import com.rngtech.client.renderer.SolarPanelModels;
 import com.rngtech.client.renderer.SolarPanelRenderer;
 import com.rngtech.client.renderer.SolidFuelBurnerRenderer;
+import com.rngtech.client.renderer.ToolBenchRenderer;
 import com.rngtech.client.renderer.VacuumCollapseGeneratorRenderer;
 import com.rngtech.client.screen.AdvancedItemFilterScreen;
 import com.rngtech.client.screen.AffixForgeScreen;
@@ -40,6 +42,7 @@ import com.rngtech.client.screen.DebugBatteryScreen;
 import com.rngtech.client.screen.DebugChestScreen;
 import com.rngtech.client.screen.DebugRerollerScreen;
 import com.rngtech.client.screen.DebugTankScreen;
+import com.rngtech.client.screen.DormantMachineScreen;
 import com.rngtech.client.screen.ExoticAffixForgeScreen;
 import com.rngtech.client.screen.ForestryCartScreen;
 import com.rngtech.client.screen.ForestryCartStationScreen;
@@ -101,6 +104,7 @@ public final class RNGTechClient {
     public RNGTechClient(IEventBus modBus, ModContainer container) {
         modBus.addListener(this::registerScreens);
         modBus.addListener(this::registerRenderers);
+        modBus.addListener(BatteryChassisRenderer::registerModels);
         modBus.addListener(CavitationGeneratorRenderer::registerModels);
         modBus.addListener(CorrosionCellRenderer::registerModels);
         modBus.addListener(SolidFuelBurnerRenderer::registerModels);
@@ -131,6 +135,7 @@ public final class RNGTechClient {
         event.register(ModMenus.DEBUG_TANK.get(), DebugTankScreen::new);
         event.register(ModMenus.DEBUG_BATTERY.get(), DebugBatteryScreen::new);
         event.register(ModMenus.TOOL_BENCH.get(), ToolBenchScreen::new);
+        event.register(ModMenus.DORMANT_MACHINE.get(), DormantMachineScreen::new);
         event.register(ModMenus.CABLE_CONNECTOR.get(), CableConnectorScreen::new);
         event.register(ModMenus.UNIVERSAL_CONNECTOR.get(), UniversalConnectorScreen::new);
         event.register(ModMenus.CONFIGURATOR_ACTION.get(), ConfiguratorActionScreen::new);
@@ -179,7 +184,9 @@ public final class RNGTechClient {
         event.registerBlockEntityRenderer(ModBlockEntities.SOLID_FUEL_BURNER.get(), SolidFuelBurnerRenderer::new);
         event.registerBlockEntityRenderer(ModBlockEntities.POTENTIAL_REACTOR.get(), PotentialReactorRenderer::new);
         event.registerBlockEntityRenderer(ModBlockEntities.VACUUM_COLLAPSE_GENERATOR.get(), VacuumCollapseGeneratorRenderer::new);
+        event.registerBlockEntityRenderer(ModBlockEntities.TOOL_BENCH.get(), ToolBenchRenderer::new);
         event.registerEntityRenderer(ModEntityTypes.FORESTRY_CART.get(), ForestryCartRenderer::new);
+        event.registerEntityRenderer(ModEntityTypes.DERELICT_CART.get(), DerelictCartRenderer::new);
     }
 
     private void registerKeyMappings(RegisterKeyMappingsEvent event) {

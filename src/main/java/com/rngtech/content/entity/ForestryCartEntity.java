@@ -9,6 +9,7 @@ import com.rngtech.content.item.ForestryCartItem;
 import com.rngtech.content.item.GearParts;
 import com.rngtech.content.item.ModularToolItem;
 import com.rngtech.content.item.PruningShearsItem;
+import com.rngtech.content.item.SoulTransferItem;
 import com.rngtech.content.loot.ChallengeContext;
 import com.rngtech.content.loot.ChallengeLoot;
 import com.rngtech.content.menu.ForestryCartMenu;
@@ -979,6 +980,9 @@ public class ForestryCartEntity extends AbstractMinecart implements MenuProvider
         if (held.getItem() instanceof ConfiguratorItem
                 && held.getOrDefault(ModDataComponents.MASTERY_CONFIGURATOR_MODE.get(), false)) {
             return ConfiguratorItem.useMastery(player, held, this);
+        }
+        if (held.getItem() instanceof SoulTransferItem) {
+            return SoulTransferItem.useOnHost(player, held, this, blockPosition());
         }
         if (level().isClientSide) {
             return InteractionResult.SUCCESS;

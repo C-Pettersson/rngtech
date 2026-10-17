@@ -1,0 +1,9 @@
+{
+  "parent": "minecraft:block/orientable",
+  "textures": {
+    "front": "rngtech:block/dormant_machine_front_awake",
+    "side": "rngtech:block/dormant_machine_side",
+    "top": "rngtech:block/dormant_machine_top",
+    "particle": "rngtech:block/dormant_machine_side"
+  }
+}

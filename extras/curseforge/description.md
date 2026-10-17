@@ -4,7 +4,7 @@
 
 RNGTech is a tech mod for Minecraft 1.21.1 on NeoForge where every machine you craft is a loot drop. Each one rolls a rarity and a set of affixes, like gear in Path of Exile or Last Epoch, so two Crushers from the same recipe rarely match. Keep the good rolls, refine them, and level them up as you work through nine material stages, from flint tools to exotic alloys.
 
-> **2.0 is in alpha.** This page describes 2.0. The passive tree and ascendancies are in the 2.0 alpha files on the Files tab; the default release file is still 1.2.0. Unique items and Corruption arrive later in 2.0.
+> **2.0 is in alpha.** This page describes 2.0. The passive tree, ascendancies, Unique items, and Corruption are in the 2.0 alpha files on the Files tab; the default release file is still 1.2.0.
 
 ## Itemization
 
@@ -23,6 +23,10 @@ The chassis is the block you place. It sets base stats and caps how advanced its
 Each item also rolls Refinement Potential (RP). At the Affix Forge, single-purpose crystals, catalysts, and coils add, upgrade, reroll, or remove affixes, or promote rarity. Every change spends RP. When it runs out, the item is finished.
 
 ![The Affix Forge](https://media.forgecdn.net/attachments/1709/662/affix-forge-png.png)
+
+## Uniques and Corruption
+
+Uniques are Gear parts and Battery Cells you find in structure chests, never craft. Each has a signature effect no normal part has and a drawback you can see, and every copy rolls its own values inside fixed ranges. A Volatile Catalyst corrupts a finished item: it may gain a bonus implicit, reroll or warp its affixes past their normal range, or pick up a penalty. Either way, the item can never be refined again.
 
 ## Machines level up
 
@@ -49,7 +53,7 @@ Universal Cable is cheap, with 12 per craft, and carries power, fluids, and item
 ## Compatibility
 
 - **Requires** Minecraft 1.21.1, NeoForge 21.1.228 or newer, and Java 21, on the client and the server.
-- **Optional:** JEI for recipes and Gear lookup, Jade for machine overlays, and Applied Energistics 2 or Refined Storage for network bridges.
+- **Optional:** JEI for recipes and Gear lookup, Jade for machine overlays, GuideME for the wiki as an in-game guide, and Applied Energistics 2 or Refined Storage for network bridges.
 - **Pack authors:** an optional FTB Quests chapter set is available as an additional file.
 
 Back up your worlds before updating.

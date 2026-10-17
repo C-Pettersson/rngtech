@@ -1,0 +1,9 @@
+{
+  "type": "rngtech:dormant_site",
+  "biomes": "#rngtech:has_structure/nether_smeltworks",
+  "spawn_overrides": {},
+  "step": "surface_structures",
+  "terrain_adaptation": "none",
+  "site": "rngtech:nether_smeltworks",
+  "layout": "smeltworks"
+}

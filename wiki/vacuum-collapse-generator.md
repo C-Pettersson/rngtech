@@ -18,7 +18,7 @@ wiki:
     },
 ) }}
 
-The **Vacuum Collapse Generator** is RNGTech's Stage 7 primary generator. It collapses one {{ item('rngtech:void_catalyst') }} at a time into a huge batch of FE, about 1,000 FE/t before Gear, and can leave {{ item('rngtech:collapse_residue') }} behind. Its Gear decides how much it makes and how stable each collapse is.
+The **Vacuum Collapse Generator** is RNGTech's Stage 7 primary generator. It collapses one {{ item('rngtech:void_catalyst') }} at a time into a huge batch of FE, about 1,000 FE/t before Gear, and can leave {{ item('rngtech:collapse_residue') }} behind. Its Gear decides how much it makes and how stable each collapse is. See [Power Chains](power-chains.md#void-catalyst) for the chain that makes its catalyst.
 
 The generator is built around its Gear. The Void Chamber is the glass vessel in the middle, a Dimensional Stabilizer pylon stands on each side, and the Collapse Nozzle hangs over the chamber from the catalyst hopper's feed line. Each part shows in its own material, so you can tell the tier at a glance, and an empty Gear slot leaves an empty mount.
 

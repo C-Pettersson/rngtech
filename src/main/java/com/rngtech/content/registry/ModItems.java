@@ -76,6 +76,7 @@ import com.rngtech.content.item.SolarArrayExtenderItem;
 import com.rngtech.content.item.SolarPanelBlockItem;
 import com.rngtech.content.item.SolidFuelBurnerBlockItem;
 import com.rngtech.content.item.SolidFuelBurnerPartItem;
+import com.rngtech.content.item.SoulTransferItem;
 import com.rngtech.content.item.ToolHeadItem;
 import com.rngtech.content.item.ToolRodItem;
 import com.rngtech.content.item.UniquePartItem;
@@ -182,6 +183,10 @@ public final class ModItems {
             "debug_battery",
             () -> new BlockItem(ModBlocks.DEBUG_BATTERY.get(), new Item.Properties().stacksTo(1))
     );
+    public static final DeferredItem<BlockItem> DORMANT_MACHINE = ITEMS.register(
+            "dormant_machine",
+            () -> new BlockItem(ModBlocks.DORMANT_MACHINE.get(), new Item.Properties())
+    );
     public static final DeferredItem<BlockItem> TOOL_BENCH = ITEMS.register(
             "tool_bench",
             () -> new BlockItem(ModBlocks.TOOL_BENCH.get(), new Item.Properties().stacksTo(1))
@@ -241,6 +246,8 @@ public final class ModItems {
     public static final List<DeferredItem<AscendancySealItem>> ASCENDANCY_SEALS = List.of(ASCENDANCY_SEAL_1, ASCENDANCY_SEAL_2, ASCENDANCY_SEAL_3);
     public static final DeferredItem<Item> PRIMED_SEAL_CORE = ITEMS.registerSimpleItem("primed_seal_core");
     public static final DeferredItem<Item> LUBRICATED_SEAL_CORE = ITEMS.registerSimpleItem("lubricated_seal_core");
+    public static final DeferredItem<SoulTransferItem> SOUL_TRANSFER = ITEMS.register(
+            "soul_transfer", () -> new SoulTransferItem(new Item.Properties().stacksTo(1).rarity(Rarity.UNCOMMON)));
 
     public static final DeferredItem<ConfiguratorItem> CONFIGURATOR = ITEMS.register(
             "configurator",

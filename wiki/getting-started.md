@@ -26,6 +26,7 @@ These mods are optional. RNGTech works without them and adds extra features when
 |---|---|
 | [JEI](https://www.curseforge.com/minecraft/mc-mods/jei) | Recipe categories for every RNGTech machine, a Gear lookup that shows which parts fit each machine, and ore generation pages with depth and hardness. |
 | [Jade](https://www.curseforge.com/minecraft/mc-mods/jade) | Machine overlays when you look at a placed RNGTech block. |
+| [GuideME](https://www.curseforge.com/minecraft/mc-mods/guideme) | This wiki as an in-game guide. Hover an RNGTech item and hold the guide key to open its page. |
 | [Applied Energistics 2](https://www.curseforge.com/minecraft/mc-mods/applied-energistics-2) | A bridge connector that links AE2 networks through [Universal Cable](universal-cable.md). |
 | [Refined Storage](https://www.curseforge.com/minecraft/mc-mods/refined-storage) | A bridge connector that links Refined Storage networks through Universal Cable. |
 
@@ -51,7 +52,7 @@ Crafted machines, Gear parts, tool parts, and Battery Cells come out **unidentif
 
 ## Start: tools
 
-You gather your own materials, so the first job is a set of tools. RNGTech tools are **Modular Field Tools** built from a separate head and rod, and each part keeps its own roll. See [Tool Bench](tool-bench.md) for the full details.
+You gather your own materials, so the first job is a set of tools. RNGTech tools are **Modular Field Tools** built from a separate head and rod, and each part keeps its own roll. See [Modular Tools](modular-tools.md) for the full details and [Tool Bench](tool-bench.md) for building them.
 
 1. Craft a {{ item('rngtech:tool_bench') }}. It needs no iron.
 2. Craft a {{ item('rngtech:flint_pick_head') }} and a {{ item('rngtech:wooden_tool_rod') }}, and assemble a {{ item('rngtech:modular_pick') }} in the bench's Build tab.
@@ -62,7 +63,7 @@ You gather your own materials, so the first job is a set of tools. RNGTech tools
 
 ### Ore hardness
 
-RNGTech ores have a **hardness** from 1 to 8, separate from vanilla mining tiers. A Modular Pick or Hammer can only mine ores up to its head's hardness. Flint heads reach hardness 1, which covers Iron and Copper ore, and better heads reach further. See [Ore hardness](tool-bench.md#ore-hardness) on the Tool Bench page for every head's reach.
+RNGTech ores have a **hardness** from 1 to 8, separate from vanilla mining tiers. A Modular Pick or Hammer can only mine ores up to its head's hardness. Flint heads reach hardness 1, which covers Iron and Copper ore, and better heads reach further. See [Ore hardness](modular-tools.md#ore-hardness) on the Modular Tools page for every head's reach.
 
 ## Stages 1–2: first power and ore doubling
 
@@ -145,7 +146,7 @@ Typical generators by stage, before rolls and Gear bonuses:
 | 6 | [Ammonia Fuel Cell](ammonia-fuel-cell.md) | 600 FE/t |
 | 7 | [Vacuum Collapse Generator](vacuum-collapse-generator.md) | About 1,000 FE/t |
 
-The [Potential Reactor](potential-reactor.md) and [Cavitation Generator](cavitation-generator.md) also generate FE. See each page for details.
+The [Potential Reactor](potential-reactor.md) and [Cavitation Generator](cavitation-generator.md) also generate FE. See each page for details, and [Power Chains](power-chains.md) for how each generator connects to the machines that fuel it.
 
 ## Logistics basics
 

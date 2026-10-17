@@ -18,7 +18,7 @@ wiki:
     },
 ) }}
 
-The **Ammonia Fuel Cell** is the Stage 6 generator at the end of the ammonia chain. It burns Ammonia from the [Ammonia Synthesizer](ammonia-synthesizer.md) through a Fuel Cell Membrane and makes 600 FE/t before rolls, leaving a little {{ item('rngtech:corrosion_residue') }} behind each cycle.
+The **Ammonia Fuel Cell** is the Stage 6 generator at the end of the ammonia chain. It burns Ammonia from the [Ammonia Synthesizer](ammonia-synthesizer.md) through a Fuel Cell Membrane and makes 600 FE/t before rolls, leaving a little {{ item('rngtech:corrosion_residue') }} behind each cycle. See [Power Chains](power-chains.md#ammonia) for the machines that feed it.
 
 It is built as a fuel cell stack: twelve cells clamped between two steel end plates by tie rods, with copper bus bars carrying the current back to a power cabinet.
 
@@ -35,15 +35,6 @@ Like every RNGTech machine, each Ammonia Fuel Cell you craft rolls its own [rari
 Mine a placed Ammonia Fuel Cell with a pickaxe. It drops itself. Installed Gear and stored items drop separately.
 
 ## Usage
-
-### The ammonia chain
-
-The fuel cell is the last step of the chain:
-
-1. A [Cavitation Generator](cavitation-generator.md) with nitrogen Gear splits Water into Nitrogen.
-2. A [Steam Methane Reformer](steam-methane-reformer.md) makes Hydrogen.
-3. The [Ammonia Synthesizer](ammonia-synthesizer.md) combines them into Ammonia, using FE.
-4. The Ammonia Fuel Cell burns the Ammonia for more FE than the synthesis cost.
 
 ### Generating power
 

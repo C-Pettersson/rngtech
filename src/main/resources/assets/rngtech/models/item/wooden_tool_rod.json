@@ -1,6 +1,6 @@
 {
     "textures":  {
-                     "layer0":  "minecraft:item/stick"
+                     "layer0":  "rngtech:item/materials/non_stage/wood"
                  },
     "parent":  "minecraft:item/handheld"
 }

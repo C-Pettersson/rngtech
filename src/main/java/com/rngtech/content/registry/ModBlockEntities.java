@@ -20,6 +20,7 @@ import com.rngtech.content.blockentity.DebugChestBlockEntity;
 import com.rngtech.content.blockentity.DebugRerollerBlockEntity;
 import com.rngtech.content.blockentity.DebugTankBlockEntity;
 import com.rngtech.content.blockentity.DebugTrashcanBlockEntity;
+import com.rngtech.content.blockentity.DormantMachineBlockEntity;
 import com.rngtech.content.blockentity.ExoticAffixForgeBlockEntity;
 import com.rngtech.content.blockentity.ForestryCartStationBlockEntity;
 import com.rngtech.content.blockentity.FurnaceBlockEntity;
@@ -93,6 +94,12 @@ public final class ModBlockEntities {
             BLOCK_ENTITY_TYPES.register(
                     "debug_battery",
                     () -> BlockEntityType.Builder.of(DebugBatteryBlockEntity::new, ModBlocks.DEBUG_BATTERY.get()).build(null)
+            );
+
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<DormantMachineBlockEntity>> DORMANT_MACHINE =
+            BLOCK_ENTITY_TYPES.register(
+                    "dormant_machine",
+                    () -> BlockEntityType.Builder.of(DormantMachineBlockEntity::new, ModBlocks.DORMANT_MACHINE.get()).build(null)
             );
 
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<ToolBenchBlockEntity>> TOOL_BENCH =

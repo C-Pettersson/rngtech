@@ -18,7 +18,7 @@ wiki:
     },
 ) }}
 
-The **Cavitation Generator** is a Stage 5 generator that spins a rotor through Water to make FE. You set the rotor's throttle: run it at rated speed, ease off to make the rotor last, or push it into supercavitation for more FE at the cost of wear and heat. With the Stage 6 nitrogen Gear installed, it also splits Water into Nitrogen for the [Ammonia Synthesizer](ammonia-synthesizer.md).
+The **Cavitation Generator** is a Stage 5 generator that spins a rotor through Water to make FE. You set the rotor's throttle: run it at rated speed, ease off to make the rotor last, or push it into supercavitation for more FE at the cost of wear and heat. With the Stage 6 nitrogen Gear installed, it also splits Water into Nitrogen for the [Ammonia Synthesizer](ammonia-synthesizer.md). See [Power Chains](power-chains.md#ammonia) for the ammonia chain, and [Water supply](power-chains.md#water) for keeping it fed.
 
 The installed rotor spins behind the front porthole at its real speed, and the chamber glows blue while it cavitates. The side sight glasses show the Water and Nitrogen levels, and the rear fins glow orange as heat strain builds.
 

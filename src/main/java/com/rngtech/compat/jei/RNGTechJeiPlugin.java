@@ -214,6 +214,7 @@ public final class RNGTechJeiPlugin implements IModPlugin {
                 ModItems.ASCENDANCY_SEALS.stream().map(seal -> new ItemStack(seal.get())).toList(),
                 Component.translatable("rngtech.jei.ascendancy_seal.info")
         );
+        registration.addIngredientInfo(ModItems.SOUL_TRANSFER.get(), Component.translatable("rngtech.jei.soul_transfer.info"));
         registration.addIngredientInfo(ModItems.VOLATILE_CATALYST.get(), volatileCatalystInfo().toArray(Component[]::new));
         registration.addIngredientInfo(
                 ModItems.JAM_DEBRIS.get(),

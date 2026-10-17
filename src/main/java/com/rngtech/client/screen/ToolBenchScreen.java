@@ -1,5 +1,6 @@
 package com.rngtech.client.screen;
 
+import com.rngtech.content.blockentity.ToolBenchBlockEntity;
 import com.rngtech.content.item.ModularToolItem;
 import com.rngtech.content.item.RefinementConsumableItem;
 import com.rngtech.content.menu.ToolBenchMenu;
@@ -16,13 +17,18 @@ import com.rngtech.rpg.refinement.RefinementEngine;
 import com.rngtech.rpg.refinement.RefinementOperation;
 import com.rngtech.rpg.refinement.RefinementTargets;
 
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.Component;
+import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
+import net.neoforged.neoforge.items.SlotItemHandler;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
@@ -86,6 +92,7 @@ public class ToolBenchScreen extends AbstractContainerScreen<ToolBenchMenu> {
     private static final int STAT_PANEL_Y = 14;
     private static final int STAT_PANEL_WIDTH = 216;
     private static final int STAT_ACCENT = 0xFF7F9ED7;
+    private static final int SLOT_HINT_WIDTH = 200;
     private static final MachineStat[] TOOL_STATS = {
             MachineStat.MINING_LEVEL,
             MachineStat.MINING_SPEED,
@@ -121,7 +128,40 @@ public class ToolBenchScreen extends AbstractContainerScreen<ToolBenchMenu> {
         renderTooltip(guiGraphics, mouseX, mouseY);
         renderStatTooltips(guiGraphics, mouseX, mouseY);
         renderRefinementTooltips(guiGraphics, mouseX, mouseY);
+        renderEmptySlotHints(guiGraphics, mouseX, mouseY);
         GearSlotTooltips.render(this, guiGraphics, font, mouseX, mouseY);
+    }
+
+    /** Hovering an empty Build or catalyst slot names it and says what it takes. */
+    private void renderEmptySlotHints(GuiGraphics guiGraphics, int mouseX, int mouseY) {
+        Slot slot = hoveredSlot;
+        if (slot == null || slot.hasItem() || !(slot instanceof SlotItemHandler)) {
+            return;
+        }
+        String key = switch (menu.selectedTab()) {
+            case ToolBenchMenu.TAB_ASSEMBLY -> switch (slot.getSlotIndex()) {
+                case ToolBenchBlockEntity.SLOT_TOOL -> "rngtech.tool_bench.slot.tool";
+                case ToolBenchBlockEntity.SLOT_HEAD -> "rngtech.tool_bench.slot.head";
+                case ToolBenchBlockEntity.SLOT_ROD -> "rngtech.tool_bench.slot.rod";
+                case ToolBenchBlockEntity.SLOT_BATTERY_CELL -> "rngtech.tool_bench.slot.cell";
+                case ToolBenchBlockEntity.SLOT_REPAIR_MATERIAL -> "rngtech.tool_bench.slot.repair";
+                default -> null;
+            };
+            case ToolBenchMenu.TAB_REFINEMENT -> slot.getSlotIndex() == ToolBenchBlockEntity.SLOT_REFINEMENT_CONSUMABLE
+                    ? "rngtech.tool_bench.slot.catalyst"
+                    : null;
+            default -> null;
+        };
+        if (key != null) {
+            renderSlotHint(guiGraphics, key, mouseX, mouseY);
+        }
+    }
+
+    private void renderSlotHint(GuiGraphics guiGraphics, String key, int mouseX, int mouseY) {
+        List<FormattedCharSequence> lines = new ArrayList<>();
+        lines.add(Component.translatable(key).withStyle(ChatFormatting.YELLOW).getVisualOrderText());
+        lines.addAll(font.split(Component.translatable(key + ".hint").withStyle(ChatFormatting.GRAY), SLOT_HINT_WIDTH));
+        guiGraphics.renderTooltip(font, lines, mouseX, mouseY);
     }
 
     @Override
@@ -432,30 +472,15 @@ public class ToolBenchScreen extends AbstractContainerScreen<ToolBenchMenu> {
             return;
         }
         if (isOverRefinementFrame(mouseX, mouseY, REFINE_TOOL_FRAME_X, REFINE_SLOT_Y) && menu.toolStack().isEmpty()) {
-            guiGraphics.renderTooltip(
-                    font,
-                    Component.translatable("rngtech.tool_bench.refine_tool_slot.tooltip"),
-                    mouseX,
-                    mouseY
-            );
+            renderSlotHint(guiGraphics, "rngtech.tool_bench.slot.refine_tool", mouseX, mouseY);
             return;
         }
         if (isOverRefinementFrame(mouseX, mouseY, REFINE_HEAD_FRAME_X, REFINE_SLOT_Y) && head.isEmpty()) {
-            guiGraphics.renderTooltip(
-                    font,
-                    Component.translatable("rngtech.tool_bench.refine_head_slot.tooltip"),
-                    mouseX,
-                    mouseY
-            );
+            renderSlotHint(guiGraphics, "rngtech.tool_bench.slot.refine_head", mouseX, mouseY);
             return;
         }
         if (isOverRefinementFrame(mouseX, mouseY, REFINE_ROD_FRAME_X, REFINE_SLOT_Y) && rod.isEmpty()) {
-            guiGraphics.renderTooltip(
-                    font,
-                    Component.translatable("rngtech.tool_bench.refine_rod_slot.tooltip"),
-                    mouseX,
-                    mouseY
-            );
+            renderSlotHint(guiGraphics, "rngtech.tool_bench.slot.refine_rod", mouseX, mouseY);
             return;
         }
         SelectionRow selectionRow = hoveredSelectionRow(mouseX, mouseY);

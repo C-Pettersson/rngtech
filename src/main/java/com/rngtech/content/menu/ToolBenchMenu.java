@@ -269,8 +269,7 @@ public class ToolBenchMenu extends AbstractContainerMenu {
                 selectedTab == TAB_ASSEMBLY || selectedTab == TAB_REFINEMENT && !hasValidToolForRefinement();
             case ToolBenchBlockEntity.SLOT_BATTERY_CELL, ToolBenchBlockEntity.SLOT_REPAIR_MATERIAL ->
                 selectedTab == TAB_ASSEMBLY;
-            case ToolBenchBlockEntity.SLOT_TINY_ANVIL -> selectedTab == TAB_GEAR;
-            case ToolBenchBlockEntity.SLOT_ENERGY_CONNECTOR -> selectedTab == TAB_GEAR;
+            case ToolBenchBlockEntity.SLOT_TINY_ANVIL, ToolBenchBlockEntity.SLOT_ENERGY_CONNECTOR -> true;
             case ToolBenchBlockEntity.SLOT_REFINEMENT_CONSUMABLE -> selectedTab == TAB_REFINEMENT;
             default -> false;
         };

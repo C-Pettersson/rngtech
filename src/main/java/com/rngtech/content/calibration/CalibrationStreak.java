@@ -1,10 +1,13 @@
 package com.rngtech.content.calibration;
 
 import com.rngtech.rpg.progression.AscendancyFormulas;
+import com.rngtech.util.ItemStackValues;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.world.item.ItemStack;
+
+import java.util.Objects;
 
 /**
  * The Harmonist's streak: consecutive calibrations of one family on one pattern. Pattern Memory keeps it on a dropped
@@ -61,5 +64,21 @@ public record CalibrationStreak(int streak, String family, ItemStack pattern, bo
     /** The streak after a completed calibration of {@code nextPattern} and {@code nextFamily}. */
     public CalibrationStreak after(ItemStack nextPattern, String nextFamily, int nextHarmonic) {
         return new CalibrationStreak(streak + 1, nextFamily, nextPattern, swapUsed, nextHarmonic, echoUsed);
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        return other instanceof CalibrationStreak that
+                && streak == that.streak
+                && family.equals(that.family)
+                && ItemStackValues.matches(pattern, that.pattern)
+                && swapUsed == that.swapUsed
+                && harmonic == that.harmonic
+                && echoUsed == that.echoUsed;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(streak, family, ItemStackValues.hash(pattern), swapUsed, harmonic, echoUsed);
     }
 }

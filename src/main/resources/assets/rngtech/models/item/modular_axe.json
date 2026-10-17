@@ -2,7 +2,7 @@
   "parent": "builtin/entity",
   "gui_light": "front",
   "textures": {
-    "particle": "minecraft:item/iron_axe"
+    "particle": "rngtech:item/modular_tool/axe"
   },
   "display": {
     "thirdperson_righthand": {

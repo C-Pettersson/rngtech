@@ -19,7 +19,7 @@ These items roll rarity, affixes, and RP when you craft them:
 | Machines | {{ item('rngtech:iron_furnace_chassis', 'Furnace') }}, {{ item('rngtech:iron_crusher_chassis', 'Crusher') }}, [Battery Chassis](battery-chassis.md), generators, [Fluid and Compressor Tanks](compressor-tank.md) |
 | Machine parts ([Gear](gear.md)) | {{ item('rngtech:iron_heat_core') }}, {{ item('rngtech:iron_crush_head') }}, Servos, Fluid Pumps, Reactor Chambers |
 | [Battery Cells](battery-cells.md) | {{ item('rngtech:iron_battery_cell') }} and every other material cell |
-| Modular tool parts | Tool Heads and Tool Rods for the [Tool Bench](tool-bench.md) |
+| Modular tool parts | Tool Heads and Tool Rods for [Modular Tools](modular-tools.md) |
 | Companions | The Forestry Companion cart from the [Forestry Cart Station](forestry-cart-station.md), and the {{ item('rngtech:miners_companion') }} |
 
 A few blocks never roll traits: the [Affix Forge](affix-forge.md) and [Exotic Affix Forge](exotic-affix-forge.md), the Crude Component Recycler, the wooden and silica-gel machines such as the [Wooden Composter](wooden-composter.md), the [Algae Photobioreactor](algae-photobioreactor.md), and cables and connectors. Assembled modular tools carry no traits of their own. Their Tool Head and Tool Rod do.
