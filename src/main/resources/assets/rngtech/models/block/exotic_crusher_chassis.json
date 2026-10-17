@@ -1,12 +1,9 @@
 {
-  "parent": "minecraft:block/cube",
+  "parent": "rngtech:block/crusher_heavy",
   "textures": {
-    "down": "rngtech:block/crusher_chassis/bottom/exotic_crusher_chassis",
-    "up": "rngtech:block/crusher_chassis/top/exotic_crusher_chassis",
-    "north": "rngtech:block/crusher_chassis/front/exotic_crusher_chassis",
-    "south": "rngtech:block/crusher_chassis/side/exotic_crusher_chassis",
-    "east": "rngtech:block/crusher_chassis/side/exotic_crusher_chassis",
-    "west": "rngtech:block/crusher_chassis/side/exotic_crusher_chassis",
-    "particle": "rngtech:block/crusher_chassis/front/exotic_crusher_chassis"
+    "particle": "rngtech:block/crusher/shell/exotic",
+    "shell": "rngtech:block/crusher/shell/exotic",
+    "trim": "rngtech:block/crusher/trim/exotic",
+    "rim": "rngtech:block/crusher/rim/naquadah"
   }
 }

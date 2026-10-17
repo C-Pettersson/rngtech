@@ -1,12 +1,11 @@
 {
-  "parent": "minecraft:block/cube",
+  "parent": "rngtech:block/crusher",
   "textures": {
-    "down": "rngtech:block/crusher_chassis/bottom/copper_crusher_chassis",
-    "up": "rngtech:block/crusher_chassis/top/copper_crusher_chassis",
-    "north": "rngtech:block/crusher_chassis/front/copper_crusher_chassis",
-    "south": "rngtech:block/crusher_chassis/side/copper_crusher_chassis",
-    "east": "rngtech:block/crusher_chassis/side/copper_crusher_chassis",
-    "west": "rngtech:block/crusher_chassis/side/copper_crusher_chassis",
-    "particle": "rngtech:block/crusher_chassis/front/copper_crusher_chassis"
+    "particle": "rngtech:block/crusher/shell/copper",
+    "shell": "rngtech:block/crusher/shell/copper",
+    "trim": "rngtech:block/crusher/trim/copper",
+    "rim": "rngtech:block/crusher/rim/copper",
+    "plinth_top": "rngtech:block/crusher/stone_top",
+    "plinth_side": "rngtech:block/crusher/stone_side"
   }
 }

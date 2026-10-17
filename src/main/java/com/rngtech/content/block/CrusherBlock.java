@@ -2,6 +2,7 @@ package com.rngtech.content.block;
 
 import com.rngtech.content.blockentity.BaseMachineBlockEntity;
 import com.rngtech.content.blockentity.CrusherBlockEntity;
+import com.rngtech.content.blockentity.CrusherVisualState;
 import com.rngtech.content.machine.CrusherChassisMaterial;
 import com.rngtech.content.registry.ModBlockEntities;
 import com.rngtech.content.registry.ModDataComponents;
@@ -9,6 +10,9 @@ import com.rngtech.rpg.MachineTraits;
 import com.rngtech.rpg.progression.MachineProgressionState;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.particles.ItemParticleOption;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -21,6 +25,8 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 
 public class CrusherBlock extends BaseMachineBlock {
+    /** Height of the nip under the primary rolls, in model pixels; see tools/blockmodels/crusher.py. */
+    private static final double NIP_Y = 6.0;
     private final CrusherChassisMaterial material;
 
     public CrusherBlock(CrusherChassisMaterial material, Properties properties) {
@@ -51,6 +57,29 @@ public class CrusherBlock extends BaseMachineBlock {
             return null;
         }
         return createTickerHelper(blockEntityType, ModBlockEntities.CRUSHER.get(), CrusherBlockEntity::serverTick);
+    }
+
+    /** Grit of the input falls from the nip under the rolls while they crush; a jammed Crusher puffs smoke instead. */
+    @Override
+    public void animateTick(BlockState state, Level level, BlockPos pos, RandomSource random) {
+        if (!(level.getBlockEntity(pos) instanceof CrusherBlockEntity crusher)) {
+            return;
+        }
+        CrusherVisualState visual = crusher.visualState();
+        double angle = Math.toRadians(180.0 - state.getValue(FACING).toYRot());
+        double x = (8.0 + random.nextGaussian() * 0.6) / 16.0 - 0.5;
+        double z = (4.0 + random.nextDouble() * 4.0) / 16.0 - 0.5;
+        double worldX = pos.getX() + 0.5 + x * Math.cos(angle) + z * Math.sin(angle);
+        double worldZ = pos.getZ() + 0.5 - x * Math.sin(angle) + z * Math.cos(angle);
+        double y = pos.getY() + NIP_Y / 16.0;
+        if (visual.jammed() && random.nextInt(4) == 0) {
+            level.addParticle(ParticleTypes.SMOKE, worldX, y, worldZ, 0.0, 0.03, 0.0);
+        } else if (state.getValue(ACTIVE) && !visual.input().isEmpty()) {
+            for (int i = 0; i < 2; i++) {
+                level.addParticle(new ItemParticleOption(ParticleTypes.ITEM, visual.input()), worldX, y, worldZ,
+                        random.nextGaussian() * 0.01, -0.05, random.nextGaussian() * 0.01);
+            }
+        }
     }
 
     @Override

@@ -192,6 +192,13 @@
     {
       "check": "unused_png",
       "subject_globs": [
+        "src/main/resources/assets/rngtech/textures/block/crusher/fx/led.png"
+      ],
+      "reason": "The Crusher charge meter and jam lamp lenses are drawn only by CrusherRenderer."
+    },
+    {
+      "check": "unused_png",
+      "subject_globs": [
         "src/main/resources/assets/rngtech/textures/block/divinity_siphon/breath_containment_seal.png",
         "src/main/resources/assets/rngtech/textures/block/divinity_siphon/breath_divinity_siphon_formed.png",
         "src/main/resources/assets/rngtech/textures/block/divinity_siphon/heart_containment_seal.png",

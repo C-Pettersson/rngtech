@@ -4,8 +4,10 @@ import com.rngtech.RNGTechConfig;
 import com.rngtech.content.block.BaseMachineBlock;
 import com.rngtech.content.block.CrusherBlock;
 import com.rngtech.content.item.BatteryCellItem;
+import com.rngtech.content.item.CrushHeadItem;
 import com.rngtech.content.item.GearParts;
 import com.rngtech.content.item.MachinePartItem;
+import com.rngtech.content.item.UniquePartItem;
 import com.rngtech.content.loot.ChallengeContext;
 import com.rngtech.content.loot.ChallengeLoot;
 import com.rngtech.content.machine.CrushHeadMaterial;
@@ -41,8 +43,12 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.component.DataComponentMap;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.Connection;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.game.ClientGamePacketListener;
+import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.world.Containers;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
@@ -51,6 +57,7 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.energy.IEnergyStorage;
@@ -113,6 +120,7 @@ public class CrusherBlockEntity extends BaseMachineBlockEntity implements MenuPr
     private static final int DATA_OUTPUT_PER_MINUTE = DATA_CHASSIS_STAGE + 1;
     private static final int DATA_COUNT = DATA_OUTPUT_PER_MINUTE + 1;
     private static final int STAT_SCALE = 100;
+    private static final int VISUAL_SYNC_INTERVAL = 5;
 
     private final ItemStackHandler inventory = new ItemStackHandler(SLOT_COUNT) {
         @Override
@@ -223,6 +231,10 @@ public class CrusherBlockEntity extends BaseMachineBlockEntity implements MenuPr
     private int internalEnergy;
     private int outputBlockedTicks;
     private int jawJamTicks;
+    private int visualCraftTicks;
+    private CrusherVisualState visualState = CrusherVisualState.IDLE;
+    private CrusherVisualState.Key lastSyncedVisual;
+    private final CrusherVisualState.Animation animation = new CrusherVisualState.Animation();
     private long energyTelemetryTick = Long.MIN_VALUE;
     private int energyInputThisTick;
     private int lastEnergyInput;
@@ -233,6 +245,11 @@ public class CrusherBlockEntity extends BaseMachineBlockEntity implements MenuPr
     }
 
     public static void serverTick(Level level, BlockPos pos, BlockState state, CrusherBlockEntity crusher) {
+        tickWork(level, pos, state, crusher);
+        crusher.syncVisualState(level);
+    }
+
+    private static void tickWork(Level level, BlockPos pos, BlockState state, CrusherBlockEntity crusher) {
         crusher.beginEnergyTelemetryTick();
         if (crusher.jawJamTicks > 0) {
             crusher.jawJamTicks--;
@@ -289,6 +306,7 @@ public class CrusherBlockEntity extends BaseMachineBlockEntity implements MenuPr
         if (crusher.progress == 0 && !underLevel(recipe, stats) && ProcessingChance.rollInstant(level, stats)) {
             int fullEnergyCost = crusher.energyCostPerBatch(recipe, stats, jobs);
             if (crusher.consumeWorkingEnergy(fullEnergyCost, true) >= fullEnergyCost) {
+                crusher.visualCraftTicks = adjustedProcessingTicks(recipe, stats, jobs);
                 crusher.markInstantProcess();
                 BaseMachineBlock.setActive(level, pos, state, true);
                 crusher.consumeWorkingEnergy(fullEnergyCost, false);
@@ -304,6 +322,7 @@ public class CrusherBlockEntity extends BaseMachineBlockEntity implements MenuPr
         BaseMachineBlock.setActive(level, pos, state, true);
         crusher.consumeWorkingEnergy(energyCost, false);
         crusher.progress++;
+        crusher.visualCraftTicks = adjustedProcessingTicks(recipe, stats, jobs);
 
         if (crusher.progress >= adjustedProcessingTicks(recipe, stats, jobs)) {
             int completed = crusher.process(recipe, stats, level, jobs);
@@ -316,6 +335,86 @@ public class CrusherBlockEntity extends BaseMachineBlockEntity implements MenuPr
 
     public IEnergyStorage getEnergyStorage(Direction side) {
         return energy;
+    }
+
+    /**
+     * Crushers saved while the block was a solid cube stored no light inside it, which leaves the renderer's rolls,
+     * cell, and items unlit. Rechecking the block's own light once on load fixes those saves.
+     */
+    @Override
+    public void onLoad() {
+        super.onLoad();
+        if (level != null && !level.isClientSide) {
+            level.getLightEngine().checkBlock(worldPosition);
+        }
+    }
+
+    /** Client copy of the state the renderer draws; synced from the server in the block entity update tag. */
+    public CrusherVisualState visualState() {
+        return visualState;
+    }
+
+    public CrusherVisualState.Animation animation() {
+        return animation;
+    }
+
+    @Override
+    public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
+        return currentVisualState().save(registries);
+    }
+
+    @Override
+    public Packet<ClientGamePacketListener> getUpdatePacket() {
+        return ClientboundBlockEntityDataPacket.create(this);
+    }
+
+    @Override
+    public void handleUpdateTag(CompoundTag tag, HolderLookup.Provider registries) {
+        visualState = CrusherVisualState.load(tag, registries);
+    }
+
+    @Override
+    public void onDataPacket(Connection connection, ClientboundBlockEntityDataPacket packet, HolderLookup.Provider registries) {
+        visualState = CrusherVisualState.load(packet.getTag(), registries);
+    }
+
+    private void syncVisualState(Level level) {
+        if (level.getGameTime() % VISUAL_SYNC_INTERVAL != 0) {
+            return;
+        }
+        CrusherVisualState.Key key = currentVisualState().key();
+        if (!key.equals(lastSyncedVisual)) {
+            lastSyncedVisual = key;
+            level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), Block.UPDATE_CLIENTS);
+        }
+    }
+
+    /** What the Crusher shows right now, built on the server. */
+    public CrusherVisualState currentVisualState() {
+        ItemStack input = inventory.getStackInSlot(SLOT_INPUT_A);
+        ItemStack output = inventory.getStackInSlot(SLOT_OUTPUT);
+        ItemStack cell = batteryCellStack();
+        boolean running = getBlockState().getValue(BaseMachineBlock.ACTIVE);
+        int capacity = batteryCell.capacity();
+        return new CrusherVisualState(
+                crushHeadKey(crushHeadStack()),
+                cell.getItem() instanceof BatteryCellItem cellItem ? cellItem.material().getSerializedName() : "",
+                cell.isEmpty() || capacity <= 0 ? -1.0F : Math.min(1.0F, batteryCell.energyStored() / (float) capacity),
+                input.copyWithCount(1),
+                CrusherVisualState.pile(input),
+                output.copyWithCount(1),
+                CrusherVisualState.pile(output),
+                running,
+                jawJamTicks > 0,
+                running ? visualCraftTicks : 0
+        );
+    }
+
+    private static String crushHeadKey(ItemStack stack) {
+        if (stack.getItem() instanceof CrushHeadItem head) {
+            return head.material().getSerializedName();
+        }
+        return stack.getItem() instanceof UniquePartItem && isGearComponent(stack) ? "unique" : "";
     }
 
     public ItemStackHandler getInventory() {

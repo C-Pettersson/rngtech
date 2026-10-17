@@ -1,3 +1,13 @@
 {
-  "parent": "rngtech:block/exotic_crusher_chassis"
+  "parent": "rngtech:item/crusher_heavy_template",
+  "textures": {
+    "particle": "rngtech:block/crusher/shell/exotic",
+    "shell": "rngtech:block/crusher/shell/exotic",
+    "trim": "rngtech:block/crusher/trim/exotic",
+    "rim": "rngtech:block/crusher/rim/naquadah",
+    "roll": "rngtech:block/crusher/roll/exotic",
+    "roll_v": "rngtech:block/crusher/roll/exotic_v",
+    "roll_end": "rngtech:block/crusher/roll/exotic_end",
+    "hub": "rngtech:block/crusher/roll/exotic_hub"
+  }
 }
