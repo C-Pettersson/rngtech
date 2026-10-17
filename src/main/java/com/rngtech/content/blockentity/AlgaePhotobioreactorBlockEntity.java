@@ -60,7 +60,10 @@ public class AlgaePhotobioreactorBlockEntity extends BlockEntity
     public static final int SLOT_WATER_OUTPUT_CONTAINER = 2;
     public static final int SLOT_CARBON_INPUT_CONTAINER = 3;
     public static final int SLOT_CARBON_OUTPUT_CONTAINER = 4;
-    public static final int SLOT_COUNT = 5;
+    public static final int SLOT_UREA = 5;
+    public static final int SLOT_COUNT = 6;
+    /** Biomass one Urea grows at twice the speed. */
+    public static final int UREA_BOOSTED_HARVESTS = 4;
     public static final int SLOT_BIO_CHAMBER = 0;
     public static final int GEAR_SLOT_COUNT = 1;
 
@@ -90,7 +93,8 @@ public class AlgaePhotobioreactorBlockEntity extends BlockEntity
     private static final int DATA_AERATION = 13;
     private static final int DATA_DENSITY = 14;
     private static final int DATA_CARBON_PER_HARVEST = 15;
-    private static final int DATA_COUNT = 16;
+    private static final int DATA_UREA_BOOST = 16;
+    private static final int DATA_COUNT = 17;
     private static final int STAT_SCALE = 100;
     private static final int OUTPUT_BONUS_PROGRESS_SCALE = 1000;
     private static final int DENSITY_SCALE = 1000;
@@ -106,6 +110,7 @@ public class AlgaePhotobioreactorBlockEntity extends BlockEntity
                 case SLOT_OUTPUT -> isAlgaeOutputStack(stack);
                 case SLOT_WATER_INPUT_CONTAINER -> isWaterInputContainer(stack);
                 case SLOT_CARBON_INPUT_CONTAINER -> isCarbonInputContainer(stack);
+                case SLOT_UREA -> stack.is(ModItems.UREA.get());
                 default -> false;
             };
         }
@@ -204,6 +209,7 @@ public class AlgaePhotobioreactorBlockEntity extends BlockEntity
                 case DATA_AERATION -> aeration;
                 case DATA_DENSITY -> (int) Math.round(density * DENSITY_SCALE);
                 case DATA_CARBON_PER_HARVEST -> recipe == null ? 0 : AlgaeCultureDynamics.carbonAmount(recipe.carbonInput().amount(), aeration);
+                case DATA_UREA_BOOST -> ureaBoost;
                 default -> 0;
             };
         }
@@ -219,6 +225,8 @@ public class AlgaePhotobioreactorBlockEntity extends BlockEntity
     };
 
     private double progress;
+    /** Harvests left that grow at twice the speed from the last Urea. */
+    private int ureaBoost;
     private FluidStack activeWater = FluidStack.EMPTY;
     private FluidStack activeCarbon = FluidStack.EMPTY;
     private double outputBonusProgress;
@@ -263,7 +271,12 @@ public class AlgaePhotobioreactorBlockEntity extends BlockEntity
         }
         startCycleIfNeeded(recipe);
         int ticks = currentProcessingTicks(recipe, stats);
-        double step = AlgaeCultureDynamics.progressPerTick(density, aeration);
+        if (ureaBoost <= 0 && !inventory.getStackInSlot(SLOT_UREA).isEmpty()) {
+            inventory.extractItem(SLOT_UREA, 1, false);
+            ureaBoost = UREA_BOOSTED_HARVESTS;
+        }
+        // Urea speeds growth only; carbon and water per biomass stay the same.
+        double step = AlgaeCultureDynamics.progressPerTick(density, aeration) * (ureaBoost > 0 ? 2.0 : 1.0);
         progress += step;
         density = AlgaeCultureDynamics.grow(density, aeration, ticks);
         carbonCharge += carbonRate(recipe, ticks) * step;
@@ -544,6 +557,7 @@ public class AlgaePhotobioreactorBlockEntity extends BlockEntity
         tag.putDouble("Density", density);
         tag.putDouble("CarbonCharge", carbonCharge);
         tag.putInt("Aeration", aeration);
+        tag.putInt("UreaBoost", ureaBoost);
     }
 
     @Override
@@ -561,6 +575,7 @@ public class AlgaePhotobioreactorBlockEntity extends BlockEntity
         density = tag.contains("Density") ? clampUnit(tag.getDouble("Density")) : 1.0;
         carbonCharge = Math.max(0.0, tag.getDouble("CarbonCharge"));
         aeration = tag.contains("Aeration") ? AlgaeCultureDynamics.clampAeration(tag.getInt("Aeration")) : AlgaeCultureDynamics.RATED_AERATION;
+        ureaBoost = Math.max(0, tag.getInt("UreaBoost"));
     }
 
     private AlgaeGrowthRecipe nextRecipe() {
@@ -594,6 +609,9 @@ public class AlgaePhotobioreactorBlockEntity extends BlockEntity
             return;
         }
         addOutput(effectiveOutput(recipe, stats, true));
+        if (ureaBoost > 0) {
+            ureaBoost--;
+        }
         progress = Math.max(0.0, progress - ticks);
         carbonCharge = Math.max(0.0, carbonCharge - carbon);
         activeWater = FluidStack.EMPTY;
@@ -796,7 +814,7 @@ public class AlgaePhotobioreactorBlockEntity extends BlockEntity
     private final class InputItemHandler implements IItemHandler {
         @Override
         public int getSlots() {
-            return 3;
+            return 4;
         }
 
         @Override
@@ -829,7 +847,8 @@ public class AlgaePhotobioreactorBlockEntity extends BlockEntity
                 case 0 -> SLOT_WATER_INPUT_CONTAINER;
                 case 1 -> SLOT_CARBON_INPUT_CONTAINER;
                 case 2 -> SLOT_OUTPUT;
-                default -> throw new RuntimeException("Slot " + slot + " not in valid range - [0,3)");
+                case 3 -> SLOT_UREA;
+                default -> throw new RuntimeException("Slot " + slot + " not in valid range - [0,4)");
             };
         }
     }

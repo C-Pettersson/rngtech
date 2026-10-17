@@ -7,6 +7,7 @@ import com.rngtech.content.purge.FluidPurgeRole;
 import com.rngtech.content.purge.FluidPurgeTarget;
 import com.rngtech.content.purge.PurgeableFluidStorage;
 import com.rngtech.content.recipe.AmmoniaSynthesisRecipe;
+import com.rngtech.content.recipe.UreaSynthesisRecipe;
 import com.rngtech.content.registry.ModBlockEntities;
 import com.rngtech.content.registry.ModFluids;
 import com.rngtech.rpg.ComponentBaseStatCatalog;
@@ -52,6 +53,7 @@ import java.util.List;
 public class AmmoniaSynthesizerBlockEntity extends BaseMachineBlockEntity
         implements MenuProvider, PurgeableFluidStorage, MachineInfoProvider {
     private final RecipeCache<AmmoniaSynthesisRecipe> recipes = new RecipeCache<>(1);
+    private final RecipeCache<UreaSynthesisRecipe> ureaRecipes = new RecipeCache<>(1);
     public static final int SLOT_CATALYST_BED = 0;
     public static final int GEAR_SLOT_COUNT = 1;
     public static final int STATUS_READY = 0;
@@ -63,6 +65,8 @@ public class AmmoniaSynthesizerBlockEntity extends BaseMachineBlockEntity
     public static final int PURGE_NITROGEN_TANK = 0;
     public static final int PURGE_HYDROGEN_TANK = 1;
     public static final int PURGE_OUTPUT_TANK = 2;
+    public static final int PURGE_CARBON_TANK = 3;
+    public static final int SLOT_UREA = 0;
 
     private static final int TANK_CAPACITY = 8000;
     private static final int DATA_PROGRESS = 0;
@@ -78,6 +82,7 @@ public class AmmoniaSynthesizerBlockEntity extends BaseMachineBlockEntity
     private static final int DATA_ENERGY_TRANSFER = 10;
     private static final int DATA_PROCESSING_SPEED = 11;
     private static final int DATA_REFINEMENT_POTENTIAL = 12;
+    private static final int DATA_CARBON = 13;
     private static final int STAT_SCALE = 100;
     private static final int VISUAL_SYNC_INTERVAL = 5;
 
@@ -109,8 +114,21 @@ public class AmmoniaSynthesizerBlockEntity extends BaseMachineBlockEntity
     private final FluidTank nitrogenTank = tank(ModFluids.NITROGEN_SOURCE.get());
     private final FluidTank hydrogenTank = tank(ModFluids.HYDROGEN_SOURCE.get());
     private final FluidTank outputTank = tank(ModFluids.AMMONIA_SOURCE.get());
+    private final FluidTank carbonTank = tank(ModFluids.CARBON_EXHAUST_SOURCE.get());
+    /** Urea from the second recipe. Players and automation only take from it. */
+    private final ItemStackHandler ureaOutput = new ItemStackHandler(1) {
+        @Override
+        public boolean isItemValid(int slot, ItemStack stack) {
+            return false;
+        }
+
+        @Override
+        protected void onContentsChanged(int slot) {
+            setChanged();
+        }
+    };
+    private final IItemHandler ureaExtractor = new UreaExtractHandler();
     private final IFluidHandler fluidHandler = new SynthesisFluidHandler();
-    private final IItemHandler emptyItemHandler = new EmptyItemHandler();
     private final ContainerData menuData = new ContainerData() {
         @Override
         public int get(int index) {
@@ -129,6 +147,7 @@ public class AmmoniaSynthesizerBlockEntity extends BaseMachineBlockEntity
                 case DATA_ENERGY_TRANSFER -> scaledStat(stats, MachineStat.ENERGY_TRANSFER);
                 case DATA_PROCESSING_SPEED -> scaledStat(stats, MachineStat.PROCESSING_SPEED);
                 case DATA_REFINEMENT_POTENTIAL -> scaledStat(stats, MachineStat.REFINEMENT_POTENTIAL);
+                case DATA_CARBON -> carbonTank.getFluidAmount();
                 default -> 0;
             };
         }
@@ -139,11 +158,13 @@ public class AmmoniaSynthesizerBlockEntity extends BaseMachineBlockEntity
 
         @Override
         public int getCount() {
-            return DATA_REFINEMENT_POTENTIAL + 1;
+            return DATA_CARBON + 1;
         }
     };
 
     private int progress;
+    /** Whether the running cycle makes Urea; switching recipes restarts the cycle. */
+    private boolean ureaCycle;
     private int activeTicks;
     private int activeEnergy;
     private AmmoniaSynthesizerVisualState visualState = AmmoniaSynthesizerVisualState.IDLE;
@@ -233,6 +254,10 @@ public class AmmoniaSynthesizerBlockEntity extends BaseMachineBlockEntity
         return gearInventory;
     }
 
+    public ItemStackHandler getUreaOutput() {
+        return ureaOutput;
+    }
+
     public ContainerData getMenuData() {
         return menuData;
     }
@@ -273,7 +298,16 @@ public class AmmoniaSynthesizerBlockEntity extends BaseMachineBlockEntity
                         outputTank::getFluid,
                         outputTank::drain,
                         this::setChanged
-                ).withCapacity(outputTank::getCapacity)
+                ).withCapacity(outputTank::getCapacity),
+                FluidPurgeTarget.of(
+                        PURGE_CARBON_TANK,
+                        Component.translatable("rngtech.purge.target.carbon_tank"),
+                        FluidPurgeRole.INPUT,
+                        carbonTank::getFluid,
+                        carbonTank::drain,
+                        this::clearActiveRecipe,
+                        this::setChanged
+                ).withCapacity(carbonTank::getCapacity)
         );
     }
 
@@ -323,7 +357,7 @@ public class AmmoniaSynthesizerBlockEntity extends BaseMachineBlockEntity
 
     @Override
     public IItemHandler getItemHandler(Direction side) {
-        return side == Direction.UP || side == null ? gearInventory : emptyItemHandler;
+        return side == Direction.UP || side == null ? gearInventory : ureaExtractor;
     }
 
     @Override
@@ -349,6 +383,7 @@ public class AmmoniaSynthesizerBlockEntity extends BaseMachineBlockEntity
 
     public void dropInventory(Level level) {
         dropSlot(level, gearInventory, SLOT_CATALYST_BED);
+        dropSlot(level, ureaOutput, SLOT_UREA);
         dropRefinementInventory(level);
     }
 
@@ -362,7 +397,18 @@ public class AmmoniaSynthesizerBlockEntity extends BaseMachineBlockEntity
         return activeTicks <= 0 ? 0.0F : Mth.clamp((float) progress / (float) activeTicks, 0.0F, 1.0F);
     }
 
+    /** Urea runs whenever its inputs and output room allow, using Ammonia from the output tank; otherwise Ammonia. */
     private boolean tickRecipe() {
+        UreaSynthesisRecipe urea = currentUreaRecipe();
+        if (urea != null && canRunUrea(urea)) {
+            return runCycle(true, urea.processingTicks(), urea.energy(), () -> {
+                outputTank.drain(urea.ammoniaInput().amount(), IFluidHandler.FluidAction.EXECUTE);
+                carbonTank.drain(urea.carbonInput().amount(), IFluidHandler.FluidAction.EXECUTE);
+                ItemStack made = urea.resultStack();
+                ItemStack held = ureaOutput.getStackInSlot(SLOT_UREA);
+                ureaOutput.setStackInSlot(SLOT_UREA, held.isEmpty() ? made : held.copyWithCount(held.getCount() + made.getCount()));
+            });
+        }
         AmmoniaSynthesisRecipe recipe = currentRecipe();
         if (recipe == null || !canRun(recipe)) {
             progress = 0;
@@ -370,8 +416,20 @@ public class AmmoniaSynthesizerBlockEntity extends BaseMachineBlockEntity
             activeEnergy = recipe == null ? 0 : recipe.energy();
             return false;
         }
-        activeTicks = adjustedTicks(recipe);
-        activeEnergy = adjustedEnergy(recipe);
+        return runCycle(false, recipe.processingTicks(), recipe.energy(), () -> {
+            nitrogenTank.drain(recipe.nitrogenInput().amount(), IFluidHandler.FluidAction.EXECUTE);
+            hydrogenTank.drain(recipe.hydrogenInput().amount(), IFluidHandler.FluidAction.EXECUTE);
+            outputTank.fill(recipe.outputFluid(), IFluidHandler.FluidAction.EXECUTE);
+        });
+    }
+
+    private boolean runCycle(boolean urea, int ticks, int energy, Runnable complete) {
+        if (urea != ureaCycle) {
+            ureaCycle = urea;
+            progress = 0;
+        }
+        activeTicks = adjustedTicks(ticks);
+        activeEnergy = adjustedEnergy(energy);
         int cost = Math.max(1, Mth.ceil(activeEnergy / (double) activeTicks));
         if (energyStorage.consumeEnergy(cost, true) < cost) {
             return false;
@@ -379,12 +437,31 @@ public class AmmoniaSynthesizerBlockEntity extends BaseMachineBlockEntity
         energyStorage.consumeEnergy(cost, false);
         progress++;
         if (progress >= activeTicks) {
-            nitrogenTank.drain(recipe.nitrogenInput().amount(), IFluidHandler.FluidAction.EXECUTE);
-            hydrogenTank.drain(recipe.hydrogenInput().amount(), IFluidHandler.FluidAction.EXECUTE);
-            outputTank.fill(recipe.outputFluid(), IFluidHandler.FluidAction.EXECUTE);
+            complete.run();
             progress = 0;
         }
         return true;
+    }
+
+    private UreaSynthesisRecipe currentUreaRecipe() {
+        if (level == null) {
+            return null;
+        }
+        ItemStack catalyst = catalystStack();
+        FluidStack ammonia = outputTank.getFluid();
+        FluidStack carbon = carbonTank.getFluid();
+        return ureaRecipes.lookup(0, level).item(catalyst).fluid(ammonia).fluid(carbon)
+                .find(() -> AmmoniaRecipes.urea(level, catalyst, ammonia, carbon));
+    }
+
+    private boolean canRunUrea(UreaSynthesisRecipe recipe) {
+        ItemStack held = ureaOutput.getStackInSlot(SLOT_UREA);
+        ItemStack made = recipe.resultStack();
+        return catalystStage() >= recipe.minimumCatalystStage()
+                && outputTank.getFluidAmount() >= recipe.ammoniaInput().amount()
+                && carbonTank.getFluidAmount() >= recipe.carbonInput().amount()
+                && (held.isEmpty() || ItemStack.isSameItemSameComponents(held, made)
+                        && held.getCount() + made.getCount() <= held.getMaxStackSize());
     }
 
     private AmmoniaSynthesisRecipe currentRecipe() {
@@ -420,6 +497,11 @@ public class AmmoniaSynthesizerBlockEntity extends BaseMachineBlockEntity
         if (!isCatalystBed(catalystStack())) {
             return STATUS_MISSING_CATALYST;
         }
+        UreaSynthesisRecipe urea = currentUreaRecipe();
+        if (urea != null && canRunUrea(urea)) {
+            int cost = Math.max(1, Mth.ceil(adjustedEnergy(urea.energy()) / (double) adjustedTicks(urea.processingTicks())));
+            return energyStorage.getEnergyStored() < cost ? STATUS_NO_POWER : STATUS_READY;
+        }
         if (nitrogenTank.isEmpty() || hydrogenTank.isEmpty()) {
             return STATUS_NO_FLUID;
         }
@@ -446,11 +528,19 @@ public class AmmoniaSynthesizerBlockEntity extends BaseMachineBlockEntity
     }
 
     private int adjustedTicks(AmmoniaSynthesisRecipe recipe) {
-        return Math.max(1, Mth.ceil(recipe.processingTicks() / effectiveStats().value(MachineStat.PROCESSING_SPEED)));
+        return adjustedTicks(recipe.processingTicks());
     }
 
     private int adjustedEnergy(AmmoniaSynthesisRecipe recipe) {
-        return Math.max(1, Mth.ceil(recipe.energy() * effectiveStats().value(MachineStat.ENERGY_USAGE)));
+        return adjustedEnergy(recipe.energy());
+    }
+
+    private int adjustedTicks(int ticks) {
+        return Math.max(1, Mth.ceil(ticks / effectiveStats().value(MachineStat.PROCESSING_SPEED)));
+    }
+
+    private int adjustedEnergy(int energy) {
+        return Math.max(1, Mth.ceil(energy * effectiveStats().value(MachineStat.ENERGY_USAGE)));
     }
 
     private int internalEnergyCapacity() {
@@ -522,6 +612,9 @@ public class AmmoniaSynthesizerBlockEntity extends BaseMachineBlockEntity
         tag.put("NitrogenTank", nitrogenTank.writeToNBT(registries, new CompoundTag()));
         tag.put("HydrogenTank", hydrogenTank.writeToNBT(registries, new CompoundTag()));
         tag.put("OutputTank", outputTank.writeToNBT(registries, new CompoundTag()));
+        tag.put("CarbonTank", carbonTank.writeToNBT(registries, new CompoundTag()));
+        tag.put("UreaOutput", ureaOutput.serializeNBT(registries));
+        tag.putBoolean("UreaCycle", ureaCycle);
         tag.putInt("Progress", progress);
         tag.putInt("ActiveTicks", activeTicks);
         tag.putInt("ActiveEnergy", activeEnergy);
@@ -535,6 +628,12 @@ public class AmmoniaSynthesizerBlockEntity extends BaseMachineBlockEntity
         nitrogenTank.readFromNBT(registries, tag.getCompound("NitrogenTank"));
         hydrogenTank.readFromNBT(registries, tag.getCompound("HydrogenTank"));
         outputTank.readFromNBT(registries, tag.getCompound("OutputTank"));
+        carbonTank.setFluid(FluidStack.EMPTY);
+        carbonTank.readFromNBT(registries, tag.getCompound("CarbonTank"));
+        if (tag.contains("UreaOutput")) {
+            ureaOutput.deserializeNBT(registries, tag.getCompound("UreaOutput"));
+        }
+        ureaCycle = tag.getBoolean("UreaCycle");
         progress = tag.getInt("Progress");
         activeTicks = tag.getInt("ActiveTicks");
         activeEnergy = tag.getInt("ActiveEnergy");
@@ -551,7 +650,7 @@ public class AmmoniaSynthesizerBlockEntity extends BaseMachineBlockEntity
     private final class SynthesisFluidHandler implements IFluidHandler {
         @Override
         public int getTanks() {
-            return 3;
+            return 4;
         }
 
         @Override
@@ -560,6 +659,7 @@ public class AmmoniaSynthesizerBlockEntity extends BaseMachineBlockEntity
                 case 0 -> nitrogenTank.getFluid();
                 case 1 -> hydrogenTank.getFluid();
                 case 2 -> outputTank.getFluid();
+                case 3 -> carbonTank.getFluid();
                 default -> FluidStack.EMPTY;
             };
         }
@@ -574,6 +674,8 @@ public class AmmoniaSynthesizerBlockEntity extends BaseMachineBlockEntity
             return switch (tank) {
                 case 0 -> nitrogenTank.isFluidValid(stack);
                 case 1 -> hydrogenTank.isFluidValid(stack);
+                case 2 -> outputTank.isFluidValid(stack);
+                case 3 -> carbonTank.isFluidValid(stack);
                 default -> false;
             };
         }
@@ -589,6 +691,13 @@ public class AmmoniaSynthesizerBlockEntity extends BaseMachineBlockEntity
             if (hydrogenTank.isFluidValid(resource)) {
                 return hydrogenTank.fill(resource, action);
             }
+            if (carbonTank.isFluidValid(resource)) {
+                return carbonTank.fill(resource, action);
+            }
+            // Ammonia piped in feeds the Urea recipe on a synthesizer without its own Nitrogen and Hydrogen.
+            if (outputTank.isFluidValid(resource)) {
+                return outputTank.fill(resource, action);
+            }
             return 0;
         }
 
@@ -603,15 +712,16 @@ public class AmmoniaSynthesizerBlockEntity extends BaseMachineBlockEntity
         }
     }
 
-    private static final class EmptyItemHandler implements IItemHandler {
+    /** Sides other than the top only take Urea out. */
+    private final class UreaExtractHandler implements IItemHandler {
         @Override
         public int getSlots() {
-            return 0;
+            return 1;
         }
 
         @Override
         public ItemStack getStackInSlot(int slot) {
-            return ItemStack.EMPTY;
+            return ureaOutput.getStackInSlot(SLOT_UREA);
         }
 
         @Override
@@ -621,12 +731,12 @@ public class AmmoniaSynthesizerBlockEntity extends BaseMachineBlockEntity
 
         @Override
         public ItemStack extractItem(int slot, int amount, boolean simulate) {
-            return ItemStack.EMPTY;
+            return ureaOutput.extractItem(SLOT_UREA, amount, simulate);
         }
 
         @Override
         public int getSlotLimit(int slot) {
-            return 0;
+            return 64;
         }
 
         @Override
@@ -634,4 +744,5 @@ public class AmmoniaSynthesizerBlockEntity extends BaseMachineBlockEntity
             return false;
         }
     }
+
 }

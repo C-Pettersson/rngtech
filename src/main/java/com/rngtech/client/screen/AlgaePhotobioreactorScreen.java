@@ -63,6 +63,7 @@ public class AlgaePhotobioreactorScreen extends AbstractContainerScreen<AlgaePho
     private static final int TAB_SPACING = 56;
     private static final int OUTPUT_X = 138;
     private static final int OUTPUT_Y = 65;
+    private static final int UREA_X = 162;
     private static final int WATER_INPUT_X = 8;
     private static final int WATER_OUTPUT_X = 30;
     private static final int WATER_CONTAINER_Y = 65;
@@ -212,6 +213,7 @@ public class AlgaePhotobioreactorScreen extends AbstractContainerScreen<AlgaePho
     private void renderSlotFrames(GuiGraphics guiGraphics) {
         if (menu.selectedTab() == AlgaePhotobioreactorMenu.TAB_PROCESSING) {
             renderSlotFrame(guiGraphics, OUTPUT_X, OUTPUT_Y);
+            renderSlotFrame(guiGraphics, UREA_X, OUTPUT_Y);
             renderSlotFrame(guiGraphics, WATER_INPUT_X, WATER_CONTAINER_Y);
             renderSlotFrame(guiGraphics, WATER_OUTPUT_X, WATER_CONTAINER_Y);
             renderSlotFrame(guiGraphics, CARBON_INPUT_X, CARBON_CONTAINER_Y);
@@ -412,6 +414,13 @@ public class AlgaePhotobioreactorScreen extends AbstractContainerScreen<AlgaePho
         }
         if (isHovering(CULTURE_X, CULTURE_Y, CULTURE_WIDTH, STATUS_SIZE, mouseX, mouseY)) {
             guiGraphics.renderComponentTooltip(font, cultureTooltip(), mouseX, mouseY);
+            return;
+        }
+        if (hoveredSlot != null && !hoveredSlot.hasItem() && isHovering(UREA_X + 1, OUTPUT_Y + 1, 16, 16, mouseX, mouseY)) {
+            guiGraphics.renderComponentTooltip(font, List.of(
+                    Component.translatable("rngtech.algae_photobioreactor.urea.hint", AlgaePhotobioreactorBlockEntity.UREA_BOOSTED_HARVESTS),
+                    Component.translatable("rngtech.algae_photobioreactor.urea.boost", menu.ureaBoost())
+            ), mouseX, mouseY);
             return;
         }
         CompactValueText.renderTooltipIfHovered(

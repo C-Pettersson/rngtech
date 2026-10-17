@@ -10,6 +10,7 @@ import com.rngtech.content.item.GearParts;
 import com.rngtech.content.item.ModularToolItem;
 import com.rngtech.content.item.PruningShearsItem;
 import com.rngtech.content.item.SoulTransferItem;
+import com.rngtech.content.item.UreaItem;
 import com.rngtech.content.loot.ChallengeContext;
 import com.rngtech.content.loot.ChallengeLoot;
 import com.rngtech.content.menu.ForestryCartMenu;
@@ -227,7 +228,7 @@ public class ForestryCartEntity extends AbstractMinecart implements MenuProvider
         @Override
         public ItemStack insertItem(int slot, ItemStack stack, boolean simulate) {
             if (slot >= SAPLING_SLOT_START && slot < OUTPUT_SLOT_START && isFertilizerStack(stack)) {
-                return stack.copyWithCount(stack.getCount() - storeFertilizer(stack.getCount(), simulate));
+                return stack.copyWithCount(stack.getCount() - storeFertilizerItems(stack, simulate));
             }
             return super.insertItem(slot, stack, simulate);
         }
@@ -2474,7 +2475,17 @@ public class ForestryCartEntity extends AbstractMinecart implements MenuProvider
     }
 
     public static boolean isFertilizerStack(ItemStack stack) {
-        return stack.is(Items.BONE_MEAL);
+        return stack.is(Items.BONE_MEAL) || stack.is(ModItems.UREA.get());
+    }
+
+    /** Bone meal one item adds to a fertilizer store: one for bone meal, four for Urea. */
+    public static int fertilizerUnits(ItemStack stack) {
+        return stack.is(ModItems.UREA.get()) ? UreaItem.FERTILIZER_UNITS : 1;
+    }
+
+    /** Whole items of {@code stack} that fit a store with {@code room} bone meal left. */
+    public static int fertilizerItemsFitting(ItemStack stack, int room) {
+        return Math.max(0, Math.min(stack.getCount(), room / fertilizerUnits(stack)));
     }
 
     /** Only a Grove Warden stores bone meal. */
@@ -2502,12 +2513,24 @@ public class ForestryCartEntity extends AbstractMinecart implements MenuProvider
         return accepted;
     }
 
-    /** Bone meal a player placed in a supply slot moves into the fertilizer store. */
+    /** Stores whole fertilizer items and returns how many it took. */
+    private int storeFertilizerItems(ItemStack stack, boolean simulate) {
+        if (!acceptsFertilizer()) {
+            return 0;
+        }
+        int items = fertilizerItemsFitting(stack, FERTILIZER_CAPACITY - fertilizer);
+        if (!simulate) {
+            fertilizer += items * fertilizerUnits(stack);
+        }
+        return items;
+    }
+
+    /** Bone meal or Urea a player placed in a supply slot moves into the fertilizer store. */
     private void absorbSuppliedFertilizer() {
         for (int slot = SAPLING_SLOT_START; slot < OUTPUT_SLOT_START; slot++) {
             ItemStack stack = cargoInventory.getStackInSlot(slot);
             if (isFertilizerStack(stack)) {
-                int accepted = storeFertilizer(stack.getCount(), false);
+                int accepted = storeFertilizerItems(stack, false);
                 if (accepted > 0) {
                     cargoInventory.extractItem(slot, accepted, false);
                 }

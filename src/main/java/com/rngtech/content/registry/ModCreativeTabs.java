@@ -204,6 +204,7 @@ public final class ModCreativeTabs {
                         output.accept(ModItems.RICH_BIOMASS.get());
                         output.accept(ModItems.ALGAE_BIOMASS.get());
                         output.accept(ModItems.DENSE_ALGAE_BIOMASS.get());
+                        output.accept(ModItems.UREA.get());
                         for (ResonanceCalibratorChassis chassis : ResonanceCalibratorChassis.values()) {
                             output.accept(ModItems.resonanceCalibrator(chassis).get());
                         }

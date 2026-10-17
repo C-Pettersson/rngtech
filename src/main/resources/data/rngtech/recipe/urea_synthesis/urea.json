@@ -1,0 +1,26 @@
+{
+  "type": "rngtech:urea_synthesis",
+  "group": "urea_synthesis",
+  "catalyst": {
+    "item": "rngtech:ammonia_catalyst_bed"
+  },
+  "ammonia_input": {
+    "ingredient": {
+      "fluid": "rngtech:ammonia"
+    },
+    "amount": 250
+  },
+  "carbon_input": {
+    "ingredient": {
+      "fluid": "rngtech:carbon_exhaust"
+    },
+    "amount": 250
+  },
+  "result": {
+    "id": "rngtech:urea",
+    "count": 1
+  },
+  "energy": 3000,
+  "processing_ticks": 120,
+  "minimum_catalyst_stage": 6
+}

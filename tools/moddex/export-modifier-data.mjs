@@ -2163,6 +2163,13 @@ function normalizeRecipeInputs(json) {
                 ...normalizeSizedFluidIngredient(json.nitrogen_input, { role: "fluid", note: "Nitrogen input" }),
                 ...normalizeSizedFluidIngredient(json.hydrogen_input, { role: "fluid", note: "Hydrogen input" })
             ];
+        case "rngtech:urea_synthesis":
+            return [
+                ...machineInput("rngtech:ammonia_synthesizer", "Ammonia Synthesizer"),
+                ...normalizeIngredient(json.catalyst, 1, { reusable: true, role: "gear", note: "Catalyst Bed" }),
+                ...normalizeSizedFluidIngredient(json.ammonia_input, { role: "fluid", note: "Ammonia input" }),
+                ...normalizeSizedFluidIngredient(json.carbon_input, { role: "fluid", note: "Carbon Exhaust input" })
+            ];
         case "rngtech:gas_reforming":
             return [
                 ...machineInput("rngtech:steam_methane_reformer", "Steam Methane Reformer"),

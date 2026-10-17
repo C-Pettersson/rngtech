@@ -24,9 +24,9 @@ class Machine:
 # Keyed by one block id per machine; any other id listed on the same wiki page resolves to it.
 # `fuel_tags`, `takes`, and `makes` cover inputs and outputs that live in Java rather than recipe JSON.
 MACHINES: dict[str, Machine] = {
-    "rngtech:algae_photobioreactor": Machine(("rngtech:algae_growth",)),
+    "rngtech:algae_photobioreactor": Machine(("rngtech:algae_growth",), takes=("rngtech:urea",)),
     "rngtech:ammonia_fuel_cell": Machine(("rngtech:ammonia_power_cycle",)),
-    "rngtech:ammonia_synthesizer": Machine(("rngtech:ammonia_synthesis",)),
+    "rngtech:ammonia_synthesizer": Machine(("rngtech:ammonia_synthesis", "rngtech:urea_synthesis")),
     "rngtech:battery_assembler": Machine(("rngtech:battery_assembly",)),
     "rngtech:bio_generator": Machine(fuel_tags=(
         "rngtech:bio_generator/potato_fuels",

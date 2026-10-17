@@ -21,6 +21,7 @@ import com.rngtech.content.recipe.MelterRecipe;
 import com.rngtech.content.recipe.MetalPressRecipe;
 import com.rngtech.content.recipe.MinersCompanionRecoveryRecipe;
 import com.rngtech.content.recipe.PotentialReactorRecipe;
+import com.rngtech.content.recipe.UreaSynthesisRecipe;
 import com.rngtech.content.recipe.VacuumCollapseRecipe;
 import com.rngtech.content.recipe.WoodenDehumidifierConversionRecipe;
 
@@ -70,6 +71,8 @@ final class JeiRecipeTypes {
             RecipeType.createRecipeHolderType(RNGTech.id("gas_reforming"));
     static final RecipeType<RecipeHolder<AmmoniaSynthesisRecipe>> AMMONIA_SYNTHESIS =
             RecipeType.createRecipeHolderType(RNGTech.id("ammonia_synthesis"));
+    static final RecipeType<RecipeHolder<UreaSynthesisRecipe>> UREA_SYNTHESIS =
+            RecipeType.createRecipeHolderType(RNGTech.id("urea_synthesis"));
     static final RecipeType<RecipeHolder<AmmoniaPowerCycleRecipe>> AMMONIA_POWER_CYCLE =
             RecipeType.createRecipeHolderType(RNGTech.id("ammonia_power_cycle"));
     static final RecipeType<RecipeHolder<CavitationRecipe>> CAVITATION =

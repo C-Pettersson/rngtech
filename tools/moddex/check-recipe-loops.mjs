@@ -29,7 +29,7 @@ const FE_PRODUCERS = new Set([
 const FE_CONSUMERS = new Set([
     "rngtech:crusher", "rngtech:furnace", "rngtech:alloy_furnace", "rngtech:metal_press", "rngtech:melter",
     "rngtech:calibration", "rngtech:component_recycling", "rngtech:battery_assembly",
-    "rngtech:coal_gasification", "rngtech:gas_reforming", "rngtech:ammonia_synthesis"
+    "rngtech:coal_gasification", "rngtech:gas_reforming", "rngtech:ammonia_synthesis", "rngtech:urea_synthesis"
 ]);
 const PASSIVE = new Set(["rngtech:algae_growth", "rngtech:desiccant_absorption", "rngtech:wooden_dehumidifier_conversion"]);
 /** Code-defined recipes: their item conversions are listed in specialReactions(), or they transform no items. */
@@ -39,7 +39,11 @@ const INPUT_KEYS = [
     "carbon_input", "dry_input", "fluid_input", "water_input", "gas_input", "nitrogen_input", "hydrogen_input", "ammonia_input"
 ];
 /** Catalyst beds are installed Gear for these types, not consumed inputs. */
-const REUSABLE_KEYS = new Map([["rngtech:ammonia_synthesis", new Set(["catalyst"])], ["rngtech:gas_reforming", new Set(["catalyst"])]]);
+const REUSABLE_KEYS = new Map([
+    ["rngtech:ammonia_synthesis", new Set(["catalyst"])],
+    ["rngtech:urea_synthesis", new Set(["catalyst"])],
+    ["rngtech:gas_reforming", new Set(["catalyst"])]
+]);
 const OUTPUT_KEYS = [
     "result", "outputs", "output", "fluid_output", "residue", "saturated_output",
     "water_output", "exhaust_output", "hydrogen_output", "carbon_monoxide_output", "byproduct_output"
