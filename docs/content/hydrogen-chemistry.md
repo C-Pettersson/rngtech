@@ -15,7 +15,7 @@ Hydrogen has one sink today: the Ammonia Synthesizer. This package gives the Sta
 | [Water-gas shift](#water-gas-shift) | More Hydrogen | CO stops feeding algae at the fast rate | Closed carbon loop or more Hydrogen |
 | [Urea](#urea) | Fertilizer | Ammonia and Carbon Exhaust | Power now or biomass later |
 | [Urea fertilizer](#urea-fertilizer) | Faster algae and sapling growth | Urea | Build space instead of power |
-| [Hydrogen annealing](#hydrogen-annealing) | Lucky RP on Gear, lucky calibration stability | Hydrogen per pressed item | Power, refinement budget, or calibration odds |
+| [Hydrogen annealing](#hydrogen-annealing) | Lucky RP on Gear, lucky calibration stability | Hydrogen per pressed item, and a Metal Press ascendancy notable | Power, refinement budget, or calibration odds |
 | [Hydrogen in the Fuel Cell](#hydrogen-in-the-fuel-cell) | FE without Nitrogen | Less than half the FE of the Ammonia route | A short chain or the full chain |
 
 It extends the [Nitrogen atmosphere](https://c-pettersson.github.io/rngtech/heat/#nitrogen-atmosphere), which already gives Nitrogen a second sink.
@@ -65,10 +65,25 @@ In the Photobioreactor, the target is that one Urea saves about one Photobioreac
 
 ### Hydrogen annealing
 
+Annealing is an ascendancy feature of the Metal Press. Each of its two ascendancies gets one annealing notable, and each anneals a different thing:
+
+| Ascendancy | New branch | Anneals | Payoff |
+|---|---|---|---|
+| **Die Keeper** | Mold Rack → Purge Line → **Bright Anneal** | Basic Electric Circuits | Lucky calibration stability |
+| **Drop Forge** | Drop Hammer → Quench Line → **Hydrogen Quench** | Plates | Lucky RP on Gear |
+
+- Each notable is the third node on its branch (Root, Small, Notable), so it costs 3 ascendancy points and needs **Seal II**. Ascendancies need a Stage 4 machine, so annealing is a Steel Metal Press feature; the Crude press cannot ascend.
+- The small nodes are ordinary stat steps, for example Purge Line 8% increased Stability and Quench Line 8% increased Processing Speed. Their exact stats follow the tree's balance pass.
+- Neither notable has a downside. The Hydrogen it spends is the trade, as with other behavior-only nodes.
+
 The Metal Press atmosphere tank takes **one gas at a time**:
 
 - **Nitrogen**: the shipped Nitrogen atmosphere, 15% increased Overheat Tolerance with Blast Draft.
-- **Hydrogen**: whatever the press presses comes out **Annealed**. It costs **250 mB Hydrogen per item**, spent when the item finishes, and needs no keystone.
+- **Hydrogen**: only on a press with Bright Anneal or Hydrogen Quench allocated. What that notable anneals comes out **Annealed**, for **250 mB Hydrogen per item**, spent when the item finishes.
+
+Without either notable, the tank stays Nitrogen-only exactly as it ships: it refuses Hydrogen, and the press shows no annealing hover, JEI note, or Hydrogen gauge text. Players who never take the branch never see annealing on their presses.
+
+A press picks one role. A circuit annealer feeds a calibration line; a plate annealer feeds Gear crafting. Doing both takes two Steel presses with their own Seals, so the choice is a real investment rather than a toggle.
 
 An Annealed item carries the `rngtech:annealed` data component, shows "Annealed" in its tooltip, and does not stack with plain copies. Every recipe that takes the plain item also takes the Annealed one. What annealing does depends on what was pressed:
 
@@ -79,7 +94,9 @@ An Annealed item carries the `rngtech:annealed` data component, shows "Annealed"
 
 The choice is what to anneal. Hydrogen spent on plates buys bigger refinement budgets on Gear; Hydrogen spent on circuits buys reliable high-stability Calibrated Logic Components, which gate Advanced and Elite blanks, Ascendancy Seals, and the Soul Transfer's success chance.
 
-Only items with a payoff spend Hydrogen. Molds that make gears, casings, connectors, or Advanced and higher circuits press normally and leave the tank alone, so nothing drains for no effect. JEI and the press's hover say which outputs can be Annealed.
+Only the outputs the press's notable anneals spend Hydrogen. Everything else, including gears, casings, connectors, Advanced and higher circuits, and the other notable's items, presses normally and leaves the tank alone, so nothing drains for no effect. On an annealing press, JEI and the press's hover say which outputs it anneals.
+
+**Drop Forge batching.** Hydrogen Quench anneals every plate in a batch, at 250 mB each, so a 6-plate batch spends 1,500 mB per cycle. Batching makes a plate annealer fast and hungry, and the gauge shows it.
 
 #### Annealed plates: lucky RP
 
@@ -95,12 +112,14 @@ At 250 mB per plate, a 4-plate Battery Cell costs 1,000 mB Hydrogen, about 136,0
 
 A Calibration recipe whose input is an Annealed Basic Electric Circuit rolls its stability twice in the recipe's range and keeps the higher roll, before the Calibrator's Control Board, Stabilizer Matrix, and chassis improve it as usual. The plain recipe's 35–75 range then reaches the Advanced blank's 55 about three times in four instead of about half the time. The resonant recipe benefits the same way.
 
+**Production Die tension.** Die Keeper's Production Die makes circuits 25% slower. A circuit annealer that also takes it gives up throughput; that is a deliberate trade inside the ascendancy, not a conflict.
+
 Annealed and plain circuits never share a stack, so every copy in one multi-lane cycle is either Annealed or not, and the shared roll stays well defined.
 
 Risks to watch in playtest:
 
 - **Soul Transfer.** Its success chance is the recorded stability, so annealing makes transfers safer. That is acceptable because it is paid in Stage 6 output, but it is the main lever to watch.
-- **Calibrator keystones.** Annealing overlaps with **Second Pass** (a calibration under 40 is re-run once) and **Master Harmonic** (every 8th calibration at the full streak comes out at 100). Both still stack with it, since annealing works per circuit and the keystones per machine, but each becomes a little less special.
+- **Calibrator ascendancy nodes.** Annealing overlaps with **Second Pass** (a calibration under 40 is re-run once) and **Master Harmonic** (every 8th calibration at the full streak comes out at 100). Both still stack with it, since annealing works per circuit and those nodes per machine, but each becomes a little less special.
 - **Volatile Catalyst.** It needs *low* stability (20–35), but it comes from a Kinetic Sparksteel Gear calibration, not a circuit, so annealing never touches it.
 - **Diamond crystals.** The Stage 6 Calibrated Diamond Crystal is not pressed, so the Ultimate blank's 85 gate stays as hard as it is today.
 
@@ -119,7 +138,8 @@ Planned runtime surface:
 - Item: `rngtech:urea`, no traits, tagged with bone meal behavior through a dispenser and use-on-block handler.
 - Data component: `rngtech:annealed` (unit) on plates, Basic Electric Circuits, and Unidentified Gear.
 - Recipes: `gas_reforming` CO shift, `ammonia_synthesis` Urea (or a new recipe type, see below), `ammonia_power_cycle` Hydrogen.
-- Metal Press: the shipped `InertAtmosphere` tank accepts Nitrogen or Hydrogen; Hydrogen marks pressed plates and Basic Electric Circuits and is spent only on those outputs.
+- Metal Press: the shipped `InertAtmosphere` tank accepts Hydrogen only while Bright Anneal or Hydrogen Quench is allocated, and Nitrogen as today. Hydrogen marks Basic Electric Circuits (Bright Anneal) or plates (Hydrogen Quench) and is spent only on those outputs.
+- Ascendancies: two new branches in the Metal Press ascendancy catalog, Die Keeper's Purge Line → Bright Anneal and Drop Forge's Quench Line → Hydrogen Quench, with behavior ids read by the press.
 - Crafting: a hook that marks a trait-rolling result Annealed when every plate ingredient is Annealed, and an RP roll hook that rolls twice and keeps the higher for Annealed items.
 - Resonance Calibrator: a stability roll hook that rolls twice and keeps the higher when the input is Annealed.
 - Forestry Companion and station: Urea in the bone meal accept lists, worth 4 store units.
@@ -130,7 +150,7 @@ Implementation checks:
 
 - `masteryCheck`: Annealed RP and Annealed calibration stability stay inside their ranges and their means match the best-of-two expectation; affix tiers and rarity odds are unchanged.
 - Energy balance simulation: no route from Urea back to Hydrogen returns more than its Ammonia cost; the Fuel Cell's Hydrogen recipe loses to the Ammonia route per mB.
-- GameTests: a Hydrogen-fed Metal Press makes Annealed plates and circuits and drains 250 mB each; a gear-mold press leaves the tank alone; a fully Annealed recipe marks its result; a mixed recipe does not; an Annealed circuit calibrates with the best of two rolls; Urea loads into the Companion store as 4.
+- GameTests: a press without either notable refuses Hydrogen; a Bright Anneal press anneals circuits but not plates, and a Hydrogen Quench press the reverse, each draining 250 mB per item; a gear-mold press leaves the tank alone; a Drop Forge batch spends Hydrogen per plate; a fully Annealed recipe marks its result; a mixed recipe does not; an Annealed circuit calibrates with the best of two rolls; Urea loads into the Companion store as 4.
 
 ## Modifier Eligibility
 
@@ -146,7 +166,8 @@ Status: Planned
 | Urea recipe | 250 mB Ammonia + 250 mB Carbon Exhaust → 1 Urea | 54,000 FE of Ammonia per Urea. |
 | Urea in the Companion store | 4 bone meal | Store cap stays 256. |
 | Urea in the Photobioreactor | 2× growth for 4 biomass | Must not return more H₂ than it cost. |
-| Annealing cost | 250 mB H₂ per pressed plate or Basic circuit | About 34,000 FE of Ammonia each. Other outputs spend nothing. |
+| Annealing gate | Bright Anneal (Die Keeper) or Hydrogen Quench (Drop Forge) | Third node on its branch: 3 points, Seal II. |
+| Annealing cost | 250 mB H₂ per annealed item | About 34,000 FE of Ammonia each. Other outputs spend nothing. |
 | Annealed plate bonus | Gear RP rolled twice, higher kept | Same stage range; tiers and rarity unchanged. |
 | Annealed circuit bonus | Calibration stability rolled twice, higher kept | 55+ from the plain recipe goes from about 51% to 76%. |
 | Fuel Cell on Hydrogen | About 60 FE per mB | Ammonia route is about 136 FE per mB. |
@@ -159,6 +180,7 @@ Status: Planned
 - **Stronger annealing.** If best-of-two RP proves too small to matter, best-of-three, or a natural tier one higher, are the next steps up. Circuit stability may need the opposite: if Soul Transfers or Elite blanks become routine, a smaller bonus such as a stability floor.
 - **Intermediates.** Whether Annealed should carry through Machine Frames into staged machine bodies, which would make annealing reach machines as well as Gear.
 - **Pack config.** Whether pack makers can turn annealing off or change its bonus, as they can for Unique sources.
+- **Small-node stats.** Purge Line and Quench Line need stats that fit their ascendancy without doubling an existing node.
 
 ## Related Pages
 
