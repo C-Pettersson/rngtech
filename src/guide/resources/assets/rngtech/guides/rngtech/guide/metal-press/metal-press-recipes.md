@@ -16,11 +16,11 @@ Both presses use the `rngtech:metal_press` recipe type. Each table lists the rec
 
 ## Circuits
 
-| Input | Output | Time | Energy | Min. temperature | Safe max. temperature | Temperature stability | Mastery XP |
+| Input | Output | Time | Heat | Min. temperature | Safe max. temperature | Temperature stability | Mastery XP |
 |---|---|---|---|---|---|---|---|
-| <ItemLink id="rngtech:advanced_circuit_blank" /><br />**Circuit Mold** *(Mold)* | <ItemLink id="rngtech:advanced_electric_circuit" /><br />**Broken Circuit** *(Failure output)* | 12 s | 3,000 FE | 1,300 | 1,550 | 1.05 | 5 |
-| <ItemLink id="rngtech:basic_circuit_blank" /><br />**Circuit Mold** *(Mold)* | <ItemLink id="rngtech:basic_electric_circuit" /><br />**Broken Circuit** *(Failure output)* | 9 s | 1,600 FE | 1,300 | 1,500 | 0.95 | 3 |
-| <ItemLink id="rngtech:elite_circuit_blank" /><br />**Circuit Mold** *(Mold)* | <ItemLink id="rngtech:elite_electric_circuit" /><br />**Broken Circuit** *(Failure output)* | 15 s | 5,000 FE | 1,600 | 1,900 | 1.1 | 10 |
-| <ItemLink id="rngtech:ultimate_circuit_blank" /><br />**Circuit Mold** *(Mold)* | <ItemLink id="rngtech:ultimate_electric_circuit" /><br />**Broken Circuit** *(Failure output)* | 20 s | 8,000 FE | 2,000 | 2,450 | 1.15 | 27 |
+| <ItemLink id="rngtech:advanced_circuit_blank" /><br />**Circuit Mold** *(Mold)* | <ItemLink id="rngtech:advanced_electric_circuit" /><br />**Broken Circuit** *(Failure output)* | 12 s | 1,593 HU | 1,300 | 1,550 | 1.05 | 5 |
+| <ItemLink id="rngtech:basic_circuit_blank" /><br />**Circuit Mold** *(Mold)* | <ItemLink id="rngtech:basic_electric_circuit" /><br />**Broken Circuit** *(Failure output)* | 9 s | 849 HU | 1,300 | 1,500 | 0.95 | 3 |
+| <ItemLink id="rngtech:elite_circuit_blank" /><br />**Circuit Mold** *(Mold)* | <ItemLink id="rngtech:elite_electric_circuit" /><br />**Broken Circuit** *(Failure output)* | 15 s | 3,134 HU | 1,600 | 1,900 | 1.1 | 10 |
+| <ItemLink id="rngtech:ultimate_circuit_blank" /><br />**Circuit Mold** *(Mold)* | <ItemLink id="rngtech:ultimate_electric_circuit" /><br />**Broken Circuit** *(Failure output)* | 20 s | 5,994 HU | 2,000 | 2,450 | 1.15 | 27 |
 
 - [Connectors](rngtech:metal-press/metal-press-recipes/connectors.md)

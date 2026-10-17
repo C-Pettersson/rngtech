@@ -471,6 +471,60 @@ def side_power():
     return s
 
 
+def mastery(start, target, level=60):
+    """A machine_progression component at `level` with the shortest path from `start` to `target` allocated."""
+    tree = json.loads((ROOT / "src/main/resources/data/rngtech/mastery/machine_tree.json").read_text(encoding="utf-8"))
+    kinds = {node["id"]: node["kind"] for node in tree["nodes"]}
+    links = {}
+    for a, b in tree["links"]:
+        links.setdefault(a, []).append(b)
+        links.setdefault(b, []).append(a)
+    start_id = f"start_{start}"
+    previous, queue = {start_id: None}, [start_id]
+    while queue and target not in previous:
+        current = queue.pop(0)
+        for nxt in links.get(current, []):
+            if nxt not in previous and kinds[nxt] != "STARTER":
+                previous[nxt] = current
+                queue.append(nxt)
+    path, node = [], target
+    while previous[node] is not None:
+        path.append(node)
+        node = previous[node]
+    return {"rngtech:machine_progression": {"tree_version": tree["version"], "xp": Tag("93085595L"), "level": level,
+                                            "start": start_id, "allocated_nodes": path[::-1]}}
+
+
+def nitrogen_atmosphere():
+    s = Setup("nitrogen_atmosphere", "Nitrogen atmosphere",
+              "Two Blast Draft Tungstensteel Furnaces smelt tin dust at 40% slider, only the first on Nitrogen; a "
+              "Titanium Alloy Furnace and a Metal Press with Blast Draft and Nitrogen wait for hand-fed input.")
+    # Channels: fluid 0 nitrogen; item 0 tin dust, 1 output.
+    nitrogen = "rngtech:nitrogen"
+    blast = mastery("drive_reserve", "blast_draft")
+    s.machine(0, "rngtech:debug_battery", {"OutputRate": 100_000}, energy="input")
+    s.machine(2, "rngtech:debug_tank", debug_tank(nitrogen), fluids=[fout(0, nitrogen)])
+    s.machine(4, "rngtech:debug_chest", debug_chest(stack("rngtech:tin_dust", 64)), items=[iout(0)])
+    for x, fluids in ((6, [fin(0, nitrogen)]), (8, [])):
+        s.machine(x, "rngtech:tungstensteel_furnace_chassis",
+                  {"Inventory": inventory(9, {4: "rngtech:nullite_battery_cell"}),
+                   "GearInventory": inventory(1, {0: "rngtech:titanium_heat_core"}),
+                   "HeatTrack": 40, "components": blast},
+                  energy="output", fluids=fluids, items=[iin(0), iout(1)])
+    s.machine(10, "rngtech:titanium_alloy_furnace_chassis",
+              {"GearInventory": inventory(4, {0: "rngtech:titanium_heat_core", 1: "rngtech:titanium_alloy_crucible",
+                                              2: "rngtech:arclite_battery_cell"}),
+               "HeatTrack": 40, "components": blast},
+              energy="output", fluids=[fin(0, nitrogen)])
+    s.machine(12, "rngtech:metal_press",
+              {"GearInventory": inventory(8, {0: "rngtech:steel_heat_core", 2: "rngtech:plate_mold",
+                                              7: "rngtech:invar_battery_cell"}),
+               "HeatTrack": 40, "components": mastery("control", "blast_draft")},
+              energy="output", fluids=[fin(0, nitrogen)])
+    s.machine(14, "rngtech:debug_trashcan", None, items=[iin(1, attach="south")])
+    return s
+
+
 def ore_lines():
     """Crusher > Furnace per stage, from tools/balance/processing-setups.json, on the stage's raw ore."""
     data = json.loads((ROOT / "tools/balance/processing-setups.json").read_text(encoding="utf-8"))
@@ -497,7 +551,8 @@ def ore_lines():
 
 
 def all_setups():
-    return [coal(), syngas(), carbon_loop(), ammonia(), void_catalyst(), water(), side_power(), *ore_lines()]
+    return [coal(), syngas(), carbon_loop(), ammonia(), void_catalyst(), water(), side_power(), nitrogen_atmosphere(),
+            *ore_lines()]
 
 
 # ---- datapack ------------------------------------------------------------------------------------------------------

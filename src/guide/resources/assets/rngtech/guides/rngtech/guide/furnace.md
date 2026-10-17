@@ -53,7 +53,7 @@ Like every RNGTech machine, each Furnace you craft rolls its own [rarity and aff
 
 ### Batching
 
-With a Batch Size above 1, each lane smelts several items from its input stack in one cycle. A batch takes as many items as the stack and the lane's free output space allow, up to the Batch Size, and keeps that count until the cycle ends. Each extra item makes the cycle longer by the Batch Overhead, 25% of one item's time to start with. Every item still pays its own FE, or its own burn time on the Stage 0 Furnace, and earns its own XP. Heating a lane costs the same however many items it batches. If a batch fails, every item in it becomes a **Malformed Ingot**.
+With a Batch Size above 1, each lane smelts several items from its input stack in one cycle. A batch takes as many items as the stack and the lane's free output space allow, up to the Batch Size, and keeps that count until the cycle ends. Each extra item makes the cycle longer by the Batch Overhead, 25% of one item's time to start with. Every item still absorbs its own heat, paid in FE or burn time, and earns its own XP. A bigger batch takes a bigger heat dip from the lane when it goes in. If a batch fails, every item in it becomes a **Malformed Ingot**.
 
 - [Gear](rngtech:furnace/gear.md)
 - [Automation](rngtech:furnace/automation.md)
@@ -63,7 +63,7 @@ With a Batch Size above 1, each lane smelts several items from its input stack i
 
 The Furnace screen has five tabs:
 
-- **Process**: input and output lanes, live heat, failure strain, and energy or fuel. Hover for exact temperatures.
+- **Process**: input and output lanes, live heat, failure strain, and energy or fuel. Electric stages add the Nitrogen gauge at the right edge. Hover for exact temperatures.
 - **Gear**: Heat Core and Battery Cell slots.
 - **Stats**: the machine's current stats, including traits, Gear, and Mastery.
 - **Refinement**: refine the placed Furnace's traits with a catalyst.

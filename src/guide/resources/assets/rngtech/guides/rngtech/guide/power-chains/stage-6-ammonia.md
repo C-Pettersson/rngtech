@@ -59,4 +59,6 @@ navigation:
 
 **Bottleneck.** Hydrogen. One Reformer keeps about one Synthesizer busy, and one Synthesizer about one Fuel Cell, while one Cavitation Generator makes Nitrogen for two or three Synthesizers. Every extra Fuel Cell therefore needs another Reformer and the Melter and Photobioreactors behind it. The Cavitation Generator is also the hungriest water user in the chain; see [Water supply](rngtech:power-chains/water-supply.md).
 
+**Spare Nitrogen.** Nitrogen has a second use. With the **Blast Draft** keystone, Nitrogen piped into a Furnace, Alloy Furnace, or Metal Press lets it run hotter, and so faster, before it builds failure strain; see [Nitrogen atmosphere](rngtech:heat/nitrogen-atmosphere.md). A hot lane uses 1 mB a tick, a bit less than a Synthesizer, so every lane you run that way is Nitrogen your Ammonia chain does not get.
+
 **Next upgrade.** [Void Catalyst](rngtech:power-chains/stage-7-8-void-catalyst.md). In the Vacuum Collapse Generator, Ammonia is worth far more FE than in a Fuel Cell.

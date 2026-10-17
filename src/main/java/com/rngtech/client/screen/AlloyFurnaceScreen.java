@@ -108,6 +108,7 @@ public class AlloyFurnaceScreen extends AbstractContainerScreen<AlloyFurnaceMenu
 
     private final MasteryScreenSupport<MegaPassiveNode> masterySupport;
     private final HeatSlider heatSlider = new HeatSlider(98, 81, 86);
+    private final NitrogenGauge nitrogenGauge = new NitrogenGauge(222, BAR_Y);
 
     public AlloyFurnaceScreen(AlloyFurnaceMenu menu, Inventory playerInventory, Component title) {
         super(menu, playerInventory, title);
@@ -394,6 +395,7 @@ public class AlloyFurnaceScreen extends AbstractContainerScreen<AlloyFurnaceMenu
         guiGraphics.fill(x + ENERGY_BAR_X + 1, y + BAR_Y + BAR_HEIGHT - 1 - energyHeight, x + ENERGY_BAR_X + BAR_WIDTH - 1, y + BAR_Y + BAR_HEIGHT - 1, ENERGY);
 
         HeatReadout.renderBar(guiGraphics, leftPos + HEAT_BAR_X, topPos + BAR_Y, BAR_WIDTH, BAR_HEIGHT, BAR_FILL_HEIGHT, heatBands());
+        nitrogenGauge.render(guiGraphics, leftPos, topPos, menu.nitrogen(), menu.nitrogenUse());
 
         if (menu.hasFailureRecipe()) {
             guiGraphics.fill(x + FAILURE_BAR_X, y + BAR_Y, x + FAILURE_BAR_X + BAR_WIDTH, y + BAR_Y + BAR_HEIGHT, 0xFF5F5F5F);
@@ -465,6 +467,10 @@ public class AlloyFurnaceScreen extends AbstractContainerScreen<AlloyFurnaceMenu
         }
         if (heatSlider.isOver(mouseX, mouseY, leftPos, topPos)) {
             guiGraphics.renderComponentTooltip(font, heatSlider.tooltip(menu.heatSlider(), menu.setpoint()), mouseX, mouseY);
+            return;
+        }
+        if (nitrogenGauge.renderTooltip(
+                guiGraphics, font, leftPos, topPos, mouseX, mouseY, menu.nitrogen(), menu.nitrogenUse(), menu.nitrogenBonusPercent())) {
             return;
         }
         CompactValueText.renderTooltipIfHovered(

@@ -55,6 +55,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.energy.IEnergyStorage;
+import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.ItemStackHandler;
 
@@ -134,7 +135,10 @@ public class MetalPressBlockEntity extends BaseMachineBlockEntity
     private static final int DATA_HEAT_REACH = DATA_WOBBLE + 1;
     private static final int DATA_HEAT_MAXIMUM = DATA_HEAT_REACH + 1;
     private static final int DATA_INPUT_ENERGY = DATA_HEAT_MAXIMUM + 1;
-    private static final int DATA_MACHINE_PROGRESSION_START = DATA_INPUT_ENERGY + 1;
+    private static final int DATA_NITROGEN = DATA_INPUT_ENERGY + 1;
+    private static final int DATA_NITROGEN_USE = DATA_NITROGEN + 1;
+    private static final int DATA_NITROGEN_BONUS = DATA_NITROGEN_USE + 1;
+    private static final int DATA_MACHINE_PROGRESSION_START = DATA_NITROGEN_BONUS + 1;
     private static final int DATA_COUNT = DATA_MACHINE_PROGRESSION_START + MasteryMenuSupport.FIELD_COUNT;
     private static final int STAT_SCALE = 100;
     private static final int LEGACY_SLOT_BATTERY_CELL = 3;
@@ -201,6 +205,7 @@ public class MetalPressBlockEntity extends BaseMachineBlockEntity
     private final EnergyTelemetry energyFlow = new EnergyTelemetry(this::getLevel);
     private final IEnergyStorage trackedEnergyStorage = energyFlow.track(energyStorage);
     private final InstalledBatteryCell batteryCell = new InstalledBatteryCell(this::batteryCellStack);
+    private final InertAtmosphere atmosphere = new InertAtmosphere(this::setChanged, () -> true);
     private final ContainerData menuData = new ContainerData() {
         @Override
         public int get(int index) {
@@ -225,6 +230,9 @@ public class MetalPressBlockEntity extends BaseMachineBlockEntity
                 case DATA_OVERHEAT_TEMPERATURE -> currentOverheatTemperature(recipe, stats);
                 case DATA_FAILURE_RISK -> HeatControl.failureProgress(failureStrain);
                 case DATA_STATUS -> statusCode(recipe, stats);
+                case DATA_NITROGEN -> atmosphere.amount();
+                case DATA_NITROGEN_USE -> atmosphere.lastUse();
+                case DATA_NITROGEN_BONUS -> (int) Math.round(atmosphereBonus() * 100.0);
                 case DATA_PROCESSING_SPEED -> scaledStat(stats, MachineStat.PROCESSING_SPEED);
                 case DATA_EFFICIENCY -> scaledStat(stats, MachineStat.EFFICIENCY);
                 case DATA_ENERGY_USAGE -> scaledStat(stats, MachineStat.ENERGY_USAGE);
@@ -295,6 +303,7 @@ public class MetalPressBlockEntity extends BaseMachineBlockEntity
     }
 
     public static void serverTick(Level level, BlockPos pos, BlockState state, MetalPressBlockEntity press) {
+        press.atmosphere.beginTick();
         MetalPressRecipe recipe = press.nextRecipe();
         MachineStatAccumulator stats = press.routeStats(recipe, press.effectiveStats());
         if (recipe == null || !press.hasRequiredComponents()) {
@@ -377,6 +386,7 @@ public class MetalPressBlockEntity extends BaseMachineBlockEntity
             press.decayPowerDrop();
         }
         press.updateFailureStrain(recipe, stats, envelope, tick.workTemperature());
+        press.atmosphere.use(tick.workTemperature(), HeatEngine.overheatTemperature(envelope.safeMaximum(), stats), press.atmosphereBonus());
         if (!press.isCrudePress() && press.failureStrain >= FAILURE_STRAIN_THRESHOLD) {
             press.tryFailCycle(recipe);
             return;
@@ -445,6 +455,15 @@ public class MetalPressBlockEntity extends BaseMachineBlockEntity
 
     public IEnergyStorage getEnergyStorage(Direction side) {
         return trackedEnergyStorage;
+    }
+
+    public IFluidHandler getFluidHandler(Direction side) {
+        return atmosphere.inlet();
+    }
+
+    /** Overheat Tolerance the Nitrogen tank adds, with Blast Draft only. */
+    private double atmosphereBonus() {
+        return atmosphere.overheatBonus(hasMasteryBehavior("BLAST_DRAFT"));
     }
 
     @Override
@@ -616,6 +635,7 @@ public class MetalPressBlockEntity extends BaseMachineBlockEntity
         tag.putInt("LastTargetTemperature", lastTargetTemperature);
         tag.putInt("LastSafeMaximumTemperature", lastSafeMaximumTemperature);
         tag.putInt("FailureStrain", failureStrain);
+        atmosphere.save(tag, registries);
         tag.putInt("PowerDropTicks", powerDropTicks);
         tag.putInt("SelectedMold", selectedMold);
         tag.put("ActiveInput", activeInput.saveOptional(registries));
@@ -649,6 +669,7 @@ public class MetalPressBlockEntity extends BaseMachineBlockEntity
         lastTargetTemperature = Math.max(0, tag.getInt("LastTargetTemperature"));
         lastSafeMaximumTemperature = Math.max(0, tag.getInt("LastSafeMaximumTemperature"));
         failureStrain = Math.max(0, tag.getInt("FailureStrain"));
+        atmosphere.load(tag, registries);
         powerDropTicks = Math.max(0, tag.getInt("PowerDropTicks"));
         selectedMold = clampMoldIndex(tag.getInt("SelectedMold"));
         activeInput = ItemStack.parseOptional(registries, tag.getCompound("ActiveInput"));
@@ -1013,7 +1034,8 @@ public class MetalPressBlockEntity extends BaseMachineBlockEntity
                 hasMasteryBehavior("BLAST_DRAFT"),
                 stats,
                 heatSlider / 100.0,
-                Integer.MAX_VALUE
+                Integer.MAX_VALUE,
+                atmosphereBonus()
         ).coolingFirst(hasMasteryBehavior("COOL_HEADED"));
     }
 
@@ -1080,7 +1102,7 @@ public class MetalPressBlockEntity extends BaseMachineBlockEntity
         int safeMaximumTemperature = currentSafeMaximumTemperature(recipe, stats);
         return safeMaximumTemperature <= 0
                 ? 0
-                : HeatControl.effectiveOverheatTemperature(safeMaximumTemperature, stats);
+                : HeatControl.effectiveOverheatTemperature(safeMaximumTemperature, stats, atmosphereBonus());
     }
 
     private int effectiveSafeMaximumTemperature(MetalPressRecipe recipe, MachineStatAccumulator stats) {

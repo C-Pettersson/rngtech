@@ -52,8 +52,11 @@ final class HeatControl {
     }
 
     static int effectiveOverheatTemperature(int safeMaximumTemperature, MachineStatAccumulator stats) {
-        double tolerance = Math.max(1.0, stats.value(MachineStat.OVERHEAT_TOLERANCE));
-        return Math.max(safeMaximumTemperature, (int) Math.round(safeMaximumTemperature * tolerance));
+        return HeatEngine.overheatTemperature(safeMaximumTemperature, stats, 0.0);
+    }
+
+    static int effectiveOverheatTemperature(int safeMaximumTemperature, MachineStatAccumulator stats, double bonus) {
+        return HeatEngine.overheatTemperature(safeMaximumTemperature, stats, bonus);
     }
 
     static int simulatedTemperature(

@@ -58,6 +58,7 @@ import net.minecraft.world.item.crafting.SingleRecipeInput;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.energy.IEnergyStorage;
+import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.ItemStackHandler;
 
@@ -138,7 +139,10 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
     private static final int DATA_HEAT_REACH = DATA_WOBBLE + 1;
     private static final int DATA_HEAT_MAXIMUM = DATA_HEAT_REACH + 1;
     private static final int DATA_INPUT_ENERGY = DATA_HEAT_MAXIMUM + 1;
-    private static final int DATA_MACHINE_PROGRESSION_START = DATA_INPUT_ENERGY + 1;
+    private static final int DATA_NITROGEN = DATA_INPUT_ENERGY + 1;
+    private static final int DATA_NITROGEN_USE = DATA_NITROGEN + 1;
+    private static final int DATA_NITROGEN_BONUS = DATA_NITROGEN_USE + 1;
+    private static final int DATA_MACHINE_PROGRESSION_START = DATA_NITROGEN_BONUS + 1;
     private static final int DATA_COUNT = DATA_MACHINE_PROGRESSION_START + MasteryMenuSupport.FIELD_COUNT;
     private static final int STAT_SCALE = 100;
 
@@ -205,6 +209,7 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
     private final IEnergyStorage energy = new FurnaceEnergyStorage();
 
     private final InstalledBatteryCell batteryCell = new InstalledBatteryCell(this::batteryCellStack);
+    private final InertAtmosphere atmosphere = new InertAtmosphere(this::setChanged, this::isElectric);
     private final ContainerData menuData = new ContainerData() {
         @Override
         public int get(int index) {
@@ -287,6 +292,9 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
                 case DATA_GEAR_SLOTS -> activeGearSlots();
                 case DATA_MIN_TEMPERATURE -> currentMinimumTemperature(stats);
                 case DATA_STATUS -> statusCode(stats);
+                case DATA_NITROGEN -> atmosphere.amount();
+                case DATA_NITROGEN_USE -> atmosphere.lastUse();
+                case DATA_NITROGEN_BONUS -> (int) Math.round(atmosphereBonus() * 100.0);
                 default -> 0;
             };
         }
@@ -340,6 +348,7 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
 
     public static void serverTick(Level level, BlockPos pos, BlockState state, FurnaceBlockEntity furnace) {
         furnace.beginEnergyTelemetryTick();
+        furnace.atmosphere.beginTick();
         furnace.releaseRemovedGear(level);
         MachineStatAccumulator baseStats = furnace.baseEffectiveStats();
         int activeLanes = furnace.activeProcessingSlots(baseStats);
@@ -407,6 +416,7 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
                 furnace.registerPowerDrop(lane, recipe, laneStats);
             }
             furnace.updateFailureStrain(lane, recipe, laneStats, envelope, tick.workTemperature());
+            furnace.atmosphere.use(tick.workTemperature(), HeatEngine.overheatTemperature(envelope.safeMaximum(), laneStats), furnace.atmosphereBonus());
             if (furnace.failureStrain[lane] >= HeatControl.FAILURE_STRAIN_THRESHOLD) {
                 furnace.tryFailCycle(lane, recipe);
                 continue;
@@ -577,6 +587,7 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
         tag.putIntArray("LastTargetTemperatures", lastTargetTemperature);
         tag.putIntArray("LastSafeMaximumTemperatures", lastSafeMaximumTemperature);
         tag.putIntArray("FailureStrains", failureStrain);
+        atmosphere.save(tag, registries);
         for (int lane = 0; lane < MAX_PROCESSING_SLOTS; lane++) {
             tag.put("ActiveInput" + lane, activeInputs[lane].saveOptional(registries));
         }
@@ -630,6 +641,7 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
                     Math.min(savedSafeTemperatures.length, lastSafeMaximumTemperature.length)
             );
         }
+        atmosphere.load(tag, registries);
         int[] savedFailureStrains = tag.getIntArray("FailureStrains");
         if (savedFailureStrains.length > 0) {
             System.arraycopy(savedFailureStrains, 0, failureStrain, 0, Math.min(savedFailureStrains.length, failureStrain.length));
@@ -1271,7 +1283,16 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
         if (safeMaximumTemperature <= 0) {
             return 0;
         }
-        return HeatControl.effectiveOverheatTemperature(safeMaximumTemperature, statsForLane(lane));
+        return HeatControl.effectiveOverheatTemperature(safeMaximumTemperature, statsForLane(lane), atmosphereBonus());
+    }
+
+    /** Overheat Tolerance the Nitrogen tank adds: electric chassis with Blast Draft only. */
+    private double atmosphereBonus() {
+        return isElectric() ? atmosphere.overheatBonus(hasMasteryBehavior("BLAST_DRAFT")) : 0.0;
+    }
+
+    public IFluidHandler getFluidHandler(Direction side) {
+        return atmosphere.inlet();
     }
 
     /**
@@ -1290,7 +1311,8 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
                 hasMasteryBehavior("BLAST_DRAFT"),
                 stats,
                 isElectric() ? heatSlider / 100.0 : 0.0,
-                ceiling
+                ceiling,
+                atmosphereBonus()
         ).coolingFirst(hasMasteryBehavior("COOL_HEADED"));
     }
 

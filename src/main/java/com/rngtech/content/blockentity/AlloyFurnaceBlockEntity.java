@@ -57,6 +57,7 @@ import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.energy.IEnergyStorage;
+import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.ItemStackHandler;
 
@@ -143,7 +144,10 @@ public class AlloyFurnaceBlockEntity extends BaseMachineBlockEntity implements M
     private static final int DATA_HEAT_REACH = DATA_WOBBLE + 1;
     private static final int DATA_HEAT_MAXIMUM = DATA_HEAT_REACH + 1;
     private static final int DATA_INPUT_ENERGY = DATA_HEAT_MAXIMUM + 1;
-    private static final int DATA_MACHINE_PROGRESSION_START = DATA_INPUT_ENERGY + 1;
+    private static final int DATA_NITROGEN = DATA_INPUT_ENERGY + 1;
+    private static final int DATA_NITROGEN_USE = DATA_NITROGEN + 1;
+    private static final int DATA_NITROGEN_BONUS = DATA_NITROGEN_USE + 1;
+    private static final int DATA_MACHINE_PROGRESSION_START = DATA_NITROGEN_BONUS + 1;
     private static final int DATA_COUNT = DATA_MACHINE_PROGRESSION_START + MasteryMenuSupport.FIELD_COUNT;
     private static final int STAT_SCALE = 100;
 
@@ -205,6 +209,7 @@ public class AlloyFurnaceBlockEntity extends BaseMachineBlockEntity implements M
     private final IItemHandler outputHandler = new OutputItemHandler();
     private final IEnergyStorage energyStorage = new AlloyFurnaceEnergyStorage();
     private final InstalledBatteryCell batteryCell = new InstalledBatteryCell(this::batteryCellStack);
+    private final InertAtmosphere atmosphere = new InertAtmosphere(this::setChanged, () -> true);
     private final ContainerData menuData = new ContainerData() {
         @Override
         public int get(int index) {
@@ -222,6 +227,9 @@ public class AlloyFurnaceBlockEntity extends BaseMachineBlockEntity implements M
                 case DATA_ENERGY_PER_TICK -> currentEnergyCostPerTick(stats);
                 case DATA_MIN_TEMPERATURE -> recipe == null ? 0 : minimumTemperature(recipe, stats);
                 case DATA_STATUS -> statusCode(recipe, stats);
+                case DATA_NITROGEN -> atmosphere.amount();
+                case DATA_NITROGEN_USE -> atmosphere.lastUse();
+                case DATA_NITROGEN_BONUS -> (int) Math.round(atmosphereBonus() * 100.0);
                 case DATA_PROCESSING_SPEED -> scaledStat(stats, MachineStat.PROCESSING_SPEED);
                 case DATA_ENERGY_USAGE -> scaledStat(stats, MachineStat.ENERGY_USAGE);
                 case DATA_ENERGY_CAPACITY_STAT -> scaledStat(stats, MachineStat.ENERGY_CAPACITY);
@@ -299,6 +307,7 @@ public class AlloyFurnaceBlockEntity extends BaseMachineBlockEntity implements M
 
     public static void serverTick(Level level, BlockPos pos, BlockState state, AlloyFurnaceBlockEntity furnace) {
         furnace.beginEnergyTelemetryTick();
+        furnace.atmosphere.beginTick();
         AlloyFurnaceRecipe recipe = furnace.nextRecipe();
         MachineStatAccumulator stats = furnace.routeStats(recipe, furnace.effectiveStats());
         if (recipe == null || !furnace.hasRequiredGear() || !furnace.meetsRecipeRequirements(recipe, stats)) {
@@ -360,6 +369,7 @@ public class AlloyFurnaceBlockEntity extends BaseMachineBlockEntity implements M
             furnace.registerPowerDrop(recipe, stats);
         }
         furnace.updateFailureStrain(recipe, stats, envelope, tick.workTemperature());
+        furnace.atmosphere.use(tick.workTemperature(), HeatEngine.overheatTemperature(envelope.safeMaximum(), stats), furnace.atmosphereBonus());
         if (furnace.failureStrain >= HeatControl.FAILURE_STRAIN_THRESHOLD) {
             furnace.tryFailCycle(recipe);
             return;
@@ -413,6 +423,15 @@ public class AlloyFurnaceBlockEntity extends BaseMachineBlockEntity implements M
 
     public IEnergyStorage getEnergyStorage(Direction side) {
         return side == Direction.UP || side == Direction.DOWN ? null : energyStorage;
+    }
+
+    public IFluidHandler getFluidHandler(Direction side) {
+        return atmosphere.inlet();
+    }
+
+    /** Overheat Tolerance the Nitrogen tank adds, with Blast Draft only. */
+    private double atmosphereBonus() {
+        return atmosphere.overheatBonus(hasMasteryBehavior("BLAST_DRAFT"));
     }
 
     @Override
@@ -559,6 +578,7 @@ public class AlloyFurnaceBlockEntity extends BaseMachineBlockEntity implements M
         tag.putInt("LastTargetTemperature", lastTargetTemperature);
         tag.putInt("LastSafeMaximumTemperature", lastSafeMaximumTemperature);
         tag.putInt("FailureStrain", failureStrain);
+        atmosphere.save(tag, registries);
         for (int slot = 0; slot < activeInputs.length; slot++) {
             tag.put("ActiveInput" + slot, activeInputs[slot].saveOptional(registries));
         }
@@ -587,6 +607,7 @@ public class AlloyFurnaceBlockEntity extends BaseMachineBlockEntity implements M
         lastTargetTemperature = Math.max(0, tag.getInt("LastTargetTemperature"));
         lastSafeMaximumTemperature = Math.max(0, tag.getInt("LastSafeMaximumTemperature"));
         failureStrain = Math.max(0, tag.getInt("FailureStrain"));
+        atmosphere.load(tag, registries);
         activeInputs = emptyInputs();
         for (int slot = 0; slot < activeInputs.length; slot++) {
             activeInputs[slot] = ItemStack.parseOptional(registries, tag.getCompound("ActiveInput" + slot));
@@ -1003,7 +1024,8 @@ public class AlloyFurnaceBlockEntity extends BaseMachineBlockEntity implements M
                 hasMasteryBehavior("BLAST_DRAFT"),
                 stats,
                 heatSlider / 100.0,
-                Integer.MAX_VALUE
+                Integer.MAX_VALUE,
+                atmosphereBonus()
         ).coolingFirst(hasMasteryBehavior("COOL_HEADED"));
     }
 
@@ -1278,7 +1300,7 @@ public class AlloyFurnaceBlockEntity extends BaseMachineBlockEntity implements M
         int safeMaximumTemperature = currentSafeMaximumTemperature(recipe, stats);
         return safeMaximumTemperature <= 0
                 ? 0
-                : HeatControl.effectiveOverheatTemperature(safeMaximumTemperature, stats);
+                : HeatControl.effectiveOverheatTemperature(safeMaximumTemperature, stats, atmosphereBonus());
     }
 
     private void idle(MachineStatAccumulator stats) {

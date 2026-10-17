@@ -45,17 +45,7 @@ The only valid shape is a three-block column:
 
 If either casing is missing, all three lanes pause. Nothing is lost, and work resumes as soon as the column is complete again.
 
-### Recharging beads
-
-Smelt saturated beads in an RNGTech [Furnace](rngtech:furnace.md) to dry them out again. Recharging gives back exactly the bead you put in, never a bonus bead.
-
-| Input | Output | Time | Energy |
-|---|---|---|---|
-| <ItemLink id="rngtech:saturated_silica_gel_beads" /> | <ItemLink id="rngtech:silica_gel_beads" /> | 60 s | 28,800 FE |
-
-| Input | Output | Time | Energy |
-|---|---|---|---|
-| <ItemLink id="rngtech:saturated_supercharged_silica_gel_beads" /> | <ItemLink id="rngtech:supercharged_silica_gel_beads" /> | 120 s | 57,600 FE |
+- [Recharging beads](rngtech:silica-gel-dehumidifier/recharging-beads.md)
 
 ### Getting water out
 
@@ -77,9 +67,9 @@ The Silica Gel Dehumidifier has a single screen with three input and output lane
 
 <ItemLink id="rngtech:supercharged_silica_gel_beads" /> hold more than three times as much water as normal beads. Make them in an [Alloy Furnace](rngtech:alloy-furnace.md) with Stage 6 parts at 1,450 heat:
 
-| Input | Output | Time | Energy | Min. temperature | Min. component stage |
+| Input | Output | Time | Heat | Min. temperature | Min. component stage |
 |---|---|---|---|---|---|
-| 4× <ItemLink id="rngtech:silica_gel_beads" /><br /><ItemLink id="rngtech:titanium_dust" /><br /><ItemLink id="minecraft:redstone" /> | <ItemLink id="rngtech:supercharged_silica_gel_beads" /> | 12 s | 6,000 FE | 1,450 | 6 |
+| 4× <ItemLink id="rngtech:silica_gel_beads" /><br /><ItemLink id="rngtech:titanium_dust" /><br /><ItemLink id="minecraft:redstone" /> | <ItemLink id="rngtech:supercharged_silica_gel_beads" /> | 12 s | 5,793 HU | 1,450 | 6 |
 
 ### Breaking
 

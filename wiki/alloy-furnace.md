@@ -87,6 +87,7 @@ The Gear tab has four slots. No Gear can be a higher stage than the chassis.
 | Top | Inserts into the active input slots. Accepts only Alloy Furnace recipe ingredients, and never lets one ingredient fill a slot another ingredient needs; see [Automation](automation.md). |
 | Bottom | Extracts finished output. Ingredient leftovers are pushed into the inventory below; see [Automation](automation.md#ingredient-leftovers). |
 | Sides | Accepts FE, for example from a [Universal Cable](universal-cable.md). |
+| Any | Accepts Nitrogen for the [Nitrogen atmosphere](heat.md#nitrogen-atmosphere). |
 
 Gear slots cannot be filled by automation.
 
@@ -154,7 +155,7 @@ Every node in this machine's ascendancies. See [Machine Mastery](machine-mastery
 
 The Alloy Furnace screen has five tabs:
 
-- **Process**: input and output slots, progress, energy, live heat, and failure strain on recipes that can fail. Status squares show the recipe state and whether the heat target is met. Hover for exact values. With an ascendancy, a thin line under the progress bar shows Flux or blend-ledger progress, and Master Blend shows a recipe-disabled status on direct-ingot recipes.
+- **Process**: input and output slots, progress, energy, live heat, failure strain on recipes that can fail, and the Nitrogen gauge at the right edge. Status squares show the recipe state and whether the heat target is met. Hover for exact values. With an ascendancy, a thin line under the progress bar shows Flux or blend-ledger progress, and Master Blend shows a recipe-disabled status on direct-ingot recipes.
 - **Gear**: Heat Core, Alloy Crucible, Battery Cell, and Servo slots.
 - **Stats**: the machine's current stats, including traits, Gear, and Mastery.
 - **Refinement**: refine the placed Alloy Furnace's traits with a catalyst.

@@ -4,9 +4,11 @@ import static com.rngtech.gametest.MachineTestSupport.check;
 
 import com.rngtech.RNGTech;
 import com.rngtech.content.blockentity.FurnaceBlockEntity;
+import com.rngtech.content.blockentity.InertAtmosphere;
 import com.rngtech.content.energy.HeatCoreMaterial;
 import com.rngtech.content.machine.FurnaceChassisMaterial;
 import com.rngtech.content.registry.ModBlocks;
+import com.rngtech.content.registry.ModFluids;
 import com.rngtech.content.registry.ModItems;
 import com.rngtech.rpg.progression.MachineMasteryFamily;
 import com.rngtech.rpg.progression.MachineProgressionState;
@@ -20,6 +22,9 @@ import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.level.material.Fluids;
+import net.neoforged.neoforge.fluids.FluidStack;
+import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
@@ -53,6 +58,32 @@ public final class OverheatFailureGameTests {
         helper.succeedWhen(() -> {
             check(drained[1] == 0, "The safe maximum ruined " + drained[1] + " ingots");
             check(drained[0] >= 8, "Only " + drained[0] + " tin ingots so far; " + MachineTestSupport.describe(furnace));
+        });
+    }
+
+    /** A Blast Draft lane pushed past its overheat temperature draws on the Nitrogen tank, which takes only Nitrogen. */
+    @GameTest(template = MachineTestSupport.EMPTY, timeoutTicks = 1200)
+    public static void overheatedLaneUsesNitrogen(GameTestHelper helper) {
+        FurnaceBlockEntity furnace = overheatedTinFurnace(helper, true);
+        IFluidHandler tank = furnace.getFluidHandler(null);
+        check(tank.fill(new FluidStack(Fluids.WATER, 1000), IFluidHandler.FluidAction.EXECUTE) == 0, "The Nitrogen tank took water");
+        int filled = tank.fill(new FluidStack(ModFluids.NITROGEN_SOURCE.get(), InertAtmosphere.CAPACITY), IFluidHandler.FluidAction.EXECUTE);
+        check(filled == InertAtmosphere.CAPACITY, "The Nitrogen tank took only " + filled + " mB");
+        drainOutput(helper, furnace);
+        helper.succeedWhen(() -> check(tank.getFluidInTank(0).getAmount() < InertAtmosphere.CAPACITY,
+                "An overheated lane used no Nitrogen; " + MachineTestSupport.describe(furnace)));
+    }
+
+    /** Without Blast Draft, Nitrogen does nothing, so the lane never spends it. */
+    @GameTest(template = MachineTestSupport.EMPTY, timeoutTicks = 1200)
+    public static void withoutBlastDraftNitrogenIsKept(GameTestHelper helper) {
+        FurnaceBlockEntity furnace = overheatedTinFurnace(helper, false);
+        IFluidHandler tank = furnace.getFluidHandler(null);
+        tank.fill(new FluidStack(ModFluids.NITROGEN_SOURCE.get(), InertAtmosphere.CAPACITY), IFluidHandler.FluidAction.EXECUTE);
+        int[] drained = drainOutput(helper, furnace);
+        helper.succeedWhen(() -> {
+            check(drained[0] >= 4, "Only " + drained[0] + " tin ingots so far; " + MachineTestSupport.describe(furnace));
+            check(tank.getFluidInTank(0).getAmount() == InertAtmosphere.CAPACITY, "A lane without Blast Draft spent Nitrogen");
         });
     }
 

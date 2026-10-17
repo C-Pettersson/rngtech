@@ -8,7 +8,7 @@ navigation:
 
 # Smelting
 
-Put items in the top input slot. The Furnace heats up at a rate set by its Heat Transfer and Warmup Time stats, and starts smelting only once the lane reaches the recipe's target temperature. While the lane is blocked, out of input, or out of power, it cools down.
+Put items in the top input slot. Each lane heats up and starts smelting once it reaches the recipe's temperature, and leaks heat while it has nothing to smelt. The Furnace pays FE, or fuel, for the heat it puts in, including what its walls lose, so a hotter lane costs more per smelt. See [Heat](rngtech:heat.md) for how lanes heat and the overheat slider on the Process tab.
 
 Each metal smelts at its own pace: low-melting Lead and Tin in half the time of Iron, high-melting Osmium, Titanium, and Tungsten in two and a half to four times as long. The FE per smelt does not change.
 
@@ -32,4 +32,4 @@ Crushed material smelts straight into ingots, which is handy for simple hopper l
 
 There is no Steel Dust smelting recipe. Steel comes from Steel Blend, which you make in the [Alloy Furnace](rngtech:alloy-furnace.md) and then smelt here.
 
-Stage 4 and higher metal recipes also need temperature stability. A Stage 0–3 Furnace will not start one without enough stability. A Stage 4 or higher Furnace starts it anyway, but poor stability or heat above the recipe's safe maximum builds up failure strain. A lane left above the recipe's overheat temperature by a hotter recipe cools down to it before smelting, so switching to a cooler metal costs time instead of ingots. Higher Overheat Tolerance shortens that wait. When strain fills, the input becomes a **Malformed Ingot** of that metal. Smelt it again to get two nuggets back. Ancient Debris never fails.
+Stage 4 and higher metal recipes also need temperature stability. A Stage 0–3 Furnace will not start one without enough stability. A Stage 4 or higher Furnace starts it anyway, but poor stability or heat above the recipe's safe maximum builds up failure strain. A lane left above the recipe's overheat temperature by a hotter recipe cools down to it before smelting, so switching to a cooler metal costs time instead of ingots. Higher Overheat Tolerance shortens that wait. When strain fills, the input becomes a **Malformed Ingot** of that metal. Smelt it again to get two nuggets back. On any Furnace, a metal smelt pushed past its overheat temperature with the [overheat slider](rngtech:heat/the-overheat-slider.md) builds strain the same way. Ancient Debris never fails.

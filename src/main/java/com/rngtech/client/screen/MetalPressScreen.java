@@ -112,6 +112,7 @@ public class MetalPressScreen extends AbstractContainerScreen<MetalPressMenu> {
 
     private final MasteryScreenSupport<MegaPassiveNode> masterySupport;
     private final HeatSlider heatSlider = new HeatSlider(86, 81, 69);
+    private final NitrogenGauge nitrogenGauge = new NitrogenGauge(222, BAR_Y);
 
     private static Map<MegaPassiveNode, ResourceLocation> createMasteryIconTextures() {
         Map<MegaPassiveNode, ResourceLocation> textures = new HashMap<>();
@@ -419,6 +420,7 @@ public class MetalPressScreen extends AbstractContainerScreen<MetalPressMenu> {
         guiGraphics.fill(x + ENERGY_BAR_X + 1, y + BAR_Y + BAR_HEIGHT - 1 - energyHeight, x + ENERGY_BAR_X + BAR_WIDTH - 1, y + BAR_Y + BAR_HEIGHT - 1, ENERGY);
 
         HeatReadout.renderBar(guiGraphics, leftPos + HEAT_BAR_X, topPos + BAR_Y, BAR_WIDTH, BAR_HEIGHT, BAR_FILL_HEIGHT, heatBands());
+        nitrogenGauge.render(guiGraphics, leftPos, topPos, menu.nitrogen(), menu.nitrogenUse());
 
         renderIconBox(guiGraphics, STATUS_ICON_X, STATUS_ICON_Y);
         MachineScreenStyle.renderStatusGlyph(guiGraphics, x + STATUS_ICON_X, y + STATUS_ICON_Y, statusState());
@@ -508,6 +510,10 @@ public class MetalPressScreen extends AbstractContainerScreen<MetalPressMenu> {
         }
         if (heatSlider.isOver(mouseX, mouseY, leftPos, topPos)) {
             guiGraphics.renderComponentTooltip(font, heatSlider.tooltip(menu.heatSlider(), menu.setpoint()), mouseX, mouseY);
+            return;
+        }
+        if (nitrogenGauge.renderTooltip(
+                guiGraphics, font, leftPos, topPos, mouseX, mouseY, menu.nitrogen(), menu.nitrogenUse(), menu.nitrogenBonusPercent())) {
             return;
         }
 

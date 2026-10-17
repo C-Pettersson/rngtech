@@ -88,7 +88,10 @@ public class FurnaceMenu extends AbstractContainerMenu implements MasteryMenuVie
     private static final int DATA_HEAT_REACH = DATA_WOBBLE + 1;
     private static final int DATA_HEAT_MAXIMUM = DATA_HEAT_REACH + 1;
     private static final int DATA_INPUT_ENERGY = DATA_HEAT_MAXIMUM + 1;
-    private static final int DATA_MACHINE_PROGRESSION_START = DATA_INPUT_ENERGY + 1;
+    private static final int DATA_NITROGEN = DATA_INPUT_ENERGY + 1;
+    private static final int DATA_NITROGEN_USE = DATA_NITROGEN + 1;
+    private static final int DATA_NITROGEN_BONUS = DATA_NITROGEN_USE + 1;
+    private static final int DATA_MACHINE_PROGRESSION_START = DATA_NITROGEN_BONUS + 1;
     private static final int DATA_COUNT = DATA_MACHINE_PROGRESSION_START + MasteryMenuSupport.FIELD_COUNT;
     private static final int STAT_SCALE = 100;
     private static final int MACHINE_SLOT_COUNT = FurnaceBlockEntity.SLOT_COUNT;
@@ -352,6 +355,18 @@ public class FurnaceMenu extends AbstractContainerMenu implements MasteryMenuVie
             safeMaximumTemperature = Math.max(safeMaximumTemperature, data.get(DATA_SAFE_MAX_TEMPERATURE_START + lane));
         }
         return safeMaximumTemperature;
+    }
+
+    public int nitrogen() {
+        return data.get(DATA_NITROGEN);
+    }
+
+    public int nitrogenUse() {
+        return data.get(DATA_NITROGEN_USE);
+    }
+
+    public int nitrogenBonusPercent() {
+        return data.get(DATA_NITROGEN_BONUS);
     }
 
     public int overheatTemperature() {

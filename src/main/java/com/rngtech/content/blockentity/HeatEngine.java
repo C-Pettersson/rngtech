@@ -135,11 +135,27 @@ public final class HeatEngine {
             double slider,
             int setpointCeiling
     ) {
+        return envelope(minimum, target, safeMaximum, requiredStability, canFail, pushPastSafe, stats, slider, setpointCeiling, 0.0);
+    }
+
+    /** {@code overheatBonus} adds to Overheat Tolerance, as a Nitrogen atmosphere does. */
+    public static Envelope envelope(
+            int minimum,
+            int target,
+            int safeMaximum,
+            double requiredStability,
+            boolean canFail,
+            boolean pushPastSafe,
+            MachineStatAccumulator stats,
+            double slider,
+            int setpointCeiling,
+            double overheatBonus
+    ) {
         if (target <= AMBIENT) {
             return new Envelope(AMBIENT, AMBIENT, AMBIENT, Integer.MAX_VALUE, requiredStability, AMBIENT, false, false, AMBIENT);
         }
         int safe = Math.max(target, safeMaximum);
-        int overheat = overheatTemperature(safe, stats);
+        int overheat = overheatTemperature(safe, stats, overheatBonus);
         int reach = Math.max(target, reach(safe, overheat, canFail, pushPastSafe, stats, setpointCeiling));
         int setpoint = setpoint(target, stats.intValue(MachineStat.MAX_TEMPERATURE), reach, slider);
         return new Envelope(Math.min(minimum, target), target, safe, overheat, requiredStability, setpoint, canFail, false, reach);
@@ -147,7 +163,11 @@ public final class HeatEngine {
 
     /** The safe maximum stretched by Overheat Tolerance: above it, a recipe that can fail builds strain. */
     public static int overheatTemperature(int safeMaximum, MachineStatAccumulator stats) {
-        double tolerance = Math.max(1.0, stats.value(MachineStat.OVERHEAT_TOLERANCE));
+        return overheatTemperature(safeMaximum, stats, 0.0);
+    }
+
+    public static int overheatTemperature(int safeMaximum, MachineStatAccumulator stats, double bonus) {
+        double tolerance = Math.max(1.0, stats.value(MachineStat.OVERHEAT_TOLERANCE)) + Math.max(0.0, bonus);
         return Math.max(safeMaximum, (int) Math.round(safeMaximum * tolerance));
     }
 

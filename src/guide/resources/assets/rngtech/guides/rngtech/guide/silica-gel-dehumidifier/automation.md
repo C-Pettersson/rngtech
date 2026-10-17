@@ -2,7 +2,7 @@
 navigation:
   title: "Automation"
   parent: silica-gel-dehumidifier.md
-  position: 0
+  position: 1
   icon: rngtech:silica_gel_dehumidifier
 ---
 

@@ -21,4 +21,4 @@ navigation:
 | 7 | <ItemLink id="rngtech:tungstensteel_furnace_chassis" /> | Heavy late-game heat chassis. |
 | 8 | <ItemLink id="rngtech:exotic_furnace_chassis" /> | Optional endgame chassis. |
 
-Higher-stage metal recipes cost more FE: Stage 5–8 recipes cost 2×, 3×, 4× and 6× the early baseline. Recipes needing 1,750 heat or more cost another 2× on electric Furnaces.
+Higher-stage metal recipes need more heat: Stage 5–8 recipes take 2×, 3×, 4× and 6× the early baseline, and recipes needing 1,750 heat or more twice that again.
