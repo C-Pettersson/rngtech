@@ -127,6 +127,18 @@ public final class RNGTechConfig {
     public static final ModConfigSpec.BooleanValue VOLATILE_CATALYST_RECIPES_ENABLED = BUILDER
             .comment("Whether the default Volatile Catalyst recipe loads. Disable it to award catalysts through quests, loot, or custom recipes instead.")
             .define("corruption.volatileCatalystRecipesEnabled", true);
+
+    public static final ModConfigSpec.EnumValue<RestrictedToolMode> RESTRICTED_TOOLS_MODE = BUILDER
+            .comment("What happens to tools in the rngtech:restricted_tools item tag (stone through netherite pickaxes, axes, and shovels by default; wooden tools reach no ore and stay free). NORMAL leaves them alone; WEAKENED slows their mining by restrictedTools.weakenedSpeedMultiplier; USELESS makes them mine, harvest, strip, and flatten like an empty hand.")
+            .defineEnum("restrictedTools.mode", RestrictedToolMode.NORMAL);
+
+    public static final ModConfigSpec.DoubleValue RESTRICTED_TOOLS_WEAKENED_SPEED_MULTIPLIER = BUILDER
+            .comment("Mining speed multiplier for restricted tools while restrictedTools.mode is WEAKENED.")
+            .defineInRange("restrictedTools.weakenedSpeedMultiplier", 0.25D, 0.01D, 1.0D);
+
+    public static final ModConfigSpec.BooleanValue VANILLA_TOOL_RECIPES_ENABLED = BUILDER
+            .comment("Whether the vanilla crafting and smithing recipes for stone through netherite pickaxes, axes, and shovels load. Wooden tools, hoes, and swords keep their recipes.")
+            .define("restrictedTools.vanillaRecipesEnabled", true);
     private static final UniqueLootConfig UNIQUE_LOOT_CONFIG = defineUniqueLoot();
     /** Gates every default Unique loot table; pack sources such as challenge tables and quests are unaffected. */
     public static final ModConfigSpec.BooleanValue UNIQUE_LOOT_ENABLED = UNIQUE_LOOT_CONFIG.enabled();
@@ -182,7 +194,7 @@ public final class RNGTechConfig {
                 .comment("Whether RNGTech biome modifiers place enabled RNGTech ores in new chunks.")
                 .define("enabled", true);
         ModConfigSpec.EnumValue<VanillaOreBridgePolicy> bridgePolicy = BUILDER
-                .comment("How ordinary vanilla pickaxes interact with RNGTech ore hardness gates.")
+                .comment("How far pickaxes that are not Modular tools reach on ore hardness, by their vanilla tier. Items in the rngtech:ore_reach data map use their listed level instead.")
                 .defineEnum("vanillaToolBridgePolicy", VanillaOreBridgePolicy.EARLY_BRIDGE);
         Map<String, ModConfigSpec.BooleanValue> values = new LinkedHashMap<>();
         for (OreDefinition ore : OreCatalog.ores()) {
@@ -199,6 +211,12 @@ public final class RNGTechConfig {
         NOTHING,
         HUSK,
         EXPLODE
+    }
+
+    public enum RestrictedToolMode {
+        NORMAL,
+        WEAKENED,
+        USELESS
     }
 
     public enum VanillaOreBridgePolicy {

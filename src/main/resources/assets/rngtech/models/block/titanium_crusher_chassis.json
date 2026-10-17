@@ -1,12 +1,9 @@
 {
-  "parent": "minecraft:block/cube",
+  "parent": "rngtech:block/crusher",
   "textures": {
-    "down": "rngtech:block/crusher_chassis/bottom/titanium_crusher_chassis",
-    "up": "rngtech:block/crusher_chassis/top/titanium_crusher_chassis",
-    "north": "rngtech:block/crusher_chassis/front/titanium_crusher_chassis",
-    "south": "rngtech:block/crusher_chassis/side/titanium_crusher_chassis",
-    "east": "rngtech:block/crusher_chassis/side/titanium_crusher_chassis",
-    "west": "rngtech:block/crusher_chassis/side/titanium_crusher_chassis",
-    "particle": "rngtech:block/crusher_chassis/front/titanium_crusher_chassis"
+    "particle": "rngtech:block/crusher/shell/titanium",
+    "shell": "rngtech:block/crusher/shell/titanium",
+    "trim": "rngtech:block/crusher/trim/titanium",
+    "rim": "rngtech:block/crusher/rim/arclite"
   }
 }

@@ -1,3 +1,13 @@
 {
-  "parent": "rngtech:block/tungstensteel_crusher_chassis"
+  "parent": "rngtech:item/crusher_heavy_template",
+  "textures": {
+    "particle": "rngtech:block/crusher/shell/tungstensteel",
+    "shell": "rngtech:block/crusher/shell/tungstensteel",
+    "trim": "rngtech:block/crusher/trim/tungstensteel",
+    "rim": "rngtech:block/crusher/rim/nullite",
+    "roll": "rngtech:block/crusher/roll/tungstensteel",
+    "roll_v": "rngtech:block/crusher/roll/tungstensteel_v",
+    "roll_end": "rngtech:block/crusher/roll/tungstensteel_end",
+    "hub": "rngtech:block/crusher/roll/tungstensteel_hub"
+  }
 }

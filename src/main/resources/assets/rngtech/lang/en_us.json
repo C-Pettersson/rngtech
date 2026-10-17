@@ -3804,6 +3804,8 @@
   "rngtech.tooltip.ore.material": "Material: %s",
   "rngtech.tooltip.ore.hardness": "Ore Hardness: %s",
   "rngtech.tooltip.modular_tool.ore_hardness_reach": "Hardness: %s",
+  "rngtech.tooltip.restricted_tool.weakened": "Weakened: mines at %s%% speed. Use a Modular tool.",
+  "rngtech.tooltip.restricted_tool.useless": "Useless: mines like an empty hand. Use a Modular tool.",
   "block.rngtech.tin_ore": "Tin Ore",
   "block.rngtech.deepslate_tin_ore": "Deepslate Tin Ore",
   "block.rngtech.zinc_ore": "Zinc Ore",

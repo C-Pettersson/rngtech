@@ -1,7 +1,9 @@
 package com.rngtech.content.blockentity;
 
 import com.rngtech.content.block.BaseMachineBlock;
+import com.rngtech.content.block.CableBlock;
 import com.rngtech.content.block.CompressorTankBlock;
+import com.rngtech.content.block.UniversalConnectorBlock;
 import com.rngtech.content.item.BatteryCellItem;
 import com.rngtech.content.item.GearParts;
 import com.rngtech.content.item.ServoItem;
@@ -28,8 +30,12 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.Connection;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.game.ClientGamePacketListener;
+import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.world.Containers;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
@@ -38,6 +44,7 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.energy.IEnergyStorage;
 import net.neoforged.neoforge.fluids.FluidActionResult;
@@ -98,6 +105,7 @@ public class CompressorTankBlockEntity extends BaseMachineBlockEntity
     private static final int DATA_LOOSE_FLUID_ID = 20;
     private static final int DATA_COMPRESSED_FLUID_ID = 21;
     private static final int STAT_SCALE = 100;
+    private static final int VISUAL_SYNC_INTERVAL = 2;
 
     private final CompressorTankBlock block;
     private final ItemStackHandler processInventory = new ItemStackHandler(PROCESS_SLOT_COUNT) {
@@ -219,6 +227,9 @@ public class CompressorTankBlockEntity extends BaseMachineBlockEntity
     private FluidStack compressedFluid = FluidStack.EMPTY;
     private int internalEnergy;
     private boolean workedThisTick;
+    private CompressorTankVisualState visualState = CompressorTankVisualState.EMPTY;
+    private CompressorTankVisualState.Key lastSyncedVisual;
+    private final CompressorTankVisualState.Animation animation = new CompressorTankVisualState.Animation();
 
     public CompressorTankBlockEntity(BlockPos pos, BlockState blockState) {
         super(ModBlockEntities.COMPRESSOR_TANK.get(), pos, blockState, MachineType.COMPRESSOR_TANK, 0, 0, 0);
@@ -251,6 +262,100 @@ public class CompressorTankBlockEntity extends BaseMachineBlockEntity
         if (tank.workedThisTick) {
             tank.setChanged();
         }
+        tank.syncVisualState(level);
+    }
+
+    /**
+     * Tanks saved while the block was a solid cube stored no light inside it, which leaves the renderer's fluid and
+     * Gear unlit. Rechecking the block's own light once on load fixes those saves.
+     */
+    @Override
+    public void onLoad() {
+        super.onLoad();
+        if (level != null && !level.isClientSide) {
+            level.getLightEngine().checkBlock(worldPosition);
+        }
+    }
+
+    /** Client copy of the state the renderer draws; synced from the server in the block entity update tag. */
+    public CompressorTankVisualState visualState() {
+        return visualState;
+    }
+
+    public CompressorTankVisualState.Animation animation() {
+        return animation;
+    }
+
+    @Override
+    public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
+        return currentVisualState().save();
+    }
+
+    @Override
+    public Packet<ClientGamePacketListener> getUpdatePacket() {
+        return ClientboundBlockEntityDataPacket.create(this);
+    }
+
+    @Override
+    public void handleUpdateTag(CompoundTag tag, HolderLookup.Provider registries) {
+        visualState = CompressorTankVisualState.load(tag);
+    }
+
+    @Override
+    public void onDataPacket(Connection connection, ClientboundBlockEntityDataPacket packet, HolderLookup.Provider registries) {
+        visualState = CompressorTankVisualState.load(packet.getTag());
+    }
+
+    private void syncVisualState(Level level) {
+        if (level.getGameTime() % VISUAL_SYNC_INTERVAL != 0) {
+            return;
+        }
+        CompressorTankVisualState.Key key = currentVisualState().key();
+        if (!key.equals(lastSyncedVisual)) {
+            lastSyncedVisual = key;
+            level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), Block.UPDATE_CLIENTS);
+        }
+    }
+
+    /** What the tank shows right now, built on the server. */
+    public CompressorTankVisualState currentVisualState() {
+        FluidStack shown = looseTank.isEmpty() ? compressedFluid : looseTank.getFluid();
+        List<String> servos = new ArrayList<>(CompressorTankVisualState.SERVO_SLOTS);
+        for (int slot = SLOT_SERVO_0; slot <= SLOT_SERVO_3; slot++) {
+            servos.add(servoKey(gearInventory.getStackInSlot(slot)));
+        }
+        ItemStack cell = batteryCellStack();
+        return new CompressorTankVisualState(
+                shown.isEmpty() ? "" : BuiltInRegistries.FLUID.getKey(shown.getFluid()).toString(),
+                looseTank.getCapacity() <= 0 ? 0.0F : looseTank.getFluidAmount() / (float) looseTank.getCapacity(),
+                supportsCompression() ? compressedFluid.getAmount() / (float) Math.max(1, compressedEquivalentCapacity()) : -1.0F,
+                servos,
+                isBatteryCell(cell) ? ((BatteryCellItem) cell.getItem()).material().getSerializedName() : "",
+                connectorSides()
+        );
+    }
+
+    private String servoKey(ItemStack stack) {
+        if (!isServo(stack)) {
+            return "";
+        }
+        return stack.getItem() instanceof ServoItem servo ? servo.material().getSerializedName() : "unique";
+    }
+
+    /** Sides a cable connector or a standalone Universal Connector faces, whatever modules it holds. */
+    private int connectorSides() {
+        if (level == null || level.isClientSide) {
+            return 0;
+        }
+        int sides = 0;
+        for (Direction direction : Direction.values()) {
+            BlockState neighbour = level.getBlockState(worldPosition.relative(direction));
+            Direction toward = direction.getOpposite();
+            if (CableBlock.hasConnector(neighbour, toward) || UniversalConnectorBlock.hasConnector(neighbour, toward)) {
+                sides |= 1 << direction.get3DDataValue();
+            }
+        }
+        return sides;
     }
 
     public ItemStackHandler getProcessInventory() {

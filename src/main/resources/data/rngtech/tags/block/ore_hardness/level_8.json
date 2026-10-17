@@ -2,6 +2,10 @@
   "replace": false,
   "values": [
     "rngtech:naquadah_ore",
-    "rngtech:deepslate_naquadah_ore"
+    "rngtech:deepslate_naquadah_ore",
+    {
+      "id": "#c:ores/naquadah",
+      "required": false
+    }
   ]
 }

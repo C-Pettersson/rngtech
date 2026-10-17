@@ -13,6 +13,7 @@ Use this page to fit RNGTech into your modpack. It lists the energy and water nu
     - **Ore to ingots** costs about 9,000 FE per ingot at Stage 1 and about 70,000 at Stage 8.
     - **Water is finite** in RNGTech's balance. The mod still accepts infinite water, so turn it off in your pack.
     - **Uniques:** you can move them to quests or machine challenges and add your own. See [Uniques](#uniques).
+    - **Ore progression:** ore hardness covers other mods' ores, and you can weaken or disable vanilla tools. See [Strict preset](#strict-preset).
     - **Settings** live in `config/rngtech-common.toml`. You change recipes with an ordinary datapack.
 
 ## Energy
@@ -169,7 +170,10 @@ These live in `config/rngtech-common.toml`.
 | `materials.<material>` | on | Turn off to stop the material's recipes loading. Its items show as disabled. |
 | `worldgen.ores.enabled` | on | RNGTech ore generation in new chunks. |
 | `worldgen.ores.<material>.enabled` | on | One ore's generation. |
-| `worldgen.ores.vanillaToolBridgePolicy` | `EARLY_BRIDGE` | How far vanilla pickaxes reach on RNGTech ores (see below). |
+| `worldgen.ores.vanillaToolBridgePolicy` | `EARLY_BRIDGE` | How far tools other than Modular tools reach on ore hardness. See [Tool reach](#tool-reach). |
+| `restrictedTools.mode` | `NORMAL` | `WEAKENED` or `USELESS` vanilla tools. See [Restricted tools](#restricted-tools). |
+| `restrictedTools.weakenedSpeedMultiplier` | 0.25 | Mining speed of restricted tools in `WEAKENED` mode. |
+| `restrictedTools.vanillaRecipesEnabled` | on | Turn off to remove the stone to netherite pickaxe, axe, and shovel recipes. |
 | `ascendancy.sealRecipesEnabled` | on | Turn off to hand out Ascendancy Seals by quest or loot instead. |
 | `soulTransfer.alwaysSucceeds` | off | Turn on so every [Soul Transfer](machine-mastery.md#soul-transfer) absorb succeeds, whatever its calibration. A Soul Transfer from a quest, loot, or `/give` has no calibration and always succeeds anyway. |
 | `soulTransfer.failureXpLossPercent` | 0 | Percent of a machine's Mastery XP lost when a Soul Transfer absorb fails. Late levels need far more XP than early ones, so a high-level machine loses only a few levels unless this is near 100. |
@@ -182,20 +186,76 @@ When a failed Soul Transfer costs levels, the machine refunds its latest-allocat
 
 Each player also has `config/rngtech-client.toml`. Its `solar.animatedPanels` (default on) turns [Solar Panel](solar-panel.md) decks smoothly with the sun; turn it off for panels that tilt in steps, which is lighter on very large fields. It takes effect after a resource reload (F3 + T).
 
-**Vanilla pickaxes and ore hardness.** Each metal ore has an ore hardness: 1 for Iron and Copper, 2 for Gold, Tin, and Zinc, and up to 8 for Naquadah. The [Modular Pick](modular-tools.md) reaches every level. The policy sets how far vanilla pickaxes reach:
+## Ore progression
 
-| Policy | Vanilla pickaxes can mine |
+Players move through RNGTech's stages by mining harder ores with better [Modular tools](modular-tools.md). You can make that the only way through, including for other mods' ores and tools.
+
+### Ore hardness
+
+Each metal has an ore hardness from 1 to 8: 1 for Iron and Copper, 2 for Gold, Tin, and Zinc, and up to 8 for Naquadah. The [Ore hardness](modular-tools.md#ore-hardness) table lists which tool heads reach each level.
+
+- **Other mods' ores** of the same metal get the same hardness. The block tags `rngtech:ore_hardness/level_1` to `level_8` include each metal's common tag, such as `c:ores/tin`. This also gates Nether Gold Ore, which is in `c:ores/gold`.
+- **Add an ore** RNGTech doesn't know, such as Diamond Ore, by adding it to a level tag.
+- **Raise an ore** by adding it to a higher level tag. An ore in several level tags uses the highest one.
+- **Lower an ore** by overriding its level tag with `"replace": true`, leaving the ore out, then adding it to the lower tag.
+- **The Crusher** takes any mod's ore of a metal by its common tag. An ore in `c:ores_in_ground/deepslate` uses the slower deepslate recipe.
+
+Hardness applies when a player breaks the ore, including the fake players many mods' machines use. Explosions, and machines that break blocks without a player, still get the drops. Gate such machines in a strict pack.
+
+### Tool reach
+
+Modular tools reach their head's hardness. Every other item reaches as far as `worldgen.ores.vanillaToolBridgePolicy` allows for its vanilla tier. RNGTech reads the tier from which vanilla blocks the item can harvest, so other mods' pickaxes and drills follow the same policy as vanilla pickaxes.
+
+| Policy | Stone tier | Iron tier | Diamond tier | Netherite Pickaxe |
+|---|---:|---:|---:|---:|
+| `MODULAR_ONLY` | none | none | none | none |
+| `BOOTSTRAP_ONLY` | 1 | 1 | 1 | 1 |
+| `EARLY_BRIDGE` (default) | 1 | 2 | 2 | 2 |
+| `VANILLA_TIER_MAPPING` | 1 | 2 | 4 | 5 |
+
+Wooden and golden pickaxes, axes, and shovels reach no ore hardness. Only the Netherite Pickaxe counts as netherite tier, because vanilla has no block that needs one. Give another mod's tool its own reach in the `rngtech:ore_reach` item data map, at `data/rngtech/data_maps/item/ore_reach.json` in your datapack. A listed item ignores the policy:
+
+```json
+{
+  "values": {
+    "examplemod:mining_drill": { "level": 5 },
+    "#examplemod:starter_picks": { "level": 1 }
+  }
+}
+```
+
+### Restricted tools
+
+The item tag `rngtech:restricted_tools` lists the stone to netherite pickaxes, axes, and shovels. Wooden tools stay usable in every mode: they reach no ore hardness, so they bypass nothing. Add other mods' tools to it, or remove ones you want to keep. `restrictedTools.mode` sets what happens to them:
+
+| Mode | Restricted tools |
 |---|---|
-| `MODULAR_ONLY` | None, including Iron and Copper ore. |
-| `BOOTSTRAP_ONLY` | Iron and Copper ore. |
-| `EARLY_BRIDGE` (default) | Stone pickaxe: Iron and Copper. Iron pickaxe or better: also Gold, Tin, and Zinc. |
-| `VANILLA_TIER_MAPPING` | Same as `EARLY_BRIDGE`, but Diamond reaches Aluminum and Osmium, and Netherite reaches Titanium. |
+| `NORMAL` (default) | Work as usual. |
+| `WEAKENED` | Mine at `restrictedTools.weakenedSpeedMultiplier` of their speed (default 0.25). |
+| `USELESS` | Mine and harvest like an empty hand, reach no ore hardness, and can't strip logs or make paths. They still work as weapons. |
 
-Wooden and golden pickaxes can't mine metal ores.
+In the last two modes, restricted tools say so in their tooltip. `restrictedTools.vanillaRecipesEnabled` (default on) removes the vanilla crafting and smithing recipes for those 15 tools when you turn it off; wooden tools, hoes, and swords keep theirs. Tools from chests, villagers, and mobs still turn up, which is why the mode exists.
+
+Players don't need restricted tools to start: the [Tool Bench](tool-bench.md) needs only oak slabs, a crafting table, and gravel, and a Flint Pick mines stone, coal, and hardness 1 ores.
+
+### Strict preset
+
+For a pack where RNGTech's Modular tools are the only way to mine, put this in `config/rngtech-common.toml`:
+
+```toml
+[worldgen.ores]
+    vanillaToolBridgePolicy = "MODULAR_ONLY"
+
+[restrictedTools]
+    mode = "USELESS"
+    vanillaRecipesEnabled = false
+```
+
+Then add other mods' mining tools to `rngtech:restricted_tools`, or give them a level in `rngtech:ore_reach`, and gate other mods' block-breaking machines.
 
 ## Compatibility
 
-- **Other mods' metals:** RNGTech recipes use common tags such as `c:ingots/tin`, so other mods' tin works in them.
+- **Other mods' metals:** RNGTech recipes use common tags such as `c:ingots/tin` and `c:ores/tin`, so other mods' tin works in them. Their ores share RNGTech's [ore hardness](#ore-hardness).
 - **AE2 and Refined Storage:** Universal Cables can link their networks.
 - **JEI and Jade** show RNGTech recipes and machine state.
 - **FTB Quests:** the repository has a ready-made quest line in [extras/ftbquests](https://github.com/c-pettersson/rngtech/tree/main/extras/ftbquests). Copy its `config/ftbquests` into your pack.

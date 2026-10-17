@@ -634,7 +634,7 @@ def generate_crusher_ore_recipes(catalog: dict, ore_catalog: dict) -> None:
                     ]),
                 ]),
                 ("type", "rngtech:crusher"),
-                ("ingredient", OrderedDict([("item", f"rngtech:{block_id}")])),
+                ("ingredient", crusher_ore_ingredient(material_id, host)),
                 ("result", OrderedDict([
                     ("count", 3),
                     ("id", crushed_id),
@@ -643,6 +643,14 @@ def generate_crusher_ore_recipes(catalog: dict, ore_catalog: dict) -> None:
                 ("energy", energy),
                 ("required_processing_level", max(1, min(8, ore["hardness_level"]))),
             ]))
+
+
+def crusher_ore_ingredient(material_id: str, host: str) -> OrderedDict:
+    ore_tag = OrderedDict([("tag", f"c:ores/{material_id}")])
+    deepslate_tag = OrderedDict([("tag", "c:ores_in_ground/deepslate")])
+    if host == "deepslate":
+        return OrderedDict([("type", "neoforge:intersection"), ("children", [ore_tag, deepslate_tag])])
+    return OrderedDict([("type", "neoforge:difference"), ("base", ore_tag), ("subtracted", deepslate_tag)])
 
 
 def generate_raw_material_recipes(catalog: dict, ore_catalog: dict) -> None:
@@ -704,6 +712,14 @@ def rewrite_recipe_result(path: Path, old_id: str, new_id: str) -> None:
         path.write_text(updated, encoding="utf-8", newline="\n")
 
 
+def material_ore_hardness(ore_catalog: dict) -> dict[str, int]:
+    """Gates every mod's ore of a material, through its common tag, at the material's hardness."""
+    hardness = {"iron": 1, "copper": 1, "gold": 2}
+    for ore in ore_catalog["ores"]:
+        hardness[ore["material"]] = ore["hardness_level"]
+    return hardness
+
+
 def generate_ore_resources(catalog: dict, ore_catalog: dict) -> None:
     materials = {material["id"]: material for material in catalog["materials"]}
     generated_values: list[str] = []
@@ -730,8 +746,17 @@ def generate_ore_resources(catalog: dict, ore_catalog: dict) -> None:
 
     for vanilla_ore, hardness in VANILLA_ORE_HARDNESS.items():
         hardness_values[hardness].append(vanilla_ore)
+    for material_id, hardness in material_ore_hardness(ore_catalog).items():
+        hardness_values[hardness].append({"id": f"#c:ores/{material_id}", "required": False})
 
     tag("rngtech/tags/block/ores.json", rngtech_ore_values)
+    for host in ("stone", "deepslate"):
+        host_values = [value for value in rngtech_ore_values if value.startswith("rngtech:deepslate_") == (host == "deepslate")]
+        if host == "deepslate":
+            # NeoForge tags these too; listing them lets the repository tools resolve the tag on their own.
+            host_values = [ore for ore in VANILLA_ORE_HARDNESS if ore.startswith("minecraft:deepslate_")] + host_values
+        tag(f"c/tags/block/ores_in_ground/{host}.json", host_values)
+        tag(f"c/tags/item/ores_in_ground/{host}.json", host_values)
     tag("rngtech/tags/item/ores.json", rngtech_ore_values)
     tag("rngtech/tags/block/generated_ores.json", generated_values)
     tag("rngtech/tags/item/generated_ores.json", generated_values)

@@ -147,7 +147,9 @@ RNGTech ores have a **hardness** from 1 to 8, separate from vanilla mining tiers
 | Nullite | 7 | 7 | None by default |
 | Exotic | 8 | 8 | Naquadah |
 
-By default, a vanilla stone pickaxe reaches hardness 1 and an iron or better pickaxe reaches hardness 2. Beyond that you need Modular tools. Modpacks can change both rules.
+Other mods' ores of the same metal share its hardness, so another mod's Tin Ore is hardness 2 like RNGTech's.
+
+By default, a vanilla stone pickaxe reaches hardness 1 and an iron or better pickaxe reaches hardness 2. Other mods' pickaxes and drills follow the same rule by their tier. Beyond that you need Modular tools. Modpacks can change these rules and can weaken or disable vanilla tools; see [Ore progression](modpack-creators.md#ore-progression).
 
 ## Tool behavior
 

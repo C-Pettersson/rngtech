@@ -16,6 +16,7 @@ import com.rngtech.content.registry.ModCapabilities;
 import com.rngtech.content.registry.ModConditions;
 import com.rngtech.content.registry.ModCreativeTabs;
 import com.rngtech.content.registry.ModDataComponents;
+import com.rngtech.content.registry.ModDataMaps;
 import com.rngtech.content.registry.ModEntityTypes;
 import com.rngtech.content.registry.ModFluids;
 import com.rngtech.content.registry.ModItems;
@@ -26,6 +27,7 @@ import com.rngtech.content.registry.ModRecipes;
 import com.rngtech.content.registry.ModSounds;
 import com.rngtech.content.registry.ModStructures;
 import com.rngtech.content.tool.FieldToolEvents;
+import com.rngtech.content.tool.RestrictedTools;
 
 import com.mojang.logging.LogUtils;
 import net.minecraft.core.cauldron.CauldronInteraction;
@@ -71,6 +73,7 @@ public final class RNGTech {
 
         modBus.addListener(this::commonSetup);
         modBus.addListener(ModCapabilities::register);
+        modBus.addListener(ModDataMaps::register);
         modBus.addListener(ModNetworking::register);
         modBus.addListener(ModConfigEvent.Loading.class, event -> MachineStatsCache.invalidateAll());
         modBus.addListener(ModConfigEvent.Reloading.class, event -> MachineStatsCache.invalidateAll());
@@ -83,6 +86,10 @@ public final class RNGTech {
         NeoForge.EVENT_BUS.addListener(FieldToolEvents::onBlockDrops);
         NeoForge.EVENT_BUS.addListener(FieldToolEvents::onAnvilUpdate);
         NeoForge.EVENT_BUS.addListener(FieldToolEvents::onGrindstonePlace);
+        NeoForge.EVENT_BUS.addListener(RestrictedTools::onBreakSpeed);
+        NeoForge.EVENT_BUS.addListener(RestrictedTools::onHarvestCheck);
+        NeoForge.EVENT_BUS.addListener(RestrictedTools::onToolModification);
+        NeoForge.EVENT_BUS.addListener(RestrictedTools::onTooltip);
         NeoForge.EVENT_BUS.addListener(MinersCompanionEvents::onBlockDrops);
         NeoForge.EVENT_BUS.addListener(MinersCompanionEvents::onPlayerTick);
         NeoForge.EVENT_BUS.addListener(CorruptionDataEvents::onAddReloadListeners);

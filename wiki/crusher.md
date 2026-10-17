@@ -42,6 +42,10 @@ The **Crusher** breaks ores and raw metals into crushed material, and crushed ma
 
 Every Crusher runs on FE and needs a Crush Head installed. Like every RNGTech machine, each Crusher you craft rolls its own [rarity and affixes](rarity-and-affixes.md), and it can level up through [Machine Mastery](machine-mastery.md).
 
+You can read a Crusher from the outside. The installed Crush Head is the pair of toothed rolls in the open front, in the head's material; with no head you see only the bare shafts. The rolls turn toward each other while the Crusher works, faster when a craft is shorter, and grit of the input falls below them. Items in the input slot wait in the hopper on top and shake while they are crushed, and finished items collect in the bin at the bottom of the front. A jam stops the rolls with a shudder, wedges the input between them, puffs smoke, and blinks the lamp above the opening red. Facing the front, the Battery Cell lies in the cradle on the left with a charge meter beside it, and the motor sits on the right. Cables connect on any side, but the cable port is drawn on the back.
+
+Each chassis has its own casing, and the rim of its hopper is the metal at the top of its recipe. The Iron, Copper, and Bronze Crushers stand on smooth stone. The Tungstensteel and Exotic Crushers, which crush several items per cycle, have a second, smaller pair of rolls under the first. The {{ item('rngtech:wooden_crusher_chassis') }} is a plank frame on wooden posts instead, with no lamp or meter; a Flint Crush Head shows as wooden rolls studded with flint.
+
 ## Obtaining
 
 ### Crafting

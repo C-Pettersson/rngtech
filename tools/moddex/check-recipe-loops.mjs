@@ -282,6 +282,33 @@ function plainIngredientAlternatives(entry) {
     return [entry];
 }
 
+/** Resolves NeoForge intersection and difference ingredients, which need their tags' members, into plain item alternatives. */
+async function resolveSetIngredient(entry, tags) {
+    if (entry?.type === "neoforge:intersection") {
+        const [first, ...rest] = await Promise.all(entry.children.map((child) => ingredientItemSet(child, tags)));
+        return [...first].filter((item) => rest.every((set) => set.has(item))).map((item) => ({ item }));
+    }
+    if (entry?.type === "neoforge:difference") {
+        const base = await ingredientItemSet(entry.base, tags);
+        const subtracted = await ingredientItemSet(entry.subtracted, tags);
+        return [...base].filter((item) => !subtracted.has(item)).map((item) => ({ item }));
+    }
+    return [entry];
+}
+
+async function ingredientItemSet(entry, tags) {
+    const items = new Set();
+    for (const plain of plainIngredientAlternatives(entry)) {
+        for (const alternative of await resolveSetIngredient(plain, tags)) {
+            const members = alternative.tag ? await tagItems(alternative.tag, tags) : [alternative.item].filter(Boolean);
+            for (const item of members) {
+                items.add(item);
+            }
+        }
+    }
+    return items;
+}
+
 async function ingredientNode(entry, count, tags, key, choices) {
     if (!entry) {
         return null;
@@ -297,7 +324,7 @@ async function ingredientNode(entry, count, tags, key, choices) {
     }
     const effective = count * (entry.count ?? 1);
     const items = [];
-    for (const alternative of plainIngredientAlternatives(entry)) {
+    for (const alternative of (await Promise.all(plainIngredientAlternatives(entry).map((plain) => resolveSetIngredient(plain, tags)))).flat()) {
         if (alternative.item) {
             items.push(alternative.item);
         } else if (alternative.type === "rngtech:malformed_ingot") {

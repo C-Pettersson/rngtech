@@ -1,0 +1,7 @@
+{
+  "parent": "rngtech:block/compressor_tank/servo",
+  "textures": {
+    "servo": "rngtech:block/compressor_tank/servo/steel",
+    "accent": "rngtech:block/compressor_tank/servo/steel_accent"
+  }
+}

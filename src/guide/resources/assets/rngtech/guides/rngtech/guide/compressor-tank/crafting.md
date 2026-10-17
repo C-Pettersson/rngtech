@@ -2,7 +2,7 @@
 navigation:
   title: "Crafting"
   parent: compressor-tank.md
-  position: 3
+  position: 4
   icon: rngtech:steel_compressor_tank
 ---
 
