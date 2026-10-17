@@ -12,6 +12,7 @@ import com.rngtech.content.menu.MetalPressMenu;
 import com.rngtech.content.recipe.MetalPressRecipe;
 import com.rngtech.content.recipe.MetalPressRecipeInput;
 import com.rngtech.content.registry.ModBlockEntities;
+import com.rngtech.content.registry.ModDataComponents;
 import com.rngtech.content.registry.ModItems;
 import com.rngtech.content.registry.ModRecipes;
 import com.rngtech.content.registry.ModTags;
@@ -138,7 +139,12 @@ public class MetalPressBlockEntity extends BaseMachineBlockEntity
     private static final int DATA_NITROGEN = DATA_INPUT_ENERGY + 1;
     private static final int DATA_NITROGEN_USE = DATA_NITROGEN + 1;
     private static final int DATA_NITROGEN_BONUS = DATA_NITROGEN_USE + 1;
-    private static final int DATA_MACHINE_PROGRESSION_START = DATA_NITROGEN_BONUS + 1;
+    private static final int DATA_HYDROGEN = DATA_NITROGEN_BONUS + 1;
+    private static final int DATA_ANNEAL_MODE = DATA_HYDROGEN + 1;
+    private static final int DATA_MACHINE_PROGRESSION_START = DATA_ANNEAL_MODE + 1;
+    public static final int ANNEAL_NONE = 0;
+    public static final int ANNEAL_CIRCUITS = 1;
+    public static final int ANNEAL_PLATES = 2;
     private static final int DATA_COUNT = DATA_MACHINE_PROGRESSION_START + MasteryMenuSupport.FIELD_COUNT;
     private static final int STAT_SCALE = 100;
     private static final int LEGACY_SLOT_BATTERY_CELL = 3;
@@ -205,7 +211,7 @@ public class MetalPressBlockEntity extends BaseMachineBlockEntity
     private final EnergyTelemetry energyFlow = new EnergyTelemetry(this::getLevel);
     private final IEnergyStorage trackedEnergyStorage = energyFlow.track(energyStorage);
     private final InstalledBatteryCell batteryCell = new InstalledBatteryCell(this::batteryCellStack);
-    private final InertAtmosphere atmosphere = new InertAtmosphere(this::setChanged, () -> true);
+    private final InertAtmosphere atmosphere = new InertAtmosphere(this::setChanged, () -> true, () -> annealMode() != ANNEAL_NONE);
     private final ContainerData menuData = new ContainerData() {
         @Override
         public int get(int index) {
@@ -233,6 +239,8 @@ public class MetalPressBlockEntity extends BaseMachineBlockEntity
                 case DATA_NITROGEN -> atmosphere.amount();
                 case DATA_NITROGEN_USE -> atmosphere.lastUse();
                 case DATA_NITROGEN_BONUS -> (int) Math.round(atmosphereBonus() * 100.0);
+                case DATA_HYDROGEN -> atmosphere.holdsHydrogen() ? 1 : 0;
+                case DATA_ANNEAL_MODE -> annealMode();
                 case DATA_PROCESSING_SPEED -> scaledStat(stats, MachineStat.PROCESSING_SPEED);
                 case DATA_EFFICIENCY -> scaledStat(stats, MachineStat.EFFICIENCY);
                 case DATA_ENERGY_USAGE -> scaledStat(stats, MachineStat.ENERGY_USAGE);
@@ -328,7 +336,7 @@ public class MetalPressBlockEntity extends BaseMachineBlockEntity
         // A blocked output keeps the forming bed at its setpoint, so pressing resumes as soon as there is room.
         if (press.effectiveHeat(stats) >= recipe.targetTemperature()
                 && !press.crudePressBlocksUnstableRecipe(recipe, stats)
-                && !press.canMergeOutput(recipe.outputStack())) {
+                && !press.canMergeOutput(press.pressedOutput(recipe))) {
             press.tooHot = false;
             press.starved = false;
             HeatEngine.hold(press.heat, press.envelope(recipe, stats), stats, HeatEngine.electric(press.heat, stats, press::drawEnergy));
@@ -770,6 +778,32 @@ public class MetalPressBlockEntity extends BaseMachineBlockEntity
         return false;
     }
 
+    /** Which pressed items this press anneals: Bright Anneal takes circuits, Hydrogen Quench takes plates. */
+    private int annealMode() {
+        return hasMasteryBehavior("BRIGHT_ANNEAL") ? ANNEAL_CIRCUITS : hasMasteryBehavior("HYDROGEN_QUENCH") ? ANNEAL_PLATES : ANNEAL_NONE;
+    }
+
+    /** Whether this recipe's output comes out Annealed while the tank holds enough Hydrogen for one item. */
+    private boolean willAnneal(MetalPressRecipe recipe) {
+        ItemStack output = recipe.outputStack();
+        boolean anneals = switch (annealMode()) {
+            case ANNEAL_CIRCUITS -> isCircuit(recipe) && output.is(ModTags.Items.ANNEALED_CALIBRATION_INPUTS);
+            case ANNEAL_PLATES -> isPlate(recipe) && output.is(ModTags.Items.PLATES);
+            default -> false;
+        };
+        return anneals && atmosphere.canAnneal(1);
+    }
+
+    /** The output this press makes next: Annealed when it will anneal it. */
+    private ItemStack pressedOutput(MetalPressRecipe recipe) {
+        return willAnneal(recipe) ? annealed(recipe.outputStack()) : recipe.outputStack();
+    }
+
+    private static ItemStack annealed(ItemStack stack) {
+        stack.set(ModDataComponents.ANNEALED.get(), true);
+        return stack;
+    }
+
     /** Forge Line disables circuit recipes. */
     private boolean routeDisabled(MetalPressRecipe recipe) {
         return isCircuit(recipe) && hasMasteryBehavior("FORGE_LINE");
@@ -821,7 +855,10 @@ public class MetalPressBlockEntity extends BaseMachineBlockEntity
             return 1;
         }
         int limit = Math.min(BatchProcessing.batchSize(stats, false), inputStack().getCount() / Math.max(1, recipe.inputCount()));
-        ItemStack output = recipe.outputStack();
+        if (willAnneal(recipe)) {
+            limit = Math.min(limit, atmosphere.amount() / InertAtmosphere.HYDROGEN_PER_ANNEAL);
+        }
+        ItemStack output = pressedOutput(recipe);
         return Math.max(1, BatchProcessing.largestFitting(limit, batch -> batch == 1 || canMergeOutput(output.copyWithCount(output.getCount() * batch))));
     }
 
@@ -871,7 +908,8 @@ public class MetalPressBlockEntity extends BaseMachineBlockEntity
         }
 
         int jobs = batchJobs(recipe, stats);
-        ItemStack baseResult = recipe.outputStack();
+        boolean annealed = willAnneal(recipe) && atmosphere.canAnneal(jobs);
+        ItemStack baseResult = annealed ? annealed(recipe.outputStack()) : recipe.outputStack();
         ItemStack batch = baseResult.copyWithCount(baseResult.getCount() * jobs);
         if (!canMergeOutput(batch)) {
             return false;
@@ -883,9 +921,12 @@ public class MetalPressBlockEntity extends BaseMachineBlockEntity
                 result = canMergeOutput(grown) ? grown : result;
             }
         }
-        result = withBatchLedger(recipe, stats, result, jobs);
+        result = withBatchLedger(recipe, stats, result, baseResult, jobs);
 
         consumeInput(recipe.inputCount() * jobs);
+        if (annealed) {
+            atmosphere.anneal(jobs);
+        }
         mergeOutput(result);
         for (int job = 0; job < jobs; job++) {
             grantRecipeXp(recipe);
@@ -897,11 +938,10 @@ public class MetalPressBlockEntity extends BaseMachineBlockEntity
     }
 
     /** The Batch Ledger banks a share of every eligible job and pays whole items once the output has room. */
-    private ItemStack withBatchLedger(MetalPressRecipe recipe, MachineStatAccumulator stats, ItemStack result, int jobs) {
+    private ItemStack withBatchLedger(MetalPressRecipe recipe, MachineStatAccumulator stats, ItemStack result, ItemStack base, int jobs) {
         if (!ledgerActive(recipe, stats)) {
             return result;
         }
-        ItemStack base = recipe.outputStack();
         batchLedger.add(base.getItem(), AscendancyFormulas.ledgerShare(stats, base.getCount(), false) * jobs);
         int payable = batchLedger.payable(base.getItem());
         ItemStack paid = ProcessingChance.grow(result, base, payable);
@@ -1137,7 +1177,7 @@ public class MetalPressBlockEntity extends BaseMachineBlockEntity
         if (isCrudePress() && stats.value(MachineStat.TEMPERATURE_STABILITY) < recipe.requiredTemperatureStability()) {
             return STATUS_STABILITY_LOW;
         }
-        if (!canMergeOutput(recipe.outputStack())
+        if (!canMergeOutput(pressedOutput(recipe))
                 || (!isCrudePress()
                         && failureStrain >= FAILURE_STRAIN_THRESHOLD
                         && !canMergeOutput(recipe.failureStack()))) {

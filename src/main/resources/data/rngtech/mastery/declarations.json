@@ -737,6 +737,20 @@
                 "melter"
             ],
             "yield": "none"
+        },
+        {
+            "id": "BRIGHT_ANNEAL",
+            "families": [
+                "metal_press"
+            ],
+            "yield": "none"
+        },
+        {
+            "id": "HYDROGEN_QUENCH",
+            "families": [
+                "metal_press"
+            ],
+            "yield": "none"
         }
     ]
 }

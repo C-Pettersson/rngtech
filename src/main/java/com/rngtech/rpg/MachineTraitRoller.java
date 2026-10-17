@@ -23,6 +23,11 @@ public final class MachineTraitRoller {
     }
 
     public static MachineTraits roll(ModifierEligibilityProfile profile, int componentStage, RandomSource random) {
+        return roll(profile, componentStage, random, false);
+    }
+
+    /** {@code luckyRefinementPotential}: RP rolls twice and keeps the higher, as Annealed items do. */
+    public static MachineTraits roll(ModifierEligibilityProfile profile, int componentStage, RandomSource random, boolean luckyRefinementPotential) {
         RollTuning tuning = tuningFor(profile);
         Rarity rarity = rollRarity(componentStage, random);
         List<MachineModifier> modifiers = new ArrayList<>();
@@ -30,7 +35,9 @@ public final class MachineTraitRoller {
         rollTraits(profile, rarity, componentStage, tuning, random, modifiers, behaviors);
         return new MachineTraits(
                 rarity,
-                rollRefinementPotential(componentStage, tuning, random),
+                luckyRefinementPotential
+                        ? Math.max(rollRefinementPotential(componentStage, tuning, random), rollRefinementPotential(componentStage, tuning, random))
+                        : rollRefinementPotential(componentStage, tuning, random),
                 modifiers,
                 behaviors
         );

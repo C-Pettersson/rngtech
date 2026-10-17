@@ -63,6 +63,7 @@ import com.rngtech.client.screen.VacuumCollapseGeneratorScreen;
 import com.rngtech.client.screen.WoodenComposterScreen;
 import com.rngtech.client.screen.WoodenDehumidifierScreen;
 import com.rngtech.client.sound.MachineSoundClient;
+import com.rngtech.client.tooltip.AnnealedTooltip;
 import com.rngtech.client.wrench.WrenchOverlayClient;
 import com.rngtech.content.item.UniqueTooltip;
 import com.rngtech.content.registry.ModBlockEntities;
@@ -122,6 +123,7 @@ public final class RNGTechClient {
         NeoForge.EVENT_BUS.addListener(ConfiguratorClient::onClientTick);
         NeoForge.EVENT_BUS.addListener(MachineSoundClient::onClientTick);
         NeoForge.EVENT_BUS.addListener(MinersCompanionLampClient::onClientTick);
+        NeoForge.EVENT_BUS.addListener(AnnealedTooltip::onTooltip);
         container.registerConfig(ModConfig.Type.CLIENT, RNGTechClientConfig.SPEC);
         container.registerExtensionPoint(IConfigScreenFactory.class, ConfigurationScreen::new);
         UniqueTooltip.setOpenHost(UniqueHostReaders::current);

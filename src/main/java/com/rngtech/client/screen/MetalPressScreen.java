@@ -420,7 +420,7 @@ public class MetalPressScreen extends AbstractContainerScreen<MetalPressMenu> {
         guiGraphics.fill(x + ENERGY_BAR_X + 1, y + BAR_Y + BAR_HEIGHT - 1 - energyHeight, x + ENERGY_BAR_X + BAR_WIDTH - 1, y + BAR_Y + BAR_HEIGHT - 1, ENERGY);
 
         HeatReadout.renderBar(guiGraphics, leftPos + HEAT_BAR_X, topPos + BAR_Y, BAR_WIDTH, BAR_HEIGHT, BAR_FILL_HEIGHT, heatBands());
-        nitrogenGauge.render(guiGraphics, leftPos, topPos, menu.nitrogen(), menu.nitrogenUse());
+        nitrogenGauge.render(guiGraphics, leftPos, topPos, menu.nitrogen(), menu.nitrogenUse(), menu.holdsHydrogen());
 
         renderIconBox(guiGraphics, STATUS_ICON_X, STATUS_ICON_Y);
         MachineScreenStyle.renderStatusGlyph(guiGraphics, x + STATUS_ICON_X, y + STATUS_ICON_Y, statusState());
@@ -513,7 +513,8 @@ public class MetalPressScreen extends AbstractContainerScreen<MetalPressMenu> {
             return;
         }
         if (nitrogenGauge.renderTooltip(
-                guiGraphics, font, leftPos, topPos, mouseX, mouseY, menu.nitrogen(), menu.nitrogenUse(), menu.nitrogenBonusPercent())) {
+                guiGraphics, font, leftPos, topPos, mouseX, mouseY, menu.nitrogen(), menu.nitrogenUse(), menu.nitrogenBonusPercent(),
+                menu.holdsHydrogen(), menu.annealMode())) {
             return;
         }
 

@@ -169,6 +169,8 @@ Every node in this machine's ascendancies. See [Machine Mastery](machine-mastery
 | **Tolerance Map** | Notable | Steady Bed | 40% less heat-related failure strain. |
 | True Bed | Small | Tolerance Map | 8% increased Temperature Stability. |
 | **Master Die** | Deep notable | True Bed | 20% less Processing Speed. No failures while heat stays in the window and power holds. |
+| Purge Line | Small | Mold Rack | 5% reduced Energy Use. |
+| **Bright Anneal** | Notable | Purge Line | The atmosphere tank takes Hydrogen, and Basic Electric Circuits pressed with it come out Annealed for 250 mB each. An Annealed circuit calibrates with lucky stability. |
 | Fine Servos | Small | Mold Rack | 8% increased Stability. |
 | **Circuit Discipline** | Notable | Fine Servos | Circuit recipes gain 20% increased Stability and use 15% less FE. |
 | Heat Margin | Small | Mold Rack | 10% increased Overheat Tolerance. |
@@ -187,6 +189,8 @@ Every node in this machine's ascendancies. See [Machine Mastery](machine-mastery
 | **Split Failure** | Notable | Wide Bed | A failed batch ruins one job’s input instead of all of them; the rest waits for the next cycle. |
 | Broad Bed | Small | Split Failure | +5% Heat Window. |
 | **Batch Ledger** | Deep notable | Broad Bed | +5% Ledger Rate. |
+| Quench Line | Small | Drop Hammer | 8% increased Temperature Stability. |
+| **Hydrogen Quench** | Notable | Quench Line | The atmosphere tank takes Hydrogen, and plates pressed with it come out Annealed for 250 mB each. Gear crafted only from Annealed plates rolls lucky Refinement Potential. |
 | Lean Strikes | Small | Drop Hammer | 5% reduced Energy Use. |
 | **Shock Absorbers** | Notable | Lean Strikes | Power-drop grace is doubled while batching. |
 | Hot Platen | Small | Drop Hammer | 8% increased Heat Transfer. |

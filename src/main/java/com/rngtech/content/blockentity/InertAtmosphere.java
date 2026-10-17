@@ -11,29 +11,40 @@ import net.neoforged.neoforge.fluids.capability.templates.FluidTank;
 import java.util.function.BooleanSupplier;
 
 /**
- * A heated machine's Nitrogen tank. With Blast Draft, a tank holding Nitrogen gives 15% increased Overheat Tolerance,
- * and a lane uses Nitrogen only while it works above the overheat temperature it would have without it.
+ * A heated machine's atmosphere tank. With Blast Draft, a tank holding Nitrogen gives 15% increased Overheat Tolerance,
+ * and a lane uses Nitrogen only while it works above the overheat temperature it would have without it. A Metal Press
+ * with an annealing ascendancy node may fill it with Hydrogen instead, one gas at a time.
  */
 public final class InertAtmosphere {
     public static final int CAPACITY = 4000;
     public static final int USE_PER_LANE_TICK = 1;
     /** Added to Overheat Tolerance, so the overheat temperature rises by this share of the safe maximum. */
     public static final double OVERHEAT_BONUS = 0.15;
+    /** Hydrogen one annealed item costs. */
+    public static final int HYDROGEN_PER_ANNEAL = 250;
     private static final String TAG = "NitrogenTank";
 
     private final FluidTank tank;
     private final BooleanSupplier accepts;
+    private final BooleanSupplier acceptsHydrogen;
     private final IFluidHandler inlet;
     private int usedThisTick;
     private int lastUse;
 
     /** {@code accepts} turns the inlet off on machines that cannot overheat, such as the Stage 0 Furnace. */
     public InertAtmosphere(Runnable onChanged, BooleanSupplier accepts) {
+        this(onChanged, accepts, () -> false);
+    }
+
+    /** {@code acceptsHydrogen} lets the inlet take Hydrogen, for a Metal Press with an annealing node. */
+    public InertAtmosphere(Runnable onChanged, BooleanSupplier accepts, BooleanSupplier acceptsHydrogen) {
         this.accepts = accepts;
+        this.acceptsHydrogen = acceptsHydrogen;
         this.tank = new FluidTank(CAPACITY) {
             @Override
             public boolean isFluidValid(FluidStack stack) {
-                return stack.is(ModFluids.NITROGEN_SOURCE.get());
+                return stack.is(ModFluids.NITROGEN_SOURCE.get())
+                        || stack.is(ModFluids.HYDROGEN_SOURCE.get()) && InertAtmosphere.this.acceptsHydrogen.getAsBoolean();
             }
 
             @Override
@@ -52,9 +63,23 @@ public final class InertAtmosphere {
         return tank.getFluidAmount();
     }
 
-    /** Whether the tank can feed a lane this tick. */
+    /** Whether the tank holds enough Nitrogen to feed a lane this tick. */
     public boolean available() {
-        return tank.getFluidAmount() >= USE_PER_LANE_TICK;
+        return tank.getFluid().is(ModFluids.NITROGEN_SOURCE.get()) && tank.getFluidAmount() >= USE_PER_LANE_TICK;
+    }
+
+    public boolean holdsHydrogen() {
+        return tank.getFluid().is(ModFluids.HYDROGEN_SOURCE.get());
+    }
+
+    /** Whether the tank can anneal {@code items} items now. */
+    public boolean canAnneal(int items) {
+        return holdsHydrogen() && tank.getFluidAmount() >= HYDROGEN_PER_ANNEAL * Math.max(1, items);
+    }
+
+    /** Spends the Hydrogen for {@code items} annealed items. */
+    public void anneal(int items) {
+        usedThisTick += tank.drain(HYDROGEN_PER_ANNEAL * Math.max(1, items), IFluidHandler.FluidAction.EXECUTE).getAmount();
     }
 
     /** The Overheat Tolerance the atmosphere adds: only with Blast Draft and Nitrogen in the tank. */
@@ -75,7 +100,7 @@ public final class InertAtmosphere {
         usedThisTick = 0;
     }
 
-    /** Nitrogen the lanes used on the last full tick, for display. */
+    /** Gas the machine used on the last full tick, for display. */
     public int lastUse() {
         return lastUse;
     }

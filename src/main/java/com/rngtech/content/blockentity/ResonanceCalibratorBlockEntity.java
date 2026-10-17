@@ -9,6 +9,7 @@ import com.rngtech.content.calibration.CalibrationValueRange;
 import com.rngtech.content.calibration.ResonanceCalibratorChassis;
 import com.rngtech.content.item.BatteryCellItem;
 import com.rngtech.content.item.CalibrationPatternItem;
+import com.rngtech.content.item.CraftedTraitOutputs;
 import com.rngtech.content.item.GearParts;
 import com.rngtech.content.item.MachinePartItem;
 import com.rngtech.content.loot.ChallengeContext;
@@ -20,6 +21,7 @@ import com.rngtech.content.recipe.CalibrationRecipeInput;
 import com.rngtech.content.registry.ModBlockEntities;
 import com.rngtech.content.registry.ModDataComponents;
 import com.rngtech.content.registry.ModRecipes;
+import com.rngtech.content.registry.ModTags;
 import com.rngtech.rpg.BatchProcessing;
 import com.rngtech.rpg.ComponentBaseStatCatalog;
 import com.rngtech.rpg.MachineBaseStatCatalog;
@@ -716,7 +718,11 @@ public class ResonanceCalibratorBlockEntity extends BaseMachineBlockEntity
     private ItemStack createOutput(CalibrationRecipe recipe, MachineStatAccumulator stats, int operations) {
         CalibrationRecipeResult recipeResult = recipe.result();
         CalibrationValueRange stabilityRange = currentStabilityRange(recipe, stats);
-        int stability = secondPass(recipe, stats, stabilityRange, stabilityRange.roll(level.random), operations);
+        int rolled = stabilityRange.roll(level.random);
+        if (annealedInput()) {
+            rolled = Math.max(rolled, stabilityRange.roll(level.random));
+        }
+        int stability = secondPass(recipe, stats, stabilityRange, rolled, operations);
         // Master Harmonic: at the full streak, every 8th calibration is perfect.
         if (hasMasteryBehavior("MASTER_HARMONIC") && fullStreak(streak, stats)) {
             int harmonic = streak.harmonic() + 1;
@@ -1089,6 +1095,12 @@ public class ResonanceCalibratorBlockEntity extends BaseMachineBlockEntity
 
     private boolean hasBatteryCell() {
         return isBatteryCell(batteryCellStack());
+    }
+
+    /** An Annealed circuit calibrates with lucky stability: two rolls, the higher kept. */
+    private boolean annealedInput() {
+        ItemStack input = inputStack();
+        return input.is(ModTags.Items.ANNEALED_CALIBRATION_INPUTS) && CraftedTraitOutputs.isAnnealed(input);
     }
 
     private ItemStack inputStack() {
