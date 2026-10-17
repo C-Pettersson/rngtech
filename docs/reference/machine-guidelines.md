@@ -199,6 +199,8 @@ Design intent and balance rules behind shipped machines that the code does not s
 - Circuit gates: a Bronze Heat Core meets the Basic heat and stability gates, Advanced needs a well-controlled Crude Press, and Elite and Ultimate target the Steel Press or a heavily upgraded Crude Press.
 - Press bodies roll modifiers with Stage 8 weighting and Refinement Potential, because they are not a staged chassis ladder that carries investment forward.
 - The Crude Energy Connector is the only connector crafted without the Connector Mold, so early wiring does not wait for a press.
+- Hydrogen annealing is an ascendancy feature so it never clutters ordinary presses: Die Keeper's Bright Anneal anneals Basic Electric Circuits and Drop Forge's Hydrogen Quench anneals plates, each the third node on its branch (Seal II). A press picks one role; both take two Steel presses. Only the outputs a press anneals spend Hydrogen (`250 mB` each), so nothing drains for no effect.
+- Annealing improves luck, never ranges: Gear crafted from all-Annealed plates rolls Refinement Potential twice and keeps the higher, and an Annealed circuit's calibration rolls stability twice. Rarity odds, affix tiers, and corruption are untouched. Watch Soul Transfer success (it reads calibration stability) and the Calibrator's Second Pass and Master Harmonic nodes; if circuits make Elite blanks or transfers routine, shrink the circuit bonus to a stability floor.
 
 ### Melter
 
@@ -269,7 +271,7 @@ Design intent and balance rules behind shipped machines that the code does not s
 
 ### Corrosion Cell
 
-- Anode FE/t stays below the same stage's main generator: the Syngas Combustor at Stage 5, the Ammonia Fuel Cell at Stage 6, and the Vacuum Collapse Generator at Stage 7 (and its all-Exotic setup at Stage 8).
+- Anode FE/t stays below the same stage's main generator: the Syngas Combustor at Stage 5, the Fuel Cell at Stage 6, and the Vacuum Collapse Generator at Stage 7 (and its all-Exotic setup at Stage 8).
 - Corrosion waste stays item-backed so recycling or chemistry recipes can consume it without a fluid slice.
 - The load dial is modelled on a metal-air cell: a fuel's charge is fixed (Faraday), so load sets the dissolve rate, and a linear polarization curve sets the voltage and so the FE per fuel. Rated load is the highest load and reproduces the recipe exactly, so recipe FE, JEI, and the energy balance simulation all describe a cell at rated load, and load can never lift Anode FE/t past the stage's main generator.
 - A lighter load is a capital-for-fuel trade, not a free gain: up to `1.15x` FE per fuel at `0.46x` FE/t, so stretching Anode supply costs more cells. Keep FE per fuel monotonic in load so no setting is a trap, and keep the curve linear so the wiki table is the whole rule.
@@ -300,6 +302,10 @@ Design intent and balance rules behind shipped machines that the code does not s
 ### Ammonia Chain
 
 - The Ammonia Catalyst Bed and Fuel Cell Membrane have neutral base stats. An unrolled part only gates recipes.
+- Hydrogen's yardstick is its value as Ammonia: about `136 FE` per mB after the Synthesizer's cost. Every other Hydrogen use pays off in something other than FE (more Hydrogen, build space, roll quality, or a shorter chain), and no loop may print power: any path from Ammonia back to Hydrogen returns less than it cost.
+- The water-gas shift (`500 mB` CO + water into `500 mB` Hydrogen and `125 mB` Carbon Exhaust) adds about a third more Hydrogen per reform. Its cost is Photobioreactor time, since algae grow twice as slowly on Carbon Exhaust as on CO. Keep its exhaust return near one biomass's need (`100 mB`); a 1:1 return would hand the loop more carbon than the CO it took.
+- The Fuel Cell burns Hydrogen at about `60 FE` per mB, under half the Ammonia route, so it stays a shortcut for small builds and surplus and never beats the full chain.
+- Urea (`250 mB` Ammonia + `250 mB` Carbon Exhaust) is worth `54,000 FE` of Ammonia. It pays back in build space, never as power: four bone meal in a Forestry Companion store, or four Photobioreactor harvests at twice the speed with the same carbon and water per biomass. It stays on the Ammonia Synthesizer or is dropped; no new machine.
 
 ### Algae and Water Support
 
