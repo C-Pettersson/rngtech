@@ -2,12 +2,15 @@ package com.rngtech.content.tool;
 
 import com.rngtech.content.item.ToolHeadItem;
 import com.rngtech.content.item.ToolRodItem;
+import com.rngtech.util.ItemStackValues;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.item.ItemStack;
+
+import java.util.Objects;
 
 public record FieldToolAssembly(ItemStack head, ItemStack rod, ItemStack batteryCell) {
     public static final FieldToolAssembly EMPTY = new FieldToolAssembly(ItemStack.EMPTY, ItemStack.EMPTY, ItemStack.EMPTY);
@@ -57,6 +60,19 @@ public record FieldToolAssembly(ItemStack head, ItemStack rod, ItemStack battery
 
     public FieldToolAssembly withBatteryCell(ItemStack stack) {
         return new FieldToolAssembly(head, rod, stack);
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        return other instanceof FieldToolAssembly that
+                && ItemStackValues.matches(head, that.head)
+                && ItemStackValues.matches(rod, that.rod)
+                && ItemStackValues.matches(batteryCell, that.batteryCell);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(ItemStackValues.hash(head), ItemStackValues.hash(rod), ItemStackValues.hash(batteryCell));
     }
 
     private static ItemStack copySingle(ItemStack stack) {
