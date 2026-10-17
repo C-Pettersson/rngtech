@@ -154,6 +154,7 @@ The [Uniques guide for pack makers](https://github.com/c-pettersson/rngtech/blob
 ```
 
 - **Sites:** each site is a JSON file in `data/<namespace>/dormant_machine/`. It sets the machine families with weights, the soul level range, the wake FE range and curve, the FE input per tick, and optionally `release_stage`, the lowest stage a soul may be released into (none by default; it never goes above the highest stage the family reaches). Override the six default files in a datapack, or add your own. A machine with no `Site` uses `rngtech:collapsed_workshop`.
+- **How often sites appear:** override `data/rngtech/worldgen/structure_set/<site>.json` in a datapack. `spacing` is the size, in chunks, of the region each site gets one try in; `separation` is the minimum gap between two of them. Each try can still fail on biome or terrain, so the surface and ocean sites turn up less often than their spacing suggests, while the underground ones almost always succeed.
 - **Builds:** a site may list builds per family as target nodes; souls follow the path through them. Without a list, each soul walks to nearby notables its family can use.
 - **Failed absorbs:** `dormantMachines.failedAbsorb` (below).
 - **Reroll souls:** `/rngtech dormant reset` gives untouched machines a new random soul, for example after you change a site file. `reset force` also rerolls machines players have started charging, and empties their charge.
