@@ -1,7 +1,13 @@
 {
     "type": "rngtech:crusher",
     "ingredient": {
-        "item": "minecraft:gold_ore"
+        "type": "neoforge:difference",
+        "base": {
+            "tag": "c:ores/gold"
+        },
+        "subtracted": {
+            "tag": "c:ores_in_ground/deepslate"
+        }
     },
     "result": {
         "count": 3,

@@ -8,7 +8,7 @@ navigation:
 
 # Ores
 
-RNGTech adds eleven ores to the Overworld, each in a stone and a deepslate version. Iron, Copper, and Gold use the vanilla ores. Each ore has a **hardness** that your pick or hammer head must reach; see [Ore hardness](rngtech:modular-tools.md#ore-hardness) for which heads reach which level.
+RNGTech adds eleven ores to the Overworld, each in a stone and a deepslate version. Iron, Copper, and Gold use the vanilla ores. Each ore has a **hardness** that your pick or hammer head must reach; see [Ore hardness](rngtech:modular-tools/ore-hardness.md) for which heads reach which level.
 
 | Ore | Stage | Hardness | Height (Y) | Notes |
 |---|---:|---:|---|---|

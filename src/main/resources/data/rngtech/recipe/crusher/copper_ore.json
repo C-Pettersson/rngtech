@@ -1,7 +1,13 @@
 {
     "type": "rngtech:crusher",
     "ingredient": {
-        "item": "minecraft:copper_ore"
+        "type": "neoforge:difference",
+        "base": {
+            "tag": "c:ores/copper"
+        },
+        "subtracted": {
+            "tag": "c:ores_in_ground/deepslate"
+        }
     },
     "result": {
         "count": 3,

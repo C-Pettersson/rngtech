@@ -1,0 +1,19 @@
+{
+  "replace": false,
+  "values": [
+    "minecraft:deepslate_iron_ore",
+    "minecraft:deepslate_copper_ore",
+    "minecraft:deepslate_gold_ore",
+    "rngtech:deepslate_tin_ore",
+    "rngtech:deepslate_zinc_ore",
+    "rngtech:deepslate_nickel_ore",
+    "rngtech:deepslate_lead_ore",
+    "rngtech:deepslate_silver_ore",
+    "rngtech:deepslate_aluminum_ore",
+    "rngtech:deepslate_osmium_ore",
+    "rngtech:deepslate_titanium_ore",
+    "rngtech:deepslate_tungsten_ore",
+    "rngtech:deepslate_platinum_ore",
+    "rngtech:deepslate_naquadah_ore"
+  ]
+}

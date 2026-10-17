@@ -263,6 +263,20 @@ class WikiSite:
         namespace, path = split_id(resource_id)
         return f"fluid.{namespace}.{path}" in self.res.lang or resource_id in {"minecraft:water", "minecraft:lava"}
 
+    def _set_ingredient(self, data: dict, label: str | None) -> Stack | None:
+        if data["type"] == "neoforge:intersection":
+            children = [self.ingredient(child) for child in data.get("children", [])]
+            if not children or None in children:
+                return None
+            options = [o for o in children[0].options if all(o in child.options for child in children[1:])]
+        else:
+            base = self.ingredient(data.get("base"))
+            if base is None:
+                return None
+            subtracted = self.ingredient(data.get("subtracted"))
+            options = [o for o in base.options if subtracted is None or o not in subtracted.options]
+        return Stack(options, label=label) if options else None
+
     def ingredient(self, data, label: str | None = None) -> Stack | None:
         if data is None:
             return None
@@ -272,6 +286,8 @@ class WikiSite:
         if data.get("type") == "neoforge:compound":
             children = self.ingredient(data.get("children", data.get("ingredients", [])), label)
             return Stack(list(dict.fromkeys(children.options)), label=label) if children else None
+        if data.get("type") in {"neoforge:intersection", "neoforge:difference"}:
+            return self._set_ingredient(data, label)
         if data.get("type") == "neoforge:components":
             items = data["items"] if isinstance(data["items"], list) else [data["items"]]
             return self.ingredient([{"tag": i[1:]} if i.startswith("#") else {"item": i} for i in items], label)
@@ -336,7 +352,7 @@ class WikiSite:
             if is_output:
                 values = value if isinstance(value, list) else [value]
                 outputs.extend(s for v in values if (s := self.result(v, role)))
-            elif isinstance(value, dict) and ({"item", "tag", "ingredient", "fluid"} & set(value)):
+            elif isinstance(value, dict) and ({"item", "tag", "ingredient", "fluid"} & set(value) or str(value.get("type", "")).startswith("neoforge:")):
                 stack = self.ingredient(value, role)
                 if stack:
                     if key == "ingredient" and "input_count" in recipe:

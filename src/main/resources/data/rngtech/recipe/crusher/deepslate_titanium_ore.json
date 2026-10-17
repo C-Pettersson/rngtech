@@ -7,7 +7,15 @@
   ],
   "type": "rngtech:crusher",
   "ingredient": {
-    "item": "rngtech:deepslate_titanium_ore"
+    "type": "neoforge:intersection",
+    "children": [
+      {
+        "tag": "c:ores/titanium"
+      },
+      {
+        "tag": "c:ores_in_ground/deepslate"
+      }
+    ]
   },
   "result": {
     "count": 3,

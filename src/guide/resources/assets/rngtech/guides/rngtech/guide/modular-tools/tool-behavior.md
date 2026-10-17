@@ -2,7 +2,7 @@
 navigation:
   title: "Tool behavior"
   parent: modular-tools.md
-  position: 1
+  position: 2
   icon: rngtech:modular_pick
 ---
 
