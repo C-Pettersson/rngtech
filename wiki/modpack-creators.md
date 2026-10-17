@@ -145,6 +145,20 @@ By default, Uniques drop from vanilla structures and mobs. The [Uniques](uniques
 
 The [Uniques guide for pack makers](https://github.com/c-pettersson/rngtech/blob/main/extras/uniques/README.md) covers the file format and rules.
 
+## Dormant Machines
+
+[Dormant Machines](dormant-machines.md) hold a Mastery soul for players to wake and take. RNGTech does not generate them yet; place them in your own structures or with a command:
+
+```
+/setblock ~ ~ ~ rngtech:dormant_machine{Site:"rngtech:end_relay"}
+```
+
+- **Sites:** each site is a JSON file in `data/<namespace>/dormant_machine/`. It sets the machine families with weights, the soul level range, the wake FE range and curve, the FE input per tick, and the lowest stage a soul may be released into. Override the six default files in a datapack, or add your own. A machine with no `Site` uses `rngtech:collapsed_workshop`.
+- **Builds:** a site may list builds per family as target nodes; souls follow the path through them. Without a list, each soul walks to nearby notables its family can use.
+- **Failed absorbs:** `dormantMachines.failedAbsorb` (below).
+- **Reroll souls:** `/rngtech dormant reset` gives untouched machines a new random soul, for example after you change a site file. `reset force` also rerolls machines players have started charging, and empties their charge.
+- **Bring sites back:** `/rngtech dormant restore same` puts every site back with its last soul, husks included, asleep and empty. `restore random` does the same with new souls. A site whose husk was mined comes back only on empty ground; the command lists the ones it skipped. Sites in unloaded chunks change the next time their chunk loads.
+
 ## Other settings
 
 These live in `config/rngtech-common.toml`.
@@ -159,6 +173,7 @@ These live in `config/rngtech-common.toml`.
 | `soulTransfer.alwaysSucceeds` | off | Turn on so every [Soul Transfer](machine-mastery.md#soul-transfer) absorb succeeds, whatever its calibration. A Soul Transfer from a quest, loot, or `/give` has no calibration and always succeeds anyway. |
 | `soulTransfer.failureXpLossPercent` | 0 | Percent of a machine's Mastery XP lost when a Soul Transfer absorb fails. Late levels need far more XP than early ones, so a high-level machine loses only a few levels unless this is near 100. |
 | `soulTransfer.failureLevelLoss` | 0 | Mastery levels lost when a Soul Transfer absorb fails, applied after any XP loss. |
+| `dormantMachines.failedAbsorb` | `NOTHING` | What a failed Soul Transfer absorb does to a [Dormant Machine](dormant-machines.md). `NOTHING` keeps the soul (the `soulTransfer` loss settings still apply to it), `HUSK` destroys it, and `EXPLODE` destroys it in a TNT-strength explosion. The Soul Transfer is used up either way. |
 | `corruption.volatileCatalystRecipesEnabled` | on | Turn off to hand out Volatile Catalysts by quest or loot instead. |
 
 When a failed Soul Transfer costs levels, the machine refunds its latest-allocated nodes first. It skips any node the rest of the tree or the installed Gear still needs, so the tree stays connected and the Gear stays legal. If no node can safely go, the machine keeps the level its tree needs. The old build becomes the machine's followed build, so it fills back in as the machine earns XP again.

@@ -183,6 +183,10 @@ public final class ModItems {
             "debug_battery",
             () -> new BlockItem(ModBlocks.DEBUG_BATTERY.get(), new Item.Properties().stacksTo(1))
     );
+    public static final DeferredItem<BlockItem> DORMANT_MACHINE = ITEMS.register(
+            "dormant_machine",
+            () -> new BlockItem(ModBlocks.DORMANT_MACHINE.get(), new Item.Properties())
+    );
     public static final DeferredItem<BlockItem> TOOL_BENCH = ITEMS.register(
             "tool_bench",
             () -> new BlockItem(ModBlocks.TOOL_BENCH.get(), new Item.Properties().stacksTo(1))

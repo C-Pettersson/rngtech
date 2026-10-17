@@ -124,6 +124,10 @@ public final class RNGTechConfig {
             .comment("Mastery levels lost when a Soul Transfer fails, after any XP loss. Refunds the latest nodes the tree and installed Gear can spare; never drops below the level the build still needs.")
             .defineInRange("soulTransfer.failureLevelLoss", 0, 0, 99);
 
+    public static final ModConfigSpec.EnumValue<DormantFailedAbsorb> DORMANT_FAILED_ABSORB = BUILDER
+            .comment("What a failed Soul Transfer absorb does to a Dormant Machine. The Soul Transfer is always used up. NOTHING keeps the soul, and the soulTransfer failure loss settings still apply to it; HUSK loses the soul; EXPLODE loses it in a TNT-strength explosion that leaves the husk.")
+            .defineEnum("dormantMachines.failedAbsorb", DormantFailedAbsorb.NOTHING);
+
     public static final ModConfigSpec.BooleanValue VOLATILE_CATALYST_RECIPES_ENABLED = BUILDER
             .comment("Whether the default Volatile Catalyst recipe loads. Disable it to award catalysts through quests, loot, or custom recipes instead.")
             .define("corruption.volatileCatalystRecipesEnabled", true);
@@ -193,6 +197,12 @@ public final class RNGTechConfig {
         BUILDER.pop();
         BUILDER.pop();
         return new OreWorldgenConfig(enabled, bridgePolicy, Collections.unmodifiableMap(values));
+    }
+
+    public enum DormantFailedAbsorb {
+        NOTHING,
+        HUSK,
+        EXPLODE
     }
 
     public enum VanillaOreBridgePolicy {

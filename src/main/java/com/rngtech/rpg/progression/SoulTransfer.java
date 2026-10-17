@@ -15,20 +15,33 @@ import java.util.function.Predicate;
 
 /** Rules for moving one machine's whole Mastery to another machine of the same family through a Soul Transfer. */
 public final class SoulTransfer {
-    public enum Release { RELEASE, WRONG_FAMILY, ENTRY_STAGE, CONFIRM_OVERWRITE }
+    public enum Release { RELEASE, WRONG_FAMILY, ENTRY_STAGE, RELEASE_STAGE, CONFIRM_OVERWRITE }
 
-    /** The Mastery a Soul Transfer absorbed, with the family it may be released into. */
-    public record Charge(MachineMasteryFamily family, MachineProgressionState state) {
+    /**
+     * The Mastery a Soul Transfer absorbed, with the family it may be released into. A soul taken from a Dormant
+     * Machine also records the lowest machine stage it may be released into; 0 means any.
+     */
+    public record Charge(MachineMasteryFamily family, MachineProgressionState state, int releaseStage) {
         private static final Codec<MachineMasteryFamily> FAMILY_CODEC = Codec.STRING.xmap(
                 name -> MachineMasteryFamily.valueOf(name.toUpperCase(Locale.ROOT)), family -> family.name().toLowerCase(Locale.ROOT));
         public static final Codec<Charge> CODEC = RecordCodecBuilder.create(instance -> instance.group(
                 FAMILY_CODEC.fieldOf("family").forGetter(Charge::family),
-                MachineProgressionState.CODEC.fieldOf("progression").forGetter(Charge::state)
+                MachineProgressionState.CODEC.fieldOf("progression").forGetter(Charge::state),
+                Codec.INT.optionalFieldOf("release_stage", 0).forGetter(Charge::releaseStage)
         ).apply(instance, Charge::new));
         public static final StreamCodec<RegistryFriendlyByteBuf, Charge> STREAM_CODEC = StreamCodec.composite(
                 ByteBufCodecs.idMapper(index -> MachineMasteryFamily.values()[index], MachineMasteryFamily::ordinal), Charge::family,
                 MachineProgressionState.STREAM_CODEC, Charge::state,
+                ByteBufCodecs.VAR_INT, Charge::releaseStage,
                 Charge::new);
+
+        public Charge {
+            releaseStage = Math.max(0, releaseStage);
+        }
+
+        public Charge(MachineMasteryFamily family, MachineProgressionState state) {
+            this(family, state, 0);
+        }
     }
 
     private SoulTransfer() { }
@@ -94,11 +107,13 @@ public final class SoulTransfer {
 
     /**
      * Checks a release. The target must be the same family, an ascended soul needs a chassis that could have taken the
-     * first Seal, and replacing a target's own Mastery needs the player to confirm.
+     * first Seal, a Dormant Machine soul needs its recorded release stage, and replacing a target's own Mastery needs the
+     * player to confirm.
      */
     public static Release release(Charge charge, MachineMasteryFamily family, int entryStage, MachineProgressionState target, boolean confirmed) {
         if (charge.family() != family) { return Release.WRONG_FAMILY; }
         if (charge.state().sealTiers() > 0 && entryStage < AscendancyCatalog.ENTRY_STAGE) { return Release.ENTRY_STAGE; }
+        if (entryStage < charge.releaseStage()) { return Release.RELEASE_STAGE; }
         if (hasSoul(target) && !confirmed) { return Release.CONFIRM_OVERWRITE; }
         return Release.RELEASE;
     }

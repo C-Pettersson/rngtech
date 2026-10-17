@@ -5,6 +5,8 @@ import com.rngtech.content.blockentity.MachineStatsCache;
 import com.rngtech.content.blockentity.RecipeCache;
 import com.rngtech.content.command.RNGTechCommands;
 import com.rngtech.content.corruption.CorruptionDataEvents;
+import com.rngtech.content.dormant.DormantSiteCatalog;
+import com.rngtech.content.dormant.DormantSites;
 import com.rngtech.content.item.CableItem;
 import com.rngtech.content.minerscompanion.MinersCompanionEvents;
 import com.rngtech.content.registry.ModBlockEntities;
@@ -81,6 +83,8 @@ public final class RNGTech {
         NeoForge.EVENT_BUS.addListener(MinersCompanionEvents::onBlockDrops);
         NeoForge.EVENT_BUS.addListener(MinersCompanionEvents::onPlayerTick);
         NeoForge.EVENT_BUS.addListener(CorruptionDataEvents::onAddReloadListeners);
+        NeoForge.EVENT_BUS.addListener(DormantSiteCatalog::onAddReloadListeners);
+        NeoForge.EVENT_BUS.addListener(DormantSites::onLevelTick);
         NeoForge.EVENT_BUS.addListener(CorruptionDataEvents::onDatapackSync);
         NeoForge.EVENT_BUS.addListener(RNGTechCommands::register);
         NeoForge.EVENT_BUS.addListener(CableBlockEntity::onLevelTick);

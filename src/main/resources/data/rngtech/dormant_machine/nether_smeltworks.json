@@ -1,0 +1,18 @@
+{
+    "families": {
+        "furnace": 1,
+        "alloy_furnace": 1,
+        "melter": 1
+    },
+    "level": {
+        "min": 35,
+        "max": 55
+    },
+    "wake_fe": {
+        "min": 2500000,
+        "max": 7500000
+    },
+    "wake_curve": 2.0,
+    "wake_input": 50000,
+    "release_stage": 5
+}

@@ -23,6 +23,8 @@ Each Soul Transfer moves one soul to one machine:
 
 It works on the Forestry Companion cart too.
 
+A Soul Transfer can also take the soul out of a [Dormant Machine](rngtech:dormant-machines.md), an old machine you wake with power.
+
 <RecipesFor id="rngtech:soul_transfer" />
 
 - **Calibrated Logic Component** must be a Logic calibration, Stage 2+, stability 0+.

@@ -20,6 +20,7 @@ import com.rngtech.content.block.DebugChestBlock;
 import com.rngtech.content.block.DebugRerollerBlock;
 import com.rngtech.content.block.DebugTankBlock;
 import com.rngtech.content.block.DebugTrashcanBlock;
+import com.rngtech.content.block.DormantMachineBlock;
 import com.rngtech.content.block.ExoticAffixForgeBlock;
 import com.rngtech.content.block.ForestryCartStationBlock;
 import com.rngtech.content.block.FurnaceBlock;
@@ -60,6 +61,7 @@ import net.minecraft.world.level.block.LiquidBlock;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.material.MapColor;
+import net.minecraft.world.level.material.PushReaction;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredBlock;
 import net.neoforged.neoforge.registries.DeferredRegister;
@@ -134,6 +136,17 @@ public final class ModBlocks {
                     .mapColor(MapColor.METAL)
                     .strength(3.0F)
                     .sound(SoundType.METAL)
+    );
+
+    public static final DeferredBlock<DormantMachineBlock> DORMANT_MACHINE = BLOCKS.registerBlock(
+            "dormant_machine",
+            DormantMachineBlock::new,
+            BlockBehaviour.Properties.of()
+                    .mapColor(MapColor.COLOR_GRAY)
+                    .strength(3.0F, 3600000.0F)
+                    .requiresCorrectToolForDrops()
+                    .pushReaction(PushReaction.BLOCK)
+                    .sound(SoundType.NETHERITE_BLOCK)
     );
 
     public static final DeferredBlock<ToolBenchBlock> TOOL_BENCH = BLOCKS.registerBlock(

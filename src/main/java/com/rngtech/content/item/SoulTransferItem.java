@@ -1,8 +1,11 @@
 package com.rngtech.content.item;
 
 import com.rngtech.RNGTechConfig;
+import com.rngtech.content.blockentity.DormantMachineBlockEntity;
 import com.rngtech.content.calibration.CalibrationState;
+import com.rngtech.content.dormant.DormantPhase;
 import com.rngtech.content.registry.ModDataComponents;
+import com.rngtech.rpg.dormant.DormantSoul;
 import com.rngtech.rpg.progression.AscendancyCatalog;
 import com.rngtech.rpg.progression.MachineMasteryFamily;
 import com.rngtech.rpg.progression.MachineMasteryHost;
@@ -21,6 +24,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.world.level.Level;
 
 import java.util.List;
 import java.util.OptionalInt;
@@ -37,11 +41,66 @@ public class SoulTransferItem extends Item {
     @Override
     public InteractionResult onItemUseFirst(ItemStack stack, UseOnContext context) {
         Player player = context.getPlayer();
-        if (player == null || !(context.getLevel().getBlockEntity(context.getClickedPos()) instanceof MachineMasteryHost host)) {
+        if (player == null) { return InteractionResult.PASS; }
+        var blockEntity = context.getLevel().getBlockEntity(context.getClickedPos());
+        if (!(blockEntity instanceof MachineMasteryHost) && !(blockEntity instanceof DormantMachineBlockEntity)) {
             return InteractionResult.PASS;
         }
         if (!player.mayUseItemAt(context.getClickedPos(), context.getClickedFace(), stack)) { return InteractionResult.FAIL; }
-        return useOnHost(player, stack, host, context.getClickedPos());
+        if (blockEntity instanceof DormantMachineBlockEntity dormant) { return useOnDormant(player, stack, dormant); }
+        return useOnHost(player, stack, (MachineMasteryHost) blockEntity, context.getClickedPos());
+    }
+
+    /**
+     * Absorbs an awake Dormant Machine's soul. The charge records the site's release stage. A failed absorb always uses
+     * the Soul Transfer up; what it does to the machine is the pack's {@code dormantMachines.failedAbsorb} choice.
+     */
+    public static InteractionResult useOnDormant(Player player, ItemStack stack, DormantMachineBlockEntity dormant) {
+        if (player.level().isClientSide) { return InteractionResult.SUCCESS; }
+        if (player.isSpectator()) { return InteractionResult.FAIL; }
+        BlockPos pos = dormant.getBlockPos();
+        DormantSoul soul = dormant.soul();
+        if (stack.has(ModDataComponents.SOUL_CHARGE.get())) {
+            message(player, Component.translatable("rngtech.soul_transfer.message.dormant_full"));
+            return InteractionResult.FAIL;
+        }
+        if (soul == null || dormant.phase() == DormantPhase.SPENT) {
+            message(player, Component.translatable("rngtech.soul_transfer.message.dormant_spent"));
+            return InteractionResult.FAIL;
+        }
+        if (dormant.phase() != DormantPhase.AWAKE) {
+            message(player, Component.translatable("rngtech.soul_transfer.message.dormant_asleep"));
+            return InteractionResult.FAIL;
+        }
+        if (player.getRandom().nextInt(100) >= successChance(stack)) {
+            stack.consume(1, player);
+            playSound(player, pos, SoundEvents.ITEM_BREAK);
+            switch (RNGTechConfig.DORMANT_FAILED_ABSORB.get()) {
+                case NOTHING -> {
+                    MachineProgressionState state = soul.state();
+                    MachineProgressionState damaged = SoulTransfer.afterFailure(state, RNGTechConfig.SOUL_TRANSFER_FAILURE_XP_LOSS.get(),
+                            RNGTechConfig.SOUL_TRANSFER_FAILURE_LEVEL_LOSS.get(), candidate -> true);
+                    dormant.setSoulState(damaged);
+                    message(player, damaged.level() == state.level() ? Component.translatable("rngtech.soul_transfer.message.failed")
+                            : Component.translatable("rngtech.soul_transfer.message.failed_loss", state.level(), damaged.level()));
+                }
+                case HUSK -> {
+                    dormant.spend();
+                    message(player, Component.translatable("rngtech.soul_transfer.message.dormant_lost"));
+                }
+                case EXPLODE -> {
+                    dormant.spend();
+                    player.level().explode(null, pos.getX() + 0.5D, pos.getY() + 0.5D, pos.getZ() + 0.5D, 4.0F, Level.ExplosionInteraction.BLOCK);
+                    message(player, Component.translatable("rngtech.soul_transfer.message.dormant_exploded"));
+                }
+            }
+            return InteractionResult.SUCCESS;
+        }
+        stack.set(ModDataComponents.SOUL_CHARGE.get(), new SoulTransfer.Charge(soul.family(), soul.state(), soul.releaseStage()));
+        dormant.spend();
+        playSound(player, pos, SoundEvents.SOUL_ESCAPE.value());
+        message(player, Component.translatable("rngtech.soul_transfer.message.absorbed", soul.level(), familyName(soul.family())));
+        return InteractionResult.SUCCESS;
     }
 
     public static InteractionResult useOnHost(Player player, ItemStack stack, MachineMasteryHost host, BlockPos pos) {
@@ -98,6 +157,10 @@ public class SoulTransferItem extends Item {
                         AscendancyCatalog.ENTRY_STAGE));
                 return InteractionResult.FAIL;
             }
+            case RELEASE_STAGE -> {
+                message(player, Component.translatable("rngtech.soul_transfer.message.release_stage", charge.releaseStage()));
+                return InteractionResult.FAIL;
+            }
             case CONFIRM_OVERWRITE -> {
                 message(player, Component.translatable("rngtech.soul_transfer.message.overwrite", target.level())
                         .withStyle(ChatFormatting.GOLD));
@@ -132,6 +195,10 @@ public class SoulTransferItem extends Item {
         Component family = familyName(charge.family());
         tooltipComponents.add(Component.translatable("rngtech.soul_transfer.tooltip.holds", charge.state().level(), family)
                 .withStyle(ChatFormatting.AQUA));
+        if (charge.releaseStage() > 0) {
+            tooltipComponents.add(Component.translatable("rngtech.soul_transfer.tooltip.release_stage", charge.releaseStage())
+                    .withStyle(ChatFormatting.GRAY));
+        }
         if (charge.state().sealTiers() > 0) {
             tooltipComponents.add(Component.translatable("rngtech.soul_transfer.tooltip.seals", charge.state().sealTiers()).withStyle(ChatFormatting.GRAY));
         }

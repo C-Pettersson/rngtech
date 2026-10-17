@@ -1,0 +1,18 @@
+{
+    "families": {
+        "crusher": 1,
+        "furnace": 1,
+        "metal_press": 1
+    },
+    "level": {
+        "min": 8,
+        "max": 20
+    },
+    "wake_fe": {
+        "min": 35000,
+        "max": 100000
+    },
+    "wake_curve": 2.0,
+    "wake_input": 2000,
+    "release_stage": 1
+}
