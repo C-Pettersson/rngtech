@@ -1,6 +1,7 @@
 package com.rngtech.content.registry;
 
 import com.rngtech.RNGTech;
+import com.rngtech.content.entity.DerelictCartEntity;
 import com.rngtech.content.entity.ForestryCartEntity;
 
 import net.minecraft.core.registries.Registries;
@@ -22,6 +23,16 @@ public final class ModEntityTypes {
                             .clientTrackingRange(8)
                             .updateInterval(3)
                             .build("forestry_cart")
+            );
+
+    public static final DeferredHolder<EntityType<?>, EntityType<DerelictCartEntity>> DERELICT_CART =
+            ENTITY_TYPES.register(
+                    "derelict_cart",
+                    () -> EntityType.Builder.<DerelictCartEntity>of(DerelictCartEntity::new, MobCategory.MISC)
+                            .sized(0.98F, 0.7F)
+                            .clientTrackingRange(8)
+                            .updateInterval(20)
+                            .build("derelict_cart")
             );
 
     public static void register(IEventBus bus) {

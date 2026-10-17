@@ -1,0 +1,9 @@
+{
+  "type": "rngtech:dormant_site",
+  "biomes": "#rngtech:has_structure/flooded_foundry",
+  "spawn_overrides": {},
+  "step": "surface_structures",
+  "terrain_adaptation": "none",
+  "site": "rngtech:flooded_foundry",
+  "layout": "foundry"
+}

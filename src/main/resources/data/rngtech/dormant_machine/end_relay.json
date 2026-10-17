@@ -1,0 +1,17 @@
+{
+    "families": {
+        "crusher": 1,
+        "resonance_calibrator": 1,
+        "melter": 1
+    },
+    "level": {
+        "min": 40,
+        "max": 70
+    },
+    "wake_fe": {
+        "min": 10000000,
+        "max": 60000000
+    },
+    "wake_curve": 2.0,
+    "wake_input": 250000
+}

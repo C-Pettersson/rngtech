@@ -1,0 +1,19 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "rngtech:dormant_sites_enabled"
+    }
+  ],
+  "structures": [
+    {
+      "structure": "rngtech:abandoned_cart_siding",
+      "weight": 1
+    }
+  ],
+  "placement": {
+    "type": "minecraft:random_spread",
+    "spacing": 48,
+    "separation": 16,
+    "salt": 714282612
+  }
+}

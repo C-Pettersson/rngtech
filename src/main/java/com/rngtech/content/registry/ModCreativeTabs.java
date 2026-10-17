@@ -81,6 +81,7 @@ public final class ModCreativeTabs {
                         acceptDebug(output, ModItems.DEBUG_TRASHCAN);
                         acceptDebug(output, ModItems.DEBUG_TANK);
                         acceptDebug(output, ModItems.DEBUG_BATTERY);
+                        acceptDebug(output, ModItems.DORMANT_MACHINE);
                         output.accept(ModItems.FURNACE.get());
                         output.accept(ModItems.CABLE.get());
                         output.accept(ModItems.UNIVERSAL_CONNECTOR.get());

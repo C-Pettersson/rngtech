@@ -18,6 +18,16 @@ public enum MachineMasteryFamily {
         return start;
     }
 
+    /** The highest stage any machine of this family reaches, as its ascendancy entry stage reports it. */
+    public int topStage() {
+        return switch (this) {
+            case CRUSHER, FURNACE -> 8;
+            case RESONANCE_CALIBRATOR -> 7;
+            case ALLOY_FURNACE, MELTER -> 6;
+            case METAL_PRESS, FORESTRY -> 4;
+        };
+    }
+
     public String translationKey() {
         return "rngtech.mastery.family." + name().toLowerCase(Locale.ROOT);
     }

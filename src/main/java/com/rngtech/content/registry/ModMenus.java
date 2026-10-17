@@ -22,6 +22,7 @@ import com.rngtech.content.menu.DebugBatteryMenu;
 import com.rngtech.content.menu.DebugChestMenu;
 import com.rngtech.content.menu.DebugRerollerMenu;
 import com.rngtech.content.menu.DebugTankMenu;
+import com.rngtech.content.menu.DormantMachineMenu;
 import com.rngtech.content.menu.ExoticAffixForgeMenu;
 import com.rngtech.content.menu.ForestryCartMenu;
 import com.rngtech.content.menu.ForestryCartStationMenu;
@@ -68,6 +69,9 @@ public final class ModMenus {
 
     public static final DeferredHolder<MenuType<?>, MenuType<DebugBatteryMenu>> DEBUG_BATTERY =
             MENU_TYPES.register("debug_battery", () -> IMenuTypeExtension.create(DebugBatteryMenu::new));
+
+    public static final DeferredHolder<MenuType<?>, MenuType<DormantMachineMenu>> DORMANT_MACHINE =
+            MENU_TYPES.register("dormant_machine", () -> IMenuTypeExtension.create(DormantMachineMenu::new));
 
     public static final DeferredHolder<MenuType<?>, MenuType<ToolBenchMenu>> TOOL_BENCH =
             MENU_TYPES.register("tool_bench", () -> IMenuTypeExtension.create(ToolBenchMenu::new));

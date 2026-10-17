@@ -1,0 +1,9 @@
+{
+  "type": "rngtech:dormant_site",
+  "biomes": "#rngtech:has_structure/end_relay",
+  "spawn_overrides": {},
+  "step": "surface_structures",
+  "terrain_adaptation": "none",
+  "site": "rngtech:end_relay",
+  "layout": "relay"
+}

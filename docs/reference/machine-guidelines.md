@@ -347,6 +347,19 @@ Design intent and balance rules behind shipped machines that the code does not s
 - A pack can move a Unique to challenge loot, quests, or its own tables, or add its own Uniques from `config/rngtech/uniques/`; default sources stay vanilla structures and mobs, and the shipped challenge tables stay empty.
 - The catalog file format is a public API for packs. Keep old stat and behavior names working through aliases, and bump the format `version` for incompatible changes. Update `extras/uniques/README.md` with it.
 
+### Dormant Machines
+
+- A dormant soul is an accelerant, never a gate. No recipe, stage, Seal, or other progression item may need one; a player who never finds one only levels more slowly.
+- Taking a soul costs RNGTech work: FE to wake the machine and a calibrated Soul Transfer to absorb it. No vanilla item or structure loot is an ingredient.
+- Wake cost, success chance, and any failed-absorb risk show before the player commits. The failed-absorb outcome is a pack choice; the default only uses up the Soul Transfer.
+- Souls carry no ascendancy and no Seal tiers, so Seals stay the only ascendancy source.
+- The wake cost is the gate for high souls, not the target's stage. Default sites set no release stage, so any soul goes into any machine of its family. A pack-set `release_stage` is capped at the family's top stage so every soul has a machine it fits.
+- Early sites are sized for a handful of carried cells. Later sites need a generator on site or a large bank of high-stage cells. The wake input rate is generous so the machine itself is never the bottleneck.
+- Machines have no owner or claim. Stealing a half-woken machine is part of the game.
+- Sites are occasional finds, one machine each: the Collapsed Workshop about as common as a ruined portal, the End Relay rarer than an End city. The derelict Forestry Companion takes power only from its cells, since cables cannot reach an entity; its site is sized for that.
+- Generated builds take only notables whose every effect the family reads, never keystones, so a found soul carries no hidden trade-off.
+- The screen is a deliberate exception to the gray panel in [Machine GUI Design](machine-gui-design.md#visual-style): worn gunmetal with a light magic touch, keeping the left-to-right flow, the bottom inventory, shape-coded status, and exact values in tooltips. Soul light is pale cyan-white, never purple or magenta.
+
 ## Documentation
 
 When adding or changing a machine:

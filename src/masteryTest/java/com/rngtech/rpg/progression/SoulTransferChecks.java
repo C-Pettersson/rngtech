@@ -100,12 +100,27 @@ final class SoulTransferChecks {
                 == SoulTransfer.Release.RELEASE, "an ascended soul releases at the entry stage");
         require(!SoulTransfer.hasSoul(empty) && SoulTransfer.hasSoul(occupied) && SoulTransfer.hasSoul(ascended.state()),
                 "XP or a Seal tier is something to absorb");
+        var dormant = new SoulTransfer.Charge(MachineMasteryFamily.CRUSHER, built(20), 5);
+        require(SoulTransfer.release(dormant, MachineMasteryFamily.CRUSHER, 4, empty, false) == SoulTransfer.Release.RELEASE_STAGE,
+                "a Dormant Machine soul refuses a machine below its release stage");
+        require(SoulTransfer.release(dormant, MachineMasteryFamily.CRUSHER, 5, empty, false) == SoulTransfer.Release.RELEASE,
+                "a Dormant Machine soul releases at its release stage");
+        require(charge.releaseStage() == 0, "a soul taken from a machine fits any stage");
+        var melter = new SoulTransfer.Charge(MachineMasteryFamily.MELTER, built(20).forFamily(MachineMasteryFamily.MELTER), 7);
+        require(melter.effectiveReleaseStage() == 6 && SoulTransfer.release(melter, MachineMasteryFamily.MELTER, 6,
+                MachineProgressionState.EMPTY.forFamily(MachineMasteryFamily.MELTER), false) == SoulTransfer.Release.RELEASE,
+                "a soul whose release stage is above its family's top stage still fits that family's top machine");
     }
 
     private static void chargeCodec() {
         var charge = new SoulTransfer.Charge(MachineMasteryFamily.RESONANCE_CALIBRATOR, built(30).forFamily(MachineMasteryFamily.RESONANCE_CALIBRATOR));
         var json = SoulTransfer.Charge.CODEC.encodeStart(JsonOps.INSTANCE, charge).getOrThrow();
         require(SoulTransfer.Charge.CODEC.parse(JsonOps.INSTANCE, json).getOrThrow().equals(charge), "a held soul survives a save");
+        var dormant = new SoulTransfer.Charge(MachineMasteryFamily.CRUSHER, built(20), 7);
+        var dormantJson = SoulTransfer.Charge.CODEC.encodeStart(JsonOps.INSTANCE, dormant).getOrThrow();
+        require(SoulTransfer.Charge.CODEC.parse(JsonOps.INSTANCE, dormantJson).getOrThrow().equals(dormant), "a release stage survives a save");
+        require(!json.getAsJsonObject().has("release_stage") || json.getAsJsonObject().get("release_stage").getAsInt() == 0,
+                "a soul without a release stage saves none");
     }
 
     /** A crusher at the given level with every point spent in allocation order. */

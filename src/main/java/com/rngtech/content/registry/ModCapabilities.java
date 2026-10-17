@@ -18,6 +18,7 @@ import com.rngtech.content.blockentity.DebugBatteryBlockEntity;
 import com.rngtech.content.blockentity.DebugChestBlockEntity;
 import com.rngtech.content.blockentity.DebugTankBlockEntity;
 import com.rngtech.content.blockentity.DebugTrashcanBlockEntity;
+import com.rngtech.content.blockentity.DormantMachineBlockEntity;
 import com.rngtech.content.blockentity.ExoticAffixForgeBlockEntity;
 import com.rngtech.content.blockentity.ForestryCartStationBlockEntity;
 import com.rngtech.content.blockentity.FurnaceBlockEntity;
@@ -426,6 +427,16 @@ public final class ModCapabilities {
                 Capabilities.FluidHandler.BLOCK,
                 ModBlockEntities.CABLE.get(),
                 CableBlockEntity::getFluidHandler
+        );
+        event.registerBlockEntity(
+                Capabilities.EnergyStorage.BLOCK,
+                ModBlockEntities.DORMANT_MACHINE.get(),
+                DormantMachineBlockEntity::getEnergyStorage
+        );
+        event.registerBlockEntity(
+                Capabilities.ItemHandler.BLOCK,
+                ModBlockEntities.DORMANT_MACHINE.get(),
+                DormantMachineBlockEntity::getItemHandler
         );
         event.registerBlockEntity(
                 Capabilities.EnergyStorage.BLOCK,

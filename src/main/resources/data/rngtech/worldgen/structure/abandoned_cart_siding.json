@@ -1,0 +1,9 @@
+{
+  "type": "rngtech:dormant_site",
+  "biomes": "#rngtech:has_structure/abandoned_cart_siding",
+  "spawn_overrides": {},
+  "step": "underground_structures",
+  "terrain_adaptation": "none",
+  "site": "rngtech:abandoned_cart_siding",
+  "layout": "siding"
+}
