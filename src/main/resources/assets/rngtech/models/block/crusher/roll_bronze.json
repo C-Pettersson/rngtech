@@ -1,0 +1,9 @@
+{
+  "parent": "rngtech:block/crusher/roll",
+  "textures": {
+    "roll": "rngtech:block/crusher/roll/bronze",
+    "roll_v": "rngtech:block/crusher/roll/bronze_v",
+    "roll_end": "rngtech:block/crusher/roll/bronze_end",
+    "hub": "rngtech:block/crusher/roll/bronze_hub"
+  }
+}

@@ -1,12 +1,9 @@
 {
-  "parent": "minecraft:block/cube",
+  "parent": "rngtech:block/crusher_heavy",
   "textures": {
-    "down": "rngtech:block/crusher_chassis/bottom/tungstensteel_crusher_chassis",
-    "up": "rngtech:block/crusher_chassis/top/tungstensteel_crusher_chassis",
-    "north": "rngtech:block/crusher_chassis/front/tungstensteel_crusher_chassis",
-    "south": "rngtech:block/crusher_chassis/side/tungstensteel_crusher_chassis",
-    "east": "rngtech:block/crusher_chassis/side/tungstensteel_crusher_chassis",
-    "west": "rngtech:block/crusher_chassis/side/tungstensteel_crusher_chassis",
-    "particle": "rngtech:block/crusher_chassis/front/tungstensteel_crusher_chassis"
+    "particle": "rngtech:block/crusher/shell/tungstensteel",
+    "shell": "rngtech:block/crusher/shell/tungstensteel",
+    "trim": "rngtech:block/crusher/trim/tungstensteel",
+    "rim": "rngtech:block/crusher/rim/nullite"
   }
 }
