@@ -2,7 +2,7 @@
 navigation:
   title: "Screen"
   parent: tool-bench.md
-  position: 6
+  position: 3
   icon: rngtech:tool_bench
 ---
 
