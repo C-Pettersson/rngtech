@@ -632,5 +632,17 @@
 			x: 7.5d
 			y: 6.0d
 		}
+		{
+			dependencies: ["7106E7A1B10F0070"]
+			id: "C1A37BFEBEEA6F43"
+			optional: true
+			tasks: [{
+				id: "F22E43395EC97A3B"
+				item: { count: 1, id: "rngtech:urea" }
+				type: "item"
+			}]
+			x: 13.5d
+			y: -0.5d
+		}
 	]
 }

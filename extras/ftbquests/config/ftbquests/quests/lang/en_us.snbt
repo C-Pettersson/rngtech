@@ -72,7 +72,8 @@
 		"- &eMax Temperature:&r going above this can create failed outputs."
 		"- &eHeat Stability:&r helps the machine stay near the target heat."
 		"- &eOverheat:&r gives more room before heat becomes unsafe."
-		"- You only risk overheating a material when changing between two different. "
+		"- &eBlast Draft&r lets the heat slider go above the safe maximum. Metal recipes above it can fail."
+		"- At Stage 6, Nitrogen in the machine raises the overheat temperature."
 		""
 		""
 		"&7Tip: Heat Cores raise heat capability. Servos and stability make the process safer.&r"
@@ -107,7 +108,8 @@
 		""
 		""
 		"&eUse:&r"
-		"- Can be used in the ammonia power chain"
+		"- Supply Nitrogen to the &eAmmonia Synthesizer&r."
+		"- Or supply it to a heated machine that has &eBlast Draft&r. The Nitrogen raises the overheat temperature."
 	]
 	quest.22A86431ABEC9DD3.title: "Nitrogen production"
 	quest.23011878EBC32FC2.quest_desc: ["Boring and simple energy storage"]
@@ -912,6 +914,16 @@
 	]
 	quest.49D6781084057122.quest_subtitle: "Two more points."
 	quest.49D6781084057122.title: "Ascendancy Seal II"
+	quest.4DE87D2F3D084228.quest_desc: [
+		"Two Metal Press ascendancy notables let the press use &eHydrogen&r to anneal items. Each Annealed item uses 250 mB."
+		""
+		"- &eBright Anneal&r (Die Keeper): Basic Electric Circuits come out Annealed. They get better calibration stability."
+		"- &eHydrogen Quench&r (Drop Forge): plates come out Annealed. Gear made only from Annealed plates gets better Refinement Potential."
+		""
+		"&7Tip: The machine rolls two times and keeps the higher roll.&r"
+	]
+	quest.4DE87D2F3D084228.quest_subtitle: "Better luck by using Hydrogen."
+	quest.4DE87D2F3D084228.title: "Hydrogen Annealing"
 	quest.4CC5AA5185C3D06B.quest_desc: [
 		"Now that you have access to creating various fluids. You star bulk producing batteries, make stuff cheaper in &bComponent Assembler&r"
 		""
@@ -1027,6 +1039,7 @@
 		"- &eCarbon Exhaust&r is enough to start algae."
 		"- &eSyngas&r is a medium upgrade."
 		"- &eCarbon Monoxide&r is the best carbon input available"
+		"- Put &eUrea&r in the Urea slot. The next 4 biomass grow two times faster."
 		""
 		"&7Use JEI for the exact fluid amounts and growth times.&r"
 	]
@@ -1076,11 +1089,27 @@
 		"- Hydrogen normally comes from the &eSteam Methane Reformer&r."
 		"- Nitrogen remains a separate gas input."
 		"- Move Ammonia into the Fuel Cell."
+		"- The Fuel Cell can also use &eHydrogen&r. It makes less than half the FE that Ammonia gives."
 		"- Pull &bFE&r from Fuel Cell sides and residue from the bottom."
+		"- Supply &eCarbon Exhaust&r to the Synthesizer. It then uses some Ammonia to make &eUrea&r."
 		"- The Synthesizer is not a generator; the Fuel Cell is."
 	]
 	quest.7106E7A1B10F0070.quest_subtitle: "SMR hydrogen plus nitrogen becomes ammonia."
 	quest.7106E7A1B10F0070.title: "Ammonia Power"
+	quest.C1A37BFEBEEA6F43.quest_desc: [
+		"Urea uses Ammonia. You get less power, but you need fewer machines and crops."
+		""
+		"&aMake:&r"
+		"- Supply Ammonia and &eCarbon Exhaust&r to an &eAmmonia Synthesizer&r."
+		"- Take the Urea from the Urea slot."
+		""
+		"&aUse:&r"
+		"- Use Urea as bone meal on plants. It also works in a dispenser."
+		"- A &eGrove Warden&r cart or its station stores each Urea as 4 bone meal."
+		"- Put Urea in an &eAlgae Photobioreactor&r. The next 4 biomass grow two times faster."
+	]
+	quest.C1A37BFEBEEA6F43.quest_subtitle: "Make fertilizer from Ammonia and exhaust."
+	quest.C1A37BFEBEEA6F43.title: "Urea"
 	quest.7106E7A1B10F0090.quest_desc: [
 		"Vacuum Collapse recipes are powerful, but they care about local stability."
 		""
@@ -1160,6 +1189,7 @@
 		"- Feed &eMethane&r plus water for strong Hydrogen output."
 		"- Syngas plus water works, but makes less Hydrogen."
 		"- Capture &eCarbon Monoxide&r for better Algae Photobioreactor performance."
+		"- Or send the Carbon Monoxide to a second Reformer. It makes more &eHydrogen&r and Carbon Exhaust."
 	]
 	quest.7106E7A1B10F0140.quest_subtitle: "Methane plus steam makes hydrogen."
 	quest.7106E7A1B10F0140.title: "Steam Methane Reformer"

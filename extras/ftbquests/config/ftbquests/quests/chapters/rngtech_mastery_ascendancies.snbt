@@ -128,5 +128,16 @@
 			x: 15.0d
 			y: 0.0d
 		}
+		{
+			dependencies: ["49D6781084057122"]
+			id: "4DE87D2F3D084228"
+			optional: true
+			tasks: [{
+				id: "B41B11006D1536E3"
+				type: "checkmark"
+			}]
+			x: 12.5d
+			y: 2.0d
+		}
 	]
 }
