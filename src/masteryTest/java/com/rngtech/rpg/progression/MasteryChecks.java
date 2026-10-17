@@ -58,6 +58,7 @@ public final class MasteryChecks {
         statBreakdowns();
         iconTextures();
         checks += AscendancyChecks.run();
+        checks += SoulTransferChecks.run();
         checks += PartGenerationChecks.run();
         checks += CrusherYieldChecks.run();
         checks += com.rngtech.content.energy.CorrosionCellLoadChecks.run();
