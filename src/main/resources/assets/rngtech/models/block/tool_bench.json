@@ -1,12 +1,197 @@
 {
-  "parent": "minecraft:block/cube",
+  "parent": "minecraft:block/block",
+  "render_type": "minecraft:cutout",
   "textures": {
-    "down": "rngtech:block/tool_bench_bottom",
-    "up": "rngtech:block/tool_bench_top",
-    "north": "rngtech:block/tool_bench_side",
-    "south": "rngtech:block/tool_bench_side",
-    "east": "rngtech:block/tool_bench_side",
-    "west": "rngtech:block/tool_bench_side",
-    "particle": "rngtech:block/tool_bench_side"
-  }
+    "worktop": "rngtech:block/tool_bench/worktop",
+    "worktop_side": "rngtech:block/tool_bench/worktop_side",
+    "underside": "rngtech:block/tool_bench/underside",
+    "leg": "rngtech:block/tool_bench/leg",
+    "leg_end": "rngtech:block/tool_bench/leg_end",
+    "gravel": "rngtech:block/tool_bench/gravel",
+    "back": "rngtech:block/tool_bench/back",
+    "port": "rngtech:block/tool_bench/port",
+    "particle": "rngtech:block/tool_bench/worktop"
+  },
+  "elements": [
+    {
+      "from": [
+        0.0,
+        12.0,
+        0.0
+      ],
+      "to": [
+        16.0,
+        16.0,
+        16.0
+      ],
+      "faces": {
+        "north": {
+          "texture": "#worktop_side"
+        },
+        "south": {
+          "texture": "#worktop_side"
+        },
+        "east": {
+          "texture": "#worktop_side"
+        },
+        "west": {
+          "texture": "#worktop_side"
+        },
+        "up": {
+          "texture": "#worktop"
+        },
+        "down": {
+          "texture": "#underside"
+        }
+      }
+    },
+    {
+      "from": [
+        0.5,
+        0,
+        0.5
+      ],
+      "to": [
+        3.5,
+        12.0,
+        3.5
+      ],
+      "faces": {
+        "north": {
+          "texture": "#leg"
+        },
+        "south": {
+          "texture": "#leg"
+        },
+        "east": {
+          "texture": "#leg"
+        },
+        "west": {
+          "texture": "#leg"
+        },
+        "down": {
+          "texture": "#leg_end"
+        }
+      }
+    },
+    {
+      "from": [
+        12.5,
+        0,
+        0.5
+      ],
+      "to": [
+        15.5,
+        12.0,
+        3.5
+      ],
+      "faces": {
+        "north": {
+          "texture": "#leg"
+        },
+        "south": {
+          "texture": "#leg"
+        },
+        "east": {
+          "texture": "#leg"
+        },
+        "west": {
+          "texture": "#leg"
+        },
+        "down": {
+          "texture": "#leg_end"
+        }
+      }
+    },
+    {
+      "from": [
+        0.5,
+        0,
+        12.5
+      ],
+      "to": [
+        3.5,
+        12.0,
+        15.5
+      ],
+      "faces": {
+        "north": {
+          "texture": "#leg"
+        },
+        "south": {
+          "texture": "#leg"
+        },
+        "east": {
+          "texture": "#leg"
+        },
+        "west": {
+          "texture": "#leg"
+        },
+        "down": {
+          "texture": "#leg_end"
+        }
+      }
+    },
+    {
+      "from": [
+        12.5,
+        0,
+        12.5
+      ],
+      "to": [
+        15.5,
+        12.0,
+        15.5
+      ],
+      "faces": {
+        "north": {
+          "texture": "#leg"
+        },
+        "south": {
+          "texture": "#leg"
+        },
+        "east": {
+          "texture": "#leg"
+        },
+        "west": {
+          "texture": "#leg"
+        },
+        "down": {
+          "texture": "#leg_end"
+        }
+      }
+    },
+    {
+      "from": [
+        1.0,
+        1.5,
+        1.0
+      ],
+      "to": [
+        15.0,
+        3.5,
+        15.0
+      ],
+      "faces": {
+        "north": {
+          "texture": "#worktop_side"
+        },
+        "south": {
+          "texture": "#worktop_side"
+        },
+        "east": {
+          "texture": "#worktop_side"
+        },
+        "west": {
+          "texture": "#worktop_side"
+        },
+        "up": {
+          "texture": "#gravel"
+        },
+        "down": {
+          "texture": "#underside"
+        }
+      }
+    }
+  ]
 }

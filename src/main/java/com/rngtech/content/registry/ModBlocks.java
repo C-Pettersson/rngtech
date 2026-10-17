@@ -143,6 +143,7 @@ public final class ModBlocks {
                     .mapColor(MapColor.METAL)
                     .strength(2.5F)
                     .sound(SoundType.METAL)
+                    .noOcclusion()
     );
 
     public static final DeferredBlock<ForestryCartStationBlock> FORESTRY_CART_STATION = BLOCKS.registerBlock(
