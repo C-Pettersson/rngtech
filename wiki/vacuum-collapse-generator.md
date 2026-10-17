@@ -109,7 +109,7 @@ A Void Catalyst is Ender Slurry sealed around a Nullite core in a Tungstensteel 
 
 Each collapse with a Dimensional Stabilizer installed leaves at least one Collapse Residue, and one Residue makes slurry for two catalysts, so a running generator with a hot Melter has Residue to spare and needs only half the Ammonia: 500 mB per catalyst instead of 1,000.
 
-A Void Catalyst lasts one collapse of 2,400 ticks (two minutes) at rated depth, so a generator running nonstop uses about 30 an hour, and 15,000 to 30,000 mB of Ammonia an hour for their slurry, a sixth of one Ammonia Synthesizer's output at most. Burned in an [Ammonia Fuel Cell](ammonia-fuel-cell.md) instead, 1,000 mB of Ammonia makes about 216,000 FE; in a Void Catalyst it helps make about 2.4M FE.
+A Void Catalyst lasts one collapse of 2,400 ticks (two minutes) at rated depth, so a generator running nonstop uses about 30 an hour, and 15,000 to 30,000 mB of Ammonia an hour for their slurry, a sixth of one Ammonia Synthesizer's output at most. Burned in a [Fuel Cell](ammonia-fuel-cell.md) instead, 1,000 mB of Ammonia makes about 216,000 FE; in a Void Catalyst it helps make about 2.4M FE.
 
 {{ processing("melter", output="rngtech:ender_slurry") }}
 

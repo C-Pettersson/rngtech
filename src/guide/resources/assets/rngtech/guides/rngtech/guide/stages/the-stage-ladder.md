@@ -16,7 +16,7 @@ navigation:
 | 3 | Bronze | Bronze, tin, zinc, gold | The first alloy. Basic Electric Circuits, the Crude [Metal Press](rngtech:metal-press.md), the Bronze [Alloy Furnace](rngtech:alloy-furnace.md). |
 | 4 | Steel | Steel, invar, nickel, lead, silver | Stable midgame machines, the Steel Metal Press, the Lead Furnace, the [Corrosion Cell](rngtech:corrosion-cell.md). The first recoverable processing failures. |
 | 5 | Aluminum | Aluminum, sparksteel, osmium | Gas power: [Coal Gasifier](rngtech:coal-gasifier.md), [Syngas Combustor](rngtech:syngas-combustor.md), [Cavitation Generator](rngtech:cavitation-generator.md), [Silica Gel Dehumidifier](rngtech:silica-gel-dehumidifier.md). |
-| 6 | Titanium | Titanium, arclite | Chemistry: [Melter](rngtech:melter.md), [Steam Methane Reformer](rngtech:steam-methane-reformer.md), [Ammonia Synthesizer](rngtech:ammonia-synthesizer.md), [Ammonia Fuel Cell](rngtech:ammonia-fuel-cell.md), the Titanium Alloy Furnace. |
+| 6 | Titanium | Titanium, arclite | Chemistry: [Melter](rngtech:melter.md), [Steam Methane Reformer](rngtech:steam-methane-reformer.md), [Ammonia Synthesizer](rngtech:ammonia-synthesizer.md), [Fuel Cell](rngtech:ammonia-fuel-cell.md), the Titanium Alloy Furnace. |
 | 7 | Tungstensteel | Tungstensteel, nullite, aethergold, tungsten, platinum | Late-game machine sets and the [Vacuum Collapse Generator](rngtech:vacuum-collapse-generator.md). |
 | 8 | Exotic | Naquadah, netherite | The top machine sets, Exotic Battery Cells, the [Exotic Affix Forge](rngtech:exotic-affix-forge.md). |
 

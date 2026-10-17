@@ -2,7 +2,7 @@
 navigation:
   title: "Calibration families"
   parent: resonance-calibrator.md
-  position: 1
+  position: 2
   icon: rngtech:iron_resonance_calibrator_chassis
 ---
 

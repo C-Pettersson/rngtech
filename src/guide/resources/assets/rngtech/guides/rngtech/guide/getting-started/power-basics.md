@@ -24,7 +24,7 @@ Typical generators by stage, before rolls and Gear bonuses:
 | 2 | [Bio Generator](rngtech:bio-generator.md) | About 8 FE/t |
 | 4+ | [Corrosion Cell](rngtech:corrosion-cell.md) | Depends on the plate or Anode |
 | 5 | [Syngas Combustor](rngtech:syngas-combustor.md) | 240 FE/t |
-| 6 | [Ammonia Fuel Cell](rngtech:ammonia-fuel-cell.md) | 600 FE/t |
+| 6 | [Fuel Cell](rngtech:ammonia-fuel-cell.md) | 600 FE/t |
 | 7 | [Vacuum Collapse Generator](rngtech:vacuum-collapse-generator.md) | About 1,000 FE/t |
 
 The [Potential Reactor](rngtech:potential-reactor.md) and [Cavitation Generator](rngtech:cavitation-generator.md) also generate FE. See each page for details, and [Power Chains](rngtech:power-chains.md) for how each generator connects to the machines that fuel it.

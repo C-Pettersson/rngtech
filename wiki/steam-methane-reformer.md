@@ -20,7 +20,7 @@ wiki:
     },
 ) }}
 
-The **Steam Methane Reformer** reacts a gas with water to make **Hydrogen** and **Carbon Monoxide**. It is the Stage 6 Hydrogen source for the [Ammonia Synthesizer](ammonia-synthesizer.md). Methane is its main feed. Syngas from the [Coal Gasifier](coal-gasifier.md) also works, at a lower Hydrogen yield.
+The **Steam Methane Reformer** reacts a gas with water to make **Hydrogen** and **Carbon Monoxide**. It is the Stage 6 Hydrogen source for the [Ammonia Synthesizer](ammonia-synthesizer.md). Methane is its main feed. Syngas from the [Coal Gasifier](coal-gasifier.md) also works, at a lower Hydrogen yield. Fed Carbon Monoxide instead, it runs the water-gas shift, which turns the Carbon Monoxide into more Hydrogen and a little Carbon Exhaust.
 
 It is built as a fired tubular reformer: burners under a firebox heat a row of catalyst-filled tubes, and a steam drum on top feeds them water.
 
@@ -43,10 +43,10 @@ Mine a placed Steam Methane Reformer with a pickaxe. It drops itself with its ro
 ### Reforming gas
 
 1. Install a Stage 6 or higher Heat Core and a Reforming Catalyst Bed in the Gear tab. The Reformer needs both to run.
-2. Fill the water tank and the gas tank with Methane or Syngas. Make Methane from algae biomass in the [Melter](melter.md).
+2. Fill the water tank, and fill the gas tank with Methane, Syngas, or Carbon Monoxide. Make Methane from algae biomass in the [Melter](melter.md).
 3. Supply FE.
 
-Each run uses 1,000 mB of gas and 500 mB of water. Methane makes 1,500 mB of Hydrogen and Syngas only 500 mB, so treat Syngas as a stopgap until your Methane supply is running. Both feeds also make 500 mB of Carbon Monoxide. See the [recipe table](#gas-reforming-recipes) for time and FE costs.
+Each reform uses 1,000 mB of gas and 500 mB of water. Methane makes 1,500 mB of Hydrogen and Syngas only 500 mB, so treat Syngas as a stopgap until your Methane supply is running. Methane and Syngas both also make 500 mB of Carbon Monoxide. See the [recipe table](#gas-reforming-recipes) for time and FE costs.
 
 All four tanks hold 8,000 mB. The Reformer stops when either output tank is full, so drain both.
 
@@ -54,16 +54,25 @@ You can read the Reformer from the outside. Facing the front:
 
 - The window shows four reformer tubes. An installed Catalyst Bed shows as pellets packed inside them, and the tubes glow red-orange while the Reformer runs.
 - The installed Heat Core sits in the burner bay under the firebox, in its material's colour, and blue burner flames light under the tubes while it runs.
-- The three glasses on the right show the feed gas, Hydrogen, and Carbon Monoxide levels. The glass on the steam drum shows the water level, and the gauge beside it rises while the Reformer runs.
+- The three glasses on the right show the feed gas, Hydrogen, and second output levels. The glass on the steam drum shows the water level, and the gauge beside it rises while the Reformer runs.
 - The Servo works the feed valve above the feed glass, and the Battery Cell sits at the front left with a charge window.
 - Smoke rises from the flue stack at the back while it runs, and the lamp at the front lights.
 
 The screen's status line tells you what is missing: Heat Core, catalyst, fluid, power, or output space. You can empty any tank with the purge buttons on the Process tab, or by right-clicking the Reformer with a {{ item('rngtech:purge_bucket') }}. Each purge voids up to 1,000 mB.
 
+### Water-gas shift
+
+The shift uses 500 mB of Carbon Monoxide and 500 mB of water, and makes 500 mB of Hydrogen and 125 mB of Carbon Exhaust. It needs the same Heat Core and Catalyst Bed as a reform.
+
+The gas tank and the second output tank each hold one fluid at a time. The second output tank holds Carbon Monoxide after a reform and Carbon Exhaust after a shift, so a Reformer cannot start a shift while that tank still holds Carbon Monoxide; drain or purge it first. In practice, run the shift in its own Reformer and pipe the first Reformer's Carbon Monoxide into it.
+
+Shifting the Carbon Monoxide from one Methane reform adds 500 mB of Hydrogen, about a third more. The cost is in the algae: the [Algae Photobioreactor](algae-photobioreactor.md) grows one Algae Biomass in 600 ticks on Carbon Monoxide but needs 1,200 ticks on Carbon Exhaust, so a shift loop needs about twice the Photobioreactors. See [the carbon loop](power-chains.md#carbon-loop).
+
 ### Where the products go
 
-- **Hydrogen** feeds the [Ammonia Synthesizer](ammonia-synthesizer.md), which makes Ammonia for the [Ammonia Fuel Cell](ammonia-fuel-cell.md).
-- **Carbon Monoxide** is the best carbon input for the [Algae Photobioreactor](algae-photobioreactor.md). The [Syngas Combustor](syngas-combustor.md) can also burn it as a weaker fuel to get rid of it.
+- **Hydrogen** feeds the [Ammonia Synthesizer](ammonia-synthesizer.md), which makes Ammonia for the [Fuel Cell](ammonia-fuel-cell.md). The Fuel Cell can also [burn Hydrogen directly](ammonia-fuel-cell.md#ammonia-or-hydrogen), for less FE.
+- **Carbon Monoxide** is the best carbon input for the [Algae Photobioreactor](algae-photobioreactor.md). A second Reformer can [shift](#water-gas-shift) it into more Hydrogen, and the [Syngas Combustor](syngas-combustor.md) can burn it as a weaker fuel to get rid of it.
+- **Carbon Exhaust** from a shift is a slower carbon input for the Algae Photobioreactor. The [Ammonia Synthesizer](ammonia-synthesizer.md) also takes it to make Urea.
 
 ### Gear
 
@@ -81,7 +90,7 @@ The Gear tab has four slots:
 | Top | Accepts FE. |
 | Bottom | Does not accept FE. |
 | Sides | Accept FE. |
-| Any | Fill water and Methane or Syngas, and drain Hydrogen and Carbon Monoxide, through any face. |
+| Any | Fill water and Methane, Syngas, or Carbon Monoxide, and drain Hydrogen and the second output, through any face. |
 
 The Reformer has no item automation. Gear slots are manual only. The back cabinet has a port plate sized for a Universal Connector, the tidiest place to attach one.
 
@@ -95,7 +104,7 @@ The Steam Methane Reformer uses the `rngtech:gas_reforming` recipe type. The Cat
 
 The Steam Methane Reformer screen has four tabs:
 
-- **Process**: water, gas, Hydrogen, and Carbon Monoxide tanks with purge buttons, progress, energy, and status. Hover for exact amounts.
+- **Process**: water, gas, Hydrogen, and second output tanks with purge buttons, progress, energy, and status. Hover for exact amounts.
 - **Gear**: Heat Core, Battery Cell, Servo, and Catalyst Bed slots.
 - **Stats**: the machine's current stats, including traits and Gear.
 - **Refinement**: refine the placed Reformer's traits with a catalyst.
@@ -107,7 +116,7 @@ The Steam Methane Reformer screen has four tabs:
 ## See also
 
 - [Coal Gasifier](coal-gasifier.md) and [Syngas Combustor](syngas-combustor.md), the rest of the gas chemistry chain.
-- [Ammonia Fuel Cell](ammonia-fuel-cell.md): how Hydrogen becomes Ammonia power.
+- [Fuel Cell](ammonia-fuel-cell.md): how Hydrogen becomes power, as Ammonia or burned directly.
 - [Stages](stages.md): where the Reformer fits in Stage 6.
 
 {{ navbox() }}

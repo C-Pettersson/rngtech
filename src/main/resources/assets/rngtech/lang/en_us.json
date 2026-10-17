@@ -3713,7 +3713,7 @@
   "rngtech.gas_chemistry.tooltip.progress.empty": "Progress: -- / -- ticks, %s",
   "rngtech.gas_chemistry.tooltip.status": "Status: %s",
   "rngtech.gas_chemistry.input.syngas_combustor": "Syngas / Carbon Monoxide",
-  "rngtech.gas_chemistry.input.steam_methane_reformer": "Methane / Syngas",
+  "rngtech.gas_chemistry.input.steam_methane_reformer": "Methane / Syngas / Carbon Monoxide",
   "rngtech.ammonia_fuel_cell.status.ready": "Ready",
   "rngtech.ammonia_fuel_cell.status.no_membrane": "Needs Membrane",
   "rngtech.ammonia_fuel_cell.status.no_ammonia": "Needs Ammonia or Hydrogen",

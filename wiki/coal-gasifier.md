@@ -107,6 +107,6 @@ The Coal Gasifier screen has four tabs:
 
 - [Syngas Combustor](syngas-combustor.md) and [Steam Methane Reformer](steam-methane-reformer.md), the rest of the gas chemistry chain.
 - [Stages](stages.md): where Syngas fits in Stage 5 power.
-- [Ammonia Fuel Cell](ammonia-fuel-cell.md): gas purge rules and the downstream Hydrogen chain.
+- [Fuel Cell](ammonia-fuel-cell.md): gas purge rules and the downstream Hydrogen chain.
 
 {{ navbox() }}

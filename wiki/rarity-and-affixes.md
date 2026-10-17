@@ -207,6 +207,12 @@ Tool Heads and Tool Rods get 2 extra RP, and some machine parts add a small bonu
 
 An illegal or failed refinement costs nothing: no catalyst and no RP. If an add or upgrade rolls a cost higher than the RP left, it still succeeds, and the item drops to 0 RP.
 
+### Annealed items {#annealed-items}
+
+An item that rolls traits comes out **Annealed** when you craft it at a crafting table and every plate in its recipe is Annealed. Annealed plates come from a [Metal Press with Hydrogen Quench](metal-press.md#annealing). Only the plates in the item's own crafting grid count, so plates used earlier, for example in a Machine Frame, do not. Items whose recipe has no plates, such as Heat Cores, cannot be Annealed.
+
+The Unidentified item shows an aqua Annealed line. When you identify or place it, its RP rolls twice in its stage's range and keeps the higher roll. For a Stage 5–6 item (14–22 RP), that raises the average from 18 to about 19.5. Rarity, affixes, and tiers roll as usual.
+
 ## Refining
 
 Refinement changes an item's rolled affixes with a consumable **catalyst**. You can:

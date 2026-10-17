@@ -69,7 +69,7 @@ nav:
       - Resonance Calibrator: resonance-calibrator.md
       - Wooden Composter: wooden-composter.md
   - Power generation:
-      - Ammonia Fuel Cell: ammonia-fuel-cell.md
+      - Fuel Cell: ammonia-fuel-cell.md
       - Bio Generator: bio-generator.md
       - Cavitation Generator: cavitation-generator.md
       - Corrosion Cell: corrosion-cell.md

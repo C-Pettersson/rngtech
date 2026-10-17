@@ -153,7 +153,7 @@ A {{ item('rngtech:purge_bucket') }} used on the generator voids up to 1,000 mB 
 ## See also
 
 - [Vacuum Collapse Generator](vacuum-collapse-generator.md), which shares the Collapse Nozzle.
-- [Ammonia Fuel Cell](ammonia-fuel-cell.md), the end of the Nitrogen chain.
+- [Fuel Cell](ammonia-fuel-cell.md), the end of the Nitrogen chain.
 - [Gear](gear.md)
 
 {{ navbox() }}

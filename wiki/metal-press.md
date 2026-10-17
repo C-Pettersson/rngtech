@@ -112,7 +112,7 @@ The Stability stat only matters on the Steel press, where low Stability adds fai
 |---|---|
 | Top | Inserts recipe input. Rejects items no Mold can press. |
 | Bottom | Extracts finished output. |
-| Any | Accepts FE, for example from a [Universal Cable](universal-cable.md), and Nitrogen for the [Nitrogen atmosphere](heat.md#nitrogen-atmosphere). |
+| Any | Accepts FE, for example from a [Universal Cable](universal-cable.md), and Nitrogen for the [Nitrogen atmosphere](heat.md#nitrogen-atmosphere). With Bright Anneal or Hydrogen Quench, also accepts Hydrogen for [annealing](#annealing). |
 
 Gear slots, Molds, and the Refinement slot cannot be filled by automation.
 
@@ -125,6 +125,20 @@ Two keystones cap your heat in exchange for speed or savings. Each cap only stop
 **Quench Protocol** halves the temperature failure strain the press takes, for 25% less Heat Transfer.
 
 Die Keeper's Mold Rack picks the first stored Mold, in slot order, that has a recipe for the input. The press cools during the swap unless you have Quick Change. A Drop Forge batch is set when the cycle starts and is limited by the input stack and the free output space. Each pressed item in a batch pays its own FE, earns its own XP, and rolls Super Output on its own.
+
+### Annealing
+
+Two ascendancy notables let the press anneal what it makes under Hydrogen: Die Keeper's **Bright Anneal**, after Purge Line, and Drop Forge's **Hydrogen Quench**, after Quench Line. With either one, the press's [atmosphere tank](heat.md#nitrogen-atmosphere) also takes {{ item('rngtech:hydrogen_bucket') }} Hydrogen. The tank holds one gas at a time, so it takes Hydrogen only while it holds no Nitrogen; pump the tank out with a [Universal Cable](universal-cable.md) to switch gases. Without either notable it refuses Hydrogen.
+
+- **Bright Anneal**: Basic Electric Circuits pressed while the tank holds Hydrogen come out Annealed.
+- **Hydrogen Quench**: plates pressed while the tank holds Hydrogen come out Annealed.
+
+Each Annealed item costs 250 mB of Hydrogen. Other outputs press normally and use none. A Drop Forge batch presses only as many plates as the tank can pay for, so a batch of 6 plates needs 1,500 mB. Hover the gauge on an annealing press to see what it anneals and the cost.
+
+Annealed items show an aqua **Annealed** line in their tooltip. They do not stack with plain copies, and every recipe accepts them like plain ones. What annealing gives you:
+
+- An Annealed Basic Electric Circuit calibrates with [lucky stability](resonance-calibrator.md#annealed-circuits) in the Resonance Calibrator.
+- Gear crafted with only Annealed plates rolls [lucky Refinement Potential](rarity-and-affixes.md#annealed-items).
 
 ### Metal Press recipes
 
@@ -202,7 +216,7 @@ Every node in this machine's ascendancies. See [Machine Mastery](machine-mastery
 
 Both presses share a screen with five tabs:
 
-- **Process**: input and output slots, progress, energy, live heat, a failure-risk bar, and the Nitrogen gauge at the right edge. Status squares show the recipe state and the current risk. Hover for exact values.
+- **Process**: input and output slots, progress, energy, live heat, a failure-risk bar, and the atmosphere gauge at the right edge, for Nitrogen or Hydrogen. Status squares show the recipe state and the current risk. Hover for exact values.
 - **Gear**: Heat Core, Servo, Battery Cell, and Mold slots, plus the active Mold selector.
 - **Stats**: the machine's current stats, including traits, Gear, and Mastery.
 - **Refinement**: refine the placed press's traits with a catalyst.

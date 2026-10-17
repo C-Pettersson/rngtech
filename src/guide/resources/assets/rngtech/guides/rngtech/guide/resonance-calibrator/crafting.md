@@ -2,7 +2,7 @@
 navigation:
   title: "Crafting"
   parent: resonance-calibrator.md
-  position: 5
+  position: 6
   icon: rngtech:iron_resonance_calibrator_chassis
 ---
 

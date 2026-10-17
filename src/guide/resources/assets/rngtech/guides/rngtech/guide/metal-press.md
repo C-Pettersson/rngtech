@@ -60,18 +60,19 @@ Both presses run on FE and heat up before pressing. Like every RNGTech machine, 
 |---|---|
 | Top | Inserts recipe input. Rejects items no Mold can press. |
 | Bottom | Extracts finished output. |
-| Any | Accepts FE, for example from a [Universal Cable](rngtech:universal-cable.md), and Nitrogen for the [Nitrogen atmosphere](rngtech:heat/nitrogen-atmosphere.md). |
+| Any | Accepts FE, for example from a [Universal Cable](rngtech:universal-cable.md), and Nitrogen for the [Nitrogen atmosphere](rngtech:heat/nitrogen-atmosphere.md). With Bright Anneal or Hydrogen Quench, also accepts Hydrogen for [annealing](rngtech:metal-press/annealing.md). |
 
 Gear slots, Molds, and the Refinement slot cannot be filled by automation.
 
 - [Mastery and Ascendancies](rngtech:metal-press/mastery-and-ascendancies.md)
+- [Annealing](rngtech:metal-press/annealing.md)
 - [Metal Press recipes](rngtech:metal-press/metal-press-recipes.md)
 
 ## Screen
 
 Both presses share a screen with five tabs:
 
-- **Process**: input and output slots, progress, energy, live heat, a failure-risk bar, and the Nitrogen gauge at the right edge. Status squares show the recipe state and the current risk. Hover for exact values.
+- **Process**: input and output slots, progress, energy, live heat, a failure-risk bar, and the atmosphere gauge at the right edge, for Nitrogen or Hydrogen. Status squares show the recipe state and the current risk. Hover for exact values.
 - **Gear**: Heat Core, Servo, Battery Cell, and Mold slots, plus the active Mold selector.
 - **Stats**: the machine's current stats, including traits, Gear, and Mastery.
 - **Refinement**: refine the placed press's traits with a catalyst.

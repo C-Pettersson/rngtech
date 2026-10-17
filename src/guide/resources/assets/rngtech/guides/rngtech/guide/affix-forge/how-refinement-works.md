@@ -8,7 +8,7 @@ navigation:
 
 # How refinement works
 
-Every refinable item has a [rarity](rngtech:rarity-and-affixes.md) and a budget of [Refinement Potential](rngtech:rarity-and-affixes/refinement-potential.md) (RP):
+Every refinable item has a [rarity](rngtech:rarity-and-affixes.md) and a budget of [Refinement Potential](rngtech:rarity-and-affixes.md#refinement-potential) (RP):
 
 - **Rarity** sets how many affixes the item can hold. Normal items have none, Magic items hold one prefix and one suffix, and Rare items hold up to three of each.
 - **RP** is spent by every successful operation. When an item runs out, you cannot refine it further, so plan where you spend it.

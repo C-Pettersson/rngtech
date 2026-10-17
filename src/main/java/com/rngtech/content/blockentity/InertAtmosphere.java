@@ -118,7 +118,7 @@ public final class InertAtmosphere {
         }
     }
 
-    /** Fills only: Nitrogen goes in from any side and is never pulled back out. */
+    /** Gas goes in from any side; pumping it out empties the tank, for example to switch gases. */
     private final class Inlet implements IFluidHandler {
         @Override
         public int getTanks() {
@@ -147,12 +147,12 @@ public final class InertAtmosphere {
 
         @Override
         public FluidStack drain(FluidStack resource, FluidAction action) {
-            return FluidStack.EMPTY;
+            return resource.isEmpty() || !FluidStack.isSameFluidSameComponents(resource, tank.getFluid()) ? FluidStack.EMPTY : tank.drain(resource, action);
         }
 
         @Override
         public FluidStack drain(int maxDrain, FluidAction action) {
-            return FluidStack.EMPTY;
+            return tank.drain(maxDrain, action);
         }
     }
 }
