@@ -139,5 +139,27 @@
 			x: 12.5d
 			y: 2.0d
 		}
+		{
+			dependencies: ["7983B2FDA710DE9A", "1FACE973E783CB4C"]
+			id: "2AB169CEEBB9FA40"
+			tasks: [{
+				id: "726938CD8C7B2F09"
+				item: { count: 1, id: "rngtech:soul_transfer" }
+				type: "item"
+			}]
+			x: 0.0d
+			y: 4.0d
+		}
+		{
+			dependencies: ["2AB169CEEBB9FA40"]
+			id: "14A8140EBDA3865E"
+			optional: true
+			tasks: [{
+				id: "4C20E17E6741D267"
+				type: "checkmark"
+			}]
+			x: 2.5d
+			y: 4.0d
+		}
 	]
 }
