@@ -160,7 +160,7 @@ These live in `config/rngtech-common.toml`.
 
 Each player also has `config/rngtech-client.toml`. Its `solar.animatedPanels` (default on) turns [Solar Panel](solar-panel.md) decks smoothly with the sun; turn it off for panels that tilt in steps, which is lighter on very large fields. It takes effect after a resource reload (F3 + T).
 
-**Vanilla pickaxes and ore hardness.** Each metal ore has an ore hardness: 1 for Iron and Copper, 2 for Gold, Tin, and Zinc, and up to 8 for Naquadah. The [Modular Pick](tool-bench.md) reaches every level. The policy sets how far vanilla pickaxes reach:
+**Vanilla pickaxes and ore hardness.** Each metal ore has an ore hardness: 1 for Iron and Copper, 2 for Gold, Tin, and Zinc, and up to 8 for Naquadah. The [Modular Pick](modular-tools.md) reaches every level. The policy sets how far vanilla pickaxes reach:
 
 | Policy | Vanilla pickaxes can mine |
 |---|---|

@@ -2,7 +2,7 @@
 navigation:
   title: "Repairing"
   parent: tool-bench.md
-  position: 3
+  position: 0
   icon: rngtech:tool_bench
 ---
 
