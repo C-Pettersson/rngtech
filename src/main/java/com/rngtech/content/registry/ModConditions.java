@@ -5,6 +5,7 @@ import com.rngtech.content.dormant.DormantSitesEnabledCondition;
 import com.rngtech.content.material.MaterialEnabledCondition;
 import com.rngtech.content.material.OreWorldgenEnabledCondition;
 import com.rngtech.content.recipe.AscendancySealRecipesEnabledCondition;
+import com.rngtech.content.recipe.VanillaToolRecipesEnabledCondition;
 import com.rngtech.content.recipe.VolatileCatalystRecipesEnabledCondition;
 
 import com.mojang.serialization.MapCodec;
@@ -26,6 +27,8 @@ public final class ModConditions {
             CONDITIONS.register("ascendancy_seal_recipes_enabled", () -> AscendancySealRecipesEnabledCondition.CODEC);
     public static final DeferredHolder<MapCodec<? extends ICondition>, MapCodec<VolatileCatalystRecipesEnabledCondition>> VOLATILE_CATALYST_RECIPES_ENABLED =
             CONDITIONS.register("volatile_catalyst_recipes_enabled", () -> VolatileCatalystRecipesEnabledCondition.CODEC);
+    public static final DeferredHolder<MapCodec<? extends ICondition>, MapCodec<VanillaToolRecipesEnabledCondition>> VANILLA_TOOL_RECIPES_ENABLED =
+            CONDITIONS.register("vanilla_tool_recipes_enabled", () -> VanillaToolRecipesEnabledCondition.CODEC);
 
     public static final DeferredHolder<MapCodec<? extends ICondition>, MapCodec<DormantSitesEnabledCondition>> DORMANT_SITES_ENABLED =
             CONDITIONS.register("dormant_sites_enabled", () -> DormantSitesEnabledCondition.CODEC);
