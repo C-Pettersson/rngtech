@@ -1,10 +1,117 @@
 {
-  "variants": {
-    "has_tiny_anvil=false": {
-      "model": "rngtech:block/tool_bench"
+  "multipart": [
+    {
+      "when": {
+        "facing": "north"
+      },
+      "apply": {
+        "model": "rngtech:block/tool_bench"
+      }
     },
-    "has_tiny_anvil=true": {
-      "model": "rngtech:block/tool_bench_with_anvil"
+    {
+      "when": {
+        "facing": "north",
+        "has_tiny_anvil": "true"
+      },
+      "apply": {
+        "model": "rngtech:block/tool_bench/tiny_anvil"
+      }
+    },
+    {
+      "when": {
+        "facing": "north",
+        "has_energy_connector": "true"
+      },
+      "apply": {
+        "model": "rngtech:block/tool_bench/energy_port"
+      }
+    },
+    {
+      "when": {
+        "facing": "east"
+      },
+      "apply": {
+        "model": "rngtech:block/tool_bench",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "facing": "east",
+        "has_tiny_anvil": "true"
+      },
+      "apply": {
+        "model": "rngtech:block/tool_bench/tiny_anvil",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "facing": "east",
+        "has_energy_connector": "true"
+      },
+      "apply": {
+        "model": "rngtech:block/tool_bench/energy_port",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "facing": "south"
+      },
+      "apply": {
+        "model": "rngtech:block/tool_bench",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "facing": "south",
+        "has_tiny_anvil": "true"
+      },
+      "apply": {
+        "model": "rngtech:block/tool_bench/tiny_anvil",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "facing": "south",
+        "has_energy_connector": "true"
+      },
+      "apply": {
+        "model": "rngtech:block/tool_bench/energy_port",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "facing": "west"
+      },
+      "apply": {
+        "model": "rngtech:block/tool_bench",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "facing": "west",
+        "has_tiny_anvil": "true"
+      },
+      "apply": {
+        "model": "rngtech:block/tool_bench/tiny_anvil",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "facing": "west",
+        "has_energy_connector": "true"
+      },
+      "apply": {
+        "model": "rngtech:block/tool_bench/energy_port",
+        "y": 270
+      }
     }
-  }
+  ]
 }

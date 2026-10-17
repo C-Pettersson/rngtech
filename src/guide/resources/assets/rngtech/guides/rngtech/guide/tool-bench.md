@@ -31,6 +31,8 @@ The **Tool Bench** is where you build and maintain RNGTech's **Modular Field Too
 
 It needs no iron to craft, so it is one of the first things you build. Modular tools are also how you mine the harder RNGTech ores; vanilla pickaxes only reach the first two ore-hardness levels by default.
 
+The placed bench faces you, with a bed of gravel between its legs. A tool in its Tool slot lies on the worktop, or the loose head and rod when there is no tool. An installed Tiny Anvil sits on the front corner of the worktop, and an installed Energy Connector adds a back panel with a cable port.
+
 ## Usage
 
 - [Building a tool](rngtech:tool-bench/building-a-tool.md)
@@ -51,16 +53,7 @@ The Refine tab applies an <ItemLink id="rngtech:affix_injector" />, <ItemLink id
 
 ### Automation
 
-The Tool Bench has no item automation. With an Energy Connector installed, it accepts FE from any side, for example from a [Universal Cable](rngtech:universal-cable.md).
-
-## Screen
-
-The Tool Bench screen has four tabs:
-
-- **Build**: Tool, head, rod, Battery Cell, and repair slots, with the Apply, Remove Battery Cell, and Disassemble buttons.
-- **Gear**: the Tiny Anvil and Energy Connector slots.
-- **Stats**: the inserted tool's effective stats. Hover a stat for an explanation.
-- **Refine**: Tool, Head, Rod, and catalyst slots for refining tool parts.
+The Tool Bench has no item automation. With an Energy Connector installed, it accepts FE from any side, for example from a [Universal Cable](rngtech:universal-cable.md). The cable port appears on the back of the bench once a connector is installed.
 
 ## Obtaining
 
@@ -71,3 +64,7 @@ The Tool Bench screen has four tabs:
 ### Breaking
 
 Mine a placed Tool Bench with a pickaxe. It drops itself.
+
+## More
+
+- [Screen](rngtech:tool-bench/screen.md)
