@@ -2,6 +2,8 @@ package com.rngtech.content.blockentity;
 
 import com.rngtech.content.block.BaseMachineBlock;
 import com.rngtech.content.block.BatteryChassisBlock;
+import com.rngtech.content.block.CableBlock;
+import com.rngtech.content.block.UniversalConnectorBlock;
 import com.rngtech.content.item.BatteryCellItem;
 import com.rngtech.content.menu.BatteryChassisMenu;
 import com.rngtech.content.registry.ModBlockEntities;
@@ -21,6 +23,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.Connection;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.Packet;
@@ -75,6 +78,11 @@ public class BatteryChassisBlockEntity extends BaseMachineBlockEntity implements
     private static final int CHARGED_STORAGE_REQUIRED_TICKS = 20 * 60 * 10;
     private static final double CELL_LEAKAGE_DAMPING = 0.02;
     private static final Direction[] DIRECTIONS = Direction.values();
+    private static final int VISUAL_SYNC_INTERVAL = 2;
+    /** Smoothing per tick for the flow the lamps show, about a second. */
+    private static final double FLOW_SMOOTHING = 0.1;
+    private static final double FLOW_THRESHOLD = 0.5;
+    private static final double FLOW_BALANCE = 1.15;
 
     private final BatteryChassisBlock block;
     private final ItemStackHandler inventory;
@@ -92,6 +100,10 @@ public class BatteryChassisBlockEntity extends BaseMachineBlockEntity implements
     private int lastEnergyOutput;
     private final InstalledCellStats cells = new InstalledCellStats();
     private RuntimeContext cachedRuntimeContext;
+    private double flowIn;
+    private double flowOut;
+    private BatteryChassisVisualState visualState = BatteryChassisVisualState.EMPTY;
+    private BatteryChassisVisualState.Key lastSyncedVisual;
 
     private final ContainerData menuData = new ContainerData() {
         @Override
@@ -187,6 +199,7 @@ public class BatteryChassisBlockEntity extends BaseMachineBlockEntity implements
 
     public static void serverTick(Level level, BlockPos pos, BlockState state, BatteryChassisBlockEntity chassis) {
         chassis.beginEnergyTelemetryTick();
+        chassis.updateFlow();
         boolean exported = chassis.exportEnergy(level, pos);
         boolean lost = chassis.applyIdleLoss();
         chassis.updateEnergizedTicks();
@@ -197,6 +210,109 @@ public class BatteryChassisBlockEntity extends BaseMachineBlockEntity implements
             chassis.setChanged();
         }
         chassis.receivedSides.clear();
+        chassis.syncVisualState(level);
+    }
+
+    /**
+     * Chassis saved while the block was a solid cube stored no light inside it, which leaves the renderer's cells and
+     * meter unlit. Rechecking the block's own light once on load fixes those saves.
+     */
+    @Override
+    public void onLoad() {
+        super.onLoad();
+        if (level != null && !level.isClientSide) {
+            level.getLightEngine().checkBlock(worldPosition);
+        }
+    }
+
+    /** Client copy of the state the renderer draws; synced from the server in the block entity update tag. */
+    public BatteryChassisVisualState visualState() {
+        return visualState;
+    }
+
+    /** What the chassis shows right now, built on the server. */
+    public BatteryChassisVisualState currentVisualState() {
+        RuntimeContext context = runtimeContext();
+        List<BatteryChassisVisualState.Cell> cells = new ArrayList<>(context.activeSlots());
+        for (int slot = 0; slot < context.activeSlots(); slot++) {
+            ItemStack stack = inventory.getStackInSlot(slot);
+            if (!(stack.getItem() instanceof BatteryCellItem cell)) {
+                cells.add(new BatteryChassisVisualState.Cell("", 0.0F));
+                continue;
+            }
+            int capacity = effectiveCellCapacity(slot, context);
+            float charge = capacity <= 0 ? 0.0F : cellEnergyStored(slot, context) / (float) capacity;
+            cells.add(new BatteryChassisVisualState.Cell(cell.material().getSerializedName(), Mth.clamp(charge, 0.0F, 1.0F)));
+        }
+        int capacity = energyCapacity(context);
+        return new BatteryChassisVisualState(
+                cells,
+                capacity <= 0 ? -1.0F : Mth.clamp(energyStored(context) / (float) capacity, 0.0F, 1.0F),
+                flow(),
+                connectorSides(),
+                contactSides()
+        );
+    }
+
+    private void updateFlow() {
+        flowIn += (lastEnergyInput - flowIn) * FLOW_SMOOTHING;
+        flowOut += (lastEnergyOutput - flowOut) * FLOW_SMOOTHING;
+    }
+
+    private BatteryChassisVisualState.Flow flow() {
+        if (Math.max(flowIn, flowOut) < FLOW_THRESHOLD) {
+            return BatteryChassisVisualState.Flow.IDLE;
+        }
+        if (flowIn > flowOut * FLOW_BALANCE) {
+            return BatteryChassisVisualState.Flow.CHARGING;
+        }
+        if (flowOut > flowIn * FLOW_BALANCE) {
+            return BatteryChassisVisualState.Flow.DISCHARGING;
+        }
+        return BatteryChassisVisualState.Flow.BALANCED;
+    }
+
+    /** Sides a cable connector or a standalone Universal Connector faces, whatever modules it holds. */
+    private int connectorSides() {
+        if (level == null || level.isClientSide) {
+            return 0;
+        }
+        int sides = 0;
+        for (Direction direction : DIRECTIONS) {
+            BlockState neighbour = level.getBlockState(worldPosition.relative(direction));
+            Direction toward = direction.getOpposite();
+            if (CableBlock.hasConnector(neighbour, toward) || UniversalConnectorBlock.hasConnector(neighbour, toward)) {
+                sides |= 1 << direction.get3DDataValue();
+            }
+        }
+        return sides;
+    }
+
+    /** Other sides with an FE neighbour, such as a machine or another chassis, read from the export caches. */
+    private int contactSides() {
+        if (level == null || level.isClientSide) {
+            return 0;
+        }
+        int connectors = connectorSides();
+        int sides = 0;
+        for (Direction direction : DIRECTIONS) {
+            int bit = 1 << direction.get3DDataValue();
+            if ((connectors & bit) == 0 && exportTargets.get(level, worldPosition, direction) != null) {
+                sides |= bit;
+            }
+        }
+        return sides;
+    }
+
+    private void syncVisualState(Level level) {
+        if (level.getGameTime() % VISUAL_SYNC_INTERVAL != 0) {
+            return;
+        }
+        BatteryChassisVisualState.Key key = currentVisualState().key();
+        if (!key.equals(lastSyncedVisual)) {
+            lastSyncedVisual = key;
+            level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), Block.UPDATE_CLIENTS);
+        }
     }
 
     public static boolean isCell(ItemStack stack) {
@@ -388,7 +504,17 @@ public class BatteryChassisBlockEntity extends BaseMachineBlockEntity implements
 
     @Override
     public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
-        return saveWithoutMetadata(registries);
+        return currentVisualState().save();
+    }
+
+    @Override
+    public void handleUpdateTag(CompoundTag tag, HolderLookup.Provider registries) {
+        visualState = BatteryChassisVisualState.load(tag);
+    }
+
+    @Override
+    public void onDataPacket(Connection connection, ClientboundBlockEntityDataPacket packet, HolderLookup.Provider registries) {
+        visualState = BatteryChassisVisualState.load(packet.getTag());
     }
 
     private void syncInventoryToClient() {

@@ -104,6 +104,7 @@ public final class RNGTechClient {
     public RNGTechClient(IEventBus modBus, ModContainer container) {
         modBus.addListener(this::registerScreens);
         modBus.addListener(this::registerRenderers);
+        modBus.addListener(BatteryChassisRenderer::registerModels);
         modBus.addListener(CavitationGeneratorRenderer::registerModels);
         modBus.addListener(CorrosionCellRenderer::registerModels);
         modBus.addListener(SolidFuelBurnerRenderer::registerModels);

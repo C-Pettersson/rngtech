@@ -1,0 +1,44 @@
+{
+  "textures": {
+    "particle": "#wire",
+    "casing": "rngtech:block/battery_chassis/casing",
+    "port": "rngtech:block/battery_chassis/port"
+  },
+  "elements": [
+    {
+      "from": [
+        4.0,
+        4.0,
+        0.0
+      ],
+      "to": [
+        12.0,
+        12.0,
+        1.0
+      ],
+      "faces": {
+        "north": {
+          "texture": "#port",
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ]
+        },
+        "east": {
+          "texture": "#wire"
+        },
+        "west": {
+          "texture": "#wire"
+        },
+        "up": {
+          "texture": "#wire"
+        },
+        "down": {
+          "texture": "#wire"
+        }
+      }
+    }
+  ]
+}

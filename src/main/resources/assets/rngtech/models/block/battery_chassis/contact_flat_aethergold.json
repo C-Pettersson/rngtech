@@ -1,0 +1,6 @@
+{
+  "parent": "rngtech:block/battery_chassis/contact_flat",
+  "textures": {
+    "wire": "rngtech:block/battery_chassis/wire/aethergold"
+  }
+}

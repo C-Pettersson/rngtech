@@ -551,6 +551,7 @@ public final class ModBlocks {
                             .mapColor(MapColor.METAL)
                             .strength(2.5F)
                             .sound(SoundType.METAL)
+                            .noOcclusion()
             );
             blocks.put(material, block);
         }
