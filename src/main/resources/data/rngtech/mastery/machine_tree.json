@@ -3075,6 +3075,39 @@
             "gate": "path_0245",
             "region": "drive_reserve",
             "layer": "home"
+        },
+        {
+            "id": "reward_402",
+            "x": 3159,
+            "y": 3623,
+            "role": "reward",
+            "shape": "diamond",
+            "gate": "path_0145",
+            "theme": "Actuation",
+            "region": "control",
+            "layer": "home"
+        },
+        {
+            "id": "reward_403",
+            "x": 3301,
+            "y": 3497,
+            "role": "reward",
+            "shape": "diamond",
+            "gate": "path_0141",
+            "theme": "Heat Flow",
+            "region": "control",
+            "layer": "home"
+        },
+        {
+            "id": "reward_404",
+            "x": 2762,
+            "y": 3408,
+            "role": "reward",
+            "shape": "wheel",
+            "gate": "path_0467",
+            "theme": "Actuation",
+            "region": "control",
+            "layer": "outer"
         }
     ],
     "nodes": [
@@ -30411,6 +30444,321 @@
             "group": "reward_400"
         },
         {
+            "effects": [
+                {
+                    "stat": "PROCESSING_SPEED",
+                    "operation": "INCREASED_PERCENT",
+                    "value": 2
+                }
+            ],
+            "behaviors": [],
+            "fixed": {},
+            "ceilings": {},
+            "scaling": [],
+            "passive": {},
+            "id": "spring_returns_1",
+            "name": "Actuation",
+            "kind": "NODE",
+            "x": 3194,
+            "y": 3656,
+            "group": "reward_402"
+        },
+        {
+            "effects": [
+                {
+                    "stat": "PROCESSING_SPEED",
+                    "operation": "INCREASED_PERCENT",
+                    "value": 2
+                }
+            ],
+            "behaviors": [],
+            "fixed": {},
+            "ceilings": {},
+            "scaling": [],
+            "passive": {},
+            "id": "spring_returns_2",
+            "name": "Actuation",
+            "kind": "NODE",
+            "x": 3137,
+            "y": 3647,
+            "group": "reward_402"
+        },
+        {
+            "effects": [
+                {
+                    "stat": "PROCESSING_SPEED",
+                    "operation": "INCREASED_PERCENT",
+                    "value": 2
+                }
+            ],
+            "behaviors": [],
+            "fixed": {},
+            "ceilings": {},
+            "scaling": [],
+            "passive": {},
+            "id": "spring_returns_3",
+            "name": "Actuation",
+            "kind": "NODE",
+            "x": 3183,
+            "y": 3599,
+            "group": "reward_402"
+        },
+        {
+            "effects": [
+                {
+                    "stat": "PROCESSING_SPEED",
+                    "operation": "INCREASED_PERCENT",
+                    "value": 6
+                },
+                {
+                    "stat": "CONTROL",
+                    "operation": "ADD",
+                    "value": 4
+                }
+            ],
+            "behaviors": [],
+            "fixed": {},
+            "ceilings": {},
+            "scaling": [],
+            "passive": {},
+            "id": "spring_returns",
+            "kind": "NOTABLE",
+            "name": "Spring Returns",
+            "x": 3124,
+            "y": 3588,
+            "group": "reward_402"
+        },
+        {
+            "effects": [
+                {
+                    "stat": "HEAT_TRANSFER",
+                    "operation": "INCREASED_PERCENT",
+                    "value": 2
+                }
+            ],
+            "behaviors": [],
+            "fixed": {},
+            "ceilings": {},
+            "scaling": [],
+            "passive": {},
+            "id": "hot_air_jackets_1",
+            "name": "Heat Flow",
+            "kind": "NODE",
+            "x": 3326,
+            "y": 3451,
+            "group": "reward_403"
+        },
+        {
+            "effects": [
+                {
+                    "stat": "HEAT_TRANSFER",
+                    "operation": "INCREASED_PERCENT",
+                    "value": 2
+                }
+            ],
+            "behaviors": [],
+            "fixed": {},
+            "ceilings": {},
+            "scaling": [],
+            "passive": {},
+            "id": "hot_air_jackets_2",
+            "name": "Heat Flow",
+            "kind": "NODE",
+            "x": 3332,
+            "y": 3514,
+            "group": "reward_403"
+        },
+        {
+            "effects": [
+                {
+                    "stat": "HEAT_TRANSFER",
+                    "operation": "INCREASED_PERCENT",
+                    "value": 2
+                }
+            ],
+            "behaviors": [],
+            "fixed": {},
+            "ceilings": {},
+            "scaling": [],
+            "passive": {},
+            "id": "hot_air_jackets_3",
+            "name": "Heat Flow",
+            "kind": "NODE",
+            "x": 3269,
+            "y": 3479,
+            "group": "reward_403"
+        },
+        {
+            "effects": [
+                {
+                    "stat": "HEAT_TRANSFER",
+                    "operation": "INCREASED_PERCENT",
+                    "value": 6
+                },
+                {
+                    "stat": "THERMAL_MASS",
+                    "operation": "DECREASED_PERCENT",
+                    "value": 2
+                }
+            ],
+            "behaviors": [],
+            "fixed": {},
+            "ceilings": {},
+            "scaling": [],
+            "passive": {},
+            "id": "hot_air_jackets",
+            "kind": "NOTABLE",
+            "name": "Hot Air Jackets",
+            "x": 3275,
+            "y": 3544,
+            "group": "reward_403"
+        },
+        {
+            "effects": [
+                {
+                    "stat": "PROCESSING_SPEED",
+                    "operation": "INCREASED_PERCENT",
+                    "value": 2
+                }
+            ],
+            "behaviors": [],
+            "fixed": {},
+            "ceilings": {},
+            "scaling": [],
+            "passive": {},
+            "id": "cam_followers_1",
+            "name": "Actuation",
+            "kind": "NODE",
+            "x": 2826,
+            "y": 3413,
+            "group": "reward_404"
+        },
+        {
+            "effects": [
+                {
+                    "stat": "PROCESSING_SPEED",
+                    "operation": "INCREASED_PERCENT",
+                    "value": 2
+                }
+            ],
+            "behaviors": [],
+            "fixed": {},
+            "ceilings": {},
+            "scaling": [],
+            "passive": {},
+            "id": "cam_followers_2",
+            "name": "Actuation",
+            "kind": "NODE",
+            "x": 2789,
+            "y": 3466,
+            "group": "reward_404"
+        },
+        {
+            "effects": [
+                {
+                    "stat": "PROCESSING_SPEED",
+                    "operation": "INCREASED_PERCENT",
+                    "value": 2
+                }
+            ],
+            "behaviors": [],
+            "fixed": {},
+            "ceilings": {},
+            "scaling": [],
+            "passive": {},
+            "id": "cam_followers_3",
+            "name": "Actuation",
+            "kind": "NODE",
+            "x": 2725,
+            "y": 3460,
+            "group": "reward_404"
+        },
+        {
+            "effects": [
+                {
+                    "stat": "PROCESSING_SPEED",
+                    "operation": "INCREASED_PERCENT",
+                    "value": 2
+                }
+            ],
+            "behaviors": [],
+            "fixed": {},
+            "ceilings": {},
+            "scaling": [],
+            "passive": {},
+            "id": "cam_followers_4",
+            "name": "Actuation",
+            "kind": "NODE",
+            "x": 2698,
+            "y": 3402,
+            "group": "reward_404"
+        },
+        {
+            "effects": [
+                {
+                    "stat": "PROCESSING_SPEED",
+                    "operation": "INCREASED_PERCENT",
+                    "value": 2
+                }
+            ],
+            "behaviors": [],
+            "fixed": {},
+            "ceilings": {},
+            "scaling": [],
+            "passive": {},
+            "id": "cam_followers_5",
+            "name": "Actuation",
+            "kind": "NODE",
+            "x": 2735,
+            "y": 3350,
+            "group": "reward_404"
+        },
+        {
+            "effects": [
+                {
+                    "stat": "PROCESSING_SPEED",
+                    "operation": "INCREASED_PERCENT",
+                    "value": 2
+                }
+            ],
+            "behaviors": [],
+            "fixed": {},
+            "ceilings": {},
+            "scaling": [],
+            "passive": {},
+            "id": "cam_followers_6",
+            "name": "Actuation",
+            "kind": "NODE",
+            "x": 2799,
+            "y": 3355,
+            "group": "reward_404"
+        },
+        {
+            "effects": [
+                {
+                    "stat": "PROCESSING_SPEED",
+                    "operation": "INCREASED_PERCENT",
+                    "value": 6
+                },
+                {
+                    "stat": "CONTROL",
+                    "operation": "ADD",
+                    "value": 4
+                }
+            ],
+            "behaviors": [],
+            "fixed": {},
+            "ceilings": {},
+            "scaling": [],
+            "passive": {},
+            "id": "cam_followers",
+            "kind": "NOTABLE",
+            "name": "Cam Followers",
+            "x": 2762,
+            "y": 3408,
+            "group": "reward_404"
+        },
+        {
             "effects": [],
             "behaviors": [
                 "MUTE_MACHINE_SOUND"
@@ -37259,6 +37607,82 @@
         [
             "path_0245",
             "cool_headed"
+        ],
+        [
+            "path_0145",
+            "spring_returns_1"
+        ],
+        [
+            "spring_returns_1",
+            "spring_returns_2"
+        ],
+        [
+            "spring_returns_1",
+            "spring_returns_3"
+        ],
+        [
+            "spring_returns_2",
+            "spring_returns"
+        ],
+        [
+            "spring_returns_3",
+            "spring_returns"
+        ],
+        [
+            "path_0141",
+            "hot_air_jackets_1"
+        ],
+        [
+            "hot_air_jackets_1",
+            "hot_air_jackets_2"
+        ],
+        [
+            "hot_air_jackets_1",
+            "hot_air_jackets_3"
+        ],
+        [
+            "hot_air_jackets_2",
+            "hot_air_jackets"
+        ],
+        [
+            "hot_air_jackets_3",
+            "hot_air_jackets"
+        ],
+        [
+            "path_0467",
+            "cam_followers_1"
+        ],
+        [
+            "cam_followers_1",
+            "cam_followers_2"
+        ],
+        [
+            "cam_followers_2",
+            "cam_followers_3"
+        ],
+        [
+            "cam_followers_3",
+            "cam_followers_4"
+        ],
+        [
+            "cam_followers_4",
+            "cam_followers_5"
+        ],
+        [
+            "cam_followers_5",
+            "cam_followers_6"
+        ],
+        [
+            "cam_followers_6",
+            "cam_followers_1"
+        ],
+        [
+            "cam_followers",
+            "cam_followers_3"
+        ],
+        [
+            "cam_followers",
+            "cam_followers_5"
         ]
     ]
 }
