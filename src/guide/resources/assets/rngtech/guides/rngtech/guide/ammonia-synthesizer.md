@@ -35,13 +35,13 @@ Each Synthesizer you craft rolls its own [rarity and affixes](rngtech:rarity-and
 
 ## Usage
 
-### Using Urea
+- [Using Urea](rngtech:ammonia-synthesizer/using-urea.md)
 
-- **By hand or from a dispenser**, Urea works like bone meal on any plant.
-- In the [Forestry Cart Station](rngtech:forestry-cart-station/mastery-and-ascendancies.md), the Forestry Companion and its station take Urea wherever they take bone meal. Each Urea counts as 4 bone meal.
-- In the [Algae Photobioreactor](rngtech:algae-photobioreactor.md#urea), each Urea grows the next 4 Algae Biomass at twice the speed.
+### Getting the gases
 
-- [Getting the gases](rngtech:ammonia-synthesizer/getting-the-gases.md)
+- **Nitrogen**: separate it from water in a Stage 6 [Cavitation Generator](rngtech:cavitation-generator.md) fitted with a Nitrogen Extraction Rotor and a Nitrogen Separation Nozzle.
+- **Hydrogen**: from the [Steam Methane Reformer](rngtech:steam-methane-reformer.md).
+- **Carbon Exhaust**, for Urea: from a [Syngas Combustor](rngtech:syngas-combustor.md), a [Wooden Dehumidifier](rngtech:wooden-dehumidifier.md), or a Steam Methane Reformer running the [water-gas shift](rngtech:steam-methane-reformer/water-gas-shift.md).
 
 ### Gear
 

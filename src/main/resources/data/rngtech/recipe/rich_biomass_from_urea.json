@@ -1,0 +1,25 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "rngtech:composted_biomass"
+    },
+    {
+      "item": "rngtech:composted_biomass"
+    },
+    {
+      "item": "rngtech:composted_biomass"
+    },
+    {
+      "item": "rngtech:composted_biomass"
+    },
+    {
+      "item": "rngtech:urea"
+    }
+  ],
+  "result": {
+    "count": 4,
+    "id": "rngtech:rich_biomass"
+  }
+}
