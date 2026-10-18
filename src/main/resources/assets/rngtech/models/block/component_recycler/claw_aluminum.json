@@ -1,0 +1,9 @@
+{
+  "parent": "rngtech:block/component_recycler/claw",
+  "textures": {
+    "body": "rngtech:block/component_recycler/head/aluminum_body",
+    "body_top": "rngtech:block/component_recycler/head/aluminum_body_top",
+    "prong": "rngtech:block/component_recycler/head/aluminum_prong",
+    "bit": "rngtech:block/component_recycler/head/aluminum_bit"
+  }
+}

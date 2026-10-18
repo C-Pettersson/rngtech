@@ -1,0 +1,6 @@
+{
+  "parent": "rngtech:block/resonance_calibrator/board",
+  "textures": {
+    "board": "rngtech:block/resonance_calibrator/board/tungstensteel"
+  }
+}

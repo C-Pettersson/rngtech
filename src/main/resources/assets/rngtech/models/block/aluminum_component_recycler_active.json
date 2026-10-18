@@ -1,12 +1,6 @@
 {
-  "parent": "minecraft:block/cube",
+  "parent": "rngtech:block/aluminum_component_recycler",
   "textures": {
-    "down": "rngtech:block/component_recycler/bottom/aluminum_component_recycler",
-    "up": "rngtech:block/component_recycler/top/aluminum_component_recycler",
-    "north": "rngtech:block/component_recycler/front/aluminum_component_recycler_active",
-    "south": "rngtech:block/component_recycler/side/aluminum_component_recycler",
-    "east": "rngtech:block/component_recycler/side/aluminum_component_recycler",
-    "west": "rngtech:block/component_recycler/side/aluminum_component_recycler",
-    "particle": "rngtech:block/component_recycler/front/aluminum_component_recycler_active"
+    "lamp": "rngtech:block/crusher/lamp_on"
   }
 }

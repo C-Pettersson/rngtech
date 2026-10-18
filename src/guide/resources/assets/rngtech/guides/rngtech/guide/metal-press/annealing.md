@@ -17,5 +17,5 @@ Each Annealed item costs 250 mB of Hydrogen. Other outputs press normally and us
 
 Annealed items show an aqua **Annealed** line in their tooltip. They do not stack with plain copies, and every recipe accepts them like plain ones. What annealing gives you:
 
-- An Annealed Basic Electric Circuit calibrates with [lucky stability](rngtech:resonance-calibrator.md#annealed-circuits) in the Resonance Calibrator.
+- An Annealed Basic Electric Circuit calibrates with [lucky stability](rngtech:resonance-calibrator/annealed-circuits.md) in the Resonance Calibrator.
 - Gear crafted with only Annealed plates rolls [lucky Refinement Potential](rngtech:rarity-and-affixes/annealed-items.md).

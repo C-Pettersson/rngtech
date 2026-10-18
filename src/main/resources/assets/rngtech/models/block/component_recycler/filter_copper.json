@@ -1,0 +1,8 @@
+{
+  "parent": "rngtech:block/component_recycler/filter",
+  "textures": {
+    "pleat": "rngtech:block/component_recycler/filter/pleat",
+    "cap": "rngtech:block/component_recycler/filter/cap",
+    "collar": "rngtech:block/component_recycler/filter/copper_collar"
+  }
+}

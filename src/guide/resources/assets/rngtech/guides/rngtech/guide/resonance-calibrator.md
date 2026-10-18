@@ -40,32 +40,16 @@ The **Resonance Calibrator** turns ordinary plates, gears, coils, casings, and c
 
 Each calibrated component records a family, a stage, a stability score from 0 to 100, and sometimes Refinement Potential. Recipes that use it can demand a minimum of each. Like every RNGTech machine, each Calibrator rolls its own [rarity and affixes](rngtech:rarity-and-affixes.md) and levels up through [Machine Mastery](rngtech:machine-mastery.md).
 
+You can read a Calibrator from the outside. The installed Resonance Coil is the wound ring at the front, in the coil's metal; with no coil you see only the empty saddle. The input waits on the pin in the middle of the ring. While the Calibrator works, the input turns, the ring glows teal, and the lens behind it shines a beam onto the input. The ring flashes when a calibration finishes, and the component drops into the tray at the front. A multi-lane chassis has one smaller ring per lane, and each pin holds an input when the cycle has enough to fill that lane. The monitor on top shows the selected pattern behind glass on the left. The scope on the right draws a waveform that sweeps across as the cycle runs, steadier the higher the stability range. The bar beside it shows the range, and a white mark shows the last roll. With the Harmonist's Resonant Streak, gold pips under the scope fill as your streak builds. The Control Board stands in a bay on the right side of the cabinet as you face it, with LEDs that blink while it works. The Stabilizer Matrix floats between two prongs on the right of the front, and the Battery Cell stands on the left with its charge meter. The cable port is on the back. The Nullite chassis adds a fine vernier ring with alignment ticks around its coil.
+
 ## Usage
 
 - [Calibrating](rngtech:resonance-calibrator/calibrating.md)
-
-### Annealed circuits
-
-An Annealed <ItemLink id="rngtech:basic_electric_circuit" />, pressed under Hydrogen in a [Metal Press](rngtech:metal-press/annealing.md) with Bright Anneal, calibrates with lucky stability. The Calibrator rolls stability twice within the recipe's range, after your Gear's adjustments, and keeps the higher roll. The Harmonist's Second Pass, if you have it, applies after that. On the plain Basic circuit recipe (35–75 stability), the chance of reaching 55 or more for an Advanced blank goes from about 51% to about 76%.
-
-Annealed and plain circuits do not stack, so a multi-lane cycle is either all Annealed or all plain.
-
+- [Annealed circuits](rngtech:resonance-calibrator/annealed-circuits.md)
 - [Calibration families](rngtech:resonance-calibrator/calibration-families.md)
 - [Stages](rngtech:resonance-calibrator/stages.md)
 - [Gear](rngtech:resonance-calibrator/gear.md)
-
-### Automation
-
-| Side | Behavior |
-|---|---|
-| Top and sides | Insert into the input, catalyst, and stabilizer slots. Each slot accepts only items a calibration recipe uses there. |
-| Bottom | Extracts finished components. |
-| Any | Accepts FE, for example from a [Universal Cable](rngtech:universal-cable.md). |
-
-Gear and pattern slots are not reachable by automation.
-
-With JEI installed, recipes are listed under Resonance Calibration. Recipe transfer puts the pattern into the selected pattern slot if it is empty or already holds that pattern, otherwise into a slot holding it or the first empty one.
-
+- [Automation](rngtech:resonance-calibrator/automation.md)
 - [Mastery and Ascendancies](rngtech:resonance-calibrator/mastery-and-ascendancies.md)
 
 ## Obtaining

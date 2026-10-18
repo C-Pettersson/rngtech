@@ -200,7 +200,12 @@ const EXTRAS = [
     // The Batch Overhead path sits beside Dense Batching, which it leads to.
     { id: "batch_overhead", angle: -62, radius: 1250, shapes: ["arc"], theme: "batching" },
     // Blast Draft and Cool Headed share a road node close to the Furnace's start, so how to run heat is an early choice.
-    { id: "blast_draft", keystones: ["blast_draft", "cool_headed"], angle: 40, radius: 1550, shapes: ["keyPair"], keystone: true, layer: "home" }
+    { id: "blast_draft", keystones: ["blast_draft", "cool_headed"], angle: 40, radius: 1550, shapes: ["keyPair"], keystone: true, layer: "home" },
+    // The Control start's home themes give neither speed nor heat, so the Metal Press gets speed and Heat Transfer
+    // pockets beside its start and a larger Actuation pocket further out.
+    { id: "press_actuation", angle: -158, radius: 1450, shapes: ["chain", "fork", "diamond"], theme: "actuation" },
+    { id: "press_heat_flow", angle: -140, radius: 1500, shapes: ["fork", "diamond", "chain"], theme: "heatFlow" },
+    { id: "press_actuation_outer", angle: -145, radius: 2200, shapes: ["wheel", "chain", "fork"], theme: "actuation" }
 ];
 
 const regionAt = angle => {

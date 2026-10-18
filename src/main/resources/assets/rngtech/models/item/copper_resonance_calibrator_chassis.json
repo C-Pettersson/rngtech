@@ -1,3 +1,11 @@
 {
-  "parent": "rngtech:block/copper_resonance_calibrator_chassis"
+  "parent": "rngtech:item/resonance_calibrator_single_template",
+  "textures": {
+    "particle": "rngtech:block/resonance_calibrator/shell/copper",
+    "shell": "rngtech:block/resonance_calibrator/shell/copper",
+    "trim": "rngtech:block/resonance_calibrator/trim/copper",
+    "crown": "rngtech:block/resonance_calibrator/crown/copper",
+    "coil": "rngtech:block/resonance_calibrator/coil/copper",
+    "board": "rngtech:block/resonance_calibrator/board/copper"
+  }
 }

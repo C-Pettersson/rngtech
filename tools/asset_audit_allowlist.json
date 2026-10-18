@@ -226,6 +226,21 @@
     {
       "check": "unused_png",
       "subject_globs": [
+        "src/main/resources/assets/rngtech/textures/block/resonance_calibrator/fx/beam.png"
+      ],
+      "reason": "The Resonance Calibrator emitter beam is drawn only by ResonanceCalibratorRenderer."
+    },
+    {
+      "check": "shared_machine_block_texture",
+      "key": "rngtech:block/resonance_calibrator/*",
+      "subject_globs": [
+        "*_resonance_calibrator_chassis"
+      ],
+      "reason": "Resonance Calibrator chassis share one tuning-bench housing and differ by shell, trim, and crown metal, with their own lane layout on the bulk and Nullite chassis; every chassis shares the status lamp."
+    },
+    {
+      "check": "unused_png",
+      "subject_globs": [
         "src/main/resources/assets/rngtech/textures/block/divinity_siphon/breath_containment_seal.png",
         "src/main/resources/assets/rngtech/textures/block/divinity_siphon/breath_divinity_siphon_formed.png",
         "src/main/resources/assets/rngtech/textures/block/divinity_siphon/heart_containment_seal.png",

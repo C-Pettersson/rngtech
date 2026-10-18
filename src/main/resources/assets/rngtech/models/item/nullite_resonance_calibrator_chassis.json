@@ -1,3 +1,11 @@
 {
-  "parent": "rngtech:block/nullite_resonance_calibrator_chassis"
+  "parent": "rngtech:item/resonance_calibrator_nullite_template",
+  "textures": {
+    "particle": "rngtech:block/resonance_calibrator/shell/nullite",
+    "shell": "rngtech:block/resonance_calibrator/shell/nullite",
+    "trim": "rngtech:block/resonance_calibrator/trim/nullite",
+    "crown": "rngtech:block/resonance_calibrator/crown/nullite",
+    "coil": "rngtech:block/resonance_calibrator/coil/nullite",
+    "board": "rngtech:block/resonance_calibrator/board/nullite"
+  }
 }
