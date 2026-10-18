@@ -68,7 +68,7 @@ Crushing seeds in a [Crusher](crusher.md) turns each seed into one Compost Feeds
 
 ### Using the output
 
-Burn {{ item('rngtech:composted_biomass') }} in the [Bio Generator](bio-generator.md) for 1,600 FE each before modifiers, or craft it with Bone Meal, Organic Reagent, or Gunpowder into {{ item('rngtech:rich_biomass') }}, a denser fuel. Composted Biomass is not a furnace fuel and does not burn in the [Solid Fuel Burner](solid-fuel-burner.md).
+Burn {{ item('rngtech:composted_biomass') }} in the [Bio Generator](bio-generator.md) for 1,600 FE each before modifiers, or craft it with Bone Meal, Organic Reagent, or Gunpowder into {{ item('rngtech:rich_biomass') }}, a denser fuel. One Urea from the [Ammonia Synthesizer](ammonia-synthesizer.md#using-urea) turns four Composted Biomass into four Rich Biomass. Composted Biomass is not a furnace fuel and does not burn in the [Solid Fuel Burner](solid-fuel-burner.md).
 
 ### Automation
 
