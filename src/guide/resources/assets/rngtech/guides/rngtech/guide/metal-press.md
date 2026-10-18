@@ -39,6 +39,10 @@ The **Metal Press** forms ingots into plates, gears, and casings, presses circui
 
 Both presses run on FE and heat up before pressing. Like every RNGTech machine, each press you craft rolls its own [rarity and affixes](rngtech:rarity-and-affixes.md), and it can level up through [Machine Mastery](rngtech:machine-mastery.md).
 
+You can read a press from the outside. The selected Mold sits on the bed as the die with the input lying on it, and the other stored Molds stand in the rack on the back cabinet. While the press works, the ram comes down as the cycle runs and strikes when it finishes, and pressed parts collect in the tray at the front of the bed. The bed and the die glow from dull red to yellow-white with the heat. The bar on the front of the bed reads like the [heat bar](rngtech:heat/the-overheat-slider.md) on the Process tab: it fills with the heat against the Heat Core's Max Temperature, a white mark shows the recipe's target and a yellow mark the setpoint, and the fill turns red while the press overheats. Facing the front, the Heat Core is the finned radiator on the right and the Battery Cell stands in the cradle on the left with its charge meter. The gas cylinder behind the cradle is the [atmosphere tank](rngtech:heat/nitrogen-atmosphere.md): its window shows how full it is, pale blue for Nitrogen and near white for Hydrogen, and its valve lights up while the press uses Nitrogen. The cable port is on the back.
+
+The Steel press is a servo press: the Servo lies on the crown and drives the ram, and the meter next to the heat bar fills from amber to red with failure strain and blinks when a failure is near. The Crude press is a bronze fly press: copper coils heat its firebrick bed, and the screw and its fly bar turn as the ram comes down. A Servo installed in a Crude press sits behind the crosshead.
+
 ## Usage
 
 - [Pressing](rngtech:metal-press/pressing.md)
@@ -53,30 +57,10 @@ Both presses run on FE and heat up before pressing. Like every RNGTech machine, 
 | 4 | <ItemLink id="rngtech:metal_press" /> | Servo required. Uses failure strain and failure outputs. |
 
 - [Gear](rngtech:metal-press/gear.md)
-
-### Automation
-
-| Side | Behavior |
-|---|---|
-| Top | Inserts recipe input. Rejects items no Mold can press. |
-| Bottom | Extracts finished output. |
-| Any | Accepts FE, for example from a [Universal Cable](rngtech:universal-cable.md), and Nitrogen for the [Nitrogen atmosphere](rngtech:heat/nitrogen-atmosphere.md). With Bright Anneal or Hydrogen Quench, also accepts Hydrogen for [annealing](rngtech:metal-press/annealing.md). |
-
-Gear slots, Molds, and the Refinement slot cannot be filled by automation.
-
+- [Automation](rngtech:metal-press/automation.md)
 - [Mastery and Ascendancies](rngtech:metal-press/mastery-and-ascendancies.md)
 - [Annealing](rngtech:metal-press/annealing.md)
 - [Metal Press recipes](rngtech:metal-press/metal-press-recipes.md)
-
-## Screen
-
-Both presses share a screen with five tabs:
-
-- **Process**: input and output slots, progress, energy, live heat, a failure-risk bar, and the atmosphere gauge at the right edge, for Nitrogen or Hydrogen. Status squares show the recipe state and the current risk. Hover for exact values.
-- **Gear**: Heat Core, Servo, Battery Cell, and Mold slots, plus the active Mold selector.
-- **Stats**: the machine's current stats, including traits, Gear, and Mastery.
-- **Refinement**: refine the placed press's traits with a catalyst.
-- **Mastery**: machine XP, level, and the passive tree.
 
 ## Obtaining
 
@@ -85,3 +69,7 @@ Both presses share a screen with five tabs:
 ### Breaking
 
 Mine a placed press with a pickaxe. It drops itself and keeps its rolled traits and Mastery progress. Items inside it, including installed Gear and stored Molds, drop next to it.
+
+## More
+
+- [Screen](rngtech:metal-press/screen.md)

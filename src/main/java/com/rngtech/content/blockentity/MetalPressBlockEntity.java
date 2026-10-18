@@ -5,6 +5,9 @@ import com.rngtech.content.block.MetalPressBlock;
 import com.rngtech.content.item.BatteryCellItem;
 import com.rngtech.content.item.GearParts;
 import com.rngtech.content.item.MachinePartItem;
+import com.rngtech.content.item.ServoItem;
+import com.rngtech.content.item.SolidFuelBurnerPartItem;
+import com.rngtech.content.item.UniquePartItem;
 import com.rngtech.content.loot.ChallengeContext;
 import com.rngtech.content.loot.ChallengeLoot;
 import com.rngtech.content.menu.MasteryMenuSupport;
@@ -42,9 +45,14 @@ import com.rngtech.rpg.progression.MegaPassiveTree;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.Connection;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.game.ClientGamePacketListener;
+import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.world.Containers;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
@@ -54,6 +62,7 @@ import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.energy.IEnergyStorage;
 import net.neoforged.neoforge.fluids.capability.IFluidHandler;
@@ -148,6 +157,7 @@ public class MetalPressBlockEntity extends BaseMachineBlockEntity
     private static final int DATA_COUNT = DATA_MACHINE_PROGRESSION_START + MasteryMenuSupport.FIELD_COUNT;
     private static final int STAT_SCALE = 100;
     private static final int LEGACY_SLOT_BATTERY_CELL = 3;
+    private static final int VISUAL_SYNC_INTERVAL = 5;
 
     private final ItemStackHandler processInventory = new ItemStackHandler(PROCESS_SLOT_COUNT) {
         @Override
@@ -304,6 +314,11 @@ public class MetalPressBlockEntity extends BaseMachineBlockEntity
     private final OutputLedger<Item> batchLedger = new OutputLedger<>();
     private int moldSwapTicks;
     private int lockedBatch;
+    /** Finished cycles since load, for the ram's strike; not saved. */
+    private int presses;
+    private MetalPressVisualState visualState = MetalPressVisualState.IDLE;
+    private MetalPressVisualState.Key lastSyncedVisual;
+    private final MetalPressVisualState.Animation animation = new MetalPressVisualState.Animation();
 
     public MetalPressBlockEntity(BlockPos pos, BlockState blockState) {
         super(ModBlockEntities.METAL_PRESS.get(), pos, blockState, MachineType.METAL_PRESS, SLOT_INPUT, SLOT_INPUT, SLOT_OUTPUT);
@@ -311,6 +326,11 @@ public class MetalPressBlockEntity extends BaseMachineBlockEntity
     }
 
     public static void serverTick(Level level, BlockPos pos, BlockState state, MetalPressBlockEntity press) {
+        work(level, pos, state, press);
+        press.syncVisualState(level);
+    }
+
+    private static void work(Level level, BlockPos pos, BlockState state, MetalPressBlockEntity press) {
         press.atmosphere.beginTick();
         MetalPressRecipe recipe = press.nextRecipe();
         MachineStatAccumulator stats = press.routeStats(recipe, press.effectiveStats());
@@ -419,6 +439,133 @@ public class MetalPressBlockEntity extends BaseMachineBlockEntity
         MetalPressRecipe recipe = nextRecipe();
         MachineStatAccumulator stats = routeStats(recipe, effectiveStats());
         return recipe == null || !(hasRequiredComponents()) ? 0 : (int) Math.round(HeatEngine.wobbleAmplitude(envelope(recipe, stats), stats));
+    }
+
+    /**
+     * Presses saved while the block was a solid cube stored no light inside it, which leaves the renderer's die, ram, and
+     * Gear unlit. Rechecking the block's own light once on load fixes those saves.
+     */
+    @Override
+    public void onLoad() {
+        super.onLoad();
+        if (level != null && !level.isClientSide) {
+            level.getLightEngine().checkBlock(worldPosition);
+        }
+    }
+
+    /** Client copy of the state the renderer draws; synced from the server in the block entity update tag. */
+    public MetalPressVisualState visualState() {
+        return visualState;
+    }
+
+    public MetalPressVisualState.Animation animation() {
+        return animation;
+    }
+
+    @Override
+    public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
+        return currentVisualState().save();
+    }
+
+    @Override
+    public Packet<ClientGamePacketListener> getUpdatePacket() {
+        return ClientboundBlockEntityDataPacket.create(this);
+    }
+
+    @Override
+    public void handleUpdateTag(CompoundTag tag, HolderLookup.Provider registries) {
+        visualState = MetalPressVisualState.load(tag);
+    }
+
+    @Override
+    public void onDataPacket(Connection connection, ClientboundBlockEntityDataPacket packet, HolderLookup.Provider registries) {
+        visualState = MetalPressVisualState.load(packet.getTag());
+    }
+
+    private void syncVisualState(Level level) {
+        if (level.getGameTime() % VISUAL_SYNC_INTERVAL != 0) {
+            return;
+        }
+        MetalPressVisualState.Key key = currentVisualState().key();
+        if (!key.equals(lastSyncedVisual)) {
+            lastSyncedVisual = key;
+            level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), Block.UPDATE_CLIENTS);
+        }
+    }
+
+    /** What the press shows right now, built on the server. */
+    public MetalPressVisualState currentVisualState() {
+        MetalPressRecipe recipe = nextRecipe();
+        MachineStatAccumulator baseStats = effectiveStats();
+        MachineStatAccumulator stats = routeStats(recipe, baseStats);
+        boolean pressing = recipe != null && hasRequiredComponents();
+        float progress = 0.0F;
+        int batch = 1;
+        if (pressing) {
+            int ticks = currentProcessingTicks(recipe, stats);
+            progress = ticks > 0 ? Math.min(1.0F, currentElapsedTicks(recipe, stats) / (float) ticks) : 0.0F;
+            batch = Math.max(1, batchJobs(recipe, stats));
+        }
+        String[] rack = MetalPressVisualState.emptyRack();
+        for (int index = 0; index < MOLD_SLOT_COUNT; index++) {
+            if (index != selectedMold) {
+                rack[index] = moldKey(gearInventory.getStackInSlot(SLOT_MOLD + index));
+            }
+        }
+        ItemStack output = processInventory.getStackInSlot(SLOT_OUTPUT);
+        ItemStack cell = batteryCellStack();
+        boolean hasCell = isBatteryCell(cell);
+        return new MetalPressVisualState(
+                heat.temperature(),
+                currentTargetTemperature(recipe),
+                pressing ? envelope(recipe, stats).setpoint() : 0,
+                currentOverheatTemperature(recipe, stats),
+                hasHeatCore() ? Math.max(0, baseStats.intValue(MachineStat.MAX_TEMPERATURE)) : 0,
+                wobbleDisplay(),
+                getBlockState().getValue(BaseMachineBlock.ACTIVE),
+                progress,
+                presses & 0xFF,
+                batch,
+                inputStack().getItem(),
+                output.getItem(),
+                output.isEmpty() ? 0.0F : output.getCount() / (float) output.getMaxStackSize(),
+                moldKey(moldStack()),
+                rack,
+                heatCoreKey(heatCoreStack()),
+                hasServo() ? partKey(servoStack()) : "",
+                hasCell ? ((BatteryCellItem) cell.getItem()).material().getSerializedName() : "",
+                hasCell && energyCapacity() > 0 ? energyStored() / (float) energyCapacity() : -1.0F,
+                atmosphere.amount() / (float) InertAtmosphere.CAPACITY,
+                atmosphere.holdsHydrogen(),
+                atmosphere.lastUse() > 0,
+                isCrudePress() ? -1.0F : HeatControl.failureProgress(failureStrain) / 100.0F
+        );
+    }
+
+    /** A Mold's kind, such as {@code plate} for the Plate Mold; empty for anything else. */
+    private static String moldKey(ItemStack stack) {
+        if (!isMetalPressMold(stack)) {
+            return "";
+        }
+        String path = BuiltInRegistries.ITEM.getKey(stack.getItem()).getPath();
+        return path.endsWith("_mold") ? path.substring(0, path.length() - "_mold".length()) : "";
+    }
+
+    private static String heatCoreKey(ItemStack stack) {
+        if (!isHeatCore(stack)) {
+            return "";
+        }
+        if (stack.getItem() instanceof SolidFuelBurnerPartItem part && part.heatCoreMaterial() != null) {
+            return part.heatCoreMaterial().getSerializedName();
+        }
+        return stack.getItem() instanceof UniquePartItem ? "unique" : "";
+    }
+
+    private static String partKey(ItemStack stack) {
+        if (stack.getItem() instanceof ServoItem servo) {
+            return servo.material().getSerializedName();
+        }
+        return stack.getItem() instanceof UniquePartItem ? "unique" : "";
     }
 
     public int heatSlider() {
@@ -933,6 +1080,7 @@ public class MetalPressBlockEntity extends BaseMachineBlockEntity
         }
         escapement.completed();
         completeCycle();
+        presses++;
         setChanged();
         return true;
     }
@@ -1014,6 +1162,7 @@ public class MetalPressBlockEntity extends BaseMachineBlockEntity
 
         consumeInput(recipe.inputCount() * jobs);
         mergeOutput(failed);
+        presses++;
         resetCycle();
         resetBulkSpeed();
         ChallengeLoot.reward(level, worldPosition, ChallengeLoot.HEAT_FAILURE,
