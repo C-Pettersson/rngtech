@@ -92,7 +92,8 @@ public class FurnaceMenu extends AbstractContainerMenu implements MasteryMenuVie
     private static final int DATA_NITROGEN_USE = DATA_NITROGEN + 1;
     private static final int DATA_NITROGEN_BONUS = DATA_NITROGEN_USE + 1;
     private static final int DATA_MACHINE_PROGRESSION_START = DATA_NITROGEN_BONUS + 1;
-    private static final int DATA_COUNT = DATA_MACHINE_PROGRESSION_START + MasteryMenuSupport.FIELD_COUNT;
+    private static final int DATA_OUTPUT_PER_MINUTE_START = DATA_MACHINE_PROGRESSION_START + MasteryMenuSupport.FIELD_COUNT;
+    private static final int DATA_COUNT = DATA_OUTPUT_PER_MINUTE_START + MAX_PROCESSING_SLOTS;
     private static final int STAT_SCALE = 100;
     private static final int MACHINE_SLOT_COUNT = FurnaceBlockEntity.SLOT_COUNT;
     private static final int GEAR_SLOT_START = MACHINE_SLOT_COUNT;
@@ -281,6 +282,11 @@ public class FurnaceMenu extends AbstractContainerMenu implements MasteryMenuVie
 
     public int processingTicks(int lane) {
         return data.get(DATA_PROCESSING_TICKS_START + Mth.clamp(lane, 0, MAX_PROCESSING_SLOTS - 1));
+    }
+
+    /** Expected items per minute for {@code lane}'s current cycle, in tenths. */
+    public int outputPerMinuteTenths(int lane) {
+        return data.get(DATA_OUTPUT_PER_MINUTE_START + Mth.clamp(lane, 0, MAX_PROCESSING_SLOTS - 1));
     }
 
     public int energyPerTick(int lane) {

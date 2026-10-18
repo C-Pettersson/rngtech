@@ -14,6 +14,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -638,20 +639,23 @@ public class MetalPressScreen extends AbstractContainerScreen<MetalPressMenu> {
         int progress = menu.progress();
         int remaining = Math.max(0, ticks - progress);
         float ledger = menu.ledgerProgress();
-        return List.of(
-                ledger < 0.0F
-                        ? Component.translatable("rngtech.press.tooltip.progress", progress, ticks, remaining)
-                        : Component.translatable("rngtech.press.tooltip.progress", progress, ticks, remaining).append(" ")
-                                .append(Component.translatable("rngtech.press.tooltip.batch_ledger", Math.round(ledger * 100))),
-                Component.translatable(
-                        "rngtech.press.tooltip.progress.energy",
-                        CompactValueText.energyRate(menu.energyPerTick()),
-                        CompactValueText.energyAmount(menu.energyPerCraft())
-                ),
-                heatTooltip(),
-                riskTooltip(),
-                Component.translatable("rngtech.press.tooltip.status", statusText())
-        );
+        List<Component> lines = new ArrayList<>();
+        lines.add(ledger < 0.0F
+                ? Component.translatable("rngtech.press.tooltip.progress", progress, ticks, remaining)
+                : Component.translatable("rngtech.press.tooltip.progress", progress, ticks, remaining).append(" ")
+                        .append(Component.translatable("rngtech.press.tooltip.batch_ledger", Math.round(ledger * 100))));
+        lines.add(Component.translatable(
+                "rngtech.press.tooltip.progress.energy",
+                CompactValueText.energyRate(menu.energyPerTick()),
+                CompactValueText.energyAmount(menu.energyPerCraft())
+        ));
+        if (menu.outputPerMinuteTenths() > 0) {
+            lines.add(MachineScreenStyle.outputRate(ticks, menu.outputPerMinuteTenths(), false));
+        }
+        lines.add(heatTooltip());
+        lines.add(riskTooltip());
+        lines.add(Component.translatable("rngtech.press.tooltip.status", statusText()));
+        return lines;
     }
 
     private void renderProgressTooltipIfHovered(GuiGraphics guiGraphics, int mouseX, int mouseY) {

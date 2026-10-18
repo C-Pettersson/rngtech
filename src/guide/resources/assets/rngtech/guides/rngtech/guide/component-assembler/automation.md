@@ -2,7 +2,7 @@
 navigation:
   title: "Automation"
   parent: component-assembler.md
-  position: 2
+  position: 3
   icon: rngtech:battery_assembler
 ---
 

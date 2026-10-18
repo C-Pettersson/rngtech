@@ -85,7 +85,8 @@ public class MetalPressMenu extends AbstractContainerMenu implements MasteryMenu
     private static final int DATA_HYDROGEN = DATA_NITROGEN_BONUS + 1;
     private static final int DATA_ANNEAL_MODE = DATA_HYDROGEN + 1;
     private static final int DATA_MACHINE_PROGRESSION_START = DATA_ANNEAL_MODE + 1;
-    private static final int DATA_COUNT = DATA_MACHINE_PROGRESSION_START + MasteryMenuSupport.FIELD_COUNT;
+    private static final int DATA_OUTPUT_PER_MINUTE = DATA_MACHINE_PROGRESSION_START + MasteryMenuSupport.FIELD_COUNT;
+    private static final int DATA_COUNT = DATA_OUTPUT_PER_MINUTE + 1;
     private static final int STAT_SCALE = 100;
     public static final int BUTTON_SELECT_MOLD_BASE = 100;
     private static final int PROCESS_SLOT_COUNT = MetalPressBlockEntity.PROCESS_SLOT_COUNT;
@@ -212,6 +213,11 @@ public class MetalPressMenu extends AbstractContainerMenu implements MasteryMenu
 
     public int progress() {
         return Math.max(0, data.get(DATA_PROGRESS));
+    }
+
+    /** Expected items per minute for the current cycle, in tenths. */
+    public int outputPerMinuteTenths() {
+        return data.get(DATA_OUTPUT_PER_MINUTE);
     }
 
     public int processingTicks() {

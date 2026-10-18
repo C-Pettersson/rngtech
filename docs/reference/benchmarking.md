@@ -21,11 +21,13 @@ A run takes a few minutes while the tick is slow. Use small tick counts for a sm
 
 ## What is measured
 
-The scene is built from constants in `src/benchmark/java/com/rngtech/benchmark/BenchmarkScene.java`, so every run builds the same world: a cable grid with machines of every registered type and Debug Batteries on Universal Connectors, a third of the machines being Crushers that are refilled and emptied every second, and a tiled solar array of controllers and panels on the same network. Time is fixed at noon with clear weather. `result.json` lists the counts for the scene (cables, connectors, machines, network endpoints) and the items produced; check them first, because a run whose network has no endpoints or whose Crushers produced nothing is not measuring the same thing.
+The scene is built from constants in `src/benchmark/java/com/rngtech/benchmark/BenchmarkScene.java`, so every run builds the same world: a cable grid with machines of every registered type and Debug Batteries on Universal Connectors, a third of the machines being Crushers that are refilled and emptied every second, an empty Iron Battery Cell in every working Crusher and in every idle machine with a cell slot, and a tiled solar array of controllers and panels on the same network. Time is fixed at noon with clear weather. `result.json` lists the counts for the scene (cables, connectors, machines, network endpoints) and the items produced; check them first, because a run whose network has no endpoints or whose Crushers produced nothing is not measuring the same thing.
 
 Each measured tick is the time between the start and end of the server tick, taken from the NeoForge tick events. The report gives mean, median, p95, p99 and max in milliseconds, and the garbage-collection time over the window. Compare the median and p95: the mean follows GC pauses. Run the benchmark twice on an idle machine and treat differences smaller than the gap between those two runs as noise.
 
 When the scene changes (new machine types are picked up automatically, but layout constants are not), record a new baseline in the pull request.
+
+The scene has held installed Battery Cells since October 2026, and `result.json` counts them as `working_crusher_battery_cells` and `idle_machine_battery_cells`. Results from before that change, which have neither count, measure no cell reads and are not comparable with later runs.
 
 ## Finding where the time goes
 

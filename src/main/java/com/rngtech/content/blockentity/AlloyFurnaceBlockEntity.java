@@ -157,7 +157,8 @@ public class AlloyFurnaceBlockEntity extends BaseMachineBlockEntity implements M
     private static final int DATA_NITROGEN_USE = DATA_NITROGEN + 1;
     private static final int DATA_NITROGEN_BONUS = DATA_NITROGEN_USE + 1;
     private static final int DATA_MACHINE_PROGRESSION_START = DATA_NITROGEN_BONUS + 1;
-    private static final int DATA_COUNT = DATA_MACHINE_PROGRESSION_START + MasteryMenuSupport.FIELD_COUNT;
+    private static final int DATA_OUTPUT_PER_MINUTE = DATA_MACHINE_PROGRESSION_START + MasteryMenuSupport.FIELD_COUNT;
+    private static final int DATA_COUNT = DATA_OUTPUT_PER_MINUTE + 1;
     private static final int STAT_SCALE = 100;
     private static final int VISUAL_SYNC_INTERVAL = 5;
 
@@ -273,6 +274,7 @@ public class AlloyFurnaceBlockEntity extends BaseMachineBlockEntity implements M
                 case DATA_SETPOINT -> recipe == null ? 0 : envelope(recipe, stats).setpoint();
                 case DATA_HEAT_REACH -> recipe == null ? 0 : envelope(recipe, stats).reach();
                 case DATA_HEAT_MAXIMUM -> stats.intValue(MachineStat.MAX_TEMPERATURE);
+                case DATA_OUTPUT_PER_MINUTE -> currentOutputPerMinuteTenths(recipe, stats);
                 default -> 0;
             };
         }
@@ -562,6 +564,17 @@ public class AlloyFurnaceBlockEntity extends BaseMachineBlockEntity implements M
         return atmosphere.overheatBonus(hasMasteryBehavior("BLAST_DRAFT"));
     }
 
+    /** Expected items per minute for the current cycle, in tenths. */
+    private int currentOutputPerMinuteTenths(AlloyFurnaceRecipe recipe, MachineStatAccumulator stats) {
+        if (recipe == null) {
+            return 0;
+        }
+        return OutputRate.perMinuteTenths(
+                batch(recipe, stats) * recipe.outputStack().getCount(),
+                currentProcessingTicks(recipe, stats)
+        );
+    }
+
     @Override
     public MachineInfoSnapshot machineInfo() {
         AlloyFurnaceRecipe recipe = nextRecipe();
@@ -573,6 +586,7 @@ public class AlloyFurnaceBlockEntity extends BaseMachineBlockEntity implements M
                 .stage(chassis().stage())
                 .state(machineInfoState(status), alloyBlockedReason(status))
                 .progress(currentElapsedTicks(recipe, stats), currentProcessingTicks(recipe, stats))
+                .outputRate(currentOutputPerMinuteTenths(recipe, stats))
                 .energy(energyStored(), energyCapacity(), energyDemand > 0 ? -energyDemand : 0)
                 .energyTelemetry(
                         lastEnergyInput(),
