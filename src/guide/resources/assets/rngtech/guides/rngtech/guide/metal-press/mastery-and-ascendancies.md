@@ -2,7 +2,7 @@
 navigation:
   title: "Mastery and Ascendancies"
   parent: metal-press.md
-  position: 4
+  position: 5
   icon: rngtech:metal_press
 ---
 

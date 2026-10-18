@@ -2,7 +2,7 @@
 navigation:
   title: "Crafting"
   parent: metal-press.md
-  position: 7
+  position: 9
   icon: rngtech:metal_press
 ---
 

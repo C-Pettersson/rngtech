@@ -36,6 +36,10 @@ The **Metal Press** forms ingots into plates, gears, and casings, presses circui
 
 Both presses run on FE and heat up before pressing. Like every RNGTech machine, each press you craft rolls its own [rarity and affixes](rarity-and-affixes.md), and it can level up through [Machine Mastery](machine-mastery.md).
 
+You can read a press from the outside. The selected Mold sits on the bed as the die with the input lying on it, and the other stored Molds stand in the rack on the back cabinet. While the press works, the ram comes down as the cycle runs and strikes when it finishes, and pressed parts collect in the tray at the front of the bed. The bed and the die glow from dull red to yellow-white with the heat. The bar on the front of the bed reads like the [heat bar](heat.md#the-overheat-slider) on the Process tab: it fills with the heat against the Heat Core's Max Temperature, a white mark shows the recipe's target and a yellow mark the setpoint, and the fill turns red while the press overheats. Facing the front, the Heat Core is the finned radiator on the right and the Battery Cell stands in the cradle on the left with its charge meter. The gas cylinder behind the cradle is the [atmosphere tank](heat.md#nitrogen-atmosphere): its window shows how full it is, pale blue for Nitrogen and near white for Hydrogen, and its valve lights up while the press uses Nitrogen. The cable port is on the back.
+
+The Steel press is a servo press: the Servo lies on the crown and drives the ram, and the meter next to the heat bar fills from amber to red with failure strain and blinks when a failure is near. The Crude press is a bronze fly press: copper coils heat its firebrick bed, and the screw and its fly bar turn as the ram comes down. A Servo installed in a Crude press sits behind the crosshead.
+
 ## Obtaining
 
 ### Crafting

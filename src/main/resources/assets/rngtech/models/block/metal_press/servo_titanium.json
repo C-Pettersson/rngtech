@@ -1,0 +1,7 @@
+{
+  "parent": "rngtech:block/metal_press/servo",
+  "textures": {
+    "servo": "rngtech:block/compressor_tank/servo/titanium",
+    "accent": "rngtech:block/compressor_tank/servo/titanium_accent"
+  }
+}

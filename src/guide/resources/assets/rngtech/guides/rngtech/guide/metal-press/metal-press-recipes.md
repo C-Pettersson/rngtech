@@ -2,7 +2,7 @@
 navigation:
   title: "Metal Press recipes"
   parent: metal-press.md
-  position: 6
+  position: 7
   icon: rngtech:metal_press
 ---
 

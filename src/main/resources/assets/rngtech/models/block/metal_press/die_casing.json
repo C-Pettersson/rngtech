@@ -1,0 +1,6 @@
+{
+  "parent": "rngtech:block/metal_press/die",
+  "textures": {
+    "cavity": "rngtech:block/metal_press/cavity/casing"
+  }
+}
