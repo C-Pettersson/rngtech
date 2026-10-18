@@ -243,6 +243,16 @@ public final class ModDataComponents {
                             .cacheEncoding()
             );
 
+    /** A Potential Reactor's recent gear burns, oldest first, kept on the dropped reactor so replacing it keeps the repeat penalty. */
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<List<String>>> REACTOR_BURN_HISTORY =
+            DATA_COMPONENTS.registerComponentType(
+                    "reactor_burn_history",
+                    builder -> builder
+                            .persistent(Codec.STRING.listOf())
+                            .networkSynchronized(ByteBufCodecs.STRING_UTF8.apply(ByteBufCodecs.list()))
+                            .cacheEncoding()
+            );
+
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<Boolean>> DIAMOND_TIPPED =
             DATA_COMPONENTS.registerComponentType(
                     "diamond_tipped",

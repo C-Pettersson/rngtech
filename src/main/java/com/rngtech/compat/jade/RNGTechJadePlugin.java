@@ -6,6 +6,7 @@ import com.rngtech.content.block.UniversalConnectorBlock;
 import com.rngtech.content.blockentity.CableBlockEntity;
 import com.rngtech.content.blockentity.MachineInfoProvider;
 import com.rngtech.content.blockentity.MachineInfoSnapshot;
+import com.rngtech.content.blockentity.PotentialReactorBlockEntity;
 import com.rngtech.content.blockentity.UniversalConnectorBlockEntity;
 import com.rngtech.content.cable.NetworkBridgeType;
 import com.rngtech.content.menu.UniversalConnectorAccess;
@@ -82,6 +83,7 @@ public final class RNGTechJadePlugin implements IWailaPlugin {
         private static final String DATA_KEY = "RNGTechMachineInfo";
         private static final String CONNECTOR_DATA_KEY = "RNGTechConnectorInfo";
         private static final String ASCENDANCY_DATA_KEY = "RNGTechAscendancy";
+        private static final String REPEAT_PAYOUT_DATA_KEY = "RNGTechRepeatPayout";
         private final ResourceLocation uid;
 
         MachineStateProvider(String uid) {
@@ -111,6 +113,12 @@ public final class RNGTechJadePlugin implements IWailaPlugin {
                 ascendancy.putInt("tiers", state.sealTiers());
                 tag.put(ASCENDANCY_DATA_KEY, ascendancy);
             }
+            if (provider instanceof PotentialReactorBlockEntity reactor && reactor.repeatPayoutPercent() >= 0) {
+                CompoundTag payout = new CompoundTag();
+                payout.putInt("percent", reactor.repeatPayoutPercent());
+                payout.putInt("repeats", reactor.inputGearRepeats());
+                tag.put(REPEAT_PAYOUT_DATA_KEY, payout);
+            }
             CompoundTag connectorInfo = connectorInfo(accessor);
             if (connectorInfo != null) {
                 tag.put(CONNECTOR_DATA_KEY, connectorInfo);
@@ -138,6 +146,7 @@ public final class RNGTechJadePlugin implements IWailaPlugin {
                 appendGateLines(tooltip, info, details);
                 appendGear(tooltip, info, details);
                 appendOutput(tooltip, info, details);
+                appendRepeatPayout(tooltip, accessor, details);
                 appendSlots(tooltip, info, details);
                 appendRefinement(tooltip, info, details);
                 appendAscendancy(tooltip, accessor, details);
@@ -352,6 +361,23 @@ public final class RNGTechJadePlugin implements IWailaPlugin {
                     Component.translatable("rngtech.rarity." + info.refinementRarity()),
                     value(info.refinementPotential()),
                     value(info.affixCount())
+            ));
+        }
+
+        /** A Potential Reactor's payout for the gear in its input; the compact view shows it only when repeats cut it. */
+        private static void appendRepeatPayout(ITooltip tooltip, BlockAccessor accessor, boolean details) {
+            if (!accessor.getServerData().contains(REPEAT_PAYOUT_DATA_KEY)) {
+                return;
+            }
+            CompoundTag tag = accessor.getServerData().getCompound(REPEAT_PAYOUT_DATA_KEY);
+            int percent = tag.getInt("percent");
+            if (!details && percent >= 100) {
+                return;
+            }
+            tooltip.add(Component.translatable(
+                    "rngtech.jade.machine_state.line.repeat_payout",
+                    value(percent + "%"),
+                    value(tag.getInt("repeats"))
             ));
         }
 

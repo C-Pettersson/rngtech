@@ -31,7 +31,7 @@ Each Potential Reactor you craft rolls its own [rarity and affixes](rarity-and-a
 
 ### Breaking
 
-Mine it with a pickaxe to get it back. Items in its slots and installed Gear drop as separate items.
+Mine it with a pickaxe to get it back. The dropped reactor keeps its rarity, affixes, and memory of recent gear burns. Items in its slots and installed Gear drop as separate items.
 
 ## Usage
 
@@ -56,7 +56,7 @@ Burning a rolled item pays FE for its rarity, affix tiers, and Refinement Potent
 
 These scales apply to the item's base value. The reactor's own stats then multiply every payout, salvage fuel included: energy generation, efficiency, and stability all raise the FE you recover, and processing speed makes each item finish sooner.
 
-Repeats lose value. The reactor remembers the item types of its last 15 gear burns, and each earlier burn of the same type cuts the next payout by a quarter, down to 10%. Rotate through 16 or more different items to avoid the penalty. Salvage fuel recipes are not affected.
+Repeats lose value. The reactor remembers the item types of its last 15 gear burns, and each earlier burn of the same type cuts the next payout by a quarter, down to 10%. Rotate through 16 or more different items to avoid the penalty. Salvage fuel recipes are not affected. The four bars beside the output icon on the Processing tab show the payout for the gear in the input slot; hover them for the percentage and the list of recent burns. With Jade, the reactor also shows the payout when you look at it. The memory stays with the reactor when you break and place it again.
 
 The output is a single **stripped** copy of the item you burned. A stripped item cannot be placed, installed, refined, or charged, but the [Component Recycler](component-recycler.md) still recognizes it. A typical chain is:
 
