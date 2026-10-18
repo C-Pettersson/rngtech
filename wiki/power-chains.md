@@ -49,7 +49,7 @@ Most gas machines also use water. To keep the diagrams readable, water appears o
 
 **What to build.** A [Crusher](crusher.md) grinding coal into Coal Dust, a [Coal Gasifier](coal-gasifier.md) that turns the dust and water into Syngas, and a [Syngas Combustor](syngas-combustor.md) that burns it. One Gasifier keeps one Combustor running at the rated mixture. The Gasifier also needs water; see [Water supply](#water).
 
-**Bottleneck.** The by-products. The Combustor stops when its Carbon Exhaust tank is full, and the Gasifier stops when its residue slot is full. Pipe Carbon Exhaust to an [Algae Photobioreactor](algae-photobioreactor.md), and put Gasification Residue in a [Wooden Dehumidifier](wooden-dehumidifier.md), which turns it into more Carbon Exhaust. One Combustor makes far more exhaust than one Photobioreactor uses, so build several Photobioreactors or void the extra with the Combustor's purge button. A leaner mixture makes less exhaust per mB of Syngas. The algae can go straight into a [Bio Generator](bio-generator.md), but its best use comes at Stage 6.
+**Bottleneck.** The by-products. The Combustor stops when its Carbon Exhaust tank is full, and the Gasifier stops when its residue slot is full. Pipe Carbon Exhaust to an [Algae Photobioreactor](algae-photobioreactor.md), and put Gasification Residue in a [Wooden Dehumidifier](wooden-dehumidifier.md), which turns it into more Carbon Exhaust. One Combustor makes far more exhaust than one Photobioreactor uses, so build several Photobioreactors or void the extra with the Combustor's purge button. From Stage 6, an Ammonia Synthesizer also uses some of it to make [Urea](#ammonia). A leaner mixture makes less exhaust per mB of Syngas. The algae can go straight into a [Bio Generator](bio-generator.md), but its best use comes at Stage 6.
 
 **Next upgrade.** The Stage 6 [carbon loop](#carbon-loop), which turns the algae into Hydrogen for [Ammonia](#ammonia).
 
@@ -67,6 +67,8 @@ Most gas machines also use water. To keep the diagrams readable, water appears o
 **What to build.** A [Melter](melter.md) that melts Algae Biomass, Organic Reagent, and water into Methane, and a [Steam Methane Reformer](steam-methane-reformer.md) that reacts the Methane with water into Hydrogen and Carbon Monoxide. Organic Reagent comes from crushing potatoes, carrots, or plant biomass in the [Crusher](crusher.md). The Reformer also accepts Syngas instead of Methane, but makes much less Hydrogen from it, so use Syngas only until your Methane runs.
 
 **Bottleneck.** The Reformer stops when its Carbon Monoxide tank is full. Send the Carbon Monoxide back to the [Algae Photobioreactor](algae-photobioreactor.md), where it is the fastest carbon input. That closes the loop: each reform makes as much Carbon Monoxide as one Algae Biomass needs at rated aeration, and that biomass melts into the next batch of Methane. A Photobioreactor grows biomass more slowly than a Reformer uses Methane, so run two or more per Reformer, and keep them in light. The [Syngas Combustor](syngas-combustor.md) can burn spare Carbon Monoxide, but it gets little FE from it. What the loop cannot make for itself is Organic Reagent, so keep a crop farm feeding the Crusher.
+
+**Urea instead of more Photobioreactors.** When the [Ammonia](#ammonia) chain runs, put [Urea](algae-photobioreactor.md#urea) from the Ammonia Synthesizer in the Photobioreactors. Each Urea makes the next 4 Algae Biomass grow twice as fast, so the same Photobioreactors keep up with more Reformers. The water and carbon gas per biomass do not change. One Urea costs 250 mB of Ammonia, a small part of the Ammonia that you get from those 4 biomass.
 
 **Shifting for more Hydrogen.** A second Reformer can run the [water-gas shift](steam-methane-reformer.md#water-gas-shift) on the Carbon Monoxide instead, which adds about a third more Hydrogen per reform. The shift turns the Carbon Monoxide into a little Carbon Exhaust, and algae grow half as fast on Carbon Exhaust, so a shift loop needs about twice the Photobioreactors. Shift when Hydrogen is what runs short and you have the room and light for more Photobioreactors.
 
@@ -88,6 +90,8 @@ Most gas machines also use water. To keep the diagrams readable, water appears o
     ["rngtech:steam_methane_reformer", "rngtech:hydrogen", "rngtech:ammonia_synthesizer"],
     ["rngtech:cavitation_generator", "rngtech:nitrogen", "rngtech:ammonia_synthesizer"],
     ["rngtech:ammonia_synthesizer", "rngtech:ammonia", "rngtech:ammonia_fuel_cell"],
+    ["rngtech:syngas_combustor", "rngtech:carbon_exhaust", "rngtech:ammonia_synthesizer", {"from": "gas_combustion/syngas_power"}],
+    ["rngtech:ammonia_synthesizer", "rngtech:urea", "rngtech:algae_photobioreactor"],
 ]) }}
 
 **What to build.** A [Cavitation Generator](cavitation-generator.md) fitted with the Nitrogen Extraction Rotor and Nitrogen Separation Nozzle, which splits water into Nitrogen. An [Ammonia Synthesizer](ammonia-synthesizer.md) that combines the Nitrogen with Hydrogen from the [carbon loop](#carbon-loop), and a [Fuel Cell](ammonia-fuel-cell.md) that burns the Ammonia. The Fuel Cell makes more FE than the Synthesizer costs.
@@ -98,7 +102,9 @@ Most gas machines also use water. To keep the diagrams readable, water appears o
 
 **Burning Hydrogen directly.** The [Fuel Cell](ammonia-fuel-cell.md#ammonia-or-hydrogen) also burns Hydrogen, with no Nitrogen or Synthesizer, but gets less than half the FE per mB of Hydrogen that the Ammonia route does. Use it while you build the rest of the chain, or for Hydrogen you have to spare.
 
-**Urea.** An Ammonia Synthesizer with Carbon Exhaust piped in turns some of its Ammonia into [Urea](ammonia-synthesizer.md#making-urea), a fertilizer for the Forestry Companion and the Algae Photobioreactor. It makes Urea before Ammonia whenever it can, and every Urea is Ammonia your Fuel Cells do not get, so feed it only as much Carbon Exhaust as you need Urea.
+**Hydrogen for annealing.** A [Metal Press](metal-press.md#annealing) with the Bright Anneal or Hydrogen Quench notable takes Hydrogen in its atmosphere tank and anneals what it presses, for 250 mB of Hydrogen per item. Annealed circuits calibrate with lucky stability, and Gear crafted only from Annealed plates rolls lucky Refinement Potential. Each Annealed item costs a sixth of the Hydrogen in one Ammonia cycle, so anneal only the circuits and plates that go into Gear.
+
+**Urea.** An Ammonia Synthesizer with Carbon Exhaust piped in turns some of its Ammonia into [Urea](ammonia-synthesizer.md#making-urea). In the Photobioreactors of your [carbon loop](#carbon-loop), Urea makes Algae Biomass grow twice as fast. It also works as bone meal and feeds the Forestry Companion. The Synthesizer makes Urea before Ammonia whenever it can, and every Urea is Ammonia your Fuel Cells do not get, so feed it only as much Carbon Exhaust as you need Urea. The Carbon Exhaust can come from a Syngas Combustor, a Wooden Dehumidifier, or a Reformer that runs the shift.
 
 **Next upgrade.** [Void Catalyst](#void-catalyst). In the Vacuum Collapse Generator, Ammonia is worth far more FE than in a Fuel Cell.
 

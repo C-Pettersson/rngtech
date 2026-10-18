@@ -11,8 +11,9 @@ import net.minecraft.world.inventory.InventoryMenu;
 import org.joml.Vector3f;
 
 /**
- * Drawing shared by the Furnace and Alloy Furnace renderers: the incandescent colour of a heat, the wobble, the heat bar,
- * the Nitrogen cylinder's fill and valve collar, and the quad and box helpers. Positions are in model pixels.
+ * Drawing shared by the Furnace, Alloy Furnace, and Metal Press renderers: the incandescent colour of a heat, the wobble, the heat bar,
+ * the Nitrogen cylinder's fill and valve collar, and the quad and box helpers, which the Resonance Calibrator renderer
+ * also uses. Positions are in model pixels.
  */
 final class FurnaceGlow {
     /** Heats where the glow colour changes: dull red, cherry, orange, yellow, and near white. */
@@ -27,6 +28,8 @@ final class FurnaceGlow {
     /** Nitrogen and the lit gauge rim, as on the Process tab. */
     private static final int NITROGEN = 0x8BA4C9;
     private static final int NITROGEN_ACTIVE = 0xB9D3F2;
+    /** Hydrogen in an annealing tank, as on the Process-tab gauge. */
+    private static final int HYDROGEN = 0xD8E6F2;
 
     private FurnaceGlow() {
     }
@@ -108,19 +111,32 @@ final class FurnaceGlow {
             VertexConsumer consumer, PoseStack.Pose pose, TextureAtlasSprite sprite, boolean east,
             float depth, float a0, float a1, float y0, float y1, float fill, int overlay
     ) {
+        gasFill(consumer, pose, sprite, east, depth, a0, a1, y0, y1, fill, NITROGEN, overlay);
+    }
+
+    /** The gauge colour of the gas in an atmosphere tank. */
+    static int gasColor(boolean hydrogen) {
+        return hydrogen ? HYDROGEN : NITROGEN;
+    }
+
+    /** {@link #nitrogenFill} in the colour of the gas the tank holds. */
+    static void gasFill(
+            VertexConsumer consumer, PoseStack.Pose pose, TextureAtlasSprite sprite, boolean east,
+            float depth, float a0, float a1, float y0, float y1, float fill, int color, int overlay
+    ) {
         if (fill <= 0.005F) {
             return;
         }
         float top = y0 + (y1 - y0) * Mth.clamp(fill, 0.0F, 1.0F);
         int light = LightTexture.FULL_BRIGHT;
         if (east) {
-            quad(consumer, pose, new Vector3f(1.0F, 0.0F, 0.0F), NITROGEN, 255, light, overlay,
+            quad(consumer, pose, new Vector3f(1.0F, 0.0F, 0.0F), color, 255, light, overlay,
                     new float[] {depth, y0, a0, sprite.getU0(), sprite.getV1()},
                     new float[] {depth, y0, a1, sprite.getU1(), sprite.getV1()},
                     new float[] {depth, top, a1, sprite.getU1(), sprite.getV0()},
                     new float[] {depth, top, a0, sprite.getU0(), sprite.getV0()});
         } else {
-            flat(consumer, pose, sprite, new Vector3f(0.0F, 0.0F, -1.0F), a0, y0, a1, top, depth, NITROGEN, light, overlay);
+            flat(consumer, pose, sprite, new Vector3f(0.0F, 0.0F, -1.0F), a0, y0, a1, top, depth, color, light, overlay);
         }
     }
 

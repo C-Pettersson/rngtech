@@ -208,9 +208,35 @@
       "key": "rngtech:block/furnace/*",
       "subject_globs": [
         "*_furnace_chassis",
-        "*_alloy_furnace_chassis"
+        "*_alloy_furnace_chassis",
+        "crude_metal_press",
+        "metal_press"
       ],
-      "reason": "Furnace and Alloy Furnace chassis of the same metal share that metal's shell, trim, and crown, and every electric chassis shares the status lamp; the two families differ by silhouette."
+      "reason": "Furnace and Alloy Furnace chassis of the same metal share that metal's shell, trim, and crown, and every electric chassis shares the status lamp; the Metal Presses reuse the Furnace's plinth, cabinet, cell cradle, atmosphere cylinder, heat bar, and port. The families differ by silhouette."
+    },
+    {
+      "check": "shared_machine_block_texture",
+      "key": "rngtech:block/metal_press/*",
+      "subject_globs": [
+        "crude_metal_press",
+        "metal_press"
+      ],
+      "reason": "Both Metal Presses share the output tray and the Mold rack; they differ by frame, bed, and ram."
+    },
+    {
+      "check": "unused_png",
+      "subject_globs": [
+        "src/main/resources/assets/rngtech/textures/block/resonance_calibrator/fx/beam.png"
+      ],
+      "reason": "The Resonance Calibrator emitter beam is drawn only by ResonanceCalibratorRenderer."
+    },
+    {
+      "check": "shared_machine_block_texture",
+      "key": "rngtech:block/resonance_calibrator/*",
+      "subject_globs": [
+        "*_resonance_calibrator_chassis"
+      ],
+      "reason": "Resonance Calibrator chassis share one tuning-bench housing and differ by shell, trim, and crown metal, with their own lane layout on the bulk and Nullite chassis; every chassis shares the status lamp."
     },
     {
       "check": "unused_png",

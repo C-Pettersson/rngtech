@@ -1,3 +1,11 @@
 {
-  "parent": "rngtech:block/lead_resonance_calibrator_chassis"
+  "parent": "rngtech:item/resonance_calibrator_dual_template",
+  "textures": {
+    "particle": "rngtech:block/resonance_calibrator/shell/lead",
+    "shell": "rngtech:block/resonance_calibrator/shell/lead",
+    "trim": "rngtech:block/resonance_calibrator/trim/lead",
+    "crown": "rngtech:block/resonance_calibrator/crown/lead",
+    "coil": "rngtech:block/resonance_calibrator/coil/steel",
+    "board": "rngtech:block/resonance_calibrator/board/steel"
+  }
 }
