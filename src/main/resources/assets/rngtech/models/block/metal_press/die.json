@@ -1,0 +1,43 @@
+{
+  "textures": {
+    "particle": "#die",
+    "die": "rngtech:block/metal_press/die"
+  },
+  "elements": [
+    {
+      "from": [
+        4.75,
+        5.5,
+        3.25
+      ],
+      "to": [
+        9.75,
+        7.0,
+        8.25
+      ],
+      "faces": {
+        "north": {
+          "texture": "#die"
+        },
+        "south": {
+          "texture": "#die"
+        },
+        "east": {
+          "texture": "#die"
+        },
+        "west": {
+          "texture": "#die"
+        },
+        "up": {
+          "texture": "#cavity",
+          "uv": [
+            0,
+            0,
+            5,
+            5
+          ]
+        }
+      }
+    }
+  ]
+}
