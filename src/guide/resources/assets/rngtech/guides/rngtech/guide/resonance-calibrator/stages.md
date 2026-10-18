@@ -2,7 +2,7 @@
 navigation:
   title: "Stages"
   parent: resonance-calibrator.md
-  position: 3
+  position: 2
   icon: rngtech:iron_resonance_calibrator_chassis
 ---
 

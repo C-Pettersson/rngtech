@@ -145,7 +145,8 @@ public class MelterBlockEntity extends BaseMachineBlockEntity
     private static final int DATA_OVERHEAT_TEMPERATURE = DATA_HEAT_MAXIMUM + 1;
     private static final int DATA_INPUT_ENERGY = DATA_OVERHEAT_TEMPERATURE + 1;
     private static final int DATA_MACHINE_PROGRESSION_START = DATA_INPUT_ENERGY + 1;
-    private static final int DATA_COUNT = DATA_MACHINE_PROGRESSION_START + MasteryMenuSupport.FIELD_COUNT;
+    private static final int DATA_OUTPUT_PER_MINUTE = DATA_MACHINE_PROGRESSION_START + MasteryMenuSupport.FIELD_COUNT;
+    private static final int DATA_COUNT = DATA_OUTPUT_PER_MINUTE + 1;
     private static final int STAT_SCALE = 100;
 
     private final ItemStackHandler processInventory = new ItemStackHandler(PROCESS_SLOT_COUNT) {
@@ -278,6 +279,7 @@ public class MelterBlockEntity extends BaseMachineBlockEntity
                 case DATA_BATCH_SIZE -> BatchProcessing.statBatchSize(stats) * STAT_SCALE;
                 case DATA_INPUT_FLUID_ID -> BuiltInRegistries.FLUID.getId(inputTank.getFluid().getFluid());
                 case DATA_OUTPUT_FLUID_ID -> BuiltInRegistries.FLUID.getId(outputTank.getFluid().getFluid());
+                case DATA_OUTPUT_PER_MINUTE -> currentOutputPerMinuteTenths(recipe, stats);
                 default -> 0;
             };
         }
@@ -465,6 +467,17 @@ public class MelterBlockEntity extends BaseMachineBlockEntity
         );
     }
 
+    /** Expected mB per minute for the current cycle, in tenths. */
+    private int currentOutputPerMinuteTenths(MelterRecipe recipe, MachineStatAccumulator stats) {
+        if (recipe == null) {
+            return 0;
+        }
+        return OutputRate.perMinuteTenths(
+                parallelMelts(recipe, stats) * (double) yieldedOutput(recipe, stats).getAmount(),
+                currentProcessingTicks(recipe, stats)
+        );
+    }
+
     @Override
     public MachineInfoSnapshot machineInfo() {
         MachineStatAccumulator stats = effectiveStats();
@@ -483,6 +496,7 @@ public class MelterBlockEntity extends BaseMachineBlockEntity
                 )
                 .status(statusKey(status), recipe == null ? 0 : recipe.minimumTemperature())
                 .progress(currentElapsedTicks(recipe, stats), currentProcessingTicks(recipe, stats))
+                .fluidOutputRate(currentOutputPerMinuteTenths(recipe, stats))
                 .energy(energyStored(), energyCapacity(), -energyDemand)
                 .energyTelemetry(
                         energyFlow.lastInput(),

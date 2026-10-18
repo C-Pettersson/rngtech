@@ -64,7 +64,8 @@ public class ResonanceCalibratorMenu extends AbstractContainerMenu implements Ma
     private static final int DATA_SELECTED_PATTERN = 20;
     private static final int DATA_STREAK = DATA_SELECTED_PATTERN + 1;
     private static final int DATA_MACHINE_PROGRESSION_START = DATA_STREAK + 1;
-    private static final int DATA_COUNT = DATA_MACHINE_PROGRESSION_START + MasteryMenuSupport.FIELD_COUNT;
+    private static final int DATA_OUTPUT_PER_MINUTE = DATA_MACHINE_PROGRESSION_START + MasteryMenuSupport.FIELD_COUNT;
+    private static final int DATA_COUNT = DATA_OUTPUT_PER_MINUTE + 1;
     private static final int STAT_SCALE = 100;
     /** Kept below 100 so pattern selection never overlaps Mastery node button ids. */
     public static final int BUTTON_SELECT_PATTERN_BASE = 10;
@@ -246,6 +247,11 @@ public class ResonanceCalibratorMenu extends AbstractContainerMenu implements Ma
 
     public int progress() {
         return Math.max(0, data.get(DATA_PROGRESS));
+    }
+
+    /** Expected items per minute for the current cycle, in tenths. */
+    public int outputPerMinuteTenths() {
+        return data.get(DATA_OUTPUT_PER_MINUTE);
     }
 
     public int processingTicks() {

@@ -2,7 +2,7 @@
 navigation:
   title: "Gear"
   parent: resonance-calibrator.md
-  position: 4
+  position: 3
   icon: rngtech:iron_resonance_calibrator_chassis
 ---
 

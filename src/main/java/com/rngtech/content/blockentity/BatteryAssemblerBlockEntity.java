@@ -108,6 +108,8 @@ public class BatteryAssemblerBlockEntity extends BaseMachineBlockEntity
     private static final int DATA_FLUID_TRANSFER = 11;
     private static final int DATA_REFINEMENT_POTENTIAL = 12;
     private static final int DATA_FLUID_ID = 13;
+    private static final int DATA_OUTPUT_PER_MINUTE = 14;
+    private static final int DATA_COUNT = 15;
     private static final int STAT_SCALE = 100;
 
     private final ItemStackHandler processInventory = new ItemStackHandler(PROCESS_SLOT_COUNT) {
@@ -192,6 +194,7 @@ public class BatteryAssemblerBlockEntity extends BaseMachineBlockEntity
                 case DATA_FLUID_TRANSFER -> scaledStat(stats, MachineStat.FLUID_TRANSFER);
                 case DATA_REFINEMENT_POTENTIAL -> scaledStat(stats, MachineStat.REFINEMENT_POTENTIAL);
                 case DATA_FLUID_ID -> BuiltInRegistries.FLUID.getId(inputTank.getFluid().getFluid());
+                case DATA_OUTPUT_PER_MINUTE -> currentOutputPerMinuteTenths(recipe, stats);
                 default -> 0;
             };
         }
@@ -202,7 +205,7 @@ public class BatteryAssemblerBlockEntity extends BaseMachineBlockEntity
 
         @Override
         public int getCount() {
-            return DATA_FLUID_ID + 1;
+            return DATA_COUNT;
         }
     };
 
@@ -315,6 +318,14 @@ public class BatteryAssemblerBlockEntity extends BaseMachineBlockEntity
         ).withCapacity(inputTank::getCapacity));
     }
 
+    /** Expected items per minute for the current cycle, in tenths. */
+    private int currentOutputPerMinuteTenths(BatteryAssemblyRecipe recipe, MachineStatAccumulator stats) {
+        if (recipe == null) {
+            return 0;
+        }
+        return OutputRate.perMinuteTenths(recipe.outputStack().getCount(), currentProcessingTicks(recipe, stats));
+    }
+
     @Override
     public MachineInfoSnapshot machineInfo() {
         MachineStatAccumulator stats = effectiveStats();
@@ -333,6 +344,7 @@ public class BatteryAssemblerBlockEntity extends BaseMachineBlockEntity
                 )
                 .status(statusKey(status))
                 .progress(progress, currentProcessingTicks(recipe, stats))
+                .outputRate(currentOutputPerMinuteTenths(recipe, stats))
                 .energy(energyStored(), energyCapacity(), -energyDemand)
                 .energyTelemetry(
                         energyFlow.lastInput(),

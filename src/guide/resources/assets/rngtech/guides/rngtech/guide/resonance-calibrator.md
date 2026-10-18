@@ -43,7 +43,13 @@ Each calibrated component records a family, a stage, a stability score from 0 to
 ## Usage
 
 - [Calibrating](rngtech:resonance-calibrator/calibrating.md)
-- [Annealed circuits](rngtech:resonance-calibrator/annealed-circuits.md)
+
+### Annealed circuits
+
+An Annealed <ItemLink id="rngtech:basic_electric_circuit" />, pressed under Hydrogen in a [Metal Press](rngtech:metal-press/annealing.md) with Bright Anneal, calibrates with lucky stability. The Calibrator rolls stability twice within the recipe's range, after your Gear's adjustments, and keeps the higher roll. The Harmonist's Second Pass, if you have it, applies after that. On the plain Basic circuit recipe (35–75 stability), the chance of reaching 55 or more for an Advanced blank goes from about 51% to about 76%.
+
+Annealed and plain circuits do not stack, so a multi-lane cycle is either all Annealed or all plain.
+
 - [Calibration families](rngtech:resonance-calibrator/calibration-families.md)
 - [Stages](rngtech:resonance-calibrator/stages.md)
 - [Gear](rngtech:resonance-calibrator/gear.md)
@@ -62,16 +68,6 @@ With JEI installed, recipes are listed under Resonance Calibration. Recipe trans
 
 - [Mastery and Ascendancies](rngtech:resonance-calibrator/mastery-and-ascendancies.md)
 
-## Screen
-
-The Resonance Calibrator screen has five tabs:
-
-- **Process**: input, catalyst, stabilizer, and output slots, progress, and energy. With the Harmonist's Resonant Streak, the progress tooltip shows your current stability-floor bonus.
-- **Gear**: Resonance Coil, Control Board, Stabilizer Matrix, Battery Cell, and pattern slots.
-- **Stats**: the machine's current stats, including traits, Gear, and Mastery.
-- **Refinement**: refine the placed Calibrator's traits with a catalyst.
-- **Mastery**: machine XP, level, and the passive tree.
-
 ## Obtaining
 
 - [Crafting](rngtech:resonance-calibrator/crafting.md)
@@ -79,3 +75,7 @@ The Resonance Calibrator screen has five tabs:
 ### Breaking
 
 Mine a placed Resonance Calibrator with a pickaxe. It drops itself and keeps its rolled traits, Mastery progress, and ascendancy.
+
+## More
+
+- [Screen](rngtech:resonance-calibrator/screen.md)

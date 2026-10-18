@@ -2,7 +2,7 @@
 navigation:
   title: "Mastery and Ascendancies"
   parent: resonance-calibrator.md
-  position: 5
+  position: 4
   icon: rngtech:iron_resonance_calibrator_chassis
 ---
 
