@@ -40,7 +40,7 @@ jobs:
           CHANGED="$(git diff --name-only HEAD^1 HEAD)"
           printf '%s\n' "$CHANGED"
 
-          DOCS_ONLY='^(docs/|wiki/|tools/rngwiki/|\.github/ISSUE_TEMPLATE/|\.github/pull_request_template\.md$|mkdocs(\.wiki)?\.yml$|requirements-docs\.txt$|compose\.docs\.yml$)'
+          DOCS_ONLY='^(docs/|wiki/|tools/rngwiki/|src/guide/|\.github/ISSUE_TEMPLATE/|\.github/pull_request_template\.md$|mkdocs(\.wiki)?\.yml$|requirements-docs\.txt$|compose\.docs\.yml$)'
           if grep -qvE "$DOCS_ONLY" <<< "$CHANGED"; then
             echo "gradle=true" >> "$GITHUB_OUTPUT"
           else
