@@ -389,7 +389,7 @@
 			y: 3.5d
 		}
 		{
-			dependencies: ["37A6C9E1284B5D3E"]
+			dependencies: ["37A6C9E1284B5D3F"]
 			id: "37A6C9E1284B5D40"
 			optional: true
 			rewards: [{
@@ -473,6 +473,18 @@
 			]
 			x: 11.0d
 			y: 2.0d
+		}
+		{
+			dependencies: ["37A6C9E1284B5D17"]
+			id: "7513BDA5DD0FC8A0"
+			optional: true
+			tasks: [{
+				id: "7856CB89364210A0"
+				item: { count: 1, id: "minecraft:comparator" }
+				type: "item"
+			}]
+			x: 6.0d
+			y: 2.5d
 		}
 	]
 }

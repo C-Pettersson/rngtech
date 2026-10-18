@@ -340,6 +340,7 @@
 				"101F072E97133585"
 				"5FCF4CF08C2ECD07"
 				"1427760B7576D8D6"
+				"D53C68DB1D969E0E"
 			]
 			id: "37A6C9E1284B5D25"
 			rewards: [
@@ -523,6 +524,7 @@
 				"37A6C9E1284B5D23"
 				"61F18F2CD460DDD9"
 				"59C090170DAE7A69"
+				"46A1F2C0DE100020"
 			]
 			id: "7106E7A1B10F0050"
 			optional: true
@@ -556,7 +558,7 @@
 			y: 7.0d
 		}
 		{
-			dependencies: ["61F18F2CD460DDD9"]
+			dependencies: ["61F18F2CD460DDD9", "4F5AA1D34A0C1A4C"]
 			id: "7106E7A1B10F0010"
 			optional: true
 			rewards: [{
@@ -613,7 +615,7 @@
 			y: -1.0d
 		}
 		{
-			dependencies: ["3A8FCB54EB8B1E89"]
+			dependencies: ["3A8FCB54EB8B1E89", "724590047E493088"]
 			id: "025813A9EAA3189B"
 			optional: true
 			tasks: [{
@@ -779,7 +781,7 @@
 			y: 8.5d
 		}
 		{
-			dependencies: ["2A87820D10501CE9"]
+			dependencies: ["2A87820D10501CE9", "5FCF4CF08C2ECD07"]
 			id: "321FEE7AFB102523"
 			optional: true
 			tasks: [{
@@ -791,10 +793,7 @@
 			y: 9.5d
 		}
 		{
-			dependencies: [
-				"2A87820D10501CE9"
-				"59C090170DAE7A69"
-			]
+			dependencies: ["2A87820D10501CE9", "59C090170DAE7A69", "5FCF4CF08C2ECD07"]
 			id: "17CCC098655F7B05"
 			optional: true
 			tasks: [{
@@ -859,6 +858,11 @@
 					item: { count: 1, id: "rngtech:bronze_heat_core" }
 					type: "item"
 				}
+				{
+					id: "4AE957C18A0E5FE0"
+					item: { count: 1, id: "rngtech:bronze_alloy_crucible" }
+					type: "item"
+				}
 			]
 			x: 10.0d
 			y: 2.0d
@@ -868,19 +872,13 @@
 			id: "59C090170DAE7A69"
 			tasks: [
 				{
+					id: "B76EBD72444DB03C"
+					item: { count: 1, id: "rngtech:steel_blend" }
+					type: "item"
+				}
+				{
 					id: "7ADE790087A0476E"
 					item: { count: 1, id: "rngtech:steel_ingot" }
-					type: "item"
-				}
-				{
-					id: "747D53F684CBD5C6"
-					item: { count: 1, id: "minecraft:coal" }
-					type: "item"
-				}
-				{
-					count: 3L
-					id: "21148985320DAFFF"
-					item: { count: 1, id: "minecraft:iron_ingot" }
 					type: "item"
 				}
 			]
@@ -905,7 +903,7 @@
 			y: 5.5d
 		}
 		{
-			dependencies: ["2DD5120E11128BFD"]
+			dependencies: ["2DD5120E11128BFD", "7431964561B74763"]
 			id: "1427760B7576D8D6"
 			tasks: [{
 				count: 3L
@@ -915,6 +913,77 @@
 			}]
 			x: 17.5d
 			y: -1.5d
+		}
+		{
+			dependencies: [
+				"46A1F2C0DE100010"
+				"5FCF4CF08C2ECD07"
+				"46A1F2C0DE100020"
+				"7431964561B74763"
+			]
+			id: "F3CB002680986DE3"
+			optional: true
+			tasks: [{
+				id: "5946F6D10716A048"
+				item: { count: 1, id: "rngtech:lead_furnace_chassis" }
+				type: "item"
+			}]
+			x: 19.0d
+			y: -0.5d
+		}
+		{
+			dependencies: ["025813A9EAA3189B", "46A1F2C0DE100010"]
+			id: "CA8B43828B863916"
+			optional: true
+			tasks: [{
+				id: "016B16252345C1F3"
+				item: { count: 1, id: "rngtech:solar_array_controller" }
+				type: "item"
+			}]
+			x: 20.0d
+			y: 2.0d
+		}
+		{
+			dependencies: ["1FACE973E783CB4C"]
+			id: "D53C68DB1D969E0E"
+			tasks: [
+				{
+					id: "8B99D640B9CEA9D6"
+					item: { count: 1, id: "rngtech:calibrated_storage_component" }
+					type: "item"
+				}
+				{
+					id: "70B153AA4B48845F"
+					item: { count: 1, id: "rngtech:storage_calibration_pattern" }
+					type: "item"
+				}
+			]
+			x: 14.0d
+			y: -0.5d
+		}
+		{
+			dependencies: ["46A1F2C0DE100010", "46A1F2C0DE100020"]
+			id: "E042D32C3886B777"
+			optional: true
+			tasks: [
+				{
+					id: "F4086205A48E2E61"
+					item: { count: 1, id: "rngtech:steel_alloy_furnace_chassis" }
+					type: "item"
+				}
+				{
+					id: "8E7EE4384576FDCF"
+					item: { count: 1, id: "rngtech:steel_alloy_crucible" }
+					type: "item"
+				}
+				{
+					id: "13C0B72350D92072"
+					item: { count: 1, id: "rngtech:steel_heat_core" }
+					type: "item"
+				}
+			]
+			x: 21.0d
+			y: 3.0d
 		}
 	]
 }
