@@ -5,9 +5,17 @@ import com.rngtech.content.menu.PotentialReactorMenu;
 import com.rngtech.rpg.MachineStat;
 
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 public class PotentialReactorScreen extends AbstractContainerScreen<PotentialReactorMenu> {
     private static final int PANEL = 0xFFC6C6C6;
@@ -37,11 +45,13 @@ public class PotentialReactorScreen extends AbstractContainerScreen<PotentialRea
     private static final int PROGRESS_BAR_HEIGHT = 7;
     private static final int ICON_SIZE = 12;
     private static final int STATUS_ICON_SPACING = 16;
-    private static final int STATUS_ICON_ROW_WIDTH = ICON_SIZE + STATUS_ICON_SPACING * 2;
+    private static final int STATUS_ICON_ROW_WIDTH = ICON_SIZE + STATUS_ICON_SPACING * 3;
     private static final int STATUS_ICON_X = PROGRESS_BAR_X + (PROGRESS_BAR_WIDTH - STATUS_ICON_ROW_WIDTH) / 2;
     private static final int STATUS_ICON_Y = PROGRESS_BAR_Y + PROGRESS_BAR_HEIGHT + 5;
     private static final int GENERATION_ICON_X = STATUS_ICON_X + STATUS_ICON_SPACING;
     private static final int OUTPUT_ICON_X = GENERATION_ICON_X + STATUS_ICON_SPACING;
+    private static final int REPEAT_ICON_X = OUTPUT_ICON_X + STATUS_ICON_SPACING;
+    private static final int REPEAT_BARS = 4;
     private static final int PROCESSING_LEVEL_ICON_X = 184;
     private static final int PROCESSING_LEVEL_ICON_Y = 78;
     private static final int PROCESSING_LEVEL_MAX = 4;
@@ -402,6 +412,58 @@ public class PotentialReactorScreen extends AbstractContainerScreen<PotentialRea
                 ICON_SIZE,
                 Component.translatable("rngtech.reactor.tooltip.output", CompactValueText.energyRate(menu.maxOutput()))
         );
+        CompactValueText.renderTooltipIfHovered(
+                guiGraphics,
+                font,
+                leftPos,
+                topPos,
+                mouseX,
+                mouseY,
+                REPEAT_ICON_X,
+                STATUS_ICON_Y,
+                ICON_SIZE,
+                ICON_SIZE,
+                repeatPayoutTooltip()
+        );
+    }
+
+    private List<Component> repeatPayoutTooltip() {
+        List<Component> tooltip = new ArrayList<>();
+        int payout = menu.repeatPayoutPercent();
+        List<Item> burns = menu.recentBurns();
+        if (payout < 0) {
+            tooltip.add(Component.translatable("rngtech.reactor.tooltip.repeat_payout", "--"));
+            tooltip.add(Component.translatable("rngtech.reactor.tooltip.repeat_payout.no_gear"));
+        } else {
+            Item input = menu.inputStack().getItem();
+            long repeats = burns.stream().filter(input::equals).count();
+            tooltip.add(Component.translatable("rngtech.reactor.tooltip.repeat_payout", payout + "%"));
+            tooltip.add(repeats > 0
+                    ? Component.translatable("rngtech.reactor.tooltip.repeat_payout.repeats", repeats)
+                    : Component.translatable("rngtech.reactor.tooltip.repeat_payout.fresh"));
+        }
+        if (burns.isEmpty()) {
+            tooltip.add(Component.translatable("rngtech.reactor.tooltip.recent_burns.empty"));
+        } else {
+            tooltip.add(Component.translatable("rngtech.reactor.tooltip.recent_burns", burns.size(), PotentialReactorBlockEntity.BURN_MEMORY));
+            Map<Item, Integer> counts = new LinkedHashMap<>();
+            for (int index = burns.size() - 1; index >= 0; index--) {
+                counts.merge(burns.get(index), 1, Integer::sum);
+            }
+            counts.forEach((item, count) -> tooltip.add(Component.translatable(
+                    "rngtech.reactor.tooltip.recent_burns.entry",
+                    new ItemStack(item).getHoverName(),
+                    count
+            )));
+        }
+        tooltip.add(Screen.hasShiftDown()
+                ? Component.translatable(
+                        "rngtech.reactor.tooltip.repeat_payout.detail",
+                        PotentialReactorBlockEntity.BURN_MEMORY,
+                        Math.round(PotentialReactorBlockEntity.repeatPayout(Long.MAX_VALUE) * 100) + "%"
+                )
+                : Component.translatable("rngtech.tooltip.hold_shift_details"));
+        return tooltip;
     }
 
     private Component progressTooltip() {
@@ -457,6 +519,22 @@ public class PotentialReactorScreen extends AbstractContainerScreen<PotentialRea
         guiGraphics.fill(arrowX + 3, arrowY + 5, arrowX + 8, arrowY + 7, ENERGY);
         guiGraphics.fill(arrowX + 8, arrowY + 4, arrowX + 10, arrowY + 8, ENERGY);
         guiGraphics.fill(arrowX + 10, arrowY + 5, arrowX + 11, arrowY + 7, ENERGY);
+
+        renderRepeatPayoutIcon(guiGraphics);
+    }
+
+    /** Four rising bars, one per quarter of the payout the input's gear still gets; all dim when the input holds no gear. */
+    private void renderRepeatPayoutIcon(GuiGraphics guiGraphics) {
+        renderIconBox(guiGraphics, REPEAT_ICON_X, STATUS_ICON_Y);
+        int payout = menu.repeatPayoutPercent();
+        int lit = payout < 0 ? 0 : Math.max(1, (payout * REPEAT_BARS + 99) / 100);
+        int color = payout >= 100 ? ENERGY : payout >= 50 ? 0xFFD3A33A : 0xFFB45B4A;
+        int left = leftPos + REPEAT_ICON_X + 2;
+        int bottom = topPos + STATUS_ICON_Y + ICON_SIZE - 2;
+        for (int bar = 0; bar < REPEAT_BARS; bar++) {
+            int x = left + bar * 2;
+            guiGraphics.fill(x, bottom - 2 - bar * 2, x + 1, bottom, bar < lit ? color : 0xFF4A4A4A);
+        }
     }
 
     private void renderIconBox(GuiGraphics guiGraphics, int x, int y) {

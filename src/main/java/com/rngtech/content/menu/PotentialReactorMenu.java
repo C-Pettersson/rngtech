@@ -7,6 +7,7 @@ import com.rngtech.rpg.MachineStatAccumulator;
 import com.rngtech.rpg.MachineTraits;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Inventory;
@@ -16,11 +17,14 @@ import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.inventory.ContainerLevelAccess;
 import net.minecraft.world.inventory.SimpleContainerData;
 import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.neoforged.neoforge.items.ItemStackHandler;
 import net.neoforged.neoforge.items.SlotItemHandler;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.BooleanSupplier;
 
 public class PotentialReactorMenu extends AbstractContainerMenu implements StatBreakdownMenu {
@@ -47,7 +51,9 @@ public class PotentialReactorMenu extends AbstractContainerMenu implements StatB
     private static final int DATA_REFINEMENT_POTENTIAL = 15;
     private static final int DATA_FLAT_ENERGY_GENERATION = 16;
     private static final int DATA_BASE_ENERGY_GENERATION = 17;
-    private static final int DATA_COUNT = 18;
+    private static final int DATA_REPEAT_PAYOUT = 18;
+    private static final int DATA_BURN_HISTORY = 19;
+    private static final int DATA_COUNT = DATA_BURN_HISTORY + PotentialReactorBlockEntity.BURN_MEMORY;
     private static final int STAT_SCALE = 100;
     private static final int INPUT_SLOT = 0;
     private static final int RESIDUE_SLOT = 1;
@@ -171,6 +177,27 @@ public class PotentialReactorMenu extends AbstractContainerMenu implements StatB
 
     public int statusCode() {
         return data.get(DATA_STATUS);
+    }
+
+    /** The payout percent the gear in the input gets from its earlier burns, or -1 when the input holds no gear. */
+    public int repeatPayoutPercent() {
+        return data.get(DATA_REPEAT_PAYOUT);
+    }
+
+    /** The remembered gear burns, oldest first. */
+    public List<Item> recentBurns() {
+        List<Item> burns = new ArrayList<>();
+        for (int index = 0; index < PotentialReactorBlockEntity.BURN_MEMORY; index++) {
+            int id = data.get(DATA_BURN_HISTORY + index);
+            if (id > 0) {
+                burns.add(BuiltInRegistries.ITEM.byId(id - 1));
+            }
+        }
+        return burns;
+    }
+
+    public ItemStack inputStack() {
+        return getSlot(INPUT_SLOT).getItem();
     }
 
     public MachineTraits machineTraits() {

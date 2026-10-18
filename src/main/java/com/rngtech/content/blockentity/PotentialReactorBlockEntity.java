@@ -8,6 +8,7 @@ import com.rngtech.content.menu.PotentialReactorMenu;
 import com.rngtech.content.recipe.PotentialReactorRecipe;
 import com.rngtech.content.recycling.RecyclingData;
 import com.rngtech.content.registry.ModBlockEntities;
+import com.rngtech.content.registry.ModDataComponents;
 import com.rngtech.rpg.ComponentBaseStatCatalog;
 import com.rngtech.rpg.MachineBaseStatCatalog;
 import com.rngtech.rpg.MachineBehavior;
@@ -24,6 +25,7 @@ import com.rngtech.rpg.refinement.RefinementTargets;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.core.component.DataComponentMap;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
@@ -35,6 +37,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.Containers;
 import net.minecraft.world.MenuProvider;
@@ -45,12 +48,14 @@ import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.energy.IEnergyStorage;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.ItemStackHandler;
 
-import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.List;
 
 public class PotentialReactorBlockEntity extends BaseMachineBlockEntity implements MenuProvider, MachineInfoProvider {
     private final EnergyExportTargets exportTargets = new EnergyExportTargets(this);
@@ -94,6 +99,8 @@ public class PotentialReactorBlockEntity extends BaseMachineBlockEntity implemen
     private static final int DATA_REFINEMENT_POTENTIAL = 15;
     private static final int DATA_FLAT_ENERGY_GENERATION = 16;
     private static final int DATA_BASE_ENERGY_GENERATION = 17;
+    private static final int DATA_REPEAT_PAYOUT = 18;
+    private static final int DATA_BURN_HISTORY = 19;
     private static final int STAT_SCALE = 100;
     private static final int VISUAL_SYNC_INTERVAL = 5;
 
@@ -177,7 +184,8 @@ public class PotentialReactorBlockEntity extends BaseMachineBlockEntity implemen
                 case DATA_PROCESSING_SPEED -> scaledStat(stats, MachineStat.PROCESSING_SPEED);
                 case DATA_STABILITY -> scaledStat(stats, MachineStat.STABILITY);
                 case DATA_REFINEMENT_POTENTIAL -> scaledStat(stats, MachineStat.REFINEMENT_POTENTIAL);
-                default -> 0;
+                case DATA_REPEAT_PAYOUT -> repeatPayoutPercent();
+                default -> index >= DATA_BURN_HISTORY ? burnHistoryItemId(index - DATA_BURN_HISTORY) : 0;
             };
         }
 
@@ -187,7 +195,7 @@ public class PotentialReactorBlockEntity extends BaseMachineBlockEntity implemen
 
         @Override
         public int getCount() {
-            return DATA_BASE_ENERGY_GENERATION + 1;
+            return DATA_BURN_HISTORY + BURN_MEMORY;
         }
     };
 
@@ -217,11 +225,12 @@ public class PotentialReactorBlockEntity extends BaseMachineBlockEntity implemen
     ) {
     }
 
-    private static final int GEAR_FATIGUE_MEMORY = 15;
+    /** How many recent gear burns the reactor remembers. */
+    public static final int BURN_MEMORY = 15;
     private static final double GEAR_FATIGUE_PER_REPEAT = 0.75;
     private static final double GEAR_FATIGUE_FLOOR = 0.10;
     /** Item ids of the most recent gear burns, oldest first; each repeat of an id lowers that item's FE. */
-    private final ArrayDeque<String> recentGear = new ArrayDeque<>();
+    private final List<String> recentGear = new ArrayList<>();
 
     public PotentialReactorBlockEntity(BlockPos pos, BlockState blockState) {
         super(ModBlockEntities.POTENTIAL_REACTOR.get(), pos, blockState, MachineType.POTENTIAL_REACTOR, SLOT_INPUT, SLOT_INPUT, SLOT_RESIDUE);
@@ -506,15 +515,68 @@ public class PotentialReactorBlockEntity extends BaseMachineBlockEntity implemen
         setChanged();
     }
 
-    private double gearFatigue(String gearId) {
-        long repeats = recentGear.stream().filter(gearId::equals).count();
+    /** The share of its FE a gear burn pays after this many earlier burns of the same item. */
+    public static double repeatPayout(long repeats) {
         return Math.max(GEAR_FATIGUE_FLOOR, Math.pow(GEAR_FATIGUE_PER_REPEAT, repeats));
     }
 
+    private double gearFatigue(String gearId) {
+        return repeatPayout(recentGear.stream().filter(gearId::equals).count());
+    }
+
     private void recordGear(String gearId) {
-        recentGear.addLast(gearId);
-        while (recentGear.size() > GEAR_FATIGUE_MEMORY) {
+        recentGear.add(gearId);
+        while (recentGear.size() > BURN_MEMORY) {
             recentGear.removeFirst();
+        }
+    }
+
+    /** Item ids of the remembered gear burns, oldest first. */
+    public List<String> recentGearIds() {
+        return List.copyOf(recentGear);
+    }
+
+    /** The payout percent the gear in the input slot gets from its earlier burns, or -1 when the input holds no gear. */
+    public int repeatPayoutPercent() {
+        String gearId = inputGearId();
+        return gearId == null ? -1 : (int) Math.round(gearFatigue(gearId) * 100.0);
+    }
+
+    /** How many remembered burns match the gear in the input slot; 0 when it holds none. */
+    public int inputGearRepeats() {
+        String gearId = inputGearId();
+        return gearId == null ? 0 : (int) recentGear.stream().filter(gearId::equals).count();
+    }
+
+    private String inputGearId() {
+        ItemStack input = processInventory.getStackInSlot(SLOT_INPUT);
+        return RecyclingData.hasRecyclableRpgValue(input) ? BuiltInRegistries.ITEM.getKey(input.getItem()).toString() : null;
+    }
+
+    /** The registry id + 1 of a remembered burn for the menu, or 0 for an empty or unknown entry. */
+    private int burnHistoryItemId(int index) {
+        if (index >= recentGear.size()) {
+            return 0;
+        }
+        ResourceLocation id = ResourceLocation.tryParse(recentGear.get(index));
+        return id == null ? 0 : BuiltInRegistries.ITEM.getOptional(id).map(item -> BuiltInRegistries.ITEM.getId(item) + 1).orElse(0);
+    }
+
+    @Override
+    protected void collectImplicitComponents(DataComponentMap.Builder components) {
+        super.collectImplicitComponents(components);
+        if (!recentGear.isEmpty()) {
+            components.set(ModDataComponents.REACTOR_BURN_HISTORY.get(), List.copyOf(recentGear));
+        }
+    }
+
+    @Override
+    protected void applyImplicitComponents(BlockEntity.DataComponentInput componentInput) {
+        super.applyImplicitComponents(componentInput);
+        List<String> history = componentInput.get(ModDataComponents.REACTOR_BURN_HISTORY.get());
+        if (history != null) {
+            recentGear.clear();
+            history.forEach(this::recordGear);
         }
     }
 
