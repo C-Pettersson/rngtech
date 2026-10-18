@@ -2,7 +2,7 @@
 navigation:
   title: "Crafting"
   parent: furnace.md
-  position: 5
+  position: 7
   icon: rngtech:furnace
 ---
 

@@ -2,7 +2,7 @@
 navigation:
   title: "Gear"
   parent: furnace.md
-  position: 2
+  position: 3
   icon: rngtech:furnace
 ---
 

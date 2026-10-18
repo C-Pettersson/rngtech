@@ -1,12 +1,6 @@
 {
-  "parent": "minecraft:block/cube",
+  "parent": "rngtech:block/iron_furnace_chassis",
   "textures": {
-    "down": "rngtech:block/furnace_chassis/bottom/iron_furnace_chassis",
-    "up": "rngtech:block/furnace_chassis/top/iron_furnace_chassis",
-    "north": "rngtech:block/furnace_chassis/front/iron_furnace_chassis_active",
-    "south": "rngtech:block/furnace_chassis/side/iron_furnace_chassis",
-    "east": "rngtech:block/furnace_chassis/side/iron_furnace_chassis",
-    "west": "rngtech:block/furnace_chassis/side/iron_furnace_chassis",
-    "particle": "rngtech:block/furnace_chassis/front/iron_furnace_chassis_active"
+    "lamp": "rngtech:block/furnace/lamp_on"
   }
 }

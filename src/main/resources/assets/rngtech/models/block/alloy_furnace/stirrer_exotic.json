@@ -1,0 +1,7 @@
+{
+  "parent": "rngtech:block/alloy_furnace/stirrer",
+  "textures": {
+    "servo": "rngtech:block/compressor_tank/servo/exotic",
+    "accent": "rngtech:block/compressor_tank/servo/exotic_accent"
+  }
+}

@@ -32,37 +32,14 @@ The **Alloy Furnace** mixes exact amounts of metals and additives into alloys. E
 
 The Alloy Furnace runs on FE and needs a Heat Core and an Alloy Crucible installed. Like every RNGTech machine, each Alloy Furnace you craft rolls its own [rarity and affixes](rngtech:rarity-and-affixes.md), and it can level up through [Machine Mastery](rngtech:machine-mastery.md).
 
+You can read an Alloy Furnace from the outside. The installed Alloy Crucible sits in a refractory well wrapped in copper induction coils. While the furnace has a recipe, a pool fills the crucible as the charge melts and drops back when the alloy pours, glowing with the crucible's heat. Each input slot has a feed hopper on the back cabinet that shows the item in it, and hoppers past the furnace's input slots are closed with a lid. An installed Servo is a stirrer over the crucible that turns while the furnace works. Facing the front, the Heat Core is the finned radiator on the left and the Battery Cell stands in the cradle on the right with its charge meter. The gas cylinder at the front left corner is the [Nitrogen tank](rngtech:heat/nitrogen-atmosphere.md): its window shows how full it is, and its valve lights up while the crucible uses Nitrogen. The bar on the front console reads like the [heat bar](rngtech:heat/the-overheat-slider.md) on the Process tab: it fills with the crucible's heat against the Heat Core's Max Temperature, a white mark shows the recipe's target and a yellow mark the setpoint, and the fill turns red while the crucible overheats. A crucible pushed past its target flickers with its wobble. The cable port is on the back.
+
 ## Usage
 
 - [Alloying](rngtech:alloy-furnace/alloying.md)
 - [Stages](rngtech:alloy-furnace/stages.md)
-
-### Gear
-
-The Gear tab has four slots. No Gear can be a higher stage than the chassis.
-
-- **Heat Core** (required): sets how hot the Alloy Furnace can get.
-- **Alloy Crucible** (required): sets how many input slots are active and adds mixing control.
-- **Battery Cell** (optional): adds portable FE storage.
-- **Servo** (optional): adds control stats.
-
-| Alloy Crucible | Stage | Input slots |
-|---|---:|---:|
-| <ItemLink id="rngtech:bronze_alloy_crucible" /> | 3 | 3 |
-| <ItemLink id="rngtech:steel_alloy_crucible" /> | 4 | 3 |
-| <ItemLink id="rngtech:titanium_alloy_crucible" /> | 6 | 4 |
-
-### Automation
-
-| Side | Behavior |
-|---|---|
-| Top | Inserts into the active input slots. Accepts only Alloy Furnace recipe ingredients, and never lets one ingredient fill a slot another ingredient needs; see [Automation](rngtech:automation.md). |
-| Bottom | Extracts finished output. Ingredient leftovers are pushed into the inventory below; see [Automation](rngtech:automation/ingredient-leftovers.md). |
-| Sides | Accepts FE, for example from a [Universal Cable](rngtech:universal-cable.md). |
-| Any | Accepts Nitrogen for the [Nitrogen atmosphere](rngtech:heat/nitrogen-atmosphere.md). |
-
-Gear slots cannot be filled by automation.
-
+- [Gear](rngtech:alloy-furnace/gear.md)
+- [Automation](rngtech:alloy-furnace/automation.md)
 - [Mastery and Ascendancies](rngtech:alloy-furnace/mastery-and-ascendancies.md)
 
 ## Obtaining

@@ -199,6 +199,22 @@
     {
       "check": "unused_png",
       "subject_globs": [
+        "src/main/resources/assets/rngtech/textures/block/furnace/fx/*.png"
+      ],
+      "reason": "The Furnace and Alloy Furnace chamber glow, element glow, molten pool, and cooled crust are drawn only by FurnaceRenderer and AlloyFurnaceRenderer, by heat."
+    },
+    {
+      "check": "shared_machine_block_texture",
+      "key": "rngtech:block/furnace/*",
+      "subject_globs": [
+        "*_furnace_chassis",
+        "*_alloy_furnace_chassis"
+      ],
+      "reason": "Furnace and Alloy Furnace chassis of the same metal share that metal's shell, trim, and crown, and every electric chassis shares the status lamp; the two families differ by silhouette."
+    },
+    {
+      "check": "unused_png",
+      "subject_globs": [
         "src/main/resources/assets/rngtech/textures/block/divinity_siphon/breath_containment_seal.png",
         "src/main/resources/assets/rngtech/textures/block/divinity_siphon/breath_divinity_siphon_formed.png",
         "src/main/resources/assets/rngtech/textures/block/divinity_siphon/heart_containment_seal.png",
