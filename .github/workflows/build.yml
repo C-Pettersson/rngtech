@@ -3,6 +3,8 @@ name: Build
 on:
   pull_request:
     branches: [main]
+  push:
+    branches: [main]
   workflow_dispatch:
 
 permissions:
@@ -18,9 +20,9 @@ jobs:
     timeout-minutes: 5
     outputs:
       gradle: ${{ steps.filter.outputs.gradle }}
+      neogradle-key: ${{ steps.neogradle.outputs.key }}
     steps:
       - name: Checkout repository
-        if: github.event_name == 'pull_request'
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
@@ -47,7 +49,81 @@ jobs:
             echo "gradle=false" >> "$GITHUB_OUTPUT"
           fi
 
+      # NeoGradle keys its task cache on input content, so only the inputs of the Minecraft setup belong in the key.
+      - name: Compute NeoGradle cache key
+        id: neogradle
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          KEY="$(
+            {
+              grep -E '^(minecraft_version|neo_version|neogradle\.)' gradle.properties
+              grep -F "id 'net.neoforged.gradle." build.gradle
+              grep -F 'distributionUrl' gradle/wrapper/gradle-wrapper.properties
+              cat src/main/resources/META-INF/accesstransformer.cfg 2>/dev/null || true
+            } | sha256sum | cut -c1-16
+          )"
+          echo "key=$KEY" >> "$GITHUB_OUTPUT"
+
+  # Pushes to main only build the NeoGradle Minecraft setup (decompile, patch, recompile) and save it for pull requests.
+  neogradle-cache:
+    needs: changes
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Setup JDK 21
+        id: java
+        uses: actions/setup-java@de7274f081f381c8f8158605e0321c36c376e2e6 # v6.0.1
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+
+      - name: Look up NeoGradle cache
+        id: lookup
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ~/.gradle/caches/ng_execute
+          key: neogradle-${{ runner.os }}-java${{ steps.java.outputs.version }}-${{ needs.changes.outputs.neogradle-key }}
+          lookup-only: true
+
+      - name: Checkout repository
+        if: steps.lookup.outputs.cache-hit != 'true'
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Setup Gradle
+        if: steps.lookup.outputs.cache-hit != 'true'
+        uses: gradle/actions/setup-gradle@3f5f9adaf7d9fecd50b5935e54106014257a94e6 # v6.4.0
+        with:
+          cache-provider: basic
+          cache-read-only: true
+          validate-wrappers: true
+
+      - name: Build the Minecraft setup
+        if: steps.lookup.outputs.cache-hit != 'true'
+        run: ./gradlew compileJava
+
+      # Asset downloads are the largest entry and fast to fetch again, so they stay out of the cache.
+      - name: Drop Minecraft assets from the NeoGradle cache
+        if: steps.lookup.outputs.cache-hit != 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+          find ~/.gradle/caches/ng_execute -mindepth 2 -maxdepth 2 -type d -name objects -printf '%h\n' | xargs -r rm -rf
+          du -sh ~/.gradle/caches/ng_execute
+
+      - name: Save NeoGradle cache
+        if: steps.lookup.outputs.cache-hit != 'true'
+        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ~/.gradle/caches/ng_execute
+          key: ${{ steps.lookup.outputs.cache-primary-key }}
+
   repository:
+    if: github.event_name != 'push'
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
@@ -94,8 +170,8 @@ jobs:
         run: python tools/rngwiki/guideme.py --check
 
   gametest:
-    needs: changes
-    if: needs.changes.outputs.gradle == 'true'
+    needs: [changes, neogradle-cache]
+    if: ${{ !cancelled() && github.event_name != 'push' && needs.changes.outputs.gradle == 'true' }}
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
@@ -107,6 +183,7 @@ jobs:
           fetch-tags: true
 
       - name: Setup JDK 21
+        id: java
         uses: actions/setup-java@de7274f081f381c8f8158605e0321c36c376e2e6 # v6.0.1
         with:
           java-version: '21'
@@ -117,13 +194,20 @@ jobs:
         with:
           cache-provider: basic
           validate-wrappers: true
+
+      - name: Restore NeoGradle cache
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ~/.gradle/caches/ng_execute
+          key: neogradle-${{ runner.os }}-java${{ steps.java.outputs.version }}-${{ needs.changes.outputs.neogradle-key }}
+          restore-keys: neogradle-${{ runner.os }}-
 
       - name: Run GameTests
         run: ./gradlew runGameTestServer
 
   build:
-    needs: changes
-    if: needs.changes.outputs.gradle == 'true'
+    needs: [changes, neogradle-cache]
+    if: ${{ !cancelled() && github.event_name != 'push' && needs.changes.outputs.gradle == 'true' }}
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
@@ -135,6 +219,7 @@ jobs:
           fetch-tags: true
 
       - name: Setup JDK 21
+        id: java
         uses: actions/setup-java@de7274f081f381c8f8158605e0321c36c376e2e6 # v6.0.1
         with:
           java-version: '21'
@@ -145,6 +230,13 @@ jobs:
         with:
           cache-provider: basic
           validate-wrappers: true
+
+      - name: Restore NeoGradle cache
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ~/.gradle/caches/ng_execute
+          key: neogradle-${{ runner.os }}-java${{ steps.java.outputs.version }}-${{ needs.changes.outputs.neogradle-key }}
+          restore-keys: neogradle-${{ runner.os }}-
 
       - name: Check with Gradle
         run: ./gradlew ciCheck
