@@ -1,3 +1,11 @@
 {
-  "parent": "rngtech:block/iron_resonance_calibrator_chassis"
+  "parent": "rngtech:item/resonance_calibrator_single_template",
+  "textures": {
+    "particle": "rngtech:block/resonance_calibrator/shell/iron",
+    "shell": "rngtech:block/resonance_calibrator/shell/iron",
+    "trim": "rngtech:block/resonance_calibrator/trim/iron",
+    "crown": "rngtech:block/resonance_calibrator/crown/iron",
+    "coil": "rngtech:block/resonance_calibrator/coil/iron",
+    "board": "rngtech:block/resonance_calibrator/board/iron"
+  }
 }

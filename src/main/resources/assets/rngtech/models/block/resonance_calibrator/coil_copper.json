@@ -1,0 +1,6 @@
+{
+  "parent": "rngtech:block/resonance_calibrator/coil",
+  "textures": {
+    "coil": "rngtech:block/resonance_calibrator/coil/copper"
+  }
+}

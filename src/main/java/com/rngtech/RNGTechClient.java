@@ -20,6 +20,7 @@ import com.rngtech.client.renderer.GasChemistryRenderer;
 import com.rngtech.client.renderer.MetalPressRenderer;
 import com.rngtech.client.renderer.ModularToolItemRenderer;
 import com.rngtech.client.renderer.PotentialReactorRenderer;
+import com.rngtech.client.renderer.ResonanceCalibratorRenderer;
 import com.rngtech.client.renderer.SolarArrayControllerRenderer;
 import com.rngtech.client.renderer.SolarPanelModels;
 import com.rngtech.client.renderer.SolarPanelRenderer;
@@ -119,6 +120,7 @@ public final class RNGTechClient {
         modBus.addListener(FurnaceRenderer::registerModels);
         modBus.addListener(AlloyFurnaceRenderer::registerModels);
         modBus.addListener(MetalPressRenderer::registerModels);
+        modBus.addListener(ResonanceCalibratorRenderer::registerModels);
         modBus.addListener(VacuumCollapseGeneratorRenderer::registerModels);
         modBus.addListener(this::registerClientExtensions);
         modBus.addListener(this::registerKeyMappings);
@@ -202,6 +204,7 @@ public final class RNGTechClient {
         event.registerBlockEntityRenderer(ModBlockEntities.FURNACE.get(), FurnaceRenderer::new);
         event.registerBlockEntityRenderer(ModBlockEntities.ALLOY_FURNACE.get(), AlloyFurnaceRenderer::new);
         event.registerBlockEntityRenderer(ModBlockEntities.METAL_PRESS.get(), MetalPressRenderer::new);
+        event.registerBlockEntityRenderer(ModBlockEntities.RESONANCE_CALIBRATOR.get(), ResonanceCalibratorRenderer::new);
         event.registerEntityRenderer(ModEntityTypes.FORESTRY_CART.get(), ForestryCartRenderer::new);
         event.registerEntityRenderer(ModEntityTypes.DERELICT_CART.get(), DerelictCartRenderer::new);
     }
