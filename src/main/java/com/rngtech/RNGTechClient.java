@@ -10,6 +10,7 @@ import com.rngtech.client.renderer.AmmoniaSynthesizerRenderer;
 import com.rngtech.client.renderer.BatteryChassisRenderer;
 import com.rngtech.client.renderer.BioGeneratorRenderer;
 import com.rngtech.client.renderer.CavitationGeneratorRenderer;
+import com.rngtech.client.renderer.ComponentRecyclerRenderer;
 import com.rngtech.client.renderer.CompressorTankRenderer;
 import com.rngtech.client.renderer.CorrosionCellRenderer;
 import com.rngtech.client.renderer.CrusherRenderer;
@@ -112,6 +113,7 @@ public final class RNGTechClient {
         modBus.addListener(BatteryChassisRenderer::registerModels);
         modBus.addListener(CompressorTankRenderer::registerModels);
         modBus.addListener(CrusherRenderer::registerModels);
+        modBus.addListener(ComponentRecyclerRenderer::registerModels);
         modBus.addListener(CavitationGeneratorRenderer::registerModels);
         modBus.addListener(CorrosionCellRenderer::registerModels);
         modBus.addListener(SolidFuelBurnerRenderer::registerModels);
@@ -197,6 +199,7 @@ public final class RNGTechClient {
         event.registerBlockEntityRenderer(ModBlockEntities.TOOL_BENCH.get(), ToolBenchRenderer::new);
         event.registerBlockEntityRenderer(ModBlockEntities.COMPRESSOR_TANK.get(), CompressorTankRenderer::new);
         event.registerBlockEntityRenderer(ModBlockEntities.CRUSHER.get(), CrusherRenderer::new);
+        event.registerBlockEntityRenderer(ModBlockEntities.COMPONENT_RECYCLER.get(), ComponentRecyclerRenderer::new);
         event.registerBlockEntityRenderer(ModBlockEntities.FURNACE.get(), FurnaceRenderer::new);
         event.registerBlockEntityRenderer(ModBlockEntities.ALLOY_FURNACE.get(), AlloyFurnaceRenderer::new);
         event.registerEntityRenderer(ModEntityTypes.FORESTRY_CART.get(), ForestryCartRenderer::new);

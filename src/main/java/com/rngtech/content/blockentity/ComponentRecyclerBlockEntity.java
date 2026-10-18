@@ -26,8 +26,12 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.Connection;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.game.ClientGamePacketListener;
+import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.Containers;
@@ -38,11 +42,13 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.energy.IEnergyStorage;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.ItemStackHandler;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class ComponentRecyclerBlockEntity extends BaseMachineBlockEntity implements MenuProvider, MachineInfoProvider {
@@ -89,6 +95,7 @@ public class ComponentRecyclerBlockEntity extends BaseMachineBlockEntity impleme
     private static final int DATA_STABILITY = 12;
     private static final int DATA_REFINEMENT_POTENTIAL = 13;
     private static final int STAT_SCALE = 100;
+    private static final int VISUAL_SYNC_INTERVAL = 5;
 
     private final ItemStackHandler processInventory = new ItemStackHandler(PROCESS_SLOT_COUNT) {
         @Override
@@ -192,6 +199,10 @@ public class ComponentRecyclerBlockEntity extends BaseMachineBlockEntity impleme
     private int internalEnergy;
     private long nextManualCrankTick;
     private long lastManualCrankTick = Long.MIN_VALUE;
+    private int manualCranks;
+    private ComponentRecyclerVisualState visualState = ComponentRecyclerVisualState.IDLE;
+    private ComponentRecyclerVisualState.Key lastSyncedVisual;
+    private final ComponentRecyclerVisualState.Animation animation = new ComponentRecyclerVisualState.Animation();
 
     public ComponentRecyclerBlockEntity(BlockPos pos, BlockState blockState) {
         super(
@@ -212,8 +223,13 @@ public class ComponentRecyclerBlockEntity extends BaseMachineBlockEntity impleme
     public static void serverTick(Level level, BlockPos pos, BlockState state, ComponentRecyclerBlockEntity recycler) {
         if (recycler.isManual()) {
             recycler.serverTickManual(level, pos, state);
-            return;
+        } else {
+            tickWork(level, pos, state, recycler);
         }
+        recycler.syncVisualState(level);
+    }
+
+    private static void tickWork(Level level, BlockPos pos, BlockState state, ComponentRecyclerBlockEntity recycler) {
         recycler.restartIfInputSwapped();
         MachineStatAccumulator stats = recycler.effectiveStats();
         ComponentRecyclingRecipe recipe = recycler.nextRecipe();
@@ -279,7 +295,86 @@ public class ComponentRecyclerBlockEntity extends BaseMachineBlockEntity impleme
             return;
         }
 
-        BaseMachineBlock.setActive(level, pos, state, level.getGameTime() - lastManualCrankTick <= MANUAL_ACTIVE_TICKS);
+        BaseMachineBlock.setActive(level, pos, state, level.getGameTime() <= lastManualCrankTick + MANUAL_ACTIVE_TICKS);
+    }
+
+    /**
+     * Recyclers saved while the block was a solid cube stored no light inside it, which leaves the renderer's claw,
+     * cell, and items unlit. Rechecking the block's own light once on load fixes those saves.
+     */
+    @Override
+    public void onLoad() {
+        super.onLoad();
+        if (level != null && !level.isClientSide) {
+            level.getLightEngine().checkBlock(worldPosition);
+        }
+    }
+
+    /** Client copy of the state the renderer draws; synced from the server in the block entity update tag. */
+    public ComponentRecyclerVisualState visualState() {
+        return visualState;
+    }
+
+    public ComponentRecyclerVisualState.Animation animation() {
+        return animation;
+    }
+
+    @Override
+    public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
+        return currentVisualState().save(registries);
+    }
+
+    @Override
+    public Packet<ClientGamePacketListener> getUpdatePacket() {
+        return ClientboundBlockEntityDataPacket.create(this);
+    }
+
+    @Override
+    public void handleUpdateTag(CompoundTag tag, HolderLookup.Provider registries) {
+        visualState = ComponentRecyclerVisualState.load(tag, registries);
+    }
+
+    @Override
+    public void onDataPacket(Connection connection, ClientboundBlockEntityDataPacket packet, HolderLookup.Provider registries) {
+        visualState = ComponentRecyclerVisualState.load(packet.getTag(), registries);
+    }
+
+    private void syncVisualState(Level level) {
+        if (level.getGameTime() % VISUAL_SYNC_INTERVAL != 0) {
+            return;
+        }
+        ComponentRecyclerVisualState.Key key = currentVisualState().key();
+        if (!key.equals(lastSyncedVisual)) {
+            lastSyncedVisual = key;
+            level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), Block.UPDATE_CLIENTS);
+        }
+    }
+
+    /** What the Recycler shows right now, built on the server. */
+    public ComponentRecyclerVisualState currentVisualState() {
+        ItemStack head = headStack();
+        ItemStack filter = filterStack();
+        ItemStack cell = batteryCellStack();
+        int capacity = batteryCell.capacity();
+        List<ItemStack> outputs = new ArrayList<>(ComponentRecyclerVisualState.OUTPUTS);
+        for (int i = 0; i < ComponentRecyclerVisualState.OUTPUTS; i++) {
+            outputs.add(ComponentRecyclerVisualState.pile(processInventory.getStackInSlot(outputSlot(i))));
+        }
+        boolean running = getBlockState().getValue(BaseMachineBlock.ACTIVE);
+        ComponentRecyclingRecipe recipe = running ? nextRecipe() : null;
+        return new ComponentRecyclerVisualState(
+                head.getItem() instanceof DisassemblyHeadItem headItem ? headItem.material().getSerializedName() : "",
+                filter.getItem() instanceof PotentialReactorPartItem part && part.filterMaterial() != null
+                        ? part.filterMaterial().getSerializedName()
+                        : "",
+                cell.getItem() instanceof BatteryCellItem cellItem ? cellItem.material().getSerializedName() : "",
+                cell.isEmpty() || capacity <= 0 ? -1.0F : Math.min(1.0F, batteryCell.energyStored() / (float) capacity),
+                inputStack().copyWithCount(1),
+                List.copyOf(outputs),
+                running,
+                recipe == null ? 0 : processingTicks(recipe, effectiveStats()),
+                manualCranks
+        );
     }
 
     public ItemStackHandler getProcessInventory() {
@@ -324,6 +419,8 @@ public class ComponentRecyclerBlockEntity extends BaseMachineBlockEntity impleme
         int processingTicks = manualProcessingTicks(recipe);
         progress = Math.min(processingTicks, progress + MANUAL_CRANK_INTERVAL_TICKS);
         playManualGrindSound(crankPos);
+        manualCranks++;
+        level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), Block.UPDATE_CLIENTS);
 
         if (progress >= processingTicks && process(recipe)) {
             playManualCompleteSound();
