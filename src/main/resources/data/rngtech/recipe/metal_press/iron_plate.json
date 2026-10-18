@@ -18,7 +18,7 @@
     "id": "rngtech:iron_plate"
   },
   "processing_ticks": 200,
-  "energy": 2400,
+  "heat": 864,
   "minimum_temperature": 800,
   "safe_maximum_temperature": 1100,
   "required_temperature_stability": 1.0,

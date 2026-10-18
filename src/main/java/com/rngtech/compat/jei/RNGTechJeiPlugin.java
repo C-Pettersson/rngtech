@@ -155,6 +155,7 @@ public final class RNGTechJeiPlugin implements IModPlugin {
                 new GasCombustionRecipeCategory(registration.getJeiHelpers().getGuiHelper()),
                 new GasReformingRecipeCategory(registration.getJeiHelpers().getGuiHelper()),
                 new AmmoniaSynthesisRecipeCategory(registration.getJeiHelpers().getGuiHelper()),
+                new UreaSynthesisRecipeCategory(registration.getJeiHelpers().getGuiHelper()),
                 new AmmoniaPowerCycleRecipeCategory(registration.getJeiHelpers().getGuiHelper()),
                 new CavitationRecipeCategory(registration.getJeiHelpers().getGuiHelper()),
                 new VacuumCollapseRecipeCategory(registration.getJeiHelpers().getGuiHelper()),
@@ -277,6 +278,7 @@ public final class RNGTechJeiPlugin implements IModPlugin {
         List<RecipeHolder<AmmoniaSynthesisRecipe>> ammoniaSynthesisRecipes =
                 level.getRecipeManager().getAllRecipesFor(ModRecipes.AMMONIA_SYNTHESIS_TYPE.get());
         registration.addRecipes(JeiRecipeTypes.AMMONIA_SYNTHESIS, ammoniaSynthesisRecipes);
+        registration.addRecipes(JeiRecipeTypes.UREA_SYNTHESIS, level.getRecipeManager().getAllRecipesFor(ModRecipes.UREA_SYNTHESIS_TYPE.get()));
         List<RecipeHolder<AmmoniaPowerCycleRecipe>> ammoniaPowerCycleRecipes =
                 level.getRecipeManager().getAllRecipesFor(ModRecipes.AMMONIA_POWER_CYCLE_TYPE.get());
         registration.addRecipes(JeiRecipeTypes.AMMONIA_POWER_CYCLE, ammoniaPowerCycleRecipes);
@@ -338,6 +340,7 @@ public final class RNGTechJeiPlugin implements IModPlugin {
         registration.addRecipeCatalyst(ModItems.SYNGAS_COMBUSTOR.get(), JeiRecipeTypes.GAS_COMBUSTION);
         registration.addRecipeCatalyst(ModItems.STEAM_METHANE_REFORMER.get(), JeiRecipeTypes.GAS_REFORMING);
         registration.addRecipeCatalyst(ModItems.AMMONIA_SYNTHESIZER.get(), JeiRecipeTypes.AMMONIA_SYNTHESIS);
+        registration.addRecipeCatalyst(ModItems.AMMONIA_SYNTHESIZER.get(), JeiRecipeTypes.UREA_SYNTHESIS);
         registration.addRecipeCatalyst(ModItems.AMMONIA_FUEL_CELL.get(), JeiRecipeTypes.AMMONIA_POWER_CYCLE);
         registration.addRecipeCatalyst(ModItems.CAVITATION_GENERATOR.get(), JeiRecipeTypes.CAVITATION);
         registration.addRecipeCatalyst(ModItems.VACUUM_COLLAPSE_GENERATOR.get(), JeiRecipeTypes.VACUUM_COLLAPSE);

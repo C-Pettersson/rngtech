@@ -183,7 +183,8 @@ public class GasChemistryBlockEntity extends BaseMachineBlockEntity
             return switch (machine) {
                 case COAL_GASIFIER -> false;
                 case SYNGAS_COMBUSTOR -> stack.is(ModFluids.SYNGAS_SOURCE.get()) || stack.is(ModFluids.CARBON_MONOXIDE_SOURCE.get());
-                case STEAM_METHANE_REFORMER -> stack.is(ModFluids.METHANE_SOURCE.get()) || stack.is(ModFluids.SYNGAS_SOURCE.get());
+                case STEAM_METHANE_REFORMER -> stack.is(ModFluids.METHANE_SOURCE.get()) || stack.is(ModFluids.SYNGAS_SOURCE.get())
+                        || stack.is(ModFluids.CARBON_MONOXIDE_SOURCE.get());
             };
         }
 
@@ -210,7 +211,9 @@ public class GasChemistryBlockEntity extends BaseMachineBlockEntity
     private final FluidTank secondaryOutputTank = new FluidTank(TANK_CAPACITY) {
         @Override
         public boolean isFluidValid(FluidStack stack) {
-            return machine == GasChemistryMachine.STEAM_METHANE_REFORMER && stack.is(ModFluids.CARBON_MONOXIDE_SOURCE.get());
+            // Carbon Monoxide from a reform, Carbon Exhaust from a water-gas shift.
+            return machine == GasChemistryMachine.STEAM_METHANE_REFORMER
+                    && (stack.is(ModFluids.CARBON_MONOXIDE_SOURCE.get()) || stack.is(ModFluids.CARBON_EXHAUST_SOURCE.get()));
         }
 
         @Override
@@ -823,7 +826,7 @@ public class GasChemistryBlockEntity extends BaseMachineBlockEntity
             inputTank.drain(recipe.gasInput().amount(), IFluidHandler.FluidAction.EXECUTE);
             waterTank.drain(recipe.waterInput().amount(), IFluidHandler.FluidAction.EXECUTE);
             outputTank.fill(recipe.hydrogenFluid(), IFluidHandler.FluidAction.EXECUTE);
-            secondaryOutputTank.fill(recipe.carbonMonoxideFluid(), IFluidHandler.FluidAction.EXECUTE);
+            secondaryOutputTank.fill(recipe.byproductFluid(), IFluidHandler.FluidAction.EXECUTE);
             finishRecipe();
         }
         return true;
@@ -881,7 +884,7 @@ public class GasChemistryBlockEntity extends BaseMachineBlockEntity
                 && inputTank.getFluidAmount() >= recipe.gasInput().amount()
                 && waterTank.getFluidAmount() >= recipe.waterInput().amount()
                 && canAcceptOutput(outputTank, recipe.hydrogenFluid())
-                && canAcceptOutput(secondaryOutputTank, recipe.carbonMonoxideFluid());
+                && canAcceptOutput(secondaryOutputTank, recipe.byproductFluid());
     }
 
     private int statusCode() {
@@ -943,7 +946,7 @@ public class GasChemistryBlockEntity extends BaseMachineBlockEntity
             return STATUS_NO_RECIPE;
         }
         if (!canAcceptOutput(outputTank, recipe.hydrogenFluid())
-                || !canAcceptOutput(secondaryOutputTank, recipe.carbonMonoxideFluid())) {
+                || !canAcceptOutput(secondaryOutputTank, recipe.byproductFluid())) {
             return STATUS_OUTPUT_FULL;
         }
         int cost = currentEnergyDelta(recipe.energy(), recipe.processingTicks(), false);

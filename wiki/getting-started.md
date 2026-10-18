@@ -107,7 +107,7 @@ Stages 5 and 6 are about fluids and gases. Gases behave like fluids: they use th
 5. Build the [Melter](melter.md) and make **Lubricant**, which later Servos and frame parts need. It also makes methane from algae for gas chemistry.
 6. Use the [Component Assembler](component-assembler.md) to make Battery Cells and other parts in bulk.
 7. Reform methane with water in the [Steam Methane Reformer](steam-methane-reformer.md) for Hydrogen. Fit the Cavitation Generator with nitrogen Gear to split water into Nitrogen.
-8. Combine Nitrogen and Hydrogen in the [Ammonia Synthesizer](ammonia-synthesizer.md), and burn the Ammonia in the [Ammonia Fuel Cell](ammonia-fuel-cell.md).
+8. Combine Nitrogen and Hydrogen in the [Ammonia Synthesizer](ammonia-synthesizer.md), and burn the Ammonia in the [Fuel Cell](ammonia-fuel-cell.md).
 
 Steel and Titanium [Resonance Calibrator](resonance-calibrator.md) sets calibrate the components the next stages ask for.
 
@@ -143,7 +143,7 @@ Typical generators by stage, before rolls and Gear bonuses:
 | 2 | [Bio Generator](bio-generator.md) | About 8 FE/t |
 | 4+ | [Corrosion Cell](corrosion-cell.md) | Depends on the plate or Anode |
 | 5 | [Syngas Combustor](syngas-combustor.md) | 240 FE/t |
-| 6 | [Ammonia Fuel Cell](ammonia-fuel-cell.md) | 600 FE/t |
+| 6 | [Fuel Cell](ammonia-fuel-cell.md) | 600 FE/t |
 | 7 | [Vacuum Collapse Generator](vacuum-collapse-generator.md) | About 1,000 FE/t |
 
 The [Potential Reactor](potential-reactor.md) and [Cavitation Generator](cavitation-generator.md) also generate FE. See each page for details, and [Power Chains](power-chains.md) for how each generator connects to the machines that fuel it.

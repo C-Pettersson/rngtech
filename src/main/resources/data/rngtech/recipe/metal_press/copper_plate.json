@@ -18,7 +18,7 @@
     "id": "rngtech:copper_plate"
   },
   "processing_ticks": 200,
-  "energy": 2400,
+  "heat": 950,
   "minimum_temperature": 900,
   "safe_maximum_temperature": 1200,
   "required_temperature_stability": 1.0,

@@ -358,11 +358,11 @@ public enum FurnacePassiveNode implements StringRepresentable, PassiveNode {
     }
 
     private static EffectSpec warmupMore(double value) {
-        return effect(MachineStat.WARMUP_TIME, ModifierOperation.MORE, value);
+        return effect(MachineStat.THERMAL_MASS, ModifierOperation.MORE, value);
     }
 
     private static EffectSpec warmupLess(double value) {
-        return effect(MachineStat.WARMUP_TIME, ModifierOperation.LESS, value);
+        return effect(MachineStat.THERMAL_MASS, ModifierOperation.LESS, value);
     }
 
     private static EffectSpec coolingUp(double value) {

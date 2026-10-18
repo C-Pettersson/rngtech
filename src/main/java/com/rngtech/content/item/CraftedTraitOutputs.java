@@ -6,6 +6,7 @@ import com.rngtech.content.tool.ToolHeadFamily;
 import com.rngtech.rpg.MachineTraitRoller;
 import com.rngtech.rpg.MachineTraits;
 import com.rngtech.rpg.MachineType;
+import com.rngtech.rpg.ModifierEligibilityProfile;
 import com.rngtech.rpg.ModifierEligibilityProfiles;
 import com.rngtech.rpg.unique.UniqueDefinition;
 import com.rngtech.rpg.unique.UniqueItems;
@@ -38,11 +39,17 @@ public final class CraftedTraitOutputs {
         RandomSource rollRandom = pendingRoll == null || pendingRoll.isUnseeded()
                 ? random
                 : RandomSource.create(pendingRoll.seed());
-        if (applyRolledTraits(stack, rollRandom)) {
+        if (applyRolledTraits(stack, rollRandom, isAnnealed(stack))) {
             stack.remove(ModDataComponents.UNIDENTIFIED_TRAIT_ROLL.get());
             stack.remove(ModDataComponents.IDENTIFY_TRAIT_ROLL_ON_CRAFT.get());
+            stack.remove(ModDataComponents.ANNEALED.get());
         }
         return stack;
+    }
+
+    /** An item crafted from Annealed plates rolls its Refinement Potential twice and keeps the higher. */
+    public static boolean isAnnealed(ItemStack stack) {
+        return stack.getOrDefault(ModDataComponents.ANNEALED.get(), false);
     }
 
     public static ItemStack handleCrafted(ItemStack stack, RandomSource random) {
@@ -106,7 +113,7 @@ public final class CraftedTraitOutputs {
         return Component.translatable("rngtech.item.unidentified", baseName);
     }
 
-    private static boolean applyRolledTraits(ItemStack stack, RandomSource random) {
+    private static boolean applyRolledTraits(ItemStack stack, RandomSource random, boolean lucky) {
         UniqueDefinition unique = UniqueItems.definition(stack);
         if (unique != null) {
             stack.set(ModDataComponents.MACHINE_TRAITS.get(), unique.roll(random));
@@ -115,7 +122,7 @@ public final class CraftedTraitOutputs {
         if (stack.getItem() instanceof MachineBlockItem machine) {
             stack.set(
                     ModDataComponents.MACHINE_TRAITS.get(),
-                    MachineTraitRoller.roll(
+                    rollTraits(lucky,
                             ModifierEligibilityProfiles.forMachine(machine.machineType()),
                             machine.traitRollComponentStage(),
                             random
@@ -124,7 +131,7 @@ public final class CraftedTraitOutputs {
             return true;
         }
         if (stack.getItem() instanceof MachinePartItem part) {
-            MachineTraits rolled = MachineTraitRoller.roll(
+            MachineTraits rolled = rollTraits(lucky,
                     ModifierEligibilityProfiles.forMachinePart(part.partType(), part.machineType()),
                     part.componentStage(),
                     random
@@ -142,14 +149,14 @@ public final class CraftedTraitOutputs {
         if (stack.getItem() instanceof BatteryCellItem cell) {
             stack.set(
                     ModDataComponents.MACHINE_TRAITS.get(),
-                    MachineTraitRoller.roll(ModifierEligibilityProfiles.forBatteryCell(false), cell.material().stage(), random)
+                    rollTraits(lucky, ModifierEligibilityProfiles.forBatteryCell(false), cell.material().stage(), random)
             );
             return true;
         }
         if (stack.getItem() instanceof MinersCompanionItem) {
             stack.set(
                     ModDataComponents.MACHINE_TRAITS.get(),
-                    MachineTraitRoller.roll(
+                    rollTraits(lucky,
                             ModifierEligibilityProfiles.forMachine(MachineType.MINERS_COMPANION),
                             MinersCompanionItem.COMPONENT_STAGE,
                             random
@@ -160,7 +167,7 @@ public final class CraftedTraitOutputs {
         if (stack.getItem() instanceof ForestryCartItem) {
             stack.set(
                     ModDataComponents.MACHINE_TRAITS.get(),
-                    MachineTraitRoller.roll(
+                    rollTraits(lucky,
                             ModifierEligibilityProfiles.forMachine(MachineType.FORESTRY_COMPANION),
                             ForestryCartItem.COMPONENT_STAGE,
                             random
@@ -171,7 +178,7 @@ public final class CraftedTraitOutputs {
         if (stack.getItem() instanceof ToolHeadItem head) {
             stack.set(
                     ModDataComponents.MACHINE_TRAITS.get(),
-                    MachineTraitRoller.roll(
+                    rollTraits(lucky,
                             ModifierEligibilityProfiles.forToolHead(head.family() == ToolHeadFamily.PICK),
                             head.material().stage(),
                             random
@@ -182,7 +189,7 @@ public final class CraftedTraitOutputs {
         if (stack.getItem() instanceof ToolRodItem rod) {
             stack.set(
                     ModDataComponents.MACHINE_TRAITS.get(),
-                    MachineTraitRoller.roll(
+                    rollTraits(lucky,
                             ModifierEligibilityProfiles.forMachine(MachineType.TOOL_ROD),
                             rod.material().stage(),
                             random
@@ -191,6 +198,10 @@ public final class CraftedTraitOutputs {
             return true;
         }
         return false;
+    }
+
+    private static MachineTraits rollTraits(boolean lucky, ModifierEligibilityProfile profile, int componentStage, RandomSource random) {
+        return MachineTraitRoller.roll(profile, componentStage, random, lucky);
     }
 
     private static int componentStage(ItemStack stack) {

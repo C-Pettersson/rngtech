@@ -12,11 +12,6 @@
                     "stat": "BATCH_SIZE",
                     "operation": "ADD",
                     "value": 2
-                },
-                {
-                    "stat": "ENERGY_USAGE",
-                    "operation": "MORE",
-                    "value": 1.15
                 }
             ],
             "behaviors": [

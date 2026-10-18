@@ -4,6 +4,8 @@ import com.rngtech.content.recipe.AmmoniaPowerCycleRecipe;
 import com.rngtech.content.recipe.AmmoniaPowerCycleRecipeInput;
 import com.rngtech.content.recipe.AmmoniaSynthesisRecipe;
 import com.rngtech.content.recipe.AmmoniaSynthesisRecipeInput;
+import com.rngtech.content.recipe.UreaSynthesisRecipe;
+import com.rngtech.content.recipe.UreaSynthesisRecipeInput;
 import com.rngtech.content.registry.ModRecipes;
 
 import net.minecraft.world.item.ItemStack;
@@ -19,6 +21,15 @@ final class AmmoniaRecipes {
         }
         return level.getRecipeManager()
                 .getRecipeFor(ModRecipes.AMMONIA_SYNTHESIS_TYPE.get(), new AmmoniaSynthesisRecipeInput(catalyst, nitrogen, hydrogen), level)
+                .map(holder -> holder.value());
+    }
+
+    static Optional<UreaSynthesisRecipe> urea(Level level, ItemStack catalyst, FluidStack ammonia, FluidStack carbon) {
+        if (level == null || catalyst.isEmpty() || ammonia.isEmpty() || carbon.isEmpty()) {
+            return Optional.empty();
+        }
+        return level.getRecipeManager()
+                .getRecipeFor(ModRecipes.UREA_SYNTHESIS_TYPE.get(), new UreaSynthesisRecipeInput(catalyst, ammonia, carbon), level)
                 .map(holder -> holder.value());
     }
 

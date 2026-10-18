@@ -21,7 +21,7 @@ Every machine is built in layers, and each layer is its own item with its own ro
 - **Gear.** Parts you install in a machine's Gear tab. Crush Heads set how hard an ore a [Crusher](rngtech:crusher.md) handles, Heat Cores set how hot a [Furnace](rngtech:furnace.md) or [Metal Press](rngtech:metal-press.md) gets, and Molds pick what a press makes. See [Gear](rngtech:gear.md).
 - **Battery Cells.** Gear that stores FE and sets how fast a machine takes it in. Most machines run slower or produce less without one. See [Battery Cells](rngtech:battery-cells.md).
 - **Rarity and affixes.** Each rolled item is Normal, Magic, or Rare, and Magic and Rare items carry random affixes that change their stats. See [Rarity and Affixes](rngtech:rarity-and-affixes.md).
-- **Refinement Potential.** Each rolled item also has a budget you spend to add, upgrade, reroll, or remove affixes. Higher-stage items roll a bigger budget. See [Refinement Potential](rngtech:rarity-and-affixes/refinement-potential.md).
+- **Refinement Potential.** Each rolled item also has a budget you spend to add, upgrade, reroll, or remove affixes. Higher-stage items roll a bigger budget. See [Refinement Potential](rngtech:rarity-and-affixes.md#refinement-potential).
 - **Machine Mastery.** Placed machines earn XP from their work and spend points in a passive tree. See [Machine Mastery](rngtech:machine-mastery.md).
 
 ### Identifying new items

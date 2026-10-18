@@ -10,6 +10,7 @@ import com.rngtech.content.purge.FluidOutputOverflow;
 import com.rngtech.content.purge.FluidPurgeRole;
 import com.rngtech.content.purge.FluidPurgeTarget;
 import com.rngtech.content.purge.PurgeableFluidStorage;
+import com.rngtech.content.recipe.CountedIngredient;
 import com.rngtech.content.recipe.MelterRecipe;
 import com.rngtech.content.recipe.MelterRecipeInput;
 import com.rngtech.content.recipe.ShapelessMatch;
@@ -99,6 +100,9 @@ public class MelterBlockEntity extends BaseMachineBlockEntity
     public static final int STATUS_OUTPUT_TANK_FULL = 7;
     public static final int STATUS_NO_POWER = 8;
     public static final int STATUS_NO_FLUID = 9;
+    public static final int STATUS_FILLING_BATCH = 10;
+    public static final int STATUS_WARMING = 11;
+    public static final int STATUS_HEAT_HIGH = 12;
     public static final int PURGE_INPUT_TANK = 0;
     public static final int PURGE_OUTPUT_TANK = 1;
 
@@ -129,7 +133,18 @@ public class MelterBlockEntity extends BaseMachineBlockEntity
     private static final int DATA_BATCH_SIZE = DATA_REFINEMENT_POTENTIAL + 1;
     private static final int DATA_INPUT_FLUID_ID = DATA_BATCH_SIZE + 1;
     private static final int DATA_OUTPUT_FLUID_ID = DATA_INPUT_FLUID_ID + 1;
-    private static final int DATA_MACHINE_PROGRESSION_START = DATA_OUTPUT_FLUID_ID + 1;
+    private static final int DATA_HEAT_SLIDER = DATA_OUTPUT_FLUID_ID + 1;
+    private static final int DATA_SETPOINT = DATA_HEAT_SLIDER + 1;
+    private static final int DATA_THERMAL_CONDUCTIVITY = DATA_SETPOINT + 1;
+    private static final int DATA_HOLDING_ENERGY = DATA_THERMAL_CONDUCTIVITY + 1;
+    private static final int DATA_HEATING_ENERGY = DATA_HOLDING_ENERGY + 1;
+    private static final int DATA_HEAT_FACTOR = DATA_HEATING_ENERGY + 1;
+    private static final int DATA_WOBBLE = DATA_HEAT_FACTOR + 1;
+    private static final int DATA_HEAT_REACH = DATA_WOBBLE + 1;
+    private static final int DATA_HEAT_MAXIMUM = DATA_HEAT_REACH + 1;
+    private static final int DATA_OVERHEAT_TEMPERATURE = DATA_HEAT_MAXIMUM + 1;
+    private static final int DATA_INPUT_ENERGY = DATA_OVERHEAT_TEMPERATURE + 1;
+    private static final int DATA_MACHINE_PROGRESSION_START = DATA_INPUT_ENERGY + 1;
     private static final int DATA_COUNT = DATA_MACHINE_PROGRESSION_START + MasteryMenuSupport.FIELD_COUNT;
     private static final int STAT_SCALE = 100;
 
@@ -227,12 +242,23 @@ public class MelterBlockEntity extends BaseMachineBlockEntity
             MachineStatAccumulator stats = effectiveStats();
             MelterRecipe recipe = nextRecipe();
             return switch (index) {
-                case DATA_PROGRESS -> syncedProgress(0, progress);
+                case DATA_PROGRESS -> syncedProgress(0, currentElapsedTicks(recipe, stats));
                 case DATA_PROCESSING_TICKS -> currentProcessingTicks(recipe, stats);
                 case DATA_ENERGY -> energyStored();
                 case DATA_ENERGY_CAPACITY -> energyCapacity();
-                case DATA_HEAT -> effectiveHeat(stats);
+                case DATA_HEAT -> heat.temperature();
                 case DATA_MIN_TEMPERATURE -> recipe == null ? 0 : recipe.minimumTemperature();
+                case DATA_HEAT_SLIDER -> heatSlider;
+                case DATA_THERMAL_CONDUCTIVITY -> scaledStat(stats, MachineStat.THERMAL_CONDUCTIVITY);
+                case DATA_HOLDING_ENERGY -> heatEnergy(0);
+                case DATA_INPUT_ENERGY -> heatEnergy(1);
+                case DATA_HEATING_ENERGY -> heatEnergy(2);
+                case DATA_HEAT_FACTOR -> heatFactorDisplay();
+                case DATA_WOBBLE -> wobbleDisplay();
+                case DATA_SETPOINT -> recipe == null || !hasRequiredComponents() ? 0 : envelope(recipe, stats).setpoint();
+                case DATA_HEAT_REACH -> recipe == null || !hasRequiredComponents() ? 0 : envelope(recipe, stats).reach();
+                case DATA_HEAT_MAXIMUM -> stats.intValue(MachineStat.MAX_TEMPERATURE);
+                case DATA_OVERHEAT_TEMPERATURE -> recipe == null ? 0 : envelope(recipe, stats).overheat();
                 case DATA_PROCESSING_LEVEL -> processingLevel(stats);
                 case DATA_REQUIRED_PROCESSING_LEVEL -> recipe == null ? 0 : recipe.requiredProcessingLevel();
                 case DATA_INPUT_FLUID -> inputTank.getFluidAmount();
@@ -267,9 +293,15 @@ public class MelterBlockEntity extends BaseMachineBlockEntity
     };
 
     private final BulkSpeedState bulkSpeed = new BulkSpeedState();
-    private int progress;
-    private int activeProcessingTicks;
+    private final HeatLane heat = new HeatLane();
+    /** Melt speed locked when the cycle started, so Overpressure does not flicker mid-melt. */
+    private double activeMeltSpeed;
     private int lockedBatch;
+    /** Whether the crucible is cooling down to its work ceiling, and whether the heater went short of FE, as of the last tick. */
+    private boolean tooHot;
+    private boolean starved;
+    /** How far past the recipe's melting point the crucible runs, in percent of the band up to Max Temperature. */
+    private int heatSlider;
     private int internalEnergy;
     private ItemStack activePrimary = ItemStack.EMPTY;
     private ItemStack activeSecondary = ItemStack.EMPTY;
@@ -290,6 +322,7 @@ public class MelterBlockEntity extends BaseMachineBlockEntity
         if (recipe == null || !melter.hasRequiredComponents()) {
             melter.escapement.idle();
             melter.resetCycleIfActive();
+            melter.idle(stats);
             BaseMachineBlock.setActive(level, pos, state, false);
             return;
         }
@@ -298,44 +331,87 @@ public class MelterBlockEntity extends BaseMachineBlockEntity
             melter.resetBulkSpeed();
         }
         melter.escapement.observe(recipe);
+        // A full output tank keeps the crucible at its setpoint, so melting resumes as soon as there is room.
+        if (melter.effectiveHeat(stats) >= recipe.minimumTemperature()
+                && melter.processingLevel(stats) >= recipe.requiredProcessingLevel()
+                && !melter.canAcceptOutputFluid(melter.yieldedOutput(recipe, stats))) {
+            melter.tooHot = false;
+            melter.starved = false;
+            HeatEngine.hold(melter.heat, melter.envelope(recipe, stats), stats, HeatEngine.electric(melter.heat, stats, melter::drawEnergy));
+            BaseMachineBlock.setActive(level, pos, state, false);
+            return;
+        }
         if (melter.effectiveHeat(stats) < recipe.minimumTemperature()
                 || melter.processingLevel(stats) < recipe.requiredProcessingLevel()
-                || !melter.canAcceptOutputFluid(melter.yieldedOutput(recipe, stats))) {
+                || melter.waitsForFullBatch(recipe, stats)) {
+            melter.idle(stats);
             BaseMachineBlock.setActive(level, pos, state, false);
             return;
         }
 
-        int energyCost = melter.scaledForJobs(melter.energyCostPerTick(recipe, stats), recipe, stats);
-        if (melter.progress == 0 && ProcessingChance.rollInstant(level, stats)) {
-            int fullEnergyCost = melter.scaledForJobs(melter.energyCostPerCraft(recipe, stats), recipe, stats);
-            if (melter.consumeWorkingEnergy(fullEnergyCost, true) >= fullEnergyCost) {
-                melter.markInstantProcess();
-                melter.startCycleIfNeeded(recipe, stats);
-                melter.consumeWorkingEnergy(fullEnergyCost, false);
-                if (melter.process(recipe, stats)) {
-                    melter.bulkSpeed.recordProcess(melter.activeTraits());
-                }
-                BaseMachineBlock.setActive(level, pos, state, true);
-                melter.setChanged();
-                return;
-            }
-        }
-        if (melter.consumeWorkingEnergy(energyCost, true) < energyCost) {
-            BaseMachineBlock.setActive(level, pos, state, false);
-            return;
-        }
-
-        melter.startCycleIfNeeded(recipe, stats);
-        melter.consumeWorkingEnergy(energyCost, false);
-        melter.progress++;
-        if (melter.progress >= melter.activeCycleProcessingTicks(recipe, stats)) {
+        HeatEngine.Envelope envelope = melter.envelope(recipe, stats);
+        HeatEngine.HeatSupply supply = HeatEngine.electric(melter.heat, stats, melter::drawEnergy);
+        HeatLane heat = melter.heat;
+        if (!heat.started()
+                && heat.exactTemperature() >= envelope.minimum()
+                && heat.exactTemperature() <= envelope.ceilingFor(heat)
+                && ProcessingChance.rollInstant(level, stats)
+                && melter.payInstant(recipe, stats, supply)) {
+            melter.markInstantProcess();
+            melter.startCycleIfNeeded(recipe, stats);
             if (melter.process(recipe, stats)) {
                 melter.bulkSpeed.recordProcess(melter.activeTraits());
             }
+            BaseMachineBlock.setActive(level, pos, state, true);
+            melter.setChanged();
+            return;
         }
 
-        BaseMachineBlock.setActive(level, pos, state, true);
+        boolean wasStarted = heat.started();
+        HeatEngine.Tick tick = HeatEngine.work(heat, envelope, stats, melter.load(recipe, stats), supply, level.getGameTime(), 0);
+        melter.tooHot = tick.tooHot();
+        melter.starved = tick.starved();
+        BaseMachineBlock.setActive(level, pos, state, tick.working() || heat.lastHeat() > 0.0);
         melter.setChanged();
+        if (tick.tooHot() || !heat.started()) {
+            return;
+        }
+        if (!wasStarted) {
+            melter.startCycleIfNeeded(recipe, stats);
+        }
+        if (HeatEngine.finished(heat, melter.cycleWork(recipe, stats)) && melter.process(recipe, stats)) {
+            melter.bulkSpeed.recordProcess(melter.activeTraits());
+        }
+    }
+
+    /** FE/t the heater spent last tick: on wall loss when {@code holding}, otherwise on heating the chamber and input. */
+    private int heatEnergy(int part) {
+        return (int) Math.ceil(HeatEngine.heatSplit(heat)[part] * HeatEngine.energyRate(effectiveStats()));
+    }
+
+    private int heatFactorDisplay() {
+        MelterRecipe recipe = nextRecipe();
+        MachineStatAccumulator stats = effectiveStats();
+        return recipe == null || !(hasRequiredComponents()) ? 0 : (int) Math.round(100.0 * HeatEngine.heatFactor(heat.exactTemperature(), envelope(recipe, stats)));
+    }
+
+    private int wobbleDisplay() {
+        MelterRecipe recipe = nextRecipe();
+        MachineStatAccumulator stats = effectiveStats();
+        return recipe == null || !(hasRequiredComponents()) ? 0 : (int) Math.round(HeatEngine.wobbleAmplitude(envelope(recipe, stats), stats));
+    }
+
+    public int heatSlider() {
+        return heatSlider;
+    }
+
+    /** Sets how far past each recipe's melting point the crucible runs, from 0 to 100 percent of the band up to Max Temperature. */
+    public void setHeatSlider(int percent) {
+        int clamped = Math.max(0, Math.min(100, percent));
+        if (clamped != heatSlider) {
+            heatSlider = clamped;
+            setChanged();
+        }
     }
 
     public ItemStackHandler getProcessInventory() {
@@ -394,19 +470,19 @@ public class MelterBlockEntity extends BaseMachineBlockEntity
         MachineStatAccumulator stats = effectiveStats();
         MelterRecipe recipe = nextRecipe();
         int status = statusCode(recipe, stats);
-        int energyDemand = status == STATUS_READY || status == STATUS_NO_POWER ? energyCostPerTick(recipe, stats) : 0;
+        int energyDemand = status == STATUS_READY || status == STATUS_WARMING || status == STATUS_NO_POWER ? currentEnergyCostPerTick(stats) : 0;
         AdjacentEnergyConnector.Info connector = AdjacentEnergyConnector.forSink(level, worldPosition);
         return MachineInfoSnapshot.builder("melter")
                 .state(
                         MachineInfoSnapshot.workState(
                                 status == STATUS_READY,
                                 getBlockState().getValue(BaseMachineBlock.ACTIVE),
-                                status == STATUS_NO_INPUT
+                                status == STATUS_NO_INPUT || status == STATUS_FILLING_BATCH
                         ),
                         MachineInfoSnapshot.BlockedReason.NONE
                 )
                 .status(statusKey(status), recipe == null ? 0 : recipe.minimumTemperature())
-                .progress(progress, currentProcessingTicks(recipe, stats))
+                .progress(currentElapsedTicks(recipe, stats), currentProcessingTicks(recipe, stats))
                 .energy(energyStored(), energyCapacity(), -energyDemand)
                 .energyTelemetry(
                         energyFlow.lastInput(),
@@ -418,7 +494,9 @@ public class MelterBlockEntity extends BaseMachineBlockEntity
                         processingLevel(stats),
                         recipe == null ? MachineInfoSnapshot.UNSET : recipe.requiredProcessingLevel()
                 )
-                .heat(effectiveHeat(stats), recipe == null ? 0 : recipe.minimumTemperature())
+                .heat(heat.temperature(), recipe == null ? 0 : recipe.minimumTemperature())
+                .setpoint(recipe == null || !hasRequiredComponents() ? 0 : envelope(recipe, stats).setpoint())
+                .batch(recipe == null ? 0 : parallelMelts(recipe, stats))
                 .gear(hasHeatCore()
                         ? MachineInfoSnapshot.GearSummary.HEAT_CORE_INSTALLED
                         : MachineInfoSnapshot.GearSummary.MISSING_HEAT_CORE)
@@ -440,6 +518,9 @@ public class MelterBlockEntity extends BaseMachineBlockEntity
             case STATUS_OUTPUT_TANK_FULL -> "output_full";
             case STATUS_NO_POWER -> "no_power";
             case STATUS_NO_FLUID -> "no_fluid";
+            case STATUS_WARMING -> "warming";
+            case STATUS_HEAT_HIGH -> "heat_high";
+            case STATUS_FILLING_BATCH -> "filling_batch";
             default -> "";
         };
         return name.isEmpty() ? "" : "rngtech.melter.status." + name;
@@ -530,8 +611,11 @@ public class MelterBlockEntity extends BaseMachineBlockEntity
         tag.put("GearInventory", gearInventory.serializeNBT(registries));
         tag.put("InputTank", inputTank.writeToNBT(registries, new CompoundTag()));
         tag.put("OutputTank", outputTank.writeToNBT(registries, new CompoundTag()));
-        tag.putInt("Progress", progress);
-        tag.putInt("ActiveProcessingTicks", activeProcessingTicks);
+        CompoundTag heatTag = new CompoundTag();
+        heat.save(heatTag);
+        tag.put("Heat", heatTag);
+        tag.putInt("HeatTrack", heatSlider);
+        tag.putDouble("ActiveMeltSpeed", activeMeltSpeed);
         tag.putInt("LockedBatch", lockedBatch);
         tag.putInt("Energy", internalEnergyStored());
         tag.put("ActivePrimary", activePrimary.saveOptional(registries));
@@ -547,8 +631,12 @@ public class MelterBlockEntity extends BaseMachineBlockEntity
         gearInventory.deserializeNBT(registries, tag.getCompound("GearInventory"));
         inputTank.readFromNBT(registries, tag.getCompound("InputTank"));
         outputTank.readFromNBT(registries, tag.getCompound("OutputTank"));
-        progress = tag.getInt("Progress");
-        activeProcessingTicks = Math.max(0, tag.getInt("ActiveProcessingTicks"));
+        heat.resetCycle();
+        if (tag.contains("Heat")) {
+            heat.load(tag.getCompound("Heat"));
+        }
+        heatSlider = Math.max(0, Math.min(100, tag.getInt("HeatTrack")));
+        activeMeltSpeed = Math.max(0.0, tag.getDouble("ActiveMeltSpeed"));
         lockedBatch = Math.max(0, tag.getInt("LockedBatch"));
         internalEnergy = Math.max(0, tag.getInt("Energy"));
         activePrimary = ItemStack.parseOptional(registries, tag.getCompound("ActivePrimary"));
@@ -670,7 +758,20 @@ public class MelterBlockEntity extends BaseMachineBlockEntity
     /** The batch locked when the cycle started, shrunk only if its inputs have since gone. */
     private int parallelMelts(MelterRecipe recipe, MachineStatAccumulator stats) {
         int available = availableMelts(recipe, stats);
-        return progress > 0 && lockedBatch > 0 ? Math.min(lockedBatch, available) : available;
+        return heat.started() && lockedBatch > 0 ? Math.min(lockedBatch, available) : available;
+    }
+
+    /** Dense Batching: an idle Melter waits until its inputs, fluid, and tank room fit a full batch. */
+    private boolean waitsForFullBatch(MelterRecipe recipe, MachineStatAccumulator stats) {
+        return !heat.started() && hasMasteryBehavior("DENSE_BATCHING") && availableMelts(recipe, stats) < fullBatch(recipe, stats);
+    }
+
+    /** The two input slots and the input tank must hold every ingredient of the full batch at once. */
+    private int fullBatch(MelterRecipe recipe, MachineStatAccumulator stats) {
+        int units = recipe.itemIngredients().stream().mapToInt(CountedIngredient::count).sum();
+        int slotLimit = units <= 0 ? BatchProcessing.MAX_BATCH_SIZE : 2 * 64 / units;
+        slotLimit = Math.min(slotLimit, inputTank.getCapacity() / Math.max(1, recipe.fluidInput().amount()));
+        return BatchProcessing.fullBatch(stats, hasMasteryBehavior("FUSED_CRUCIBLES"), slotLimit);
     }
 
     /** Each batched melt needs its own inputs, fluid, and tank room. Fused Crucibles gives up batching. */
@@ -682,11 +783,10 @@ public class MelterBlockEntity extends BaseMachineBlockEntity
         return Math.max(1, BatchProcessing.largestFitting(limit, batch -> batch == 1 || canAcceptOutputFluid(output.copyWithAmount(output.getAmount() * batch))));
     }
 
-    /** Batched melts each pay FE; Shared Heat makes every melt after the first 20% cheaper. */
-    private int scaledForJobs(int energy, MelterRecipe recipe, MachineStatAccumulator stats) {
+    /** Batched melts each need their own heat; Shared Heat makes every melt after the first need 20% less. */
+    private double batchHeat(MelterRecipe recipe, MachineStatAccumulator stats) {
         int extra = parallelMelts(recipe, stats) - 1;
-        double scale = 1.0 + extra * (hasMasteryBehavior("SHARED_HEAT") ? 0.8 : 1.0);
-        return Math.max(1, (int) Math.ceil(energy * scale));
+        return recipe.heat() * (1.0 + extra * (hasMasteryBehavior("SHARED_HEAT") ? 0.8 : 1.0));
     }
 
     /** Overpressure, Lava Tap, Crush Feed, and Fused Crucibles speed up a melt; set when its cycle starts. */
@@ -808,10 +908,40 @@ public class MelterBlockEntity extends BaseMachineBlockEntity
                 && FluidOutputOverflow.canAcceptOrVoidExcess(outputTank, result, autoPurgesFluidOutput() && !hasMasteryBehavior("SEALED_LINES"));
     }
 
-    private int processingTicks(MelterRecipe recipe, MachineStatAccumulator stats) {
-        int ticks = Math.max(1, (int) Math.ceil(stats.adjustedHeatProcessingTicks(recipe.processingTicks())
-                / (meltSpeed(recipe, stats) * escapementSpeed(stats))));
-        return BatchProcessing.batchTicks(ticks, stats, parallelMelts(recipe, stats));
+    /** Melter recipes only name a melting point, which is both the minimum and the target; nothing can fail. */
+    private HeatEngine.Envelope envelope(MelterRecipe recipe, MachineStatAccumulator stats) {
+        int target = recipe.minimumTemperature();
+        return HeatEngine.envelope(target, target, HeatControl.defaultSafeMaximumTemperature(target), 0.0, false,
+                hasMasteryBehavior("BLAST_DRAFT"), stats, heatSlider / 100.0, Integer.MAX_VALUE).coolingFirst(hasMasteryBehavior("COOL_HEADED"));
+    }
+
+    /** Reference ticks a melt needs: the recipe's time, longer for every extra melt in the batch. */
+    private double cycleWork(MelterRecipe recipe, MachineStatAccumulator stats) {
+        return recipe.processingTicks() * BatchProcessing.timeMultiplier(stats, parallelMelts(recipe, stats));
+    }
+
+    private HeatEngine.Load load(MelterRecipe recipe, MachineStatAccumulator stats) {
+        double meltSpeed = heat.started() && activeMeltSpeed > 0.0 ? activeMeltSpeed : meltSpeed(recipe, stats);
+        double workPerTick = HeatEngine.speed(stats) * meltSpeed * escapementSpeed(stats);
+        return new HeatEngine.Load(batchHeat(recipe, stats) * workPerTick / cycleWork(recipe, stats), workPerTick, parallelMelts(recipe, stats));
+    }
+
+    private int drawEnergy(int amount) {
+        int take = Math.min(amount, consumeWorkingEnergy(amount, true));
+        return take > 0 ? consumeWorkingEnergy(take, false) : 0;
+    }
+
+    /** Instant Process pays the whole batch's heat at once, without the wall loss of a full melt. */
+    private boolean payInstant(MelterRecipe recipe, MachineStatAccumulator stats, HeatEngine.HeatSupply supply) {
+        double needed = batchHeat(recipe, stats);
+        int energyCost = (int) Math.ceil(needed * HeatEngine.energyRate(stats));
+        return consumeWorkingEnergy(energyCost, true) >= energyCost && HeatEngine.payAtOnce(supply, needed);
+    }
+
+    private void idle(MachineStatAccumulator stats) {
+        tooHot = false;
+        starved = false;
+        HeatEngine.idle(heat, stats, false);
     }
 
     private double escapementSpeed(MachineStatAccumulator stats) {
@@ -819,21 +949,21 @@ public class MelterBlockEntity extends BaseMachineBlockEntity
     }
 
 
-    private int energyCostPerTick(MelterRecipe recipe, MachineStatAccumulator stats) {
-        int adjustedTicks = processingTicks(recipe, stats);
-        int totalEnergy = stats.adjustedEnergyCost(recipe.energy());
-        return Math.max(1, (int) Math.ceil(totalEnergy / (double) adjustedTicks));
-    }
-
-    private int energyCostPerCraft(MelterRecipe recipe, MachineStatAccumulator stats) {
-        return stats.adjustedEnergyCost(recipe.energy());
+    /** FE the heater drew last tick. */
+    private int currentEnergyCostPerTick(MachineStatAccumulator stats) {
+        return (int) Math.ceil(heat.lastHeat() * HeatEngine.energyRate(stats));
     }
 
     private int currentProcessingTicks(MelterRecipe recipe, MachineStatAccumulator stats) {
-        if (hasActiveCycle() && activeProcessingTicks > 0) {
-            return activeProcessingTicks;
-        }
-        return recipe == null ? 0 : processingTicks(recipe, stats);
+        return recipe == null || !hasRequiredComponents()
+                ? 0
+                : HeatEngine.cycleTicks(cycleWork(recipe, stats), load(recipe, stats), envelope(recipe, stats));
+    }
+
+    private int currentElapsedTicks(MelterRecipe recipe, MachineStatAccumulator stats) {
+        return recipe == null || !hasRequiredComponents()
+                ? 0
+                : HeatEngine.elapsedTicks(heat, load(recipe, stats), envelope(recipe, stats));
     }
 
     private int statusCode(MelterRecipe recipe, MachineStatAccumulator stats) {
@@ -861,33 +991,36 @@ public class MelterBlockEntity extends BaseMachineBlockEntity
         if (!canAcceptOutputFluid(yieldedOutput(recipe, stats))) {
             return STATUS_OUTPUT_TANK_FULL;
         }
-        int energyCost = energyCostPerTick(recipe, stats);
-        return consumeWorkingEnergy(energyCost, true) < energyCost ? STATUS_NO_POWER : STATUS_READY;
+        if (waitsForFullBatch(recipe, stats)) {
+            int loaded = ShapelessMatch.crafts(recipe.itemIngredients(), new ItemStack[] {primaryStack(), secondaryStack()}, BatchProcessing.MAX_BATCH_SIZE);
+            loaded = Math.min(loaded, inputTank.getFluidAmount() / Math.max(1, recipe.fluidInput().amount()));
+            return loaded < fullBatch(recipe, stats) ? STATUS_FILLING_BATCH : STATUS_OUTPUT_TANK_FULL;
+        }
+        if (tooHot) {
+            return STATUS_HEAT_HIGH;
+        }
+        if (starved) {
+            return STATUS_NO_POWER;
+        }
+        return heat.started() ? STATUS_READY : STATUS_WARMING;
     }
 
     private void startCycleIfNeeded(MelterRecipe recipe, MachineStatAccumulator stats) {
-        if (progress != 0) {
+        if (lockedBatch != 0) {
             return;
         }
         lockedBatch = availableMelts(recipe, stats);
         activePrimary = singleCopy(primaryStack());
         activeSecondary = singleCopy(secondaryStack());
         activeFluid = inputTank.getFluid().copyWithAmount(recipe.fluidInput().amount());
-        activeProcessingTicks = processingTicks(recipe, stats);
+        activeMeltSpeed = meltSpeed(recipe, stats);
         if (bulkSpeed.startRecipe(recipe)) {
             setChanged();
         }
     }
 
-    private int activeCycleProcessingTicks(MelterRecipe recipe, MachineStatAccumulator stats) {
-        if (activeProcessingTicks <= 0) {
-            activeProcessingTicks = processingTicks(recipe, stats);
-        }
-        return activeProcessingTicks;
-    }
-
     private boolean activeCycleMatches() {
-        if (progress == 0) {
+        if (!heat.started()) {
             return true;
         }
         return (!activePrimary.isEmpty() || !activeSecondary.isEmpty())
@@ -910,7 +1043,7 @@ public class MelterBlockEntity extends BaseMachineBlockEntity
     }
 
     private void resetCycleIfActive() {
-        if (progress != 0 || !activePrimary.isEmpty() || !activeSecondary.isEmpty() || !activeFluid.isEmpty()) {
+        if (hasActiveCycle()) {
             resetCycle();
             resetBulkSpeed();
             setChanged();
@@ -918,8 +1051,8 @@ public class MelterBlockEntity extends BaseMachineBlockEntity
     }
 
     private void resetCycle() {
-        progress = 0;
-        activeProcessingTicks = 0;
+        heat.resetCycle();
+        activeMeltSpeed = 0.0;
         lockedBatch = 0;
         activePrimary = ItemStack.EMPTY;
         activeSecondary = ItemStack.EMPTY;
@@ -927,7 +1060,7 @@ public class MelterBlockEntity extends BaseMachineBlockEntity
     }
 
     private boolean hasActiveCycle() {
-        return progress != 0 || !activePrimary.isEmpty() || !activeSecondary.isEmpty() || !activeFluid.isEmpty();
+        return heat.started() || heat.work() > 0.0 || !activePrimary.isEmpty() || !activeSecondary.isEmpty() || !activeFluid.isEmpty();
     }
 
     private void resetBulkSpeed() {

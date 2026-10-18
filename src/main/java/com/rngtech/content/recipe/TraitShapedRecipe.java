@@ -1,7 +1,9 @@
 package com.rngtech.content.recipe;
 
 import com.rngtech.content.item.CraftedTraitOutputs;
+import com.rngtech.content.registry.ModDataComponents;
 import com.rngtech.content.registry.ModRecipes;
+import com.rngtech.content.registry.ModTags;
 
 import com.mojang.serialization.MapCodec;
 import net.minecraft.core.HolderLookup;
@@ -28,7 +30,25 @@ public final class TraitShapedRecipe extends ShapedRecipe {
 
     @Override
     public ItemStack assemble(CraftingInput input, HolderLookup.Provider registries) {
-        return CraftedTraitOutputs.seedIfMissing(super.assemble(input, registries), RandomSource.create());
+        ItemStack result = CraftedTraitOutputs.seedIfMissing(super.assemble(input, registries), RandomSource.create());
+        if (CraftedTraitOutputs.isUnidentified(result) && allPlatesAnnealed(input)) {
+            result.set(ModDataComponents.ANNEALED.get(), true);
+        }
+        return result;
+    }
+
+    /** At least one plate, and every plate pressed under Hydrogen. */
+    private static boolean allPlatesAnnealed(CraftingInput input) {
+        boolean anyPlate = false;
+        for (ItemStack stack : input.items()) {
+            if (stack.is(ModTags.Items.PLATES)) {
+                if (!CraftedTraitOutputs.isAnnealed(stack)) {
+                    return false;
+                }
+                anyPlate = true;
+            }
+        }
+        return anyPlate;
     }
 
     @Override

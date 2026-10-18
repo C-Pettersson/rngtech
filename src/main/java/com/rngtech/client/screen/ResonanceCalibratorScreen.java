@@ -695,6 +695,7 @@ public class ResonanceCalibratorScreen extends AbstractContainerScreen<Resonance
             case ResonanceCalibratorBlockEntity.STATUS_INSUFFICIENT_STAGE ->
                     Component.translatable("rngtech.calibrator.status.insufficient_stage");
             case ResonanceCalibratorBlockEntity.STATUS_OUTPUT_FULL -> Component.translatable("rngtech.calibrator.status.output_full");
+            case ResonanceCalibratorBlockEntity.STATUS_FILLING_BATCH -> Component.translatable("rngtech.calibrator.status.filling_batch");
             case ResonanceCalibratorBlockEntity.STATUS_NO_POWER -> Component.translatable("rngtech.calibrator.status.no_power");
             default -> Component.translatable("rngtech.calibrator.status.ready");
         };
@@ -705,6 +706,7 @@ public class ResonanceCalibratorScreen extends AbstractContainerScreen<Resonance
             case ResonanceCalibratorBlockEntity.STATUS_READY -> PROGRESS;
             case ResonanceCalibratorBlockEntity.STATUS_NO_POWER -> 0xFFD3A33A;
             case ResonanceCalibratorBlockEntity.STATUS_NO_INPUT,
+                    ResonanceCalibratorBlockEntity.STATUS_FILLING_BATCH,
                     ResonanceCalibratorBlockEntity.STATUS_MISSING_PATTERN,
                     ResonanceCalibratorBlockEntity.STATUS_MISSING_CATALYST,
                     ResonanceCalibratorBlockEntity.STATUS_MISSING_RESONANCE_COIL,

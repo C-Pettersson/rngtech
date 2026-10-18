@@ -62,8 +62,8 @@ public class FurnaceMenu extends AbstractContainerMenu implements MasteryMenuVie
     private static final int DATA_ENERGY_USAGE = DATA_ENERGY_CAPACITY + 1;
     private static final int DATA_ENERGY_CAPACITY_STAT = DATA_ENERGY_USAGE + 1;
     private static final int DATA_ENERGY_TRANSFER = DATA_ENERGY_CAPACITY_STAT + 1;
-    private static final int DATA_WARMUP_TIME = DATA_ENERGY_TRANSFER + 1;
-    private static final int DATA_COOLING_RATE = DATA_WARMUP_TIME + 1;
+    private static final int DATA_THERMAL_MASS = DATA_ENERGY_TRANSFER + 1;
+    private static final int DATA_COOLING_RATE = DATA_THERMAL_MASS + 1;
     private static final int DATA_OVERHEAT_TOLERANCE = DATA_COOLING_RATE + 1;
     private static final int DATA_INPUT_SLOTS = DATA_OVERHEAT_TOLERANCE + 1;
     private static final int DATA_GEAR_SLOTS = DATA_INPUT_SLOTS + 1;
@@ -78,7 +78,20 @@ public class FurnaceMenu extends AbstractContainerMenu implements MasteryMenuVie
     private static final int DATA_POWER_SENSITIVE_START = DATA_FAILURE_ENABLED_START + MAX_PROCESSING_SLOTS;
     private static final int DATA_LEDGER_START = DATA_POWER_SENSITIVE_START + MAX_PROCESSING_SLOTS;
     private static final int DATA_BATCH_SIZE = DATA_LEDGER_START + MAX_PROCESSING_SLOTS;
-    private static final int DATA_MACHINE_PROGRESSION_START = DATA_BATCH_SIZE + 1;
+    private static final int DATA_HEAT_SLIDER = DATA_BATCH_SIZE + 1;
+    private static final int DATA_SETPOINT_START = DATA_HEAT_SLIDER + 1;
+    private static final int DATA_THERMAL_CONDUCTIVITY = DATA_SETPOINT_START + MAX_PROCESSING_SLOTS;
+    private static final int DATA_HOLDING_ENERGY = DATA_THERMAL_CONDUCTIVITY + 1;
+    private static final int DATA_HEATING_ENERGY = DATA_HOLDING_ENERGY + 1;
+    private static final int DATA_HEAT_FACTOR = DATA_HEATING_ENERGY + 1;
+    private static final int DATA_WOBBLE = DATA_HEAT_FACTOR + 1;
+    private static final int DATA_HEAT_REACH = DATA_WOBBLE + 1;
+    private static final int DATA_HEAT_MAXIMUM = DATA_HEAT_REACH + 1;
+    private static final int DATA_INPUT_ENERGY = DATA_HEAT_MAXIMUM + 1;
+    private static final int DATA_NITROGEN = DATA_INPUT_ENERGY + 1;
+    private static final int DATA_NITROGEN_USE = DATA_NITROGEN + 1;
+    private static final int DATA_NITROGEN_BONUS = DATA_NITROGEN_USE + 1;
+    private static final int DATA_MACHINE_PROGRESSION_START = DATA_NITROGEN_BONUS + 1;
     private static final int DATA_COUNT = DATA_MACHINE_PROGRESSION_START + MasteryMenuSupport.FIELD_COUNT;
     private static final int STAT_SCALE = 100;
     private static final int MACHINE_SLOT_COUNT = FurnaceBlockEntity.SLOT_COUNT;
@@ -306,6 +319,20 @@ public class FurnaceMenu extends AbstractContainerMenu implements MasteryMenuVie
         return data.get(DATA_MIN_TEMPERATURE);
     }
 
+    /** The overheat slider, 0 to 100 percent of the band from the recipe target to Max Temperature. */
+    public int heatSlider() {
+        return data.get(DATA_HEAT_SLIDER);
+    }
+
+    /** The hottest setpoint among the active lanes; each lane holds its own recipe's. */
+    public int setpoint() {
+        int setpoint = 0;
+        for (int lane = 0; lane < activeProcessingSlots(); lane++) {
+            setpoint = Math.max(setpoint, data.get(DATA_SETPOINT_START + lane));
+        }
+        return setpoint;
+    }
+
     public int heat() {
         int heat = 0;
         for (int lane = 0; lane < activeProcessingSlots(); lane++) {
@@ -328,6 +355,18 @@ public class FurnaceMenu extends AbstractContainerMenu implements MasteryMenuVie
             safeMaximumTemperature = Math.max(safeMaximumTemperature, data.get(DATA_SAFE_MAX_TEMPERATURE_START + lane));
         }
         return safeMaximumTemperature;
+    }
+
+    public int nitrogen() {
+        return data.get(DATA_NITROGEN);
+    }
+
+    public int nitrogenUse() {
+        return data.get(DATA_NITROGEN_USE);
+    }
+
+    public int nitrogenBonusPercent() {
+        return data.get(DATA_NITROGEN_BONUS);
     }
 
     public int overheatTemperature() {
@@ -483,7 +522,7 @@ public class FurnaceMenu extends AbstractContainerMenu implements MasteryMenuVie
     }
 
     public static int warmupTimeDataIndex() {
-        return DATA_WARMUP_TIME;
+        return DATA_THERMAL_MASS;
     }
 
     public static int coolingRateDataIndex() {
@@ -498,12 +537,54 @@ public class FurnaceMenu extends AbstractContainerMenu implements MasteryMenuVie
         return DATA_INPUT_SLOTS;
     }
 
+    public static int thermalConductivityDataIndex() {
+        return DATA_THERMAL_CONDUCTIVITY;
+    }
+
+    /** FE/t the heater spent last tick replacing heat lost through the walls. */
+    public int holdingEnergy() {
+        return data.get(DATA_HOLDING_ENERGY);
+    }
+
+    /** FE/t the heater spent last tick raising the chamber's temperature. */
+    public int heatingEnergy() {
+        return data.get(DATA_HEATING_ENERGY);
+    }
+
+    /** FE/t the input took last tick: the heat the recipe consumes. */
+    public int inputEnergy() {
+        return data.get(DATA_INPUT_ENERGY);
+    }
+
+    /** How fast the input takes heat at the current temperature, in percent. */
+    public int heatFactor() {
+        return data.get(DATA_HEAT_FACTOR);
+    }
+
+    /** How far the working temperature swings around the lane temperature, in degrees. */
+    public int wobble() {
+        return data.get(DATA_WOBBLE);
+    }
+
+    /** The highest setpoint the slider reaches for the current recipe: its 100%. */
+    public int heatReach() {
+        return data.get(DATA_HEAT_REACH);
+    }
+
+    /** The machine's Max Temperature, the top of the slider track. */
+    public int heatMaximum() {
+        return data.get(DATA_HEAT_MAXIMUM);
+    }
+
     public static int batchSizeDataIndex() {
         return DATA_BATCH_SIZE;
     }
 
     @Override
     public boolean clickMenuButton(Player player, int id) {
+        if (HeatSliderSupport.handle(player, id, furnace::setHeatSlider)) {
+            return true;
+        }
         MegaPassiveNode passiveNode = MegaPassiveTree.byButtonId(id);
         if (passiveNode != null) {
             if (player.level().isClientSide) {

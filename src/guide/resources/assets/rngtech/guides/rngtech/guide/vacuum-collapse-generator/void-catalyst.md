@@ -15,12 +15,12 @@ A Void Catalyst is Ender Slurry sealed around a Nullite core in a Tungstensteel 
 
 Each collapse with a Dimensional Stabilizer installed leaves at least one Collapse Residue, and one Residue makes slurry for two catalysts, so a running generator with a hot Melter has Residue to spare and needs only half the Ammonia: 500 mB per catalyst instead of 1,000.
 
-A Void Catalyst lasts one collapse of 2,400 ticks (two minutes) at rated depth, so a generator running nonstop uses about 30 an hour, and 15,000 to 30,000 mB of Ammonia an hour for their slurry, a sixth of one Ammonia Synthesizer's output at most. Burned in an [Ammonia Fuel Cell](rngtech:ammonia-fuel-cell.md) instead, 1,000 mB of Ammonia makes about 216,000 FE; in a Void Catalyst it helps make about 2.4M FE.
+A Void Catalyst lasts one collapse of 2,400 ticks (two minutes) at rated depth, so a generator running nonstop uses about 30 an hour, and 15,000 to 30,000 mB of Ammonia an hour for their slurry, a sixth of one Ammonia Synthesizer's output at most. Burned in a [Fuel Cell](rngtech:ammonia-fuel-cell.md) instead, 1,000 mB of Ammonia makes about 216,000 FE; in a Void Catalyst it helps make about 2.4M FE.
 
-| Input | Output | Time | Energy | Min. temperature | Processing level | Mastery XP |
+| Input | Output | Time | Heat | Min. temperature | Processing level | Mastery XP |
 |---|---|---|---|---|---|---|
-| <ItemLink id="minecraft:ender_pearl" /> *(Primary ingredient)*<br /><ItemLink id="minecraft:ender_pearl" /> *(Secondary ingredient)*<br />Ammonia (1,000 mB) *(Fluid input)* | Ender Slurry (1,000 mB) *(Fluid output)* | 12 s | 4,800 FE | 1,200 | 6 | 5 |
-| <ItemLink id="minecraft:ender_pearl" /> *(Primary ingredient)*<br />**Collapse Residue** *(Secondary ingredient)*<br />Ammonia (1,000 mB) *(Fluid input)* | Ender Slurry (2,000 mB) *(Fluid output)* | 18 s | 9,600 FE | 1,600 | 6 | 8 |
+| <ItemLink id="minecraft:ender_pearl" /> *(Primary ingredient)*<br /><ItemLink id="minecraft:ender_pearl" /> *(Secondary ingredient)*<br />Ammonia (1,000 mB) *(Fluid input)* | Ender Slurry (1,000 mB) *(Fluid output)* | 12 s | 3,984 HU | 1,200 | 6 | 5 |
+| <ItemLink id="minecraft:ender_pearl" /> *(Primary ingredient)*<br />**Collapse Residue** *(Secondary ingredient)*<br />Ammonia (1,000 mB) *(Fluid input)* | Ender Slurry (2,000 mB) *(Fluid output)* | 18 s | 10,029 HU | 1,600 | 6 | 8 |
 
 | Input | Output | Time | Energy | Rolls traits |
 |---|---|---|---|---|

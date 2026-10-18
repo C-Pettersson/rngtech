@@ -19,7 +19,7 @@
     "id": "rngtech:zinc_gear"
   },
   "processing_ticks": 300,
-  "energy": 3600,
+  "heat": 1550,
   "minimum_temperature": 1000,
   "safe_maximum_temperature": 1300,
   "required_temperature_stability": 1.0,

@@ -368,7 +368,7 @@ def carbon_loop():
 
 def ammonia():
     s = Setup("ammonia", "Ammonia S6", "Methane (debug) > Reformer > H2; Cavitation Generator splits water into N2; "
-                                       "Ammonia Synthesizer > Ammonia Fuel Cell. CO and residue go to trashcans.")
+                                       "Ammonia Synthesizer > Fuel Cell. CO and residue go to trashcans.")
     # Channels: fluid 0 water, 1 methane, 2 hydrogen, 3 carbon monoxide, 4 nitrogen, 5 ammonia; item 0 residue.
     s.machine(0, "rngtech:debug_tank", debug_tank("rngtech:methane"), fluids=[fout(1, "rngtech:methane")])
     s.machine(2, "rngtech:debug_tank", debug_tank(WATER), fluids=[fout(0, WATER)])
@@ -471,6 +471,102 @@ def side_power():
     return s
 
 
+def mastery(start, target, level=60):
+    """A machine_progression component at `level` with the shortest path from `start` to `target` allocated."""
+    tree = json.loads((ROOT / "src/main/resources/data/rngtech/mastery/machine_tree.json").read_text(encoding="utf-8"))
+    kinds = {node["id"]: node["kind"] for node in tree["nodes"]}
+    links = {}
+    for a, b in tree["links"]:
+        links.setdefault(a, []).append(b)
+        links.setdefault(b, []).append(a)
+    start_id = f"start_{start}"
+    previous, queue = {start_id: None}, [start_id]
+    while queue and target not in previous:
+        current = queue.pop(0)
+        for nxt in links.get(current, []):
+            if nxt not in previous and kinds[nxt] != "STARTER":
+                previous[nxt] = current
+                queue.append(nxt)
+    path, node = [], target
+    while previous[node] is not None:
+        path.append(node)
+        node = previous[node]
+    return {"rngtech:machine_progression": {"tree_version": tree["version"], "xp": Tag("93085595L"), "level": level,
+                                            "start": start_id, "allocated_nodes": path[::-1]}}
+
+
+def nitrogen_atmosphere():
+    s = Setup("nitrogen_atmosphere", "Nitrogen atmosphere",
+              "Two Blast Draft Tungstensteel Furnaces smelt tin dust at 40% slider, only the first on Nitrogen; a "
+              "Titanium Alloy Furnace and a Metal Press with Blast Draft and Nitrogen wait for hand-fed input.")
+    # Channels: fluid 0 nitrogen; item 0 tin dust, 1 output.
+    nitrogen = "rngtech:nitrogen"
+    blast = mastery("drive_reserve", "blast_draft")
+    s.machine(0, "rngtech:debug_battery", {"OutputRate": 100_000}, energy="input")
+    s.machine(2, "rngtech:debug_tank", debug_tank(nitrogen), fluids=[fout(0, nitrogen)])
+    s.machine(4, "rngtech:debug_chest", debug_chest(stack("rngtech:tin_dust", 64)), items=[iout(0)])
+    for x, fluids in ((6, [fin(0, nitrogen)]), (8, [])):
+        s.machine(x, "rngtech:tungstensteel_furnace_chassis",
+                  {"Inventory": inventory(9, {4: "rngtech:nullite_battery_cell"}),
+                   "GearInventory": inventory(1, {0: "rngtech:titanium_heat_core"}),
+                   "HeatTrack": 40, "components": blast},
+                  energy="output", fluids=fluids, items=[iin(0), iout(1)])
+    s.machine(10, "rngtech:titanium_alloy_furnace_chassis",
+              {"GearInventory": inventory(4, {0: "rngtech:titanium_heat_core", 1: "rngtech:titanium_alloy_crucible",
+                                              2: "rngtech:arclite_battery_cell"}),
+               "HeatTrack": 40, "components": blast},
+              energy="output", fluids=[fin(0, nitrogen)])
+    s.machine(12, "rngtech:metal_press",
+              {"GearInventory": inventory(8, {0: "rngtech:steel_heat_core", 1: "rngtech:steel_servo",
+                                              2: "rngtech:plate_mold", 7: "rngtech:invar_battery_cell"}),
+               "HeatTrack": 40, "components": mastery("control", "blast_draft")},
+              energy="output", fluids=[fin(0, nitrogen)])
+    s.machine(14, "rngtech:debug_trashcan", None, items=[iin(1, attach="south")])
+    return s
+
+
+def ascended(ascendancy, nodes):
+    """A level-60 machine_progression component with one ascendancy and two Seal tiers (4 points)."""
+    return {"rngtech:machine_progression": {"xp": Tag("93085595L"), "level": 60, "ascendancy": ascendancy,
+                                            "ascendancy_nodes": nodes, "seal_tiers": 2}}
+
+
+def hydrogen_chemistry():
+    s = Setup("hydrogen_chemistry", "Hydrogen chemistry",
+              "CO (debug) > water-gas shift Reformer > Hydrogen and Carbon Exhaust; a Fuel Cell burns Hydrogen; an "
+              "Ammonia Synthesizer makes Urea from Ammonia (debug) and the shift exhaust; a Hydrogen Quench press "
+              "anneals iron plates and a Bright Anneal press anneals Basic circuits into a chest.")
+    # Channels: fluid 0 water, 1 carbon monoxide, 2 hydrogen, 3 carbon exhaust, 4 ammonia; item 0 iron, 1 blanks, 2 output.
+    hydrogen, exhaust, ammonia = "rngtech:hydrogen", "rngtech:carbon_exhaust", "rngtech:ammonia"
+    s.machine(0, "rngtech:debug_battery", {"OutputRate": 100_000}, energy="input")
+    s.machine(2, "rngtech:debug_tank", debug_tank(WATER), fluids=[fout(0, WATER)])
+    s.machine(4, "rngtech:debug_tank", debug_tank("rngtech:carbon_monoxide"), fluids=[fout(1, "rngtech:carbon_monoxide")])
+    s.machine(6, "rngtech:steam_methane_reformer", reformer_gear(), energy="output",
+              fluids=[fin(0, WATER), fin(1, "rngtech:carbon_monoxide"), fout(2, hydrogen)])
+    s.extra_cable(5, -1, "east", fluids=[fout(3, exhaust)])
+    s.machine(8, "rngtech:debug_tank", debug_tank(hydrogen), fluids=[fout(2, hydrogen)])
+    s.machine(10, "rngtech:ammonia_fuel_cell",
+              {"GearInventory": inventory(2, {0: "rngtech:fuel_cell_membrane", 1: "rngtech:arclite_battery_cell"})},
+              energy="input", fluids=[fin(2, hydrogen)])
+    s.machine(12, "rngtech:debug_tank", debug_tank(ammonia), fluids=[fout(4, ammonia)])
+    s.machine(14, "rngtech:ammonia_synthesizer", {"GearInventory": inventory(1, {0: "rngtech:ammonia_catalyst_bed"})},
+              energy="output", fluids=[fin(4, ammonia), fin(3, exhaust)])
+    s.machine(16, "rngtech:debug_chest", debug_chest(stack("minecraft:iron_ingot", 64)), items=[iout(0)])
+    s.machine(18, "rngtech:metal_press",
+              {"GearInventory": inventory(8, {0: "rngtech:titanium_heat_core", 1: "rngtech:steel_servo",
+                                              2: "rngtech:plate_mold", 7: "rngtech:arclite_battery_cell"}),
+               "components": ascended("drop_forge", ["drop_hammer", "quench_line", "hydrogen_quench"])},
+              energy="output", fluids=[fin(2, hydrogen)], items=[iin(0), iout(2)])
+    s.machine(20, "rngtech:debug_chest", debug_chest(stack("rngtech:basic_circuit_blank", 64)), items=[iout(1)])
+    s.machine(22, "rngtech:metal_press",
+              {"GearInventory": inventory(8, {0: "rngtech:titanium_heat_core", 1: "rngtech:steel_servo",
+                                              2: "rngtech:circuit_mold", 7: "rngtech:arclite_battery_cell"}),
+               "components": ascended("die_keeper", ["mold_rack", "purge_line", "bright_anneal"])},
+              energy="output", fluids=[fin(2, hydrogen)], items=[iin(1), iout(2)])
+    s.machine(24, "minecraft:chest", None, items=[iin(2, attach="south")])
+    return s
+
+
 def ore_lines():
     """Crusher > Furnace per stage, from tools/balance/processing-setups.json, on the stage's raw ore."""
     data = json.loads((ROOT / "tools/balance/processing-setups.json").read_text(encoding="utf-8"))
@@ -497,7 +593,9 @@ def ore_lines():
 
 
 def all_setups():
-    return [coal(), syngas(), carbon_loop(), ammonia(), void_catalyst(), water(), side_power(), *ore_lines()]
+    return [coal(), syngas(), carbon_loop(), ammonia(), void_catalyst(), water(), side_power(), nitrogen_atmosphere(),
+            hydrogen_chemistry(),
+            *ore_lines()]
 
 
 # ---- datapack ------------------------------------------------------------------------------------------------------

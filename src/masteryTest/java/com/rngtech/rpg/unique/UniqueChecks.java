@@ -129,18 +129,18 @@ public final class UniqueChecks {
         UniqueDefinition fortress = UniqueCatalog.get(FORTRESS);
         List<MachineModifier> rolls = fortress.rollModifiers(List.of(-0.7, 30.0, 0.5, -0.5, -0.5));
         MachineStatAccumulator part = ComponentBaseStatCatalog.uniqueStats(fortress, rolls);
-        near(part.baseValue(MachineStat.WARMUP_TIME), 0.3, "70% less Warmup Time on the part");
+        near(part.baseValue(MachineStat.THERMAL_MASS), 0.3, "70% less Warmup Time on the part");
         near(part.baseValue(MachineStat.OVERHEAT_TOLERANCE), 0.5, "50% less Overheat Tolerance");
         near(part.baseValue(MachineStat.TEMPERATURE_STABILITY), 1.12, "Sparksteel Temperature Stability is untouched");
         near(part.baseValue(MachineStat.MAX_TEMPERATURE), 1000, "the fixed Sparksteel Maximum Temperature");
         near(part.baseValue(MachineStat.FUEL_EFFICIENCY), 1.25 * 0.5, "the fixed 50% less Fuel Efficiency");
         MachineStatAccumulator furnace = new MachineStatAccumulator();
-        furnace.apply(new MachineModifier(ModifierSlot.IMPLICIT, MachineStat.WARMUP_TIME, ModifierOperation.ADD, 1.0));
+        furnace.apply(new MachineModifier(ModifierSlot.IMPLICIT, MachineStat.THERMAL_MASS, ModifierOperation.ADD, 1.0));
         furnace.apply(new MachineModifier(ModifierSlot.IMPLICIT, MachineStat.MAX_TEMPERATURE, ModifierOperation.ADD,
                 MachineStatAccumulator.FURNACE_BASE_MAX_TEMPERATURE));
         furnace.setAscendancy("crucible_keeper");
         ComponentBaseStatCatalog.applyUniqueContribution(furnace, fortress, rolls);
-        near(furnace.value(MachineStat.WARMUP_TIME), 0.3, "the host's Warmup Time takes the part's multiplier");
+        near(furnace.value(MachineStat.THERMAL_MASS), 0.3, "the host's Warmup Time takes the part's multiplier");
         near(furnace.increasedPercent(MachineStat.ENERGY_USAGE), 50.0, "increased Energy Usage joins the host bucket");
         near(furnace.value(MachineStat.MAX_TEMPERATURE), MachineStatAccumulator.FURNACE_BASE_MAX_TEMPERATURE + 1000, "Maximum Temperature adds");
 
@@ -181,7 +181,7 @@ public final class UniqueChecks {
         keeper.setAscendancy("crucible_keeper");
         ComponentBaseStatCatalog.applyUniqueContribution(keeper, fortress, rolls);
         near(keeper.value(MachineStat.OVERDRIVE_MARGIN), 30, "Crucible Keeper reads the rolled Overdrive Margin");
-        near(keeper.value(MachineStat.WARMUP_TIME), without.value(MachineStat.WARMUP_TIME), "non-hook lines ignore the ascendancy");
+        near(keeper.value(MachineStat.THERMAL_MASS), without.value(MachineStat.THERMAL_MASS), "non-hook lines ignore the ascendancy");
     }
 
     private static void storageKeepsRollsOnlyOnUniques() {
@@ -202,10 +202,10 @@ public final class UniqueChecks {
     }
 
     private static void changedRangesClamp() {
-        UniqueStatLine line = new UniqueStatLine(MachineStat.WARMUP_TIME, UniqueStatLine.Operation.MORE, -0.6, -0.8,
+        UniqueStatLine line = new UniqueStatLine(MachineStat.THERMAL_MASS, UniqueStatLine.Operation.MORE, -0.6, -0.8,
                 UniqueStatLine.Role.SIGNATURE, "");
         UniqueDefinition narrowed = new UniqueDefinition("fixture", UniqueHost.HEAT_CORE, 4, "titanium", List.of(line), List.of(), "");
-        MachineModifier outside = new MachineModifier("", "", ModifierSlot.UNIQUE, MachineStat.WARMUP_TIME, ModifierOperation.MORE, 0,
+        MachineModifier outside = new MachineModifier("", "", ModifierSlot.UNIQUE, MachineStat.THERMAL_MASS, ModifierOperation.MORE, 0,
                 new com.rngtech.rpg.ModifierValueRange(0.0, 1.0), 0.05, List.of());
         near(narrowed.value(line, List.of(outside)), -0.8, "a stored roll past the new range clamps to its best end");
         near(narrowed.value(line, List.of()), -0.7, "a line missing from an old copy uses its midpoint");

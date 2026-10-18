@@ -64,7 +64,8 @@ public enum ModifierLensTag {
                     MINING_SPEED,
                     ATTACK_SPEED,
                     ORE_BURST_SPEED,
-                    WARMUP_TIME,
+                    THERMAL_MASS,
+                    THERMAL_CONDUCTIVITY,
                     COOLING_RATE -> tags.add(SPEED);
             case OUTPUT_AMOUNT,
                     SUPER_OUTPUT_CHANCE,

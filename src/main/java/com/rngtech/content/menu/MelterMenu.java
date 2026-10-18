@@ -68,7 +68,18 @@ public class MelterMenu extends AbstractContainerMenu implements MasteryMenuView
     private static final int DATA_BATCH_SIZE = DATA_REFINEMENT_POTENTIAL + 1;
     private static final int DATA_INPUT_FLUID_ID = DATA_BATCH_SIZE + 1;
     private static final int DATA_OUTPUT_FLUID_ID = DATA_INPUT_FLUID_ID + 1;
-    private static final int DATA_MACHINE_PROGRESSION_START = DATA_OUTPUT_FLUID_ID + 1;
+    private static final int DATA_HEAT_SLIDER = DATA_OUTPUT_FLUID_ID + 1;
+    private static final int DATA_SETPOINT = DATA_HEAT_SLIDER + 1;
+    private static final int DATA_THERMAL_CONDUCTIVITY = DATA_SETPOINT + 1;
+    private static final int DATA_HOLDING_ENERGY = DATA_THERMAL_CONDUCTIVITY + 1;
+    private static final int DATA_HEATING_ENERGY = DATA_HOLDING_ENERGY + 1;
+    private static final int DATA_HEAT_FACTOR = DATA_HEATING_ENERGY + 1;
+    private static final int DATA_WOBBLE = DATA_HEAT_FACTOR + 1;
+    private static final int DATA_HEAT_REACH = DATA_WOBBLE + 1;
+    private static final int DATA_HEAT_MAXIMUM = DATA_HEAT_REACH + 1;
+    private static final int DATA_OVERHEAT_TEMPERATURE = DATA_HEAT_MAXIMUM + 1;
+    private static final int DATA_INPUT_ENERGY = DATA_OVERHEAT_TEMPERATURE + 1;
+    private static final int DATA_MACHINE_PROGRESSION_START = DATA_INPUT_ENERGY + 1;
     private static final int DATA_COUNT = DATA_MACHINE_PROGRESSION_START + MasteryMenuSupport.FIELD_COUNT;
     private static final int STAT_SCALE = 100;
     private static final int PROCESS_SLOT_COUNT = MelterBlockEntity.PROCESS_SLOT_COUNT;
@@ -171,8 +182,13 @@ public class MelterMenu extends AbstractContainerMenu implements MasteryMenuView
     }
 
     public float heatProgress() {
-        int target = Math.max(data.get(DATA_MIN_TEMPERATURE), data.get(DATA_HEAT));
-        return target <= 0 ? 0.0F : Mth.clamp((float) data.get(DATA_HEAT) / (float) target, 0.0F, 1.0F);
+        int scale = heatScale();
+        return scale <= 0 ? 0.0F : Mth.clamp((float) data.get(DATA_HEAT) / (float) scale, 0.0F, 1.0F);
+    }
+
+    /** The heat bar's top: the melting point's safe band, the setpoint, or the current heat, whichever is highest. */
+    public int heatScale() {
+        return Math.max(Math.round(data.get(DATA_MIN_TEMPERATURE) * 1.15F), Math.max(data.get(DATA_SETPOINT), data.get(DATA_HEAT)));
     }
 
     public float inputFluidProgress() {
@@ -204,6 +220,15 @@ public class MelterMenu extends AbstractContainerMenu implements MasteryMenuView
 
     public int energyCapacity() {
         return data.get(DATA_ENERGY_CAPACITY);
+    }
+
+    /** The overheat slider, 0 to 100 percent of the band from the recipe target to Max Temperature. */
+    public int heatSlider() {
+        return data.get(DATA_HEAT_SLIDER);
+    }
+
+    public int setpoint() {
+        return data.get(DATA_SETPOINT);
     }
 
     public int heat() {
@@ -346,6 +371,50 @@ public class MelterMenu extends AbstractContainerMenu implements MasteryMenuView
         return DATA_MAX_TEMPERATURE;
     }
 
+    public static int thermalConductivityDataIndex() {
+        return DATA_THERMAL_CONDUCTIVITY;
+    }
+
+    /** FE/t the heater spent last tick replacing heat lost through the walls. */
+    public int holdingEnergy() {
+        return data.get(DATA_HOLDING_ENERGY);
+    }
+
+    /** FE/t the heater spent last tick raising the chamber's temperature. */
+    public int heatingEnergy() {
+        return data.get(DATA_HEATING_ENERGY);
+    }
+
+    /** FE/t the input took last tick: the heat the recipe consumes. */
+    public int inputEnergy() {
+        return data.get(DATA_INPUT_ENERGY);
+    }
+
+    /** How fast the input takes heat at the current temperature, in percent. */
+    public int heatFactor() {
+        return data.get(DATA_HEAT_FACTOR);
+    }
+
+    /** How far the working temperature swings around the lane temperature, in degrees. */
+    public int wobble() {
+        return data.get(DATA_WOBBLE);
+    }
+
+    /** The highest setpoint the slider reaches for the current recipe: its 100%. */
+    public int heatReach() {
+        return data.get(DATA_HEAT_REACH);
+    }
+
+    /** The machine's Max Temperature, the top of the slider track. */
+    public int heatMaximum() {
+        return data.get(DATA_HEAT_MAXIMUM);
+    }
+
+    /** The melt's overheat temperature: its safe maximum stretched by Overheat Tolerance. */
+    public int overheatTemperature() {
+        return data.get(DATA_OVERHEAT_TEMPERATURE);
+    }
+
     public static int batchSizeDataIndex() {
         return DATA_BATCH_SIZE;
     }
@@ -360,6 +429,9 @@ public class MelterMenu extends AbstractContainerMenu implements MasteryMenuView
 
     @Override
     public boolean clickMenuButton(Player player, int id) {
+        if (HeatSliderSupport.handle(player, id, melter::setHeatSlider)) {
+            return true;
+        }
         if (FluidPurgeSupport.handleMenuButton(player, melter, id)) {
             return true;
         }

@@ -48,6 +48,7 @@ public class MachineBlockItem extends BlockItem {
         }
         boolean temporaryPlacementRoll = !level.isClientSide && !stack.has(ModDataComponents.MACHINE_TRAITS.get());
         UnidentifiedTraitRoll unidentifiedRoll = stack.get(ModDataComponents.UNIDENTIFIED_TRAIT_ROLL.get());
+        boolean annealed = CraftedTraitOutputs.isAnnealed(stack);
         if (temporaryPlacementRoll) {
             rollTraitsIfMissing(stack, level);
         }
@@ -57,6 +58,9 @@ public class MachineBlockItem extends BlockItem {
             stack.remove(ModDataComponents.MACHINE_TRAITS.get());
             if (!stack.isEmpty() && unidentifiedRoll != null) {
                 stack.set(ModDataComponents.UNIDENTIFIED_TRAIT_ROLL.get(), unidentifiedRoll);
+                if (annealed) {
+                    stack.set(ModDataComponents.ANNEALED.get(), true);
+                }
             }
         }
         return result;

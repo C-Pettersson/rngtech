@@ -2,7 +2,7 @@
 navigation:
   title: "Using Algae Biomass"
   parent: algae-photobioreactor.md
-  position: 2
+  position: 3
   icon: rngtech:algae_photobioreactor
 ---
 

@@ -17,6 +17,7 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -52,7 +53,7 @@ public final class OverheatCoolingGameTests {
         press.getGearInventory().setStackInSlot(MetalPressBlockEntity.SLOT_SERVO, new ItemStack(ModItems.servo(ServoMaterial.STEEL).get()));
         press.getGearInventory().setStackInSlot(MetalPressBlockEntity.SLOT_MOLD, new ItemStack(ModItems.PLATE_MOLD.get()));
         press.getProcessInventory().setStackInSlot(MetalPressBlockEntity.SLOT_INPUT, new ItemStack(Items.IRON_INGOT, 2));
-        withSaved(helper, press, tag -> tag.putInt("CurrentTemperature", LEFTOVER_HEAT));
+        withSaved(helper, press, tag -> tag.getCompound("Heat").putDouble("Temperature", LEFTOVER_HEAT));
         MachineTestSupport.powerEachTick(helper, press.getEnergyStorage(null));
 
         helper.onEachTick(() -> {
@@ -72,11 +73,7 @@ public final class OverheatCoolingGameTests {
                 ModBlocks.furnaceChassis(FurnaceChassisMaterial.TITANIUM).get(), FurnaceBlockEntity.class);
         furnace.getGearInventory().setStackInSlot(0, new ItemStack(ModItems.heatCore(HeatCoreMaterial.TITANIUM).get()));
         furnace.getInventory().setStackInSlot(FurnaceBlockEntity.SLOT_INPUT_START, new ItemStack(item("lead_dust"), 2));
-        withSaved(helper, furnace, tag -> {
-            int[] temperatures = tag.getIntArray("CurrentTemperatures");
-            temperatures[0] = LEFTOVER_HEAT;
-            tag.putIntArray("CurrentTemperatures", temperatures);
-        });
+        withSaved(helper, furnace, tag -> tag.getList("HeatLanes", Tag.TAG_COMPOUND).getCompound(0).putDouble("Temperature", LEFTOVER_HEAT));
         MachineTestSupport.powerEachTick(helper, furnace.getEnergyStorage(null));
 
         IItemHandler inventory = furnace.getInventory();

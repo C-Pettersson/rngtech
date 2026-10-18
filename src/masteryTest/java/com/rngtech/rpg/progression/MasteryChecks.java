@@ -61,6 +61,7 @@ public final class MasteryChecks {
         checks += SoulTransferChecks.run();
         checks += com.rngtech.rpg.dormant.DormantChecks.run();
         checks += PartGenerationChecks.run();
+        checks += com.rngtech.rpg.AnnealingChecks.run();
         checks += CrusherYieldChecks.run();
         checks += com.rngtech.content.energy.CorrosionCellLoadChecks.run();
         checks += RefinementChecks.run();
@@ -75,6 +76,8 @@ public final class MasteryChecks {
         checks += com.rngtech.content.energy.SolidFuelBurnerStokeChecks.run();
         checks += com.rngtech.content.blockentity.VacuumCollapseChecks.run();
         checks += com.rngtech.rpg.VoidCatalystChainChecks.run();
+        checks += com.rngtech.rpg.HeatProgressionChecks.run();
+        checks += com.rngtech.rpg.SmeltGateChecks.run();
         System.out.println("Machine mastery: " + checks + " checks passed");
         ForestryTreeScanChecks.run();
         ForestryCartRulesChecks.run();
@@ -198,7 +201,7 @@ public final class MasteryChecks {
     }
 
     private static void graphAndBuilds() {
-        require(MegaPassiveTree.TREE.nodes().size() == 1348, "full shared catalog");
+        require(MegaPassiveTree.TREE.nodes().size() == 1353, "full shared catalog");
         for (MegaPassiveNode root : MegaPassiveTree.TREE.nodes().stream().filter(n -> n.kind() == PassiveNodeKind.STARTER).toList()) {
             require(root.links().size() == 3, "three exits per starter");
             for (MegaPassiveNode key : MegaPassiveTree.TREE.nodes().stream().filter(n -> n.kind() == PassiveNodeKind.KEYSTONE).toList()) {
@@ -418,6 +421,25 @@ public final class MasteryChecks {
             require(family.supportsBehavior("EVEN_FEED") == (family == MachineMasteryFamily.FURNACE), family + " fills lanes evenly only as a Furnace");
         }
         require(MegaPassiveTree.has(build(MachineMasteryFamily.FURNACE, "even_feed"), "EVEN_FEED"), "a Furnace build reaching Even Feed grants it");
+
+        // Blast Draft unlocks the overheat slider past the safe maximum; it is cheap from the Furnace's start and has no downside.
+        MegaPassiveNode blastDraft = MegaPassiveTree.node("blast_draft");
+        require(blastDraft.kind() == PassiveNodeKind.KEYSTONE && blastDraft.behaviors().equals(Set.of("BLAST_DRAFT")) && blastDraft.effects().isEmpty(),
+                "Blast Draft is a behavior-only keystone");
+        for (MachineMasteryFamily family : MachineMasteryFamily.values()) {
+            require(family.supportsBehavior("BLAST_DRAFT") == (family.has(MachineTag.HEATED) || family == MachineMasteryFamily.MELTER),
+                    family + " pushes the overheat slider only as a heated machine");
+        }
+        require(MegaPassiveTree.has(build(MachineMasteryFamily.FURNACE, "blast_draft"), "BLAST_DRAFT"), "a Furnace build reaching Blast Draft grants it");
+
+        // Cool Headed shares Blast Draft's road node: the same early heat choice, in the other direction.
+        MegaPassiveNode coolHeaded = MegaPassiveTree.node("cool_headed");
+        require(coolHeaded.kind() == PassiveNodeKind.KEYSTONE && coolHeaded.behaviors().equals(Set.of("COOL_HEADED")) && coolHeaded.effects().isEmpty(),
+                "Cool Headed is a behavior-only keystone");
+        require(coolHeaded.links().size() == 1 && coolHeaded.links().equals(blastDraft.links()), "Cool Headed hangs from Blast Draft's travel node");
+        for (MachineMasteryFamily family : MachineMasteryFamily.values()) {
+            require(family.supportsBehavior("COOL_HEADED") == family.supportsBehavior("BLAST_DRAFT"), family + " cools first only as a heated machine");
+        }
     }
 
     /** Speed multiplier the destination keystone adds on top of the route that reaches it. */
@@ -437,7 +459,7 @@ public final class MasteryChecks {
 
     private static final Map<MachineStat, Double> BASE_100 = Arrays.stream(MachineStat.values()).collect(Collectors.toMap(stat -> stat, stat -> 100.0));
     private static final Set<MachineStat> LOWER_IS_BETTER = Set.of(
-            MachineStat.ENERGY_USAGE, MachineStat.WARMUP_TIME, MachineStat.COOLING_RATE, MachineStat.IDLE_LOSS);
+            MachineStat.ENERGY_USAGE, MachineStat.THERMAL_MASS, MachineStat.COOLING_RATE, MachineStat.IDLE_LOSS);
     private static final Set<String> COST_BEHAVIORS = Set.of("BLOCK_BATTERY", "MATCHING_HEAD", "NO_BONUS_OUTPUT",
             "NO_INHERENT_ATTRIBUTES", "NO_INHERENT_CONTROL", "NO_INHERENT_DRIVE", "NO_INHERENT_RESERVE");
 

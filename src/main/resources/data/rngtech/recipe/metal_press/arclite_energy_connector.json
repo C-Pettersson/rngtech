@@ -19,7 +19,7 @@
     "id": "rngtech:arclite_energy_connector"
   },
   "processing_ticks": 240,
-  "energy": 4800,
+  "heat": 2391,
   "minimum_temperature": 1200,
   "safe_maximum_temperature": 1600,
   "required_temperature_stability": 1.0,

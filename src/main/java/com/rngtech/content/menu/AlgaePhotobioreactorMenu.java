@@ -4,6 +4,7 @@ import com.rngtech.content.blockentity.AlgaeCultureDynamics;
 import com.rngtech.content.blockentity.AlgaePhotobioreactorBlockEntity;
 import com.rngtech.content.purge.FluidPurgeSupport;
 import com.rngtech.content.registry.ModBlocks;
+import com.rngtech.content.registry.ModItems;
 import com.rngtech.content.registry.ModMenus;
 import com.rngtech.rpg.MachineStatAccumulator;
 
@@ -47,13 +48,15 @@ public class AlgaePhotobioreactorMenu extends AbstractContainerMenu implements S
     private static final int DATA_AERATION = 13;
     private static final int DATA_DENSITY = 14;
     private static final int DATA_CARBON_PER_HARVEST = 15;
-    private static final int DATA_COUNT = 16;
+    private static final int DATA_UREA_BOOST = 16;
+    private static final int DATA_COUNT = 17;
     private static final int DENSITY_SCALE = 1000;
     private static final int BUTTON_AERATION_BASE = 8000;
     private static final int STAT_SCALE = 100;
     private static final int OUTPUT_BONUS_PROGRESS_SCALE = 1000;
     private static final int BIO_CHAMBER_SLOT = 5;
-    private static final int PLAYER_INVENTORY_START = BIO_CHAMBER_SLOT + 1;
+    private static final int UREA_SLOT = BIO_CHAMBER_SLOT + 1;
+    private static final int PLAYER_INVENTORY_START = UREA_SLOT + 1;
     private static final int HOTBAR_END = PLAYER_INVENTORY_START + 36;
 
     private final ContainerLevelAccess access;
@@ -116,6 +119,7 @@ public class AlgaePhotobioreactorMenu extends AbstractContainerMenu implements S
 
         ItemStackHandler gearInventory = reactor.getGearInventory();
         addSlot(new TabbedSlot(gearInventory, AlgaePhotobioreactorBlockEntity.SLOT_BIO_CHAMBER, 110, 48, () -> selectedTab == TAB_GEAR));
+        addSlot(new TabbedSlot(inventory, AlgaePhotobioreactorBlockEntity.SLOT_UREA, 163, 66, () -> selectedTab == TAB_PROCESSING));
 
         addPlayerInventory(playerInventory);
     }
@@ -252,6 +256,11 @@ public class AlgaePhotobioreactorMenu extends AbstractContainerMenu implements S
         return stillValid(access, player, ModBlocks.ALGAE_PHOTOBIOREACTOR.get());
     }
 
+    /** Harvests left that the last Urea grows at twice the speed. */
+    public int ureaBoost() {
+        return data.get(DATA_UREA_BOOST);
+    }
+
     @Override
     public ItemStack quickMoveStack(Player player, int index) {
         ItemStack moved = ItemStack.EMPTY;
@@ -269,6 +278,10 @@ public class AlgaePhotobioreactorMenu extends AbstractContainerMenu implements S
             }
         } else if (reactor.isBioChamber(stack)) {
             if (!moveItemStackTo(stack, BIO_CHAMBER_SLOT, BIO_CHAMBER_SLOT + 1, false)) {
+                return ItemStack.EMPTY;
+            }
+        } else if (stack.is(ModItems.UREA.get())) {
+            if (!moveItemStackTo(stack, UREA_SLOT, UREA_SLOT + 1, false)) {
                 return ItemStack.EMPTY;
             }
         } else if (AlgaePhotobioreactorBlockEntity.isWaterInputContainer(stack)) {

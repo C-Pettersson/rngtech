@@ -54,6 +54,11 @@ final class JeiCategoryUi {
                 : Component.translatable("rngtech.jei.energy_cost_time_multiplier", energy, ticks, compactDouble(multiplier));
     }
 
+    /** A heated recipe's heat units and reference time; FE follows from the machine's heat loss and Energy Usage. */
+    static Component heatCost(int heat, int ticks) {
+        return Component.translatable("rngtech.jei.heat_cost_time", heat, ticks);
+    }
+
     static Component energyGenerated(int energy, int ticks) {
         return Component.translatable("rngtech.jei.energy_generated_time", energy, ticks);
     }

@@ -12,19 +12,19 @@
 	quests: [
 		{
 			dependencies: ["37A6C9E1284B5D12"]
-			id: "C029A39B5659FEE9"
+			id: "3034E1FAD40A48B2"
 			tasks: [{
-				id: "B110B4865E8713AF"
+				id: "1B35DE0F7799F12B"
 				type: "checkmark"
 			}]
 			x: 0.0d
 			y: 2.5d
 		}
 		{
-			dependencies: ["C029A39B5659FEE9"]
+			dependencies: ["3034E1FAD40A48B2"]
 			id: "1B2ED2616C7CD0DE"
 			tasks: [{
-				id: "CF71266277760952"
+				id: "199AF3301664EAAF"
 				type: "checkmark"
 			}]
 			x: 0.0d
@@ -97,7 +97,7 @@
 			y: 0.0d
 		}
 		{
-			dependencies: ["5410F981F9D5914E", "1FACE973E783CB4C"]
+			dependencies: ["5410F981F9D5914E"]
 			id: "12A0A2EF0429FF13"
 			tasks: [{
 				id: "1D602ABD5801B09F"
@@ -154,7 +154,7 @@
 			y: -1.5d
 		}
 		{
-			dependencies: ["12A0A2EF0429FF13", "7106E7A1B10F0090"]
+			dependencies: ["12A0A2EF0429FF13"]
 			id: "5704E39094767FA2"
 			optional: true
 			tasks: [{
@@ -269,7 +269,7 @@
 			y: -2.0d
 		}
 		{
-			dependencies: ["5410F981F9D5914E", "7106E7A1B10F0322"]
+			dependencies: ["5410F981F9D5914E"]
 			id: "62AFD2FEB4686A8A"
 			tasks: [{
 				id: "1765DE0D5B238198"
@@ -347,27 +347,15 @@
 		}
 		{
 			dependencies: ["12A0A2EF0429FF13"]
-			id: "BAE00B9B83600445"
+			id: "4F6A5736BFB8557E"
 			optional: true
 			tasks: [{
-				id: "BAB578BAE6F2C5E1"
+				id: "57341F9596D07D0A"
 				item: { count: 1, id: "rngtech:volatile_catalyst" }
 				type: "item"
 			}]
 			x: 16.5d
 			y: 0.0d
-		}
-		{
-			dependencies: ["5410F981F9D5914E"]
-			id: "0C91C843EC327E9C"
-			optional: true
-			tasks: [{
-				id: "2F57E38AD09AE085"
-				item: { count: 1, id: "rngtech:frugality_crystal" }
-				type: "item"
-			}]
-			x: 10.0d
-			y: 1.5d
 		}
 	]
 }

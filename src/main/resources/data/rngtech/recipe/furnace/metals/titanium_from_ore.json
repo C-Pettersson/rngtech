@@ -14,7 +14,7 @@
     "id": "rngtech:titanium_ingot"
   },
   "processing_ticks": 900,
-  "energy": 21600,
+  "heat": 20856,
   "experience": 0.7,
   "minimum_temperature": 1450,
   "required_temperature_stability": 1,

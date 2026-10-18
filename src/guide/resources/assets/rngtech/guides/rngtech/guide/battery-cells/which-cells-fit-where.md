@@ -16,7 +16,7 @@ Most slots take any cell. These machines limit the stage:
 | [Bio Generator](rngtech:bio-generator.md) | Optional, Stage 0–3. |
 | [Coal Gasifier](rngtech:coal-gasifier.md), [Syngas Combustor](rngtech:syngas-combustor.md) | Optional, Stage 5 or higher. |
 | [Steam Methane Reformer](rngtech:steam-methane-reformer.md) | Optional, Stage 6 or higher. |
-| [Ammonia Fuel Cell](rngtech:ammonia-fuel-cell.md) | Optional, Stage 6 or higher. |
+| [Fuel Cell](rngtech:ammonia-fuel-cell.md) | Optional, Stage 6 or higher. |
 | [Compressor Tank](rngtech:compressor-tank.md) (Steel and higher) | Required, up to the tank's stage. |
 
 Modular tools and the <ItemLink id="rngtech:miners_companion" /> also run on an installed Battery Cell. The [Tool Bench](rngtech:tool-bench.md) installs cells in modular tools and charges both; the Miner's Companion takes its cell in its own Gear tab.

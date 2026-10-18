@@ -1,12 +1,14 @@
 package com.rngtech.rpg;
 
 import com.rngtech.RNGTechConfig;
+import com.rngtech.content.blockentity.HeatEngine;
 import com.rngtech.content.cable.EnergyConnectorTier;
 import com.rngtech.content.energy.BatteryCellMaterial;
 import com.rngtech.content.energy.HeatCoreMaterial;
 import com.rngtech.content.machine.CrushHeadMaterial;
 import com.rngtech.content.machine.CrusherChassisMaterial;
 import com.rngtech.content.machine.FurnaceChassisMaterial;
+import com.rngtech.content.recipe.RecipeHeat;
 import com.rngtech.rpg.progression.AscendancyFormulas;
 import com.rngtech.rpg.progression.MachineMasteryFamily;
 import com.rngtech.rpg.progression.MachineProgressionState;
@@ -75,7 +77,7 @@ public final class ProcessingBalanceSimulation {
      * Loads RNGTechConfig defaults the way FML builds a fresh config file, so stat bases and recipe scaling read the real
      * values headless. {@code LoadedConfig} is FML-internal; with a corrected config, accepting it never saves.
      */
-    private static void loadDefaultConfig() {
+    static void loadDefaultConfig() {
         CommentedConfig config = CommentedConfig.inMemory();
         RNGTechConfig.SPEC.correct(config);
         try {
@@ -272,7 +274,7 @@ public final class ProcessingBalanceSimulation {
             double mitigation = Math.max(0, Math.min(100, stats.value(MachineStat.HIGH_HARDNESS_ENERGY_MITIGATION))) / 100.0;
             double mitigated = 1 + (surcharge - 1) * (1 - mitigation);
             double surchargeScale = has("SHATTER_POINT") ? 0.5 : 1.0;
-            int baseEnergy = (int) Math.round(Math.max(1, recipe.energy()) * Math.max(0.01, 1 + (mitigated - 1) * surchargeScale));
+            int baseEnergy = (int) Math.round(Math.max(1, recipe.cost()) * Math.max(0.01, 1 + (mitigated - 1) * surchargeScale));
             int perCraftFe = (int) Math.max(1, Math.ceil(stats.adjustedEnergyCost(baseEnergy) * under));
             double runningFePerTick = (double) perCraftFe * jobs / cycle;
 
@@ -353,18 +355,23 @@ public final class ProcessingBalanceSimulation {
             }
             settled = Math.max(recipe.temperature(), settled);
             boolean overdrive = stats.value(MachineStat.OVERDRIVE_CAP) > 0 && stats.value(MachineStat.OVERDRIVE_SPEED) > 0;
+            // Overdrive builds run their lanes at the settled heat; everything else holds the target (slider at 0%).
             int temperature = overdrive ? settled : recipe.temperature();
-            double overdriveMultiplier = AscendancyFormulas.overdriveSpeedMultiplier(temperature, recipe.temperature(), stats);
-            int ticks = Math.max(1, (int) Math.ceil(stats.adjustedHeatProcessingTicks(recipe.ticks()) / overdriveMultiplier));
+            int safeMaximum = (int) Math.round(SAFE_MAXIMUM_SCALE * recipe.temperature());
+            HeatEngine.Envelope envelope = new HeatEngine.Envelope(recipe.temperature(), recipe.temperature(), safeMaximum, safeMaximum,
+                    recipe.stability(), temperature, false, false, temperature);
+            double overdriveMultiplier = AscendancyFormulas.overdriveSpeedMultiplier(temperature, safeMaximum, stats);
+            // Crucible Heart adds an item to each batch while the lane runs at twice the target.
+            int crafts = has("CRUCIBLE_HEART") && temperature >= 2 * recipe.temperature() ? 2 : 1;
+            double cycleWork = recipe.ticks() * BatchProcessing.timeMultiplier(stats, crafts);
+            double workPerTick = HeatEngine.speed(stats) * overdriveMultiplier;
+            HeatEngine.Load load = new HeatEngine.Load(recipe.cost() * (double) crafts * workPerTick / cycleWork, workPerTick, crafts);
+            int ticks = HeatEngine.cycleTicks(cycleWork, load, envelope);
             double instant = clampChance(stats.value(MachineStat.INSTANT_PROCESS_CHANCE));
             double expectedTicks = instant + (1 - instant) * ticks;
-            int crafts = has("CRUCIBLE_HEART") && temperature >= 2 * recipe.temperature() ? 2 : 1;
 
-            int energy = (int) Math.round(Math.max(1, recipe.energy())
-                    * (recipe.temperature() >= RNGTechConfig.FURNACE_HIGH_HEAT_ENERGY_THRESHOLD.get()
-                    ? RNGTechConfig.FURNACE_HIGH_HEAT_ENERGY_MULTIPLIER.get() : 1.0));
-            int perCraftFe = stats.adjustedEnergyCost(energy);
-            double refund = has("CLOSED_LOOP_RECUPERATOR") ? Math.max(1, Math.ceil(0.05 * perCraftFe)) : 0.0;
+            int perCraftFe = HeatEngine.steadyEnergyPerCycle(envelope, load, cycleWork, stats) / crafts;
+            double refund = has("CLOSED_LOOP_RECUPERATOR") ? Math.max(1, Math.ceil(0.25 * recipe.cost() * HeatEngine.energyRate(stats))) : 0.0;
 
             double superChance = recipe.bonusOutput() ? clampChance(stats.value(MachineStat.SUPER_OUTPUT_CHANCE)) : 0.0;
             double ledger = recipe.bonusOutput() && recipe.ledgerInput()
@@ -519,7 +526,7 @@ public final class ProcessingBalanceSimulation {
     // Recipes
     // ---------------------------------------------------------------------------------------------------------------
 
-    private record Recipe(String id, int count, int ticks, int energy, int level, int temperature, double stability,
+    private record Recipe(String id, int count, int ticks, int cost, int level, int temperature, double stability,
             boolean bonusOutput, boolean ledgerInput, boolean crushedInput) {
     }
 
@@ -560,7 +567,8 @@ public final class ProcessingBalanceSimulation {
         int minimum = intOr(json, "minimum_temperature", 0);
         int target = intOr(json, "target_temperature", minimum);
         double stability = json.has("required_temperature_stability") ? json.get("required_temperature_stability").getAsDouble() : 0.0;
-        return new Recipe("furnace/" + id, count, ticks, intOr(json, "energy", ticks * 24), 0, Math.max(minimum, target), stability,
+        return new Recipe("furnace/" + id, count, ticks, intOr(json, "heat", (int) Math.round(ticks * 24 * RecipeHeat.HEAT_PER_LEGACY_FE)), 0,
+                Math.max(minimum, target), stability,
                 !json.has("bonus_output") || json.get("bonus_output").getAsBoolean(), ledgerInput, crushedInput);
     }
 

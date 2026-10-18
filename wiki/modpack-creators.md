@@ -45,7 +45,7 @@ These numbers use freshly crafted parts and no Mastery. Rolled affixes and Maste
 | 3 | Solid Fuel Burner, Bronze Heat Core | 64 | 48–96 FE/t |
 | 4 | Solid Fuel Burner, Steel Heat Core | 96 | about 96 FE/t |
 | 5 | [Syngas Combustor](syngas-combustor.md) | 240 | 128–384 FE/t |
-| 6 | [Ammonia Fuel Cell](ammonia-fuel-cell.md) | 600 | 160–512 FE/t |
+| 6 | [Fuel Cell](ammonia-fuel-cell.md) | 600 | 160–512 FE/t |
 | 7 | [Vacuum Collapse Generator](vacuum-collapse-generator.md) | about 1,057 | 512–3,072 FE/t |
 | 8 | Vacuum Collapse Generator, Exotic parts | about 3,000 | 2,048–8,192 FE/t |
 
@@ -79,11 +79,11 @@ RNGTech has no global FE multiplier. To scale the whole mod, multiply generator 
 | You want to change | How |
 |---|---|
 | FE cost of a machine recipe | Override the recipe in a datapack and change `energy` (total FE per craft) or `processing_ticks`. |
-| FE output of a fuel generator | Override its recipe and change `energy`: `gas_combustion` (Syngas), `ammonia_power_cycle`, `vacuum_collapse`, `cavitation`, `corrosion_cell`, `potential_reactor`. |
+| FE output of a fuel generator | Override its recipe and change `energy`: `gas_combustion` (Syngas), `ammonia_power_cycle` (Ammonia and Hydrogen in the Fuel Cell), `vacuum_collapse`, `cavitation`, `corrosion_cell`, `potential_reactor`. |
 | Solid Fuel Burner FE per item | Each fuel gives 10 FE per burn tick (Coal: 16,000 FE). Change the burn time in NeoForge's `furnace_fuels` data map. This also changes vanilla furnaces. |
 | Other mods' fuels in the Solid Fuel Burner | Add the item to a tier tag `rngtech:solid_fuel/tier_1` to `tier_4`, plus `rngtech:solid_fuel/item_fuels` or `block_fuels`. |
 | Bio Generator fuels | Add the item to a `rngtech:bio_generator/*` tag. It gives that category's fixed FE, such as `potato_fuels` (120 FE). |
-| Surcharge on the hardest ores and hottest smelts | `crusher.highHardnessEnergyMultiplier` and `furnace.highHeatEnergyMultiplier` (default 2.0). |
+| Surcharge on the hardest ores | `crusher.highHardnessEnergyMultiplier` (default 2.0). Heated recipes carry their own `heat` in heat units instead; a datapack recipe that still sets `energy` in FE loads with 0.6 heat per FE. |
 | Resonance Calibrator cost | `calibration.energyMultiplier` and `calibration.timeMultiplier`. |
 | Exotic Affix Forge cost | `exoticAffixForge.energyMultiplier` and `exoticAffixForge.timeMultiplier`. |
 | Solar in other dimensions | `solar.dimensions.overworld`, `nether`, `end`, `other`. The Overworld is the default. |
@@ -121,16 +121,16 @@ Each generator below needs this much water to keep running, counting its whole f
 |---|---:|---:|
 | [Syngas Combustor](syngas-combustor.md), fed by a [Coal Gasifier](coal-gasifier.md) | 5 | about 2.1 mB/t |
 | [Cavitation Generator](cavitation-generator.md), water rotor | 5 | about 4.2 mB/t |
-| [Ammonia Fuel Cell](ammonia-fuel-cell.md), whole Ammonia chain | 6 | about 6.3 mB/t |
+| [Fuel Cell](ammonia-fuel-cell.md), whole Ammonia chain | 6 | about 6.3 mB/t |
 
-A full Wooden Dehumidifier (1.25 mB/t) falls short of one Syngas Combustor. An Ammonia Fuel Cell uses most of a Supercharged Silica Gel Dehumidifier.
+A full Wooden Dehumidifier (1.25 mB/t) falls short of one Syngas Combustor. A Fuel Cell uses most of a Supercharged Silica Gel Dehumidifier.
 
 Other machines use less:
 
 | Machine | Water |
 |---|---|
 | [Melter](melter.md) (Lubricant, Electrolyte, Methane, Lava) | 1,000 mB per melt, about 3–4.5 mB/t per melt running |
-| [Steam Methane Reformer](steam-methane-reformer.md) | 500 mB per craft, about 1.4–1.7 mB/t |
+| [Steam Methane Reformer](steam-methane-reformer.md) | 500 mB per craft, about 1.4–2.1 mB/t |
 | [Algae Photobioreactor](algae-photobioreactor.md) | 250 mB per Algae Biomass, about 0.2–0.4 mB/t |
 | [Forestry Cart](forestry-cart-station.md) sprinkler | up to about 8 mB/t for a full field |
 | [Wooden Composter](wooden-composter.md) | 10 mB per batch (optional, doubles speed) |

@@ -8,6 +8,7 @@ import com.rngtech.content.corruption.CorruptionDataEvents;
 import com.rngtech.content.dormant.DormantSiteCatalog;
 import com.rngtech.content.dormant.DormantSites;
 import com.rngtech.content.item.CableItem;
+import com.rngtech.content.item.UreaItem;
 import com.rngtech.content.minerscompanion.MinersCompanionEvents;
 import com.rngtech.content.registry.ModBlockEntities;
 import com.rngtech.content.registry.ModBlocks;
@@ -102,7 +103,10 @@ public final class RNGTech {
     }
 
     private void commonSetup(FMLCommonSetupEvent event) {
-        event.enqueueWork(() -> CauldronInteraction.WATER.map().put(ModItems.CABLE.get(), CableItem::washInCauldron));
+        event.enqueueWork(() -> {
+            CauldronInteraction.WATER.map().put(ModItems.CABLE.get(), CableItem::washInCauldron);
+            UreaItem.registerDispenserBehavior();
+        });
         LOGGER.info("RNGTech loaded");
     }
 }

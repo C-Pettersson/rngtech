@@ -31,7 +31,7 @@ public record MelterRecipe(
         SizedFluidIngredient fluidInput,
         FluidStack fluidOutput,
         int processingTicks,
-        int energy,
+        int heat,
         int minimumTemperature,
         int requiredProcessingLevel,
         boolean allowsBonusOutput,
@@ -122,10 +122,7 @@ public record MelterRecipe(
                                 .fieldOf("processing_ticks")
                                 .orElse(240)
                                 .forGetter(MelterRecipe::processingTicks),
-                        Codec.intRange(1, Integer.MAX_VALUE)
-                                .fieldOf("energy")
-                                .orElse(4800)
-                                .forGetter(MelterRecipe::energy),
+                        RecipeHeat.CODEC.forGetter(recipe -> RecipeHeat.of(recipe.heat())),
                         Codec.intRange(1, Integer.MAX_VALUE)
                                 .fieldOf("minimum_temperature")
                                 .orElse(1200)
@@ -147,7 +144,7 @@ public record MelterRecipe(
                         fluidInput,
                         fluidOutput,
                         processingTicks,
-                        energy,
+                        heatFields,
                         minimumTemperature,
                         requiredProcessingLevel,
                         allowsBonusOutput,
@@ -159,7 +156,7 @@ public record MelterRecipe(
                         fluidInput,
                         fluidOutput,
                         processingTicks,
-                        energy,
+                        heatFields.resolve(4800, RecipeHeat.temperatureScale(minimumTemperature)),
                         minimumTemperature,
                         requiredProcessingLevel,
                         allowsBonusOutput,
@@ -196,7 +193,7 @@ public record MelterRecipe(
                         SizedFluidIngredient.STREAM_CODEC.encode(buffer, recipe.fluidInput);
                         FluidStack.STREAM_CODEC.encode(buffer, recipe.fluidOutput);
                         ByteBufCodecs.VAR_INT.encode(buffer, recipe.processingTicks);
-                        ByteBufCodecs.VAR_INT.encode(buffer, recipe.energy);
+                        ByteBufCodecs.VAR_INT.encode(buffer, recipe.heat);
                         ByteBufCodecs.VAR_INT.encode(buffer, recipe.minimumTemperature);
                         ByteBufCodecs.VAR_INT.encode(buffer, recipe.requiredProcessingLevel);
                         ByteBufCodecs.BOOL.encode(buffer, recipe.allowsBonusOutput);

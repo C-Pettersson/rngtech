@@ -2,7 +2,7 @@
 navigation:
   title: "Crafting"
   parent: ammonia-synthesizer.md
-  position: 0
+  position: 2
   icon: rngtech:ammonia_synthesizer
 ---
 

@@ -66,6 +66,12 @@ If a component rolls too low for the recipe you need, put it in a [Component Rec
 
 Only the Sparksteel Coil and Calibrated Diamond Crystal recipes can give Super Output. Every other recipe makes exactly one component per job, so calibrating and recycling never gains you items.
 
+### Annealed circuits
+
+An Annealed {{ item('rngtech:basic_electric_circuit') }}, pressed under Hydrogen in a [Metal Press](metal-press.md#annealing) with Bright Anneal, calibrates with lucky stability. The Calibrator rolls stability twice within the recipe's range, after your Gear's adjustments, and keeps the higher roll. The Harmonist's Second Pass, if you have it, applies after that. On the plain Basic circuit recipe (35–75 stability), the chance of reaching 55 or more for an Advanced blank goes from about 51% to about 76%.
+
+Annealed and plain circuits do not stack, so a multi-lane cycle is either all Annealed or all plain.
+
 ### Calibration families
 
 There are six patterns, one per family: {{ item('rngtech:structural_calibration_pattern') }}, {{ item('rngtech:kinetic_calibration_pattern') }}, {{ item('rngtech:thermal_calibration_pattern') }}, {{ item('rngtech:conductive_calibration_pattern') }}, {{ item('rngtech:storage_calibration_pattern') }}, and {{ item('rngtech:logic_calibration_pattern') }}. The Logic family also makes the {{ item('rngtech:calibrated_diamond_crystal') }}, a Stage 6 crystal needed for the Stage 7 chassis and late Stabilizer Matrices. The Kinetic family also makes the {{ item('rngtech:cavitation_rotor_hub') }} from a Steel Casing, a Stage 5 hub every [Cavitation Rotor](cavitation-generator.md#crafting-rotors) needs. Its stability, from 20% to 80%, decides which rotors it can build and pushes the rotor's resonance higher.
@@ -152,17 +158,17 @@ Every node in this machine's ascendancies. See [Machine Mastery](machine-mastery
 
 | Node | Type | After | Effect |
 |---|---|---|---|
-| **Shared Field** | Root | — | One catalyst per cycle however many lanes run; the stability ceiling drops by 10. |
+| **Shared Field** | Root | — | One catalyst per cycle however large the batch; the stability ceiling drops by 10. |
 | Brisk Field | Small | Shared Field | 8% increased Processing Speed. |
 | **Stabilizer Economy** | Notable | Brisk Field | Recipe stabilizers are consumed every other cycle. |
 | Tight Field | Small | Shared Field | 8% increased Calibration Precision. |
-| **Lane Sync** | Notable | Tight Field | 15% more Processing Speed while more than one lane runs. |
+| **Lane Sync** | Notable | Tight Field | 15% more Processing Speed while a cycle calibrates more than one item. |
 | Focused Array | Small | Lane Sync | 8% increased Calibration Precision. |
 | **Resonance Array** | Deep notable | Focused Array | 100% increased Batch Size. The stability ceiling drops by another 15. |
 | Lean Field | Small | Shared Field | 5% reduced Energy Use. |
 | **Catalytic Surplus** | Notable | Lean Field | 25% increased Catalyst Efficiency. |
 | Broad Field | Small | Shared Field | 8% increased Stability. |
-| **Wide Tolerance** | Notable | Broad Field | +5 stability floor on a multi-lane chassis. |
+| **Wide Tolerance** | Notable | Broad Field | +5 stability floor on a chassis with a base Batch Size above 1. |
 | Steady Reach | Small | Wide Tolerance | 8% increased Stability. |
 | **Overreach** | Deep notable | Steady Reach | +1 Coil Reach; 20% less Calibration Precision. |
 

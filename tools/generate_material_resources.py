@@ -100,6 +100,11 @@ def load_ore_catalog() -> dict:
         return json.load(handle, object_pairs_hook=OrderedDict)
 
 
+def scaled_heat(heat: int, target: int) -> int:
+    """Recipe heat at 800 C scaled to the recipe's temperature, as RecipeHeat.temperatureScale does."""
+    return round(heat * (max(800, target) / 800) ** 0.8)
+
+
 def write_json(path: Path, data: dict) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     with path.open("w", encoding="utf-8", newline="\n") as handle:
@@ -601,9 +606,11 @@ def generate_ore_furnace_recipe(catalog: dict, material: dict) -> None:
         ("ingredient", OrderedDict([("tag", f"c:ores/{material_id}")])),
         ("result", OrderedDict([("id", primary_material_item_id(catalog, forms["ingot"], material))])),
         ("processing_ticks", 300),
-        ("energy", 7200),
+        ("heat", scaled_heat(4320, 1000)),
         ("experience", 0.7),
         ("minimum_temperature", 1000),
+        ("failure_output", OrderedDict([("count", 1), ("id", "rngtech:malformed_ingot")])),
+        ("failure_material", material_id),
     ]))
 
 
@@ -646,6 +653,35 @@ def crusher_ore_ingredient(material_id: str, host: str) -> OrderedDict:
     return OrderedDict([("type", "neoforge:difference"), ("base", ore_tag), ("subtracted", deepslate_tag)])
 
 
+RAW_SMELT_KEYS = ("processing_ticks", "heat", "minimum_temperature", "target_temperature", "safe_maximum_temperature",
+                  "required_temperature_stability")
+
+
+def raw_smelt_terms(material_id: str) -> OrderedDict:
+    """A raw metal smelts like its ore block: same time, heat, and heat gate, so raw is never a cheap shortcut."""
+    for form in ("ore", "dust"):
+        path = DATA_ROOT / f"rngtech/recipe/furnace/metals/{material_id}_from_{form}.json"
+        if path.exists():
+            with path.open(encoding="utf-8") as handle:
+                recipe = json.load(handle, object_pairs_hook=OrderedDict)
+            return OrderedDict((key, recipe[key]) for key in RAW_SMELT_KEYS if key in recipe)
+    return OrderedDict([("processing_ticks", 200), ("heat", scaled_heat(2880, 1000)), ("minimum_temperature", 1000)])
+
+
+def keep_tuned_recipe(path: Path, ingredient: OrderedDict, result: OrderedDict, terms: OrderedDict | None = None) -> bool:
+    """Updates the ingredient, result, and given terms of a recipe that already exists and keeps its other tuned values."""
+    if not path.exists():
+        return False
+    with path.open(encoding="utf-8") as handle:
+        recipe = json.load(handle, object_pairs_hook=OrderedDict)
+    recipe["ingredient"] = ingredient
+    recipe["result"] = result
+    for key, value in (terms or {}).items():
+        recipe[key] = value
+    write_json(path, recipe)
+    return True
+
+
 def generate_raw_material_recipes(catalog: dict, ore_catalog: dict) -> None:
     forms = {form["id"]: form for form in catalog["metal_forms"]}
     materials = {material["id"]: material for material in catalog["materials"]}
@@ -657,39 +693,47 @@ def generate_raw_material_recipes(catalog: dict, ore_catalog: dict) -> None:
             continue
         material = materials[material_id]
         raw_tag = f"c:raw_materials/{material_id}"
-        write_json(DATA_ROOT / f"rngtech/recipe/furnace/metals/{material_id}_from_raw.json", OrderedDict([
-            ("neoforge:conditions", [
-                OrderedDict([
-                    ("type", "rngtech:material_enabled"),
-                    ("material", material_id),
+        ingredient = OrderedDict([("tag", raw_tag)])
+        terms = raw_smelt_terms(material_id)
+        ingot = OrderedDict([("id", primary_material_item_id(catalog, forms["ingot"], material))])
+        smelt_path = DATA_ROOT / f"rngtech/recipe/furnace/metals/{material_id}_from_raw.json"
+        if not keep_tuned_recipe(smelt_path, ingredient, ingot, terms):
+            write_json(smelt_path, OrderedDict([
+                ("neoforge:conditions", [
+                    OrderedDict([
+                        ("type", "rngtech:material_enabled"),
+                        ("material", material_id),
+                    ]),
                 ]),
-            ]),
-            ("type", "rngtech:furnace"),
-            ("group", "rngtech_metals"),
-            ("ingredient", OrderedDict([("tag", raw_tag)])),
-            ("result", OrderedDict([("id", primary_material_item_id(catalog, forms["ingot"], material))])),
-            ("processing_ticks", 200),
-            ("energy", 4800),
-            ("experience", 0.7),
-            ("minimum_temperature", 1000),
-        ]))
-        write_json(DATA_ROOT / f"rngtech/recipe/crusher/raw_{material_id}.json", OrderedDict([
-            ("neoforge:conditions", [
-                OrderedDict([
-                    ("type", "rngtech:material_enabled"),
-                    ("material", material_id),
+                ("type", "rngtech:furnace"),
+                ("group", "rngtech_metals"),
+                ("ingredient", ingredient),
+                ("result", ingot),
+                *terms.items(),
+                ("experience", 0.7),
+                ("failure_output", OrderedDict([("count", 1), ("id", "rngtech:malformed_ingot")])),
+                ("failure_material", material_id),
+            ]))
+        crushed = OrderedDict([
+            ("count", 2),
+            ("id", primary_material_item_id(catalog, forms["crushed"], material)),
+        ])
+        crush_path = DATA_ROOT / f"rngtech/recipe/crusher/raw_{material_id}.json"
+        if not keep_tuned_recipe(crush_path, ingredient, crushed):
+            write_json(crush_path, OrderedDict([
+                ("neoforge:conditions", [
+                    OrderedDict([
+                        ("type", "rngtech:material_enabled"),
+                        ("material", material_id),
+                    ]),
                 ]),
-            ]),
-            ("type", "rngtech:crusher"),
-            ("ingredient", OrderedDict([("tag", raw_tag)])),
-            ("result", OrderedDict([
-                ("count", 2),
-                ("id", primary_material_item_id(catalog, forms["crushed"], material)),
-            ])),
-            ("processing_ticks", 120),
-            ("energy", 5760),
-            ("required_processing_level", 1),
-        ]))
+                ("type", "rngtech:crusher"),
+                ("ingredient", ingredient),
+                ("result", crushed),
+                ("processing_ticks", 120),
+                ("energy", 5760),
+                ("required_processing_level", max(1, min(8, ore["hardness_level"]))),
+            ]))
 
 
 def rewrite_recipe_result(path: Path, old_id: str, new_id: str) -> None:

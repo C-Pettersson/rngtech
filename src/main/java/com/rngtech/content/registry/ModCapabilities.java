@@ -71,6 +71,11 @@ public final class ModCapabilities {
                 FurnaceBlockEntity::getEnergyStorage
         );
         event.registerBlockEntity(
+                Capabilities.FluidHandler.BLOCK,
+                ModBlockEntities.FURNACE.get(),
+                FurnaceBlockEntity::getFluidHandler
+        );
+        event.registerBlockEntity(
                 Capabilities.ItemHandler.BLOCK,
                 ModBlockEntities.ALLOY_FURNACE.get(),
                 AlloyFurnaceBlockEntity::getItemHandler
@@ -79,6 +84,11 @@ public final class ModCapabilities {
                 Capabilities.EnergyStorage.BLOCK,
                 ModBlockEntities.ALLOY_FURNACE.get(),
                 AlloyFurnaceBlockEntity::getEnergyStorage
+        );
+        event.registerBlockEntity(
+                Capabilities.FluidHandler.BLOCK,
+                ModBlockEntities.ALLOY_FURNACE.get(),
+                AlloyFurnaceBlockEntity::getFluidHandler
         );
         event.registerBlockEntity(
                 Capabilities.ItemHandler.BLOCK,
@@ -260,6 +270,11 @@ public final class ModCapabilities {
                 Capabilities.EnergyStorage.BLOCK,
                 ModBlockEntities.METAL_PRESS.get(),
                 MetalPressBlockEntity::getEnergyStorage
+        );
+        event.registerBlockEntity(
+                Capabilities.FluidHandler.BLOCK,
+                ModBlockEntities.METAL_PRESS.get(),
+                MetalPressBlockEntity::getFluidHandler
         );
         event.registerBlockEntity(
                 Capabilities.ItemHandler.BLOCK,

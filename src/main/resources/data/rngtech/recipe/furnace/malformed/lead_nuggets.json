@@ -16,7 +16,7 @@
     "id": "rngtech:lead_nugget"
   },
   "processing_ticks": 400,
-  "energy": 1200,
+  "heat": 720,
   "minimum_temperature": 400,
   "bonus_output": false
 }

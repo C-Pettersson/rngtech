@@ -19,7 +19,7 @@
     "id": "rngtech:arclite_casing"
   },
   "processing_ticks": 300,
-  "energy": 4800,
+  "heat": 2781,
   "minimum_temperature": 1450,
   "safe_maximum_temperature": 1750,
   "required_temperature_stability": 1.0,

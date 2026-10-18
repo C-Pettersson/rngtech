@@ -52,7 +52,7 @@ Mine a placed press with a pickaxe. It drops itself and keeps its rolled traits 
 
 ### Pressing
 
-Install a Heat Core and at least one Mold, select the Mold you want in the Gear tab, then put the input in the input slot and supply FE. The press warms up using the recipe's normal FE draw and starts pressing only once its heat reaches the recipe's target temperature. If it runs out of FE while warming up, it pauses and cools. Adding more of the same input keeps the current press going, so a hopper or Item Connector can feed it; swapping the input for a different item restarts it.
+Install a Heat Core and at least one Mold, select the Mold you want in the Gear tab, then put the input in the input slot and supply FE. The press heats up and starts pressing once its heat reaches the recipe's temperature; without FE its heater stops and it cools. See [Heat](heat.md) for how it heats, what the FE pays for, and the overheat slider. Adding more of the same input keeps the current press going, so a hopper or Item Connector can feed it; swapping the input for a different item restarts it.
 
 Each recipe has a heat window and a temperature stability requirement. The two presses handle a bad window differently:
 
@@ -112,7 +112,7 @@ The Stability stat only matters on the Steel press, where low Stability adds fai
 |---|---|
 | Top | Inserts recipe input. Rejects items no Mold can press. |
 | Bottom | Extracts finished output. |
-| Any | Accepts FE, for example from a [Universal Cable](universal-cable.md). |
+| Any | Accepts FE, for example from a [Universal Cable](universal-cable.md), and Nitrogen for the [Nitrogen atmosphere](heat.md#nitrogen-atmosphere). With Bright Anneal or Hydrogen Quench, also accepts Hydrogen for [annealing](#annealing). |
 
 Gear slots, Molds, and the Refinement slot cannot be filled by automation.
 
@@ -125,6 +125,20 @@ Two keystones cap your heat in exchange for speed or savings. Each cap only stop
 **Quench Protocol** halves the temperature failure strain the press takes, for 25% less Heat Transfer.
 
 Die Keeper's Mold Rack picks the first stored Mold, in slot order, that has a recipe for the input. The press cools during the swap unless you have Quick Change. A Drop Forge batch is set when the cycle starts and is limited by the input stack and the free output space. Each pressed item in a batch pays its own FE, earns its own XP, and rolls Super Output on its own.
+
+### Annealing
+
+Two ascendancy notables let the press anneal what it makes under Hydrogen: Die Keeper's **Bright Anneal**, after Purge Line, and Drop Forge's **Hydrogen Quench**, after Quench Line. With either one, the press's [atmosphere tank](heat.md#nitrogen-atmosphere) also takes {{ item('rngtech:hydrogen_bucket') }} Hydrogen. The tank holds one gas at a time, so it takes Hydrogen only while it holds no Nitrogen; pump the tank out with a [Universal Cable](universal-cable.md) to switch gases. Without either notable it refuses Hydrogen.
+
+- **Bright Anneal**: Basic Electric Circuits pressed while the tank holds Hydrogen come out Annealed.
+- **Hydrogen Quench**: plates pressed while the tank holds Hydrogen come out Annealed.
+
+Each Annealed item costs 250 mB of Hydrogen. Other outputs press normally and use none. A Drop Forge batch presses only as many plates as the tank can pay for, so a batch of 6 plates needs 1,500 mB. Hover the gauge on an annealing press to see what it anneals and the cost.
+
+Annealed items show an aqua **Annealed** line in their tooltip. They do not stack with plain copies, and every recipe accepts them like plain ones. What annealing gives you:
+
+- An Annealed Basic Electric Circuit calibrates with [lucky stability](resonance-calibrator.md#annealed-circuits) in the Resonance Calibrator.
+- Gear crafted with only Annealed plates rolls [lucky Refinement Potential](rarity-and-affixes.md#annealed-items).
 
 ### Metal Press recipes
 
@@ -169,6 +183,8 @@ Every node in this machine's ascendancies. See [Machine Mastery](machine-mastery
 | **Tolerance Map** | Notable | Steady Bed | 40% less heat-related failure strain. |
 | True Bed | Small | Tolerance Map | 8% increased Temperature Stability. |
 | **Master Die** | Deep notable | True Bed | 20% less Processing Speed. No failures while heat stays in the window and power holds. |
+| Purge Line | Small | Mold Rack | 5% reduced Energy Use. |
+| **Bright Anneal** | Notable | Purge Line | The atmosphere tank takes Hydrogen, and Basic Electric Circuits pressed with it come out Annealed for 250 mB each. An Annealed circuit calibrates with lucky stability. |
 | Fine Servos | Small | Mold Rack | 8% increased Stability. |
 | **Circuit Discipline** | Notable | Fine Servos | Circuit recipes gain 20% increased Stability and use 15% less FE. |
 | Heat Margin | Small | Mold Rack | 10% increased Overheat Tolerance. |
@@ -178,7 +194,7 @@ Every node in this machine's ascendancies. See [Machine Mastery](machine-mastery
 
 | Node | Type | After | Effect |
 |---|---|---|---|
-| **Drop Hammer** | Root | — | +4 Batch Size; −25% Heat Window. Plate, gear, and casing recipes batch; circuits never do. |
+| **Drop Hammer** | Root | — | +4 Batch Size; −15% Heat Window. Plate, gear, and casing recipes batch; circuits never do. |
 | Heavy Blows | Small | Drop Hammer | 8% increased Processing Speed. |
 | **Anvil Mass** | Notable | Heavy Blows | +2 Batch Size. |
 | Fast Line | Small | Anvil Mass | 8% increased Processing Speed. |
@@ -187,6 +203,8 @@ Every node in this machine's ascendancies. See [Machine Mastery](machine-mastery
 | **Split Failure** | Notable | Wide Bed | A failed batch ruins one job’s input instead of all of them; the rest waits for the next cycle. |
 | Broad Bed | Small | Split Failure | +5% Heat Window. |
 | **Batch Ledger** | Deep notable | Broad Bed | +5% Ledger Rate. |
+| Quench Line | Small | Drop Hammer | 8% increased Temperature Stability. |
+| **Hydrogen Quench** | Notable | Quench Line | The atmosphere tank takes Hydrogen, and plates pressed with it come out Annealed for 250 mB each. Gear crafted only from Annealed plates rolls lucky Refinement Potential. |
 | Lean Strikes | Small | Drop Hammer | 5% reduced Energy Use. |
 | **Shock Absorbers** | Notable | Lean Strikes | Power-drop grace is doubled while batching. |
 | Hot Platen | Small | Drop Hammer | 8% increased Heat Transfer. |
@@ -198,7 +216,7 @@ Every node in this machine's ascendancies. See [Machine Mastery](machine-mastery
 
 Both presses share a screen with five tabs:
 
-- **Process**: input and output slots, progress, energy, live heat, and a failure-risk bar. Status squares show the recipe state and the current risk. Hover for exact values.
+- **Process**: input and output slots, progress, energy, live heat, a failure-risk bar, and the atmosphere gauge at the right edge, for Nitrogen or Hydrogen. Status squares show the recipe state and the current risk. Hover for exact values.
 - **Gear**: Heat Core, Servo, Battery Cell, and Mold slots, plus the active Mold selector.
 - **Stats**: the machine's current stats, including traits, Gear, and Mastery.
 - **Refinement**: refine the placed press's traits with a catalyst.

@@ -99,7 +99,7 @@
 			y: 0.5d
 		}
 		{
-			dependencies: ["46A1F2C0DE100001"]
+			dependencies: ["37A6C9E1284B5D27"]
 			id: "37A6C9E1284B5D45"
 			optional: true
 			rewards: [{
@@ -185,7 +185,7 @@
 			y: 2.0d
 		}
 		{
-			dependencies: ["37A6C9E1284B5D45", "46A1F2C0DE100020"]
+			dependencies: ["37A6C9E1284B5D45"]
 			id: "6A5586EEBF6EC289"
 			tasks: [{
 				id: "2192686E16AD27A7"
@@ -196,7 +196,7 @@
 			y: 5.0d
 		}
 		{
-			dependencies: ["6A5586EEBF6EC289", "7106E7A1B10F0316"]
+			dependencies: ["6A5586EEBF6EC289"]
 			id: "7881F937740ED4E4"
 			rewards: [{
 				exclude_from_claim_all: true
@@ -213,7 +213,7 @@
 			y: 6.0d
 		}
 		{
-			dependencies: ["6A5586EEBF6EC289", "1E106D356E9A0C94"]
+			dependencies: ["6A5586EEBF6EC289"]
 			id: "6D8585E478E2A8D5"
 			rewards: [{
 				exclude_from_claim_all: true
@@ -228,42 +228,6 @@
 			}]
 			x: 2.5d
 			y: 6.5d
-		}
-		{
-			dependencies: ["37A6C9E1284B5D1A"]
-			id: "ECB1488CD9CF7D3C"
-			optional: true
-			tasks: [{
-				id: "DD2B901F8DD9D6B8"
-				item: { count: 1, id: "rngtech:wrench" }
-				type: "item"
-			}]
-			x: -1.0d
-			y: 3.0d
-		}
-		{
-			dependencies: ["37A6C9E1284B5D4A"]
-			id: "BB4E152C2F89A2AD"
-			optional: true
-			tasks: [{
-				id: "E901E8FCAA3D90FE"
-				item: { count: 1, id: "rngtech:advanced_item_filter" }
-				type: "item"
-			}]
-			x: 0.0d
-			y: -1.0d
-		}
-		{
-			dependencies: ["6A5586EEBF6EC289", "7106E7A1B10F0312"]
-			id: "820E815B8A28448E"
-			optional: true
-			tasks: [{
-				id: "44CF288855F3102F"
-				item: { count: 1, id: "rngtech:aluminum_compressor_tank" }
-				type: "item"
-			}]
-			x: 2.5d
-			y: 3.5d
 		}
 	]
 }

@@ -21,7 +21,7 @@ item_ids:
 - **Mastery:** No
 - **Tool:** <ItemLink id="minecraft:wooden_pickaxe" />
 
-The **Steam Methane Reformer** reacts a gas with water to make **Hydrogen** and **Carbon Monoxide**. It is the Stage 6 Hydrogen source for the [Ammonia Synthesizer](rngtech:ammonia-synthesizer.md). Methane is its main feed. Syngas from the [Coal Gasifier](rngtech:coal-gasifier.md) also works, at a lower Hydrogen yield.
+The **Steam Methane Reformer** reacts a gas with water to make **Hydrogen** and **Carbon Monoxide**. It is the Stage 6 Hydrogen source for the [Ammonia Synthesizer](rngtech:ammonia-synthesizer.md). Methane is its main feed. Syngas from the [Coal Gasifier](rngtech:coal-gasifier.md) also works, at a lower Hydrogen yield. Fed Carbon Monoxide instead, it runs the water-gas shift, which turns the Carbon Monoxide into more Hydrogen and a little Carbon Exhaust.
 
 It is built as a fired tubular reformer: burners under a firebox heat a row of catalyst-filled tubes, and a steam drum on top feeds them water.
 
@@ -30,13 +30,17 @@ Like other RNGTech machines, each Steam Methane Reformer you craft rolls its own
 ## Usage
 
 - [Reforming gas](rngtech:steam-methane-reformer/reforming-gas.md)
+- [Water-gas shift](rngtech:steam-methane-reformer/water-gas-shift.md)
+- [Where the products go](rngtech:steam-methane-reformer/where-the-products-go.md)
 
-### Where the products go
+### Gear
 
-- **Hydrogen** feeds the [Ammonia Synthesizer](rngtech:ammonia-synthesizer.md), which makes Ammonia for the [Ammonia Fuel Cell](rngtech:ammonia-fuel-cell.md).
-- **Carbon Monoxide** is the best carbon input for the [Algae Photobioreactor](rngtech:algae-photobioreactor.md). The [Syngas Combustor](rngtech:syngas-combustor.md) can also burn it as a weaker fuel to get rid of it.
+The Gear tab has four slots:
 
-- [Gear](rngtech:steam-methane-reformer/gear.md)
+- **Heat Core** (required): Stage 6 or higher, so a <ItemLink id="rngtech:titanium_heat_core" /> or an <ItemLink id="rngtech:exotic_heat_core" />.
+- **Catalyst Bed** (required): a <ItemLink id="rngtech:reforming_catalyst_bed" />. Like other machine parts, it rolls its own affixes, and they apply to the Reformer.
+- **Battery Cell** (optional): Stage 6 or higher, such as an <ItemLink id="rngtech:arclite_battery_cell" />. It adds energy storage on top of the small internal buffer.
+- **Servo** (optional): <ItemLink id="rngtech:steel_servo" /> or better. A <ItemLink id="rngtech:nullite_servo" /> also auto-purges: when an output tank is full, it voids the extra gas instead of stopping the machine.
 
 ### Automation
 
@@ -45,7 +49,7 @@ Like other RNGTech machines, each Steam Methane Reformer you craft rolls its own
 | Top | Accepts FE. |
 | Bottom | Does not accept FE. |
 | Sides | Accept FE. |
-| Any | Fill water and Methane or Syngas, and drain Hydrogen and Carbon Monoxide, through any face. |
+| Any | Fill water and Methane, Syngas, or Carbon Monoxide, and drain Hydrogen and the second output, through any face. |
 
 The Reformer has no item automation. Gear slots are manual only. The back cabinet has a port plate sized for a Universal Connector, the tidiest place to attach one.
 
@@ -53,7 +57,7 @@ The Reformer has no item automation. Gear slots are manual only. The back cabine
 
 The Steam Methane Reformer screen has four tabs:
 
-- **Process**: water, gas, Hydrogen, and Carbon Monoxide tanks with purge buttons, progress, energy, and status. Hover for exact amounts.
+- **Process**: water, gas, Hydrogen, and second output tanks with purge buttons, progress, energy, and status. Hover for exact amounts.
 - **Gear**: Heat Core, Battery Cell, Servo, and Catalyst Bed slots.
 - **Stats**: the machine's current stats, including traits and Gear.
 - **Refinement**: refine the placed Reformer's traits with a catalyst.

@@ -17,6 +17,10 @@ import com.rngtech.rpg.MachineTraits;
 import com.rngtech.rpg.ModifierOperation;
 import com.rngtech.rpg.ModifierSlot;
 import com.rngtech.rpg.Rarity;
+import com.rngtech.rpg.progression.MachineMasteryFamily;
+import com.rngtech.rpg.progression.MachineProgressionState;
+import com.rngtech.rpg.progression.MegaPassiveNode;
+import com.rngtech.rpg.progression.MegaPassiveTree;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
@@ -88,6 +92,36 @@ public final class FurnaceBatchGameTests {
         // Four, then the two left over.
         helper.succeedWhen(() -> check(inventory.getStackInSlot(FurnaceBlockEntity.SLOT_OUTPUT_START).getCount() == 6,
                 "The batches have not finished; " + MachineTestSupport.describe(furnace)));
+    }
+
+    /** Dense Batching (+3 Batch Size) holds three potatoes until a fourth arrives, then smelts all four at once. */
+    @GameTest(template = MachineTestSupport.EMPTY, timeoutTicks = 3000)
+    public static void denseBatchingWaitsForAFullBatch(GameTestHelper helper) {
+        FurnaceBlockEntity furnace = MachineTestSupport.place(helper, MACHINE,
+                ModBlocks.furnaceChassis(FurnaceChassisMaterial.STEEL).get(), FurnaceBlockEntity.class);
+        String start = MachineMasteryFamily.FURNACE.startNodeId();
+        List<String> path = MegaPassiveTree.allocationPath(node -> node.id().equals(start), MegaPassiveTree.node("dense_batching"))
+                .stream().map(MegaPassiveNode::id).toList();
+        check(!path.isEmpty(), "Dense Batching is unreachable from the Furnace start");
+        furnace.setMachineProgression(new MachineProgressionState(MachineProgressionState.xpForLevel(MachineProgressionState.MAX_LEVEL), 0,
+                MachineProgressionState.MAX_LEVEL, path, start, List.of(), false));
+        furnace.getGearInventory().setStackInSlot(0, new ItemStack(ModItems.heatCore(HeatCoreMaterial.STEEL).get()));
+        ItemStackHandler inventory = furnace.getInventory();
+        inventory.setStackInSlot(FurnaceBlockEntity.SLOT_INPUT_START, new ItemStack(Items.POTATO, 3));
+        MachineTestSupport.powerEachTick(helper, furnace.getEnergyStorage(null));
+
+        helper.runAfterDelay(400, () -> {
+            check(inventory.getStackInSlot(FurnaceBlockEntity.SLOT_OUTPUT_START).isEmpty(),
+                    "A short batch started; " + MachineTestSupport.describe(furnace));
+            check(furnace.machineInfo().progress() == 0, "A short batch made progress; " + MachineTestSupport.describe(furnace));
+            inventory.setStackInSlot(FurnaceBlockEntity.SLOT_INPUT_START, new ItemStack(Items.POTATO, 4));
+        });
+        helper.onEachTick(() -> {
+            int output = inventory.getStackInSlot(FurnaceBlockEntity.SLOT_OUTPUT_START).getCount();
+            check(output == 0 || output == 4, "The lane smelted " + output + " items, not one full batch");
+        });
+        helper.succeedWhen(() -> check(inventory.getStackInSlot(FurnaceBlockEntity.SLOT_OUTPUT_START).getCount() == 4,
+                "The full batch has not finished; " + MachineTestSupport.describe(furnace)));
     }
 
     /** A batch takes only whole recipe sets: with ingredients for two bronze crafts and one spare copper, it crafts two. */

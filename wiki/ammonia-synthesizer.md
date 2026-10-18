@@ -5,6 +5,7 @@ wiki:
   ids:
     - rngtech:ammonia_synthesizer
     - rngtech:ammonia_catalyst_bed
+    - rngtech:urea
 ---
 
 # Ammonia Synthesizer
@@ -23,7 +24,7 @@ wiki:
     },
 ) }}
 
-The **Ammonia Synthesizer** combines Nitrogen and Hydrogen into Ammonia using FE. It is the first half of the ammonia power chain: the Ammonia it makes fuels the [Ammonia Fuel Cell](ammonia-fuel-cell.md), a strong late-game generator.
+The **Ammonia Synthesizer** combines Nitrogen and Hydrogen into Ammonia using FE. It is the first half of the ammonia power chain: the Ammonia it makes fuels the [Fuel Cell](ammonia-fuel-cell.md), a strong late-game generator. It can also combine Ammonia with Carbon Exhaust into {{ item('rngtech:urea') }}, a fertilizer.
 
 It is built as an ammonia loop: a compressor pushes the mixed gases into a thick-walled converter that holds the catalyst, and the hot gas passes through a frosted condenser into a glass Ammonia receiver.
 
@@ -62,32 +63,54 @@ Synthesis uses the `rngtech:ammonia_synthesis` recipe type.
 
 {{ processing("ammonia_synthesis") }}
 
+### Making Urea
+
+Pipe Carbon Exhaust into the Synthesizer's 8,000 mB Carbon Exhaust tank. Each Urea cycle takes 250 mB of Ammonia from the Synthesizer's own Ammonia tank and 250 mB of Carbon Exhaust, and makes one Urea in the Urea slot on the Process tab, using 3,000 FE over 120 ticks. It needs the same Stage 6 Catalyst Bed as Ammonia.
+
+Urea comes first. Whenever the Ammonia tank and the Carbon Exhaust tank both hold enough and the Urea slot has room, the Synthesizer makes Urea; otherwise it makes Ammonia. Switching between the two restarts the cycle in progress. A full Urea slot does not stop the machine: it goes back to making Ammonia.
+
+You can also pipe Ammonia into the Synthesizer. A Synthesizer with no Nitrogen or Hydrogen then works as a dedicated Urea maker, fed from another Synthesizer's Ammonia.
+
+Urea is not free. The 250 mB of Ammonia in each Urea would make 54,000 FE in a Fuel Cell, so make Urea only as fast as you use it.
+
+Urea synthesis uses the `rngtech:urea_synthesis` recipe type.
+
+{{ processing("urea_synthesis") }}
+
+### Using Urea
+
+- **By hand or from a dispenser**, Urea works like bone meal on any plant.
+- In the [Forestry Cart Station](forestry-cart-station.md#mastery-and-ascendancies), the Forestry Companion and its station take Urea wherever they take bone meal. Each Urea counts as 4 bone meal.
+- In the [Algae Photobioreactor](algae-photobioreactor.md#urea), each Urea grows the next 4 Algae Biomass at twice the speed.
+
 ### Getting the gases
 
 - **Nitrogen**: separate it from water in a Stage 6 [Cavitation Generator](cavitation-generator.md) fitted with a Nitrogen Extraction Rotor and a Nitrogen Separation Nozzle.
 - **Hydrogen**: from the [Steam Methane Reformer](steam-methane-reformer.md).
+- **Carbon Exhaust**, for Urea: from a [Syngas Combustor](syngas-combustor.md), a [Wooden Dehumidifier](wooden-dehumidifier.md), or a Steam Methane Reformer running the [water-gas shift](steam-methane-reformer.md#water-gas-shift).
 
 ### Gear
 
 The Gear tab has one required **Catalyst Bed** slot. The bed's stage must be high enough for the recipe; the default recipe needs a Stage 6 bed, which is what the Ammonia Catalyst Bed is.
 
-An unrolled Catalyst Bed only unlocks recipes. Its rolled Processing Speed and Energy Usage modifiers speed up the Synthesizer or cut its FE cost. Other rolls on the bed do nothing here. See [Ammonia Fuel Cell](ammonia-fuel-cell.md) for details.
+An unrolled Catalyst Bed only unlocks recipes. Its rolled Processing Speed and Energy Usage modifiers speed up the Synthesizer or cut its FE cost. Other rolls on the bed do nothing here.
 
 ### Automation
 
 | Side | Behavior |
 |---|---|
 | Top | Inserts an Ammonia Catalyst Bed into the Gear slot. Accepts FE. |
-| Sides | Accept FE. |
-| Any | Fills Nitrogen and Hydrogen, and drains Ammonia. |
+| Bottom | Extracts Urea. |
+| Sides | Accept FE. Extract Urea. |
+| Any | Fills Nitrogen, Hydrogen, Carbon Exhaust, and Ammonia, and drains Ammonia. |
 
-There are no process item slots to automate. The back cabinet has a port plate sized for a Universal Connector, the tidiest place to attach one. To throw gas away, use the purge buttons beside each tank, or right-click the machine with a {{ item('rngtech:purge_bucket') }} to void up to 1,000 mB. A normal right-click empties Nitrogen or Hydrogen first, and sneaking empties the Ammonia tank first. Purging Nitrogen or Hydrogen resets the cycle in progress.
+Nothing can insert into the Urea slot; you and automation can only take from it. The back cabinet has a port plate sized for a Universal Connector, the tidiest place to attach one. To throw gas away, use the purge buttons beside each tank, or right-click the machine with a {{ item('rngtech:purge_bucket') }} to void up to 1,000 mB. A normal right-click empties an input tank first, and sneaking empties the Ammonia tank first. Purging Nitrogen, Hydrogen, or Carbon Exhaust resets the cycle in progress.
 
 ## Screen
 
 The Ammonia Synthesizer screen has four tabs:
 
-- **Process**: Nitrogen, Hydrogen, and Ammonia tanks with purge buttons, progress, FE, and status.
+- **Process**: Nitrogen, Hydrogen, Ammonia, and Carbon Exhaust tanks with purge buttons, the Urea slot, progress, FE, and status.
 - **Gear**: the Catalyst Bed slot.
 - **Stats**: the machine's current stats, including traits and Gear.
 - **Refinement**: refine the placed Synthesizer's traits with a catalyst.
@@ -98,7 +121,7 @@ The Ammonia Synthesizer screen has four tabs:
 
 ## See also
 
-- [Ammonia Fuel Cell](ammonia-fuel-cell.md)
+- [Fuel Cell](ammonia-fuel-cell.md)
 - [Gear](gear.md)
 
 {{ navbox() }}

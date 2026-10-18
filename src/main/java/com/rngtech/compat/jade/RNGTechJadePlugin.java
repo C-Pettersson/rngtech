@@ -266,6 +266,12 @@ public final class RNGTechJadePlugin implements IWailaPlugin {
             } else if (details && info.heat() != MachineInfoSnapshot.UNSET) {
                 tooltip.add(Component.translatable("rngtech.jade.machine_state.line.heat", value(info.heat())));
             }
+            if (details && info.requiredHeat() > 0 && info.setpoint() > info.requiredHeat()) {
+                tooltip.add(Component.translatable("rngtech.jade.machine_state.line.setpoint", value(info.setpoint())));
+            }
+            if (info.batch() > 1) {
+                tooltip.add(Component.translatable("rngtech.jade.machine_state.line.batch", value(info.batch())));
+            }
         }
 
         private static void appendGear(ITooltip tooltip, MachineInfoSnapshot info, boolean details) {

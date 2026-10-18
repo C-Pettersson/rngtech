@@ -1,0 +1,16 @@
+{
+  "type": "rngtech:ammonia_power_cycle",
+  "group": "ammonia_power",
+  "membrane": {
+    "item": "rngtech:fuel_cell_membrane"
+  },
+  "ammonia_input": {
+    "ingredient": {
+      "fluid": "rngtech:hydrogen"
+    },
+    "amount": 1000
+  },
+  "energy": 60000,
+  "processing_ticks": 300,
+  "minimum_membrane_stage": 6
+}

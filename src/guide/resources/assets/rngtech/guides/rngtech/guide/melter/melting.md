@@ -12,7 +12,7 @@ Fill the input tank with the recipe's fluid, put the two recipe items in the inp
 
 Some ingredients leave an item behind, such as the Glass Bottle from a <ItemLink id="minecraft:honey_bottle" />. A leftover the Melter cannot use goes into an empty output container slot if it can hold the product, and otherwise into the inventory directly below the Melter, such as a hopper or chest, or onto the ground if there is none. It never blocks the input slots; see [Automation](rngtech:automation/ingredient-leftovers.md).
 
-Every default recipe needs at least 1,200 heat (methane needs 1,400, and Ender Slurry from Collapse Residue needs 1,600) and hardness level 6, so you need a hot enough Heat Core and a Titanium or better Crush Head. Unlike the [Crusher](rngtech:crusher.md), the Melter does not run recipes above its hardness at all.
+The crucible heats up like the other heated machines and melts once it reaches the recipe's temperature; see [Heat](rngtech:heat.md). Every default recipe needs at least 1,200 heat (methane needs 1,400, and Ender Slurry from Collapse Residue needs 1,600) and hardness level 6, so you need a hot enough Heat Core and a Titanium or better Crush Head. Unlike the [Crusher](rngtech:crusher.md), the Melter does not run recipes above its hardness at all.
 
 Methane takes plain **Algae Biomass**. **Dense Algae Biomass** does not work in the Melter; burn it in a [Bio Generator](rngtech:bio-generator.md) instead.
 

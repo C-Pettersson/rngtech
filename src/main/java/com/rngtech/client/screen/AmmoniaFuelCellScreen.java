@@ -16,6 +16,7 @@ public class AmmoniaFuelCellScreen extends AbstractContainerScreen<AmmoniaFuelCe
     private static final int MUTED = 0xFF6B6B6B;
     private static final int ENERGY = 0xFF74A857;
     private static final int AMMONIA = 0xFFBFD48B;
+    private static final int HYDROGEN = 0xFFD8E6F2;
     private static final int PROGRESS = 0xFF71A67B;
     private static final int STAT_ACCENT = 0xFF8EA553;
     private static final int TAB_WIDTH = 54;
@@ -58,7 +59,7 @@ public class AmmoniaFuelCellScreen extends AbstractContainerScreen<AmmoniaFuelCe
         guiGraphics.fill(leftPos, topPos, leftPos + imageWidth, topPos + imageHeight, PANEL);
         renderTabs(guiGraphics);
         if (menu.selectedTab() == AmmoniaFuelCellMenu.TAB_PROCESSING) {
-            bar(guiGraphics, AMMONIA_BAR_X, BAR_Y, menu.ammoniaFill(), AMMONIA);
+            bar(guiGraphics, AMMONIA_BAR_X, BAR_Y, menu.ammoniaFill(), menu.burnsHydrogen() ? HYDROGEN : AMMONIA);
             FluidPurgeButton.render(guiGraphics, leftPos, topPos, AMMONIA_BAR_X, BAR_Y + 2, menu.ammonia() > 0);
             bar(guiGraphics, ENERGY_BAR_X, BAR_Y, menu.energyFill(), ENERGY);
             guiGraphics.fill(
@@ -199,6 +200,10 @@ public class AmmoniaFuelCellScreen extends AbstractContainerScreen<AmmoniaFuelCe
         };
     }
 
+    private Component fuelName() {
+        return Component.translatable(menu.burnsHydrogen() ? "fluid.rngtech.hydrogen" : "fluid.rngtech.ammonia");
+    }
+
     private Component progressTooltip() {
         int ticks = menu.processingTicks();
         if (ticks <= 0) {
@@ -220,15 +225,15 @@ public class AmmoniaFuelCellScreen extends AbstractContainerScreen<AmmoniaFuelCe
                 mouseY,
                 AMMONIA_BAR_X,
                 BAR_Y + 2,
-                Component.translatable("rngtech.purge.target.ammonia_tank"),
-                menu.ammonia() > 0 ? Component.translatable("fluid.rngtech.ammonia") : Component.translatable("rngtech.purge.empty_fluid"),
+                Component.translatable("rngtech.purge.target.fuel_tank"),
+                menu.ammonia() > 0 ? fuelName() : Component.translatable("rngtech.purge.empty_fluid"),
                 menu.ammonia(),
                 menu.tankCapacity()
         )) {
             return;
         }
         CompactValueText.renderTooltipIfHovered(guiGraphics, font, leftPos, topPos, mouseX, mouseY, AMMONIA_BAR_X, BAR_Y, BAR_WIDTH, BAR_HEIGHT,
-                FluidMeterTooltips.amount(Component.translatable("fluid.rngtech.ammonia"), menu.ammonia(), menu.tankCapacity()));
+                FluidMeterTooltips.amount(fuelName(), menu.ammonia(), menu.tankCapacity()));
         CompactValueText.renderTooltipIfHovered(guiGraphics, font, leftPos, topPos, mouseX, mouseY, ENERGY_BAR_X, BAR_Y, BAR_WIDTH, BAR_HEIGHT,
                 Component.translatable("rngtech.ammonia_fuel_cell.tooltip.energy", CompactValueText.exactEnergyAmountPair(menu.energy(), menu.energyCapacity())));
         CompactValueText.renderTooltipIfHovered(

@@ -29,6 +29,7 @@ import com.rngtech.content.recipe.ToolDamageShapelessRecipe;
 import com.rngtech.content.recipe.TraitShapedRecipe;
 import com.rngtech.content.recipe.UnidentifiedTraitIdentifyRecipe;
 import com.rngtech.content.recipe.UnidentifiedTraitIngredient;
+import com.rngtech.content.recipe.UreaSynthesisRecipe;
 import com.rngtech.content.recipe.VacuumCollapseRecipe;
 import com.rngtech.content.recipe.WoodenDehumidifierConversionRecipe;
 
@@ -118,6 +119,10 @@ public final class ModRecipes {
             RECIPE_SERIALIZERS.register("ammonia_synthesis", AmmoniaSynthesisRecipe.Serializer::new);
     public static final DeferredHolder<RecipeType<?>, RecipeType<AmmoniaSynthesisRecipe>> AMMONIA_SYNTHESIS_TYPE =
             RECIPE_TYPES.register("ammonia_synthesis", () -> RecipeType.simple(RNGTech.id("ammonia_synthesis")));
+    public static final DeferredHolder<RecipeSerializer<?>, RecipeSerializer<UreaSynthesisRecipe>> UREA_SYNTHESIS_SERIALIZER =
+            RECIPE_SERIALIZERS.register("urea_synthesis", UreaSynthesisRecipe.Serializer::new);
+    public static final DeferredHolder<RecipeType<?>, RecipeType<UreaSynthesisRecipe>> UREA_SYNTHESIS_TYPE =
+            RECIPE_TYPES.register("urea_synthesis", () -> RecipeType.simple(RNGTech.id("urea_synthesis")));
     public static final DeferredHolder<RecipeSerializer<?>, RecipeSerializer<AmmoniaPowerCycleRecipe>> AMMONIA_POWER_CYCLE_SERIALIZER =
             RECIPE_SERIALIZERS.register("ammonia_power_cycle", AmmoniaPowerCycleRecipe.Serializer::new);
     public static final DeferredHolder<RecipeType<?>, RecipeType<AmmoniaPowerCycleRecipe>> AMMONIA_POWER_CYCLE_TYPE =

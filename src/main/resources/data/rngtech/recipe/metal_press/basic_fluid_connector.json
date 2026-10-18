@@ -19,7 +19,7 @@
     "id": "rngtech:basic_fluid_connector"
   },
   "processing_ticks": 120,
-  "energy": 1200,
+  "heat": 474,
   "minimum_temperature": 900,
   "safe_maximum_temperature": 1300,
   "required_temperature_stability": 1.0,

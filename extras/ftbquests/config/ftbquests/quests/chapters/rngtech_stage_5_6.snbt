@@ -152,7 +152,7 @@
 			y: 6.0d
 		}
 		{
-			dependencies: ["7106E7A1B10F0310", "46A1F2C0DE100040"]
+			dependencies: ["7106E7A1B10F0310"]
 			id: "7106E7A1B10F0316"
 			optional: true
 			tasks: [
@@ -254,7 +254,7 @@
 			y: 6.0d
 		}
 		{
-			dependencies: ["37A6C9E1284B5D26", "46A1F2C0DE100030"]
+			dependencies: ["37A6C9E1284B5D26"]
 			id: "5E1CA6E1D5C00500"
 			optional: true
 			rewards: [{
@@ -492,7 +492,10 @@
 			y: -2.5d
 		}
 		{
-			dependencies: ["7106E7A1B10F0050", "5E1CA6E1D5C00500", "7106E7A1B10F0328"]
+			dependencies: [
+				"7106E7A1B10F0050"
+				"5E1CA6E1D5C00500"
+			]
 			id: "7106E7A1B10F0060"
 			optional: true
 			rewards: [
@@ -630,23 +633,16 @@
 			y: 6.0d
 		}
 		{
-			dependencies: ["7106E7A1B10F0050", "4CC5AA5185C3D06B"]
-			id: "9E1165C60E56ECF8"
+			dependencies: ["7106E7A1B10F0070"]
+			id: "36290C98154741A7"
 			optional: true
-			tasks: [
-				{
-					id: "628C83F7142DD61D"
-					item: { count: 1, id: "rngtech:aluminum_cathode" }
-					type: "item"
-				}
-				{
-					id: "40E3B449A4988A35"
-					item: { count: 1, id: "rngtech:aluminum_anode" }
-					type: "item"
-				}
-			]
-			x: 5.0d
-			y: 3.5d
+			tasks: [{
+				id: "1EDE0958D7048E66"
+				item: { count: 1, id: "rngtech:urea" }
+				type: "item"
+			}]
+			x: 13.5d
+			y: -0.5d
 		}
 	]
 }

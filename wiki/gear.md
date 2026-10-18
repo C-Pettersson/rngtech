@@ -389,7 +389,7 @@ These single-item parts gate the gas chemistry machines' recipes and tune their 
 |---|---|
 | {{ item('rngtech:ammonia_catalyst_bed') }} | [Ammonia Synthesizer](ammonia-synthesizer.md) (required) |
 | {{ item('rngtech:reforming_catalyst_bed') }} | [Steam Methane Reformer](steam-methane-reformer.md) (required) |
-| {{ item('rngtech:fuel_cell_membrane') }} | [Ammonia Fuel Cell](ammonia-fuel-cell.md) (required) |
+| {{ item('rngtech:fuel_cell_membrane') }} | [Fuel Cell](ammonia-fuel-cell.md) (required) |
 
 {{ crafting('rngtech:fuel_cell_membrane') }}
 

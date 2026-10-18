@@ -12,6 +12,7 @@ import com.rngtech.content.menu.MetalPressMenu;
 import com.rngtech.content.recipe.MetalPressRecipe;
 import com.rngtech.content.recipe.MetalPressRecipeInput;
 import com.rngtech.content.registry.ModBlockEntities;
+import com.rngtech.content.registry.ModDataComponents;
 import com.rngtech.content.registry.ModItems;
 import com.rngtech.content.registry.ModRecipes;
 import com.rngtech.content.registry.ModTags;
@@ -55,6 +56,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.energy.IEnergyStorage;
+import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.ItemStackHandler;
 
@@ -88,6 +90,7 @@ public class MetalPressBlockEntity extends BaseMachineBlockEntity
     public static final int STATUS_WARMING = 12;
     public static final int STATUS_ROUTE_DISABLED = 13;
     public static final int STATUS_SWAPPING_MOLD = 14;
+    public static final int STATUS_FILLING_BATCH = 15;
 
     private static final double NO_BATTERY_PROCESSING_SPEED = 0.85;
     private static final int NO_BATTERY_STABILITY_PENALTY = 20;
@@ -113,7 +116,7 @@ public class MetalPressBlockEntity extends BaseMachineBlockEntity
     private static final int DATA_HEAT_TRANSFER = 16;
     private static final int DATA_MAX_TEMPERATURE = 17;
     private static final int DATA_TEMPERATURE_STABILITY = 18;
-    private static final int DATA_WARMUP_TIME = 19;
+    private static final int DATA_THERMAL_MASS = 19;
     private static final int DATA_COOLING_RATE = 20;
     private static final int DATA_OVERHEAT_TOLERANCE = 21;
     private static final int DATA_STABILITY = 22;
@@ -123,7 +126,25 @@ public class MetalPressBlockEntity extends BaseMachineBlockEntity
     private static final int DATA_ENERGY_PER_CRAFT = 26;
     private static final int DATA_LEDGER = DATA_ENERGY_PER_CRAFT + 1;
     private static final int DATA_BATCH_SIZE = DATA_LEDGER + 1;
-    private static final int DATA_MACHINE_PROGRESSION_START = DATA_BATCH_SIZE + 1;
+    private static final int DATA_HEAT_SLIDER = DATA_BATCH_SIZE + 1;
+    private static final int DATA_SETPOINT = DATA_HEAT_SLIDER + 1;
+    private static final int DATA_THERMAL_CONDUCTIVITY = DATA_SETPOINT + 1;
+    private static final int DATA_HOLDING_ENERGY = DATA_THERMAL_CONDUCTIVITY + 1;
+    private static final int DATA_HEATING_ENERGY = DATA_HOLDING_ENERGY + 1;
+    private static final int DATA_HEAT_FACTOR = DATA_HEATING_ENERGY + 1;
+    private static final int DATA_WOBBLE = DATA_HEAT_FACTOR + 1;
+    private static final int DATA_HEAT_REACH = DATA_WOBBLE + 1;
+    private static final int DATA_HEAT_MAXIMUM = DATA_HEAT_REACH + 1;
+    private static final int DATA_INPUT_ENERGY = DATA_HEAT_MAXIMUM + 1;
+    private static final int DATA_NITROGEN = DATA_INPUT_ENERGY + 1;
+    private static final int DATA_NITROGEN_USE = DATA_NITROGEN + 1;
+    private static final int DATA_NITROGEN_BONUS = DATA_NITROGEN_USE + 1;
+    private static final int DATA_HYDROGEN = DATA_NITROGEN_BONUS + 1;
+    private static final int DATA_ANNEAL_MODE = DATA_HYDROGEN + 1;
+    private static final int DATA_MACHINE_PROGRESSION_START = DATA_ANNEAL_MODE + 1;
+    public static final int ANNEAL_NONE = 0;
+    public static final int ANNEAL_CIRCUITS = 1;
+    public static final int ANNEAL_PLATES = 2;
     private static final int DATA_COUNT = DATA_MACHINE_PROGRESSION_START + MasteryMenuSupport.FIELD_COUNT;
     private static final int STAT_SCALE = 100;
     private static final int LEGACY_SLOT_BATTERY_CELL = 3;
@@ -190,6 +211,7 @@ public class MetalPressBlockEntity extends BaseMachineBlockEntity
     private final EnergyTelemetry energyFlow = new EnergyTelemetry(this::getLevel);
     private final IEnergyStorage trackedEnergyStorage = energyFlow.track(energyStorage);
     private final InstalledBatteryCell batteryCell = new InstalledBatteryCell(this::batteryCellStack);
+    private final InertAtmosphere atmosphere = new InertAtmosphere(this::setChanged, () -> true, () -> annealMode() != ANNEAL_NONE);
     private final ContainerData menuData = new ContainerData() {
         @Override
         public int get(int index) {
@@ -203,17 +225,22 @@ public class MetalPressBlockEntity extends BaseMachineBlockEntity
             MetalPressRecipe recipe = nextRecipe();
             MachineStatAccumulator stats = routeStats(recipe, effectiveStats());
             return switch (index) {
-                case DATA_PROGRESS -> syncedProgress(0, progress);
+                case DATA_PROGRESS -> syncedProgress(0, currentElapsedTicks(recipe, stats));
                 case DATA_PROCESSING_TICKS -> currentProcessingTicks(recipe, stats);
                 case DATA_ENERGY -> energyStored();
                 case DATA_ENERGY_CAPACITY -> energyCapacity();
-                case DATA_HEAT -> currentTemperature;
+                case DATA_HEAT -> heat.temperature();
                 case DATA_MIN_TEMPERATURE -> currentMinimumTemperature(recipe, stats);
                 case DATA_TARGET_TEMPERATURE -> currentTargetTemperature(recipe);
                 case DATA_SAFE_MAX_TEMPERATURE -> currentSafeMaximumTemperature(recipe, stats);
                 case DATA_OVERHEAT_TEMPERATURE -> currentOverheatTemperature(recipe, stats);
                 case DATA_FAILURE_RISK -> HeatControl.failureProgress(failureStrain);
                 case DATA_STATUS -> statusCode(recipe, stats);
+                case DATA_NITROGEN -> atmosphere.amount();
+                case DATA_NITROGEN_USE -> atmosphere.lastUse();
+                case DATA_NITROGEN_BONUS -> (int) Math.round(atmosphereBonus() * 100.0);
+                case DATA_HYDROGEN -> atmosphere.holdsHydrogen() ? 1 : 0;
+                case DATA_ANNEAL_MODE -> annealMode();
                 case DATA_PROCESSING_SPEED -> scaledStat(stats, MachineStat.PROCESSING_SPEED);
                 case DATA_EFFICIENCY -> scaledStat(stats, MachineStat.EFFICIENCY);
                 case DATA_ENERGY_USAGE -> scaledStat(stats, MachineStat.ENERGY_USAGE);
@@ -222,15 +249,25 @@ public class MetalPressBlockEntity extends BaseMachineBlockEntity
                 case DATA_HEAT_TRANSFER -> scaledStat(stats, MachineStat.HEAT_TRANSFER);
                 case DATA_MAX_TEMPERATURE -> scaledStat(stats, MachineStat.MAX_TEMPERATURE);
                 case DATA_TEMPERATURE_STABILITY -> scaledStat(stats, MachineStat.TEMPERATURE_STABILITY);
-                case DATA_WARMUP_TIME -> scaledStat(stats, MachineStat.WARMUP_TIME);
+                case DATA_THERMAL_MASS -> scaledStat(stats, MachineStat.THERMAL_MASS);
                 case DATA_COOLING_RATE -> scaledStat(stats, MachineStat.COOLING_RATE);
                 case DATA_OVERHEAT_TOLERANCE -> scaledStat(stats, MachineStat.OVERHEAT_TOLERANCE);
                 case DATA_STABILITY -> scaledStat(stats, MachineStat.STABILITY);
                 case DATA_REFINEMENT_POTENTIAL -> scaledStat(stats, MachineStat.REFINEMENT_POTENTIAL);
                 case DATA_BATCH_SIZE -> BatchProcessing.statBatchSize(stats) * STAT_SCALE;
                 case DATA_SELECTED_MOLD -> selectedMold;
-                case DATA_ENERGY_PER_TICK -> recipe == null ? 0 : energyCostPerTick(recipe, stats);
-                case DATA_ENERGY_PER_CRAFT -> recipe == null ? 0 : energyCostPerCraft(recipe, stats);
+                case DATA_ENERGY_PER_TICK -> currentEnergyCostPerTick(stats);
+                case DATA_ENERGY_PER_CRAFT -> recipe == null ? 0 : currentEnergyCostPerCraft(recipe, stats);
+                case DATA_HEAT_SLIDER -> heatSlider;
+                case DATA_THERMAL_CONDUCTIVITY -> scaledStat(stats, MachineStat.THERMAL_CONDUCTIVITY);
+                case DATA_HOLDING_ENERGY -> heatEnergy(0);
+                case DATA_INPUT_ENERGY -> heatEnergy(1);
+                case DATA_HEATING_ENERGY -> heatEnergy(2);
+                case DATA_HEAT_FACTOR -> heatFactorDisplay();
+                case DATA_WOBBLE -> wobbleDisplay();
+                case DATA_SETPOINT -> recipe == null ? 0 : envelope(recipe, stats).setpoint();
+                case DATA_HEAT_REACH -> recipe == null ? 0 : envelope(recipe, stats).reach();
+                case DATA_HEAT_MAXIMUM -> stats.intValue(MachineStat.MAX_TEMPERATURE);
                 case DATA_LEDGER -> recipe == null || !ledgerActive(recipe, stats) ? -1 : LedgerNbt.permille(batchLedger.progress(recipe.outputStack().getItem()));
                 default -> 0;
             };
@@ -249,15 +286,18 @@ public class MetalPressBlockEntity extends BaseMachineBlockEntity
     private final BulkSpeedState bulkSpeed = new BulkSpeedState();
     private static final RecipeCache.Search<MetalPressRecipe> RECIPE_SEARCH = MetalPressRecipes::find;
     private final RecipeCache<MetalPressRecipe> recipes = new RecipeCache<>(MOLD_SLOT_COUNT);
-    private int progress;
+    private final HeatLane heat = new HeatLane();
+    /** Whether the press is cooling down to its work ceiling, and whether the heater went short of FE, as of the last tick. */
+    private boolean tooHot;
+    private boolean starved;
+    /** How far past the recipe target the press runs, in percent of the band up to Max Temperature. */
+    private int heatSlider;
     private int internalEnergy;
-    private int currentTemperature;
     private int lastMinimumTemperature;
     private int lastTargetTemperature;
     private int lastSafeMaximumTemperature;
     private int failureStrain;
     private int powerDropTicks;
-    private boolean targetReached;
     private int selectedMold;
     private ItemStack activeInput = ItemStack.EMPTY;
     private ItemStack activeMold = ItemStack.EMPTY;
@@ -271,6 +311,7 @@ public class MetalPressBlockEntity extends BaseMachineBlockEntity
     }
 
     public static void serverTick(Level level, BlockPos pos, BlockState state, MetalPressBlockEntity press) {
+        press.atmosphere.beginTick();
         MetalPressRecipe recipe = press.nextRecipe();
         MachineStatAccumulator stats = press.routeStats(recipe, press.effectiveStats());
         if (recipe == null || !press.hasRequiredComponents()) {
@@ -278,7 +319,7 @@ public class MetalPressBlockEntity extends BaseMachineBlockEntity
             boolean swapping = press.rackMolds(stats);
             press.resetCycleIfActive();
             // Quick Change keeps the press hot while Mold Rack swaps.
-            if (!(swapping && press.hasMasteryBehavior("QUICK_CHANGE")) && press.cool(stats)) {
+            if (press.idle(stats, swapping && press.hasMasteryBehavior("QUICK_CHANGE"))) {
                 press.setChanged();
             }
             BaseMachineBlock.setActive(level, pos, state, false);
@@ -292,94 +333,105 @@ public class MetalPressBlockEntity extends BaseMachineBlockEntity
         press.escapement.observe(recipe);
         press.rememberHeatEnvelope(recipe, stats);
 
+        // A blocked output keeps the forming bed at its setpoint, so pressing resumes as soon as there is room.
+        if (press.effectiveHeat(stats) >= recipe.targetTemperature()
+                && !press.crudePressBlocksUnstableRecipe(recipe, stats)
+                && !press.canMergeOutput(press.pressedOutput(recipe))) {
+            press.tooHot = false;
+            press.starved = false;
+            HeatEngine.hold(press.heat, press.envelope(recipe, stats), stats, HeatEngine.electric(press.heat, stats, press::drawEnergy));
+            press.setChanged();
+            BaseMachineBlock.setActive(level, pos, state, false);
+            return;
+        }
         if (press.effectiveHeat(stats) < recipe.targetTemperature()
-                || press.tooHot(recipe, stats)
                 || press.crudePressBlocksUnstableRecipe(recipe, stats)
-                || !press.canMergeOutput(recipe.outputStack())) {
-            if (press.cool(stats)) {
+                || press.waitsForFullBatch(recipe, stats)) {
+            if (press.idle(stats, false)) {
                 press.setChanged();
             }
             BaseMachineBlock.setActive(level, pos, state, false);
             return;
         }
 
-        int energyCost = press.energyCostPerTick(recipe, stats);
-        if (press.progress == 0 && press.currentTemperature < recipe.targetTemperature()) {
-            press.targetReached = false;
-        }
-        int requiredTemperature = press.requiredTemperatureForProgress(recipe, stats);
-        if (press.currentTemperature < requiredTemperature) {
-            if (press.consumeWorkingEnergy(energyCost, true) >= energyCost) {
-                press.consumeWorkingEnergy(energyCost, false);
-                if (press.warm(recipe, stats, requiredTemperature)) {
-                    press.setChanged();
-                }
-                BaseMachineBlock.setActive(level, pos, state, true);
-            } else {
-                if (!press.isCrudePress() && press.progress > 0 && press.registerPowerDrop(recipe)) {
-                    press.tryFailCycle(recipe);
-                }
-                if (press.cool(stats)) {
-                    press.setChanged();
-                }
-                BaseMachineBlock.setActive(level, pos, state, false);
+        HeatEngine.Envelope envelope = press.envelope(recipe, stats);
+        HeatEngine.HeatSupply supply = HeatEngine.electric(press.heat, stats, press::drawEnergy);
+        HeatLane heat = press.heat;
+        if (!heat.started()
+                && heat.exactTemperature() >= envelope.minimum()
+                && heat.exactTemperature() <= envelope.ceilingFor(heat)
+                && ProcessingChance.rollInstant(level, stats)
+                && press.payInstant(recipe, stats, supply)) {
+            press.markInstantProcess();
+            press.startCycleIfNeeded(recipe, stats);
+            press.decayPowerDrop();
+            if (press.process(recipe, stats)) {
+                press.bulkSpeed.recordProcess(press.activeTraits());
             }
-            return;
-        }
-        press.targetReached = true;
-
-        if (press.progress == 0 && ProcessingChance.rollInstant(level, stats)) {
-            int fullEnergyCost = press.energyCostPerCraft(recipe, stats) * press.batchJobs(recipe, stats);
-            if (press.consumeWorkingEnergy(fullEnergyCost, true) >= fullEnergyCost) {
-                press.markInstantProcess();
-                press.startCycleIfNeeded(recipe, stats);
-                press.consumeWorkingEnergy(fullEnergyCost, false);
-                press.decayPowerDrop();
-                if (press.process(recipe, stats)) {
-                    press.bulkSpeed.recordProcess(press.activeTraits());
-                }
-                BaseMachineBlock.setActive(level, pos, state, true);
-                press.setChanged();
-                return;
-            }
-        }
-        // Each batched job pays its share of the FE.
-        energyCost *= press.batchJobs(recipe, stats);
-        if (press.consumeWorkingEnergy(energyCost, true) < energyCost) {
-            if (!press.isCrudePress() && press.progress > 0 && press.registerPowerDrop(recipe)) {
-                press.tryFailCycle(recipe);
-            }
-            if (press.cool(stats)) {
-                press.setChanged();
-            }
-            BaseMachineBlock.setActive(level, pos, state, false);
-            return;
-        }
-
-        press.startCycleIfNeeded(recipe, stats);
-        press.consumeWorkingEnergy(energyCost, false);
-        press.decayPowerDrop();
-        press.progress++;
-        press.updateFailureStrain(recipe, stats);
-
-        if (!press.isCrudePress() && press.failureStrain >= FAILURE_STRAIN_THRESHOLD) {
-            if (press.tryFailCycle(recipe)) {
-                BaseMachineBlock.setActive(level, pos, state, false);
-            } else {
-                BaseMachineBlock.setActive(level, pos, state, false);
-            }
+            BaseMachineBlock.setActive(level, pos, state, true);
             press.setChanged();
             return;
         }
 
-        if (press.progress >= press.processingTicks(recipe, stats)) {
-            if (press.process(recipe, stats)) {
-                press.bulkSpeed.recordProcess(press.activeTraits());
-            }
-        }
-
-        BaseMachineBlock.setActive(level, pos, state, true);
+        boolean wasStarted = heat.started();
+        HeatEngine.Tick tick = HeatEngine.work(heat, envelope, stats, press.load(recipe, stats), supply, level.getGameTime(), 0);
+        press.tooHot = tick.tooHot();
+        press.starved = tick.starved();
+        BaseMachineBlock.setActive(level, pos, state, tick.working() || heat.lastHeat() > 0.0);
         press.setChanged();
+        if (tick.tooHot() || !heat.started()) {
+            return;
+        }
+        if (!wasStarted) {
+            press.startCycleIfNeeded(recipe, stats);
+        }
+        if (tick.starved()) {
+            if (!press.isCrudePress() && press.registerPowerDrop(recipe)) {
+                press.tryFailCycle(recipe);
+                return;
+            }
+        } else {
+            press.decayPowerDrop();
+        }
+        press.updateFailureStrain(recipe, stats, envelope, tick.workTemperature());
+        press.atmosphere.use(tick.workTemperature(), HeatEngine.overheatTemperature(envelope.safeMaximum(), stats), press.atmosphereBonus());
+        if (!press.isCrudePress() && press.failureStrain >= FAILURE_STRAIN_THRESHOLD) {
+            press.tryFailCycle(recipe);
+            return;
+        }
+        if (HeatEngine.finished(heat, press.cycleWork(recipe, stats)) && press.process(recipe, stats)) {
+            press.bulkSpeed.recordProcess(press.activeTraits());
+        }
+    }
+
+    /** FE/t the heater spent last tick: on wall loss when {@code holding}, otherwise on heating the chamber and input. */
+    private int heatEnergy(int part) {
+        return (int) Math.ceil(HeatEngine.heatSplit(heat)[part] * HeatEngine.energyRate(effectiveStats()));
+    }
+
+    private int heatFactorDisplay() {
+        MetalPressRecipe recipe = nextRecipe();
+        MachineStatAccumulator stats = routeStats(recipe, effectiveStats());
+        return recipe == null || !(hasRequiredComponents()) ? 0 : (int) Math.round(100.0 * HeatEngine.heatFactor(heat.exactTemperature(), envelope(recipe, stats)));
+    }
+
+    private int wobbleDisplay() {
+        MetalPressRecipe recipe = nextRecipe();
+        MachineStatAccumulator stats = routeStats(recipe, effectiveStats());
+        return recipe == null || !(hasRequiredComponents()) ? 0 : (int) Math.round(HeatEngine.wobbleAmplitude(envelope(recipe, stats), stats));
+    }
+
+    public int heatSlider() {
+        return heatSlider;
+    }
+
+    /** Sets how far past each recipe target the press runs, from 0 to 100 percent of the band up to Max Temperature. */
+    public void setHeatSlider(int percent) {
+        int clamped = Math.max(0, Math.min(100, percent));
+        if (clamped != heatSlider) {
+            heatSlider = clamped;
+            setChanged();
+        }
     }
 
     public ItemStackHandler getProcessInventory() {
@@ -413,6 +465,15 @@ public class MetalPressBlockEntity extends BaseMachineBlockEntity
         return trackedEnergyStorage;
     }
 
+    public IFluidHandler getFluidHandler(Direction side) {
+        return atmosphere.inlet();
+    }
+
+    /** Overheat Tolerance the Nitrogen tank adds, with Blast Draft only. */
+    private double atmosphereBonus() {
+        return atmosphere.overheatBonus(hasMasteryBehavior("BLAST_DRAFT"));
+    }
+
     @Override
     public IItemHandler getItemHandler(Direction side) {
         if (side == Direction.UP) {
@@ -441,7 +502,7 @@ public class MetalPressBlockEntity extends BaseMachineBlockEntity
                         MachineInfoSnapshot.workState(
                                 status == STATUS_READY || status == STATUS_WARMING,
                                 getBlockState().getValue(BaseMachineBlock.ACTIVE),
-                                status == STATUS_NO_INPUT
+                                status == STATUS_NO_INPUT || status == STATUS_FILLING_BATCH
                         ),
                         MachineInfoSnapshot.BlockedReason.NONE
                 )
@@ -449,7 +510,7 @@ public class MetalPressBlockEntity extends BaseMachineBlockEntity
                         statusKey(status),
                         status == STATUS_WARMING ? currentTargetTemperature(recipe) : currentMinimumTemperature(recipe, stats)
                 )
-                .progress(progress, currentProcessingTicks(recipe, stats))
+                .progress(currentElapsedTicks(recipe, stats), currentProcessingTicks(recipe, stats))
                 .energy(energyStored(), energyCapacity(), -energyDemand)
                 .energyTelemetry(
                         energyFlow.lastInput(),
@@ -457,7 +518,9 @@ public class MetalPressBlockEntity extends BaseMachineBlockEntity
                         connector.transferRate(),
                         AdjacentEnergyConnector.inputBottleneck(connector, energyDemand)
                 )
-                .heat(currentTemperature, currentTargetTemperature(recipe))
+                .heat(heat.temperature(), currentTargetTemperature(recipe))
+                .setpoint(recipe == null ? 0 : envelope(recipe, stats).setpoint())
+                .batch(recipe == null ? 0 : batchJobs(recipe, stats))
                 .gear(hasHeatCore()
                         ? MachineInfoSnapshot.GearSummary.HEAT_CORE_INSTALLED
                         : MachineInfoSnapshot.GearSummary.MISSING_HEAT_CORE)
@@ -473,8 +536,7 @@ public class MetalPressBlockEntity extends BaseMachineBlockEntity
             return 0;
         }
         return switch (status) {
-            case STATUS_READY -> energyCostPerTick(recipe, stats) * batchJobs(recipe, stats);
-            case STATUS_WARMING, STATUS_NO_POWER -> energyCostPerTick(recipe, stats);
+            case STATUS_READY, STATUS_WARMING, STATUS_NO_POWER -> currentEnergyCostPerTick(stats);
             default -> 0;
         };
     }
@@ -495,6 +557,7 @@ public class MetalPressBlockEntity extends BaseMachineBlockEntity
             case STATUS_WARMING -> "warming";
             case STATUS_ROUTE_DISABLED -> "route_disabled";
             case STATUS_SWAPPING_MOLD -> "swapping_mold";
+            case STATUS_FILLING_BATCH -> "filling_batch";
             default -> "";
         };
         return name.isEmpty() ? "" : "rngtech.press.status." + name;
@@ -571,15 +634,17 @@ public class MetalPressBlockEntity extends BaseMachineBlockEntity
         super.saveAdditional(tag, registries);
         tag.put("ProcessInventory", processInventory.serializeNBT(registries));
         tag.put("GearInventory", gearInventory.serializeNBT(registries));
-        tag.putInt("Progress", progress);
+        CompoundTag heatTag = new CompoundTag();
+        heat.save(heatTag);
+        tag.put("Heat", heatTag);
+        tag.putInt("HeatTrack", heatSlider);
         tag.putInt("Energy", internalEnergyStored());
-        tag.putInt("CurrentTemperature", currentTemperature);
         tag.putInt("LastMinimumTemperature", lastMinimumTemperature);
         tag.putInt("LastTargetTemperature", lastTargetTemperature);
         tag.putInt("LastSafeMaximumTemperature", lastSafeMaximumTemperature);
         tag.putInt("FailureStrain", failureStrain);
+        atmosphere.save(tag, registries);
         tag.putInt("PowerDropTicks", powerDropTicks);
-        tag.putBoolean("TargetReached", targetReached);
         tag.putInt("SelectedMold", selectedMold);
         tag.put("ActiveInput", activeInput.saveOptional(registries));
         tag.put("ActiveMold", activeMold.saveOptional(registries));
@@ -599,15 +664,21 @@ public class MetalPressBlockEntity extends BaseMachineBlockEntity
         if (legacyGearLayout) {
             migrateLegacyBatteryCell();
         }
-        progress = tag.getInt("Progress");
+        if (tag.contains("Heat")) {
+            heat.load(tag.getCompound("Heat"));
+        } else {
+            // Saved before the heat engine: the press keeps its heat, and an unfinished press starts over.
+            heat.resetCycle();
+            heat.setTemperature(tag.getInt("CurrentTemperature"));
+        }
+        heatSlider = Math.max(0, Math.min(100, tag.getInt("HeatTrack")));
         internalEnergy = Math.max(0, tag.getInt("Energy"));
-        currentTemperature = Math.max(0, tag.getInt("CurrentTemperature"));
         lastMinimumTemperature = Math.max(0, tag.getInt("LastMinimumTemperature"));
         lastTargetTemperature = Math.max(0, tag.getInt("LastTargetTemperature"));
         lastSafeMaximumTemperature = Math.max(0, tag.getInt("LastSafeMaximumTemperature"));
         failureStrain = Math.max(0, tag.getInt("FailureStrain"));
+        atmosphere.load(tag, registries);
         powerDropTicks = Math.max(0, tag.getInt("PowerDropTicks"));
-        targetReached = tag.getBoolean("TargetReached") || progress > 0;
         selectedMold = clampMoldIndex(tag.getInt("SelectedMold"));
         activeInput = ItemStack.parseOptional(registries, tag.getCompound("ActiveInput"));
         activeMold = ItemStack.parseOptional(registries, tag.getCompound("ActiveMold"));
@@ -707,6 +778,32 @@ public class MetalPressBlockEntity extends BaseMachineBlockEntity
         return false;
     }
 
+    /** Which pressed items this press anneals: Bright Anneal takes circuits, Hydrogen Quench takes plates. */
+    private int annealMode() {
+        return hasMasteryBehavior("BRIGHT_ANNEAL") ? ANNEAL_CIRCUITS : hasMasteryBehavior("HYDROGEN_QUENCH") ? ANNEAL_PLATES : ANNEAL_NONE;
+    }
+
+    /** Whether this recipe's output comes out Annealed while the tank holds enough Hydrogen for one item. */
+    private boolean willAnneal(MetalPressRecipe recipe) {
+        ItemStack output = recipe.outputStack();
+        boolean anneals = switch (annealMode()) {
+            case ANNEAL_CIRCUITS -> isCircuit(recipe) && output.is(ModTags.Items.ANNEALED_CALIBRATION_INPUTS);
+            case ANNEAL_PLATES -> isPlate(recipe) && output.is(ModTags.Items.PLATES);
+            default -> false;
+        };
+        return anneals && atmosphere.canAnneal(1);
+    }
+
+    /** The output this press makes next: Annealed when it will anneal it. */
+    private ItemStack pressedOutput(MetalPressRecipe recipe) {
+        return willAnneal(recipe) ? annealed(recipe.outputStack()) : recipe.outputStack();
+    }
+
+    private static ItemStack annealed(ItemStack stack) {
+        stack.set(ModDataComponents.ANNEALED.get(), true);
+        return stack;
+    }
+
     /** Forge Line disables circuit recipes. */
     private boolean routeDisabled(MetalPressRecipe recipe) {
         return isCircuit(recipe) && hasMasteryBehavior("FORGE_LINE");
@@ -728,7 +825,7 @@ public class MetalPressBlockEntity extends BaseMachineBlockEntity
         if (hasMasteryBehavior("PRODUCTION_DIE")) {
             speed *= isGearOrCasing(recipe) ? 1.4 : isCircuit(recipe) ? 0.75 : 1.0;
         }
-        if (hasMasteryBehavior("HOT_STAMPING") && isPlate(recipe) && currentTemperature > recipe.targetTemperature()) {
+        if (hasMasteryBehavior("HOT_STAMPING") && isPlate(recipe) && heat.temperature() > recipe.targetTemperature()) {
             speed *= 1.2;
         }
         return speed;
@@ -737,7 +834,19 @@ public class MetalPressBlockEntity extends BaseMachineBlockEntity
     /** The batch locked when the cycle started, shrunk only if its input has since gone. */
     private int batchJobs(MetalPressRecipe recipe, MachineStatAccumulator stats) {
         int available = availableBatch(recipe, stats);
-        return progress > 0 && lockedBatch > 0 ? Math.min(lockedBatch, available) : available;
+        return heat.started() && lockedBatch > 0 ? Math.min(lockedBatch, available) : available;
+    }
+
+    /** Dense Batching: an idle press waits until its stack and output room fit a full batch. */
+    private boolean waitsForFullBatch(MetalPressRecipe recipe, MachineStatAccumulator stats) {
+        return !heat.started() && hasMasteryBehavior("DENSE_BATCHING") && availableBatch(recipe, stats) < fullBatch(recipe, stats);
+    }
+
+    private int fullBatch(MetalPressRecipe recipe, MachineStatAccumulator stats) {
+        if (isCircuit(recipe) || !(isPlate(recipe) || isGearOrCasing(recipe))) {
+            return 1;
+        }
+        return BatchProcessing.fullBatch(stats, false, inputStack().getMaxStackSize() / Math.max(1, recipe.inputCount()));
     }
 
     /** Plates, gears, and casings press one input set per batched item, as far as input and output allow. Circuits never batch. */
@@ -746,7 +855,10 @@ public class MetalPressBlockEntity extends BaseMachineBlockEntity
             return 1;
         }
         int limit = Math.min(BatchProcessing.batchSize(stats, false), inputStack().getCount() / Math.max(1, recipe.inputCount()));
-        ItemStack output = recipe.outputStack();
+        if (willAnneal(recipe)) {
+            limit = Math.min(limit, atmosphere.amount() / InertAtmosphere.HYDROGEN_PER_ANNEAL);
+        }
+        ItemStack output = pressedOutput(recipe);
         return Math.max(1, BatchProcessing.largestFitting(limit, batch -> batch == 1 || canMergeOutput(output.copyWithCount(output.getCount() * batch))));
     }
 
@@ -796,7 +908,8 @@ public class MetalPressBlockEntity extends BaseMachineBlockEntity
         }
 
         int jobs = batchJobs(recipe, stats);
-        ItemStack baseResult = recipe.outputStack();
+        boolean annealed = willAnneal(recipe) && atmosphere.canAnneal(jobs);
+        ItemStack baseResult = annealed ? annealed(recipe.outputStack()) : recipe.outputStack();
         ItemStack batch = baseResult.copyWithCount(baseResult.getCount() * jobs);
         if (!canMergeOutput(batch)) {
             return false;
@@ -808,25 +921,27 @@ public class MetalPressBlockEntity extends BaseMachineBlockEntity
                 result = canMergeOutput(grown) ? grown : result;
             }
         }
-        result = withBatchLedger(recipe, stats, result, jobs);
+        result = withBatchLedger(recipe, stats, result, baseResult, jobs);
 
         consumeInput(recipe.inputCount() * jobs);
+        if (annealed) {
+            atmosphere.anneal(jobs);
+        }
         mergeOutput(result);
         for (int job = 0; job < jobs; job++) {
             grantRecipeXp(recipe);
         }
         escapement.completed();
-        resetCycle();
+        completeCycle();
         setChanged();
         return true;
     }
 
     /** The Batch Ledger banks a share of every eligible job and pays whole items once the output has room. */
-    private ItemStack withBatchLedger(MetalPressRecipe recipe, MachineStatAccumulator stats, ItemStack result, int jobs) {
+    private ItemStack withBatchLedger(MetalPressRecipe recipe, MachineStatAccumulator stats, ItemStack result, ItemStack base, int jobs) {
         if (!ledgerActive(recipe, stats)) {
             return result;
         }
-        ItemStack base = recipe.outputStack();
         batchLedger.add(base.getItem(), AscendancyFormulas.ledgerShare(stats, base.getCount(), false) * jobs);
         int payable = batchLedger.payable(base.getItem());
         ItemStack paid = ProcessingChance.grow(result, base, payable);
@@ -947,10 +1062,44 @@ public class MetalPressBlockEntity extends BaseMachineBlockEntity
         processInventory.setStackInSlot(SLOT_OUTPUT, merged);
     }
 
-    private int processingTicks(MetalPressRecipe recipe, MachineStatAccumulator stats) {
-        int ticks = Math.max(1, (int) Math.ceil(stats.adjustedHeatProcessingTicks(recipe.processingTicks())
-                / (routeSpeed(recipe, stats) * escapementSpeed(stats))));
-        return BatchProcessing.batchTicks(ticks, stats, batchJobs(recipe, stats));
+    /** The press's heat band: Heat Window moves the minimum and the safe maximum; Master Die ignores stability wobble. */
+    private HeatEngine.Envelope envelope(MetalPressRecipe recipe, MachineStatAccumulator stats) {
+        double requiredStability = hasMasteryBehavior("MASTER_DIE") ? 0.0 : recipe.requiredTemperatureStability();
+        return HeatEngine.envelope(
+                minimumTemperature(recipe, stats),
+                recipe.targetTemperature(),
+                safeMaximumTemperature(recipe, stats),
+                requiredStability,
+                failureEnabled(recipe),
+                hasMasteryBehavior("BLAST_DRAFT"),
+                stats,
+                heatSlider / 100.0,
+                Integer.MAX_VALUE,
+                atmosphereBonus()
+        ).coolingFirst(hasMasteryBehavior("COOL_HEADED"));
+    }
+
+    /** Reference ticks a cycle needs: the recipe's time, longer for every extra item in the batch. */
+    private double cycleWork(MetalPressRecipe recipe, MachineStatAccumulator stats) {
+        return recipe.processingTicks() * BatchProcessing.timeMultiplier(stats, batchJobs(recipe, stats));
+    }
+
+    private HeatEngine.Load load(MetalPressRecipe recipe, MachineStatAccumulator stats) {
+        int jobs = batchJobs(recipe, stats);
+        double workPerTick = HeatEngine.speed(stats) * routeSpeed(recipe, stats) * escapementSpeed(stats);
+        return new HeatEngine.Load(recipe.heat() * (double) jobs * workPerTick / cycleWork(recipe, stats), workPerTick, jobs);
+    }
+
+    private int drawEnergy(int amount) {
+        int take = Math.min(amount, consumeWorkingEnergy(amount, true));
+        return take > 0 ? consumeWorkingEnergy(take, false) : 0;
+    }
+
+    /** Instant Process pays the whole batch's heat at once, without the wall loss of a full cycle. */
+    private boolean payInstant(MetalPressRecipe recipe, MachineStatAccumulator stats, HeatEngine.HeatSupply supply) {
+        double needed = recipe.heat() * (double) batchJobs(recipe, stats);
+        int energyCost = (int) Math.ceil(needed * HeatEngine.energyRate(stats));
+        return consumeWorkingEnergy(energyCost, true) >= energyCost && HeatEngine.payAtOnce(supply, needed);
     }
 
     private double escapementSpeed(MachineStatAccumulator stats) {
@@ -958,18 +1107,23 @@ public class MetalPressBlockEntity extends BaseMachineBlockEntity
     }
 
 
-    private int energyCostPerTick(MetalPressRecipe recipe, MachineStatAccumulator stats) {
-        int adjustedTicks = processingTicks(recipe, stats);
-        int totalEnergy = stats.adjustedEnergyCost(recipe.energy());
-        return Math.max(1, (int) Math.ceil(totalEnergy / (double) adjustedTicks));
+    /** FE the heater drew last tick. */
+    private int currentEnergyCostPerTick(MachineStatAccumulator stats) {
+        return (int) Math.ceil(heat.lastHeat() * HeatEngine.energyRate(stats));
     }
 
-    private int energyCostPerCraft(MetalPressRecipe recipe, MachineStatAccumulator stats) {
-        return stats.adjustedEnergyCost(recipe.energy());
+    /** FE one item costs at the setpoint: its own heat plus its share of the wall loss during the cycle. */
+    private int currentEnergyCostPerCraft(MetalPressRecipe recipe, MachineStatAccumulator stats) {
+        int jobs = batchJobs(recipe, stats);
+        return HeatEngine.steadyEnergyPerCycle(envelope(recipe, stats), load(recipe, stats), cycleWork(recipe, stats), stats) / Math.max(1, jobs);
     }
 
     private int currentProcessingTicks(MetalPressRecipe recipe, MachineStatAccumulator stats) {
-        return recipe == null ? 0 : processingTicks(recipe, stats);
+        return recipe == null ? 0 : HeatEngine.cycleTicks(cycleWork(recipe, stats), load(recipe, stats), envelope(recipe, stats));
+    }
+
+    private int currentElapsedTicks(MetalPressRecipe recipe, MachineStatAccumulator stats) {
+        return recipe == null ? 0 : HeatEngine.elapsedTicks(heat, load(recipe, stats), envelope(recipe, stats));
     }
 
     private int currentMinimumTemperature(MetalPressRecipe recipe, MachineStatAccumulator stats) {
@@ -988,7 +1142,7 @@ public class MetalPressBlockEntity extends BaseMachineBlockEntity
         int safeMaximumTemperature = currentSafeMaximumTemperature(recipe, stats);
         return safeMaximumTemperature <= 0
                 ? 0
-                : HeatControl.effectiveOverheatTemperature(safeMaximumTemperature, stats);
+                : HeatControl.effectiveOverheatTemperature(safeMaximumTemperature, stats, atmosphereBonus());
     }
 
     private int effectiveSafeMaximumTemperature(MetalPressRecipe recipe, MachineStatAccumulator stats) {
@@ -1014,7 +1168,7 @@ public class MetalPressBlockEntity extends BaseMachineBlockEntity
         if (recipe == null) {
             return level != null && moldRecipe(selectedMold) != null ? STATUS_ROUTE_DISABLED : STATUS_INVALID_RECIPE;
         }
-        if (tooHot(recipe, stats)) {
+        if (tooHot) {
             return STATUS_HEAT_HIGH;
         }
         if (effectiveHeat(stats) < recipe.targetTemperature()) {
@@ -1023,59 +1177,36 @@ public class MetalPressBlockEntity extends BaseMachineBlockEntity
         if (isCrudePress() && stats.value(MachineStat.TEMPERATURE_STABILITY) < recipe.requiredTemperatureStability()) {
             return STATUS_STABILITY_LOW;
         }
-        if (!canMergeOutput(recipe.outputStack())
+        if (!canMergeOutput(pressedOutput(recipe))
                 || (!isCrudePress()
                         && failureStrain >= FAILURE_STRAIN_THRESHOLD
                         && !canMergeOutput(recipe.failureStack()))) {
             return STATUS_OUTPUT_FULL;
         }
+        if (waitsForFullBatch(recipe, stats)) {
+            return inputStack().getCount() / Math.max(1, recipe.inputCount()) < fullBatch(recipe, stats)
+                    ? STATUS_FILLING_BATCH
+                    : STATUS_OUTPUT_FULL;
+        }
         if (powerDropTicks > 0) {
             return STATUS_POWER_DROP;
         }
-        if (currentTemperature < requiredTemperatureForProgress(recipe, stats)) {
-            int energyCost = energyCostPerTick(recipe, stats);
-            return consumeWorkingEnergy(energyCost, true) < energyCost ? STATUS_NO_POWER : STATUS_WARMING;
+        if (starved) {
+            return STATUS_NO_POWER;
         }
-        int energyCost = energyCostPerTick(recipe, stats);
-        return consumeWorkingEnergy(energyCost, true) < energyCost ? STATUS_NO_POWER : STATUS_READY;
-    }
-
-    /** Heat left from a hotter recipe cools to this recipe's overheat line before either press works it. */
-    private boolean tooHot(MetalPressRecipe recipe, MachineStatAccumulator stats) {
-        return currentTemperature > effectiveSafeMaximumTemperature(recipe, stats);
+        return heat.started() ? STATUS_READY : STATUS_WARMING;
     }
 
     private boolean crudePressBlocksUnstableRecipe(MetalPressRecipe recipe, MachineStatAccumulator stats) {
         return isCrudePress() && stats.value(MachineStat.TEMPERATURE_STABILITY) < recipe.requiredTemperatureStability();
     }
 
-    private int requiredTemperatureForProgress(MetalPressRecipe recipe, MachineStatAccumulator stats) {
-        return targetReached ? minimumTemperature(recipe, stats) : recipe.targetTemperature();
-    }
-
-    private boolean warm(MetalPressRecipe recipe, MachineStatAccumulator stats, int requiredTemperature) {
-        int nextTemperature = Math.min(
-                Math.min(requiredTemperature, stats.intValue(MachineStat.MAX_TEMPERATURE)),
-                currentTemperature + HeatControl.warmupRate(stats)
-        );
-        if (nextTemperature == currentTemperature) {
-            return false;
-        }
-        currentTemperature = nextTemperature;
-        if (currentTemperature >= recipe.targetTemperature()) {
-            targetReached = true;
-        }
-        return true;
-    }
-
-    private boolean cool(MachineStatAccumulator stats) {
-        int nextTemperature = Math.max(HeatControl.AMBIENT_TEMPERATURE, currentTemperature - HeatControl.coolingStep(stats, level == null ? 0L : level.getGameTime()));
-        boolean changed = false;
-        if (nextTemperature != currentTemperature) {
-            currentTemperature = nextTemperature;
-            changed = true;
-        }
-        if (currentTemperature <= HeatControl.AMBIENT_TEMPERATURE) {
+    /** An idle press leaks heat unless something holds it. */
+    private boolean idle(MachineStatAccumulator stats, boolean holdHeat) {
+        tooHot = false;
+        starved = false;
+        boolean changed = HeatEngine.idle(heat, stats, holdHeat);
+        if (heat.temperature() <= HeatEngine.AMBIENT) {
             changed |= clearHeatEnvelope();
         }
         return changed;
@@ -1096,11 +1227,16 @@ public class MetalPressBlockEntity extends BaseMachineBlockEntity
     }
 
     private boolean hasCooldownHeat() {
-        return currentTemperature > HeatControl.AMBIENT_TEMPERATURE && lastSafeMaximumTemperature > 0;
+        return heat.temperature() > HeatEngine.AMBIENT && lastSafeMaximumTemperature > 0;
     }
 
-    private void updateFailureStrain(MetalPressRecipe recipe, MachineStatAccumulator stats) {
-        if (!failureEnabled(recipe)) {
+    private void updateFailureStrain(
+            MetalPressRecipe recipe,
+            MachineStatAccumulator stats,
+            HeatEngine.Envelope envelope,
+            double workTemperature
+    ) {
+        if (!envelope.canFail()) {
             failureStrain = 0;
             return;
         }
@@ -1108,22 +1244,14 @@ public class MetalPressBlockEntity extends BaseMachineBlockEntity
         // Master Die: only heat outside the window adds strain, measured without the stability wobble.
         boolean masterDie = hasMasteryBehavior("MASTER_DIE");
         double requiredStability = masterDie ? 0.0 : recipe.requiredTemperatureStability();
-        int simulatedTemperature = HeatControl.simulatedTemperature(
-                currentTemperature,
-                recipe.targetTemperature(),
-                requiredStability,
-                stats,
-                worldPosition,
-                level == null ? 0L : level.getGameTime(),
-                0
-        );
         int addedStrain = HeatControl.failureStrainFromTemperature(
-                simulatedTemperature,
-                minimumTemperature(recipe, stats),
-                HeatControl.effectiveOverheatTemperature(safeMaximumTemperature(recipe, stats), stats),
+                (int) Math.round(workTemperature),
+                envelope.minimum(),
+                envelope.overheat(),
                 requiredStability,
                 stats
         );
+        addedStrain = HeatControl.paced(addedStrain, workTemperature, envelope);
         if (hasMasteryBehavior("TOLERANCE_MAP")) {
             addedStrain = (int) Math.round(addedStrain * 0.6);
         }
@@ -1169,13 +1297,12 @@ public class MetalPressBlockEntity extends BaseMachineBlockEntity
     }
 
     private void startCycleIfNeeded(MetalPressRecipe recipe, MachineStatAccumulator stats) {
-        if (progress != 0) {
+        if (lockedBatch != 0) {
             return;
         }
         lockedBatch = availableBatch(recipe, stats);
         activeInput = singleCopy(inputStack());
         activeMold = singleCopy(moldStack());
-        failureStrain = 0;
         powerDropTicks = 0;
         if (bulkSpeed.startRecipe(recipe)) {
             setChanged();
@@ -1183,7 +1310,7 @@ public class MetalPressBlockEntity extends BaseMachineBlockEntity
     }
 
     private boolean activeCycleMatches() {
-        if (progress == 0) {
+        if (!heat.started()) {
             return true;
         }
         return !activeInput.isEmpty()
@@ -1195,10 +1322,10 @@ public class MetalPressBlockEntity extends BaseMachineBlockEntity
     private final EscapementState escapement = new EscapementState();
 
     private void resetCycleIfActive() {
-        if (progress != 0
+        if (heat.started()
+                || heat.work() > 0.0
                 || failureStrain != 0
                 || powerDropTicks != 0
-                || targetReached
                 || !activeInput.isEmpty()
                 || !activeMold.isEmpty()) {
             resetCycle();
@@ -1208,13 +1335,19 @@ public class MetalPressBlockEntity extends BaseMachineBlockEntity
     }
 
     private void resetCycle() {
-        progress = 0;
+        heat.resetCycle();
         lockedBatch = 0;
         failureStrain = 0;
         powerDropTicks = 0;
-        targetReached = false;
         activeInput = ItemStack.EMPTY;
         activeMold = ItemStack.EMPTY;
+    }
+
+    /** A finished cycle keeps its strain: only time in the safe band drains it, so short cycles cannot dodge it. */
+    private void completeCycle() {
+        int strain = failureStrain;
+        resetCycle();
+        failureStrain = strain;
     }
 
     private void resetBulkSpeed() {

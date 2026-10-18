@@ -7,7 +7,7 @@
         "id": "minecraft:netherite_scrap"
     },
     "processing_ticks": 200,
-    "energy": 4800,
+    "heat": 11989,
     "experience": 2,
     "minimum_temperature": 2000,
     "required_temperature_stability": 1.05,

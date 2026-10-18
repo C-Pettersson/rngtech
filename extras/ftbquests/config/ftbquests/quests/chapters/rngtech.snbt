@@ -876,7 +876,7 @@
 			y: -9.0d
 		}
 		{
-			dependencies: ["7106E7A1B10F0240", "7431964561B74763"]
+			dependencies: ["7106E7A1B10F0240"]
 			id: "2C865B9D41D7EEBB"
 			tasks: [{
 				id: "15AE6121EF4C9879"
@@ -959,7 +959,7 @@
 			y: 5.5d
 		}
 		{
-			dependencies: ["10D59A7D9BDC28C1", "724590047E493088"]
+			dependencies: ["10D59A7D9BDC28C1"]
 			id: "510CAD7DC389C5A5"
 			optional: true
 			tasks: [{
@@ -971,7 +971,7 @@
 			y: 7.0d
 		}
 		{
-			dependencies: ["10D59A7D9BDC28C1", "1FACE973E783CB4C"]
+			dependencies: ["10D59A7D9BDC28C1"]
 			id: "4256134BC1B890B1"
 			optional: true
 			tasks: [{
@@ -1006,40 +1006,6 @@
 			}]
 			x: 9.5d
 			y: 7.0d
-		}
-		{
-			dependencies: ["37A6C9E1284B5D10"]
-			id: "C8764D7EDB5586AE"
-			tasks: [{
-				id: "529ED28196C194BF"
-				type: "checkmark"
-			}]
-			x: -3.0d
-			y: 1.5d
-		}
-		{
-			dependencies: ["37A6C9E1284B5D13"]
-			id: "5457DA22336DA9D8"
-			optional: true
-			tasks: [{
-				id: "B92F5E7CF6C8D93B"
-				item: { count: 1, id: "rngtech:iron_tool_rod" }
-				type: "item"
-			}]
-			x: 17.0d
-			y: 1.5d
-		}
-		{
-			dependencies: ["37A6C9E1284B5D3B", "4F5AA1D34A0C1A4C", "724590047E493088"]
-			id: "1053383AC7EC2C92"
-			optional: true
-			tasks: [{
-				id: "1ECB363FF3FE8045"
-				item: { count: 1, id: "rngtech:forestry_cart" }
-				type: "item"
-			}]
-			x: 15.0d
-			y: 1.5d
 		}
 	]
 }

@@ -81,6 +81,7 @@ import com.rngtech.content.item.ToolHeadItem;
 import com.rngtech.content.item.ToolRodItem;
 import com.rngtech.content.item.UniquePartItem;
 import com.rngtech.content.item.UniversalConnectorItem;
+import com.rngtech.content.item.UreaItem;
 import com.rngtech.content.item.VacuumCollapsePartItem;
 import com.rngtech.content.item.WrenchItem;
 import com.rngtech.content.machine.AlloyBlendMaterial;
@@ -640,6 +641,7 @@ public final class ModItems {
             "algae_biomass",
             () -> new Item(new Item.Properties())
     );
+    public static final DeferredItem<Item> UREA = ITEMS.register("urea", () -> new UreaItem(new Item.Properties()));
     public static final DeferredItem<Item> DENSE_ALGAE_BIOMASS = ITEMS.register(
             "dense_algae_biomass",
             () -> new Item(new Item.Properties())
@@ -650,6 +652,10 @@ public final class ModItems {
     );
     public static final DeferredItem<Item> COLLAPSE_RESIDUE = ITEMS.register(
             "collapse_residue",
+            () -> new Item(new Item.Properties())
+    );
+    public static final DeferredItem<Item> ASH = ITEMS.register(
+            "ash",
             () -> new Item(new Item.Properties())
     );
     public static final Map<ResonanceCalibratorChassis, DeferredItem<ResonanceCalibratorBlockItem>> RESONANCE_CALIBRATORS =

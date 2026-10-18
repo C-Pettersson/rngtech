@@ -204,6 +204,7 @@ public final class ModCreativeTabs {
                         output.accept(ModItems.RICH_BIOMASS.get());
                         output.accept(ModItems.ALGAE_BIOMASS.get());
                         output.accept(ModItems.DENSE_ALGAE_BIOMASS.get());
+                        output.accept(ModItems.UREA.get());
                         for (ResonanceCalibratorChassis chassis : ResonanceCalibratorChassis.values()) {
                             output.accept(ModItems.resonanceCalibrator(chassis).get());
                         }
@@ -222,6 +223,7 @@ public final class ModCreativeTabs {
                         output.accept(ModItems.GASIFICATION_RESIDUE.get());
                         output.accept(ModItems.VOID_CATALYST.get());
                         output.accept(ModItems.COLLAPSE_RESIDUE.get());
+                        output.accept(ModItems.ASH.get());
                         for (CrushHeadMaterial material : CrushHeadMaterial.values()) {
                             output.accept(ModItems.crushHead(material).get());
                         }

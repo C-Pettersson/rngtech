@@ -42,12 +42,14 @@ public class AmmoniaSynthesizerMenu extends AbstractContainerMenu implements Sta
     private static final int DATA_ENERGY_TRANSFER = 10;
     private static final int DATA_PROCESSING_SPEED = 11;
     private static final int DATA_REFINEMENT_POTENTIAL = 12;
-    private static final int DATA_COUNT = 13;
+    private static final int DATA_CARBON = 13;
+    private static final int DATA_COUNT = 14;
     private static final int STAT_SCALE = 100;
     private static final int CATALYST_SLOT = 0;
     private static final int REFINEMENT_CONSUMABLE_SLOT = 1;
     private static final int REFINEMENT_TARGET_SLOT = 2;
-    private static final int PLAYER_INVENTORY_START = 3;
+    private static final int UREA_SLOT = 3;
+    private static final int PLAYER_INVENTORY_START = 4;
     private static final int HOTBAR_END = PLAYER_INVENTORY_START + 36;
 
     private final ContainerLevelAccess access;
@@ -74,6 +76,7 @@ public class AmmoniaSynthesizerMenu extends AbstractContainerMenu implements Sta
         addSlot(new TabbedSlot(synthesizer.getGearInventory(), AmmoniaSynthesizerBlockEntity.SLOT_CATALYST_BED, 80, 48, () -> selectedTab == TAB_GEAR));
         addSlot(RefinementMenuSupport.consumableSlot(synthesizer.getRefinementInventory(), 0, RefinementMenuSupport.REFINEMENT_CONSUMABLE_SLOT_X, RefinementMenuSupport.REFINEMENT_SLOT_Y, () -> selectedTab == TAB_REFINEMENT));
         addSlot(RefinementMenuSupport.targetDisplaySlot(refinementTarget, RefinementMenuSupport.REFINEMENT_TARGET_SLOT_X, RefinementMenuSupport.REFINEMENT_SLOT_Y, () -> selectedTab == TAB_REFINEMENT));
+        addSlot(new TabbedSlot(synthesizer.getUreaOutput(), AmmoniaSynthesizerBlockEntity.SLOT_UREA, 196, 45, () -> selectedTab == TAB_PROCESSING));
         addPlayerInventory(playerInventory);
         addDataSlots(data);
     }
@@ -134,6 +137,14 @@ public class AmmoniaSynthesizerMenu extends AbstractContainerMenu implements Sta
 
     public int hydrogen() {
         return data.get(DATA_HYDROGEN);
+    }
+
+    public float carbonFill() {
+        return fill(DATA_CARBON, DATA_TANK_CAPACITY);
+    }
+
+    public int carbon() {
+        return data.get(DATA_CARBON);
     }
 
     public int ammonia() {

@@ -77,6 +77,7 @@ public class CrusherBlockEntity extends BaseMachineBlockEntity implements MenuPr
     public static final int STATUS_INSUFFICIENT_INPUT = 7;
     public static final int STATUS_JAMMED = 8;
     public static final int STATUS_UNDER_LEVEL_PENALTY = 9;
+    public static final int STATUS_FILLING_BATCH = 10;
 
     public static final int SLOT_INPUT_A = 0;
     public static final int SLOT_FUEL = 1;
@@ -450,6 +451,7 @@ public class CrusherBlockEntity extends BaseMachineBlockEntity implements MenuPr
                 .stage(chassisMaterial().stage())
                 .state(machineInfoState(status), crusherBlockedReason(status))
                 .progress(progress, currentProcessingTicks(stats))
+                .batch(currentActiveJobs(stats))
                 .energy(energyStored(), energyCapacity(), energyDemand > 0 ? -energyDemand : 0)
                 .energyTelemetry(
                         lastEnergyInput(),
@@ -679,7 +681,7 @@ public class CrusherBlockEntity extends BaseMachineBlockEntity implements MenuPr
 
     private int prepareBatchJobs(CrusherRecipe recipe, MachineStatAccumulator stats) {
         if (progress <= 0) {
-            batchJobs = availableJobs(recipe, stats);
+            batchJobs = waitsForFullBatch(recipe, stats) ? 0 : availableJobs(recipe, stats);
             return batchJobs;
         }
         if (batchJobs <= 0) {
@@ -697,6 +699,16 @@ public class CrusherBlockEntity extends BaseMachineBlockEntity implements MenuPr
             return 0;
         }
         return progress > 0 && batchJobs > 0 ? batchJobs : availableJobs(recipe, stats);
+    }
+
+    /** Dense Batching: an idle Crusher waits until its stack and output room fit a full batch. */
+    private boolean waitsForFullBatch(CrusherRecipe recipe, MachineStatAccumulator stats) {
+        return progress <= 0 && hasMasteryBehavior("DENSE_BATCHING") && availableJobs(recipe, stats) < fullBatch(recipe, stats);
+    }
+
+    private int fullBatch(CrusherRecipe recipe, MachineStatAccumulator stats) {
+        int slotLimit = inventory.getStackInSlot(SLOT_INPUT_A).getMaxStackSize() / Math.max(1, recipe.inputCount());
+        return BatchProcessing.fullBatch(stats, hasMasteryBehavior("REFINERS_OATH"), slotLimit);
     }
 
     private int availableJobs(CrusherRecipe recipe, MachineStatAccumulator stats) {
@@ -899,6 +911,9 @@ public class CrusherBlockEntity extends BaseMachineBlockEntity implements MenuPr
         if (!canAcceptOutput(recipe, stats)) {
             return STATUS_OUTPUT_FULL;
         }
+        if (waitsForFullBatch(recipe, stats)) {
+            return input.getCount() / recipe.inputCount() < fullBatch(recipe, stats) ? STATUS_FILLING_BATCH : STATUS_OUTPUT_FULL;
+        }
         int energyCost = currentEnergyCostPerTick(stats);
         if (energyCost > 0 && consumeWorkingEnergy(energyCost, true) < energyCost) {
             return STATUS_NO_POWER;
@@ -915,7 +930,9 @@ public class CrusherBlockEntity extends BaseMachineBlockEntity implements MenuPr
                     ? MachineInfoSnapshot.WorkState.RUNNING
                     : MachineInfoSnapshot.WorkState.IDLE;
         }
-        return status == STATUS_NO_INPUT ? MachineInfoSnapshot.WorkState.IDLE : MachineInfoSnapshot.WorkState.BLOCKED;
+        return status == STATUS_NO_INPUT || status == STATUS_FILLING_BATCH
+                ? MachineInfoSnapshot.WorkState.IDLE
+                : MachineInfoSnapshot.WorkState.BLOCKED;
     }
 
     private static boolean isRunnableStatus(int status) {

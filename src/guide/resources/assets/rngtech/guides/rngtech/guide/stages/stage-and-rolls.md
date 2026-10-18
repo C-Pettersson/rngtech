@@ -8,7 +8,7 @@ navigation:
 
 # Stage and rolls
 
-When a machine, Gear part, or Battery Cell rolls its traits, its stage sets the size of its [Refinement Potential](rngtech:rarity-and-affixes/refinement-potential.md) budget:
+When a machine, Gear part, or Battery Cell rolls its traits, its stage sets the size of its [Refinement Potential](rngtech:rarity-and-affixes.md#refinement-potential) budget:
 
 | Stage | Refinement Potential |
 |---:|---:|

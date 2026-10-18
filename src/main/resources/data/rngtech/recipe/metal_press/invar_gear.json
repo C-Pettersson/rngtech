@@ -19,7 +19,7 @@
     "id": "rngtech:invar_gear"
   },
   "processing_ticks": 300,
-  "energy": 3600,
+  "heat": 1672,
   "minimum_temperature": 1100,
   "safe_maximum_temperature": 1400,
   "required_temperature_stability": 1.0,

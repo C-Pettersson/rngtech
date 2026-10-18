@@ -117,7 +117,7 @@ public final class MetalPressRecipeCategory implements IRecipeCategory<RecipeHol
         JeiCategoryUi.drawLine(
                 guiGraphics,
                 font,
-                JeiCategoryUi.energyCost(recipe.energy(), recipe.processingTicks()),
+                JeiCategoryUi.heatCost(recipe.heat(), recipe.processingTicks()),
                 42,
                 JeiCategoryUi.TEXT_COLOR
         );

@@ -59,7 +59,7 @@ Mine a placed Furnace with a pickaxe. It drops itself and keeps its rolled trait
 
 ### Smelting
 
-Put items in the top input slot. The Furnace heats up at a rate set by its Heat Transfer and Warmup Time stats, and starts smelting only once the lane reaches the recipe's target temperature. While the lane is blocked, out of input, or out of power, it cools down.
+Put items in the top input slot. Each lane heats up and starts smelting once it reaches the recipe's temperature, and leaks heat while it has nothing to smelt. The Furnace pays FE, or fuel, for the heat it puts in, including what its walls lose, so a hotter lane costs more per smelt. See [Heat](heat.md) for how lanes heat and the overheat slider on the Process tab.
 
 Each metal smelts at its own pace: low-melting Lead and Tin in half the time of Iron, high-melting Osmium, Titanium, and Tungsten in two and a half to four times as long. The FE per smelt does not change.
 
@@ -83,7 +83,7 @@ Crushed material smelts straight into ingots, which is handy for simple hopper l
 
 There is no Steel Dust smelting recipe. Steel comes from Steel Blend, which you make in the [Alloy Furnace](alloy-furnace.md) and then smelt here.
 
-Stage 4 and higher metal recipes also need temperature stability. A Stage 0–3 Furnace will not start one without enough stability. A Stage 4 or higher Furnace starts it anyway, but poor stability or heat above the recipe's safe maximum builds up failure strain. A lane left above the recipe's overheat temperature by a hotter recipe cools down to it before smelting, so switching to a cooler metal costs time instead of ingots. Higher Overheat Tolerance shortens that wait. When strain fills, the input becomes a {{ item('rngtech:malformed_ingot') }} of that metal. Smelt it again to get two nuggets back. Ancient Debris never fails.
+Stage 4 and higher metal recipes also need temperature stability. A Stage 0–3 Furnace will not start one without enough stability. A Stage 4 or higher Furnace starts it anyway, but poor stability or heat above the recipe's safe maximum builds up failure strain. A lane left above the recipe's overheat temperature by a hotter recipe cools down to it before smelting, so switching to a cooler metal costs time instead of ingots. Higher Overheat Tolerance shortens that wait. When strain fills, the input becomes a {{ item('rngtech:malformed_ingot') }} of that metal. Smelt it again to get two nuggets back. On any Furnace, a metal smelt pushed past its overheat temperature with the [overheat slider](heat.md#the-overheat-slider) builds strain the same way. Ancient Debris never fails.
 
 ### Stages
 
@@ -100,11 +100,11 @@ Stage 4 and higher metal recipes also need temperature stability. A Stage 0–3 
 | 7 | {{ item('rngtech:tungstensteel_furnace_chassis') }} | Heavy late-game heat chassis. |
 | 8 | {{ item('rngtech:exotic_furnace_chassis') }} | Optional endgame chassis. |
 
-Higher-stage metal recipes cost more FE: Stage 5–8 recipes cost 2×, 3×, 4× and 6× the early baseline. Recipes needing 1,750 heat or more cost another 2× on electric Furnaces.
+Higher-stage metal recipes need more heat: Stage 5–8 recipes take 2×, 3×, 4× and 6× the early baseline, and recipes needing 1,750 heat or more twice that again.
 
 ### Batching
 
-With a Batch Size above 1, each lane smelts several items from its input stack in one cycle. A batch takes as many items as the stack and the lane's free output space allow, up to the Batch Size, and keeps that count until the cycle ends. Each extra item makes the cycle longer by the Batch Overhead, 25% of one item's time to start with. Every item still pays its own FE, or its own burn time on the Stage 0 Furnace, and earns its own XP. Heating a lane costs the same however many items it batches. If a batch fails, every item in it becomes a {{ item('rngtech:malformed_ingot') }}.
+With a Batch Size above 1, each lane smelts several items from its input stack in one cycle. A batch takes as many items as the stack and the lane's free output space allow, up to the Batch Size, and keeps that count until the cycle ends. Each extra item makes the cycle longer by the Batch Overhead, 25% of one item's time to start with. Every item still absorbs its own heat, paid in FE or burn time, and earns its own XP. A bigger batch takes a bigger heat dip from the lane when it goes in. If a batch fails, every item in it becomes a {{ item('rngtech:malformed_ingot') }}.
 
 ### Gear
 
@@ -122,13 +122,13 @@ The Stage 0 Furnace burns fuel from a slot on its Process tab and does not need 
 | Top | Inserts into the input lane(s). Accepts only items with a Furnace recipe. |
 | Bottom | Extracts finished output. |
 | Sides | Fuel on Stage 0, Battery Cells on electric stages. |
-| Any | Electric stages accept FE, for example from a [Universal Cable](universal-cable.md). |
+| Any | Electric stages accept FE, for example from a [Universal Cable](universal-cable.md), and Nitrogen for the [Nitrogen atmosphere](heat.md#nitrogen-atmosphere). |
 
 Automation fills the input lanes in order: lane 1 takes a full stack before lane 2 gets anything, so a slow feed into a Lead Furnace keeps one lane busy while the others sit idle. The **Even Feed** keystone on the [Machine Mastery](machine-mastery.md) tree changes that. With it, each item that arrives through automation goes to the emptiest lane that can hold it, so a hopper trickle or a full stack from a cable spreads across every lane. It does not change which items the Furnace accepts, and a lane never holds two kinds of item. Items you place by hand still go where you put them. Even Feed sits right on a road, 15 points from the Furnace start, and has no downside beyond the points it costs.
 
 ### Mastery and Ascendancies
 
-Smelting ores, raw metals, crushed ores, and alloy blends earns Furnace Mastery XP, and you spend the points on the shared [Machine Mastery](machine-mastery.md) tree. Reversible dust-to-ingot smelts, food, and decorative blocks earn no XP. Furnaces choose between the **Crucible Keeper** and **Bloomer** [ascendancies](machine-mastery.md#ascendancies).
+Smelting ores, raw metals, crushed ores, and alloy blends earns Furnace Mastery XP, and you spend the points on the shared [Machine Mastery](machine-mastery.md) tree. Reversible dust-to-ingot smelts, food, and decorative blocks earn no XP. Furnaces choose between the **Crucible Keeper** and **Bloomer** [ascendancies](machine-mastery.md#ascendancies). Crucible Keeper's Overdrive speeds a lane up only past the recipe's safe maximum, so it needs the **Blast Draft** keystone to let the [overheat slider](heat.md#the-overheat-slider) go that far.
 
 Two keystones cap your heat in exchange for speed or savings. Each cap only stops Gear from going higher; it never raises a weaker Heat Core. Compare the caps with the heat column in the [recipe table](#furnace-recipes).
 
@@ -139,7 +139,7 @@ Other Furnace keystones:
 
 - **Quench Protocol** halves temperature failure strain, for 25% less Heat Transfer.
 - **Closed Loop Recuperator** returns 25% of each electric smelt's FE to the internal buffer, for 15% less Processing Speed.
-- **Thermal Reservoir** gives 60% less Cooling Rate, so the Furnace keeps its heat between jobs, but 25% more Warmup Time from cold.
+- **Thermal Reservoir** gives 40% more Heat Insulation and 50% more Thermal Mass, so the Furnace keeps its heat between jobs and through load dips, but warms up more slowly from cold.
 - **High Flux** gives 100% more Heat Transfer for 25% more Energy Usage and 40% less Fuel Duration.
 
 ### Furnace recipes
@@ -162,15 +162,15 @@ Every node in this machine's ascendancies. See [Machine Mastery](machine-mastery
 | Hotter Lanes | Small | Overdrive Lanes | +5% Overdrive Cap. |
 | **Superheat** | Notable | Hotter Lanes | +15% Overdrive Cap. |
 | Deep Draft | Small | Superheat | 10% increased Heat Transfer. |
-| **Crucible Heart** | Deep notable | Deep Draft | Recipes whose target is at most half the lane’s temperature finish two inputs per cycle at twice the FE. |
+| **Crucible Heart** | Deep notable | Deep Draft | +1 Batch Size while a lane runs at twice the recipe target or hotter. |
 | Banked Coals | Small | Overdrive Lanes | 10% increased Heat Insulation. |
 | **Hold the Fire** | Notable | Banked Coals | A lane does not cool while its input slot holds a smeltable input. |
 | Watchful Gauge | Small | Overdrive Lanes | +10 °C Overdrive Margin. |
-| **Safe Margin** | Notable | Watchful Gauge | +15 °C Overdrive Margin. Overdrive never enters a recipe’s overheat band. |
+| **Safe Margin** | Notable | Watchful Gauge | +15 °C Overdrive Margin. The overheat slider stops at the recipe’s safe maximum, and wobble never spikes past the overheat temperature. |
 | Steady Hands | Small | Safe Margin | +2 Strain Recovery. |
 | **Strain Bleed** | Deep notable | Steady Hands | +10 Strain Recovery. |
 | Stoked Hearth | Small | Overdrive Lanes | 4% increased Max Temperature. |
-| **Shared Hearth** | Notable | Stoked Hearth | A lane warming up starts at the hottest working lane’s temperature, up to its own target. |
+| **Shared Hearth** | Notable | Stoked Hearth | Each load dip is split across every lane that is smelting. |
 
 ### Bloomer
 
@@ -196,7 +196,7 @@ Every node in this machine's ascendancies. See [Machine Mastery](machine-mastery
 
 The Furnace screen has five tabs:
 
-- **Process**: input and output lanes, live heat, failure strain, and energy or fuel. Hover for exact temperatures.
+- **Process**: input and output lanes, live heat, failure strain, and energy or fuel. Electric stages add the Nitrogen gauge at the right edge. Hover for exact temperatures.
 - **Gear**: Heat Core and Battery Cell slots.
 - **Stats**: the machine's current stats, including traits, Gear, and Mastery.
 - **Refinement**: refine the placed Furnace's traits with a catalyst.

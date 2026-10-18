@@ -12,4 +12,4 @@ A cold-running Heat Core for presses and furnaces that punish unstable heat. Its
 
 - **Signature:** (40–80)% more Temperature Stability, (40–80)% more Overheat Tolerance, and Power Grace, which normal parts only have on Stage 6 and higher Servos.
 - **Drop Forge:** +(5–15)% Heat Window.
-- **Drawback:** (35–20)% less Heat Transfer, which slows heating and processing, including in the Melter.
+- **Drawback:** (35–20)% less Heat Transfer, which slows heating and recovery, including in the Melter.

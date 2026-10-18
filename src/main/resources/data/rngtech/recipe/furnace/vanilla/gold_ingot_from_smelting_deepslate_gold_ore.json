@@ -8,8 +8,13 @@
         "id": "minecraft:gold_ingot"
     },
     "processing_ticks": 200,
-    "energy": 4800,
+    "heat": 3443,
     "experience": 1,
     "minimum_temperature": 1000,
-    "machine_xp": 2
+    "machine_xp": 2,
+    "failure_output": {
+        "count": 1,
+        "id": "rngtech:malformed_ingot"
+    },
+    "failure_material": "gold"
 }
