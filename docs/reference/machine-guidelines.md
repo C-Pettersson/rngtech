@@ -182,6 +182,7 @@ Design intent and balance rules behind shipped machines that the code does not s
 ### Furnace
 
 - Vanilla ore and raw-metal smelts are mirrored as `rngtech:furnace` recipes with the same heat gates, so vanilla inputs cannot bypass metal heat progression.
+- Every smelt form of a metal shares its heat gate (minimum temperature and stability), and a raw metal smelts like its ore block (`1.5x` the dust heat and time), so direct smelting is the slow, low-yield shortcut and processing pays: crushing doubles the ingots, and dust is the cheapest smelt. `tools/generate_material_resources.py` copies the ore smelt onto raw, and `SmeltGateChecks` holds the gate. Iron, Copper, and Gold keep their vanilla-mirrored raw and ore smelts at the dust price.
 - Crushed material smelts directly for early hopper lines, but at `3x` the time and `1.5x` the FE of dust, so the dust step stays worthwhile.
 - Steel comes from the Alloy Furnace, as Steel Blend or direct ingots. Do not add a Furnace Steel Dust smelt.
 - The Stage 0 solid-fuel Furnace is deliberately slow (`0.54x` base speed).

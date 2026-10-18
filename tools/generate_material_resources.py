@@ -653,29 +653,30 @@ def crusher_ore_ingredient(material_id: str, host: str) -> OrderedDict:
     return OrderedDict([("type", "neoforge:difference"), ("base", ore_tag), ("subtracted", deepslate_tag)])
 
 
-HEAT_GATE_KEYS = ("heat", "minimum_temperature", "target_temperature", "safe_maximum_temperature",
+RAW_SMELT_KEYS = ("processing_ticks", "heat", "minimum_temperature", "target_temperature", "safe_maximum_temperature",
                   "required_temperature_stability")
 
 
-def raw_heat_gate(material_id: str) -> OrderedDict:
-    """A raw metal smelts behind the same heat gate as its dust, so raw never skips the metal's furnace stage."""
-    dust_path = DATA_ROOT / f"rngtech/recipe/furnace/metals/{material_id}_from_dust.json"
-    if not dust_path.exists():
-        return OrderedDict([("heat", scaled_heat(2880, 1000)), ("minimum_temperature", 1000)])
-    with dust_path.open(encoding="utf-8") as handle:
-        dust = json.load(handle, object_pairs_hook=OrderedDict)
-    return OrderedDict((key, dust[key]) for key in HEAT_GATE_KEYS if key in dust)
+def raw_smelt_terms(material_id: str) -> OrderedDict:
+    """A raw metal smelts like its ore block: same time, heat, and heat gate, so raw is never a cheap shortcut."""
+    for form in ("ore", "dust"):
+        path = DATA_ROOT / f"rngtech/recipe/furnace/metals/{material_id}_from_{form}.json"
+        if path.exists():
+            with path.open(encoding="utf-8") as handle:
+                recipe = json.load(handle, object_pairs_hook=OrderedDict)
+            return OrderedDict((key, recipe[key]) for key in RAW_SMELT_KEYS if key in recipe)
+    return OrderedDict([("processing_ticks", 200), ("heat", scaled_heat(2880, 1000)), ("minimum_temperature", 1000)])
 
 
-def keep_tuned_recipe(path: Path, ingredient: OrderedDict, result: OrderedDict, gate: OrderedDict | None = None) -> bool:
-    """Updates the ingredient, result, and heat gate of a recipe that already exists and keeps its tuned values."""
+def keep_tuned_recipe(path: Path, ingredient: OrderedDict, result: OrderedDict, terms: OrderedDict | None = None) -> bool:
+    """Updates the ingredient, result, and given terms of a recipe that already exists and keeps its other tuned values."""
     if not path.exists():
         return False
     with path.open(encoding="utf-8") as handle:
         recipe = json.load(handle, object_pairs_hook=OrderedDict)
     recipe["ingredient"] = ingredient
     recipe["result"] = result
-    for key, value in (gate or {}).items():
+    for key, value in (terms or {}).items():
         recipe[key] = value
     write_json(path, recipe)
     return True
@@ -693,10 +694,10 @@ def generate_raw_material_recipes(catalog: dict, ore_catalog: dict) -> None:
         material = materials[material_id]
         raw_tag = f"c:raw_materials/{material_id}"
         ingredient = OrderedDict([("tag", raw_tag)])
-        gate = raw_heat_gate(material_id)
+        terms = raw_smelt_terms(material_id)
         ingot = OrderedDict([("id", primary_material_item_id(catalog, forms["ingot"], material))])
         smelt_path = DATA_ROOT / f"rngtech/recipe/furnace/metals/{material_id}_from_raw.json"
-        if not keep_tuned_recipe(smelt_path, ingredient, ingot, gate):
+        if not keep_tuned_recipe(smelt_path, ingredient, ingot, terms):
             write_json(smelt_path, OrderedDict([
                 ("neoforge:conditions", [
                     OrderedDict([
@@ -708,9 +709,8 @@ def generate_raw_material_recipes(catalog: dict, ore_catalog: dict) -> None:
                 ("group", "rngtech_metals"),
                 ("ingredient", ingredient),
                 ("result", ingot),
-                ("processing_ticks", 200),
+                *terms.items(),
                 ("experience", 0.7),
-                *gate.items(),
                 ("failure_output", OrderedDict([("count", 1), ("id", "rngtech:malformed_ingot")])),
                 ("failure_material", material_id),
             ]))

@@ -13,8 +13,8 @@
   "result": {
     "id": "rngtech:tungsten_ingot"
   },
-  "processing_ticks": 800,
-  "heat": 43096,
+  "processing_ticks": 1200,
+  "heat": 64645,
   "experience": 0.7,
   "minimum_temperature": 1750,
   "required_temperature_stability": 1,

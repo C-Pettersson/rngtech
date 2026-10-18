@@ -8,7 +8,7 @@ navigation:
 
 # Smelting heat
 
-Raw metal is the easy route: it smelts into one ingot at only 1,000 heat (800 for raw iron and copper). Ore blocks, crushed material, and dust need the metal's full smelting heat, so your Furnace's Heat Core decides which metals you can process this way.
+Every form of a metal needs the same smelting heat: raw metal, ore blocks, crushed material, and dust. Your Furnace's Heat Core decides which metals you can smelt at all, whatever form they are in. Raw metal smelts like its ore block, so smelting it directly is the slow, heat-hungry way to get one ingot; crushing it gives two, and dust is the cheapest to smelt.
 
 | Metal | Minimum heat | Needs stability |
 |---|---:|---|
