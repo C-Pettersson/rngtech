@@ -84,7 +84,7 @@ public class WoodenDehumidifierBlock extends BaseMachineBlock {
     }
 
     @Override
-    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> blockEntityType) {
+    protected <T extends BlockEntity> BlockEntityTicker<T> machineTicker(Level level, BlockState state, BlockEntityType<T> blockEntityType) {
         if (level.isClientSide) {
             return null;
         }

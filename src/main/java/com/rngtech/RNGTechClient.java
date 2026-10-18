@@ -17,6 +17,7 @@ import com.rngtech.client.renderer.DerelictCartRenderer;
 import com.rngtech.client.renderer.ForestryCartRenderer;
 import com.rngtech.client.renderer.FurnaceRenderer;
 import com.rngtech.client.renderer.GasChemistryRenderer;
+import com.rngtech.client.renderer.MachineStatusRenderer;
 import com.rngtech.client.renderer.MetalPressRenderer;
 import com.rngtech.client.renderer.ModularToolItemRenderer;
 import com.rngtech.client.renderer.PotentialReactorRenderer;
@@ -78,8 +79,11 @@ import com.rngtech.content.registry.ModItems;
 import com.rngtech.content.registry.ModMenus;
 
 import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
+import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
@@ -183,27 +187,43 @@ public final class RNGTechClient {
     }
 
     private void registerRenderers(EntityRenderersEvent.RegisterRenderers event) {
-        event.registerBlockEntityRenderer(ModBlockEntities.BATTERY_CHASSIS.get(), BatteryChassisRenderer::new);
-        event.registerBlockEntityRenderer(ModBlockEntities.SOLAR_ARRAY_CONTROLLER.get(), SolarArrayControllerRenderer::new);
-        event.registerBlockEntityRenderer(ModBlockEntities.SOLAR_PANEL.get(), SolarPanelRenderer::new);
-        event.registerBlockEntityRenderer(ModBlockEntities.BIO_GENERATOR.get(), BioGeneratorRenderer::new);
-        event.registerBlockEntityRenderer(ModBlockEntities.CAVITATION_GENERATOR.get(), CavitationGeneratorRenderer::new);
-        event.registerBlockEntityRenderer(ModBlockEntities.CORROSION_CELL.get(), CorrosionCellRenderer::new);
-        event.registerBlockEntityRenderer(ModBlockEntities.ALGAE_PHOTOBIOREACTOR.get(), AlgaePhotobioreactorRenderer::new);
-        event.registerBlockEntityRenderer(ModBlockEntities.AMMONIA_FUEL_CELL.get(), AmmoniaFuelCellRenderer::new);
-        event.registerBlockEntityRenderer(ModBlockEntities.GAS_CHEMISTRY.get(), GasChemistryRenderer::new);
-        event.registerBlockEntityRenderer(ModBlockEntities.AMMONIA_SYNTHESIZER.get(), AmmoniaSynthesizerRenderer::new);
-        event.registerBlockEntityRenderer(ModBlockEntities.SOLID_FUEL_BURNER.get(), SolidFuelBurnerRenderer::new);
-        event.registerBlockEntityRenderer(ModBlockEntities.POTENTIAL_REACTOR.get(), PotentialReactorRenderer::new);
-        event.registerBlockEntityRenderer(ModBlockEntities.VACUUM_COLLAPSE_GENERATOR.get(), VacuumCollapseGeneratorRenderer::new);
+        machineRenderer(event, ModBlockEntities.BATTERY_CHASSIS.get(), BatteryChassisRenderer::new);
+        machineRenderer(event, ModBlockEntities.SOLAR_ARRAY_CONTROLLER.get(), SolarArrayControllerRenderer::new);
+        machineRenderer(event, ModBlockEntities.SOLAR_PANEL.get(), SolarPanelRenderer::new);
+        machineRenderer(event, ModBlockEntities.BIO_GENERATOR.get(), BioGeneratorRenderer::new);
+        machineRenderer(event, ModBlockEntities.CAVITATION_GENERATOR.get(), CavitationGeneratorRenderer::new);
+        machineRenderer(event, ModBlockEntities.CORROSION_CELL.get(), CorrosionCellRenderer::new);
+        machineRenderer(event, ModBlockEntities.ALGAE_PHOTOBIOREACTOR.get(), AlgaePhotobioreactorRenderer::new);
+        machineRenderer(event, ModBlockEntities.AMMONIA_FUEL_CELL.get(), AmmoniaFuelCellRenderer::new);
+        machineRenderer(event, ModBlockEntities.GAS_CHEMISTRY.get(), GasChemistryRenderer::new);
+        machineRenderer(event, ModBlockEntities.AMMONIA_SYNTHESIZER.get(), AmmoniaSynthesizerRenderer::new);
+        machineRenderer(event, ModBlockEntities.SOLID_FUEL_BURNER.get(), SolidFuelBurnerRenderer::new);
+        machineRenderer(event, ModBlockEntities.POTENTIAL_REACTOR.get(), PotentialReactorRenderer::new);
+        machineRenderer(event, ModBlockEntities.VACUUM_COLLAPSE_GENERATOR.get(), VacuumCollapseGeneratorRenderer::new);
         event.registerBlockEntityRenderer(ModBlockEntities.TOOL_BENCH.get(), ToolBenchRenderer::new);
-        event.registerBlockEntityRenderer(ModBlockEntities.COMPRESSOR_TANK.get(), CompressorTankRenderer::new);
-        event.registerBlockEntityRenderer(ModBlockEntities.CRUSHER.get(), CrusherRenderer::new);
-        event.registerBlockEntityRenderer(ModBlockEntities.FURNACE.get(), FurnaceRenderer::new);
-        event.registerBlockEntityRenderer(ModBlockEntities.ALLOY_FURNACE.get(), AlloyFurnaceRenderer::new);
-        event.registerBlockEntityRenderer(ModBlockEntities.METAL_PRESS.get(), MetalPressRenderer::new);
+        machineRenderer(event, ModBlockEntities.COMPRESSOR_TANK.get(), CompressorTankRenderer::new);
+        machineRenderer(event, ModBlockEntities.CRUSHER.get(), CrusherRenderer::new);
+        machineRenderer(event, ModBlockEntities.FURNACE.get(), FurnaceRenderer::new);
+        machineRenderer(event, ModBlockEntities.ALLOY_FURNACE.get(), AlloyFurnaceRenderer::new);
+        machineRenderer(event, ModBlockEntities.METAL_PRESS.get(), MetalPressRenderer::new);
+        event.registerBlockEntityRenderer(ModBlockEntities.WOODEN_DEHUMIDIFIER.get(), MachineStatusRenderer.sign());
+        event.registerBlockEntityRenderer(ModBlockEntities.SILICA_GEL_DEHUMIDIFIER.get(), MachineStatusRenderer.sign());
+        event.registerBlockEntityRenderer(ModBlockEntities.RESONANCE_CALIBRATOR.get(), MachineStatusRenderer.sign());
+        event.registerBlockEntityRenderer(ModBlockEntities.COMPONENT_RECYCLER.get(), MachineStatusRenderer.sign());
+        event.registerBlockEntityRenderer(ModBlockEntities.MELTER.get(), MachineStatusRenderer.sign());
+        event.registerBlockEntityRenderer(ModBlockEntities.BATTERY_ASSEMBLER.get(), MachineStatusRenderer.sign());
+        event.registerBlockEntityRenderer(ModBlockEntities.FORESTRY_CART_STATION.get(), MachineStatusRenderer.sign());
         event.registerEntityRenderer(ModEntityTypes.FORESTRY_CART.get(), ForestryCartRenderer::new);
         event.registerEntityRenderer(ModEntityTypes.DERELICT_CART.get(), DerelictCartRenderer::new);
+    }
+
+    /** A machine's own renderer with the shared blocked-machine sign drawn over it. */
+    private static <T extends BlockEntity> void machineRenderer(
+            EntityRenderersEvent.RegisterRenderers event,
+            BlockEntityType<? extends T> type,
+            BlockEntityRendererProvider<T> renderer
+    ) {
+        event.registerBlockEntityRenderer(type, MachineStatusRenderer.around(renderer));
     }
 
     private void registerKeyMappings(RegisterKeyMappingsEvent event) {
