@@ -46,28 +46,16 @@ The **Furnace** is RNGTech's heat-aware smelter. Each recipe needs the machine t
 
 Like every RNGTech machine, each Furnace you craft rolls its own [rarity and affixes](rngtech:rarity-and-affixes.md), and it can level up through [Machine Mastery](rngtech:machine-mastery.md).
 
+You can read a Furnace from the outside. The Stage 0 Furnace is a smooth-stone kiln: fuel burns in the fire mouth at the bottom, the item being smelted sits in the oven above it, and smoke rises from the copper-banded chimney while fuel burns. An electric Furnace shows the item it is smelting on the hearth behind its viewport door. As the lane heats up, the chamber and its heating elements glow from dull red through orange to yellow-white. The bar under the door reads like the [heat bar](rngtech:heat/the-overheat-slider.md) on the Process tab: it fills with the lane's heat against the Heat Core's Max Temperature, a white mark shows the recipe's target and a yellow mark the setpoint when the slider pushes past it, and the fill turns red while the lane overheats. A lane pushed past its target flickers with its wobble. With extra lanes, the items stand side by side on the hearth and the bar reads the hottest lane. The Heat Core sits on the crown as a row of fins in the core's material. Facing the front, the Battery Cell stands in the cradle on the left with its charge meter, the [Nitrogen tank](rngtech:heat/nitrogen-atmosphere.md) is the gas cylinder behind it, and the cable port is on the back. The window on the cylinder shows how full the tank is, and its valve lights up while a lane uses Nitrogen. The Lead Furnace has four small chambers, one per lane: under each column of doors, the upper half of the bar reads the top chamber and the lower half the bottom one. Each chassis has its own shell metal.
+
 ## Usage
 
 - [Smelting](rngtech:furnace/smelting.md)
 - [Stages](rngtech:furnace/stages.md)
-
-### Batching
-
-With a Batch Size above 1, each lane smelts several items from its input stack in one cycle. A batch takes as many items as the stack and the lane's free output space allow, up to the Batch Size, and keeps that count until the cycle ends. Each extra item makes the cycle longer by the Batch Overhead, 25% of one item's time to start with. Every item still absorbs its own heat, paid in FE or burn time, and earns its own XP. A bigger batch takes a bigger heat dip from the lane when it goes in. If a batch fails, every item in it becomes a **Malformed Ingot**.
-
+- [Batching](rngtech:furnace/batching.md)
 - [Gear](rngtech:furnace/gear.md)
 - [Automation](rngtech:furnace/automation.md)
 - [Mastery and Ascendancies](rngtech:furnace/mastery-and-ascendancies.md)
-
-## Screen
-
-The Furnace screen has five tabs:
-
-- **Process**: input and output lanes, live heat, failure strain, and energy or fuel. Electric stages add the Nitrogen gauge at the right edge. Hover for exact temperatures.
-- **Gear**: Heat Core and Battery Cell slots.
-- **Stats**: the machine's current stats, including traits, Gear, and Mastery.
-- **Refinement**: refine the placed Furnace's traits with a catalyst.
-- **Mastery**: machine XP, level, and the passive tree.
 
 ## Obtaining
 
@@ -76,3 +64,7 @@ The Furnace screen has five tabs:
 ### Breaking
 
 Mine a placed Furnace with a pickaxe. It drops itself and keeps its rolled traits and Mastery progress.
+
+## More
+
+- [Screen](rngtech:furnace/screen.md)

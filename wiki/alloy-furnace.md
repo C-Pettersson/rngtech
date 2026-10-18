@@ -29,6 +29,8 @@ The **Alloy Furnace** mixes exact amounts of metals and additives into alloys. E
 
 The Alloy Furnace runs on FE and needs a Heat Core and an Alloy Crucible installed. Like every RNGTech machine, each Alloy Furnace you craft rolls its own [rarity and affixes](rarity-and-affixes.md), and it can level up through [Machine Mastery](machine-mastery.md).
 
+You can read an Alloy Furnace from the outside. The installed Alloy Crucible sits in a refractory well wrapped in copper induction coils. While the furnace has a recipe, a pool fills the crucible as the charge melts and drops back when the alloy pours, glowing with the crucible's heat. Each input slot has a feed hopper on the back cabinet that shows the item in it, and hoppers past the furnace's input slots are closed with a lid. An installed Servo is a stirrer over the crucible that turns while the furnace works. Facing the front, the Heat Core is the finned radiator on the left and the Battery Cell stands in the cradle on the right with its charge meter. The gas cylinder at the front left corner is the [Nitrogen tank](heat.md#nitrogen-atmosphere): its window shows how full it is, and its valve lights up while the crucible uses Nitrogen. The bar on the front console reads like the [heat bar](heat.md#the-overheat-slider) on the Process tab: it fills with the crucible's heat against the Heat Core's Max Temperature, a white mark shows the recipe's target and a yellow mark the setpoint, and the fill turns red while the crucible overheats. A crucible pushed past its target flickers with its wobble. The cable port is on the back.
+
 ## Obtaining
 
 ### Crafting

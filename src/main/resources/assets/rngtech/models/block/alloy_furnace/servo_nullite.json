@@ -1,0 +1,7 @@
+{
+  "parent": "rngtech:block/alloy_furnace/servo",
+  "textures": {
+    "servo": "rngtech:block/compressor_tank/servo/nullite",
+    "accent": "rngtech:block/compressor_tank/servo/nullite_accent"
+  }
+}

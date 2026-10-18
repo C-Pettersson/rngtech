@@ -1,12 +1,9 @@
 {
-  "parent": "minecraft:block/cube",
+  "parent": "rngtech:block/furnace/electric",
   "textures": {
-    "down": "rngtech:block/furnace_chassis/bottom/aluminum_furnace_chassis",
-    "up": "rngtech:block/furnace_chassis/top/aluminum_furnace_chassis",
-    "north": "rngtech:block/furnace_chassis/front/aluminum_furnace_chassis",
-    "south": "rngtech:block/furnace_chassis/side/aluminum_furnace_chassis",
-    "east": "rngtech:block/furnace_chassis/side/aluminum_furnace_chassis",
-    "west": "rngtech:block/furnace_chassis/side/aluminum_furnace_chassis",
-    "particle": "rngtech:block/furnace_chassis/front/aluminum_furnace_chassis"
+    "particle": "rngtech:block/furnace/shell/aluminum",
+    "shell": "rngtech:block/furnace/shell/aluminum",
+    "trim": "rngtech:block/furnace/trim/aluminum",
+    "crown": "rngtech:block/furnace/crown/aluminum"
   }
 }

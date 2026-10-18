@@ -9,6 +9,8 @@ import com.rngtech.rpg.MachineTraits;
 import com.rngtech.rpg.progression.MachineProgressionState;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -55,6 +57,20 @@ public class FurnaceBlock extends BaseMachineBlock {
             return null;
         }
         return createTickerHelper(blockEntityType, ModBlockEntities.FURNACE.get(), FurnaceBlockEntity::serverTick);
+    }
+
+    /** Smoke rises from the Stage 0 Furnace's chimney while it burns fuel. */
+    @Override
+    public void animateTick(BlockState state, Level level, BlockPos pos, RandomSource random) {
+        if (material.electric() || !state.getValue(ACTIVE) || random.nextInt(3) != 0) {
+            return;
+        }
+        double x = 8.0 / 16.0 - 0.5;
+        double z = 12.0 / 16.0 - 0.5;
+        double angle = Math.toRadians(180.0 - state.getValue(FACING).toYRot());
+        double worldX = x * Math.cos(angle) + z * Math.sin(angle);
+        double worldZ = -x * Math.sin(angle) + z * Math.cos(angle);
+        level.addParticle(ParticleTypes.SMOKE, pos.getX() + 0.5 + worldX, pos.getY() + 1.02, pos.getZ() + 0.5 + worldZ, 0.0, 0.04, 0.0);
     }
 
     @Override

@@ -1,12 +1,9 @@
 {
-  "parent": "minecraft:block/cube",
+  "parent": "rngtech:block/alloy_furnace/housing",
   "textures": {
-    "down": "rngtech:block/alloy_furnace_chassis/bottom/titanium_alloy_furnace_chassis",
-    "up": "rngtech:block/alloy_furnace_chassis/top/titanium_alloy_furnace_chassis",
-    "north": "rngtech:block/alloy_furnace_chassis/front/titanium_alloy_furnace_chassis",
-    "south": "rngtech:block/alloy_furnace_chassis/side/titanium_alloy_furnace_chassis",
-    "east": "rngtech:block/alloy_furnace_chassis/side/titanium_alloy_furnace_chassis",
-    "west": "rngtech:block/alloy_furnace_chassis/side/titanium_alloy_furnace_chassis",
-    "particle": "rngtech:block/alloy_furnace_chassis/front/titanium_alloy_furnace_chassis"
+    "particle": "rngtech:block/furnace/shell/titanium",
+    "shell": "rngtech:block/furnace/shell/titanium",
+    "trim": "rngtech:block/furnace/trim/titanium",
+    "crown": "rngtech:block/furnace/crown/titanium"
   }
 }

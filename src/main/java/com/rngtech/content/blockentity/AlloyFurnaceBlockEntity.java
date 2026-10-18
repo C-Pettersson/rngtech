@@ -2,9 +2,13 @@ package com.rngtech.content.blockentity;
 
 import com.rngtech.content.block.AlloyFurnaceBlock;
 import com.rngtech.content.block.BaseMachineBlock;
+import com.rngtech.content.item.AlloyCrucibleItem;
 import com.rngtech.content.item.BatteryCellItem;
 import com.rngtech.content.item.GearParts;
 import com.rngtech.content.item.MachinePartItem;
+import com.rngtech.content.item.ServoItem;
+import com.rngtech.content.item.SolidFuelBurnerPartItem;
+import com.rngtech.content.item.UniquePartItem;
 import com.rngtech.content.loot.ChallengeContext;
 import com.rngtech.content.loot.ChallengeLoot;
 import com.rngtech.content.machine.AlloyFurnaceChassisMaterial;
@@ -43,8 +47,12 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.Connection;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.game.ClientGamePacketListener;
+import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.world.Containers;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
@@ -55,6 +63,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.energy.IEnergyStorage;
 import net.neoforged.neoforge.fluids.capability.IFluidHandler;
@@ -150,6 +159,7 @@ public class AlloyFurnaceBlockEntity extends BaseMachineBlockEntity implements M
     private static final int DATA_MACHINE_PROGRESSION_START = DATA_NITROGEN_BONUS + 1;
     private static final int DATA_COUNT = DATA_MACHINE_PROGRESSION_START + MasteryMenuSupport.FIELD_COUNT;
     private static final int STAT_SCALE = 100;
+    private static final int VISUAL_SYNC_INTERVAL = 5;
 
     private final ItemStackHandler processInventory = new ItemStackHandler(PROCESS_SLOT_COUNT) {
         @Override
@@ -299,6 +309,9 @@ public class AlloyFurnaceBlockEntity extends BaseMachineBlockEntity implements M
     private long energyTelemetryTick = Long.MIN_VALUE;
     private int energyInputThisTick;
     private int lastEnergyInput;
+    private AlloyFurnaceVisualState visualState = AlloyFurnaceVisualState.IDLE;
+    private AlloyFurnaceVisualState.Key lastSyncedVisual;
+    private final AlloyFurnaceVisualState.Animation animation = new AlloyFurnaceVisualState.Animation();
 
     public AlloyFurnaceBlockEntity(BlockPos pos, BlockState blockState) {
         super(ModBlockEntities.ALLOY_FURNACE.get(), pos, blockState, MachineType.ALLOY_FURNACE, SLOT_INPUT_START, SLOT_INPUT_START, SLOT_OUTPUT);
@@ -306,6 +319,11 @@ public class AlloyFurnaceBlockEntity extends BaseMachineBlockEntity implements M
     }
 
     public static void serverTick(Level level, BlockPos pos, BlockState state, AlloyFurnaceBlockEntity furnace) {
+        tickFurnace(level, pos, state, furnace);
+        furnace.syncVisualState(level);
+    }
+
+    private static void tickFurnace(Level level, BlockPos pos, BlockState state, AlloyFurnaceBlockEntity furnace) {
         furnace.beginEnergyTelemetryTick();
         furnace.atmosphere.beginTick();
         AlloyFurnaceRecipe recipe = furnace.nextRecipe();
@@ -407,6 +425,116 @@ public class AlloyFurnaceBlockEntity extends BaseMachineBlockEntity implements M
             heatSlider = clamped;
             setChanged();
         }
+    }
+
+    /**
+     * Alloy Furnaces saved while the block was a solid cube stored no light inside it, which leaves the renderer's
+     * crucible, core, and cell unlit. Rechecking the block's own light once on load fixes those saves.
+     */
+    @Override
+    public void onLoad() {
+        super.onLoad();
+        if (level != null && !level.isClientSide) {
+            level.getLightEngine().checkBlock(worldPosition);
+        }
+    }
+
+    /** Client copy of the state the renderer draws; synced from the server in the block entity update tag. */
+    public AlloyFurnaceVisualState visualState() {
+        return visualState;
+    }
+
+    public AlloyFurnaceVisualState.Animation animation() {
+        return animation;
+    }
+
+    @Override
+    public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
+        return currentVisualState().save();
+    }
+
+    @Override
+    public Packet<ClientGamePacketListener> getUpdatePacket() {
+        return ClientboundBlockEntityDataPacket.create(this);
+    }
+
+    @Override
+    public void handleUpdateTag(CompoundTag tag, HolderLookup.Provider registries) {
+        visualState = AlloyFurnaceVisualState.load(tag);
+    }
+
+    @Override
+    public void onDataPacket(Connection connection, ClientboundBlockEntityDataPacket packet, HolderLookup.Provider registries) {
+        visualState = AlloyFurnaceVisualState.load(packet.getTag());
+    }
+
+    private void syncVisualState(Level level) {
+        if (level.getGameTime() % VISUAL_SYNC_INTERVAL != 0) {
+            return;
+        }
+        AlloyFurnaceVisualState.Key key = currentVisualState().key();
+        if (!key.equals(lastSyncedVisual)) {
+            lastSyncedVisual = key;
+            level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), Block.UPDATE_CLIENTS);
+        }
+    }
+
+    /** What the Alloy Furnace shows right now, built on the server. */
+    public AlloyFurnaceVisualState currentVisualState() {
+        MachineStatAccumulator baseStats = effectiveStats();
+        int hoppers = activeInputSlots(baseStats);
+        Item[] inputs = FurnaceVisualState.emptyInputs();
+        for (int slot = 0; slot < hoppers; slot++) {
+            inputs[slot] = processInventory.getStackInSlot(SLOT_INPUT_START + slot).getItem();
+        }
+        AlloyFurnaceRecipe recipe = nextRecipe();
+        MachineStatAccumulator stats = routeStats(recipe, baseStats);
+        float melt = 0.0F;
+        if (recipe != null) {
+            int ticks = currentProcessingTicks(recipe, stats);
+            melt = Math.max(0.2F, ticks > 0 ? Math.min(1.0F, currentElapsedTicks(recipe, stats) / (float) ticks) : 0.0F);
+        }
+        ItemStack cell = batteryCellStack();
+        boolean hasCell = isBatteryCell(cell);
+        return new AlloyFurnaceVisualState(
+                heat.temperature(),
+                currentTargetTemperature(recipe, stats),
+                recipe == null ? 0 : envelope(recipe, stats).setpoint(),
+                currentOverheatTemperature(recipe, stats),
+                hasHeatCore() ? Math.max(0, baseStats.intValue(MachineStat.MAX_TEMPERATURE)) : 0,
+                wobbleDisplay(),
+                getBlockState().getValue(BaseMachineBlock.ACTIVE),
+                hoppers,
+                inputs,
+                melt,
+                heatCoreKey(heatCoreStack()),
+                isAlloyCrucible(crucibleStack()) ? partKey(crucibleStack()) : "",
+                isServo(servoStack()) ? partKey(servoStack()) : "",
+                hasCell ? ((BatteryCellItem) cell.getItem()).material().getSerializedName() : "",
+                hasCell && energyCapacity() > 0 ? energyStored() / (float) energyCapacity() : -1.0F,
+                atmosphere.amount() / (float) InertAtmosphere.CAPACITY,
+                atmosphere.lastUse() > 0
+        );
+    }
+
+    private String heatCoreKey(ItemStack stack) {
+        if (!isHeatCore(stack)) {
+            return "";
+        }
+        if (stack.getItem() instanceof SolidFuelBurnerPartItem part && part.heatCoreMaterial() != null) {
+            return part.heatCoreMaterial().getSerializedName();
+        }
+        return stack.getItem() instanceof UniquePartItem ? "unique" : "";
+    }
+
+    private static String partKey(ItemStack stack) {
+        if (stack.getItem() instanceof AlloyCrucibleItem crucible) {
+            return crucible.material().getSerializedName();
+        }
+        if (stack.getItem() instanceof ServoItem servo) {
+            return servo.material().getSerializedName();
+        }
+        return stack.getItem() instanceof UniquePartItem ? "unique" : "";
     }
 
     public ItemStackHandler getProcessInventory() {

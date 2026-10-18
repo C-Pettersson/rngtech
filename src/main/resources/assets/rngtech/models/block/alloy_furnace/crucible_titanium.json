@@ -1,0 +1,6 @@
+{
+  "parent": "rngtech:block/alloy_furnace/crucible",
+  "textures": {
+    "crucible": "rngtech:block/alloy_furnace/crucible/titanium"
+  }
+}

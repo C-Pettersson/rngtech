@@ -1,12 +1,9 @@
 {
-  "parent": "minecraft:block/cube",
+  "parent": "rngtech:block/alloy_furnace/housing",
   "textures": {
-    "down": "rngtech:block/alloy_furnace_chassis/bottom/steel_alloy_furnace_chassis",
-    "up": "rngtech:block/alloy_furnace_chassis/top/steel_alloy_furnace_chassis",
-    "north": "rngtech:block/alloy_furnace_chassis/front/steel_alloy_furnace_chassis",
-    "south": "rngtech:block/alloy_furnace_chassis/side/steel_alloy_furnace_chassis",
-    "east": "rngtech:block/alloy_furnace_chassis/side/steel_alloy_furnace_chassis",
-    "west": "rngtech:block/alloy_furnace_chassis/side/steel_alloy_furnace_chassis",
-    "particle": "rngtech:block/alloy_furnace_chassis/front/steel_alloy_furnace_chassis"
+    "particle": "rngtech:block/furnace/shell/steel",
+    "shell": "rngtech:block/furnace/shell/steel",
+    "trim": "rngtech:block/furnace/trim/steel",
+    "crown": "rngtech:block/furnace/crown/steel"
   }
 }

@@ -1,3 +1,10 @@
 {
-  "parent": "rngtech:block/aluminum_furnace_chassis"
+  "parent": "rngtech:item/furnace_electric_template",
+  "textures": {
+    "particle": "rngtech:block/furnace/shell/aluminum",
+    "shell": "rngtech:block/furnace/shell/aluminum",
+    "trim": "rngtech:block/furnace/trim/aluminum",
+    "crown": "rngtech:block/furnace/crown/aluminum",
+    "core": "rngtech:block/solid_fuel_burner/heat_core/aluminum"
+  }
 }

@@ -2,7 +2,7 @@
 navigation:
   title: "Mastery and Ascendancies"
   parent: alloy-furnace.md
-  position: 2
+  position: 4
   icon: rngtech:bronze_alloy_furnace_chassis
 ---
 

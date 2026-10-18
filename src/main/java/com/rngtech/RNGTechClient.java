@@ -4,6 +4,7 @@ import com.rngtech.client.CableTintClient;
 import com.rngtech.client.MinersCompanionLampClient;
 import com.rngtech.client.configurator.ConfiguratorClient;
 import com.rngtech.client.renderer.AlgaePhotobioreactorRenderer;
+import com.rngtech.client.renderer.AlloyFurnaceRenderer;
 import com.rngtech.client.renderer.AmmoniaFuelCellRenderer;
 import com.rngtech.client.renderer.AmmoniaSynthesizerRenderer;
 import com.rngtech.client.renderer.BatteryChassisRenderer;
@@ -14,6 +15,7 @@ import com.rngtech.client.renderer.CorrosionCellRenderer;
 import com.rngtech.client.renderer.CrusherRenderer;
 import com.rngtech.client.renderer.DerelictCartRenderer;
 import com.rngtech.client.renderer.ForestryCartRenderer;
+import com.rngtech.client.renderer.FurnaceRenderer;
 import com.rngtech.client.renderer.GasChemistryRenderer;
 import com.rngtech.client.renderer.ModularToolItemRenderer;
 import com.rngtech.client.renderer.PotentialReactorRenderer;
@@ -113,6 +115,8 @@ public final class RNGTechClient {
         modBus.addListener(CavitationGeneratorRenderer::registerModels);
         modBus.addListener(CorrosionCellRenderer::registerModels);
         modBus.addListener(SolidFuelBurnerRenderer::registerModels);
+        modBus.addListener(FurnaceRenderer::registerModels);
+        modBus.addListener(AlloyFurnaceRenderer::registerModels);
         modBus.addListener(VacuumCollapseGeneratorRenderer::registerModels);
         modBus.addListener(this::registerClientExtensions);
         modBus.addListener(this::registerKeyMappings);
@@ -193,6 +197,8 @@ public final class RNGTechClient {
         event.registerBlockEntityRenderer(ModBlockEntities.TOOL_BENCH.get(), ToolBenchRenderer::new);
         event.registerBlockEntityRenderer(ModBlockEntities.COMPRESSOR_TANK.get(), CompressorTankRenderer::new);
         event.registerBlockEntityRenderer(ModBlockEntities.CRUSHER.get(), CrusherRenderer::new);
+        event.registerBlockEntityRenderer(ModBlockEntities.FURNACE.get(), FurnaceRenderer::new);
+        event.registerBlockEntityRenderer(ModBlockEntities.ALLOY_FURNACE.get(), AlloyFurnaceRenderer::new);
         event.registerEntityRenderer(ModEntityTypes.FORESTRY_CART.get(), ForestryCartRenderer::new);
         event.registerEntityRenderer(ModEntityTypes.DERELICT_CART.get(), DerelictCartRenderer::new);
     }

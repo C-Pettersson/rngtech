@@ -6,6 +6,8 @@ import com.rngtech.content.block.FurnaceBlock;
 import com.rngtech.content.item.BatteryCellItem;
 import com.rngtech.content.item.GearParts;
 import com.rngtech.content.item.MachinePartItem;
+import com.rngtech.content.item.SolidFuelBurnerPartItem;
+import com.rngtech.content.item.UniquePartItem;
 import com.rngtech.content.loot.ChallengeContext;
 import com.rngtech.content.loot.ChallengeLoot;
 import com.rngtech.content.machine.FurnaceChassisMaterial;
@@ -43,8 +45,12 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
+import net.minecraft.network.Connection;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.game.ClientGamePacketListener;
+import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.world.Containers;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
@@ -56,6 +62,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.item.crafting.SingleRecipeInput;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.energy.IEnergyStorage;
 import net.neoforged.neoforge.fluids.capability.IFluidHandler;
@@ -145,6 +152,7 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
     private static final int DATA_MACHINE_PROGRESSION_START = DATA_NITROGEN_BONUS + 1;
     private static final int DATA_COUNT = DATA_MACHINE_PROGRESSION_START + MasteryMenuSupport.FIELD_COUNT;
     private static final int STAT_SCALE = 100;
+    private static final int VISUAL_SYNC_INTERVAL = 5;
 
     private final ItemStackHandler inventory = new ItemStackHandler(SLOT_COUNT) {
         @Override
@@ -333,6 +341,9 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
     private long energyTelemetryTick = Long.MIN_VALUE;
     private int energyInputThisTick;
     private int lastEnergyInput;
+    private FurnaceVisualState visualState = FurnaceVisualState.IDLE;
+    private FurnaceVisualState.Key lastSyncedVisual;
+    private final FurnaceVisualState.Animation animation = new FurnaceVisualState.Animation();
 
     public FurnaceBlockEntity(BlockPos pos, BlockState blockState) {
         super(ModBlockEntities.FURNACE.get(), pos, blockState, MachineType.FURNACE, SLOT_INPUT, SLOT_FUEL, SLOT_OUTPUT);
@@ -438,6 +449,108 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
         if (changed) {
             furnace.setChanged();
         }
+        furnace.syncVisualState(level);
+    }
+
+    /**
+     * Furnaces saved while the block was a solid cube stored no light inside it, which leaves the renderer's chamber,
+     * core, and cell unlit. Rechecking the block's own light once on load fixes those saves.
+     */
+    @Override
+    public void onLoad() {
+        super.onLoad();
+        if (level != null && !level.isClientSide) {
+            level.getLightEngine().checkBlock(worldPosition);
+        }
+    }
+
+    /** Client copy of the state the renderer draws; synced from the server in the block entity update tag. */
+    public FurnaceVisualState visualState() {
+        return visualState;
+    }
+
+    public FurnaceVisualState.Animation animation() {
+        return animation;
+    }
+
+    @Override
+    public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
+        return currentVisualState().save();
+    }
+
+    @Override
+    public Packet<ClientGamePacketListener> getUpdatePacket() {
+        return ClientboundBlockEntityDataPacket.create(this);
+    }
+
+    @Override
+    public void handleUpdateTag(CompoundTag tag, HolderLookup.Provider registries) {
+        visualState = FurnaceVisualState.load(tag);
+    }
+
+    @Override
+    public void onDataPacket(Connection connection, ClientboundBlockEntityDataPacket packet, HolderLookup.Provider registries) {
+        visualState = FurnaceVisualState.load(packet.getTag());
+    }
+
+    private void syncVisualState(Level level) {
+        if (level.getGameTime() % VISUAL_SYNC_INTERVAL != 0) {
+            return;
+        }
+        FurnaceVisualState.Key key = currentVisualState().key();
+        if (!key.equals(lastSyncedVisual)) {
+            lastSyncedVisual = key;
+            level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), Block.UPDATE_CLIENTS);
+        }
+    }
+
+    /** What the Furnace shows right now, built on the server. */
+    public FurnaceVisualState currentVisualState() {
+        int lanes = activeProcessingSlots();
+        int[] heat = new int[FurnaceVisualState.LANES];
+        int[] target = new int[FurnaceVisualState.LANES];
+        int[] setpoint = new int[FurnaceVisualState.LANES];
+        int[] overheat = new int[FurnaceVisualState.LANES];
+        Item[] inputs = FurnaceVisualState.emptyInputs();
+        for (int lane = 0; lane < FurnaceVisualState.LANES; lane++) {
+            heat[lane] = this.heat[lane].temperature();
+            ItemStack input = lane < lanes ? inventory.getStackInSlot(inputSlot(lane)) : ItemStack.EMPTY;
+            inputs[lane] = input.getItem();
+            if (!input.isEmpty()) {
+                target[lane] = currentTargetTemperature(lane);
+                setpoint[lane] = currentSetpoint(lane);
+                overheat[lane] = currentOverheatTemperature(lane);
+            }
+        }
+        ItemStack cell = isElectric() ? batteryCellStack() : ItemStack.EMPTY;
+        boolean hasCell = isBatteryCell(cell);
+        return new FurnaceVisualState(
+                lanes,
+                heat,
+                target,
+                setpoint,
+                overheat,
+                inputs,
+                Math.max(0, effectiveStats().intValue(MachineStat.MAX_TEMPERATURE)),
+                wobbleDisplay(),
+                getBlockState().getValue(BaseMachineBlock.ACTIVE),
+                !isElectric() && hasBurnTime() && totalBurnTime > 0 ? Math.min(1.0F, burnTime / (float) totalBurnTime) : 0.0F,
+                usesHeatCores() ? heatCoreKey(gearInventory.getStackInSlot(0)) : "",
+                hasCell ? ((BatteryCellItem) cell.getItem()).material().getSerializedName() : "",
+                hasCell && energyCapacity() > 0 ? energyStored() / (float) energyCapacity() : -1.0F,
+                isElectric() ? atmosphere.amount() / (float) InertAtmosphere.CAPACITY : -1.0F,
+                isElectric() && atmosphere.lastUse() > 0
+        );
+    }
+
+    private String heatCoreKey(ItemStack stack) {
+        if (!isAllowedGearComponent(0, stack)) {
+            return "";
+        }
+        if (stack.getItem() instanceof SolidFuelBurnerPartItem part && part.heatCoreMaterial() != null) {
+            return part.heatCoreMaterial().getSerializedName();
+        }
+        return stack.getItem() instanceof UniquePartItem ? "unique" : "";
     }
 
     public int heatSlider() {

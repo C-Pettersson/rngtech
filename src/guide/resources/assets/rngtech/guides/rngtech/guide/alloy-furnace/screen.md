@@ -2,7 +2,7 @@
 navigation:
   title: "Screen"
   parent: alloy-furnace.md
-  position: 3
+  position: 5
   icon: rngtech:bronze_alloy_furnace_chassis
 ---
 

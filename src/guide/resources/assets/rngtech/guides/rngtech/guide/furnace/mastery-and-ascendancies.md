@@ -2,7 +2,7 @@
 navigation:
   title: "Mastery and Ascendancies"
   parent: furnace.md
-  position: 4
+  position: 5
   icon: rngtech:furnace
 ---
 

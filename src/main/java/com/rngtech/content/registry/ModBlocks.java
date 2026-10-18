@@ -175,9 +175,10 @@ public final class ModBlocks {
             "furnace",
             properties -> new FurnaceBlock(FurnaceChassisMaterial.PRIMITIVE, properties),
             BlockBehaviour.Properties.of()
-                    .mapColor(MapColor.METAL)
+                    .mapColor(MapColor.STONE)
                     .strength(3.5F)
-                    .sound(SoundType.METAL)
+                    .sound(SoundType.STONE)
+                    .noOcclusion()
     );
     public static final Map<FurnaceChassisMaterial, DeferredBlock<FurnaceBlock>> FURNACE_CHASSIS =
             registerFurnaceChassisBlocks();
@@ -593,6 +594,7 @@ public final class ModBlocks {
                             .mapColor(MapColor.METAL)
                             .strength(3.5F)
                             .sound(SoundType.METAL)
+                            .noOcclusion()
             );
             blocks.put(material, block);
         }
@@ -610,6 +612,7 @@ public final class ModBlocks {
                             .mapColor(MapColor.METAL)
                             .strength(3.5F)
                             .sound(SoundType.METAL)
+                            .noOcclusion()
             );
             blocks.put(material, block);
         }

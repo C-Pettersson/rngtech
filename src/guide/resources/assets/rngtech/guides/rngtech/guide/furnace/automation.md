@@ -2,7 +2,7 @@
 navigation:
   title: "Automation"
   parent: furnace.md
-  position: 3
+  position: 4
   icon: rngtech:furnace
 ---
 

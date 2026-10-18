@@ -2,7 +2,7 @@
 navigation:
   title: "Crafting"
   parent: alloy-furnace.md
-  position: 4
+  position: 6
   icon: rngtech:bronze_alloy_furnace_chassis
 ---
 
