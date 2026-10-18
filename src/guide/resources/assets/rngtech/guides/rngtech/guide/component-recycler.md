@@ -45,27 +45,15 @@ The **Component Recycler** takes RNGTech machines, machine parts, modular tool p
 
 Returns are always physical parts only. A recycled item's rarity, affixes, and Refinement Potential are lost, so strip valuable items in a [Potential Reactor](rngtech:potential-reactor.md) first if you want energy for them.
 
+You can read a powered Recycler from the outside. The installed Disassembly Head hangs in the open front as a claw in the head's material; with no head you see only the bare spindle. While the Recycler works, the claw turns, faster when a craft is shorter, and reaches down onto the item on the turntable, throwing off sparks and bits of the item. Each output slot has its own tray under the grated floor, and its returns stand in it. Facing the front, the Battery Cell lies in the cradle on the left of the back cabinet with a charge meter beside it, and an installed Recovery Filter stands as a cartridge in the cage on the right. Each chassis has its own casing. FE still enters on any of the four sides, but the cable port is drawn on the back.
+
+The <ItemLink id="rngtech:crude_recycler" /> is a plank crate instead. Through its front window you can see a flint-studded stone on a cobblestone bed, with the item to recycle lying on it and its returns standing in front. The stone turns while you turn the Hand Crank on the lid.
+
 ## Usage
 
 - [Recycling](rngtech:component-recycler/recycling.md)
 - [Crude Recycler and Hand Crank](rngtech:component-recycler/crude-recycler-and-hand-crank.md)
-
-### Stages
-
-| Stage | Recycler | Notes |
-|---:|---|---|
-| 2 (manual) | <ItemLink id="rngtech:crude_recycler" /> | Hand-cranked, no FE, no Gear, no traits. |
-| 1 | <ItemLink id="rngtech:iron_component_recycler" /> | First powered Recycler. |
-| 2 | <ItemLink id="rngtech:copper_component_recycler" /> | |
-| 3 | <ItemLink id="rngtech:bronze_component_recycler" /> | |
-| 4 | <ItemLink id="rngtech:steel_component_recycler" /> | |
-| 5 | <ItemLink id="rngtech:aluminum_component_recycler" /> | |
-| 6 | <ItemLink id="rngtech:titanium_component_recycler" /> | |
-| 7 | <ItemLink id="rngtech:tungstensteel_component_recycler" /> | |
-| 8 | <ItemLink id="rngtech:exotic_component_recycler" /> | |
-
-Each recipe has a minimum processing level. To run it, both the Recycler's stage and the installed Disassembly Head's processing level must reach that level.
-
+- [Stages](rngtech:component-recycler/stages.md)
 - [Gear](rngtech:component-recycler/gear.md)
 
 ### Automation
@@ -78,17 +66,6 @@ Each recipe has a minimum processing level. To run it, both the Recycler's stage
 
 Gear slots are not reachable by automation. The Crude Recycler has no FE input, and its top is taken by the Hand Crank.
 
-## Screen
-
-Powered Recyclers have four tabs:
-
-- **Process**: the input, three outputs, progress, and energy. With JEI installed, click the progress bar to browse recycling recipes.
-- **Gear**: Disassembly Head, Recovery Filter, and Battery Cell slots.
-- **Stats**: the machine's current stats, including traits and Gear.
-- **Refinement**: refine the placed Recycler's traits with a catalyst.
-
-The Crude Recycler has only its Process screen.
-
 ## Obtaining
 
 - [Crafting](rngtech:component-recycler/crafting.md)
@@ -96,3 +73,7 @@ The Crude Recycler has only its Process screen.
 ### Breaking
 
 Mine a placed Component Recycler with a pickaxe. It drops itself, and any items inside drop as well. The Hand Crank breaks with any tool.
+
+## More
+
+- [Screen](rngtech:component-recycler/screen.md)

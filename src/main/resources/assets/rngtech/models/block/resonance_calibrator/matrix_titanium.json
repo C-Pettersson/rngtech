@@ -1,0 +1,6 @@
+{
+  "parent": "rngtech:block/resonance_calibrator/matrix",
+  "textures": {
+    "matrix": "rngtech:block/resonance_calibrator/matrix/titanium"
+  }
+}
