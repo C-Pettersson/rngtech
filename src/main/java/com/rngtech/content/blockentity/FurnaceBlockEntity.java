@@ -150,7 +150,8 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
     private static final int DATA_NITROGEN_USE = DATA_NITROGEN + 1;
     private static final int DATA_NITROGEN_BONUS = DATA_NITROGEN_USE + 1;
     private static final int DATA_MACHINE_PROGRESSION_START = DATA_NITROGEN_BONUS + 1;
-    private static final int DATA_COUNT = DATA_MACHINE_PROGRESSION_START + MasteryMenuSupport.FIELD_COUNT;
+    private static final int DATA_OUTPUT_PER_MINUTE_START = DATA_MACHINE_PROGRESSION_START + MasteryMenuSupport.FIELD_COUNT;
+    private static final int DATA_COUNT = DATA_OUTPUT_PER_MINUTE_START + MAX_PROCESSING_SLOTS;
     private static final int STAT_SCALE = 100;
     private static final int VISUAL_SYNC_INTERVAL = 5;
 
@@ -262,6 +263,9 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
             }
             if (index >= DATA_SETPOINT_START && index < DATA_SETPOINT_START + MAX_PROCESSING_SLOTS) {
                 return currentSetpoint(index - DATA_SETPOINT_START);
+            }
+            if (index >= DATA_OUTPUT_PER_MINUTE_START && index < DATA_OUTPUT_PER_MINUTE_START + MAX_PROCESSING_SLOTS) {
+                return currentOutputPerMinuteTenths(index - DATA_OUTPUT_PER_MINUTE_START);
             }
             if (index >= DATA_MACHINE_PROGRESSION_START
                     && index < DATA_MACHINE_PROGRESSION_START + MasteryMenuSupport.FIELD_COUNT) {
@@ -633,6 +637,7 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
                 .heat(lane < 0 ? 0 : heat[lane].temperature(), lane < 0 ? 0 : currentTargetTemperature(lane))
                 .setpoint(lane < 0 ? 0 : currentSetpoint(lane))
                 .batch(lane < 0 || recipe == null ? 0 : laneBatch(lane, recipe, statsForLane(lane)))
+                .outputRate(totalOutputPerMinuteTenths(baseStats))
                 .slots(activeProcessingSlots(baseStats), MAX_PROCESSING_SLOTS)
                 .gear(furnaceGearSummary())
                 .output(status == STATUS_OUTPUT_FULL
@@ -1361,6 +1366,24 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
         int batch = laneBatch(lane, recipe, stats);
         HeatEngine.Load load = load(lane, recipe, stats, 1);
         return HeatEngine.steadyEnergyPerCycle(envelope(lane, recipe, stats), load, cycleWork(lane, recipe, stats), stats) / Math.max(1, batch);
+    }
+
+    /** Expected items per minute for {@code lane}'s current cycle, in tenths. */
+    private int currentOutputPerMinuteTenths(int lane) {
+        FurnaceRecipe recipe = findNextRecipe(lane);
+        if (recipe == null) {
+            return 0;
+        }
+        int batch = laneBatch(lane, recipe, statsForLane(lane));
+        return OutputRate.perMinuteTenths(batch * recipe.outputStack().getCount(), currentProcessingTicks(lane));
+    }
+
+    private int totalOutputPerMinuteTenths(MachineStatAccumulator baseStats) {
+        long total = 0;
+        for (int lane = 0; lane < activeProcessingSlots(baseStats); lane++) {
+            total += currentOutputPerMinuteTenths(lane);
+        }
+        return (int) Math.min(Integer.MAX_VALUE, total);
     }
 
     private long totalActiveEnergyDemand(MachineStatAccumulator baseStats) {

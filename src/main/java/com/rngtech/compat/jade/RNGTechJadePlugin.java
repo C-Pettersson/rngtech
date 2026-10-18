@@ -192,6 +192,18 @@ public final class RNGTechJadePlugin implements IWailaPlugin {
                         "rngtech.jade.machine_state.line.time_remaining",
                         value(String.format(Locale.ROOT, "%.1f", Math.max(0, info.progressMax() - info.progress()) / 20.0D))
                 ));
+                if (info.outputPerMinuteTenths() > 0) {
+                    tooltip.add(Component.translatable(
+                            info.fluidOutputRate()
+                                    ? "rngtech.jade.machine_state.line.output_rate_fluid"
+                                    : "rngtech.jade.machine_state.line.output_rate",
+                            value(String.format(
+                                    Locale.ROOT,
+                                    info.fluidOutputRate() ? "%.0f" : "%.1f",
+                                    info.outputPerMinuteTenths() / 10.0D
+                            ))
+                    ));
+                }
             }
         }
 

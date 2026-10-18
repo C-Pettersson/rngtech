@@ -154,7 +154,8 @@ public class MetalPressBlockEntity extends BaseMachineBlockEntity
     public static final int ANNEAL_NONE = 0;
     public static final int ANNEAL_CIRCUITS = 1;
     public static final int ANNEAL_PLATES = 2;
-    private static final int DATA_COUNT = DATA_MACHINE_PROGRESSION_START + MasteryMenuSupport.FIELD_COUNT;
+    private static final int DATA_OUTPUT_PER_MINUTE = DATA_MACHINE_PROGRESSION_START + MasteryMenuSupport.FIELD_COUNT;
+    private static final int DATA_COUNT = DATA_OUTPUT_PER_MINUTE + 1;
     private static final int STAT_SCALE = 100;
     private static final int LEGACY_SLOT_BATTERY_CELL = 3;
     private static final int VISUAL_SYNC_INTERVAL = 5;
@@ -279,6 +280,7 @@ public class MetalPressBlockEntity extends BaseMachineBlockEntity
                 case DATA_HEAT_REACH -> recipe == null ? 0 : envelope(recipe, stats).reach();
                 case DATA_HEAT_MAXIMUM -> stats.intValue(MachineStat.MAX_TEMPERATURE);
                 case DATA_LEDGER -> recipe == null || !ledgerActive(recipe, stats) ? -1 : LedgerNbt.permille(batchLedger.progress(recipe.outputStack().getItem()));
+                case DATA_OUTPUT_PER_MINUTE -> currentOutputPerMinuteTenths(recipe, stats);
                 default -> 0;
             };
         }
@@ -637,6 +639,17 @@ public class MetalPressBlockEntity extends BaseMachineBlockEntity
         return processInventory;
     }
 
+    /** Expected items per minute for the current cycle, in tenths. */
+    private int currentOutputPerMinuteTenths(MetalPressRecipe recipe, MachineStatAccumulator stats) {
+        if (recipe == null) {
+            return 0;
+        }
+        return OutputRate.perMinuteTenths(
+                batchJobs(recipe, stats) * recipe.outputStack().getCount(),
+                currentProcessingTicks(recipe, stats)
+        );
+    }
+
     @Override
     public MachineInfoSnapshot machineInfo() {
         MetalPressRecipe recipe = nextRecipe();
@@ -658,6 +671,7 @@ public class MetalPressBlockEntity extends BaseMachineBlockEntity
                         status == STATUS_WARMING ? currentTargetTemperature(recipe) : currentMinimumTemperature(recipe, stats)
                 )
                 .progress(currentElapsedTicks(recipe, stats), currentProcessingTicks(recipe, stats))
+                .outputRate(currentOutputPerMinuteTenths(recipe, stats))
                 .energy(energyStored(), energyCapacity(), -energyDemand)
                 .energyTelemetry(
                         energyFlow.lastInput(),

@@ -134,7 +134,8 @@ public class ResonanceCalibratorBlockEntity extends BaseMachineBlockEntity
     private static final int DATA_SELECTED_PATTERN = 20;
     private static final int DATA_STREAK = DATA_SELECTED_PATTERN + 1;
     private static final int DATA_MACHINE_PROGRESSION_START = DATA_STREAK + 1;
-    private static final int DATA_COUNT = DATA_MACHINE_PROGRESSION_START + MasteryMenuSupport.FIELD_COUNT;
+    private static final int DATA_OUTPUT_PER_MINUTE = DATA_MACHINE_PROGRESSION_START + MasteryMenuSupport.FIELD_COUNT;
+    private static final int DATA_COUNT = DATA_OUTPUT_PER_MINUTE + 1;
     private static final int STAT_SCALE = 100;
     private static final int VISUAL_SYNC_INTERVAL = 5;
     private static final int[] AUTOMATION_INPUT_SLOTS = {SLOT_INPUT, SLOT_CATALYST, SLOT_STABILIZER};
@@ -242,6 +243,7 @@ public class ResonanceCalibratorBlockEntity extends BaseMachineBlockEntity
                 case DATA_REFINEMENT_POTENTIAL -> scaledStat(stats, MachineStat.REFINEMENT_POTENTIAL);
                 case DATA_SELECTED_PATTERN -> selectedPattern;
                 case DATA_STREAK -> recipe == null ? 0 : AscendancyFormulas.streakFloor(streakBefore(recipe).streak(), stats);
+                case DATA_OUTPUT_PER_MINUTE -> currentOutputPerMinuteTenths(recipe, stats);
                 default -> 0;
             };
         }
@@ -480,6 +482,16 @@ public class ResonanceCalibratorBlockEntity extends BaseMachineBlockEntity
         return processInventory;
     }
 
+    /** Expected items per minute for the current cycle, in tenths. */
+    private int currentOutputPerMinuteTenths(CalibrationRecipe recipe, MachineStatAccumulator stats) {
+        if (recipe == null) {
+            return 0;
+        }
+        ItemStack output = recipe.outputStack();
+        int perCycle = Math.min(output.getMaxStackSize(), output.getCount() * operationsFor(recipe, stats));
+        return OutputRate.perMinuteTenths(perCycle, currentProcessingTicks(recipe, stats));
+    }
+
     @Override
     public MachineInfoSnapshot machineInfo() {
         MachineStatAccumulator stats = effectiveStats();
@@ -500,6 +512,7 @@ public class ResonanceCalibratorBlockEntity extends BaseMachineBlockEntity
                 )
                 .status(statusKey(status))
                 .progress(progress, currentProcessingTicks(recipe, stats))
+                .outputRate(currentOutputPerMinuteTenths(recipe, stats))
                 .energy(energyStored(), energyCapacity(), -energyDemand)
                 .energyTelemetry(
                         energyFlow.lastInput(),

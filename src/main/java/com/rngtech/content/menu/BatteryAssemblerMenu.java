@@ -50,7 +50,8 @@ public class BatteryAssemblerMenu extends AbstractContainerMenu implements StatB
     private static final int DATA_FLUID_TRANSFER = 11;
     private static final int DATA_REFINEMENT_POTENTIAL = 12;
     private static final int DATA_FLUID_ID = 13;
-    private static final int DATA_COUNT = 14;
+    private static final int DATA_OUTPUT_PER_MINUTE = 14;
+    private static final int DATA_COUNT = 15;
     private static final int STAT_SCALE = 100;
     private static final int PROCESS_SLOT_COUNT = BatteryAssemblerBlockEntity.PROCESS_SLOT_COUNT;
     private static final int GEAR_SLOT_START = PROCESS_SLOT_COUNT;
@@ -166,6 +167,11 @@ public class BatteryAssemblerMenu extends AbstractContainerMenu implements StatB
 
     public int progress() {
         return Math.max(0, data.get(DATA_PROGRESS));
+    }
+
+    /** Expected items per minute for the current cycle, in tenths. */
+    public int outputPerMinuteTenths() {
+        return data.get(DATA_OUTPUT_PER_MINUTE);
     }
 
     public int processingTicks() {

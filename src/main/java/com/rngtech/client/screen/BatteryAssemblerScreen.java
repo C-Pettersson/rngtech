@@ -394,7 +394,13 @@ public class BatteryAssemblerScreen extends AbstractContainerScreen<BatteryAssem
     }
 
     private List<Component> progressTooltipLines() {
-        return MachineScreenStyle.withTimeRemaining(progressTooltip(), menu.progress(), menu.processingTicks());
+        return MachineScreenStyle.withOutputRate(
+                progressTooltip(),
+                menu.progress(),
+                menu.processingTicks(),
+                menu.outputPerMinuteTenths(),
+                false
+        );
     }
 
     private Component progressTooltip() {

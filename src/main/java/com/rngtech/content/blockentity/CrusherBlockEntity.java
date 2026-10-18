@@ -452,6 +452,7 @@ public class CrusherBlockEntity extends BaseMachineBlockEntity implements MenuPr
                 .state(machineInfoState(status), crusherBlockedReason(status))
                 .progress(progress, currentProcessingTicks(stats))
                 .batch(currentActiveJobs(stats))
+                .outputRate(currentOutputPerMinuteTenths(stats))
                 .energy(energyStored(), energyCapacity(), energyDemand > 0 ? -energyDemand : 0)
                 .energyTelemetry(
                         lastEnergyInput(),
@@ -841,8 +842,7 @@ public class CrusherBlockEntity extends BaseMachineBlockEntity implements MenuPr
         }
         int jobs = Math.max(1, currentActiveJobs(stats));
         int ticks = adjustedProcessingTicks(recipe, stats, jobs);
-        double itemsPerCycle = jobs * recipe.baseOutputCount() * outputAmountFor(recipe, stats);
-        return (int) Math.min(Integer.MAX_VALUE, Math.round(itemsPerCycle * 12000.0D / ticks));
+        return OutputRate.perMinuteTenths(jobs * recipe.baseOutputCount() * outputAmountFor(recipe, stats), ticks);
     }
 
     private int currentBonusOutputIncrement(MachineStatAccumulator stats) {
