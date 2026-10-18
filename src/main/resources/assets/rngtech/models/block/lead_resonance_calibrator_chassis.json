@@ -1,12 +1,9 @@
 {
-  "parent": "minecraft:block/cube",
+  "parent": "rngtech:block/resonance_calibrator/dual",
   "textures": {
-    "down": "rngtech:block/resonance_calibrator_chassis/bottom/lead_resonance_calibrator_chassis",
-    "up": "rngtech:block/resonance_calibrator_chassis/top/lead_resonance_calibrator_chassis",
-    "north": "rngtech:block/resonance_calibrator_chassis/front/lead_resonance_calibrator_chassis",
-    "south": "rngtech:block/resonance_calibrator_chassis/side/lead_resonance_calibrator_chassis",
-    "east": "rngtech:block/resonance_calibrator_chassis/side/lead_resonance_calibrator_chassis",
-    "west": "rngtech:block/resonance_calibrator_chassis/side/lead_resonance_calibrator_chassis",
-    "particle": "rngtech:block/resonance_calibrator_chassis/front/lead_resonance_calibrator_chassis"
+    "particle": "rngtech:block/resonance_calibrator/shell/lead",
+    "shell": "rngtech:block/resonance_calibrator/shell/lead",
+    "trim": "rngtech:block/resonance_calibrator/trim/lead",
+    "crown": "rngtech:block/resonance_calibrator/crown/lead"
   }
 }

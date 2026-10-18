@@ -201,7 +201,7 @@ public final class MasteryChecks {
     }
 
     private static void graphAndBuilds() {
-        require(MegaPassiveTree.TREE.nodes().size() == 1353, "full shared catalog");
+        require(MegaPassiveTree.TREE.nodes().size() == 1368, "full shared catalog");
         for (MegaPassiveNode root : MegaPassiveTree.TREE.nodes().stream().filter(n -> n.kind() == PassiveNodeKind.STARTER).toList()) {
             require(root.links().size() == 3, "three exits per starter");
             for (MegaPassiveNode key : MegaPassiveTree.TREE.nodes().stream().filter(n -> n.kind() == PassiveNodeKind.KEYSTONE).toList()) {

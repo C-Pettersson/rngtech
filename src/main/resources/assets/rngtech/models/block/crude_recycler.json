@@ -1,12 +1,341 @@
 {
-  "parent": "minecraft:block/cube",
+  "parent": "minecraft:block/block",
+  "render_type": "minecraft:cutout",
   "textures": {
-    "down": "rngtech:block/component_recycler/bottom/crude_recycler",
-    "up": "rngtech:block/component_recycler/top/crude_recycler",
-    "north": "rngtech:block/component_recycler/front/crude_recycler",
-    "south": "rngtech:block/component_recycler/side/crude_recycler",
-    "east": "rngtech:block/component_recycler/side/crude_recycler",
-    "west": "rngtech:block/component_recycler/side/crude_recycler",
-    "particle": "rngtech:block/component_recycler/front/crude_recycler"
-  }
+    "particle": "rngtech:block/crusher/wood/boards",
+    "boards": "rngtech:block/crusher/wood/boards",
+    "boards_v": "rngtech:block/crusher/wood/boards_v",
+    "boards_edge": "rngtech:block/crusher/wood/boards_edge",
+    "dark": "rngtech:block/crusher/wood/dark",
+    "post": "rngtech:block/crusher/wood/post",
+    "post_end": "rngtech:block/crusher/wood/post_end",
+    "cobble": "rngtech:block/component_recycler/crude/cobble",
+    "cobble_top": "rngtech:block/component_recycler/crude/cobble_top",
+    "lid": "rngtech:block/component_recycler/crude/lid"
+  },
+  "elements": [
+    {
+      "from": [
+        0,
+        0,
+        0
+      ],
+      "to": [
+        16,
+        2,
+        16
+      ],
+      "faces": {
+        "north": {
+          "texture": "#boards_edge"
+        },
+        "south": {
+          "texture": "#boards_edge"
+        },
+        "east": {
+          "texture": "#boards_edge"
+        },
+        "west": {
+          "texture": "#boards_edge"
+        },
+        "up": {
+          "texture": "#boards"
+        },
+        "down": {
+          "texture": "#boards"
+        }
+      }
+    },
+    {
+      "from": [
+        0.5,
+        2.0,
+        0.5
+      ],
+      "to": [
+        2.0,
+        14.5,
+        2.0
+      ],
+      "faces": {
+        "north": {
+          "texture": "#post"
+        },
+        "south": {
+          "texture": "#post"
+        },
+        "east": {
+          "texture": "#post"
+        },
+        "west": {
+          "texture": "#post"
+        }
+      }
+    },
+    {
+      "from": [
+        14.0,
+        2.0,
+        0.5
+      ],
+      "to": [
+        15.5,
+        14.5,
+        2.0
+      ],
+      "faces": {
+        "north": {
+          "texture": "#post"
+        },
+        "south": {
+          "texture": "#post"
+        },
+        "east": {
+          "texture": "#post"
+        },
+        "west": {
+          "texture": "#post"
+        }
+      }
+    },
+    {
+      "from": [
+        0.5,
+        2.0,
+        14.0
+      ],
+      "to": [
+        2.0,
+        14.5,
+        15.5
+      ],
+      "faces": {
+        "north": {
+          "texture": "#post"
+        },
+        "south": {
+          "texture": "#post"
+        },
+        "east": {
+          "texture": "#post"
+        },
+        "west": {
+          "texture": "#post"
+        }
+      }
+    },
+    {
+      "from": [
+        14.0,
+        2.0,
+        14.0
+      ],
+      "to": [
+        15.5,
+        14.5,
+        15.5
+      ],
+      "faces": {
+        "north": {
+          "texture": "#post"
+        },
+        "south": {
+          "texture": "#post"
+        },
+        "east": {
+          "texture": "#post"
+        },
+        "west": {
+          "texture": "#post"
+        }
+      }
+    },
+    {
+      "from": [
+        1.0,
+        2.0,
+        2.0
+      ],
+      "to": [
+        2.0,
+        14.5,
+        14.0
+      ],
+      "faces": {
+        "east": {
+          "texture": "#dark"
+        },
+        "west": {
+          "texture": "#boards_v"
+        }
+      }
+    },
+    {
+      "from": [
+        14.0,
+        2.0,
+        2.0
+      ],
+      "to": [
+        15.0,
+        14.5,
+        14.0
+      ],
+      "faces": {
+        "east": {
+          "texture": "#boards_v"
+        },
+        "west": {
+          "texture": "#dark"
+        }
+      }
+    },
+    {
+      "from": [
+        2.0,
+        2.0,
+        14.0
+      ],
+      "to": [
+        14.0,
+        14.5,
+        15.0
+      ],
+      "faces": {
+        "north": {
+          "texture": "#dark"
+        },
+        "south": {
+          "texture": "#boards_v"
+        }
+      }
+    },
+    {
+      "from": [
+        2.0,
+        2.0,
+        1.0
+      ],
+      "to": [
+        14.0,
+        3.0,
+        2.0
+      ],
+      "faces": {
+        "north": {
+          "texture": "#boards_edge"
+        },
+        "south": {
+          "texture": "#boards_edge"
+        },
+        "up": {
+          "texture": "#boards_edge"
+        }
+      }
+    },
+    {
+      "from": [
+        2.0,
+        11.5,
+        1.0
+      ],
+      "to": [
+        14.0,
+        14.5,
+        2.0
+      ],
+      "faces": {
+        "north": {
+          "texture": "#boards"
+        },
+        "south": {
+          "texture": "#boards_edge"
+        },
+        "down": {
+          "texture": "#boards_edge"
+        }
+      }
+    },
+    {
+      "from": [
+        2.0,
+        2.0,
+        2.0
+      ],
+      "to": [
+        14.0,
+        2.25,
+        14.0
+      ],
+      "faces": {
+        "up": {
+          "texture": "#dark"
+        }
+      }
+    },
+    {
+      "from": [
+        3.0,
+        2.0,
+        4.0
+      ],
+      "to": [
+        13.0,
+        5.0,
+        13.0
+      ],
+      "faces": {
+        "north": {
+          "texture": "#cobble"
+        },
+        "east": {
+          "texture": "#cobble"
+        },
+        "west": {
+          "texture": "#cobble"
+        },
+        "up": {
+          "texture": "#cobble_top"
+        }
+      }
+    },
+    {
+      "from": [
+        0.5,
+        14.5,
+        0.5
+      ],
+      "to": [
+        15.5,
+        16.0,
+        15.5
+      ],
+      "faces": {
+        "north": {
+          "texture": "#boards_edge"
+        },
+        "south": {
+          "texture": "#boards_edge"
+        },
+        "east": {
+          "texture": "#boards_edge"
+        },
+        "west": {
+          "texture": "#boards_edge"
+        },
+        "up": {
+          "texture": "#lid",
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ]
+        },
+        "down": {
+          "texture": "#boards_edge"
+        }
+      }
+    }
+  ]
 }

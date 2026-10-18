@@ -40,6 +40,7 @@
             "path_0147",
             "soft_starter_1",
             "path_0140",
+            "spring_returns_1",
             "path_0141",
             "soft_starter_2",
             "soft_starter_3",
@@ -47,21 +48,28 @@
             "path_0044",
             "path_0148",
             "path_0163",
+            "spring_returns_2",
+            "spring_returns_3",
             "path_0150",
             "path_0166",
+            "hot_air_jackets_1",
             "soft_starter",
             "path_0018",
             "path_0043",
             "path_0149",
             "path_0164",
+            "spring_returns",
             "path_0151",
             "path_0167",
+            "hot_air_jackets_2",
+            "hot_air_jackets_3",
             "path_0011",
             "path_0042",
             "path_0142",
             "path_0165",
             "path_0143",
             "path_0069",
+            "hot_air_jackets",
             "path_0019",
             "path_0071",
             "fine_control_1",
@@ -92,15 +100,7 @@
             "path_0162",
             "path_0172",
             "lean_draw_1",
-            "path_0074",
-            "path_0207",
-            "path_0006",
-            "fine_control",
-            "path_0040",
-            "path_0121",
-            "raw_power_2",
-            "path_0049",
-            "path_0154"
+            "path_0074"
         ],
         "start_control_drive": [
             "path_0130",
@@ -609,7 +609,7 @@
         ]
     },
     "metrics": {
-        "nodes": 1353,
+        "nodes": 1368,
         "starts": 6,
         "startPositions": {
             "start_control": {
@@ -640,17 +640,17 @@
         "kinds": {
             "STARTER": 6,
             "TRAVEL": 634,
-            "NODE": 482,
-            "NOTABLE": 196,
+            "NODE": 494,
+            "NOTABLE": 199,
             "KEYSTONE": 35
         },
-        "groups": 402,
-        "edges": 1506,
-        "cycleRank": 154,
+        "groups": 405,
+        "edges": 1525,
+        "cycleRank": 158,
         "investment": {
             "travelNodes": 634,
-            "rewardPockets": 133,
-            "rewardComponents": 145,
+            "rewardPockets": 136,
+            "rewardComponents": 148,
             "minimumGateTravel": 2,
             "notablePointsFromRoad": {
                 "min": 3,
@@ -664,7 +664,7 @@
         "overlaps": 0,
         "throughNodes": 0,
         "crossings": 0,
-        "medianLength": 72.00694410957877,
+        "medianLength": 71.56116265125938,
         "p90Length": 95.88013350011566,
         "distances": {
             "start_control": {

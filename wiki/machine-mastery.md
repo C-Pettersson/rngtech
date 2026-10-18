@@ -84,7 +84,7 @@ After level 30, each level needs 10% more total XP than the one before.
 
 ## The passive tree
 
-All seven families share one passive tree of 1,348 nodes. Each family enters at its own **start**, shown in the table above. Your machine can only grow outward from its own start, and it cannot pass through another family's start.
+All seven families share one passive tree of 1,368 nodes. Each family enters at its own **start**, shown in the table above. Your machine can only grow outward from its own start, and it cannot pass through another family's start.
 
 The tree has three **attributes**: **Control** (teal), **Drive** (gold), and **Reserve** (red). Each start gives 20 points of its attribute, split 10 and 10 on mixed starts. Travel nodes along the tree's roads add more, and machines and Gear can roll [attribute suffixes](rarity-and-affixes.md#attribute-suffixes). Attributes give bonuses on their own:
 

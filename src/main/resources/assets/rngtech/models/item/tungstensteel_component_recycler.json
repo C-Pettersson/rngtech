@@ -1,3 +1,12 @@
 {
-    "parent":  "rngtech:block/tungstensteel_component_recycler"
+  "parent": "rngtech:item/component_recycler_template",
+  "textures": {
+    "particle": "rngtech:block/crusher/shell/tungstensteel",
+    "shell": "rngtech:block/crusher/shell/tungstensteel",
+    "trim": "rngtech:block/crusher/trim/tungstensteel",
+    "body": "rngtech:block/component_recycler/head/tungstensteel_body",
+    "body_top": "rngtech:block/component_recycler/head/tungstensteel_body_top",
+    "prong": "rngtech:block/component_recycler/head/tungstensteel_prong",
+    "bit": "rngtech:block/component_recycler/head/tungstensteel_bit"
+  }
 }
