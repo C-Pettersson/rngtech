@@ -194,6 +194,18 @@
                 "forestry"
             ],
             "yield": "none"
+        },
+        {
+            "stat": "BATCH_OVERHEAD",
+            "families": [
+                "crusher",
+                "furnace",
+                "alloy_furnace",
+                "metal_press",
+                "melter",
+                "resonance_calibrator"
+            ],
+            "yield": "none"
         }
     ],
     "behaviors": [
@@ -691,6 +703,52 @@
             "id": "ROLLING_REAP",
             "families": [
                 "forestry"
+            ],
+            "yield": "none"
+        },
+        {
+            "id": "DENSE_BATCHING",
+            "families": [
+                "crusher",
+                "furnace",
+                "alloy_furnace",
+                "metal_press",
+                "melter",
+                "resonance_calibrator"
+            ],
+            "yield": "none"
+        },
+        {
+            "id": "BLAST_DRAFT",
+            "families": [
+                "furnace",
+                "alloy_furnace",
+                "metal_press",
+                "melter"
+            ],
+            "yield": "none"
+        },
+        {
+            "id": "COOL_HEADED",
+            "families": [
+                "furnace",
+                "alloy_furnace",
+                "metal_press",
+                "melter"
+            ],
+            "yield": "none"
+        },
+        {
+            "id": "BRIGHT_ANNEAL",
+            "families": [
+                "metal_press"
+            ],
+            "yield": "none"
+        },
+        {
+            "id": "HYDROGEN_QUENCH",
+            "families": [
+                "metal_press"
             ],
             "yield": "none"
         }

@@ -5,14 +5,17 @@ import com.rngtech.rpg.ModifierSet;
 import java.util.Locale;
 
 public enum HeatCoreMaterial {
-    IRON(1, 24, 0.85, 1, 0.85, 1.08, 200, 0.85, 8),
-    COPPER(2, 40, 0.80, 2, 0.75, 1.16, 400, 0.90, 10),
-    BRONZE(3, 64, 1.00, 3, 1.00, 1.24, 600, 0.95, 12),
-    STEEL(4, 96, 1.15, 4, 1.20, 1.32, 800, 1.08, 14),
-    ALUMINUM(5, 48, 0.70, 2, 0.60, 2.20, 250, 0.86, 16),
-    SPARKSTEEL(5, 64, 1.25, 5, 1.28, 1.40, 1000, 1.12, 16),
-    TITANIUM(6, 80, 1.35, 6, 1.35, 1.48, 1200, 1.18, 18),
-    EXOTIC(8, 128, 1.60, 8, 1.60, 1.64, 1600, 1.30, 24);
+    // Heat Transfer heats the chamber; Thermal Conductivity sets crafting speed and wall loss; Thermal Mass smooths heat.
+    // Steel is the kiln core (heavy, well insulated, slower); Aluminum the blast core (fast, light, leaky); Sparksteel and
+    // Titanium heat up fastest.
+    IRON(1, 24, 0.85, 1, 0.85, 1.08, 1.08, 1.00, 200, 0.85, 8),
+    COPPER(2, 40, 0.80, 2, 0.75, 1.16, 1.16, 0.90, 400, 0.90, 10),
+    BRONZE(3, 64, 1.00, 3, 1.00, 1.24, 1.24, 1.00, 600, 0.95, 12),
+    STEEL(4, 96, 1.15, 4, 1.20, 1.15, 1.20, 1.40, 800, 1.08, 14),
+    ALUMINUM(5, 48, 0.70, 2, 0.60, 2.20, 2.20, 0.65, 250, 0.86, 16),
+    SPARKSTEEL(5, 64, 1.25, 5, 1.28, 1.70, 1.40, 1.00, 1000, 1.12, 16),
+    TITANIUM(6, 80, 1.35, 6, 1.35, 1.80, 1.48, 1.10, 1200, 1.18, 18),
+    EXOTIC(8, 128, 1.60, 8, 1.60, 2.00, 1.64, 1.20, 1600, 1.30, 24);
 
     private final int stage;
     private final int energyGeneration;
@@ -20,6 +23,8 @@ public enum HeatCoreMaterial {
     private final int maxFuelTier;
     private final double heatIsolation;
     private final double heatTransfer;
+    private final double thermalConductivity;
+    private final double thermalMass;
     private final int maxTemperatureBonus;
     private final double temperatureStability;
     private final int refinementPotential;
@@ -32,6 +37,8 @@ public enum HeatCoreMaterial {
             int maxFuelTier,
             double heatIsolation,
             double heatTransfer,
+            double thermalConductivity,
+            double thermalMass,
             int maxTemperatureBonus,
             double temperatureStability,
             int refinementPotential
@@ -42,6 +49,8 @@ public enum HeatCoreMaterial {
         this.maxFuelTier = maxFuelTier;
         this.heatIsolation = heatIsolation;
         this.heatTransfer = heatTransfer;
+        this.thermalConductivity = thermalConductivity;
+        this.thermalMass = thermalMass;
         this.maxTemperatureBonus = maxTemperatureBonus;
         this.temperatureStability = temperatureStability;
         this.refinementPotential = refinementPotential;
@@ -70,6 +79,14 @@ public enum HeatCoreMaterial {
 
     public double heatTransfer() {
         return heatTransfer;
+    }
+
+    public double thermalConductivity() {
+        return thermalConductivity;
+    }
+
+    public double thermalMass() {
+        return thermalMass;
     }
 
     public int maxTemperatureBonus() {

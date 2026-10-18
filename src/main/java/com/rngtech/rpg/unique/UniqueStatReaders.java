@@ -47,8 +47,8 @@ public final class UniqueStatReaders {
     ));
 
     private static final Set<MachineStat> HEAT_CONTROL = EnumSet.of(MachineStat.COOLING_RATE, MachineStat.HEAT_ISOLATION,
-            MachineStat.HEAT_TRANSFER, MachineStat.OVERHEAT_TOLERANCE, MachineStat.TEMPERATURE_STABILITY, MachineStat.WARMUP_TIME,
-            MachineStat.MAX_TEMPERATURE, MachineStat.STRAIN_RECOVERY);
+            MachineStat.HEAT_TRANSFER, MachineStat.THERMAL_CONDUCTIVITY, MachineStat.OVERHEAT_TOLERANCE, MachineStat.TEMPERATURE_STABILITY,
+            MachineStat.THERMAL_MASS, MachineStat.MAX_TEMPERATURE, MachineStat.STRAIN_RECOVERY);
     private static final Set<MachineStat> BATCHING = EnumSet.of(MachineStat.BATCH_SIZE, MachineStat.BATCH_OVERHEAD);
 
     private static final Map<Reader, Set<MachineStat>> STATS = new EnumMap<>(Reader.class);
@@ -69,7 +69,9 @@ public final class UniqueStatReaders {
         stats(Reader.METAL_PRESS, HEAT_CONTROL, MachineStat.ENERGY_USAGE, MachineStat.PROCESSING_SPEED, MachineStat.STABILITY,
                 MachineStat.EFFICIENCY, MachineStat.MOLD_SWAP_TIME, MachineStat.HEAT_WINDOW, MachineStat.ESCAPEMENT_SPEED,
                 MachineStat.BATCH_SIZE, MachineStat.BATCH_OVERHEAD);
-        stats(Reader.MELTER, BATCHING, MachineStat.MAX_TEMPERATURE, MachineStat.HEAT_TRANSFER, MachineStat.PROCESSING_LEVEL,
+        stats(Reader.MELTER, BATCHING, MachineStat.MAX_TEMPERATURE, MachineStat.HEAT_TRANSFER, MachineStat.THERMAL_CONDUCTIVITY,
+                MachineStat.HEAT_ISOLATION, MachineStat.THERMAL_MASS, MachineStat.COOLING_RATE, MachineStat.TEMPERATURE_STABILITY,
+                MachineStat.OVERHEAT_TOLERANCE, MachineStat.PROCESSING_LEVEL,
                 MachineStat.PROCESSING_SPEED, MachineStat.ENERGY_USAGE, MachineStat.EFFICIENCY, MachineStat.FLUID_CAPACITY,
                 MachineStat.FLUID_TRANSFER, MachineStat.ESCAPEMENT_SPEED);
         stats(Reader.SOLID_FUEL_BURNER, Set.of(), MachineStat.ENERGY_GENERATION, MachineStat.FUEL_EFFICIENCY, MachineStat.HEAT_ISOLATION,
@@ -104,7 +106,7 @@ public final class UniqueStatReaders {
     }
 
     /** Stats where a smaller value helps, so a negative roll is the benefit. */
-    private static final Set<MachineStat> LOWER_IS_BETTER = EnumSet.of(MachineStat.ENERGY_USAGE, MachineStat.WARMUP_TIME,
+    private static final Set<MachineStat> LOWER_IS_BETTER = EnumSet.of(MachineStat.ENERGY_USAGE, MachineStat.THERMAL_MASS,
             MachineStat.IDLE_LOSS, MachineStat.JAM_CHANCE, MachineStat.CYCLE_JAM_CHANCE, MachineStat.MOLD_SWAP_TIME,
             MachineStat.BATCH_OVERHEAD, MachineStat.FE_USAGE, MachineStat.VEIN_MINE_FE_USAGE, MachineStat.ORE_BURST_FE_USAGE,
             MachineStat.ORE_BURST_COOLDOWN);

@@ -18,6 +18,14 @@ public final class BatchProcessing {
         return batchingOff ? 1 : statBatchSize(stats);
     }
 
+    /**
+     * Dense Batching starts a cycle only with this many items: the batch the machine may lock, or less when the input
+     * slots cannot hold that many.
+     */
+    public static int fullBatch(MachineStatAccumulator stats, boolean batchingOff, int slotLimit) {
+        return Math.max(1, Math.min(batchSize(stats, batchingOff), slotLimit));
+    }
+
     /** Batch Overhead as a fraction of the base cycle time per extra item. */
     public static double overhead(MachineStatAccumulator stats) {
         return Math.max(MIN_BATCH_OVERHEAD, stats.value(MachineStat.BATCH_OVERHEAD)) / 100.0;

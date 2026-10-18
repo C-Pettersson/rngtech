@@ -17,6 +17,6 @@ The **Forestry Companion** screen opens when you right-click the cart and has th
 The **Companion Station** screen has four tabs:
 
 - **Station**: the six output slots, water and FE gauges, status, and the hold toggle.
-- **Supply**: a 3×3 plantables buffer and a refills row for bone meal, a spare tool, and spare shears.
+- **Supply**: a 3×3 plantables buffer and a refills row for bone meal or Urea, a spare tool, and spare shears.
 - **Gear**: the Battery Cell and connector ports.
 - **Stats**: the station's water store and, while a cart is docked, the cart's energy, Work Range, and tool condition.

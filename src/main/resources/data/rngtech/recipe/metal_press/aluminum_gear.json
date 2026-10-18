@@ -19,7 +19,7 @@
     "id": "rngtech:aluminum_gear"
   },
   "processing_ticks": 300,
-  "energy": 3600,
+  "heat": 1911,
   "minimum_temperature": 1300,
   "safe_maximum_temperature": 1600,
   "required_temperature_stability": 0.95,

@@ -17,6 +17,6 @@ Stages 5 and 6 are about fluids and gases. Gases behave like fluids: they use th
 5. Build the [Melter](rngtech:melter.md) and make **Lubricant**, which later Servos and frame parts need. It also makes methane from algae for gas chemistry.
 6. Use the [Component Assembler](rngtech:component-assembler.md) to make Battery Cells and other parts in bulk.
 7. Reform methane with water in the [Steam Methane Reformer](rngtech:steam-methane-reformer.md) for Hydrogen. Fit the Cavitation Generator with nitrogen Gear to split water into Nitrogen.
-8. Combine Nitrogen and Hydrogen in the [Ammonia Synthesizer](rngtech:ammonia-synthesizer.md), and burn the Ammonia in the [Ammonia Fuel Cell](rngtech:ammonia-fuel-cell.md).
+8. Combine Nitrogen and Hydrogen in the [Ammonia Synthesizer](rngtech:ammonia-synthesizer.md), and burn the Ammonia in the [Fuel Cell](rngtech:ammonia-fuel-cell.md).
 
 Steel and Titanium [Resonance Calibrator](rngtech:resonance-calibrator.md) sets calibrate the components the next stages ask for.

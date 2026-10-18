@@ -2,7 +2,7 @@
 navigation:
   title: "Crafting"
   parent: silica-gel-dehumidifier.md
-  position: 1
+  position: 2
   icon: rngtech:silica_gel_dehumidifier
 ---
 

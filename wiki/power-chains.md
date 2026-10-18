@@ -68,6 +68,17 @@ Most gas machines also use water. To keep the diagrams readable, water appears o
 
 **Bottleneck.** The Reformer stops when its Carbon Monoxide tank is full. Send the Carbon Monoxide back to the [Algae Photobioreactor](algae-photobioreactor.md), where it is the fastest carbon input. That closes the loop: each reform makes as much Carbon Monoxide as one Algae Biomass needs at rated aeration, and that biomass melts into the next batch of Methane. A Photobioreactor grows biomass more slowly than a Reformer uses Methane, so run two or more per Reformer, and keep them in light. The [Syngas Combustor](syngas-combustor.md) can burn spare Carbon Monoxide, but it gets little FE from it. What the loop cannot make for itself is Organic Reagent, so keep a crop farm feeding the Crusher.
 
+**Shifting for more Hydrogen.** A second Reformer can run the [water-gas shift](steam-methane-reformer.md#water-gas-shift) on the Carbon Monoxide instead, which adds about a third more Hydrogen per reform. The shift turns the Carbon Monoxide into a little Carbon Exhaust, and algae grow half as fast on Carbon Exhaust, so a shift loop needs about twice the Photobioreactors. Shift when Hydrogen is what runs short and you have the room and light for more Photobioreactors.
+
+{{ chain(edges=[
+    ["rngtech:melter", "rngtech:methane", "rngtech:steam_methane_reformer"],
+    ["rngtech:steam_methane_reformer", "rngtech:carbon_monoxide", "rngtech:steam_methane_reformer#2"],
+    ["rngtech:steam_methane_reformer#2", "rngtech:carbon_exhaust", "rngtech:algae_photobioreactor"],
+    ["rngtech:algae_photobioreactor", "rngtech:algae_biomass", "rngtech:melter"],
+    ["rngtech:steam_methane_reformer", "rngtech:hydrogen", None],
+    ["rngtech:steam_methane_reformer#2", "rngtech:hydrogen", None],
+]) }}
+
 **Next upgrade.** Send the Hydrogen on to [Ammonia](#ammonia).
 
 ## Stage 6: Ammonia {#ammonia}
@@ -79,9 +90,15 @@ Most gas machines also use water. To keep the diagrams readable, water appears o
     ["rngtech:ammonia_synthesizer", "rngtech:ammonia", "rngtech:ammonia_fuel_cell"],
 ]) }}
 
-**What to build.** A [Cavitation Generator](cavitation-generator.md) fitted with the Nitrogen Extraction Rotor and Nitrogen Separation Nozzle, which splits water into Nitrogen. An [Ammonia Synthesizer](ammonia-synthesizer.md) that combines the Nitrogen with Hydrogen from the [carbon loop](#carbon-loop), and an [Ammonia Fuel Cell](ammonia-fuel-cell.md) that burns the Ammonia. The Fuel Cell makes more FE than the Synthesizer costs.
+**What to build.** A [Cavitation Generator](cavitation-generator.md) fitted with the Nitrogen Extraction Rotor and Nitrogen Separation Nozzle, which splits water into Nitrogen. An [Ammonia Synthesizer](ammonia-synthesizer.md) that combines the Nitrogen with Hydrogen from the [carbon loop](#carbon-loop), and a [Fuel Cell](ammonia-fuel-cell.md) that burns the Ammonia. The Fuel Cell makes more FE than the Synthesizer costs.
 
 **Bottleneck.** Hydrogen. One Reformer keeps about one Synthesizer busy, and one Synthesizer about one Fuel Cell, while one Cavitation Generator makes Nitrogen for two or three Synthesizers. Every extra Fuel Cell therefore needs another Reformer and the Melter and Photobioreactors behind it. The Cavitation Generator is also the hungriest water user in the chain; see [Water supply](#water).
+
+**Spare Nitrogen.** Nitrogen has a second use. With the **Blast Draft** keystone, Nitrogen piped into a Furnace, Alloy Furnace, or Metal Press lets it run hotter, and so faster, before it builds failure strain; see [Nitrogen atmosphere](heat.md#nitrogen-atmosphere). A hot lane uses 1 mB a tick, a bit less than a Synthesizer, so every lane you run that way is Nitrogen your Ammonia chain does not get.
+
+**Burning Hydrogen directly.** The [Fuel Cell](ammonia-fuel-cell.md#ammonia-or-hydrogen) also burns Hydrogen, with no Nitrogen or Synthesizer, but gets less than half the FE per mB of Hydrogen that the Ammonia route does. Use it while you build the rest of the chain, or for Hydrogen you have to spare.
+
+**Urea.** An Ammonia Synthesizer with Carbon Exhaust piped in turns some of its Ammonia into [Urea](ammonia-synthesizer.md#making-urea), a fertilizer for the Forestry Companion and the Algae Photobioreactor. It makes Urea before Ammonia whenever it can, and every Urea is Ammonia your Fuel Cells do not get, so feed it only as much Carbon Exhaust as you need Urea.
 
 **Next upgrade.** [Void Catalyst](#void-catalyst). In the Vacuum Collapse Generator, Ammonia is worth far more FE than in a Fuel Cell.
 

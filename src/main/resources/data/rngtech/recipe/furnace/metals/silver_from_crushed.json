@@ -14,7 +14,7 @@
         "id": "rngtech:silver_ingot"
     },
     "processing_ticks": 600,
-    "energy": 7200,
+    "heat": 5573,
     "experience": 0.7,
     "minimum_temperature": 1100,
     "required_temperature_stability": 0.95,

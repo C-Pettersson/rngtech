@@ -67,7 +67,7 @@ Ranges are listed worst roll to best. Flat lines with whole-number ranges, such 
 
 A Heat Core with Sparksteel-class maximum temperature in a Stage 4 slot, so a Steel-stage [Furnace](furnace.md), [Alloy Furnace](alloy-furnace.md), [Metal Press](metal-press.md), or [Melter](melter.md) reaches the next stage's heat early. A Steel Furnace with it reaches 1600 heat, enough for Titanium recipes. Its other base stats, including Temperature Stability, are a Sparksteel Heat Core's. In a [Solid Fuel Burner](solid-fuel-burner.md) it burns fuels up to tier 4.
 
-- **Signature:** (60–80)% less Warmup Time.
+- **Signature:** (60–80)% less Thermal Mass: it heats up very fast, but load dips and wobble are larger.
 - **Crucible Keeper:** +(20–40) °C Overdrive Margin.
 - **Drawbacks:** (60–40)% increased Energy Use, (60–40)% less Overheat Tolerance, which adds failure strain when heat overshoots a recipe's safe maximum, and 50% less Fuel Efficiency.
 
@@ -77,7 +77,7 @@ A cold-running Heat Core for presses and furnaces that punish unstable heat. Its
 
 - **Signature:** (40–80)% more Temperature Stability, (40–80)% more Overheat Tolerance, and Power Grace, which normal parts only have on Stage 6 and higher Servos.
 - **Drop Forge:** +(5–15)% Heat Window.
-- **Drawback:** (35–20)% less Heat Transfer, which slows heating and processing, including in the Melter.
+- **Drawback:** (35–20)% less Heat Transfer, which slows heating and recovery, including in the Melter.
 
 ### Mineshaft Worn Pick-Jaw
 

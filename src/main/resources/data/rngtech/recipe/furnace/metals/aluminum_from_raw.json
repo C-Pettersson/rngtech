@@ -13,9 +13,15 @@
   "result": {
     "id": "rngtech:aluminum_ingot"
   },
-  "processing_ticks": 150,
-  "energy": 9600,
+  "processing_ticks": 225,
+  "heat": 12741,
   "experience": 0.7,
-  "minimum_temperature": 1000,
-  "machine_xp": 2
+  "minimum_temperature": 1300,
+  "required_temperature_stability": 0.95,
+  "machine_xp": 2,
+  "failure_output": {
+    "count": 1,
+    "id": "rngtech:malformed_ingot"
+  },
+  "failure_material": "aluminum"
 }

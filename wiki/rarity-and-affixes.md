@@ -207,6 +207,12 @@ Tool Heads and Tool Rods get 2 extra RP, and some machine parts add a small bonu
 
 An illegal or failed refinement costs nothing: no catalyst and no RP. If an add or upgrade rolls a cost higher than the RP left, it still succeeds, and the item drops to 0 RP.
 
+### Annealed items {#annealed-items}
+
+An item that rolls traits comes out **Annealed** when you craft it at a crafting table and every plate in its recipe is Annealed. Annealed plates come from a [Metal Press with Hydrogen Quench](metal-press.md#annealing). Only the plates in the item's own crafting grid count, so plates used earlier, for example in a Machine Frame, do not. Items whose recipe has no plates, such as Heat Cores, cannot be Annealed.
+
+The Unidentified item shows an aqua Annealed line. When you identify or place it, its RP rolls twice in its stage's range and keeps the higher roll. For a Stage 5–6 item (14–22 RP), that raises the average from 18 to about 19.5. Rarity, affixes, and tiers roll as usual.
+
 ## Refining
 
 Refinement changes an item's rolled affixes with a consumable **catalyst**. You can:
@@ -252,10 +258,10 @@ A corruption implicit is one fixed value, with no tier or range. It sits outside
 
 | Item | Blessed | Blighted |
 |---|---|---|
-| Heat Core | 10% increased Max Temperature, 15% increased Temperature Stability, 15% increased Overheat Tolerance, 10% increased Heat Transfer, 10% increased Fuel Efficiency, 20% reduced Warmup Time, or Power Grace | 20% less Temperature Stability, or 25% increased Warmup Time |
+| Heat Core | 10% increased Max Temperature, 15% increased Temperature Stability, 15% increased Overheat Tolerance, 10% increased Heat Transfer, 10% increased Fuel Efficiency, 20% reduced Thermal Mass, or Power Grace | 20% less Temperature Stability, or 25% increased Thermal Mass |
 | Crush Head | +1 Processing Level (rare), +25% Jam Recovery, 10% increased Processing Speed, or 10% more Processing Speed | 25% more Jam Chance, or 15% less Processing Speed |
 | Servo | Power Grace, Auto Purge, 15% increased Overheat Tolerance, 10% increased Processing Speed, 15% increased Stability, 15% reduced Energy Use, or 20% increased Fluid Transfer | 15% less Processing Speed, or 20% less Stability |
-| Alloy Crucible | +15% Blend Speed, 15% increased Temperature Stability, 10% increased Processing Speed, 15% increased Overheat Tolerance, or 20% reduced Warmup Time | 20% less Stability |
+| Alloy Crucible | +15% Blend Speed, 15% increased Temperature Stability, 10% increased Processing Speed, 15% increased Overheat Tolerance, or 20% reduced Thermal Mass | 20% less Stability |
 | Fluid Pump | 50% increased Fluid Capacity, or 30% increased Fluid Transfer | 30% less Fluid Transfer |
 | Battery Cell | 20% increased Energy Transfer, 30% less Idle Loss, 15% increased Energy Capacity, or 10% increased Efficiency | Doubled Idle Loss |
 | Resonance Coil, Control Board, Stabilizer Matrix | +1 Coil Reach, 10% increased Catalyst Efficiency, 10% increased Calibration Precision, or 10% increased Processing Speed | 20% less Processing Speed, or 10% less Calibration Precision |

@@ -65,6 +65,8 @@ const SHAPES = {
     },
     star: { gateLinks: [0], nodes: starPoints(), links: Array.from({ length: 12 }, (_, i) => [i, (i + 1) % 12]) },
     keyDirect: { gateLinks: [0], nodes: [["KEYSTONE", 96, 0]], links: [] },
+    // Two keystones hanging from the same travel node, for a pair of related choices.
+    keyPair: { gateLinks: [0, 1], nodes: [["KEYSTONE", 92, -52], ["KEYSTONE", 92, 52]], links: [] },
     keyArc: { gateLinks: [0], nodes: [["NODE", 62, 0], ["NODE", 110, 24], ["NOTABLE", 162, 66], ["KEYSTONE", 238, 120]], links: [[0, 1], [1, 2], [2, 3]] },
     keyFork: { gateLinks: [0], nodes: [["NODE", 60, 0], ["NODE", 106, -44], ["NOTABLE", 158, -82], ["NODE", 110, 42], ["NOTABLE", 170, 64], ["KEYSTONE", 250, 88]], links: [[0, 1], [1, 2], [0, 3], [3, 4], [4, 5]] }
 };
@@ -381,7 +383,7 @@ export function layoutMegaTree({ starts, totalNodes, keystones, centerFacing, ex
         for (const [id, value] of depth) startDistance.set(id, Math.min(startDistance.get(id) ?? Infinity, value));
     }
     if (KEYSTONE_TARGETS.length + outerHubs.length + 1 !== keystones) throw new Error("Keystone targets do not match the keystone count");
-    const keystoneDepth = { keyDirect: 1, keyArc: 4, keyFork: 4 };
+    const keystoneDepth = { keyDirect: 1, keyPair: 1, keyArc: 4, keyFork: 4 };
     const gapDirections = node => {
         const angles = [...adjacency.get(node.id)].map(id => angleOf(byId.get(id), node)).sort((a, b) => a - b);
         return angles.flatMap((angle, i) => {
@@ -393,7 +395,11 @@ export function layoutMegaTree({ starts, totalNodes, keystones, centerFacing, ex
         for (const gate of gates) for (const direction of directionsOf(gate)) {
             const allowed = shapes.filter(name => startDistance.get(gate.id) + keystoneDepth[name] >= KEYSTONE_START_DISTANCE);
             const created = tryPlace(gate, direction, allowed, turns);
-            if (created) return keystoneNodes.push({ id: created.find(n => n.kind === "KEYSTONE").id, layer, ...(extra ? { extra } : {}) });
+            if (created) {
+                const keystones = created.filter(n => n.kind === "KEYSTONE");
+                keystones.forEach((node, i) => keystoneNodes.push({ id: node.id, layer, ...(extra ? { extra: [extra].flat()[i] } : {}) }));
+                return keystones.length;
+            }
         }
         return 0;
     };
@@ -474,7 +480,7 @@ export function layoutMegaTree({ starts, totalNodes, keystones, centerFacing, ex
         for (const reach of [260, 420, 600]) {
             const gates = nodes.filter(n => n.kind === "TRAVEL" && distance(n, point) < reach).sort((a, b) => distance(a, point) - distance(b, point));
             if (extra.keystone) {
-                placed = placeKeystone(gates, toward, extra.shapes, turns, extra.layer, extra.id) > 0;
+                placed = placeKeystone(gates, toward, extra.shapes, turns, extra.layer, extra.keystones ?? extra.id) > 0;
             } else {
                 for (const gate of gates) {
                     for (const direction of toward(gate)) if (!placed && tryPlace(gate, direction, extra.shapes, turns)) placed = true;

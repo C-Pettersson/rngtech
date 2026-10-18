@@ -47,7 +47,7 @@ Mine a placed Alloy Furnace with a pickaxe. It drops itself and keeps its rolled
 
 Put the recipe's ingredients in the input slots. Each recipe needs a set count of each ingredient, but the slot order does not matter. Extra units are fine and feed the next crafts, but every item in the input slots must belong to the recipe: one stray item stops the machine. The Alloy Furnace then heats up and starts mixing only once it reaches the recipe's target temperature. While it is out of input or out of power, it cools down. A full output slot pauses it with its heat and progress kept. Swapping an input for a different item mid-craft restarts the craft.
 
-Each recipe also has a minimum stage. Both the chassis and the installed Alloy Crucible must reach that stage, so late alloys need a Titanium setup. The machine's max heat must also reach the recipe's target temperature. On recipes that cannot fail, its Temperature Stability must meet the recipe's requirement, or the craft does not start.
+Each recipe also has a minimum stage. Both the chassis and the installed Alloy Crucible must reach that stage, so late alloys need a Titanium setup. The machine's max heat must also reach the recipe's target temperature. On recipes that cannot fail, its Temperature Stability must meet the recipe's requirement, or the craft does not start. See [Heat](heat.md) for how it heats, what the FE pays for, and the overheat slider.
 
 Your first Bronze does not need an Alloy Furnace. 3 Copper Dust, 1 Tin Dust, and 1 Coal Dust make 2 Bronze Blend in a crafting grid, in any arrangement. Once you have a Bronze Alloy Furnace, it makes more Bronze Blend from the same dusts plus Charcoal, and it can already make a slow Steel Blend bootstrap recipe.
 
@@ -63,7 +63,7 @@ Stage 4 and higher recipes with a failure output build up failure strain when he
 
 Output Guard means the machine avoids working while its output is blocked. Every Alloy Furnace already keeps its progress and heat while the output slot is full.
 
-With a Batch Size above 1, the Alloy Furnace crafts several whole recipe sets in one cycle: a batch of 3 needs three times every ingredient. A batch takes as many sets as the input slots hold and the output has room for, up to the Batch Size. Each extra set makes the cycle longer by the Batch Overhead, 25% of one craft's time to start with. Every set still pays its own FE and earns its own XP, while heating costs the same however large the batch. A failed batch ruins every set in it.
+With a Batch Size above 1, the Alloy Furnace crafts several whole recipe sets in one cycle: a batch of 3 needs three times every ingredient. A batch takes as many sets as the input slots hold and the output has room for, up to the Batch Size. Each extra set makes the cycle longer by the Batch Overhead, 25% of one craft's time to start with. Every set still absorbs its own heat and earns its own XP, and a bigger batch takes a bigger heat dip when it goes in. A failed batch ruins every set in it.
 
 ### Gear
 
@@ -87,6 +87,7 @@ The Gear tab has four slots. No Gear can be a higher stage than the chassis.
 | Top | Inserts into the active input slots. Accepts only Alloy Furnace recipe ingredients, and never lets one ingredient fill a slot another ingredient needs; see [Automation](automation.md). |
 | Bottom | Extracts finished output. Ingredient leftovers are pushed into the inventory below; see [Automation](automation.md#ingredient-leftovers). |
 | Sides | Accepts FE, for example from a [Universal Cable](universal-cable.md). |
+| Any | Accepts Nitrogen for the [Nitrogen atmosphere](heat.md#nitrogen-atmosphere). |
 
 Gear slots cannot be filled by automation.
 
@@ -104,7 +105,7 @@ Metallurgist Flux only saves a unit of an ingredient the recipe needs two or mor
 
 The Alloy Furnace uses its own recipe type, `rngtech:alloy_furnace`. Mode tells you whether a recipe makes a blend or a finished ingot. The desiccant recipe makes Supercharged Silica Gel Beads for the [Silica Gel Dehumidifier](silica-gel-dehumidifier.md).
 
-{{ processing("alloy_furnace", columns=["mode", "processing_ticks", "energy", "minimum_component_stage", "minimum_temperature", "required_temperature_stability", "machine_xp"]) }}
+{{ processing("alloy_furnace", columns=["mode", "processing_ticks", "heat", "minimum_component_stage", "minimum_temperature", "required_temperature_stability", "machine_xp"]) }}
 
 ## Ascendancy trees
 
@@ -128,7 +129,7 @@ Every node in this machine's ascendancies. See [Machine Mastery](machine-mastery
 | Skimmed Melt | Small | Flux Ledger | 8% increased Temperature Stability. |
 | **Dross Skimming** | Notable | Skimmed Melt | A failure keeps one unit of the recipe’s largest input. |
 | Banked Heat | Small | Flux Ledger | 5% reduced Energy Use. |
-| **Heat Economy** | Notable | Banked Heat | Warmup costs 30% less FE. |
+| **Heat Economy** | Notable | Banked Heat | Heat put in before a craft starts costs 30% less FE. |
 
 ### Blendwright
 
@@ -138,7 +139,7 @@ Every node in this machine's ascendancies. See [Machine Mastery](machine-mastery
 | Quick Blend | Small | Blend Reversal | +5% Blend Speed. |
 | **Cold Mixing** | Notable | Quick Blend | +100 °C Blend Heat Reduction. |
 | Warm Mix | Small | Cold Mixing | +5% Blend Speed. |
-| **Continuous Pour** | Deep notable | Warm Mix | Back-to-back blend crafts skip re-warmup. |
+| **Continuous Pour** | Deep notable | Warm Mix | Back-to-back blend crafts take no load dip. |
 | Steady Pace | Small | Blend Reversal | 6% increased Processing Speed. |
 | **Blend Ledger** | Notable | Steady Pace | +25% Ledger Rate. |
 | Measured Pace | Small | Blend Ledger | 6% increased Processing Speed. |
@@ -154,7 +155,7 @@ Every node in this machine's ascendancies. See [Machine Mastery](machine-mastery
 
 The Alloy Furnace screen has five tabs:
 
-- **Process**: input and output slots, progress, energy, live heat, and failure strain on recipes that can fail. Status squares show the recipe state and whether the heat target is met. Hover for exact values. With an ascendancy, a thin line under the progress bar shows Flux or blend-ledger progress, and Master Blend shows a recipe-disabled status on direct-ingot recipes.
+- **Process**: input and output slots, progress, energy, live heat, failure strain on recipes that can fail, and the Nitrogen gauge at the right edge. Status squares show the recipe state and whether the heat target is met. Hover for exact values. With an ascendancy, a thin line under the progress bar shows Flux or blend-ledger progress, and Master Blend shows a recipe-disabled status on direct-ingot recipes.
 - **Gear**: Heat Core, Alloy Crucible, Battery Cell, and Servo slots.
 - **Stats**: the machine's current stats, including traits, Gear, and Mastery.
 - **Refinement**: refine the placed Alloy Furnace's traits with a catalyst.

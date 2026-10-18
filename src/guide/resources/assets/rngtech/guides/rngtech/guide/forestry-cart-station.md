@@ -63,7 +63,7 @@ The station is the only automation surface; the cart's cargo cannot be piped.
 
 | Side | Behavior |
 |---|---|
-| Top | With an Item Connector: inserts saplings, bone meal, shears, and spare Axes or Treefellers into their slots. |
+| Top | With an Item Connector: inserts saplings, bone meal or Urea, shears, and spare Axes or Treefellers into their slots. |
 | Bottom | With an Item Connector: extracts from the six output slots. |
 | Any | With an Energy Connector: accepts FE, for example from a [Universal Cable](rngtech:universal-cable.md). With a Fluid Connector: accepts water. |
 
@@ -78,7 +78,7 @@ Each connector's tier caps how fast it transfers.
 
 ### Breaking
 
-Mine a placed Companion Station with a pickaxe. It drops itself, the items in its slots, its connectors and Battery Cell, and its stored bone meal. Water in its tank is lost.
+Mine a placed Companion Station with a pickaxe. It drops itself, the items in its slots, its connectors and Battery Cell, and its stored bone meal. Urea in the store comes back as bone meal. Water in its tank is lost.
 
 Break a placed Forestry Companion like a minecart. It drops as an item that keeps its traits and Mastery progress. Pick-block on a placed cart also keeps them.
 

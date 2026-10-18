@@ -72,8 +72,9 @@ public class MetalPressScreen extends AbstractContainerScreen<MetalPressMenu> {
             "rngtech.stat.energy_usage",
             "rngtech.stat.energy_capacity",
             "rngtech.stat.heat_transfer",
+            "rngtech.stat.thermal_conductivity",
             "rngtech.stat.max_temperature",
-            "rngtech.stat.warmup_time",
+            "rngtech.stat.thermal_mass",
             "rngtech.stat.cooling_rate",
             "rngtech.stat.temperature_stability",
             "rngtech.stat.overheat_tolerance",
@@ -85,6 +86,7 @@ public class MetalPressScreen extends AbstractContainerScreen<MetalPressMenu> {
             MetalPressMenu.energyUsageDataIndex(),
             MetalPressMenu.energyCapacityStatDataIndex(),
             MetalPressMenu.heatTransferDataIndex(),
+            MetalPressMenu.thermalConductivityDataIndex(),
             MetalPressMenu.maxTemperatureDataIndex(),
             MetalPressMenu.warmupTimeDataIndex(),
             MetalPressMenu.coolingRateDataIndex(),
@@ -98,8 +100,9 @@ public class MetalPressScreen extends AbstractContainerScreen<MetalPressMenu> {
             MachineStat.ENERGY_USAGE,
             MachineStat.ENERGY_CAPACITY,
             MachineStat.HEAT_TRANSFER,
+            MachineStat.THERMAL_CONDUCTIVITY,
             MachineStat.MAX_TEMPERATURE,
-            MachineStat.WARMUP_TIME,
+            MachineStat.THERMAL_MASS,
             MachineStat.COOLING_RATE,
             MachineStat.TEMPERATURE_STABILITY,
             MachineStat.OVERHEAT_TOLERANCE,
@@ -108,6 +111,8 @@ public class MetalPressScreen extends AbstractContainerScreen<MetalPressMenu> {
     private static final Map<MegaPassiveNode, ResourceLocation> MASTERY_ICON_TEXTURES = createMasteryIconTextures();
 
     private final MasteryScreenSupport<MegaPassiveNode> masterySupport;
+    private final HeatSlider heatSlider = new HeatSlider(86, 81, 69);
+    private final NitrogenGauge nitrogenGauge = new NitrogenGauge(222, BAR_Y);
 
     private static Map<MegaPassiveNode, ResourceLocation> createMasteryIconTextures() {
         Map<MegaPassiveNode, ResourceLocation> textures = new HashMap<>();
@@ -213,6 +218,10 @@ public class MetalPressScreen extends AbstractContainerScreen<MetalPressMenu> {
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        if (menu.selectedTab() == MetalPressMenu.TAB_PROCESSING
+                && heatSlider.mouseClicked(mouseX, mouseY, button, leftPos, topPos, menu.containerId)) {
+            return true;
+        }
         if (button == 0) {
             if (isOverTab(mouseX, mouseY, 0)) {
                 selectTab(MetalPressMenu.TAB_PROCESSING);
@@ -254,6 +263,9 @@ public class MetalPressScreen extends AbstractContainerScreen<MetalPressMenu> {
 
     @Override
     public boolean mouseDragged(double mouseX, double mouseY, int button, double dragX, double dragY) {
+        if (heatSlider.mouseDragged(mouseX, button, leftPos, menu.containerId)) {
+            return true;
+        }
         if (menu.selectedTab() == MetalPressMenu.TAB_MASTERY
                 && masterySupport.mouseDragged(mouseX, mouseY, button, imageWidth, imageHeight)) {
             return true;
@@ -263,6 +275,7 @@ public class MetalPressScreen extends AbstractContainerScreen<MetalPressMenu> {
 
     @Override
     public boolean mouseReleased(double mouseX, double mouseY, int button) {
+        heatSlider.mouseReleased();
         if (masterySupport.mouseReleased(mouseX, mouseY, button, leftPos, topPos, imageWidth, imageHeight)) {
             return true;
         }
@@ -373,6 +386,8 @@ public class MetalPressScreen extends AbstractContainerScreen<MetalPressMenu> {
     }
 
     private void renderProcessing(GuiGraphics guiGraphics) {
+        heatSlider.sync(menu.heatSlider());
+        heatSlider.render(guiGraphics, font, leftPos, topPos, menu.heatSlider(), heatBands());
         int x = leftPos;
         int y = topPos;
         guiGraphics.fill(x + RISK_BAR_X, y + RISK_BAR_Y, x + RISK_BAR_X + RISK_BAR_WIDTH, y + RISK_BAR_Y + RISK_BAR_HEIGHT, 0xFF5F5F5F);
@@ -404,9 +419,8 @@ public class MetalPressScreen extends AbstractContainerScreen<MetalPressMenu> {
         int energyHeight = Math.round(BAR_FILL_HEIGHT * menu.energyProgress());
         guiGraphics.fill(x + ENERGY_BAR_X + 1, y + BAR_Y + BAR_HEIGHT - 1 - energyHeight, x + ENERGY_BAR_X + BAR_WIDTH - 1, y + BAR_Y + BAR_HEIGHT - 1, ENERGY);
 
-        guiGraphics.fill(x + HEAT_BAR_X, y + BAR_Y, x + HEAT_BAR_X + BAR_WIDTH, y + BAR_Y + BAR_HEIGHT, 0xFF5F5F5F);
-        int heatHeight = Math.round(BAR_FILL_HEIGHT * menu.heatProgress());
-        guiGraphics.fill(x + HEAT_BAR_X + 1, y + BAR_Y + BAR_HEIGHT - 1 - heatHeight, x + HEAT_BAR_X + BAR_WIDTH - 1, y + BAR_Y + BAR_HEIGHT - 1, HEAT);
+        HeatReadout.renderBar(guiGraphics, leftPos + HEAT_BAR_X, topPos + BAR_Y, BAR_WIDTH, BAR_HEIGHT, BAR_FILL_HEIGHT, heatBands());
+        nitrogenGauge.render(guiGraphics, leftPos, topPos, menu.nitrogen(), menu.nitrogenUse(), menu.holdsHydrogen());
 
         renderIconBox(guiGraphics, STATUS_ICON_X, STATUS_ICON_Y);
         MachineScreenStyle.renderStatusGlyph(guiGraphics, x + STATUS_ICON_X, y + STATUS_ICON_Y, statusState());
@@ -494,6 +508,15 @@ public class MetalPressScreen extends AbstractContainerScreen<MetalPressMenu> {
         if (menu.selectedTab() != MetalPressMenu.TAB_PROCESSING) {
             return;
         }
+        if (heatSlider.isOver(mouseX, mouseY, leftPos, topPos)) {
+            guiGraphics.renderComponentTooltip(font, heatSlider.tooltip(menu.heatSlider(), menu.setpoint()), mouseX, mouseY);
+            return;
+        }
+        if (nitrogenGauge.renderTooltip(
+                guiGraphics, font, leftPos, topPos, mouseX, mouseY, menu.nitrogen(), menu.nitrogenUse(), menu.nitrogenBonusPercent(),
+                menu.holdsHydrogen(), menu.annealMode())) {
+            return;
+        }
 
         CompactValueText.renderTooltipIfHovered(
                 guiGraphics,
@@ -519,7 +542,7 @@ public class MetalPressScreen extends AbstractContainerScreen<MetalPressMenu> {
                 BAR_Y,
                 BAR_WIDTH,
                 BAR_HEIGHT,
-                heatTooltip()
+                heatTooltipLines()
         );
         CompactValueText.renderTooltipIfHovered(
                 guiGraphics,
@@ -575,6 +598,16 @@ public class MetalPressScreen extends AbstractContainerScreen<MetalPressMenu> {
                 ? Component.translatable("rngtech.press.tooltip.active_mold")
                 : Component.translatable("rngtech.press.tooltip.select_mold");
         guiGraphics.renderTooltip(font, tooltip, mouseX, mouseY);
+    }
+
+    private HeatReadout.Bands heatBands() {
+        return new HeatReadout.Bands(menu.heat(), menu.minimumTemperature(), menu.targetTemperature(), menu.safeMaximumTemperature(),
+                menu.overheatTemperature(), menu.setpoint(), menu.heatReach(), menu.heatMaximum(), menu.wobble());
+    }
+
+    private List<Component> heatTooltipLines() {
+        return HeatReadout.lines(heatTooltip(), menu.heatSlider(), menu.targetTemperature(), menu.setpoint(), menu.heatFactor(), menu.wobble(),
+                menu.inputEnergy(), menu.heatingEnergy(), menu.holdingEnergy(), true);
     }
 
     private Component heatTooltip() {
@@ -666,6 +699,7 @@ public class MetalPressScreen extends AbstractContainerScreen<MetalPressMenu> {
             case MetalPressBlockEntity.STATUS_WARMING -> Component.translatable("rngtech.press.status.warming", menu.targetTemperature());
             case MetalPressBlockEntity.STATUS_ROUTE_DISABLED -> Component.translatable("rngtech.press.status.route_disabled");
             case MetalPressBlockEntity.STATUS_SWAPPING_MOLD -> Component.translatable("rngtech.press.status.swapping_mold");
+            case MetalPressBlockEntity.STATUS_FILLING_BATCH -> Component.translatable("rngtech.press.status.filling_batch");
             default -> Component.translatable("rngtech.press.status.ready");
         };
     }
@@ -675,6 +709,7 @@ public class MetalPressScreen extends AbstractContainerScreen<MetalPressMenu> {
             case MetalPressBlockEntity.STATUS_READY -> MachineScreenStyle.StatusState.RUNNING;
             case MetalPressBlockEntity.STATUS_NO_POWER,
                     MetalPressBlockEntity.STATUS_NO_INPUT,
+                    MetalPressBlockEntity.STATUS_FILLING_BATCH,
                     MetalPressBlockEntity.STATUS_MISSING_HEAT_CORE,
                     MetalPressBlockEntity.STATUS_MISSING_SERVO,
                     MetalPressBlockEntity.STATUS_MISSING_MOLD,

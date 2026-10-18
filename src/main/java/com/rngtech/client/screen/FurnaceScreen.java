@@ -50,6 +50,7 @@ public class FurnaceScreen extends AbstractContainerScreen<FurnaceMenu> {
     private static final int ENERGY_BAR_X = 2;
     private static final int HEAT_BAR_X = 14;
     private static final int FAILURE_BAR_X = 26;
+    private static final int NITROGEN_GAUGE_X = 222;
     private static final int FUEL_FRAME_X = 55;
     private static final int FUEL_FRAME_Y = 83;
     private static final int BATTERY_FRAME_Y = 65;
@@ -68,8 +69,9 @@ public class FurnaceScreen extends AbstractContainerScreen<FurnaceMenu> {
             "rngtech.stat.processing_speed",
             "rngtech.stat.efficiency",
             "rngtech.stat.heat_transfer",
+            "rngtech.stat.thermal_conductivity",
             "rngtech.stat.max_temperature",
-            "rngtech.stat.warmup_time",
+            "rngtech.stat.thermal_mass",
             "rngtech.stat.cooling_rate",
             "rngtech.stat.temperature_stability",
             "rngtech.stat.overheat_tolerance",
@@ -82,6 +84,7 @@ public class FurnaceScreen extends AbstractContainerScreen<FurnaceMenu> {
             FurnaceMenu.processingSpeedDataIndex(),
             FurnaceMenu.efficiencyDataIndex(),
             FurnaceMenu.heatTransferDataIndex(),
+            FurnaceMenu.thermalConductivityDataIndex(),
             FurnaceMenu.maxTemperatureDataIndex(),
             FurnaceMenu.warmupTimeDataIndex(),
             FurnaceMenu.coolingRateDataIndex(),
@@ -96,8 +99,9 @@ public class FurnaceScreen extends AbstractContainerScreen<FurnaceMenu> {
             MachineStat.PROCESSING_SPEED,
             MachineStat.EFFICIENCY,
             MachineStat.HEAT_TRANSFER,
+            MachineStat.THERMAL_CONDUCTIVITY,
             MachineStat.MAX_TEMPERATURE,
-            MachineStat.WARMUP_TIME,
+            MachineStat.THERMAL_MASS,
             MachineStat.COOLING_RATE,
             MachineStat.TEMPERATURE_STABILITY,
             MachineStat.OVERHEAT_TOLERANCE,
@@ -109,8 +113,9 @@ public class FurnaceScreen extends AbstractContainerScreen<FurnaceMenu> {
     private static final String[] ELECTRIC_STAT_LABEL_KEYS = {
             "rngtech.stat.processing_speed",
             "rngtech.stat.heat_transfer",
+            "rngtech.stat.thermal_conductivity",
             "rngtech.stat.max_temperature",
-            "rngtech.stat.warmup_time",
+            "rngtech.stat.thermal_mass",
             "rngtech.stat.cooling_rate",
             "rngtech.stat.temperature_stability",
             "rngtech.stat.overheat_tolerance",
@@ -122,6 +127,7 @@ public class FurnaceScreen extends AbstractContainerScreen<FurnaceMenu> {
     private static final int[] ELECTRIC_STAT_DATA_INDICES = {
             FurnaceMenu.processingSpeedDataIndex(),
             FurnaceMenu.heatTransferDataIndex(),
+            FurnaceMenu.thermalConductivityDataIndex(),
             FurnaceMenu.maxTemperatureDataIndex(),
             FurnaceMenu.warmupTimeDataIndex(),
             FurnaceMenu.coolingRateDataIndex(),
@@ -135,8 +141,9 @@ public class FurnaceScreen extends AbstractContainerScreen<FurnaceMenu> {
     private static final MachineStat[] ELECTRIC_STAT_TYPES = {
             MachineStat.PROCESSING_SPEED,
             MachineStat.HEAT_TRANSFER,
+            MachineStat.THERMAL_CONDUCTIVITY,
             MachineStat.MAX_TEMPERATURE,
-            MachineStat.WARMUP_TIME,
+            MachineStat.THERMAL_MASS,
             MachineStat.COOLING_RATE,
             MachineStat.TEMPERATURE_STABILITY,
             MachineStat.OVERHEAT_TOLERANCE,
@@ -148,6 +155,8 @@ public class FurnaceScreen extends AbstractContainerScreen<FurnaceMenu> {
     private static final Map<MegaPassiveNode, ResourceLocation> MASTERY_ICON_TEXTURES = createMasteryIconTextures();
 
     private final MasteryScreenSupport<MegaPassiveNode> masterySupport;
+    private final HeatSlider heatSlider = new HeatSlider(86, 81, 69);
+    private final NitrogenGauge nitrogenGauge = new NitrogenGauge(NITROGEN_GAUGE_X, BAR_Y);
 
     private static Map<MegaPassiveNode, ResourceLocation> createMasteryIconTextures() {
         Map<MegaPassiveNode, ResourceLocation> textures = new java.util.HashMap<>();
@@ -263,6 +272,11 @@ public class FurnaceScreen extends AbstractContainerScreen<FurnaceMenu> {
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        if (menu.selectedTab() == FurnaceMenu.TAB_PROCESSING
+                && menu.isElectric()
+                && heatSlider.mouseClicked(mouseX, mouseY, button, leftPos, topPos, menu.containerId)) {
+            return true;
+        }
         if (button == 0) {
             if (isOverTab(mouseX, mouseY, 0)) {
                 selectTab(FurnaceMenu.TAB_PROCESSING);
@@ -298,6 +312,9 @@ public class FurnaceScreen extends AbstractContainerScreen<FurnaceMenu> {
 
     @Override
     public boolean mouseDragged(double mouseX, double mouseY, int button, double dragX, double dragY) {
+        if (heatSlider.mouseDragged(mouseX, button, leftPos, menu.containerId)) {
+            return true;
+        }
         if (menu.selectedTab() == FurnaceMenu.TAB_MASTERY
                 && masterySupport.mouseDragged(mouseX, mouseY, button, imageWidth, imageHeight)) {
             return true;
@@ -307,6 +324,7 @@ public class FurnaceScreen extends AbstractContainerScreen<FurnaceMenu> {
 
     @Override
     public boolean mouseReleased(double mouseX, double mouseY, int button) {
+        heatSlider.mouseReleased();
         if (masterySupport.mouseReleased(mouseX, mouseY, button, leftPos, topPos, imageWidth, imageHeight)) {
             return true;
         }
@@ -428,6 +446,11 @@ public class FurnaceScreen extends AbstractContainerScreen<FurnaceMenu> {
     }
 
     private void renderProcessing(GuiGraphics guiGraphics) {
+        // The Stage 0 fuel Furnace has no overheat slider: it always holds the recipe target.
+        if (menu.isElectric()) {
+            heatSlider.sync(menu.heatSlider());
+            heatSlider.render(guiGraphics, font, leftPos, topPos, menu.heatSlider(), heatBands());
+        }
         int x = leftPos;
         int y = topPos;
         if (menu.activeProcessingSlots() == 1) {
@@ -452,8 +475,9 @@ public class FurnaceScreen extends AbstractContainerScreen<FurnaceMenu> {
 
         if (menu.isElectric()) {
             renderVerticalBar(guiGraphics, ENERGY_BAR_X, menu.energyProgress(), ENERGY);
+            nitrogenGauge.render(guiGraphics, leftPos, topPos, menu.nitrogen(), menu.nitrogenUse());
         }
-        renderVerticalBar(guiGraphics, HEAT_BAR_X, menu.heatProgress(), HEAT);
+        HeatReadout.renderBar(guiGraphics, leftPos + HEAT_BAR_X, topPos + BAR_Y, BAR_WIDTH, BAR_HEIGHT, BAR_FILL_HEIGHT, heatBands());
         if (menu.hasFailureRecipe()) {
             renderVerticalBar(guiGraphics, FAILURE_BAR_X, menu.failureProgress(), FAILURE);
         }
@@ -555,6 +579,14 @@ public class FurnaceScreen extends AbstractContainerScreen<FurnaceMenu> {
         if (menu.selectedTab() != FurnaceMenu.TAB_PROCESSING) {
             return;
         }
+        if (menu.isElectric() && heatSlider.isOver(mouseX, mouseY, leftPos, topPos)) {
+            guiGraphics.renderComponentTooltip(font, heatSlider.tooltip(menu.heatSlider(), menu.setpoint()), mouseX, mouseY);
+            return;
+        }
+        if (menu.isElectric() && nitrogenGauge.renderTooltip(
+                guiGraphics, font, leftPos, topPos, mouseX, mouseY, menu.nitrogen(), menu.nitrogenUse(), menu.nitrogenBonusPercent())) {
+            return;
+        }
 
         if (menu.isElectric()) {
             CompactValueText.renderTooltipIfHovered(
@@ -582,7 +614,7 @@ public class FurnaceScreen extends AbstractContainerScreen<FurnaceMenu> {
                 BAR_Y,
                 BAR_WIDTH,
                 BAR_HEIGHT,
-                heatTooltip()
+                heatTooltipLines()
         );
         if (menu.hasFailureRecipe()) {
             CompactValueText.renderTooltipIfHovered(
@@ -710,6 +742,16 @@ public class FurnaceScreen extends AbstractContainerScreen<FurnaceMenu> {
                 : Component.translatable("rngtech.furnace.tooltip.fuel", menu.burnTime(), totalBurnTime);
     }
 
+    private HeatReadout.Bands heatBands() {
+        return new HeatReadout.Bands(menu.heat(), menu.minimumTemperature(), menu.targetTemperature(), menu.safeMaximumTemperature(),
+                menu.overheatTemperature(), menu.setpoint(), menu.heatReach(), menu.heatMaximum(), menu.wobble());
+    }
+
+    private List<Component> heatTooltipLines() {
+        return HeatReadout.lines(heatTooltip(), menu.heatSlider(), menu.targetTemperature(), menu.setpoint(), menu.heatFactor(), menu.wobble(),
+                menu.inputEnergy(), menu.heatingEnergy(), menu.holdingEnergy(), menu.isElectric());
+    }
+
     private Component heatTooltip() {
         return Component.translatable(
                 "rngtech.furnace.tooltip.heat",
@@ -742,6 +784,7 @@ public class FurnaceScreen extends AbstractContainerScreen<FurnaceMenu> {
             case FurnaceBlockEntity.STATUS_WARMING -> Component.translatable("rngtech.furnace.status.warming", menu.targetTemperature());
             case FurnaceBlockEntity.STATUS_POWER_DROP -> Component.translatable("rngtech.furnace.status.power_drop");
             case FurnaceBlockEntity.STATUS_FAILURE_RISK -> Component.translatable("rngtech.furnace.status.failure_risk", menu.failureStrain());
+            case FurnaceBlockEntity.STATUS_FILLING_BATCH -> Component.translatable("rngtech.machine.status.filling_batch");
             default -> Component.translatable("rngtech.furnace.status.ready");
         };
     }
@@ -749,7 +792,7 @@ public class FurnaceScreen extends AbstractContainerScreen<FurnaceMenu> {
     private MachineScreenStyle.StatusState statusState() {
         return switch (menu.statusCode()) {
             case FurnaceBlockEntity.STATUS_READY -> MachineScreenStyle.StatusState.RUNNING;
-            case FurnaceBlockEntity.STATUS_NO_INPUT -> MachineScreenStyle.StatusState.IDLE;
+            case FurnaceBlockEntity.STATUS_NO_INPUT, FurnaceBlockEntity.STATUS_FILLING_BATCH -> MachineScreenStyle.StatusState.IDLE;
             case FurnaceBlockEntity.STATUS_NO_POWER,
                     FurnaceBlockEntity.STATUS_POWER_LIMITED,
                     FurnaceBlockEntity.STATUS_NO_FUEL,

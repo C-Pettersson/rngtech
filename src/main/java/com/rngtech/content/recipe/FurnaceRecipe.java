@@ -31,7 +31,7 @@ public record FurnaceRecipe(
         String malformedMaterial,
         ItemStack result,
         int processingTicks,
-        int energy,
+        int heat,
         double experience,
         int minimumTemperature,
         double requiredTemperatureStability,
@@ -140,6 +140,8 @@ public record FurnaceRecipe(
 
     public static class Serializer implements RecipeSerializer<FurnaceRecipe> {
         private static final int DEFAULT_ENERGY_PER_TICK = 24;
+        /** Furnace FE costs of 1,750 °C recipes used to double at run time; legacy datapacks keep that cost. */
+        private static final int LEGACY_HIGH_HEAT = 1750;
 
         private static final MapCodec<FurnaceRecipe> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
                         Codec.STRING.optionalFieldOf("group", "").forGetter(FurnaceRecipe::group),
@@ -150,9 +152,7 @@ public record FurnaceRecipe(
                                 .fieldOf("processing_ticks")
                                 .orElse(200)
                                 .forGetter(FurnaceRecipe::processingTicks),
-                        Codec.intRange(1, Integer.MAX_VALUE)
-                                .optionalFieldOf("energy")
-                                .forGetter(recipe -> Optional.of(recipe.energy())),
+                        RecipeHeat.CODEC.forGetter(recipe -> RecipeHeat.of(recipe.heat())),
                         Codec.doubleRange(0.0, Double.MAX_VALUE)
                                 .fieldOf("experience")
                                 .orElse(0.0)
@@ -193,7 +193,7 @@ public record FurnaceRecipe(
                         malformedMaterial,
                         result,
                         processingTicks,
-                        energy,
+                        heatFields,
                         experience,
                         minimumTemperature,
                         requiredTemperatureStability,
@@ -212,7 +212,8 @@ public record FurnaceRecipe(
                         malformedMaterial,
                         result,
                         processingTicks,
-                        energy.orElse(defaultEnergy(processingTicks)),
+                        heatFields.resolve(defaultEnergy(processingTicks),
+                                (minimumTemperature >= LEGACY_HIGH_HEAT ? 2.0 : 1.0) * RecipeHeat.temperatureScale(resolvedTarget)),
                         experience,
                         minimumTemperature,
                         requiredTemperatureStability,
@@ -259,7 +260,7 @@ public record FurnaceRecipe(
                         ByteBufCodecs.STRING_UTF8.encode(buffer, recipe.malformedMaterial);
                         ItemStack.STREAM_CODEC.encode(buffer, recipe.result);
                         ByteBufCodecs.VAR_INT.encode(buffer, recipe.processingTicks);
-                        ByteBufCodecs.VAR_INT.encode(buffer, recipe.energy);
+                        ByteBufCodecs.VAR_INT.encode(buffer, recipe.heat);
                         ByteBufCodecs.DOUBLE.encode(buffer, recipe.experience);
                         ByteBufCodecs.VAR_INT.encode(buffer, recipe.minimumTemperature);
                         ByteBufCodecs.DOUBLE.encode(buffer, recipe.requiredTemperatureStability);

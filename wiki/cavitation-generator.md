@@ -83,7 +83,7 @@ The generator never pauses because its storage is full. FE that its 4,000 FE buf
 
 ### Nitrogen
 
-Install a {{ item('rngtech:nitrogen_extraction_rotor') }} and a {{ item('rngtech:nitrogen_separation_nozzle') }}, then run Water as usual. Each cycle adds Nitrogen to an 8,000 mB output tank and makes much less FE than the plain Water recipe. Recipes that need specific Gear take priority over the plain Water recipe. When the output tank is full, the generator stops with a Nitrogen Full status unless a Nullite Servo is installed and the tank already holds Nitrogen, in which case the excess is voided.
+Install a {{ item('rngtech:nitrogen_extraction_rotor') }} and a {{ item('rngtech:nitrogen_separation_nozzle') }}, then run Water as usual. Each cycle adds Nitrogen to an 8,000 mB output tank and makes much less FE than the plain Water recipe. Recipes that need specific Gear take priority over the plain Water recipe. When the output tank is full, the generator stops with a Nitrogen Full status unless a Nullite Servo is installed and the tank already holds Nitrogen, in which case the excess is voided. Nitrogen feeds the [Ammonia Synthesizer](ammonia-synthesizer.md) and the [Nitrogen atmosphere](heat.md#nitrogen-atmosphere) of heated machines.
 
 ### Burst rotor
 
@@ -103,7 +103,7 @@ Cavitation Rotors can roll flat and percent Durability affixes.
 
 **Bonus Output** from the generator, rotor, or nozzle gets the same FE from less Water: each cycle draws 1,000 mB divided by Bonus Output, so +55% draws 646 mB. With Nitrogen Gear it adds Nitrogen instead. **Fluid Transfer** only matters with Nitrogen Gear, where it limits how fast Nitrogen drains out, so the Stats tab only shows it then.
 
-On the Gear tab, the tooltip of an installed Heat Core or Servo dims the lines this generator does not use, such as Cooling Rate, Heat Isolation, Warmup Time, and the Heat Core's own Energy Generation.
+On the Gear tab, the tooltip of an installed Heat Core or Servo dims the lines this generator does not use, such as Cooling Rate, Heat Isolation, Thermal Mass, and the Heat Core's own Energy Generation.
 
 ### Crafting rotors
 
@@ -153,7 +153,7 @@ A {{ item('rngtech:purge_bucket') }} used on the generator voids up to 1,000 mB 
 ## See also
 
 - [Vacuum Collapse Generator](vacuum-collapse-generator.md), which shares the Collapse Nozzle.
-- [Ammonia Fuel Cell](ammonia-fuel-cell.md), the end of the Nitrogen chain.
+- [Fuel Cell](ammonia-fuel-cell.md), the end of the Nitrogen chain.
 - [Gear](gear.md)
 
 {{ navbox() }}

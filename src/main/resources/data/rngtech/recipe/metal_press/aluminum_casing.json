@@ -19,7 +19,7 @@
     "id": "rngtech:aluminum_casing"
   },
   "processing_ticks": 300,
-  "energy": 4800,
+  "heat": 2548,
   "minimum_temperature": 1300,
   "safe_maximum_temperature": 1600,
   "required_temperature_stability": 0.95,

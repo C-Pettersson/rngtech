@@ -73,6 +73,7 @@ public class MelterScreen extends AbstractContainerScreen<MelterMenu> {
             "rngtech.stat.energy_usage",
             "rngtech.stat.energy_capacity",
             "rngtech.stat.heat_transfer",
+            "rngtech.stat.thermal_conductivity",
             "rngtech.stat.max_temperature",
             "rngtech.stat.fluid_transfer"
     };
@@ -82,6 +83,7 @@ public class MelterScreen extends AbstractContainerScreen<MelterMenu> {
             MelterMenu.energyUsageDataIndex(),
             MelterMenu.energyCapacityStatDataIndex(),
             MelterMenu.heatTransferDataIndex(),
+            MelterMenu.thermalConductivityDataIndex(),
             MelterMenu.maxTemperatureDataIndex(),
             MelterMenu.fluidTransferDataIndex()
     };
@@ -91,12 +93,14 @@ public class MelterScreen extends AbstractContainerScreen<MelterMenu> {
             MachineStat.ENERGY_USAGE,
             MachineStat.ENERGY_CAPACITY,
             MachineStat.HEAT_TRANSFER,
+            MachineStat.THERMAL_CONDUCTIVITY,
             MachineStat.MAX_TEMPERATURE,
             MachineStat.FLUID_TRANSFER
     };
     private static final Map<MegaPassiveNode, ResourceLocation> MASTERY_ICON_TEXTURES = createMasteryIconTextures();
 
     private final MasteryScreenSupport<MegaPassiveNode> masterySupport;
+    private final HeatSlider heatSlider = new HeatSlider(104, 81, 58, true);
 
     private static Map<MegaPassiveNode, ResourceLocation> createMasteryIconTextures() {
         Map<MegaPassiveNode, ResourceLocation> textures = new HashMap<>();
@@ -201,6 +205,10 @@ public class MelterScreen extends AbstractContainerScreen<MelterMenu> {
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        if (menu.selectedTab() == MelterMenu.TAB_PROCESSING
+                && heatSlider.mouseClicked(mouseX, mouseY, button, leftPos, topPos, menu.containerId)) {
+            return true;
+        }
         if (button == 0) {
             if (isOverTab(mouseX, mouseY, 0)) {
                 selectTab(MelterMenu.TAB_PROCESSING);
@@ -239,6 +247,9 @@ public class MelterScreen extends AbstractContainerScreen<MelterMenu> {
 
     @Override
     public boolean mouseDragged(double mouseX, double mouseY, int button, double dragX, double dragY) {
+        if (heatSlider.mouseDragged(mouseX, button, leftPos, menu.containerId)) {
+            return true;
+        }
         if (menu.selectedTab() == MelterMenu.TAB_MASTERY
                 && masterySupport.mouseDragged(mouseX, mouseY, button, imageWidth, imageHeight)) {
             return true;
@@ -248,6 +259,7 @@ public class MelterScreen extends AbstractContainerScreen<MelterMenu> {
 
     @Override
     public boolean mouseReleased(double mouseX, double mouseY, int button) {
+        heatSlider.mouseReleased();
         if (masterySupport.mouseReleased(mouseX, mouseY, button, leftPos, topPos, imageWidth, imageHeight)) {
             return true;
         }
@@ -358,6 +370,8 @@ public class MelterScreen extends AbstractContainerScreen<MelterMenu> {
     }
 
     private void renderProcessing(GuiGraphics guiGraphics) {
+        heatSlider.sync(menu.heatSlider());
+        heatSlider.render(guiGraphics, font, leftPos, topPos, menu.heatSlider(), heatBands());
         int x = leftPos;
         int y = topPos;
 
@@ -374,9 +388,7 @@ public class MelterScreen extends AbstractContainerScreen<MelterMenu> {
         int energyHeight = Math.round(BAR_FILL_HEIGHT * menu.energyProgress());
         guiGraphics.fill(x + ENERGY_BAR_X + 1, y + BAR_Y + BAR_HEIGHT - 1 - energyHeight, x + ENERGY_BAR_X + BAR_WIDTH - 1, y + BAR_Y + BAR_HEIGHT - 1, ENERGY);
 
-        guiGraphics.fill(x + HEAT_BAR_X, y + BAR_Y, x + HEAT_BAR_X + BAR_WIDTH, y + BAR_Y + BAR_HEIGHT, 0xFF5F5F5F);
-        int heatHeight = Math.round(BAR_FILL_HEIGHT * menu.heatProgress());
-        guiGraphics.fill(x + HEAT_BAR_X + 1, y + BAR_Y + BAR_HEIGHT - 1 - heatHeight, x + HEAT_BAR_X + BAR_WIDTH - 1, y + BAR_Y + BAR_HEIGHT - 1, HEAT);
+        HeatReadout.renderBar(guiGraphics, leftPos + HEAT_BAR_X, topPos + BAR_Y, BAR_WIDTH, BAR_HEIGHT, BAR_FILL_HEIGHT, heatBands());
 
         int outputHeight = Math.round(BAR_FILL_HEIGHT * menu.outputFluidProgress());
         guiGraphics.fill(x + OUTPUT_FLUID_BAR_X, y + BAR_Y, x + OUTPUT_FLUID_BAR_X + FLUID_BAR_WIDTH, y + BAR_Y + BAR_HEIGHT, 0xFF5F5F5F);
@@ -498,6 +510,10 @@ public class MelterScreen extends AbstractContainerScreen<MelterMenu> {
         if (menu.selectedTab() != MelterMenu.TAB_PROCESSING) {
             return;
         }
+        if (heatSlider.isOver(mouseX, mouseY, leftPos, topPos)) {
+            guiGraphics.renderComponentTooltip(font, heatSlider.tooltip(menu.heatSlider(), menu.setpoint()), mouseX, mouseY);
+            return;
+        }
         if (renderPurgeTooltips(guiGraphics, mouseX, mouseY)) {
             return;
         }
@@ -526,7 +542,7 @@ public class MelterScreen extends AbstractContainerScreen<MelterMenu> {
                 BAR_Y,
                 BAR_WIDTH,
                 BAR_HEIGHT,
-                heatTooltip()
+                heatTooltipLines()
         );
         CompactValueText.renderTooltipIfHovered(
                 guiGraphics,
@@ -593,6 +609,18 @@ public class MelterScreen extends AbstractContainerScreen<MelterMenu> {
                 STATUS_SIZE,
                 transferTooltip()
         );
+    }
+
+    /** The Melter's melting point is its target; its safe maximum is 15% above. */
+    private HeatReadout.Bands heatBands() {
+        int melt = menu.minimumTemperature();
+        return new HeatReadout.Bands(menu.heat(), melt, melt, Math.round(melt * 1.15F), menu.overheatTemperature(), menu.setpoint(),
+                menu.heatReach(), menu.heatMaximum(), menu.wobble());
+    }
+
+    private List<Component> heatTooltipLines() {
+        return HeatReadout.lines(heatTooltip(), menu.heatSlider(), menu.minimumTemperature(), menu.setpoint(), menu.heatFactor(), menu.wobble(),
+                menu.inputEnergy(), menu.heatingEnergy(), menu.holdingEnergy(), true);
     }
 
     private Component heatTooltip() {
@@ -735,6 +763,9 @@ public class MelterScreen extends AbstractContainerScreen<MelterMenu> {
             case MelterBlockEntity.STATUS_OUTPUT_TANK_FULL -> Component.translatable("rngtech.melter.status.output_full");
             case MelterBlockEntity.STATUS_NO_POWER -> Component.translatable("rngtech.melter.status.no_power");
             case MelterBlockEntity.STATUS_NO_FLUID -> Component.translatable("rngtech.melter.status.no_fluid");
+            case MelterBlockEntity.STATUS_FILLING_BATCH -> Component.translatable("rngtech.melter.status.filling_batch");
+            case MelterBlockEntity.STATUS_WARMING -> Component.translatable("rngtech.melter.status.warming", menu.minimumTemperature());
+            case MelterBlockEntity.STATUS_HEAT_HIGH -> Component.translatable("rngtech.melter.status.heat_high");
             default -> Component.translatable("rngtech.melter.status.ready");
         };
     }
@@ -745,6 +776,9 @@ public class MelterScreen extends AbstractContainerScreen<MelterMenu> {
             case MelterBlockEntity.STATUS_NO_POWER,
                     MelterBlockEntity.STATUS_NO_FLUID,
                     MelterBlockEntity.STATUS_NO_INPUT,
+                    MelterBlockEntity.STATUS_FILLING_BATCH,
+                    MelterBlockEntity.STATUS_WARMING,
+                    MelterBlockEntity.STATUS_HEAT_HIGH,
                     MelterBlockEntity.STATUS_MISSING_HEAT_CORE,
                     MelterBlockEntity.STATUS_MISSING_CRUSH_HEAD -> MachineScreenStyle.StatusState.WAITING;
             case MelterBlockEntity.STATUS_INVALID_RECIPE -> MachineScreenStyle.StatusState.ERROR;

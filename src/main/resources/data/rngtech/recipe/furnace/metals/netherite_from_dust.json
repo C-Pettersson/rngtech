@@ -14,7 +14,7 @@
         "id": "minecraft:netherite_ingot"
     },
     "processing_ticks": 600,
-    "energy": 28800,
+    "heat": 71933,
     "experience": 0.7,
     "minimum_temperature": 2000,
     "required_temperature_stability": 1.05,

@@ -18,6 +18,7 @@ public class AmmoniaSynthesizerScreen extends AbstractContainerScreen<AmmoniaSyn
     private static final int NITROGEN = 0xFF8BA4C9;
     private static final int HYDROGEN = 0xFFE3D2A2;
     private static final int AMMONIA = 0xFFBFD48B;
+    private static final int CARBON = 0xFF6F6A64;
     private static final int PROGRESS = 0xFF71A67B;
     private static final int STAT_ACCENT = 0xFF74A7A0;
     private static final int TAB_WIDTH = 54;
@@ -50,6 +51,8 @@ public class AmmoniaSynthesizerScreen extends AbstractContainerScreen<AmmoniaSyn
             bar(guiGraphics, 48, 28, menu.nitrogenFill(), NITROGEN);
             bar(guiGraphics, 68, 28, menu.hydrogenFill(), HYDROGEN);
             bar(guiGraphics, 154, 28, menu.ammoniaFill(), AMMONIA);
+            bar(guiGraphics, 174, 28, menu.carbonFill(), CARBON);
+            slot(guiGraphics, 195, 44);
             renderPurgeButtons(guiGraphics);
             guiGraphics.fill(leftPos + 92, topPos + 54, leftPos + 140, topPos + 62, DARK);
             guiGraphics.fill(leftPos + 93, topPos + 55, leftPos + 93 + Math.round(46 * menu.progressFill()), topPos + 61, PROGRESS);
@@ -183,6 +186,9 @@ public class AmmoniaSynthesizerScreen extends AbstractContainerScreen<AmmoniaSyn
                 FluidMeterTooltips.amount(Component.translatable("fluid.rngtech.hydrogen"), menu.hydrogen(), menu.tankCapacity()));
         CompactValueText.renderTooltipIfHovered(guiGraphics, font, leftPos, topPos, mouseX, mouseY, 154, 28, 10, 50,
                 FluidMeterTooltips.amount(Component.translatable("fluid.rngtech.ammonia"), menu.ammonia(), menu.tankCapacity()));
+        CompactValueText.renderTooltipIfHovered(guiGraphics, font, leftPos, topPos, mouseX, mouseY, 174, 28, 10, 50,
+                FluidMeterTooltips.amount(Component.translatable("fluid.rngtech.carbon_exhaust"), menu.carbon(), menu.tankCapacity(),
+                        Component.translatable("rngtech.ammonia_synthesizer.tooltip.urea_feed")));
         CompactValueText.renderTooltipIfHovered(guiGraphics, font, leftPos, topPos, mouseX, mouseY, 92, 54, 48, 8, progressTooltip());
         CompactValueText.renderTooltipIfHovered(guiGraphics, font, leftPos, topPos, mouseX, mouseY, 110, 66, 12, 12,
                 Component.translatable("rngtech.ammonia_synthesizer.tooltip.status", statusComponent()));
@@ -192,6 +198,7 @@ public class AmmoniaSynthesizerScreen extends AbstractContainerScreen<AmmoniaSyn
         FluidPurgeButton.render(guiGraphics, leftPos, topPos, 48, 30, menu.nitrogen() > 0);
         FluidPurgeButton.render(guiGraphics, leftPos, topPos, 68, 30, menu.hydrogen() > 0);
         FluidPurgeButton.render(guiGraphics, leftPos, topPos, 154, 30, menu.ammonia() > 0);
+        FluidPurgeButton.render(guiGraphics, leftPos, topPos, 174, 30, menu.carbon() > 0);
     }
 
     private boolean handlePurgeButtonClick(double mouseX, double mouseY) {
@@ -222,6 +229,15 @@ public class AmmoniaSynthesizerScreen extends AbstractContainerScreen<AmmoniaSyn
                 154,
                 30,
                 AmmoniaSynthesizerBlockEntity.PURGE_OUTPUT_TANK
+        ) || FluidPurgeButton.handleClick(
+                menu,
+                leftPos,
+                topPos,
+                mouseX,
+                mouseY,
+                174,
+                30,
+                AmmoniaSynthesizerBlockEntity.PURGE_CARBON_TANK
         );
     }
 
@@ -254,6 +270,22 @@ public class AmmoniaSynthesizerScreen extends AbstractContainerScreen<AmmoniaSyn
                 Component.translatable("rngtech.purge.target.hydrogen_tank"),
                 menu.hydrogen() > 0 ? Component.translatable("fluid.rngtech.hydrogen") : Component.translatable("rngtech.purge.empty_fluid"),
                 menu.hydrogen(),
+                menu.tankCapacity()
+        )) {
+            return true;
+        }
+        if (FluidPurgeButton.renderTooltip(
+                guiGraphics,
+                font,
+                leftPos,
+                topPos,
+                mouseX,
+                mouseY,
+                174,
+                30,
+                Component.translatable("rngtech.purge.target.carbon_tank"),
+                menu.carbon() > 0 ? Component.translatable("fluid.rngtech.carbon_exhaust") : Component.translatable("rngtech.purge.empty_fluid"),
+                menu.carbon(),
                 menu.tankCapacity()
         )) {
             return true;

@@ -33,7 +33,7 @@ In the tables below, **Better** says which direction you want.
 | Energy Use | Multiplier on the FE each craft costs. Increases multiply it; reductions add together and then divide it, so 100% reduced halves the cost. | Powered processing machines, such as the [Crusher](crusher.md), [Furnace](furnace.md), [Alloy Furnace](alloy-furnace.md), [Melter](melter.md), [Metal Press](metal-press.md), [Component Assembler](component-assembler.md), [Component Recycler](component-recycler.md), [Resonance Calibrator](resonance-calibrator.md), and Steel and higher [Compressor Tanks](compressor-tank.md). | Lower |
 | Processing Level | The hardness or tier an installed part lets the machine handle. Shown as **Hardness** on the Crusher. Set by Crush Heads, Reactor Chambers, and Disassembly Heads; affixes never raise it. | [Crusher](crusher.md), [Melter](melter.md), [Potential Reactor](potential-reactor.md), [Component Recycler](component-recycler.md), and others with a level gate. | Higher |
 | Batch Size | How many items from one input stack the machine works in a single cycle. Each item still pays its own FE and earns its own XP. Starts at 1, up to 16. | [Crusher](crusher.md), [Furnace](furnace.md), [Alloy Furnace](alloy-furnace.md), [Melter](melter.md), [Metal Press](metal-press.md), [Resonance Calibrator](resonance-calibrator.md). | Higher |
-| Batch Overhead | Extra cycle time for each item past the first in a batch, as a percentage of one item's time. Starts at 25%, never below 5%. | The same machines as Batch Size. | Lower |
+| Batch Overhead | Extra cycle time for each item past the first in a batch, as a percentage of one item's time. Starts at 25%, never below 5%. The path to the Dense Batching keystone lowers it. | The same machines as Batch Size. | Lower |
 | Input Slots | Active input lanes or slots. Sets the Furnace's smelting lanes (four on the Lead Furnace), the Alloy Furnace's inputs (from its Alloy Crucible), and a Solid Fuel Burner's fuel slots (from its Fuel Box). | [Furnace](furnace.md), [Alloy Furnace](alloy-furnace.md), [Solid Fuel Burner](solid-fuel-burner.md). | Higher |
 | Bonus Output | Extra output per recipe. Fractions are banked and paid out as whole items. On the Crusher, increases have diminishing returns; see [Output amount](crusher.md#output-amount). On the Cavitation Generator it multiplies the nitrogen made per cycle. | [Crusher](crusher.md), [Cavitation Generator](cavitation-generator.md). | Higher |
 | Super Output | Chance to add one extra copy of the recipe's base output. Separate from Bonus Output. | Item-processing machines. | Higher |
@@ -81,15 +81,16 @@ These come from Crusher prefixes and start at 0.
 
 ## Heat
 
-Heat machines must warm up to a recipe's target temperature before they start, and can fail if they run too hot, too cold, or lose power. See [Furnace](furnace.md#smelting) for how this plays out.
+Heat machines must warm up to a recipe's temperature before they start, and can fail if they run too hot, too cold, or lose power. See [Heat](heat.md) for how this plays out.
 
 | Stat | What it does | Used by | Better |
 |---|---|---|---|
 | Max Temperature | Highest temperature the machine can reach. Recipes above it are locked. Mostly comes from the installed Heat Core. | [Furnace](furnace.md), [Alloy Furnace](alloy-furnace.md), [Metal Press](metal-press.md), [Melter](melter.md). | Higher |
-| Heat Transfer | How fast the machine heats up. Also shortens heat-processing time. | [Furnace](furnace.md), [Alloy Furnace](alloy-furnace.md), [Metal Press](metal-press.md). | Higher |
-| Warmup Time | Time to reach target heat. | [Furnace](furnace.md), [Alloy Furnace](alloy-furnace.md), [Metal Press](metal-press.md). | Lower |
-| Cooling Rate | How fast heat drains while the machine is blocked, idle, unpowered, or too hot for its next recipe. | [Furnace](furnace.md), [Alloy Furnace](alloy-furnace.md), [Metal Press](metal-press.md). | Lower |
-| Heat Insulation | How well heat is kept. Slows cooling on heat machines. On a [Solid Fuel Burner](solid-fuel-burner.md), below 1.0 some burn time leaks away as waste heat. | Heat machines, Solid Fuel Burner. | Higher |
+| Heat Transfer | How hard the heater pushes heat in: faster warmup and recovery, and higher FE/t while heating. On the [Cavitation Generator](cavitation-generator.md) it sheds heat strain. | Heat machines, Cavitation Generator. | Higher |
+| Thermal Conductivity | How fast heat reaches the input, and leaks through the walls: faster crafting and higher FE/t, about the same FE per craft. | Heat machines. | Higher |
+| Thermal Mass | How much heat the chamber stores: smaller load dips and less wobble, but slower warmup and recovery. | Heat machines. | Depends |
+| Cooling Rate | How fast a heat machine sheds heat when it is too hot for its next recipe or slider setting. | Heat machines. | Higher |
+| Heat Insulation | How well the walls hold heat in: less heat lost, so cheaper crafts. On a [Solid Fuel Burner](solid-fuel-burner.md), below 1.0 some burn time leaks away as waste heat. | Heat machines, Solid Fuel Burner. | Higher |
 | Temperature Stability | Precision of temperature control. Some recipes need a minimum; on Stage 4 and higher recipes, low values build failure strain instead. On the Cavitation Generator it reduces heat strain. | [Furnace](furnace.md), [Alloy Furnace](alloy-furnace.md), [Metal Press](metal-press.md), [Cavitation Generator](cavitation-generator.md). | Higher |
 | Overheat Tolerance | Widens each recipe's safe maximum before overheating builds failure strain. | [Furnace](furnace.md), [Alloy Furnace](alloy-furnace.md), [Metal Press](metal-press.md). | Higher |
 

@@ -44,7 +44,8 @@ public class AmmoniaFuelCellMenu extends AbstractContainerMenu implements StatBr
     private static final int DATA_REFINEMENT_POTENTIAL = 12;
     private static final int DATA_FLAT_ENERGY_GENERATION = 13;
     private static final int DATA_BASE_ENERGY_GENERATION = 14;
-    private static final int DATA_COUNT = 15;
+    private static final int DATA_FUEL_HYDROGEN = 15;
+    private static final int DATA_COUNT = 16;
     private static final int STAT_SCALE = 100;
     private static final int RESIDUE_SLOT = 0;
     private static final int MEMBRANE_SLOT = 1;
@@ -124,6 +125,11 @@ public class AmmoniaFuelCellMenu extends AbstractContainerMenu implements StatBr
 
     public int energyCapacity() {
         return data.get(DATA_ENERGY_CAPACITY);
+    }
+
+    /** Whether the fuel tank holds Hydrogen rather than Ammonia. */
+    public boolean burnsHydrogen() {
+        return data.get(DATA_FUEL_HYDROGEN) != 0;
     }
 
     public int ammonia() {

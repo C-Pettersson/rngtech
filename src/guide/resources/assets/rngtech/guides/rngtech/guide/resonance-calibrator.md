@@ -43,6 +43,7 @@ Each calibrated component records a family, a stage, a stability score from 0 to
 ## Usage
 
 - [Calibrating](rngtech:resonance-calibrator/calibrating.md)
+- [Annealed circuits](rngtech:resonance-calibrator/annealed-circuits.md)
 - [Calibration families](rngtech:resonance-calibrator/calibration-families.md)
 - [Stages](rngtech:resonance-calibrator/stages.md)
 - [Gear](rngtech:resonance-calibrator/gear.md)

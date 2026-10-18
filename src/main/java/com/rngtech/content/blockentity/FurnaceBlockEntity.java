@@ -12,7 +12,6 @@ import com.rngtech.content.machine.FurnaceChassisMaterial;
 import com.rngtech.content.menu.FurnaceMenu;
 import com.rngtech.content.menu.MasteryMenuSupport;
 import com.rngtech.content.recipe.FurnaceRecipe;
-import com.rngtech.content.recipe.ProcessingEnergyScaling;
 import com.rngtech.content.registry.ModBlockEntities;
 import com.rngtech.content.registry.ModTags;
 import com.rngtech.rpg.BatchProcessing;
@@ -42,6 +41,8 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.Containers;
@@ -57,6 +58,7 @@ import net.minecraft.world.item.crafting.SingleRecipeInput;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.energy.IEnergyStorage;
+import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.ItemStackHandler;
 
@@ -88,6 +90,7 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
     public static final int STATUS_FAILURE_RISK = 10;
     public static final int STATUS_POWER_LIMITED = 11;
     public static final int STATUS_HEAT_HIGH = 12;
+    public static final int STATUS_FILLING_BATCH = 13;
 
     /** Share of an electric recipe's FE that Closed Loop Recuperator returns to the internal buffer. */
     private static final double CLOSED_LOOP_REFUND = 0.25D;
@@ -110,8 +113,8 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
     private static final int DATA_ENERGY_USAGE = DATA_ENERGY_CAPACITY + 1;
     private static final int DATA_ENERGY_CAPACITY_STAT = DATA_ENERGY_USAGE + 1;
     private static final int DATA_ENERGY_TRANSFER = DATA_ENERGY_CAPACITY_STAT + 1;
-    private static final int DATA_WARMUP_TIME = DATA_ENERGY_TRANSFER + 1;
-    private static final int DATA_COOLING_RATE = DATA_WARMUP_TIME + 1;
+    private static final int DATA_THERMAL_MASS = DATA_ENERGY_TRANSFER + 1;
+    private static final int DATA_COOLING_RATE = DATA_THERMAL_MASS + 1;
     private static final int DATA_OVERHEAT_TOLERANCE = DATA_COOLING_RATE + 1;
     private static final int DATA_INPUT_SLOTS = DATA_OVERHEAT_TOLERANCE + 1;
     private static final int DATA_GEAR_SLOTS = DATA_INPUT_SLOTS + 1;
@@ -126,7 +129,20 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
     private static final int DATA_POWER_SENSITIVE_START = DATA_FAILURE_ENABLED_START + MAX_PROCESSING_SLOTS;
     private static final int DATA_LEDGER_START = DATA_POWER_SENSITIVE_START + MAX_PROCESSING_SLOTS;
     private static final int DATA_BATCH_SIZE = DATA_LEDGER_START + MAX_PROCESSING_SLOTS;
-    private static final int DATA_MACHINE_PROGRESSION_START = DATA_BATCH_SIZE + 1;
+    private static final int DATA_HEAT_SLIDER = DATA_BATCH_SIZE + 1;
+    private static final int DATA_SETPOINT_START = DATA_HEAT_SLIDER + 1;
+    private static final int DATA_THERMAL_CONDUCTIVITY = DATA_SETPOINT_START + MAX_PROCESSING_SLOTS;
+    private static final int DATA_HOLDING_ENERGY = DATA_THERMAL_CONDUCTIVITY + 1;
+    private static final int DATA_HEATING_ENERGY = DATA_HOLDING_ENERGY + 1;
+    private static final int DATA_HEAT_FACTOR = DATA_HEATING_ENERGY + 1;
+    private static final int DATA_WOBBLE = DATA_HEAT_FACTOR + 1;
+    private static final int DATA_HEAT_REACH = DATA_WOBBLE + 1;
+    private static final int DATA_HEAT_MAXIMUM = DATA_HEAT_REACH + 1;
+    private static final int DATA_INPUT_ENERGY = DATA_HEAT_MAXIMUM + 1;
+    private static final int DATA_NITROGEN = DATA_INPUT_ENERGY + 1;
+    private static final int DATA_NITROGEN_USE = DATA_NITROGEN + 1;
+    private static final int DATA_NITROGEN_BONUS = DATA_NITROGEN_USE + 1;
+    private static final int DATA_MACHINE_PROGRESSION_START = DATA_NITROGEN_BONUS + 1;
     private static final int DATA_COUNT = DATA_MACHINE_PROGRESSION_START + MasteryMenuSupport.FIELD_COUNT;
     private static final int STAT_SCALE = 100;
 
@@ -193,12 +209,13 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
     private final IEnergyStorage energy = new FurnaceEnergyStorage();
 
     private final InstalledBatteryCell batteryCell = new InstalledBatteryCell(this::batteryCellStack);
+    private final InertAtmosphere atmosphere = new InertAtmosphere(this::setChanged, this::isElectric);
     private final ContainerData menuData = new ContainerData() {
         @Override
         public int get(int index) {
             MachineStatAccumulator stats = effectiveStats();
             if (index >= DATA_PROGRESS_START && index < DATA_PROGRESS_START + MAX_PROCESSING_SLOTS) {
-                return syncedProgress(index - DATA_PROGRESS_START, progress[index - DATA_PROGRESS_START]);
+                return syncedProgress(index - DATA_PROGRESS_START, currentElapsedTicks(index - DATA_PROGRESS_START));
             }
             if (index >= DATA_PROCESSING_TICKS_START && index < DATA_PROCESSING_TICKS_START + MAX_PROCESSING_SLOTS) {
                 return currentProcessingTicks(index - DATA_PROCESSING_TICKS_START);
@@ -210,7 +227,7 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
                 return currentEnergyCostPerCraft(index - DATA_ENERGY_PER_CRAFT_START);
             }
             if (index >= DATA_HEAT_START && index < DATA_HEAT_START + MAX_PROCESSING_SLOTS) {
-                return currentTemperature[index - DATA_HEAT_START];
+                return heat[index - DATA_HEAT_START].temperature();
             }
             if (index >= DATA_TARGET_TEMPERATURE_START && index < DATA_TARGET_TEMPERATURE_START + MAX_PROCESSING_SLOTS) {
                 return currentTargetTemperature(index - DATA_TARGET_TEMPERATURE_START);
@@ -226,7 +243,7 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
             }
             if (index >= DATA_FAILURE_ENABLED_START && index < DATA_FAILURE_ENABLED_START + MAX_PROCESSING_SLOTS) {
                 int lane = index - DATA_FAILURE_ENABLED_START;
-                return failureEnabled(lane, statsForLane(lane)) ? 1 : 0;
+                return overheatFailureEnabled(lane, statsForLane(lane)) ? 1 : 0;
             }
             if (index >= DATA_POWER_SENSITIVE_START && index < DATA_POWER_SENSITIVE_START + MAX_PROCESSING_SLOTS) {
                 int lane = index - DATA_POWER_SENSITIVE_START;
@@ -234,6 +251,9 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
             }
             if (index >= DATA_LEDGER_START && index < DATA_LEDGER_START + MAX_PROCESSING_SLOTS) {
                 return ledgerDisplay(index - DATA_LEDGER_START);
+            }
+            if (index >= DATA_SETPOINT_START && index < DATA_SETPOINT_START + MAX_PROCESSING_SLOTS) {
+                return currentSetpoint(index - DATA_SETPOINT_START);
             }
             if (index >= DATA_MACHINE_PROGRESSION_START
                     && index < DATA_MACHINE_PROGRESSION_START + MasteryMenuSupport.FIELD_COUNT) {
@@ -255,14 +275,26 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
                 case DATA_ENERGY_USAGE -> scaledStat(stats, MachineStat.ENERGY_USAGE);
                 case DATA_ENERGY_CAPACITY_STAT -> scaledStat(stats, MachineStat.ENERGY_CAPACITY);
                 case DATA_ENERGY_TRANSFER -> scaledStat(stats, MachineStat.ENERGY_TRANSFER);
-                case DATA_WARMUP_TIME -> scaledStat(stats, MachineStat.WARMUP_TIME);
+                case DATA_THERMAL_MASS -> scaledStat(stats, MachineStat.THERMAL_MASS);
                 case DATA_COOLING_RATE -> scaledStat(stats, MachineStat.COOLING_RATE);
                 case DATA_OVERHEAT_TOLERANCE -> scaledStat(stats, MachineStat.OVERHEAT_TOLERANCE);
                 case DATA_INPUT_SLOTS -> scaledStat(stats, MachineStat.INPUT_SLOTS);
                 case DATA_BATCH_SIZE -> BatchProcessing.statBatchSize(stats) * STAT_SCALE;
+                case DATA_HEAT_SLIDER -> heatSlider;
+                case DATA_THERMAL_CONDUCTIVITY -> scaledStat(stats, MachineStat.THERMAL_CONDUCTIVITY);
+                case DATA_HOLDING_ENERGY -> heatEnergy(0);
+                case DATA_INPUT_ENERGY -> heatEnergy(1);
+                case DATA_HEATING_ENERGY -> heatEnergy(2);
+                case DATA_HEAT_FACTOR -> heatFactorDisplay();
+                case DATA_WOBBLE -> wobbleDisplay();
+                case DATA_HEAT_REACH -> reachDisplay();
+                case DATA_HEAT_MAXIMUM -> baseEffectiveStats().intValue(MachineStat.MAX_TEMPERATURE);
                 case DATA_GEAR_SLOTS -> activeGearSlots();
                 case DATA_MIN_TEMPERATURE -> currentMinimumTemperature(stats);
                 case DATA_STATUS -> statusCode(stats);
+                case DATA_NITROGEN -> atmosphere.amount();
+                case DATA_NITROGEN_USE -> atmosphere.lastUse();
+                case DATA_NITROGEN_BONUS -> (int) Math.round(atmosphereBonus() * 100.0);
                 default -> 0;
             };
         }
@@ -283,19 +315,20 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
     private final RecipeCache<FurnaceRecipe> recipes = new RecipeCache<>(MAX_PROCESSING_SLOTS + 1);
     private final MachineStatsCache[] laneStatsCaches = new MachineStatsCache[MAX_PROCESSING_SLOTS];
     private final List<Supplier<MachineStatAccumulator>> laneStatsBuilders = new ArrayList<>(MAX_PROCESSING_SLOTS);
-    private final int[] progress = new int[MAX_PROCESSING_SLOTS];
+    private final HeatLane[] heat = new HeatLane[MAX_PROCESSING_SLOTS];
     private final int[] lockedBatch = new int[MAX_PROCESSING_SLOTS];
-    private final int[] currentTemperature = new int[MAX_PROCESSING_SLOTS];
     private final int[] lastTargetTemperature = new int[MAX_PROCESSING_SLOTS];
     private final int[] lastSafeMaximumTemperature = new int[MAX_PROCESSING_SLOTS];
     private final int[] failureStrain = new int[MAX_PROCESSING_SLOTS];
-    private final boolean[] targetReached = new boolean[MAX_PROCESSING_SLOTS];
+    /** Lanes cooling down to their work ceiling, and lanes the heater could not keep fed, as of the last tick. */
+    private final boolean[] tooHotLane = new boolean[MAX_PROCESSING_SLOTS];
+    private final boolean[] starved = new boolean[MAX_PROCESSING_SLOTS];
+    /** How far past the recipe target the lanes run, in percent of the band up to Max Temperature. */
+    private int heatSlider;
     private final ItemStack[] activeInputs = emptyInputs();
     private final OutputLedger<Item> bloomLedger = new OutputLedger<>();
     private int burnTime;
     private int totalBurnTime;
-    /** Burn time owed by batched smelts, in thousandths of a tick. */
-    private int burnCarry;
     private int internalEnergy;
     private long energyTelemetryTick = Long.MIN_VALUE;
     private int energyInputThisTick;
@@ -307,6 +340,7 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
         trackStatSlots(inventory, SLOT_FUEL);
         for (int lane = 0; lane < MAX_PROCESSING_SLOTS; lane++) {
             int laneIndex = lane;
+            heat[lane] = new HeatLane();
             laneStatsCaches[lane] = new MachineStatsCache();
             laneStatsBuilders.add(() -> buildLaneStats(laneIndex));
         }
@@ -314,18 +348,28 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
 
     public static void serverTick(Level level, BlockPos pos, BlockState state, FurnaceBlockEntity furnace) {
         furnace.beginEnergyTelemetryTick();
+        furnace.atmosphere.beginTick();
         furnace.releaseRemovedGear(level);
         MachineStatAccumulator baseStats = furnace.baseEffectiveStats();
         int activeLanes = furnace.activeProcessingSlots(baseStats);
         boolean running = false;
         boolean changed = false;
 
+        FurnaceRecipe[] recipes = new FurnaceRecipe[MAX_PROCESSING_SLOTS];
+        int heatedLanes = 0;
+        for (int lane = 0; lane < activeLanes; lane++) {
+            recipes[lane] = furnace.findNextRecipe(lane, furnace.statsForLane(lane));
+            heatedLanes += recipes[lane] == null ? 0 : 1;
+        }
+
         for (int lane = 0; lane < activeLanes; lane++) {
             MachineStatAccumulator laneStats = furnace.statsForLane(lane);
-            FurnaceRecipe recipe = furnace.findNextRecipe(lane, laneStats);
+            FurnaceRecipe recipe = recipes[lane];
+            HeatLane heat = furnace.heat[lane];
             if (recipe == null) {
                 changed |= furnace.resetCycle(lane);
-                changed |= furnace.coolLane(lane, laneStats);
+                FurnaceRecipe blocked = furnace.outputBlockedRecipe(lane, laneStats);
+                changed |= blocked != null ? furnace.holdLane(lane, blocked, laneStats) : furnace.idleLane(lane, laneStats);
                 continue;
             }
             if (!furnace.activeCycleMatches(lane)) {
@@ -333,97 +377,58 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
                 changed |= furnace.resetBulkSpeed();
             }
             changed |= furnace.rememberHeatEnvelope(lane, recipe);
-            if (furnace.tooHot(lane, recipe, laneStats)) {
-                changed |= furnace.shedHeat(lane, recipe, laneStats);
-                continue;
-            }
+            HeatEngine.Envelope envelope = furnace.envelope(lane, recipe, laneStats);
+            HeatEngine.HeatSupply supply = furnace.heatSupply(lane, laneStats);
 
-            if (furnace.progress[lane] == 0 && furnace.currentTemperature[lane] < furnace.targetTemperature(recipe)) {
-                furnace.targetReached[lane] = false;
-            }
-            int requiredTemperature = furnace.requiredTemperatureForProgress(lane, recipe);
-            if (furnace.currentTemperature[lane] < requiredTemperature) {
-                changed |= furnace.shareHearthHeat(lane, recipe, laneStats, activeLanes);
-            }
-            if (furnace.currentTemperature[lane] < requiredTemperature) {
-                if (furnace.payHeatTick(lane, recipe, laneStats)) {
-                    changed |= furnace.warmLane(lane, recipe, laneStats, requiredTemperature);
-                    running = true;
-                } else {
-                    changed |= furnace.registerPowerDrop(lane, recipe, laneStats);
-                    if (furnace.failureStrain[lane] >= HeatControl.FAILURE_STRAIN_THRESHOLD) {
-                        changed |= furnace.tryFailCycle(lane, recipe);
-                    }
-                    changed |= furnace.coolLane(lane, laneStats);
-                }
-                continue;
-            }
-            furnace.targetReached[lane] = true;
-
-            if (furnace.isElectric()) {
-                int energyCost = furnace.energyCostForProgress(lane, recipe, laneStats);
-                if (furnace.progress[lane] == 0 && ProcessingChance.rollInstant(level, laneStats)) {
-                    int fullEnergyCost = furnace.energyCostPerCraft(recipe, laneStats) * furnace.laneBatch(lane, recipe, laneStats);
-                    if (furnace.consumeWorkingEnergy(fullEnergyCost, true) >= fullEnergyCost) {
-                        furnace.markInstantProcess(lane);
-                        furnace.startCycleIfNeeded(lane, recipe, laneStats);
-                        furnace.consumeWorkingEnergy(fullEnergyCost, false);
-                        if (furnace.process(lane, recipe, laneStats)) {
-                            changed |= furnace.bulkSpeed.recordProcess(furnace.activeTraits());
-                        }
-                        running = true;
-                        changed = true;
-                        continue;
-                    }
-                }
-                if (furnace.consumeWorkingEnergy(energyCost, true) < energyCost) {
-                    changed |= furnace.registerPowerDrop(lane, recipe, laneStats);
-                    if (furnace.failureStrain[lane] >= HeatControl.FAILURE_STRAIN_THRESHOLD) {
-                        changed |= furnace.tryFailCycle(lane, recipe);
-                    }
-                    changed |= furnace.coolLane(lane, laneStats);
-                    continue;
-                }
-                furnace.consumeWorkingEnergy(energyCost, false);
-            } else {
-                if (!furnace.burnWorkingFuel(lane, recipe, laneStats)) {
-                    changed |= furnace.coolLane(lane, laneStats);
-                    continue;
-                }
-                if (furnace.progress[lane] == 0 && ProcessingChance.rollInstant(level, laneStats)) {
-                    furnace.markInstantProcess(lane);
-                    furnace.startCycleIfNeeded(lane, recipe, laneStats);
-                    if (furnace.process(lane, recipe, laneStats)) {
-                        changed |= furnace.bulkSpeed.recordProcess(furnace.activeTraits());
-                    }
-                    running = true;
-                    changed = true;
-                    continue;
-                }
-            }
-
-            furnace.startCycleIfNeeded(lane, recipe, laneStats);
-            changed |= furnace.updateFailureStrain(lane, recipe, laneStats);
-            if (furnace.failureStrain[lane] >= HeatControl.FAILURE_STRAIN_THRESHOLD) {
-                changed |= furnace.tryFailCycle(lane, recipe);
-                continue;
-            }
-
-            furnace.progress[lane]++;
-            running = true;
-            changed = true;
-            changed |= furnace.overdrive(lane, recipe, laneStats);
-
-            if (furnace.progress[lane] >= furnace.processingTicks(lane, recipe, laneStats)) {
+            if (!heat.started()
+                    && heat.exactTemperature() >= envelope.minimum()
+                    && heat.exactTemperature() <= envelope.ceilingFor(heat)
+                    && ProcessingChance.rollInstant(level, laneStats)
+                    && furnace.payInstant(lane, recipe, laneStats, supply)) {
+                furnace.markInstantProcess(lane);
+                furnace.startCycleIfNeeded(lane, recipe, laneStats);
                 if (furnace.process(lane, recipe, laneStats)) {
                     changed |= furnace.bulkSpeed.recordProcess(furnace.activeTraits());
                 }
+                running = true;
+                changed = true;
+                continue;
+            }
+
+            boolean wasStarted = heat.started();
+            HeatEngine.Load load = furnace.load(lane, recipe, laneStats, heatedLanes);
+            HeatEngine.Tick tick = HeatEngine.work(heat, envelope, laneStats, load, supply, level.getGameTime(), lane);
+            furnace.tooHotLane[lane] = tick.tooHot();
+            furnace.starved[lane] = tick.starved();
+            changed = true;
+            if (tick.tooHot()) {
+                continue;
+            }
+            running |= tick.working() || heat.lastHeat() > 0.0;
+            if (!heat.started()) {
+                continue;
+            }
+            if (!wasStarted) {
+                furnace.startCycleIfNeeded(lane, recipe, laneStats);
+                furnace.shareLoadDip(lane, envelope, laneStats, load, activeLanes, heatedLanes);
+            }
+            if (tick.starved()) {
+                furnace.registerPowerDrop(lane, recipe, laneStats);
+            }
+            furnace.updateFailureStrain(lane, recipe, laneStats, envelope, tick.workTemperature());
+            furnace.atmosphere.use(tick.workTemperature(), HeatEngine.overheatTemperature(envelope.safeMaximum(), laneStats), furnace.atmosphereBonus());
+            if (furnace.failureStrain[lane] >= HeatControl.FAILURE_STRAIN_THRESHOLD) {
+                furnace.tryFailCycle(lane, recipe);
+                continue;
+            }
+            if (HeatEngine.finished(heat, furnace.cycleWork(lane, recipe, laneStats)) && furnace.process(lane, recipe, laneStats)) {
+                changed |= furnace.bulkSpeed.recordProcess(furnace.activeTraits());
             }
         }
 
         for (int lane = activeLanes; lane < MAX_PROCESSING_SLOTS; lane++) {
             changed |= furnace.resetCycle(lane);
-            changed |= furnace.coolLane(lane, baseStats);
+            changed |= furnace.idleLane(lane, baseStats);
         }
 
         if (!running) {
@@ -432,6 +437,19 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
         BaseMachineBlock.setActive(level, pos, state, running);
         if (changed) {
             furnace.setChanged();
+        }
+    }
+
+    public int heatSlider() {
+        return heatSlider;
+    }
+
+    /** Sets how far past each recipe target the lanes run, from 0 to 100 percent of the band up to Max Temperature. */
+    public void setHeatSlider(int percent) {
+        int clamped = Math.max(0, Math.min(100, percent));
+        if (clamped != heatSlider) {
+            heatSlider = clamped;
+            setChanged();
         }
     }
 
@@ -490,7 +508,7 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
         return MachineInfoSnapshot.builder("furnace")
                 .stage(furnaceMaterial().stage())
                 .state(machineInfoState(status), furnaceBlockedReason(status))
-                .progress(lane < 0 ? 0 : progress[lane], lane < 0 ? 0 : currentProcessingTicks(lane))
+                .progress(lane < 0 ? 0 : currentElapsedTicks(lane), lane < 0 ? 0 : currentProcessingTicks(lane))
                 .energy(energyStored(), energyCapacity(), energyRate)
                 .energyTelemetry(
                         lastEnergyInput(),
@@ -499,7 +517,9 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
                         energyBottleneck(connector, connectorDemand)
                 )
                 .fuel(burnTime, totalBurnTime)
-                .heat(lane < 0 ? 0 : currentTemperature[lane], lane < 0 ? 0 : currentTargetTemperature(lane))
+                .heat(lane < 0 ? 0 : heat[lane].temperature(), lane < 0 ? 0 : currentTargetTemperature(lane))
+                .setpoint(lane < 0 ? 0 : currentSetpoint(lane))
+                .batch(lane < 0 || recipe == null ? 0 : laneBatch(lane, recipe, statsForLane(lane)))
                 .slots(activeProcessingSlots(baseStats), MAX_PROCESSING_SLOTS)
                 .gear(furnaceGearSummary())
                 .output(status == STATUS_OUTPUT_FULL
@@ -555,19 +575,24 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
         super.saveAdditional(tag, registries);
         tag.put("Inventory", inventory.serializeNBT(registries));
         tag.put("GearInventory", gearInventory.serializeNBT(registries));
-        tag.putIntArray("Progresses", progress);
+        ListTag lanes = new ListTag();
+        for (HeatLane lane : heat) {
+            CompoundTag laneTag = new CompoundTag();
+            lane.save(laneTag);
+            lanes.add(laneTag);
+        }
+        tag.put("HeatLanes", lanes);
+        tag.putInt("HeatTrack", heatSlider);
         tag.putIntArray("LockedBatches", lockedBatch);
-        tag.putIntArray("CurrentTemperatures", currentTemperature);
         tag.putIntArray("LastTargetTemperatures", lastTargetTemperature);
         tag.putIntArray("LastSafeMaximumTemperatures", lastSafeMaximumTemperature);
         tag.putIntArray("FailureStrains", failureStrain);
+        atmosphere.save(tag, registries);
         for (int lane = 0; lane < MAX_PROCESSING_SLOTS; lane++) {
             tag.put("ActiveInput" + lane, activeInputs[lane].saveOptional(registries));
         }
-        tag.putInt("Progress", progress[0]);
         tag.putInt("BurnTime", burnTime);
         tag.putInt("TotalBurnTime", totalBurnTime);
-        tag.putInt("BurnCarry", burnCarry);
         tag.putInt("Energy", internalEnergyStored());
         bulkSpeed.save(tag);
         LedgerNbt.save(tag, "BloomLedger", bloomLedger);
@@ -580,19 +605,21 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
         if (tag.contains("GearInventory")) {
             loadGearInventory(tag.getCompound("GearInventory"), registries);
         }
-        int[] savedProgress = tag.getIntArray("Progresses");
-        if (savedProgress.length > 0) {
-            System.arraycopy(savedProgress, 0, progress, 0, Math.min(savedProgress.length, progress.length));
-        } else {
-            progress[0] = tag.getInt("Progress");
+        ListTag savedLanes = tag.getList("HeatLanes", Tag.TAG_COMPOUND);
+        int[] legacyTemperatures = tag.getIntArray("CurrentTemperatures");
+        for (int lane = 0; lane < heat.length; lane++) {
+            heat[lane] = new HeatLane();
+            if (lane < savedLanes.size()) {
+                heat[lane].load(savedLanes.getCompound(lane));
+            } else if (lane < legacyTemperatures.length) {
+                // Saved before the heat engine: the lane keeps its heat, and an unfinished smelt starts over.
+                heat[lane].setTemperature(legacyTemperatures[lane]);
+            }
         }
+        heatSlider = Math.max(0, Math.min(100, tag.getInt("HeatTrack")));
         int[] savedBatches = tag.getIntArray("LockedBatches");
         for (int lane = 0; lane < lockedBatch.length; lane++) {
             lockedBatch[lane] = lane < savedBatches.length ? Math.max(0, savedBatches[lane]) : 0;
-        }
-        int[] savedTemperatures = tag.getIntArray("CurrentTemperatures");
-        if (savedTemperatures.length > 0) {
-            System.arraycopy(savedTemperatures, 0, currentTemperature, 0, Math.min(savedTemperatures.length, currentTemperature.length));
         }
         int[] savedTargetTemperatures = tag.getIntArray("LastTargetTemperatures");
         if (savedTargetTemperatures.length > 0) {
@@ -614,22 +641,19 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
                     Math.min(savedSafeTemperatures.length, lastSafeMaximumTemperature.length)
             );
         }
+        atmosphere.load(tag, registries);
         int[] savedFailureStrains = tag.getIntArray("FailureStrains");
         if (savedFailureStrains.length > 0) {
             System.arraycopy(savedFailureStrains, 0, failureStrain, 0, Math.min(savedFailureStrains.length, failureStrain.length));
         }
         for (int lane = 0; lane < activeInputs.length; lane++) {
             activeInputs[lane] = ItemStack.parseOptional(registries, tag.getCompound("ActiveInput" + lane));
-            if (activeInputs[lane].isEmpty() && progress[lane] > 0) {
+            if (activeInputs[lane].isEmpty() && heat[lane].started()) {
                 activeInputs[lane] = singleCopy(inventory.getStackInSlot(inputSlot(lane)));
             }
         }
-        for (int lane = 0; lane < targetReached.length; lane++) {
-            targetReached[lane] = progress[lane] > 0;
-        }
         burnTime = tag.getInt("BurnTime");
         totalBurnTime = tag.getInt("TotalBurnTime");
-        burnCarry = Math.max(0, tag.getInt("BurnCarry"));
         internalEnergy = Math.max(0, tag.getInt("Energy"));
         bulkSpeed.load(tag);
         clampInternalEnergy();
@@ -726,7 +750,8 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
             return null;
         }
         FurnaceRecipe recipe = laneRecipe(lane);
-        if (recipe == null || !meetsRecipeRequirements(recipe, stats, input) || !canAcceptOutput(lane, recipe)) {
+        if (recipe == null || !meetsRecipeRequirements(recipe, stats, input) || !canAcceptOutput(lane, recipe)
+                || waitsForFullBatch(lane, recipe, stats)) {
             return null;
         }
         return recipe;
@@ -843,13 +868,17 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
                 blockedStatus = STATUS_OUTPUT_FULL;
                 continue;
             }
-            if (failureEnabled(lane, laneStats)
+            if (waitsForFullBatch(lane, recipe, laneStats)) {
+                blockedStatus = input.getCount() < fullBatch(lane, laneStats) ? STATUS_FILLING_BATCH : STATUS_OUTPUT_FULL;
+                continue;
+            }
+            if (overheatFailureEnabled(lane, laneStats)
                     && failureStrain[lane] >= HeatControl.FAILURE_STRAIN_THRESHOLD
                     && !canAcceptFailureOutput(lane, recipe)) {
                 blockedStatus = STATUS_OUTPUT_FULL;
                 continue;
             }
-            if (tooHot(lane, recipe, laneStats)) {
+            if (tooHotLane[lane]) {
                 blockedStatus = STATUS_HEAT_HIGH;
                 continue;
             }
@@ -857,36 +886,16 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
                 blockedStatus = STATUS_POWER_DROP;
                 continue;
             }
-            if (failureStrain[lane] > 0 && failureEnabled(lane, laneStats)) {
+            if (failureStrain[lane] > 0 && overheatFailureEnabled(lane, laneStats)) {
                 blockedStatus = STATUS_FAILURE_RISK;
                 continue;
             }
-            if (currentTemperature[lane] < requiredTemperatureForProgress(lane, recipe)) {
-                if (isElectric()) {
-                    int energyStatus = laneEnergyStatus(lane, recipe, laneStats);
-                    if (energyStatus != STATUS_READY) {
-                        blockedStatus = energyStatus;
-                        continue;
-                    }
-                }
-                if (!isElectric() && !hasBurnTime() && !isFuel(inventory.getStackInSlot(SLOT_FUEL))) {
-                    blockedStatus = STATUS_NO_FUEL;
-                    continue;
-                }
-                return STATUS_WARMING;
-            }
-            if (isElectric()) {
-                int energyStatus = laneEnergyStatus(lane, recipe, laneStats);
-                if (energyStatus == STATUS_READY) {
-                    return STATUS_READY;
-                }
+            int energyStatus = laneEnergyStatus(lane);
+            if (energyStatus != STATUS_READY) {
                 blockedStatus = energyStatus;
                 continue;
             }
-            if (hasBurnTime() || isFuel(inventory.getStackInSlot(SLOT_FUEL))) {
-                return STATUS_READY;
-            }
-            blockedStatus = STATUS_NO_FUEL;
+            return heat[lane].started() ? STATUS_READY : STATUS_WARMING;
         }
         return hasInput ? blockedStatus : STATUS_NO_INPUT;
     }
@@ -894,7 +903,7 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
     private int machineInfoLane(MachineStatAccumulator baseStats) {
         int activeLanes = activeProcessingSlots(baseStats);
         for (int lane = 0; lane < activeLanes; lane++) {
-            if (progress[lane] > 0) {
+            if (heat[lane].started()) {
                 return lane;
             }
         }
@@ -912,7 +921,9 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
                     ? MachineInfoSnapshot.WorkState.RUNNING
                     : MachineInfoSnapshot.WorkState.IDLE;
         }
-        return status == STATUS_NO_INPUT ? MachineInfoSnapshot.WorkState.IDLE : MachineInfoSnapshot.WorkState.BLOCKED;
+        return status == STATUS_NO_INPUT || status == STATUS_FILLING_BATCH
+                ? MachineInfoSnapshot.WorkState.IDLE
+                : MachineInfoSnapshot.WorkState.BLOCKED;
     }
 
     private static boolean hasEnergyDemandStatus(int status) {
@@ -961,15 +972,7 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
         if (crafted == 0) {
             return false;
         }
-        // Crucible Heart finishes a second input when the lane runs at twice the recipe target or hotter.
-        if (hasMasteryBehavior("CRUCIBLE_HEART")
-                && currentTemperature[lane] >= 2 * targetTemperature(recipe)
-                && recipe.matches(new SingleRecipeInput(inventory.getStackInSlot(inputSlot(lane))), level)
-                && canMergeOutput(outputSlot(lane), recipe.outputStack())
-                && payExtraCraft(lane, recipe, stats)) {
-            craft(lane, recipe, stats, 0);
-        }
-        resetCycle(lane);
+        completeCycle(lane);
         setChanged();
         return true;
     }
@@ -1037,29 +1040,11 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
         return LedgerNbt.permille(bloomLedger.progress(recipe.outputStack().getItem()));
     }
 
-    /** Crucible Heart's second input costs a second craft's FE, or its burn time on a fuel furnace. */
-    private boolean payExtraCraft(int lane, FurnaceRecipe recipe, MachineStatAccumulator stats) {
-        if (isElectric()) {
-            int cost = energyCostPerCraft(recipe, stats);
-            if (consumeWorkingEnergy(cost, true) < cost) {
-                return false;
-            }
-            consumeWorkingEnergy(cost, false);
-            return true;
-        }
-        int ticks = processingTicks(lane, recipe, stats, 1);
-        if (burnTime < ticks) {
-            return false;
-        }
-        burnTime -= ticks;
-        return true;
-    }
-
     private void refundClosedLoopEnergy(FurnaceRecipe recipe, MachineStatAccumulator stats) {
         if (!isElectric() || !FurnacePassiveTree.usesClosedLoopRecuperator(machineProgression())) {
             return;
         }
-        int refund = Math.max(1, (int) Math.ceil(energyCostPerCraft(recipe, stats) * CLOSED_LOOP_REFUND));
+        int refund = Math.max(1, (int) Math.ceil(recipe.heat() * HeatEngine.energyRate(stats) * CLOSED_LOOP_REFUND));
         int stored = internalEnergyStored();
         int capacity = internalEnergyCapacity();
         if (stored >= capacity) {
@@ -1104,7 +1089,7 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
     }
 
     private boolean tryFailCycle(int lane, FurnaceRecipe recipe) {
-        if (!failureEnabled(lane, statsForLane(lane)) || level == null) {
+        if (!overheatFailureEnabled(lane, statsForLane(lane)) || level == null) {
             return false;
         }
         ItemStack input = inventory.getStackInSlot(inputSlot(lane));
@@ -1177,39 +1162,92 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
 
     private int currentProcessingTicks(int lane) {
         FurnaceRecipe recipe = findNextRecipe(lane);
-        return recipe == null ? 0 : processingTicks(lane, recipe, statsForLane(lane));
+        if (recipe == null) {
+            return 0;
+        }
+        MachineStatAccumulator stats = statsForLane(lane);
+        return HeatEngine.cycleTicks(cycleWork(lane, recipe, stats), load(lane, recipe, stats, 1), envelope(lane, recipe, stats));
     }
 
-    private int currentEnergyCostPerTick(int lane) {
+    private int currentElapsedTicks(int lane) {
+        FurnaceRecipe recipe = findNextRecipe(lane);
+        if (recipe == null) {
+            return 0;
+        }
+        MachineStatAccumulator stats = statsForLane(lane);
+        return HeatEngine.elapsedTicks(heat[lane], load(lane, recipe, stats, 1), envelope(lane, recipe, stats));
+    }
+
+    /** FE/t the lanes' heaters spent last tick: on wall loss when {@code holding}, otherwise on heating chambers and inputs. */
+    private int heatEnergy(int part) {
         if (!isElectric()) {
             return 0;
         }
+        double total = 0.0;
+        for (int lane = 0; lane < activeProcessingSlots(); lane++) {
+            total += HeatEngine.heatSplit(heat[lane])[part] * HeatEngine.energyRate(statsForLane(lane));
+        }
+        return (int) Math.ceil(total);
+    }
+
+    private int reachDisplay() {
+        int lane = machineInfoLane(baseEffectiveStats());
+        FurnaceRecipe recipe = lane < 0 ? null : findNextRecipe(lane);
+        return recipe == null ? 0 : envelope(lane, recipe, statsForLane(lane)).reach();
+    }
+
+    private int heatFactorDisplay() {
+        int lane = machineInfoLane(baseEffectiveStats());
+        FurnaceRecipe recipe = lane < 0 ? null : findNextRecipe(lane);
+        return recipe == null ? 0 : (int) Math.round(100.0 * HeatEngine.heatFactor(heat[lane].exactTemperature(),
+                envelope(lane, recipe, statsForLane(lane))));
+    }
+
+    private int wobbleDisplay() {
+        int lane = machineInfoLane(baseEffectiveStats());
+        FurnaceRecipe recipe = lane < 0 ? null : findNextRecipe(lane);
+        if (recipe == null) {
+            return 0;
+        }
+        MachineStatAccumulator stats = statsForLane(lane);
+        return (int) Math.round(HeatEngine.wobbleAmplitude(envelope(lane, recipe, stats), stats));
+    }
+
+    private int currentSetpoint(int lane) {
         FurnaceRecipe recipe = findNextRecipe(lane);
-        return recipe == null ? 0 : energyCostForProgress(lane, recipe, statsForLane(lane));
+        return recipe == null ? 0 : envelope(lane, recipe, statsForLane(lane)).setpoint();
     }
 
-    private boolean canPayLaneEnergy(int lane, FurnaceRecipe recipe, MachineStatAccumulator stats) {
-        if (!isElectric()) {
-            return true;
+    /** FE the lane's heater drew last tick. */
+    private int currentEnergyCostPerTick(int lane) {
+        if (!isElectric() || lane >= activeProcessingSlots()) {
+            return 0;
         }
-        int energyCost = energyCostForProgress(lane, recipe, stats);
-        return consumeWorkingEnergy(energyCost, true) >= energyCost;
+        return (int) Math.ceil(heat[lane].lastHeat() * HeatEngine.energyRate(statsForLane(lane)));
     }
 
-    private int laneEnergyStatus(int lane, FurnaceRecipe recipe, MachineStatAccumulator stats) {
-        int energyCost = energyCostForProgress(lane, recipe, stats);
-        if (consumeWorkingEnergy(energyCost, true) >= energyCost) {
-            return STATUS_READY;
+    private int laneEnergyStatus(int lane) {
+        if (isElectric()) {
+            // A lane still taking heat while short of power is underpowered, not out of power.
+            return !starved[lane] ? STATUS_READY
+                    : energyStored() > 0 || heat[lane].lastAbsorbed() > 0.0 ? STATUS_POWER_LIMITED : STATUS_NO_POWER;
         }
-        return energyStored() >= energyCost ? STATUS_POWER_LIMITED : STATUS_NO_POWER;
+        return hasBurnTime() || isFuel(inventory.getStackInSlot(SLOT_FUEL)) ? STATUS_READY : STATUS_NO_FUEL;
     }
 
+    /** FE one item costs at the setpoint: its own heat plus its share of the wall loss during the cycle. */
     private int currentEnergyCostPerCraft(int lane) {
         if (!isElectric()) {
             return 0;
         }
         FurnaceRecipe recipe = findNextRecipe(lane);
-        return recipe == null ? 0 : energyCostPerCraft(recipe, statsForLane(lane));
+        if (recipe == null) {
+            return 0;
+        }
+        MachineStatAccumulator stats = statsForLane(lane);
+        int batch = laneBatch(lane, recipe, stats);
+        HeatEngine.Load load = load(lane, recipe, stats, 1);
+        return HeatEngine.steadyEnergyPerCycle(envelope(lane, recipe, stats), load, cycleWork(lane, recipe, stats), stats) / Math.max(1, batch);
     }
 
     private long totalActiveEnergyDemand(MachineStatAccumulator baseStats) {
@@ -1245,102 +1283,136 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
         if (safeMaximumTemperature <= 0) {
             return 0;
         }
-        return HeatControl.effectiveOverheatTemperature(safeMaximumTemperature, statsForLane(lane));
+        return HeatControl.effectiveOverheatTemperature(safeMaximumTemperature, statsForLane(lane), atmosphereBonus());
     }
 
-    private int processingTicks(int lane, FurnaceRecipe recipe, MachineStatAccumulator stats) {
-        return processingTicks(lane, recipe, stats, laneBatch(lane, recipe, stats));
+    /** Overheat Tolerance the Nitrogen tank adds: electric chassis with Blast Draft only. */
+    private double atmosphereBonus() {
+        return isElectric() ? atmosphere.overheatBonus(hasMasteryBehavior("BLAST_DRAFT")) : 0.0;
     }
 
-    /** Overdrive shortens a lane's cycle while it runs above the recipe target; the cycle's FE stays the same. */
-    private int processingTicks(int lane, FurnaceRecipe recipe, MachineStatAccumulator stats, int batch) {
-        int ticks = BatchProcessing.batchTicks(stats.adjustedHeatProcessingTicks(recipe.processingTicks()), stats, batch);
-        double overdrive = AscendancyFormulas.overdriveSpeedMultiplier(currentTemperature[lane], targetTemperature(recipe), stats);
-        return Math.max(1, (int) Math.ceil(ticks / overdrive));
+    public IFluidHandler getFluidHandler(Direction side) {
+        return atmosphere.inlet();
     }
 
-    /** Every item in a batch pays its own FE, spread over the batch's longer cycle. */
-    private int energyCostForProgress(int lane, FurnaceRecipe recipe, MachineStatAccumulator stats) {
+    /**
+     * The lane's heat band. Overdrive Margin caps the slider that far below the recipe's safe maximum, and Safe Overdrive
+     * caps it at the safe maximum.
+     */
+    private HeatEngine.Envelope envelope(int lane, FurnaceRecipe recipe, MachineStatAccumulator stats) {
+        int margin = stats.intValue(MachineStat.OVERDRIVE_MARGIN);
+        int ceiling = margin > 0 || hasMasteryBehavior("SAFE_OVERDRIVE") ? safeMaximumTemperature(recipe) - margin : Integer.MAX_VALUE;
+        return HeatEngine.envelope(
+                minimumTemperature(recipe),
+                targetTemperature(recipe),
+                safeMaximumTemperature(recipe),
+                recipe.requiredTemperatureStability(),
+                overheatFailureEnabled(lane, stats),
+                hasMasteryBehavior("BLAST_DRAFT"),
+                stats,
+                isElectric() ? heatSlider / 100.0 : 0.0,
+                ceiling,
+                atmosphereBonus()
+        ).coolingFirst(hasMasteryBehavior("COOL_HEADED"));
+    }
+
+    /** Reference ticks a cycle needs: the recipe's time, longer for every extra item in the batch. */
+    private double cycleWork(int lane, FurnaceRecipe recipe, MachineStatAccumulator stats) {
+        return recipe.processingTicks() * BatchProcessing.timeMultiplier(stats, laneBatch(lane, recipe, stats));
+    }
+
+    /**
+     * Every item in the batch absorbs the recipe's heat over the cycle. Overdrive speeds work past the safe maximum, and
+     * Shared Hearth splits each load dip across the lanes that are smelting.
+     */
+    private HeatEngine.Load load(int lane, FurnaceRecipe recipe, MachineStatAccumulator stats, int heatedLanes) {
         int batch = laneBatch(lane, recipe, stats);
-        return stats.adjustedEnergyCostForProgress(
-                ProcessingEnergyScaling.furnaceEnergy(recipe) * batch,
-                processingTicks(lane, recipe, stats, batch),
-                progress[lane]
-        );
+        int safeMaximum = safeMaximumTemperature(recipe);
+        double overdrive = safeMaximum <= 0 ? 1.0 : AscendancyFormulas.overdriveSpeedMultiplier(heat[lane].temperature(), safeMaximum, stats);
+        double workPerTick = HeatEngine.speed(stats) * overdrive;
+        double heatPerTick = recipe.heat() * (double) batch * workPerTick / cycleWork(lane, recipe, stats);
+        double dipShare = hasMasteryBehavior("SHARED_HEARTH") && heatedLanes > 1 ? 1.0 / heatedLanes : 1.0;
+        return new HeatEngine.Load(heatPerTick, workPerTick, batch, dipShare);
     }
 
-    /** Heating the lane costs one item's FE rate, however large the batch. */
-    private int heatTickEnergyCost(int lane, FurnaceRecipe recipe, MachineStatAccumulator stats) {
-        return stats.adjustedEnergyCostForProgress(
-                ProcessingEnergyScaling.furnaceEnergy(recipe),
-                processingTicks(lane, recipe, stats, 1),
-                progress[lane]
-        );
+    /** Shared Hearth: the rest of a starting lane's load dip comes out of the other smelting lanes. */
+    private void shareLoadDip(
+            int lane,
+            HeatEngine.Envelope envelope,
+            MachineStatAccumulator stats,
+            HeatEngine.Load load,
+            int activeLanes,
+            int heatedLanes
+    ) {
+        if (load.dipShare() >= 1.0) {
+            return;
+        }
+        double share = HeatEngine.loadDip(envelope, stats, load.batch()) * load.dipShare();
+        for (int other = 0; other < activeLanes; other++) {
+            if (other != lane && heat[other].started()) {
+                heat[other].setTemperature(Math.max(lastTargetTemperature[other], heat[other].exactTemperature() - share));
+            }
+        }
+    }
+
+    private HeatEngine.HeatSupply heatSupply(int lane, MachineStatAccumulator stats) {
+        return isElectric() ? HeatEngine.electric(heat[lane], stats, this::drawEnergy) : HeatEngine.fuel(heat[lane], this::burnFuel);
+    }
+
+    /** Takes up to {@code amount} FE from the internal buffer and the Battery Cell. */
+    private int drawEnergy(int amount) {
+        int take = Math.min(amount, consumeWorkingEnergy(amount, true));
+        return take > 0 ? consumeWorkingEnergy(take, false) : 0;
+    }
+
+    /** Burns up to {@code ticks} burn ticks, lighting the next fuel item when the current one runs out. */
+    private int burnFuel(int ticks) {
+        int burned = 0;
+        while (burned < ticks && (hasBurnTime() || tryStartBurningFuel())) {
+            int take = Math.min(ticks - burned, burnTime);
+            burnTime -= take;
+            burned += take;
+        }
+        return burned;
+    }
+
+    /** Instant Process pays the whole batch's heat at once, without the wall loss of a full cycle. */
+    private boolean payInstant(int lane, FurnaceRecipe recipe, MachineStatAccumulator stats, HeatEngine.HeatSupply supply) {
+        double needed = recipe.heat() * (double) laneBatch(lane, recipe, stats);
+        if (isElectric()) {
+            int energyCost = (int) Math.ceil(needed * HeatEngine.energyRate(stats));
+            if (consumeWorkingEnergy(energyCost, true) < energyCost) {
+                return false;
+            }
+        }
+        return HeatEngine.payAtOnce(supply, needed);
     }
 
     /** The batch locked when the lane's cycle started, shrunk only if its input has since gone. */
     private int laneBatch(int lane, FurnaceRecipe recipe, MachineStatAccumulator stats) {
         int available = availableBatch(lane, recipe, stats);
-        return progress[lane] > 0 && lockedBatch[lane] > 0 ? Math.min(lockedBatch[lane], available) : available;
+        return heat[lane].started() && lockedBatch[lane] > 0 ? Math.min(lockedBatch[lane], available) : available;
     }
 
-    /** A lane batches items from its input stack, as far as its output slot has room for their base output. */
+    /** Dense Batching: an idle lane waits until its stack and output room fit a full batch. */
+    private boolean waitsForFullBatch(int lane, FurnaceRecipe recipe, MachineStatAccumulator stats) {
+        return !heat[lane].started() && hasMasteryBehavior("DENSE_BATCHING") && availableBatch(lane, recipe, stats) < fullBatch(lane, stats);
+    }
+
+    private int fullBatch(int lane, MachineStatAccumulator stats) {
+        return BatchProcessing.fullBatch(stats, false, inventory.getStackInSlot(inputSlot(lane)).getMaxStackSize());
+    }
+
+    /**
+     * A lane batches items from its input stack, as far as its output slot has room for their base output. Crucible Heart
+     * adds one item while the lane runs at twice the recipe target or hotter.
+     */
     private int availableBatch(int lane, FurnaceRecipe recipe, MachineStatAccumulator stats) {
-        int limit = Math.min(BatchProcessing.batchSize(stats, false), inventory.getStackInSlot(inputSlot(lane)).getCount());
+        int crucibleHeart = hasMasteryBehavior("CRUCIBLE_HEART") && heat[lane].temperature() >= 2 * targetTemperature(recipe) ? 1 : 0;
+        int limit = Math.min(BatchProcessing.batchSize(stats, false) + crucibleHeart, inventory.getStackInSlot(inputSlot(lane)).getCount());
         ItemStack output = recipe.outputStack();
         return Math.max(1, BatchProcessing.largestFitting(limit,
                 batch -> batch == 1 || canMergeOutput(outputSlot(lane), output.copyWithCount(output.getCount() * batch))));
-    }
-
-    /** Overdrive heats toward the lane maximum, or stops Overdrive Margin below the recipe's safe maximum. */
-    private int overdriveTarget(FurnaceRecipe recipe, MachineStatAccumulator stats) {
-        int ceiling = stats.intValue(MachineStat.MAX_TEMPERATURE);
-        int margin = stats.intValue(MachineStat.OVERDRIVE_MARGIN);
-        if (margin > 0 || hasMasteryBehavior("SAFE_OVERDRIVE")) {
-            ceiling = Math.min(ceiling, safeMaximumTemperature(recipe) - margin);
-        }
-        return Math.max(targetTemperature(recipe), ceiling);
-    }
-
-    /** Overdrive keeps heating a working lane past the recipe target; each step costs another heat tick. */
-    private boolean overdrive(int lane, FurnaceRecipe recipe, MachineStatAccumulator stats) {
-        if (!hasOverdrive(stats)) {
-            return false;
-        }
-        int target = overdriveTarget(recipe, stats);
-        if (currentTemperature[lane] >= target || !payHeatTick(lane, recipe, stats)) {
-            return false;
-        }
-        return warmLane(lane, recipe, stats, target);
-    }
-
-    private static boolean hasOverdrive(MachineStatAccumulator stats) {
-        return stats.value(MachineStat.OVERDRIVE_CAP) > 0.0 && stats.value(MachineStat.OVERDRIVE_SPEED) > 0.0;
-    }
-
-    /** Heat left from a hotter recipe cools to this recipe's overheat line before a smelt that can fail. */
-    private boolean tooHot(int lane, FurnaceRecipe recipe, MachineStatAccumulator stats) {
-        return failureEnabled(lane, stats) && currentTemperature[lane] > heatCeiling(recipe, stats);
-    }
-
-    /** Overdrive keeps the heat it adds on purpose, so its target raises the ceiling. */
-    private int heatCeiling(FurnaceRecipe recipe, MachineStatAccumulator stats) {
-        int overheat = HeatControl.effectiveOverheatTemperature(safeMaximumTemperature(recipe), stats);
-        return hasOverdrive(stats) ? Math.max(overheat, overdriveTarget(recipe, stats)) : overheat;
-    }
-
-    /** Unlike an idle lane, Hold the Fire does not keep this heat, so a too-hot lane always cools. */
-    private boolean shedHeat(int lane, FurnaceRecipe recipe, MachineStatAccumulator stats) {
-        int nextTemperature = Math.max(heatCeiling(recipe, stats), currentTemperature[lane] - HeatControl.coolingStep(stats, level == null ? 0L : level.getGameTime()));
-        if (nextTemperature == currentTemperature[lane]) {
-            return false;
-        }
-        currentTemperature[lane] = nextTemperature;
-        return true;
-    }
-
-    private int energyCostPerCraft(FurnaceRecipe recipe, MachineStatAccumulator stats) {
-        return stats.adjustedEnergyCost(ProcessingEnergyScaling.furnaceEnergy(recipe));
     }
 
     /** Lane stats follow the base stats and the lane's input item, whose tags pick the lane bonuses. */
@@ -1364,28 +1436,6 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
             ));
         }
         return stats;
-    }
-
-    /** Shared Hearth: a lane warming up starts from the hottest working lane's heat, up to its own target. */
-    private boolean shareHearthHeat(int lane, FurnaceRecipe recipe, MachineStatAccumulator stats, int activeLanes) {
-        if (!hasMasteryBehavior("SHARED_HEARTH")) {
-            return false;
-        }
-        int shared = 0;
-        for (int other = 0; other < activeLanes; other++) {
-            if (other != lane && targetReached[other]) {
-                shared = Math.max(shared, currentTemperature[other]);
-            }
-        }
-        int nextTemperature = Math.min(shared, Math.min(targetTemperature(recipe), stats.intValue(MachineStat.MAX_TEMPERATURE)));
-        if (nextTemperature <= currentTemperature[lane]) {
-            return false;
-        }
-        currentTemperature[lane] = nextTemperature;
-        if (nextTemperature >= targetTemperature(recipe)) {
-            targetReached[lane] = true;
-        }
-        return true;
     }
 
     private boolean alloyBlendActive(int lane) {
@@ -1535,25 +1585,6 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
         return true;
     }
 
-    private int requiredTemperatureForProgress(int lane, FurnaceRecipe recipe) {
-        return targetReached[lane] ? minimumTemperature(recipe) : targetTemperature(recipe);
-    }
-
-    private boolean warmLane(int lane, FurnaceRecipe recipe, MachineStatAccumulator stats, int requiredTemperature) {
-        int nextTemperature = Math.min(
-                Math.min(requiredTemperature, stats.intValue(MachineStat.MAX_TEMPERATURE)),
-                currentTemperature[lane] + HeatControl.warmupRate(stats)
-        );
-        if (nextTemperature == currentTemperature[lane]) {
-            return false;
-        }
-        currentTemperature[lane] = nextTemperature;
-        if (currentTemperature[lane] >= targetTemperature(recipe)) {
-            targetReached[lane] = true;
-        }
-        return true;
-    }
-
     private boolean rememberHeatEnvelope(int lane, FurnaceRecipe recipe) {
         boolean changed = lastTargetTemperature[lane] != targetTemperature(recipe)
                 || lastSafeMaximumTemperature[lane] != safeMaximumTemperature(recipe);
@@ -1570,64 +1601,43 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
     }
 
     private boolean hasCooldownHeat(int lane) {
-        return currentTemperature[lane] > HeatControl.AMBIENT_TEMPERATURE && lastSafeMaximumTemperature[lane] > 0;
+        return heat[lane].temperature() > HeatEngine.AMBIENT && lastSafeMaximumTemperature[lane] > 0;
     }
 
-    private boolean coolLane(int lane, MachineStatAccumulator stats) {
-        if (hasMasteryBehavior("HOLD_THE_FIRE") && findRecipeWithoutGates(lane) != null) {
-            return false;
-        }
-        int nextTemperature = Math.max(HeatControl.AMBIENT_TEMPERATURE, currentTemperature[lane] - HeatControl.coolingStep(stats, level == null ? 0L : level.getGameTime()));
-        boolean changed = false;
-        if (nextTemperature != currentTemperature[lane]) {
-            currentTemperature[lane] = nextTemperature;
-            changed = true;
-        }
-        if (currentTemperature[lane] <= HeatControl.AMBIENT_TEMPERATURE) {
+    /** An idle lane leaks heat; Hold the Fire keeps it while the lane holds an input it could smelt. */
+    /** The lane's recipe when only a full output stops it, so the lane holds its heat instead of cooling. */
+    private FurnaceRecipe outputBlockedRecipe(int lane, MachineStatAccumulator stats) {
+        ItemStack input = inventory.getStackInSlot(inputSlot(lane));
+        FurnaceRecipe recipe = input.isEmpty() ? null : laneRecipe(lane);
+        return recipe != null && meetsRecipeRequirements(recipe, stats, input) && !canAcceptOutput(lane, recipe) ? recipe : null;
+    }
+
+    private boolean holdLane(int lane, FurnaceRecipe recipe, MachineStatAccumulator stats) {
+        tooHotLane[lane] = false;
+        starved[lane] = false;
+        HeatEngine.hold(heat[lane], envelope(lane, recipe, stats), stats, heatSupply(lane, stats));
+        return true;
+    }
+
+    private boolean idleLane(int lane, MachineStatAccumulator stats) {
+        tooHotLane[lane] = false;
+        starved[lane] = false;
+        boolean hold = hasMasteryBehavior("HOLD_THE_FIRE") && findRecipeWithoutGates(lane) != null;
+        boolean changed = HeatEngine.idle(heat[lane], stats, hold);
+        if (heat[lane].temperature() <= HeatEngine.AMBIENT) {
             changed |= clearHeatEnvelope(lane);
         }
         return changed;
     }
 
-    private boolean payHeatTick(int lane, FurnaceRecipe recipe, MachineStatAccumulator stats) {
-        if (isElectric()) {
-            int energyCost = heatTickEnergyCost(lane, recipe, stats);
-            if (consumeWorkingEnergy(energyCost, true) < energyCost) {
-                return false;
-            }
-            consumeWorkingEnergy(energyCost, false);
-            return true;
-        }
-        if (!hasBurnTime() && !tryStartBurningFuel()) {
-            return false;
-        }
-        burnTime--;
-        return true;
-    }
-
-    /**
-     * A working fuel lane burns one item's burn time per item it smelts: a batch spreads that over its longer cycle, so
-     * each tick burns batch ÷ the Batch Overhead multiplier, carried over in thousandths.
-     */
-    private boolean burnWorkingFuel(int lane, FurnaceRecipe recipe, MachineStatAccumulator stats) {
-        if (!hasBurnTime() && !tryStartBurningFuel()) {
-            return false;
-        }
-        int batch = laneBatch(lane, recipe, stats);
-        int burns = 1;
-        if (batch > 1) {
-            burnCarry += (int) Math.round(1000.0 * batch / BatchProcessing.timeMultiplier(stats, batch));
-            burns = burnCarry / 1000;
-            burnCarry %= 1000;
-        }
-        for (int burn = 0; burn < burns && (hasBurnTime() || tryStartBurningFuel()); burn++) {
-            burnTime--;
-        }
-        return true;
-    }
-
-    private boolean updateFailureStrain(int lane, FurnaceRecipe recipe, MachineStatAccumulator stats) {
-        if (!failureEnabled(lane, stats)) {
+    private boolean updateFailureStrain(
+            int lane,
+            FurnaceRecipe recipe,
+            MachineStatAccumulator stats,
+            HeatEngine.Envelope envelope,
+            double workTemperature
+    ) {
+        if (!envelope.canFail()) {
             if (failureStrain[lane] == 0) {
                 return false;
             }
@@ -1635,26 +1645,20 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
             return true;
         }
 
-        int simulatedTemperature = HeatControl.simulatedTemperature(
-                currentTemperature[lane],
-                targetTemperature(recipe),
-                recipe.requiredTemperatureStability(),
-                stats,
-                worldPosition,
-                level == null ? 0L : level.getGameTime(),
-                lane
-        );
-        int overheatTemperature = HeatControl.effectiveOverheatTemperature(safeMaximumTemperature(recipe), stats);
-        if (hasMasteryBehavior("SAFE_OVERDRIVE") && currentTemperature[lane] > targetTemperature(recipe)) {
-            simulatedTemperature = Math.min(simulatedTemperature, overheatTemperature);
+        int simulatedTemperature = (int) Math.round(workTemperature);
+        // Safe Overdrive keeps wobble spikes at the overheat temperature.
+        if (hasMasteryBehavior("SAFE_OVERDRIVE")) {
+            simulatedTemperature = Math.min(simulatedTemperature, envelope.overheat());
         }
+        boolean fullFailure = failureEnabled(lane, stats);
         int addedStrain = HeatControl.failureStrainFromTemperature(
                 simulatedTemperature,
-                minimumTemperature(recipe),
-                overheatTemperature,
-                recipe.requiredTemperatureStability(),
+                fullFailure ? envelope.minimum() : 0,
+                envelope.overheat(),
+                fullFailure ? recipe.requiredTemperatureStability() : 0.0,
                 stats
         );
+        addedStrain = HeatControl.paced(addedStrain, workTemperature, envelope);
         if (FurnacePassiveTree.usesQuenchProtocol(machineProgression())) {
             addedStrain = HeatControl.quenched(addedStrain);
         }
@@ -1671,7 +1675,7 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
     }
 
     private boolean registerPowerDrop(int lane, FurnaceRecipe recipe, MachineStatAccumulator stats) {
-        if (!recipe.powerSensitive() || progress[lane] <= 0 || !failureEnabled(lane, stats)) {
+        if (!recipe.powerSensitive() || !heat[lane].started() || !failureEnabled(lane, stats)) {
             return false;
         }
         failureStrain[lane] = Math.min(
@@ -1681,11 +1685,16 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
         return true;
     }
 
+    /** Stage 4+ chassis: underheat, instability, overheating, and sensitive power drops all build strain. */
     private boolean failureEnabled(int lane, MachineStatAccumulator stats) {
+        return furnaceMaterial().stage() >= 4 && overheatFailureEnabled(lane, stats);
+    }
+
+    /** Any chassis: a recipe with a failure output builds strain when its lane runs past the overheat temperature. */
+    private boolean overheatFailureEnabled(int lane, MachineStatAccumulator stats) {
         FurnaceRecipe recipe = laneRecipe(lane);
         return recipe != null
                 && recipe.hasFailureOutput()
-                && furnaceMaterial().stage() >= 4
                 && !cleanBloom(inventory.getStackInSlot(inputSlot(lane)))
                 && stats.intValue(MachineStat.MAX_TEMPERATURE) >= targetTemperature(recipe);
     }
@@ -1694,9 +1703,9 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
         FurnaceRecipe recipe = laneRecipe(lane);
         return recipe != null
                 && recipe.powerSensitive()
-                && progress[lane] > 0
+                && heat[lane].started()
                 && failureEnabled(lane, stats)
-                && !canPayLaneEnergy(lane, recipe, stats);
+                && starved[lane];
     }
 
     private boolean hasPowerGrace() {
@@ -1712,16 +1721,15 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
     }
 
     private void startCycleIfNeeded(int lane, FurnaceRecipe recipe, MachineStatAccumulator stats) {
-        if (progress[lane] != 0) {
+        if (lockedBatch[lane] != 0) {
             return;
         }
         lockedBatch[lane] = availableBatch(lane, recipe, stats);
         activeInputs[lane] = singleCopy(inventory.getStackInSlot(inputSlot(lane)));
-        failureStrain[lane] = 0;
     }
 
     private boolean activeCycleMatches(int lane) {
-        if (progress[lane] == 0) {
+        if (!heat[lane].started()) {
             return true;
         }
         return !activeInputs[lane].isEmpty()
@@ -1729,17 +1737,21 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
     }
 
     private boolean resetCycle(int lane) {
-        boolean changed = progress[lane] != 0
+        boolean changed = heat[lane].resetCycle()
                 || lockedBatch[lane] != 0
                 || failureStrain[lane] != 0
-                || targetReached[lane]
                 || !activeInputs[lane].isEmpty();
-        progress[lane] = 0;
         lockedBatch[lane] = 0;
         failureStrain[lane] = 0;
-        targetReached[lane] = false;
         activeInputs[lane] = ItemStack.EMPTY;
         return changed;
+    }
+
+    /** A finished cycle keeps its lane's strain: only time in the safe band drains it, so short cycles cannot dodge it. */
+    private void completeCycle(int lane) {
+        int strain = failureStrain[lane];
+        resetCycle(lane);
+        failureStrain[lane] = strain;
     }
 
     private void resetAllCycles() {

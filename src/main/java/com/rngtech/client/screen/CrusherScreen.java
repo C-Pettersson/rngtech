@@ -638,6 +638,7 @@ public class CrusherScreen extends AbstractContainerScreen<CrusherMenu> {
             case CrusherBlockEntity.STATUS_NO_POWER -> Component.translatable("rngtech.crusher.status.no_power");
             case CrusherBlockEntity.STATUS_JAMMED -> Component.translatable("rngtech.crusher.status.jammed");
             case CrusherBlockEntity.STATUS_UNDER_LEVEL_PENALTY -> Component.translatable("rngtech.crusher.status.under_level_penalty");
+            case CrusherBlockEntity.STATUS_FILLING_BATCH -> Component.translatable("rngtech.machine.status.filling_batch");
             default -> Component.translatable("rngtech.crusher.status.ready");
         };
     }
@@ -645,7 +646,8 @@ public class CrusherScreen extends AbstractContainerScreen<CrusherMenu> {
     private MachineScreenStyle.StatusState statusState() {
         return switch (menu.statusCode()) {
             case CrusherBlockEntity.STATUS_READY -> MachineScreenStyle.StatusState.RUNNING;
-            case CrusherBlockEntity.STATUS_NO_INPUT, CrusherBlockEntity.STATUS_MISSING_CRUSH_HEAD -> MachineScreenStyle.StatusState.IDLE;
+            case CrusherBlockEntity.STATUS_NO_INPUT, CrusherBlockEntity.STATUS_MISSING_CRUSH_HEAD,
+                    CrusherBlockEntity.STATUS_FILLING_BATCH -> MachineScreenStyle.StatusState.IDLE;
             case CrusherBlockEntity.STATUS_NO_POWER,
                     CrusherBlockEntity.STATUS_JAMMED,
                     CrusherBlockEntity.STATUS_UNDER_LEVEL_PENALTY -> MachineScreenStyle.StatusState.WAITING;

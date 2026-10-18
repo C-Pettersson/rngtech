@@ -37,9 +37,9 @@ const THEMES = {
         ["Ore Sieve", "Dust Recovery", "Sorting Rake", "Sample Tray", "Clean Dust Ledge", "Material Memory", "Fine Screens", "Tailings Pass", "Double Sort", "Scrap Catcher", "Riffle Tables", "Grit Traps"]),
     thermalReach: theme("Thermal Reach", ["MAX_TEMPERATURE", "INCREASED_PERCENT"], 1, 3, effect("HEAT_TRANSFER", 2),
         ["White Heat", "Refractory Lining", "Blast Nozzles", "Firebrick Walls", "Oxygen Feed", "Crucible Glaze", "Arc Chamber", "Stoked Core", "Molten Pour", "Superheat", "Bellows Draft", "Kiln Crown"]),
-    heatFlow: theme("Heat Flow", ["HEAT_TRANSFER", "INCREASED_PERCENT"], 2, 6, effect("WARMUP_TIME", 2, "DECREASED_PERCENT"),
+    heatFlow: theme("Heat Flow", ["HEAT_TRANSFER", "INCREASED_PERCENT"], 2, 6, effect("THERMAL_MASS", 2, "DECREASED_PERCENT"),
         ["Conduction Fins", "Radiant Plates", "Copper Cladding", "Forced Draft", "Heat Pipes", "Flame Spreaders", "Convection Loops", "Hot Air Jackets", "Thermal Bridge", "Flux Channels", "Baffle Plates", "Hearth Fans"]),
-    startup: theme("Startup", ["WARMUP_TIME", "DECREASED_PERCENT"], 2, 6, effect("HEAT_TRANSFER", 2),
+    startup: theme("Startup", ["THERMAL_MASS", "DECREASED_PERCENT"], 2, 6, effect("HEAT_TRANSFER", 2),
         ["Preheater Coils", "Pilot Flame", "Quick Ignition", "Glow Plugs", "Warm Standby", "Kindling Tray", "Spark Gap", "Flash Start", "Primed Burners", "Heat Soak", "Tinder Box", "Fire Starter"]),
     fuelEconomy: theme("Fuel Economy", ["FUEL_DURATION", "INCREASED_PERCENT"], 2, 6, effect("HEAT_ISOLATION", 3),
         ["Slow Burn", "Banked Coals", "Clean Combustion", "Air Dampers", "Ember Keeper", "Fuel Metering", "Long Grate", "Charcoal Bed", "Lean Mixture", "Afterburner Loop", "Stoking Rhythm", "Coke Oven"]),
@@ -55,7 +55,8 @@ const THEMES = {
         ["Mineral Wool", "Double Walls", "Ceramic Jackets", "Vacuum Gaps", "Reflective Foil", "Clay Packing", "Sealed Doors", "Thermal Blankets", "Heat Shields", "Cork Lagging", "Brick Lining", "Air Pockets"]),
     regulation: theme("Regulation", ["TEMPERATURE_STABILITY", "INCREASED_PERCENT"], 2, 6, effect("STABILITY", 2),
         ["Thermostat Loop", "Bimetal Switch", "Feedback Controller", "Setpoint Hold", "Damped Swing", "Feedback Valve", "Steady Flame", "Temperature Log", "Governor Valve", "Balanced Draft", "Trim Burner", "Pressure Relief"]),
-    thermalInertia: theme("Thermal Inertia", ["COOLING_RATE", "DECREASED_PERCENT"], 2, 6, effect("HEAT_ISOLATION", 3),
+    // Heat that stays in the walls; Cooling Rate sheds it quickly when a cooler recipe needs it gone.
+    thermalInertia: theme("Thermal Inertia", ["HEAT_ISOLATION", "INCREASED_PERCENT"], 2, 6, effect("COOLING_RATE", 3),
         ["Heat Battery", "Thick Hearth", "Stone Mass", "Slow Cooling", "Retained Warmth", "Cast Iron Body", "Ember Bed", "Thermal Mass", "Warm Core", "Kiln Memory", "Soapstone Walls", "Sand Bath"]),
     fluidHandling: theme("Fluid Handling", ["FLUID_TRANSFER", "INCREASED_PERCENT"], 3, 9, effect("ENERGY_USAGE", 1, "DECREASED_PERCENT"),
         ["Wide Pipes", "Pump Impellers", "Smooth Bore", "Pressure Seals", "Flow Valves", "Siphon Loops", "Check Valves", "Manifold Taps", "Quick Couplers", "Bilge Pumps", "Header Tanks", "Gravity Feed"]),
@@ -76,6 +77,8 @@ const THEMES = {
     rowcraft: theme("Rowcraft", ["TREE_FELL_LIMIT", "ADD"], 1, 2, effect("PROCESSING_SPEED", 3),
         ["Row Markers", "Field Lines", "Survey Stakes", "Plot Chains"]),
     // Fluid Capacity for the Melter's tanks and the Forestry Companion's sprinkler tank; also in the Melter's home region.
+    // The Batch Overhead path that leads to Dense Batching.
+    batching: theme("Batching", ["BATCH_OVERHEAD", "DECREASED_PERCENT"], 8, 15, effect("BATCH_SIZE", 1, "ADD"), ["Even Loading"]),
     reservoirs: theme("Reservoirs", ["FLUID_CAPACITY", "INCREASED_PERCENT"], 10, 30, effect("RESERVE", 4, "ADD"),
         ["Holding Tanks", "Cistern Walls", "Deep Tanks", "Bulk Reservoir", "Header Cisterns", "Overflow Basin", "Settling Tanks", "Sump Pits",
             "Standpipes", "Catch Basins", "Tank Farms", "Spill Trays"])
@@ -138,7 +141,8 @@ const KEYSTONES = [
     { id: "singular_drive", layer: "core", name: "Singular Drive", effects: [effect("DRIVE", 1.5, "MORE"), effect("CONTROL", 0.5, "LESS"), effect("RESERVE", 0.5, "LESS")] },
     // The fuel Furnace pays no FE, so a matching fuel cost keeps its speed from being free there.
     { id: "redline_drive", name: "Redline Drive", effects: [effect("PROCESSING_SPEED", 1.5, "MORE"), effect("ENERGY_USAGE", 1.8, "MORE"), effect("FUEL_EFFICIENCY", 0.55, "LESS")] },
-    { id: "dense_batching", name: "Dense Batching", effects: [effect("BATCH_SIZE", 2, "ADD"), effect("PROCESSING_SPEED", 0.75, "LESS"), effect("ENERGY_USAGE", 1.25, "MORE")] },
+    // Batch Overhead already makes big batches slower, so the cost is waiting for a full batch.
+    { id: "dense_batching", name: "Dense Batching", behaviors: ["DENSE_BATCHING"], effects: [effect("BATCH_SIZE", 3, "ADD")] },
     { id: "precision_jaw_mount", name: "Precision Jaw Mount", behaviors: ["MATCHING_HEAD"], effects: [effect("OUTPUT_AMOUNT", 10), effect("CRUSHER_SALVAGE_CHANCE", 2, "ADD")] },
     { id: "soft_material_specialist", name: "Soft Material Specialist", recipeHardnessCeiling: 2, effects: [tagged("CRUSHING", effect("PROCESSING_SPEED", 3, "MORE")), effect("ENERGY_USAGE", 1.5, "MORE")] },
     { id: "heavy_yield", name: "Heavy Yield", effects: [effect("OUTPUT_AMOUNT", 15), effect("ENERGY_USAGE", 1.5, "MORE")] },
@@ -150,9 +154,9 @@ const KEYSTONES = [
     { id: "low_heat_specialist", name: "Low Heat Specialist", ceilings: { MAX_TEMPERATURE: 800 }, effects: [tagged("SMELTING", effect("ENERGY_USAGE", 0.5, "LESS")), tagged("SMELTING", effect("FUEL_EFFICIENCY", 2, "MORE"))] },
     { id: "quench_protocol", name: "Quench Protocol", behaviors: ["QUENCH_PROTOCOL"], effects: [effect("HEAT_TRANSFER", 0.75, "LESS")] },
     { id: "closed_loop_recuperator", name: "Closed Loop Recuperator", behaviors: ["CLOSED_LOOP_RECUPERATOR"], effects: [effect("PROCESSING_SPEED", 0.85, "LESS")] },
-    { id: "kiln_discipline", name: "Kiln Discipline", effects: [effect("TEMPERATURE_STABILITY", 1.6, "MORE"), effect("WARMUP_TIME", 1.4, "MORE")] },
-    // Holds heat between jobs at the price of a slower cold start.
-    { id: "thermal_reservoir", name: "Thermal Reservoir", effects: [effect("COOLING_RATE", 0.4, "LESS"), effect("WARMUP_TIME", 1.25, "MORE")] },
+    { id: "kiln_discipline", name: "Kiln Discipline", effects: [effect("TEMPERATURE_STABILITY", 1.6, "MORE"), effect("THERMAL_MASS", 1.4, "MORE")] },
+    // Holds heat between jobs and through load dips at the price of a slower cold start.
+    { id: "thermal_reservoir", name: "Thermal Reservoir", effects: [effect("HEAT_ISOLATION", 1.4, "MORE"), effect("THERMAL_MASS", 1.5, "MORE")] },
     { id: "high_flux", name: "High Flux", effects: [effect("HEAT_TRANSFER", 2, "MORE"), effect("ENERGY_USAGE", 1.25, "MORE"), effect("FUEL_DURATION", 0.6, "LESS")] },
     { id: "cell_bypass", name: "Cell Bypass", behaviors: ["BLOCK_BATTERY"], effects: [tagged("CRUSHING", effect("ENERGY_CAPACITY", 100)), effect("NO_BATTERY_OUTPUT_RETENTION", 100, "ADD"), effect("ENERGY_USAGE", 1.1, "MORE")] },
     { id: "deep_reserve", name: "Deep Reserve", effects: [effect("RESERVE", 1.5, "MORE"), effect("CONTROL", 0.5, "LESS"), effect("DRIVE", 0.5, "LESS")] },
@@ -165,7 +169,11 @@ const KEYSTONES = [
     // Trades guaranteed speed for random speed: increased Processing Speed becomes Instant Process chance, under a cap.
     { id: "surge_cycling", extra: "surge_cycling", name: "Surge Cycling", behaviors: ["SURGE_CYCLING"], ceilings: { INSTANT_PROCESS_CHANCE: 75 } },
     // Quality of life, like Silent Operation: the points spent reaching it are the cost.
-    { id: "even_feed", extra: "even_feed", name: "Even Feed", behaviors: ["EVEN_FEED"] }
+    { id: "even_feed", extra: "even_feed", name: "Even Feed", behaviors: ["EVEN_FEED"] },
+    // Unlocks the overheat slider past the safe maximum. The risk is the player's: recipes that can fail build strain.
+    { id: "blast_draft", extra: "blast_draft", name: "Blast Draft", behaviors: ["BLAST_DRAFT"] },
+    // Its counterpart on the same road node: every new input starts at the recipe target, never on leftover heat.
+    { id: "cool_headed", extra: "cool_headed", name: "Cool Headed", behaviors: ["COOL_HEADED"] }
 ];
 
 // Additions placed after the original fill, in design coordinates. Output constellations mirror Clean Dust Ledge on the
@@ -188,7 +196,11 @@ const EXTRAS = [
     { id: "melter_reservoirs", angle: 150, radius: 2500, shapes: ["fork"], theme: "reservoirs" },
     { id: "even_feed", angle: 9, radius: 2167, shapes: ["keyDirect"], keystone: true, layer: "home" },
     // Surge Cycling sits on the outer road beside the Surge (Instant Process) pockets it feeds.
-    { id: "surge_cycling", angle: 96, radius: 2300, shapes: ["keyDirect"], keystone: true, layer: "outer" }
+    { id: "surge_cycling", angle: 96, radius: 2300, shapes: ["keyDirect"], keystone: true, layer: "outer" },
+    // The Batch Overhead path sits beside Dense Batching, which it leads to.
+    { id: "batch_overhead", angle: -62, radius: 1250, shapes: ["arc"], theme: "batching" },
+    // Blast Draft and Cool Headed share a road node close to the Furnace's start, so how to run heat is an early choice.
+    { id: "blast_draft", keystones: ["blast_draft", "cool_headed"], angle: 40, radius: 1550, shapes: ["keyPair"], keystone: true, layer: "home" }
 ];
 
 const regionAt = angle => {

@@ -91,6 +91,16 @@ public final class ModDataComponents {
                             .cacheEncoding()
             );
 
+    /** Pressed under Hydrogen: on plates and Basic Electric Circuits, and on Gear crafted from all-Annealed plates. */
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Boolean>> ANNEALED =
+            DATA_COMPONENTS.registerComponentType(
+                    "annealed",
+                    builder -> builder
+                            .persistent(Codec.BOOL)
+                            .networkSynchronized(ByteBufCodecs.BOOL)
+                            .cacheEncoding()
+            );
+
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<CalibrationState>> CALIBRATION_STATE =
             DATA_COMPONENTS.registerComponentType(
                     "calibration_state",

@@ -87,9 +87,13 @@ Every recipe also uses 250 mB of water. Algae growth uses the `rngtech:algae_gro
 
 {{ processing("algae_growth") }}
 
+### Urea {#urea}
+
+The Process tab has an optional {{ item('rngtech:urea') }} slot, to the right of the Algae Biomass output. Urea comes from the [Ammonia Synthesizer](ammonia-synthesizer.md#making-urea). The Photobioreactor takes one Urea at a time, and each one makes the next 4 Algae Biomass grow at twice the speed. Water and carbon gas per Algae Biomass do not change. Hover the empty Urea slot to see how many boosted harvests are left.
+
 ### Getting carbon gas
 
-- **Carbon Exhaust**: make it in a [Wooden Dehumidifier](wooden-dehumidifier.md) from Coal Dust or Gasification Residue, or burn Syngas in a [Syngas Combustor](syngas-combustor.md). To bootstrap, craft a Carbon Exhaust Bucket from a Water Bucket and one {{ item('rngtech:coal_dust') }}. You get Coal Dust by crushing coal in a [Crusher](crusher.md).
+- **Carbon Exhaust**: make it in a [Wooden Dehumidifier](wooden-dehumidifier.md) from Coal Dust or Gasification Residue, burn Syngas in a [Syngas Combustor](syngas-combustor.md), or shift Carbon Monoxide in a [Steam Methane Reformer](steam-methane-reformer.md#water-gas-shift). To bootstrap, craft a Carbon Exhaust Bucket from a Water Bucket and one {{ item('rngtech:coal_dust') }}. You get Coal Dust by crushing coal in a [Crusher](crusher.md).
 - **Syngas**: from the [Coal Gasifier](coal-gasifier.md).
 - **Carbon Monoxide**: a byproduct of the [Steam Methane Reformer](steam-methane-reformer.md).
 
@@ -113,7 +117,7 @@ You can also put Algae Biomass into the output slot yourself, by hand or from th
 
 | Side | Behavior |
 |---|---|
-| Top and sides | Fill the water and carbon tanks with fluid. Insert filled water or carbon-gas containers. Insert Algae Biomass into the output slot. |
+| Top and sides | Fill the water and carbon tanks with fluid. Insert filled water or carbon-gas containers. Insert Algae Biomass into the output slot and Urea into the Urea slot. |
 | Bottom | Extracts Algae Biomass and empty containers. |
 
 Pipes cannot drain fluid back out of the tanks. The Photobioreactor has no FE connection, and the Bio Chamber slot is not reachable by automation. The back of the machine has a port plate sized for a Universal Connector, the tidiest place to attach one.
@@ -124,7 +128,7 @@ To throw fluid away, use the purge buttons beside each tank, or right-click the 
 
 The Algae Photobioreactor screen has three tabs:
 
-- **Process**: water and carbon tanks with purge buttons, the container slots, the output slot, progress, the light level, the culture density, and the aeration gauge. Hover for amounts, the light requirement, and what the aeration setting does.
+- **Process**: water and carbon tanks with purge buttons, the container slots, the output slot, the Urea slot, progress, the light level, the culture density, and the aeration gauge. Hover for amounts, the light requirement, and what the aeration setting does.
 - **Gear**: the Bio Chamber slot.
 - **Stats**: the machine's current stats.
 

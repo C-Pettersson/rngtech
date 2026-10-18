@@ -72,7 +72,8 @@
 		"- &eMax Temperature:&r going above this can create failed outputs."
 		"- &eHeat Stability:&r helps the machine stay near the target heat."
 		"- &eOverheat:&r gives more room before heat becomes unsafe."
-		"- You only risk overheating a material when changing between two different. "
+		"- &eBlast Draft&r lets the heat slider go above the safe maximum. Metal recipes above it can fail."
+		"- At Stage 6, Nitrogen in the machine raises the overheat temperature."
 		""
 		""
 		"&7Tip: Heat Cores raise heat capability. Servos and stability make the process safer.&r"
@@ -107,7 +108,8 @@
 		""
 		""
 		"&eUse:&r"
-		"- Can be used in the ammonia power chain"
+		"- Supply Nitrogen to the &eAmmonia Synthesizer&r."
+		"- Or supply it to a heated machine that has &eBlast Draft&r. The Nitrogen raises the overheat temperature."
 	]
 	quest.22A86431ABEC9DD3.title: "Nitrogen production"
 	quest.23011878EBC32FC2.quest_desc: ["Boring and simple energy storage"]
@@ -161,15 +163,15 @@
 	]
 	quest.37A6C9E1284B5D12.quest_subtitle: "Stats can roll before you refine them."
 	quest.37A6C9E1284B5D12.title: "Read: Affixes"
-	quest.C029A39B5659FEE9.quest_desc: [
+	quest.3034E1FAD40A48B2.quest_desc: [
 		"&aRead:&r &6Uniques&r are find-only Gear with an orange-brown name. Each has a signature mechanic and a visible drawback, and some carry an ascendancy hook that only works with that ascendancy."
 		""
 		"Every copy has the same stat lines, but each copy rolls its own values inside the ranges shown on the item."
 		""
 		"Uniques cannot be crafted, refined, rerolled, or recycled."
 	]
-	quest.C029A39B5659FEE9.quest_subtitle: "Sidegrades you find, not craft."
-	quest.C029A39B5659FEE9.title: "Read: Uniques"
+	quest.3034E1FAD40A48B2.quest_subtitle: "Sidegrades you find, not craft."
+	quest.3034E1FAD40A48B2.title: "Read: Uniques"
 	quest.1B2ED2616C7CD0DE.quest_desc: [
 		"&aFind:&r Look in structure chests: villages, mineshafts, ruined portals, igloo basements, Nether fortresses, bastions, ancient cities, and ominous trial vaults. Witches can drop one too."
 		""
@@ -912,6 +914,50 @@
 	]
 	quest.49D6781084057122.quest_subtitle: "Two more points."
 	quest.49D6781084057122.title: "Ascendancy Seal II"
+	quest.4DE87D2F3D084228.quest_desc: [
+		"Two Metal Press ascendancy notables let the press use &eHydrogen&r to anneal items. Each Annealed item uses 250 mB."
+		""
+		"- &eBright Anneal&r (Die Keeper): Basic Electric Circuits come out Annealed. They get better calibration stability."
+		"- &eHydrogen Quench&r (Drop Forge): plates come out Annealed. Gear made only from Annealed plates gets better Refinement Potential."
+		""
+		"&7Tip: The machine rolls two times and keeps the higher roll.&r"
+	]
+	quest.4DE87D2F3D084228.quest_subtitle: "Better luck by using Hydrogen."
+	quest.4DE87D2F3D084228.title: "Hydrogen Annealing"
+	quest.2AB169CEEBB9FA40.quest_desc: [
+		"A new chassis starts at level 1. A &eSoul Transfer&r moves the Mastery of a machine into a new machine of the same kind."
+		""
+		"&aMake:&r"
+		"- Calibrate a Basic Electric Circuit into a &eCalibrated Logic Component&r."
+		"- Its stability is the success chance of the Soul Transfer."
+		""
+		"&aUse:&r"
+		"- Use the Soul Transfer on the old machine. It absorbs the soul."
+		"- Use it on the new machine. It releases the soul."
+		"- The soul keeps XP, level, tree, ascendancy, and Seal tiers."
+		"- A failed absorb uses the Soul Transfer. The old machine keeps its Mastery."
+		""
+		"&7Tip: An Annealed circuit gives better calibration stability.&r"
+	]
+	quest.2AB169CEEBB9FA40.quest_subtitle: "Move Mastery to a better machine."
+	quest.2AB169CEEBB9FA40.title: "Soul Transfer"
+	quest.14A8140EBDA3865E.quest_desc: [
+		"Optional. Old machines in ruins still hold a Mastery soul."
+		""
+		"&aFind:&r"
+		"- Look for a Collapsed Workshop on dry land, or an Abandoned Cart Siding underground."
+		"- Sites that are deeper or farther away hold higher souls."
+		""
+		"&aWake:&r"
+		"- Supply FE from cables, or put charged Battery Cells in its sockets."
+		"- A higher soul needs more FE."
+		""
+		"&aTake:&r"
+		"- Use a Soul Transfer on the awake machine. Then release the soul into a machine of the same family."
+		"- The soul has no ascendancy and no Seal tiers. It gives one free Full Reset."
+	]
+	quest.14A8140EBDA3865E.quest_subtitle: "Find old machines with a soul."
+	quest.14A8140EBDA3865E.title: "Dormant Machines"
 	quest.4CC5AA5185C3D06B.quest_desc: [
 		"Now that you have access to creating various fluids. You star bulk producing batteries, make stuff cheaper in &bComponent Assembler&r"
 		""
@@ -1027,6 +1073,7 @@
 		"- &eCarbon Exhaust&r is enough to start algae."
 		"- &eSyngas&r is a medium upgrade."
 		"- &eCarbon Monoxide&r is the best carbon input available"
+		"- Put &eUrea&r in the Urea slot. The next 4 biomass grow two times faster."
 		""
 		"&7Use JEI for the exact fluid amounts and growth times.&r"
 	]
@@ -1068,7 +1115,7 @@
 		""
 		"&aBuild:&r"
 		"- Craft an &eAmmonia Catalyst Bed&r and install it in an &eAmmonia Synthesizer&r."
-		"- Craft a &eFuel Cell Membrane&r and install it in an &eAmmonia Fuel Cell&r."
+		"- Craft a &eFuel Cell Membrane&r and install it in a &eFuel Cell&r."
 		"- Optional: add a Stage 6+ Battery Cell to the Fuel Cell."
 		""
 		"&aRun:&r"
@@ -1076,11 +1123,27 @@
 		"- Hydrogen normally comes from the &eSteam Methane Reformer&r."
 		"- Nitrogen remains a separate gas input."
 		"- Move Ammonia into the Fuel Cell."
+		"- The Fuel Cell can also use &eHydrogen&r. It makes less than half the FE that Ammonia gives."
 		"- Pull &bFE&r from Fuel Cell sides and residue from the bottom."
+		"- Supply &eCarbon Exhaust&r to the Synthesizer. It then uses some Ammonia to make &eUrea&r."
 		"- The Synthesizer is not a generator; the Fuel Cell is."
 	]
 	quest.7106E7A1B10F0070.quest_subtitle: "SMR hydrogen plus nitrogen becomes ammonia."
 	quest.7106E7A1B10F0070.title: "Ammonia Power"
+	quest.36290C98154741A7.quest_desc: [
+		"Urea uses Ammonia. You get less power, but you need fewer machines and crops."
+		""
+		"&aMake:&r"
+		"- Supply Ammonia and &eCarbon Exhaust&r to an &eAmmonia Synthesizer&r."
+		"- Take the Urea from the Urea slot."
+		""
+		"&aUse:&r"
+		"- Use Urea as bone meal on plants. It also works in a dispenser."
+		"- A &eGrove Warden&r cart or its station stores each Urea as 4 bone meal."
+		"- Put Urea in an &eAlgae Photobioreactor&r. The next 4 biomass grow two times faster."
+	]
+	quest.36290C98154741A7.quest_subtitle: "Make fertilizer from Ammonia and exhaust."
+	quest.36290C98154741A7.title: "Urea"
 	quest.7106E7A1B10F0090.quest_desc: [
 		"Vacuum Collapse recipes are powerful, but they care about local stability."
 		""
@@ -1160,6 +1223,7 @@
 		"- Feed &eMethane&r plus water for strong Hydrogen output."
 		"- Syngas plus water works, but makes less Hydrogen."
 		"- Capture &eCarbon Monoxide&r for better Algae Photobioreactor performance."
+		"- Or send the Carbon Monoxide to a second Reformer. It makes more &eHydrogen&r and Carbon Exhaust."
 	]
 	quest.7106E7A1B10F0140.quest_subtitle: "Methane plus steam makes hydrogen."
 	quest.7106E7A1B10F0140.title: "Steam Methane Reformer"
@@ -1543,17 +1607,17 @@
 	]
 	quest.7E96148C6A2F7B94.quest_subtitle: "Conductive parts start here."
 	quest.7E96148C6A2F7B94.title: "First Copper"
-	quest.83437B2BE1852F4E.quest_desc: [
+	quest.4D576FB3BBF8C6D4.quest_desc: [
 		"Upgrade a Primed Seal Core in the Component Assembler with a Tungstensteel Casing, a Nullite Coil, an Elite Electric Circuit, and 1,000 mB of Lubricant."
 	]
-	quest.83437B2BE1852F4E.quest_subtitle: "Stage 7 precision."
-	quest.83437B2BE1852F4E.title: "Lubricated Seal Core"
-	quest.866D43F46AC8E5BE.quest_desc: [
+	quest.4D576FB3BBF8C6D4.quest_subtitle: "Stage 7 precision."
+	quest.4D576FB3BBF8C6D4.title: "Lubricated Seal Core"
+	quest.53AD85A55402A1A2.quest_desc: [
 		"Assemble a &ePrimed Seal Core&r in the &eComponent Assembler&r from a Sparksteel Coil, an Aluminum Casing, four redstone, a Stabilization Catalyst, and 1,000 mB of Electrolyte Solution."
 	]
-	quest.866D43F46AC8E5BE.quest_subtitle: "The heart of a Seal."
-	quest.866D43F46AC8E5BE.title: "Primed Seal Core"
-	quest.9978E0313902657D.quest_desc: [
+	quest.53AD85A55402A1A2.quest_subtitle: "The heart of a Seal."
+	quest.53AD85A55402A1A2.title: "Primed Seal Core"
+	quest.66BFDC3B5C785D23.quest_desc: [
 		"From Stage 5, a machine can specialize. Open the crest beside its start node on the Mastery tab and press &aAscend&r with an &eAscendancy Seal&r in your inventory."
 		""
 		"- Seal I needs a Stage 4+ chassis (a Forestry Companion can always use it) and chooses one of the family's ascendancies."
@@ -1562,18 +1626,18 @@
 		""
 		"&7&oTip: each machine's wiki page lists all of its ascendancies.&r"
 	]
-	quest.9978E0313902657D.quest_subtitle: "Two paths per machine."
-	quest.9978E0313902657D.title: "Read: Ascendancies"
-	quest.B707E4F323CE4189.quest_desc: [
+	quest.66BFDC3B5C785D23.quest_subtitle: "Two paths per machine."
+	quest.66BFDC3B5C785D23.title: "Read: Ascendancies"
+	quest.2395BFD1C7ACB809.quest_desc: [
 		"Frame the core with Sparksteel Plates, Aluminum Casings, Advanced Electric Circuits, and a &eStage 5 calibrated conductive component&r of 70+ stability."
 		""
 		"Calibrate a Sparksteel Coil in a Steel Resonance Calibrator to get one. A Stabilizer Matrix recipe accepts components down to 55 stability."
 		""
 		"Use it on a machine you plan to keep. The ascendancy stays with that chassis."
 	]
-	quest.B707E4F323CE4189.quest_subtitle: "Choose a path."
-	quest.B707E4F323CE4189.title: "Ascendancy Seal I"
-	quest.BAE00B9B83600445.quest_desc: [
+	quest.2395BFD1C7ACB809.quest_subtitle: "Choose a path."
+	quest.2395BFD1C7ACB809.title: "Ascendancy Seal I"
+	quest.4F6A5736BFB8557E.quest_desc: [
 		"The &eVolatile Catalyst&r corrupts a finished part, Battery Cell, or placed machine: Untouched, Blessed, Reforged, Warped, or Blighted. A Corrupted item can never be refined again."
 		""
 		"&aCraft:&r"
@@ -1585,23 +1649,23 @@
 		"- Affix Forge with a Resonance Matrix, or a machine's Refinement tab."
 		"- A Stabilization Crystal in the focus slot removes Blighted."
 	]
-	quest.BAE00B9B83600445.quest_subtitle: "A one-way gamble."
-	quest.BAE00B9B83600445.title: "Volatile Catalyst"
-	quest.C3604160EA637458.quest_desc: [
+	quest.4F6A5736BFB8557E.quest_subtitle: "A one-way gamble."
+	quest.4F6A5736BFB8557E.title: "Volatile Catalyst"
+	quest.117EDD2049951ECF.quest_desc: [
 		"Craft &eMastery Refunds&r from paper, redstone, and a copper ingot, eight at a time."
 		""
 		"One refund removes a shared-tree node. An ascendancy node costs five."
 	]
-	quest.C3604160EA637458.quest_subtitle: "Change your mind."
-	quest.C3604160EA637458.title: "Mastery Refunds"
-	quest.FAEF4E1A8753B3FE.quest_desc: [
+	quest.117EDD2049951ECF.quest_subtitle: "Change your mind."
+	quest.117EDD2049951ECF.title: "Mastery Refunds"
+	quest.1B2846DF3677C5FF.quest_desc: [
 		"Sneak-use the &eConfigurator&r in the air to switch it to Mastery mode."
 		""
 		"Sneak-use a machine to copy its build, then use another machine of the same start to paste it. The target follows the build as it earns points."
 	]
-	quest.FAEF4E1A8753B3FE.quest_subtitle: "One build, many machines."
-	quest.FAEF4E1A8753B3FE.title: "Copy a Build"
-	quest.FB45A90F15D87663.quest_desc: [
+	quest.1B2846DF3677C5FF.quest_subtitle: "One build, many machines."
+	quest.1B2846DF3677C5FF.title: "Copy a Build"
+	quest.7983B2FDA710DE9A.quest_desc: [
 		"Every machine levels up from the work it finishes. Open its &eMastery&r tab to spend points in the shared passive tree."
 		""
 		"- Mastery belongs to the chassis. Breaking and replacing the machine keeps it."
@@ -1609,8 +1673,8 @@
 		"- Right-click an allocated node to refund it for one &eMastery Refund&r."
 		"- &eCopy&r and &ePaste&r move a build between machines that share a start."
 	]
-	quest.FB45A90F15D87663.quest_subtitle: "Machines are characters too."
-	quest.FB45A90F15D87663.title: "Read: Machine Mastery"
+	quest.7983B2FDA710DE9A.quest_subtitle: "Machines are characters too."
+	quest.7983B2FDA710DE9A.title: "Read: Machine Mastery"
 	reward_table.078B604FCB901AA9.title: "Refine"
 	reward_table.72A0AC975B999BE5.title: "lenses"
 	task.07652CB1B5828F97.title: "Check Affixes"

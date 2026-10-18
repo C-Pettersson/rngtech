@@ -29,11 +29,11 @@ It is a Stage 3–4 support machine that turns early gas byproducts into fuel. I
 - [Growing algae](rngtech:algae-photobioreactor/growing-algae.md)
 - [The culture](rngtech:algae-photobioreactor/the-culture.md)
 
-### Getting carbon gas
+### Urea
 
-- **Carbon Exhaust**: make it in a [Wooden Dehumidifier](rngtech:wooden-dehumidifier.md) from Coal Dust or Gasification Residue, or burn Syngas in a [Syngas Combustor](rngtech:syngas-combustor.md). To bootstrap, craft a Carbon Exhaust Bucket from a Water Bucket and one **Coal Dust**. You get Coal Dust by crushing coal in a [Crusher](rngtech:crusher.md).
-- **Syngas**: from the [Coal Gasifier](rngtech:coal-gasifier.md).
-- **Carbon Monoxide**: a byproduct of the [Steam Methane Reformer](rngtech:steam-methane-reformer.md).
+The Process tab has an optional <ItemLink id="rngtech:urea" /> slot, to the right of the Algae Biomass output. Urea comes from the [Ammonia Synthesizer](rngtech:ammonia-synthesizer.md). The Photobioreactor takes one Urea at a time, and each one makes the next 4 Algae Biomass grow at twice the speed. Water and carbon gas per Algae Biomass do not change. Hover the empty Urea slot to see how many boosted harvests are left.
+
+- [Getting carbon gas](rngtech:algae-photobioreactor/getting-carbon-gas.md)
 
 ### Gear
 
@@ -46,7 +46,7 @@ The Gear tab has one optional **Bio Chamber** slot. The chamber's fuel-efficienc
 
 The Algae Photobioreactor screen has three tabs:
 
-- **Process**: water and carbon tanks with purge buttons, the container slots, the output slot, progress, the light level, the culture density, and the aeration gauge. Hover for amounts, the light requirement, and what the aeration setting does.
+- **Process**: water and carbon tanks with purge buttons, the container slots, the output slot, the Urea slot, progress, the light level, the culture density, and the aeration gauge. Hover for amounts, the light requirement, and what the aeration setting does.
 - **Gear**: the Bio Chamber slot.
 - **Stats**: the machine's current stats.
 

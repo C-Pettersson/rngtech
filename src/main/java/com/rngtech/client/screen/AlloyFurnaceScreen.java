@@ -64,8 +64,9 @@ public class AlloyFurnaceScreen extends AbstractContainerScreen<AlloyFurnaceMenu
             "rngtech.stat.energy_usage",
             "rngtech.stat.energy_capacity",
             "rngtech.stat.heat_transfer",
+            "rngtech.stat.thermal_conductivity",
             "rngtech.stat.max_temperature",
-            "rngtech.stat.warmup_time",
+            "rngtech.stat.thermal_mass",
             "rngtech.stat.cooling_rate",
             "rngtech.stat.temperature_stability",
             "rngtech.stat.overheat_tolerance",
@@ -78,6 +79,7 @@ public class AlloyFurnaceScreen extends AbstractContainerScreen<AlloyFurnaceMenu
             AlloyFurnaceMenu.energyUsageDataIndex(),
             AlloyFurnaceMenu.energyCapacityStatDataIndex(),
             AlloyFurnaceMenu.heatTransferDataIndex(),
+            AlloyFurnaceMenu.thermalConductivityDataIndex(),
             AlloyFurnaceMenu.maxTemperatureDataIndex(),
             AlloyFurnaceMenu.warmupTimeDataIndex(),
             AlloyFurnaceMenu.coolingRateDataIndex(),
@@ -92,8 +94,9 @@ public class AlloyFurnaceScreen extends AbstractContainerScreen<AlloyFurnaceMenu
             MachineStat.ENERGY_USAGE,
             MachineStat.ENERGY_CAPACITY,
             MachineStat.HEAT_TRANSFER,
+            MachineStat.THERMAL_CONDUCTIVITY,
             MachineStat.MAX_TEMPERATURE,
-            MachineStat.WARMUP_TIME,
+            MachineStat.THERMAL_MASS,
             MachineStat.COOLING_RATE,
             MachineStat.TEMPERATURE_STABILITY,
             MachineStat.OVERHEAT_TOLERANCE,
@@ -104,6 +107,8 @@ public class AlloyFurnaceScreen extends AbstractContainerScreen<AlloyFurnaceMenu
     private static final Map<MegaPassiveNode, ResourceLocation> MASTERY_ICON_TEXTURES = createMasteryIconTextures();
 
     private final MasteryScreenSupport<MegaPassiveNode> masterySupport;
+    private final HeatSlider heatSlider = new HeatSlider(98, 81, 86);
+    private final NitrogenGauge nitrogenGauge = new NitrogenGauge(222, BAR_Y);
 
     public AlloyFurnaceScreen(AlloyFurnaceMenu menu, Inventory playerInventory, Component title) {
         super(menu, playerInventory, title);
@@ -204,6 +209,10 @@ public class AlloyFurnaceScreen extends AbstractContainerScreen<AlloyFurnaceMenu
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        if (menu.selectedTab() == AlloyFurnaceMenu.TAB_PROCESSING
+                && heatSlider.mouseClicked(mouseX, mouseY, button, leftPos, topPos, menu.containerId)) {
+            return true;
+        }
         if (button == 0) {
             if (isOverTab(mouseX, mouseY, 0)) {
                 selectTab(AlloyFurnaceMenu.TAB_PROCESSING);
@@ -239,6 +248,9 @@ public class AlloyFurnaceScreen extends AbstractContainerScreen<AlloyFurnaceMenu
 
     @Override
     public boolean mouseDragged(double mouseX, double mouseY, int button, double dragX, double dragY) {
+        if (heatSlider.mouseDragged(mouseX, button, leftPos, menu.containerId)) {
+            return true;
+        }
         if (menu.selectedTab() == AlloyFurnaceMenu.TAB_MASTERY
                 && masterySupport.mouseDragged(mouseX, mouseY, button, imageWidth, imageHeight)) {
             return true;
@@ -248,6 +260,7 @@ public class AlloyFurnaceScreen extends AbstractContainerScreen<AlloyFurnaceMenu
 
     @Override
     public boolean mouseReleased(double mouseX, double mouseY, int button) {
+        heatSlider.mouseReleased();
         if (masterySupport.mouseReleased(mouseX, mouseY, button, leftPos, topPos, imageWidth, imageHeight)) {
             return true;
         }
@@ -356,6 +369,8 @@ public class AlloyFurnaceScreen extends AbstractContainerScreen<AlloyFurnaceMenu
     }
 
     private void renderProcessing(GuiGraphics guiGraphics) {
+        heatSlider.sync(menu.heatSlider());
+        heatSlider.render(guiGraphics, font, leftPos, topPos, menu.heatSlider(), heatBands());
         int x = leftPos;
         int y = topPos;
         guiGraphics.fill(x + PROGRESS_X, y + PROGRESS_Y, x + PROGRESS_X + PROGRESS_WIDTH, y + PROGRESS_Y + PROGRESS_HEIGHT, 0xFF5F5F5F);
@@ -379,9 +394,8 @@ public class AlloyFurnaceScreen extends AbstractContainerScreen<AlloyFurnaceMenu
         int energyHeight = Math.round(BAR_FILL_HEIGHT * menu.energyProgress());
         guiGraphics.fill(x + ENERGY_BAR_X + 1, y + BAR_Y + BAR_HEIGHT - 1 - energyHeight, x + ENERGY_BAR_X + BAR_WIDTH - 1, y + BAR_Y + BAR_HEIGHT - 1, ENERGY);
 
-        guiGraphics.fill(x + HEAT_BAR_X, y + BAR_Y, x + HEAT_BAR_X + BAR_WIDTH, y + BAR_Y + BAR_HEIGHT, 0xFF5F5F5F);
-        int heatHeight = Math.round(BAR_FILL_HEIGHT * menu.heatProgress());
-        guiGraphics.fill(x + HEAT_BAR_X + 1, y + BAR_Y + BAR_HEIGHT - 1 - heatHeight, x + HEAT_BAR_X + BAR_WIDTH - 1, y + BAR_Y + BAR_HEIGHT - 1, HEAT);
+        HeatReadout.renderBar(guiGraphics, leftPos + HEAT_BAR_X, topPos + BAR_Y, BAR_WIDTH, BAR_HEIGHT, BAR_FILL_HEIGHT, heatBands());
+        nitrogenGauge.render(guiGraphics, leftPos, topPos, menu.nitrogen(), menu.nitrogenUse());
 
         if (menu.hasFailureRecipe()) {
             guiGraphics.fill(x + FAILURE_BAR_X, y + BAR_Y, x + FAILURE_BAR_X + BAR_WIDTH, y + BAR_Y + BAR_HEIGHT, 0xFF5F5F5F);
@@ -451,6 +465,14 @@ public class AlloyFurnaceScreen extends AbstractContainerScreen<AlloyFurnaceMenu
         if (menu.selectedTab() != AlloyFurnaceMenu.TAB_PROCESSING) {
             return;
         }
+        if (heatSlider.isOver(mouseX, mouseY, leftPos, topPos)) {
+            guiGraphics.renderComponentTooltip(font, heatSlider.tooltip(menu.heatSlider(), menu.setpoint()), mouseX, mouseY);
+            return;
+        }
+        if (nitrogenGauge.renderTooltip(
+                guiGraphics, font, leftPos, topPos, mouseX, mouseY, menu.nitrogen(), menu.nitrogenUse(), menu.nitrogenBonusPercent())) {
+            return;
+        }
         CompactValueText.renderTooltipIfHovered(
                 guiGraphics,
                 font,
@@ -475,7 +497,7 @@ public class AlloyFurnaceScreen extends AbstractContainerScreen<AlloyFurnaceMenu
                 BAR_Y,
                 BAR_WIDTH,
                 BAR_HEIGHT,
-                heatTooltip()
+                heatTooltipLines()
         );
         if (menu.hasFailureRecipe()) {
             CompactValueText.renderTooltipIfHovered(
@@ -531,6 +553,16 @@ public class AlloyFurnaceScreen extends AbstractContainerScreen<AlloyFurnaceMenu
                 STATUS_ICON_SIZE,
                 heatTooltip()
         );
+    }
+
+    private HeatReadout.Bands heatBands() {
+        return new HeatReadout.Bands(menu.heat(), menu.minimumTemperature(), menu.targetTemperature(), menu.safeMaximumTemperature(),
+                menu.overheatTemperature(), menu.setpoint(), menu.heatReach(), menu.heatMaximum(), menu.wobble());
+    }
+
+    private List<Component> heatTooltipLines() {
+        return HeatReadout.lines(heatTooltip(), menu.heatSlider(), menu.targetTemperature(), menu.setpoint(), menu.heatFactor(), menu.wobble(),
+                menu.inputEnergy(), menu.heatingEnergy(), menu.holdingEnergy(), true);
     }
 
     private Component heatTooltip() {
@@ -598,6 +630,8 @@ public class AlloyFurnaceScreen extends AbstractContainerScreen<AlloyFurnaceMenu
             case AlloyFurnaceBlockEntity.STATUS_WARMING -> Component.translatable("rngtech.alloy_furnace.status.warming", menu.targetTemperature());
             case AlloyFurnaceBlockEntity.STATUS_POWER_DROP -> Component.translatable("rngtech.alloy_furnace.status.power_drop");
             case AlloyFurnaceBlockEntity.STATUS_FAILURE_RISK -> Component.translatable("rngtech.alloy_furnace.status.failure_risk", menu.failureStrain());
+            case AlloyFurnaceBlockEntity.STATUS_FILLING_BATCH -> Component.translatable("rngtech.machine.status.filling_batch");
+            case AlloyFurnaceBlockEntity.STATUS_HEAT_HIGH -> Component.translatable("rngtech.alloy_furnace.status.heat_high");
             default -> Component.translatable("rngtech.alloy_furnace.status.ready");
         };
     }
@@ -607,10 +641,12 @@ public class AlloyFurnaceScreen extends AbstractContainerScreen<AlloyFurnaceMenu
             case AlloyFurnaceBlockEntity.STATUS_READY -> MachineScreenStyle.StatusState.RUNNING;
             case AlloyFurnaceBlockEntity.STATUS_NO_POWER,
                     AlloyFurnaceBlockEntity.STATUS_NO_INPUT,
+                    AlloyFurnaceBlockEntity.STATUS_FILLING_BATCH,
                     AlloyFurnaceBlockEntity.STATUS_MISSING_HEAT_CORE,
                     AlloyFurnaceBlockEntity.STATUS_MISSING_CRUCIBLE,
                     AlloyFurnaceBlockEntity.STATUS_HEAT_LOW,
                     AlloyFurnaceBlockEntity.STATUS_WARMING,
+                    AlloyFurnaceBlockEntity.STATUS_HEAT_HIGH,
                     AlloyFurnaceBlockEntity.STATUS_POWER_DROP,
                     AlloyFurnaceBlockEntity.STATUS_FAILURE_RISK -> MachineScreenStyle.StatusState.WAITING;
             case AlloyFurnaceBlockEntity.STATUS_INVALID_RECIPE -> MachineScreenStyle.StatusState.ERROR;

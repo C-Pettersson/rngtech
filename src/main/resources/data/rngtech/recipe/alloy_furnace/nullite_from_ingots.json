@@ -26,7 +26,7 @@
     "id": "rngtech:nullite_ingot"
   },
   "processing_ticks": 1200,
-  "energy": 26000,
+  "heat": 25794,
   "minimum_component_stage": 6,
   "minimum_temperature": 1500,
   "target_temperature": 1500,

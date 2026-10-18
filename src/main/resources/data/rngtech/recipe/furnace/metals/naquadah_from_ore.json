@@ -14,7 +14,7 @@
     "id": "rngtech:naquadah_ingot"
   },
   "processing_ticks": 1200,
-  "energy": 43200,
+  "heat": 107899,
   "experience": 0.7,
   "minimum_temperature": 2000,
   "required_temperature_stability": 1.05,

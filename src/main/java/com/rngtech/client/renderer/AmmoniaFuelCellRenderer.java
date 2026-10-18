@@ -77,7 +77,7 @@ public class AmmoniaFuelCellRenderer implements BlockEntityRenderer<AmmoniaFuelC
             renderMembranes(cutout, pose, packedLight, packedOverlay);
         }
         renderResidue(cutout, pose, state.residue(), packedLight, packedOverlay);
-        renderAmmonia(bufferSource.getBuffer(Sheets.translucentCullBlockSheet()), pose, state.ammonia(), packedLight, packedOverlay);
+        renderFuel(bufferSource.getBuffer(Sheets.translucentCullBlockSheet()), pose, state.ammonia(), state.hydrogen(), packedLight, packedOverlay);
         poseStack.popPose();
     }
 
@@ -106,11 +106,11 @@ public class AmmoniaFuelCellRenderer implements BlockEntityRenderer<AmmoniaFuelC
         }
     }
 
-    private static void renderAmmonia(VertexConsumer consumer, PoseStack.Pose pose, float fill, int light, int overlay) {
+    private static void renderFuel(VertexConsumer consumer, PoseStack.Pose pose, float fill, boolean hydrogen, int light, int overlay) {
         if (fill <= 0.001F) {
             return;
         }
-        IClientFluidTypeExtensions fluidType = IClientFluidTypeExtensions.of(ModFluids.AMMONIA_SOURCE.get());
+        IClientFluidTypeExtensions fluidType = IClientFluidTypeExtensions.of((hydrogen ? ModFluids.HYDROGEN_SOURCE : ModFluids.AMMONIA_SOURCE).get());
         TextureAtlasSprite sprite = Minecraft.getInstance().getTextureAtlas(InventoryMenu.BLOCK_ATLAS).apply(fluidType.getStillTexture());
         float y1 = TANK_Y0 + (TANK_Y1 - TANK_Y0) * Mth.clamp(fill, 0.0F, 1.0F);
         cube(consumer, pose, sprite, 16.0F, TANK_X0, TANK_Y0, TANK_Z0, TANK_X1, y1, TANK_Z1, fluidType.getTintColor() & 0xFFFFFF, 220, light, overlay);

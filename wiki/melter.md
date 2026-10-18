@@ -42,7 +42,7 @@ Fill the input tank with the recipe's fluid, put the two recipe items in the inp
 
 Some ingredients leave an item behind, such as the Glass Bottle from a {{ item('minecraft:honey_bottle') }}. A leftover the Melter cannot use goes into an empty output container slot if it can hold the product, and otherwise into the inventory directly below the Melter, such as a hopper or chest, or onto the ground if there is none. It never blocks the input slots; see [Automation](automation.md#ingredient-leftovers).
 
-Every default recipe needs at least 1,200 heat (methane needs 1,400, and Ender Slurry from Collapse Residue needs 1,600) and hardness level 6, so you need a hot enough Heat Core and a Titanium or better Crush Head. Unlike the [Crusher](crusher.md), the Melter does not run recipes above its hardness at all.
+The crucible heats up like the other heated machines and melts once it reaches the recipe's temperature; see [Heat](heat.md). Every default recipe needs at least 1,200 heat (methane needs 1,400, and Ender Slurry from Collapse Residue needs 1,600) and hardness level 6, so you need a hot enough Heat Core and a Titanium or better Crush Head. Unlike the [Crusher](crusher.md), the Melter does not run recipes above its hardness at all.
 
 Methane takes plain {{ item('rngtech:algae_biomass') }}. {{ item('rngtech:dense_algae_biomass') }} does not work in the Melter; burn it in a [Bio Generator](bio-generator.md) instead.
 
@@ -120,7 +120,7 @@ Every node in this machine's ascendancies. See [Machine Mastery](machine-mastery
 
 | Node | Type | After | Effect |
 |---|---|---|---|
-| **Second Crucible** | Root | — | +2 Batch Size; 15% more Energy Use. Each batched melt needs its own inputs, fluid, and tank room. |
+| **Second Crucible** | Root | — | +2 Batch Size. Each batched melt needs its own inputs, fluid, and tank room. |
 | Steady Feed | Small | Second Crucible | 8% increased Processing Speed. |
 | **Crush Feed** | Notable | Steady Feed | +10% Overlevel Speed. |
 | Hot Walls | Small | Second Crucible | 4% increased Max Temperature. |

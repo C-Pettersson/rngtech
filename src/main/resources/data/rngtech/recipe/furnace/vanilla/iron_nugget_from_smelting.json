@@ -48,6 +48,6 @@
         "id": "minecraft:iron_nugget"
     },
     "processing_ticks": 200,
-    "energy": 4800,
+    "heat": 2880,
     "experience": 0.1
 }

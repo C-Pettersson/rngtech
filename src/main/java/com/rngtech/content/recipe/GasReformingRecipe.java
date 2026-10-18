@@ -3,6 +3,7 @@ package com.rngtech.content.recipe;
 import com.rngtech.content.registry.ModItems;
 import com.rngtech.content.registry.ModRecipes;
 
+import com.mojang.datafixers.util.Either;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
@@ -26,7 +27,7 @@ public record GasReformingRecipe(
         SizedFluidIngredient gasInput,
         SizedFluidIngredient waterInput,
         FluidStack hydrogenOutput,
-        FluidStack carbonMonoxideOutput,
+        FluidStack byproductOutput,
         int energy,
         int processingTicks,
         int minimumCatalystStage
@@ -36,8 +37,9 @@ public record GasReformingRecipe(
         return hydrogenOutput.copy();
     }
 
-    public FluidStack carbonMonoxideFluid() {
-        return carbonMonoxideOutput.copy();
+    /** The second output: Carbon Monoxide from a reform, Carbon Exhaust from a water-gas shift. */
+    public FluidStack byproductFluid() {
+        return byproductOutput.copy();
     }
 
     @Override
@@ -93,13 +95,19 @@ public record GasReformingRecipe(
     }
 
     public static class Serializer implements RecipeSerializer<GasReformingRecipe> {
+        /** {@code byproduct_output}, or the older {@code carbon_monoxide_output} key that existing datapacks use. */
+        private static final MapCodec<FluidStack> BYPRODUCT_CODEC = Codec.mapEither(
+                FluidStack.CODEC.fieldOf("byproduct_output"),
+                FluidStack.CODEC.fieldOf("carbon_monoxide_output")
+        ).xmap(either -> either.map(stack -> stack, stack -> stack), Either::left);
+
         private static final MapCodec<GasReformingRecipe> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
                         Codec.STRING.optionalFieldOf("group", "").forGetter(GasReformingRecipe::group),
                         Ingredient.CODEC_NONEMPTY.fieldOf("catalyst").forGetter(GasReformingRecipe::catalyst),
                         SizedFluidIngredient.NESTED_CODEC.fieldOf("gas_input").forGetter(GasReformingRecipe::gasInput),
                         SizedFluidIngredient.NESTED_CODEC.fieldOf("water_input").forGetter(GasReformingRecipe::waterInput),
                         FluidStack.CODEC.fieldOf("hydrogen_output").forGetter(GasReformingRecipe::hydrogenOutput),
-                        FluidStack.CODEC.fieldOf("carbon_monoxide_output").forGetter(GasReformingRecipe::carbonMonoxideOutput),
+                        BYPRODUCT_CODEC.forGetter(GasReformingRecipe::byproductOutput),
                         Codec.intRange(1, Integer.MAX_VALUE).fieldOf("energy").forGetter(GasReformingRecipe::energy),
                         Codec.intRange(1, Integer.MAX_VALUE)
                                 .fieldOf("processing_ticks")
@@ -136,7 +144,7 @@ public record GasReformingRecipe(
                         SizedFluidIngredient.STREAM_CODEC.encode(buffer, recipe.gasInput);
                         SizedFluidIngredient.STREAM_CODEC.encode(buffer, recipe.waterInput);
                         FluidStack.STREAM_CODEC.encode(buffer, recipe.hydrogenOutput);
-                        FluidStack.STREAM_CODEC.encode(buffer, recipe.carbonMonoxideOutput);
+                        FluidStack.STREAM_CODEC.encode(buffer, recipe.byproductOutput);
                         ByteBufCodecs.VAR_INT.encode(buffer, recipe.energy);
                         ByteBufCodecs.VAR_INT.encode(buffer, recipe.processingTicks);
                         ByteBufCodecs.VAR_INT.encode(buffer, recipe.minimumCatalystStage);

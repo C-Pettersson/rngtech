@@ -17,7 +17,7 @@ final class HeatControl {
 
     static int warmupRate(MachineStatAccumulator stats) {
         double heatTransfer = Math.max(0.1, stats.value(MachineStat.HEAT_TRANSFER));
-        double warmupTime = Math.max(0.25, stats.value(MachineStat.WARMUP_TIME));
+        double warmupTime = Math.max(0.25, stats.value(MachineStat.THERMAL_MASS));
         return Math.max(1, (int) Math.round(10.0 * heatTransfer / warmupTime));
     }
 
@@ -52,8 +52,11 @@ final class HeatControl {
     }
 
     static int effectiveOverheatTemperature(int safeMaximumTemperature, MachineStatAccumulator stats) {
-        double tolerance = Math.max(1.0, stats.value(MachineStat.OVERHEAT_TOLERANCE));
-        return Math.max(safeMaximumTemperature, (int) Math.round(safeMaximumTemperature * tolerance));
+        return HeatEngine.overheatTemperature(safeMaximumTemperature, stats, 0.0);
+    }
+
+    static int effectiveOverheatTemperature(int safeMaximumTemperature, MachineStatAccumulator stats, double bonus) {
+        return HeatEngine.overheatTemperature(safeMaximumTemperature, stats, bonus);
     }
 
     static int simulatedTemperature(
@@ -93,6 +96,14 @@ final class HeatControl {
         double instability = Math.max(0.0, requiredTemperatureStability - stats.value(MachineStat.TEMPERATURE_STABILITY));
         double risk = underheat / 5.0 + overheat / 5.0 + instability * 80.0;
         return Mth.clamp((int) Math.round(risk), 0, 100);
+    }
+
+    /**
+     * Temperature strain per tick scaled by the heat factor, so strain is counted per unit of work: running hotter speeds
+     * crafting up, and must not outrun its own risk.
+     */
+    static int paced(int addedStrain, double workTemperature, HeatEngine.Envelope envelope) {
+        return (int) Math.round(addedStrain * Math.max(1.0, HeatEngine.heatFactor(workTemperature, envelope)));
     }
 
     /** Strain drained per tick inside the safe band; Strain Recovery adds to it. */

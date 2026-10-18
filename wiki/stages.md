@@ -111,7 +111,7 @@ Stage is not the same as affix **tier**. Tier describes how strong one affix is;
 | 3 | Bronze | Bronze, tin, zinc, gold | The first alloy. Basic Electric Circuits, the Crude [Metal Press](metal-press.md), the Bronze [Alloy Furnace](alloy-furnace.md). |
 | 4 | Steel | Steel, invar, nickel, lead, silver | Stable midgame machines, the Steel Metal Press, the Lead Furnace, the [Corrosion Cell](corrosion-cell.md). The first recoverable processing failures. |
 | 5 | Aluminum | Aluminum, sparksteel, osmium | Gas power: [Coal Gasifier](coal-gasifier.md), [Syngas Combustor](syngas-combustor.md), [Cavitation Generator](cavitation-generator.md), [Silica Gel Dehumidifier](silica-gel-dehumidifier.md). |
-| 6 | Titanium | Titanium, arclite | Chemistry: [Melter](melter.md), [Steam Methane Reformer](steam-methane-reformer.md), [Ammonia Synthesizer](ammonia-synthesizer.md), [Ammonia Fuel Cell](ammonia-fuel-cell.md), the Titanium Alloy Furnace. |
+| 6 | Titanium | Titanium, arclite | Chemistry: [Melter](melter.md), [Steam Methane Reformer](steam-methane-reformer.md), [Ammonia Synthesizer](ammonia-synthesizer.md), [Fuel Cell](ammonia-fuel-cell.md), the Titanium Alloy Furnace. |
 | 7 | Tungstensteel | Tungstensteel, nullite, aethergold, tungsten, platinum | Late-game machine sets and the [Vacuum Collapse Generator](vacuum-collapse-generator.md). |
 | 8 | Exotic | Naquadah, netherite | The top machine sets, Exotic Battery Cells, the [Exotic Affix Forge](exotic-affix-forge.md). |
 
@@ -199,7 +199,7 @@ The Crusher's [Output Amount](crusher.md#output-amount) stat adds bonus crushed 
 
 ### Smelting heat
 
-Raw metal is the easy route: it smelts into one ingot at only 1,000 heat (800 for raw iron and copper). Ore blocks, crushed material, and dust need the metal's full smelting heat, so your Furnace's Heat Core decides which metals you can process this way.
+Every form of a metal needs the same smelting heat: raw metal, ore blocks, crushed material, and dust. Your Furnace's Heat Core decides which metals you can smelt at all, whatever form they are in. Raw metal smelts like its ore block, so smelting it directly is the slow, heat-hungry way to get one ingot; crushing it gives two, and dust is the cheapest to smelt.
 
 | Metal | Minimum heat | Needs stability |
 |---|---:|---|

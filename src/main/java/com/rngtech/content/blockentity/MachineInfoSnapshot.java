@@ -31,6 +31,8 @@ public record MachineInfoSnapshot(
         int requiredProcessingLevel,
         int heat,
         int requiredHeat,
+        int setpoint,
+        int batch,
         int activeSlots,
         int maxSlots,
         GearSummary gearSummary,
@@ -65,6 +67,8 @@ public record MachineInfoSnapshot(
         tag.putInt("required_processing_level", requiredProcessingLevel);
         tag.putInt("heat", heat);
         tag.putInt("required_heat", requiredHeat);
+        tag.putInt("setpoint", setpoint);
+        tag.putInt("batch", batch);
         tag.putInt("active_slots", activeSlots);
         tag.putInt("max_slots", maxSlots);
         tag.putString("gear_summary", gearSummary.serializedName());
@@ -103,6 +107,8 @@ public record MachineInfoSnapshot(
                 tag.contains("required_processing_level") ? tag.getInt("required_processing_level") : UNSET,
                 tag.contains("heat") ? tag.getInt("heat") : UNSET,
                 tag.contains("required_heat") ? tag.getInt("required_heat") : UNSET,
+                tag.contains("setpoint") ? tag.getInt("setpoint") : UNSET,
+                tag.contains("batch") ? tag.getInt("batch") : UNSET,
                 tag.contains("active_slots") ? tag.getInt("active_slots") : UNSET,
                 tag.contains("max_slots") ? tag.getInt("max_slots") : UNSET,
                 GearSummary.byName(tag.getString("gear_summary")),
@@ -253,6 +259,8 @@ public record MachineInfoSnapshot(
         private int requiredProcessingLevel = UNSET;
         private int heat = UNSET;
         private int requiredHeat = UNSET;
+        private int setpoint = UNSET;
+        private int batch = UNSET;
         private int activeSlots = UNSET;
         private int maxSlots = UNSET;
         private GearSummary gearSummary = GearSummary.NONE;
@@ -317,6 +325,18 @@ public record MachineInfoSnapshot(
             return this;
         }
 
+        /** The temperature the heater holds, from the overheat slider. */
+        public Builder setpoint(int setpoint) {
+            this.setpoint = setpoint;
+            return this;
+        }
+
+        /** Items the current cycle works at once. */
+        public Builder batch(int batch) {
+            this.batch = batch;
+            return this;
+        }
+
         public Builder heat(int heat, int requiredHeat) {
             this.heat = heat;
             this.requiredHeat = requiredHeat;
@@ -375,6 +395,8 @@ public record MachineInfoSnapshot(
                     requiredProcessingLevel,
                     heat,
                     requiredHeat,
+                    setpoint,
+                    batch,
                     activeSlots,
                     maxSlots,
                     gearSummary,

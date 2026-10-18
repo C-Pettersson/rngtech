@@ -9,6 +9,7 @@ import com.rngtech.content.calibration.CalibrationValueRange;
 import com.rngtech.content.calibration.ResonanceCalibratorChassis;
 import com.rngtech.content.item.BatteryCellItem;
 import com.rngtech.content.item.CalibrationPatternItem;
+import com.rngtech.content.item.CraftedTraitOutputs;
 import com.rngtech.content.item.GearParts;
 import com.rngtech.content.item.MachinePartItem;
 import com.rngtech.content.loot.ChallengeContext;
@@ -20,6 +21,7 @@ import com.rngtech.content.recipe.CalibrationRecipeInput;
 import com.rngtech.content.registry.ModBlockEntities;
 import com.rngtech.content.registry.ModDataComponents;
 import com.rngtech.content.registry.ModRecipes;
+import com.rngtech.content.registry.ModTags;
 import com.rngtech.rpg.BatchProcessing;
 import com.rngtech.rpg.ComponentBaseStatCatalog;
 import com.rngtech.rpg.MachineBaseStatCatalog;
@@ -98,6 +100,7 @@ public class ResonanceCalibratorBlockEntity extends BaseMachineBlockEntity
     public static final int STATUS_INSUFFICIENT_STAGE = 7;
     public static final int STATUS_OUTPUT_FULL = 8;
     public static final int STATUS_NO_POWER = 9;
+    public static final int STATUS_FILLING_BATCH = 10;
 
     private static final double NO_BATTERY_PROCESSING_SPEED = 0.85;
     private static final int NO_BATTERY_QUALITY_PENALTY = 10;
@@ -283,7 +286,7 @@ public class ResonanceCalibratorBlockEntity extends BaseMachineBlockEntity
             calibrator.resetCycle();
             calibrator.resetBulkSpeed();
         }
-        if (!calibrator.canMergeOutput(recipe.outputStack())) {
+        if (!calibrator.canMergeOutput(recipe.outputStack()) || calibrator.waitsForFullBatch(recipe, stats)) {
             BaseMachineBlock.setActive(level, pos, state, false);
             return;
         }
@@ -374,11 +377,12 @@ public class ResonanceCalibratorBlockEntity extends BaseMachineBlockEntity
         AdjacentEnergyConnector.Info connector = AdjacentEnergyConnector.forSink(level, worldPosition);
         return MachineInfoSnapshot.builder("resonance_calibrator")
                 .stage(chassis().stage())
+                .batch(recipe == null ? 0 : operationsFor(recipe, stats))
                 .state(
                         MachineInfoSnapshot.workState(
                                 status == STATUS_READY,
                                 getBlockState().getValue(BaseMachineBlock.ACTIVE),
-                                status == STATUS_NO_INPUT
+                                status == STATUS_NO_INPUT || status == STATUS_FILLING_BATCH
                         ),
                         MachineInfoSnapshot.BlockedReason.NONE
                 )
@@ -408,6 +412,7 @@ public class ResonanceCalibratorBlockEntity extends BaseMachineBlockEntity
             case STATUS_INVALID_RECIPE -> "invalid_recipe";
             case STATUS_INSUFFICIENT_STAGE -> "insufficient_stage";
             case STATUS_OUTPUT_FULL -> "output_full";
+            case STATUS_FILLING_BATCH -> "filling_batch";
             case STATUS_NO_POWER -> "no_power";
             default -> "";
         };
@@ -713,7 +718,11 @@ public class ResonanceCalibratorBlockEntity extends BaseMachineBlockEntity
     private ItemStack createOutput(CalibrationRecipe recipe, MachineStatAccumulator stats, int operations) {
         CalibrationRecipeResult recipeResult = recipe.result();
         CalibrationValueRange stabilityRange = currentStabilityRange(recipe, stats);
-        int stability = secondPass(recipe, stats, stabilityRange, stabilityRange.roll(level.random), operations);
+        int rolled = stabilityRange.roll(level.random);
+        if (annealedInput()) {
+            rolled = Math.max(rolled, stabilityRange.roll(level.random));
+        }
+        int stability = secondPass(recipe, stats, stabilityRange, rolled, operations);
         // Master Harmonic: at the full streak, every 8th calibration is perfect.
         if (hasMasteryBehavior("MASTER_HARMONIC") && fullStreak(streak, stats)) {
             int harmonic = streak.harmonic() + 1;
@@ -734,6 +743,12 @@ public class ResonanceCalibratorBlockEntity extends BaseMachineBlockEntity
     private int operationsFor(CalibrationRecipe recipe, MachineStatAccumulator stats) {
         int available = availableOperations(recipe, stats);
         return progress > 0 && lockedBatch > 0 ? Math.min(lockedBatch, available) : available;
+    }
+
+    /** Dense Batching: an idle Calibrator waits until its input, catalyst, and stabilizer stacks fill a full batch. */
+    private boolean waitsForFullBatch(CalibrationRecipe recipe, MachineStatAccumulator stats) {
+        return progress == 0 && hasMasteryBehavior("DENSE_BATCHING")
+                && availableOperations(recipe, stats) < BatchProcessing.fullBatch(stats, false, inputStack().getMaxStackSize());
     }
 
     /** One calibration per point of Batch Size, as far as the input, catalyst, and stabilizer stacks allow. */
@@ -934,6 +949,9 @@ public class ResonanceCalibratorBlockEntity extends BaseMachineBlockEntity
         if (!canMergeOutput(recipe.outputStack())) {
             return STATUS_OUTPUT_FULL;
         }
+        if (waitsForFullBatch(recipe, stats)) {
+            return STATUS_FILLING_BATCH;
+        }
         int energyCost = energyCostPerTick(recipe, stats);
         return consumeWorkingEnergy(energyCost, true) < energyCost ? STATUS_NO_POWER : STATUS_READY;
     }
@@ -1077,6 +1095,12 @@ public class ResonanceCalibratorBlockEntity extends BaseMachineBlockEntity
 
     private boolean hasBatteryCell() {
         return isBatteryCell(batteryCellStack());
+    }
+
+    /** An Annealed circuit calibrates with lucky stability: two rolls, the higher kept. */
+    private boolean annealedInput() {
+        ItemStack input = inputStack();
+        return input.is(ModTags.Items.ANNEALED_CALIBRATION_INPUTS) && CraftedTraitOutputs.isAnnealed(input);
     }
 
     private ItemStack inputStack() {

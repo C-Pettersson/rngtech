@@ -19,7 +19,7 @@
     "id": "rngtech:gold_fluid_connector"
   },
   "processing_ticks": 140,
-  "energy": 1800,
+  "heat": 712,
   "minimum_temperature": 900,
   "safe_maximum_temperature": 1300,
   "required_temperature_stability": 1.0,

@@ -29,7 +29,7 @@ public record AlloyFurnaceRecipe(
         List<CountedIngredient> ingredients,
         ItemStack result,
         int processingTicks,
-        int energy,
+        int heat,
         int minimumComponentStage,
         int minimumTemperature,
         double requiredTemperatureStability,
@@ -159,10 +159,7 @@ public record AlloyFurnaceRecipe(
                                 .fieldOf("processing_ticks")
                                 .orElse(180)
                                 .forGetter(AlloyFurnaceRecipe::processingTicks),
-                        Codec.intRange(1, Integer.MAX_VALUE)
-                                .fieldOf("energy")
-                                .orElse(1800)
-                                .forGetter(AlloyFurnaceRecipe::energy),
+                        RecipeHeat.CODEC.forGetter(recipe -> RecipeHeat.of(recipe.heat())),
                         Codec.intRange(0, Integer.MAX_VALUE)
                                 .fieldOf("minimum_component_stage")
                                 .orElse(2)
@@ -203,7 +200,7 @@ public record AlloyFurnaceRecipe(
                         ingredients,
                         result,
                         processingTicks,
-                        energy,
+                        heatFields,
                         minimumComponentStage,
                         minimumTemperature,
                         requiredTemperatureStability,
@@ -222,7 +219,7 @@ public record AlloyFurnaceRecipe(
                             ingredients,
                             result,
                             processingTicks,
-                            energy,
+                            heatFields.resolve(1800, RecipeHeat.temperatureScale(resolvedTarget)),
                             minimumComponentStage,
                             minimumTemperature,
                             requiredTemperatureStability,
@@ -269,7 +266,7 @@ public record AlloyFurnaceRecipe(
                         CountedIngredient.STREAM_CODEC.apply(ByteBufCodecs.list()).encode(buffer, recipe.ingredients);
                         ItemStack.STREAM_CODEC.encode(buffer, recipe.result);
                         ByteBufCodecs.VAR_INT.encode(buffer, recipe.processingTicks);
-                        ByteBufCodecs.VAR_INT.encode(buffer, recipe.energy);
+                        ByteBufCodecs.VAR_INT.encode(buffer, recipe.heat);
                         ByteBufCodecs.VAR_INT.encode(buffer, recipe.minimumComponentStage);
                         ByteBufCodecs.VAR_INT.encode(buffer, recipe.minimumTemperature);
                         ByteBufCodecs.DOUBLE.encode(buffer, recipe.requiredTemperatureStability);

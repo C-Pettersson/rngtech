@@ -62,6 +62,8 @@ public final class MachineStatAccumulator {
     private final Deque<Component> sources = new ArrayDeque<>();
     private String ascendancy = "";
     private boolean frozen;
+    /** Heated machines shed heat actively, so a Cooling Rate reduction rolled for the old idle-cooling meaning counts as an increase. */
+    private boolean activeCooling;
 
     /**
      * Runs {@code statsFactory} with breakdown recording on: every accumulator it creates remembers which labelled
@@ -108,6 +110,7 @@ public final class MachineStatAccumulator {
             recorded.forEach((stat, terms) -> copy.recorded.put(stat, new ArrayList<>(terms)));
         }
         copy.ascendancy = ascendancy;
+        copy.activeCooling = activeCooling;
         return copy;
     }
 
@@ -495,6 +498,7 @@ public final class MachineStatAccumulator {
         MachineStatAccumulator stats = new MachineStatAccumulator();
         applyBaseMachineValues(stats);
         applyBaseFurnaceValues(stats);
+        applyHeatedMachineValues(stats);
         stats.baseValues.put(MachineStat.INPUT_SLOTS, 1.0);
         stats.baseValues.put(MachineStat.OUTPUT_SLOTS, 1.0);
         stats.baseValues.put(MachineStat.ENERGY_CAPACITY, (double) energyCapacity);
@@ -513,6 +517,7 @@ public final class MachineStatAccumulator {
         MachineStatAccumulator stats = new MachineStatAccumulator();
         applyBaseMachineValues(stats);
         applyBaseFurnaceValues(stats);
+        applyHeatedMachineValues(stats);
         stats.baseValues.put(MachineStat.INPUT_SLOTS, 0.0);
         stats.baseValues.put(MachineStat.OUTPUT_SLOTS, 1.0);
         stats.baseValues.put(MachineStat.ENERGY_CAPACITY, (double) chassis.energyCapacity());
@@ -521,6 +526,7 @@ public final class MachineStatAccumulator {
         stats.baseValues.put(MachineStat.ENERGY_USAGE, chassis.energyUsage());
         stats.baseValues.put(MachineStat.EFFICIENCY, 1.0);
         stats.baseValues.put(MachineStat.HEAT_TRANSFER, chassis.heatTransfer());
+        stats.baseValues.put(MachineStat.THERMAL_CONDUCTIVITY, chassis.heatTransfer());
         stats.baseValues.put(MachineStat.MAX_TEMPERATURE, 300.0);
         stats.baseValues.put(MachineStat.TEMPERATURE_STABILITY, 1.0);
         stats.baseValues.put(MachineStat.STABILITY, chassis.stability());
@@ -531,6 +537,7 @@ public final class MachineStatAccumulator {
         MachineStatAccumulator stats = new MachineStatAccumulator();
         applyBaseMachineValues(stats);
         applyBaseFurnaceValues(stats);
+        applyHeatedMachineValues(stats);
         stats.baseValues.put(MachineStat.INPUT_SLOTS, 2.0);
         stats.baseValues.put(MachineStat.OUTPUT_SLOTS, 0.0);
         stats.baseValues.put(MachineStat.PROCESSING_LEVEL, 0.0);
@@ -677,6 +684,7 @@ public final class MachineStatAccumulator {
         MachineStatAccumulator stats = new MachineStatAccumulator();
         applyBaseMachineValues(stats);
         applyBaseFurnaceValues(stats);
+        applyHeatedMachineValues(stats);
         stats.baseValues.put(
                 MachineStat.INPUT_SLOTS,
                 (double) Math.max(RNGTechConfig.FURNACE_BASE_INPUT_SLOTS.get(), chassis.processingSlots())
@@ -684,6 +692,7 @@ public final class MachineStatAccumulator {
         stats.baseValues.put(MachineStat.OUTPUT_SLOTS, (double) chassis.processingSlots());
         stats.baseValues.put(MachineStat.ADDON_SLOTS, (double) chassis.heatCoreSlots());
         stats.baseValues.put(MachineStat.HEAT_TRANSFER, chassis.heatTransfer());
+        stats.baseValues.put(MachineStat.THERMAL_CONDUCTIVITY, chassis.heatTransfer());
         stats.baseValues.put(
                 MachineStat.PROCESSING_SPEED,
                 chassis == FurnaceChassisMaterial.BRONZE ? 1.0 : chassis.processingSpeed()
@@ -822,7 +831,7 @@ public final class MachineStatAccumulator {
         stats.baseValues.put(MachineStat.MAX_TEMPERATURE, FURNACE_BASE_MAX_TEMPERATURE);
         stats.baseValues.put(MachineStat.TEMPERATURE_STABILITY, 1.0);
         stats.baseValues.put(MachineStat.FUEL_EFFICIENCY, 1.0);
-        stats.baseValues.put(MachineStat.WARMUP_TIME, 1.0);
+        stats.baseValues.put(MachineStat.THERMAL_MASS, 1.0);
         stats.baseValues.put(MachineStat.COOLING_RATE, 1.0);
         stats.baseValues.put(MachineStat.OVERHEAT_TOLERANCE, 1.0);
     }
@@ -885,6 +894,10 @@ public final class MachineStatAccumulator {
     }
 
     private void apply(MachineModifierEffect effect) {
+        if (activeCooling && effect.stat() == MachineStat.COOLING_RATE) {
+            applyActiveCooling(effect);
+            return;
+        }
         switch (effect.operation()) {
             case ADD -> add(effect.stat(), effect.value());
             case INCREASED_PERCENT -> addIncreasedPercent(effect.stat(), effect.value());
@@ -892,6 +905,22 @@ public final class MachineStatAccumulator {
             case MORE -> addMore(effect.stat(), effect.value());
             case LESS -> addMore(effect.stat(), effect.value());
         }
+    }
+
+    /** On a heated machine every Cooling Rate modifier speeds active cooling: reductions apply as the matching increase. */
+    private void applyActiveCooling(MachineModifierEffect effect) {
+        double value = effect.value();
+        switch (effect.operation()) {
+            case ADD -> add(MachineStat.COOLING_RATE, value);
+            case INCREASED_PERCENT, DECREASED_PERCENT -> addIncreasedPercent(MachineStat.COOLING_RATE, Math.abs(value));
+            case MORE, LESS -> addMore(MachineStat.COOLING_RATE, value > 0.0 && value < 1.0 ? 1.0 / value : value);
+        }
+    }
+
+    /** Marks the Furnace, Alloy Furnace, Metal Press, and Melter, which run on the shared heat engine. */
+    private static void applyHeatedMachineValues(MachineStatAccumulator stats) {
+        stats.activeCooling = true;
+        stats.baseValues.put(MachineStat.THERMAL_CONDUCTIVITY, 1.0);
     }
 
     public double value(MachineStat stat) {

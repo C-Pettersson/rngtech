@@ -744,14 +744,16 @@ public class ForestryCartStationBlockEntity extends BlockEntity implements MenuP
     }
 
     /**
-     * Bone meal in the bone meal slot drains into the fertilizer store. Bone meal an older station left in the
-     * plantables slot drains too, so it never blocks saplings.
+     * Bone meal or Urea in the bone meal slot drains into the fertilizer store, Urea as four bone meal each. Bone meal
+     * an older station left in the plantables slot drains too, so it never blocks saplings.
      */
     private void absorbSlotFertilizer() {
         for (int slot : new int[] {SLOT_FERTILIZER_INPUT, SLOT_SAPLING}) {
             ItemStack stack = processInventory.getStackInSlot(slot);
             if (ForestryCartEntity.isFertilizerStack(stack)) {
-                int accepted = storeFertilizer(stack.getCount(), false);
+                int items = ForestryCartEntity.fertilizerItemsFitting(stack, ForestryCartEntity.FERTILIZER_CAPACITY - fertilizer);
+                storeFertilizer(items * ForestryCartEntity.fertilizerUnits(stack), false);
+                int accepted = items;
                 if (accepted > 0) {
                     processInventory.setStackInSlot(slot, stack.copyWithCount(stack.getCount() - accepted));
                 }

@@ -23,6 +23,11 @@ public final class MachineTraitRoller {
     }
 
     public static MachineTraits roll(ModifierEligibilityProfile profile, int componentStage, RandomSource random) {
+        return roll(profile, componentStage, random, false);
+    }
+
+    /** {@code luckyRefinementPotential}: RP rolls twice and keeps the higher, as Annealed items do. */
+    public static MachineTraits roll(ModifierEligibilityProfile profile, int componentStage, RandomSource random, boolean luckyRefinementPotential) {
         RollTuning tuning = tuningFor(profile);
         Rarity rarity = rollRarity(componentStage, random);
         List<MachineModifier> modifiers = new ArrayList<>();
@@ -30,7 +35,9 @@ public final class MachineTraitRoller {
         rollTraits(profile, rarity, componentStage, tuning, random, modifiers, behaviors);
         return new MachineTraits(
                 rarity,
-                rollRefinementPotential(componentStage, tuning, random),
+                luckyRefinementPotential
+                        ? Math.max(rollRefinementPotential(componentStage, tuning, random), rollRefinementPotential(componentStage, tuning, random))
+                        : rollRefinementPotential(componentStage, tuning, random),
                 modifiers,
                 behaviors
         );
@@ -220,8 +227,9 @@ public final class MachineTraitRoller {
                     BLOCK_FILTER_SLOTS,
                     CONTROL,
                     HEAT_TRANSFER,
+                    THERMAL_CONDUCTIVITY,
                     HEAT_ISOLATION,
-                    WARMUP_TIME,
+                    THERMAL_MASS,
                     COOLING_RATE,
                     BATTERY_SLOTS,
                     EFFICIENCY,
@@ -272,8 +280,7 @@ public final class MachineTraitRoller {
                 || stat == MachineStat.FE_USAGE
                 || stat == MachineStat.ORE_BURST_FE_USAGE
                 || stat == MachineStat.IDLE_LOSS
-                || stat == MachineStat.WARMUP_TIME
-                || stat == MachineStat.COOLING_RATE
+                || stat == MachineStat.THERMAL_MASS
                 ? ModifierOperation.DECREASED_PERCENT
                 : ModifierOperation.INCREASED_PERCENT;
     }

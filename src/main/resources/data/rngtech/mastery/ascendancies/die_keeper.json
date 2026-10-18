@@ -175,6 +175,30 @@
             "behaviors": [
                 "PRODUCTION_DIE"
             ]
+        },
+        {
+            "id": "purge_line",
+            "kind": "SMALL",
+            "parent": "mold_rack",
+            "x": 0,
+            "y": 1,
+            "effects": [
+                {
+                    "stat": "ENERGY_USAGE",
+                    "operation": "DECREASED_PERCENT",
+                    "value": 5
+                }
+            ]
+        },
+        {
+            "id": "bright_anneal",
+            "kind": "NOTABLE",
+            "parent": "purge_line",
+            "x": 0,
+            "y": 2,
+            "behaviors": [
+                "BRIGHT_ANNEAL"
+            ]
         }
     ]
 }

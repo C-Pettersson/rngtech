@@ -66,7 +66,7 @@ The network connectors have recipes only when their mod is installed:
 
 Every other Energy, Fluid, and Item Connector is pressed in a [Metal Press](metal-press.md) with a Connector Mold. Energy Connectors start from a coil, Fluid Connectors from a casing, and Item Connectors from a gear.
 
-{{ processing("metal_press", input="rngtech:connector_mold", columns=["processing_ticks", "energy", "minimum_temperature"]) }}
+{{ processing("metal_press", input="rngtech:connector_mold", columns=["processing_ticks", "heat", "minimum_temperature"]) }}
 
 ### Breaking
 

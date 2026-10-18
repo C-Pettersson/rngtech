@@ -2,7 +2,7 @@
 navigation:
   title: "Automation"
   parent: algae-photobioreactor.md
-  position: 3
+  position: 4
   icon: rngtech:algae_photobioreactor
 ---
 
@@ -10,7 +10,7 @@ navigation:
 
 | Side | Behavior |
 |---|---|
-| Top and sides | Fill the water and carbon tanks with fluid. Insert filled water or carbon-gas containers. Insert Algae Biomass into the output slot. |
+| Top and sides | Fill the water and carbon tanks with fluid. Insert filled water or carbon-gas containers. Insert Algae Biomass into the output slot and Urea into the Urea slot. |
 | Bottom | Extracts Algae Biomass and empty containers. |
 
 Pipes cannot drain fluid back out of the tanks. The Photobioreactor has no FE connection, and the Bio Chamber slot is not reachable by automation. The back of the machine has a port plate sized for a Universal Connector, the tidiest place to attach one.

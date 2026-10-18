@@ -363,7 +363,7 @@ public final class MachineBaseStatCatalog {
         if (item instanceof FurnaceChassisBlockItem) {
             return List.of(
                     MachineStat.HEAT_TRANSFER,
-                    MachineStat.WARMUP_TIME,
+                    MachineStat.THERMAL_MASS,
                     MachineStat.COOLING_RATE,
                     MachineStat.PROCESSING_SPEED,
                     MachineStat.ENERGY_USAGE,
@@ -479,7 +479,7 @@ public final class MachineBaseStatCatalog {
                         MachineStat.PROCESSING_SPEED,
                         MachineStat.ENERGY_USAGE,
                         MachineStat.HEAT_TRANSFER,
-                        MachineStat.WARMUP_TIME,
+                        MachineStat.THERMAL_MASS,
                         MachineStat.COOLING_RATE,
                         MachineStat.STABILITY
                 );
@@ -488,7 +488,7 @@ public final class MachineBaseStatCatalog {
                         MachineStat.PROCESSING_SPEED,
                         MachineStat.ENERGY_USAGE,
                         MachineStat.HEAT_TRANSFER,
-                        MachineStat.WARMUP_TIME,
+                        MachineStat.THERMAL_MASS,
                         MachineStat.COOLING_RATE,
                         MachineStat.STABILITY
                 );
