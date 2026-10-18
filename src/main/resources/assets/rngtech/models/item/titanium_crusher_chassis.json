@@ -1,3 +1,13 @@
 {
-  "parent": "rngtech:block/titanium_crusher_chassis"
+  "parent": "rngtech:item/crusher_template",
+  "textures": {
+    "particle": "rngtech:block/crusher/shell/titanium",
+    "shell": "rngtech:block/crusher/shell/titanium",
+    "trim": "rngtech:block/crusher/trim/titanium",
+    "rim": "rngtech:block/crusher/rim/arclite",
+    "roll": "rngtech:block/crusher/roll/titanium",
+    "roll_v": "rngtech:block/crusher/roll/titanium_v",
+    "roll_end": "rngtech:block/crusher/roll/titanium_end",
+    "hub": "rngtech:block/crusher/roll/titanium_hub"
+  }
 }

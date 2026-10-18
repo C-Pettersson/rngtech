@@ -45,21 +45,17 @@ The **Crusher** breaks ores and raw metals into crushed material, and crushed ma
 
 Every Crusher runs on FE and needs a Crush Head installed. Like every RNGTech machine, each Crusher you craft rolls its own [rarity and affixes](rngtech:rarity-and-affixes.md), and it can level up through [Machine Mastery](rngtech:machine-mastery.md).
 
+You can read a Crusher from the outside. The installed Crush Head is the pair of toothed rolls in the open front, in the head's material; with no head you see only the bare shafts. The rolls turn toward each other while the Crusher works, faster when a craft is shorter, and grit of the input falls below them. Items in the input slot wait in the hopper on top and shake while they are crushed, and finished items collect in the bin at the bottom of the front. A jam stops the rolls with a shudder, wedges the input between them, puffs smoke, and blinks the lamp above the opening red. Facing the front, the Battery Cell lies in the cradle on the left with a charge meter beside it, and the motor sits on the right. Cables connect on any side, but the cable port is drawn on the back.
+
+Each chassis has its own casing, and the rim of its hopper is the metal at the top of its recipe. The Iron, Copper, and Bronze Crushers stand on smooth stone. The Tungstensteel and Exotic Crushers, which crush several items per cycle, have a second, smaller pair of rolls under the first. The <ItemLink id="rngtech:wooden_crusher_chassis" /> is a plank frame on wooden posts instead, with no lamp or meter; a Flint Crush Head shows as wooden rolls studded with flint.
+
 ## Usage
 
 - [Crushing](rngtech:crusher/crushing.md)
 - [Hardness](rngtech:crusher/hardness.md)
 - [Output amount](rngtech:crusher/output-amount.md)
 - [Stages](rngtech:crusher/stages.md)
-
-### Gear
-
-The Gear tab has two slots:
-
-- one **Crush Head** slot. A head is required. Its stage cannot be higher than the chassis stage, so a Wooden Crusher only takes a Flint Crush Head.
-- one **Battery Cell** slot. Without a cell, the Crusher keeps only a tiny internal buffer and loses a quarter of its bonus output.
-
-Crush Heads roll their own affixes, and their stats add to the Crusher's. See [Gear](rngtech:gear.md) for how Gear works.
+- [Gear](rngtech:crusher/gear.md)
 
 ### Automation
 
@@ -70,9 +66,7 @@ Crush Heads roll their own affixes, and their stats add to the Crusher's. See [G
 | Sides | Inserts Battery Cells. |
 | Any | Accepts FE, for example from a [Universal Cable](rngtech:universal-cable.md). |
 
-### Mastery and Ascendancies
-
-Each completed crushing job earns Crusher Mastery XP, and you spend the points on the shared [Machine Mastery](rngtech:machine-mastery.md) tree. Reversible ingot-to-dust recipes earn no XP. Some Crusher keystones change how Gear works, for example removing the Battery Cell slot or allowing a Crush Head one stage higher than the chassis. Crushers choose between the **Rockbreaker** and **Assayer** [ascendancies](rngtech:machine-mastery.md#ascendancies).
+- [Mastery and Ascendancies](rngtech:crusher/mastery-and-ascendancies.md)
 
 ## Obtaining
 

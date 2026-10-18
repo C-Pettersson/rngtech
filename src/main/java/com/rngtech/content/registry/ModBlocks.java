@@ -575,7 +575,8 @@ public final class ModBlocks {
         BlockBehaviour.Properties properties = BlockBehaviour.Properties.of()
                 .mapColor(material == CrusherChassisMaterial.WOODEN ? MapColor.WOOD : MapColor.METAL)
                 .strength(material == CrusherChassisMaterial.WOODEN ? 1.5F : 3.5F)
-                .sound(material == CrusherChassisMaterial.WOODEN ? SoundType.WOOD : SoundType.METAL);
+                .sound(material == CrusherChassisMaterial.WOODEN ? SoundType.WOOD : SoundType.METAL)
+                .noOcclusion();
         return properties;
     }
 
