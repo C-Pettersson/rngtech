@@ -1,12 +1,9 @@
 {
-  "parent": "minecraft:block/cube",
+  "parent": "rngtech:block/resonance_calibrator/triple",
   "textures": {
-    "down": "rngtech:block/resonance_calibrator_chassis/bottom/tungstensteel_resonance_calibrator_chassis",
-    "up": "rngtech:block/resonance_calibrator_chassis/top/tungstensteel_resonance_calibrator_chassis",
-    "north": "rngtech:block/resonance_calibrator_chassis/front/tungstensteel_resonance_calibrator_chassis",
-    "south": "rngtech:block/resonance_calibrator_chassis/side/tungstensteel_resonance_calibrator_chassis",
-    "east": "rngtech:block/resonance_calibrator_chassis/side/tungstensteel_resonance_calibrator_chassis",
-    "west": "rngtech:block/resonance_calibrator_chassis/side/tungstensteel_resonance_calibrator_chassis",
-    "particle": "rngtech:block/resonance_calibrator_chassis/front/tungstensteel_resonance_calibrator_chassis"
+    "particle": "rngtech:block/resonance_calibrator/shell/tungstensteel",
+    "shell": "rngtech:block/resonance_calibrator/shell/tungstensteel",
+    "trim": "rngtech:block/resonance_calibrator/trim/tungstensteel",
+    "crown": "rngtech:block/resonance_calibrator/crown/tungstensteel"
   }
 }

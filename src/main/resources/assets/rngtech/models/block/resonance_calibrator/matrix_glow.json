@@ -1,0 +1,55 @@
+{
+  "textures": {
+    "particle": "#glow",
+    "glow": "rngtech:block/resonance_calibrator/fx/core"
+  },
+  "elements": [
+    {
+      "from": [
+        0.78,
+        6.205,
+        6.53
+      ],
+      "to": [
+        3.22,
+        7.045,
+        8.97
+      ],
+      "faces": {
+        "north": {
+          "texture": "#glow",
+          "tintindex": 0
+        },
+        "south": {
+          "texture": "#glow",
+          "tintindex": 0
+        },
+        "east": {
+          "texture": "#glow",
+          "tintindex": 0
+        },
+        "west": {
+          "texture": "#glow",
+          "tintindex": 0
+        },
+        "up": {
+          "texture": "#glow",
+          "tintindex": 0
+        },
+        "down": {
+          "texture": "#glow",
+          "tintindex": 0
+        }
+      },
+      "rotation": {
+        "origin": [
+          2.0,
+          6.625,
+          7.75
+        ],
+        "axis": "y",
+        "angle": 45
+      }
+    }
+  ]
+}
