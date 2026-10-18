@@ -37,6 +37,8 @@ public record MachineInfoSnapshot(
         int maxSlots,
         GearSummary gearSummary,
         OutputSummary outputSummary,
+        int outputPerMinuteTenths,
+        boolean fluidOutputRate,
         String refinementRarity,
         int refinementPotential,
         int affixCount,
@@ -73,6 +75,10 @@ public record MachineInfoSnapshot(
         tag.putInt("max_slots", maxSlots);
         tag.putString("gear_summary", gearSummary.serializedName());
         tag.putString("output_summary", outputSummary.serializedName());
+        if (outputPerMinuteTenths > 0) {
+            tag.putInt("output_rate", outputPerMinuteTenths);
+            tag.putBoolean("output_rate_fluid", fluidOutputRate);
+        }
         tag.putString("refinement_rarity", refinementRarity);
         tag.putInt("refinement_potential", refinementPotential);
         tag.putInt("affix_count", affixCount);
@@ -113,6 +119,8 @@ public record MachineInfoSnapshot(
                 tag.contains("max_slots") ? tag.getInt("max_slots") : UNSET,
                 GearSummary.byName(tag.getString("gear_summary")),
                 OutputSummary.byName(tag.getString("output_summary")),
+                tag.getInt("output_rate"),
+                tag.getBoolean("output_rate_fluid"),
                 tag.getString("refinement_rarity"),
                 tag.getInt("refinement_potential"),
                 tag.getInt("affix_count"),
@@ -265,6 +273,8 @@ public record MachineInfoSnapshot(
         private int maxSlots = UNSET;
         private GearSummary gearSummary = GearSummary.NONE;
         private OutputSummary outputSummary = OutputSummary.NONE;
+        private int outputPerMinuteTenths;
+        private boolean fluidOutputRate;
         private String refinementRarity = "normal";
         private int refinementPotential;
         private int affixCount;
@@ -359,6 +369,20 @@ public record MachineInfoSnapshot(
             return this;
         }
 
+        /** Expected items per minute for the current cycle, in tenths. */
+        public Builder outputRate(int perMinuteTenths) {
+            this.outputPerMinuteTenths = Math.max(0, perMinuteTenths);
+            this.fluidOutputRate = false;
+            return this;
+        }
+
+        /** Expected mB per minute for the current cycle, in tenths. */
+        public Builder fluidOutputRate(int perMinuteTenths) {
+            this.outputPerMinuteTenths = Math.max(0, perMinuteTenths);
+            this.fluidOutputRate = true;
+            return this;
+        }
+
         public Builder refinement(MachineTraits traits) {
             refinementRarity = traits.rarity().getSerializedName();
             corrupted = traits.isCorrupted();
@@ -401,6 +425,8 @@ public record MachineInfoSnapshot(
                     maxSlots,
                     gearSummary,
                     outputSummary,
+                    outputPerMinuteTenths,
+                    fluidOutputRate,
                     refinementRarity,
                     refinementPotential,
                     affixCount,

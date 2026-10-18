@@ -543,16 +543,13 @@ public class CrusherScreen extends AbstractContainerScreen<CrusherMenu> {
         if (menu.jamTicks() > 0) {
             return List.of(Component.translatable("rngtech.crusher.tooltip.jammed", menu.jamTicks()));
         }
-        int ticks = menu.processingTicks();
-        List<Component> lines = MachineScreenStyle.withTimeRemaining(progressTooltip(), menu.progress(), ticks);
-        int outputPerMinute = menu.outputPerMinuteTenths();
-        if (ticks > 0 && outputPerMinute > 0) {
-            lines.add(Component.translatable(
-                    ticks <= 1 ? "rngtech.crusher.tooltip.output_rate.capped" : "rngtech.crusher.tooltip.output_rate",
-                    String.format(Locale.ROOT, "%.1f", outputPerMinute / 10.0D)
-            ));
-        }
-        return lines;
+        return MachineScreenStyle.withOutputRate(
+                progressTooltip(),
+                menu.progress(),
+                menu.processingTicks(),
+                menu.outputPerMinuteTenths(),
+                false
+        );
     }
 
     private Component progressTooltip() {

@@ -693,7 +693,13 @@ public class FurnaceScreen extends AbstractContainerScreen<FurnaceMenu> {
     }
 
     private List<Component> progressTooltipLines(int lane) {
-        return MachineScreenStyle.withTimeRemaining(progressTooltip(lane), menu.progress(lane), menu.processingTicks(lane));
+        return MachineScreenStyle.withOutputRate(
+                progressTooltip(lane),
+                menu.progress(lane),
+                menu.processingTicks(lane),
+                menu.outputPerMinuteTenths(lane),
+                false
+        );
     }
 
     private Component progressTooltip(int lane) {

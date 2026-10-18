@@ -3,11 +3,27 @@ package com.rngtech.benchmark;
 import com.rngtech.RNGTech;
 import com.rngtech.content.block.BaseMachineBlock;
 import com.rngtech.content.block.CableBlock;
+import com.rngtech.content.blockentity.AlloyFurnaceBlockEntity;
+import com.rngtech.content.blockentity.AmmoniaFuelCellBlockEntity;
+import com.rngtech.content.blockentity.BatteryAssemblerBlockEntity;
+import com.rngtech.content.blockentity.BioGeneratorBlockEntity;
 import com.rngtech.content.blockentity.CableBlockEntity;
+import com.rngtech.content.blockentity.CavitationGeneratorBlockEntity;
+import com.rngtech.content.blockentity.ComponentRecyclerBlockEntity;
+import com.rngtech.content.blockentity.CompressorTankBlockEntity;
+import com.rngtech.content.blockentity.CorrosionCellBlockEntity;
 import com.rngtech.content.blockentity.CrusherBlockEntity;
 import com.rngtech.content.blockentity.DebugBatteryBlockEntity;
+import com.rngtech.content.blockentity.ExoticAffixForgeBlockEntity;
+import com.rngtech.content.blockentity.FurnaceBlockEntity;
+import com.rngtech.content.blockentity.GasChemistryBlockEntity;
+import com.rngtech.content.blockentity.MelterBlockEntity;
+import com.rngtech.content.blockentity.MetalPressBlockEntity;
+import com.rngtech.content.blockentity.ResonanceCalibratorBlockEntity;
+import com.rngtech.content.blockentity.SolidFuelBurnerBlockEntity;
 import com.rngtech.content.blockentity.UniversalConnectorBlockEntity;
 import com.rngtech.content.cable.EnergyConnectorTier;
+import com.rngtech.content.energy.BatteryCellMaterial;
 import com.rngtech.content.energy.SolarPanelMaterial;
 import com.rngtech.content.machine.CrushHeadMaterial;
 import com.rngtech.content.machine.CrusherChassisMaterial;
@@ -24,7 +40,9 @@ import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.neoforged.neoforge.items.ItemStackHandler;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -38,6 +56,9 @@ import java.util.Set;
  * <p>Layout, in blocks from the scene origin. The main grid is {@value #GRID} by {@value #GRID} with a cable line every
  * {@value #LINE_SPACING} blocks. One machine sits in each cell, beside a line cable that carries a Universal Connector
  * facing it. The solar array lies east of the grid on the same plane, joined by one cable line.
+ *
+ * <p>Every working Crusher and every idle machine with a Battery Cell slot holds an empty {@link #CELL} Battery Cell,
+ * which the network charges, so the cell paths of working and idle machines are both measured.
  */
 final class BenchmarkScene {
     static final int GRID = 65;
@@ -56,6 +77,7 @@ final class BenchmarkScene {
     private static final int BRIDGE_LINE_Z = 32;
     private static final long DAY_TIME = 6000L;
     private static final int COAL_STACK = 64;
+    private static final BatteryCellMaterial CELL = BatteryCellMaterial.IRON;
 
     private final ServerLevel level;
     private final BlockPos origin;
@@ -75,6 +97,8 @@ final class BenchmarkScene {
         int workingCrushers;
         int idleMachines;
         int batteries;
+        int workingCrusherCells;
+        int idleMachineCells;
         int solarControllers;
         int solarPanels;
     }
@@ -207,6 +231,9 @@ final class BenchmarkScene {
                     new ItemStack(ModItems.crushHead(CrushHeadMaterial.FLINT).get())
             );
             crusher.getInventory().setStackInSlot(CrusherBlockEntity.SLOT_INPUT_A, new ItemStack(Items.COAL, COAL_STACK));
+            if (installCell(crusher.getInventory(), CrusherBlockEntity.SLOT_FUEL)) {
+                counts.workingCrusherCells++;
+            }
             workingCrushers.add(crusher);
             counts.workingCrushers++;
         }
@@ -215,6 +242,43 @@ final class BenchmarkScene {
     private void placeIdleMachine(BlockPos pos, Block block) {
         level.setBlock(pos, block.defaultBlockState(), Block.UPDATE_CLIENTS);
         counts.idleMachines++;
+        CellSlot cellSlot = cellSlot(level.getBlockEntity(pos));
+        if (cellSlot != null && installCell(cellSlot.inventory(), cellSlot.slot())) {
+            counts.idleMachineCells++;
+        }
+    }
+
+    /** The Battery Cell slot of an idle machine, or null for a machine that holds no cell. */
+    private static CellSlot cellSlot(BlockEntity blockEntity) {
+        return switch (blockEntity) {
+            case AlloyFurnaceBlockEntity machine -> new CellSlot(machine.getGearInventory(), AlloyFurnaceBlockEntity.SLOT_BATTERY_CELL);
+            case AmmoniaFuelCellBlockEntity machine -> new CellSlot(machine.getGearInventory(), AmmoniaFuelCellBlockEntity.SLOT_BATTERY_CELL);
+            case BatteryAssemblerBlockEntity machine -> new CellSlot(machine.getGearInventory(), BatteryAssemblerBlockEntity.SLOT_BATTERY_CELL);
+            case BioGeneratorBlockEntity machine -> new CellSlot(machine.getGearInventory(), BioGeneratorBlockEntity.SLOT_BATTERY_CELL);
+            case CavitationGeneratorBlockEntity machine -> new CellSlot(machine.getGearInventory(), CavitationGeneratorBlockEntity.SLOT_BATTERY_CELL);
+            case ComponentRecyclerBlockEntity machine -> new CellSlot(machine.getGearInventory(), ComponentRecyclerBlockEntity.SLOT_BATTERY_CELL);
+            case CompressorTankBlockEntity machine -> new CellSlot(machine.getGearInventory(), CompressorTankBlockEntity.SLOT_BATTERY_CELL);
+            case CorrosionCellBlockEntity machine -> new CellSlot(machine.getGearInventory(), CorrosionCellBlockEntity.SLOT_BATTERY_CELL);
+            case CrusherBlockEntity machine -> new CellSlot(machine.getInventory(), CrusherBlockEntity.SLOT_FUEL);
+            case ExoticAffixForgeBlockEntity machine -> new CellSlot(machine.getGearInventory(), ExoticAffixForgeBlockEntity.SLOT_BATTERY_CELL);
+            case FurnaceBlockEntity machine -> new CellSlot(machine.getInventory(), FurnaceBlockEntity.SLOT_FUEL);
+            case GasChemistryBlockEntity machine -> new CellSlot(machine.getGearInventory(), GasChemistryBlockEntity.SLOT_BATTERY_CELL);
+            case MelterBlockEntity machine -> new CellSlot(machine.getGearInventory(), MelterBlockEntity.SLOT_BATTERY_CELL);
+            case MetalPressBlockEntity machine -> new CellSlot(machine.getGearInventory(), MetalPressBlockEntity.SLOT_BATTERY_CELL);
+            case ResonanceCalibratorBlockEntity machine -> new CellSlot(machine.getGearInventory(), ResonanceCalibratorBlockEntity.SLOT_BATTERY_CELL);
+            case SolidFuelBurnerBlockEntity machine -> new CellSlot(machine.getGearInventory(), SolidFuelBurnerBlockEntity.SLOT_BATTERY_CELL);
+            case null, default -> null;
+        };
+    }
+
+    /** Installs an empty cell if the slot accepts it, as a player or hopper would. */
+    private static boolean installCell(ItemStackHandler inventory, int slot) {
+        ItemStack cell = new ItemStack(ModItems.batteryCell(CELL).get());
+        if (!inventory.isItemValid(slot, cell)) {
+            return false;
+        }
+        inventory.setStackInSlot(slot, cell);
+        return true;
     }
 
     /** Controllers every {@value #SOLAR_TILE} blocks, panels everywhere else, one cable under each controller. */
@@ -294,6 +358,9 @@ final class BenchmarkScene {
 
     private BlockPos at(int x, int y, int z) {
         return origin.offset(x, y, z);
+    }
+
+    private record CellSlot(ItemStackHandler inventory, int slot) {
     }
 
     private record Placement(BlockPos cable, Direction face, EnergyConnectorTier tier) {
