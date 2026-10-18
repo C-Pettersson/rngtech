@@ -12,7 +12,8 @@ import org.joml.Vector3f;
 
 /**
  * Drawing shared by the Furnace, Alloy Furnace, and Metal Press renderers: the incandescent colour of a heat, the wobble, the heat bar,
- * the Nitrogen cylinder's fill and valve collar, and the quad and box helpers. Positions are in model pixels.
+ * the Nitrogen cylinder's fill and valve collar, and the quad and box helpers, which the Resonance Calibrator renderer
+ * also uses. Positions are in model pixels.
  */
 final class FurnaceGlow {
     /** Heats where the glow colour changes: dull red, cherry, orange, yellow, and near white. */
