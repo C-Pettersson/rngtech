@@ -4,11 +4,11 @@
 
 PRD status: Accepted
 
-Implementation status: Planned
+Implementation status: Prototype
 
 Release: 2.0
 
-Last updated: 2026-09-29
+Last updated: 2026-10-18
 
 ## Summary
 
