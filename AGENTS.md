@@ -145,4 +145,4 @@ with Temurin Java 21 on Ubuntu. CI also runs `npm run repo:check`, `npm run modd
 
 A separate `gametest` job runs `./gradlew runGameTestServer` (the GameTests in `com.rngtech.gametest`), which fails when the server exits without running them; run it locally after changing machine behavior.
 
-The Build workflow runs on pull requests, not on pushes to `main`; the ruleset requires up-to-date branches, so the squashed commit was already tested. Its Gradle job is skipped for pull requests that only touch docs, wiki, or docs tooling files.
+The Build workflow runs on pull requests, not on pushes to `main`; the ruleset requires up-to-date branches, so the squashed commit was already tested. Its Gradle job is skipped for pull requests that only touch docs, wiki, the generated in-game guide (`src/guide/`), or docs tooling files.
