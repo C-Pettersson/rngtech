@@ -72,6 +72,8 @@ public final class TickBenchmark {
         sceneInfo.addProperty("working_crushers", counts.workingCrushers);
         sceneInfo.addProperty("idle_machines", counts.idleMachines);
         sceneInfo.addProperty("debug_batteries", counts.batteries);
+        sceneInfo.addProperty("working_crusher_battery_cells", counts.workingCrusherCells);
+        sceneInfo.addProperty("idle_machine_battery_cells", counts.idleMachineCells);
         sceneInfo.addProperty("solar_controllers", counts.solarControllers);
         sceneInfo.addProperty("solar_panels", counts.solarPanels);
         CableBlockEntity.NetworkDebugSnapshot network = scene.networkSnapshot();
