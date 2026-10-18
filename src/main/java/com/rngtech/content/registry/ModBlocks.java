@@ -709,14 +709,16 @@ public final class ModBlocks {
     private static BlockBehaviour.Properties componentRecyclerProperties(ComponentRecyclerChassis chassis) {
         if (chassis.manual()) {
             return BlockBehaviour.Properties.of()
-                    .mapColor(MapColor.STONE)
+                    .mapColor(MapColor.WOOD)
                     .strength(2.0F)
-                    .sound(SoundType.STONE);
+                    .sound(SoundType.WOOD)
+                    .noOcclusion();
         }
         return BlockBehaviour.Properties.of()
                 .mapColor(MapColor.METAL)
                 .strength(3.5F)
-                .sound(SoundType.METAL);
+                .sound(SoundType.METAL)
+                .noOcclusion();
     }
 
     private static Map<String, DeferredBlock<Block>> registerMaterialOreBlocks() {

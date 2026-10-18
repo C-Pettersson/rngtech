@@ -2,7 +2,7 @@
 navigation:
   title: "Gear"
   parent: component-recycler.md
-  position: 2
+  position: 3
   icon: rngtech:iron_component_recycler
 ---
 

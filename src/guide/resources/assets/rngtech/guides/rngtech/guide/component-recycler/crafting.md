@@ -2,7 +2,7 @@
 navigation:
   title: "Crafting"
   parent: component-recycler.md
-  position: 3
+  position: 5
   icon: rngtech:iron_component_recycler
 ---
 
