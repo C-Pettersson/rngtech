@@ -65,6 +65,8 @@ navigation:
 
 **Bottleneck.** The Reformer stops when its Carbon Monoxide tank is full. Send the Carbon Monoxide back to the [Algae Photobioreactor](rngtech:algae-photobioreactor.md), where it is the fastest carbon input. That closes the loop: each reform makes as much Carbon Monoxide as one Algae Biomass needs at rated aeration, and that biomass melts into the next batch of Methane. A Photobioreactor grows biomass more slowly than a Reformer uses Methane, so run two or more per Reformer, and keep them in light. The [Syngas Combustor](rngtech:syngas-combustor.md) can burn spare Carbon Monoxide, but it gets little FE from it. What the loop cannot make for itself is Organic Reagent, so keep a crop farm feeding the Crusher.
 
+**Urea instead of more Photobioreactors.** When the [Ammonia](rngtech:power-chains/stage-6-ammonia.md) chain runs, put [Urea](rngtech:algae-photobioreactor.md#urea) from the Ammonia Synthesizer in the Photobioreactors. Each Urea makes the next 4 Algae Biomass grow twice as fast, so the same Photobioreactors keep up with more Reformers. The water and carbon gas per biomass do not change. One Urea costs 250 mB of Ammonia, a small part of the Ammonia that you get from those 4 biomass.
+
 **Shifting for more Hydrogen.** A second Reformer can run the [water-gas shift](rngtech:steam-methane-reformer/water-gas-shift.md) on the Carbon Monoxide instead, which adds about a third more Hydrogen per reform. The shift turns the Carbon Monoxide into a little Carbon Exhaust, and algae grow half as fast on Carbon Exhaust, so a shift loop needs about twice the Photobioreactors. Shift when Hydrogen is what runs short and you have the room and light for more Photobioreactors.
 
 <Column alignItems="center" fullWidth={true}>
