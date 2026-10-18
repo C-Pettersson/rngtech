@@ -29,14 +29,7 @@ It started life as the Battery Assembler, which is why its resource id is still 
 
 - [Assembling](rngtech:component-assembler/assembling.md)
 - [Battery Cells](rngtech:component-assembler/battery-cells.md)
-
-### Other components
-
-- **Anodes**: two Aluminum, Titanium, Tungstensteel, or Naquadah plates and 250 mB of Electrolyte Solution make one Anode, the fuel for a [Corrosion Cell](rngtech:corrosion-cell.md).
-- **Servos**: Titanium and higher Servos are assembled with Lubricant.
-- **Lubricated Frame Coupling**: a Tungstensteel Casing and 1,000 mB of Lubricant, used to craft the Exotic Machine Frame.
-- **Void Catalyst**: a Nullite Ingot, a Tungstensteel Plate, and 1,000 mB of Ender Slurry make the [Vacuum Collapse Generator](rngtech:vacuum-collapse-generator.md)'s fuel.
-- **Seal Cores**: the Primed and Lubricated Seal Cores used to craft Ascendancy Seals. See [Machine Mastery](rngtech:machine-mastery.md#ascendancies).
+- [Other components](rngtech:component-assembler/other-components.md)
 
 ### Gear
 
@@ -48,7 +41,7 @@ The Gear tab has one optional **Battery Cell** slot. FE you supply fills the mac
 
 The Component Assembler screen has four tabs:
 
-- **Process**: four item inputs, the fluid slot and tank with its purge button, the output rack, progress, and energy.
+- **Process**: four item inputs, the fluid slot and tank with its purge button, the output rack, progress, and energy. Hover the progress bar for time remaining and expected items per minute.
 - **Gear**: the Battery Cell slot.
 - **Stats**: the machine's current stats, including traits and Gear.
 - **Refinement**: refine the placed Assembler's traits with a catalyst.

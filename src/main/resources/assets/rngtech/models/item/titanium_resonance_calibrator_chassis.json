@@ -1,3 +1,11 @@
 {
-  "parent": "rngtech:block/titanium_resonance_calibrator_chassis"
+  "parent": "rngtech:item/resonance_calibrator_single_template",
+  "textures": {
+    "particle": "rngtech:block/resonance_calibrator/shell/titanium",
+    "shell": "rngtech:block/resonance_calibrator/shell/titanium",
+    "trim": "rngtech:block/resonance_calibrator/trim/titanium",
+    "crown": "rngtech:block/resonance_calibrator/crown/titanium",
+    "coil": "rngtech:block/resonance_calibrator/coil/titanium",
+    "board": "rngtech:block/resonance_calibrator/board/titanium"
+  }
 }

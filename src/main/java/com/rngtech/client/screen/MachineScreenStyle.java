@@ -717,6 +717,21 @@ final class MachineScreenStyle {
         return lines;
     }
 
+    /** Progress and time remaining, then the expected output per minute while a cycle is set up. */
+    static List<Component> withOutputRate(Component progressLine, int progress, int ticks, int perMinuteTenths, boolean fluid) {
+        List<Component> lines = withTimeRemaining(progressLine, progress, ticks);
+        if (ticks > 0 && perMinuteTenths > 0) {
+            lines.add(outputRate(ticks, perMinuteTenths, fluid));
+        }
+        return lines;
+    }
+
+    /** Items or mB per minute, noting when a one-tick cycle has reached the one-craft-per-tick limit. */
+    static Component outputRate(int ticks, int perMinuteTenths, boolean fluid) {
+        String key = "rngtech.tooltip.output_rate" + (fluid ? ".fluid" : "") + (ticks <= 1 ? ".capped" : "");
+        return Component.translatable(key, String.format(Locale.ROOT, fluid ? "%.0f" : "%.1f", perMinuteTenths / 10.0D));
+    }
+
     static Component timeRemaining(int progress, int ticks) {
         int remaining = Math.max(0, ticks - Math.max(0, progress));
         return Component.translatable("rngtech.tooltip.time_remaining", String.format(Locale.ROOT, "%.1f", remaining / 20.0D));

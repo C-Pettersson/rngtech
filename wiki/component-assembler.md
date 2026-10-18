@@ -98,7 +98,7 @@ The Component Assembler uses the `rngtech:battery_assembly` recipe type.
 
 The Component Assembler screen has four tabs:
 
-- **Process**: four item inputs, the fluid slot and tank with its purge button, the output rack, progress, and energy.
+- **Process**: four item inputs, the fluid slot and tank with its purge button, the output rack, progress, and energy. Hover the progress bar for time remaining and expected items per minute.
 - **Gear**: the Battery Cell slot.
 - **Stats**: the machine's current stats, including traits and Gear.
 - **Refinement**: refine the placed Assembler's traits with a catalyst.

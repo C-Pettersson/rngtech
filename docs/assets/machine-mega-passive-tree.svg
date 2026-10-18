@@ -1,8 +1,8 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="1829 1536 4369 4769" width="1200" height="1310" role="img" aria-labelledby="title description">
 <title id="title">RNGTech shared machine passive tree</title>
-<desc id="description">1353 nodes, six starts, 1506 links. Control in green, Drive in copper, Reserve in blue. White notables and violet keystones. Each machine earns 99 points by level 100.</desc>
+<desc id="description">1368 nodes, six starts, 1525 links. Control in green, Drive in copper, Reserve in blue. White notables and violet keystones. Each machine earns 99 points by level 100.</desc>
 <rect x="1829" y="1536" width="4369" height="4769" fill="#111820"/>
-<g font-family="sans-serif" fill="#e5ecf3"><text x="1909" y="1686" font-size="96">Machine Mastery</text><text x="1914" y="1806" font-size="58" fill="#a9b9c9">1353 nodes · 6 starts · 3 attributes · 99 points at level 100</text></g>
+<g font-family="sans-serif" fill="#e5ecf3"><text x="1909" y="1686" font-size="96">Machine Mastery</text><text x="1914" y="1806" font-size="58" fill="#a9b9c9">1368 nodes · 6 starts · 3 attributes · 99 points at level 100</text></g>
 <g stroke="#66727d" stroke-width="5" opacity="0.65">
 <path d="M4000,4000 L3939,3895"/>
 <path d="M4000,4000 L4122,3998"/>
@@ -1510,6 +1510,25 @@
 <path d="M4331,3319 L4316,3257"/>
 <path d="M4966,4456 L4875,4402"/>
 <path d="M4966,4456 L4965,4350"/>
+<path d="M3234,3695 L3194,3656"/>
+<path d="M3194,3656 L3137,3647"/>
+<path d="M3194,3656 L3183,3599"/>
+<path d="M3137,3647 L3124,3588"/>
+<path d="M3183,3599 L3124,3588"/>
+<path d="M3355,3399 L3326,3451"/>
+<path d="M3326,3451 L3332,3514"/>
+<path d="M3326,3451 L3269,3479"/>
+<path d="M3332,3514 L3275,3544"/>
+<path d="M3269,3479 L3275,3544"/>
+<path d="M2884,3418 L2826,3413"/>
+<path d="M2826,3413 L2789,3466"/>
+<path d="M2789,3466 L2725,3460"/>
+<path d="M2725,3460 L2698,3402"/>
+<path d="M2698,3402 L2735,3350"/>
+<path d="M2735,3350 L2799,3355"/>
+<path d="M2799,3355 L2826,3413"/>
+<path d="M2762,3408 L2725,3460"/>
+<path d="M2762,3408 L2735,3350"/>
 </g>
 <circle cx="3388" cy="3633" r="20" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>control (start_control)</title></circle>
 <circle cx="4000" cy="3310" r="20" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>control / drive (start_control_drive)</title></circle>
@@ -2829,6 +2848,21 @@
 <circle cx="4359" cy="3359" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Batching (even_loading_1)</title></circle>
 <circle cx="4331" cy="3319" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Batching (even_loading_2)</title></circle>
 <circle cx="4316" cy="3257" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Even Loading (even_loading)</title></circle>
+<circle cx="3194" cy="3656" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Actuation (spring_returns_1)</title></circle>
+<circle cx="3137" cy="3647" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Actuation (spring_returns_2)</title></circle>
+<circle cx="3183" cy="3599" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Actuation (spring_returns_3)</title></circle>
+<circle cx="3124" cy="3588" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Spring Returns (spring_returns)</title></circle>
+<circle cx="3326" cy="3451" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Heat Flow (hot_air_jackets_1)</title></circle>
+<circle cx="3332" cy="3514" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Heat Flow (hot_air_jackets_2)</title></circle>
+<circle cx="3269" cy="3479" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Heat Flow (hot_air_jackets_3)</title></circle>
+<circle cx="3275" cy="3544" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Hot Air Jackets (hot_air_jackets)</title></circle>
+<circle cx="2826" cy="3413" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Actuation (cam_followers_1)</title></circle>
+<circle cx="2789" cy="3466" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Actuation (cam_followers_2)</title></circle>
+<circle cx="2725" cy="3460" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Actuation (cam_followers_3)</title></circle>
+<circle cx="2698" cy="3402" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Actuation (cam_followers_4)</title></circle>
+<circle cx="2735" cy="3350" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Actuation (cam_followers_5)</title></circle>
+<circle cx="2799" cy="3355" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Actuation (cam_followers_6)</title></circle>
+<circle cx="2762" cy="3408" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Cam Followers (cam_followers)</title></circle>
 <circle cx="4047" cy="3916" r="24" fill="#c79dea" stroke="#111820" stroke-width="3"><title>Silent Operation (silent_operation)</title></circle>
 <circle cx="2579" cy="3318" r="24" fill="#c79dea" stroke="#111820" stroke-width="3"><title>Manual Throttle (manual_throttle)</title></circle>
 <circle cx="3900" cy="2301" r="24" fill="#c79dea" stroke="#111820" stroke-width="3"><title>Seedling Magnet (seedling_magnet)</title></circle>

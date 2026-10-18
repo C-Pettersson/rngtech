@@ -84,7 +84,8 @@ public class AlloyFurnaceMenu extends AbstractContainerMenu implements MasteryMe
     private static final int DATA_NITROGEN_USE = DATA_NITROGEN + 1;
     private static final int DATA_NITROGEN_BONUS = DATA_NITROGEN_USE + 1;
     private static final int DATA_MACHINE_PROGRESSION_START = DATA_NITROGEN_BONUS + 1;
-    private static final int DATA_COUNT = DATA_MACHINE_PROGRESSION_START + MasteryMenuSupport.FIELD_COUNT;
+    private static final int DATA_OUTPUT_PER_MINUTE = DATA_MACHINE_PROGRESSION_START + MasteryMenuSupport.FIELD_COUNT;
+    private static final int DATA_COUNT = DATA_OUTPUT_PER_MINUTE + 1;
     private static final int STAT_SCALE = 100;
     private static final int PROCESS_SLOT_COUNT = AlloyFurnaceBlockEntity.PROCESS_SLOT_COUNT;
     private static final int GEAR_SLOT_START = PROCESS_SLOT_COUNT;
@@ -233,6 +234,11 @@ public class AlloyFurnaceMenu extends AbstractContainerMenu implements MasteryMe
 
     public int progress() {
         return Math.max(0, data.get(DATA_PROGRESS));
+    }
+
+    /** Expected items per minute for the current cycle, in tenths. */
+    public int outputPerMinuteTenths() {
+        return data.get(DATA_OUTPUT_PER_MINUTE);
     }
 
     public int processingTicks() {

@@ -1,12 +1,9 @@
 {
-  "parent": "minecraft:block/cube",
+  "parent": "rngtech:block/resonance_calibrator/nullite",
   "textures": {
-    "down": "rngtech:block/resonance_calibrator_chassis/bottom/nullite_resonance_calibrator_chassis",
-    "up": "rngtech:block/resonance_calibrator_chassis/top/nullite_resonance_calibrator_chassis",
-    "north": "rngtech:block/resonance_calibrator_chassis/front/nullite_resonance_calibrator_chassis",
-    "south": "rngtech:block/resonance_calibrator_chassis/side/nullite_resonance_calibrator_chassis",
-    "east": "rngtech:block/resonance_calibrator_chassis/side/nullite_resonance_calibrator_chassis",
-    "west": "rngtech:block/resonance_calibrator_chassis/side/nullite_resonance_calibrator_chassis",
-    "particle": "rngtech:block/resonance_calibrator_chassis/front/nullite_resonance_calibrator_chassis"
+    "particle": "rngtech:block/resonance_calibrator/shell/nullite",
+    "shell": "rngtech:block/resonance_calibrator/shell/nullite",
+    "trim": "rngtech:block/resonance_calibrator/trim/nullite",
+    "crown": "rngtech:block/resonance_calibrator/crown/nullite"
   }
 }

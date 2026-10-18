@@ -80,7 +80,8 @@ public class MelterMenu extends AbstractContainerMenu implements MasteryMenuView
     private static final int DATA_OVERHEAT_TEMPERATURE = DATA_HEAT_MAXIMUM + 1;
     private static final int DATA_INPUT_ENERGY = DATA_OVERHEAT_TEMPERATURE + 1;
     private static final int DATA_MACHINE_PROGRESSION_START = DATA_INPUT_ENERGY + 1;
-    private static final int DATA_COUNT = DATA_MACHINE_PROGRESSION_START + MasteryMenuSupport.FIELD_COUNT;
+    private static final int DATA_OUTPUT_PER_MINUTE = DATA_MACHINE_PROGRESSION_START + MasteryMenuSupport.FIELD_COUNT;
+    private static final int DATA_COUNT = DATA_OUTPUT_PER_MINUTE + 1;
     private static final int STAT_SCALE = 100;
     private static final int PROCESS_SLOT_COUNT = MelterBlockEntity.PROCESS_SLOT_COUNT;
     private static final int GEAR_SLOT_START = PROCESS_SLOT_COUNT;
@@ -208,6 +209,11 @@ public class MelterMenu extends AbstractContainerMenu implements MasteryMenuView
 
     public int progress() {
         return Math.max(0, data.get(DATA_PROGRESS));
+    }
+
+    /** Expected mB per minute for the current cycle, in tenths. */
+    public int outputPerMinuteTenths() {
+        return data.get(DATA_OUTPUT_PER_MINUTE);
     }
 
     public int processingTicks() {

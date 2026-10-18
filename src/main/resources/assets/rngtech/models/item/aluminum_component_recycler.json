@@ -1,3 +1,12 @@
 {
-    "parent":  "rngtech:block/aluminum_component_recycler"
+  "parent": "rngtech:item/component_recycler_template",
+  "textures": {
+    "particle": "rngtech:block/crusher/shell/aluminum",
+    "shell": "rngtech:block/crusher/shell/aluminum",
+    "trim": "rngtech:block/crusher/trim/aluminum",
+    "body": "rngtech:block/component_recycler/head/aluminum_body",
+    "body_top": "rngtech:block/component_recycler/head/aluminum_body_top",
+    "prong": "rngtech:block/component_recycler/head/aluminum_prong",
+    "bit": "rngtech:block/component_recycler/head/aluminum_bit"
+  }
 }
