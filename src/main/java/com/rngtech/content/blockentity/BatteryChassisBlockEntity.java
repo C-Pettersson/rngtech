@@ -337,6 +337,11 @@ public class BatteryChassisBlockEntity extends BaseMachineBlockEntity implements
         return inventory;
     }
 
+    @Override
+    public boolean isGearSlot(int slot) {
+        return true;
+    }
+
     public ContainerData getMenuData() {
         return menuData;
     }

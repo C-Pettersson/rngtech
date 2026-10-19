@@ -123,6 +123,11 @@ public abstract class BaseMachineBlockEntity extends BlockEntity implements Refi
 
     protected abstract ItemStackHandler getMachineInventory();
 
+    /** Whether {@code slot} of the inventory {@link #getItemHandler} returns for no side holds installed Gear. */
+    public boolean isGearSlot(int slot) {
+        return false;
+    }
+
     @Override
     public MachineType refinementMachineType() {
         return machineType;

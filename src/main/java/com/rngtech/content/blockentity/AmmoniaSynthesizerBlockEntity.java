@@ -366,6 +366,11 @@ public class AmmoniaSynthesizerBlockEntity extends BaseMachineBlockEntity
     }
 
     @Override
+    public boolean isGearSlot(int slot) {
+        return true;
+    }
+
+    @Override
     public Component getDisplayName() {
         return MachineNameGenerator.generatedName(machineTraits(), Component.translatable("container.rngtech.ammonia_synthesizer"));
     }
