@@ -1,6 +1,7 @@
 package com.rngtech;
 
 import com.rngtech.client.CableTintClient;
+import com.rngtech.client.ItemLinkClient;
 import com.rngtech.client.MinersCompanionLampClient;
 import com.rngtech.client.configurator.ConfiguratorClient;
 import com.rngtech.client.renderer.AlgaePhotobioreactorRenderer;
@@ -138,6 +139,7 @@ public final class RNGTechClient {
         NeoForge.EVENT_BUS.addListener(MachineSoundClient::onClientTick);
         NeoForge.EVENT_BUS.addListener(MinersCompanionLampClient::onClientTick);
         NeoForge.EVENT_BUS.addListener(AnnealedTooltip::onTooltip);
+        NeoForge.EVENT_BUS.addListener(ItemLinkClient::onMouseButtonPressed);
         container.registerConfig(ModConfig.Type.CLIENT, RNGTechClientConfig.SPEC);
         container.registerExtensionPoint(IConfigScreenFactory.class, ConfigurationScreen::new);
         UniqueTooltip.setOpenHost(UniqueHostReaders::current);
