@@ -26,6 +26,8 @@ The **Component Assembler** is a powered workbench that combines items with a fl
 
 It started life as the Battery Assembler, which is why its resource id is still `battery_assembler`. Each Component Assembler you craft rolls its own [rarity and affixes](rarity-and-affixes.md).
 
+You can read an Assembler from the outside. Each input slot is a pocket along the front of the bed, and its item lies in it, in slot order from left to right. While the Assembler works, the head on the gantry picks up the item from each filled pocket in turn and carries it to the nest behind them. A pocket stays filled if its slot holds more than the job takes. When the recipe takes fluid, the head ends the job by pouring it over the items on the nest. The puddle soaks in and leaves the finished part. The output rack is the row of four cubbies in the back cabinet, and finished items stand in them. The assembly fluid shows in the glass reservoir on the roof, and the Battery Cell lies beside it, with a charge meter on the left side of the cabinet. FE and fluid still enter on any side, but the cable port is drawn on the back.
+
 ## Obtaining
 
 ### Crafting

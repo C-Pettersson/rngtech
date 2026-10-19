@@ -1,0 +1,168 @@
+{
+  "textures": {
+    "particle": "#head",
+    "beam": "rngtech:block/battery_assembler/beam",
+    "band": "rngtech:block/crusher/band",
+    "truck": "rngtech:block/crusher/trim/copper",
+    "carriage": "rngtech:block/crusher/casing",
+    "carriage_top": "rngtech:block/battery_assembler/carriage_top",
+    "quill": "rngtech:block/crusher/shaft",
+    "head": "rngtech:block/battery_assembler/head",
+    "head_bottom": "rngtech:block/battery_assembler/head_bottom",
+    "finger": "rngtech:block/crusher/trim/copper",
+    "nozzle": "rngtech:block/furnace/pipe"
+  },
+  "elements": [
+    {
+      "from": [
+        7.75,
+        7.75,
+        7.75
+      ],
+      "to": [
+        8.25,
+        13.5,
+        8.25
+      ],
+      "faces": {
+        "north": {
+          "texture": "#quill"
+        },
+        "south": {
+          "texture": "#quill"
+        },
+        "east": {
+          "texture": "#quill"
+        },
+        "west": {
+          "texture": "#quill"
+        }
+      }
+    },
+    {
+      "from": [
+        7.25,
+        7.0,
+        7.25
+      ],
+      "to": [
+        8.75,
+        7.75,
+        8.75
+      ],
+      "faces": {
+        "north": {
+          "texture": "#head"
+        },
+        "south": {
+          "texture": "#head"
+        },
+        "east": {
+          "texture": "#head"
+        },
+        "west": {
+          "texture": "#head"
+        },
+        "up": {
+          "texture": "#head"
+        },
+        "down": {
+          "texture": "#head_bottom",
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ]
+        }
+      }
+    },
+    {
+      "from": [
+        7.0,
+        6.25,
+        7.75
+      ],
+      "to": [
+        7.5,
+        7.5,
+        8.25
+      ],
+      "faces": {
+        "north": {
+          "texture": "#finger"
+        },
+        "south": {
+          "texture": "#finger"
+        },
+        "east": {
+          "texture": "#finger"
+        },
+        "west": {
+          "texture": "#finger"
+        },
+        "down": {
+          "texture": "#finger"
+        }
+      }
+    },
+    {
+      "from": [
+        8.5,
+        6.25,
+        7.75
+      ],
+      "to": [
+        9.0,
+        7.5,
+        8.25
+      ],
+      "faces": {
+        "north": {
+          "texture": "#finger"
+        },
+        "south": {
+          "texture": "#finger"
+        },
+        "east": {
+          "texture": "#finger"
+        },
+        "west": {
+          "texture": "#finger"
+        },
+        "down": {
+          "texture": "#finger"
+        }
+      }
+    },
+    {
+      "from": [
+        7.8,
+        6.5,
+        7.8
+      ],
+      "to": [
+        8.2,
+        7.0,
+        8.2
+      ],
+      "faces": {
+        "north": {
+          "texture": "#nozzle"
+        },
+        "south": {
+          "texture": "#nozzle"
+        },
+        "east": {
+          "texture": "#nozzle"
+        },
+        "west": {
+          "texture": "#nozzle"
+        },
+        "down": {
+          "texture": "#nozzle"
+        }
+      }
+    }
+  ]
+}

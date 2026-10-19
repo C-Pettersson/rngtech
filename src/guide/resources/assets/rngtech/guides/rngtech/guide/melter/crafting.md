@@ -2,7 +2,7 @@
 navigation:
   title: "Crafting"
   parent: melter.md
-  position: 3
+  position: 5
   icon: rngtech:melter
 ---
 

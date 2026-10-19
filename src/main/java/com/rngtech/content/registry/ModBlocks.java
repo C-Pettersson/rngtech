@@ -334,6 +334,7 @@ public final class ModBlocks {
                     .mapColor(MapColor.METAL)
                     .strength(3.5F)
                     .sound(SoundType.METAL)
+                    .noOcclusion()
     );
     public static final DeferredBlock<BatteryAssemblerBlock> BATTERY_ASSEMBLER = BLOCKS.registerBlock(
             "battery_assembler",
@@ -342,6 +343,7 @@ public final class ModBlocks {
                     .mapColor(MapColor.METAL)
                     .strength(3.0F)
                     .sound(SoundType.METAL)
+                    .noOcclusion()
     );
     public static final DeferredBlock<GasChemistryBlock> COAL_GASIFIER = BLOCKS.registerBlock(
             "coal_gasifier",

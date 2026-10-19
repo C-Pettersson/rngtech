@@ -2,8 +2,13 @@ package com.rngtech.content.blockentity;
 
 import com.rngtech.content.block.BaseMachineBlock;
 import com.rngtech.content.item.BatteryCellItem;
+import com.rngtech.content.item.CrushHeadItem;
+import com.rngtech.content.item.FluidPumpItem;
 import com.rngtech.content.item.GearParts;
 import com.rngtech.content.item.MachinePartItem;
+import com.rngtech.content.item.ServoItem;
+import com.rngtech.content.item.SolidFuelBurnerPartItem;
+import com.rngtech.content.item.UniquePartItem;
 import com.rngtech.content.menu.MasteryMenuSupport;
 import com.rngtech.content.menu.MelterMenu;
 import com.rngtech.content.purge.FluidOutputOverflow;
@@ -45,8 +50,12 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.Connection;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.game.ClientGamePacketListener;
+import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.world.Containers;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
@@ -55,6 +64,7 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Fluids;
 import net.neoforged.neoforge.energy.IEnergyStorage;
@@ -148,6 +158,7 @@ public class MelterBlockEntity extends BaseMachineBlockEntity
     private static final int DATA_OUTPUT_PER_MINUTE = DATA_MACHINE_PROGRESSION_START + MasteryMenuSupport.FIELD_COUNT;
     private static final int DATA_COUNT = DATA_OUTPUT_PER_MINUTE + 1;
     private static final int STAT_SCALE = 100;
+    private static final int VISUAL_SYNC_INTERVAL = 5;
 
     private final ItemStackHandler processInventory = new ItemStackHandler(PROCESS_SLOT_COUNT) {
         @Override
@@ -308,6 +319,9 @@ public class MelterBlockEntity extends BaseMachineBlockEntity
     private ItemStack activePrimary = ItemStack.EMPTY;
     private ItemStack activeSecondary = ItemStack.EMPTY;
     private FluidStack activeFluid = FluidStack.EMPTY;
+    private MelterVisualState visualState = MelterVisualState.IDLE;
+    private MelterVisualState.Key lastSyncedVisual;
+    private final MelterVisualState.Animation animation = new MelterVisualState.Animation();
 
     public MelterBlockEntity(BlockPos pos, BlockState blockState) {
         super(ModBlockEntities.MELTER.get(), pos, blockState, MachineType.MELTER, SLOT_PRIMARY_INPUT, SLOT_FLUID_INPUT_CONTAINER, SLOT_FLUID_OUTPUT_CONTAINER);
@@ -315,6 +329,11 @@ public class MelterBlockEntity extends BaseMachineBlockEntity
     }
 
     public static void serverTick(Level level, BlockPos pos, BlockState state, MelterBlockEntity melter) {
+        tickWork(level, pos, state, melter);
+        melter.syncVisualState(level);
+    }
+
+    private static void tickWork(Level level, BlockPos pos, BlockState state, MelterBlockEntity melter) {
         melter.drainInputContainer();
         melter.fillOutputContainer();
 
@@ -384,6 +403,131 @@ public class MelterBlockEntity extends BaseMachineBlockEntity
         if (HeatEngine.finished(heat, melter.cycleWork(recipe, stats)) && melter.process(recipe, stats)) {
             melter.bulkSpeed.recordProcess(melter.activeTraits());
         }
+    }
+
+    /**
+     * Melters saved while the block was a solid cube stored no light inside it, which leaves the renderer's parts, melt,
+     * and tanks unlit. Rechecking the block's own light once on load fixes those saves.
+     */
+    @Override
+    public void onLoad() {
+        super.onLoad();
+        if (level != null && !level.isClientSide) {
+            level.getLightEngine().checkBlock(worldPosition);
+        }
+    }
+
+    /** Client copy of the state the renderer draws; synced from the server in the block entity update tag. */
+    public MelterVisualState visualState() {
+        return visualState;
+    }
+
+    public MelterVisualState.Animation animation() {
+        return animation;
+    }
+
+    @Override
+    public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
+        return currentVisualState().save();
+    }
+
+    @Override
+    public Packet<ClientGamePacketListener> getUpdatePacket() {
+        return ClientboundBlockEntityDataPacket.create(this);
+    }
+
+    @Override
+    public void handleUpdateTag(CompoundTag tag, HolderLookup.Provider registries) {
+        visualState = MelterVisualState.load(tag);
+    }
+
+    @Override
+    public void onDataPacket(Connection connection, ClientboundBlockEntityDataPacket packet, HolderLookup.Provider registries) {
+        visualState = MelterVisualState.load(packet.getTag());
+    }
+
+    private void syncVisualState(Level level) {
+        if (level.getGameTime() % VISUAL_SYNC_INTERVAL != 0) {
+            return;
+        }
+        MelterVisualState.Key key = currentVisualState().key();
+        if (!key.equals(lastSyncedVisual)) {
+            lastSyncedVisual = key;
+            level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), Block.UPDATE_CLIENTS);
+        }
+    }
+
+    /** What the Melter shows right now, built on the server. */
+    public MelterVisualState currentVisualState() {
+        MachineStatAccumulator stats = effectiveStats();
+        MelterRecipe recipe = nextRecipe();
+        HeatEngine.Envelope envelope = recipe != null && hasRequiredComponents() ? envelope(recipe, stats) : null;
+        int cycleTicks = currentProcessingTicks(recipe, stats);
+        ItemStack cell = batteryCellStack();
+        boolean hasCell = isBatteryCell(cell);
+        return new MelterVisualState(
+                heat.temperature(),
+                recipe == null ? 0 : recipe.minimumTemperature(),
+                envelope == null ? 0 : envelope.setpoint(),
+                envelope == null || envelope.ungated() ? 0 : envelope.overheat(),
+                Math.max(0, stats.intValue(MachineStat.MAX_TEMPERATURE)),
+                wobbleDisplay(),
+                getBlockState().getValue(BaseMachineBlock.ACTIVE),
+                cycleTicks <= 0 ? 0.0F : Math.min(1.0F, currentElapsedTicks(recipe, stats) / (float) cycleTicks),
+                cycleTicks,
+                primaryStack().getItem(),
+                secondaryStack().getItem(),
+                fluidKey(inputTank.getFluid()),
+                fill(inputTank),
+                fluidKey(outputTank.getFluid()),
+                fill(outputTank),
+                recipe == null ? "" : fluidKey(recipe.outputFluid()),
+                crushHeadKey(crushHeadStack()),
+                heatCoreKey(heatCoreStack()),
+                pumpKey(fluidPumpStack()),
+                servoKey(servoStack()),
+                hasCell ? ((BatteryCellItem) cell.getItem()).material().getSerializedName() : "",
+                hasCell && energyCapacity() > 0 ? energyStored() / (float) energyCapacity() : -1.0F
+        );
+    }
+
+    private static String fluidKey(FluidStack stack) {
+        return stack.isEmpty() ? "" : BuiltInRegistries.FLUID.getKey(stack.getFluid()).toString();
+    }
+
+    private static float fill(FluidTank tank) {
+        return tank.getCapacity() <= 0 ? 0.0F : Math.min(1.0F, tank.getFluidAmount() / (float) tank.getCapacity());
+    }
+
+    private static String crushHeadKey(ItemStack stack) {
+        if (stack.getItem() instanceof CrushHeadItem head) {
+            return head.material().getSerializedName();
+        }
+        return stack.getItem() instanceof UniquePartItem && isCrushHead(stack) ? "unique" : "";
+    }
+
+    private static String heatCoreKey(ItemStack stack) {
+        if (!isHeatCore(stack)) {
+            return "";
+        }
+        if (stack.getItem() instanceof SolidFuelBurnerPartItem part && part.heatCoreMaterial() != null) {
+            return part.heatCoreMaterial().getSerializedName();
+        }
+        return stack.getItem() instanceof UniquePartItem ? "unique" : "";
+    }
+
+    private static String pumpKey(ItemStack stack) {
+        if (stack.getItem() instanceof FluidPumpItem pump) {
+            return pump.material().getSerializedName();
+        }
+        return stack.getItem() instanceof UniquePartItem && isFluidPump(stack) ? "unique" : "";
+    }
+
+    private static String servoKey(ItemStack stack) {
+        if (stack.getItem() instanceof ServoItem servo) {
+            return servo.material().getSerializedName();
+        }
+        return stack.getItem() instanceof UniquePartItem && isServo(stack) ? "unique" : "";
     }
 
     /** FE/t the heater spent last tick: on wall loss when {@code holding}, otherwise on heating the chamber and input. */

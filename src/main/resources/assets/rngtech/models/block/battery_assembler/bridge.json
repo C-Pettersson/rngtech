@@ -1,0 +1,121 @@
+{
+  "textures": {
+    "particle": "#beam",
+    "beam": "rngtech:block/battery_assembler/beam",
+    "band": "rngtech:block/crusher/band",
+    "truck": "rngtech:block/crusher/trim/copper",
+    "carriage": "rngtech:block/crusher/casing",
+    "carriage_top": "rngtech:block/battery_assembler/carriage_top",
+    "quill": "rngtech:block/crusher/shaft",
+    "head": "rngtech:block/battery_assembler/head",
+    "head_bottom": "rngtech:block/battery_assembler/head_bottom",
+    "finger": "rngtech:block/crusher/trim/copper",
+    "nozzle": "rngtech:block/furnace/pipe"
+  },
+  "elements": [
+    {
+      "from": [
+        2.5,
+        12.5,
+        7.5
+      ],
+      "to": [
+        13.5,
+        13.25,
+        8.5
+      ],
+      "faces": {
+        "north": {
+          "texture": "#beam"
+        },
+        "south": {
+          "texture": "#beam"
+        },
+        "up": {
+          "texture": "#beam"
+        },
+        "down": {
+          "texture": "#beam"
+        }
+      }
+    },
+    {
+      "from": [
+        3.0,
+        12.85,
+        7.45
+      ],
+      "to": [
+        13.0,
+        13.1,
+        8.55
+      ],
+      "faces": {
+        "north": {
+          "texture": "#band"
+        },
+        "south": {
+          "texture": "#band"
+        }
+      }
+    },
+    {
+      "from": [
+        1.0,
+        13.25,
+        7.25
+      ],
+      "to": [
+        2.5,
+        13.75,
+        8.75
+      ],
+      "faces": {
+        "north": {
+          "texture": "#truck"
+        },
+        "south": {
+          "texture": "#truck"
+        },
+        "east": {
+          "texture": "#truck"
+        },
+        "west": {
+          "texture": "#truck"
+        },
+        "up": {
+          "texture": "#truck"
+        }
+      }
+    },
+    {
+      "from": [
+        13.5,
+        13.25,
+        7.25
+      ],
+      "to": [
+        15.0,
+        13.75,
+        8.75
+      ],
+      "faces": {
+        "north": {
+          "texture": "#truck"
+        },
+        "south": {
+          "texture": "#truck"
+        },
+        "east": {
+          "texture": "#truck"
+        },
+        "west": {
+          "texture": "#truck"
+        },
+        "up": {
+          "texture": "#truck"
+        }
+      }
+    }
+  ]
+}

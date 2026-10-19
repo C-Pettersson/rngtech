@@ -1,0 +1,8 @@
+{
+  "parent": "rngtech:block/melter/roll",
+  "textures": {
+    "roll": "rngtech:block/crusher/roll/copper",
+    "roll_end": "rngtech:block/crusher/roll/copper_end",
+    "hub": "rngtech:block/crusher/roll/copper_hub"
+  }
+}

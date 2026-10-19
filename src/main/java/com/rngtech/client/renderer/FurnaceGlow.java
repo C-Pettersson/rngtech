@@ -11,9 +11,9 @@ import net.minecraft.world.inventory.InventoryMenu;
 import org.joml.Vector3f;
 
 /**
- * Drawing shared by the Furnace, Alloy Furnace, and Metal Press renderers: the incandescent colour of a heat, the wobble, the heat bar,
- * the Nitrogen cylinder's fill and valve collar, and the quad and box helpers, which the Resonance Calibrator renderer
- * also uses. Positions are in model pixels.
+ * Drawing shared by the Furnace, Alloy Furnace, Metal Press, and Melter renderers: the incandescent colour of a heat, the
+ * wobble, the heat bar, the glow inside an open-fronted chamber, the Nitrogen cylinder's fill and valve collar, and the
+ * quad and box helpers, which the Resonance Calibrator renderer also uses. Positions are in model pixels.
  */
 final class FurnaceGlow {
     /** Heats where the glow colour changes: dull red, cherry, orange, yellow, and near white. */
@@ -30,6 +30,8 @@ final class FurnaceGlow {
     private static final int NITROGEN_ACTIVE = 0xB9D3F2;
     /** Hydrogen in an annealing tank, as on the Process-tab gauge. */
     private static final int HYDROGEN = 0xD8E6F2;
+    /** How far chamber glow sits inside the chamber walls, so it never fights them for depth. */
+    private static final float GLOW_INSET = 0.02F;
 
     private FurnaceGlow() {
     }
@@ -151,6 +153,33 @@ final class FurnaceGlow {
         int color = lerpColor(Mth.clamp(brightness, 0.0F, 1.0F), 0x46505A, NITROGEN_ACTIVE);
         float half = 0.62F;
         cube(consumer, pose, sprite, 16.0F, cx - half, y0, cz - half, cx + half, y1, cz + half, color, 255, LightTexture.FULL_BRIGHT, overlay);
+    }
+
+    /** Glow on the back wall, side walls, ceiling, and floor of an open-fronted chamber {x0, y0, z0, x1, y1, z1}. */
+    static void chamberGlow(VertexConsumer consumer, PoseStack.Pose pose, float[] chamber, int color, int overlay) {
+        float x0 = chamber[0];
+        float y0 = chamber[1];
+        float z0 = chamber[2];
+        float x1 = chamber[3];
+        float y1 = chamber[4];
+        float z1 = chamber[5];
+        int light = LightTexture.FULL_BRIGHT;
+        float back = z1 - GLOW_INSET;
+        quad(consumer, pose, new Vector3f(0.0F, 0.0F, -1.0F), color, 255, light, overlay,
+                new float[] {x0, y0, back, 0.0F, 1.0F}, new float[] {x1, y0, back, 1.0F, 1.0F},
+                new float[] {x1, y1, back, 1.0F, 0.0F}, new float[] {x0, y1, back, 0.0F, 0.0F});
+        for (float x : new float[] {x0 + GLOW_INSET, x1 - GLOW_INSET}) {
+            Vector3f normal = new Vector3f(x < (x0 + x1) / 2.0F ? 1.0F : -1.0F, 0.0F, 0.0F);
+            quad(consumer, pose, normal, color, 255, light, overlay,
+                    new float[] {x, y0, z0, 0.0F, 1.0F}, new float[] {x, y0, z1, 1.0F, 1.0F},
+                    new float[] {x, y1, z1, 1.0F, 0.0F}, new float[] {x, y1, z0, 0.0F, 0.0F});
+        }
+        for (float y : new float[] {y0 + GLOW_INSET, y1 - GLOW_INSET}) {
+            Vector3f normal = new Vector3f(0.0F, y < (y0 + y1) / 2.0F ? 1.0F : -1.0F, 0.0F);
+            quad(consumer, pose, normal, color, 255, light, overlay,
+                    new float[] {x0, y, z0, 0.0F, 0.0F}, new float[] {x1, y, z0, 1.0F, 0.0F},
+                    new float[] {x1, y, z1, 1.0F, 1.0F}, new float[] {x0, y, z1, 0.0F, 1.0F});
+        }
     }
 
     /** A flat north-facing rectangle at depth z. */

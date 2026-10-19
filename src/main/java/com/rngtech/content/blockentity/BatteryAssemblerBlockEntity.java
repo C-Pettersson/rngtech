@@ -31,8 +31,12 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.Connection;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.game.ClientGamePacketListener;
+import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.world.Containers;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
@@ -41,6 +45,7 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.energy.IEnergyStorage;
 import net.neoforged.neoforge.fluids.FluidActionResult;
@@ -52,6 +57,7 @@ import net.neoforged.neoforge.fluids.capability.templates.FluidTank;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.ItemStackHandler;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.IntStream;
@@ -113,6 +119,7 @@ public class BatteryAssemblerBlockEntity extends BaseMachineBlockEntity
     private static final int DATA_OUTPUT_PER_MINUTE = 14;
     private static final int DATA_COUNT = 15;
     private static final int STAT_SCALE = 100;
+    private static final int VISUAL_SYNC_INTERVAL = 5;
 
     private final ItemStackHandler processInventory = new ItemStackHandler(PROCESS_SLOT_COUNT) {
         @Override
@@ -216,6 +223,9 @@ public class BatteryAssemblerBlockEntity extends BaseMachineBlockEntity
     private int internalEnergy;
     private ItemStack[] activeInputs = emptyInputs();
     private FluidStack activeFluid = FluidStack.EMPTY;
+    private BatteryAssemblerVisualState visualState = BatteryAssemblerVisualState.IDLE;
+    private BatteryAssemblerVisualState.Key lastSyncedVisual;
+    private final BatteryAssemblerVisualState.Animation animation = new BatteryAssemblerVisualState.Animation();
 
     public BatteryAssemblerBlockEntity(BlockPos pos, BlockState blockState) {
         super(
@@ -231,6 +241,11 @@ public class BatteryAssemblerBlockEntity extends BaseMachineBlockEntity
     }
 
     public static void serverTick(Level level, BlockPos pos, BlockState state, BatteryAssemblerBlockEntity assembler) {
+        tickWork(level, pos, state, assembler);
+        assembler.syncVisualState(level);
+    }
+
+    private static void tickWork(Level level, BlockPos pos, BlockState state, BatteryAssemblerBlockEntity assembler) {
         assembler.dissolveElectrolyteReagent();
         assembler.drainInputContainer();
 
@@ -281,6 +296,90 @@ public class BatteryAssemblerBlockEntity extends BaseMachineBlockEntity
 
         BaseMachineBlock.setActive(level, pos, state, true);
         assembler.setChanged();
+    }
+
+    /**
+     * Assemblers saved while the block was a solid cube stored no light inside it, which leaves the renderer's gantry,
+     * items, and reservoir unlit. Rechecking the block's own light once on load fixes those saves.
+     */
+    @Override
+    public void onLoad() {
+        super.onLoad();
+        if (level != null && !level.isClientSide) {
+            level.getLightEngine().checkBlock(worldPosition);
+        }
+    }
+
+    /** Client copy of the state the renderer draws; synced from the server in the block entity update tag. */
+    public BatteryAssemblerVisualState visualState() {
+        return visualState;
+    }
+
+    public BatteryAssemblerVisualState.Animation animation() {
+        return animation;
+    }
+
+    @Override
+    public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
+        return currentVisualState().save(registries);
+    }
+
+    @Override
+    public Packet<ClientGamePacketListener> getUpdatePacket() {
+        return ClientboundBlockEntityDataPacket.create(this);
+    }
+
+    @Override
+    public void handleUpdateTag(CompoundTag tag, HolderLookup.Provider registries) {
+        visualState = BatteryAssemblerVisualState.load(tag, registries);
+    }
+
+    @Override
+    public void onDataPacket(Connection connection, ClientboundBlockEntityDataPacket packet, HolderLookup.Provider registries) {
+        visualState = BatteryAssemblerVisualState.load(packet.getTag(), registries);
+    }
+
+    private void syncVisualState(Level level) {
+        if (level.getGameTime() % VISUAL_SYNC_INTERVAL != 0) {
+            return;
+        }
+        BatteryAssemblerVisualState.Key key = currentVisualState().key();
+        if (!key.equals(lastSyncedVisual)) {
+            lastSyncedVisual = key;
+            level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), Block.UPDATE_CLIENTS);
+        }
+    }
+
+    /** What the Assembler shows right now, built on the server. */
+    public BatteryAssemblerVisualState currentVisualState() {
+        BatteryAssemblyRecipe recipe = nextRecipe();
+        List<ItemStack> inputs = new ArrayList<>(ITEM_INPUT_SLOT_COUNT);
+        for (int slot = 0; slot < ITEM_INPUT_SLOT_COUNT; slot++) {
+            ItemStack input = inputStack(slot);
+            int used = recipe != null && slot < recipe.ingredients().size() ? recipe.ingredients().get(slot).count() : 1;
+            inputs.add(input.isEmpty() ? ItemStack.EMPTY : input.copyWithCount(input.getCount() > used ? 2 : 1));
+        }
+        List<ItemStack> outputs = new ArrayList<>(OUTPUT_SLOT_COUNT);
+        for (int slot = 0; slot < OUTPUT_SLOT_COUNT; slot++) {
+            outputs.add(BatteryAssemblerVisualState.pile(processInventory.getStackInSlot(SLOT_OUTPUT_0 + slot)));
+        }
+        boolean working = getBlockState().getValue(BaseMachineBlock.ACTIVE);
+        int craftTicks = recipe == null ? 0 : processingTicks(recipe, effectiveStats());
+        ItemStack cell = batteryCellStack();
+        boolean hasCell = BatteryCellItem.isBatteryCell(cell);
+        return new BatteryAssemblerVisualState(
+                List.copyOf(inputs),
+                List.copyOf(outputs),
+                recipe != null ? recipe.outputStack().copyWithCount(1) : ItemStack.EMPTY,
+                inputTank.isEmpty() ? "" : BuiltInRegistries.FLUID.getKey(inputTank.getFluid().getFluid()).toString(),
+                inputTank.getCapacity() <= 0 ? 0.0F : Math.min(1.0F, inputTank.getFluidAmount() / (float) inputTank.getCapacity()),
+                recipe != null && recipe.fluidInput().isPresent(),
+                working,
+                craftTicks <= 0 ? 0.0F : Math.min(1.0F, progress / (float) craftTicks),
+                craftTicks,
+                hasCell ? ((BatteryCellItem) cell.getItem()).material().getSerializedName() : "",
+                hasCell && energyCapacity() > 0 ? energyStored() / (float) energyCapacity() : -1.0F
+        );
     }
 
     public ItemStackHandler getProcessInventory() {

@@ -1,0 +1,9 @@
+{
+  "parent": "rngtech:block/melter/pump",
+  "textures": {
+    "pump": "rngtech:block/melter/pump/titanium",
+    "pump_end": "rngtech:block/melter/pump/titanium_end",
+    "pump_motor": "rngtech:block/melter/pump/motor",
+    "pump_flange": "rngtech:block/melter/pump/titanium_end"
+  }
+}

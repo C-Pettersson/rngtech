@@ -281,7 +281,7 @@ public class FurnaceRenderer implements BlockEntityRenderer<FurnaceBlockEntity> 
         int lane = state.hottestLane();
         float heat = shownHeat(state, animation, lane, time);
         if (FurnaceGlow.strength(heat) > 0.0F) {
-            chamberGlow(bufferSource.getBuffer(RenderType.eyes(GLOW)), pose, CHAMBER, FurnaceGlow.glow(heat, 0.75F), overlay);
+            FurnaceGlow.chamberGlow(bufferSource.getBuffer(RenderType.eyes(GLOW)), pose, CHAMBER, FurnaceGlow.glow(heat, 0.75F), overlay);
             VertexConsumer coils = bufferSource.getBuffer(RenderType.eyes(COIL));
             int color = FurnaceGlow.glow(heat, 1.0F);
             for (float y : ROD_YS) {
@@ -313,7 +313,7 @@ public class FurnaceRenderer implements BlockEntityRenderer<FurnaceBlockEntity> 
             if (FurnaceGlow.strength(heat) > 0.0F) {
                 float[] column = QUAD_COLUMNS[lane % 2];
                 float[] row = QUAD_ROWS[lane / 2];
-                chamberGlow(glow, pose, new float[] {column[0], row[0], QUAD_Z0, column[1], row[1], QUAD_Z1},
+                FurnaceGlow.chamberGlow(glow, pose, new float[] {column[0], row[0], QUAD_Z0, column[1], row[1], QUAD_Z1},
                         FurnaceGlow.glow(heat, 0.75F), overlay);
             }
         }
@@ -366,12 +366,12 @@ public class FurnaceRenderer implements BlockEntityRenderer<FurnaceBlockEntity> 
         if (animation.fire > 0.01F) {
             float flicker = 0.8F + 0.2F * Mth.sin(time * 0.53F) * Mth.sin(time * 0.17F + 2.0F);
             int firelight = FurnaceGlow.scale(0xFF7A20, animation.fire * flicker * 0.85F);
-            chamberGlow(bufferSource.getBuffer(RenderType.eyes(GLOW)), pose, FIRE_MOUTH, firelight, overlay);
+            FurnaceGlow.chamberGlow(bufferSource.getBuffer(RenderType.eyes(GLOW)), pose, FIRE_MOUTH, firelight, overlay);
             renderFlames(bufferSource.getBuffer(RenderType.eyes(FLAME)), pose, state, animation, time, overlay);
         }
         float heat = animation.heat[state.hottestLane()];
         if (FurnaceGlow.strength(heat) > 0.0F) {
-            chamberGlow(bufferSource.getBuffer(RenderType.eyes(GLOW)), pose, OVEN, FurnaceGlow.glow(heat, 0.6F), overlay);
+            FurnaceGlow.chamberGlow(bufferSource.getBuffer(RenderType.eyes(GLOW)), pose, OVEN, FurnaceGlow.glow(heat, 0.6F), overlay);
         }
     }
 
@@ -400,33 +400,6 @@ public class FurnaceRenderer implements BlockEntityRenderer<FurnaceBlockEntity> 
                         new float[] {x1 + sway, y1, z, 1.0F, 0.0F},
                         new float[] {x0 + sway, y1, z, 0.0F, 0.0F});
             }
-        }
-    }
-
-    /** Glow on the back wall, side walls, ceiling, and floor of an open-fronted chamber {x0, y0, z0, x1, y1, z1}. */
-    private static void chamberGlow(VertexConsumer consumer, PoseStack.Pose pose, float[] chamber, int color, int overlay) {
-        float x0 = chamber[0];
-        float y0 = chamber[1];
-        float z0 = chamber[2];
-        float x1 = chamber[3];
-        float y1 = chamber[4];
-        float z1 = chamber[5];
-        int light = LightTexture.FULL_BRIGHT;
-        float back = z1 - SURFACE;
-        FurnaceGlow.quad(consumer, pose, new Vector3f(0.0F, 0.0F, -1.0F), color, 255, light, overlay,
-                new float[] {x0, y0, back, 0.0F, 1.0F}, new float[] {x1, y0, back, 1.0F, 1.0F},
-                new float[] {x1, y1, back, 1.0F, 0.0F}, new float[] {x0, y1, back, 0.0F, 0.0F});
-        for (float x : new float[] {x0 + SURFACE, x1 - SURFACE}) {
-            Vector3f normal = new Vector3f(x < (x0 + x1) / 2.0F ? 1.0F : -1.0F, 0.0F, 0.0F);
-            FurnaceGlow.quad(consumer, pose, normal, color, 255, light, overlay,
-                    new float[] {x, y0, z0, 0.0F, 1.0F}, new float[] {x, y0, z1, 1.0F, 1.0F},
-                    new float[] {x, y1, z1, 1.0F, 0.0F}, new float[] {x, y1, z0, 0.0F, 0.0F});
-        }
-        for (float y : new float[] {y0 + SURFACE, y1 - SURFACE}) {
-            Vector3f normal = new Vector3f(0.0F, y < (y0 + y1) / 2.0F ? 1.0F : -1.0F, 0.0F);
-            FurnaceGlow.quad(consumer, pose, normal, color, 255, light, overlay,
-                    new float[] {x0, y, z0, 0.0F, 0.0F}, new float[] {x1, y, z0, 1.0F, 0.0F},
-                    new float[] {x1, y, z1, 1.0F, 1.0F}, new float[] {x0, y, z1, 0.0F, 1.0F});
         }
     }
 
