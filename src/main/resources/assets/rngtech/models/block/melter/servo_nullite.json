@@ -1,0 +1,7 @@
+{
+  "parent": "rngtech:block/melter/servo",
+  "textures": {
+    "servo": "rngtech:block/compressor_tank/servo/nullite",
+    "accent": "rngtech:block/compressor_tank/servo/nullite_accent"
+  }
+}

@@ -22,6 +22,8 @@ The **Melter** is a Stage 6 machine that turns two items and a fluid, usually wa
 
 The Melter runs on FE and needs a Heat Core, a Crush Head, and a Fluid Pump installed. Like every RNGTech machine, each Melter you craft rolls its own [rarity and affixes](rarity-and-affixes.md), and it can level up through [Machine Mastery](machine-mastery.md).
 
+You can read a Melter from the outside. The two ingredients lie in the hopper on the lid, on the Crush Head: two toothed rolls in the head's material that turn while the Melter works, faster when a melt is shorter. Behind the bolted porthole, the product rises in the crucible during a melt while the ingredients sink and shrink. The chamber glows from dull red to yellow-white with its heat. The bar under the porthole reads that heat like the Process tab's bar, with a white mark at the recipe's melting point and a yellow mark at your setpoint, and turns red while the Melter runs too hot. Facing the front, the input tank is the glass column on the right and the output tank the one on the left. The Heat Core is the fins on both sides, the Fluid Pump stands in the back corner on the left, and an installed Servo is the motor beside the hopper. Missing Gear leaves bare shafts, rails, or a pad. The Battery Cell lies in the cradle in the back corner on the right, with a charge meter beside it. FE still enters on any side, but the cable port is drawn on the back.
+
 ## Obtaining
 
 ### Crafting

@@ -1,0 +1,7 @@
+{
+  "parent": "rngtech:block/melter/servo",
+  "textures": {
+    "servo": "rngtech:block/compressor_tank/servo/tungstensteel",
+    "accent": "rngtech:block/compressor_tank/servo/tungstensteel_accent"
+  }
+}
