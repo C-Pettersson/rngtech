@@ -2,13 +2,13 @@
 
 > Design requirements, not a release status report. See [Current Implementation](../reference/current-implementation.md) and the machine content pages for current behavior.
 
-PRD status: Draft
+PRD status: Accepted
 
 Implementation status: Prototype
 
 Release: 2.0
 
-Last updated: 2026-10-15
+Last updated: 2026-10-18
 
 ## Summary
 
@@ -362,7 +362,5 @@ Follows [Machine GUI Design](../reference/machine-gui-design.md).
 
 ## Open questions
 
-- **Constants:** `k_loss`, `k_heat`, `k_dip`, `p`, and the FE-per-HU rate are set during slice 1 calibration, against progression rule 5 and the build targets.
 - **Slider on automated lines:** whether a redstone signal should be able to set the slider. The current proposal is UI only.
-- **Wobble constants:** `k_wobble` and `k_cool` are set in slice 1 calibration. At 100% slider with base Stability, spikes should cross the overheat temperature often enough to matter on Stage 4+ recipes.
-- **Order with batching:** this PRD and [Batch Processing](batch-processing.md) both touch Furnace lanes. The current plan lands batching first.
+- **Wobble and strain constants:** `k_wobble`, `k_cool`, and the strain rates have first values (see [Heat Model State](heat-model-state.md)) and are tuned in the 2.0 playtest. At 100% slider with base Stability, spikes should cross the overheat temperature often enough to matter on Stage 4+ recipes.
