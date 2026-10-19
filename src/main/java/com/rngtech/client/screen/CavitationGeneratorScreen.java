@@ -514,11 +514,23 @@ public class CavitationGeneratorScreen extends AbstractContainerScreen<Cavitatio
         CompactValueText.renderTooltipIfHovered(guiGraphics, font, leftPos, topPos, mouseX, mouseY, STATUS_ICON_X, STATUS_ICON_Y, ICON_SIZE, ICON_SIZE,
                 Component.translatable("rngtech.cavitation.tooltip.status", statusComponent()));
         CompactValueText.renderTooltipIfHovered(guiGraphics, font, leftPos, topPos, mouseX, mouseY, GENERATION_ICON_X, STATUS_ICON_Y, ICON_SIZE, ICON_SIZE,
-                Component.translatable("rngtech.cavitation.tooltip.generation", CompactValueText.energyRate(menu.energyPerTick())));
+                generationTooltip());
         CompactValueText.renderTooltipIfHovered(guiGraphics, font, leftPos, topPos, mouseX, mouseY, OUTPUT_ICON_X, STATUS_ICON_Y, ICON_SIZE, ICON_SIZE,
                 Component.translatable("rngtech.cavitation.tooltip.output", CompactValueText.energyRate(menu.maxOutput())));
         CompactValueText.renderTooltipIfHovered(guiGraphics, font, leftPos, topPos, mouseX, mouseY, PRESSURE_ICON_X, STATUS_ICON_Y, ICON_SIZE, ICON_SIZE,
                 Component.translatable("rngtech.cavitation.tooltip.pressure", menu.pressureRating(), menu.ratedPressure()));
+    }
+
+    /** A cycle with a fluid output is run for that fluid, so its rate leads and the FE/t follows. */
+    private List<Component> generationTooltip() {
+        Component generation = Component.translatable("rngtech.cavitation.tooltip.generation", CompactValueText.energyRate(menu.energyPerTick()));
+        if (menu.recipeFluidOutput() <= 0) {
+            return List.of(generation);
+        }
+        return List.of(
+                Component.translatable("rngtech.cavitation.tooltip.fluid_product", menu.outputFluidName(), CompactValueText.fluidRate(menu.fluidOutputRate())),
+                generation.copy().withStyle(ChatFormatting.GRAY)
+        );
     }
 
     private void renderPurgeButtons(GuiGraphics guiGraphics) {

@@ -51,6 +51,14 @@ final class CompactValueText {
         return amount + " / " + capacity + " mB";
     }
 
+    /** mB per minute, switching to buckets from 1,000 mB. */
+    static String fluidRate(int perMinute) {
+        if (Math.abs(perMinute) < 1000) {
+            return perMinute + " mB/min";
+        }
+        return trimTrailingZeroes(String.format(Locale.ROOT, "%.2f", perMinute / 1000.0)) + " B/min";
+    }
+
     static Component exactEnergyAmount(int amount) {
         return Component.literal(exact(amount) + " FE");
     }

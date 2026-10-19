@@ -140,6 +140,7 @@ public final class RNGTechJadePlugin implements IWailaPlugin {
                 MachineInfoSnapshot info = MachineInfoSnapshot.load(accessor.getServerData().getCompound(DATA_KEY));
                 boolean details = accessor.showDetails();
                 appendState(tooltip, info);
+                appendFluidProduct(tooltip, info);
                 appendProgress(tooltip, info, details);
                 appendEnergy(tooltip, info, details);
                 appendFuel(tooltip, info);
@@ -201,7 +202,7 @@ public final class RNGTechJadePlugin implements IWailaPlugin {
                         "rngtech.jade.machine_state.line.time_remaining",
                         value(String.format(Locale.ROOT, "%.1f", Math.max(0, info.progressMax() - info.progress()) / 20.0D))
                 ));
-                if (info.outputPerMinuteTenths() > 0) {
+                if (info.outputPerMinuteTenths() > 0 && info.productFluid().isEmpty()) {
                     tooltip.add(Component.translatable(
                             info.fluidOutputRate()
                                     ? "rngtech.jade.machine_state.line.output_rate_fluid"
@@ -220,7 +221,8 @@ public final class RNGTechJadePlugin implements IWailaPlugin {
             if (info.energyCapacity() <= 0) {
                 return;
             }
-            if (info.energyRate() == 0) {
+            // A fluid product's rate stands in for the FE/t, which is only a by-product of the cycle.
+            if (info.energyRate() == 0 || !details && !info.productFluid().isEmpty()) {
                 tooltip.add(Component.translatable(
                         "rngtech.jade.machine_state.line.energy",
                         value(info.energy()),
@@ -236,6 +238,28 @@ public final class RNGTechJadePlugin implements IWailaPlugin {
                     value(signed(info.energyRate()))
             ));
             appendEnergyTelemetry(tooltip, info, details);
+        }
+
+        private static void appendFluidProduct(ITooltip tooltip, MachineInfoSnapshot info) {
+            if (info.productFluid().isEmpty()
+                    || info.outputPerMinuteTenths() <= 0
+                    || info.state() != MachineInfoSnapshot.WorkState.RUNNING) {
+                return;
+            }
+            tooltip.add(Component.translatable(
+                    "rngtech.jade.machine_state.line.fluid_product",
+                    Component.translatable(info.productFluid()),
+                    value(fluidRate(info.outputPerMinuteTenths() / 10.0D))
+            ));
+        }
+
+        /** mB per minute, switching to buckets from 1,000 mB. */
+        private static String fluidRate(double perMinute) {
+            if (perMinute < 1000.0D) {
+                return String.format(Locale.ROOT, "%.0f mB/min", perMinute);
+            }
+            String buckets = String.format(Locale.ROOT, "%.2f", perMinute / 1000.0D).replaceAll("\\.?0+$", "");
+            return buckets + " B/min";
         }
 
         private static void appendEnergyTelemetry(ITooltip tooltip, MachineInfoSnapshot info, boolean details) {
