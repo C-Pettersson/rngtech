@@ -1,15 +1,16 @@
 #!/usr/bin/env python3
 """Generate the Solar Panel and Solar Array Controller block models, blockstates, and owned textures.
 
-Panels are low single-axis trackers on a full-footprint ground pad. The deck fills the 16x16 footprint on a
+Panels are low single-axis trackers on a compact post. The deck fills the 16x16 footprint on a
 north-south torque tube and follows the sun (or, in an array that converts moonlight, the moon) while generating;
 an idle panel stows flat. Each frame lip is half a bar wide, so flat neighbours share one frame bar and a
 north-south row stays one continuous deck and tube while tracking. Every panel blockstate bakes only the mount
 (*_mount); SolarPanelRenderer turns the deck (*_deck). The full stepped models (flat, *_east, *_west) are the static
-fallback when animation is off in the client config, and the item model. The pad's underside carries the cable port,
-so a cable buried under a field is covered by the pads.
+fallback when animation is off in the client config, and the item model. Only the deck spans the footprint: the post
+stands on a foot plate sized to the Universal Connector ring, whose underside is the cable port, so a panel on the
+ground, on a roof, or on top of a cable column shows one flat surface.
 
-The controller is the array head: an inverter cabinet that rises above the decks on the same pad, with a teal band at
+The controller is the array head: an inverter cabinet that rises above the decks, with the cable port under its base, a teal band at
 deck height, a framed battery bay and status lamp on the front, heat-sink fins on the back, a top display that
 SolarArrayControllerRenderer lights as a map of the array, and a bracket on which the renderer mounts the installed
 Solar Array Extender. Both renderers' constants match the geometry here.
@@ -52,14 +53,15 @@ LIP = 0.5
 # Purlins under the deck run east-west; rail clamps hold the deck to them on the west and east edges.
 PURLIN_ZS = (2.5, 12.0)
 PURLIN_W = 1.5
-# Every solar block stands on a full-footprint ground pad whose underside carries the cable port (the Universal
-# Connector ring, 4 to 12, drawn in the middle of the pad's bottom texture). A cable buried one block down plugs in,
-# and a field of pads covers the trench as one continuous floor.
-PAD_TOP = 0.5
+# The post stands on a foot plate exactly the size of the Universal Connector ring (4 to 12), whose underside is the
+# cable port, so a cable below plugs straight into it. Anchor bolts hold the plate at its corners.
+FOOT = ((4.0, 0.0, 4.0), (12.0, 0.75, 12.0))
+FOOT_TOP = FOOT[1][1]
+BOLT = 0.75
 
 # Controller. The front faces north (z = 0). A wide base sits among the panel decks; the narrower head above it
 # carries everything a player reads.
-BASE = ((1.0, PAD_TOP, 1.0), (15.0, 7.0, 15.0))
+BASE = ((1.0, 0.0, 1.0), (15.0, 7.0, 15.0))
 BAND_Y = DECK_Y1
 HEAD = ((2.0, 7.0, 2.0), (14.0, 11.25, 14.0))
 CAP = ((1.5, 11.25, 1.5), (14.5, 12.0, 14.5))
@@ -130,17 +132,22 @@ def deck_elements():
     return deck
 
 
-def pad_element():
-    return box((0, 0, 0), (16, PAD_TOP, 16), {"up": "pad", "down": "pad_port", "*": "pad_side"})
+def foot_elements():
+    """The foot plate with the cable port underneath, and an anchor bolt in each corner."""
+    (fx0, _, fz0), (fx1, fy1, fz1) = FOOT
+    elements = [box(*FOOT, {"up": "foot", "down": "port", "*": "foot_side"}, uv={"up": [fx0, fz0, fx1, fz1], "down": [fx0, fz0, fx1, fz1]})]
+    for x0 in (fx0 + 0.5, fx1 - 0.5 - BOLT):
+        for z0 in (fz0 + 0.5, fz1 - 0.5 - BOLT):
+            elements.append(box((x0, fy1, z0), (x0 + BOLT, fy1 + 0.4, z0 + BOLT), "clamp", faces=UP_AND_SIDES))
+    return elements
 
 
 def mount_elements():
-    """The static mount: ground pad with the cable port, post, bearing, slew drive, and braces, all set from the pivot."""
+    """The static mount: foot plate with the cable port, post, bearing, slew drive, and braces, all set from the pivot."""
     py = TRACK_PIVOT[1]
-    elements = [
-        pad_element(),
-        box((7.0, PAD_TOP, 7.0), (9.0, py - 1.5, 9.0), "post", faces=SIDES),
-        box((6.75, py - 3.5, 6.75), (9.25, py - 3.0, 9.25), "band", faces=SIDES),
+    elements = foot_elements() + [
+        box((7.0, FOOT_TOP, 7.0), (9.0, py - 1.5, 9.0), "post", faces=SIDES),
+        box((6.75, FOOT_TOP, 6.75), (9.25, FOOT_TOP + 0.5, 9.25), "band", faces=("north", "south", "east", "west", "up")),
         # Bearing saddle and cheek plates under the tube, and the slew drive on the post.
         box((6.75, py - 1.5, 7.0), (9.25, py - 0.75, 9.0), "flange"),
         box((6.4, py - 1.5, 7.25), (6.8, py + 0.5, 8.75), "flange"),
@@ -178,9 +185,9 @@ def panel_textures(material):
         "flange": PANEL_TEX + "flange",
         "clamp": PANEL_TEX + "clamp",
         "tube": PANEL_TEX + "post",
-        "pad": PANEL_TEX + "pad",
-        "pad_side": PANEL_TEX + "pad_side",
-        "pad_port": PANEL_TEX + "pad_port",
+        "foot": PANEL_TEX + "foot",
+        "foot_side": PANEL_TEX + "foot_side",
+        "port": PANEL_TEX + "port",
     }
 
 
@@ -204,8 +211,10 @@ def panel_blockstate(material):
 def controller_elements():
     (bx0, _, bz0), (bx1, by1, bz1) = BASE
     (hx0, _, hz0), (hx1, _, hz1) = HEAD
-    elements = [pad_element()]
-    elements.append(box((bx0, PAD_TOP, bz0), (bx1, by1, bz1), {"up": "ledge", "*": "casing"}, faces=("north", "south", "east", "west", "up")))
+    elements = [box(
+        (bx0, 0.0, bz0), (bx1, by1, bz1), {"up": "ledge", "down": "port", "*": "casing"},
+        uv={"down": [bx0, bz0, bx1, bz1]},
+    )]
     # Teal band just above the panel decks, where the array head rises out of the field.
     elements.append(box((bx0 - 0.25, BAND_Y, bz0 - 0.25), (bx1 + 0.25, by1, bz1 + 0.25), "band", faces=SIDES))
     elements.append(box(*HEAD, {"north": "front", "south": "back", "east": "side", "west": "side"}, faces=SIDES))
@@ -245,9 +254,7 @@ CONTROLLER_TEXTURES_MAP = {
     "flange": CONTROLLER_TEX + "flange",
     "glass": CONTROLLER_TEX + "glass",
     "fin": CONTROLLER_TEX + "fin",
-    "pad": PANEL_TEX + "pad",
-    "pad_side": PANEL_TEX + "pad_side",
-    "pad_port": PANEL_TEX + "pad_port",
+    "port": PANEL_TEX + "port",
     "lamp": CONTROLLER_TEX + "lamp_off",
 }
 
@@ -509,9 +516,9 @@ def write_panel_textures() -> None:
     junction = panel_seams(noisy(64, SLATE, "junction", amount=4), rivets=False)
     save(junction, PANEL_TEXTURES, "junction")
     save(band_texture("panel_band"), PANEL_TEXTURES, "band")
-    save(pad_top(), PANEL_TEXTURES, "pad")
-    save(pad_side(), PANEL_TEXTURES, "pad_side")
-    save(pad_port(), PANEL_TEXTURES, "pad_port")
+    save(foot_top(), PANEL_TEXTURES, "foot")
+    save(foot_side(), PANEL_TEXTURES, "foot_side")
+    save(port(), PANEL_TEXTURES, "port")
 
 
 def band_texture(name):
@@ -526,41 +533,44 @@ def band_texture(name):
     return band
 
 
-def pad_top():
-    """Ground pad: dark slate tread with a seam on every block edge, so a field of pads reads as laid plates."""
-    pad = noisy(64, SLATE_DARK, "pad", amount=4)
-    pixels = pad.load()
-    for y in range(64):
-        for x in range(64):
+def foot_top():
+    """Foot plate: dark slate tread, drawn in the middle of the texture where the plate's 4 to 12 face maps it, with a
+    bevel at the plate's edge."""
+    foot = noisy(64, SLATE_DARK, "foot", amount=4)
+    pixels = foot.load()
+    for y in range(16, 48):
+        for x in range(16, 48):
             if (x + y) % 8 in (0, 1) and (x - y) % 16 in range(0, 6):
                 pixels[x, y] = (*shade(pixels[x, y], 18), 255)
-            if x in (0, 63) or y in (0, 63):
-                pixels[x, y] = (*shade(SLATE_DARK, -10), 255)
-    return pad
+            if x in (16, 47) or y in (16, 47):
+                pixels[x, y] = (*shade(SLATE, 16), 255)
+    return foot
 
 
-def pad_side():
-    side = noisy(64, SLATE_DARK, "pad_side", amount=4)
+def foot_side():
+    side = noisy(64, SLATE_DARK, "foot_side", amount=4)
     pixels = side.load()
     for x in range(64):
-        pixels[x, 59] = (*shade(SLATE, 20), 255)
+        pixels[x, 61] = (*shade(SLATE, 20), 255)
         pixels[x, 63] = (*shade(SLATE_DARK, -10), 255)
     return side
 
 
-def pad_port():
-    """The pad's underside: plain slate with the cable port in the middle, the Universal Connector ring at 4 to 12."""
-    pad = noisy(64, SLATE_DARK, "pad_bottom", amount=3)
-    draw = ImageDraw.Draw(pad)
+def port():
+    """The cable port for a block's underside: the Universal Connector ring at 4 to 12, in the middle of the texture,
+    on plain slate for a face that is wider than the ring. The ring stays dim, since a raised field shows every
+    panel's port from below."""
+    image = noisy(64, SLATE_DARK, "pad_bottom", amount=3)
+    draw = ImageDraw.Draw(image)
     draw.rectangle([16, 16, 47, 47], fill=(*SLATE, 255), outline=(*SLATE_DARK, 255))
-    draw.rectangle([18, 18, 45, 45], outline=(*TEAL_DARK, 255), width=2)
-    draw.rectangle([19, 19, 44, 44], outline=(*shade(TEAL, 10), 255))
+    draw.rectangle([18, 18, 45, 45], outline=(*shade(SLATE_DARK, 8), 255))
+    draw.rectangle([19, 19, 44, 44], outline=(*TEAL_DARK, 255))
     for x, y in ((17, 17), (45, 17), (17, 45), (45, 45)):
         draw.point([(x, y)], fill=(150, 158, 168, 255))
     draw.rectangle([26, 26, 37, 37], fill=(14, 18, 24, 255), outline=(98, 108, 120, 255))
     for x, y in ((28, 28), (34, 28), (28, 34), (34, 34)):
         draw.rectangle([x, y, x + 1, y + 1], fill=(184, 115, 51, 255))
-    return pad
+    return image
 
 
 def lamp_texture(color, name):
