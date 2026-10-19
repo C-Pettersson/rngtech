@@ -225,7 +225,10 @@ public class BatteryChassisMenu extends AbstractContainerMenu implements StatBre
     }
 
     public double statValue(int dataIndex) {
-        if (dataIndex == DATA_CELL_SLOTS || dataIndex == DATA_BURST_DURATION || dataIndex == DATA_REFINEMENT_POTENTIAL) {
+        if (dataIndex == DATA_CELL_SLOTS
+                || dataIndex == DATA_ENERGY_TRANSFER
+                || dataIndex == DATA_BURST_DURATION
+                || dataIndex == DATA_REFINEMENT_POTENTIAL) {
             return data.get(dataIndex);
         }
         return data.get(dataIndex) / (double) STAT_SCALE;

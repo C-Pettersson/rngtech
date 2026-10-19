@@ -433,20 +433,30 @@ public class BatteryChassisScreen extends AbstractContainerScreen<BatteryChassis
                     Component.translatable(STAT_LABEL_KEYS[index]),
                     statValue(index),
                     value,
-                    index == 0 || index == 3,
+                    isAbsoluteStat(STAT_DATA_INDICES[index]),
                     isEnhancedStat(STAT_DATA_INDICES[index], value),
-                    MachineScreenStyle.statLayerTooltip(
-                            menu.getSlot(menu.refinementTargetSlot()).getItem(),
-                            STAT_TYPES[index],
-                            value
-                    )
+                    statTooltip(index, value)
             ).withStat(STAT_TYPES[index]);
         }
         return statLines;
     }
 
+    private Component statTooltip(int index, double value) {
+        if (STAT_DATA_INDICES[index] == BatteryChassisMenu.energyTransferDataIndex()) {
+            return Component.translatable("rngtech.battery_chassis.stat.energy_transfer.description", statValue(index));
+        }
+        return MachineScreenStyle.statLayerTooltip(menu.getSlot(menu.refinementTargetSlot()).getItem(), STAT_TYPES[index], value);
+    }
+
+    /** Slots, FE/t, and ticks read as amounts, not as a multiplier around 1. */
+    private static boolean isAbsoluteStat(int dataIndex) {
+        return dataIndex == BatteryChassisMenu.cellSlotsDataIndex()
+                || dataIndex == BatteryChassisMenu.energyTransferDataIndex()
+                || dataIndex == BatteryChassisMenu.burstDurationDataIndex();
+    }
+
     private boolean isEnhancedStat(int dataIndex, double value) {
-        if (dataIndex == BatteryChassisMenu.idleLossDataIndex()) {
+        if (dataIndex == BatteryChassisMenu.idleLossDataIndex() || isAbsoluteStat(dataIndex)) {
             return false;
         }
         return value > 1.001;
