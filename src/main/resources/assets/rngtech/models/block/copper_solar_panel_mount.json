@@ -12,47 +12,175 @@
     "flange": "rngtech:block/solar_panel/flange",
     "clamp": "rngtech:block/solar_panel/clamp",
     "tube": "rngtech:block/solar_panel/post",
-    "pad": "rngtech:block/solar_panel/pad",
-    "pad_side": "rngtech:block/solar_panel/pad_side",
-    "pad_port": "rngtech:block/solar_panel/pad_port"
+    "foot": "rngtech:block/solar_panel/foot",
+    "foot_side": "rngtech:block/solar_panel/foot_side",
+    "port": "rngtech:block/solar_panel/port"
   },
   "elements": [
     {
       "from": [
-        0,
-        0,
-        0
+        4.0,
+        0.0,
+        4.0
       ],
       "to": [
-        16,
-        0.5,
-        16
+        12.0,
+        0.75,
+        12.0
       ],
       "faces": {
         "north": {
-          "texture": "#pad_side"
+          "texture": "#foot_side"
         },
         "south": {
-          "texture": "#pad_side"
+          "texture": "#foot_side"
         },
         "east": {
-          "texture": "#pad_side"
+          "texture": "#foot_side"
         },
         "west": {
-          "texture": "#pad_side"
+          "texture": "#foot_side"
         },
         "up": {
-          "texture": "#pad"
+          "texture": "#foot",
+          "uv": [
+            4.0,
+            4.0,
+            12.0,
+            12.0
+          ]
         },
         "down": {
-          "texture": "#pad_port"
+          "texture": "#port",
+          "uv": [
+            4.0,
+            4.0,
+            12.0,
+            12.0
+          ]
+        }
+      }
+    },
+    {
+      "from": [
+        4.5,
+        0.75,
+        4.5
+      ],
+      "to": [
+        5.25,
+        1.15,
+        5.25
+      ],
+      "faces": {
+        "north": {
+          "texture": "#clamp"
+        },
+        "south": {
+          "texture": "#clamp"
+        },
+        "east": {
+          "texture": "#clamp"
+        },
+        "west": {
+          "texture": "#clamp"
+        },
+        "up": {
+          "texture": "#clamp"
+        }
+      }
+    },
+    {
+      "from": [
+        4.5,
+        0.75,
+        10.75
+      ],
+      "to": [
+        5.25,
+        1.15,
+        11.5
+      ],
+      "faces": {
+        "north": {
+          "texture": "#clamp"
+        },
+        "south": {
+          "texture": "#clamp"
+        },
+        "east": {
+          "texture": "#clamp"
+        },
+        "west": {
+          "texture": "#clamp"
+        },
+        "up": {
+          "texture": "#clamp"
+        }
+      }
+    },
+    {
+      "from": [
+        10.75,
+        0.75,
+        4.5
+      ],
+      "to": [
+        11.5,
+        1.15,
+        5.25
+      ],
+      "faces": {
+        "north": {
+          "texture": "#clamp"
+        },
+        "south": {
+          "texture": "#clamp"
+        },
+        "east": {
+          "texture": "#clamp"
+        },
+        "west": {
+          "texture": "#clamp"
+        },
+        "up": {
+          "texture": "#clamp"
+        }
+      }
+    },
+    {
+      "from": [
+        10.75,
+        0.75,
+        10.75
+      ],
+      "to": [
+        11.5,
+        1.15,
+        11.5
+      ],
+      "faces": {
+        "north": {
+          "texture": "#clamp"
+        },
+        "south": {
+          "texture": "#clamp"
+        },
+        "east": {
+          "texture": "#clamp"
+        },
+        "west": {
+          "texture": "#clamp"
+        },
+        "up": {
+          "texture": "#clamp"
         }
       }
     },
     {
       "from": [
         7.0,
-        0.5,
+        0.75,
         7.0
       ],
       "to": [
@@ -78,12 +206,12 @@
     {
       "from": [
         6.75,
-        0.5,
+        0.75,
         6.75
       ],
       "to": [
         9.25,
-        1.0,
+        1.25,
         9.25
       ],
       "faces": {
@@ -97,6 +225,9 @@
           "texture": "#band"
         },
         "west": {
+          "texture": "#band"
+        },
+        "up": {
           "texture": "#band"
         }
       }

@@ -12,9 +12,9 @@
     "flange": "rngtech:block/solar_panel/flange",
     "clamp": "rngtech:block/solar_panel/clamp",
     "tube": "rngtech:block/solar_panel/post",
-    "pad": "rngtech:block/solar_panel/pad",
-    "pad_side": "rngtech:block/solar_panel/pad_side",
-    "pad_port": "rngtech:block/solar_panel/pad_port"
+    "foot": "rngtech:block/solar_panel/foot",
+    "foot_side": "rngtech:block/solar_panel/foot_side",
+    "port": "rngtech:block/solar_panel/port"
   },
   "elements": [
     {
