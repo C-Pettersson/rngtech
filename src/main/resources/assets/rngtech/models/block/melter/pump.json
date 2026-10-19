@@ -1,0 +1,152 @@
+{
+  "textures": {
+    "particle": "#pump"
+  },
+  "elements": [
+    {
+      "from": [
+        12.125,
+        2.5,
+        12.54
+      ],
+      "to": [
+        15.625,
+        5.5,
+        14.71
+      ],
+      "faces": {
+        "north": {
+          "texture": "#pump"
+        },
+        "south": {
+          "texture": "#pump"
+        },
+        "east": {
+          "texture": "#pump"
+        },
+        "west": {
+          "texture": "#pump"
+        },
+        "up": {
+          "texture": "#pump_end"
+        }
+      }
+    },
+    {
+      "from": [
+        12.79,
+        2.5,
+        11.875
+      ],
+      "to": [
+        14.96,
+        5.5,
+        15.375
+      ],
+      "faces": {
+        "north": {
+          "texture": "#pump"
+        },
+        "south": {
+          "texture": "#pump"
+        },
+        "east": {
+          "texture": "#pump"
+        },
+        "west": {
+          "texture": "#pump"
+        },
+        "up": {
+          "texture": "#pump_end"
+        }
+      }
+    },
+    {
+      "from": [
+        12.775,
+        5.5,
+        12.925
+      ],
+      "to": [
+        14.975,
+        7.5,
+        14.325
+      ],
+      "faces": {
+        "north": {
+          "texture": "#pump_motor"
+        },
+        "south": {
+          "texture": "#pump_motor"
+        },
+        "east": {
+          "texture": "#pump_motor"
+        },
+        "west": {
+          "texture": "#pump_motor"
+        },
+        "up": {
+          "texture": "#pump_end"
+        }
+      }
+    },
+    {
+      "from": [
+        13.175,
+        5.5,
+        12.525
+      ],
+      "to": [
+        14.575,
+        7.5,
+        14.725
+      ],
+      "faces": {
+        "north": {
+          "texture": "#pump_motor"
+        },
+        "south": {
+          "texture": "#pump_motor"
+        },
+        "east": {
+          "texture": "#pump_motor"
+        },
+        "west": {
+          "texture": "#pump_motor"
+        },
+        "up": {
+          "texture": "#pump_end"
+        }
+      }
+    },
+    {
+      "from": [
+        13.0,
+        2.25,
+        11.375
+      ],
+      "to": [
+        14.5,
+        3.75,
+        12.125
+      ],
+      "faces": {
+        "north": {
+          "texture": "#pump_flange"
+        },
+        "south": {
+          "texture": "#pump_flange"
+        },
+        "east": {
+          "texture": "#pump_flange"
+        },
+        "west": {
+          "texture": "#pump_flange"
+        },
+        "up": {
+          "texture": "#pump_flange"
+        }
+      }
+    }
+  ]
+}

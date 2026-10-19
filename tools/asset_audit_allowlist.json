@@ -210,9 +210,10 @@
         "*_furnace_chassis",
         "*_alloy_furnace_chassis",
         "crude_metal_press",
-        "metal_press"
+        "metal_press",
+        "melter"
       ],
-      "reason": "Furnace and Alloy Furnace chassis of the same metal share that metal's shell, trim, and crown, and every electric chassis shares the status lamp; the Metal Presses reuse the Furnace's plinth, cabinet, cell cradle, atmosphere cylinder, heat bar, and port. The families differ by silhouette."
+      "reason": "Furnace and Alloy Furnace chassis of the same metal share that metal's shell, trim, and crown, and every electric chassis shares the status lamp; the Metal Presses reuse the Furnace's plinth, cabinet, cell cradle, atmosphere cylinder, heat bar, and port, and the Melter its refractory lining, heat bar, pipe, sealed glass, and pump pad. The families differ by silhouette."
     },
     {
       "check": "shared_machine_block_texture",

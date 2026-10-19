@@ -1,0 +1,159 @@
+{
+  "textures": {
+    "particle": "#carriage",
+    "beam": "rngtech:block/battery_assembler/beam",
+    "band": "rngtech:block/crusher/band",
+    "truck": "rngtech:block/crusher/trim/copper",
+    "carriage": "rngtech:block/crusher/casing",
+    "carriage_top": "rngtech:block/battery_assembler/carriage_top",
+    "quill": "rngtech:block/crusher/shaft",
+    "head": "rngtech:block/battery_assembler/head",
+    "head_bottom": "rngtech:block/battery_assembler/head_bottom",
+    "finger": "rngtech:block/crusher/trim/copper",
+    "nozzle": "rngtech:block/furnace/pipe"
+  },
+  "elements": [
+    {
+      "from": [
+        7.0,
+        13.25,
+        7.0
+      ],
+      "to": [
+        9.0,
+        13.75,
+        9.0
+      ],
+      "faces": {
+        "north": {
+          "texture": "#carriage"
+        },
+        "south": {
+          "texture": "#carriage"
+        },
+        "east": {
+          "texture": "#carriage"
+        },
+        "west": {
+          "texture": "#carriage"
+        },
+        "up": {
+          "texture": "#carriage_top",
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ]
+        },
+        "down": {
+          "texture": "#carriage"
+        }
+      }
+    },
+    {
+      "from": [
+        7.0,
+        11.75,
+        7.0
+      ],
+      "to": [
+        9.0,
+        12.5,
+        7.5
+      ],
+      "faces": {
+        "north": {
+          "texture": "#carriage"
+        },
+        "south": {
+          "texture": "#carriage"
+        },
+        "east": {
+          "texture": "#carriage"
+        },
+        "west": {
+          "texture": "#carriage"
+        },
+        "down": {
+          "texture": "#carriage"
+        }
+      }
+    },
+    {
+      "from": [
+        7.0,
+        11.75,
+        8.5
+      ],
+      "to": [
+        9.0,
+        12.5,
+        9.0
+      ],
+      "faces": {
+        "north": {
+          "texture": "#carriage"
+        },
+        "south": {
+          "texture": "#carriage"
+        },
+        "east": {
+          "texture": "#carriage"
+        },
+        "west": {
+          "texture": "#carriage"
+        },
+        "down": {
+          "texture": "#carriage"
+        }
+      }
+    },
+    {
+      "from": [
+        7.0,
+        11.75,
+        7.5
+      ],
+      "to": [
+        7.5,
+        12.5,
+        8.5
+      ],
+      "faces": {
+        "east": {
+          "texture": "#carriage"
+        },
+        "west": {
+          "texture": "#carriage"
+        },
+        "down": {
+          "texture": "#carriage"
+        }
+      }
+    },
+    {
+      "from": [
+        8.5,
+        11.75,
+        7.5
+      ],
+      "to": [
+        9.0,
+        12.5,
+        8.5
+      ],
+      "faces": {
+        "east": {
+          "texture": "#carriage"
+        },
+        "west": {
+          "texture": "#carriage"
+        },
+        "down": {
+          "texture": "#carriage"
+        }
+      }
+    }
+  ]
+}

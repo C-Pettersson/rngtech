@@ -1,0 +1,8 @@
+{
+  "parent": "rngtech:block/melter/roll",
+  "textures": {
+    "roll": "rngtech:block/crusher/roll/exotic",
+    "roll_end": "rngtech:block/crusher/roll/exotic_end",
+    "hub": "rngtech:block/crusher/roll/exotic_hub"
+  }
+}

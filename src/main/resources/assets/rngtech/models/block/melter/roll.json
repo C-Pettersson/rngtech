@@ -1,0 +1,150 @@
+{
+  "textures": {
+    "particle": "#roll"
+  },
+  "elements": [
+    {
+      "from": [
+        5.5,
+        7.1868,
+        7.1868
+      ],
+      "to": [
+        10.5,
+        8.8132,
+        8.8132
+      ],
+      "faces": {
+        "north": {
+          "texture": "#roll"
+        },
+        "south": {
+          "texture": "#roll"
+        },
+        "east": {
+          "texture": "#roll_end"
+        },
+        "west": {
+          "texture": "#roll_end"
+        },
+        "up": {
+          "texture": "#roll"
+        },
+        "down": {
+          "texture": "#roll"
+        }
+      }
+    },
+    {
+      "from": [
+        5.55,
+        7.1868,
+        7.1868
+      ],
+      "to": [
+        10.45,
+        8.8132,
+        8.8132
+      ],
+      "faces": {
+        "north": {
+          "texture": "#roll"
+        },
+        "south": {
+          "texture": "#roll"
+        },
+        "east": {
+          "texture": "#roll_end"
+        },
+        "west": {
+          "texture": "#roll_end"
+        },
+        "up": {
+          "texture": "#roll"
+        },
+        "down": {
+          "texture": "#roll"
+        }
+      },
+      "rotation": {
+        "origin": [
+          8.0,
+          8.0,
+          8.0
+        ],
+        "axis": "x",
+        "angle": 45
+      }
+    },
+    {
+      "from": [
+        5.25,
+        7.6,
+        7.6
+      ],
+      "to": [
+        5.5,
+        8.4,
+        8.4
+      ],
+      "faces": {
+        "west": {
+          "texture": "#hub",
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ]
+        },
+        "north": {
+          "texture": "#hub"
+        },
+        "south": {
+          "texture": "#hub"
+        },
+        "up": {
+          "texture": "#hub"
+        },
+        "down": {
+          "texture": "#hub"
+        }
+      }
+    },
+    {
+      "from": [
+        10.5,
+        7.6,
+        7.6
+      ],
+      "to": [
+        10.75,
+        8.4,
+        8.4
+      ],
+      "faces": {
+        "east": {
+          "texture": "#hub",
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ]
+        },
+        "north": {
+          "texture": "#hub"
+        },
+        "south": {
+          "texture": "#hub"
+        },
+        "up": {
+          "texture": "#hub"
+        },
+        "down": {
+          "texture": "#hub"
+        }
+      }
+    }
+  ]
+}

@@ -2,7 +2,7 @@
 navigation:
   title: "Mastery and Ascendancies"
   parent: melter.md
-  position: 2
+  position: 3
   icon: rngtech:melter
 ---
 
