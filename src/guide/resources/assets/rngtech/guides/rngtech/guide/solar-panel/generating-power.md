@@ -18,6 +18,6 @@ Rain, snow, and thunderstorms drop a panel to its lower weather output. At night
 
 A standalone panel stores FE in a small internal buffer and pushes it out to adjacent blocks that accept FE, such as a [Universal Cable](rngtech:universal-cable.md) or a [Battery Chassis](rngtech:battery-chassis.md). A panel does not limit its own output, so the receiver or connector tier decides how much FE moves each tick. Panels never accept FE from outside.
 
-The cable port sits on the underside of the ground pad. Run a cable one block down, under the panels, and the pads cover it. A cable beside a panel connects too.
+The cable port sits under the foot of the post. A cable directly below plugs in, so you can run cables one block down under a field or raise panels on a column of cable. A cable beside a panel connects too.
 
 A standalone panel with a full buffer has nowhere to send its FE, so it stops and lies flat until something takes the FE.

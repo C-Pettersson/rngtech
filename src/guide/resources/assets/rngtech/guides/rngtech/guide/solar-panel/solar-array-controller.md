@@ -17,7 +17,7 @@ Place the controller on the same level as your panels. Every 20 ticks it scans a
 
 The controller starts at range 1. Range rolls on the controller and an installed Solar Array Extender raise it, up to a maximum of 2.
 
-While a controller owns a panel, that panel stops exporting on its own. The controller adds up its panels' output, applies its own stats once to the total, stores the FE, and exports it to adjacent blocks. Its cable port is also on the underside of its pad. A few more rules:
+While a controller owns a panel, that panel stops exporting on its own. The controller adds up its panels' output, applies its own stats once to the total, stores the FE, and exports it to adjacent blocks. Its cable port is on the underside of its base. A few more rules:
 
 - **Set bonus.** If every panel spot in range holds a panel of the same stage, the array gets +20% output.
 - **Overlap.** A panel inside two controllers' ranges splits its output between them.

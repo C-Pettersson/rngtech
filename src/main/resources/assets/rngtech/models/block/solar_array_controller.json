@@ -15,48 +15,14 @@
     "flange": "rngtech:block/solar_array_controller/flange",
     "glass": "rngtech:block/solar_array_controller/glass",
     "fin": "rngtech:block/solar_array_controller/fin",
-    "pad": "rngtech:block/solar_panel/pad",
-    "pad_side": "rngtech:block/solar_panel/pad_side",
-    "pad_port": "rngtech:block/solar_panel/pad_port",
+    "port": "rngtech:block/solar_panel/port",
     "lamp": "rngtech:block/solar_array_controller/lamp_off"
   },
   "elements": [
     {
       "from": [
-        0,
-        0,
-        0
-      ],
-      "to": [
-        16,
-        0.5,
-        16
-      ],
-      "faces": {
-        "north": {
-          "texture": "#pad_side"
-        },
-        "south": {
-          "texture": "#pad_side"
-        },
-        "east": {
-          "texture": "#pad_side"
-        },
-        "west": {
-          "texture": "#pad_side"
-        },
-        "up": {
-          "texture": "#pad"
-        },
-        "down": {
-          "texture": "#pad_port"
-        }
-      }
-    },
-    {
-      "from": [
         1.0,
-        0.5,
+        0.0,
         1.0
       ],
       "to": [
@@ -79,6 +45,15 @@
         },
         "up": {
           "texture": "#ledge"
+        },
+        "down": {
+          "texture": "#port",
+          "uv": [
+            1.0,
+            1.0,
+            15.0,
+            15.0
+          ]
         }
       }
     },

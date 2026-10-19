@@ -33,7 +33,7 @@ wiki:
 
 **Solar Panels** generate FE from daylight with no fuel at all. Place one under open sky and it charges whatever is next to it. Once you have a few, a **Solar Array Controller** gathers a connected field of panels into one output with a shared buffer and its own bonuses. See [Power Chains](power-chains.md#solar) for how panels fit beside the main generators.
 
-Each panel is a low tracker on a ground pad: a deck of cells on a torque tube. While it generates, the deck tilts toward the sun and follows it across the sky, east in the morning and west in the afternoon. When it can't generate it lies flat, so you can tell at a glance which panels are working. Panels are a little over a third of a block tall, so you can walk across a field of them.
+Each panel is a low tracker on a short post: a deck of cells on a torque tube. While it generates, the deck tilts toward the sun and follows it across the sky, east in the morning and west in the afternoon. When it can't generate it lies flat, so you can tell at a glance which panels are working. Panels are a little over a third of a block tall, so you can walk across a field of them.
 
 Each panel and controller you craft rolls its own [rarity and affixes](rarity-and-affixes.md). Solar blocks do not have Machine Mastery.
 
@@ -65,7 +65,7 @@ Rain, snow, and thunderstorms drop a panel to its lower weather output. At night
 
 A standalone panel stores FE in a small internal buffer and pushes it out to adjacent blocks that accept FE, such as a [Universal Cable](universal-cable.md) or a [Battery Chassis](battery-chassis.md). A panel does not limit its own output, so the receiver or connector tier decides how much FE moves each tick. Panels never accept FE from outside.
 
-The cable port sits on the underside of the ground pad. Run a cable one block down, under the panels, and the pads cover it. A cable beside a panel connects too.
+The cable port sits under the foot of the post. A cable directly below plugs in, so you can run cables one block down under a field or raise panels on a column of cable. A cable beside a panel connects too.
 
 A standalone panel with a full buffer has nowhere to send its FE, so it stops and lies flat until something takes the FE.
 
@@ -92,7 +92,7 @@ Place the controller on the same level as your panels. Every 20 ticks it scans a
 
 The controller starts at range 1. Range rolls on the controller and an installed Solar Array Extender raise it, up to a maximum of 2.
 
-While a controller owns a panel, that panel stops exporting on its own. The controller adds up its panels' output, applies its own stats once to the total, stores the FE, and exports it to adjacent blocks. Its cable port is also on the underside of its pad. A few more rules:
+While a controller owns a panel, that panel stops exporting on its own. The controller adds up its panels' output, applies its own stats once to the total, stores the FE, and exports it to adjacent blocks. Its cable port is on the underside of its base. A few more rules:
 
 - **Set bonus.** If every panel spot in range holds a panel of the same stage, the array gets +20% output.
 - **Overlap.** A panel inside two controllers' ranges splits its output between them.
@@ -141,8 +141,8 @@ Extenders also roll their own affixes, which apply while installed.
 
 | Block | Behavior |
 |---|---|
-| Solar Panel | Exports FE on every side. The cable port is under its pad. Does not accept FE or items. |
-| Solar Array Controller | Exports FE on every side. The cable port is under its pad. Does not accept FE. Gear is installed by hand. |
+| Solar Panel | Exports FE on every side. The cable port is under its foot. Does not accept FE or items. |
+| Solar Array Controller | Exports FE on every side. The cable port is under its base. Does not accept FE. Gear is installed by hand. |
 
 If a very large field slows your game down, turn off animated solar panels in RNGTech's client config. Panels then tilt in steps instead of turning smoothly.
 
