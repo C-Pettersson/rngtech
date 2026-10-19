@@ -1,5 +1,6 @@
 package com.rngtech.content.registry;
 
+import com.rngtech.content.network.LinkItemPayload;
 import com.rngtech.content.network.OpenConfiguratorAdvancedPayload;
 import com.rngtech.content.network.OpenConfiguratorAdvancedServerHandler;
 import com.rngtech.content.network.StatBreakdownPayload;
@@ -13,7 +14,7 @@ import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 
 public final class ModNetworking {
-    private static final String VERSION = "4";
+    private static final String VERSION = "5";
 
     private ModNetworking() {
     }
@@ -37,6 +38,11 @@ public final class ModNetworking {
                 StatBreakdownRequestPayload.TYPE,
                 StatBreakdownRequestPayload.STREAM_CODEC,
                 StatBreakdownRequestPayload::handle
+        );
+        registrar.playToServer(
+                LinkItemPayload.TYPE,
+                LinkItemPayload.STREAM_CODEC,
+                LinkItemPayload::handle
         );
         registrar.playToClient(
                 StatBreakdownPayload.TYPE,

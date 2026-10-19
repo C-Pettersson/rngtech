@@ -371,7 +371,7 @@ final class MachineTraitTooltip {
         };
     }
 
-    private static Style rarityStyle(Style style, Rarity rarity) {
+    static Style rarityStyle(Style style, Rarity rarity) {
         return switch (rarity) {
             case NORMAL -> style.withColor(ChatFormatting.WHITE);
             case MAGIC -> style.withColor(ChatFormatting.AQUA);

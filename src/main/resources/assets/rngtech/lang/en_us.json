@@ -1,6 +1,7 @@
 {
   "itemGroup.rngtech": "RNGTech",
   "rngtech.item.unidentified": "Unidentified %s",
+  "rngtech.chat.linked_item": "%s linked %s",
   "block.rngtech.affix_forge": "Affix Forge",
   "block.rngtech.exotic_affix_forge": "Exotic Affix Forge",
   "block.rngtech.debug_reroller": "Debug Reroller",
