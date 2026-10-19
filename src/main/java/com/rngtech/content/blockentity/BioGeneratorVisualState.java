@@ -10,17 +10,21 @@ import net.minecraft.world.item.Items;
 /**
  * What a Bio Generator shows in the world. {@code gas} is the gas holder fill and {@code feed} the undigested share of the
  * current item, both 0 to 1. {@code digestion} and {@code engine} are gas made and burned per tick against the rated
- * generation, so 1 is the rated pace and 0 is idle.
+ * generation, so 1 is the rated pace and 0 is idle; {@code vent} is the CO2 a take-off vents on the same scale. The two
+ * gas lines hold one of the {@code GAS_LINE_*} kinds from {@link BioGeneratorBlockEntity}.
  */
 public record BioGeneratorVisualState(
         float gas,
         float feed,
         float digestion,
         float engine,
+        float vent,
         boolean chamber,
+        int lineA,
+        int lineB,
         Item hopper
 ) {
-    public static final BioGeneratorVisualState IDLE = new BioGeneratorVisualState(0.0F, 0.0F, 0.0F, 0.0F, false, Items.AIR);
+    public static final BioGeneratorVisualState IDLE = new BioGeneratorVisualState(0.0F, 0.0F, 0.0F, 0.0F, 0.0F, false, 0, 0, Items.AIR);
 
     /** Quantized so the slow gas and feed drifts do not send an update every tick. */
     public Key key() {
@@ -29,7 +33,10 @@ public record BioGeneratorVisualState(
                 Math.round(feed * 16.0F),
                 Math.round(digestion * 10.0F),
                 Math.round(engine * 10.0F),
+                Math.round(vent * 10.0F),
                 chamber,
+                lineA,
+                lineB,
                 hopper
         );
     }
@@ -40,7 +47,10 @@ public record BioGeneratorVisualState(
         tag.putFloat("Feed", feed);
         tag.putFloat("Digestion", digestion);
         tag.putFloat("Engine", engine);
+        tag.putFloat("Vent", vent);
         tag.putBoolean("Chamber", chamber);
+        tag.putInt("LineA", lineA);
+        tag.putInt("LineB", lineB);
         tag.putString("Hopper", BuiltInRegistries.ITEM.getKey(hopper).toString());
         return tag;
     }
@@ -55,12 +65,15 @@ public record BioGeneratorVisualState(
                 tag.getFloat("Feed"),
                 tag.getFloat("Digestion"),
                 tag.getFloat("Engine"),
+                tag.getFloat("Vent"),
                 tag.getBoolean("Chamber"),
+                tag.getInt("LineA"),
+                tag.getInt("LineB"),
                 hopper == null ? Items.AIR : BuiltInRegistries.ITEM.get(hopper)
         );
     }
 
-    public record Key(int gas, int feed, int digestion, int engine, boolean chamber, Item hopper) {
+    public record Key(int gas, int feed, int digestion, int engine, int vent, boolean chamber, int lineA, int lineB, Item hopper) {
     }
 
     /** Client-side animation, eased toward the synced state between updates. */

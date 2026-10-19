@@ -31,7 +31,8 @@ public record BatteryAssemblyRecipe(
         ItemStack result,
         int processingTicks,
         int energy,
-        boolean rollResultTraits
+        boolean rollResultTraits,
+        boolean recordCalibration
 )
         implements Recipe<BatteryAssemblyRecipeInput> {
     public BatteryAssemblyRecipe {
@@ -147,7 +148,8 @@ public record BatteryAssemblyRecipe(
                                 .fieldOf("energy")
                                 .orElse(1200)
                                 .forGetter(BatteryAssemblyRecipe::energy),
-                        Codec.BOOL.fieldOf("roll_result_traits").orElse(false).forGetter(BatteryAssemblyRecipe::rollResultTraits)
+                        Codec.BOOL.fieldOf("roll_result_traits").orElse(false).forGetter(BatteryAssemblyRecipe::rollResultTraits),
+                        Codec.BOOL.fieldOf("record_calibration").orElse(false).forGetter(BatteryAssemblyRecipe::recordCalibration)
                 )
                 .apply(instance, BatteryAssemblyRecipe::new));
 
@@ -165,6 +167,7 @@ public record BatteryAssemblyRecipe(
                         int processingTicks = ByteBufCodecs.VAR_INT.decode(buffer);
                         int energy = ByteBufCodecs.VAR_INT.decode(buffer);
                         boolean rollResultTraits = ByteBufCodecs.BOOL.decode(buffer);
+                        boolean recordCalibration = ByteBufCodecs.BOOL.decode(buffer);
                         return new BatteryAssemblyRecipe(
                                 group,
                                 ingredients,
@@ -172,7 +175,8 @@ public record BatteryAssemblyRecipe(
                                 result,
                                 processingTicks,
                                 energy,
-                                rollResultTraits
+                                rollResultTraits,
+                                recordCalibration
                         );
                     }
 
@@ -186,6 +190,7 @@ public record BatteryAssemblyRecipe(
                         ByteBufCodecs.VAR_INT.encode(buffer, recipe.processingTicks);
                         ByteBufCodecs.VAR_INT.encode(buffer, recipe.energy);
                         ByteBufCodecs.BOOL.encode(buffer, recipe.rollResultTraits);
+                        ByteBufCodecs.BOOL.encode(buffer, recipe.recordCalibration);
                     }
                 };
 

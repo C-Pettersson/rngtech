@@ -29,7 +29,7 @@ import net.neoforged.neoforge.client.model.data.ModelData;
 
 /**
  * Draws the live parts of the Bio Generator: the gas holder dome rising with stored biogas, the engine flywheel, the
- * installed Bio Chamber's culture canister, digester slurry and bubbles in the sight glass, the gas-train gauge needle,
+ * installed Bio Chamber's culture canister, the Fluid Pumps and Biogas Membranes in the gas-line slots, digester slurry and bubbles in the sight glass, the gas-train gauge needle,
  * and the feed waiting in the hopper. Positions are in model pixels and match tools/blockmodels/bio_generator.py.
  */
 public class BioGeneratorRenderer implements BlockEntityRenderer<BioGeneratorBlockEntity> {
@@ -38,6 +38,10 @@ public class BioGeneratorRenderer implements BlockEntityRenderer<BioGeneratorBlo
     private static final ModelResourceLocation DOME = standalone("block/bio_generator/dome");
     private static final ModelResourceLocation FLYWHEEL = standalone("block/bio_generator/flywheel");
     private static final ModelResourceLocation CULTURE = standalone("block/bio_generator/culture");
+    private static final ModelResourceLocation PUMP = standalone("block/bio_generator/pump");
+    private static final ModelResourceLocation GAS_MEMBRANE = standalone("block/bio_generator/gas_membrane");
+    /** The second gas-line slot sits this far behind the first, matching GAS_LINE_STEP in the model script. */
+    private static final float GAS_LINE_STEP = 2.8F;
     private static final float DOME_BASE = 11.0F;
     private static final float DOME_SLACK = 0.45F;
     private static final float DOME_RISE = 0.75F;
@@ -71,6 +75,8 @@ public class BioGeneratorRenderer implements BlockEntityRenderer<BioGeneratorBlo
         event.register(DOME);
         event.register(FLYWHEEL);
         event.register(CULTURE);
+        event.register(PUMP);
+        event.register(GAS_MEMBRANE);
     }
 
     private static ModelResourceLocation standalone(String path) {
@@ -107,6 +113,8 @@ public class BioGeneratorRenderer implements BlockEntityRenderer<BioGeneratorBlo
         if (state.chamber()) {
             renderModel(CULTURE, poseStack, bufferSource, packedLight, packedOverlay);
         }
+        renderGasLine(state.lineA(), 0.0F, poseStack, bufferSource, packedLight, packedOverlay);
+        renderGasLine(state.lineB(), GAS_LINE_STEP, poseStack, bufferSource, packedLight, packedOverlay);
         renderSlurry(animation, time, poseStack, bufferSource, packedLight, packedOverlay);
         renderNeedle(animation, poseStack, bufferSource, packedLight, packedOverlay);
         renderHopper(animation, state, blockEntity, poseStack, bufferSource, packedLight, packedOverlay);
@@ -166,6 +174,21 @@ public class BioGeneratorRenderer implements BlockEntityRenderer<BioGeneratorBlo
         poseStack.mulPose(Axis.ZP.rotationDegrees(animation.flywheelAngle));
         poseStack.translate(-FLYWHEEL_X, -FLYWHEEL_Y, 0.0F);
         renderModel(FLYWHEEL, poseStack, bufferSource, packedLight, packedOverlay);
+        poseStack.popPose();
+    }
+
+    private void renderGasLine(int kind, float offset, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight, int packedOverlay) {
+        ModelResourceLocation model = switch (kind) {
+            case BioGeneratorBlockEntity.GAS_LINE_PUMP -> PUMP;
+            case BioGeneratorBlockEntity.GAS_LINE_MEMBRANE -> GAS_MEMBRANE;
+            default -> null;
+        };
+        if (model == null) {
+            return;
+        }
+        poseStack.pushPose();
+        poseStack.translate(0.0F, 0.0F, offset);
+        renderModel(model, poseStack, bufferSource, packedLight, packedOverlay);
         poseStack.popPose();
     }
 

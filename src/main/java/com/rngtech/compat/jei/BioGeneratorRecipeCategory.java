@@ -1,5 +1,6 @@
 package com.rngtech.compat.jei;
 
+import com.rngtech.content.energy.BiogasDigestion;
 import com.rngtech.content.registry.ModItems;
 
 import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
@@ -14,6 +15,8 @@ import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
+
+import java.util.Locale;
 
 public final class BioGeneratorRecipeCategory implements IRecipeCategory<BioGeneratorJeiFuel> {
     private static final int HEIGHT = 68;
@@ -69,6 +72,10 @@ public final class BioGeneratorRecipeCategory implements IRecipeCategory<BioGene
                     tooltip.add(Component.translatable("rngtech.processing.fuel"));
                     tooltip.add(recipe.family());
                     tooltip.add(Component.translatable("rngtech.jei.bio_generator.base_energy", recipe.baseEnergy()));
+                    tooltip.add(Component.translatable(
+                            "rngtech.jei.bio_generator.methane",
+                            String.format(Locale.ROOT, "%.1f", recipe.baseEnergy() * BiogasDigestion.METHANE_PER_FE)
+                    ));
                 });
     }
 

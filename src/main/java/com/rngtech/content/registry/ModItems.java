@@ -33,6 +33,7 @@ import com.rngtech.content.item.BatteryCellItem;
 import com.rngtech.content.item.BatteryChassisBlockItem;
 import com.rngtech.content.item.BioChamberItem;
 import com.rngtech.content.item.BioGeneratorBlockItem;
+import com.rngtech.content.item.BiogasMembraneItem;
 import com.rngtech.content.item.CableItem;
 import com.rngtech.content.item.CalibratedComponentItem;
 import com.rngtech.content.item.CalibrationGearItem;
@@ -624,6 +625,10 @@ public final class ModItems {
     public static final DeferredItem<BioChamberItem> BIO_CHAMBER = ITEMS.register(
             "bio_chamber",
             () -> new BioChamberItem(new Item.Properties().stacksTo(1))
+    );
+    public static final DeferredItem<BiogasMembraneItem> BIOGAS_MEMBRANE = ITEMS.register(
+            "biogas_membrane",
+            () -> new BiogasMembraneItem(new Item.Properties().stacksTo(1))
     );
     public static final DeferredItem<Item> COMPOST_FEEDSTOCK = ITEMS.register(
             "compost_feedstock",

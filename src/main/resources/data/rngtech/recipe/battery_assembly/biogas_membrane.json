@@ -1,0 +1,32 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "rngtech:material_enabled",
+      "material": "titanium"
+    }
+  ],
+  "type": "rngtech:battery_assembly",
+  "group": "component_assembly_membranes",
+  "ingredients": [
+    {
+      "item": "rngtech:calibrated_storage_component"
+    },
+    {
+      "ingredient": {
+        "item": "rngtech:rubber"
+      },
+      "count": 2
+    },
+    {
+      "item": "rngtech:titanium_plate"
+    }
+  ],
+  "result": {
+    "count": 1,
+    "id": "rngtech:biogas_membrane"
+  },
+  "processing_ticks": 240,
+  "energy": 6000,
+  "roll_result_traits": false,
+  "record_calibration": true
+}

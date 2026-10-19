@@ -67,6 +67,8 @@ navigation:
 
 **Urea instead of more Photobioreactors.** When the [Ammonia](rngtech:power-chains/stage-6-ammonia.md) chain runs, put [Urea](rngtech:algae-photobioreactor.md#urea) from the Ammonia Synthesizer in the Photobioreactors. Each Urea makes the next 4 Algae Biomass grow twice as fast, so the same Photobioreactors keep up with more Reformers. The water and carbon gas per biomass do not change. One Urea costs 250 mB of Ammonia, a small part of the Ammonia that you get from those 4 biomass.
 
+**Methane from a farm.** Bio Generators with a Fluid Pump send their biogas out as Methane through the [Methane take-off](rngtech:bio-generator/methane-take-off.md). This needs no Melter heat and no light, but each item gives far less Methane than in the Melter, so it takes several Bio Generators and a large crop or compost farm to keep one Reformer busy. It is a good use for the Bio Generators from your first stages.
+
 **Shifting for more Hydrogen.** A second Reformer can run the [water-gas shift](rngtech:steam-methane-reformer/water-gas-shift.md) on the Carbon Monoxide instead, which adds about a third more Hydrogen per reform. The shift turns the Carbon Monoxide into a little Carbon Exhaust, and algae grow half as fast on Carbon Exhaust, so a shift loop needs about twice the Photobioreactors. Shift when Hydrogen is what runs short and you have the room and light for more Photobioreactors.
 
 <Column alignItems="center" fullWidth={true}>

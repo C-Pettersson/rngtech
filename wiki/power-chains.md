@@ -70,6 +70,8 @@ Most gas machines also use water. To keep the diagrams readable, water appears o
 
 **Urea instead of more Photobioreactors.** When the [Ammonia](#ammonia) chain runs, put [Urea](algae-photobioreactor.md#urea) from the Ammonia Synthesizer in the Photobioreactors. Each Urea makes the next 4 Algae Biomass grow twice as fast, so the same Photobioreactors keep up with more Reformers. The water and carbon gas per biomass do not change. One Urea costs 250 mB of Ammonia, a small part of the Ammonia that you get from those 4 biomass.
 
+**Methane from a farm.** Bio Generators with a Fluid Pump send their biogas out as Methane through the [Methane take-off](bio-generator.md#methane-take-off). This needs no Melter heat and no light, but each item gives far less Methane than in the Melter, so it takes several Bio Generators and a large crop or compost farm to keep one Reformer busy. It is a good use for the Bio Generators from your first stages.
+
 **Shifting for more Hydrogen.** A second Reformer can run the [water-gas shift](steam-methane-reformer.md#water-gas-shift) on the Carbon Monoxide instead, which adds about a third more Hydrogen per reform. The shift turns the Carbon Monoxide into a little Carbon Exhaust, and algae grow half as fast on Carbon Exhaust, so a shift loop needs about twice the Photobioreactors. Shift when Hydrogen is what runs short and you have the room and light for more Photobioreactors.
 
 {{ chain(edges=[
@@ -159,7 +161,7 @@ These generators support the main chains. None of them replaces the chain for yo
     ["rngtech:algae_photobioreactor", "rngtech:algae_biomass", "rngtech:bio_generator"],
 ]) }}
 
-The [Bio Generator](bio-generator.md) burns crops and prepared biomass. Prepared fuels from the [Wooden Composter](wooden-composter.md) and [Algae Photobioreactor](algae-photobioreactor.md) are worth much more per item than raw crops. See [Fuel chains](bio-generator.md#fuel-chains) for which preparation pays off.
+The [Bio Generator](bio-generator.md) burns crops and prepared biomass. Prepared fuels from the [Wooden Composter](wooden-composter.md) and [Algae Photobioreactor](algae-photobioreactor.md) are worth much more per item than raw crops. See [Fuel chains](bio-generator.md#fuel-chains) for which preparation pays off. At Stage 6 the same generators can export Methane for the [carbon loop](#carbon-loop) instead.
 
 ### Corrosion Cell {#corrosion}
 

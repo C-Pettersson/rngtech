@@ -4,20 +4,22 @@ wiki:
   icon: rngtech:bio_generator
   ids:
     - rngtech:bio_generator
+    - rngtech:biogas_membrane
 ---
 
 # Bio Generator
 
 {{ infobox(
+    variants=["rngtech:bio_generator"],
     fields={
         "Type": "Generator",
-        "Power": "Digests crops and biomass into biogas, burns it for FE",
-        "Gear": "{{ item('rngtech:bio_chamber', 'Bio Chamber') }}, {{ item('rngtech:iron_battery_cell', 'Battery Cell') }}",
+        "Power": "Digests crops and biomass into biogas, burns it for FE or exports it as Methane",
+        "Gear": "{{ item('rngtech:bio_chamber', 'Bio Chamber') }}, {{ item('rngtech:iron_battery_cell', 'Battery Cell') }}, {{ item('rngtech:osmium_fluid_pump', 'Fluid Pump') }}, {{ item('rngtech:biogas_membrane') }}",
         "Mastery": "No",
     },
 ) }}
 
-The **Bio Generator** is an early generator built like a small farm biogas plant. A feed hopper drops food and plant matter into a digester tank, where it rots into biogas. The gas collects under a membrane dome, and a small gas engine burns it for FE. Potatoes, carrots, bread, saplings, and seeds all work straight from the farm, and prepared biomass from the [Wooden Composter](wooden-composter.md) and [Algae Photobioreactor](algae-photobioreactor.md) lasts much longer. See [Power Chains](power-chains.md#bio) for how it fits beside the main generators.
+The **Bio Generator** is an early generator built like a small farm biogas plant. A feed hopper drops food and plant matter into a digester tank, where it rots into biogas. The gas collects under a membrane dome, and a small gas engine burns it for FE. Potatoes, carrots, bread, saplings, and seeds all work straight from the farm, and prepared biomass from the [Wooden Composter](wooden-composter.md) and [Algae Photobioreactor](algae-photobioreactor.md) lasts much longer. See [Power Chains](power-chains.md#bio) for how it fits beside the main generators. Later, a Fluid Pump turns the same generator into a Methane source for the Stage 6 chain; see [Methane take-off](#methane-take-off).
 
 Each Bio Generator you craft rolls its own [rarity and affixes](rarity-and-affixes.md). It does not have Machine Mastery.
 
@@ -29,7 +31,7 @@ Each Bio Generator you craft rolls its own [rarity and affixes](rarity-and-affix
 
 ### Breaking
 
-Mine it with a pickaxe to get it back. Fuel and installed Gear drop as separate items.
+Mine it with a pickaxe to get it back. Fuel and installed Gear drop as separate items. Methane and Carbon Exhaust in its tanks are lost.
 
 ## Usage
 
@@ -94,16 +96,44 @@ Composted Biomass and Rich Biomass are fuel only for the Bio Generator. They are
 
 {{ crafting("rngtech:rich_biomass", "rngtech:dense_algae_biomass") }}
 
+### Methane take-off
+
+Instead of burning its gas, the Bio Generator can send it out as Methane for the [Steam Methane Reformer](steam-methane-reformer.md). Install a Fluid Pump in one of the two **Gas Line** slots on the Gear tab. The engine stops, and the generator separates the gas in its holder. Biogas is 60% methane and 40% CO₂:
+
+| Gas | Amount in the gas |
+|---|---|
+| Methane | 1 mB for each 20 FE of gas |
+| CO₂ | 1 mB of Carbon Exhaust for each 30 FE of gas |
+
+A Rich Biomass (3,200 FE) holds 160 mB of Methane and 107 mB of CO₂. Retention, Fuel Efficiency, and the Bio Chamber change the gas per item as they change FE. Energy Generation does not add gas in take-off mode: it only makes the digester work through each item faster, so a well-rolled generator makes Methane faster but needs just as much feed for it. Some Methane always escapes with the CO₂, and the Gas Line slots decide how much:
+
+| Gas Line slots | Methane out | CO₂ |
+|---|---|---|
+| A Fluid Pump, or two | 70% | Vented from the stack |
+| A Fluid Pump and a Biogas Membrane | 85–98%, set by the membrane | Captured as Carbon Exhaust |
+| A Biogas Membrane alone | None; the engine runs as normal | Burned with the gas |
+
+Methane and Carbon Exhaust collect in two 1,000 mB tanks, shown on the right of the Process tab. Pipes pull both from any face. When the Methane tank is full, the gas holder fills and the digester waits, so no fuel is lost. When the Carbon Exhaust tank is full, the extra CO₂ is vented. Rolled Fluid Capacity on a pump enlarges both tanks, and a second pump adds its own. To empty the tanks, sneak and use a {{ item('rngtech:purge_bucket') }} on the generator; it voids up to 1,000 mB, Methane first.
+
+Through the Reformer and the [Ammonia](power-chains.md#ammonia) chain, the Methane is worth about ten times the FE the engine makes from the same gas. A [Melter](melter.md) gets far more Methane from each item, so send Algae Biomass and Organic Reagent there, and give the take-off crops and compost from a large farm. Several old Bio Generators together feed one Reformer.
+
+#### Biogas Membrane
+
+A {{ item('rngtech:biogas_membrane') }} is assembled in the [Component Assembler](component-assembler.md) from a Calibrated Storage Component, two Rubber, and a Titanium Plate. Its Methane recovery is fixed when it is made: 85%, plus up to 13% more from the calibration stability of the component, so a stability 80 component gives about 95%. The tooltip shows the recovery. Membranes do not roll affixes.
+
+{{ processing("battery_assembly", output="rngtech:biogas_membrane") }}
+
 ### Gear
 
-The Gear tab has two optional slots:
+The Gear tab has four optional slots:
 
 - **Battery Cell**: adds FE storage on top of the internal buffer. Stage 0–3 cells fit, including the Voltaic Potato Battery Cell.
 - **Bio Chamber**: a {{ item('rngtech:bio_chamber') }} adds its rolled power modifiers, and shows as a green culture canister in front of the sight glass. Besides generic FE/t and fuel-duration bonuses, it can roll bonuses for one fuel family, such as potatoes, seeds, Composted Biomass, or algae. These apply only while that family is digesting, and a specific family like saplings uses its own bonus rather than the general plant bonus.
+- **Gas Line** (two slots): each takes any Fluid Pump or a Biogas Membrane. A pump starts the [Methane take-off](#methane-take-off). A pump and a membrane show beside the engine while installed.
 
 ### Automation
 
-Connectors work on any side: every face inserts fuel and exports FE to adjacent receivers, and no face accepts FE. The **automation port** on the back, the plant's grid-connection cabinet with a copper-pinned socket in its door and a copper conduit from the engine, marks the spot where a [Universal Cable](universal-cable.md) connector seats flush against the machine.
+Connectors work on any side: every face inserts fuel and exports FE to adjacent receivers, and no face accepts FE. With a Fluid Pump installed, every face also gives Methane and Carbon Exhaust, and no face accepts fluid. The **automation port** on the back, the plant's grid-connection cabinet with a copper-pinned socket in its door and a copper conduit from the engine, marks the spot where a [Universal Cable](universal-cable.md) connector seats flush against the machine.
 
 Automation cannot extract items, and the Gear slots are installed by hand.
 
@@ -111,8 +141,8 @@ Automation cannot extract items, and the Gear slots are installed by hand.
 
 The Bio Generator screen has four tabs:
 
-- **Process**: fuel slot, the retention dial, digestion progress, the gas holder gauge with its engine start mark, stored FE, and status icons. Hover for exact values.
-- **Gear**: Battery Cell and Bio Chamber slots.
+- **Process**: fuel slot, the retention dial, digestion progress, the gas holder gauge with its engine start mark, stored FE, the Methane and Carbon Exhaust tanks, and status icons. Hover for exact values.
+- **Gear**: Battery Cell, Bio Chamber, and two Gas Line slots.
 - **Stats**: the generator's current stats, including traits and Gear.
 - **Refinement**: refine the placed generator's traits with a catalyst.
 

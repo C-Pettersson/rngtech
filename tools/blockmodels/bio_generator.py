@@ -4,7 +4,8 @@
 The Bio Generator is a small biogas plant: a digester tank under a membrane gas
 holder dome, a feed hopper, a gas engine with a flywheel, and an exhaust stack.
 The static housing is a block model; the dome, flywheel, culture canister,
-slurry, gauge needle, and hopper contents are drawn by BioGeneratorRenderer,
+installed gas-line pumps and membranes, slurry, gauge needle, and hopper
+contents are drawn by BioGeneratorRenderer,
 whose constants match the geometry here. Run from the repository root:
 
     python tools/blockmodels/bio_generator.py
@@ -254,6 +255,34 @@ def culture_elements():
     ]
 
 
+# Gas-line Gear sits on the plinth on the west side, between the engine and the cabinet, clear of the conduit and the
+# tank rim. Both parts are modelled in the front slot; the renderer moves the second slot back by GAS_LINE_STEP.
+GAS_LINE_STEP = 2.8
+
+
+def pump_elements():
+    """An installed Fluid Pump: a motor and pump casing on a skid, with a riser and valve on the outlet."""
+    return [
+        box((1.0, 2.0, 5.9), (3.5, 2.4, 8.2), "rim"),
+        box((1.1, 2.4, 6.0), (2.4, 3.9, 8.1), "engine"),
+        box((2.4, 2.5, 6.3), (3.5, 4.1, 7.8), "hopper"),
+        box((2.75, 4.1, 6.8), (3.25, 6.5, 7.3), "pipe"),
+        box((2.6, 5.0, 6.65), (3.4, 5.5, 7.45), "valve"),
+    ]
+
+
+def gas_membrane_elements():
+    """An installed Biogas Membrane: a pressure tube on two saddles, with flanged end caps and a port on top."""
+    return [
+        box((1.2, 2.0, 6.0), (3.3, 2.5, 6.5), "rim"),
+        box((1.2, 2.0, 7.6), (3.3, 2.5, 8.1), "rim"),
+        box((1.15, 2.5, 5.85), (3.35, 4.7, 8.25), "stack"),
+        box((1.0, 2.35, 5.75), (3.5, 4.85, 6.05), "band"),
+        box((1.0, 2.35, 8.05), (3.5, 4.85, 8.35), "band"),
+        box((2.0, 4.7, 6.8), (2.5, 5.6, 7.3), "pipe"),
+    ]
+
+
 HOUSING_TEXTURES = {
     "particle": TEX + "tank",
     "casing": TEX + "casing",
@@ -324,6 +353,15 @@ def write_models() -> None:
         "render_type": "minecraft:cutout",
         "textures": {"particle": "#culture", "culture": PART_TEXTURES["culture"], "valve": TEX + "valve"},
         "elements": culture_elements(),
+    })
+    write_json(MODELS / "block/bio_generator/pump.json", {
+        "textures": {key: HOUSING_TEXTURES[key] for key in ("rim", "engine", "hopper", "pipe", "valve")}
+        | {"particle": "#engine"},
+        "elements": pump_elements(),
+    })
+    write_json(MODELS / "block/bio_generator/gas_membrane.json", {
+        "textures": {key: HOUSING_TEXTURES[key] for key in ("rim", "stack", "band", "pipe")} | {"particle": "#stack"},
+        "elements": gas_membrane_elements(),
     })
     write_json(MODELS / "item/bio_generator.json", {
         "parent": "minecraft:block/block",

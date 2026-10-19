@@ -130,6 +130,7 @@ public final class EnergyBalanceSimulation {
     private void defineSetups() throws IOException {
         solidFuelBurners();
         bioGenerators();
+        bioGeneratorTakeOffs();
         solarPanels();
         solarArrays();
         potentialReactors();
@@ -197,27 +198,125 @@ public final class EnergyBalanceSimulation {
                 add("bio_generator", "Bio Generator", 2, List.of(
                         chamber ? "bio_chamber:standard" : "bio_chamber:none", "retention:" + days + "d"
                 ), fuel, roller -> {
-                    MachineStatAccumulator stats = MachineBaseStatCatalog.bioGenerator();
-                    stats.apply(roller.machine(MachineType.BIO_GENERATOR, 2));
-                    if (chamber) {
-                        part(stats, ComponentBaseStatCatalog.bioChamber(),
-                                roller.part(MachinePartType.BIO_CHAMBER, MachineType.BIO_GENERATOR, 1, 0));
-                    }
-                    double multiplier = Math.max(0.1, stats.effectiveEnergyGenerationMultiplier());
-                    double flat = Math.max(0.0, stats.effectiveFlatEnergyGenerationBonus());
-                    double ratedGeneration = 8 * multiplier + flat;
-                    int ratedRate = Math.max(1, ceil(ratedGeneration));
-                    double baseEnergy = fuel.baseAmount()
-                            * Math.max(0.1, stats.value(powerStat))
-                            * Math.max(0.1, stats.value(MachineStat.FUEL_EFFICIENCY))
-                            * Math.max(0.1, stats.value(MachineStat.EFFICIENCY));
-                    int baseTicks = Math.max(1, ceil(baseEnergy / 8.0));
-                    int ticks = Math.max(1, ceil(baseTicks * Math.max(0.1, stats.value(MachineStat.FUEL_DURATION))));
-                    int rate = BiogasDigestion.engineRate(ratedGeneration, days);
-                    return Outcome.running(rate, rate, (double) ticks * ratedRate * BiogasDigestion.gasYield(days));
+                    Digestion digestion = digest(roller, chamber, days, fuel, powerStat);
+                    return Outcome.running(digestion.rate(), digestion.rate(), digestion.gasPerItem());
                 });
             }
         }
+    }
+
+    /** Gas FE/t and gas FE per item of one rolled Bio Generator: BioGeneratorBlockEntity#engineRate and #ratedFuelEnergy. */
+    private static Digestion digest(Roller roller, boolean chamber, int days, ChainCosts.Fuel fuel, MachineStat powerStat) {
+        MachineStatAccumulator stats = MachineBaseStatCatalog.bioGenerator();
+        stats.apply(roller.machine(MachineType.BIO_GENERATOR, 2));
+        if (chamber) {
+            part(stats, ComponentBaseStatCatalog.bioChamber(), roller.part(MachinePartType.BIO_CHAMBER, MachineType.BIO_GENERATOR, 1, 0));
+        }
+        double multiplier = Math.max(0.1, stats.effectiveEnergyGenerationMultiplier());
+        double flat = Math.max(0.0, stats.effectiveFlatEnergyGenerationBonus());
+        double ratedGeneration = 8 * multiplier + flat;
+        int ratedRate = Math.max(1, ceil(ratedGeneration));
+        double baseEnergy = fuel.baseAmount()
+                * Math.max(0.1, stats.value(powerStat))
+                * Math.max(0.1, stats.value(MachineStat.FUEL_EFFICIENCY))
+                * Math.max(0.1, stats.value(MachineStat.EFFICIENCY));
+        int baseTicks = Math.max(1, ceil(baseEnergy / 8.0));
+        int ticks = Math.max(1, ceil(baseTicks * Math.max(0.1, stats.value(MachineStat.FUEL_DURATION))));
+        double yield = BiogasDigestion.gasYield(days);
+        return new Digestion(BiogasDigestion.engineRate(ratedGeneration, days), ticks * ratedRate * yield, ticks * 8.0 * yield);
+    }
+
+    /** {@code takeOffGasPerItem} is BioGeneratorBlockEntity#feedEnergy in take-off mode: Energy Generation left out. */
+    private record Digestion(int rate, double gasPerItem, double takeOffGasPerItem) {
+    }
+
+    /**
+     * BioGeneratorBlockEntity#tickTakeOff: a Fluid Pump sends the digested gas out as Methane instead of burning it,
+     * and Energy Generation only digests each item faster (#feedEnergy). FE/t is what the Steam Methane Reformer,
+     * Ammonia Synthesizer, and Fuel Cell make from this one generator's Methane at base stats; net also pays the
+     * Reformer, shift, and Synthesizer. Membranes use fixed calibration stabilities: 62 is the middle of a Stage 2
+     * storage calibration (45-80). The take-off feeds a generator rather than being one, so it stays out of the stage
+     * ladder.
+     */
+    private void bioGeneratorTakeOffs() throws IOException {
+        ChainCosts.Fuel fuel = chains.fuel("bio_generator");
+        MachineStat powerStat = MachineStat.valueOf(fuel.stat());
+        double methanePerFe = scenario.bioTakeOffMethanePerFe() > 0 ? scenario.bioTakeOffMethanePerFe() : BiogasDigestion.METHANE_PER_FE;
+        Map<String, Double> separations = new LinkedHashMap<>();
+        separations.put("pump", BiogasDigestion.PUMP_RECOVERY);
+        for (int stability : new int[] {62, 100}) {
+            separations.put("membrane_" + stability, BiogasDigestion.membraneRecovery(stability));
+        }
+        double fuelCellAmmoniaPerTick = methaneChainRate();
+        for (boolean shift : new boolean[] {false, true}) {
+            MethaneValue value = methaneValue(shift);
+            for (int days : new int[] {BiogasDigestion.RATED_RETENTION_DAYS, BiogasDigestion.MIN_RETENTION_DAYS}) {
+                for (boolean chamber : new boolean[] {false, true}) {
+                    for (Map.Entry<String, Double> separation : separations.entrySet()) {
+                        add("bio_generator_take_off", "Bio Generator Take-off", 6, List.of(
+                                "separation:" + separation.getKey(),
+                                "shift:" + (shift ? "on" : "off"),
+                                chamber ? "bio_chamber:standard" : "bio_chamber:none",
+                                "retention:" + days + "d"
+                        ), null, roller -> {
+                            Digestion digestion = digest(roller, chamber, days, fuel, powerStat);
+                            double methanePerItem = digestion.takeOffGasPerItem() * methanePerFe * separation.getValue();
+                            double methanePerTick = digestion.rate() * methanePerFe * separation.getValue();
+                            double fet = methanePerTick * value.gross();
+                            ChainCosts.Fuel chain = new ChainCosts.Fuel("bio_generator_take_off", fuel.input(), fuel.baseAmount(), fuel.stat(),
+                                    methanePerItem * value.cost(), true, 6, "Steam Methane Reformer, Ammonia Synthesizer"
+                                    + (shift ? ", and water-gas shift" : "") + " at base stats.");
+                            return new Outcome(true, fet, fet, methanePerItem * value.gross(), chain, new LinkedHashMap<>())
+                                    .withMetric("methanePerTick", methanePerTick)
+                                    .withMetric("methanePerItem", methanePerItem)
+                                    .withMetric("burnedInPlace", digestion.rate())
+                                    .withMetric("multipleOfBurning", (fet - methanePerTick * value.cost()) / digestion.rate())
+                                    .withMetric("generatorsPerFuelCell", fuelCellAmmoniaPerTick / (methanePerTick * value.ammoniaPerMethane()))
+                                    .withMetric("itemsPerMinutePerFuelCell", fuelCellAmmoniaPerTick / value.ammoniaPerMethane() * 1200.0 / methanePerItem);
+                        });
+                    }
+                }
+            }
+        }
+    }
+
+    /** Ammonia one Fuel Cell burns per tick at base stats. */
+    private double methaneChainRate() throws IOException {
+        JsonObject cell = recipeJson("ammonia_power_cycle", "ammonia_power");
+        return cell.getAsJsonObject("ammonia_input").get("amount").getAsDouble() / cell.get("processing_ticks").getAsDouble();
+    }
+
+    /**
+     * FE a mB of Methane is worth through the Reformer, the Ammonia Synthesizer, and the Fuel Cell at base stats: gross is
+     * the Fuel Cell's output, cost the Reformer's, the shift's, and the Synthesizer's FE. Nitrogen is left out.
+     */
+    private MethaneValue methaneValue(boolean shift) throws IOException {
+        JsonObject reform = recipeJson("gas_reforming", "methane_smr");
+        JsonObject shiftRecipe = recipeJson("gas_reforming", "water_gas_shift");
+        JsonObject synthesis = recipeJson("ammonia_synthesis", "basic_ammonia");
+        JsonObject cell = recipeJson("ammonia_power_cycle", "ammonia_power");
+        double methane = amount(reform, "gas_input");
+        double hydrogen = amount(reform, "hydrogen_output") / methane;
+        double cost = reform.get("energy").getAsDouble() / methane;
+        if (shift) {
+            double carbonMonoxide = amount(reform, "carbon_monoxide_output") / methane;
+            double shiftInput = amount(shiftRecipe, "gas_input");
+            hydrogen += carbonMonoxide * amount(shiftRecipe, "hydrogen_output") / shiftInput;
+            cost += carbonMonoxide * shiftRecipe.get("energy").getAsDouble() / shiftInput;
+        }
+        double ammoniaOut = synthesis.getAsJsonObject("output").get("amount").getAsDouble();
+        double ammonia = hydrogen * ammoniaOut / amount(synthesis, "hydrogen_input");
+        cost += ammonia * synthesis.get("energy").getAsDouble() / ammoniaOut;
+        double gross = ammonia * cell.get("energy").getAsDouble() / amount(cell, "ammonia_input");
+        return new MethaneValue(gross, cost, ammonia);
+    }
+
+    private static double amount(JsonObject recipe, String key) {
+        JsonObject entry = recipe.getAsJsonObject(key);
+        return entry.has("amount") ? entry.get("amount").getAsDouble() : 0.0;
+    }
+
+    private record MethaneValue(double gross, double cost, double ammoniaPerMethane) {
     }
 
     /** SolarPanelBlockEntity#currentGeneration and #applyPeakSolarBonus, clear weather. */
@@ -1154,13 +1253,14 @@ public final class EnergyBalanceSimulation {
 
     /**
      * For each stage, the sustained (non-solar, non-burst) setup with the best unrolled output, and how often a craft
-     * of it beats the next stage's best unrolled setup. Solar aggregates up to 168 blocks, and the Aethergold rotor is
-     * a burst consumable, so neither anchors a stage.
+     * of it beats the next stage's best unrolled setup. Solar aggregates up to 168 blocks, the Aethergold rotor is a
+     * burst consumable, and the Bio Generator take-off only feeds a Fuel Cell, so none of them anchors a stage.
      */
     private static List<Map<String, Object>> ladder(Map<Setup, double[]> averages, Map<Setup, Double> baselines) {
         Map<Integer, Setup> best = new TreeMap<>();
         for (Setup setup : averages.keySet()) {
-            if (setup.generator().startsWith("solar") || setup.components().contains("rotor:aethergold")) {
+            if (setup.generator().startsWith("solar") || setup.generator().equals("bio_generator_take_off")
+                    || setup.components().contains("rotor:aethergold")) {
                 continue;
             }
             Setup current = best.get(setup.stage());
@@ -1470,13 +1570,14 @@ public final class EnergyBalanceSimulation {
             GearScale gearScale,
             boolean cavitationVent,
             boolean vacuumVent,
-            Mastery mastery
+            Mastery mastery,
+            double bioTakeOffMethanePerFe
     ) {
         /** PotentialReactorBlockEntity: 15 remembered burns, x0.75 per repeat, floor 10%. */
         static final Fatigue CURRENT_FATIGUE = new Fatigue(16, 0.75, 0.10);
         /** Cavitation and Vacuum Collapse vent FE their buffer cannot hold instead of pausing. */
         static final Scenario CURRENT = new Scenario("current", "Current", new JsonObject(), 0, Map.of(), Solar.CURRENT, null, CURRENT_FATIGUE,
-                null, true, true, null);
+                null, true, true, null, 0);
 
         /** Reactor gear-fuel bonus for a machine's Mastery: {@code (1 + level * perLevel) * (1 + sealTiers * perSealTier)}. */
         record Mastery(double perLevel, double perSealTier) {
@@ -1573,7 +1674,8 @@ public final class EnergyBalanceSimulation {
                     json.has("reactor_mastery")
                             ? new Mastery(json.getAsJsonObject("reactor_mastery").get("per_level").getAsDouble(),
                                     json.getAsJsonObject("reactor_mastery").get("per_seal_tier").getAsDouble())
-                            : null
+                            : null,
+                    json.has("bio_take_off_methane_per_fe") ? json.get("bio_take_off_methane_per_fe").getAsDouble() : 0
             );
         }
     }

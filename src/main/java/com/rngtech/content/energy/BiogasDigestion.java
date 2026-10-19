@@ -17,8 +17,24 @@ public final class BiogasDigestion {
     public static final int HOLDER_CAPACITY = 1600;
     /** Biogas the engine needs in the holder before it starts, in FE. */
     public static final int ENGINE_START_GAS = 400;
+    /** Methane in the biogas, in mB per FE of gas: 60% of the gas by volume. */
+    public static final double METHANE_PER_FE = 1.0 / 20.0;
+    /** CO2 in the biogas, in mB of Carbon Exhaust per FE of gas: the other 40%. */
+    public static final double CARBON_EXHAUST_PER_FE = 1.0 / 30.0;
+    /** Share of the Methane a Fluid Pump recovers with no membrane; the rest slips out with the vented CO2. */
+    public static final double PUMP_RECOVERY = 0.70;
+    /** Methane a Biogas Membrane recovers at stability 0, and the extra it gains at stability 100. */
+    public static final double MEMBRANE_BASE_RECOVERY = 0.85;
+    public static final double MEMBRANE_RECOVERY_SPAN = 0.13;
+    /** Each take-off output tank before Fluid Capacity, in mB. */
+    public static final int TAKE_OFF_TANK_CAPACITY = 1000;
 
     private BiogasDigestion() {
+    }
+
+    /** Methane a membrane recovers, from the stability of the calibrated component it was assembled from. */
+    public static double membraneRecovery(int stability) {
+        return MEMBRANE_BASE_RECOVERY + MEMBRANE_RECOVERY_SPAN * Mth.clamp(stability, 0, 100) / 100.0;
     }
 
     public static int clampRetention(int days) {

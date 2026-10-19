@@ -1,6 +1,10 @@
 {
     "description": "Balance what-if scenarios for energyBalanceSim. 'current' must stay empty: it is the game as coded. Add other scenarios to override the simulator's mirrored generator formulas (see tools/balance/README.md); nothing here changes the game.",
     "scenarios": {
-        "current": {}
+        "current": {},
+        "biogas_methane_1_in_25": {
+            "label": "Bio Generator take-off at 1 mB Methane per 25 FE",
+            "bio_take_off_methane_per_fe": 0.04
+        }
     }
 }

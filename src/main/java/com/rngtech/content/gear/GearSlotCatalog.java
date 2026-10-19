@@ -355,6 +355,16 @@ public final class GearSlotCatalog {
                         BioGeneratorBlockEntity.SLOT_BIO_CHAMBER,
                         List.of(item(ModItems.BIO_CHAMBER.get())),
                         exactComponent()
+                ),
+                slot(
+                        "rngtech.gear.gas_line",
+                        false,
+                        GearSlotArea.GEAR,
+                        BioGeneratorBlockEntity.SLOT_GAS_LINE_A,
+                        2,
+                        gasLineParts(),
+                        anyStage(),
+                        Component.translatable("rngtech.gear_guide.bio_generator_gas_line").withStyle(ChatFormatting.GRAY)
                 )
         ));
         specs.add(spec(
@@ -955,6 +965,12 @@ public final class GearSlotCatalog {
 
     private static ItemStack item(Item item) {
         return new ItemStack(item);
+    }
+
+    private static List<ItemStack> gasLineParts() {
+        List<ItemStack> stacks = new ArrayList<>(fluidPumps(pump -> true));
+        stacks.add(item(ModItems.BIOGAS_MEMBRANE.get()));
+        return List.copyOf(stacks);
     }
 
     private static List<ItemStack> batteryCells(Predicate<BatteryCellMaterial> filter) {

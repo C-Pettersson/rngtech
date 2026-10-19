@@ -3,6 +3,7 @@ package com.rngtech.client.screen;
 import com.rngtech.content.item.UniqueTooltip;
 import com.rngtech.content.menu.AlloyFurnaceMenu;
 import com.rngtech.content.menu.BatteryChassisMenu;
+import com.rngtech.content.menu.BioGeneratorMenu;
 import com.rngtech.content.menu.CavitationGeneratorMenu;
 import com.rngtech.content.menu.CompressorTankMenu;
 import com.rngtech.content.menu.CorrosionCellMenu;
@@ -81,6 +82,9 @@ public final class UniqueHostReaders {
         }
         if (menu instanceof MinersCompanionMenu) {
             return Reader.MINERS_COMPANION;
+        }
+        if (menu instanceof BioGeneratorMenu) {
+            return Reader.BIO_GENERATOR;
         }
         return null;
     }
