@@ -93,7 +93,7 @@ The Process tab has an optional {{ item('rngtech:urea') }} slot, to the right of
 
 ### Getting carbon gas
 
-- **Carbon Exhaust**: make it in a [Wooden Dehumidifier](wooden-dehumidifier.md) from Coal Dust or Gasification Residue, burn Syngas in a [Syngas Combustor](syngas-combustor.md), or shift Carbon Monoxide in a [Steam Methane Reformer](steam-methane-reformer.md#water-gas-shift). To bootstrap, craft a Carbon Exhaust Bucket from a Water Bucket and one {{ item('rngtech:coal_dust') }}. You get Coal Dust by crushing coal in a [Crusher](crusher.md).
+- **Carbon Exhaust**: make it in a [Wooden Dehumidifier](wooden-dehumidifier.md) from Coal Dust or Gasification Residue, burn Syngas in a [Syngas Combustor](syngas-combustor.md), shift Carbon Monoxide in a [Steam Methane Reformer](steam-methane-reformer.md#water-gas-shift), or capture it from a [Bio Generator](bio-generator.md#methane-take-off) with a Fluid Pump and a Biogas Membrane. To bootstrap, craft a Carbon Exhaust Bucket from a Water Bucket and one {{ item('rngtech:coal_dust') }}. You get Coal Dust by crushing coal in a [Crusher](crusher.md).
 - **Syngas**: from the [Coal Gasifier](coal-gasifier.md).
 - **Carbon Monoxide**: a byproduct of the [Steam Methane Reformer](steam-methane-reformer.md).
 

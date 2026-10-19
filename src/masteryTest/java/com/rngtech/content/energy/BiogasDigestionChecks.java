@@ -18,6 +18,10 @@ public final class BiogasDigestionChecks {
         curveEndpoints();
         retentionIsClamped();
         holderStartsBeforeItFills();
+        takeOffGasIsSixtyFortyMethane();
+        membraneRecoveryFollowsCalibration();
+        takeOffNeverBeatsTheMelter();
+        takeOffLoopsReturnLessThanTheyUse();
         System.out.println("Biogas digestion: " + checks + " checks passed");
     }
 
@@ -99,6 +103,46 @@ public final class BiogasDigestionChecks {
     private static void holderStartsBeforeItFills() {
         require(BiogasDigestion.ENGINE_START_GAS > 0 && BiogasDigestion.ENGINE_START_GAS < BiogasDigestion.HOLDER_CAPACITY,
                 "the engine starts on part of the holder");
+    }
+
+    private static void takeOffGasIsSixtyFortyMethane() {
+        double methane = BiogasDigestion.METHANE_PER_FE;
+        double carbon = BiogasDigestion.CARBON_EXHAUST_PER_FE;
+        near(methane / (methane + carbon), 0.6, "biogas is 60% Methane by volume");
+        near(methane, 0.05, "the take-off holds 1 mB Methane per 20 FE of gas");
+    }
+
+    private static void membraneRecoveryFollowsCalibration() {
+        near(BiogasDigestion.membraneRecovery(0), 0.85, "a stability 0 membrane recovers 85%");
+        near(BiogasDigestion.membraneRecovery(100), 0.98, "a perfect membrane recovers 98%");
+        require(BiogasDigestion.membraneRecovery(-5) == BiogasDigestion.membraneRecovery(0)
+                && BiogasDigestion.membraneRecovery(150) == BiogasDigestion.membraneRecovery(100), "stability clamps to 0-100");
+        for (int stability = 1; stability <= 100; stability++) {
+            require(BiogasDigestion.membraneRecovery(stability) > BiogasDigestion.membraneRecovery(stability - 1),
+                    "better calibration always recovers more");
+        }
+        require(BiogasDigestion.membraneRecovery(0) > BiogasDigestion.PUMP_RECOVERY, "any membrane beats a bare pump");
+        require(BiogasDigestion.membraneRecovery(100) < 1.0, "some Methane always slips");
+    }
+
+    /**
+     * The Melter turns one Algae Biomass and one Organic Reagent (946 FE as Bio Generator fuel) into 1,000 mB Methane.
+     * The same items through the best take-off must give far less, so algae and reagent still go to the Melter.
+     */
+    private static void takeOffNeverBeatsTheMelter() {
+        double takeOff = (400 + 546) * BiogasDigestion.METHANE_PER_FE * BiogasDigestion.membraneRecovery(100);
+        require(takeOff * 10.0 < 1000.0, "the Melter gets over ten times the Methane per item: take-off gives " + takeOff + " mB");
+    }
+
+    /**
+     * Neither by-product feeds back into more than it came from: a reform's 500 mB Carbon Monoxide grows one 400 FE Algae
+     * Biomass, and Algae grows on 100 mB Carbon Exhaust.
+     */
+    private static void takeOffLoopsReturnLessThanTheyUse() {
+        double reformReturn = 400 * BiogasDigestion.METHANE_PER_FE * BiogasDigestion.membraneRecovery(100) / 1000.0;
+        require(reformReturn < 0.05, "reformed Methane returns " + reformReturn + " of itself through algae");
+        double carbonReturn = BiogasDigestion.CARBON_EXHAUST_PER_FE / 100.0 * 400;
+        require(carbonReturn < 0.25, "captured CO2 returns " + carbonReturn + " of its gas through algae");
     }
 
     private static void near(double actual, double expected, String message) {

@@ -29,6 +29,7 @@ public final class UniqueStatReaders {
         CORROSION_CELL,
         FORESTRY_CART,
         RESONANCE_CALIBRATOR,
+        BIO_GENERATOR,
         /** A Battery Cell's own storage, in any machine that holds one. */
         BATTERY_CELL,
         BATTERY_CHASSIS
@@ -41,7 +42,7 @@ public final class UniqueStatReaders {
             UniqueHost.ALLOY_CRUCIBLE, List.of(Reader.ALLOY_FURNACE),
             UniqueHost.SERVO, List.of(Reader.METAL_PRESS, Reader.ALLOY_FURNACE, Reader.MELTER, Reader.CAVITATION_GENERATOR,
                     Reader.GAS_CHEMISTRY, Reader.COMPRESSOR_TANK),
-            UniqueHost.FLUID_PUMP, List.of(Reader.MELTER, Reader.CORROSION_CELL, Reader.FORESTRY_CART),
+            UniqueHost.FLUID_PUMP, List.of(Reader.MELTER, Reader.CORROSION_CELL, Reader.FORESTRY_CART, Reader.BIO_GENERATOR),
             UniqueHost.CONTROL_BOARD, List.of(Reader.RESONANCE_CALIBRATOR),
             UniqueHost.BATTERY_CELL, List.of(Reader.BATTERY_CELL, Reader.BATTERY_CHASSIS)
     ));
@@ -88,6 +89,7 @@ public final class UniqueStatReaders {
         stats(Reader.CORROSION_CELL, Set.of(), MachineStat.FLUID_CAPACITY, MachineStat.FLUID_TRANSFER, MachineStat.PROCESSING_SPEED,
                 MachineStat.STABILITY, MachineStat.EFFICIENCY);
         stats(Reader.FORESTRY_CART, Set.of(), MachineStat.FLUID_CAPACITY, MachineStat.FLUID_TRANSFER);
+        stats(Reader.BIO_GENERATOR, Set.of(), MachineStat.FLUID_CAPACITY, MachineStat.FLUID_TRANSFER);
         stats(Reader.RESONANCE_CALIBRATOR, BATCHING, MachineStat.CALIBRATION_PRECISION, MachineStat.CALIBRATION_QUALITY,
                 MachineStat.CATALYST_EFFICIENCY, MachineStat.STABILITY, MachineStat.PROCESSING_SPEED, MachineStat.ENERGY_USAGE,
                 MachineStat.REFINEMENT_POTENTIAL_BONUS, MachineStat.STREAK_CAP, MachineStat.STREAK_FLOOR);

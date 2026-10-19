@@ -42,7 +42,7 @@ These prepared inputs count as 2 compost units each:
 
 ### Using the output
 
-Burn **Composted Biomass** in the [Bio Generator](rngtech:bio-generator.md) for 1,600 FE each before modifiers, or craft it with Bone Meal, Organic Reagent, or Gunpowder into **Rich Biomass**, a denser fuel. One Urea from the [Ammonia Synthesizer](rngtech:ammonia-synthesizer/using-urea.md) turns four Composted Biomass into four Rich Biomass. Composted Biomass is not a furnace fuel and does not burn in the [Solid Fuel Burner](rngtech:solid-fuel-burner.md).
+Burn **Composted Biomass** in the [Bio Generator](rngtech:bio-generator.md) for 1,600 FE each before modifiers, or craft it with Bone Meal, Organic Reagent, or Gunpowder into **Rich Biomass**, a denser fuel. One Urea from the [Ammonia Synthesizer](rngtech:ammonia-synthesizer.md#using-urea) turns four Composted Biomass into four Rich Biomass. Composted Biomass is not a furnace fuel and does not burn in the [Solid Fuel Burner](rngtech:solid-fuel-burner.md).
 
 ### Automation
 

@@ -55,7 +55,7 @@ These generators support the main chains. None of them replaces the chain for yo
 | <ItemLink id="rngtech:iron_crusher_chassis" /> | Organic Reagent · 1 · 10/min | <ItemLink id="rngtech:bio_generator" /> |
 | <ItemLink id="rngtech:algae_photobioreactor" /> | Algae Biomass · 1 · 1/min | <ItemLink id="rngtech:bio_generator" /> |
 
-The [Bio Generator](rngtech:bio-generator.md) burns crops and prepared biomass. Prepared fuels from the [Wooden Composter](rngtech:wooden-composter.md) and [Algae Photobioreactor](rngtech:algae-photobioreactor.md) are worth much more per item than raw crops. See [Fuel chains](rngtech:bio-generator/fuel-chains.md) for which preparation pays off.
+The [Bio Generator](rngtech:bio-generator.md) burns crops and prepared biomass. Prepared fuels from the [Wooden Composter](rngtech:wooden-composter.md) and [Algae Photobioreactor](rngtech:algae-photobioreactor.md) are worth much more per item than raw crops. See [Fuel chains](rngtech:bio-generator/fuel-chains.md) for which preparation pays off. At Stage 6 the same generators can export Methane for the [carbon loop](rngtech:power-chains/stage-6-the-carbon-loop.md) instead.
 
 - [Corrosion Cell](rngtech:power-chains/corrosion-cell.md)
 

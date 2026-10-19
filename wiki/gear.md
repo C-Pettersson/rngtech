@@ -299,7 +299,7 @@ Fluid Pumps move fluid out of, or into, a machine. Their transfer rate before af
 | {{ item('rngtech:tungstensteel_fluid_pump') }} | 7 | 500 mB/t |
 | {{ item('rngtech:exotic_fluid_pump') }} | 8 | 1,000 mB/t |
 
-**Used in:** [Melter](melter.md) (required, lets it fill containers and pipe out fluid), [Corrosion Cell](corrosion-cell.md) (optional, lets it fill with Electrolyte Solution from the side), and the Forestry Companion cart (optional, used by the Field Hand sprinkler; see [Machine Mastery](machine-mastery.md#ascendancies)). Any stage fits.
+**Used in:** [Melter](melter.md) (required, lets it fill containers and pipe out fluid), [Corrosion Cell](corrosion-cell.md) (optional, lets it fill with Electrolyte Solution from the side), [Bio Generator](bio-generator.md#methane-take-off) (optional, exports its gas as Methane), and the Forestry Companion cart (optional, used by the Field Hand sprinkler; see [Machine Mastery](machine-mastery.md#ascendancies)). Any stage fits.
 
 {{ crafting('rngtech:osmium_fluid_pump') }}
 
@@ -381,15 +381,16 @@ The [Vacuum Collapse Generator](vacuum-collapse-generator.md) needs both. The **
 
 **Used in:** [Vacuum Collapse Generator](vacuum-collapse-generator.md) (both required).
 
-### Catalyst Beds and Fuel Cell Membrane
+### Catalyst Beds and membranes
 
-These single-item parts gate the gas chemistry machines' recipes and tune their speed, efficiency, and stability.
+These single-item parts gate the gas chemistry machines' recipes and tune their speed, efficiency, and stability. The Biogas Membrane instead sets how much Methane a Bio Generator take-off recovers; it rolls no affixes.
 
 | Part | Used in |
 |---|---|
 | {{ item('rngtech:ammonia_catalyst_bed') }} | [Ammonia Synthesizer](ammonia-synthesizer.md) (required) |
 | {{ item('rngtech:reforming_catalyst_bed') }} | [Steam Methane Reformer](steam-methane-reformer.md) (required) |
 | {{ item('rngtech:fuel_cell_membrane') }} | [Fuel Cell](ammonia-fuel-cell.md) (required) |
+| {{ item('rngtech:biogas_membrane') }} | [Bio Generator](bio-generator.md#biogas-membrane) (optional, Gas Line slot) |
 
 {{ crafting('rngtech:fuel_cell_membrane') }}
 

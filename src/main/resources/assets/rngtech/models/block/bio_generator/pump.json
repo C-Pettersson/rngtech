@@ -1,0 +1,172 @@
+{
+  "textures": {
+    "rim": "rngtech:block/bio_generator/rim",
+    "engine": "rngtech:block/bio_generator/engine",
+    "hopper": "rngtech:block/bio_generator/hopper",
+    "pipe": "rngtech:block/bio_generator/pipe",
+    "valve": "rngtech:block/bio_generator/valve",
+    "particle": "#engine"
+  },
+  "elements": [
+    {
+      "from": [
+        1.0,
+        2.0,
+        5.9
+      ],
+      "to": [
+        3.5,
+        2.4,
+        8.2
+      ],
+      "faces": {
+        "north": {
+          "texture": "#rim"
+        },
+        "south": {
+          "texture": "#rim"
+        },
+        "east": {
+          "texture": "#rim"
+        },
+        "west": {
+          "texture": "#rim"
+        },
+        "up": {
+          "texture": "#rim"
+        },
+        "down": {
+          "texture": "#rim"
+        }
+      }
+    },
+    {
+      "from": [
+        1.1,
+        2.4,
+        6.0
+      ],
+      "to": [
+        2.4,
+        3.9,
+        8.1
+      ],
+      "faces": {
+        "north": {
+          "texture": "#engine"
+        },
+        "south": {
+          "texture": "#engine"
+        },
+        "east": {
+          "texture": "#engine"
+        },
+        "west": {
+          "texture": "#engine"
+        },
+        "up": {
+          "texture": "#engine"
+        },
+        "down": {
+          "texture": "#engine"
+        }
+      }
+    },
+    {
+      "from": [
+        2.4,
+        2.5,
+        6.3
+      ],
+      "to": [
+        3.5,
+        4.1,
+        7.8
+      ],
+      "faces": {
+        "north": {
+          "texture": "#hopper"
+        },
+        "south": {
+          "texture": "#hopper"
+        },
+        "east": {
+          "texture": "#hopper"
+        },
+        "west": {
+          "texture": "#hopper"
+        },
+        "up": {
+          "texture": "#hopper"
+        },
+        "down": {
+          "texture": "#hopper"
+        }
+      }
+    },
+    {
+      "from": [
+        2.75,
+        4.1,
+        6.8
+      ],
+      "to": [
+        3.25,
+        6.5,
+        7.3
+      ],
+      "faces": {
+        "north": {
+          "texture": "#pipe"
+        },
+        "south": {
+          "texture": "#pipe"
+        },
+        "east": {
+          "texture": "#pipe"
+        },
+        "west": {
+          "texture": "#pipe"
+        },
+        "up": {
+          "texture": "#pipe"
+        },
+        "down": {
+          "texture": "#pipe"
+        }
+      }
+    },
+    {
+      "from": [
+        2.6,
+        5.0,
+        6.65
+      ],
+      "to": [
+        3.4,
+        5.5,
+        7.45
+      ],
+      "faces": {
+        "north": {
+          "texture": "#valve"
+        },
+        "south": {
+          "texture": "#valve"
+        },
+        "east": {
+          "texture": "#valve"
+        },
+        "west": {
+          "texture": "#valve"
+        },
+        "up": {
+          "texture": "#valve"
+        },
+        "down": {
+          "texture": "#valve"
+        }
+      }
+    }
+  ]
+}

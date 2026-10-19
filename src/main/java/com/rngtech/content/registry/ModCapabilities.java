@@ -121,6 +121,11 @@ public final class ModCapabilities {
                 BioGeneratorBlockEntity::getEnergyStorage
         );
         event.registerBlockEntity(
+                Capabilities.FluidHandler.BLOCK,
+                ModBlockEntities.BIO_GENERATOR.get(),
+                BioGeneratorBlockEntity::getFluidHandler
+        );
+        event.registerBlockEntity(
                 Capabilities.ItemHandler.BLOCK,
                 ModBlockEntities.ALGAE_PHOTOBIOREACTOR.get(),
                 AlgaePhotobioreactorBlockEntity::getItemHandler

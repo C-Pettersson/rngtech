@@ -9,7 +9,7 @@ navigation:
 # Reforming gas
 
 1. Install a Stage 6 or higher Heat Core and a Reforming Catalyst Bed in the Gear tab. The Reformer needs both to run.
-2. Fill the water tank, and fill the gas tank with Methane, Syngas, or Carbon Monoxide. Make Methane from algae biomass in the [Melter](rngtech:melter.md).
+2. Fill the water tank, and fill the gas tank with Methane, Syngas, or Carbon Monoxide. Make Methane from algae biomass in the [Melter](rngtech:melter.md), or take it from [Bio Generators](rngtech:bio-generator/methane-take-off.md) fitted with a Fluid Pump.
 3. Supply FE.
 
 Each reform uses 1,000 mB of gas and 500 mB of water. Methane makes 1,500 mB of Hydrogen and Syngas only 500 mB, so treat Syngas as a stopgap until your Methane supply is running. Methane and Syngas both also make 500 mB of Carbon Monoxide. See the [recipe table](rngtech:steam-methane-reformer.md) for time and FE costs.

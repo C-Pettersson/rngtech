@@ -60,6 +60,15 @@ public class BioGeneratorScreen extends AbstractContainerScreen<BioGeneratorMenu
     private static final int GAS_GAUGE_HEIGHT = 52;
     private static final int GAS = 0xFFC2C76A;
     private static final int GAS_START_MARK = 0xFF2F2F2F;
+    private static final int METHANE_GAUGE_X = 202;
+    private static final int EXHAUST_GAUGE_X = 216;
+    private static final int TAKE_OFF_GAUGE_Y = 30;
+    private static final int TAKE_OFF_GAUGE_WIDTH = 10;
+    private static final int TAKE_OFF_GAUGE_HEIGHT = 52;
+    private static final int METHANE = 0xFF8FB8D8;
+    private static final int EXHAUST = 0xFF7A7A72;
+    private static final int TAKE_OFF_IDLE = 0xFF4A4A4A;
+    private static final int WARNING = 0xFFD3A33A;
     private static final MachineScreenStyle.AffixLine[] EMPTY_AFFIX_LINES = new MachineScreenStyle.AffixLine[0];
     private static final String[] STAT_LABEL_KEYS = {
             "rngtech.stat.energy_generation",
@@ -265,8 +274,9 @@ public class BioGeneratorScreen extends AbstractContainerScreen<BioGeneratorMenu
         if (menu.selectedTab() == BioGeneratorMenu.TAB_PROCESSING) {
             renderSlotFrame(guiGraphics, 52, 54);
         } else if (menu.selectedTab() == BioGeneratorMenu.TAB_GEAR) {
-            renderSlotFrame(guiGraphics, 65, 47);
-            renderSlotFrame(guiGraphics, 125, 47);
+            for (int x : BioGeneratorMenu.GEAR_SLOT_X) {
+                renderSlotFrame(guiGraphics, x - 1, BioGeneratorMenu.GEAR_SLOT_Y - 1);
+            }
         } else if (menu.selectedTab() == BioGeneratorMenu.TAB_REFINEMENT) {
             renderSlotFrame(guiGraphics, RefinementScreenStyle.TARGET_SLOT_X - 1, RefinementScreenStyle.SLOT_Y - 1);
             renderSlotFrame(guiGraphics, RefinementScreenStyle.CONSUMABLE_SLOT_X - 1, RefinementScreenStyle.SLOT_Y - 1);
@@ -306,6 +316,8 @@ public class BioGeneratorScreen extends AbstractContainerScreen<BioGeneratorMenu
                 FUEL
         );
         renderGasHolder(guiGraphics);
+        renderTakeOffTank(guiGraphics, METHANE_GAUGE_X, menu.methane(), METHANE);
+        renderTakeOffTank(guiGraphics, EXHAUST_GAUGE_X, menu.exhaust(), EXHAUST);
         renderRetentionDial(guiGraphics);
         renderProcessingIcons(guiGraphics);
     }
@@ -322,6 +334,18 @@ public class BioGeneratorScreen extends AbstractContainerScreen<BioGeneratorMenu
         int capacity = Math.max(1, menu.gasCapacity());
         int mark = bottom - Math.round(inner * BiogasDigestion.ENGINE_START_GAS / (float) capacity);
         guiGraphics.fill(left + 1, mark, left + GAS_GAUGE_WIDTH - 1, mark + 1, GAS_START_MARK);
+    }
+
+    /** A take-off output tank; its frame darkens while no pump sends gas to it. */
+    private void renderTakeOffTank(GuiGraphics guiGraphics, int x, int amount, int color) {
+        int left = leftPos + x;
+        int top = topPos + TAKE_OFF_GAUGE_Y;
+        int inner = TAKE_OFF_GAUGE_HEIGHT - 4;
+        int bottom = top + TAKE_OFF_GAUGE_HEIGHT - 2;
+        guiGraphics.fill(left, top, left + TAKE_OFF_GAUGE_WIDTH, top + TAKE_OFF_GAUGE_HEIGHT, menu.takeOff() ? 0xFF5F5F5F : TAKE_OFF_IDLE);
+        int capacity = Math.max(1, menu.takeOffCapacity());
+        int height = Math.round(inner * Math.min(1.0F, amount / (float) capacity));
+        guiGraphics.fill(left + 2, bottom - height, left + TAKE_OFF_GAUGE_WIDTH - 2, bottom, color);
     }
 
     /** Retention from short to long: the rated notch keeps the listed fuel values, and the pointer marks the setting. */
@@ -369,8 +393,11 @@ public class BioGeneratorScreen extends AbstractContainerScreen<BioGeneratorMenu
     }
 
     private void drawGearLabels(GuiGraphics guiGraphics) {
-        drawGearLabel(guiGraphics, Component.translatable("rngtech.gear.battery_cell.short"), 74);
-        drawGearLabel(guiGraphics, Component.translatable("rngtech.gear.bio_chamber.short"), 134);
+        int[] x = BioGeneratorMenu.GEAR_SLOT_X;
+        drawGearLabel(guiGraphics, Component.translatable("rngtech.gear.battery_cell.short"), x[0] + 8);
+        drawGearLabel(guiGraphics, Component.translatable("rngtech.gear.bio_chamber.short"), x[1] + 8);
+        drawGearLabel(guiGraphics, Component.translatable("rngtech.gear.gas_line.short"), x[2] + 8);
+        drawGearLabel(guiGraphics, Component.translatable("rngtech.gear.gas_line.short"), x[3] + 8);
     }
 
     private void drawStatsLabels(GuiGraphics guiGraphics) {
@@ -398,6 +425,9 @@ public class BioGeneratorScreen extends AbstractContainerScreen<BioGeneratorMenu
             case BioGeneratorBlockEntity.STATUS_INVALID_FUEL -> Component.translatable("rngtech.bio_generator.status.invalid_fuel");
             case BioGeneratorBlockEntity.STATUS_ENERGY_FULL -> Component.translatable("rngtech.bio_generator.status.energy_full");
             case BioGeneratorBlockEntity.STATUS_PRIMING -> Component.translatable("rngtech.bio_generator.status.priming");
+            case BioGeneratorBlockEntity.STATUS_TAKE_OFF -> Component.translatable("rngtech.bio_generator.status.take_off");
+            case BioGeneratorBlockEntity.STATUS_METHANE_FULL -> Component.translatable("rngtech.bio_generator.status.methane_full");
+            case BioGeneratorBlockEntity.STATUS_NEEDS_PUMP -> Component.translatable("rngtech.bio_generator.status.needs_pump");
             default -> Component.translatable("rngtech.bio_generator.status.ready");
         };
     }
@@ -408,6 +438,8 @@ public class BioGeneratorScreen extends AbstractContainerScreen<BioGeneratorMenu
             case BioGeneratorBlockEntity.STATUS_ENERGY_FULL -> 0xFFD3A33A;
             case BioGeneratorBlockEntity.STATUS_INVALID_FUEL -> 0xFFB45B4A;
             case BioGeneratorBlockEntity.STATUS_PRIMING -> GAS;
+            case BioGeneratorBlockEntity.STATUS_TAKE_OFF -> METHANE;
+            case BioGeneratorBlockEntity.STATUS_METHANE_FULL, BioGeneratorBlockEntity.STATUS_NEEDS_PUMP -> WARNING;
             default -> FUEL;
         };
     }
@@ -445,17 +477,59 @@ public class BioGeneratorScreen extends AbstractContainerScreen<BioGeneratorMenu
     }
 
     private List<Component> gasTooltip() {
+        Component gas = Component.translatable(
+                "rngtech.bio_generator.tooltip.gas",
+                CompactValueText.energyAmount(menu.gas()),
+                CompactValueText.energyAmount(menu.gasCapacity())
+        );
+        if (menu.takeOff()) {
+            return List.of(gas, Component.translatable("rngtech.bio_generator.tooltip.gas_take_off").withStyle(ChatFormatting.GRAY));
+        }
         return List.of(
-                Component.translatable(
-                        "rngtech.bio_generator.tooltip.gas",
-                        CompactValueText.energyAmount(menu.gas()),
-                        CompactValueText.energyAmount(menu.gasCapacity())
-                ),
+                gas,
                 (menu.engineRunning()
                         ? Component.translatable("rngtech.bio_generator.tooltip.engine_running", CompactValueText.energyRate(menu.engineRate()))
                         : Component.translatable("rngtech.bio_generator.tooltip.engine_start", CompactValueText.energyAmount(BiogasDigestion.ENGINE_START_GAS)))
                         .withStyle(ChatFormatting.GRAY)
         );
+    }
+
+    private List<Component> methaneTooltip() {
+        List<Component> lines = new ArrayList<>();
+        lines.add(Component.translatable("rngtech.bio_generator.tooltip.methane", menu.methane(), menu.takeOffCapacity()));
+        if (menu.takeOff()) {
+            lines.add(Component.translatable("rngtech.bio_generator.tooltip.methane_rate", rate(menu.methaneRate()))
+                    .withStyle(ChatFormatting.GRAY));
+            lines.add(Component.translatable("rngtech.bio_generator.tooltip.recovery", decimal(menu.recovery() * 100.0))
+                    .withStyle(ChatFormatting.GRAY));
+        } else {
+            lines.add(Component.translatable("rngtech.bio_generator.tooltip.take_off_needs_pump").withStyle(ChatFormatting.DARK_GRAY));
+        }
+        return lines;
+    }
+
+    private List<Component> exhaustTooltip() {
+        List<Component> lines = new ArrayList<>();
+        lines.add(Component.translatable("rngtech.bio_generator.tooltip.exhaust", menu.exhaust(), menu.takeOffCapacity()));
+        if (!menu.takeOff()) {
+            lines.add(Component.translatable("rngtech.bio_generator.tooltip.take_off_needs_pump").withStyle(ChatFormatting.DARK_GRAY));
+            return lines;
+        }
+        String key = menu.capturesCarbon() ? "rngtech.bio_generator.tooltip.exhaust_captured" : "rngtech.bio_generator.tooltip.exhaust_vented";
+        lines.add(Component.translatable(key).withStyle(ChatFormatting.GRAY));
+        if (menu.ventRate() > 0.0) {
+            lines.add(Component.translatable("rngtech.bio_generator.tooltip.vent_rate", rate(menu.ventRate()))
+                    .withStyle(ChatFormatting.DARK_GRAY));
+        }
+        return lines;
+    }
+
+    private static String rate(double value) {
+        return String.format(Locale.ROOT, "%.2f", value);
+    }
+
+    private static String decimal(double value) {
+        return String.format(Locale.ROOT, "%.1f", value);
     }
 
     private static String multiplier(double value) {
@@ -480,6 +554,14 @@ public class BioGeneratorScreen extends AbstractContainerScreen<BioGeneratorMenu
         }
         if (isOver(mouseX, mouseY, GAS_GAUGE_X, GAS_GAUGE_Y, GAS_GAUGE_WIDTH, GAS_GAUGE_HEIGHT)) {
             guiGraphics.renderComponentTooltip(font, gasTooltip(), mouseX, mouseY);
+            return;
+        }
+        if (isOver(mouseX, mouseY, METHANE_GAUGE_X, TAKE_OFF_GAUGE_Y, TAKE_OFF_GAUGE_WIDTH, TAKE_OFF_GAUGE_HEIGHT)) {
+            guiGraphics.renderComponentTooltip(font, methaneTooltip(), mouseX, mouseY);
+            return;
+        }
+        if (isOver(mouseX, mouseY, EXHAUST_GAUGE_X, TAKE_OFF_GAUGE_Y, TAKE_OFF_GAUGE_WIDTH, TAKE_OFF_GAUGE_HEIGHT)) {
+            guiGraphics.renderComponentTooltip(font, exhaustTooltip(), mouseX, mouseY);
             return;
         }
         CompactValueText.renderTooltipIfHovered(
@@ -532,7 +614,9 @@ public class BioGeneratorScreen extends AbstractContainerScreen<BioGeneratorMenu
                 STATUS_ICON_Y,
                 ICON_SIZE,
                 ICON_SIZE,
-                Component.translatable("rngtech.bio_generator.tooltip.generation", CompactValueText.energyRate(menu.energyPerTick()))
+                menu.takeOff()
+                        ? Component.translatable("rngtech.bio_generator.tooltip.methane_rate", rate(menu.methaneRate()))
+                        : Component.translatable("rngtech.bio_generator.tooltip.generation", CompactValueText.energyRate(menu.energyPerTick()))
         );
         CompactValueText.renderTooltipIfHovered(
                 guiGraphics,
@@ -682,7 +766,7 @@ public class BioGeneratorScreen extends AbstractContainerScreen<BioGeneratorMenu
     }
 
     private void drawGearLabel(GuiGraphics guiGraphics, Component label, int centerX) {
-        MachineScreenStyle.drawClippedCentered(guiGraphics, font, label, centerX, 35, 54, TEXT_MUTED);
+        MachineScreenStyle.drawClippedCentered(guiGraphics, font, label, centerX, 35, 48, TEXT_MUTED);
     }
 
     private void renderSlotFrame(GuiGraphics guiGraphics, int x, int y) {

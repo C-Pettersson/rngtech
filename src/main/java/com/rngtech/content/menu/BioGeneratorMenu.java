@@ -63,15 +63,28 @@ public class BioGeneratorMenu extends AbstractContainerMenu implements StatBreak
     private static final int DATA_ENGINE_RATE = 30;
     private static final int DATA_ENGINE_RUNNING = 31;
     private static final int DATA_FEED_ENERGY = 32;
-    private static final int DATA_COUNT = 33;
+    private static final int DATA_TAKE_OFF = 33;
+    private static final int DATA_METHANE = 34;
+    private static final int DATA_EXHAUST = 35;
+    private static final int DATA_TAKE_OFF_CAPACITY = 36;
+    private static final int DATA_RECOVERY = 37;
+    private static final int DATA_CAPTURE = 38;
+    private static final int DATA_METHANE_RATE = 39;
+    private static final int DATA_VENT_RATE = 40;
+    private static final int DATA_COUNT = 41;
     private static final int BUTTON_RETENTION_BASE = 9000;
     private static final int STAT_SCALE = 100;
     private static final int FUEL_SLOT = 0;
     private static final int BATTERY_CELL_SLOT = 1;
     private static final int BIO_CHAMBER_SLOT = 2;
-    private static final int REFINEMENT_CONSUMABLE_SLOT = 3;
-    private static final int REFINEMENT_TARGET_SLOT = 4;
-    private static final int PLAYER_INVENTORY_START = 5;
+    private static final int GAS_LINE_A_SLOT = 3;
+    private static final int GAS_LINE_B_SLOT = 4;
+    private static final int REFINEMENT_CONSUMABLE_SLOT = 5;
+    private static final int REFINEMENT_TARGET_SLOT = 6;
+    private static final int PLAYER_INVENTORY_START = 7;
+    /** Gear tab slot positions, left to right: Battery Cell, Bio Chamber, and the two gas lines. */
+    public static final int[] GEAR_SLOT_X = {30, 80, 130, 180};
+    public static final int GEAR_SLOT_Y = 48;
     private static final int HOTBAR_END = PLAYER_INVENTORY_START + 36;
 
     private final ContainerLevelAccess access;
@@ -111,8 +124,10 @@ public class BioGeneratorMenu extends AbstractContainerMenu implements StatBreak
         addSlot(new TabbedSlot(generator.getFuelInventory(), BioGeneratorBlockEntity.SLOT_FUEL, 53, 55, () -> selectedTab == TAB_PROCESSING));
 
         ItemStackHandler gearInventory = generator.getGearInventory();
-        addSlot(new TabbedSlot(gearInventory, BioGeneratorBlockEntity.SLOT_BATTERY_CELL, 66, 48, () -> selectedTab == TAB_GEAR));
-        addSlot(new TabbedSlot(gearInventory, BioGeneratorBlockEntity.SLOT_BIO_CHAMBER, 126, 48, () -> selectedTab == TAB_GEAR));
+        addSlot(new TabbedSlot(gearInventory, BioGeneratorBlockEntity.SLOT_BATTERY_CELL, GEAR_SLOT_X[0], GEAR_SLOT_Y, () -> selectedTab == TAB_GEAR));
+        addSlot(new TabbedSlot(gearInventory, BioGeneratorBlockEntity.SLOT_BIO_CHAMBER, GEAR_SLOT_X[1], GEAR_SLOT_Y, () -> selectedTab == TAB_GEAR));
+        addSlot(new TabbedSlot(gearInventory, BioGeneratorBlockEntity.SLOT_GAS_LINE_A, GEAR_SLOT_X[2], GEAR_SLOT_Y, () -> selectedTab == TAB_GEAR));
+        addSlot(new TabbedSlot(gearInventory, BioGeneratorBlockEntity.SLOT_GAS_LINE_B, GEAR_SLOT_X[3], GEAR_SLOT_Y, () -> selectedTab == TAB_GEAR));
 
         addSlot(RefinementMenuSupport.consumableSlot(
                 generator.getRefinementInventory(),
@@ -210,6 +225,42 @@ public class BioGeneratorMenu extends AbstractContainerMenu implements StatBreak
     /** Rated FE of the item digesting, or of the next item; 0 when there is none. */
     public int feedEnergy() {
         return data.get(DATA_FEED_ENERGY);
+    }
+
+    /** True while a Fluid Pump sends the gas out instead of the engine burning it. */
+    public boolean takeOff() {
+        return data.get(DATA_TAKE_OFF) != 0;
+    }
+
+    public int methane() {
+        return data.get(DATA_METHANE);
+    }
+
+    public int exhaust() {
+        return data.get(DATA_EXHAUST);
+    }
+
+    public int takeOffCapacity() {
+        return data.get(DATA_TAKE_OFF_CAPACITY);
+    }
+
+    /** Share of the biogas Methane the take-off recovers, 0 to 1. */
+    public double recovery() {
+        return data.get(DATA_RECOVERY) / 1000.0;
+    }
+
+    public boolean capturesCarbon() {
+        return data.get(DATA_CAPTURE) != 0;
+    }
+
+    /** Methane made last tick, in mB per tick. */
+    public double methaneRate() {
+        return data.get(DATA_METHANE_RATE) / 100.0;
+    }
+
+    /** CO2 vented last tick, in mB per tick. */
+    public double ventRate() {
+        return data.get(DATA_VENT_RATE) / 100.0;
     }
 
     public static int retentionButtonId(int days) {
@@ -364,6 +415,10 @@ public class BioGeneratorMenu extends AbstractContainerMenu implements StatBreak
             }
         } else if (generator.isBioChamber(stack)) {
             if (!moveItemStackTo(stack, BIO_CHAMBER_SLOT, BIO_CHAMBER_SLOT + 1, false)) {
+                return ItemStack.EMPTY;
+            }
+        } else if (BioGeneratorBlockEntity.isGasLinePart(stack)) {
+            if (!moveItemStackTo(stack, GAS_LINE_A_SLOT, GAS_LINE_B_SLOT + 1, false)) {
                 return ItemStack.EMPTY;
             }
         } else if (generator.isAcceptedFuel(stack)) {

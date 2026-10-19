@@ -1,6 +1,7 @@
 package com.rngtech.content.blockentity;
 
 import com.rngtech.content.block.BaseMachineBlock;
+import com.rngtech.content.calibration.CalibrationState;
 import com.rngtech.content.item.BatteryCellItem;
 import com.rngtech.content.menu.BatteryAssemblerMenu;
 import com.rngtech.content.purge.FluidPurgeRole;
@@ -10,6 +11,7 @@ import com.rngtech.content.recipe.BatteryAssemblyRecipe;
 import com.rngtech.content.recipe.BatteryAssemblyRecipeInput;
 import com.rngtech.content.recipe.CountedIngredient;
 import com.rngtech.content.registry.ModBlockEntities;
+import com.rngtech.content.registry.ModDataComponents;
 import com.rngtech.content.registry.ModFluids;
 import com.rngtech.content.registry.ModItems;
 import com.rngtech.content.registry.ModRecipes;
@@ -524,6 +526,9 @@ public class BatteryAssemblerBlockEntity extends BaseMachineBlockEntity
         if (recipe.rollResultTraits()) {
             BatteryCellItem.rollTraitsIfMissing(result, level);
         }
+        if (recipe.recordCalibration()) {
+            recordCalibration(recipe, result);
+        }
         if (!canAcceptOutput(result)) {
             return false;
         }
@@ -541,6 +546,17 @@ public class BatteryAssemblerBlockEntity extends BaseMachineBlockEntity
         resetCycle();
         setChanged();
         return true;
+    }
+
+    /** Copies the first calibrated ingredient's state onto the result, so the crafted item can read its stability. */
+    private void recordCalibration(BatteryAssemblyRecipe recipe, ItemStack result) {
+        for (int slot = 0; slot < recipe.ingredients().size(); slot++) {
+            CalibrationState state = processInventory.getStackInSlot(slot).get(ModDataComponents.CALIBRATION_STATE.get());
+            if (state != null) {
+                result.set(ModDataComponents.SOURCE_CALIBRATION.get(), state);
+                return;
+            }
+        }
     }
 
     /** Uses up {@code count} items from the slot and returns the first remainder; any further ones leave the machine. */

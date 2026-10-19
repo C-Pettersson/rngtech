@@ -17,7 +17,7 @@ Fluid Pumps move fluid out of, or into, a machine. Their transfer rate before af
 | <ItemLink id="rngtech:tungstensteel_fluid_pump" /> | 7 | 500 mB/t |
 | <ItemLink id="rngtech:exotic_fluid_pump" /> | 8 | 1,000 mB/t |
 
-**Used in:** [Melter](rngtech:melter.md) (required, lets it fill containers and pipe out fluid), [Corrosion Cell](rngtech:corrosion-cell.md) (optional, lets it fill with Electrolyte Solution from the side), and the Forestry Companion cart (optional, used by the Field Hand sprinkler; see [Machine Mastery](rngtech:machine-mastery.md#ascendancies)). Any stage fits.
+**Used in:** [Melter](rngtech:melter.md) (required, lets it fill containers and pipe out fluid), [Corrosion Cell](rngtech:corrosion-cell.md) (optional, lets it fill with Electrolyte Solution from the side), [Bio Generator](rngtech:bio-generator/methane-take-off.md) (optional, exports its gas as Methane), and the Forestry Companion cart (optional, used by the Field Hand sprinkler; see [Machine Mastery](rngtech:machine-mastery.md#ascendancies)). Any stage fits.
 
 <RecipesFor id="rngtech:osmium_fluid_pump" />
 

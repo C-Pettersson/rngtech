@@ -21,7 +21,7 @@ item_ids:
 - **Mastery:** No
 - **Tool:** <ItemLink id="minecraft:wooden_pickaxe" />
 
-The **Component Assembler** is a powered workbench that combines items with a fluid. It makes <ItemLink id="rngtech:battery_cell" />s and the material Battery Cells built from them, Corrosion Cell Anodes, late-game Servos and frame parts that need Lubricant, and **Void Catalyst**.
+The **Component Assembler** is a powered workbench that combines items with a fluid. It makes <ItemLink id="rngtech:battery_cell" />s and the material Battery Cells built from them, Corrosion Cell Anodes, late-game Servos and frame parts that need Lubricant, the <ItemLink id="rngtech:biogas_membrane" />, and **Void Catalyst**.
 
 It started life as the Battery Assembler, which is why its resource id is still `battery_assembler`. Each Component Assembler you craft rolls its own [rarity and affixes](rngtech:rarity-and-affixes.md).
 

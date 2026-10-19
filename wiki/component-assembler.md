@@ -22,7 +22,7 @@ wiki:
     },
 ) }}
 
-The **Component Assembler** is a powered workbench that combines items with a fluid. It makes {{ item('rngtech:battery_cell') }}s and the material Battery Cells built from them, Corrosion Cell Anodes, late-game Servos and frame parts that need Lubricant, and {{ item('rngtech:void_catalyst') }}.
+The **Component Assembler** is a powered workbench that combines items with a fluid. It makes {{ item('rngtech:battery_cell') }}s and the material Battery Cells built from them, Corrosion Cell Anodes, late-game Servos and frame parts that need Lubricant, the {{ item('rngtech:biogas_membrane') }}, and {{ item('rngtech:void_catalyst') }}.
 
 It started life as the Battery Assembler, which is why its resource id is still `battery_assembler`. Each Component Assembler you craft rolls its own [rarity and affixes](rarity-and-affixes.md).
 
@@ -71,6 +71,7 @@ The finished cell starts empty and rolls its own traits when assembly completes.
 - **Servos**: Titanium and higher Servos are assembled with Lubricant.
 - **Lubricated Frame Coupling**: a Tungstensteel Casing and 1,000 mB of Lubricant, used to craft the Exotic Machine Frame.
 - **Void Catalyst**: a Nullite Ingot, a Tungstensteel Plate, and 1,000 mB of Ender Slurry make the [Vacuum Collapse Generator](vacuum-collapse-generator.md)'s fuel.
+- **Biogas Membrane**: a Calibrated Storage Component, two Rubber, and a Titanium Plate, with no fluid. The membrane remembers the component's calibration stability, which sets its Methane recovery in a [Bio Generator](bio-generator.md#biogas-membrane).
 - **Seal Cores**: the Primed and Lubricated Seal Cores used to craft Ascendancy Seals. See [Machine Mastery](machine-mastery.md#ascendancies).
 
 ### Gear

@@ -156,7 +156,7 @@ A Cathode sets the highest-stage Anode a [Corrosion Cell](rngtech:corrosion-cell
 - [Cavitation Rotors](rngtech:gear/cavitation-rotors.md)
 - [Collapse Nozzles](rngtech:gear/collapse-nozzles.md)
 - [Void Chambers and Dimensional Stabilizers](rngtech:gear/void-chambers-and-dimensional-stabilizers.md)
-- [Catalyst Beds and Fuel Cell Membrane](rngtech:gear/catalyst-beds-and-fuel-cell-membrane.md)
+- [Catalyst Beds and membranes](rngtech:gear/catalyst-beds-and-membranes.md)
 
 ### Battery Cells
 

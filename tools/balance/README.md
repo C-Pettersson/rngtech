@@ -27,6 +27,7 @@ A full run at the defaults (1,000 fresh crafts and 500 crafts per other behavior
 - `corrosion_recipes`: a full replacement Corrosion Cell recipe list with chain costs.
 - `reactor_fatigue`, `reactor_gear_stage_scale`, `reactor_mastery`: Potential Reactor gear-fuel rules.
 - `cavitation_overflow`, `vacuum_collapse_overflow`: `vent` (the game's behavior) or `stall`.
+- `bio_take_off_methane_per_fe`: Methane the Bio Generator take-off makes per FE of digested gas (the game uses `0.05`).
 
 Nothing in a scenario changes the game.
 
@@ -39,6 +40,8 @@ The task writes `build/energy-balance/energy-balance.json`. For each scenario an
 - `ladder`: the best unrolled sustained setup per stage, and how often a craft of it beats the next stage's best unrolled setup.
 
 Each scenario also has `gearFuel`: FE per item when crafted gear is burned in a Potential Reactor.
+
+`bio_generator_take_off` setups are one rolled Bio Generator exporting Methane instead of burning it (Energy Generation only digests faster there, so Methane per item depends on the fuel alone), by separation (bare pump or a membrane at stability 62 or 100), water-gas shift, Bio Chamber, and retention. FE/t is what the Reformer, Ammonia Synthesizer, and Fuel Cell make from that Methane at base stats, and net also pays those machines. Metrics give Methane per tick and per Rich Biomass, Bio Generators per Fuel Cell, Rich Biomass per minute per Fuel Cell, and the net as a multiple of burning the same gas in place. These setups feed a generator rather than being one, so they stay out of the `ladder`.
 
 ### Keeping it accurate
 

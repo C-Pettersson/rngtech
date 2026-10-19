@@ -199,6 +199,7 @@ public final class ModCreativeTabs {
                             output.accept(ModItems.solarArrayExtender(material).get());
                         }
                         output.accept(ModItems.BIO_CHAMBER.get());
+                        output.accept(ModItems.BIOGAS_MEMBRANE.get());
                         output.accept(ModItems.COMPOST_FEEDSTOCK.get());
                         output.accept(ModItems.COMPOSTED_BIOMASS.get());
                         output.accept(ModItems.RICH_BIOMASS.get());
