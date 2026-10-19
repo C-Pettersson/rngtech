@@ -106,7 +106,7 @@ Stages 5 and 6 are about fluids and gases. Gases behave like fluids: they use th
 4. Build the [Silica Gel Dehumidifier](silica-gel-dehumidifier.md) for steady water that works underground.
 5. Build the [Melter](melter.md) and make **Lubricant**, which later Servos and frame parts need. It also makes methane from algae for gas chemistry.
 6. Use the [Component Assembler](component-assembler.md) to make Battery Cells and other parts in bulk.
-7. Reform methane with water in the [Steam Methane Reformer](steam-methane-reformer.md) for Hydrogen. Fit the Cavitation Generator with nitrogen Gear to split water into Nitrogen.
+7. Reform methane with water in the [Steam Methane Reformer](steam-methane-reformer.md) for Hydrogen. Your old Bio Generators can supply methane too: fit them with a Fluid Pump for the [Methane take-off](bio-generator.md#methane-take-off). Fit the Cavitation Generator with nitrogen Gear to split water into Nitrogen.
 8. Combine Nitrogen and Hydrogen in the [Ammonia Synthesizer](ammonia-synthesizer.md), and burn the Ammonia in the [Fuel Cell](ammonia-fuel-cell.md).
 
 Steel and Titanium [Resonance Calibrator](resonance-calibrator.md) sets calibrate the components the next stages ask for.

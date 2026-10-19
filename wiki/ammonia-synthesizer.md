@@ -87,7 +87,7 @@ Urea synthesis uses the `rngtech:urea_synthesis` recipe type.
 
 - **Nitrogen**: separate it from water in a Stage 6 [Cavitation Generator](cavitation-generator.md) fitted with a Nitrogen Extraction Rotor and a Nitrogen Separation Nozzle.
 - **Hydrogen**: from the [Steam Methane Reformer](steam-methane-reformer.md).
-- **Carbon Exhaust**, for Urea: from a [Syngas Combustor](syngas-combustor.md), a [Wooden Dehumidifier](wooden-dehumidifier.md), or a Steam Methane Reformer running the [water-gas shift](steam-methane-reformer.md#water-gas-shift).
+- **Carbon Exhaust**, for Urea: from a [Syngas Combustor](syngas-combustor.md), a [Wooden Dehumidifier](wooden-dehumidifier.md), a Steam Methane Reformer running the [water-gas shift](steam-methane-reformer.md#water-gas-shift), or a [Bio Generator](bio-generator.md#methane-take-off) with a Biogas Membrane.
 
 ### Gear
 

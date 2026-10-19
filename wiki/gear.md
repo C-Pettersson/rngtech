@@ -381,15 +381,16 @@ The [Vacuum Collapse Generator](vacuum-collapse-generator.md) needs both. The **
 
 **Used in:** [Vacuum Collapse Generator](vacuum-collapse-generator.md) (both required).
 
-### Catalyst Beds and Fuel Cell Membrane
+### Catalyst Beds and membranes
 
-These single-item parts gate the gas chemistry machines' recipes and tune their speed, efficiency, and stability.
+These single-item parts gate the gas chemistry machines' recipes and tune their speed, efficiency, and stability. The Biogas Membrane instead sets how much Methane a Bio Generator take-off recovers; it rolls no affixes.
 
 | Part | Used in |
 |---|---|
 | {{ item('rngtech:ammonia_catalyst_bed') }} | [Ammonia Synthesizer](ammonia-synthesizer.md) (required) |
 | {{ item('rngtech:reforming_catalyst_bed') }} | [Steam Methane Reformer](steam-methane-reformer.md) (required) |
 | {{ item('rngtech:fuel_cell_membrane') }} | [Fuel Cell](ammonia-fuel-cell.md) (required) |
+| {{ item('rngtech:biogas_membrane') }} | [Bio Generator](bio-generator.md#biogas-membrane) (optional, Gas Line slot) |
 
 {{ crafting('rngtech:fuel_cell_membrane') }}
 
