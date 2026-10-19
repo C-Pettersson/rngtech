@@ -2,13 +2,13 @@
 
 > Design requirements, not a release status report. See [Current Implementation](../reference/current-implementation.md) and the machine content pages for current behavior.
 
-PRD status: Draft
+PRD status: Accepted
 
 Implementation status: Prototype
 
 Release: 2.0
 
-Last updated: 2026-10-05
+Last updated: 2026-10-18
 
 ## Summary
 
@@ -253,4 +253,3 @@ Follows [Machine GUI Design](../reference/machine-gui-design.md).
 ## Open questions
 
 - **Batch Overhead by chassis:** whether the Tungstensteel and Exotic Crusher author a lower base, and how much. With the base 25%, an Exotic Crusher at batch 9 drops from 9× to 3× throughput.
-- **Dense Batching:** "only full batches start" is the proposed drawback. The alternative is "Batch Overhead is doubled".

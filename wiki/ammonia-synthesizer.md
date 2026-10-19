@@ -82,6 +82,7 @@ Urea synthesis uses the `rngtech:urea_synthesis` recipe type.
 - **By hand or from a dispenser**, Urea works like bone meal on any plant.
 - In the [Forestry Cart Station](forestry-cart-station.md#mastery-and-ascendancies), the Forestry Companion and its station take Urea wherever they take bone meal. Each Urea counts as 4 bone meal.
 - In the [Algae Photobioreactor](algae-photobioreactor.md#urea), each Urea grows the next 4 Algae Biomass at twice the speed.
+- In a crafting grid, one Urea turns four Composted Biomass into four [Rich Biomass](bio-generator.md#fuel-chains).
 
 ### Getting the gases
 

@@ -265,7 +265,7 @@ Design intent and balance rules behind shipped machines that the code does not s
 
 ### Potential Reactor
 
-- Payout scales with what the item was (stage, Machine Mastery, Ascendancy Seals), so the reactor recoups retired gear instead of paying for cheap crafts. Repeat burns of the same item lose value.
+- Payout scales with what the item was (stage, Machine Mastery, Ascendancy Seals), so the reactor recoups retired gear instead of paying for cheap crafts. Repeat burns of the same item lose value. The penalty must stay visible (the payout for the input on the Processing tab and in Jade) and must survive breaking the reactor (the burn history travels on the dropped item), so it reads as a known cost instead of a hidden rule that replacing the block resets.
 - Authored base stats and fixed behavior pay nothing. Only rarity, rolled affixes, and Refinement Potential pay FE.
 - `rngtech:scrap` is residue-only with no reactor fuel recipe, so recovered residue cannot loop back into FE.
 

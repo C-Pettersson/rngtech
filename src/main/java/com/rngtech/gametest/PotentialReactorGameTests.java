@@ -23,6 +23,7 @@ import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.Block;
 import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
@@ -33,6 +34,7 @@ import java.util.List;
 @PrefixGameTestTemplate(false)
 public final class PotentialReactorGameTests {
     private static final BlockPos REACTOR = new BlockPos(2, 1, 2);
+    private static final BlockPos REPLACEMENT = new BlockPos(0, 1, 0);
 
     private PotentialReactorGameTests() {
     }
@@ -97,6 +99,42 @@ public final class PotentialReactorGameTests {
             ItemStack residue = reactor.getProcessInventory().getStackInSlot(PotentialReactorBlockEntity.SLOT_RESIDUE);
             check(RecyclingData.isStripped(residue), "The residue should be the stripped item, was " + residue);
             check(state.core() == PotentialReactorVisualState.CORE_OFF, "The core should go out after the run: " + state);
+            helper.succeed();
+        });
+    }
+
+    /** A repeat burn shows its cut payout, and the broken reactor's drop carries the memory to a new reactor. */
+    @GameTest(template = MachineTestSupport.EMPTY, timeoutTicks = 200)
+    public static void brokenReactorKeepsItsBurnHistory(GameTestHelper helper) {
+        PotentialReactorBlockEntity reactor = reactor(helper, ReactorChamberMaterial.IRON);
+        ItemStack gear = new ItemStack(ModItems.containmentLining(ContainmentLiningMaterial.COPPER).get());
+        gear.set(ModDataComponents.MACHINE_TRAITS.get(), new MachineTraits(Rarity.RARE, 3, List.of(), List.of()));
+        check(reactor.repeatPayoutPercent() == -1, "An empty input should show no payout, was " + reactor.repeatPayoutPercent());
+        reactor.getProcessInventory().setStackInSlot(PotentialReactorBlockEntity.SLOT_INPUT, gear.copy());
+        check(reactor.repeatPayoutPercent() == 100, "Unburned gear should pay in full, was " + reactor.repeatPayoutPercent());
+        helper.onEachTick(() -> {
+            List<String> history = reactor.recentGearIds();
+            if (history.isEmpty()) {
+                return;
+            }
+            reactor.getProcessInventory().setStackInSlot(PotentialReactorBlockEntity.SLOT_INPUT, gear.copy());
+            check(reactor.repeatPayoutPercent() == 75 && reactor.inputGearRepeats() == 1,
+                    "One earlier burn should cut the payout to 75%, was " + reactor.repeatPayoutPercent());
+
+            ItemStack drop = Block.getDrops(helper.getBlockState(REACTOR), helper.getLevel(), helper.absolutePos(REACTOR), reactor)
+                    .stream()
+                    .filter(stack -> stack.is(ModBlocks.POTENTIAL_REACTOR.get().asItem()))
+                    .findFirst()
+                    .orElseThrow(() -> new IllegalStateException("The reactor should drop itself"));
+            check(history.equals(drop.get(ModDataComponents.REACTOR_BURN_HISTORY.get())),
+                    "The dropped reactor should carry its burn history " + history + ", had " + drop.getComponents());
+
+            PotentialReactorBlockEntity replacement = MachineTestSupport.place(
+                    helper, REPLACEMENT, ModBlocks.POTENTIAL_REACTOR.get(), PotentialReactorBlockEntity.class);
+            replacement.applyComponentsFromItemStack(drop);
+            replacement.getProcessInventory().setStackInSlot(PotentialReactorBlockEntity.SLOT_INPUT, gear.copy());
+            check(replacement.recentGearIds().equals(history), "A placed reactor should keep the history, had " + replacement.recentGearIds());
+            check(replacement.repeatPayoutPercent() == 75, "The replacement should keep the repeat penalty, was " + replacement.repeatPayoutPercent());
             helper.succeed();
         });
     }

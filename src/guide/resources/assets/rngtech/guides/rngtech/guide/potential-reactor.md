@@ -59,4 +59,4 @@ The Potential Reactor screen has four tabs:
 
 ### Breaking
 
-Mine it with a pickaxe to get it back. Items in its slots and installed Gear drop as separate items.
+Mine it with a pickaxe to get it back. The dropped reactor keeps its rarity, affixes, and memory of recent gear burns. Items in its slots and installed Gear drop as separate items.

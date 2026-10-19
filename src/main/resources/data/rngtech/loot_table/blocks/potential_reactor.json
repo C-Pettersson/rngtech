@@ -6,6 +6,16 @@
       "entries": [
         {
           "type": "minecraft:item",
+          "functions": [
+            {
+              "function": "minecraft:copy_components",
+              "include": [
+                "rngtech:machine_traits",
+                "rngtech:reactor_burn_history"
+              ],
+              "source": "block_entity"
+            }
+          ],
           "name": "rngtech:potential_reactor"
         }
       ],
