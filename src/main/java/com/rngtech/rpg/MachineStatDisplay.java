@@ -16,6 +16,7 @@ public final class MachineStatDisplay {
             MachineStat.PROCESSING_SPEED,
             MachineStat.EFFICIENCY,
             MachineStat.STABILITY,
+            MachineStat.BURST_TRANSFER,
             MachineStat.HEAT_TRANSFER,
             MachineStat.THERMAL_CONDUCTIVITY,
             MachineStat.HEAT_ISOLATION,
@@ -66,7 +67,7 @@ public final class MachineStatDisplay {
             case BATCH_OVERHEAD -> formatNumber(value) + "% per extra item";
             case ENERGY_CAPACITY, ENERGY_CAPACITY_FLAT, BUFFER_SIZE -> formatNumber(value) + " FE";
             case ENERGY_GENERATION -> formatNumber(value) + " FE/t";
-            case ENERGY_TRANSFER, BURST_TRANSFER, FE_TRANSFER -> formatNumber(value) + " FE/t";
+            case ENERGY_TRANSFER, FE_TRANSFER -> formatNumber(value) + " FE/t";
             case FLUID_CAPACITY -> formatNumber(value) + " mB";
             case FLUID_TRANSFER -> formatNumber(value) + " mB/t";
             case COMPRESSION_RATIO -> formatNumber(value) + ":1";
@@ -203,7 +204,7 @@ public final class MachineStatDisplay {
         return switch (stat) {
             case ENERGY_CAPACITY, ENERGY_CAPACITY_FLAT, BUFFER_SIZE -> formatSignedNumber(value) + " FE";
             case ENERGY_GENERATION -> formatSignedNumber(value) + " FE/t";
-            case ENERGY_TRANSFER, BURST_TRANSFER, FE_TRANSFER -> formatSignedNumber(value) + " FE/t";
+            case ENERGY_TRANSFER, FE_TRANSFER -> formatSignedNumber(value) + " FE/t";
             case INPUT_SLOTS, OUTPUT_SLOTS, ADDON_SLOTS, BLOCK_FILTER_SLOTS -> formatSignedUnit(value, "slot", "slots");
             case CONTROL, DRIVE, RESERVE -> formatSignedUnit(value, "point", "points");
             case BATTERY_SLOTS -> formatSignedUnit(value, "cell", "cells");
