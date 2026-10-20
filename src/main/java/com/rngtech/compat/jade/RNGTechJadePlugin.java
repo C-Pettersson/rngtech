@@ -3,6 +3,7 @@ package com.rngtech.compat.jade;
 import com.rngtech.RNGTech;
 import com.rngtech.content.block.CableBlock;
 import com.rngtech.content.block.UniversalConnectorBlock;
+import com.rngtech.content.blockentity.BaseMachineBlockEntity;
 import com.rngtech.content.blockentity.CableBlockEntity;
 import com.rngtech.content.blockentity.MachineInfoProvider;
 import com.rngtech.content.blockentity.MachineInfoSnapshot;
@@ -30,6 +31,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.neoforged.neoforge.fluids.FluidStack;
+import net.neoforged.neoforge.items.IItemHandler;
 import snownee.jade.api.Accessor;
 import snownee.jade.api.BlockAccessor;
 import snownee.jade.api.IBlockComponentProvider;
@@ -50,6 +52,7 @@ import snownee.jade.api.view.IClientExtensionProvider;
 import snownee.jade.api.view.IServerExtensionProvider;
 import snownee.jade.api.view.ViewGroup;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
@@ -62,6 +65,7 @@ public final class RNGTechJadePlugin implements IWailaPlugin {
         registration.registerBlockDataProvider(MachineStateProvider.CABLE_CONNECTOR, CableBlockEntity.class);
         registration.registerFluidStorage(MachineTankProvider.INSTANCE, BlockEntity.class);
         registration.registerEnergyStorage(MachineEnergyBarFilter.INSTANCE, BlockEntity.class);
+        registration.registerItemStorage(MachineItemStorageProvider.INSTANCE, BlockEntity.class);
     }
 
     @Override
@@ -579,6 +583,44 @@ public final class RNGTechJadePlugin implements IWailaPlugin {
         @Override
         public List<ViewGroup<CompoundTag>> getGroups(Accessor<?> accessor) {
             return accessor.getTarget() instanceof MachineInfoProvider ? List.of() : null;
+        }
+    }
+
+    /** Lists a machine's installed Gear only in the detailed view; the compact view keeps its inputs and outputs. */
+    private enum MachineItemStorageProvider implements IServerExtensionProvider<ItemStack> {
+        INSTANCE;
+
+        private static final ResourceLocation UID = RNGTech.id("machine_item_storage");
+
+        @Override
+        public ResourceLocation getUid() {
+            return UID;
+        }
+
+        @Override
+        public List<ViewGroup<ItemStack>> getGroups(Accessor<?> accessor) {
+            if (accessor.showDetails() || !(accessor.getTarget() instanceof BaseMachineBlockEntity machine)) {
+                return null;
+            }
+            IItemHandler inventory = machine.getItemHandler(null);
+            List<ItemStack> stacks = new ArrayList<>();
+            for (int slot = 0; slot < inventory.getSlots(); slot++) {
+                ItemStack stack = inventory.getStackInSlot(slot);
+                if (!stack.isEmpty() && !machine.isGearSlot(slot)) {
+                    merge(stacks, stack);
+                }
+            }
+            return stacks.isEmpty() ? List.of() : List.of(new ViewGroup<>(stacks));
+        }
+
+        private static void merge(List<ItemStack> stacks, ItemStack stack) {
+            for (ItemStack listed : stacks) {
+                if (ItemStack.isSameItemSameComponents(listed, stack)) {
+                    listed.grow(stack.getCount());
+                    return;
+                }
+            }
+            stacks.add(stack.copy());
         }
     }
 
