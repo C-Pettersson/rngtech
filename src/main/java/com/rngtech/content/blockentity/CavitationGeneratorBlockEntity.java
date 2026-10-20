@@ -139,7 +139,11 @@ public class CavitationGeneratorBlockEntity extends BaseMachineBlockEntity
     private static final int DATA_LIVE_RESONANCE = 40;
     private static final int DATA_WATER_PER_CYCLE = 41;
     private static final int DATA_MAX_PENALTY = 42;
+    private static final int DATA_FLUID_OUTPUT_RATE = 43;
+    private static final int DATA_GENERATION_FLUID_BONUS = 44;
     private static final int STAT_SCALE = 100;
+    /** Share of the extra FE Energy Generation bonuses would make that a fluid-output cycle adds to its fluid instead. */
+    public static final double GENERATION_TO_FLUID = 0.25;
     private static final int VISUAL_SYNC_INTERVAL = 2;
 
     private final ItemStackHandler processInventory = new ItemStackHandler(PROCESS_SLOT_COUNT) {
@@ -273,6 +277,10 @@ public class CavitationGeneratorBlockEntity extends BaseMachineBlockEntity
                 case DATA_THROTTLE -> throttle;
                 case DATA_THROTTLE_HEAT -> (int) Math.round(heatPerTick(stats, CavitationRotorDynamics.targetSpeed(throttle)) * STAT_SCALE);
                 case DATA_COOLING -> (int) Math.round(coolingPerTick() * STAT_SCALE);
+                case DATA_FLUID_OUTPUT_RATE -> (int) Math.round(fluidOutputPerMinute(stats));
+                case DATA_GENERATION_FLUID_BONUS -> recipe == null || recipe.fluidOutputStack().isEmpty()
+                        ? 0
+                        : (int) Math.round((generationFluidMultiplier(recipe, stats) - 1.0) * STAT_SCALE * STAT_SCALE);
                 default -> 0;
             };
         }
@@ -283,7 +291,7 @@ public class CavitationGeneratorBlockEntity extends BaseMachineBlockEntity
 
         @Override
         public int getCount() {
-            return DATA_MAX_PENALTY + 1;
+            return DATA_GENERATION_FLUID_BONUS + 1;
         }
     };
 
@@ -463,6 +471,7 @@ public class CavitationGeneratorBlockEntity extends BaseMachineBlockEntity
         CavitationRecipe recipe = nextRecipe();
         int status = statusCode(stats);
         AdjacentEnergyConnector.Info connector = AdjacentEnergyConnector.forSource(level, worldPosition);
+        FluidStack product = hasActiveRecipe() ? activeFluidOutput : recipe == null ? FluidStack.EMPTY : recipe.fluidOutputStack();
         return MachineInfoSnapshot.builder("cavitation_generator")
                 .state(
                         MachineInfoSnapshot.workState(
@@ -486,6 +495,10 @@ public class CavitationGeneratorBlockEntity extends BaseMachineBlockEntity
                         recipe == null ? MachineInfoSnapshot.UNSET : recipe.minimumRotorStage()
                 )
                 .output(outputSummary(status))
+                .fluidProduct(
+                        product.isEmpty() ? "" : product.getFluid().getFluidType().getDescriptionId(),
+                        (int) Math.round(fluidOutputPerMinute(stats) * 10.0)
+                )
                 .refinement(machineTraits())
                 .build();
     }
@@ -788,7 +801,11 @@ public class CavitationGeneratorBlockEntity extends BaseMachineBlockEntity
         return level == null ? null : CavitationRecipes.find(level, inputTank.getFluid(), rotorStack(), nozzleStack()).orElse(null);
     }
 
+    /** Cycles with a fluid output make no FE; their Energy Generation goes to the fluid instead. */
     private double effectiveRecipeEnergy(CavitationRecipe recipe, MachineStatAccumulator stats) {
+        if (!recipe.fluidOutputStack().isEmpty()) {
+            return 0.0;
+        }
         int ticks = stats.adjustedProcessingTicks(recipe.processingTicks());
         return Math.max(1.0, stats.generatedEnergyTotal(recipe.energy(), ticks)
                 * Math.max(0.1, stats.value(MachineStat.EFFICIENCY)));
@@ -809,8 +826,33 @@ public class CavitationGeneratorBlockEntity extends BaseMachineBlockEntity
         if (output.isEmpty()) {
             return FluidStack.EMPTY;
         }
-        int amount = Math.max(1, (int) Math.round(output.getAmount() * Math.max(1.0, stats.value(MachineStat.OUTPUT_AMOUNT))));
+        double scale = Math.max(1.0, stats.value(MachineStat.OUTPUT_AMOUNT)) * generationFluidMultiplier(recipe, stats);
+        // Capped at the tank, or a cycle larger than the whole tank could never start.
+        int amount = Math.min(outputTank.getCapacity(), Math.max(1, (int) Math.round(output.getAmount() * scale)));
         return output.copyWithAmount(amount);
+    }
+
+    /**
+     * Each Energy Generation bonus adds {@link #GENERATION_TO_FLUID} of what it would add to a power cycle, and a net
+     * penalty takes fluid away the same way. Percent counts over the same Gear unrolled; flat FE/t counts against the
+     * recipe's FE/t, which on a fluid recipe is this reference rate, not FE made.
+     */
+    private double generationFluidMultiplier(CavitationRecipe recipe, MachineStatAccumulator stats) {
+        double unrolled = unrolledStats().effectiveEnergyGenerationMultiplier();
+        double percent = unrolled > 0.0 ? stats.effectiveEnergyGenerationMultiplier() / unrolled - 1.0 : 0.0;
+        double reference = recipe.energy() / (double) Math.max(1, recipe.processingTicks());
+        double flat = reference > 0.0 ? stats.effectiveFlatEnergyGenerationBonus() / reference : 0.0;
+        return Math.max(0.0, 1.0 + (percent + flat) * GENERATION_TO_FLUID);
+    }
+
+    private MachineStatAccumulator unrolledStats() {
+        MachineStatAccumulator stats = MachineBaseStatCatalog.cavitationGenerator();
+        for (ItemStack part : List.of(rotorStack(), nozzleStack(), servoStack())) {
+            if (part.getItem() instanceof MachinePartItem) {
+                ComponentBaseStatCatalog.applyUnrolledContribution(stats, part);
+            }
+        }
+        return stats;
     }
 
     private boolean canAcceptFluidOutput(FluidStack output) {
@@ -845,6 +887,18 @@ public class CavitationGeneratorBlockEntity extends BaseMachineBlockEntity
         );
     }
 
+    /** Live fluid output per minute while a cycle cavitates, otherwise what the throttle would make once spooled up. */
+    private double fluidOutputPerMinute(MachineStatAccumulator stats) {
+        int amount = currentRecipeFluidOutput(stats);
+        int ticks = currentProcessingTicks(stats);
+        if (amount <= 0 || ticks <= 0) {
+            return 0.0;
+        }
+        double speed = hasActiveRecipe() ? rotorSpeed : CavitationRotorDynamics.targetSpeed(throttle);
+        double flow = CavitationRotorDynamics.cavitating(speed) ? CavitationRotorDynamics.flow(speed) : 0.0;
+        return amount * flow * 1200.0 / ticks;
+    }
+
     private double currentGenerationRate(double totalEnergy, int processingTicks) {
         MachineStatAccumulator stats = effectiveStats();
         double strainPenalty = 1.0 - CavitationHeat.penalty(
@@ -867,7 +921,11 @@ public class CavitationGeneratorBlockEntity extends BaseMachineBlockEntity
             return Math.max(0, (int) Math.round(activeTotalEnergyForDisplay(stats)));
         }
         CavitationRecipe recipe = nextRecipe();
-        return recipe == null || rotorStage(stats) < recipe.minimumRotorStage() ? 0 : Math.max(1, (int) Math.round(effectiveRecipeEnergy(recipe, stats)));
+        if (recipe == null || rotorStage(stats) < recipe.minimumRotorStage()) {
+            return 0;
+        }
+        double energy = effectiveRecipeEnergy(recipe, stats);
+        return energy <= 0.0 ? 0 : Math.max(1, (int) Math.round(energy));
     }
 
     private int currentRecipeFluidOutput(MachineStatAccumulator stats) {
@@ -1416,6 +1474,6 @@ public class CavitationGeneratorBlockEntity extends BaseMachineBlockEntity
     /** Generation before machine and part stats, for the Stats tab breakdown; 0 when unknown. */
     private double baseEnergyPerTick() {
         CavitationRecipe recipe = nextRecipe();
-        return recipe == null ? 0.0 : recipe.energy() / (double) Math.max(1, recipe.processingTicks());
+        return recipe == null || !recipe.fluidOutputStack().isEmpty() ? 0.0 : recipe.energy() / (double) Math.max(1, recipe.processingTicks());
     }
 }

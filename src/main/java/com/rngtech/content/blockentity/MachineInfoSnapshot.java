@@ -39,6 +39,7 @@ public record MachineInfoSnapshot(
         OutputSummary outputSummary,
         int outputPerMinuteTenths,
         boolean fluidOutputRate,
+        String productFluid,
         String refinementRarity,
         int refinementPotential,
         int affixCount,
@@ -78,6 +79,9 @@ public record MachineInfoSnapshot(
         if (outputPerMinuteTenths > 0) {
             tag.putInt("output_rate", outputPerMinuteTenths);
             tag.putBoolean("output_rate_fluid", fluidOutputRate);
+        }
+        if (!productFluid.isEmpty()) {
+            tag.putString("product_fluid", productFluid);
         }
         tag.putString("refinement_rarity", refinementRarity);
         tag.putInt("refinement_potential", refinementPotential);
@@ -121,6 +125,7 @@ public record MachineInfoSnapshot(
                 OutputSummary.byName(tag.getString("output_summary")),
                 tag.getInt("output_rate"),
                 tag.getBoolean("output_rate_fluid"),
+                tag.getString("product_fluid"),
                 tag.getString("refinement_rarity"),
                 tag.getInt("refinement_potential"),
                 tag.getInt("affix_count"),
@@ -275,6 +280,7 @@ public record MachineInfoSnapshot(
         private OutputSummary outputSummary = OutputSummary.NONE;
         private int outputPerMinuteTenths;
         private boolean fluidOutputRate;
+        private String productFluid = "";
         private String refinementRarity = "normal";
         private int refinementPotential;
         private int affixCount;
@@ -383,6 +389,18 @@ public record MachineInfoSnapshot(
             return this;
         }
 
+        /**
+         * A generator's fluid product, by its fluid's translation key, and its mB per minute in tenths. Jade leads with
+         * this rate instead of the FE/t when the fluid, not the power, is what the cycle is run for.
+         */
+        public Builder fluidProduct(String fluidTranslationKey, int perMinuteTenths) {
+            if (fluidTranslationKey == null || fluidTranslationKey.isEmpty()) {
+                return this;
+            }
+            productFluid = fluidTranslationKey;
+            return fluidOutputRate(perMinuteTenths);
+        }
+
         public Builder refinement(MachineTraits traits) {
             refinementRarity = traits.rarity().getSerializedName();
             corrupted = traits.isCorrupted();
@@ -427,6 +445,7 @@ public record MachineInfoSnapshot(
                     outputSummary,
                     outputPerMinuteTenths,
                     fluidOutputRate,
+                    productFluid,
                     refinementRarity,
                     refinementPotential,
                     affixCount,

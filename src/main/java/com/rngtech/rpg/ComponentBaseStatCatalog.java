@@ -214,6 +214,14 @@ public final class ComponentBaseStatCatalog {
         }
     }
 
+    /** The part's contribution as crafted, without its rolled affixes: the baseline its rolls are measured against. */
+    public static void applyUnrolledContribution(MachineStatAccumulator target, ItemStack stack) {
+        Profile profile = profile(stack);
+        if (profile != null) {
+            applyContribution(target, profile, MachineTraits.EMPTY);
+        }
+    }
+
     /**
      * Control, Drive, and Reserve rolled or corrupted on a part. They describe the machine rather than the part, and the machine adds
      * them before its Mastery attribute conversions, separately from {@link #applyEffectiveContribution}, because the

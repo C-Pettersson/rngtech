@@ -17,7 +17,7 @@
     "id": "rngtech:nitrogen",
     "amount": 1000
   },
-  "energy": 4800,
+  "energy": 30000,
   "processing_ticks": 300,
   "minimum_rotor_stage": 6,
   "pressure_rating": 1800,
