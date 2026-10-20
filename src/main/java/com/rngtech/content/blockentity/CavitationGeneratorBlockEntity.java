@@ -827,22 +827,22 @@ public class CavitationGeneratorBlockEntity extends BaseMachineBlockEntity
             return FluidStack.EMPTY;
         }
         double scale = Math.max(1.0, stats.value(MachineStat.OUTPUT_AMOUNT)) * generationFluidMultiplier(recipe, stats);
-        int amount = Math.max(1, (int) Math.round(output.getAmount() * scale));
+        // Capped at the tank, or a cycle larger than the whole tank could never start.
+        int amount = Math.min(outputTank.getCapacity(), Math.max(1, (int) Math.round(output.getAmount() * scale)));
         return output.copyWithAmount(amount);
     }
 
     /**
-     * The FE this cycle's Energy Generation would make, flat FE/t included, against the same Gear unrolled; the
-     * fluid gains {@link #GENERATION_TO_FLUID} of the difference, and loses it for a net penalty.
+     * Each Energy Generation bonus adds {@link #GENERATION_TO_FLUID} of what it would add to a power cycle, and a net
+     * penalty takes fluid away the same way. Percent counts over the same Gear unrolled; flat FE/t counts against the
+     * recipe's FE/t, which on a fluid recipe is this reference rate, not FE made.
      */
     private double generationFluidMultiplier(CavitationRecipe recipe, MachineStatAccumulator stats) {
-        int ticks = stats.adjustedProcessingTicks(recipe.processingTicks());
-        double unrolled = unrolledStats().generatedEnergyTotal(recipe.energy(), ticks);
-        if (unrolled <= 0.0) {
-            return 1.0;
-        }
-        double ratio = stats.generatedEnergyTotal(recipe.energy(), ticks) / unrolled;
-        return Math.max(0.0, 1.0 + (ratio - 1.0) * GENERATION_TO_FLUID);
+        double unrolled = unrolledStats().effectiveEnergyGenerationMultiplier();
+        double percent = unrolled > 0.0 ? stats.effectiveEnergyGenerationMultiplier() / unrolled - 1.0 : 0.0;
+        double reference = recipe.energy() / (double) Math.max(1, recipe.processingTicks());
+        double flat = reference > 0.0 ? stats.effectiveFlatEnergyGenerationBonus() / reference : 0.0;
+        return Math.max(0.0, 1.0 + (percent + flat) * GENERATION_TO_FLUID);
     }
 
     private MachineStatAccumulator unrolledStats() {
