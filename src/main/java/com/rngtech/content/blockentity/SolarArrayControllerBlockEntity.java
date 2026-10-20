@@ -225,6 +225,11 @@ public class SolarArrayControllerBlockEntity extends BaseMachineBlockEntity impl
     }
 
     @Override
+    public boolean isGearSlot(int slot) {
+        return true;
+    }
+
+    @Override
     public Component getDisplayName() {
         return MachineNameGenerator.generatedName(
                 machineTraits(),

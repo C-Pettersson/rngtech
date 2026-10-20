@@ -435,6 +435,11 @@ public class CrusherBlockEntity extends BaseMachineBlockEntity implements MenuPr
         return inventory;
     }
 
+    @Override
+    public boolean isGearSlot(int slot) {
+        return slot == SLOT_CRUSH_HEAD;
+    }
+
     public ContainerData getMenuData() {
         return menuData;
     }
