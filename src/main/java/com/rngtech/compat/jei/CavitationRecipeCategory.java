@@ -110,7 +110,10 @@ public final class CavitationRecipeCategory implements IRecipeCategory<RecipeHol
         if (!recipe.fluidOutputStack().isEmpty()) {
             JeiCategoryUi.drawLabel(guiGraphics, font, "rngtech.jei.cavitation.fluid_output", OUTPUT_X + 8, 8);
         }
-        JeiCategoryUi.drawLine(guiGraphics, font, JeiCategoryUi.energyGenerated(recipe.energy(), recipe.processingTicks()), 48, JeiCategoryUi.TEXT_COLOR);
+        Component yield = recipe.fluidOutputStack().isEmpty()
+                ? JeiCategoryUi.energyGenerated(recipe.energy(), recipe.processingTicks())
+                : Component.translatable("rngtech.jei.cavitation.no_fe");
+        JeiCategoryUi.drawLine(guiGraphics, font, yield, 48, JeiCategoryUi.TEXT_COLOR);
         JeiCategoryUi.drawLine(
                 guiGraphics,
                 font,

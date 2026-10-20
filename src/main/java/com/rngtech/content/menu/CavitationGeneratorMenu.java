@@ -77,7 +77,8 @@ public class CavitationGeneratorMenu extends AbstractContainerMenu implements St
     private static final int DATA_WATER_PER_CYCLE = 41;
     private static final int DATA_MAX_PENALTY = 42;
     private static final int DATA_FLUID_OUTPUT_RATE = 43;
-    private static final int DATA_COUNT = 44;
+    private static final int DATA_GENERATION_FLUID_BONUS = 44;
+    private static final int DATA_COUNT = 45;
     private static final int BUTTON_THROTTLE_BASE = 8000;
     private static final int STAT_SCALE = 100;
 
@@ -318,6 +319,11 @@ public class CavitationGeneratorMenu extends AbstractContainerMenu implements St
 
     public int recipeFluidOutput() {
         return data.get(DATA_RECIPE_FLUID_OUTPUT);
+    }
+
+    /** What Energy Generation adds to a fluid-output cycle's fluid, as a fraction; negative for a net penalty. */
+    public double generationFluidBonus() {
+        return data.get(DATA_GENERATION_FLUID_BONUS) / (double) (STAT_SCALE * STAT_SCALE);
     }
 
     /** Fluid output in mB per minute at the live rotor speed, or the throttle's while idle. */

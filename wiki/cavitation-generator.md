@@ -83,7 +83,7 @@ The generator never pauses because its storage is full. FE that its 4,000 FE buf
 
 ### Nitrogen
 
-Install a {{ item('rngtech:nitrogen_extraction_rotor') }} and a {{ item('rngtech:nitrogen_separation_nozzle') }}, then run Water as usual. Each cycle adds Nitrogen to an 8,000 mB output tank and makes much less FE than the plain Water recipe. Recipes that need specific Gear take priority over the plain Water recipe. When the output tank is full, the generator stops with a Nitrogen Full status unless a Nullite Servo is installed and the tank already holds Nitrogen, in which case the excess is voided. Nitrogen feeds the [Ammonia Synthesizer](ammonia-synthesizer.md) and the [Nitrogen atmosphere](heat.md#nitrogen-atmosphere) of heated machines. While it makes Nitrogen, the generation icon on the Process tab and Jade lead with the Nitrogen rate per minute rather than the small FE/t; Jade's detailed view still shows the FE/t.
+Install a {{ item('rngtech:nitrogen_extraction_rotor') }} and a {{ item('rngtech:nitrogen_separation_nozzle') }}, then run Water as usual. Each cycle adds Nitrogen to an 8,000 mB output tank and makes no FE. Energy Generation still counts, at 25% of its value: the generator works out the extra FE your Energy Generation bonuses, flat FE/t included, would make over the same Gear unrolled, and adds a quarter of that share to the Nitrogen. +40% Energy Generation adds 10% Nitrogen per cycle, and a net penalty takes Nitrogen away the same way. Recipes that need specific Gear take priority over the plain Water recipe. When the output tank is full, the generator stops with a Nitrogen Full status unless a Nullite Servo is installed and the tank already holds Nitrogen, in which case the excess is voided. Nitrogen feeds the [Ammonia Synthesizer](ammonia-synthesizer.md) and the [Nitrogen atmosphere](heat.md#nitrogen-atmosphere) of heated machines. While it makes Nitrogen, the generation icon on the Process tab shows the Nitrogen rate per minute and the Energy Generation bonus, the Stats tab's Energy Generation row shows the Nitrogen it adds, and Jade shows the Nitrogen rate and progress, with the energy lines only in its detailed view.
 
 ### Burst rotor
 
@@ -101,7 +101,7 @@ The {{ item('rngtech:aethergold_cavitation_rotor') }} is a Stage 7 sidegrade. It
 
 Cavitation Rotors can roll flat and percent Durability affixes.
 
-**Bonus Output** from the generator, rotor, or nozzle gets the same FE from less Water: each cycle draws 1,000 mB divided by Bonus Output, so +55% draws 646 mB. With Nitrogen Gear it adds Nitrogen instead. **Fluid Transfer** only matters with Nitrogen Gear, where it limits how fast Nitrogen drains out, so the Stats tab only shows it then.
+**Bonus Output** from the generator, rotor, or nozzle gets the same FE from less Water: each cycle draws 1,000 mB divided by Bonus Output, so +55% draws 646 mB. With Nitrogen Gear it adds Nitrogen instead, on top of the Energy Generation bonus. **Fluid Transfer** only matters with Nitrogen Gear, where it limits how fast Nitrogen drains out, so the Stats tab only shows it then.
 
 On the Gear tab, the tooltip of an installed Heat Core or Servo dims the lines this generator does not use, such as Cooling Rate, Heat Isolation, Thermal Mass, and the Heat Core's own Energy Generation.
 

@@ -520,6 +520,18 @@ final class MachineScreenStyle {
         ).withStat(line.stat);
     }
 
+    /** For a cycle that makes a fluid instead of FE: the Energy Generation row shows what it adds to that fluid. */
+    static StatLine[] withGenerationAsFluid(MachineStat[] stats, StatLine[] statLines, String value, List<Component> tooltipLines) {
+        for (int index = 0; index < Math.min(stats.length, statLines.length); index++) {
+            if (stats[index] == MachineStat.ENERGY_GENERATION) {
+                StatLine line = statLines[index];
+                statLines[index] = new StatLine(line.label(), value, line.strength(), false, line.strength() > 1.001, Component.empty(), tooltipLines)
+                        .withStat(line.stat);
+            }
+        }
+        return statLines;
+    }
+
     /** Declared ascendancy stats follow the machine's own rows, highlighted, only while an allocated node grants them. */
     /** The Process tab's progress-bar color while it flashes a job that finished instantly. */
     static final int INSTANT_FLASH = 0xFFE8C24A;

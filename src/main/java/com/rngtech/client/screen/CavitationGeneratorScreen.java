@@ -9,6 +9,7 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.world.entity.player.Inventory;
 
 import java.util.List;
@@ -521,16 +522,28 @@ public class CavitationGeneratorScreen extends AbstractContainerScreen<Cavitatio
                 Component.translatable("rngtech.cavitation.tooltip.pressure", menu.pressureRating(), menu.ratedPressure()));
     }
 
-    /** A cycle with a fluid output is run for that fluid, so its rate leads and the FE/t follows. */
+    /** A cycle with a fluid output makes no FE, so it shows the fluid rate and what Energy Generation adds to it. */
     private List<Component> generationTooltip() {
-        Component generation = Component.translatable("rngtech.cavitation.tooltip.generation", CompactValueText.energyRate(menu.energyPerTick()));
         if (menu.recipeFluidOutput() <= 0) {
-            return List.of(generation);
+            return List.of(Component.translatable("rngtech.cavitation.tooltip.generation", CompactValueText.energyRate(menu.energyPerTick())));
         }
         return List.of(
                 Component.translatable("rngtech.cavitation.tooltip.fluid_product", menu.outputFluidName(), CompactValueText.fluidRate(menu.fluidOutputRate())),
-                generation.copy().withStyle(ChatFormatting.GRAY)
+                generationFluidLine().withStyle(ChatFormatting.GRAY)
         );
+    }
+
+    private MutableComponent generationFluidLine() {
+        return Component.translatable(
+                "rngtech.cavitation.tooltip.generation_to_fluid",
+                percent(CavitationGeneratorBlockEntity.GENERATION_TO_FLUID),
+                signedPercent(menu.generationFluidBonus()),
+                menu.outputFluidName()
+        );
+    }
+
+    private static String signedPercent(double fraction) {
+        return (fraction < 0.0 ? "" : "+") + String.format(Locale.ROOT, "%.1f", fraction * 100.0).replaceAll("\\.0$", "") + "%";
     }
 
     private void renderPurgeButtons(GuiGraphics guiGraphics) {
@@ -618,6 +631,17 @@ public class CavitationGeneratorScreen extends AbstractContainerScreen<Cavitatio
                     value > 1.001,
                     MachineScreenStyle.statLayerTooltip(menu.getSlot(menu.refinementTargetSlot()).getItem(), STAT_TYPES[index], value)
             ).withStat(STAT_TYPES[index]));
+        }
+        if (menu.recipeFluidOutput() > 0) {
+            return MachineScreenStyle.withGenerationAsFluid(
+                    shown.toArray(MachineStat[]::new),
+                    lines.toArray(MachineScreenStyle.StatLine[]::new),
+                    signedPercent(menu.generationFluidBonus()) + " mB",
+                    List.of(
+                            Component.translatable("rngtech.cavitation.tooltip.no_fe", menu.outputFluidName()),
+                            generationFluidLine().withStyle(ChatFormatting.GRAY)
+                    )
+            );
         }
         return MachineScreenStyle.withGenerationBreakdown(
                 shown.toArray(MachineStat[]::new),

@@ -218,11 +218,11 @@ public final class RNGTechJadePlugin implements IWailaPlugin {
         }
 
         private static void appendEnergy(ITooltip tooltip, MachineInfoSnapshot info, boolean details) {
-            if (info.energyCapacity() <= 0) {
+            // A fluid product's rate stands in for the energy lines, which only the detailed view keeps.
+            if (info.energyCapacity() <= 0 || !details && !info.productFluid().isEmpty()) {
                 return;
             }
-            // A fluid product's rate stands in for the FE/t, which is only a by-product of the cycle.
-            if (info.energyRate() == 0 || !details && !info.productFluid().isEmpty()) {
+            if (info.energyRate() == 0) {
                 tooltip.add(Component.translatable(
                         "rngtech.jade.machine_state.line.energy",
                         value(info.energy()),
