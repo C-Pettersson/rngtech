@@ -505,7 +505,7 @@ public class CavitationGeneratorScreen extends AbstractContainerScreen<Cavitatio
         CompactValueText.renderTooltipIfHovered(guiGraphics, font, leftPos, topPos, mouseX, mouseY, ENERGY_METER_X, ENERGY_METER_Y, ENERGY_METER_WIDTH, ENERGY_METER_HEIGHT,
                 CompactValueText.exactEnergyAmountPair(menu.energy(), menu.energyCapacity()));
         CompactValueText.renderTooltipIfHovered(guiGraphics, font, leftPos, topPos, mouseX, mouseY, PROGRESS_BAR_X, PROGRESS_BAR_Y, PROCESS_BAR_WIDTH, PROGRESS_BAR_HEIGHT,
-                Component.translatable("rngtech.cavitation.tooltip.progress", menu.progress(), menu.processingTicks(), CompactValueText.energyAmount(menu.recipeEnergy())));
+                Component.translatable("rngtech.cavitation.tooltip.progress", menu.progress(), menu.processingTicks(), cycleYield()));
         if (isOver(mouseX, mouseY, PROGRESS_BAR_X, STRAIN_BAR_Y, PROCESS_BAR_WIDTH, STRAIN_WEAR_BAR_HEIGHT)) {
             guiGraphics.renderComponentTooltip(font, strainTooltip(), mouseX, mouseY);
             return;
@@ -520,6 +520,14 @@ public class CavitationGeneratorScreen extends AbstractContainerScreen<Cavitatio
                 Component.translatable("rngtech.cavitation.tooltip.output", CompactValueText.energyRate(menu.maxOutput())));
         CompactValueText.renderTooltipIfHovered(guiGraphics, font, leftPos, topPos, mouseX, mouseY, PRESSURE_ICON_X, STATUS_ICON_Y, ICON_SIZE, ICON_SIZE,
                 Component.translatable("rngtech.cavitation.tooltip.pressure", menu.pressureRating(), menu.ratedPressure()));
+    }
+
+    /** What one cycle makes: its fluid on a fluid-output cycle, which makes no FE, otherwise its FE. */
+    private Component cycleYield() {
+        if (menu.recipeFluidOutput() > 0) {
+            return Component.translatable("rngtech.cavitation.tooltip.cycle_fluid", menu.recipeFluidOutput(), menu.outputFluidName());
+        }
+        return Component.literal(CompactValueText.energyAmount(menu.recipeEnergy()));
     }
 
     /** A cycle with a fluid output makes no FE, so it shows the fluid rate and what Energy Generation adds to it. */

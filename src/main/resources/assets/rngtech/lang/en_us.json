@@ -3795,6 +3795,7 @@
   "rngtech.cavitation.tooltip.status": "Status: %s",
   "rngtech.cavitation.tooltip.generation": "Generation: %s",
   "rngtech.cavitation.tooltip.fluid_product": "%s: +%s",
+  "rngtech.cavitation.tooltip.cycle_fluid": "+%s mB %s",
   "rngtech.cavitation.tooltip.no_fe": "%s cycles make no FE.",
   "rngtech.cavitation.tooltip.generation_to_fluid": "Energy Generation bonuses count at %s%%: %s %s",
   "rngtech.cavitation.tooltip.output": "Output: %s",
