@@ -2,7 +2,7 @@
 navigation:
   title: "Crafting"
   parent: phase-array.md
-  position: 5
+  position: 9
   icon: rngtech:exotic_affix_forge
 ---
 

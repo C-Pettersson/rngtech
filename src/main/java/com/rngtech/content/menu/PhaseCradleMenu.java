@@ -180,7 +180,7 @@ public class PhaseCradleMenu extends AbstractContainerMenu {
         } else if (id == BUTTON_FIRE) {
             cradle.fire();
         } else if (id >= BUTTON_INSCRIBE_BASE && id < BUTTON_INSCRIBE_BASE + PhaseArrayRules.MAX_COILS) {
-            cradle.inscribe(id - BUTTON_INSCRIBE_BASE + 1);
+            cradle.lockIn(id - BUTTON_INSCRIBE_BASE + 1, player);
         } else {
             return false;
         }

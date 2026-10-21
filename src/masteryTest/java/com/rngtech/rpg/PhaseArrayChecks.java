@@ -3,6 +3,7 @@ package com.rngtech.rpg;
 import com.rngtech.RNGTech;
 import com.rngtech.content.loot.GlyphSources;
 import com.rngtech.rpg.refinement.PhaseLineStats;
+import com.rngtech.rpg.refinement.PhaseOutcome;
 import com.rngtech.rpg.refinement.PhasePulse;
 import com.rngtech.rpg.refinement.PhasePulseSequence;
 import com.rngtech.rpg.refinement.RefinementEngine;
@@ -31,6 +32,8 @@ public final class PhaseArrayChecks {
         pulseOddsMatchTheSequence();
         costsFollowTheFormula();
         engineOperationsRespectTheirLimits();
+        outcomeRulesFollowThePrd();
+        fractureChanceFollowsStrain();
         sequenceFramesFollowThePulse();
         dormantSitesPayByTier();
         return checks;
@@ -166,6 +169,31 @@ public final class PhaseArrayChecks {
         check(graftedDown != null && graftedDown.modifiers().get(0).tier() == 2, "a Partial Graft arrives one tier lower");
         check(RefinementEngine.phaseGraft(emitter, MachineTraits.EMPTY, donor, ModifierSlot.PREFIX, false, random) == null,
                 "a suffix cannot be grafted onto a prefix slot");
+    }
+
+    /** RP goes only where the item changed, and a Graft donor survives only a keep-donor Overhold. */
+    private static void outcomeRulesFollowThePrd() {
+        for (PhasePulse.Outcome outcome : PhasePulse.Outcome.values()) {
+            boolean spends = outcome == PhasePulse.Outcome.SUCCESS || outcome == PhasePulse.Outcome.OVERHOLD
+                    || outcome == PhasePulse.Outcome.PARTIAL;
+            check(PhasePulse.spendsRefinementPotential(outcome) == spends, "RP is spent on " + outcome + " only if the item changed");
+        }
+        check(PhasePulse.graftConsumesDonor(PhasePulse.Outcome.SUCCESS, PhaseOutcome.Overhold.KEEP_DONOR), "Graft destroys the donor on Success");
+        check(!PhasePulse.graftConsumesDonor(PhasePulse.Outcome.OVERHOLD, PhaseOutcome.Overhold.KEEP_DONOR), "a keep-donor Overhold spares it");
+        check(PhasePulse.graftConsumesDonor(PhasePulse.Outcome.OVERHOLD, PhaseOutcome.Overhold.NONE), "any other Overhold still destroys it");
+        check(PhasePulse.graftConsumesDonor(PhasePulse.Outcome.PARTIAL, PhaseOutcome.Overhold.KEEP_DONOR), "a Partial Graft destroys the donor");
+    }
+
+    /** 0% within Tolerance, then 1% per point. */
+    private static void fractureChanceFollowsStrain() {
+        near(PhasePulse.fractureChance(line(3, 0), 0), 0.0, "no Fracture at 0 Strain");
+        near(PhasePulse.fractureChance(line(3, 0), 10), 0.10, "10 Strain fractures 10% of the time");
+        near(PhasePulse.fractureChance(line(3, 5), 5), 0.0, "Strain within Tolerance adds nothing");
+        near(PhasePulse.fractureChance(line(3, 5), 7), 0.02, "two points past Tolerance add 2%");
+        near(PhasePulse.fractureChance(line(3, 0), 500), 1.0, "the chance caps at certain");
+        PhasePulse.Odds odds = PhasePulse.odds(line(3, 0), 3, 25);
+        near(odds.fracture(), 0.25, "the preview carries the Fracture chance");
+        near(odds.success() + odds.overhold() + odds.partial() + odds.miss() + odds.fracture(), 1.0, "the preview sums to one");
     }
 
     /** The frames the Cradle and the screen read from a rolled pulse: engage, slip, unwind, hold, apply. */

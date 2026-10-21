@@ -8,24 +8,36 @@ import com.rngtech.content.block.PhaseCoilBlock;
 import com.rngtech.content.block.PhaseEmitterBlock;
 import com.rngtech.content.blockentity.PhaseCoilBlockEntity;
 import com.rngtech.content.blockentity.PhaseCradleBlockEntity;
+import com.rngtech.content.recipe.PhaseArrayRecipe;
 import com.rngtech.content.registry.ModBlocks;
+import com.rngtech.content.registry.ModDataComponents;
 import com.rngtech.content.registry.ModItems;
-import com.rngtech.rpg.MachineTraitRoller;
+import com.rngtech.content.registry.ModRecipes;
+import com.rngtech.rpg.MachineModifier;
 import com.rngtech.rpg.MachineTraits;
 import com.rngtech.rpg.ModifierEligibilityProfiles;
-import com.rngtech.rpg.PhaseArrayRules;
+import com.rngtech.rpg.ModifierFlag;
+import com.rngtech.rpg.ModifierSlot;
+import com.rngtech.rpg.Rarity;
 import com.rngtech.rpg.refinement.PhaseArrayAction;
 import com.rngtech.rpg.refinement.PhaseStrain;
 import com.rngtech.rpg.refinement.RefinementTargets;
 
+import com.google.gson.JsonObject;
+import com.mojang.serialization.JsonOps;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.level.block.Blocks;
 import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Phase Array line: a Cradle, three to nine Coils, and an Emitter in a straight horizontal row form; anything else does
@@ -54,7 +66,7 @@ public final class PhaseArrayGameTests {
         });
     }
 
-    /** Blank Coils form a line that can fire nothing; inscribing them opens positions from the Emitter inward. */
+    /** Blank Coils form a line that can fire nothing; locking Glyphs in opens positions from the Emitter inward. */
     @GameTest(template = MachineTestSupport.EMPTY, timeoutTicks = TIMEOUT)
     public static void inscribedCoilsOpenPositions(GameTestHelper helper) {
         line(helper, Direction.EAST, 3);
@@ -120,8 +132,8 @@ public final class PhaseArrayGameTests {
         line(helper, Direction.EAST, 3);
         PhaseCradleBlockEntity cradle = cradle(helper);
         ItemStack target = new ItemStack(ModItems.PHASE_COIL.get());
-        MachineTraits traits = MachineTraitRoller.roll(ModifierEligibilityProfiles.PHASE_COIL, PhaseArrayRules.PART_STAGE, helper.getLevel().random);
-        RefinementTargets.setTraits(target, traits);
+        // A bare part has Quality 0, so the pulse costs 3 MFE and charges well inside the timeout.
+        RefinementTargets.setTraits(target, cheapTraits(0));
         // Registered up front: a delayed task must not add tick tasks while the harness iterates them. The charge
         // storage accepts nothing until the Cradle is charging, so early power is harmless.
         MachineTestSupport.powerEachTick(helper, cradle.getEnergyStorage(Direction.UP));
@@ -160,16 +172,153 @@ public final class PhaseArrayGameTests {
         });
     }
 
-    private static void line(GameTestHelper helper, Direction axis, int coils) {
-        for (int i = 1; i <= coils; i++) {
-            helper.setBlock(CRADLE.relative(axis, i), ModBlocks.PHASE_COIL.get());
+    /** Attune on a four-Coil line keeps every affix's identity and tier, rolls their values, and adds one Strain. */
+    @GameTest(template = MachineTestSupport.LINE, timeoutTicks = 600)
+    public static void attunePulseKeepsTiers(GameTestHelper helper) {
+        BlockPos origin = new BlockPos(0, 1, 2);
+        line(helper, origin, Direction.EAST, 4);
+        PhaseCradleBlockEntity cradle = cradle(helper, origin);
+        ItemStack target = new ItemStack(ModItems.PHASE_COIL.get());
+        // Attune needs affixes to reroll; four Tier 1 affixes keep Quality 4 and the pulse cheap.
+        MachineTraits traits = cheapTraits(4);
+        RefinementTargets.setTraits(target, traits);
+        List<String> before = affixSummary(traits);
+        MachineTestSupport.powerEachTick(helper, cradle.getEnergyStorage(Direction.UP));
+        helper.runAfterDelay(5, () -> {
+            // Position 1 is next to the Emitter at east 5, so east 1 is position 4 and needs Tier II.
+            coil(helper, origin.east(1)).inscribe(2);
+            for (int i = 2; i <= 4; i++) {
+                coil(helper, origin.east(i)).inscribe(1);
+            }
+        });
+        helper.runAfterDelay(10, () -> {
+            check(cradle.usableCoils() == 4, "Four locked Coils should be usable, found " + cradle.usableCoils());
+            cradle.getItems().setStackInSlot(PhaseCradleBlockEntity.SLOT_TARGET, target);
+            cradle.setAction(PhaseArrayAction.ATTUNE);
+            check(cradle.status() == PhaseCradleBlockEntity.STATUS_IDLE, "Attune on a fresh part should be ready to charge, status " + cradle.status());
+            cradle.toggleCharging();
+        });
+        helper.succeedWhen(() -> {
+            if (cradle.status() == PhaseCradleBlockEntity.STATUS_READY) {
+                check(cradle.fire(), "A ready Cradle should fire");
+            }
+            check(!cradle.isPulsing(), "The sequence should end");
+            ItemStack output = cradle.outputStack();
+            check(!output.isEmpty(), "The attuned item should be in the output");
+            check(PhaseStrain.get(output) == 1, "One pulse adds one Strain, found " + PhaseStrain.get(output));
+            check(affixSummary(RefinementTargets.storedTraits(output)).equals(before), "Attune keeps every affix and its tier");
+        });
+    }
+
+    /** Breaking a Coil mid-charge unforms the line; the charge already gathered waits for it to re-form. */
+    @GameTest(template = MachineTestSupport.EMPTY, timeoutTicks = 600)
+    public static void brokenCoilKeepsCharge(GameTestHelper helper) {
+        line(helper, Direction.EAST, 3);
+        PhaseCradleBlockEntity cradle = cradle(helper);
+        ItemStack target = new ItemStack(ModItems.PHASE_COIL.get());
+        RefinementTargets.setTraits(target, cheapTraits(0));
+        MachineTestSupport.powerEachTick(helper, cradle.getEnergyStorage(Direction.UP));
+        helper.runAfterDelay(5, () -> {
+            for (int i = 1; i <= 3; i++) {
+                coil(helper, CRADLE.east(i)).inscribe(1);
+            }
+        });
+        helper.runAfterDelay(10, () -> {
+            cradle.getItems().setStackInSlot(PhaseCradleBlockEntity.SLOT_TARGET, target);
+            cradle.setAction(PhaseArrayAction.REFORGE);
+            cradle.toggleCharging();
+        });
+        long[] kept = { -1L };
+        helper.runAfterDelay(20, () -> {
+            check(cradle.charge() > 0, "Supply should have charged the line");
+            kept[0] = cradle.charge();
+            helper.setBlock(CRADLE.east(2), Blocks.AIR);
+        });
+        // The Cradle notices the break on its next scan, so one more tick of supply may land first; the charge
+        // must then hold still at or above what was read.
+        long[] settled = { -1L };
+        helper.succeedWhen(() -> {
+            check(kept[0] > 0, "The charge is read before the Coil breaks");
+            check(!cradle.isLineFormed(), "Breaking a Coil should unform the line");
+            check(!cradle.isCharging(), "An unformed line stops charging");
+            check(cradle.charge() >= kept[0], "The charge should be kept, found " + cradle.charge() + " of " + kept[0]);
+            if (settled[0] < 0) {
+                settled[0] = cradle.charge();
+                check(false, "Waiting a tick to see the charge hold still");
+            }
+            check(cradle.charge() == settled[0], "An unformed line takes no more FE, found " + cradle.charge() + " after " + settled[0]);
+        });
+    }
+
+    /** Strain is an optional component: absent reads 0, a value round-trips, and 0 removes it again. */
+    @GameTest(template = MachineTestSupport.EMPTY, timeoutTicks = TIMEOUT)
+    public static void strainRoundTrips(GameTestHelper helper) {
+        ItemStack stack = new ItemStack(ModItems.PHASE_COIL.get());
+        check(PhaseStrain.get(stack) == 0, "A fresh item has no Strain");
+        PhaseStrain.set(stack, 3);
+        check(PhaseStrain.get(stack) == 3, "Strain reads back");
+        PhaseStrain.add(stack, 2);
+        check(PhaseStrain.get(stack) == 5, "Strain adds up");
+        PhaseStrain.set(stack, 0);
+        check(!stack.has(ModDataComponents.STRAIN.get()), "Strain 0 leaves no component behind");
+        helper.succeed();
+    }
+
+    /** A pack retunes an operation by overriding its recipe; the nine defaults load with the PRD's numbers. */
+    @GameTest(template = MachineTestSupport.EMPTY, timeoutTicks = TIMEOUT)
+    public static void datapackRetunesOperations(GameTestHelper helper) {
+        List<RecipeHolder<PhaseArrayRecipe>> loaded = helper.getLevel().getRecipeManager().getAllRecipesFor(ModRecipes.PHASE_ARRAY_TYPE.get());
+        check(loaded.size() == PhaseArrayAction.values().length, "One default recipe per operation, found " + loaded.size());
+        PhaseArrayRecipe resonate = loaded.stream().map(RecipeHolder::value)
+                .filter(recipe -> recipe.action() == PhaseArrayAction.RESONATE).findFirst().orElse(null);
+        check(resonate != null && resonate.baseFe() == 2_000_000L && resonate.refinementPotentialCost() == 1, "Resonate loads with 2 MFE and 1 RP");
+        JsonObject json = new JsonObject();
+        json.addProperty("action", "resonate");
+        json.addProperty("coils", 5);
+        json.addProperty("base_fe", 3_000_000L);
+        json.addProperty("refinement_potential_cost", 0);
+        PhaseArrayRecipe retuned = ModRecipes.PHASE_ARRAY_SERIALIZER.get().codec().codec().parse(JsonOps.INSTANCE, json).getOrThrow();
+        check(retuned.baseFe() == 3_000_000L && retuned.refinementPotentialCost() == 0 && retuned.glyphTier() == 0,
+                "A recipe with a changed cost parses, with defaults for what it leaves out");
+        helper.succeed();
+    }
+
+    /** Rare Coil traits with {@code affixes} Tier 1 affixes, half prefixes and half suffixes, so a pulse's cost is known. */
+    private static MachineTraits cheapTraits(int affixes) {
+        RandomSource random = RandomSource.create(1L);
+        List<MachineModifier> modifiers = new ArrayList<>();
+        for (ModifierSlot slot : List.of(ModifierSlot.PREFIX, ModifierSlot.SUFFIX)) {
+            int wanted = slot == ModifierSlot.PREFIX ? (affixes + 1) / 2 : affixes / 2;
+            ModifierEligibilityProfiles.PHASE_COIL.definitions().stream()
+                    .filter(definition -> definition.slot() == slot && definition.isTiered() && definition.flags().contains(ModifierFlag.CAN_ROLL))
+                    .limit(wanted)
+                    .forEach(definition -> modifiers.add(definition.roll(1, random)));
         }
-        helper.setBlock(CRADLE.relative(axis, coils + 1), ModBlocks.PHASE_EMITTER.get());
+        return new MachineTraits(affixes == 0 ? Rarity.NORMAL : Rarity.RARE, 20, List.copyOf(modifiers), List.of());
+    }
+
+    private static List<String> affixSummary(MachineTraits traits) {
+        return traits.modifiers().stream().map(modifier -> modifier.affixId() + ":" + modifier.tier()).toList();
+    }
+
+    private static void line(GameTestHelper helper, Direction axis, int coils) {
+        line(helper, CRADLE, axis, coils);
+    }
+
+    private static void line(GameTestHelper helper, BlockPos origin, Direction axis, int coils) {
+        for (int i = 1; i <= coils; i++) {
+            helper.setBlock(origin.relative(axis, i), ModBlocks.PHASE_COIL.get());
+        }
+        helper.setBlock(origin.relative(axis, coils + 1), ModBlocks.PHASE_EMITTER.get());
     }
 
     private static PhaseCradleBlockEntity cradle(GameTestHelper helper) {
-        helper.setBlock(CRADLE, ModBlocks.EXOTIC_AFFIX_FORGE.get());
-        return (PhaseCradleBlockEntity) helper.getBlockEntity(CRADLE);
+        return cradle(helper, CRADLE);
+    }
+
+    private static PhaseCradleBlockEntity cradle(GameTestHelper helper, BlockPos origin) {
+        helper.setBlock(origin, ModBlocks.EXOTIC_AFFIX_FORGE.get());
+        return (PhaseCradleBlockEntity) helper.getBlockEntity(origin);
     }
 
     private static PhaseCoilBlockEntity coil(GameTestHelper helper, BlockPos pos) {

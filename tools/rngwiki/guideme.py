@@ -79,6 +79,22 @@ Most gas machines also use water. To keep the chains readable, water appears onl
 # AE2 pages describe the block first and end with its recipe.
 _LAST_TITLES = ["Obtaining"]
 
+# Guide-only markup put in front of a wiki section's text, keyed like _GUIDE_SECTIONS: scenes the site cannot draw.
+_GUIDE_PREFIXES = {
+    ("phase-array.md", "building"): """<GameScene zoom="2" interactive={true}>
+  <Block id="rngtech:exotic_affix_forge" x="0" y="0" z="0" p:facing="east" />
+  <Block id="rngtech:phase_coil" x="1" y="0" z="0" p:facing="east" p:formed="true" p:tier="2" />
+  <Block id="rngtech:phase_coil" x="2" y="0" z="0" p:facing="east" p:formed="true" p:tier="2" />
+  <Block id="rngtech:phase_coil" x="3" y="0" z="0" p:facing="east" p:formed="true" p:tier="1" />
+  <Block id="rngtech:phase_coil" x="4" y="0" z="0" p:facing="east" p:formed="true" p:tier="1" />
+  <Block id="rngtech:phase_coil" x="5" y="0" z="0" p:facing="east" p:formed="true" p:tier="1" />
+  <Block id="rngtech:phase_emitter" x="6" y="0" z="0" p:facing="west" p:formed="true" />
+</GameScene>
+
+*A five-Coil line: the Cradle at the left, the Emitter at the right, positions counted from the Emitter.*
+""",
+}
+
 _LINK = re.compile(r"\[([^\]]+)\]\(([^)\s]+)\)")
 _HTML_COMMENT = re.compile(r"<!--.*?-->\n?", re.S)
 _CODE = re.compile(r"<code>(.*?)</code>")
@@ -294,6 +310,9 @@ class GuideExporter(WikiSite):
             replacement = _GUIDE_SECTIONS.get((src_uri, section.wiki_id))
             if replacement:
                 section.lead, section.children = ["", replacement], []
+            prefix = _GUIDE_PREFIXES.get((src_uri, section.wiki_id))
+            if prefix:
+                section.lead = ["", prefix] + section.lead
         root.children.sort(key=lambda s: _LAST_TITLES.index(s.title) + 1 if s.title in _LAST_TITLES else 0)
 
         name = src_uri[:-3]
@@ -463,19 +482,22 @@ class GuideExporter(WikiSite):
         return "\n".join(f"- {self.item_text(r)}" for r in dict.fromkeys(results))
 
     def t_processing(self, type: str, input: str | None = None, output: str | None = None,
-                     columns: list[str] | None = None, hide: list[str] | None = None, limit: int | None = None) -> str:
-        if input is None and output is None:
+                     columns: list[str] | None = None, hide: list[str] | None = None, limit: int | None = None,
+                     always: bool = False) -> str:
+        if input is None and output is None and not always:
             return _DROP  # a machine's full recipe list is JEI's job in game
         rows, keys = self.processing_rows(type, input, output, columns, hide, limit)
         if not rows:
             return "No recipes."
-        header = ["Input", "Output"] + [_label(k) for k in keys]
+        # A list of operations with no item in or out, such as the Phase Array's, shows only its numbers.
+        with_items = any(inputs or outputs for _, inputs, outputs, _ in rows)
+        header = (["Input", "Output"] if with_items else []) + [_label(k) for k in keys]
         lines = ["| " + " | ".join(header) + " |", "|" + "---|" * len(header)]
         for _, inputs, outputs, scalars in rows:
             cells = [
                 "<br />".join(self.stack_text(s) for s in inputs) or "—",
                 "<br />".join(self.stack_text(s) for s in outputs) or "—",
-            ]
+            ] if with_items else []
             cells += [_format_cell(k, scalars[k]) if k in scalars else "" for k in keys]
             lines.append("| " + " | ".join(c.replace("|", "\\|") for c in cells) + " |")
         return "\n".join(lines)

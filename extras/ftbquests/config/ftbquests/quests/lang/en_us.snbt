@@ -1524,10 +1524,10 @@
 		""
 		"&aUse:&r"
 		"- Supply &bFE&r to any side."
-		"- Inscribe Glyphs into the Coils, put the item in the target slot, charge, and fire."
-		"- Select an operation, then click Apply."
+		"- Open the Cradle, click each blank Coil position to lock in the Glyph it needs, and put the item in the Cradle."
+		"- Pick an operation, read its odds, then charge and fire."
 		""
-		"&7&oNote: Each operation uses millions of FE. Each operation on the same item costs more than the last one.&r"
+		"&7&oNote: A pulse costs FE that grows with the item's affix tiers, and every pulse adds Strain.&r"
 	]
 	quest.46A1F2C0DE100070.quest_subtitle: "Choose exactly how to refine an item."
 	quest.46A1F2C0DE100070.title: "Phase Cradle"

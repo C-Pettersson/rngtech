@@ -2,13 +2,13 @@
 navigation:
   title: "Glyphs"
   parent: phase-array.md
-  position: 6
+  position: 10
   icon: rngtech:exotic_affix_forge
 ---
 
 # Glyphs
 
-<ItemLink id="rngtech:glyph" /> have no recipe. They come in tiers I to V and are earned by running machines hard:
+<ItemLink id="rngtech:glyph" /> have no recipe. They come in tiers I to V and are earned by running RNGTech machines hard:
 
 | Source | Glyph |
 |---|---|
@@ -22,3 +22,5 @@ navigation:
 | Waking a [Dormant Machine](rngtech:dormant-machines.md) | Tier I to IV by site |
 
 Tier V has no source yet. A Glyph with no tier counts as Tier I, so one from a quest or a command works.
+
+A Glyph has two uses, and they compete: **lock** it into a Coil to open that position for good, or **spend** it on a deep operation. The tier is a floor for both: a Tier III Glyph opens any position up to 7 and pays for any operation that asks for Tier III or less.

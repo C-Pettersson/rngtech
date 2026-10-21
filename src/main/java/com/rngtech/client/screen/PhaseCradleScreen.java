@@ -174,7 +174,8 @@ public class PhaseCradleScreen extends AbstractContainerScreen<PhaseCradleMenu> 
         int status = menu.status();
         boolean blocked = status == PhaseCradleBlockEntity.STATUS_NO_LINE || status == PhaseCradleBlockEntity.STATUS_NO_COILS
                 || status == PhaseCradleBlockEntity.STATUS_LOCKED || status == PhaseCradleBlockEntity.STATUS_OUTPUT_FULL
-                || status == PhaseCradleBlockEntity.STATUS_ILLEGAL || status == PhaseCradleBlockEntity.STATUS_NO_RECIPE;
+                || status == PhaseCradleBlockEntity.STATUS_ILLEGAL || status == PhaseCradleBlockEntity.STATUS_NO_RECIPE
+                || status == PhaseCradleBlockEntity.STATUS_DONOR_MISMATCH;
         boolean waiting = status == PhaseCradleBlockEntity.STATUS_NO_TARGET || status == PhaseCradleBlockEntity.STATUS_NO_GLYPH
                 || status == PhaseCradleBlockEntity.STATUS_NO_RP || status == PhaseCradleBlockEntity.STATUS_NO_SELECTION;
         boolean live = status == PhaseCradleBlockEntity.STATUS_CHARGING || status == PhaseCradleBlockEntity.STATUS_READY
@@ -232,8 +233,9 @@ public class PhaseCradleScreen extends AbstractContainerScreen<PhaseCradleMenu> 
             int fill = NODE_DARK;
             int edge = TRACE;
             if (position == flashing) {
-                fill = blink ? RED : NODE_DARK;
-                edge = RED;
+                int slip = flashing > menu.requiredCoils() ? AMBER : RED;
+                fill = blink ? slip : NODE_DARK;
+                edge = slip;
             } else if (position <= lit) {
                 fill = stage == PhasePulseSequence.Stage.HOLDING && blink ? LIT_BRIGHT : LIT;
                 edge = LIT_DEEP;
@@ -244,14 +246,17 @@ public class PhaseCradleScreen extends AbstractContainerScreen<PhaseCradleMenu> 
         }
     }
 
-    /** After a pulse, held Coils stay lit and the slipped one shows red until the next target goes in. */
+    /**
+     * After a pulse, held Coils stay lit and the slipped one shows red until the next target goes in; a slip past the
+     * operation's Coil count did no harm, so it shows amber.
+     */
     private int lastPulseColor(int position, int base) {
         PhasePulse.Outcome outcome = menu.lastOutcome();
         if (outcome == null || !menu.targetStack().isEmpty()) {
             return base;
         }
         if (position == menu.lastSlipped()) {
-            return RED;
+            return outcome == PhasePulse.Outcome.SUCCESS || outcome == PhasePulse.Outcome.OVERHOLD ? AMBER : RED;
         }
         return position <= menu.lastHeld() ? GREEN : NODE_DARK;
     }
@@ -455,9 +460,15 @@ public class PhaseCradleScreen extends AbstractContainerScreen<PhaseCradleMenu> 
                 }
                 for (int index = 0; index < donor.size(); index++) {
                     MachineModifier modifier = donor.get(index);
-                    boolean legal = modifier.slot() == selection.emptySlot();
+                    RefinementEngine.GraftBlock block = RefinementEngine.phaseGraftBlock(
+                            RefinementTargets.eligibilityProfile(target), traits, modifier, selection.emptySlot());
+                    List<Component> tooltip = new ArrayList<>(List.of(MachineModifierText.tooltipLine(modifier)));
+                    if (block != RefinementEngine.GraftBlock.NONE) {
+                        tooltip.add(Component.translatable("rngtech.phase_cradle.screen.donor." + block.name().toLowerCase(java.util.Locale.ROOT),
+                                MachineModifierText.slotLabel(modifier.slot())).withStyle(ChatFormatting.RED));
+                    }
                     rows.add(new Row(PhaseCradleMenu.BUTTON_DONOR_BASE + index, MachineModifierText.displayName(modifier),
-                            List.of(MachineModifierText.tooltipLine(modifier)), index == menu.donorAffixIndex(), legal));
+                            tooltip, index == menu.donorAffixIndex(), block == RefinementEngine.GraftBlock.NONE));
                 }
             }
             return rows;
@@ -544,7 +555,7 @@ public class PhaseCradleScreen extends AbstractContainerScreen<PhaseCradleMenu> 
             }
             if (inside(x, y, NODE_X, LINE_Y, PhaseArrayRules.MAX_COILS * NODE_SPACING, NODE_SIZE + 2) && !menu.pulsing()) {
                 int position = (x - NODE_X) / NODE_SPACING + 1;
-                if (position <= menu.coilCount() && GlyphItem.isGlyph(menu.glyphStack())) {
+                if (position <= menu.coilCount() && position > menu.usableCoils()) {
                     sendButton(PhaseCradleMenu.BUTTON_INSCRIBE_BASE + position - 1);
                     return true;
                 }
@@ -720,9 +731,12 @@ public class PhaseCradleScreen extends AbstractContainerScreen<PhaseCradleMenu> 
         if (position <= menu.usableCoils()) {
             return Component.translatable("rngtech.phase_cradle.screen.coil", position, percent(menu.holdChance(position)));
         }
-        Component hint = GlyphItem.isGlyph(menu.glyphStack())
-                ? Component.translatable("rngtech.phase_cradle.screen.coil.inscribe", GlyphItem.numeral(GlyphItem.tier(menu.glyphStack())))
-                : Component.translatable("rngtech.phase_cradle.screen.coil.glyph_slot");
+        int lockTier = minecraft != null && minecraft.player != null
+                ? PhaseCradleBlockEntity.lockInTier(position, minecraft.player.getInventory())
+                : 0;
+        Component hint = lockTier > 0
+                ? Component.translatable("rngtech.phase_cradle.screen.coil.lock", GlyphItem.numeral(lockTier))
+                : Component.translatable("rngtech.phase_cradle.screen.coil.lock_missing", GlyphItem.numeral(floor));
         if (position == menu.usableCoils() + 1) {
             return Component.translatable("rngtech.phase_cradle.screen.coil.blank", position, GlyphItem.numeral(floor)).withStyle(ChatFormatting.GOLD)
                     .append(" ").append(hint.copy().withStyle(ChatFormatting.GRAY));

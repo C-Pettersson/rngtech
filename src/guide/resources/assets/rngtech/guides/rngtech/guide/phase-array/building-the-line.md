@@ -8,16 +8,18 @@ navigation:
 
 # Building the line
 
-Place the Cradle, then three to nine Coils in a straight horizontal row from any side of it, and an Emitter at the far end. The Cradle finds the line on its own and lights the parts while it is complete; break any part and the line goes dark. Nothing else is needed above, below, or beside the row.
+<GameScene zoom="2" interactive={true}>
+  <Block id="rngtech:exotic_affix_forge" x="0" y="0" z="0" p:facing="east" />
+  <Block id="rngtech:phase_coil" x="1" y="0" z="0" p:facing="east" p:formed="true" p:tier="2" />
+  <Block id="rngtech:phase_coil" x="2" y="0" z="0" p:facing="east" p:formed="true" p:tier="2" />
+  <Block id="rngtech:phase_coil" x="3" y="0" z="0" p:facing="east" p:formed="true" p:tier="1" />
+  <Block id="rngtech:phase_coil" x="4" y="0" z="0" p:facing="east" p:formed="true" p:tier="1" />
+  <Block id="rngtech:phase_coil" x="5" y="0" z="0" p:facing="east" p:formed="true" p:tier="1" />
+  <Block id="rngtech:phase_emitter" x="6" y="0" z="0" p:facing="west" p:formed="true" />
+</GameScene>
 
-Each Coil has a **position**, counted from the Emitter. A Coil is blank until a Glyph is inscribed into it, and a blank Coil ends the usable line. The position sets the lowest Glyph tier it takes:
+*A five-Coil line: the Cradle at the left, the Emitter at the right, positions counted from the Emitter.*
 
-| Position | Lowest Glyph tier |
-|---:|---:|
-| 1 to 3 | I |
-| 4 to 5 | II |
-| 6 to 7 | III |
-| 8 | IV |
-| 9 | V |
+Place the Cradle, then three to nine Coils in a straight horizontal row from any side of it, and the Emitter at the far end. The Cradle finds the line on its own and lights the parts while it is complete; break any part and the line goes dark, and the charge waits for it to re-form. Nothing is needed above, below, or beside the row, and no block may sit between the parts.
 
-To inscribe, right-click a placed Coil with a Glyph. The Glyph is used up and the Coil keeps its tier for good. The Cradle's screen does the same: with a Glyph in its Glyph slot, click the Coil's node on the line. An inscribed Coil can move to any position that accepts its tier, so a line grows by inserting a new Coil next to the Emitter and shifting the rest outward.
+Each Coil has a **position**, counted from the Emitter: position 1 is the Coil next to the Emitter, position 9 the Coil next to the Cradle on the longest line. When a part is placed next to the line it turns to follow the line, whichever way you face.

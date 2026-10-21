@@ -93,6 +93,8 @@ public class PhaseCradleBlockEntity extends BlockEntity implements MenuProvider,
     public static final int STATUS_CHARGING = 11;
     public static final int STATUS_READY = 12;
     public static final int STATUS_PULSING = 13;
+    /** Graft: the chosen donor affix is one the target cannot take. */
+    public static final int STATUS_DONOR_MISMATCH = 14;
 
     public static final int DATA_STATUS = 0;
     public static final int DATA_FORMED = 1;
@@ -824,7 +826,7 @@ public class PhaseCradleBlockEntity extends BlockEntity implements MenuProvider,
             return STATUS_NO_SELECTION;
         }
         if (!operationLegal(recipe)) {
-            return STATUS_ILLEGAL;
+            return recipe.action() == PhaseArrayAction.GRAFT ? STATUS_DONOR_MISMATCH : STATUS_ILLEGAL;
         }
         if (recipe.needsGlyph() && GlyphItem.tier(glyphStack()) < recipe.glyphTier()) {
             return STATUS_NO_GLYPH;
@@ -930,37 +932,61 @@ public class PhaseCradleBlockEntity extends BlockEntity implements MenuProvider,
     }
 
     /**
-     * Inscribes the Glyph in the Glyph slot into the Coil at {@code position} (1 next to the Emitter). The Glyph must
-     * meet the position's floor and beat the Coil's current tier. One Glyph is used up.
+     * Locks a Glyph into the Coil at {@code position} (1 next to the Emitter), taken from the player's inventory: the
+     * tier the position needs when the player carries one, else the lowest tier above it. The Coil keeps the tier for
+     * good and the Glyph is used up.
      */
-    public boolean inscribe(int position) {
+    public boolean lockIn(int position, Player player) {
         if (level == null || pulse != null || !line.complete()) {
             return false;
         }
         List<BlockPos> coils = line.coilsFromEmitter();
-        if (position < 1 || position > coils.size()) {
-            return false;
-        }
-        ItemStack glyph = glyphStack();
-        if (!GlyphItem.isGlyph(glyph)) {
-            return false;
-        }
-        int tier = GlyphItem.tier(glyph);
-        if (tier < PhaseArrayRules.lowestGlyphTier(position)
+        if (position < 1 || position > coils.size()
                 || !(level.getBlockEntity(coils.get(position - 1)) instanceof PhaseCoilBlockEntity coil)
-                || !coil.inscribe(tier)) {
+                || coil.coilTier() >= PhaseArrayRules.lowestGlyphTier(position)) {
             return false;
         }
-        glyph.shrink(1);
+        int slot = lockInSlot(position, player.getInventory());
+        if (slot < 0) {
+            return false;
+        }
+        int tier = GlyphItem.tier(player.getInventory().getItem(slot));
+        if (!coil.inscribe(tier)) {
+            return false;
+        }
+        player.getInventory().removeItem(slot, 1);
         level.playSound(null, worldPosition, SoundEvents.AMETHYST_BLOCK_RESONATE, SoundSource.BLOCKS, 0.8F, 1.0F + 0.1F * tier);
         requestLineRescan();
         setChanged();
         return true;
     }
 
-    /** Whether a click on {@code position} would inscribe, for the screen's hint. */
-    public static boolean canInscribe(int position, int currentTier, int glyphTier) {
-        return glyphTier >= PhaseArrayRules.lowestGlyphTier(position) && glyphTier > currentTier;
+    /** The inventory slot a lock-in at {@code position} would take a Glyph from, or -1: the floor tier first, else the lowest above it. */
+    public static int lockInSlot(int position, Inventory inventory) {
+        int floor = PhaseArrayRules.lowestGlyphTier(position);
+        int bestSlot = -1;
+        int bestTier = Integer.MAX_VALUE;
+        for (int slot = 0; slot < inventory.getContainerSize(); slot++) {
+            ItemStack stack = inventory.getItem(slot);
+            if (!GlyphItem.isGlyph(stack)) {
+                continue;
+            }
+            int tier = GlyphItem.tier(stack);
+            if (tier >= floor && tier < bestTier) {
+                bestTier = tier;
+                bestSlot = slot;
+                if (tier == floor) {
+                    break;
+                }
+            }
+        }
+        return bestSlot;
+    }
+
+    /** The Glyph tier a lock-in at {@code position} would spend from {@code inventory}, or 0 when it carries none that fits. */
+    public static int lockInTier(int position, Inventory inventory) {
+        int slot = lockInSlot(position, inventory);
+        return slot < 0 ? 0 : GlyphItem.tier(inventory.getItem(slot));
     }
 
     /** Charge starts a pulse's fill; pressed again it stops, keeping what has arrived. */
@@ -1033,7 +1059,7 @@ public class PhaseCradleBlockEntity extends BlockEntity implements MenuProvider,
         };
         if (applied.traits() != null) {
             RefinementTargets.setTraits(refined, applied.traits());
-            if (result.outcome() != PhasePulse.Outcome.FRACTURE) {
+            if (PhasePulse.spendsRefinementPotential(result.outcome())) {
                 int rp = applied.traits().refinementPotential() - recipe.refinementPotentialCost();
                 RefinementTargets.setTraits(refined, withPotential(applied.traits(), Math.max(0, rp)));
             }
@@ -1126,7 +1152,7 @@ public class PhaseCradleBlockEntity extends BlockEntity implements MenuProvider,
                 if (grafted == null) {
                     yield new Applied(null, false, null, strainAfter);
                 }
-                if (overholdKind == PhaseOutcome.Overhold.KEEP_DONOR) {
+                if (!PhasePulse.graftConsumesDonor(outcome, recipe.overhold())) {
                     MachineTraits stripped = RefinementEngine.phaseRemove(
                             RefinementTargets.eligibilityProfile(donorStack()),
                             RefinementTargets.storedTraits(donorStack()), donorAffixIndex, random);
@@ -1280,6 +1306,7 @@ public class PhaseCradleBlockEntity extends BlockEntity implements MenuProvider,
             case STATUS_CHARGING -> "charging";
             case STATUS_READY -> "ready";
             case STATUS_PULSING -> "pulsing";
+            case STATUS_DONOR_MISMATCH -> "donor_mismatch";
             default -> "idle";
         };
         return "rngtech.phase_cradle.status." + name;

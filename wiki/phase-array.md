@@ -22,9 +22,20 @@ wiki:
     },
 ) }}
 
-The **Phase Array** is the endgame refinement bench. Where the [Affix Forge](affix-forge.md) rolls dice for you, the Array lets you choose: raise this affix, remove that one, add the affix you want, swap one for another, or move an affix from a donor item. Every operation is a **pulse**: the line charges, you fire it, and the Coils hold the pulse or let it slip. A pulse costs FE that grows with how good the item already is, adds **Strain** to the item, and the deeper operations spend a **Glyph**. The Array spends only a little [Refinement Potential](rarity-and-affixes.md#refinement-potential), so an item is usually done when you decide it is, not when a counter runs out.
+The **Phase Array** is the endgame refinement bench. Where the [Affix Forge](affix-forge.md) rolls dice for you, the Array lets you choose: raise this affix, remove that one, add the affix you want, swap one for another, or move an affix across from a donor item. It works on any refinable item of any stage, and it spends only a little [Refinement Potential](rarity-and-affixes.md#refinement-potential), so an item is done when you decide it is.
 
-The Array works on any refinable item of any stage: machine items, machine parts, Battery Cells, Tool Heads, Tool Rods, companions, and its own Emitter and Coils. Unique and [Corrupted](rarity-and-affixes.md#corruption) items are refused.
+Every operation is a **pulse**. The line charges FE, you fire it, and the pulse crosses the Coils one by one. Each Coil holds it or lets it slip. Reach far enough and the operation happens; slip early and nothing changes. Three things make you stop before your RP runs out:
+
+- **FE** that grows with how good the item already is.
+- **Strain**, one point per pulse, which raises the chance of a Fracture.
+- **Glyphs**, which the deeper operations spend and which no recipe makes.
+
+### In one minute
+
+1. Place the **Cradle**, three to nine **Coils** in a straight row from one side of it, and the **Emitter** at the far end. The line lights up when it is complete.
+2. Open the Cradle. Click each blank Coil position on the line to lock a **Glyph** into it. Three positions open with Tier I Glyphs.
+3. Put the item in the Cradle, pick an operation, and read its odds.
+4. **Charge**, then **Fire**. Watch the Coils engage. Take the item out of the output.
 
 ## Obtaining
 
@@ -36,7 +47,7 @@ The Emitter and Coils roll rarity and affixes when crafted, like other Stage 8 p
 
 ### Glyphs
 
-{{ item('rngtech:glyph', 'Glyphs') }} have no recipe. They come in tiers I to V and are earned by running machines hard:
+{{ item('rngtech:glyph', 'Glyphs') }} have no recipe. They come in tiers I to V and are earned by running RNGTech machines hard:
 
 | Source | Glyph |
 |---|---|
@@ -51,37 +62,47 @@ The Emitter and Coils roll rarity and affixes when crafted, like other Stage 8 p
 
 Tier V has no source yet. A Glyph with no tier counts as Tier I, so one from a quest or a command works.
 
+A Glyph has two uses, and they compete: **lock** it into a Coil to open that position for good, or **spend** it on a deep operation. The tier is a floor for both: a Tier III Glyph opens any position up to 7 and pays for any operation that asks for Tier III or less.
+
 ### Breaking
 
-Mine any part with a pickaxe. The Cradle drops itself and everything in its slots, including the Battery Cells. A Coil keeps the Glyph inscribed into it.
+Mine any part with a pickaxe. The Cradle drops itself and everything in its slots, including the Battery Cells. A Coil keeps the Glyph locked into it.
 
 ## Usage
 
-### Building the line
+### Building the line {#building}
 
-Place the Cradle, then three to nine Coils in a straight horizontal row from any side of it, and an Emitter at the far end. The Cradle finds the line on its own and lights the parts while it is complete; break any part and the line goes dark. Nothing else is needed above, below, or beside the row.
+Place the Cradle, then three to nine Coils in a straight horizontal row from any side of it, and the Emitter at the far end. The Cradle finds the line on its own and lights the parts while it is complete; break any part and the line goes dark, and the charge waits for it to re-form. Nothing is needed above, below, or beside the row, and no block may sit between the parts.
 
-Each Coil has a **position**, counted from the Emitter. A Coil is blank until a Glyph is inscribed into it, and a blank Coil ends the usable line. The position sets the lowest Glyph tier it takes:
+Each Coil has a **position**, counted from the Emitter: position 1 is the Coil next to the Emitter, position 9 the Coil next to the Cradle on the longest line. When a part is placed next to the line it turns to follow the line, whichever way you face.
 
-| Position | Lowest Glyph tier |
-|---:|---:|
-| 1 to 3 | I |
-| 4 to 5 | II |
-| 6 to 7 | III |
-| 8 | IV |
-| 9 | V |
+### Opening positions {#positions}
 
-To inscribe, right-click a placed Coil with a Glyph. The Glyph is used up and the Coil keeps its tier for good. The Cradle's screen does the same: with a Glyph in its Glyph slot, click the Coil's node on the line. An inscribed Coil can move to any position that accepts its tier, so a line grows by inserting a new Coil next to the Emitter and shifting the rest outward.
+A Coil is blank until a Glyph is locked into it, and the first blank Coil from the Emitter ends the usable line. Each position asks for a Glyph tier:
+
+| Position | Glyph it needs | Operations it opens |
+|---:|---:|---|
+| 1 to 3 | I | Reforge |
+| 4 | II | Attune |
+| 5 | II | Resonate, Excise |
+| 6 | III | Imprint |
+| 7 | III | Transmute, Temper |
+| 8 | IV | Exalt |
+| 9 | V | Graft |
+
+To lock a Glyph in, open the Cradle and click the blank position on the line at the top of the screen. The Glyph that position needs leaves your inventory; if you carry none of that tier, the lowest higher tier goes instead, and the hover says which. The Coil keeps the tier for good and shows it on its sides. A Coil locked at a higher tier than its position needs still works, so a Coil can move to any position its tier covers: a line grows by placing a new Coil next to the Emitter and shifting the rest outward.
+
+Opening every position costs three Tier I, two Tier II, two Tier III, one Tier IV, and one Tier V Glyph. That Tier V is also what one Graft costs, so the player who locks it in gives up a Graft to make every later Graft possible.
 
 ### Running a pulse
 
-1. Put the item in the Cradle's **target** slot. For a Graft, put the donor in the **donor** slot too.
-2. Pick an operation from the row of marks. Operations that work on one affix or one empty slot ask you to click it in the list; Imprint then lists the affixes it can add, and Graft lists the donor's affixes.
-3. Hover the mark for the cost, the Glyph, the RP, and the odds of each outcome for this item on this line.
-4. Click **Charge**. The line fills from FE on any side of the Cradle, the Emitter, or a Coil, and from the Battery Cells in the Cradle's sockets, up to the line's Charge Rate. A dip in supply pauses the charge; it never fails. Charge stays if you close the screen or switch to a cheaper operation.
+1. Put the item in the Cradle's **target** slot. For a Graft, put the donor in the **donor** slot too. For an operation that spends a Glyph, put one in the **Glyph** slot.
+2. Pick an operation from the row of marks. Operations that work on one affix or one empty slot ask you to click it in the list under the marks; Imprint then lists the affixes it can add, and Graft lists the donor's affixes.
+3. Hover the mark for the FE, the Glyph, the RP, and the odds of every outcome for this item on this line. The chamber's hover shows the item's Strain and the Fracture chance it adds.
+4. Click **Charge**. The line fills from FE on any side of the Cradle, the Emitter, or a Coil, and from the Battery Cells in the Cradle's sockets, up to the line's Charge Rate. A dip in supply pauses the charge; it never fails. The charge stays if you close the screen or switch operations, and a costlier operation asks for more.
 5. Click **Fire**. The Coils engage from the Emitter inward, one every 0.4 seconds with a tone that climbs the line. The first Coil that slips stops the pulse: it flashes, the lit Coils go dark one by one, and the outcome applies.
 
-The item sits locked in the Cradle while the pulse runs and moves to the **output** slot when it ends. Take it out before the next pulse.
+The item hangs in the Cradle's bore while it sits in the chamber and is locked while the pulse runs. When the pulse ends it moves to the **output** slot; take it out before the next one. The result line under the conduit names the outcome and what it did until the next item goes in.
 
 ### Outcomes
 
@@ -95,35 +116,60 @@ Each Coil holds the pulse with its own **Hold Chance**, 92% before affixes. With
 | Miss | The pulse slips earlier | Nothing changes. Only the FE and the Glyph are spent. |
 | Fracture | Rolled before the Coils engage, 1% per point of Strain above the line's Tolerance | One random affix drops a tier. A Tier 1 affix is removed. |
 
-RP is spent on Success, Overhold, and Partial, never on a Miss or a Fracture.
+The pulse always runs the whole usable line, so a nine-Coil line fires a three-Coil operation past the three it needs. A slip past `R` does no harm: it still counts as Success and shows amber, not red, on the line. Holding every Coil is what buys the Overhold roll.
+
+RP is spent on Success, Overhold, and Partial, never on a Miss or a Fracture. A Glyph is spent on every outcome unless the line's Glyph Salvage returns it on a Miss.
 
 ### Operations
 
-{{ processing("phase_array", columns=["action", "coils", "glyph_tier", "base_fe", "refinement_potential_cost", "partial", "overhold"]) }}
+{{ processing("phase_array", columns=["action", "coils", "glyph_tier", "base_fe", "refinement_potential_cost", "partial", "overhold"], always=True) }}
 
-- **Reforge** rerolls rarity, affixes, and RP as if the item were newly crafted. Strain stays.
-- **Attune** rerolls every affix's value within its tier.
-- **Resonate** raises the selected affix one tier, up to Tier 6.
-- **Excise** removes the selected affix.
-- **Imprint** adds the affix you choose to the empty slot you choose. The tier rolls with the item's normal weights.
-- **Transmute** swaps the selected affix for another legal affix of the same slot at the same tier.
-- **Temper** sets Strain to 0.
-- **Exalt** raises the selected Tier 6 affix to Tier 7. Exotic items only.
-- **Graft** moves the selected donor affix onto the empty slot you choose, keeping its tier and value. The donor is destroyed.
+| Operation | On Success | You choose |
+|---|---|---|
+| **Reforge** | Rerolls rarity, affixes, and RP as if the item were newly crafted. Strain stays. Works at 0 RP. | Nothing |
+| **Attune** | Rerolls every affix's value within its tier. | Nothing |
+| **Resonate** | Raises the selected affix one tier, up to Tier 6. | One affix |
+| **Excise** | Removes the selected affix. | One affix |
+| **Imprint** | Adds the affix you choose to the empty slot you choose. The tier rolls with the item's normal weights. | An empty slot, then an affix |
+| **Transmute** | Swaps the selected affix for another legal affix of the same slot, keeping its tier. | One affix |
+| **Temper** | Sets Strain to 0. | Nothing |
+| **Exalt** | Raises the selected Tier 6 affix to Tier 7. Stage 8 Exotic items only. | One Tier 6 affix |
+| **Graft** | Moves the selected donor affix onto the empty slot you choose, keeping its tier and value. The donor is destroyed. | A donor affix and an empty slot |
 
-### Costs
+Fixed identity affixes and implicits are never selectable. An affix the item could not roll on its own cannot be Imprinted or Grafted onto it, and neither can one from a modifier group the item already carries; the donor list dims such affixes and says why. A pack can retune, remove, or add operations: they are `rngtech:phase_array` recipes.
 
-A pulse's FE is the operation's base, times a factor for the item's stage, times `1.5` for every `3.5` points of the item's **Quality**, the sum of its affix tiers. A fresh Rare Stage 8 part pays about four times the base; six Tier 7 affixes pay about a hundred and thirty times. Stage 0 to 2 items pay a tenth of a Stage 8 item at the same Quality. The line's FE Thrift takes a percentage off.
+### Costs and Strain
 
-Every pulse adds one **Strain** to the item, on every outcome, unless the line's Strain Mercy rolls. Strain shows on the item's tooltip and as marks around the chamber. Only Temper removes it, and Excise's Overhold takes one off.
+A pulse's FE is the operation's base, times a factor for the item's stage, times `1.5` for every `3.5` points of the item's **Quality**, the sum of its affix tiers. The line's FE Thrift takes a percentage off.
+
+| Item stage | Stage factor |
+|---:|---:|
+| 0 to 2 | 0.1 |
+| 3 to 4 | 0.25 |
+| 5 to 6 | 0.5 |
+| 7 | 1 |
+| 8 | 1.5 |
+
+One Resonate on a Stage 8 item, from a 20 kFE/t supply:
+
+| Item | Quality | FE | Charge time |
+|---|---:|---:|---|
+| Fresh Rare Exotic part | 12 | 12 MFE | 30 seconds |
+| All affixes Tier 4 | 24 | 48 MFE | 2 minutes |
+| Six Tier 6 affixes | 36 | 194 MFE | 8 minutes |
+| Six Tier 7 affixes | 42 | 389 MFE | 16 minutes |
+
+A Stage 5 item pays a third of that at the same Quality, and a Stage 2 item a fifteenth. The last pulses on an item cost thirty times the first.
+
+Every pulse adds one **Strain** to the item, on every outcome, unless the line's Strain Mercy rolls. Strain shows on the item's tooltip with the Fracture chance it adds, and as marks around the chamber. Strain up to the line's Strain Tolerance adds no Fracture chance; every point past it adds 1%. Only Temper removes Strain, and Excise's Overhold takes one point off. A Reforge keeps it, so a reforged item is a fresh roll on a worn body.
 
 ### Gear
 
-The Cradle has nine Battery Cell sockets. Any Battery Cell fits. While the line charges, each cell drains into the charge at its own output rate, so a full set carries a pulse to a line with no cable.
+The Cradle has nine Battery Cell sockets. Any Battery Cell fits. While the line charges, each cell drains into the charge at its own output rate, so a full set carries a pulse to a line with no cable. Drained cells can be pulled out of the Cradle's bottom face.
 
 ### Line stats
 
-The Emitter and Coils roll their own affixes, and the line reads them. Hover a Coil's node for its Hold Chance, Second Hold, Overhold Chance, and affixes, and the Emitter's for the line's totals and its affixes.
+The Emitter and Coils roll their own affixes, and the line reads them. Hover a Coil's node for its Hold Chance, Second Hold, Overhold Chance, and affixes, and the Emitter's node for the line's totals and its affixes.
 
 | Stat | From | What it does |
 |---|---|---|
@@ -136,7 +182,7 @@ The Emitter and Coils roll their own affixes, and the line reads them. Hover a C
 | FE Thrift, FE Recovery | Every part, summed | A percentage off every pulse, and a percentage of a slipped pulse's FE returned to the charge |
 | Glyph Salvage, Strain Mercy | Every part, summed | The chance a Glyph returns on a Miss, and the chance a pulse adds no Strain |
 
-A Coil or the Emitter is itself a target: pull it out, refine it in the Cradle, and put it back.
+A Coil or the Emitter is itself a target: pull it out, refine it in the Cradle, and put it back. Pulling position 7 out drops the line to six Coils, so refine it in a second line or a friend's.
 
 ### Automation
 
@@ -145,13 +191,29 @@ A Coil or the Emitter is itself a target: pull it out, refine it in the Cradle, 
 | Any side of the Cradle, the Emitter, or a Coil | Accepts FE while the line charges, for example from a [Universal Cable](universal-cable.md). |
 | Bottom of the Cradle | Hands out Battery Cells once they are drained, for example to a hopper. Nothing goes in this way. |
 
-Nothing else moves by automation: the target, the Glyph, the donor, and the output are placed and taken by hand, and every pulse is a click. The target shows in the Cradle's bore while it sits in the chamber.
+Nothing else moves by automation: the target, the Glyph, the donor, and the output are placed and taken by hand, and every pulse is a click.
 
 ## Screen
 
-The Cradle has one screen. The line is drawn across the top as it stands, with the Emitter at the left and the target's chamber at the right; the conduit under it fills with the charge. The cell sockets sit on the left, the operation marks and the affix list in the middle, and the one button under the list reads Charge, Stop, Fire, or Pulse. Three lights at the top left show blocked, waiting for input, and live. Hover anything for its exact values.
+The Cradle has one screen, read from the top down:
 
-With JEI installed, the operations are listed under the Phase Array category.
+- **The line** runs across the top: the Emitter's node at the left, one node per position, and the target's chamber at the right. A lit node is a usable position; a dim node with an amber edge is blank or locked too low, and clicking it locks a Glyph in. After a pulse the held nodes turn green and the slipped one red, or amber when the slip did no harm, until the next item goes in.
+- **The conduit** under the line fills with the charge. Hover it for FE held and needed, the rate FE is arriving, and the time to full.
+- **The cell sockets** sit on the left, nine of them, each ring dimming as its cell empties.
+- **The chamber** holds the target slot with its affixes listed under it; the Glyph, donor, and output slots sit beside it. Marks around the chamber show the item's Strain.
+- **The operation marks** run in a row above the list. A dim mark cannot run, and its hover says why: the missing position, Glyph, selection, or RP.
+- **The one button** under the list reads Charge, Stop, Fire, or Pulse, whichever the line is ready for.
+- **Three lights** at the top left show blocked, waiting for input, and live.
+
+Hover anything for its exact values. In the world, Jade on the Cradle names the chosen operation and, with no line, the first block it lacks. With JEI installed, the operations are listed under the Phase Array category.
+
+## Tips
+
+- Read the odds before every pulse. When the Fracture chance passes what you will accept, Temper the item or call it done.
+- Reforge is cheap on a bad item and nearly useless on a good one: a Rare with high Quality is a rare roll, and the item's Strain runs out before your luck does.
+- Open positions 1 to 3 first; three Tier I Glyphs give you Reforge, and every Glyph after that opens a deeper operation.
+- Nine Coils against a seven-Coil operation buy Overhold, not Success. Build long for the bonus, not for safety.
+- A bank of charged Battery Cells in the sockets finishes a pulse that a cable alone would take minutes to fill.
 
 ## Data values
 

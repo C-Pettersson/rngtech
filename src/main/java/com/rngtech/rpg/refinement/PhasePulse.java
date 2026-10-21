@@ -34,6 +34,16 @@ public final class PhasePulse {
     private PhasePulse() {
     }
 
+    /** RP is spent when the operation did something: Success, Overhold, and Partial, never a Miss or a Fracture. */
+    public static boolean spendsRefinementPotential(Outcome outcome) {
+        return outcome == Outcome.SUCCESS || outcome == Outcome.OVERHOLD || outcome == Outcome.PARTIAL;
+    }
+
+    /** Graft destroys the donor unless an Overhold that keeps it rolled. */
+    public static boolean graftConsumesDonor(Outcome outcome, PhaseOutcome.Overhold overhold) {
+        return !(outcome == Outcome.OVERHOLD && overhold == PhaseOutcome.Overhold.KEEP_DONOR);
+    }
+
     /** PRD, The Hold Sequence: 1% per point of Strain above the line's Tolerance. */
     public static double fractureChance(PhaseLineStats line, int strain) {
         int exposed = Math.max(0, strain - line.strainTolerance());

@@ -2119,7 +2119,30 @@ public final class RefinementEngine {
 
     /** Whether {@code donor} could be grafted onto {@code slot} of these traits. */
     public static boolean phaseCanGraft(ModifierEligibilityProfile profile, MachineTraits traits, MachineModifier donor, ModifierSlot slot) {
-        return donor.slot() == slot && phaseImprintCandidates(profile, traits, slot).stream().anyMatch(candidate -> candidate.matches(donor));
+        return phaseGraftBlock(profile, traits, donor, slot) == GraftBlock.NONE;
+    }
+
+    /** Why a donor affix cannot be grafted onto {@code slot} of the target, or {@link GraftBlock#NONE}. */
+    public enum GraftBlock {
+        NONE,
+        /** The donor affix belongs to the other slot type. */
+        WRONG_SLOT,
+        /** The target's profile never rolls this affix. */
+        NOT_ELIGIBLE,
+        /** The target already carries an affix from the same modifier group. */
+        GROUP_TAKEN
+    }
+
+    public static GraftBlock phaseGraftBlock(ModifierEligibilityProfile profile, MachineTraits traits, MachineModifier donor, ModifierSlot slot) {
+        if (donor.slot() != slot) {
+            return GraftBlock.WRONG_SLOT;
+        }
+        if (profile.rollableDefinitions(slot).stream().noneMatch(definition -> definition.matches(donor))) {
+            return GraftBlock.NOT_ELIGIBLE;
+        }
+        return phaseImprintCandidates(profile, traits, slot).stream().anyMatch(candidate -> candidate.matches(donor))
+                ? GraftBlock.NONE
+                : GraftBlock.GROUP_TAKEN;
     }
 
     /** Fracture: one random affix down a tier with a fresh value; a Tier 1 or untiered affix is removed. */

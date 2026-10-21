@@ -111,7 +111,7 @@ A nine-Coil line stores 52 MFE and charges at 26 kFE/t from its own parts. The E
 
 The Cradle also has nine Battery Cell sockets, like a Dormant Machine. Cells in the sockets drain into the charge, each at its own output rate, so a player can carry a pulse's worth of FE to a line that has no cable. Empty cells come out of the bottom. The sockets are the Array's only Gear.
 
-The Emitter and Coils are Stage 8 parts. Their recipes use Exotic Machine Frames, Nullite, and a Calibrated Conductive Component, and both sit behind the Nullite material condition. A Blank Coil takes a Glyph in the Cradle's Inscribe tab, which fixes the Coil's tier and uses the Glyph up. The position sets the lowest Glyph tier it accepts:
+The Emitter and Coils are Stage 8 parts. Their recipes use Exotic Machine Frames, Nullite, and a Calibrated Conductive Component, and both sit behind the Nullite material condition. A Blank Coil is locked in from the Cradle's screen: a click on its position takes the Glyph that position needs from the player's inventory, the exact tier first and else the lowest tier above it, fixes the Coil's tier, and uses the Glyph up. The position sets the lowest Glyph tier it accepts:
 
 | Position | Lowest Glyph tier |
 |---:|---:|
@@ -260,7 +260,7 @@ When the [Work Orders PRD](work-orders.md) ships, its reward table pays Glyphs o
 A Glyph has two uses, and they compete:
 
 - **Consume** it on a deep pulse.
-- **Inscribe** it into a Blank Coil for good, to open a position.
+- **Lock** it into a Blank Coil for good, to open a position.
 
 Opening position 9 costs a Tier V Glyph, which is also what a Graft costs. The player who inscribes it gives up one Graft to make every later Graft possible.
 
@@ -312,7 +312,7 @@ The Cradle screen does not follow the Process, Gear, and Stats tab layout of the
 - **The charge conduit:** fills along the line as FE arrives, from the Emitter toward the chamber. Hover for FE held, FE needed, and charge time at the current rate.
 - **The cell sockets:** nine sockets under the Emitter, each with a ring that dims as its cell empties, exactly as on a Dormant Machine.
 - **The operation selector:** a column of operation marks beside the chamber. A mark that cannot run is dim, and its hover names the missing position, Glyph, selection, or RP. Hover the selected mark for the full outcome table: Success, Overhold, Partial, Miss, and Fracture with their odds, plus FE, RP, Glyph, and Strain after the pulse.
-- **Inscribing:** drop a Glyph on a blank node. The node shows the lowest tier its position accepts.
+- **Locking in:** click a blank node, and the Glyph its position needs leaves the player's inventory. The node's hover names the tier it will take, or the tier the player lacks.
 - **One button:** Charge, then Fire. It reads the current state and nothing else is needed.
 - **Tooltips:** Strain on every item that has it, with the Fracture chance it adds. Glyph tier. Emitter and Coil affixes.
 - **JEI:** every `rngtech:phase_array` recipe in a Phase Array category, with its Coil count, Glyph, FE at Quality 0, and RP, and information pages for Glyphs, the Emitter, and Coils.
