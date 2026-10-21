@@ -174,7 +174,7 @@ public class ForestryCartItem extends Item {
             ).withStyle(ChatFormatting.GRAY));
         }
         MachineTraitTooltip.appendBaseStats(stack, tooltipComponents);
-        MachineTraitTooltip.appendTraitDetails(traits, tooltipComponents);
+        MachineTraitTooltip.appendTraitDetails(traits, tooltipComponents, ItemStack.EMPTY, stack);
         if (!RecyclingData.isStripped(stack)) {
             MachineTraitTooltip.appendTraitKeyHints(tooltipComponents);
         }

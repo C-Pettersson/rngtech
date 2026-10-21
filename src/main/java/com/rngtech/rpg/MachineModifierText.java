@@ -74,6 +74,11 @@ public final class MachineModifierText {
         return Component.translatable("rngtech.tooltip.modifier_tier.effect", rangeEffectWithStat(modifier), modifier.tier());
     }
 
+    /** The tier line with the top tier this affix can reach, so a four-tier affix at Tier 4 reads as finished. */
+    public static MutableComponent tierTooltipLine(MachineModifier modifier, int topTier) {
+        return Component.translatable("rngtech.tooltip.modifier_tier.effect.of", rangeEffectWithStat(modifier), modifier.tier(), topTier);
+    }
+
     public static MutableComponent fullEffect(MachineModifier modifier) {
         if (ModifierEligibilityProfiles.isBatteryChassisBalanceMode(modifier)) {
             return Component.translatable("rngtech.tooltip.modifier.balance_mode.effect");

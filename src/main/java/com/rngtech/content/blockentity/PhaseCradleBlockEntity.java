@@ -11,6 +11,7 @@ import com.rngtech.content.recipe.PhaseArrayRecipeInput;
 import com.rngtech.content.registry.ModBlockEntities;
 import com.rngtech.content.registry.ModRecipes;
 import com.rngtech.rpg.MachineModifier;
+import com.rngtech.rpg.MachineModifierText;
 import com.rngtech.rpg.MachineStatAccumulator;
 import com.rngtech.rpg.MachineTraitRoller;
 import com.rngtech.rpg.MachineTraits;
@@ -97,6 +98,8 @@ public class PhaseCradleBlockEntity extends BlockEntity implements MenuProvider,
     public static final int STATUS_DONOR_MISMATCH = 14;
     /** Imprint or Graft: every affix slot the item's rarity allows is full. */
     public static final int STATUS_NO_EMPTY_SLOT = 15;
+    /** Resonate, Excise, or Exalt: the selected affix is one the operation cannot change. */
+    public static final int STATUS_AFFIX_BLOCKED = 16;
 
     public static final int DATA_STATUS = 0;
     public static final int DATA_FORMED = 1;
@@ -831,7 +834,13 @@ public class PhaseCradleBlockEntity extends BlockEntity implements MenuProvider,
             return STATUS_NO_SELECTION;
         }
         if (!operationLegal(recipe)) {
-            return recipe.action() == PhaseArrayAction.GRAFT ? STATUS_DONOR_MISMATCH : STATUS_ILLEGAL;
+            if (recipe.action() == PhaseArrayAction.GRAFT) {
+                return STATUS_DONOR_MISMATCH;
+            }
+            if (selection.kind() == RefinementSelection.Kind.EXISTING_MODIFIER && selectedAffix() != null) {
+                return STATUS_AFFIX_BLOCKED;
+            }
+            return STATUS_ILLEGAL;
         }
         if (recipe.needsGlyph() && GlyphItem.tier(glyphStack()) < recipe.glyphTier()) {
             return STATUS_NO_GLYPH;
@@ -847,6 +856,52 @@ public class PhaseCradleBlockEntity extends BlockEntity implements MenuProvider,
 
     private static boolean isLocked(MachineTraits traits) {
         return traits.isCorrupted() || traits.rarity() == Rarity.UNIQUE;
+    }
+
+    /** Why an operation that works on one affix cannot work on this one. */
+    public enum AffixBlock {
+        NONE,
+        /** Already at the highest tier an affix can reach. */
+        AT_MAX,
+        /** Tier 6: Resonate stops here and Exalt takes it on. */
+        USE_EXALT,
+        /** Exalt takes only a Tier 6 affix. */
+        NOT_TIER_SIX,
+        /** Exalt works on Stage 8 Exotic items only. */
+        NOT_EXOTIC,
+        /** A fixed affix cannot be removed. */
+        FIXED,
+        /** An affix with no tiers cannot be raised. */
+        UNTIERED
+    }
+
+    public static AffixBlock affixBlock(PhaseArrayAction action, ModifierEligibilityProfile profile, MachineTraits traits, int affixIndex, int stage) {
+        List<MachineModifier> affixes = traits.modifiers().stream().filter(modifier -> modifier.slot().isAffix()).toList();
+        if (affixIndex < 0 || affixIndex >= affixes.size()) {
+            return AffixBlock.NONE;
+        }
+        int tier = affixes.get(affixIndex).tier();
+        int top = MachineTraitRoller.maxUpgradeTier();
+        return switch (action) {
+            case RESONATE -> tier <= 0 ? AffixBlock.UNTIERED
+                    : tier > top ? AffixBlock.AT_MAX
+                    : tier == top ? AffixBlock.USE_EXALT
+                    : RefinementEngine.phaseRaisedTier(profile, traits, affixIndex, 1, top) > 0 ? AffixBlock.NONE : AffixBlock.AT_MAX;
+            case EXALT -> stage < PhaseArrayRules.PART_STAGE ? AffixBlock.NOT_EXOTIC
+                    : tier <= 0 ? AffixBlock.UNTIERED
+                    : tier > top ? AffixBlock.AT_MAX
+                    : tier < top ? AffixBlock.NOT_TIER_SIX
+                    : RefinementEngine.phaseRaisedTier(profile, traits, affixIndex, 1, top + 1) == top + 1 ? AffixBlock.NONE : AffixBlock.AT_MAX;
+            case EXCISE -> RefinementEngine.phaseRemove(profile, traits, affixIndex, RandomSource.create(0)) == null ? AffixBlock.FIXED : AffixBlock.NONE;
+            default -> AffixBlock.NONE;
+        };
+    }
+
+    private MachineModifier selectedAffix() {
+        List<MachineModifier> affixes = RefinementTargets.storedTraits(targetStack()).modifiers().stream()
+                .filter(modifier -> modifier.slot().isAffix()).toList();
+        int index = selection.affixIndex();
+        return index >= 0 && index < affixes.size() ? affixes.get(index) : null;
     }
 
     private static boolean wantsEmptySlot(PhaseArrayAction action) {
@@ -1308,6 +1363,10 @@ public class PhaseCradleBlockEntity extends BlockEntity implements MenuProvider,
             case STATUS_NO_COILS -> new Object[] { recipe == null ? 0 : recipe.coils(), line.usableCoils() };
             case STATUS_NO_RP -> new Object[] { recipe == null ? 0 : recipe.refinementPotentialCost(),
                     RefinementTargets.storedTraits(targetStack()).refinementPotential() };
+            case STATUS_AFFIX_BLOCKED -> {
+                MachineModifier affix = selectedAffix();
+                yield affix == null ? new Object[0] : new Object[] { MachineModifierText.displayName(affix).getString(), affix.tier() };
+            }
             default -> new Object[0];
         };
     }
@@ -1329,6 +1388,7 @@ public class PhaseCradleBlockEntity extends BlockEntity implements MenuProvider,
             case STATUS_PULSING -> "pulsing";
             case STATUS_DONOR_MISMATCH -> "donor_mismatch";
             case STATUS_NO_EMPTY_SLOT -> "no_empty_slot";
+            case STATUS_AFFIX_BLOCKED -> "affix_blocked";
             default -> "idle";
         };
         return "rngtech.phase_cradle.status." + name;

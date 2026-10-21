@@ -237,7 +237,7 @@ public class BatteryCellItem extends Item {
         appendEnergyTooltip(stack, tooltipComponents);
         MachineTraitTooltip.appendIdentity(stack, tooltipComponents);
         MachineTraitTooltip.appendComponentBaseStats(stack, tooltipComponents);
-        MachineTraitTooltip.appendTraitDetails(traits, tooltipComponents);
+        MachineTraitTooltip.appendTraitDetails(traits, tooltipComponents, ItemStack.EMPTY, stack);
         if (!RecyclingData.isStripped(stack)) {
             MachineTraitTooltip.appendTraitKeyHints(tooltipComponents);
         }

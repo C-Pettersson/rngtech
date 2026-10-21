@@ -52,6 +52,8 @@ Recorded 2026-10-21 from the code on `main` at `c7757d96` and the open branches:
 
 ## Progress log
 
+- 2026-10-21: the Alt tier view on an item names each affix's top tier ("Tier 4 of 4"), because some affixes, such as the flat Max Temperature one, stop below Tier 7 and read as raisable when they are finished.
+- 2026-10-21: a Tier 7 affix selected for Resonate, and a Tier 6 one, read only as an illegal operation. The affix list now dims each affix the chosen operation cannot change and says why on hover (at the top tier, Tier 6 needs Exalt, Exalt wants Tier 6, Exotic only, fixed, untiered), and the status names the affix and its tier with the same reason; Jade gets the affix and tier.
 - 2026-10-21: the result line ran under the donor, Glyph, and output slots. It now stops short of them with a short form, and its hover, like the chamber's, carries the full outcome text.
 - 2026-10-21: every empty Cradle slot and cell socket explains what it takes on hover, and the blocked statuses name their numbers: the Glyph tier the operation wants, the Coils it needs against the usable count, and the RP it spends against the item's. The same numbers reach Jade.
 - 2026-10-21: a full Magic item showed Imprint and Graft with nothing to select, because rarity sets the slot count and nothing but Reforge changes it. The Cradle now reports a dedicated no-empty-slot status, the list carries a red hint row that says why and points at Reforge, and the wiki says the same under Operations.

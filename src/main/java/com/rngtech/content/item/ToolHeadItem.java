@@ -143,7 +143,7 @@ public class ToolHeadItem extends Item {
             ).withStyle(ChatFormatting.RED));
         }
         FieldToolTooltip.appendBaseStats(stack, ToolBaseStatCatalog.baseStats(stack), tooltipComponents);
-        MachineTraitTooltip.appendTraitDetails(traits, tooltipComponents);
+        MachineTraitTooltip.appendTraitDetails(traits, tooltipComponents, ItemStack.EMPTY, stack);
         MachineTraitTooltip.appendTraitKeyHints(tooltipComponents);
     }
 }

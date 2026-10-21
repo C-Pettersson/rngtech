@@ -96,7 +96,7 @@ public class MachinePartItem extends Item {
         }
         MachineTraitTooltip.appendIdentity(stack, tooltipComponents);
         MachineTraitTooltip.appendComponentBaseStats(stack, tooltipComponents);
-        MachineTraitTooltip.appendTraitDetails(traits, tooltipComponents, stack);
+        MachineTraitTooltip.appendTraitDetails(traits, tooltipComponents, stack, stack);
         if (!RecyclingData.isStripped(stack)) {
             MachineTraitTooltip.appendTraitKeyHints(tooltipComponents);
         }

@@ -177,7 +177,8 @@ public class PhaseCradleScreen extends AbstractContainerScreen<PhaseCradleMenu> 
         boolean blocked = status == PhaseCradleBlockEntity.STATUS_NO_LINE || status == PhaseCradleBlockEntity.STATUS_NO_COILS
                 || status == PhaseCradleBlockEntity.STATUS_LOCKED || status == PhaseCradleBlockEntity.STATUS_OUTPUT_FULL
                 || status == PhaseCradleBlockEntity.STATUS_ILLEGAL || status == PhaseCradleBlockEntity.STATUS_NO_RECIPE
-                || status == PhaseCradleBlockEntity.STATUS_DONOR_MISMATCH || status == PhaseCradleBlockEntity.STATUS_NO_EMPTY_SLOT;
+                || status == PhaseCradleBlockEntity.STATUS_DONOR_MISMATCH || status == PhaseCradleBlockEntity.STATUS_NO_EMPTY_SLOT
+                || status == PhaseCradleBlockEntity.STATUS_AFFIX_BLOCKED;
         boolean waiting = status == PhaseCradleBlockEntity.STATUS_NO_TARGET || status == PhaseCradleBlockEntity.STATUS_NO_GLYPH
                 || status == PhaseCradleBlockEntity.STATUS_NO_RP || status == PhaseCradleBlockEntity.STATUS_NO_SELECTION;
         boolean live = status == PhaseCradleBlockEntity.STATUS_CHARGING || status == PhaseCradleBlockEntity.STATUS_READY
@@ -482,8 +483,15 @@ public class PhaseCradleScreen extends AbstractContainerScreen<PhaseCradleMenu> 
         for (int index = 0; index < affixes.size(); index++) {
             MachineModifier modifier = affixes.get(index);
             boolean selected = selection.kind() == RefinementSelection.Kind.EXISTING_MODIFIER && selection.affixIndex() == index;
+            List<Component> tooltip = new ArrayList<>(List.of(MachineModifierText.tooltipLine(modifier)));
+            boolean usable = wantsAffix;
+            if (wantsAffix && PhaseCradleBlockEntity.affixBlock(action, RefinementTargets.eligibilityProfile(target), traits, index,
+                    RefinementTargets.componentStage(target)) != PhaseCradleBlockEntity.AffixBlock.NONE) {
+                usable = false;
+                tooltip.add(affixBlockText(action, index, modifier).copy().withStyle(ChatFormatting.RED));
+            }
             rows.add(new Row(PhaseCradleMenu.BUTTON_SELECTION_EXISTING_BASE + index, MachineModifierText.displayName(modifier),
-                    List.of(MachineModifierText.tooltipLine(modifier)), selected, wantsAffix));
+                    tooltip, selected, usable));
         }
         boolean anyOpen = false;
         for (ModifierSlot slot : List.of(ModifierSlot.PREFIX, ModifierSlot.SUFFIX)) {
@@ -802,8 +810,26 @@ public class PhaseCradleScreen extends AbstractContainerScreen<PhaseCradleMenu> 
             case PhaseCradleBlockEntity.STATUS_NO_COILS -> Component.translatable(key, menu.requiredCoils(), menu.usableCoils());
             case PhaseCradleBlockEntity.STATUS_NO_RP -> Component.translatable(key, menu.rpCost(),
                     RefinementTargets.storedTraits(menu.targetStack()).refinementPotential());
+            case PhaseCradleBlockEntity.STATUS_AFFIX_BLOCKED -> {
+                List<MachineModifier> affixes = affixes(targetTraits());
+                int index = menu.selection().affixIndex();
+                if (index < 0 || index >= affixes.size()) {
+                    yield Component.translatable(PhaseCradleBlockEntity.statusKey(PhaseCradleBlockEntity.STATUS_ILLEGAL));
+                }
+                MachineModifier affix = affixes.get(index);
+                yield Component.translatable(key, MachineModifierText.displayName(affix), affix.tier())
+                        .append(" ").append(affixBlockText(menu.action(), index, affix));
+            }
             default -> Component.translatable(key);
         };
+    }
+
+    /** The reason {@code action} cannot work on the affix at {@code index}, as the list and the status say it. */
+    private Component affixBlockText(PhaseArrayAction action, int index, MachineModifier affix) {
+        ItemStack target = menu.targetStack();
+        PhaseCradleBlockEntity.AffixBlock block = PhaseCradleBlockEntity.affixBlock(action,
+                RefinementTargets.eligibilityProfile(target), targetTraits(), index, RefinementTargets.componentStage(target));
+        return Component.translatable("rngtech.phase_cradle.screen.affix." + block.name().toLowerCase(java.util.Locale.ROOT), affix.tier());
     }
 
     private static Component gray(String key, Object... args) {
