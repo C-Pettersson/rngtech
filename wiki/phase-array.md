@@ -143,8 +143,9 @@ A Coil or the Emitter is itself a target: pull it out, refine it in the Cradle, 
 | Side | Behavior |
 |---|---|
 | Any side of the Cradle, the Emitter, or a Coil | Accepts FE while the line charges, for example from a [Universal Cable](universal-cable.md). |
+| Bottom of the Cradle | Hands out Battery Cells once they are drained, for example to a hopper. Nothing goes in this way. |
 
-The Array has no item automation. Every pulse is a click.
+Nothing else moves by automation: the target, the Glyph, the donor, and the output are placed and taken by hand, and every pulse is a click. The target shows in the Cradle's bore while it sits in the chamber.
 
 ## Screen
 

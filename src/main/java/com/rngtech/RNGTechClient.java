@@ -23,6 +23,7 @@ import com.rngtech.client.renderer.GasChemistryRenderer;
 import com.rngtech.client.renderer.MelterRenderer;
 import com.rngtech.client.renderer.MetalPressRenderer;
 import com.rngtech.client.renderer.ModularToolItemRenderer;
+import com.rngtech.client.renderer.PhaseCradleRenderer;
 import com.rngtech.client.renderer.PotentialReactorRenderer;
 import com.rngtech.client.renderer.ResonanceCalibratorRenderer;
 import com.rngtech.client.renderer.SolarArrayControllerRenderer;
@@ -194,6 +195,7 @@ public final class RNGTechClient {
 
     private void registerRenderers(EntityRenderersEvent.RegisterRenderers event) {
         event.registerBlockEntityRenderer(ModBlockEntities.BATTERY_CHASSIS.get(), BatteryChassisRenderer::new);
+        event.registerBlockEntityRenderer(ModBlockEntities.EXOTIC_AFFIX_FORGE.get(), PhaseCradleRenderer::new);
         event.registerBlockEntityRenderer(ModBlockEntities.SOLAR_ARRAY_CONTROLLER.get(), SolarArrayControllerRenderer::new);
         event.registerBlockEntityRenderer(ModBlockEntities.SOLAR_PANEL.get(), SolarPanelRenderer::new);
         event.registerBlockEntityRenderer(ModBlockEntities.BIO_GENERATOR.get(), BioGeneratorRenderer::new);

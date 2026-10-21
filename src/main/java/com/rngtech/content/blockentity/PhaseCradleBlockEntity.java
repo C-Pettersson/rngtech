@@ -37,6 +37,9 @@ import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.game.ClientGamePacketListener;
+import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -54,6 +57,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.energy.IEnergyStorage;
+import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.ItemStackHandler;
 
 import java.util.ArrayList;
@@ -164,6 +168,9 @@ public class PhaseCradleBlockEntity extends BlockEntity implements MenuProvider,
             if (slot == SLOT_TARGET) {
                 selection = RefinementSelection.none();
                 definitionIndex = 0;
+                if (level != null && !level.isClientSide) {
+                    level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), Block.UPDATE_CLIENTS);
+                }
             }
             if (slot == SLOT_DONOR) {
                 donorAffixIndex = 0;
@@ -277,6 +284,8 @@ public class PhaseCradleBlockEntity extends BlockEntity implements MenuProvider,
     private PhaseArrayRecipe pulseRecipe;
     private int pulseTick;
     private int shownChargeLevel = -1;
+    /** The target as the client last heard it, for the renderer that shows it in the bore. */
+    private ItemStack clientTarget = ItemStack.EMPTY;
 
     public PhaseCradleBlockEntity(BlockPos pos, BlockState blockState) {
         super(ModBlockEntities.EXOTIC_AFFIX_FORGE.get(), pos, blockState);
@@ -416,6 +425,70 @@ public class PhaseCradleBlockEntity extends BlockEntity implements MenuProvider,
     }
 
     // -- What the line shows --------------------------------------------------------------------------------------
+
+    public ItemStack clientTarget() {
+        return clientTarget;
+    }
+
+    @Override
+    public Packet<ClientGamePacketListener> getUpdatePacket() {
+        return ClientboundBlockEntityDataPacket.create(this);
+    }
+
+    @Override
+    public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
+        CompoundTag tag = new CompoundTag();
+        tag.put("Target", targetStack().saveOptional(registries));
+        return tag;
+    }
+
+    @Override
+    public void handleUpdateTag(CompoundTag tag, HolderLookup.Provider registries) {
+        clientTarget = ItemStack.parseOptional(registries, tag.getCompound("Target"));
+    }
+
+    // -- Drained cells leave through the bottom ---------------------------------------------------------------------
+
+    /** The one item surface: the bottom face hands out Battery Cells once they are empty, and takes nothing in. */
+    public IItemHandler getItemHandler(Direction side) {
+        return side == Direction.DOWN ? drainedCells : null;
+    }
+
+    private final IItemHandler drainedCells = new IItemHandler() {
+        @Override
+        public int getSlots() {
+            return CELL_SLOTS;
+        }
+
+        @Override
+        public ItemStack getStackInSlot(int slot) {
+            return cells.getStackInSlot(slot);
+        }
+
+        @Override
+        public ItemStack insertItem(int slot, ItemStack stack, boolean simulate) {
+            return stack;
+        }
+
+        @Override
+        public ItemStack extractItem(int slot, int amount, boolean simulate) {
+            ItemStack cell = cells.getStackInSlot(slot);
+            if (cell.isEmpty() || BatteryCellItem.energyStored(cell) > 0) {
+                return ItemStack.EMPTY;
+            }
+            return cells.extractItem(slot, amount, simulate);
+        }
+
+        @Override
+        public int getSlotLimit(int slot) {
+            return 1;
+        }
+
+        @Override
+        public boolean isItemValid(int slot, ItemStack stack) {
+            return false;
+        }
+    };
 
     /** The charge in quarters of the pulse's cost, full only once the pulse can fire. */
     private int chargeLevel() {

@@ -433,6 +433,11 @@ public final class ModCapabilities {
                 ModBlockEntities.EXOTIC_AFFIX_FORGE.get(),
                 PhaseCradleBlockEntity::getEnergyStorage
         );
+        event.registerBlockEntity(
+                Capabilities.ItemHandler.BLOCK,
+                ModBlockEntities.EXOTIC_AFFIX_FORGE.get(),
+                PhaseCradleBlockEntity::getItemHandler
+        );
         event.registerBlock(
                 Capabilities.EnergyStorage.BLOCK,
                 (level, pos, state, blockEntity, side) -> PhaseCradleBlockEntity.cradleForMember(level, pos)

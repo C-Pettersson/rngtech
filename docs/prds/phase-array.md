@@ -69,7 +69,7 @@ Key existing code:
 - No new RP source and no RP refund. Reforge stays the only way to a fresh RP roll.
 - No Tier 8 or new affix tiers. The Array reaches Tier 7 on Exotic items, where the Affix Forge stops at 6.
 - No refinement of Corrupted items or Uniques. Corruption stays final, and Uniques stay sidegrades.
-- No item automation and no redstone trigger. A pulse is a player click, so there is no roll-until-X loop.
+- No item automation of the target, the Glyph, the donor, or the output, and no redstone trigger. A pulse is a player click, so there is no roll-until-X loop. The one item surface is the Cradle's bottom face, which hands out drained Battery Cells and takes nothing in.
 - No operation that raises yield, Refinement Potential, or Gear stage acceptance beyond what affixes already allow.
 - No Mastery family for the Array, and no Work Orders on the Array.
 - No Nitrogen, cooling, spool, or power-failure mechanic. Speed is charge time, and charge time is supply.
@@ -408,6 +408,7 @@ Resolved 2026-10-21:
 - Operations are `rngtech:phase_array` recipes.
 - Default Glyph sources are the existing challenge loot tables and Dormant Machines. Tier V comes from Work Orders only.
 - The Cradle screen follows the Dormant Machine's graphical panel.
+- Drained Battery Cells leave through the Cradle's bottom face, as Structure says; the Non-Goal rules out automating the pulse, not emptying the sockets. Nothing enters by automation.
 
 ## Open Questions
 
