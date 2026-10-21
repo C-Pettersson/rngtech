@@ -175,7 +175,7 @@ public class PhaseCradleScreen extends AbstractContainerScreen<PhaseCradleMenu> 
         boolean blocked = status == PhaseCradleBlockEntity.STATUS_NO_LINE || status == PhaseCradleBlockEntity.STATUS_NO_COILS
                 || status == PhaseCradleBlockEntity.STATUS_LOCKED || status == PhaseCradleBlockEntity.STATUS_OUTPUT_FULL
                 || status == PhaseCradleBlockEntity.STATUS_ILLEGAL || status == PhaseCradleBlockEntity.STATUS_NO_RECIPE
-                || status == PhaseCradleBlockEntity.STATUS_DONOR_MISMATCH;
+                || status == PhaseCradleBlockEntity.STATUS_DONOR_MISMATCH || status == PhaseCradleBlockEntity.STATUS_NO_EMPTY_SLOT;
         boolean waiting = status == PhaseCradleBlockEntity.STATUS_NO_TARGET || status == PhaseCradleBlockEntity.STATUS_NO_GLYPH
                 || status == PhaseCradleBlockEntity.STATUS_NO_RP || status == PhaseCradleBlockEntity.STATUS_NO_SELECTION;
         boolean live = status == PhaseCradleBlockEntity.STATUS_CHARGING || status == PhaseCradleBlockEntity.STATUS_READY
@@ -483,13 +483,20 @@ public class PhaseCradleScreen extends AbstractContainerScreen<PhaseCradleMenu> 
             rows.add(new Row(PhaseCradleMenu.BUTTON_SELECTION_EXISTING_BASE + index, MachineModifierText.displayName(modifier),
                     List.of(MachineModifierText.tooltipLine(modifier)), selected, wantsAffix));
         }
+        boolean anyOpen = false;
         for (ModifierSlot slot : List.of(ModifierSlot.PREFIX, ModifierSlot.SUFFIX)) {
             if (RefinementEngine.hasOpenAffixSlot(traits, slot)) {
+                anyOpen = true;
                 boolean selected = selection.kind() == RefinementSelection.Kind.EMPTY_SLOT && selection.emptySlot() == slot;
                 int button = slot == ModifierSlot.SUFFIX ? PhaseCradleMenu.BUTTON_SELECTION_EMPTY_SUFFIX : PhaseCradleMenu.BUTTON_SELECTION_EMPTY_PREFIX;
                 rows.add(new Row(button, Component.translatable("rngtech.refinement.empty_slot", MachineModifierText.slotLabel(slot)).withStyle(ChatFormatting.GRAY),
                         List.of(Component.translatable("rngtech.refinement.select_empty_slot")), selected, wantsSlot));
             }
+        }
+        if (wantsSlot && !anyOpen) {
+            rows.add(new Row(-1, Component.translatable("rngtech.phase_cradle.screen.no_empty_slot").withStyle(ChatFormatting.RED),
+                    List.of(Component.translatable("rngtech.phase_cradle.screen.no_empty_slot.rarity"),
+                            Component.translatable("rngtech.phase_cradle.screen.no_empty_slot.reforge")), false, false));
         }
         return rows;
     }

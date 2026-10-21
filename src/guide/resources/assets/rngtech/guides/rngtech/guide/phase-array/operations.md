@@ -32,4 +32,4 @@ navigation:
 | **Exalt** | Raises the selected Tier 6 affix to Tier 7. Stage 8 Exotic items only. | One Tier 6 affix |
 | **Graft** | Moves the selected donor affix onto the empty slot you choose, keeping its tier and value. The donor is destroyed. | A donor affix and an empty slot |
 
-Fixed identity affixes and implicits are never selectable. An affix the item could not roll on its own cannot be Imprinted or Grafted onto it, and neither can one from a modifier group the item already carries; the donor list dims such affixes and says why. A pack can retune, remove, or add operations: they are `rngtech:phase_array` recipes.
+Imprint and Graft need an empty slot, and rarity sets how many an item has: a Magic item holds one prefix and one suffix, a Rare item three of each, and nothing but Reforge changes rarity. Fixed identity affixes and implicits are never selectable. An affix the item could not roll on its own cannot be Imprinted or Grafted onto it, and neither can one from a modifier group the item already carries; the donor list dims such affixes and says why. A pack can retune, remove, or add operations: they are `rngtech:phase_array` recipes.

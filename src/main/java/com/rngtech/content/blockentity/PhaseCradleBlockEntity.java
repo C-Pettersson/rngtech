@@ -95,6 +95,8 @@ public class PhaseCradleBlockEntity extends BlockEntity implements MenuProvider,
     public static final int STATUS_PULSING = 13;
     /** Graft: the chosen donor affix is one the target cannot take. */
     public static final int STATUS_DONOR_MISMATCH = 14;
+    /** Imprint or Graft: every affix slot the item's rarity allows is full. */
+    public static final int STATUS_NO_EMPTY_SLOT = 15;
 
     public static final int DATA_STATUS = 0;
     public static final int DATA_FORMED = 1;
@@ -822,6 +824,9 @@ public class PhaseCradleBlockEntity extends BlockEntity implements MenuProvider,
         if (!outputStack().isEmpty()) {
             return STATUS_OUTPUT_FULL;
         }
+        if (wantsEmptySlot(recipe.action()) && !RefinementEngine.hasAnyOpenAffixSlot(RefinementTargets.storedTraits(target))) {
+            return STATUS_NO_EMPTY_SLOT;
+        }
         if (!hasSelection(recipe.action())) {
             return STATUS_NO_SELECTION;
         }
@@ -842,6 +847,11 @@ public class PhaseCradleBlockEntity extends BlockEntity implements MenuProvider,
 
     private static boolean isLocked(MachineTraits traits) {
         return traits.isCorrupted() || traits.rarity() == Rarity.UNIQUE;
+    }
+
+    private static boolean wantsEmptySlot(PhaseArrayAction action) {
+        return action.selection() == PhaseArrayAction.Selection.EMPTY_SLOT_AND_DEFINITION
+                || action.selection() == PhaseArrayAction.Selection.EMPTY_SLOT_AND_DONOR_AFFIX;
     }
 
     private boolean hasSelection(PhaseArrayAction wanted) {
@@ -1307,6 +1317,7 @@ public class PhaseCradleBlockEntity extends BlockEntity implements MenuProvider,
             case STATUS_READY -> "ready";
             case STATUS_PULSING -> "pulsing";
             case STATUS_DONOR_MISMATCH -> "donor_mismatch";
+            case STATUS_NO_EMPTY_SLOT -> "no_empty_slot";
             default -> "idle";
         };
         return "rngtech.phase_cradle.status." + name;
