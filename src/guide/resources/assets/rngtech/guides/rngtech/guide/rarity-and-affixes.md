@@ -81,6 +81,7 @@ Tool Heads and Tool Rods get 2 extra RP, and some machine parts add a small bonu
 
 An illegal or failed refinement costs nothing: no catalyst and no RP. If an add or upgrade rolls a cost higher than the RP left, it still succeeds, and the item drops to 0 RP.
 
+- [Strain and Quality](rngtech:rarity-and-affixes/strain-and-quality.md)
 - [Annealed items](rngtech:rarity-and-affixes/annealed-items.md)
 
 ## Corruption

@@ -4,7 +4,7 @@
 
 PRD status: Accepted
 
-Implementation status: Planned
+Implementation status: Prototype
 
 Release: Not scheduled
 

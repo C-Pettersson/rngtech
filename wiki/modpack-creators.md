@@ -252,6 +252,12 @@ For a pack where RNGTech's Modular tools are the only way to mine, put this in `
 
 Then add other mods' mining tools to `rngtech:restricted_tools`, or give them a level in `rngtech:ore_reach`, and gate other mods' block-breaking machines.
 
+## Phase Array
+
+The [Phase Array](phase-array.md)'s operations are recipes of type `rngtech:phase_array`, one file per operation under `data/rngtech/recipe/phase_array/`. Each names its `action` (`reforge`, `attune`, `resonate`, `excise`, `imprint`, `transmute`, `temper`, `exalt`, or `graft`), its `coils` (3 to 9), its `glyph_tier` (0 for none, else 1 to 5), its `base_fe`, its `refinement_potential_cost`, and its `partial` and `overhold` outcomes. Override a file to retune an operation, replace it with an empty recipe to remove it, or add a file with another action to offer the same action at a second price. A recipe condition such as `rngtech:material_enabled` hides an operation the way it hides a crafting recipe.
+
+Glyphs (`rngtech:glyph`) have no recipe. Their tier is the `rngtech:glyph_tier` component, 1 to 5; a stack without it counts as Tier I, so `/give @p rngtech:glyph[rngtech:glyph_tier=3]` or a quest reward works. By default they drop from the six machine-challenge loot tables and from woken Dormant Machines; Tier V has no default source. Replace the tables to change that, or hand Glyphs out through quests.
+
 ## Compatibility
 
 - **Other mods' metals:** RNGTech recipes use common tags such as `c:ingots/tin` and `c:ores/tin`, so other mods' tin works in them. Their ores share RNGTech's [ore hardness](#ore-hardness).

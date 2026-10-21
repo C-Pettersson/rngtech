@@ -209,6 +209,13 @@ Tool Heads and Tool Rods get 2 extra RP, and some machine parts add a small bonu
 
 An illegal or failed refinement costs nothing: no catalyst and no RP. If an add or upgrade rolls a cost higher than the RP left, it still succeeds, and the item drops to 0 RP.
 
+### Strain and Quality {#strain}
+
+Two more numbers matter only at the [Phase Array](phase-array.md):
+
+- **Strain** counts the pulses an item has taken, one per pulse on every outcome. It shows on the tooltip and never comes off on its own; only the Array's Temper operation resets it. Each point above the line's Strain Tolerance adds 1% to the chance that a pulse fractures the item, dropping a random affix a tier.
+- **Quality** is the sum of an item's affix tiers. It is not shown as a number, but it prices every pulse: the FE grows by half for every 3.5 points, so a near-perfect item costs far more to touch than a fresh one.
+
 ### Annealed items {#annealed-items}
 
 An item that rolls traits comes out **Annealed** when you craft it at a crafting table and every plate in its recipe is Annealed. Annealed plates come from a [Metal Press with Hydrogen Quench](metal-press.md#annealing). Only the plates in the item's own crafting grid count, so plates used earlier, for example in a Machine Frame, do not. Items whose recipe has no plates, such as Heat Cores, cannot be Annealed.

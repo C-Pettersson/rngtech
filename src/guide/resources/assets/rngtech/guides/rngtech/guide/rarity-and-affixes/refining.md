@@ -2,7 +2,7 @@
 navigation:
   title: "Refining"
   parent: rarity-and-affixes.md
-  position: 11
+  position: 12
   icon: rngtech:affix_injector
 ---
 

@@ -2,7 +2,7 @@
 navigation:
   title: "Annealed items"
   parent: rarity-and-affixes.md
-  position: 10
+  position: 11
   icon: rngtech:affix_injector
 ---
 

@@ -81,6 +81,8 @@ Your modpack can change the Crusher and Furnace penalties.
 
 ### Which cells fit where
 
+The [Phase Cradle](phase-array.md#gear) has nine sockets that take any cell. While the line charges, each cell drains into the charge at its own output rate, like a Dormant Machine's sockets.
+
 Most slots take any cell. These machines limit the stage:
 
 | Machine | Cell slot |
