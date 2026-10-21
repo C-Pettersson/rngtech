@@ -4,6 +4,7 @@ import com.rngtech.RNGTech;
 import com.rngtech.RNGTechConfig;
 import com.rngtech.content.blockentity.MachineInfoSnapshot;
 import com.rngtech.content.item.BatteryCellItem;
+import com.rngtech.content.loot.GlyphSources;
 import com.rngtech.rpg.dormant.DormantSite;
 import com.rngtech.rpg.dormant.DormantSoul;
 import com.rngtech.rpg.progression.MachineProgressionState;
@@ -200,6 +201,9 @@ public final class DormantCore {
     private void wake() {
         host.setPhase(DormantPhase.AWAKE);
         host.hostLevel().playSound(null, host.sitePos(), SoundEvents.RESPAWN_ANCHOR_SET_SPAWN, SoundSource.BLOCKS, 1.0F, 0.8F);
+        if (soul != null) {
+            GlyphSources.dropDormantGlyph(host.hostLevel(), host.sitePos(), site, soul.level());
+        }
     }
 
     /** Takes the soul away for good: the machine becomes a spent husk. */

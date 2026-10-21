@@ -51,8 +51,19 @@ export async function checkUniques({ log = true } = {}) {
         if (table.type !== "rngtech:challenge") {
             failures.push(`challenges/${name} must use the rngtech:challenge type`);
         }
-        if ((table.pools ?? []).length > 0) {
-            failures.push(`challenges/${name} must ship empty; packs fill it by datapack`);
+        const pools = table.pools ?? [];
+        if (name === "heat_failure" && pools.length > 0) {
+            failures.push(`challenges/${name} must ship empty; failing on purpose should not pay`);
+        }
+        for (const pool of pools) {
+            if ((pool.conditions ?? []).length === 0) {
+                failures.push(`challenges/${name} has a pool with no condition; every default Glyph drop is a machine challenge`);
+            }
+            for (const entry of pool.entries ?? []) {
+                if (entry.name !== "rngtech:glyph") {
+                    failures.push(`challenges/${name} drops ${entry.name}; only Glyphs ship by default, packs add the rest`);
+                }
+            }
         }
     }
 
@@ -77,7 +88,7 @@ export async function checkUniques({ log = true } = {}) {
         throw new Error(`Unique source check failed:\n${failures.map((failure) => `- ${failure}`).join("\n")}`);
     }
     if (log) {
-        console.log(`Unique sources PASS: ${uniques.length} Uniques with gated default loot, ${challengeFiles.length} empty challenge tables, no Unique recipes`);
+        console.log(`Unique sources PASS: ${uniques.length} Uniques with gated default loot, ${challengeFiles.length} challenge tables with Glyph entries only, no Unique recipes`);
     }
     return uniques.length;
 }

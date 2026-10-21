@@ -1,4 +1,5 @@
 {
+  "rngtech.command.glyph.given": "Gave a Tier %s Glyph to %s players",
   "rngtech.phase_cradle.status.pulsing": "Pulse running",
   "rngtech.phase_cradle.screen.button.pulsing": "Pulse",
   "rngtech.phase_cradle.status.no_line": "No line: build three to nine Phase Coils and a Phase Emitter in a row from the Cradle",

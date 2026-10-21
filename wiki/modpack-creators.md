@@ -141,7 +141,7 @@ By default, Uniques drop from vanilla structures and mobs. The [Uniques](uniques
 
 - **Turn off default drops:** `uniques.loot.enabled`, or one Unique with `uniques.loot.<id>.enabled`.
 - **Give one:** `/rngtech unique give <players> <id>`, or use the item as a quest reward. Each player rolls their own copy when they identify it.
-- **Machine challenges:** RNGTech rolls a loot table on machine events, such as a Crusher jam or a finished calibration. The tables ship empty; fill them to reward players for running the machines.
+- **Machine challenges:** RNGTech rolls a loot table on machine events, such as a Crusher jam or a finished calibration. By default the tables drop only Glyphs for the Phase Array, behind Mastery milestones, high-stability calibrations, Stage 7+ forestry heads, unstable Vacuum Collapse cycles, and high-level Crusher jams. Replace or extend them to reward players your own way. `/rngtech glyph give <players> <tier>` hands out a Glyph of tier 1 to 5.
 - **Add your own Uniques:** put a JSON file in `config/rngtech/uniques/`.
 
 The [Uniques guide for pack makers](https://github.com/c-pettersson/rngtech/blob/main/extras/uniques/README.md) covers the file format and rules.

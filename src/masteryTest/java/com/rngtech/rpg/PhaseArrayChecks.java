@@ -1,5 +1,7 @@
 package com.rngtech.rpg;
 
+import com.rngtech.RNGTech;
+import com.rngtech.content.loot.GlyphSources;
 import com.rngtech.rpg.refinement.PhaseLineStats;
 import com.rngtech.rpg.refinement.PhasePulse;
 import com.rngtech.rpg.refinement.PhasePulseSequence;
@@ -30,6 +32,7 @@ public final class PhaseArrayChecks {
         costsFollowTheFormula();
         engineOperationsRespectTheirLimits();
         sequenceFramesFollowThePulse();
+        dormantSitesPayByTier();
         return checks;
     }
 
@@ -202,6 +205,15 @@ public final class PhaseArrayChecks {
         check(PhasePulseSequence.frame(fracture, 1).stage() == PhasePulseSequence.Stage.FRACTURED && PhasePulseSequence.engagingOn(fracture, 0) == 0,
                 "no Coil engages on a Fracture");
         check(PhasePulseSequence.engagePitch(9) > PhasePulseSequence.engagePitch(1), "the tone climbs along the line");
+    }
+
+    private static void dormantSitesPayByTier() {
+        check(GlyphSources.dormantTier(RNGTech.id("collapsed_workshop"), 8) == 1, "a Collapsed Workshop pays Tier I");
+        check(GlyphSources.dormantTier(RNGTech.id("flooded_foundry"), 40) == 2, "a Flooded Foundry pays Tier II");
+        check(GlyphSources.dormantTier(RNGTech.id("nether_smeltworks"), 50) == 3, "a Nether Smeltworks pays Tier III");
+        check(GlyphSources.dormantTier(RNGTech.id("end_relay"), 60) == 4, "an End Relay pays Tier IV, never Tier V");
+        check(GlyphSources.dormantTier(RNGTech.id("some_pack_site"), 70) == 4 && GlyphSources.dormantTier(RNGTech.id("some_pack_site"), 20) == 1,
+                "an unknown site pays by soul level");
     }
 
     private static void near(double actual, double expected, String what) {

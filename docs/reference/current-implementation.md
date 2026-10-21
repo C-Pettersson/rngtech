@@ -245,7 +245,7 @@ The Debug Chest, Debug Trashcan, Debug Tank, and Debug Battery are also admin/de
 
 ## Challenge Loot Tables
 
-RNGTech rolls a loot table of type `rngtech:challenge` when a machine event happens. All six tables ship empty, so default play is unchanged; packs fill them by datapack.
+RNGTech rolls a loot table of type `rngtech:challenge` when a machine event happens. The default tables drop only [Glyphs](../prds/phase-array.md#glyphs-and-work-orders), each behind a machine challenge: Mastery milestones at 20, 40, 60, 80, and 100; high-stability Stage 6+ calibrations; Stage 7+ forestry heads; high-instability Vacuum Collapse cycles; and Processing Level 7+ Crusher jams. Heat failures pay nothing. Packs replace or extend them by datapack; `tools/moddex/check-uniques.mjs` keeps the defaults to conditioned Glyph pools.
 
 | Table | Rolled when | Results |
 |---|---|---|

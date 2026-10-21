@@ -1,4 +1,125 @@
 {
   "type": "rngtech:challenge",
-  "pools": []
+  "pools": [
+    {
+      "rolls": 1,
+      "conditions": [
+        {
+          "condition": "rngtech:mastery_level",
+          "min": 20,
+          "max": 20
+        }
+      ],
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "rngtech:glyph",
+          "functions": [
+            {
+              "function": "minecraft:set_components",
+              "components": {
+                "rngtech:glyph_tier": 1
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "rolls": 1,
+      "conditions": [
+        {
+          "condition": "rngtech:mastery_level",
+          "min": 40,
+          "max": 40
+        }
+      ],
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "rngtech:glyph",
+          "functions": [
+            {
+              "function": "minecraft:set_components",
+              "components": {
+                "rngtech:glyph_tier": 1
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "rolls": 1,
+      "conditions": [
+        {
+          "condition": "rngtech:mastery_level",
+          "min": 60,
+          "max": 60
+        }
+      ],
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "rngtech:glyph",
+          "functions": [
+            {
+              "function": "minecraft:set_components",
+              "components": {
+                "rngtech:glyph_tier": 2
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "rolls": 1,
+      "conditions": [
+        {
+          "condition": "rngtech:mastery_level",
+          "min": 80,
+          "max": 80
+        }
+      ],
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "rngtech:glyph",
+          "functions": [
+            {
+              "function": "minecraft:set_components",
+              "components": {
+                "rngtech:glyph_tier": 2
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "rolls": 1,
+      "conditions": [
+        {
+          "condition": "rngtech:mastery_level",
+          "min": 100,
+          "max": 100
+        }
+      ],
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "rngtech:glyph",
+          "functions": [
+            {
+              "function": "minecraft:set_components",
+              "components": {
+                "rngtech:glyph_tier": 3
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
 }
