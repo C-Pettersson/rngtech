@@ -1,5 +1,6 @@
 package com.rngtech.content.blockentity;
 
+import com.rngtech.content.block.PhaseCoilBlock;
 import com.rngtech.content.registry.ModBlockEntities;
 import com.rngtech.content.registry.ModDataComponents;
 import com.rngtech.rpg.MachineBaseStatCatalog;
@@ -10,6 +11,7 @@ import com.rngtech.rpg.PhaseArrayRules;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.component.DataComponentMap;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.items.ItemStackHandler;
 
@@ -48,6 +50,10 @@ public class PhaseCoilBlockEntity extends BaseMachineBlockEntity {
                 .build());
         setChanged();
         if (level != null) {
+            BlockState state = getBlockState();
+            if (state.hasProperty(PhaseCoilBlock.TIER) && state.getValue(PhaseCoilBlock.TIER) != clamped) {
+                level.setBlock(worldPosition, state.setValue(PhaseCoilBlock.TIER, clamped), Block.UPDATE_ALL);
+            }
             PhaseLine.requestNearbyCradleRescans(level, worldPosition);
         }
         return true;

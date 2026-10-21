@@ -71,7 +71,7 @@ Each Coil has a **position**, counted from the Emitter. A Coil is blank until a 
 | 8 | IV |
 | 9 | V |
 
-To inscribe, put a Glyph in the Cradle's Glyph slot and click the Coil's node on the line. The Glyph is used up and the Coil keeps its tier for good. An inscribed Coil can move to any position that accepts its tier, so a line grows by inserting a new Coil next to the Emitter and shifting the rest outward.
+To inscribe, right-click a placed Coil with a Glyph. The Glyph is used up and the Coil keeps its tier for good. The Cradle's screen does the same: with a Glyph in its Glyph slot, click the Coil's node on the line. An inscribed Coil can move to any position that accepts its tier, so a line grows by inserting a new Coil next to the Emitter and shifting the rest outward.
 
 ### Running a pulse
 

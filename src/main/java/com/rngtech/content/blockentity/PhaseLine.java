@@ -1,6 +1,8 @@
 package com.rngtech.content.blockentity;
 
+import com.rngtech.content.block.BaseMachineBlock;
 import com.rngtech.content.block.PhaseCoilBlock;
+import com.rngtech.content.block.PhaseCradleBlock;
 import com.rngtech.content.block.PhaseEmitterBlock;
 import com.rngtech.rpg.PhaseArrayRules;
 
@@ -110,6 +112,20 @@ public final class PhaseLine {
         return usable;
     }
 
+    /**
+     * The direction of a line part next to {@code pos}, so a new part placed beside a line turns along it instead of
+     * toward the player; null when none is adjacent.
+     */
+    public static Direction axisNextTo(Level level, BlockPos pos) {
+        for (Direction direction : Direction.Plane.HORIZONTAL) {
+            Block neighbour = level.getBlockState(pos.relative(direction)).getBlock();
+            if (neighbour instanceof PhaseCoilBlock || neighbour instanceof PhaseEmitterBlock || neighbour instanceof PhaseCradleBlock) {
+                return direction;
+            }
+        }
+        return null;
+    }
+
     /** Asks every Cradle whose line could include {@code pos} to rescan: the line is straight, so only the four rows matter. */
     public static void requestNearbyCradleRescans(Level level, BlockPos pos) {
         for (Direction direction : Direction.Plane.HORIZONTAL) {
@@ -123,11 +139,29 @@ public final class PhaseLine {
 
     /** Sets the formed look on a Coil or Emitter; other blocks are left alone. */
     public static void setFormed(Level level, BlockPos pos, boolean formed) {
+        setFormed(level, pos, formed, null);
+    }
+
+    /**
+     * Sets the formed look and, with an {@code axis} (the direction from the Cradle outward), turns the member along
+     * the line: a Coil's beam runs along it and the Emitter fires back toward the Cradle.
+     */
+    public static void setFormed(Level level, BlockPos pos, boolean formed, Direction axis) {
         BlockState state = level.getBlockState(pos);
-        if (state.getBlock() instanceof PhaseCoilBlock && state.getValue(PhaseCoilBlock.FORMED) != formed) {
-            level.setBlock(pos, state.setValue(PhaseCoilBlock.FORMED, formed), Block.UPDATE_ALL);
-        } else if (state.getBlock() instanceof PhaseEmitterBlock && state.getValue(PhaseEmitterBlock.FORMED) != formed) {
-            level.setBlock(pos, state.setValue(PhaseEmitterBlock.FORMED, formed), Block.UPDATE_ALL);
+        BlockState next = state;
+        if (state.getBlock() instanceof PhaseCoilBlock) {
+            next = state.setValue(PhaseCoilBlock.FORMED, formed);
+            if (axis != null) {
+                next = next.setValue(BaseMachineBlock.FACING, axis);
+            }
+        } else if (state.getBlock() instanceof PhaseEmitterBlock) {
+            next = state.setValue(PhaseEmitterBlock.FORMED, formed);
+            if (axis != null) {
+                next = next.setValue(BaseMachineBlock.FACING, axis.getOpposite());
+            }
+        }
+        if (next != state) {
+            level.setBlock(pos, next, Block.UPDATE_ALL);
         }
     }
 }

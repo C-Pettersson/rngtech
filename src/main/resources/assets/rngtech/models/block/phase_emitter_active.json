@@ -1,12 +1,8 @@
 {
-  "parent": "minecraft:block/cube",
+  "parent": "rngtech:block/phase_emitter",
   "textures": {
-    "particle": "rngtech:block/phase_array/emitter_side_active",
-    "north": "rngtech:block/phase_array/emitter_front_active",
-    "south": "rngtech:block/phase_array/emitter_front_active",
-    "east": "rngtech:block/phase_array/emitter_side_active",
-    "west": "rngtech:block/phase_array/emitter_side_active",
-    "up": "rngtech:block/phase_array/emitter_side_active",
-    "down": "rngtech:block/phase_array/emitter_side_active"
+    "core": "rngtech:block/phase_array/core_active",
+    "lens": "rngtech:block/phase_array/lens_active",
+    "strip": "rngtech:block/phase_array/estrip_active"
   }
 }

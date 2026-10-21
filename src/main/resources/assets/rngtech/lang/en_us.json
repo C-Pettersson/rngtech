@@ -1,4 +1,7 @@
 {
+  "rngtech.phase_cradle.screen.result.effect": "%s: %s",
+  "rngtech.phase_cradle.screen.result.miss": "%s: slipped at position %s, nothing changed",
+  "rngtech.phase_cradle.screen.result.fracture": "%s: one affix dropped a tier",
   "rngtech.phase_cradle.screen.coil.inscribe": "Click to inscribe the Tier %s Glyph in the Glyph slot.",
   "rngtech.phase_cradle.screen.coil.glyph_slot": "Put a Glyph in the Glyph slot, then click here to inscribe it.",
   "rngtech.command.glyph.given": "Gave a Tier %s Glyph to %s players",
@@ -99,8 +102,8 @@
   "item.rngtech.glyph": "Glyph",
   "item.rngtech.glyph.tiered": "Glyph %s",
   "rngtech.tooltip.glyph.use": "Spent by the Phase Array's deeper operations.",
-  "rngtech.tooltip.glyph.inscribe": "Inscribe into a Phase Coil to open its position for good.",
-  "rngtech.tooltip.phase_coil.blank": "Blank. Inscribe a Glyph at the Phase Cradle.",
+  "rngtech.tooltip.glyph.inscribe": "Right-click a placed Phase Coil to inscribe it and open its position for good.",
+  "rngtech.tooltip.phase_coil.blank": "Blank. Right-click the placed Coil with a Glyph to inscribe it.",
   "rngtech.tooltip.phase_coil.inscribed": "Inscribed: Tier %s",
   "rngtech.stat.charge_capacity": "Charge Capacity",
   "rngtech.stat.charge_capacity.description": "The line holds up to %s of charge for one pulse.",

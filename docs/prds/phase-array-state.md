@@ -52,6 +52,7 @@ Recorded 2026-10-21 from the code on `main` at `c7757d96` and the open branches:
 
 ## Progress log
 
+- 2026-10-21: art and interaction pass after the first in-game look. The three parts are shaped models from `tools/blockmodels/phase_array.py`: caged cubes with lit strips that follow the line's state, a glyph disc on each side of a Coil, a core in the Emitter that fills by quarters through a new `charge` block state, and a mirror-lined bore on the Cradle that faces the Coils through a new `facing` state the line sets on formation. The beam, charge sparks, and outcome burst are particles. Placement follows the neighbouring line axis instead of the look direction. A Glyph right-clicked on a placed Coil inscribes it, and the Cradle's screen names each outcome's effect. Two earlier passes, a receiver well with rising crystals and Needler-style needles on the Emitter, were rendered by a block entity renderer and rejected as looking detached from the block.
 - 2026-10-21: drafted the PRD and this state page, and updated the Work Orders PRD to match. Accepted the same day.
 - 2026-10-21: phase 9. The Machine Stats page lists the eleven line stats, Rarity and Affixes defines Strain and Quality, Battery Cells mentions the Cradle's sockets, and Modpack Creators explains `rngtech:phase_array` recipes and Glyph handling. The guide is regenerated.
 - 2026-10-21: phases 7 and 8. The Exotic Affix Catalyst item, recipe, model, texture, and lang key are gone, and the Stage 7-8 quests describe the Phase Array. `wiki/exotic-affix-forge.md` is replaced by `wiki/phase-array.md`, with every link repointed and the guide regenerated. Inscribing has its in-game surface: a Glyph in the Cradle's Glyph slot plus a click on a Coil's node. `rngbalance:phase_array` spawns a nine-Coil line with every position inscribed, a Debug Battery on the Cradle, charged cells in its sockets, and Debug Chests of Glyphs and parts.
@@ -63,6 +64,7 @@ Recorded 2026-10-21 from the code on `main` at `c7757d96` and the open branches:
 
 ## Verification
 
+- 2026-10-21: art pass. `./gradlew ciCheck`, `./gradlew runGameTestServer`, `npm run moddex:check`, `npm run repo:check`, `python tools/rngwiki/guideme.py --check`, and both `mkdocs build --strict` runs passed.
 - 2026-10-21: documentation only. `mkdocs build --strict` passed. No Gradle or ModDex checks were run, because no code or data changed.
 - 2026-10-21: `./gradlew spotlessApply phaseArraySim` ran clean, and `./gradlew quickCheck` passed with the new `masteryTest` class. `mkdocs build --strict` passed.
 - 2026-10-21: phase 3. `./gradlew quickCheck`, `./gradlew runGameTestServer`, `npm run moddex:check`, `npm run repo:check`, and `mkdocs build --strict` passed.
@@ -74,9 +76,8 @@ Recorded 2026-10-21 from the code on `main` at `c7757d96` and the open branches:
 ## Handoff and limits
 
 - The PRD's numbers are the `prd` scenario of `tools/balance/phase-array-scenarios.json`. The model has no Second Hold, Strain Tolerance, or part affixes in play; they are zero at base and only exist once parts roll.
-- The parts' block models are plain textured cubes from `tools`-style generated pixel art, not shaped models. They need the shaped-model pass the other machines got.
-- The sequence uses vanilla sounds (amethyst chime, beacon deactivate, respawn anchor charge, glass break). Custom sounds, particles, and a hovering item are open for the art pass.
-- The screen is drawn but has not been opened in a client yet. `rngbalance:phase_array` is the place to look at it.
+- The sequence uses vanilla sounds (amethyst chime, beacon deactivate, respawn anchor charge, glass break) and vanilla particles. Custom sounds and a hovering item in the bore are open.
+- The pulse crosses every usable Coil, so a long line running a short operation watches all its positions; slips past the operation's count still succeed and a full hold rolls Overhold. This is the PRD's ladder, and it was questioned in playtest.
 - Formation differs from the first PRD text: it is automatic, not a right-click, so it matches the Dehumidifier. The PRD now says so.
 - The model's players are simple: they always Resonate the lowest affix, and they stop at 25% Fracture. A player who Reforges a worn item, or Grafts between bodies, is not modelled.
 - The line is drafted horizontal only. A vertical line is an open question.

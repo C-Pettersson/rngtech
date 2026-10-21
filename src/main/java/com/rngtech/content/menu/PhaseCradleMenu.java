@@ -249,6 +249,12 @@ public class PhaseCradleMenu extends AbstractContainerMenu {
         return ordinal < 0 || ordinal >= PhasePulse.Outcome.values().length ? null : PhasePulse.Outcome.values()[ordinal];
     }
 
+    /** The action the last pulse ran, or null before the first. */
+    public PhaseArrayAction lastAction() {
+        int ordinal = data.get(PhaseCradleBlockEntity.DATA_LAST_ACTION);
+        return ordinal < 0 || ordinal >= PhaseArrayAction.values().length ? null : PhaseArrayAction.values()[ordinal];
+    }
+
     public int lastHeld() {
         return data.get(PhaseCradleBlockEntity.DATA_LAST_HELD);
     }

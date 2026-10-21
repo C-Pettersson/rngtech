@@ -93,6 +93,7 @@ public final class ModBlocks {
                     .mapColor(MapColor.COLOR_CYAN)
                     .strength(6.0F, 9.0F)
                     .sound(SoundType.METAL)
+                    .noOcclusion()
     );
 
     public static final DeferredBlock<PhaseEmitterBlock> PHASE_EMITTER = BLOCKS.registerBlock(
@@ -102,6 +103,7 @@ public final class ModBlocks {
                     .mapColor(MapColor.COLOR_CYAN)
                     .strength(6.0F, 9.0F)
                     .sound(SoundType.METAL)
+                    .noOcclusion()
     );
     public static final DeferredBlock<PhaseCoilBlock> PHASE_COIL = BLOCKS.registerBlock(
             "phase_coil",
@@ -110,6 +112,7 @@ public final class ModBlocks {
                     .mapColor(MapColor.COLOR_CYAN)
                     .strength(6.0F, 9.0F)
                     .sound(SoundType.METAL)
+                    .noOcclusion()
     );
 
     public static final DeferredBlock<DebugRerollerBlock> DEBUG_REROLLER = BLOCKS.registerBlock(

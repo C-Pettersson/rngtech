@@ -1,6 +1,8 @@
 package com.rngtech.content.blockentity;
 
 import com.rngtech.content.block.BaseMachineBlock;
+import com.rngtech.content.block.PhaseCradleBlock;
+import com.rngtech.content.block.PhaseEmitterBlock;
 import com.rngtech.content.item.BatteryCellItem;
 import com.rngtech.content.item.GlyphItem;
 import com.rngtech.content.menu.PhaseCradleMenu;
@@ -31,9 +33,11 @@ import com.rngtech.rpg.refinement.RefinementTargets;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.RandomSource;
@@ -45,6 +49,7 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.capabilities.Capabilities;
@@ -117,7 +122,8 @@ public class PhaseCradleBlockEntity extends BlockEntity implements MenuProvider,
     public static final int DATA_PULSE_STAGE = 29;
     public static final int DATA_PULSE_LIT = 30;
     public static final int DATA_PULSE_FLASHING = 31;
-    public static final int DATA_HOLD_BASE = 32;
+    public static final int DATA_LAST_ACTION = 32;
+    public static final int DATA_HOLD_BASE = 33;
     public static final int DATA_COUNT = DATA_HOLD_BASE + PhaseArrayRules.MAX_COILS;
     /** Odds and hold chances cross the menu as thousandths. */
     public static final int ODDS_SCALE = 1000;
@@ -222,6 +228,7 @@ public class PhaseCradleBlockEntity extends BlockEntity implements MenuProvider,
                 case DATA_PULSE_STAGE -> pulse == null ? -1 : PhasePulseSequence.frame(pulse, pulseTick).stage().ordinal();
                 case DATA_PULSE_LIT -> pulse == null ? 0 : PhasePulseSequence.frame(pulse, pulseTick).lit();
                 case DATA_PULSE_FLASHING -> pulse == null ? 0 : PhasePulseSequence.frame(pulse, pulseTick).flashing();
+                case DATA_LAST_ACTION -> lastAction == null ? -1 : lastAction.ordinal();
                 default -> 0;
             };
         }
@@ -251,12 +258,14 @@ public class PhaseCradleBlockEntity extends BlockEntity implements MenuProvider,
     private int definitionIndex;
     private int donorAffixIndex;
     private PhasePulse.Outcome lastOutcome;
+    private PhaseArrayAction lastAction;
     private int lastHeld;
     private int lastSlipped;
     /** The pulse in flight: rolled at Fire, shown over the sequence, applied when it ends. */
     private PhasePulse.Result pulse;
     private PhaseArrayRecipe pulseRecipe;
     private int pulseTick;
+    private int shownChargeLevel = -1;
 
     public PhaseCradleBlockEntity(BlockPos pos, BlockState blockState) {
         super(ModBlockEntities.EXOTIC_AFFIX_FORGE.get(), pos, blockState);
@@ -316,6 +325,7 @@ public class PhaseCradleBlockEntity extends BlockEntity implements MenuProvider,
             return;
         }
         lineRescanRequested = false;
+        shownChargeLevel = -1;
         PhaseLine.Scan scan = PhaseLine.scan(level, worldPosition);
         boolean changed = scan.complete() != line.complete()
                 || scan.coilCount() != line.coilCount()
@@ -331,8 +341,12 @@ public class PhaseCradleBlockEntity extends BlockEntity implements MenuProvider,
         }
         for (BlockPos member : next) {
             if (formedMembers.add(member)) {
-                PhaseLine.setFormed(level, member, true);
+                PhaseLine.setFormed(level, member, true, scan.axis());
             }
+        }
+        BlockState state = getBlockState();
+        if (scan.complete() && state.hasProperty(PhaseCradleBlock.FACING) && state.getValue(PhaseCradleBlock.FACING) != scan.axis()) {
+            level.setBlock(worldPosition, state.setValue(PhaseCradleBlock.FACING, scan.axis()), Block.UPDATE_ALL);
         }
         if (!scan.complete()) {
             charging = false;
@@ -381,6 +395,123 @@ public class PhaseCradleBlockEntity extends BlockEntity implements MenuProvider,
         }
         if (cradle.pulse != null) {
             cradle.tickPulse();
+        } else if (cradle.line.complete() && level instanceof ServerLevel server && level.getGameTime() % IDLE_PARTICLE_INTERVAL == 0) {
+            cradle.idleBeam(server);
+        }
+        if (cradle.charging && level instanceof ServerLevel server && level.getGameTime() % 2 == 0) {
+            cradle.chargeParticles(server);
+        }
+        cradle.showCharge();
+    }
+
+    // -- What the line shows --------------------------------------------------------------------------------------
+
+    /** The charge in quarters of the pulse's cost, full only once the pulse can fire. */
+    private int chargeLevel() {
+        long cost = cost(recipe());
+        if (cost <= 0 || charge <= 0) {
+            return 0;
+        }
+        return (int) Math.min(PhaseEmitterBlock.CHARGE_LEVELS, Math.ceil(charge * (double) PhaseEmitterBlock.CHARGE_LEVELS / cost));
+    }
+
+    /** Fills the Emitter's core as the charge rises. */
+    private void showCharge() {
+        int quarters = chargeLevel();
+        if (quarters == shownChargeLevel || line.emitter() == null) {
+            return;
+        }
+        shownChargeLevel = quarters;
+        BlockState state = level.getBlockState(line.emitter());
+        if (state.hasProperty(PhaseEmitterBlock.CHARGE) && state.getValue(PhaseEmitterBlock.CHARGE) != quarters) {
+            level.setBlock(line.emitter(), state.setValue(PhaseEmitterBlock.CHARGE, quarters), Block.UPDATE_CLIENTS);
+        }
+    }
+
+    /** While charging, sparks stream in from around the Cradle and fall into the well. */
+    private void chargeParticles(ServerLevel server) {
+        double angle = server.random.nextDouble() * Math.PI * 2;
+        double radius = 1.1 + server.random.nextDouble() * 0.6;
+        double x = worldPosition.getX() + 0.5 + Math.cos(angle) * radius;
+        double z = worldPosition.getZ() + 0.5 + Math.sin(angle) * radius;
+        double y = worldPosition.getY() + 1.1 + server.random.nextDouble() * 0.4;
+        server.sendParticles(ParticleTypes.ELECTRIC_SPARK, x, y, z, 0, -Math.cos(angle) * 0.08, -0.02, -Math.sin(angle) * 0.08, 1.0);
+    }
+
+    /** The outcome's burst over the well: sparks for a hold, a flash for Overhold, smoke for a miss, shards for a Fracture. */
+    private void outcomeParticles(PhasePulse.Outcome outcome) {
+        if (!(level instanceof ServerLevel server)) {
+            return;
+        }
+        double x = worldPosition.getX() + 0.5;
+        double y = worldPosition.getY() + 1.0;
+        double z = worldPosition.getZ() + 0.5;
+        switch (outcome) {
+            case SUCCESS -> server.sendParticles(ParticleTypes.FIREWORK, x, y, z, 24, 0.2, 0.1, 0.2, 0.08);
+            case OVERHOLD -> {
+                server.sendParticles(ParticleTypes.FIREWORK, x, y, z, 48, 0.25, 0.15, 0.25, 0.12);
+                server.sendParticles(ParticleTypes.FLASH, x, y + 0.2, z, 1, 0.0, 0.0, 0.0, 0.0);
+            }
+            case PARTIAL -> server.sendParticles(ParticleTypes.ELECTRIC_SPARK, x, y, z, 16, 0.3, 0.1, 0.3, 0.05);
+            case MISS -> server.sendParticles(ParticleTypes.SMOKE, x, y, z, 10, 0.2, 0.1, 0.2, 0.01);
+            case FRACTURE -> {
+                server.sendParticles(ParticleTypes.CRIT, x, y, z, 20, 0.3, 0.2, 0.3, 0.2);
+                server.sendParticles(ParticleTypes.LARGE_SMOKE, x, y, z, 8, 0.2, 0.1, 0.2, 0.02);
+            }
+        }
+    }
+
+    // -- The beam, as particles ------------------------------------------------------------------------------------
+
+    private static final int IDLE_PARTICLE_INTERVAL = 6;
+    /** The ring's centre height in a Coil, from the model. */
+    private static final double BEAM_HEIGHT = 8.75 / 16.0;
+
+    /** A formed line carries a faint drift of motes from the Emitter toward the Cradle. */
+    private void idleBeam(ServerLevel server) {
+        List<BlockPos> coils = line.coilsFromEmitter();
+        if (coils.isEmpty() || line.emitter() == null) {
+            return;
+        }
+        Direction toward = line.axis().getOpposite();
+        BlockPos from = line.emitter();
+        double length = coils.size() + 1;
+        double at = server.random.nextDouble() * length;
+        double x = from.getX() + 0.5 + toward.getStepX() * at;
+        double z = from.getZ() + 0.5 + toward.getStepZ() * at;
+        server.sendParticles(ParticleTypes.GLOW, x, from.getY() + BEAM_HEIGHT, z, 0,
+                toward.getStepX() * 0.03, 0.0, toward.getStepZ() * 0.03, 1.0);
+    }
+
+    /** While a pulse runs, the beam reaches from the Emitter to the last lit Coil and sparks where it slips. */
+    private void pulseBeam(ServerLevel server, PhasePulseSequence.Frame frame) {
+        if (line.emitter() == null) {
+            return;
+        }
+        Direction toward = line.axis().getOpposite();
+        BlockPos from = line.emitter();
+        double reach = frame.lit() + (frame.flashing() > 0 ? 0.5 : 0.0);
+        for (int step = 0; step < 5; step++) {
+            double at = server.random.nextDouble() * Math.max(0.5, reach);
+            double x = from.getX() + 0.5 + toward.getStepX() * at;
+            double z = from.getZ() + 0.5 + toward.getStepZ() * at;
+            server.sendParticles(ParticleTypes.END_ROD, x, from.getY() + BEAM_HEIGHT, z, 0,
+                    toward.getStepX() * 0.12, 0.0, toward.getStepZ() * 0.12, 1.0);
+        }
+        List<BlockPos> lit = line.coilsFromEmitter();
+        for (int position = 1; position <= Math.min(frame.lit(), lit.size()); position++) {
+            BlockPos coil = lit.get(position - 1);
+            double angle = server.random.nextDouble() * Math.PI * 2;
+            double radius = 0.28;
+            double dx = toward.getStepX() == 0 ? Math.cos(angle) * radius : 0.0;
+            double dz = toward.getStepZ() == 0 ? Math.cos(angle) * radius : 0.0;
+            server.sendParticles(ParticleTypes.GLOW, coil.getX() + 0.5 + dx, coil.getY() + BEAM_HEIGHT + Math.sin(angle) * radius,
+                    coil.getZ() + 0.5 + dz, 1, 0.0, 0.0, 0.0, 0.0);
+        }
+        if (frame.flashing() > 0) {
+            BlockPos slipped = line.coilsFromEmitter().get(frame.flashing() - 1);
+            server.sendParticles(ParticleTypes.ELECTRIC_SPARK, slipped.getX() + 0.5, slipped.getY() + BEAM_HEIGHT, slipped.getZ() + 0.5,
+                    6, 0.3, 0.3, 0.3, 0.1);
         }
     }
 
@@ -405,6 +536,9 @@ public class PhaseCradleBlockEntity extends BlockEntity implements MenuProvider,
             playEngage(engaging, engaging == pulse.slippedPosition());
         }
         lightLine(frame);
+        if (level instanceof ServerLevel server) {
+            pulseBeam(server, frame);
+        }
         pulseTick++;
     }
 
@@ -820,9 +954,11 @@ public class PhaseCradleBlockEntity extends BlockEntity implements MenuProvider,
             items.setStackInSlot(SLOT_DONOR, donor);
         }
         lastOutcome = result.outcome();
+        lastAction = recipe.action();
         lastHeld = result.held();
         lastSlipped = result.slippedPosition();
         playOutcome(result.outcome());
+        outcomeParticles(result.outcome());
         setChanged();
     }
 
@@ -1057,6 +1193,7 @@ public class PhaseCradleBlockEntity extends BlockEntity implements MenuProvider,
         tag.putInt("DonorAffixIndex", donorAffixIndex);
         tag.putInt("LastOutcome", lastOutcome == null ? NO_OUTCOME : lastOutcome.ordinal());
         tag.putInt("LastHeld", lastHeld);
+        tag.putString("LastAction", lastAction == null ? "" : lastAction.getSerializedName());
         tag.putInt("LastSlipped", lastSlipped);
         if (pulse != null) {
             tag.putInt("PulseOutcome", pulse.outcome().ordinal());
@@ -1091,6 +1228,7 @@ public class PhaseCradleBlockEntity extends BlockEntity implements MenuProvider,
         int outcome = tag.contains("LastOutcome") ? tag.getInt("LastOutcome") : NO_OUTCOME;
         lastOutcome = outcome >= 0 && outcome < PhasePulse.Outcome.values().length ? PhasePulse.Outcome.values()[outcome] : null;
         lastHeld = tag.getInt("LastHeld");
+        lastAction = tag.getString("LastAction").isEmpty() ? null : actionByName(tag.getString("LastAction"));
         lastSlipped = tag.getInt("LastSlipped");
     }
 

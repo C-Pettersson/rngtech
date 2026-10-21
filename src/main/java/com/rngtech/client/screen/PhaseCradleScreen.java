@@ -4,6 +4,8 @@ import com.rngtech.content.blockentity.PhaseCradleBlockEntity;
 import com.rngtech.content.item.BatteryCellItem;
 import com.rngtech.content.item.GlyphItem;
 import com.rngtech.content.menu.PhaseCradleMenu;
+import com.rngtech.content.recipe.PhaseArrayRecipe;
+import com.rngtech.content.registry.ModRecipes;
 import com.rngtech.rpg.MachineModifier;
 import com.rngtech.rpg.MachineModifierText;
 import com.rngtech.rpg.MachineTraits;
@@ -63,6 +65,8 @@ public class PhaseCradleScreen extends AbstractContainerScreen<PhaseCradleMenu> 
     private static final int CONDUIT_HEIGHT = 7;
     private static final int STATUS_X = 12;
     private static final int STATUS_Y = 18;
+    private static final int RESULT_X = 76;
+    private static final int RESULT_Y = 54;
     private static final int OPERATION_X = 76;
     private static final int OPERATION_Y = 70;
     private static final int OPERATION_SIZE = 12;
@@ -148,6 +152,10 @@ public class PhaseCradleScreen extends AbstractContainerScreen<PhaseCradleMenu> 
             Row row = rows.get(index);
             int color = row.selected() ? LIT : row.enabled() ? TEXT : DIM;
             drawClipped(graphics, row.title(), LIST_X + 3, LIST_Y + index * ROW_HEIGHT + 2, LIST_WIDTH - 6, color);
+        }
+        Component result = resultLine();
+        if (result != null) {
+            drawClipped(graphics, result, RESULT_X, RESULT_Y, LIST_WIDTH, resultColor());
         }
         Component label = buttonLabel();
         int width = font.width(label);
@@ -629,6 +637,50 @@ public class PhaseCradleScreen extends AbstractContainerScreen<PhaseCradleMenu> 
         if (!lines.isEmpty()) {
             graphics.renderComponentTooltip(font, lines, mouseX, mouseY);
         }
+    }
+
+    /** What the last pulse did, shown until a new target goes in; Partial and Overhold name their effect. */
+    private Component resultLine() {
+        PhasePulse.Outcome outcome = menu.lastOutcome();
+        PhaseArrayAction action = menu.lastAction();
+        if (outcome == null || action == null || menu.pulsing() || !menu.targetStack().isEmpty()) {
+            return null;
+        }
+        Component name = Component.translatable(outcome.translationKey());
+        PhaseArrayRecipe recipe = recipeFor(action);
+        return switch (outcome) {
+            case PARTIAL -> recipe == null ? name : Component.translatable("rngtech.phase_cradle.screen.result.effect", name,
+                    Component.translatable("rngtech.phase_array.partial." + recipe.partial().getSerializedName()));
+            case OVERHOLD -> recipe == null ? name : Component.translatable("rngtech.phase_cradle.screen.result.effect", name,
+                    Component.translatable("rngtech.phase_array.overhold." + recipe.overhold().getSerializedName()));
+            case SUCCESS -> Component.translatable("rngtech.phase_cradle.screen.result.effect", name, Component.translatable(action.translationKey()));
+            case MISS -> Component.translatable("rngtech.phase_cradle.screen.result.miss", name, menu.lastSlipped());
+            case FRACTURE -> Component.translatable("rngtech.phase_cradle.screen.result.fracture", name);
+        };
+    }
+
+    private int resultColor() {
+        PhasePulse.Outcome outcome = menu.lastOutcome();
+        if (outcome == null) {
+            return TEXT;
+        }
+        return switch (outcome) {
+            case SUCCESS, OVERHOLD -> GREEN;
+            case PARTIAL -> AMBER;
+            case MISS -> DIM;
+            case FRACTURE -> RED;
+        };
+    }
+
+    private PhaseArrayRecipe recipeFor(PhaseArrayAction action) {
+        if (minecraft == null || minecraft.level == null) {
+            return null;
+        }
+        return minecraft.level.getRecipeManager().getAllRecipesFor(ModRecipes.PHASE_ARRAY_TYPE.get()).stream()
+                .map(holder -> holder.value())
+                .filter(recipe -> recipe.action() == action)
+                .findFirst()
+                .orElse(null);
     }
 
     private Component lineLine() {

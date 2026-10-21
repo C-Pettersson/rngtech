@@ -1,0 +1,6 @@
+{
+  "parent": "rngtech:block/phase_emitter",
+  "textures": {
+    "core": "rngtech:block/phase_array/core_1"
+  }
+}

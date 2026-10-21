@@ -1,11 +1,14 @@
 package com.rngtech.content.block;
 
 import com.rngtech.content.blockentity.PhaseCradleBlockEntity;
+import com.rngtech.content.blockentity.PhaseLine;
 import com.rngtech.content.registry.ModBlockEntities;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.EntityBlock;
@@ -14,12 +17,30 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.DirectionProperty;
 import net.minecraft.world.phys.BlockHitResult;
 
 /** The Phase Cradle block. It keeps the {@code rngtech:exotic_affix_forge} id it had as the Exotic Affix Forge. */
 public class PhaseCradleBlock extends Block implements EntityBlock {
+    /** The side the bore opens on: toward the Coils once a line forms, else the way the player placed it. */
+    public static final DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;
+
     public PhaseCradleBlock(Properties properties) {
         super(properties);
+        registerDefaultState(stateDefinition.any().setValue(FACING, Direction.NORTH));
+    }
+
+    @Override
+    public BlockState getStateForPlacement(BlockPlaceContext context) {
+        Direction along = PhaseLine.axisNextTo(context.getLevel(), context.getClickedPos());
+        return defaultBlockState().setValue(FACING, along != null ? along : context.getHorizontalDirection());
+    }
+
+    @Override
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
+        builder.add(FACING);
     }
 
     @Override

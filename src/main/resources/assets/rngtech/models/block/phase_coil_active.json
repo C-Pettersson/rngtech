@@ -1,12 +1,7 @@
 {
-  "parent": "minecraft:block/cube",
+  "parent": "rngtech:block/phase_coil",
   "textures": {
-    "particle": "rngtech:block/phase_array/coil_side_active",
-    "north": "rngtech:block/phase_array/coil_side_active",
-    "south": "rngtech:block/phase_array/coil_side_active",
-    "east": "rngtech:block/phase_array/coil_end_active",
-    "west": "rngtech:block/phase_array/coil_end_active",
-    "up": "rngtech:block/phase_array/coil_side_active",
-    "down": "rngtech:block/phase_array/coil_side_active"
+    "pane": "rngtech:block/phase_array/pane_active",
+    "strip": "rngtech:block/phase_array/strip_active"
   }
 }
