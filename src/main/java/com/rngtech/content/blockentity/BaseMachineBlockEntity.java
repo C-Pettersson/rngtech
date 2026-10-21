@@ -14,6 +14,8 @@ import com.rngtech.content.block.FurnaceBlock;
 import com.rngtech.content.block.GasChemistryBlock;
 import com.rngtech.content.block.MelterBlock;
 import com.rngtech.content.block.MetalPressBlock;
+import com.rngtech.content.block.PhaseCoilBlock;
+import com.rngtech.content.block.PhaseEmitterBlock;
 import com.rngtech.content.block.PotentialReactorBlock;
 import com.rngtech.content.block.ResonanceCalibratorBlock;
 import com.rngtech.content.block.SolarArrayControllerBlock;
@@ -27,6 +29,7 @@ import com.rngtech.rpg.MachineImplicitCatalog;
 import com.rngtech.rpg.MachineStatAccumulator;
 import com.rngtech.rpg.MachineTraits;
 import com.rngtech.rpg.MachineType;
+import com.rngtech.rpg.PhaseArrayRules;
 import com.rngtech.rpg.progression.MachineMasteryHost;
 import com.rngtech.rpg.progression.MachineProgressionState;
 import com.rngtech.rpg.progression.MegaPassiveTree;
@@ -295,6 +298,9 @@ public abstract class BaseMachineBlockEntity extends BlockEntity implements Refi
         }
         if (block instanceof AmmoniaSynthesizerBlock || block instanceof AmmoniaFuelCellBlock) {
             return 6;
+        }
+        if (block instanceof PhaseEmitterBlock || block instanceof PhaseCoilBlock) {
+            return PhaseArrayRules.PART_STAGE;
         }
         return 0;
     }

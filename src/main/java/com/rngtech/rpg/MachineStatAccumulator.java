@@ -465,6 +465,34 @@ public final class MachineStatAccumulator {
         return stats;
     }
 
+    /** {@code PhaseArrayRules}: the Emitter's charge store and rate, and the line's base Partial window. */
+    public static MachineStatAccumulator phaseEmitterBase() {
+        MachineStatAccumulator stats = new MachineStatAccumulator();
+        applyBaseMachineValues(stats);
+        applyPhaseArrayZeroes(stats);
+        stats.baseValues.put(MachineStat.CHARGE_CAPACITY, (double) PhaseArrayRules.EMITTER_CHARGE_CAPACITY);
+        stats.baseValues.put(MachineStat.CHARGE_RATE, (double) PhaseArrayRules.EMITTER_CHARGE_RATE);
+        stats.baseValues.put(MachineStat.PARTIAL_WINDOW, (double) PhaseArrayRules.BASE_PARTIAL_WINDOW);
+        return stats;
+    }
+
+    /** {@code PhaseArrayRules}: a Coil's Hold Chance and its share of charge. */
+    public static MachineStatAccumulator phaseCoilBase() {
+        MachineStatAccumulator stats = new MachineStatAccumulator();
+        applyBaseMachineValues(stats);
+        applyPhaseArrayZeroes(stats);
+        stats.baseValues.put(MachineStat.CHARGE_CAPACITY, (double) PhaseArrayRules.COIL_CHARGE_CAPACITY);
+        stats.baseValues.put(MachineStat.CHARGE_RATE, (double) PhaseArrayRules.COIL_CHARGE_RATE);
+        stats.baseValues.put(MachineStat.HOLD_CHANCE, PhaseArrayRules.COIL_HOLD_CHANCE);
+        return stats;
+    }
+
+    private static void applyPhaseArrayZeroes(MachineStatAccumulator stats) {
+        for (MachineStat stat : PhaseArrayRules.LINE_STATS) {
+            stats.baseValues.put(stat, 0.0);
+        }
+    }
+
     public static MachineStatAccumulator componentRecyclerBase(ComponentRecyclerChassis chassis) {
         MachineStatAccumulator stats = componentRecyclerBase(chassis.energyCapacity(), chassis.energyTransfer());
         stats.baseValues.put(MachineStat.PROCESSING_SPEED, chassis.processingSpeed());

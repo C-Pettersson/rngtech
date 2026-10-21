@@ -40,6 +40,9 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.energy.IEnergyStorage;
 import net.neoforged.neoforge.items.ItemStackHandler;
 
+import java.util.HashSet;
+import java.util.Set;
+
 public class ExoticAffixForgeBlockEntity extends BlockEntity implements MenuProvider, MachineInfoProvider {
     public static final int SLOT_TARGET = 0;
     public static final int SLOT_CATALYST = 1;
@@ -190,12 +193,92 @@ public class ExoticAffixForgeBlockEntity extends BlockEntity implements MenuProv
     private boolean craftFailed;
     private ExoticAffixForgeAction selectedAction = ExoticAffixForgeAction.REFINE_ALL;
     private RefinementSelection selectedRefinement = RefinementSelection.none();
+    private static final int LINE_RESCAN_INTERVAL = 80;
+    private PhaseLine.Scan line = PhaseLine.Scan.none();
+    private final Set<BlockPos> formedMembers = new HashSet<>();
+    private boolean lineRescanRequested = true;
+    private int lineRescanTimer;
 
     public ExoticAffixForgeBlockEntity(BlockPos pos, BlockState blockState) {
         super(ModBlockEntities.EXOTIC_AFFIX_FORGE.get(), pos, blockState);
     }
 
+    // -- The Phase Array line -------------------------------------------------------------------------------------
+
+    /** Asks for a line scan on the next tick, as the Wooden Dehumidifier does when a frame changes. */
+    public void requestLineRescan() {
+        lineRescanRequested = true;
+    }
+
+    public boolean isLineFormed() {
+        return line.complete();
+    }
+
+    public int lineCoilCount() {
+        return line.coilCount();
+    }
+
+    /** Coils, counted from the Emitter, whose inscribed tier meets their position; the operations a line can fire. */
+    public int usableCoils() {
+        return line.usableCoils();
+    }
+
+    public Direction lineAxis() {
+        return line.axis();
+    }
+
+    public PhaseLine.Scan lineScan() {
+        return line;
+    }
+
+    public boolean ownsMember(BlockPos pos) {
+        return line.complete() && formedMembers.contains(pos);
+    }
+
+    private void scanLine() {
+        if (level == null) {
+            return;
+        }
+        lineRescanRequested = false;
+        PhaseLine.Scan scan = PhaseLine.scan(level, worldPosition);
+        boolean changed = scan.complete() != line.complete()
+                || scan.coilCount() != line.coilCount()
+                || scan.usableCoils() != line.usableCoils();
+        line = scan;
+        Set<BlockPos> next = scan.complete() ? scan.members() : Set.of();
+        for (BlockPos member : Set.copyOf(formedMembers)) {
+            if (!next.contains(member)) {
+                PhaseLine.setFormed(level, member, false);
+                formedMembers.remove(member);
+            }
+        }
+        for (BlockPos member : next) {
+            if (formedMembers.add(member)) {
+                PhaseLine.setFormed(level, member, true);
+            }
+        }
+        if (changed) {
+            setChanged();
+        }
+    }
+
+    /** Unlights every member; called when the Cradle is broken. */
+    public void clearFormedMembers() {
+        if (level == null) {
+            return;
+        }
+        for (BlockPos member : Set.copyOf(formedMembers)) {
+            PhaseLine.setFormed(level, member, false);
+        }
+        formedMembers.clear();
+        line = PhaseLine.Scan.none();
+    }
+
     public static void serverTick(Level level, BlockPos pos, BlockState state, ExoticAffixForgeBlockEntity forge) {
+        if (forge.lineRescanRequested || forge.lineRescanTimer-- <= 0) {
+            forge.scanLine();
+            forge.lineRescanTimer = LINE_RESCAN_INTERVAL;
+        }
         if (!forge.craftActive) {
             return;
         }
@@ -322,6 +405,7 @@ public class ExoticAffixForgeBlockEntity extends BlockEntity implements MenuProv
     @Override
     protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.loadAdditional(tag, registries);
+        lineRescanRequested = true;
         if (tag.contains("ProcessInventory")) {
             CompoundTag inventoryTag = tag.getCompound("ProcessInventory");
             if (inventoryTag.getInt("Size") < PROCESS_SLOT_COUNT) {

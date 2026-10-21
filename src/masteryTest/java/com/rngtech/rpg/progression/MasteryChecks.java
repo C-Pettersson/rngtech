@@ -61,6 +61,7 @@ public final class MasteryChecks {
         checks += SoulTransferChecks.run();
         checks += com.rngtech.rpg.dormant.DormantChecks.run();
         checks += PartGenerationChecks.run();
+        checks += com.rngtech.rpg.PhaseArrayChecks.run();
         checks += com.rngtech.rpg.AnnealingChecks.run();
         checks += CrusherYieldChecks.run();
         checks += com.rngtech.content.energy.CorrosionCellLoadChecks.run();

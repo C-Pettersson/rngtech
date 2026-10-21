@@ -54,6 +54,7 @@ import com.rngtech.content.item.FluidPumpItem;
 import com.rngtech.content.item.ForestryCartItem;
 import com.rngtech.content.item.FurnaceChassisBlockItem;
 import com.rngtech.content.item.GasChemistryPartItem;
+import com.rngtech.content.item.GlyphItem;
 import com.rngtech.content.item.ItemConnectorItem;
 import com.rngtech.content.item.MachineBlockItem;
 import com.rngtech.content.item.MachineChassisItem;
@@ -63,6 +64,7 @@ import com.rngtech.content.item.MinersCompanionItem;
 import com.rngtech.content.item.ModularToolItem;
 import com.rngtech.content.item.NetworkConnectorItem;
 import com.rngtech.content.item.OreBlockItem;
+import com.rngtech.content.item.PhaseCoilBlockItem;
 import com.rngtech.content.item.PotentialReactorBlockItem;
 import com.rngtech.content.item.PotentialReactorPartItem;
 import com.rngtech.content.item.PruningShearsItem;
@@ -110,6 +112,7 @@ import com.rngtech.rpg.MachineChassisType;
 import com.rngtech.rpg.MachinePartType;
 import com.rngtech.rpg.MachineType;
 import com.rngtech.rpg.ModifierLensTag;
+import com.rngtech.rpg.PhaseArrayRules;
 import com.rngtech.rpg.refinement.RefinementModifier;
 import com.rngtech.rpg.refinement.RefinementOperation;
 import com.rngtech.rpg.unique.UniqueCatalog;
@@ -164,6 +167,19 @@ public final class ModItems {
     public static final DeferredItem<BlockItem> EXOTIC_AFFIX_FORGE = ITEMS.register(
             "exotic_affix_forge",
             () -> new BlockItem(ModBlocks.EXOTIC_AFFIX_FORGE.get(), new Item.Properties().stacksTo(1))
+    );
+    public static final DeferredItem<MachineBlockItem> PHASE_EMITTER = ITEMS.register(
+            "phase_emitter",
+            () -> new MachineBlockItem(ModBlocks.PHASE_EMITTER.get(), MachineType.PHASE_EMITTER, new Item.Properties().stacksTo(1)) {
+                @Override
+                protected int componentStage() {
+                    return PhaseArrayRules.PART_STAGE;
+                }
+            }
+    );
+    public static final DeferredItem<PhaseCoilBlockItem> PHASE_COIL = ITEMS.register(
+            "phase_coil",
+            () -> new PhaseCoilBlockItem(ModBlocks.PHASE_COIL.get(), new Item.Properties().stacksTo(1))
     );
     public static final DeferredItem<BlockItem> DEBUG_REROLLER = ITEMS.register(
             "debug_reroller",
@@ -821,6 +837,10 @@ public final class ModItems {
     public static final DeferredItem<Item> EXOTIC_AFFIX_CATALYST = ITEMS.register(
             "exotic_affix_catalyst",
             () -> new Item(new Item.Properties())
+    );
+    public static final DeferredItem<GlyphItem> GLYPH = ITEMS.register(
+            "glyph",
+            () -> new GlyphItem(new Item.Properties())
     );
 
     public static final Map<String, DeferredItem<Item>> MATERIAL_ITEMS = registerMaterialItems();

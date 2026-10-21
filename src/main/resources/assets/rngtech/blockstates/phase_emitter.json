@@ -1,0 +1,64 @@
+{
+  "variants": {
+    "active=false,facing=north,formed=false": {
+      "model": "rngtech:block/phase_emitter"
+    },
+    "active=false,facing=east,formed=false": {
+      "model": "rngtech:block/phase_emitter",
+      "y": 90
+    },
+    "active=false,facing=south,formed=false": {
+      "model": "rngtech:block/phase_emitter",
+      "y": 180
+    },
+    "active=false,facing=west,formed=false": {
+      "model": "rngtech:block/phase_emitter",
+      "y": 270
+    },
+    "active=false,facing=north,formed=true": {
+      "model": "rngtech:block/phase_emitter_formed"
+    },
+    "active=false,facing=east,formed=true": {
+      "model": "rngtech:block/phase_emitter_formed",
+      "y": 90
+    },
+    "active=false,facing=south,formed=true": {
+      "model": "rngtech:block/phase_emitter_formed",
+      "y": 180
+    },
+    "active=false,facing=west,formed=true": {
+      "model": "rngtech:block/phase_emitter_formed",
+      "y": 270
+    },
+    "active=true,facing=north,formed=false": {
+      "model": "rngtech:block/phase_emitter"
+    },
+    "active=true,facing=east,formed=false": {
+      "model": "rngtech:block/phase_emitter",
+      "y": 90
+    },
+    "active=true,facing=south,formed=false": {
+      "model": "rngtech:block/phase_emitter",
+      "y": 180
+    },
+    "active=true,facing=west,formed=false": {
+      "model": "rngtech:block/phase_emitter",
+      "y": 270
+    },
+    "active=true,facing=north,formed=true": {
+      "model": "rngtech:block/phase_emitter_formed"
+    },
+    "active=true,facing=east,formed=true": {
+      "model": "rngtech:block/phase_emitter_formed",
+      "y": 90
+    },
+    "active=true,facing=south,formed=true": {
+      "model": "rngtech:block/phase_emitter_formed",
+      "y": 180
+    },
+    "active=true,facing=west,formed=true": {
+      "model": "rngtech:block/phase_emitter_formed",
+      "y": 270
+    }
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "parent": "minecraft:block/cube",
+  "textures": {
+    "particle": "rngtech:block/phase_array/emitter_side",
+    "north": "rngtech:block/phase_array/emitter_front",
+    "south": "rngtech:block/phase_array/emitter_front",
+    "east": "rngtech:block/phase_array/emitter_side",
+    "west": "rngtech:block/phase_array/emitter_side",
+    "up": "rngtech:block/phase_array/emitter_side",
+    "down": "rngtech:block/phase_array/emitter_side"
+  }
+}

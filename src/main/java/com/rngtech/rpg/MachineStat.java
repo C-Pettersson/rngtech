@@ -126,7 +126,18 @@ public enum MachineStat implements StringRepresentable {
     IDLE_CART_SPEED,
     BATCH_OVERHEAD,
     CYCLE_JAM_CHANCE,
-    ESCAPEMENT_SPEED;
+    ESCAPEMENT_SPEED,
+    CHARGE_CAPACITY,
+    CHARGE_RATE,
+    HOLD_CHANCE,
+    SECOND_HOLD,
+    OVERHOLD_CHANCE,
+    PARTIAL_WINDOW,
+    STRAIN_TOLERANCE,
+    FE_THRIFT,
+    FE_RECOVERY,
+    GLYPH_SALVAGE,
+    STRAIN_MERCY;
 
     public static final Codec<MachineStat> CODEC = Codec.STRING.comapFlatMap(
             name -> {

@@ -27,6 +27,8 @@ import com.rngtech.content.blockentity.FurnaceBlockEntity;
 import com.rngtech.content.blockentity.GasChemistryBlockEntity;
 import com.rngtech.content.blockentity.MelterBlockEntity;
 import com.rngtech.content.blockentity.MetalPressBlockEntity;
+import com.rngtech.content.blockentity.PhaseCoilBlockEntity;
+import com.rngtech.content.blockentity.PhaseEmitterBlockEntity;
 import com.rngtech.content.blockentity.PotentialReactorBlockEntity;
 import com.rngtech.content.blockentity.ResonanceCalibratorBlockEntity;
 import com.rngtech.content.blockentity.SilicaGelDehumidifierBlockEntity;
@@ -64,6 +66,16 @@ public final class ModBlockEntities {
             BLOCK_ENTITY_TYPES.register(
                     "exotic_affix_forge",
                     () -> BlockEntityType.Builder.of(ExoticAffixForgeBlockEntity::new, ModBlocks.EXOTIC_AFFIX_FORGE.get()).build(null)
+            );
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<PhaseEmitterBlockEntity>> PHASE_EMITTER =
+            BLOCK_ENTITY_TYPES.register(
+                    "phase_emitter",
+                    () -> BlockEntityType.Builder.of(PhaseEmitterBlockEntity::new, ModBlocks.PHASE_EMITTER.get()).build(null)
+            );
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<PhaseCoilBlockEntity>> PHASE_COIL =
+            BLOCK_ENTITY_TYPES.register(
+                    "phase_coil",
+                    () -> BlockEntityType.Builder.of(PhaseCoilBlockEntity::new, ModBlocks.PHASE_COIL.get()).build(null)
             );
 
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<DebugRerollerBlockEntity>> DEBUG_REROLLER =

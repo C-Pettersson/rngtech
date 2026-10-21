@@ -52,8 +52,16 @@ public class ExoticAffixForgeBlock extends Block implements EntityBlock {
     }
 
     @Override
+    protected void neighborChanged(BlockState state, Level level, BlockPos pos, Block block, BlockPos fromPos, boolean isMoving) {
+        if (!level.isClientSide && level.getBlockEntity(pos) instanceof ExoticAffixForgeBlockEntity cradle) {
+            cradle.requestLineRescan();
+        }
+    }
+
+    @Override
     protected void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean movedByPiston) {
         if (!state.is(newState.getBlock()) && level.getBlockEntity(pos) instanceof ExoticAffixForgeBlockEntity affixForge) {
+            affixForge.clearFormedMembers();
             affixForge.dropInventory(level);
         }
         super.onRemove(state, level, pos, newState, movedByPiston);

@@ -98,7 +98,7 @@ Key existing code:
 
 The Array is a straight line on one horizontal axis, 5 to 11 blocks long: the Emitter, then 3 to 9 Phase Coils, then the Cradle. The Cradle faces away from the line, so the item is reached from the end. Nothing is required above, below, or beside the line.
 
-Right-clicking the Cradle with a valid line behind it forms the Array, the same way the Wooden Dehumidifier forms. A line with fewer than three inscribed Coils forms but can fire nothing, and the Cradle screen says which positions are blank. Breaking any line block unforms it. The Emitter and Coils keep their rolled traits when mined.
+The Cradle forms the Array on its own, the same way the Wooden Dehumidifier forms its cube: it scans every horizontal side on a timer and whenever a member block is placed, changed, or broken, and lights the members while the line is complete. A line with fewer than three inscribed Coils forms but can fire nothing, and the Cradle screen says which positions are blank. Breaking any line block unforms it. The Emitter and Coils keep their rolled traits when mined.
 
 Draft base stats:
 

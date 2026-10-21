@@ -165,6 +165,24 @@ public final class ModDataComponents {
                             .cacheEncoding()
             );
 
+    /** The Glyph tier inscribed into a Phase Coil, 1 to 5. Absent means blank. */
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Integer>> COIL_TIER =
+            DATA_COMPONENTS.registerComponentType(
+                    "coil_tier",
+                    builder -> builder
+                            .persistent(Codec.intRange(1, 5))
+                            .networkSynchronized(ByteBufCodecs.VAR_INT)
+                            .cacheEncoding()
+            );
+    /** A Glyph's tier, 1 to 5. A plain stack with no tier reads as Tier I. */
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Integer>> GLYPH_TIER =
+            DATA_COMPONENTS.registerComponentType(
+                    "glyph_tier",
+                    builder -> builder
+                            .persistent(Codec.intRange(1, 5))
+                            .networkSynchronized(ByteBufCodecs.VAR_INT)
+                            .cacheEncoding()
+            );
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<Integer>> CAVITATION_ROTOR_WEAR =
             DATA_COMPONENTS.registerComponentType(
                     "cavitation_rotor_wear",

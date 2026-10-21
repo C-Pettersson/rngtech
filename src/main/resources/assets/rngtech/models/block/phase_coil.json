@@ -1,0 +1,12 @@
+{
+  "parent": "minecraft:block/cube",
+  "textures": {
+    "particle": "rngtech:block/phase_array/coil_side",
+    "north": "rngtech:block/phase_array/coil_side",
+    "south": "rngtech:block/phase_array/coil_side",
+    "east": "rngtech:block/phase_array/coil_end",
+    "west": "rngtech:block/phase_array/coil_end",
+    "up": "rngtech:block/phase_array/coil_side",
+    "down": "rngtech:block/phase_array/coil_side"
+  }
+}
