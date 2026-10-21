@@ -54,6 +54,8 @@ public class PhaseCradleMenu extends AbstractContainerMenu {
     public static final int BUTTON_CHARGE = 600;
     public static final int BUTTON_FIRE = 601;
     public static final int BUTTON_INSCRIBE_BASE = 700;
+    /** The Cradle's own slots come first in menu order: target, Glyph, donor, output, then the nine cell sockets. */
+    public static final int MACHINE_SLOTS = PhaseCradleBlockEntity.SLOT_COUNT + PhaseCradleBlockEntity.CELL_SLOTS;
 
     private static final int ITEM_SLOTS = PhaseCradleBlockEntity.SLOT_COUNT;
     private static final int CELL_SLOT_START = ITEM_SLOTS;

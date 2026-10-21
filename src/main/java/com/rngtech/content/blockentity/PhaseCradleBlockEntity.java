@@ -1279,7 +1279,7 @@ public class PhaseCradleBlockEntity extends BlockEntity implements MenuProvider,
                                 status == STATUS_NO_TARGET || status == STATUS_NO_GLYPH),
                         MachineInfoSnapshot.BlockedReason.NONE
                 )
-                .status(status == STATUS_NO_LINE ? missingKey() : statusKey(status), status == STATUS_NO_LINE ? missingArg() : new Object[0])
+                .status(status == STATUS_NO_LINE ? missingKey() : statusKey(status), status == STATUS_NO_LINE ? missingArg() : statusArgs(status, recipe))
                 .note("rngtech.phase_cradle.jade.operation", action.translationKey())
                 .energy(charge, cost(recipe), -demand)
                 .energyTelemetry(energyFlow.lastInput(), energyFlow.lastOutput(), connector.transferRate(),
@@ -1299,6 +1299,17 @@ public class PhaseCradleBlockEntity extends BlockEntity implements MenuProvider,
     private Object[] missingArg() {
         boolean emitterTooClose = line.coilCount() < PhaseArrayRules.MIN_COILS && line.emitter() != null;
         return new Object[] { emitterTooClose ? line.coilCount() : line.coilCount() + 1 };
+    }
+
+    /** The numbers a status line names, in the order its lang entry takes them. */
+    private Object[] statusArgs(int status, PhaseArrayRecipe recipe) {
+        return switch (status) {
+            case STATUS_NO_GLYPH -> new Object[] { GlyphItem.numeral(recipe == null ? 0 : recipe.glyphTier()) };
+            case STATUS_NO_COILS -> new Object[] { recipe == null ? 0 : recipe.coils(), line.usableCoils() };
+            case STATUS_NO_RP -> new Object[] { recipe == null ? 0 : recipe.refinementPotentialCost(),
+                    RefinementTargets.storedTraits(targetStack()).refinementPotential() };
+            default -> new Object[0];
+        };
     }
 
     public static String statusKey(int status) {

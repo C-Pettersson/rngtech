@@ -617,8 +617,10 @@ public class PhaseCradleScreen extends AbstractContainerScreen<PhaseCradleMenu> 
         int x = mouseX - leftPos;
         int y = mouseY - topPos;
         List<Component> lines = new ArrayList<>();
-        if (inside(x, y, STATUS_X, STATUS_Y, 26, 6)) {
-            lines.add(Component.translatable(PhaseCradleBlockEntity.statusKey(menu.status())));
+        if (hoveredSlot != null && !hoveredSlot.hasItem() && hoveredSlot.index < PhaseCradleMenu.MACHINE_SLOTS) {
+            emptySlotLines(lines, hoveredSlot.index);
+        } else if (inside(x, y, STATUS_X, STATUS_Y, 26, 6)) {
+            lines.add(statusText());
         } else if (inside(x, y, EMITTER_X, LINE_Y, 10, 10)) {
             lines.add(Component.translatable("rngtech.phase_cradle.screen.emitter"));
             lines.add(lineLine());
@@ -662,7 +664,7 @@ public class PhaseCradleScreen extends AbstractContainerScreen<PhaseCradleMenu> 
                 operationLines(lines, PhaseArrayAction.values()[index]);
             }
         } else if (inside(x, y, BUTTON_X, BUTTON_Y, BUTTON_WIDTH, BUTTON_HEIGHT)) {
-            lines.add(Component.translatable(PhaseCradleBlockEntity.statusKey(menu.status())));
+            lines.add(statusText());
             if (menu.status() == PhaseCradleBlockEntity.STATUS_READY || menu.status() == PhaseCradleBlockEntity.STATUS_CHARGING
                     || menu.status() == PhaseCradleBlockEntity.STATUS_IDLE) {
                 lines.add(oddsLine());
@@ -750,6 +752,38 @@ public class PhaseCradleScreen extends AbstractContainerScreen<PhaseCradleMenu> 
         }
         return Component.translatable("rngtech.phase_cradle.screen.coil.low", position, GlyphItem.numeral(floor)).withStyle(ChatFormatting.GOLD)
                 .append(" ").append(hint.copy().withStyle(ChatFormatting.GRAY));
+    }
+
+    /** What an empty Cradle slot takes: the four item slots in menu order, then the nine cell sockets. */
+    private void emptySlotLines(List<Component> lines, int index) {
+        String slot = switch (index) {
+            case PhaseCradleBlockEntity.SLOT_TARGET -> "target";
+            case PhaseCradleBlockEntity.SLOT_GLYPH -> "glyph";
+            case PhaseCradleBlockEntity.SLOT_DONOR -> "donor";
+            case PhaseCradleBlockEntity.SLOT_OUTPUT -> "output";
+            default -> "cell";
+        };
+        lines.add(Component.translatable("rngtech.phase_cradle.screen.slot." + slot));
+        lines.add(gray("rngtech.phase_cradle.screen.slot." + slot + ".detail"));
+        if (index == PhaseCradleBlockEntity.SLOT_TARGET) {
+            lines.add(strainLine());
+            lastPulseLines(lines);
+        } else if (index == PhaseCradleBlockEntity.SLOT_GLYPH && menu.glyphTier() > 0) {
+            lines.add(gray("rngtech.phase_cradle.screen.slot.glyph.needed", GlyphItem.numeral(menu.glyphTier())));
+        }
+    }
+
+    /** The status with its numbers: the Glyph tier, the Coils, or the RP the operation wants against what is there. */
+    private Component statusText() {
+        int status = menu.status();
+        String key = PhaseCradleBlockEntity.statusKey(status);
+        return switch (status) {
+            case PhaseCradleBlockEntity.STATUS_NO_GLYPH -> Component.translatable(key, GlyphItem.numeral(menu.glyphTier()));
+            case PhaseCradleBlockEntity.STATUS_NO_COILS -> Component.translatable(key, menu.requiredCoils(), menu.usableCoils());
+            case PhaseCradleBlockEntity.STATUS_NO_RP -> Component.translatable(key, menu.rpCost(),
+                    RefinementTargets.storedTraits(menu.targetStack()).refinementPotential());
+            default -> Component.translatable(key);
+        };
     }
 
     private static Component gray(String key, Object... args) {

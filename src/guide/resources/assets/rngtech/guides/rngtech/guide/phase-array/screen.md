@@ -18,4 +18,4 @@ The Cradle has one screen, read from the top down:
 - **The one button** under the list reads Charge, Stop, Fire, or Pulse, whichever the line is ready for.
 - **Three lights** at the top left show blocked, waiting for input, and live.
 
-Hover anything for its exact values. In the world, Jade on the Cradle names the chosen operation and, with no line, the first block it lacks. With JEI installed, the operations are listed under the Phase Array category.
+Hover anything for its exact values, and an empty slot for what goes in it. In the world, Jade on the Cradle names the chosen operation and, with no line, the first block it lacks. With JEI installed, the operations are listed under the Phase Array category.
