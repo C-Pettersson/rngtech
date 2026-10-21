@@ -45,7 +45,9 @@ public record MachineInfoSnapshot(
         int affixCount,
         boolean corrupted,
         String statusKey,
-        List<String> statusArgs
+        List<String> statusArgs,
+        String noteKey,
+        List<String> noteArgs
 ) {
     public static final int UNSET = -1;
 
@@ -93,6 +95,12 @@ public record MachineInfoSnapshot(
             statusArgs.forEach(arg -> args.add(StringTag.valueOf(arg)));
             tag.put("status_args", args);
         }
+        if (!noteKey.isEmpty()) {
+            tag.putString("note_key", noteKey);
+            ListTag args = new ListTag();
+            noteArgs.forEach(arg -> args.add(StringTag.valueOf(arg)));
+            tag.put("note_args", args);
+        }
         return tag;
     }
 
@@ -131,7 +139,9 @@ public record MachineInfoSnapshot(
                 tag.getInt("affix_count"),
                 tag.getBoolean("corrupted"),
                 tag.getString("status_key"),
-                tag.getList("status_args", Tag.TAG_STRING).stream().map(Tag::getAsString).toList()
+                tag.getList("status_args", Tag.TAG_STRING).stream().map(Tag::getAsString).toList(),
+                tag.getString("note_key"),
+                tag.getList("note_args", Tag.TAG_STRING).stream().map(Tag::getAsString).toList()
         );
     }
 
@@ -287,6 +297,8 @@ public record MachineInfoSnapshot(
         private boolean corrupted;
         private String statusKey = "";
         private List<String> statusArgs = List.of();
+        private String noteKey = "";
+        private List<String> noteArgs = List.of();
 
         private Builder(String family) {
             this.family = family;
@@ -416,6 +428,13 @@ public record MachineInfoSnapshot(
             return this;
         }
 
+        /** One extra line shown in every state; an argument that is a translation key is translated. */
+        public Builder note(String noteKey, Object... args) {
+            this.noteKey = noteKey == null ? "" : noteKey;
+            this.noteArgs = Arrays.stream(args).map(String::valueOf).toList();
+            return this;
+        }
+
         public MachineInfoSnapshot build() {
             return new MachineInfoSnapshot(
                     family,
@@ -451,7 +470,9 @@ public record MachineInfoSnapshot(
                     affixCount,
                     corrupted,
                     statusKey,
-                    statusArgs
+                    statusArgs,
+                    noteKey,
+                    noteArgs
             );
         }
     }

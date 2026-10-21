@@ -206,6 +206,9 @@ public final class RNGTechJeiPlugin implements IModPlugin {
                 ModItems.EXOTIC_AFFIX_FORGE.get(),
                 Component.translatable("rngtech.jei.phase_cradle.info")
         );
+        registration.addIngredientInfo(ModItems.PHASE_EMITTER.get(), Component.translatable("rngtech.jei.phase_emitter.info"));
+        registration.addIngredientInfo(ModItems.PHASE_COIL.get(), Component.translatable("rngtech.jei.phase_coil.info"));
+        registration.addIngredientInfo(ModItems.GLYPH.get(), Component.translatable("rngtech.jei.glyph.info"));
         for (UniqueDefinition unique : UniqueCatalog.all()) {
             registration.addItemStackInfo(List.of(uniqueStack(unique)), uniqueInfo(unique).toArray(Component[]::new));
         }

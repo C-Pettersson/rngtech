@@ -1170,12 +1170,26 @@ public class PhaseCradleBlockEntity extends BlockEntity implements MenuProvider,
                                 status == STATUS_NO_TARGET || status == STATUS_NO_GLYPH),
                         MachineInfoSnapshot.BlockedReason.NONE
                 )
-                .status(statusKey(status))
+                .status(status == STATUS_NO_LINE ? missingKey() : statusKey(status), status == STATUS_NO_LINE ? missingArg() : new Object[0])
+                .note("rngtech.phase_cradle.jade.operation", action.translationKey())
                 .energy(charge, cost(recipe), -demand)
                 .energyTelemetry(energyFlow.lastInput(), energyFlow.lastOutput(), connector.transferRate(),
                         AdjacentEnergyConnector.inputBottleneck(connector, demand))
                 .gear(anyCell ? MachineInfoSnapshot.GearSummary.BATTERY_CELL_INSTALLED : MachineInfoSnapshot.GearSummary.NONE)
                 .build();
+    }
+
+    /** Which block the longest row from the Cradle lacks: a Coil, an Emitter, or Coils before an Emitter that sits too close. */
+    private String missingKey() {
+        if (line.coilCount() < PhaseArrayRules.MIN_COILS) {
+            return line.emitter() == null ? "rngtech.phase_cradle.status.no_line.coil" : "rngtech.phase_cradle.status.no_line.short";
+        }
+        return "rngtech.phase_cradle.status.no_line.emitter";
+    }
+
+    private Object[] missingArg() {
+        boolean emitterTooClose = line.coilCount() < PhaseArrayRules.MIN_COILS && line.emitter() != null;
+        return new Object[] { emitterTooClose ? line.coilCount() : line.coilCount() + 1 };
     }
 
     public static String statusKey(int status) {
