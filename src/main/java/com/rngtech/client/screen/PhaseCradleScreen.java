@@ -70,6 +70,8 @@ public class PhaseCradleScreen extends AbstractContainerScreen<PhaseCradleMenu> 
     private static final int STATUS_Y = 18;
     private static final int RESULT_X = 76;
     private static final int RESULT_Y = 54;
+    /** The result line stops short of the donor, Glyph, and output slots; its hover carries the full text. */
+    private static final int RESULT_WIDTH = PhaseCradleMenu.DONOR_X - RESULT_X - 4;
     private static final int OPERATION_X = 76;
     private static final int OPERATION_Y = 70;
     private static final int OPERATION_SIZE = 12;
@@ -158,7 +160,7 @@ public class PhaseCradleScreen extends AbstractContainerScreen<PhaseCradleMenu> 
         }
         Component result = resultLine();
         if (result != null) {
-            drawClipped(graphics, result, RESULT_X, RESULT_Y, LIST_WIDTH, resultColor());
+            drawClipped(graphics, result, RESULT_X, RESULT_Y, RESULT_WIDTH, resultColor());
         }
         Component label = buttonLabel();
         int width = font.width(label);
@@ -652,6 +654,9 @@ public class PhaseCradleScreen extends AbstractContainerScreen<PhaseCradleMenu> 
                     CompactValueText.energyRate(menu.lastInput()),
                     CompactValueText.energyRate(menu.chargeRate())));
             lines.add(chargeTimeLine());
+        } else if (resultLine() != null && inside(x, y, RESULT_X, RESULT_Y - 1, RESULT_WIDTH, 10)) {
+            lines.add(resultLine().copy().withColor(resultColor()));
+            lastPulseLines(lines);
         } else if (inside(x, y, PhaseCradleMenu.TARGET_X - 4, PhaseCradleMenu.TARGET_Y - 4, 26, 26) && (hoveredSlot == null || !hoveredSlot.hasItem())) {
             lines.add(Component.translatable("rngtech.phase_cradle.screen.chamber"));
             lines.add(strainLine());
@@ -689,15 +694,30 @@ public class PhaseCradleScreen extends AbstractContainerScreen<PhaseCradleMenu> 
             return null;
         }
         Component name = Component.translatable(outcome.translationKey());
-        PhaseArrayRecipe recipe = recipeFor(action);
         return switch (outcome) {
-            case PARTIAL -> recipe == null ? name : Component.translatable("rngtech.phase_cradle.screen.result.effect", name,
-                    Component.translatable("rngtech.phase_array.partial." + recipe.partial().getSerializedName()));
-            case OVERHOLD -> recipe == null ? name : Component.translatable("rngtech.phase_cradle.screen.result.effect", name,
-                    Component.translatable("rngtech.phase_array.overhold." + recipe.overhold().getSerializedName()));
-            case SUCCESS -> Component.translatable("rngtech.phase_cradle.screen.result.effect", name, Component.translatable(action.translationKey()));
+            case SUCCESS, OVERHOLD, PARTIAL -> Component.translatable("rngtech.phase_cradle.screen.result.effect", name,
+                    Component.translatable(action.translationKey()));
             case MISS -> Component.translatable("rngtech.phase_cradle.screen.result.miss", name, menu.lastSlipped());
             case FRACTURE -> Component.translatable("rngtech.phase_cradle.screen.result.fracture", name);
+        };
+    }
+
+    /** What the last pulse did in full, for the hover: the operation's effect, or the weaker or bonus version it rolled. */
+    private Component resultDetail() {
+        PhasePulse.Outcome outcome = menu.lastOutcome();
+        PhaseArrayAction action = menu.lastAction();
+        if (outcome == null || action == null) {
+            return null;
+        }
+        PhaseArrayRecipe recipe = recipeFor(action);
+        return switch (outcome) {
+            case SUCCESS -> Component.translatable(action.translationKey() + ".description");
+            case OVERHOLD -> recipe == null ? null : Component.translatable("rngtech.phase_cradle.screen.result.detail.overhold",
+                    Component.translatable("rngtech.phase_array.overhold." + recipe.overhold().getSerializedName()));
+            case PARTIAL -> recipe == null ? null : Component.translatable("rngtech.phase_cradle.screen.result.detail.partial",
+                    Component.translatable("rngtech.phase_array.partial." + recipe.partial().getSerializedName()));
+            case MISS -> Component.translatable("rngtech.phase_cradle.screen.result.detail.miss");
+            case FRACTURE -> Component.translatable("rngtech.phase_cradle.screen.result.detail.fracture");
         };
     }
 
@@ -855,6 +875,10 @@ public class PhaseCradleScreen extends AbstractContainerScreen<PhaseCradleMenu> 
                 .withStyle(ChatFormatting.GRAY));
         if (menu.lastSlipped() > 0) {
             lines.add(Component.translatable("rngtech.phase_cradle.screen.last.slipped", menu.lastSlipped()).withStyle(ChatFormatting.GRAY));
+        }
+        Component detail = resultDetail();
+        if (detail != null) {
+            lines.add(detail.copy().withStyle(ChatFormatting.GRAY));
         }
     }
 

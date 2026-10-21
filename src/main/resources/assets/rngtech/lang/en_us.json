@@ -1,7 +1,11 @@
 {
   "rngtech.phase_cradle.screen.result.effect": "%s: %s",
-  "rngtech.phase_cradle.screen.result.miss": "%s: slipped at position %s, nothing changed",
-  "rngtech.phase_cradle.screen.result.fracture": "%s: one affix dropped a tier",
+  "rngtech.phase_cradle.screen.result.miss": "%s at position %s",
+  "rngtech.phase_cradle.screen.result.fracture": "%s: a tier lost",
+  "rngtech.phase_cradle.screen.result.detail.overhold": "With a bonus: %s.",
+  "rngtech.phase_cradle.screen.result.detail.partial": "A weaker result: %s.",
+  "rngtech.phase_cradle.screen.result.detail.miss": "The pulse slipped too early. Nothing changed; the FE and any Glyph were spent.",
+  "rngtech.phase_cradle.screen.result.detail.fracture": "One random affix dropped a tier; a Tier 1 affix is removed.",
   "rngtech.phase_cradle.screen.coil.lock": "Click to lock in a Tier %s Glyph from your inventory.",
   "rngtech.phase_cradle.screen.coil.lock_missing": "No Tier %s Glyph in your inventory.",
   "rngtech.command.glyph.given": "Gave a Tier %s Glyph to %s players",

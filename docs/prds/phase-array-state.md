@@ -52,6 +52,7 @@ Recorded 2026-10-21 from the code on `main` at `c7757d96` and the open branches:
 
 ## Progress log
 
+- 2026-10-21: the result line ran under the donor, Glyph, and output slots. It now stops short of them with a short form, and its hover, like the chamber's, carries the full outcome text.
 - 2026-10-21: every empty Cradle slot and cell socket explains what it takes on hover, and the blocked statuses name their numbers: the Glyph tier the operation wants, the Coils it needs against the usable count, and the RP it spends against the item's. The same numbers reach Jade.
 - 2026-10-21: a full Magic item showed Imprint and Graft with nothing to select, because rarity sets the slot count and nothing but Reforge changes it. The Cradle now reports a dedicated no-empty-slot status, the list carries a red hint row that says why and points at Reforge, and the wiki says the same under Operations.
 - 2026-10-21: Graft feedback and the guide. A Graft whose donor affix the target cannot take now reports a dedicated status, and the donor list dims each such affix with its reason: wrong slot type, not in the target's profile, or a group the target already carries; the legality rule itself is unchanged. The wiki page is rewritten as a manual, with a one-minute start, a positions table that names the operations each one opens, a worked cost table, a screen walkthrough, and tips; the in-game guide now keeps the operations table and opens with an interactive scene of a five-Coil line through a new guide-only prefix hook in `tools/rngwiki/guideme.py`.
