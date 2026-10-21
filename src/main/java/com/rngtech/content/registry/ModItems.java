@@ -834,10 +834,6 @@ public final class ModItems {
             "volatile_catalyst",
             () -> new RefinementConsumableItem(RefinementOperation.CORRUPT, new Item.Properties())
     );
-    public static final DeferredItem<Item> EXOTIC_AFFIX_CATALYST = ITEMS.register(
-            "exotic_affix_catalyst",
-            () -> new Item(new Item.Properties())
-    );
     public static final DeferredItem<GlyphItem> GLYPH = ITEMS.register(
             "glyph",
             () -> new GlyphItem(new Item.Properties())

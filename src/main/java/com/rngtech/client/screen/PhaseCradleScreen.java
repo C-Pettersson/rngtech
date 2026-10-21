@@ -531,6 +531,13 @@ public class PhaseCradleScreen extends AbstractContainerScreen<PhaseCradleMenu> 
                     return true;
                 }
             }
+            if (inside(x, y, NODE_X, LINE_Y, PhaseArrayRules.MAX_COILS * NODE_SPACING, NODE_SIZE + 2) && !menu.pulsing()) {
+                int position = (x - NODE_X) / NODE_SPACING + 1;
+                if (position <= menu.coilCount() && GlyphItem.isGlyph(menu.glyphStack())) {
+                    sendButton(PhaseCradleMenu.BUTTON_INSCRIBE_BASE + position - 1);
+                    return true;
+                }
+            }
             int row = hoveredRow((int) mouseX, (int) mouseY);
             if (row >= 0) {
                 Row hit = visibleRows().get(row);
@@ -639,10 +646,15 @@ public class PhaseCradleScreen extends AbstractContainerScreen<PhaseCradleMenu> 
         if (position <= menu.usableCoils()) {
             return Component.translatable("rngtech.phase_cradle.screen.coil", position, percent(menu.holdChance(position)));
         }
+        Component hint = GlyphItem.isGlyph(menu.glyphStack())
+                ? Component.translatable("rngtech.phase_cradle.screen.coil.inscribe", GlyphItem.numeral(GlyphItem.tier(menu.glyphStack())))
+                : Component.translatable("rngtech.phase_cradle.screen.coil.glyph_slot");
         if (position == menu.usableCoils() + 1) {
-            return Component.translatable("rngtech.phase_cradle.screen.coil.blank", position, GlyphItem.numeral(floor)).withStyle(ChatFormatting.GOLD);
+            return Component.translatable("rngtech.phase_cradle.screen.coil.blank", position, GlyphItem.numeral(floor)).withStyle(ChatFormatting.GOLD)
+                    .append(" ").append(hint.copy().withStyle(ChatFormatting.GRAY));
         }
-        return Component.translatable("rngtech.phase_cradle.screen.coil.low", position, GlyphItem.numeral(floor)).withStyle(ChatFormatting.GOLD);
+        return Component.translatable("rngtech.phase_cradle.screen.coil.low", position, GlyphItem.numeral(floor)).withStyle(ChatFormatting.GOLD)
+                .append(" ").append(hint.copy().withStyle(ChatFormatting.GRAY));
     }
 
     private Component strainLine() {

@@ -53,6 +53,7 @@ public class PhaseCradleMenu extends AbstractContainerMenu {
     public static final int BUTTON_DONOR_BASE = 500;
     public static final int BUTTON_CHARGE = 600;
     public static final int BUTTON_FIRE = 601;
+    public static final int BUTTON_INSCRIBE_BASE = 700;
 
     private static final int ITEM_SLOTS = PhaseCradleBlockEntity.SLOT_COUNT;
     private static final int CELL_SLOT_START = ITEM_SLOTS;
@@ -178,6 +179,8 @@ public class PhaseCradleMenu extends AbstractContainerMenu {
             cradle.toggleCharging();
         } else if (id == BUTTON_FIRE) {
             cradle.fire();
+        } else if (id >= BUTTON_INSCRIBE_BASE && id < BUTTON_INSCRIBE_BASE + PhaseArrayRules.MAX_COILS) {
+            cradle.inscribe(id - BUTTON_INSCRIBE_BASE + 1);
         } else {
             return false;
         }

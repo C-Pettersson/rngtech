@@ -313,7 +313,6 @@ public final class ModCreativeTabs {
                         output.accept(ModItems.STABILIZATION_CRYSTAL.get());
                         output.accept(ModItems.NULL_CRYSTAL.get());
                         output.accept(ModItems.VOLATILE_CATALYST.get());
-                        output.accept(ModItems.EXOTIC_AFFIX_CATALYST.get());
                         output.accept(ModItems.PHASE_EMITTER.get());
                         output.accept(ModItems.PHASE_COIL.get());
                         for (int tier = 1; tier <= PhaseArrayRules.GLYPH_TIERS; tier++) {

@@ -1,4 +1,6 @@
 {
+  "rngtech.phase_cradle.screen.coil.inscribe": "Click to inscribe the Tier %s Glyph in the Glyph slot.",
+  "rngtech.phase_cradle.screen.coil.glyph_slot": "Put a Glyph in the Glyph slot, then click here to inscribe it.",
   "rngtech.command.glyph.given": "Gave a Tier %s Glyph to %s players",
   "rngtech.phase_cradle.status.pulsing": "Pulse running",
   "rngtech.phase_cradle.screen.button.pulsing": "Pulse",
@@ -530,7 +532,6 @@
   "item.rngtech.stabilization_crystal": "Stabilization Crystal",
   "item.rngtech.null_crystal": "Null Crystal",
   "item.rngtech.volatile_catalyst": "Volatile Catalyst",
-  "item.rngtech.exotic_affix_catalyst": "Exotic Affix Catalyst",
   "item.rngtech.affix_lens_array": "Affix Lens Array",
   "item.rngtech.affix_modifier_socket": "Affix Modifier Socket",
   "item.rngtech.affix_resonance_matrix": "Affix Resonance Matrix",

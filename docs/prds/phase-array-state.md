@@ -14,8 +14,8 @@ Status: **Planned**. The PRD was accepted on 2026-10-21 with no release target. 
 - [x] Operations with instant outcomes: the `rngtech:phase_array` recipe type, the Cradle screen, charge, and every operation through the refinement library.
 - [x] The hold sequence: timed holds, sound, lights, and the stored outcome.
 - [x] Glyph sources: default challenge table entries, Dormant Machines, the `/rngtech glyph give` command, and the plain-stack rule.
-- [x] Removal of the Exotic Affix Forge operations, history, recipe type, menu, screen, JEI category, and config keys (done in phase 4, since the Cradle took over the block). Its wiki page, guide, and quest text wait for the documentation phase.
-- [ ] Balance-world setup `rngbalance:phase_array`.
+- [x] Removal of the Exotic Affix Forge operations, history, recipe type, menu, screen, JEI category, and config keys (phase 4), then its catalyst item, wiki page, guide pages, and quest text (phase 7).
+- [x] Balance-world setup `rngbalance:phase_array`.
 - [ ] Documentation: wiki page, Rarity and Affixes, Modpack Creators, the implementation matrix, the GuideME guide, Machine Design Notes, and quests.
 - [ ] In-game playtest of every operation and outcome.
 
@@ -53,6 +53,7 @@ Recorded 2026-10-21 from the code on `main` at `c7757d96` and the open branches:
 ## Progress log
 
 - 2026-10-21: drafted the PRD and this state page, and updated the Work Orders PRD to match. Accepted the same day.
+- 2026-10-21: phases 7 and 8. The Exotic Affix Catalyst item, recipe, model, texture, and lang key are gone, and the Stage 7-8 quests describe the Phase Array. `wiki/exotic-affix-forge.md` is replaced by `wiki/phase-array.md`, with every link repointed and the guide regenerated. Inscribing has its in-game surface: a Glyph in the Cradle's Glyph slot plus a click on a Coil's node. `rngbalance:phase_array` spawns a nine-Coil line with every position inscribed, a Debug Battery on the Cradle, charged cells in its sockets, and Debug Chests of Glyphs and parts.
 - 2026-10-21: phase 6. The six challenge tables carry their first default loot: conditioned Glyph pools per the PRD's table, with `heat_failure` empty. A woken Dormant Machine drops a Glyph by site through `GlyphSources`. `/rngtech glyph give <players> <tier>` exists. A plain `rngtech:glyph` stack already read as Tier I. `check-uniques.mjs` now requires every default challenge pool to drop only Glyphs behind a condition.
 - 2026-10-21: phase 5. `PhasePulseSequence` turns a rolled pulse into frames: Coils engage from the Emitter every 8 ticks with a chime that climbs the line, the slipped Coil flashes for 12 ticks with a slip sound, lit Coils unwind back toward the Emitter every 5 ticks, a full hold stays lit 16 ticks, and a Fracture shows 20 ticks with no Coil engaging. The Cradle rolls the outcome at Fire, locks its slots, lights the Coils and the Emitter through their `active` block state (new lit models), and applies the outcome when the frames end. The screen mirrors the frames. A pulse in flight survives a save: it applies on the first tick after load without replaying.
 - 2026-10-21: phase 4. `rngtech:phase_array` is a recipe type with one recipe per operation (`data/rngtech/recipe/phase_array/`), and the nine defaults carry the PRD's numbers. `PhaseCradleBlockEntity` replaces the Exotic Affix Forge's logic behind the same block id: it charges a pulse from supply and nine Battery Cell sockets at the line's Charge Rate, prices it with `PhaseArrayRules.pulseCost` and the line's Thrift, previews the odds with `PhasePulse.odds`, and fires through new `phase*` methods on `RefinementEngine` that spend no RP themselves. Strain lives in `rngtech:strain`. The old recipe type, action enum, history component, menu, screen, JEI category, and config multipliers are gone. `PhaseCradleScreen` is one panel in the Dormant Machine's style. The hold sequence is still instant; phase 5 adds the timed locks.
@@ -73,8 +74,7 @@ Recorded 2026-10-21 from the code on `main` at `c7757d96` and the open branches:
 - The PRD's numbers are the `prd` scenario of `tools/balance/phase-array-scenarios.json`. The model has no Second Hold, Strain Tolerance, or part affixes in play; they are zero at base and only exist once parts roll.
 - The parts' block models are plain textured cubes from `tools`-style generated pixel art, not shaped models. They need the shaped-model pass the other machines got.
 - The sequence uses vanilla sounds (amethyst chime, beacon deactivate, respawn anchor charge, glass break). Custom sounds, particles, and a hovering item are open for the art pass.
-- The screen is drawn but has not been opened in a client yet. Check the panel in the balance world once the setup exists.
-- `wiki/exotic-affix-forge.md` still describes the old forge. It is rewritten in the documentation phase.
+- The screen is drawn but has not been opened in a client yet. `rngbalance:phase_array` is the place to look at it.
 - Formation differs from the first PRD text: it is automatic, not a right-click, so it matches the Dehumidifier. The PRD now says so.
 - The model's players are simple: they always Resonate the lowest affix, and they stop at 25% Fracture. A player who Reforges a worn item, or Grafts between bodies, is not modelled.
 - The line is drafted horizontal only. A vertical line is an open question.

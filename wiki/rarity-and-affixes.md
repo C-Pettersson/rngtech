@@ -22,7 +22,7 @@ These items roll rarity, affixes, and RP when you craft them:
 | Modular tool parts | Tool Heads and Tool Rods for [Modular Tools](modular-tools.md) |
 | Companions | The Forestry Companion cart from the [Forestry Cart Station](forestry-cart-station.md), and the {{ item('rngtech:miners_companion') }} |
 
-A few blocks never roll traits: the [Affix Forge](affix-forge.md) and [Exotic Affix Forge](exotic-affix-forge.md), the Crude Component Recycler, the wooden and silica-gel machines such as the [Wooden Composter](wooden-composter.md), the [Algae Photobioreactor](algae-photobioreactor.md), and cables and connectors. Assembled modular tools carry no traits of their own. Their Tool Head and Tool Rod do.
+A few blocks never roll traits: the [Affix Forge](affix-forge.md) and the Phase Cradle of the [Phase Array](phase-array.md), the Crude Component Recycler, the wooden and silica-gel machines such as the [Wooden Composter](wooden-composter.md), the [Algae Photobioreactor](algae-photobioreactor.md), and cables and connectors. Assembled modular tools carry no traits of their own. Their Tool Head and Tool Rod do.
 
 ## Identification
 
@@ -193,7 +193,7 @@ A suffix that halves the failure strain a heat machine takes when its power drop
 
 ## Refinement Potential
 
-**Refinement Potential** (RP) is each item's budget for changing its affixes. Every successful refinement spends some. When RP runs out, the item is final, so spend it where it matters. The only way back is a Reforge in the [Exotic Affix Forge](exotic-affix-forge.md), which rerolls the whole item, RP included. A [Corrupted](#corruption) item keeps its RP but can never spend it, so its RP is hidden.
+**Refinement Potential** (RP) is each item's budget for changing its affixes. Every successful refinement spends some. When RP runs out, the item is final, so spend it where it matters. The only way back is a Reforge in the [Phase Array](phase-array.md), which rerolls the whole item, RP included. A [Corrupted](#corruption) item keeps its RP but can never spend it, so its RP is hidden.
 
 RP is rolled separately from rarity, and the starting affixes cost nothing. A Rare item keeps its full budget, just like a Normal one. Higher stages get bigger budgets:
 
@@ -232,7 +232,7 @@ Where to refine:
 - **Items** in the [Affix Forge](affix-forge.md). Its [catalyst table](affix-forge.md#catalysts) lists every operation and its RP cost.
 - **Placed machines** in the Refinement tab of the machine's own screen.
 - **Tool Heads and Tool Rods**, even inside an assembled tool, in the [Tool Bench](tool-bench.md) Refine tab.
-- **Late-game powered operations** in the [Exotic Affix Forge](exotic-affix-forge.md).
+- **Chosen operations** in the [Phase Array](phase-array.md), the endgame bench, which spends only a little RP per pulse.
 
 ## Corruption
 
@@ -252,7 +252,7 @@ On a Unique, Reforged rerolls every ranged stat line inside its range, and Bless
 
 A Warped affix uses one roll for all of its effects, so a drawback on a two-stat affix grows or shrinks with its benefit. Hold Left Alt to compare a Warped affix with its tier's normal range.
 
-A **Corrupted** item can never be refined again: the Affix Forge, Exotic Affix Forge, Tool Bench, Refinement tabs, and a second Volatile Catalyst all refuse it, and nothing is used. Corruption cannot be removed. Nothing is ever destroyed or loses rarity; the worst result is a Blighted implicit. A placed machine keeps its corruption when you break and place it again.
+A **Corrupted** item can never be refined again: the Affix Forge, Phase Array, Tool Bench, Refinement tabs, and a second Volatile Catalyst all refuse it, and nothing is used. Corruption cannot be removed. Nothing is ever destroyed or loses rarity; the worst result is a Blighted implicit. A placed machine keeps its corruption when you break and place it again.
 
 ### Corruption implicits
 

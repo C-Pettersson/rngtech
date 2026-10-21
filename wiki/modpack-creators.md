@@ -85,7 +85,6 @@ RNGTech has no global FE multiplier. To scale the whole mod, multiply generator 
 | Bio Generator fuels | Add the item to a `rngtech:bio_generator/*` tag. It gives that category's fixed FE, such as `potato_fuels` (120 FE). |
 | Surcharge on the hardest ores | `crusher.highHardnessEnergyMultiplier` (default 2.0). Heated recipes carry their own `heat` in heat units instead; a datapack recipe that still sets `energy` in FE loads with 0.6 heat per FE. |
 | Resonance Calibrator cost | `calibration.energyMultiplier` and `calibration.timeMultiplier`. |
-| Exotic Affix Forge cost | `exoticAffixForge.energyMultiplier` and `exoticAffixForge.timeMultiplier`. |
 | Solar in other dimensions | `solar.dimensions.overworld`, `nether`, `end`, `other`. The Overworld is the default. |
 
 You cannot change these without code: connector caps, Battery Cell sizes, Heat Core FE/t, Solar Panel FE/t, and Bio Generator FE per category.

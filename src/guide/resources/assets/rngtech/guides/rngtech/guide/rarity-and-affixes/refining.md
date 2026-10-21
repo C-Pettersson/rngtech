@@ -23,4 +23,4 @@ Where to refine:
 - **Items** in the [Affix Forge](rngtech:affix-forge.md). Its [catalyst table](rngtech:affix-forge/catalysts.md) lists every operation and its RP cost.
 - **Placed machines** in the Refinement tab of the machine's own screen.
 - **Tool Heads and Tool Rods**, even inside an assembled tool, in the [Tool Bench](rngtech:tool-bench.md) Refine tab.
-- **Late-game powered operations** in the [Exotic Affix Forge](rngtech:exotic-affix-forge.md).
+- **Chosen operations** in the [Phase Array](rngtech:phase-array.md), the endgame bench, which spends only a little RP per pulse.

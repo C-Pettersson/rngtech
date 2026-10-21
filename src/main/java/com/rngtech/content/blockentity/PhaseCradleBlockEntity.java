@@ -697,6 +697,40 @@ public class PhaseCradleBlockEntity extends BlockEntity implements MenuProvider,
         setChanged();
     }
 
+    /**
+     * Inscribes the Glyph in the Glyph slot into the Coil at {@code position} (1 next to the Emitter). The Glyph must
+     * meet the position's floor and beat the Coil's current tier. One Glyph is used up.
+     */
+    public boolean inscribe(int position) {
+        if (level == null || pulse != null || !line.complete()) {
+            return false;
+        }
+        List<BlockPos> coils = line.coilsFromEmitter();
+        if (position < 1 || position > coils.size()) {
+            return false;
+        }
+        ItemStack glyph = glyphStack();
+        if (!GlyphItem.isGlyph(glyph)) {
+            return false;
+        }
+        int tier = GlyphItem.tier(glyph);
+        if (tier < PhaseArrayRules.lowestGlyphTier(position)
+                || !(level.getBlockEntity(coils.get(position - 1)) instanceof PhaseCoilBlockEntity coil)
+                || !coil.inscribe(tier)) {
+            return false;
+        }
+        glyph.shrink(1);
+        level.playSound(null, worldPosition, SoundEvents.AMETHYST_BLOCK_RESONATE, SoundSource.BLOCKS, 0.8F, 1.0F + 0.1F * tier);
+        requestLineRescan();
+        setChanged();
+        return true;
+    }
+
+    /** Whether a click on {@code position} would inscribe, for the screen's hint. */
+    public static boolean canInscribe(int position, int currentTier, int glyphTier) {
+        return glyphTier >= PhaseArrayRules.lowestGlyphTier(position) && glyphTier > currentTier;
+    }
+
     /** Charge starts a pulse's fill; pressed again it stops, keeping what has arrived. */
     public void toggleCharging() {
         int status = status();

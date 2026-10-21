@@ -10,7 +10,7 @@ These pages describe proposed systems or requirements beyond the implemented fea
 - [Corruption requirements](prds/corruption.md): accepted 2.0 design for the Volatile Catalyst and the Corrupted state.
 - [Passive Tree Framework requirements](prds/passive-tree-framework.md): historical framework design; see the [shared Machine Mastery implementation](systems/machine-mastery.md).
 - [Work Orders requirements](prds/work-orders.md): draft endgame loop of rolled machine jobs that pay out through a challenge loot table.
-- [Phase Array requirements](prds/phase-array.md): draft crafting-bench multiblock whose operations are datapack recipes paid in FE, Strain, Glyphs, and a little Refinement Potential, replacing the Exotic Affix Forge.
+- [Phase Array requirements](prds/phase-array.md): draft crafting-bench multiblock whose operations are datapack recipes paid in FE, Strain, Glyphs, and a little Refinement Potential, which replaced the Exotic Affix Forge.
 - [Tree Farm Automation requirements](prds/tree-farm-automation.md): design record; consult [Tree Farm Automation](https://c-pettersson.github.io/rngtech/forestry-cart-station/) for current cart and station behavior.
 
 ## Planned Extensions to Shipped Machines
@@ -71,10 +71,6 @@ Future work on machines that already ship. Design intent for their current behav
 ### Fluid and Compressor Tanks
 
 - Portable tank contents. Breaking a tank drops the block, Gear, and Refinement inventory, but not stored loose or compressed fluid.
-
-### Exotic Affix Forge
-
-- Replacement by the [Phase Array](prds/phase-array.md), a crafting-bench multiblock. Until then it refines item stacks only.
 
 ### Modular Field Tools
 
