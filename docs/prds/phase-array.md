@@ -10,6 +10,8 @@ Release: Not scheduled
 
 Last updated: 2026-10-21
 
+Model: `./gradlew phaseArraySim`, described in `tools/balance/README.md`.
+
 ## Summary
 
 The Phase Array is the endgame refinement multiblock. It replaces the Exotic Affix Forge. A player builds a straight line: an Emitter, three to nine Phase Coils, and a Cradle holding the item. They pick an operation, the line charges FE, and they fire it. A pulse runs down the line, coil to coil. Each coil either holds the pulse or lets it slip. If the pulse reaches the Cradle, the operation happens. If it dies on the way, it does not.
@@ -140,15 +142,15 @@ Operations are recipes of type `rngtech:phase_array`. Each names its action, sel
 |---|---|---|---:|---|---:|---|---|
 | Reforge | Rerolls rarity, affixes, and RP as if newly crafted. Strain stays. | None | 3 | None | 0 | Rerolls affixes only | Rolls rarity twice, keeps the better |
 | Attune | Rerolls every affix's value within its tier. | None | 4 | None | 1 | Rerolls one random affix's value | Rolls each value twice, keeps the better |
-| Resonate | Raises the selected affix one tier, up to Tier 6. | One affix | 5 | None | 2 | Rerolls its value within its tier | Raises it two tiers |
+| Resonate | Raises the selected affix one tier, up to Tier 6. | One affix | 5 | None | 1 | Rerolls its value within its tier | Raises it two tiers |
 | Excise | Removes the selected affix. | One affix | 5 | None | 1 | Removes a random affix | Also removes one Strain |
-| Imprint | Adds the chosen affix to the chosen empty slot. The tier rolls with the item's normal weights. | One empty slot and one legal affix | 6 | II or higher | 3 | Adds a random affix of the chosen affix's family | Rolls the tier twice, keeps the higher |
-| Transmute | Swaps the selected affix for another legal affix in the same prefix or suffix slot, keeping its tier. | One affix | 7 | III or higher | 2 | Swaps it for a random affix of the same slot type | Keeps the roll's value quality too |
+| Imprint | Adds the chosen affix to the chosen empty slot. The tier rolls with the item's normal weights. | One empty slot and one legal affix | 6 | II or higher | 2 | Adds a random affix of the chosen affix's family | Rolls the tier twice, keeps the higher |
+| Transmute | Swaps the selected affix for another legal affix in the same prefix or suffix slot, keeping its tier. | One affix | 7 | III or higher | 1 | Swaps it for a random affix of the same slot type | Keeps the roll's value quality too |
 | Temper | Sets Strain to 0. | None | 7 | III or higher | 0 | Halves Strain, rounding down | None |
-| Exalt | Raises the selected Tier 6 affix to Tier 7. Exotic items only. | One Tier 6 affix | 8 | IV or higher | 4 | Rerolls its value within Tier 6 | None |
-| Graft | Moves the selected affix from a donor item onto the target's chosen empty slot, keeping tier and value. The donor is destroyed. | One donor affix and one empty slot | 9 | V | 3 | The affix arrives one tier lower | The donor survives, stripped of that affix |
+| Exalt | Raises the selected Tier 6 affix to Tier 7. Exotic items only. | One Tier 6 affix | 8 | IV or higher | 2 | Rerolls its value within Tier 6 | None |
+| Graft | Moves the selected affix from a donor item onto the target's chosen empty slot, keeping tier and value. The donor is destroyed. | One donor affix and one empty slot | 9 | V | 2 | The affix arrives one tier lower | The donor survives, stripped of that affix |
 
-RP is spent on Success, Overhold, and Partial, never on a Miss or a Fracture, like a failed catalyst at the Affix Forge. The costs are fixed, lower than the Affix Forge's rolled ranges for the same work, and the item needs the full cost to start. The Array is a bench, not a second RP budget.
+RP is spent on Success, Overhold, and Partial, never on a Miss or a Fracture, like a failed catalyst at the Affix Forge. The costs are fixed, lower than the Affix Forge's rolled ranges for the same work, and the item needs the full cost to start. The Array is a bench, not a second RP budget. The model set Resonate at 1 RP: at 2 RP, RP was the only limit a Rare item ever met, and Strain and FE never got to matter.
 
 Rules:
 
@@ -163,7 +165,7 @@ Rules:
 
 A pulse resolves in two steps, both shown in the preview:
 
-1. **Fracture check.** Before the pulse leaves the Emitter, the item fractures with a chance of 2% per point of Strain above the line's Strain Tolerance. A fractured pulse spends FE and the Glyph, and the sequence does not run. Strain still rises by one. At 0 Strain, or within Tolerance, this step cannot happen.
+1. **Fracture check.** Before the pulse leaves the Emitter, the item fractures with a chance of 1% per point of Strain above the line's Strain Tolerance. A fractured pulse spends FE and the Glyph, and the sequence does not run. Strain still rises by one. At 0 Strain, or within Tolerance, this step cannot happen.
 2. **Hold sequence.** The pulse crosses the Coils in position order, from 1 up to the last inscribed Coil. Each holds with its own Hold Chance, or slips. The first slip ends the sequence. With `R` the Coils the operation needs and `L` the Coils that held:
     - `L` equals the number of inscribed Coils: **Success**, and the Overhold roll runs if the line has more Coils than `R`.
     - `L` is at least `R`: **Success**, no Overhold.
@@ -172,7 +174,7 @@ A pulse resolves in two steps, both shown in the preview:
 
 Overhold rolls once per Coil beyond `R` that held, at 8% each. One Overhold is enough; extra Coils only add chances.
 
-Draft odds on a line of seven unmodified Coils, Resonate (`R` = 5), 0 Strain:
+Odds on a line of seven unmodified Coils, Resonate (`R` = 5), 0 Strain, from the model's closed form:
 
 | Outcome | Chance |
 |---|---:|
@@ -182,19 +184,19 @@ Draft odds on a line of seven unmodified Coils, Resonate (`R` = 5), 0 Strain:
 | Miss | 22% |
 | Fracture | 0% |
 
-At 10 Strain the same pulse fractures 20% of the time first. At 25 Strain it fractures half the time. Temper resets that, at a Glyph and a large FE cost, so the player decides between tempering and living with the risk.
+At 10 Strain the same pulse fractures 10% of the time first. At 25 Strain it fractures a quarter of the time, and a player who reads the preview stops there: the model's players all do. Temper resets that, at a Glyph and a large FE cost, so the player decides between tempering and living with the risk. The model started Fracture at 2% per point; that made a fresh Rare item unworkable after 13 pulses and cost five Glyphs of Temper to reach the same place one Glyph reaches at 1%.
 
-Every number here is a draft. Hold Chance, the Strain rate, the Overhold rate, and the Partial window get tuned in a seeded simulation before the operations are coded, with a target of about two pulses in three doing something on a fresh item.
+Nine Coils against seven buy Overhold, not Success: 13% against 9% on Resonate. Hold Chance 92% is kept. At 95% the ladder barely moves, and at 88% a Rare item fractures twice as often before it is done.
 
 ## Costs
 
 FE is the main cost. It grows with the item, not with the item's history, so a bad item is cheap to fix and a near-perfect item is expensive to polish:
 
 ```text
-FE = base(operation) x stage(item) x 1.5 ^ (Quality / 4)
+FE = base(operation) x stage(item) x 1.5 ^ (Quality / 3.5)
 ```
 
-Draft `base` values are 1 MFE for Attune and Excise, 2 MFE for Resonate, Reforge, and Imprint, 4 MFE for Transmute and Temper, and 8 MFE for Exalt and Graft. `stage` scales the price to the item, so a lower-stage item is cheap to work on and the Array is worth building before Stage 8:
+`base` is 1 MFE for Attune and Excise, 2 MFE for Resonate, Reforge, and Imprint, 4 MFE for Transmute, Temper, and Exalt, and 8 MFE for Graft. `stage` scales the price to the item, so a lower-stage item is cheap to work on and the Array is worth building before Stage 8:
 
 | Item stage | `stage` factor |
 |---:|---:|
@@ -204,22 +206,37 @@ Draft `base` values are 1 MFE for Attune and Excise, 2 MFE for Resonate, Reforge
 | 7 | 1 |
 | 8 | 1.5 |
 
-Targets expressed as charge time on a reference Stage 8 power setup of about 20 kFE/t:
+Charge time for one Resonate on a Stage 8 item at a reference supply of 20 kFE/t, from the model:
 
-| Item | Quality | Resonate charge time |
-|---|---:|---|
-| Fresh Rare Exotic part | 12 | About 20 seconds |
-| Mid-refined, all Tier 4 | 24 | About 1.5 minutes |
-| Six Tier 6 affixes | 36 | About 10 minutes |
-| Six Tier 7 affixes | 42 | About 35 minutes |
+| Item | Quality | FE | Resonate charge time |
+|---|---:|---:|---|
+| Fresh Rare Exotic part | 12 | 12 MFE | 30 seconds |
+| Mid-refined, all Tier 4 | 24 | 48 MFE | 2 minutes |
+| Six Tier 6 affixes | 36 | 194 MFE | 8 minutes |
+| Six Tier 7 affixes | 42 | 389 MFE | 16 minutes |
 
-The last pulses on an item cost two orders of magnitude more than the first. A player with a long line and a bank of Battery Chassis can still finish a perfect item; they pay for it with everything they stored.
+A Stage 5 item costs a third of that at the same Quality, and a Stage 2 item a fifteenth. The last pulses on an item cost thirty times the first. A player with a long line and a bank of Battery Chassis can still finish a perfect item; they pay for it with everything they stored.
 
 Strain adds 1 per pulse, on every outcome. Nothing but Temper and Excise's Overhold removes it. A Reforge keeps it, so a reforged item is a fresh roll on a worn body.
 
 Glyphs are consumed per pulse by Imprint, Transmute, Temper, Exalt, and Graft. The tier is a floor: a Tier V Glyph pays for an Imprint. The Glyph is spent whatever the outcome.
 
-RP is the ceiling. A fresh Stage 5 part with 18 RP can take about nine Resonates in the Array, against three to six at the Affix Forge. The Array does not replace the Affix Forge for early play: the Emitter and Coils are Stage 8 parts, and Glyphs come from Tier I Work Orders at the earliest. It replaces the question of what to do with a good item once catalysts stop being the limit.
+RP is the ceiling. A fresh Stage 5 part with 18 RP can take eighteen Resonates in the Array, against three to six at the Affix Forge. The Array does not replace the Affix Forge for early play: the Emitter and Coils are Stage 8 parts, and Glyphs come from Stage 6 calibrations and Mastery milestones at the earliest. It replaces the question of what to do with a good item once catalysts stop being the limit.
+
+### What the model shows
+
+`./gradlew phaseArraySim` plays these numbers out with players who read the preview and stop firing at 25% Fracture. On a seven-Coil line at 20 kFE/t, medians over 2,000 trials:
+
+| Player | Item | Pulses | Time | Ends at | Stopped by |
+|---|---|---:|---:|---|---|
+| Resonate the lowest affix, never Temper | Fresh Rare Stage 8 | 25 | 30 min | Quality 25 of 36, 10 RP left | Strain |
+| The same, Tempering at 10% Fracture | Fresh Rare Stage 8 | 39 | 100 min, 5 Glyphs | Quality 34; half reach all Tier 6 | RP |
+| Resonate the lowest affix | Fresh Magic Stage 8 | 12 | 4 min | Both affixes Tier 6 | Done |
+| Resonate the lowest affix | Fresh Rare Stage 5 | 25 | 8 min | Quality 24; 40% run out of RP first | Strain |
+| Exalt six Tier 6 affixes to Tier 7, nine Coils | All-Tier-6 Rare Stage 8 | 12 | 4.5 h, 12 Glyphs | 94% reach six Tier 7 | Done |
+| Reforge until Rare with Quality 12 or more | Any Stage 8 | 1 to 25 | Under 5 min | 83% get one before Strain stops them | Done |
+
+The three limits bind in the order the PRD wants. Strain is the first wall and Glyphs buy the way past it, RP ends the Resonate stretch around all Tier 6, and FE is what a perfect item costs: a Tier 7 pulse at the end is 16 to 30 minutes of the reference supply. A Reforge is cheap on a bad item and useless on a good one, since a Rare with Quality 12 is 10% of rolls and the item's Strain runs out before the player's luck does.
 
 ## Glyphs and Work Orders
 
@@ -323,7 +340,8 @@ Domain checks (`masteryCheck`):
 - RP is spent on Success, Overhold, and Partial only.
 - A datapack can override a default operation with a changed cost, and an empty recipe removes it.
 - The outcome ladder over a seeded sample matches the preview's odds within tolerance.
-- The Fracture check is 0% at 0 Strain and 2% per point after.
+- The Fracture check is 0% at 0 Strain and 1% per point after.
+- The outcome ladder the Cradle previews matches `PhaseArraySimulation`'s closed form for every operation and line size.
 - FE by Quality matches the formula for every operation and stage.
 - No Emitter or Coil affix touches yield, RP, or stage acceptance.
 - Every Phase Array profile has at least six prefixes and six suffixes, and every affix in it is read by the Cradle.

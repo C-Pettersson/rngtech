@@ -445,6 +445,19 @@ tasks.register('processingBalanceSim', JavaExec) {
     doFirst { workingDir.mkdirs() }
 }
 
+tasks.register('phaseArraySim', JavaExec) {
+    group = 'balance'
+    description = 'Models the Phase Array PRD: the hold sequence, Strain, FE by Quality and the RP ceiling per scenario.'
+    dependsOn tasks.named('masteryTestClasses')
+    classpath = sourceSets.masteryTest.runtimeClasspath
+    mainClass = 'com.rngtech.rpg.PhaseArraySimulation'
+    javaLauncher = javaToolchains.launcherFor { languageVersion = JavaLanguageVersion.of(21) }
+    def output = layout.buildDirectory.file('phase-array/phase-array.json').get().asFile
+    args layout.projectDirectory.asFile.path, output.path
+    workingDir = layout.buildDirectory.dir('phase-array').get().asFile
+    doFirst { workingDir.mkdirs() }
+}
+
 // The tick benchmark is only compiled by the checks, so it cannot rot; running it takes minutes.
 tasks.named('quickCheck') { dependsOn 'masteryCheck', 'benchmarkClasses' }
 tasks.named('check') { dependsOn 'masteryCheck', 'benchmarkClasses' }
