@@ -291,10 +291,31 @@ public class PhaseCradleMenu extends AbstractContainerMenu {
 
     /** A Coil's Hold Chance as a fraction, position 1 next to the Emitter. */
     public double holdChance(int position) {
+        return perCoil(PhaseCradleBlockEntity.DATA_HOLD_BASE, position);
+    }
+
+    public double secondHold(int position) {
+        return perCoil(PhaseCradleBlockEntity.DATA_SECOND_BASE, position);
+    }
+
+    public double overholdChance(int position) {
+        return perCoil(PhaseCradleBlockEntity.DATA_OVERHOLD_BASE, position);
+    }
+
+    private double perCoil(int base, int position) {
         if (position < 1 || position > PhaseArrayRules.MAX_COILS) {
             return 0;
         }
-        return fraction(PhaseCradleBlockEntity.DATA_HOLD_BASE + position - 1);
+        return fraction(base + position - 1);
+    }
+
+    public long chargeCapacity() {
+        return composeLong(PhaseCradleBlockEntity.DATA_CAPACITY_LOW, PhaseCradleBlockEntity.DATA_CAPACITY_HIGH);
+    }
+
+    /** The Cradle this menu opened on; on the client, its client-side block entity, or {@code null} if unloaded. */
+    public PhaseCradleBlockEntity cradle() {
+        return cradle;
     }
 
     private double fraction(int index) {

@@ -14,7 +14,9 @@ import com.rngtech.rpg.MachineTraits;
 import com.rngtech.rpg.ModifierOperation;
 import com.rngtech.rpg.ModifierSet;
 import com.rngtech.rpg.ModifierSlot;
+import com.rngtech.rpg.PhaseArrayRules;
 import com.rngtech.rpg.Rarity;
+import com.rngtech.rpg.refinement.PhaseStrain;
 import com.rngtech.rpg.unique.UniqueHost;
 import com.rngtech.rpg.unique.UniqueStatReaders;
 
@@ -114,6 +116,23 @@ final class MachineTraitTooltip {
         }
         appendTraitDetails(traits, tooltipComponents);
         appendTraitKeyHints(tooltipComponents);
+    }
+
+    /** The header plus the item's Strain, when it carries any. */
+    static boolean appendTraitHeader(ItemStack stack, MachineTraits traits, List<Component> tooltipComponents, boolean showRarity) {
+        boolean shown = appendTraitHeader(traits, tooltipComponents, showRarity);
+        appendStrain(stack, tooltipComponents);
+        return shown;
+    }
+
+    /** Strain with the Fracture chance it adds past a line's Tolerance; nothing at 0. */
+    static void appendStrain(ItemStack stack, List<Component> tooltipComponents) {
+        int strain = PhaseStrain.get(stack);
+        if (strain <= 0) {
+            return;
+        }
+        long fracture = Math.round(strain * PhaseArrayRules.FRACTURE_PER_STRAIN * 100.0);
+        tooltipComponents.add(Component.translatable("rngtech.tooltip.strain", strain, fracture).withStyle(ChatFormatting.GOLD));
     }
 
     static boolean appendTraitHeader(MachineTraits traits, List<Component> tooltipComponents, boolean showRarity) {

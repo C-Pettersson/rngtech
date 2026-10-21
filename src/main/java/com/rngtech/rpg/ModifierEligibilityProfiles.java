@@ -1459,7 +1459,7 @@ public final class ModifierEligibilityProfiles {
     );
     private static final ModifierDefinition PHASE_PRIMED = ModifierDefinition.rollable(
             "phase_primed", "primed_charge_rate", ModifierSlot.PREFIX,
-            MachineStat.CHARGE_RATE, ModifierOperation.INCREASED_PERCENT, RUNTIME_PERCENT_RANGES
+            MachineStat.PRIMED_CHARGE_RATE, ModifierOperation.ADD, RUNTIME_PERCENT_RANGES
     ).withRollWeight(60);
     private static final ModifierDefinition PHASE_STEADY = ModifierDefinition.rollable(
             "phase_steady", "hold_chance", ModifierSlot.PREFIX,

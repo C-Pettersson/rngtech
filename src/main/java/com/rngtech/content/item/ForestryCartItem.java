@@ -150,7 +150,7 @@ public class ForestryCartItem extends Item {
         MachineTraitTooltip.appendUnidentified(stack, tooltipComponents);
         MachineTraits traits = traits(stack);
         if (stack.has(ModDataComponents.MACHINE_TRAITS.get()) || RecyclingData.isStripped(stack)) {
-            MachineTraitTooltip.appendTraitHeader(traits, tooltipComponents, true);
+            MachineTraitTooltip.appendTraitHeader(stack, traits, tooltipComponents, true);
         } else {
             MachineTraitTooltip.appendUnrolledTraitHeader(
                     MachineTraitRoller.refinementPotentialRange(

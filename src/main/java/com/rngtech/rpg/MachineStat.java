@@ -137,7 +137,8 @@ public enum MachineStat implements StringRepresentable {
     FE_THRIFT,
     FE_RECOVERY,
     GLYPH_SALVAGE,
-    STRAIN_MERCY;
+    STRAIN_MERCY,
+    PRIMED_CHARGE_RATE;
 
     public static final Codec<MachineStat> CODEC = Codec.STRING.comapFlatMap(
             name -> {

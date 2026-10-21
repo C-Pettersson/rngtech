@@ -8,11 +8,12 @@ navigation:
 
 # Line stats
 
-The Emitter and Coils roll their own affixes, and the line reads them. Hover a Coil's node for its numbers.
+The Emitter and Coils roll their own affixes, and the line reads them. Hover a Coil's node for its Hold Chance, Second Hold, Overhold Chance, and affixes, and the Emitter's for the line's totals and its affixes.
 
 | Stat | From | What it does |
 |---|---|---|
 | Charge Capacity, Charge Rate | Every part, summed | How much FE the line holds and how fast it takes it |
+| Primed Charge Rate | Emitter | Extra Charge Rate, paid only while a Battery Cell sits in the Cradle's sockets |
 | Hold Chance, Second Hold | Each Coil | Whether that Coil holds the pulse, and whether a slip there is rolled again |
 | Overhold Chance | Each Coil, plus the Emitter | The chance a surplus hold triggers Overhold |
 | Partial Window | The Emitter | How many Coils short of `R` still count as Partial |

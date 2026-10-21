@@ -70,7 +70,7 @@ public final class MachineStatDisplay {
             case ENERGY_TRANSFER, FE_TRANSFER -> formatNumber(value) + " FE/t";
             case CHARGE_CAPACITY -> formatNumber(value) + " FE";
             case CHARGE_RATE -> formatNumber(value) + " FE/t";
-            case HOLD_CHANCE, SECOND_HOLD, OVERHOLD_CHANCE, FE_THRIFT, FE_RECOVERY, GLYPH_SALVAGE, STRAIN_MERCY ->
+            case HOLD_CHANCE, SECOND_HOLD, OVERHOLD_CHANCE, FE_THRIFT, FE_RECOVERY, GLYPH_SALVAGE, STRAIN_MERCY, PRIMED_CHARGE_RATE ->
                     formatNumber(value) + "%";
             case PARTIAL_WINDOW -> formatUnit(value, "Coil", "Coils");
             case STRAIN_TOLERANCE -> formatNumber(value) + " Strain";
@@ -213,7 +213,7 @@ public final class MachineStatDisplay {
             case ENERGY_TRANSFER, FE_TRANSFER -> formatSignedNumber(value) + " FE/t";
             case CHARGE_CAPACITY -> formatSignedNumber(value) + " FE";
             case CHARGE_RATE -> formatSignedNumber(value) + " FE/t";
-            case HOLD_CHANCE, SECOND_HOLD, OVERHOLD_CHANCE, FE_THRIFT, FE_RECOVERY, GLYPH_SALVAGE, STRAIN_MERCY ->
+            case HOLD_CHANCE, SECOND_HOLD, OVERHOLD_CHANCE, FE_THRIFT, FE_RECOVERY, GLYPH_SALVAGE, STRAIN_MERCY, PRIMED_CHARGE_RATE ->
                     formatSignedPercentPoints(value);
             case PARTIAL_WINDOW -> formatSignedUnit(value, "Coil", "Coils");
             case STRAIN_TOLERANCE -> formatSignedUnit(value, "Strain", "Strain");

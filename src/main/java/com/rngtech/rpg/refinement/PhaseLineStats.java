@@ -10,11 +10,13 @@ import java.util.List;
 /**
  * What a formed Phase Array line reads from its parts, in line order with position 1 next to the Emitter. Sums are the
  * PRD's: charge, Tolerance, Thrift, Recovery, Salvage, and Mercy add up over every part; Hold, Second Hold, and Overhold
- * are per Coil, with the Emitter's Overhold added to each Coil; the Partial Window is the Emitter's.
+ * are per Coil, with the Emitter's Overhold added to each Coil; the Partial Window is the Emitter's. Primed Charge
+ * Rate is the Emitter's percent on top of the rate, paid only while Battery Cells sit in the Cradle's sockets.
  */
 public record PhaseLineStats(
         long chargeCapacity,
         int chargeRate,
+        double primedChargeRate,
         List<Double> holdChance,
         List<Double> secondHold,
         List<Double> overholdChance,
@@ -31,7 +33,7 @@ public record PhaseLineStats(
     private static final double THRIFT_CAP = 50.0;
 
     public static PhaseLineStats empty() {
-        return new PhaseLineStats(0L, 0, List.of(), List.of(), List.of(), PhaseArrayRules.BASE_PARTIAL_WINDOW, 0, 0, 0, 0, 0, 0);
+        return new PhaseLineStats(0L, 0, 0, List.of(), List.of(), List.of(), PhaseArrayRules.BASE_PARTIAL_WINDOW, 0, 0, 0, 0, 0, 0);
     }
 
     /** {@code coilsFromEmitter} holds each Coil's effective stats, position 1 first. */
@@ -62,6 +64,7 @@ public record PhaseLineStats(
         return new PhaseLineStats(
                 capacity,
                 (int) Math.round(rate),
+                Math.max(0.0, emitter.value(MachineStat.PRIMED_CHARGE_RATE)),
                 List.copyOf(hold),
                 List.copyOf(second),
                 List.copyOf(overhold),
@@ -77,6 +80,11 @@ public record PhaseLineStats(
 
     public int coilCount() {
         return holdChance.size();
+    }
+
+    /** The rate the line charges at: the sum of its parts, plus the Emitter's Primed percent while cells are socketed. */
+    public int chargeRate(boolean cellsSocketed) {
+        return cellsSocketed ? (int) Math.round(chargeRate * (1.0 + primedChargeRate / 100.0)) : chargeRate;
     }
 
     /** The chance one Coil holds, counting its Second Hold reroll on a slip, as a fraction. */

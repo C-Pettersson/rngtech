@@ -116,7 +116,7 @@ public final class PhaseArrayChecks {
             coilStats.add(MachineBaseStatCatalog.phaseCoil());
         }
         PhaseLineStats base = PhaseLineStats.of(MachineBaseStatCatalog.phaseEmitter(), coilStats, coils);
-        return new PhaseLineStats(base.chargeCapacity(), base.chargeRate(), base.holdChance(), base.secondHold(),
+        return new PhaseLineStats(base.chargeCapacity(), base.chargeRate(), base.primedChargeRate(), base.holdChance(), base.secondHold(),
                 base.overholdChance(), base.partialWindow(), tolerance, base.feThrift(), base.feRecovery(),
                 base.glyphSalvage(), base.strainMercy(), coils);
     }

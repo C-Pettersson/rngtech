@@ -55,7 +55,7 @@ public class ToolRodItem extends Item {
         MachineTraitTooltip.appendUnidentified(stack, tooltipComponents);
         MachineTraits traits = traits(stack);
         if (stack.has(ModDataComponents.MACHINE_TRAITS.get())) {
-            MachineTraitTooltip.appendTraitHeader(traits, tooltipComponents, true);
+            MachineTraitTooltip.appendTraitHeader(stack, traits, tooltipComponents, true);
         } else {
             MachineTraitTooltip.appendUnrolledTraitHeader(
                     MachineTraitRoller.refinementPotentialRange(ModifierEligibilityProfiles.forMachine(MachineType.TOOL_ROD), material.stage()),

@@ -123,8 +123,13 @@ public class PhaseCradleBlockEntity extends BlockEntity implements MenuProvider,
     public static final int DATA_PULSE_LIT = 30;
     public static final int DATA_PULSE_FLASHING = 31;
     public static final int DATA_LAST_ACTION = 32;
-    public static final int DATA_HOLD_BASE = 33;
-    public static final int DATA_COUNT = DATA_HOLD_BASE + PhaseArrayRules.MAX_COILS;
+    public static final int DATA_CAPACITY_LOW = 33;
+    public static final int DATA_CAPACITY_HIGH = 34;
+    /** Three runs of {@link PhaseArrayRules#MAX_COILS}: each Coil's Hold Chance, Second Hold, and Overhold Chance. */
+    public static final int DATA_HOLD_BASE = 35;
+    public static final int DATA_SECOND_BASE = DATA_HOLD_BASE + PhaseArrayRules.MAX_COILS;
+    public static final int DATA_OVERHOLD_BASE = DATA_SECOND_BASE + PhaseArrayRules.MAX_COILS;
+    public static final int DATA_COUNT = DATA_OVERHOLD_BASE + PhaseArrayRules.MAX_COILS;
     /** Odds and hold chances cross the menu as thousandths. */
     public static final int ODDS_SCALE = 1000;
 
@@ -190,10 +195,14 @@ public class PhaseCradleBlockEntity extends BlockEntity implements MenuProvider,
         public int get(int index) {
             PhaseArrayRecipe recipe = recipe();
             if (index >= DATA_HOLD_BASE) {
-                int position = index - DATA_HOLD_BASE + 1;
-                return position <= lineStats.coilCount()
-                        ? (int) Math.round(lineStats.holdChance().get(position - 1) * ODDS_SCALE / 100.0)
-                        : 0;
+                int position = (index - DATA_HOLD_BASE) % PhaseArrayRules.MAX_COILS + 1;
+                if (position > lineStats.coilCount()) {
+                    return 0;
+                }
+                List<Double> run = index >= DATA_OVERHOLD_BASE ? lineStats.overholdChance()
+                        : index >= DATA_SECOND_BASE ? lineStats.secondHold()
+                        : lineStats.holdChance();
+                return (int) Math.round(run.get(position - 1) * ODDS_SCALE / 100.0);
             }
             return switch (index) {
                 case DATA_STATUS -> status(recipe);
@@ -208,7 +217,9 @@ public class PhaseCradleBlockEntity extends BlockEntity implements MenuProvider,
                 case DATA_CHARGE_HIGH -> (int) (charge >>> 32);
                 case DATA_COST_LOW -> (int) cost(recipe);
                 case DATA_COST_HIGH -> (int) (cost(recipe) >>> 32);
-                case DATA_CHARGE_RATE -> lineStats.chargeRate();
+                case DATA_CHARGE_RATE -> chargeRate();
+                case DATA_CAPACITY_LOW -> (int) lineStats.chargeCapacity();
+                case DATA_CAPACITY_HIGH -> (int) (lineStats.chargeCapacity() >>> 32);
                 case DATA_LAST_INPUT -> energyFlow.lastInput();
                 case DATA_LAST_OUTCOME -> lastOutcome == null ? NO_OUTCOME : lastOutcome.ordinal();
                 case DATA_LAST_HELD -> lastHeld;
@@ -586,7 +597,7 @@ public class PhaseCradleBlockEntity extends BlockEntity implements MenuProvider,
             return 0;
         }
         long toCost = cost(recipe()) - charge;
-        long rate = lineStats.chargeRate() - inputThisTick;
+        long rate = chargeRate() - inputThisTick;
         return (int) Math.max(0L, Math.min(Integer.MAX_VALUE, Math.min(toCost, rate)));
     }
 
@@ -613,6 +624,20 @@ public class PhaseCradleBlockEntity extends BlockEntity implements MenuProvider,
 
     public long charge() {
         return charge;
+    }
+
+    /** The line's Charge Rate as it stands, with the Emitter's Primed bonus while a cell is socketed. */
+    private int chargeRate() {
+        return lineStats.chargeRate(anyCellSocketed());
+    }
+
+    private boolean anyCellSocketed() {
+        for (int slot = 0; slot < CELL_SLOTS; slot++) {
+            if (BatteryCellItem.isBatteryCell(cells.getStackInSlot(slot))) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public boolean isCharging() {
@@ -1136,11 +1161,8 @@ public class PhaseCradleBlockEntity extends BlockEntity implements MenuProvider,
         PhaseArrayRecipe recipe = recipe();
         int status = status(recipe);
         AdjacentEnergyConnector.Info connector = AdjacentEnergyConnector.forSink(level, worldPosition);
-        int demand = status == STATUS_CHARGING ? lineStats.chargeRate() : 0;
-        boolean anyCell = false;
-        for (int slot = 0; slot < CELL_SLOTS; slot++) {
-            anyCell |= BatteryCellItem.isBatteryCell(cells.getStackInSlot(slot));
-        }
+        int demand = status == STATUS_CHARGING ? chargeRate() : 0;
+        boolean anyCell = anyCellSocketed();
         return MachineInfoSnapshot.builder("phase_cradle")
                 .state(
                         MachineInfoSnapshot.workState(status == STATUS_READY || status == STATUS_CHARGING || status == STATUS_PULSING,

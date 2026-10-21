@@ -1,6 +1,8 @@
 package com.rngtech.client.screen;
 
+import com.rngtech.content.blockentity.BaseMachineBlockEntity;
 import com.rngtech.content.blockentity.PhaseCradleBlockEntity;
+import com.rngtech.content.blockentity.PhaseLine;
 import com.rngtech.content.item.BatteryCellItem;
 import com.rngtech.content.item.GlyphItem;
 import com.rngtech.content.menu.PhaseCradleMenu;
@@ -22,6 +24,7 @@ import com.rngtech.rpg.refinement.RefinementTargets;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.Slot;
@@ -601,15 +604,34 @@ public class PhaseCradleScreen extends AbstractContainerScreen<PhaseCradleMenu> 
         } else if (inside(x, y, EMITTER_X, LINE_Y, 10, 10)) {
             lines.add(Component.translatable("rngtech.phase_cradle.screen.emitter"));
             lines.add(lineLine());
+            if (menu.formed()) {
+                lines.add(gray("rngtech.phase_cradle.screen.emitter.capacity", CompactValueText.energyAmount(menu.chargeCapacity())));
+                lines.add(gray("rngtech.phase_cradle.screen.emitter.rate", CompactValueText.energyRate(menu.chargeRate())));
+                lines.add(gray("rngtech.phase_cradle.screen.emitter.window", menu.partialWindow()));
+                lines.add(gray("rngtech.phase_cradle.screen.emitter.tolerance", menu.strainTolerance()));
+            }
+            PhaseLine.Scan scan = clientScan();
+            if (scan != null && scan.emitter() != null) {
+                affixLines(lines, scan.emitter());
+            }
         } else if (inside(x, y, NODE_X, LINE_Y, PhaseArrayRules.MAX_COILS * NODE_SPACING, NODE_SIZE + 2)) {
             int position = (x - NODE_X) / NODE_SPACING + 1;
             lines.add(coilLine(position));
             lines.add(lineLine());
+            if (position <= menu.usableCoils()) {
+                lines.add(gray("rngtech.phase_cradle.screen.coil.second", percent(menu.secondHold(position))));
+                lines.add(gray("rngtech.phase_cradle.screen.coil.overhold", percent(menu.overholdChance(position))));
+            }
+            PhaseLine.Scan scan = clientScan();
+            if (scan != null && position <= scan.coilCount()) {
+                affixLines(lines, scan.coilsFromEmitter().get(position - 1));
+            }
         } else if (inside(x, y, CONDUIT_X, CONDUIT_Y, CONDUIT_WIDTH, CONDUIT_HEIGHT)) {
             lines.add(Component.translatable("rngtech.phase_cradle.screen.charge",
                     CompactValueText.exactEnergyAmountPair(menu.charge(), menu.cost()),
                     CompactValueText.energyRate(menu.lastInput()),
                     CompactValueText.energyRate(menu.chargeRate())));
+            lines.add(chargeTimeLine());
         } else if (inside(x, y, PhaseCradleMenu.TARGET_X - 4, PhaseCradleMenu.TARGET_Y - 4, 26, 26) && (hoveredSlot == null || !hoveredSlot.hasItem())) {
             lines.add(Component.translatable("rngtech.phase_cradle.screen.chamber"));
             lines.add(strainLine());
@@ -707,6 +729,54 @@ public class PhaseCradleScreen extends AbstractContainerScreen<PhaseCradleMenu> 
         }
         return Component.translatable("rngtech.phase_cradle.screen.coil.low", position, GlyphItem.numeral(floor)).withStyle(ChatFormatting.GOLD)
                 .append(" ").append(hint.copy().withStyle(ChatFormatting.GRAY));
+    }
+
+    private static Component gray(String key, Object... args) {
+        return Component.translatable(key, args).withStyle(ChatFormatting.GRAY);
+    }
+
+    /** The line as the client sees it, for the parts' affixes; the numbers themselves come from the menu. */
+    private PhaseLine.Scan clientScan() {
+        PhaseCradleBlockEntity cradle = menu.cradle();
+        if (cradle == null || minecraft == null || minecraft.level == null) {
+            return null;
+        }
+        return PhaseLine.scan(minecraft.level, cradle.getBlockPos());
+    }
+
+    private void affixLines(List<Component> lines, BlockPos pos) {
+        if (minecraft == null || minecraft.level == null
+                || !(minecraft.level.getBlockEntity(pos) instanceof BaseMachineBlockEntity part)) {
+            return;
+        }
+        for (MachineModifier modifier : affixes(part.machineTraits())) {
+            lines.add(Component.literal("  ").append(MachineModifierText.tooltipLine(modifier)));
+        }
+    }
+
+    /** How long the charge takes to fill at the rate FE arrived last tick. */
+    private Component chargeTimeLine() {
+        long remaining = menu.cost() - menu.charge();
+        if (menu.cost() <= 0 || remaining <= 0) {
+            return gray("rngtech.phase_cradle.screen.charge.full");
+        }
+        int rate = menu.lastInput();
+        if (rate <= 0) {
+            return Component.translatable("rngtech.phase_cradle.screen.charge.stalled").withStyle(ChatFormatting.GOLD);
+        }
+        long seconds = Math.max(1L, (remaining + rate * 20L - 1) / (rate * 20L));
+        return gray("rngtech.phase_cradle.screen.charge.time", duration(seconds));
+    }
+
+    private static String duration(long seconds) {
+        if (seconds < 60) {
+            return seconds + "s";
+        }
+        long minutes = seconds / 60;
+        if (minutes < 60) {
+            return minutes + "m " + (seconds % 60) + "s";
+        }
+        return (minutes / 60) + "h " + (minutes % 60) + "m";
     }
 
     private Component strainLine() {

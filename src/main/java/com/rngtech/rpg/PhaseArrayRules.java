@@ -61,7 +61,8 @@ public final class PhaseArrayRules {
             MachineStat.FE_THRIFT,
             MachineStat.FE_RECOVERY,
             MachineStat.GLYPH_SALVAGE,
-            MachineStat.STRAIN_MERCY
+            MachineStat.STRAIN_MERCY,
+            MachineStat.PRIMED_CHARGE_RATE
     );
 
     private PhaseArrayRules() {
