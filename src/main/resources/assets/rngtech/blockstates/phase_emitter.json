@@ -31,33 +31,33 @@
       "y": 270
     },
     "active=true,facing=north,formed=false": {
-      "model": "rngtech:block/phase_emitter"
+      "model": "rngtech:block/phase_emitter_active"
     },
     "active=true,facing=east,formed=false": {
-      "model": "rngtech:block/phase_emitter",
+      "model": "rngtech:block/phase_emitter_active",
       "y": 90
     },
     "active=true,facing=south,formed=false": {
-      "model": "rngtech:block/phase_emitter",
+      "model": "rngtech:block/phase_emitter_active",
       "y": 180
     },
     "active=true,facing=west,formed=false": {
-      "model": "rngtech:block/phase_emitter",
+      "model": "rngtech:block/phase_emitter_active",
       "y": 270
     },
     "active=true,facing=north,formed=true": {
-      "model": "rngtech:block/phase_emitter_formed"
+      "model": "rngtech:block/phase_emitter_active"
     },
     "active=true,facing=east,formed=true": {
-      "model": "rngtech:block/phase_emitter_formed",
+      "model": "rngtech:block/phase_emitter_active",
       "y": 90
     },
     "active=true,facing=south,formed=true": {
-      "model": "rngtech:block/phase_emitter_formed",
+      "model": "rngtech:block/phase_emitter_active",
       "y": 180
     },
     "active=true,facing=west,formed=true": {
-      "model": "rngtech:block/phase_emitter_formed",
+      "model": "rngtech:block/phase_emitter_active",
       "y": 270
     }
   }

@@ -12,6 +12,7 @@ import com.rngtech.rpg.ModifierSlot;
 import com.rngtech.rpg.PhaseArrayRules;
 import com.rngtech.rpg.refinement.PhaseArrayAction;
 import com.rngtech.rpg.refinement.PhasePulse;
+import com.rngtech.rpg.refinement.PhasePulseSequence;
 import com.rngtech.rpg.refinement.RefinementEngine;
 import com.rngtech.rpg.refinement.RefinementSelection;
 import com.rngtech.rpg.refinement.RefinementTargets;
@@ -49,6 +50,7 @@ public class PhaseCradleScreen extends AbstractContainerScreen<PhaseCradleMenu> 
     private static final int ROW = 0xFF262C33;
     private static final int ROW_SELECTED = 0xFF35505A;
     private static final int ROW_HOVER = 0xFF303840;
+    private static final int LIT_BRIGHT = 0xFFD8FBFF;
 
     private static final int LINE_Y = 20;
     private static final int EMITTER_X = 76;
@@ -123,6 +125,15 @@ public class PhaseCradleScreen extends AbstractContainerScreen<PhaseCradleMenu> 
             }
         }
         drawStrainMarks(graphics, left + PhaseCradleMenu.TARGET_X - 1, top + PhaseCradleMenu.TARGET_Y - 1);
+        if (menu.pulsing()) {
+            int glow = (ticks / 4) % 2 == 0 ? LIT : LIT_DEEP;
+            int gx = left + PhaseCradleMenu.TARGET_X - 3;
+            int gy = top + PhaseCradleMenu.TARGET_Y - 3;
+            graphics.fill(gx, gy, gx + 22, gy + 1, glow);
+            graphics.fill(gx, gy + 21, gx + 22, gy + 22, glow);
+            graphics.fill(gx, gy, gx + 1, gy + 22, glow);
+            graphics.fill(gx + 21, gy, gx + 22, gy + 22, glow);
+        }
         drawOperations(graphics, left + OPERATION_X, top + OPERATION_Y, mouseX, mouseY);
         drawList(graphics, left + LIST_X, top + LIST_Y, mouseX, mouseY);
         drawButton(graphics, left + BUTTON_X, top + BUTTON_Y, mouseX, mouseY);
@@ -155,7 +166,8 @@ public class PhaseCradleScreen extends AbstractContainerScreen<PhaseCradleMenu> 
                 || status == PhaseCradleBlockEntity.STATUS_ILLEGAL || status == PhaseCradleBlockEntity.STATUS_NO_RECIPE;
         boolean waiting = status == PhaseCradleBlockEntity.STATUS_NO_TARGET || status == PhaseCradleBlockEntity.STATUS_NO_GLYPH
                 || status == PhaseCradleBlockEntity.STATUS_NO_RP || status == PhaseCradleBlockEntity.STATUS_NO_SELECTION;
-        boolean live = status == PhaseCradleBlockEntity.STATUS_CHARGING || status == PhaseCradleBlockEntity.STATUS_READY;
+        boolean live = status == PhaseCradleBlockEntity.STATUS_CHARGING || status == PhaseCradleBlockEntity.STATUS_READY
+                || status == PhaseCradleBlockEntity.STATUS_PULSING;
         for (int row = 0; row < 5; row++) {
             graphics.fill(x + 2 - row / 2, y + row, x + 3 + row / 2, y + row + 1, blocked ? RED : NODE_DARK);
         }
@@ -167,8 +179,13 @@ public class PhaseCradleScreen extends AbstractContainerScreen<PhaseCradleMenu> 
 
     private void drawLine(GuiGraphics graphics, int left, int top) {
         int y = top + LINE_Y;
-        graphics.fill(left + EMITTER_X + 10, y + 4, left + PhaseCradleMenu.TARGET_X - 2, y + 5, menu.formed() ? LIT_DEEP : TRACE);
-        drawNode(graphics, left + EMITTER_X, y, 10, menu.formed() ? LIT : NODE_DARK, menu.formed() ? LIT_DEEP : TRACE);
+        boolean pulsing = menu.pulsing();
+        graphics.fill(left + EMITTER_X + 10, y + 4, left + PhaseCradleMenu.TARGET_X - 2, y + 5, pulsing ? LIT : menu.formed() ? LIT_DEEP : TRACE);
+        drawNode(graphics, left + EMITTER_X, y, 10, pulsing ? LIT_BRIGHT : menu.formed() ? LIT : NODE_DARK, menu.formed() ? LIT_DEEP : TRACE);
+        if (pulsing) {
+            drawPulse(graphics, left, y);
+            return;
+        }
         int coils = menu.coilCount();
         int usable = menu.usableCoils();
         int required = menu.requiredCoils();
@@ -184,6 +201,33 @@ public class PhaseCradleScreen extends AbstractContainerScreen<PhaseCradleMenu> 
             } else {
                 fill = NODE_DARK;
                 edge = AMBER;
+            }
+            drawNode(graphics, x, y + 1, NODE_SIZE, fill, edge);
+        }
+    }
+
+    /** The sequence as the Cradle reports it: engaged Coils bright, the slipped one flashing, the rest dark. */
+    private void drawPulse(GuiGraphics graphics, int left, int y) {
+        PhasePulseSequence.Stage stage = menu.pulseStage();
+        int lit = menu.pulseLit();
+        int flashing = menu.pulseFlashing();
+        boolean blink = (ticks / 3) % 2 == 0;
+        for (int position = 1; position <= PhaseArrayRules.MAX_COILS; position++) {
+            int x = left + NODE_X + (position - 1) * NODE_SPACING;
+            if (position > menu.coilCount()) {
+                drawNode(graphics, x, y + 1, NODE_SIZE, 0, TRACE);
+                continue;
+            }
+            int fill = NODE_DARK;
+            int edge = TRACE;
+            if (position == flashing) {
+                fill = blink ? RED : NODE_DARK;
+                edge = RED;
+            } else if (position <= lit) {
+                fill = stage == PhasePulseSequence.Stage.HOLDING && blink ? LIT_BRIGHT : LIT;
+                edge = LIT_DEEP;
+            } else if (stage == PhasePulseSequence.Stage.FRACTURED) {
+                fill = blink ? RED : NODE_DARK;
             }
             drawNode(graphics, x, y + 1, NODE_SIZE, fill, edge);
         }
@@ -460,6 +504,9 @@ public class PhaseCradleScreen extends AbstractContainerScreen<PhaseCradleMenu> 
 
     private Component buttonLabel() {
         int status = menu.status();
+        if (status == PhaseCradleBlockEntity.STATUS_PULSING) {
+            return Component.translatable("rngtech.phase_cradle.screen.button.pulsing");
+        }
         if (status == PhaseCradleBlockEntity.STATUS_READY) {
             return Component.translatable("rngtech.phase_cradle.screen.button.fire");
         }

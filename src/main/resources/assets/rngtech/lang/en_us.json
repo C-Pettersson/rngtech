@@ -1,4 +1,6 @@
 {
+  "rngtech.phase_cradle.status.pulsing": "Pulse running",
+  "rngtech.phase_cradle.screen.button.pulsing": "Pulse",
   "rngtech.phase_cradle.status.no_line": "No line: build three to nine Phase Coils and a Phase Emitter in a row from the Cradle",
   "rngtech.phase_cradle.status.no_recipe": "No recipe for this operation",
   "rngtech.phase_cradle.status.no_target": "Put an item in the Cradle",

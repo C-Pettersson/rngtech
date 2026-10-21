@@ -1,5 +1,6 @@
 package com.rngtech.content.blockentity;
 
+import com.rngtech.content.block.BaseMachineBlock;
 import com.rngtech.content.item.BatteryCellItem;
 import com.rngtech.content.item.GlyphItem;
 import com.rngtech.content.menu.PhaseCradleMenu;
@@ -20,6 +21,7 @@ import com.rngtech.rpg.refinement.PhaseArrayAction;
 import com.rngtech.rpg.refinement.PhaseLineStats;
 import com.rngtech.rpg.refinement.PhaseOutcome;
 import com.rngtech.rpg.refinement.PhasePulse;
+import com.rngtech.rpg.refinement.PhasePulseSequence;
 import com.rngtech.rpg.refinement.PhaseStrain;
 import com.rngtech.rpg.refinement.RefinementEngine;
 import com.rngtech.rpg.refinement.RefinementResult;
@@ -81,6 +83,7 @@ public class PhaseCradleBlockEntity extends BlockEntity implements MenuProvider,
     public static final int STATUS_IDLE = 10;
     public static final int STATUS_CHARGING = 11;
     public static final int STATUS_READY = 12;
+    public static final int STATUS_PULSING = 13;
 
     public static final int DATA_STATUS = 0;
     public static final int DATA_FORMED = 1;
@@ -111,7 +114,10 @@ public class PhaseCradleBlockEntity extends BlockEntity implements MenuProvider,
     public static final int DATA_PARTIAL_WINDOW = 26;
     public static final int DATA_STRAIN_TOLERANCE = 27;
     public static final int DATA_CHARGING = 28;
-    public static final int DATA_HOLD_BASE = 29;
+    public static final int DATA_PULSE_STAGE = 29;
+    public static final int DATA_PULSE_LIT = 30;
+    public static final int DATA_PULSE_FLASHING = 31;
+    public static final int DATA_HOLD_BASE = 32;
     public static final int DATA_COUNT = DATA_HOLD_BASE + PhaseArrayRules.MAX_COILS;
     /** Odds and hold chances cross the menu as thousandths. */
     public static final int ODDS_SCALE = 1000;
@@ -121,7 +127,15 @@ public class PhaseCradleBlockEntity extends BlockEntity implements MenuProvider,
 
     private final ItemStackHandler items = new ItemStackHandler(SLOT_COUNT) {
         @Override
+        public ItemStack extractItem(int slot, int amount, boolean simulate) {
+            return pulse != null && slot != SLOT_OUTPUT ? ItemStack.EMPTY : super.extractItem(slot, amount, simulate);
+        }
+
+        @Override
         public boolean isItemValid(int slot, ItemStack stack) {
+            if (pulse != null) {
+                return false;
+            }
             return switch (slot) {
                 case SLOT_TARGET, SLOT_DONOR -> RefinementTargets.canRefine(stack);
                 case SLOT_GLYPH -> GlyphItem.isGlyph(stack);
@@ -205,6 +219,9 @@ public class PhaseCradleBlockEntity extends BlockEntity implements MenuProvider,
                 case DATA_PARTIAL_WINDOW -> lineStats.partialWindow();
                 case DATA_STRAIN_TOLERANCE -> lineStats.strainTolerance();
                 case DATA_CHARGING -> charging ? 1 : 0;
+                case DATA_PULSE_STAGE -> pulse == null ? -1 : PhasePulseSequence.frame(pulse, pulseTick).stage().ordinal();
+                case DATA_PULSE_LIT -> pulse == null ? 0 : PhasePulseSequence.frame(pulse, pulseTick).lit();
+                case DATA_PULSE_FLASHING -> pulse == null ? 0 : PhasePulseSequence.frame(pulse, pulseTick).flashing();
                 default -> 0;
             };
         }
@@ -236,6 +253,10 @@ public class PhaseCradleBlockEntity extends BlockEntity implements MenuProvider,
     private PhasePulse.Outcome lastOutcome;
     private int lastHeld;
     private int lastSlipped;
+    /** The pulse in flight: rolled at Fire, shown over the sequence, applied when it ends. */
+    private PhasePulse.Result pulse;
+    private PhaseArrayRecipe pulseRecipe;
+    private int pulseTick;
 
     public PhaseCradleBlockEntity(BlockPos pos, BlockState blockState) {
         super(ModBlockEntities.EXOTIC_AFFIX_FORGE.get(), pos, blockState);
@@ -357,6 +378,64 @@ public class PhaseCradleBlockEntity extends BlockEntity implements MenuProvider,
         cradle.rollInputWindow(level.getGameTime());
         if (cradle.charging) {
             cradle.drainCells();
+        }
+        if (cradle.pulse != null) {
+            cradle.tickPulse();
+        }
+    }
+
+    // -- The hold sequence -----------------------------------------------------------------------------------------
+
+    public boolean isPulsing() {
+        return pulse != null;
+    }
+
+    private void tickPulse() {
+        if (pulseRecipe == null) {
+            pulseRecipe = recipeFor(action);
+        }
+        PhasePulseSequence.Frame frame = PhasePulseSequence.frame(pulse, pulseTick);
+        if (frame.done()) {
+            lightLine(null);
+            completePulse();
+            return;
+        }
+        int engaging = PhasePulseSequence.engagingOn(pulse, pulseTick);
+        if (engaging > 0) {
+            playEngage(engaging, engaging == pulse.slippedPosition());
+        }
+        lightLine(frame);
+        pulseTick++;
+    }
+
+    /** Lights the Coils the frame shows and the Emitter while a pulse runs; {@code null} darkens the line. */
+    private void lightLine(PhasePulseSequence.Frame frame) {
+        if (level == null) {
+            return;
+        }
+        List<BlockPos> coils = line.coilsFromEmitter();
+        for (int position = 1; position <= coils.size(); position++) {
+            boolean lit = frame != null && (position <= frame.lit() || position == frame.flashing());
+            setMemberActive(coils.get(position - 1), lit);
+        }
+        if (line.emitter() != null) {
+            setMemberActive(line.emitter(), frame != null);
+        }
+    }
+
+    private void setMemberActive(BlockPos pos, boolean active) {
+        BlockState state = level.getBlockState(pos);
+        if (state.hasProperty(BaseMachineBlock.ACTIVE) && state.getValue(BaseMachineBlock.ACTIVE) != active) {
+            BaseMachineBlock.setActive(level, pos, state, active);
+        }
+    }
+
+    private void playEngage(int position, boolean slips) {
+        if (slips) {
+            level.playSound(null, worldPosition, SoundEvents.BEACON_DEACTIVATE, SoundSource.BLOCKS, 0.9F, 1.5F);
+        } else {
+            level.playSound(null, worldPosition, SoundEvents.AMETHYST_BLOCK_CHIME, SoundSource.BLOCKS, 0.8F,
+                    PhasePulseSequence.engagePitch(position));
         }
     }
 
@@ -487,6 +566,9 @@ public class PhaseCradleBlockEntity extends BlockEntity implements MenuProvider,
     }
 
     private int status(PhaseArrayRecipe recipe) {
+        if (pulse != null) {
+            return STATUS_PULSING;
+        }
         if (!line.complete()) {
             return STATUS_NO_LINE;
         }
@@ -626,7 +708,7 @@ public class PhaseCradleBlockEntity extends BlockEntity implements MenuProvider,
         setChanged();
     }
 
-    /** Fires the pulse when the charge is full. Phase 5 adds the hold sequence in front of this; here it is instant. */
+    /** Fires the pulse when the charge is full: the outcome rolls now, the sequence plays, then it applies. */
     public boolean fire() {
         PhaseArrayRecipe recipe = recipe();
         if (level == null || status(recipe) != STATUS_READY) {
@@ -647,7 +729,32 @@ public class PhaseCradleBlockEntity extends BlockEntity implements MenuProvider,
         if (recipe.needsGlyph() && !keepGlyph) {
             glyphStack().shrink(1);
         }
+        pulse = result;
+        pulseRecipe = recipe;
+        pulseTick = 0;
+        charging = false;
+        if (result.outcome() == PhasePulse.Outcome.FRACTURE) {
+            level.playSound(null, worldPosition, SoundEvents.GLASS_BREAK, SoundSource.BLOCKS, 1.0F, 0.6F);
+        } else {
+            level.playSound(null, worldPosition, SoundEvents.RESPAWN_ANCHOR_CHARGE, SoundSource.BLOCKS, 0.6F, 1.6F);
+        }
+        setChanged();
+        return true;
+    }
 
+    /** The end of the sequence: the rolled outcome applies to the target, which has sat locked in the Cradle. */
+    private void completePulse() {
+        PhasePulse.Result result = pulse;
+        PhaseArrayRecipe recipe = pulseRecipe;
+        ItemStack target = targetStack();
+        RandomSource random = level.random;
+        pulse = null;
+        pulseRecipe = null;
+        if (target.isEmpty() || recipe == null) {
+            setChanged();
+            return;
+        }
+        int strain = PhaseStrain.get(target);
         ItemStack refined = target.copy();
         MachineTraits traits = RefinementTargets.storedTraits(target);
         ModifierEligibilityProfile profile = RefinementTargets.eligibilityProfile(target);
@@ -681,10 +788,8 @@ public class PhaseCradleBlockEntity extends BlockEntity implements MenuProvider,
         lastOutcome = result.outcome();
         lastHeld = result.held();
         lastSlipped = result.slippedPosition();
-        charging = false;
         playOutcome(result.outcome());
         setChanged();
-        return true;
     }
 
     /** What a pulse did: the target's new traits (null for no change), what happens to the donor, and the Strain after. */
@@ -868,7 +973,8 @@ public class PhaseCradleBlockEntity extends BlockEntity implements MenuProvider,
         }
         return MachineInfoSnapshot.builder("phase_cradle")
                 .state(
-                        MachineInfoSnapshot.workState(status == STATUS_READY || status == STATUS_CHARGING, charging,
+                        MachineInfoSnapshot.workState(status == STATUS_READY || status == STATUS_CHARGING || status == STATUS_PULSING,
+                                charging || status == STATUS_PULSING,
                                 status == STATUS_NO_TARGET || status == STATUS_NO_GLYPH),
                         MachineInfoSnapshot.BlockedReason.NONE
                 )
@@ -894,6 +1000,7 @@ public class PhaseCradleBlockEntity extends BlockEntity implements MenuProvider,
             case STATUS_NO_RP -> "no_rp";
             case STATUS_CHARGING -> "charging";
             case STATUS_READY -> "ready";
+            case STATUS_PULSING -> "pulsing";
             default -> "idle";
         };
         return "rngtech.phase_cradle.status." + name;
@@ -917,12 +1024,24 @@ public class PhaseCradleBlockEntity extends BlockEntity implements MenuProvider,
         tag.putInt("LastOutcome", lastOutcome == null ? NO_OUTCOME : lastOutcome.ordinal());
         tag.putInt("LastHeld", lastHeld);
         tag.putInt("LastSlipped", lastSlipped);
+        if (pulse != null) {
+            tag.putInt("PulseOutcome", pulse.outcome().ordinal());
+            tag.putInt("PulseHeld", pulse.held());
+            tag.putInt("PulseSlipped", pulse.slippedPosition());
+            tag.putString("PulseAction", pulseRecipe == null ? action.getSerializedName() : pulseRecipe.action().getSerializedName());
+        }
     }
 
     @Override
     protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.loadAdditional(tag, registries);
         lineRescanRequested = true;
+        if (tag.contains("PulseOutcome")) {
+            int outcome = tag.getInt("PulseOutcome");
+            pulse = new PhasePulse.Result(PhasePulse.Outcome.values()[Math.max(0, Math.min(outcome, PhasePulse.Outcome.values().length - 1))],
+                    tag.getInt("PulseHeld"), tag.getInt("PulseSlipped"));
+            pulseTick = Integer.MAX_VALUE / 2;
+        }
         if (tag.contains("Items")) {
             items.deserializeNBT(registries, tag.getCompound("Items"));
         }

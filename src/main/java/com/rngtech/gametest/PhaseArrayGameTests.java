@@ -3,6 +3,7 @@ package com.rngtech.gametest;
 import static com.rngtech.gametest.MachineTestSupport.check;
 
 import com.rngtech.RNGTech;
+import com.rngtech.content.block.BaseMachineBlock;
 import com.rngtech.content.block.PhaseCoilBlock;
 import com.rngtech.content.block.PhaseEmitterBlock;
 import com.rngtech.content.blockentity.PhaseCoilBlockEntity;
@@ -137,11 +138,20 @@ public final class PhaseArrayGameTests {
             cradle.toggleCharging();
         });
         helper.runAfterDelay(15, () -> check(cradle.charge() > 0, "Supply should charge the line"));
+        boolean[] sawPulse = { false };
         helper.succeedWhen(() -> {
             if (cradle.status() == PhaseCradleBlockEntity.STATUS_READY) {
                 check(cradle.charge() >= cradle.cost(cradle.recipe()), "Ready means the charge covers the cost");
                 check(cradle.fire(), "A ready Cradle should fire");
+                check(cradle.isPulsing(), "Fire starts the hold sequence");
+                check(cradle.outputStack().isEmpty(), "The outcome waits for the sequence to end");
             }
+            if (cradle.isPulsing()) {
+                sawPulse[0] |= helper.getBlockState(CRADLE.east(4)).getValue(BaseMachineBlock.ACTIVE);
+            }
+            check(sawPulse[0], "The Emitter should light while the pulse runs");
+            check(!cradle.isPulsing(), "The sequence should end");
+            check(!helper.getBlockState(CRADLE.east(1)).getValue(BaseMachineBlock.ACTIVE), "Coils go dark after the pulse");
             ItemStack output = cradle.outputStack();
             check(!output.isEmpty(), "The refined item should be in the output");
             check(cradle.targetStack().isEmpty(), "The target slot should be empty after the pulse");

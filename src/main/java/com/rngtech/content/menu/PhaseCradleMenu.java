@@ -9,6 +9,7 @@ import com.rngtech.rpg.ModifierSlot;
 import com.rngtech.rpg.PhaseArrayRules;
 import com.rngtech.rpg.refinement.PhaseArrayAction;
 import com.rngtech.rpg.refinement.PhasePulse;
+import com.rngtech.rpg.refinement.PhasePulseSequence;
 import com.rngtech.rpg.refinement.RefinementSelection;
 import com.rngtech.rpg.refinement.RefinementTargets;
 
@@ -162,6 +163,9 @@ public class PhaseCradleMenu extends AbstractContainerMenu {
         if (cradle == null || player.level().isClientSide) {
             return true;
         }
+        if (cradle.isPulsing()) {
+            return true;
+        }
         if (id >= BUTTON_ACTION_BASE && id < BUTTON_ACTION_BASE + PhaseArrayAction.values().length) {
             cradle.setAction(PhaseArrayAction.values()[id - BUTTON_ACTION_BASE]);
         } else if (id >= BUTTON_SELECTION_NONE && id < BUTTON_DEFINITION_BASE) {
@@ -298,6 +302,25 @@ public class PhaseCradleMenu extends AbstractContainerMenu {
 
     public boolean charging() {
         return data.get(PhaseCradleBlockEntity.DATA_CHARGING) == 1;
+    }
+
+    public boolean pulsing() {
+        return data.get(PhaseCradleBlockEntity.DATA_PULSE_STAGE) >= 0;
+    }
+
+    /** The sequence's stage, or null between pulses. */
+    public PhasePulseSequence.Stage pulseStage() {
+        int ordinal = data.get(PhaseCradleBlockEntity.DATA_PULSE_STAGE);
+        PhasePulseSequence.Stage[] stages = PhasePulseSequence.Stage.values();
+        return ordinal < 0 || ordinal >= stages.length ? null : stages[ordinal];
+    }
+
+    public int pulseLit() {
+        return data.get(PhaseCradleBlockEntity.DATA_PULSE_LIT);
+    }
+
+    public int pulseFlashing() {
+        return data.get(PhaseCradleBlockEntity.DATA_PULSE_FLASHING);
     }
 
     public ItemStack targetStack() {

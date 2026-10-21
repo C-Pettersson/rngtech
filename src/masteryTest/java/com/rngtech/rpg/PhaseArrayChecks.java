@@ -2,6 +2,7 @@ package com.rngtech.rpg;
 
 import com.rngtech.rpg.refinement.PhaseLineStats;
 import com.rngtech.rpg.refinement.PhasePulse;
+import com.rngtech.rpg.refinement.PhasePulseSequence;
 import com.rngtech.rpg.refinement.RefinementEngine;
 
 import net.minecraft.util.RandomSource;
@@ -28,6 +29,7 @@ public final class PhaseArrayChecks {
         pulseOddsMatchTheSequence();
         costsFollowTheFormula();
         engineOperationsRespectTheirLimits();
+        sequenceFramesFollowThePulse();
         return checks;
     }
 
@@ -161,6 +163,45 @@ public final class PhaseArrayChecks {
         check(graftedDown != null && graftedDown.modifiers().get(0).tier() == 2, "a Partial Graft arrives one tier lower");
         check(RefinementEngine.phaseGraft(emitter, MachineTraits.EMPTY, donor, ModifierSlot.PREFIX, false, random) == null,
                 "a suffix cannot be grafted onto a prefix slot");
+    }
+
+    /** The frames the Cradle and the screen read from a rolled pulse: engage, slip, unwind, hold, apply. */
+    private static void sequenceFramesFollowThePulse() {
+        PhasePulse.Result slipped = new PhasePulse.Result(PhasePulse.Outcome.PARTIAL, 3, 4);
+        check(PhasePulseSequence.engagedCoils(slipped) == 4, "the slipped Coil engages too");
+        int engaging = 4 * PhasePulseSequence.ENGAGE_TICKS;
+        check(PhasePulseSequence.totalTicks(slipped) == engaging + PhasePulseSequence.SLIP_TICKS + 3 * PhasePulseSequence.UNWIND_TICKS,
+                "a slip engages, flashes, then unwinds every held Coil");
+        PhasePulseSequence.Frame first = PhasePulseSequence.frame(slipped, 0);
+        check(first.stage() == PhasePulseSequence.Stage.ENGAGING && first.lit() == 1, "the first Coil lights on Fire");
+        check(PhasePulseSequence.engagingOn(slipped, 0) == 1 && PhasePulseSequence.engagingOn(slipped, PhasePulseSequence.ENGAGE_TICKS) == 2
+                && PhasePulseSequence.engagingOn(slipped, 1) == 0, "Coils engage on the beat");
+        PhasePulseSequence.Frame flash = PhasePulseSequence.frame(slipped, engaging);
+        check(flash.stage() == PhasePulseSequence.Stage.SLIPPED && flash.flashing() == 4 && flash.lit() == 3, "the slipped Coil flashes with the held ones lit");
+        PhasePulseSequence.Frame unwind = PhasePulseSequence.frame(slipped, engaging + PhasePulseSequence.SLIP_TICKS + PhasePulseSequence.UNWIND_TICKS);
+        check(unwind.stage() == PhasePulseSequence.Stage.UNWINDING && unwind.lit() == 1, "lit Coils go dark one by one toward the Emitter");
+        check(PhasePulseSequence.frame(slipped, PhasePulseSequence.totalTicks(slipped)).done(), "the outcome applies on the last tick");
+        int previousLit = 0;
+        boolean falling = false;
+        for (int tick = 0; tick < PhasePulseSequence.totalTicks(slipped); tick++) {
+            int lit = PhasePulseSequence.frame(slipped, tick).lit();
+            if (lit < previousLit) {
+                falling = true;
+            }
+            check(!falling || lit <= previousLit, "once Coils unwind they never relight");
+            previousLit = lit;
+        }
+
+        PhasePulse.Result held = new PhasePulse.Result(PhasePulse.Outcome.SUCCESS, 5, 0);
+        check(PhasePulseSequence.totalTicks(held) == 5 * PhasePulseSequence.ENGAGE_TICKS + PhasePulseSequence.HOLD_TICKS, "a full hold engages then holds");
+        PhasePulseSequence.Frame holding = PhasePulseSequence.frame(held, 5 * PhasePulseSequence.ENGAGE_TICKS + 1);
+        check(holding.stage() == PhasePulseSequence.Stage.HOLDING && holding.lit() == 5 && holding.flashing() == 0, "every Coil stays lit on a hold");
+
+        PhasePulse.Result fracture = new PhasePulse.Result(PhasePulse.Outcome.FRACTURE, 0, 0);
+        check(PhasePulseSequence.totalTicks(fracture) == PhasePulseSequence.FRACTURE_TICKS, "a Fracture shows without engaging");
+        check(PhasePulseSequence.frame(fracture, 1).stage() == PhasePulseSequence.Stage.FRACTURED && PhasePulseSequence.engagingOn(fracture, 0) == 0,
+                "no Coil engages on a Fracture");
+        check(PhasePulseSequence.engagePitch(9) > PhasePulseSequence.engagePitch(1), "the tone climbs along the line");
     }
 
     private static void near(double actual, double expected, String what) {
