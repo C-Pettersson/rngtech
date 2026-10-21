@@ -53,7 +53,6 @@ import com.rngtech.client.screen.DebugChestScreen;
 import com.rngtech.client.screen.DebugRerollerScreen;
 import com.rngtech.client.screen.DebugTankScreen;
 import com.rngtech.client.screen.DormantMachineScreen;
-import com.rngtech.client.screen.ExoticAffixForgeScreen;
 import com.rngtech.client.screen.ForestryCartScreen;
 import com.rngtech.client.screen.ForestryCartStationScreen;
 import com.rngtech.client.screen.FurnaceScreen;
@@ -61,6 +60,7 @@ import com.rngtech.client.screen.GasChemistryScreen;
 import com.rngtech.client.screen.MelterScreen;
 import com.rngtech.client.screen.MetalPressScreen;
 import com.rngtech.client.screen.MinersCompanionScreen;
+import com.rngtech.client.screen.PhaseCradleScreen;
 import com.rngtech.client.screen.PotentialReactorScreen;
 import com.rngtech.client.screen.ResonanceCalibratorScreen;
 import com.rngtech.client.screen.SilicaGelDehumidifierScreen;
@@ -151,7 +151,7 @@ public final class RNGTechClient {
 
     private void registerScreens(RegisterMenuScreensEvent event) {
         event.register(ModMenus.AFFIX_FORGE.get(), AffixForgeScreen::new);
-        event.register(ModMenus.EXOTIC_AFFIX_FORGE.get(), ExoticAffixForgeScreen::new);
+        event.register(ModMenus.EXOTIC_AFFIX_FORGE.get(), PhaseCradleScreen::new);
         event.register(ModMenus.DEBUG_REROLLER.get(), DebugRerollerScreen::new);
         event.register(ModMenus.DEBUG_CHEST.get(), DebugChestScreen::new);
         event.register(ModMenus.DEBUG_TANK.get(), DebugTankScreen::new);

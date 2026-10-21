@@ -21,7 +21,6 @@ import com.rngtech.content.block.DebugRerollerBlock;
 import com.rngtech.content.block.DebugTankBlock;
 import com.rngtech.content.block.DebugTrashcanBlock;
 import com.rngtech.content.block.DormantMachineBlock;
-import com.rngtech.content.block.ExoticAffixForgeBlock;
 import com.rngtech.content.block.ForestryCartStationBlock;
 import com.rngtech.content.block.FurnaceBlock;
 import com.rngtech.content.block.GasChemistryBlock;
@@ -29,6 +28,7 @@ import com.rngtech.content.block.HandCrankBlock;
 import com.rngtech.content.block.MelterBlock;
 import com.rngtech.content.block.MetalPressBlock;
 import com.rngtech.content.block.PhaseCoilBlock;
+import com.rngtech.content.block.PhaseCradleBlock;
 import com.rngtech.content.block.PhaseEmitterBlock;
 import com.rngtech.content.block.PotentialReactorBlock;
 import com.rngtech.content.block.ResonanceCalibratorBlock;
@@ -86,9 +86,9 @@ public final class ModBlocks {
                     .noOcclusion()
     );
 
-    public static final DeferredBlock<ExoticAffixForgeBlock> EXOTIC_AFFIX_FORGE = BLOCKS.registerBlock(
+    public static final DeferredBlock<PhaseCradleBlock> EXOTIC_AFFIX_FORGE = BLOCKS.registerBlock(
             "exotic_affix_forge",
-            ExoticAffixForgeBlock::new,
+            PhaseCradleBlock::new,
             BlockBehaviour.Properties.of()
                     .mapColor(MapColor.COLOR_CYAN)
                     .strength(6.0F, 9.0F)

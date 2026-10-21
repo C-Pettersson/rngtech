@@ -1,0 +1,10 @@
+{
+  "type": "rngtech:phase_array",
+  "action": "graft",
+  "coils": 9,
+  "glyph_tier": 5,
+  "base_fe": 8000000,
+  "refinement_potential_cost": 2,
+  "partial": "donor_tier_down",
+  "overhold": "keep_donor"
+}

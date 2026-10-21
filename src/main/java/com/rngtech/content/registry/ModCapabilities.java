@@ -19,12 +19,12 @@ import com.rngtech.content.blockentity.DebugChestBlockEntity;
 import com.rngtech.content.blockentity.DebugTankBlockEntity;
 import com.rngtech.content.blockentity.DebugTrashcanBlockEntity;
 import com.rngtech.content.blockentity.DormantMachineBlockEntity;
-import com.rngtech.content.blockentity.ExoticAffixForgeBlockEntity;
 import com.rngtech.content.blockentity.ForestryCartStationBlockEntity;
 import com.rngtech.content.blockentity.FurnaceBlockEntity;
 import com.rngtech.content.blockentity.GasChemistryBlockEntity;
 import com.rngtech.content.blockentity.MelterBlockEntity;
 import com.rngtech.content.blockentity.MetalPressBlockEntity;
+import com.rngtech.content.blockentity.PhaseCradleBlockEntity;
 import com.rngtech.content.blockentity.PotentialReactorBlockEntity;
 import com.rngtech.content.blockentity.ResonanceCalibratorBlockEntity;
 import com.rngtech.content.blockentity.SilicaGelDehumidifierBlockEntity;
@@ -431,7 +431,15 @@ public final class ModCapabilities {
         event.registerBlockEntity(
                 Capabilities.EnergyStorage.BLOCK,
                 ModBlockEntities.EXOTIC_AFFIX_FORGE.get(),
-                ExoticAffixForgeBlockEntity::getEnergyStorage
+                PhaseCradleBlockEntity::getEnergyStorage
+        );
+        event.registerBlock(
+                Capabilities.EnergyStorage.BLOCK,
+                (level, pos, state, blockEntity, side) -> PhaseCradleBlockEntity.cradleForMember(level, pos)
+                        .map(cradle -> cradle.getEnergyStorage(side))
+                        .orElse(null),
+                ModBlocks.PHASE_COIL.get(),
+                ModBlocks.PHASE_EMITTER.get()
         );
         event.registerBlockEntity(
                 Capabilities.EnergyStorage.BLOCK,

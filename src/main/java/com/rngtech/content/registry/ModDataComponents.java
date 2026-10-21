@@ -12,7 +12,6 @@ import com.rngtech.rpg.MachineTraits;
 import com.rngtech.rpg.OutputAmountTracker;
 import com.rngtech.rpg.progression.MachineProgressionState;
 import com.rngtech.rpg.progression.SoulTransfer;
-import com.rngtech.rpg.refinement.ExoticAffixForgeHistory;
 
 import com.mojang.serialization.Codec;
 import net.minecraft.core.component.DataComponentType;
@@ -146,15 +145,6 @@ public final class ModDataComponents {
                             .cacheEncoding()
             );
 
-    public static final DeferredHolder<DataComponentType<?>, DataComponentType<ExoticAffixForgeHistory>>
-            EXOTIC_AFFIX_FORGE_HISTORY =
-                    DATA_COMPONENTS.registerComponentType(
-                            "exotic_affix_forge_history",
-                            builder -> builder
-                                    .persistent(ExoticAffixForgeHistory.CODEC)
-                                    .networkSynchronized(ExoticAffixForgeHistory.STREAM_CODEC)
-                                    .cacheEncoding()
-                    );
 
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<Integer>> BATTERY_CELL_ENERGY =
             DATA_COMPONENTS.registerComponentType(
@@ -171,6 +161,15 @@ public final class ModDataComponents {
                     "coil_tier",
                     builder -> builder
                             .persistent(Codec.intRange(1, 5))
+                            .networkSynchronized(ByteBufCodecs.VAR_INT)
+                            .cacheEncoding()
+            );
+    /** Strain from Phase Array pulses. Absent means 0. */
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Integer>> STRAIN =
+            DATA_COMPONENTS.registerComponentType(
+                    "strain",
+                    builder -> builder
+                            .persistent(Codec.intRange(0, Integer.MAX_VALUE))
                             .networkSynchronized(ByteBufCodecs.VAR_INT)
                             .cacheEncoding()
             );

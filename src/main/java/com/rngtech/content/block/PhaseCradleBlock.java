@@ -1,6 +1,6 @@
 package com.rngtech.content.block;
 
-import com.rngtech.content.blockentity.ExoticAffixForgeBlockEntity;
+import com.rngtech.content.blockentity.PhaseCradleBlockEntity;
 import com.rngtech.content.registry.ModBlockEntities;
 
 import net.minecraft.core.BlockPos;
@@ -16,14 +16,15 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 
-public class ExoticAffixForgeBlock extends Block implements EntityBlock {
-    public ExoticAffixForgeBlock(Properties properties) {
+/** The Phase Cradle block. It keeps the {@code rngtech:exotic_affix_forge} id it had as the Exotic Affix Forge. */
+public class PhaseCradleBlock extends Block implements EntityBlock {
+    public PhaseCradleBlock(Properties properties) {
         super(properties);
     }
 
     @Override
     public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
-        return new ExoticAffixForgeBlockEntity(pos, state);
+        return new PhaseCradleBlockEntity(pos, state);
     }
 
     @Override
@@ -33,8 +34,8 @@ public class ExoticAffixForgeBlock extends Block implements EntityBlock {
 
     @Override
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hitResult) {
-        if (!level.isClientSide && level.getBlockEntity(pos) instanceof ExoticAffixForgeBlockEntity affixForge) {
-            player.openMenu(affixForge);
+        if (!level.isClientSide && level.getBlockEntity(pos) instanceof PhaseCradleBlockEntity cradle) {
+            player.openMenu(cradle);
         }
         return InteractionResult.sidedSuccess(level.isClientSide);
     }
@@ -44,25 +45,21 @@ public class ExoticAffixForgeBlock extends Block implements EntityBlock {
         if (level.isClientSide) {
             return null;
         }
-        return createTickerHelper(
-                blockEntityType,
-                ModBlockEntities.EXOTIC_AFFIX_FORGE.get(),
-                ExoticAffixForgeBlockEntity::serverTick
-        );
+        return createTickerHelper(blockEntityType, ModBlockEntities.EXOTIC_AFFIX_FORGE.get(), PhaseCradleBlockEntity::serverTick);
     }
 
     @Override
     protected void neighborChanged(BlockState state, Level level, BlockPos pos, Block block, BlockPos fromPos, boolean isMoving) {
-        if (!level.isClientSide && level.getBlockEntity(pos) instanceof ExoticAffixForgeBlockEntity cradle) {
+        if (!level.isClientSide && level.getBlockEntity(pos) instanceof PhaseCradleBlockEntity cradle) {
             cradle.requestLineRescan();
         }
     }
 
     @Override
     protected void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean movedByPiston) {
-        if (!state.is(newState.getBlock()) && level.getBlockEntity(pos) instanceof ExoticAffixForgeBlockEntity affixForge) {
-            affixForge.clearFormedMembers();
-            affixForge.dropInventory(level);
+        if (!state.is(newState.getBlock()) && level.getBlockEntity(pos) instanceof PhaseCradleBlockEntity cradle) {
+            cradle.clearFormedMembers();
+            cradle.dropInventory(level);
         }
         super.onRemove(state, level, pos, newState, movedByPiston);
     }

@@ -11,10 +11,10 @@ Status: **Planned**. The PRD was accepted on 2026-10-21 with no release target. 
 - [ ] Create a feature branch from clean `main`.
 - [x] Simulation: `./gradlew phaseArraySim`, `tools/balance/phase-array-scenarios.json`, and the PRD's numbers set from it.
 - [x] Parts and formation: Emitter, Coil, Glyph, their profiles, the line pattern, formation, and the Cradle rename.
-- [ ] Operations with instant outcomes: the `rngtech:phase_array` recipe type, the Fire tab, charge, and every operation through the refinement library.
+- [x] Operations with instant outcomes: the `rngtech:phase_array` recipe type, the Cradle screen, charge, and every operation through the refinement library.
 - [ ] The hold sequence: timed holds, sound, lights, and the stored outcome.
 - [ ] Glyph sources: default challenge table entries, Dormant Machines, the `/rngtech glyph give` command, and the plain-stack rule.
-- [ ] Removal of the Exotic Affix Forge operations, history, cooling, cells, Coils, and forge affixes.
+- [x] Removal of the Exotic Affix Forge operations, history, recipe type, menu, screen, JEI category, and config keys (done in phase 4, since the Cradle took over the block). Its wiki page, guide, and quest text wait for the documentation phase.
 - [ ] Balance-world setup `rngbalance:phase_array`.
 - [ ] Documentation: wiki page, Rarity and Affixes, Modpack Creators, the implementation matrix, the GuideME guide, Machine Design Notes, and quests.
 - [ ] In-game playtest of every operation and outcome.
@@ -53,6 +53,7 @@ Recorded 2026-10-21 from the code on `main` at `c7757d96` and the open branches:
 ## Progress log
 
 - 2026-10-21: drafted the PRD and this state page, and updated the Work Orders PRD to match. Accepted the same day.
+- 2026-10-21: phase 4. `rngtech:phase_array` is a recipe type with one recipe per operation (`data/rngtech/recipe/phase_array/`), and the nine defaults carry the PRD's numbers. `PhaseCradleBlockEntity` replaces the Exotic Affix Forge's logic behind the same block id: it charges a pulse from supply and nine Battery Cell sockets at the line's Charge Rate, prices it with `PhaseArrayRules.pulseCost` and the line's Thrift, previews the odds with `PhasePulse.odds`, and fires through new `phase*` methods on `RefinementEngine` that spend no RP themselves. Strain lives in `rngtech:strain`. The old recipe type, action enum, history component, menu, screen, JEI category, and config multipliers are gone. `PhaseCradleScreen` is one panel in the Dormant Machine's style. The hold sequence is still instant; phase 5 adds the timed locks.
 - 2026-10-21: phase 3. `rngtech:phase_emitter` and `rngtech:phase_coil` are trait-bearing Stage 8 machine blocks with twelve-affix profiles under a new `HAS_PHASE_ARRAY` capability, eleven new `MachineStat` entries, base stats from `PhaseArrayRules`, loot tables that keep traits and the Coil's `rngtech:coil_tier`, calibrated shaped recipes behind the Nullite condition, and a `phase_array` corruption pool. `rngtech:glyph` carries `rngtech:glyph_tier` and has no recipe. The Cradle (the renamed `rngtech:exotic_affix_forge`) scans for the line like the Dehumidifier, lights members, and counts usable Coils. `PhaseArrayChecks` and `PhaseArrayGameTests` cover pools, base stats, position floors, formation, unforming, and inscribing. Inscribing has no in-game surface until the Fire tab lands.
 - 2026-10-21: added `phaseArraySim` and set the PRD's numbers from it: Resonate 1 RP, Fracture 1% per Strain, Quality divisor 3.5, Exalt 4 MFE. The first draft's 2 RP and 2% made RP the only limit a Rare item met and burned five Glyphs of Temper per item. Revised the same day: the form is a straight line instead of a ring, every stage is accepted, operations spend a little RP, operations are datapack recipes, Glyphs get default sources so the Array stands alone, part pools hold six affixes per slot type, the screen follows the Dormant Machine, and a balance-world setup is in scope.
 
@@ -61,11 +62,14 @@ Recorded 2026-10-21 from the code on `main` at `c7757d96` and the open branches:
 - 2026-10-21: documentation only. `mkdocs build --strict` passed. No Gradle or ModDex checks were run, because no code or data changed.
 - 2026-10-21: `./gradlew spotlessApply phaseArraySim` ran clean, and `./gradlew quickCheck` passed with the new `masteryTest` class. `mkdocs build --strict` passed.
 - 2026-10-21: phase 3. `./gradlew quickCheck`, `./gradlew runGameTestServer`, `npm run moddex:check`, `npm run repo:check`, and `mkdocs build --strict` passed.
+- 2026-10-21: phase 4. `./gradlew quickCheck`, `./gradlew runGameTestServer`, `npm run moddex:check`, `npm run repo:check`, and both `mkdocs build --strict` runs passed.
 
 ## Handoff and limits
 
 - The PRD's numbers are the `prd` scenario of `tools/balance/phase-array-scenarios.json`. The model has no Second Hold, Strain Tolerance, or part affixes in play; they are zero at base and only exist once parts roll.
 - The parts' block models are plain textured cubes from `tools`-style generated pixel art, not shaped models. They need the shaped-model pass the other machines got.
+- The screen is drawn but has not been opened in a client yet. Check the panel in the balance world once the setup exists.
+- `wiki/exotic-affix-forge.md` still describes the old forge. It is rewritten in the documentation phase.
 - Formation differs from the first PRD text: it is automatic, not a right-click, so it matches the Dehumidifier. The PRD now says so.
 - The model's players are simple: they always Resonate the lowest affix, and they stop at 25% Fracture. A player who Reforges a worn item, or Grafts between bodies, is not modelled.
 - The line is drafted horizontal only. A vertical line is an open question.

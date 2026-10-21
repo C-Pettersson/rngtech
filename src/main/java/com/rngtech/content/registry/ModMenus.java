@@ -23,7 +23,6 @@ import com.rngtech.content.menu.DebugChestMenu;
 import com.rngtech.content.menu.DebugRerollerMenu;
 import com.rngtech.content.menu.DebugTankMenu;
 import com.rngtech.content.menu.DormantMachineMenu;
-import com.rngtech.content.menu.ExoticAffixForgeMenu;
 import com.rngtech.content.menu.ForestryCartMenu;
 import com.rngtech.content.menu.ForestryCartStationMenu;
 import com.rngtech.content.menu.FurnaceMenu;
@@ -31,6 +30,7 @@ import com.rngtech.content.menu.GasChemistryMenu;
 import com.rngtech.content.menu.MelterMenu;
 import com.rngtech.content.menu.MetalPressMenu;
 import com.rngtech.content.menu.MinersCompanionMenu;
+import com.rngtech.content.menu.PhaseCradleMenu;
 import com.rngtech.content.menu.PotentialReactorMenu;
 import com.rngtech.content.menu.ResonanceCalibratorMenu;
 import com.rngtech.content.menu.SilicaGelDehumidifierMenu;
@@ -55,8 +55,8 @@ public final class ModMenus {
     public static final DeferredHolder<MenuType<?>, MenuType<AffixForgeMenu>> AFFIX_FORGE =
             MENU_TYPES.register("affix_forge", () -> IMenuTypeExtension.create(AffixForgeMenu::new));
 
-    public static final DeferredHolder<MenuType<?>, MenuType<ExoticAffixForgeMenu>> EXOTIC_AFFIX_FORGE =
-            MENU_TYPES.register("exotic_affix_forge", () -> IMenuTypeExtension.create(ExoticAffixForgeMenu::new));
+    public static final DeferredHolder<MenuType<?>, MenuType<PhaseCradleMenu>> EXOTIC_AFFIX_FORGE =
+            MENU_TYPES.register("exotic_affix_forge", () -> IMenuTypeExtension.create(PhaseCradleMenu::new));
 
     public static final DeferredHolder<MenuType<?>, MenuType<DebugRerollerMenu>> DEBUG_REROLLER =
             MENU_TYPES.register("debug_reroller", () -> IMenuTypeExtension.create(DebugRerollerMenu::new));

@@ -114,7 +114,7 @@ public final class PhaseLine {
     public static void requestNearbyCradleRescans(Level level, BlockPos pos) {
         for (Direction direction : Direction.Plane.HORIZONTAL) {
             for (int distance = 1; distance <= CRADLE_NOTIFY_DISTANCE; distance++) {
-                if (level.getBlockEntity(pos.relative(direction, distance)) instanceof ExoticAffixForgeBlockEntity cradle) {
+                if (level.getBlockEntity(pos.relative(direction, distance)) instanceof PhaseCradleBlockEntity cradle) {
                     cradle.requestLineRescan();
                 }
             }

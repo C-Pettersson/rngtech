@@ -1,0 +1,10 @@
+{
+  "type": "rngtech:phase_array",
+  "action": "imprint",
+  "coils": 6,
+  "glyph_tier": 2,
+  "base_fe": 2000000,
+  "refinement_potential_cost": 2,
+  "partial": "add_random_of_family",
+  "overhold": "best_of_two_tiers"
+}

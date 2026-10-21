@@ -21,13 +21,13 @@ import com.rngtech.content.blockentity.DebugRerollerBlockEntity;
 import com.rngtech.content.blockentity.DebugTankBlockEntity;
 import com.rngtech.content.blockentity.DebugTrashcanBlockEntity;
 import com.rngtech.content.blockentity.DormantMachineBlockEntity;
-import com.rngtech.content.blockentity.ExoticAffixForgeBlockEntity;
 import com.rngtech.content.blockentity.ForestryCartStationBlockEntity;
 import com.rngtech.content.blockentity.FurnaceBlockEntity;
 import com.rngtech.content.blockentity.GasChemistryBlockEntity;
 import com.rngtech.content.blockentity.MelterBlockEntity;
 import com.rngtech.content.blockentity.MetalPressBlockEntity;
 import com.rngtech.content.blockentity.PhaseCoilBlockEntity;
+import com.rngtech.content.blockentity.PhaseCradleBlockEntity;
 import com.rngtech.content.blockentity.PhaseEmitterBlockEntity;
 import com.rngtech.content.blockentity.PotentialReactorBlockEntity;
 import com.rngtech.content.blockentity.ResonanceCalibratorBlockEntity;
@@ -62,10 +62,10 @@ public final class ModBlockEntities {
                     () -> BlockEntityType.Builder.of(AffixForgeBlockEntity::new, ModBlocks.AFFIX_FORGE.get()).build(null)
             );
 
-    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<ExoticAffixForgeBlockEntity>> EXOTIC_AFFIX_FORGE =
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<PhaseCradleBlockEntity>> EXOTIC_AFFIX_FORGE =
             BLOCK_ENTITY_TYPES.register(
                     "exotic_affix_forge",
-                    () -> BlockEntityType.Builder.of(ExoticAffixForgeBlockEntity::new, ModBlocks.EXOTIC_AFFIX_FORGE.get()).build(null)
+                    () -> BlockEntityType.Builder.of(PhaseCradleBlockEntity::new, ModBlocks.EXOTIC_AFFIX_FORGE.get()).build(null)
             );
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<PhaseEmitterBlockEntity>> PHASE_EMITTER =
             BLOCK_ENTITY_TYPES.register(

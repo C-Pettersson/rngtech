@@ -484,6 +484,7 @@ public final class MachineStatAccumulator {
         stats.baseValues.put(MachineStat.CHARGE_CAPACITY, (double) PhaseArrayRules.COIL_CHARGE_CAPACITY);
         stats.baseValues.put(MachineStat.CHARGE_RATE, (double) PhaseArrayRules.COIL_CHARGE_RATE);
         stats.baseValues.put(MachineStat.HOLD_CHANCE, PhaseArrayRules.COIL_HOLD_CHANCE);
+        stats.baseValues.put(MachineStat.OVERHOLD_CHANCE, PhaseArrayRules.COIL_OVERHOLD_CHANCE);
         return stats;
     }
 

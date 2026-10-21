@@ -11,7 +11,6 @@ import com.rngtech.client.screen.CavitationGeneratorScreen;
 import com.rngtech.client.screen.ComponentRecyclerScreen;
 import com.rngtech.client.screen.CorrosionCellScreen;
 import com.rngtech.client.screen.CrusherScreen;
-import com.rngtech.client.screen.ExoticAffixForgeScreen;
 import com.rngtech.client.screen.FurnaceScreen;
 import com.rngtech.client.screen.GasChemistryScreen;
 import com.rngtech.client.screen.MelterScreen;
@@ -43,7 +42,6 @@ import com.rngtech.content.menu.CavitationGeneratorMenu;
 import com.rngtech.content.menu.ComponentRecyclerMenu;
 import com.rngtech.content.menu.CorrosionCellMenu;
 import com.rngtech.content.menu.CrusherMenu;
-import com.rngtech.content.menu.ExoticAffixForgeMenu;
 import com.rngtech.content.menu.FurnaceMenu;
 import com.rngtech.content.menu.GasChemistryMenu;
 import com.rngtech.content.menu.MelterMenu;
@@ -68,13 +66,13 @@ import com.rngtech.content.recipe.ComponentRecyclingRecipe;
 import com.rngtech.content.recipe.CorrosionCellRecipe;
 import com.rngtech.content.recipe.CrusherRecipe;
 import com.rngtech.content.recipe.DesiccantAbsorptionRecipe;
-import com.rngtech.content.recipe.ExoticAffixForgeRecipe;
 import com.rngtech.content.recipe.FurnaceRecipe;
 import com.rngtech.content.recipe.GasCombustionRecipe;
 import com.rngtech.content.recipe.GasReformingRecipe;
 import com.rngtech.content.recipe.MelterRecipe;
 import com.rngtech.content.recipe.MetalPressRecipe;
 import com.rngtech.content.recipe.MinersCompanionRecoveryRecipe;
+import com.rngtech.content.recipe.PhaseArrayRecipe;
 import com.rngtech.content.recipe.PotentialReactorRecipe;
 import com.rngtech.content.recipe.VacuumCollapseRecipe;
 import com.rngtech.content.recipe.WoodenDehumidifierConversionRecipe;
@@ -136,7 +134,7 @@ public final class RNGTechJeiPlugin implements IModPlugin {
         registration.addRecipeCategories(
                 new MachineGearRecipeCategory(registration.getJeiHelpers().getGuiHelper()),
                 new AffixForgeRecipeCategory(registration.getJeiHelpers().getGuiHelper()),
-                new ExoticAffixForgeRecipeCategory(registration.getJeiHelpers().getGuiHelper()),
+                new PhaseArrayRecipeCategory(registration.getJeiHelpers().getGuiHelper()),
                 new SolidFuelBurnerRecipeCategory(registration.getJeiHelpers().getGuiHelper()),
                 new BioGeneratorRecipeCategory(registration.getJeiHelpers().getGuiHelper()),
                 new WoodenComposterRecipeCategory(registration.getJeiHelpers().getGuiHelper()),
@@ -206,7 +204,7 @@ public final class RNGTechJeiPlugin implements IModPlugin {
         );
         registration.addIngredientInfo(
                 ModItems.EXOTIC_AFFIX_FORGE.get(),
-                Component.translatable("rngtech.jei.exotic_affix_forge.info")
+                Component.translatable("rngtech.jei.phase_cradle.info")
         );
         for (UniqueDefinition unique : UniqueCatalog.all()) {
             registration.addItemStackInfo(List.of(uniqueStack(unique)), uniqueInfo(unique).toArray(Component[]::new));
@@ -248,9 +246,9 @@ public final class RNGTechJeiPlugin implements IModPlugin {
         List<RecipeHolder<MinersCompanionRecoveryRecipe>> minersCompanionRecoveryRecipes =
                 level.getRecipeManager().getAllRecipesFor(ModRecipes.MINERS_COMPANION_RECOVERY_TYPE.get());
         registration.addRecipes(JeiRecipeTypes.MINERS_COMPANION_RECOVERY, minersCompanionRecoveryRecipes);
-        List<RecipeHolder<ExoticAffixForgeRecipe>> exoticAffixForgeRecipes =
-                level.getRecipeManager().getAllRecipesFor(ModRecipes.EXOTIC_AFFIX_FORGE_TYPE.get());
-        registration.addRecipes(JeiRecipeTypes.EXOTIC_AFFIX_FORGE, exoticAffixForgeRecipes);
+        List<RecipeHolder<PhaseArrayRecipe>> phaseArrayRecipes =
+                level.getRecipeManager().getAllRecipesFor(ModRecipes.PHASE_ARRAY_TYPE.get());
+        registration.addRecipes(JeiRecipeTypes.PHASE_ARRAY, phaseArrayRecipes);
         List<RecipeHolder<CorrosionCellRecipe>> corrosionCellRecipes =
                 level.getRecipeManager().getAllRecipesFor(ModRecipes.CORROSION_CELL_TYPE.get());
         registration.addRecipes(JeiRecipeTypes.CORROSION_CELL, corrosionCellRecipes);
@@ -311,7 +309,7 @@ public final class RNGTechJeiPlugin implements IModPlugin {
             }
         }
         registration.addRecipeCatalyst(ModItems.AFFIX_FORGE.get(), JeiRecipeTypes.AFFIX_FORGE);
-        registration.addRecipeCatalyst(ModItems.EXOTIC_AFFIX_FORGE.get(), JeiRecipeTypes.EXOTIC_AFFIX_FORGE);
+        registration.addRecipeCatalyst(ModItems.EXOTIC_AFFIX_FORGE.get(), JeiRecipeTypes.PHASE_ARRAY);
         for (SolidFuelBurnerChassis chassis : SolidFuelBurnerChassis.values()) {
             registration.addRecipeCatalyst(ModItems.solidFuelBurner(chassis).get(), JeiRecipeTypes.SOLID_FUEL_BURNING);
         }
@@ -354,16 +352,6 @@ public final class RNGTechJeiPlugin implements IModPlugin {
 
     @Override
     public void registerGuiHandlers(IGuiHandlerRegistration registration) {
-        registerProcessRecipeLineClickArea(
-                registration,
-                ExoticAffixForgeScreen.class,
-                screen -> screen.getMenu().selectedTab() == ExoticAffixForgeMenu.TAB_PROCESSING,
-                96,
-                105,
-                112,
-                8,
-                JeiRecipeTypes.EXOTIC_AFFIX_FORGE
-        );
         registerProcessRecipeLineClickArea(
                 registration,
                 SolidFuelBurnerScreen.class,
@@ -668,15 +656,6 @@ public final class RNGTechJeiPlugin implements IModPlugin {
                 0,
                 2,
                 6,
-                36
-        );
-        registration.addRecipeTransferHandler(
-                ExoticAffixForgeMenu.class,
-                ModMenus.EXOTIC_AFFIX_FORGE.get(),
-                JeiRecipeTypes.EXOTIC_AFFIX_FORGE,
-                0,
-                2,
-                4,
                 36
         );
         registration.addRecipeTransferHandler(

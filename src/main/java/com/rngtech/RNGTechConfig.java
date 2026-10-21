@@ -68,14 +68,6 @@ public final class RNGTechConfig {
             .comment("Multiplier applied to Resonance Calibrator recipe processing time.")
             .defineInRange("calibration.timeMultiplier", 1.0D, 0.01D, 100.0D);
 
-    public static final ModConfigSpec.DoubleValue EXOTIC_AFFIX_FORGE_ENERGY_MULTIPLIER = BUILDER
-            .comment("Multiplier applied to Exotic Affix Forge recipe FE costs after per-target history scaling.")
-            .defineInRange("exoticAffixForge.energyMultiplier", 1.0D, 0.01D, 100.0D);
-
-    public static final ModConfigSpec.DoubleValue EXOTIC_AFFIX_FORGE_TIME_MULTIPLIER = BUILDER
-            .comment("Multiplier applied to Exotic Affix Forge recipe processing time.")
-            .defineInRange("exoticAffixForge.timeMultiplier", 1.0D, 0.01D, 100.0D);
-
     public static final ModConfigSpec.BooleanValue SOLAR_GENERATES_IN_OVERWORLD = BUILDER
             .comment("Whether Solar Panels and Solar Array Controllers generate FE in the Overworld.")
             .define("solar.dimensions.overworld", true);
