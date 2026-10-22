@@ -4,7 +4,7 @@
   "coils": 5,
   "glyph_tier": 0,
   "base_fe": 2000000,
-  "refinement_potential_cost": 1,
+  "refinement_potential_cost": 2,
   "partial": "reroll_selected_value",
   "overhold": "two_tiers"
 }

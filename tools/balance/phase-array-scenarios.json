@@ -23,9 +23,9 @@
             "operations": {
                 "reforge": { "base_fe": 2000000, "coils": 3, "rp": 0, "glyph": 0 },
                 "attune": { "base_fe": 1000000, "coils": 4, "rp": 1, "glyph": 0 },
-                "resonate": { "base_fe": 2000000, "coils": 5, "rp": 1, "glyph": 0 },
+                "resonate": { "base_fe": 2000000, "coils": 5, "rp": 2, "glyph": 0 },
                 "excise": { "base_fe": 1000000, "coils": 5, "rp": 1, "glyph": 0 },
-                "imprint": { "base_fe": 2000000, "coils": 6, "rp": 2, "glyph": 2 },
+                "imprint": { "base_fe": 2000000, "coils": 6, "rp": 2, "glyph": 4 },
                 "transmute": { "base_fe": 4000000, "coils": 7, "rp": 1, "glyph": 3 },
                 "temper": { "base_fe": 4000000, "coils": 7, "rp": 0, "glyph": 3 },
                 "exalt": { "base_fe": 4000000, "coils": 8, "rp": 2, "glyph": 4 },

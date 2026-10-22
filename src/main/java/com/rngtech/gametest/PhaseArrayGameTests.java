@@ -263,7 +263,7 @@ public final class PhaseArrayGameTests {
         check(loaded.size() == PhaseArrayAction.values().length, "One default recipe per operation, found " + loaded.size());
         PhaseArrayRecipe resonate = loaded.stream().map(RecipeHolder::value)
                 .filter(recipe -> recipe.action() == PhaseArrayAction.RESONATE).findFirst().orElse(null);
-        check(resonate != null && resonate.baseFe() == 2_000_000L && resonate.refinementPotentialCost() == 1, "Resonate loads with 2 MFE and 1 RP");
+        check(resonate != null && resonate.baseFe() == 2_000_000L && resonate.refinementPotentialCost() == 2, "Resonate loads with 2 MFE and 2 RP");
         JsonObject json = new JsonObject();
         json.addProperty("action", "resonate");
         json.addProperty("coils", 5);

@@ -14,9 +14,9 @@ navigation:
 | Exalt | 8 | IV | 4 MFE | 2 | Reroll selected value | None |
 | Excise | 5 | None | 1 MFE | 1 | Remove random | Remove strain |
 | Graft | 9 | V | 8 MFE | 2 | Donor tier down | Keep donor |
-| Imprint | 6 | II | 2 MFE | 2 | Add random of family | Best of two tiers |
+| Imprint | 6 | IV | 2 MFE | 2 | Add random of family | Best of two tiers |
 | Reforge | 3 | None | 2 MFE | 0 | Reroll affixes | Best of two rarity |
-| Resonate | 5 | None | 2 MFE | 1 | Reroll selected value | Two tiers |
+| Resonate | 5 | None | 2 MFE | 2 | Reroll selected value | Two tiers |
 | Temper | 7 | III | 4 MFE | 0 | Halve strain | None |
 | Transmute | 7 | III | 4 MFE | 1 | Swap random same slot | Keep value quality |
 

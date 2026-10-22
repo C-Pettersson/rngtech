@@ -142,15 +142,15 @@ Operations are recipes of type `rngtech:phase_array`. Each names its action, sel
 |---|---|---|---:|---|---:|---|---|
 | Reforge | Rerolls rarity, affixes, and RP as if newly crafted. Strain stays. | None | 3 | None | 0 | Rerolls affixes only | Rolls rarity twice, keeps the better |
 | Attune | Rerolls every affix's value within its tier. | None | 4 | None | 1 | Rerolls one random affix's value | Rolls each value twice, keeps the better |
-| Resonate | Raises the selected affix one tier, up to Tier 6. | One affix | 5 | None | 1 | Rerolls its value within its tier | Raises it two tiers |
+| Resonate | Raises the selected affix one tier, up to Tier 6. | One affix | 5 | None | 2 | Rerolls its value within its tier | Raises it two tiers |
 | Excise | Removes the selected affix. | One affix | 5 | None | 1 | Removes a random affix | Also removes one Strain |
-| Imprint | Adds the chosen affix to the chosen empty slot. The tier rolls with the item's normal weights. | One empty slot and one legal affix | 6 | II or higher | 2 | Adds a random affix of the chosen affix's family | Rolls the tier twice, keeps the higher |
+| Imprint | Adds the chosen affix to the chosen empty slot. The tier rolls with the item's normal weights. | One empty slot and one legal affix | 6 | IV or higher | 2 | Adds a random affix of the chosen affix's family | Rolls the tier twice, keeps the higher |
 | Transmute | Swaps the selected affix for another legal affix in the same prefix or suffix slot, keeping its tier. | One affix | 7 | III or higher | 1 | Swaps it for a random affix of the same slot type | Keeps the roll's value quality too |
 | Temper | Sets Strain to 0. | None | 7 | III or higher | 0 | Halves Strain, rounding down | None |
 | Exalt | Raises the selected Tier 6 affix to Tier 7. Exotic items only. | One Tier 6 affix | 8 | IV or higher | 2 | Rerolls its value within Tier 6 | None |
 | Graft | Moves the selected affix from a donor item onto the target's chosen empty slot, keeping tier and value. The donor is destroyed. | One donor affix and one empty slot | 9 | V | 2 | The affix arrives one tier lower | The donor survives, stripped of that affix |
 
-RP is spent on Success, Overhold, and Partial, never on a Miss or a Fracture, like a failed catalyst at the Affix Forge. The costs are fixed, lower than the Affix Forge's rolled ranges for the same work, and the item needs the full cost to start. The Array is a bench, not a second RP budget. The model set Resonate at 1 RP: at 2 RP, RP was the only limit a Rare item ever met, and Strain and FE never got to matter.
+RP is spent on Success, Overhold, and Partial, never on a Miss or a Fracture, like a failed catalyst at the Affix Forge. The costs are fixed, lower than the Affix Forge's rolled ranges for the same work, and the item needs the full cost to start. The Array is a bench, not a second RP budget. Resonate costs 2 RP and Imprint a Tier IV Glyph, set from playtest on 2026-10-22: at 1 RP, Resonate climbed every affix to Tier 6 before anything else mattered, and a Tier II Imprint chose the affix far earlier than any other deep operation. At 2 RP the model's Rare players run out of RP before Strain stops them, so the item ends with the player's choices spent, not with a Fracture.
 
 Rules:
 
@@ -229,14 +229,14 @@ RP is the ceiling. A fresh Stage 5 part with 18 RP can take eighteen Resonates i
 
 | Player | Item | Pulses | Time | Ends at | Stopped by |
 |---|---|---:|---:|---|---|
-| Resonate the lowest affix, never Temper | Fresh Rare Stage 8 | 25 | 30 min | Quality 25 of 36, 10 RP left | Strain |
-| The same, Tempering at 10% Fracture | Fresh Rare Stage 8 | 39 | 100 min, 5 Glyphs | Quality 34; half reach all Tier 6 | RP |
-| Resonate the lowest affix | Fresh Magic Stage 8 | 12 | 4 min | Both affixes Tier 6 | Done |
-| Resonate the lowest affix | Fresh Rare Stage 5 | 25 | 8 min | Quality 24; 40% run out of RP first | Strain |
+| Resonate the lowest affix, never Temper | Fresh Rare Stage 8 | 18 | 17 min | Quality 22 of 36, no RP left | RP, 91%; Strain, 9% |
+| The same, Tempering at 10% Fracture | Fresh Rare Stage 8 | 19 | 22 min, 2 Glyphs | Quality 23 | RP |
+| Resonate the lowest affix | Fresh Magic Stage 8 | 12 | 4 min | Both affixes Tier 6 for 87%, 8 RP left | Done |
+| Resonate the lowest affix | Fresh Rare Stage 5 | 12 | 3 min | Quality 18 | RP |
 | Exalt six Tier 6 affixes to Tier 7, nine Coils | All-Tier-6 Rare Stage 8 | 12 | 4.5 h, 12 Glyphs | 94% reach six Tier 7 | Done |
 | Reforge until Rare with Quality 12 or more | Any Stage 8 | 1 to 25 | Under 5 min | 83% get one before Strain stops them | Done |
 
-The three limits bind in the order the PRD wants. Strain is the first wall and Glyphs buy the way past it, RP ends the Resonate stretch around all Tier 6, and FE is what a perfect item costs: a Tier 7 pulse at the end is 16 to 30 minutes of the reference supply. A Reforge is cheap on a bad item and useless on a good one, since a Rare with Quality 12 is 10% of rolls and the item's Strain runs out before the player's luck does.
+RP binds first: a fresh Rare item spends its budget on about a dozen Resonates and ends around Tier 4, so the player chooses which affixes get the RP, and Strain is the wall only for the unlucky tenth. Tempering buys almost nothing once RP is the limit. FE is what a perfect item costs: a Tier 7 pulse at the end is 16 to 30 minutes of the reference supply, and the Exalt run still reaches six Tier 7 affixes because its items start with their RP unspent. Reforge stays cheap on a bad item and useless on a good one.
 
 ## Glyphs and Work Orders
 
