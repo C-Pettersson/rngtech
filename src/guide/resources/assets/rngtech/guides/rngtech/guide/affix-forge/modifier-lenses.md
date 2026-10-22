@@ -8,9 +8,14 @@ navigation:
 
 # Modifier lenses
 
-With an Affix Lens Array installed, a lens in the focus slot makes affixes from its family three times as likely to be picked. Lenses work with the Affix Injector, Affix Upgrader, and Greater Affix Upgrader.
+With an Affix Lens Array installed, a lens in the focus slot makes affixes from its family three times as likely to be picked. Lenses work with every catalyst except the Volatile Catalyst:
 
-A lens is a nudge, not a filter: other affixes can still roll. If nothing on the item can match the lens, Reforge is blocked and nothing is used. On success, both the catalyst and the lens are used up. Hold Shift on a lens to see which affixes it favors.
+- the Affix Injector, Expansion Crystal, Ascension Catalyst, and Ascension Matrix favor the lens's family when they add affixes;
+- the Affix Upgrader, Greater Affix Upgrader, and Ascension Matrix favor it when they choose the affix to upgrade;
+- the Chaos Crystal favors it for every affix it rerolls;
+- the Nullifier Coil and Null Crystal favor it when they choose the affix to remove.
+
+A lens is a nudge, not a filter: other affixes can still roll. If nothing the catalyst can pick matches the lens, Reforge is blocked and nothing is used. On success, both the catalyst and the lens are used up. Hold Shift on a lens to see which affixes it favors.
 
 | Lens | Favors |
 |---|---|

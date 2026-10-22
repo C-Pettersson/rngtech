@@ -31,14 +31,16 @@ public record AffixForgeJeiRecipe(
         List<ItemStack> lenses = ModItems.modifierLenses().stream()
                 .map(item -> new ItemStack(item.get()))
                 .toList();
-        List<ItemStack> addModifiers = List.of(
-                new ItemStack(ModItems.CONSERVATION_CRYSTAL.get())
-        );
-        List<ItemStack> randomUpgradeModifiers = List.of(
+        List<ItemStack> costModifiers = List.of(
+                new ItemStack(ModItems.CONSERVATION_CRYSTAL.get()),
                 new ItemStack(ModItems.FRUGALITY_CRYSTAL.get())
+        );
+        List<ItemStack> ascendModifiers = List.of(
+                new ItemStack(ModItems.CONSERVATION_CRYSTAL.get())
         );
         List<ItemStack> upgradeModifiers = List.of(
                 new ItemStack(ModItems.CONSERVATION_CRYSTAL.get()),
+                new ItemStack(ModItems.FRUGALITY_CRYSTAL.get()),
                 new ItemStack(ModItems.TRANSMUTATION_CRYSTAL.get()),
                 new ItemStack(ModItems.RESONANCE_CRYSTAL.get()),
                 new ItemStack(ModItems.DESTABILIZATION_CRYSTAL.get())
@@ -50,7 +52,7 @@ public record AffixForgeJeiRecipe(
                         new ItemStack(ModItems.AFFIX_INJECTOR.get()),
                         RefinementOperation.ADD_MODIFIER,
                         ItemStack.EMPTY,
-                        withLenses(addModifiers, lenses),
+                        withLenses(costModifiers, lenses),
                         "rngtech.jei.affix_forge.action.add",
                         "rngtech.jei.affix_forge.selection.none",
                         "rngtech.jei.affix_forge.cost.injector",
@@ -61,7 +63,7 @@ public record AffixForgeJeiRecipe(
                         new ItemStack(ModItems.AFFIX_MODIFIER.get()),
                         RefinementOperation.UPGRADE_RANDOM_MODIFIER,
                         ItemStack.EMPTY,
-                        withLenses(randomUpgradeModifiers, lenses),
+                        withLenses(upgradeModifiers, lenses),
                         "rngtech.jei.affix_forge.action.random_upgrade",
                         "rngtech.jei.affix_forge.selection.none",
                         "rngtech.jei.affix_forge.cost.random_upgrade",
@@ -83,7 +85,7 @@ public record AffixForgeJeiRecipe(
                         new ItemStack(ModItems.ASCENSION_MATRIX.get()),
                         RefinementOperation.ASCEND_RARITY,
                         new ItemStack(ModItems.AFFIX_RESONANCE_MATRIX.get()),
-                        List.of(),
+                        withLenses(ascendModifiers, lenses),
                         "rngtech.jei.affix_forge.action.ascend",
                         "rngtech.jei.affix_forge.selection.none",
                         "rngtech.jei.affix_forge.cost.all",
@@ -94,7 +96,7 @@ public record AffixForgeJeiRecipe(
                         new ItemStack(ModItems.ASCENSION_CATALYST.get()),
                         RefinementOperation.ASCENSION_CATALYST,
                         new ItemStack(ModItems.AFFIX_RESONANCE_MATRIX.get()),
-                        List.of(),
+                        withLenses(costModifiers, lenses),
                         "rngtech.jei.affix_forge.action.catalyze_ascension",
                         "rngtech.jei.affix_forge.selection.none",
                         "rngtech.jei.affix_forge.cost.ascension_catalyst",
@@ -105,7 +107,7 @@ public record AffixForgeJeiRecipe(
                         new ItemStack(ModItems.NULLIFIER_COIL.get()),
                         RefinementOperation.REMOVE_MODIFIER,
                         ItemStack.EMPTY,
-                        List.of(),
+                        withLenses(costModifiers, lenses),
                         "rngtech.jei.affix_forge.action.remove",
                         "rngtech.jei.affix_forge.selection.none",
                         "rngtech.jei.affix_forge.cost.random",
@@ -116,7 +118,7 @@ public record AffixForgeJeiRecipe(
                         new ItemStack(ModItems.CHAOS_CRYSTAL.get()),
                         RefinementOperation.CHAOS_CRYSTAL,
                         new ItemStack(ModItems.AFFIX_RESONANCE_MATRIX.get()),
-                        List.of(),
+                        withLenses(costModifiers, lenses),
                         "rngtech.jei.affix_forge.action.reroll",
                         "rngtech.jei.affix_forge.selection.none",
                         "rngtech.jei.affix_forge.cost.random",
@@ -127,7 +129,7 @@ public record AffixForgeJeiRecipe(
                         new ItemStack(ModItems.EXPANSION_CRYSTAL.get()),
                         RefinementOperation.EXPANSION_CRYSTAL,
                         new ItemStack(ModItems.AFFIX_RESONANCE_MATRIX.get()),
-                        List.of(),
+                        withLenses(costModifiers, lenses),
                         "rngtech.jei.affix_forge.action.fill",
                         "rngtech.jei.affix_forge.selection.none",
                         "rngtech.jei.affix_forge.cost.each",
@@ -149,7 +151,7 @@ public record AffixForgeJeiRecipe(
                         new ItemStack(ModItems.NULL_CRYSTAL.get()),
                         RefinementOperation.NULL_CRYSTAL,
                         new ItemStack(ModItems.AFFIX_RESONANCE_MATRIX.get()),
-                        List.of(),
+                        withLenses(costModifiers, lenses),
                         "rngtech.jei.affix_forge.action.remove",
                         "rngtech.jei.affix_forge.selection.none",
                         "rngtech.jei.affix_forge.cost.random",
