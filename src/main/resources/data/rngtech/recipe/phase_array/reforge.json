@@ -1,0 +1,10 @@
+{
+  "type": "rngtech:phase_array",
+  "action": "reforge",
+  "coils": 3,
+  "glyph_tier": 0,
+  "base_fe": 2000000,
+  "refinement_potential_cost": 0,
+  "partial": "reroll_affixes",
+  "overhold": "best_of_two_rarity"
+}

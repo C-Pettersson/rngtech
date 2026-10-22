@@ -1,0 +1,8 @@
+{
+  "parent": "rngtech:block/phase_emitter",
+  "textures": {
+    "core": "rngtech:block/phase_array/core_active",
+    "lens": "rngtech:block/phase_array/lens_active",
+    "strip": "rngtech:block/phase_array/estrip_active"
+  }
+}

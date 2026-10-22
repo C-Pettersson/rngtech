@@ -18,6 +18,6 @@ navigation:
 | 5 | Aluminum | Aluminum, sparksteel, osmium | Gas power: [Coal Gasifier](rngtech:coal-gasifier.md), [Syngas Combustor](rngtech:syngas-combustor.md), [Cavitation Generator](rngtech:cavitation-generator.md), [Silica Gel Dehumidifier](rngtech:silica-gel-dehumidifier.md). |
 | 6 | Titanium | Titanium, arclite | Chemistry: [Melter](rngtech:melter.md), [Steam Methane Reformer](rngtech:steam-methane-reformer.md), [Ammonia Synthesizer](rngtech:ammonia-synthesizer.md), [Fuel Cell](rngtech:ammonia-fuel-cell.md), the Titanium Alloy Furnace. |
 | 7 | Tungstensteel | Tungstensteel, nullite, aethergold, tungsten, platinum | Late-game machine sets and the [Vacuum Collapse Generator](rngtech:vacuum-collapse-generator.md). |
-| 8 | Exotic | Naquadah, netherite | The top machine sets, Exotic Battery Cells, the [Exotic Affix Forge](rngtech:exotic-affix-forge.md). |
+| 8 | Exotic | Naquadah, netherite | The top machine sets, Exotic Battery Cells, the [Phase Array](rngtech:phase-array.md). |
 
 Modpacks can disable materials, change recipes, and swap the Exotic material, so check the recipe tables in your pack.

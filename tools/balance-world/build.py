@@ -594,8 +594,33 @@ def ore_lines():
 
 def all_setups():
     return [coal(), syngas(), carbon_loop(), ammonia(), void_catalyst(), water(), side_power(), nitrogen_atmosphere(),
-            hydrogen_chemistry(),
+            hydrogen_chemistry(), phase_array(),
             *ore_lines()]
+
+
+def phase_array():
+    """A nine-Coil Phase Array with every position open, powered by a Debug Battery behind the Cradle.
+
+    The Emitter sits at the west end and the Cradle at column 10, so the Coils count 1 to 9 from the Emitter. Three
+    charged Exotic Cells wait in the Cradle's sockets, and two Debug Chests hold Glyphs of every tier and sample Stage 8
+    parts to fire at. Parts taken from the chest are unidentified: put one alone in a crafting grid first.
+    """
+    s = Setup("phase_array", "Phase Array", "Nine-Coil Phase Array, a Glyph of every tier seated, Debug Battery and charged "
+                                          "cells on the Cradle, Debug Chests of Glyphs and Stage 8 parts.")
+    s.block(0, 0, -1, "rngtech:phase_emitter[facing=east]")
+    for position in range(1, 10):
+        s.block(position, 0, -1, "rngtech:phase_coil[facing=east]")
+    cells = {slot: charged_cell("rngtech:exotic_battery_cell", 100_000_000) for slot in range(3)}
+    seats = {tier - 1: stack("rngtech:glyph", 1, {"rngtech:glyph_tier": tier}) for tier in range(1, 6)}
+    s.machine(10, "rngtech:exotic_affix_forge", {"Cells": inventory(9, cells), "Seats": inventory(5, seats)}, energy="input")
+    s.block(10, 0, -2, "rngtech:debug_battery", {"OutputRate": 60_000})
+    glyphs = [stack("rngtech:glyph", 64, {"rngtech:glyph_tier": tier}) for tier in range(1, 6)]
+    s.block(12, 0, -1, "rngtech:debug_chest", debug_chest(*glyphs))
+    s.block(13, 0, -1, "rngtech:debug_chest", debug_chest(
+        "rngtech:phase_coil", "rngtech:phase_emitter", "rngtech:exotic_crush_head", "rngtech:exotic_heat_core",
+        "rngtech:exotic_battery_cell", "rngtech:exotic_crusher_chassis"))
+    s.trunk_end = max(s.trunk_end, 13)
+    return s
 
 
 # ---- datapack ------------------------------------------------------------------------------------------------------

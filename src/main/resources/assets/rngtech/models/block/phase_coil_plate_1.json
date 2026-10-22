@@ -1,0 +1,76 @@
+{
+  "render_type": "minecraft:cutout",
+  "textures": {
+    "particle": "rngtech:block/phase_array/casing",
+    "plate": "rngtech:block/phase_array/plate_1",
+    "interior": "rngtech:block/phase_array/interior"
+  },
+  "elements": [
+    {
+      "from": [
+        13.5,
+        4.0,
+        4.0
+      ],
+      "to": [
+        14.0,
+        12.0,
+        12.0
+      ],
+      "faces": {
+        "north": {
+          "texture": "#interior"
+        },
+        "south": {
+          "texture": "#interior"
+        },
+        "east": {
+          "texture": "#plate"
+        },
+        "west": {
+          "texture": "#interior"
+        },
+        "up": {
+          "texture": "#interior"
+        },
+        "down": {
+          "texture": "#interior"
+        }
+      },
+      "shade": false
+    },
+    {
+      "from": [
+        2.0,
+        4.0,
+        4.0
+      ],
+      "to": [
+        2.5,
+        12.0,
+        12.0
+      ],
+      "faces": {
+        "north": {
+          "texture": "#interior"
+        },
+        "south": {
+          "texture": "#interior"
+        },
+        "east": {
+          "texture": "#interior"
+        },
+        "west": {
+          "texture": "#plate"
+        },
+        "up": {
+          "texture": "#interior"
+        },
+        "down": {
+          "texture": "#interior"
+        }
+      },
+      "shade": false
+    }
+  ]
+}

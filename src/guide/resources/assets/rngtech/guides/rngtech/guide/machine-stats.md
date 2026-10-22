@@ -51,3 +51,4 @@ Every RNGTech machine, part, Battery Cell, and tool works from a set of **stats*
 - [Tools and companions](rngtech:machine-stats/tools-and-companions.md)
 - [Ascendancy stats](rngtech:machine-stats/ascendancy-stats.md)
 - [Unique stats](rngtech:machine-stats/unique-stats.md)
+- [Phase Array line](rngtech:machine-stats/phase-array-line.md)

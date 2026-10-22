@@ -1091,6 +1091,9 @@ function staticStageEntries() {
         stageEntry("potential_reactor", 4, "static stage catalog"),
         stageEntry("metal_press", 4, "static stage catalog"),
         stageEntry("melter", 6, "static stage catalog"),
+        stageEntry("phase_emitter", 8, "static stage catalog"),
+        stageEntry("phase_coil", 8, "static stage catalog"),
+        stageEntry("glyph", 8, "static stage catalog"),
         stageEntry("tool_bench", 0, "static stage catalog"),
         stageEntry("affix_forge", 4, "static stage catalog"),
         stageEntry("affix_injector", 4, "static stage catalog"),
@@ -1707,7 +1710,7 @@ function stageItemCategory(id, materialItemIds) {
     if (materialItemIds.has(id)) {
         return "material";
     }
-    if (/(?:^|_)(crusher|furnace|melter|press|reactor|generator|calibrator|recycler|solar_panel|solar_array_controller|battery_chassis|solid_fuel_burner|tool_bench|affix_forge|wooden_composter|compressor_tank)$/.test(local)
+    if (/(?:^|_)(crusher|furnace|melter|press|reactor|generator|calibrator|recycler|solar_panel|solar_array_controller|battery_chassis|solid_fuel_burner|tool_bench|affix_forge|wooden_composter|compressor_tank|phase_emitter|phase_coil)$/.test(local)
             || local.endsWith("_chassis")
             || local.endsWith("_compressor_tank")
             || local.endsWith("_component_recycler")
@@ -1821,6 +1824,9 @@ function modifierProfileIdForItem(id) {
     }
     if (local === "corrosion_cell") {
         return "corrosion_cell";
+    }
+    if (local === "phase_emitter" || local === "phase_coil") {
+        return local;
     }
     if (local === "vacuum_collapse_generator") {
         return "vacuum_collapse_generator";

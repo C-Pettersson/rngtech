@@ -1363,6 +1363,153 @@ public final class ModifierEligibilityProfiles {
     );
 
     private static final Set<String> BEHAVIOR_ONLY_AFFIX_IDS = Set.of();
+    private static final List<ModifierValueRange> PHASE_HOLD_CHANCE_RANGES = List.of(
+            new ModifierValueRange(0.5, 1.0, false),
+            new ModifierValueRange(1.0, 1.5, false),
+            new ModifierValueRange(1.5, 2.0, false),
+            new ModifierValueRange(2.0, 2.5, false),
+            new ModifierValueRange(2.5, 3.0, false),
+            new ModifierValueRange(3.0, 3.5, false),
+            new ModifierValueRange(3.5, 4.0, false)
+    );
+    private static final List<ModifierValueRange> PHASE_POISE_RANGES = List.of(
+            new ModifierValueRange(0.25, 0.5, false),
+            new ModifierValueRange(0.5, 0.75, false),
+            new ModifierValueRange(0.75, 1.0, false),
+            new ModifierValueRange(1.0, 1.25, false),
+            new ModifierValueRange(1.25, 1.5, false),
+            new ModifierValueRange(1.5, 1.75, false),
+            new ModifierValueRange(1.75, 2.0, false)
+    );
+    private static final List<ModifierValueRange> PHASE_SECOND_HOLD_RANGES = List.of(
+            new ModifierValueRange(2, 4, true),
+            new ModifierValueRange(4, 6, true),
+            new ModifierValueRange(6, 8, true),
+            new ModifierValueRange(8, 11, true),
+            new ModifierValueRange(11, 14, true),
+            new ModifierValueRange(14, 18, true),
+            new ModifierValueRange(18, 25, true)
+    );
+    private static final List<ModifierValueRange> PHASE_OVERHOLD_RANGES = List.of(
+            new ModifierValueRange(1, 2, true),
+            new ModifierValueRange(2, 3, true),
+            new ModifierValueRange(3, 4, true),
+            new ModifierValueRange(4, 5, true),
+            new ModifierValueRange(5, 6, true),
+            new ModifierValueRange(6, 8, true),
+            new ModifierValueRange(8, 10, true)
+    );
+    private static final List<ModifierValueRange> PHASE_FOCUS_RANGES = List.of(
+            ModifierValueRange.fixed(1),
+            new ModifierValueRange(1, 2, true),
+            ModifierValueRange.fixed(2),
+            new ModifierValueRange(2, 3, true),
+            ModifierValueRange.fixed(3),
+            new ModifierValueRange(3, 4, true),
+            new ModifierValueRange(4, 5, true)
+    );
+    private static final List<ModifierValueRange> PHASE_TOLERANCE_RANGES = List.of(
+            ModifierValueRange.fixed(1),
+            new ModifierValueRange(1, 2, true),
+            ModifierValueRange.fixed(2),
+            new ModifierValueRange(2, 3, true),
+            ModifierValueRange.fixed(3),
+            new ModifierValueRange(3, 4, true),
+            new ModifierValueRange(4, 5, true)
+    );
+    private static final List<ModifierValueRange> PHASE_PATIENCE_RANGES = List.of(
+            ModifierValueRange.fixed(1),
+            ModifierValueRange.fixed(1),
+            ModifierValueRange.fixed(1),
+            new ModifierValueRange(1, 2, true),
+            new ModifierValueRange(1, 2, true),
+            ModifierValueRange.fixed(2),
+            new ModifierValueRange(2, 3, true)
+    );
+    private static final List<ModifierValueRange> PHASE_RECOVERY_RANGES = List.of(
+            new ModifierValueRange(2, 4, true),
+            new ModifierValueRange(4, 6, true),
+            new ModifierValueRange(6, 8, true),
+            new ModifierValueRange(8, 10, true),
+            new ModifierValueRange(10, 13, true),
+            new ModifierValueRange(13, 16, true),
+            new ModifierValueRange(16, 20, true)
+    );
+
+    // Phase Array parts. Every stat here is read by the Cradle; PhaseArrayRules.LINE_STATS is the list.
+    private static final ModifierDefinition PHASE_DENSE = ModifierDefinition.rollable(
+            "phase_dense", "charge_capacity", ModifierSlot.PREFIX,
+            MachineStat.CHARGE_CAPACITY, ModifierOperation.INCREASED_PERCENT, PERCENT_TIER_RANGES
+    );
+    private static final ModifierDefinition PHASE_CONDUCTIVE = ModifierDefinition.rollable(
+            "phase_conductive", "charge_rate", ModifierSlot.PREFIX,
+            MachineStat.CHARGE_RATE, ModifierOperation.INCREASED_PERCENT, PERCENT_TIER_RANGES
+    );
+    private static final ModifierDefinition PHASE_FOCUSED = ModifierDefinition.rollable(
+            "phase_focused", "overhold_chance", ModifierSlot.PREFIX,
+            MachineStat.OVERHOLD_CHANCE, ModifierOperation.ADD, PHASE_OVERHOLD_RANGES
+    );
+    private static final ModifierDefinition PHASE_LENIENT = ModifierDefinition.rollableUntiered(
+            "phase_lenient", "partial_window", ModifierSlot.PREFIX,
+            MachineStat.PARTIAL_WINDOW, ModifierOperation.ADD, ModifierValueRange.fixed(1)
+    ).withRollWeight(40);
+    private static final ModifierDefinition PHASE_TEMPERED = ModifierDefinition.rollable(
+            "phase_tempered", "strain_tolerance", ModifierSlot.PREFIX,
+            MachineStat.STRAIN_TOLERANCE, ModifierOperation.ADD, PHASE_TOLERANCE_RANGES
+    );
+    private static final ModifierDefinition PHASE_PRIMED = ModifierDefinition.rollable(
+            "phase_primed", "primed_charge_rate", ModifierSlot.PREFIX,
+            MachineStat.PRIMED_CHARGE_RATE, ModifierOperation.ADD, RUNTIME_PERCENT_RANGES
+    ).withRollWeight(60);
+    private static final ModifierDefinition PHASE_STEADY = ModifierDefinition.rollable(
+            "phase_steady", "hold_chance", ModifierSlot.PREFIX,
+            MachineStat.HOLD_CHANCE, ModifierOperation.ADD, PHASE_HOLD_CHANCE_RANGES
+    );
+    private static final ModifierDefinition PHASE_PERSISTENT = ModifierDefinition.rollable(
+            "phase_persistent", "second_hold", ModifierSlot.PREFIX,
+            MachineStat.SECOND_HOLD, ModifierOperation.ADD, PHASE_SECOND_HOLD_RANGES
+    );
+    private static final ModifierDefinition PHASE_RESONANT = ModifierDefinition.rollable(
+            "phase_resonant", "overhold_chance", ModifierSlot.PREFIX,
+            MachineStat.OVERHOLD_CHANCE, ModifierOperation.ADD, PHASE_OVERHOLD_RANGES
+    );
+    private static final ModifierDefinition PHASE_CHARGED = ModifierDefinition.rollable(
+            "phase_charged", "charge_capacity", ModifierSlot.PREFIX,
+            MachineStat.CHARGE_CAPACITY, ModifierOperation.INCREASED_PERCENT, PERCENT_TIER_RANGES
+    );
+    private static final ModifierDefinition PHASE_THRIFT = ModifierDefinition.rollable(
+            "phase_thrift", "fe_thrift", ModifierSlot.SUFFIX,
+            MachineStat.FE_THRIFT, ModifierOperation.ADD, CHANCE_TIER_RANGES
+    );
+    private static final ModifierDefinition PHASE_RECOVERY = ModifierDefinition.rollable(
+            "phase_recovery", "fe_recovery", ModifierSlot.SUFFIX,
+            MachineStat.FE_RECOVERY, ModifierOperation.ADD, PHASE_RECOVERY_RANGES
+    );
+    private static final ModifierDefinition PHASE_SALVAGE = ModifierDefinition.rollable(
+            "phase_salvage", "glyph_salvage", ModifierSlot.SUFFIX,
+            MachineStat.GLYPH_SALVAGE, ModifierOperation.ADD, CHANCE_TIER_RANGES
+    );
+    private static final ModifierDefinition PHASE_MERCY = ModifierDefinition.rollable(
+            "phase_mercy", "strain_mercy", ModifierSlot.SUFFIX,
+            MachineStat.STRAIN_MERCY, ModifierOperation.ADD, CHANCE_TIER_RANGES
+    );
+    private static final ModifierDefinition PHASE_BANKING = ModifierDefinition.rollable(
+            "phase_banking", "charge_capacity", ModifierSlot.SUFFIX,
+            MachineStat.CHARGE_CAPACITY, ModifierOperation.INCREASED_PERCENT, RUNTIME_PERCENT_RANGES
+    ).withRollWeight(60);
+    private static final ModifierDefinition PHASE_PATIENCE = ModifierDefinition.rollable(
+            "phase_patience", "strain_tolerance", ModifierSlot.SUFFIX,
+            MachineStat.STRAIN_TOLERANCE, ModifierOperation.ADD, PHASE_PATIENCE_RANGES
+    ).withRollWeight(60);
+    private static final ModifierDefinition PHASE_POISE = ModifierDefinition.rollable(
+            "phase_poise", "hold_chance", ModifierSlot.SUFFIX,
+            MachineStat.HOLD_CHANCE, ModifierOperation.ADD, PHASE_POISE_RANGES
+    ).withRollWeight(60);
+    private static final ModifierDefinition PHASE_FOCUS = ModifierDefinition.rollable(
+            "phase_focus", "overhold_chance", ModifierSlot.SUFFIX,
+            MachineStat.OVERHOLD_CHANCE, ModifierOperation.ADD, PHASE_FOCUS_RANGES
+    ).withRollWeight(60);
+
     private static final Set<String> DESCRIBED_AFFIX_IDS = Set.of(
             CRUSHER_SALVAGE.id(),
             CRUSH_HEAD_JAGGED.id(),
@@ -1907,6 +2054,24 @@ public final class ModifierEligibilityProfiles {
                     MachineStat.FLUID_TRANSFER
             )
     );
+    public static final ModifierEligibilityProfile PHASE_EMITTER = profile(
+            "phase_emitter",
+            Set.of(ModifierCapability.HAS_PHASE_ARRAY),
+            List.of(
+                    PHASE_DENSE, PHASE_CONDUCTIVE, PHASE_FOCUSED, PHASE_LENIENT, PHASE_TEMPERED, PHASE_PRIMED,
+                    PHASE_THRIFT, PHASE_RECOVERY, PHASE_SALVAGE, PHASE_MERCY, PHASE_BANKING, PHASE_PATIENCE
+            )
+    );
+
+    public static final ModifierEligibilityProfile PHASE_COIL = profile(
+            "phase_coil",
+            Set.of(ModifierCapability.HAS_PHASE_ARRAY),
+            List.of(
+                    PHASE_STEADY, PHASE_PERSISTENT, PHASE_RESONANT, PHASE_CHARGED, PHASE_CONDUCTIVE, PHASE_TEMPERED,
+                    PHASE_THRIFT, PHASE_RECOVERY, PHASE_SALVAGE, PHASE_MERCY, PHASE_POISE, PHASE_FOCUS
+            )
+    );
+
     public static final ModifierEligibilityProfile COMPRESSOR_TANK = profile(
             "compressor_tank",
             Set.of(
@@ -2590,7 +2755,9 @@ public final class ModifierEligibilityProfiles {
                 SOLAR_ARRAY_EXTENDER,
                 RESONANCE_COIL,
                 CONTROL_BOARD,
-                STABILIZER_MATRIX
+                STABILIZER_MATRIX,
+                PHASE_EMITTER,
+                PHASE_COIL
         );
     }
 
@@ -2627,6 +2794,8 @@ public final class ModifierEligibilityProfiles {
             case MODULAR_TOOL -> MODULAR_TOOL;
             case MINERS_COMPANION -> MINERS_COMPANION;
             case FORESTRY_COMPANION -> FORESTRY_COMPANION;
+            case PHASE_EMITTER -> PHASE_EMITTER;
+            case PHASE_COIL -> PHASE_COIL;
         };
     }
 
@@ -3126,6 +3295,14 @@ public final class ModifierEligibilityProfiles {
                 COMPOSTED_BIOMASS_POWER,
                 ALGAE_POWER,
                 RICH_BIOMASS_POWER
+        );
+        put(
+                definitions,
+                ModifierCapability.HAS_PHASE_ARRAY,
+                PHASE_DENSE, PHASE_CONDUCTIVE, PHASE_FOCUSED, PHASE_LENIENT, PHASE_TEMPERED, PHASE_PRIMED,
+                PHASE_STEADY, PHASE_PERSISTENT, PHASE_RESONANT, PHASE_CHARGED,
+                PHASE_THRIFT, PHASE_RECOVERY, PHASE_SALVAGE, PHASE_MERCY, PHASE_BANKING, PHASE_PATIENCE,
+                PHASE_POISE, PHASE_FOCUS
         );
         return Map.copyOf(definitions);
     }

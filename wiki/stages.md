@@ -113,7 +113,7 @@ Stage is not the same as affix **tier**. Tier describes how strong one affix is;
 | 5 | Aluminum | Aluminum, sparksteel, osmium | Gas power: [Coal Gasifier](coal-gasifier.md), [Syngas Combustor](syngas-combustor.md), [Cavitation Generator](cavitation-generator.md), [Silica Gel Dehumidifier](silica-gel-dehumidifier.md). |
 | 6 | Titanium | Titanium, arclite | Chemistry: [Melter](melter.md), [Steam Methane Reformer](steam-methane-reformer.md), [Ammonia Synthesizer](ammonia-synthesizer.md), [Fuel Cell](ammonia-fuel-cell.md), the Titanium Alloy Furnace. |
 | 7 | Tungstensteel | Tungstensteel, nullite, aethergold, tungsten, platinum | Late-game machine sets and the [Vacuum Collapse Generator](vacuum-collapse-generator.md). |
-| 8 | Exotic | Naquadah, netherite | The top machine sets, Exotic Battery Cells, the [Exotic Affix Forge](exotic-affix-forge.md). |
+| 8 | Exotic | Naquadah, netherite | The top machine sets, Exotic Battery Cells, the [Phase Array](phase-array.md). |
 
 Modpacks can disable materials, change recipes, and swap the Exotic material, so check the recipe tables in your pack.
 

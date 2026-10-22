@@ -17,6 +17,7 @@
         "generators",
         "heat_core",
         "mastery_attributes",
+        "phase_array",
         "processing_machines",
         "servo",
         "stability_parts",

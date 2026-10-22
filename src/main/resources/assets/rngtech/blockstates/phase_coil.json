@@ -1,0 +1,410 @@
+{
+  "multipart": [
+    {
+      "when": {
+        "active": "false",
+        "formed": "false",
+        "facing": "north"
+      },
+      "apply": {
+        "model": "rngtech:block/phase_coil"
+      }
+    },
+    {
+      "when": {
+        "active": "false",
+        "formed": "false",
+        "facing": "east"
+      },
+      "apply": {
+        "model": "rngtech:block/phase_coil",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "active": "false",
+        "formed": "false",
+        "facing": "south"
+      },
+      "apply": {
+        "model": "rngtech:block/phase_coil",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "active": "false",
+        "formed": "false",
+        "facing": "west"
+      },
+      "apply": {
+        "model": "rngtech:block/phase_coil",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "active": "false",
+        "formed": "true",
+        "facing": "north"
+      },
+      "apply": {
+        "model": "rngtech:block/phase_coil_formed"
+      }
+    },
+    {
+      "when": {
+        "active": "false",
+        "formed": "true",
+        "facing": "east"
+      },
+      "apply": {
+        "model": "rngtech:block/phase_coil_formed",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "active": "false",
+        "formed": "true",
+        "facing": "south"
+      },
+      "apply": {
+        "model": "rngtech:block/phase_coil_formed",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "active": "false",
+        "formed": "true",
+        "facing": "west"
+      },
+      "apply": {
+        "model": "rngtech:block/phase_coil_formed",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "active": "true",
+        "formed": "false",
+        "facing": "north"
+      },
+      "apply": {
+        "model": "rngtech:block/phase_coil_active"
+      }
+    },
+    {
+      "when": {
+        "active": "true",
+        "formed": "false",
+        "facing": "east"
+      },
+      "apply": {
+        "model": "rngtech:block/phase_coil_active",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "active": "true",
+        "formed": "false",
+        "facing": "south"
+      },
+      "apply": {
+        "model": "rngtech:block/phase_coil_active",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "active": "true",
+        "formed": "false",
+        "facing": "west"
+      },
+      "apply": {
+        "model": "rngtech:block/phase_coil_active",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "active": "true",
+        "formed": "true",
+        "facing": "north"
+      },
+      "apply": {
+        "model": "rngtech:block/phase_coil_active"
+      }
+    },
+    {
+      "when": {
+        "active": "true",
+        "formed": "true",
+        "facing": "east"
+      },
+      "apply": {
+        "model": "rngtech:block/phase_coil_active",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "active": "true",
+        "formed": "true",
+        "facing": "south"
+      },
+      "apply": {
+        "model": "rngtech:block/phase_coil_active",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "active": "true",
+        "formed": "true",
+        "facing": "west"
+      },
+      "apply": {
+        "model": "rngtech:block/phase_coil_active",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "tier": "0",
+        "facing": "north"
+      },
+      "apply": {
+        "model": "rngtech:block/phase_coil_plate_0"
+      }
+    },
+    {
+      "when": {
+        "tier": "0",
+        "facing": "east"
+      },
+      "apply": {
+        "model": "rngtech:block/phase_coil_plate_0",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "tier": "0",
+        "facing": "south"
+      },
+      "apply": {
+        "model": "rngtech:block/phase_coil_plate_0",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "tier": "0",
+        "facing": "west"
+      },
+      "apply": {
+        "model": "rngtech:block/phase_coil_plate_0",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "tier": "1",
+        "facing": "north"
+      },
+      "apply": {
+        "model": "rngtech:block/phase_coil_plate_1"
+      }
+    },
+    {
+      "when": {
+        "tier": "1",
+        "facing": "east"
+      },
+      "apply": {
+        "model": "rngtech:block/phase_coil_plate_1",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "tier": "1",
+        "facing": "south"
+      },
+      "apply": {
+        "model": "rngtech:block/phase_coil_plate_1",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "tier": "1",
+        "facing": "west"
+      },
+      "apply": {
+        "model": "rngtech:block/phase_coil_plate_1",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "tier": "2",
+        "facing": "north"
+      },
+      "apply": {
+        "model": "rngtech:block/phase_coil_plate_2"
+      }
+    },
+    {
+      "when": {
+        "tier": "2",
+        "facing": "east"
+      },
+      "apply": {
+        "model": "rngtech:block/phase_coil_plate_2",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "tier": "2",
+        "facing": "south"
+      },
+      "apply": {
+        "model": "rngtech:block/phase_coil_plate_2",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "tier": "2",
+        "facing": "west"
+      },
+      "apply": {
+        "model": "rngtech:block/phase_coil_plate_2",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "tier": "3",
+        "facing": "north"
+      },
+      "apply": {
+        "model": "rngtech:block/phase_coil_plate_3"
+      }
+    },
+    {
+      "when": {
+        "tier": "3",
+        "facing": "east"
+      },
+      "apply": {
+        "model": "rngtech:block/phase_coil_plate_3",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "tier": "3",
+        "facing": "south"
+      },
+      "apply": {
+        "model": "rngtech:block/phase_coil_plate_3",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "tier": "3",
+        "facing": "west"
+      },
+      "apply": {
+        "model": "rngtech:block/phase_coil_plate_3",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "tier": "4",
+        "facing": "north"
+      },
+      "apply": {
+        "model": "rngtech:block/phase_coil_plate_4"
+      }
+    },
+    {
+      "when": {
+        "tier": "4",
+        "facing": "east"
+      },
+      "apply": {
+        "model": "rngtech:block/phase_coil_plate_4",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "tier": "4",
+        "facing": "south"
+      },
+      "apply": {
+        "model": "rngtech:block/phase_coil_plate_4",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "tier": "4",
+        "facing": "west"
+      },
+      "apply": {
+        "model": "rngtech:block/phase_coil_plate_4",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "tier": "5",
+        "facing": "north"
+      },
+      "apply": {
+        "model": "rngtech:block/phase_coil_plate_5"
+      }
+    },
+    {
+      "when": {
+        "tier": "5",
+        "facing": "east"
+      },
+      "apply": {
+        "model": "rngtech:block/phase_coil_plate_5",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "tier": "5",
+        "facing": "south"
+      },
+      "apply": {
+        "model": "rngtech:block/phase_coil_plate_5",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "tier": "5",
+        "facing": "west"
+      },
+      "apply": {
+        "model": "rngtech:block/phase_coil_plate_5",
+        "y": 270
+      }
+    }
+  ]
+}

@@ -1,4 +1,100 @@
 {
   "type": "rngtech:challenge",
-  "pools": []
+  "pools": [
+    {
+      "rolls": 1,
+      "conditions": [
+        {
+          "condition": "rngtech:machine_stage",
+          "min": 6,
+          "max": 7
+        },
+        {
+          "condition": "rngtech:calibration_stability",
+          "min": 90
+        },
+        {
+          "condition": "minecraft:random_chance",
+          "chance": 0.15
+        }
+      ],
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "rngtech:glyph",
+          "functions": [
+            {
+              "function": "minecraft:set_components",
+              "components": {
+                "rngtech:glyph_tier": 2
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "rolls": 1,
+      "conditions": [
+        {
+          "condition": "rngtech:machine_stage",
+          "min": 8
+        },
+        {
+          "condition": "rngtech:calibration_stability",
+          "min": 90,
+          "max": 94
+        },
+        {
+          "condition": "minecraft:random_chance",
+          "chance": 0.15
+        }
+      ],
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "rngtech:glyph",
+          "functions": [
+            {
+              "function": "minecraft:set_components",
+              "components": {
+                "rngtech:glyph_tier": 2
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "rolls": 1,
+      "conditions": [
+        {
+          "condition": "rngtech:machine_stage",
+          "min": 8
+        },
+        {
+          "condition": "rngtech:calibration_stability",
+          "min": 95
+        },
+        {
+          "condition": "minecraft:random_chance",
+          "chance": 0.15
+        }
+      ],
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "rngtech:glyph",
+          "functions": [
+            {
+              "function": "minecraft:set_components",
+              "components": {
+                "rngtech:glyph_tier": 3
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
 }

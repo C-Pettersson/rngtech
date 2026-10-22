@@ -334,7 +334,6 @@ try {
     const collapseResidue = stagePreview?.items?.find((item) => item.id === "rngtech:collapse_residue");
     const chaosCrystal = stagePreview?.items?.find((item) => item.id === "rngtech:chaos_crystal");
     const exoticAffixForge = stagePreview?.items?.find((item) => item.id === "rngtech:exotic_affix_forge");
-    const exoticAffixCatalyst = stagePreview?.items?.find((item) => item.id === "rngtech:exotic_affix_catalyst");
     if (collapseResidueRecipes[0] !== "rngtech:vacuum_collapse/void_catalyst"
             || vacuumCollapseRecipe?.result?.id !== "rngtech:collapse_residue"
             || vacuumCollapseRecipe.requirements?.minimumChamberStage !== 7
@@ -366,9 +365,7 @@ try {
             || !chaosCrystal.reachable
             || chaosCrystal.issues.length
             || !exoticAffixForge?.reachable
-            || exoticAffixForge.issues.length
-            || !exoticAffixCatalyst?.reachable
-            || exoticAffixCatalyst.issues.length) {
+            || exoticAffixForge.issues.length) {
         throw new Error("RBOM did not model Vacuum Collapse residue output and staged Gear requirements.");
     }
     const superchargedRecipe = data.rbom.recipes.find((recipe) => recipe.id === "rngtech:alloy_furnace/supercharged_silica_gel_beads");

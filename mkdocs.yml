@@ -72,6 +72,10 @@ nav:
       - Batch Processing State: prds/batch-processing-state.md
       - Heat Model: prds/heat-model.md
       - Heat Model State: prds/heat-model-state.md
+      - Work Orders: prds/work-orders.md
+      - Work Orders State: prds/work-orders-state.md
+      - Phase Array: prds/phase-array.md
+      - Phase Array State: prds/phase-array-state.md
   - Reference:
       - Releasing: releasing.md
       - Tick Benchmark: reference/benchmarking.md

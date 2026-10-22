@@ -255,7 +255,7 @@ public class MinersCompanionItem extends Item {
         MachineTraitTooltip.appendUnidentified(stack, tooltipComponents);
         MachineTraits traits = traits(stack);
         if (stack.has(ModDataComponents.MACHINE_TRAITS.get())) {
-            MachineTraitTooltip.appendTraitHeader(traits, tooltipComponents, true);
+            MachineTraitTooltip.appendTraitHeader(stack, traits, tooltipComponents, true);
         } else {
             MachineTraitTooltip.appendUnrolledTraitHeader(
                     MachineTraitRoller.refinementPotentialRange(
@@ -290,7 +290,7 @@ public class MinersCompanionItem extends Item {
             tooltipComponents.add(Component.translatable("rngtech.tooltip.miners_companion.gear").withStyle(ChatFormatting.GRAY));
             tooltipComponents.add(Component.translatable("rngtech.tooltip.miners_companion.utility_gear").withStyle(ChatFormatting.GRAY));
         }
-        MachineTraitTooltip.appendTraitDetails(traits, tooltipComponents);
+        MachineTraitTooltip.appendTraitDetails(traits, tooltipComponents, ItemStack.EMPTY, stack);
         MachineTraitTooltip.appendTraitKeyHints(tooltipComponents);
     }
 

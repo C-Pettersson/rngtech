@@ -33,7 +33,7 @@ const FE_CONSUMERS = new Set([
 ]);
 const PASSIVE = new Set(["rngtech:algae_growth", "rngtech:desiccant_absorption", "rngtech:wooden_dehumidifier_conversion"]);
 /** Code-defined recipes: their item conversions are listed in specialReactions(), or they transform no items. */
-const SPECIAL = new Set(["rngtech:carbon_exhaust_bucket", "rngtech:identify_traits", "rngtech:exotic_affix_forge"]);
+const SPECIAL = new Set(["rngtech:carbon_exhaust_bucket", "rngtech:identify_traits", "rngtech:phase_array"]);
 const INPUT_KEYS = [
     "ingredient", "ingredients", "primary_ingredient", "secondary_ingredient", "catalyst", "stabilizer", "plate", "electrolyte",
     "carbon_input", "dry_input", "fluid_input", "water_input", "gas_input", "nitrogen_input", "hydrogen_input", "ammonia_input"

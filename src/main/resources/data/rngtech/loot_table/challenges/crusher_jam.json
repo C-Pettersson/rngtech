@@ -1,4 +1,32 @@
 {
   "type": "rngtech:challenge",
-  "pools": []
+  "pools": [
+    {
+      "rolls": 1,
+      "conditions": [
+        {
+          "condition": "rngtech:recipe_stage",
+          "min": 7
+        },
+        {
+          "condition": "minecraft:random_chance",
+          "chance": 0.05
+        }
+      ],
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "rngtech:glyph",
+          "functions": [
+            {
+              "function": "minecraft:set_components",
+              "components": {
+                "rngtech:glyph_tier": 1
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
 }

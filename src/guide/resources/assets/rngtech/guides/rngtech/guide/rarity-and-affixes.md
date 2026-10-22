@@ -65,7 +65,7 @@ A suffix that halves the failure strain a heat machine takes when its power drop
 
 ## Refinement Potential
 
-**Refinement Potential** (RP) is each item's budget for changing its affixes. Every successful refinement spends some. When RP runs out, the item is final, so spend it where it matters. The only way back is a Reforge in the [Exotic Affix Forge](rngtech:exotic-affix-forge.md), which rerolls the whole item, RP included. A [Corrupted](rngtech:rarity-and-affixes.md#corruption) item keeps its RP but can never spend it, so its RP is hidden.
+**Refinement Potential** (RP) is each item's budget for changing its affixes. Every successful refinement spends some. When RP runs out, the item is final, so spend it where it matters. The only way back is a Reforge in the [Phase Array](rngtech:phase-array.md), which rerolls the whole item, RP included. A [Corrupted](rngtech:rarity-and-affixes.md#corruption) item keeps its RP but can never spend it, so its RP is hidden.
 
 RP is rolled separately from rarity, and the starting affixes cost nothing. A Rare item keeps its full budget, just like a Normal one. Higher stages get bigger budgets:
 
@@ -81,6 +81,7 @@ Tool Heads and Tool Rods get 2 extra RP, and some machine parts add a small bonu
 
 An illegal or failed refinement costs nothing: no catalyst and no RP. If an add or upgrade rolls a cost higher than the RP left, it still succeeds, and the item drops to 0 RP.
 
+- [Strain and Quality](rngtech:rarity-and-affixes/strain-and-quality.md)
 - [Annealed items](rngtech:rarity-and-affixes/annealed-items.md)
 
 ## Corruption
@@ -101,7 +102,7 @@ On a Unique, Reforged rerolls every ranged stat line inside its range, and Bless
 
 A Warped affix uses one roll for all of its effects, so a drawback on a two-stat affix grows or shrinks with its benefit. Hold Left Alt to compare a Warped affix with its tier's normal range.
 
-A **Corrupted** item can never be refined again: the Affix Forge, Exotic Affix Forge, Tool Bench, Refinement tabs, and a second Volatile Catalyst all refuse it, and nothing is used. Corruption cannot be removed. Nothing is ever destroyed or loses rarity; the worst result is a Blighted implicit. A placed machine keeps its corruption when you break and place it again.
+A **Corrupted** item can never be refined again: the Affix Forge, Phase Array, Tool Bench, Refinement tabs, and a second Volatile Catalyst all refuse it, and nothing is used. Corruption cannot be removed. Nothing is ever destroyed or loses rarity; the worst result is a Blighted implicit. A placed machine keeps its corruption when you break and place it again.
 
 - [Corruption implicits](rngtech:rarity-and-affixes/corruption-implicits.md)
 

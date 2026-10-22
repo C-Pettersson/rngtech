@@ -79,3 +79,39 @@ The task writes `build/processing-balance/processing-balance.json`. For each sta
 ### Keeping it accurate
 
 Stats assemble through `MachineBaseStatCatalog`, `ComponentBaseStatCatalog`, and `MegaPassiveTree`, and RNGTech config defaults load headless. Ticks, FE, Output Amount, Super Output, batching, and Overdrive mirror `CrusherBlockEntity` and `FurnaceBlockEntity` in `src/masteryTest/java/com/rngtech/rpg/ProcessingBalanceSimulation.java`, so update it when those methods change. The model counts steady running only: Furnace warm-up, jams, and output-blocked waits are left out.
+
+## Phase Array model
+
+`./gradlew phaseArraySim` models the [Phase Array PRD](../../docs/prds/phase-array.md) before any of it exists in code: the hold sequence, Strain and Fracture, FE by Quality, and the Refinement Potential ceiling. Fresh affix tiers and RP roll through `MachineTraitRoller`, so the starting items are what the game crafts; every other rule is the PRD's, read from `phase-array-scenarios.json`.
+
+```sh
+./gradlew phaseArraySim
+```
+
+### Scenarios
+
+`prd` is the PRD's number set. Every other scenario overrides part of it to preview a change; `first_draft` keeps the numbers the PRD started with. Keys: `hold_chance`, `second_hold`, `overhold_per_surplus`, `partial_window`, `fracture_per_strain`, `strain_tolerance`, `quality_base`, `quality_divisor`, `stage_factors`, `reference_supply_fe_per_tick`, and `operations` (`base_fe`, `coils`, `rp`, `glyph` per operation). `items` lists the fresh items to start from, and `line_sizes` the Coil counts to run.
+
+### Behaviors
+
+Every player reads the preview, so none fires once the Fracture chance reaches 25% (`strain` in `stoppedBy`).
+
+- `resonate_until_rp`: Resonate the lowest affix until every affix is Tier 6 or RP runs out.
+- `resonate_with_budget`: as above, but stop when one pulse would take more than ten minutes at the reference supply.
+- `resonate_and_temper`: as `resonate_until_rp`, Tempering whenever the Fracture chance reaches 10%, with Glyphs assumed on hand.
+- `exalt_all`: start from an all-Tier-6 item with fresh RP and Exalt each affix to Tier 7 until RP runs out.
+- `reforge_fish`: Reforge until the item is Rare with Quality 12 or more, paying each Reforge at the item's current Quality.
+
+An item whose affixes were all fractured away stops as `dead`.
+
+### Output
+
+The task writes `build/phase-array/phase-array.json`. For each scenario:
+
+- `resonateTimeByQuality`: Resonate FE and minutes at the reference supply, by item stage and Quality.
+- `ladder`: the closed-form outcome odds (Success, Overhold, Partial, Miss, Fracture) per operation, line size, and Strain. This is what the Cradle preview would show.
+- `behaviors`: per behavior, item, and line size, distributions of pulses, FE, minutes, final Quality, Fractures, Strain, RP left, and Glyphs, plus how often the goal was reached and what stopped the player.
+
+### Keeping it accurate
+
+Nothing in the game implements the Array yet. When it does, each rule in `src/masteryTest/java/com/rngtech/rpg/PhaseArraySimulation.java` must name the method it mirrors, as the other simulations do.

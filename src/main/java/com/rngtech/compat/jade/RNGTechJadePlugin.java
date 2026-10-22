@@ -144,6 +144,7 @@ public final class RNGTechJadePlugin implements IWailaPlugin {
                 MachineInfoSnapshot info = MachineInfoSnapshot.load(accessor.getServerData().getCompound(DATA_KEY));
                 boolean details = accessor.showDetails();
                 appendState(tooltip, info);
+                appendNote(tooltip, info);
                 appendFluidProduct(tooltip, info);
                 appendProgress(tooltip, info, details);
                 appendEnergy(tooltip, info, details);
@@ -171,6 +172,16 @@ public final class RNGTechJadePlugin implements IWailaPlugin {
 
         private static void appendState(ITooltip tooltip, MachineInfoSnapshot info) {
             tooltip.add(line("state", stateValue(info)));
+        }
+
+        private static void appendNote(ITooltip tooltip, MachineInfoSnapshot info) {
+            if (info.noteKey().isEmpty()) {
+                return;
+            }
+            Object[] args = info.noteArgs().stream()
+                    .map(arg -> arg.startsWith("rngtech.") ? Component.translatable(arg).withStyle(ChatFormatting.WHITE) : value(arg))
+                    .toArray();
+            tooltip.add(Component.translatable(info.noteKey(), args));
         }
 
         private static Component stateValue(MachineInfoSnapshot info) {

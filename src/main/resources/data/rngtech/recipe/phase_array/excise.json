@@ -1,0 +1,10 @@
+{
+  "type": "rngtech:phase_array",
+  "action": "excise",
+  "coils": 5,
+  "glyph_tier": 0,
+  "base_fe": 1000000,
+  "refinement_potential_cost": 1,
+  "partial": "remove_random",
+  "overhold": "remove_strain"
+}

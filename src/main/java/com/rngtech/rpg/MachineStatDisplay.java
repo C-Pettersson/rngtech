@@ -68,6 +68,12 @@ public final class MachineStatDisplay {
             case ENERGY_CAPACITY, ENERGY_CAPACITY_FLAT, BUFFER_SIZE -> formatNumber(value) + " FE";
             case ENERGY_GENERATION -> formatNumber(value) + " FE/t";
             case ENERGY_TRANSFER, FE_TRANSFER -> formatNumber(value) + " FE/t";
+            case CHARGE_CAPACITY -> formatNumber(value) + " FE";
+            case CHARGE_RATE -> formatNumber(value) + " FE/t";
+            case HOLD_CHANCE, SECOND_HOLD, OVERHOLD_CHANCE, FE_THRIFT, FE_RECOVERY, GLYPH_SALVAGE, STRAIN_MERCY, PRIMED_CHARGE_RATE ->
+                    formatNumber(value) + "%";
+            case PARTIAL_WINDOW -> formatUnit(value, "Coil", "Coils");
+            case STRAIN_TOLERANCE -> formatNumber(value) + " Strain";
             case FLUID_CAPACITY -> formatNumber(value) + " mB";
             case FLUID_TRANSFER -> formatNumber(value) + " mB/t";
             case COMPRESSION_RATIO -> formatNumber(value) + ":1";
@@ -205,6 +211,12 @@ public final class MachineStatDisplay {
             case ENERGY_CAPACITY, ENERGY_CAPACITY_FLAT, BUFFER_SIZE -> formatSignedNumber(value) + " FE";
             case ENERGY_GENERATION -> formatSignedNumber(value) + " FE/t";
             case ENERGY_TRANSFER, FE_TRANSFER -> formatSignedNumber(value) + " FE/t";
+            case CHARGE_CAPACITY -> formatSignedNumber(value) + " FE";
+            case CHARGE_RATE -> formatSignedNumber(value) + " FE/t";
+            case HOLD_CHANCE, SECOND_HOLD, OVERHOLD_CHANCE, FE_THRIFT, FE_RECOVERY, GLYPH_SALVAGE, STRAIN_MERCY, PRIMED_CHARGE_RATE ->
+                    formatSignedPercentPoints(value);
+            case PARTIAL_WINDOW -> formatSignedUnit(value, "Coil", "Coils");
+            case STRAIN_TOLERANCE -> formatSignedUnit(value, "Strain", "Strain");
             case INPUT_SLOTS, OUTPUT_SLOTS, ADDON_SLOTS, BLOCK_FILTER_SLOTS -> formatSignedUnit(value, "slot", "slots");
             case CONTROL, DRIVE, RESERVE -> formatSignedUnit(value, "point", "points");
             case BATTERY_SLOTS -> formatSignedUnit(value, "cell", "cells");

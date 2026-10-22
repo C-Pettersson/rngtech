@@ -53,7 +53,12 @@ _COLUMN_LABELS = {
     "experience": "Player XP",
     "bonus_output": "Bonus output",
     "roll_result_traits": "Rolls traits",
+    "action": "Operation",
+    "glyph_tier": "Glyph",
+    "base_fe": "Base FE",
+    "refinement_potential_cost": "RP",
 }
+_GLYPH_NUMERALS = ["None", "I", "II", "III", "IV", "V"]
 _TEMPLATE_START = re.compile(r"\{\{\s*([a-z_]+)\s*\(")
 _CODE = re.compile(r"(^```.*?^```|`[^`\n]+`)", re.S | re.M)
 
@@ -93,6 +98,10 @@ def _format_cell(key: str, value) -> str:
         return f"{_format_number(value)} FE"
     if key == "heat" and isinstance(value, (int, float)):
         return f"{_format_number(value)} HU"
+    if key == "base_fe" and isinstance(value, (int, float)):
+        return f"{value / 1_000_000:g} MFE" if value >= 1_000_000 else f"{value / 1_000:g} kFE"
+    if key == "glyph_tier" and isinstance(value, int) and 0 <= value < len(_GLYPH_NUMERALS):
+        return _GLYPH_NUMERALS[value]
     if isinstance(value, dict) and set(value) == {"min", "max"}:
         return f"{_format_number(value['min'])}–{_format_number(value['max'])}"
     if isinstance(value, str):
@@ -599,18 +608,22 @@ class WikiSite:
         return rows, keys
 
     def t_processing(self, type: str, input: str | None = None, output: str | None = None,
-                     columns: list[str] | None = None, hide: list[str] | None = None, limit: int | None = None) -> str:
+                     columns: list[str] | None = None, hide: list[str] | None = None, limit: int | None = None,
+                     always: bool = False) -> str:
+        """`always` keeps a small, whole recipe list in the in-game guide too; the site shows every list."""
         rows, keys = self.processing_rows(type, input, output, columns, hide, limit)
         if not rows:
             return '<p class="rw-empty">No recipes.</p>'
         self.table_counter += 1
         table_id = f"rw-table-{self.table_counter}"
-        head = "<tr><th>Input</th><th></th><th>Output</th>" + "".join(f"<th>{_esc(_label(k))}</th>" for k in keys) + "</tr>"
+        # A list of operations with no item in or out, such as the Phase Array's, shows only its numbers.
+        with_items = any(inputs or outputs for _, inputs, outputs, _ in rows)
+        head = ("<tr><th>Input</th><th></th><th>Output</th>" if with_items else "<tr>")             + "".join(f"<th>{_esc(_label(k))}</th>" for k in keys) + "</tr>"
         body = []
         for _, inputs, outputs, scalars in rows:
             search = " ".join(self.res.name(o) for s in inputs + outputs for o in s.options[:1]).lower()
             cells = (f'<td class="rw-slots">{"".join(self.slot(s) for s in inputs)}</td><td class="rw-arrow-cell">→</td>'
-                     f'<td class="rw-slots">{"".join(self.slot(s) for s in outputs) or "—"}</td>')
+                     f'<td class="rw-slots">{"".join(self.slot(s) for s in outputs) or "—"}</td>') if with_items else ""
             cells += "".join(f"<td>{_esc(_format_cell(k, scalars[k])) if k in scalars else ''}</td>" for k in keys)
             body.append(f'<tr data-search="{_esc(search)}">{cells}</tr>')
         filter_box = ""

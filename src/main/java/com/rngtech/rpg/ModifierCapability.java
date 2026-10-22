@@ -28,5 +28,6 @@ public enum ModifierCapability {
     HAS_CRUSHER_SPECIALS,
     HAS_MINERS_COMPANION,
     /** Gear and bodies of machines with Machine Mastery, which can roll Control, Drive, and Reserve. */
-    HAS_MASTERY_ATTRIBUTES
+    HAS_MASTERY_ATTRIBUTES,
+    HAS_PHASE_ARRAY
 }

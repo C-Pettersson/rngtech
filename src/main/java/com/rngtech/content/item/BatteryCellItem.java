@@ -224,7 +224,7 @@ public class BatteryCellItem extends Item {
         if (CraftedTraitOutputs.isUnidentified(stack)) {
             MachineTraitTooltip.appendUnrolledTraitHeader(MachineTraitRoller.refinementPotentialRange(material.stage()), tooltipComponents);
         } else if (stack.has(ModDataComponents.MACHINE_TRAITS.get()) || RecyclingData.isStripped(stack)) {
-            MachineTraitTooltip.appendTraitHeader(traits, tooltipComponents, true);
+            MachineTraitTooltip.appendTraitHeader(stack, traits, tooltipComponents, true);
         } else {
             MachineTraitTooltip.appendUnrolledTraitHeader(MachineTraitRoller.refinementPotentialRange(material.stage()), tooltipComponents);
         }
@@ -237,7 +237,7 @@ public class BatteryCellItem extends Item {
         appendEnergyTooltip(stack, tooltipComponents);
         MachineTraitTooltip.appendIdentity(stack, tooltipComponents);
         MachineTraitTooltip.appendComponentBaseStats(stack, tooltipComponents);
-        MachineTraitTooltip.appendTraitDetails(traits, tooltipComponents);
+        MachineTraitTooltip.appendTraitDetails(traits, tooltipComponents, ItemStack.EMPTY, stack);
         if (!RecyclingData.isStripped(stack)) {
             MachineTraitTooltip.appendTraitKeyHints(tooltipComponents);
         }

@@ -13,13 +13,13 @@ import com.rngtech.content.recipe.ComponentRecyclingRecipe;
 import com.rngtech.content.recipe.CorrosionCellRecipe;
 import com.rngtech.content.recipe.CrusherRecipe;
 import com.rngtech.content.recipe.DesiccantAbsorptionRecipe;
-import com.rngtech.content.recipe.ExoticAffixForgeRecipe;
 import com.rngtech.content.recipe.FurnaceRecipe;
 import com.rngtech.content.recipe.GasCombustionRecipe;
 import com.rngtech.content.recipe.GasReformingRecipe;
 import com.rngtech.content.recipe.MelterRecipe;
 import com.rngtech.content.recipe.MetalPressRecipe;
 import com.rngtech.content.recipe.MinersCompanionRecoveryRecipe;
+import com.rngtech.content.recipe.PhaseArrayRecipe;
 import com.rngtech.content.recipe.PotentialReactorRecipe;
 import com.rngtech.content.recipe.UreaSynthesisRecipe;
 import com.rngtech.content.recipe.VacuumCollapseRecipe;
@@ -51,8 +51,8 @@ final class JeiRecipeTypes {
             RecipeType.createRecipeHolderType(RNGTech.id("potential_reactor"));
     static final RecipeType<RecipeHolder<MinersCompanionRecoveryRecipe>> MINERS_COMPANION_RECOVERY =
             RecipeType.createRecipeHolderType(RNGTech.id("miners_companion_recovery"));
-    static final RecipeType<RecipeHolder<ExoticAffixForgeRecipe>> EXOTIC_AFFIX_FORGE =
-            RecipeType.createRecipeHolderType(RNGTech.id("exotic_affix_forge"));
+    static final RecipeType<RecipeHolder<PhaseArrayRecipe>> PHASE_ARRAY =
+            RecipeType.createRecipeHolderType(RNGTech.id("phase_array"));
     static final RecipeType<RecipeHolder<CorrosionCellRecipe>> CORROSION_CELL =
             RecipeType.createRecipeHolderType(RNGTech.id("corrosion_cell"));
     static final RecipeType<RecipeHolder<ComponentRecyclingRecipe>> COMPONENT_RECYCLING =

@@ -15,7 +15,6 @@ import com.rngtech.content.recipe.ComponentRecyclingRecipe;
 import com.rngtech.content.recipe.CorrosionCellRecipe;
 import com.rngtech.content.recipe.CrusherRecipe;
 import com.rngtech.content.recipe.DesiccantAbsorptionRecipe;
-import com.rngtech.content.recipe.ExoticAffixForgeRecipe;
 import com.rngtech.content.recipe.FurnaceRecipe;
 import com.rngtech.content.recipe.GasCombustionRecipe;
 import com.rngtech.content.recipe.GasReformingRecipe;
@@ -23,6 +22,7 @@ import com.rngtech.content.recipe.MalformedIngotIngredient;
 import com.rngtech.content.recipe.MelterRecipe;
 import com.rngtech.content.recipe.MetalPressRecipe;
 import com.rngtech.content.recipe.MinersCompanionRecoveryRecipe;
+import com.rngtech.content.recipe.PhaseArrayRecipe;
 import com.rngtech.content.recipe.PotentialReactorRecipe;
 import com.rngtech.content.recipe.ToolDamageShapedRecipe;
 import com.rngtech.content.recipe.ToolDamageShapelessRecipe;
@@ -71,10 +71,10 @@ public final class ModRecipes {
                     RECIPE_SERIALIZERS.register("miners_companion_recovery", MinersCompanionRecoveryRecipe.Serializer::new);
     public static final DeferredHolder<RecipeType<?>, RecipeType<MinersCompanionRecoveryRecipe>> MINERS_COMPANION_RECOVERY_TYPE =
             RECIPE_TYPES.register("miners_companion_recovery", () -> RecipeType.simple(RNGTech.id("miners_companion_recovery")));
-    public static final DeferredHolder<RecipeSerializer<?>, RecipeSerializer<ExoticAffixForgeRecipe>> EXOTIC_AFFIX_FORGE_SERIALIZER =
-            RECIPE_SERIALIZERS.register("exotic_affix_forge", ExoticAffixForgeRecipe.Serializer::new);
-    public static final DeferredHolder<RecipeType<?>, RecipeType<ExoticAffixForgeRecipe>> EXOTIC_AFFIX_FORGE_TYPE =
-            RECIPE_TYPES.register("exotic_affix_forge", () -> RecipeType.simple(RNGTech.id("exotic_affix_forge")));
+    public static final DeferredHolder<RecipeSerializer<?>, RecipeSerializer<PhaseArrayRecipe>> PHASE_ARRAY_SERIALIZER =
+            RECIPE_SERIALIZERS.register("phase_array", PhaseArrayRecipe.Serializer::new);
+    public static final DeferredHolder<RecipeType<?>, RecipeType<PhaseArrayRecipe>> PHASE_ARRAY_TYPE =
+            RECIPE_TYPES.register("phase_array", () -> RecipeType.simple(RNGTech.id("phase_array")));
     public static final DeferredHolder<RecipeSerializer<?>, RecipeSerializer<CavitationRecipe>> CAVITATION_SERIALIZER =
             RECIPE_SERIALIZERS.register("cavitation", CavitationRecipe.Serializer::new);
     public static final DeferredHolder<RecipeType<?>, RecipeType<CavitationRecipe>> CAVITATION_TYPE =

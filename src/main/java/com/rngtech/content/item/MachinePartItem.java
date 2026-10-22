@@ -84,7 +84,7 @@ public class MachinePartItem extends Item {
         MachineTraitTooltip.appendUnidentified(stack, tooltipComponents);
         MachineTraits traits = traits(stack);
         if (stack.has(ModDataComponents.MACHINE_TRAITS.get()) || RecyclingData.isStripped(stack)) {
-            MachineTraitTooltip.appendTraitHeader(traits, tooltipComponents, true);
+            MachineTraitTooltip.appendTraitHeader(stack, traits, tooltipComponents, true);
         } else {
             MachineTraitTooltip.appendUnrolledTraitHeader(
                     MachineTraitRoller.refinementPotentialRange(componentStage()).offset(modifierSet.refinementPotential()),
@@ -96,7 +96,7 @@ public class MachinePartItem extends Item {
         }
         MachineTraitTooltip.appendIdentity(stack, tooltipComponents);
         MachineTraitTooltip.appendComponentBaseStats(stack, tooltipComponents);
-        MachineTraitTooltip.appendTraitDetails(traits, tooltipComponents, stack);
+        MachineTraitTooltip.appendTraitDetails(traits, tooltipComponents, stack, stack);
         if (!RecyclingData.isStripped(stack)) {
             MachineTraitTooltip.appendTraitKeyHints(tooltipComponents);
         }

@@ -1,4 +1,60 @@
 {
   "type": "rngtech:challenge",
-  "pools": []
+  "pools": [
+    {
+      "rolls": 1,
+      "conditions": [
+        {
+          "condition": "rngtech:instability",
+          "min": 60,
+          "max": 89
+        },
+        {
+          "condition": "minecraft:random_chance",
+          "chance": 0.1
+        }
+      ],
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "rngtech:glyph",
+          "functions": [
+            {
+              "function": "minecraft:set_components",
+              "components": {
+                "rngtech:glyph_tier": 3
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "rolls": 1,
+      "conditions": [
+        {
+          "condition": "rngtech:instability",
+          "min": 90
+        },
+        {
+          "condition": "minecraft:random_chance",
+          "chance": 0.1
+        }
+      ],
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "rngtech:glyph",
+          "functions": [
+            {
+              "function": "minecraft:set_components",
+              "components": {
+                "rngtech:glyph_tier": 4
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
 }

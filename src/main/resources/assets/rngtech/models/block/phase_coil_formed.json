@@ -1,0 +1,7 @@
+{
+  "parent": "rngtech:block/phase_coil",
+  "textures": {
+    "pane": "rngtech:block/phase_array/pane_formed",
+    "strip": "rngtech:block/phase_array/strip_formed"
+  }
+}
