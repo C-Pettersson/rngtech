@@ -33,7 +33,7 @@ public record PhaseLineStats(
     private static final double THRIFT_CAP = 50.0;
 
     public static PhaseLineStats empty() {
-        return new PhaseLineStats(0L, 0, 0, List.of(), List.of(), List.of(), PhaseArrayRules.BASE_PARTIAL_WINDOW, 0, 0, 0, 0, 0, 0);
+        return new PhaseLineStats(0L, 0, 0, List.of(), List.of(), List.of(), PhaseArrayRules.basePartialWindow(), 0, 0, 0, 0, 0, 0);
     }
 
     /** {@code coilsFromEmitter} holds each Coil's effective stats, position 1 first. */

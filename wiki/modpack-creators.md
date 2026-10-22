@@ -256,6 +256,22 @@ Then add other mods' mining tools to `rngtech:restricted_tools`, or give them a 
 
 The [Phase Array](phase-array.md)'s operations are recipes of type `rngtech:phase_array`, one file per operation under `data/rngtech/recipe/phase_array/`. Each names its `action` (`reforge`, `attune`, `resonate`, `excise`, `imprint`, `transmute`, `temper`, `exalt`, or `graft`), its `coils` (3 to 9), its `glyph_tier` (0 for none, else 1 to 5), its `base_fe`, its `refinement_potential_cost`, and its `partial` and `overhold` outcomes. Override a file to retune an operation, replace it with an empty recipe to remove it, or add a file with another action to offer the same action at a second price. A recipe condition such as `rngtech:material_enabled` hides an operation the way it hides a crafting recipe.
 
+The line's own numbers live under `phaseArray.*` in `config/rngtech-common.toml`:
+
+| Setting | Default | What it does |
+|---|---|---|
+| `phaseArray.coilHoldChance` | 92 | Percent chance a Coil holds the pulse, before part affixes. |
+| `phaseArray.coilOverholdChance` | 8 | Percent chance a surplus Coil's hold triggers Overhold, before part affixes. |
+| `phaseArray.partialWindow` | 2 | Coils short of an operation's count that still count as Partial. |
+| `phaseArray.fracturePerStrainPercent` | 1 | Percent Fracture chance per point of Strain past the line's Tolerance. |
+| `phaseArray.qualityBase`, `phaseArray.qualityDivisor` | 1.5, 3.5 | A pulse's FE multiplies by the base for every divisor points of Quality, the sum of the item's affix tiers. |
+| `phaseArray.stageFactor.stage0to2` to `stage8` | 0.1, 0.25, 0.5, 1, 1.5 | The FE factor for the item's stage. |
+| `phaseArray.emitterChargeCapacity`, `phaseArray.emitterChargeRate` | 16,000,000 FE, 8,000 FE/t | What the Emitter adds to the line's store and rate, before affixes. |
+| `phaseArray.coilChargeCapacity`, `phaseArray.coilChargeRate` | 4,000,000 FE, 2,000 FE/t | What each Coil adds, before affixes. |
+| `phaseArray.glyphFloors` | `[1, 1, 1, 2, 2, 3, 3, 4, 5]` | The lowest Glyph tier each position needs, nine entries from the position next to the Emitter outward. |
+
+Refinement Potential is shared with the Affix Forge: a Stage 8 part rolls 22 to 32 at craft, `calibration.refinementPotentialBonus` shifts every roll, and each operation's `refinement_potential_cost` is in its recipe.
+
 Glyphs (`rngtech:glyph`) have no recipe. Their tier is the `rngtech:glyph_tier` component, 1 to 5; a stack without it counts as Tier I, so `/give @p rngtech:glyph[rngtech:glyph_tier=3]` or a quest reward works. By default they drop from the six machine-challenge loot tables and from woken Dormant Machines; Tier V has no default source. Replace the tables to change that, or hand Glyphs out through quests.
 
 ## Compatibility

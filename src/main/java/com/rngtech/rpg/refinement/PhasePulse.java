@@ -47,7 +47,7 @@ public final class PhasePulse {
     /** PRD, The Hold Sequence: 1% per point of Strain above the line's Tolerance. */
     public static double fractureChance(PhaseLineStats line, int strain) {
         int exposed = Math.max(0, strain - line.strainTolerance());
-        return Math.min(1.0, exposed * PhaseArrayRules.FRACTURE_PER_STRAIN);
+        return Math.min(1.0, exposed * PhaseArrayRules.fracturePerStrain());
     }
 
     public static Result resolve(PhaseLineStats line, int requiredCoils, int strain, RandomSource random) {

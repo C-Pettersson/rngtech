@@ -61,13 +61,13 @@ public final class PhaseArrayChecks {
 
     private static void baseStatsMatchTheRules() {
         MachineStatAccumulator emitter = MachineBaseStatCatalog.phaseEmitter();
-        near(emitter.value(MachineStat.CHARGE_CAPACITY), PhaseArrayRules.EMITTER_CHARGE_CAPACITY, "Emitter Charge Capacity");
-        near(emitter.value(MachineStat.CHARGE_RATE), PhaseArrayRules.EMITTER_CHARGE_RATE, "Emitter Charge Rate");
-        near(emitter.value(MachineStat.PARTIAL_WINDOW), PhaseArrayRules.BASE_PARTIAL_WINDOW, "Emitter Partial Window");
+        near(emitter.value(MachineStat.CHARGE_CAPACITY), PhaseArrayRules.emitterChargeCapacity(), "Emitter Charge Capacity");
+        near(emitter.value(MachineStat.CHARGE_RATE), PhaseArrayRules.emitterChargeRate(), "Emitter Charge Rate");
+        near(emitter.value(MachineStat.PARTIAL_WINDOW), PhaseArrayRules.basePartialWindow(), "Emitter Partial Window");
         near(emitter.value(MachineStat.HOLD_CHANCE), 0, "Emitter has no Hold Chance");
         MachineStatAccumulator coil = MachineBaseStatCatalog.phaseCoil();
-        near(coil.value(MachineStat.HOLD_CHANCE), PhaseArrayRules.COIL_HOLD_CHANCE, "Coil Hold Chance");
-        near(coil.value(MachineStat.CHARGE_CAPACITY), PhaseArrayRules.COIL_CHARGE_CAPACITY, "Coil Charge Capacity");
+        near(coil.value(MachineStat.HOLD_CHANCE), PhaseArrayRules.coilHoldChance(), "Coil Hold Chance");
+        near(coil.value(MachineStat.CHARGE_CAPACITY), PhaseArrayRules.coilChargeCapacity(), "Coil Charge Capacity");
         near(coil.value(MachineStat.STRAIN_TOLERANCE), 0, "Coil Strain Tolerance starts at 0");
     }
 
@@ -91,7 +91,7 @@ public final class PhaseArrayChecks {
             for (int strain : new int[] { 0, 10, 30 }) {
                 PhasePulse.Odds odds = PhasePulse.odds(line, 5, strain);
                 near(odds.success() + odds.overhold() + odds.partial() + odds.miss() + odds.fracture(), 1.0, "odds sum to one");
-                double expectedFracture = Math.min(1.0, strain * PhaseArrayRules.FRACTURE_PER_STRAIN);
+                double expectedFracture = Math.min(1.0, strain * PhaseArrayRules.fracturePerStrain());
                 near(odds.fracture(), expectedFracture, "fracture is 1% per Strain point");
                 RandomSource random = RandomSource.create(coils * 1000L + strain);
                 int trials = 40_000;

@@ -135,7 +135,7 @@ final class MachineTraitTooltip {
         if (strain <= 0) {
             return;
         }
-        long fracture = Math.round(strain * PhaseArrayRules.FRACTURE_PER_STRAIN * 100.0);
+        long fracture = Math.round(strain * PhaseArrayRules.fracturePerStrain() * 100.0);
         tooltipComponents.add(Component.translatable("rngtech.tooltip.strain", strain, fracture).withStyle(ChatFormatting.GOLD));
     }
 

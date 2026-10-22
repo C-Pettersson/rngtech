@@ -470,9 +470,9 @@ public final class MachineStatAccumulator {
         MachineStatAccumulator stats = new MachineStatAccumulator();
         applyBaseMachineValues(stats);
         applyPhaseArrayZeroes(stats);
-        stats.baseValues.put(MachineStat.CHARGE_CAPACITY, (double) PhaseArrayRules.EMITTER_CHARGE_CAPACITY);
-        stats.baseValues.put(MachineStat.CHARGE_RATE, (double) PhaseArrayRules.EMITTER_CHARGE_RATE);
-        stats.baseValues.put(MachineStat.PARTIAL_WINDOW, (double) PhaseArrayRules.BASE_PARTIAL_WINDOW);
+        stats.baseValues.put(MachineStat.CHARGE_CAPACITY, (double) PhaseArrayRules.emitterChargeCapacity());
+        stats.baseValues.put(MachineStat.CHARGE_RATE, (double) PhaseArrayRules.emitterChargeRate());
+        stats.baseValues.put(MachineStat.PARTIAL_WINDOW, (double) PhaseArrayRules.basePartialWindow());
         return stats;
     }
 
@@ -481,10 +481,10 @@ public final class MachineStatAccumulator {
         MachineStatAccumulator stats = new MachineStatAccumulator();
         applyBaseMachineValues(stats);
         applyPhaseArrayZeroes(stats);
-        stats.baseValues.put(MachineStat.CHARGE_CAPACITY, (double) PhaseArrayRules.COIL_CHARGE_CAPACITY);
-        stats.baseValues.put(MachineStat.CHARGE_RATE, (double) PhaseArrayRules.COIL_CHARGE_RATE);
-        stats.baseValues.put(MachineStat.HOLD_CHANCE, PhaseArrayRules.COIL_HOLD_CHANCE);
-        stats.baseValues.put(MachineStat.OVERHOLD_CHANCE, PhaseArrayRules.COIL_OVERHOLD_CHANCE);
+        stats.baseValues.put(MachineStat.CHARGE_CAPACITY, (double) PhaseArrayRules.coilChargeCapacity());
+        stats.baseValues.put(MachineStat.CHARGE_RATE, (double) PhaseArrayRules.coilChargeRate());
+        stats.baseValues.put(MachineStat.HOLD_CHANCE, PhaseArrayRules.coilHoldChance());
+        stats.baseValues.put(MachineStat.OVERHOLD_CHANCE, PhaseArrayRules.coilOverholdChance());
         return stats;
     }
 
