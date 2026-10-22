@@ -15,8 +15,12 @@ import com.rngtech.rpg.refinement.RefinementTargets;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.Connection;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.game.ClientGamePacketListener;
+import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.world.Containers;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
@@ -39,6 +43,10 @@ public class AffixForgeBlockEntity extends BlockEntity implements MenuProvider {
     public static final int SLOT_COUNT = 6;
 
     private boolean suppressUpgradeStateSync;
+    private int reforges;
+    private AffixForgeVisualState visualState = AffixForgeVisualState.IDLE;
+    private AffixForgeVisualState lastSyncedVisual;
+    private final AffixForgeVisualState.Animation animation = new AffixForgeVisualState.Animation();
 
     private final ItemStackHandler inventory = new ItemStackHandler(SLOT_COUNT) {
         @Override
@@ -72,6 +80,8 @@ public class AffixForgeBlockEntity extends BlockEntity implements MenuProvider {
             setChanged();
             if (isUpgradeSlot(slot)) {
                 syncUpgradeBlockState();
+            } else {
+                syncVisualState();
             }
         }
     };
@@ -155,7 +165,12 @@ public class AffixForgeBlockEntity extends BlockEntity implements MenuProvider {
             showFailure(player, focusMessage);
             return false;
         }
-        return RefinementMenuSupport.applyToTargetStack(player, inventory, selection, true);
+        if (!RefinementMenuSupport.applyToTargetStack(player, inventory, selection, true)) {
+            return false;
+        }
+        reforges++;
+        syncVisualState();
+        return true;
     }
 
     private String focusLockedMessage(ItemStack stack) {
@@ -235,6 +250,56 @@ public class AffixForgeBlockEntity extends BlockEntity implements MenuProvider {
         }
         if (inventory.getStackInSlot(SLOT_RESONANCE_MATRIX).isEmpty()) {
             inventory.setStackInSlot(SLOT_RESONANCE_MATRIX, new ItemStack(ModItems.AFFIX_RESONANCE_MATRIX.get()));
+        }
+    }
+
+    /** Client copy of the state the renderer draws; synced from the server in the block entity update tag. */
+    public AffixForgeVisualState visualState() {
+        return visualState;
+    }
+
+    public AffixForgeVisualState.Animation animation() {
+        return animation;
+    }
+
+    /** What the forge shows right now, built on the server. */
+    public AffixForgeVisualState currentVisualState() {
+        return new AffixForgeVisualState(
+                inventory.getStackInSlot(SLOT_TARGET).getItem(),
+                inventory.getStackInSlot(SLOT_CONSUMABLE).getItem(),
+                inventory.getStackInSlot(SLOT_MODIFIER).getItem(),
+                reforges
+        );
+    }
+
+    @Override
+    public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
+        return currentVisualState().save();
+    }
+
+    @Override
+    public Packet<ClientGamePacketListener> getUpdatePacket() {
+        return ClientboundBlockEntityDataPacket.create(this);
+    }
+
+    @Override
+    public void handleUpdateTag(CompoundTag tag, HolderLookup.Provider registries) {
+        visualState = AffixForgeVisualState.load(tag);
+    }
+
+    @Override
+    public void onDataPacket(Connection connection, ClientboundBlockEntityDataPacket packet, HolderLookup.Provider registries) {
+        visualState = AffixForgeVisualState.load(packet.getTag());
+    }
+
+    private void syncVisualState() {
+        if (suppressUpgradeStateSync || level == null || level.isClientSide) {
+            return;
+        }
+        AffixForgeVisualState current = currentVisualState();
+        if (!current.equals(lastSyncedVisual)) {
+            lastSyncedVisual = current;
+            level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), Block.UPDATE_CLIENTS);
         }
     }
 

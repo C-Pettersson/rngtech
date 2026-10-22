@@ -48,6 +48,8 @@ The **Affix Forge** is RNGTech's early refinement station. Put in a machine item
 
 The forge refines items, not placed machines. To refine a machine that is already placed, use the Refinement tab in that machine's own screen. For the endgame bench where you choose the affix, see the [Phase Array](phase-array.md).
 
+You can read a forge from the outside. The item in the target slot stands on the iron plate in the middle, inside the lapis ring, and the catalyst lies in the copper dish at the front. Each upgrade appears once it is installed. The Lens Array is a magnifier on a boom over the target, with a lens on each side, and a modifier lens in the focus slot clips to its front. The Modifier Socket is the copper claw cup on the stand on the right, where a modifier crystal in the focus slot turns. The Resonance Matrix is the violet crystal glowing in the tower on the left. Without an upgrade, its mount stays bare, and a lens or crystal in the focus slot lies on that mount. When a Reforge succeeds, the lapis ring and the matrix flare, the Lens Array shines down on the target, and the target turns once.
+
 ## Obtaining
 
 ### Crafting

@@ -1,0 +1,221 @@
+{
+  "render_type": "minecraft:cutout",
+  "textures": {
+    "particle": "rngtech:block/affix_forge/copper",
+    "copper": "rngtech:block/affix_forge/copper",
+    "socket_well": "rngtech:block/affix_forge/socket_well"
+  },
+  "elements": [
+    {
+      "from": [
+        1.0,
+        9.0,
+        7.5
+      ],
+      "to": [
+        3.0,
+        9.5,
+        9.5
+      ],
+      "faces": {
+        "north": {
+          "texture": "#copper"
+        },
+        "south": {
+          "texture": "#copper"
+        },
+        "east": {
+          "texture": "#copper"
+        },
+        "west": {
+          "texture": "#copper"
+        },
+        "up": {
+          "texture": "#socket_well",
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ]
+        },
+        "down": {
+          "texture": "#copper"
+        }
+      },
+      "rotation": {
+        "origin": [
+          2.0,
+          9.0,
+          8.5
+        ],
+        "axis": "y",
+        "angle": 45
+      }
+    },
+    {
+      "from": [
+        0.75,
+        9.5,
+        8.15
+      ],
+      "to": [
+        1.15,
+        10.75,
+        8.85
+      ],
+      "faces": {
+        "north": {
+          "texture": "#copper"
+        },
+        "south": {
+          "texture": "#copper"
+        },
+        "east": {
+          "texture": "#copper"
+        },
+        "west": {
+          "texture": "#copper"
+        },
+        "up": {
+          "texture": "#copper"
+        },
+        "down": {
+          "texture": "#copper"
+        }
+      },
+      "rotation": {
+        "origin": [
+          2.0,
+          9.0,
+          8.5
+        ],
+        "axis": "y",
+        "angle": 45
+      }
+    },
+    {
+      "from": [
+        2.85,
+        9.5,
+        8.15
+      ],
+      "to": [
+        3.25,
+        10.75,
+        8.85
+      ],
+      "faces": {
+        "north": {
+          "texture": "#copper"
+        },
+        "south": {
+          "texture": "#copper"
+        },
+        "east": {
+          "texture": "#copper"
+        },
+        "west": {
+          "texture": "#copper"
+        },
+        "up": {
+          "texture": "#copper"
+        },
+        "down": {
+          "texture": "#copper"
+        }
+      },
+      "rotation": {
+        "origin": [
+          2.0,
+          9.0,
+          8.5
+        ],
+        "axis": "y",
+        "angle": 45
+      }
+    },
+    {
+      "from": [
+        1.65,
+        9.5,
+        7.25
+      ],
+      "to": [
+        2.35,
+        10.75,
+        7.65
+      ],
+      "faces": {
+        "north": {
+          "texture": "#copper"
+        },
+        "south": {
+          "texture": "#copper"
+        },
+        "east": {
+          "texture": "#copper"
+        },
+        "west": {
+          "texture": "#copper"
+        },
+        "up": {
+          "texture": "#copper"
+        },
+        "down": {
+          "texture": "#copper"
+        }
+      },
+      "rotation": {
+        "origin": [
+          2.0,
+          9.0,
+          8.5
+        ],
+        "axis": "y",
+        "angle": 45
+      }
+    },
+    {
+      "from": [
+        1.65,
+        9.5,
+        9.35
+      ],
+      "to": [
+        2.35,
+        10.75,
+        9.75
+      ],
+      "faces": {
+        "north": {
+          "texture": "#copper"
+        },
+        "south": {
+          "texture": "#copper"
+        },
+        "east": {
+          "texture": "#copper"
+        },
+        "west": {
+          "texture": "#copper"
+        },
+        "up": {
+          "texture": "#copper"
+        },
+        "down": {
+          "texture": "#copper"
+        }
+      },
+      "rotation": {
+        "origin": [
+          2.0,
+          9.0,
+          8.5
+        ],
+        "axis": "y",
+        "angle": 45
+      }
+    }
+  ]
+}

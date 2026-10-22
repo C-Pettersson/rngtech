@@ -1,0 +1,102 @@
+{
+  "textures": {
+    "particle": "#glow",
+    "glow": "rngtech:block/affix_forge/fx/core"
+  },
+  "elements": [
+    {
+      "from": [
+        12.72,
+        8.27,
+        7.22
+      ],
+      "to": [
+        15.28,
+        9.23,
+        9.78
+      ],
+      "faces": {
+        "north": {
+          "texture": "#glow",
+          "tintindex": 0
+        },
+        "south": {
+          "texture": "#glow",
+          "tintindex": 0
+        },
+        "east": {
+          "texture": "#glow",
+          "tintindex": 0
+        },
+        "west": {
+          "texture": "#glow",
+          "tintindex": 0
+        },
+        "up": {
+          "texture": "#glow",
+          "tintindex": 0
+        },
+        "down": {
+          "texture": "#glow",
+          "tintindex": 0
+        }
+      },
+      "rotation": {
+        "origin": [
+          14.0,
+          8.75,
+          8.5
+        ],
+        "axis": "y",
+        "angle": 45
+      }
+    },
+    {
+      "from": [
+        13.02,
+        7.67,
+        7.52
+      ],
+      "to": [
+        14.98,
+        9.83,
+        9.48
+      ],
+      "faces": {
+        "north": {
+          "texture": "#glow",
+          "tintindex": 0
+        },
+        "south": {
+          "texture": "#glow",
+          "tintindex": 0
+        },
+        "east": {
+          "texture": "#glow",
+          "tintindex": 0
+        },
+        "west": {
+          "texture": "#glow",
+          "tintindex": 0
+        },
+        "up": {
+          "texture": "#glow",
+          "tintindex": 0
+        },
+        "down": {
+          "texture": "#glow",
+          "tintindex": 0
+        }
+      },
+      "rotation": {
+        "origin": [
+          14.0,
+          8.75,
+          8.5
+        ],
+        "axis": "y",
+        "angle": 45
+      }
+    }
+  ]
+}

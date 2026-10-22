@@ -4,6 +4,7 @@ import com.rngtech.client.CableTintClient;
 import com.rngtech.client.ItemLinkClient;
 import com.rngtech.client.MinersCompanionLampClient;
 import com.rngtech.client.configurator.ConfiguratorClient;
+import com.rngtech.client.renderer.AffixForgeRenderer;
 import com.rngtech.client.renderer.AlgaePhotobioreactorRenderer;
 import com.rngtech.client.renderer.AlloyFurnaceRenderer;
 import com.rngtech.client.renderer.AmmoniaFuelCellRenderer;
@@ -129,6 +130,7 @@ public final class RNGTechClient {
         modBus.addListener(MelterRenderer::registerModels);
         modBus.addListener(BatteryAssemblerRenderer::registerModels);
         modBus.addListener(ResonanceCalibratorRenderer::registerModels);
+        modBus.addListener(AffixForgeRenderer::registerModels);
         modBus.addListener(VacuumCollapseGeneratorRenderer::registerModels);
         modBus.addListener(this::registerClientExtensions);
         modBus.addListener(this::registerKeyMappings);
@@ -218,6 +220,7 @@ public final class RNGTechClient {
         event.registerBlockEntityRenderer(ModBlockEntities.MELTER.get(), MelterRenderer::new);
         event.registerBlockEntityRenderer(ModBlockEntities.BATTERY_ASSEMBLER.get(), BatteryAssemblerRenderer::new);
         event.registerBlockEntityRenderer(ModBlockEntities.RESONANCE_CALIBRATOR.get(), ResonanceCalibratorRenderer::new);
+        event.registerBlockEntityRenderer(ModBlockEntities.AFFIX_FORGE.get(), AffixForgeRenderer::new);
         event.registerEntityRenderer(ModEntityTypes.FORESTRY_CART.get(), ForestryCartRenderer::new);
         event.registerEntityRenderer(ModEntityTypes.DERELICT_CART.get(), DerelictCartRenderer::new);
     }
