@@ -20,10 +20,10 @@ import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
 
-/** One position of a Phase Array line. Blank until a Glyph is locked in from the Cradle's screen; lit while formed. */
+/** One position of a Phase Array line; lit while its line is formed, showing the Glyph tier its position runs at. */
 public class PhaseCoilBlock extends BaseMachineBlock {
     public static final BooleanProperty FORMED = BooleanProperty.create("formed");
-    /** The inscribed Glyph tier, 0 while blank, mirrored from the block entity so the model can show it. */
+    /** The Glyph tier the Coil's position needs, shown while the line uses it; 0 otherwise. The Cradle sets it. */
     public static final IntegerProperty TIER = IntegerProperty.create("tier", 0, PhaseArrayRules.GLYPH_TIERS);
 
     public PhaseCoilBlock(Properties properties) {
@@ -73,9 +73,6 @@ public class PhaseCoilBlock extends BaseMachineBlock {
             MachineTraits traits = machine.machineTraits();
             if (!traits.isEmpty()) {
                 stack.set(ModDataComponents.MACHINE_TRAITS.get(), traits);
-            }
-            if (machine instanceof PhaseCoilBlockEntity coil && coil.coilTier() > 0) {
-                stack.set(ModDataComponents.COIL_TIER.get(), coil.coilTier());
             }
         }
         return stack;

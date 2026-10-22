@@ -32,8 +32,8 @@ public final class PhaseLine {
     /**
      * One scan of a line from the Cradle outward along {@code axis}. {@code coils} are the Coils found in order from the
      * Cradle, {@code emitter} the Emitter after them or {@code null}, and {@code complete} whether that makes a legal line.
-     * {@code usableCoils} counts the leading Coils, from the Emitter inward, whose inscribed Glyph tier meets their
-     * position's floor; it is 0 unless the line is complete.
+     * {@code usableCoils} counts the leading Coils, from the Emitter inward, whose position the Cradle's seated Glyphs
+     * open; it is 0 unless the line is complete.
      */
     public record Scan(Direction axis, List<BlockPos> coils, BlockPos emitter, boolean complete, int usableCoils) {
         public static Scan none() {
@@ -73,10 +73,16 @@ public final class PhaseLine {
     }
 
     /** The complete line on any horizontal side of the Cradle, or else the side with the most Coils. */
+    /** The line's shape only; the client uses this for the parts' positions. */
     public static Scan scan(Level level, BlockPos cradle) {
+        return scan(level, cradle, 0);
+    }
+
+    /** {@code openPositions} counts the positions from the Emitter the Cradle's seated Glyphs open; usable Coils never exceed it. */
+    public static Scan scan(Level level, BlockPos cradle, int openPositions) {
         Scan best = Scan.none();
         for (Direction axis : Direction.Plane.HORIZONTAL) {
-            Scan scan = scanAxis(level, cradle, axis);
+            Scan scan = scanAxis(level, cradle, axis, openPositions);
             if (scan.complete()) {
                 return scan;
             }
@@ -87,7 +93,7 @@ public final class PhaseLine {
         return best;
     }
 
-    private static Scan scanAxis(Level level, BlockPos cradle, Direction axis) {
+    private static Scan scanAxis(Level level, BlockPos cradle, Direction axis, int openPositions) {
         List<BlockPos> coils = new ArrayList<>();
         BlockPos cursor = cradle.relative(axis);
         while (coils.size() < PhaseArrayRules.MAX_COILS && level.getBlockState(cursor).getBlock() instanceof PhaseCoilBlock) {
@@ -96,20 +102,7 @@ public final class PhaseLine {
         }
         BlockPos emitter = level.getBlockState(cursor).getBlock() instanceof PhaseEmitterBlock ? cursor.immutable() : null;
         boolean complete = emitter != null && coils.size() >= PhaseArrayRules.MIN_COILS;
-        Scan scan = new Scan(axis, List.copyOf(coils), emitter, complete, 0);
-        return complete ? new Scan(axis, scan.coils(), emitter, true, usableCoils(level, scan)) : scan;
-    }
-
-    private static int usableCoils(Level level, Scan scan) {
-        int usable = 0;
-        for (BlockPos pos : scan.coilsFromEmitter()) {
-            int tier = level.getBlockEntity(pos) instanceof PhaseCoilBlockEntity coil ? coil.coilTier() : 0;
-            if (tier < PhaseArrayRules.lowestGlyphTier(usable + 1)) {
-                break;
-            }
-            usable++;
-        }
-        return usable;
+        return new Scan(axis, List.copyOf(coils), emitter, complete, complete ? Math.min(coils.size(), openPositions) : 0);
     }
 
     /**
@@ -151,6 +144,9 @@ public final class PhaseLine {
         BlockState next = state;
         if (state.getBlock() instanceof PhaseCoilBlock) {
             next = state.setValue(PhaseCoilBlock.FORMED, formed);
+            if (!formed) {
+                next = next.setValue(PhaseCoilBlock.TIER, 0);
+            }
             if (axis != null) {
                 next = next.setValue(BaseMachineBlock.FACING, axis);
             }

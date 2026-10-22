@@ -6,8 +6,8 @@ import com.rngtech.RNGTech;
 import com.rngtech.content.block.BaseMachineBlock;
 import com.rngtech.content.block.PhaseCoilBlock;
 import com.rngtech.content.block.PhaseEmitterBlock;
-import com.rngtech.content.blockentity.PhaseCoilBlockEntity;
 import com.rngtech.content.blockentity.PhaseCradleBlockEntity;
+import com.rngtech.content.item.GlyphItem;
 import com.rngtech.content.recipe.PhaseArrayRecipe;
 import com.rngtech.content.registry.ModBlocks;
 import com.rngtech.content.registry.ModDataComponents;
@@ -66,19 +66,21 @@ public final class PhaseArrayGameTests {
         });
     }
 
-    /** Blank Coils form a line that can fire nothing; locking Glyphs in opens positions from the Emitter inward. */
+    /** A line with no Glyph seated fires nothing; a Tier I Glyph in seat I opens positions 1 to 3 and the Coils show it. */
     @GameTest(template = MachineTestSupport.EMPTY, timeoutTicks = TIMEOUT)
-    public static void inscribedCoilsOpenPositions(GameTestHelper helper) {
+    public static void seatedGlyphsOpenPositions(GameTestHelper helper) {
         line(helper, Direction.EAST, 3);
         PhaseCradleBlockEntity cradle = cradle(helper);
         helper.runAfterDelay(5, () -> {
-            check(cradle.isLineFormed(), "The blank line should still form");
-            check(cradle.usableCoils() == 0, "Blank Coils open no positions, found " + cradle.usableCoils());
-            coil(helper, CRADLE.east(3)).inscribe(1);
-            coil(helper, CRADLE.east(2)).inscribe(1);
+            check(cradle.isLineFormed(), "The line should form with no Glyph seated");
+            check(cradle.usableCoils() == 0, "No seated Glyph opens no positions, found " + cradle.usableCoils());
+            check(helper.getBlockState(CRADLE.east(1)).getValue(PhaseCoilBlock.TIER) == 0, "A closed position shows no tier");
+            seat(cradle, 1);
         });
-        helper.succeedWhen(() -> check(cradle.usableCoils() == 2,
-                "Two inscribed Coils next to the Emitter open two positions, found " + cradle.usableCoils()));
+        helper.succeedWhen(() -> {
+            check(cradle.usableCoils() == 3, "A Tier I Glyph opens positions 1 to 3, found " + cradle.usableCoils());
+            check(helper.getBlockState(CRADLE.east(1)).getValue(PhaseCoilBlock.TIER) == 1, "An open position shows the tier it runs at");
+        });
     }
 
     @GameTest(template = MachineTestSupport.EMPTY, timeoutTicks = TIMEOUT)
@@ -137,13 +139,9 @@ public final class PhaseArrayGameTests {
         // Registered up front: a delayed task must not add tick tasks while the harness iterates them. The charge
         // storage accepts nothing until the Cradle is charging, so early power is harmless.
         MachineTestSupport.powerEachTick(helper, cradle.getEnergyStorage(Direction.UP));
-        helper.runAfterDelay(5, () -> {
-            for (int i = 1; i <= 3; i++) {
-                coil(helper, CRADLE.east(i)).inscribe(1);
-            }
-        });
+        helper.runAfterDelay(5, () -> seat(cradle, 1));
         helper.runAfterDelay(10, () -> {
-            check(cradle.usableCoils() == 3, "Three inscribed Coils should be usable, found " + cradle.usableCoils());
+            check(cradle.usableCoils() == 3, "Three Coils open on a seated Tier I Glyph, found " + cradle.usableCoils());
             cradle.getItems().setStackInSlot(PhaseCradleBlockEntity.SLOT_TARGET, target);
             cradle.setAction(PhaseArrayAction.REFORGE);
             check(cradle.status() == PhaseCradleBlockEntity.STATUS_IDLE, "A Reforge on a fresh target should be ready to charge, status " + cradle.status());
@@ -185,14 +183,12 @@ public final class PhaseArrayGameTests {
         List<String> before = affixSummary(traits);
         MachineTestSupport.powerEachTick(helper, cradle.getEnergyStorage(Direction.UP));
         helper.runAfterDelay(5, () -> {
-            // Position 1 is next to the Emitter at east 5, so east 1 is position 4 and needs Tier II.
-            coil(helper, origin.east(1)).inscribe(2);
-            for (int i = 2; i <= 4; i++) {
-                coil(helper, origin.east(i)).inscribe(1);
-            }
+            // Position 4 needs Tier II, so seats I and II open all four.
+            seat(cradle, 1);
+            seat(cradle, 2);
         });
         helper.runAfterDelay(10, () -> {
-            check(cradle.usableCoils() == 4, "Four locked Coils should be usable, found " + cradle.usableCoils());
+            check(cradle.usableCoils() == 4, "Seats I and II open four positions, found " + cradle.usableCoils());
             cradle.getItems().setStackInSlot(PhaseCradleBlockEntity.SLOT_TARGET, target);
             cradle.setAction(PhaseArrayAction.ATTUNE);
             check(cradle.status() == PhaseCradleBlockEntity.STATUS_IDLE, "Attune on a fresh part should be ready to charge, status " + cradle.status());
@@ -218,11 +214,7 @@ public final class PhaseArrayGameTests {
         ItemStack target = new ItemStack(ModItems.PHASE_COIL.get());
         RefinementTargets.setTraits(target, cheapTraits(0));
         MachineTestSupport.powerEachTick(helper, cradle.getEnergyStorage(Direction.UP));
-        helper.runAfterDelay(5, () -> {
-            for (int i = 1; i <= 3; i++) {
-                coil(helper, CRADLE.east(i)).inscribe(1);
-            }
-        });
+        helper.runAfterDelay(5, () -> seat(cradle, 1));
         helper.runAfterDelay(10, () -> {
             cradle.getItems().setStackInSlot(PhaseCradleBlockEntity.SLOT_TARGET, target);
             cradle.setAction(PhaseArrayAction.REFORGE);
@@ -321,8 +313,9 @@ public final class PhaseArrayGameTests {
         return (PhaseCradleBlockEntity) helper.getBlockEntity(origin);
     }
 
-    private static PhaseCoilBlockEntity coil(GameTestHelper helper, BlockPos pos) {
-        return (PhaseCoilBlockEntity) helper.getBlockEntity(pos);
+    /** Seats a Glyph of {@code tier} in the Cradle's seat for that tier. */
+    private static void seat(PhaseCradleBlockEntity cradle, int tier) {
+        cradle.getSeats().setStackInSlot(tier - 1, GlyphItem.of(ModItems.GLYPH.get(), tier));
     }
 
     private static void assertNeverForms(GameTestHelper helper, PhaseCradleBlockEntity cradle, int coils) {

@@ -599,20 +599,20 @@ def all_setups():
 
 
 def phase_array():
-    """A nine-Coil Phase Array with every position inscribed, powered by a Debug Battery behind the Cradle.
+    """A nine-Coil Phase Array with every position open, powered by a Debug Battery behind the Cradle.
 
     The Emitter sits at the west end and the Cradle at column 10, so the Coils count 1 to 9 from the Emitter. Three
     charged Exotic Cells wait in the Cradle's sockets, and two Debug Chests hold Glyphs of every tier and sample Stage 8
     parts to fire at. Parts taken from the chest are unidentified: put one alone in a crafting grid first.
     """
-    s = Setup("phase_array", "Phase Array", "Nine-Coil Phase Array, every position inscribed, Debug Battery and charged "
+    s = Setup("phase_array", "Phase Array", "Nine-Coil Phase Array, a Glyph of every tier seated, Debug Battery and charged "
                                           "cells on the Cradle, Debug Chests of Glyphs and Stage 8 parts.")
-    tiers = [1, 1, 1, 2, 2, 3, 3, 4, 5]
     s.block(0, 0, -1, "rngtech:phase_emitter[facing=east]")
-    for position, tier in enumerate(tiers, start=1):
-        s.block(position, 0, -1, "rngtech:phase_coil[facing=east]", {"components": {"rngtech:coil_tier": tier}})
+    for position in range(1, 10):
+        s.block(position, 0, -1, "rngtech:phase_coil[facing=east]")
     cells = {slot: charged_cell("rngtech:exotic_battery_cell", 100_000_000) for slot in range(3)}
-    s.machine(10, "rngtech:exotic_affix_forge", {"Cells": inventory(9, cells)}, energy="input")
+    seats = {tier - 1: stack("rngtech:glyph", 1, {"rngtech:glyph_tier": tier}) for tier in range(1, 6)}
+    s.machine(10, "rngtech:exotic_affix_forge", {"Cells": inventory(9, cells), "Seats": inventory(5, seats)}, energy="input")
     s.block(10, 0, -2, "rngtech:debug_battery", {"OutputRate": 60_000})
     glyphs = [stack("rngtech:glyph", 64, {"rngtech:glyph_tier": tier}) for tier in range(1, 6)]
     s.block(12, 0, -1, "rngtech:debug_chest", debug_chest(*glyphs))

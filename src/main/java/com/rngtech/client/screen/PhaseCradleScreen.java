@@ -162,6 +162,11 @@ public class PhaseCradleScreen extends AbstractContainerScreen<PhaseCradleMenu> 
         if (result != null) {
             drawClipped(graphics, result, RESULT_X, RESULT_Y, RESULT_WIDTH, resultColor());
         }
+        for (int seat = 0; seat < PhaseCradleBlockEntity.GLYPH_SEATS; seat++) {
+            boolean seated = !menu.getSlot(PhaseCradleMenu.SEAT_SLOT_START + seat).getItem().isEmpty();
+            graphics.drawString(font, GlyphItem.numeral(seat + 1), PhaseCradleMenu.SEAT_X + 20, PhaseCradleMenu.SEAT_Y + seat * PhaseCradleMenu.SEAT_SPACING + 5,
+                    seated ? LIT : DIM, false);
+        }
         Component label = buttonLabel();
         int width = font.width(label);
         graphics.drawString(font, label, BUTTON_X + (BUTTON_WIDTH - width) / 2, BUTTON_Y + 3, buttonEnabled() ? TEXT : DIM, false);
@@ -570,13 +575,6 @@ public class PhaseCradleScreen extends AbstractContainerScreen<PhaseCradleMenu> 
                     return true;
                 }
             }
-            if (inside(x, y, NODE_X, LINE_Y, PhaseArrayRules.MAX_COILS * NODE_SPACING, NODE_SIZE + 2) && !menu.pulsing()) {
-                int position = (x - NODE_X) / NODE_SPACING + 1;
-                if (position <= menu.coilCount() && position > menu.usableCoils()) {
-                    sendButton(PhaseCradleMenu.BUTTON_INSCRIBE_BASE + position - 1);
-                    return true;
-                }
-            }
             int row = hoveredRow((int) mouseX, (int) mouseY);
             if (row >= 0) {
                 Row hit = visibleRows().get(row);
@@ -768,22 +766,30 @@ public class PhaseCradleScreen extends AbstractContainerScreen<PhaseCradleMenu> 
         if (position <= menu.usableCoils()) {
             return Component.translatable("rngtech.phase_cradle.screen.coil", position, percent(menu.holdChance(position)));
         }
-        int lockTier = minecraft != null && minecraft.player != null
-                ? PhaseCradleBlockEntity.lockInTier(position, minecraft.player.getInventory())
-                : 0;
-        Component hint = lockTier > 0
-                ? Component.translatable("rngtech.phase_cradle.screen.coil.lock", GlyphItem.numeral(lockTier))
-                : Component.translatable("rngtech.phase_cradle.screen.coil.lock_missing", GlyphItem.numeral(floor));
-        if (position == menu.usableCoils() + 1) {
-            return Component.translatable("rngtech.phase_cradle.screen.coil.blank", position, GlyphItem.numeral(floor)).withStyle(ChatFormatting.GOLD)
-                    .append(" ").append(hint.copy().withStyle(ChatFormatting.GRAY));
+        return Component.translatable("rngtech.phase_cradle.screen.coil.closed", position, GlyphItem.numeral(floor)).withStyle(ChatFormatting.GOLD);
+    }
+
+    /** The positions a seat of {@code tier} opens, as "1 to 3" or "8". */
+    private static String seatPositions(int tier) {
+        int first = 0;
+        int last = 0;
+        for (int position = 1; position <= PhaseArrayRules.MAX_COILS; position++) {
+            if (PhaseArrayRules.lowestGlyphTier(position) == tier) {
+                first = first == 0 ? position : first;
+                last = position;
+            }
         }
-        return Component.translatable("rngtech.phase_cradle.screen.coil.low", position, GlyphItem.numeral(floor)).withStyle(ChatFormatting.GOLD)
-                .append(" ").append(hint.copy().withStyle(ChatFormatting.GRAY));
+        return first == 0 ? "-" : first == last ? Integer.toString(first) : first + " to " + last;
     }
 
     /** What an empty Cradle slot takes: the four item slots in menu order, then the nine cell sockets. */
     private void emptySlotLines(List<Component> lines, int index) {
+        if (index >= PhaseCradleMenu.SEAT_SLOT_START) {
+            int tier = index - PhaseCradleMenu.SEAT_SLOT_START + 1;
+            lines.add(Component.translatable("rngtech.phase_cradle.screen.slot.seat", GlyphItem.numeral(tier)));
+            lines.add(gray("rngtech.phase_cradle.screen.slot.seat.detail", GlyphItem.numeral(tier), seatPositions(tier)));
+            return;
+        }
         String slot = switch (index) {
             case PhaseCradleBlockEntity.SLOT_TARGET -> "target";
             case PhaseCradleBlockEntity.SLOT_GLYPH -> "glyph";

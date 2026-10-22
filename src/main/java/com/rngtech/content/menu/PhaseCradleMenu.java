@@ -40,6 +40,10 @@ public class PhaseCradleMenu extends AbstractContainerMenu {
     public static final int CELL_X = 12;
     public static final int CELL_Y = 40;
     public static final int CELL_SPACING = 19;
+    /** The five Glyph seats, a column under the output slot, seat I at the top. */
+    public static final int SEAT_X = 226;
+    public static final int SEAT_Y = 72;
+    public static final int SEAT_SPACING = 18;
     public static final int INVENTORY_X = 48;
     public static final int INVENTORY_Y = 180;
     public static final int HOTBAR_Y = 238;
@@ -53,13 +57,13 @@ public class PhaseCradleMenu extends AbstractContainerMenu {
     public static final int BUTTON_DONOR_BASE = 500;
     public static final int BUTTON_CHARGE = 600;
     public static final int BUTTON_FIRE = 601;
-    public static final int BUTTON_INSCRIBE_BASE = 700;
-    /** The Cradle's own slots come first in menu order: target, Glyph, donor, output, then the nine cell sockets. */
-    public static final int MACHINE_SLOTS = PhaseCradleBlockEntity.SLOT_COUNT + PhaseCradleBlockEntity.CELL_SLOTS;
+    /** The Cradle's own slots come first in menu order: target, Glyph, donor, output, the nine cell sockets, then the five seats. */
+    public static final int MACHINE_SLOTS = PhaseCradleBlockEntity.SLOT_COUNT + PhaseCradleBlockEntity.CELL_SLOTS + PhaseCradleBlockEntity.GLYPH_SEATS;
 
     private static final int ITEM_SLOTS = PhaseCradleBlockEntity.SLOT_COUNT;
     private static final int CELL_SLOT_START = ITEM_SLOTS;
-    private static final int PLAYER_SLOT_START = CELL_SLOT_START + PhaseCradleBlockEntity.CELL_SLOTS;
+    public static final int SEAT_SLOT_START = CELL_SLOT_START + PhaseCradleBlockEntity.CELL_SLOTS;
+    private static final int PLAYER_SLOT_START = SEAT_SLOT_START + PhaseCradleBlockEntity.GLYPH_SEATS;
     private static final int PLAYER_SLOT_END = PLAYER_SLOT_START + 36;
 
     private final PhaseCradleBlockEntity cradle;
@@ -76,6 +80,7 @@ public class PhaseCradleMenu extends AbstractContainerMenu {
         checkContainerDataCount(data, PhaseCradleBlockEntity.DATA_COUNT);
         ItemStackHandler items = cradle == null ? new ItemStackHandler(ITEM_SLOTS) : cradle.getItems();
         ItemStackHandler cells = cradle == null ? new ItemStackHandler(PhaseCradleBlockEntity.CELL_SLOTS) : cradle.getCells();
+        ItemStackHandler seats = cradle == null ? new ItemStackHandler(PhaseCradleBlockEntity.GLYPH_SEATS) : cradle.getSeats();
         addSlot(new SlotItemHandler(items, PhaseCradleBlockEntity.SLOT_TARGET, TARGET_X, TARGET_Y) {
             @Override
             public boolean mayPlace(ItemStack stack) {
@@ -115,6 +120,20 @@ public class PhaseCradleMenu extends AbstractContainerMenu {
                 @Override
                 public boolean mayPlace(ItemStack stack) {
                     return BatteryCellItem.isBatteryCell(stack);
+                }
+
+                @Override
+                public int getMaxStackSize() {
+                    return 1;
+                }
+            });
+        }
+        for (int seat = 0; seat < PhaseCradleBlockEntity.GLYPH_SEATS; seat++) {
+            int tierSeat = seat;
+            addSlot(new SlotItemHandler(seats, seat, SEAT_X, SEAT_Y + seat * SEAT_SPACING) {
+                @Override
+                public boolean mayPlace(ItemStack stack) {
+                    return PhaseCradleBlockEntity.acceptsSeat(tierSeat, stack);
                 }
 
                 @Override
@@ -181,8 +200,6 @@ public class PhaseCradleMenu extends AbstractContainerMenu {
             cradle.toggleCharging();
         } else if (id == BUTTON_FIRE) {
             cradle.fire();
-        } else if (id >= BUTTON_INSCRIBE_BASE && id < BUTTON_INSCRIBE_BASE + PhaseArrayRules.MAX_COILS) {
-            cradle.lockIn(id - BUTTON_INSCRIBE_BASE + 1, player);
         } else {
             return false;
         }
@@ -386,7 +403,10 @@ public class PhaseCradleMenu extends AbstractContainerMenu {
                 return ItemStack.EMPTY;
             }
         } else if (GlyphItem.isGlyph(stack)) {
-            if (!moveItemStackTo(stack, PhaseCradleBlockEntity.SLOT_GLYPH, PhaseCradleBlockEntity.SLOT_GLYPH + 1, false)) {
+            // An empty seat of the Glyph's own tier first, so a new line fills its seats; the spend slot takes the rest.
+            int seat = SEAT_SLOT_START + GlyphItem.tier(stack) - 1;
+            if (!moveItemStackTo(stack, seat, seat + 1, false)
+                    && !moveItemStackTo(stack, PhaseCradleBlockEntity.SLOT_GLYPH, PhaseCradleBlockEntity.SLOT_GLYPH + 1, false)) {
                 return ItemStack.EMPTY;
             }
         } else if (RefinementTargets.canRefine(stack)) {

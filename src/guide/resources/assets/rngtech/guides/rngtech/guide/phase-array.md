@@ -40,7 +40,7 @@ Every operation is a **pulse**. The line charges FE, you fire it, and the pulse 
 ### In one minute
 
 1. Place the **Cradle**, three to nine **Coils** in a straight row from one side of it, and the **Emitter** at the far end. The line lights up when it is complete.
-2. Open the Cradle. Click each blank Coil position on the line to lock a **Glyph** into it. Three positions open with Tier I Glyphs.
+2. Open the Cradle and put a **Glyph** in the seat of its tier. A Tier I Glyph opens the first three positions.
 3. Put the item in the Cradle, pick an operation, and read its odds.
 4. **Charge**, then **Fire**. Watch the Coils engage. Take the item out of the output.
 
@@ -75,7 +75,7 @@ Nothing else moves by automation: the target, the Glyph, the donor, and the outp
 
 ### Breaking
 
-Mine any part with a pickaxe. The Cradle drops itself and everything in its slots, including the Battery Cells. A Coil keeps the Glyph locked into it.
+Mine any part with a pickaxe. The Cradle drops itself and everything in its slots, including the Battery Cells. The seated Glyphs drop with the Cradle; a Coil carries nothing but its own affixes.
 
 ## More
 

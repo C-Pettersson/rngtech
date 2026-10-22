@@ -33,7 +33,7 @@ Every operation is a **pulse**. The line charges FE, you fire it, and the pulse 
 ### In one minute
 
 1. Place the **Cradle**, three to nine **Coils** in a straight row from one side of it, and the **Emitter** at the far end. The line lights up when it is complete.
-2. Open the Cradle. Click each blank Coil position on the line to lock a **Glyph** into it. Three positions open with Tier I Glyphs.
+2. Open the Cradle and put a **Glyph** in the seat of its tier. A Tier I Glyph opens the first three positions.
 3. Put the item in the Cradle, pick an operation, and read its odds.
 4. **Charge**, then **Fire**. Watch the Coils engage. Take the item out of the output.
 
@@ -62,11 +62,11 @@ The Emitter and Coils roll rarity and affixes when crafted, like other Stage 8 p
 
 Tier V has no source yet. A Glyph with no tier counts as Tier I, so one from a quest or a command works.
 
-A Glyph has two uses, and they compete: **lock** it into a Coil to open that position for good, or **spend** it on a deep operation. The tier is a floor for both: a Tier III Glyph opens any position up to 7 and pays for any operation that asks for Tier III or less.
+A Glyph has two uses, and they compete: **seat** it in the Cradle to open the positions of its tier, or **spend** it on a deep operation. The tier is a floor for both: a Tier III Glyph opens any position up to 7 and pays for any operation that asks for Tier III or less.
 
 ### Breaking
 
-Mine any part with a pickaxe. The Cradle drops itself and everything in its slots, including the Battery Cells. A Coil keeps the Glyph locked into it.
+Mine any part with a pickaxe. The Cradle drops itself and everything in its slots, including the Battery Cells. The seated Glyphs drop with the Cradle; a Coil carries nothing but its own affixes.
 
 ## Usage
 
@@ -78,9 +78,9 @@ Each Coil has a **position**, counted from the Emitter: position 1 is the Coil n
 
 ### Opening positions {#positions}
 
-A Coil is blank until a Glyph is locked into it, and the first blank Coil from the Emitter ends the usable line. Each position asks for a Glyph tier:
+The Cradle has five Glyph seats, one per tier, in a column beside the chamber. A Glyph of that tier or higher in a seat opens every position of its tier, and positions open from the Emitter inward: the first closed one ends the usable line. Take a Glyph out and its positions close again. Each position asks for a seat:
 
-| Position | Glyph it needs | Operations it opens |
+| Position | Seat it needs | Operations it opens |
 |---:|---:|---|
 | 1 to 3 | I | Reforge |
 | 4 | II | Attune |
@@ -90,9 +90,9 @@ A Coil is blank until a Glyph is locked into it, and the first blank Coil from t
 | 8 | IV | Exalt |
 | 9 | V | Graft |
 
-To lock a Glyph in, open the Cradle and click the blank position on the line at the top of the screen. The Glyph that position needs leaves your inventory; if you carry none of that tier, the lowest higher tier goes instead, and the hover says which. The Coil keeps the tier for good and shows it on its sides. A Coil locked at a higher tier than its position needs still works, so a Coil can move to any position its tier covers: a line grows by placing a new Coil next to the Emitter and shifting the rest outward.
+Shift-click a Glyph into the Cradle and it goes to its own seat if that seat is empty, else to the Glyph slot. While the line uses a position, its Coil shows the tier it runs at on its sides; a closed position shows nothing. Coils carry no tier of their own, so they are interchangeable, and a line grows by placing another Coil at the Emitter end.
 
-Opening every position costs three Tier I, two Tier II, two Tier III, one Tier IV, and one Tier V Glyph. That Tier V is also what one Graft costs, so the player who locks it in gives up a Graft to make every later Graft possible.
+Opening every position takes one Glyph of each tier. The Tier V is also what one Graft spends, so seating it ties up a Graft to make every later Graft possible.
 
 ### Running a pulse
 
@@ -197,10 +197,11 @@ Nothing else moves by automation: the target, the Glyph, the donor, and the outp
 
 The Cradle has one screen, read from the top down:
 
-- **The line** runs across the top: the Emitter's node at the left, one node per position, and the target's chamber at the right. A lit node is a usable position; a dim node with an amber edge is blank or locked too low, and clicking it locks a Glyph in. After a pulse the held nodes turn green and the slipped one red, or amber when the slip did no harm, until the next item goes in.
+- **The line** runs across the top: the Emitter's node at the left, one node per position, and the target's chamber at the right. A lit node is a usable position; a dim node with an amber edge is closed, and its hover names the seat it waits on. After a pulse the held nodes turn green and the slipped one red, or amber when the slip did no harm, until the next item goes in.
 - **The conduit** under the line fills with the charge. Hover it for FE held and needed, the rate FE is arriving, and the time to full.
 - **The cell sockets** sit on the left, nine of them, each ring dimming as its cell empties.
 - **The chamber** holds the target slot with its affixes listed under it; the Glyph, donor, and output slots sit beside it. Marks around the chamber show the item's Strain.
+- **The Glyph seats** run down the right edge under the output slot, numbered I to V; a numeral lights while its seat holds a Glyph.
 - **The operation marks** run in a row above the list. A dim mark cannot run, and its hover says why: the missing position, Glyph, selection, or RP.
 - **The one button** under the list reads Charge, Stop, Fire, or Pulse, whichever the line is ready for.
 - **Three lights** at the top left show blocked, waiting for input, and live.
@@ -211,7 +212,7 @@ Hover anything for its exact values, and an empty slot for what goes in it. In t
 
 - Read the odds before every pulse. When the Fracture chance passes what you will accept, Temper the item or call it done.
 - Reforge is cheap on a bad item and nearly useless on a good one: a Rare with high Quality is a rare roll, and the item's Strain runs out before your luck does.
-- Open positions 1 to 3 first; three Tier I Glyphs give you Reforge, and every Glyph after that opens a deeper operation.
+- Seat a Tier I Glyph first; it gives you Reforge on three Coils, and every seat after that opens a deeper operation.
 - Nine Coils against a seven-Coil operation buy Overhold, not Success. Build long for the bonus, not for safety.
 - A bank of charged Battery Cells in the sockets finishes a pulse that a cable alone would take minutes to fill.
 

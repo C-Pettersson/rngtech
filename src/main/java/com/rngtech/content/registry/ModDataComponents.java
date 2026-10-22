@@ -155,15 +155,6 @@ public final class ModDataComponents {
                             .cacheEncoding()
             );
 
-    /** The Glyph tier inscribed into a Phase Coil, 1 to 5. Absent means blank. */
-    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Integer>> COIL_TIER =
-            DATA_COMPONENTS.registerComponentType(
-                    "coil_tier",
-                    builder -> builder
-                            .persistent(Codec.intRange(1, 5))
-                            .networkSynchronized(ByteBufCodecs.VAR_INT)
-                            .cacheEncoding()
-            );
     /** Strain from Phase Array pulses. Absent means 0. */
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<Integer>> STRAIN =
             DATA_COMPONENTS.registerComponentType(

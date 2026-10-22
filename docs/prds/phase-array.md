@@ -18,7 +18,7 @@ The Phase Array is the endgame refinement multiblock. It replaces the Exotic Aff
 
 The Array is RNGTech's crafting bench, in the Path of Exile sense: the player chooses what happens to the item and pays for the choice. It takes any refinable item of any stage. Its operations are datapack recipes, so a pack maker can change, remove, or add them. Each operation spends a little Refinement Potential, so RP stays the ceiling it is everywhere else, but the Array's real limits sit below that ceiling: FE that grows with how good the item already is, Strain that grows with every pulse and raises the odds of a Fracture, and Glyphs, which no recipe makes. Glyphs ship with this PRD, with default sources in the existing challenge loot tables and in Dormant Machines, so the Array works on its own. [Work Orders](work-orders.md) will add Glyphs to their rewards when they land. Most items are done when the next pulse costs more than the player wants to pay, before their RP runs out.
 
-The Array is also a build of its own. Its Emitter and Coils roll rarity and affixes like machine parts, Glyphs inscribed into Coils unlock deeper operations, and a Coil can be pulled from the line and refined in the Array like any other part. A player who wants nothing but a longer, steadier line has a reason to run it.
+The Array is also a build of its own. Its Emitter and Coils roll rarity and affixes like machine parts, Glyphs seated in the Cradle unlock deeper operations, and a Coil can be pulled from the line and refined in the Array like any other part. A player who wants nothing but a longer, steadier line has a reason to run it.
 
 ## Why the Exotic Affix Forge is replaced
 
@@ -58,7 +58,7 @@ Key existing code:
 - The soft limit is price, not a counter. FE grows with the item's quality, Strain grows with each pulse, and Glyphs are scarce. RP is spent sparingly, so a player decides an item is done before RP decides for them.
 - Every operation is a datapack recipe. Pack makers change, remove, or add operations without code.
 - A pulse is a short, watchable, audible sequence with a payoff at the end. It reads as a machine holding a signal together, not as a spell.
-- The Array scales by length: more inscribed Coils unlock deeper operations and add charge, better Coils hold the pulse more often, a better Emitter charges faster.
+- The Array scales by length: more open positions unlock deeper operations and add charge, better Coils hold the pulse more often, a better Emitter charges faster.
 - The Array is a target for itself. The Emitter and Coils are refinable parts, and Glyphs spent on the line compete with Glyphs spent on items.
 - Glyphs have no recipe. They come from RNGTech machine challenges, and pack makers can hand them out from any source.
 - Everything the Array needs ships with it: the parts and their recipes, the operations, the Glyph item and its default sources, and a balance-world setup that spawns a formed line. No later PRD is required for it to be playable.
@@ -82,7 +82,7 @@ Key existing code:
 | Phase Array | The formed multiblock: an Emitter, three to nine Phase Coils, and a Cradle in a straight horizontal line. |
 | Cradle | `rngtech:exotic_affix_forge`, renamed. The controller block at the end of the line. It holds the target, the Glyph slot, the output, and the screen. |
 | Emitter | `rngtech:phase_emitter`. The block at the start of the line. It stores and delivers most of the charge. Rolls rarity and affixes. |
-| Phase Coil | `rngtech:phase_coil`. A line block between the Emitter and the Cradle. Rolls rarity and affixes. Blank until a Glyph is inscribed. |
+| Phase Coil | `rngtech:phase_coil`. A line block between the Emitter and the Cradle. Rolls rarity and affixes. Usable while the Cradle seats the Glyph its position needs. |
 | Position | A Coil's place in the line, counted from the Emitter: 1 is next to the Emitter, 9 is the farthest allowed. |
 | Glyph | `rngtech:glyph`, with a tier I to V in a data component. No recipe. Consumed by deep operations, or inscribed into a Coil for good. |
 | Operation | What a pulse does. A recipe of type `rngtech:phase_array`, under `data/<namespace>/recipe/`. |
@@ -111,7 +111,7 @@ A nine-Coil line stores 52 MFE and charges at 26 kFE/t from its own parts. The E
 
 The Cradle also has nine Battery Cell sockets, like a Dormant Machine. Cells in the sockets drain into the charge, each at its own output rate, so a player can carry a pulse's worth of FE to a line that has no cable. Empty cells come out of the bottom. The sockets are the Array's only Gear.
 
-The Emitter and Coils are Stage 8 parts. Their recipes use Exotic Machine Frames, Nullite, and a Calibrated Conductive Component, and both sit behind the Nullite material condition. A Blank Coil is locked in from the Cradle's screen: a click on its position takes the Glyph that position needs from the player's inventory, the exact tier first and else the lowest tier above it, fixes the Coil's tier, and uses the Glyph up. The position sets the lowest Glyph tier it accepts:
+The Emitter and Coils are Stage 8 parts. Their recipes use Exotic Machine Frames, Nullite, and a Calibrated Conductive Component, and both sit behind the Nullite material condition. The Cradle has five Glyph seats, one per tier. A Glyph of that tier or higher in a seat opens every position whose floor is that tier, and the seated Glyph can be taken back out, which closes them again. Positions open from the Emitter inward and the first closed one ends the usable line. The position sets the tier its seat needs:
 
 | Position | Lowest Glyph tier |
 |---:|---:|
@@ -121,7 +121,7 @@ The Emitter and Coils are Stage 8 parts. Their recipes use Exotic Machine Frames
 | 8 | IV |
 | 9 | V |
 
-A Coil inscribed with a higher tier than its position needs is legal. An inscribed Coil can move to any position that accepts its tier, so a player can extend a line by inserting a new Coil near the Emitter and shifting the rest outward.
+Coils carry no tier of their own, so they are interchangeable: a line grows by placing another Coil at the Emitter end, and the seats decide how much of it runs. While the line uses a position, its Coil shows the tier it runs at on its sides.
 
 ## Player Flow
 
@@ -260,9 +260,9 @@ When the [Work Orders PRD](work-orders.md) ships, its reward table pays Glyphs o
 A Glyph has two uses, and they compete:
 
 - **Consume** it on a deep pulse.
-- **Lock** it into a Blank Coil for good, to open a position.
+- **Seat** it in the Cradle, to open the positions of its tier.
 
-Opening position 9 costs a Tier V Glyph, which is also what a Graft costs. The player who inscribes it gives up one Graft to make every later Graft possible.
+Opening position 9 means seating a Tier V Glyph, which is also what a Graft spends. A seated Glyph can come back out, so the player who seats it ties up one Graft to make every later Graft possible.
 
 ## The Array as a Build
 
@@ -300,7 +300,7 @@ The Array has no Mastery. Its progression is length, Glyph tiers, and part affix
 - Strain is a new optional field on the item's traits, next to the Exotic Forge history it replaces. Missing means 0, so existing items load unchanged.
 - The Cradle block entity stores the formed state, the line's direction and length, the charge, the chosen operation and selection, and the last pulse's outcome.
 - The Emitter and Coils store their traits as machine parts do, and copy them to the item on drop.
-- An inscribed Coil stores its Glyph tier in `rngtech:coil_tier`.
+- The Cradle stores its five Glyph seats. A Coil's `tier` block state shows the tier its position runs at while the line uses it, and nothing when it is closed.
 - The Exotic Forge per-item history, the Nitrogen tank, and the cooling and spool state are removed. A world with an Exotic Affix Forge placed keeps the block as an unformed Cradle.
 
 ## UI
@@ -312,7 +312,7 @@ The Cradle screen does not follow the Process, Gear, and Stats tab layout of the
 - **The charge conduit:** fills along the line as FE arrives, from the Emitter toward the chamber. Hover for FE held, FE needed, and charge time at the current rate.
 - **The cell sockets:** nine sockets under the Emitter, each with a ring that dims as its cell empties, exactly as on a Dormant Machine.
 - **The operation selector:** a column of operation marks beside the chamber. A mark that cannot run is dim, and its hover names the missing position, Glyph, selection, or RP. Hover the selected mark for the full outcome table: Success, Overhold, Partial, Miss, and Fracture with their odds, plus FE, RP, Glyph, and Strain after the pulse.
-- **Locking in:** click a blank node, and the Glyph its position needs leaves the player's inventory. The node's hover names the tier it will take, or the tier the player lacks.
+- **Seats:** five Glyph slots in a column beside the chamber, numbered I to V. A seated Glyph opens every position of its tier; a closed node's hover names the seat it waits on.
 - **One button:** Charge, then Fire. It reads the current state and nothing else is needed.
 - **Tooltips:** Strain on every item that has it, with the Fracture chance it adds. Glyph tier. Emitter and Coil affixes.
 - **JEI:** every `rngtech:phase_array` recipe in a Phase Array category, with its Coil count, Glyph, FE at Quality 0, and RP, and information pages for Glyphs, the Emitter, and Coils.
@@ -408,6 +408,7 @@ Resolved 2026-10-21:
 - Operations are `rngtech:phase_array` recipes.
 - Default Glyph sources are the existing challenge loot tables and Dormant Machines. Tier V comes from Work Orders only.
 - The Cradle screen follows the Dormant Machine's graphical panel.
+- Glyphs are seated in the Cradle, one seat per tier, like the Affix Forge's installed upgrades, after locking them into Coils one by one proved hard to read in playtest (resolved 2026-10-22). A seated Glyph can be taken back out.
 - Drained Battery Cells leave through the Cradle's bottom face, as Structure says; the Non-Goal rules out automating the pulse, not emptying the sockets. Nothing enters by automation.
 
 ## Open Questions

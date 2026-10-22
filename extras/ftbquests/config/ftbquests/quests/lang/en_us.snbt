@@ -1524,7 +1524,7 @@
 		""
 		"&aUse:&r"
 		"- Supply &bFE&r to any side."
-		"- Open the Cradle, click each blank Coil position to lock in the Glyph it needs, and put the item in the Cradle."
+		"- Open the Cradle, seat a Glyph of each tier you have in its seat, and put the item in the Cradle."
 		"- Pick an operation, read its odds, then charge and fire."
 		""
 		"&7&oNote: A pulse costs FE that grows with the item's affix tiers, and every pulse adds Strain.&r"

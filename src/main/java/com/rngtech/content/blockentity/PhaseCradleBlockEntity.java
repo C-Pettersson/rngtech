@@ -1,6 +1,7 @@
 package com.rngtech.content.blockentity;
 
 import com.rngtech.content.block.BaseMachineBlock;
+import com.rngtech.content.block.PhaseCoilBlock;
 import com.rngtech.content.block.PhaseCradleBlock;
 import com.rngtech.content.block.PhaseEmitterBlock;
 import com.rngtech.content.item.BatteryCellItem;
@@ -79,6 +80,8 @@ public class PhaseCradleBlockEntity extends BlockEntity implements MenuProvider,
     public static final int SLOT_OUTPUT = 3;
     public static final int SLOT_COUNT = 4;
     public static final int CELL_SLOTS = 9;
+    /** One Glyph seat per tier; a Glyph of that tier or higher in seat {@code n} opens every position whose floor is tier {@code n + 1}. */
+    public static final int GLYPH_SEATS = PhaseArrayRules.GLYPH_TIERS;
 
     public static final int STATUS_NO_LINE = 0;
     public static final int STATUS_NO_RECIPE = 1;
@@ -198,6 +201,23 @@ public class PhaseCradleBlockEntity extends BlockEntity implements MenuProvider,
 
         @Override
         protected void onContentsChanged(int slot) {
+            setChanged();
+        }
+    };
+    private final ItemStackHandler seats = new ItemStackHandler(GLYPH_SEATS) {
+        @Override
+        public boolean isItemValid(int slot, ItemStack stack) {
+            return acceptsSeat(slot, stack);
+        }
+
+        @Override
+        public int getSlotLimit(int slot) {
+            return 1;
+        }
+
+        @Override
+        protected void onContentsChanged(int slot) {
+            requestLineRescan();
             setChanged();
         }
     };
@@ -353,7 +373,7 @@ public class PhaseCradleBlockEntity extends BlockEntity implements MenuProvider,
         }
         lineRescanRequested = false;
         shownChargeLevel = -1;
-        PhaseLine.Scan scan = PhaseLine.scan(level, worldPosition);
+        PhaseLine.Scan scan = PhaseLine.scan(level, worldPosition, openPositions());
         boolean changed = scan.complete() != line.complete()
                 || scan.coilCount() != line.coilCount()
                 || scan.usableCoils() != line.usableCoils();
@@ -371,6 +391,7 @@ public class PhaseCradleBlockEntity extends BlockEntity implements MenuProvider,
                 PhaseLine.setFormed(level, member, true, scan.axis());
             }
         }
+        showPositionTiers(scan);
         BlockState state = getBlockState();
         if (scan.complete() && state.hasProperty(PhaseCradleBlock.FACING) && state.getValue(PhaseCradleBlock.FACING) != scan.axis()) {
             level.setBlock(worldPosition, state.setValue(PhaseCradleBlock.FACING, scan.axis()), Block.UPDATE_ALL);
@@ -380,6 +401,42 @@ public class PhaseCradleBlockEntity extends BlockEntity implements MenuProvider,
         }
         if (changed) {
             setChanged();
+        }
+    }
+
+    /** Seat {@code slot} takes a Glyph of tier {@code slot + 1} or higher. */
+    public static boolean acceptsSeat(int slot, ItemStack stack) {
+        return GlyphItem.isGlyph(stack) && GlyphItem.tier(stack) >= slot + 1;
+    }
+
+    public ItemStackHandler getSeats() {
+        return seats;
+    }
+
+    /** Positions open from the Emitter inward while each one's floor tier has a Glyph seated; the first closed one ends it. */
+    public int openPositions() {
+        int open = 0;
+        for (int position = 1; position <= PhaseArrayRules.MAX_COILS; position++) {
+            if (seats.getStackInSlot(PhaseArrayRules.lowestGlyphTier(position) - 1).isEmpty()) {
+                break;
+            }
+            open++;
+        }
+        return open;
+    }
+
+    /** Each formed Coil shows the tier its position runs at, or nothing while the position is closed. */
+    private void showPositionTiers(PhaseLine.Scan scan) {
+        if (!scan.complete()) {
+            return;
+        }
+        List<BlockPos> coils = scan.coilsFromEmitter();
+        for (int position = 1; position <= coils.size(); position++) {
+            int tier = position <= scan.usableCoils() ? PhaseArrayRules.lowestGlyphTier(position) : 0;
+            BlockState state = level.getBlockState(coils.get(position - 1));
+            if (state.hasProperty(PhaseCoilBlock.TIER) && state.getValue(PhaseCoilBlock.TIER) != tier) {
+                level.setBlock(coils.get(position - 1), state.setValue(PhaseCoilBlock.TIER, tier), Block.UPDATE_CLIENTS);
+            }
         }
     }
 
@@ -996,64 +1053,6 @@ public class PhaseCradleBlockEntity extends BlockEntity implements MenuProvider,
         setChanged();
     }
 
-    /**
-     * Locks a Glyph into the Coil at {@code position} (1 next to the Emitter), taken from the player's inventory: the
-     * tier the position needs when the player carries one, else the lowest tier above it. The Coil keeps the tier for
-     * good and the Glyph is used up.
-     */
-    public boolean lockIn(int position, Player player) {
-        if (level == null || pulse != null || !line.complete()) {
-            return false;
-        }
-        List<BlockPos> coils = line.coilsFromEmitter();
-        if (position < 1 || position > coils.size()
-                || !(level.getBlockEntity(coils.get(position - 1)) instanceof PhaseCoilBlockEntity coil)
-                || coil.coilTier() >= PhaseArrayRules.lowestGlyphTier(position)) {
-            return false;
-        }
-        int slot = lockInSlot(position, player.getInventory());
-        if (slot < 0) {
-            return false;
-        }
-        int tier = GlyphItem.tier(player.getInventory().getItem(slot));
-        if (!coil.inscribe(tier)) {
-            return false;
-        }
-        player.getInventory().removeItem(slot, 1);
-        level.playSound(null, worldPosition, SoundEvents.AMETHYST_BLOCK_RESONATE, SoundSource.BLOCKS, 0.8F, 1.0F + 0.1F * tier);
-        requestLineRescan();
-        setChanged();
-        return true;
-    }
-
-    /** The inventory slot a lock-in at {@code position} would take a Glyph from, or -1: the floor tier first, else the lowest above it. */
-    public static int lockInSlot(int position, Inventory inventory) {
-        int floor = PhaseArrayRules.lowestGlyphTier(position);
-        int bestSlot = -1;
-        int bestTier = Integer.MAX_VALUE;
-        for (int slot = 0; slot < inventory.getContainerSize(); slot++) {
-            ItemStack stack = inventory.getItem(slot);
-            if (!GlyphItem.isGlyph(stack)) {
-                continue;
-            }
-            int tier = GlyphItem.tier(stack);
-            if (tier >= floor && tier < bestTier) {
-                bestTier = tier;
-                bestSlot = slot;
-                if (tier == floor) {
-                    break;
-                }
-            }
-        }
-        return bestSlot;
-    }
-
-    /** The Glyph tier a lock-in at {@code position} would spend from {@code inventory}, or 0 when it carries none that fits. */
-    public static int lockInTier(int position, Inventory inventory) {
-        int slot = lockInSlot(position, inventory);
-        return slot < 0 ? 0 : GlyphItem.tier(inventory.getItem(slot));
-    }
-
     /** Charge starts a pulse's fill; pressed again it stops, keeping what has arrived. */
     public void toggleCharging() {
         int status = status();
@@ -1293,6 +1292,9 @@ public class PhaseCradleBlockEntity extends BlockEntity implements MenuProvider,
         for (int slot = 0; slot < cells.getSlots(); slot++) {
             dropSlot(level, cells, slot);
         }
+        for (int slot = 0; slot < seats.getSlots(); slot++) {
+            dropSlot(level, seats, slot);
+        }
     }
 
     private void dropSlot(Level level, ItemStackHandler inventory, int slot) {
@@ -1401,6 +1403,7 @@ public class PhaseCradleBlockEntity extends BlockEntity implements MenuProvider,
         super.saveAdditional(tag, registries);
         tag.put("Items", items.serializeNBT(registries));
         tag.put("Cells", cells.serializeNBT(registries));
+        tag.put("Seats", seats.serializeNBT(registries));
         tag.putLong("Charge", charge);
         tag.putBoolean("Charging", charging);
         tag.putString("Action", action.getSerializedName());
@@ -1436,6 +1439,9 @@ public class PhaseCradleBlockEntity extends BlockEntity implements MenuProvider,
         }
         if (tag.contains("Cells")) {
             cells.deserializeNBT(registries, tag.getCompound("Cells"));
+        }
+        if (tag.contains("Seats")) {
+            seats.deserializeNBT(registries, tag.getCompound("Seats"));
         }
         charge = Math.max(0L, tag.getLong("Charge"));
         charging = tag.getBoolean("Charging");

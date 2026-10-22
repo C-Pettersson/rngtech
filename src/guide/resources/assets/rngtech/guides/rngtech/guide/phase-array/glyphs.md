@@ -23,4 +23,4 @@ navigation:
 
 Tier V has no source yet. A Glyph with no tier counts as Tier I, so one from a quest or a command works.
 
-A Glyph has two uses, and they compete: **lock** it into a Coil to open that position for good, or **spend** it on a deep operation. The tier is a floor for both: a Tier III Glyph opens any position up to 7 and pays for any operation that asks for Tier III or less.
+A Glyph has two uses, and they compete: **seat** it in the Cradle to open the positions of its tier, or **spend** it on a deep operation. The tier is a floor for both: a Tier III Glyph opens any position up to 7 and pays for any operation that asks for Tier III or less.

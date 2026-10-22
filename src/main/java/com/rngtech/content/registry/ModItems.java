@@ -64,7 +64,6 @@ import com.rngtech.content.item.MinersCompanionItem;
 import com.rngtech.content.item.ModularToolItem;
 import com.rngtech.content.item.NetworkConnectorItem;
 import com.rngtech.content.item.OreBlockItem;
-import com.rngtech.content.item.PhaseCoilBlockItem;
 import com.rngtech.content.item.PotentialReactorBlockItem;
 import com.rngtech.content.item.PotentialReactorPartItem;
 import com.rngtech.content.item.PruningShearsItem;
@@ -177,9 +176,14 @@ public final class ModItems {
                 }
             }
     );
-    public static final DeferredItem<PhaseCoilBlockItem> PHASE_COIL = ITEMS.register(
+    public static final DeferredItem<MachineBlockItem> PHASE_COIL = ITEMS.register(
             "phase_coil",
-            () -> new PhaseCoilBlockItem(ModBlocks.PHASE_COIL.get(), new Item.Properties().stacksTo(1))
+            () -> new MachineBlockItem(ModBlocks.PHASE_COIL.get(), MachineType.PHASE_COIL, new Item.Properties().stacksTo(1)) {
+                @Override
+                protected int componentStage() {
+                    return PhaseArrayRules.PART_STAGE;
+                }
+            }
     );
     public static final DeferredItem<BlockItem> DEBUG_REROLLER = ITEMS.register(
             "debug_reroller",
