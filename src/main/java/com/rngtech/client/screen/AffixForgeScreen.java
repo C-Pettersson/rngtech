@@ -16,6 +16,7 @@ import com.rngtech.rpg.ModifierEligibilityProfile;
 import com.rngtech.rpg.ModifierLensTag;
 import com.rngtech.rpg.ModifierLensTargets;
 import com.rngtech.rpg.ModifierSlot;
+import com.rngtech.rpg.Rarity;
 import com.rngtech.rpg.corruption.CorruptionCatalog;
 import com.rngtech.rpg.corruption.CorruptionPreview;
 import com.rngtech.rpg.corruption.CorruptionText;
@@ -339,32 +340,12 @@ public class AffixForgeScreen extends AbstractContainerScreen<AffixForgeMenu> {
             return List.of(new OutcomeLine(Component.translatable("rngtech.refinement.failure.cannot_corrupt"), TEXT_BAD));
         }
         if (!lensTags.isEmpty() && !RefinementEngine.operationSupportsLens(operation)) {
-            return focusFailureLines("rngtech.refinement.failure.lens_requires_add_or_upgrade");
+            return focusFailureLines("rngtech.refinement.failure.lens_rejects_corrupt");
         }
-        if (refinementModifier.requiresCorrupt() && operation != RefinementOperation.CORRUPT) {
+        String modifierFailure = refinementModifier.failureKey(operation);
+        if (modifierFailure != null) {
             return List.of(
-                    new OutcomeLine(Component.translatable("rngtech.refinement.failure.modifier_requires_corrupt"), TEXT_BAD),
-                    modifierPreviewLine(refinementModifier)
-            );
-        }
-        if (refinementModifier.requiresRandomUpgrade() && operation != RefinementOperation.UPGRADE_RANDOM_MODIFIER) {
-            return List.of(
-                    new OutcomeLine(Component.translatable("rngtech.refinement.failure.modifier_requires_affix_modifier"), TEXT_BAD),
-                    modifierPreviewLine(refinementModifier)
-            );
-        }
-        if (refinementModifier != RefinementModifier.NONE
-                && !refinementModifier.requiresRandomUpgrade()
-                && !refinementModifier.requiresCorrupt()
-                && !RefinementEngine.canUseModifier(operation.action())) {
-            return List.of(
-                    new OutcomeLine(Component.translatable("rngtech.refinement.failure.modifier_requires_add_or_upgrade"), TEXT_BAD),
-                    modifierPreviewLine(refinementModifier)
-            );
-        }
-        if (refinementModifier.requiresSelectedUpgrade() && operation != RefinementOperation.UPGRADE_SELECTED_MODIFIER) {
-            return List.of(
-                    new OutcomeLine(Component.translatable("rngtech.refinement.failure.modifier_requires_upgrade"), TEXT_BAD),
+                    new OutcomeLine(Component.translatable(modifierFailure), TEXT_BAD),
                     modifierPreviewLine(refinementModifier)
             );
         }
@@ -413,34 +394,123 @@ public class AffixForgeScreen extends AbstractContainerScreen<AffixForgeMenu> {
     }
 
     private List<OutcomeLine> crystalOutcomeLines(RefinementOperation operation) {
+        Rarity rarity = RefinementEngine.rarityAfterOperation(targetTraits(), operation);
         return switch (operation.action()) {
-            case FULL_REROLL -> List.of(
-                    new OutcomeLine(Component.translatable("rngtech.refinement.preview.full_reroll"), TEXT_GOOD),
-                    new OutcomeLine(Component.translatable("rngtech.refinement.preview.cost_random"), TEXT_MUTED)
+            case FULL_REROLL -> withDefinitionFocus(
+                    List.of(
+                            new OutcomeLine(Component.translatable("rngtech.refinement.preview.full_reroll"), TEXT_GOOD),
+                            new OutcomeLine(Component.translatable("rngtech.refinement.preview.cost_random"), TEXT_MUTED)
+                    ),
+                    rerollDefinitions()
             );
-            case FILL_OPEN_SLOTS -> List.of(
-                    new OutcomeLine(Component.translatable("rngtech.refinement.preview.fill_slots"), TEXT_GOOD),
-                    costRangeEachLine()
+            case FILL_OPEN_SLOTS -> withDefinitionFocus(
+                    List.of(
+                            new OutcomeLine(Component.translatable("rngtech.refinement.preview.fill_slots"), TEXT_GOOD),
+                            costRangeEachLine()
+                    ),
+                    candidateDefinitions(List.of(), rarity)
             );
             case RANDOM_UPGRADE -> upgradeLines(false);
             case SELECTED_UPGRADE -> upgradeLines(true);
-            case RANDOM_REMOVE -> List.of(
-                    new OutcomeLine(Component.translatable("rngtech.refinement.preview.random_remove"), TEXT_GOOD),
-                    new OutcomeLine(Component.translatable("rngtech.refinement.preview.cost_random"), TEXT_MUTED)
+            case RANDOM_REMOVE -> withModifierFocus(
+                    List.of(
+                            new OutcomeLine(Component.translatable("rngtech.refinement.preview.random_remove"), TEXT_GOOD),
+                            new OutcomeLine(Component.translatable("rngtech.refinement.preview.cost_random"), TEXT_MUTED)
+                    ),
+                    RefinementEngine.removableAffixes(RefinementTargets.eligibilityProfile(targetStack()), targetTraits())
             );
             case RANDOM_ADD -> candidateLines(candidateDefinitions(List.of()));
-            case ASCEND_RARITY -> List.of(
-                    new OutcomeLine(Component.translatable("rngtech.refinement.preview.ascend"), TEXT_GOOD),
-                    new OutcomeLine(Component.translatable("rngtech.refinement.preview.upgrade_existing"), TEXT_MUTED),
-                    new OutcomeLine(Component.translatable("rngtech.refinement.preview.cost_all"), TEXT_MUTED)
+            case ASCEND_RARITY -> ascensionLines(
+                    List.of(
+                            new OutcomeLine(Component.translatable("rngtech.refinement.preview.ascend"), TEXT_GOOD),
+                            new OutcomeLine(Component.translatable("rngtech.refinement.preview.upgrade_existing"), TEXT_MUTED),
+                            new OutcomeLine(Component.translatable("rngtech.refinement.preview.cost_all"), TEXT_MUTED)
+                    ),
+                    candidateDefinitions(List.of(), rarity)
             );
-            case CATALYZE_ASCENSION -> List.of(
-                    new OutcomeLine(Component.translatable("rngtech.refinement.preview.catalyze_ascension"), TEXT_GOOD),
-                    costFixedLine(RefinementEngine.ascensionCatalystPotentialCost())
+            case CATALYZE_ASCENSION -> withDefinitionFocus(
+                    List.of(
+                            new OutcomeLine(Component.translatable("rngtech.refinement.preview.catalyze_ascension"), TEXT_GOOD),
+                            costFixedLine(RefinementEngine.ascensionCatalystPotentialCost())
+                    ),
+                    candidateDefinitions(List.of(), rarity)
             );
             case TARGETED_ADD_OR_UPGRADE -> candidateLines(candidateDefinitions(operation.targetStats()));
             case CORRUPT -> corruptionLines();
         };
+    }
+
+    private List<OutcomeLine> withDefinitionFocus(List<OutcomeLine> base, List<ModifierDefinition> definitions) {
+        List<OutcomeLine> lines = new ArrayList<>(base);
+        addDefinitionFocusPreviewLine(lines, definitions);
+        return lines;
+    }
+
+    private List<OutcomeLine> withModifierFocus(List<OutcomeLine> base, List<MachineModifier> modifiers) {
+        List<OutcomeLine> lines = new ArrayList<>(base);
+        addModifierFocusPreviewLine(lines, modifiers);
+        return lines;
+    }
+
+    /** The Ascension Matrix lens line counts the existing affixes it may upgrade and the candidates it may add. */
+    private List<OutcomeLine> ascensionLines(List<OutcomeLine> base, List<ModifierDefinition> definitions) {
+        Set<ModifierLensTag> lensTags = lensTags();
+        if (lensTags.isEmpty()) {
+            return withDefinitionFocus(base, definitions);
+        }
+        ModifierEligibilityProfile profile = RefinementTargets.eligibilityProfile(targetStack());
+        List<MachineModifier> upgradeable = upgradeableAffixesAllowingTuning(true);
+        ModifierLensTargets.MatchSummary definitionSummary = ModifierLensTargets.summarizeDefinitions(definitions, lensTags);
+        ModifierLensTargets.MatchSummary modifierSummary = ModifierLensTargets.summarizeModifiers(profile, upgradeable, lensTags);
+        List<Component> tooltip = new ArrayList<>();
+        tooltip.add(Component.translatable("rngtech.refinement.preview.lens_bias.tooltip").withStyle(ChatFormatting.GRAY));
+        List<MachineModifier> matchingModifiers = ModifierLensTargets.matchingModifiers(profile, upgradeable, lensTags);
+        List<ModifierDefinition> matchingDefinitions = ModifierLensTargets.matchingDefinitions(definitions, lensTags);
+        if (matchingModifiers.isEmpty() && matchingDefinitions.isEmpty()) {
+            tooltip.add(Component.translatable("rngtech.refinement.preview.lens_bias.no_current_targets")
+                    .withStyle(ChatFormatting.DARK_GRAY));
+        } else {
+            tooltip.add(Component.translatable("rngtech.refinement.preview.lens_bias.current_targets")
+                    .withStyle(ChatFormatting.DARK_AQUA));
+            for (MachineModifier modifier : matchingModifiers) {
+                tooltip.add(Component.translatable(
+                        "rngtech.refinement.candidate",
+                        MachineModifierText.slotLabel(modifier.slot()),
+                        MachineModifierText.displayName(modifier)
+                ).withStyle(ChatFormatting.BLUE));
+            }
+            for (ModifierDefinition definition : matchingDefinitions) {
+                tooltip.add(candidateName(definition).copy().withStyle(ChatFormatting.BLUE));
+            }
+        }
+        List<OutcomeLine> lines = new ArrayList<>(base);
+        lines.add(lensBiasLine(
+                new ModifierLensTargets.MatchSummary(
+                        definitionSummary.matchingCount() + modifierSummary.matchingCount(),
+                        definitionSummary.stillPossibleCount() + modifierSummary.stillPossibleCount()
+                ),
+                tooltip
+        ));
+        return lines;
+    }
+
+    /** Every affix a Chaos Crystal can roll into the slots the target already fills. */
+    private List<ModifierDefinition> rerollDefinitions() {
+        ItemStack target = targetStack();
+        if (!RefinementTargets.canRefine(target)) {
+            return List.of();
+        }
+        ModifierEligibilityProfile profile = RefinementTargets.eligibilityProfile(target);
+        List<MachineModifier> kept = targetTraits().modifiers().stream()
+                .filter(modifier -> !modifier.slot().isAffix())
+                .toList();
+        List<ModifierDefinition> definitions = new ArrayList<>();
+        for (ModifierSlot slot : RefinementEngine.rerolledSlots(targetTraits())) {
+            profile.rollableDefinitions(slot).stream()
+                    .filter(definition -> kept.stream().noneMatch(definition::conflictsWith))
+                    .forEach(definitions::add);
+        }
+        return definitions;
     }
 
     /** The Volatile Catalyst table for this target; hovering Blessed or Blighted lists the implicits its pool can grant. */
@@ -534,15 +604,19 @@ public class AffixForgeScreen extends AbstractContainerScreen<AffixForgeMenu> {
     }
 
     private List<ModifierDefinition> candidateDefinitions(List<MachineStat> targetStats) {
+        return candidateDefinitions(targetStats, RefinementEngine.rarityAfterOperation(targetTraits(), operation()));
+    }
+
+    private List<ModifierDefinition> candidateDefinitions(List<MachineStat> targetStats, Rarity rarity) {
         List<ModifierDefinition> definitions = new ArrayList<>();
-        definitions.addAll(candidateDefinitions(ModifierSlot.PREFIX, targetStats));
-        definitions.addAll(candidateDefinitions(ModifierSlot.SUFFIX, targetStats));
+        definitions.addAll(candidateDefinitions(ModifierSlot.PREFIX, targetStats, rarity));
+        definitions.addAll(candidateDefinitions(ModifierSlot.SUFFIX, targetStats, rarity));
         return definitions;
     }
 
-    private List<ModifierDefinition> candidateDefinitions(ModifierSlot slot, List<MachineStat> targetStats) {
+    private List<ModifierDefinition> candidateDefinitions(ModifierSlot slot, List<MachineStat> targetStats, Rarity rarity) {
         ItemStack target = targetStack();
-        if (!RefinementTargets.canRefine(target) || !hasOpenSlot(slot)) {
+        if (!RefinementTargets.canRefine(target) || !RefinementEngine.hasOpenAffixSlot(targetTraits(), rarity, slot)) {
             return List.of();
         }
 
@@ -587,10 +661,6 @@ public class AffixForgeScreen extends AbstractContainerScreen<AffixForgeMenu> {
                 .filter(definition -> definition.matches(modifier))
                 .findFirst()
                 .orElse(null);
-    }
-
-    private boolean hasOpenSlot(ModifierSlot slot) {
-        return RefinementEngine.hasOpenAffixSlot(targetTraits(), slot);
     }
 
     private OutcomeLine noAddableAffixLine() {
