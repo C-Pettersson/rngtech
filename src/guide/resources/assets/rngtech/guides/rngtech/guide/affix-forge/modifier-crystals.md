@@ -2,7 +2,7 @@
 navigation:
   title: "Modifier crystals"
   parent: affix-forge.md
-  position: 4
+  position: 5
   icon: rngtech:affix_forge
 ---
 

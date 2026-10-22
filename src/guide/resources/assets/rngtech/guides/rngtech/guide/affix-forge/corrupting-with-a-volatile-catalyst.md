@@ -2,7 +2,7 @@
 navigation:
   title: "Corrupting with a Volatile Catalyst"
   parent: affix-forge.md
-  position: 5
+  position: 6
   icon: rngtech:affix_forge
 ---
 

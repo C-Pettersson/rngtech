@@ -2,7 +2,7 @@
 navigation:
   title: "Catalysts"
   parent: affix-forge.md
-  position: 1
+  position: 2
   icon: rngtech:affix_forge
 ---
 
