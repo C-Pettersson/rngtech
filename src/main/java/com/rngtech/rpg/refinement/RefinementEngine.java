@@ -2064,8 +2064,8 @@ public final class RefinementEngine {
         List<MachineModifier> modifiers = new ArrayList<>(traits.modifiers().stream()
                 .filter(modifier -> !modifier.slot().isAffix())
                 .toList());
-        rollSlotModifiers(profile, ModifierSlot.PREFIX, prefixCount, traits.rarity(), componentStage, Integer.MAX_VALUE, random, modifiers);
-        rollSlotModifiers(profile, ModifierSlot.SUFFIX, suffixCount, traits.rarity(), componentStage, Integer.MAX_VALUE, random, modifiers);
+        rollSlotModifiers(profile, ModifierSlot.PREFIX, prefixCount, traits.rarity(), componentStage, Integer.MAX_VALUE, Set.of(), random, modifiers);
+        rollSlotModifiers(profile, ModifierSlot.SUFFIX, suffixCount, traits.rarity(), componentStage, Integer.MAX_VALUE, Set.of(), random, modifiers);
         return withModifiers(traits, traits.rarity(), traits.refinementPotential(), modifiers);
     }
 
