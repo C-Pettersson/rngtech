@@ -119,9 +119,14 @@ Without an upgrade, the forge still runs the Affix Injector, Affix Upgrader, and
 
 ### Modifier lenses
 
-With an Affix Lens Array installed, a lens in the focus slot makes affixes from its family three times as likely to be picked. Lenses work with the Affix Injector, Affix Upgrader, and Greater Affix Upgrader.
+With an Affix Lens Array installed, a lens in the focus slot makes affixes from its family three times as likely to be picked. Lenses work with every catalyst except the Volatile Catalyst:
 
-A lens is a nudge, not a filter: other affixes can still roll. If nothing on the item can match the lens, Reforge is blocked and nothing is used. On success, both the catalyst and the lens are used up. Hold Shift on a lens to see which affixes it favors.
+- the Affix Injector, Expansion Crystal, Ascension Catalyst, and Ascension Matrix favor the lens's family when they add affixes;
+- the Affix Upgrader, Greater Affix Upgrader, and Ascension Matrix favor it when they choose the affix to upgrade;
+- the Chaos Crystal favors it for every affix it rerolls;
+- the Nullifier Coil and Null Crystal favor it when they choose the affix to remove.
+
+A lens is a nudge, not a filter: other affixes can still roll. If nothing the catalyst can pick matches the lens, Reforge is blocked and nothing is used. On success, both the catalyst and the lens are used up. Hold Shift on a lens to see which affixes it favors.
 
 | Lens | Favors |
 |---|---|
@@ -139,11 +144,11 @@ With an Affix Modifier Socket installed, a crystal in the focus slot changes how
 
 | Crystal | Works with | Effect |
 |---|---|---|
-| {{ item('rngtech:conservation_crystal') }} | Affix Injector, Affix Upgrader, Greater Affix Upgrader | 25% chance to keep the catalyst. The crystal is used up. |
-| {{ item('rngtech:frugality_crystal') }} | Affix Upgrader | 25% chance the upgrade costs only 1 RP. The crystal is used up. |
-| {{ item('rngtech:transmutation_crystal') }} | Greater Affix Upgrader | Swaps the upgraded affix for a different one in the same prefix or suffix slot. |
-| {{ item('rngtech:resonance_crystal') }} | Greater Affix Upgrader | Keeps the upgraded affix's roll quality in its new tier. |
-| {{ item('rngtech:destabilization_crystal') }} | Greater Affix Upgrader | Rerolls the item's other affixes, at their current tiers, after the upgrade. |
+| {{ item('rngtech:conservation_crystal') }} | Every catalyst except the Volatile Catalyst | 25% chance to keep the catalyst. The crystal is used up. |
+| {{ item('rngtech:frugality_crystal') }} | Every catalyst except the Ascension Matrix and Volatile Catalyst | 25% chance the operation costs only 1 RP. For an Expansion Crystal that is the whole fill. The crystal is used up. |
+| {{ item('rngtech:transmutation_crystal') }} | Affix Upgrader, Greater Affix Upgrader | Swaps the upgraded affix for a different one in the same prefix or suffix slot. |
+| {{ item('rngtech:resonance_crystal') }} | Affix Upgrader, Greater Affix Upgrader | Keeps the upgraded affix's roll quality in its new tier. |
+| {{ item('rngtech:destabilization_crystal') }} | Affix Upgrader, Greater Affix Upgrader | Rerolls the item's other affixes, at their current tiers, after the upgrade. |
 | {{ item('rngtech:stabilization_crystal') }} | Volatile Catalyst | Removes the Blighted outcome; its chance goes to Untouched. |
 
 Every crystal is used up on success. A crystal paired with a catalyst it does not work with blocks Reforge, and nothing is used.

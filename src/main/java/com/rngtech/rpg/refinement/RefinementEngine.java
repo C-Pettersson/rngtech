@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Predicate;
 
 public final class RefinementEngine {
     private static final int MAGIC_SLOT_LIMIT = 1;
@@ -130,25 +131,14 @@ public final class RefinementEngine {
         }
         lensTags = Set.copyOf(lensTags);
         if (!lensTags.isEmpty() && !operationSupportsLens(operation)) {
-            return RefinementResult.failure(traits, "rngtech.refinement.failure.lens_requires_add_or_upgrade");
+            return RefinementResult.failure(traits, "rngtech.refinement.failure.lens_rejects_corrupt");
         }
         if (!lensTags.isEmpty() && modifier != RefinementModifier.NONE) {
             return RefinementResult.failure(traits, "rngtech.refinement.failure.focus_conflict");
         }
-        if (modifier.requiresCorrupt() && operation != RefinementOperation.CORRUPT) {
-            return RefinementResult.failure(traits, "rngtech.refinement.failure.modifier_requires_corrupt");
-        }
-        if (modifier.requiresRandomUpgrade() && operation != RefinementOperation.UPGRADE_RANDOM_MODIFIER) {
-            return RefinementResult.failure(traits, "rngtech.refinement.failure.modifier_requires_affix_modifier");
-        }
-        if (modifier != RefinementModifier.NONE
-                && !modifier.requiresRandomUpgrade()
-                && !modifier.requiresCorrupt()
-                && !canUseModifier(operation.action())) {
-            return RefinementResult.failure(traits, "rngtech.refinement.failure.modifier_requires_add_or_upgrade");
-        }
-        if (modifier.requiresSelectedUpgrade() && operation != RefinementOperation.UPGRADE_SELECTED_MODIFIER) {
-            return RefinementResult.failure(traits, "rngtech.refinement.failure.modifier_requires_upgrade");
+        String modifierFailure = modifier.failureKey(operation);
+        if (modifierFailure != null) {
+            return RefinementResult.failure(traits, modifierFailure);
         }
         return switch (operation.action()) {
             case RANDOM_ADD -> addModifier(
@@ -182,12 +172,12 @@ public final class RefinementEngine {
                     SELECTED_UPGRADE_COST,
                     random
             );
-            case ASCEND_RARITY -> ascendRarity(profile, traits, componentStage, random);
-            case CATALYZE_ASCENSION -> catalyzeAscension(profile, traits, componentStage, random);
-            case RANDOM_REMOVE -> removeModifier(profile, traits, random);
+            case ASCEND_RARITY -> ascendRarity(profile, traits, componentStage, modifier, lensTags, random);
+            case CATALYZE_ASCENSION -> catalyzeAscension(profile, traits, componentStage, modifier, lensTags, random);
+            case RANDOM_REMOVE -> removeModifier(profile, traits, modifier, lensTags, random);
             case TARGETED_ADD_OR_UPGRADE -> targetedAddOrUpgrade(profile, traits, operation, componentStage, selection, modifier, random);
-            case FULL_REROLL -> fullReroll(profile, traits, componentStage, random);
-            case FILL_OPEN_SLOTS -> fillOpenSlots(profile, traits, componentStage, random);
+            case FULL_REROLL -> fullReroll(profile, traits, componentStage, modifier, lensTags, random);
+            case FILL_OPEN_SLOTS -> fillOpenSlots(profile, traits, componentStage, modifier, lensTags, random);
             case CORRUPT -> corrupt(profile, traits, componentStage, modifier, unique, random);
         };
     }
@@ -444,9 +434,6 @@ public final class RefinementEngine {
         if (locked != null) {
             return locked;
         }
-        if (refinementModifier.requiresRandomUpgrade()) {
-            return RefinementResult.failure(traits, "rngtech.refinement.failure.modifier_requires_affix_modifier");
-        }
         if (selection.kind() != RefinementSelection.Kind.EXISTING_MODIFIER) {
             return RefinementResult.failure(traits, "rngtech.refinement.failure.select_modifier_or_slot");
         }
@@ -618,17 +605,40 @@ public final class RefinementEngine {
         return Math.min(costRange.max(), Math.max(costRange.min(), tierMinimum));
     }
 
-    public static boolean canUseModifier(RefinementAction action) {
-        return action == RefinementAction.RANDOM_ADD
-                || action == RefinementAction.TARGETED_ADD_OR_UPGRADE
-                || action == RefinementAction.RANDOM_UPGRADE
-                || action == RefinementAction.SELECTED_UPGRADE;
+    /** A lens biases which affix every catalyst adds, upgrades, rerolls or removes; the Volatile Catalyst picks none. */
+    public static boolean operationSupportsLens(RefinementOperation operation) {
+        return switch (operation.action()) {
+            case CORRUPT, TARGETED_ADD_OR_UPGRADE -> false;
+            default -> true;
+        };
     }
 
-    public static boolean operationSupportsLens(RefinementOperation operation) {
-        return operation == RefinementOperation.ADD_MODIFIER
-                || operation == RefinementOperation.UPGRADE_RANDOM_MODIFIER
-                || operation == RefinementOperation.UPGRADE_SELECTED_MODIFIER;
+    /** The rolled affixes a Nullifier Coil or Null Crystal may remove. */
+    public static List<MachineModifier> removableAffixes(ModifierEligibilityProfile profile, MachineTraits traits) {
+        return traits.modifiers().stream()
+                .filter(modifier -> modifier.slot().isAffix())
+                .filter(modifier -> !isFixedDefinition(profile, modifier))
+                .toList();
+    }
+
+    /** The affix slots a Chaos Crystal rerolls: each slot the target has at least one affix in. */
+    public static List<ModifierSlot> rerolledSlots(MachineTraits traits) {
+        List<ModifierSlot> slots = new ArrayList<>();
+        if (count(traits.modifiers(), ModifierSlot.PREFIX) > 0) {
+            slots.add(ModifierSlot.PREFIX);
+        }
+        if (count(traits.modifiers(), ModifierSlot.SUFFIX) > 0) {
+            slots.add(ModifierSlot.SUFFIX);
+        }
+        return slots;
+    }
+
+    /** The rarity a catalyst adds affixes at: Normal targets become Magic, and ascension makes Magic targets Rare. */
+    public static Rarity rarityAfterOperation(MachineTraits traits, RefinementOperation operation) {
+        return switch (operation.action()) {
+            case ASCEND_RARITY, CATALYZE_ASCENSION -> Rarity.RARE;
+            default -> rarityAfterAdd(traits.rarity());
+        };
     }
 
     private static RefinementResult addModifier(
@@ -861,6 +871,8 @@ public final class RefinementEngine {
             ModifierEligibilityProfile profile,
             MachineTraits traits,
             int componentStage,
+            RefinementModifier refinementModifier,
+            Set<ModifierLensTag> lensTags,
             RandomSource random
     ) {
         if (traits.rarity() != Rarity.MAGIC) {
@@ -870,14 +882,34 @@ public final class RefinementEngine {
             return RefinementResult.failure(traits, "rngtech.refinement.failure.no_potential");
         }
 
+        int ascensionTierStage = nonExoticRandomTierStage(componentStage);
         List<MachineModifier> modifiers = new ArrayList<>(traits.modifiers());
-        if (!upgradeRandomExistingAffix(profile, modifiers, random)) {
+        if (!lensTags.isEmpty()
+                && modifiers.stream().noneMatch(modifier -> modifier.slot().isAffix() && matchesLensTags(profile, modifier, lensTags))
+                && !hasLensCandidate(
+                        profile,
+                        availableSlots(
+                                profile,
+                                withModifiers(traits, Rarity.RARE, 0, modifiers),
+                                Rarity.RARE,
+                                List.of(),
+                                ascensionTierStage,
+                                traits.refinementPotential(),
+                                DEFAULT_ADD_OR_UPGRADE_COST
+                        ),
+                        modifiers,
+                        lensTags,
+                        ascensionTierStage,
+                        traits.refinementPotential()
+                )) {
+            return RefinementResult.failure(traits, "rngtech.refinement.failure.no_matching_lens_affix");
+        }
+        if (!upgradeRandomExistingAffix(profile, modifiers, lensTags, random)) {
             return RefinementResult.failure(traits, "rngtech.refinement.failure.no_matching_modifier");
         }
 
         int targetCount = rollPotentialCost(random);
         int added = 0;
-        int ascensionTierStage = nonExoticRandomTierStage(componentStage);
         for (int index = 0; index < targetCount; index++) {
             MachineTraits preview = withModifiers(traits, Rarity.RARE, 0, modifiers);
             List<ModifierSlot> slots = availableSlots(
@@ -901,6 +933,7 @@ public final class RefinementEngine {
                     traits.refinementPotential(),
                     modifiers,
                     List.of(),
+                    lensTags,
                     random,
                     DEFAULT_ADD_OR_UPGRADE_COST
             );
@@ -919,7 +952,9 @@ public final class RefinementEngine {
         return RefinementResult.success(
                 withModifiers(traits, Rarity.RARE, 0, modifiers),
                 traits.refinementPotential(),
-                "rngtech.refinement.success.ascend_rarity"
+                "rngtech.refinement.success.ascend_rarity",
+                consumeCatalyst(refinementModifier, random),
+                consumeFocus(refinementModifier, lensTags)
         );
     }
 
@@ -927,6 +962,8 @@ public final class RefinementEngine {
             ModifierEligibilityProfile profile,
             MachineTraits traits,
             int componentStage,
+            RefinementModifier refinementModifier,
+            Set<ModifierLensTag> lensTags,
             RandomSource random
     ) {
         if (traits.rarity() != Rarity.MAGIC) {
@@ -951,6 +988,10 @@ public final class RefinementEngine {
         if (slots.isEmpty()) {
             return RefinementResult.failure(traits, noAddableAffixFailureKey(traits, Rarity.RARE, false));
         }
+        if (!lensTags.isEmpty()
+                && !hasLensCandidate(profile, slots, modifiers, lensTags, ascensionTierStage, ASCENSION_CATALYST_POTENTIAL_COST)) {
+            return RefinementResult.failure(traits, "rngtech.refinement.failure.no_matching_lens_affix");
+        }
 
         MachineModifier modifier = rollModifier(
                 profile,
@@ -960,6 +1001,7 @@ public final class RefinementEngine {
                 ASCENSION_CATALYST_POTENTIAL_COST,
                 modifiers,
                 List.of(),
+                lensTags,
                 random,
                 DEFAULT_ADD_OR_UPGRADE_COST
         );
@@ -968,21 +1010,20 @@ public final class RefinementEngine {
         }
 
         modifiers.add(modifier);
+        int cost = adjustedPotentialCost(ASCENSION_CATALYST_POTENTIAL_COST, refinementModifier, random);
         return RefinementResult.success(
-                withModifiers(
-                        traits,
-                        Rarity.RARE,
-                        traits.refinementPotential() - ASCENSION_CATALYST_POTENTIAL_COST,
-                        modifiers
-                ),
-                ASCENSION_CATALYST_POTENTIAL_COST,
-                "rngtech.refinement.success.catalyze_ascension"
+                withModifiers(traits, Rarity.RARE, traits.refinementPotential() - cost, modifiers),
+                cost,
+                "rngtech.refinement.success.catalyze_ascension",
+                consumeCatalyst(refinementModifier, random),
+                consumeFocus(refinementModifier, lensTags)
         );
     }
 
     private static boolean upgradeRandomExistingAffix(
             ModifierEligibilityProfile profile,
             List<MachineModifier> modifiers,
+            Set<ModifierLensTag> lensTags,
             RandomSource random
     ) {
         List<Integer> indexes = new ArrayList<>();
@@ -996,7 +1037,12 @@ public final class RefinementEngine {
             return false;
         }
 
-        int selectedIndex = indexes.get(random.nextInt(indexes.size()));
+        int selectedIndex = lensBiasedPick(
+                indexes,
+                index -> matchesLensTags(profile, modifiers.get(index), lensTags),
+                lensTags,
+                random
+        );
         MachineModifier current = modifiers.get(selectedIndex);
         ModifierDefinition definition = definitionFor(profile, current);
         if (definition == null) {
@@ -1027,27 +1073,41 @@ public final class RefinementEngine {
         return currentTier >= maxUpgradeTier ? Math.min(currentTier, maxTier) : currentTier + 1;
     }
 
-    private static RefinementResult removeModifier(ModifierEligibilityProfile profile, MachineTraits traits, RandomSource random) {
+    private static RefinementResult removeModifier(
+            ModifierEligibilityProfile profile,
+            MachineTraits traits,
+            RefinementModifier refinementModifier,
+            Set<ModifierLensTag> lensTags,
+            RandomSource random
+    ) {
         if (traits.refinementPotential() <= 0) {
             return RefinementResult.failure(traits, "rngtech.refinement.failure.no_potential");
         }
 
-        List<MachineModifier> removable = traits.modifiers().stream()
-                .filter(modifier -> modifier.slot().isAffix())
-                .filter(modifier -> !isFixedDefinition(profile, modifier))
-                .toList();
+        List<MachineModifier> removable = removableAffixes(profile, traits);
         if (removable.isEmpty()) {
             return RefinementResult.failure(traits, "rngtech.refinement.failure.no_removable_modifier");
         }
+        if (!lensTags.isEmpty() && removable.stream().noneMatch(modifier -> matchesLensTags(profile, modifier, lensTags))) {
+            return RefinementResult.failure(traits, "rngtech.refinement.failure.no_matching_lens_affix");
+        }
 
-        MachineModifier removed = removable.get(random.nextInt(removable.size()));
+        MachineModifier removed = lensBiasedPick(
+                removable,
+                modifier -> matchesLensTags(profile, modifier, lensTags),
+                lensTags,
+                random
+        );
         List<MachineModifier> modifiers = new ArrayList<>(traits.modifiers());
         modifiers.remove(removed);
         int cost = Math.min(rollPotentialCost(random), traits.refinementPotential());
+        cost = adjustedPotentialCost(cost, refinementModifier, random);
         return RefinementResult.success(
                 withModifiers(traits, traits.rarity(), traits.refinementPotential() - cost, modifiers),
                 cost,
-                "rngtech.refinement.success.remove_modifier"
+                "rngtech.refinement.success.remove_modifier",
+                consumeCatalyst(refinementModifier, random),
+                consumeFocus(refinementModifier, lensTags)
         );
     }
 
@@ -1055,6 +1115,8 @@ public final class RefinementEngine {
             ModifierEligibilityProfile profile,
             MachineTraits traits,
             int componentStage,
+            RefinementModifier refinementModifier,
+            Set<ModifierLensTag> lensTags,
             RandomSource random
     ) {
         if (traits.refinementPotential() <= 0) {
@@ -1070,6 +1132,10 @@ public final class RefinementEngine {
         List<MachineModifier> modifiers = new ArrayList<>(traits.modifiers().stream()
                 .filter(modifier -> !modifier.slot().isAffix())
                 .toList());
+        if (!lensTags.isEmpty()
+                && !hasLensCandidate(profile, rerolledSlots(traits), modifiers, lensTags, componentStage, Integer.MAX_VALUE)) {
+            return RefinementResult.failure(traits, "rngtech.refinement.failure.no_matching_lens_affix");
+        }
         rollSlotModifiers(
                 profile,
                 ModifierSlot.PREFIX,
@@ -1077,6 +1143,7 @@ public final class RefinementEngine {
                 traits.rarity(),
                 componentStage,
                 Integer.MAX_VALUE,
+                lensTags,
                 random,
                 modifiers
         );
@@ -1087,6 +1154,7 @@ public final class RefinementEngine {
                 traits.rarity(),
                 componentStage,
                 Integer.MAX_VALUE,
+                lensTags,
                 random,
                 modifiers
         );
@@ -1096,10 +1164,13 @@ public final class RefinementEngine {
         }
 
         int cost = Math.min(rollPotentialCost(random), traits.refinementPotential());
+        cost = adjustedPotentialCost(cost, refinementModifier, random);
         return RefinementResult.success(
                 withModifiers(traits, traits.rarity(), traits.refinementPotential() - cost, modifiers),
                 cost,
-                "rngtech.refinement.success.full_reroll"
+                "rngtech.refinement.success.full_reroll",
+                consumeCatalyst(refinementModifier, random),
+                consumeFocus(refinementModifier, lensTags)
         );
     }
 
@@ -1179,8 +1250,8 @@ public final class RefinementEngine {
         List<MachineModifier> modifiers = new ArrayList<>(traits.modifiers().stream()
                 .filter(modifier -> !modifier.slot().isAffix())
                 .toList());
-        rollSlotModifiers(profile, ModifierSlot.PREFIX, prefixCount, traits.rarity(), componentStage, Integer.MAX_VALUE, random, modifiers);
-        rollSlotModifiers(profile, ModifierSlot.SUFFIX, suffixCount, traits.rarity(), componentStage, Integer.MAX_VALUE, random, modifiers);
+        rollSlotModifiers(profile, ModifierSlot.PREFIX, prefixCount, traits.rarity(), componentStage, Integer.MAX_VALUE, Set.of(), random, modifiers);
+        rollSlotModifiers(profile, ModifierSlot.SUFFIX, suffixCount, traits.rarity(), componentStage, Integer.MAX_VALUE, Set.of(), random, modifiers);
         if (count(modifiers, ModifierSlot.PREFIX) + count(modifiers, ModifierSlot.SUFFIX) == 0) {
             return null;
         }
@@ -1281,6 +1352,8 @@ public final class RefinementEngine {
             ModifierEligibilityProfile profile,
             MachineTraits traits,
             int componentStage,
+            RefinementModifier refinementModifier,
+            Set<ModifierLensTag> lensTags,
             RandomSource random
     ) {
         if (traits.refinementPotential() <= 0) {
@@ -1289,6 +1362,25 @@ public final class RefinementEngine {
 
         Rarity rarity = rarityAfterAdd(traits.rarity());
         List<MachineModifier> modifiers = new ArrayList<>(traits.modifiers());
+        if (!lensTags.isEmpty()
+                && !hasLensCandidate(
+                        profile,
+                        availableSlots(
+                                profile,
+                                traits,
+                                rarity,
+                                List.of(),
+                                componentStage,
+                                traits.refinementPotential(),
+                                DEFAULT_ADD_OR_UPGRADE_COST
+                        ),
+                        modifiers,
+                        lensTags,
+                        componentStage,
+                        traits.refinementPotential()
+                )) {
+            return RefinementResult.failure(traits, "rngtech.refinement.failure.no_matching_lens_affix");
+        }
         int consumedPotential = 0;
         int added = 0;
         while (consumedPotential < traits.refinementPotential()) {
@@ -1314,6 +1406,7 @@ public final class RefinementEngine {
                     traits.refinementPotential() - consumedPotential,
                     modifiers,
                     List.of(),
+                    lensTags,
                     random,
                     DEFAULT_ADD_OR_UPGRADE_COST
             );
@@ -1336,10 +1429,13 @@ public final class RefinementEngine {
             return RefinementResult.failure(traits, noAddableAffixFailureKey(traits, rarity, false));
         }
 
+        consumedPotential = adjustedPotentialCost(consumedPotential, refinementModifier, random);
         return RefinementResult.success(
                 withModifiers(traits, rarity, traits.refinementPotential() - consumedPotential, modifiers),
                 consumedPotential,
-                "rngtech.refinement.success.fill_slots"
+                "rngtech.refinement.success.fill_slots",
+                consumeCatalyst(refinementModifier, random),
+                consumeFocus(refinementModifier, lensTags)
         );
     }
 
@@ -1418,7 +1514,7 @@ public final class RefinementEngine {
                 || hasOpenAffixSlot(traits, rarity, ModifierSlot.SUFFIX);
     }
 
-    private static boolean hasOpenAffixSlot(MachineTraits traits, Rarity rarity, ModifierSlot slot) {
+    public static boolean hasOpenAffixSlot(MachineTraits traits, Rarity rarity, ModifierSlot slot) {
         return slot.isAffix() && count(traits.modifiers(), slot) < affixLimit(rarity);
     }
 
@@ -1438,6 +1534,7 @@ public final class RefinementEngine {
             int availablePotential,
             List<MachineModifier> existingModifiers,
             List<MachineStat> targetStats,
+            Set<ModifierLensTag> lensTags,
             RandomSource random,
             PotentialCostRange costRange
     ) {
@@ -1447,7 +1544,7 @@ public final class RefinementEngine {
             return null;
         }
 
-        ModifierDefinition definition = MachineTraitRoller.weightedDefinition(definitions, random);
+        ModifierDefinition definition = lensWeightedDefinition(definitions, lensTags, random);
         int tier = MachineTraitRoller.rollModifierTier(
                 definition,
                 profile,
@@ -1491,21 +1588,72 @@ public final class RefinementEngine {
             Set<ModifierLensTag> lensTags,
             RandomSource random
     ) {
-        int totalWeight = candidates.stream()
-                .mapToInt(candidate -> lensAdjustedWeight(candidate.definition(), lensTags))
+        List<ModifierDefinition> definitions = candidates.stream().map(ModifierRollCandidate::definition).toList();
+        return new ModifierRollCandidate(lensWeightedDefinition(definitions, lensTags, random));
+    }
+
+    private static ModifierDefinition lensWeightedDefinition(
+            List<ModifierDefinition> definitions,
+            Set<ModifierLensTag> lensTags,
+            RandomSource random
+    ) {
+        if (lensTags.isEmpty()) {
+            return MachineTraitRoller.weightedDefinition(definitions, random);
+        }
+        int totalWeight = definitions.stream()
+                .mapToInt(definition -> lensAdjustedWeight(definition, lensTags))
                 .sum();
         if (totalWeight <= 0) {
-            return candidates.get(random.nextInt(candidates.size()));
+            return definitions.get(random.nextInt(definitions.size()));
         }
         int roll = random.nextInt(totalWeight);
         int cursor = 0;
-        for (ModifierRollCandidate candidate : candidates) {
-            cursor += lensAdjustedWeight(candidate.definition(), lensTags);
+        for (ModifierDefinition definition : definitions) {
+            cursor += lensAdjustedWeight(definition, lensTags);
             if (roll < cursor) {
-                return candidate;
+                return definition;
             }
         }
-        return candidates.getLast();
+        return definitions.getLast();
+    }
+
+    /** A uniform pick without a lens; with one, entries matching the lens are {@code LENS_WEIGHT_MULTIPLIER} times as likely. */
+    private static <T> T lensBiasedPick(List<T> entries, Predicate<T> matchesLens, Set<ModifierLensTag> lensTags, RandomSource random) {
+        if (lensTags.isEmpty()) {
+            return entries.get(random.nextInt(entries.size()));
+        }
+        int totalWeight = entries.stream().mapToInt(entry -> matchesLens.test(entry) ? LENS_WEIGHT_MULTIPLIER : 1).sum();
+        int roll = random.nextInt(totalWeight);
+        int cursor = 0;
+        for (T entry : entries) {
+            cursor += matchesLens.test(entry) ? LENS_WEIGHT_MULTIPLIER : 1;
+            if (roll < cursor) {
+                return entry;
+            }
+        }
+        return entries.getLast();
+    }
+
+    /** Whether any affix the lens favors can roll into one of {@code slots} next to {@code existingModifiers}. */
+    private static boolean hasLensCandidate(
+            ModifierEligibilityProfile profile,
+            List<ModifierSlot> slots,
+            List<MachineModifier> existingModifiers,
+            Set<ModifierLensTag> lensTags,
+            int componentStage,
+            int availablePotential
+    ) {
+        return slots.stream()
+                .flatMap(slot -> availableDefinitions(
+                        profile,
+                        slot,
+                        existingModifiers,
+                        List.of(),
+                        componentStage,
+                        availablePotential,
+                        DEFAULT_ADD_OR_UPGRADE_COST
+                ).stream())
+                .anyMatch(definition -> definition.matchesLensTags(lensTags));
     }
 
     private static MachineModifier weightedModifier(
@@ -1573,6 +1721,7 @@ public final class RefinementEngine {
             Rarity rarity,
             int componentStage,
             int availablePotential,
+            Set<ModifierLensTag> lensTags,
             RandomSource random,
             List<MachineModifier> modifiers
     ) {
@@ -1585,6 +1734,7 @@ public final class RefinementEngine {
                     availablePotential,
                     modifiers,
                     List.of(),
+                    lensTags,
                     random,
                     DEFAULT_ADD_OR_UPGRADE_COST
             );
@@ -1853,6 +2003,10 @@ public final class RefinementEngine {
         return refinementModifier != RefinementModifier.NONE && refinementModifier != RefinementModifier.CORRUPTION_WARD;
     }
 
+    private static boolean consumeFocus(RefinementModifier refinementModifier, Set<ModifierLensTag> lensTags) {
+        return !lensTags.isEmpty() || consumeModifier(refinementModifier);
+    }
+
     private static double clamp(double value, double min, double max) {
         return Math.max(min, Math.min(max, value));
     }
@@ -1910,8 +2064,8 @@ public final class RefinementEngine {
         List<MachineModifier> modifiers = new ArrayList<>(traits.modifiers().stream()
                 .filter(modifier -> !modifier.slot().isAffix())
                 .toList());
-        rollSlotModifiers(profile, ModifierSlot.PREFIX, prefixCount, traits.rarity(), componentStage, Integer.MAX_VALUE, random, modifiers);
-        rollSlotModifiers(profile, ModifierSlot.SUFFIX, suffixCount, traits.rarity(), componentStage, Integer.MAX_VALUE, random, modifiers);
+        rollSlotModifiers(profile, ModifierSlot.PREFIX, prefixCount, traits.rarity(), componentStage, Integer.MAX_VALUE, Set.of(), random, modifiers);
+        rollSlotModifiers(profile, ModifierSlot.SUFFIX, suffixCount, traits.rarity(), componentStage, Integer.MAX_VALUE, Set.of(), random, modifiers);
         return withModifiers(traits, traits.rarity(), traits.refinementPotential(), modifiers);
     }
 
