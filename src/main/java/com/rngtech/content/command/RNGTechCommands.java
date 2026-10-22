@@ -4,10 +4,14 @@ import com.rngtech.RNGTech;
 import com.rngtech.content.cable.CableStats;
 import com.rngtech.content.dormant.DormantSiteIndex;
 import com.rngtech.content.dormant.DormantSites;
+import com.rngtech.content.item.GlyphItem;
+import com.rngtech.content.registry.ModItems;
+import com.rngtech.rpg.PhaseArrayRules;
 import com.rngtech.rpg.unique.UniqueCatalog;
 import com.rngtech.rpg.unique.UniqueDefinition;
 
 import com.mojang.brigadier.CommandDispatcher;
+import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.exceptions.DynamicCommandExceptionType;
@@ -56,6 +60,11 @@ public final class RNGTechCommands {
                                                         builder
                                                 ))
                                                 .executes(RNGTechCommands::giveUnique)))))
+                .then(Commands.literal("glyph")
+                        .then(Commands.literal("give")
+                                .then(Commands.argument("targets", EntityArgument.players())
+                                        .then(Commands.argument("tier", IntegerArgumentType.integer(1, PhaseArrayRules.GLYPH_TIERS))
+                                                .executes(RNGTechCommands::giveGlyph)))))
                 .then(Commands.literal("cable")
                         .then(Commands.literal("stats")
                                 .executes(RNGTechCommands::cableStats)
@@ -106,6 +115,19 @@ public final class RNGTechCommands {
             source.sendSuccess(() -> Component.translatable("rngtech.command.dormant.skipped", outcome.skipped().size(), positions), false);
         }
         return marked;
+    }
+
+    private static int giveGlyph(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
+        int tier = IntegerArgumentType.getInteger(context, "tier");
+        Collection<ServerPlayer> targets = EntityArgument.getPlayers(context, "targets");
+        for (ServerPlayer player : targets) {
+            ItemStack stack = GlyphItem.of(ModItems.GLYPH.get(), tier);
+            if (!player.getInventory().add(stack)) {
+                player.drop(stack, false);
+            }
+        }
+        context.getSource().sendSuccess(() -> Component.translatable("rngtech.command.glyph.given", GlyphItem.numeral(tier), targets.size()), true);
+        return targets.size();
     }
 
     private static int giveUnique(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {

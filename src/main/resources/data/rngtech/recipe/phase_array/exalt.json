@@ -1,0 +1,10 @@
+{
+  "type": "rngtech:phase_array",
+  "action": "exalt",
+  "coils": 8,
+  "glyph_tier": 4,
+  "base_fe": 4000000,
+  "refinement_potential_cost": 2,
+  "partial": "reroll_selected_value",
+  "overhold": "none"
+}

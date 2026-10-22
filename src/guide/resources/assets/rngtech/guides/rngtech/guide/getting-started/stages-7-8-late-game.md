@@ -16,6 +16,6 @@ Stages 7 and 8 are permanent infrastructure for high FE/t lines. Late recipes ca
 4. Build <ItemLink id="rngtech:nullite_battery_cell" />s and a <ItemLink id="rngtech:nullite_battery_chassis" />. <ItemLink id="rngtech:aethergold_battery_cell" />s have the highest burst output and never leak.
 5. Press an <ItemLink id="rngtech:ultimate_electric_circuit" />.
 6. Build the [Vacuum Collapse Generator](rngtech:vacuum-collapse-generator.md), the Stage 7 generator. It collapses **Void Catalyst** into large batches of FE.
-7. Build the [Exotic Affix Forge](rngtech:exotic-affix-forge.md), where you choose exactly which affix to change.
+7. Build the [Phase Array](rngtech:phase-array.md), where you choose exactly which affix to change and a pulse decides whether it holds.
 
 Exotic machine sets with Exotic Battery Cells are the top stage. Naquadah, the Stage 8 ore, needs an Exotic head to mine.

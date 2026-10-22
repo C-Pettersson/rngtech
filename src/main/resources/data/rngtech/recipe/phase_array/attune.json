@@ -1,0 +1,10 @@
+{
+  "type": "rngtech:phase_array",
+  "action": "attune",
+  "coils": 4,
+  "glyph_tier": 0,
+  "base_fe": 1000000,
+  "refinement_potential_cost": 1,
+  "partial": "reroll_one_value",
+  "overhold": "best_of_two_values"
+}

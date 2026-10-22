@@ -15,6 +15,8 @@ import com.rngtech.content.block.FurnaceBlock;
 import com.rngtech.content.block.GasChemistryBlock;
 import com.rngtech.content.block.MelterBlock;
 import com.rngtech.content.block.MetalPressBlock;
+import com.rngtech.content.block.PhaseCoilBlock;
+import com.rngtech.content.block.PhaseEmitterBlock;
 import com.rngtech.content.block.PotentialReactorBlock;
 import com.rngtech.content.block.ResonanceCalibratorBlock;
 import com.rngtech.content.block.SolarArrayControllerBlock;
@@ -134,6 +136,8 @@ public final class MachineBaseStatCatalog {
                 case SOLAR_ARRAY_CONTROLLER -> solarArrayController();
                 case CORROSION_CELL -> corrosionCell();
                 case VACUUM_COLLAPSE_GENERATOR -> vacuumCollapseGenerator();
+                case PHASE_EMITTER -> phaseEmitter();
+                case PHASE_COIL -> phaseCoil();
                 case ALLOY_FURNACE -> alloyFurnace(AlloyFurnaceChassisMaterial.BRONZE);
                 case METAL_PRESS -> metalPress();
                 case MELTER -> melter();
@@ -196,6 +200,12 @@ public final class MachineBaseStatCatalog {
         }
         if (block instanceof VacuumCollapseGeneratorBlock) {
             return vacuumCollapseGenerator();
+        }
+        if (block instanceof PhaseEmitterBlock) {
+            return phaseEmitter();
+        }
+        if (block instanceof PhaseCoilBlock) {
+            return phaseCoil();
         }
         if (block instanceof MetalPressBlock) {
             return metalPress();
@@ -275,6 +285,31 @@ public final class MachineBaseStatCatalog {
         return MachineStatAccumulator.vacuumCollapseGeneratorBase(
                 VACUUM_COLLAPSE_ENERGY_CAPACITY,
                 VACUUM_COLLAPSE_ENERGY_TRANSFER
+        );
+    }
+
+    public static MachineStatAccumulator phaseEmitter() {
+        return MachineStatAccumulator.phaseEmitterBase();
+    }
+
+    public static MachineStatAccumulator phaseCoil() {
+        return MachineStatAccumulator.phaseCoilBase();
+    }
+
+    public static List<MachineStat> phaseEmitterSummaryStats() {
+        return List.of(
+                MachineStat.CHARGE_CAPACITY,
+                MachineStat.CHARGE_RATE,
+                MachineStat.PARTIAL_WINDOW,
+                MachineStat.STRAIN_TOLERANCE
+        );
+    }
+
+    public static List<MachineStat> phaseCoilSummaryStats() {
+        return List.of(
+                MachineStat.HOLD_CHANCE,
+                MachineStat.CHARGE_CAPACITY,
+                MachineStat.CHARGE_RATE
         );
     }
 
@@ -453,6 +488,8 @@ public final class MachineBaseStatCatalog {
         }
         if (item instanceof MachineBlockItem machine) {
             return switch (machine.machineType()) {
+                case PHASE_EMITTER -> phaseEmitterSummaryStats();
+                case PHASE_COIL -> phaseCoilSummaryStats();
                 case BIO_GENERATOR -> List.of(
                         MachineStat.ENERGY_CAPACITY,
                         MachineStat.ENERGY_GENERATION,

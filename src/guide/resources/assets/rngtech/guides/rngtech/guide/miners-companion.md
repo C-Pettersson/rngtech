@@ -69,7 +69,7 @@ Each Miner's Companion rolls its rarity, affixes, and Refinement Potential when 
 - **Indexing** (prefix): extra active filter slots.
 - **Economy** (suffix): less FE per chewed item. It does not change the Magnet or Mining Lamp costs.
 
-Because it is an item and has no Refinement tab, refine it in the [Affix Forge](rngtech:affix-forge.md) or the [Exotic Affix Forge](rngtech:exotic-affix-forge.md) like any other refinable item.
+Because it is an item and has no Refinement tab, refine it in the [Affix Forge](rngtech:affix-forge.md) or the [Phase Array](rngtech:phase-array.md) like any other refinable item.
 
 ## Obtaining
 

@@ -1,0 +1,51 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "rngtech:material_enabled",
+      "material": "nullite"
+    }
+  ],
+  "type": "rngtech:calibrated_shaped",
+  "category": "misc",
+  "pattern": [
+    "BXB",
+    "MFM",
+    "BCB"
+  ],
+  "key": {
+    "M": {
+      "ingredient": {
+        "tag": "c:ingots/nullite"
+      }
+    },
+    "B": {
+      "ingredient": {
+        "item": "rngtech:bus_bar"
+      }
+    },
+    "F": {
+      "ingredient": {
+        "tag": "rngtech:machine_frames/exotic"
+      }
+    },
+    "C": {
+      "ingredient": {
+        "item": "rngtech:exotic_battery_cell"
+      }
+    },
+    "X": {
+      "ingredient": {
+        "item": "rngtech:calibrated_conductive_component"
+      },
+      "calibration": {
+        "family": "conductive",
+        "min_stage": 6,
+        "min_stability": 70
+      }
+    }
+  },
+  "result": {
+    "count": 1,
+    "id": "rngtech:phase_emitter"
+  }
+}

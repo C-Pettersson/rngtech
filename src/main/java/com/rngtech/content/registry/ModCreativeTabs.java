@@ -21,6 +21,7 @@ import com.rngtech.content.energy.SolarArrayExtenderMaterial;
 import com.rngtech.content.energy.SolarPanelMaterial;
 import com.rngtech.content.energy.SolidFuelBurnerChassis;
 import com.rngtech.content.energy.VacuumCollapsePartMaterial;
+import com.rngtech.content.item.GlyphItem;
 import com.rngtech.content.machine.AlloyBlendMaterial;
 import com.rngtech.content.machine.AlloyCrucibleMaterial;
 import com.rngtech.content.machine.AlloyFurnaceChassisMaterial;
@@ -42,6 +43,7 @@ import com.rngtech.content.tool.PruningShearsMaterial;
 import com.rngtech.content.tool.ToolHeadFamily;
 import com.rngtech.content.tool.ToolHeadMaterial;
 import com.rngtech.content.tool.ToolRodMaterial;
+import com.rngtech.rpg.PhaseArrayRules;
 
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
@@ -311,7 +313,11 @@ public final class ModCreativeTabs {
                         output.accept(ModItems.STABILIZATION_CRYSTAL.get());
                         output.accept(ModItems.NULL_CRYSTAL.get());
                         output.accept(ModItems.VOLATILE_CATALYST.get());
-                        output.accept(ModItems.EXOTIC_AFFIX_CATALYST.get());
+                        output.accept(ModItems.PHASE_EMITTER.get());
+                        output.accept(ModItems.PHASE_COIL.get());
+                        for (int tier = 1; tier <= PhaseArrayRules.GLYPH_TIERS; tier++) {
+                            output.accept(GlyphItem.of(ModItems.GLYPH.get(), tier));
+                        }
                         acceptMaterial(output, ModItems.CRUSHED_IRON);
                         acceptMaterial(output, ModItems.CRUSHED_GOLD);
                         acceptMaterial(output, ModItems.CRUSHED_COPPER);

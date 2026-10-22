@@ -51,8 +51,19 @@ export async function checkUniques({ log = true } = {}) {
         if (table.type !== "rngtech:challenge") {
             failures.push(`challenges/${name} must use the rngtech:challenge type`);
         }
-        if ((table.pools ?? []).length > 0) {
-            failures.push(`challenges/${name} must ship empty; packs fill it by datapack`);
+        const pools = table.pools ?? [];
+        if (name === "heat_failure" && pools.length > 0) {
+            failures.push(`challenges/${name} must ship empty; failing on purpose should not pay`);
+        }
+        for (const pool of pools) {
+            if ((pool.conditions ?? []).length === 0) {
+                failures.push(`challenges/${name} has a pool with no condition; every default Glyph drop is a machine challenge`);
+            }
+            for (const entry of pool.entries ?? []) {
+                if (entry.name !== "rngtech:glyph") {
+                    failures.push(`challenges/${name} drops ${entry.name}; only Glyphs ship by default, packs add the rest`);
+                }
+            }
         }
     }
 
@@ -61,14 +72,26 @@ export async function checkUniques({ log = true } = {}) {
         failures.push(`the rngtech:uniques tag lists ${tag.values.join(", ")}; expected the catalog ${uniques.join(", ")}`);
     }
 
+    const nullitePartRecipes = ["phase_coil", "phase_emitter"];
     for (const file of await jsonFiles(RECIPE_ROOT)) {
         const text = await readFile(file, "utf8");
         const json = JSON.parse(text);
+        const relative = path.relative(PROJECT_ROOT, file).replaceAll(path.sep, "/");
         const outputs = [json.result?.id, json.result?.stack?.id, json.result?.item, json.output?.id, json.output?.item]
                 .filter(Boolean);
         for (const output of outputs) {
             if (uniques.includes(output)) {
-                failures.push(`${path.relative(PROJECT_ROOT, file).replaceAll(path.sep, "/")} makes ${output}; Uniques are find-only`);
+                failures.push(`${relative} makes ${output}; Uniques are find-only`);
+            }
+        }
+        if (text.includes('"rngtech:glyph"')) {
+            failures.push(`${relative} names rngtech:glyph; no recipe makes, recycles, or burns a Glyph`);
+        }
+        const name = path.basename(file, ".json");
+        if (nullitePartRecipes.includes(name) && path.dirname(file) === RECIPE_ROOT) {
+            const conditions = json["neoforge:conditions"] ?? [];
+            if (!conditions.some((condition) => condition.type === "rngtech:material_enabled" && condition.material === "nullite")) {
+                failures.push(`${relative} lacks the rngtech:material_enabled nullite condition the Phase Array parts sit behind`);
             }
         }
     }
@@ -77,7 +100,7 @@ export async function checkUniques({ log = true } = {}) {
         throw new Error(`Unique source check failed:\n${failures.map((failure) => `- ${failure}`).join("\n")}`);
     }
     if (log) {
-        console.log(`Unique sources PASS: ${uniques.length} Uniques with gated default loot, ${challengeFiles.length} empty challenge tables, no Unique recipes`);
+        console.log(`Unique sources PASS: ${uniques.length} Uniques with gated default loot, ${challengeFiles.length} challenge tables with Glyph entries only, no Unique or Glyph recipes, Phase Array parts behind Nullite`);
     }
     return uniques.length;
 }

@@ -24,6 +24,8 @@ import java.util.function.IntSupplier;
 public final class MachineTestSupport {
     /** Use with {@code @PrefixGameTestTemplate(false)}. */
     public static final String EMPTY = "gametest_empty";
+    /** A 12 by 4 by 5 room on a stone floor, long enough for a Phase Array line of nine Coils along x. */
+    public static final String LINE = "gametest_line";
     public static final MachineTraits BULK_SPEED = new MachineTraits(Rarity.MAGIC, 0, List.of(), List.of(MachineBehavior.BULK_SPEED));
 
     private MachineTestSupport() {

@@ -1,0 +1,64 @@
+{
+    "description": "Phase Array model for phaseArraySim. 'prd' is the number set in docs/prds/phase-array.md. Every other scenario overrides it to preview a change; nothing here changes the game. Keys: hold_chance, second_hold, overhold_per_surplus, partial_window, fracture_per_strain, strain_tolerance, quality_base, quality_divisor, stage_factors, reference_supply_fe_per_tick, operations (base_fe, coils, rp, glyph).",
+    "trials": 2000,
+    "line_sizes": [5, 7, 9],
+    "items": {
+        "rare_s8": { "stage": 8, "rarity": "RARE", "label": "Rare Stage 8 part, fresh" },
+        "magic_s8": { "stage": 8, "rarity": "MAGIC", "label": "Magic Stage 8 part, fresh" },
+        "rare_s5": { "stage": 5, "rarity": "RARE", "label": "Rare Stage 5 part, fresh" }
+    },
+    "scenarios": {
+        "prd": {
+            "label": "PRD numbers",
+            "hold_chance": 0.92,
+            "second_hold": 0.0,
+            "overhold_per_surplus": 0.08,
+            "partial_window": 2,
+            "fracture_per_strain": 0.01,
+            "strain_tolerance": 0,
+            "quality_base": 1.5,
+            "quality_divisor": 3.5,
+            "stage_factors": { "0": 0.1, "1": 0.1, "2": 0.1, "3": 0.25, "4": 0.25, "5": 0.5, "6": 0.5, "7": 1.0, "8": 1.5 },
+            "reference_supply_fe_per_tick": 20000,
+            "operations": {
+                "reforge": { "base_fe": 2000000, "coils": 3, "rp": 0, "glyph": 0 },
+                "attune": { "base_fe": 1000000, "coils": 4, "rp": 1, "glyph": 0 },
+                "resonate": { "base_fe": 2000000, "coils": 5, "rp": 2, "glyph": 0 },
+                "excise": { "base_fe": 1000000, "coils": 5, "rp": 1, "glyph": 0 },
+                "imprint": { "base_fe": 2000000, "coils": 6, "rp": 2, "glyph": 4 },
+                "transmute": { "base_fe": 4000000, "coils": 7, "rp": 1, "glyph": 3 },
+                "temper": { "base_fe": 4000000, "coils": 7, "rp": 0, "glyph": 3 },
+                "exalt": { "base_fe": 4000000, "coils": 8, "rp": 2, "glyph": 4 },
+                "graft": { "base_fe": 8000000, "coils": 9, "rp": 2, "glyph": 5 }
+            }
+        },
+        "first_draft": {
+            "label": "The PRD's first draft: 2 RP Resonate, 2% Fracture per Strain, Quality divisor 4, 8 MFE Exalt",
+            "fracture_per_strain": 0.02,
+            "quality_divisor": 4,
+            "operations": {
+                "resonate": { "rp": 2 },
+                "transmute": { "rp": 2 },
+                "imprint": { "rp": 3 },
+                "exalt": { "base_fe": 8000000, "rp": 4 },
+                "graft": { "rp": 3 }
+            }
+        },
+        "steeper_quality": {
+            "label": "Quality divisor 3",
+            "quality_divisor": 3
+        },
+        "hold_95": {
+            "label": "Hold Chance 95%",
+            "hold_chance": 0.95
+        },
+        "hold_88": {
+            "label": "Hold Chance 88%",
+            "hold_chance": 0.88
+        },
+        "strain_2pct": {
+            "label": "Fracture 2% per Strain point",
+            "fracture_per_strain": 0.02
+        }
+    }
+}

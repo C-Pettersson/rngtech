@@ -1,0 +1,65 @@
+{
+  "hosts": [
+    "phase_emitter",
+    "phase_coil"
+  ],
+  "blessed": [
+    {
+      "id": "strain_tolerance",
+      "weight": 30,
+      "modifiers": [
+        {
+          "stat": "strain_tolerance",
+          "operation": "add",
+          "value": 1
+        }
+      ]
+    },
+    {
+      "id": "charge_capacity",
+      "weight": 30,
+      "modifiers": [
+        {
+          "stat": "charge_capacity",
+          "operation": "increased_percent",
+          "value": 15
+        }
+      ]
+    },
+    {
+      "id": "fe_thrift",
+      "weight": 20,
+      "modifiers": [
+        {
+          "stat": "fe_thrift",
+          "operation": "add",
+          "value": 3
+        }
+      ]
+    }
+  ],
+  "blighted": [
+    {
+      "id": "charge_rate",
+      "weight": 30,
+      "modifiers": [
+        {
+          "stat": "charge_rate",
+          "operation": "decreased_percent",
+          "value": 15
+        }
+      ]
+    },
+    {
+      "id": "charge_capacity",
+      "weight": 30,
+      "modifiers": [
+        {
+          "stat": "charge_capacity",
+          "operation": "decreased_percent",
+          "value": 15
+        }
+      ]
+    }
+  ]
+}

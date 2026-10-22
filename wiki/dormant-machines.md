@@ -46,6 +46,8 @@ A Dormant Machine starts asleep. Fill its wake charge with FE:
 - **Carry cells.** Put up to nine charged [Battery Cells](battery-cells.md) in its sockets. It drains them all at once, each at its own output rate. The early sites are small enough for a handful of Iron or Lead Cells.
 - **Bring power.** It takes FE from any side, from a generator or a cable.
 
+When it wakes, the machine also drops a Glyph for the Phase Array: Tier I from a Collapsed Workshop or Abandoned Cart Siding, Tier II from a Buried Calibration Vault or Flooded Foundry, Tier III from a Nether Smeltworks, and Tier IV from an End Relay.
+
 A higher soul costs more to wake, and the cost climbs faster near the top of a site's level range. The charge never leaks away, even if you leave and come back. When it is full, the machine wakes and stays awake.
 
 ## Taking the soul

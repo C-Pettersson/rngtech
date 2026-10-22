@@ -11,6 +11,7 @@ import net.neoforged.neoforge.common.ModConfigSpec;
 
 import java.util.Collections;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 public final class RNGTechConfig {
@@ -67,14 +68,6 @@ public final class RNGTechConfig {
     public static final ModConfigSpec.DoubleValue CALIBRATION_TIME_MULTIPLIER = BUILDER
             .comment("Multiplier applied to Resonance Calibrator recipe processing time.")
             .defineInRange("calibration.timeMultiplier", 1.0D, 0.01D, 100.0D);
-
-    public static final ModConfigSpec.DoubleValue EXOTIC_AFFIX_FORGE_ENERGY_MULTIPLIER = BUILDER
-            .comment("Multiplier applied to Exotic Affix Forge recipe FE costs after per-target history scaling.")
-            .defineInRange("exoticAffixForge.energyMultiplier", 1.0D, 0.01D, 100.0D);
-
-    public static final ModConfigSpec.DoubleValue EXOTIC_AFFIX_FORGE_TIME_MULTIPLIER = BUILDER
-            .comment("Multiplier applied to Exotic Affix Forge recipe processing time.")
-            .defineInRange("exoticAffixForge.timeMultiplier", 1.0D, 0.01D, 100.0D);
 
     public static final ModConfigSpec.BooleanValue SOLAR_GENERATES_IN_OVERWORLD = BUILDER
             .comment("Whether Solar Panels and Solar Array Controllers generate FE in the Overworld.")
@@ -143,6 +136,71 @@ public final class RNGTechConfig {
     /** Gates every default Unique loot table; pack sources such as challenge tables and quests are unaffected. */
     public static final ModConfigSpec.BooleanValue UNIQUE_LOOT_ENABLED = UNIQUE_LOOT_CONFIG.enabled();
     public static final Map<String, ModConfigSpec.BooleanValue> UNIQUE_LOOT = UNIQUE_LOOT_CONFIG.uniques();
+
+    // Phase Array. The operations themselves are rngtech:phase_array recipes; these are the line's own numbers.
+    public static final ModConfigSpec.DoubleValue PHASE_COIL_HOLD_CHANCE = BUILDER
+            .comment("Phase Array: percent chance a Coil holds the pulse, before part affixes.")
+            .defineInRange("phaseArray.coilHoldChance", 92.0D, 0.0D, 100.0D);
+
+    public static final ModConfigSpec.DoubleValue PHASE_COIL_OVERHOLD_CHANCE = BUILDER
+            .comment("Phase Array: percent chance a surplus Coil's hold triggers Overhold, before part affixes.")
+            .defineInRange("phaseArray.coilOverholdChance", 8.0D, 0.0D, 100.0D);
+
+    public static final ModConfigSpec.IntValue PHASE_PARTIAL_WINDOW = BUILDER
+            .comment("Phase Array: Coils short of an operation's count that still count as Partial, before the Emitter's affixes.")
+            .defineInRange("phaseArray.partialWindow", 2, 0, 8);
+
+    public static final ModConfigSpec.DoubleValue PHASE_FRACTURE_PER_STRAIN = BUILDER
+            .comment("Phase Array: percent Fracture chance per point of Strain above the line's Tolerance.")
+            .defineInRange("phaseArray.fracturePerStrainPercent", 1.0D, 0.0D, 100.0D);
+
+    public static final ModConfigSpec.DoubleValue PHASE_QUALITY_BASE = BUILDER
+            .comment("Phase Array: a pulse's FE multiplies by this for every qualityDivisor points of the item's Quality.")
+            .defineInRange("phaseArray.qualityBase", 1.5D, 1.0D, 10.0D);
+
+    public static final ModConfigSpec.DoubleValue PHASE_QUALITY_DIVISOR = BUILDER
+            .comment("Phase Array: Quality points per step of qualityBase. Quality is the sum of the item's affix tiers.")
+            .defineInRange("phaseArray.qualityDivisor", 3.5D, 0.1D, 100.0D);
+
+    public static final ModConfigSpec.DoubleValue PHASE_STAGE_FACTOR_0_TO_2 = BUILDER
+            .comment("Phase Array: FE factor for a Stage 0 to 2 item.")
+            .defineInRange("phaseArray.stageFactor.stage0to2", 0.1D, 0.0001D, 100.0D);
+
+    public static final ModConfigSpec.DoubleValue PHASE_STAGE_FACTOR_3_TO_4 = BUILDER
+            .comment("Phase Array: FE factor for a Stage 3 or 4 item.")
+            .defineInRange("phaseArray.stageFactor.stage3to4", 0.25D, 0.0001D, 100.0D);
+
+    public static final ModConfigSpec.DoubleValue PHASE_STAGE_FACTOR_5_TO_6 = BUILDER
+            .comment("Phase Array: FE factor for a Stage 5 or 6 item.")
+            .defineInRange("phaseArray.stageFactor.stage5to6", 0.5D, 0.0001D, 100.0D);
+
+    public static final ModConfigSpec.DoubleValue PHASE_STAGE_FACTOR_7 = BUILDER
+            .comment("Phase Array: FE factor for a Stage 7 item.")
+            .defineInRange("phaseArray.stageFactor.stage7", 1.0D, 0.0001D, 100.0D);
+
+    public static final ModConfigSpec.DoubleValue PHASE_STAGE_FACTOR_8 = BUILDER
+            .comment("Phase Array: FE factor for a Stage 8 item.")
+            .defineInRange("phaseArray.stageFactor.stage8", 1.5D, 0.0001D, 100.0D);
+
+    public static final ModConfigSpec.LongValue PHASE_EMITTER_CHARGE_CAPACITY = BUILDER
+            .comment("Phase Array: FE a Phase Emitter adds to the line's charge store, before affixes.")
+            .defineInRange("phaseArray.emitterChargeCapacity", 16_000_000L, 1L, Long.MAX_VALUE);
+
+    public static final ModConfigSpec.IntValue PHASE_EMITTER_CHARGE_RATE = BUILDER
+            .comment("Phase Array: FE per tick a Phase Emitter adds to the line's Charge Rate, before affixes.")
+            .defineInRange("phaseArray.emitterChargeRate", 8_000, 1, Integer.MAX_VALUE);
+
+    public static final ModConfigSpec.LongValue PHASE_COIL_CHARGE_CAPACITY = BUILDER
+            .comment("Phase Array: FE each Phase Coil adds to the line's charge store, before affixes.")
+            .defineInRange("phaseArray.coilChargeCapacity", 4_000_000L, 0L, Long.MAX_VALUE);
+
+    public static final ModConfigSpec.IntValue PHASE_COIL_CHARGE_RATE = BUILDER
+            .comment("Phase Array: FE per tick each Phase Coil adds to the line's Charge Rate, before affixes.")
+            .defineInRange("phaseArray.coilChargeRate", 2_000, 0, Integer.MAX_VALUE);
+
+    public static final ModConfigSpec.ConfigValue<List<? extends Integer>> PHASE_GLYPH_FLOORS = BUILDER
+            .comment("Phase Array: the lowest Glyph tier (1 to 5) each Coil position needs, nine entries from the position next to the Emitter outward.")
+            .defineList("phaseArray.glyphFloors", List.of(1, 1, 1, 2, 2, 3, 3, 4, 5), element -> element instanceof Integer tier && tier >= 1 && tier <= 5);
 
     public static final Map<String, ModConfigSpec.BooleanValue> MATERIALS = defineMaterials();
     private static final OreWorldgenConfig ORE_WORLDGEN_CONFIG = defineOreWorldgen();

@@ -643,7 +643,7 @@
 			optional: true
 			tasks: [{
 				id: "6C9DD1A3050022D1"
-				item: { count: 1, id: "rngtech:exotic_affix_catalyst" }
+				item: { count: 1, id: "rngtech:phase_coil" }
 				type: "item"
 			}]
 			x: 9.0d

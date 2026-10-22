@@ -46,7 +46,7 @@ wiki:
 
 The **Affix Forge** is RNGTech's early refinement station. Put in a machine item, machine part, Battery Cell, Tool Head, Tool Rod, or companion item, add a catalyst, and the forge adds, upgrades, rerolls, or removes that item's rolled affixes. It needs no power. Three reusable upgrades unlock stronger catalysts and the optional focus slot.
 
-The forge refines items, not placed machines. To refine a machine that is already placed, use the Refinement tab in that machine's own screen. For late-game powered refinement, see the [Exotic Affix Forge](exotic-affix-forge.md).
+The forge refines items, not placed machines. To refine a machine that is already placed, use the Refinement tab in that machine's own screen. For the endgame bench where you choose the affix, see the [Phase Array](phase-array.md).
 
 ## Obtaining
 
@@ -206,6 +206,6 @@ With JEI installed, the catalysts are listed under the Affix Forging category.
 ## See also
 
 - [Rarity and Affixes](rarity-and-affixes.md): rarity tiers, affixes, and Refinement Potential.
-- [Exotic Affix Forge](exotic-affix-forge.md)
+- [Phase Array](phase-array.md)
 
 {{ navbox() }}

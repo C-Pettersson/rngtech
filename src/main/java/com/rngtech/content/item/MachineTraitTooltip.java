@@ -11,10 +11,16 @@ import com.rngtech.rpg.MachineStat;
 import com.rngtech.rpg.MachineStatAccumulator;
 import com.rngtech.rpg.MachineTraitRoller;
 import com.rngtech.rpg.MachineTraits;
+import com.rngtech.rpg.ModifierDefinition;
+import com.rngtech.rpg.ModifierEligibilityProfile;
+import com.rngtech.rpg.ModifierLensTargets;
 import com.rngtech.rpg.ModifierOperation;
 import com.rngtech.rpg.ModifierSet;
 import com.rngtech.rpg.ModifierSlot;
+import com.rngtech.rpg.PhaseArrayRules;
 import com.rngtech.rpg.Rarity;
+import com.rngtech.rpg.refinement.PhaseStrain;
+import com.rngtech.rpg.refinement.RefinementTargets;
 import com.rngtech.rpg.unique.UniqueHost;
 import com.rngtech.rpg.unique.UniqueStatReaders;
 
@@ -116,6 +122,23 @@ final class MachineTraitTooltip {
         appendTraitKeyHints(tooltipComponents);
     }
 
+    /** The header plus the item's Strain, when it carries any. */
+    static boolean appendTraitHeader(ItemStack stack, MachineTraits traits, List<Component> tooltipComponents, boolean showRarity) {
+        boolean shown = appendTraitHeader(traits, tooltipComponents, showRarity);
+        appendStrain(stack, tooltipComponents);
+        return shown;
+    }
+
+    /** Strain with the Fracture chance it adds past a line's Tolerance; nothing at 0. */
+    static void appendStrain(ItemStack stack, List<Component> tooltipComponents) {
+        int strain = PhaseStrain.get(stack);
+        if (strain <= 0) {
+            return;
+        }
+        long fracture = Math.round(strain * PhaseArrayRules.fracturePerStrain() * 100.0);
+        tooltipComponents.add(Component.translatable("rngtech.tooltip.strain", strain, fracture).withStyle(ChatFormatting.GOLD));
+    }
+
     static boolean appendTraitHeader(MachineTraits traits, List<Component> tooltipComponents, boolean showRarity) {
         if (traits.isEmpty()) {
             return false;
@@ -144,11 +167,19 @@ final class MachineTraitTooltip {
 
     /** With Shift held, marks rolled modifiers that are local to {@code part}; an empty stack marks none. */
     static void appendTraitDetails(MachineTraits traits, List<Component> tooltipComponents, ItemStack part) {
+        appendTraitDetails(traits, tooltipComponents, part, part);
+    }
+
+    /**
+     * {@code owner} is the item the traits sit on, used to name each affix's top tier in the Alt view; {@code part}
+     * marks local modifiers as above.
+     */
+    static void appendTraitDetails(MachineTraits traits, List<Component> tooltipComponents, ItemStack part, ItemStack owner) {
         appendCorruptionSection(traits, tooltipComponents);
         appendModifierSections(traits.modifierSet(), tooltipComponents, part);
         appendBehaviorSection(traits, tooltipComponents, part);
         if (TooltipKeyState.hasAltDown()) {
-            appendTierTooltip(tooltipComponents, traits.modifierSet());
+            appendTierTooltip(tooltipComponents, traits.modifierSet(), owner);
         }
     }
 
@@ -171,7 +202,7 @@ final class MachineTraitTooltip {
         ).withStyle(ChatFormatting.GRAY));
         appendModifierSections(modifierSet, tooltipComponents);
         if (TooltipKeyState.hasAltDown()) {
-            appendTierTooltip(tooltipComponents, modifierSet);
+            appendTierTooltip(tooltipComponents, modifierSet, ItemStack.EMPTY);
         }
         appendTraitKeyHints(tooltipComponents);
     }
@@ -323,18 +354,23 @@ final class MachineTraitTooltip {
         }
     }
 
-    private static void appendTierTooltip(List<Component> tooltipComponents, ModifierSet modifierSet) {
+    /** Each tiered affix with its tier and, when the owner's profile knows the affix, the top tier it can reach. */
+    private static void appendTierTooltip(List<Component> tooltipComponents, ModifierSet modifierSet, ItemStack owner) {
         boolean hasTieredModifiers = modifierSet.modifiers().stream().anyMatch(modifier -> modifier.hasTier());
         if (!hasTieredModifiers) {
             return;
         }
-
+        ModifierEligibilityProfile profile = owner.isEmpty() || !RefinementTargets.canRefine(owner) ? null : RefinementTargets.eligibilityProfile(owner);
         tooltipComponents.add(Component.empty());
         tooltipComponents.add(Component.translatable("rngtech.tooltip.modifier_tiers").withStyle(ChatFormatting.DARK_AQUA));
         for (var modifier : modifierSet.modifiers()) {
-            if (modifier.hasTier()) {
-                tooltipComponents.add(MachineModifierText.tierTooltipLine(modifier).withStyle(ChatFormatting.DARK_GRAY));
+            if (!modifier.hasTier()) {
+                continue;
             }
+            ModifierDefinition definition = profile == null ? null : ModifierLensTargets.definitionFor(profile, modifier);
+            int top = definition == null ? 0 : definition.maxTier();
+            tooltipComponents.add((top > 0 ? MachineModifierText.tierTooltipLine(modifier, top) : MachineModifierText.tierTooltipLine(modifier))
+                    .withStyle(ChatFormatting.DARK_GRAY));
         }
     }
 

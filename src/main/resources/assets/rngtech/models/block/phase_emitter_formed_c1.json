@@ -1,0 +1,8 @@
+{
+  "parent": "rngtech:block/phase_emitter",
+  "textures": {
+    "core": "rngtech:block/phase_array/core_1",
+    "lens": "rngtech:block/phase_array/lens_formed",
+    "strip": "rngtech:block/phase_array/estrip_formed"
+  }
+}

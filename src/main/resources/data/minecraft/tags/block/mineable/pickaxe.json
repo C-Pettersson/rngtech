@@ -117,6 +117,8 @@
     "rngtech:platinum_ore",
     "rngtech:deepslate_platinum_ore",
     "rngtech:naquadah_ore",
-    "rngtech:deepslate_naquadah_ore"
+    "rngtech:deepslate_naquadah_ore",
+    "rngtech:phase_emitter",
+    "rngtech:phase_coil"
   ]
 }

@@ -2035,6 +2035,300 @@ public final class RefinementEngine {
     private record ModifierRollCandidate(ModifierDefinition definition) {
     }
 
+
+    // -- Phase Array -------------------------------------------------------------------------------------------------
+    // These compose the private helpers above for the Phase Cradle. They never spend Refinement Potential themselves:
+    // the Cradle takes its recipe's fixed RP cost, so every method returns new traits with the input's RP, or null when
+    // the operation is not legal on these traits.
+
+    /** The sum of every affix's tier; untiered affixes count 1. The PRD's Quality, which prices a pulse. */
+    public static int phaseQuality(MachineTraits traits) {
+        return traits.modifiers().stream()
+                .filter(modifier -> modifier.slot().isAffix())
+                .mapToInt(modifier -> Math.max(1, modifier.tier()))
+                .sum();
+    }
+
+    /** Reforge's Partial: new affixes in the same slots, with rarity and RP kept. */
+    public static MachineTraits phaseRerollAffixes(
+            ModifierEligibilityProfile profile,
+            MachineTraits traits,
+            int componentStage,
+            RandomSource random
+    ) {
+        int prefixCount = count(traits.modifiers(), ModifierSlot.PREFIX);
+        int suffixCount = count(traits.modifiers(), ModifierSlot.SUFFIX);
+        if (prefixCount == 0 && suffixCount == 0) {
+            return null;
+        }
+        List<MachineModifier> modifiers = new ArrayList<>(traits.modifiers().stream()
+                .filter(modifier -> !modifier.slot().isAffix())
+                .toList());
+        rollSlotModifiers(profile, ModifierSlot.PREFIX, prefixCount, traits.rarity(), componentStage, Integer.MAX_VALUE, random, modifiers);
+        rollSlotModifiers(profile, ModifierSlot.SUFFIX, suffixCount, traits.rarity(), componentStage, Integer.MAX_VALUE, random, modifiers);
+        return withModifiers(traits, traits.rarity(), traits.refinementPotential(), modifiers);
+    }
+
+    /** Attune: every affix's value rerolled within its tier; with {@code bestOfTwo}, the better of two rolls each. */
+    public static MachineTraits phaseRerollValues(
+            ModifierEligibilityProfile profile,
+            MachineTraits traits,
+            boolean bestOfTwo,
+            RandomSource random
+    ) {
+        List<MachineModifier> modifiers = new ArrayList<>(traits.modifiers());
+        boolean changed = false;
+        for (int index = 0; index < modifiers.size(); index++) {
+            MachineModifier current = modifiers.get(index);
+            if (!current.slot().isAffix()) {
+                continue;
+            }
+            ModifierDefinition definition = definitionFor(profile, current);
+            if (definition == null) {
+                continue;
+            }
+            modifiers.set(index, rerolledValue(definition, current, bestOfTwo, random));
+            changed = true;
+        }
+        return changed ? withModifiers(traits, traits.rarity(), traits.refinementPotential(), modifiers) : null;
+    }
+
+    /** One affix's value rerolled within its tier; a negative index picks a random affix. */
+    public static MachineTraits phaseRerollValue(
+            ModifierEligibilityProfile profile,
+            MachineTraits traits,
+            int affixIndex,
+            RandomSource random
+    ) {
+        int index = affixIndex < 0 ? randomAffixModifierIndex(traits, random) : selectedAffixModifierIndex(traits, affixIndex);
+        if (index < 0) {
+            return null;
+        }
+        MachineModifier current = traits.modifiers().get(index);
+        ModifierDefinition definition = definitionFor(profile, current);
+        if (definition == null) {
+            return null;
+        }
+        List<MachineModifier> modifiers = new ArrayList<>(traits.modifiers());
+        modifiers.set(index, rerolledValue(definition, current, false, random));
+        return withModifiers(traits, traits.rarity(), traits.refinementPotential(), modifiers);
+    }
+
+    private static MachineModifier rerolledValue(ModifierDefinition definition, MachineModifier current, boolean bestOfTwo, RandomSource random) {
+        int tier = Math.max(1, current.tier());
+        MachineModifier first = definition.roll(tier, random);
+        if (!bestOfTwo) {
+            return first;
+        }
+        MachineModifier second = definition.roll(tier, random);
+        return percentile(second) > percentile(first) ? second : first;
+    }
+
+    /** The highest tier Resonate or Exalt can take the selected affix to, or 0 when it cannot rise. */
+    public static int phaseRaisedTier(ModifierEligibilityProfile profile, MachineTraits traits, int affixIndex, int tiers, int cap) {
+        MachineModifier current = selectedAffix(traits, affixIndex);
+        if (current == null) {
+            return 0;
+        }
+        ModifierDefinition definition = definitionFor(profile, current);
+        if (definition == null || !definition.isTiered()) {
+            return 0;
+        }
+        int target = Math.min(Math.min(cap, definition.maxTier()), current.tier() + tiers);
+        return target > current.tier() ? target : 0;
+    }
+
+    /** Resonate and Exalt: the selected affix at a higher tier with a fresh value. */
+    public static MachineTraits phaseRaiseTier(
+            ModifierEligibilityProfile profile,
+            MachineTraits traits,
+            int affixIndex,
+            int tiers,
+            int cap,
+            RandomSource random
+    ) {
+        int target = phaseRaisedTier(profile, traits, affixIndex, tiers, cap);
+        if (target == 0) {
+            return null;
+        }
+        int index = selectedAffixModifierIndex(traits, affixIndex);
+        MachineModifier current = traits.modifiers().get(index);
+        List<MachineModifier> modifiers = new ArrayList<>(traits.modifiers());
+        modifiers.set(index, definitionFor(profile, current).roll(target, random));
+        return withModifiers(traits, traits.rarity(), traits.refinementPotential(), modifiers);
+    }
+
+    /** Excise: the selected affix removed; a negative index removes a random one. Fixed identity affixes stay. */
+    public static MachineTraits phaseRemove(ModifierEligibilityProfile profile, MachineTraits traits, int affixIndex, RandomSource random) {
+        int index = affixIndex < 0 ? randomAffixModifierIndex(traits, random) : selectedAffixModifierIndex(traits, affixIndex);
+        if (index < 0 || isFixedDefinition(profile, traits.modifiers().get(index))) {
+            return null;
+        }
+        List<MachineModifier> modifiers = new ArrayList<>(traits.modifiers());
+        modifiers.remove(index);
+        return withModifiers(traits, traits.rarity(), traits.refinementPotential(), modifiers);
+    }
+
+    /** Every affix Imprint can add to {@code slot}: legal for the profile and not in conflict with what the item has. */
+    public static List<ModifierDefinition> phaseImprintCandidates(ModifierEligibilityProfile profile, MachineTraits traits, ModifierSlot slot) {
+        if (!hasOpenAffixSlot(traits, rarityAfterAdd(traits.rarity()), slot)) {
+            return List.of();
+        }
+        return availableDefinitions(profile, slot, traits.modifiers(), List.of());
+    }
+
+    /**
+     * Imprint: {@code definition} added to {@code slot} at a tier rolled with the item's weights, or with
+     * {@code bestOfTwoTiers} the higher of two tier rolls. With {@code sameFamily}, a random legal affix that shares a
+     * lens family with {@code definition} is added instead.
+     */
+    public static MachineTraits phaseAdd(
+            ModifierEligibilityProfile profile,
+            MachineTraits traits,
+            ModifierSlot slot,
+            ModifierDefinition definition,
+            int componentStage,
+            boolean bestOfTwoTiers,
+            boolean sameFamily,
+            RandomSource random
+    ) {
+        List<ModifierDefinition> candidates = phaseImprintCandidates(profile, traits, slot);
+        if (candidates.isEmpty()) {
+            return null;
+        }
+        ModifierDefinition chosen = definition;
+        if (sameFamily) {
+            List<ModifierDefinition> family = candidates.stream()
+                    .filter(candidate -> candidate.matchesLensTags(definition.lensTags()))
+                    .toList();
+            chosen = MachineTraitRoller.weightedDefinition(family.isEmpty() ? candidates : family, random);
+        } else if (!candidates.contains(definition)) {
+            return null;
+        }
+        Rarity rarity = rarityAfterAdd(traits.rarity());
+        int tier = MachineTraitRoller.rollModifierTier(chosen, profile, rarity, componentStage, random);
+        if (bestOfTwoTiers) {
+            tier = Math.max(tier, MachineTraitRoller.rollModifierTier(chosen, profile, rarity, componentStage, random));
+        }
+        List<MachineModifier> modifiers = new ArrayList<>(traits.modifiers());
+        modifiers.add(chosen.roll(tier, random));
+        return withModifiers(traits, rarity, traits.refinementPotential(), modifiers);
+    }
+
+    /** Transmute: the selected affix swapped for another legal affix of its slot at the same tier. */
+    public static MachineTraits phaseTransmute(
+            ModifierEligibilityProfile profile,
+            MachineTraits traits,
+            int affixIndex,
+            boolean keepQuality,
+            RandomSource random
+    ) {
+        int index = selectedAffixModifierIndex(traits, affixIndex);
+        if (index < 0) {
+            return null;
+        }
+        MachineModifier current = traits.modifiers().get(index);
+        if (isFixedDefinition(profile, current)) {
+            return null;
+        }
+        int tier = Math.max(1, current.tier());
+        ModifierDefinition target = transmutationDefinition(profile, traits.modifiers(), index, current, tier, random);
+        if (target == null) {
+            return null;
+        }
+        MachineModifier swapped = keepQuality
+                ? rollAtPercentile(target, target.isTiered() ? tier : 0, percentile(current))
+                : target.roll(target.isTiered() ? tier : 0, random);
+        List<MachineModifier> modifiers = new ArrayList<>(traits.modifiers());
+        modifiers.set(index, swapped);
+        return withModifiers(traits, traits.rarity(), traits.refinementPotential(), modifiers);
+    }
+
+    /** Graft: {@code donor} copied onto {@code slot}, keeping tier and value, or one tier lower with a fresh value. */
+    public static MachineTraits phaseGraft(
+            ModifierEligibilityProfile profile,
+            MachineTraits traits,
+            MachineModifier donor,
+            ModifierSlot slot,
+            boolean tierDown,
+            RandomSource random
+    ) {
+        if (donor.slot() != slot) {
+            return null;
+        }
+        ModifierDefinition definition = phaseImprintCandidates(profile, traits, slot).stream()
+                .filter(candidate -> candidate.matches(donor))
+                .findFirst()
+                .orElse(null);
+        if (definition == null) {
+            return null;
+        }
+        MachineModifier grafted = tierDown && definition.isTiered()
+                ? definition.roll(Math.max(1, donor.tier() - 1), random)
+                : MachineModifier.roll(definition.id(), definition.modGroup(), slot, donor.tier(), donor.effects());
+        List<MachineModifier> modifiers = new ArrayList<>(traits.modifiers());
+        modifiers.add(grafted);
+        return withModifiers(traits, rarityAfterAdd(traits.rarity()), traits.refinementPotential(), modifiers);
+    }
+
+    /** Whether {@code donor} could be grafted onto {@code slot} of these traits. */
+    public static boolean phaseCanGraft(ModifierEligibilityProfile profile, MachineTraits traits, MachineModifier donor, ModifierSlot slot) {
+        return phaseGraftBlock(profile, traits, donor, slot) == GraftBlock.NONE;
+    }
+
+    /** Why a donor affix cannot be grafted onto {@code slot} of the target, or {@link GraftBlock#NONE}. */
+    public enum GraftBlock {
+        NONE,
+        /** The donor affix belongs to the other slot type. */
+        WRONG_SLOT,
+        /** The target's profile never rolls this affix. */
+        NOT_ELIGIBLE,
+        /** The target already carries an affix from the same modifier group. */
+        GROUP_TAKEN
+    }
+
+    public static GraftBlock phaseGraftBlock(ModifierEligibilityProfile profile, MachineTraits traits, MachineModifier donor, ModifierSlot slot) {
+        if (donor.slot() != slot) {
+            return GraftBlock.WRONG_SLOT;
+        }
+        if (profile.rollableDefinitions(slot).stream().noneMatch(definition -> definition.matches(donor))) {
+            return GraftBlock.NOT_ELIGIBLE;
+        }
+        return phaseImprintCandidates(profile, traits, slot).stream().anyMatch(candidate -> candidate.matches(donor))
+                ? GraftBlock.NONE
+                : GraftBlock.GROUP_TAKEN;
+    }
+
+    /** Fracture: one random affix down a tier with a fresh value; a Tier 1 or untiered affix is removed. */
+    public static MachineTraits phaseFracture(ModifierEligibilityProfile profile, MachineTraits traits, RandomSource random) {
+        int index = randomAffixModifierIndex(traits, random);
+        if (index < 0) {
+            return null;
+        }
+        MachineModifier current = traits.modifiers().get(index);
+        ModifierDefinition definition = definitionFor(profile, current);
+        List<MachineModifier> modifiers = new ArrayList<>(traits.modifiers());
+        if (definition == null || !definition.isTiered() || current.tier() <= 1) {
+            if (isFixedDefinition(profile, current)) {
+                return null;
+            }
+            modifiers.remove(index);
+        } else {
+            modifiers.set(index, definition.roll(current.tier() - 1, random));
+        }
+        return withModifiers(traits, traits.rarity(), traits.refinementPotential(), modifiers);
+    }
+
+    private static int randomAffixModifierIndex(MachineTraits traits, RandomSource random) {
+        List<Integer> indices = new ArrayList<>();
+        for (int index = 0; index < traits.modifiers().size(); index++) {
+            if (traits.modifiers().get(index).slot().isAffix()) {
+                indices.add(index);
+            }
+        }
+        return indices.isEmpty() ? -1 : indices.get(random.nextInt(indices.size()));
+    }
+
     private RefinementEngine() {
     }
 }
