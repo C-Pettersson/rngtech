@@ -2,7 +2,7 @@
 navigation:
   title: "Upgrades"
   parent: affix-forge.md
-  position: 2
+  position: 3
   icon: rngtech:affix_forge
 ---
 

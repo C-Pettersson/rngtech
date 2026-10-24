@@ -21,15 +21,12 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.block.state.properties.DirectionProperty;
 import net.minecraft.world.phys.BlockHitResult;
-import net.minecraft.world.phys.shapes.CollisionContext;
-import net.minecraft.world.phys.shapes.VoxelShape;
 
 public class AffixForgeBlock extends Block implements EntityBlock {
     public static final DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;
     public static final BooleanProperty HAS_LENS_ARRAY = BooleanProperty.create("has_lens_array");
     public static final BooleanProperty HAS_MODIFIER_SOCKET = BooleanProperty.create("has_modifier_socket");
     public static final BooleanProperty HAS_RESONANCE_MATRIX = BooleanProperty.create("has_resonance_matrix");
-    private static final VoxelShape SHAPE = Block.box(1.0D, 0.0D, 1.0D, 15.0D, 12.0D, 15.0D);
 
     public AffixForgeBlock(Properties properties) {
         super(properties);
@@ -55,9 +52,10 @@ public class AffixForgeBlock extends Block implements EntityBlock {
         return RenderShape.MODEL;
     }
 
+    /** The forge's open model is a full block to stand on, but keeps letting sky light through as the low forge did. */
     @Override
-    protected VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
-        return SHAPE;
+    protected boolean propagatesSkylightDown(BlockState state, BlockGetter level, BlockPos pos) {
+        return true;
     }
 
     @Override

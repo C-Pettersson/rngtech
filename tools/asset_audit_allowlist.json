@@ -229,7 +229,14 @@
       "subject_globs": [
         "src/main/resources/assets/rngtech/textures/block/resonance_calibrator/fx/beam.png"
       ],
-      "reason": "The Resonance Calibrator emitter beam is drawn only by ResonanceCalibratorRenderer."
+      "reason": "The Resonance Calibrator emitter beam is drawn only by ResonanceCalibratorRenderer and AffixForgeRenderer."
+    },
+    {
+      "check": "unused_png",
+      "subject_globs": [
+        "src/main/resources/assets/rngtech/textures/block/affix_forge/fx/ring.png"
+      ],
+      "reason": "The Affix Forge Reforge ring flare is drawn only by AffixForgeRenderer."
     },
     {
       "check": "shared_machine_block_texture",

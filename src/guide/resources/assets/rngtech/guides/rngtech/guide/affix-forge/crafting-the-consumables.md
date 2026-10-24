@@ -2,7 +2,7 @@
 navigation:
   title: "Crafting the consumables"
   parent: affix-forge.md
-  position: 6
+  position: 7
   icon: rngtech:affix_forge
 ---
 

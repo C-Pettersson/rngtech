@@ -2,7 +2,7 @@
 navigation:
   title: "Modifier lenses"
   parent: affix-forge.md
-  position: 3
+  position: 4
   icon: rngtech:affix_forge
 ---
 
