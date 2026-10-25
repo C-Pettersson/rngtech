@@ -13,6 +13,7 @@ import com.rngtech.client.screen.CorrosionCellScreen;
 import com.rngtech.client.screen.CrusherScreen;
 import com.rngtech.client.screen.FurnaceScreen;
 import com.rngtech.client.screen.GasChemistryScreen;
+import com.rngtech.client.screen.MachineTabs;
 import com.rngtech.client.screen.MelterScreen;
 import com.rngtech.client.screen.MetalPressScreen;
 import com.rngtech.client.screen.MinersCompanionScreen;
@@ -355,13 +356,14 @@ public final class RNGTechJeiPlugin implements IModPlugin {
 
     @Override
     public void registerGuiHandlers(IGuiHandlerRegistration registration) {
+        registration.addGenericGuiContainerHandler(AbstractContainerScreen.class, new MachineTabAreas());
         registerProcessRecipeLineClickArea(
                 registration,
                 SolidFuelBurnerScreen.class,
                 screen -> screen.getMenu().selectedTab() == SolidFuelBurnerMenu.TAB_PROCESSING,
-                137,
-                48,
-                69,
+                110,
+                52,
+                58,
                 7,
                 JeiRecipeTypes.SOLID_FUEL_BURNING
         );
@@ -369,9 +371,9 @@ public final class RNGTechJeiPlugin implements IModPlugin {
                 registration,
                 BioGeneratorScreen.class,
                 screen -> screen.getMenu().selectedTab() == BioGeneratorMenu.TAB_PROCESSING,
-                126,
-                48,
-                80,
+                96,
+                52,
+                72,
                 7,
                 JeiRecipeTypes.BIO_GENERATOR
         );
@@ -390,7 +392,7 @@ public final class RNGTechJeiPlugin implements IModPlugin {
                 CrusherScreen.class,
                 screen -> screen.getMenu().selectedTab() == CrusherMenu.TAB_PROCESSING,
                 86,
-                51,
+                61,
                 69,
                 8,
                 JeiRecipeTypes.CRUSHER
@@ -411,7 +413,7 @@ public final class RNGTechJeiPlugin implements IModPlugin {
                 screen -> screen.getMenu().selectedTab() == AlloyFurnaceMenu.TAB_PROCESSING,
                 98,
                 51,
-                88,
+                86,
                 8,
                 JeiRecipeTypes.ALLOY_FURNACE
         );
@@ -419,9 +421,9 @@ public final class RNGTechJeiPlugin implements IModPlugin {
                 registration,
                 PotentialReactorScreen.class,
                 screen -> screen.getMenu().selectedTab() == PotentialReactorMenu.TAB_PROCESSING,
-                137,
-                48,
-                69,
+                90,
+                60,
+                66,
                 7,
                 JeiRecipeTypes.POTENTIAL_REACTOR
         );
@@ -439,9 +441,9 @@ public final class RNGTechJeiPlugin implements IModPlugin {
                 registration,
                 CorrosionCellScreen.class,
                 screen -> screen.getMenu().selectedTab() == CorrosionCellMenu.TAB_PROCESSING,
-                137,
-                48,
-                69,
+                72,
+                70,
+                64,
                 7,
                 JeiRecipeTypes.CORROSION_CELL
         );
@@ -450,7 +452,7 @@ public final class RNGTechJeiPlugin implements IModPlugin {
                 ComponentRecyclerScreen.class,
                 screen -> screen.getMenu().selectedTab() == ComponentRecyclerMenu.TAB_PROCESSING,
                 84,
-                50,
+                62,
                 76,
                 7,
                 JeiRecipeTypes.COMPONENT_RECYCLING
@@ -460,7 +462,7 @@ public final class RNGTechJeiPlugin implements IModPlugin {
                 MetalPressScreen.class,
                 screen -> screen.getMenu().selectedTab() == MetalPressMenu.TAB_PROCESSING,
                 86,
-                43,
+                53,
                 69,
                 16,
                 JeiRecipeTypes.METAL_PRESS
@@ -470,7 +472,7 @@ public final class RNGTechJeiPlugin implements IModPlugin {
                 MelterScreen.class,
                 screen -> screen.getMenu().selectedTab() == MelterMenu.TAB_PROCESSING,
                 104,
-                51,
+                57,
                 58,
                 8,
                 JeiRecipeTypes.MELTER
@@ -480,7 +482,7 @@ public final class RNGTechJeiPlugin implements IModPlugin {
                 ResonanceCalibratorScreen.class,
                 screen -> screen.getMenu().selectedTab() == ResonanceCalibratorMenu.TAB_PROCESSING,
                 92,
-                74,
+                77,
                 76,
                 8,
                 JeiRecipeTypes.CALIBRATION
@@ -489,7 +491,7 @@ public final class RNGTechJeiPlugin implements IModPlugin {
                 registration,
                 BatteryAssemblerScreen.class,
                 screen -> screen.getMenu().selectedTab() == BatteryAssemblerMenu.TAB_PROCESSING,
-                146,
+                147,
                 50,
                 34,
                 8,
@@ -521,7 +523,7 @@ public final class RNGTechJeiPlugin implements IModPlugin {
                 VacuumCollapseGeneratorScreen.class,
                 screen -> screen.getMenu().selectedTab() == VacuumCollapseGeneratorMenu.TAB_PROCESSING,
                 90,
-                48,
+                37,
                 66,
                 7,
                 JeiRecipeTypes.VACUUM_COLLAPSE
@@ -540,9 +542,9 @@ public final class RNGTechJeiPlugin implements IModPlugin {
                 registration,
                 AmmoniaFuelCellScreen.class,
                 screen -> screen.getMenu().selectedTab() == AmmoniaFuelCellMenu.TAB_PROCESSING,
-                88,
-                54,
-                38,
+                90,
+                48,
+                66,
                 8,
                 JeiRecipeTypes.AMMONIA_POWER_CYCLE
         );
@@ -551,7 +553,7 @@ public final class RNGTechJeiPlugin implements IModPlugin {
                 WoodenDehumidifierScreen.class,
                 screen -> true,
                 88,
-                56,
+                59,
                 66,
                 8,
                 JeiRecipeTypes.WOODEN_DEHUMIDIFIER_CONVERSION
@@ -794,5 +796,12 @@ public final class RNGTechJeiPlugin implements IModPlugin {
         lines.add(Component.translatable("rngtech.jei.unique.source", Component.translatable(unique.sourceKey())));
         lines.add(Component.translatable("rngtech.jei.unique.identify"));
         return lines;
+    }
+
+    private static final class MachineTabAreas implements IGuiContainerHandler<AbstractContainerScreen<?>> {
+        @Override
+        public List<Rect2i> getGuiExtraAreas(AbstractContainerScreen<?> screen) {
+            return screen instanceof MachineTabs.Host host ? host.machineTabs().areas() : List.of();
+        }
     }
 }

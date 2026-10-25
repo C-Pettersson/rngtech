@@ -2,6 +2,7 @@ package com.rngtech.client.screen;
 
 import com.rngtech.content.blockentity.AmmoniaFuelCellBlockEntity;
 import com.rngtech.content.menu.AmmoniaFuelCellMenu;
+import com.rngtech.content.registry.ModBlocks;
 import com.rngtech.rpg.MachineStat;
 
 import net.minecraft.client.gui.GuiGraphics;
@@ -9,7 +10,7 @@ import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
 
-public class AmmoniaFuelCellScreen extends AbstractContainerScreen<AmmoniaFuelCellMenu> {
+public class AmmoniaFuelCellScreen extends AbstractContainerScreen<AmmoniaFuelCellMenu> implements MachineTabs.Host {
     private static final int PANEL = 0xFFC6C6C6;
     private static final int DARK = 0xFF5F5F5F;
     private static final int TEXT = 0xFF3F3F3F;
@@ -19,8 +20,6 @@ public class AmmoniaFuelCellScreen extends AbstractContainerScreen<AmmoniaFuelCe
     private static final int HYDROGEN = 0xFFD8E6F2;
     private static final int PROGRESS = 0xFF71A67B;
     private static final int STAT_ACCENT = 0xFF8EA553;
-    private static final int TAB_WIDTH = 54;
-    private static final int TAB_SPACING = 56;
     private static final int AMMONIA_BAR_X = 40;
     private static final int ENERGY_BAR_X = 174;
     private static final int BAR_Y = 28;
@@ -32,9 +31,11 @@ public class AmmoniaFuelCellScreen extends AbstractContainerScreen<AmmoniaFuelCe
     private static final int PROGRESS_HEIGHT = 8;
     private static final int RESIDUE_SLOT_X = 194;
     private static final int RESIDUE_SLOT_Y = 60;
-    private static final int STATUS_X = 117;
-    private static final int STATUS_Y = 60;
+    private static final int STATUS_X = 90;
+    private static final int STATUS_Y = 33;
     private static final int STATUS_SIZE = 12;
+
+    private final MachineTabs tabs;
 
     public AmmoniaFuelCellScreen(AmmoniaFuelCellMenu menu, Inventory playerInventory, Component title) {
         super(menu, playerInventory, title);
@@ -42,12 +43,24 @@ public class AmmoniaFuelCellScreen extends AbstractContainerScreen<AmmoniaFuelCe
         imageHeight = 200;
         inventoryLabelX = 39;
         inventoryLabelY = 104;
+        tabs = MachineTabs.builder(this)
+                .processing(AmmoniaFuelCellMenu.TAB_PROCESSING, ModBlocks.AMMONIA_FUEL_CELL.get())
+                .gear(AmmoniaFuelCellMenu.TAB_GEAR)
+                .stats(AmmoniaFuelCellMenu.TAB_STATS)
+                .refinement(AmmoniaFuelCellMenu.TAB_REFINEMENT)
+                .build();
+    }
+
+    @Override
+    public MachineTabs machineTabs() {
+        return tabs;
     }
 
     @Override
     public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         super.render(guiGraphics, mouseX, mouseY, partialTick);
         renderTooltip(guiGraphics, mouseX, mouseY);
+        tabs.renderTooltip(guiGraphics, mouseX, mouseY);
         renderValueTooltips(guiGraphics, mouseX, mouseY);
         renderStatTooltips(guiGraphics, mouseX, mouseY);
         RefinementScreenStyle.renderTooltips(guiGraphics, font, leftPos, topPos, mouseX, mouseY, menu.selectedTab() == RefinementScreenStyle.REFINEMENT_TAB_INDEX, menu.machineTraits(), menu);
@@ -57,7 +70,7 @@ public class AmmoniaFuelCellScreen extends AbstractContainerScreen<AmmoniaFuelCe
     @Override
     protected void renderBg(GuiGraphics guiGraphics, float partialTick, int mouseX, int mouseY) {
         guiGraphics.fill(leftPos, topPos, leftPos + imageWidth, topPos + imageHeight, PANEL);
-        renderTabs(guiGraphics);
+        tabs.render(guiGraphics, mouseX, mouseY, menu.selectedTab());
         if (menu.selectedTab() == AmmoniaFuelCellMenu.TAB_PROCESSING) {
             bar(guiGraphics, AMMONIA_BAR_X, BAR_Y, menu.ammoniaFill(), menu.burnsHydrogen() ? HYDROGEN : AMMONIA);
             FluidPurgeButton.render(guiGraphics, leftPos, topPos, AMMONIA_BAR_X, BAR_Y + 2, menu.ammonia() > 0);
@@ -96,6 +109,7 @@ public class AmmoniaFuelCellScreen extends AbstractContainerScreen<AmmoniaFuelCe
     @Override
     protected void renderLabels(GuiGraphics guiGraphics, int mouseX, int mouseY) {
         guiGraphics.drawString(font, title, titleLabelX, titleLabelY, TEXT, false);
+        tabs.renderSelectedLabel(guiGraphics, menu.selectedTab(), titleLabelX, titleLabelY, MUTED);
         if (menu.selectedTab() != AmmoniaFuelCellMenu.TAB_STATS) {
             guiGraphics.drawString(font, playerInventoryTitle, inventoryLabelX, inventoryLabelY, TEXT, false);
         }
@@ -112,11 +126,10 @@ public class AmmoniaFuelCellScreen extends AbstractContainerScreen<AmmoniaFuelCe
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         if (button == 0) {
-            for (int index = 0; index < 4; index++) {
-                if (isOverTab(mouseX, mouseY, index)) {
-                    menu.selectTab(index);
-                    return true;
-                }
+            int tab = tabs.tabAt(mouseX, mouseY);
+            if (tab >= 0) {
+                menu.selectTab(tab);
+                return true;
             }
             if (menu.selectedTab() == AmmoniaFuelCellMenu.TAB_REFINEMENT
                     && RefinementScreenStyle.handleApplyClick(this, menu, mouseX, mouseY)) {
@@ -161,20 +174,6 @@ public class AmmoniaFuelCellScreen extends AbstractContainerScreen<AmmoniaFuelCe
                 value > 1.001,
                 MachineScreenStyle.statLayerTooltip(menu.getSlot(menu.refinementTargetSlot()).getItem(), stat, value)
         ).withStat(stat);
-    }
-
-    private void renderTabs(GuiGraphics guiGraphics) {
-        tab(guiGraphics, 0, Component.translatable("rngtech.tab.processing.short"));
-        tab(guiGraphics, 1, Component.translatable("rngtech.tab.gear"));
-        tab(guiGraphics, 2, Component.translatable("rngtech.tab.stats"));
-        tab(guiGraphics, 3, Component.translatable("rngtech.tab.refinement.short"));
-    }
-
-    private void tab(GuiGraphics guiGraphics, int index, Component label) {
-        int x = leftPos + 8 + index * TAB_SPACING;
-        int y = topPos - 20;
-        guiGraphics.fill(x, y, x + TAB_WIDTH, y + 21, menu.selectedTab() == index ? PANEL : 0xFF9A9A9A);
-        guiGraphics.drawString(font, label, x + (TAB_WIDTH - font.width(label)) / 2, y + 7, TEXT, false);
     }
 
     private void bar(GuiGraphics guiGraphics, int x, int y, float fill, int color) {
@@ -278,11 +277,5 @@ public class AmmoniaFuelCellScreen extends AbstractContainerScreen<AmmoniaFuelCe
 
     private void drawGearLabel(GuiGraphics guiGraphics, Component label, int centerX) {
         MachineScreenStyle.drawClippedCentered(guiGraphics, font, label, centerX, 35, 54, MUTED);
-    }
-
-    private boolean isOverTab(double mouseX, double mouseY, int index) {
-        int x = leftPos + 8 + index * TAB_SPACING;
-        int y = topPos - 20;
-        return mouseX >= x && mouseX < x + TAB_WIDTH && mouseY >= y && mouseY < y + 21;
     }
 }

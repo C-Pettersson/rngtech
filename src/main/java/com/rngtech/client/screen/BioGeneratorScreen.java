@@ -3,6 +3,7 @@ package com.rngtech.client.screen;
 import com.rngtech.content.blockentity.BioGeneratorBlockEntity;
 import com.rngtech.content.energy.BiogasDigestion;
 import com.rngtech.content.menu.BioGeneratorMenu;
+import com.rngtech.content.registry.ModBlocks;
 import com.rngtech.rpg.MachineStat;
 
 import net.minecraft.ChatFormatting;
@@ -15,7 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-public class BioGeneratorScreen extends AbstractContainerScreen<BioGeneratorMenu> {
+public class BioGeneratorScreen extends AbstractContainerScreen<BioGeneratorMenu> implements MachineTabs.Host {
     private static final int PANEL = 0xFFC6C6C6;
     private static final int PANEL_DARK = 0xFF8B8B8B;
     private static final int PANEL_LIGHT = 0xFFE9E9E9;
@@ -24,8 +25,6 @@ public class BioGeneratorScreen extends AbstractContainerScreen<BioGeneratorMenu
     private static final int ENERGY = 0xFF4C9C70;
     private static final int FUEL = 0xFF7DA84B;
     private static final int STAT_ACCENT = 0xFF82B366;
-    private static final int TAB_WIDTH = 54;
-    private static final int TAB_SPACING = 56;
     private static final int STAT_PANEL_X = 8;
     private static final int STAT_PANEL_Y = 18;
     private static final int STAT_PANEL_WIDTH = 224;
@@ -34,17 +33,17 @@ public class BioGeneratorScreen extends AbstractContainerScreen<BioGeneratorMenu
     private static final int ENERGY_GAUGE_WIDTH = 12;
     private static final int ENERGY_GAUGE_HEIGHT = 52;
     private static final int FUEL_BAR_X = 96;
-    private static final int FUEL_BAR_Y = 48;
+    private static final int FUEL_BAR_Y = 52;
     private static final int FUEL_BAR_WIDTH = 72;
     private static final int FUEL_BAR_HEIGHT = 7;
-    private static final int STATUS_ICON_X = 102;
-    private static final int GENERATION_ICON_X = 118;
-    private static final int OUTPUT_ICON_X = 134;
-    private static final int FUEL_VALUE_ICON_X = 150;
-    private static final int STATUS_ICON_Y = 60;
+    private static final int STATUS_ICON_X = 96;
+    private static final int GENERATION_ICON_X = 112;
+    private static final int OUTPUT_ICON_X = 128;
+    private static final int FUEL_VALUE_ICON_X = 144;
+    private static final int STATUS_ICON_Y = 37;
     private static final int ICON_SIZE = 12;
     private static final int RETENTION_DIAL_X = 96;
-    private static final int RETENTION_DIAL_Y = 30;
+    private static final int RETENTION_DIAL_Y = 65;
     private static final int RETENTION_DIAL_WIDTH = 72;
     private static final int RETENTION_DIAL_HEIGHT = 7;
     private static final int RETENTION_POINTER_HEIGHT = 3;
@@ -122,18 +121,32 @@ public class BioGeneratorScreen extends AbstractContainerScreen<BioGeneratorMenu
             MachineStat.FUEL_DURATION
     };
 
+    private final MachineTabs tabs;
+
     public BioGeneratorScreen(BioGeneratorMenu menu, Inventory playerInventory, Component title) {
         super(menu, playerInventory, title);
         imageWidth = 240;
         imageHeight = 200;
         inventoryLabelX = 39;
         inventoryLabelY = 104;
+        tabs = MachineTabs.builder(this)
+                .processing(BioGeneratorMenu.TAB_PROCESSING, ModBlocks.BIO_GENERATOR.get())
+                .gear(BioGeneratorMenu.TAB_GEAR)
+                .stats(BioGeneratorMenu.TAB_STATS)
+                .refinement(BioGeneratorMenu.TAB_REFINEMENT)
+                .build();
+    }
+
+    @Override
+    public MachineTabs machineTabs() {
+        return tabs;
     }
 
     @Override
     public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         super.render(guiGraphics, mouseX, mouseY, partialTick);
         renderTooltip(guiGraphics, mouseX, mouseY);
+        tabs.renderTooltip(guiGraphics, mouseX, mouseY);
         renderValueTooltips(guiGraphics, mouseX, mouseY);
         renderStatTooltips(guiGraphics, mouseX, mouseY);
         RefinementScreenStyle.renderTooltips(guiGraphics, font, leftPos, topPos, mouseX, mouseY, menu.selectedTab() == RefinementScreenStyle.REFINEMENT_TAB_INDEX, menu.machineTraits(), menu);
@@ -143,7 +156,7 @@ public class BioGeneratorScreen extends AbstractContainerScreen<BioGeneratorMenu
     @Override
     protected void renderBg(GuiGraphics guiGraphics, float partialTick, int mouseX, int mouseY) {
         renderPanel(guiGraphics);
-        renderTabs(guiGraphics);
+        tabs.render(guiGraphics, mouseX, mouseY, menu.selectedTab());
         renderSlotFrames(guiGraphics);
         if (menu.selectedTab() == BioGeneratorMenu.TAB_PROCESSING) {
             renderProcessing(guiGraphics);
@@ -157,6 +170,7 @@ public class BioGeneratorScreen extends AbstractContainerScreen<BioGeneratorMenu
     @Override
     protected void renderLabels(GuiGraphics guiGraphics, int mouseX, int mouseY) {
         guiGraphics.drawString(font, title, titleLabelX, titleLabelY, TEXT, false);
+        tabs.renderSelectedLabel(guiGraphics, menu.selectedTab(), titleLabelX, titleLabelY, TEXT_MUTED);
         if (menu.selectedTab() != BioGeneratorMenu.TAB_STATS) {
             guiGraphics.drawString(font, playerInventoryTitle, inventoryLabelX, inventoryLabelY, TEXT, false);
         }
@@ -174,20 +188,9 @@ public class BioGeneratorScreen extends AbstractContainerScreen<BioGeneratorMenu
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         if (button == 0) {
-            if (isOverTab(mouseX, mouseY, 0)) {
-                menu.selectTab(BioGeneratorMenu.TAB_PROCESSING);
-                return true;
-            }
-            if (isOverTab(mouseX, mouseY, 1)) {
-                menu.selectTab(BioGeneratorMenu.TAB_GEAR);
-                return true;
-            }
-            if (isOverTab(mouseX, mouseY, 2)) {
-                menu.selectTab(BioGeneratorMenu.TAB_STATS);
-                return true;
-            }
-            if (isOverTab(mouseX, mouseY, 3)) {
-                menu.selectTab(BioGeneratorMenu.TAB_REFINEMENT);
+            int tab = tabs.tabAt(mouseX, mouseY);
+            if (tab >= 0) {
+                menu.selectTab(tab);
                 return true;
             }
             if (menu.selectedTab() == BioGeneratorMenu.TAB_REFINEMENT
@@ -247,27 +250,6 @@ public class BioGeneratorScreen extends AbstractContainerScreen<BioGeneratorMenu
         guiGraphics.fill(x, y, x + 1, y + imageHeight, PANEL_LIGHT);
         guiGraphics.fill(x + imageWidth - 1, y, x + imageWidth, y + imageHeight, PANEL_DARK);
         guiGraphics.fill(x, y + imageHeight - 1, x + imageWidth, y + imageHeight, PANEL_DARK);
-    }
-
-    private void renderTabs(GuiGraphics guiGraphics) {
-        renderTab(guiGraphics, 0, Component.translatable("rngtech.tab.processing.short"), menu.selectedTab() == BioGeneratorMenu.TAB_PROCESSING);
-        renderTab(guiGraphics, 1, Component.translatable("rngtech.tab.gear"), menu.selectedTab() == BioGeneratorMenu.TAB_GEAR);
-        renderTab(guiGraphics, 2, Component.translatable("rngtech.tab.stats"), menu.selectedTab() == BioGeneratorMenu.TAB_STATS);
-        renderTab(guiGraphics, 3, Component.translatable("rngtech.tab.refinement.short"), menu.selectedTab() == BioGeneratorMenu.TAB_REFINEMENT);
-    }
-
-    private void renderTab(GuiGraphics guiGraphics, int index, Component label, boolean selected) {
-        int x = leftPos + 8 + index * TAB_SPACING;
-        int y = topPos - 20;
-        int color = selected ? PANEL : 0xFF9A9A9A;
-        guiGraphics.fill(x, y, x + TAB_WIDTH, y + 21, color);
-        guiGraphics.fill(x, y, x + TAB_WIDTH, y + 1, PANEL_LIGHT);
-        guiGraphics.fill(x, y, x + 1, y + 21, PANEL_LIGHT);
-        guiGraphics.fill(x + TAB_WIDTH - 1, y, x + TAB_WIDTH, y + 21, PANEL_DARK);
-        if (!selected) {
-            guiGraphics.fill(x, y + 20, x + TAB_WIDTH, y + 21, PANEL_DARK);
-        }
-        guiGraphics.drawString(font, label, x + (TAB_WIDTH - font.width(label)) / 2, y + 7, selected ? TEXT : 0xFF2F2F2F, false);
     }
 
     private void renderSlotFrames(GuiGraphics guiGraphics) {
@@ -779,11 +761,5 @@ public class BioGeneratorScreen extends AbstractContainerScreen<BioGeneratorMenu
 
     private boolean isOver(double mouseX, double mouseY, int x, int y, int width, int height) {
         return mouseX >= leftPos + x && mouseX < leftPos + x + width && mouseY >= topPos + y && mouseY < topPos + y + height;
-    }
-
-    private boolean isOverTab(double mouseX, double mouseY, int index) {
-        int x = leftPos + 8 + index * TAB_SPACING;
-        int y = topPos - 20;
-        return mouseX >= x && mouseX < x + TAB_WIDTH && mouseY >= y && mouseY < y + 21;
     }
 }

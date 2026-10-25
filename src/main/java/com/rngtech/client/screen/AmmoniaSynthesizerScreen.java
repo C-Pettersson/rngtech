@@ -2,6 +2,7 @@ package com.rngtech.client.screen;
 
 import com.rngtech.content.blockentity.AmmoniaSynthesizerBlockEntity;
 import com.rngtech.content.menu.AmmoniaSynthesizerMenu;
+import com.rngtech.content.registry.ModBlocks;
 import com.rngtech.rpg.MachineStat;
 
 import net.minecraft.client.gui.GuiGraphics;
@@ -9,7 +10,7 @@ import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
 
-public class AmmoniaSynthesizerScreen extends AbstractContainerScreen<AmmoniaSynthesizerMenu> {
+public class AmmoniaSynthesizerScreen extends AbstractContainerScreen<AmmoniaSynthesizerMenu> implements MachineTabs.Host {
     private static final int PANEL = 0xFFC6C6C6;
     private static final int DARK = 0xFF5F5F5F;
     private static final int TEXT = 0xFF3F3F3F;
@@ -21,8 +22,8 @@ public class AmmoniaSynthesizerScreen extends AbstractContainerScreen<AmmoniaSyn
     private static final int CARBON = 0xFF6F6A64;
     private static final int PROGRESS = 0xFF71A67B;
     private static final int STAT_ACCENT = 0xFF74A7A0;
-    private static final int TAB_WIDTH = 54;
-    private static final int TAB_SPACING = 56;
+
+    private final MachineTabs tabs;
 
     public AmmoniaSynthesizerScreen(AmmoniaSynthesizerMenu menu, Inventory playerInventory, Component title) {
         super(menu, playerInventory, title);
@@ -30,12 +31,24 @@ public class AmmoniaSynthesizerScreen extends AbstractContainerScreen<AmmoniaSyn
         imageHeight = 200;
         inventoryLabelX = 39;
         inventoryLabelY = 104;
+        tabs = MachineTabs.builder(this)
+                .processing(AmmoniaSynthesizerMenu.TAB_PROCESSING, ModBlocks.AMMONIA_SYNTHESIZER.get())
+                .gear(AmmoniaSynthesizerMenu.TAB_GEAR)
+                .stats(AmmoniaSynthesizerMenu.TAB_STATS)
+                .refinement(AmmoniaSynthesizerMenu.TAB_REFINEMENT)
+                .build();
+    }
+
+    @Override
+    public MachineTabs machineTabs() {
+        return tabs;
     }
 
     @Override
     public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         super.render(guiGraphics, mouseX, mouseY, partialTick);
         renderTooltip(guiGraphics, mouseX, mouseY);
+        tabs.renderTooltip(guiGraphics, mouseX, mouseY);
         renderValueTooltips(guiGraphics, mouseX, mouseY);
         renderStatTooltips(guiGraphics, mouseX, mouseY);
         RefinementScreenStyle.renderTooltips(guiGraphics, font, leftPos, topPos, mouseX, mouseY, menu.selectedTab() == RefinementScreenStyle.REFINEMENT_TAB_INDEX, menu.machineTraits(), menu);
@@ -45,7 +58,7 @@ public class AmmoniaSynthesizerScreen extends AbstractContainerScreen<AmmoniaSyn
     @Override
     protected void renderBg(GuiGraphics guiGraphics, float partialTick, int mouseX, int mouseY) {
         guiGraphics.fill(leftPos, topPos, leftPos + imageWidth, topPos + imageHeight, PANEL);
-        renderTabs(guiGraphics);
+        tabs.render(guiGraphics, mouseX, mouseY, menu.selectedTab());
         if (menu.selectedTab() == AmmoniaSynthesizerMenu.TAB_PROCESSING) {
             bar(guiGraphics, 28, 28, menu.energyFill(), ENERGY);
             bar(guiGraphics, 48, 28, menu.nitrogenFill(), NITROGEN);
@@ -56,7 +69,7 @@ public class AmmoniaSynthesizerScreen extends AbstractContainerScreen<AmmoniaSyn
             renderPurgeButtons(guiGraphics);
             guiGraphics.fill(leftPos + 92, topPos + 54, leftPos + 140, topPos + 62, DARK);
             guiGraphics.fill(leftPos + 93, topPos + 55, leftPos + 93 + Math.round(46 * menu.progressFill()), topPos + 61, PROGRESS);
-            statusIcon(guiGraphics, 110, 66);
+            statusIcon(guiGraphics, 92, 39);
         } else if (menu.selectedTab() == AmmoniaSynthesizerMenu.TAB_GEAR) {
             slot(guiGraphics, 79, 47);
         } else if (menu.selectedTab() == AmmoniaSynthesizerMenu.TAB_STATS) {
@@ -74,6 +87,7 @@ public class AmmoniaSynthesizerScreen extends AbstractContainerScreen<AmmoniaSyn
     @Override
     protected void renderLabels(GuiGraphics guiGraphics, int mouseX, int mouseY) {
         guiGraphics.drawString(font, title, titleLabelX, titleLabelY, TEXT, false);
+        tabs.renderSelectedLabel(guiGraphics, menu.selectedTab(), titleLabelX, titleLabelY, MUTED);
         if (menu.selectedTab() != AmmoniaSynthesizerMenu.TAB_STATS) {
             guiGraphics.drawString(font, playerInventoryTitle, inventoryLabelX, inventoryLabelY, TEXT, false);
         }
@@ -89,11 +103,10 @@ public class AmmoniaSynthesizerScreen extends AbstractContainerScreen<AmmoniaSyn
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         if (button == 0) {
-            for (int index = 0; index < 4; index++) {
-                if (isOverTab(mouseX, mouseY, index)) {
-                    menu.selectTab(index);
-                    return true;
-                }
+            int tab = tabs.tabAt(mouseX, mouseY);
+            if (tab >= 0) {
+                menu.selectTab(tab);
+                return true;
             }
             if (menu.selectedTab() == AmmoniaSynthesizerMenu.TAB_REFINEMENT
                     && RefinementScreenStyle.handleApplyClick(this, menu, mouseX, mouseY)) {
@@ -122,20 +135,6 @@ public class AmmoniaSynthesizerScreen extends AbstractContainerScreen<AmmoniaSyn
                 value > 1.001,
                 MachineScreenStyle.statLayerTooltip(menu.getSlot(menu.refinementTargetSlot()).getItem(), stat, value)
         ).withStat(stat);
-    }
-
-    private void renderTabs(GuiGraphics guiGraphics) {
-        tab(guiGraphics, 0, Component.translatable("rngtech.tab.processing.short"));
-        tab(guiGraphics, 1, Component.translatable("rngtech.tab.gear"));
-        tab(guiGraphics, 2, Component.translatable("rngtech.tab.stats"));
-        tab(guiGraphics, 3, Component.translatable("rngtech.tab.refinement.short"));
-    }
-
-    private void tab(GuiGraphics guiGraphics, int index, Component label) {
-        int x = leftPos + 8 + index * TAB_SPACING;
-        int y = topPos - 20;
-        guiGraphics.fill(x, y, x + TAB_WIDTH, y + 21, menu.selectedTab() == index ? PANEL : 0xFF9A9A9A);
-        guiGraphics.drawString(font, label, x + (TAB_WIDTH - font.width(label)) / 2, y + 7, TEXT, false);
     }
 
     private void bar(GuiGraphics guiGraphics, int x, int y, float fill, int color) {
@@ -190,7 +189,7 @@ public class AmmoniaSynthesizerScreen extends AbstractContainerScreen<AmmoniaSyn
                 FluidMeterTooltips.amount(Component.translatable("fluid.rngtech.carbon_exhaust"), menu.carbon(), menu.tankCapacity(),
                         Component.translatable("rngtech.ammonia_synthesizer.tooltip.urea_feed")));
         CompactValueText.renderTooltipIfHovered(guiGraphics, font, leftPos, topPos, mouseX, mouseY, 92, 54, 48, 8, progressTooltip());
-        CompactValueText.renderTooltipIfHovered(guiGraphics, font, leftPos, topPos, mouseX, mouseY, 110, 66, 12, 12,
+        CompactValueText.renderTooltipIfHovered(guiGraphics, font, leftPos, topPos, mouseX, mouseY, 92, 39, 12, 12,
                 Component.translatable("rngtech.ammonia_synthesizer.tooltip.status", statusComponent()));
     }
 
@@ -327,11 +326,5 @@ public class AmmoniaSynthesizerScreen extends AbstractContainerScreen<AmmoniaSyn
         guiGraphics.fill(leftPos + x, topPos + y, leftPos + x + 18, topPos + y + 18, 0xFF373737);
         guiGraphics.fill(leftPos + x + 1, topPos + y + 1, leftPos + x + 17, topPos + y + 17, 0xFFE0E0E0);
         guiGraphics.fill(leftPos + x + 2, topPos + y + 2, leftPos + x + 16, topPos + y + 16, 0xFF8B8B8B);
-    }
-
-    private boolean isOverTab(double mouseX, double mouseY, int index) {
-        int x = leftPos + 8 + index * TAB_SPACING;
-        int y = topPos - 20;
-        return mouseX >= x && mouseX < x + TAB_WIDTH && mouseY >= y && mouseY < y + 21;
     }
 }

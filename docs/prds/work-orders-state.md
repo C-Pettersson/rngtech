@@ -159,6 +159,7 @@ Recorded 2026-10-25 for phase 6, from the build:
 - Rule conditions are zero-value affixes read by id, like the existing behavior-only affixes. Deep Ore applies in counting (`WorkOrderConditions.counts`), not by changing the stored job, so removing it by refinement later restores the job; the Shift list shows the raised minimum.
 - Reset conditions hook the Crusher's jam and the Furnace's heat failure through `WorkOrderHost.workOrderSetback`, which resets only the active chip that carries that condition.
 - Templates gained `rarity`; conditions on a template always roll.
+- After `MachineTabs` reached `main` (#209), the branch merged `main`, and Orders is now a `MachineTabs` entry after Mastery with the Job Chip as its icon. The temporary sixth top tab is gone.
 - Shift-click from the inventory into the drive bays did nothing in playtest: tab selection was client-only, so the server's menu never saw the Orders tab. The Crusher and Furnace screens now send the selected tab as a menu button (`WorkOrderMenuSupport.BUTTON_SELECT_TAB` plus the tab), and the GameTests open the Orders tab the same way.
 - Rush: the Orders tab's Rush button activates the selected chip with a deadline of half the tier's target time (7:30 at Tier I up to 15:00; the first build used 1.5 times, which playtest found far too generous, since a Tier IV job of 440 items was nearly done in six minutes) and 50% more listed reward, rounded up, or 50% more Bounty for a job without a list. Its tooltip shows the deadline and the loss before the player commits. Machines drop expired chips about once a second, a chip in a player's inventory disappears when its deadline passes, and a bay refuses an expired chip. A finished chip never expires. The rows show "Rush m:ss" and the chip tooltip the time left; the menu sync grew a Rush field per slot.
 
@@ -175,7 +176,6 @@ Keeps, with small changes:
 
 Still to change:
 
-- The Orders entry in the Crusher and Furnace tab strips, which moves to `MachineTabs` when the layout redesign merges.
 
 Done in phase 2: the `work_order` field on `MachineProgressionState` and its Soul Transfer carry are gone, and orders live in a `rngtech:work_orders` component on the machine; the Mastery level gate is now an optional per-order requirement; the tier and seed components became `rngtech:work_order` item data; `ActiveWorkOrder` became `LoadedWorkOrder`; and the Tier I recipe is gone.
 

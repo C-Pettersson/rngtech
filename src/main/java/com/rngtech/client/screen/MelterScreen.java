@@ -3,6 +3,7 @@ package com.rngtech.client.screen;
 import com.rngtech.RNGTech;
 import com.rngtech.content.blockentity.MelterBlockEntity;
 import com.rngtech.content.menu.MelterMenu;
+import com.rngtech.content.registry.ModBlocks;
 import com.rngtech.rpg.MachineStat;
 import com.rngtech.rpg.progression.MachineMasteryFamily;
 import com.rngtech.rpg.progression.MegaPassiveNode;
@@ -18,7 +19,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class MelterScreen extends AbstractContainerScreen<MelterMenu> {
+public class MelterScreen extends AbstractContainerScreen<MelterMenu> implements MachineTabs.Host {
     private static final int BASE_IMAGE_WIDTH = 240;
     private static final int BASE_IMAGE_HEIGHT = 200;
     private static final int PANEL = 0xFFC6C6C6;
@@ -38,8 +39,6 @@ public class MelterScreen extends AbstractContainerScreen<MelterMenu> {
     private static final int STAT_PANEL_X = 8;
     private static final int STAT_PANEL_Y = 18;
     private static final int STAT_PANEL_WIDTH = 224;
-    private static final int TAB_WIDTH = 42;
-    private static final int TAB_SPACING = 44;
     private static final int ENERGY_BAR_X = 8;
     private static final int HEAT_BAR_X = 22;
     private static final int INPUT_FLUID_BAR_X = 38;
@@ -50,15 +49,15 @@ public class MelterScreen extends AbstractContainerScreen<MelterMenu> {
     private static final int BAR_HEIGHT = 50;
     private static final int BAR_FILL_HEIGHT = 48;
     private static final int PROGRESS_X = 104;
-    private static final int PROGRESS_Y = 51;
+    private static final int PROGRESS_Y = 57;
     private static final int PROGRESS_WIDTH = 58;
     private static final int PROGRESS_HEIGHT = 8;
-    private static final int STATUS_X = 119;
-    private static final int TRANSFER_X = 135;
-    private static final int STATUS_Y = 63;
+    private static final int STATUS_X = 104;
+    private static final int TRANSFER_X = 120;
+    private static final int STATUS_Y = 42;
     private static final int STATUS_SIZE = 12;
-    private static final int PROCESSING_LEVEL_ICON_X = 184;
-    private static final int PROCESSING_LEVEL_ICON_Y = 78;
+    private static final int PROCESSING_LEVEL_ICON_X = 136;
+    private static final int PROCESSING_LEVEL_ICON_Y = STATUS_Y;
     private static final int PROCESSING_LEVEL_MAX = 8;
     private static final int INPUT_SLOT_FRAME_X = 57;
     private static final int SECONDARY_INPUT_SLOT_FRAME_X = 81;
@@ -100,6 +99,7 @@ public class MelterScreen extends AbstractContainerScreen<MelterMenu> {
     private static final Map<MegaPassiveNode, ResourceLocation> MASTERY_ICON_TEXTURES = createMasteryIconTextures();
 
     private final MasteryScreenSupport<MegaPassiveNode> masterySupport;
+    private final MachineTabs tabs;
     private final HeatSlider heatSlider = new HeatSlider(104, 81, 58, true);
 
     private static Map<MegaPassiveNode, ResourceLocation> createMasteryIconTextures() {
@@ -116,6 +116,13 @@ public class MelterScreen extends AbstractContainerScreen<MelterMenu> {
         imageHeight = BASE_IMAGE_HEIGHT;
         inventoryLabelX = 39;
         inventoryLabelY = 104;
+        tabs = MachineTabs.builder(this)
+                .processing(MelterMenu.TAB_PROCESSING, ModBlocks.MELTER.get())
+                .gear(MelterMenu.TAB_GEAR)
+                .stats(MelterMenu.TAB_CONFIGURATION)
+                .refinement(MelterMenu.TAB_REFINEMENT)
+                .mastery(MelterMenu.TAB_MASTERY)
+                .build();
         masterySupport = new MasteryScreenSupport<>(
                 MegaPassiveTree.TREE,
                 MegaPassiveTree.TREE.nodes(),
@@ -146,6 +153,11 @@ public class MelterScreen extends AbstractContainerScreen<MelterMenu> {
     }
 
     @Override
+    public MachineTabs machineTabs() {
+        return tabs;
+    }
+
+    @Override
     protected void init() {
         updateImageSizeForSelectedTab();
         super.init();
@@ -155,6 +167,7 @@ public class MelterScreen extends AbstractContainerScreen<MelterMenu> {
     public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         super.render(guiGraphics, mouseX, mouseY, partialTick);
         renderTooltip(guiGraphics, mouseX, mouseY);
+        tabs.renderTooltip(guiGraphics, mouseX, mouseY);
         renderValueTooltips(guiGraphics, mouseX, mouseY);
         renderStatTooltips(guiGraphics, mouseX, mouseY);
         if (menu.selectedTab() == MelterMenu.TAB_MASTERY) {
@@ -167,18 +180,16 @@ public class MelterScreen extends AbstractContainerScreen<MelterMenu> {
     @Override
     protected void renderBg(GuiGraphics guiGraphics, float partialTick, int mouseX, int mouseY) {
         renderPanel(guiGraphics);
-        renderTabs(guiGraphics);
+        tabs.render(guiGraphics, mouseX, mouseY, menu.selectedTab());
         renderSlotFrames(guiGraphics);
 
         if (menu.selectedTab() == MelterMenu.TAB_PROCESSING) {
             renderProcessing(guiGraphics);
-        } else if (menu.selectedTab() == MelterMenu.TAB_GEAR) {
-            renderGear(guiGraphics);
         } else if (menu.selectedTab() == MelterMenu.TAB_CONFIGURATION) {
             renderConfiguration(guiGraphics);
         } else if (menu.selectedTab() == MelterMenu.TAB_REFINEMENT) {
             renderRefinement(guiGraphics);
-        } else {
+        } else if (menu.selectedTab() == MelterMenu.TAB_MASTERY) {
             masterySupport.render(guiGraphics, leftPos, topPos, imageWidth, imageHeight, mouseX, mouseY);
         }
     }
@@ -186,6 +197,7 @@ public class MelterScreen extends AbstractContainerScreen<MelterMenu> {
     @Override
     protected void renderLabels(GuiGraphics guiGraphics, int mouseX, int mouseY) {
         guiGraphics.drawString(font, title, titleLabelX, titleLabelY, TEXT, false);
+        tabs.renderSelectedLabel(guiGraphics, menu.selectedTab(), titleLabelX, titleLabelY, TEXT_MUTED);
         if (menu.selectedTab() != MelterMenu.TAB_CONFIGURATION && menu.selectedTab() != MelterMenu.TAB_MASTERY) {
             guiGraphics.drawString(font, playerInventoryTitle, inventoryLabelX, inventoryLabelY, TEXT, false);
         }
@@ -210,24 +222,9 @@ public class MelterScreen extends AbstractContainerScreen<MelterMenu> {
             return true;
         }
         if (button == 0) {
-            if (isOverTab(mouseX, mouseY, 0)) {
-                selectTab(MelterMenu.TAB_PROCESSING);
-                return true;
-            }
-            if (isOverTab(mouseX, mouseY, 1)) {
-                selectTab(MelterMenu.TAB_GEAR);
-                return true;
-            }
-            if (isOverTab(mouseX, mouseY, 2)) {
-                selectTab(MelterMenu.TAB_CONFIGURATION);
-                return true;
-            }
-            if (isOverTab(mouseX, mouseY, 3)) {
-                selectTab(MelterMenu.TAB_REFINEMENT);
-                return true;
-            }
-            if (isOverTab(mouseX, mouseY, 4)) {
-                selectTab(MelterMenu.TAB_MASTERY);
+            int tab = tabs.tabAt(mouseX, mouseY);
+            if (tab >= 0) {
+                selectTab(tab);
                 return true;
             }
             if (menu.selectedTab() == MelterMenu.TAB_REFINEMENT
@@ -325,28 +322,6 @@ public class MelterScreen extends AbstractContainerScreen<MelterMenu> {
         guiGraphics.fill(x, y + imageHeight - 1, x + imageWidth, y + imageHeight, PANEL_DARK);
     }
 
-    private void renderTabs(GuiGraphics guiGraphics) {
-        renderTab(guiGraphics, 0, Component.translatable("rngtech.tab.processing.short"), menu.selectedTab() == MelterMenu.TAB_PROCESSING);
-        renderTab(guiGraphics, 1, Component.translatable("rngtech.tab.gear"), menu.selectedTab() == MelterMenu.TAB_GEAR);
-        renderTab(guiGraphics, 2, Component.translatable("rngtech.tab.stats"), menu.selectedTab() == MelterMenu.TAB_CONFIGURATION);
-        renderTab(guiGraphics, 3, Component.translatable("rngtech.tab.refinement.short"), menu.selectedTab() == MelterMenu.TAB_REFINEMENT);
-        renderTab(guiGraphics, 4, Component.translatable("rngtech.tab.mastery.short"), menu.selectedTab() == MelterMenu.TAB_MASTERY);
-    }
-
-    private void renderTab(GuiGraphics guiGraphics, int index, Component label, boolean selected) {
-        int x = leftPos + 8 + index * TAB_SPACING;
-        int y = topPos - 20;
-        int color = selected ? PANEL : 0xFF9A9A9A;
-        guiGraphics.fill(x, y, x + TAB_WIDTH, y + 21, color);
-        guiGraphics.fill(x, y, x + TAB_WIDTH, y + 1, PANEL_LIGHT);
-        guiGraphics.fill(x, y, x + 1, y + 21, PANEL_LIGHT);
-        guiGraphics.fill(x + TAB_WIDTH - 1, y, x + TAB_WIDTH, y + 21, PANEL_DARK);
-        if (!selected) {
-            guiGraphics.fill(x, y + 20, x + TAB_WIDTH, y + 21, PANEL_DARK);
-        }
-        guiGraphics.drawString(font, label, x + (TAB_WIDTH - font.width(label)) / 2, y + 7, selected ? TEXT : 0xFF2F2F2F, false);
-    }
-
     private void renderSlotFrames(GuiGraphics guiGraphics) {
         if (menu.selectedTab() == MelterMenu.TAB_PROCESSING) {
             renderSlotFrame(guiGraphics, INPUT_SLOT_FRAME_X, INPUT_SLOT_TOP_FRAME_Y);
@@ -418,6 +393,16 @@ public class MelterScreen extends AbstractContainerScreen<MelterMenu> {
         MachineScreenStyle.renderStatusGlyph(guiGraphics, leftPos + STATUS_X, topPos + STATUS_Y, statusState());
         renderIconBox(guiGraphics, TRANSFER_X, STATUS_Y);
         renderTransferGlyph(guiGraphics, TRANSFER_X, STATUS_Y);
+        MachineScreenStyle.renderProcessingLevelSquare(
+                guiGraphics,
+                leftPos,
+                topPos,
+                PROCESSING_LEVEL_ICON_X,
+                PROCESSING_LEVEL_ICON_Y,
+                menu.processingLevel(),
+                PROCESSING_LEVEL_MAX,
+                STAT_ACCENT
+        );
         renderPurgeButtons(guiGraphics);
     }
 
@@ -430,19 +415,6 @@ public class MelterScreen extends AbstractContainerScreen<MelterMenu> {
                 STAT_PANEL_Y,
                 STAT_PANEL_WIDTH,
                 statLines().length,
-                STAT_ACCENT
-        );
-    }
-
-    private void renderGear(GuiGraphics guiGraphics) {
-        MachineScreenStyle.renderProcessingLevelSquare(
-                guiGraphics,
-                leftPos,
-                topPos,
-                PROCESSING_LEVEL_ICON_X,
-                PROCESSING_LEVEL_ICON_Y,
-                menu.processingLevel(),
-                PROCESSING_LEVEL_MAX,
                 STAT_ACCENT
         );
     }
@@ -493,23 +465,20 @@ public class MelterScreen extends AbstractContainerScreen<MelterMenu> {
     }
 
     private void renderValueTooltips(GuiGraphics guiGraphics, int mouseX, int mouseY) {
-        if (menu.selectedTab() == MelterMenu.TAB_GEAR) {
-            MachineScreenStyle.renderStatusSquareTooltip(
-                    guiGraphics,
-                    font,
-                    leftPos,
-                    topPos,
-                    mouseX,
-                    mouseY,
-                    PROCESSING_LEVEL_ICON_X,
-                    PROCESSING_LEVEL_ICON_Y,
-                    processingLevelTooltip()
-            );
-            return;
-        }
         if (menu.selectedTab() != MelterMenu.TAB_PROCESSING) {
             return;
         }
+        MachineScreenStyle.renderStatusSquareTooltip(
+                guiGraphics,
+                font,
+                leftPos,
+                topPos,
+                mouseX,
+                mouseY,
+                PROCESSING_LEVEL_ICON_X,
+                PROCESSING_LEVEL_ICON_Y,
+                processingLevelTooltip()
+        );
         if (heatSlider.isOver(mouseX, mouseY, leftPos, topPos)) {
             guiGraphics.renderComponentTooltip(font, heatSlider.tooltip(menu.heatSlider(), menu.setpoint()), mouseX, mouseY);
             return;
@@ -879,11 +848,5 @@ public class MelterScreen extends AbstractContainerScreen<MelterMenu> {
             guiGraphics.fill(left + 2, top + 7, left + 5, top + 8, color);
             guiGraphics.fill(left + 2, top + 8, left + 4, top + 9, color);
         }
-    }
-
-    private boolean isOverTab(double mouseX, double mouseY, int index) {
-        int x = leftPos + 8 + index * TAB_SPACING;
-        int y = topPos - 20;
-        return mouseX >= x && mouseX < x + TAB_WIDTH && mouseY >= y && mouseY < y + 21;
     }
 }

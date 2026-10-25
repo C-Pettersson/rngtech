@@ -111,8 +111,8 @@ public class VacuumCollapseGeneratorMenu extends AbstractContainerMenu implement
         RefinementMenuSupport.setMachineDisplay(refinementTarget, ModBlocks.VACUUM_COLLAPSE_GENERATOR.get(), machineTraits);
 
         ItemStackHandler processInventory = generator.getProcessInventory();
-        addSlot(new TabbedSlot(processInventory, VacuumCollapseGeneratorBlockEntity.SLOT_INPUT, 43, 55, () -> selectedTab == TAB_PROCESSING));
-        addSlot(new TabbedSlot(processInventory, VacuumCollapseGeneratorBlockEntity.SLOT_RESIDUE, 195, 55, () -> selectedTab == TAB_PROCESSING));
+        addSlot(new TabbedSlot(processInventory, VacuumCollapseGeneratorBlockEntity.SLOT_INPUT, 43, 52, () -> selectedTab == TAB_PROCESSING));
+        addSlot(new TabbedSlot(processInventory, VacuumCollapseGeneratorBlockEntity.SLOT_RESIDUE, 195, 52, () -> selectedTab == TAB_PROCESSING));
 
         ItemStackHandler gearInventory = generator.getGearInventory();
         addSlot(new TabbedSlot(gearInventory, VacuumCollapseGeneratorBlockEntity.SLOT_VOID_CHAMBER, 25, 48, () -> selectedTab == TAB_GEAR));
