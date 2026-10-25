@@ -1579,6 +1579,10 @@ public class CrusherBlockEntity extends BaseMachineBlockEntity implements MenuPr
     @Override public int workOrderStage() { return ascendancyEntryStage(); }
     @Override public int workOrderMasteryLevel() { return masteryState().level(); }
     @Override public String workOrderAscendancy() { return masteryState().ascendancy(); }
+    @Override public double workOrderStat(String stat) {
+        MachineStat value = MachineStat.bySerializedName(stat);
+        return value == null ? 0 : effectiveStats().value(value);
+    }
 
     @Override public boolean masteryGearAllows(MachineProgressionState state) {
         if (MegaPassiveTree.has(state, "BLOCK_BATTERY") && isBatteryCell(inventory.getStackInSlot(SLOT_FUEL))) { return false; }

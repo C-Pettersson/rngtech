@@ -1,5 +1,6 @@
 package com.rngtech.rpg.workorder;
 
+import com.rngtech.rpg.MachineStat;
 import com.rngtech.rpg.Rarity;
 
 import com.google.gson.JsonElement;
@@ -54,6 +55,11 @@ public record WorkOrderTemplate(ResourceLocation id, String family, int tier, Re
         if (!family.isEmpty() && !WorkOrderFamilies.known(family)) { throw new IllegalArgumentException(id + ": unknown family " + family); }
         if (weight < 0) { throw new IllegalArgumentException(id + ": weight must not be negative"); }
         if (rarity == Rarity.UNIQUE) { throw new IllegalArgumentException(id + ": a Job Chip is Normal, Magic, or Rare"); }
+        for (PartSpec part : parts) {
+            if (part.filter() == WorkFilter.STAT && !WorkOrderFamilies.goalStat(family, MachineStat.bySerializedName(part.item()))) {
+                throw new IllegalArgumentException(id + ": a " + family + " stat goal cannot name " + part.item());
+            }
+        }
     }
 
     /** In the Dispatch Terminal's listing, not only given by command or quest. */
@@ -159,13 +165,16 @@ public record WorkOrderTemplate(ResourceLocation id, String family, int tier, Re
         WorkFilter filter = WorkFilter.byId(json.has("filter") ? json.get("filter").getAsString() : json.has("item") ? "item" : "any");
         if (filter == null) { throw new IllegalArgumentException("unknown filter " + json.get("filter")); }
         int minimum = json.has("min") ? json.get("min").getAsInt() : 0;
-        JsonElement count = json.get("count");
+        boolean stat = filter == WorkFilter.STAT;
+        JsonElement count = json.has("target") ? json.get("target") : json.get("count");
         if (count == null) { throw new IllegalArgumentException("a part needs a count"); }
-        WorkObjectiveEntry.Goal goal = count.isJsonObject()
-                ? new WorkObjectiveEntry.Goal(count.getAsJsonObject().get("min").getAsLong(), count.getAsJsonObject().get("max").getAsLong(),
-                        count.getAsJsonObject().has("step") ? count.getAsJsonObject().get("step").getAsLong() : 1, minimum)
-                : new WorkObjectiveEntry.Goal(count.getAsLong(), minimum);
-        return new PartSpec(filter, json.has("item") ? json.get("item").getAsString() : "", goal);
+        WorkObjectiveEntry.Goal goal = WorkObjectiveEntry.goal(count, minimum, stat ? WorkPart.STAT_SCALE : 1);
+        if (stat && MachineStat.bySerializedName(json.has("stat") ? json.get("stat").getAsString() : "") == null) {
+            throw new IllegalArgumentException("a stat part needs a known stat");
+        }
+        String item = stat ? MachineStat.bySerializedName(json.get("stat").getAsString()).getSerializedName()
+                : json.has("item") ? json.get("item").getAsString() : "";
+        return new PartSpec(filter, item, goal);
     }
 
     private static Rarity rarity(JsonObject json) {

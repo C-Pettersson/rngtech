@@ -10,6 +10,9 @@ import net.minecraft.network.codec.StreamCodec;
  * filter stay names, so a part whose verb or filter a later version drops still loads; it just stops counting.
  */
 public record WorkPart(String type, String filter, int minimum, String item, long target) {
+    /** A stat goal's target and progress are this many times the stat's value. */
+    public static final int STAT_SCALE = 100;
+
     public static final Codec<WorkPart> CODEC = RecordCodecBuilder.create(instance -> instance.group(
             Codec.STRING.fieldOf("type").forGetter(WorkPart::type),
             Codec.STRING.optionalFieldOf("filter", "any").forGetter(WorkPart::filter),
@@ -50,6 +53,12 @@ public record WorkPart(String type, String filter, int minimum, String item, lon
             case STAGE -> report.stage() >= minimum;
             case SETTING -> report.setting() >= minimum;
             case ITEM -> !item.isEmpty() && item.equals(report.item());
+            case STAT -> false;
         };
+    }
+
+    /** A stat goal, which the machine's stats meet rather than its work. */
+    public boolean statGoal() {
+        return WorkFilter.STAT.id().equals(filter);
     }
 }

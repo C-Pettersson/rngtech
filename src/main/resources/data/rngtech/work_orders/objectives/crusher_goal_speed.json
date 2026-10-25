@@ -1,0 +1,44 @@
+{
+    "family": "crusher",
+    "type": "crush",
+    "filter": "stat",
+    "stat": "processing_speed",
+    "weight": 1,
+    "tiers": [
+        {
+            "target": {
+                "min": 2.4,
+                "max": 3.1,
+                "step": 0.1
+            }
+        },
+        {
+            "target": {
+                "min": 3.7,
+                "max": 4.8,
+                "step": 0.1
+            }
+        },
+        {
+            "target": {
+                "min": 3.4,
+                "max": 4.4,
+                "step": 0.1
+            }
+        },
+        {
+            "target": {
+                "min": 2.3,
+                "max": 2.9,
+                "step": 0.1
+            }
+        },
+        {
+            "target": {
+                "min": 3.8,
+                "max": 5.0,
+                "step": 0.1
+            }
+        }
+    ]
+}

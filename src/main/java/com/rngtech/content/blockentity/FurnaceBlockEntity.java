@@ -2185,6 +2185,10 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
     @Override public int workOrderStage() { return ascendancyEntryStage(); }
     @Override public int workOrderMasteryLevel() { return masteryState().level(); }
     @Override public String workOrderAscendancy() { return masteryState().ascendancy(); }
+    @Override public double workOrderStat(String stat) {
+        MachineStat value = MachineStat.bySerializedName(stat);
+        return value == null ? 0 : effectiveStats().value(value);
+    }
 
     @Override public void masteryChanged() { resetAllCycles(); resetBulkSpeed(); clampInternalEnergy(); setChanged(); }
 

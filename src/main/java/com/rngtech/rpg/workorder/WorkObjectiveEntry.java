@@ -1,5 +1,7 @@
 package com.rngtech.rpg.workorder;
 
+import com.rngtech.rpg.MachineStat;
+
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import net.minecraft.resources.ResourceLocation;
@@ -13,10 +15,11 @@ import java.util.random.RandomGenerator;
 /**
  * One job from {@code data/<namespace>/work_orders/objectives/}: the family that can draw it, its verb and filter, a draw
  * weight, and for each of the five tiers a count range, a step the rolled count lands on, and the filter's minimum. An
- * item job also lists its item options and how many parts it names; the rolled count is split between its parts.
+ * item job also lists its item options and how many parts it names; the rolled count is split between its parts. A stat
+ * goal names its {@code stat}, and its tiers' targets are read in the stat's own units and kept in hundredths.
  */
 public record WorkObjectiveEntry(ResourceLocation id, String family, WorkObjectiveType type, WorkFilter filter, int weight,
-        int minParts, int maxParts, List<Option> options, List<Goal> tiers) {
+        int minParts, int maxParts, List<Option> options, List<Goal> tiers, String stat) {
     /** An item a job can name, the stage of its recipe, and its draw weight. */
     public record Option(String item, int stage, int weight) {
         public Option {
@@ -61,6 +64,15 @@ public record WorkObjectiveEntry(ResourceLocation id, String family, WorkObjecti
         if (filter == WorkFilter.ITEM && options.isEmpty()) { throw new IllegalArgumentException(id + ": an item job needs options"); }
         minParts = Math.clamp(minParts, 1, WorkObjective.MAX_PARTS);
         maxParts = Math.clamp(maxParts, minParts, WorkObjective.MAX_PARTS);
+        stat = stat == null ? "" : stat;
+        if (filter == WorkFilter.STAT && !WorkOrderFamilies.goalStat(family, MachineStat.bySerializedName(stat))) {
+            throw new IllegalArgumentException(id + ": a " + family + " stat goal cannot name " + stat);
+        }
+    }
+
+    public WorkObjectiveEntry(ResourceLocation id, String family, WorkObjectiveType type, WorkFilter filter, int weight,
+            int minParts, int maxParts, List<Option> options, List<Goal> tiers) {
+        this(id, family, type, filter, weight, minParts, maxParts, options, tiers, "");
     }
 
     public Goal goal(int tier) {
@@ -80,6 +92,9 @@ public record WorkObjectiveEntry(ResourceLocation id, String family, WorkObjecti
         Goal goal = goal(tier);
         long count = goal.roll(random);
         int bonus = goal.bonus(count);
+        if (filter == WorkFilter.STAT) {
+            return new WorkObjective(id, List.of(new WorkPart(type, filter, 0, MachineStat.bySerializedName(stat).getSerializedName(), count)), bonus);
+        }
         if (filter != WorkFilter.ITEM) {
             return new WorkObjective(id, List.of(new WorkPart(type, filter, goal.minimum(), "", count)), bonus);
         }
@@ -133,23 +148,28 @@ public record WorkObjectiveEntry(ResourceLocation id, String family, WorkObjecti
                 }
             }
         }
+        String stat = json.has("stat") ? json.get("stat").getAsString() : "";
         List<Goal> goals = new ArrayList<>();
         for (JsonElement element : json.getAsJsonArray("tiers")) {
             JsonObject goal = element.getAsJsonObject();
             int minimum = goal.has("min") ? goal.get("min").getAsInt() : 0;
-            JsonElement count = goal.get("count");
+            JsonElement count = goal.has("target") ? goal.get("target") : goal.get("count");
             try {
-                if (count.isJsonObject()) {
-                    JsonObject range = count.getAsJsonObject();
-                    goals.add(new Goal(range.get("min").getAsLong(), range.get("max").getAsLong(),
-                            range.has("step") ? range.get("step").getAsLong() : 1, minimum));
-                } else {
-                    goals.add(new Goal(count.getAsLong(), minimum));
-                }
+                goals.add(goal(count, minimum, filter == WorkFilter.STAT ? WorkPart.STAT_SCALE : 1));
             } catch (IllegalArgumentException exception) {
                 throw new IllegalArgumentException(id + ": " + exception.getMessage(), exception);
             }
         }
-        return new WorkObjectiveEntry(id, family, type, filter, weight, minParts, maxParts, options, goals);
+        return new WorkObjectiveEntry(id, family, type, filter, weight, minParts, maxParts, options, goals, stat);
+    }
+
+    /** A count or target, fixed or a {@code min}/{@code max}/{@code step} range, times {@code scale}. */
+    static Goal goal(JsonElement count, int minimum, int scale) {
+        if (count.isJsonObject()) {
+            JsonObject range = count.getAsJsonObject();
+            return new Goal(Math.round(range.get("min").getAsDouble() * scale), Math.round(range.get("max").getAsDouble() * scale),
+                    range.has("step") ? Math.round(range.get("step").getAsDouble() * scale) : scale, minimum);
+        }
+        return new Goal(Math.round(count.getAsDouble() * scale), minimum);
     }
 }

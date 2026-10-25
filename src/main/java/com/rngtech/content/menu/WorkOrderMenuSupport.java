@@ -1,6 +1,7 @@
 package com.rngtech.content.menu;
 
 import com.rngtech.RNGTech;
+import com.rngtech.rpg.MachineStat;
 import com.rngtech.rpg.workorder.LoadedWorkOrder;
 import com.rngtech.rpg.workorder.MachineWorkOrders;
 import com.rngtech.rpg.workorder.WorkFilter;
@@ -91,7 +92,7 @@ public final class WorkOrderMenuSupport {
             case 0 -> { WorkObjectiveType type = WorkObjectiveType.byId(value.type()); yield type == null ? 0 : type.ordinal() + 1; }
             case 1 -> { WorkFilter filter = WorkFilter.byId(value.filter()); yield filter == null ? 0 : filter.ordinal() + 1; }
             case 2 -> value.minimum();
-            case 3 -> itemId(value.item());
+            case 3 -> value.statGoal() ? statId(value.item()) : itemId(value.item());
             case 4 -> clamp(value.target());
             default -> clamp(loaded.progress().get(part));
         };
@@ -113,7 +114,7 @@ public final class WorkOrderMenuSupport {
                 parts.add(new WorkPart(
                         type >= 0 && type < WorkObjectiveType.values().length ? WorkObjectiveType.values()[type].id() : "",
                         filter >= 0 && filter < WorkFilter.values().length ? WorkFilter.values()[filter].id() : "",
-                        data.get(at + 2), itemKey(data.get(at + 3)), data.get(at + 4)));
+                        data.get(at + 2), filter == WorkFilter.STAT.ordinal() ? statKey(data.get(at + 3)) : itemKey(data.get(at + 3)), data.get(at + 4)));
                 progress.add((long) data.get(at + 5));
             }
             slots.add(new Slot(tier, data.get(start + 1), data.get(start + 2), new WorkObjective(SYNCED, parts, 0), progress, data.get(start + 4)));
@@ -129,6 +130,16 @@ public final class WorkOrderMenuSupport {
 
     private static String itemKey(int id) {
         return id <= 0 ? "" : BuiltInRegistries.ITEM.getKey(BuiltInRegistries.ITEM.byId(id - 1)).toString();
+    }
+
+    /** A stat goal's stat as its ordinal plus one, synced in the part's item field. */
+    private static int statId(String stat) {
+        MachineStat value = MachineStat.bySerializedName(stat);
+        return value == null ? 0 : value.ordinal() + 1;
+    }
+
+    private static String statKey(int id) {
+        return id <= 0 || id > MachineStat.values().length ? "" : MachineStat.byId(id - 1).getSerializedName();
     }
 
     private static int clamp(long value) {

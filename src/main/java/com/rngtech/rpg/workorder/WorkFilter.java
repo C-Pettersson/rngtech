@@ -11,7 +11,12 @@ public enum WorkFilter {
     /** Work done with a machine setting at or above the part's minimum, such as the Furnace's heat slider in percent. */
     SETTING,
     /** Work on one named input item. */
-    ITEM;
+    ITEM,
+    /**
+     * A stat goal: the machine's effective stat named by the part's item, at or above its target, which is in hundredths
+     * of the stat's value. It counts no work; the machine checks the stat each time it completes a job.
+     */
+    STAT;
 
     public String id() {
         return name().toLowerCase(Locale.ROOT);

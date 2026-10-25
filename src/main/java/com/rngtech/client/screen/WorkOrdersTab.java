@@ -172,7 +172,7 @@ final class WorkOrdersTab {
         graphics.fill(left, barTop, barRight, barTop + 5, ROW_BORDER);
         graphics.fill(left + 1, barTop + 1, barRight - 1, barTop + 4, BAR_EMPTY);
         graphics.fill(left + 1, barTop + 1, left + 1 + filled, barTop + 4, slot.done() ? DONE : accent);
-        Component count = Component.translatable("rngtech.work_order.tab.progress", slot.totalProgress(), slot.totalTarget());
+        Component count = JobChipItem.progressText(slot.objective(), slot.totalProgress());
         graphics.drawString(font, count, right - font.width(count), barTop - 2, active ? TEXT : TEXT_MUTED, false);
     }
 

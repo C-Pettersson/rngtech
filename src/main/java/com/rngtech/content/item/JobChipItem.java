@@ -4,6 +4,8 @@ import com.rngtech.content.registry.ModDataComponents;
 import com.rngtech.content.workorder.WorkOrderEligibility;
 import com.rngtech.content.workorder.WorkOrderRewards;
 import com.rngtech.rpg.MachineModifier;
+import com.rngtech.rpg.MachineStat;
+import com.rngtech.rpg.MachineStatDisplay;
 import com.rngtech.rpg.MachineTraits;
 import com.rngtech.rpg.workorder.WorkFilter;
 import com.rngtech.rpg.workorder.WorkObjective;
@@ -93,7 +95,30 @@ public class JobChipItem extends Item {
         if (type == null || filter == null) {
             return Component.translatable("rngtech.work_order.objective.unknown");
         }
+        if (filter == WorkFilter.STAT) {
+            MachineStat stat = MachineStat.bySerializedName(part.item());
+            return stat == null ? Component.translatable("rngtech.work_order.objective.unknown")
+                    : Component.translatable("rngtech.work_order.part.stat", Component.translatable(stat.translationKey()), statText(stat, part.target()));
+        }
         return Component.translatable("rngtech.work_order.part." + type.id() + "." + filter.id(), part.target(), part.minimum(), itemName(part.item()));
+    }
+
+    /** A stat goal's value in hundredths, written the way the Stats tab writes that stat. */
+    public static String statText(MachineStat stat, long hundredths) {
+        return MachineStatDisplay.statValue(stat, hundredths / (double) WorkPart.STAT_SCALE);
+    }
+
+    /**
+     * A job's progress against its target: items for counted work, and for a one-part stat goal the machine's value at
+     * its last completed job against the target, both written as the stat.
+     */
+    public static Component progressText(WorkObjective objective, long progress) {
+        WorkPart first = objective.parts().getFirst();
+        MachineStat stat = first.statGoal() ? MachineStat.bySerializedName(first.item()) : null;
+        if (stat != null && objective.parts().size() == 1) {
+            return Component.translatable("rngtech.work_order.tab.progress", statText(stat, progress), statText(stat, first.target()));
+        }
+        return Component.translatable("rngtech.work_order.tab.progress", progress, objective.totalTarget());
     }
 
     /**
@@ -239,8 +264,8 @@ public class JobChipItem extends Item {
         }
         WorkOrderProgress progress = stack.get(ModDataComponents.WORK_ORDER_PROGRESS.get());
         if (progress != null && !progress.isNone()) {
-            tooltipComponents.add(Component.translatable("rngtech.tooltip.work_order.progress", progress.progress().stream().mapToLong(Long::longValue).sum(), order.objective().totalTarget())
-                    .withStyle(ChatFormatting.GRAY));
+            tooltipComponents.add(Component.translatable("rngtech.tooltip.work_order.progress_line",
+                    progressText(order.objective(), progress.progress().stream().mapToLong(Long::longValue).sum())).withStyle(ChatFormatting.GRAY));
         }
         if (progress != null && progress.rushDeadline() > 0) {
             long now = ClientWorld.gameTime();

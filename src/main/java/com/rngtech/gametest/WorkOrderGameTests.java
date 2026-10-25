@@ -389,6 +389,29 @@ public final class WorkOrderGameTests {
         helper.succeed();
     }
 
+    /** A stat goal reads the Crusher's effective stat at each completed job, and is met once the stat reaches its target. */
+    @GameTest(template = MachineTestSupport.EMPTY)
+    public static void statGoalsReadTheMachine(GameTestHelper helper) {
+        CrusherBlockEntity crusher = steelCrusher(helper, new BlockPos(2, 1, 2));
+        double speed = crusher.workOrderStat("processing_speed");
+        long current = Math.round(speed * WorkPart.STAT_SCALE);
+        check(speed > 0 && speed == crusher.effectiveStats().value(MachineStat.PROCESSING_SPEED), "The Crusher did not report its Processing Speed");
+        WorkOrder high = new WorkOrder("crusher", 1, new WorkObjective(RNGTech.id("goal_high"),
+                new WorkPart(WorkObjectiveType.CRUSH, WorkFilter.STAT, 0, "processing_speed", current + 50)), 4, 0, 100, 0);
+        WorkOrder low = new WorkOrder("crusher", 1, new WorkObjective(RNGTech.id("goal_low"),
+                new WorkPart(WorkObjectiveType.CRUSH, WorkFilter.STAT, 0, "processing_speed", Math.max(1, current - 10))), 4, 0, 100, 0);
+        crusher.setWorkOrders(MachineWorkOrders.EMPTY.withLoaded(new LoadedWorkOrder(high, MachineTraits.EMPTY))
+                .withLoaded(new LoadedWorkOrder(low, MachineTraits.EMPTY)));
+        crusher.workOrderWork(new WorkReport(WorkObjectiveType.CRUSH, 1, 0, "minecraft:raw_iron", 1));
+        LoadedWorkOrder reading = crusher.workOrders().orders().get(0);
+        check(reading.totalProgress() == current && !reading.fulfilled(), "The goal did not show the Crusher's speed below its target: " + reading.progress());
+        check(WorkOrderOperations.perform(helper.makeMockPlayer(GameType.SURVIVAL), crusher, "activate", "1"), "The Crusher refused to switch goals");
+        crusher.workOrderWork(new WorkReport(WorkObjectiveType.CRUSH, 1, 0, "minecraft:raw_iron", 1));
+        check(crusher.workOrders().orders().get(1).fulfilled() && crusher.workOrders().active() == MachineWorkOrders.NONE,
+                "A goal under the Crusher's speed was not met at the next job: " + crusher.workOrders());
+        helper.succeed();
+    }
+
     /** The Crusher's menu as the server sees it after the screen opens the Orders tab, so Shift-click fills the bays. */
     private static CrusherMenu ordersMenu(CrusherBlockEntity crusher, Player player) {
         CrusherMenu menu = (CrusherMenu) crusher.createMenu(1, player.getInventory(), player);

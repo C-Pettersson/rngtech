@@ -1,5 +1,6 @@
 package com.rngtech.rpg.workorder;
 
+import com.rngtech.rpg.MachineStat;
 import com.rngtech.rpg.MachineTraits;
 
 import com.google.gson.JsonObject;
@@ -32,6 +33,7 @@ public final class WorkOrderRuleChecks {
         itemJobs(shipped);
         rewardAmounts();
         rush();
+        statGoals(shipped);
         reachable(shipped);
         return checks;
     }
@@ -204,6 +206,7 @@ public final class WorkOrderRuleChecks {
                     case SETTING -> minimum <= 100;
                     case ITEM -> !entry.options(stage, item -> true).isEmpty()
                             && entry.options().stream().allMatch(option -> hasRecipe(entry.type(), option.item()));
+                    case STAT -> WorkOrderFamilies.goalStat(entry.family(), MachineStat.bySerializedName(entry.stat()));
                 };
                 require(ok, entry.id() + " Tier " + tier + " is reachable on a Stage " + stage + " chassis");
             }
@@ -233,6 +236,44 @@ public final class WorkOrderRuleChecks {
 
     private static WorkOrder order(String family, int minStage, int minMasteryLevel) {
         return new WorkOrder(family, 1, single(WorkFilter.STAGE, 3, "", 256), minStage, minMasteryLevel, 100, 0);
+    }
+
+    /**
+     * Stat goals: each family ships some, their targets roll in hundredths of the stat, a goal tracks the machine's value at
+     * each completed job, can fall back, and is met only at or above the target. The tiers' targets come from the level-1
+     * processing balance simulation, so they are pinned here until it can run with Mastery again.
+     */
+    private static void statGoals(List<WorkObjectiveEntry> shipped) {
+        List<WorkObjectiveEntry> goals = shipped.stream().filter(entry -> entry.filter() == WorkFilter.STAT).toList();
+        require(goals.stream().anyMatch(entry -> entry.family().equals("crusher")) && goals.stream().anyMatch(entry -> entry.family().equals("furnace")),
+                "the Crusher and Furnace ship stat goals");
+        WorkObjectiveEntry speed = goals.stream().filter(entry -> entry.family().equals("crusher") && entry.stat().equals("processing_speed")).findFirst().orElseThrow();
+        require(speed.goal(1).min() == 240 && speed.goal(1).max() == 310 && speed.goal(1).step() == 10, "a stat goal's target is kept in hundredths");
+        WorkObjective objective = speed.roll(1, 4, new SplittableRandom(3L), item -> true);
+        WorkPart part = objective.parts().getFirst();
+        require(part.statGoal() && part.item().equals("processing_speed") && part.target() >= 240 && part.target() <= 310 && part.target() % 10 == 0,
+                "a stat goal rolls its target on its step: " + part);
+        WorkReport crush = new WorkReport(WorkObjectiveType.CRUSH, 8, 0, "", 50);
+        require(!part.counts(crush), "a stat goal counts no work");
+
+        var orders = MachineWorkOrders.EMPTY.withLoaded(loaded(new WorkOrder("crusher", 1, objective, 4, 0, 100, 0)));
+        require(WorkOrderRules.reachStats(orders, stat -> 0) == orders, "a stat at 0 changes nothing");
+        var partway = WorkOrderRules.reachStats(orders, stat -> stat.equals("processing_speed") ? 1.5 : 99);
+        require(partway.activeOrder().totalProgress() == 150 && !partway.activeOrder().fulfilled(), "a goal shows the machine's value below the target");
+        var lower = WorkOrderRules.reachStats(partway, stat -> 1.2);
+        require(lower.activeOrder().totalProgress() == 120, "a goal's progress falls when the stat falls");
+        var met = WorkOrderRules.reachStats(lower, stat -> 9.0);
+        require(met.activeOrder() == null && met.orders().getFirst().fulfilled() && met.orders().getFirst().totalProgress() == part.target(),
+                "a goal at or above its target is met, and the chip leaves the active slot");
+        require(WorkOrderRules.reachStats(met.withActive(0), stat -> 0) .equals(met.withActive(0)), "a met goal never falls back");
+        try {
+            WorkObjectiveEntry.parse(id("bad_goal"), JsonParser.parseString(
+                    "{\"family\": \"crusher\", \"type\": \"crush\", \"filter\": \"stat\", \"stat\": \"heat_transfer\", \"tiers\": [{\"target\": 2}, {\"target\": 2}, {\"target\": 2}, {\"target\": 2}, {\"target\": 2}]}").getAsJsonObject());
+        } catch (IllegalArgumentException expected) {
+            checks++;
+            return;
+        }
+        throw new AssertionError("a Crusher stat goal named a stat the Crusher does not read");
     }
 
     /** Rush deadlines: half the tier's target time, a rounded-up bonus, and expiry that spares finished chips. */

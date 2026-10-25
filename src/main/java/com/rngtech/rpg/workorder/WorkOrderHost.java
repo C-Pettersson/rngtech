@@ -38,10 +38,17 @@ public interface WorkOrderHost {
     /** The ascendancy a Completed Job Chip records for its reward rolls, or "" for none. */
     default String workOrderAscendancy() { return ""; }
 
-    /** Counts finished work toward the active chip. A chip that reaches its target stays in its bay, finished and inactive. */
+    /** The machine's effective value of the stat named {@code stat}, for stat goals; 0 for a stat it does not read. */
+    default double workOrderStat(String stat) { return 0; }
+
+    /**
+     * Counts finished work toward the active chip, then checks its stat goals against the machine's stats. A chip that
+     * reaches every target stays in its bay, finished and inactive.
+     */
     default void workOrderWork(WorkReport report) {
         MachineWorkOrders orders = workOrders();
         WorkOrderRules.Progress result = WorkOrderRules.progress(orders.withoutExpired(workOrderGameTime()), report);
-        if (result.orders() != orders) { setWorkOrders(result.orders()); }
+        MachineWorkOrders next = WorkOrderRules.reachStats(result.orders(), this::workOrderStat);
+        if (next != orders) { setWorkOrders(next); }
     }
 }

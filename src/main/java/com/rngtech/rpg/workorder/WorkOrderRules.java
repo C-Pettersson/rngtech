@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
+import java.util.function.ToDoubleFunction;
 import java.util.random.RandomGenerator;
 
 /** Rolling, loading, counting, and paying out Work Orders, apart from any machine or world. */
@@ -140,6 +141,25 @@ public final class WorkOrderRules {
         }
         if (advanced == active) { return new Progress(orders, null); }
         return new Progress(orders.withReplaced(orders.active(), advanced), advanced.fulfilled() ? advanced : null);
+    }
+
+    /**
+     * Checks the active chip's stat goals after a completed job: each one's progress becomes the machine's current value,
+     * in hundredths and capped at the target, so it can fall as well as rise until the goal is met. A chip whose every part
+     * is met is done. Returns the same chips when nothing changed.
+     */
+    public static MachineWorkOrders reachStats(MachineWorkOrders orders, ToDoubleFunction<String> statValue) {
+        LoadedWorkOrder active = orders.activeOrder();
+        if (active == null) { return orders; }
+        LoadedWorkOrder next = active;
+        List<WorkPart> parts = active.order().objective().parts();
+        for (int index = 0; index < parts.size(); index++) {
+            WorkPart part = parts.get(index);
+            if (!part.statGoal() || active.progress().get(index) >= part.target()) { continue; }
+            long value = Math.max(0, Math.round(statValue.applyAsDouble(part.item()) * WorkPart.STAT_SCALE));
+            next = next.withPartProgress(index, Math.min(part.target(), value));
+        }
+        return next.equals(active) ? orders : orders.withReplaced(orders.active(), next);
     }
 
     /**
