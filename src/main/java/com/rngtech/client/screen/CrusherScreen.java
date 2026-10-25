@@ -192,7 +192,7 @@ public class CrusherScreen extends AbstractContainerScreen<CrusherMenu> implemen
             renderConfiguration(guiGraphics);
         } else if (menu.selectedTab() == CrusherMenu.TAB_REFINEMENT) {
             renderRefinement(guiGraphics);
-        } else {
+        } else if (menu.selectedTab() == CrusherMenu.TAB_MASTERY) {
             masterySupport.render(guiGraphics, leftPos, topPos, imageWidth, imageHeight, mouseX, mouseY);
         }
     }
