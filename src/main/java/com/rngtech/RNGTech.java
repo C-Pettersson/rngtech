@@ -28,6 +28,7 @@ import com.rngtech.content.registry.ModSounds;
 import com.rngtech.content.registry.ModStructures;
 import com.rngtech.content.tool.FieldToolEvents;
 import com.rngtech.content.tool.RestrictedTools;
+import com.rngtech.content.workorder.WorkObjectiveCatalog;
 
 import com.mojang.logging.LogUtils;
 import net.minecraft.core.cauldron.CauldronInteraction;
@@ -94,6 +95,7 @@ public final class RNGTech {
         NeoForge.EVENT_BUS.addListener(MinersCompanionEvents::onPlayerTick);
         NeoForge.EVENT_BUS.addListener(CorruptionDataEvents::onAddReloadListeners);
         NeoForge.EVENT_BUS.addListener(DormantSiteCatalog::onAddReloadListeners);
+        NeoForge.EVENT_BUS.addListener(WorkObjectiveCatalog::onAddReloadListeners);
         NeoForge.EVENT_BUS.addListener(DormantSites::onLevelTick);
         NeoForge.EVENT_BUS.addListener(CorruptionDataEvents::onDatapackSync);
         NeoForge.EVENT_BUS.addListener(RNGTechCommands::register);

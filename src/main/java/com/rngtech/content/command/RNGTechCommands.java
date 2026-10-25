@@ -5,16 +5,21 @@ import com.rngtech.content.cable.CableStats;
 import com.rngtech.content.dormant.DormantSiteIndex;
 import com.rngtech.content.dormant.DormantSites;
 import com.rngtech.content.item.GlyphItem;
+import com.rngtech.content.item.JobChipItem;
 import com.rngtech.content.registry.ModItems;
+import com.rngtech.content.workorder.WorkOrderJobs;
+import com.rngtech.rpg.MachineTraits;
 import com.rngtech.rpg.PhaseArrayRules;
 import com.rngtech.rpg.unique.UniqueCatalog;
 import com.rngtech.rpg.unique.UniqueDefinition;
+import com.rngtech.rpg.workorder.WorkOrder;
 
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.exceptions.DynamicCommandExceptionType;
+import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.SharedSuggestionProvider;
@@ -29,6 +34,7 @@ import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
 
 import java.util.Collection;
+import java.util.SplittableRandom;
 import java.util.stream.Collectors;
 
 /**
@@ -38,6 +44,8 @@ import java.util.stream.Collectors;
  * charged ones. {@code /rngtech dormant restore <same|random>}: brings every site back, husks included.
  */
 public final class RNGTechCommands {
+    private static final SimpleCommandExceptionType NO_WORK_ORDER_OBJECTIVES =
+            new SimpleCommandExceptionType(Component.translatable("rngtech.command.work_order.no_objectives"));
     private static final DynamicCommandExceptionType UNKNOWN_UNIQUE =
             new DynamicCommandExceptionType(id -> Component.translatable("rngtech.command.unique.unknown", id));
 
@@ -65,6 +73,13 @@ public final class RNGTechCommands {
                                 .then(Commands.argument("targets", EntityArgument.players())
                                         .then(Commands.argument("tier", IntegerArgumentType.integer(1, PhaseArrayRules.GLYPH_TIERS))
                                                 .executes(RNGTechCommands::giveGlyph)))))
+                .then(Commands.literal("work_order")
+                        .then(Commands.literal("give")
+                                .then(Commands.argument("targets", EntityArgument.players())
+                                        .then(Commands.literal("random")
+                                                .executes(context -> giveWorkOrder(context, 0))
+                                                .then(Commands.argument("tier", IntegerArgumentType.integer(WorkOrder.MIN_TIER, WorkOrder.MAX_TIER))
+                                                        .executes(context -> giveWorkOrder(context, IntegerArgumentType.getInteger(context, "tier"))))))))
                 .then(Commands.literal("cable")
                         .then(Commands.literal("stats")
                                 .executes(RNGTechCommands::cableStats)
@@ -127,6 +142,24 @@ public final class RNGTechCommands {
             }
         }
         context.getSource().sendSuccess(() -> Component.translatable("rngtech.command.glyph.given", GlyphItem.numeral(tier), targets.size()), true);
+        return targets.size();
+    }
+
+    /** Gives each target a random order of {@code tier}, or of a random tier as the Dispatch Terminal rolls one when it is 0. */
+    private static int giveWorkOrder(CommandContext<CommandSourceStack> context, int tier) throws CommandSyntaxException {
+        Collection<ServerPlayer> targets = EntityArgument.getPlayers(context, "targets");
+        for (ServerPlayer player : targets) {
+            SplittableRandom random = new SplittableRandom(player.getRandom().nextLong());
+            WorkOrder order = WorkOrderJobs.roll(player.level(), player.blockPosition(), tier, random);
+            if (order == null) {
+                throw NO_WORK_ORDER_OBJECTIVES.create();
+            }
+            ItemStack stack = JobChipItem.of(ModItems.JOB_CHIP.get(), order, MachineTraits.EMPTY);
+            if (!player.getInventory().add(stack)) {
+                player.drop(stack, false);
+            }
+        }
+        context.getSource().sendSuccess(() -> Component.translatable("rngtech.command.work_order.given", targets.size()), true);
         return targets.size();
     }
 

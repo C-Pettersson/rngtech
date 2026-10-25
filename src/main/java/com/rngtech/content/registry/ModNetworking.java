@@ -24,6 +24,9 @@ public final class ModNetworking {
         registrar.playToServer(com.rngtech.content.network.MasteryActionPayload.TYPE,
                 com.rngtech.content.network.MasteryActionPayload.STREAM_CODEC,
                 com.rngtech.content.network.MasteryActionPayload::handle);
+        registrar.playToServer(com.rngtech.content.network.WorkOrderActionPayload.TYPE,
+                com.rngtech.content.network.WorkOrderActionPayload.STREAM_CODEC,
+                com.rngtech.content.network.WorkOrderActionPayload::handle);
         registrar.playToServer(
                 WrenchOverlayRequestPayload.TYPE,
                 WrenchOverlayRequestPayload.STREAM_CODEC,

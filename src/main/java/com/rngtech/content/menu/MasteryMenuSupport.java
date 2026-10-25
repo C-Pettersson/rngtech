@@ -12,6 +12,8 @@ import com.rngtech.rpg.progression.MegaPassiveTree;
 import com.rngtech.rpg.progression.PassiveProgressionView;
 import com.rngtech.rpg.unique.UniqueCatalog;
 import com.rngtech.rpg.unique.UniqueStatLine;
+import com.rngtech.rpg.workorder.MachineWorkOrders;
+import com.rngtech.rpg.workorder.WorkOrderHost;
 
 import net.minecraft.util.Mth;
 import net.minecraft.world.inventory.ContainerData;
@@ -38,7 +40,9 @@ public final class MasteryMenuSupport {
     /** Declared stats granted by the ascendancy, as a stat id plus one and its value times 100. */
     private static final int GRANTED_STATS_START = ASCENDANCY_NODES_START + AscendancyCatalog.MAX_POINTS;
     public static final int GRANTED_STAT_SLOTS = 8;
-    public static final int FIELD_COUNT = GRANTED_STATS_START + GRANTED_STAT_SLOTS * 2;
+    /** The machine's loaded Work Orders, synced through {@link WorkOrderMenuSupport}. */
+    private static final int WORK_ORDER_START = GRANTED_STATS_START + GRANTED_STAT_SLOTS * 2;
+    public static final int FIELD_COUNT = WORK_ORDER_START + WorkOrderMenuSupport.FIELD_COUNT;
 
     private static final Map<MachineMasteryHost, List<MachineStat>> SHOWN = Collections.synchronizedMap(new WeakHashMap<>());
 
@@ -51,6 +55,9 @@ public final class MasteryMenuSupport {
             return (int) Math.round(stats.get().value(attribute(field - ATTRIBUTE_START)) * 100);
         }
         if (field == ENTRY_STAGE) { return host.ascendancyEntryStage(); }
+        if (field >= WORK_ORDER_START) {
+            return WorkOrderMenuSupport.get(host instanceof WorkOrderHost machine ? machine.workOrders() : MachineWorkOrders.EMPTY, field - WORK_ORDER_START);
+        }
         if (field >= GRANTED_STATS_START) {
             int slot = (field - GRANTED_STATS_START) / 2;
             // Sync reads fields in order, so the list is built once per pass, at the first granted-stat field.
@@ -95,6 +102,11 @@ public final class MasteryMenuSupport {
             }
         }
         return granted;
+    }
+
+    /** The machine's loaded Work Orders synced into {@code data}. */
+    public static WorkOrderMenuSupport.View workOrders(ContainerData data, int base) {
+        return WorkOrderMenuSupport.view(data, base + WORK_ORDER_START);
     }
 
     /** The chosen ascendancy as its catalog index plus one, and its nodes as their index in that ascendancy plus one. */

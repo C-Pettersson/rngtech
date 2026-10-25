@@ -1,0 +1,371 @@
+{
+  "type": "rngtech:challenge",
+  "pools": [
+    {
+      "rolls": 1,
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "rngtech:chaos_crystal",
+          "weight": 20,
+          "functions": [
+            {
+              "function": "rngtech:set_order_count",
+              "counts": [
+                2,
+                3,
+                4,
+                5,
+                6
+              ]
+            }
+          ]
+        },
+        {
+          "type": "minecraft:item",
+          "name": "rngtech:expansion_crystal",
+          "weight": 14,
+          "functions": [
+            {
+              "function": "rngtech:set_order_count",
+              "counts": [
+                1,
+                2,
+                2,
+                3,
+                4
+              ]
+            }
+          ]
+        },
+        {
+          "type": "minecraft:item",
+          "name": "rngtech:null_crystal",
+          "weight": 12,
+          "functions": [
+            {
+              "function": "rngtech:set_order_count",
+              "counts": [
+                1,
+                1,
+                2,
+                2,
+                3
+              ]
+            }
+          ]
+        },
+        {
+          "type": "minecraft:item",
+          "name": "rngtech:affix_modifier",
+          "weight": 14,
+          "functions": [
+            {
+              "function": "rngtech:set_order_count",
+              "counts": [
+                1,
+                1,
+                2,
+                2,
+                3
+              ]
+            }
+          ]
+        },
+        {
+          "type": "minecraft:item",
+          "name": "rngtech:mastery_refund",
+          "weight": 12,
+          "functions": [
+            {
+              "function": "rngtech:set_order_count",
+              "counts": [
+                2,
+                3,
+                4,
+                6,
+                8
+              ]
+            }
+          ]
+        },
+        {
+          "type": "minecraft:item",
+          "name": "rngtech:requisition",
+          "weight": 12,
+          "functions": [
+            {
+              "function": "rngtech:set_order_count",
+              "counts": [
+                1,
+                1,
+                2,
+                2,
+                3
+              ]
+            }
+          ]
+        },
+        {
+          "type": "minecraft:item",
+          "name": "rngtech:glyph",
+          "weight": 10,
+          "functions": [
+            {
+              "function": "rngtech:set_order_tier"
+            }
+          ]
+        },
+        {
+          "type": "minecraft:item",
+          "name": "rngtech:volatile_catalyst",
+          "weight": 4,
+          "conditions": [
+            {
+              "condition": "rngtech:order_tier",
+              "min": 3
+            }
+          ],
+          "functions": [
+            {
+              "function": "rngtech:set_order_count",
+              "counts": [
+                1,
+                1,
+                1,
+                1,
+                2
+              ]
+            }
+          ]
+        },
+        {
+          "type": "minecraft:item",
+          "name": "rngtech:affix_upgrade",
+          "weight": 4,
+          "conditions": [
+            {
+              "condition": "rngtech:order_tier",
+              "min": 3
+            }
+          ],
+          "functions": [
+            {
+              "function": "rngtech:set_order_count",
+              "counts": [
+                1,
+                1,
+                1,
+                2,
+                2
+              ]
+            }
+          ]
+        },
+        {
+          "type": "minecraft:item",
+          "name": "rngtech:ascension_matrix",
+          "weight": 2,
+          "conditions": [
+            {
+              "condition": "rngtech:order_tier",
+              "min": 3
+            }
+          ],
+          "functions": [
+            {
+              "function": "rngtech:set_order_count",
+              "counts": [
+                1,
+                1,
+                1,
+                1,
+                1
+              ]
+            }
+          ]
+        },
+        {
+          "type": "minecraft:item",
+          "name": "rngtech:unique_potato_battery_cell",
+          "weight": 1,
+          "conditions": [
+            {
+              "condition": "rngtech:order_prestige",
+              "min": 2
+            },
+            {
+              "condition": "rngtech:unique_loot_enabled",
+              "unique": "rngtech:unique_potato_battery_cell"
+            }
+          ],
+          "functions": [
+            {
+              "function": "rngtech:unidentified_unique"
+            }
+          ]
+        },
+        {
+          "type": "minecraft:item",
+          "name": "rngtech:fortress_heater_element",
+          "weight": 1,
+          "conditions": [
+            {
+              "condition": "rngtech:order_prestige",
+              "min": 2
+            },
+            {
+              "condition": "rngtech:unique_loot_enabled",
+              "unique": "rngtech:fortress_heater_element"
+            }
+          ],
+          "functions": [
+            {
+              "function": "rngtech:unidentified_unique"
+            }
+          ]
+        },
+        {
+          "type": "minecraft:item",
+          "name": "rngtech:igloo_basement_thermostat",
+          "weight": 1,
+          "conditions": [
+            {
+              "condition": "rngtech:order_prestige",
+              "min": 2
+            },
+            {
+              "condition": "rngtech:unique_loot_enabled",
+              "unique": "rngtech:igloo_basement_thermostat"
+            }
+          ],
+          "functions": [
+            {
+              "function": "rngtech:unidentified_unique"
+            }
+          ]
+        },
+        {
+          "type": "minecraft:item",
+          "name": "rngtech:mineshaft_worn_pick_jaw",
+          "weight": 1,
+          "conditions": [
+            {
+              "condition": "rngtech:order_prestige",
+              "min": 2
+            },
+            {
+              "condition": "rngtech:unique_loot_enabled",
+              "unique": "rngtech:mineshaft_worn_pick_jaw"
+            }
+          ],
+          "functions": [
+            {
+              "function": "rngtech:unidentified_unique"
+            }
+          ]
+        },
+        {
+          "type": "minecraft:item",
+          "name": "rngtech:crying_crucible",
+          "weight": 1,
+          "conditions": [
+            {
+              "condition": "rngtech:order_prestige",
+              "min": 2
+            },
+            {
+              "condition": "rngtech:unique_loot_enabled",
+              "unique": "rngtech:crying_crucible"
+            }
+          ],
+          "functions": [
+            {
+              "function": "rngtech:unidentified_unique"
+            }
+          ]
+        },
+        {
+          "type": "minecraft:item",
+          "name": "rngtech:trial_vault_escapement",
+          "weight": 1,
+          "conditions": [
+            {
+              "condition": "rngtech:order_prestige",
+              "min": 2
+            },
+            {
+              "condition": "rngtech:unique_loot_enabled",
+              "unique": "rngtech:trial_vault_escapement"
+            }
+          ],
+          "functions": [
+            {
+              "function": "rngtech:unidentified_unique"
+            }
+          ]
+        },
+        {
+          "type": "minecraft:item",
+          "name": "rngtech:witch_bottle_reflux_pump",
+          "weight": 1,
+          "conditions": [
+            {
+              "condition": "rngtech:order_prestige",
+              "min": 2
+            },
+            {
+              "condition": "rngtech:unique_loot_enabled",
+              "unique": "rngtech:witch_bottle_reflux_pump"
+            }
+          ],
+          "functions": [
+            {
+              "function": "rngtech:unidentified_unique"
+            }
+          ]
+        },
+        {
+          "type": "minecraft:item",
+          "name": "rngtech:ancient_echo_control_board",
+          "weight": 1,
+          "conditions": [
+            {
+              "condition": "rngtech:order_prestige",
+              "min": 2
+            },
+            {
+              "condition": "rngtech:unique_loot_enabled",
+              "unique": "rngtech:ancient_echo_control_board"
+            }
+          ],
+          "functions": [
+            {
+              "function": "rngtech:unidentified_unique"
+            }
+          ]
+        },
+        {
+          "type": "minecraft:item",
+          "name": "rngtech:bastion_coin_stack_capacitor",
+          "weight": 1,
+          "conditions": [
+            {
+              "condition": "rngtech:order_prestige",
+              "min": 2
+            },
+            {
+              "condition": "rngtech:unique_loot_enabled",
+              "unique": "rngtech:bastion_coin_stack_capacitor"
+            }
+          ],
+          "functions": [
+            {
+              "function": "rngtech:unidentified_unique"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

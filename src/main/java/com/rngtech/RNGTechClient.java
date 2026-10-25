@@ -54,6 +54,7 @@ import com.rngtech.client.screen.DebugBatteryScreen;
 import com.rngtech.client.screen.DebugChestScreen;
 import com.rngtech.client.screen.DebugRerollerScreen;
 import com.rngtech.client.screen.DebugTankScreen;
+import com.rngtech.client.screen.DispatchTerminalScreen;
 import com.rngtech.client.screen.DormantMachineScreen;
 import com.rngtech.client.screen.ForestryCartScreen;
 import com.rngtech.client.screen.ForestryCartStationScreen;
@@ -157,6 +158,7 @@ public final class RNGTechClient {
         event.register(ModMenus.EXOTIC_AFFIX_FORGE.get(), PhaseCradleScreen::new);
         event.register(ModMenus.DEBUG_REROLLER.get(), DebugRerollerScreen::new);
         event.register(ModMenus.DEBUG_CHEST.get(), DebugChestScreen::new);
+        event.register(ModMenus.DISPATCH_TERMINAL.get(), DispatchTerminalScreen::new);
         event.register(ModMenus.DEBUG_TANK.get(), DebugTankScreen::new);
         event.register(ModMenus.DEBUG_BATTERY.get(), DebugBatteryScreen::new);
         event.register(ModMenus.TOOL_BENCH.get(), ToolBenchScreen::new);

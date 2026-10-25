@@ -93,6 +93,7 @@ public class CrusherScreen extends AbstractContainerScreen<CrusherMenu> {
             MachineStat.CRUSHER_INPUT_FILTER
     };
     private final MasteryScreenSupport<MegaPassiveNode> masterySupport;
+    private final WorkOrdersTab workOrdersTab;
 
     private static Map<MegaPassiveNode, ResourceLocation> createMasteryIconTextures() {
         Map<MegaPassiveNode, ResourceLocation> textures = new java.util.HashMap<>();
@@ -145,6 +146,7 @@ public class CrusherScreen extends AbstractContainerScreen<CrusherMenu> {
                         MASTERY_RING
                 )
         );
+        workOrdersTab = new WorkOrdersTab(menu, STAT_ACCENT);
     }
 
     @Override
@@ -161,6 +163,12 @@ public class CrusherScreen extends AbstractContainerScreen<CrusherMenu> {
         renderStatTooltips(guiGraphics, mouseX, mouseY);
         if (menu.selectedTab() == CrusherMenu.TAB_MASTERY) {
             masterySupport.renderTooltips(guiGraphics, font, leftPos, topPos, imageWidth, imageHeight, mouseX, mouseY);
+        }
+        if (menu.selectedTab() == CrusherMenu.TAB_ORDERS) {
+            List<Component> orderTooltip = workOrdersTab.tooltip(mouseX, mouseY, leftPos, topPos, imageWidth, imageHeight);
+            if (!orderTooltip.isEmpty()) {
+                guiGraphics.renderComponentTooltip(font, orderTooltip, mouseX, mouseY);
+            }
         }
         RefinementScreenStyle.renderTooltips(guiGraphics, font, leftPos, topPos, mouseX, mouseY, menu.selectedTab() == RefinementScreenStyle.REFINEMENT_TAB_INDEX, menu.machineTraits(), menu);
         GearSlotTooltips.render(this, guiGraphics, font, mouseX, mouseY);
@@ -180,6 +188,8 @@ public class CrusherScreen extends AbstractContainerScreen<CrusherMenu> {
             renderConfiguration(guiGraphics);
         } else if (menu.selectedTab() == CrusherMenu.TAB_REFINEMENT) {
             renderRefinement(guiGraphics);
+        } else if (menu.selectedTab() == CrusherMenu.TAB_ORDERS) {
+            workOrdersTab.render(guiGraphics, leftPos, topPos, imageWidth, imageHeight, mouseX, mouseY);
         } else {
             masterySupport.render(guiGraphics, leftPos, topPos, imageWidth, imageHeight, mouseX, mouseY);
         }
@@ -200,7 +210,7 @@ public class CrusherScreen extends AbstractContainerScreen<CrusherMenu> {
             drawConfigurationLabels(guiGraphics);
         } else if (menu.selectedTab() == CrusherMenu.TAB_REFINEMENT) {
             drawRefinementLabels(guiGraphics);
-        } else {
+        } else if (menu.selectedTab() == CrusherMenu.TAB_MASTERY) {
             masterySupport.drawLabels(guiGraphics, font, imageWidth);
         }
     }
@@ -226,6 +236,14 @@ public class CrusherScreen extends AbstractContainerScreen<CrusherMenu> {
             }
             if (isOverTab(mouseX, mouseY, 4)) {
                 selectTab(CrusherMenu.TAB_MASTERY);
+                return true;
+            }
+            if (isOverTab(mouseX, mouseY, 5)) {
+                selectTab(CrusherMenu.TAB_ORDERS);
+                return true;
+            }
+            if (menu.selectedTab() == CrusherMenu.TAB_ORDERS
+                    && workOrdersTab.mouseClicked(mouseX, mouseY, button, leftPos, topPos, imageWidth, imageHeight)) {
                 return true;
             }
             if (menu.selectedTab() == CrusherMenu.TAB_REFINEMENT
@@ -259,6 +277,9 @@ public class CrusherScreen extends AbstractContainerScreen<CrusherMenu> {
 
     @Override
     public boolean mouseScrolled(double mouseX, double mouseY, double scrollX, double scrollY) {
+        if (menu.selectedTab() == CrusherMenu.TAB_ORDERS) {
+            return workOrdersTab.mouseScrolled(scrollY);
+        }
         if (menu.selectedTab() == CrusherMenu.TAB_MASTERY
                 && masterySupport.mouseScrolled(mouseX, mouseY, scrollX, scrollY, leftPos, topPos, imageWidth, imageHeight)) {
             return true;
@@ -306,6 +327,7 @@ public class CrusherScreen extends AbstractContainerScreen<CrusherMenu> {
         renderTab(guiGraphics, 2, Component.translatable("rngtech.tab.stats"), menu.selectedTab() == CrusherMenu.TAB_CONFIGURATION);
         renderTab(guiGraphics, 3, Component.translatable("rngtech.tab.refinement.short"), menu.selectedTab() == CrusherMenu.TAB_REFINEMENT);
         renderTab(guiGraphics, 4, Component.translatable("rngtech.tab.mastery.short"), menu.selectedTab() == CrusherMenu.TAB_MASTERY);
+        renderTab(guiGraphics, 5, Component.translatable("rngtech.tab.orders"), menu.selectedTab() == CrusherMenu.TAB_ORDERS);
     }
 
     private void renderTab(GuiGraphics guiGraphics, int index, Component label, boolean selected) {

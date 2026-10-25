@@ -1,0 +1,48 @@
+{
+    "family": "furnace",
+    "type": "smelt",
+    "filter": "setting",
+    "weight": 2,
+    "tiers": [
+        {
+            "count": {
+                "min": 152,
+                "max": 232,
+                "step": 8
+            },
+            "min": 50
+        },
+        {
+            "count": {
+                "min": 208,
+                "max": 304,
+                "step": 8
+            },
+            "min": 55
+        },
+        {
+            "count": {
+                "min": 256,
+                "max": 384,
+                "step": 8
+            },
+            "min": 60
+        },
+        {
+            "count": {
+                "min": 304,
+                "max": 464,
+                "step": 8
+            },
+            "min": 70
+        },
+        {
+            "count": {
+                "min": 360,
+                "max": 536,
+                "step": 8
+            },
+            "min": 80
+        }
+    ]
+}

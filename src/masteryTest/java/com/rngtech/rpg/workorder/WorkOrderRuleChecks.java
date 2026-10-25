@@ -1,0 +1,292 @@
+package com.rngtech.rpg.workorder;
+
+import com.rngtech.rpg.MachineTraits;
+
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import net.minecraft.resources.ResourceLocation;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.SplittableRandom;
+import java.util.stream.Stream;
+
+/** Rolling, loading, counting, and reward rolls for Work Orders, run from {@code MasteryChecks}. */
+public final class WorkOrderRuleChecks {
+    private static int checks;
+
+    private WorkOrderRuleChecks() { }
+
+    public static int run() {
+        checks = 0;
+        List<WorkObjectiveEntry> shipped = shippedObjectives();
+        rolls(shipped);
+        ranges(shipped);
+        loadRules();
+        counting();
+        itemJobs(shipped);
+        rewardAmounts();
+        reachable(shipped);
+        return checks;
+    }
+
+    private static void rolls(List<WorkObjectiveEntry> shipped) {
+        for (int tier = WorkOrder.MIN_TIER; tier <= WorkOrder.MAX_TIER; tier++) {
+            WorkOrder first = WorkOrderRules.roll(shipped, tier, new SplittableRandom(42L));
+            require(first != null && first.equals(WorkOrderRules.roll(List.copyOf(shipped).reversed(), tier, new SplittableRandom(42L))),
+                    "a roll for a seed and tier does not depend on load order");
+            require(first.tier() == tier && first.minMasteryLevel() == 0 && first.bounty() == WorkOrder.BASE_BOUNTY + first.objective().bonus()
+                    && first.prestige() == 0, "a rolled order has base Bounty plus its band bonus and no Mastery level requirement");
+            require(first.minStage() == Math.min(WorkOrder.tierStage(tier), WorkOrderFamilies.topStage(first.family())),
+                    "a rolled order asks for its tier's stage, capped at the family's top stage");
+        }
+        require(WorkOrderRules.roll(List.of(), 1, new SplittableRandom(1L)) == null, "nothing rolls without objectives");
+
+        var melter = entry("rngtech:melt", "melter", 1);
+        require(WorkOrderRules.roll(List.of(melter), 5, new SplittableRandom(1L)).minStage() == 6,
+                "a Tier V Melter order asks for the Melter's top stage");
+        var heavy = entry("rngtech:heavy", "crusher", 3);
+        var light = entry("rngtech:light", "furnace", 1);
+        var random = new SplittableRandom(7L);
+        int heavyDraws = 0;
+        Set<String> families = new HashSet<>();
+        for (int i = 0; i < 4_000; i++) {
+            WorkOrder rolled = WorkOrderRules.roll(List.of(heavy, light), 2, random);
+            families.add(rolled.family());
+            if (rolled.objective().id().equals(heavy.id())) { heavyDraws++; }
+        }
+        require(families.size() == 2 && heavyDraws > 2_700 && heavyDraws < 3_300, "objective weights set the roll odds, and each objective names its family");
+        WorkObjective fixed = heavy.roll(2, 8, random, item -> true);
+        require(fixed.totalTarget() == 20 && fixed.parts().getFirst().minimum() == 2 && fixed.bonus() == 0, "a fixed goal rolls its count with no band bonus");
+
+        var tiers = new int[WorkOrder.MAX_TIER + 1];
+        for (int i = 0; i < 10_000; i++) { tiers[WorkOrderRules.roll(List.of(heavy, light), random).tier()]++; }
+        boolean even = true;
+        for (int tier = WorkOrder.MIN_TIER; tier <= WorkOrder.MAX_TIER; tier++) { even &= tiers[tier] > 1_800 && tiers[tier] < 2_200; }
+        require(even, "a board roll picks every tier equally often");
+    }
+
+    private static void ranges(List<WorkObjectiveEntry> shipped) {
+        var goal = new WorkObjectiveEntry.Goal(208, 304, 8, 3);
+        var random = new SplittableRandom(3L);
+        int[] bands = new int[3];
+        boolean onStep = true;
+        for (int i = 0; i < 6_000; i++) {
+            long count = goal.roll(random);
+            onStep &= count >= 208 && count <= 304 && count % 8 == 0;
+            int bonus = goal.bonus(count);
+            double position = (count - 208) / 96.0;
+            int band = position < 1.0 / 3.0 ? 0 : position < 2.0 / 3.0 ? 1 : 2;
+            require(bonus == new int[] {0, 10, 20}[band], "the band bonus matches the band " + count + " falls in");
+            bands[band]++;
+        }
+        require(onStep, "a rolled count stays in its range on a multiple of its step");
+        require(bands[0] > 1_500 && bands[1] > 1_500 && bands[2] > 1_500, "counts land in all three bands");
+        require(goal.bonus(208) == 0 && goal.bonus(304) == 20 && goal.bonus(256) == 10, "the low, middle, and high bands pay 0, 10, and 20");
+        require(new WorkObjectiveEntry.Goal(9, 15, 8, 0).roll(random) == 9, "a range with no multiple of the step rolls its minimum");
+        for (WorkObjectiveEntry entry : shipped) {
+            for (int tier = WorkOrder.MIN_TIER; tier <= WorkOrder.MAX_TIER; tier++) {
+                WorkOrder order = WorkOrderRules.roll(List.of(entry), tier, random);
+                require(order.bounty() == WorkOrder.BASE_BOUNTY + order.objective().bonus(), entry.id() + " pays its band bonus as Bounty");
+                var tierGoal = entry.goal(tier);
+                require(tierGoal.max() > tierGoal.min(), entry.id() + " Tier " + tier + " rolls a count range");
+            }
+        }
+    }
+
+    private static void loadRules() {
+        var empty = MachineWorkOrders.EMPTY;
+        var tierOne = order("crusher", 4, 0);
+        require(WorkOrderRules.loadFailure(empty, "crusher", 4, 1, tierOne) == null, "a level 1 Stage 4 Crusher loads an order with no level requirement");
+        require("blank".equals(WorkOrderRules.loadFailure(empty, "crusher", 8, 100, null)), "a blank order never loads");
+        require("family".equals(WorkOrderRules.loadFailure(empty, "furnace", 8, 100, tierOne)), "an order loads only on its family");
+        require("stage".equals(WorkOrderRules.loadFailure(empty, "crusher", 3, 100, tierOne)), "an order needs its stage");
+        var veteran = order("crusher", 4, 60);
+        require("level".equals(WorkOrderRules.loadFailure(empty, "crusher", 8, 59, veteran))
+                && WorkOrderRules.loadFailure(empty, "crusher", 8, 60, veteran) == null, "an order with a level requirement needs that Mastery level");
+        require("level".equals(WorkOrderRules.loadFailure(empty, "crusher", 8, 0, veteran)),
+                "a machine without Mastery cannot load an order that needs a Mastery level");
+        var full = empty.withLoaded(loaded(tierOne)).withLoaded(loaded(tierOne)).withLoaded(loaded(tierOne));
+        require("full".equals(WorkOrderRules.loadFailure(full, "crusher", 8, 100, tierOne)), "a machine holds three orders");
+    }
+
+    private static void counting() {
+        var first = loaded(new WorkOrder("crusher", 2, single(WorkFilter.STAGE, 6, "", 10), 5, 0, 100, 0));
+        var second = loaded(new WorkOrder("crusher", 1, single(WorkFilter.STAGE, 3, "", 5), 4, 0, 100, 0));
+        var orders = MachineWorkOrders.EMPTY.withLoaded(first).withLoaded(second);
+        require(WorkOrderRules.progress(orders, crush(WorkObjectiveType.SMELT, 99, "", 3)).orders() == orders, "other work does not count");
+        require(WorkOrderRules.progress(orders, crush(WorkObjectiveType.CRUSH, 5, "", 3)).orders() == orders, "work below the minimum does not count");
+        require(WorkOrderRules.progress(orders.withActive(MachineWorkOrders.NONE), crush(WorkObjectiveType.CRUSH, 8, "", 3)).orders()
+                .equals(orders.withActive(MachineWorkOrders.NONE)), "a machine with no active chip counts nothing");
+        var three = WorkOrderRules.progress(orders, crush(WorkObjectiveType.CRUSH, 6, "", 3));
+        require(three.fulfilled() == null && three.orders().orders().get(0).totalProgress() == 3 && three.orders().orders().get(1).totalProgress() == 0,
+                "matching work counts each item a batch completes, toward the active chip only");
+        var switched = WorkOrderRules.progress(three.orders().withActive(1), crush(WorkObjectiveType.CRUSH, 4, "", 2)).orders();
+        require(switched.orders().get(0).totalProgress() == 3 && switched.orders().get(1).totalProgress() == 2,
+                "after a switch, work counts toward the new active chip and the old one keeps its progress");
+        var done = WorkOrderRules.progress(switched, crush(WorkObjectiveType.CRUSH, 8, "", 9));
+        require(done.fulfilled() != null && done.fulfilled().fulfilled() && done.fulfilled().totalProgress() == 5, "the chip fulfils at its target");
+        require(done.orders().orders().size() == 2 && done.orders().active() == MachineWorkOrders.NONE
+                && done.orders().orders().get(0).totalProgress() == 3 && done.orders().orders().get(1).fulfilled(),
+                "a fulfilled chip stays in its bay, inactive, and no other chip becomes active");
+        require(done.orders().withActive(1) == done.orders(), "a fulfilled chip cannot be made active again");
+        require(new MachineWorkOrders(done.orders().orders(), 1).active() == MachineWorkOrders.NONE, "a stored active index never points at a fulfilled chip");
+
+        var items = new WorkObjective(id("items"), List.of(new WorkPart(WorkObjectiveType.CRUSH, WorkFilter.ITEM, 0, "rngtech:raw_tin", 4),
+                new WorkPart(WorkObjectiveType.CRUSH, WorkFilter.ITEM, 0, "rngtech:raw_lead", 3)), 0);
+        var multi = MachineWorkOrders.EMPTY.withLoaded(loaded(new WorkOrder("crusher", 1, items, 4, 0, 100, 0)));
+        var tin = WorkOrderRules.progress(multi, crush(WorkObjectiveType.CRUSH, 2, "rngtech:raw_tin", 6));
+        require(tin.fulfilled() == null && tin.orders().activeOrder().progress().equals(List.of(4L, 0L)),
+                "an item part counts only its item and stops at its target");
+        require(WorkOrderRules.progress(tin.orders(), crush(WorkObjectiveType.CRUSH, 2, "rngtech:raw_iron", 5)).orders() == tin.orders(),
+                "an item no part names does not count");
+        var both = WorkOrderRules.progress(tin.orders(), crush(WorkObjectiveType.CRUSH, 3, "rngtech:raw_lead", 3));
+        require(both.fulfilled() != null && both.fulfilled().progress().equals(List.of(4L, 3L)), "a job with several parts is done when every part is");
+    }
+
+    private static void itemJobs(List<WorkObjectiveEntry> shipped) {
+        var random = new SplittableRandom(5L);
+        for (WorkObjectiveEntry entry : shipped) {
+            if (entry.filter() != WorkFilter.ITEM) { continue; }
+            int[] sizes = new int[WorkObjective.MAX_PARTS + 1];
+            for (int i = 0; i < 2_000; i++) {
+                int tier = WorkOrder.MIN_TIER + i % WorkOrder.MAX_TIER;
+                int cap = Math.min(WorkOrder.tierStage(tier), WorkOrderFamilies.topStage(entry.family()));
+                WorkObjective job = entry.roll(tier, cap, random, item -> true);
+                List<String> named = job.parts().stream().map(WorkPart::item).toList();
+                require(named.size() == named.stream().distinct().count(), entry.id() + " never names one item twice");
+                require(job.totalTarget() <= entry.goal(tier).max(), entry.id() + " splits its count between its parts");
+                for (WorkPart part : job.parts()) {
+                    int stage = entry.options().stream().filter(option -> option.item().equals(part.item())).findFirst().orElseThrow().stage();
+                    require(stage <= cap, entry.id() + " names " + part.item() + " only where a Stage " + cap + " chassis can run it");
+                }
+                sizes[job.parts().size()]++;
+            }
+            require(sizes[1] > 0 && sizes[2] > 0 && sizes[3] > 0, entry.id() + " rolls jobs of one, two, and three items");
+            require(entry.roll(1, 4, random, item -> false) == null, entry.id() + " rolls nothing when no option has a loaded recipe");
+        }
+    }
+
+    private static void rewardAmounts() {
+        var random = new SplittableRandom(11L);
+        boolean always = true;
+        int extra = 0;
+        int samples = 20_000;
+        for (int i = 0; i < samples; i++) {
+            always &= WorkOrderRules.scaledAmount(3, 100, random) == 3;
+            int amount = WorkOrderRules.scaledAmount(3, 150, random);
+            always &= amount == 4 || amount == 5;
+            if (amount == 5) { extra++; }
+        }
+        require(always, "100% Bounty pays the base amount, and 150% of 3 pays 4 or 5");
+        require(extra > samples * 0.48 && extra < samples * 0.52, "150% of 3 pays 5 half the time");
+        require(WorkOrderRules.scaledAmount(1, 0, random) == 1, "a reward always pays at least one");
+        require(WorkOrderRules.scaledAmount(2, 300, random) == 6, "300% Bounty triples the amount");
+    }
+
+    /** Every shipped objective's minimum is met by at least one recipe a chassis at the tier's stage can run. */
+    private static void reachable(List<WorkObjectiveEntry> shipped) {
+        List<Integer> crushLevels = crusherLevels();
+        for (WorkObjectiveEntry entry : shipped) {
+            for (int tier = WorkOrder.MIN_TIER; tier <= WorkOrder.MAX_TIER; tier++) {
+                int minimum = entry.goal(tier).minimum();
+                int stage = Math.min(WorkOrder.tierStage(tier), WorkOrderFamilies.topStage(entry.family()));
+                boolean ok = switch (entry.filter()) {
+                    case ANY -> true;
+                    case STAGE -> entry.type() == WorkObjectiveType.CRUSH
+                            ? crushLevels.stream().anyMatch(level -> level >= minimum && level <= stage) : minimum <= stage;
+                    case SETTING -> minimum <= 100;
+                    case ITEM -> !entry.options(stage, item -> true).isEmpty()
+                            && entry.options().stream().allMatch(option -> hasRecipe(entry.type(), option.item()));
+                };
+                require(ok, entry.id() + " Tier " + tier + " is reachable on a Stage " + stage + " chassis");
+            }
+        }
+    }
+
+    private static List<WorkObjectiveEntry> shippedObjectives() {
+        Path root = projectRoot().resolve("src/main/resources/data/rngtech/work_orders/objectives");
+        List<WorkObjectiveEntry> entries = new ArrayList<>();
+        for (Path file : jsonFiles(root)) {
+            String name = file.getFileName().toString().replace(".json", "");
+            entries.add(WorkObjectiveEntry.parse(id(name), read(file)));
+        }
+        require(entries.stream().anyMatch(entry -> entry.family().equals("crusher"))
+                && entries.stream().anyMatch(entry -> entry.family().equals("furnace")), "the Crusher and Furnace ship objectives");
+        return entries;
+    }
+
+    private static List<Integer> crusherLevels() {
+        List<Integer> levels = new ArrayList<>();
+        for (Path file : jsonFiles(projectRoot().resolve("src/main/resources/data/rngtech/recipe/crusher"))) {
+            JsonObject recipe = read(file);
+            if (recipe.has("required_processing_level")) { levels.add(recipe.get("required_processing_level").getAsInt()); }
+        }
+        return levels;
+    }
+
+    private static WorkOrder order(String family, int minStage, int minMasteryLevel) {
+        return new WorkOrder(family, 1, single(WorkFilter.STAGE, 3, "", 256), minStage, minMasteryLevel, 100, 0);
+    }
+
+    private static LoadedWorkOrder loaded(WorkOrder order) {
+        return new LoadedWorkOrder(order, MachineTraits.EMPTY);
+    }
+
+    private static WorkObjectiveEntry entry(String id, String family, int weight) {
+        List<WorkObjectiveEntry.Goal> goals = new ArrayList<>();
+        for (int tier = 1; tier <= WorkOrder.MAX_TIER; tier++) { goals.add(new WorkObjectiveEntry.Goal(tier * 10L, tier)); }
+        return new WorkObjectiveEntry(ResourceLocation.parse(id), family, WorkObjectiveType.CRUSH, WorkFilter.STAGE, weight, 1, 1, List.of(), goals);
+    }
+
+    private static WorkObjective single(WorkFilter filter, int minimum, String item, long target) {
+        return new WorkObjective(id("test"), new WorkPart(WorkObjectiveType.CRUSH, filter, minimum, item, target));
+    }
+
+    private static WorkReport crush(WorkObjectiveType type, int stage, String item, long amount) {
+        return new WorkReport(type, stage, stage, item, amount);
+    }
+
+    /** Whether an item option has its recipe: a Crusher recipe named after the raw item, or a Furnace smelt from the crushed item. */
+    private static boolean hasRecipe(WorkObjectiveType type, String item) {
+        String path = item.substring(item.indexOf(':') + 1);
+        Path recipes = projectRoot().resolve("src/main/resources/data/rngtech/recipe");
+        return type == WorkObjectiveType.CRUSH
+                ? Files.exists(recipes.resolve("crusher/" + path + ".json"))
+                : Files.exists(recipes.resolve("furnace/metals/" + path.replace("crushed_", "") + "_from_crushed.json"));
+    }
+
+    private static ResourceLocation id(String path) {
+        return ResourceLocation.fromNamespaceAndPath("rngtech", path);
+    }
+
+    private static List<Path> jsonFiles(Path root) {
+        try (Stream<Path> files = Files.walk(root)) {
+            return files.filter(file -> file.toString().endsWith(".json")).sorted().toList();
+        } catch (IOException exception) {
+            throw new IllegalStateException("Cannot read " + root, exception);
+        }
+    }
+
+    private static JsonObject read(Path file) {
+        try {
+            return JsonParser.parseString(Files.readString(file)).getAsJsonObject();
+        } catch (IOException exception) {
+            throw new IllegalStateException("Cannot read " + file, exception);
+        }
+    }
+
+    private static Path projectRoot() {
+        for (Path dir = Path.of("").toAbsolutePath(); dir != null; dir = dir.getParent()) {
+            if (Files.exists(dir.resolve("settings.gradle"))) { return dir; }
+        }
+        throw new IllegalStateException("No project root above " + Path.of("").toAbsolutePath());
+    }
+
+    private static void require(boolean condition, String label) { checks++; if (!condition) { throw new AssertionError(label); } }
+}

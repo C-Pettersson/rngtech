@@ -16,6 +16,7 @@ import com.rngtech.content.menu.MasteryMenuSupport;
 import com.rngtech.content.recipe.FurnaceRecipe;
 import com.rngtech.content.registry.ModBlockEntities;
 import com.rngtech.content.registry.ModTags;
+import com.rngtech.content.workorder.WorkOrderEligibility;
 import com.rngtech.rpg.BatchProcessing;
 import com.rngtech.rpg.ComponentBaseStatCatalog;
 import com.rngtech.rpg.MachineBaseStatCatalog;
@@ -38,10 +39,15 @@ import com.rngtech.rpg.progression.MachineMasteryHost;
 import com.rngtech.rpg.progression.MachineProgressionState;
 import com.rngtech.rpg.progression.MegaPassiveNode;
 import com.rngtech.rpg.progression.MegaPassiveTree;
+import com.rngtech.rpg.workorder.WorkObjectiveType;
+import com.rngtech.rpg.workorder.WorkOrderFamilies;
+import com.rngtech.rpg.workorder.WorkOrderHost;
+import com.rngtech.rpg.workorder.WorkReport;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
@@ -73,7 +79,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
 
-public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuProvider, MachineInfoProvider, MachineMasteryHost {
+public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuProvider, MachineInfoProvider, MachineMasteryHost, WorkOrderHost {
     public static final int MAX_PROCESSING_SLOTS = 4;
     /** Every lane shares the furnace's one Gear slot, so one Heat Core drives a whole Lead Furnace. */
     public static final int MAX_GEAR_SLOTS = 1;
@@ -1112,9 +1118,11 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
         }
 
         result = withLedger(recipe, stats, input, result, outputSlot, reserved);
+        String inputId = BuiltInRegistries.ITEM.getKey(input.getItem()).toString();
         input.shrink(1);
         mergeOutput(outputSlot, result);
         grantRecipeXp(recipe);
+        workOrderWork(new WorkReport(WorkObjectiveType.SMELT, WorkOrderEligibility.smeltStage(recipe), isElectric() ? heatSlider : 0, inputId, 1));
         refundClosedLoopEnergy(recipe, stats);
         return true;
     }
@@ -1171,6 +1179,7 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
         internalEnergy = Math.min(capacity, stored + refund);
     }
 
+    /** The material stage of a recipe's metal, read from its failure or malformed material, or 0 when it names none. */
     private void grantRecipeXp(FurnaceRecipe recipe) {
         if (recipe.machineXp() <= 0) {
             return;
@@ -2168,6 +2177,10 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
     @Override public int ascendancyEntryStage() { return furnaceMaterial().stage(); }
 
     @Override public MachineProgressionState machineProgression() { return super.machineProgression().forFamily(masteryFamily()); }
+    @Override public String workOrderFamily() { return WorkOrderFamilies.of(masteryFamily()); }
+    @Override public int workOrderStage() { return ascendancyEntryStage(); }
+    @Override public int workOrderMasteryLevel() { return masteryState().level(); }
+    @Override public String workOrderAscendancy() { return masteryState().ascendancy(); }
 
     @Override public void masteryChanged() { resetAllCycles(); resetBulkSpeed(); clampInternalEnergy(); setChanged(); }
 

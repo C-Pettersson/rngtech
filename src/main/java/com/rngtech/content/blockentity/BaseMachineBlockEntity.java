@@ -33,6 +33,7 @@ import com.rngtech.rpg.PhaseArrayRules;
 import com.rngtech.rpg.progression.MachineMasteryHost;
 import com.rngtech.rpg.progression.MachineProgressionState;
 import com.rngtech.rpg.progression.MegaPassiveTree;
+import com.rngtech.rpg.workorder.MachineWorkOrders;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -231,6 +232,19 @@ public abstract class BaseMachineBlockEntity extends BlockEntity implements Refi
             behaviors = MegaPassiveTree.behaviors(state);
         }
         return behaviors.contains(behavior);
+    }
+
+    /** The Work Orders loaded into this machine, stored as a component so they drop with it. */
+    public MachineWorkOrders workOrders() {
+        MachineWorkOrders orders = components().get(ModDataComponents.WORK_ORDERS.get());
+        return orders == null ? MachineWorkOrders.EMPTY : orders;
+    }
+
+    public void setWorkOrders(MachineWorkOrders orders) {
+        DataComponentMap.Builder builder = DataComponentMap.builder().addAll(components());
+        builder.set(ModDataComponents.WORK_ORDERS.get(), orders == null || orders.isEmpty() ? null : orders);
+        setComponents(builder.build());
+        setChanged();
     }
 
     public void setMachineProgression(MachineProgressionState progression) {

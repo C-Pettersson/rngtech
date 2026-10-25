@@ -24,8 +24,9 @@ import net.neoforged.neoforge.items.IItemHandlerModifiable;
 import java.util.List;
 
 /**
- * Loot tables RNGTech rolls when a machine event happens, so packs can reward machine challenges. Every shipped table is
- * empty; packs fill them by datapack, and conditions read the event through {@link #CONTEXT}.
+ * Loot tables RNGTech rolls when a machine event happens, so packs can reward machine challenges. The shipped tables hold
+ * only default Glyph drops, and the Work Order table its default rewards; packs change them by datapack, and conditions
+ * read the event through {@link #CONTEXT}.
  */
 public final class ChallengeLoot {
     public static final LootContextParam<ChallengeContext> CONTEXT = new LootContextParam<>(RNGTech.id("challenge"));
@@ -41,8 +42,10 @@ public final class ChallengeLoot {
     public static final ResourceKey<LootTable> VACUUM_COLLAPSE = table("vacuum_collapse");
     public static final ResourceKey<LootTable> FORESTRY_HARVEST = table("forestry_harvest");
     public static final ResourceKey<LootTable> MASTERY_LEVEL = table("mastery_level");
+    /** Rolled once per reward roll of a Fulfilled Work Order; {@code rngtech:order_roll} tells the rolls apart. */
+    public static final ResourceKey<LootTable> WORK_ORDER = table("work_order");
     public static final List<ResourceKey<LootTable>> TABLES =
-            List.of(CALIBRATION, CRUSHER_JAM, HEAT_FAILURE, VACUUM_COLLAPSE, FORESTRY_HARVEST, MASTERY_LEVEL);
+            List.of(CALIBRATION, CRUSHER_JAM, HEAT_FAILURE, VACUUM_COLLAPSE, FORESTRY_HARVEST, MASTERY_LEVEL, WORK_ORDER);
 
     private ChallengeLoot() {
     }

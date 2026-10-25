@@ -41,6 +41,7 @@ import com.rngtech.content.item.CalibrationPatternItem;
 import com.rngtech.content.item.CathodeItem;
 import com.rngtech.content.item.CavitationPartItem;
 import com.rngtech.content.item.CollapseNozzleItem;
+import com.rngtech.content.item.CompletedJobChipItem;
 import com.rngtech.content.item.ComponentRecyclerBlockItem;
 import com.rngtech.content.item.CompressorTankBlockItem;
 import com.rngtech.content.item.ConfiguratorItem;
@@ -56,6 +57,7 @@ import com.rngtech.content.item.FurnaceChassisBlockItem;
 import com.rngtech.content.item.GasChemistryPartItem;
 import com.rngtech.content.item.GlyphItem;
 import com.rngtech.content.item.ItemConnectorItem;
+import com.rngtech.content.item.JobChipItem;
 import com.rngtech.content.item.MachineBlockItem;
 import com.rngtech.content.item.MachineChassisItem;
 import com.rngtech.content.item.MalformedIngotItem;
@@ -71,6 +73,7 @@ import com.rngtech.content.item.PurgeBucketItem;
 import com.rngtech.content.item.RefinementConsumableItem;
 import com.rngtech.content.item.RefinementLensItem;
 import com.rngtech.content.item.RefinementModifierItem;
+import com.rngtech.content.item.RequisitionItem;
 import com.rngtech.content.item.ResonanceCalibratorBlockItem;
 import com.rngtech.content.item.ServoItem;
 import com.rngtech.content.item.SolarArrayControllerBlockItem;
@@ -188,6 +191,10 @@ public final class ModItems {
     public static final DeferredItem<BlockItem> DEBUG_REROLLER = ITEMS.register(
             "debug_reroller",
             () -> new BlockItem(ModBlocks.DEBUG_REROLLER.get(), new Item.Properties().stacksTo(1))
+    );
+    public static final DeferredItem<BlockItem> DISPATCH_TERMINAL = ITEMS.register(
+            "dispatch_terminal",
+            () -> new BlockItem(ModBlocks.DISPATCH_TERMINAL.get(), new Item.Properties().stacksTo(1))
     );
     public static final DeferredItem<BlockItem> DEBUG_CHEST = ITEMS.register(
             "debug_chest",
@@ -841,6 +848,18 @@ public final class ModItems {
     public static final DeferredItem<GlyphItem> GLYPH = ITEMS.register(
             "glyph",
             () -> new GlyphItem(new Item.Properties())
+    );
+    public static final DeferredItem<JobChipItem> JOB_CHIP = ITEMS.register(
+            "job_chip",
+            () -> new JobChipItem(new Item.Properties().stacksTo(16))
+    );
+    public static final DeferredItem<RequisitionItem> REQUISITION = ITEMS.register(
+            "requisition",
+            () -> new RequisitionItem(new Item.Properties())
+    );
+    public static final DeferredItem<CompletedJobChipItem> COMPLETED_JOB_CHIP = ITEMS.register(
+            "completed_job_chip",
+            () -> new CompletedJobChipItem(new Item.Properties().stacksTo(16))
     );
 
     public static final Map<String, DeferredItem<Item>> MATERIAL_ITEMS = registerMaterialItems();

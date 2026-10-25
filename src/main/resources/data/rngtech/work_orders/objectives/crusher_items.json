@@ -1,0 +1,105 @@
+{
+    "family": "crusher",
+    "type": "crush",
+    "filter": "item",
+    "weight": 3,
+    "parts": {
+        "min": 1,
+        "max": 3
+    },
+    "options": [
+        {
+            "item": "minecraft:raw_iron",
+            "stage": 2
+        },
+        {
+            "item": "minecraft:raw_copper",
+            "stage": 2
+        },
+        {
+            "item": "minecraft:raw_gold",
+            "stage": 2
+        },
+        {
+            "item": "rngtech:raw_tin",
+            "stage": 2
+        },
+        {
+            "item": "rngtech:raw_zinc",
+            "stage": 2
+        },
+        {
+            "item": "rngtech:raw_lead",
+            "stage": 3
+        },
+        {
+            "item": "rngtech:raw_nickel",
+            "stage": 3
+        },
+        {
+            "item": "rngtech:raw_silver",
+            "stage": 3
+        },
+        {
+            "item": "rngtech:raw_aluminum",
+            "stage": 4
+        },
+        {
+            "item": "rngtech:raw_osmium",
+            "stage": 4
+        },
+        {
+            "item": "rngtech:raw_titanium",
+            "stage": 5
+        },
+        {
+            "item": "rngtech:raw_platinum",
+            "stage": 6
+        },
+        {
+            "item": "rngtech:raw_tungsten",
+            "stage": 6
+        },
+        {
+            "item": "rngtech:raw_naquadah",
+            "stage": 8
+        }
+    ],
+    "tiers": [
+        {
+            "count": {
+                "min": 160,
+                "max": 240,
+                "step": 8
+            }
+        },
+        {
+            "count": {
+                "min": 208,
+                "max": 312,
+                "step": 8
+            }
+        },
+        {
+            "count": {
+                "min": 256,
+                "max": 384,
+                "step": 8
+            }
+        },
+        {
+            "count": {
+                "min": 304,
+                "max": 456,
+                "step": 8
+            }
+        },
+        {
+            "count": {
+                "min": 352,
+                "max": 528,
+                "step": 8
+            }
+        }
+    ]
+}

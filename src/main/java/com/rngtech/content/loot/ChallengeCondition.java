@@ -25,7 +25,10 @@ public final class ChallengeCondition {
         RECIPE_STAGE(ChallengeContext::recipeStage),
         CALIBRATION_STABILITY(ChallengeContext::stability),
         INSTABILITY(ChallengeContext::instability),
-        MASTERY_LEVEL(ChallengeContext::masteryLevel);
+        MASTERY_LEVEL(ChallengeContext::masteryLevel),
+        ORDER_TIER(ChallengeContext::orderTier),
+        ORDER_PRESTIGE(ChallengeContext::prestige),
+        ORDER_ROLL(ChallengeContext::orderRoll);
 
         private final ToIntFunction<ChallengeContext> value;
 
