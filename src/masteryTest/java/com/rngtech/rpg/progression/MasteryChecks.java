@@ -61,6 +61,7 @@ public final class MasteryChecks {
         checks += SoulTransferChecks.run();
         checks += com.rngtech.rpg.workorder.WorkOrderStorageChecks.run();
         checks += com.rngtech.rpg.workorder.WorkOrderRuleChecks.run();
+        checks += com.rngtech.rpg.workorder.WorkOrderTemplateChecks.run();
         checks += com.rngtech.rpg.dormant.DormantChecks.run();
         checks += PartGenerationChecks.run();
         checks += com.rngtech.rpg.PhaseArrayChecks.run();

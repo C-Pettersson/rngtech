@@ -125,6 +125,10 @@ public final class RNGTechConfig {
             .comment("Whether the default Work Order recipes load: the Dispatch Terminal and Requisitions. Disable it to award them through quests, loot, or custom recipes instead.")
             .define("workOrders.recipesEnabled", true);
 
+    public static final ModConfigSpec.BooleanValue WORK_ORDER_RANDOM_ENABLED = BUILDER
+            .comment("Whether the Dispatch Terminal and /rngtech work_order give random roll random jobs from the objectives. Disable it to list only the job templates a datapack puts in the terminal's pool.")
+            .define("workOrders.randomOrdersEnabled", true);
+
     public static final ModConfigSpec.EnumValue<RestrictedToolMode> RESTRICTED_TOOLS_MODE = BUILDER
             .comment("What happens to tools in the rngtech:restricted_tools item tag (stone through netherite pickaxes, axes, and shovels by default; wooden tools reach no ore and stay free). NORMAL leaves them alone; WEAKENED slows their mining by restrictedTools.weakenedSpeedMultiplier; USELESS makes them mine, harvest, strip, and flatten like an empty hand.")
             .defineEnum("restrictedTools.mode", RestrictedToolMode.NORMAL);

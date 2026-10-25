@@ -209,7 +209,7 @@ public final class WorkOrderRuleChecks {
         }
     }
 
-    private static List<WorkObjectiveEntry> shippedObjectives() {
+    static List<WorkObjectiveEntry> shippedObjectives() {
         Path root = projectRoot().resolve("src/main/resources/data/rngtech/work_orders/objectives");
         List<WorkObjectiveEntry> entries = new ArrayList<>();
         for (Path file : jsonFiles(root)) {

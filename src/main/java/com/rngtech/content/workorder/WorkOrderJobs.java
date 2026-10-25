@@ -1,16 +1,20 @@
 package com.rngtech.content.workorder;
 
+import com.rngtech.RNGTechConfig;
 import com.rngtech.content.registry.ModRecipes;
 import com.rngtech.rpg.workorder.WorkOrder;
 import com.rngtech.rpg.workorder.WorkOrderRules;
+import com.rngtech.rpg.workorder.WorkOrderTemplate;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.component.ItemContainerContents;
 import net.minecraft.world.item.crafting.SingleRecipeInput;
 import net.minecraft.world.level.Level;
 
+import java.util.List;
 import java.util.function.Predicate;
 import java.util.random.RandomGenerator;
 
@@ -19,13 +23,33 @@ public final class WorkOrderJobs {
     private WorkOrderJobs() {
     }
 
-    /** A random job of {@code tier}, or of a random tier when it is 0, with its reward rolled; null when nothing can roll. */
+    /**
+     * A listing the way the Dispatch Terminal rolls one, of {@code tier} or of a random tier when it is 0: a random job, or
+     * a pooled template by weight; with {@code workOrders.randomOrdersEnabled} off, only pooled templates. Its reward is
+     * rolled or fixed. Null when nothing can roll.
+     */
     public static WorkOrder roll(Level level, BlockPos pos, int tier, RandomGenerator random) {
-        Predicate<String> available = itemAvailable(level);
-        WorkOrder order = tier > 0
-                ? WorkOrderRules.roll(WorkObjectiveCatalog.all(), tier, random, available)
-                : WorkOrderRules.roll(WorkObjectiveCatalog.all(), random, available);
-        return order == null ? null : WorkOrderRewards.withRewards(level, pos, order, random);
+        WorkOrder order = WorkOrderRules.roll(WorkObjectiveCatalog.all(), RNGTechConfig.WORK_ORDER_RANDOM_ENABLED.get(), WorkOrderTemplateCatalog.all(),
+                tier, random, itemAvailable(level));
+        return order == null ? null : withRewards(level, pos, order, WorkOrderTemplateCatalog.get(ResourceLocation.tryParse(order.template())), random);
+    }
+
+    /** The template's job, of {@code tier} or of a random tier when it is 0, unless the template fixes one; null when it cannot roll. */
+    public static WorkOrder roll(Level level, BlockPos pos, WorkOrderTemplate template, int tier, RandomGenerator random) {
+        int rolledTier = tier > 0 ? tier : WorkOrder.MIN_TIER + random.nextInt(WorkOrder.MAX_TIER - WorkOrder.MIN_TIER + 1);
+        WorkOrder order = template.roll(rolledTier, WorkObjectiveCatalog.byId(), random, itemAvailable(level));
+        return order == null ? null : withRewards(level, pos, order, template, random);
+    }
+
+    /** {@code order} with its template's fixed rewards, or with its reward table rolled. */
+    private static WorkOrder withRewards(Level level, BlockPos pos, WorkOrder order, WorkOrderTemplate template, RandomGenerator random) {
+        if (template != null && !template.rewards().isEmpty()) {
+            List<ItemStack> stacks = template.rewards().stream()
+                    .map(reward -> new ItemStack(BuiltInRegistries.ITEM.get(ResourceLocation.parse(reward.item())), reward.count()))
+                    .toList();
+            return order.withRewards(ItemContainerContents.fromItems(stacks));
+        }
+        return WorkOrderRewards.withRewards(level, pos, order, random);
     }
 
     /** Whether an item job may name {@code id}: a registered item with a loaded Crusher or Furnace recipe. */

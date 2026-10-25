@@ -8,11 +8,13 @@ import com.rngtech.content.item.GlyphItem;
 import com.rngtech.content.item.JobChipItem;
 import com.rngtech.content.registry.ModItems;
 import com.rngtech.content.workorder.WorkOrderJobs;
+import com.rngtech.content.workorder.WorkOrderTemplateCatalog;
 import com.rngtech.rpg.MachineTraits;
 import com.rngtech.rpg.PhaseArrayRules;
 import com.rngtech.rpg.unique.UniqueCatalog;
 import com.rngtech.rpg.unique.UniqueDefinition;
 import com.rngtech.rpg.workorder.WorkOrder;
+import com.rngtech.rpg.workorder.WorkOrderTemplate;
 
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
@@ -46,6 +48,8 @@ import java.util.stream.Collectors;
 public final class RNGTechCommands {
     private static final SimpleCommandExceptionType NO_WORK_ORDER_OBJECTIVES =
             new SimpleCommandExceptionType(Component.translatable("rngtech.command.work_order.no_objectives"));
+    private static final DynamicCommandExceptionType UNKNOWN_WORK_ORDER_TEMPLATE =
+            new DynamicCommandExceptionType(id -> Component.translatable("rngtech.command.work_order.unknown_template", id));
     private static final DynamicCommandExceptionType UNKNOWN_UNIQUE =
             new DynamicCommandExceptionType(id -> Component.translatable("rngtech.command.unique.unknown", id));
 
@@ -77,9 +81,17 @@ public final class RNGTechCommands {
                         .then(Commands.literal("give")
                                 .then(Commands.argument("targets", EntityArgument.players())
                                         .then(Commands.literal("random")
-                                                .executes(context -> giveWorkOrder(context, 0))
+                                                .executes(context -> giveWorkOrder(context, null, 0))
                                                 .then(Commands.argument("tier", IntegerArgumentType.integer(WorkOrder.MIN_TIER, WorkOrder.MAX_TIER))
-                                                        .executes(context -> giveWorkOrder(context, IntegerArgumentType.getInteger(context, "tier"))))))))
+                                                        .executes(context -> giveWorkOrder(context, null, IntegerArgumentType.getInteger(context, "tier")))))
+                                        .then(Commands.literal("template")
+                                                .then(Commands.argument("template", ResourceLocationArgument.id())
+                                                        .suggests((context, builder) -> SharedSuggestionProvider.suggestResource(
+                                                                WorkOrderTemplateCatalog.all().stream().map(WorkOrderTemplate::id), builder))
+                                                        .executes(context -> giveWorkOrder(context, template(context), 0))
+                                                        .then(Commands.argument("tier", IntegerArgumentType.integer(WorkOrder.MIN_TIER, WorkOrder.MAX_TIER))
+                                                                .executes(context -> giveWorkOrder(context, template(context),
+                                                                        IntegerArgumentType.getInteger(context, "tier")))))))))
                 .then(Commands.literal("cable")
                         .then(Commands.literal("stats")
                                 .executes(RNGTechCommands::cableStats)
@@ -146,11 +158,22 @@ public final class RNGTechCommands {
     }
 
     /** Gives each target a random order of {@code tier}, or of a random tier as the Dispatch Terminal rolls one when it is 0. */
-    private static int giveWorkOrder(CommandContext<CommandSourceStack> context, int tier) throws CommandSyntaxException {
+    private static WorkOrderTemplate template(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
+        ResourceLocation id = ResourceLocationArgument.getId(context, "template");
+        WorkOrderTemplate template = WorkOrderTemplateCatalog.get(id);
+        if (template == null) {
+            throw UNKNOWN_WORK_ORDER_TEMPLATE.create(id.toString());
+        }
+        return template;
+    }
+
+    /** Gives each target a chip: the template's job, or with no template a listing rolled the way the terminal rolls one. */
+    private static int giveWorkOrder(CommandContext<CommandSourceStack> context, WorkOrderTemplate template, int tier) throws CommandSyntaxException {
         Collection<ServerPlayer> targets = EntityArgument.getPlayers(context, "targets");
         for (ServerPlayer player : targets) {
             SplittableRandom random = new SplittableRandom(player.getRandom().nextLong());
-            WorkOrder order = WorkOrderJobs.roll(player.level(), player.blockPosition(), tier, random);
+            WorkOrder order = template == null ? WorkOrderJobs.roll(player.level(), player.blockPosition(), tier, random)
+                    : WorkOrderJobs.roll(player.level(), player.blockPosition(), template, tier, random);
             if (order == null) {
                 throw NO_WORK_ORDER_OBJECTIVES.create();
             }

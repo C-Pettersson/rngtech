@@ -12,6 +12,7 @@ import net.minecraft.util.profiling.ProfilerFiller;
 import net.neoforged.neoforge.event.AddReloadListenerEvent;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -27,6 +28,13 @@ public final class WorkObjectiveCatalog {
 
     public static List<WorkObjectiveEntry> all() {
         return entries;
+    }
+
+    /** The loaded objectives by id, which templates name. */
+    public static Map<ResourceLocation, WorkObjectiveEntry> byId() {
+        Map<ResourceLocation, WorkObjectiveEntry> byId = new HashMap<>();
+        entries.forEach(entry -> byId.put(entry.id(), entry));
+        return byId;
     }
 
     public static void onAddReloadListeners(AddReloadListenerEvent event) {

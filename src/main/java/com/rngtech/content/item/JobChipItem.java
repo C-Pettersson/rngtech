@@ -139,6 +139,11 @@ public class JobChipItem extends Item {
         return objectiveText(objective);
     }
 
+    /** A template job's display name: a translation key, or plain text when no such key exists. */
+    public static MutableComponent displayName(WorkOrder order) {
+        return Component.translatableWithFallback(order.name(), order.name());
+    }
+
     public static MutableComponent familyName(String family) {
         return Component.translatable("rngtech.work_order.family." + family);
     }
@@ -146,8 +151,11 @@ public class JobChipItem extends Item {
     @Override
     public Component getName(ItemStack stack) {
         WorkOrder order = data(stack);
-        return order == null ? Component.translatable("item.rngtech.job_chip.blank")
-                : Component.translatable("item.rngtech.job_chip.tiered", GlyphItem.numeral(order.tier()));
+        if (order == null) {
+            return Component.translatable("item.rngtech.job_chip.blank");
+        }
+        return order.name().isEmpty() ? Component.translatable("item.rngtech.job_chip.tiered", GlyphItem.numeral(order.tier()))
+                : Component.translatable("item.rngtech.job_chip.named", displayName(order), GlyphItem.numeral(order.tier()));
     }
 
     @Override

@@ -1,8 +1,13 @@
 package com.rngtech.rpg.workorder;
 
+import net.minecraft.resources.ResourceLocation;
+
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Predicate;
 import java.util.random.RandomGenerator;
 
@@ -33,22 +38,66 @@ public final class WorkOrderRules {
      * entry can roll.
      */
     public static WorkOrder roll(Collection<WorkObjectiveEntry> entries, int tier, RandomGenerator random, Predicate<String> itemAvailable) {
-        List<WorkObjectiveEntry> eligible = entries.stream()
-                .filter(entry -> WorkOrderFamilies.known(entry.family()))
-                .filter(entry -> entry.filter() != WorkFilter.ITEM || !entry.options(stageCap(tier, entry), itemAvailable).isEmpty())
-                .sorted(Comparator.comparing(entry -> entry.id().toString()))
-                .toList();
-        if (eligible.isEmpty()) { return null; }
-        int total = eligible.stream().mapToInt(WorkObjectiveEntry::weight).sum();
-        int pick = random.nextInt(total);
-        WorkObjectiveEntry chosen = eligible.getLast();
-        for (WorkObjectiveEntry entry : eligible) {
-            pick -= entry.weight();
-            if (pick < 0) { chosen = entry; break; }
+        return roll(entries, true, List.of(), tier, random, itemAvailable);
+    }
+
+    /**
+     * Rolls a listing the way the Dispatch Terminal does: at {@code tier}, or with 0 at a tier picked evenly among the tiers
+     * that have something to draw, one draw by weight from the random objectives (only while {@code randomJobs} is on) and
+     * the pooled templates that fit the tier. Objective and template weights share one scale. {@code objectives} is every
+     * loaded objective, which templates name even with random jobs off. Returns null when nothing can roll.
+     */
+    public static WorkOrder roll(Collection<WorkObjectiveEntry> objectives, boolean randomJobs, Collection<WorkOrderTemplate> templates, int tier,
+            RandomGenerator random, Predicate<String> itemAvailable) {
+        Map<ResourceLocation, WorkObjectiveEntry> byId = new HashMap<>();
+        objectives.forEach(entry -> byId.put(entry.id(), entry));
+        List<WorkObjectiveEntry> entries = randomJobs ? objectives.stream().sorted(Comparator.comparing(entry -> entry.id().toString())).toList() : List.of();
+        List<WorkOrderTemplate> pooled = templates.stream().filter(WorkOrderTemplate::pooled)
+                .sorted(Comparator.comparing(template -> template.id().toString())).toList();
+        int rolledTier = tier;
+        if (tier == 0) {
+            List<Integer> tiers = new ArrayList<>();
+            for (int candidate = WorkOrder.MIN_TIER; candidate <= WorkOrder.MAX_TIER; candidate++) {
+                if (!candidates(entries, pooled, byId, candidate, itemAvailable).isEmpty()) { tiers.add(candidate); }
+            }
+            if (tiers.isEmpty()) { return null; }
+            rolledTier = tiers.get(random.nextInt(tiers.size()));
         }
-        int stage = stageCap(tier, chosen);
-        WorkObjective objective = chosen.roll(tier, stage, random, itemAvailable);
-        return new WorkOrder(chosen.family(), tier, objective, stage, 0, WorkOrder.BASE_BOUNTY + objective.bonus(), 0);
+        List<Candidate> candidates = candidates(entries, pooled, byId, rolledTier, itemAvailable);
+        if (candidates.isEmpty()) { return null; }
+        int pick = random.nextInt(candidates.stream().mapToInt(Candidate::weight).sum());
+        Candidate chosen = candidates.getLast();
+        for (Candidate candidate : candidates) {
+            pick -= candidate.weight();
+            if (pick < 0) { chosen = candidate; break; }
+        }
+        if (chosen.template() != null) {
+            return chosen.template().roll(rolledTier, byId, random, itemAvailable);
+        }
+        WorkObjectiveEntry entry = chosen.entry();
+        int stage = stageCap(rolledTier, entry);
+        WorkObjective objective = entry.roll(rolledTier, stage, random, itemAvailable);
+        return new WorkOrder(entry.family(), rolledTier, objective, stage, 0, WorkOrder.BASE_BOUNTY + objective.bonus(), 0);
+    }
+
+    /** One thing a listing can draw: a random objective or a pooled template, with its weight. */
+    private record Candidate(WorkObjectiveEntry entry, WorkOrderTemplate template, int weight) { }
+
+    private static List<Candidate> candidates(List<WorkObjectiveEntry> entries, List<WorkOrderTemplate> pooled,
+            Map<ResourceLocation, WorkObjectiveEntry> byId, int tier, Predicate<String> itemAvailable) {
+        List<Candidate> candidates = new ArrayList<>();
+        for (WorkObjectiveEntry entry : entries) {
+            if (WorkOrderFamilies.known(entry.family())
+                    && (entry.filter() != WorkFilter.ITEM || !entry.options(stageCap(tier, entry), itemAvailable).isEmpty())) {
+                candidates.add(new Candidate(entry, null, entry.weight()));
+            }
+        }
+        for (WorkOrderTemplate template : pooled) {
+            if (template.canRoll(tier, byId, itemAvailable)) {
+                candidates.add(new Candidate(null, template, template.weight()));
+            }
+        }
+        return candidates;
     }
 
     private static int stageCap(int tier, WorkObjectiveEntry entry) {
@@ -71,7 +120,7 @@ public final class WorkOrderRules {
     /**
      * Counts {@code report} toward the active chip: into the first unfinished part it matches, and any amount past that
      * part's target into the next matching part. No active chip or no matching part changes nothing, and the same chips
-     * come back. A fulfilled chip leaves the machine, and no other chip becomes active.
+     * come back. A fulfilled chip stays in its bay, inactive, and no other chip becomes active.
      */
     public static Progress progress(MachineWorkOrders orders, WorkReport report) {
         LoadedWorkOrder active = orders.activeOrder();

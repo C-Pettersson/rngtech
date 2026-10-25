@@ -199,10 +199,35 @@ The range is split into three equal bands: low, middle, and high. The band sets 
 
 Pack makers write fixed jobs in `data/<namespace>/work_orders/templates/*.json`. A template sets any of these and leaves the rest to roll: family, tier, objective (an objective id, or inline parts or a stat goal with fixed values or ranges), requirements (chassis stage, Mastery level), rarity, conditions, Bounty, Prestige, a display name, a fixed reward, and a reward table that replaces `rngtech:challenges/work_order` for this job.
 
-- `/rngtech work_order give <players> <template>` gives a template's chip. `/rngtech work_order give <players> random [tier]` rolls one the way the terminal does, of the given tier or a random one; with random jobs off, it rolls from the pooled templates instead.
+- `/rngtech work_order give <players> template <template> [tier]` gives a template's chip; the tier only applies when the template leaves it unset. `/rngtech work_order give <players> random [tier]` rolls one the way the terminal does, of the given tier or a random one; with random jobs off, it rolls from the pooled templates instead.
 - Quests hand out template chips through the give command or an item reward with the chip's components.
 - A template can join the Dispatch Terminal's pools with a weight, or stay quest-only.
 - Template fields left unset still roll, so a template can fix only the family and objective and keep random conditions. A template that sets every field is fully specific.
+
+The shipped format (phase 5). Every key but `objective` is optional:
+
+```json
+{
+    "objective": "rngtech:furnace_items",
+    "family": "furnace",
+    "tier": 3,
+    "min_stage": 6,
+    "min_mastery_level": 40,
+    "bounty": 150,
+    "prestige": 1,
+    "name": "mypack.work_order.foundry_contract",
+    "rewards": [{"item": "rngtech:chaos_crystal", "count": 6}],
+    "reward_table": "mypack:work_orders/foundry",
+    "weight": 4
+}
+```
+
+- `objective` names a loaded objective, whose family the job takes, or is inline: `{"type": "smelt", "parts": [...]}` with one to three parts, each `{"filter": "any" | "stage" | "setting" | "item", "min": n, "item": id, "count": n | {"min": a, "max": b, "step": s}}`. A part with an `item` defaults to the item filter. Inline parts need a `family`. A ranged count earns its band's Bounty bonus; with several ranged parts, the highest band counts.
+- An unset `tier` follows the listing or the command; an unset `min_stage` is the tier's stage capped at the family's top stage; an unset `bounty` is 100% plus the band bonus; `prestige` and `min_mastery_level` default to 0.
+- `name` is a translation key or plain text. The chip reads "Name (Job Chip III)", and the terminal row shows the name in place of the machine.
+- Fixed `rewards` are listed as they are, with no Bounty scaling. Without them, the reward rolls from `reward_table`, or from `rngtech:challenges/work_order` when that is unset, and the chip and its Completed Job Chip keep the table for a redeem that has no list.
+- `weight` puts the template in the terminal's listing on the same scale as objective weights. Without it, or at 0, the template is quest-only.
+- Rarity and conditions come with phase 6.
 
 ## Conditions
 

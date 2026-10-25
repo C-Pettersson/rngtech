@@ -13,7 +13,7 @@ Status: **Planned**. The PRD is a draft with open questions and no release targe
 - [x] Order data and storage: readable order item data, the `rngtech:work_orders` machine component with three slots and an active index, drop carry, and round-trip checks.
 - [x] Core loop for the Crusher and Furnace: drive bays to load and unload, activate, switch, and abandon on an Orders tab; progress hooks; the Completed Job Chip; the reward table.
 - [x] Dispatch Terminal and Requisitions: the block, job rolling with count ranges and item jobs, one-kind rewards, Download and Refresh, the Requisition recipe, and the give commands.
-- [ ] Order templates: loader, board pools, per-template reward tables, and the config key that turns random orders off.
+- [x] Order templates: loader, terminal pools, per-template reward tables, the template give command, and the config key that turns random orders off. Rarity and conditions on templates wait for phase 6.
 - [ ] Conditions: the `work_order` eligibility profile and pool, conditions as an effect source on any machine, reset-on-event conditions, and Rush.
 - [ ] More jobs and machines: stat goals for the Crusher and Furnace, then the other Mastery families and the machines without Mastery, starting with the Component Assembler.
 - [ ] Refinement and corruption: order corruption pools and Phase Array rejection.
@@ -130,6 +130,18 @@ Recorded 2026-10-25 while playtesting the Dispatch Terminal and drive bays, from
 - A stage job's line ("Processing Level 4+", "Stage 4+") did not say which items count. Chip tooltips and the Orders tab now list them while Shift or Alt is held, read from the loaded recipes the same way the machine reports its work, and the terminal heading reads "Stage 4+ chassis" so the chassis requirement is not mistaken for the job. A Furnace stage job lists materials instead of items: a smelt's stage is its material's, and items made the list too long (up to about 50 at Stage 3+, where materials are a handful). Heat and any-work jobs have no list, because every recipe of the machine counts and the list would run to about 130 items.
 - A finished chip stays in its bay as a Completed Job Chip for the player to take out, instead of dropping on top of the machine. It is stored as a loaded job with every part at its target, so it rides on the dropped machine like any chip. It is never active, cannot be activated, and keeps its bay until it is taken out.
 
+Recorded 2026-10-25 for phase 5, from the build:
+
+- A template's `weight` shares one scale with objective weights, so a listing is one weighted draw over the random objectives and the pooled templates that fit its tier. With `workOrders.randomOrdersEnabled` off, the objectives leave the draw but stay loaded, because templates name them.
+- A listing of a random tier picks evenly among the tiers that have something to draw. With random jobs off and templates of only some tiers, every listing is one of those tiers instead of an empty slot.
+- Every key but `objective` is optional, and unset fields roll the way a random job's do. Inline parts take one count each, fixed or ranged, and the highest band among ranged parts sets the Bounty bonus.
+- Fixed rewards are listed as written, without Bounty scaling. A template's `reward_table` replaces `rngtech:challenges/work_order` for its job, and both the chip and the Completed Job Chip keep the table id, so a chip without a list still redeems from the right table. A table that is not loaded pays nothing; the loader cannot check tables, which load beside templates.
+- The give command is `give <players> template <id> [tier]`, not `give <players> <id>`: a bare id would collide with the `random` literal. A template's own tier wins over the command's.
+- `name` is a translation key or plain text (`translatableWithFallback`). The chip reads "Name (Job Chip III)", and the terminal row heading shows the name in place of the machine.
+- The loader rejects a template with no objective, an unknown family or job type, a tier outside I to V, an item part with no item, negative numbers, an empty reward, or a reward item that is not registered. A template naming an objective that is not loaded parses but never rolls.
+- No template ships in the mod's own data. `/rngtech work_order give` suggests the loaded templates.
+- Work Orders have no wiki page yet (phase 10), so the template format and `workOrders.randomOrdersEnabled` are documented here and in the PRD until then.
+
 ## Code against the redesign
 
 The branch's loop was built for the earlier design. Phase 2 of the rework replaced the Mastery storage, the Mastery level gate, the tier and seed components, and the Tier I recipe; the lists below show what is left for later phases.
@@ -196,6 +208,7 @@ Recorded 2026-10-25 from the chips slice:
 
 - 2026-10-25: Job Chips, Dispatch Terminal, and drive bays. Work Order items became the Job Chip and Completed Job Chip; the Dispatch Terminal replaced the Dispatch Board, with a console model, six listing lamps, and a terminal screen with Download and Refresh; item jobs with one to three parts and the balanced job mix; one reward kind per job; three drive-bay slots on the Orders tab replace Load and Unload; and the terminal and Requisition recipes gate on calibration stability. GameTests cover loading through the bays, pulling the active chip, putting it back, Shift-click both ways, and a bay refusing another family's chip.
 - 2026-10-25: playtest fixes. Shift lists what counts toward stage jobs, Crusher inputs or Furnace materials (`WorkOrderEligibility`, which the Furnace now also uses for a smelt's stage), the terminal heading names the chassis, and finished chips stay in their bays as Completed Job Chips. GameTests check the listed items against the recipes and that a finished chip stays in its bay, inactive, until it is taken out.
+- 2026-10-25: rework phase 5, job templates. `WorkOrderTemplate` (parse and roll, with no item classes), `WorkOrderTemplateCatalog` under `work_orders/templates`, one weighted terminal draw over random objectives and pooled templates, `workOrders.randomOrdersEnabled`, fixed rewards and per-template reward tables carried to the Completed Job Chip, template names on chips and terminal rows, and `/rngtech work_order give <players> template <id> [tier]`. Checks: `WorkOrderTemplateChecks` and `WorkOrderTemplateGameTests`.
 
 ## Verification
 
@@ -210,6 +223,7 @@ Recorded 2026-10-25 from the chips slice:
 
 - 2026-10-25: Job Chips, Dispatch Terminal, and drive bays. `./gradlew quickCheck`, `./gradlew runGameTestServer` (276 tests), `npm run moddex:check`, and `npm run repo:check` passed. `mkdocs build --strict` was not run locally. The terminal, its screen, and the drive bays have not been checked in a running client.
 - 2026-10-25: playtest fixes. `./gradlew quickCheck`, `./gradlew runGameTestServer` (277 tests), `npm run moddex:check`, and `npm run repo:check` passed. Playtested in the client: the Shift lists (Crusher items, Furnace materials, none on heat and any-work jobs) and finished chips staying in their bays behave as intended.
+- 2026-10-25: rework phase 5. `./gradlew quickCheck` (including `masteryCheck` with `WorkOrderTemplateChecks`), `./gradlew runGameTestServer` (279 tests), `npm run moddex:check`, and `npm run repo:check` passed. `mkdocs build --strict` was not run locally. Templates have not been tried from a datapack in a running client.
 
 ## Handoff and limits
 

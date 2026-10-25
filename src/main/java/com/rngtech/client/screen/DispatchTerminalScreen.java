@@ -144,7 +144,8 @@ public class DispatchTerminalScreen extends AbstractContainerScreen<DispatchTerm
         String tag = "[" + GlyphItem.numeral(order.tier()) + "]";
         guiGraphics.drawString(font, tag, textLeft, y + 4, AMBER, false);
         int nameLeft = textLeft + font.width(tag) + 4;
-        Component heading = Component.translatable("rngtech.dispatch_terminal.heading", JobChipItem.familyName(order.family()), order.minStage());
+        Component heading = Component.translatable("rngtech.dispatch_terminal.heading",
+                order.name().isEmpty() ? JobChipItem.familyName(order.family()) : JobChipItem.displayName(order), order.minStage());
         guiGraphics.drawString(font, font.plainSubstrByWidth(heading.getString(), rewardLeft - nameLeft - 2), nameLeft, y + 4, TEAL_TEXT, false);
         String job = font.plainSubstrByWidth(JobChipItem.objectiveText(order.objective()).getString(), rewardLeft - textLeft - 2);
         guiGraphics.drawString(font, job, textLeft, y + 15, TEAL_MUTED, false);

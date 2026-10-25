@@ -9,30 +9,34 @@ import net.minecraft.world.item.component.ItemContainerContents;
 import java.util.Optional;
 
 /**
- * What a Fulfilled Work Order keeps for its payout: the tier, the machine's family and ascendancy, Bounty, Prestige, and
- * the exact items the order listed, or null with no list, when opening it rolls the reward table instead.
+ * What a Completed Job Chip keeps for its payout: the tier, the machine's family and ascendancy, Bounty, Prestige, and
+ * the exact items the job listed, or null with no list, when redeeming it rolls the reward table instead: the job's own
+ * {@code rewardTable}, or {@code rngtech:challenges/work_order} when that is "".
  */
-public record FulfilledWorkOrder(int tier, String family, String ascendancy, int bounty, int prestige, ItemContainerContents rewards) {
+public record FulfilledWorkOrder(int tier, String family, String ascendancy, int bounty, int prestige, ItemContainerContents rewards,
+        String rewardTable) {
     public static final Codec<FulfilledWorkOrder> CODEC = RecordCodecBuilder.create(instance -> instance.group(
             Codec.INT.optionalFieldOf("tier", WorkOrder.MIN_TIER).forGetter(FulfilledWorkOrder::tier),
             Codec.STRING.optionalFieldOf("family", "").forGetter(FulfilledWorkOrder::family),
             Codec.STRING.optionalFieldOf("ascendancy", "").forGetter(FulfilledWorkOrder::ascendancy),
             Codec.INT.optionalFieldOf("bounty", WorkOrder.BASE_BOUNTY).forGetter(FulfilledWorkOrder::bounty),
             Codec.INT.optionalFieldOf("prestige", 0).forGetter(FulfilledWorkOrder::prestige),
-            Codec.lazyInitialized(() -> ItemContainerContents.CODEC).optionalFieldOf("rewards").forGetter(order -> Optional.ofNullable(order.rewards))
-    ).apply(instance, (tier, family, ascendancy, bounty, prestige, rewards) ->
-            new FulfilledWorkOrder(tier, family, ascendancy, bounty, prestige, rewards.orElse(null))));
+            Codec.lazyInitialized(() -> ItemContainerContents.CODEC).optionalFieldOf("rewards").forGetter(order -> Optional.ofNullable(order.rewards)),
+            Codec.STRING.optionalFieldOf("reward_table", "").forGetter(FulfilledWorkOrder::rewardTable)
+    ).apply(instance, (tier, family, ascendancy, bounty, prestige, rewards, rewardTable) ->
+            new FulfilledWorkOrder(tier, family, ascendancy, bounty, prestige, rewards.orElse(null), rewardTable)));
 
     public static final StreamCodec<RegistryFriendlyByteBuf, FulfilledWorkOrder> STREAM_CODEC = new StreamCodec<>() {
         @Override public FulfilledWorkOrder decode(RegistryFriendlyByteBuf buffer) {
             return new FulfilledWorkOrder(buffer.readVarInt(), buffer.readUtf(64), buffer.readUtf(80), buffer.readVarInt(), buffer.readVarInt(),
-                    buffer.readBoolean() ? ItemContainerContents.STREAM_CODEC.decode(buffer) : null);
+                    buffer.readBoolean() ? ItemContainerContents.STREAM_CODEC.decode(buffer) : null, buffer.readUtf());
         }
         @Override public void encode(RegistryFriendlyByteBuf buffer, FulfilledWorkOrder order) {
             buffer.writeVarInt(order.tier); buffer.writeUtf(order.family, 64); buffer.writeUtf(order.ascendancy, 80);
             buffer.writeVarInt(order.bounty); buffer.writeVarInt(order.prestige);
             buffer.writeBoolean(order.rewards != null);
             if (order.rewards != null) { ItemContainerContents.STREAM_CODEC.encode(buffer, order.rewards); }
+            buffer.writeUtf(order.rewardTable);
         }
     };
 
@@ -45,5 +49,10 @@ public record FulfilledWorkOrder(int tier, String family, String ascendancy, int
         ascendancy = ascendancy == null ? "" : ascendancy;
         bounty = Math.max(0, bounty);
         prestige = Math.max(0, prestige);
+        rewardTable = rewardTable == null ? "" : rewardTable;
+    }
+
+    public FulfilledWorkOrder(int tier, String family, String ascendancy, int bounty, int prestige, ItemContainerContents rewards) {
+        this(tier, family, ascendancy, bounty, prestige, rewards, "");
     }
 }

@@ -8,20 +8,24 @@ import com.rngtech.rpg.workorder.WorkOrderRules;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.component.ItemContainerContents;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.storage.loot.LootTable;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.random.RandomGenerator;
 
 /**
- * The one reward a Work Order pays. The terminal rolls {@code rngtech:challenges/work_order} once when it lists the job,
- * which picks one reward kind and its tier's amount, then scales the amount by Bounty. The chip lists the result, and
- * redeeming the Completed Job Chip pays exactly that.
+ * The one reward a Work Order pays. The terminal rolls the job's reward table once when it lists the job, which picks one
+ * reward kind and its tier's amount, then scales the amount by Bounty. The table is {@code rngtech:challenges/work_order}
+ * unless a template names its own. The chip lists the result, and redeeming the Completed Job Chip pays exactly that.
  */
 public final class WorkOrderRewards {
     private static final int MAX_STACKS = 27;
@@ -34,14 +38,14 @@ public final class WorkOrderRewards {
         if (level == null || level.isClientSide) {
             return order;
         }
-        FulfilledWorkOrder context = new FulfilledWorkOrder(order.tier(), order.family(), "", order.bounty(), order.prestige(), null);
+        FulfilledWorkOrder context = new FulfilledWorkOrder(order.tier(), order.family(), "", order.bounty(), order.prestige(), null, order.rewardTable());
         return order.withRewards(ItemContainerContents.fromItems(roll(level, pos, context, random)));
     }
 
     /** Rolls the reward table once for {@code order} and scales each result's amount by Bounty. */
     public static List<ItemStack> roll(Level level, BlockPos pos, FulfilledWorkOrder order, RandomGenerator random) {
         List<ItemStack> merged = new ArrayList<>();
-        for (ItemStack stack : ChallengeLoot.roll(level, pos, ChallengeLoot.WORK_ORDER, ChallengeContext.of(order, 0))) {
+        for (ItemStack stack : ChallengeLoot.roll(level, pos, table(order.rewardTable()), ChallengeContext.of(order, 0))) {
             int amount = WorkOrderRules.scaledAmount(stack.getCount(), order.bounty(), random);
             while (amount > 0 && merged.size() < MAX_STACKS) {
                 int count = Math.min(amount, stack.getMaxStackSize());
@@ -50,6 +54,12 @@ public final class WorkOrderRewards {
             }
         }
         return merged;
+    }
+
+    /** The loot table {@code id} names, or {@code rngtech:challenges/work_order} for "" or an id that does not parse. */
+    static ResourceKey<LootTable> table(String id) {
+        ResourceLocation key = id.isEmpty() ? null : ResourceLocation.tryParse(id);
+        return key == null ? ChallengeLoot.WORK_ORDER : ResourceKey.create(Registries.LOOT_TABLE, key);
     }
 
     /** The listed items, or for an order without a list, a fresh roll of the reward table. */

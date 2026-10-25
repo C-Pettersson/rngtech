@@ -38,7 +38,7 @@ public class CompletedJobChipItem extends Item {
         ItemStack stack = new ItemStack(ModItems.COMPLETED_JOB_CHIP.get());
         var order = loaded.order();
         stack.set(ModDataComponents.FULFILLED_WORK_ORDER.get(),
-                new FulfilledWorkOrder(order.tier(), order.family(), ascendancy, order.bounty(), order.prestige(), order.rewards()));
+                new FulfilledWorkOrder(order.tier(), order.family(), ascendancy, order.bounty(), order.prestige(), order.rewards(), order.rewardTable()));
         return stack;
     }
 
