@@ -1,5 +1,6 @@
 package com.rngtech.rpg.workorder;
 
+import com.rngtech.content.energy.BatteryCellMaterial;
 import com.rngtech.rpg.MachineStat;
 import com.rngtech.rpg.MachineTraits;
 
@@ -13,6 +14,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 import java.util.SplittableRandom;
 import java.util.stream.Stream;
@@ -159,7 +161,7 @@ public final class WorkOrderRuleChecks {
             int[] sizes = new int[WorkObjective.MAX_PARTS + 1];
             for (int i = 0; i < 2_000; i++) {
                 int tier = WorkOrder.MIN_TIER + i % WorkOrder.MAX_TIER;
-                int cap = Math.min(WorkOrder.tierStage(tier), WorkOrderFamilies.topStage(entry.family()));
+                int cap = WorkOrderFamilies.stageCap(entry.family(), tier);
                 WorkObjective job = entry.roll(tier, cap, random, item -> true);
                 List<String> named = job.parts().stream().map(WorkPart::item).toList();
                 require(named.size() == named.stream().distinct().count(), entry.id() + " never names one item twice");
@@ -170,7 +172,9 @@ public final class WorkOrderRuleChecks {
                 }
                 sizes[job.parts().size()]++;
             }
-            require(sizes[1] > 0 && sizes[2] > 0 && sizes[3] > 0, entry.id() + " rolls jobs of one, two, and three items");
+            for (int size = entry.minParts(); size <= entry.maxParts(); size++) {
+                require(sizes[size] > 0, entry.id() + " rolls jobs of " + size + " items");
+            }
             require(entry.roll(1, 4, random, item -> false) == null, entry.id() + " rolls nothing when no option has a loaded recipe");
         }
     }
@@ -198,11 +202,14 @@ public final class WorkOrderRuleChecks {
         for (WorkObjectiveEntry entry : shipped) {
             for (int tier = WorkOrder.MIN_TIER; tier <= WorkOrder.MAX_TIER; tier++) {
                 int minimum = entry.goal(tier).minimum();
-                int stage = Math.min(WorkOrder.tierStage(tier), WorkOrderFamilies.topStage(entry.family()));
+                int stage = WorkOrderFamilies.stageCap(entry.family(), tier);
                 boolean ok = switch (entry.filter()) {
                     case ANY -> true;
-                    case STAGE -> entry.type() == WorkObjectiveType.CRUSH
-                            ? crushLevels.stream().anyMatch(level -> level >= minimum && level <= stage) : minimum <= stage;
+                    case STAGE -> switch (entry.type()) {
+                        case CRUSH -> crushLevels.stream().anyMatch(level -> level >= minimum && level <= stage);
+                        case ASSEMBLE -> cellStages().stream().anyMatch(cell -> cell >= minimum && cell <= stage);
+                        default -> minimum <= stage;
+                    };
                     case SETTING -> minimum <= 100;
                     case ITEM -> !entry.options(stage, item -> true).isEmpty()
                             && entry.options().stream().allMatch(option -> hasRecipe(entry.type(), option.item()));
@@ -316,9 +323,24 @@ public final class WorkOrderRuleChecks {
     private static boolean hasRecipe(WorkObjectiveType type, String item) {
         String path = item.substring(item.indexOf(':') + 1);
         Path recipes = projectRoot().resolve("src/main/resources/data/rngtech/recipe");
-        return type == WorkObjectiveType.CRUSH
-                ? Files.exists(recipes.resolve("crusher/" + path + ".json"))
-                : Files.exists(recipes.resolve("furnace/metals/" + path.replace("crushed_", "") + "_from_crushed.json"));
+        return switch (type) {
+            case CRUSH -> Files.exists(recipes.resolve("crusher/" + path + ".json"));
+            case SMELT -> Files.exists(recipes.resolve("furnace/metals/" + path.replace("crushed_", "") + "_from_crushed.json"));
+            case ASSEMBLE -> assemblyOutputs().contains(item);
+        };
+    }
+
+    /** What the Component Assembler's shipped recipes make, by item id. */
+    private static List<String> assemblyOutputs() {
+        return jsonFiles(projectRoot().resolve("src/main/resources/data/rngtech/recipe/battery_assembly")).stream()
+                .map(file -> read(file).getAsJsonObject("result").get("id").getAsString()).toList();
+    }
+
+    /** The stages of the Battery Cells the Component Assembler makes, from each cell's material. */
+    private static List<Integer> cellStages() {
+        return assemblyOutputs().stream().filter(item -> item.endsWith("_battery_cell"))
+                .map(item -> BatteryCellMaterial.valueOf(item.substring(item.indexOf(':') + 1, item.length() - "_battery_cell".length()).toUpperCase(Locale.ROOT)).stage())
+                .toList();
     }
 
     private static ResourceLocation id(String path) {

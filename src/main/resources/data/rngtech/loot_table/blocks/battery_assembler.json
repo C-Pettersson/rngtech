@@ -15,7 +15,8 @@
             {
               "function": "minecraft:copy_components",
               "include": [
-                "rngtech:machine_traits"
+                "rngtech:machine_traits",
+                "rngtech:work_orders"
               ],
               "source": "block_entity"
             }

@@ -70,7 +70,10 @@ public final class WorkOrderJobs {
         return WorkOrderRewards.withRewards(level, pos, order, random);
     }
 
-    /** Whether an item job may name {@code id}: a registered item with a loaded Crusher or Furnace recipe. */
+    /**
+     * Whether an item job may name {@code id}: a registered item with a loaded Crusher or Furnace recipe that takes it, or a
+     * loaded Component Assembler recipe that makes it.
+     */
     public static Predicate<String> itemAvailable(Level level) {
         return id -> {
             ResourceLocation key = ResourceLocation.tryParse(id);
@@ -79,7 +82,9 @@ public final class WorkOrderJobs {
             }
             SingleRecipeInput input = new SingleRecipeInput(new ItemStack(BuiltInRegistries.ITEM.get(key)));
             return level.getRecipeManager().getRecipeFor(ModRecipes.CRUSHER_TYPE.get(), input, level).isPresent()
-                    || level.getRecipeManager().getRecipeFor(ModRecipes.FURNACE_TYPE.get(), input, level).isPresent();
+                    || level.getRecipeManager().getRecipeFor(ModRecipes.FURNACE_TYPE.get(), input, level).isPresent()
+                    || level.getRecipeManager().getAllRecipesFor(ModRecipes.BATTERY_ASSEMBLY_TYPE.get()).stream()
+                            .anyMatch(holder -> holder.value().outputStack().is(BuiltInRegistries.ITEM.get(key)));
         };
     }
 }

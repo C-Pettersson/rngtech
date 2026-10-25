@@ -2,7 +2,9 @@ package com.rngtech.client.screen;
 
 import com.rngtech.content.blockentity.BatteryAssemblerBlockEntity;
 import com.rngtech.content.menu.BatteryAssemblerMenu;
+import com.rngtech.content.menu.WorkOrderMenuSupport;
 import com.rngtech.content.registry.ModBlocks;
+import com.rngtech.content.registry.ModItems;
 import com.rngtech.rpg.MachineStat;
 
 import net.minecraft.client.gui.GuiGraphics;
@@ -66,6 +68,7 @@ public class BatteryAssemblerScreen extends AbstractContainerScreen<BatteryAssem
     };
 
     private final MachineTabs tabs;
+    private final WorkOrdersTab workOrdersTab;
 
     public BatteryAssemblerScreen(BatteryAssemblerMenu menu, Inventory playerInventory, Component title) {
         super(menu, playerInventory, title);
@@ -78,7 +81,9 @@ public class BatteryAssemblerScreen extends AbstractContainerScreen<BatteryAssem
                 .gear(BatteryAssemblerMenu.TAB_GEAR)
                 .stats(BatteryAssemblerMenu.TAB_CONFIGURATION)
                 .refinement(BatteryAssemblerMenu.TAB_REFINEMENT)
+                .tab(BatteryAssemblerMenu.TAB_ORDERS, "rngtech.tab.orders", ModItems.JOB_CHIP.get())
                 .build();
+        workOrdersTab = new WorkOrdersTab(menu, STAT_ACCENT);
     }
 
     @Override
@@ -91,6 +96,12 @@ public class BatteryAssemblerScreen extends AbstractContainerScreen<BatteryAssem
         super.render(guiGraphics, mouseX, mouseY, partialTick);
         renderTooltip(guiGraphics, mouseX, mouseY);
         tabs.renderTooltip(guiGraphics, mouseX, mouseY);
+        if (menu.selectedTab() == BatteryAssemblerMenu.TAB_ORDERS) {
+            List<Component> orderTooltip = workOrdersTab.tooltip(mouseX, mouseY, leftPos, topPos, imageWidth, imageHeight);
+            if (!orderTooltip.isEmpty()) {
+                guiGraphics.renderComponentTooltip(font, orderTooltip, mouseX, mouseY);
+            }
+        }
         renderValueTooltips(guiGraphics, mouseX, mouseY);
         renderStatTooltips(guiGraphics, mouseX, mouseY);
         RefinementScreenStyle.renderTooltips(guiGraphics, font, leftPos, topPos, mouseX, mouseY, menu.selectedTab() == RefinementScreenStyle.REFINEMENT_TAB_INDEX, menu.machineTraits(), menu);
@@ -109,6 +120,8 @@ public class BatteryAssemblerScreen extends AbstractContainerScreen<BatteryAssem
             renderConfiguration(guiGraphics);
         } else if (menu.selectedTab() == BatteryAssemblerMenu.TAB_REFINEMENT) {
             renderRefinement(guiGraphics);
+        } else if (menu.selectedTab() == BatteryAssemblerMenu.TAB_ORDERS) {
+            workOrdersTab.render(guiGraphics, leftPos, topPos, imageWidth, imageHeight, mouseX, mouseY);
         }
     }
 
@@ -126,7 +139,7 @@ public class BatteryAssemblerScreen extends AbstractContainerScreen<BatteryAssem
             drawGearLabels(guiGraphics);
         } else if (menu.selectedTab() == BatteryAssemblerMenu.TAB_CONFIGURATION) {
             drawConfigurationLabels(guiGraphics);
-        } else {
+        } else if (menu.selectedTab() == BatteryAssemblerMenu.TAB_REFINEMENT) {
             drawRefinementLabels(guiGraphics);
         }
     }
@@ -137,6 +150,13 @@ public class BatteryAssemblerScreen extends AbstractContainerScreen<BatteryAssem
             int tab = tabs.tabAt(mouseX, mouseY);
             if (tab >= 0) {
                 menu.selectTab(tab);
+                if (minecraft != null && minecraft.gameMode != null) {
+                    minecraft.gameMode.handleInventoryButtonClick(menu.containerId, WorkOrderMenuSupport.BUTTON_SELECT_TAB + menu.selectedTab());
+                }
+                return true;
+            }
+            if (menu.selectedTab() == BatteryAssemblerMenu.TAB_ORDERS
+                    && workOrdersTab.mouseClicked(mouseX, mouseY, button, leftPos, topPos, imageWidth, imageHeight)) {
                 return true;
             }
             if (menu.selectedTab() == BatteryAssemblerMenu.TAB_REFINEMENT

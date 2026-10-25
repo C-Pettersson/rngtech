@@ -7,7 +7,9 @@ public enum WorkObjectiveType {
     /** Completed Crusher jobs. */
     CRUSH,
     /** Completed Furnace smelts. */
-    SMELT;
+    SMELT,
+    /** Completed Component Assembler assemblies. */
+    ASSEMBLE;
 
     public String id() {
         return name().toLowerCase(Locale.ROOT);

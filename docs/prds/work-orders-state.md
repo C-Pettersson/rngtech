@@ -15,7 +15,7 @@ Status: **Planned**. The PRD is a draft with open questions and no release targe
 - [x] Dispatch Terminal and Requisitions: the block, job rolling with count ranges and item jobs, one-kind rewards, Download and Refresh, the Requisition recipe, and the give commands.
 - [x] Order templates: loader, terminal pools, per-template reward tables, the template give command, and the config key that turns random orders off. Rarity and conditions on templates wait for phase 6.
 - [x] Conditions: the `work_order` profiles and pool for the Crusher and Furnace, conditions as an effect source on the machine, reset-on-event conditions, and Rush. The Bonus Summary drawer section moved to phase 9.
-- [ ] More jobs and machines: stat goals for the Crusher and Furnace (done), then the other Mastery families and the machines without Mastery, starting with the Component Assembler.
+- [ ] More jobs and machines: stat goals for the Crusher and Furnace (done), the Component Assembler (done), then the other Mastery families and the machines without Mastery, starting with the Component Assembler.
 - [ ] Refinement and corruption: order corruption pools and Phase Array rejection.
 - [ ] UI polish: drive-bay panels on machine models, the Bonus Summary section, Jade, JEI, and model cues.
 - [ ] Documentation: wiki page, Machine Mastery and Rarity updates, the implementation matrix, the GuideME guide, Machine Design Notes, and an FTB Quests chapter.
@@ -172,6 +172,15 @@ Recorded 2026-10-25 for phase 7, from the user and the build:
 - A stat goal's progress is the machine's value at each completed job, any job, in hundredths and capped at the target. It falls if the stat falls, and the goal is met at the first completed job at or above the target. The value includes the chip's own conditions, so Starved Feed makes a speed goal harder.
 - The menu sync carries a goal's stat as its ordinal in the part's item field.
 
+Recorded 2026-10-25 for the Component Assembler, from the user and the build:
+
+- The Component Assembler (`rngtech:battery_assembler`, `BatteryAssembler*` in code) is the first machine without Mastery. Its family id is `component_assembler`.
+- It gets three job kinds (user's pick): Battery Cells of Stage N+ (the stage is the cell's material stage; other outputs report Stage 0), one or two named outputs from its 18 staged recipe outputs, and broad counts of any assembly. Counts are small, since assembly is slow and costly: broad 24–84, cells 6–24, named 4–12 across the tiers. No stat goals yet.
+- It has no chassis stage, so its chips need none (user's pick). `WorkOrderFamilies` marks it stageless: the required stage is 0, and the tier's own stage still caps which outputs a job can name. Chips and terminal rows with no requirement show no stage.
+- Its menu has no Mastery fields, so it syncs chips through its own data block, `WorkOrderMenuSupport.data(host)`. Its Orders tab, drive bays, Shift-click, and tab sync follow the Crusher's.
+- Starved Feed and Power Surcharge apply to it; Short Crew is now Crusher and Furnace only, since the Assembler has no batches. Deep Ore applies to its cell-stage jobs.
+- Its drop keeps its chips (`rngtech:work_orders` added to its loot table), and Rush expires on it like on the Crusher.
+
 ## Code against the redesign
 
 The branch's loop was built for the earlier design. Phase 2 of the rework replaced the Mastery storage, the Mastery level gate, the tier and seed components, and the Tier I recipe; the lists below show what is left for later phases.
@@ -240,6 +249,7 @@ Recorded 2026-10-25 from the chips slice:
 - 2026-10-25: rework phase 5, job templates. `WorkOrderTemplate` (parse and roll, with no item classes), `WorkOrderTemplateCatalog` under `work_orders/templates`, one weighted terminal draw over random objectives and pooled templates, `workOrders.randomOrdersEnabled`, fixed rewards and per-template reward tables carried to the Completed Job Chip, template names on chips and terminal rows, and `/rngtech work_order give <players> template <id> [tier]`. Checks: `WorkOrderTemplateChecks` and `WorkOrderTemplateGameTests`.
 - 2026-10-25: rework phase 6, conditions and Rush. `WorkOrderConditions` (profiles, rarity roll, condition roll, rewards, counting, stat application), chip rarity colours and condition lines, the Orders tab row showing the chip's tooltip, the Rush button, deadlines, and expiry, stats cache keyed on the active chip, and jam and heat-failure setbacks. Checks: `WorkOrderConditionChecks`, Rush checks in `WorkOrderRuleChecks`, and `WorkOrderGameTests` for Rush and conditions.
 - 2026-10-25: rework phase 7, stat goals for the Crusher and Furnace: the `stat` filter, seven objectives sized from the level-1 processing simulation, `WorkOrderRules.reachStats`, machine stat reads, and stat text on chips and the Orders tab. Checks: stat-goal checks in `WorkOrderRuleChecks` and `WorkOrderGameTests.statGoalsReadTheMachine`.
+- 2026-10-25: the Component Assembler joins Work Orders: stageless families, the `assemble` verb, the assembly report hook, three objectives, its Orders tab and own menu sync, conditions in its stats, and Rush ticking. Checks: Assembler reachability in `WorkOrderRuleChecks` and `AssemblerWorkOrderGameTests`.
 
 ## Verification
 
@@ -257,6 +267,7 @@ Recorded 2026-10-25 from the chips slice:
 - 2026-10-25: rework phase 5. `./gradlew quickCheck` (including `masteryCheck` with `WorkOrderTemplateChecks`), `./gradlew runGameTestServer` (279 tests), `npm run moddex:check`, and `npm run repo:check` passed. `mkdocs build --strict` was not run locally. Templates have not been tried from a datapack in a running client.
 - 2026-10-25: rework phase 6. `./gradlew quickCheck` (`masteryCheck` 604,167 checks), `./gradlew runGameTestServer` (281 tests), `npm run moddex:check`, and `npm run repo:check` passed. `mkdocs build --strict` was not run locally. Conditions and Rush have not been checked in a running client.
 - 2026-10-25: phase 7 stat goals, after merging `main`. `./gradlew quickCheck`, `./gradlew runGameTestServer` (282 tests), `npm run moddex:check`, and `npm run repo:check` passed. Not checked in a running client.
+- 2026-10-25: Component Assembler. `./gradlew quickCheck`, `./gradlew runGameTestServer` (284 tests), `npm run moddex:check`, and `npm run repo:check` passed. Not checked in a running client.
 
 ## Handoff and limits
 

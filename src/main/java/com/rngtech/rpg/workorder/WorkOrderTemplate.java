@@ -97,19 +97,19 @@ public record WorkOrderTemplate(ResourceLocation id, String family, int tier, Re
         int rolledTier = this.tier == 0 ? Math.clamp(tier, WorkOrder.MIN_TIER, WorkOrder.MAX_TIER) : this.tier;
         if (!canRoll(rolledTier, objectives, itemAvailable)) { return null; }
         String jobFamily = family(objectives);
-        int stage = stage(rolledTier, jobFamily);
         WorkObjective objective = objectiveId != null
-                ? objectives.get(objectiveId).roll(rolledTier, stage, random, itemAvailable)
+                ? objectives.get(objectiveId).roll(rolledTier, stage(rolledTier, jobFamily), random, itemAvailable)
                 : inline(random);
         if (objective == null) { return null; }
-        return new WorkOrder(jobFamily, rolledTier, objective, stage, minMasteryLevel == UNSET ? 0 : minMasteryLevel,
+        int required = minStage != UNSET ? minStage : WorkOrderFamilies.requiredStage(jobFamily, rolledTier);
+        return new WorkOrder(jobFamily, rolledTier, objective, required, minMasteryLevel == UNSET ? 0 : minMasteryLevel,
                 bounty == UNSET ? WorkOrder.BASE_BOUNTY + objective.bonus() : bounty, prestige == UNSET ? 0 : prestige)
                 .fromTemplate(id.toString(), name, rewardTable);
     }
 
-    /** The template's chassis stage, or the tier's stage capped at the family's top stage. */
+    /** The stage that caps the template's item options: its own chassis stage, or the family's cap for the tier. */
     private int stage(int tier, String jobFamily) {
-        return minStage != UNSET ? minStage : Math.min(WorkOrder.tierStage(tier), WorkOrderFamilies.topStage(jobFamily));
+        return minStage != UNSET ? minStage : WorkOrderFamilies.stageCap(jobFamily, tier);
     }
 
     /** The inline parts with their counts rolled. The Bounty bonus is the highest band any ranged part lands in. */

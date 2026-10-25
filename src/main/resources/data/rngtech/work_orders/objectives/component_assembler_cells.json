@@ -1,0 +1,48 @@
+{
+    "family": "component_assembler",
+    "type": "assemble",
+    "filter": "stage",
+    "weight": 2,
+    "tiers": [
+        {
+            "count": {
+                "min": 16,
+                "max": 24,
+                "step": 2
+            },
+            "min": 2
+        },
+        {
+            "count": {
+                "min": 12,
+                "max": 18,
+                "step": 2
+            },
+            "min": 4
+        },
+        {
+            "count": {
+                "min": 10,
+                "max": 16,
+                "step": 2
+            },
+            "min": 5
+        },
+        {
+            "count": {
+                "min": 8,
+                "max": 12,
+                "step": 2
+            },
+            "min": 6
+        },
+        {
+            "count": {
+                "min": 6,
+                "max": 10,
+                "step": 2
+            },
+            "min": 7
+        }
+    ]
+}

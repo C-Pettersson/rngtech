@@ -3,10 +3,15 @@ package com.rngtech.content.menu;
 import com.rngtech.content.block.BatteryAssemblerBlock;
 import com.rngtech.content.blockentity.BaseMachineBlockEntity;
 import com.rngtech.content.blockentity.BatteryAssemblerBlockEntity;
+import com.rngtech.content.item.JobChipItem;
 import com.rngtech.content.purge.FluidPurgeSupport;
 import com.rngtech.content.registry.ModMenus;
+import com.rngtech.content.workorder.DriveBays;
 import com.rngtech.rpg.MachineStatAccumulator;
 import com.rngtech.rpg.MachineTraits;
+import com.rngtech.rpg.workorder.MachineWorkOrders;
+import com.rngtech.rpg.workorder.WorkOrderFamilies;
+import com.rngtech.rpg.workorder.WorkOrderHost;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -25,16 +30,18 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.Fluids;
 import net.neoforged.neoforge.fluids.FluidStack;
+import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.ItemStackHandler;
 import net.neoforged.neoforge.items.SlotItemHandler;
 
 import java.util.function.BooleanSupplier;
 
-public class BatteryAssemblerMenu extends AbstractContainerMenu implements StatBreakdownMenu {
+public class BatteryAssemblerMenu extends AbstractContainerMenu implements StatBreakdownMenu, WorkOrderMenuView {
     public static final int TAB_PROCESSING = 0;
     public static final int TAB_GEAR = 1;
     public static final int TAB_CONFIGURATION = 2;
     public static final int TAB_REFINEMENT = 3;
+    public static final int TAB_ORDERS = 4;
 
     private static final int DATA_PROGRESS = 0;
     private static final int DATA_PROCESSING_TICKS = 1;
@@ -68,6 +75,7 @@ public class BatteryAssemblerMenu extends AbstractContainerMenu implements StatB
     private final BatteryAssemblerBlockEntity assembler;
     private final ItemStackHandler refinementTarget = new ItemStackHandler(1);
     private int selectedTab = TAB_PROCESSING;
+    private final ContainerData workOrderData;
 
     public BatteryAssemblerMenu(int containerId, Inventory playerInventory, RegistryFriendlyByteBuf extraData) {
         this(
@@ -126,7 +134,44 @@ public class BatteryAssemblerMenu extends AbstractContainerMenu implements StatB
         addSlot(RefinementMenuSupport.targetDisplaySlot(refinementTarget, RefinementMenuSupport.REFINEMENT_TARGET_SLOT_X, RefinementMenuSupport.REFINEMENT_SLOT_Y, () -> selectedTab == TAB_REFINEMENT));
 
         addPlayerInventory(playerInventory);
+        IItemHandler bays = playerInventory.player.level().isClientSide ? DriveBays.client(this) : new DriveBays(assembler);
+        for (int bay = 0; bay < MachineWorkOrders.SLOTS; bay++) {
+            addSlot(new DriveBaySlot(bays, bay, () -> selectedTab == TAB_ORDERS));
+        }
         addDataSlots(data);
+        workOrderData = playerInventory.player.level().isClientSide ? new SimpleContainerData(WorkOrderMenuSupport.FIELD_COUNT)
+                : WorkOrderMenuSupport.data(assembler);
+        addDataSlots(workOrderData);
+    }
+
+    @Override
+    public WorkOrderHost workOrderHost() {
+        return assembler;
+    }
+
+    @Override
+    public String workOrderFamily() {
+        return WorkOrderFamilies.COMPONENT_ASSEMBLER;
+    }
+
+    @Override
+    public int workOrderStage() {
+        return 0;
+    }
+
+    @Override
+    public int workOrderMasteryLevel() {
+        return 0;
+    }
+
+    @Override
+    public WorkOrderMenuSupport.View workOrderView() {
+        return WorkOrderMenuSupport.view(workOrderData, 0);
+    }
+
+    @Override
+    public ItemStack workOrderChip(int bay) {
+        return bay >= 0 && bay < MachineWorkOrders.SLOTS ? getSlot(HOTBAR_END + bay).getItem() : ItemStack.EMPTY;
     }
 
     public void selectTab(int tab) {
@@ -134,6 +179,7 @@ public class BatteryAssemblerMenu extends AbstractContainerMenu implements StatB
             case TAB_GEAR -> TAB_GEAR;
             case TAB_CONFIGURATION -> TAB_CONFIGURATION;
             case TAB_REFINEMENT -> TAB_REFINEMENT;
+            case TAB_ORDERS -> TAB_ORDERS;
             default -> TAB_PROCESSING;
         };
     }
@@ -252,6 +298,10 @@ public class BatteryAssemblerMenu extends AbstractContainerMenu implements StatB
 
     @Override
     public boolean clickMenuButton(Player player, int id) {
+        if (id >= WorkOrderMenuSupport.BUTTON_SELECT_TAB && id <= WorkOrderMenuSupport.BUTTON_SELECT_TAB + TAB_ORDERS) {
+            selectTab(id - WorkOrderMenuSupport.BUTTON_SELECT_TAB);
+            return true;
+        }
         if (FluidPurgeSupport.handleMenuButton(player, assembler, id)) {
             return true;
         }
@@ -299,7 +349,15 @@ public class BatteryAssemblerMenu extends AbstractContainerMenu implements StatB
         ItemStack stack = slot.getItem();
         moved = stack.copy();
 
-        if (index == REFINEMENT_CONSUMABLE_SLOT) {
+        if (index >= HOTBAR_END) {
+            if (!moveItemStackTo(stack, PLAYER_INVENTORY_START, HOTBAR_END, false)) {
+                return ItemStack.EMPTY;
+            }
+        } else if (selectedTab == TAB_ORDERS && index >= PLAYER_INVENTORY_START && JobChipItem.isWorkOrder(stack)) {
+            if (!moveItemStackTo(stack, HOTBAR_END, HOTBAR_END + MachineWorkOrders.SLOTS, false)) {
+                return ItemStack.EMPTY;
+            }
+        } else if (index == REFINEMENT_CONSUMABLE_SLOT) {
             if (!moveItemStackTo(stack, PLAYER_INVENTORY_START, HOTBAR_END, false)) {
                 return ItemStack.EMPTY;
             }

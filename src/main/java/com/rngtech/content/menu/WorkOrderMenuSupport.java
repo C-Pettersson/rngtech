@@ -7,6 +7,7 @@ import com.rngtech.rpg.workorder.MachineWorkOrders;
 import com.rngtech.rpg.workorder.WorkFilter;
 import com.rngtech.rpg.workorder.WorkObjective;
 import com.rngtech.rpg.workorder.WorkObjectiveType;
+import com.rngtech.rpg.workorder.WorkOrderHost;
 import com.rngtech.rpg.workorder.WorkPart;
 
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -95,6 +96,25 @@ public final class WorkOrderMenuSupport {
             case 3 -> value.statGoal() ? statId(value.item()) : itemId(value.item());
             case 4 -> clamp(value.target());
             default -> clamp(loaded.progress().get(part));
+        };
+    }
+
+    /** The server's live menu data for a machine without Mastery fields to embed the chips in. */
+    public static ContainerData data(WorkOrderHost host) {
+        return new ContainerData() {
+            @Override
+            public int get(int index) {
+                return WorkOrderMenuSupport.get(host.workOrders(), index, host.workOrderGameTime());
+            }
+
+            @Override
+            public void set(int index, int value) {
+            }
+
+            @Override
+            public int getCount() {
+                return FIELD_COUNT;
+            }
         };
     }
 

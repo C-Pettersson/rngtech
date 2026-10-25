@@ -76,9 +76,9 @@ public final class WorkOrderRules {
             return chosen.template().roll(rolledTier, byId, random, itemAvailable);
         }
         WorkObjectiveEntry entry = chosen.entry();
-        int stage = stageCap(rolledTier, entry);
-        WorkObjective objective = entry.roll(rolledTier, stage, random, itemAvailable);
-        return new WorkOrder(entry.family(), rolledTier, objective, stage, 0, WorkOrder.BASE_BOUNTY + objective.bonus(), 0);
+        WorkObjective objective = entry.roll(rolledTier, stageCap(rolledTier, entry), random, itemAvailable);
+        return new WorkOrder(entry.family(), rolledTier, objective, WorkOrderFamilies.requiredStage(entry.family(), rolledTier), 0,
+                WorkOrder.BASE_BOUNTY + objective.bonus(), 0);
     }
 
     /** One thing a listing can draw: a random objective or a pooled template, with its weight. */
@@ -102,7 +102,7 @@ public final class WorkOrderRules {
     }
 
     private static int stageCap(int tier, WorkObjectiveEntry entry) {
-        return Math.min(WorkOrder.tierStage(tier), WorkOrderFamilies.topStage(entry.family()));
+        return WorkOrderFamilies.stageCap(entry.family(), tier);
     }
 
     /**

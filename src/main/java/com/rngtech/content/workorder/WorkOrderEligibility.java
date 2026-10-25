@@ -1,6 +1,8 @@
 package com.rngtech.content.workorder;
 
+import com.rngtech.content.item.BatteryCellItem;
 import com.rngtech.content.material.MaterialCatalog;
+import com.rngtech.content.recipe.BatteryAssemblyRecipe;
 import com.rngtech.content.recipe.CrusherRecipe;
 import com.rngtech.content.recipe.FurnaceRecipe;
 import com.rngtech.content.registry.ModRecipes;
@@ -43,9 +45,23 @@ public final class WorkOrderEligibility {
      * several forms, so a Furnace list names materials instead of items.
      */
     public static List<Component> names(RecipeManager recipes, WorkPart part) {
-        return WorkObjectiveType.byId(part.type()) == WorkObjectiveType.SMELT
-                ? materials(recipes, part).stream().map(id -> (Component) Component.literal(MaterialCatalog.materialFamily(id).displayName())).toList()
-                : items(recipes, part).stream().map(Item::getDescription).toList();
+        return switch (WorkObjectiveType.byId(part.type())) {
+            case SMELT -> materials(recipes, part).stream().map(id -> (Component) Component.literal(MaterialCatalog.materialFamily(id).displayName())).toList();
+            case ASSEMBLE -> cells(recipes, part).stream().map(Item::getDescription).toList();
+            case null, default -> items(recipes, part).stream().map(Item::getDescription).toList();
+        };
+    }
+
+    /** The Battery Cells the Component Assembler makes at the part's stage or more, sorted by name. */
+    public static List<Item> cells(RecipeManager recipes, WorkPart part) {
+        Set<Item> cells = new LinkedHashSet<>();
+        for (RecipeHolder<BatteryAssemblyRecipe> holder : recipes.getAllRecipesFor(ModRecipes.BATTERY_ASSEMBLY_TYPE.get())) {
+            ItemStack result = holder.value().outputStack();
+            if (result.getItem() instanceof BatteryCellItem cell && cell.material().stage() >= part.minimum()) {
+                cells.add(result.getItem());
+            }
+        }
+        return cells.stream().sorted(Comparator.comparing(item -> item.getDescription().getString())).toList();
     }
 
     /** The inputs of the Crusher recipes that need the part's Processing Level or more, sorted by name. */

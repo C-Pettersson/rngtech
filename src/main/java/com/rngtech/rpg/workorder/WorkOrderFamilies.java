@@ -9,9 +9,13 @@ import java.util.Set;
 
 /**
  * The machine kinds Work Orders name, by id. A Mastery machine's id is its Mastery family's. Machines without Mastery
- * join here when they get objectives.
+ * join here when they get objectives. A stageless machine, such as the Component Assembler, has no chassis stage: its
+ * chips need none, while the tier still caps which outputs a job can name.
  */
 public final class WorkOrderFamilies {
+    public static final String COMPONENT_ASSEMBLER = "component_assembler";
+    private static final Set<String> STAGELESS = Set.of(COMPONENT_ASSEMBLER);
+
     /**
      * The stats each family's stat goals may name: effective stats players raise through Gear, refinement, or Mastery and
      * the family's machine reads. A goal never grants a stat, it only asks for one.
@@ -42,6 +46,24 @@ public final class WorkOrderFamilies {
     }
 
     public static boolean known(String id) {
-        return topStage(id) > 0;
+        return topStage(id) > 0 || STAGELESS.contains(id);
+    }
+
+    /** Whether machines of {@code id} have chassis stages a chip's stage requirement checks. */
+    public static boolean staged(String id) {
+        return !STAGELESS.contains(id);
+    }
+
+    /**
+     * The stage that caps what a job of {@code tier} can name, such as its item options: the tier's stage, capped at the
+     * family's top stage when it has stages.
+     */
+    public static int stageCap(String id, int tier) {
+        return staged(id) ? Math.min(WorkOrder.tierStage(tier), topStage(id)) : WorkOrder.tierStage(tier);
+    }
+
+    /** The chassis stage a job of {@code tier} needs: the stage cap, or none on a stageless machine. */
+    public static int requiredStage(String id, int tier) {
+        return staged(id) ? stageCap(id, tier) : 0;
     }
 }

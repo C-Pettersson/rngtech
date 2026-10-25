@@ -254,9 +254,11 @@ public class JobChipItem extends Item {
         tooltipComponents.add(objectiveText(order.objective()).copy().withStyle(ChatFormatting.GRAY));
         appendEligibleItems(tooltipComponents, order.objective(), traits(stack));
         appendConditions(tooltipComponents, traits(stack));
-        tooltipComponents.add(order.minMasteryLevel() > 0
-                ? Component.translatable("rngtech.tooltip.work_order.requires_level", order.minStage(), order.minMasteryLevel()).withStyle(ChatFormatting.GRAY)
-                : Component.translatable("rngtech.tooltip.work_order.requires", order.minStage()).withStyle(ChatFormatting.GRAY));
+        if (order.minStage() > 0 || order.minMasteryLevel() > 0) {
+            tooltipComponents.add(order.minMasteryLevel() > 0
+                    ? Component.translatable("rngtech.tooltip.work_order.requires_level", order.minStage(), order.minMasteryLevel()).withStyle(ChatFormatting.GRAY)
+                    : Component.translatable("rngtech.tooltip.work_order.requires", order.minStage()).withStyle(ChatFormatting.GRAY));
+        }
         if (!WorkOrderRewards.items(order.rewards()).isEmpty()) {
             WorkOrderRewards.appendLines(tooltipComponents, order.rewards());
         } else {
