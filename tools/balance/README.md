@@ -64,9 +64,20 @@ Rolls use `MachineTraitRoller`, part stats merge through `ComponentBaseStatCatal
 - `levels`: the Mastery levels to model. Each level `L` spends `L - 1` points.
 - `stages`: one row per stage. Each row names the stage's metal, the stage-matched Crusher chassis, Crush Head, Battery Cell, Furnace chassis and Heat Core, the Universal Connector, the stage's primary generator FE/t for comparison, and the Ascendancy Seal tiers assumed at that stage. `furnaceVariants` adds sidegrade Furnaces, such as the Lead Furnace or an Aluminum Heat Core with a flat Max Temperature roll.
 - `archetypes`: one build per archetype. Each machine lists its chassis and part affixes (`prefix:<id>` or `suffix:<id>`), a `tree` key, and optionally an ascendancy with nodes in allocation order. Seal tiers decide how many ascendancy nodes apply.
-- `trees`: shared Mastery tree allocations, by level, in a valid allocation order. They were chosen by a search over `machine_tree.json` that maximizes the archetype's stat, with recipe-blocking keystones (temperature and hardness caps, Single Pass, Cell Bypass) excluded.
+- `trees`: shared Mastery tree allocations, by level, in a valid allocation order. `processingTreeSearch` writes them; see [Tree search](#tree-search).
+- `treeSearch`: what each tree maximizes. Each entry under `objectives` names the machine `family`, the archetype whose affixes and ascendancy score it, and its `metrics`: `output` (items per input), `speed` (inputs per tick), `efficiency` (inputs per FE), and `batch` (Crusher Batch Size).
 
 Every listed affix is a perfect crafted Magic roll: the highest tier refinement upgrades reach (`6`, or the family's top tier), at its maximum value. The task rejects affixes that a profile cannot roll or that share a mod group.
+
+### Tree search
+
+```sh
+./gradlew processingTreeSearch
+```
+
+The task rewrites `trees` in `processing-setups.json` for every tree under `treeSearch.objectives`. Run it after a passive tree change; `masteryCheck` fails while a stored allocation is no longer a valid build.
+
+A build's score is the sum, over every stage and each of the tree's metrics, of the log ratio to the same machine with no tree. The Crusher is measured crushing the stage's ore, the Furnace smelting its crushed ore, with the ascendancy nodes the stage's Seals unlock. The search is greedy and deterministic: each step allocates the shortest path to whichever node gains the most score per point, ties going to the shorter path and then the lower node index. It stops when no path gains or the level's points run out, so a tree can leave points unspent. Nodes that cap recipe temperature or hardness, Single Pass, and Cell Bypass are never allocated, since they would block recipes the model runs.
 
 ### Output
 
