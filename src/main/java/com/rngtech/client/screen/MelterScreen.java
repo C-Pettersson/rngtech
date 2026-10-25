@@ -54,7 +54,7 @@ public class MelterScreen extends AbstractContainerScreen<MelterMenu> implements
     private static final int PROGRESS_HEIGHT = 8;
     private static final int STATUS_X = 104;
     private static final int TRANSFER_X = 120;
-    private static final int STATUS_Y = 41;
+    private static final int STATUS_Y = 42;
     private static final int STATUS_SIZE = 12;
     private static final int PROCESSING_LEVEL_ICON_X = 136;
     private static final int PROCESSING_LEVEL_ICON_Y = STATUS_Y;

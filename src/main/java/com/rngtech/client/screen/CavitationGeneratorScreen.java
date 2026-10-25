@@ -46,7 +46,7 @@ public class CavitationGeneratorScreen extends AbstractContainerScreen<Cavitatio
     private static final int ENERGY_METER_WIDTH = 12;
     private static final int ENERGY_METER_HEIGHT = 52;
     private static final int STATUS_ICON_X = 84;
-    private static final int STATUS_ICON_Y = 30;
+    private static final int STATUS_ICON_Y = 34;
     private static final int GENERATION_ICON_X = 100;
     private static final int OUTPUT_ICON_X = 116;
     private static final int PRESSURE_ICON_X = 132;

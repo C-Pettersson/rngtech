@@ -32,7 +32,7 @@ public class AmmoniaFuelCellScreen extends AbstractContainerScreen<AmmoniaFuelCe
     private static final int RESIDUE_SLOT_X = 194;
     private static final int RESIDUE_SLOT_Y = 60;
     private static final int STATUS_X = 90;
-    private static final int STATUS_Y = 60;
+    private static final int STATUS_Y = 33;
     private static final int STATUS_SIZE = 12;
 
     private final MachineTabs tabs;

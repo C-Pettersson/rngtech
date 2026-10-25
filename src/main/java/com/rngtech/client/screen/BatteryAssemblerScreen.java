@@ -38,7 +38,7 @@ public class BatteryAssemblerScreen extends AbstractContainerScreen<BatteryAssem
     private static final int PROGRESS_HEIGHT = 8;
     private static final int STATUS_X = 147;
     private static final int TRANSFER_X = 163;
-    private static final int STATUS_Y = 66;
+    private static final int STATUS_Y = 35;
     private static final int STATUS_SIZE = 12;
     private static final int[] INPUT_SLOT_X = {56, 78, 100, 122};
     private static final int INPUT_SLOT_Y = 28;

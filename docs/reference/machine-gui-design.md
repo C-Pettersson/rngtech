@@ -166,6 +166,7 @@ Rules:
 - If a machine needs a deliberately smaller auxiliary meter, make the difference meaningful: label it, frame it differently, or move it to `Stats`. Do not mix random meter heights for visual decoration.
 - Adjacent output meters on the right should feel like a coordinated output cluster, not unrelated widgets.
 - Meter height and baseline are reserved before status icon layout. If a status icon row would force unequal meters, change the status rail orientation instead of changing the meters.
+- The center lane stacks in one order, top to bottom: status squares, the progress bar, readout bars (strain, wear, bonus), then graphs and setting dials (retention, speed, depth). The status squares sit 3 px above the first bar under them. A graph that explains a dial sits directly above it. A thin bar that fills alongside the progress bar, like the Crusher's output bonus, may sit directly above it so the progress bar keeps its slot alignment. The Wooden Composter keeps its status row under its progress bar, because its item grid fills the space above.
 - Where the layout allows it, such as one input and one output, the input and output slot frames share a row, and the bottom of the progress bar lines up with the bottom of the slot frames. The progress group (status squares, bonus bar, progress bar) is centered vertically against the energy meter.
 
 ## Tabs

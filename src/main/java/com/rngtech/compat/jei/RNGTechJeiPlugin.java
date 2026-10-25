@@ -362,7 +362,7 @@ public final class RNGTechJeiPlugin implements IModPlugin {
                 SolidFuelBurnerScreen.class,
                 screen -> screen.getMenu().selectedTab() == SolidFuelBurnerMenu.TAB_PROCESSING,
                 110,
-                48,
+                52,
                 58,
                 7,
                 JeiRecipeTypes.SOLID_FUEL_BURNING
@@ -372,7 +372,7 @@ public final class RNGTechJeiPlugin implements IModPlugin {
                 BioGeneratorScreen.class,
                 screen -> screen.getMenu().selectedTab() == BioGeneratorMenu.TAB_PROCESSING,
                 96,
-                48,
+                52,
                 72,
                 7,
                 JeiRecipeTypes.BIO_GENERATOR
@@ -482,7 +482,7 @@ public final class RNGTechJeiPlugin implements IModPlugin {
                 ResonanceCalibratorScreen.class,
                 screen -> screen.getMenu().selectedTab() == ResonanceCalibratorMenu.TAB_PROCESSING,
                 92,
-                74,
+                77,
                 76,
                 8,
                 JeiRecipeTypes.CALIBRATION
@@ -523,7 +523,7 @@ public final class RNGTechJeiPlugin implements IModPlugin {
                 VacuumCollapseGeneratorScreen.class,
                 screen -> screen.getMenu().selectedTab() == VacuumCollapseGeneratorMenu.TAB_PROCESSING,
                 90,
-                62,
+                37,
                 66,
                 7,
                 JeiRecipeTypes.VACUUM_COLLAPSE

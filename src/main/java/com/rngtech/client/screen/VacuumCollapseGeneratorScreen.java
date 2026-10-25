@@ -36,13 +36,13 @@ public class VacuumCollapseGeneratorScreen extends AbstractContainerScreen<Vacuu
     private static final int ENERGY_METER_WIDTH = 12;
     private static final int ENERGY_METER_HEIGHT = 52;
     private static final int PROGRESS_BAR_X = 90;
-    private static final int PROGRESS_BAR_Y = 62;
+    private static final int PROGRESS_BAR_Y = 37;
     private static final int PROGRESS_BAR_WIDTH = 66;
     private static final int PROGRESS_BAR_HEIGHT = 7;
     private static final int ICON_SIZE = 12;
     private static final int STATUS_ICON_SPACING = 16;
     private static final int STATUS_ICON_X = PROGRESS_BAR_X;
-    private static final int STATUS_ICON_Y = 47;
+    private static final int STATUS_ICON_Y = 22;
     private static final int GENERATION_ICON_X = STATUS_ICON_X + STATUS_ICON_SPACING;
     private static final int OUTPUT_ICON_X = GENERATION_ICON_X + STATUS_ICON_SPACING;
     private static final int INSTABILITY_ICON_X = OUTPUT_ICON_X + STATUS_ICON_SPACING;
@@ -50,7 +50,7 @@ public class VacuumCollapseGeneratorScreen extends AbstractContainerScreen<Vacuu
     private static final int PROCESSING_LEVEL_ICON_Y = STATUS_ICON_Y;
     private static final int PROCESSING_LEVEL_MAX = 8;
     private static final int CURVE_X = PROGRESS_BAR_X;
-    private static final int CURVE_Y = 20;
+    private static final int CURVE_Y = 48;
     private static final int CURVE_WIDTH = PROGRESS_BAR_WIDTH;
     private static final int CURVE_HEIGHT = 24;
     private static final int CURVE_DONE = 0xFF9C88E0;
@@ -58,7 +58,7 @@ public class VacuumCollapseGeneratorScreen extends AbstractContainerScreen<Vacuu
     private static final int CURVE_AVERAGE = 0xFF6B6B6B;
     private static final int CURVE_MARKER = 0xFFF2F2F2;
     private static final int DEPTH_X = PROGRESS_BAR_X;
-    private static final int DEPTH_Y = 80;
+    private static final int DEPTH_Y = 76;
     private static final int DEPTH_WIDTH = PROGRESS_BAR_WIDTH;
     private static final int DEPTH_HEIGHT = 8;
     private static final int DEPTH_POINTER_HEIGHT = 3;
