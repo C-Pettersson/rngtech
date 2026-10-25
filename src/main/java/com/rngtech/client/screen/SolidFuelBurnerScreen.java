@@ -1,8 +1,10 @@
 package com.rngtech.client.screen;
 
 import com.rngtech.content.blockentity.SolidFuelBurnerBlockEntity;
+import com.rngtech.content.energy.SolidFuelBurnerChassis;
 import com.rngtech.content.energy.SolidFuelBurnerStoke;
 import com.rngtech.content.menu.SolidFuelBurnerMenu;
+import com.rngtech.content.registry.ModBlocks;
 import com.rngtech.rpg.MachineStat;
 
 import net.minecraft.ChatFormatting;
@@ -14,7 +16,7 @@ import net.minecraft.world.entity.player.Inventory;
 import java.util.List;
 import java.util.Locale;
 
-public class SolidFuelBurnerScreen extends AbstractContainerScreen<SolidFuelBurnerMenu> {
+public class SolidFuelBurnerScreen extends AbstractContainerScreen<SolidFuelBurnerMenu> implements MachineTabs.Host {
     private static final int PANEL = 0xFFC6C6C6;
     private static final int PANEL_DARK = 0xFF8B8B8B;
     private static final int PANEL_LIGHT = 0xFFE9E9E9;
@@ -23,8 +25,6 @@ public class SolidFuelBurnerScreen extends AbstractContainerScreen<SolidFuelBurn
     private static final int ENERGY = 0xFFB43B28;
     private static final int FUEL = 0xFFD3942F;
     private static final int STAT_ACCENT = 0xFFE3B75A;
-    private static final int TAB_WIDTH = 54;
-    private static final int TAB_SPACING = 56;
     private static final int STAT_PANEL_X = 8;
     private static final int STAT_PANEL_Y = 18;
     private static final int STAT_PANEL_WIDTH = 224;
@@ -78,18 +78,32 @@ public class SolidFuelBurnerScreen extends AbstractContainerScreen<SolidFuelBurn
             MachineStat.STABILITY
     };
 
+    private final MachineTabs tabs;
+
     public SolidFuelBurnerScreen(SolidFuelBurnerMenu menu, Inventory playerInventory, Component title) {
         super(menu, playerInventory, title);
         imageWidth = 240;
         imageHeight = 200;
         inventoryLabelX = 39;
         inventoryLabelY = 104;
+        tabs = MachineTabs.builder(this)
+                .processing(SolidFuelBurnerMenu.TAB_PROCESSING, ModBlocks.SOLID_FUEL_BURNERS.get(SolidFuelBurnerChassis.CRUDE).get())
+                .gear(SolidFuelBurnerMenu.TAB_GEAR)
+                .stats(SolidFuelBurnerMenu.TAB_STATS)
+                .refinement(SolidFuelBurnerMenu.TAB_REFINEMENT)
+                .build();
+    }
+
+    @Override
+    public MachineTabs machineTabs() {
+        return tabs;
     }
 
     @Override
     public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         super.render(guiGraphics, mouseX, mouseY, partialTick);
         renderTooltip(guiGraphics, mouseX, mouseY);
+        tabs.renderTooltip(guiGraphics, mouseX, mouseY);
         renderValueTooltips(guiGraphics, mouseX, mouseY);
         renderStatTooltips(guiGraphics, mouseX, mouseY);
         RefinementScreenStyle.renderTooltips(guiGraphics, font, leftPos, topPos, mouseX, mouseY, menu.selectedTab() == RefinementScreenStyle.REFINEMENT_TAB_INDEX, menu.machineTraits(), menu);
@@ -99,7 +113,7 @@ public class SolidFuelBurnerScreen extends AbstractContainerScreen<SolidFuelBurn
     @Override
     protected void renderBg(GuiGraphics guiGraphics, float partialTick, int mouseX, int mouseY) {
         renderPanel(guiGraphics);
-        renderTabs(guiGraphics);
+        tabs.render(guiGraphics, mouseX, mouseY, menu.selectedTab());
         renderSlotFrames(guiGraphics);
         if (menu.selectedTab() == SolidFuelBurnerMenu.TAB_PROCESSING) {
             renderProcessing(guiGraphics);
@@ -115,6 +129,7 @@ public class SolidFuelBurnerScreen extends AbstractContainerScreen<SolidFuelBurn
     @Override
     protected void renderLabels(GuiGraphics guiGraphics, int mouseX, int mouseY) {
         guiGraphics.drawString(font, title, titleLabelX, titleLabelY, TEXT, false);
+        tabs.renderSelectedLabel(guiGraphics, menu.selectedTab(), titleLabelX, titleLabelY, TEXT_MUTED);
         if (menu.selectedTab() != SolidFuelBurnerMenu.TAB_STATS) {
             guiGraphics.drawString(font, playerInventoryTitle, inventoryLabelX, inventoryLabelY, TEXT, false);
         }
@@ -132,20 +147,9 @@ public class SolidFuelBurnerScreen extends AbstractContainerScreen<SolidFuelBurn
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         if (button == 0) {
-            if (isOverTab(mouseX, mouseY, 0)) {
-                menu.selectTab(SolidFuelBurnerMenu.TAB_PROCESSING);
-                return true;
-            }
-            if (isOverTab(mouseX, mouseY, 1)) {
-                menu.selectTab(SolidFuelBurnerMenu.TAB_GEAR);
-                return true;
-            }
-            if (isOverTab(mouseX, mouseY, 2)) {
-                menu.selectTab(SolidFuelBurnerMenu.TAB_STATS);
-                return true;
-            }
-            if (isOverTab(mouseX, mouseY, 3)) {
-                menu.selectTab(SolidFuelBurnerMenu.TAB_REFINEMENT);
+            int tab = tabs.tabAt(mouseX, mouseY);
+            if (tab >= 0) {
+                menu.selectTab(tab);
                 return true;
             }
             if (menu.selectedTab() == SolidFuelBurnerMenu.TAB_REFINEMENT
@@ -197,27 +201,6 @@ public class SolidFuelBurnerScreen extends AbstractContainerScreen<SolidFuelBurn
         guiGraphics.fill(x, y, x + 1, y + imageHeight, PANEL_LIGHT);
         guiGraphics.fill(x + imageWidth - 1, y, x + imageWidth, y + imageHeight, PANEL_DARK);
         guiGraphics.fill(x, y + imageHeight - 1, x + imageWidth, y + imageHeight, PANEL_DARK);
-    }
-
-    private void renderTabs(GuiGraphics guiGraphics) {
-        renderTab(guiGraphics, 0, Component.translatable("rngtech.tab.processing.short"), menu.selectedTab() == SolidFuelBurnerMenu.TAB_PROCESSING);
-        renderTab(guiGraphics, 1, Component.translatable("rngtech.tab.gear"), menu.selectedTab() == SolidFuelBurnerMenu.TAB_GEAR);
-        renderTab(guiGraphics, 2, Component.translatable("rngtech.tab.stats"), menu.selectedTab() == SolidFuelBurnerMenu.TAB_STATS);
-        renderTab(guiGraphics, 3, Component.translatable("rngtech.tab.refinement.short"), menu.selectedTab() == SolidFuelBurnerMenu.TAB_REFINEMENT);
-    }
-
-    private void renderTab(GuiGraphics guiGraphics, int index, Component label, boolean selected) {
-        int x = leftPos + 8 + index * TAB_SPACING;
-        int y = topPos - 20;
-        int color = selected ? PANEL : 0xFF9A9A9A;
-        guiGraphics.fill(x, y, x + TAB_WIDTH, y + 21, color);
-        guiGraphics.fill(x, y, x + TAB_WIDTH, y + 1, PANEL_LIGHT);
-        guiGraphics.fill(x, y, x + 1, y + 21, PANEL_LIGHT);
-        guiGraphics.fill(x + TAB_WIDTH - 1, y, x + TAB_WIDTH, y + 21, PANEL_DARK);
-        if (!selected) {
-            guiGraphics.fill(x, y + 20, x + TAB_WIDTH, y + 21, PANEL_DARK);
-        }
-        guiGraphics.drawString(font, label, x + (TAB_WIDTH - font.width(label)) / 2, y + 7, selected ? TEXT : 0xFF2F2F2F, false);
     }
 
     private void renderSlotFrames(GuiGraphics guiGraphics) {
@@ -657,11 +640,5 @@ public class SolidFuelBurnerScreen extends AbstractContainerScreen<SolidFuelBurn
 
     private void drawGearLabel(GuiGraphics guiGraphics, Component label, int centerX) {
         MachineScreenStyle.drawClippedCentered(guiGraphics, font, label, centerX, 35, 34, TEXT_MUTED);
-    }
-
-    private boolean isOverTab(double mouseX, double mouseY, int index) {
-        int x = leftPos + 8 + index * TAB_SPACING;
-        int y = topPos - 20;
-        return mouseX >= x && mouseX < x + TAB_WIDTH && mouseY >= y && mouseY < y + 21;
     }
 }

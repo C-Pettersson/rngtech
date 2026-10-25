@@ -4,6 +4,7 @@ import com.rngtech.content.blockentity.GasChemistryBlockEntity;
 import com.rngtech.content.chemistry.GasChemistryMachine;
 import com.rngtech.content.energy.CombustionMixture;
 import com.rngtech.content.menu.GasChemistryMenu;
+import com.rngtech.content.registry.ModBlocks;
 import com.rngtech.rpg.MachineStat;
 
 import net.minecraft.ChatFormatting;
@@ -11,6 +12,7 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.Fluids;
 
@@ -18,7 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-public class GasChemistryScreen extends AbstractContainerScreen<GasChemistryMenu> {
+public class GasChemistryScreen extends AbstractContainerScreen<GasChemistryMenu> implements MachineTabs.Host {
     private static final int PANEL = 0xFFC7C8C2;
     private static final int DARK = 0xFF565A5C;
     private static final int TEXT = 0xFF333333;
@@ -30,8 +32,6 @@ public class GasChemistryScreen extends AbstractContainerScreen<GasChemistryMenu
     private static final int SECONDARY = 0xFF8B8D90;
     private static final int PROGRESS = 0xFF5F9D69;
     private static final int STAT_ACCENT = 0xFF6B9085;
-    private static final int TAB_WIDTH = 54;
-    private static final int TAB_SPACING = 56;
     private static final int GASIFIER_INPUT_SLOT_X = 70;
     private static final int GASIFIER_OUTPUT_SLOT_X = 142;
     private static final int GASIFIER_OUTPUT_BAR_X = 174;
@@ -60,18 +60,41 @@ public class GasChemistryScreen extends AbstractContainerScreen<GasChemistryMenu
     private static final int MIXTURE_COARSE_STEP = 5;
     private static final int MIXTURE_NOTCH_STEP = 10;
 
+    private final MachineTabs tabs;
+
     public GasChemistryScreen(GasChemistryMenu menu, Inventory playerInventory, Component title) {
         super(menu, playerInventory, title);
         imageWidth = 240;
         imageHeight = 200;
         inventoryLabelX = 39;
         inventoryLabelY = 104;
+        tabs = MachineTabs.builder(this)
+                .processing(GasChemistryMenu.TAB_PROCESSING, processingBlock(menu.machine()))
+                .gear(GasChemistryMenu.TAB_GEAR)
+                .stats(GasChemistryMenu.TAB_STATS)
+                .refinement(GasChemistryMenu.TAB_REFINEMENT)
+                .style(new MachineTabs.Style(PANEL, 0xFFE9E9E9, 0xFF8B8B8B, 0xFF9A9A9A, 0xFFB0B0B0, 0xFF3F3F3F, 0xFF2F2F2F))
+                .build();
+    }
+
+    private static Block processingBlock(GasChemistryMachine machine) {
+        return switch (machine) {
+            case COAL_GASIFIER -> ModBlocks.COAL_GASIFIER.get();
+            case SYNGAS_COMBUSTOR -> ModBlocks.SYNGAS_COMBUSTOR.get();
+            case STEAM_METHANE_REFORMER -> ModBlocks.STEAM_METHANE_REFORMER.get();
+        };
+    }
+
+    @Override
+    public MachineTabs machineTabs() {
+        return tabs;
     }
 
     @Override
     public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         super.render(guiGraphics, mouseX, mouseY, partialTick);
         renderTooltip(guiGraphics, mouseX, mouseY);
+        tabs.renderTooltip(guiGraphics, mouseX, mouseY);
         renderValueTooltips(guiGraphics, mouseX, mouseY);
         renderStatTooltips(guiGraphics, mouseX, mouseY);
         RefinementScreenStyle.renderTooltips(guiGraphics, font, leftPos, topPos, mouseX, mouseY, menu.selectedTab() == RefinementScreenStyle.REFINEMENT_TAB_INDEX, menu.machineTraits(), menu);
@@ -81,7 +104,7 @@ public class GasChemistryScreen extends AbstractContainerScreen<GasChemistryMenu
     @Override
     protected void renderBg(GuiGraphics guiGraphics, float partialTick, int mouseX, int mouseY) {
         guiGraphics.fill(leftPos, topPos, leftPos + imageWidth, topPos + imageHeight, PANEL);
-        renderTabs(guiGraphics);
+        tabs.render(guiGraphics, mouseX, mouseY, menu.selectedTab());
         if (menu.selectedTab() == GasChemistryMenu.TAB_PROCESSING) {
             renderProcessing(guiGraphics);
         } else if (menu.selectedTab() == GasChemistryMenu.TAB_GEAR) {
@@ -101,6 +124,7 @@ public class GasChemistryScreen extends AbstractContainerScreen<GasChemistryMenu
     @Override
     protected void renderLabels(GuiGraphics guiGraphics, int mouseX, int mouseY) {
         guiGraphics.drawString(font, title, titleLabelX, titleLabelY, TEXT, false);
+        tabs.renderSelectedLabel(guiGraphics, menu.selectedTab(), titleLabelX, titleLabelY, MUTED);
         if (menu.selectedTab() != GasChemistryMenu.TAB_STATS) {
             guiGraphics.drawString(font, playerInventoryTitle, inventoryLabelX, inventoryLabelY, TEXT, false);
         }
@@ -123,11 +147,10 @@ public class GasChemistryScreen extends AbstractContainerScreen<GasChemistryMenu
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         if (button == 0) {
-            for (int index = 0; index < 4; index++) {
-                if (isOverTab(mouseX, mouseY, index)) {
-                    menu.selectTab(index);
-                    return true;
-                }
+            int tab = tabs.tabAt(mouseX, mouseY);
+            if (tab >= 0) {
+                menu.selectTab(tab);
+                return true;
             }
             if (menu.selectedTab() == GasChemistryMenu.TAB_REFINEMENT
                     && RefinementScreenStyle.handleApplyClick(this, menu, mouseX, mouseY)) {
@@ -308,20 +331,6 @@ public class GasChemistryScreen extends AbstractContainerScreen<GasChemistryMenu
                 value > 1.001,
                 MachineScreenStyle.statLayerTooltip(menu.getSlot(menu.refinementTargetSlot()).getItem(), stat, value)
         ).withStat(stat);
-    }
-
-    private void renderTabs(GuiGraphics guiGraphics) {
-        tab(guiGraphics, 0, Component.translatable("rngtech.tab.processing.short"));
-        tab(guiGraphics, 1, Component.translatable("rngtech.tab.gear"));
-        tab(guiGraphics, 2, Component.translatable("rngtech.tab.stats"));
-        tab(guiGraphics, 3, Component.translatable("rngtech.tab.refinement.short"));
-    }
-
-    private void tab(GuiGraphics guiGraphics, int index, Component label) {
-        int x = leftPos + 8 + index * TAB_SPACING;
-        int y = topPos - 20;
-        guiGraphics.fill(x, y, x + TAB_WIDTH, y + 21, menu.selectedTab() == index ? PANEL : 0xFF9A9A9A);
-        guiGraphics.drawString(font, label, x + (TAB_WIDTH - font.width(label)) / 2, y + 7, TEXT, false);
     }
 
     private void bar(GuiGraphics guiGraphics, int x, int y, float fill, Fluid fluid, int color) {
@@ -565,11 +574,5 @@ public class GasChemistryScreen extends AbstractContainerScreen<GasChemistryMenu
 
     private void drawGearLabel(GuiGraphics guiGraphics, Component label, int centerX) {
         MachineScreenStyle.drawClippedCentered(guiGraphics, font, label, centerX, 35, 34, MUTED);
-    }
-
-    private boolean isOverTab(double mouseX, double mouseY, int index) {
-        int x = leftPos + 8 + index * TAB_SPACING;
-        int y = topPos - 20;
-        return mouseX >= x && mouseX < x + TAB_WIDTH && mouseY >= y && mouseY < y + 21;
     }
 }

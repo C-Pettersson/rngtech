@@ -3,6 +3,7 @@ package com.rngtech.client.screen;
 import com.rngtech.content.blockentity.ForestryCartStationBlockEntity;
 import com.rngtech.content.entity.ForestryCartEntity;
 import com.rngtech.content.menu.ForestryCartStationMenu;
+import com.rngtech.content.registry.ModItems;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
@@ -16,7 +17,7 @@ import net.minecraft.world.item.Items;
 
 import java.util.List;
 
-public class ForestryCartStationScreen extends AbstractContainerScreen<ForestryCartStationMenu> {
+public class ForestryCartStationScreen extends AbstractContainerScreen<ForestryCartStationMenu> implements MachineTabs.Host {
     private static final int PANEL = 0xFFC6C6C6;
     private static final int PANEL_DARK = 0xFF8B8B8B;
     private static final int PANEL_LIGHT = 0xFFE9E9E9;
@@ -25,8 +26,6 @@ public class ForestryCartStationScreen extends AbstractContainerScreen<ForestryC
     private static final int ENERGY = 0xFFB43B28;
     private static final int FORESTRY = 0xFF4E8B54;
     private static final int WARNING = 0xFFB45B4A;
-    private static final int TAB_WIDTH = 54;
-    private static final int TAB_SPACING = 56;
     private static final int ENERGY_GAUGE_X = 212;
     private static final int ENERGY_GAUGE_Y = 30;
     private static final int ENERGY_GAUGE_WIDTH = 12;
@@ -50,18 +49,32 @@ public class ForestryCartStationScreen extends AbstractContainerScreen<ForestryC
     private static final int GHOST_OVERLAY = 0x998B8B8B;
     private static final int FERTILIZER = 0xFFE3DCC4;
 
+    private final MachineTabs tabs;
+
     public ForestryCartStationScreen(ForestryCartStationMenu menu, Inventory playerInventory, Component title) {
         super(menu, playerInventory, title);
         imageWidth = 240;
         imageHeight = 200;
         inventoryLabelX = 39;
         inventoryLabelY = 104;
+        tabs = MachineTabs.builder(this)
+                .tab(ForestryCartStationMenu.TAB_PROCESSING, "rngtech.tab.station", ModItems.FORESTRY_CART_STATION.get())
+                .tab(ForestryCartStationMenu.TAB_SUPPLY, "rngtech.tab.supply", Items.CHEST)
+                .gear(ForestryCartStationMenu.TAB_GEAR)
+                .stats(ForestryCartStationMenu.TAB_STATS)
+                .build();
+    }
+
+    @Override
+    public MachineTabs machineTabs() {
+        return tabs;
     }
 
     @Override
     public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         super.render(guiGraphics, mouseX, mouseY, partialTick);
         renderTooltip(guiGraphics, mouseX, mouseY);
+        tabs.renderTooltip(guiGraphics, mouseX, mouseY);
         renderValueTooltips(guiGraphics, mouseX, mouseY);
         renderEmptySlotHints(guiGraphics, mouseX, mouseY);
         GearSlotTooltips.render(this, guiGraphics, font, mouseX, mouseY);
@@ -70,7 +83,7 @@ public class ForestryCartStationScreen extends AbstractContainerScreen<ForestryC
     @Override
     protected void renderBg(GuiGraphics guiGraphics, float partialTick, int mouseX, int mouseY) {
         renderPanel(guiGraphics);
-        renderTabs(guiGraphics);
+        tabs.render(guiGraphics, mouseX, mouseY, menu.selectedTab());
         renderSlotFrames(guiGraphics);
         if (menu.selectedTab() == ForestryCartStationMenu.TAB_PROCESSING) {
             renderProcessing(guiGraphics);
@@ -86,6 +99,7 @@ public class ForestryCartStationScreen extends AbstractContainerScreen<ForestryC
     @Override
     protected void renderLabels(GuiGraphics guiGraphics, int mouseX, int mouseY) {
         guiGraphics.drawString(font, title, titleLabelX, titleLabelY, TEXT, false);
+        tabs.renderSelectedLabel(guiGraphics, menu.selectedTab(), titleLabelX, titleLabelY, TEXT_MUTED);
         if (menu.selectedTab() != ForestryCartStationMenu.TAB_STATS) {
             guiGraphics.drawString(font, playerInventoryTitle, inventoryLabelX, inventoryLabelY, TEXT, false);
         }
@@ -108,20 +122,9 @@ public class ForestryCartStationScreen extends AbstractContainerScreen<ForestryC
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         if (button == 0) {
-            if (isOverTab(mouseX, mouseY, 0)) {
-                menu.selectTab(ForestryCartStationMenu.TAB_PROCESSING);
-                return true;
-            }
-            if (isOverTab(mouseX, mouseY, 1)) {
-                menu.selectTab(ForestryCartStationMenu.TAB_SUPPLY);
-                return true;
-            }
-            if (isOverTab(mouseX, mouseY, 2)) {
-                menu.selectTab(ForestryCartStationMenu.TAB_GEAR);
-                return true;
-            }
-            if (isOverTab(mouseX, mouseY, 3)) {
-                menu.selectTab(ForestryCartStationMenu.TAB_STATS);
+            int tab = tabs.tabAt(mouseX, mouseY);
+            if (tab >= 0) {
+                menu.selectTab(tab);
                 return true;
             }
             if (menu.selectedTab() == ForestryCartStationMenu.TAB_PROCESSING
@@ -141,27 +144,6 @@ public class ForestryCartStationScreen extends AbstractContainerScreen<ForestryC
         guiGraphics.fill(x, y, x + 1, y + imageHeight, PANEL_LIGHT);
         guiGraphics.fill(x + imageWidth - 1, y, x + imageWidth, y + imageHeight, PANEL_DARK);
         guiGraphics.fill(x, y + imageHeight - 1, x + imageWidth, y + imageHeight, PANEL_DARK);
-    }
-
-    private void renderTabs(GuiGraphics guiGraphics) {
-        renderTab(guiGraphics, 0, Component.translatable("rngtech.tab.station"), menu.selectedTab() == ForestryCartStationMenu.TAB_PROCESSING);
-        renderTab(guiGraphics, 1, Component.translatable("rngtech.tab.supply"), menu.selectedTab() == ForestryCartStationMenu.TAB_SUPPLY);
-        renderTab(guiGraphics, 2, Component.translatable("rngtech.tab.gear"), menu.selectedTab() == ForestryCartStationMenu.TAB_GEAR);
-        renderTab(guiGraphics, 3, Component.translatable("rngtech.tab.stats"), menu.selectedTab() == ForestryCartStationMenu.TAB_STATS);
-    }
-
-    private void renderTab(GuiGraphics guiGraphics, int index, Component label, boolean selected) {
-        int x = leftPos + 8 + index * TAB_SPACING;
-        int y = topPos - 20;
-        int color = selected ? PANEL : 0xFF9A9A9A;
-        guiGraphics.fill(x, y, x + TAB_WIDTH, y + 21, color);
-        guiGraphics.fill(x, y, x + TAB_WIDTH, y + 1, PANEL_LIGHT);
-        guiGraphics.fill(x, y, x + 1, y + 21, PANEL_LIGHT);
-        guiGraphics.fill(x + TAB_WIDTH - 1, y, x + TAB_WIDTH, y + 21, PANEL_DARK);
-        if (!selected) {
-            guiGraphics.fill(x, y + 20, x + TAB_WIDTH, y + 21, PANEL_DARK);
-        }
-        MachineScreenStyle.drawClippedCentered(guiGraphics, font, label, x + TAB_WIDTH / 2, y + 7, TAB_WIDTH - 8, selected ? TEXT : 0xFF2F2F2F);
     }
 
     /** Short group labels sit centered above their slots, clipped to the group's width so they never overlap. */
@@ -526,12 +508,6 @@ public class ForestryCartStationScreen extends AbstractContainerScreen<ForestryC
         guiGraphics.fill(left, top, left + 18, top + 18, 0xFF373737);
         guiGraphics.fill(left + 1, top + 1, left + 17, top + 17, 0xFFE0E0E0);
         guiGraphics.fill(left + 2, top + 2, left + 16, top + 16, 0xFF8B8B8B);
-    }
-
-    private boolean isOverTab(double mouseX, double mouseY, int index) {
-        int x = leftPos + 8 + index * TAB_SPACING;
-        int y = topPos - 20;
-        return mouseX >= x && mouseX < x + TAB_WIDTH && mouseY >= y && mouseY < y + 21;
     }
 
     private boolean inBounds(double mouseX, double mouseY, int x, int y, int width, int height) {
