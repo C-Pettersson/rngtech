@@ -34,14 +34,14 @@ public class ComponentRecyclerScreen extends AbstractContainerScreen<ComponentRe
     private static final int ENERGY_BAR_WIDTH = 12;
     private static final int ENERGY_BAR_HEIGHT = 52;
     private static final int PROGRESS_BAR_X = 84;
-    private static final int PROGRESS_BAR_Y = 56;
+    private static final int PROGRESS_BAR_Y = 62;
     private static final int PROGRESS_BAR_WIDTH = 76;
     private static final int PROGRESS_BAR_HEIGHT = 7;
-    private static final int STATUS_ICON_X = 108;
-    private static final int STATUS_ICON_Y = 67;
-    private static final int ENERGY_ICON_X = 124;
-    private static final int PROCESSING_LEVEL_ICON_X = 184;
-    private static final int PROCESSING_LEVEL_ICON_Y = 78;
+    private static final int STATUS_ICON_X = 84;
+    private static final int STATUS_ICON_Y = 47;
+    private static final int ENERGY_ICON_X = 100;
+    private static final int PROCESSING_LEVEL_ICON_X = 116;
+    private static final int PROCESSING_LEVEL_ICON_Y = STATUS_ICON_Y;
     private static final int PROCESSING_LEVEL_MAX = 8;
     private static final int ICON_SIZE = 12;
     private static final String[] STAT_LABEL_KEYS = {
@@ -108,8 +108,6 @@ public class ComponentRecyclerScreen extends AbstractContainerScreen<ComponentRe
         renderSlotFrames(guiGraphics);
         if (menu.selectedTab() == ComponentRecyclerMenu.TAB_PROCESSING) {
             renderProcessing(guiGraphics);
-        } else if (menu.selectedTab() == ComponentRecyclerMenu.TAB_GEAR) {
-            renderGear(guiGraphics);
         } else if (menu.selectedTab() == ComponentRecyclerMenu.TAB_STATS) {
             renderStats(guiGraphics);
         } else if (menu.selectedTab() == ComponentRecyclerMenu.TAB_REFINEMENT) {
@@ -218,12 +216,6 @@ public class ComponentRecyclerScreen extends AbstractContainerScreen<ComponentRe
         int energyBottom = y + ENERGY_BAR_Y + ENERGY_BAR_HEIGHT - 2;
         guiGraphics.fill(x + ENERGY_BAR_X + 2, energyBottom - energyHeight, x + ENERGY_BAR_X + 10, energyBottom, ENERGY);
         renderProcessingIcons(guiGraphics);
-    }
-
-    private void renderGear(GuiGraphics guiGraphics) {
-        if (menu.isManual()) {
-            return;
-        }
         MachineScreenStyle.renderProcessingLevelSquare(
                 guiGraphics,
                 leftPos,
@@ -337,7 +329,10 @@ public class ComponentRecyclerScreen extends AbstractContainerScreen<ComponentRe
     }
 
     private void renderValueTooltips(GuiGraphics guiGraphics, int mouseX, int mouseY) {
-        if (menu.selectedTab() == ComponentRecyclerMenu.TAB_GEAR) {
+        if (menu.selectedTab() != ComponentRecyclerMenu.TAB_PROCESSING) {
+            return;
+        }
+        if (!menu.isManual()) {
             MachineScreenStyle.renderStatusSquareTooltip(
                     guiGraphics,
                     font,
@@ -349,12 +344,6 @@ public class ComponentRecyclerScreen extends AbstractContainerScreen<ComponentRe
                     PROCESSING_LEVEL_ICON_Y,
                     Component.translatable("rngtech.gear.tooltip.processing_level", menu.processingLevel())
             );
-            return;
-        }
-        if (menu.selectedTab() != ComponentRecyclerMenu.TAB_PROCESSING) {
-            return;
-        }
-        if (!menu.isManual()) {
             CompactValueText.renderTooltipIfHovered(
                     guiGraphics,
                     font,

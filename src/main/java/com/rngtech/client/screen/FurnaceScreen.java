@@ -39,8 +39,9 @@ public class FurnaceScreen extends AbstractContainerScreen<FurnaceMenu> implemen
     private static final int STAT_PANEL_X = 8;
     private static final int STAT_PANEL_Y = 18;
     private static final int STAT_PANEL_WIDTH = 224;
-    private static final int STATUS_ICON_X = 114;
-    private static final int STATUS_ICON_Y = 28;
+    private static final int STATUS_ICON_X = 86;
+    private static final int MULTI_LANE_STATUS_ICON_Y = 28;
+    private static final int SINGLE_LANE_STATUS_ICON_Y = 36;
     private static final int ICON_SIZE = 12;
     private static final int BAR_Y = 28;
     private static final int BAR_WIDTH = 10;
@@ -472,6 +473,11 @@ public class FurnaceScreen extends AbstractContainerScreen<FurnaceMenu> implemen
     }
 
     /** The Bloomer's ledger fills a thin line along the bottom edge of a lane's progress bar. */
+    /** The status row sits 3 px above the first progress bar, which is lower with one lane than with stacked lanes. */
+    private int statusIconY() {
+        return menu.activeProcessingSlots() == 1 ? SINGLE_LANE_STATUS_ICON_Y : MULTI_LANE_STATUS_ICON_Y;
+    }
+
     private void renderLedgerBar(GuiGraphics guiGraphics, int lane, int barY) {
         float ledger = menu.ledgerProgress(lane);
         if (ledger < 0.0F) {
@@ -496,8 +502,8 @@ public class FurnaceScreen extends AbstractContainerScreen<FurnaceMenu> implemen
     }
 
     private void renderStatusIcon(GuiGraphics guiGraphics) {
-        renderIconBox(guiGraphics, STATUS_ICON_X, STATUS_ICON_Y);
-        MachineScreenStyle.renderStatusGlyph(guiGraphics, leftPos + STATUS_ICON_X, topPos + STATUS_ICON_Y, statusState());
+        renderIconBox(guiGraphics, STATUS_ICON_X, statusIconY());
+        MachineScreenStyle.renderStatusGlyph(guiGraphics, leftPos + STATUS_ICON_X, topPos + statusIconY(), statusState());
     }
 
     private void renderConfiguration(GuiGraphics guiGraphics) {
@@ -662,7 +668,7 @@ public class FurnaceScreen extends AbstractContainerScreen<FurnaceMenu> implemen
                 mouseX,
                 mouseY,
                 STATUS_ICON_X,
-                STATUS_ICON_Y,
+                statusIconY(),
                 ICON_SIZE,
                 ICON_SIZE,
                 Component.translatable("rngtech.furnace.tooltip.status", statusComponent())

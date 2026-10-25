@@ -47,7 +47,7 @@ public class GasChemistryScreen extends AbstractContainerScreen<GasChemistryMenu
     private static final int STANDARD_PROGRESS_X = 92;
     private static final int STANDARD_PROGRESS_WIDTH = 48;
     private static final int MIXTURE_X = 72;
-    private static final int MIXTURE_Y = 32;
+    private static final int MIXTURE_Y = 66;
     private static final int MIXTURE_WIDTH = 72;
     private static final int MIXTURE_HEIGHT = 8;
     private static final int MIXTURE_POINTER_HEIGHT = 3;
@@ -284,7 +284,7 @@ public class GasChemistryScreen extends AbstractContainerScreen<GasChemistryMenu
         int progressWidth = menu.machine() == GasChemistryMachine.COAL_GASIFIER ? GASIFIER_PROGRESS_WIDTH : STANDARD_PROGRESS_WIDTH;
         guiGraphics.fill(leftPos + progressX, topPos + 54, leftPos + progressX + progressWidth, topPos + 62, DARK);
         guiGraphics.fill(leftPos + progressX + 1, topPos + 55, leftPos + progressX + 1 + Math.round((progressWidth - 2) * menu.progressFill()), topPos + 61, PROGRESS);
-        statusIcon(guiGraphics, 110, 66);
+        statusIcon(guiGraphics, progressX, 39);
         renderPurgeButtons(guiGraphics);
         if (menu.machine() == GasChemistryMachine.SYNGAS_COMBUSTOR) {
             renderMixtureGauge(guiGraphics);
@@ -400,7 +400,7 @@ public class GasChemistryScreen extends AbstractContainerScreen<GasChemistryMenu
         int progressX = menu.machine() == GasChemistryMachine.COAL_GASIFIER ? GASIFIER_PROGRESS_X : STANDARD_PROGRESS_X;
         int progressWidth = menu.machine() == GasChemistryMachine.COAL_GASIFIER ? GASIFIER_PROGRESS_WIDTH : STANDARD_PROGRESS_WIDTH;
         CompactValueText.renderTooltipIfHovered(guiGraphics, font, leftPos, topPos, mouseX, mouseY, progressX, 54, progressWidth, 8, progressTooltip());
-        CompactValueText.renderTooltipIfHovered(guiGraphics, font, leftPos, topPos, mouseX, mouseY, 110, 66, 12, 12,
+        CompactValueText.renderTooltipIfHovered(guiGraphics, font, leftPos, topPos, mouseX, mouseY, progressX, 39, 12, 12,
                 Component.translatable("rngtech.gas_chemistry.tooltip.status", statusComponent()));
     }
 

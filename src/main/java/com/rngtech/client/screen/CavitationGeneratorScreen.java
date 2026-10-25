@@ -46,7 +46,7 @@ public class CavitationGeneratorScreen extends AbstractContainerScreen<Cavitatio
     private static final int ENERGY_METER_WIDTH = 12;
     private static final int ENERGY_METER_HEIGHT = 52;
     private static final int STATUS_ICON_X = 84;
-    private static final int STATUS_ICON_Y = 30;
+    private static final int STATUS_ICON_Y = 34;
     private static final int GENERATION_ICON_X = 100;
     private static final int OUTPUT_ICON_X = 116;
     private static final int PRESSURE_ICON_X = 132;
@@ -74,8 +74,8 @@ public class CavitationGeneratorScreen extends AbstractContainerScreen<Cavitatio
     private static final int PITTED_LABEL_Y = 47;
     private static final int PITTED_SLOT_X = 192;
     private static final int PITTED_SLOT_Y = 61;
-    private static final int PROCESSING_LEVEL_ICON_X = 184;
-    private static final int PROCESSING_LEVEL_ICON_Y = 78;
+    private static final int PROCESSING_LEVEL_ICON_X = 148;
+    private static final int PROCESSING_LEVEL_ICON_Y = STATUS_ICON_Y;
     private static final int PROCESSING_LEVEL_MAX = 4;
     private static final String[] STAT_LABEL_KEYS = {
             "rngtech.stat.energy_generation",
@@ -150,11 +150,9 @@ public class CavitationGeneratorScreen extends AbstractContainerScreen<Cavitatio
         renderSlotFrames(guiGraphics);
         if (menu.selectedTab() == CavitationGeneratorMenu.TAB_PROCESSING) {
             renderProcessing(guiGraphics);
-        } else if (menu.selectedTab() == CavitationGeneratorMenu.TAB_GEAR) {
-            renderGear(guiGraphics);
         } else if (menu.selectedTab() == CavitationGeneratorMenu.TAB_STATS) {
             MachineScreenStyle.renderStatPanel(guiGraphics, leftPos, topPos, STAT_PANEL_X, STAT_PANEL_Y, STAT_PANEL_WIDTH, statLines().length, ENERGY);
-        } else {
+        } else if (menu.selectedTab() == CavitationGeneratorMenu.TAB_REFINEMENT) {
             RefinementScreenStyle.render(guiGraphics, leftPos, topPos, menu.machineTraits(), ENERGY);
         }
     }
@@ -302,6 +300,16 @@ public class CavitationGeneratorScreen extends AbstractContainerScreen<Cavitatio
         renderHorizontalMeter(guiGraphics, PROGRESS_BAR_X, WEAR_BAR_Y, PROCESS_BAR_WIDTH, STRAIN_WEAR_BAR_HEIGHT, menu.wearProgress(), WEAR);
         renderSpeedGauge(guiGraphics);
         renderProcessingIcons(guiGraphics);
+        MachineScreenStyle.renderProcessingLevelSquare(
+                guiGraphics,
+                leftPos,
+                topPos,
+                PROCESSING_LEVEL_ICON_X,
+                PROCESSING_LEVEL_ICON_Y,
+                menu.processingLevel(),
+                PROCESSING_LEVEL_MAX,
+                ENERGY
+        );
         renderPurgeButtons(guiGraphics);
     }
 
@@ -393,19 +401,6 @@ public class CavitationGeneratorScreen extends AbstractContainerScreen<Cavitatio
         return String.format(Locale.ROOT, "%.2f", value);
     }
 
-    private void renderGear(GuiGraphics guiGraphics) {
-        MachineScreenStyle.renderProcessingLevelSquare(
-                guiGraphics,
-                leftPos,
-                topPos,
-                PROCESSING_LEVEL_ICON_X,
-                PROCESSING_LEVEL_ICON_Y,
-                menu.processingLevel(),
-                PROCESSING_LEVEL_MAX,
-                ENERGY
-        );
-    }
-
     private void renderProcessingIcons(GuiGraphics guiGraphics) {
         renderIconBox(guiGraphics, STATUS_ICON_X, STATUS_ICON_Y);
         guiGraphics.fill(leftPos + STATUS_ICON_X + 3, topPos + STATUS_ICON_Y + 3, leftPos + STATUS_ICON_X + 9, topPos + STATUS_ICON_Y + 9, statusColor());
@@ -473,23 +468,20 @@ public class CavitationGeneratorScreen extends AbstractContainerScreen<Cavitatio
     }
 
     private void renderValueTooltips(GuiGraphics guiGraphics, int mouseX, int mouseY) {
-        if (menu.selectedTab() == CavitationGeneratorMenu.TAB_GEAR) {
-            MachineScreenStyle.renderStatusSquareTooltip(
-                    guiGraphics,
-                    font,
-                    leftPos,
-                    topPos,
-                    mouseX,
-                    mouseY,
-                    PROCESSING_LEVEL_ICON_X,
-                    PROCESSING_LEVEL_ICON_Y,
-                    Component.translatable("rngtech.gear.tooltip.processing_level", menu.processingLevel())
-            );
-            return;
-        }
         if (menu.selectedTab() != CavitationGeneratorMenu.TAB_PROCESSING) {
             return;
         }
+        MachineScreenStyle.renderStatusSquareTooltip(
+                guiGraphics,
+                font,
+                leftPos,
+                topPos,
+                mouseX,
+                mouseY,
+                PROCESSING_LEVEL_ICON_X,
+                PROCESSING_LEVEL_ICON_Y,
+                Component.translatable("rngtech.gear.tooltip.processing_level", menu.processingLevel())
+        );
         if (renderPurgeTooltips(guiGraphics, mouseX, mouseY)) {
             return;
         }

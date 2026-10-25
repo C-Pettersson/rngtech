@@ -45,16 +45,16 @@ public class MetalPressScreen extends AbstractContainerScreen<MetalPressMenu> im
     private static final int BAR_HEIGHT = 50;
     private static final int BAR_FILL_HEIGHT = 48;
     private static final int RISK_BAR_X = 86;
-    private static final int RISK_BAR_Y = 41;
+    private static final int RISK_BAR_Y = 51;
     private static final int RISK_BAR_WIDTH = 69;
     private static final int RISK_BAR_HEIGHT = 5;
     private static final int PROGRESS_BAR_X = 86;
-    private static final int PROGRESS_BAR_Y = 51;
+    private static final int PROGRESS_BAR_Y = 61;
     private static final int PROGRESS_BAR_WIDTH = 69;
     private static final int PROGRESS_BAR_HEIGHT = 8;
-    private static final int STATUS_ICON_X = 107;
-    private static final int RISK_ICON_X = 123;
-    private static final int STATUS_ICON_Y = 63;
+    private static final int STATUS_ICON_X = 86;
+    private static final int RISK_ICON_X = 102;
+    private static final int STATUS_ICON_Y = 36;
     private static final int STATUS_ICON_SIZE = 12;
     private static final int GEAR_HEAT_CORE_X = 29;
     private static final int GEAR_SERVO_X = 77;
@@ -344,7 +344,7 @@ public class MetalPressScreen extends AbstractContainerScreen<MetalPressMenu> im
 
     private void renderSlotFrames(GuiGraphics guiGraphics) {
         if (menu.selectedTab() == MetalPressMenu.TAB_PROCESSING) {
-            renderSlotFrame(guiGraphics, 55, 41);
+            renderSlotFrame(guiGraphics, 55, 51);
             renderSlotFrame(guiGraphics, 169, 51);
         } else if (menu.selectedTab() == MetalPressMenu.TAB_GEAR) {
             renderSlotFrame(guiGraphics, GEAR_HEAT_CORE_X, GEAR_TOP_ROW_Y);
@@ -444,7 +444,7 @@ public class MetalPressScreen extends AbstractContainerScreen<MetalPressMenu> im
     }
 
     private void drawProcessingLabels(GuiGraphics guiGraphics) {
-        guiGraphics.drawString(font, Component.translatable("rngtech.processing.input"), 52, 28, TEXT_MUTED, false);
+        guiGraphics.drawString(font, Component.translatable("rngtech.processing.input"), 52, 40, TEXT_MUTED, false);
         guiGraphics.drawString(font, Component.translatable("rngtech.processing.output"), 164, 40, TEXT_MUTED, false);
     }
 

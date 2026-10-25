@@ -40,7 +40,7 @@ public class AlgaePhotobioreactorScreen extends AbstractContainerScreen<AlgaePho
     private static final int PROGRESS_WIDTH = 58;
     private static final int PROGRESS_HEIGHT = 8;
     private static final int STATUS_X = 98;
-    private static final int STATUS_Y = 37;
+    private static final int STATUS_Y = 38;
     private static final int STATUS_SIZE = 12;
     private static final int LIGHT_X = 114;
     private static final int LIGHT_Y = 37;

@@ -69,7 +69,7 @@ public class AmmoniaSynthesizerScreen extends AbstractContainerScreen<AmmoniaSyn
             renderPurgeButtons(guiGraphics);
             guiGraphics.fill(leftPos + 92, topPos + 54, leftPos + 140, topPos + 62, DARK);
             guiGraphics.fill(leftPos + 93, topPos + 55, leftPos + 93 + Math.round(46 * menu.progressFill()), topPos + 61, PROGRESS);
-            statusIcon(guiGraphics, 110, 66);
+            statusIcon(guiGraphics, 92, 39);
         } else if (menu.selectedTab() == AmmoniaSynthesizerMenu.TAB_GEAR) {
             slot(guiGraphics, 79, 47);
         } else if (menu.selectedTab() == AmmoniaSynthesizerMenu.TAB_STATS) {
@@ -189,7 +189,7 @@ public class AmmoniaSynthesizerScreen extends AbstractContainerScreen<AmmoniaSyn
                 FluidMeterTooltips.amount(Component.translatable("fluid.rngtech.carbon_exhaust"), menu.carbon(), menu.tankCapacity(),
                         Component.translatable("rngtech.ammonia_synthesizer.tooltip.urea_feed")));
         CompactValueText.renderTooltipIfHovered(guiGraphics, font, leftPos, topPos, mouseX, mouseY, 92, 54, 48, 8, progressTooltip());
-        CompactValueText.renderTooltipIfHovered(guiGraphics, font, leftPos, topPos, mouseX, mouseY, 110, 66, 12, 12,
+        CompactValueText.renderTooltipIfHovered(guiGraphics, font, leftPos, topPos, mouseX, mouseY, 92, 39, 12, 12,
                 Component.translatable("rngtech.ammonia_synthesizer.tooltip.status", statusComponent()));
     }
 
