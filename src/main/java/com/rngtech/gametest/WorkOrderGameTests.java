@@ -19,7 +19,10 @@ import com.rngtech.content.registry.ModItems;
 import com.rngtech.content.registry.ModRecipes;
 import com.rngtech.content.workorder.WorkOrderEligibility;
 import com.rngtech.content.workorder.WorkOrderOperations;
+import com.rngtech.content.workorder.WorkOrderRewards;
+import com.rngtech.rpg.MachineStat;
 import com.rngtech.rpg.MachineTraits;
+import com.rngtech.rpg.Rarity;
 import com.rngtech.rpg.workorder.FulfilledWorkOrder;
 import com.rngtech.rpg.workorder.LoadedWorkOrder;
 import com.rngtech.rpg.workorder.MachineWorkOrders;
@@ -27,6 +30,7 @@ import com.rngtech.rpg.workorder.WorkFilter;
 import com.rngtech.rpg.workorder.WorkObjective;
 import com.rngtech.rpg.workorder.WorkObjectiveType;
 import com.rngtech.rpg.workorder.WorkOrder;
+import com.rngtech.rpg.workorder.WorkOrderConditions;
 import com.rngtech.rpg.workorder.WorkOrderProgress;
 import com.rngtech.rpg.workorder.WorkPart;
 import com.rngtech.rpg.workorder.WorkReport;
@@ -35,6 +39,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
@@ -309,10 +314,86 @@ public final class WorkOrderGameTests {
         helper.succeed();
     }
 
-    /** The Crusher's menu as the player sees it, on the Orders tab. */
+    /**
+     * Rush activates a chip with a deadline of the tier's Rush time and half again its listed reward. Past the deadline the
+     * chip is lost from the bay, from an inventory, and a bay refuses it.
+     */
+    @GameTest(template = MachineTestSupport.EMPTY)
+    public static void rushRaisesTheRewardAndExpires(GameTestHelper helper) {
+        CrusherBlockEntity crusher = steelCrusher(helper, new BlockPos(2, 1, 2));
+        Player player = helper.makeMockPlayer(GameType.SURVIVAL);
+        WorkOrder listed = JobChipItem.data(order("crusher", 1, 4, 0)).withRewards(ItemContainerContents.fromItems(List.of(new ItemStack(ModItems.CHAOS_CRYSTAL.get(), 4))));
+        player.getInventory().setItem(0, JobChipItem.of(ModItems.JOB_CHIP.get(), listed, MachineTraits.EMPTY));
+        player.getInventory().setItem(1, order("crusher", 2, 4, 0));
+        CrusherMenu menu = ordersMenu(crusher, player);
+        check(shiftIntoBay(menu, player, 0) && shiftIntoBay(menu, player, 1), "The Crusher refused the chips");
+        long now = helper.getLevel().getGameTime();
+        check(WorkOrderOperations.perform(player, crusher, "rush", "1"), "The Crusher refused Rush");
+        LoadedWorkOrder rushed = crusher.workOrders().orders().get(1);
+        check(crusher.workOrders().active() == 1 && rushed.rushed() && rushed.rushDeadline() >= now + WorkOrder.rushTicks(2)
+                && rushed.rushDeadline() <= now + WorkOrder.rushTicks(2) + 5, "Rush did not activate the chip with its deadline: " + crusher.workOrders());
+        check(!WorkOrderOperations.perform(player, crusher, "rush", "1"), "Rush ran twice on one chip");
+        check(WorkOrderOperations.perform(player, crusher, "rush", "0"), "The Crusher refused Rush on the listed chip");
+        List<ItemStack> boosted = WorkOrderRewards.items(crusher.workOrders().orders().get(0).order().rewards());
+        check(boosted.size() == 1 && boosted.getFirst().getCount() == 6, "Rush did not raise the listed reward by half: " + boosted);
+        check(crusher.workOrders().orders().get(1).order().bounty() == WorkOrder.rushAmount(WorkOrder.BASE_BOUNTY),
+                "Rush did not raise an unlisted chip's Bounty by half");
+
+        crusher.setWorkOrders(crusher.workOrders().withReplaced(1, rushed.withRush(now - 1)));
+        crusher.workOrderTick();
+        check(crusher.workOrders().orders().size() == 1 && crusher.workOrders().orders().getFirst().rushed(), "The expired chip stayed in its bay: " + crusher.workOrders());
+
+        ItemStack late = order("crusher", 1, 4, 0);
+        late.set(ModDataComponents.WORK_ORDER_PROGRESS.get(), new WorkOrderProgress(List.of(5L), 5, now - 1));
+        player.getInventory().setItem(2, late);
+        check(!shiftIntoBay(menu, player, 2), "A bay took an expired Rush chip");
+        helper.startSequence()
+                .thenWaitUntil(() -> {
+                    ItemStack held = player.getInventory().getItem(2);
+                    held.inventoryTick(helper.getLevel(), player, 2, false);
+                    check(held.isEmpty(), "Waiting for the expired chip to leave the inventory");
+                })
+                .thenSucceed();
+    }
+
+    /**
+     * A chip's pressure conditions cost the machine only while the chip is active, and a reset condition sends the active
+     * job back to 0 on its event.
+     */
+    @GameTest(template = MachineTestSupport.EMPTY)
+    public static void conditionsCostTheMachineWhileActive(GameTestHelper helper) {
+        CrusherBlockEntity crusher = steelCrusher(helper, new BlockPos(2, 1, 2));
+        Player player = helper.makeMockPlayer(GameType.SURVIVAL);
+        RandomSource random = RandomSource.create(2L);
+        MachineTraits traits = new MachineTraits(Rarity.MAGIC, 0, List.of(
+                WorkOrderConditions.get(WorkOrderConditions.STARVED_FEED).definition().roll(3, random),
+                WorkOrderConditions.get(WorkOrderConditions.JAMMED_LINE).definition().roll(1, random)), List.of());
+        double speed = crusher.effectiveStats().value(MachineStat.PROCESSING_SPEED);
+        player.getInventory().setItem(0, JobChipItem.of(ModItems.JOB_CHIP.get(), JobChipItem.data(order("crusher", 1, 4, 0)), traits));
+        player.getInventory().setItem(1, order("crusher", 1, 4, 0));
+        CrusherMenu menu = ordersMenu(crusher, player);
+        check(shiftIntoBay(menu, player, 0) && shiftIntoBay(menu, player, 1), "The Crusher refused the chips");
+        check(crusher.workOrders().orders().getFirst().traits().equals(traits), "The bay lost the chip's conditions");
+        double starved = crusher.effectiveStats().value(MachineStat.PROCESSING_SPEED);
+        check(starved < speed * 0.76 && starved > speed * 0.69, "Starved Feed did not slow the Crusher: " + speed + " -> " + starved);
+
+        crusher.workOrderWork(new WorkReport(WorkObjectiveType.CRUSH, 6, 0, "", 40));
+        crusher.workOrderSetback(WorkOrderConditions.BRITTLE_LINING);
+        check(crusher.workOrders().activeOrder().totalProgress() == 40, "A setback the chip does not carry reset it");
+        crusher.workOrderSetback(WorkOrderConditions.JAMMED_LINE);
+        check(crusher.workOrders().activeOrder().totalProgress() == 0, "Jammed Line did not reset the job on a jam");
+
+        check(WorkOrderOperations.perform(player, crusher, "activate", "1"), "The Crusher refused to switch chips");
+        check(Math.abs(crusher.effectiveStats().value(MachineStat.PROCESSING_SPEED) - speed) < 1.0E-6,
+                "The inactive chip's condition still slowed the Crusher");
+        helper.succeed();
+    }
+
+    /** The Crusher's menu as the server sees it after the screen opens the Orders tab, so Shift-click fills the bays. */
     private static CrusherMenu ordersMenu(CrusherBlockEntity crusher, Player player) {
         CrusherMenu menu = (CrusherMenu) crusher.createMenu(1, player.getInventory(), player);
-        menu.selectTab(CrusherMenu.TAB_ORDERS);
+        check(menu.clickMenuButton(player, WorkOrderMenuSupport.BUTTON_SELECT_TAB + CrusherMenu.TAB_ORDERS) && menu.selectedTab() == CrusherMenu.TAB_ORDERS,
+                "The server menu did not follow the screen to the Orders tab");
         return menu;
     }
 

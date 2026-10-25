@@ -24,6 +24,10 @@ public record WorkOrder(String family, int tier, WorkObjective objective, int mi
     public static final int MAX_TIER = 5;
     public static final int BASE_BOUNTY = 100;
     private static final int[] TIER_STAGE = {4, 5, 6, 7, 8};
+    /** Draft minutes of steady work each tier's job is sized for on a good build of its stage. */
+    private static final int[] TIER_MINUTES = {15, 20, 25, 30, 30};
+    /** Rush adds this share, in percent, to the listed reward's amount, or to Bounty for a job without a list. */
+    public static final int RUSH_BONUS = 50;
 
     public static final Codec<WorkOrder> CODEC = RecordCodecBuilder.create(instance -> instance.group(
             Codec.STRING.fieldOf("family").forGetter(WorkOrder::family),
@@ -78,6 +82,10 @@ public record WorkOrder(String family, int tier, WorkObjective objective, int mi
         this(family, tier, objective, minStage, minMasteryLevel, bounty, prestige, rewards, "", "", "");
     }
 
+    public WorkOrder withBounty(int value) {
+        return new WorkOrder(family, tier, objective, minStage, minMasteryLevel, value, prestige, rewards, template, name, rewardTable);
+    }
+
     public WorkOrder withRewards(ItemContainerContents value) {
         return new WorkOrder(family, tier, objective, minStage, minMasteryLevel, bounty, prestige, value, template, name, rewardTable);
     }
@@ -85,6 +93,19 @@ public record WorkOrder(String family, int tier, WorkObjective objective, int mi
     /** This job as the template {@code id} made it, with the template's display name and reward table. */
     public WorkOrder fromTemplate(String id, String displayName, String table) {
         return new WorkOrder(family, tier, objective, minStage, minMasteryLevel, bounty, prestige, rewards, id, displayName, table);
+    }
+
+    /**
+     * A Rush deadline's length for {@code tier}, in game ticks: half the tier's target time. Draft job sizes finish well
+     * inside the target time, so a longer deadline was no pressure in playtest.
+     */
+    public static long rushTicks(int tier) {
+        return TIER_MINUTES[Mth.clamp(tier, MIN_TIER, MAX_TIER) - 1] * 60L * 20L / 2L;
+    }
+
+    /** {@code amount} with the Rush bonus, rounded up. */
+    public static int rushAmount(int amount) {
+        return amount + (amount * RUSH_BONUS + 99) / 100;
     }
 
     /** The tier's chassis stage before any family's top stage caps it. */

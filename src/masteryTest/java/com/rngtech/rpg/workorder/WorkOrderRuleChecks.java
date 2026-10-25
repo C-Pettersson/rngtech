@@ -31,6 +31,7 @@ public final class WorkOrderRuleChecks {
         counting();
         itemJobs(shipped);
         rewardAmounts();
+        rush();
         reachable(shipped);
         return checks;
     }
@@ -232,6 +233,24 @@ public final class WorkOrderRuleChecks {
 
     private static WorkOrder order(String family, int minStage, int minMasteryLevel) {
         return new WorkOrder(family, 1, single(WorkFilter.STAGE, 3, "", 256), minStage, minMasteryLevel, 100, 0);
+    }
+
+    /** Rush deadlines: half the tier's target time, a rounded-up bonus, and expiry that spares finished chips. */
+    private static void rush() {
+        require(WorkOrder.rushTicks(1) == 15 * 60 * 20 / 2 && WorkOrder.rushTicks(5) == 30 * 60 * 20 / 2, "Rush is half the tier's target time");
+        require(WorkOrder.rushAmount(4) == 6 && WorkOrder.rushAmount(3) == 5 && WorkOrder.rushAmount(1) == 2 && WorkOrder.rushAmount(100) == 150,
+                "Rush adds half again, rounded up");
+        var order = new WorkOrder("crusher", 1, single(WorkFilter.ANY, 0, "", 10), 4, 0, 100, 0);
+        var running = loaded(order).withRush(1_000);
+        var finished = loaded(order).withPartProgress(0, 10).withRush(1_000);
+        var plain = loaded(order);
+        require(running.rushed() && !running.expired(999) && running.expired(1_000) && !finished.expired(5_000) && !plain.expired(5_000),
+                "a Rush chip expires at its deadline unless its job is done");
+        var orders = MachineWorkOrders.EMPTY.withLoaded(plain).withLoaded(running).withLoaded(finished).withActive(1);
+        require(orders.withoutExpired(999) == orders, "nothing expires before the deadline");
+        var after = orders.withoutExpired(1_000);
+        require(after.orders().size() == 2 && after.orders().get(0).equals(plain) && after.orders().get(1).equals(finished)
+                && after.active() == MachineWorkOrders.NONE, "an expired chip is lost, a finished one stays, and none is left active");
     }
 
     private static LoadedWorkOrder loaded(WorkOrder order) {

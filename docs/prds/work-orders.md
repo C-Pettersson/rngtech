@@ -227,7 +227,7 @@ The shipped format (phase 5). Every key but `objective` is optional:
 - `name` is a translation key or plain text. The chip reads "Name (Job Chip III)", and the terminal row shows the name in place of the machine.
 - Fixed `rewards` are listed as they are, with no Bounty scaling. Without them, the reward rolls from `reward_table`, or from `rngtech:challenges/work_order` when that is unset, and the chip and its Completed Job Chip keep the table for a redeem that has no list.
 - `weight` puts the template in the terminal's listing on the same scale as objective weights. Without it, or at 0, the template is quest-only.
-- Rarity and conditions come with phase 6.
+- `rarity` (`normal`, `magic`, or `rare`) fixes how many conditions roll; the conditions themselves always roll. A template cannot name its conditions yet.
 
 ## Conditions
 
@@ -250,6 +250,8 @@ Conditions are affixes on the order, drawn from a `work_order` eligibility profi
 
 Rules:
 
+- Phase 6 ships the conditions the Crusher and Furnace can read: Starved Feed, Power Surcharge, Short Crew, Cold Start (Furnace), of Hand Feeding (Crusher), of Brittle Lining (Furnace), of the Jammed Line (Crusher), and of Deep Ore (stage jobs). Thin Margins needs a safe-band reader, Veteran Crew is a load requirement rather than a stat cost, and Unsteady Hands and of Fine Tolerance have no Crusher or Furnace reader; they wait for later machines or phases. Hand Feeding is a suffix in the shipped pool, since it changes a rule rather than a stat's size.
+- Listed jobs roll Normal, Magic, or Rare at 50/35/15 (draft). Normal chips exist: half the listings are plain jobs, and conditions are a choice the player takes for more Bounty.
 - Rarity sets the condition count: Normal 0, Magic 1–2, Rare 3–4. Normal orders still pay a base reward. Rarity changes only the conditions, never the kind of job: any rarity can be a work objective, an item objective, or a stat goal.
 - Condition tiers follow normal affix tiers. A higher tier is a harsher cost and a larger reward.
 - Because an order knows its family, only conditions that family can read roll on it.
@@ -261,7 +263,7 @@ Rules:
 Rush is the one condition the player adds when activating an order. It never rolls on an order, and refinement cannot add or remove it.
 
 - The Orders tab shows the deadline before the player commits.
-- Draft: the deadline is 1.5 times the tier's target time, in world game time. Rush adds 50% to the listed reward's amount.
+- Draft: the deadline is half the tier's target time (7:30 at Tier I up to 15:00 at Tier V), in world game time. Rush adds 50% to the listed reward's amount. The first draft, 1.5 times the target time, was no pressure in playtest, because the draft job sizes finish well inside the target time.
 - The deadline keeps running while the chip is inactive or out of its bay, while the machine's chunk is unloaded, and while the machine is broken.
 - When the deadline passes, the chip expires. It is lost, the conditions stop, and nothing is ejected.
 
@@ -425,5 +427,4 @@ Resolved 2026-10-25, after playtesting the Dispatch Board. These replace the pap
 
 - Release target: a later 2.0 alpha, or the first feature after 2.0.
 - Whether a machine should have three drive bays, as drafted, or more.
-- Whether Normal chips should exist, or every chip should roll at least Magic.
 - Whether the Unique reward should weight toward the job's family or roll from the whole catalog.

@@ -38,6 +38,7 @@ import com.rngtech.rpg.progression.MegaPassiveNode;
 import com.rngtech.rpg.progression.MegaPassiveTree;
 import com.rngtech.rpg.progression.PassiveStatType;
 import com.rngtech.rpg.workorder.WorkObjectiveType;
+import com.rngtech.rpg.workorder.WorkOrderConditions;
 import com.rngtech.rpg.workorder.WorkOrderFamilies;
 import com.rngtech.rpg.workorder.WorkOrderHost;
 import com.rngtech.rpg.workorder.WorkReport;
@@ -251,6 +252,7 @@ public class CrusherBlockEntity extends BaseMachineBlockEntity implements MenuPr
     }
 
     public static void serverTick(Level level, BlockPos pos, BlockState state, CrusherBlockEntity crusher) {
+        crusher.tickWorkOrders(level);
         tickWork(level, pos, state, crusher);
         crusher.syncVisualState(level);
     }
@@ -824,6 +826,7 @@ public class CrusherBlockEntity extends BaseMachineBlockEntity implements MenuPr
             ComponentBaseStatCatalog.applyAttributeAffixes(stats, crushHead);
         }
         MegaPassiveTree.applyAttributeStats(stats, machineProgression(), MachineMasteryFamily.CRUSHER);
+        WorkOrderConditions.apply(stats, workOrders().activeOrder());
         if (!hasBatteryCell()) {
             try (MachineStatAccumulator.Source ignored = stats.source(MachineStatAccumulator.NO_BATTERY_SOURCE)) {
                 stats.scaleBonus(MachineStat.OUTPUT_AMOUNT, noBatteryOutputMultiplier(stats));
@@ -1096,6 +1099,7 @@ public class CrusherBlockEntity extends BaseMachineBlockEntity implements MenuPr
         resetProgress();
         jawJamTicks = ticks;
         dropJamDebris(recipe);
+        workOrderSetback(WorkOrderConditions.JAMMED_LINE);
         ChallengeLoot.reward(level, worldPosition, ChallengeLoot.CRUSHER_JAM,
                 ChallengeContext.of(this).withRecipeStage(recipe.requiredProcessingLevel()), inventory, SLOT_OUTPUT);
         return true;

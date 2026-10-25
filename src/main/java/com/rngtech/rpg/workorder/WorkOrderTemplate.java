@@ -1,5 +1,7 @@
 package com.rngtech.rpg.workorder;
 
+import com.rngtech.rpg.Rarity;
+
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import net.minecraft.resources.ResourceLocation;
@@ -14,12 +16,13 @@ import java.util.random.RandomGenerator;
 /**
  * A pack maker's job from {@code data/<namespace>/work_orders/templates/}. It sets any of the job's fields and leaves the
  * rest to roll: the objective (an objective id, or inline parts with fixed counts or ranges), the family, tier, chassis
- * stage, Mastery level, Bounty, Prestige, a display name, fixed rewards, and a reward table. A positive {@code weight}
+ * stage, Mastery level, Bounty, Prestige, a display name, a rarity, fixed rewards, and a reward table. A positive {@code weight}
  * puts it in the Dispatch Terminal's listing beside the objectives, on the same weight scale; 0 keeps it for quests and
- * commands only. Unset numbers are {@link #UNSET}, an unset tier is 0, and unset text is "".
+ * commands only. Unset numbers are {@link #UNSET}, an unset tier is 0, an unset rarity is null, and unset text is "".
+ * Conditions always roll; a rarity fixes how many.
  */
 public record WorkOrderTemplate(ResourceLocation id, String family, int tier, ResourceLocation objectiveId, WorkObjectiveType type,
-        List<PartSpec> parts, int minStage, int minMasteryLevel, int bounty, int prestige, String name, List<Reward> rewards,
+        List<PartSpec> parts, int minStage, int minMasteryLevel, int bounty, int prestige, String name, Rarity rarity, List<Reward> rewards,
         String rewardTable, int weight) {
     public static final int UNSET = -1;
 
@@ -50,6 +53,7 @@ public record WorkOrderTemplate(ResourceLocation id, String family, int tier, Re
         if (parts.size() > WorkObjective.MAX_PARTS) { throw new IllegalArgumentException(id + ": a job has at most three parts"); }
         if (!family.isEmpty() && !WorkOrderFamilies.known(family)) { throw new IllegalArgumentException(id + ": unknown family " + family); }
         if (weight < 0) { throw new IllegalArgumentException(id + ": weight must not be negative"); }
+        if (rarity == Rarity.UNIQUE) { throw new IllegalArgumentException(id + ": a Job Chip is Normal, Magic, or Rare"); }
     }
 
     /** In the Dispatch Terminal's listing, not only given by command or quest. */
@@ -142,7 +146,7 @@ public record WorkOrderTemplate(ResourceLocation id, String family, int tier, Re
                 }
             }
             return new WorkOrderTemplate(id, family, tier, objectiveId, type, parts, number(json, "min_stage"), number(json, "min_mastery_level"),
-                    number(json, "bounty"), number(json, "prestige"), json.has("name") ? json.get("name").getAsString() : "", rewards,
+                    number(json, "bounty"), number(json, "prestige"), json.has("name") ? json.get("name").getAsString() : "", rarity(json), rewards,
                     json.has("reward_table") ? ResourceLocation.parse(json.get("reward_table").getAsString()).toString() : "",
                     json.has("weight") ? json.get("weight").getAsInt() : 0);
         } catch (RuntimeException exception) {
@@ -162,6 +166,15 @@ public record WorkOrderTemplate(ResourceLocation id, String family, int tier, Re
                         count.getAsJsonObject().has("step") ? count.getAsJsonObject().get("step").getAsLong() : 1, minimum)
                 : new WorkObjectiveEntry.Goal(count.getAsLong(), minimum);
         return new PartSpec(filter, json.has("item") ? json.get("item").getAsString() : "", goal);
+    }
+
+    private static Rarity rarity(JsonObject json) {
+        if (!json.has("rarity")) { return null; }
+        String name = json.get("rarity").getAsString().toLowerCase(Locale.ROOT);
+        for (Rarity rarity : Rarity.values()) {
+            if (rarity.getSerializedName().equals(name)) { return rarity; }
+        }
+        throw new IllegalArgumentException("unknown rarity " + name);
     }
 
     private static int number(JsonObject json, String key) {

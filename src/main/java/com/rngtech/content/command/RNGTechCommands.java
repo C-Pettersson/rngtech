@@ -5,11 +5,9 @@ import com.rngtech.content.cable.CableStats;
 import com.rngtech.content.dormant.DormantSiteIndex;
 import com.rngtech.content.dormant.DormantSites;
 import com.rngtech.content.item.GlyphItem;
-import com.rngtech.content.item.JobChipItem;
 import com.rngtech.content.registry.ModItems;
 import com.rngtech.content.workorder.WorkOrderJobs;
 import com.rngtech.content.workorder.WorkOrderTemplateCatalog;
-import com.rngtech.rpg.MachineTraits;
 import com.rngtech.rpg.PhaseArrayRules;
 import com.rngtech.rpg.unique.UniqueCatalog;
 import com.rngtech.rpg.unique.UniqueDefinition;
@@ -172,12 +170,12 @@ public final class RNGTechCommands {
         Collection<ServerPlayer> targets = EntityArgument.getPlayers(context, "targets");
         for (ServerPlayer player : targets) {
             SplittableRandom random = new SplittableRandom(player.getRandom().nextLong());
-            WorkOrder order = template == null ? WorkOrderJobs.roll(player.level(), player.blockPosition(), tier, random)
+            WorkOrderJobs.Job job = template == null ? WorkOrderJobs.roll(player.level(), player.blockPosition(), tier, random)
                     : WorkOrderJobs.roll(player.level(), player.blockPosition(), template, tier, random);
-            if (order == null) {
+            if (job == null) {
                 throw NO_WORK_ORDER_OBJECTIVES.create();
             }
-            ItemStack stack = JobChipItem.of(ModItems.JOB_CHIP.get(), order, MachineTraits.EMPTY);
+            ItemStack stack = job.stack();
             if (!player.getInventory().add(stack)) {
                 player.drop(stack, false);
             }

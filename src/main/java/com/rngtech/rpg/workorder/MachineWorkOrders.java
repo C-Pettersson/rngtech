@@ -90,6 +90,15 @@ public record MachineWorkOrders(List<LoadedWorkOrder> orders, int active) {
         return new MachineWorkOrders(next, nextActive);
     }
 
+    /** Without the Rush chips whose deadline passed at {@code gameTime}: they are lost, and nothing is returned. */
+    public MachineWorkOrders withoutExpired(long gameTime) {
+        MachineWorkOrders next = this;
+        for (int index = orders.size() - 1; index >= 0; index--) {
+            if (orders.get(index).expired(gameTime)) { next = next.without(index); }
+        }
+        return next;
+    }
+
     /** Replaces slot {@code index} and keeps which order is active. */
     public MachineWorkOrders withReplaced(int index, LoadedWorkOrder order) {
         if (index < 0 || index >= orders.size()) { return this; }

@@ -40,6 +40,7 @@ import com.rngtech.rpg.progression.MachineProgressionState;
 import com.rngtech.rpg.progression.MegaPassiveNode;
 import com.rngtech.rpg.progression.MegaPassiveTree;
 import com.rngtech.rpg.workorder.WorkObjectiveType;
+import com.rngtech.rpg.workorder.WorkOrderConditions;
 import com.rngtech.rpg.workorder.WorkOrderFamilies;
 import com.rngtech.rpg.workorder.WorkOrderHost;
 import com.rngtech.rpg.workorder.WorkReport;
@@ -368,6 +369,7 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
     }
 
     public static void serverTick(Level level, BlockPos pos, BlockState state, FurnaceBlockEntity furnace) {
+        furnace.tickWorkOrders(level);
         furnace.beginEnergyTelemetryTick();
         furnace.atmosphere.beginTick();
         furnace.releaseRemovedGear(level);
@@ -821,6 +823,7 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
             }
         }
         MegaPassiveTree.applyAttributeStats(stats, machineProgression(), MachineMasteryFamily.FURNACE);
+        WorkOrderConditions.apply(stats, workOrders().activeOrder());
         if (isElectric() && !hasBatteryCell()) {
             stats.apply(MachineStatAccumulator.NO_BATTERY_SOURCE, new MachineModifier(
                     ModifierSlot.IMPLICIT,
@@ -1239,6 +1242,7 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
         resetBulkSpeed();
         ChallengeLoot.reward(level, worldPosition, ChallengeLoot.HEAT_FAILURE,
                 ChallengeContext.of(this).withRecipeStage(recipe.machineXpBand()), inventory, outputSlot);
+        workOrderSetback(WorkOrderConditions.BRITTLE_LINING);
         setChanged();
         return true;
     }
@@ -1563,7 +1567,7 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
     /** Lane stats follow the base stats and the lane's input item, whose tags pick the lane bonuses. */
     private MachineStatAccumulator statsForLane(int lane) {
         Item input = inventory.getStackInSlot(inputSlot(lane)).getItem();
-        return laneStatsCaches[lane].get(baseEffectiveStats(), input, 0L, laneStatsBuilders.get(lane));
+        return laneStatsCaches[lane].get(baseEffectiveStats(), input, 0L, null, laneStatsBuilders.get(lane));
     }
 
     private MachineStatAccumulator buildLaneStats(int lane) {

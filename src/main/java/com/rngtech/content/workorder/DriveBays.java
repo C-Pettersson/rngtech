@@ -127,6 +127,10 @@ public final class DriveBays implements IItemHandlerModifiable {
     @Override
     public boolean isItemValid(int slot, ItemStack stack) {
         WorkOrder order = JobChipItem.isWorkOrder(stack) ? JobChipItem.data(stack) : null;
+        LoadedWorkOrder chip = loaded(stack);
+        if (chip != null && chip.expired(host.workOrderGameTime())) {
+            return false;
+        }
         MachineWorkOrders orders = host.workOrders();
         MachineWorkOrders room = slot < orders.orders().size() ? orders.without(slot) : orders;
         return WorkOrderRules.loadFailure(room, host.workOrderFamily(), host.workOrderStage(), host.workOrderMasteryLevel(), order) == null;

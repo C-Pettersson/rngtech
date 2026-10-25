@@ -7,6 +7,7 @@ import com.rngtech.content.menu.WorkOrderMenuSupport;
 import com.rngtech.content.menu.WorkOrderMenuView;
 import com.rngtech.content.network.WorkOrderActionPayload;
 import com.rngtech.rpg.workorder.MachineWorkOrders;
+import com.rngtech.rpg.workorder.WorkOrder;
 import com.rngtech.rpg.workorder.WorkPart;
 
 import net.minecraft.ChatFormatting;
@@ -15,6 +16,7 @@ import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.network.PacketDistributor;
 
 import java.util.ArrayList;
@@ -38,6 +40,7 @@ final class WorkOrdersTab {
     private static final int TEXT = 0xFF3F3F3F;
     private static final int TEXT_MUTED = 0xFF6B6B6B;
     private static final int DONE = 0xFF2F7F3F;
+    private static final int RUSH = 0xFFB0661A;
     private static final int ROW = 0xFFB4B4B4;
     private static final int ROW_SELECTED = 0xFFC9C9C9;
     private static final int ROW_BORDER = 0xFF8B8B8B;
@@ -56,7 +59,7 @@ final class WorkOrdersTab {
     private final int accent;
     private int selected = MachineWorkOrders.NONE;
 
-    private enum Action { ROW, ACTIVATE, PAUSE, ABANDON }
+    private enum Action { ROW, ACTIVATE, PAUSE, RUSH, ABANDON }
 
     /** A clickable or hoverable part of the tab, in screen coordinates. {@code enabled} is false for a greyed-out button. */
     private record Part(Action action, int bay, int left, int top, int width, int height, boolean enabled) {
@@ -116,6 +119,7 @@ final class WorkOrdersTab {
                 switch (part.action()) {
                     case ACTIVATE -> send("activate", part.bay());
                     case PAUSE -> send("deactivate", part.bay());
+                    case RUSH -> send("rush", part.bay());
                     case ABANDON -> {
                         if (Screen.hasShiftDown()) { send("abandon", part.bay()); }
                     }
@@ -137,9 +141,10 @@ final class WorkOrdersTab {
                 continue;
             }
             return switch (part.action()) {
-                case ROW -> overSlot(part.bay(), mouseX, mouseY, leftPos, topPos) ? List.of() : rowTooltip(view.workOrderView().slots().get(part.bay()));
+                case ROW -> overSlot(part.bay(), mouseX, mouseY, leftPos, topPos) ? List.of() : rowTooltip(part.bay());
                 case ACTIVATE -> List.of(Component.translatable("rngtech.work_order.tab.activate_hint"));
                 case PAUSE -> List.of(Component.translatable("rngtech.work_order.tab.pause_hint"));
+                case RUSH -> rushTooltip(part);
                 case ABANDON -> List.of(Component.translatable("rngtech.work_order.tab.abandon_hint"));
             };
         }
@@ -151,10 +156,12 @@ final class WorkOrdersTab {
         graphics.drawString(font, tier, left, top + 3, active ? accent : TEXT, false);
         int jobLeft = left + font.width(tier) + 4;
         int jobRight = right;
-        if (active || slot.done()) {
-            Component tag = Component.translatable(slot.done() ? "rngtech.work_order.tab.done" : "rngtech.work_order.tab.active");
+        if (active || slot.done() || slot.rushed()) {
+            Component tag = slot.done() ? Component.translatable("rngtech.work_order.tab.done")
+                    : slot.rushed() ? Component.translatable("rngtech.work_order.tab.rushed", JobChipItem.clock(slot.rushSeconds()))
+                    : Component.translatable("rngtech.work_order.tab.active");
             jobRight -= font.width(tag) + 4;
-            graphics.drawString(font, tag, right - font.width(tag), top + 3, slot.done() ? DONE : accent, false);
+            graphics.drawString(font, tag, right - font.width(tag), top + 3, slot.done() ? DONE : slot.rushed() ? RUSH : accent, false);
         }
         String job = font.plainSubstrByWidth(JobChipItem.shortObjectiveText(slot.objective()).getString(), jobRight - jobLeft);
         graphics.drawString(font, job, jobLeft, top + 3, TEXT, false);
@@ -182,11 +189,27 @@ final class WorkOrdersTab {
         boolean active = any && chosen == orders.active();
         int buttonWidth = buttonWidth(font);
         int top = topPos + rowTop(0);
-        for (Action action : new Action[] {active ? Action.PAUSE : Action.ACTIVATE, Action.ABANDON}) {
-            parts.add(new Part(action, chosen, leftPos + width - MARGIN - buttonWidth, top, buttonWidth, BUTTON_HEIGHT, any));
+        boolean rushed = any && orders.slots().get(chosen).rushed();
+        for (Action action : new Action[] {active ? Action.PAUSE : Action.ACTIVATE, Action.RUSH, Action.ABANDON}) {
+            boolean enabled = any && (action != Action.RUSH || !rushed);
+            parts.add(new Part(action, chosen, leftPos + width - MARGIN - buttonWidth, top, buttonWidth, BUTTON_HEIGHT, enabled));
             top += BUTTON_HEIGHT + BUTTON_GAP;
         }
         return parts;
+    }
+
+    /** Rush's terms for the selected chip, shown before the player commits; a chip under Rush shows its time left. */
+    private List<Component> rushTooltip(Part part) {
+        WorkOrderMenuSupport.View orders = view.workOrderView();
+        if (part.bay() < 0 || part.bay() >= orders.slots().size()) {
+            return List.of(Component.translatable("rngtech.work_order.tab.rush_none"));
+        }
+        WorkOrderMenuSupport.Slot slot = orders.slots().get(part.bay());
+        if (slot.rushed()) {
+            return List.of(Component.translatable("rngtech.work_order.tab.rush_running", JobChipItem.clock(slot.rushSeconds())));
+        }
+        return List.of(Component.translatable("rngtech.work_order.tab.rush_hint", JobChipItem.clock(WorkOrder.rushTicks(slot.tier()) / 20), WorkOrder.RUSH_BONUS),
+                Component.translatable("rngtech.work_order.tab.rush_warning").withStyle(ChatFormatting.RED));
     }
 
     /** The bay the buttons act on: the one the player clicked, else the active chip, else the first. */
@@ -201,20 +224,17 @@ final class WorkOrdersTab {
         return orders.slots().isEmpty() ? MachineWorkOrders.NONE : 0;
     }
 
-    private List<Component> rowTooltip(WorkOrderMenuSupport.Slot slot) {
-        List<Component> lines = new ArrayList<>();
-        lines.add(Component.translatable("item.rngtech.job_chip.tiered", GlyphItem.numeral(slot.tier())));
-        lines.add(JobChipItem.objectiveText(slot.objective()).copy().withStyle(ChatFormatting.GRAY));
-        JobChipItem.appendEligibleItems(lines, slot.objective());
+    /** The chip's own tooltip, with each part's progress for a job of several parts, and what clicking the row does. */
+    private List<Component> rowTooltip(int bay) {
+        WorkOrderMenuSupport.Slot slot = view.workOrderView().slots().get(bay);
+        ItemStack chip = view.workOrderChip(bay);
+        List<Component> lines = new ArrayList<>(chip.isEmpty() ? List.of() : Screen.getTooltipFromItem(Minecraft.getInstance(), chip));
         if (slot.objective().parts().size() > 1) {
             for (int part = 0; part < slot.objective().parts().size(); part++) {
                 WorkPart value = slot.objective().parts().get(part);
                 lines.add(Component.translatable("rngtech.work_order.tab.part_progress", JobChipItem.itemName(value.item()),
                         slot.progress().get(part), value.target()).withStyle(ChatFormatting.DARK_GRAY));
             }
-        }
-        if (slot.prestige() > 0) {
-            lines.add(Component.translatable("rngtech.tooltip.fulfilled_work_order.prestige", slot.prestige()).withStyle(ChatFormatting.GRAY));
         }
         lines.add(Component.translatable(slot.done() ? "rngtech.work_order.tab.done_hint" : "rngtech.work_order.tab.select_hint")
                 .withStyle(slot.done() ? ChatFormatting.GREEN : ChatFormatting.DARK_GRAY));
@@ -241,7 +261,7 @@ final class WorkOrdersTab {
 
     private static int buttonWidth(Font font) {
         int widest = 0;
-        for (Action action : new Action[] {Action.ACTIVATE, Action.PAUSE, Action.ABANDON}) {
+        for (Action action : new Action[] {Action.ACTIVATE, Action.PAUSE, Action.RUSH, Action.ABANDON}) {
             widest = Math.max(widest, font.width(label(action)));
         }
         return widest + 10;

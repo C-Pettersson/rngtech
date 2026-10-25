@@ -4,6 +4,7 @@ import com.rngtech.RNGTech;
 import com.rngtech.content.blockentity.CrusherBlockEntity;
 import com.rngtech.content.item.GearParts;
 import com.rngtech.content.menu.CrusherMenu;
+import com.rngtech.content.menu.WorkOrderMenuSupport;
 import com.rngtech.rpg.MachinePartType;
 import com.rngtech.rpg.MachineStat;
 import com.rngtech.rpg.progression.CrusherPassiveTree;
@@ -290,6 +291,9 @@ public class CrusherScreen extends AbstractContainerScreen<CrusherMenu> {
     private void selectTab(int tab) {
         masterySupport.resetDragging();
         menu.selectTab(tab);
+        if (minecraft != null && minecraft.gameMode != null) {
+            minecraft.gameMode.handleInventoryButtonClick(menu.containerId, WorkOrderMenuSupport.BUTTON_SELECT_TAB + menu.selectedTab());
+        }
         updateImageSizeForSelectedTab();
         if (menu.selectedTab() == CrusherMenu.TAB_MASTERY) {
             masterySupport.clampAfterGeometryChange(imageWidth, imageHeight);

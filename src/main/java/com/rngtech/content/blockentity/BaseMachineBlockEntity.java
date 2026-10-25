@@ -33,7 +33,9 @@ import com.rngtech.rpg.PhaseArrayRules;
 import com.rngtech.rpg.progression.MachineMasteryHost;
 import com.rngtech.rpg.progression.MachineProgressionState;
 import com.rngtech.rpg.progression.MegaPassiveTree;
+import com.rngtech.rpg.workorder.LoadedWorkOrder;
 import com.rngtech.rpg.workorder.MachineWorkOrders;
+import com.rngtech.rpg.workorder.WorkOrderHost;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -182,6 +184,7 @@ public abstract class BaseMachineBlockEntity extends BlockEntity implements Refi
                 components().get(ModDataComponents.MACHINE_TRAITS.get()),
                 components().get(ModDataComponents.MACHINE_PROGRESSION.get()),
                 localKey,
+                activeWorkOrderConditions(),
                 statsBuilder
         );
     }
@@ -238,6 +241,24 @@ public abstract class BaseMachineBlockEntity extends BlockEntity implements Refi
     public MachineWorkOrders workOrders() {
         MachineWorkOrders orders = components().get(ModDataComponents.WORK_ORDERS.get());
         return orders == null ? MachineWorkOrders.EMPTY : orders;
+    }
+
+    /** The active Job Chip's traits while it has conditions to apply, else null; a stats cache key. */
+    private Object activeWorkOrderConditions() {
+        LoadedWorkOrder active = workOrders().activeOrder();
+        return active == null || active.fulfilled() || active.traits().modifiers().isEmpty() ? null : active.traits();
+    }
+
+    /** The world's game time for Rush deadlines; 0 before the machine is in a world. */
+    public long workOrderGameTime() {
+        return level == null ? 0 : level.getGameTime();
+    }
+
+    /** Drops expired Rush chips about once a second. */
+    protected void tickWorkOrders(Level level) {
+        if (this instanceof WorkOrderHost host && level.getGameTime() % 20 == 0) {
+            host.workOrderTick();
+        }
     }
 
     public void setWorkOrders(MachineWorkOrders orders) {

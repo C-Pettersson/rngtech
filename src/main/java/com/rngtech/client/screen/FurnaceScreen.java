@@ -3,6 +3,7 @@ package com.rngtech.client.screen;
 import com.rngtech.RNGTech;
 import com.rngtech.content.blockentity.FurnaceBlockEntity;
 import com.rngtech.content.menu.FurnaceMenu;
+import com.rngtech.content.menu.WorkOrderMenuSupport;
 import com.rngtech.rpg.MachineStat;
 import com.rngtech.rpg.MachineStatAccumulator;
 import com.rngtech.rpg.progression.FurnacePassiveTree;
@@ -364,6 +365,9 @@ public class FurnaceScreen extends AbstractContainerScreen<FurnaceMenu> {
     private void selectTab(int tab) {
         masterySupport.resetDragging();
         menu.selectTab(tab);
+        if (minecraft != null && minecraft.gameMode != null) {
+            minecraft.gameMode.handleInventoryButtonClick(menu.containerId, WorkOrderMenuSupport.BUTTON_SELECT_TAB + menu.selectedTab());
+        }
         updateImageSizeForSelectedTab();
         if (menu.selectedTab() == FurnaceMenu.TAB_MASTERY) {
             masterySupport.clampAfterGeometryChange(imageWidth, imageHeight);

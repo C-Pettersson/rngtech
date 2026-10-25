@@ -73,7 +73,24 @@ public record LoadedWorkOrder(WorkOrder order, MachineTraits traits, List<Long> 
     }
 
     public boolean rushed() { return rushDeadline > 0; }
-    public boolean expired(long gameTime) { return rushed() && gameTime >= rushDeadline; }
+
+    /** A Rush chip whose deadline has passed before its job was done. A finished chip never expires. */
+    public boolean expired(long gameTime) { return rushed() && !fulfilled() && gameTime >= rushDeadline; }
+
+    /** This chip with {@code value} as its job, such as with Rush's larger reward. */
+    public LoadedWorkOrder withOrder(WorkOrder value) {
+        return new LoadedWorkOrder(value, traits, progress, bestStreak, rushDeadline);
+    }
+
+    /** This chip with every part's progress back at 0, as a reset condition leaves it. Rush keeps its deadline. */
+    public LoadedWorkOrder withoutProgress() {
+        return new LoadedWorkOrder(order, traits, List.of(), 0, rushDeadline);
+    }
+
+    /** This chip under Rush, due at game time {@code deadline}. */
+    public LoadedWorkOrder withRush(long deadline) {
+        return new LoadedWorkOrder(order, traits, progress, bestStreak, deadline);
+    }
 
     /** Every part has reached its target. */
     public boolean fulfilled() {

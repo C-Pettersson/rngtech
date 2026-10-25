@@ -56,7 +56,8 @@ public final class MasteryMenuSupport {
         }
         if (field == ENTRY_STAGE) { return host.ascendancyEntryStage(); }
         if (field >= WORK_ORDER_START) {
-            return WorkOrderMenuSupport.get(host instanceof WorkOrderHost machine ? machine.workOrders() : MachineWorkOrders.EMPTY, field - WORK_ORDER_START);
+            return host instanceof WorkOrderHost machine ? WorkOrderMenuSupport.get(machine.workOrders(), field - WORK_ORDER_START, machine.workOrderGameTime())
+                    : WorkOrderMenuSupport.get(MachineWorkOrders.EMPTY, field - WORK_ORDER_START, 0);
         }
         if (field >= GRANTED_STATS_START) {
             int slot = (field - GRANTED_STATS_START) / 2;

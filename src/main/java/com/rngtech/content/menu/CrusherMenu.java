@@ -152,6 +152,11 @@ public class CrusherMenu extends AbstractContainerMenu implements MasteryMenuVie
         addDataSlots(data);
     }
 
+    @Override
+    public ItemStack workOrderChip(int bay) {
+        return bay >= 0 && bay < MachineWorkOrders.SLOTS ? getSlot(HOTBAR_END + bay).getItem() : ItemStack.EMPTY;
+    }
+
     public void selectTab(int tab) {
         selectedTab = switch (tab) {
             case TAB_GEAR -> TAB_GEAR;
@@ -428,6 +433,10 @@ public class CrusherMenu extends AbstractContainerMenu implements MasteryMenuVie
 
     @Override
     public boolean clickMenuButton(Player player, int id) {
+        if (id >= WorkOrderMenuSupport.BUTTON_SELECT_TAB && id <= WorkOrderMenuSupport.BUTTON_SELECT_TAB + TAB_ORDERS) {
+            selectTab(id - WorkOrderMenuSupport.BUTTON_SELECT_TAB);
+            return true;
+        }
         MegaPassiveNode passiveNode = MegaPassiveTree.byButtonId(id);
         if (passiveNode != null) {
             if (player.level().isClientSide) {

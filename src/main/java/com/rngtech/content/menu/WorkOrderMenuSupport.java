@@ -17,17 +17,27 @@ import java.util.List;
 
 /**
  * Syncs a machine's chips to its Orders tab as menu data: the active slot plus one, then for each slot its tier (0 for
- * an empty slot), Bounty, Prestige, and part count, and for each part its verb and filter plus one, minimum, item as its
- * registry id plus one, target, and progress.
+ * an empty slot), Bounty, Prestige, part count, and Rush seconds left (0 without Rush, at least 1 with it), and for each
+ * part its verb and filter plus one, minimum, item as its registry id plus one, target, and progress.
  */
 public final class WorkOrderMenuSupport {
     private static final int PART_FIELDS = 6;
-    private static final int SLOT_FIELDS = 4 + WorkObjective.MAX_PARTS * PART_FIELDS;
+    private static final int HEADER_FIELDS = 5;
+    private static final int SLOT_FIELDS = HEADER_FIELDS + WorkObjective.MAX_PARTS * PART_FIELDS;
     public static final int FIELD_COUNT = 1 + MachineWorkOrders.SLOTS * SLOT_FIELDS;
     private static final ResourceLocation SYNCED = RNGTech.id("synced");
+    /**
+     * Menu button ids from here up select a tab on the server, so Shift-click from the inventory fills a drive bay while
+     * the Orders tab is open. Tab selection is otherwise client-only. Far above the Mastery tree's node buttons.
+     */
+    public static final int BUTTON_SELECT_TAB = 1_000_000;
 
-    /** One synced chip: its tier, Bounty, Prestige, job, and each part's progress. */
-    public record Slot(int tier, int bounty, int prestige, WorkObjective objective, List<Long> progress) {
+    /** One synced chip: its tier, Bounty, Prestige, job, each part's progress, and Rush seconds left, 0 without Rush. */
+    public record Slot(int tier, int bounty, int prestige, WorkObjective objective, List<Long> progress, int rushSeconds) {
+        public boolean rushed() {
+            return rushSeconds > 0;
+        }
+
         public long totalTarget() {
             return objective.totalTarget();
         }
@@ -59,7 +69,7 @@ public final class WorkOrderMenuSupport {
     private WorkOrderMenuSupport() {
     }
 
-    public static int get(MachineWorkOrders orders, int field) {
+    public static int get(MachineWorkOrders orders, int field, long gameTime) {
         if (field == 0) { return orders.active() + 1; }
         int slot = (field - 1) / SLOT_FIELDS;
         if (slot >= orders.orders().size()) { return 0; }
@@ -71,12 +81,13 @@ public final class WorkOrderMenuSupport {
             case 1: return loaded.order().bounty();
             case 2: return loaded.order().prestige();
             case 3: return parts.size();
+            case 4: return loaded.rushed() ? (int) Math.max(1, Math.min(Integer.MAX_VALUE, (loaded.rushDeadline() - gameTime) / 20)) : 0;
             default: break;
         }
-        int part = (offset - 4) / PART_FIELDS;
+        int part = (offset - HEADER_FIELDS) / PART_FIELDS;
         if (part >= parts.size()) { return 0; }
         WorkPart value = parts.get(part);
-        return switch ((offset - 4) % PART_FIELDS) {
+        return switch ((offset - HEADER_FIELDS) % PART_FIELDS) {
             case 0 -> { WorkObjectiveType type = WorkObjectiveType.byId(value.type()); yield type == null ? 0 : type.ordinal() + 1; }
             case 1 -> { WorkFilter filter = WorkFilter.byId(value.filter()); yield filter == null ? 0 : filter.ordinal() + 1; }
             case 2 -> value.minimum();
@@ -96,7 +107,7 @@ public final class WorkOrderMenuSupport {
             List<WorkPart> parts = new ArrayList<>();
             List<Long> progress = new ArrayList<>();
             for (int part = 0; part < count; part++) {
-                int at = start + 4 + part * PART_FIELDS;
+                int at = start + HEADER_FIELDS + part * PART_FIELDS;
                 int type = data.get(at) - 1;
                 int filter = data.get(at + 1) - 1;
                 parts.add(new WorkPart(
@@ -105,7 +116,7 @@ public final class WorkOrderMenuSupport {
                         data.get(at + 2), itemKey(data.get(at + 3)), data.get(at + 4)));
                 progress.add((long) data.get(at + 5));
             }
-            slots.add(new Slot(tier, data.get(start + 1), data.get(start + 2), new WorkObjective(SYNCED, parts, 0), progress));
+            slots.add(new Slot(tier, data.get(start + 1), data.get(start + 2), new WorkObjective(SYNCED, parts, 0), progress, data.get(start + 4)));
         }
         int active = data.get(base) - 1;
         return new View(List.copyOf(slots), active >= 0 && active < slots.size() ? active : MachineWorkOrders.NONE);

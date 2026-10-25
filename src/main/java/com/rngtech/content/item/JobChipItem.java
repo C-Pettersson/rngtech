@@ -3,11 +3,13 @@ package com.rngtech.content.item;
 import com.rngtech.content.registry.ModDataComponents;
 import com.rngtech.content.workorder.WorkOrderEligibility;
 import com.rngtech.content.workorder.WorkOrderRewards;
+import com.rngtech.rpg.MachineModifier;
 import com.rngtech.rpg.MachineTraits;
 import com.rngtech.rpg.workorder.WorkFilter;
 import com.rngtech.rpg.workorder.WorkObjective;
 import com.rngtech.rpg.workorder.WorkObjectiveType;
 import com.rngtech.rpg.workorder.WorkOrder;
+import com.rngtech.rpg.workorder.WorkOrderConditions;
 import com.rngtech.rpg.workorder.WorkOrderProgress;
 import com.rngtech.rpg.workorder.WorkPart;
 
@@ -16,12 +18,16 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.crafting.RecipeManager;
+import net.minecraft.world.level.Level;
 
 import java.util.List;
+import java.util.Locale;
 
 /**
  * A Work Order: its family, tier, job, requirements, Bounty, and Prestige are readable on the item, and its rarity and
@@ -94,8 +100,9 @@ public class JobChipItem extends Item {
      * For a stage job, what counts toward it while Shift or Alt is held: Crusher inputs, or Furnace materials. Otherwise a
      * hint to hold it. A job line such as "Processing Level 6+" or "Stage 5+" alone does not say what reaches it.
      */
-    public static void appendEligibleItems(List<Component> lines, WorkObjective objective) {
-        WorkPart part = objective.parts().getFirst();
+    public static void appendEligibleItems(List<Component> lines, WorkObjective objective, MachineTraits traits) {
+        WorkPart listed = objective.parts().getFirst();
+        WorkPart part = new WorkPart(listed.type(), listed.filter(), WorkOrderConditions.minimum(listed, traits), listed.item(), listed.target());
         if (!WorkOrderEligibility.lists(part)) {
             return;
         }
@@ -104,7 +111,7 @@ public class JobChipItem extends Item {
             lines.add(Component.translatable("rngtech.tooltip.work_order.eligible_hint." + kind).withStyle(ChatFormatting.DARK_GRAY));
             return;
         }
-        RecipeManager recipes = ClientRecipes.manager();
+        RecipeManager recipes = ClientWorld.recipes();
         List<Component> names = recipes == null ? List.of() : WorkOrderEligibility.names(recipes, part);
         if (names.isEmpty()) {
             lines.add(Component.translatable("rngtech.tooltip.work_order.eligible_none").withStyle(ChatFormatting.DARK_GRAY));
@@ -148,14 +155,66 @@ public class JobChipItem extends Item {
         return Component.translatable("rngtech.work_order.family." + family);
     }
 
+    /** Whole seconds as m:ss, or h:mm:ss from an hour up. */
+    public static String clock(long seconds) {
+        long hours = seconds / 3600;
+        long minutes = seconds / 60 % 60;
+        return hours > 0 ? String.format(Locale.ROOT, "%d:%02d:%02d", hours, minutes, seconds % 60)
+                : String.format(Locale.ROOT, "%d:%02d", minutes, seconds % 60);
+    }
+
+    /** A Rush chip in a player's inventory is lost when its deadline passes, the same as one in a drive bay. */
+    @Override
+    public void inventoryTick(ItemStack stack, Level level, Entity entity, int slot, boolean selected) {
+        if (level.isClientSide || level.getGameTime() % 20 != 0) {
+            return;
+        }
+        WorkOrderProgress progress = stack.get(ModDataComponents.WORK_ORDER_PROGRESS.get());
+        if (progress != null && progress.rushDeadline() > 0 && level.getGameTime() >= progress.rushDeadline()) {
+            stack.setCount(0);
+            if (entity instanceof Player player) {
+                player.displayClientMessage(Component.translatable("rngtech.work_order.message.expired"), true);
+            }
+        }
+    }
+
     @Override
     public Component getName(ItemStack stack) {
         WorkOrder order = data(stack);
         if (order == null) {
             return Component.translatable("item.rngtech.job_chip.blank");
         }
-        return order.name().isEmpty() ? Component.translatable("item.rngtech.job_chip.tiered", GlyphItem.numeral(order.tier()))
+        MutableComponent name = order.name().isEmpty() ? Component.translatable("item.rngtech.job_chip.tiered", GlyphItem.numeral(order.tier()))
                 : Component.translatable("item.rngtech.job_chip.named", displayName(order), GlyphItem.numeral(order.tier()));
+        return switch (traits(stack).rarity()) {
+            case MAGIC -> name.withStyle(ChatFormatting.AQUA);
+            case RARE -> name.withStyle(ChatFormatting.GOLD);
+            default -> name;
+        };
+    }
+
+    /** One line per condition: its name, its cost or rule, and the Bounty and Prestige it adds. */
+    public static void appendConditions(List<Component> lines, MachineTraits traits) {
+        for (MachineModifier modifier : traits.modifiers()) {
+            WorkOrderConditions.Condition condition = WorkOrderConditions.get(modifier.affixId());
+            if (condition == null) {
+                continue;
+            }
+            String id = condition.id();
+            Component effect = switch (id) {
+                case WorkOrderConditions.STARVED_FEED -> Component.translatable("rngtech.work_order.condition." + id + ".effect",
+                        Math.round((1 - modifier.value()) * 100));
+                case WorkOrderConditions.POWER_SURCHARGE, WorkOrderConditions.COLD_START ->
+                        Component.translatable("rngtech.work_order.condition." + id + ".effect", Math.round(modifier.value()));
+                default -> Component.translatable("rngtech.work_order.condition." + id + ".effect");
+            };
+            Component reward = condition.prestige() > 0
+                    ? Component.translatable("rngtech.tooltip.work_order.condition_reward_prestige", condition.bounty(modifier.tier()), condition.prestige())
+                    : Component.translatable("rngtech.tooltip.work_order.condition_reward", condition.bounty(modifier.tier()));
+            lines.add(Component.translatable("rngtech.tooltip.work_order.condition",
+                    Component.translatable("rngtech.work_order.condition." + id).withStyle(ChatFormatting.RED),
+                    effect, reward.copy().withStyle(ChatFormatting.DARK_GREEN)).withStyle(ChatFormatting.GRAY));
+        }
     }
 
     @Override
@@ -168,7 +227,8 @@ public class JobChipItem extends Item {
         }
         tooltipComponents.add(familyName(order.family()).withStyle(ChatFormatting.GOLD));
         tooltipComponents.add(objectiveText(order.objective()).copy().withStyle(ChatFormatting.GRAY));
-        appendEligibleItems(tooltipComponents, order.objective());
+        appendEligibleItems(tooltipComponents, order.objective(), traits(stack));
+        appendConditions(tooltipComponents, traits(stack));
         tooltipComponents.add(order.minMasteryLevel() > 0
                 ? Component.translatable("rngtech.tooltip.work_order.requires_level", order.minStage(), order.minMasteryLevel()).withStyle(ChatFormatting.GRAY)
                 : Component.translatable("rngtech.tooltip.work_order.requires", order.minStage()).withStyle(ChatFormatting.GRAY));
@@ -181,6 +241,11 @@ public class JobChipItem extends Item {
         if (progress != null && !progress.isNone()) {
             tooltipComponents.add(Component.translatable("rngtech.tooltip.work_order.progress", progress.progress().stream().mapToLong(Long::longValue).sum(), order.objective().totalTarget())
                     .withStyle(ChatFormatting.GRAY));
+        }
+        if (progress != null && progress.rushDeadline() > 0) {
+            long now = ClientWorld.gameTime();
+            tooltipComponents.add(Component.translatable("rngtech.tooltip.work_order.rush",
+                    clock(now < 0 ? 0 : Math.max(0, progress.rushDeadline() - now) / 20)).withStyle(ChatFormatting.GOLD));
         }
         if (order.prestige() > 0) {
             tooltipComponents.add(Component.translatable("rngtech.tooltip.fulfilled_work_order.prestige", order.prestige()).withStyle(ChatFormatting.GRAY));

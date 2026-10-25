@@ -2,6 +2,8 @@ package com.rngtech.content.menu;
 
 import com.rngtech.rpg.workorder.WorkOrderHost;
 
+import net.minecraft.world.item.ItemStack;
+
 /** A machine menu with an Orders tab. */
 public interface WorkOrderMenuView {
     /** The machine; on the client only its synced data in {@link #workOrderView} is meaningful. */
@@ -17,4 +19,7 @@ public interface WorkOrderMenuView {
     int workOrderMasteryLevel();
 
     WorkOrderMenuSupport.View workOrderView();
+
+    /** The chip in drive bay {@code bay}, as its slot syncs it, or empty. */
+    ItemStack workOrderChip(int bay);
 }

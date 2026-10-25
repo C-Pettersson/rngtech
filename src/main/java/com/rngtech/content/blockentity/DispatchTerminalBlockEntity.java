@@ -75,12 +75,19 @@ public class DispatchTerminalBlockEntity extends BlockEntity implements MenuProv
     public boolean reroll(RandomGenerator random) {
         ItemStack[] rolled = new ItemStack[OFFERS];
         for (int slot = 0; slot < OFFERS; slot++) {
-            WorkOrder order = level == null ? WorkOrderRules.roll(WorkObjectiveCatalog.all(), random)
-                    : WorkOrderJobs.roll(level, worldPosition, 0, random);
-            if (order == null) {
+            if (level == null) {
+                WorkOrder order = WorkOrderRules.roll(WorkObjectiveCatalog.all(), random);
+                if (order == null) {
+                    return false;
+                }
+                rolled[slot] = JobChipItem.of(ModItems.JOB_CHIP.get(), order, MachineTraits.EMPTY);
+                continue;
+            }
+            WorkOrderJobs.Job job = WorkOrderJobs.roll(level, worldPosition, 0, random);
+            if (job == null) {
                 return false;
             }
-            rolled[slot] = JobChipItem.of(ModItems.JOB_CHIP.get(), order, MachineTraits.EMPTY);
+            rolled[slot] = job.stack();
         }
         for (int slot = 0; slot < OFFERS; slot++) {
             offers.setStackInSlot(slot, rolled[slot]);

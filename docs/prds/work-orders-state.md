@@ -14,7 +14,7 @@ Status: **Planned**. The PRD is a draft with open questions and no release targe
 - [x] Core loop for the Crusher and Furnace: drive bays to load and unload, activate, switch, and abandon on an Orders tab; progress hooks; the Completed Job Chip; the reward table.
 - [x] Dispatch Terminal and Requisitions: the block, job rolling with count ranges and item jobs, one-kind rewards, Download and Refresh, the Requisition recipe, and the give commands.
 - [x] Order templates: loader, terminal pools, per-template reward tables, the template give command, and the config key that turns random orders off. Rarity and conditions on templates wait for phase 6.
-- [ ] Conditions: the `work_order` eligibility profile and pool, conditions as an effect source on any machine, reset-on-event conditions, and Rush.
+- [x] Conditions: the `work_order` profiles and pool for the Crusher and Furnace, conditions as an effect source on the machine, reset-on-event conditions, and Rush. The Bonus Summary drawer section moved to phase 9.
 - [ ] More jobs and machines: stat goals for the Crusher and Furnace, then the other Mastery families and the machines without Mastery, starting with the Component Assembler.
 - [ ] Refinement and corruption: order corruption pools and Phase Array rejection.
 - [ ] UI polish: drive-bay panels on machine models, the Bonus Summary section, Jade, JEI, and model cues.
@@ -142,6 +142,26 @@ Recorded 2026-10-25 for phase 5, from the build:
 - No template ships in the mod's own data. `/rngtech work_order give` suggests the loaded templates.
 - Work Orders have no wiki page yet (phase 10), so the template format and `workOrders.randomOrdersEnabled` are documented here and in the PRD until then.
 
+Recorded 2026-10-25 for phase 6, from the user:
+
+- Ship the conditions the Crusher and Furnace can read with existing stats and events. Thin Margins, Veteran Crew, Unsteady Hands, and of Fine Tolerance wait.
+- Listed jobs roll Normal 50%, Magic 35%, Rare 15% (draft). This settles the open question: Normal chips exist.
+- The Bonus Summary drawer's Work Order section waits for the phase 9 UI polish; this phase shows conditions on the chip tooltip and the Orders tab row.
+
+Recorded 2026-10-25 for phase 6, from the build:
+
+- Conditions are real affixes: `ModifierDefinition`s in `WorkOrderConditions`, stored as the chip's `MachineTraits` and carried into the bay. `WorkOrderConditions.profile(family)` builds a `work_order_<family>` eligibility profile from them for phase 8 refinement. They are not in `ModifierEligibilityProfiles`, whose capability validation is for machine stats.
+- Counts: Normal 0, Magic 1–2, Rare 3–4, within the usual slot limits (Magic one prefix and one suffix, Rare three of each), each from a different group. A family with fewer conditions to offer rolls fewer. Tiers roll evenly among a condition's tiers.
+- Each condition adds its tier's Bounty, and the rule conditions add one Prestige, when the job rolls; the reward then rolls at that Bounty. Rush works on top: it multiplies the listed reward, or the Bounty of a job without a list.
+- Draft values: Starved Feed 15–30% less Processing Speed (+15/22/30% Bounty), Power Surcharge 25–50% increased Energy Usage (+10/17/25%), Short Crew −1 Batch Size (+30%), Cold Start 10–20% reduced Temperature Stability (+15/20/25%), Hand Feeding no Instant Process (+20%), Brittle Lining and Jammed Line reset progress on a heat failure or jam (+35% and +30%, +1 Prestige), Deep Ore one level above a stage job's minimum (+25%, +1 Prestige).
+- Pressure conditions apply in the Crusher's and Furnace's `buildStats` right after the Mastery attribute stats, as implicit modifiers labelled "Work Order: <condition>" in a stat breakdown. The stats cache gets a third key object, the active chip's traits, so activating, pausing, or finishing a chip rebuilds the stats once.
+- Hand Feeding is a 0× less Instant Process Chance. Short Crew is −1 Batch Size, which the machines already floor at 1.
+- Rule conditions are zero-value affixes read by id, like the existing behavior-only affixes. Deep Ore applies in counting (`WorkOrderConditions.counts`), not by changing the stored job, so removing it by refinement later restores the job; the Shift list shows the raised minimum.
+- Reset conditions hook the Crusher's jam and the Furnace's heat failure through `WorkOrderHost.workOrderSetback`, which resets only the active chip that carries that condition.
+- Templates gained `rarity`; conditions on a template always roll.
+- Shift-click from the inventory into the drive bays did nothing in playtest: tab selection was client-only, so the server's menu never saw the Orders tab. The Crusher and Furnace screens now send the selected tab as a menu button (`WorkOrderMenuSupport.BUTTON_SELECT_TAB` plus the tab), and the GameTests open the Orders tab the same way.
+- Rush: the Orders tab's Rush button activates the selected chip with a deadline of half the tier's target time (7:30 at Tier I up to 15:00; the first build used 1.5 times, which playtest found far too generous, since a Tier IV job of 440 items was nearly done in six minutes) and 50% more listed reward, rounded up, or 50% more Bounty for a job without a list. Its tooltip shows the deadline and the loss before the player commits. Machines drop expired chips about once a second, a chip in a player's inventory disappears when its deadline passes, and a bay refuses an expired chip. A finished chip never expires. The rows show "Rush m:ss" and the chip tooltip the time left; the menu sync grew a Rush field per slot.
+
 ## Code against the redesign
 
 The branch's loop was built for the earlier design. Phase 2 of the rework replaced the Mastery storage, the Mastery level gate, the tier and seed components, and the Tier I recipe; the lists below show what is left for later phases.
@@ -209,6 +229,7 @@ Recorded 2026-10-25 from the chips slice:
 - 2026-10-25: Job Chips, Dispatch Terminal, and drive bays. Work Order items became the Job Chip and Completed Job Chip; the Dispatch Terminal replaced the Dispatch Board, with a console model, six listing lamps, and a terminal screen with Download and Refresh; item jobs with one to three parts and the balanced job mix; one reward kind per job; three drive-bay slots on the Orders tab replace Load and Unload; and the terminal and Requisition recipes gate on calibration stability. GameTests cover loading through the bays, pulling the active chip, putting it back, Shift-click both ways, and a bay refusing another family's chip.
 - 2026-10-25: playtest fixes. Shift lists what counts toward stage jobs, Crusher inputs or Furnace materials (`WorkOrderEligibility`, which the Furnace now also uses for a smelt's stage), the terminal heading names the chassis, and finished chips stay in their bays as Completed Job Chips. GameTests check the listed items against the recipes and that a finished chip stays in its bay, inactive, until it is taken out.
 - 2026-10-25: rework phase 5, job templates. `WorkOrderTemplate` (parse and roll, with no item classes), `WorkOrderTemplateCatalog` under `work_orders/templates`, one weighted terminal draw over random objectives and pooled templates, `workOrders.randomOrdersEnabled`, fixed rewards and per-template reward tables carried to the Completed Job Chip, template names on chips and terminal rows, and `/rngtech work_order give <players> template <id> [tier]`. Checks: `WorkOrderTemplateChecks` and `WorkOrderTemplateGameTests`.
+- 2026-10-25: rework phase 6, conditions and Rush. `WorkOrderConditions` (profiles, rarity roll, condition roll, rewards, counting, stat application), chip rarity colours and condition lines, the Orders tab row showing the chip's tooltip, the Rush button, deadlines, and expiry, stats cache keyed on the active chip, and jam and heat-failure setbacks. Checks: `WorkOrderConditionChecks`, Rush checks in `WorkOrderRuleChecks`, and `WorkOrderGameTests` for Rush and conditions.
 
 ## Verification
 
@@ -224,6 +245,7 @@ Recorded 2026-10-25 from the chips slice:
 - 2026-10-25: Job Chips, Dispatch Terminal, and drive bays. `./gradlew quickCheck`, `./gradlew runGameTestServer` (276 tests), `npm run moddex:check`, and `npm run repo:check` passed. `mkdocs build --strict` was not run locally. The terminal, its screen, and the drive bays have not been checked in a running client.
 - 2026-10-25: playtest fixes. `./gradlew quickCheck`, `./gradlew runGameTestServer` (277 tests), `npm run moddex:check`, and `npm run repo:check` passed. Playtested in the client: the Shift lists (Crusher items, Furnace materials, none on heat and any-work jobs) and finished chips staying in their bays behave as intended.
 - 2026-10-25: rework phase 5. `./gradlew quickCheck` (including `masteryCheck` with `WorkOrderTemplateChecks`), `./gradlew runGameTestServer` (279 tests), `npm run moddex:check`, and `npm run repo:check` passed. `mkdocs build --strict` was not run locally. Templates have not been tried from a datapack in a running client.
+- 2026-10-25: rework phase 6. `./gradlew quickCheck` (`masteryCheck` 604,167 checks), `./gradlew runGameTestServer` (281 tests), `npm run moddex:check`, and `npm run repo:check` passed. `mkdocs build --strict` was not run locally. Conditions and Rush have not been checked in a running client.
 
 ## Handoff and limits
 
