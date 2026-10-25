@@ -4,6 +4,7 @@ import com.rngtech.content.blockentity.ToolBenchBlockEntity;
 import com.rngtech.content.item.ModularToolItem;
 import com.rngtech.content.item.RefinementConsumableItem;
 import com.rngtech.content.menu.ToolBenchMenu;
+import com.rngtech.content.registry.ModItems;
 import com.rngtech.content.tool.ToolBaseStatCatalog;
 import com.rngtech.rpg.MachineModifier;
 import com.rngtech.rpg.MachineModifierText;
@@ -33,7 +34,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
-public class ToolBenchScreen extends AbstractContainerScreen<ToolBenchMenu> {
+public class ToolBenchScreen extends AbstractContainerScreen<ToolBenchMenu> implements MachineTabs.Host {
     private static final int PANEL = 0xFFC6C6C6;
     private static final int PANEL_DARK = 0xFF8B8B8B;
     private static final int PANEL_LIGHT = 0xFFE9E9E9;
@@ -55,8 +56,6 @@ public class ToolBenchScreen extends AbstractContainerScreen<ToolBenchMenu> {
     private static final int DISASSEMBLE_Y = 83;
     private static final int BUTTON_WIDTH = 72;
     private static final int BUTTON_HEIGHT = 18;
-    private static final int TAB_WIDTH = 54;
-    private static final int TAB_SPACING = 56;
     private static final int REFINE_SLOT_Y = 31;
     private static final int REFINE_LABEL_Y = 20;
     private static final int REFINE_TOOL_FRAME_X = 13;
@@ -114,18 +113,32 @@ public class ToolBenchScreen extends AbstractContainerScreen<ToolBenchMenu> {
             MachineStat.CONTROL
     };
 
+    private final MachineTabs tabs;
+
     public ToolBenchScreen(ToolBenchMenu menu, Inventory playerInventory, Component title) {
         super(menu, playerInventory, title);
         imageWidth = 360;
         imageHeight = 226;
         inventoryLabelX = PLAYER_INVENTORY_X;
         inventoryLabelY = 130;
+        tabs = MachineTabs.builder(this)
+                .tab(ToolBenchMenu.TAB_ASSEMBLY, "rngtech.tab.assembly", ModItems.TOOL_BENCH.get())
+                .gear(ToolBenchMenu.TAB_GEAR)
+                .stats(ToolBenchMenu.TAB_STATS)
+                .refinement(ToolBenchMenu.TAB_REFINEMENT)
+                .build();
+    }
+
+    @Override
+    public MachineTabs machineTabs() {
+        return tabs;
     }
 
     @Override
     public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         super.render(guiGraphics, mouseX, mouseY, partialTick);
         renderTooltip(guiGraphics, mouseX, mouseY);
+        tabs.renderTooltip(guiGraphics, mouseX, mouseY);
         renderStatTooltips(guiGraphics, mouseX, mouseY);
         renderRefinementTooltips(guiGraphics, mouseX, mouseY);
         renderEmptySlotHints(guiGraphics, mouseX, mouseY);
@@ -167,7 +180,7 @@ public class ToolBenchScreen extends AbstractContainerScreen<ToolBenchMenu> {
     @Override
     protected void renderBg(GuiGraphics guiGraphics, float partialTick, int mouseX, int mouseY) {
         renderPanel(guiGraphics);
-        renderTabs(guiGraphics);
+        tabs.render(guiGraphics, mouseX, mouseY, menu.selectedTab());
         renderSlotFrames(guiGraphics);
         if (menu.selectedTab() == ToolBenchMenu.TAB_STATS) {
             renderStats(guiGraphics);
@@ -181,6 +194,7 @@ public class ToolBenchScreen extends AbstractContainerScreen<ToolBenchMenu> {
     @Override
     protected void renderLabels(GuiGraphics guiGraphics, int mouseX, int mouseY) {
         guiGraphics.drawString(font, title, titleLabelX, titleLabelY, TEXT, false);
+        tabs.renderSelectedLabel(guiGraphics, menu.selectedTab(), titleLabelX, titleLabelY, TEXT_MUTED);
         if (menu.selectedTab() == ToolBenchMenu.TAB_STATS) {
             drawStatsLabels(guiGraphics);
         } else if (menu.selectedTab() == ToolBenchMenu.TAB_GEAR) {
@@ -217,20 +231,9 @@ public class ToolBenchScreen extends AbstractContainerScreen<ToolBenchMenu> {
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         if (button == 0) {
-            if (isOverTab(mouseX, mouseY, 0)) {
-                selectTab(ToolBenchMenu.TAB_ASSEMBLY);
-                return true;
-            }
-            if (isOverTab(mouseX, mouseY, 1)) {
-                selectTab(ToolBenchMenu.TAB_GEAR);
-                return true;
-            }
-            if (isOverTab(mouseX, mouseY, 2)) {
-                selectTab(ToolBenchMenu.TAB_STATS);
-                return true;
-            }
-            if (isOverTab(mouseX, mouseY, 3)) {
-                selectTab(ToolBenchMenu.TAB_REFINEMENT);
+            int tab = tabs.tabAt(mouseX, mouseY);
+            if (tab >= 0) {
+                selectTab(tab);
                 return true;
             }
             if (menu.selectedTab() == ToolBenchMenu.TAB_ASSEMBLY) {
@@ -318,27 +321,6 @@ public class ToolBenchScreen extends AbstractContainerScreen<ToolBenchMenu> {
         guiGraphics.fill(x, y, x + 1, y + imageHeight, PANEL_LIGHT);
         guiGraphics.fill(x + imageWidth - 1, y, x + imageWidth, y + imageHeight, PANEL_DARK);
         guiGraphics.fill(x, y + imageHeight - 1, x + imageWidth, y + imageHeight, PANEL_DARK);
-    }
-
-    private void renderTabs(GuiGraphics guiGraphics) {
-        renderTab(guiGraphics, 0, Component.translatable("rngtech.tab.assembly"), menu.selectedTab() == ToolBenchMenu.TAB_ASSEMBLY);
-        renderTab(guiGraphics, 1, Component.translatable("rngtech.tab.gear"), menu.selectedTab() == ToolBenchMenu.TAB_GEAR);
-        renderTab(guiGraphics, 2, Component.translatable("rngtech.tab.stats"), menu.selectedTab() == ToolBenchMenu.TAB_STATS);
-        renderTab(guiGraphics, 3, Component.translatable("rngtech.tab.refinement.short"), menu.selectedTab() == ToolBenchMenu.TAB_REFINEMENT);
-    }
-
-    private void renderTab(GuiGraphics guiGraphics, int index, Component label, boolean selected) {
-        int x = leftPos + 8 + index * TAB_SPACING;
-        int y = topPos - 20;
-        int color = selected ? PANEL : 0xFF9A9A9A;
-        guiGraphics.fill(x, y, x + TAB_WIDTH, y + 21, color);
-        guiGraphics.fill(x, y, x + TAB_WIDTH, y + 1, PANEL_LIGHT);
-        guiGraphics.fill(x, y, x + 1, y + 21, PANEL_LIGHT);
-        guiGraphics.fill(x + TAB_WIDTH - 1, y, x + TAB_WIDTH, y + 21, PANEL_DARK);
-        if (!selected) {
-            guiGraphics.fill(x, y + 20, x + TAB_WIDTH, y + 21, PANEL_DARK);
-        }
-        guiGraphics.drawString(font, label, x + (TAB_WIDTH - font.width(label)) / 2, y + 7, selected ? TEXT : 0xFF2F2F2F, false);
     }
 
     private void renderSlotFrames(GuiGraphics guiGraphics) {
@@ -1074,12 +1056,6 @@ public class ToolBenchScreen extends AbstractContainerScreen<ToolBenchMenu> {
         guiGraphics.fill(left, top, left + 18, top + 18, 0xFF373737);
         guiGraphics.fill(left + 1, top + 1, left + 17, top + 17, 0xFFE0E0E0);
         guiGraphics.fill(left + 2, top + 2, left + 16, top + 16, 0xFF8B8B8B);
-    }
-
-    private boolean isOverTab(double mouseX, double mouseY, int index) {
-        int x = leftPos + 8 + index * TAB_SPACING;
-        int y = topPos - 20;
-        return mouseX >= x && mouseX < x + TAB_WIDTH && mouseY >= y && mouseY < y + 21;
     }
 
     private record SelectionRow(Component title, Component tooltip, boolean enabled, int y) {}

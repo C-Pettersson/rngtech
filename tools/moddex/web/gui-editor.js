@@ -5,10 +5,10 @@ const SLOT_TYPES = ["BUCKET_INPUT", "BUCKET_OUTPUT", "ITEM", "FILTERED_ITEM", "M
 const ORIENTATIONS = ["HORIZONTAL", "VERTICAL"];
 const TAB_PRESETS = ["PROCESSING", "GEAR", "STATS", "REFINEMENT"];
 const DEFAULT_TAB_LABELS = {
-    PROCESSING: "rngtech.tab.processing.short",
+    PROCESSING: "rngtech.tab.processing",
     GEAR: "rngtech.tab.gear",
     STATS: "rngtech.tab.stats",
-    REFINEMENT: "rngtech.tab.refinement.short"
+    REFINEMENT: "rngtech.tab.refinement"
 };
 const ELEMENT_DEFAULTS = {
     ITEM_SLOT: { width: 18, height: 18, label: "Item", slotType: "ITEM", visibleInJade: false },

@@ -13,6 +13,7 @@ import com.rngtech.client.screen.CorrosionCellScreen;
 import com.rngtech.client.screen.CrusherScreen;
 import com.rngtech.client.screen.FurnaceScreen;
 import com.rngtech.client.screen.GasChemistryScreen;
+import com.rngtech.client.screen.MachineTabs;
 import com.rngtech.client.screen.MelterScreen;
 import com.rngtech.client.screen.MetalPressScreen;
 import com.rngtech.client.screen.MinersCompanionScreen;
@@ -355,6 +356,7 @@ public final class RNGTechJeiPlugin implements IModPlugin {
 
     @Override
     public void registerGuiHandlers(IGuiHandlerRegistration registration) {
+        registration.addGenericGuiContainerHandler(AbstractContainerScreen.class, new MachineTabAreas());
         registerProcessRecipeLineClickArea(
                 registration,
                 SolidFuelBurnerScreen.class,
@@ -390,7 +392,7 @@ public final class RNGTechJeiPlugin implements IModPlugin {
                 CrusherScreen.class,
                 screen -> screen.getMenu().selectedTab() == CrusherMenu.TAB_PROCESSING,
                 86,
-                51,
+                61,
                 69,
                 8,
                 JeiRecipeTypes.CRUSHER
@@ -794,5 +796,12 @@ public final class RNGTechJeiPlugin implements IModPlugin {
         lines.add(Component.translatable("rngtech.jei.unique.source", Component.translatable(unique.sourceKey())));
         lines.add(Component.translatable("rngtech.jei.unique.identify"));
         return lines;
+    }
+
+    private static final class MachineTabAreas implements IGuiContainerHandler<AbstractContainerScreen<?>> {
+        @Override
+        public List<Rect2i> getGuiExtraAreas(AbstractContainerScreen<?> screen) {
+            return screen instanceof MachineTabs.Host host ? host.machineTabs().areas() : List.of();
+        }
     }
 }

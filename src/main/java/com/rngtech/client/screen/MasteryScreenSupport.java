@@ -70,7 +70,13 @@ public final class MasteryScreenSupport<N extends PassiveNode> {
     private static final int MASTERY_EXPAND_BUTTON_Y = 16;
     private static final int MASTERY_ICON_TEXTURE_SIZE = 16;
     private static final int MASTERY_RING_SPACING = 120;
-    private static final int MASTERY_SEARCH_X = 154;
+    private static final int MASTERY_TOOLBAR_X = 8;
+    private static final int MASTERY_TOOLBAR_Y = 42;
+    private static final int MASTERY_TOOLBAR_HEIGHT = 12;
+    private static final int MASTERY_TOOLBAR_GAP = 4;
+    private static final int MASTERY_MENU_ACTIONS = 7;
+    private static final int MASTERY_MENU_ROW_HEIGHT = 12;
+    private static final int MASTERY_MENU_PADDING = 2;
     private static final double MASTERY_MIN_ZOOM = 0.5D;
     private static final double MASTERY_MAX_ZOOM = 2.0D;
     private static final double MASTERY_ZOOM_STEP = 1.25D;
@@ -152,6 +158,7 @@ public final class MasteryScreenSupport<N extends PassiveNode> {
     private double lastDragX;
     private double lastDragY;
     private boolean searchFocused;
+    private boolean menuOpen;
     private String search = "";
     private boolean highlightRelevant;
     private int searchCursor;
@@ -296,7 +303,7 @@ public final class MasteryScreenSupport<N extends PassiveNode> {
         guiGraphics.fill(viewLeft - 1, viewTop - 1, viewRight + 1, viewBottom + 1, 0xFF655B46);
         guiGraphics.fill(viewLeft, viewTop, viewRight, viewBottom, 0xFF10171D);
 
-        int hovered = panning() ? -1 : hoveredNode(leftPos, topPos, imageWidth, imageHeight, mouseX, mouseY);
+        int hovered = panning() || menuOpen ? -1 : hoveredNode(leftPos, topPos, imageWidth, imageHeight, mouseX, mouseY);
         int[] hoveredRoute = hovered >= 0 ? routeTo(hovered) : NO_ROUTE;
         guiGraphics.enableScissor(viewLeft, viewTop, viewRight, viewBottom);
         GuiShapeBatch shapes = new GuiShapeBatch(guiGraphics, viewLeft, viewTop, viewRight, viewBottom);
@@ -323,6 +330,9 @@ public final class MasteryScreenSupport<N extends PassiveNode> {
             ascendancy.render(guiGraphics, Minecraft.getInstance().font, bounds, mouseX, mouseY);
         } else if (expanded) {
             summary.render(guiGraphics, Minecraft.getInstance().font, bounds, mouseX, mouseY);
+        }
+        if (menuOpen) {
+            renderMenu(guiGraphics, leftPos, topPos, mouseX, mouseY);
         }
     }
 
@@ -356,8 +366,11 @@ public final class MasteryScreenSupport<N extends PassiveNode> {
             int mouseX,
             int mouseY
     ) {
-        int tool = toolbarIndex(leftPos, topPos, mouseX, mouseY);
-        if (tool >= 0) {
+        if (menuOpen) {
+            int tool = menuRowAt(leftPos, topPos, mouseX, mouseY);
+            if (tool < 0) {
+                return;
+            }
             List<Component> tooltip = new ArrayList<>(List.of(Component.translatable("rngtech.mastery.toolbar." + tool)));
             if (tool == 3 && view.masterySnapshot().freeReset()) {
                 tooltip.add(Component.translatable("rngtech.mastery.toolbar.free_reset").withStyle(ChatFormatting.GREEN));
@@ -419,6 +432,14 @@ public final class MasteryScreenSupport<N extends PassiveNode> {
             int imageWidth,
             int imageHeight
     ) {
+        if (menuOpen) {
+            int tool = menuRowAt(leftPos, topPos, mouseX, mouseY);
+            menuOpen = false;
+            if (tool >= 0 && button == 0) {
+                runMenuAction(tool, imageWidth, imageHeight);
+            }
+            return true;
+        }
         if (ascendancy.isOpen() && isOverViewport(leftPos, topPos, imageWidth, imageHeight, mouseX, mouseY)) {
             return ascendancy.mouseClicked(viewBounds(leftPos, topPos, imageWidth, imageHeight), mouseX, mouseY, button);
         }
@@ -436,24 +457,9 @@ public final class MasteryScreenSupport<N extends PassiveNode> {
         if (button != 0) {
             return false;
         }
-        int tool = toolbarIndex(leftPos, topPos, mouseX, mouseY);
-        if (tool >= 0) {
-            switch (tool) {
-                case 0 -> {
-                    if (Screen.hasShiftDown()) { send("copy_configurator", ""); }
-                    else { Minecraft.getInstance().keyboardHandler.setClipboard(MasteryBuildCode.copy(view.masterySnapshot()).encode()); }
-                }
-                case 1 -> {
-                    String code = Minecraft.getInstance().keyboardHandler.getClipboard();
-                    if (code.length() <= MasteryBuildCode.MAX_LENGTH) { send("paste", code); }
-                }
-                case 2 -> send(view.masterySnapshot().following() ? "pause" : "resume", "");
-                case 3 -> { if (Screen.hasShiftDown()) { send("clear", ""); } }
-                case 4 -> { zoom = MASTERY_FOCUS_ZOOM; panInitialized = false; ensurePanInitialized(imageWidth, imageHeight); }
-                case 5 -> fitTree(imageWidth, imageHeight);
-                case 6 -> highlightRelevant = !highlightRelevant;
-                default -> { }
-            }
+        if (isOverMenuButton(leftPos, topPos, mouseX, mouseY)) {
+            menuOpen = true;
+            searchFocused = false;
             return true;
         }
         searchFocused = isOverSearch(leftPos, topPos, imageWidth, mouseX, mouseY);
@@ -541,6 +547,9 @@ public final class MasteryScreenSupport<N extends PassiveNode> {
         if (!isOverViewport(leftPos, topPos, imageWidth, imageHeight, mouseX, mouseY)) {
             return false;
         }
+        if (menuOpen) {
+            return true;
+        }
         if (ascendancy.isOpen()) {
             return ascendancy.mouseScrolled(scrollY);
         }
@@ -567,7 +576,8 @@ public final class MasteryScreenSupport<N extends PassiveNode> {
     }
 
     public boolean keyPressed(int key, int scan, int modifiers, int width, int height) {
-        if (key == 70 && Screen.hasControlDown()) { searchFocused = true; return true; }
+        if (key == 256 && menuOpen) { menuOpen = false; return true; }
+        if (key == 70 && Screen.hasControlDown()) { searchFocused = true; menuOpen = false; return true; }
         if (key == 256 && !searchFocused && ascendancy.isOpen()) { ascendancy.close(); return true; }
         if (!searchFocused) { return false; }
         if (key == 256) { searchFocused = false; return true; }
@@ -1254,29 +1264,116 @@ public final class MasteryScreenSupport<N extends PassiveNode> {
 
     private void renderToolbar(GuiGraphics graphics, int left, int top, int width) {
         Font font = Minecraft.getInstance().font;
-        String[] labels = {"C", "P", snapshot.following() ? "||" : ">", "X", "H", "F", "R"};
-        for (int i = 0; i < labels.length; i++) {
-            int x = left + 8 + i * 20;
-            // Relevance highlighting lights R; an unused free Full Reset lights X (Clear) green.
-            boolean lit = i == 6 && highlightRelevant || i == 3 && snapshot.freeReset();
-            graphics.fill(x, top + 42, x + 18, top + 54, lit ? 0xFF596035 : 0xFF343E49);
-            graphics.drawString(font, labels[i], x + 5, top + 44, 0xFFE7DDC0, false);
-        }
-        int searchLeft = left + MASTERY_SEARCH_X;
+        int buttonLeft = left + MASTERY_TOOLBAR_X;
+        int buttonTop = top + MASTERY_TOOLBAR_Y;
+        // A free Full Reset or relevance highlighting lights the Menu button, since both controls live inside it.
+        boolean lit = snapshot.freeReset() || highlightRelevant;
+        graphics.fill(buttonLeft, buttonTop, buttonLeft + menuButtonWidth(), buttonTop + MASTERY_TOOLBAR_HEIGHT,
+                menuOpen ? 0xFF465366 : lit ? 0xFF596035 : 0xFF343E49);
+        graphics.drawString(font, Component.translatable("rngtech.mastery.menu"), buttonLeft + 5, buttonTop + 2, 0xFFE7DDC0, false);
+        int searchLeft = left + searchX();
         int searchRight = left + width - 8;
-        graphics.fill(searchLeft, top + 42, searchRight, top + 54, searchFocused ? 0xFF465366 : 0xFF252E38);
+        graphics.fill(searchLeft, buttonTop, searchRight, buttonTop + MASTERY_TOOLBAR_HEIGHT, searchFocused ? 0xFF465366 : 0xFF252E38);
         String count = search.isBlank() ? "" : Integer.toString(matchCount);
         int countWidth = count.isEmpty() ? 0 : font.width(count) + 4;
         if (!count.isEmpty()) {
-            graphics.drawString(font, count, searchRight - 2 - font.width(count), top + 44, matchCount > 0 ? 0xFFA9A08A : 0xFFC8604E, false);
+            graphics.drawString(font, count, searchRight - 2 - font.width(count), buttonTop + 2, matchCount > 0 ? 0xFFA9A08A : 0xFFC8604E, false);
         }
         String text = search.isEmpty() ? Component.translatable("rngtech.mastery.search").getString() : search;
-        graphics.drawString(font, font.plainSubstrByWidth(text, Math.max(1, width - 168 - countWidth)), searchLeft + 3, top + 44, 0xFFE7DDC0, false);
+        graphics.drawString(font, font.plainSubstrByWidth(text, Math.max(1, searchRight - searchLeft - 6 - countWidth)), searchLeft + 3, buttonTop + 2, 0xFFE7DDC0, false);
     }
 
-    private int toolbarIndex(int left, int top, double x, double y) {
-        if (y < top + 42 || y >= top + 54 || x < left + 8 || x >= left + 148) { return -1; }
-        return (int) (x - left - 8) / 20;
+    private void renderMenu(GuiGraphics graphics, int left, int top, int mouseX, int mouseY) {
+        Font font = Minecraft.getInstance().font;
+        int menuLeft = left + MASTERY_TOOLBAR_X;
+        int menuTop = menuTop(top);
+        int menuRight = menuLeft + menuWidth();
+        int menuBottom = menuTop + menuHeight();
+        int hoveredRow = menuRowAt(left, top, mouseX, mouseY);
+        graphics.pose().pushPose();
+        graphics.pose().translate(0.0F, 0.0F, 300.0F);
+        graphics.fill(menuLeft - 1, menuTop - 1, menuRight + 1, menuBottom + 1, 0xFF655B46);
+        graphics.fill(menuLeft, menuTop, menuRight, menuBottom, 0xFF252E38);
+        for (int row = 0; row < MASTERY_MENU_ACTIONS; row++) {
+            int rowTop = menuTop + MASTERY_MENU_PADDING + row * MASTERY_MENU_ROW_HEIGHT;
+            boolean lit = row == 6 && highlightRelevant || row == 3 && snapshot.freeReset();
+            if (row == hoveredRow || lit) {
+                graphics.fill(menuLeft + 1, rowTop, menuRight - 1, rowTop + MASTERY_MENU_ROW_HEIGHT, row == hoveredRow ? 0xFF465366 : 0xFF596035);
+            }
+            graphics.drawString(font, menuLabel(row), menuLeft + 5, rowTop + 2, 0xFFE7DDC0, false);
+        }
+        graphics.pose().popPose();
+    }
+
+    private Component menuLabel(int row) {
+        if (row == 2) {
+            return Component.translatable(snapshot.following() ? "rngtech.mastery.menu.2.pause" : "rngtech.mastery.menu.2.resume");
+        }
+        return Component.translatable("rngtech.mastery.menu." + row);
+    }
+
+    private int menuButtonWidth() {
+        return Minecraft.getInstance().font.width(Component.translatable("rngtech.mastery.menu")) + 10;
+    }
+
+    private int menuWidth() {
+        Font font = Minecraft.getInstance().font;
+        int widest = 0;
+        for (int row = 0; row < MASTERY_MENU_ACTIONS; row++) {
+            widest = Math.max(widest, font.width(menuLabel(row)));
+        }
+        return widest + 10;
+    }
+
+    private static int menuHeight() {
+        return MASTERY_MENU_ACTIONS * MASTERY_MENU_ROW_HEIGHT + MASTERY_MENU_PADDING * 2;
+    }
+
+    private static int menuTop(int top) {
+        return top + MASTERY_TOOLBAR_Y + MASTERY_TOOLBAR_HEIGHT + 2;
+    }
+
+    private int searchX() {
+        return MASTERY_TOOLBAR_X + menuButtonWidth() + MASTERY_TOOLBAR_GAP;
+    }
+
+    private boolean isOverMenuButton(int left, int top, double x, double y) {
+        int buttonLeft = left + MASTERY_TOOLBAR_X;
+        int buttonTop = top + MASTERY_TOOLBAR_Y;
+        return x >= buttonLeft && x < buttonLeft + menuButtonWidth() && y >= buttonTop && y < buttonTop + MASTERY_TOOLBAR_HEIGHT;
+    }
+
+    private boolean isOverMenu(int left, int top, double x, double y) {
+        int menuLeft = left + MASTERY_TOOLBAR_X;
+        int menuTop = menuTop(top);
+        return x >= menuLeft && x < menuLeft + menuWidth() && y >= menuTop && y < menuTop + menuHeight();
+    }
+
+    private int menuRowAt(int left, int top, double x, double y) {
+        if (!menuOpen || !isOverMenu(left, top, x, y)) {
+            return -1;
+        }
+        int row = (int) (y - menuTop(top) - MASTERY_MENU_PADDING) / MASTERY_MENU_ROW_HEIGHT;
+        return row >= 0 && row < MASTERY_MENU_ACTIONS ? row : -1;
+    }
+
+    private void runMenuAction(int tool, int imageWidth, int imageHeight) {
+        switch (tool) {
+            case 0 -> {
+                if (Screen.hasShiftDown()) { send("copy_configurator", ""); }
+                else { Minecraft.getInstance().keyboardHandler.setClipboard(MasteryBuildCode.copy(view.masterySnapshot()).encode()); }
+            }
+            case 1 -> {
+                String code = Minecraft.getInstance().keyboardHandler.getClipboard();
+                if (code.length() <= MasteryBuildCode.MAX_LENGTH) { send("paste", code); }
+            }
+            case 2 -> send(view.masterySnapshot().following() ? "pause" : "resume", "");
+            case 3 -> { if (Screen.hasShiftDown()) { send("clear", ""); } }
+            case 4 -> { zoom = MASTERY_FOCUS_ZOOM; panInitialized = false; ensurePanInitialized(imageWidth, imageHeight); }
+            case 5 -> fitTree(imageWidth, imageHeight);
+            case 6 -> highlightRelevant = !highlightRelevant;
+            default -> { }
+        }
     }
 
     private boolean send(String action, String value) {
@@ -1318,9 +1415,9 @@ public final class MasteryScreenSupport<N extends PassiveNode> {
         return new MasterySummaryDrawer.Bounds(leftPos + MASTERY_VIEW_X, topPos + MASTERY_VIEW_Y, leftPos + viewRight(imageWidth), topPos + viewBottom(imageHeight));
     }
 
-    private static boolean isOverSearch(int leftPos, int topPos, int imageWidth, double mouseX, double mouseY) {
-        return mouseX >= leftPos + MASTERY_SEARCH_X && mouseX < leftPos + imageWidth - 8
-                && mouseY >= topPos + 42 && mouseY < topPos + 54;
+    private boolean isOverSearch(int leftPos, int topPos, int imageWidth, double mouseX, double mouseY) {
+        return mouseX >= leftPos + searchX() && mouseX < leftPos + imageWidth - 8
+                && mouseY >= topPos + MASTERY_TOOLBAR_Y && mouseY < topPos + MASTERY_TOOLBAR_Y + MASTERY_TOOLBAR_HEIGHT;
     }
 
     private boolean isOverExpandButton(int leftPos, int topPos, int imageWidth, double mouseX, double mouseY) {

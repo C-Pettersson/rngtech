@@ -62,14 +62,14 @@ Hover your start node to see your current attribute totals.
 
 Open the **Mastery** tab to browse the tree.
 
-- **Moving around**: drag to pan and scroll to zoom. Shift-scroll pans sideways and Ctrl-scroll pans up and down. The button at the top right expands the view to fill the screen. The toolbar has **Home**, which centers on your machine's start, and **Fit**, which shows the whole tree.
+- **Moving around**: drag to pan and scroll to zoom. Shift-scroll pans sideways and Ctrl-scroll pans up and down. The button at the top right expands the view to fill the screen. The **Menu** button left of the search box opens the tree's actions, including **Home**, which centers on your machine's start, and **Fit**, which shows the whole tree.
 - **Find**: click the search box or press Ctrl+F, then type part of a node's name, stat, or ID. The box shows how many nodes match, and Enter jumps to the next match. Typing `keystone`, `notable`, or `travel` highlights every node of that type.
 
 Spending and refunding points:
 
 - **Allocate**: hover any unallocated node to preview the shortest path to it and its cost, then click to buy the whole path in one go. The path is bought only if you can afford all of it and your Gear allows every node on it; otherwise nothing is bought. The purchase happens when you release the click, so a drag that starts on a node only pans. Every node costs one point and must connect back to your start.
 - **Gear limits**: some nodes restrict which Gear you can install. You cannot take a node your installed Gear breaks; the tooltip says why.
-- **Refund**: right-click an allocated node to remove it. Each removed node costs one <ItemLink id="rngtech:mastery_refund" />. A refund must leave the rest of your tree connected and your Gear legal. Shift-click **Clear** to refund the whole tree at the same price per node. After an update that changes the tree, each machine's build is kept wherever it still fits, and its next Clear is free. While it is available, the **X** (Clear) button glows green, and the Bonus Summary and start node say so.
+- **Refund**: right-click an allocated node to remove it. Each removed node costs one <ItemLink id="rngtech:mastery_refund" />. A refund must leave the rest of your tree connected and your Gear legal. Shift-click **Clear tree** in the **Menu** to refund the whole tree at the same price per node. After an update that changes the tree, each machine's build is kept wherever it still fits, and its next Clear is free. While it is available, the **Menu** button and its **Clear tree** entry glow green, and the Bonus Summary and start node say so.
 
 In the expanded view, the tab on the right edge opens the **Bonus Summary**: your attribute totals, keystones, and every allocated effect combined the way the machine actually adds them up. It has sections for your Ascendancy, bonuses that come from attributes, attribute scaling, limits, special behaviors, and effects this machine does not use. Hover a line to see the stat, its current contribution, and which nodes it comes from.
 

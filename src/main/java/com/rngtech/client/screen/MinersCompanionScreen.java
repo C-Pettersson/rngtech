@@ -3,6 +3,7 @@ package com.rngtech.client.screen;
 import com.rngtech.content.item.MinersCompanionItem;
 import com.rngtech.content.menu.MinersCompanionMenu;
 import com.rngtech.content.minerscompanion.MinersCompanionState;
+import com.rngtech.content.registry.ModItems;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
@@ -12,7 +13,7 @@ import net.minecraft.world.entity.player.Inventory;
 
 import java.util.List;
 
-public class MinersCompanionScreen extends AbstractContainerScreen<MinersCompanionMenu> {
+public class MinersCompanionScreen extends AbstractContainerScreen<MinersCompanionMenu> implements MachineTabs.Host {
     private static final int PANEL = 0xFFC6C6C6;
     private static final int PANEL_DARK = 0xFF8B8B8B;
     private static final int PANEL_LIGHT = 0xFFE9E9E9;
@@ -31,8 +32,6 @@ public class MinersCompanionScreen extends AbstractContainerScreen<MinersCompani
     private static final int SLOT = 0xFFB8B8B8;
     private static final int SLOT_DARK = 0xFF5F5F5F;
     private static final int SLOT_DISABLED = 0xFF777777;
-    private static final int TAB_WIDTH = 52;
-    private static final int TAB_SPACING = 56;
     private static final int ENERGY_X = 18;
     private static final int ENERGY_Y = 34;
     private static final int ENERGY_WIDTH = 8;
@@ -57,6 +56,8 @@ public class MinersCompanionScreen extends AbstractContainerScreen<MinersCompani
     private static final int STAT_LABEL_X = 26;
     private static final int STAT_VALUE_RIGHT = 150;
 
+    private final MachineTabs tabs;
+
     public MinersCompanionScreen(MinersCompanionMenu menu, Inventory playerInventory, Component title) {
         super(menu, playerInventory, title);
         imageWidth = 176;
@@ -64,6 +65,16 @@ public class MinersCompanionScreen extends AbstractContainerScreen<MinersCompani
         titleLabelX = 8;
         titleLabelY = 8;
         inventoryLabelY = 104;
+        tabs = MachineTabs.builder(this)
+                .tab(MinersCompanionMenu.TAB_PROCESS, "rngtech.miners_companion.tab.process", ModItems.MINERS_COMPANION.get())
+                .tab(MinersCompanionMenu.TAB_GEAR, "rngtech.miners_companion.tab.gear", ModItems.WRENCH.get())
+                .tab(MinersCompanionMenu.TAB_STATS, "rngtech.miners_companion.tab.stats", ModItems.CONFIGURATOR.get())
+                .build();
+    }
+
+    @Override
+    public MachineTabs machineTabs() {
+        return tabs;
     }
 
     @Override
@@ -71,13 +82,14 @@ public class MinersCompanionScreen extends AbstractContainerScreen<MinersCompani
         super.render(guiGraphics, mouseX, mouseY, partialTick);
         renderCustomTooltip(guiGraphics, mouseX, mouseY);
         renderTooltip(guiGraphics, mouseX, mouseY);
+        tabs.renderTooltip(guiGraphics, mouseX, mouseY);
         GearSlotTooltips.render(this, guiGraphics, font, mouseX, mouseY);
     }
 
     @Override
     protected void renderBg(GuiGraphics guiGraphics, float partialTick, int mouseX, int mouseY) {
         renderPanel(guiGraphics);
-        renderTabs(guiGraphics);
+        tabs.render(guiGraphics, mouseX, mouseY, menu.selectedTab());
         switch (menu.selectedTab()) {
             case MinersCompanionMenu.TAB_GEAR -> renderGearBg(guiGraphics);
             case MinersCompanionMenu.TAB_STATS -> renderStatsBg(guiGraphics);
@@ -89,6 +101,7 @@ public class MinersCompanionScreen extends AbstractContainerScreen<MinersCompani
     @Override
     protected void renderLabels(GuiGraphics guiGraphics, int mouseX, int mouseY) {
         guiGraphics.drawString(font, title, titleLabelX, titleLabelY, TEXT, false);
+        tabs.renderSelectedLabel(guiGraphics, menu.selectedTab(), titleLabelX, titleLabelY, TEXT_MUTED);
         guiGraphics.drawString(font, playerInventoryTitle, inventoryLabelX, inventoryLabelY, TEXT, false);
         switch (menu.selectedTab()) {
             case MinersCompanionMenu.TAB_GEAR -> renderGearLabels(guiGraphics);
@@ -100,16 +113,9 @@ public class MinersCompanionScreen extends AbstractContainerScreen<MinersCompani
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         if (button == 0) {
-            if (isOverTab(mouseX, mouseY, 0)) {
-                sendButton(MinersCompanionMenu.BUTTON_TAB_BASE + MinersCompanionMenu.TAB_PROCESS);
-                return true;
-            }
-            if (isOverTab(mouseX, mouseY, 1)) {
-                sendButton(MinersCompanionMenu.BUTTON_TAB_BASE + MinersCompanionMenu.TAB_GEAR);
-                return true;
-            }
-            if (isOverTab(mouseX, mouseY, 2)) {
-                sendButton(MinersCompanionMenu.BUTTON_TAB_BASE + MinersCompanionMenu.TAB_STATS);
+            int tab = tabs.tabAt(mouseX, mouseY);
+            if (tab >= 0) {
+                sendButton(MinersCompanionMenu.BUTTON_TAB_BASE + tab);
                 return true;
             }
             if (menu.selectedTab() == MinersCompanionMenu.TAB_PROCESS
@@ -441,26 +447,6 @@ public class MinersCompanionScreen extends AbstractContainerScreen<MinersCompani
         guiGraphics.fill(x, y + imageHeight - 1, x + imageWidth, y + imageHeight, PANEL_DARK);
     }
 
-    private void renderTabs(GuiGraphics guiGraphics) {
-        renderTab(guiGraphics, 0, Component.translatable("rngtech.miners_companion.tab.process"), menu.selectedTab() == MinersCompanionMenu.TAB_PROCESS);
-        renderTab(guiGraphics, 1, Component.translatable("rngtech.miners_companion.tab.gear"), menu.selectedTab() == MinersCompanionMenu.TAB_GEAR);
-        renderTab(guiGraphics, 2, Component.translatable("rngtech.miners_companion.tab.stats"), menu.selectedTab() == MinersCompanionMenu.TAB_STATS);
-    }
-
-    private void renderTab(GuiGraphics guiGraphics, int index, Component label, boolean selected) {
-        int x = leftPos + 8 + index * TAB_SPACING;
-        int y = topPos - 20;
-        int color = selected ? PANEL : 0xFF9A9A9A;
-        guiGraphics.fill(x, y, x + TAB_WIDTH, y + 21, color);
-        guiGraphics.fill(x, y, x + TAB_WIDTH, y + 1, PANEL_LIGHT);
-        guiGraphics.fill(x, y, x + 1, y + 21, PANEL_LIGHT);
-        guiGraphics.fill(x + TAB_WIDTH - 1, y, x + TAB_WIDTH, y + 21, PANEL_DARK);
-        if (!selected) {
-            guiGraphics.fill(x, y + 20, x + TAB_WIDTH, y + 21, PANEL_DARK);
-        }
-        guiGraphics.drawString(font, label, x + (TAB_WIDTH - font.width(label)) / 2, y + 7, selected ? TEXT : 0xFF2F2F2F, false);
-    }
-
     private void renderButton(GuiGraphics guiGraphics, int x, int y, int width, int height, boolean selected, boolean active) {
         int left = leftPos + x;
         int top = topPos + y;
@@ -493,12 +479,6 @@ public class MinersCompanionScreen extends AbstractContainerScreen<MinersCompani
 
     private void drawGearLabel(GuiGraphics guiGraphics, Component label, int centerX) {
         MachineScreenStyle.drawClippedCentered(guiGraphics, font, label, centerX, 68, 32, TEXT_MUTED);
-    }
-
-    private boolean isOverTab(double mouseX, double mouseY, int index) {
-        int left = leftPos + 8 + index * TAB_SPACING;
-        int top = topPos - 20;
-        return mouseX >= left && mouseX < left + TAB_WIDTH && mouseY >= top && mouseY < top + 21;
     }
 
     private boolean inBounds(double mouseX, double mouseY, int x, int y, int width, int height) {

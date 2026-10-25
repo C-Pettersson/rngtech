@@ -2,13 +2,14 @@ package com.rngtech.client.screen;
 
 import com.rngtech.content.blockentity.WoodenComposterBlockEntity;
 import com.rngtech.content.menu.WoodenComposterMenu;
+import com.rngtech.content.registry.ModBlocks;
 
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
 
-public class WoodenComposterScreen extends AbstractContainerScreen<WoodenComposterMenu> {
+public class WoodenComposterScreen extends AbstractContainerScreen<WoodenComposterMenu> implements MachineTabs.Host {
     private static final int PANEL = 0xFFC6C6C6;
     private static final int PANEL_DARK = 0xFF8B8B8B;
     private static final int PANEL_LIGHT = 0xFFE9E9E9;
@@ -35,8 +36,7 @@ public class WoodenComposterScreen extends AbstractContainerScreen<WoodenCompost
     private static final int WATER_GAUGE_HEIGHT = 8;
     private static final int WATER_PURGE_X = 213;
     private static final int WATER_PURGE_Y = 29;
-    private static final int TAB_WIDTH = 54;
-    private static final int TAB_SPACING = 56;
+    private static final int TAB_PROCESSING = 0;
     private static final int STATUS_X = 118;
     private static final int STATUS_Y = 101;
     private static final int STATUS_SIZE = 12;
@@ -45,25 +45,36 @@ public class WoodenComposterScreen extends AbstractContainerScreen<WoodenCompost
     private static final int BULK_BONUS = 0xFF7DA84B;
     private static final int VARIETY_BONUS = 0xFFD3A33A;
 
+    private final MachineTabs tabs;
+
     public WoodenComposterScreen(WoodenComposterMenu menu, Inventory playerInventory, Component title) {
         super(menu, playerInventory, title);
         imageWidth = 232;
         imageHeight = 204;
         inventoryLabelX = 35;
         inventoryLabelY = 108;
+        tabs = MachineTabs.builder(this)
+                .processing(TAB_PROCESSING, ModBlocks.WOODEN_COMPOSTER.get())
+                .build();
+    }
+
+    @Override
+    public MachineTabs machineTabs() {
+        return tabs;
     }
 
     @Override
     public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         super.render(guiGraphics, mouseX, mouseY, partialTick);
         renderTooltip(guiGraphics, mouseX, mouseY);
+        tabs.renderTooltip(guiGraphics, mouseX, mouseY);
         renderValueTooltips(guiGraphics, mouseX, mouseY);
     }
 
     @Override
     protected void renderBg(GuiGraphics guiGraphics, float partialTick, int mouseX, int mouseY) {
         renderPanel(guiGraphics);
-        renderTabs(guiGraphics);
+        tabs.render(guiGraphics, mouseX, mouseY, TAB_PROCESSING);
         renderMachineSlots(guiGraphics);
         renderPlayerInventoryFrames(guiGraphics);
         renderProgress(guiGraphics);
@@ -76,6 +87,7 @@ public class WoodenComposterScreen extends AbstractContainerScreen<WoodenCompost
     @Override
     protected void renderLabels(GuiGraphics guiGraphics, int mouseX, int mouseY) {
         guiGraphics.drawString(font, title, titleLabelX, titleLabelY, TEXT, false);
+        tabs.renderSelectedLabel(guiGraphics, TAB_PROCESSING, titleLabelX, titleLabelY, TEXT_MUTED);
         guiGraphics.drawString(font, playerInventoryTitle, inventoryLabelX, inventoryLabelY, TEXT, false);
         guiGraphics.drawString(font, Component.translatable("rngtech.wooden_composter.inputs"), 8, 18, TEXT_MUTED, false);
         guiGraphics.drawString(font, Component.translatable("rngtech.wooden_composter.output"), 188, 39, TEXT_MUTED, false);
@@ -107,27 +119,6 @@ public class WoodenComposterScreen extends AbstractContainerScreen<WoodenCompost
         guiGraphics.fill(x, y, x + 1, y + imageHeight, PANEL_LIGHT);
         guiGraphics.fill(x + imageWidth - 1, y, x + imageWidth, y + imageHeight, PANEL_DARK);
         guiGraphics.fill(x, y + imageHeight - 1, x + imageWidth, y + imageHeight, PANEL_DARK);
-    }
-
-    private void renderTabs(GuiGraphics guiGraphics) {
-        renderTab(guiGraphics, 0, Component.translatable("rngtech.tab.processing.short"), true);
-        renderTab(guiGraphics, 1, Component.translatable("rngtech.tab.gear"), false);
-        renderTab(guiGraphics, 2, Component.translatable("rngtech.tab.stats"), false);
-        renderTab(guiGraphics, 3, Component.translatable("rngtech.tab.refinement.short"), false);
-    }
-
-    private void renderTab(GuiGraphics guiGraphics, int index, Component label, boolean selected) {
-        int x = leftPos + 8 + index * TAB_SPACING;
-        int y = topPos - 20;
-        int color = selected ? PANEL : 0xFF9A9A9A;
-        guiGraphics.fill(x, y, x + TAB_WIDTH, y + 21, color);
-        guiGraphics.fill(x, y, x + TAB_WIDTH, y + 1, PANEL_LIGHT);
-        guiGraphics.fill(x, y, x + 1, y + 21, PANEL_LIGHT);
-        guiGraphics.fill(x + TAB_WIDTH - 1, y, x + TAB_WIDTH, y + 21, PANEL_DARK);
-        if (!selected) {
-            guiGraphics.fill(x, y + 20, x + TAB_WIDTH, y + 21, PANEL_DARK);
-        }
-        guiGraphics.drawString(font, label, x + (TAB_WIDTH - font.width(label)) / 2, y + 7, selected ? TEXT : 0xFF2F2F2F, false);
     }
 
     private void renderMachineSlots(GuiGraphics guiGraphics) {

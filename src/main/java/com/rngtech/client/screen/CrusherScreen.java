@@ -3,7 +3,9 @@ package com.rngtech.client.screen;
 import com.rngtech.RNGTech;
 import com.rngtech.content.blockentity.CrusherBlockEntity;
 import com.rngtech.content.item.GearParts;
+import com.rngtech.content.machine.CrusherChassisMaterial;
 import com.rngtech.content.menu.CrusherMenu;
+import com.rngtech.content.registry.ModBlocks;
 import com.rngtech.rpg.MachinePartType;
 import com.rngtech.rpg.MachineStat;
 import com.rngtech.rpg.progression.CrusherPassiveTree;
@@ -22,7 +24,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-public class CrusherScreen extends AbstractContainerScreen<CrusherMenu> {
+public class CrusherScreen extends AbstractContainerScreen<CrusherMenu> implements MachineTabs.Host {
     private static final int BASE_IMAGE_WIDTH = 240;
     private static final int BASE_IMAGE_HEIGHT = 200;
     private static final int PANEL = 0xFFC6C6C6;
@@ -39,15 +41,13 @@ public class CrusherScreen extends AbstractContainerScreen<CrusherMenu> {
     private static final int STAT_PANEL_X = 8;
     private static final int STAT_PANEL_Y = 18;
     private static final int STAT_PANEL_WIDTH = 224;
-    private static final int TAB_WIDTH = 42;
-    private static final int TAB_SPACING = 44;
-    private static final int STATUS_ICON_X = 96;
-    private static final int CELL_STATUS_ICON_X = 112;
-    private static final int STATUS_ICON_Y = 26;
+    private static final int STATUS_ICON_X = 86;
+    private static final int CELL_STATUS_ICON_X = 102;
+    private static final int STATUS_ICON_Y = 36;
     private static final int ICON_SIZE = 12;
     private static final int OUTPUT_BONUS_BAR_WIDTH = 67;
-    private static final int PROCESSING_LEVEL_ICON_X = 184;
-    private static final int PROCESSING_LEVEL_ICON_Y = 78;
+    private static final int PROCESSING_LEVEL_ICON_X = 118;
+    private static final int PROCESSING_LEVEL_ICON_Y = STATUS_ICON_Y;
     private static final int PROCESSING_LEVEL_MAX = 8;
     private static final Map<MegaPassiveNode, ResourceLocation> MASTERY_ICON_TEXTURES = createMasteryIconTextures();
     private static final String[] STAT_LABEL_KEYS = {
@@ -93,6 +93,7 @@ public class CrusherScreen extends AbstractContainerScreen<CrusherMenu> {
             MachineStat.CRUSHER_INPUT_FILTER
     };
     private final MasteryScreenSupport<MegaPassiveNode> masterySupport;
+    private final MachineTabs tabs;
 
     private static Map<MegaPassiveNode, ResourceLocation> createMasteryIconTextures() {
         Map<MegaPassiveNode, ResourceLocation> textures = new java.util.HashMap<>();
@@ -108,6 +109,13 @@ public class CrusherScreen extends AbstractContainerScreen<CrusherMenu> {
         imageHeight = BASE_IMAGE_HEIGHT;
         inventoryLabelX = 39;
         inventoryLabelY = 104;
+        tabs = MachineTabs.builder(this)
+                .processing(CrusherMenu.TAB_PROCESSING, ModBlocks.CRUSHER_CHASSIS.get(CrusherChassisMaterial.IRON).get())
+                .gear(CrusherMenu.TAB_GEAR)
+                .stats(CrusherMenu.TAB_CONFIGURATION)
+                .refinement(CrusherMenu.TAB_REFINEMENT)
+                .mastery(CrusherMenu.TAB_MASTERY)
+                .build();
         masterySupport = new MasteryScreenSupport<>(
                 CrusherPassiveTree.TREE,
                 CrusherPassiveTree.TREE.nodes(),
@@ -148,6 +156,11 @@ public class CrusherScreen extends AbstractContainerScreen<CrusherMenu> {
     }
 
     @Override
+    public MachineTabs machineTabs() {
+        return tabs;
+    }
+
+    @Override
     protected void init() {
         updateImageSizeForSelectedTab();
         super.init();
@@ -157,6 +170,7 @@ public class CrusherScreen extends AbstractContainerScreen<CrusherMenu> {
     public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         super.render(guiGraphics, mouseX, mouseY, partialTick);
         renderTooltip(guiGraphics, mouseX, mouseY);
+        tabs.renderTooltip(guiGraphics, mouseX, mouseY);
         renderValueTooltips(guiGraphics, mouseX, mouseY);
         renderStatTooltips(guiGraphics, mouseX, mouseY);
         if (menu.selectedTab() == CrusherMenu.TAB_MASTERY) {
@@ -169,13 +183,11 @@ public class CrusherScreen extends AbstractContainerScreen<CrusherMenu> {
     @Override
     protected void renderBg(GuiGraphics guiGraphics, float partialTick, int mouseX, int mouseY) {
         renderPanel(guiGraphics);
-        renderTabs(guiGraphics);
+        tabs.render(guiGraphics, mouseX, mouseY, menu.selectedTab());
         renderSlotFrames(guiGraphics);
 
         if (menu.selectedTab() == CrusherMenu.TAB_PROCESSING) {
             renderProcessing(guiGraphics);
-        } else if (menu.selectedTab() == CrusherMenu.TAB_GEAR) {
-            renderGear(guiGraphics);
         } else if (menu.selectedTab() == CrusherMenu.TAB_CONFIGURATION) {
             renderConfiguration(guiGraphics);
         } else if (menu.selectedTab() == CrusherMenu.TAB_REFINEMENT) {
@@ -188,6 +200,7 @@ public class CrusherScreen extends AbstractContainerScreen<CrusherMenu> {
     @Override
     protected void renderLabels(GuiGraphics guiGraphics, int mouseX, int mouseY) {
         guiGraphics.drawString(font, title, titleLabelX, titleLabelY, TEXT, false);
+        tabs.renderSelectedLabel(guiGraphics, menu.selectedTab(), titleLabelX, titleLabelY, TEXT_MUTED);
         if (menu.selectedTab() != CrusherMenu.TAB_CONFIGURATION && menu.selectedTab() != CrusherMenu.TAB_MASTERY) {
             guiGraphics.drawString(font, playerInventoryTitle, inventoryLabelX, inventoryLabelY, TEXT, false);
         }
@@ -208,24 +221,9 @@ public class CrusherScreen extends AbstractContainerScreen<CrusherMenu> {
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         if (button == 0) {
-            if (isOverTab(mouseX, mouseY, 0)) {
-                selectTab(CrusherMenu.TAB_PROCESSING);
-                return true;
-            }
-            if (isOverTab(mouseX, mouseY, 1)) {
-                selectTab(CrusherMenu.TAB_GEAR);
-                return true;
-            }
-            if (isOverTab(mouseX, mouseY, 2)) {
-                selectTab(CrusherMenu.TAB_CONFIGURATION);
-                return true;
-            }
-            if (isOverTab(mouseX, mouseY, 3)) {
-                selectTab(CrusherMenu.TAB_REFINEMENT);
-                return true;
-            }
-            if (isOverTab(mouseX, mouseY, 4)) {
-                selectTab(CrusherMenu.TAB_MASTERY);
+            int tab = tabs.tabAt(mouseX, mouseY);
+            if (tab >= 0) {
+                selectTab(tab);
                 return true;
             }
             if (menu.selectedTab() == CrusherMenu.TAB_REFINEMENT
@@ -300,31 +298,9 @@ public class CrusherScreen extends AbstractContainerScreen<CrusherMenu> {
         guiGraphics.fill(x, y + imageHeight - 1, x + imageWidth, y + imageHeight, PANEL_DARK);
     }
 
-    private void renderTabs(GuiGraphics guiGraphics) {
-        renderTab(guiGraphics, 0, Component.translatable("rngtech.tab.processing.short"), menu.selectedTab() == CrusherMenu.TAB_PROCESSING);
-        renderTab(guiGraphics, 1, Component.translatable("rngtech.tab.gear"), menu.selectedTab() == CrusherMenu.TAB_GEAR);
-        renderTab(guiGraphics, 2, Component.translatable("rngtech.tab.stats"), menu.selectedTab() == CrusherMenu.TAB_CONFIGURATION);
-        renderTab(guiGraphics, 3, Component.translatable("rngtech.tab.refinement.short"), menu.selectedTab() == CrusherMenu.TAB_REFINEMENT);
-        renderTab(guiGraphics, 4, Component.translatable("rngtech.tab.mastery.short"), menu.selectedTab() == CrusherMenu.TAB_MASTERY);
-    }
-
-    private void renderTab(GuiGraphics guiGraphics, int index, Component label, boolean selected) {
-        int x = leftPos + 8 + index * TAB_SPACING;
-        int y = topPos - 20;
-        int color = selected ? PANEL : 0xFF9A9A9A;
-        guiGraphics.fill(x, y, x + TAB_WIDTH, y + 21, color);
-        guiGraphics.fill(x, y, x + TAB_WIDTH, y + 1, PANEL_LIGHT);
-        guiGraphics.fill(x, y, x + 1, y + 21, PANEL_LIGHT);
-        guiGraphics.fill(x + TAB_WIDTH - 1, y, x + TAB_WIDTH, y + 21, PANEL_DARK);
-        if (!selected) {
-            guiGraphics.fill(x, y + 20, x + TAB_WIDTH, y + 21, PANEL_DARK);
-        }
-        guiGraphics.drawString(font, label, x + (TAB_WIDTH - font.width(label)) / 2, y + 7, selected ? TEXT : 0xFF2F2F2F, false);
-    }
-
     private void renderSlotFrames(GuiGraphics guiGraphics) {
         if (menu.selectedTab() == CrusherMenu.TAB_PROCESSING) {
-            renderSlotFrame(guiGraphics, 55, 41);
+            renderSlotFrame(guiGraphics, 55, 51);
             renderSlotFrame(guiGraphics, 169, 51);
         } else if (menu.selectedTab() == CrusherMenu.TAB_GEAR) {
             renderSlotFrame(guiGraphics, 43, 47);
@@ -351,26 +327,36 @@ public class CrusherScreen extends AbstractContainerScreen<CrusherMenu> {
     private void renderProcessing(GuiGraphics guiGraphics) {
         int x = leftPos;
         int y = topPos;
-        guiGraphics.fill(x + 86, y + 41, x + 155, y + 46, 0xFF5F5F5F);
+        guiGraphics.fill(x + 86, y + 51, x + 155, y + 56, 0xFF5F5F5F);
         guiGraphics.fill(
                 x + 87,
-                y + 42,
+                y + 52,
                 x + 87 + Math.round(OUTPUT_BONUS_BAR_WIDTH * menu.outputBonusProgress()),
-                y + 45,
+                y + 55,
                 OUTPUT_BONUS
         );
         if (menu.outputBonusPayoutsNextCraft() > 0) {
-            guiGraphics.fill(x + 153, y + 42, x + 154, y + 45, 0xFFFFE2A2);
+            guiGraphics.fill(x + 153, y + 52, x + 154, y + 55, 0xFFFFE2A2);
         }
 
-        guiGraphics.fill(x + 86, y + 51, x + 155, y + 59, 0xFF5F5F5F);
-        guiGraphics.fill(x + 87, y + 52, x + 87 + Math.round(67 * menu.processingProgress()), y + 58, (menu.instantFlash() ? MachineScreenStyle.INSTANT_FLASH : PROGRESS));
+        guiGraphics.fill(x + 86, y + 61, x + 155, y + 69, 0xFF5F5F5F);
+        guiGraphics.fill(x + 87, y + 62, x + 87 + Math.round(67 * menu.processingProgress()), y + 68, (menu.instantFlash() ? MachineScreenStyle.INSTANT_FLASH : PROGRESS));
 
         guiGraphics.fill(x + 22, y + 28, x + 32, y + 78, 0xFF5F5F5F);
         int energyHeight = Math.round(48 * menu.energyProgress());
         guiGraphics.fill(x + 23, y + 77 - energyHeight, x + 31, y + 77, ENERGY);
 
         renderStatusIcons(guiGraphics);
+        MachineScreenStyle.renderProcessingLevelSquare(
+                guiGraphics,
+                leftPos,
+                topPos,
+                PROCESSING_LEVEL_ICON_X,
+                PROCESSING_LEVEL_ICON_Y,
+                menu.processingLevel(),
+                PROCESSING_LEVEL_MAX,
+                STAT_ACCENT
+        );
     }
 
     private void renderStatusIcons(GuiGraphics guiGraphics) {
@@ -403,25 +389,12 @@ public class CrusherScreen extends AbstractContainerScreen<CrusherMenu> {
         );
     }
 
-    private void renderGear(GuiGraphics guiGraphics) {
-        MachineScreenStyle.renderProcessingLevelSquare(
-                guiGraphics,
-                leftPos,
-                topPos,
-                PROCESSING_LEVEL_ICON_X,
-                PROCESSING_LEVEL_ICON_Y,
-                menu.processingLevel(),
-                PROCESSING_LEVEL_MAX,
-                STAT_ACCENT
-        );
-    }
-
     private void renderRefinement(GuiGraphics guiGraphics) {
         RefinementScreenStyle.render(guiGraphics, leftPos, topPos, menu.machineTraits(), STAT_ACCENT);
     }
 
     private void drawProcessingLabels(GuiGraphics guiGraphics) {
-        guiGraphics.drawString(font, Component.translatable("rngtech.processing.input"), 52, 28, TEXT_MUTED, false);
+        guiGraphics.drawString(font, Component.translatable("rngtech.processing.input"), 52, 40, TEXT_MUTED, false);
         guiGraphics.drawString(font, Component.translatable("rngtech.processing.output"), 164, 40, TEXT_MUTED, false);
     }
 
@@ -454,23 +427,21 @@ public class CrusherScreen extends AbstractContainerScreen<CrusherMenu> {
     }
 
     private void renderValueTooltips(GuiGraphics guiGraphics, int mouseX, int mouseY) {
-        if (menu.selectedTab() == CrusherMenu.TAB_GEAR) {
-            MachineScreenStyle.renderStatusSquareTooltip(
-                    guiGraphics,
-                    font,
-                    leftPos,
-                    topPos,
-                    mouseX,
-                    mouseY,
-                    PROCESSING_LEVEL_ICON_X,
-                    PROCESSING_LEVEL_ICON_Y,
-                    processingLevelTooltip()
-            );
-            return;
-        }
         if (menu.selectedTab() != CrusherMenu.TAB_PROCESSING) {
             return;
         }
+
+        MachineScreenStyle.renderStatusSquareTooltip(
+                guiGraphics,
+                font,
+                leftPos,
+                topPos,
+                mouseX,
+                mouseY,
+                PROCESSING_LEVEL_ICON_X,
+                PROCESSING_LEVEL_ICON_Y,
+                processingLevelTooltip()
+        );
 
         CompactValueText.renderTooltipIfHovered(
                 guiGraphics,
@@ -493,7 +464,7 @@ public class CrusherScreen extends AbstractContainerScreen<CrusherMenu> {
                 mouseX,
                 mouseY,
                 86,
-                41,
+                51,
                 69,
                 5,
                 outputBonusTooltip()
@@ -506,7 +477,7 @@ public class CrusherScreen extends AbstractContainerScreen<CrusherMenu> {
                 mouseX,
                 mouseY,
                 86,
-                51,
+                61,
                 69,
                 8,
                 progressTooltipLines()
@@ -797,12 +768,6 @@ public class CrusherScreen extends AbstractContainerScreen<CrusherMenu> {
         guiGraphics.fill(left, top, left + ICON_SIZE, top + ICON_SIZE, 0xFF373737);
         guiGraphics.fill(left + 1, top + 1, left + ICON_SIZE - 1, top + ICON_SIZE - 1, PANEL_LIGHT);
         guiGraphics.fill(left + 2, top + 2, left + ICON_SIZE - 2, top + ICON_SIZE - 2, PANEL_DARK);
-    }
-
-    private boolean isOverTab(double mouseX, double mouseY, int index) {
-        int x = leftPos + 8 + index * TAB_SPACING;
-        int y = topPos - 20;
-        return mouseX >= x && mouseX < x + TAB_WIDTH && mouseY >= y && mouseY < y + 21;
     }
 
     @Override public boolean keyPressed(int key, int scan, int modifiers) {

@@ -3,6 +3,7 @@ package com.rngtech.client.screen;
 import com.rngtech.RNGTech;
 import com.rngtech.content.blockentity.MetalPressBlockEntity;
 import com.rngtech.content.menu.MetalPressMenu;
+import com.rngtech.content.registry.ModBlocks;
 import com.rngtech.rpg.MachineStat;
 import com.rngtech.rpg.progression.MachineMasteryFamily;
 import com.rngtech.rpg.progression.MegaPassiveNode;
@@ -19,7 +20,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class MetalPressScreen extends AbstractContainerScreen<MetalPressMenu> {
+public class MetalPressScreen extends AbstractContainerScreen<MetalPressMenu> implements MachineTabs.Host {
     private static final int BASE_IMAGE_WIDTH = 240;
     private static final int BASE_IMAGE_HEIGHT = 200;
     private static final int PANEL = 0xFFC6C6C6;
@@ -37,8 +38,6 @@ public class MetalPressScreen extends AbstractContainerScreen<MetalPressMenu> {
     private static final int STAT_PANEL_X = 8;
     private static final int STAT_PANEL_Y = 18;
     private static final int STAT_PANEL_WIDTH = 224;
-    private static final int TAB_WIDTH = 42;
-    private static final int TAB_SPACING = 44;
     private static final int ENERGY_BAR_X = 22;
     private static final int HEAT_BAR_X = 36;
     private static final int BAR_Y = 28;
@@ -112,6 +111,7 @@ public class MetalPressScreen extends AbstractContainerScreen<MetalPressMenu> {
     private static final Map<MegaPassiveNode, ResourceLocation> MASTERY_ICON_TEXTURES = createMasteryIconTextures();
 
     private final MasteryScreenSupport<MegaPassiveNode> masterySupport;
+    private final MachineTabs tabs;
     private final HeatSlider heatSlider = new HeatSlider(86, 81, 69);
     private final NitrogenGauge nitrogenGauge = new NitrogenGauge(222, BAR_Y);
 
@@ -129,6 +129,13 @@ public class MetalPressScreen extends AbstractContainerScreen<MetalPressMenu> {
         imageHeight = BASE_IMAGE_HEIGHT;
         inventoryLabelX = 39;
         inventoryLabelY = 104;
+        tabs = MachineTabs.builder(this)
+                .processing(MetalPressMenu.TAB_PROCESSING, ModBlocks.METAL_PRESS.get())
+                .gear(MetalPressMenu.TAB_GEAR)
+                .stats(MetalPressMenu.TAB_CONFIGURATION)
+                .refinement(MetalPressMenu.TAB_REFINEMENT)
+                .mastery(MetalPressMenu.TAB_MASTERY)
+                .build();
         masterySupport = new MasteryScreenSupport<>(
                 MegaPassiveTree.TREE,
                 MegaPassiveTree.TREE.nodes(),
@@ -159,6 +166,11 @@ public class MetalPressScreen extends AbstractContainerScreen<MetalPressMenu> {
     }
 
     @Override
+    public MachineTabs machineTabs() {
+        return tabs;
+    }
+
+    @Override
     protected void init() {
         updateImageSizeForSelectedTab();
         super.init();
@@ -168,6 +180,7 @@ public class MetalPressScreen extends AbstractContainerScreen<MetalPressMenu> {
     public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         super.render(guiGraphics, mouseX, mouseY, partialTick);
         renderTooltip(guiGraphics, mouseX, mouseY);
+        tabs.renderTooltip(guiGraphics, mouseX, mouseY);
         renderValueTooltips(guiGraphics, mouseX, mouseY);
         renderStatTooltips(guiGraphics, mouseX, mouseY);
         renderMoldSelectorTooltips(guiGraphics, mouseX, mouseY);
@@ -181,7 +194,7 @@ public class MetalPressScreen extends AbstractContainerScreen<MetalPressMenu> {
     @Override
     protected void renderBg(GuiGraphics guiGraphics, float partialTick, int mouseX, int mouseY) {
         renderPanel(guiGraphics);
-        renderTabs(guiGraphics);
+        tabs.render(guiGraphics, mouseX, mouseY, menu.selectedTab());
         renderSlotFrames(guiGraphics);
 
         if (menu.selectedTab() == MetalPressMenu.TAB_PROCESSING) {
@@ -200,6 +213,7 @@ public class MetalPressScreen extends AbstractContainerScreen<MetalPressMenu> {
     @Override
     protected void renderLabels(GuiGraphics guiGraphics, int mouseX, int mouseY) {
         guiGraphics.drawString(font, title, titleLabelX, titleLabelY, TEXT, false);
+        tabs.renderSelectedLabel(guiGraphics, menu.selectedTab(), titleLabelX, titleLabelY, TEXT_MUTED);
         if (menu.selectedTab() != MetalPressMenu.TAB_CONFIGURATION && menu.selectedTab() != MetalPressMenu.TAB_MASTERY) {
             guiGraphics.drawString(font, playerInventoryTitle, inventoryLabelX, inventoryLabelY, TEXT, false);
         }
@@ -224,24 +238,9 @@ public class MetalPressScreen extends AbstractContainerScreen<MetalPressMenu> {
             return true;
         }
         if (button == 0) {
-            if (isOverTab(mouseX, mouseY, 0)) {
-                selectTab(MetalPressMenu.TAB_PROCESSING);
-                return true;
-            }
-            if (isOverTab(mouseX, mouseY, 1)) {
-                selectTab(MetalPressMenu.TAB_GEAR);
-                return true;
-            }
-            if (isOverTab(mouseX, mouseY, 2)) {
-                selectTab(MetalPressMenu.TAB_CONFIGURATION);
-                return true;
-            }
-            if (isOverTab(mouseX, mouseY, 3)) {
-                selectTab(MetalPressMenu.TAB_REFINEMENT);
-                return true;
-            }
-            if (isOverTab(mouseX, mouseY, 4)) {
-                selectTab(MetalPressMenu.TAB_MASTERY);
+            int tab = tabs.tabAt(mouseX, mouseY);
+            if (tab >= 0) {
+                selectTab(tab);
                 return true;
             }
             if (menu.selectedTab() == MetalPressMenu.TAB_REFINEMENT
@@ -341,28 +340,6 @@ public class MetalPressScreen extends AbstractContainerScreen<MetalPressMenu> {
         guiGraphics.fill(x, y, x + 1, y + imageHeight, PANEL_LIGHT);
         guiGraphics.fill(x + imageWidth - 1, y, x + imageWidth, y + imageHeight, PANEL_DARK);
         guiGraphics.fill(x, y + imageHeight - 1, x + imageWidth, y + imageHeight, PANEL_DARK);
-    }
-
-    private void renderTabs(GuiGraphics guiGraphics) {
-        renderTab(guiGraphics, 0, Component.translatable("rngtech.tab.processing.short"), menu.selectedTab() == MetalPressMenu.TAB_PROCESSING);
-        renderTab(guiGraphics, 1, Component.translatable("rngtech.tab.gear"), menu.selectedTab() == MetalPressMenu.TAB_GEAR);
-        renderTab(guiGraphics, 2, Component.translatable("rngtech.tab.stats"), menu.selectedTab() == MetalPressMenu.TAB_CONFIGURATION);
-        renderTab(guiGraphics, 3, Component.translatable("rngtech.tab.refinement.short"), menu.selectedTab() == MetalPressMenu.TAB_REFINEMENT);
-        renderTab(guiGraphics, 4, Component.translatable("rngtech.tab.mastery.short"), menu.selectedTab() == MetalPressMenu.TAB_MASTERY);
-    }
-
-    private void renderTab(GuiGraphics guiGraphics, int index, Component label, boolean selected) {
-        int x = leftPos + 8 + index * TAB_SPACING;
-        int y = topPos - 20;
-        int color = selected ? PANEL : 0xFF9A9A9A;
-        guiGraphics.fill(x, y, x + TAB_WIDTH, y + 21, color);
-        guiGraphics.fill(x, y, x + TAB_WIDTH, y + 1, PANEL_LIGHT);
-        guiGraphics.fill(x, y, x + 1, y + 21, PANEL_LIGHT);
-        guiGraphics.fill(x + TAB_WIDTH - 1, y, x + TAB_WIDTH, y + 21, PANEL_DARK);
-        if (!selected) {
-            guiGraphics.fill(x, y + 20, x + TAB_WIDTH, y + 21, PANEL_DARK);
-        }
-        guiGraphics.drawString(font, label, x + (TAB_WIDTH - font.width(label)) / 2, y + 7, selected ? TEXT : 0xFF2F2F2F, false);
     }
 
     private void renderSlotFrames(GuiGraphics guiGraphics) {
@@ -800,12 +777,6 @@ public class MetalPressScreen extends AbstractContainerScreen<MetalPressMenu> {
         guiGraphics.fill(leftPos + x, topPos + y, leftPos + x + STATUS_ICON_SIZE, topPos + y + STATUS_ICON_SIZE, 0xFF5F5F5F);
         guiGraphics.fill(leftPos + x + 1, topPos + y + 1, leftPos + x + STATUS_ICON_SIZE - 1, topPos + y + STATUS_ICON_SIZE - 1, PANEL_LIGHT);
         guiGraphics.fill(leftPos + x + 2, topPos + y + 2, leftPos + x + STATUS_ICON_SIZE - 2, topPos + y + STATUS_ICON_SIZE - 2, PANEL_DARK);
-    }
-
-    private boolean isOverTab(double mouseX, double mouseY, int index) {
-        int x = leftPos + 8 + index * TAB_SPACING;
-        int y = topPos - 20;
-        return mouseX >= x && mouseX < x + TAB_WIDTH && mouseY >= y && mouseY < y + 21;
     }
 
     private int moldSelectorAt(double mouseX, double mouseY) {

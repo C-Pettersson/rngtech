@@ -2,6 +2,8 @@ package com.rngtech.client.screen;
 
 import com.rngtech.content.blockentity.ComponentRecyclerBlockEntity;
 import com.rngtech.content.menu.ComponentRecyclerMenu;
+import com.rngtech.content.recycling.ComponentRecyclerChassis;
+import com.rngtech.content.registry.ModBlocks;
 import com.rngtech.rpg.MachineStat;
 
 import net.minecraft.client.gui.GuiGraphics;
@@ -9,7 +11,7 @@ import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
 
-public class ComponentRecyclerScreen extends AbstractContainerScreen<ComponentRecyclerMenu> {
+public class ComponentRecyclerScreen extends AbstractContainerScreen<ComponentRecyclerMenu> implements MachineTabs.Host {
     private static final int PANEL = 0xFFC6C6C6;
     private static final int PANEL_DARK = 0xFF8B8B8B;
     private static final int PANEL_LIGHT = 0xFFE9E9E9;
@@ -18,8 +20,6 @@ public class ComponentRecyclerScreen extends AbstractContainerScreen<ComponentRe
     private static final int ENERGY = 0xFFB43B28;
     private static final int PROGRESS = 0xFF4F7A85;
     private static final int STAT_ACCENT = 0xFF4F7A85;
-    private static final int TAB_WIDTH = 54;
-    private static final int TAB_SPACING = 56;
     private static final int STAT_PANEL_X = 8;
     private static final int STAT_PANEL_Y = 18;
     private static final int STAT_PANEL_WIDTH = 224;
@@ -66,18 +66,35 @@ public class ComponentRecyclerScreen extends AbstractContainerScreen<ComponentRe
             MachineStat.STABILITY
     };
 
+    private final MachineTabs tabs;
+
     public ComponentRecyclerScreen(ComponentRecyclerMenu menu, Inventory playerInventory, Component title) {
         super(menu, playerInventory, title);
         imageWidth = 240;
         imageHeight = 200;
         inventoryLabelX = 39;
         inventoryLabelY = 104;
+        MachineTabs.Builder tabBuilder = MachineTabs.builder(this)
+                .processing(ComponentRecyclerMenu.TAB_PROCESSING, ModBlocks.COMPONENT_RECYCLERS.get(ComponentRecyclerChassis.IRON).get());
+        if (!menu.isManual()) {
+            tabBuilder
+                    .gear(ComponentRecyclerMenu.TAB_GEAR)
+                    .stats(ComponentRecyclerMenu.TAB_STATS)
+                    .refinement(ComponentRecyclerMenu.TAB_REFINEMENT);
+        }
+        tabs = tabBuilder.build();
+    }
+
+    @Override
+    public MachineTabs machineTabs() {
+        return tabs;
     }
 
     @Override
     public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         super.render(guiGraphics, mouseX, mouseY, partialTick);
         renderTooltip(guiGraphics, mouseX, mouseY);
+        tabs.renderTooltip(guiGraphics, mouseX, mouseY);
         renderValueTooltips(guiGraphics, mouseX, mouseY);
         renderStatTooltips(guiGraphics, mouseX, mouseY);
         RefinementScreenStyle.renderTooltips(guiGraphics, font, leftPos, topPos, mouseX, mouseY, menu.selectedTab() == RefinementScreenStyle.REFINEMENT_TAB_INDEX, menu.machineTraits(), menu);
@@ -87,7 +104,7 @@ public class ComponentRecyclerScreen extends AbstractContainerScreen<ComponentRe
     @Override
     protected void renderBg(GuiGraphics guiGraphics, float partialTick, int mouseX, int mouseY) {
         renderPanel(guiGraphics);
-        renderTabs(guiGraphics);
+        tabs.render(guiGraphics, mouseX, mouseY, menu.isManual() ? ComponentRecyclerMenu.TAB_PROCESSING : menu.selectedTab());
         renderSlotFrames(guiGraphics);
         if (menu.selectedTab() == ComponentRecyclerMenu.TAB_PROCESSING) {
             renderProcessing(guiGraphics);
@@ -103,6 +120,7 @@ public class ComponentRecyclerScreen extends AbstractContainerScreen<ComponentRe
     @Override
     protected void renderLabels(GuiGraphics guiGraphics, int mouseX, int mouseY) {
         guiGraphics.drawString(font, title, titleLabelX, titleLabelY, TEXT, false);
+        tabs.renderSelectedLabel(guiGraphics, menu.isManual() ? ComponentRecyclerMenu.TAB_PROCESSING : menu.selectedTab(), titleLabelX, titleLabelY, TEXT_MUTED);
         if (menu.selectedTab() != ComponentRecyclerMenu.TAB_STATS) {
             guiGraphics.drawString(font, playerInventoryTitle, inventoryLabelX, inventoryLabelY, TEXT, false);
         }
@@ -123,20 +141,9 @@ public class ComponentRecyclerScreen extends AbstractContainerScreen<ComponentRe
             return super.mouseClicked(mouseX, mouseY, button);
         }
         if (button == 0) {
-            if (isOverTab(mouseX, mouseY, 0)) {
-                menu.selectTab(ComponentRecyclerMenu.TAB_PROCESSING);
-                return true;
-            }
-            if (isOverTab(mouseX, mouseY, 1)) {
-                menu.selectTab(ComponentRecyclerMenu.TAB_GEAR);
-                return true;
-            }
-            if (isOverTab(mouseX, mouseY, 2)) {
-                menu.selectTab(ComponentRecyclerMenu.TAB_STATS);
-                return true;
-            }
-            if (isOverTab(mouseX, mouseY, 3)) {
-                menu.selectTab(ComponentRecyclerMenu.TAB_REFINEMENT);
+            int tab = tabs.tabAt(mouseX, mouseY);
+            if (tab >= 0) {
+                menu.selectTab(tab);
                 return true;
             }
             if (menu.selectedTab() == ComponentRecyclerMenu.TAB_REFINEMENT
@@ -155,31 +162,6 @@ public class ComponentRecyclerScreen extends AbstractContainerScreen<ComponentRe
         guiGraphics.fill(x, y, x + 1, y + imageHeight, PANEL_LIGHT);
         guiGraphics.fill(x + imageWidth - 1, y, x + imageWidth, y + imageHeight, PANEL_DARK);
         guiGraphics.fill(x, y + imageHeight - 1, x + imageWidth, y + imageHeight, PANEL_DARK);
-    }
-
-    private void renderTabs(GuiGraphics guiGraphics) {
-        if (menu.isManual()) {
-            renderTab(guiGraphics, 0, Component.translatable("rngtech.tab.processing.short"), true);
-            return;
-        }
-        renderTab(guiGraphics, 0, Component.translatable("rngtech.tab.processing.short"), menu.selectedTab() == ComponentRecyclerMenu.TAB_PROCESSING);
-        renderTab(guiGraphics, 1, Component.translatable("rngtech.tab.gear"), menu.selectedTab() == ComponentRecyclerMenu.TAB_GEAR);
-        renderTab(guiGraphics, 2, Component.translatable("rngtech.tab.stats"), menu.selectedTab() == ComponentRecyclerMenu.TAB_STATS);
-        renderTab(guiGraphics, 3, Component.translatable("rngtech.tab.refinement.short"), menu.selectedTab() == ComponentRecyclerMenu.TAB_REFINEMENT);
-    }
-
-    private void renderTab(GuiGraphics guiGraphics, int index, Component label, boolean selected) {
-        int x = leftPos + 8 + index * TAB_SPACING;
-        int y = topPos - 20;
-        int color = selected ? PANEL : 0xFF9A9A9A;
-        guiGraphics.fill(x, y, x + TAB_WIDTH, y + 21, color);
-        guiGraphics.fill(x, y, x + TAB_WIDTH, y + 1, PANEL_LIGHT);
-        guiGraphics.fill(x, y, x + 1, y + 21, PANEL_LIGHT);
-        guiGraphics.fill(x + TAB_WIDTH - 1, y, x + TAB_WIDTH, y + 21, PANEL_DARK);
-        if (!selected) {
-            guiGraphics.fill(x, y + 20, x + TAB_WIDTH, y + 21, PANEL_DARK);
-        }
-        guiGraphics.drawString(font, label, x + (TAB_WIDTH - font.width(label)) / 2, y + 7, selected ? TEXT : 0xFF2F2F2F, false);
     }
 
     private void renderSlotFrames(GuiGraphics guiGraphics) {
@@ -560,11 +542,5 @@ public class ComponentRecyclerScreen extends AbstractContainerScreen<ComponentRe
             text = text.substring(0, text.length() - 1);
         }
         return Component.literal(text + suffix);
-    }
-
-    private boolean isOverTab(double mouseX, double mouseY, int index) {
-        int x = leftPos + 8 + index * TAB_SPACING;
-        int y = topPos - 20;
-        return mouseX >= x && mouseX < x + TAB_WIDTH && mouseY >= y && mouseY < y + 21;
     }
 }
