@@ -445,6 +445,18 @@ tasks.register('processingBalanceSim', JavaExec) {
     doFirst { workingDir.mkdirs() }
 }
 
+tasks.register('processingTreeSearch', JavaExec) {
+    group = 'balance'
+    description = 'Regenerates the ore line model tree allocations in tools/balance/processing-setups.json.'
+    dependsOn tasks.named('masteryTestClasses')
+    classpath = sourceSets.masteryTest.runtimeClasspath
+    mainClass = 'com.rngtech.rpg.ProcessingTreeSearch'
+    javaLauncher = javaToolchains.launcherFor { languageVersion = JavaLanguageVersion.of(21) }
+    args layout.projectDirectory.asFile.path
+    workingDir = layout.buildDirectory.dir('processing-balance').get().asFile
+    doFirst { workingDir.mkdirs() }
+}
+
 tasks.register('phaseArraySim', JavaExec) {
     group = 'balance'
     description = 'Models the Phase Array PRD: the hold sequence, Strain, FE by Quality and the RP ceiling per scenario.'

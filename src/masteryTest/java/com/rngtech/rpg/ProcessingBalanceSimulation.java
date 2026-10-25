@@ -54,9 +54,9 @@ public final class ProcessingBalanceSimulation {
     private static final double SAFE_MAXIMUM_SCALE = 1.15;
 
     private final Path recipeRoot;
-    private final JsonObject setups;
+    final JsonObject setups;
 
-    private ProcessingBalanceSimulation(Path projectDir) throws IOException {
+    ProcessingBalanceSimulation(Path projectDir) throws IOException {
         recipeRoot = projectDir.resolve("src/main/resources/data/rngtech/recipe");
         setups = read(projectDir.resolve("tools/balance/processing-setups.json"));
     }
@@ -200,10 +200,13 @@ public final class ProcessingBalanceSimulation {
     // ---------------------------------------------------------------------------------------------------------------
 
     private Crusher crusher(JsonObject stage, JsonObject build, int level) {
+        return crusher(stage, build, progression(MachineMasteryFamily.CRUSHER, stage, build, level));
+    }
+
+    static Crusher crusher(JsonObject stage, JsonObject build, MachineProgressionState state) {
         CrusherChassisMaterial chassis = CrusherChassisMaterial.valueOf(upper(stage, "crusherChassis"));
         CrushHeadMaterial head = CrushHeadMaterial.valueOf(upper(stage, "crushHead"));
         BatteryCellMaterial cell = BatteryCellMaterial.valueOf(upper(stage, "batteryCell"));
-        MachineProgressionState state = progression(MachineMasteryFamily.CRUSHER, stage, build, level);
 
         // CrusherBlockEntity#effectiveStats
         MachineStatAccumulator stats = MachineBaseStatCatalog.crusher(chassis);
@@ -220,10 +223,10 @@ public final class ProcessingBalanceSimulation {
         }
         // CrusherBlockEntity#consumeWorkingEnergy: one tick draws from the internal buffer plus the cell's output rate.
         double supply = Math.min(stats.value(MachineStat.ENERGY_CAPACITY) + (battery ? cell.outputRate() : 0), connector(stage));
-        return new Crusher(stats, state, oath, supply, build, level);
+        return new Crusher(stats, state, oath, supply, build, state.level());
     }
 
-    private record Crusher(MachineStatAccumulator stats, MachineProgressionState state, boolean oath, double feSupply,
+    record Crusher(MachineStatAccumulator stats, MachineProgressionState state, boolean oath, double feSupply,
             JsonObject build, int level) {
         boolean has(String behavior) {
             return MegaPassiveTree.has(state, behavior);
@@ -309,10 +312,13 @@ public final class ProcessingBalanceSimulation {
     // ---------------------------------------------------------------------------------------------------------------
 
     private Furnace furnace(JsonObject stage, JsonObject setup, JsonObject build, int level) {
+        return furnace(stage, setup, build, progression(MachineMasteryFamily.FURNACE, stage, build, level));
+    }
+
+    static Furnace furnace(JsonObject stage, JsonObject setup, JsonObject build, MachineProgressionState state) {
         FurnaceChassisMaterial chassis = FurnaceChassisMaterial.valueOf(upper(setup, "chassis"));
         HeatCoreMaterial core = HeatCoreMaterial.valueOf(upper(setup, "heatCore"));
         BatteryCellMaterial cell = BatteryCellMaterial.valueOf(upper(stage, "batteryCell"));
-        MachineProgressionState state = progression(MachineMasteryFamily.FURNACE, stage, build, level);
 
         // FurnaceBlockEntity#baseEffectiveStats then #statsForLane. Every lane shares the one core, so lanes share stats.
         MachineStatAccumulator stats = MachineBaseStatCatalog.furnace(chassis);
@@ -328,7 +334,7 @@ public final class ProcessingBalanceSimulation {
         return new Furnace(stats, state, lanes, supply);
     }
 
-    private record Furnace(MachineStatAccumulator stats, MachineProgressionState state, int lanes, double feSupply) {
+    record Furnace(MachineStatAccumulator stats, MachineProgressionState state, int lanes, double feSupply) {
         boolean has(String behavior) {
             return MegaPassiveTree.has(state, behavior);
         }
@@ -406,7 +412,7 @@ public final class ProcessingBalanceSimulation {
     // ---------------------------------------------------------------------------------------------------------------
 
     /** One machine step per input item, in expectation. */
-    private record Step(boolean furnace, boolean blocked, String reason, String recipe, int baseCount, double outputPerInput,
+    record Step(boolean furnace, boolean blocked, String reason, String recipe, int baseCount, double outputPerInput,
             double fePerInput, double ticksPerInput, double runningFePerTick, double feSupplyPerTick, int parallel,
             int cycleTicks, int hardnessDeficit, Map<String, Object> detail) {
         /** Ticks per input when FE arrives no faster than the machine can draw it; a short tick pauses work. */
@@ -486,6 +492,11 @@ public final class ProcessingBalanceSimulation {
         if (nodes.size() > level - 1 || !MegaPassiveTree.validBuild(family.startNodeId(), nodes)) {
             throw new IllegalArgumentException("Invalid " + family + " tree " + build.get("tree").getAsString() + " at level " + level);
         }
+        return progression(stage, build, level, nodes, family);
+    }
+
+    /** A machine at {@code level} with {@code nodes} allocated and the archetype's ascendancy nodes its stage's Seals unlock. */
+    static MachineProgressionState progression(JsonObject stage, JsonObject build, int level, List<String> nodes, MachineMasteryFamily family) {
         int seals = stage.get("sealTiers").getAsInt();
         String ascendancy = seals > 0 && build.has("ascendancy") ? build.get("ascendancy").getAsString() : "";
         List<String> ascendancyNodes = new ArrayList<>();
@@ -498,7 +509,7 @@ public final class ProcessingBalanceSimulation {
         MachineProgressionState state = new MachineProgressionState(MachineProgressionState.xpForLevel(level), 0, level, nodes,
                 family.startNodeId(), List.of(), false, ascendancy, ascendancyNodes, seals);
         if (state.allocatedNodes().size() != nodes.size() || state.ascendancyNodes().size() != ascendancyNodes.size()) {
-            throw new IllegalStateException("Mastery state rejected " + build.get("tree").getAsString() + " / " + ascendancy);
+            throw new IllegalStateException("Mastery state rejected " + nodes + " / " + ascendancy);
         }
         return state;
     }
@@ -526,14 +537,14 @@ public final class ProcessingBalanceSimulation {
     // Recipes
     // ---------------------------------------------------------------------------------------------------------------
 
-    private record Recipe(String id, int count, int ticks, int cost, int level, int temperature, double stability,
+    record Recipe(String id, int count, int ticks, int cost, int level, int temperature, double stability,
             boolean bonusOutput, boolean ledgerInput, boolean crushedInput) {
     }
 
-    private record Recipes(Recipe crushOre, Recipe crushDust, Recipe smeltDust, Recipe smeltCrushed, Recipe smeltOre) {
+    record Recipes(Recipe crushOre, Recipe crushDust, Recipe smeltDust, Recipe smeltCrushed, Recipe smeltOre) {
     }
 
-    private Recipes recipes(String metal) throws IOException {
+    Recipes recipes(String metal) throws IOException {
         String furnaceOre = switch (metal) {
             case "iron", "copper" -> "vanilla/" + metal + "_ingot_from_smelting_" + metal + "_ore";
             default -> "metals/" + metal + "_from_ore";
