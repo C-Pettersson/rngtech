@@ -48,7 +48,7 @@ public class ResonanceCalibratorScreen extends AbstractContainerScreen<Resonance
     private static final int PROGRESS_BAR_Y = 74;
     private static final int PROGRESS_BAR_WIDTH = 76;
     private static final int PROGRESS_BAR_HEIGHT = 8;
-    private static final int STATUS_ICON_X = 124;
+    private static final int STATUS_ICON_X = 92;
     private static final int STATUS_ICON_Y = 86;
     private static final int STATUS_ICON_SIZE = 12;
     private static final int PROCESS_INPUT_FRAME_X = 37;

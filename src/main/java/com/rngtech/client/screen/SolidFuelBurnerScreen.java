@@ -36,9 +36,9 @@ public class SolidFuelBurnerScreen extends AbstractContainerScreen<SolidFuelBurn
     private static final int FUEL_BAR_Y = 48;
     private static final int FUEL_BAR_WIDTH = 58;
     private static final int FUEL_BAR_HEIGHT = 7;
-    private static final int STATUS_ICON_X = 117;
-    private static final int GENERATION_ICON_X = 133;
-    private static final int OUTPUT_ICON_X = 149;
+    private static final int STATUS_ICON_X = 110;
+    private static final int GENERATION_ICON_X = 126;
+    private static final int OUTPUT_ICON_X = 142;
     private static final int STATUS_ICON_Y = 60;
     private static final int TIER_ICON_X = 79;
     private static final int FUEL_FORM_ICON_X = 95;

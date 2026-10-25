@@ -100,8 +100,8 @@ public class PotentialReactorMenu extends AbstractContainerMenu implements StatB
         RefinementMenuSupport.setMachineDisplay(refinementTarget, ModBlocks.POTENTIAL_REACTOR.get(), machineTraits);
 
         ItemStackHandler processInventory = reactor.getProcessInventory();
-        addSlot(new TabbedSlot(processInventory, PotentialReactorBlockEntity.SLOT_INPUT, 43, 55, () -> selectedTab == TAB_PROCESSING));
-        addSlot(new TabbedSlot(processInventory, PotentialReactorBlockEntity.SLOT_RESIDUE, 195, 55, () -> selectedTab == TAB_PROCESSING));
+        addSlot(new TabbedSlot(processInventory, PotentialReactorBlockEntity.SLOT_INPUT, 43, 50, () -> selectedTab == TAB_PROCESSING));
+        addSlot(new TabbedSlot(processInventory, PotentialReactorBlockEntity.SLOT_RESIDUE, 195, 50, () -> selectedTab == TAB_PROCESSING));
 
         ItemStackHandler gearInventory = reactor.getGearInventory();
         addSlot(new TabbedSlot(gearInventory, PotentialReactorBlockEntity.SLOT_REACTOR_CHAMBER, 44, 48, () -> selectedTab == TAB_GEAR));

@@ -28,27 +28,26 @@ public class VacuumCollapseGeneratorScreen extends AbstractContainerScreen<Vacuu
     private static final int STAT_PANEL_Y = 18;
     private static final int STAT_PANEL_WIDTH = 224;
     private static final int INPUT_SLOT_X = 42;
-    private static final int INPUT_SLOT_Y = 54;
+    private static final int INPUT_SLOT_Y = 51;
     private static final int RESIDUE_SLOT_X = 194;
-    private static final int RESIDUE_SLOT_Y = 54;
+    private static final int RESIDUE_SLOT_Y = 51;
     private static final int ENERGY_METER_X = 174;
     private static final int ENERGY_METER_Y = 30;
     private static final int ENERGY_METER_WIDTH = 12;
     private static final int ENERGY_METER_HEIGHT = 52;
     private static final int PROGRESS_BAR_X = 90;
-    private static final int PROGRESS_BAR_Y = 48;
+    private static final int PROGRESS_BAR_Y = 62;
     private static final int PROGRESS_BAR_WIDTH = 66;
     private static final int PROGRESS_BAR_HEIGHT = 7;
     private static final int ICON_SIZE = 12;
     private static final int STATUS_ICON_SPACING = 16;
-    private static final int STATUS_ICON_ROW_WIDTH = ICON_SIZE + STATUS_ICON_SPACING * 3;
-    private static final int STATUS_ICON_X = PROGRESS_BAR_X + (PROGRESS_BAR_WIDTH - STATUS_ICON_ROW_WIDTH) / 2;
-    private static final int STATUS_ICON_Y = PROGRESS_BAR_Y + PROGRESS_BAR_HEIGHT + 5;
+    private static final int STATUS_ICON_X = PROGRESS_BAR_X;
+    private static final int STATUS_ICON_Y = 47;
     private static final int GENERATION_ICON_X = STATUS_ICON_X + STATUS_ICON_SPACING;
     private static final int OUTPUT_ICON_X = GENERATION_ICON_X + STATUS_ICON_SPACING;
     private static final int INSTABILITY_ICON_X = OUTPUT_ICON_X + STATUS_ICON_SPACING;
-    private static final int PROCESSING_LEVEL_ICON_X = 184;
-    private static final int PROCESSING_LEVEL_ICON_Y = 78;
+    private static final int PROCESSING_LEVEL_ICON_X = INSTABILITY_ICON_X + STATUS_ICON_SPACING;
+    private static final int PROCESSING_LEVEL_ICON_Y = STATUS_ICON_Y;
     private static final int PROCESSING_LEVEL_MAX = 8;
     private static final int CURVE_X = PROGRESS_BAR_X;
     private static final int CURVE_Y = 20;
@@ -134,8 +133,6 @@ public class VacuumCollapseGeneratorScreen extends AbstractContainerScreen<Vacuu
         renderSlotFrames(guiGraphics);
         if (menu.selectedTab() == VacuumCollapseGeneratorMenu.TAB_PROCESSING) {
             renderProcessing(guiGraphics);
-        } else if (menu.selectedTab() == VacuumCollapseGeneratorMenu.TAB_GEAR) {
-            renderGear(guiGraphics);
         } else if (menu.selectedTab() == VacuumCollapseGeneratorMenu.TAB_STATS) {
             renderStats(guiGraphics);
         } else if (menu.selectedTab() == VacuumCollapseGeneratorMenu.TAB_REFINEMENT) {
@@ -272,6 +269,16 @@ public class VacuumCollapseGeneratorScreen extends AbstractContainerScreen<Vacuu
                 PROGRESS
         );
         renderProcessingIcons(guiGraphics);
+        MachineScreenStyle.renderProcessingLevelSquare(
+                guiGraphics,
+                leftPos,
+                topPos,
+                PROCESSING_LEVEL_ICON_X,
+                PROCESSING_LEVEL_ICON_Y,
+                menu.processingLevel(),
+                PROCESSING_LEVEL_MAX,
+                STAT_ACCENT
+        );
         renderCurve(guiGraphics);
         renderDepthGauge(guiGraphics);
     }
@@ -379,26 +386,13 @@ public class VacuumCollapseGeneratorScreen extends AbstractContainerScreen<Vacuu
         MachineScreenStyle.renderStatPanel(guiGraphics, leftPos, topPos, STAT_PANEL_X, STAT_PANEL_Y, STAT_PANEL_WIDTH, statLines().length, STAT_ACCENT);
     }
 
-    private void renderGear(GuiGraphics guiGraphics) {
-        MachineScreenStyle.renderProcessingLevelSquare(
-                guiGraphics,
-                leftPos,
-                topPos,
-                PROCESSING_LEVEL_ICON_X,
-                PROCESSING_LEVEL_ICON_Y,
-                menu.processingLevel(),
-                PROCESSING_LEVEL_MAX,
-                STAT_ACCENT
-        );
-    }
-
     private void renderRefinement(GuiGraphics guiGraphics) {
         RefinementScreenStyle.render(guiGraphics, leftPos, topPos, menu.machineTraits(), STAT_ACCENT);
     }
 
     private void drawProcessingLabels(GuiGraphics guiGraphics) {
-        guiGraphics.drawString(font, Component.translatable("rngtech.processing.input"), INPUT_SLOT_X, 43, TEXT_MUTED, false);
-        guiGraphics.drawString(font, Component.translatable("rngtech.collapse.residue"), RESIDUE_SLOT_X - 6, 43, TEXT_MUTED, false);
+        guiGraphics.drawString(font, Component.translatable("rngtech.processing.input"), INPUT_SLOT_X, 40, TEXT_MUTED, false);
+        guiGraphics.drawString(font, Component.translatable("rngtech.collapse.residue"), RESIDUE_SLOT_X - 6, 40, TEXT_MUTED, false);
     }
 
     private void drawGearLabels(GuiGraphics guiGraphics) {
@@ -443,23 +437,20 @@ public class VacuumCollapseGeneratorScreen extends AbstractContainerScreen<Vacuu
     }
 
     private void renderValueTooltips(GuiGraphics guiGraphics, int mouseX, int mouseY) {
-        if (menu.selectedTab() == VacuumCollapseGeneratorMenu.TAB_GEAR) {
-            MachineScreenStyle.renderStatusSquareTooltip(
-                    guiGraphics,
-                    font,
-                    leftPos,
-                    topPos,
-                    mouseX,
-                    mouseY,
-                    PROCESSING_LEVEL_ICON_X,
-                    PROCESSING_LEVEL_ICON_Y,
-                    Component.translatable("rngtech.gear.tooltip.processing_level", menu.processingLevel())
-            );
-            return;
-        }
         if (menu.selectedTab() != VacuumCollapseGeneratorMenu.TAB_PROCESSING) {
             return;
         }
+        MachineScreenStyle.renderStatusSquareTooltip(
+                guiGraphics,
+                font,
+                leftPos,
+                topPos,
+                mouseX,
+                mouseY,
+                PROCESSING_LEVEL_ICON_X,
+                PROCESSING_LEVEL_ICON_Y,
+                Component.translatable("rngtech.gear.tooltip.processing_level", menu.processingLevel())
+        );
         if (isOverDepthGauge(mouseX, mouseY)) {
             guiGraphics.renderComponentTooltip(font, depthTooltip(), mouseX, mouseY);
             return;

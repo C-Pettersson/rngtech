@@ -51,8 +51,8 @@ public class AlloyFurnaceScreen extends AbstractContainerScreen<AlloyFurnaceMenu
     private static final int PROGRESS_Y = 51;
     private static final int PROGRESS_WIDTH = 86;
     private static final int PROGRESS_HEIGHT = 8;
-    private static final int STATUS_ICON_X = 127;
-    private static final int HEAT_ICON_X = 143;
+    private static final int STATUS_ICON_X = 98;
+    private static final int HEAT_ICON_X = 114;
     private static final int STATUS_ICON_Y = 63;
     private static final int STATUS_ICON_SIZE = 12;
     private static final int OUTPUT_SLOT_X = 204;

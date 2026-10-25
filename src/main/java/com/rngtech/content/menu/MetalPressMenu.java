@@ -140,7 +140,7 @@ public class MetalPressMenu extends AbstractContainerMenu implements MasteryMenu
         RefinementMenuSupport.setMachineDisplay(refinementTarget, press.getBlockState().getBlock(), machineTraits);
 
         ItemStackHandler processInventory = press.getProcessInventory();
-        addSlot(new TabbedSlot(processInventory, MetalPressBlockEntity.SLOT_INPUT, 56, 42, () -> selectedTab == TAB_PROCESSING));
+        addSlot(new TabbedSlot(processInventory, MetalPressBlockEntity.SLOT_INPUT, 56, 52, () -> selectedTab == TAB_PROCESSING));
         addSlot(new TabbedSlot(processInventory, MetalPressBlockEntity.SLOT_OUTPUT, 170, 52, () -> selectedTab == TAB_PROCESSING));
 
         ItemStackHandler gearInventory = press.getGearInventory();

@@ -36,10 +36,10 @@ public class BioGeneratorScreen extends AbstractContainerScreen<BioGeneratorMenu
     private static final int FUEL_BAR_Y = 48;
     private static final int FUEL_BAR_WIDTH = 72;
     private static final int FUEL_BAR_HEIGHT = 7;
-    private static final int STATUS_ICON_X = 102;
-    private static final int GENERATION_ICON_X = 118;
-    private static final int OUTPUT_ICON_X = 134;
-    private static final int FUEL_VALUE_ICON_X = 150;
+    private static final int STATUS_ICON_X = 96;
+    private static final int GENERATION_ICON_X = 112;
+    private static final int OUTPUT_ICON_X = 128;
+    private static final int FUEL_VALUE_ICON_X = 144;
     private static final int STATUS_ICON_Y = 60;
     private static final int ICON_SIZE = 12;
     private static final int RETENTION_DIAL_X = 96;

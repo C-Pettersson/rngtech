@@ -39,7 +39,7 @@ public class FurnaceScreen extends AbstractContainerScreen<FurnaceMenu> implemen
     private static final int STAT_PANEL_X = 8;
     private static final int STAT_PANEL_Y = 18;
     private static final int STAT_PANEL_WIDTH = 224;
-    private static final int STATUS_ICON_X = 114;
+    private static final int STATUS_ICON_X = 86;
     private static final int STATUS_ICON_Y = 28;
     private static final int ICON_SIZE = 12;
     private static final int BAR_Y = 28;

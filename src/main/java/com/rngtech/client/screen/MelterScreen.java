@@ -49,15 +49,15 @@ public class MelterScreen extends AbstractContainerScreen<MelterMenu> implements
     private static final int BAR_HEIGHT = 50;
     private static final int BAR_FILL_HEIGHT = 48;
     private static final int PROGRESS_X = 104;
-    private static final int PROGRESS_Y = 51;
+    private static final int PROGRESS_Y = 57;
     private static final int PROGRESS_WIDTH = 58;
     private static final int PROGRESS_HEIGHT = 8;
-    private static final int STATUS_X = 119;
-    private static final int TRANSFER_X = 135;
-    private static final int STATUS_Y = 63;
+    private static final int STATUS_X = 104;
+    private static final int TRANSFER_X = 120;
+    private static final int STATUS_Y = 41;
     private static final int STATUS_SIZE = 12;
-    private static final int PROCESSING_LEVEL_ICON_X = 184;
-    private static final int PROCESSING_LEVEL_ICON_Y = 78;
+    private static final int PROCESSING_LEVEL_ICON_X = 136;
+    private static final int PROCESSING_LEVEL_ICON_Y = STATUS_Y;
     private static final int PROCESSING_LEVEL_MAX = 8;
     private static final int INPUT_SLOT_FRAME_X = 57;
     private static final int SECONDARY_INPUT_SLOT_FRAME_X = 81;
@@ -185,13 +185,11 @@ public class MelterScreen extends AbstractContainerScreen<MelterMenu> implements
 
         if (menu.selectedTab() == MelterMenu.TAB_PROCESSING) {
             renderProcessing(guiGraphics);
-        } else if (menu.selectedTab() == MelterMenu.TAB_GEAR) {
-            renderGear(guiGraphics);
         } else if (menu.selectedTab() == MelterMenu.TAB_CONFIGURATION) {
             renderConfiguration(guiGraphics);
         } else if (menu.selectedTab() == MelterMenu.TAB_REFINEMENT) {
             renderRefinement(guiGraphics);
-        } else {
+        } else if (menu.selectedTab() == MelterMenu.TAB_MASTERY) {
             masterySupport.render(guiGraphics, leftPos, topPos, imageWidth, imageHeight, mouseX, mouseY);
         }
     }
@@ -395,6 +393,16 @@ public class MelterScreen extends AbstractContainerScreen<MelterMenu> implements
         MachineScreenStyle.renderStatusGlyph(guiGraphics, leftPos + STATUS_X, topPos + STATUS_Y, statusState());
         renderIconBox(guiGraphics, TRANSFER_X, STATUS_Y);
         renderTransferGlyph(guiGraphics, TRANSFER_X, STATUS_Y);
+        MachineScreenStyle.renderProcessingLevelSquare(
+                guiGraphics,
+                leftPos,
+                topPos,
+                PROCESSING_LEVEL_ICON_X,
+                PROCESSING_LEVEL_ICON_Y,
+                menu.processingLevel(),
+                PROCESSING_LEVEL_MAX,
+                STAT_ACCENT
+        );
         renderPurgeButtons(guiGraphics);
     }
 
@@ -407,19 +415,6 @@ public class MelterScreen extends AbstractContainerScreen<MelterMenu> implements
                 STAT_PANEL_Y,
                 STAT_PANEL_WIDTH,
                 statLines().length,
-                STAT_ACCENT
-        );
-    }
-
-    private void renderGear(GuiGraphics guiGraphics) {
-        MachineScreenStyle.renderProcessingLevelSquare(
-                guiGraphics,
-                leftPos,
-                topPos,
-                PROCESSING_LEVEL_ICON_X,
-                PROCESSING_LEVEL_ICON_Y,
-                menu.processingLevel(),
-                PROCESSING_LEVEL_MAX,
                 STAT_ACCENT
         );
     }
@@ -470,23 +465,20 @@ public class MelterScreen extends AbstractContainerScreen<MelterMenu> implements
     }
 
     private void renderValueTooltips(GuiGraphics guiGraphics, int mouseX, int mouseY) {
-        if (menu.selectedTab() == MelterMenu.TAB_GEAR) {
-            MachineScreenStyle.renderStatusSquareTooltip(
-                    guiGraphics,
-                    font,
-                    leftPos,
-                    topPos,
-                    mouseX,
-                    mouseY,
-                    PROCESSING_LEVEL_ICON_X,
-                    PROCESSING_LEVEL_ICON_Y,
-                    processingLevelTooltip()
-            );
-            return;
-        }
         if (menu.selectedTab() != MelterMenu.TAB_PROCESSING) {
             return;
         }
+        MachineScreenStyle.renderStatusSquareTooltip(
+                guiGraphics,
+                font,
+                leftPos,
+                topPos,
+                mouseX,
+                mouseY,
+                PROCESSING_LEVEL_ICON_X,
+                PROCESSING_LEVEL_ICON_Y,
+                processingLevelTooltip()
+        );
         if (heatSlider.isOver(mouseX, mouseY, leftPos, topPos)) {
             guiGraphics.renderComponentTooltip(font, heatSlider.tooltip(menu.heatSlider(), menu.setpoint()), mouseX, mouseY);
             return;
