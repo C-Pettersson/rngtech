@@ -147,7 +147,7 @@ public final class WorkOrderRules {
         for (int index = 0; index < parts.size() && (left > 0 || work > 0 || weighed); index++) {
             WorkPart part = parts.get(index);
             long current = advanced.progress().get(index);
-            boolean counts = WorkOrderConditions.counts(part, report, active.traits());
+            boolean counts = WorkOrderConditions.counts(active.order(), part, report, active.traits());
             if (!counts && current > 0 && current < part.target() && report.type().id().equals(part.type())
                     && WorkOrderConditions.breaks(part, active.traits())) {
                 advanced = advanced.withPartProgress(index, 0);

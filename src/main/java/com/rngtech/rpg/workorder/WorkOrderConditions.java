@@ -318,10 +318,13 @@ public final class WorkOrderConditions {
         return traits != null && active(traits).stream().anyMatch(modifier -> modifier.affixId().equals(id));
     }
 
-    /** Whether {@code report} counts toward {@code part} under {@code traits}: Deep Ore raises a stage part's minimum by one. */
-    public static boolean counts(WorkPart part, WorkReport report, MachineTraits traits) {
+    /**
+     * Whether {@code report} counts toward {@code order}'s {@code part} under {@code traits}: Deep Ore raises a stage part's
+     * minimum to the next stage with work, or leaves it when the tier's chassis has none above.
+     */
+    public static boolean counts(WorkOrder order, WorkPart part, WorkReport report, MachineTraits traits) {
         if (has(traits, DEEP_ORE) && WorkFilter.STAGE.id().equals(part.filter())) {
-            return new WorkPart(part.type(), part.filter(), part.minimum() + 1, part.item(), part.target()).counts(report);
+            return new WorkPart(part.type(), part.filter(), minimum(order, part, traits), part.item(), part.target()).counts(report);
         }
         return part.counts(report);
     }
@@ -334,9 +337,10 @@ public final class WorkOrderConditions {
         return WorkFilter.STREAK.id().equals(part.filter()) || (has(traits, FINE_TOLERANCE) && WorkFilter.SETTING.id().equals(part.filter()));
     }
 
-    /** The minimum a stage part needs under {@code traits}, for the job's Shift list. */
-    public static int minimum(WorkPart part, MachineTraits traits) {
-        return part.minimum() + (has(traits, DEEP_ORE) && WorkFilter.STAGE.id().equals(part.filter()) ? 1 : 0);
+    /** The minimum {@code order}'s stage part needs under {@code traits}, for counting and the job's Shift list. */
+    public static int minimum(WorkOrder order, WorkPart part, MachineTraits traits) {
+        return has(traits, DEEP_ORE) && WorkFilter.STAGE.id().equals(part.filter())
+                ? WorkOrderFamilies.deepMinimum(order.family(), order.tier(), part.minimum()) : part.minimum();
     }
 
     /**

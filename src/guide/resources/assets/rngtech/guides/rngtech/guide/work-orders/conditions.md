@@ -31,7 +31,7 @@ Conditions apply only while their chip is active. A stat breakdown lists each on
 | of Brittle Lining | A heat failure resets the job's progress to 0 | +35% Bounty, +1 Prestige | Furnace, Alloy Furnace, Metal Press |
 | of the Jammed Line | A jam resets the job's progress to 0 | +30% Bounty, +1 Prestige | Crusher |
 | of Fine Tolerance | A calibration below the job's stability resets its progress to 0 | +35% Bounty, +1 Prestige | Resonance Calibrator stability jobs |
-| of Deep Ore | Only work one level above the job's minimum counts | +25% Bounty, +1 Prestige | Stage jobs |
+| of Deep Ore | Only work above the job's minimum counts. If the tier's chassis has no work above it, the condition costs nothing. | +25% Bounty, +1 Prestige | Stage jobs |
 | of the Short Fuse | Rush clock 25%–60% shorter | +25% to +60% Rush reward, only when you Rush | All |
 
 A higher-tier condition costs more and pays more. A chip only rolls conditions its job can use.

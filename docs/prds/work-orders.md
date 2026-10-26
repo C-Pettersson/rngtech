@@ -225,7 +225,7 @@ Conditions are affixes on the order, drawn from a `work_order` eligibility profi
 | Suffix | of Hand Feeding | Instant Process does not trigger | +20% Bounty | Every machine that rolls Instant Process: Crusher, Furnace, Alloy Furnace, Metal Press, Melter, Resonance Calibrator, Component Assembler, Component Recycler |
 | Suffix | of Brittle Lining | A heat failure resets progress to 0 | +35% Bounty, +1 Prestige | Furnace, Alloy Furnace, Metal Press |
 | Suffix | of Fine Tolerance | A calibration below the objective's stability resets progress to 0 | +35% Bounty, +1 Prestige | Resonance Calibrator stability jobs |
-| Suffix | of Deep Ore | Only work on recipes one stage above the objective's filter counts | +25% Bounty, +1 Prestige | Stage jobs |
+| Suffix | of Deep Ore | Only work on recipes at the next stage above the objective's filter counts; free when the tier's chassis has no stage with work above it | +25% Bounty, +1 Prestige | Stage jobs |
 | Suffix | of the Jammed Line | A Crusher jam resets progress to 0 | +30% Bounty, +1 Prestige | Crusher |
 | Suffix | of the Short Fuse | The Rush clock is 25%–60% shorter | +25%–60% Rush reward, only when Rushed | All |
 
@@ -306,7 +306,7 @@ Conditions only add costs, and a domain check fails on any condition that raises
 
 - **Dispatch Terminal screen:** a terminal display with no player inventory. Six job lines show each chip's machine, tier, job, requirements, and reward, with a Download button that moves the chip into the inventory; hovering a line shows the chip's full tooltip. Refresh and the Requisition count sit below the display.
 - **Orders tab:** its own tab on every eligible machine, beside Mastery. It shows three drive bays as real chip slots with the player's inventory below, the active chip's job, per-part progress, best streak, and Rush countdown, and Activate, Pause, Rush, and Abandon controls. Rush is greyed out with its reason once a chip has progress. Bays refuse a chip for another family, one the machine does not meet, a blank chip, or an expired Rush chip. Fluid amounts read in SI form (mB, B, MB).
-- **Tooltip:** family, tier, job with each part, requirements, rarity, conditions, and the reward it pays.
+- **Tooltip:** family, tier, job with each part, condition names, requirements, rarity, and the reward it pays, kept short so a listing is quick to scan. Shift adds each condition's effect and pay, the counts-work note, Refinement Potential, Prestige, and the insert hint; Alt lists what counts toward a stage job.
 - **Completed Job Chip tooltip:** tier, family, and the reward it pays.
 - **Bonus Summary drawer:** a Work Order section that lists each active condition's effect is [deferred](#deferred), and built only if playtesters ask for it.
 - **Jade:** the active chip's job and progress, and the Rush countdown, on block machines. The Forestry Companion cart shows none, since it is an entity; that is [deferred](#deferred).

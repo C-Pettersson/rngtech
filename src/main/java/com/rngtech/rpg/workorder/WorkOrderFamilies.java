@@ -21,6 +21,12 @@ public final class WorkOrderFamilies {
     private static final Map<String, Integer> STAGED = Map.of(COMPONENT_RECYCLER, 8);
 
     /**
+     * Stages a family's stage jobs can name that no shipped recipe reaches, which Deep Ore skips: the Crusher has no
+     * Processing Level 7 recipe and the Alloy Furnace no Stage 5 alloy.
+     */
+    private static final Map<String, Set<Integer>> EMPTY_STAGES = Map.of("crusher", Set.of(7), "alloy_furnace", Set.of(5));
+
+    /**
      * The stats each family's stat goals may name: effective stats players raise through Gear, refinement, or Mastery and
      * the family's machine reads. A goal never grants a stat, it only asks for one.
      */
@@ -146,6 +152,18 @@ public final class WorkOrderFamilies {
      */
     public static int stageCap(String id, int tier) {
         return staged(id) ? Math.min(WorkOrder.tierStage(tier), topStage(id)) : WorkOrder.tierStage(tier);
+    }
+
+    /**
+     * The minimum a stage part of a {@code tier} job needs under Deep Ore: the next stage above {@code minimum} that has
+     * work and that the tier's chassis runs, or {@code minimum} when there is none, so Deep Ore then costs nothing.
+     */
+    public static int deepMinimum(String id, int tier, int minimum) {
+        Set<Integer> empty = EMPTY_STAGES.getOrDefault(id, Set.of());
+        for (int stage = minimum + 1; stage <= stageCap(id, tier); stage++) {
+            if (!empty.contains(stage)) { return stage; }
+        }
+        return minimum;
     }
 
     /** The chassis stage a job of {@code tier} needs: the stage cap, or none on a stageless machine. */

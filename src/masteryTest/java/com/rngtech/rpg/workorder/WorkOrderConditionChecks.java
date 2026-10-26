@@ -128,18 +128,29 @@ public final class WorkOrderConditionChecks {
         }
     }
 
+    /**
+     * Deep Ore raises a stage part's minimum to the next stage with work that the tier's chassis runs, skipping stages no
+     * recipe reaches, and costs nothing when none is left, such as a Tier V Crusher job at Processing Level 8.
+     */
     private static void deepOre() {
         WorkPart part = new WorkPart(WorkObjectiveType.CRUSH, WorkFilter.STAGE, 4, "", 100);
         MachineTraits deep = new MachineTraits(Rarity.MAGIC, 0, List.of(WorkOrderConditions.get(WorkOrderConditions.DEEP_ORE).definition().roll(1, RandomSource.create(1L))), List.of());
+        WorkOrder order = new WorkOrder("crusher", 2, new WorkObjective(ResourceLocation.parse("rngtech:deep"), part), 5, 0, 100, 0);
         WorkReport atFour = new WorkReport(WorkObjectiveType.CRUSH, 4, 0, "", 1);
         WorkReport atFive = new WorkReport(WorkObjectiveType.CRUSH, 5, 0, "", 1);
-        require(WorkOrderConditions.counts(part, atFour, MachineTraits.EMPTY) && !WorkOrderConditions.counts(part, atFour, deep)
-                && WorkOrderConditions.counts(part, atFive, deep) && WorkOrderConditions.minimum(part, deep) == 5,
+        require(WorkOrderConditions.counts(order, part, atFour, MachineTraits.EMPTY) && !WorkOrderConditions.counts(order, part, atFour, deep)
+                && WorkOrderConditions.counts(order, part, atFive, deep) && WorkOrderConditions.minimum(order, part, deep) == 5,
                 "Deep Ore counts only work one level above the job's minimum");
-        WorkOrder order = new WorkOrder("crusher", 1, new WorkObjective(ResourceLocation.parse("rngtech:deep"), part), 4, 0, 100, 0);
         MachineWorkOrders orders = MachineWorkOrders.EMPTY.withLoaded(new LoadedWorkOrder(order, deep)).withActive(0);
         require(WorkOrderRules.progress(orders, atFour).orders() == orders && WorkOrderRules.progress(orders, atFive).orders().activeOrder().totalProgress() == 1,
                 "the machine's counting follows Deep Ore");
+
+        WorkPart top = new WorkPart(WorkObjectiveType.CRUSH, WorkFilter.STAGE, 8, "", 100);
+        WorkOrder topJob = new WorkOrder("crusher", 5, new WorkObjective(ResourceLocation.parse("rngtech:deep_top"), top), 8, 0, 100, 0);
+        require(WorkOrderConditions.minimum(topJob, top, deep) == 8 && WorkOrderConditions.counts(topJob, top, new WorkReport(WorkObjectiveType.CRUSH, 8, 0, "", 1), deep),
+                "Deep Ore costs nothing on a Tier V Crusher job at Processing Level 8, the top level");
+        require(WorkOrderFamilies.deepMinimum("crusher", 4, 6) == 6 && WorkOrderFamilies.deepMinimum("crusher", 5, 6) == 8
+                && WorkOrderFamilies.deepMinimum("alloy_furnace", 3, 4) == 6, "Deep Ore skips stages no recipe reaches");
     }
 
     /**

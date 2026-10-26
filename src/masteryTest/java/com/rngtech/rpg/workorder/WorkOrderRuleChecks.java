@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 import java.util.SplittableRandom;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 /** Rolling, loading, counting, and reward rolls for Work Orders, run from {@code MasteryChecks}. */
@@ -265,13 +266,7 @@ public final class WorkOrderRuleChecks {
                 int stage = WorkOrderFamilies.stageCap(entry.family(), tier);
                 boolean ok = switch (entry.filter()) {
                     case ANY -> true;
-                    case STAGE -> switch (entry.type()) {
-                        case CRUSH -> crushLevels.stream().anyMatch(level -> level >= minimum && level <= stage);
-                        case ASSEMBLE -> cellStages().stream().anyMatch(cell -> cell >= minimum && cell <= stage);
-                        case ALLOY -> alloyRecipes().stream().anyMatch(recipe -> recipe.get("minimum_component_stage").getAsInt() >= minimum
-                                && recipe.get("minimum_component_stage").getAsInt() <= stage);
-                        default -> minimum <= stage;
-                    };
+                    case STAGE -> stageReachable(entry, minimum, stage, crushLevels);
                     case SETTING -> minimum <= 100;
                     case ITEM -> !entry.options(stage, item -> true).isEmpty()
                             && entry.options().stream().allMatch(option -> hasRecipe(entry.type(), option.item()));
@@ -281,8 +276,25 @@ public final class WorkOrderRuleChecks {
                             && entry.options().stream().allMatch(option -> WorkOrderFamilies.group(entry.family(), option.item()));
                 };
                 require(ok, entry.id() + " Tier " + tier + " is reachable on a Stage " + stage + " chassis");
+                if (entry.filter() == WorkFilter.STAGE) {
+                    int deep = WorkOrderFamilies.deepMinimum(entry.family(), tier, minimum);
+                    require(stageReachable(entry, deep, stage, crushLevels), entry.id() + " Tier " + tier + " is reachable under Deep Ore at " + deep);
+                    require(deep > minimum || IntStream.rangeClosed(minimum + 1, stage).noneMatch(level -> stageReachable(entry, level, level, crushLevels)),
+                            entry.id() + " Tier " + tier + ": Deep Ore is free only where no stage above the minimum has work");
+                }
             }
         }
+    }
+
+    /** Whether a recipe of the entry's family at {@code minimum} or above runs on a Stage {@code stage} chassis. */
+    private static boolean stageReachable(WorkObjectiveEntry entry, int minimum, int stage, List<Integer> crushLevels) {
+        return switch (entry.type()) {
+            case CRUSH -> crushLevels.stream().anyMatch(level -> level >= minimum && level <= stage);
+            case ASSEMBLE -> cellStages().stream().anyMatch(cell -> cell >= minimum && cell <= stage);
+            case ALLOY -> alloyRecipes().stream().anyMatch(recipe -> recipe.get("minimum_component_stage").getAsInt() >= minimum
+                    && recipe.get("minimum_component_stage").getAsInt() <= stage);
+            default -> minimum <= stage;
+        };
     }
 
     static List<WorkObjectiveEntry> shippedObjectives() {

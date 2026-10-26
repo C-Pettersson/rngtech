@@ -305,6 +305,8 @@ Recorded 2026-10-26 for the post-merge polish, from the user:
 
 - Release target: the next 2.0 alpha, the last big feature before 2.0. Machines keep three drive bays. Unique rewards weight toward the job's machine.
 - Uniques should be really rare, about one per hundred jobs, seen after maybe 20 refreshes; that is the minimum scarcity, and rarer is fine.
+- Deep Ore may roll on a stage job at the top level; there it is a free condition. Found in playtest: a Tier V Crusher job at Processing Level 8 with Deep Ore asked for Level 9, which no recipe has, so nothing counted.
+- Chip tooltips show less by default, with details behind Shift and Alt, so a listing is quick to scan. The Orders tab's progress bars are shorter so the count fits beside them.
 - of Hand Feeding goes on every machine that rolls Instant Process. Cold Start stays off the Melter.
 - Thin Margins and drive-bay panels are dropped. Veteran Crew, pack-editable conditions, template condition names, and Jade on the Forestry cart are deferred; the Bonus Summary section waits for playtesters to ask.
 
@@ -401,6 +403,7 @@ Recorded 2026-10-25 from the chips slice:
 - 2026-10-26: pre-merge tuning. Crusher Tier V capped, chassis-based speeds for the six other families, material-bound sizing for the Calibrator, Assembler, and Recycler, and the Alloy Furnace's per-item reference time.
 - 2026-10-26: post-merge polish. `WorkOrderRuleChecks.statGoalTargets` against `ProcessingBalanceSimulation.bestStat`; of Hand Feeding on all eight Instant Process families; JEI tier and reward pages for the Dispatch Terminal and Job Chip; machine-weighted Unique entries in the reward table. Checks: `WorkOrderConditionChecks.handFeeding`, `WorkOrderGameTests.handFeedingStopsInstantProcessOnEveryMachine` and `uniqueRewardsFavourTheJobsMachine`, and the family-entry rule in `check-work-orders.mjs`.
 - 2026-10-26: Unique rarity. The Unique kind became three Prestige-band entries nesting `rngtech:work_orders/unique_reward`, about 1 Unique per 131 listed jobs, and a Unique reward always pays one. Checks: `WorkOrderRuleChecks.uniqueRate`, the band and nested-table rules in `check-work-orders.mjs`, and the reworked `WorkOrderGameTests.uniqueRewardsFavourTheJobsMachine`.
+- 2026-10-27: Deep Ore is free where no stage above the minimum has work (`WorkOrderFamilies.deepMinimum`, which skips the Crusher's empty Processing Level 7 and the Alloy Furnace's empty Stage 5), a compact chip tooltip with Shift for details and Alt for what counts, and Orders tab bars that end before the widest count. Checks: the Deep Ore rule in `WorkOrderRuleChecks.reachable` and `WorkOrderConditionChecks.deepOre`.
 
 ## Verification
 
