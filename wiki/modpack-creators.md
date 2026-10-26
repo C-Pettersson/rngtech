@@ -293,7 +293,7 @@ The game checks each template when it loads and logs an error for any it rejects
 
 ### Objectives and rewards
 
-Random jobs come from `data/rngtech/work_orders/objectives/`. Each file has a `family`, a `type`, a `filter`, a `weight`, and a goal per tier. For `any`, `stage`, and `setting` parts of recipe machines, a count is in items of work: each finished item counts as its recipe's `processing_ticks` over the machine's reference time (Crusher 120, Furnace 200, Alloy Furnace 1,200, Metal Press 240, Resonance Calibrator 300, Component Assembler 240, Component Recycler 144). Other parts, and the Melter and Forestry Companion, count items or mB. A goal is a count or a stat target, fixed or `min`/`max`/`step`. Item and group objectives list `options` instead. Override a file to retune it. A file that fails to load is skipped, with an error in the log.
+Random jobs come from `data/rngtech/work_orders/objectives/`. Each file has a `family`, a `type`, a `filter`, a `weight`, and a goal per tier. For `any`, `stage`, and `setting` parts of recipe machines, a count is in items of work: each finished item counts as its recipe's `processing_ticks` over the machine's reference time (Crusher 120, Furnace 200, Alloy Furnace 600 per output item, Metal Press 240, Resonance Calibrator 300, Component Assembler 240, Component Recycler 144). Other parts, and the Melter and Forestry Companion, count items or mB. A goal is a count or a stat target, fixed or `min`/`max`/`step`. Item and group objectives list `options` instead. Override a file to retune it. A file that fails to load is skipped, with an error in the log.
 
 The reward table `rngtech:challenges/work_order` is a loot table with one pool and one roll, so each job pays one kind of reward. It can use:
 

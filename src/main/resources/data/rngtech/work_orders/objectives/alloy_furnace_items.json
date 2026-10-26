@@ -44,37 +44,37 @@
     "tiers": [
         {
             "count": {
-                "min": 80,
-                "max": 120,
-                "step": 8
+                "min": 20,
+                "max": 28,
+                "step": 4
             }
         },
         {
             "count": {
-                "min": 104,
-                "max": 152,
-                "step": 8
+                "min": 28,
+                "max": 40,
+                "step": 4
             }
         },
         {
             "count": {
-                "min": 128,
-                "max": 192,
-                "step": 8
+                "min": 36,
+                "max": 56,
+                "step": 4
             }
         },
         {
             "count": {
-                "min": 152,
-                "max": 232,
-                "step": 8
+                "min": 44,
+                "max": 64,
+                "step": 4
             }
         },
         {
             "count": {
-                "min": 176,
-                "max": 264,
-                "step": 8
+                "min": 44,
+                "max": 64,
+                "step": 4
             }
         }
     ]

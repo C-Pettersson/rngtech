@@ -44,28 +44,36 @@ public final class WorkOrderFamilies {
     private static final Set<String> STREAKS = Set.of("metal_press", "resonance_calibrator");
 
     /**
-     * Each recipe family's reference recipe time in ticks, about its median recipe. Any-work, stage, and setting jobs count
-     * an item as its recipe's time over this, so a quick recipe counts less than a slow one. The Melter counts mB and the
-     * Forestry Companion has no recipes, so neither is listed.
+     * Each recipe family's reference time in ticks, about its median recipe time per item it reports. Any-work, stage,
+     * and setting jobs count an item as its recipe's time over this, so a quick recipe counts less than a slow one. The
+     * Melter counts mB and the Forestry Companion has no recipes, so neither is listed.
      */
     private static final Map<String, Integer> WORK_TICKS = Map.of(
-            "crusher", 120, "furnace", 200, "alloy_furnace", 1200, "metal_press", 240, "resonance_calibrator", 300,
+            "crusher", 120, "furnace", 200, "alloy_furnace", 600, "metal_press", 240, "resonance_calibrator", 300,
             COMPONENT_ASSEMBLER, 240, COMPONENT_RECYCLER, 144);
 
     /**
-     * A good build's throughput at each tier's stage, in hundredths of base recipe speed: job sizes and the Rush clock are
-     * set from it. The Crusher and Furnace come from the processing balance simulation (the 75th percentile build at
-     * Mastery level 1), raised where a stage's sample metal ran slower than the stage below; the others from their job
-     * sizes before work counting.
+     * A good build's throughput at each tier's stage, in hundredths of base recipe speed: the Rush clock is set from it,
+     * and so are job sizes for families whose jobs are sized by time. The Crusher and Furnace come from the processing
+     * balance simulation (the 75th percentile build at Mastery level 1), raised where a stage's sample metal ran slower
+     * than the stage below; the Crusher's Tier V stays at its Tier IV speed, so a Stage 8 job is not a huge mining trip.
+     * The others are the bare chassis's best throughput at or below the stage, times the good-to-bare ratio of a similar
+     * machine: about 1.5 for heated machines, from the Furnace, and 4 for the rest, from the Crusher.
      */
     private static final Map<String, int[]> JOB_SPEED = Map.of(
-            "crusher", new int[] {450, 690, 690, 990, 2190},
+            "crusher", new int[] {450, 690, 690, 990, 990},
             "furnace", new int[] {160, 350, 430, 430, 490},
-            "alloy_furnace", new int[] {667, 667, 667, 667, 733},
-            "metal_press", new int[] {160, 160, 160, 160, 160},
-            "resonance_calibrator", new int[] {50, 50, 50, 50, 58},
-            COMPONENT_ASSEMBLER, new int[] {40, 40, 40, 40, 47},
-            COMPONENT_RECYCLER, new int[] {24, 24, 24, 24, 28});
+            "alloy_furnace", new int[] {165, 165, 183, 183, 183},
+            "metal_press", new int[] {150, 150, 150, 150, 150},
+            "resonance_calibrator", new int[] {460, 460, 510, 660, 660},
+            COMPONENT_ASSEMBLER, new int[] {400, 400, 400, 400, 400},
+            COMPONENT_RECYCLER, new int[] {420, 480, 528, 528, 580});
+
+    /**
+     * Families whose jobs are sized by the materials the work eats, such as catalysts, cell materials, or parts to
+     * recycle, rather than by machine time. Their counts are set by hand; the speed table sets only their Rush clock.
+     */
+    private static final Set<String> MATERIAL_BOUND = Set.of("resonance_calibrator", COMPONENT_ASSEMBLER, COMPONENT_RECYCLER);
 
     private WorkOrderFamilies() { }
 
@@ -88,6 +96,11 @@ public final class WorkOrderFamilies {
     public static boolean countsWork(String id, String filter) {
         return workTicks(id) > 0 && (WorkFilter.ANY.id().equals(filter) || WorkFilter.STAGE.id().equals(filter)
                 || WorkFilter.SETTING.id().equals(filter));
+    }
+
+    /** Whether {@code id}'s work jobs are sized by machine time; the others are sized by the materials they use. */
+    public static boolean sizedByTime(String id) {
+        return workTicks(id) > 0 && !MATERIAL_BOUND.contains(id);
     }
 
     /** A good build's throughput at {@code tier}'s stage in hundredths of base recipe speed, or 0 when none is set. */

@@ -385,11 +385,14 @@ public final class WorkOrderRuleChecks {
         require(WorkOrderFamilies.workTicks("melter") == 0 && WorkOrderFamilies.workTicks("forestry") == 0, "the Melter and Forestry Companion count items");
     }
 
-    /** Job sizes match the reference: a work job's middle count takes a good build of its stage about the tier's target time. */
+    /**
+     * Job sizes match the reference: a time-sized work job's middle count takes a good build of its stage about the tier's
+     * target time. Material-bound families are sized by hand.
+     */
     private static void jobSizes(List<WorkObjectiveEntry> shipped) {
         int[] minutes = {15, 20, 25, 30, 30};
         for (WorkObjectiveEntry entry : shipped) {
-            if (!WorkOrderFamilies.countsWork(entry.family(), entry.filter().id())) { continue; }
+            if (!WorkOrderFamilies.countsWork(entry.family(), entry.filter().id()) || !WorkOrderFamilies.sizedByTime(entry.family())) { continue; }
             for (int tier = WorkOrder.MIN_TIER; tier <= WorkOrder.MAX_TIER; tier++) {
                 WorkObjectiveEntry.Goal goal = entry.goal(tier);
                 double ticks = (goal.min() + goal.max()) / 2.0 * WorkOrderFamilies.workTicks(entry.family()) * 100 / WorkOrderFamilies.jobSpeed(entry.family(), tier);

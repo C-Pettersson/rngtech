@@ -144,7 +144,7 @@ The **Dispatch Terminal** is the vendor:
 | IV | 7 | About 30 minutes on a good Stage 7 build |
 | V | 8 | About 30 minutes on a good Stage 8 build |
 
-The stage requirement is the lower of the tier's stage and the family's top stage, because the Metal Press and Forestry Companion top out at Stage 4, the Alloy Furnace and Melter at 6, and the Resonance Calibrator at 7. Default orders have no Mastery level requirement. An order template can add one; a condition that adds one (Veteran Crew) is [open](#open-items). Objective sizes come from one good-build speed table per family and tier: the processing balance simulation's 75th percentile build for the Crusher and Furnace, and the speeds the earlier counts implied for the other families, which still need playtest timings.
+The stage requirement is the lower of the tier's stage and the family's top stage, because the Metal Press and Forestry Companion top out at Stage 4, the Alloy Furnace and Melter at 6, and the Resonance Calibrator at 7. Default orders have no Mastery level requirement. An order template can add one; a condition that adds one (Veteran Crew) is [open](#open-items). Objective sizes come from one good-build speed table per family and tier: the processing balance simulation's 75th percentile build for the Crusher and Furnace (the Crusher's Tier V held at its Tier IV speed), and for the other families the bare chassis's throughput times a good-to-bare ratio, about 1.5 for heated machines and 4 for the rest. The Resonance Calibrator, Component Assembler, and Component Recycler are material-bound: their counts are set by the materials their work eats, and the table sets only their Rush clock.
 
 ## Objectives
 
@@ -179,7 +179,7 @@ Counts are illustrative; the shipped ranges are in the objective files.
 | Furnace | Any work of a stage | Smelt 640 items of work of Stage 5 or higher |
 | Furnace | Machine filter | Smelt 140 items of work with the heat slider at 50% or more |
 | Furnace | Stat goal | Reach 1.6 Heat Transfer |
-| Alloy Furnace | Any work of a stage | Alloy 168 items of work from Stage 6+ recipes |
+| Alloy Furnace | Any work of a stage | Alloy 110 items of work from Stage 6+ recipes |
 | Metal Press | Group | Press 96 plates and 48 gears |
 | Metal Press | Streak | Press 200 times in a row without a failure |
 | Melter | Specific fluid | Make 32 B of Lubricant |
@@ -434,7 +434,7 @@ Specified above, not built:
 - The Bonus Summary drawer's Work Order section.
 - Drive bay panels on shaped machine models.
 - JEI pages that explain tiers and reward kinds, and Jade for the Forestry Companion cart.
-- Playtest timings for every family's job sizes; only the Crusher and Furnace are tuned from the simulation.
+- Playtest timings for every family's job sizes. Only the Crusher and Furnace come from the simulation; the others are estimated from chassis base stats.
 
 ## Open Questions
 

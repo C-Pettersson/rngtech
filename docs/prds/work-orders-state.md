@@ -293,6 +293,13 @@ Recorded 2026-10-26 when merging the machine challenge loot removal, from the us
 
 - Glyphs dropping on top of machines left items lying around. A separate session removed the six machine challenge tables and their hooks (`feature/remove-machine-challenge-loot`, `a6faa4f0`), and the user had it merged into this branch: Work Orders are meant to be the main Glyph source. The `rngtech:challenge` type, `ChallengeContext`, its conditions, and `ChallengeLoot.roll` stay for the Work Order table, which is now the only shipped challenge table. Dormant Machines still give Tier I to IV Glyphs, and Work Orders the only default Tier V.
 
+Recorded 2026-10-26 before merging #214, from the user's go-ahead on the recommended pre-merge work:
+
+- The Crusher's Tier V speed is held at its Tier IV value (9.9 instead of the Stage 8 75th percentile, 21.9), so Tier V Crusher jobs are 2,368 to 3,568 items of work instead of 5,248 to 7,888.
+- The six families without simulation data now take their speeds from the bare chassis's base Processing Speed and Batch Size (read from `MachineStatAccumulator`'s chassis bases), at the best chassis at or below the tier's stage, times a good-to-bare ratio: about 1.5 for heated machines (Alloy Furnace, Metal Press), from the Furnace's simulated builds, and 4 for the rest, from the Crusher's. The old values were what the earlier counts implied and ran from 0.24 to 6.67.
+- The Resonance Calibrator, Component Assembler, and Component Recycler are material-bound (`WorkOrderFamilies.sizedByTime` is false): their counts stay as set by hand, since their work eats catalysts, cell materials, or parts, and the speed sets only their Rush clock. `jobSizes` checks only time-sized families.
+- The Alloy Furnace's reference time is 600 ticks per output item, its median, not 1,200 per recipe: it reports work per item, and its recipes make one to four ingots. Its counts were regenerated, and its and the Metal Press's named-item parts are now half a stage job's count, like the Crusher's and Furnace's.
+
 ## Code against the redesign
 
 The branch's loop was built for the earlier design. Phase 2 of the rework replaced the Mastery storage, the Mastery level gate, the tier and seed components, and the Tier I recipe; the lists below show what is left for later phases.
@@ -375,6 +382,7 @@ Recorded 2026-10-25 from the chips slice:
 - 2026-10-26: work counting, the work-based Rush clock, and of the Short Fuse. `WorkReport.ticks`, `LoadedWorkOrder.workCarry`, `WorkOrderFamilies.workTicks` and `jobSpeed`, `WorkOrderRules.rushTicks` and `rushBonus`, retuned counts for every recipe machine's any-work, stage, and setting jobs and the Crusher and Furnace item jobs. Checks: `workCounting`, `jobSizes`, and Rush and Short Fuse rules in `WorkOrderRuleChecks`.
 - 2026-10-26: Rush only before a job starts, no auto-start on load, and SI fluid amounts on chips. Checks: the storage check for an inactive load, explicit Activate in every machine's GameTest, a refused Rush on a started chip, and SI text in `MelterWorkOrderGameTests`.
 - 2026-10-26: merged the machine challenge loot removal. Work Orders keep `ChallengeLoot.WORK_ORDER` as the one shipped table; the wiki Phase Array page, Modpack Creators, JEI Glyph page, implementation matrix, and `check-uniques.mjs` name Work Orders as the main Glyph source.
+- 2026-10-26: pre-merge tuning. Crusher Tier V capped, chassis-based speeds for the six other families, material-bound sizing for the Calibrator, Assembler, and Recycler, and the Alloy Furnace's per-item reference time.
 
 ## Verification
 
