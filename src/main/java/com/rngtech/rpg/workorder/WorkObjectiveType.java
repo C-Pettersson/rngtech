@@ -17,7 +17,9 @@ public enum WorkObjectiveType {
     /** Fluid a Melter makes, in mB. */
     MELT,
     /** Components a Resonance Calibrator calibrates. */
-    CALIBRATE;
+    CALIBRATE,
+    /** Logs a Forestry Companion fells and crops it harvests. */
+    HARVEST;
 
     public String id() {
         return name().toLowerCase(Locale.ROOT);

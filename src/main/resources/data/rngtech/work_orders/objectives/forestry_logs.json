@@ -1,0 +1,49 @@
+{
+    "family": "forestry",
+    "type": "harvest",
+    "filter": "group",
+    "weight": 3,
+    "options": [
+        {
+            "item": "logs",
+            "stage": 1
+        }
+    ],
+    "tiers": [
+        {
+            "count": {
+                "min": 320,
+                "max": 480,
+                "step": 16
+            }
+        },
+        {
+            "count": {
+                "min": 400,
+                "max": 600,
+                "step": 16
+            }
+        },
+        {
+            "count": {
+                "min": 480,
+                "max": 720,
+                "step": 16
+            }
+        },
+        {
+            "count": {
+                "min": 560,
+                "max": 840,
+                "step": 16
+            }
+        },
+        {
+            "count": {
+                "min": 640,
+                "max": 960,
+                "step": 16
+            }
+        }
+    ]
+}

@@ -33,7 +33,8 @@ public final class WorkOrderFamilies {
      */
     private static final Map<String, List<String>> GROUPS = Map.of(
             "metal_press", List.of("plate", "gear", "casing", "connector"),
-            "resonance_calibrator", List.of("structural", "kinetic", "thermal", "conductive", "storage", "logic"));
+            "resonance_calibrator", List.of("structural", "kinetic", "thermal", "conductive", "storage", "logic"),
+            "forestry", List.of("logs", "crops"));
     private static final List<String> ALL_GROUPS = GROUPS.values().stream().flatMap(List::stream).distinct().sorted().toList();
 
     /** The families whose machines report failures that break a streak. */

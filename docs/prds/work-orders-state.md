@@ -15,7 +15,7 @@ Status: **Planned**. The PRD is a draft with open questions and no release targe
 - [x] Dispatch Terminal and Requisitions: the block, job rolling with count ranges and item jobs, one-kind rewards, Download and Refresh, the Requisition recipe, and the give commands.
 - [x] Order templates: loader, terminal pools, per-template reward tables, the template give command, and the config key that turns random orders off. Rarity and conditions on templates wait for phase 6.
 - [x] Conditions: the `work_order` profiles and pool for the Crusher and Furnace, conditions as an effect source on the machine, reset-on-event conditions, and Rush. The Bonus Summary drawer section moved to phase 9.
-- [ ] More jobs and machines: stat goals for the Crusher and Furnace (done), the Component Assembler (done), the Alloy Furnace (done), the Metal Press (done), the Melter (done), the Resonance Calibrator (done), then the other Mastery families and the machines without Mastery, starting with the Component Assembler.
+- [ ] More jobs and machines: stat goals for the Crusher and Furnace (done), the Component Assembler (done), the Alloy Furnace (done), the Metal Press (done), the Melter (done), the Resonance Calibrator (done), the Forestry Companion (done), then the other Mastery families and the machines without Mastery, starting with the Component Assembler.
 - [ ] Refinement and corruption: order corruption pools and Phase Array rejection.
 - [ ] UI polish: drive-bay panels on machine models, the Bonus Summary section, Jade, JEI, and model cues.
 - [ ] Documentation: wiki page, Machine Mastery and Rarity updates, the implementation matrix, the GuideME guide, Machine Design Notes, and an FTB Quests chapter.
@@ -216,6 +216,15 @@ Recorded 2026-10-26 after playtesting the new machines, from the user:
 - The Metal Press and the Resonance Calibrator should take jobs by kind of output, not only by exact item: "Press plates" of any metal, and "Calibrate Logic" of any recipe in that family. Item jobs named one output, which missed most of both machines' range, including the Calibrated Diamond Crystal and the Cavitation Rotor Hub.
 - Group jobs shipped as a `group` filter: a report carries a group, the Metal Press its mold (plate, gear, casing, connector) and the Calibrator its calibration family, and a group part counts its group across every recipe. `WorkOrderFamilies` lists each family's groups, the loaders reject others, and the menu syncs a group by its index. Two objectives: Metal Press kinds (one or two, 80–216 presses) and Calibrator families (one or two, 20–54 components), both at weight 3.
 
+Recorded 2026-10-26 for the Forestry Companion, from the build:
+
+- The Forestry Companion is a cart entity, not a block, so its chips live in its own field, saved with the cart under `WorkOrders` and copied onto the cart item (`rngtech:work_orders`) when it is picked up and back when it is placed. The cart ticks Rush, and its stats add the active chip's conditions on top of the item's.
+- It reports `harvest` work: each felling pass reports its broken logs with the cutting head's stage and the group `logs`, and each crop harvest reports one crop with the group `crops` and stage 0.
+- Three objectives: logs (320–960), crops (96–336), and logs with a Stage N+ head (minimums 1, 2, 3, 4, 4). The Forestry top stage is 4, as is the cart's, so every chip loads on it. No named-item jobs.
+- Its Orders tab shows the player inventory, which its menu otherwise shows only on the Cart tab.
+- Power Surcharge now lists its families and leaves out the Forestry Companion, as the PRD's condition table says. Starved Feed reads on the cart.
+- The GameTest caught a save bug while building this: the chips' save sat inside the Mastery block, so a cart without Mastery progress dropped its chips on save.
+
 ## Code against the redesign
 
 The branch's loop was built for the earlier design. Phase 2 of the rework replaced the Mastery storage, the Mastery level gate, the tier and seed components, and the Tier I recipe; the lists below show what is left for later phases.
@@ -312,6 +321,7 @@ Recorded 2026-10-25 from the chips slice:
 - 2026-10-26: Melter. `./gradlew quickCheck`, `./gradlew runGameTestServer` (288 tests), `npm run moddex:check`, and `npm run repo:check` passed. Not checked in a running client.
 - 2026-10-26: Resonance Calibrator. `./gradlew quickCheck`, `./gradlew runGameTestServer` (289 tests), `npm run moddex:check`, and `npm run repo:check` passed. Not checked in a running client.
 - 2026-10-26: group jobs for the Metal Press and Resonance Calibrator. `./gradlew quickCheck`, `./gradlew runGameTestServer` (289 tests; the press and Calibrator GameTests now finish group jobs from real presses and calibrations), `npm run moddex:check`, and `npm run repo:check` passed. Not checked in a running client.
+- 2026-10-26: Forestry Companion. `./gradlew quickCheck`, `./gradlew runGameTestServer` (290 tests), `npm run moddex:check`, and `npm run repo:check` passed. Not checked in a running client; no GameTest fells a real tree for a chip.
 
 ## Handoff and limits
 

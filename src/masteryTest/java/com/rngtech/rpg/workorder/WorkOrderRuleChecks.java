@@ -343,7 +343,9 @@ public final class WorkOrderRuleChecks {
         require(gears.orders().getFirst().fulfilled(), "a group job is done when every group is");
         require(WorkOrderFamilies.group("resonance_calibrator", "logic") && !WorkOrderFamilies.group("resonance_calibrator", "plate")
                 && !WorkOrderFamilies.group("crusher", "plate"), "each family's group jobs name only the groups its machines report");
-        require(WorkOrderFamilies.allGroups().size() == 10 && WorkOrderFamilies.allGroups().indexOf("logic") >= 0, "every group syncs by its index");
+        List<String> all = WorkOrderFamilies.allGroups();
+        require(all.equals(all.stream().distinct().sorted().toList()) && all.contains("logic") && all.contains("plate") && all.contains("logs"),
+                "every group syncs by its index in one sorted list");
     }
 
     /** Rush deadlines: half the tier's target time, a rounded-up bonus, and expiry that spares finished chips. */
@@ -396,6 +398,7 @@ public final class WorkOrderRuleChecks {
                     .anyMatch(file -> read(file).getAsJsonObject("fluid_output").get("id").getAsString().equals(item));
             case CALIBRATE -> jsonFiles(recipes).stream().filter(file -> file.getFileName().toString().startsWith("calibration_"))
                     .anyMatch(file -> read(file).getAsJsonObject("result").getAsJsonObject("stack").get("id").getAsString().equals(item));
+            case HARVEST -> false;
         };
     }
 
