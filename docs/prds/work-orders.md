@@ -56,7 +56,7 @@ Key existing code:
 - Higher tiers ask for higher chassis stages, up to each family's top stage, so Stage 7 and 8 bodies have an endgame role.
 - Rewards are refinement currency, Glyphs for the Phase Array, Uniques, and Requisitions. They are never FE and never yield, so orders cannot create a loop.
 - The Dispatch Terminal and Requisitions are gated by RNGTech's own challenges.
-- Pack makers can write their own orders by datapack, hand them out through quests and commands, replace the objective, condition, and reward data, and turn the random orders off by config.
+- Pack makers can write their own orders by datapack, hand them out through quests and commands, replace the objective and reward data, and turn the random orders off by config. Replacing the condition data is [open](#open-items): conditions are defined in code.
 
 ## Non-Goals
 
@@ -89,7 +89,8 @@ Key existing code:
 | Bounty | A percent, 100% at base. It sets how big the reward is when the terminal rolls the job. Players see the result as the chip's reward, not the percentage. |
 | Prestige | A whole number, 0 at base. It unlocks better reward kinds. |
 | Active chip | The one inserted chip the machine counts work toward and whose conditions apply. |
-| Rush | An opt-in deadline the player can add when activating a chip. It never rolls on its own. |
+| Rush | An opt-in deadline the player adds by starting a chip with Rush instead of Activate. It only starts a job and never rolls on its own. |
+| Work | What any-work, stage, and setting parts count on machines with recipes: each item as its recipe's base time over the family's reference time. |
 | Random job | A job the terminal rolls from the objective and condition pools. On by default; `workOrders.randomOrdersEnabled` turns it off. |
 | Job template | A datapack entry that defines a specific job, for pack makers and quests. |
 
@@ -98,10 +99,10 @@ Key existing code:
 1. The player places a Dispatch Terminal. Its screen lists six jobs, each with its family, job, tier, requirements, conditions, and reward.
 2. The player downloads the jobs they want. Each becomes a Job Chip in their inventory, and its line on the terminal stays empty.
 3. A Requisition refreshes the terminal: every listed job is replaced by a new roll, and empty lines fill again.
-4. The player may shape a chip in the Affix Forge or a Refinement tab: add a condition for more reward, remove one to make the job safer, reroll it, or corrupt it.
+4. The player may shape a chip in the Affix Forge: add a condition for more reward, remove one to make the job safer, reroll it, or corrupt it.
 5. On a machine of the chip's family, the player opens the Orders tab and inserts the chip into a drive bay. The bay accepts it only if the machine meets its requirements: chassis stage, and Mastery level if the chip has one.
 6. A loaded chip waits inactive until the player clicks Activate or Rush. The player can activate another bay's chip, or pause the active one. Rush only starts a job: a chip with any progress cannot be Rushed.
-7. While a chip is active, its conditions apply, and the machine counts matching work toward its job. The Orders tab, the Bonus Summary drawer, and Jade show progress.
+7. While a chip is active, its conditions apply, a blue Job Chip lamp on the machine lights, and the machine counts matching work toward its job. The Orders tab and Jade show progress.
 8. Switching to another chip pauses the current one. Its progress and best streak stay, and its conditions stop applying.
 9. When the active chip's job is complete, it becomes a Completed Job Chip in the same bay and is no longer active. It keeps the bay until the player takes it out, cannot be made active again, and no other chip becomes active on its own.
 10. The player redeems the Completed Job Chip for its listed reward.
@@ -110,9 +111,9 @@ Pulling a chip out of its bay unloads it, progress kept; pulling the active chip
 
 ## Eligible Machines
 
-Work Orders work on every processing machine: a machine that turns inputs into outputs. That includes the seven Mastery families and the machines without Mastery, such as the Component Assembler and the Component Recycler. Generators, Battery Chassis, the Miner's Companion, and storage blocks are not eligible.
+Work Orders work on every processing machine: a machine that turns inputs into outputs. That includes the seven Mastery families and the machines without Mastery, such as the Component Assembler and the Component Recycler. Generators, Battery Chassis, the Miner's Companion, the manual Crude Component Recycler, and storage blocks are not eligible.
 
-A machine without a Mastery family has a family for orders only. Its tier stage requirement uses that machine's own highest stage.
+A machine without a Mastery family has a family for orders only. Its tier stage requirement uses that machine's own highest stage. The Component Assembler has no chassis stage, so its chips need none.
 
 ## Dispatch Terminal
 
@@ -129,8 +130,8 @@ The **Dispatch Terminal** is the vendor:
 ## Requisitions
 
 - `rngtech:requisition` is crafted. Its recipe is gated by an RNGTech challenge, following the Seal and Volatile Catalyst precedent, and sits under a `rngtech:work_order_recipes_enabled` condition and the `workOrders.recipesEnabled` config key.
-- Requisitions are one of the reward kinds a job can pay, so some jobs fund more refreshes. No job pays them by default.
-- Draft recipe: a Calibrated Logic Component (65+ stability), Paper, Steel Plates, and Basic Electric Circuits. One recipe makes two.
+- Requisitions are one of the reward kinds a job can pay, so some jobs fund more refreshes. The default reward table pays them at every tier.
+- Recipe: a Calibrated Logic Component (65+ stability), Paper, Steel Plates, and Basic Electric Circuits. One recipe makes two.
 - Requisitions have no tier. The terminal rolls the tiers.
 
 ## Tiers
@@ -143,7 +144,7 @@ The **Dispatch Terminal** is the vendor:
 | IV | 7 | About 30 minutes on a good Stage 7 build |
 | V | 8 | About 30 minutes on a good Stage 8 build |
 
-The stage requirement is the lower of the tier's stage and the family's top stage, because the Metal Press tops out at Stage 4, the Alloy Furnace at 6, and the Melter has one body. Default orders have no Mastery level requirement. An order template can add one, and a condition can add one. Objective sizes are tuned to time on a reference build, and the tuning uses the processing balance simulation.
+The stage requirement is the lower of the tier's stage and the family's top stage, because the Metal Press and Forestry Companion top out at Stage 4, the Alloy Furnace and Melter at 6, and the Resonance Calibrator at 7. Default orders have no Mastery level requirement. An order template can add one; a condition that adds one (Veteran Crew) is [open](#open-items). Objective sizes come from one good-build speed table per family and tier: the processing balance simulation's 75th percentile build for the Crusher and Furnace, and the speeds the earlier counts implied for the other families, which still need playtest timings.
 
 ## Objectives
 
@@ -151,40 +152,41 @@ Objectives come from `data/rngtech/work_orders/objectives/*.json`. Each entry na
 
 The mix should feel balanced, with no one kind dominating. Draft kinds, tuned by entry weight rather than fixed rules:
 
-- **Specific items:** one to three named items, each with its own count, such as "Smelt 96 Tin Dust and 64 Copper Dust". An entry lists options, each a recipe id, an input tag, or an output item or tag, with a weight and a stage. The terminal picks the parts when it rolls the job, never the same option twice in one job. Each part counts separately, and the job is done when every part is.
+- **Specific items:** one to three named items, each with its own count, such as "Smelt 96 Tin Dust and 64 Copper Dust". An entry lists options, each an item or fluid id (the input for the Crusher and Furnace, the output for the other machines), with a weight and a stage. The terminal picks the parts when it rolls the job, never the same option twice in one job. Each part counts separately, and the job is done when every part is.
 - **Groups of work:** one or two kinds of output, counted across every recipe of that kind, such as "Press 96 plates and 48 gears" on the Metal Press (by mold: plates, gears, casings, connectors) or "Calibrate 24 Logic components" on the Resonance Calibrator (by calibration family). A group entry uses `"filter": "group"` with options naming the groups its family reports.
 - **Any work of a stage:** a count of any completed work whose recipe is at or above a stage, such as "Crush 256 items of Stage 6 or higher".
 - **Broad counts:** a large count of any completed work, with no stage or item filter, such as "Smelt 768 items".
 - **Work with a machine filter:** a count of work done a particular way, such as "Smelt 192 items with the heat slider at 50% or more" or "Crush 256 ores that need Processing Level 6 or more".
-- **Stat goals:** reach a value of one of the machine's effective stats, such as "Reach 2,000 Max Temperature" on a Furnace, or "Reach 40% Bonus Output Chance" on a Crusher. They reward building and refining the machine rather than running it longer.
+- **Stat goals:** reach a value of one of the machine's effective stats, such as "Reach 1.6 Heat Transfer" on a Furnace, or "Reach 3.1 Processing Speed" on a Crusher. They reward building and refining the machine rather than running it longer. Only the Crusher and Furnace ship stat goals.
 
 ### Counts and targets
 
-Any-work, stage, and setting parts of machines with recipes count work, not items: each item counts as its recipe's base time over a reference time for the family, so quick filler recipes cannot finish a job. Each tier's goal is a range, not one number: a count range for counted parts, and a target range for stat goals. The terminal rolls a value in the range and rounds it to the entry's step, such as a multiple of 8 items or 50 °C, so jobs read cleanly and rarely stack. Draft: ranges stay within about 20% either side of their middle, so jobs of one tier stay comparable. A single number still works and means a fixed goal. Broad counts use larger ranges than specific items, because any work counts toward them.
+Any-work, stage, and setting parts of machines with recipes count work, not items: each item counts as its recipe's base time over a reference time for the family, so quick filler recipes cannot finish a job. Each tier's goal is a range, not one number: a count range for counted parts, and a target range for stat goals. The terminal rolls a value in the range and rounds it to the entry's step, such as a multiple of 8 items or 50 °C, so jobs read cleanly and rarely stack. Draft: ranges stay within about 20% either side of their middle, so jobs of one tier stay comparable. A single number still works and means a fixed goal. Any-work and stage jobs of one tier ask for the same work, and a specific-item part is half a stage job's count, since an item job has two parts on average.
 
 The range is split into three equal bands: low, middle, and high. The band sets a Bounty bonus, which makes the reward bigger. Every value inside one band pays the same. Draft bonuses: low +0%, middle +10%, high +20% Bounty. A fixed goal has no bands and no bonus. A job with several parts uses the band of its largest part.
 
 ### Examples
 
+Counts are illustrative; the shipped ranges are in the objective files.
+
 | Family | Kind | Example |
 |---|---|---|
-| Crusher | Specific items | Crush 96 Raw Tin and 64 Raw Lead |
-| Crusher | Any work of a stage | Crush 256 items of Stage 6 or higher |
-| Crusher | Broad count | Crush 640 items |
-| Crusher | Machine filter | Crush 256 ores that need Processing Level 6 or more |
-| Crusher | Stat goal | Reach 40% Bonus Output Chance |
-| Furnace | Specific items | Smelt 180 Naquadah Dust |
-| Furnace | Any work of a stage | Smelt 192 items of Stage 5 or higher |
-| Furnace | Broad count | Smelt 768 items |
-| Furnace | Machine filter | Smelt 192 items with the heat slider at 50% or more |
-| Furnace | Stat goal | Reach 2,000 Max Temperature |
-| Alloy Furnace | Any work of a stage | 96 Stage 6+ alloy cycles |
-| Metal Press | Machine filter | 200 presses in a row without a failure |
-| Melter | Any work of a stage | Melt 48,000 mB of Stage 6+ metal |
-| Resonance Calibrator | Machine filter | 12 calibrations in a row at 80+ stability |
-| Forestry Companion | Machine filter | Harvest 300 trees with a Stage 6+ head |
-| Component Assembler | Any work of a stage | Assemble 64 Stage 5+ components |
-| Component Recycler | Any work of a stage | Recycle 96 Stage 4+ parts |
+| Crusher | Specific items | Crush 336 Raw Tin and 296 Raw Lead |
+| Crusher | Any work of a stage | Crush 1,600 items of work needing Processing Level 6+ |
+| Crusher | Broad count | Crush 680 items of work |
+| Crusher | Stat goal | Reach 3.1 Processing Speed |
+| Furnace | Specific items | Smelt 72 Crushed Lead |
+| Furnace | Any work of a stage | Smelt 640 items of work of Stage 5 or higher |
+| Furnace | Machine filter | Smelt 140 items of work with the heat slider at 50% or more |
+| Furnace | Stat goal | Reach 1.6 Heat Transfer |
+| Alloy Furnace | Any work of a stage | Alloy 168 items of work from Stage 6+ recipes |
+| Metal Press | Group | Press 96 plates and 48 gears |
+| Metal Press | Streak | Press 200 times in a row without a failure |
+| Melter | Specific fluid | Make 32 B of Lubricant |
+| Resonance Calibrator | Streak | Calibrate 12 components in a row at 80+ stability |
+| Forestry Companion | Machine filter | Fell 640 logs with a Stage 3+ head |
+| Component Assembler | Any work of a stage | Assemble 40 Battery Cells of Stage 5+ |
+| Component Recycler | Any work of a stage | Recycle 40 parts of Stage 4+ |
 
 ### Rules
 
@@ -194,52 +196,55 @@ The range is split into three equal bands: low, middle, and high. The band sets 
 - A stat goal reads the machine's effective stat with every source applied: traits, Gear, Mastery, and the chip's own conditions. It is met at the first job the machine completes while the stat is at or above the target, so the build has to run, not just be installed for a moment. Until then the Orders tab shows the current value against the target.
 - A stat goal entry uses `"filter": "stat"`, names its `stat`, and gives each tier a `target` in the stat's own units (such as `3.1` Processing Speed or `12` Super Output Chance), fixed or as a `min`/`max`/`step` range. Targets are kept in hundredths. A template part can be a stat goal the same way. The Orders tab and the chip show the machine's value at its last completed job against the target, written the way the Stats tab writes that stat.
 - A stat goal asks for a stat; it never grants one. Only stats players can raise through Gear, refinement, or Mastery can be goals, listed per family in the entry.
-- An objective must be reachable on every chassis that meets the job's stage requirement. A domain check runs each counted part's filters against the family's recipes, and each stat goal's top target against a reference build of that stage from the processing balance simulation.
+- An objective must be reachable on every chassis that meets the job's stage requirement. A domain check runs each counted part's filters against the family's recipes, and every work job's middle count against the good-build speed table. Checking each stat goal's top target against a reference build of that stage is [open](#open-items); the shipped targets were drafted from the simulation at Mastery level 1.
 - New objective kinds and filters need a reporting hook in each machine that uses them.
 
 ## Order Templates
 
-Pack makers write fixed jobs in `data/<namespace>/work_orders/templates/*.json`. A template sets any of these and leaves the rest to roll: family, tier, objective (an objective id, or inline parts or a stat goal with fixed values or ranges), requirements (chassis stage, Mastery level), rarity, conditions, Bounty, Prestige, a display name, a fixed reward, and a reward table that replaces `rngtech:challenges/work_order` for this job.
+Pack makers write fixed jobs in `data/<namespace>/work_orders/templates/*.json`. A template sets any of these and leaves the rest to roll: family, tier, objective (an objective id, or inline parts or a stat goal with fixed values or ranges), requirements (chassis stage, Mastery level), rarity, Bounty, Prestige, a display name, a fixed reward, and a reward table that replaces `rngtech:challenges/work_order` for this job. Naming a template's conditions is [open](#open-items); a template's conditions always roll.
 
 - `/rngtech work_order give <players> template <template> [tier]` gives a template's chip; the tier only applies when the template leaves it unset. `/rngtech work_order give <players> random [tier]` rolls one the way the terminal does, of the given tier or a random one; with random jobs off, it rolls from the pooled templates instead.
 - Quests hand out template chips through the give command or an item reward with the chip's components.
 - A template can join the Dispatch Terminal's pools with a weight, or stay quest-only.
-- Template fields left unset still roll, so a template can fix only the family and objective and keep random conditions. A template that sets every field is fully specific.
+- Template fields left unset still roll, so a template can fix only the family and objective and keep random conditions.
 
 The shipped format, with every key, is on the wiki's [Modpack Creators](https://c-pettersson.github.io/rngtech/modpack-creators/#job-templates) page.
 
 ## Conditions
 
-Conditions are affixes on the order, drawn from a `work_order` eligibility profile. Prefixes are **pressure** conditions on the machine's stats. Suffixes are **rule** conditions on the job. Each condition adds Bounty, Prestige, or both. Draft pool:
+Conditions are affixes on the order, drawn from a `work_order` eligibility profile. Prefixes are **pressure** conditions on the machine's stats. Suffixes are **rule** conditions on the job. Each condition adds Bounty, Prestige, or both, except Short Fuse, which pays only when the chip is Rushed. The pool:
 
 | Slot | Condition | Effect while active | Reward | Families |
 |---|---|---|---|---|
 | Prefix | Starved Feed | 15%–30% less Processing Speed | +15%–30% Bounty | All |
 | Prefix | Power Surcharge | 25%–50% increased Energy Usage | +10%–25% Bounty | All except Forestry Companion |
-| Prefix | Short Crew | −1 Batch Size, where the machine has 2 or more | +30% Bounty | Machines that read Batch Size |
-| Prefix | Unsteady Hands | 10–20 less Stability | +15%–25% Bounty | Machines that read Stability |
-| Prefix | Thin Margins | The overheat safe band is 25%–50% narrower | +20%–35% Bounty | Furnace, Alloy Furnace, Metal Press, Melter |
-| Prefix | Cold Start | 10–20 less Temperature Stability | +15%–25% Bounty | Furnace, Alloy Furnace, Metal Press, Melter |
-| Prefix | Veteran Crew | Needs Mastery level 60–90 to load | +20%–40% Bounty, +1 Prestige | Mastery families |
-| Suffix | of Hand Feeding | Instant Process does not trigger | +20% Bounty | Machines that roll Instant Process |
-| Suffix | of Brittle Lining | A heat failure or Malformed Ingot resets progress to 0 | +35% Bounty, +1 Prestige | Furnace, Alloy Furnace, Metal Press |
-| Suffix | of Fine Tolerance | A calibration below the objective's stability resets progress to 0 | +35% Bounty, +1 Prestige | Resonance Calibrator |
-| Suffix | of Deep Ore | Only work on recipes one stage above the objective's filter counts | +25% Bounty, +1 Prestige | All |
+| Prefix | Short Crew | −1 Batch Size, never below 1 | +30% Bounty | Crusher, Furnace, Alloy Furnace, Metal Press, Melter, Resonance Calibrator |
+| Prefix | Unsteady Hands | 10%–20% reduced Stability | +15%–25% Bounty | Metal Press, Resonance Calibrator |
+| Prefix | Thin Margins ([open](#open-items)) | The overheat safe band is 25%–50% narrower | +20%–35% Bounty | Furnace, Alloy Furnace, Metal Press, Melter |
+| Prefix | Cold Start | 10%–20% reduced Temperature Stability | +15%–25% Bounty | Furnace, Alloy Furnace, Metal Press; the Melter is [open](#open-items) |
+| Prefix | Veteran Crew ([open](#open-items)) | Needs Mastery level 60–90 to load | +20%–40% Bounty, +1 Prestige | Mastery families |
+| Suffix | of Hand Feeding | Instant Process does not trigger | +20% Bounty | Crusher; other machines that roll Instant Process are [open](#open-items) |
+| Suffix | of Brittle Lining | A heat failure resets progress to 0 | +35% Bounty, +1 Prestige | Furnace, Alloy Furnace, Metal Press |
+| Suffix | of Fine Tolerance | A calibration below the objective's stability resets progress to 0 | +35% Bounty, +1 Prestige | Resonance Calibrator stability jobs |
+| Suffix | of Deep Ore | Only work on recipes one stage above the objective's filter counts | +25% Bounty, +1 Prestige | Stage jobs |
 | Suffix | of the Jammed Line | A Crusher jam resets progress to 0 | +30% Bounty, +1 Prestige | Crusher |
+| Suffix | of the Short Fuse | The Rush clock is 25%–60% shorter | +25%–60% Rush reward, only when Rushed | All |
 
 Rules:
 
-- Phase 6 ships the conditions the Crusher and Furnace can read: Starved Feed, Power Surcharge, Short Crew, Cold Start (Furnace), of Hand Feeding (Crusher), of Brittle Lining (Furnace), of the Jammed Line (Crusher), and of Deep Ore (stage jobs). Thin Margins needs a safe-band reader, Veteran Crew is a load requirement rather than a stat cost, and Unsteady Hands and of Fine Tolerance have no Crusher or Furnace reader; they wait for later machines or phases. Hand Feeding is a suffix in the shipped pool, since it changes a rule rather than a stat's size.
+- Every condition in the table ships except Thin Margins, which needs a reader for the overheat safe band, and Veteran Crew, a load requirement rather than a stat cost. Hand Feeding is a suffix, since it changes a rule rather than a stat's size. A condition can need a filter on the job: Deep Ore needs a stage part, and Fine Tolerance a stability part.
 - Listed jobs roll Normal, Magic, or Rare at 50/35/15 (draft). Normal chips exist: half the listings are plain jobs, and conditions are a choice the player takes for more Bounty.
 - Rarity sets the condition count: Normal 0, Magic 1–2, Rare 3–4. Normal orders still pay a base reward. Rarity changes only the conditions, never the kind of job: any rarity can be a work objective, an item objective, or a stat goal.
 - Condition tiers follow normal affix tiers. A higher tier is a harsher cost and a larger reward.
 - Because an order knows its family, only conditions that family can read roll on it.
-- Every pressure condition is a cost. The pool loader rejects an entry that raises any stat, so a condition can never add yield, FE, Refinement Potential, Gear stage acceptance, or speed.
-- Condition effects are one more effect source on the machine. They apply after Gear, tree, and ascendancy effects, only while the order is active, and the Bonus Summary drawer lists them in their own Work Order section. Machines without Mastery read them through the same source.
+- Every pressure condition is a cost. Conditions are defined in code, and a domain check fails on any that raises a stat, so a condition can never add yield, FE, Refinement Potential, Gear stage acceptance, or speed.
+- Condition effects are one more effect source on the machine. They apply after Gear, tree, and ascendancy effects, only while the order is active, and a stat breakdown labels them "Work Order: <condition>". A Work Order section in the Bonus Summary drawer is [open](#open-items). Machines without Mastery read them through the same source.
 
 ### Rush
 
-Rush is the one condition the player adds when activating an order. It never rolls on an order, and refinement cannot add or remove it.
+Rush is a deadline the player adds by starting a chip with Rush instead of Activate. It never rolls on an order, and refinement cannot add or remove it.
+
+- Rush only starts a job: a chip with any progress, or a best streak, cannot be Rushed, and a loaded chip never starts on its own.
 
 - The Orders tab shows the deadline before the player commits.
 - The deadline is half the time a good build of the tier's stage needs for the job's work, so a bigger rolled job gets more time; stat goals and jobs that count no recipe time keep half the tier's target time. Rush adds 50% to the listed reward's amount. The first draft, 1.5 times the target time, was no pressure in playtest, and a fixed half of the target time was still beaten by strong builds.
@@ -252,9 +257,11 @@ Rush is the one condition the player adds when activating an order. It never rol
 A Job Chip is a refinement target like a machine part:
 
 - **Affix Injector** adds a condition, **Affix Upgrader** raises one condition's tier, **Nullifier Coil** and **Null Crystal** remove one, **Chaos Crystal** rerolls them, and the ascension items promote rarity. Each spends the chip's Refinement Potential as usual.
-- The **Volatile Catalyst** corrupts a chip. Job Chips get their own corruption pools:
-    - Blessed: a larger reward, +1 Prestige, or a condition that adds reward with no cost.
+- The **Volatile Catalyst** corrupts a chip. It rolls the shared corruption odds, then resolves the outcome for the chip, because the corruption pools hold machine stats, not pay:
+    - Blessed: half again the reward, +1 Prestige, or a condition that adds reward with no cost.
     - Blighted: one extra condition that adds no reward.
+    - Reforged rerolls the conditions at the chip's rarity; Warped rerolls each condition's value within its tier; Untouched only marks the chip.
+    - Every outcome leaves the chip Corrupted, and a corrupted chip takes no more refinement.
 - The [Phase Array](phase-array.md) rejects Job Chips. Its costs are sized for permanent Gear, not a consumable.
 - A chip in a drive bay is not a target. Pulled out, it is a target again, with its progress kept.
 
@@ -283,28 +290,30 @@ Draft default reward kinds:
 
 ## Storage and Saves
 
-- An eligible machine stores its chips in a `rngtech:work_orders` component on the block entity: up to three, each with its full job data plus `progress`, `best_streak`, and `rush_deadline`, and the index of the active one. The persistent codec is lenient, so a chip that no longer decodes is dropped without touching the machine's other data.
+- An eligible machine stores its chips in a `rngtech:work_orders` component on the block entity: up to three, each with its full job data plus `progress`, `best_streak`, `rush_deadline`, and `work_carry` (recipe time short of one whole item of work), and the index of the active one. The persistent codec is lenient, so a chip that no longer decodes is dropped without touching the machine's other data.
 - The drive bays are slots over that component: inserting a chip loads it, and pulling one out returns a chip that carries its progress in `rngtech:work_order_progress`.
-- Breaking a machine keeps its chips on the dropped item, the same way the machine keeps its traits.
+- Breaking a machine keeps its chips on the dropped item, the same way the machine keeps its traits. The Forestry Companion keeps them on the cart item.
 - Chips stay with the machine. They do not move with Mastery through a Soul Transfer.
 - A Job Chip stores its traits like other refinement targets, plus `rngtech:work_order` data: family, tier, objective, requirements, Bounty, Prestige, the listed reward, and an optional template id.
 
 ## Loop Prevention
 
-Conditions only add costs, and the pool loader rejects any entry that raises a stat. Rewards are items with no FE value: Job Chips, Completed Job Chips, and Requisitions have no Component Recycler or Potential Reactor recipe, and the default reward table has no material, fuel, or ingot entries. The recipe loop audit needs no new allowlist entries. A ModDex check confirms that no recycling or reactor recipe accepts any of the three items.
+Conditions only add costs, and a domain check fails on any condition that raises a stat. Machines roll no loot on their own events; the Work Order table is the one shipped `rngtech:challenge` table. Rewards are items with no FE value: Job Chips, Completed Job Chips, and Requisitions have no Component Recycler or Potential Reactor recipe, and the default reward table has no material, fuel, or ingot entries. The recipe loop audit needs no new allowlist entries. A ModDex check confirms that no recycling or reactor recipe accepts any of the three items.
 
 ## UI
 
 - **Dispatch Terminal screen:** a terminal display with no player inventory. Six job lines show each chip's machine, tier, job, requirements, and reward, with a Download button that moves the chip into the inventory; hovering a line shows the chip's full tooltip. Refresh and the Requisition count sit below the display.
-- **Orders tab:** its own tab on every eligible machine, beside Mastery. It shows three drive bays as real chip slots with the player's inventory below, the active chip's job, per-part progress, best streak, and Rush countdown, and Activate, Pause, and Abandon controls. Bays refuse a chip for another family or one the machine does not meet.
+- **Orders tab:** its own tab on every eligible machine, beside Mastery. It shows three drive bays as real chip slots with the player's inventory below, the active chip's job, per-part progress, best streak, and Rush countdown, and Activate, Pause, Rush, and Abandon controls. Rush is greyed out with its reason once a chip has progress. Bays refuse a chip for another family, one the machine does not meet, a blank chip, or an expired Rush chip. Fluid amounts read in SI form (mB, B, MB).
 - **Tooltip:** family, tier, job with each part, requirements, rarity, conditions, and the reward it pays.
 - **Completed Job Chip tooltip:** tier, family, and the reward it pays.
-- **Bonus Summary drawer:** a Work Order section that lists each active condition's effect.
-- **Jade:** the active chip's job and progress, and the Rush countdown.
-- **Machine model:** where a shaped model has room, a drive bay panel shows one lit chip per inserted chip, the active one brighter. Machines without room show a status light only. This follows the diegetic-cue rule; there is no floating icon.
-- **JEI:** an information page for Job Chips, the Dispatch Terminal, and Requisitions that explains tiers and the reward kinds.
+- **Bonus Summary drawer:** a Work Order section that lists each active condition's effect. [Open](#open-items).
+- **Jade:** the active chip's job and progress, and the Rush countdown, on block machines. The Forestry Companion cart shows none, since it is an entity; that is [open](#open-items).
+- **Machine model:** every block machine that loads chips has a small blue Job Chip lamp beside its status lamp, lit while a chip is active. Drive bay panels that show one lit chip per inserted chip are [open](#open-items). This follows the diegetic-cue rule; there is no floating icon.
+- **JEI:** information pages for the Dispatch Terminal, Job Chips, Completed Job Chips, and Requisitions. Explaining the tiers and reward kinds there is [open](#open-items).
 
 ## Delivery Phases
+
+Phases 1 to 8 and 10 shipped; phase 9 shipped in part. [Open Items](#open-items) lists what is left.
 
 1. **PRD and state.** This document and [its state page](work-orders-state.md).
 2. **Order data and storage:** the readable job data, the `rngtech:work_orders` machine component with three slots and an active index, drop carry, and round-trip checks.
@@ -316,7 +325,7 @@ Conditions only add costs, and the pool loader rejects any entry that raises a s
 6. **Conditions:** the `work_order` eligibility profile and pool, conditions as an effect source on any machine, reset-on-event rule conditions, and Rush.
 7. **More jobs and machines:** stat goals for the Crusher and Furnace, then objectives and progress hooks for the other Mastery families and the machines without Mastery, starting with the Component Assembler.
 8. **Refinement and corruption:** order corruption pools and Phase Array rejection.
-9. **UI polish:** the Bonus Summary section, Jade, JEI, and the drive bay panels on machine models.
+9. **UI polish:** Jade, JEI, Affix Forge condition text, and the Job Chip lamp shipped; the Bonus Summary section and drive bay panels are open.
 10. **Documentation:** a wiki page, Machine Mastery and Rarity updates, the implementation matrix, the GuideME guide, a Machine Design Notes entry, and an FTB Quests chapter.
 
 ## Test Plan
@@ -327,12 +336,12 @@ Domain checks (`masteryCheck`):
 - Switching the active order keeps every order's progress and best streak.
 - Pulling a chip out of its bay returns a chip that loads again with its progress.
 - The terminal's listing for a given seed is stable, and rolled conditions only come from the job family's readable pool.
-- Every counted part's filters match at least one loaded recipe on every chassis that meets the job's stage requirement, and every stat goal's top target is reachable on a reference build of that stage.
+- Every counted part's filters match at least one loaded recipe on every chassis that meets the job's stage requirement, and every work job's middle count takes a good build about the tier's target time. Every stat goal's top target is reachable on a reference build of that stage ([open](#open-items)).
 - A specific-item job has one to three parts, never the same option twice, and is done only when every part is.
 - A rolled count or target stays inside its tier's range and lands on the entry's step, and its band's Bounty bonus matches the band the value falls in.
 - A specific-item part never rolls an option whose recipe is not loaded.
 - A stat goal is met at the first completed job with the stat at or above its target, and not while the machine is idle.
-- The condition pool loader rejects any entry that raises a stat.
+- No condition raises a stat.
 - A reset-on-event condition resets progress, and the best streak stays.
 - A rolled reward is one kind, and Bounty scales its amount: 100% pays the base amount, 150% half again, over a seeded sample.
 - Rush expires an order at its deadline and drops nothing.
@@ -363,6 +372,8 @@ In-game checks:
 - With the recipe config off, the recipes are absent, and a template order from a command still works.
 - With random jobs off, the terminal lists only pooled templates.
 - Check the target times against the tier table on a reference build of each family.
+
+The recipe-config, template, and random-jobs-off checks, and the target times for families other than the Crusher and Furnace, have not been run in a client.
 
 ## Acceptance Criteria
 
@@ -402,6 +413,28 @@ Resolved 2026-10-25, after playtesting the Dispatch Board. These replace the pap
 - Orders are Job Chips, a fit for a tech mod. The Dispatch Terminal replaces the Dispatch Board, and machines take chips in three real drive bays on the Orders tab, with no automation.
 - Each job pays one kind of reward, scaled by tier and Bounty. Requisitions are one possible kind, not paid by every job.
 - The job mix is balanced across specific items (one to three), any work of a stage, broad counts, machine filters, and stat goals. The examples are tuning targets, not hard rules.
+
+Resolved 2026-10-26, after playtesting the shipped machines:
+
+- Any-work, stage, and setting jobs count recipe time, not items, so filler recipes cannot finish them. Job sizes come from one good-build speed table per family and tier, which also sets the Rush clock.
+- Rush's clock is half a good build's time for the job's work, and strong builds beat it on purpose. The suffix of the Short Fuse makes Rush a real race for more reward, paid only when Rushed.
+- Rush only starts a job, and a loaded chip waits for Activate or Rush.
+- Machines roll no challenge loot on their own events, so nothing drops in the world. Work Orders are the main Glyph source and the only default Tier V source.
+- The Component Assembler is stageless; the Component Recycler uses its own chassis stages; the manual Crude Recycler takes no chips.
+
+## Open Items
+
+Specified above, not built:
+
+- The Thin Margins and Veteran Crew conditions.
+- of Hand Feeding on machines other than the Crusher that roll Instant Process, and Cold Start on the Melter.
+- Condition data that packs can replace; conditions are defined in code.
+- Naming conditions in a template.
+- A domain check of each stat goal's top target against a reference build.
+- The Bonus Summary drawer's Work Order section.
+- Drive bay panels on shaped machine models.
+- JEI pages that explain tiers and reward kinds, and Jade for the Forestry Companion cart.
+- Playtest timings for every family's job sizes; only the Crusher and Furnace are tuned from the simulation.
 
 ## Open Questions
 
