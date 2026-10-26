@@ -7,6 +7,7 @@ import { checkAscendancyDocs } from "./export-ascendancy-data.mjs";
 import { checkRecipeLoopMutations, checkRecipeLoops } from "./check-recipe-loops.mjs";
 import { checkRecyclingReturns } from "./check-recycling-returns.mjs";
 import { checkVolatileCatalyst } from "./check-volatile-catalyst.mjs";
+import { checkWorkOrders } from "./check-work-orders.mjs";
 
 const { server, url } = await startModdexServer({ port: 0, log: false });
 
@@ -118,6 +119,7 @@ try {
     await checkRecyclingReturns();
     await checkAscendancySeals();
     await checkVolatileCatalyst();
+    await checkWorkOrders();
     await checkUniques();
     await checkScreenStrings();
     await checkAscendancyView(url);

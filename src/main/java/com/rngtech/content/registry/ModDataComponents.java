@@ -12,6 +12,10 @@ import com.rngtech.rpg.MachineTraits;
 import com.rngtech.rpg.OutputAmountTracker;
 import com.rngtech.rpg.progression.MachineProgressionState;
 import com.rngtech.rpg.progression.SoulTransfer;
+import com.rngtech.rpg.workorder.FulfilledWorkOrder;
+import com.rngtech.rpg.workorder.MachineWorkOrders;
+import com.rngtech.rpg.workorder.WorkOrder;
+import com.rngtech.rpg.workorder.WorkOrderProgress;
 
 import com.mojang.serialization.Codec;
 import net.minecraft.core.component.DataComponentType;
@@ -173,6 +177,21 @@ public final class ModDataComponents {
                             .networkSynchronized(ByteBufCodecs.VAR_INT)
                             .cacheEncoding()
             );
+    /** A Work Order item's family, tier, job, requirements, Bounty, and Prestige. A stack without it is blank and never loads. */
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<WorkOrder>> WORK_ORDER =
+            DATA_COMPONENTS.registerComponentType("work_order", builder -> builder
+                    .persistent(WorkOrder.CODEC).networkSynchronized(WorkOrder.STREAM_CODEC).cacheEncoding());
+    /** The progress an unloaded Work Order keeps until it is loaded again. */
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<WorkOrderProgress>> WORK_ORDER_PROGRESS =
+            DATA_COMPONENTS.registerComponentType("work_order_progress", builder -> builder
+                    .persistent(WorkOrderProgress.CODEC).networkSynchronized(WorkOrderProgress.STREAM_CODEC).cacheEncoding());
+    /** The Work Orders loaded into a machine, kept on its dropped item. */
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<MachineWorkOrders>> WORK_ORDERS =
+            DATA_COMPONENTS.registerComponentType("work_orders", builder -> builder
+                    .persistent(MachineWorkOrders.CODEC).networkSynchronized(MachineWorkOrders.STREAM_CODEC).cacheEncoding());
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<FulfilledWorkOrder>> FULFILLED_WORK_ORDER =
+            DATA_COMPONENTS.registerComponentType("fulfilled_work_order", builder -> builder
+                    .persistent(FulfilledWorkOrder.CODEC).networkSynchronized(FulfilledWorkOrder.STREAM_CODEC).cacheEncoding());
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<Integer>> CAVITATION_ROTOR_WEAR =
             DATA_COMPONENTS.registerComponentType(
                     "cavitation_rotor_wear",

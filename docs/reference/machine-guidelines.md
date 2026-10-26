@@ -76,6 +76,7 @@ Use these tab responsibilities consistently.
 | Stats | Effective stats that apply to this machine's actual capabilities. |
 | Refinement | Shared placed-machine refinement UI for compatible machines. |
 | Mastery | Machine-owned XP, level, unspent passive points, and passive-tree nodes for machines that implement progression. |
+| Orders | Three Work Order drive bays and the active job's progress, on every processing machine, with or without Mastery. |
 
 Battery Cells are Gear, not Process. A processing machine may expose a side-insertable Battery Cell slot for automation, but the UI should still present it as equipment.
 
@@ -361,7 +362,8 @@ Design intent and balance rules behind shipped machines that the code does not s
 - A signature stays a benefit at its worst roll, and a drawback stays a penalty at its best roll. Drawbacks are visible stat lines or missing behaviors, never hidden rules.
 - Ascendancy hooks apply only on a machine with that ascendancy. Gate them through the hook role, not through stats that only matter by coincidence.
 - No Unique adds yield until the recipe loop audit covers the Unique catalog. A yield penalty is allowed.
-- A pack can move a Unique to challenge loot, quests, or its own tables, or add its own Uniques from `config/rngtech/uniques/`; default sources stay vanilla structures and mobs, and the shipped challenge tables stay empty.
+- A pack can move a Unique to quests or its own tables, or add its own Uniques from `config/rngtech/uniques/`; default sources stay vanilla structures and mobs.
+- Machines roll no loot on their own events. A reward never drops on top of a machine or lands in its output slot, where it would block the machine and flow down automated lines.
 - The catalog file format is a public API for packs. Keep old stat and behavior names working through aliases, and bump the format `version` for incompatible changes. Update `extras/uniques/README.md` with it.
 
 ### Dormant Machines
@@ -376,6 +378,19 @@ Design intent and balance rules behind shipped machines that the code does not s
 - Sites are occasional finds, one machine each: the Collapsed Workshop about as common as a ruined portal, the End Relay rarer than an End city. The derelict Forestry Companion takes power only from its cells, since cables cannot reach an entity; its site is sized for that.
 - Generated builds take only notables whose every effect the family reads, never keystones, so a found soul carries no hidden trade-off.
 - The screen is a deliberate exception to the gray panel in [Machine GUI Design](machine-gui-design.md#visual-style): worn gunmetal with a light magic touch, keeping the left-to-right flow, the bottom inventory, shape-coded status, and exact values in tooltips. Soul light is pale cyan-white, never purple or magenta.
+
+### Work Orders
+
+- Work Orders are a goal layer, never a power source. Conditions only cost the machine, and rewards are refinement currency, Requisitions, Glyphs, and Uniques: never FE, yield, materials, Mastery XP, tree points, or Seals. `check-work-orders.mjs` keeps chips and Requisitions out of recycling and reactor recipes, so the recipe loop audit needs no allowlist entry.
+- A job shows everything before the player commits: it is rolled when the terminal lists it, conditions are visible affixes, and Rush is the only deadline, added by the player with its time shown. No penalty is hidden.
+- Each job pays one reward kind, so picking a job is picking what to earn. Count bands, conditions, Rush, and corruption raise Bounty, which grows that one reward; they never add kinds.
+- Tiers ask for chassis stages 4 to 8, capped at the family's top stage, so Stage 7 and 8 bodies get work lower stages cannot take. Job sizes target 15 to 30 minutes on a good build of the tier's stage, from one speed table per family that also sets the Rush clock. Machines whose work eats scarce materials (Calibrator, Assembler, Recycler) are sized by those materials instead, and the table sets only their Rush clock. Broad jobs count recipe time, not items, so no quick filler recipe can finish them.
+- Rush is meant to be failable. The plain clock is half a good build's time and strong builds beat it; the Short Fuse condition is the opt-in way to make it a real race, and its pay applies only when the chip is Rushed.
+- Only processing machines take chips. A new processing machine joins by reporting its finished work through `WorkOrderHost`, getting an Orders tab, and shipping objectives for its family. A new filter, streak, group, or condition needs a reporting hook in every family that offers it; families list their groups, streaks, and goal stats explicitly, and the loaders reject the rest.
+- A stat goal asks for a stat players can raise through Gear, refinement, or Mastery, and is met only at a finished job, so the build has to run. Its top target must be reachable on a reference build of the tier's stage.
+- Chips are moved by hand. Drive bays take no automation, and only the active chip counts work or applies conditions.
+- A condition must cost something its family reads, or add a rule it reports, and is offered only to jobs that can use it. Corruption on a chip resolves to pay and conditions, because the shared corruption pools hold machine stats. The Phase Array refuses chips: its costs are sized for permanent Gear, not a consumable.
+- The Dispatch Terminal and Requisitions are gated by a Stage 4 calibration, not vanilla items, and sit behind `workOrders.recipesEnabled` so packs can hand them out another way.
 
 ## Documentation
 

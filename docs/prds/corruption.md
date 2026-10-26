@@ -48,7 +48,7 @@ Key existing code:
 - The Stabilization Crystal removes the negative outcome when it is in the focus slot.
 - Corruption implicits never add yield or Refinement Potential in 2.0.
 - The catalyst is gated by RNGTech's own challenges, not by vanilla items or exploration. Its recipe mirrors the Seals: Seals reward precision, and the catalyst rewards controlled instability.
-- Pack makers can disable the catalyst recipe and award catalysts another way, such as quests or [challenge loot](uniques.md#challenge-loot).
+- Pack makers can disable the catalyst recipe and award catalysts another way, such as quests.
 
 ## Non-Goals
 
@@ -173,7 +173,7 @@ Supporting changes:
 - `rngtech:jam_debris` is a plain item with no RPG traits. A jam that drops debris still costs its normal time and FE, and the input is not consumed. Rockbreaker's jam reduction and the Mineshaft Worn Pick-Jaw's extra jam chance both change how fast debris arrives. That trade-off is intended.
 - The Volatile Catalyst and Jam Debris have no Component Recycler or Potential Reactor recipes.
 
-Pack makers can disable the recipe and award catalysts through quests, their own recipes, or the [challenge loot hooks](uniques.md#challenge-loot) defined in the Uniques PRD.
+Pack makers can disable the recipe and award catalysts through quests or their own recipes.
 
 ## Loop Prevention
 

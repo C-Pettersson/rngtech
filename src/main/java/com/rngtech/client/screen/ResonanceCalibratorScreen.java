@@ -5,7 +5,9 @@ import com.rngtech.content.blockentity.ResonanceCalibratorBlockEntity;
 import com.rngtech.content.calibration.CalibrationFamily;
 import com.rngtech.content.calibration.ResonanceCalibratorChassis;
 import com.rngtech.content.menu.ResonanceCalibratorMenu;
+import com.rngtech.content.menu.WorkOrderMenuSupport;
 import com.rngtech.content.registry.ModBlocks;
+import com.rngtech.content.registry.ModItems;
 import com.rngtech.rpg.MachineStat;
 import com.rngtech.rpg.progression.MachineMasteryFamily;
 import com.rngtech.rpg.progression.MegaPassiveNode;
@@ -104,6 +106,7 @@ public class ResonanceCalibratorScreen extends AbstractContainerScreen<Resonance
 
     private final MasteryScreenSupport<MegaPassiveNode> masterySupport;
     private final MachineTabs tabs;
+    private final WorkOrdersTab workOrdersTab;
 
     public ResonanceCalibratorScreen(ResonanceCalibratorMenu menu, Inventory playerInventory, Component title) {
         super(menu, playerInventory, title);
@@ -117,7 +120,9 @@ public class ResonanceCalibratorScreen extends AbstractContainerScreen<Resonance
                 .stats(ResonanceCalibratorMenu.TAB_CONFIGURATION)
                 .refinement(ResonanceCalibratorMenu.TAB_REFINEMENT)
                 .mastery(ResonanceCalibratorMenu.TAB_MASTERY)
+                .tab(ResonanceCalibratorMenu.TAB_ORDERS, "rngtech.tab.orders", ModItems.JOB_CHIP.get())
                 .build();
+        workOrdersTab = new WorkOrdersTab(menu, STAT_ACCENT);
         masterySupport = new MasteryScreenSupport<>(
                 MegaPassiveTree.TREE,
                 MegaPassiveTree.TREE.nodes(),
@@ -176,6 +181,12 @@ public class ResonanceCalibratorScreen extends AbstractContainerScreen<Resonance
         if (menu.selectedTab() == ResonanceCalibratorMenu.TAB_MASTERY) {
             masterySupport.renderTooltips(guiGraphics, font, leftPos, topPos, imageWidth, imageHeight, mouseX, mouseY);
         }
+        if (menu.selectedTab() == ResonanceCalibratorMenu.TAB_ORDERS) {
+            List<Component> orderTooltip = workOrdersTab.tooltip(mouseX, mouseY, leftPos, topPos, imageWidth, imageHeight);
+            if (!orderTooltip.isEmpty()) {
+                guiGraphics.renderComponentTooltip(font, orderTooltip, mouseX, mouseY);
+            }
+        }
         RefinementScreenStyle.renderTooltips(guiGraphics, font, leftPos, topPos, mouseX, mouseY, menu.selectedTab() == RefinementScreenStyle.REFINEMENT_TAB_INDEX, menu.machineTraits(), menu);
         renderLabelTooltips(guiGraphics, mouseX, mouseY);
         renderPatternSelectorTooltips(guiGraphics, mouseX, mouseY);
@@ -196,6 +207,8 @@ public class ResonanceCalibratorScreen extends AbstractContainerScreen<Resonance
             renderConfiguration(guiGraphics);
         } else if (menu.selectedTab() == ResonanceCalibratorMenu.TAB_REFINEMENT) {
             renderRefinement(guiGraphics);
+        } else if (menu.selectedTab() == ResonanceCalibratorMenu.TAB_ORDERS) {
+            workOrdersTab.render(guiGraphics, leftPos, topPos, imageWidth, imageHeight, mouseX, mouseY);
         } else {
             masterySupport.render(guiGraphics, leftPos, topPos, imageWidth, imageHeight, mouseX, mouseY);
         }
@@ -218,7 +231,7 @@ public class ResonanceCalibratorScreen extends AbstractContainerScreen<Resonance
             drawConfigurationLabels(guiGraphics);
         } else if (menu.selectedTab() == ResonanceCalibratorMenu.TAB_REFINEMENT) {
             drawRefinementLabels(guiGraphics);
-        } else {
+        } else if (menu.selectedTab() == ResonanceCalibratorMenu.TAB_MASTERY) {
             masterySupport.drawLabels(guiGraphics, font, imageWidth);
         }
     }
@@ -240,6 +253,10 @@ public class ResonanceCalibratorScreen extends AbstractContainerScreen<Resonance
             int tab = tabs.tabAt(mouseX, mouseY);
             if (tab >= 0) {
                 selectTab(tab);
+                return true;
+            }
+            if (menu.selectedTab() == ResonanceCalibratorMenu.TAB_ORDERS
+                    && workOrdersTab.mouseClicked(mouseX, mouseY, button, leftPos, topPos, imageWidth, imageHeight)) {
                 return true;
             }
             if (menu.selectedTab() == ResonanceCalibratorMenu.TAB_REFINEMENT
@@ -306,6 +323,9 @@ public class ResonanceCalibratorScreen extends AbstractContainerScreen<Resonance
     private void selectTab(int tab) {
         masterySupport.resetDragging();
         menu.selectTab(tab);
+        if (minecraft != null && minecraft.gameMode != null) {
+            minecraft.gameMode.handleInventoryButtonClick(menu.containerId, WorkOrderMenuSupport.BUTTON_SELECT_TAB + menu.selectedTab());
+        }
         updateImageSizeForSelectedTab();
         if (menu.selectedTab() == ResonanceCalibratorMenu.TAB_MASTERY) {
             masterySupport.clampAfterGeometryChange(imageWidth, imageHeight);

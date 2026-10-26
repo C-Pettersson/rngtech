@@ -15,6 +15,7 @@
     "nitrogen_band": "rngtech:block/furnace/nitrogen_band",
     "cylinder_window": "rngtech:block/furnace/cylinder_window",
     "collar": "rngtech:block/furnace/collar",
+    "job_lamp": "rngtech:block/work_order/lamp_off",
     "refractory": "rngtech:block/furnace/refractory",
     "hearth": "rngtech:block/furnace/hearth",
     "setter": "rngtech:block/furnace/setter",
@@ -1255,6 +1256,35 @@
       "neoforge_data": {
         "block_light": 15,
         "sky_light": 15
+      }
+    },
+    {
+      "from": [
+        13.25,
+        10.0,
+        2.75
+      ],
+      "to": [
+        14.75,
+        11.0,
+        4.25
+      ],
+      "faces": {
+        "north": {
+          "texture": "#job_lamp"
+        },
+        "south": {
+          "texture": "#job_lamp"
+        },
+        "east": {
+          "texture": "#job_lamp"
+        },
+        "west": {
+          "texture": "#job_lamp"
+        },
+        "up": {
+          "texture": "#job_lamp"
+        }
       }
     },
     {

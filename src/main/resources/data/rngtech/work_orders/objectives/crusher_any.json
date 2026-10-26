@@ -1,0 +1,43 @@
+{
+    "family": "crusher",
+    "type": "crush",
+    "filter": "any",
+    "weight": 2,
+    "tiers": [
+        {
+            "count": {
+                "min": 544,
+                "max": 816,
+                "step": 16
+            }
+        },
+        {
+            "count": {
+                "min": 1104,
+                "max": 1664,
+                "step": 16
+            }
+        },
+        {
+            "count": {
+                "min": 1376,
+                "max": 2064,
+                "step": 16
+            }
+        },
+        {
+            "count": {
+                "min": 2368,
+                "max": 3568,
+                "step": 16
+            }
+        },
+        {
+            "count": {
+                "min": 2368,
+                "max": 3568,
+                "step": 16
+            }
+        }
+    ]
+}

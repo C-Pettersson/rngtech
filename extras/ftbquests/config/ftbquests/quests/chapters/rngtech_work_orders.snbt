@@ -1,0 +1,109 @@
+{
+	default_hide_dependency_lines: false
+	default_quest_shape: ""
+	filename: "rngtech_work_orders"
+	group: "7106E7A1B10FA000"
+	icon: {
+		id: "rngtech:job_chip"
+	}
+	id: "7106E7A1B10FA080"
+	order_index: 8
+	quest_links: [ ]
+	quests: [
+		{
+			dependencies: ["7106E7A1B10F0322"]
+			id: "766D5255F991FE77"
+			tasks: [{
+				id: "24E125DE128196DA"
+				type: "checkmark"
+			}]
+			x: 0.0d
+			y: 0.0d
+		}
+		{
+			dependencies: ["766D5255F991FE77"]
+			id: "6019B5AA53D9F0CD"
+			rewards: [{
+				count: 8
+				id: "12CB862847F7ABC5"
+				item: {
+					count: 1
+					id: "minecraft:experience_bottle"
+				}
+				type: "item"
+			}]
+			tasks: [{
+				id: "2B425490B12175AA"
+				item: { count: 1, id: "rngtech:dispatch_terminal" }
+				type: "item"
+			}]
+			x: 2.5d
+			y: 0.0d
+		}
+		{
+			dependencies: ["6019B5AA53D9F0CD"]
+			id: "095B2C2EAFC75846"
+			tasks: [{
+				id: "24DE6C434829597D"
+				item: { count: 1, id: "rngtech:job_chip" }
+				type: "item"
+			}]
+			x: 5.0d
+			y: 0.0d
+		}
+		{
+			dependencies: ["095B2C2EAFC75846"]
+			id: "278F57CB04C541E1"
+			rewards: [{
+				count: 8
+				id: "068A8CC400FAC55C"
+				item: {
+					count: 1
+					id: "minecraft:experience_bottle"
+				}
+				type: "item"
+			}]
+			tasks: [{
+				id: "65F5CD9AC55F874D"
+				item: { count: 1, id: "rngtech:completed_job_chip" }
+				type: "item"
+			}]
+			x: 7.5d
+			y: 0.0d
+		}
+		{
+			dependencies: ["6019B5AA53D9F0CD"]
+			id: "6B93582CAFA30B6D"
+			optional: true
+			tasks: [{
+				id: "5A1B3D22F0E2AD99"
+				item: { count: 1, id: "rngtech:requisition" }
+				type: "item"
+			}]
+			x: 2.5d
+			y: 2.0d
+		}
+		{
+			dependencies: ["095B2C2EAFC75846"]
+			id: "3A1FD024757A73C7"
+			optional: true
+			tasks: [{
+				id: "46A9CFD3E3C2BD82"
+				type: "checkmark"
+			}]
+			x: 5.0d
+			y: 2.0d
+		}
+		{
+			dependencies: ["095B2C2EAFC75846", "37A6C9E1284B5D1F"]
+			id: "36827C604EDFB930"
+			optional: true
+			tasks: [{
+				id: "3E50372755DEA223"
+				type: "checkmark"
+			}]
+			x: 7.5d
+			y: 2.0d
+		}
+	]
+}

@@ -25,6 +25,11 @@ import com.rngtech.rpg.MachineTraits;
 import com.rngtech.rpg.MachineType;
 import com.rngtech.rpg.ModifierOperation;
 import com.rngtech.rpg.ModifierSlot;
+import com.rngtech.rpg.workorder.WorkObjectiveType;
+import com.rngtech.rpg.workorder.WorkOrderConditions;
+import com.rngtech.rpg.workorder.WorkOrderFamilies;
+import com.rngtech.rpg.workorder.WorkOrderHost;
+import com.rngtech.rpg.workorder.WorkReport;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -63,7 +68,7 @@ import java.util.List;
 import java.util.stream.IntStream;
 
 public class BatteryAssemblerBlockEntity extends BaseMachineBlockEntity
-        implements MenuProvider, PurgeableFluidStorage, MachineInfoProvider {
+        implements MenuProvider, PurgeableFluidStorage, MachineInfoProvider, WorkOrderHost {
     private final RecipeCache<BatteryAssemblyRecipe> recipes = new RecipeCache<>(1);
     private static final List<RecipeInputFilter<BatteryAssemblyRecipeInput, BatteryAssemblyRecipe>> INPUT_FILTERS =
             IntStream.rangeClosed(0, 3)
@@ -241,6 +246,7 @@ public class BatteryAssemblerBlockEntity extends BaseMachineBlockEntity
     }
 
     public static void serverTick(Level level, BlockPos pos, BlockState state, BatteryAssemblerBlockEntity assembler) {
+        assembler.tickWorkOrders(level);
         tickWork(level, pos, state, assembler);
         assembler.syncVisualState(level);
     }
@@ -531,6 +537,7 @@ public class BatteryAssemblerBlockEntity extends BaseMachineBlockEntity
     protected MachineStatAccumulator buildStats() {
         MachineStatAccumulator stats = MachineBaseStatCatalog.batteryAssembler();
         stats.apply(effectiveTraits());
+        WorkOrderConditions.apply(stats, workOrders().activeOrder());
         if (!hasBatteryCell()) {
             stats.apply(MachineStatAccumulator.NO_BATTERY_SOURCE, new MachineModifier(
                     ModifierSlot.IMPLICIT,
@@ -641,11 +648,23 @@ public class BatteryAssemblerBlockEntity extends BaseMachineBlockEntity
             placeRemainder(slot, remainders[slot]);
         }
         recipe.consumeFluid(inputTank);
+        WorkReport report = assemblyReport(result).withTicks(recipe.processingTicks() / Math.max(1, result.getCount()));
         addOutput(result);
         resetCycle();
+        workOrderWork(report);
         setChanged();
         return true;
     }
+
+    /** A finished assembly for Work Orders: its output and count, and a Battery Cell's material stage, or 0 for any other output. */
+    public static WorkReport assemblyReport(ItemStack result) {
+        int stage = result.getItem() instanceof BatteryCellItem cell ? cell.material().stage() : 0;
+        return new WorkReport(WorkObjectiveType.ASSEMBLE, stage, 0, BuiltInRegistries.ITEM.getKey(result.getItem()).toString(), result.getCount());
+    }
+
+    @Override public String workOrderFamily() { return WorkOrderFamilies.COMPONENT_ASSEMBLER; }
+    @Override public int workOrderStage() { return 0; }
+    @Override public int workOrderMasteryLevel() { return 0; }
 
     /** Copies the first calibrated ingredient's state onto the result, so the crafted item can read its stability. */
     private void recordCalibration(BatteryAssemblyRecipe recipe, ItemStack result) {

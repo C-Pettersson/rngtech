@@ -10,11 +10,13 @@ const CHALLENGE_ROOT = path.join(DATA_ROOT, "rngtech/loot_table/challenges");
 const RECIPE_ROOT = path.join(DATA_ROOT, "rngtech/recipe");
 const CONDITION = "rngtech:unique_loot_enabled";
 const FUNCTION = "rngtech:unidentified_unique";
-const CHALLENGE_TABLES = ["calibration", "crusher_jam", "heat_failure", "vacuum_collapse", "forestry_harvest", "mastery_level"];
+const CHALLENGE_TABLES = ["work_order"];
+// The Work Order reward table pays a fulfilled order; check-work-orders.mjs checks its entries instead.
+const REWARD_TABLES = new Set(["work_order"]);
 
 /**
  * Unique sources stay pack-configurable and find-only: every Unique has a default loot table gated by its config key that
- * drops it unidentified and is added to vanilla loot by a loot modifier, the shipped challenge tables are empty, the
+ * drops it unidentified and is added to vanilla loot by a loot modifier, the one shipped challenge table pays Work Orders, the
  * rngtech:uniques tag matches the catalog, and no recipe makes a Unique.
  */
 export async function checkUniques({ log = true } = {}) {
@@ -44,7 +46,7 @@ export async function checkUniques({ log = true } = {}) {
 
     const challengeFiles = (await jsonFiles(CHALLENGE_ROOT)).map((file) => path.basename(file, ".json")).sort();
     if (JSON.stringify(challengeFiles) !== JSON.stringify([...CHALLENGE_TABLES].sort())) {
-        failures.push(`challenge tables are ${challengeFiles.join(", ")}; expected ${CHALLENGE_TABLES.join(", ")}`);
+        failures.push(`challenge tables are ${challengeFiles.join(", ")}; expected ${CHALLENGE_TABLES.join(", ")}, since machines roll no loot and only Work Orders pay`);
     }
     for (const name of challengeFiles) {
         const table = await readJson(path.join(CHALLENGE_ROOT, `${name}.json`));
@@ -52,12 +54,12 @@ export async function checkUniques({ log = true } = {}) {
             failures.push(`challenges/${name} must use the rngtech:challenge type`);
         }
         const pools = table.pools ?? [];
-        if (name === "heat_failure" && pools.length > 0) {
-            failures.push(`challenges/${name} must ship empty; failing on purpose should not pay`);
+        if (REWARD_TABLES.has(name)) {
+            continue;
         }
         for (const pool of pools) {
             if ((pool.conditions ?? []).length === 0) {
-                failures.push(`challenges/${name} has a pool with no condition; every default Glyph drop is a machine challenge`);
+                failures.push(`challenges/${name} has a pool with no condition; every default reward is conditioned`);
             }
             for (const entry of pool.entries ?? []) {
                 if (entry.name !== "rngtech:glyph") {
@@ -100,7 +102,7 @@ export async function checkUniques({ log = true } = {}) {
         throw new Error(`Unique source check failed:\n${failures.map((failure) => `- ${failure}`).join("\n")}`);
     }
     if (log) {
-        console.log(`Unique sources PASS: ${uniques.length} Uniques with gated default loot, ${challengeFiles.length} challenge tables with Glyph entries only, no Unique or Glyph recipes, Phase Array parts behind Nullite`);
+        console.log(`Unique sources PASS: ${uniques.length} Uniques with gated default loot, no machine challenge tables (only the Work Order reward table), no Unique or Glyph recipes, Phase Array parts behind Nullite`);
     }
     return uniques.length;
 }

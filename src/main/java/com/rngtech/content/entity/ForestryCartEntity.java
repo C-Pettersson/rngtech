@@ -11,8 +11,6 @@ import com.rngtech.content.item.ModularToolItem;
 import com.rngtech.content.item.PruningShearsItem;
 import com.rngtech.content.item.SoulTransferItem;
 import com.rngtech.content.item.UreaItem;
-import com.rngtech.content.loot.ChallengeContext;
-import com.rngtech.content.loot.ChallengeLoot;
 import com.rngtech.content.menu.ForestryCartMenu;
 import com.rngtech.content.menu.MasteryMenuSupport;
 import com.rngtech.content.registry.ModDataComponents;
@@ -39,6 +37,12 @@ import com.rngtech.rpg.progression.MachineMasteryHost;
 import com.rngtech.rpg.progression.MachineProgressionState;
 import com.rngtech.rpg.progression.MegaPassiveNode;
 import com.rngtech.rpg.progression.MegaPassiveTree;
+import com.rngtech.rpg.workorder.MachineWorkOrders;
+import com.rngtech.rpg.workorder.WorkObjectiveType;
+import com.rngtech.rpg.workorder.WorkOrderConditions;
+import com.rngtech.rpg.workorder.WorkOrderFamilies;
+import com.rngtech.rpg.workorder.WorkOrderHost;
+import com.rngtech.rpg.workorder.WorkReport;
 
 import com.mojang.authlib.GameProfile;
 import net.minecraft.core.BlockPos;
@@ -120,7 +124,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.function.Predicate;
 
-public class ForestryCartEntity extends AbstractMinecart implements MenuProvider, MachineMasteryHost {
+public class ForestryCartEntity extends AbstractMinecart implements MenuProvider, MachineMasteryHost, WorkOrderHost {
     public static final int SAPLING_SLOT_START = 0;
     public static final int SAPLING_SLOT_COUNT = 2;
     public static final int OUTPUT_SLOT_START = SAPLING_SLOT_START + SAPLING_SLOT_COUNT;
@@ -139,6 +143,7 @@ public class ForestryCartEntity extends AbstractMinecart implements MenuProvider
 
     private static final String TAG_MACHINE_TRAITS = "MachineTraits";
     private static final String TAG_MACHINE_PROGRESSION = "MachineProgression";
+    private static final String TAG_WORK_ORDERS = "WorkOrders";
     private static final String TAG_MANUAL_SPEED_ENABLED = "ManualSpeedEnabled";
     private static final int AXE_CONNECTED_LOG_LIMIT = 8;
     private static final int BASE_MAX_TREE_HEIGHT = 16;
@@ -336,6 +341,7 @@ public class ForestryCartEntity extends AbstractMinecart implements MenuProvider
     private boolean manualSpeedEnabled;
     private WorkflowState workflowState = WorkflowState.SETUP_BLOCKED;
     private HarvestSnapshot activeHarvestSnapshot;
+    private MachineWorkOrders workOrders = MachineWorkOrders.EMPTY;
     private ActiveBreak activeBreak;
     private UUID ownerUuid;
     private String ownerName = "";
@@ -429,21 +435,22 @@ public class ForestryCartEntity extends AbstractMinecart implements MenuProvider
         return allocateMastery(node);
     }
 
-    /** Forestry harvest challenge loot goes into the cart; its context is the cutting tool's stage and the ascendancy. */
-    private void rollHarvestChallenge() {
+    /** The stage of the cutting tool's head, or 0 without one. */
+    private int headStage() {
         ToolHeadMaterial head = ModularToolItem.assembly(toolStack()).headMaterial();
-        MachineProgressionState state = masteryState();
-        ChallengeContext context = new ChallengeContext("forestry", head == null ? 0 : head.stage(), 0, 0, 0, state.level(), state.ascendancy());
-        insertOutputs(ChallengeLoot.roll(level(), blockPosition(), ChallengeLoot.FORESTRY_HARVEST, context));
+        return head == null ? 0 : head.stage();
     }
 
-    /** Mastery level challenge loot drops where the cart stands. */
-    @Override
-    public void masteryLevelGained(MachineProgressionState state) {
-        ChallengeContext context = new ChallengeContext("forestry", ascendancyEntryStage(), 0, 0, 0, state.level(), state.ascendancy());
-        for (ItemStack stack : ChallengeLoot.roll(level(), blockPosition(), ChallengeLoot.MASTERY_LEVEL, context)) {
-            Containers.dropItemStack(level(), getX(), getY() + 0.5D, getZ(), stack);
-        }
+    @Override public MachineWorkOrders workOrders() { return workOrders; }
+    @Override public void setWorkOrders(MachineWorkOrders orders) { workOrders = orders == null ? MachineWorkOrders.EMPTY : orders; }
+    @Override public String workOrderFamily() { return WorkOrderFamilies.of(masteryFamily()); }
+    @Override public int workOrderStage() { return ascendancyEntryStage(); }
+    @Override public int workOrderMasteryLevel() { return masteryState().level(); }
+    @Override public String workOrderAscendancy() { return masteryState().ascendancy(); }
+    @Override public long workOrderGameTime() { return level().getGameTime(); }
+    @Override public double workOrderStat(String stat) {
+        MachineStat value = MachineStat.bySerializedName(stat);
+        return value == null ? 0 : effectiveStats().value(value);
     }
 
     /** Work XP marks the cart as busy, which pauses Idle Cart Speed for the next 4 seconds. */
@@ -456,7 +463,9 @@ public class ForestryCartEntity extends AbstractMinecart implements MenuProvider
     }
 
     public MachineStatAccumulator effectiveStats() {
-        return ForestryCartItem.effectiveStats(machineTraits, machineProgression, hasPump() ? pumpStack() : ItemStack.EMPTY);
+        MachineStatAccumulator stats = ForestryCartItem.effectiveStats(machineTraits, machineProgression, hasPump() ? pumpStack() : ItemStack.EMPTY);
+        WorkOrderConditions.apply(stats, workOrders.activeOrder());
+        return stats;
     }
 
     private int coreStatPoints(MachineStat stat) {
@@ -686,6 +695,9 @@ public class ForestryCartEntity extends AbstractMinecart implements MenuProvider
         }
         super.tick();
         if (!level().isClientSide) {
+            if (level().getGameTime() % 20 == 0) {
+                workOrderTick();
+            }
             updateScanDebugData();
         }
         if (level().isClientSide) {
@@ -1041,6 +1053,9 @@ public class ForestryCartEntity extends AbstractMinecart implements MenuProvider
         if (!machineProgression.equals(MachineProgressionState.EMPTY)) {
             stack.set(ModDataComponents.MACHINE_PROGRESSION.get(), machineProgression);
         }
+        if (!workOrders.isEmpty()) {
+            stack.set(ModDataComponents.WORK_ORDERS.get(), workOrders);
+        }
         if (hasCustomName()) {
             stack.set(DataComponents.CUSTOM_NAME, getCustomName());
         }
@@ -1101,6 +1116,10 @@ public class ForestryCartEntity extends AbstractMinecart implements MenuProvider
                     .result()
                     .ifPresent(progressionTag -> tag.put(TAG_MACHINE_PROGRESSION, progressionTag));
         }
+        if (!workOrders.isEmpty()) {
+            MachineWorkOrders.CODEC.encodeStart(registryAccess().createSerializationContext(NbtOps.INSTANCE), workOrders).result()
+                    .ifPresent(ordersTag -> tag.put(TAG_WORK_ORDERS, ordersTag));
+        }
         tag.put("CargoInventory", cargoInventory.serializeNBT(level().registryAccess()));
         tag.put("GearInventory", gearInventory.serializeNBT(level().registryAccess()));
         tag.putString("WorkflowState", workflowState.name());
@@ -1145,6 +1164,10 @@ public class ForestryCartEntity extends AbstractMinecart implements MenuProvider
         machineTraits = tag.contains(TAG_MACHINE_TRAITS)
                 ? MachineTraits.CODEC.parse(NbtOps.INSTANCE, tag.get(TAG_MACHINE_TRAITS)).result().orElse(MachineTraits.EMPTY)
                 : MachineTraits.EMPTY;
+        workOrders = tag.contains(TAG_WORK_ORDERS)
+                ? MachineWorkOrders.CODEC.parse(registryAccess().createSerializationContext(NbtOps.INSTANCE), tag.get(TAG_WORK_ORDERS)).result()
+                        .orElse(MachineWorkOrders.EMPTY)
+                : MachineWorkOrders.EMPTY;
         machineProgression = tag.contains(TAG_MACHINE_PROGRESSION)
                 ? MachineProgressionState.CODEC.parse(NbtOps.INSTANCE, tag.get(TAG_MACHINE_PROGRESSION))
                         .result()
@@ -2034,7 +2057,7 @@ public class ForestryCartEntity extends AbstractMinecart implements MenuProvider
         feedLogLedger(expectedDrops, true);
         setCellState(cell, ManagedCell.STATE_HARVESTING);
         addMachineXp(LOG_HARVEST_MACHINE_XP * brokenCount);
-        rollHarvestChallenge();
+        workOrderWork(new WorkReport(WorkObjectiveType.HARVEST, headStage(), 0, "", brokenCount, "logs"));
         workCooldown = LOG_SETTLE_TICKS;
         setStatus(ForestryCartStationBlockEntity.STATUS_READY);
         playWorkSound(
@@ -2849,7 +2872,7 @@ public class ForestryCartEntity extends AbstractMinecart implements MenuProvider
         consumeEnergy(cost, false);
         insertOutputs(reserveFromDrops(cell, drops));
         addMachineXp(CROP_HARVEST_MACHINE_XP);
-        rollHarvestChallenge();
+        workOrderWork(new WorkReport(WorkObjectiveType.HARVEST, 0, 0, BuiltInRegistries.ITEM.getKey(state.getBlock().asItem()).toString(), 1, "crops"));
         workCooldown = plantIntervalTicks();
         setWorkflowState(WorkflowState.HARVESTING_LEAVES, ForestryCartStationBlockEntity.STATUS_READY, ForestryCartStationBlockEntity.ACTION_HARVESTING_CROP);
         playWorkSound(ModSounds.FORESTRY_COMPANION_LEAF_CUT.get(), 0.42F, 1.15F, WORK_SOUND_COOLDOWN_TICKS);

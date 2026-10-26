@@ -18,7 +18,7 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 
-public class BatteryAssemblerBlock extends BaseMachineBlock {
+public class BatteryAssemblerBlock extends WorkOrderMachineBlock {
     public BatteryAssemblerBlock(Properties properties) {
         super(properties);
     }

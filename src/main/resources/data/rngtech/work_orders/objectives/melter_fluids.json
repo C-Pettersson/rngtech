@@ -1,0 +1,69 @@
+{
+    "family": "melter",
+    "type": "melt",
+    "filter": "item",
+    "weight": 3,
+    "parts": {
+        "min": 1,
+        "max": 2
+    },
+    "options": [
+        {
+            "item": "minecraft:lava",
+            "stage": 1
+        },
+        {
+            "item": "rngtech:lubricant",
+            "stage": 1
+        },
+        {
+            "item": "rngtech:electrolyte_solution",
+            "stage": 1
+        },
+        {
+            "item": "rngtech:ender_slurry",
+            "stage": 1
+        },
+        {
+            "item": "rngtech:methane",
+            "stage": 1
+        }
+    ],
+    "tiers": [
+        {
+            "count": {
+                "min": 16000,
+                "max": 24000,
+                "step": 2000
+            }
+        },
+        {
+            "count": {
+                "min": 20000,
+                "max": 30000,
+                "step": 2000
+            }
+        },
+        {
+            "count": {
+                "min": 24000,
+                "max": 36000,
+                "step": 2000
+            }
+        },
+        {
+            "count": {
+                "min": 28000,
+                "max": 42000,
+                "step": 2000
+            }
+        },
+        {
+            "count": {
+                "min": 32000,
+                "max": 48000,
+                "step": 2000
+            }
+        }
+    ]
+}

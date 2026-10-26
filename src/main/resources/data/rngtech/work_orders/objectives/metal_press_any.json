@@ -1,0 +1,43 @@
+{
+    "family": "metal_press",
+    "type": "press",
+    "filter": "any",
+    "weight": 2,
+    "tiers": [
+        {
+            "count": {
+                "min": 88,
+                "max": 136,
+                "step": 8
+            }
+        },
+        {
+            "count": {
+                "min": 120,
+                "max": 176,
+                "step": 8
+            }
+        },
+        {
+            "count": {
+                "min": 152,
+                "max": 224,
+                "step": 8
+            }
+        },
+        {
+            "count": {
+                "min": 176,
+                "max": 272,
+                "step": 8
+            }
+        },
+        {
+            "count": {
+                "min": 176,
+                "max": 272,
+                "step": 8
+            }
+        }
+    ]
+}

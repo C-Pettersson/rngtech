@@ -39,19 +39,19 @@ The Gear tab has one optional **Battery Cell** slot. FE you supply fills the mac
 
 - [Automation](rngtech:component-assembler/automation.md)
 
-## Screen
-
-The Component Assembler screen has four tabs:
-
-- **Process**: four item inputs, the fluid slot and tank with its purge button, the output rack, progress, and energy. Hover the progress bar for time remaining and expected items per minute.
-- **Gear**: the Battery Cell slot.
-- **Stats**: the machine's current stats, including traits and Gear.
-- **Refinement**: refine the placed Assembler's traits with a catalyst.
-
 ## Obtaining
 
-- [Crafting](rngtech:component-assembler/crafting.md)
+### Crafting
+
+<RecipesFor id="rngtech:battery_assembler" />
+
+- Requires the Iron material to be enabled.
+- Requires the Copper material to be enabled.
 
 ### Breaking
 
 Mine a placed Component Assembler with a pickaxe. It drops itself and keeps its rolled traits.
+
+## More
+
+- [Screen](rngtech:component-assembler/screen.md)

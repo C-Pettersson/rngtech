@@ -1,0 +1,121 @@
+{
+    "family": "component_assembler",
+    "type": "assemble",
+    "filter": "item",
+    "weight": 3,
+    "parts": {
+        "min": 1,
+        "max": 2
+    },
+    "options": [
+        {
+            "item": "rngtech:copper_battery_cell",
+            "stage": 2
+        },
+        {
+            "item": "rngtech:lead_battery_cell",
+            "stage": 3
+        },
+        {
+            "item": "rngtech:invar_battery_cell",
+            "stage": 4
+        },
+        {
+            "item": "rngtech:aluminum_anode",
+            "stage": 5
+        },
+        {
+            "item": "rngtech:primed_seal_core",
+            "stage": 5
+        },
+        {
+            "item": "rngtech:sparksteel_battery_cell",
+            "stage": 5
+        },
+        {
+            "item": "rngtech:arclite_battery_cell",
+            "stage": 6
+        },
+        {
+            "item": "rngtech:biogas_membrane",
+            "stage": 6
+        },
+        {
+            "item": "rngtech:titanium_anode",
+            "stage": 6
+        },
+        {
+            "item": "rngtech:titanium_servo",
+            "stage": 6
+        },
+        {
+            "item": "rngtech:aethergold_battery_cell",
+            "stage": 7
+        },
+        {
+            "item": "rngtech:nullite_battery_cell",
+            "stage": 7
+        },
+        {
+            "item": "rngtech:nullite_servo",
+            "stage": 7
+        },
+        {
+            "item": "rngtech:tungstensteel_anode",
+            "stage": 7
+        },
+        {
+            "item": "rngtech:tungstensteel_servo",
+            "stage": 7
+        },
+        {
+            "item": "rngtech:exotic_battery_cell",
+            "stage": 8
+        },
+        {
+            "item": "rngtech:exotic_servo",
+            "stage": 8
+        },
+        {
+            "item": "rngtech:naquadah_anode",
+            "stage": 8
+        }
+    ],
+    "tiers": [
+        {
+            "count": {
+                "min": 8,
+                "max": 12,
+                "step": 2
+            }
+        },
+        {
+            "count": {
+                "min": 8,
+                "max": 12,
+                "step": 2
+            }
+        },
+        {
+            "count": {
+                "min": 6,
+                "max": 10,
+                "step": 2
+            }
+        },
+        {
+            "count": {
+                "min": 6,
+                "max": 10,
+                "step": 2
+            }
+        },
+        {
+            "count": {
+                "min": 4,
+                "max": 8,
+                "step": 2
+            }
+        }
+    ]
+}

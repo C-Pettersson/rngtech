@@ -3,8 +3,10 @@ package com.rngtech.content.menu;
 import com.rngtech.content.block.MelterBlock;
 import com.rngtech.content.blockentity.BaseMachineBlockEntity;
 import com.rngtech.content.blockentity.MelterBlockEntity;
+import com.rngtech.content.item.JobChipItem;
 import com.rngtech.content.purge.FluidPurgeSupport;
 import com.rngtech.content.registry.ModMenus;
+import com.rngtech.content.workorder.DriveBays;
 import com.rngtech.rpg.MachineStat;
 import com.rngtech.rpg.MachineStatAccumulator;
 import com.rngtech.rpg.MachineTraits;
@@ -15,6 +17,9 @@ import com.rngtech.rpg.progression.MegaPassiveNode;
 import com.rngtech.rpg.progression.MegaPassiveTree;
 import com.rngtech.rpg.progression.PassiveNode;
 import com.rngtech.rpg.progression.PassiveProgressionView;
+import com.rngtech.rpg.workorder.MachineWorkOrders;
+import com.rngtech.rpg.workorder.WorkOrderFamilies;
+import com.rngtech.rpg.workorder.WorkOrderHost;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.RegistryFriendlyByteBuf;
@@ -30,18 +35,20 @@ import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.material.Fluid;
+import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.ItemStackHandler;
 import net.neoforged.neoforge.items.SlotItemHandler;
 
 import java.util.List;
 import java.util.function.BooleanSupplier;
 
-public class MelterMenu extends AbstractContainerMenu implements MasteryMenuView<MegaPassiveNode>, StatBreakdownMenu {
+public class MelterMenu extends AbstractContainerMenu implements MasteryMenuView<MegaPassiveNode>, StatBreakdownMenu, WorkOrderMenuView {
     public static final int TAB_PROCESSING = 0;
     public static final int TAB_GEAR = 1;
     public static final int TAB_CONFIGURATION = 2;
     public static final int TAB_REFINEMENT = 3;
     public static final int TAB_MASTERY = 4;
+    public static final int TAB_ORDERS = 5;
 
     private static final int DATA_PROGRESS = 0;
     private static final int DATA_PROCESSING_TICKS = 1;
@@ -152,7 +159,22 @@ public class MelterMenu extends AbstractContainerMenu implements MasteryMenuView
         addSlot(RefinementMenuSupport.targetDisplaySlot(refinementTarget, RefinementMenuSupport.REFINEMENT_TARGET_SLOT_X, RefinementMenuSupport.REFINEMENT_SLOT_Y, () -> selectedTab == TAB_REFINEMENT));
 
         addPlayerInventory(playerInventory);
+        IItemHandler bays = playerInventory.player.level().isClientSide ? DriveBays.client(this) : new DriveBays(melter);
+        for (int bay = 0; bay < MachineWorkOrders.SLOTS; bay++) {
+            addSlot(new DriveBaySlot(bays, bay, () -> selectedTab == TAB_ORDERS));
+        }
         addDataSlots(data);
+    }
+
+    @Override public WorkOrderHost workOrderHost() { return melter; }
+    @Override public String workOrderFamily() { return WorkOrderFamilies.of(masteryFamily()); }
+    @Override public int workOrderStage() { return ascendancyEntryStage(); }
+    @Override public int workOrderMasteryLevel() { return machineLevel(); }
+    @Override public WorkOrderMenuSupport.View workOrderView() {
+        return MasteryMenuSupport.workOrders(data, DATA_MACHINE_PROGRESSION_START);
+    }
+    @Override public ItemStack workOrderChip(int bay) {
+        return bay >= 0 && bay < MachineWorkOrders.SLOTS ? getSlot(HOTBAR_END + bay).getItem() : ItemStack.EMPTY;
     }
 
     public void selectTab(int tab) {
@@ -161,6 +183,7 @@ public class MelterMenu extends AbstractContainerMenu implements MasteryMenuView
             case TAB_CONFIGURATION -> TAB_CONFIGURATION;
             case TAB_REFINEMENT -> TAB_REFINEMENT;
             case TAB_MASTERY -> TAB_MASTERY;
+            case TAB_ORDERS -> TAB_ORDERS;
             default -> TAB_PROCESSING;
         };
     }
@@ -435,6 +458,10 @@ public class MelterMenu extends AbstractContainerMenu implements MasteryMenuView
 
     @Override
     public boolean clickMenuButton(Player player, int id) {
+        if (id >= WorkOrderMenuSupport.BUTTON_SELECT_TAB && id <= WorkOrderMenuSupport.BUTTON_SELECT_TAB + TAB_ORDERS) {
+            selectTab(id - WorkOrderMenuSupport.BUTTON_SELECT_TAB);
+            return true;
+        }
         if (HeatSliderSupport.handle(player, id, melter::setHeatSlider)) {
             return true;
         }
@@ -495,7 +522,15 @@ public class MelterMenu extends AbstractContainerMenu implements MasteryMenuView
         ItemStack stack = slot.getItem();
         moved = stack.copy();
 
-        if (index == REFINEMENT_CONSUMABLE_SLOT) {
+        if (index >= HOTBAR_END) {
+            if (!moveItemStackTo(stack, PLAYER_INVENTORY_START, HOTBAR_END, false)) {
+                return ItemStack.EMPTY;
+            }
+        } else if (selectedTab == TAB_ORDERS && index >= PLAYER_INVENTORY_START && JobChipItem.isWorkOrder(stack)) {
+            if (!moveItemStackTo(stack, HOTBAR_END, HOTBAR_END + MachineWorkOrders.SLOTS, false)) {
+                return ItemStack.EMPTY;
+            }
+        } else if (index == REFINEMENT_CONSUMABLE_SLOT) {
             if (!moveItemStackTo(stack, PLAYER_INVENTORY_START, HOTBAR_END, false)) {
                 return ItemStack.EMPTY;
             }

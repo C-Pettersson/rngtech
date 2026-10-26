@@ -21,3 +21,5 @@ Seven machine families have a **Mastery** tab:
 | Forestry Companion | The Forestry Companion cart ([Forestry Cart Station](rngtech:forestry-cart-station.md)) | Control / Drive |
 
 Other machines, Gear, and cables do not level up.
+
+[Work Orders](rngtech:work-orders.md) give every processing machine repeatable jobs, with or without Mastery, so a maxed machine still has goals. Jobs give no XP or tree points. Chips stay with the machine, not its Mastery, so a Soul Transfer does not move them.

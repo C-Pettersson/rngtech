@@ -69,9 +69,14 @@ public abstract class BaseMachineBlock extends Block implements EntityBlock {
         };
     }
 
+    /**
+     * Sets {@link #ACTIVE} on the block at {@code pos}. {@code state} may be the state a tick started with, so the change
+     * applies to the current state, keeping properties the tick changed since, such as a Job Chip lamp.
+     */
     public static void setActive(Level level, BlockPos pos, BlockState state, boolean active) {
         if (state.getValue(ACTIVE) != active) {
-            level.setBlock(pos, state.setValue(ACTIVE, active), Block.UPDATE_ALL);
+            BlockState current = level.getBlockState(pos);
+            level.setBlock(pos, (current.is(state.getBlock()) ? current : state).setValue(ACTIVE, active), Block.UPDATE_ALL);
         }
     }
 

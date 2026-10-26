@@ -20,6 +20,7 @@ import com.rngtech.content.block.DebugChestBlock;
 import com.rngtech.content.block.DebugRerollerBlock;
 import com.rngtech.content.block.DebugTankBlock;
 import com.rngtech.content.block.DebugTrashcanBlock;
+import com.rngtech.content.block.DispatchTerminalBlock;
 import com.rngtech.content.block.DormantMachineBlock;
 import com.rngtech.content.block.ForestryCartStationBlock;
 import com.rngtech.content.block.FurnaceBlock;
@@ -122,6 +123,17 @@ public final class ModBlocks {
                     .mapColor(MapColor.METAL)
                     .strength(3.0F)
                     .sound(SoundType.METAL)
+    );
+
+    public static final DeferredBlock<DispatchTerminalBlock> DISPATCH_TERMINAL = BLOCKS.registerBlock(
+            "dispatch_terminal",
+            DispatchTerminalBlock::new,
+            BlockBehaviour.Properties.of()
+                    .mapColor(MapColor.METAL)
+                    .strength(3.0F)
+                    .sound(SoundType.METAL)
+                    .requiresCorrectToolForDrops()
+                    .noOcclusion()
     );
 
     public static final DeferredBlock<DebugChestBlock> DEBUG_CHEST = BLOCKS.registerBlock(

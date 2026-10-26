@@ -2,14 +2,18 @@ package com.rngtech.client.screen;
 
 import com.rngtech.content.blockentity.ComponentRecyclerBlockEntity;
 import com.rngtech.content.menu.ComponentRecyclerMenu;
+import com.rngtech.content.menu.WorkOrderMenuSupport;
 import com.rngtech.content.recycling.ComponentRecyclerChassis;
 import com.rngtech.content.registry.ModBlocks;
+import com.rngtech.content.registry.ModItems;
 import com.rngtech.rpg.MachineStat;
 
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
+
+import java.util.List;
 
 public class ComponentRecyclerScreen extends AbstractContainerScreen<ComponentRecyclerMenu> implements MachineTabs.Host {
     private static final int PANEL = 0xFFC6C6C6;
@@ -67,6 +71,7 @@ public class ComponentRecyclerScreen extends AbstractContainerScreen<ComponentRe
     };
 
     private final MachineTabs tabs;
+    private final WorkOrdersTab workOrdersTab;
 
     public ComponentRecyclerScreen(ComponentRecyclerMenu menu, Inventory playerInventory, Component title) {
         super(menu, playerInventory, title);
@@ -80,9 +85,11 @@ public class ComponentRecyclerScreen extends AbstractContainerScreen<ComponentRe
             tabBuilder
                     .gear(ComponentRecyclerMenu.TAB_GEAR)
                     .stats(ComponentRecyclerMenu.TAB_STATS)
-                    .refinement(ComponentRecyclerMenu.TAB_REFINEMENT);
+                    .refinement(ComponentRecyclerMenu.TAB_REFINEMENT)
+                    .tab(ComponentRecyclerMenu.TAB_ORDERS, "rngtech.tab.orders", ModItems.JOB_CHIP.get());
         }
         tabs = tabBuilder.build();
+        workOrdersTab = new WorkOrdersTab(menu, STAT_ACCENT);
     }
 
     @Override
@@ -95,6 +102,12 @@ public class ComponentRecyclerScreen extends AbstractContainerScreen<ComponentRe
         super.render(guiGraphics, mouseX, mouseY, partialTick);
         renderTooltip(guiGraphics, mouseX, mouseY);
         tabs.renderTooltip(guiGraphics, mouseX, mouseY);
+        if (menu.selectedTab() == ComponentRecyclerMenu.TAB_ORDERS) {
+            List<Component> orderTooltip = workOrdersTab.tooltip(mouseX, mouseY, leftPos, topPos, imageWidth, imageHeight);
+            if (!orderTooltip.isEmpty()) {
+                guiGraphics.renderComponentTooltip(font, orderTooltip, mouseX, mouseY);
+            }
+        }
         renderValueTooltips(guiGraphics, mouseX, mouseY);
         renderStatTooltips(guiGraphics, mouseX, mouseY);
         RefinementScreenStyle.renderTooltips(guiGraphics, font, leftPos, topPos, mouseX, mouseY, menu.selectedTab() == RefinementScreenStyle.REFINEMENT_TAB_INDEX, menu.machineTraits(), menu);
@@ -112,6 +125,8 @@ public class ComponentRecyclerScreen extends AbstractContainerScreen<ComponentRe
             renderStats(guiGraphics);
         } else if (menu.selectedTab() == ComponentRecyclerMenu.TAB_REFINEMENT) {
             renderRefinement(guiGraphics);
+        } else if (menu.selectedTab() == ComponentRecyclerMenu.TAB_ORDERS) {
+            workOrdersTab.render(guiGraphics, leftPos, topPos, imageWidth, imageHeight, mouseX, mouseY);
         }
     }
 
@@ -128,7 +143,7 @@ public class ComponentRecyclerScreen extends AbstractContainerScreen<ComponentRe
             drawGearLabels(guiGraphics);
         } else if (menu.selectedTab() == ComponentRecyclerMenu.TAB_STATS) {
             drawStatsLabels(guiGraphics);
-        } else {
+        } else if (menu.selectedTab() == ComponentRecyclerMenu.TAB_REFINEMENT) {
             drawRefinementLabels(guiGraphics);
         }
     }
@@ -142,6 +157,13 @@ public class ComponentRecyclerScreen extends AbstractContainerScreen<ComponentRe
             int tab = tabs.tabAt(mouseX, mouseY);
             if (tab >= 0) {
                 menu.selectTab(tab);
+                if (minecraft != null && minecraft.gameMode != null) {
+                    minecraft.gameMode.handleInventoryButtonClick(menu.containerId, WorkOrderMenuSupport.BUTTON_SELECT_TAB + menu.selectedTab());
+                }
+                return true;
+            }
+            if (menu.selectedTab() == ComponentRecyclerMenu.TAB_ORDERS
+                    && workOrdersTab.mouseClicked(mouseX, mouseY, button, leftPos, topPos, imageWidth, imageHeight)) {
                 return true;
             }
             if (menu.selectedTab() == ComponentRecyclerMenu.TAB_REFINEMENT

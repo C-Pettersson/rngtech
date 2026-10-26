@@ -10,8 +10,9 @@ import java.util.List;
 import java.util.function.Supplier;
 
 /**
- * Built machine stats, kept until one of their inputs changes. The inputs are two key objects compared by reference
- * (such as the traits and Mastery components, which are replaced rather than changed), a numeric key (such as the
+ * Built machine stats, kept until one of their inputs changes. The inputs are three key objects compared by reference
+ * (such as the traits and Mastery components, which are replaced rather than changed, and the active Job Chip's
+ * conditions), a numeric key (such as the
  * Bulk Speed count), the tracked stacks, compared by reference and count, and a global generation bumped when the
  * config or tags reload. Stats never read randomness, the tick, or a stack's charge or wear, so nothing else can
  * change them.
@@ -26,6 +27,7 @@ public final class MachineStatsCache {
     private int builtGeneration;
     private Object builtKeyA;
     private Object builtKeyB;
+    private Object builtKeyD;
     private long builtKeyC;
     private int builds;
 
@@ -48,7 +50,7 @@ public final class MachineStatsCache {
      * The cached stats, or {@code builder}'s new ones when an input changed. The result is frozen, so callers that add
      * conditional effects copy it first. While a stat breakdown is recording, the stats are always built fresh.
      */
-    MachineStatAccumulator get(Object keyA, Object keyB, long keyC, Supplier<MachineStatAccumulator> builder) {
+    MachineStatAccumulator get(Object keyA, Object keyB, long keyC, Object keyD, Supplier<MachineStatAccumulator> builder) {
         if (MachineStatAccumulator.isRecording()) {
             return builder.get();
         }
@@ -57,6 +59,7 @@ public final class MachineStatsCache {
                 || builtKeyA != keyA
                 || builtKeyB != keyB
                 || builtKeyC != keyC
+                || builtKeyD != keyD
                 || stacksChanged()) {
             int buildGeneration = generation;
             MachineStatAccumulator built = builder.get().freeze();
@@ -67,6 +70,7 @@ public final class MachineStatsCache {
             builtKeyA = keyA;
             builtKeyB = keyB;
             builtKeyC = keyC;
+            builtKeyD = keyD;
         }
         return stats;
     }

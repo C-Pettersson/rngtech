@@ -5,7 +5,9 @@ import com.rngtech.content.blockentity.CrusherBlockEntity;
 import com.rngtech.content.item.GearParts;
 import com.rngtech.content.machine.CrusherChassisMaterial;
 import com.rngtech.content.menu.CrusherMenu;
+import com.rngtech.content.menu.WorkOrderMenuSupport;
 import com.rngtech.content.registry.ModBlocks;
+import com.rngtech.content.registry.ModItems;
 import com.rngtech.rpg.MachinePartType;
 import com.rngtech.rpg.MachineStat;
 import com.rngtech.rpg.progression.CrusherPassiveTree;
@@ -93,6 +95,7 @@ public class CrusherScreen extends AbstractContainerScreen<CrusherMenu> implemen
             MachineStat.CRUSHER_INPUT_FILTER
     };
     private final MasteryScreenSupport<MegaPassiveNode> masterySupport;
+    private final WorkOrdersTab workOrdersTab;
     private final MachineTabs tabs;
 
     private static Map<MegaPassiveNode, ResourceLocation> createMasteryIconTextures() {
@@ -115,6 +118,7 @@ public class CrusherScreen extends AbstractContainerScreen<CrusherMenu> implemen
                 .stats(CrusherMenu.TAB_CONFIGURATION)
                 .refinement(CrusherMenu.TAB_REFINEMENT)
                 .mastery(CrusherMenu.TAB_MASTERY)
+                .tab(CrusherMenu.TAB_ORDERS, "rngtech.tab.orders", ModItems.JOB_CHIP.get())
                 .build();
         masterySupport = new MasteryScreenSupport<>(
                 CrusherPassiveTree.TREE,
@@ -153,6 +157,7 @@ public class CrusherScreen extends AbstractContainerScreen<CrusherMenu> implemen
                         MASTERY_RING
                 )
         );
+        workOrdersTab = new WorkOrdersTab(menu, STAT_ACCENT);
     }
 
     @Override
@@ -176,6 +181,12 @@ public class CrusherScreen extends AbstractContainerScreen<CrusherMenu> implemen
         if (menu.selectedTab() == CrusherMenu.TAB_MASTERY) {
             masterySupport.renderTooltips(guiGraphics, font, leftPos, topPos, imageWidth, imageHeight, mouseX, mouseY);
         }
+        if (menu.selectedTab() == CrusherMenu.TAB_ORDERS) {
+            List<Component> orderTooltip = workOrdersTab.tooltip(mouseX, mouseY, leftPos, topPos, imageWidth, imageHeight);
+            if (!orderTooltip.isEmpty()) {
+                guiGraphics.renderComponentTooltip(font, orderTooltip, mouseX, mouseY);
+            }
+        }
         RefinementScreenStyle.renderTooltips(guiGraphics, font, leftPos, topPos, mouseX, mouseY, menu.selectedTab() == RefinementScreenStyle.REFINEMENT_TAB_INDEX, menu.machineTraits(), menu);
         GearSlotTooltips.render(this, guiGraphics, font, mouseX, mouseY);
     }
@@ -192,6 +203,8 @@ public class CrusherScreen extends AbstractContainerScreen<CrusherMenu> implemen
             renderConfiguration(guiGraphics);
         } else if (menu.selectedTab() == CrusherMenu.TAB_REFINEMENT) {
             renderRefinement(guiGraphics);
+        } else if (menu.selectedTab() == CrusherMenu.TAB_ORDERS) {
+            workOrdersTab.render(guiGraphics, leftPos, topPos, imageWidth, imageHeight, mouseX, mouseY);
         } else if (menu.selectedTab() == CrusherMenu.TAB_MASTERY) {
             masterySupport.render(guiGraphics, leftPos, topPos, imageWidth, imageHeight, mouseX, mouseY);
         }
@@ -213,7 +226,7 @@ public class CrusherScreen extends AbstractContainerScreen<CrusherMenu> implemen
             drawConfigurationLabels(guiGraphics);
         } else if (menu.selectedTab() == CrusherMenu.TAB_REFINEMENT) {
             drawRefinementLabels(guiGraphics);
-        } else {
+        } else if (menu.selectedTab() == CrusherMenu.TAB_MASTERY) {
             masterySupport.drawLabels(guiGraphics, font, imageWidth);
         }
     }
@@ -224,6 +237,10 @@ public class CrusherScreen extends AbstractContainerScreen<CrusherMenu> implemen
             int tab = tabs.tabAt(mouseX, mouseY);
             if (tab >= 0) {
                 selectTab(tab);
+                return true;
+            }
+            if (menu.selectedTab() == CrusherMenu.TAB_ORDERS
+                    && workOrdersTab.mouseClicked(mouseX, mouseY, button, leftPos, topPos, imageWidth, imageHeight)) {
                 return true;
             }
             if (menu.selectedTab() == CrusherMenu.TAB_REFINEMENT
@@ -257,6 +274,9 @@ public class CrusherScreen extends AbstractContainerScreen<CrusherMenu> implemen
 
     @Override
     public boolean mouseScrolled(double mouseX, double mouseY, double scrollX, double scrollY) {
+        if (menu.selectedTab() == CrusherMenu.TAB_ORDERS) {
+            return workOrdersTab.mouseScrolled(scrollY);
+        }
         if (menu.selectedTab() == CrusherMenu.TAB_MASTERY
                 && masterySupport.mouseScrolled(mouseX, mouseY, scrollX, scrollY, leftPos, topPos, imageWidth, imageHeight)) {
             return true;
@@ -267,6 +287,9 @@ public class CrusherScreen extends AbstractContainerScreen<CrusherMenu> implemen
     private void selectTab(int tab) {
         masterySupport.resetDragging();
         menu.selectTab(tab);
+        if (minecraft != null && minecraft.gameMode != null) {
+            minecraft.gameMode.handleInventoryButtonClick(menu.containerId, WorkOrderMenuSupport.BUTTON_SELECT_TAB + menu.selectedTab());
+        }
         updateImageSizeForSelectedTab();
         if (menu.selectedTab() == CrusherMenu.TAB_MASTERY) {
             masterySupport.clampAfterGeometryChange(imageWidth, imageHeight);

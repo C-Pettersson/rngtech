@@ -29,7 +29,7 @@ item_ids:
 - **Mastery:** No
 - **Tool:** <ItemLink id="minecraft:wooden_pickaxe" />
 
-The **Phase Array** is the endgame refinement bench. Where the [Affix Forge](rngtech:affix-forge.md) rolls dice for you, the Array lets you choose: raise this affix, remove that one, add the affix you want, swap one for another, or move an affix across from a donor item. It works on any refinable item of any stage, and it spends only a little [Refinement Potential](rngtech:rarity-and-affixes.md#refinement-potential), so an item is done when you decide it is.
+The **Phase Array** is the endgame refinement bench. Where the [Affix Forge](rngtech:affix-forge.md) rolls dice for you, the Array lets you choose: raise this affix, remove that one, add the affix you want, swap one for another, or move an affix across from a donor item. It works on any refinable item of any stage, and it spends only a little [Refinement Potential](rngtech:rarity-and-affixes.md#refinement-potential), so an item is done when you decide it is. It does not accept [Job Chips](rngtech:work-orders.md).
 
 Every operation is a **pulse**. The line charges FE, you fire it, and the pulse crosses the Coils one by one. Each Coil holds it or lets it slip. Reach far enough and the operation happens; slip early and nothing changes. Three things make you stop before your RP runs out:
 

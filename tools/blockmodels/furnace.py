@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Generate the Furnace and Alloy Furnace block models, part models, item models, and owned textures.
+"""Generate the Furnace and Alloy Furnace blockstates, block models, part models, item models, and owned textures.
 
 The Stage 0 Furnace is a smooth-stone kiln from its recipe: a fire mouth below a smelting oven,
 and a copper-banded chimney. Every electric Furnace is an insulated muffle kiln on the slate
@@ -13,6 +13,9 @@ The Alloy Furnace is a crucible furnace: the installed Crucible sits in a refrac
 in induction bands, fed from four hoppers on the back cabinet, with the Heat Core as a side
 radiator, the Battery Cell in a cradle on the other side, the Nitrogen tank as a gas cylinder at
 the front corner, and the Servo as a stirrer over the pot.
+
+Every Furnace and Alloy Furnace carries the Job Chip lamp (job_lamp.py) near its status lamp; the
+Stage 0 kiln sets it in a copper bezel beside the oven lintel.
 
 The housings are static block models. The installed parts are standalone part models; they, the
 items, the heat glow, the fire, the molten pool, and the meters are drawn by FurnaceRenderer and
@@ -29,6 +32,8 @@ import random
 from pathlib import Path
 
 from PIL import Image, ImageDraw
+
+import job_lamp
 
 ROOT = Path(__file__).resolve().parents[2]
 ASSETS = ROOT / "src/main/resources/assets/rngtech"
@@ -83,6 +88,9 @@ CYLINDER = (14.0, 12.25)
 CYLINDER_R, CYLINDER_FLAT = 1.5, 1.0
 CYLINDER_Y = (2.0, 11.5)
 CYLINDER_WINDOW = (3.5, 10.5)
+# Job Chip lamp on the cradle's top strap, in front of the status lamp.
+JOB_LAMP = ((13.25, CRADLE[1][1], 2.75), (14.75, CRADLE[1][1] + 1.0, 4.25))
+JOB_LAMP_FACES = SIDES + ("up",)
 
 FURNACE_TIERS = ("iron", "copper", "bronze", "steel", "lead", "aluminum", "titanium", "tungstensteel", "exotic")
 # The Heat Core shown on each chassis item model, which has no renderer.
@@ -98,6 +106,10 @@ FIRE_MOUTH = ((5.0, 1.0, 1.0), (11.0, 4.5, 9.0))
 OVEN = ((4.0, 6.0, 1.0), (12.0, 10.0, 10.0))
 KILN_CHIMNEY = (8.0, 12.0)
 KILN_CHIMNEY_R, KILN_CHIMNEY_FLAT = 2.0, 1.25
+# Job Chip lamp in a copper bezel beside the oven lintel.
+KILN_JOB_LAMP = ((1.75, 10.0, 0.5), (2.5, 10.75, 0.75))
+KILN_JOB_BEZEL = ((1.5, 9.75, 0.75), (2.75, 11.0, 1.0))
+FRONT_FACES = ("north", "east", "west", "up", "down")
 
 
 def r(value: float) -> float:
@@ -284,6 +296,7 @@ def electric_elements(rods=True):
     elements += cradle_elements(feed_to=CYLINDER[1] - CYLINDER_R)
     elements += port_elements()
     elements.append(lamp((13.25, CRADLE[1][1], 6.25), (14.75, CRADLE[1][1] + 1.0, 7.75)))
+    elements.append(job_lamp.element(*JOB_LAMP, JOB_LAMP_FACES))
     elements += furnace_cylinder()
     return elements
 
@@ -325,6 +338,7 @@ def quad_elements(rods=True):
     elements += cradle_elements(feed_to=CYLINDER[1] - CYLINDER_R)
     elements += port_elements()
     elements.append(lamp((13.25, CRADLE[1][1], 6.25), (14.75, CRADLE[1][1] + 1.0, 7.75)))
+    elements.append(job_lamp.element(*JOB_LAMP, JOB_LAMP_FACES))
     elements += furnace_cylinder()
     return elements
 
@@ -379,6 +393,8 @@ def kiln_elements():
     # A copper draught plate on the fire-mouth side.
     elements.append(box((kx1, 2.0, 4.0), (kx1 + 0.5, 4.5, 8.0), {"east": "draught", "*": "copper"},
                         faces=("north", "south", "east", "up", "down"), uv={"east": [0, 0, 16, 10]}))
+    elements.append(box(*KILN_JOB_BEZEL, "copper", faces=FRONT_FACES))
+    elements.append(job_lamp.element(*KILN_JOB_LAMP, FRONT_FACES))
     return elements
 
 
@@ -436,6 +452,8 @@ ALLOY_CYLINDER = (14.25, 1.75)
 ALLOY_CYLINDER_R, ALLOY_CYLINDER_FLAT = 1.25, 0.75
 ALLOY_CYLINDER_Y = (2.0, 9.25)
 ALLOY_CYLINDER_WINDOW = (3.25, 8.25)
+# Job Chip lamp on the cabinet front, across from the status lamp.
+ALLOY_JOB_LAMP = ((1.5, 9.75, CABINET[0][2] - 0.5), (3.0, 10.75, CABINET[0][2]))
 STIRRER_SHAFT = 0.5
 STIRRER_Y = (5.25, 12.0)
 ALLOY_TIERS = ("bronze", "steel", "titanium")
@@ -482,6 +500,7 @@ def alloy_elements():
     elements.append(box((kx0 - 0.25, ky1 - 1.25, kz0 - 0.25), (kx1 + 0.25, ky1 - 0.75, kz1), "band", faces=("north", "east", "west", "down")))
     elements += port_elements()
     elements.append(lamp((13.0, 9.75, kz0 - 0.5), (14.5, 10.75, kz0)))
+    elements.append(job_lamp.element(*ALLOY_JOB_LAMP, FRONT_FACES))
     # Feed hoppers, each with a chute into the collector trough that runs along the cabinet front.
     for x0, x1 in HOPPERS:
         z0, z1 = HOPPER_Z
@@ -566,6 +585,7 @@ SHARED = {
     "nitrogen_band": TEX + "nitrogen_band",
     "cylinder_window": TEX + "cylinder_window",
     "collar": TEX + "collar",
+    **job_lamp.TEXTURE,
 }
 
 FURNACE_TEXTURES = {
@@ -593,6 +613,7 @@ KILN_TEXTURES = {
     "copper": TEX + "kiln/copper",
     "chimney_mouth": TEX + "kiln/chimney_mouth",
     "draught": TEX + "kiln/draught",
+    **job_lamp.TEXTURE,
 }
 
 
@@ -625,6 +646,7 @@ def write_furnace_models() -> None:
     for tier in FURNACE_TIERS:
         name = f"{tier}_furnace_chassis"
         template = "quad" if tier == "lead" else "electric"
+        job_lamp.write_blockstate(name, f"rngtech:block/{name}", f"rngtech:block/{name}_active", "rngtech:block/furnace/job_lamp")
         write_json(MODELS / f"block/{name}.json", {"parent": f"rngtech:block/furnace/{template}", "textures": tier_textures(tier)})
         write_json(MODELS / f"block/{name}_active.json", {"parent": f"rngtech:block/{name}", "textures": {"lamp": TEX + "lamp_on"}})
         write_json(MODELS / f"item/{name}.json", {
@@ -637,6 +659,7 @@ def write_furnace_models() -> None:
         "textures": KILN_TEXTURES, "elements": kiln_elements(),
     })
     write_json(MODELS / "block/furnace_active.json", {"parent": "rngtech:block/furnace"})
+    job_lamp.write_blockstate("furnace", "rngtech:block/furnace", "rngtech:block/furnace_active", "rngtech:block/furnace/kiln_job_lamp")
     write_json(MODELS / "item/furnace.json", {
         "parent": "minecraft:block/block", "render_type": "minecraft:cutout",
         "textures": {**KILN_TEXTURES, "coal": TEX + "kiln/coal"},
@@ -644,6 +667,8 @@ def write_furnace_models() -> None:
     })
 
     parts = MODELS / "block/furnace"
+    job_lamp.write_part(parts / "job_lamp.json", *JOB_LAMP, JOB_LAMP_FACES)
+    job_lamp.write_part(parts / "kiln_job_lamp.json", *KILN_JOB_LAMP, FRONT_FACES)
     write_json(parts / "heat_core.json", {"textures": {"particle": "#core"}, "elements": fin_elements()})
     for material in HEAT_CORES:
         write_json(parts / f"heat_core_{material}.json", {"parent": "rngtech:block/furnace/heat_core", "textures": {"core": CORE_TEX + material}})
@@ -671,6 +696,7 @@ def write_alloy_models() -> None:
     })
     for tier in ALLOY_TIERS:
         name = f"{tier}_alloy_furnace_chassis"
+        job_lamp.write_blockstate(name, f"rngtech:block/{name}", f"rngtech:block/{name}_active", "rngtech:block/alloy_furnace/job_lamp")
         write_json(MODELS / f"block/{name}.json", {"parent": "rngtech:block/alloy_furnace/housing", "textures": tier_textures(tier)})
         write_json(MODELS / f"block/{name}_active.json", {"parent": f"rngtech:block/{name}", "textures": {"lamp": TEX + "lamp_on"}})
         write_json(MODELS / f"item/{name}.json", {
@@ -679,6 +705,7 @@ def write_alloy_models() -> None:
         })
 
     parts = MODELS / "block/alloy_furnace"
+    job_lamp.write_part(parts / "job_lamp.json", *ALLOY_JOB_LAMP, FRONT_FACES)
     write_json(parts / "heat_core.json", {"textures": {"particle": "#core"}, "elements": radiator_elements()})
     write_json(parts / "crucible.json", {"textures": {"particle": "#crucible"}, "elements": crucible_elements()})
     write_json(parts / "servo.json", {"textures": {"particle": "#servo"}, "elements": servo_elements()})

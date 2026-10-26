@@ -129,12 +129,13 @@ The Component Recycler uses the `rngtech:component_recycling` recipe type. Use t
 
 ## Screen
 
-Powered Recyclers have four tabs:
+Powered Recyclers have five tabs:
 
 - **Process**: the input, three outputs, progress, and energy. With JEI installed, click the progress bar to browse recycling recipes.
 - **Gear**: Disassembly Head, Recovery Filter, and Battery Cell slots.
 - **Stats**: the machine's current stats, including traits and Gear.
 - **Refinement**: refine the placed Recycler's traits with a catalyst.
+- **Orders**: three drive bays for [Job Chips](work-orders.md), with each chip's job, progress, and the Activate, Pause, Rush, and Abandon buttons.
 
 The Crude Recycler has only its Process screen.
 

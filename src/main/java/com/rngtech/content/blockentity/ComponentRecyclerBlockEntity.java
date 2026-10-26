@@ -21,10 +21,16 @@ import com.rngtech.rpg.MachineStat;
 import com.rngtech.rpg.MachineStatAccumulator;
 import com.rngtech.rpg.MachineTraits;
 import com.rngtech.rpg.MachineType;
+import com.rngtech.rpg.workorder.WorkObjectiveType;
+import com.rngtech.rpg.workorder.WorkOrderConditions;
+import com.rngtech.rpg.workorder.WorkOrderFamilies;
+import com.rngtech.rpg.workorder.WorkOrderHost;
+import com.rngtech.rpg.workorder.WorkReport;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.Connection;
 import net.minecraft.network.RegistryFriendlyByteBuf;
@@ -51,7 +57,7 @@ import net.neoforged.neoforge.items.ItemStackHandler;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ComponentRecyclerBlockEntity extends BaseMachineBlockEntity implements MenuProvider, MachineInfoProvider {
+public class ComponentRecyclerBlockEntity extends BaseMachineBlockEntity implements MenuProvider, MachineInfoProvider, WorkOrderHost {
     private static final int RECIPE_INPUT = 0;
     private static final int RECIPE_CANDIDATE = 1;
     private static final RecipeCache.Search<ComponentRecyclingRecipe> RECIPE_SEARCH =
@@ -221,6 +227,7 @@ public class ComponentRecyclerBlockEntity extends BaseMachineBlockEntity impleme
     }
 
     public static void serverTick(Level level, BlockPos pos, BlockState state, ComponentRecyclerBlockEntity recycler) {
+        recycler.tickWorkOrders(level);
         if (recycler.isManual()) {
             recycler.serverTickManual(level, pos, state);
         } else {
@@ -572,6 +579,7 @@ public class ComponentRecyclerBlockEntity extends BaseMachineBlockEntity impleme
         ComponentRecyclerChassis chassis = chassis();
         MachineStatAccumulator stats = MachineBaseStatCatalog.componentRecycler(chassis);
         stats.apply(effectiveTraits());
+        WorkOrderConditions.apply(stats, workOrders().activeOrder());
         if (!chassis.manual()) {
             applyGearStats(stats, headStack());
             applyGearStats(stats, filterStack());
@@ -635,11 +643,21 @@ public class ComponentRecyclerBlockEntity extends BaseMachineBlockEntity impleme
         if (outputs.isEmpty() || !canMergeOutputs(outputs)) {
             return false;
         }
+        String input = BuiltInRegistries.ITEM.getKey(inputStack().getItem()).toString();
         consumeInput();
         mergeOutputs(outputs);
         resetCycle();
+        workOrderWork(new WorkReport(WorkObjectiveType.RECYCLE, recipe.minimumProcessingLevel(), 0, input, 1).withTicks(recipe.processingTicks()));
         setChanged();
         return true;
+    }
+
+    @Override public String workOrderFamily() { return WorkOrderFamilies.COMPONENT_RECYCLER; }
+    @Override public int workOrderStage() { return chassis().stage(); }
+    @Override public int workOrderMasteryLevel() { return 0; }
+    @Override public double workOrderStat(String stat) {
+        MachineStat value = MachineStat.bySerializedName(stat);
+        return value == null ? 0 : effectiveStats().value(value);
     }
 
     private void consumeInput() {

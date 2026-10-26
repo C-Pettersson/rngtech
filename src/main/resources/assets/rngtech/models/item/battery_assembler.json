@@ -24,6 +24,7 @@
     "cubby": "rngtech:block/battery_assembler/cubby",
     "tank_end": "rngtech:block/battery_assembler/tank_end",
     "tank_rail": "rngtech:block/battery_assembler/rail",
+    "job_lamp": "rngtech:block/work_order/lamp_off",
     "beam": "rngtech:block/battery_assembler/beam",
     "truck": "rngtech:block/crusher/trim/copper",
     "carriage": "rngtech:block/crusher/casing",
@@ -1998,6 +1999,35 @@
       "neoforge_data": {
         "block_light": 15,
         "sky_light": 15
+      }
+    },
+    {
+      "from": [
+        2.75,
+        10.0,
+        10.25
+      ],
+      "to": [
+        4.25,
+        10.75,
+        10.5
+      ],
+      "faces": {
+        "north": {
+          "texture": "#job_lamp"
+        },
+        "east": {
+          "texture": "#job_lamp"
+        },
+        "west": {
+          "texture": "#job_lamp"
+        },
+        "up": {
+          "texture": "#job_lamp"
+        },
+        "down": {
+          "texture": "#job_lamp"
+        }
       }
     },
     {

@@ -3,7 +3,9 @@ package com.rngtech.content.menu;
 import com.rngtech.content.block.FurnaceBlock;
 import com.rngtech.content.blockentity.BaseMachineBlockEntity;
 import com.rngtech.content.blockentity.FurnaceBlockEntity;
+import com.rngtech.content.item.JobChipItem;
 import com.rngtech.content.registry.ModMenus;
+import com.rngtech.content.workorder.DriveBays;
 import com.rngtech.rpg.MachineStat;
 import com.rngtech.rpg.MachineStatAccumulator;
 import com.rngtech.rpg.MachineTraits;
@@ -15,6 +17,9 @@ import com.rngtech.rpg.progression.MegaPassiveNode;
 import com.rngtech.rpg.progression.MegaPassiveTree;
 import com.rngtech.rpg.progression.PassiveNode;
 import com.rngtech.rpg.progression.PassiveProgressionView;
+import com.rngtech.rpg.workorder.MachineWorkOrders;
+import com.rngtech.rpg.workorder.WorkOrderFamilies;
+import com.rngtech.rpg.workorder.WorkOrderHost;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.RegistryFriendlyByteBuf;
@@ -28,18 +33,20 @@ import net.minecraft.world.inventory.SimpleContainerData;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.ItemStackHandler;
 import net.neoforged.neoforge.items.SlotItemHandler;
 
 import java.util.List;
 import java.util.function.BooleanSupplier;
 
-public class FurnaceMenu extends AbstractContainerMenu implements MasteryMenuView<MegaPassiveNode>, StatBreakdownMenu {
+public class FurnaceMenu extends AbstractContainerMenu implements MasteryMenuView<MegaPassiveNode>, StatBreakdownMenu, WorkOrderMenuView {
     public static final int TAB_PROCESSING = 0;
     public static final int TAB_GEAR = 1;
     public static final int TAB_CONFIGURATION = 2;
     public static final int TAB_REFINEMENT = 3;
     public static final int TAB_MASTERY = 4;
+    public static final int TAB_ORDERS = 5;
 
     private static final int MAX_PROCESSING_SLOTS = FurnaceBlockEntity.MAX_PROCESSING_SLOTS;
     private static final int MAX_GEAR_SLOTS = FurnaceBlockEntity.MAX_GEAR_SLOTS;
@@ -198,7 +205,16 @@ public class FurnaceMenu extends AbstractContainerMenu implements MasteryMenuVie
         addSlot(RefinementMenuSupport.targetDisplaySlot(refinementTarget, RefinementMenuSupport.REFINEMENT_TARGET_SLOT_X, RefinementMenuSupport.REFINEMENT_SLOT_Y, () -> selectedTab == TAB_REFINEMENT));
 
         addPlayerInventory(playerInventory);
+        IItemHandler bays = playerInventory.player.level().isClientSide ? DriveBays.client(this) : new DriveBays(furnace);
+        for (int bay = 0; bay < MachineWorkOrders.SLOTS; bay++) {
+            addSlot(new DriveBaySlot(bays, bay, () -> selectedTab == TAB_ORDERS));
+        }
         addDataSlots(data);
+    }
+
+    @Override
+    public ItemStack workOrderChip(int bay) {
+        return bay >= 0 && bay < MachineWorkOrders.SLOTS ? getSlot(HOTBAR_END + bay).getItem() : ItemStack.EMPTY;
     }
 
     public void selectTab(int tab) {
@@ -207,6 +223,7 @@ public class FurnaceMenu extends AbstractContainerMenu implements MasteryMenuVie
             case TAB_CONFIGURATION -> TAB_CONFIGURATION;
             case TAB_REFINEMENT -> TAB_REFINEMENT;
             case TAB_MASTERY -> TAB_MASTERY;
+            case TAB_ORDERS -> TAB_ORDERS;
             default -> TAB_PROCESSING;
         };
     }
@@ -588,6 +605,10 @@ public class FurnaceMenu extends AbstractContainerMenu implements MasteryMenuVie
 
     @Override
     public boolean clickMenuButton(Player player, int id) {
+        if (id >= WorkOrderMenuSupport.BUTTON_SELECT_TAB && id <= WorkOrderMenuSupport.BUTTON_SELECT_TAB + TAB_ORDERS) {
+            selectTab(id - WorkOrderMenuSupport.BUTTON_SELECT_TAB);
+            return true;
+        }
         if (HeatSliderSupport.handle(player, id, furnace::setHeatSlider)) {
             return true;
         }
@@ -632,7 +653,15 @@ public class FurnaceMenu extends AbstractContainerMenu implements MasteryMenuVie
         ItemStack stack = slot.getItem();
         moved = stack.copy();
 
-        if (index >= FurnaceBlockEntity.SLOT_OUTPUT_START
+        if (index >= HOTBAR_END) {
+            if (!moveItemStackTo(stack, PLAYER_INVENTORY_START, HOTBAR_END, false)) {
+                return ItemStack.EMPTY;
+            }
+        } else if (selectedTab == TAB_ORDERS && index >= PLAYER_INVENTORY_START && JobChipItem.isWorkOrder(stack)) {
+            if (!moveItemStackTo(stack, HOTBAR_END, HOTBAR_END + MachineWorkOrders.SLOTS, false)) {
+                return ItemStack.EMPTY;
+            }
+        } else if (index >= FurnaceBlockEntity.SLOT_OUTPUT_START
                 && index < FurnaceBlockEntity.SLOT_OUTPUT_START + MAX_PROCESSING_SLOTS) {
             if (!moveItemStackTo(stack, PLAYER_INVENTORY_START, HOTBAR_END, true)) {
                 return ItemStack.EMPTY;
@@ -765,6 +794,13 @@ public class FurnaceMenu extends AbstractContainerMenu implements MasteryMenuVie
     @Override public MachineMasteryFamily masteryFamily() { return MachineMasteryFamily.FURNACE; }
     @Override public MachineProgressionState masterySnapshot() {
         return MasteryMenuSupport.snapshot(data, DATA_MACHINE_PROGRESSION_START, masteryFamily());
+    }
+    @Override public WorkOrderHost workOrderHost() { return furnace; }
+    @Override public String workOrderFamily() { return WorkOrderFamilies.of(masteryFamily()); }
+    @Override public int workOrderStage() { return ascendancyEntryStage(); }
+    @Override public int workOrderMasteryLevel() { return machineLevel(); }
+    @Override public WorkOrderMenuSupport.View workOrderView() {
+        return MasteryMenuSupport.workOrders(data, DATA_MACHINE_PROGRESSION_START);
     }
     @Override public int ascendancyEntryStage() {
         return MasteryMenuSupport.ascendancyEntryStage(data, DATA_MACHINE_PROGRESSION_START);

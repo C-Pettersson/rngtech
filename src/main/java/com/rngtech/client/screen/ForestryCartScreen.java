@@ -4,6 +4,7 @@ import com.rngtech.RNGTech;
 import com.rngtech.content.blockentity.ForestryCartStationBlockEntity;
 import com.rngtech.content.entity.ForestryCartEntity;
 import com.rngtech.content.menu.ForestryCartMenu;
+import com.rngtech.content.menu.WorkOrderMenuSupport;
 import com.rngtech.content.registry.ModItems;
 import com.rngtech.rpg.progression.ForestryCompanionPassiveTree;
 import com.rngtech.rpg.progression.MachineMasteryFamily;
@@ -31,6 +32,7 @@ public class ForestryCartScreen extends AbstractContainerScreen<ForestryCartMenu
     private static final int PANEL_LIGHT = 0xFFE9E9E9;
     private static final int TEXT = 0xFF3F3F3F;
     private static final int TEXT_MUTED = 0xFF6B6B6B;
+    private static final int ORDERS_ACCENT = 0xFF4E8A3A;
     private static final int ENERGY = 0xFFB43B28;
     private static final int FORESTRY = 0xFF4E8B54;
     private static final int WARNING = 0xFFB45B4A;
@@ -69,6 +71,7 @@ public class ForestryCartScreen extends AbstractContainerScreen<ForestryCartMenu
 
     private final MasteryScreenSupport<MegaPassiveNode> masterySupport;
     private final MachineTabs tabs;
+    private final WorkOrdersTab workOrdersTab;
 
     private static Map<MegaPassiveNode, ResourceLocation> createMasteryIconTextures() {
         Map<MegaPassiveNode, ResourceLocation> textures = new java.util.HashMap<>();
@@ -88,7 +91,9 @@ public class ForestryCartScreen extends AbstractContainerScreen<ForestryCartMenu
                 .tab(ForestryCartMenu.TAB_CART, "rngtech.tab.cart", ModItems.FORESTRY_CART.get())
                 .stats(ForestryCartMenu.TAB_STATS)
                 .mastery(ForestryCartMenu.TAB_MASTERY)
+                .tab(ForestryCartMenu.TAB_ORDERS, "rngtech.tab.orders", ModItems.JOB_CHIP.get())
                 .build();
+        workOrdersTab = new WorkOrdersTab(menu, ORDERS_ACCENT);
         masterySupport = new MasteryScreenSupport<>(
                 ForestryCompanionPassiveTree.TREE,
                 ForestryCompanionPassiveTree.TREE.nodes(),
@@ -166,6 +171,12 @@ public class ForestryCartScreen extends AbstractContainerScreen<ForestryCartMenu
         if (menu.selectedTab() == ForestryCartMenu.TAB_MASTERY) {
             masterySupport.renderTooltips(guiGraphics, font, leftPos, topPos, imageWidth, imageHeight, mouseX, mouseY);
         }
+        if (menu.selectedTab() == ForestryCartMenu.TAB_ORDERS) {
+            List<Component> orderTooltip = workOrdersTab.tooltip(mouseX, mouseY, leftPos, topPos, imageWidth, imageHeight);
+            if (!orderTooltip.isEmpty()) {
+                guiGraphics.renderComponentTooltip(font, orderTooltip, mouseX, mouseY);
+            }
+        }
     }
 
     @Override
@@ -177,6 +188,9 @@ public class ForestryCartScreen extends AbstractContainerScreen<ForestryCartMenu
             renderCart(guiGraphics);
         } else if (menu.selectedTab() == ForestryCartMenu.TAB_STATS) {
             renderStats(guiGraphics);
+        } else if (menu.selectedTab() == ForestryCartMenu.TAB_ORDERS) {
+            renderPlayerInventoryFrames(guiGraphics);
+            workOrdersTab.render(guiGraphics, leftPos, topPos, imageWidth, imageHeight, mouseX, mouseY);
         } else {
             masterySupport.render(guiGraphics, leftPos, topPos, imageWidth, imageHeight, mouseX, mouseY);
         }
@@ -198,6 +212,8 @@ public class ForestryCartScreen extends AbstractContainerScreen<ForestryCartMenu
                     RANGE_ICON_X + ICON_SIZE / 2, RANGE_ICON_Y + 2, ICON_SIZE - 2, 0xFFE0E0E0);
         } else if (menu.selectedTab() == ForestryCartMenu.TAB_STATS) {
             drawStatsLabels(guiGraphics);
+        } else if (menu.selectedTab() == ForestryCartMenu.TAB_ORDERS) {
+            guiGraphics.drawString(font, playerInventoryTitle, inventoryLabelX, inventoryLabelY, TEXT, false);
         } else {
             masterySupport.drawLabels(guiGraphics, font, imageWidth);
         }
@@ -209,6 +225,10 @@ public class ForestryCartScreen extends AbstractContainerScreen<ForestryCartMenu
             int tab = tabs.tabAt(mouseX, mouseY);
             if (tab >= 0) {
                 selectTab(tab);
+                return true;
+            }
+            if (menu.selectedTab() == ForestryCartMenu.TAB_ORDERS
+                    && workOrdersTab.mouseClicked(mouseX, mouseY, button, leftPos, topPos, imageWidth, imageHeight)) {
                 return true;
             }
             if (menu.selectedTab() == ForestryCartMenu.TAB_CART
@@ -829,6 +849,9 @@ public class ForestryCartScreen extends AbstractContainerScreen<ForestryCartMenu
     private void selectTab(int tab) {
         masterySupport.resetDragging();
         menu.selectTab(tab);
+        if (minecraft != null && minecraft.gameMode != null) {
+            minecraft.gameMode.handleInventoryButtonClick(menu.containerId, WorkOrderMenuSupport.BUTTON_SELECT_TAB + menu.selectedTab());
+        }
         updateImageSizeForSelectedTab();
         if (menu.selectedTab() == ForestryCartMenu.TAB_MASTERY) {
             masterySupport.clampAfterGeometryChange(imageWidth, imageHeight);

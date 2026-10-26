@@ -17,7 +17,8 @@
               "include": [
                 "rngtech:machine_traits",
                 "rngtech:machine_progression",
-                "rngtech:output_banks"
+                "rngtech:output_banks",
+                "rngtech:work_orders"
               ],
               "source": "block_entity"
             }

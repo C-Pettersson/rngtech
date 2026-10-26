@@ -1,0 +1,48 @@
+{
+    "family": "alloy_furnace",
+    "type": "alloy",
+    "filter": "stage",
+    "weight": 2,
+    "tiers": [
+        {
+            "count": {
+                "min": 40,
+                "max": 60,
+                "step": 4
+            },
+            "min": 3
+        },
+        {
+            "count": {
+                "min": 52,
+                "max": 80,
+                "step": 4
+            },
+            "min": 4
+        },
+        {
+            "count": {
+                "min": 72,
+                "max": 108,
+                "step": 4
+            },
+            "min": 4
+        },
+        {
+            "count": {
+                "min": 88,
+                "max": 132,
+                "step": 4
+            },
+            "min": 6
+        },
+        {
+            "count": {
+                "min": 88,
+                "max": 132,
+                "step": 4
+            },
+            "min": 6
+        }
+    ]
+}

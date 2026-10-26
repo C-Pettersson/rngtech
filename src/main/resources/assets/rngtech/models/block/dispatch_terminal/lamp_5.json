@@ -1,0 +1,38 @@
+{
+  "render_type": "minecraft:cutout",
+  "textures": {
+    "particle": "rngtech:block/dispatch_terminal/lamp_on",
+    "lamp_on": "rngtech:block/dispatch_terminal/lamp_on"
+  },
+  "elements": [
+    {
+      "from": [
+        4.85,
+        7.25,
+        0.8
+      ],
+      "to": [
+        5.75,
+        7.75,
+        1.0
+      ],
+      "faces": {
+        "north": {
+          "texture": "#lamp_on"
+        },
+        "up": {
+          "texture": "#lamp_on"
+        },
+        "down": {
+          "texture": "#lamp_on"
+        },
+        "east": {
+          "texture": "#lamp_on"
+        },
+        "west": {
+          "texture": "#lamp_on"
+        }
+      }
+    }
+  ]
+}

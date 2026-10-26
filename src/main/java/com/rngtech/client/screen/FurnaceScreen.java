@@ -3,7 +3,9 @@ package com.rngtech.client.screen;
 import com.rngtech.RNGTech;
 import com.rngtech.content.blockentity.FurnaceBlockEntity;
 import com.rngtech.content.menu.FurnaceMenu;
+import com.rngtech.content.menu.WorkOrderMenuSupport;
 import com.rngtech.content.registry.ModBlocks;
+import com.rngtech.content.registry.ModItems;
 import com.rngtech.rpg.MachineStat;
 import com.rngtech.rpg.MachineStatAccumulator;
 import com.rngtech.rpg.progression.FurnacePassiveTree;
@@ -155,6 +157,7 @@ public class FurnaceScreen extends AbstractContainerScreen<FurnaceMenu> implemen
     private static final Map<MegaPassiveNode, ResourceLocation> MASTERY_ICON_TEXTURES = createMasteryIconTextures();
 
     private final MasteryScreenSupport<MegaPassiveNode> masterySupport;
+    private final WorkOrdersTab workOrdersTab;
     private final MachineTabs tabs;
     private final HeatSlider heatSlider = new HeatSlider(86, 81, 69);
     private final NitrogenGauge nitrogenGauge = new NitrogenGauge(NITROGEN_GAUGE_X, BAR_Y);
@@ -179,6 +182,7 @@ public class FurnaceScreen extends AbstractContainerScreen<FurnaceMenu> implemen
                 .stats(FurnaceMenu.TAB_CONFIGURATION)
                 .refinement(FurnaceMenu.TAB_REFINEMENT)
                 .mastery(FurnaceMenu.TAB_MASTERY)
+                .tab(FurnaceMenu.TAB_ORDERS, "rngtech.tab.orders", ModItems.JOB_CHIP.get())
                 .build();
         masterySupport = new MasteryScreenSupport<>(
                 FurnacePassiveTree.TREE,
@@ -219,6 +223,7 @@ public class FurnaceScreen extends AbstractContainerScreen<FurnaceMenu> implemen
                         0xFF6D4A24
                 )
         );
+        workOrdersTab = new WorkOrdersTab(menu, STAT_ACCENT);
     }
 
     @Override
@@ -242,6 +247,12 @@ public class FurnaceScreen extends AbstractContainerScreen<FurnaceMenu> implemen
         if (menu.selectedTab() == FurnaceMenu.TAB_MASTERY) {
             masterySupport.renderTooltips(guiGraphics, font, leftPos, topPos, imageWidth, imageHeight, mouseX, mouseY);
         }
+        if (menu.selectedTab() == FurnaceMenu.TAB_ORDERS) {
+            List<Component> orderTooltip = workOrdersTab.tooltip(mouseX, mouseY, leftPos, topPos, imageWidth, imageHeight);
+            if (!orderTooltip.isEmpty()) {
+                guiGraphics.renderComponentTooltip(font, orderTooltip, mouseX, mouseY);
+            }
+        }
         RefinementScreenStyle.renderTooltips(guiGraphics, font, leftPos, topPos, mouseX, mouseY, menu.selectedTab() == RefinementScreenStyle.REFINEMENT_TAB_INDEX, menu.machineTraits(), menu);
         GearSlotTooltips.render(this, guiGraphics, font, mouseX, mouseY);
     }
@@ -260,6 +271,8 @@ public class FurnaceScreen extends AbstractContainerScreen<FurnaceMenu> implemen
             renderConfiguration(guiGraphics);
         } else if (menu.selectedTab() == FurnaceMenu.TAB_REFINEMENT) {
             renderRefinement(guiGraphics);
+        } else if (menu.selectedTab() == FurnaceMenu.TAB_ORDERS) {
+            workOrdersTab.render(guiGraphics, leftPos, topPos, imageWidth, imageHeight, mouseX, mouseY);
         } else {
             masterySupport.render(guiGraphics, leftPos, topPos, imageWidth, imageHeight, mouseX, mouseY);
         }
@@ -280,7 +293,7 @@ public class FurnaceScreen extends AbstractContainerScreen<FurnaceMenu> implemen
             drawConfigurationLabels(guiGraphics);
         } else if (menu.selectedTab() == FurnaceMenu.TAB_REFINEMENT) {
             drawRefinementLabels(guiGraphics);
-        } else {
+        } else if (menu.selectedTab() == FurnaceMenu.TAB_MASTERY) {
             masterySupport.drawLabels(guiGraphics, font, imageWidth);
         }
     }
@@ -296,6 +309,10 @@ public class FurnaceScreen extends AbstractContainerScreen<FurnaceMenu> implemen
             int tab = tabs.tabAt(mouseX, mouseY);
             if (tab >= 0) {
                 selectTab(tab);
+                return true;
+            }
+            if (menu.selectedTab() == FurnaceMenu.TAB_ORDERS
+                    && workOrdersTab.mouseClicked(mouseX, mouseY, button, leftPos, topPos, imageWidth, imageHeight)) {
                 return true;
             }
             if (menu.selectedTab() == FurnaceMenu.TAB_REFINEMENT
@@ -333,6 +350,9 @@ public class FurnaceScreen extends AbstractContainerScreen<FurnaceMenu> implemen
 
     @Override
     public boolean mouseScrolled(double mouseX, double mouseY, double scrollX, double scrollY) {
+        if (menu.selectedTab() == FurnaceMenu.TAB_ORDERS) {
+            return workOrdersTab.mouseScrolled(scrollY);
+        }
         if (menu.selectedTab() == FurnaceMenu.TAB_MASTERY
                 && masterySupport.mouseScrolled(mouseX, mouseY, scrollX, scrollY, leftPos, topPos, imageWidth, imageHeight)) {
             return true;
@@ -343,6 +363,9 @@ public class FurnaceScreen extends AbstractContainerScreen<FurnaceMenu> implemen
     private void selectTab(int tab) {
         masterySupport.resetDragging();
         menu.selectTab(tab);
+        if (minecraft != null && minecraft.gameMode != null) {
+            minecraft.gameMode.handleInventoryButtonClick(menu.containerId, WorkOrderMenuSupport.BUTTON_SELECT_TAB + menu.selectedTab());
+        }
         updateImageSizeForSelectedTab();
         if (menu.selectedTab() == FurnaceMenu.TAB_MASTERY) {
             masterySupport.clampAfterGeometryChange(imageWidth, imageHeight);

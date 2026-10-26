@@ -1,0 +1,49 @@
+{
+    "family": "forestry",
+    "type": "harvest",
+    "filter": "group",
+    "weight": 2,
+    "options": [
+        {
+            "item": "crops",
+            "stage": 1
+        }
+    ],
+    "tiers": [
+        {
+            "count": {
+                "min": 96,
+                "max": 144,
+                "step": 8
+            }
+        },
+        {
+            "count": {
+                "min": 128,
+                "max": 192,
+                "step": 8
+            }
+        },
+        {
+            "count": {
+                "min": 160,
+                "max": 240,
+                "step": 8
+            }
+        },
+        {
+            "count": {
+                "min": 192,
+                "max": 288,
+                "step": 8
+            }
+        },
+        {
+            "count": {
+                "min": 224,
+                "max": 336,
+                "step": 8
+            }
+        }
+    ]
+}

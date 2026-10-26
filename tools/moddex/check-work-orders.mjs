@@ -1,0 +1,143 @@
+import { readdir, readFile } from "node:fs/promises";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+
+const PROJECT_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..");
+const DATA_ROOT = path.join(PROJECT_ROOT, "src/main/resources/data");
+const RECIPE_ROOT = path.join(DATA_ROOT, "rngtech/recipe");
+const OBJECTIVE_ROOT = path.join(DATA_ROOT, "rngtech/work_orders/objectives");
+const REWARD_TABLE = path.join(DATA_ROOT, "rngtech/loot_table/challenges/work_order.json");
+const ORDER = "rngtech:job_chip";
+const FULFILLED = "rngtech:completed_job_chip";
+const REQUISITION = "rngtech:requisition";
+const TERMINAL = "rngtech:dispatch_terminal";
+const CONDITION = "rngtech:work_order_recipes_enabled";
+const RECLAIM_TYPES = new Set(["rngtech:component_recycling", "rngtech:potential_reactor"]);
+const FAMILIES = ["crusher", "furnace"];
+// Rewards are Requisitions, refinement currency, Glyphs, and Uniques: nothing with FE value or a place in the processing chain.
+const REWARD_ITEMS = new Set([
+    REQUISITION,
+    "rngtech:glyph",
+    "rngtech:chaos_crystal",
+    "rngtech:expansion_crystal",
+    "rngtech:null_crystal",
+    "rngtech:affix_modifier",
+    "rngtech:affix_upgrade",
+    "rngtech:mastery_refund",
+    "rngtech:volatile_catalyst",
+    "rngtech:ascension_matrix",
+]);
+
+/**
+ * Work Orders stay a closed loop: orders come from the Dispatch Terminal and commands, so no recipe makes one or a Fulfilled
+ * Work Order; the Requisition and Dispatch Terminal recipes carry the config condition; no recycling or reactor recipe takes
+ * any of them back; the reward table is one pool that pays one kind: Requisitions, currency, Glyphs, or Uniques; and
+ * every family with progress hooks has an objective with one goal per tier.
+ */
+export async function checkWorkOrders({ log = true } = {}) {
+    const failures = [];
+    let recipes = 0;
+    const gated = new Set();
+    for (const { file, json } of await jsonFiles(RECIPE_ROOT)) {
+        recipes++;
+        const relative = path.relative(PROJECT_ROOT, file).replaceAll(path.sep, "/");
+        const output = json.result?.id ?? json.result?.stack?.id;
+        if (output === ORDER || output === FULFILLED) {
+            failures.push(`${relative} crafts ${output}; orders come from the Dispatch Terminal`);
+        }
+        if (output === REQUISITION || output === TERMINAL) {
+            gated.add(output);
+            if (!(json["neoforge:conditions"] ?? []).some((condition) => condition.type === CONDITION)) {
+                failures.push(`${relative} makes ${output} without the ${CONDITION} condition`);
+            }
+        }
+        if (RECLAIM_TYPES.has(json.type)) {
+            const text = JSON.stringify(json.ingredient ?? json.ingredients ?? json.input ?? {});
+            for (const item of [ORDER, FULFILLED, REQUISITION, TERMINAL]) {
+                if (text.includes(`"${item}"`)) {
+                    failures.push(`${relative} is a ${json.type} recipe for ${item}`);
+                }
+            }
+        }
+    }
+
+    for (const item of [REQUISITION, TERMINAL]) {
+        if (!gated.has(item)) {
+            failures.push(`No ${item} recipe was found`);
+        }
+    }
+
+    const table = JSON.parse(await readFile(REWARD_TABLE, "utf8"));
+    if (table.type !== "rngtech:challenge") {
+        failures.push("challenges/work_order must use the rngtech:challenge type");
+    }
+    let uniqueEntries = 0;
+    for (const pool of table.pools ?? []) {
+        for (const entry of pool.entries ?? []) {
+            if (entry.type === "minecraft:empty") {
+                continue;
+            }
+            const unique = (entry.conditions ?? []).some((condition) => condition.condition === "rngtech:unique_loot_enabled");
+            if (unique) {
+                uniqueEntries++;
+                if (!(entry.functions ?? []).some((fn) => fn.function === "rngtech:unidentified_unique")) {
+                    failures.push(`challenges/work_order drops ${entry.name} identified`);
+                }
+            } else if (!REWARD_ITEMS.has(entry.name)) {
+                failures.push(`challenges/work_order drops ${entry.name}; rewards are currency, Glyphs, and Uniques`);
+            }
+        }
+    }
+
+    if ((table.pools ?? []).length !== 1 || table.pools[0].rolls !== 1) {
+        failures.push("challenges/work_order must be one pool with one roll, so every job pays one reward kind");
+    }
+
+    const families = new Map();
+    for (const { file, json } of await jsonFiles(OBJECTIVE_ROOT)) {
+        const relative = path.relative(PROJECT_ROOT, file).replaceAll(path.sep, "/");
+        if ((json.tiers ?? []).length !== 5) {
+            failures.push(`${relative} needs one goal for each of the five tiers`);
+        }
+        families.set(json.family, (families.get(json.family) ?? 0) + 1);
+    }
+    for (const family of FAMILIES) {
+        if (!families.has(family)) {
+            failures.push(`no Work Order objective for the ${family}`);
+        }
+    }
+
+    if (failures.length) {
+        throw new Error(`Work Order check failed:\n${failures.map((failure) => `- ${failure}`).join("\n")}`);
+    }
+    if (log) {
+        console.log(`Work Orders PASS: none of ${recipes} recipes crafts an order, Requisition and terminal recipes carry ${CONDITION}, `
+            + `rewards are Requisitions, currency, Glyphs, and ${uniqueEntries} Uniques; `
+            + `objectives for ${[...families.keys()].sort().join(", ")}`);
+    }
+    return recipes;
+}
+
+async function jsonFiles(root) {
+    let entries;
+    try {
+        entries = await readdir(root, { recursive: true, withFileTypes: true });
+    } catch (error) {
+        if (error.code === "ENOENT") {
+            return [];
+        }
+        throw error;
+    }
+    const files = [];
+    for (const entry of entries) {
+        if (entry.isFile() && entry.name.endsWith(".json")) {
+            const file = path.join(entry.parentPath, entry.name);
+            files.push({ file, json: JSON.parse(await readFile(file, "utf8")) });
+        }
+    }
+    return files;
+}
+
+if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+    await checkWorkOrders();
+}

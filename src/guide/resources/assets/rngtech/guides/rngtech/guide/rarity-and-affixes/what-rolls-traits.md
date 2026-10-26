@@ -17,5 +17,6 @@ These items roll rarity, affixes, and RP when you craft them:
 | [Battery Cells](rngtech:battery-cells.md) | <ItemLink id="rngtech:iron_battery_cell" /> and every other material cell |
 | Modular tool parts | Tool Heads and Tool Rods for [Modular Tools](rngtech:modular-tools.md) |
 | Companions | The Forestry Companion cart from the [Forestry Cart Station](rngtech:forestry-cart-station.md), and the <ItemLink id="rngtech:miners_companion" /> |
+| [Job Chips](rngtech:work-orders.md) | A Dispatch Terminal rolls a chip when it lists the job. A chip's affixes are [conditions](rngtech:work-orders/conditions.md), which cost the machine and add reward. |
 
 A few blocks never roll traits: the [Affix Forge](rngtech:affix-forge.md) and the Phase Cradle of the [Phase Array](rngtech:phase-array.md), the Crude Component Recycler, the wooden and silica-gel machines such as the [Wooden Composter](rngtech:wooden-composter.md), the [Algae Photobioreactor](rngtech:algae-photobioreactor.md), and cables and connectors. Assembled modular tools carry no traits of their own. Their Tool Head and Tool Rod do.

@@ -218,6 +218,10 @@ public final class RNGTechJeiPlugin implements IModPlugin {
         registration.addIngredientInfo(ModItems.PHASE_EMITTER.get(), Component.translatable("rngtech.jei.phase_emitter.info"));
         registration.addIngredientInfo(ModItems.PHASE_COIL.get(), Component.translatable("rngtech.jei.phase_coil.info"));
         registration.addIngredientInfo(ModItems.GLYPH.get(), Component.translatable("rngtech.jei.glyph.info"));
+        registration.addIngredientInfo(ModItems.DISPATCH_TERMINAL.get(), Component.translatable("rngtech.jei.dispatch_terminal.info"));
+        registration.addIngredientInfo(ModItems.JOB_CHIP.get(), Component.translatable("rngtech.jei.job_chip.info"));
+        registration.addIngredientInfo(ModItems.COMPLETED_JOB_CHIP.get(), Component.translatable("rngtech.jei.completed_job_chip.info"));
+        registration.addIngredientInfo(ModItems.REQUISITION.get(), Component.translatable("rngtech.jei.requisition.info"));
         for (UniqueDefinition unique : UniqueCatalog.all()) {
             registration.addItemStackInfo(List.of(uniqueStack(unique)), uniqueInfo(unique).toArray(Component[]::new));
         }

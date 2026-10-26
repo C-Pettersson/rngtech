@@ -20,6 +20,7 @@ import com.rngtech.content.blockentity.DebugChestBlockEntity;
 import com.rngtech.content.blockentity.DebugRerollerBlockEntity;
 import com.rngtech.content.blockentity.DebugTankBlockEntity;
 import com.rngtech.content.blockentity.DebugTrashcanBlockEntity;
+import com.rngtech.content.blockentity.DispatchTerminalBlockEntity;
 import com.rngtech.content.blockentity.DormantMachineBlockEntity;
 import com.rngtech.content.blockentity.ForestryCartStationBlockEntity;
 import com.rngtech.content.blockentity.FurnaceBlockEntity;
@@ -82,6 +83,12 @@ public final class ModBlockEntities {
             BLOCK_ENTITY_TYPES.register(
                     "debug_reroller",
                     () -> BlockEntityType.Builder.of(DebugRerollerBlockEntity::new, ModBlocks.DEBUG_REROLLER.get()).build(null)
+            );
+
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<DispatchTerminalBlockEntity>> DISPATCH_TERMINAL =
+            BLOCK_ENTITY_TYPES.register(
+                    "dispatch_terminal",
+                    () -> BlockEntityType.Builder.of(DispatchTerminalBlockEntity::new, ModBlocks.DISPATCH_TERMINAL.get()).build(null)
             );
 
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<DebugChestBlockEntity>> DEBUG_CHEST =

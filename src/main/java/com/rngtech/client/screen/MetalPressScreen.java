@@ -3,7 +3,9 @@ package com.rngtech.client.screen;
 import com.rngtech.RNGTech;
 import com.rngtech.content.blockentity.MetalPressBlockEntity;
 import com.rngtech.content.menu.MetalPressMenu;
+import com.rngtech.content.menu.WorkOrderMenuSupport;
 import com.rngtech.content.registry.ModBlocks;
+import com.rngtech.content.registry.ModItems;
 import com.rngtech.rpg.MachineStat;
 import com.rngtech.rpg.progression.MachineMasteryFamily;
 import com.rngtech.rpg.progression.MegaPassiveNode;
@@ -112,6 +114,7 @@ public class MetalPressScreen extends AbstractContainerScreen<MetalPressMenu> im
 
     private final MasteryScreenSupport<MegaPassiveNode> masterySupport;
     private final MachineTabs tabs;
+    private final WorkOrdersTab workOrdersTab;
     private final HeatSlider heatSlider = new HeatSlider(86, 81, 69);
     private final NitrogenGauge nitrogenGauge = new NitrogenGauge(222, BAR_Y);
 
@@ -135,7 +138,9 @@ public class MetalPressScreen extends AbstractContainerScreen<MetalPressMenu> im
                 .stats(MetalPressMenu.TAB_CONFIGURATION)
                 .refinement(MetalPressMenu.TAB_REFINEMENT)
                 .mastery(MetalPressMenu.TAB_MASTERY)
+                .tab(MetalPressMenu.TAB_ORDERS, "rngtech.tab.orders", ModItems.JOB_CHIP.get())
                 .build();
+        workOrdersTab = new WorkOrdersTab(menu, STAT_ACCENT);
         masterySupport = new MasteryScreenSupport<>(
                 MegaPassiveTree.TREE,
                 MegaPassiveTree.TREE.nodes(),
@@ -187,6 +192,12 @@ public class MetalPressScreen extends AbstractContainerScreen<MetalPressMenu> im
         if (menu.selectedTab() == MetalPressMenu.TAB_MASTERY) {
             masterySupport.renderTooltips(guiGraphics, font, leftPos, topPos, imageWidth, imageHeight, mouseX, mouseY);
         }
+        if (menu.selectedTab() == MetalPressMenu.TAB_ORDERS) {
+            List<Component> orderTooltip = workOrdersTab.tooltip(mouseX, mouseY, leftPos, topPos, imageWidth, imageHeight);
+            if (!orderTooltip.isEmpty()) {
+                guiGraphics.renderComponentTooltip(font, orderTooltip, mouseX, mouseY);
+            }
+        }
         RefinementScreenStyle.renderTooltips(guiGraphics, font, leftPos, topPos, mouseX, mouseY, menu.selectedTab() == RefinementScreenStyle.REFINEMENT_TAB_INDEX, menu.machineTraits(), menu);
         GearSlotTooltips.render(this, guiGraphics, font, mouseX, mouseY);
     }
@@ -205,6 +216,8 @@ public class MetalPressScreen extends AbstractContainerScreen<MetalPressMenu> im
             renderConfiguration(guiGraphics);
         } else if (menu.selectedTab() == MetalPressMenu.TAB_REFINEMENT) {
             renderRefinement(guiGraphics);
+        } else if (menu.selectedTab() == MetalPressMenu.TAB_ORDERS) {
+            workOrdersTab.render(guiGraphics, leftPos, topPos, imageWidth, imageHeight, mouseX, mouseY);
         } else {
             masterySupport.render(guiGraphics, leftPos, topPos, imageWidth, imageHeight, mouseX, mouseY);
         }
@@ -226,7 +239,7 @@ public class MetalPressScreen extends AbstractContainerScreen<MetalPressMenu> im
             drawConfigurationLabels(guiGraphics);
         } else if (menu.selectedTab() == MetalPressMenu.TAB_REFINEMENT) {
             drawRefinementLabels(guiGraphics);
-        } else {
+        } else if (menu.selectedTab() == MetalPressMenu.TAB_MASTERY) {
             masterySupport.drawLabels(guiGraphics, font, imageWidth);
         }
     }
@@ -241,6 +254,10 @@ public class MetalPressScreen extends AbstractContainerScreen<MetalPressMenu> im
             int tab = tabs.tabAt(mouseX, mouseY);
             if (tab >= 0) {
                 selectTab(tab);
+                return true;
+            }
+            if (menu.selectedTab() == MetalPressMenu.TAB_ORDERS
+                    && workOrdersTab.mouseClicked(mouseX, mouseY, button, leftPos, topPos, imageWidth, imageHeight)) {
                 return true;
             }
             if (menu.selectedTab() == MetalPressMenu.TAB_REFINEMENT
@@ -311,6 +328,9 @@ public class MetalPressScreen extends AbstractContainerScreen<MetalPressMenu> im
     private void selectTab(int tab) {
         masterySupport.resetDragging();
         menu.selectTab(tab);
+        if (minecraft != null && minecraft.gameMode != null) {
+            minecraft.gameMode.handleInventoryButtonClick(menu.containerId, WorkOrderMenuSupport.BUTTON_SELECT_TAB + menu.selectedTab());
+        }
         updateImageSizeForSelectedTab();
         if (menu.selectedTab() == MetalPressMenu.TAB_MASTERY) {
             masterySupport.clampAfterGeometryChange(imageWidth, imageHeight);
