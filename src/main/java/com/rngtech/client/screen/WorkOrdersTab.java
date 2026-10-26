@@ -6,8 +6,10 @@ import com.rngtech.content.menu.DriveBaySlot;
 import com.rngtech.content.menu.WorkOrderMenuSupport;
 import com.rngtech.content.menu.WorkOrderMenuView;
 import com.rngtech.content.network.WorkOrderActionPayload;
+import com.rngtech.rpg.MachineTraits;
 import com.rngtech.rpg.workorder.MachineWorkOrders;
 import com.rngtech.rpg.workorder.WorkOrder;
+import com.rngtech.rpg.workorder.WorkOrderRules;
 import com.rngtech.rpg.workorder.WorkPart;
 
 import net.minecraft.ChatFormatting;
@@ -208,7 +210,11 @@ final class WorkOrdersTab {
         if (slot.rushed()) {
             return List.of(Component.translatable("rngtech.work_order.tab.rush_running", JobChipItem.clock(slot.rushSeconds())));
         }
-        return List.of(Component.translatable("rngtech.work_order.tab.rush_hint", JobChipItem.clock(WorkOrder.rushTicks(slot.tier()) / 20), WorkOrder.RUSH_BONUS),
+        ItemStack chip = view.workOrderChip(part.bay());
+        WorkOrder order = JobChipItem.data(chip);
+        MachineTraits traits = JobChipItem.traits(chip);
+        long ticks = order == null ? WorkOrder.rushTicks(slot.tier()) : WorkOrderRules.rushTicks(order, traits);
+        return List.of(Component.translatable("rngtech.work_order.tab.rush_hint", JobChipItem.clock(ticks / 20), WorkOrderRules.rushBonus(traits)),
                 Component.translatable("rngtech.work_order.tab.rush_warning").withStyle(ChatFormatting.RED));
     }
 

@@ -647,7 +647,7 @@ public class ComponentRecyclerBlockEntity extends BaseMachineBlockEntity impleme
         consumeInput();
         mergeOutputs(outputs);
         resetCycle();
-        workOrderWork(new WorkReport(WorkObjectiveType.RECYCLE, recipe.minimumProcessingLevel(), 0, input, 1));
+        workOrderWork(new WorkReport(WorkObjectiveType.RECYCLE, recipe.minimumProcessingLevel(), 0, input, 1).withTicks(recipe.processingTicks()));
         setChanged();
         return true;
     }

@@ -4,6 +4,7 @@ import com.rngtech.rpg.workorder.LoadedWorkOrder;
 import com.rngtech.rpg.workorder.MachineWorkOrders;
 import com.rngtech.rpg.workorder.WorkOrder;
 import com.rngtech.rpg.workorder.WorkOrderHost;
+import com.rngtech.rpg.workorder.WorkOrderRules;
 
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Player;
@@ -44,19 +45,20 @@ public final class WorkOrderOperations {
     }
 
     /**
-     * Activates chip {@code index} under Rush: its deadline is the tier's Rush time from now, and its listed reward, or its
-     * Bounty when it has no list, grows by the Rush bonus. A chip that already has Rush keeps its deadline.
+     * Activates chip {@code index} under Rush: its deadline is the job's Rush clock from now, and its listed reward, or its
+     * Bounty when it has no list, grows by the Rush bonus with Short Fuse's. A chip that already has Rush keeps its deadline.
      */
     private static String rush(WorkOrderHost host, MachineWorkOrders orders, int index) {
         if (index < 0 || index >= orders.orders().size()) { return "slot"; }
         LoadedWorkOrder loaded = orders.orders().get(index);
         if (loaded.rushed()) { return "rushed"; }
         WorkOrder order = loaded.order();
+        int bonus = WorkOrderRules.rushBonus(loaded.traits());
         List<ItemStack> listed = WorkOrderRewards.items(order.rewards());
-        WorkOrder boosted = listed.isEmpty() ? order.withBounty(WorkOrder.rushAmount(order.bounty()))
+        WorkOrder boosted = listed.isEmpty() ? order.withBounty(WorkOrder.rushAmount(order.bounty(), bonus))
                 : order.withRewards(ItemContainerContents.fromItems(listed.stream()
-                        .map(stack -> stack.copyWithCount(WorkOrder.rushAmount(stack.getCount()))).toList()));
-        LoadedWorkOrder rushed = loaded.withOrder(boosted).withRush(host.workOrderGameTime() + WorkOrder.rushTicks(order.tier()));
+                        .map(stack -> stack.copyWithCount(WorkOrder.rushAmount(stack.getCount(), bonus))).toList()));
+        LoadedWorkOrder rushed = loaded.withOrder(boosted).withRush(host.workOrderGameTime() + WorkOrderRules.rushTicks(order, loaded.traits()));
         host.setWorkOrders(orders.withReplaced(index, rushed).withActive(index));
         return null;
     }

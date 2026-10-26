@@ -321,7 +321,8 @@ public class CrusherBlockEntity extends BaseMachineBlockEntity implements MenuPr
                 String input = crusher.inputId();
                 int completed = crusher.process(recipe, stats, level, jobs);
                 crusher.grantRecipeXp(recipe, completed);
-                crusher.workOrderWork(new WorkReport(WorkObjectiveType.CRUSH, recipe.requiredProcessingLevel(), 0, input, completed));
+                crusher.workOrderWork(new WorkReport(WorkObjectiveType.CRUSH, recipe.requiredProcessingLevel(), 0, input, completed)
+                        .withTicks(recipe.processingTicks()));
                 crusher.bulkSpeed.recordProcesses(crusher.activeTraits(), completed);
                 crusher.finishCraft();
                 crusher.setChanged();
@@ -338,7 +339,8 @@ public class CrusherBlockEntity extends BaseMachineBlockEntity implements MenuPr
             String input = crusher.inputId();
             int completed = crusher.process(recipe, stats, level, jobs);
             crusher.grantRecipeXp(recipe, completed);
-            crusher.workOrderWork(new WorkReport(WorkObjectiveType.CRUSH, recipe.requiredProcessingLevel(), 0, input, completed));
+            crusher.workOrderWork(new WorkReport(WorkObjectiveType.CRUSH, recipe.requiredProcessingLevel(), 0, input, completed)
+                        .withTicks(recipe.processingTicks()));
             crusher.bulkSpeed.recordProcesses(crusher.activeTraits(), completed);
             crusher.finishCraft();
         }

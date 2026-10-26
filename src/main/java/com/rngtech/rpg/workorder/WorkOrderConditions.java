@@ -39,6 +39,9 @@ public final class WorkOrderConditions {
     public static final String DEEP_ORE = "deep_ore";
     public static final String UNSTEADY_HANDS = "unsteady_hands";
     public static final String FINE_TOLERANCE = "fine_tolerance";
+    public static final String SHORT_FUSE = "short_fuse";
+    /** Short Fuse's extra Rush reward per tier, in percent. It pays only when the chip is Rushed, so it adds no Bounty. */
+    private static final int[] FUSE_BONUS = {25, 40, 60};
 
     /** Draft rarity weights for a listed job: Normal, Magic, Rare. */
     private static final int[] RARITY_WEIGHTS = {50, 35, 15};
@@ -83,7 +86,9 @@ public final class WorkOrderConditions {
             new Condition(rule(DEEP_ORE), ALL, WorkFilter.STAGE, false, new int[] {25}, 1),
             new Condition(tiered(UNSTEADY_HANDS, ModifierSlot.PREFIX, MachineStat.STABILITY, ModifierOperation.DECREASED_PERCENT,
                     whole(10, 13), whole(14, 16), whole(17, 20)), Set.of("resonance_calibrator", "metal_press"), null, true, new int[] {15, 20, 25}, 0),
-            new Condition(rule(FINE_TOLERANCE), Set.of("resonance_calibrator"), WorkFilter.SETTING, false, new int[] {35}, 1));
+            new Condition(rule(FINE_TOLERANCE), Set.of("resonance_calibrator"), WorkFilter.SETTING, false, new int[] {35}, 1),
+            new Condition(tiered(SHORT_FUSE, ModifierSlot.SUFFIX, MachineStat.PROCESSING_SPEED, ModifierOperation.ADD,
+                    whole(25, 35), whole(36, 47), whole(48, 60)), ALL, null, false, new int[] {0, 0, 0}, 0));
 
     private WorkOrderConditions() {
     }
@@ -273,6 +278,7 @@ public final class WorkOrderConditions {
         return switch (condition.id()) {
             case STARVED_FEED -> Component.translatable(key, Math.round((1 - modifier.value()) * 100));
             case POWER_SURCHARGE, COLD_START, UNSTEADY_HANDS -> Component.translatable(key, Math.round(modifier.value()));
+            case SHORT_FUSE -> Component.translatable(key, Math.round(modifier.value()), FUSE_BONUS[Math.clamp(modifier.tier(), 1, FUSE_BONUS.length) - 1]);
             default -> Component.translatable(key);
         };
     }
@@ -280,7 +286,28 @@ public final class WorkOrderConditions {
     /** A rule condition's rule, for a list of what a refinement can add, or null for a pressure condition or another affix. */
     public static Component ruleText(ModifierDefinition definition) {
         Condition condition = get(definition.id());
-        return condition == null || condition.pressure() ? null : Component.translatable("rngtech.work_order.condition." + condition.id() + ".effect");
+        if (condition == null || condition.pressure()) { return null; }
+        return Component.translatable("rngtech.work_order.condition." + condition.id() + (SHORT_FUSE.equals(condition.id()) ? ".rule" : ".effect"));
+    }
+
+    /** How much shorter Short Fuse makes the Rush clock, in percent; a Blessed Short Fuse costs nothing. */
+    public static int fuse(MachineTraits traits) {
+        if (traits == null) { return 0; }
+        int percent = 0;
+        for (MachineModifier modifier : active(traits)) {
+            if (SHORT_FUSE.equals(modifier.affixId())) { percent = Math.max(percent, (int) Math.round(modifier.value())); }
+        }
+        return Math.clamp(percent, 0, 90);
+    }
+
+    /** Short Fuse's extra Rush reward in percent; a Blighted Short Fuse pays nothing. */
+    public static int fuseBonus(MachineTraits traits) {
+        if (traits == null) { return 0; }
+        int bonus = 0;
+        for (MachineModifier modifier : rewarded(traits)) {
+            if (SHORT_FUSE.equals(modifier.affixId())) { bonus = Math.max(bonus, FUSE_BONUS[Math.clamp(modifier.tier(), 1, FUSE_BONUS.length) - 1]); }
+        }
+        return bonus;
     }
 
     /** Whether {@code traits} carry the condition {@code id}, a Blighted chip's extra condition included. */

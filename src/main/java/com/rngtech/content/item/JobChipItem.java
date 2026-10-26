@@ -15,6 +15,7 @@ import com.rngtech.rpg.workorder.WorkObjective;
 import com.rngtech.rpg.workorder.WorkObjectiveType;
 import com.rngtech.rpg.workorder.WorkOrder;
 import com.rngtech.rpg.workorder.WorkOrderConditions;
+import com.rngtech.rpg.workorder.WorkOrderFamilies;
 import com.rngtech.rpg.workorder.WorkOrderProgress;
 import com.rngtech.rpg.workorder.WorkPart;
 
@@ -294,7 +295,9 @@ public class JobChipItem extends Item {
             Component effect = WorkOrderConditions.effectText(modifier);
             boolean blessed = modifier.slot() == ModifierSlot.CORRUPTION && corruption.outcome() == CorruptionOutcome.BLESSED;
             boolean blighted = modifier.slot() == ModifierSlot.CORRUPTION && corruption.outcome() == CorruptionOutcome.BLIGHTED;
-            Component reward = blighted ? Component.translatable("rngtech.tooltip.work_order.condition_no_reward")
+            Component reward = WorkOrderConditions.SHORT_FUSE.equals(id)
+                    ? Component.translatable("rngtech.tooltip.work_order.condition_rush" + (blighted ? "_blighted" : blessed ? "_blessed" : ""))
+                    : blighted ? Component.translatable("rngtech.tooltip.work_order.condition_no_reward")
                     : blessed ? Component.translatable("rngtech.tooltip.work_order.condition_no_cost", condition.bounty(modifier.tier()))
                     : condition.prestige() > 0
                     ? Component.translatable("rngtech.tooltip.work_order.condition_reward_prestige", condition.bounty(modifier.tier()), condition.prestige())
@@ -315,6 +318,9 @@ public class JobChipItem extends Item {
         }
         tooltipComponents.add(familyName(order.family()).withStyle(ChatFormatting.GOLD));
         tooltipComponents.add(objectiveText(order.objective()).copy().withStyle(ChatFormatting.GRAY));
+        if (order.objective().parts().stream().anyMatch(part -> WorkOrderFamilies.countsWork(order.family(), part.filter()))) {
+            tooltipComponents.add(Component.translatable("rngtech.tooltip.work_order.counts_work").withStyle(ChatFormatting.DARK_GRAY));
+        }
         appendEligibleItems(tooltipComponents, order.objective(), traits(stack));
         appendConditions(tooltipComponents, traits(stack));
         if (traits(stack).refinementPotential() > 0 && !traits(stack).isCorrupted()) {

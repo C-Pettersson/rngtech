@@ -1102,7 +1102,8 @@ public class MetalPressBlockEntity extends BaseMachineBlockEntity
         }
         String mold = BuiltInRegistries.ITEM.getKey(moldStack().getItem()).getPath();
         workOrderWork(new WorkReport(WorkObjectiveType.PRESS, Math.max(0, MaterialCatalog.materialStage(recipe.failureMaterial())), heatSlider,
-                BuiltInRegistries.ITEM.getKey(baseResult.getItem()).toString(), jobs, mold.endsWith("_mold") ? mold.substring(0, mold.length() - 5) : ""));
+                BuiltInRegistries.ITEM.getKey(baseResult.getItem()).toString(), jobs, mold.endsWith("_mold") ? mold.substring(0, mold.length() - 5) : "")
+                .withTicks(recipe.processingTicks()));
         escapement.completed();
         completeCycle();
         presses++;

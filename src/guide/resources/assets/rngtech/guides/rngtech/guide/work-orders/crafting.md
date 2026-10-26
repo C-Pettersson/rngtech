@@ -2,7 +2,7 @@
 navigation:
   title: "Crafting"
   parent: work-orders.md
-  position: 6
+  position: 7
   icon: rngtech:job_chip
 ---
 

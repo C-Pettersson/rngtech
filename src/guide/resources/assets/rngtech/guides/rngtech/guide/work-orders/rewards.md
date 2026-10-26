@@ -2,7 +2,7 @@
 navigation:
   title: "Rewards"
   parent: work-orders.md
-  position: 5
+  position: 6
   icon: rngtech:job_chip
 ---
 

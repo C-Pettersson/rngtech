@@ -50,19 +50,7 @@ One terminal lists jobs of every tier for every machine. The six lamps on its fa
 - [Drive bays and the Orders tab](rngtech:work-orders/drive-bays-and-the-orders-tab.md)
 - [Conditions](rngtech:work-orders/conditions.md)
 - [Refining and corrupting chips](rngtech:work-orders/refining-and-corrupting-chips.md)
-
-### Rush
-
-Rush is an optional time limit for a bigger reward. To use it:
-
-1. Click the chip's row to select it.
-2. Hover over **Rush** to see the time limit.
-3. Click **Rush**.
-
-The chip becomes active with half its tier's target time on the clock (see [Tiers](rngtech:work-orders/tiers.md)). Its reward goes up by 50%, rounded up.
-
-The clock never stops. It keeps running while the chip is paused, out of its bay, in your inventory, or in an unloaded chunk. If time runs out, you lose the chip and get nothing. A finished chip cannot expire. You cannot Rush a chip twice.
-
+- [Rush](rngtech:work-orders/rush.md)
 - [Rewards](rngtech:work-orders/rewards.md)
 
 ## Screen

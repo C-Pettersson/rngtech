@@ -648,7 +648,7 @@ public class BatteryAssemblerBlockEntity extends BaseMachineBlockEntity
             placeRemainder(slot, remainders[slot]);
         }
         recipe.consumeFluid(inputTank);
-        WorkReport report = assemblyReport(result);
+        WorkReport report = assemblyReport(result).withTicks(recipe.processingTicks() / Math.max(1, result.getCount()));
         addOutput(result);
         resetCycle();
         workOrderWork(report);

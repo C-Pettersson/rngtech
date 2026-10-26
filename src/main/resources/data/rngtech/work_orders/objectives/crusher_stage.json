@@ -6,40 +6,40 @@
     "tiers": [
         {
             "count": {
-                "min": 208,
-                "max": 304,
+                "min": 544,
+                "max": 808,
                 "step": 8
             },
             "min": 3
         },
         {
             "count": {
-                "min": 256,
-                "max": 384,
+                "min": 1104,
+                "max": 1656,
                 "step": 8
             },
             "min": 4
         },
         {
             "count": {
-                "min": 304,
-                "max": 464,
+                "min": 1376,
+                "max": 2072,
                 "step": 8
             },
             "min": 6
         },
         {
             "count": {
-                "min": 360,
-                "max": 536,
+                "min": 2376,
+                "max": 3568,
                 "step": 8
             },
             "min": 6
         },
         {
             "count": {
-                "min": 408,
-                "max": 616,
+                "min": 5256,
+                "max": 7888,
                 "step": 8
             },
             "min": 8

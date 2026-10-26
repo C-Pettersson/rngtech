@@ -45,7 +45,10 @@ public final class RecyclerWorkOrderGameTests {
     private RecyclerWorkOrderGameTests() {
     }
 
-    /** An Iron recycler takes a Stage 1 chip but not a Stage 4 one, and two Broken Circuits finish its job. */
+    /**
+     * An Iron recycler takes a Stage 1 chip but not a Stage 4 one, and two Broken Circuits finish its one-item job: each
+     * counts its recipe time, so two short recycles make one item of work.
+     */
     @GameTest(template = MachineTestSupport.EMPTY, timeoutTicks = 1200)
     public static void recyclingCountsTowardTheJob(GameTestHelper helper) {
         ComponentRecyclerBlockEntity recycler = MachineTestSupport.place(helper, MACHINE,
@@ -69,7 +72,7 @@ public final class RecyclerWorkOrderGameTests {
         MachineTestSupport.powerEachTick(helper, recycler.getEnergyStorage(null));
         helper.succeedWhen(() -> {
             LoadedWorkOrder job = recycler.workOrders().orders().isEmpty() ? null : recycler.workOrders().orders().getFirst();
-            check(job != null && job.fulfilled(), "Waiting for two recycles: " + recycler.workOrders() + "; " + MachineTestSupport.describe(recycler));
+            check(job != null && job.fulfilled(), "Waiting for two recycles to make one item of work: " + recycler.workOrders() + "; " + MachineTestSupport.describe(recycler));
             List<ItemStack> drops = Block.getDrops(helper.getBlockState(MACHINE), helper.getLevel(), helper.absolutePos(MACHINE), recycler);
             check(drops.stream().anyMatch(stack -> recycler.workOrders().equals(stack.get(ModDataComponents.WORK_ORDERS.get()))),
                     "The dropped recycler lost its chips: " + drops);
@@ -78,7 +81,7 @@ public final class RecyclerWorkOrderGameTests {
 
     private static ItemStack chip(int stage) {
         WorkOrder order = new WorkOrder(WorkOrderFamilies.COMPONENT_RECYCLER, 1, new WorkObjective(RNGTech.id("recycle"),
-                new WorkPart(WorkObjectiveType.RECYCLE, WorkFilter.ANY, 0, "", 2)), stage, 0, WorkOrder.BASE_BOUNTY, 0);
+                new WorkPart(WorkObjectiveType.RECYCLE, WorkFilter.ANY, 0, "", 1)), stage, 0, WorkOrder.BASE_BOUNTY, 0);
         return JobChipItem.of(ModItems.JOB_CHIP.get(), order, MachineTraits.EMPTY);
     }
 

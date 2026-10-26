@@ -1125,7 +1125,8 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
         input.shrink(1);
         mergeOutput(outputSlot, result);
         grantRecipeXp(recipe);
-        workOrderWork(new WorkReport(WorkObjectiveType.SMELT, WorkOrderEligibility.smeltStage(recipe), isElectric() ? heatSlider : 0, inputId, 1));
+        workOrderWork(new WorkReport(WorkObjectiveType.SMELT, WorkOrderEligibility.smeltStage(recipe), isElectric() ? heatSlider : 0, inputId, 1)
+                .withTicks(recipe.processingTicks()));
         refundClosedLoopEnergy(recipe, stats);
         return true;
     }

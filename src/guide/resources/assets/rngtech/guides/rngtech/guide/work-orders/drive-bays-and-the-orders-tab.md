@@ -22,7 +22,7 @@ A machine works on one chip at a time, the **active** chip. If no chip is active
 
 - **Activate:** Makes the selected chip active. The previously active chip pauses and keeps its progress.
 - **Pause:** Stops the active chip. It keeps its progress.
-- **Rush:** Makes the selected chip active with a time limit. See [Rush](rngtech:work-orders.md#rush).
+- **Rush:** Makes the selected chip active with a time limit. See [Rush](rngtech:work-orders/rush.md).
 - **Abandon:** Shift-click to destroy the chip. You get nothing back.
 
 A chip you take out of its bay keeps its progress, which its tooltip shows. When you load it again, here or in another machine of the same kind, it carries on from there. Taking out the active chip leaves the machine with no active chip.

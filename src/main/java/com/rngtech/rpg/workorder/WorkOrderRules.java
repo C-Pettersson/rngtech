@@ -1,5 +1,7 @@
 package com.rngtech.rpg.workorder;
 
+import com.rngtech.rpg.MachineTraits;
+
 import net.minecraft.resources.ResourceLocation;
 
 import java.util.ArrayList;
@@ -14,6 +16,9 @@ import java.util.random.RandomGenerator;
 
 /** Rolling, loading, counting, and paying out Work Orders, apart from any machine or world. */
 public final class WorkOrderRules {
+    /** The shortest Rush clock, in game ticks. */
+    public static final long MIN_RUSH_TICKS = 60L * 20L;
+
     private WorkOrderRules() { }
 
     /** The result of reported work: the machine's next chips, and the chip it fulfilled, or null. */
@@ -120,7 +125,8 @@ public final class WorkOrderRules {
 
     /**
      * Counts {@code report} toward the active chip: into the first unfinished part it matches, and any amount past that
-     * part's target into the next matching part. Work of the part's verb that misses a streak's minimum, or a stability job's
+     * part's target into the next matching part. Any-work, stage, and setting parts of a family with a reference recipe
+     * time count work: each item as its recipe's time over the reference, with the remainder carried on the chip. Work of the part's verb that misses a streak's minimum, or a stability job's
      * minimum under Fine Tolerance, sets that part back to 0. No active chip or no matching part changes nothing, and the same chips
      * come back. A fulfilled chip stays in its bay, inactive, and no other chip becomes active.
      */
@@ -130,9 +136,15 @@ public final class WorkOrderRules {
             return new Progress(orders, null);
         }
         LoadedWorkOrder advanced = active;
+        String family = active.order().family();
+        int reference = WorkOrderFamilies.workTicks(family);
+        boolean weighed = reference > 0 && report.ticks() > 0;
+        long recipeTime = weighed ? report.amount() * report.ticks() + active.workCarry() : 0;
         long left = report.amount();
+        long work = weighed ? recipeTime / reference : report.amount();
+        boolean worked = false;
         List<WorkPart> parts = active.order().objective().parts();
-        for (int index = 0; index < parts.size() && left > 0; index++) {
+        for (int index = 0; index < parts.size() && (left > 0 || work > 0 || weighed); index++) {
             WorkPart part = parts.get(index);
             long current = advanced.progress().get(index);
             boolean counts = WorkOrderConditions.counts(part, report, active.traits());
@@ -142,12 +154,42 @@ public final class WorkOrderRules {
                 continue;
             }
             if (current >= part.target() || !counts) { continue; }
-            long added = Math.min(left, part.target() - current);
-            advanced = advanced.withPartProgress(index, current + added);
-            left -= added;
+            boolean countsWork = WorkOrderFamilies.countsWork(family, part.filter());
+            long added = Math.min(countsWork ? work : left, part.target() - current);
+            if (added > 0) { advanced = advanced.withPartProgress(index, current + added); }
+            if (countsWork) {
+                work -= added;
+                worked = true;
+            } else {
+                left -= added;
+            }
         }
+        if (worked && weighed) { advanced = advanced.withWorkCarry(recipeTime % reference); }
         if (advanced == active) { return new Progress(orders, null); }
         return new Progress(orders.withReplaced(orders.active(), advanced), advanced.fulfilled() ? advanced : null);
+    }
+
+    /**
+     * Rush's clock for {@code order} in game ticks: half the time a good build of the tier's stage needs for the job's work,
+     * shortened by Short Fuse, and never under a minute. Stat goals, and families whose jobs count no recipe time, keep half
+     * the tier's target time.
+     */
+    public static long rushTicks(WorkOrder order, MachineTraits traits) {
+        long ticks = WorkOrder.rushTicks(order.tier());
+        int reference = WorkOrderFamilies.workTicks(order.family());
+        int speed = WorkOrderFamilies.jobSpeed(order.family(), order.tier());
+        List<WorkPart> parts = order.objective().parts();
+        if (reference > 0 && speed > 0 && parts.stream().noneMatch(WorkPart::statGoal)) {
+            long work = 0;
+            for (WorkPart part : parts) { work += part.target() * reference; }
+            ticks = work * 100 / speed / 2;
+        }
+        return Math.max(MIN_RUSH_TICKS, ticks * (100 - WorkOrderConditions.fuse(traits)) / 100);
+    }
+
+    /** Rush's bonus on the listed reward, in percent: the base bonus plus Short Fuse's. */
+    public static int rushBonus(MachineTraits traits) {
+        return WorkOrder.RUSH_BONUS + WorkOrderConditions.fuseBonus(traits);
     }
 
     /**

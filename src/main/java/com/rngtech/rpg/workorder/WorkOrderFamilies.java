@@ -43,6 +43,30 @@ public final class WorkOrderFamilies {
     /** The families whose machines report failures that break a streak. */
     private static final Set<String> STREAKS = Set.of("metal_press", "resonance_calibrator");
 
+    /**
+     * Each recipe family's reference recipe time in ticks, about its median recipe. Any-work, stage, and setting jobs count
+     * an item as its recipe's time over this, so a quick recipe counts less than a slow one. The Melter counts mB and the
+     * Forestry Companion has no recipes, so neither is listed.
+     */
+    private static final Map<String, Integer> WORK_TICKS = Map.of(
+            "crusher", 120, "furnace", 200, "alloy_furnace", 1200, "metal_press", 240, "resonance_calibrator", 300,
+            COMPONENT_ASSEMBLER, 240, COMPONENT_RECYCLER, 144);
+
+    /**
+     * A good build's throughput at each tier's stage, in hundredths of base recipe speed: job sizes and the Rush clock are
+     * set from it. The Crusher and Furnace come from the processing balance simulation (the 75th percentile build at
+     * Mastery level 1), raised where a stage's sample metal ran slower than the stage below; the others from their job
+     * sizes before work counting.
+     */
+    private static final Map<String, int[]> JOB_SPEED = Map.of(
+            "crusher", new int[] {450, 690, 690, 990, 2190},
+            "furnace", new int[] {160, 350, 430, 430, 490},
+            "alloy_furnace", new int[] {667, 667, 667, 667, 733},
+            "metal_press", new int[] {160, 160, 160, 160, 160},
+            "resonance_calibrator", new int[] {50, 50, 50, 50, 58},
+            COMPONENT_ASSEMBLER, new int[] {40, 40, 40, 40, 47},
+            COMPONENT_RECYCLER, new int[] {24, 24, 24, 24, 28});
+
     private WorkOrderFamilies() { }
 
     /** Whether a group job for {@code id} may name {@code group}. */
@@ -53,6 +77,23 @@ public final class WorkOrderFamilies {
     /** Every family's groups, sorted, so the menu can sync a group by its index. */
     public static List<String> allGroups() {
         return ALL_GROUPS;
+    }
+
+    /** {@code id}'s reference recipe time in ticks, or 0 when its jobs count items rather than work. */
+    public static int workTicks(String id) {
+        return WORK_TICKS.getOrDefault(id, 0);
+    }
+
+    /** Whether a {@code filter} part of {@code id}'s jobs counts work rather than items. */
+    public static boolean countsWork(String id, String filter) {
+        return workTicks(id) > 0 && (WorkFilter.ANY.id().equals(filter) || WorkFilter.STAGE.id().equals(filter)
+                || WorkFilter.SETTING.id().equals(filter));
+    }
+
+    /** A good build's throughput at {@code tier}'s stage in hundredths of base recipe speed, or 0 when none is set. */
+    public static int jobSpeed(String id, int tier) {
+        int[] speeds = JOB_SPEED.get(id);
+        return speeds == null ? 0 : speeds[Math.clamp(tier, WorkOrder.MIN_TIER, WorkOrder.MAX_TIER) - 1];
     }
 
     /** Whether streak jobs can roll for {@code id}: its machines report the failures that break a streak. */

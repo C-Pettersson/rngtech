@@ -15,23 +15,23 @@
         {
             "count": {
                 "min": 104,
-                "max": 152,
+                "max": 160,
                 "step": 8
             },
             "min": 4
         },
         {
             "count": {
-                "min": 128,
-                "max": 192,
+                "min": 136,
+                "max": 200,
                 "step": 8
             },
             "min": 4
         },
         {
             "count": {
-                "min": 152,
-                "max": 232,
+                "min": 160,
+                "max": 240,
                 "step": 8
             },
             "min": 6

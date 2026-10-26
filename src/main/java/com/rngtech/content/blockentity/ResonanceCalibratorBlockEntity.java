@@ -769,7 +769,8 @@ public class ResonanceCalibratorBlockEntity extends BaseMachineBlockEntity
         }
         mergeOutput(result);
         workOrderWork(new WorkReport(WorkObjectiveType.CALIBRATE, recipe.minimumStage(), lastStability,
-                BuiltInRegistries.ITEM.getKey(baseResult.getItem()).toString(), operations, recipe.family().getSerializedName()));
+                BuiltInRegistries.ITEM.getKey(baseResult.getItem()).toString(), operations, recipe.family().getSerializedName())
+                .withTicks(recipe.processingTicks()));
         completions = (completions + 1) & 0xFF;
         for (int index = 0; index < operations; index++) {
             grantRecipeXp(recipe);

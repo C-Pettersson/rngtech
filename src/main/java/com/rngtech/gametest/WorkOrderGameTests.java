@@ -34,6 +34,7 @@ import com.rngtech.rpg.workorder.WorkObjectiveType;
 import com.rngtech.rpg.workorder.WorkOrder;
 import com.rngtech.rpg.workorder.WorkOrderConditions;
 import com.rngtech.rpg.workorder.WorkOrderProgress;
+import com.rngtech.rpg.workorder.WorkOrderRules;
 import com.rngtech.rpg.workorder.WorkPart;
 import com.rngtech.rpg.workorder.WorkReport;
 
@@ -357,7 +358,7 @@ public final class WorkOrderGameTests {
     }
 
     /**
-     * Rush activates a chip with a deadline of the tier's Rush time and half again its listed reward. Past the deadline the
+     * Rush activates a chip with a deadline of the job's Rush clock and half again its listed reward. Past the deadline the
      * chip is lost from the bay, from an inventory, and a bay refuses it.
      */
     @GameTest(template = MachineTestSupport.EMPTY)
@@ -372,8 +373,9 @@ public final class WorkOrderGameTests {
         long now = helper.getLevel().getGameTime();
         check(WorkOrderOperations.perform(player, crusher, "rush", "1"), "The Crusher refused Rush");
         LoadedWorkOrder rushed = crusher.workOrders().orders().get(1);
-        check(crusher.workOrders().active() == 1 && rushed.rushed() && rushed.rushDeadline() >= now + WorkOrder.rushTicks(2)
-                && rushed.rushDeadline() <= now + WorkOrder.rushTicks(2) + 5, "Rush did not activate the chip with its deadline: " + crusher.workOrders());
+        long clock = WorkOrderRules.rushTicks(rushed.order(), rushed.traits());
+        check(crusher.workOrders().active() == 1 && rushed.rushed() && rushed.rushDeadline() >= now + clock
+                && rushed.rushDeadline() <= now + clock + 5, "Rush did not activate the chip with its deadline: " + crusher.workOrders());
         check(!WorkOrderOperations.perform(player, crusher, "rush", "1"), "Rush ran twice on one chip");
         check(WorkOrderOperations.perform(player, crusher, "rush", "0"), "The Crusher refused Rush on the listed chip");
         List<ItemStack> boosted = WorkOrderRewards.items(crusher.workOrders().orders().get(0).order().rewards());

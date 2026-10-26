@@ -105,7 +105,12 @@ public record WorkOrder(String family, int tier, WorkObjective objective, int mi
 
     /** {@code amount} with the Rush bonus, rounded up. */
     public static int rushAmount(int amount) {
-        return amount + (amount * RUSH_BONUS + 99) / 100;
+        return rushAmount(amount, RUSH_BONUS);
+    }
+
+    /** {@code amount} grown by {@code bonus} percent, rounded up. */
+    public static int rushAmount(int amount, int bonus) {
+        return amount + (amount * bonus + 99) / 100;
     }
 
     /** The tier's chassis stage before any family's top stage caps it. */

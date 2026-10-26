@@ -830,7 +830,8 @@ public class AlloyFurnaceBlockEntity extends BaseMachineBlockEntity implements M
         consumeInputs(consumed);
         mergeOutput(result);
         workOrderWork(new WorkReport(WorkObjectiveType.ALLOY, recipe.minimumComponentStage(), heatSlider,
-                BuiltInRegistries.ITEM.getKey(baseResult.getItem()).toString(), baseResult.getCount() * batch));
+                BuiltInRegistries.ITEM.getKey(baseResult.getItem()).toString(), baseResult.getCount() * batch)
+                .withTicks(recipe.processingTicks() / Math.max(1, baseResult.getCount())));
         lastRecipe = recipe;
         escapement.completed();
         completeCycle();

@@ -85,14 +85,19 @@ public final class WorkOrderConditionChecks {
             }
         }
         require(seenCrusher.equals(Set.of(WorkOrderConditions.STARVED_FEED, WorkOrderConditions.POWER_SURCHARGE, WorkOrderConditions.SHORT_CREW,
-                WorkOrderConditions.HAND_FEEDING, WorkOrderConditions.JAMMED_LINE, WorkOrderConditions.DEEP_ORE)), "every Crusher condition rolls: " + seenCrusher);
+                WorkOrderConditions.HAND_FEEDING, WorkOrderConditions.JAMMED_LINE, WorkOrderConditions.DEEP_ORE, WorkOrderConditions.SHORT_FUSE)),
+                "every Crusher condition rolls: " + seenCrusher);
         require(seenFurnace.equals(Set.of(WorkOrderConditions.STARVED_FEED, WorkOrderConditions.POWER_SURCHARGE, WorkOrderConditions.SHORT_CREW,
-                WorkOrderConditions.COLD_START, WorkOrderConditions.BRITTLE_LINING, WorkOrderConditions.DEEP_ORE)), "every Furnace condition rolls: " + seenFurnace);
-        require(WorkOrderConditions.profile("crusher").definitions().size() == 6 && WorkOrderConditions.profile("furnace").definitions().size() == 6,
+                WorkOrderConditions.COLD_START, WorkOrderConditions.BRITTLE_LINING, WorkOrderConditions.DEEP_ORE, WorkOrderConditions.SHORT_FUSE)),
+                "every Furnace condition rolls: " + seenFurnace);
+        require(WorkOrderConditions.profile("crusher").definitions().size() == 7 && WorkOrderConditions.profile("furnace").definitions().size() == 7,
                 "each family's profile holds the conditions it reads");
     }
 
-    /** No pressure condition can raise a stat's benefit; rule conditions change no stat at all. */
+    /**
+     * No pressure condition can raise a stat's benefit; rule conditions change no stat at all. Short Fuse's value is the
+     * share it cuts from the Rush clock, and like every rule condition it is never applied to the machine's stats.
+     */
     private static void costsOnly() {
         for (WorkOrderConditions.Condition condition : WorkOrderConditions.all()) {
             for (ModifierValueRange range : condition.definition().tierRanges()) {
@@ -100,7 +105,9 @@ public final class WorkOrderConditionChecks {
                 ModifierOperation operation = condition.definition().operation();
                 boolean cost;
                 if (!condition.pressure()) {
-                    cost = operation == ModifierOperation.ADD && range.min() == 0 && range.max() == 0;
+                    cost = WorkOrderConditions.SHORT_FUSE.equals(condition.id())
+                            ? range.min() > 0 && range.max() < 100
+                            : operation == ModifierOperation.ADD && range.min() == 0 && range.max() == 0;
                 } else if (operation == ModifierOperation.LESS) {
                     cost = range.max() < 1;
                 } else if (stat == MachineStat.ENERGY_USAGE) {

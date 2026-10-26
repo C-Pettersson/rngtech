@@ -1,6 +1,8 @@
 package com.rngtech.rpg.workorder;
 
 import com.rngtech.content.energy.BatteryCellMaterial;
+import com.rngtech.rpg.CorruptionOutcome;
+import com.rngtech.rpg.MachineCorruption;
 import com.rngtech.rpg.MachineStat;
 import com.rngtech.rpg.MachineTraits;
 import com.rngtech.rpg.Rarity;
@@ -8,6 +10,7 @@ import com.rngtech.rpg.Rarity;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.RandomSource;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -33,10 +36,12 @@ public final class WorkOrderRuleChecks {
         ranges(shipped);
         loadRules();
         counting();
+        workCounting();
         itemJobs(shipped);
         rewardAmounts();
         rush();
         statGoals(shipped);
+        jobSizes(shipped);
         streaks();
         groups();
         reachable(shipped);
@@ -348,9 +353,82 @@ public final class WorkOrderRuleChecks {
                 "every group syncs by its index in one sorted list");
     }
 
-    /** Rush deadlines: half the tier's target time, a rounded-up bonus, and expiry that spares finished chips. */
+    /** Any-work, stage, and setting parts count recipe time over the family's reference; named items and the Melter count items. */
+    private static void workCounting() {
+        int reference = WorkOrderFamilies.workTicks("crusher");
+        var stage = MachineWorkOrders.EMPTY.withLoaded(loaded(new WorkOrder("crusher", 1, single(WorkFilter.STAGE, 3, "", 10), 4, 0, 100, 0)));
+        var seeds = WorkOrderRules.progress(stage, new WorkReport(WorkObjectiveType.CRUSH, 3, 0, "", 20).withTicks(16)).orders();
+        LoadedWorkOrder afterSeeds = seeds.activeOrder();
+        require(afterSeeds.progress().getFirst() == 20L * 16 / reference && afterSeeds.workCarry() == 20L * 16 % reference,
+                "quick recipes count their recipe time, with the remainder carried: " + afterSeeds);
+        var topped = WorkOrderRules.progress(seeds, new WorkReport(WorkObjectiveType.CRUSH, 3, 0, "", 1).withTicks(reference - 20L * 16 % reference > 0
+                ? (int) (reference - 20L * 16 % reference) : reference)).orders().activeOrder();
+        require(topped.progress().getFirst() == 20L * 16 / reference + 1 && topped.workCarry() == 0, "the carry completes the next whole item");
+        var slow = WorkOrderRules.progress(stage, new WorkReport(WorkObjectiveType.CRUSH, 3, 0, "", 1).withTicks(reference * 5)).orders().activeOrder();
+        require(slow.progress().getFirst() == 5, "a slow recipe counts as several items");
+        var bare = WorkOrderRules.progress(stage, new WorkReport(WorkObjectiveType.CRUSH, 3, 0, "", 4)).orders().activeOrder();
+        require(bare.progress().getFirst() == 4 && bare.workCarry() == 0, "a report without a recipe time counts its items");
+        var named = MachineWorkOrders.EMPTY.withLoaded(loaded(new WorkOrder("crusher", 1, single(WorkFilter.ITEM, 0, "minecraft:raw_iron", 10), 4, 0, 100, 0)));
+        require(WorkOrderRules.progress(named, new WorkReport(WorkObjectiveType.CRUSH, 1, 0, "minecraft:raw_iron", 2).withTicks(reference * 3))
+                .orders().activeOrder().progress().getFirst() == 2, "a named-item part counts items, whatever their recipe time");
+        var melt = MachineWorkOrders.EMPTY.withLoaded(loaded(new WorkOrder("melter", 1,
+                new WorkObjective(id("melt"), new WorkPart(WorkObjectiveType.MELT, WorkFilter.ANY, 0, "", 5000)), 6, 0, 100, 0)));
+        require(WorkOrderRules.progress(melt, new WorkReport(WorkObjectiveType.MELT, 6, 0, "rngtech:lubricant", 1000).withTicks(300))
+                .orders().activeOrder().progress().getFirst() == 1000, "the Melter counts mB, not recipe time");
+        for (String family : List.of("crusher", "furnace", "alloy_furnace", "metal_press", "resonance_calibrator", "component_assembler", "component_recycler")) {
+            require(WorkOrderFamilies.workTicks(family) > 0, family + " counts work");
+            for (int tier = WorkOrder.MIN_TIER; tier < WorkOrder.MAX_TIER; tier++) {
+                require(WorkOrderFamilies.jobSpeed(family, tier) > 0 && WorkOrderFamilies.jobSpeed(family, tier) <= WorkOrderFamilies.jobSpeed(family, tier + 1),
+                        family + "'s good-build speed never drops from one tier to the next");
+            }
+        }
+        require(WorkOrderFamilies.workTicks("melter") == 0 && WorkOrderFamilies.workTicks("forestry") == 0, "the Melter and Forestry Companion count items");
+    }
+
+    /** Job sizes match the reference: a work job's middle count takes a good build of its stage about the tier's target time. */
+    private static void jobSizes(List<WorkObjectiveEntry> shipped) {
+        int[] minutes = {15, 20, 25, 30, 30};
+        for (WorkObjectiveEntry entry : shipped) {
+            if (!WorkOrderFamilies.countsWork(entry.family(), entry.filter().id())) { continue; }
+            for (int tier = WorkOrder.MIN_TIER; tier <= WorkOrder.MAX_TIER; tier++) {
+                WorkObjectiveEntry.Goal goal = entry.goal(tier);
+                double ticks = (goal.min() + goal.max()) / 2.0 * WorkOrderFamilies.workTicks(entry.family()) * 100 / WorkOrderFamilies.jobSpeed(entry.family(), tier);
+                double target = minutes[tier - 1] * 60 * 20;
+                require(ticks >= target * 0.85 && ticks <= target * 1.15, entry.id() + " Tier " + tier + " takes a good build about "
+                        + minutes[tier - 1] + " minutes, not " + Math.round(ticks / 1200));
+            }
+        }
+    }
+
+    /**
+     * Rush deadlines: half a good build's time for the job's work, shortened by Short Fuse, a rounded-up bonus, and expiry
+     * that spares finished chips.
+     */
     private static void rush() {
-        require(WorkOrder.rushTicks(1) == 15 * 60 * 20 / 2 && WorkOrder.rushTicks(5) == 30 * 60 * 20 / 2, "Rush is half the tier's target time");
+        require(WorkOrder.rushTicks(1) == 15 * 60 * 20 / 2 && WorkOrder.rushTicks(5) == 30 * 60 * 20 / 2, "Rush falls back to half the tier's target time");
+        WorkOrder sized = new WorkOrder("crusher", 2, single(WorkFilter.ANY, 0, "", 1200), 5, 0, 100, 0);
+        long expected = 1200L * WorkOrderFamilies.workTicks("crusher") * 100 / WorkOrderFamilies.jobSpeed("crusher", 2) / 2;
+        require(WorkOrderRules.rushTicks(sized, MachineTraits.EMPTY) == expected, "Rush is half a good build's time for the job's work");
+        WorkOrder doubled = new WorkOrder("crusher", 2, single(WorkFilter.ANY, 0, "", 2400), 5, 0, 100, 0);
+        require(Math.abs(WorkOrderRules.rushTicks(doubled, MachineTraits.EMPTY) - expected * 2) <= 1, "a bigger rolled job gets a longer Rush clock");
+        WorkOrder goal = new WorkOrder("crusher", 2, single(WorkFilter.STAT, 0, "processing_speed", 300), 5, 0, 100, 0);
+        WorkOrder melt = new WorkOrder("melter", 2, new WorkObjective(id("melt"), new WorkPart(WorkObjectiveType.MELT, WorkFilter.ANY, 0, "", 5000)), 6, 0, 100, 0);
+        require(WorkOrderRules.rushTicks(goal, MachineTraits.EMPTY) == WorkOrder.rushTicks(2) && WorkOrderRules.rushTicks(melt, MachineTraits.EMPTY) == WorkOrder.rushTicks(2),
+                "stat goals and the Melter keep half the tier's target time");
+        require(WorkOrderRules.rushTicks(new WorkOrder("crusher", 1, single(WorkFilter.ANY, 0, "", 1), 4, 0, 100, 0), MachineTraits.EMPTY) == WorkOrderRules.MIN_RUSH_TICKS,
+                "Rush never runs under a minute");
+        var fuse = WorkOrderConditions.get(WorkOrderConditions.SHORT_FUSE).definition().roll(3, RandomSource.create(4L));
+        MachineTraits fused = new MachineTraits(Rarity.MAGIC, 0, List.of(fuse), List.of());
+        long shortened = expected * (100 - Math.round(fuse.value())) / 100;
+        require(fuse.value() >= 48 && fuse.value() <= 60 && WorkOrderRules.rushTicks(sized, fused) == shortened
+                && WorkOrderRules.rushBonus(fused) == WorkOrder.RUSH_BONUS + 60, "Short Fuse shortens the clock and raises the Rush reward: " + fuse);
+        MachineTraits blessed = MachineTraits.EMPTY.withCorruption(new MachineCorruption(CorruptionOutcome.BLESSED, List.of(fuse), List.of()));
+        MachineTraits blighted = MachineTraits.EMPTY.withCorruption(new MachineCorruption(CorruptionOutcome.BLIGHTED, List.of(fuse), List.of()));
+        require(WorkOrderRules.rushTicks(sized, blessed) == expected && WorkOrderRules.rushBonus(blessed) > WorkOrder.RUSH_BONUS,
+                "a Blessed Short Fuse pays without the shorter clock");
+        require(WorkOrderRules.rushTicks(sized, blighted) == shortened && WorkOrderRules.rushBonus(blighted) == WorkOrder.RUSH_BONUS,
+                "a Blighted Short Fuse shortens the clock and pays nothing");
+        require(WorkOrderConditions.bounty(fused) == 0, "Short Fuse adds no Bounty, so an un-Rushed chip gains nothing from it");
         require(WorkOrder.rushAmount(4) == 6 && WorkOrder.rushAmount(3) == 5 && WorkOrder.rushAmount(1) == 2 && WorkOrder.rushAmount(100) == 150,
                 "Rush adds half again, rounded up");
         var order = new WorkOrder("crusher", 1, single(WorkFilter.ANY, 0, "", 10), 4, 0, 100, 0);

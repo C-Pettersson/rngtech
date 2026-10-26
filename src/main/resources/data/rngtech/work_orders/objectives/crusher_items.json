@@ -68,36 +68,36 @@
     "tiers": [
         {
             "count": {
-                "min": 160,
-                "max": 240,
+                "min": 272,
+                "max": 408,
                 "step": 8
             }
         },
         {
             "count": {
-                "min": 208,
-                "max": 312,
+                "min": 552,
+                "max": 832,
                 "step": 8
             }
         },
         {
             "count": {
-                "min": 256,
-                "max": 384,
+                "min": 688,
+                "max": 1032,
                 "step": 8
             }
         },
         {
             "count": {
-                "min": 304,
-                "max": 456,
+                "min": 1184,
+                "max": 1784,
                 "step": 8
             }
         },
         {
             "count": {
-                "min": 352,
-                "max": 528,
+                "min": 2624,
+                "max": 3944,
                 "step": 8
             }
         }

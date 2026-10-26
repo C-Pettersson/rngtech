@@ -270,6 +270,19 @@ Recorded 2026-10-26 for phase 10, from the build:
 - Machine Design Notes gain a Work Orders section with the design rules, and the Machine Tabs table an Orders row. The implementation matrix gains a Work Orders section, rows for the terminal, chips, and Requisitions, the chip refinement target, and the reward table.
 - The FTB Quests chapter `rngtech_work_orders` (order 8) runs from a Stage 4 Calibrator through the terminal, a first chip, and a redeemed chip, with optional quests for Requisitions, conditions and Rush, and refining chips. Its ids start 0-7.
 
+Recorded 2026-10-26 after timing jobs against the processing balance simulation, from the user:
+
+- A per-recipe model of the shipped Crusher jobs (recipe ticks against the level-1 simulation's builds, with the player picking the fastest recipe that counts) showed two faults. Any-work jobs counted 16-tick Seeds to Compost Feedstock like ores, so every tier finished in minutes. And item counts did not scale with build strength: the user's Exotic Crusher (917% faster, batch 12, about 32 times base throughput) finished the hardest Tier V job in about 6 minutes, inside every Rush clock.
+- The user chose all three recommendations. Any-work, stage, and setting jobs count work: each item counts as its recipe's base time over a reference time per family, with the remainder carried on the chip. The Rush clock comes from the job's work: half the time a good build of the tier's stage needs, so a bigger rolled job gets more time; stat goals, the Melter, and the Forestry Companion keep half the tier's target time. A new suffix, of the Short Fuse, cuts the Rush clock by 25% to 60% for 25% to 60% more Rush reward. It pays only when the chip is Rushed, so it adds no Bounty.
+- "I want people to fail": the plain clock stays beatable by strong builds, and Short Fuse is the opt-in that makes a Rush a real race.
+
+Recorded 2026-10-26 for work counting, from the build:
+
+- `WorkReport` carries the recipe's base ticks per item (the Alloy Furnace and Assembler divide by the recipe's output count). `WorkOrderFamilies` holds each family's reference ticks (about its median recipe) and a good build's throughput per tier. The Crusher and Furnace speeds are the simulation's 75th percentile build at Mastery level 1, raised where a stage's sample metal ran slower than the stage below; the other families keep the speed their stage jobs implied before, made non-decreasing.
+- Counts come from that table: a job's middle count is about the tier's target minutes of work for a good build, and `WorkOrderRuleChecks.jobSizes` holds every work job within 15% of it. Crusher and Furnace item parts are half a stage job's count, since an item job has two parts on average. Any-work jobs now match stage jobs. Crusher counts grew about two to ten times (Tier V stage jobs 5,256 to 7,888 items of work), so a Tier V job is a large mining demand; the playtest should confirm it.
+- The carry lives on the loaded chip (`work_carry`); unloading a chip drops less than one item of work.
+- Short Fuse is a rule condition whose value is the share cut from the clock. It is never applied to the machine's stats. A Blessed Short Fuse pays its Rush bonus without the shorter clock; a Blighted one shortens the clock and pays nothing.
+
 ## Code against the redesign
 
 The branch's loop was built for the earlier design. Phase 2 of the rework replaced the Mastery storage, the Mastery level gate, the tier and seed components, and the Tier I recipe; the lists below show what is left for later phases.
@@ -349,6 +362,7 @@ Recorded 2026-10-25 from the chips slice:
 - 2026-10-26: rework phase 10. The Work Orders wiki page and updates to nine machine pages and five guide and refinement pages, the regenerated in-game guide, the implementation matrix, Machine Design Notes, and the FTB Quests chapter.
 - 2026-10-26: merged the Job Chip lamp branch (`feature/work-order-status-light`) after phase 10, and added the lamp to the wiki page.
 - 2026-10-26: playtested the Job Chip lamp in the client after the merge: placed correctly and lights with the active chip.
+- 2026-10-26: work counting, the work-based Rush clock, and of the Short Fuse. `WorkReport.ticks`, `LoadedWorkOrder.workCarry`, `WorkOrderFamilies.workTicks` and `jobSpeed`, `WorkOrderRules.rushTicks` and `rushBonus`, retuned counts for every recipe machine's any-work, stage, and setting jobs and the Crusher and Furnace item jobs. Checks: `workCounting`, `jobSizes`, and Rush and Short Fuse rules in `WorkOrderRuleChecks`.
 
 ## Verification
 

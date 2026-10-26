@@ -10,13 +10,15 @@ navigation:
 
 A job's tier, I to V, sets the job's size, the chassis stage it needs, and the reward's size. Some machines stop below a tier's stage. These machines need only their top stage.
 
-| Tier | Chassis stage | Job size | Rush time |
-|---|---:|---|---:|
-| I | 4 | About 15 minutes on a good Stage 4 build | 7:30 |
-| II | 5 | About 20 minutes on a good Stage 5 build | 10:00 |
-| III | 6 | About 25 minutes on a good Stage 6 build | 12:30 |
-| IV | 7 | About 30 minutes on a good Stage 7 build | 15:00 |
-| V | 8 | About 30 minutes on a good Stage 8 build | 15:00 |
+| Tier | Chassis stage | Job size |
+|---|---:|---|
+| I | 4 | About 15 minutes on a good Stage 4 build |
+| II | 5 | About 20 minutes on a good Stage 5 build |
+| III | 6 | About 25 minutes on a good Stage 6 build |
+| IV | 7 | About 30 minutes on a good Stage 7 build |
+| V | 8 | About 30 minutes on a good Stage 8 build |
+
+A strong build finishes a job much faster than this, and a weak one takes longer.
 
 | Machine | Top stage |
 |---|---:|

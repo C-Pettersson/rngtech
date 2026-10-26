@@ -160,7 +160,7 @@ The mix should feel balanced, with no one kind dominating. Draft kinds, tuned by
 
 ### Counts and targets
 
-Each tier's goal is a range, not one number: a count range for counted parts, and a target range for stat goals. The terminal rolls a value in the range and rounds it to the entry's step, such as a multiple of 8 items or 50 °C, so jobs read cleanly and rarely stack. Draft: ranges stay within about 20% either side of their middle, so jobs of one tier stay comparable. A single number still works and means a fixed goal. Broad counts use larger ranges than specific items, because any work counts toward them.
+Any-work, stage, and setting parts of machines with recipes count work, not items: each item counts as its recipe's base time over a reference time for the family, so quick filler recipes cannot finish a job. Each tier's goal is a range, not one number: a count range for counted parts, and a target range for stat goals. The terminal rolls a value in the range and rounds it to the entry's step, such as a multiple of 8 items or 50 °C, so jobs read cleanly and rarely stack. Draft: ranges stay within about 20% either side of their middle, so jobs of one tier stay comparable. A single number still works and means a fixed goal. Broad counts use larger ranges than specific items, because any work counts toward them.
 
 The range is split into three equal bands: low, middle, and high. The band sets a Bounty bonus, which makes the reward bigger. Every value inside one band pays the same. Draft bonuses: low +0%, middle +10%, high +20% Bounty. A fixed goal has no bands and no bonus. A job with several parts uses the band of its largest part.
 
@@ -242,7 +242,8 @@ Rules:
 Rush is the one condition the player adds when activating an order. It never rolls on an order, and refinement cannot add or remove it.
 
 - The Orders tab shows the deadline before the player commits.
-- Draft: the deadline is half the tier's target time (7:30 at Tier I up to 15:00 at Tier V), in world game time. Rush adds 50% to the listed reward's amount. The first draft, 1.5 times the target time, was no pressure in playtest, because the draft job sizes finish well inside the target time.
+- The deadline is half the time a good build of the tier's stage needs for the job's work, so a bigger rolled job gets more time; stat goals and jobs that count no recipe time keep half the tier's target time. Rush adds 50% to the listed reward's amount. The first draft, 1.5 times the target time, was no pressure in playtest, and a fixed half of the target time was still beaten by strong builds.
+- Rush is beatable by strong builds on purpose. The suffix of the Short Fuse cuts the clock by 25% to 60% for a larger Rush reward, so players who want a real race refine it onto the chip.
 - The deadline keeps running while the chip is inactive or out of its bay, while the machine's chunk is unloaded, and while the machine is broken.
 - When the deadline passes, the chip expires. It is lost, the conditions stop, and nothing is ejected.
 

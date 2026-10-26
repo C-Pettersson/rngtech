@@ -65,13 +65,15 @@ One terminal lists jobs of every tier for every machine. The six lamps on its fa
 
 A job's tier, I to V, sets the job's size, the chassis stage it needs, and the reward's size. Some machines stop below a tier's stage. These machines need only their top stage.
 
-| Tier | Chassis stage | Job size | Rush time |
-|---|---:|---|---:|
-| I | 4 | About 15 minutes on a good Stage 4 build | 7:30 |
-| II | 5 | About 20 minutes on a good Stage 5 build | 10:00 |
-| III | 6 | About 25 minutes on a good Stage 6 build | 12:30 |
-| IV | 7 | About 30 minutes on a good Stage 7 build | 15:00 |
-| V | 8 | About 30 minutes on a good Stage 8 build | 15:00 |
+| Tier | Chassis stage | Job size |
+|---|---:|---|
+| I | 4 | About 15 minutes on a good Stage 4 build |
+| II | 5 | About 20 minutes on a good Stage 5 build |
+| III | 6 | About 25 minutes on a good Stage 6 build |
+| IV | 7 | About 30 minutes on a good Stage 7 build |
+| V | 8 | About 30 minutes on a good Stage 8 build |
+
+A strong build finishes a job much faster than this, and a weak one takes longer.
 
 | Machine | Top stage |
 |---|---:|
@@ -98,6 +100,8 @@ A job has one to three parts, and it is done when every part is done. The termin
 | A stat goal | Reach a Processing Speed of 3.1 on a Crusher |
 
 Only work the machine finishes while the chip is active counts. A batch counts every item it finishes.
+
+Any-work, stage, and setting jobs count **work**, not single items. Each item counts by its recipe's time, so a quick recipe counts as part of an item and a slow one as several. For example, Seeds in a Crusher count as a fraction of an item, and Raw Naquadah counts as several. The chip says "Counts work" on these jobs. Named-item, kind-of-output, and streak jobs count items. The Melter counts mB, and the Forestry Companion counts logs and crops.
 
 - **Stage jobs:** Hold Shift on the chip, or on its row in the Orders tab, to see the items that count. Furnace and Metal Press chips list materials instead.
 - **Streaks:** A streak counts work in a row. A failure resets it to 0, and so does work below the streak's setting. The chip remembers its best streak.
@@ -172,6 +176,7 @@ Conditions apply only while their chip is active. A stat breakdown lists each on
 | of the Jammed Line | A jam resets the job's progress to 0 | +30% Bounty, +1 Prestige | Crusher |
 | of Fine Tolerance | A calibration below the job's stability resets its progress to 0 | +35% Bounty, +1 Prestige | Resonance Calibrator stability jobs |
 | of Deep Ore | Only work one level above the job's minimum counts | +25% Bounty, +1 Prestige | Stage jobs |
+| of the Short Fuse | Rush clock 25%–60% shorter | +25% to +60% Rush reward, only when you Rush | All |
 
 A higher-tier condition costs more and pays more. A chip only rolls conditions its job can use.
 
@@ -206,7 +211,9 @@ Rush is an optional time limit for a bigger reward. To use it:
 2. Hover over **Rush** to see the time limit.
 3. Click **Rush**.
 
-The chip becomes active with half its tier's target time on the clock (see [Tiers](#tiers)). Its reward goes up by 50%, rounded up.
+The chip becomes active with a time limit. The limit is half the time that a good build of the tier's stage needs for this job (see [Tiers](#tiers)), so a bigger job gets more time. A stat goal gets half its tier's target time. Its reward goes up by 50%, rounded up.
+
+A strong build beats the plain clock easily. A chip **of the Short Fuse** cuts the clock by 25% to 60% and adds 25% to 60% to the Rush reward. It does nothing unless you Rush the chip, so add it in the Affix Forge when you want a real race.
 
 The clock never stops. It keeps running while the chip is paused, out of its bay, in your inventory, or in an unloaded chunk. If time runs out, you lose the chip and get nothing. A finished chip cannot expire. You cannot Rush a chip twice.
 
