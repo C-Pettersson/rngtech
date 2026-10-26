@@ -175,6 +175,10 @@ public final class RNGTechJeiPlugin implements IModPlugin {
                 com.rngtech.content.recipe.TraitShapedRecipe.class,
                 new TraitCraftingCategoryExtension()
         );
+        registration.getCraftingCategory().addExtension(
+                com.rngtech.content.recipe.ToolDamageShapelessRecipe.class,
+                new ToolDamageCraftingCategoryExtension()
+        );
     }
 
     /** The default outcome weights as loaded, then how the Stabilization Crystal changes them. */

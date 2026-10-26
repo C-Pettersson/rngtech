@@ -14,7 +14,8 @@ import java.util.function.Predicate;
 
 /**
  * Adds the real stacks the open crafting grid holds to a recipe slot. Refined Storage's recipe transfer only takes a
- * slot's exact stacks, so rolled items such as Calibrated Crystals count as missing unless the slot lists them.
+ * slot's exact stacks, so rolled items such as Calibrated Crystals, or a used tool, count as missing unless the slot
+ * lists them.
  */
 final class CraftingTransferVariants {
     private static final String REFINED_STORAGE = "refinedstorage";
