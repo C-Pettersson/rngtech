@@ -289,6 +289,10 @@ Recorded 2026-10-26 while playtesting work counting, from the user:
 - A loaded chip no longer starts on its own. `MachineWorkOrders.withLoaded` keeps the active chip as it is, so the player chooses Activate or Rush. Before, a chip loaded into a machine with none active became active, which also made a later Rush impossible once work had counted.
 - Fluid amounts on chips use SI form, like the tanks: `JobChipItem.amountText` writes 250 mB, 32 B, or 1.5 MB in job text, progress, and per-part lines. Item counts stay exact.
 
+Recorded 2026-10-26 when merging the machine challenge loot removal, from the user:
+
+- Glyphs dropping on top of machines left items lying around. A separate session removed the six machine challenge tables and their hooks (`feature/remove-machine-challenge-loot`, `a6faa4f0`), and the user had it merged into this branch: Work Orders are meant to be the main Glyph source. The `rngtech:challenge` type, `ChallengeContext`, its conditions, and `ChallengeLoot.roll` stay for the Work Order table, which is now the only shipped challenge table. Dormant Machines still give Tier I to IV Glyphs, and Work Orders the only default Tier V.
+
 ## Code against the redesign
 
 The branch's loop was built for the earlier design. Phase 2 of the rework replaced the Mastery storage, the Mastery level gate, the tier and seed components, and the Tier I recipe; the lists below show what is left for later phases.
@@ -370,6 +374,7 @@ Recorded 2026-10-25 from the chips slice:
 - 2026-10-26: playtested the Job Chip lamp in the client after the merge: placed correctly and lights with the active chip.
 - 2026-10-26: work counting, the work-based Rush clock, and of the Short Fuse. `WorkReport.ticks`, `LoadedWorkOrder.workCarry`, `WorkOrderFamilies.workTicks` and `jobSpeed`, `WorkOrderRules.rushTicks` and `rushBonus`, retuned counts for every recipe machine's any-work, stage, and setting jobs and the Crusher and Furnace item jobs. Checks: `workCounting`, `jobSizes`, and Rush and Short Fuse rules in `WorkOrderRuleChecks`.
 - 2026-10-26: Rush only before a job starts, no auto-start on load, and SI fluid amounts on chips. Checks: the storage check for an inactive load, explicit Activate in every machine's GameTest, a refused Rush on a started chip, and SI text in `MelterWorkOrderGameTests`.
+- 2026-10-26: merged the machine challenge loot removal. Work Orders keep `ChallengeLoot.WORK_ORDER` as the one shipped table; the wiki Phase Array page, Modpack Creators, JEI Glyph page, implementation matrix, and `check-uniques.mjs` name Work Orders as the main Glyph source.
 
 ## Verification
 

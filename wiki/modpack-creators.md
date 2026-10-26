@@ -12,7 +12,7 @@ Use this page to fit RNGTech into your modpack. It lists the energy and water nu
     - **Energy** is plain FE. At each stage, one main generator powers about one typical machine.
     - **Ore to ingots** costs about 9,000 FE per ingot at Stage 1 and about 70,000 at Stage 8.
     - **Water is finite** in RNGTech's balance. The mod still accepts infinite water, so turn it off in your pack.
-    - **Uniques:** you can move them to quests or machine challenges and add your own. See [Uniques](#uniques).
+    - **Uniques:** you can move them to quests and add your own. See [Uniques](#uniques).
     - **Ore progression:** ore hardness covers other mods' ores, and you can weaken or disable vanilla tools. See [Strict preset](#strict-preset).
     - **Settings** live in `config/rngtech-common.toml`. You change recipes with an ordinary datapack.
 
@@ -140,7 +140,7 @@ By default, Uniques drop from vanilla structures and mobs. The [Uniques](uniques
 
 - **Turn off default drops:** `uniques.loot.enabled`, or one Unique with `uniques.loot.<id>.enabled`.
 - **Give one:** `/rngtech unique give <players> <id>`, or use the item as a quest reward. Each player rolls their own copy when they identify it.
-- **Machine challenges:** RNGTech rolls a loot table on machine events, such as a Crusher jam or a finished calibration. By default the tables drop only Glyphs for the Phase Array, behind Mastery milestones, high-stability calibrations, Stage 7+ forestry heads, unstable Vacuum Collapse cycles, and high-level Crusher jams. Replace or extend them to reward players your own way. `/rngtech glyph give <players> <tier>` hands out a Glyph of tier 1 to 5.
+- **Give a Glyph:** `/rngtech glyph give <players> <tier>` gives a Glyph of tier 1 to 5. Machines do not drop loot on their own events, so quests are the way to reward machine play.
 - **Add your own Uniques:** put a JSON file in `config/rngtech/uniques/`.
 
 The [Uniques guide for pack makers](https://github.com/c-pettersson/rngtech/blob/main/extras/uniques/README.md) covers the file format and rules.
@@ -323,7 +323,7 @@ The line's own numbers live under `phaseArray.*` in `config/rngtech-common.toml`
 
 Refinement Potential is shared with the Affix Forge: a Stage 8 part rolls 22 to 32 at craft, `calibration.refinementPotentialBonus` shifts every roll, and each operation's `refinement_potential_cost` is in its recipe.
 
-Glyphs (`rngtech:glyph`) have no recipe. Their tier is the `rngtech:glyph_tier` component, 1 to 5; a stack without it counts as Tier I, so `/give @p rngtech:glyph[rngtech:glyph_tier=3]` or a quest reward works. By default they drop from the six machine-challenge loot tables, from woken Dormant Machines, and from Work Order rewards. Work Orders are the only default source of Tier V. Replace the tables to change that, or hand Glyphs out through quests.
+Glyphs (`rngtech:glyph`) have no recipe. Their tier is the `rngtech:glyph_tier` component, 1 to 5; a stack without it counts as Tier I, so `/give @p rngtech:glyph[rngtech:glyph_tier=3]` or a quest reward works. By default they come from Work Order rewards, the only default source of Tier V, and from woken Dormant Machines. Machines roll no loot on their own events. Change the Work Order reward table to change what jobs pay, or hand Glyphs out through quests.
 
 ## Compatibility
 

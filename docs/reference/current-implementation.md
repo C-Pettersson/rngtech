@@ -262,21 +262,11 @@ The Debug Reroller is an admin/debug exception for local testing. It does not co
 
 The Debug Chest, Debug Trashcan, Debug Tank, and Debug Battery are also admin/debug exceptions. The Debug Chest uses GUI slots as item templates and lets item automation extract infinite copies without consuming those templates. The Debug Trashcan voids inserted items, filled fluids, and received FE. The Debug Tank stores a fluid template from filled containers, direct bucket interaction, or fluid automation, then exposes infinite extraction of that fluid without consuming the template. The Debug Battery is an infinite FE source that can push or be extracted from up to its selected output cap.
 
-## Challenge Loot Tables
+## Challenge Loot Type
 
-RNGTech rolls a loot table of type `rngtech:challenge` when a machine event happens. The default tables drop only [Glyphs](../prds/phase-array.md#glyphs-and-work-orders), each behind a machine challenge: Mastery milestones at 20, 40, 60, 80, and 100; high-stability Stage 6+ calibrations; Stage 7+ forestry heads; high-instability Vacuum Collapse cycles; and Processing Level 7+ Crusher jams. Heat failures pay nothing. The Work Order table is the exception: one pool of refinement currency, Requisitions, Glyphs, and Prestige-gated Uniques. Packs replace or extend them by datapack; `tools/moddex/check-uniques.mjs` keeps the other defaults to conditioned Glyph pools.
+`rngtech:challenge` is a loot table type whose conditions read a `ChallengeContext`. Machines and the Forestry Companion roll no loot on their own events, so nothing a machine earns lands in the world. The one shipped table is `rngtech:challenges/work_order`: a Dispatch Terminal rolls it when it lists a job and stores the result on the chip, and a Completed Job Chip without a listed reward rolls it when used; either way the reward goes to the player. [Glyphs](../prds/phase-array.md#glyphs-and-work-orders) come from Work Order rewards (the only default Tier V source), woken Dormant Machines, quests, and `/rngtech glyph give`. `tools/moddex/check-uniques.mjs` fails if another table ships under `loot_table/challenges/`.
 
-| Table | Rolled when | Results |
-|---|---|---|
-| `rngtech:challenges/calibration` | A Resonance Calibrator calibration completes | Output slot, else dropped on top |
-| `rngtech:challenges/crusher_jam` | A Crusher jams | Output slot, else dropped on top |
-| `rngtech:challenges/heat_failure` | A Furnace, Alloy Furnace, or Metal Press cycle fails | Output slot, else dropped on top |
-| `rngtech:challenges/vacuum_collapse` | A Vacuum Collapse Generator cycle completes | Residue slot, else dropped on top |
-| `rngtech:challenges/forestry_harvest` | A Forestry Companion harvests a tree or crop | The cart's cargo |
-| `rngtech:challenges/mastery_level` | A machine or cart gains a Mastery level | Dropped on top of the machine or at the cart |
-| `rngtech:challenges/work_order` | A Dispatch Terminal lists a job, or a Completed Job Chip without a listed reward is used | Listed on the chip, then given to the player on use |
-
-Conditions read the event: `rngtech:machine_family` (`family`, the Mastery family id, or `vacuum_collapse_generator`), `rngtech:ascendancy` (`ascendancy`), and the number conditions `rngtech:machine_stage` (chassis stage, or the cutting tool head's stage for a Forestry harvest), `rngtech:recipe_stage` (the recipe's XP band, Alloy Furnace minimum component stage, calibration minimum stage, or the recipe Processing Level for a jam), `rngtech:calibration_stability`, `rngtech:instability` (Vacuum Collapse instability times 100), `rngtech:mastery_level`, and for the Work Order table `rngtech:order_tier` and `rngtech:order_prestige`, each with an optional inclusive `min` and `max`. A condition never passes outside a challenge roll.
+The context conditions stay registered for any table of this type: `rngtech:machine_family` (`family`), `rngtech:ascendancy` (`ascendancy`), and the number conditions `rngtech:machine_stage`, `rngtech:recipe_stage`, `rngtech:calibration_stability`, `rngtech:instability`, `rngtech:mastery_level`, `rngtech:order_tier`, and `rngtech:order_prestige`, each with an optional inclusive `min` and `max`. The functions `rngtech:set_order_count` and `rngtech:set_order_tier` size a Work Order reward by the job's tier. A condition never passes outside a challenge roll.
 
 ## Verification Baseline
 

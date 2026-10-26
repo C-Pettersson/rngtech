@@ -8,8 +8,6 @@ import com.rngtech.content.item.MachinePartItem;
 import com.rngtech.content.item.ServoItem;
 import com.rngtech.content.item.SolidFuelBurnerPartItem;
 import com.rngtech.content.item.UniquePartItem;
-import com.rngtech.content.loot.ChallengeContext;
-import com.rngtech.content.loot.ChallengeLoot;
 import com.rngtech.content.material.MaterialCatalog;
 import com.rngtech.content.menu.MasteryMenuSupport;
 import com.rngtech.content.menu.MetalPressMenu;
@@ -1200,8 +1198,6 @@ public class MetalPressBlockEntity extends BaseMachineBlockEntity
         presses++;
         resetCycle();
         resetBulkSpeed();
-        ChallengeLoot.reward(level, worldPosition, ChallengeLoot.HEAT_FAILURE,
-                ChallengeContext.of(this).withRecipeStage(recipe.machineXpBand()), processInventory, SLOT_OUTPUT);
         workOrderStreakBroken();
         workOrderSetback(WorkOrderConditions.BRITTLE_LINING);
         setChanged();

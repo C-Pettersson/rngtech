@@ -14,8 +14,6 @@ import com.rngtech.content.item.CraftedTraitOutputs;
 import com.rngtech.content.item.GearParts;
 import com.rngtech.content.item.MachinePartItem;
 import com.rngtech.content.item.UniquePartItem;
-import com.rngtech.content.loot.ChallengeContext;
-import com.rngtech.content.loot.ChallengeLoot;
 import com.rngtech.content.menu.MasteryMenuSupport;
 import com.rngtech.content.menu.ResonanceCalibratorMenu;
 import com.rngtech.content.recipe.CalibrationRecipe;
@@ -780,8 +778,6 @@ public class ResonanceCalibratorBlockEntity extends BaseMachineBlockEntity
         } else if (stats.value(MachineStat.STREAK_FLOOR) > 0.0) {
             streak = streak.after(activePatternOrCurrent(), recipe.family().getSerializedName(), streak.harmonic());
         }
-        ChallengeLoot.reward(level, worldPosition, ChallengeLoot.CALIBRATION,
-                ChallengeContext.of(this).withRecipeStage(recipe.minimumStage()).withStability(lastStability), processInventory, SLOT_OUTPUT);
         resetCycle();
         setChanged();
         return true;

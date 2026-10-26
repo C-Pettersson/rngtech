@@ -76,7 +76,7 @@ Use sources that make the item's identity obvious:
 | Boss or entity drop | Monument containment, witch brews, endgame phase storage | Mandatory progression drops for ordinary machines |
 | Trial or vault reward | Stop-start servos, burst parts, risky high-value sidegrades | Required crafting ingredients for baseline chassis |
 
-Vanilla sources are the default. Every default Unique loot table carries the `rngtech:unique_loot_enabled` condition, so pack makers can switch any Unique off and move it to an RNGTech [challenge loot table](../prds/uniques.md#challenge-loot), a quest reward, or their own loot. See [Pack configuration](../prds/uniques.md#pack-configuration).
+Vanilla sources are the default. Every default Unique loot table carries the `rngtech:unique_loot_enabled` condition, so pack makers can switch any Unique off and move it to a quest reward or their own loot. See [Pack configuration](../prds/uniques.md#pack-configuration).
 
 ## Promotion Checklist
 

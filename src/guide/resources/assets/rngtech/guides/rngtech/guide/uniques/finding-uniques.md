@@ -22,4 +22,4 @@ Each Unique comes from one kind of place.
 | <ItemLink id="rngtech:trial_vault_escapement" /> | Servo | Stage 6 | Ominous trial vaults, 3% per vault |
 | <ItemLink id="rngtech:ancient_echo_control_board" /> | Control Board | Stage 6 | Ancient city chests, 4% |
 
-Your modpack may move Uniques to other sources, such as quest rewards or machine challenges.
+Your modpack may move Uniques to other sources, such as quest rewards.

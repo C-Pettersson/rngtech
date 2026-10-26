@@ -16,12 +16,12 @@ Work Orders are a repeatable loop of jobs for processing machines, modeled on qu
 
 A machine has three drive bays but works on one chip at a time. Switching the active chip keeps every chip's progress. When the machine finishes the active chip's job, the chip stays in its bay as a Completed Job Chip until the player takes it out and redeems it for the listed reward. Some jobs pay Requisitions, so the loop can feed itself.
 
-Today a machine's Mastery has no goal after its third Seal and level 100, Stage 8 chassis have little to do that a Stage 7 chassis can't, and machines without Mastery have no goals at all. Work Orders give each of these a job:
+Today a machine's Mastery has no goal after its third Seal and level 100, Stage 8 chassis have little to do that a Stage 7 chassis can't, machines without Mastery have no goals at all, and machines roll no loot on their own events (see [Challenge Loot Type](../reference/current-implementation.md#challenge-loot-type)). Work Orders give each of these a job:
 
 - Every processing machine gets repeatable goals, including machines with no Mastery family, such as the Component Assembler.
 - Higher tiers need higher chassis stages, up to each family's top stage.
 - A job can also ask for a Mastery level, but the default jobs don't.
-- The reward table is a seventh challenge table, with default loot like the Glyph entries the [Phase Array](phase-array.md) adds to the other six.
+- The reward table is the one shipped `rngtech:challenge` table. Machines roll no loot on their own events, so Work Orders are the main source of the [Phase Array](phase-array.md)'s Glyphs.
 
 Orders reuse the existing systems. Conditions are affixes, so the Affix Forge, Nullifier Coil, Chaos Crystal, and Volatile Catalyst all work on a chip. Condition effects join the machine's stat pipeline as one more effect source. Rewards roll through `ChallengeLoot`.
 
