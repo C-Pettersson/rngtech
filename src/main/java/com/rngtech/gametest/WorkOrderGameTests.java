@@ -311,6 +311,13 @@ public final class WorkOrderGameTests {
         }
         check(!WorkOrderEligibility.lists(new WorkPart(WorkObjectiveType.SMELT, WorkFilter.SETTING, 60, "", 100))
                 && !WorkOrderEligibility.lists(new WorkPart(WorkObjectiveType.SMELT, WorkFilter.ANY, 0, "", 100)), "A heat or any-work job has a Shift list");
+        check(!WorkOrderEligibility.lists(new WorkPart(WorkObjectiveType.HARVEST, WorkFilter.STAGE, 2, "", 100))
+                && !WorkOrderEligibility.lists(new WorkPart(WorkObjectiveType.RECYCLE, WorkFilter.STAGE, 2, "", 100)),
+                "A Forestry or Recycler stage job lists items it does not take");
+        WorkPart calibrated = new WorkPart(WorkObjectiveType.CALIBRATE, WorkFilter.STAGE, 5, "", 100);
+        List<Item> calibrations = WorkOrderEligibility.calibrations(recipes, calibrated);
+        check(WorkOrderEligibility.lists(calibrated) && !calibrations.isEmpty() && calibrations.size() == WorkOrderEligibility.names(recipes, calibrated).size()
+                && calibrations.stream().noneMatch(item -> crushed.contains(item)), "A Calibrator stage job lists the Crusher's inputs: " + calibrations);
         helper.succeed();
     }
 

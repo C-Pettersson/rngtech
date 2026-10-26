@@ -162,7 +162,7 @@ public class PhaseCradleBlockEntity extends BlockEntity implements MenuProvider,
                 return false;
             }
             return switch (slot) {
-                case SLOT_TARGET, SLOT_DONOR -> RefinementTargets.canRefine(stack);
+                case SLOT_TARGET, SLOT_DONOR -> RefinementTargets.canPhase(stack);
                 case SLOT_GLYPH -> GlyphItem.isGlyph(stack);
                 default -> false;
             };
@@ -875,7 +875,7 @@ public class PhaseCradleBlockEntity extends BlockEntity implements MenuProvider,
         if (target.isEmpty()) {
             return STATUS_NO_TARGET;
         }
-        if (!RefinementTargets.canRefine(target) || isLocked(RefinementTargets.storedTraits(target))) {
+        if (!RefinementTargets.canPhase(target) || isLocked(RefinementTargets.storedTraits(target))) {
             return STATUS_LOCKED;
         }
         if (line.usableCoils() < recipe.coils()) {
@@ -1002,7 +1002,7 @@ public class PhaseCradleBlockEntity extends BlockEntity implements MenuProvider,
     /** The affixes Imprint can add to the selected empty slot, in profile order; the same list the screen shows. */
     public List<ModifierDefinition> imprintCandidates() {
         ItemStack target = targetStack();
-        if (selection.kind() != RefinementSelection.Kind.EMPTY_SLOT || !RefinementTargets.canRefine(target)) {
+        if (selection.kind() != RefinementSelection.Kind.EMPTY_SLOT || !RefinementTargets.canPhase(target)) {
             return List.of();
         }
         return RefinementEngine.phaseImprintCandidates(
@@ -1014,7 +1014,7 @@ public class PhaseCradleBlockEntity extends BlockEntity implements MenuProvider,
 
     /** The donor affixes Graft can move, in the donor's affix order. */
     public static List<MachineModifier> donorAffixes(ItemStack donor) {
-        if (!RefinementTargets.canRefine(donor)) {
+        if (!RefinementTargets.canPhase(donor)) {
             return List.of();
         }
         return RefinementTargets.storedTraits(donor).modifiers().stream()

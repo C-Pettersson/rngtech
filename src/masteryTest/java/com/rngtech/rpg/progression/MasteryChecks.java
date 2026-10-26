@@ -63,6 +63,7 @@ public final class MasteryChecks {
         checks += com.rngtech.rpg.workorder.WorkOrderRuleChecks.run();
         checks += com.rngtech.rpg.workorder.WorkOrderTemplateChecks.run();
         checks += com.rngtech.rpg.workorder.WorkOrderConditionChecks.run();
+        checks += com.rngtech.rpg.workorder.WorkOrderRefinementChecks.run();
         checks += com.rngtech.rpg.dormant.DormantChecks.run();
         checks += PartGenerationChecks.run();
         checks += com.rngtech.rpg.PhaseArrayChecks.run();

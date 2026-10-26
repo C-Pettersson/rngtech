@@ -429,7 +429,7 @@ public class PhaseCradleScreen extends AbstractContainerScreen<PhaseCradleMenu> 
 
     private MachineTraits targetTraits() {
         ItemStack target = menu.targetStack();
-        return RefinementTargets.canRefine(target) ? RefinementTargets.storedTraits(target) : MachineTraits.EMPTY;
+        return RefinementTargets.canPhase(target) ? RefinementTargets.storedTraits(target) : MachineTraits.EMPTY;
     }
 
     private List<MachineModifier> affixes(MachineTraits traits) {
@@ -440,7 +440,7 @@ public class PhaseCradleScreen extends AbstractContainerScreen<PhaseCradleMenu> 
     private List<Row> allRows() {
         List<Row> rows = new ArrayList<>();
         ItemStack target = menu.targetStack();
-        if (!RefinementTargets.canRefine(target)) {
+        if (!RefinementTargets.canPhase(target)) {
             rows.add(new Row(-1, Component.translatable("rngtech.phase_cradle.screen.no_target"), List.of(), false, false));
             return rows;
         }

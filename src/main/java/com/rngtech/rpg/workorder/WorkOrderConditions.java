@@ -1,8 +1,11 @@
 package com.rngtech.rpg.workorder;
 
+import com.rngtech.rpg.CorruptionOutcome;
+import com.rngtech.rpg.MachineCorruption;
 import com.rngtech.rpg.MachineModifier;
 import com.rngtech.rpg.MachineStat;
 import com.rngtech.rpg.MachineStatAccumulator;
+import com.rngtech.rpg.MachineTraitRoller;
 import com.rngtech.rpg.MachineTraits;
 import com.rngtech.rpg.ModifierDefinition;
 import com.rngtech.rpg.ModifierEligibilityProfile;
@@ -93,11 +96,128 @@ public final class WorkOrderConditions {
         return CONDITIONS.stream().filter(condition -> condition.id().equals(id)).findFirst().orElse(null);
     }
 
-    /** The conditions {@code family} can read, as an eligibility profile for rolling and, later, refinement. */
+    /** The conditions {@code family} can read, as an eligibility profile. */
     public static ModifierEligibilityProfile profile(String family) {
         return new ModifierEligibilityProfile("work_order_" + family, Set.of(),
                 CONDITIONS.stream().filter(condition -> condition.families().isEmpty() || condition.families().contains(family))
                         .map(Condition::definition).toList());
+    }
+
+    /**
+     * The conditions one chip can carry: its family's, less any its job cannot use, such as Deep Ore without a stage part.
+     * Refinement rolls from this, so a refined chip never gains a condition that would only add Bounty.
+     */
+    public static ModifierEligibilityProfile profile(WorkOrder order) {
+        return new ModifierEligibilityProfile("work_order_" + order.family(), Set.of(),
+                CONDITIONS.stream().filter(condition -> condition.fits(order.family(), order.objective())).map(Condition::definition).toList());
+    }
+
+    /** The conditions that apply to the machine and its counting: the chip's affixes, plus a Blighted chip's extra condition. */
+    public static List<MachineModifier> active(MachineTraits traits) {
+        List<MachineModifier> active = new ArrayList<>(traits.modifiers());
+        if (traits.corruption() != null && traits.corruption().outcome() == CorruptionOutcome.BLIGHTED) {
+            active.addAll(traits.corruption().modifiers());
+        }
+        return active;
+    }
+
+    /** The conditions that pay: the chip's affixes, plus a Blessed chip's cost-free condition. */
+    public static List<MachineModifier> rewarded(MachineTraits traits) {
+        List<MachineModifier> rewarded = new ArrayList<>(traits.modifiers());
+        if (traits.corruption() != null && traits.corruption().outcome() == CorruptionOutcome.BLESSED) {
+            rewarded.addAll(traits.corruption().modifiers());
+        }
+        return rewarded;
+    }
+
+    /** The Bounty the chip's paying conditions add. */
+    public static int bounty(MachineTraits traits) {
+        int bounty = 0;
+        for (MachineModifier modifier : rewarded(traits)) {
+            Condition condition = get(modifier.affixId());
+            bounty += condition == null ? 0 : condition.bounty(modifier.tier());
+        }
+        return bounty;
+    }
+
+    /** The Prestige the chip's paying conditions add. */
+    public static int prestige(MachineTraits traits) {
+        int prestige = 0;
+        for (MachineModifier modifier : rewarded(traits)) {
+            Condition condition = get(modifier.affixId());
+            prestige += condition == null ? 0 : condition.prestige();
+        }
+        return prestige;
+    }
+
+    /** {@code order} with its Bounty and Prestige moved from what {@code before}'s conditions paid to what {@code after}'s pay. */
+    public static WorkOrder rebalance(WorkOrder order, MachineTraits before, MachineTraits after) {
+        return new WorkOrder(order.family(), order.tier(), order.objective(), order.minStage(), order.minMasteryLevel(),
+                Math.max(0, order.bounty() - bounty(before) + bounty(after)), Math.max(0, order.prestige() - prestige(before) + prestige(after)),
+                order.rewards(), order.template(), order.name(), order.rewardTable());
+    }
+
+    /**
+     * A Volatile Catalyst's result on a chip for a rolled {@code outcome}. Blessed pays half again, adds a Prestige, or adds
+     * a condition that pays with no cost. Blighted adds a condition that costs with no pay. Reforged rerolls the conditions
+     * at the chip's rarity; Warped rerolls each condition's value within its tier. Every outcome leaves the chip Corrupted.
+     */
+    public static Rolled corrupt(WorkOrder order, MachineTraits traits, CorruptionOutcome outcome, RandomSource random) {
+        WorkOrder next = order;
+        MachineTraits nextTraits = traits;
+        MachineCorruption corruption = MachineCorruption.of(outcome);
+        switch (outcome) {
+            case BLESSED -> {
+                int kind = random.nextInt(3);
+                MachineModifier extra = kind == 2 ? extraCondition(order, traits, random) : null;
+                if (extra != null) {
+                    corruption = new MachineCorruption(outcome, List.of(extra), List.of());
+                    Condition condition = get(extra.affixId());
+                    next = order.withBounty(order.bounty() + condition.bounty(extra.tier()));
+                    next = new WorkOrder(next.family(), next.tier(), next.objective(), next.minStage(), next.minMasteryLevel(), next.bounty(),
+                            next.prestige() + condition.prestige(), next.rewards(), next.template(), next.name(), next.rewardTable());
+                } else if (kind == 1) {
+                    next = new WorkOrder(order.family(), order.tier(), order.objective(), order.minStage(), order.minMasteryLevel(), order.bounty(),
+                            order.prestige() + 1, order.rewards(), order.template(), order.name(), order.rewardTable());
+                } else {
+                    next = order.withBounty(WorkOrder.rushAmount(order.bounty()));
+                }
+            }
+            case BLIGHTED -> {
+                MachineModifier extra = extraCondition(order, traits, random);
+                if (extra != null) {
+                    corruption = new MachineCorruption(outcome, List.of(extra), List.of());
+                }
+            }
+            case REFORGED -> {
+                Rolled rerolled = roll(rebalance(order, traits, MachineTraits.EMPTY), traits.rarity(), random);
+                nextTraits = new MachineTraits(traits.rarity(), traits.refinementPotential(), rerolled.traits().modifiers(), List.of());
+                next = rerolled.order();
+            }
+            case WARPED -> {
+                List<MachineModifier> warped = new ArrayList<>();
+                for (MachineModifier modifier : traits.modifiers()) {
+                    Condition condition = get(modifier.affixId());
+                    warped.add(condition == null ? modifier : condition.definition().roll(Math.max(1, modifier.tier()), random));
+                }
+                nextTraits = new MachineTraits(traits.rarity(), traits.refinementPotential(), warped, List.of());
+            }
+            default -> { }
+        }
+        return new Rolled(next, nextTraits.withCorruption(corruption));
+    }
+
+    /**
+     * One more condition the chip's job can carry, from a group it does not have yet, at its first tier, or null when none
+     * is left. A corruption's modifiers keep no tier, so a tiered roll would pay one tier and read back another.
+     */
+    private static MachineModifier extraCondition(WorkOrder order, MachineTraits traits, RandomSource random) {
+        Set<String> groups = new HashSet<>();
+        traits.modifiers().forEach(modifier -> groups.add(modifier.modGroup()));
+        List<Condition> open = CONDITIONS.stream().filter(condition -> condition.fits(order.family(), order.objective()))
+                .filter(condition -> !groups.contains(condition.definition().modGroup())).toList();
+        if (open.isEmpty()) { return null; }
+        return open.get(random.nextInt(open.size())).definition().roll(1, random);
     }
 
     /** A job's rarity, by the draft weights. */
@@ -136,21 +256,18 @@ public final class WorkOrderConditions {
             modifiers.add(picked.definition().roll(tier, random));
             groups.add(picked.definition().modGroup());
         }
-        int bounty = order.bounty();
-        int prestige = order.prestige();
-        for (MachineModifier modifier : modifiers) {
-            Condition condition = get(modifier.affixId());
-            bounty += condition.bounty(modifier.tier());
-            prestige += condition.prestige();
-        }
-        MachineTraits traits = new MachineTraits(rolledRarity, 0, modifiers, List.of());
+        int stage = WorkOrder.tierStage(order.tier());
+        MachineTraitRoller.RefinementPotentialRange potential = MachineTraitRoller.refinementPotentialRange(profile(order), stage);
+        MachineTraits traits = new MachineTraits(rolledRarity, potential.min() + random.nextInt(potential.max() - potential.min() + 1), modifiers, List.of());
+        int bounty = order.bounty() + bounty(traits);
+        int prestige = order.prestige() + prestige(traits);
         return new Rolled(new WorkOrder(order.family(), order.tier(), order.objective(), order.minStage(), order.minMasteryLevel(), bounty, prestige,
                 order.rewards(), order.template(), order.name(), order.rewardTable()), traits);
     }
 
-    /** Whether {@code traits} carry the condition {@code id}. */
+    /** Whether {@code traits} carry the condition {@code id}, a Blighted chip's extra condition included. */
     public static boolean has(MachineTraits traits, String id) {
-        return traits != null && traits.modifiers().stream().anyMatch(modifier -> modifier.affixId().equals(id));
+        return traits != null && active(traits).stream().anyMatch(modifier -> modifier.affixId().equals(id));
     }
 
     /** Whether {@code report} counts toward {@code part} under {@code traits}: Deep Ore raises a stage part's minimum by one. */
@@ -180,7 +297,7 @@ public final class WorkOrderConditions {
      */
     public static void apply(MachineStatAccumulator stats, LoadedWorkOrder active) {
         if (active == null || active.fulfilled()) { return; }
-        for (MachineModifier modifier : active.traits().modifiers()) {
+        for (MachineModifier modifier : active(active.traits())) {
             Condition condition = get(modifier.affixId());
             if (condition == null || !condition.pressure()) { continue; }
             stats.apply(Component.translatable("rngtech.stat.breakdown.source.work_order",

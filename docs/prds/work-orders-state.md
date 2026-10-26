@@ -16,7 +16,7 @@ Status: **Planned**. The PRD is a draft with open questions and no release targe
 - [x] Order templates: loader, terminal pools, per-template reward tables, the template give command, and the config key that turns random orders off. Rarity and conditions on templates wait for phase 6.
 - [x] Conditions: the `work_order` profiles and pool for the Crusher and Furnace, conditions as an effect source on the machine, reset-on-event conditions, and Rush. The Bonus Summary drawer section moved to phase 9.
 - [x] More jobs and machines: stat goals for the Crusher and Furnace, group and streak jobs, and Work Orders on every eligible machine: Crusher, Furnace, Component Assembler, Alloy Furnace, Metal Press, Melter, Resonance Calibrator, Forestry Companion, and Component Recycler.
-- [ ] Refinement and corruption: order corruption pools and Phase Array rejection.
+- [x] Refinement and corruption: Job Chips as refinement targets, chip corruption outcomes, and Phase Array rejection.
 - [ ] UI polish: drive-bay panels on machine models, the Bonus Summary section, Jade, JEI, and model cues.
 - [ ] Documentation: wiki page, Machine Mastery and Rarity updates, the implementation matrix, the GuideME guide, Machine Design Notes, and an FTB Quests chapter.
 - [ ] In-game playtest of every eligible machine and tier.
@@ -235,6 +235,16 @@ Recorded 2026-10-26 for the Component Recycler, from the build:
 
 With the Recycler, phase 7 covers every eligible machine. Generators, the Battery Chassis, the Miner's Companion, and storage are not eligible.
 
+Recorded 2026-10-26 for phase 8, from the build:
+
+- A Job Chip with a job is a refinement target. Its profile is built per chip from the conditions its job can carry, so refinement never adds Deep Ore to a job without a stage part or Fine Tolerance to one without a stability part. Its component stage is its tier's stage.
+- Listed chips roll Refinement Potential from that stage's usual range; before phase 8 they had none, so every refinement would have failed.
+- Refined conditions move the chip's Bounty and Prestige with them, and a listed reward scales with the change in Bounty, at least one of each item. The refinement engine itself is unchanged: Affix Injector, Affix Upgrader, Nullifier Coil, Null Crystal, Chaos Crystal, and the ascension items work on chips as on Gear, with Magic and Rare slot limits.
+- The Volatile Catalyst rolls its outcome on the shared corruption odds, a Corruption Ward included, and then resolves it for the chip, because the corruption pools hold machine stats, not pay. Blessed pays half again, adds a Prestige, or adds a condition that pays with no cost; Blighted adds a condition that costs and pays nothing; Reforged rerolls the conditions at the chip's rarity; Warped rerolls their values within their tiers; Untouched only marks the chip. A Blessed or Blighted condition is always Tier 1, because a corruption's modifiers keep no tier. A corrupted chip takes no more refinement.
+- The Phase Array checks targets with `RefinementTargets.canPhase`, which turns away Job Chips; everything else it took before, it still takes.
+- Playtest found a Forestry head-stage chip's Shift list naming ores: the list fell back to the Crusher's inputs for any machine it did not know, which also hit Calibrator and Recycler stage jobs. The list is now explicit per machine: Crusher inputs, Furnace and Metal Press metals, Assembler cells, Alloy Furnace outputs, and Calibrator outputs; Forestry (its stage is the cutting head's) and Recycler stage jobs have none.
+- Conditions have Affix Forge names (`rngtech.affix.prefix|suffix.<id>`). Rule conditions show their zero-value stat line in the forge's stat preview; a custom description would read better (UI polish).
+
 ## Code against the redesign
 
 The branch's loop was built for the earlier design. Phase 2 of the rework replaced the Mastery storage, the Mastery level gate, the tier and seed components, and the Tier I recipe; the lists below show what is left for later phases.
@@ -308,6 +318,7 @@ Recorded 2026-10-25 from the chips slice:
 - 2026-10-26: the Metal Press joins Work Orders, with streak jobs: the `press` verb and report, the `streak` filter and its failure hook, five objectives, its Orders tab and bays, conditions, and Rush. Checks: streak rules in `WorkOrderRuleChecks` and `MetalPressWorkOrderGameTests`, where a crude press's real Iron Plates finish a chip.
 - 2026-10-26: the Melter joins Work Orders: the `melt` verb and its mB report, fluid parts and names, three objectives, its Orders tab and bays, conditions, and Rush. Checks: Melter reachability in `WorkOrderRuleChecks` and `MelterWorkOrderGameTests`, where real Lubricant melts finish a chip.
 - 2026-10-26: the Resonance Calibrator joins Work Orders: the `calibrate` verb and report, streaks with a stability minimum, Unsteady Hands and Fine Tolerance, five objectives, its Orders tab and bays, and Rush. Checks: streak and Fine Tolerance rules in `WorkOrderRuleChecks` and `CalibratorWorkOrderGameTests`, where real calibrations finish a chip.
+- 2026-10-26: rework phase 8. Job Chips as refinement targets (`RefinementTargets`), chip Refinement Potential, Bounty and reward rebalancing on refinement, chip corruption outcomes (`WorkOrderConditions.corrupt`), and the Phase Array's `canPhase`. Checks: `WorkOrderRefinementChecks` and `JobChipRefinementGameTests`.
 
 ## Verification
 
@@ -333,6 +344,7 @@ Recorded 2026-10-25 from the chips slice:
 - 2026-10-26: group jobs for the Metal Press and Resonance Calibrator. `./gradlew quickCheck`, `./gradlew runGameTestServer` (289 tests; the press and Calibrator GameTests now finish group jobs from real presses and calibrations), `npm run moddex:check`, and `npm run repo:check` passed. Not checked in a running client.
 - 2026-10-26: Forestry Companion. `./gradlew quickCheck`, `./gradlew runGameTestServer` (290 tests), `npm run moddex:check`, and `npm run repo:check` passed. Not checked in a running client; no GameTest fells a real tree for a chip.
 - 2026-10-26: Component Recycler, closing phase 7. `./gradlew quickCheck`, `./gradlew runGameTestServer` (291 tests; a real Iron recycler finishes a chip and drops with it), `npm run moddex:check` (objectives for all nine families), and `npm run repo:check` passed. Not checked in a running client.
+- 2026-10-26: rework phase 8. `./gradlew quickCheck` (`masteryCheck` 671,509 checks), `./gradlew runGameTestServer` (292 tests), `npm run moddex:check`, and `npm run repo:check` passed. Not checked in a running client.
 
 ## Handoff and limits
 

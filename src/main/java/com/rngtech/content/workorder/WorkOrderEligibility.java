@@ -4,6 +4,7 @@ import com.rngtech.content.item.BatteryCellItem;
 import com.rngtech.content.material.MaterialCatalog;
 import com.rngtech.content.recipe.AlloyFurnaceRecipe;
 import com.rngtech.content.recipe.BatteryAssemblyRecipe;
+import com.rngtech.content.recipe.CalibrationRecipe;
 import com.rngtech.content.recipe.CrusherRecipe;
 import com.rngtech.content.recipe.FurnaceRecipe;
 import com.rngtech.content.recipe.MetalPressRecipe;
@@ -19,6 +20,7 @@ import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.item.crafting.RecipeManager;
 
 import java.util.Comparator;
+import java.util.EnumSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -33,12 +35,18 @@ public final class WorkOrderEligibility {
         return Math.max(0, MaterialCatalog.materialStage(material(recipe)));
     }
 
+    /** The work whose stage comes from recipes the client can list. A Forestry stage is the cutting head's; a Recycler's would list dozens of parts. */
+    private static final Set<WorkObjectiveType> LISTED = EnumSet.of(WorkObjectiveType.CRUSH, WorkObjectiveType.SMELT, WorkObjectiveType.ASSEMBLE,
+            WorkObjectiveType.ALLOY, WorkObjectiveType.PRESS, WorkObjectiveType.CALIBRATE);
+
     /**
      * Whether a part has a Shift list: a stage part, whose job line names a Processing Level or Stage but not what reaches
-     * it. Item parts name their item, and on any-work and heat parts every recipe of the machine counts.
+     * it, on a machine whose stage comes from its recipes. Item parts name their item, and on any-work and heat parts
+     * every recipe of the machine counts.
      */
     public static boolean lists(WorkPart part) {
-        return WorkFilter.STAGE.id().equals(part.filter()) && WorkObjectiveType.byId(part.type()) != null;
+        WorkObjectiveType type = WorkObjectiveType.byId(part.type());
+        return WorkFilter.STAGE.id().equals(part.filter()) && type != null && LISTED.contains(type);
     }
 
     /**
@@ -52,8 +60,21 @@ public final class WorkOrderEligibility {
             case ASSEMBLE -> cells(recipes, part).stream().map(Item::getDescription).toList();
             case ALLOY -> alloys(recipes, part).stream().map(Item::getDescription).toList();
             case PRESS -> pressMaterials(recipes, part).stream().map(id -> (Component) Component.literal(MaterialCatalog.materialFamily(id).displayName())).toList();
-            case null, default -> items(recipes, part).stream().map(Item::getDescription).toList();
+            case CALIBRATE -> calibrations(recipes, part).stream().map(Item::getDescription).toList();
+            case CRUSH -> items(recipes, part).stream().map(Item::getDescription).toList();
+            case null, default -> List.of();
         };
+    }
+
+    /** What the Resonance Calibrator makes from recipes at the part's stage or more, sorted by name. */
+    public static List<Item> calibrations(RecipeManager recipes, WorkPart part) {
+        Set<Item> outputs = new LinkedHashSet<>();
+        for (RecipeHolder<CalibrationRecipe> holder : recipes.getAllRecipesFor(ModRecipes.CALIBRATION_TYPE.get())) {
+            if (holder.value().minimumStage() >= part.minimum()) {
+                outputs.add(holder.value().result().stack().getItem());
+            }
+        }
+        return outputs.stream().sorted(Comparator.comparing(item -> item.getDescription().getString())).toList();
     }
 
     /** The metals of the Metal Press recipes at the part's stage or more, by their failure material, sorted by name. */

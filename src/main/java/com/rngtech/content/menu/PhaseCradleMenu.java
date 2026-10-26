@@ -84,7 +84,7 @@ public class PhaseCradleMenu extends AbstractContainerMenu {
         addSlot(new SlotItemHandler(items, PhaseCradleBlockEntity.SLOT_TARGET, TARGET_X, TARGET_Y) {
             @Override
             public boolean mayPlace(ItemStack stack) {
-                return RefinementTargets.canRefine(stack);
+                return RefinementTargets.canPhase(stack);
             }
 
             @Override
@@ -101,7 +101,7 @@ public class PhaseCradleMenu extends AbstractContainerMenu {
         addSlot(new SlotItemHandler(items, PhaseCradleBlockEntity.SLOT_DONOR, DONOR_X, DONOR_Y) {
             @Override
             public boolean mayPlace(ItemStack stack) {
-                return RefinementTargets.canRefine(stack);
+                return RefinementTargets.canPhase(stack);
             }
 
             @Override
@@ -409,7 +409,7 @@ public class PhaseCradleMenu extends AbstractContainerMenu {
                     && !moveItemStackTo(stack, PhaseCradleBlockEntity.SLOT_GLYPH, PhaseCradleBlockEntity.SLOT_GLYPH + 1, false)) {
                 return ItemStack.EMPTY;
             }
-        } else if (RefinementTargets.canRefine(stack)) {
+        } else if (RefinementTargets.canPhase(stack)) {
             if (!moveItemStackTo(stack, PhaseCradleBlockEntity.SLOT_TARGET, PhaseCradleBlockEntity.SLOT_TARGET + 1, false)
                     && !moveItemStackTo(stack, PhaseCradleBlockEntity.SLOT_DONOR, PhaseCradleBlockEntity.SLOT_DONOR + 1, false)) {
                 return ItemStack.EMPTY;

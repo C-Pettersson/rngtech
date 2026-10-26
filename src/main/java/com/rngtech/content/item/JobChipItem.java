@@ -3,10 +3,13 @@ package com.rngtech.content.item;
 import com.rngtech.content.registry.ModDataComponents;
 import com.rngtech.content.workorder.WorkOrderEligibility;
 import com.rngtech.content.workorder.WorkOrderRewards;
+import com.rngtech.rpg.CorruptionOutcome;
+import com.rngtech.rpg.MachineCorruption;
 import com.rngtech.rpg.MachineModifier;
 import com.rngtech.rpg.MachineStat;
 import com.rngtech.rpg.MachineStatDisplay;
 import com.rngtech.rpg.MachineTraits;
+import com.rngtech.rpg.ModifierSlot;
 import com.rngtech.rpg.workorder.WorkFilter;
 import com.rngtech.rpg.workorder.WorkObjective;
 import com.rngtech.rpg.workorder.WorkObjectiveType;
@@ -25,9 +28,11 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.component.ItemContainerContents;
 import net.minecraft.world.item.crafting.RecipeManager;
 import net.minecraft.world.level.Level;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
@@ -242,9 +247,45 @@ public class JobChipItem extends Item {
         };
     }
 
+    /**
+     * Stores refined conditions on a chip and moves its Bounty and Prestige with them. A listed reward scales with the
+     * change in Bounty, at least one of each item.
+     */
+    public static void setConditions(ItemStack stack, MachineTraits traits) {
+        WorkOrder order = data(stack);
+        if (order == null) {
+            return;
+        }
+        setJob(stack, WorkOrderConditions.rebalance(order, traits(stack), traits), traits);
+    }
+
+    /** Stores a chip's job and conditions together, scaling a listed reward with any change in Bounty. */
+    public static void setJob(ItemStack stack, WorkOrder next, MachineTraits traits) {
+        WorkOrder order = data(stack);
+        List<ItemStack> listed = WorkOrderRewards.items(next.rewards());
+        WorkOrder stored = next;
+        if (order != null && next.bounty() != order.bounty() && order.bounty() > 0 && !listed.isEmpty()) {
+            double scale = next.bounty() / (double) order.bounty();
+            stored = next.withRewards(ItemContainerContents.fromItems(listed.stream()
+                    .map(reward -> reward.copyWithCount(Math.max(1, (int) Math.round(reward.getCount() * scale))))
+                    .toList()));
+        }
+        stack.set(ModDataComponents.WORK_ORDER.get(), stored);
+        stack.set(ModDataComponents.MACHINE_TRAITS.get(), traits);
+    }
+
     /** One line per condition: its name, its cost or rule, and the Bounty and Prestige it adds. */
     public static void appendConditions(List<Component> lines, MachineTraits traits) {
-        for (MachineModifier modifier : traits.modifiers()) {
+        MachineCorruption corruption = traits.corruption();
+        if (corruption != null) {
+            lines.add(Component.translatable("rngtech.tooltip.work_order.corrupted." + corruption.outcome().getSerializedName())
+                    .withStyle(ChatFormatting.DARK_RED));
+        }
+        List<MachineModifier> shown = new ArrayList<>(traits.modifiers());
+        if (corruption != null) {
+            shown.addAll(corruption.modifiers());
+        }
+        for (MachineModifier modifier : shown) {
             WorkOrderConditions.Condition condition = WorkOrderConditions.get(modifier.affixId());
             if (condition == null) {
                 continue;
@@ -257,7 +298,11 @@ public class JobChipItem extends Item {
                         Component.translatable("rngtech.work_order.condition." + id + ".effect", Math.round(modifier.value()));
                 default -> Component.translatable("rngtech.work_order.condition." + id + ".effect");
             };
-            Component reward = condition.prestige() > 0
+            boolean blessed = modifier.slot() == ModifierSlot.CORRUPTION && corruption.outcome() == CorruptionOutcome.BLESSED;
+            boolean blighted = modifier.slot() == ModifierSlot.CORRUPTION && corruption.outcome() == CorruptionOutcome.BLIGHTED;
+            Component reward = blighted ? Component.translatable("rngtech.tooltip.work_order.condition_no_reward")
+                    : blessed ? Component.translatable("rngtech.tooltip.work_order.condition_no_cost", condition.bounty(modifier.tier()))
+                    : condition.prestige() > 0
                     ? Component.translatable("rngtech.tooltip.work_order.condition_reward_prestige", condition.bounty(modifier.tier()), condition.prestige())
                     : Component.translatable("rngtech.tooltip.work_order.condition_reward", condition.bounty(modifier.tier()));
             lines.add(Component.translatable("rngtech.tooltip.work_order.condition",
@@ -278,6 +323,9 @@ public class JobChipItem extends Item {
         tooltipComponents.add(objectiveText(order.objective()).copy().withStyle(ChatFormatting.GRAY));
         appendEligibleItems(tooltipComponents, order.objective(), traits(stack));
         appendConditions(tooltipComponents, traits(stack));
+        if (traits(stack).refinementPotential() > 0 && !traits(stack).isCorrupted()) {
+            tooltipComponents.add(Component.translatable("rngtech.tooltip.work_order.potential", traits(stack).refinementPotential()).withStyle(ChatFormatting.DARK_AQUA));
+        }
         if (order.minStage() > 0 || order.minMasteryLevel() > 0) {
             tooltipComponents.add(order.minMasteryLevel() > 0
                     ? Component.translatable("rngtech.tooltip.work_order.requires_level", order.minStage(), order.minMasteryLevel()).withStyle(ChatFormatting.GRAY)
