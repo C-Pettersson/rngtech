@@ -215,7 +215,6 @@ Unique components are drop or find only. They should not replace the normal stag
 Pack makers control where Uniques come from without code:
 
 - The `uniques.loot.enabled` common config key turns off every default Unique loot table, and `uniques.loot.<id>.enabled` turns off one Unique's table. These keys gate only the default tables.
-- The six `rngtech:challenges/*` loot tables roll when machine events happen, such as a Crusher jam, a heat failure, or a Mastery level. They ship empty; a datapack can fill them with Uniques or anything else, using the context conditions listed in the [Current Implementation Matrix](../reference/current-implementation.md#challenge-loot-tables).
 - A plain Unique stack, such as an FTB Quests item reward, counts as unidentified, so each player rolls their own copy. `/rngtech unique give <players> <id>` gives one the same way.
 - Any default loot table or loot modifier can be replaced or extended by datapack. Use the `rngtech:unidentified_unique` loot function on Unique entries so they drop unidentified with a fixed roll.
 - Packs can add their own Uniques as `config/rngtech/uniques/*.json`, with names and textures from a resource pack and loot from a datapack.

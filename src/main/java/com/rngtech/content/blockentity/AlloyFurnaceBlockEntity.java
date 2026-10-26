@@ -9,8 +9,6 @@ import com.rngtech.content.item.MachinePartItem;
 import com.rngtech.content.item.ServoItem;
 import com.rngtech.content.item.SolidFuelBurnerPartItem;
 import com.rngtech.content.item.UniquePartItem;
-import com.rngtech.content.loot.ChallengeContext;
-import com.rngtech.content.loot.ChallengeLoot;
 import com.rngtech.content.machine.AlloyFurnaceChassisMaterial;
 import com.rngtech.content.menu.AlloyFurnaceMenu;
 import com.rngtech.content.menu.MasteryMenuSupport;
@@ -1104,8 +1102,6 @@ public class AlloyFurnaceBlockEntity extends BaseMachineBlockEntity implements M
         pourContinues = false;
         resetCycle();
         resetBulkSpeed();
-        ChallengeLoot.reward(level, worldPosition, ChallengeLoot.HEAT_FAILURE,
-                ChallengeContext.of(this).withRecipeStage(recipe.minimumComponentStage()), processInventory, SLOT_OUTPUT);
         setChanged();
         return true;
     }

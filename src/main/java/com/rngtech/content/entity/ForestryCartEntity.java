@@ -11,8 +11,6 @@ import com.rngtech.content.item.ModularToolItem;
 import com.rngtech.content.item.PruningShearsItem;
 import com.rngtech.content.item.SoulTransferItem;
 import com.rngtech.content.item.UreaItem;
-import com.rngtech.content.loot.ChallengeContext;
-import com.rngtech.content.loot.ChallengeLoot;
 import com.rngtech.content.menu.ForestryCartMenu;
 import com.rngtech.content.menu.MasteryMenuSupport;
 import com.rngtech.content.registry.ModDataComponents;
@@ -22,7 +20,6 @@ import com.rngtech.content.registry.ModSounds;
 import com.rngtech.content.registry.ModTags;
 import com.rngtech.content.tool.ToolBaseStatCatalog;
 import com.rngtech.content.tool.ToolHeadFamily;
-import com.rngtech.content.tool.ToolHeadMaterial;
 import com.rngtech.rpg.ComponentBaseStatCatalog;
 import com.rngtech.rpg.MachineBehavior;
 import com.rngtech.rpg.MachineImplicitCatalog;
@@ -427,23 +424,6 @@ public class ForestryCartEntity extends AbstractMinecart implements MenuProvider
 
     public boolean unlockPassiveNode(MegaPassiveNode node) {
         return allocateMastery(node);
-    }
-
-    /** Forestry harvest challenge loot goes into the cart; its context is the cutting tool's stage and the ascendancy. */
-    private void rollHarvestChallenge() {
-        ToolHeadMaterial head = ModularToolItem.assembly(toolStack()).headMaterial();
-        MachineProgressionState state = masteryState();
-        ChallengeContext context = new ChallengeContext("forestry", head == null ? 0 : head.stage(), 0, 0, 0, state.level(), state.ascendancy());
-        insertOutputs(ChallengeLoot.roll(level(), blockPosition(), ChallengeLoot.FORESTRY_HARVEST, context));
-    }
-
-    /** Mastery level challenge loot drops where the cart stands. */
-    @Override
-    public void masteryLevelGained(MachineProgressionState state) {
-        ChallengeContext context = new ChallengeContext("forestry", ascendancyEntryStage(), 0, 0, 0, state.level(), state.ascendancy());
-        for (ItemStack stack : ChallengeLoot.roll(level(), blockPosition(), ChallengeLoot.MASTERY_LEVEL, context)) {
-            Containers.dropItemStack(level(), getX(), getY() + 0.5D, getZ(), stack);
-        }
     }
 
     /** Work XP marks the cart as busy, which pauses Idle Cart Speed for the next 4 seconds. */
@@ -2034,7 +2014,6 @@ public class ForestryCartEntity extends AbstractMinecart implements MenuProvider
         feedLogLedger(expectedDrops, true);
         setCellState(cell, ManagedCell.STATE_HARVESTING);
         addMachineXp(LOG_HARVEST_MACHINE_XP * brokenCount);
-        rollHarvestChallenge();
         workCooldown = LOG_SETTLE_TICKS;
         setStatus(ForestryCartStationBlockEntity.STATUS_READY);
         playWorkSound(
@@ -2849,7 +2828,6 @@ public class ForestryCartEntity extends AbstractMinecart implements MenuProvider
         consumeEnergy(cost, false);
         insertOutputs(reserveFromDrops(cell, drops));
         addMachineXp(CROP_HARVEST_MACHINE_XP);
-        rollHarvestChallenge();
         workCooldown = plantIntervalTicks();
         setWorkflowState(WorkflowState.HARVESTING_LEAVES, ForestryCartStationBlockEntity.STATUS_READY, ForestryCartStationBlockEntity.ACTION_HARVESTING_CROP);
         playWorkSound(ModSounds.FORESTRY_COMPANION_LEAF_CUT.get(), 0.42F, 1.15F, WORK_SOUND_COOLDOWN_TICKS);

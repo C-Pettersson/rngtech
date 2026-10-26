@@ -10,7 +10,7 @@ const CHALLENGE_ROOT = path.join(DATA_ROOT, "rngtech/loot_table/challenges");
 const RECIPE_ROOT = path.join(DATA_ROOT, "rngtech/recipe");
 const CONDITION = "rngtech:unique_loot_enabled";
 const FUNCTION = "rngtech:unidentified_unique";
-const CHALLENGE_TABLES = ["calibration", "crusher_jam", "heat_failure", "vacuum_collapse", "forestry_harvest", "mastery_level"];
+const CHALLENGE_TABLES = [];
 
 /**
  * Unique sources stay pack-configurable and find-only: every Unique has a default loot table gated by its config key that
@@ -44,20 +44,16 @@ export async function checkUniques({ log = true } = {}) {
 
     const challengeFiles = (await jsonFiles(CHALLENGE_ROOT)).map((file) => path.basename(file, ".json")).sort();
     if (JSON.stringify(challengeFiles) !== JSON.stringify([...CHALLENGE_TABLES].sort())) {
-        failures.push(`challenge tables are ${challengeFiles.join(", ")}; expected ${CHALLENGE_TABLES.join(", ")}`);
+        failures.push(`challenge tables are ${challengeFiles.join(", ")}; expected ${CHALLENGE_TABLES.join(", ") || "none, since machines roll no loot"}`);
     }
     for (const name of challengeFiles) {
         const table = await readJson(path.join(CHALLENGE_ROOT, `${name}.json`));
         if (table.type !== "rngtech:challenge") {
             failures.push(`challenges/${name} must use the rngtech:challenge type`);
         }
-        const pools = table.pools ?? [];
-        if (name === "heat_failure" && pools.length > 0) {
-            failures.push(`challenges/${name} must ship empty; failing on purpose should not pay`);
-        }
-        for (const pool of pools) {
+        for (const pool of table.pools ?? []) {
             if ((pool.conditions ?? []).length === 0) {
-                failures.push(`challenges/${name} has a pool with no condition; every default Glyph drop is a machine challenge`);
+                failures.push(`challenges/${name} has a pool with no condition; every default reward is conditioned`);
             }
             for (const entry of pool.entries ?? []) {
                 if (entry.name !== "rngtech:glyph") {

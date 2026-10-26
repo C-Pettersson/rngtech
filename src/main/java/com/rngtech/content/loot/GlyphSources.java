@@ -14,8 +14,7 @@ import net.minecraft.world.level.Level;
 import java.util.Map;
 
 /**
- * Where Glyphs come from by default: the challenge loot tables under {@code data/rngtech/loot_table/challenges/} and a
- * woken Dormant Machine. Tier V has no default source; Work Orders add it.
+ * Where Glyphs come from by default: a woken Dormant Machine. Tier V has no default source; Work Orders add it.
  */
 public final class GlyphSources {
     /** A woken site's Glyph tier. Unknown sites fall back to the soul's level. */

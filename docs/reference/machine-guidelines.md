@@ -361,7 +361,8 @@ Design intent and balance rules behind shipped machines that the code does not s
 - A signature stays a benefit at its worst roll, and a drawback stays a penalty at its best roll. Drawbacks are visible stat lines or missing behaviors, never hidden rules.
 - Ascendancy hooks apply only on a machine with that ascendancy. Gate them through the hook role, not through stats that only matter by coincidence.
 - No Unique adds yield until the recipe loop audit covers the Unique catalog. A yield penalty is allowed.
-- A pack can move a Unique to challenge loot, quests, or its own tables, or add its own Uniques from `config/rngtech/uniques/`; default sources stay vanilla structures and mobs, and the shipped challenge tables stay empty.
+- A pack can move a Unique to quests or its own tables, or add its own Uniques from `config/rngtech/uniques/`; default sources stay vanilla structures and mobs.
+- Machines roll no loot on their own events. A reward never drops on top of a machine or lands in its output slot, where it would block the machine and flow down automated lines.
 - The catalog file format is a public API for packs. Keep old stat and behavior names working through aliases, and bump the format `version` for incompatible changes. Update `extras/uniques/README.md` with it.
 
 ### Dormant Machines

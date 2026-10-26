@@ -141,7 +141,7 @@
   "rngtech.jei.phase_array.outcomes": "Partial %s. Overhold %s.",
   "rngtech.jei.phase_emitter.info": "The start of a Phase Array line. It holds most of the line's charge and fires the pulse toward the Phase Cradle; its core fills as the charge rises. A Stage 8 part that rolls rarity and affixes, and a legal target for the Array itself.",
   "rngtech.jei.phase_coil.info": "A Phase Array line block between the Emitter and the Cradle. Its sides show the Glyph tier its position runs at while the line uses it; the Glyphs themselves sit in the Cradle's seats, and positions farther from the Emitter need higher tiers. Each Coil holds or slips the pulse with its own Hold Chance. A Stage 8 part that rolls rarity and affixes.",
-  "rngtech.jei.glyph.info": "A Phase Array key with a tier from I to V. No recipe makes one: RNGTech machine challenges and woken Dormant Machines drop them, and packs can hand them out. Spend one on a deep operation at the Phase Cradle, or seat it in one of the Cradle's five Glyph seats to open the positions of its tier.",
+  "rngtech.jei.glyph.info": "A Phase Array key with a tier from I to V. No recipe makes one: woken Dormant Machines drop them, and packs can hand them out. Spend one on a deep operation at the Phase Cradle, or seat it in one of the Cradle's five Glyph seats to open the positions of its tier.",
   "rngtech.jei.phase_cradle.info": "The end of a Phase Array line. Build three to nine Phase Coils and a Phase Emitter in a row from the Cradle, inscribe Glyphs into the Coils, then charge and fire an operation on the item in the Cradle.",
   "block.rngtech.phase_emitter": "Phase Emitter",
   "block.rngtech.phase_coil": "Phase Coil",

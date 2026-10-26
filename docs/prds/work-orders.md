@@ -14,7 +14,7 @@ Last updated: 2026-10-21
 
 Work Orders are a repeatable endgame loop for Mastery machines, modeled on Path of Exile's maps. A Work Order is an item that sets one Mastery machine a job, such as "Crush 256 ores that need Processing Level 6". Rolled conditions make the job harder, and each condition raises the reward. When the machine finishes the job, it drops a Fulfilled Work Order, which the player opens for loot. That loot includes blank orders of the same or a higher tier, so the loop feeds itself.
 
-Today a machine's Mastery has no goal after its third Seal and level 100. Stage 8 chassis have little to do that a Stage 7 chassis can't, and all six [challenge loot tables](../reference/current-implementation.md#challenge-loot-tables) ship empty. Work Orders give each of these a job:
+Today a machine's Mastery has no goal after its third Seal and level 100. Stage 8 chassis have little to do that a Stage 7 chassis can't, and machines roll no loot on their own events (see [Challenge Loot Type](../reference/current-implementation.md#challenge-loot-type)). Work Orders give each of these a job:
 
 - A maxed machine gets repeatable goals, and the machine's build decides how hard a job it can take.
 - The highest tiers need the top chassis stage of each family.

@@ -20,57 +20,6 @@ Every built-in Unique drops from one vanilla source through its own loot table, 
 
 The keys gate only the default tables. Uniques you add to other loot, quests, or commands are unaffected.
 
-### Challenge loot
-
-RNGTech rolls a loot table of type `rngtech:challenge` when a machine event happens. All six ship empty, so default play is unchanged.
-
-| Table | Rolled when | Results go to |
-|---|---|---|
-| `rngtech:challenges/calibration` | A Resonance Calibrator calibration completes | Output slot, else dropped on top |
-| `rngtech:challenges/crusher_jam` | A Crusher jams | Output slot, else dropped on top |
-| `rngtech:challenges/heat_failure` | A Furnace, Alloy Furnace, or Metal Press cycle fails | Output slot, else dropped on top |
-| `rngtech:challenges/vacuum_collapse` | A Vacuum Collapse Generator cycle completes | Residue slot, else dropped on top |
-| `rngtech:challenges/forestry_harvest` | A Forestry Companion harvests a tree or crop | The cart's cargo |
-| `rngtech:challenges/mastery_level` | A machine or cart gains a Mastery level | Dropped on top, or at the cart |
-
-Conditions that read the event:
-
-| Condition | Field | Value |
-|---|---|---|
-| `rngtech:machine_family` | `family` | `crusher`, `furnace`, `alloy_furnace`, `metal_press`, `melter`, `resonance_calibrator`, `forestry`, or `vacuum_collapse_generator` |
-| `rngtech:ascendancy` | `ascendancy` | An ascendancy id, such as `rockbreaker` |
-| `rngtech:machine_stage` | `min`, `max` | Chassis stage, or the cutting tool head's stage for a Forestry harvest |
-| `rngtech:recipe_stage` | `min`, `max` | The recipe's XP band; the Alloy Furnace's minimum component stage; the calibration minimum stage; a jam's recipe Processing Level |
-| `rngtech:calibration_stability` | `min`, `max` | The calibrated result's stability |
-| `rngtech:instability` | `min`, `max` | Vacuum Collapse instability times 100 |
-| `rngtech:mastery_level` | `min`, `max` | The machine's Mastery level |
-
-`min` and `max` are inclusive and optional. A condition never passes outside a challenge roll. This datapack file, `data/rngtech/loot_table/challenges/heat_failure.json`, gives a 2% chance of a Fortress Heater Element on a Stage 4+ heat failure:
-
-```json
-{
-    "type": "rngtech:challenge",
-    "pools": [
-        {
-            "rolls": 1,
-            "conditions": [
-                { "condition": "rngtech:machine_stage", "min": 4 },
-                { "condition": "minecraft:random_chance", "chance": 0.02 }
-            ],
-            "entries": [
-                {
-                    "type": "minecraft:item",
-                    "name": "rngtech:fortress_heater_element",
-                    "functions": [{ "function": "rngtech:unidentified_unique" }]
-                }
-            ]
-        }
-    ]
-}
-```
-
-The tables can hold anything, not only Uniques. You own the balance and loop safety of what you add.
-
 ### Quests and commands
 
 A plain Unique item, such as an FTB Quests item reward, counts as unidentified, so each player rolls their own copy when they identify it. `/rngtech unique give <players> <id>` gives an unidentified copy and needs permission level 2.
