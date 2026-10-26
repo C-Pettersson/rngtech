@@ -83,7 +83,8 @@ public class JobChipItem extends Item {
             if (index > 0) {
                 list.append(Component.translatable(index == parts.size() - 1 ? "rngtech.work_order.list.last" : "rngtech.work_order.list.next"));
             }
-            list.append(Component.translatable("rngtech.work_order.item_count", parts.get(index).target(), itemName(parts.get(index).item())));
+            list.append(Component.translatable(type == WorkObjectiveType.MELT ? "rngtech.work_order.fluid_count" : "rngtech.work_order.item_count",
+                    parts.get(index).target(), itemName(parts.get(index).item())));
         }
         return Component.translatable("rngtech.work_order.verb." + type.id(), list);
     }
@@ -160,11 +161,16 @@ public class JobChipItem extends Item {
         }
     }
 
-    /** An item's display name from its id, or the id itself when no such item exists. */
+    /** An item's or, failing that, a fluid's display name from its id, or the id itself when neither exists. */
     public static Component itemName(String id) {
         ResourceLocation key = ResourceLocation.tryParse(id);
-        return key != null && BuiltInRegistries.ITEM.containsKey(key)
-                ? BuiltInRegistries.ITEM.get(key).getDescription() : Component.literal(id);
+        if (key != null && BuiltInRegistries.ITEM.containsKey(key)) {
+            return BuiltInRegistries.ITEM.get(key).getDescription();
+        }
+        if (key != null && BuiltInRegistries.FLUID.containsKey(key)) {
+            return BuiltInRegistries.FLUID.get(key).getFluidType().getDescription();
+        }
+        return Component.literal(id);
     }
 
     /** The job in a few words for a narrow card, such as "Crush 256, Processing Level 6+". */

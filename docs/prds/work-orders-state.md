@@ -15,7 +15,7 @@ Status: **Planned**. The PRD is a draft with open questions and no release targe
 - [x] Dispatch Terminal and Requisitions: the block, job rolling with count ranges and item jobs, one-kind rewards, Download and Refresh, the Requisition recipe, and the give commands.
 - [x] Order templates: loader, terminal pools, per-template reward tables, the template give command, and the config key that turns random orders off. Rarity and conditions on templates wait for phase 6.
 - [x] Conditions: the `work_order` profiles and pool for the Crusher and Furnace, conditions as an effect source on the machine, reset-on-event conditions, and Rush. The Bonus Summary drawer section moved to phase 9.
-- [ ] More jobs and machines: stat goals for the Crusher and Furnace (done), the Component Assembler (done), the Alloy Furnace (done), the Metal Press (done), then the other Mastery families and the machines without Mastery, starting with the Component Assembler.
+- [ ] More jobs and machines: stat goals for the Crusher and Furnace (done), the Component Assembler (done), the Alloy Furnace (done), the Metal Press (done), the Melter (done), then the other Mastery families and the machines without Mastery, starting with the Component Assembler.
 - [ ] Refinement and corruption: order corruption pools and Phase Array rejection.
 - [ ] UI polish: drive-bay panels on machine models, the Bonus Summary section, Jade, JEI, and model cues.
 - [ ] Documentation: wiki page, Machine Mastery and Rarity updates, the implementation matrix, the GuideME guide, Machine Design Notes, and an FTB Quests chapter.
@@ -196,6 +196,14 @@ Recorded 2026-10-26 for the Metal Press, from the build:
 - Short Crew, Cold Start, and Brittle Lining read on it. The crude press is Stage 3 and cannot fail, so it loads no tiered chip and never runs a streak.
 - The Shift list for a press stage job names metals, like the Furnace's.
 
+Recorded 2026-10-26 for the Melter, from the build:
+
+- The Melter has six recipes, all at Processing Level 6, and one body at Stage 6, so the PRD's "Stage 6+ metal" example does not fit: it makes fluids (Lava, Lubricant, Electrolyte Solution, Ender Slurry, Methane), not metal. Its jobs count fluid in mB.
+- It reports each finished cycle as `melt` work: the mB its parallel melts filled, the recipe's Processing Level as its stage, the heat slider, and the output fluid's id.
+- Three objectives: any fluid (24,000–84,000 mB), heat slider (two thirds of that, 50–80%), and one or two named fluids (16,000–48,000 mB). No stage jobs, since every recipe is Stage 6, and no streaks or stat goals.
+- A job part can name a fluid: `JobChipItem.itemName` falls back to the fluid registry, item jobs read "Make 20000 mB of Lubricant", and an option is available when a loaded Melter recipe makes that fluid.
+- Short Crew reads on it (its parallel melts); Cold Start and Brittle Lining do not, since it reports no heat failures.
+
 ## Code against the redesign
 
 The branch's loop was built for the earlier design. Phase 2 of the rework replaced the Mastery storage, the Mastery level gate, the tier and seed components, and the Tier I recipe; the lists below show what is left for later phases.
@@ -267,6 +275,7 @@ Recorded 2026-10-25 from the chips slice:
 - 2026-10-25: the Component Assembler joins Work Orders: stageless families, the `assemble` verb, the assembly report hook, three objectives, its Orders tab and own menu sync, conditions in its stats, and Rush ticking. Checks: Assembler reachability in `WorkOrderRuleChecks` and `AssemblerWorkOrderGameTests`.
 - 2026-10-26: the Alloy Furnace joins Work Orders: the `alloy` verb and report, four objectives, its Orders tab and bays, conditions, the Brittle Lining setback, and Rush. Checks: Alloy reachability in `WorkOrderRuleChecks` and `AlloyFurnaceWorkOrderGameTests`, which finishes a chip with a real Bronze craft.
 - 2026-10-26: the Metal Press joins Work Orders, with streak jobs: the `press` verb and report, the `streak` filter and its failure hook, five objectives, its Orders tab and bays, conditions, and Rush. Checks: streak rules in `WorkOrderRuleChecks` and `MetalPressWorkOrderGameTests`, where a crude press's real Iron Plates finish a chip.
+- 2026-10-26: the Melter joins Work Orders: the `melt` verb and its mB report, fluid parts and names, three objectives, its Orders tab and bays, conditions, and Rush. Checks: Melter reachability in `WorkOrderRuleChecks` and `MelterWorkOrderGameTests`, where real Lubricant melts finish a chip.
 
 ## Verification
 
@@ -287,6 +296,7 @@ Recorded 2026-10-25 from the chips slice:
 - 2026-10-25: Component Assembler. `./gradlew quickCheck`, `./gradlew runGameTestServer` (284 tests), `npm run moddex:check`, and `npm run repo:check` passed. Not checked in a running client.
 - 2026-10-26: Alloy Furnace. `./gradlew quickCheck`, `./gradlew runGameTestServer` (285 tests), `npm run moddex:check`, and `npm run repo:check` passed. Not checked in a running client.
 - 2026-10-26: Metal Press. `./gradlew quickCheck`, `./gradlew runGameTestServer` (287 tests), `npm run moddex:check`, and `npm run repo:check` passed. Not checked in a running client.
+- 2026-10-26: Melter. `./gradlew quickCheck`, `./gradlew runGameTestServer` (288 tests), `npm run moddex:check`, and `npm run repo:check` passed. Not checked in a running client.
 
 ## Handoff and limits
 

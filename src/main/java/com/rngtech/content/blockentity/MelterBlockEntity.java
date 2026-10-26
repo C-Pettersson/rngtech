@@ -44,6 +44,11 @@ import com.rngtech.rpg.progression.MachineMasteryHost;
 import com.rngtech.rpg.progression.MachineProgressionState;
 import com.rngtech.rpg.progression.MegaPassiveNode;
 import com.rngtech.rpg.progression.MegaPassiveTree;
+import com.rngtech.rpg.workorder.WorkObjectiveType;
+import com.rngtech.rpg.workorder.WorkOrderConditions;
+import com.rngtech.rpg.workorder.WorkOrderFamilies;
+import com.rngtech.rpg.workorder.WorkOrderHost;
+import com.rngtech.rpg.workorder.WorkReport;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -80,7 +85,7 @@ import net.neoforged.neoforge.items.ItemStackHandler;
 import java.util.List;
 
 public class MelterBlockEntity extends BaseMachineBlockEntity
-        implements MenuProvider, PurgeableFluidStorage, MachineMasteryHost, MachineInfoProvider {
+        implements MenuProvider, PurgeableFluidStorage, MachineMasteryHost, MachineInfoProvider, WorkOrderHost {
     private final RecipeCache<MelterRecipe> recipes = new RecipeCache<>(1);
     private static final RecipeInputFilter<MelterRecipeInput, MelterRecipe> INPUT_FILTER = new RecipeInputFilter<>(
             ModRecipes.MELTER_TYPE::get,
@@ -329,6 +334,7 @@ public class MelterBlockEntity extends BaseMachineBlockEntity
     }
 
     public static void serverTick(Level level, BlockPos pos, BlockState state, MelterBlockEntity melter) {
+        melter.tickWorkOrders(level);
         tickWork(level, pos, state, melter);
         melter.syncVisualState(level);
     }
@@ -746,6 +752,7 @@ public class MelterBlockEntity extends BaseMachineBlockEntity
         applyServoStats(stats);
         applyFluidPumpStats(stats);
         MegaPassiveTree.applyAttributeStats(stats, machineProgression(), MachineMasteryFamily.MELTER);
+        WorkOrderConditions.apply(stats, workOrders().activeOrder());
         if (!hasBatteryCell()) {
             stats.apply(MachineStatAccumulator.NO_BATTERY_SOURCE, new MachineModifier(
                     ModifierSlot.IMPLICIT,
@@ -870,6 +877,7 @@ public class MelterBlockEntity extends BaseMachineBlockEntity
     private boolean process(MelterRecipe recipe, MachineStatAccumulator stats) {
         int jobs = parallelMelts(recipe, stats);
         boolean melted = false;
+        long made = 0;
         for (int job = 0; job < jobs; job++) {
             int[] consumed = level == null ? null : recipe.consumed(currentInput(), 1);
             if (consumed == null || !recipe.fluidInput().test(inputTank.getFluid())) {
@@ -884,13 +892,17 @@ public class MelterBlockEntity extends BaseMachineBlockEntity
             if (drained.getAmount() < recipe.fluidInput().amount()) {
                 break;
             }
-            if (outputTank.fill(output, IFluidHandler.FluidAction.EXECUTE) > 0) {
+            int filled = outputTank.fill(output, IFluidHandler.FluidAction.EXECUTE);
+            if (filled > 0) {
                 grantRecipeXp(recipe);
             }
+            made += filled;
             melted = true;
         }
         if (melted) {
             escapement.completed();
+            workOrderWork(new WorkReport(WorkObjectiveType.MELT, recipe.requiredProcessingLevel(), heatSlider,
+                    BuiltInRegistries.FLUID.getKey(recipe.outputFluid().getFluid()).toString(), made));
         }
         resetCycle();
         if (!melted) {
@@ -1002,6 +1014,15 @@ public class MelterBlockEntity extends BaseMachineBlockEntity
     @Override
     public int ascendancyEntryStage() {
         return 6;
+    }
+
+    @Override public String workOrderFamily() { return WorkOrderFamilies.of(masteryFamily()); }
+    @Override public int workOrderStage() { return ascendancyEntryStage(); }
+    @Override public int workOrderMasteryLevel() { return masteryState().level(); }
+    @Override public String workOrderAscendancy() { return masteryState().ascendancy(); }
+    @Override public double workOrderStat(String stat) {
+        MachineStat value = MachineStat.bySerializedName(stat);
+        return value == null ? 0 : effectiveStats().value(value);
     }
 
     @Override

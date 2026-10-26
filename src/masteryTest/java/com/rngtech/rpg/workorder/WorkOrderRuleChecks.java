@@ -349,6 +349,8 @@ public final class WorkOrderRuleChecks {
             case ASSEMBLE -> assemblyOutputs().contains(item);
             case ALLOY -> alloyRecipes().stream().anyMatch(recipe -> recipe.getAsJsonObject("result").get("id").getAsString().equals(item));
             case PRESS -> Files.exists(recipes.resolve("metal_press/" + path + ".json"));
+            case MELT -> jsonFiles(recipes.resolve("melter")).stream()
+                    .anyMatch(file -> read(file).getAsJsonObject("fluid_output").get("id").getAsString().equals(item));
         };
     }
 

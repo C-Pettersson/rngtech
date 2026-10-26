@@ -72,11 +72,15 @@ public final class WorkOrderJobs {
 
     /**
      * Whether an item job may name {@code id}: a registered item with a loaded Crusher or Furnace recipe that takes it, or a
-     * loaded Component Assembler, Alloy Furnace, or Metal Press recipe that makes it.
+     * loaded Component Assembler, Alloy Furnace, or Metal Press recipe that makes it. A fluid id names a Melter output.
      */
     public static Predicate<String> itemAvailable(Level level) {
         return id -> {
             ResourceLocation key = ResourceLocation.tryParse(id);
+            if (key != null && !BuiltInRegistries.ITEM.containsKey(key) && BuiltInRegistries.FLUID.containsKey(key)) {
+                return level.getRecipeManager().getAllRecipesFor(ModRecipes.MELTER_TYPE.get()).stream()
+                        .anyMatch(holder -> holder.value().outputFluid().getFluid() == BuiltInRegistries.FLUID.get(key));
+            }
             if (key == null || !BuiltInRegistries.ITEM.containsKey(key)) {
                 return false;
             }

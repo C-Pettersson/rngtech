@@ -13,7 +13,9 @@ public enum WorkObjectiveType {
     /** Completed Alloy Furnace recipe sets. */
     ALLOY,
     /** Completed Metal Press jobs. */
-    PRESS;
+    PRESS,
+    /** Fluid a Melter makes, in mB. */
+    MELT;
 
     public String id() {
         return name().toLowerCase(Locale.ROOT);
