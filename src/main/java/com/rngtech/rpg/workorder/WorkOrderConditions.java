@@ -265,6 +265,24 @@ public final class WorkOrderConditions {
                 order.rewards(), order.template(), order.name(), order.rewardTable()), traits);
     }
 
+    /** A condition's cost or rule as a player reads it, such as "26% less Processing Speed", or null for another modifier. */
+    public static Component effectText(MachineModifier modifier) {
+        Condition condition = get(modifier.affixId());
+        if (condition == null) { return null; }
+        String key = "rngtech.work_order.condition." + condition.id() + ".effect";
+        return switch (condition.id()) {
+            case STARVED_FEED -> Component.translatable(key, Math.round((1 - modifier.value()) * 100));
+            case POWER_SURCHARGE, COLD_START, UNSTEADY_HANDS -> Component.translatable(key, Math.round(modifier.value()));
+            default -> Component.translatable(key);
+        };
+    }
+
+    /** A rule condition's rule, for a list of what a refinement can add, or null for a pressure condition or another affix. */
+    public static Component ruleText(ModifierDefinition definition) {
+        Condition condition = get(definition.id());
+        return condition == null || condition.pressure() ? null : Component.translatable("rngtech.work_order.condition." + condition.id() + ".effect");
+    }
+
     /** Whether {@code traits} carry the condition {@code id}, a Blighted chip's extra condition included. */
     public static boolean has(MachineTraits traits, String id) {
         return traits != null && active(traits).stream().anyMatch(modifier -> modifier.affixId().equals(id));

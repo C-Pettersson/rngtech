@@ -291,13 +291,7 @@ public class JobChipItem extends Item {
                 continue;
             }
             String id = condition.id();
-            Component effect = switch (id) {
-                case WorkOrderConditions.STARVED_FEED -> Component.translatable("rngtech.work_order.condition." + id + ".effect",
-                        Math.round((1 - modifier.value()) * 100));
-                case WorkOrderConditions.POWER_SURCHARGE, WorkOrderConditions.COLD_START, WorkOrderConditions.UNSTEADY_HANDS ->
-                        Component.translatable("rngtech.work_order.condition." + id + ".effect", Math.round(modifier.value()));
-                default -> Component.translatable("rngtech.work_order.condition." + id + ".effect");
-            };
+            Component effect = WorkOrderConditions.effectText(modifier);
             boolean blessed = modifier.slot() == ModifierSlot.CORRUPTION && corruption.outcome() == CorruptionOutcome.BLESSED;
             boolean blighted = modifier.slot() == ModifierSlot.CORRUPTION && corruption.outcome() == CorruptionOutcome.BLIGHTED;
             Component reward = blighted ? Component.translatable("rngtech.tooltip.work_order.condition_no_reward")

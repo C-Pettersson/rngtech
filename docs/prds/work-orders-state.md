@@ -17,7 +17,7 @@ Status: **Planned**. The PRD is a draft with open questions and no release targe
 - [x] Conditions: the `work_order` profiles and pool for the Crusher and Furnace, conditions as an effect source on the machine, reset-on-event conditions, and Rush. The Bonus Summary drawer section moved to phase 9.
 - [x] More jobs and machines: stat goals for the Crusher and Furnace, group and streak jobs, and Work Orders on every eligible machine: Crusher, Furnace, Component Assembler, Alloy Furnace, Metal Press, Melter, Resonance Calibrator, Forestry Companion, and Component Recycler.
 - [x] Refinement and corruption: Job Chips as refinement targets, chip corruption outcomes, and Phase Array rejection.
-- [ ] UI polish: drive-bay panels on machine models, the Bonus Summary section, Jade, JEI, and model cues.
+- [ ] UI polish: Jade, JEI info, and Affix Forge condition text (done); the active-chip status light on machine models; the Bonus Summary section and drive-bay panels deferred by the user.
 - [ ] Documentation: wiki page, Machine Mastery and Rarity updates, the implementation matrix, the GuideME guide, Machine Design Notes, and an FTB Quests chapter.
 - [ ] In-game playtest of every eligible machine and tier.
 
@@ -244,6 +244,14 @@ Recorded 2026-10-26 for phase 8, from the build:
 - The Phase Array checks targets with `RefinementTargets.canPhase`, which turns away Job Chips; everything else it took before, it still takes.
 - Playtest found a Forestry head-stage chip's Shift list naming ores: the list fell back to the Crusher's inputs for any machine it did not know, which also hit Calibrator and Recycler stage jobs. The list is now explicit per machine: Crusher inputs, Furnace and Metal Press metals, Assembler cells, Alloy Furnace outputs, and Calibrator outputs; Forestry (its stage is the cutting head's) and Recycler stage jobs have none.
 - Conditions have Affix Forge names (`rngtech.affix.prefix|suffix.<id>`). Rule conditions show their zero-value stat line in the forge's stat preview; a custom description would read better (UI polish).
+
+Recorded 2026-10-26 for phase 9, from the user and the build:
+
+- The user picked Jade, JEI info, the Affix Forge condition text, and a status light for this pass. The Bonus Summary drawer section and drive-bay panels on the models wait.
+- Jade: a machine with chips shows its active job and progress, Rush time left, or that none is active; Shift adds how many chips are loaded and done. It covers block machines through the shared machine provider; the Forestry Companion cart is an entity and shows none.
+- JEI: info pages for the Dispatch Terminal, Job Chip, Completed Job Chip, and Requisition.
+- Affix Forge: condition text comes from `WorkOrderConditions.effectText` and `ruleText`, which the chip tooltip now uses too. Pressure conditions read as their cost and rule conditions as their rule, so the "+0 Processing Speed" line is gone.
+- The status light needs a blockstate property and a lamp part in every eligible machine's model, from eight model generators with their own geometry. It is left for its own art pass rather than placed by guesswork.
 
 ## Code against the redesign
 
