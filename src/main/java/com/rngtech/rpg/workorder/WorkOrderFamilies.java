@@ -15,7 +15,10 @@ import java.util.Set;
  */
 public final class WorkOrderFamilies {
     public static final String COMPONENT_ASSEMBLER = "component_assembler";
+    public static final String COMPONENT_RECYCLER = "component_recycler";
     private static final Set<String> STAGELESS = Set.of(COMPONENT_ASSEMBLER);
+    /** Machines without Mastery that have chassis stages, and their highest stage. */
+    private static final Map<String, Integer> STAGED = Map.of(COMPONENT_RECYCLER, 8);
 
     /**
      * The stats each family's stat goals may name: effective stats players raise through Gear, refinement, or Mastery and
@@ -71,7 +74,7 @@ public final class WorkOrderFamilies {
         for (MachineMasteryFamily family : MachineMasteryFamily.values()) {
             if (of(family).equals(id)) { return family.topStage(); }
         }
-        return 0;
+        return STAGED.getOrDefault(id, 0);
     }
 
     public static boolean known(String id) {

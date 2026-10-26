@@ -15,7 +15,7 @@ Status: **Planned**. The PRD is a draft with open questions and no release targe
 - [x] Dispatch Terminal and Requisitions: the block, job rolling with count ranges and item jobs, one-kind rewards, Download and Refresh, the Requisition recipe, and the give commands.
 - [x] Order templates: loader, terminal pools, per-template reward tables, the template give command, and the config key that turns random orders off. Rarity and conditions on templates wait for phase 6.
 - [x] Conditions: the `work_order` profiles and pool for the Crusher and Furnace, conditions as an effect source on the machine, reset-on-event conditions, and Rush. The Bonus Summary drawer section moved to phase 9.
-- [ ] More jobs and machines: stat goals for the Crusher and Furnace (done), the Component Assembler (done), the Alloy Furnace (done), the Metal Press (done), the Melter (done), the Resonance Calibrator (done), the Forestry Companion (done), then the other Mastery families and the machines without Mastery, starting with the Component Assembler.
+- [x] More jobs and machines: stat goals for the Crusher and Furnace, group and streak jobs, and Work Orders on every eligible machine: Crusher, Furnace, Component Assembler, Alloy Furnace, Metal Press, Melter, Resonance Calibrator, Forestry Companion, and Component Recycler.
 - [ ] Refinement and corruption: order corruption pools and Phase Array rejection.
 - [ ] UI polish: drive-bay panels on machine models, the Bonus Summary section, Jade, JEI, and model cues.
 - [ ] Documentation: wiki page, Machine Mastery and Rarity updates, the implementation matrix, the GuideME guide, Machine Design Notes, and an FTB Quests chapter.
@@ -225,6 +225,16 @@ Recorded 2026-10-26 for the Forestry Companion, from the build:
 - Power Surcharge now lists its families and leaves out the Forestry Companion, as the PRD's condition table says. Starved Feed reads on the cart.
 - The GameTest caught a save bug while building this: the chips' save sat inside the Mastery block, so a cart without Mastery progress dropped its chips on save.
 
+Recorded 2026-10-26 for the Component Recycler, from the build:
+
+- The Component Recycler has no Mastery but has chassis stages (1 to 8), so `WorkOrderFamilies` keeps a stage table for such machines beside the stageless set; its chips need the tier's stage like a Mastery machine's.
+- It reports each recycle as `recycle` work: one part, with the recipe's minimum Processing Level as its stage. Two objectives: any parts (48–168) and parts of Stage N+ (minimums 2 to 6, after the PRD's "Recycle 96 Stage 4+ parts").
+- Its menu syncs chips through its own data block, like the Assembler's. The crude recycler is manual and shows no tabs, so it has no Orders tab and takes no chips.
+- Its loot tables copied no components, so the chassis recyclers now copy `rngtech:work_orders`; traits still do not ride on its drop, as before.
+- Power Surcharge and Starved Feed read on it.
+
+With the Recycler, phase 7 covers every eligible machine. Generators, the Battery Chassis, the Miner's Companion, and storage are not eligible.
+
 ## Code against the redesign
 
 The branch's loop was built for the earlier design. Phase 2 of the rework replaced the Mastery storage, the Mastery level gate, the tier and seed components, and the Tier I recipe; the lists below show what is left for later phases.
@@ -322,6 +332,7 @@ Recorded 2026-10-25 from the chips slice:
 - 2026-10-26: Resonance Calibrator. `./gradlew quickCheck`, `./gradlew runGameTestServer` (289 tests), `npm run moddex:check`, and `npm run repo:check` passed. Not checked in a running client.
 - 2026-10-26: group jobs for the Metal Press and Resonance Calibrator. `./gradlew quickCheck`, `./gradlew runGameTestServer` (289 tests; the press and Calibrator GameTests now finish group jobs from real presses and calibrations), `npm run moddex:check`, and `npm run repo:check` passed. Not checked in a running client.
 - 2026-10-26: Forestry Companion. `./gradlew quickCheck`, `./gradlew runGameTestServer` (290 tests), `npm run moddex:check`, and `npm run repo:check` passed. Not checked in a running client; no GameTest fells a real tree for a chip.
+- 2026-10-26: Component Recycler, closing phase 7. `./gradlew quickCheck`, `./gradlew runGameTestServer` (291 tests; a real Iron recycler finishes a chip and drops with it), `npm run moddex:check` (objectives for all nine families), and `npm run repo:check` passed. Not checked in a running client.
 
 ## Handoff and limits
 

@@ -19,7 +19,9 @@ public enum WorkObjectiveType {
     /** Components a Resonance Calibrator calibrates. */
     CALIBRATE,
     /** Logs a Forestry Companion fells and crops it harvests. */
-    HARVEST;
+    HARVEST,
+    /** Parts a Component Recycler breaks down. */
+    RECYCLE;
 
     public String id() {
         return name().toLowerCase(Locale.ROOT);

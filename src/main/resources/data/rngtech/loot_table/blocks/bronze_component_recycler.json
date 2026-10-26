@@ -1,16 +1,25 @@
 {
-    "type":  "minecraft:block",
-    "pools":  [
-                  {
-                      "bonus_rolls":  0,
-                      "entries":  [
-                                      {
-                                          "type":  "minecraft:item",
-                                          "name":  "rngtech:bronze_component_recycler"
-                                      }
-                                  ],
-                      "rolls":  1
-                  }
-              ],
-    "random_sequence":  "rngtech:blocks/bronze_component_recycler"
+    "type": "minecraft:block",
+    "pools": [
+        {
+            "bonus_rolls": 0,
+            "entries": [
+                {
+                    "type": "minecraft:item",
+                    "name": "rngtech:bronze_component_recycler",
+                    "functions": [
+                        {
+                            "function": "minecraft:copy_components",
+                            "include": [
+                                "rngtech:work_orders"
+                            ],
+                            "source": "block_entity"
+                        }
+                    ]
+                }
+            ],
+            "rolls": 1
+        }
+    ],
+    "random_sequence": "rngtech:blocks/bronze_component_recycler"
 }

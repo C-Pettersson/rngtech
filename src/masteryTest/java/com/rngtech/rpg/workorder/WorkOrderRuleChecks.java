@@ -398,7 +398,7 @@ public final class WorkOrderRuleChecks {
                     .anyMatch(file -> read(file).getAsJsonObject("fluid_output").get("id").getAsString().equals(item));
             case CALIBRATE -> jsonFiles(recipes).stream().filter(file -> file.getFileName().toString().startsWith("calibration_"))
                     .anyMatch(file -> read(file).getAsJsonObject("result").getAsJsonObject("stack").get("id").getAsString().equals(item));
-            case HARVEST -> false;
+            case HARVEST, RECYCLE -> false;
         };
     }
 
