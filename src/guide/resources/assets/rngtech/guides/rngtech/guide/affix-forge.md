@@ -45,7 +45,7 @@ item_ids:
 - **Mastery:** No
 - **Tool:** <ItemLink id="minecraft:wooden_pickaxe" />
 
-The **Affix Forge** is RNGTech's early refinement station. Put in a machine item, machine part, Battery Cell, Tool Head, Tool Rod, or companion item, add a catalyst, and the forge adds, upgrades, rerolls, or removes that item's rolled affixes. It needs no power. Three reusable upgrades unlock stronger catalysts and the optional focus slot.
+The **Affix Forge** is RNGTech's early refinement station. Put in a machine item, machine part, Battery Cell, Tool Head, Tool Rod, companion item, or [Job Chip](rngtech:work-orders.md), add a catalyst, and the forge adds, upgrades, rerolls, or removes that item's rolled affixes. It needs no power. Three reusable upgrades unlock stronger catalysts and the optional focus slot.
 
 The forge refines items, not placed machines. To refine a machine that is already placed, use the Refinement tab in that machine's own screen. For the endgame bench where you choose the affix, see the [Phase Array](rngtech:phase-array.md).
 

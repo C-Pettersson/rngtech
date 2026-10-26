@@ -44,7 +44,7 @@ wiki:
     },
 ) }}
 
-The **Affix Forge** is RNGTech's early refinement station. Put in a machine item, machine part, Battery Cell, Tool Head, Tool Rod, or companion item, add a catalyst, and the forge adds, upgrades, rerolls, or removes that item's rolled affixes. It needs no power. Three reusable upgrades unlock stronger catalysts and the optional focus slot.
+The **Affix Forge** is RNGTech's early refinement station. Put in a machine item, machine part, Battery Cell, Tool Head, Tool Rod, companion item, or [Job Chip](work-orders.md), add a catalyst, and the forge adds, upgrades, rerolls, or removes that item's rolled affixes. It needs no power. Three reusable upgrades unlock stronger catalysts and the optional focus slot.
 
 The forge refines items, not placed machines. To refine a machine that is already placed, use the Refinement tab in that machine's own screen. For the endgame bench where you choose the affix, see the [Phase Array](phase-array.md).
 
@@ -163,6 +163,8 @@ Click **Reforge** to roll. The catalyst is always used up, and so is a Stabiliza
 
 A placed machine's Refinement tab also accepts the catalyst, without a focus slot. Hover its **Apply** button with a catalyst inserted to see the same outcome table.
 
+On a Job Chip, the outcomes change the job's reward and conditions instead of adding an implicit. See [Work Orders](work-orders.md#refining-and-corrupting-chips).
+
 ### Automation
 
 The Affix Forge has no item or energy automation. Everything goes through its screen.
@@ -209,5 +211,6 @@ With JEI installed, the catalysts are listed under the Affix Forging category.
 
 - [Rarity and Affixes](rarity-and-affixes.md): rarity tiers, affixes, and Refinement Potential.
 - [Phase Array](phase-array.md)
+- [Work Orders](work-orders.md): refining Job Chips.
 
 {{ navbox() }}

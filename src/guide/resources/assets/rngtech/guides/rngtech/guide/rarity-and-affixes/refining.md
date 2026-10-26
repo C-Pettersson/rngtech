@@ -24,3 +24,4 @@ Where to refine:
 - **Placed machines** in the Refinement tab of the machine's own screen.
 - **Tool Heads and Tool Rods**, even inside an assembled tool, in the [Tool Bench](rngtech:tool-bench.md) Refine tab.
 - **Chosen operations** in the [Phase Array](rngtech:phase-array.md), the endgame bench, which spends only a little RP per pulse.
+- **Job Chips** in the Affix Forge. The forge adds, removes, upgrades, and rerolls their [conditions](rngtech:work-orders/refining-and-corrupting-chips.md). The Phase Array does not accept Job Chips.

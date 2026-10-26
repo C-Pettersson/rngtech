@@ -21,6 +21,7 @@ These items roll rarity, affixes, and RP when you craft them:
 | [Battery Cells](battery-cells.md) | {{ item('rngtech:iron_battery_cell') }} and every other material cell |
 | Modular tool parts | Tool Heads and Tool Rods for [Modular Tools](modular-tools.md) |
 | Companions | The Forestry Companion cart from the [Forestry Cart Station](forestry-cart-station.md), and the {{ item('rngtech:miners_companion') }} |
+| [Job Chips](work-orders.md) | A Dispatch Terminal rolls a chip when it lists the job. A chip's affixes are [conditions](work-orders.md#conditions), which cost the machine and add reward. |
 
 A few blocks never roll traits: the [Affix Forge](affix-forge.md) and the Phase Cradle of the [Phase Array](phase-array.md), the Crude Component Recycler, the wooden and silica-gel machines such as the [Wooden Composter](wooden-composter.md), the [Algae Photobioreactor](algae-photobioreactor.md), and cables and connectors. Assembled modular tools carry no traits of their own. Their Tool Head and Tool Rod do.
 
@@ -240,10 +241,11 @@ Where to refine:
 - **Placed machines** in the Refinement tab of the machine's own screen.
 - **Tool Heads and Tool Rods**, even inside an assembled tool, in the [Tool Bench](tool-bench.md) Refine tab.
 - **Chosen operations** in the [Phase Array](phase-array.md), the endgame bench, which spends only a little RP per pulse.
+- **Job Chips** in the Affix Forge. The forge adds, removes, upgrades, and rerolls their [conditions](work-orders.md#refining-and-corrupting-chips). The Phase Array does not accept Job Chips.
 
 ## Corruption
 
-A {{ item('rngtech:volatile_catalyst') }} corrupts a finished machine part or Battery Cell in the [Affix Forge](affix-forge.md#corrupting-with-a-volatile-catalyst), or a placed machine in its Refinement tab. It costs no RP, and it is the only thing that can change a Unique. Machine and chassis items, Tool Heads, Tool Rods, companions, and unidentified or stripped items cannot be corrupted as items; place a machine first and corrupt it from its Refinement tab.
+A {{ item('rngtech:volatile_catalyst') }} corrupts a finished machine part or Battery Cell in the [Affix Forge](affix-forge.md#corrupting-with-a-volatile-catalyst), or a placed machine in its Refinement tab. It costs no RP, and it is the only thing that can change a Unique. Machine and chassis items, Tool Heads, Tool Rods, companions, and unidentified or stripped items cannot be corrupted as items; place a machine first and corrupt it from its Refinement tab. You can corrupt a [Job Chip](work-orders.md#refining-and-corrupting-chips) in the Affix Forge. There, the outcomes change the job's reward instead of a stat.
 
 The catalyst rolls one outcome, and every outcome leaves the item **Corrupted**:
 
@@ -291,5 +293,6 @@ Machines with [Machine Mastery](machine-mastery.md) and the Gear they take (Crus
 - [Affix Forge](affix-forge.md): catalysts, lenses, and modifier crystals.
 - [Gear](gear.md): the parts you install in machines.
 - [Machine Mastery](machine-mastery.md): levelling machines up.
+- [Work Orders](work-orders.md): Job Chips and their conditions.
 
 {{ navbox() }}

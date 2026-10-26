@@ -252,6 +252,57 @@ For a pack where RNGTech's Modular tools are the only way to mine, put this in `
 
 Then add other mods' mining tools to `rngtech:restricted_tools`, or give them a level in `rngtech:ore_reach`, and gate other mods' block-breaking machines.
 
+## Work Orders
+
+[Work Orders](work-orders.md) are jobs on Job Chips (`rngtech:job_chip`). A Dispatch Terminal lists the jobs, and machines run them. Jobs are data, so a pack can add its own, hand them out through quests, and change what they pay.
+
+- **Recipes:** `workOrders.recipesEnabled` (on) loads the Dispatch Terminal and Requisition recipes. Both recipes have the `rngtech:work_order_recipes_enabled` recipe condition. To give these items through quests or your own recipes, set the key to off.
+- **Random jobs:** `workOrders.randomOrdersEnabled` (on) lets the terminal roll jobs from the objectives. When it is off, the terminal lists only your pooled templates. With no pooled templates, the terminal lists nothing.
+- **Give a chip:** `/rngtech work_order give <players> random [tier]` rolls a job the way the terminal does. Without a tier, the tier is random. `/rngtech work_order give <players> template <template> [tier]` gives a template's job. The tier applies only if the template sets none.
+
+### Job templates
+
+A template is a fixed job in `data/<namespace>/work_orders/templates/<name>.json`. All keys except `objective` are optional. Keys you leave out roll as they would for a random job:
+
+```json
+{
+    "objective": "rngtech:furnace_items",
+    "family": "furnace",
+    "tier": 3,
+    "min_stage": 6,
+    "min_mastery_level": 40,
+    "rarity": "magic",
+    "bounty": 150,
+    "prestige": 1,
+    "name": "mypack.work_order.foundry_contract",
+    "rewards": [{"item": "rngtech:chaos_crystal", "count": 6}],
+    "reward_table": "mypack:work_orders/foundry",
+    "weight": 4
+}
+```
+
+- `objective` is the id of a loaded objective, or an inline objective. An inline objective is `{"type": "smelt", "parts": [...]}` with one to three parts. Each part is `{"filter": "any" | "stage" | "setting" | "item" | "group" | "streak" | "stat", "min": n, "item": id, "group": name, "stat": name, "count": n | {"min": a, "max": b, "step": s}}`. A stat part takes `target` in place of `count`. Inline parts need a `family`.
+- Families are `crusher`, `furnace`, `alloy_furnace`, `metal_press`, `melter`, `resonance_calibrator`, `forestry`, `component_assembler`, and `component_recycler`. Job types are `crush`, `smelt`, `alloy`, `press`, `melt`, `calibrate`, `harvest`, `assemble`, and `recycle`.
+- Without `min_stage`, the job needs the tier's stage, capped at the family's top stage. `bounty` is a percentage, 100 at base. `prestige` and `min_mastery_level` are 0 by default.
+- `rarity` (`normal`, `magic`, or `rare`) fixes how many conditions roll. The conditions themselves always roll.
+- `name` is a translation key or plain text. The chip reads "Name (Job Chip III)".
+- Fixed `rewards` are paid exactly as written. Bounty does not scale them. Without `rewards`, the reward rolls from `reward_table`. Without `reward_table`, it rolls from `rngtech:challenges/work_order`.
+- `weight` adds the template to the terminal's listings, on the same scale as objective weights. Without `weight`, the template is quest-only.
+
+The game checks each template when it loads and logs an error for any it rejects. `/rngtech work_order give` suggests the loaded templates. For a quest, use the give command, or an item reward with the components copied from a given chip.
+
+### Objectives and rewards
+
+Random jobs come from `data/rngtech/work_orders/objectives/`. Each file has a `family`, a `type`, a `filter`, a `weight`, and a goal per tier. A goal is a count or a stat target, fixed or `min`/`max`/`step`. Item and group objectives list `options` instead. Override a file to retune it. A file that fails to load is skipped, with an error in the log.
+
+The reward table `rngtech:challenges/work_order` is a loot table with one pool and one roll, so each job pays one kind of reward. It can use:
+
+- `rngtech:set_order_count` sets an entry's count per tier (`"counts": [t1, t2, t3, t4, t5]`).
+- `rngtech:set_order_tier` sets a Glyph's tier to the job's tier, plus an optional `offset`.
+- The conditions `rngtech:order_tier` and `rngtech:order_prestige` take an inclusive `min` and `max`.
+
+When the terminal lists the job, Bounty multiplies the rolled count.
+
 ## Phase Array
 
 The [Phase Array](phase-array.md)'s operations are recipes of type `rngtech:phase_array`, one file per operation under `data/rngtech/recipe/phase_array/`. Each names its `action` (`reforge`, `attune`, `resonate`, `excise`, `imprint`, `transmute`, `temper`, `exalt`, or `graft`), its `coils` (3 to 9), its `glyph_tier` (0 for none, else 1 to 5), its `base_fe`, its `refinement_potential_cost`, and its `partial` and `overhold` outcomes. Override a file to retune an operation, replace it with an empty recipe to remove it, or add a file with another action to offer the same action at a second price. A recipe condition such as `rngtech:material_enabled` hides an operation the way it hides a crafting recipe.
@@ -272,7 +323,7 @@ The line's own numbers live under `phaseArray.*` in `config/rngtech-common.toml`
 
 Refinement Potential is shared with the Affix Forge: a Stage 8 part rolls 22 to 32 at craft, `calibration.refinementPotentialBonus` shifts every roll, and each operation's `refinement_potential_cost` is in its recipe.
 
-Glyphs (`rngtech:glyph`) have no recipe. Their tier is the `rngtech:glyph_tier` component, 1 to 5; a stack without it counts as Tier I, so `/give @p rngtech:glyph[rngtech:glyph_tier=3]` or a quest reward works. By default they drop from the six machine-challenge loot tables and from woken Dormant Machines; Tier V has no default source. Replace the tables to change that, or hand Glyphs out through quests.
+Glyphs (`rngtech:glyph`) have no recipe. Their tier is the `rngtech:glyph_tier` component, 1 to 5; a stack without it counts as Tier I, so `/give @p rngtech:glyph[rngtech:glyph_tier=3]` or a quest reward works. By default they drop from the six machine-challenge loot tables, from woken Dormant Machines, and from Work Order rewards. Work Orders are the only default source of Tier V. Replace the tables to change that, or hand Glyphs out through quests.
 
 ## Compatibility
 
@@ -286,6 +337,7 @@ Glyphs (`rngtech:glyph`) have no recipe. Their tier is the `rngtech:glyph_tier` 
 - [Getting Started](getting-started.md)
 - [Stages](stages.md)
 - [Uniques](uniques.md)
+- [Work Orders](work-orders.md)
 - [Universal Cable](universal-cable.md)
 
 {{ navbox() }}

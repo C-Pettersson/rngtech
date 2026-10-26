@@ -22,7 +22,7 @@ wiki:
     },
 ) }}
 
-The **Phase Array** is the endgame refinement bench. Where the [Affix Forge](affix-forge.md) rolls dice for you, the Array lets you choose: raise this affix, remove that one, add the affix you want, swap one for another, or move an affix across from a donor item. It works on any refinable item of any stage, and it spends only a little [Refinement Potential](rarity-and-affixes.md#refinement-potential), so an item is done when you decide it is.
+The **Phase Array** is the endgame refinement bench. Where the [Affix Forge](affix-forge.md) rolls dice for you, the Array lets you choose: raise this affix, remove that one, add the affix you want, swap one for another, or move an affix across from a donor item. It works on any refinable item of any stage, and it spends only a little [Refinement Potential](rarity-and-affixes.md#refinement-potential), so an item is done when you decide it is. It does not accept [Job Chips](work-orders.md).
 
 Every operation is a **pulse**. The line charges FE, you fire it, and the pulse crosses the Coils one by one. Each Coil holds it or lets it slip. Reach far enough and the operation happens; slip early and nothing changes. Three things make you stop before your RP runs out:
 
@@ -59,8 +59,9 @@ The Emitter and Coils roll rarity and affixes when crafted, like other Stage 8 p
 | A [Vacuum Collapse](vacuum-collapse-generator.md) cycle at instability 60 or more | 10% chance of Tier III; 90 or more gives Tier IV |
 | A [Crusher](crusher.md) jam on a Processing Level 7 or higher recipe | 5% chance of Tier I |
 | Waking a [Dormant Machine](dormant-machines.md) | Tier I to IV by site |
+| A [Work Order](work-orders.md#rewards) that pays a Glyph | The job's tier, I to V |
 
-Tier V has no source yet. A Glyph with no tier counts as Tier I, so one from a quest or a command works.
+A Glyph with no tier counts as Tier I, so one from a quest or a command works.
 
 A Glyph has two uses, and they compete: **seat** it in the Cradle to open the positions of its tier, or **spend** it on a deep operation. The tier is a floor for both: a Tier III Glyph opens any position up to 7 and pays for any operation that asks for Tier III or less.
 

@@ -1,14 +1,14 @@
 # PRD: Work Orders
 
-> Design requirements, not a release status report. See [Current Implementation](../reference/current-implementation.md) and [Machine Mastery](https://c-pettersson.github.io/rngtech/machine-mastery/) for current behavior.
+> Design requirements, not a release status report. See [Current Implementation](../reference/current-implementation.md) and the [Work Orders](https://c-pettersson.github.io/rngtech/work-orders/) wiki page for current behavior.
 
 PRD status: Draft
 
-Implementation status: Planned
+Implementation status: Prototype
 
 Release: Not scheduled
 
-Last updated: 2026-10-25
+Last updated: 2026-10-26
 
 ## Summary
 
@@ -206,30 +206,7 @@ Pack makers write fixed jobs in `data/<namespace>/work_orders/templates/*.json`.
 - A template can join the Dispatch Terminal's pools with a weight, or stay quest-only.
 - Template fields left unset still roll, so a template can fix only the family and objective and keep random conditions. A template that sets every field is fully specific.
 
-The shipped format (phase 5). Every key but `objective` is optional:
-
-```json
-{
-    "objective": "rngtech:furnace_items",
-    "family": "furnace",
-    "tier": 3,
-    "min_stage": 6,
-    "min_mastery_level": 40,
-    "bounty": 150,
-    "prestige": 1,
-    "name": "mypack.work_order.foundry_contract",
-    "rewards": [{"item": "rngtech:chaos_crystal", "count": 6}],
-    "reward_table": "mypack:work_orders/foundry",
-    "weight": 4
-}
-```
-
-- `objective` names a loaded objective, whose family the job takes, or is inline: `{"type": "smelt", "parts": [...]}` with one to three parts, each `{"filter": "any" | "stage" | "setting" | "item", "min": n, "item": id, "count": n | {"min": a, "max": b, "step": s}}`. A part with an `item` defaults to the item filter. Inline parts need a `family`. A ranged count earns its band's Bounty bonus; with several ranged parts, the highest band counts.
-- An unset `tier` follows the listing or the command; an unset `min_stage` is the tier's stage capped at the family's top stage; an unset `bounty` is 100% plus the band bonus; `prestige` and `min_mastery_level` default to 0.
-- `name` is a translation key or plain text. The chip reads "Name (Job Chip III)", and the terminal row shows the name in place of the machine.
-- Fixed `rewards` are listed as they are, with no Bounty scaling. Without them, the reward rolls from `reward_table`, or from `rngtech:challenges/work_order` when that is unset, and the chip and its Completed Job Chip keep the table for a redeem that has no list.
-- `weight` puts the template in the terminal's listing on the same scale as objective weights. Without it, or at 0, the template is quest-only.
-- `rarity` (`normal`, `magic`, or `rare`) fixes how many conditions roll; the conditions themselves always roll. A template cannot name its conditions yet.
+The shipped format, with every key, is on the wiki's [Modpack Creators](https://c-pettersson.github.io/rngtech/modpack-creators/#job-templates) page.
 
 ## Conditions
 

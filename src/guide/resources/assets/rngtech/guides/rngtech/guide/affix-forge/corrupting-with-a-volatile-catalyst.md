@@ -13,3 +13,5 @@ With a Resonance Matrix installed, a <ItemLink id="rngtech:volatile_catalyst" />
 Click **Reforge** to roll. The catalyst is always used up, and so is a Stabilization Crystal. No RP is spent, and the RP readout shows Corrupted from then on.
 
 A placed machine's Refinement tab also accepts the catalyst, without a focus slot. Hover its **Apply** button with a catalyst inserted to see the same outcome table.
+
+On a Job Chip, the outcomes change the job's reward and conditions instead of adding an implicit. See [Work Orders](rngtech:work-orders/refining-and-corrupting-chips.md).

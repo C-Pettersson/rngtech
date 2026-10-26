@@ -20,7 +20,8 @@ navigation:
 | A [Vacuum Collapse](rngtech:vacuum-collapse-generator.md) cycle at instability 60 or more | 10% chance of Tier III; 90 or more gives Tier IV |
 | A [Crusher](rngtech:crusher.md) jam on a Processing Level 7 or higher recipe | 5% chance of Tier I |
 | Waking a [Dormant Machine](rngtech:dormant-machines.md) | Tier I to IV by site |
+| A [Work Order](rngtech:work-orders/rewards.md) that pays a Glyph | The job's tier, I to V |
 
-Tier V has no source yet. A Glyph with no tier counts as Tier I, so one from a quest or a command works.
+A Glyph with no tier counts as Tier I, so one from a quest or a command works.
 
 A Glyph has two uses, and they compete: **seat** it in the Cradle to open the positions of its tier, or **spend** it on a deep operation. The tier is a floor for both: a Tier III Glyph opens any position up to 7 and pays for any operation that asks for Tier III or less.

@@ -34,6 +34,8 @@ Seven machine families have a **Mastery** tab:
 
 Other machines, Gear, and cables do not level up.
 
+[Work Orders](work-orders.md) give every processing machine repeatable jobs, with or without Mastery, so a maxed machine still has goals. Jobs give no XP or tree points. Chips stay with the machine, not its Mastery, so a Soul Transfer does not move them.
+
 ## Earning XP
 
 A machine earns XP each time it successfully finishes a job that awards Mastery XP. Recipe tables on the machine pages show a **Mastery XP** column where a recipe gives XP.
@@ -257,5 +259,6 @@ No ascendancy lets a loop of recipes create items or FE from nothing, and none l
 - [Rarity and Affixes](rarity-and-affixes.md)
 - [Stages](stages.md)
 - [Gear](gear.md)
+- [Work Orders](work-orders.md)
 
 {{ navbox() }}

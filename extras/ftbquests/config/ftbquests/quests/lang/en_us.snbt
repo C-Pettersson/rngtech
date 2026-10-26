@@ -7,6 +7,7 @@
 	chapter.7106E7A1B10FA050.title: "Logistics and Transport"
 	chapter.7106E7A1B10FA060.title: "Affix Forge"
 	chapter.7106E7A1B10FA070.title: "Mastery and Ascendancies"
+	chapter.7106E7A1B10FA080.title: "Work Orders"
 	chapter_group.7106E7A1B10FA000.title: "RNGTech"
 	quest.00B991D729BDFC26.quest_desc: [
 		"The &eForestry Companion&r is a cart on vanilla rails. It plants saplings beside the track and cuts the trees that grow."
@@ -114,6 +115,18 @@
 	]
 	quest.08CA89C63A70CEDE.quest_subtitle: "The Steel Battery Chassis needs it."
 	quest.08CA89C63A70CEDE.title: "Calibrated Storage"
+	quest.095B2C2EAFC75846.quest_desc: [
+		"Download a job for a machine you have at the stage it needs."
+		""
+		"&aUse:&r"
+		"1. Open the machine's &eOrders&r tab and put the chip in a drive bay. Shift-click works while the tab is open."
+		"2. The first chip in a machine with none active becomes active. Otherwise select it and press &eActivate&r."
+		"3. Run the machine. Only work it finishes while the chip is active counts."
+		""
+		"A machine holds three chips and works on one. Switching keeps every chip's progress. Hold Shift on a stage job to see the items that count."
+	]
+	quest.095B2C2EAFC75846.quest_subtitle: "Pick a job you can run."
+	quest.095B2C2EAFC75846.title: "First Job Chip"
 	quest.09E6CC376427E6D3.quest_desc: [
 		"The &eCrude Recycler&r takes early items apart and gives back some of their materials. It needs no &bFE&r."
 		""
@@ -399,6 +412,13 @@
 	]
 	quest.2395BFD1C7ACB809.quest_subtitle: "Choose a path."
 	quest.2395BFD1C7ACB809.title: "Ascendancy Seal I"
+	quest.278F57CB04C541E1.quest_desc: [
+		"A finished job turns its chip into a &eCompleted Job Chip&r in the same bay. Take it out and use it to receive the reward it lists."
+		""
+		"The machine does not start another chip on its own. Activate the next one."
+	]
+	quest.278F57CB04C541E1.quest_subtitle: "Collect the pay."
+	quest.278F57CB04C541E1.title: "Job Done"
 	quest.2A87820D10501CE9.quest_desc: [
 		"Optional. Each Solid Fuel Burner accepts Gear up to its own stage."
 		"A better Heat Core gives more &bFE/t&r and burns higher fuel tiers."
@@ -530,6 +550,13 @@
 	]
 	quest.366307DF419BEB06.quest_subtitle: "One output for a field of panels."
 	quest.366307DF419BEB06.title: "Solar Array"
+	quest.36827C604EDFB930.quest_desc: [
+		"Optional. A Job Chip is a refinement target in the &eAffix Forge&r. Add a condition for more reward, remove one for an easier job, or reroll them. The listed reward follows the change."
+		""
+		"A &eVolatile Catalyst&r corrupts a chip: it may pay more, gain a free condition, or gain one that pays nothing. Take a chip out of its bay before you refine it. The Phase Array does not take chips."
+	]
+	quest.36827C604EDFB930.quest_subtitle: "Shape the job."
+	quest.36827C604EDFB930.title: "Refining Job Chips"
 	quest.36FD86C58309204A.quest_desc: ["Insert the &eEfficiency Modifier Lens&r in the focus slot of the Affix Forge. It makes efficiency affixes 3 times as likely."]
 	quest.37A6C9E1284B5D10.quest_desc: [
 		"&6RNGTech&r adds RPG elements to tech machines. Machines, Gear, tool parts, and Battery Cells roll their own rarity and affixes."
@@ -1324,6 +1351,13 @@
 		""
 		"&7&oNote: You cannot select the affix that it removes. Fixed traits and base stats stay.&r"
 	]
+	quest.3A1FD024757A73C7.quest_desc: [
+		"Optional. Magic and Rare chips carry &econditions&r: a cost to the machine, such as less Processing Speed, or a rule, such as a jam resetting progress. Each one makes the reward bigger. Conditions apply only while their chip is active."
+		""
+		"&eRush&r activates a chip under a deadline of half its tier's target time for 50% more reward. The clock never stops, and the chip is lost if time runs out."
+	]
+	quest.3A1FD024757A73C7.quest_subtitle: "Harder jobs pay more."
+	quest.3A1FD024757A73C7.title: "Conditions and Rush"
 	quest.3A817746747CF255.quest_desc: ["Install a Crush Head in the Head slot of the &eMiner's Companion&r to enable Block Chew. Any Crush Head fits."]
 	quest.3A8FCB54EB8B1E89.quest_desc: [
 		"Optional. A &eCrude Solar Panel&r makes 4 &bFE/t&r on a clear day, 1 &bFE/t&r in rain, and nothing at night."
@@ -1783,6 +1817,17 @@
 		"Calibrate a &eCopper Casing&r with the &eThermal Calibration Pattern&r and Glowstone Dust."
 		"The &eBronze Furnace Chassis&r and the &eAlloy Solid Fuel Burner&r need 45 or more stability. Steel machines need 55 or more."
 	]
+	quest.6019B5AA53D9F0CD.quest_desc: [
+		"The &eDispatch Terminal&r lists six jobs of mixed tiers and machines."
+		""
+		"Its recipe needs a &eCalibrated Logic Component&r with 80% or more stability. Only the Stage 4 Calibrator's resonant recipe reaches that."
+		""
+		"- &eDownload&r takes a job as a Job Chip. Its line stays empty."
+		"- &eRefresh&r spends a Requisition to replace all six lines."
+		"- A broken terminal keeps its listing, so placing it again is no free refresh."
+	]
+	quest.6019B5AA53D9F0CD.quest_subtitle: "The job board."
+	quest.6019B5AA53D9F0CD.title: "Dispatch Terminal"
 	quest.61F18F2CD460DDD9.quest_desc: [
 		"Optional. Stage 3-4 adds more ways to make &bFE&r:"
 		"- Burn crops and biomass in the &eBio Generator&r."
@@ -1853,6 +1898,13 @@
 	]
 	quest.6B295A9B5D422CB1.quest_subtitle: "Reveal the rolls of new items."
 	quest.6B295A9B5D422CB1.title: "Unidentified Items"
+	quest.6B93582CAFA30B6D.quest_desc: [
+		"Optional. A &eRequisition&r refreshes a Dispatch Terminal's six lines."
+		""
+		"Craft two from a &eCalibrated Logic Component&r with 65% or more stability, Paper, Steel Plates, and Basic Electric Circuits. Some jobs pay Requisitions as their reward."
+	]
+	quest.6B93582CAFA30B6D.quest_subtitle: "New jobs on demand."
+	quest.6B93582CAFA30B6D.title: "Requisitions"
 	quest.6D8585E478E2A8D5.quest_desc: [
 		"The &eTungstensteel Compressor Tank&r stores 128,000 mB loose and 4,096,000 mB compressed. It accepts Gear up to Stage 7."
 		"Craft it from a &ePressure Tank Frame&r, 4 glass, 2 tungstensteel ingots, and 2 &eTitanium Casings&r."
@@ -2489,6 +2541,15 @@
 	]
 	quest.760227B83533AF3C.quest_subtitle: "A comparator shows the machine state."
 	quest.760227B83533AF3C.title: "Comparator Output"
+	quest.766D5255F991FE77.quest_desc: [
+		"&eWork Orders&r are repeatable jobs for processing machines. Each job is a &eJob Chip&r that shows everything before you take it: the machine, the job, its tier, the chassis stage it needs, its conditions, and the one reward it pays."
+		""
+		"- Tier I jobs need a Stage 4 chassis, up to Stage 8 for Tier V. A machine whose top stage is lower needs only its top stage."
+		"- Crushers, Furnaces, Alloy Furnaces, Metal Presses, Melters, Resonance Calibrators, the Forestry Companion, the Component Assembler, and powered Component Recyclers take chips."
+		"- Rewards are refinement catalysts, Mastery Refunds, Requisitions, Glyphs, and Uniques. Never FE or materials."
+	]
+	quest.766D5255F991FE77.quest_subtitle: "Jobs for your machines."
+	quest.766D5255F991FE77.title: "Read: Work Orders"
 	quest.77BDE15168C209AE.quest_desc: [
 		"With an Energy Connector in its Gear tab, the &eTool Bench&r charges the Battery Cell of a tool."
 		""

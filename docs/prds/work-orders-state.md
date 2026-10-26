@@ -2,7 +2,7 @@
 
 Source: [draft design](work-orders.md).
 
-Status: **Planned**. The PRD is a draft with open questions and no release target. On 2026-10-25, after a first playtest, it was redesigned around a Dispatch Board vendor, readable order items, and an Orders tab on every processing machine. After a second playtest the same day, orders became Job Chips from a Dispatch Terminal, loaded through drive bays. The branch `feature/workplan-machine-065464` has phases 2 to 4 of the rework done: chips are readable item data, are stored on the machine, are loaded through three drive bays on an Orders tab on the Crusher and Furnace, and come from a Dispatch Terminal. See [Code against the redesign](#code-against-the-redesign).
+Status: **Prototype**. The PRD is a draft with open questions and no release target. On 2026-10-25, after a first playtest, it was redesigned around a Dispatch Board vendor, readable order items, and an Orders tab on every processing machine. After a second playtest the same day, orders became Job Chips from a Dispatch Terminal, loaded through drive bays. The branch `feature/workplan-machine-065464` has every phase but the deferred UI polish done: Job Chips from a Dispatch Terminal, three drive bays on the Orders tab of all nine eligible machines, templates, conditions and Rush, stat, group, and streak jobs, refinement and corruption, Jade and JEI, and the player wiki page, in-game guide, and FTB Quests chapter. It is not merged and needs a full playtest. See [Code against the redesign](#code-against-the-redesign).
 
 ## Scope checklist
 
@@ -18,7 +18,7 @@ Status: **Planned**. The PRD is a draft with open questions and no release targe
 - [x] More jobs and machines: stat goals for the Crusher and Furnace, group and streak jobs, and Work Orders on every eligible machine: Crusher, Furnace, Component Assembler, Alloy Furnace, Metal Press, Melter, Resonance Calibrator, Forestry Companion, and Component Recycler.
 - [x] Refinement and corruption: Job Chips as refinement targets, chip corruption outcomes, and Phase Array rejection.
 - [ ] UI polish: Jade, JEI info, and Affix Forge condition text (done); the active-chip status light on machine models; the Bonus Summary section and drive-bay panels deferred by the user.
-- [ ] Documentation: wiki page, Machine Mastery and Rarity updates, the implementation matrix, the GuideME guide, Machine Design Notes, and an FTB Quests chapter.
+- [x] Documentation: wiki page, Machine Mastery and Rarity updates, the implementation matrix, the GuideME guide, Machine Design Notes, and an FTB Quests chapter.
 - [ ] In-game playtest of every eligible machine and tier.
 
 ## Decisions
@@ -140,7 +140,7 @@ Recorded 2026-10-25 for phase 5, from the build:
 - `name` is a translation key or plain text (`translatableWithFallback`). The chip reads "Name (Job Chip III)", and the terminal row heading shows the name in place of the machine.
 - The loader rejects a template with no objective, an unknown family or job type, a tier outside I to V, an item part with no item, negative numbers, an empty reward, or a reward item that is not registered. A template naming an objective that is not loaded parses but never rolls.
 - No template ships in the mod's own data. `/rngtech work_order give` suggests the loaded templates.
-- Work Orders have no wiki page yet (phase 10), so the template format and `workOrders.randomOrdersEnabled` are documented here and in the PRD until then.
+- Work Orders have no wiki page yet (phase 10), so the template format and `workOrders.randomOrdersEnabled` are documented here and in the PRD until then. Phase 10 moved them to the wiki's Modpack Creators page.
 
 Recorded 2026-10-25 for phase 6, from the user:
 
@@ -253,6 +253,14 @@ Recorded 2026-10-26 for phase 9, from the user and the build:
 - Affix Forge: condition text comes from `WorkOrderConditions.effectText` and `ruleText`, which the chip tooltip now uses too. Pressure conditions read as their cost and rule conditions as their rule, so the "+0 Processing Speed" line is gone.
 - The status light needs a blockstate property and a lamp part in every eligible machine's model, from eight model generators with their own geometry. It is left for its own art pass rather than placed by guesswork.
 
+Recorded 2026-10-26 for phase 10, from the build:
+
+- The player page is `wiki/work-orders.md`, under Guides after Machine Mastery, with the Dispatch Terminal infobox and both recipes. It documents shipped behavior only, so the deferred Bonus Summary section, drive-bay panels, and status light are not on it.
+- Each eligible machine's Screen section lists the Orders tab. Machine Mastery, Rarity and Affixes, the Affix Forge, and the Phase Array link to the page; the Phase Array's Glyph table gains Work Orders as the only Tier V source.
+- Pack-maker facts (config keys, give commands, the template format, objectives, and the reward table's functions and conditions) live on the wiki's Modpack Creators page. The PRD's shipped-format block now points there, so there is one home for it.
+- Machine Design Notes gain a Work Orders section with the design rules, and the Machine Tabs table an Orders row. The implementation matrix gains a Work Orders section, rows for the terminal, chips, and Requisitions, the chip refinement target, and the reward table.
+- The FTB Quests chapter `rngtech_work_orders` (order 8) runs from a Stage 4 Calibrator through the terminal, a first chip, and a redeemed chip, with optional quests for Requisitions, conditions and Rush, and refining chips. Its ids start 0-7.
+
 ## Code against the redesign
 
 The branch's loop was built for the earlier design. Phase 2 of the rework replaced the Mastery storage, the Mastery level gate, the tier and seed components, and the Tier I recipe; the lists below show what is left for later phases.
@@ -327,6 +335,8 @@ Recorded 2026-10-25 from the chips slice:
 - 2026-10-26: the Melter joins Work Orders: the `melt` verb and its mB report, fluid parts and names, three objectives, its Orders tab and bays, conditions, and Rush. Checks: Melter reachability in `WorkOrderRuleChecks` and `MelterWorkOrderGameTests`, where real Lubricant melts finish a chip.
 - 2026-10-26: the Resonance Calibrator joins Work Orders: the `calibrate` verb and report, streaks with a stability minimum, Unsteady Hands and Fine Tolerance, five objectives, its Orders tab and bays, and Rush. Checks: streak and Fine Tolerance rules in `WorkOrderRuleChecks` and `CalibratorWorkOrderGameTests`, where real calibrations finish a chip.
 - 2026-10-26: rework phase 8. Job Chips as refinement targets (`RefinementTargets`), chip Refinement Potential, Bounty and reward rebalancing on refinement, chip corruption outcomes (`WorkOrderConditions.corrupt`), and the Phase Array's `canPhase`. Checks: `WorkOrderRefinementChecks` and `JobChipRefinementGameTests`.
+- 2026-10-26: rework phase 9, in part. Jade lines for the active job, JEI information pages, and condition text in the Affix Forge and on chips. The Bonus Summary section, drive-bay panels, and status light wait.
+- 2026-10-26: rework phase 10. The Work Orders wiki page and updates to nine machine pages and five guide and refinement pages, the regenerated in-game guide, the implementation matrix, Machine Design Notes, and the FTB Quests chapter.
 
 ## Verification
 
@@ -353,6 +363,7 @@ Recorded 2026-10-25 from the chips slice:
 - 2026-10-26: Forestry Companion. `./gradlew quickCheck`, `./gradlew runGameTestServer` (290 tests), `npm run moddex:check`, and `npm run repo:check` passed. Not checked in a running client; no GameTest fells a real tree for a chip.
 - 2026-10-26: Component Recycler, closing phase 7. `./gradlew quickCheck`, `./gradlew runGameTestServer` (291 tests; a real Iron recycler finishes a chip and drops with it), `npm run moddex:check` (objectives for all nine families), and `npm run repo:check` passed. Not checked in a running client.
 - 2026-10-26: rework phase 8. `./gradlew quickCheck` (`masteryCheck` 671,509 checks), `./gradlew runGameTestServer` (292 tests), `npm run moddex:check`, and `npm run repo:check` passed. Not checked in a running client.
+- 2026-10-26: rework phase 10, documentation only. `mkdocs build --strict`, `mkdocs build --strict -f mkdocs.wiki.yml`, `python tools/rngwiki/guideme.py --check`, `npm run repo:check`, and `npm run moddex:check` passed. The FTB Quests chapter has not been loaded in a running client.
 
 ## Handoff and limits
 
