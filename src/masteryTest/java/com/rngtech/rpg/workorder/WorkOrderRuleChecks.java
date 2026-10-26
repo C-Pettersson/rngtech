@@ -36,6 +36,7 @@ public final class WorkOrderRuleChecks {
         rewardAmounts();
         rush();
         statGoals(shipped);
+        streaks();
         reachable(shipped);
         return checks;
     }
@@ -216,6 +217,7 @@ public final class WorkOrderRuleChecks {
                     case ITEM -> !entry.options(stage, item -> true).isEmpty()
                             && entry.options().stream().allMatch(option -> hasRecipe(entry.type(), option.item()));
                     case STAT -> WorkOrderFamilies.goalStat(entry.family(), MachineStat.bySerializedName(entry.stat()));
+                    case STREAK -> WorkOrderFamilies.streaks(entry.family());
                 };
                 require(ok, entry.id() + " Tier " + tier + " is reachable on a Stage " + stage + " chassis");
             }
@@ -285,6 +287,22 @@ public final class WorkOrderRuleChecks {
         throw new AssertionError("a Crusher stat goal named a stat the Crusher does not read");
     }
 
+    /** Streak jobs: they count like any work, a failure sets an unfinished streak back to 0, and the chip keeps its best streak. */
+    private static void streaks() {
+        var objective = new WorkObjective(id("streak"), new WorkPart(WorkObjectiveType.PRESS, WorkFilter.STREAK, 0, "", 10));
+        var orders = MachineWorkOrders.EMPTY.withLoaded(loaded(new WorkOrder("metal_press", 1, objective, 4, 0, 100, 0)));
+        var six = WorkOrderRules.progress(orders, crush(WorkObjectiveType.PRESS, 0, "rngtech:iron_plate", 6)).orders();
+        require(six.activeOrder().totalProgress() == 6, "a streak counts any work of its verb");
+        var broken = WorkOrderRules.breakStreaks(six);
+        require(broken.activeOrder().totalProgress() == 0 && broken.activeOrder().bestStreak() == 6, "a failure breaks the streak and keeps the best");
+        require(WorkOrderRules.breakStreaks(broken) == broken, "breaking an empty streak changes nothing");
+        var four = WorkOrderRules.progress(broken, crush(WorkObjectiveType.PRESS, 0, "", 4)).orders();
+        require(four.activeOrder().totalProgress() == 4 && four.activeOrder().bestStreak() == 6, "a new streak starts from 0 under the best");
+        var done = WorkOrderRules.progress(four, crush(WorkObjectiveType.PRESS, 0, "", 6)).orders();
+        require(done.orders().getFirst().fulfilled() && WorkOrderRules.breakStreaks(done) == done, "a finished streak cannot be broken");
+        require(WorkOrderFamilies.streaks("metal_press") && !WorkOrderFamilies.streaks("crusher"), "only machines that report failures roll streaks");
+    }
+
     /** Rush deadlines: half the tier's target time, a rounded-up bonus, and expiry that spares finished chips. */
     private static void rush() {
         require(WorkOrder.rushTicks(1) == 15 * 60 * 20 / 2 && WorkOrder.rushTicks(5) == 30 * 60 * 20 / 2, "Rush is half the tier's target time");
@@ -330,6 +348,7 @@ public final class WorkOrderRuleChecks {
             case SMELT -> Files.exists(recipes.resolve("furnace/metals/" + path.replace("crushed_", "") + "_from_crushed.json"));
             case ASSEMBLE -> assemblyOutputs().contains(item);
             case ALLOY -> alloyRecipes().stream().anyMatch(recipe -> recipe.getAsJsonObject("result").get("id").getAsString().equals(item));
+            case PRESS -> Files.exists(recipes.resolve("metal_press/" + path + ".json"));
         };
     }
 

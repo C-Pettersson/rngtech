@@ -16,7 +16,12 @@ public enum WorkFilter {
      * A stat goal: the machine's effective stat named by the part's item, at or above its target, which is in hundredths
      * of the stat's value. It counts no work; the machine checks the stat each time it completes a job.
      */
-    STAT;
+    STAT,
+    /**
+     * Work of the part's verb in a row: it counts like {@link #ANY}, and a failure on the machine, such as a Metal Press
+     * heat failure, sets an unfinished streak back to 0. The chip keeps its best streak.
+     */
+    STREAK;
 
     public String id() {
         return name().toLowerCase(Locale.ROOT);

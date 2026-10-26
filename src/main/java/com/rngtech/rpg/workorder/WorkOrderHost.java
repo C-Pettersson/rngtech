@@ -26,6 +26,13 @@ public interface WorkOrderHost {
         if (next != orders) { setWorkOrders(next); }
     }
 
+    /** Breaks the active chip's streaks after a failure on the machine, such as a Metal Press heat failure. */
+    default void workOrderStreakBroken() {
+        MachineWorkOrders orders = workOrders();
+        MachineWorkOrders next = WorkOrderRules.breakStreaks(orders);
+        if (next != orders) { setWorkOrders(next); }
+    }
+
     /** Resets the active chip's progress to 0 when it carries the reset condition {@code condition}, such as Jammed Line on a jam. */
     default void workOrderSetback(String condition) {
         MachineWorkOrders orders = workOrders();

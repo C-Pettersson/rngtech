@@ -59,6 +59,9 @@ public record WorkOrderTemplate(ResourceLocation id, String family, int tier, Re
             if (part.filter() == WorkFilter.STAT && !WorkOrderFamilies.goalStat(family, MachineStat.bySerializedName(part.item()))) {
                 throw new IllegalArgumentException(id + ": a " + family + " stat goal cannot name " + part.item());
             }
+            if (part.filter() == WorkFilter.STREAK && !WorkOrderFamilies.streaks(family)) {
+                throw new IllegalArgumentException(id + ": " + family + " machines report no failures to break a streak");
+            }
         }
     }
 

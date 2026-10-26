@@ -67,12 +67,12 @@ public final class WorkOrderConditions {
             new Condition(tiered(POWER_SURCHARGE, ModifierSlot.PREFIX, MachineStat.ENERGY_USAGE, ModifierOperation.INCREASED_PERCENT,
                     whole(25, 33), whole(34, 41), whole(42, 50)), ALL, false, true, new int[] {10, 17, 25}, 0),
             new Condition(fixed(SHORT_CREW, ModifierSlot.PREFIX, MachineStat.BATCH_SIZE, ModifierOperation.ADD, -1),
-                    Set.of("crusher", "furnace", "alloy_furnace"), false, true, new int[] {30}, 0),
+                    Set.of("crusher", "furnace", "alloy_furnace", "metal_press"), false, true, new int[] {30}, 0),
             new Condition(tiered(COLD_START, ModifierSlot.PREFIX, MachineStat.TEMPERATURE_STABILITY, ModifierOperation.DECREASED_PERCENT,
-                    whole(10, 13), whole(14, 16), whole(17, 20)), Set.of("furnace", "alloy_furnace"), false, true, new int[] {15, 20, 25}, 0),
+                    whole(10, 13), whole(14, 16), whole(17, 20)), Set.of("furnace", "alloy_furnace", "metal_press"), false, true, new int[] {15, 20, 25}, 0),
             new Condition(fixed(HAND_FEEDING, ModifierSlot.SUFFIX, MachineStat.INSTANT_PROCESS_CHANCE, ModifierOperation.LESS, 0),
                     Set.of("crusher"), false, true, new int[] {20}, 0),
-            new Condition(rule(BRITTLE_LINING), Set.of("furnace", "alloy_furnace"), false, false, new int[] {35}, 1),
+            new Condition(rule(BRITTLE_LINING), Set.of("furnace", "alloy_furnace", "metal_press"), false, false, new int[] {35}, 1),
             new Condition(rule(JAMMED_LINE), Set.of("crusher"), false, false, new int[] {30}, 1),
             new Condition(rule(DEEP_ORE), ALL, true, false, new int[] {25}, 1));
 

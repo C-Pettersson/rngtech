@@ -188,7 +188,7 @@ The range is split into three equal bands: low, middle, and high. The band sets 
 ### Rules
 
 - Progress counts only work this machine finishes while the chip is active. A batch counts each item it completes.
-- A streak objective resets to 0 on the event that breaks it, such as a Malformed Ingot. The Orders tab shows the best streak so far.
+- A streak objective resets to 0 on the event that breaks it, such as a Malformed Ingot. The Orders tab shows the best streak so far. A streak part uses `"filter": "streak"`, counts like any work of its verb, and only rolls for families whose machines report the failures that break it (the Metal Press so far).
 - A specific-item part is rolled only from recipes that are loaded, so an option whose material a pack disabled never rolls. An option's stage must be at or below the job's stage requirement.
 - A stat goal reads the machine's effective stat with every source applied: traits, Gear, Mastery, and the chip's own conditions. It is met at the first job the machine completes while the stat is at or above the target, so the build has to run, not just be installed for a moment. Until then the Orders tab shows the current value against the target.
 - A stat goal entry uses `"filter": "stat"`, names its `stat`, and gives each tier a `target` in the stat's own units (such as `3.1` Processing Speed or `12` Super Output Chance), fixed or as a `min`/`max`/`step` range. Targets are kept in hundredths. A template part can be a stat goal the same way. The Orders tab and the chip show the machine's value at its last completed job against the target, written the way the Stats tab writes that stat.

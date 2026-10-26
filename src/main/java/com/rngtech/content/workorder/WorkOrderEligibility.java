@@ -6,6 +6,7 @@ import com.rngtech.content.recipe.AlloyFurnaceRecipe;
 import com.rngtech.content.recipe.BatteryAssemblyRecipe;
 import com.rngtech.content.recipe.CrusherRecipe;
 import com.rngtech.content.recipe.FurnaceRecipe;
+import com.rngtech.content.recipe.MetalPressRecipe;
 import com.rngtech.content.registry.ModRecipes;
 import com.rngtech.rpg.workorder.WorkFilter;
 import com.rngtech.rpg.workorder.WorkObjectiveType;
@@ -50,8 +51,21 @@ public final class WorkOrderEligibility {
             case SMELT -> materials(recipes, part).stream().map(id -> (Component) Component.literal(MaterialCatalog.materialFamily(id).displayName())).toList();
             case ASSEMBLE -> cells(recipes, part).stream().map(Item::getDescription).toList();
             case ALLOY -> alloys(recipes, part).stream().map(Item::getDescription).toList();
+            case PRESS -> pressMaterials(recipes, part).stream().map(id -> (Component) Component.literal(MaterialCatalog.materialFamily(id).displayName())).toList();
             case null, default -> items(recipes, part).stream().map(Item::getDescription).toList();
         };
+    }
+
+    /** The metals of the Metal Press recipes at the part's stage or more, by their failure material, sorted by name. */
+    public static List<String> pressMaterials(RecipeManager recipes, WorkPart part) {
+        Set<String> materials = new LinkedHashSet<>();
+        for (RecipeHolder<MetalPressRecipe> holder : recipes.getAllRecipesFor(ModRecipes.METAL_PRESS_TYPE.get())) {
+            String material = holder.value().failureMaterial();
+            if (!material.isEmpty() && MaterialCatalog.materialStage(material) >= part.minimum()) {
+                materials.add(material);
+            }
+        }
+        return materials.stream().sorted(Comparator.comparing(id -> MaterialCatalog.materialFamily(id).displayName())).toList();
     }
 
     /** What the Alloy Furnace makes from recipes at the part's component stage or more, sorted by name. */

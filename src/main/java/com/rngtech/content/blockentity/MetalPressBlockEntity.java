@@ -10,6 +10,7 @@ import com.rngtech.content.item.SolidFuelBurnerPartItem;
 import com.rngtech.content.item.UniquePartItem;
 import com.rngtech.content.loot.ChallengeContext;
 import com.rngtech.content.loot.ChallengeLoot;
+import com.rngtech.content.material.MaterialCatalog;
 import com.rngtech.content.menu.MasteryMenuSupport;
 import com.rngtech.content.menu.MetalPressMenu;
 import com.rngtech.content.recipe.MetalPressRecipe;
@@ -41,6 +42,11 @@ import com.rngtech.rpg.progression.MachineMasteryHost;
 import com.rngtech.rpg.progression.MachineProgressionState;
 import com.rngtech.rpg.progression.MegaPassiveNode;
 import com.rngtech.rpg.progression.MegaPassiveTree;
+import com.rngtech.rpg.workorder.WorkObjectiveType;
+import com.rngtech.rpg.workorder.WorkOrderConditions;
+import com.rngtech.rpg.workorder.WorkOrderFamilies;
+import com.rngtech.rpg.workorder.WorkOrderHost;
+import com.rngtech.rpg.workorder.WorkReport;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -70,7 +76,7 @@ import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.ItemStackHandler;
 
 public class MetalPressBlockEntity extends BaseMachineBlockEntity
-        implements MenuProvider, MachineMasteryHost, MachineInfoProvider {
+        implements MenuProvider, MachineMasteryHost, MachineInfoProvider, WorkOrderHost {
     private static final RecipeInputFilter<MetalPressRecipeInput, MetalPressRecipe> INPUT_FILTER = new RecipeInputFilter<>(
             ModRecipes.METAL_PRESS_TYPE::get,
             (recipe, item) -> recipe.ingredient().test(item));
@@ -328,6 +334,7 @@ public class MetalPressBlockEntity extends BaseMachineBlockEntity
     }
 
     public static void serverTick(Level level, BlockPos pos, BlockState state, MetalPressBlockEntity press) {
+        press.tickWorkOrders(level);
         work(level, pos, state, press);
         press.syncVisualState(level);
     }
@@ -768,6 +775,7 @@ public class MetalPressBlockEntity extends BaseMachineBlockEntity
         applyHeatCoreStats(stats);
         applyServoStats(stats);
         MegaPassiveTree.applyAttributeStats(stats, machineProgression(), MachineMasteryFamily.METAL_PRESS);
+        WorkOrderConditions.apply(stats, workOrders().activeOrder());
         if (!hasBatteryCell()) {
             stats.apply(MachineStatAccumulator.NO_BATTERY_SOURCE, new MachineModifier(
                     ModifierSlot.IMPLICIT,
@@ -1092,6 +1100,8 @@ public class MetalPressBlockEntity extends BaseMachineBlockEntity
         for (int job = 0; job < jobs; job++) {
             grantRecipeXp(recipe);
         }
+        workOrderWork(new WorkReport(WorkObjectiveType.PRESS, Math.max(0, MaterialCatalog.materialStage(recipe.failureMaterial())), heatSlider,
+                BuiltInRegistries.ITEM.getKey(baseResult.getItem()).toString(), jobs));
         escapement.completed();
         completeCycle();
         presses++;
@@ -1140,6 +1150,15 @@ public class MetalPressBlockEntity extends BaseMachineBlockEntity
         return isCrudePress() ? 3 : 4;
     }
 
+    @Override public String workOrderFamily() { return WorkOrderFamilies.of(masteryFamily()); }
+    @Override public int workOrderStage() { return ascendancyEntryStage(); }
+    @Override public int workOrderMasteryLevel() { return masteryState().level(); }
+    @Override public String workOrderAscendancy() { return masteryState().ascendancy(); }
+    @Override public double workOrderStat(String stat) {
+        MachineStat value = MachineStat.bySerializedName(stat);
+        return value == null ? 0 : effectiveStats().value(value);
+    }
+
     @Override
     public MachineProgressionState machineProgression() {
         return super.machineProgression().forFamily(masteryFamily());
@@ -1181,6 +1200,8 @@ public class MetalPressBlockEntity extends BaseMachineBlockEntity
         resetBulkSpeed();
         ChallengeLoot.reward(level, worldPosition, ChallengeLoot.HEAT_FAILURE,
                 ChallengeContext.of(this).withRecipeStage(recipe.machineXpBand()), processInventory, SLOT_OUTPUT);
+        workOrderStreakBroken();
+        workOrderSetback(WorkOrderConditions.BRITTLE_LINING);
         setChanged();
         return true;
     }

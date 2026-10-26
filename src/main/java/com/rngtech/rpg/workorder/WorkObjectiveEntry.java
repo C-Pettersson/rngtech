@@ -68,6 +68,9 @@ public record WorkObjectiveEntry(ResourceLocation id, String family, WorkObjecti
         if (filter == WorkFilter.STAT && !WorkOrderFamilies.goalStat(family, MachineStat.bySerializedName(stat))) {
             throw new IllegalArgumentException(id + ": a " + family + " stat goal cannot name " + stat);
         }
+        if (filter == WorkFilter.STREAK && !WorkOrderFamilies.streaks(family)) {
+            throw new IllegalArgumentException(id + ": " + family + " machines report no failures to break a streak");
+        }
     }
 
     public WorkObjectiveEntry(ResourceLocation id, String family, WorkObjectiveType type, WorkFilter filter, int weight,

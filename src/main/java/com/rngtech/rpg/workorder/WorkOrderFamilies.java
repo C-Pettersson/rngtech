@@ -26,7 +26,15 @@ public final class WorkOrderFamilies {
             "furnace", Set.of(MachineStat.PROCESSING_SPEED, MachineStat.SUPER_OUTPUT_CHANCE, MachineStat.HEAT_TRANSFER,
                     MachineStat.TEMPERATURE_STABILITY, MachineStat.MAX_TEMPERATURE, MachineStat.BATCH_SIZE));
 
+    /** The families whose machines report failures that break a streak. */
+    private static final Set<String> STREAKS = Set.of("metal_press");
+
     private WorkOrderFamilies() { }
+
+    /** Whether streak jobs can roll for {@code id}: its machines report the failures that break a streak. */
+    public static boolean streaks(String id) {
+        return STREAKS.contains(id);
+    }
 
     /** Whether a stat goal for {@code id} may name {@code stat}. */
     public static boolean goalStat(String id, MachineStat stat) {

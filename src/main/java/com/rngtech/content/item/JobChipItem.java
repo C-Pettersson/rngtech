@@ -131,7 +131,8 @@ public class JobChipItem extends Item {
         if (!WorkOrderEligibility.lists(part)) {
             return;
         }
-        String kind = WorkObjectiveType.byId(part.type()) == WorkObjectiveType.SMELT ? "materials" : "items";
+        WorkObjectiveType type = WorkObjectiveType.byId(part.type());
+        String kind = type == WorkObjectiveType.SMELT || type == WorkObjectiveType.PRESS ? "materials" : "items";
         if (!TooltipKeyState.hasDetailKeyDown()) {
             lines.add(Component.translatable("rngtech.tooltip.work_order.eligible_hint." + kind).withStyle(ChatFormatting.DARK_GRAY));
             return;
@@ -268,6 +269,10 @@ public class JobChipItem extends Item {
         if (progress != null && !progress.isNone()) {
             tooltipComponents.add(Component.translatable("rngtech.tooltip.work_order.progress_line",
                     progressText(order.objective(), progress.progress().stream().mapToLong(Long::longValue).sum())).withStyle(ChatFormatting.GRAY));
+        }
+        if (progress != null && progress.bestStreak() > 0
+                && order.objective().parts().stream().anyMatch(part -> WorkFilter.STREAK.id().equals(part.filter()))) {
+            tooltipComponents.add(Component.translatable("rngtech.tooltip.work_order.best_streak", progress.bestStreak()).withStyle(ChatFormatting.GRAY));
         }
         if (progress != null && progress.rushDeadline() > 0) {
             long now = ClientWorld.gameTime();

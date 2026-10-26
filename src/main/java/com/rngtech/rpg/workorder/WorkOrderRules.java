@@ -144,6 +144,25 @@ public final class WorkOrderRules {
     }
 
     /**
+     * Breaks the active chip's streaks after a failure on the machine: each unfinished streak part goes back to 0. The chip
+     * keeps its best streak. Returns the same chips when no streak was running.
+     */
+    public static MachineWorkOrders breakStreaks(MachineWorkOrders orders) {
+        LoadedWorkOrder active = orders.activeOrder();
+        if (active == null) { return orders; }
+        LoadedWorkOrder next = active;
+        List<WorkPart> parts = active.order().objective().parts();
+        for (int index = 0; index < parts.size(); index++) {
+            WorkPart part = parts.get(index);
+            long current = active.progress().get(index);
+            if (WorkFilter.STREAK.id().equals(part.filter()) && current > 0 && current < part.target()) {
+                next = next.withPartProgress(index, 0);
+            }
+        }
+        return next.equals(active) ? orders : orders.withReplaced(orders.active(), next);
+    }
+
+    /**
      * Checks the active chip's stat goals after a completed job: each one's progress becomes the machine's current value,
      * in hundredths and capped at the target, so it can fall as well as rise until the goal is met. A chip whose every part
      * is met is done. Returns the same chips when nothing changed.

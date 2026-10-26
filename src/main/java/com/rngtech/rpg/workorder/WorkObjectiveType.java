@@ -11,7 +11,9 @@ public enum WorkObjectiveType {
     /** Completed Component Assembler assemblies. */
     ASSEMBLE,
     /** Completed Alloy Furnace recipe sets. */
-    ALLOY;
+    ALLOY,
+    /** Completed Metal Press jobs. */
+    PRESS;
 
     public String id() {
         return name().toLowerCase(Locale.ROOT);

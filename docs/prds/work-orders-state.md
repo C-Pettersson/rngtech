@@ -15,7 +15,7 @@ Status: **Planned**. The PRD is a draft with open questions and no release targe
 - [x] Dispatch Terminal and Requisitions: the block, job rolling with count ranges and item jobs, one-kind rewards, Download and Refresh, the Requisition recipe, and the give commands.
 - [x] Order templates: loader, terminal pools, per-template reward tables, the template give command, and the config key that turns random orders off. Rarity and conditions on templates wait for phase 6.
 - [x] Conditions: the `work_order` profiles and pool for the Crusher and Furnace, conditions as an effect source on the machine, reset-on-event conditions, and Rush. The Bonus Summary drawer section moved to phase 9.
-- [ ] More jobs and machines: stat goals for the Crusher and Furnace (done), the Component Assembler (done), the Alloy Furnace (done), then the other Mastery families and the machines without Mastery, starting with the Component Assembler.
+- [ ] More jobs and machines: stat goals for the Crusher and Furnace (done), the Component Assembler (done), the Alloy Furnace (done), the Metal Press (done), then the other Mastery families and the machines without Mastery, starting with the Component Assembler.
 - [ ] Refinement and corruption: order corruption pools and Phase Array rejection.
 - [ ] UI polish: drive-bay panels on machine models, the Bonus Summary section, Jade, JEI, and model cues.
 - [ ] Documentation: wiki page, Machine Mastery and Rarity updates, the implementation matrix, the GuideME guide, Machine Design Notes, and an FTB Quests chapter.
@@ -188,6 +188,14 @@ Recorded 2026-10-26 for the Alloy Furnace, from the build:
 - Short Crew, Cold Start, and Brittle Lining now read on the Alloy Furnace too; its heat failure resets a Brittle Lining job.
 - It syncs chips through its Mastery data block, like the Crusher and Furnace.
 
+Recorded 2026-10-26 for the Metal Press, from the build:
+
+- Streak jobs shipped as a `streak` filter: a part counts any work of its verb, and `WorkOrderHost.workOrderStreakBroken` sets an unfinished streak back to 0 on a failure. The chip keeps its best streak, which its tooltip and so the Orders tab row show. `WorkOrderFamilies.streaks` lists the families whose machines report failures; only the Metal Press for now, and the loaders reject a streak elsewhere.
+- The Metal Press reports each finished press as `press` work: its jobs in the batch, the failure material's stage as its stage, the heat slider, and the output. A heat failure breaks streaks and resets a Brittle Lining job.
+- Five objectives: any (160–432 presses), Stage N+ metal (minimums 2, 3, 3, 4, 4; its top stage is 4, so every tier needs a Stage 4 press), heat slider (50–80%), one or two named plates, gears, or casings of Stage 4 or lower metals (64–192), and streaks without a failure (64–296, the PRD's 200 at Tier V).
+- Short Crew, Cold Start, and Brittle Lining read on it. The crude press is Stage 3 and cannot fail, so it loads no tiered chip and never runs a streak.
+- The Shift list for a press stage job names metals, like the Furnace's.
+
 ## Code against the redesign
 
 The branch's loop was built for the earlier design. Phase 2 of the rework replaced the Mastery storage, the Mastery level gate, the tier and seed components, and the Tier I recipe; the lists below show what is left for later phases.
@@ -258,6 +266,7 @@ Recorded 2026-10-25 from the chips slice:
 - 2026-10-25: rework phase 7, stat goals for the Crusher and Furnace: the `stat` filter, seven objectives sized from the level-1 processing simulation, `WorkOrderRules.reachStats`, machine stat reads, and stat text on chips and the Orders tab. Checks: stat-goal checks in `WorkOrderRuleChecks` and `WorkOrderGameTests.statGoalsReadTheMachine`.
 - 2026-10-25: the Component Assembler joins Work Orders: stageless families, the `assemble` verb, the assembly report hook, three objectives, its Orders tab and own menu sync, conditions in its stats, and Rush ticking. Checks: Assembler reachability in `WorkOrderRuleChecks` and `AssemblerWorkOrderGameTests`.
 - 2026-10-26: the Alloy Furnace joins Work Orders: the `alloy` verb and report, four objectives, its Orders tab and bays, conditions, the Brittle Lining setback, and Rush. Checks: Alloy reachability in `WorkOrderRuleChecks` and `AlloyFurnaceWorkOrderGameTests`, which finishes a chip with a real Bronze craft.
+- 2026-10-26: the Metal Press joins Work Orders, with streak jobs: the `press` verb and report, the `streak` filter and its failure hook, five objectives, its Orders tab and bays, conditions, and Rush. Checks: streak rules in `WorkOrderRuleChecks` and `MetalPressWorkOrderGameTests`, where a crude press's real Iron Plates finish a chip.
 
 ## Verification
 
@@ -277,6 +286,7 @@ Recorded 2026-10-25 from the chips slice:
 - 2026-10-25: phase 7 stat goals, after merging `main`. `./gradlew quickCheck`, `./gradlew runGameTestServer` (282 tests), `npm run moddex:check`, and `npm run repo:check` passed. Not checked in a running client.
 - 2026-10-25: Component Assembler. `./gradlew quickCheck`, `./gradlew runGameTestServer` (284 tests), `npm run moddex:check`, and `npm run repo:check` passed. Not checked in a running client.
 - 2026-10-26: Alloy Furnace. `./gradlew quickCheck`, `./gradlew runGameTestServer` (285 tests), `npm run moddex:check`, and `npm run repo:check` passed. Not checked in a running client.
+- 2026-10-26: Metal Press. `./gradlew quickCheck`, `./gradlew runGameTestServer` (287 tests), `npm run moddex:check`, and `npm run repo:check` passed. Not checked in a running client.
 
 ## Handoff and limits
 
