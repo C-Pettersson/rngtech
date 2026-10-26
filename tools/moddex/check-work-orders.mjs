@@ -7,6 +7,7 @@ const DATA_ROOT = path.join(PROJECT_ROOT, "src/main/resources/data");
 const RECIPE_ROOT = path.join(DATA_ROOT, "rngtech/recipe");
 const OBJECTIVE_ROOT = path.join(DATA_ROOT, "rngtech/work_orders/objectives");
 const REWARD_TABLE = path.join(DATA_ROOT, "rngtech/loot_table/challenges/work_order.json");
+const UNIQUE_ROOT = path.join(DATA_ROOT, "rngtech/uniques");
 const ORDER = "rngtech:job_chip";
 const FULFILLED = "rngtech:completed_job_chip";
 const REQUISITION = "rngtech:requisition";
@@ -28,11 +29,24 @@ const REWARD_ITEMS = new Set([
     "rngtech:ascension_matrix",
 ]);
 
+// The Work Order families whose machines have a Gear slot for each Unique host. Battery Cells power every machine, so they
+// roll for any job with no family entry.
+const HOST_FAMILIES = {
+    crush_head: ["crusher", "melter"],
+    heat_core: ["alloy_furnace", "furnace", "melter", "metal_press"],
+    alloy_crucible: ["alloy_furnace"],
+    servo: ["alloy_furnace", "melter", "metal_press"],
+    fluid_pump: ["forestry", "melter"],
+    control_board: ["resonance_calibrator"],
+    battery_cell: [],
+};
+
 /**
  * Work Orders stay a closed loop: orders come from the Dispatch Terminal and commands, so no recipe makes one or a Fulfilled
  * Work Order; the Requisition and Dispatch Terminal recipes carry the config condition; no recycling or reactor recipe takes
- * any of them back; the reward table is one pool that pays one kind: Requisitions, currency, Glyphs, or Uniques; and
- * every family with progress hooks has an objective with one goal per tier.
+ * any of them back; the reward table is one pool that pays one kind: Requisitions, currency, Glyphs, or Uniques; each
+ * Unique rolls from the whole catalog, plus a family entry for exactly the machines its part fits; and every family with
+ * progress hooks has an objective with one goal per tier.
  */
 export async function checkWorkOrders({ log = true } = {}) {
     const failures = [];
@@ -72,6 +86,7 @@ export async function checkWorkOrders({ log = true } = {}) {
         failures.push("challenges/work_order must use the rngtech:challenge type");
     }
     let uniqueEntries = 0;
+    const uniqueRolls = new Map();
     for (const pool of table.pools ?? []) {
         for (const entry of pool.entries ?? []) {
             if (entry.type === "minecraft:empty") {
@@ -83,9 +98,34 @@ export async function checkWorkOrders({ log = true } = {}) {
                 if (!(entry.functions ?? []).some((fn) => fn.function === "rngtech:unidentified_unique")) {
                     failures.push(`challenges/work_order drops ${entry.name} identified`);
                 }
+                const families = familyTerms(entry.conditions ?? []);
+                const rolls = uniqueRolls.get(entry.name) ?? { catalog: 0, family: [] };
+                if (families.length === 0) {
+                    rolls.catalog++;
+                } else {
+                    rolls.family.push(families.sort());
+                }
+                uniqueRolls.set(entry.name, rolls);
             } else if (!REWARD_ITEMS.has(entry.name)) {
                 failures.push(`challenges/work_order drops ${entry.name}; rewards are currency, Glyphs, and Uniques`);
             }
+        }
+    }
+
+    for (const [unique, rolls] of uniqueRolls) {
+        const host = JSON.parse(await readFile(path.join(UNIQUE_ROOT, `${unique.slice("rngtech:".length)}.json`), "utf8")).host;
+        const fits = HOST_FAMILIES[host];
+        if (fits === undefined) {
+            failures.push(`${unique} is a ${host}; add its Work Order families to HOST_FAMILIES`);
+            continue;
+        }
+        if (rolls.catalog !== 1) {
+            failures.push(`challenges/work_order rolls ${unique} from the whole catalog ${rolls.catalog} times; expected once`);
+        }
+        const expected = fits.length === 0 ? [] : [JSON.stringify(fits)];
+        const actual = rolls.family.map((families) => JSON.stringify(families));
+        if (JSON.stringify(actual) !== JSON.stringify(expected)) {
+            failures.push(`challenges/work_order favours ${unique} on ${actual.join(", ") || "no family"}; a ${host} fits ${fits.join(", ") || "every machine"}`);
         }
     }
 
@@ -112,10 +152,16 @@ export async function checkWorkOrders({ log = true } = {}) {
     }
     if (log) {
         console.log(`Work Orders PASS: none of ${recipes} recipes crafts an order, Requisition and terminal recipes carry ${CONDITION}, `
-            + `rewards are Requisitions, currency, Glyphs, and ${uniqueEntries} Uniques; `
+            + `rewards are Requisitions, currency, Glyphs, and ${uniqueRolls.size} Uniques in ${uniqueEntries} entries, favoured on the machines they fit; `
             + `objectives for ${[...families.keys()].sort().join(", ")}`);
     }
     return recipes;
+}
+
+/** The families an entry's rngtech:machine_family conditions name, alone or inside minecraft:any_of. */
+function familyTerms(conditions) {
+    return conditions.flatMap((condition) => condition.condition === "rngtech:machine_family" ? [condition.family]
+            : condition.condition === "minecraft:any_of" ? familyTerms(condition.terms ?? []) : []);
 }
 
 async function jsonFiles(root) {

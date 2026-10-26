@@ -5,16 +5,30 @@ import static com.rngtech.gametest.MachineTestSupport.check;
 import com.rngtech.RNGTech;
 import com.rngtech.content.block.BaseMachineBlock;
 import com.rngtech.content.block.WorkOrderMachineBlock;
+import com.rngtech.content.blockentity.AlloyFurnaceBlockEntity;
+import com.rngtech.content.blockentity.BaseMachineBlockEntity;
+import com.rngtech.content.blockentity.BatteryAssemblerBlockEntity;
+import com.rngtech.content.blockentity.ComponentRecyclerBlockEntity;
 import com.rngtech.content.blockentity.CrusherBlockEntity;
+import com.rngtech.content.blockentity.FurnaceBlockEntity;
+import com.rngtech.content.blockentity.MelterBlockEntity;
+import com.rngtech.content.blockentity.MetalPressBlockEntity;
+import com.rngtech.content.blockentity.ResonanceCalibratorBlockEntity;
+import com.rngtech.content.calibration.ResonanceCalibratorChassis;
 import com.rngtech.content.item.CompletedJobChipItem;
 import com.rngtech.content.item.JobChipItem;
+import com.rngtech.content.loot.ChallengeContext;
+import com.rngtech.content.loot.ChallengeLoot;
+import com.rngtech.content.machine.AlloyFurnaceChassisMaterial;
 import com.rngtech.content.machine.CrushHeadMaterial;
 import com.rngtech.content.machine.CrusherChassisMaterial;
+import com.rngtech.content.machine.FurnaceChassisMaterial;
 import com.rngtech.content.menu.CrusherMenu;
 import com.rngtech.content.menu.MasteryMenuSupport;
 import com.rngtech.content.menu.WorkOrderMenuSupport;
 import com.rngtech.content.recipe.CrusherRecipe;
 import com.rngtech.content.recipe.FurnaceRecipe;
+import com.rngtech.content.recycling.ComponentRecyclerChassis;
 import com.rngtech.content.registry.ModBlocks;
 import com.rngtech.content.registry.ModDataComponents;
 import com.rngtech.content.registry.ModItems;
@@ -22,8 +36,12 @@ import com.rngtech.content.registry.ModRecipes;
 import com.rngtech.content.workorder.WorkOrderEligibility;
 import com.rngtech.content.workorder.WorkOrderOperations;
 import com.rngtech.content.workorder.WorkOrderRewards;
+import com.rngtech.rpg.MachineModifier;
 import com.rngtech.rpg.MachineStat;
+import com.rngtech.rpg.MachineStatAccumulator;
 import com.rngtech.rpg.MachineTraits;
+import com.rngtech.rpg.ModifierOperation;
+import com.rngtech.rpg.ModifierSlot;
 import com.rngtech.rpg.Rarity;
 import com.rngtech.rpg.workorder.FulfilledWorkOrder;
 import com.rngtech.rpg.workorder.LoadedWorkOrder;
@@ -33,15 +51,23 @@ import com.rngtech.rpg.workorder.WorkObjective;
 import com.rngtech.rpg.workorder.WorkObjectiveType;
 import com.rngtech.rpg.workorder.WorkOrder;
 import com.rngtech.rpg.workorder.WorkOrderConditions;
+import com.rngtech.rpg.workorder.WorkOrderHost;
 import com.rngtech.rpg.workorder.WorkOrderProgress;
 import com.rngtech.rpg.workorder.WorkOrderRules;
 import com.rngtech.rpg.workorder.WorkPart;
 import com.rngtech.rpg.workorder.WorkReport;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import com.mojang.serialization.JsonOps;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.gametest.framework.GameTest;
+import net.minecraft.gametest.framework.GameTestAssertException;
 import net.minecraft.gametest.framework.GameTestHelper;
+import net.minecraft.resources.RegistryOps;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.item.ItemEntity;
@@ -58,12 +84,22 @@ import net.minecraft.world.item.crafting.RecipeManager;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.loot.LootContext;
+import net.minecraft.world.level.storage.loot.LootParams;
+import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
+import net.minecraft.world.level.storage.loot.predicates.LootItemCondition;
 import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
+import java.io.IOException;
+import java.io.Reader;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -438,6 +474,116 @@ public final class WorkOrderGameTests {
         check(Math.abs(crusher.effectiveStats().value(MachineStat.PROCESSING_SPEED) - speed) < 1.0E-6,
                 "The inactive chip's condition still slowed the Crusher");
         helper.succeed();
+    }
+
+    /**
+     * An active chip of Hand Feeding stops Instant Process on every machine that rolls it, through the machine's own stat
+     * pipeline, and the chance returns once the chip is inactive.
+     */
+    @GameTest(template = MachineTestSupport.EMPTY)
+    public static void handFeedingStopsInstantProcessOnEveryMachine(GameTestHelper helper) {
+        List<Block> blocks = List.of(ModBlocks.crusherChassis(CrusherChassisMaterial.STEEL).get(), ModBlocks.furnaceChassis(FurnaceChassisMaterial.LEAD).get(),
+                ModBlocks.alloyFurnaceChassis(AlloyFurnaceChassisMaterial.TITANIUM).get(), ModBlocks.CRUDE_METAL_PRESS.get(), ModBlocks.MELTER.get(),
+                ModBlocks.resonanceCalibrator(ResonanceCalibratorChassis.IRON).get(), ModBlocks.BATTERY_ASSEMBLER.get(),
+                ModBlocks.componentRecycler(ComponentRecyclerChassis.IRON).get());
+        MachineTraits instant = new MachineTraits(Rarity.MAGIC, 0, List.of(new MachineModifier(ModifierSlot.PREFIX, MachineStat.INSTANT_PROCESS_CHANCE,
+                ModifierOperation.ADD, 25)));
+        MachineTraits feeding = new MachineTraits(Rarity.MAGIC, 0, List.of(WorkOrderConditions.get(WorkOrderConditions.HAND_FEEDING).definition()
+                .roll(1, RandomSource.create(5L))), List.of());
+        Set<String> families = new HashSet<>();
+        for (int index = 0; index < blocks.size(); index++) {
+            BlockPos pos = new BlockPos(index % 3 * 2, 1 + index / 3 * 2, 0);
+            BaseMachineBlockEntity machine = MachineTestSupport.place(helper, pos, blocks.get(index), BaseMachineBlockEntity.class);
+            String family = ((WorkOrderHost) machine).workOrderFamily();
+            families.add(family);
+            machine.setMachineTraits(instant);
+            double before = instantChance(machine);
+            check(before > 0, family + " has no Instant Process Chance to stop: " + before);
+            WorkOrder order = new WorkOrder(family, 1, new WorkObjective(RNGTech.id(family + "_any"),
+                    new WorkPart(WorkObjectiveType.CRUSH, WorkFilter.ANY, 0, "", 100)), 0, 0, WorkOrder.BASE_BOUNTY, 0);
+            machine.setWorkOrders(MachineWorkOrders.EMPTY.withLoaded(new LoadedWorkOrder(order, feeding)).withActive(0));
+            check(instantChance(machine) == 0, "of Hand Feeding left " + family + " an Instant Process Chance of " + instantChance(machine));
+            machine.setWorkOrders(MachineWorkOrders.EMPTY.withLoaded(new LoadedWorkOrder(order, feeding)));
+            check(instantChance(machine) == before, "An inactive chip of Hand Feeding still stopped Instant Process on " + family);
+        }
+        check(families.equals(WorkOrderConditions.INSTANT_PROCESS), "The machines tested are not the families that roll Instant Process: " + families);
+        helper.succeed();
+    }
+
+    private static double instantChance(BaseMachineBlockEntity machine) {
+        MachineStatAccumulator stats = switch (machine) {
+            case CrusherBlockEntity crusher -> crusher.effectiveStats();
+            case FurnaceBlockEntity furnace -> furnace.effectiveStats();
+            case AlloyFurnaceBlockEntity furnace -> furnace.effectiveStats();
+            case MetalPressBlockEntity press -> press.effectiveStats();
+            case MelterBlockEntity melter -> melter.effectiveStats();
+            case ResonanceCalibratorBlockEntity calibrator -> calibrator.effectiveStats();
+            case BatteryAssemblerBlockEntity assembler -> assembler.effectiveStats();
+            case ComponentRecyclerBlockEntity recycler -> recycler.effectiveStats();
+            default -> throw new IllegalArgumentException("No Work Order machine: " + machine);
+        };
+        return stats.value(MachineStat.INSTANT_PROCESS_CHANCE);
+    }
+
+    /**
+     * The Work Order reward table rolls every Unique for any job with Prestige 2, and adds a second entry for each Unique on
+     * exactly the machines its part fits. The entries read the order's family from the reward roll's context.
+     */
+    @GameTest(template = MachineTestSupport.EMPTY)
+    public static void uniqueRewardsFavourTheJobsMachine(GameTestHelper helper) {
+        MinecraftServer server = helper.getLevel().getServer();
+        JsonObject table;
+        try (Reader reader = server.getResourceManager().openAsReader(RNGTech.id("loot_table/challenges/work_order.json"))) {
+            table = JsonParser.parseReader(reader).getAsJsonObject();
+        } catch (IOException exception) {
+            throw new GameTestAssertException("Cannot read the Work Order reward table: " + exception);
+        }
+        RegistryOps<JsonElement> ops = server.registryAccess().createSerializationContext(JsonOps.INSTANCE);
+        List<String> families = List.of("crusher", "furnace", "alloy_furnace", "metal_press", "melter", "resonance_calibrator", "forestry",
+                "component_assembler", "component_recycler");
+        Map<String, Set<String>> favoured = new HashMap<>();
+        Set<String> catalog = new HashSet<>();
+        for (JsonElement element : table.getAsJsonArray("pools").get(0).getAsJsonObject().getAsJsonArray("entries")) {
+            JsonObject entry = element.getAsJsonObject();
+            String conditionText = String.valueOf(entry.get("conditions"));
+            if (!conditionText.contains("rngtech:unique_loot_enabled")) {
+                continue;
+            }
+            String unique = entry.get("name").getAsString();
+            List<LootItemCondition> conditions = LootItemCondition.DIRECT_CODEC.listOf().parse(ops, entry.get("conditions")).getOrThrow();
+            boolean familyEntry = conditionText.contains("rngtech:machine_family");
+            for (String family : families) {
+                check(!passes(helper, conditions, family, 1), unique + " rolled for a " + family + " job below Prestige 2");
+                if (!passes(helper, conditions, family, 2)) {
+                    check(familyEntry, unique + "'s catalog entry did not roll for a " + family + " job");
+                } else if (familyEntry) {
+                    favoured.computeIfAbsent(unique, key -> new HashSet<>()).add(family);
+                }
+            }
+            if (!familyEntry) { catalog.add(unique); }
+        }
+        check(catalog.size() == 9, "Not every Unique rolls from the whole catalog: " + catalog);
+        Set<String> heat = Set.of("furnace", "alloy_furnace", "metal_press", "melter");
+        check(favoured.equals(Map.of(
+                "rngtech:mineshaft_worn_pick_jaw", Set.of("crusher", "melter"),
+                "rngtech:fortress_heater_element", heat,
+                "rngtech:igloo_basement_thermostat", heat,
+                "rngtech:crying_crucible", Set.of("alloy_furnace"),
+                "rngtech:trial_vault_escapement", Set.of("alloy_furnace", "metal_press", "melter"),
+                "rngtech:witch_bottle_reflux_pump", Set.of("melter", "forestry"),
+                "rngtech:ancient_echo_control_board", Set.of("resonance_calibrator"))),
+                "A Unique is favoured on machines its part does not fit: " + favoured);
+        helper.succeed();
+    }
+
+    /** Whether every condition passes for a reward roll of a Tier V {@code family} job with {@code prestige}. */
+    private static boolean passes(GameTestHelper helper, List<LootItemCondition> conditions, String family, int prestige) {
+        ChallengeContext challenge = ChallengeContext.of(new FulfilledWorkOrder(5, family, "", WorkOrder.BASE_BOUNTY, prestige, null), 0);
+        LootContext context = new LootContext.Builder(new LootParams.Builder(helper.getLevel())
+                .withParameter(LootContextParams.ORIGIN, Vec3.ZERO)
+                .withParameter(ChallengeLoot.CONTEXT, challenge)
+                .create(ChallengeLoot.PARAM_SET)).create(Optional.empty());
+        return conditions.stream().allMatch(condition -> condition.test(context));
     }
 
     /** A stat goal reads the Crusher's effective stat at each completed job, and is met once the stat reaches its target. */

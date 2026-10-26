@@ -171,7 +171,7 @@ Conditions apply only while their chip is active. A stat breakdown lists each on
 | Short Crew | 1 less Batch Size | +30% Bounty | Crusher, Furnace, Alloy Furnace, Metal Press, Melter, Resonance Calibrator |
 | Cold Start | 10%–20% reduced Temperature Stability | +15% to +25% Bounty | Furnace, Alloy Furnace, Metal Press |
 | Unsteady Hands | 10%–20% reduced Stability | +15% to +25% Bounty | Metal Press, Resonance Calibrator |
-| of Hand Feeding | Instant Process does not occur | +20% Bounty | Crusher |
+| of Hand Feeding | Instant Process does not occur | +20% Bounty | All except the Forestry Companion |
 | of Brittle Lining | A heat failure resets the job's progress to 0 | +35% Bounty, +1 Prestige | Furnace, Alloy Furnace, Metal Press |
 | of the Jammed Line | A jam resets the job's progress to 0 | +30% Bounty, +1 Prestige | Crusher |
 | of Fine Tolerance | A calibration below the job's stability resets its progress to 0 | +35% Bounty, +1 Prestige | Resonance Calibrator stability jobs |
@@ -231,7 +231,9 @@ Each job pays one kind of reward, shown on the chip, so you choose jobs by what 
 | {{ item('rngtech:requisition', 'Requisitions') }} | All |
 | A {{ item('rngtech:glyph') }} of the job's tier | All |
 | {{ item('rngtech:volatile_catalyst', 'Volatile Catalysts') }}, {{ item('rngtech:affix_upgrade', 'Greater Affix Upgraders') }}, or an {{ item('rngtech:ascension_matrix') }} | III and higher |
-| An unidentified [Unique](uniques.md) | Prestige 2 or more |
+| An unidentified [Unique](uniques.md), most often one for the job's machine | Prestige 2 or more |
+
+A Unique that fits the job's machine is three times as likely as one that does not. For example, a Melter job favours the Mineshaft Worn Pick-Jaw, both Heat Cores, the Trial Vault Escapement, and the Witch-Bottle Reflux Pump. Every Unique can still drop from any job. Battery Cell Uniques fit every machine, so they are never favoured.
 
 Rewards never include FE, ores, ingots, or other materials. Tier V jobs are the only source of Tier V Glyphs for the [Phase Array](phase-array.md).
 

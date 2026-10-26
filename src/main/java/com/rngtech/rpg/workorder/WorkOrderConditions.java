@@ -46,6 +46,9 @@ public final class WorkOrderConditions {
     /** Draft rarity weights for a listed job: Normal, Magic, Rare. */
     private static final int[] RARITY_WEIGHTS = {50, 35, 15};
     private static final Set<String> ALL = Set.of();
+    /** The families whose machines roll Instant Process Chance, so of Hand Feeding costs them something. */
+    public static final Set<String> INSTANT_PROCESS = Set.of("crusher", "furnace", "alloy_furnace", "metal_press", "melter",
+            "resonance_calibrator", "component_assembler", "component_recycler");
 
     /**
      * One condition: its affix definition, the families that can read it (none listed means every family), the filter a
@@ -80,7 +83,7 @@ public final class WorkOrderConditions {
             new Condition(tiered(COLD_START, ModifierSlot.PREFIX, MachineStat.TEMPERATURE_STABILITY, ModifierOperation.DECREASED_PERCENT,
                     whole(10, 13), whole(14, 16), whole(17, 20)), Set.of("furnace", "alloy_furnace", "metal_press"), null, true, new int[] {15, 20, 25}, 0),
             new Condition(fixed(HAND_FEEDING, ModifierSlot.SUFFIX, MachineStat.INSTANT_PROCESS_CHANCE, ModifierOperation.LESS, 0),
-                    Set.of("crusher"), null, true, new int[] {20}, 0),
+                    INSTANT_PROCESS, null, true, new int[] {20}, 0),
             new Condition(rule(BRITTLE_LINING), Set.of("furnace", "alloy_furnace", "metal_press"), null, false, new int[] {35}, 1),
             new Condition(rule(JAMMED_LINE), Set.of("crusher"), null, false, new int[] {30}, 1),
             new Condition(rule(DEEP_ORE), ALL, WorkFilter.STAGE, false, new int[] {25}, 1),

@@ -160,7 +160,7 @@ Status: Prototype. [Work Orders](https://c-pettersson.github.io/rngtech/work-ord
 - domain checks, GameTests per machine, and `tools/moddex/check-work-orders.mjs`;
 - a Work Orders chapter in the optional FTB Quests extra.
 
-Every block machine that loads chips shows a blue Job Chip lamp while a chip is active, through the `work_order` blockstate property. The Bonus Summary drawer section and drive-bay panels are not built. Job sizes and rewards still need an in-game playtest.
+Every block machine that loads chips shows a blue Job Chip lamp while a chip is active, through the `work_order` blockstate property. The Bonus Summary drawer section is deferred and drive-bay panels are dropped. Job sizes and rewards still need an in-game playtest.
 
 ## Material Catalog
 
@@ -264,7 +264,7 @@ The Debug Chest, Debug Trashcan, Debug Tank, and Debug Battery are also admin/de
 
 ## Challenge Loot Type
 
-`rngtech:challenge` is a loot table type whose conditions read a `ChallengeContext`. Machines and the Forestry Companion roll no loot on their own events, so nothing a machine earns lands in the world. The one shipped table is `rngtech:challenges/work_order`: a Dispatch Terminal rolls it when it lists a job and stores the result on the chip, and a Completed Job Chip without a listed reward rolls it when used; either way the reward goes to the player. [Glyphs](../prds/phase-array.md#glyphs-and-work-orders) come from Work Order rewards (the only default Tier V source), woken Dormant Machines, quests, and `/rngtech glyph give`. `tools/moddex/check-uniques.mjs` fails if another table ships under `loot_table/challenges/`.
+`rngtech:challenge` is a loot table type whose conditions read a `ChallengeContext`. Machines and the Forestry Companion roll no loot on their own events, so nothing a machine earns lands in the world. The one shipped table is `rngtech:challenges/work_order`: a Dispatch Terminal rolls it when it lists a job and stores the result on the chip, and a Completed Job Chip without a listed reward rolls it when used; either way the reward goes to the player. [Glyphs](../prds/phase-array.md#glyphs-and-work-orders) come from Work Order rewards (the only default Tier V source), woken Dormant Machines, quests, and `/rngtech glyph give`. `tools/moddex/check-uniques.mjs` fails if another table ships under `loot_table/challenges/`. Every Unique has one catalog entry gated by Prestige 2, and each Unique whose part fits a Work Order machine has a second entry at twice the weight behind `rngtech:machine_family`; `tools/moddex/check-work-orders.mjs` holds those families to the machines each Unique host fits.
 
 The context conditions stay registered for any table of this type: `rngtech:machine_family` (`family`), `rngtech:ascendancy` (`ascendancy`), and the number conditions `rngtech:machine_stage`, `rngtech:recipe_stage`, `rngtech:calibration_stability`, `rngtech:instability`, `rngtech:mastery_level`, `rngtech:order_tier`, and `rngtech:order_prestige`, each with an optional inclusive `min` and `max`. The functions `rngtech:set_order_count` and `rngtech:set_order_tier` size a Work Order reward by the job's tier. A condition never passes outside a challenge roll.
 

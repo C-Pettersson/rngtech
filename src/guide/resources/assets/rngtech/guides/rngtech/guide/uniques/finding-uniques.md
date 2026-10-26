@@ -22,4 +22,6 @@ Each Unique comes from one kind of place.
 | <ItemLink id="rngtech:trial_vault_escapement" /> | Servo | Stage 6 | Ominous trial vaults, 3% per vault |
 | <ItemLink id="rngtech:ancient_echo_control_board" /> | Control Board | Stage 6 | Ancient city chests, 4% |
 
+A [Work Order](rngtech:work-orders/rewards.md) with Prestige 2 or more can also pay an unidentified Unique. It is most often one that fits the job's machine.
+
 Your modpack may move Uniques to other sources, such as quest rewards.

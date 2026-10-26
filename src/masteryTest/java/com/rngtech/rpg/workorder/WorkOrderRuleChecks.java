@@ -5,7 +5,9 @@ import com.rngtech.rpg.CorruptionOutcome;
 import com.rngtech.rpg.MachineCorruption;
 import com.rngtech.rpg.MachineStat;
 import com.rngtech.rpg.MachineTraits;
+import com.rngtech.rpg.ProcessingBalanceSimulation;
 import com.rngtech.rpg.Rarity;
+import com.rngtech.rpg.progression.MachineMasteryFamily;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -26,6 +28,8 @@ import java.util.stream.Stream;
 /** Rolling, loading, counting, and reward rolls for Work Orders, run from {@code MasteryChecks}. */
 public final class WorkOrderRuleChecks {
     private static int checks;
+    /** The Mastery level of the reference build a stat goal's top target is checked against: the simulation's lowest. */
+    private static final int REFERENCE_LEVEL = 10;
 
     private WorkOrderRuleChecks() { }
 
@@ -41,6 +45,7 @@ public final class WorkOrderRuleChecks {
         rewardAmounts();
         rush();
         statGoals(shipped);
+        statGoalTargets(shipped);
         jobSizes(shipped);
         streaks();
         groups();
@@ -262,8 +267,8 @@ public final class WorkOrderRuleChecks {
 
     /**
      * Stat goals: each family ships some, their targets roll in hundredths of the stat, a goal tracks the machine's value at
-     * each completed job, can fall back, and is met only at or above the target. The tiers' targets come from the level-1
-     * processing balance simulation, so they are pinned here until it can run with Mastery again.
+     * each completed job, can fall back, and is met only at or above the target. The tiers' targets were drafted from the
+     * level-1 processing balance simulation; {@link #statGoalTargets} checks them against a reference build.
      */
     private static void statGoals(List<WorkObjectiveEntry> shipped) {
         List<WorkObjectiveEntry> goals = shipped.stream().filter(entry -> entry.filter() == WorkFilter.STAT).toList();
@@ -296,6 +301,36 @@ public final class WorkOrderRuleChecks {
             return;
         }
         throw new AssertionError("a Crusher stat goal named a stat the Crusher does not read");
+    }
+
+    /**
+     * Every shipped stat goal's top target is reachable: the processing balance simulation's best archetype build of the
+     * tier's stage, at its lowest simulated Mastery level, reaches it. Jobs ask for no Mastery level by default.
+     */
+    private static void statGoalTargets(List<WorkObjectiveEntry> shipped) {
+        ProcessingBalanceSimulation.loadDefaultConfig();
+        ProcessingBalanceSimulation simulation;
+        try {
+            simulation = new ProcessingBalanceSimulation(projectRoot());
+        } catch (IOException exception) {
+            throw new IllegalStateException("Cannot load the processing balance setups", exception);
+        }
+        for (WorkObjectiveEntry entry : shipped) {
+            if (entry.filter() != WorkFilter.STAT) { continue; }
+            MachineMasteryFamily family = switch (entry.family()) {
+                case "crusher" -> MachineMasteryFamily.CRUSHER;
+                case "furnace" -> MachineMasteryFamily.FURNACE;
+                default -> throw new AssertionError(entry.id() + " is a stat goal for a family the processing simulation does not model");
+            };
+            MachineStat stat = MachineStat.bySerializedName(entry.stat());
+            for (int tier = WorkOrder.MIN_TIER; tier <= WorkOrder.MAX_TIER; tier++) {
+                int stage = WorkOrderFamilies.stageCap(entry.family(), tier);
+                double top = entry.goal(tier).max() / (double) WorkPart.STAT_SCALE;
+                double best = simulation.bestStat(family, stage, stat, REFERENCE_LEVEL);
+                require(top <= best + 1e-9, entry.id() + " Tier " + tier + "'s top target " + top + " is reachable on a Stage " + stage
+                        + " reference build, which reaches " + Math.round(best * 100) / 100.0);
+            }
+        }
     }
 
     /** Streak jobs: they count like any work, a failure sets an unfinished streak back to 0, and the chip keeps its best streak. */
