@@ -348,6 +348,7 @@ Recorded 2026-10-25 from the chips slice:
 - 2026-10-26: the Job Chip lamp. `WorkOrderMachineBlock` and its `work_order` property, the lamp sync in `BaseMachineBlockEntity`, `setActive` on the current state, `tools/blockmodels/job_lamp.py`, and lamp parts and multipart blockstates from the seven model generators. Checks: `WorkOrderGameTests.jobChipLampFollowsTheActiveChip`.
 - 2026-10-26: rework phase 10. The Work Orders wiki page and updates to nine machine pages and five guide and refinement pages, the regenerated in-game guide, the implementation matrix, Machine Design Notes, and the FTB Quests chapter.
 - 2026-10-26: merged the Job Chip lamp branch (`feature/work-order-status-light`) after phase 10, and added the lamp to the wiki page.
+- 2026-10-26: playtested the Job Chip lamp in the client after the merge: placed correctly and lights with the active chip.
 
 ## Verification
 
@@ -381,4 +382,4 @@ Recorded 2026-10-25 from the chips slice:
 
 - Tier stages, target times, condition values, rewards, the board size, the slot count, and the Requisition recipe are draft numbers. Tune them with the processing balance simulation.
 - The objective filters assume each family can report the listed values at the moment work completes. Check each hook before committing to an objective type.
-- Every block machine that loads Job Chips shows the Job Chip lamp. It has been checked in rendered models, not in a running client.
+- Every block machine that loads Job Chips shows the Job Chip lamp. The user checked its placement and lighting in a running client on 2026-10-26.
