@@ -3,6 +3,8 @@ package com.rngtech.gametest;
 import static com.rngtech.gametest.MachineTestSupport.check;
 
 import com.rngtech.RNGTech;
+import com.rngtech.content.block.BaseMachineBlock;
+import com.rngtech.content.block.WorkOrderMachineBlock;
 import com.rngtech.content.blockentity.CrusherBlockEntity;
 import com.rngtech.content.item.CompletedJobChipItem;
 import com.rngtech.content.item.JobChipItem;
@@ -54,6 +56,7 @@ import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.item.crafting.RecipeManager;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
@@ -230,6 +233,38 @@ public final class WorkOrderGameTests {
         check(crusher.workOrders().orders().get(1).totalProgress() == 30, "Loading the chip again did not resume it: " + crusher.workOrders());
         check(WorkOrderOperations.perform(player, crusher, "deactivate", "") && crusher.workOrders().activeOrder() == null, "Pause left a chip active");
         helper.succeed();
+    }
+
+    /**
+     * The Job Chip lamp is lit exactly while a chip is active, a tick's stale running-state write does not relight it, and a
+     * machine placed with an active chip lights it within a second.
+     */
+    @GameTest(template = MachineTestSupport.EMPTY, timeoutTicks = 100)
+    public static void jobChipLampFollowsTheActiveChip(GameTestHelper helper) {
+        BlockPos pos = new BlockPos(2, 1, 2);
+        CrusherBlockEntity crusher = steelCrusher(helper, pos);
+        Player player = helper.makeMockPlayer(GameType.SURVIVAL);
+        player.getInventory().setItem(0, order("crusher", 1, 4, 0));
+        CrusherMenu menu = ordersMenu(crusher, player);
+        check(!lampLit(helper, pos), "The lamp was lit with no chip");
+        check(shiftIntoBay(menu, player, 0) && lampLit(helper, pos), "Loading a chip did not light the lamp");
+        BlockState tickStart = helper.getBlockState(pos);
+        check(WorkOrderOperations.perform(player, crusher, "deactivate", "") && !lampLit(helper, pos), "Pausing the chip left the lamp lit");
+        BaseMachineBlock.setActive(helper.getLevel(), helper.absolutePos(pos), tickStart, !tickStart.getValue(BaseMachineBlock.ACTIVE));
+        check(!lampLit(helper, pos), "A running-state change from the tick's start relit the lamp");
+        check(WorkOrderOperations.perform(player, crusher, "activate", "0") && lampLit(helper, pos), "Activating the chip did not light the lamp");
+
+        BlockPos placedPos = new BlockPos(4, 1, 2);
+        CrusherBlockEntity placed = steelCrusher(helper, placedPos);
+        ItemStack machine = new ItemStack(ModBlocks.crusherChassis(CrusherChassisMaterial.STEEL).get());
+        machine.set(ModDataComponents.WORK_ORDERS.get(), crusher.workOrders());
+        placed.applyComponentsFromItemStack(machine);
+        check(placed.workOrders().activeOrder() != null && !lampLit(helper, placedPos), "The placed Crusher did not start with an unlit active chip");
+        helper.succeedWhen(() -> check(lampLit(helper, placedPos), "A Crusher placed with an active chip never lit its lamp"));
+    }
+
+    private static boolean lampLit(GameTestHelper helper, BlockPos pos) {
+        return helper.getBlockState(pos).getValue(WorkOrderMachineBlock.WORK_ORDER);
     }
 
     /** A bay refuses a chip for another machine family, so the chip stays on the cursor. */

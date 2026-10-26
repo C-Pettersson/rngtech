@@ -247,6 +247,40 @@
       "reason": "Resonance Calibrator chassis share one tuning-bench housing and differ by shell, trim, and crown metal, with their own lane layout on the bulk and Nullite chassis; every chassis shares the status lamp."
     },
     {
+      "check": "shared_blockstate_model",
+      "key": "rngtech:block/*/job_lamp",
+      "subject_globs": [
+        "*_crusher_chassis",
+        "furnace",
+        "*_furnace_chassis",
+        "*_alloy_furnace_chassis",
+        "crude_metal_press",
+        "metal_press",
+        "melter",
+        "battery_assembler",
+        "*_resonance_calibrator_chassis",
+        "*_component_recycler"
+      ],
+      "reason": "Every chassis of a Work Order machine family lights the same Job Chip lamp part, placed for the family's shared housing; the Metal Presses reuse the Furnace's cradle and its lamp."
+    },
+    {
+      "check": "shared_machine_block_texture",
+      "key": "rngtech:block/work_order/*",
+      "subject_globs": [
+        "*_crusher_chassis",
+        "furnace",
+        "*_furnace_chassis",
+        "*_alloy_furnace_chassis",
+        "crude_metal_press",
+        "metal_press",
+        "melter",
+        "battery_assembler",
+        "*_resonance_calibrator_chassis",
+        "*_component_recycler"
+      ],
+      "reason": "The Job Chip lamp is one cue across every machine that loads Job Chips, so players read an active chip the same way on each."
+    },
+    {
       "check": "unused_png",
       "subject_globs": [
         "src/main/resources/assets/rngtech/textures/block/divinity_siphon/breath_containment_seal.png",

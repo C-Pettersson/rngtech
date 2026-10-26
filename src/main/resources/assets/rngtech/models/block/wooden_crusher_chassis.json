@@ -11,7 +11,8 @@
     "port": "rngtech:block/crusher/wood/port",
     "particle": "rngtech:block/crusher/wood/boards",
     "throat": "rngtech:block/crusher/wood/throat",
-    "shaft": "rngtech:block/crusher/shaft"
+    "shaft": "rngtech:block/crusher/shaft",
+    "job_lamp": "rngtech:block/work_order/lamp_off"
   },
   "elements": [
     {
@@ -356,6 +357,35 @@
         },
         "down": {
           "texture": "#boards_edge"
+        }
+      }
+    },
+    {
+      "from": [
+        3.25,
+        11.5,
+        0.0
+      ],
+      "to": [
+        5.0,
+        12.25,
+        0.25
+      ],
+      "faces": {
+        "north": {
+          "texture": "#job_lamp"
+        },
+        "east": {
+          "texture": "#job_lamp"
+        },
+        "west": {
+          "texture": "#job_lamp"
+        },
+        "up": {
+          "texture": "#job_lamp"
+        },
+        "down": {
+          "texture": "#job_lamp"
         }
       }
     },

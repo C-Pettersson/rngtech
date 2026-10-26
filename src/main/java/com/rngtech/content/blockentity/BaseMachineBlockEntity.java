@@ -21,6 +21,7 @@ import com.rngtech.content.block.ResonanceCalibratorBlock;
 import com.rngtech.content.block.SolarArrayControllerBlock;
 import com.rngtech.content.block.SolarPanelBlock;
 import com.rngtech.content.block.SolidFuelBurnerBlock;
+import com.rngtech.content.block.WorkOrderMachineBlock;
 import com.rngtech.content.item.RefinementConsumableItem;
 import com.rngtech.content.loot.ChallengeContext;
 import com.rngtech.content.loot.ChallengeLoot;
@@ -254,10 +255,14 @@ public abstract class BaseMachineBlockEntity extends BlockEntity implements Refi
         return level == null ? 0 : level.getGameTime();
     }
 
-    /** Drops expired Rush chips about once a second. */
+    /**
+     * Drops expired Rush chips about once a second, and lights the Job Chip lamp to match, which also catches a machine
+     * placed from an item that carries an active chip.
+     */
     protected void tickWorkOrders(Level level) {
         if (this instanceof WorkOrderHost host && level.getGameTime() % 20 == 0) {
             host.workOrderTick();
+            syncWorkOrderLamp();
         }
     }
 
@@ -266,6 +271,19 @@ public abstract class BaseMachineBlockEntity extends BlockEntity implements Refi
         builder.set(ModDataComponents.WORK_ORDERS.get(), orders == null || orders.isEmpty() ? null : orders);
         setComponents(builder.build());
         setChanged();
+        syncWorkOrderLamp();
+    }
+
+    /** Lights the model's Job Chip lamp while a chip is active, on machines that have one. */
+    private void syncWorkOrderLamp() {
+        BlockState state = getBlockState();
+        if (level == null || level.isClientSide || !state.hasProperty(WorkOrderMachineBlock.WORK_ORDER)) {
+            return;
+        }
+        boolean lit = workOrders().activeOrder() != null;
+        if (state.getValue(WorkOrderMachineBlock.WORK_ORDER) != lit) {
+            level.setBlock(worldPosition, state.setValue(WorkOrderMachineBlock.WORK_ORDER, lit), Block.UPDATE_CLIENTS);
+        }
     }
 
     public void setMachineProgression(MachineProgressionState progression) {

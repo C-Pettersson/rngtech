@@ -1,12 +1,13 @@
 #!/usr/bin/env python3
-"""Generate the Component Recycler block models, part models, item models, and owned textures.
+"""Generate the Component Recycler blockstates, block models, part models, item models, and owned textures.
 
 A powered Recycler is an open teardown bay. The item being recycled lies on a turntable on a grated
 floor, under the installed Disassembly Head: a four-prong claw on a spindle that hangs from the bay
 roof, with the spindle motor on top. Returns fall through the grate into three trays at the bottom of
 the front, one per output slot. Behind the bay stands a drive cabinet with the cable port on its back,
 a Battery Cell cradle and charge meter on its east side, and a cage on its west side that holds the
-Recovery Filter cartridge.
+Recovery Filter cartridge. The roof header carries the status lamp and, across from it, the Job Chip
+lamp (job_lamp.py); the Crude Recycler takes no Job Chips and has neither.
 
 The claw and the cartridge are part models in the installed part's material, drawn by
 ComponentRecyclerRenderer, whose constants match the geometry here; with no head installed only the
@@ -26,6 +27,8 @@ import random
 from pathlib import Path
 
 from PIL import Image, ImageDraw
+
+import job_lamp
 
 ROOT = Path(__file__).resolve().parents[2]
 ASSETS = ROOT / "src/main/resources/assets/rngtech"
@@ -58,6 +61,9 @@ CAGE = ((0.75, 2.0, 10.5), (3.25, 10.0, 14.5))
 QUERN_BED = ((3.0, 2.0, 4.0), (13.0, 5.0, 13.0))
 RUNNER_Y0, RUNNER_Y1, RUNNER_R = 5.0, 7.0, 3.5
 LID_Y0 = 14.5
+# Job Chip lamp on the roof header, across from the status lamp.
+JOB_LAMP = ((3.25, 12.75, 0.0), (5.0, 13.25, 0.25))
+JOB_LAMP_FACES = ("north", "east", "west", "up", "down")
 
 POWERED = ("iron", "copper", "bronze", "steel", "aluminum", "titanium", "tungstensteel", "exotic")
 HEADS = POWERED
@@ -160,12 +166,13 @@ def powered_housing():
     elements += octagon(TABLE_X, TABLE_Z, TABLE_R, GRATE_Y1, TABLE_Y1, {"up": "table", "*": "shaft"})
     elements.append(box((BAY_X0, GRATE_Y1, BAY_Z1), (BAY_X1, ROOF_Y0, CABINET[0][2]), "liner", faces=("north",)))
 
-    # Roof with a riveted header, the status lamp, the bare spindle, and the spindle motor on top.
+    # Roof with a riveted header, the status and Job Chip lamps, the bare spindle, and the spindle motor on top.
     elements.append(box((1.0, ROOF_Y0, 0.25), (15.0, ROOF_Y1, CABINET[0][2]),
                         {"north": "header", "down": "liner", "up": "shell", "*": "shell"},
                         faces=("north", "east", "west", "up", "down"), uv={"north": [0, 0, 14, 1]}))
     elements.append(box((11.0, 12.75, 0.0), (12.75, 13.25, 0.25), "lamp", faces=("north", "east", "west", "up", "down"),
                         extra={"neoforge_data": {"block_light": 15, "sky_light": 15}}))
+    elements.append(job_lamp.element(*JOB_LAMP, JOB_LAMP_FACES))
     elements.append(box((TABLE_X - 0.6, 11.0, TABLE_Z - 0.6), (TABLE_X + 0.6, ROOF_Y0, TABLE_Z + 0.6), "shaft",
                         faces=("north", "south", "east", "west", "down")))
     elements.append(box((TABLE_X - 2.75, ROOF_Y1, TABLE_Z - 2.75), (TABLE_X + 2.75, 14.0, TABLE_Z + 2.75), "trim",
@@ -241,6 +248,7 @@ POWERED_TEXTURES = {
     "grate": TEX + "grate",
     "tray": TEX + "tray",
     "table": TEX + "table",
+    **job_lamp.TEXTURE,
 }
 CRUDE_TEXTURES = {
     "particle": CRUSHER + "wood/boards",
@@ -323,8 +331,11 @@ def write_models() -> None:
         "textures": POWERED_TEXTURES,
         "elements": offset(claw_elements(), TABLE_X - PART_CENTRE, TABLE_Z - PART_CENTRE) + housing,
     })
+    job_lamp.write_part(MODELS / "block/component_recycler/job_lamp.json", *JOB_LAMP, JOB_LAMP_FACES)
     for chassis in POWERED:
         name = f"{chassis}_component_recycler"
+        job_lamp.write_blockstate(name, f"rngtech:block/{name}", f"rngtech:block/{name}_active",
+                                  "rngtech:block/component_recycler/job_lamp")
         write_json(MODELS / f"block/{name}.json", {"parent": "rngtech:block/component_recycler", "textures": chassis_textures(chassis)})
         write_json(MODELS / f"block/{name}_active.json", {"parent": f"rngtech:block/{name}", "textures": {"lamp": CRUSHER + "lamp_on"}})
         write_json(MODELS / f"item/{name}.json", {

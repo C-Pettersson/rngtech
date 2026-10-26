@@ -21,7 +21,8 @@
     "emitter": "rngtech:block/resonance_calibrator/emitter",
     "tray": "rngtech:block/resonance_calibrator/tray",
     "accent": "rngtech:block/resonance_calibrator/accent",
-    "vernier": "rngtech:block/resonance_calibrator/vernier"
+    "vernier": "rngtech:block/resonance_calibrator/vernier",
+    "job_lamp": "rngtech:block/work_order/lamp_off"
   },
   "elements": [
     {
@@ -564,6 +565,35 @@
       "neoforge_data": {
         "block_light": 15,
         "sky_light": 15
+      }
+    },
+    {
+      "from": [
+        2.5,
+        15.75,
+        11.0
+      ],
+      "to": [
+        4.0,
+        16.0,
+        12.5
+      ],
+      "faces": {
+        "north": {
+          "texture": "#job_lamp"
+        },
+        "south": {
+          "texture": "#job_lamp"
+        },
+        "east": {
+          "texture": "#job_lamp"
+        },
+        "west": {
+          "texture": "#job_lamp"
+        },
+        "up": {
+          "texture": "#job_lamp"
+        }
       }
     },
     {

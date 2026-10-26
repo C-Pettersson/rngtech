@@ -30,7 +30,8 @@
     "cap_top": "rngtech:block/melter/cap_top",
     "crucible": "rngtech:block/melter/crucible",
     "crucible_rim": "rngtech:block/melter/crucible_rim",
-    "crucible_floor": "rngtech:block/melter/crucible_floor"
+    "crucible_floor": "rngtech:block/melter/crucible_floor",
+    "job_lamp": "rngtech:block/work_order/lamp_off"
   },
   "elements": [
     {
@@ -953,6 +954,35 @@
       "neoforge_data": {
         "block_light": 15,
         "sky_light": 15
+      }
+    },
+    {
+      "from": [
+        5.5,
+        11.1,
+        1.25
+      ],
+      "to": [
+        6.75,
+        11.65,
+        1.5
+      ],
+      "faces": {
+        "north": {
+          "texture": "#job_lamp"
+        },
+        "east": {
+          "texture": "#job_lamp"
+        },
+        "west": {
+          "texture": "#job_lamp"
+        },
+        "up": {
+          "texture": "#job_lamp"
+        },
+        "down": {
+          "texture": "#job_lamp"
+        }
       }
     },
     {

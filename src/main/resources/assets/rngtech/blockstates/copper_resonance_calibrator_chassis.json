@@ -1,34 +1,121 @@
 {
-  "variants": {
-    "active=false,facing=north": {
-      "model": "rngtech:block/copper_resonance_calibrator_chassis"
+  "multipart": [
+    {
+      "when": {
+        "active": "false",
+        "facing": "north"
+      },
+      "apply": {
+        "model": "rngtech:block/copper_resonance_calibrator_chassis"
+      }
     },
-    "active=false,facing=east": {
-      "model": "rngtech:block/copper_resonance_calibrator_chassis",
-      "y": 90
+    {
+      "when": {
+        "active": "false",
+        "facing": "east"
+      },
+      "apply": {
+        "model": "rngtech:block/copper_resonance_calibrator_chassis",
+        "y": 90
+      }
     },
-    "active=false,facing=south": {
-      "model": "rngtech:block/copper_resonance_calibrator_chassis",
-      "y": 180
+    {
+      "when": {
+        "active": "false",
+        "facing": "south"
+      },
+      "apply": {
+        "model": "rngtech:block/copper_resonance_calibrator_chassis",
+        "y": 180
+      }
     },
-    "active=false,facing=west": {
-      "model": "rngtech:block/copper_resonance_calibrator_chassis",
-      "y": 270
+    {
+      "when": {
+        "active": "false",
+        "facing": "west"
+      },
+      "apply": {
+        "model": "rngtech:block/copper_resonance_calibrator_chassis",
+        "y": 270
+      }
     },
-    "active=true,facing=north": {
-      "model": "rngtech:block/copper_resonance_calibrator_chassis_active"
+    {
+      "when": {
+        "active": "true",
+        "facing": "north"
+      },
+      "apply": {
+        "model": "rngtech:block/copper_resonance_calibrator_chassis_active"
+      }
     },
-    "active=true,facing=east": {
-      "model": "rngtech:block/copper_resonance_calibrator_chassis_active",
-      "y": 90
+    {
+      "when": {
+        "active": "true",
+        "facing": "east"
+      },
+      "apply": {
+        "model": "rngtech:block/copper_resonance_calibrator_chassis_active",
+        "y": 90
+      }
     },
-    "active=true,facing=south": {
-      "model": "rngtech:block/copper_resonance_calibrator_chassis_active",
-      "y": 180
+    {
+      "when": {
+        "active": "true",
+        "facing": "south"
+      },
+      "apply": {
+        "model": "rngtech:block/copper_resonance_calibrator_chassis_active",
+        "y": 180
+      }
     },
-    "active=true,facing=west": {
-      "model": "rngtech:block/copper_resonance_calibrator_chassis_active",
-      "y": 270
+    {
+      "when": {
+        "active": "true",
+        "facing": "west"
+      },
+      "apply": {
+        "model": "rngtech:block/copper_resonance_calibrator_chassis_active",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "facing": "north",
+        "work_order": "true"
+      },
+      "apply": {
+        "model": "rngtech:block/resonance_calibrator/job_lamp"
+      }
+    },
+    {
+      "when": {
+        "facing": "east",
+        "work_order": "true"
+      },
+      "apply": {
+        "model": "rngtech:block/resonance_calibrator/job_lamp",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "facing": "south",
+        "work_order": "true"
+      },
+      "apply": {
+        "model": "rngtech:block/resonance_calibrator/job_lamp",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "facing": "west",
+        "work_order": "true"
+      },
+      "apply": {
+        "model": "rngtech:block/resonance_calibrator/job_lamp",
+        "y": 270
+      }
     }
-  }
+  ]
 }
