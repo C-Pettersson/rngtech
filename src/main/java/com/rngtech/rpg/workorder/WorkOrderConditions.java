@@ -34,17 +34,19 @@ public final class WorkOrderConditions {
     public static final String BRITTLE_LINING = "brittle_lining";
     public static final String JAMMED_LINE = "jammed_line";
     public static final String DEEP_ORE = "deep_ore";
+    public static final String UNSTEADY_HANDS = "unsteady_hands";
+    public static final String FINE_TOLERANCE = "fine_tolerance";
 
     /** Draft rarity weights for a listed job: Normal, Magic, Rare. */
     private static final int[] RARITY_WEIGHTS = {50, 35, 15};
     private static final Set<String> ALL = Set.of();
 
     /**
-     * One condition: its affix definition, the families that can read it (none listed means every family), whether it only
-     * rolls on stage jobs, whether it is a pressure condition applied to the machine's stats, and its Bounty for each
-     * tier and Prestige.
+     * One condition: its affix definition, the families that can read it (none listed means every family), the filter a
+     * job needs for it to roll (null for any job), whether it is a pressure condition applied to the machine's stats, and
+     * its Bounty for each tier and Prestige.
      */
-    public record Condition(ModifierDefinition definition, Set<String> families, boolean stageJobsOnly, boolean pressure,
+    public record Condition(ModifierDefinition definition, Set<String> families, WorkFilter needs, boolean pressure,
             int[] bounty, int prestige) {
         public String id() {
             return definition.id();
@@ -52,7 +54,7 @@ public final class WorkOrderConditions {
 
         boolean fits(String family, WorkObjective objective) {
             return (families.isEmpty() || families.contains(family))
-                    && (!stageJobsOnly || objective.parts().stream().anyMatch(part -> WorkFilter.STAGE.id().equals(part.filter())));
+                    && (needs == null || objective.parts().stream().anyMatch(part -> needs.id().equals(part.filter())));
         }
 
         /** The Bounty this condition adds at {@code tier}; an untiered condition reads tier 0 as its one tier. */
@@ -63,18 +65,21 @@ public final class WorkOrderConditions {
 
     private static final List<Condition> CONDITIONS = List.of(
             new Condition(tiered(STARVED_FEED, ModifierSlot.PREFIX, MachineStat.PROCESSING_SPEED, ModifierOperation.LESS,
-                    range(0.80, 0.85), range(0.75, 0.80), range(0.70, 0.75)), ALL, false, true, new int[] {15, 22, 30}, 0),
+                    range(0.80, 0.85), range(0.75, 0.80), range(0.70, 0.75)), ALL, null, true, new int[] {15, 22, 30}, 0),
             new Condition(tiered(POWER_SURCHARGE, ModifierSlot.PREFIX, MachineStat.ENERGY_USAGE, ModifierOperation.INCREASED_PERCENT,
-                    whole(25, 33), whole(34, 41), whole(42, 50)), ALL, false, true, new int[] {10, 17, 25}, 0),
+                    whole(25, 33), whole(34, 41), whole(42, 50)), ALL, null, true, new int[] {10, 17, 25}, 0),
             new Condition(fixed(SHORT_CREW, ModifierSlot.PREFIX, MachineStat.BATCH_SIZE, ModifierOperation.ADD, -1),
-                    Set.of("crusher", "furnace", "alloy_furnace", "metal_press", "melter"), false, true, new int[] {30}, 0),
+                    Set.of("crusher", "furnace", "alloy_furnace", "metal_press", "melter", "resonance_calibrator"), null, true, new int[] {30}, 0),
             new Condition(tiered(COLD_START, ModifierSlot.PREFIX, MachineStat.TEMPERATURE_STABILITY, ModifierOperation.DECREASED_PERCENT,
-                    whole(10, 13), whole(14, 16), whole(17, 20)), Set.of("furnace", "alloy_furnace", "metal_press"), false, true, new int[] {15, 20, 25}, 0),
+                    whole(10, 13), whole(14, 16), whole(17, 20)), Set.of("furnace", "alloy_furnace", "metal_press"), null, true, new int[] {15, 20, 25}, 0),
             new Condition(fixed(HAND_FEEDING, ModifierSlot.SUFFIX, MachineStat.INSTANT_PROCESS_CHANCE, ModifierOperation.LESS, 0),
-                    Set.of("crusher"), false, true, new int[] {20}, 0),
-            new Condition(rule(BRITTLE_LINING), Set.of("furnace", "alloy_furnace", "metal_press"), false, false, new int[] {35}, 1),
-            new Condition(rule(JAMMED_LINE), Set.of("crusher"), false, false, new int[] {30}, 1),
-            new Condition(rule(DEEP_ORE), ALL, true, false, new int[] {25}, 1));
+                    Set.of("crusher"), null, true, new int[] {20}, 0),
+            new Condition(rule(BRITTLE_LINING), Set.of("furnace", "alloy_furnace", "metal_press"), null, false, new int[] {35}, 1),
+            new Condition(rule(JAMMED_LINE), Set.of("crusher"), null, false, new int[] {30}, 1),
+            new Condition(rule(DEEP_ORE), ALL, WorkFilter.STAGE, false, new int[] {25}, 1),
+            new Condition(tiered(UNSTEADY_HANDS, ModifierSlot.PREFIX, MachineStat.STABILITY, ModifierOperation.DECREASED_PERCENT,
+                    whole(10, 13), whole(14, 16), whole(17, 20)), Set.of("resonance_calibrator", "metal_press"), null, true, new int[] {15, 20, 25}, 0),
+            new Condition(rule(FINE_TOLERANCE), Set.of("resonance_calibrator"), WorkFilter.SETTING, false, new int[] {35}, 1));
 
     private WorkOrderConditions() {
     }
@@ -153,6 +158,14 @@ public final class WorkOrderConditions {
             return new WorkPart(part.type(), part.filter(), part.minimum() + 1, part.item(), part.target()).counts(report);
         }
         return part.counts(report);
+    }
+
+    /**
+     * Whether work that misses {@code part} sets it back to 0: a streak's work below its minimum, and a stability job's
+     * work below its minimum under Fine Tolerance.
+     */
+    public static boolean breaks(WorkPart part, MachineTraits traits) {
+        return WorkFilter.STREAK.id().equals(part.filter()) || (has(traits, FINE_TOLERANCE) && WorkFilter.SETTING.id().equals(part.filter()));
     }
 
     /** The minimum a stage part needs under {@code traits}, for the job's Shift list. */

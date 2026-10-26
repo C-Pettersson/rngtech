@@ -15,7 +15,7 @@ Status: **Planned**. The PRD is a draft with open questions and no release targe
 - [x] Dispatch Terminal and Requisitions: the block, job rolling with count ranges and item jobs, one-kind rewards, Download and Refresh, the Requisition recipe, and the give commands.
 - [x] Order templates: loader, terminal pools, per-template reward tables, the template give command, and the config key that turns random orders off. Rarity and conditions on templates wait for phase 6.
 - [x] Conditions: the `work_order` profiles and pool for the Crusher and Furnace, conditions as an effect source on the machine, reset-on-event conditions, and Rush. The Bonus Summary drawer section moved to phase 9.
-- [ ] More jobs and machines: stat goals for the Crusher and Furnace (done), the Component Assembler (done), the Alloy Furnace (done), the Metal Press (done), the Melter (done), then the other Mastery families and the machines without Mastery, starting with the Component Assembler.
+- [ ] More jobs and machines: stat goals for the Crusher and Furnace (done), the Component Assembler (done), the Alloy Furnace (done), the Metal Press (done), the Melter (done), the Resonance Calibrator (done), then the other Mastery families and the machines without Mastery, starting with the Component Assembler.
 - [ ] Refinement and corruption: order corruption pools and Phase Array rejection.
 - [ ] UI polish: drive-bay panels on machine models, the Bonus Summary section, Jade, JEI, and model cues.
 - [ ] Documentation: wiki page, Machine Mastery and Rarity updates, the implementation matrix, the GuideME guide, Machine Design Notes, and an FTB Quests chapter.
@@ -204,6 +204,18 @@ Recorded 2026-10-26 for the Melter, from the build:
 - A job part can name a fluid: `JobChipItem.itemName` falls back to the fluid registry, item jobs read "Make 20000 mB of Lubricant", and an option is available when a loaded Melter recipe makes that fluid.
 - Short Crew reads on it (its parallel melts); Cold Start and Brittle Lining do not, since it reports no heat failures.
 
+Recorded 2026-10-26 for the Resonance Calibrator, from the build:
+
+- It reports each calibration as `calibrate` work: the recipe's minimum stage, the rolled stability as its setting, the output, and the components in the batch.
+- Five objectives: any (48–168 components), Stage N+ recipes (minimums 2, 2, 4, 4, 5; its top stage is 7), stability (60–80+), one or two named calibrated components, and streaks at a stability (6–18 in a row at 60–80+, after the PRD's "12 in a row at 80+").
+- Streaks gained a minimum on the work's setting. Work of the streak's verb below it breaks the streak, so a low-stability calibration breaks a Calibrator streak; Metal Press streaks keep a minimum of 0 and break only on failures.
+- The two Calibrator conditions the phase 6 decision deferred now ship, since the Calibrator reads them: Unsteady Hands (10–20% reduced Stability, also on the Metal Press, whose family reads Stability) and of Fine Tolerance (a calibration below a stability job's minimum resets it). A condition can now require a filter on the job: Deep Ore needs a stage job, Fine Tolerance a stability job. Short Crew reads its batches.
+
+Recorded 2026-10-26 after playtesting the new machines, from the user:
+
+- The Metal Press and the Resonance Calibrator should take jobs by kind of output, not only by exact item: "Press plates" of any metal, and "Calibrate Logic" of any recipe in that family. Item jobs named one output, which missed most of both machines' range, including the Calibrated Diamond Crystal and the Cavitation Rotor Hub.
+- Group jobs shipped as a `group` filter: a report carries a group, the Metal Press its mold (plate, gear, casing, connector) and the Calibrator its calibration family, and a group part counts its group across every recipe. `WorkOrderFamilies` lists each family's groups, the loaders reject others, and the menu syncs a group by its index. Two objectives: Metal Press kinds (one or two, 80–216 presses) and Calibrator families (one or two, 20–54 components), both at weight 3.
+
 ## Code against the redesign
 
 The branch's loop was built for the earlier design. Phase 2 of the rework replaced the Mastery storage, the Mastery level gate, the tier and seed components, and the Tier I recipe; the lists below show what is left for later phases.
@@ -276,6 +288,7 @@ Recorded 2026-10-25 from the chips slice:
 - 2026-10-26: the Alloy Furnace joins Work Orders: the `alloy` verb and report, four objectives, its Orders tab and bays, conditions, the Brittle Lining setback, and Rush. Checks: Alloy reachability in `WorkOrderRuleChecks` and `AlloyFurnaceWorkOrderGameTests`, which finishes a chip with a real Bronze craft.
 - 2026-10-26: the Metal Press joins Work Orders, with streak jobs: the `press` verb and report, the `streak` filter and its failure hook, five objectives, its Orders tab and bays, conditions, and Rush. Checks: streak rules in `WorkOrderRuleChecks` and `MetalPressWorkOrderGameTests`, where a crude press's real Iron Plates finish a chip.
 - 2026-10-26: the Melter joins Work Orders: the `melt` verb and its mB report, fluid parts and names, three objectives, its Orders tab and bays, conditions, and Rush. Checks: Melter reachability in `WorkOrderRuleChecks` and `MelterWorkOrderGameTests`, where real Lubricant melts finish a chip.
+- 2026-10-26: the Resonance Calibrator joins Work Orders: the `calibrate` verb and report, streaks with a stability minimum, Unsteady Hands and Fine Tolerance, five objectives, its Orders tab and bays, and Rush. Checks: streak and Fine Tolerance rules in `WorkOrderRuleChecks` and `CalibratorWorkOrderGameTests`, where real calibrations finish a chip.
 
 ## Verification
 
@@ -297,6 +310,8 @@ Recorded 2026-10-25 from the chips slice:
 - 2026-10-26: Alloy Furnace. `./gradlew quickCheck`, `./gradlew runGameTestServer` (285 tests), `npm run moddex:check`, and `npm run repo:check` passed. Not checked in a running client.
 - 2026-10-26: Metal Press. `./gradlew quickCheck`, `./gradlew runGameTestServer` (287 tests), `npm run moddex:check`, and `npm run repo:check` passed. Not checked in a running client.
 - 2026-10-26: Melter. `./gradlew quickCheck`, `./gradlew runGameTestServer` (288 tests), `npm run moddex:check`, and `npm run repo:check` passed. Not checked in a running client.
+- 2026-10-26: Resonance Calibrator. `./gradlew quickCheck`, `./gradlew runGameTestServer` (289 tests), `npm run moddex:check`, and `npm run repo:check` passed. Not checked in a running client.
+- 2026-10-26: group jobs for the Metal Press and Resonance Calibrator. `./gradlew quickCheck`, `./gradlew runGameTestServer` (289 tests; the press and Calibrator GameTests now finish group jobs from real presses and calibrations), `npm run moddex:check`, and `npm run repo:check` passed. Not checked in a running client.
 
 ## Handoff and limits
 

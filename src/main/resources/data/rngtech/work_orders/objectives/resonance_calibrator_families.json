@@ -1,0 +1,73 @@
+{
+    "family": "resonance_calibrator",
+    "type": "calibrate",
+    "filter": "group",
+    "weight": 3,
+    "parts": {
+        "min": 1,
+        "max": 2
+    },
+    "options": [
+        {
+            "item": "structural",
+            "stage": 1
+        },
+        {
+            "item": "kinetic",
+            "stage": 1
+        },
+        {
+            "item": "thermal",
+            "stage": 1
+        },
+        {
+            "item": "conductive",
+            "stage": 1
+        },
+        {
+            "item": "storage",
+            "stage": 1
+        },
+        {
+            "item": "logic",
+            "stage": 1
+        }
+    ],
+    "tiers": [
+        {
+            "count": {
+                "min": 20,
+                "max": 30,
+                "step": 2
+            }
+        },
+        {
+            "count": {
+                "min": 24,
+                "max": 36,
+                "step": 2
+            }
+        },
+        {
+            "count": {
+                "min": 28,
+                "max": 42,
+                "step": 2
+            }
+        },
+        {
+            "count": {
+                "min": 32,
+                "max": 48,
+                "step": 2
+            }
+        },
+        {
+            "count": {
+                "min": 36,
+                "max": 54,
+                "step": 2
+            }
+        }
+    ]
+}

@@ -89,7 +89,7 @@ public final class WorkOrderRules {
         List<Candidate> candidates = new ArrayList<>();
         for (WorkObjectiveEntry entry : entries) {
             if (WorkOrderFamilies.known(entry.family())
-                    && (entry.filter() != WorkFilter.ITEM || !entry.options(stageCap(tier, entry), itemAvailable).isEmpty())) {
+                    && (!entry.filter().named() || !entry.options(stageCap(tier, entry), itemAvailable).isEmpty())) {
                 candidates.add(new Candidate(entry, null, entry.weight()));
             }
         }
@@ -120,7 +120,8 @@ public final class WorkOrderRules {
 
     /**
      * Counts {@code report} toward the active chip: into the first unfinished part it matches, and any amount past that
-     * part's target into the next matching part. No active chip or no matching part changes nothing, and the same chips
+     * part's target into the next matching part. Work of the part's verb that misses a streak's minimum, or a stability job's
+     * minimum under Fine Tolerance, sets that part back to 0. No active chip or no matching part changes nothing, and the same chips
      * come back. A fulfilled chip stays in its bay, inactive, and no other chip becomes active.
      */
     public static Progress progress(MachineWorkOrders orders, WorkReport report) {
@@ -134,7 +135,13 @@ public final class WorkOrderRules {
         for (int index = 0; index < parts.size() && left > 0; index++) {
             WorkPart part = parts.get(index);
             long current = advanced.progress().get(index);
-            if (current >= part.target() || !WorkOrderConditions.counts(part, report, active.traits())) { continue; }
+            boolean counts = WorkOrderConditions.counts(part, report, active.traits());
+            if (!counts && current > 0 && current < part.target() && report.type().id().equals(part.type())
+                    && WorkOrderConditions.breaks(part, active.traits())) {
+                advanced = advanced.withPartProgress(index, 0);
+                continue;
+            }
+            if (current >= part.target() || !counts) { continue; }
             long added = Math.min(left, part.target() - current);
             advanced = advanced.withPartProgress(index, current + added);
             left -= added;

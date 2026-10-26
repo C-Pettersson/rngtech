@@ -7,6 +7,7 @@ import com.rngtech.rpg.workorder.MachineWorkOrders;
 import com.rngtech.rpg.workorder.WorkFilter;
 import com.rngtech.rpg.workorder.WorkObjective;
 import com.rngtech.rpg.workorder.WorkObjectiveType;
+import com.rngtech.rpg.workorder.WorkOrderFamilies;
 import com.rngtech.rpg.workorder.WorkOrderHost;
 import com.rngtech.rpg.workorder.WorkPart;
 
@@ -93,7 +94,8 @@ public final class WorkOrderMenuSupport {
             case 0 -> { WorkObjectiveType type = WorkObjectiveType.byId(value.type()); yield type == null ? 0 : type.ordinal() + 1; }
             case 1 -> { WorkFilter filter = WorkFilter.byId(value.filter()); yield filter == null ? 0 : filter.ordinal() + 1; }
             case 2 -> value.minimum();
-            case 3 -> value.statGoal() ? statId(value.item()) : itemId(value.item());
+            case 3 -> value.statGoal() ? statId(value.item())
+                    : WorkFilter.GROUP.id().equals(value.filter()) ? WorkOrderFamilies.allGroups().indexOf(value.item()) + 1 : itemId(value.item());
             case 4 -> clamp(value.target());
             default -> clamp(loaded.progress().get(part));
         };
@@ -134,7 +136,8 @@ public final class WorkOrderMenuSupport {
                 parts.add(new WorkPart(
                         type >= 0 && type < WorkObjectiveType.values().length ? WorkObjectiveType.values()[type].id() : "",
                         filter >= 0 && filter < WorkFilter.values().length ? WorkFilter.values()[filter].id() : "",
-                        data.get(at + 2), filter == WorkFilter.STAT.ordinal() ? statKey(data.get(at + 3)) : itemKey(data.get(at + 3)), data.get(at + 4)));
+                        data.get(at + 2), filter == WorkFilter.STAT.ordinal() ? statKey(data.get(at + 3))
+                                : filter == WorkFilter.GROUP.ordinal() ? groupKey(data.get(at + 3)) : itemKey(data.get(at + 3)), data.get(at + 4)));
                 progress.add((long) data.get(at + 5));
             }
             slots.add(new Slot(tier, data.get(start + 1), data.get(start + 2), new WorkObjective(SYNCED, parts, 0), progress, data.get(start + 4)));
@@ -156,6 +159,11 @@ public final class WorkOrderMenuSupport {
     private static int statId(String stat) {
         MachineStat value = MachineStat.bySerializedName(stat);
         return value == null ? 0 : value.ordinal() + 1;
+    }
+
+    private static String groupKey(int id) {
+        List<String> groups = WorkOrderFamilies.allGroups();
+        return id <= 0 || id > groups.size() ? "" : groups.get(id - 1);
     }
 
     private static String statKey(int id) {

@@ -18,10 +18,18 @@ public enum WorkFilter {
      */
     STAT,
     /**
-     * Work of the part's verb in a row: it counts like {@link #ANY}, and a failure on the machine, such as a Metal Press
-     * heat failure, sets an unfinished streak back to 0. The chip keeps its best streak.
+     * Work of the part's verb in a row, with its setting at or above the part's minimum (0 takes any): qualifying work
+     * counts, and both other work of the verb and a failure on the machine, such as a Metal Press heat failure, set an
+     * unfinished streak back to 0. The chip keeps its best streak.
      */
-    STREAK;
+    STREAK,
+    /** Work of one group the part's item names, such as Metal Press plates or Logic calibrations. */
+    GROUP;
+
+    /** Whether parts of this filter name what they count, an item or a group, from the entry's options. */
+    public boolean named() {
+        return this == ITEM || this == GROUP;
+    }
 
     public String id() {
         return name().toLowerCase(Locale.ROOT);

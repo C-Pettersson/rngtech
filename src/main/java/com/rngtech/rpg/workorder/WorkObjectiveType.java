@@ -15,7 +15,9 @@ public enum WorkObjectiveType {
     /** Completed Metal Press jobs. */
     PRESS,
     /** Fluid a Melter makes, in mB. */
-    MELT;
+    MELT,
+    /** Components a Resonance Calibrator calibrates. */
+    CALIBRATE;
 
     public String id() {
         return name().toLowerCase(Locale.ROOT);

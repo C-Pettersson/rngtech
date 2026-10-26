@@ -71,9 +71,20 @@ public class JobChipItem extends Item {
     public static Component objectiveText(WorkObjective objective) {
         List<WorkPart> parts = objective.parts();
         boolean items = parts.stream().allMatch(part -> WorkFilter.ITEM.id().equals(part.filter()));
+        boolean groups = parts.stream().allMatch(part -> WorkFilter.GROUP.id().equals(part.filter()));
         WorkObjectiveType type = WorkObjectiveType.byId(parts.getFirst().type());
         if (type == null) {
             return Component.translatable("rngtech.work_order.objective.unknown");
+        }
+        if (groups) {
+            MutableComponent named = Component.empty();
+            for (int index = 0; index < parts.size(); index++) {
+                if (index > 0) {
+                    named.append(Component.translatable(index == parts.size() - 1 ? "rngtech.work_order.list.last" : "rngtech.work_order.list.next"));
+                }
+                named.append(Component.translatable("rngtech.work_order.item_count", parts.get(index).target(), groupName(type, parts.get(index).item())));
+            }
+            return Component.translatable("rngtech.work_order.verb_group." + type.id(), named);
         }
         if (!items) {
             return partText(parts.getFirst());
@@ -101,7 +112,13 @@ public class JobChipItem extends Item {
             return stat == null ? Component.translatable("rngtech.work_order.objective.unknown")
                     : Component.translatable("rngtech.work_order.part.stat", Component.translatable(stat.translationKey()), statText(stat, part.target()));
         }
-        return Component.translatable("rngtech.work_order.part." + type.id() + "." + filter.id(), part.target(), part.minimum(), itemName(part.item()));
+        return Component.translatable("rngtech.work_order.part." + type.id() + "." + filter.id(), part.target(), part.minimum(),
+                filter == WorkFilter.GROUP ? groupName(type, part.item()) : itemName(part.item()));
+    }
+
+    /** A group's name for {@code type}'s work, such as "plates" for the Metal Press or "Logic components" for the Calibrator. */
+    public static Component groupName(WorkObjectiveType type, String group) {
+        return Component.translatableWithFallback("rngtech.work_order.group." + type.id() + "." + group, group);
     }
 
     /** A stat goal's value in hundredths, written the way the Stats tab writes that stat. */
@@ -236,7 +253,7 @@ public class JobChipItem extends Item {
             Component effect = switch (id) {
                 case WorkOrderConditions.STARVED_FEED -> Component.translatable("rngtech.work_order.condition." + id + ".effect",
                         Math.round((1 - modifier.value()) * 100));
-                case WorkOrderConditions.POWER_SURCHARGE, WorkOrderConditions.COLD_START ->
+                case WorkOrderConditions.POWER_SURCHARGE, WorkOrderConditions.COLD_START, WorkOrderConditions.UNSTEADY_HANDS ->
                         Component.translatable("rngtech.work_order.condition." + id + ".effect", Math.round(modifier.value()));
                 default -> Component.translatable("rngtech.work_order.condition." + id + ".effect");
             };

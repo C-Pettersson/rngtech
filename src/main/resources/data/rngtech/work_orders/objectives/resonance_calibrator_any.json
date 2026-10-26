@@ -1,0 +1,43 @@
+{
+    "family": "resonance_calibrator",
+    "type": "calibrate",
+    "filter": "any",
+    "weight": 2,
+    "tiers": [
+        {
+            "count": {
+                "min": 48,
+                "max": 72,
+                "step": 4
+            }
+        },
+        {
+            "count": {
+                "min": 64,
+                "max": 96,
+                "step": 4
+            }
+        },
+        {
+            "count": {
+                "min": 80,
+                "max": 120,
+                "step": 4
+            }
+        },
+        {
+            "count": {
+                "min": 96,
+                "max": 144,
+                "step": 4
+            }
+        },
+        {
+            "count": {
+                "min": 112,
+                "max": 168,
+                "step": 4
+            }
+        }
+    ]
+}

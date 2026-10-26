@@ -61,7 +61,12 @@ public record WorkObjectiveEntry(ResourceLocation id, String family, WorkObjecti
         options = List.copyOf(options);
         if (tiers.size() != WorkOrder.MAX_TIER) { throw new IllegalArgumentException(id + ": a job needs one goal per tier"); }
         if (weight <= 0) { throw new IllegalArgumentException(id + ": weight must be positive"); }
-        if (filter == WorkFilter.ITEM && options.isEmpty()) { throw new IllegalArgumentException(id + ": an item job needs options"); }
+        if (filter.named() && options.isEmpty()) { throw new IllegalArgumentException(id + ": an item or group job needs options"); }
+        if (filter == WorkFilter.GROUP) {
+            for (Option option : options) {
+                if (!WorkOrderFamilies.group(family, option.item())) { throw new IllegalArgumentException(id + ": " + family + " machines report no group " + option.item()); }
+            }
+        }
         minParts = Math.clamp(minParts, 1, WorkObjective.MAX_PARTS);
         maxParts = Math.clamp(maxParts, minParts, WorkObjective.MAX_PARTS);
         stat = stat == null ? "" : stat;
@@ -82,9 +87,9 @@ public record WorkObjectiveEntry(ResourceLocation id, String family, WorkObjecti
         return tiers.get(Math.clamp(tier, WorkOrder.MIN_TIER, WorkOrder.MAX_TIER) - 1);
     }
 
-    /** The item options a job of a stage capped at {@code stageCap} can name. */
+    /** The options a job of a stage capped at {@code stageCap} can name. A group needs no loaded recipe check. */
     public List<Option> options(int stageCap, Predicate<String> itemAvailable) {
-        return options.stream().filter(option -> option.stage() <= stageCap && itemAvailable.test(option.item())).toList();
+        return options.stream().filter(option -> option.stage() <= stageCap && (filter == WorkFilter.GROUP || itemAvailable.test(option.item()))).toList();
     }
 
     /**
@@ -98,7 +103,7 @@ public record WorkObjectiveEntry(ResourceLocation id, String family, WorkObjecti
         if (filter == WorkFilter.STAT) {
             return new WorkObjective(id, List.of(new WorkPart(type, filter, 0, MachineStat.bySerializedName(stat).getSerializedName(), count)), bonus);
         }
-        if (filter != WorkFilter.ITEM) {
+        if (!filter.named()) {
             return new WorkObjective(id, List.of(new WorkPart(type, filter, goal.minimum(), "", count)), bonus);
         }
         List<Option> pool = new ArrayList<>(options(stageCap, itemAvailable));
@@ -109,7 +114,7 @@ public record WorkObjectiveEntry(ResourceLocation id, String family, WorkObjecti
         for (int index = 0; index < parts; index++) {
             Option option = pick(pool, random);
             pool.remove(option);
-            picked.add(new WorkPart(type, WorkFilter.ITEM, 0, option.item(), share));
+            picked.add(new WorkPart(type, filter, 0, option.item(), share));
         }
         return new WorkObjective(id, picked, bonus);
     }

@@ -3,6 +3,7 @@ package com.rngtech.rpg.workorder;
 import com.rngtech.rpg.MachineStat;
 import com.rngtech.rpg.progression.MachineMasteryFamily;
 
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
@@ -26,10 +27,29 @@ public final class WorkOrderFamilies {
             "furnace", Set.of(MachineStat.PROCESSING_SPEED, MachineStat.SUPER_OUTPUT_CHANCE, MachineStat.HEAT_TRANSFER,
                     MachineStat.TEMPERATURE_STABILITY, MachineStat.MAX_TEMPERATURE, MachineStat.BATCH_SIZE));
 
+    /**
+     * The groups each family's machines report, in a fixed order the menu sync uses: Metal Press molds and calibration
+     * families. Group jobs may only name these.
+     */
+    private static final Map<String, List<String>> GROUPS = Map.of(
+            "metal_press", List.of("plate", "gear", "casing", "connector"),
+            "resonance_calibrator", List.of("structural", "kinetic", "thermal", "conductive", "storage", "logic"));
+    private static final List<String> ALL_GROUPS = GROUPS.values().stream().flatMap(List::stream).distinct().sorted().toList();
+
     /** The families whose machines report failures that break a streak. */
-    private static final Set<String> STREAKS = Set.of("metal_press");
+    private static final Set<String> STREAKS = Set.of("metal_press", "resonance_calibrator");
 
     private WorkOrderFamilies() { }
+
+    /** Whether a group job for {@code id} may name {@code group}. */
+    public static boolean group(String id, String group) {
+        return GROUPS.getOrDefault(id, List.of()).contains(group);
+    }
+
+    /** Every family's groups, sorted, so the menu can sync a group by its index. */
+    public static List<String> allGroups() {
+        return ALL_GROUPS;
+    }
 
     /** Whether streak jobs can roll for {@code id}: its machines report the failures that break a streak. */
     public static boolean streaks(String id) {

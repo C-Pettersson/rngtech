@@ -59,6 +59,9 @@ public record WorkOrderTemplate(ResourceLocation id, String family, int tier, Re
             if (part.filter() == WorkFilter.STAT && !WorkOrderFamilies.goalStat(family, MachineStat.bySerializedName(part.item()))) {
                 throw new IllegalArgumentException(id + ": a " + family + " stat goal cannot name " + part.item());
             }
+            if (part.filter() == WorkFilter.GROUP && !WorkOrderFamilies.group(family, part.item())) {
+                throw new IllegalArgumentException(id + ": " + family + " machines report no group " + part.item());
+            }
             if (part.filter() == WorkFilter.STREAK && !WorkOrderFamilies.streaks(family)) {
                 throw new IllegalArgumentException(id + ": " + family + " machines report no failures to break a streak");
             }
@@ -88,7 +91,7 @@ public record WorkOrderTemplate(ResourceLocation id, String family, int tier, Re
         if (objectiveId == null) { return true; }
         WorkObjectiveEntry entry = objectives.get(objectiveId);
         if (entry == null || (!family.isEmpty() && !family.equals(entry.family()))) { return false; }
-        return entry.filter() != WorkFilter.ITEM || !entry.options(stage(tier, entry.family()), itemAvailable).isEmpty();
+        return !entry.filter().named() || !entry.options(stage(tier, entry.family()), itemAvailable).isEmpty();
     }
 
     /**
@@ -176,6 +179,7 @@ public record WorkOrderTemplate(ResourceLocation id, String family, int tier, Re
             throw new IllegalArgumentException("a stat part needs a known stat");
         }
         String item = stat ? MachineStat.bySerializedName(json.get("stat").getAsString()).getSerializedName()
+                : filter == WorkFilter.GROUP ? json.get("group").getAsString()
                 : json.has("item") ? json.get("item").getAsString() : "";
         return new PartSpec(filter, item, goal);
     }

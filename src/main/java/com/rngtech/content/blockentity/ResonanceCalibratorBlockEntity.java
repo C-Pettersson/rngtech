@@ -44,11 +44,17 @@ import com.rngtech.rpg.progression.MachineMasteryHost;
 import com.rngtech.rpg.progression.MachineProgressionState;
 import com.rngtech.rpg.progression.MegaPassiveNode;
 import com.rngtech.rpg.progression.MegaPassiveTree;
+import com.rngtech.rpg.workorder.WorkObjectiveType;
+import com.rngtech.rpg.workorder.WorkOrderConditions;
+import com.rngtech.rpg.workorder.WorkOrderFamilies;
+import com.rngtech.rpg.workorder.WorkOrderHost;
+import com.rngtech.rpg.workorder.WorkReport;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.component.DataComponentMap;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.Connection;
 import net.minecraft.network.RegistryFriendlyByteBuf;
@@ -72,7 +78,7 @@ import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.ItemStackHandler;
 
 public class ResonanceCalibratorBlockEntity extends BaseMachineBlockEntity
-        implements MenuProvider, MachineMasteryHost, MachineInfoProvider {
+        implements MenuProvider, MachineMasteryHost, MachineInfoProvider, WorkOrderHost {
     private final RecipeCache<CalibrationRecipe> recipes = new RecipeCache<>(1);
     private static final RecipeInputFilter<CalibrationRecipeInput, CalibrationRecipe> INGREDIENT_FILTER = new RecipeInputFilter<>(
             ModRecipes.CALIBRATION_TYPE::get,
@@ -289,6 +295,7 @@ public class ResonanceCalibratorBlockEntity extends BaseMachineBlockEntity
     }
 
     public static void serverTick(Level level, BlockPos pos, BlockState state, ResonanceCalibratorBlockEntity calibrator) {
+        calibrator.tickWorkOrders(level);
         tickCalibration(level, pos, state, calibrator);
         calibrator.syncVisualState(level);
     }
@@ -587,6 +594,7 @@ public class ResonanceCalibratorBlockEntity extends BaseMachineBlockEntity
         applyGearStats(stats, controlBoardStack());
         applyGearStats(stats, stabilizerMatrixStack());
         MegaPassiveTree.applyAttributeStats(stats, machineProgression(), masteryFamily());
+        WorkOrderConditions.apply(stats, workOrders().activeOrder());
         if (!hasBatteryCell()) {
             stats.apply(MachineStatAccumulator.NO_BATTERY_SOURCE, new MachineModifier(
                     ModifierSlot.IMPLICIT,
@@ -760,6 +768,8 @@ public class ResonanceCalibratorBlockEntity extends BaseMachineBlockEntity
             }
         }
         mergeOutput(result);
+        workOrderWork(new WorkReport(WorkObjectiveType.CALIBRATE, recipe.minimumStage(), lastStability,
+                BuiltInRegistries.ITEM.getKey(baseResult.getItem()).toString(), operations, recipe.family().getSerializedName()));
         completions = (completions + 1) & 0xFF;
         for (int index = 0; index < operations; index++) {
             grantRecipeXp(recipe);
@@ -826,6 +836,15 @@ public class ResonanceCalibratorBlockEntity extends BaseMachineBlockEntity
     @Override
     public int ascendancyEntryStage() {
         return chassis().stage();
+    }
+
+    @Override public String workOrderFamily() { return WorkOrderFamilies.of(masteryFamily()); }
+    @Override public int workOrderStage() { return ascendancyEntryStage(); }
+    @Override public int workOrderMasteryLevel() { return masteryState().level(); }
+    @Override public String workOrderAscendancy() { return masteryState().ascendancy(); }
+    @Override public double workOrderStat(String stat) {
+        MachineStat value = MachineStat.bySerializedName(stat);
+        return value == null ? 0 : effectiveStats().value(value);
     }
 
     @Override

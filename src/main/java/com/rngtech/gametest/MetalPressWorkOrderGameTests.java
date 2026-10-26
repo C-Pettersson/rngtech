@@ -40,7 +40,7 @@ public final class MetalPressWorkOrderGameTests {
     private MetalPressWorkOrderGameTests() {
     }
 
-    /** A crude press loads an Iron Plate job through its Orders tab, and its plates finish the job in the bay. */
+    /** A crude press loads a "Press 2 plates" job through its Orders tab, and its Iron Plates, reported by their mold, finish it. */
     @GameTest(template = MachineTestSupport.EMPTY, timeoutTicks = 3000)
     public static void pressesCountTowardTheirJob(GameTestHelper helper) {
         MetalPressBlockEntity press = MachineTestSupport.place(helper, MACHINE, ModBlocks.CRUDE_METAL_PRESS.get(), MetalPressBlockEntity.class);
@@ -48,7 +48,7 @@ public final class MetalPressWorkOrderGameTests {
         press.getGearInventory().setStackInSlot(MetalPressBlockEntity.SLOT_MOLD, new ItemStack(ModItems.PLATE_MOLD.get()));
         Player player = helper.makeMockPlayer(GameType.SURVIVAL);
         WorkOrder plates = new WorkOrder("metal_press", 1, new WorkObjective(RNGTech.id("plates"),
-                new WorkPart(WorkObjectiveType.PRESS, WorkFilter.ITEM, 0, "rngtech:iron_plate", 2)), 3, 0, WorkOrder.BASE_BOUNTY, 0);
+                new WorkPart(WorkObjectiveType.PRESS, WorkFilter.GROUP, 0, "plate", 2)), 3, 0, WorkOrder.BASE_BOUNTY, 0);
         player.getInventory().setItem(0, JobChipItem.of(ModItems.JOB_CHIP.get(), plates, MachineTraits.EMPTY));
         MetalPressMenu menu = (MetalPressMenu) press.createMenu(1, player.getInventory(), player);
         check(menu.clickMenuButton(player, WorkOrderMenuSupport.BUTTON_SELECT_TAB + MetalPressMenu.TAB_ORDERS)

@@ -3,6 +3,7 @@ package com.rngtech.rpg.workorder;
 import com.rngtech.content.energy.BatteryCellMaterial;
 import com.rngtech.rpg.MachineStat;
 import com.rngtech.rpg.MachineTraits;
+import com.rngtech.rpg.Rarity;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -37,6 +38,7 @@ public final class WorkOrderRuleChecks {
         rush();
         statGoals(shipped);
         streaks();
+        groups();
         reachable(shipped);
         return checks;
     }
@@ -158,7 +160,7 @@ public final class WorkOrderRuleChecks {
     private static void itemJobs(List<WorkObjectiveEntry> shipped) {
         var random = new SplittableRandom(5L);
         for (WorkObjectiveEntry entry : shipped) {
-            if (entry.filter() != WorkFilter.ITEM) { continue; }
+            if (!entry.filter().named()) { continue; }
             int[] sizes = new int[WorkObjective.MAX_PARTS + 1];
             for (int i = 0; i < 2_000; i++) {
                 int tier = WorkOrder.MIN_TIER + i % WorkOrder.MAX_TIER;
@@ -176,7 +178,9 @@ public final class WorkOrderRuleChecks {
             for (int size = entry.minParts(); size <= entry.maxParts(); size++) {
                 require(sizes[size] > 0, entry.id() + " rolls jobs of " + size + " items");
             }
-            require(entry.roll(1, 4, random, item -> false) == null, entry.id() + " rolls nothing when no option has a loaded recipe");
+            if (entry.filter() == WorkFilter.ITEM) {
+                require(entry.roll(1, 4, random, item -> false) == null, entry.id() + " rolls nothing when no option has a loaded recipe");
+            }
         }
     }
 
@@ -218,6 +222,8 @@ public final class WorkOrderRuleChecks {
                             && entry.options().stream().allMatch(option -> hasRecipe(entry.type(), option.item()));
                     case STAT -> WorkOrderFamilies.goalStat(entry.family(), MachineStat.bySerializedName(entry.stat()));
                     case STREAK -> WorkOrderFamilies.streaks(entry.family());
+                    case GROUP -> !entry.options(stage, item -> false).isEmpty()
+                            && entry.options().stream().allMatch(option -> WorkOrderFamilies.group(entry.family(), option.item()));
                 };
                 require(ok, entry.id() + " Tier " + tier + " is reachable on a Stage " + stage + " chassis");
             }
@@ -301,6 +307,43 @@ public final class WorkOrderRuleChecks {
         var done = WorkOrderRules.progress(four, crush(WorkObjectiveType.PRESS, 0, "", 6)).orders();
         require(done.orders().getFirst().fulfilled() && WorkOrderRules.breakStreaks(done) == done, "a finished streak cannot be broken");
         require(WorkOrderFamilies.streaks("metal_press") && !WorkOrderFamilies.streaks("crusher"), "only machines that report failures roll streaks");
+
+        var calibrated = new WorkObjective(id("calibrated"), new WorkPart(WorkObjectiveType.CALIBRATE, WorkFilter.STREAK, 80, "", 5));
+        var run = MachineWorkOrders.EMPTY.withLoaded(loaded(new WorkOrder("resonance_calibrator", 1, calibrated, 4, 0, 100, 0)));
+        var three = WorkOrderRules.progress(run, new WorkReport(WorkObjectiveType.CALIBRATE, 2, 85, "", 3)).orders();
+        require(three.activeOrder().totalProgress() == 3, "calibrations at the streak's stability count");
+        var low = WorkOrderRules.progress(three, new WorkReport(WorkObjectiveType.CALIBRATE, 2, 79, "", 1)).orders();
+        require(low.activeOrder().totalProgress() == 0 && low.activeOrder().bestStreak() == 3, "a calibration below the streak's stability breaks it");
+        require(WorkOrderRules.progress(three, new WorkReport(WorkObjectiveType.CRUSH, 2, 0, "", 1)).orders() == three, "other work leaves a streak alone");
+
+        var stable = new WorkObjective(id("stable"), new WorkPart(WorkObjectiveType.CALIBRATE, WorkFilter.SETTING, 70, "", 10));
+        var fine = new MachineTraits(Rarity.MAGIC, 0, List.of(WorkOrderConditions.get(WorkOrderConditions.FINE_TOLERANCE).definition()
+                .roll(1, net.minecraft.util.RandomSource.create(1L))), List.of());
+        var plain = MachineWorkOrders.EMPTY.withLoaded(loaded(new WorkOrder("resonance_calibrator", 1, stable, 4, 0, 100, 0)));
+        var tolerant = MachineWorkOrders.EMPTY.withLoaded(new LoadedWorkOrder(new WorkOrder("resonance_calibrator", 1, stable, 4, 0, 100, 0), fine));
+        var good = new WorkReport(WorkObjectiveType.CALIBRATE, 2, 75, "", 4);
+        var poor = new WorkReport(WorkObjectiveType.CALIBRATE, 2, 60, "", 1);
+        require(WorkOrderRules.progress(WorkOrderRules.progress(plain, good).orders(), poor).orders().activeOrder().totalProgress() == 4,
+                "a poor calibration only misses a stability job");
+        require(WorkOrderRules.progress(WorkOrderRules.progress(tolerant, good).orders(), poor).orders().activeOrder().totalProgress() == 0,
+                "under Fine Tolerance a poor calibration resets a stability job");
+    }
+
+    /** Group jobs count work of one kind, such as Metal Press plates of any metal or one calibration family. */
+    private static void groups() {
+        var plates = new WorkObjective(id("plates"), List.of(new WorkPart(WorkObjectiveType.PRESS, WorkFilter.GROUP, 0, "plate", 4),
+                new WorkPart(WorkObjectiveType.PRESS, WorkFilter.GROUP, 0, "gear", 2)), 0);
+        var orders = MachineWorkOrders.EMPTY.withLoaded(loaded(new WorkOrder("metal_press", 1, plates, 4, 0, 100, 0)));
+        var iron = WorkOrderRules.progress(orders, new WorkReport(WorkObjectiveType.PRESS, 1, 0, "rngtech:iron_plate", 3, "plate")).orders();
+        var gold = WorkOrderRules.progress(iron, new WorkReport(WorkObjectiveType.PRESS, 1, 0, "rngtech:gold_plate", 3, "plate")).orders();
+        require(gold.activeOrder().progress().equals(List.of(4L, 0L)), "any metal's plates count toward a plate part, and stop at its target");
+        require(WorkOrderRules.progress(gold, new WorkReport(WorkObjectiveType.PRESS, 1, 0, "rngtech:iron_casing", 2, "casing")).orders() == gold,
+                "a group no part names does not count");
+        var gears = WorkOrderRules.progress(gold, new WorkReport(WorkObjectiveType.PRESS, 1, 0, "rngtech:iron_gear", 2, "gear")).orders();
+        require(gears.orders().getFirst().fulfilled(), "a group job is done when every group is");
+        require(WorkOrderFamilies.group("resonance_calibrator", "logic") && !WorkOrderFamilies.group("resonance_calibrator", "plate")
+                && !WorkOrderFamilies.group("crusher", "plate"), "each family's group jobs name only the groups its machines report");
+        require(WorkOrderFamilies.allGroups().size() == 10 && WorkOrderFamilies.allGroups().indexOf("logic") >= 0, "every group syncs by its index");
     }
 
     /** Rush deadlines: half the tier's target time, a rounded-up bonus, and expiry that spares finished chips. */
@@ -351,6 +394,8 @@ public final class WorkOrderRuleChecks {
             case PRESS -> Files.exists(recipes.resolve("metal_press/" + path + ".json"));
             case MELT -> jsonFiles(recipes.resolve("melter")).stream()
                     .anyMatch(file -> read(file).getAsJsonObject("fluid_output").get("id").getAsString().equals(item));
+            case CALIBRATE -> jsonFiles(recipes).stream().filter(file -> file.getFileName().toString().startsWith("calibration_"))
+                    .anyMatch(file -> read(file).getAsJsonObject("result").getAsJsonObject("stack").get("id").getAsString().equals(item));
         };
     }
 

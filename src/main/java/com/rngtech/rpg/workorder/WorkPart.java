@@ -54,7 +54,8 @@ public record WorkPart(String type, String filter, int minimum, String item, lon
             case SETTING -> report.setting() >= minimum;
             case ITEM -> !item.isEmpty() && item.equals(report.item());
             case STAT -> false;
-            case STREAK -> true;
+            case STREAK -> report.setting() >= minimum;
+            case GROUP -> !item.isEmpty() && item.equals(report.group());
         };
     }
 
