@@ -16,7 +16,7 @@ A chip has a [rarity](rngtech:rarity-and-affixes.md#rarity), like Gear:
 | Magic | 35% | 1 or 2 |
 | Rare | 15% | 3 or 4 |
 
-Conditions are affixes. A prefix lowers one of the machine's stats, and a suffix adds a rule to the job. Each condition adds Bounty, which makes the reward bigger. Rule conditions also add Prestige, which unlocks rarer rewards.
+Conditions are affixes. A prefix lowers one of the machine's stats, and a suffix adds a rule to the job. Each condition adds Bounty, which makes the reward bigger. Rule conditions also add Prestige, which makes a Unique reward more likely.
 
 Conditions apply only while their chip is active. A stat breakdown lists each one's cost, such as "Work Order: Starved Feed".
 

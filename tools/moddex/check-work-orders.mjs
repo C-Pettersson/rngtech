@@ -8,6 +8,8 @@ const RECIPE_ROOT = path.join(DATA_ROOT, "rngtech/recipe");
 const OBJECTIVE_ROOT = path.join(DATA_ROOT, "rngtech/work_orders/objectives");
 const REWARD_TABLE = path.join(DATA_ROOT, "rngtech/loot_table/challenges/work_order.json");
 const UNIQUE_ROOT = path.join(DATA_ROOT, "rngtech/uniques");
+const UNIQUE_REWARD = "rngtech:work_orders/unique_reward";
+const UNIQUE_REWARD_TABLE = path.join(DATA_ROOT, "rngtech/loot_table/work_orders/unique_reward.json");
 const ORDER = "rngtech:job_chip";
 const FULFILLED = "rngtech:completed_job_chip";
 const REQUISITION = "rngtech:requisition";
@@ -44,9 +46,10 @@ const HOST_FAMILIES = {
 /**
  * Work Orders stay a closed loop: orders come from the Dispatch Terminal and commands, so no recipe makes one or a Fulfilled
  * Work Order; the Requisition and Dispatch Terminal recipes carry the config condition; no recycling or reactor recipe takes
- * any of them back; the reward table is one pool that pays one kind: Requisitions, currency, Glyphs, or Uniques; each
- * Unique rolls from the whole catalog, plus a family entry for exactly the machines its part fits; and every family with
- * progress hooks has an objective with one goal per tier.
+ * any of them back; the reward table is one pool that pays one kind: Requisitions, currency, Glyphs, or a Unique, whose
+ * entries are Prestige bands that nest the Unique table; that table rolls each Unique once from the whole catalog, plus a
+ * family entry for exactly the machines its part fits; and every family with progress hooks has an objective with one goal
+ * per tier. masteryCheck holds the listed Unique rate between 1 in 200 and 1 in 100.
  */
 export async function checkWorkOrders({ log = true } = {}) {
     const failures = [];
@@ -85,31 +88,51 @@ export async function checkWorkOrders({ log = true } = {}) {
     if (table.type !== "rngtech:challenge") {
         failures.push("challenges/work_order must use the rngtech:challenge type");
     }
-    let uniqueEntries = 0;
-    const uniqueRolls = new Map();
+    let uniqueBands = 0;
     for (const pool of table.pools ?? []) {
         for (const entry of pool.entries ?? []) {
             if (entry.type === "minecraft:empty") {
                 continue;
             }
-            const unique = (entry.conditions ?? []).some((condition) => condition.condition === "rngtech:unique_loot_enabled");
-            if (unique) {
-                uniqueEntries++;
-                if (!(entry.functions ?? []).some((fn) => fn.function === "rngtech:unidentified_unique")) {
-                    failures.push(`challenges/work_order drops ${entry.name} identified`);
+            if (entry.type === "minecraft:loot_table") {
+                uniqueBands++;
+                const tests = (entry.conditions ?? []).map((condition) => condition.condition);
+                if (entry.value !== UNIQUE_REWARD) {
+                    failures.push(`challenges/work_order nests ${JSON.stringify(entry.value)}; only ${UNIQUE_REWARD} may be nested`);
+                } else if (!tests.includes("rngtech:unique_loot_enabled") || !tests.includes("rngtech:order_prestige")) {
+                    failures.push(`challenges/work_order's Unique entries need rngtech:unique_loot_enabled and an rngtech:order_prestige band`);
                 }
-                const families = familyTerms(entry.conditions ?? []);
-                const rolls = uniqueRolls.get(entry.name) ?? { catalog: 0, family: [] };
-                if (families.length === 0) {
-                    rolls.catalog++;
-                } else {
-                    rolls.family.push(families.sort());
-                }
-                uniqueRolls.set(entry.name, rolls);
             } else if (!REWARD_ITEMS.has(entry.name)) {
-                failures.push(`challenges/work_order drops ${entry.name}; rewards are currency, Glyphs, and Uniques`);
+                failures.push(`challenges/work_order drops ${entry.name}; rewards are currency, Glyphs, and the Unique table`);
             }
         }
+    }
+    if (uniqueBands === 0) {
+        failures.push(`challenges/work_order never rolls ${UNIQUE_REWARD}`);
+    }
+
+    const uniqueTable = JSON.parse(await readFile(UNIQUE_REWARD_TABLE, "utf8"));
+    if (uniqueTable.type !== "rngtech:challenge" || (uniqueTable.pools ?? []).length !== 1 || uniqueTable.pools[0].rolls !== 1) {
+        failures.push(`${UNIQUE_REWARD} must be one rngtech:challenge pool with one roll, so it pays one Unique`);
+    }
+    let uniqueEntries = 0;
+    const uniqueRolls = new Map();
+    for (const entry of uniqueTable.pools?.[0]?.entries ?? []) {
+        uniqueEntries++;
+        if (!(entry.conditions ?? []).some((condition) => condition.condition === "rngtech:unique_loot_enabled" && condition.unique === entry.name)) {
+            failures.push(`${UNIQUE_REWARD} drops ${entry.name} without its own rngtech:unique_loot_enabled gate`);
+        }
+        if (!(entry.functions ?? []).some((fn) => fn.function === "rngtech:unidentified_unique")) {
+            failures.push(`${UNIQUE_REWARD} drops ${entry.name} identified`);
+        }
+        const families = familyTerms(entry.conditions ?? []);
+        const rolls = uniqueRolls.get(entry.name) ?? { catalog: 0, family: [] };
+        if (families.length === 0) {
+            rolls.catalog++;
+        } else {
+            rolls.family.push(families.sort());
+        }
+        uniqueRolls.set(entry.name, rolls);
     }
 
     for (const [unique, rolls] of uniqueRolls) {
@@ -120,12 +143,12 @@ export async function checkWorkOrders({ log = true } = {}) {
             continue;
         }
         if (rolls.catalog !== 1) {
-            failures.push(`challenges/work_order rolls ${unique} from the whole catalog ${rolls.catalog} times; expected once`);
+            failures.push(`${UNIQUE_REWARD} rolls ${unique} from the whole catalog ${rolls.catalog} times; expected once`);
         }
         const expected = fits.length === 0 ? [] : [JSON.stringify(fits)];
         const actual = rolls.family.map((families) => JSON.stringify(families));
         if (JSON.stringify(actual) !== JSON.stringify(expected)) {
-            failures.push(`challenges/work_order favours ${unique} on ${actual.join(", ") || "no family"}; a ${host} fits ${fits.join(", ") || "every machine"}`);
+            failures.push(`${UNIQUE_REWARD} favours ${unique} on ${actual.join(", ") || "no family"}; a ${host} fits ${fits.join(", ") || "every machine"}`);
         }
     }
 
@@ -152,7 +175,7 @@ export async function checkWorkOrders({ log = true } = {}) {
     }
     if (log) {
         console.log(`Work Orders PASS: none of ${recipes} recipes crafts an order, Requisition and terminal recipes carry ${CONDITION}, `
-            + `rewards are Requisitions, currency, Glyphs, and ${uniqueRolls.size} Uniques in ${uniqueEntries} entries, favoured on the machines they fit; `
+            + `rewards are Requisitions, currency, Glyphs, and ${uniqueBands} Prestige bands of ${uniqueRolls.size} Uniques in ${uniqueEntries} entries, favoured on the machines they fit; `
             + `objectives for ${[...families.keys()].sort().join(", ")}`);
     }
     return recipes;

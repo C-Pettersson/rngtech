@@ -87,7 +87,7 @@ Key existing code:
 | Requirements | What the machine needs to load the chip: a chassis stage, and optionally a Mastery level. |
 | Condition | A rolled prefix or suffix on the chip. It applies a cost to the machine while the job is active, and adds Bounty or Prestige. |
 | Bounty | A percent, 100% at base. It sets how big the reward is when the terminal rolls the job. Players see the result as the chip's reward, not the percentage. |
-| Prestige | A whole number, 0 at base. It unlocks better reward kinds. |
+| Prestige | A whole number, 0 at base. It raises the chance of rare reward kinds. |
 | Active chip | The one inserted chip the machine counts work toward and whose conditions apply. |
 | Rush | An opt-in deadline the player adds by starting a chip with Rush instead of Activate. It only starts a job and never rolls on its own. |
 | Work | What any-work, stage, and setting parts count on machines with recipes: each item as its recipe's base time over the family's reference time. |
@@ -270,8 +270,10 @@ Every job pays **one kind of reward**, listed on the chip, so the player chooses
 
 - The table holds one pool of reward kinds, each with a weight, a base amount for each tier, and optional conditions. One entry is picked.
 - Bounty scales the amount: the base amount times Bounty, rounded down, with the rest as a chance of one more. 100% pays the base amount; 150% pays half again. Count bands, conditions, Rush, and corruption raise Bounty, so they make the one reward bigger rather than adding kinds.
-- Prestige unlocks rarer kinds through entry conditions.
-- Uniques favour the job's machine. Each Unique has one entry from the whole catalog, and a Unique whose part fits the job's machine family has a second entry, behind `rngtech:machine_family`, at twice the weight. A fitting Unique rolls three times as often as one that does not fit, and machines that fit more Uniques pay Uniques more often. Battery Cell Uniques power every machine, so they have no family entry.
+- Prestige raises the chance of rarer kinds through entry conditions.
+- A Unique is the rarest reward: about 1 listed job in 130, never more often than 1 in 100. The table's Unique kind is three entries, one per Prestige band (0, 1, 2 or more, at weights 6, 20, and 50 against about 1,000 for the other kinds), and each nests `rngtech:work_orders/unique_reward`. So any job can pay one, every machine included, and rule conditions raise the chance: about 0.6% at Prestige 0, 2% at Prestige 1, and 5% at Prestige 2 or more. A domain check holds the listed rate between 1 in 200 and 1 in 100.
+- The nested table picks the Unique and favours the job's machine. Each Unique has one entry from the whole catalog, and a Unique whose part fits the job's machine family has a second entry, behind `rngtech:machine_family`, at twice the weight, so it rolls three times as often there. The total Unique chance does not depend on how many Uniques fit. Battery Cell Uniques power every machine, so they have no family entry.
+- Bounty, Rush, and refinement scale every reward's amount except a Unique's, which always pays one.
 - `ChallengeContext` carries the job's tier, Bounty, and Prestige. The loot conditions `rngtech:order_tier` and `rngtech:order_prestige` read them with an optional inclusive `min` and `max`. The loot function `rngtech:set_order_tier` sets a Glyph's tier to the job's tier plus an optional `offset`. The existing `rngtech:machine_family` and `rngtech:ascendancy` conditions work here too.
 
 Draft default reward kinds:
@@ -286,7 +288,7 @@ Draft default reward kinds:
 | Requisitions | Any tier | 1 to 3 by tier |
 | A [Glyph](phase-array.md#glyphs-and-work-orders) of the job's tier | Any tier | 1 |
 | Volatile Catalysts, Greater Affix Upgraders, or an Ascension Matrix | Tier III or more | 1 to 2 |
-| An unidentified Unique through `rngtech:unidentified_unique`, most often one that fits the job's machine | Prestige 2 or more | 1 |
+| An unidentified Unique through `rngtech:unidentified_unique`, most often one that fits the job's machine | Any job, about 1 in 130; more likely with Prestige | 1 |
 
 ## Storage and Saves
 
@@ -431,6 +433,7 @@ Resolved 2026-10-26, before release:
 - Work Orders ship in the next 2.0 alpha, as the last big feature before 2.0.
 - A machine keeps three drive bays.
 - Unique rewards weight toward the job's machine: a Unique whose part fits the machine rolls more often, and every Unique can still roll.
+- Uniques are rare: about 1 listed job in 100 is the most common they may be. Any job can pay one, and Prestige raises the chance, replacing the Prestige 2 gate, which made them about 1 in 5,000 and impossible on five machines.
 - of Hand Feeding rolls on every machine that rolls Instant Process. Cold Start stays off the Melter.
 - Thin Margins and drive bay panels are dropped.
 - Veteran Crew, condition data that packs can replace, naming conditions in a template, and Jade for the Forestry Companion are deferred until after 2.0. The Bonus Summary section waits until playtesters ask for it.

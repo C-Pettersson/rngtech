@@ -526,35 +526,40 @@ public final class WorkOrderGameTests {
     }
 
     /**
-     * The Work Order reward table rolls every Unique for any job with Prestige 2, and adds a second entry for each Unique on
-     * exactly the machines its part fits. The entries read the order's family from the reward roll's context.
+     * The Work Order reward table rolls the Unique table in Prestige bands, and the Unique table rolls every Unique for any
+     * job plus a second entry for each Unique on exactly the machines its part fits. The entries read the order's family
+     * and Prestige from the reward roll's context.
      */
     @GameTest(template = MachineTestSupport.EMPTY)
     public static void uniqueRewardsFavourTheJobsMachine(GameTestHelper helper) {
         MinecraftServer server = helper.getLevel().getServer();
-        JsonObject table;
-        try (Reader reader = server.getResourceManager().openAsReader(RNGTech.id("loot_table/challenges/work_order.json"))) {
-            table = JsonParser.parseReader(reader).getAsJsonObject();
-        } catch (IOException exception) {
-            throw new GameTestAssertException("Cannot read the Work Order reward table: " + exception);
-        }
         RegistryOps<JsonElement> ops = server.registryAccess().createSerializationContext(JsonOps.INSTANCE);
         List<String> families = List.of("crusher", "furnace", "alloy_furnace", "metal_press", "melter", "resonance_calibrator", "forestry",
                 "component_assembler", "component_recycler");
-        Map<String, Set<String>> favoured = new HashMap<>();
-        Set<String> catalog = new HashSet<>();
-        for (JsonElement element : table.getAsJsonArray("pools").get(0).getAsJsonObject().getAsJsonArray("entries")) {
+        Set<Integer> bands = new HashSet<>();
+        for (JsonElement element : entries(helper, "loot_table/challenges/work_order.json")) {
             JsonObject entry = element.getAsJsonObject();
-            String conditionText = String.valueOf(entry.get("conditions"));
-            if (!conditionText.contains("rngtech:unique_loot_enabled")) {
+            if (!entry.get("type").getAsString().equals("minecraft:loot_table")) {
                 continue;
             }
+            List<LootItemCondition> conditions = LootItemCondition.DIRECT_CODEC.listOf().parse(ops, entry.get("conditions")).getOrThrow();
+            for (int prestige = 0; prestige <= 4; prestige++) {
+                if (passes(helper, conditions, "melter", prestige)) {
+                    check(bands.add(prestige), "Two Unique entries roll at Prestige " + prestige);
+                }
+            }
+        }
+        check(bands.equals(Set.of(0, 1, 2, 3, 4)), "The Unique entries do not cover every Prestige once: " + bands);
+
+        Map<String, Set<String>> favoured = new HashMap<>();
+        Set<String> catalog = new HashSet<>();
+        for (JsonElement element : entries(helper, "loot_table/work_orders/unique_reward.json")) {
+            JsonObject entry = element.getAsJsonObject();
             String unique = entry.get("name").getAsString();
             List<LootItemCondition> conditions = LootItemCondition.DIRECT_CODEC.listOf().parse(ops, entry.get("conditions")).getOrThrow();
-            boolean familyEntry = conditionText.contains("rngtech:machine_family");
+            boolean familyEntry = String.valueOf(entry.get("conditions")).contains("rngtech:machine_family");
             for (String family : families) {
-                check(!passes(helper, conditions, family, 1), unique + " rolled for a " + family + " job below Prestige 2");
-                if (!passes(helper, conditions, family, 2)) {
+                if (!passes(helper, conditions, family, 0)) {
                     check(familyEntry, unique + "'s catalog entry did not roll for a " + family + " job");
                 } else if (familyEntry) {
                     favoured.computeIfAbsent(unique, key -> new HashSet<>()).add(family);
@@ -573,7 +578,19 @@ public final class WorkOrderGameTests {
                 "rngtech:witch_bottle_reflux_pump", Set.of("melter", "forestry"),
                 "rngtech:ancient_echo_control_board", Set.of("resonance_calibrator"))),
                 "A Unique is favoured on machines its part does not fit: " + favoured);
+        check(!WorkOrderRewards.fixedAmount(new ItemStack(ModItems.CHAOS_CRYSTAL.get()))
+                && WorkOrderRewards.fixedAmount(new ItemStack(BuiltInRegistries.ITEM.get(RNGTech.id("crying_crucible")))),
+                "Bounty, Rush, and refinement must scale every reward but a Unique");
         helper.succeed();
+    }
+
+    /** The entries of the one pool in the loot table at {@code path}, read from the loaded data packs. */
+    private static List<JsonElement> entries(GameTestHelper helper, String path) {
+        try (Reader reader = helper.getLevel().getServer().getResourceManager().openAsReader(RNGTech.id(path))) {
+            return JsonParser.parseReader(reader).getAsJsonObject().getAsJsonArray("pools").get(0).getAsJsonObject().getAsJsonArray("entries").asList();
+        } catch (IOException exception) {
+            throw new GameTestAssertException("Cannot read " + path + ": " + exception);
+        }
     }
 
     /** Whether every condition passes for a reward roll of a Tier V {@code family} job with {@code prestige}. */

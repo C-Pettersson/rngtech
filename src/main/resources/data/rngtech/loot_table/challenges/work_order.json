@@ -7,7 +7,7 @@
         {
           "type": "minecraft:item",
           "name": "rngtech:chaos_crystal",
-          "weight": 20,
+          "weight": 200,
           "functions": [
             {
               "function": "rngtech:set_order_count",
@@ -24,7 +24,7 @@
         {
           "type": "minecraft:item",
           "name": "rngtech:expansion_crystal",
-          "weight": 14,
+          "weight": 140,
           "functions": [
             {
               "function": "rngtech:set_order_count",
@@ -41,7 +41,7 @@
         {
           "type": "minecraft:item",
           "name": "rngtech:null_crystal",
-          "weight": 12,
+          "weight": 120,
           "functions": [
             {
               "function": "rngtech:set_order_count",
@@ -58,7 +58,7 @@
         {
           "type": "minecraft:item",
           "name": "rngtech:affix_modifier",
-          "weight": 14,
+          "weight": 140,
           "functions": [
             {
               "function": "rngtech:set_order_count",
@@ -75,7 +75,7 @@
         {
           "type": "minecraft:item",
           "name": "rngtech:mastery_refund",
-          "weight": 12,
+          "weight": 120,
           "functions": [
             {
               "function": "rngtech:set_order_count",
@@ -92,7 +92,7 @@
         {
           "type": "minecraft:item",
           "name": "rngtech:requisition",
-          "weight": 12,
+          "weight": 120,
           "functions": [
             {
               "function": "rngtech:set_order_count",
@@ -109,7 +109,7 @@
         {
           "type": "minecraft:item",
           "name": "rngtech:glyph",
-          "weight": 10,
+          "weight": 100,
           "functions": [
             {
               "function": "rngtech:set_order_tier"
@@ -119,7 +119,7 @@
         {
           "type": "minecraft:item",
           "name": "rngtech:volatile_catalyst",
-          "weight": 4,
+          "weight": 40,
           "conditions": [
             {
               "condition": "rngtech:order_tier",
@@ -142,7 +142,7 @@
         {
           "type": "minecraft:item",
           "name": "rngtech:affix_upgrade",
-          "weight": 4,
+          "weight": 40,
           "conditions": [
             {
               "condition": "rngtech:order_tier",
@@ -165,7 +165,7 @@
         {
           "type": "minecraft:item",
           "name": "rngtech:ascension_matrix",
-          "weight": 2,
+          "weight": 20,
           "conditions": [
             {
               "condition": "rngtech:order_tier",
@@ -186,425 +186,45 @@
           ]
         },
         {
-          "type": "minecraft:item",
-          "name": "rngtech:unique_potato_battery_cell",
-          "weight": 1,
+          "type": "minecraft:loot_table",
+          "value": "rngtech:work_orders/unique_reward",
+          "weight": 6,
           "conditions": [
             {
-              "condition": "rngtech:order_prestige",
-              "min": 2
+              "condition": "rngtech:unique_loot_enabled"
             },
             {
-              "condition": "rngtech:unique_loot_enabled",
-              "unique": "rngtech:unique_potato_battery_cell"
-            }
-          ],
-          "functions": [
-            {
-              "function": "rngtech:unidentified_unique"
+              "condition": "rngtech:order_prestige",
+              "max": 0
             }
           ]
         },
         {
-          "type": "minecraft:item",
-          "name": "rngtech:fortress_heater_element",
-          "weight": 1,
+          "type": "minecraft:loot_table",
+          "value": "rngtech:work_orders/unique_reward",
+          "weight": 20,
           "conditions": [
             {
-              "condition": "rngtech:order_prestige",
-              "min": 2
+              "condition": "rngtech:unique_loot_enabled"
             },
             {
-              "condition": "rngtech:unique_loot_enabled",
-              "unique": "rngtech:fortress_heater_element"
-            }
-          ],
-          "functions": [
-            {
-              "function": "rngtech:unidentified_unique"
+              "condition": "rngtech:order_prestige",
+              "min": 1,
+              "max": 1
             }
           ]
         },
         {
-          "type": "minecraft:item",
-          "name": "rngtech:fortress_heater_element",
-          "weight": 2,
+          "type": "minecraft:loot_table",
+          "value": "rngtech:work_orders/unique_reward",
+          "weight": 50,
           "conditions": [
+            {
+              "condition": "rngtech:unique_loot_enabled"
+            },
             {
               "condition": "rngtech:order_prestige",
               "min": 2
-            },
-            {
-              "condition": "rngtech:unique_loot_enabled",
-              "unique": "rngtech:fortress_heater_element"
-            },
-            {
-              "condition": "minecraft:any_of",
-              "terms": [
-                {
-                  "condition": "rngtech:machine_family",
-                  "family": "furnace"
-                },
-                {
-                  "condition": "rngtech:machine_family",
-                  "family": "alloy_furnace"
-                },
-                {
-                  "condition": "rngtech:machine_family",
-                  "family": "metal_press"
-                },
-                {
-                  "condition": "rngtech:machine_family",
-                  "family": "melter"
-                }
-              ]
-            }
-          ],
-          "functions": [
-            {
-              "function": "rngtech:unidentified_unique"
-            }
-          ]
-        },
-        {
-          "type": "minecraft:item",
-          "name": "rngtech:igloo_basement_thermostat",
-          "weight": 1,
-          "conditions": [
-            {
-              "condition": "rngtech:order_prestige",
-              "min": 2
-            },
-            {
-              "condition": "rngtech:unique_loot_enabled",
-              "unique": "rngtech:igloo_basement_thermostat"
-            }
-          ],
-          "functions": [
-            {
-              "function": "rngtech:unidentified_unique"
-            }
-          ]
-        },
-        {
-          "type": "minecraft:item",
-          "name": "rngtech:igloo_basement_thermostat",
-          "weight": 2,
-          "conditions": [
-            {
-              "condition": "rngtech:order_prestige",
-              "min": 2
-            },
-            {
-              "condition": "rngtech:unique_loot_enabled",
-              "unique": "rngtech:igloo_basement_thermostat"
-            },
-            {
-              "condition": "minecraft:any_of",
-              "terms": [
-                {
-                  "condition": "rngtech:machine_family",
-                  "family": "furnace"
-                },
-                {
-                  "condition": "rngtech:machine_family",
-                  "family": "alloy_furnace"
-                },
-                {
-                  "condition": "rngtech:machine_family",
-                  "family": "metal_press"
-                },
-                {
-                  "condition": "rngtech:machine_family",
-                  "family": "melter"
-                }
-              ]
-            }
-          ],
-          "functions": [
-            {
-              "function": "rngtech:unidentified_unique"
-            }
-          ]
-        },
-        {
-          "type": "minecraft:item",
-          "name": "rngtech:mineshaft_worn_pick_jaw",
-          "weight": 1,
-          "conditions": [
-            {
-              "condition": "rngtech:order_prestige",
-              "min": 2
-            },
-            {
-              "condition": "rngtech:unique_loot_enabled",
-              "unique": "rngtech:mineshaft_worn_pick_jaw"
-            }
-          ],
-          "functions": [
-            {
-              "function": "rngtech:unidentified_unique"
-            }
-          ]
-        },
-        {
-          "type": "minecraft:item",
-          "name": "rngtech:mineshaft_worn_pick_jaw",
-          "weight": 2,
-          "conditions": [
-            {
-              "condition": "rngtech:order_prestige",
-              "min": 2
-            },
-            {
-              "condition": "rngtech:unique_loot_enabled",
-              "unique": "rngtech:mineshaft_worn_pick_jaw"
-            },
-            {
-              "condition": "minecraft:any_of",
-              "terms": [
-                {
-                  "condition": "rngtech:machine_family",
-                  "family": "crusher"
-                },
-                {
-                  "condition": "rngtech:machine_family",
-                  "family": "melter"
-                }
-              ]
-            }
-          ],
-          "functions": [
-            {
-              "function": "rngtech:unidentified_unique"
-            }
-          ]
-        },
-        {
-          "type": "minecraft:item",
-          "name": "rngtech:crying_crucible",
-          "weight": 1,
-          "conditions": [
-            {
-              "condition": "rngtech:order_prestige",
-              "min": 2
-            },
-            {
-              "condition": "rngtech:unique_loot_enabled",
-              "unique": "rngtech:crying_crucible"
-            }
-          ],
-          "functions": [
-            {
-              "function": "rngtech:unidentified_unique"
-            }
-          ]
-        },
-        {
-          "type": "minecraft:item",
-          "name": "rngtech:crying_crucible",
-          "weight": 2,
-          "conditions": [
-            {
-              "condition": "rngtech:order_prestige",
-              "min": 2
-            },
-            {
-              "condition": "rngtech:unique_loot_enabled",
-              "unique": "rngtech:crying_crucible"
-            },
-            {
-              "condition": "minecraft:any_of",
-              "terms": [
-                {
-                  "condition": "rngtech:machine_family",
-                  "family": "alloy_furnace"
-                }
-              ]
-            }
-          ],
-          "functions": [
-            {
-              "function": "rngtech:unidentified_unique"
-            }
-          ]
-        },
-        {
-          "type": "minecraft:item",
-          "name": "rngtech:trial_vault_escapement",
-          "weight": 1,
-          "conditions": [
-            {
-              "condition": "rngtech:order_prestige",
-              "min": 2
-            },
-            {
-              "condition": "rngtech:unique_loot_enabled",
-              "unique": "rngtech:trial_vault_escapement"
-            }
-          ],
-          "functions": [
-            {
-              "function": "rngtech:unidentified_unique"
-            }
-          ]
-        },
-        {
-          "type": "minecraft:item",
-          "name": "rngtech:trial_vault_escapement",
-          "weight": 2,
-          "conditions": [
-            {
-              "condition": "rngtech:order_prestige",
-              "min": 2
-            },
-            {
-              "condition": "rngtech:unique_loot_enabled",
-              "unique": "rngtech:trial_vault_escapement"
-            },
-            {
-              "condition": "minecraft:any_of",
-              "terms": [
-                {
-                  "condition": "rngtech:machine_family",
-                  "family": "alloy_furnace"
-                },
-                {
-                  "condition": "rngtech:machine_family",
-                  "family": "metal_press"
-                },
-                {
-                  "condition": "rngtech:machine_family",
-                  "family": "melter"
-                }
-              ]
-            }
-          ],
-          "functions": [
-            {
-              "function": "rngtech:unidentified_unique"
-            }
-          ]
-        },
-        {
-          "type": "minecraft:item",
-          "name": "rngtech:witch_bottle_reflux_pump",
-          "weight": 1,
-          "conditions": [
-            {
-              "condition": "rngtech:order_prestige",
-              "min": 2
-            },
-            {
-              "condition": "rngtech:unique_loot_enabled",
-              "unique": "rngtech:witch_bottle_reflux_pump"
-            }
-          ],
-          "functions": [
-            {
-              "function": "rngtech:unidentified_unique"
-            }
-          ]
-        },
-        {
-          "type": "minecraft:item",
-          "name": "rngtech:witch_bottle_reflux_pump",
-          "weight": 2,
-          "conditions": [
-            {
-              "condition": "rngtech:order_prestige",
-              "min": 2
-            },
-            {
-              "condition": "rngtech:unique_loot_enabled",
-              "unique": "rngtech:witch_bottle_reflux_pump"
-            },
-            {
-              "condition": "minecraft:any_of",
-              "terms": [
-                {
-                  "condition": "rngtech:machine_family",
-                  "family": "melter"
-                },
-                {
-                  "condition": "rngtech:machine_family",
-                  "family": "forestry"
-                }
-              ]
-            }
-          ],
-          "functions": [
-            {
-              "function": "rngtech:unidentified_unique"
-            }
-          ]
-        },
-        {
-          "type": "minecraft:item",
-          "name": "rngtech:ancient_echo_control_board",
-          "weight": 1,
-          "conditions": [
-            {
-              "condition": "rngtech:order_prestige",
-              "min": 2
-            },
-            {
-              "condition": "rngtech:unique_loot_enabled",
-              "unique": "rngtech:ancient_echo_control_board"
-            }
-          ],
-          "functions": [
-            {
-              "function": "rngtech:unidentified_unique"
-            }
-          ]
-        },
-        {
-          "type": "minecraft:item",
-          "name": "rngtech:ancient_echo_control_board",
-          "weight": 2,
-          "conditions": [
-            {
-              "condition": "rngtech:order_prestige",
-              "min": 2
-            },
-            {
-              "condition": "rngtech:unique_loot_enabled",
-              "unique": "rngtech:ancient_echo_control_board"
-            },
-            {
-              "condition": "minecraft:any_of",
-              "terms": [
-                {
-                  "condition": "rngtech:machine_family",
-                  "family": "resonance_calibrator"
-                }
-              ]
-            }
-          ],
-          "functions": [
-            {
-              "function": "rngtech:unidentified_unique"
-            }
-          ]
-        },
-        {
-          "type": "minecraft:item",
-          "name": "rngtech:bastion_coin_stack_capacitor",
-          "weight": 1,
-          "conditions": [
-            {
-              "condition": "rngtech:order_prestige",
-              "min": 2
-            },
-            {
-              "condition": "rngtech:unique_loot_enabled",
-              "unique": "rngtech:bastion_coin_stack_capacitor"
-            }
-          ],
-          "functions": [
-            {
-              "function": "rngtech:unidentified_unique"
             }
           ]
         }

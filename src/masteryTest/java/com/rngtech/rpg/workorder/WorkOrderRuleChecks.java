@@ -9,6 +9,8 @@ import com.rngtech.rpg.ProcessingBalanceSimulation;
 import com.rngtech.rpg.Rarity;
 import com.rngtech.rpg.progression.MachineMasteryFamily;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import net.minecraft.resources.ResourceLocation;
@@ -43,6 +45,7 @@ public final class WorkOrderRuleChecks {
         workCounting();
         itemJobs(shipped);
         rewardAmounts();
+        uniqueRate(shipped);
         rush();
         statGoals(shipped);
         statGoalTargets(shipped);
@@ -209,6 +212,48 @@ public final class WorkOrderRuleChecks {
         require(extra > samples * 0.48 && extra < samples * 0.52, "150% of 3 pays 5 half the time");
         require(WorkOrderRules.scaledAmount(1, 0, random) == 1, "a reward always pays at least one");
         require(WorkOrderRules.scaledAmount(2, 300, random) == 6, "300% Bounty triples the amount");
+    }
+
+    /**
+     * Uniques stay rare: a listed job pays one between 1 time in 200 and 1 time in 100. Each listing's chance is the
+     * Unique entries' share of the reward table's weights that pass at its tier and Prestige, with jobs and conditions
+     * rolled the way the terminal rolls them. Every Unique entry is a nested table; {@code check-work-orders.mjs} keeps
+     * the nested tables to the Unique one.
+     */
+    private static void uniqueRate(List<WorkObjectiveEntry> shipped) {
+        JsonArray entries = read(projectRoot().resolve("src/main/resources/data/rngtech/loot_table/challenges/work_order.json"))
+                .getAsJsonArray("pools").get(0).getAsJsonObject().getAsJsonArray("entries");
+        SplittableRandom random = new SplittableRandom(9L);
+        int listings = 50_000;
+        double chance = 0;
+        for (int listing = 0; listing < listings; listing++) {
+            int tier = WorkOrder.MIN_TIER + random.nextInt(WorkOrder.MAX_TIER - WorkOrder.MIN_TIER + 1);
+            WorkOrder order = WorkOrderRules.roll(shipped, tier, random);
+            int prestige = WorkOrderConditions.roll(order, null, RandomSource.create(random.nextLong())).order().prestige();
+            double total = 0;
+            double unique = 0;
+            for (JsonElement element : entries) {
+                JsonObject entry = element.getAsJsonObject();
+                if (!inRange(entry, "rngtech:order_tier", tier) || !inRange(entry, "rngtech:order_prestige", prestige)) { continue; }
+                int weight = entry.has("weight") ? entry.get("weight").getAsInt() : 1;
+                total += weight;
+                if (entry.get("type").getAsString().equals("minecraft:loot_table")) { unique += weight; }
+            }
+            chance += unique / total;
+        }
+        double rate = chance / listings;
+        require(rate >= 0.005 && rate <= 0.01, "a listed job pays a Unique 1 time in 100 to 200, not 1 in " + Math.round(1 / rate));
+    }
+
+    /** Whether {@code entry}'s {@code condition}, if it has one, lets {@code value} through its optional min and max. */
+    private static boolean inRange(JsonObject entry, String condition, int value) {
+        if (!entry.has("conditions")) { return true; }
+        for (JsonElement element : entry.getAsJsonArray("conditions")) {
+            JsonObject test = element.getAsJsonObject();
+            if (!test.get("condition").getAsString().equals(condition)) { continue; }
+            if (test.has("min") && value < test.get("min").getAsInt() || test.has("max") && value > test.get("max").getAsInt()) { return false; }
+        }
+        return true;
     }
 
     /** Every shipped objective's minimum is met by at least one recipe a chassis at the tier's stage can run. */

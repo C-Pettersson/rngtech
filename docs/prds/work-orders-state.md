@@ -304,6 +304,7 @@ Recorded 2026-10-26 before merging #214, from the user's go-ahead on the recomme
 Recorded 2026-10-26 for the post-merge polish, from the user:
 
 - Release target: the next 2.0 alpha, the last big feature before 2.0. Machines keep three drive bays. Unique rewards weight toward the job's machine.
+- Uniques should be really rare, about one per hundred jobs, seen after maybe 20 refreshes; that is the minimum scarcity, and rarer is fine.
 - of Hand Feeding goes on every machine that rolls Instant Process. Cold Start stays off the Melter.
 - Thin Margins and drive-bay panels are dropped. Veteran Crew, pack-editable conditions, template condition names, and Jade on the Forestry cart are deferred; the Bonus Summary section waits for playtesters to ask.
 
@@ -312,7 +313,8 @@ Recorded 2026-10-26 for the post-merge polish, from the build:
 - Stat-goal reachability uses `ProcessingBalanceSimulation.bestStat`: the best archetype build of the tier's stage, Furnace variants included, at Mastery level 10, the simulation's lowest level, since default jobs ask for no Mastery level. Every shipped top target passes with room to spare, so none was retuned. The tightest are Output Amount (Tier I 1.34 against 1.49) and Temperature Stability (Tier IV 1.90 against 2.36); Super Output Chance targets sit far below the 18% to 20% the builds reach.
 - Eight machines call `ProcessingChance.rollInstant`: the Crusher, Furnace, Alloy Furnace, Metal Press, Melter, Resonance Calibrator, Component Assembler, and Component Recycler. The Forestry Companion has no Instant Process. `WorkOrderConditions.INSTANT_PROCESS` names those eight families for of Hand Feeding.
 - `ChallengeContext.of(FulfilledWorkOrder, roll)` already carried the order's family, and `WorkOrderRewards.withRewards` builds that order from the listed job, so no plumbing changed. Each Unique whose host fits a Work Order machine gets a second entry at weight 2 behind `minecraft:any_of` over `rngtech:machine_family`, so it rolls three times as often on those machines. Fits by host: Crush Head on the Crusher and Melter; Heat Core on the Furnace, Alloy Furnace, Metal Press, and Melter; Alloy Crucible on the Alloy Furnace; Servo on the Alloy Furnace, Metal Press, and Melter; Fluid Pump on the Melter and Forestry Companion; Control Board on the Resonance Calibrator. Battery Cell Uniques power every machine and keep only their catalog entry.
-- A machine that fits more Uniques pays Uniques more often: at Prestige 2 and Tier III or higher, the Unique share is about 8% on the Component Assembler and Recycler and about 15% on the Melter. The playtest should say whether that spread is fine.
+- The Prestige 2 gate made Uniques far rarer than wanted. Over 200,000 rolled listings, 88.3% had Prestige 0, 11.4% Prestige 1, and 0.23% Prestige 2, and the Melter, Resonance Calibrator, Component Assembler, Component Recycler, and Forestry Companion never reach 2 at listing. That was about 1 Unique in 5,000 jobs. The Unique kind is now three Prestige-band entries (weights 6, 20, and 50, with the other kinds' weights multiplied by 10) that nest `rngtech:work_orders/unique_reward`, which holds the per-Unique and per-machine entries. A listed job pays a Unique about 1 time in 131; `WorkOrderRuleChecks.uniqueRate` holds it between 1 in 200 and 1 in 100. Since the nested table only picks which Unique, every machine has the same Unique chance.
+- Bounty, Rush, Blessed, and refinement scaled a Unique reward's count like any other, so a Unique could pay two. `WorkOrderRewards.fixedAmount` keeps it at one. A roll that pays nothing, such as a Unique band whose every Unique is switched off, rolls again up to eight times.
 
 ## Code against the redesign
 
@@ -398,6 +400,7 @@ Recorded 2026-10-25 from the chips slice:
 - 2026-10-26: merged the machine challenge loot removal. Work Orders keep `ChallengeLoot.WORK_ORDER` as the one shipped table; the wiki Phase Array page, Modpack Creators, JEI Glyph page, implementation matrix, and `check-uniques.mjs` name Work Orders as the main Glyph source.
 - 2026-10-26: pre-merge tuning. Crusher Tier V capped, chassis-based speeds for the six other families, material-bound sizing for the Calibrator, Assembler, and Recycler, and the Alloy Furnace's per-item reference time.
 - 2026-10-26: post-merge polish. `WorkOrderRuleChecks.statGoalTargets` against `ProcessingBalanceSimulation.bestStat`; of Hand Feeding on all eight Instant Process families; JEI tier and reward pages for the Dispatch Terminal and Job Chip; machine-weighted Unique entries in the reward table. Checks: `WorkOrderConditionChecks.handFeeding`, `WorkOrderGameTests.handFeedingStopsInstantProcessOnEveryMachine` and `uniqueRewardsFavourTheJobsMachine`, and the family-entry rule in `check-work-orders.mjs`.
+- 2026-10-26: Unique rarity. The Unique kind became three Prestige-band entries nesting `rngtech:work_orders/unique_reward`, about 1 Unique per 131 listed jobs, and a Unique reward always pays one. Checks: `WorkOrderRuleChecks.uniqueRate`, the band and nested-table rules in `check-work-orders.mjs`, and the reworked `WorkOrderGameTests.uniqueRewardsFavourTheJobsMachine`.
 
 ## Verification
 
@@ -427,6 +430,7 @@ Recorded 2026-10-25 from the chips slice:
 - 2026-10-26: Job Chip lamp. `./gradlew quickCheck`, `./gradlew runGameTestServer` (293 tests), `npm run moddex:check`, and `npm run repo:check` passed; `tools/asset_audit.py` still reports 263 unallowlisted findings, none new. Every lamp was checked in rendered models from four sides, not in a running client. `mkdocs build --strict` was not run locally.
 - 2026-10-26: rework phase 10, documentation only. `mkdocs build --strict`, `mkdocs build --strict -f mkdocs.wiki.yml`, `python tools/rngwiki/guideme.py --check`, `npm run repo:check`, and `npm run moddex:check` passed. The FTB Quests chapter has not been loaded in a running client.
 - 2026-10-26: post-merge polish. `./gradlew quickCheck`, `./gradlew runGameTestServer` (295 tests), `npm run moddex:check`, `npm run repo:check`, `python tools/rngwiki/guideme.py --check`, `mkdocs build --strict`, and `mkdocs build --strict -f mkdocs.wiki.yml` passed. The JEI pages and Unique weighting have not been checked in a running client.
+- 2026-10-26: Unique rarity. `./gradlew ciCheck`, `./gradlew runGameTestServer` (295 tests), `npm run moddex:check`, `npm run repo:check`, `python tools/rngwiki/guideme.py --check`, and both `mkdocs build --strict` runs passed.
 
 ## Handoff and limits
 

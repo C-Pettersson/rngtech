@@ -160,7 +160,7 @@ A chip has a [rarity](rarity-and-affixes.md#rarity), like Gear:
 | Magic | 35% | 1 or 2 |
 | Rare | 15% | 3 or 4 |
 
-Conditions are affixes. A prefix lowers one of the machine's stats, and a suffix adds a rule to the job. Each condition adds Bounty, which makes the reward bigger. Rule conditions also add Prestige, which unlocks rarer rewards.
+Conditions are affixes. A prefix lowers one of the machine's stats, and a suffix adds a rule to the job. Each condition adds Bounty, which makes the reward bigger. Rule conditions also add Prestige, which makes a Unique reward more likely.
 
 Conditions apply only while their chip is active. A stat breakdown lists each one's cost, such as "Work Order: Starved Feed".
 
@@ -231,7 +231,9 @@ Each job pays one kind of reward, shown on the chip, so you choose jobs by what 
 | {{ item('rngtech:requisition', 'Requisitions') }} | All |
 | A {{ item('rngtech:glyph') }} of the job's tier | All |
 | {{ item('rngtech:volatile_catalyst', 'Volatile Catalysts') }}, {{ item('rngtech:affix_upgrade', 'Greater Affix Upgraders') }}, or an {{ item('rngtech:ascension_matrix') }} | III and higher |
-| An unidentified [Unique](uniques.md), most often one for the job's machine | Prestige 2 or more |
+| An unidentified [Unique](uniques.md), most often one for the job's machine | All, but rare |
+
+A Unique is the rarest reward. About 1 job in 130 pays one, so you see one every 20 or so refreshes. Prestige makes it more likely: about 1 in 160 at Prestige 0, 1 in 50 at Prestige 1, and 1 in 20 at Prestige 2 or more. The terminal picks the reward when it lists the job, so Prestige that you add later does not change it. A Unique reward is always one item, whatever the Bounty.
 
 A Unique that fits the job's machine is three times as likely as one that does not. For example, a Melter job favours the Mineshaft Worn Pick-Jaw, both Heat Cores, the Trial Vault Escapement, and the Witch-Bottle Reflux Pump. Every Unique can still drop from any job. Battery Cell Uniques fit every machine, so they are never favoured.
 

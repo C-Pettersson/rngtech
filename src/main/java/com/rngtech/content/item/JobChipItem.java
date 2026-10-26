@@ -278,7 +278,7 @@ public class JobChipItem extends Item {
         setJob(stack, WorkOrderConditions.rebalance(order, traits(stack), traits), traits);
     }
 
-    /** Stores a chip's job and conditions together, scaling a listed reward with any change in Bounty. */
+    /** Stores a chip's job and conditions together, scaling a listed reward with any change in Bounty, except a Unique. */
     public static void setJob(ItemStack stack, WorkOrder next, MachineTraits traits) {
         WorkOrder order = data(stack);
         List<ItemStack> listed = WorkOrderRewards.items(next.rewards());
@@ -286,7 +286,7 @@ public class JobChipItem extends Item {
         if (order != null && next.bounty() != order.bounty() && order.bounty() > 0 && !listed.isEmpty()) {
             double scale = next.bounty() / (double) order.bounty();
             stored = next.withRewards(ItemContainerContents.fromItems(listed.stream()
-                    .map(reward -> reward.copyWithCount(Math.max(1, (int) Math.round(reward.getCount() * scale))))
+                    .map(reward -> WorkOrderRewards.fixedAmount(reward) ? reward : reward.copyWithCount(Math.max(1, (int) Math.round(reward.getCount() * scale))))
                     .toList()));
         }
         stack.set(ModDataComponents.WORK_ORDER.get(), stored);
