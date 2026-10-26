@@ -5,6 +5,7 @@ import com.rngtech.content.item.JobChipItem;
 import com.rngtech.content.menu.WorkOrderMenuView;
 import com.rngtech.content.registry.ModDataComponents;
 import com.rngtech.content.registry.ModItems;
+import com.rngtech.rpg.refinement.RefinementTargets;
 import com.rngtech.rpg.workorder.LoadedWorkOrder;
 import com.rngtech.rpg.workorder.MachineWorkOrders;
 import com.rngtech.rpg.workorder.WorkOrder;
@@ -12,6 +13,7 @@ import com.rngtech.rpg.workorder.WorkOrderHost;
 import com.rngtech.rpg.workorder.WorkOrderProgress;
 import com.rngtech.rpg.workorder.WorkOrderRules;
 
+import net.minecraft.util.Unit;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.items.IItemHandlerModifiable;
 import net.neoforged.neoforge.items.ItemStackHandler;
@@ -57,6 +59,9 @@ public final class DriveBays implements IItemHandlerModifiable {
         if (!progress.isNone()) {
             stack.set(ModDataComponents.WORK_ORDER_PROGRESS.get(), progress);
         }
+        if (loaded.mirrored()) {
+            stack.set(ModDataComponents.MIRRORED.get(), Unit.INSTANCE);
+        }
         return stack;
     }
 
@@ -66,7 +71,9 @@ public final class DriveBays implements IItemHandlerModifiable {
         if (order == null) {
             return null;
         }
-        return stack.getOrDefault(ModDataComponents.WORK_ORDER_PROGRESS.get(), WorkOrderProgress.NONE).load(order, JobChipItem.traits(stack));
+        return stack.getOrDefault(ModDataComponents.WORK_ORDER_PROGRESS.get(), WorkOrderProgress.NONE)
+                .load(order, JobChipItem.traits(stack))
+                .withMirrored(RefinementTargets.isMirrored(stack));
     }
 
     @Override

@@ -21,6 +21,8 @@ import com.mojang.serialization.Codec;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.util.Unit;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
@@ -84,6 +86,15 @@ public final class ModDataComponents {
                                     .networkSynchronized(UnidentifiedTraitRoll.STREAM_CODEC)
                                     .cacheEncoding()
                     );
+
+    /** A copy made by a Mirror Catalyst. Every refinement path refuses it, and it cannot be mirrored again. */
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Unit>> MIRRORED =
+            DATA_COMPONENTS.registerComponentType(
+                    "mirrored",
+                    builder -> builder
+                            .persistent(Unit.CODEC)
+                            .networkSynchronized(StreamCodec.unit(Unit.INSTANCE))
+            );
 
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<Boolean>> IDENTIFY_TRAIT_ROLL_ON_CRAFT =
             DATA_COMPONENTS.registerComponentType(

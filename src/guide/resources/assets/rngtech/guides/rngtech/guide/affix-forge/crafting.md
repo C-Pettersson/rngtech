@@ -2,7 +2,7 @@
 navigation:
   title: "Crafting"
   parent: affix-forge.md
-  position: 8
+  position: 9
   icon: rngtech:affix_forge
 ---
 

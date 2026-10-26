@@ -17,7 +17,8 @@
               "include": [
                 "rngtech:machine_traits",
                 "rngtech:machine_progression",
-                "rngtech:work_orders"
+                "rngtech:work_orders",
+                "rngtech:mirrored"
               ],
               "source": "block_entity"
             }

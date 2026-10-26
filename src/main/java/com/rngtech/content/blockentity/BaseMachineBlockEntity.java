@@ -143,6 +143,12 @@ public abstract class BaseMachineBlockEntity extends BlockEntity implements Refi
         return traits == null ? MachineTraits.EMPTY : traits;
     }
 
+    /** Placing a Mirrored machine item keeps its component, and the block loot table copies it back to the drop. */
+    @Override
+    public boolean isMirrored() {
+        return components().has(ModDataComponents.MIRRORED.get());
+    }
+
     @Override
     public void setMachineTraits(MachineTraits traits) {
         setComponents(DataComponentMap.builder()

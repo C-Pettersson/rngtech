@@ -17,7 +17,8 @@ const TERMINAL = "rngtech:dispatch_terminal";
 const CONDITION = "rngtech:work_order_recipes_enabled";
 const RECLAIM_TYPES = new Set(["rngtech:component_recycling", "rngtech:potential_reactor"]);
 const FAMILIES = ["crusher", "furnace"];
-// Rewards are Requisitions, refinement currency, Glyphs, and Uniques: nothing with FE value or a place in the processing chain.
+// Rewards are Requisitions, refinement currency (the Mirror Catalyst included), Glyphs, and Uniques: nothing with FE value or a
+// place in the processing chain.
 const REWARD_ITEMS = new Set([
     REQUISITION,
     "rngtech:glyph",
@@ -29,6 +30,7 @@ const REWARD_ITEMS = new Set([
     "rngtech:mastery_refund",
     "rngtech:volatile_catalyst",
     "rngtech:ascension_matrix",
+    "rngtech:mirror_catalyst",
 ]);
 
 // The Work Order families whose machines have a Gear slot for each Unique host. Battery Cells power every machine, so they

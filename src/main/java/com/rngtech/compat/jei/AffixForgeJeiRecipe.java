@@ -147,6 +147,17 @@ public record AffixForgeJeiRecipe(
                         "rngtech.jei.affix_forge.requirement.resonance_matrix"
                 ),
                 recipe(
+                        "mirror_catalyst",
+                        new ItemStack(ModItems.MIRROR_CATALYST.get()),
+                        RefinementOperation.MIRROR,
+                        new ItemStack(ModItems.AFFIX_RESONANCE_MATRIX.get()),
+                        List.of(),
+                        "rngtech.jei.affix_forge.action.mirror",
+                        "rngtech.jei.affix_forge.selection.none",
+                        "rngtech.jei.affix_forge.cost.none",
+                        "rngtech.jei.affix_forge.requirement.resonance_matrix"
+                ),
+                recipe(
                         "null_crystal",
                         new ItemStack(ModItems.NULL_CRYSTAL.get()),
                         RefinementOperation.NULL_CRYSTAL,

@@ -47,7 +47,28 @@ public final class RefinementChecks {
         ascensionMatrixRespectsUpgradeCap();
         failuresLeaveTargetAndItemsAlone();
         everyRollableAffixHasAName();
+        mirrorStaysOutOfTheEngine();
         return checks;
+    }
+
+    /**
+     * The Mirror Catalyst copies item stacks in the Affix Forge, outside the engine: through the engine, as a placed
+     * machine's Refinement tab calls it, it fails and spends nothing, and no lens or crystal works with it.
+     */
+    private static void mirrorStaysOutOfTheEngine() {
+        ModifierEligibilityProfile profile = profile();
+        MachineTraits traits = magicWith(tieredPrefix(profile, 2).roll(1, RandomSource.create(1L)));
+        RefinementResult placed = apply(profile, traits, RefinementOperation.MIRROR, RefinementModifier.NONE, 0);
+        require(!placed.success() && "rngtech.refinement.failure.mirror_forge_only".equals(placed.messageKey())
+                        && !placed.consumeCatalyst() && placed.traits().equals(traits),
+                "a Mirror Catalyst in a Refinement tab fails, keeps the traits, and is not spent");
+        for (RefinementModifier modifier : RefinementModifier.values()) {
+            require(modifier == RefinementModifier.NONE
+                            ? modifier.failureKey(RefinementOperation.MIRROR) == null
+                            : "rngtech.refinement.failure.focus_rejects_mirror".equals(modifier.failureKey(RefinementOperation.MIRROR)),
+                    modifier + " is rejected with a Mirror Catalyst");
+        }
+        require(!RefinementEngine.operationSupportsLens(RefinementOperation.MIRROR), "a lens does not work with a Mirror Catalyst");
     }
 
     private static void conservationWorksWithAffixUpgrader() {

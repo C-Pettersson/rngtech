@@ -58,6 +58,7 @@ public class DebugRerollerBlockEntity extends BlockEntity implements MenuProvide
         return RNGTech.isDebugContentEnabled()
                 && RefinementTargets.canRefine(stack)
                 && !RefinementTargets.isCorrupted(stack)
+                && !RefinementTargets.isMirrored(stack)
                 && RefinementTargets.traits(stack).rarity() != Rarity.UNIQUE;
     }
 
@@ -82,6 +83,9 @@ public class DebugRerollerBlockEntity extends BlockEntity implements MenuProvide
         ItemStack target = inventory.getStackInSlot(SLOT_TARGET);
         if (RefinementTargets.canRefine(target) && RefinementTargets.isCorrupted(target)) {
             return "rngtech.debug_reroller.failure.corrupted";
+        }
+        if (RefinementTargets.canRefine(target) && RefinementTargets.isMirrored(target)) {
+            return "rngtech.debug_reroller.failure.mirrored";
         }
         if (RefinementTargets.canRefine(target) && RefinementTargets.traits(target).rarity() == Rarity.UNIQUE) {
             return "rngtech.debug_reroller.failure.unique";

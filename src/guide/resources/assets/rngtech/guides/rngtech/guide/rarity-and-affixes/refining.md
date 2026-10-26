@@ -15,6 +15,7 @@ Refinement changes an item's rolled affixes with a consumable **catalyst**. You 
 - **promote** a Magic item to Rare with an Ascension Catalyst or Ascension Matrix.
 - **remove** or **reroll** affixes.
 - **corrupt** a finished item with a <ItemLink id="rngtech:volatile_catalyst" />, a one-way gamble described in [Corruption](rngtech:rarity-and-affixes.md#corruption).
+- **copy** an item with a <ItemLink id="rngtech:mirror_catalyst" />, described in [Mirrored items](rngtech:rarity-and-affixes/mirrored-items.md).
 
 You choose the catalyst, but the game picks which affix it adds or upgrades. In the Affix Forge, modifier lenses can tilt the odds towards a family you want.
 

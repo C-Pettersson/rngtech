@@ -46,7 +46,7 @@ public final class WorkOrderRuleChecks {
         workCounting();
         itemJobs(shipped);
         rewardAmounts();
-        uniqueRate(shipped);
+        rewardRates(shipped);
         rush();
         statGoals(shipped);
         statGoalTargets(shipped);
@@ -216,34 +216,43 @@ public final class WorkOrderRuleChecks {
     }
 
     /**
-     * Uniques stay rare: a listed job pays one between 1 time in 200 and 1 time in 100. Each listing's chance is the
-     * Unique entries' share of the reward table's weights that pass at its tier and Prestige, with jobs and conditions
-     * rolled the way the terminal rolls them. Every Unique entry is a nested table; {@code check-work-orders.mjs} keeps
-     * the nested tables to the Unique one.
+     * Uniques stay rare: a listed job pays one between 1 time in 200 and 1 time in 100. The Mirror Catalyst is far rarer:
+     * between 1 time in 4,000 and 1 time in 2,000, and at most a tenth of the Unique rate. Each listing's chance is the
+     * entries' share of the reward table's weights that pass at its tier and Prestige, with jobs and conditions rolled
+     * the way the terminal rolls them. Every Unique entry is a nested table; {@code check-work-orders.mjs} keeps the
+     * nested tables to the Unique one.
      */
-    private static void uniqueRate(List<WorkObjectiveEntry> shipped) {
+    private static void rewardRates(List<WorkObjectiveEntry> shipped) {
         JsonArray entries = read(projectRoot().resolve("src/main/resources/data/rngtech/loot_table/challenges/work_order.json"))
                 .getAsJsonArray("pools").get(0).getAsJsonObject().getAsJsonArray("entries");
         SplittableRandom random = new SplittableRandom(9L);
         int listings = 50_000;
         double chance = 0;
+        double mirrorChance = 0;
         for (int listing = 0; listing < listings; listing++) {
             int tier = WorkOrder.MIN_TIER + random.nextInt(WorkOrder.MAX_TIER - WorkOrder.MIN_TIER + 1);
             WorkOrder order = WorkOrderRules.roll(shipped, tier, random);
             int prestige = WorkOrderConditions.roll(order, null, RandomSource.create(random.nextLong())).order().prestige();
             double total = 0;
             double unique = 0;
+            double mirror = 0;
             for (JsonElement element : entries) {
                 JsonObject entry = element.getAsJsonObject();
                 if (!inRange(entry, "rngtech:order_tier", tier) || !inRange(entry, "rngtech:order_prestige", prestige)) { continue; }
                 int weight = entry.has("weight") ? entry.get("weight").getAsInt() : 1;
                 total += weight;
                 if (entry.get("type").getAsString().equals("minecraft:loot_table")) { unique += weight; }
+                if (entry.has("name") && entry.get("name").getAsString().equals("rngtech:mirror_catalyst")) { mirror += weight; }
             }
             chance += unique / total;
+            mirrorChance += mirror / total;
         }
         double rate = chance / listings;
         require(rate >= 0.005 && rate <= 0.01, "a listed job pays a Unique 1 time in 100 to 200, not 1 in " + Math.round(1 / rate));
+        double mirrorRate = mirrorChance / listings;
+        require(mirrorRate >= 1 / 4000.0 && mirrorRate <= 1 / 2000.0,
+                "a listed job pays a Mirror Catalyst 1 time in 2,000 to 4,000, not 1 in " + Math.round(1 / mirrorRate));
+        require(mirrorRate <= rate / 10, "a Mirror Catalyst is at most a tenth as common as a Unique");
     }
 
     /** Whether {@code entry}'s {@code condition}, if it has one, lets {@code value} through its optional min and max. */

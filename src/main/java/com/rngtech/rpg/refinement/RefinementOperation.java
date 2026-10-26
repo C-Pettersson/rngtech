@@ -53,7 +53,8 @@ public enum RefinementOperation {
     CHAOS_CRYSTAL(RefinementAction.FULL_REROLL),
     EXPANSION_CRYSTAL(RefinementAction.FILL_OPEN_SLOTS),
     NULL_CRYSTAL(RefinementAction.RANDOM_REMOVE),
-    CORRUPT(RefinementAction.CORRUPT);
+    CORRUPT(RefinementAction.CORRUPT),
+    MIRROR(RefinementAction.MIRROR);
 
     private final RefinementAction action;
     private final List<MachineStat> targetStats;

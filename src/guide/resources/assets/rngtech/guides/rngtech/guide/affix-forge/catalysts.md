@@ -20,11 +20,12 @@ navigation:
 | <ItemLink id="rngtech:expansion_crystal" /> | Adds affixes until every open slot is full or the RP runs out. A Normal item becomes Magic. | 1–18 per affix | Resonance Matrix |
 | <ItemLink id="rngtech:null_crystal" /> | Removes one random rolled affix. | 1–4 | Resonance Matrix |
 | <ItemLink id="rngtech:volatile_catalyst" /> | [Corrupts](rngtech:rarity-and-affixes.md#corruption) a machine part or Battery Cell, Uniques included. The item can never be refined again. | None | Resonance Matrix |
+| <ItemLink id="rngtech:mirror_catalyst" /> | Makes a [Mirrored](rngtech:rarity-and-affixes/mirrored-items.md) copy of a machine part, Battery Cell, machine item, or Job Chip. The original does not change. The copy can never be changed. | None | Resonance Matrix |
 
 Stronger affixes cost more RP. Each tier above Tier 1 raises the lowest possible cost by 3 RP, up to the catalyst's maximum. For example, an Affix Injector that adds a Tier 3 affix costs 7–8 RP. The final cost is capped by what the item has left, so a low-RP item can still gamble, but may spend everything. The Affix Upgrader needs at least 2 RP to start, and the Greater Affix Upgrader at least 6.
 
 Removing or rerolling is cheap. The Nullifier Coil, Chaos Crystal, and Null Crystal cost 1 RP half the time, 2 RP 30% of the time, 3 RP 15% of the time, and 4 RP 5% of the time.
 
-A placed machine's Refinement tab works the same way, with one catalyst slot and no focus slot. It needs no forge upgrades: every catalyst works there.
+A placed machine's Refinement tab works the same way, with one catalyst slot and no focus slot. It needs no forge upgrades. Every catalyst except the Mirror Catalyst works there.
 
 Removing affixes never touches an item's fixed identity traits or base stats. Only rolled affixes can be added or removed.

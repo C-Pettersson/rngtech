@@ -10,5 +10,6 @@ public enum RefinementAction {
     TARGETED_ADD_OR_UPGRADE,
     FULL_REROLL,
     FILL_OPEN_SLOTS,
-    CORRUPT
+    CORRUPT,
+    MIRROR
 }

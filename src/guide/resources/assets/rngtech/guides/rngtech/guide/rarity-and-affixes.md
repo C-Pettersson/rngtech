@@ -111,3 +111,4 @@ A **Corrupted** item can never be refined again: the Affix Forge, Phase Array, T
 - [What rolls traits](rngtech:rarity-and-affixes/what-rolls-traits.md)
 - [Identification](rngtech:rarity-and-affixes/identification.md)
 - [Refining](rngtech:rarity-and-affixes/refining.md)
+- [Mirrored items](rngtech:rarity-and-affixes/mirrored-items.md)
