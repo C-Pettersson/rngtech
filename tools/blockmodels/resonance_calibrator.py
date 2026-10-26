@@ -1,13 +1,14 @@
 #!/usr/bin/env python3
-"""Generate the Resonance Calibrator block models, part models, item models, and owned textures.
+"""Generate the Resonance Calibrator blockstates, block models, part models, item models, and owned textures.
 
-A Resonance Calibrator is a tuning bench on the slate plinth. At the front, the Resonance Coil stands upright as a
-wound ring on a saddle, and the input waits on a pin in the middle of the ring, lit by an emitter lens on the cabinet
-behind it. Bulk chassis carry one smaller ring per lane. The cabinet at the back holds the cable port and, in a bay in
-its west wall, the Control Board. On top of it a monitor shows the active Calibration Pattern behind glass and a scope
-with the waveform and the stability range. Facing the front, the Battery Cell stands in a cradle on the left and the
-Stabilizer Matrix floats between two prongs on the right. Finished components collect in a tray at the front. The
-Nullite chassis, the precision branch, adds a vernier ring with alignment ticks around the coil.
+A Resonance Calibrator is a tuning bench on the slate plinth. At the front, the Resonance Coil stands upright as a wound
+ring on a saddle, and the input waits on a pin in the middle of the ring, lit by an emitter lens on the cabinet behind
+it. Bulk chassis carry one smaller ring per lane. The cabinet at the back holds the cable port and, in a bay in its west
+wall, the Control Board. On top of it a monitor shows the active Calibration Pattern behind glass and a scope with the
+waveform and the stability range, and on its roof the status lamp and the Job Chip lamp (job_lamp.py). Facing the front,
+the Battery Cell stands in a cradle on the left and the Stabilizer Matrix floats between two prongs on the right.
+Finished components collect in a tray at the front. The Nullite chassis, the precision branch, adds a vernier ring with
+alignment ticks around the coil.
 
 The housings are static block models. The installed parts are standalone part models; they, the items, the field
 glow, the beam, the scope, and the meters are drawn by ResonanceCalibratorRenderer, whose constants match the geometry
@@ -24,6 +25,8 @@ import random
 from pathlib import Path
 
 from PIL import Image, ImageDraw
+
+import job_lamp
 
 ROOT = Path(__file__).resolve().parents[2]
 ASSETS = ROOT / "src/main/resources/assets/rngtech"
@@ -53,6 +56,9 @@ PATTERN_WINDOW = ((2.75, 12.75), (5.75, 15.0))
 SCREEN = ((6.25, 12.75), (13.25, 15.0))
 BACKING_Z = 9.98
 GLASS_Z = 9.6
+# Job Chip lamp on the monitor's roof, across from the status lamp.
+JOB_LAMP = ((2.5, MONITOR[1][1], 11.0), (4.0, 16.0, 12.5))
+JOB_LAMP_FACES = SIDES + ("up",)
 
 # Resonance Coil: an octagonal ring on the z axis, wound around its bars, between two teal former lips inside the ring.
 RING_X, RING_Y = 8.0, 7.5
@@ -241,6 +247,7 @@ def monitor_elements():
         box((px0, py0, GLASS_Z - 0.05), (px1, py1, GLASS_Z), "glass", faces=("north", "south"),
             uv={"north": [0, 0, 16, 16], "south": [0, 0, 16, 16]}),
         lamp((12.0, my1, 11.0), (13.5, 16.0, 12.5)),
+        job_lamp.element(*JOB_LAMP, JOB_LAMP_FACES),
     ]
     return elements
 
@@ -379,6 +386,7 @@ SHARED = {
     "tray": TEX + "tray",
     "accent": TEX + "accent",
     "vernier": TEX + "vernier",
+    **job_lamp.TEXTURE,
 }
 
 
@@ -411,6 +419,8 @@ def write_models() -> None:
         })
     for tier in TIERS:
         name = f"{tier}_resonance_calibrator_chassis"
+        job_lamp.write_blockstate(name, f"rngtech:block/{name}", f"rngtech:block/{name}_active",
+                                  "rngtech:block/resonance_calibrator/job_lamp")
         write_json(MODELS / f"block/{name}.json", {
             "parent": f"rngtech:block/resonance_calibrator/{template(tier)}", "textures": tier_textures(tier),
         })
@@ -422,6 +432,7 @@ def write_models() -> None:
         })
 
     parts = MODELS / "block/resonance_calibrator"
+    job_lamp.write_part(parts / "job_lamp.json", *JOB_LAMP, JOB_LAMP_FACES)
     write_json(parts / "coil.json", {"textures": {"particle": "#coil", "accent": TEX + "accent"}, "elements": coil_elements()})
     write_json(parts / "coil_glow.json", {"textures": {"particle": "#glow", "glow": TEX + "fx/field"}, "elements": coil_elements(glow=True)})
     write_json(parts / "board.json", {"textures": {"particle": "#board"}, "elements": board_elements()})

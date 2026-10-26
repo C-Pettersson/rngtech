@@ -15,6 +15,7 @@
     "copper": "rngtech:block/furnace/kiln/copper",
     "chimney_mouth": "rngtech:block/furnace/kiln/chimney_mouth",
     "draught": "rngtech:block/furnace/kiln/draught",
+    "job_lamp": "rngtech:block/work_order/lamp_off",
     "coal": "rngtech:block/furnace/kiln/coal"
   },
   "elements": [
@@ -1051,6 +1052,64 @@
         },
         "down": {
           "texture": "#copper"
+        }
+      }
+    },
+    {
+      "from": [
+        1.5,
+        9.75,
+        0.75
+      ],
+      "to": [
+        2.75,
+        11.0,
+        1.0
+      ],
+      "faces": {
+        "north": {
+          "texture": "#copper"
+        },
+        "east": {
+          "texture": "#copper"
+        },
+        "west": {
+          "texture": "#copper"
+        },
+        "up": {
+          "texture": "#copper"
+        },
+        "down": {
+          "texture": "#copper"
+        }
+      }
+    },
+    {
+      "from": [
+        1.75,
+        10.0,
+        0.5
+      ],
+      "to": [
+        2.5,
+        10.75,
+        0.75
+      ],
+      "faces": {
+        "north": {
+          "texture": "#job_lamp"
+        },
+        "east": {
+          "texture": "#job_lamp"
+        },
+        "west": {
+          "texture": "#job_lamp"
+        },
+        "up": {
+          "texture": "#job_lamp"
+        },
+        "down": {
+          "texture": "#job_lamp"
         }
       }
     }

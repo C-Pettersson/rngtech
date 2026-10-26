@@ -19,7 +19,7 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 
-public class MetalPressBlock extends BaseMachineBlock {
+public class MetalPressBlock extends WorkOrderMachineBlock {
     public static final int MODIFIER_ROLL_COMPONENT_STAGE = 8;
 
     private final boolean crude;

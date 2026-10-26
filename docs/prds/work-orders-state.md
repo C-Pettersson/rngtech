@@ -17,7 +17,7 @@ Status: **Prototype**. The PRD is a draft with open questions and no release tar
 - [x] Conditions: the `work_order` profiles and pool for the Crusher and Furnace, conditions as an effect source on the machine, reset-on-event conditions, and Rush. The Bonus Summary drawer section moved to phase 9.
 - [x] More jobs and machines: stat goals for the Crusher and Furnace, group and streak jobs, and Work Orders on every eligible machine: Crusher, Furnace, Component Assembler, Alloy Furnace, Metal Press, Melter, Resonance Calibrator, Forestry Companion, and Component Recycler.
 - [x] Refinement and corruption: Job Chips as refinement targets, chip corruption outcomes, and Phase Array rejection.
-- [ ] UI polish: Jade, JEI info, and Affix Forge condition text (done); the active-chip status light on machine models; the Bonus Summary section and drive-bay panels deferred by the user.
+- [ ] UI polish: Jade, JEI info, Affix Forge condition text, and the Job Chip lamp on machine models (done); the Bonus Summary section and drive-bay panels deferred by the user.
 - [x] Documentation: wiki page, Machine Mastery and Rarity updates, the implementation matrix, the GuideME guide, Machine Design Notes, and an FTB Quests chapter.
 - [ ] In-game playtest of every eligible machine and tier.
 
@@ -253,9 +253,18 @@ Recorded 2026-10-26 for phase 9, from the user and the build:
 - Affix Forge: condition text comes from `WorkOrderConditions.effectText` and `ruleText`, which the chip tooltip now uses too. Pressure conditions read as their cost and rule conditions as their rule, so the "+0 Processing Speed" line is gone.
 - The status light needs a blockstate property and a lamp part in every eligible machine's model, from eight model generators with their own geometry. It is left for its own art pass rather than placed by guesswork.
 
+Recorded 2026-10-26 for the Job Chip lamp, from the art pass:
+
+- Every block machine that loads Job Chips has a small blue lamp beside its status lamp, lit while a chip is active. Blue keeps it apart from the green, amber, and cyan status lamps. It sits across the header from the status lamp on the Crusher and Recycler, beside it on the Furnace and Metal Press cell cradles, on the Alloy Furnace and Assembler cabinet fronts, on the Melter flange, and on the Calibrator monitor roof.
+- The Wooden Crusher and the Stage 0 Furnace carry the lamp too, because a template's `min_stage` can put a chip on them; the kiln sets it in a copper bezel to match its chimney. The Crude Recycler takes no chips and has no lamp.
+- The lamp is the `work_order` blockstate property, added only by `WorkOrderMachineBlock`, which the eight machine block classes now extend. The Crude Recycler's block shares the class, so it has the property, but its blockstate ignores it.
+- `BaseMachineBlockEntity` sets the property whenever the loaded chips change and checks it once a second, which also lights a machine placed from an item that carries an active chip.
+- Each family's base model carries the unlit lamp, and a multipart case adds a lit lamp part over it. The shared `tools/blockmodels/job_lamp.py` writes the textures, the part, and the blockstates, so the eight machines' blockstates are generated now instead of hand-written. The asset audit allowlists the shared lamp part and textures.
+- `BaseMachineBlock.setActive` now writes over the block's current state. Machine ticks pass the state they started with, and the old code would have written a lamp change from earlier in the same tick back to its old value.
+
 Recorded 2026-10-26 for phase 10, from the build:
 
-- The player page is `wiki/work-orders.md`, under Guides after Machine Mastery, with the Dispatch Terminal infobox and both recipes. It documents shipped behavior only, so the deferred Bonus Summary section, drive-bay panels, and status light are not on it.
+- The player page is `wiki/work-orders.md`, under Guides after Machine Mastery, with the Dispatch Terminal infobox and both recipes. It documents shipped behavior only, so the deferred Bonus Summary section and drive-bay panels are not on it. The Job Chip lamp, merged in afterwards, is.
 - Each eligible machine's Screen section lists the Orders tab. Machine Mastery, Rarity and Affixes, the Affix Forge, and the Phase Array link to the page; the Phase Array's Glyph table gains Work Orders as the only Tier V source.
 - Pack-maker facts (config keys, give commands, the template format, objectives, and the reward table's functions and conditions) live on the wiki's Modpack Creators page. The PRD's shipped-format block now points there, so there is one home for it.
 - Machine Design Notes gain a Work Orders section with the design rules, and the Machine Tabs table an Orders row. The implementation matrix gains a Work Orders section, rows for the terminal, chips, and Requisitions, the chip refinement target, and the reward table.
@@ -335,8 +344,10 @@ Recorded 2026-10-25 from the chips slice:
 - 2026-10-26: the Melter joins Work Orders: the `melt` verb and its mB report, fluid parts and names, three objectives, its Orders tab and bays, conditions, and Rush. Checks: Melter reachability in `WorkOrderRuleChecks` and `MelterWorkOrderGameTests`, where real Lubricant melts finish a chip.
 - 2026-10-26: the Resonance Calibrator joins Work Orders: the `calibrate` verb and report, streaks with a stability minimum, Unsteady Hands and Fine Tolerance, five objectives, its Orders tab and bays, and Rush. Checks: streak and Fine Tolerance rules in `WorkOrderRuleChecks` and `CalibratorWorkOrderGameTests`, where real calibrations finish a chip.
 - 2026-10-26: rework phase 8. Job Chips as refinement targets (`RefinementTargets`), chip Refinement Potential, Bounty and reward rebalancing on refinement, chip corruption outcomes (`WorkOrderConditions.corrupt`), and the Phase Array's `canPhase`. Checks: `WorkOrderRefinementChecks` and `JobChipRefinementGameTests`.
-- 2026-10-26: rework phase 9, in part. Jade lines for the active job, JEI information pages, and condition text in the Affix Forge and on chips. The Bonus Summary section, drive-bay panels, and status light wait.
+- 2026-10-26: rework phase 9, in part. Jade lines for the active job, JEI information pages, and condition text in the Affix Forge and on chips. The Bonus Summary section and drive-bay panels wait.
+- 2026-10-26: the Job Chip lamp. `WorkOrderMachineBlock` and its `work_order` property, the lamp sync in `BaseMachineBlockEntity`, `setActive` on the current state, `tools/blockmodels/job_lamp.py`, and lamp parts and multipart blockstates from the seven model generators. Checks: `WorkOrderGameTests.jobChipLampFollowsTheActiveChip`.
 - 2026-10-26: rework phase 10. The Work Orders wiki page and updates to nine machine pages and five guide and refinement pages, the regenerated in-game guide, the implementation matrix, Machine Design Notes, and the FTB Quests chapter.
+- 2026-10-26: merged the Job Chip lamp branch (`feature/work-order-status-light`) after phase 10, and added the lamp to the wiki page.
 
 ## Verification
 
@@ -363,10 +374,11 @@ Recorded 2026-10-25 from the chips slice:
 - 2026-10-26: Forestry Companion. `./gradlew quickCheck`, `./gradlew runGameTestServer` (290 tests), `npm run moddex:check`, and `npm run repo:check` passed. Not checked in a running client; no GameTest fells a real tree for a chip.
 - 2026-10-26: Component Recycler, closing phase 7. `./gradlew quickCheck`, `./gradlew runGameTestServer` (291 tests; a real Iron recycler finishes a chip and drops with it), `npm run moddex:check` (objectives for all nine families), and `npm run repo:check` passed. Not checked in a running client.
 - 2026-10-26: rework phase 8. `./gradlew quickCheck` (`masteryCheck` 671,509 checks), `./gradlew runGameTestServer` (292 tests), `npm run moddex:check`, and `npm run repo:check` passed. Not checked in a running client.
+- 2026-10-26: Job Chip lamp. `./gradlew quickCheck`, `./gradlew runGameTestServer` (293 tests), `npm run moddex:check`, and `npm run repo:check` passed; `tools/asset_audit.py` still reports 263 unallowlisted findings, none new. Every lamp was checked in rendered models from four sides, not in a running client. `mkdocs build --strict` was not run locally.
 - 2026-10-26: rework phase 10, documentation only. `mkdocs build --strict`, `mkdocs build --strict -f mkdocs.wiki.yml`, `python tools/rngwiki/guideme.py --check`, `npm run repo:check`, and `npm run moddex:check` passed. The FTB Quests chapter has not been loaded in a running client.
 
 ## Handoff and limits
 
 - Tier stages, target times, condition values, rewards, the board size, the slot count, and the Requisition recipe are draft numbers. Tune them with the processing balance simulation.
 - The objective filters assume each family can report the listed values at the moment work completes. Check each hook before committing to an objective type.
-- Shaped models exist for some families only, so the order sheet cue is per model, with a status light as the fallback.
+- Every block machine that loads Job Chips shows the Job Chip lamp. It has been checked in rendered models, not in a running client.

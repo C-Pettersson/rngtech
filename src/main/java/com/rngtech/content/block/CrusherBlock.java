@@ -24,7 +24,7 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 
-public class CrusherBlock extends BaseMachineBlock {
+public class CrusherBlock extends WorkOrderMachineBlock {
     /** Height of the nip under the primary rolls, in model pixels; see tools/blockmodels/crusher.py. */
     private static final double NIP_Y = 6.0;
     private final CrusherChassisMaterial material;

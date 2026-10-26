@@ -25,7 +25,7 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 
-public class MelterBlock extends BaseMachineBlock {
+public class MelterBlock extends WorkOrderMachineBlock {
     /** Where the rolls meet in the feed hopper, in model pixels; see tools/blockmodels/melter.py. */
     private static final double NIP_Z = 7.25;
     private static final double NIP_TOP = 15.0;

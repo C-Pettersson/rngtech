@@ -160,7 +160,7 @@ Status: Prototype. [Work Orders](https://c-pettersson.github.io/rngtech/work-ord
 - domain checks, GameTests per machine, and `tools/moddex/check-work-orders.mjs`;
 - a Work Orders chapter in the optional FTB Quests extra.
 
-The Bonus Summary drawer section, drive-bay panels, and a status light on machine models are not built. Job sizes and rewards still need an in-game playtest.
+Every block machine that loads chips shows a blue Job Chip lamp while a chip is active, through the `work_order` blockstate property. The Bonus Summary drawer section and drive-bay panels are not built. Job sizes and rewards still need an in-game playtest.
 
 ## Material Catalog
 

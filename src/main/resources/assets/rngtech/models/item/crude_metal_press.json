@@ -18,6 +18,7 @@
     "heat_bar": "rngtech:block/furnace/heat_bar",
     "tray": "rngtech:block/metal_press/tray",
     "rack": "rngtech:block/metal_press/rack",
+    "job_lamp": "rngtech:block/work_order/lamp_off",
     "particle": "rngtech:block/metal_press/shell/bronze",
     "shell": "rngtech:block/metal_press/shell/bronze",
     "trim": "rngtech:block/metal_press/trim/bronze",
@@ -1793,6 +1794,35 @@
       "neoforge_data": {
         "block_light": 15,
         "sky_light": 15
+      }
+    },
+    {
+      "from": [
+        13.25,
+        10.0,
+        2.75
+      ],
+      "to": [
+        14.75,
+        11.0,
+        4.25
+      ],
+      "faces": {
+        "north": {
+          "texture": "#job_lamp"
+        },
+        "south": {
+          "texture": "#job_lamp"
+        },
+        "east": {
+          "texture": "#job_lamp"
+        },
+        "west": {
+          "texture": "#job_lamp"
+        },
+        "up": {
+          "texture": "#job_lamp"
+        }
       }
     },
     {

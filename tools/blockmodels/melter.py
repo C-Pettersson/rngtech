@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Generate the Melter block model, part models, item model, and owned textures.
+"""Generate the Melter blockstate, block model, part models, item model, and owned textures.
 
 The Melter is a sealed crucible on the slate plinth. A rounded titanium vessel stands in the middle
 with a bolted porthole in its front: behind it, a crucible on the refractory floor holds the melt in
@@ -10,6 +10,7 @@ material, and an installed Servo is the motor beside the hopper that drives them
 tanks are glass sight columns on the front corners. The Fluid Pump stands in the back-east corner and
 feeds the output column through a pipe along the plinth; the Battery Cell lies in a cradle in the
 back-west corner, with its charge meter on the drive cabinet that carries the cable port on its back.
+The status lamp and the Job Chip lamp (job_lamp.py) sit on the front of the flange.
 
 The vessel and its fixtures are a static block model. The rolls, fins, pump, and motor are part models
 in the installed part's material; they, the fluids, the melt, the ingredients, the heat glow, and the
@@ -27,6 +28,8 @@ import random
 from pathlib import Path
 
 from PIL import Image, ImageDraw
+
+import job_lamp
 
 ROOT = Path(__file__).resolve().parents[2]
 ASSETS = ROOT / "src/main/resources/assets/rngtech"
@@ -96,6 +99,9 @@ METER = ((3.75, 5.0, 12.0), (4.0, 9.5, 15.0))
 # Battery Cell cradle in the back-west corner: the cell lies along z across two saddles.
 CRADLE = ((0.75, 2.0, 11.5), (3.5, 2.5, 15.25))
 SADDLE_ZS = (12.0, 14.25)
+# Job Chip lamp on the flange, across the vessel's centre line from the status lamp.
+JOB_LAMP = ((5.5, VESSEL_Y1 + 0.1, NARROW[0][1] - 0.75), (6.75, FLANGE_Y1 - 0.1, NARROW[0][1] - 0.5))
+JOB_LAMP_FACES = ("north", "east", "west", "up", "down")
 
 HEAT_CORES = ("iron", "copper", "bronze", "steel", "aluminum", "sparksteel", "titanium", "exotic", "unique")
 CRUSH_HEADS = ("flint", "iron", "copper", "bronze", "steel", "aluminum", "titanium", "tungstensteel", "exotic", "unique")
@@ -245,8 +251,9 @@ def vessel_elements():
         for y0, y1 in RAIL_YS:
             elements.append(box((x0, y0, FIN_ZS[0] - 0.25), (x1, y1, FIN_ZS[-1] + FIN_WIDTH + 0.25), "trim",
                                 faces=SIDES + ("up", "down")))
-    # Status lamp on the flange.
+    # Status lamp and Job Chip lamp on the flange.
     elements.append(lamp((9.25, VESSEL_Y1 + 0.1, NARROW[0][1] - 0.75), (10.5, FLANGE_Y1 - 0.1, NARROW[0][1] - 0.5)))
+    elements.append(job_lamp.element(*JOB_LAMP, JOB_LAMP_FACES))
     return elements
 
 
@@ -358,6 +365,7 @@ HOUSING_TEXTURES = {
     "crucible": TEX + "crucible",
     "crucible_rim": TEX + "crucible_rim",
     "crucible_floor": TEX + "crucible_floor",
+    **job_lamp.TEXTURE,
 }
 
 
@@ -421,6 +429,8 @@ def write_models() -> None:
         "elements": elements,
     })
     write_json(MODELS / "block/melter_active.json", {"parent": "rngtech:block/melter", "textures": {"lamp": CRUSHER + "lamp_on"}})
+    job_lamp.write_part(MODELS / "block/melter/job_lamp.json", *JOB_LAMP, JOB_LAMP_FACES)
+    job_lamp.write_blockstate("melter", "rngtech:block/melter", "rngtech:block/melter_active", "rngtech:block/melter/job_lamp")
     # The item shows the Gear its recipe builds in: Titanium rolls and fins, and an Osmium pump.
     write_json(MODELS / "item/melter.json", {
         "parent": "minecraft:block/block",

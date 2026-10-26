@@ -18,7 +18,7 @@ A bay refuses:
 - A blank chip
 - A Rush chip with no time left
 
-A machine works on one chip at a time, the **active** chip. If no chip is active, the first chip you load becomes active. Click a chip's row to select it, then use these buttons:
+A machine works on one chip at a time, the **active** chip. If no chip is active, the first chip you load becomes active. A small blue lamp on the machine lights while it has an active chip. Click a chip's row to select it, then use these buttons:
 
 - **Activate:** Makes the selected chip active. The previously active chip pauses and keeps its progress.
 - **Pause:** Stops the active chip. It keeps its progress.
