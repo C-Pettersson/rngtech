@@ -2,6 +2,7 @@ package com.rngtech.content.workorder;
 
 import com.rngtech.content.item.BatteryCellItem;
 import com.rngtech.content.material.MaterialCatalog;
+import com.rngtech.content.recipe.AlloyFurnaceRecipe;
 import com.rngtech.content.recipe.BatteryAssemblyRecipe;
 import com.rngtech.content.recipe.CrusherRecipe;
 import com.rngtech.content.recipe.FurnaceRecipe;
@@ -48,8 +49,20 @@ public final class WorkOrderEligibility {
         return switch (WorkObjectiveType.byId(part.type())) {
             case SMELT -> materials(recipes, part).stream().map(id -> (Component) Component.literal(MaterialCatalog.materialFamily(id).displayName())).toList();
             case ASSEMBLE -> cells(recipes, part).stream().map(Item::getDescription).toList();
+            case ALLOY -> alloys(recipes, part).stream().map(Item::getDescription).toList();
             case null, default -> items(recipes, part).stream().map(Item::getDescription).toList();
         };
+    }
+
+    /** What the Alloy Furnace makes from recipes at the part's component stage or more, sorted by name. */
+    public static List<Item> alloys(RecipeManager recipes, WorkPart part) {
+        Set<Item> outputs = new LinkedHashSet<>();
+        for (RecipeHolder<AlloyFurnaceRecipe> holder : recipes.getAllRecipesFor(ModRecipes.ALLOY_FURNACE_TYPE.get())) {
+            if (holder.value().minimumComponentStage() >= part.minimum()) {
+                outputs.add(holder.value().outputStack().getItem());
+            }
+        }
+        return outputs.stream().sorted(Comparator.comparing(item -> item.getDescription().getString())).toList();
     }
 
     /** The Battery Cells the Component Assembler makes at the part's stage or more, sorted by name. */

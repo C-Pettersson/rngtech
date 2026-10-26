@@ -72,7 +72,7 @@ public final class WorkOrderJobs {
 
     /**
      * Whether an item job may name {@code id}: a registered item with a loaded Crusher or Furnace recipe that takes it, or a
-     * loaded Component Assembler recipe that makes it.
+     * loaded Component Assembler or Alloy Furnace recipe that makes it.
      */
     public static Predicate<String> itemAvailable(Level level) {
         return id -> {
@@ -84,6 +84,8 @@ public final class WorkOrderJobs {
             return level.getRecipeManager().getRecipeFor(ModRecipes.CRUSHER_TYPE.get(), input, level).isPresent()
                     || level.getRecipeManager().getRecipeFor(ModRecipes.FURNACE_TYPE.get(), input, level).isPresent()
                     || level.getRecipeManager().getAllRecipesFor(ModRecipes.BATTERY_ASSEMBLY_TYPE.get()).stream()
+                            .anyMatch(holder -> holder.value().outputStack().is(BuiltInRegistries.ITEM.get(key)))
+                    || level.getRecipeManager().getAllRecipesFor(ModRecipes.ALLOY_FURNACE_TYPE.get()).stream()
                             .anyMatch(holder -> holder.value().outputStack().is(BuiltInRegistries.ITEM.get(key)));
         };
     }

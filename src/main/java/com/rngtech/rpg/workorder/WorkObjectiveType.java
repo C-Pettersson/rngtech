@@ -9,7 +9,9 @@ public enum WorkObjectiveType {
     /** Completed Furnace smelts. */
     SMELT,
     /** Completed Component Assembler assemblies. */
-    ASSEMBLE;
+    ASSEMBLE,
+    /** Completed Alloy Furnace recipe sets. */
+    ALLOY;
 
     public String id() {
         return name().toLowerCase(Locale.ROOT);

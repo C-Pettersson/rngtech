@@ -1,0 +1,43 @@
+{
+    "family": "alloy_furnace",
+    "type": "alloy",
+    "filter": "any",
+    "weight": 2,
+    "tiers": [
+        {
+            "count": {
+                "min": 192,
+                "max": 288,
+                "step": 8
+            }
+        },
+        {
+            "count": {
+                "min": 240,
+                "max": 360,
+                "step": 8
+            }
+        },
+        {
+            "count": {
+                "min": 288,
+                "max": 432,
+                "step": 8
+            }
+        },
+        {
+            "count": {
+                "min": 336,
+                "max": 504,
+                "step": 8
+            }
+        },
+        {
+            "count": {
+                "min": 384,
+                "max": 576,
+                "step": 8
+            }
+        }
+    ]
+}

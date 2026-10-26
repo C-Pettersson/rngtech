@@ -208,6 +208,8 @@ public final class WorkOrderRuleChecks {
                     case STAGE -> switch (entry.type()) {
                         case CRUSH -> crushLevels.stream().anyMatch(level -> level >= minimum && level <= stage);
                         case ASSEMBLE -> cellStages().stream().anyMatch(cell -> cell >= minimum && cell <= stage);
+                        case ALLOY -> alloyRecipes().stream().anyMatch(recipe -> recipe.get("minimum_component_stage").getAsInt() >= minimum
+                                && recipe.get("minimum_component_stage").getAsInt() <= stage);
                         default -> minimum <= stage;
                     };
                     case SETTING -> minimum <= 100;
@@ -327,7 +329,12 @@ public final class WorkOrderRuleChecks {
             case CRUSH -> Files.exists(recipes.resolve("crusher/" + path + ".json"));
             case SMELT -> Files.exists(recipes.resolve("furnace/metals/" + path.replace("crushed_", "") + "_from_crushed.json"));
             case ASSEMBLE -> assemblyOutputs().contains(item);
+            case ALLOY -> alloyRecipes().stream().anyMatch(recipe -> recipe.getAsJsonObject("result").get("id").getAsString().equals(item));
         };
+    }
+
+    private static List<JsonObject> alloyRecipes() {
+        return jsonFiles(projectRoot().resolve("src/main/resources/data/rngtech/recipe/alloy_furnace")).stream().map(WorkOrderRuleChecks::read).toList();
     }
 
     /** What the Component Assembler's shipped recipes make, by item id. */

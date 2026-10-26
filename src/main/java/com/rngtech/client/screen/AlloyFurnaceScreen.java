@@ -4,7 +4,9 @@ import com.rngtech.RNGTech;
 import com.rngtech.content.blockentity.AlloyFurnaceBlockEntity;
 import com.rngtech.content.machine.AlloyFurnaceChassisMaterial;
 import com.rngtech.content.menu.AlloyFurnaceMenu;
+import com.rngtech.content.menu.WorkOrderMenuSupport;
 import com.rngtech.content.registry.ModBlocks;
+import com.rngtech.content.registry.ModItems;
 import com.rngtech.rpg.MachineStat;
 import com.rngtech.rpg.progression.MachineMasteryFamily;
 import com.rngtech.rpg.progression.MegaPassiveNode;
@@ -108,6 +110,7 @@ public class AlloyFurnaceScreen extends AbstractContainerScreen<AlloyFurnaceMenu
 
     private final MasteryScreenSupport<MegaPassiveNode> masterySupport;
     private final MachineTabs tabs;
+    private final WorkOrdersTab workOrdersTab;
     private final HeatSlider heatSlider = new HeatSlider(98, 81, 86);
     private final NitrogenGauge nitrogenGauge = new NitrogenGauge(222, BAR_Y);
 
@@ -123,7 +126,9 @@ public class AlloyFurnaceScreen extends AbstractContainerScreen<AlloyFurnaceMenu
                 .stats(AlloyFurnaceMenu.TAB_STATS)
                 .refinement(AlloyFurnaceMenu.TAB_REFINEMENT)
                 .mastery(AlloyFurnaceMenu.TAB_MASTERY)
+                .tab(AlloyFurnaceMenu.TAB_ORDERS, "rngtech.tab.orders", ModItems.JOB_CHIP.get())
                 .build();
+        workOrdersTab = new WorkOrdersTab(menu, STAT_ACCENT);
         masterySupport = new MasteryScreenSupport<>(
                 MegaPassiveTree.TREE,
                 MegaPassiveTree.TREE.nodes(),
@@ -182,6 +187,12 @@ public class AlloyFurnaceScreen extends AbstractContainerScreen<AlloyFurnaceMenu
         if (menu.selectedTab() == AlloyFurnaceMenu.TAB_MASTERY) {
             masterySupport.renderTooltips(guiGraphics, font, leftPos, topPos, imageWidth, imageHeight, mouseX, mouseY);
         }
+        if (menu.selectedTab() == AlloyFurnaceMenu.TAB_ORDERS) {
+            List<Component> orderTooltip = workOrdersTab.tooltip(mouseX, mouseY, leftPos, topPos, imageWidth, imageHeight);
+            if (!orderTooltip.isEmpty()) {
+                guiGraphics.renderComponentTooltip(font, orderTooltip, mouseX, mouseY);
+            }
+        }
         RefinementScreenStyle.renderTooltips(guiGraphics, font, leftPos, topPos, mouseX, mouseY, menu.selectedTab() == RefinementScreenStyle.REFINEMENT_TAB_INDEX, menu.machineTraits(), menu);
         GearSlotTooltips.render(this, guiGraphics, font, mouseX, mouseY);
     }
@@ -199,6 +210,8 @@ public class AlloyFurnaceScreen extends AbstractContainerScreen<AlloyFurnaceMenu
             renderRefinement(guiGraphics);
         } else if (menu.selectedTab() == AlloyFurnaceMenu.TAB_MASTERY) {
             masterySupport.render(guiGraphics, leftPos, topPos, imageWidth, imageHeight, mouseX, mouseY);
+        } else if (menu.selectedTab() == AlloyFurnaceMenu.TAB_ORDERS) {
+            workOrdersTab.render(guiGraphics, leftPos, topPos, imageWidth, imageHeight, mouseX, mouseY);
         }
     }
 
@@ -217,7 +230,7 @@ public class AlloyFurnaceScreen extends AbstractContainerScreen<AlloyFurnaceMenu
             drawStatsLabels(guiGraphics);
         } else if (menu.selectedTab() == AlloyFurnaceMenu.TAB_REFINEMENT) {
             drawRefinementLabels(guiGraphics);
-        } else {
+        } else if (menu.selectedTab() == AlloyFurnaceMenu.TAB_MASTERY) {
             masterySupport.drawLabels(guiGraphics, font, imageWidth);
         }
     }
@@ -232,6 +245,10 @@ public class AlloyFurnaceScreen extends AbstractContainerScreen<AlloyFurnaceMenu
             int tab = tabs.tabAt(mouseX, mouseY);
             if (tab >= 0) {
                 selectTab(tab);
+                return true;
+            }
+            if (menu.selectedTab() == AlloyFurnaceMenu.TAB_ORDERS
+                    && workOrdersTab.mouseClicked(mouseX, mouseY, button, leftPos, topPos, imageWidth, imageHeight)) {
                 return true;
             }
             if (menu.selectedTab() == AlloyFurnaceMenu.TAB_REFINEMENT
@@ -295,6 +312,9 @@ public class AlloyFurnaceScreen extends AbstractContainerScreen<AlloyFurnaceMenu
     private void selectTab(int tab) {
         masterySupport.resetDragging();
         menu.selectTab(tab);
+        if (minecraft != null && minecraft.gameMode != null) {
+            minecraft.gameMode.handleInventoryButtonClick(menu.containerId, WorkOrderMenuSupport.BUTTON_SELECT_TAB + menu.selectedTab());
+        }
         updateImageSizeForSelectedTab();
         if (menu.selectedTab() == AlloyFurnaceMenu.TAB_MASTERY) {
             masterySupport.clampAfterGeometryChange(imageWidth, imageHeight);
