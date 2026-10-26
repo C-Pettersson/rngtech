@@ -10,6 +10,7 @@ import com.rngtech.content.menu.WorkOrderMenuSupport;
 import com.rngtech.content.registry.ModBlocks;
 import com.rngtech.content.registry.ModDataComponents;
 import com.rngtech.content.registry.ModItems;
+import com.rngtech.content.workorder.WorkOrderOperations;
 import com.rngtech.rpg.MachineStat;
 import com.rngtech.rpg.MachineTraits;
 import com.rngtech.rpg.Rarity;
@@ -82,7 +83,8 @@ public final class AssemblerWorkOrderGameTests {
         shiftClick(menu, player, 1);
         check(assembler.workOrders().isEmpty(), "The Assembler loaded a Crusher chip");
         shiftClick(menu, player, 0);
-        check(assembler.workOrders().orders().size() == 1 && assembler.workOrders().active() == 0,
+        check(assembler.workOrders().orders().size() == 1 && assembler.workOrders().active() == MachineWorkOrders.NONE
+                && WorkOrderOperations.perform(player, assembler, "activate", "0") && assembler.workOrders().active() == 0,
                 "The Assembler did not load its own chip with no stage requirement: " + assembler.workOrders());
         check(menu.workOrderView().slots().size() == 1 && menu.workOrderView().slots().getFirst().tier() == 3,
                 "The Assembler did not sync its chip to the Orders tab");

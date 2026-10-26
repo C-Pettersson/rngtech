@@ -131,7 +131,7 @@ public final class WorkOrderRuleChecks {
     private static void counting() {
         var first = loaded(new WorkOrder("crusher", 2, single(WorkFilter.STAGE, 6, "", 10), 5, 0, 100, 0));
         var second = loaded(new WorkOrder("crusher", 1, single(WorkFilter.STAGE, 3, "", 5), 4, 0, 100, 0));
-        var orders = MachineWorkOrders.EMPTY.withLoaded(first).withLoaded(second);
+        var orders = MachineWorkOrders.EMPTY.withLoaded(first).withLoaded(second).withActive(0);
         require(WorkOrderRules.progress(orders, crush(WorkObjectiveType.SMELT, 99, "", 3)).orders() == orders, "other work does not count");
         require(WorkOrderRules.progress(orders, crush(WorkObjectiveType.CRUSH, 5, "", 3)).orders() == orders, "work below the minimum does not count");
         require(WorkOrderRules.progress(orders.withActive(MachineWorkOrders.NONE), crush(WorkObjectiveType.CRUSH, 8, "", 3)).orders()
@@ -152,7 +152,7 @@ public final class WorkOrderRuleChecks {
 
         var items = new WorkObjective(id("items"), List.of(new WorkPart(WorkObjectiveType.CRUSH, WorkFilter.ITEM, 0, "rngtech:raw_tin", 4),
                 new WorkPart(WorkObjectiveType.CRUSH, WorkFilter.ITEM, 0, "rngtech:raw_lead", 3)), 0);
-        var multi = MachineWorkOrders.EMPTY.withLoaded(loaded(new WorkOrder("crusher", 1, items, 4, 0, 100, 0)));
+        var multi = MachineWorkOrders.EMPTY.withLoaded(loaded(new WorkOrder("crusher", 1, items, 4, 0, 100, 0))).withActive(0);
         var tin = WorkOrderRules.progress(multi, crush(WorkObjectiveType.CRUSH, 2, "rngtech:raw_tin", 6));
         require(tin.fulfilled() == null && tin.orders().activeOrder().progress().equals(List.of(4L, 0L)),
                 "an item part counts only its item and stops at its target");
@@ -278,7 +278,7 @@ public final class WorkOrderRuleChecks {
         WorkReport crush = new WorkReport(WorkObjectiveType.CRUSH, 8, 0, "", 50);
         require(!part.counts(crush), "a stat goal counts no work");
 
-        var orders = MachineWorkOrders.EMPTY.withLoaded(loaded(new WorkOrder("crusher", 1, objective, 4, 0, 100, 0)));
+        var orders = MachineWorkOrders.EMPTY.withLoaded(loaded(new WorkOrder("crusher", 1, objective, 4, 0, 100, 0))).withActive(0);
         require(WorkOrderRules.reachStats(orders, stat -> 0) == orders, "a stat at 0 changes nothing");
         var partway = WorkOrderRules.reachStats(orders, stat -> stat.equals("processing_speed") ? 1.5 : 99);
         require(partway.activeOrder().totalProgress() == 150 && !partway.activeOrder().fulfilled(), "a goal shows the machine's value below the target");
@@ -301,7 +301,7 @@ public final class WorkOrderRuleChecks {
     /** Streak jobs: they count like any work, a failure sets an unfinished streak back to 0, and the chip keeps its best streak. */
     private static void streaks() {
         var objective = new WorkObjective(id("streak"), new WorkPart(WorkObjectiveType.PRESS, WorkFilter.STREAK, 0, "", 10));
-        var orders = MachineWorkOrders.EMPTY.withLoaded(loaded(new WorkOrder("metal_press", 1, objective, 4, 0, 100, 0)));
+        var orders = MachineWorkOrders.EMPTY.withLoaded(loaded(new WorkOrder("metal_press", 1, objective, 4, 0, 100, 0))).withActive(0);
         var six = WorkOrderRules.progress(orders, crush(WorkObjectiveType.PRESS, 0, "rngtech:iron_plate", 6)).orders();
         require(six.activeOrder().totalProgress() == 6, "a streak counts any work of its verb");
         var broken = WorkOrderRules.breakStreaks(six);
@@ -314,7 +314,7 @@ public final class WorkOrderRuleChecks {
         require(WorkOrderFamilies.streaks("metal_press") && !WorkOrderFamilies.streaks("crusher"), "only machines that report failures roll streaks");
 
         var calibrated = new WorkObjective(id("calibrated"), new WorkPart(WorkObjectiveType.CALIBRATE, WorkFilter.STREAK, 80, "", 5));
-        var run = MachineWorkOrders.EMPTY.withLoaded(loaded(new WorkOrder("resonance_calibrator", 1, calibrated, 4, 0, 100, 0)));
+        var run = MachineWorkOrders.EMPTY.withLoaded(loaded(new WorkOrder("resonance_calibrator", 1, calibrated, 4, 0, 100, 0))).withActive(0);
         var three = WorkOrderRules.progress(run, new WorkReport(WorkObjectiveType.CALIBRATE, 2, 85, "", 3)).orders();
         require(three.activeOrder().totalProgress() == 3, "calibrations at the streak's stability count");
         var low = WorkOrderRules.progress(three, new WorkReport(WorkObjectiveType.CALIBRATE, 2, 79, "", 1)).orders();
@@ -324,8 +324,8 @@ public final class WorkOrderRuleChecks {
         var stable = new WorkObjective(id("stable"), new WorkPart(WorkObjectiveType.CALIBRATE, WorkFilter.SETTING, 70, "", 10));
         var fine = new MachineTraits(Rarity.MAGIC, 0, List.of(WorkOrderConditions.get(WorkOrderConditions.FINE_TOLERANCE).definition()
                 .roll(1, net.minecraft.util.RandomSource.create(1L))), List.of());
-        var plain = MachineWorkOrders.EMPTY.withLoaded(loaded(new WorkOrder("resonance_calibrator", 1, stable, 4, 0, 100, 0)));
-        var tolerant = MachineWorkOrders.EMPTY.withLoaded(new LoadedWorkOrder(new WorkOrder("resonance_calibrator", 1, stable, 4, 0, 100, 0), fine));
+        var plain = MachineWorkOrders.EMPTY.withLoaded(loaded(new WorkOrder("resonance_calibrator", 1, stable, 4, 0, 100, 0))).withActive(0);
+        var tolerant = MachineWorkOrders.EMPTY.withLoaded(new LoadedWorkOrder(new WorkOrder("resonance_calibrator", 1, stable, 4, 0, 100, 0), fine)).withActive(0);
         var good = new WorkReport(WorkObjectiveType.CALIBRATE, 2, 75, "", 4);
         var poor = new WorkReport(WorkObjectiveType.CALIBRATE, 2, 60, "", 1);
         require(WorkOrderRules.progress(WorkOrderRules.progress(plain, good).orders(), poor).orders().activeOrder().totalProgress() == 4,
@@ -338,7 +338,7 @@ public final class WorkOrderRuleChecks {
     private static void groups() {
         var plates = new WorkObjective(id("plates"), List.of(new WorkPart(WorkObjectiveType.PRESS, WorkFilter.GROUP, 0, "plate", 4),
                 new WorkPart(WorkObjectiveType.PRESS, WorkFilter.GROUP, 0, "gear", 2)), 0);
-        var orders = MachineWorkOrders.EMPTY.withLoaded(loaded(new WorkOrder("metal_press", 1, plates, 4, 0, 100, 0)));
+        var orders = MachineWorkOrders.EMPTY.withLoaded(loaded(new WorkOrder("metal_press", 1, plates, 4, 0, 100, 0))).withActive(0);
         var iron = WorkOrderRules.progress(orders, new WorkReport(WorkObjectiveType.PRESS, 1, 0, "rngtech:iron_plate", 3, "plate")).orders();
         var gold = WorkOrderRules.progress(iron, new WorkReport(WorkObjectiveType.PRESS, 1, 0, "rngtech:gold_plate", 3, "plate")).orders();
         require(gold.activeOrder().progress().equals(List.of(4L, 0L)), "any metal's plates count toward a plate part, and stop at its target");
@@ -356,7 +356,7 @@ public final class WorkOrderRuleChecks {
     /** Any-work, stage, and setting parts count recipe time over the family's reference; named items and the Melter count items. */
     private static void workCounting() {
         int reference = WorkOrderFamilies.workTicks("crusher");
-        var stage = MachineWorkOrders.EMPTY.withLoaded(loaded(new WorkOrder("crusher", 1, single(WorkFilter.STAGE, 3, "", 10), 4, 0, 100, 0)));
+        var stage = MachineWorkOrders.EMPTY.withLoaded(loaded(new WorkOrder("crusher", 1, single(WorkFilter.STAGE, 3, "", 10), 4, 0, 100, 0))).withActive(0);
         var seeds = WorkOrderRules.progress(stage, new WorkReport(WorkObjectiveType.CRUSH, 3, 0, "", 20).withTicks(16)).orders();
         LoadedWorkOrder afterSeeds = seeds.activeOrder();
         require(afterSeeds.progress().getFirst() == 20L * 16 / reference && afterSeeds.workCarry() == 20L * 16 % reference,
@@ -368,11 +368,11 @@ public final class WorkOrderRuleChecks {
         require(slow.progress().getFirst() == 5, "a slow recipe counts as several items");
         var bare = WorkOrderRules.progress(stage, new WorkReport(WorkObjectiveType.CRUSH, 3, 0, "", 4)).orders().activeOrder();
         require(bare.progress().getFirst() == 4 && bare.workCarry() == 0, "a report without a recipe time counts its items");
-        var named = MachineWorkOrders.EMPTY.withLoaded(loaded(new WorkOrder("crusher", 1, single(WorkFilter.ITEM, 0, "minecraft:raw_iron", 10), 4, 0, 100, 0)));
+        var named = MachineWorkOrders.EMPTY.withLoaded(loaded(new WorkOrder("crusher", 1, single(WorkFilter.ITEM, 0, "minecraft:raw_iron", 10), 4, 0, 100, 0))).withActive(0);
         require(WorkOrderRules.progress(named, new WorkReport(WorkObjectiveType.CRUSH, 1, 0, "minecraft:raw_iron", 2).withTicks(reference * 3))
                 .orders().activeOrder().progress().getFirst() == 2, "a named-item part counts items, whatever their recipe time");
         var melt = MachineWorkOrders.EMPTY.withLoaded(loaded(new WorkOrder("melter", 1,
-                new WorkObjective(id("melt"), new WorkPart(WorkObjectiveType.MELT, WorkFilter.ANY, 0, "", 5000)), 6, 0, 100, 0)));
+                new WorkObjective(id("melt"), new WorkPart(WorkObjectiveType.MELT, WorkFilter.ANY, 0, "", 5000)), 6, 0, 100, 0))).withActive(0);
         require(WorkOrderRules.progress(melt, new WorkReport(WorkObjectiveType.MELT, 6, 0, "rngtech:lubricant", 1000).withTicks(300))
                 .orders().activeOrder().progress().getFirst() == 1000, "the Melter counts mB, not recipe time");
         for (String family : List.of("crusher", "furnace", "alloy_furnace", "metal_press", "resonance_calibrator", "component_assembler", "component_recycler")) {

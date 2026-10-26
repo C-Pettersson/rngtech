@@ -11,6 +11,7 @@ import com.rngtech.content.menu.MelterMenu;
 import com.rngtech.content.menu.WorkOrderMenuSupport;
 import com.rngtech.content.registry.ModBlocks;
 import com.rngtech.content.registry.ModItems;
+import com.rngtech.content.workorder.WorkOrderOperations;
 import com.rngtech.rpg.MachineTraits;
 import com.rngtech.rpg.workorder.LoadedWorkOrder;
 import com.rngtech.rpg.workorder.MachineWorkOrders;
@@ -66,8 +67,13 @@ public final class MelterWorkOrderGameTests {
                 menu.quickMoveStack(player, index);
             }
         }
-        check(melter.workOrders().orders().size() == 1 && melter.workOrders().active() == 0, "The Melter did not load its chip: " + melter.workOrders());
-        check(JobChipItem.objectiveText(lubricant.objective()).getString().contains("2000"), "The job text lost its amount");
+        check(melter.workOrders().orders().size() == 1 && melter.workOrders().active() == MachineWorkOrders.NONE
+                && WorkOrderOperations.perform(player, melter, "activate", "0") && melter.workOrders().active() == 0, "The Melter did not load its chip: " + melter.workOrders());
+        check(JobChipItem.objectiveText(lubricant.objective()).getString().contains("2 B of"), "The job text lost its amount in SI form: "
+                + JobChipItem.objectiveText(lubricant.objective()).getString());
+        check(JobChipItem.amountText(WorkObjectiveType.MELT, 250).equals("250 mB") && JobChipItem.amountText(WorkObjectiveType.MELT, 32_000).equals("32 B")
+                && JobChipItem.amountText(WorkObjectiveType.MELT, 22_500).equals("22.5 B") && JobChipItem.amountText(WorkObjectiveType.CRUSH, 32_000).equals("32000"),
+                "Fluid amounts are not in SI form");
 
         melter.getInputTank().fill(new FluidStack(Fluids.WATER, 4000), IFluidHandler.FluidAction.EXECUTE);
         IItemHandler top = melter.getItemHandler(Direction.UP);

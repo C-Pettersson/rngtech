@@ -8,9 +8,9 @@ navigation:
 
 # Rush
 
-Rush is an optional time limit for a bigger reward. To use it:
+Rush is an optional time limit for a bigger reward. It only starts a job: once a chip has any progress, you cannot Rush it. To use it:
 
-1. Click the chip's row to select it.
+1. Load the chip and click its row to select it. Do not activate it first.
 2. Hover over **Rush** to see the time limit.
 3. Click **Rush**.
 

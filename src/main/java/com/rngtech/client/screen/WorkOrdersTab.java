@@ -8,6 +8,7 @@ import com.rngtech.content.menu.WorkOrderMenuView;
 import com.rngtech.content.network.WorkOrderActionPayload;
 import com.rngtech.rpg.MachineTraits;
 import com.rngtech.rpg.workorder.MachineWorkOrders;
+import com.rngtech.rpg.workorder.WorkObjectiveType;
 import com.rngtech.rpg.workorder.WorkOrder;
 import com.rngtech.rpg.workorder.WorkOrderRules;
 import com.rngtech.rpg.workorder.WorkPart;
@@ -191,9 +192,9 @@ final class WorkOrdersTab {
         boolean active = any && chosen == orders.active();
         int buttonWidth = buttonWidth(font);
         int top = topPos + rowTop(0);
-        boolean rushed = any && orders.slots().get(chosen).rushed();
+        boolean rushable = any && !orders.slots().get(chosen).rushed() && orders.slots().get(chosen).totalProgress() == 0;
         for (Action action : new Action[] {active ? Action.PAUSE : Action.ACTIVATE, Action.RUSH, Action.ABANDON}) {
-            boolean enabled = any && (action != Action.RUSH || !rushed);
+            boolean enabled = any && (action != Action.RUSH || rushable);
             parts.add(new Part(action, chosen, leftPos + width - MARGIN - buttonWidth, top, buttonWidth, BUTTON_HEIGHT, enabled));
             top += BUTTON_HEIGHT + BUTTON_GAP;
         }
@@ -209,6 +210,9 @@ final class WorkOrdersTab {
         WorkOrderMenuSupport.Slot slot = orders.slots().get(part.bay());
         if (slot.rushed()) {
             return List.of(Component.translatable("rngtech.work_order.tab.rush_running", JobChipItem.clock(slot.rushSeconds())));
+        }
+        if (slot.totalProgress() > 0) {
+            return List.of(Component.translatable("rngtech.work_order.tab.rush_started"));
         }
         ItemStack chip = view.workOrderChip(part.bay());
         WorkOrder order = JobChipItem.data(chip);
@@ -238,8 +242,10 @@ final class WorkOrdersTab {
         if (slot.objective().parts().size() > 1) {
             for (int part = 0; part < slot.objective().parts().size(); part++) {
                 WorkPart value = slot.objective().parts().get(part);
+                WorkObjectiveType type = WorkObjectiveType.byId(value.type());
                 lines.add(Component.translatable("rngtech.work_order.tab.part_progress", JobChipItem.itemName(value.item()),
-                        slot.progress().get(part), value.target()).withStyle(ChatFormatting.DARK_GRAY));
+                        JobChipItem.amountText(type, slot.progress().get(part)), JobChipItem.amountText(type, value.target()))
+                        .withStyle(ChatFormatting.DARK_GRAY));
             }
         }
         lines.add(Component.translatable(slot.done() ? "rngtech.work_order.tab.done_hint" : "rngtech.work_order.tab.select_hint")

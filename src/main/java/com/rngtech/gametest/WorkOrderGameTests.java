@@ -99,6 +99,8 @@ public final class WorkOrderGameTests {
         check(!shiftIntoBay(menu, player, 4), "A Crusher loaded a blank chip");
         check(crusher.workOrders().isEmpty(), "A refused chip loaded: " + crusher.workOrders());
         check(shiftIntoBay(menu, player, 5), "A level 1 Crusher refused a chip with no Mastery requirement");
+        check(crusher.workOrders().active() == MachineWorkOrders.NONE, "A loaded chip started on its own");
+        check(WorkOrderOperations.perform(player, crusher, "activate", "0"), "The Crusher refused to activate its chip");
         LoadedWorkOrder loaded = crusher.workOrders().activeOrder();
         check(loaded != null && loaded.order().tier() == 1 && loaded.order().objective().parts().getFirst().minimum() == 3, "The Crusher did not activate the order: " + loaded);
 
@@ -155,7 +157,8 @@ public final class WorkOrderGameTests {
         Player player = helper.makeMockPlayer(GameType.SURVIVAL);
         player.getInventory().setItem(0, order("crusher", 1, 4, 0));
         check(!WorkOrderOperations.perform(player, crusher, "abandon", "0"), "Abandoned an order that was not there");
-        check(shiftIntoBay(ordersMenu(crusher, player), player, 0), "The Crusher refused a Tier I chip");
+        check(shiftIntoBay(ordersMenu(crusher, player), player, 0) && WorkOrderOperations.perform(player, crusher, "activate", "0"),
+                "The Crusher refused a Tier I chip");
         WorkOrderMenuSupport.Slot synced = synced(crusher).activeSlot();
         check(synced != null && synced.tier() == 1 && synced.objective().parts().getFirst().type().equals(WorkObjectiveType.CRUSH.id())
                 && synced.objective().parts().getFirst().minimum() == 3 && synced.totalTarget() == 256 && synced.totalProgress() == 0
@@ -203,8 +206,10 @@ public final class WorkOrderGameTests {
         player.getInventory().setItem(1, order("crusher", 2, 4, 0));
         CrusherMenu menu = ordersMenu(crusher, player);
         check(shiftIntoBay(menu, player, 0) && shiftIntoBay(menu, player, 1), "The Crusher refused two chips");
-        check(crusher.workOrders().active() == 0, "The first chip loaded did not become active");
+        check(crusher.workOrders().active() == MachineWorkOrders.NONE && WorkOrderOperations.perform(player, crusher, "activate", "0")
+                && crusher.workOrders().active() == 0, "Loading started a chip, or Activate did not");
         crusher.workOrderWork(new WorkReport(WorkObjectiveType.CRUSH, 6, 0, "", 30));
+        check(!WorkOrderOperations.perform(player, crusher, "rush", "0"), "Rush started a chip that already had progress");
         check(WorkOrderOperations.perform(player, crusher, "activate", "1"), "The Crusher refused to switch chips");
         crusher.workOrderWork(new WorkReport(WorkObjectiveType.CRUSH, 6, 0, "", 4));
         check(crusher.workOrders().orders().get(0).totalProgress() == 30 && crusher.workOrders().orders().get(1).totalProgress() == 4,
@@ -248,7 +253,8 @@ public final class WorkOrderGameTests {
         player.getInventory().setItem(0, order("crusher", 1, 4, 0));
         CrusherMenu menu = ordersMenu(crusher, player);
         check(!lampLit(helper, pos), "The lamp was lit with no chip");
-        check(shiftIntoBay(menu, player, 0) && lampLit(helper, pos), "Loading a chip did not light the lamp");
+        check(shiftIntoBay(menu, player, 0) && !lampLit(helper, pos), "Loading a chip lit the lamp before it was activated");
+        check(WorkOrderOperations.perform(player, crusher, "activate", "0") && lampLit(helper, pos), "Activating a loaded chip did not light the lamp");
         BlockState tickStart = helper.getBlockState(pos);
         check(WorkOrderOperations.perform(player, crusher, "deactivate", "") && !lampLit(helper, pos), "Pausing the chip left the lamp lit");
         BaseMachineBlock.setActive(helper.getLevel(), helper.absolutePos(pos), tickStart, !tickStart.getValue(BaseMachineBlock.ACTIVE));
@@ -416,7 +422,8 @@ public final class WorkOrderGameTests {
         player.getInventory().setItem(0, JobChipItem.of(ModItems.JOB_CHIP.get(), JobChipItem.data(order("crusher", 1, 4, 0)), traits));
         player.getInventory().setItem(1, order("crusher", 1, 4, 0));
         CrusherMenu menu = ordersMenu(crusher, player);
-        check(shiftIntoBay(menu, player, 0) && shiftIntoBay(menu, player, 1), "The Crusher refused the chips");
+        check(shiftIntoBay(menu, player, 0) && shiftIntoBay(menu, player, 1) && WorkOrderOperations.perform(player, crusher, "activate", "0"),
+                "The Crusher refused the chips");
         check(crusher.workOrders().orders().getFirst().traits().equals(traits), "The bay lost the chip's conditions");
         double starved = crusher.effectiveStats().value(MachineStat.PROCESSING_SPEED);
         check(starved < speed * 0.76 && starved > speed * 0.69, "Starved Feed did not slow the Crusher: " + speed + " -> " + starved);
@@ -445,7 +452,7 @@ public final class WorkOrderGameTests {
         WorkOrder low = new WorkOrder("crusher", 1, new WorkObjective(RNGTech.id("goal_low"),
                 new WorkPart(WorkObjectiveType.CRUSH, WorkFilter.STAT, 0, "processing_speed", Math.max(1, current - 10))), 4, 0, 100, 0);
         crusher.setWorkOrders(MachineWorkOrders.EMPTY.withLoaded(new LoadedWorkOrder(high, MachineTraits.EMPTY))
-                .withLoaded(new LoadedWorkOrder(low, MachineTraits.EMPTY)));
+                .withLoaded(new LoadedWorkOrder(low, MachineTraits.EMPTY)).withActive(0));
         crusher.workOrderWork(new WorkReport(WorkObjectiveType.CRUSH, 1, 0, "minecraft:raw_iron", 1));
         LoadedWorkOrder reading = crusher.workOrders().orders().get(0);
         check(reading.totalProgress() == current && !reading.fulfilled(), "The goal did not show the Crusher's speed below its target: " + reading.progress());

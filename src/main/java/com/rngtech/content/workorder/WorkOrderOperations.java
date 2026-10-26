@@ -46,12 +46,14 @@ public final class WorkOrderOperations {
 
     /**
      * Activates chip {@code index} under Rush: its deadline is the job's Rush clock from now, and its listed reward, or its
-     * Bounty when it has no list, grows by the Rush bonus with Short Fuse's. A chip that already has Rush keeps its deadline.
+     * Bounty when it has no list, grows by the Rush bonus with Short Fuse's. Rush only starts a job: a chip with any progress,
+     * or one that already has Rush, is refused.
      */
     private static String rush(WorkOrderHost host, MachineWorkOrders orders, int index) {
         if (index < 0 || index >= orders.orders().size()) { return "slot"; }
         LoadedWorkOrder loaded = orders.orders().get(index);
         if (loaded.rushed()) { return "rushed"; }
+        if (started(loaded)) { return "started"; }
         WorkOrder order = loaded.order();
         int bonus = WorkOrderRules.rushBonus(loaded.traits());
         List<ItemStack> listed = WorkOrderRewards.items(order.rewards());
@@ -61,6 +63,11 @@ public final class WorkOrderOperations {
         LoadedWorkOrder rushed = loaded.withOrder(boosted).withRush(host.workOrderGameTime() + WorkOrderRules.rushTicks(order, loaded.traits()));
         host.setWorkOrders(orders.withReplaced(index, rushed).withActive(index));
         return null;
+    }
+
+    /** Whether {@code loaded}'s job has begun: any part has progress, or a streak has run. */
+    public static boolean started(LoadedWorkOrder loaded) {
+        return loaded.totalProgress() > 0 || loaded.bestStreak() > 0;
     }
 
     private static String change(WorkOrderHost host, MachineWorkOrders before, MachineWorkOrders after, boolean unchangedIsFine) {

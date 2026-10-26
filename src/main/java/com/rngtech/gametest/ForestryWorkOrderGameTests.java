@@ -8,6 +8,7 @@ import com.rngtech.content.item.JobChipItem;
 import com.rngtech.content.menu.ForestryCartMenu;
 import com.rngtech.content.menu.WorkOrderMenuSupport;
 import com.rngtech.content.registry.ModItems;
+import com.rngtech.content.workorder.WorkOrderOperations;
 import com.rngtech.rpg.MachineStat;
 import com.rngtech.rpg.MachineTraits;
 import com.rngtech.rpg.Rarity;
@@ -62,7 +63,8 @@ public final class ForestryWorkOrderGameTests {
         shiftClick(menu, player, 0);
         check(cart.workOrders().isEmpty(), "The cart loaded a Crusher chip");
         shiftClick(menu, player, 1);
-        check(cart.workOrders().orders().size() == 1 && cart.workOrders().active() == 0, "The cart did not load its chip: " + cart.workOrders());
+        check(cart.workOrders().orders().size() == 1 && cart.workOrders().active() == MachineWorkOrders.NONE
+                && WorkOrderOperations.perform(player, cart, "activate", "0") && cart.workOrders().active() == 0, "The cart did not load its chip: " + cart.workOrders());
         check(cart.effectiveStats().value(MachineStat.PROCESSING_SPEED) < speed * 0.76, "Starved Feed did not slow the cart");
 
         cart.workOrderWork(new WorkReport(WorkObjectiveType.HARVEST, 2, 0, "", 12, "logs"));

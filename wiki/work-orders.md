@@ -135,11 +135,11 @@ A bay refuses:
 - A blank chip
 - A Rush chip with no time left
 
-A machine works on one chip at a time, the **active** chip. If no chip is active, the first chip you load becomes active. A small blue lamp on the machine lights while it has an active chip. Click a chip's row to select it, then use these buttons:
+A machine works on one chip at a time, the **active** chip. A loaded chip waits until you click **Activate** or **Rush**. A small blue lamp on the machine lights while it has an active chip. Click a chip's row to select it, then use these buttons:
 
 - **Activate:** Makes the selected chip active. The previously active chip pauses and keeps its progress.
 - **Pause:** Stops the active chip. It keeps its progress.
-- **Rush:** Makes the selected chip active with a time limit. See [Rush](#rush).
+- **Rush:** Makes the selected chip active with a time limit. Only a chip with no progress can be Rushed. See [Rush](#rush).
 - **Abandon:** Shift-click to destroy the chip. You get nothing back.
 
 A chip you take out of its bay keeps its progress, which its tooltip shows. When you load it again, here or in another machine of the same kind, it carries on from there. Taking out the active chip leaves the machine with no active chip.
@@ -205,9 +205,9 @@ The [Phase Array](phase-array.md) does not accept Job Chips.
 
 ### Rush
 
-Rush is an optional time limit for a bigger reward. To use it:
+Rush is an optional time limit for a bigger reward. It only starts a job: once a chip has any progress, you cannot Rush it. To use it:
 
-1. Click the chip's row to select it.
+1. Load the chip and click its row to select it. Do not activate it first.
 2. Hover over **Rush** to see the time limit.
 3. Click **Rush**.
 

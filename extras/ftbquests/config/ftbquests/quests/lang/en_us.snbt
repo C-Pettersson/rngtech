@@ -120,7 +120,7 @@
 		""
 		"&aUse:&r"
 		"1. Open the machine's &eOrders&r tab and put the chip in a drive bay. Shift-click works while the tab is open."
-		"2. The first chip in a machine with none active becomes active. Otherwise select it and press &eActivate&r."
+		"2. Select the chip and press &eActivate&r, or &eRush&r for a timed job. A loaded chip does not start on its own."
 		"3. Run the machine. Only work it finishes while the chip is active counts."
 		""
 		"A machine holds three chips and works on one. Switching keeps every chip's progress. Hold Shift on a stage job to see the items that count."

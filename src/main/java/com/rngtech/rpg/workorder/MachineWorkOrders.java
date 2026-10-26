@@ -67,12 +67,12 @@ public record MachineWorkOrders(List<LoadedWorkOrder> orders, int active) {
         return active == NONE ? null : orders.get(active);
     }
 
-    /** Loads {@code order} into the next free slot. The first order loaded into a machine with none active becomes active. */
+    /** Loads {@code order} into the next free slot, inactive: the player starts it with Activate or Rush. */
     public MachineWorkOrders withLoaded(LoadedWorkOrder order) {
         if (full()) { return this; }
         List<LoadedWorkOrder> next = new ArrayList<>(orders);
         next.add(order);
-        return new MachineWorkOrders(next, active == NONE ? next.size() - 1 : active);
+        return new MachineWorkOrders(next, active);
     }
 
     /** Makes slot {@code index} active, or none with {@link #NONE}. Every order keeps its progress. A finished chip stays inactive. */

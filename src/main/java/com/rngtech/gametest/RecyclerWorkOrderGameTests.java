@@ -12,6 +12,7 @@ import com.rngtech.content.recycling.DisassemblyHeadMaterial;
 import com.rngtech.content.registry.ModBlocks;
 import com.rngtech.content.registry.ModDataComponents;
 import com.rngtech.content.registry.ModItems;
+import com.rngtech.content.workorder.WorkOrderOperations;
 import com.rngtech.rpg.MachineTraits;
 import com.rngtech.rpg.workorder.LoadedWorkOrder;
 import com.rngtech.rpg.workorder.MachineWorkOrders;
@@ -66,6 +67,7 @@ public final class RecyclerWorkOrderGameTests {
         shiftClick(menu, player, 1);
         check(recycler.workOrders().orders().size() == 1 && menu.workOrderView().slots().size() == 1,
                 "The recycler did not load and sync its chip: " + recycler.workOrders());
+        check(WorkOrderOperations.perform(player, recycler, "activate", "0"), "The recycler refused to activate its chip");
 
         recycler.getProcessInventory().setStackInSlot(ComponentRecyclerBlockEntity.SLOT_INPUT,
                 new ItemStack(BuiltInRegistries.ITEM.get(RNGTech.id("broken_circuit")), 2));

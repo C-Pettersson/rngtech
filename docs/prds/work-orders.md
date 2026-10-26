@@ -100,7 +100,7 @@ Key existing code:
 3. A Requisition refreshes the terminal: every listed job is replaced by a new roll, and empty lines fill again.
 4. The player may shape a chip in the Affix Forge or a Refinement tab: add a condition for more reward, remove one to make the job safer, reroll it, or corrupt it.
 5. On a machine of the chip's family, the player opens the Orders tab and inserts the chip into a drive bay. The bay accepts it only if the machine meets its requirements: chassis stage, and Mastery level if the chip has one.
-6. The first chip inserted into a machine with none active becomes active. The player can activate another bay's chip, or pause the active one, and can add Rush when activating.
+6. A loaded chip waits inactive until the player clicks Activate or Rush. The player can activate another bay's chip, or pause the active one. Rush only starts a job: a chip with any progress cannot be Rushed.
 7. While a chip is active, its conditions apply, and the machine counts matching work toward its job. The Orders tab, the Bonus Summary drawer, and Jade show progress.
 8. Switching to another chip pauses the current one. Its progress and best streak stay, and its conditions stop applying.
 9. When the active chip's job is complete, it becomes a Completed Job Chip in the same bay and is no longer active. It keeps the bay until the player takes it out, cannot be made active again, and no other chip becomes active on its own.

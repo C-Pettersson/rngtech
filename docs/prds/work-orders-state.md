@@ -283,6 +283,12 @@ Recorded 2026-10-26 for work counting, from the build:
 - The carry lives on the loaded chip (`work_carry`); unloading a chip drops less than one item of work.
 - Short Fuse is a rule condition whose value is the share cut from the clock. It is never applied to the machine's stats. A Blessed Short Fuse pays its Rush bonus without the shorter clock; a Blighted one shortens the clock and pays nothing.
 
+Recorded 2026-10-26 while playtesting work counting, from the user:
+
+- Rush could be pressed at any time, so a chip 95% done could be Rushed for the full Rush reward. Rush now only starts a job: the server refuses it on a chip with any progress or a best streak, and the Orders tab greys out the button with the reason.
+- A loaded chip no longer starts on its own. `MachineWorkOrders.withLoaded` keeps the active chip as it is, so the player chooses Activate or Rush. Before, a chip loaded into a machine with none active became active, which also made a later Rush impossible once work had counted.
+- Fluid amounts on chips use SI form, like the tanks: `JobChipItem.amountText` writes 250 mB, 32 B, or 1.5 MB in job text, progress, and per-part lines. Item counts stay exact.
+
 ## Code against the redesign
 
 The branch's loop was built for the earlier design. Phase 2 of the rework replaced the Mastery storage, the Mastery level gate, the tier and seed components, and the Tier I recipe; the lists below show what is left for later phases.
@@ -363,6 +369,7 @@ Recorded 2026-10-25 from the chips slice:
 - 2026-10-26: merged the Job Chip lamp branch (`feature/work-order-status-light`) after phase 10, and added the lamp to the wiki page.
 - 2026-10-26: playtested the Job Chip lamp in the client after the merge: placed correctly and lights with the active chip.
 - 2026-10-26: work counting, the work-based Rush clock, and of the Short Fuse. `WorkReport.ticks`, `LoadedWorkOrder.workCarry`, `WorkOrderFamilies.workTicks` and `jobSpeed`, `WorkOrderRules.rushTicks` and `rushBonus`, retuned counts for every recipe machine's any-work, stage, and setting jobs and the Crusher and Furnace item jobs. Checks: `workCounting`, `jobSizes`, and Rush and Short Fuse rules in `WorkOrderRuleChecks`.
+- 2026-10-26: Rush only before a job starts, no auto-start on load, and SI fluid amounts on chips. Checks: the storage check for an inactive load, explicit Activate in every machine's GameTest, a refused Rush on a started chip, and SI text in `MelterWorkOrderGameTests`.
 
 ## Verification
 

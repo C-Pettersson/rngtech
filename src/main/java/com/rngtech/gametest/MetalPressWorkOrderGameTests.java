@@ -10,6 +10,7 @@ import com.rngtech.content.menu.MetalPressMenu;
 import com.rngtech.content.menu.WorkOrderMenuSupport;
 import com.rngtech.content.registry.ModBlocks;
 import com.rngtech.content.registry.ModItems;
+import com.rngtech.content.workorder.WorkOrderOperations;
 import com.rngtech.rpg.MachineTraits;
 import com.rngtech.rpg.workorder.LoadedWorkOrder;
 import com.rngtech.rpg.workorder.MachineWorkOrders;
@@ -59,7 +60,8 @@ public final class MetalPressWorkOrderGameTests {
                 menu.quickMoveStack(player, index);
             }
         }
-        check(press.workOrders().orders().size() == 1 && press.workOrders().active() == 0, "The crude press did not load its chip: " + press.workOrders());
+        check(press.workOrders().orders().size() == 1 && press.workOrders().active() == MachineWorkOrders.NONE
+                && WorkOrderOperations.perform(player, press, "activate", "0") && press.workOrders().active() == 0, "The crude press did not load its chip: " + press.workOrders());
 
         press.getProcessInventory().setStackInSlot(MetalPressBlockEntity.SLOT_INPUT, new ItemStack(Items.IRON_INGOT, 4));
         MachineTestSupport.powerEachTick(helper, press.getEnergyStorage(null));
@@ -75,7 +77,7 @@ public final class MetalPressWorkOrderGameTests {
         MetalPressBlockEntity press = MachineTestSupport.place(helper, MACHINE, ModBlocks.CRUDE_METAL_PRESS.get(), MetalPressBlockEntity.class);
         WorkOrder streak = new WorkOrder("metal_press", 1, new WorkObjective(RNGTech.id("streak"),
                 new WorkPart(WorkObjectiveType.PRESS, WorkFilter.STREAK, 0, "", 50)), 3, 0, WorkOrder.BASE_BOUNTY, 0);
-        press.setWorkOrders(MachineWorkOrders.EMPTY.withLoaded(new LoadedWorkOrder(streak, MachineTraits.EMPTY)));
+        press.setWorkOrders(MachineWorkOrders.EMPTY.withLoaded(new LoadedWorkOrder(streak, MachineTraits.EMPTY)).withActive(0));
         press.workOrderWork(new WorkReport(WorkObjectiveType.PRESS, 1, 0, "rngtech:iron_plate", 12));
         check(press.workOrders().activeOrder().totalProgress() == 12, "The streak did not count the presses");
         press.workOrderStreakBroken();

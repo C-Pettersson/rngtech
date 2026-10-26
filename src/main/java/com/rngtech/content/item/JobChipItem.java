@@ -101,7 +101,7 @@ public class JobChipItem extends Item {
                 list.append(Component.translatable(index == parts.size() - 1 ? "rngtech.work_order.list.last" : "rngtech.work_order.list.next"));
             }
             list.append(Component.translatable(type == WorkObjectiveType.MELT ? "rngtech.work_order.fluid_count" : "rngtech.work_order.item_count",
-                    parts.get(index).target(), itemName(parts.get(index).item())));
+                    amountText(type, parts.get(index).target()), itemName(parts.get(index).item())));
         }
         return Component.translatable("rngtech.work_order.verb." + type.id(), list);
     }
@@ -118,7 +118,7 @@ public class JobChipItem extends Item {
             return stat == null ? Component.translatable("rngtech.work_order.objective.unknown")
                     : Component.translatable("rngtech.work_order.part.stat", Component.translatable(stat.translationKey()), statText(stat, part.target()));
         }
-        return Component.translatable("rngtech.work_order.part." + type.id() + "." + filter.id(), part.target(), part.minimum(),
+        return Component.translatable("rngtech.work_order.part." + type.id() + "." + filter.id(), amountText(type, part.target()), part.minimum(),
                 filter == WorkFilter.GROUP ? groupName(type, part.item()) : itemName(part.item()));
     }
 
@@ -142,7 +142,25 @@ public class JobChipItem extends Item {
         if (stat != null && objective.parts().size() == 1) {
             return Component.translatable("rngtech.work_order.tab.progress", statText(stat, progress), statText(stat, first.target()));
         }
-        return Component.translatable("rngtech.work_order.tab.progress", progress, objective.totalTarget());
+        WorkObjectiveType type = WorkObjectiveType.byId(first.type());
+        return Component.translatable("rngtech.work_order.tab.progress", amountText(type, progress), amountText(type, objective.totalTarget()));
+    }
+
+    /** A job amount as the chip writes it: items as a count, and the Melter's fluid in SI form, such as 250 mB or 32 B. */
+    public static String amountText(WorkObjectiveType type, long amount) {
+        if (type != WorkObjectiveType.MELT) {
+            return Long.toString(amount);
+        }
+        if (Math.abs(amount) < 1_000) {
+            return amount + " mB";
+        }
+        boolean mega = Math.abs(amount) >= 1_000_000;
+        double scaled = amount / (mega ? 1_000_000.0 : 1_000.0);
+        String number = String.format(Locale.ROOT, Math.abs(scaled) >= 100 ? "%.0f" : Math.abs(scaled) >= 10 ? "%.1f" : "%.2f", scaled);
+        if (number.contains(".")) {
+            number = number.replaceAll("0+$", "").replaceAll("\\.$", "");
+        }
+        return number + (mega ? " MB" : " B");
     }
 
     /**

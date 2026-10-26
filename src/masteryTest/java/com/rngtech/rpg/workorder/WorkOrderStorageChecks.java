@@ -92,9 +92,9 @@ public final class WorkOrderStorageChecks {
         var second = new LoadedWorkOrder(order(2), MachineTraits.EMPTY);
         var third = new LoadedWorkOrder(order(3), MachineTraits.EMPTY);
         var one = MachineWorkOrders.EMPTY.withLoaded(first);
-        require(one.active() == 0 && one.activeOrder().equals(first), "the first order loaded becomes active");
-        var two = one.withLoaded(second);
-        require(two.active() == 0 && two.orders().size() == 2, "a later order loads inactive");
+        require(one.active() == MachineWorkOrders.NONE && one.orders().getFirst().equals(first), "a loaded order waits inactive until it is activated");
+        var two = one.withActive(0).withLoaded(second);
+        require(two.active() == 0 && two.orders().size() == 2, "loading another order keeps the active one");
         var full = two.withLoaded(third);
         require(full.full() && full.withLoaded(first) == full, "a full machine refuses a fourth order");
 

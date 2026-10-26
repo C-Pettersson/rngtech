@@ -12,6 +12,7 @@ import com.rngtech.content.menu.ResonanceCalibratorMenu;
 import com.rngtech.content.menu.WorkOrderMenuSupport;
 import com.rngtech.content.registry.ModBlocks;
 import com.rngtech.content.registry.ModItems;
+import com.rngtech.content.workorder.WorkOrderOperations;
 import com.rngtech.rpg.MachineTraits;
 import com.rngtech.rpg.workorder.LoadedWorkOrder;
 import com.rngtech.rpg.workorder.MachineWorkOrders;
@@ -66,7 +67,8 @@ public final class CalibratorWorkOrderGameTests {
                 menu.quickMoveStack(player, index);
             }
         }
-        check(calibrator.workOrders().orders().size() == 1 && calibrator.workOrders().active() == 0,
+        check(calibrator.workOrders().orders().size() == 1 && calibrator.workOrders().active() == MachineWorkOrders.NONE
+                && WorkOrderOperations.perform(player, calibrator, "activate", "0") && calibrator.workOrders().active() == 0,
                 "The Calibrator did not load its chip: " + calibrator.workOrders());
 
         ItemStackHandler process = calibrator.getProcessInventory();

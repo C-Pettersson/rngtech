@@ -133,7 +133,7 @@ public final class WorkOrderConditionChecks {
                 && WorkOrderConditions.counts(part, atFive, deep) && WorkOrderConditions.minimum(part, deep) == 5,
                 "Deep Ore counts only work one level above the job's minimum");
         WorkOrder order = new WorkOrder("crusher", 1, new WorkObjective(ResourceLocation.parse("rngtech:deep"), part), 4, 0, 100, 0);
-        MachineWorkOrders orders = MachineWorkOrders.EMPTY.withLoaded(new LoadedWorkOrder(order, deep));
+        MachineWorkOrders orders = MachineWorkOrders.EMPTY.withLoaded(new LoadedWorkOrder(order, deep)).withActive(0);
         require(WorkOrderRules.progress(orders, atFour).orders() == orders && WorkOrderRules.progress(orders, atFive).orders().activeOrder().totalProgress() == 1,
                 "the machine's counting follows Deep Ore");
     }

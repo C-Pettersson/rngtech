@@ -12,6 +12,7 @@ import com.rngtech.content.menu.AlloyFurnaceMenu;
 import com.rngtech.content.menu.WorkOrderMenuSupport;
 import com.rngtech.content.registry.ModBlocks;
 import com.rngtech.content.registry.ModItems;
+import com.rngtech.content.workorder.WorkOrderOperations;
 import com.rngtech.rpg.MachineTraits;
 import com.rngtech.rpg.workorder.LoadedWorkOrder;
 import com.rngtech.rpg.workorder.MachineWorkOrders;
@@ -65,7 +66,8 @@ public final class AlloyFurnaceWorkOrderGameTests {
         shiftClick(menu, player, 0);
         check(furnace.workOrders().isEmpty(), "The Alloy Furnace loaded a Crusher chip");
         shiftClick(menu, player, 1);
-        check(furnace.workOrders().orders().size() == 1 && furnace.workOrders().active() == 0, "The Alloy Furnace did not load its chip: " + furnace.workOrders());
+        check(furnace.workOrders().orders().size() == 1 && furnace.workOrders().active() == MachineWorkOrders.NONE
+                && WorkOrderOperations.perform(player, furnace, "activate", "0") && furnace.workOrders().active() == 0, "The Alloy Furnace did not load its chip: " + furnace.workOrders());
         check(menu.workOrderView().slots().size() == 1, "The Alloy Furnace did not sync its chip to the Orders tab");
 
         ItemStackHandler process = furnace.getProcessInventory();
