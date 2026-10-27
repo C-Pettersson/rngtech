@@ -6,6 +6,7 @@ import com.rngtech.content.menu.DispatchTerminalMenu;
 import com.rngtech.content.registry.ModBlockEntities;
 import com.rngtech.content.registry.ModItems;
 import com.rngtech.content.workorder.WorkObjectiveCatalog;
+import com.rngtech.content.workorder.WorkOrderDiscovery;
 import com.rngtech.content.workorder.WorkOrderJobs;
 import com.rngtech.rpg.MachineTraits;
 import com.rngtech.rpg.workorder.WorkOrder;
@@ -120,6 +121,7 @@ public class DispatchTerminalBlockEntity extends BlockEntity implements MenuProv
     @Override
     public AbstractContainerMenu createMenu(int containerId, Inventory playerInventory, Player player) {
         ensureFilled();
+        WorkOrderDiscovery.find(player);
         return new DispatchTerminalMenu(containerId, playerInventory, this);
     }
 

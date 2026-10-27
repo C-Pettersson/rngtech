@@ -5,7 +5,6 @@ import com.rngtech.content.menu.ComponentRecyclerMenu;
 import com.rngtech.content.menu.WorkOrderMenuSupport;
 import com.rngtech.content.recycling.ComponentRecyclerChassis;
 import com.rngtech.content.registry.ModBlocks;
-import com.rngtech.content.registry.ModItems;
 import com.rngtech.rpg.MachineStat;
 
 import net.minecraft.client.gui.GuiGraphics;
@@ -86,7 +85,7 @@ public class ComponentRecyclerScreen extends AbstractContainerScreen<ComponentRe
                     .gear(ComponentRecyclerMenu.TAB_GEAR)
                     .stats(ComponentRecyclerMenu.TAB_STATS)
                     .refinement(ComponentRecyclerMenu.TAB_REFINEMENT)
-                    .tab(ComponentRecyclerMenu.TAB_ORDERS, "rngtech.tab.orders", ModItems.JOB_CHIP.get());
+                    .orders(ComponentRecyclerMenu.TAB_ORDERS, menu::workOrdersShown);
         }
         tabs = tabBuilder.build();
         workOrdersTab = new WorkOrdersTab(menu, STAT_ACCENT);

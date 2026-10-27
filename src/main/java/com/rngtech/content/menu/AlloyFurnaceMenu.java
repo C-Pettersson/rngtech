@@ -6,6 +6,7 @@ import com.rngtech.content.blockentity.BaseMachineBlockEntity;
 import com.rngtech.content.item.JobChipItem;
 import com.rngtech.content.registry.ModMenus;
 import com.rngtech.content.workorder.DriveBays;
+import com.rngtech.content.workorder.WorkOrderDiscovery;
 import com.rngtech.rpg.MachineStat;
 import com.rngtech.rpg.MachineStatAccumulator;
 import com.rngtech.rpg.MachineTraits;
@@ -28,6 +29,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.inventory.ContainerLevelAccess;
+import net.minecraft.world.inventory.DataSlot;
 import net.minecraft.world.inventory.SimpleContainerData;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
@@ -116,6 +118,7 @@ public class AlloyFurnaceMenu extends AbstractContainerMenu implements MasteryMe
             this::unspentPassivePoints,
             MachineMasteryFamily.ALLOY_FURNACE.startNodeId()
     );
+    private final DataSlot ordersShown;
     private int selectedTab = TAB_PROCESSING;
 
     public AlloyFurnaceMenu(int containerId, Inventory playerInventory, RegistryFriendlyByteBuf extraData) {
@@ -186,9 +189,11 @@ public class AlloyFurnaceMenu extends AbstractContainerMenu implements MasteryMe
             addSlot(new DriveBaySlot(bays, bay, () -> selectedTab == TAB_ORDERS));
         }
         addDataSlots(data);
+        ordersShown = addDataSlot(WorkOrderDiscovery.shownSlot(playerInventory.player, furnace));
     }
 
     @Override public WorkOrderHost workOrderHost() { return furnace; }
+    @Override public boolean workOrdersShown() { return ordersShown.get() != 0; }
     @Override public String workOrderFamily() { return WorkOrderFamilies.of(masteryFamily()); }
     @Override public int workOrderStage() { return ascendancyEntryStage(); }
     @Override public int workOrderMasteryLevel() { return machineLevel(); }

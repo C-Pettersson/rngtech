@@ -6,6 +6,7 @@ import com.rngtech.content.blockentity.FurnaceBlockEntity;
 import com.rngtech.content.item.JobChipItem;
 import com.rngtech.content.registry.ModMenus;
 import com.rngtech.content.workorder.DriveBays;
+import com.rngtech.content.workorder.WorkOrderDiscovery;
 import com.rngtech.rpg.MachineStat;
 import com.rngtech.rpg.MachineStatAccumulator;
 import com.rngtech.rpg.MachineTraits;
@@ -29,6 +30,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.inventory.ContainerLevelAccess;
+import net.minecraft.world.inventory.DataSlot;
 import net.minecraft.world.inventory.SimpleContainerData;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
@@ -127,6 +129,7 @@ public class FurnaceMenu extends AbstractContainerMenu implements MasteryMenuVie
     private final ItemStackHandler refinementTarget = new ItemStackHandler(1);
     private final PassiveProgressionView passiveProgressionView =
             MasteryMenuSupport.progressionView(this::hasPassiveNodeIndex, this::machineLevel, this::unspentPassivePoints, MachineMasteryFamily.FURNACE.startNodeId());
+    private final DataSlot ordersShown;
     private int selectedTab = TAB_PROCESSING;
 
     public FurnaceMenu(int containerId, Inventory playerInventory, RegistryFriendlyByteBuf extraData) {
@@ -210,6 +213,7 @@ public class FurnaceMenu extends AbstractContainerMenu implements MasteryMenuVie
             addSlot(new DriveBaySlot(bays, bay, () -> selectedTab == TAB_ORDERS));
         }
         addDataSlots(data);
+        ordersShown = addDataSlot(WorkOrderDiscovery.shownSlot(playerInventory.player, furnace));
     }
 
     @Override
@@ -796,6 +800,7 @@ public class FurnaceMenu extends AbstractContainerMenu implements MasteryMenuVie
         return MasteryMenuSupport.snapshot(data, DATA_MACHINE_PROGRESSION_START, masteryFamily());
     }
     @Override public WorkOrderHost workOrderHost() { return furnace; }
+    @Override public boolean workOrdersShown() { return ordersShown.get() != 0; }
     @Override public String workOrderFamily() { return WorkOrderFamilies.of(masteryFamily()); }
     @Override public int workOrderStage() { return ascendancyEntryStage(); }
     @Override public int workOrderMasteryLevel() { return machineLevel(); }

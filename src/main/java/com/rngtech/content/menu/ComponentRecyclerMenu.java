@@ -6,6 +6,7 @@ import com.rngtech.content.blockentity.ComponentRecyclerBlockEntity;
 import com.rngtech.content.item.JobChipItem;
 import com.rngtech.content.registry.ModMenus;
 import com.rngtech.content.workorder.DriveBays;
+import com.rngtech.content.workorder.WorkOrderDiscovery;
 import com.rngtech.rpg.MachineStatAccumulator;
 import com.rngtech.rpg.MachineTraits;
 import com.rngtech.rpg.workorder.MachineWorkOrders;
@@ -20,6 +21,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.inventory.ContainerLevelAccess;
+import net.minecraft.world.inventory.DataSlot;
 import net.minecraft.world.inventory.SimpleContainerData;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
@@ -67,6 +69,7 @@ public class ComponentRecyclerMenu extends AbstractContainerMenu implements Stat
     private final ComponentRecyclerBlockEntity recycler;
     private final ItemStackHandler refinementTarget = new ItemStackHandler(1);
     private final boolean manual;
+    private final DataSlot ordersShown;
     private int selectedTab = TAB_PROCESSING;
     private ContainerData workOrderData;
 
@@ -133,6 +136,7 @@ public class ComponentRecyclerMenu extends AbstractContainerMenu implements Stat
         workOrderData = playerInventory.player.level().isClientSide ? new SimpleContainerData(WorkOrderMenuSupport.FIELD_COUNT)
                 : WorkOrderMenuSupport.data(recycler);
         addDataSlots(workOrderData);
+        ordersShown = addDataSlot(WorkOrderDiscovery.shownSlot(playerInventory.player, recycler));
     }
 
     public void selectTab(int tab) {
@@ -150,6 +154,7 @@ public class ComponentRecyclerMenu extends AbstractContainerMenu implements Stat
     }
 
     @Override public WorkOrderHost workOrderHost() { return recycler; }
+    @Override public boolean workOrdersShown() { return ordersShown.get() != 0; }
     @Override public String workOrderFamily() { return WorkOrderFamilies.COMPONENT_RECYCLER; }
     @Override public int workOrderStage() { return recycler.workOrderStage(); }
     @Override public int workOrderMasteryLevel() { return 0; }

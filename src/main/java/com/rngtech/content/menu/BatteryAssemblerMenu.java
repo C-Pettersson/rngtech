@@ -7,6 +7,7 @@ import com.rngtech.content.item.JobChipItem;
 import com.rngtech.content.purge.FluidPurgeSupport;
 import com.rngtech.content.registry.ModMenus;
 import com.rngtech.content.workorder.DriveBays;
+import com.rngtech.content.workorder.WorkOrderDiscovery;
 import com.rngtech.rpg.MachineStatAccumulator;
 import com.rngtech.rpg.MachineTraits;
 import com.rngtech.rpg.workorder.MachineWorkOrders;
@@ -23,6 +24,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.inventory.ContainerLevelAccess;
+import net.minecraft.world.inventory.DataSlot;
 import net.minecraft.world.inventory.SimpleContainerData;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
@@ -74,6 +76,7 @@ public class BatteryAssemblerMenu extends AbstractContainerMenu implements StatB
     private final ContainerData data;
     private final BatteryAssemblerBlockEntity assembler;
     private final ItemStackHandler refinementTarget = new ItemStackHandler(1);
+    private final DataSlot ordersShown;
     private int selectedTab = TAB_PROCESSING;
     private final ContainerData workOrderData;
 
@@ -142,11 +145,17 @@ public class BatteryAssemblerMenu extends AbstractContainerMenu implements StatB
         workOrderData = playerInventory.player.level().isClientSide ? new SimpleContainerData(WorkOrderMenuSupport.FIELD_COUNT)
                 : WorkOrderMenuSupport.data(assembler);
         addDataSlots(workOrderData);
+        ordersShown = addDataSlot(WorkOrderDiscovery.shownSlot(playerInventory.player, assembler));
     }
 
     @Override
     public WorkOrderHost workOrderHost() {
         return assembler;
+    }
+
+    @Override
+    public boolean workOrdersShown() {
+        return ordersShown.get() != 0;
     }
 
     @Override

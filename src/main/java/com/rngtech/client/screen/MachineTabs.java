@@ -18,6 +18,7 @@ import net.minecraft.world.phys.HitResult;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.BooleanSupplier;
 
 /**
  * Tab strip shared by the tabbed machine screens. Tabs stack down the panel's left edge with icon and name,
@@ -48,7 +49,7 @@ public final class MachineTabs {
         MachineTabs machineTabs();
     }
 
-    public record Tab(int id, Component label, ItemStack icon) {
+    public record Tab(int id, Component label, ItemStack icon, BooleanSupplier shown) {
     }
 
     public record Style(int panel, int light, int dark, int idle, int hover, int text, int idleText) {
@@ -77,7 +78,7 @@ public final class MachineTabs {
 
     public Mode mode() {
         int left = screen.getGuiLeft();
-        boolean railFits = RAIL_TOP + tabs.size() * TAB_STEP <= screen.getYSize();
+        boolean railFits = RAIL_TOP + shownTabs().size() * TAB_STEP <= screen.getYSize();
         if (railFits && left >= labelledWidth + SCREEN_MARGIN) {
             return Mode.LABELLED;
         }
@@ -89,6 +90,7 @@ public final class MachineTabs {
 
     public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, int selectedId) {
         Mode mode = mode();
+        List<Tab> tabs = shownTabs();
         for (int index = 0; index < tabs.size(); index++) {
             Tab tab = tabs.get(index);
             Rect2i area = tabArea(mode, index);
@@ -141,31 +143,33 @@ public final class MachineTabs {
         }
         int index = indexAt(mode, mouseX, mouseY);
         if (index >= 0) {
-            guiGraphics.renderTooltip(font(), tabs.get(index).label(), mouseX, mouseY);
+            guiGraphics.renderTooltip(font(), shownTabs().get(index).label(), mouseX, mouseY);
         }
     }
 
     /** Returns the id of the tab under the mouse, or -1. */
     public int tabAt(double mouseX, double mouseY) {
         int index = indexAt(mode(), mouseX, mouseY);
-        return index < 0 ? -1 : tabs.get(index).id();
+        return index < 0 ? -1 : shownTabs().get(index).id();
     }
 
     /** Screen-space rectangles the tabs cover outside the panel, for recipe viewer exclusion areas. */
     public List<Rect2i> areas() {
         Mode mode = mode();
-        if (tabs.isEmpty()) {
+        int count = shownTabs().size();
+        if (count == 0) {
             return List.of();
         }
         Rect2i first = tabArea(mode, 0);
-        Rect2i last = tabArea(mode, tabs.size() - 1);
+        Rect2i last = tabArea(mode, count - 1);
         int right = last.getX() + last.getWidth();
         int bottom = last.getY() + last.getHeight();
         return List.of(new Rect2i(first.getX(), first.getY(), right - first.getX(), bottom - first.getY()));
     }
 
     private int indexAt(Mode mode, double mouseX, double mouseY) {
-        for (int index = 0; index < tabs.size(); index++) {
+        int count = shownTabs().size();
+        for (int index = 0; index < count; index++) {
             Rect2i area = tabArea(mode, index);
             if (mouseX >= area.getX() && mouseX < area.getX() + area.getWidth()
                     && mouseY >= area.getY() && mouseY < area.getY() + area.getHeight()) {
@@ -215,8 +219,18 @@ public final class MachineTabs {
         }
     }
 
-    private Tab tab(int id) {
+    private List<Tab> shownTabs() {
+        List<Tab> shown = new ArrayList<>(tabs.size());
         for (Tab tab : tabs) {
+            if (tab.shown().getAsBoolean()) {
+                shown.add(tab);
+            }
+        }
+        return shown;
+    }
+
+    private Tab tab(int id) {
+        for (Tab tab : shownTabs()) {
             if (tab.id() == id) {
                 return tab;
             }
@@ -242,7 +256,11 @@ public final class MachineTabs {
         }
 
         public Builder tab(int id, Component label, ItemStack icon) {
-            tabs.add(new Tab(id, label, icon));
+            return tab(id, label, icon, () -> true);
+        }
+
+        private Builder tab(int id, Component label, ItemStack icon, BooleanSupplier shown) {
+            tabs.add(new Tab(id, label, icon, shown));
             return this;
         }
 
@@ -265,6 +283,11 @@ public final class MachineTabs {
 
         public Builder mastery(int id) {
             return tab(id, "rngtech.tab.mastery", ModItems.MASTERY_REFUND.get());
+        }
+
+        /** The Orders tab, hidden until {@code shown} holds, so players who have not found Work Orders do not see it. */
+        public Builder orders(int id, BooleanSupplier shown) {
+            return tab(id, Component.translatable("rngtech.tab.orders"), new ItemStack(ModItems.JOB_CHIP.get()), shown);
         }
 
         public Builder style(Style style) {

@@ -91,7 +91,7 @@ public class ForestryCartScreen extends AbstractContainerScreen<ForestryCartMenu
                 .tab(ForestryCartMenu.TAB_CART, "rngtech.tab.cart", ModItems.FORESTRY_CART.get())
                 .stats(ForestryCartMenu.TAB_STATS)
                 .mastery(ForestryCartMenu.TAB_MASTERY)
-                .tab(ForestryCartMenu.TAB_ORDERS, "rngtech.tab.orders", ModItems.JOB_CHIP.get())
+                .orders(ForestryCartMenu.TAB_ORDERS, menu::workOrdersShown)
                 .build();
         workOrdersTab = new WorkOrdersTab(menu, ORDERS_ACCENT);
         masterySupport = new MasteryScreenSupport<>(

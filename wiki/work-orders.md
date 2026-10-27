@@ -129,6 +129,12 @@ These do not take chips: generators, the [Battery Chassis](battery-chassis.md), 
 
 Each machine in the table has an **Orders** tab with three **drive bays**. To load a chip, put it in a bay. While the tab is open, you can also Shift-click a chip in your inventory to put it in the next empty bay.
 
+The Orders tab stays hidden until you find Work Orders. Any of these shows it on all your machines, for good:
+
+- Open a Dispatch Terminal.
+- Open a machine while you carry a Dispatch Terminal, a Job Chip, or a Completed Job Chip.
+- Open a machine that has a chip in a bay.
+
 A bay refuses:
 
 - A chip for a different kind of machine
