@@ -82,6 +82,12 @@ public final class WorkOrderStorageChecks {
         json.addProperty("active", 7);
         require(MachineWorkOrders.CODEC.parse(JsonOps.INSTANCE, json).getOrThrow().active() == MachineWorkOrders.NONE,
                 "an active index past the loaded orders means none is active");
+        LoadedWorkOrder mirrored = new LoadedWorkOrder(order(1), magic(), List.of(9L), 9, 0).withMirrored(true);
+        roundTrip(MachineWorkOrders.CODEC, MachineWorkOrders.STREAM_CODEC, MachineWorkOrders.EMPTY.withLoaded(mirrored), "a loaded Mirrored chip");
+        require(mirrored.withPartProgress(0, 20).withRush(5).withoutProgress().withWorkCarry(3).withOrder(order(2)).mirrored(),
+                "a loaded chip stays Mirrored through progress, Rush, and resets");
+        require(!full.orders().get(0).mirrored(), "a loaded chip is not Mirrored unless marked");
+
         List<LoadedWorkOrder> four = new ArrayList<>(full.orders());
         four.add(new LoadedWorkOrder(order(4), MachineTraits.EMPTY));
         require(new MachineWorkOrders(four, 0).orders().size() == MachineWorkOrders.SLOTS, "a machine never holds more than three orders");

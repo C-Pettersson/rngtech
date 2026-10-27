@@ -875,7 +875,7 @@ public class PhaseCradleBlockEntity extends BlockEntity implements MenuProvider,
         if (target.isEmpty()) {
             return STATUS_NO_TARGET;
         }
-        if (!RefinementTargets.canPhase(target) || isLocked(RefinementTargets.storedTraits(target))) {
+        if (!RefinementTargets.canPhase(target) || RefinementTargets.isMirrored(target) || isLocked(RefinementTargets.storedTraits(target))) {
             return STATUS_LOCKED;
         }
         if (line.usableCoils() < recipe.coils()) {
@@ -1012,9 +1012,9 @@ public class PhaseCradleBlockEntity extends BlockEntity implements MenuProvider,
         );
     }
 
-    /** The donor affixes Graft can move, in the donor's affix order. */
+    /** The donor affixes Graft can move, in the donor's affix order. Graft strips its donor, so a Mirrored donor has none. */
     public static List<MachineModifier> donorAffixes(ItemStack donor) {
-        if (!RefinementTargets.canPhase(donor)) {
+        if (!RefinementTargets.canPhase(donor) || RefinementTargets.isMirrored(donor)) {
             return List.of();
         }
         return RefinementTargets.storedTraits(donor).modifiers().stream()

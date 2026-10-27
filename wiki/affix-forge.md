@@ -30,6 +30,7 @@ wiki:
     - rngtech:destabilization_crystal
     - rngtech:stabilization_crystal
     - rngtech:volatile_catalyst
+    - rngtech:mirror_catalyst
 ---
 
 # Affix Forge
@@ -71,7 +72,7 @@ Every refinable item has a [rarity](rarity-and-affixes.md) and a budget of [Refi
 - **Rarity** sets how many affixes the item can hold. Normal items have none, Magic items hold one prefix and one suffix, and Rare items hold up to three of each.
 - **RP** is spent by every successful operation. When an item runs out, you cannot refine it further, so plan where you spend it.
 
-A failed or illegal operation costs nothing: no catalyst and no RP. Identify an item before you refine it (see [Getting Started](getting-started.md)). Unidentified items, recycled (stripped) items, and [Corrupted](rarity-and-affixes.md#corruption) items cannot be refined. Unique items accept only a Volatile Catalyst.
+A failed or illegal operation costs nothing: no catalyst and no RP. Identify an item before you refine it (see [Getting Started](getting-started.md)). Unidentified items, recycled (stripped) items, [Corrupted](rarity-and-affixes.md#corruption) items, and [Mirrored](rarity-and-affixes.md#mirrored-items) items cannot be refined. Unique items accept only a Volatile Catalyst.
 
 Affix and tier odds are weighted, not guaranteed. Tier 7 affixes can appear only on Stage 8 Exotic items, and only when an affix is added or rerolled. Upgrades and the Ascension catalysts stop at Tier 6. See [Rarity and Affixes](rarity-and-affixes.md#affix-tiers) for tiers and weights.
 
@@ -98,12 +99,13 @@ The modifier list shows the item's current affixes. You cannot pick which affix 
 | {{ item('rngtech:expansion_crystal') }} | Adds affixes until every open slot is full or the RP runs out. A Normal item becomes Magic. | 1–18 per affix | Resonance Matrix |
 | {{ item('rngtech:null_crystal') }} | Removes one random rolled affix. | 1–4 | Resonance Matrix |
 | {{ item('rngtech:volatile_catalyst') }} | [Corrupts](rarity-and-affixes.md#corruption) a machine part or Battery Cell, Uniques included. The item can never be refined again. | None | Resonance Matrix |
+| {{ item('rngtech:mirror_catalyst') }} | Makes a [Mirrored](rarity-and-affixes.md#mirrored-items) copy of a machine part, Battery Cell, machine item, or Job Chip. The original does not change. The copy can never be changed. | None | Resonance Matrix |
 
 Stronger affixes cost more RP. Each tier above Tier 1 raises the lowest possible cost by 3 RP, up to the catalyst's maximum. For example, an Affix Injector that adds a Tier 3 affix costs 7–8 RP. The final cost is capped by what the item has left, so a low-RP item can still gamble, but may spend everything. The Affix Upgrader needs at least 2 RP to start, and the Greater Affix Upgrader at least 6.
 
 Removing or rerolling is cheap. The Nullifier Coil, Chaos Crystal, and Null Crystal cost 1 RP half the time, 2 RP 30% of the time, 3 RP 15% of the time, and 4 RP 5% of the time.
 
-A placed machine's Refinement tab works the same way, with one catalyst slot and no focus slot. It needs no forge upgrades: every catalyst works there.
+A placed machine's Refinement tab works the same way, with one catalyst slot and no focus slot. It needs no forge upgrades. Every catalyst except the Mirror Catalyst works there.
 
 Removing affixes never touches an item's fixed identity traits or base stats. Only rolled affixes can be added or removed.
 
@@ -115,13 +117,13 @@ The forge has three upgrade slots. Upgrades are reusable: they stay installed an
 |---|---|
 | {{ item('rngtech:affix_lens_array') }} | Modifier lenses in the focus slot. |
 | {{ item('rngtech:affix_modifier_socket') }} | Modifier crystals in the focus slot. |
-| {{ item('rngtech:affix_resonance_matrix') }} | Greater Affix Upgrader, Ascension Catalyst, Ascension Matrix, Chaos Crystal, Expansion Crystal, Null Crystal, and Volatile Catalyst. |
+| {{ item('rngtech:affix_resonance_matrix') }} | Greater Affix Upgrader, Ascension Catalyst, Ascension Matrix, Chaos Crystal, Expansion Crystal, Null Crystal, Volatile Catalyst, and Mirror Catalyst. |
 
 Without an upgrade, the forge still runs the Affix Injector, Affix Upgrader, and Nullifier Coil. If a catalyst or focus needs a missing upgrade, the outcome panel names it and Reforge refuses without using anything.
 
 ### Modifier lenses
 
-With an Affix Lens Array installed, a lens in the focus slot makes affixes from its family three times as likely to be picked. Lenses work with every catalyst except the Volatile Catalyst:
+With an Affix Lens Array installed, a lens in the focus slot makes affixes from its family three times as likely to be picked. Lenses work with every catalyst except the Volatile Catalyst and the Mirror Catalyst:
 
 - the Affix Injector, Expansion Crystal, Ascension Catalyst, and Ascension Matrix favor the lens's family when they add affixes;
 - the Affix Upgrader, Greater Affix Upgrader, and Ascension Matrix favor it when they choose the affix to upgrade;
@@ -146,8 +148,8 @@ With an Affix Modifier Socket installed, a crystal in the focus slot changes how
 
 | Crystal | Works with | Effect |
 |---|---|---|
-| {{ item('rngtech:conservation_crystal') }} | Every catalyst except the Volatile Catalyst | 25% chance to keep the catalyst. The crystal is used up. |
-| {{ item('rngtech:frugality_crystal') }} | Every catalyst except the Ascension Matrix and Volatile Catalyst | 25% chance the operation costs only 1 RP. For an Expansion Crystal that is the whole fill. The crystal is used up. |
+| {{ item('rngtech:conservation_crystal') }} | Every catalyst except the Volatile Catalyst and Mirror Catalyst | 25% chance to keep the catalyst. The crystal is used up. |
+| {{ item('rngtech:frugality_crystal') }} | Every catalyst except the Ascension Matrix, Volatile Catalyst, and Mirror Catalyst | 25% chance the operation costs only 1 RP. For an Expansion Crystal that is the whole fill. The crystal is used up. |
 | {{ item('rngtech:transmutation_crystal') }} | Affix Upgrader, Greater Affix Upgrader | Swaps the upgraded affix for a different one in the same prefix or suffix slot. |
 | {{ item('rngtech:resonance_crystal') }} | Affix Upgrader, Greater Affix Upgrader | Keeps the upgraded affix's roll quality in its new tier. |
 | {{ item('rngtech:destabilization_crystal') }} | Affix Upgrader, Greater Affix Upgrader | Rerolls the item's other affixes, at their current tiers, after the upgrade. |
@@ -164,6 +166,21 @@ Click **Reforge** to roll. The catalyst is always used up, and so is a Stabiliza
 A placed machine's Refinement tab also accepts the catalyst, without a focus slot. Hover its **Apply** button with a catalyst inserted to see the same outcome table.
 
 On a Job Chip, the outcomes change the job's reward and conditions instead of adding an implicit. See [Work Orders](work-orders.md#refining-and-corrupting-chips).
+
+### Copying with a Mirror Catalyst
+
+The {{ item('rngtech:mirror_catalyst') }} needs a Resonance Matrix. To copy an item:
+
+1. Put the item in the target slot.
+2. Put the Mirror Catalyst in the catalyst slot.
+3. Make sure that the focus slot is empty. No lens or crystal works with the Mirror Catalyst.
+4. Click **Reforge**.
+
+The item in the target slot does not change. The copy goes to your inventory. If your inventory is full, the copy drops at your feet. The catalyst is used up, and no RP is spent.
+
+The copy is [Mirrored](rarity-and-affixes.md#mirrored-items), and nothing can change it. The RP readout shows Mirrored. The outcome panel tells you when the forge cannot copy an item, such as a Unique.
+
+A placed machine's Refinement tab does not accept the Mirror Catalyst. To copy a machine, break it and copy its item.
 
 ### Automation
 
@@ -182,6 +199,8 @@ The Volatile Catalyst asks you to make three machines go wrong on purpose:
 - two {{ item('rngtech:jam_debris') }} from [Crusher](crusher.md#jam-debris) jams.
 
 {{ crafting("rngtech:volatile_catalyst") }}
+
+The Mirror Catalyst has no recipe. Only a [Work Order](work-orders.md#rewards) of Tier IV or V can pay it.
 
 Upgrades. The Resonance Matrix needs calibrated components from a [Resonance Calibrator](resonance-calibrator.md):
 

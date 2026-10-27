@@ -8,6 +8,7 @@ import com.rngtech.content.item.ModularToolItem;
 import com.rngtech.content.item.RefinementConsumableItem;
 import com.rngtech.content.item.ToolHeadItem;
 import com.rngtech.content.item.ToolRodItem;
+import com.rngtech.content.menu.RefinementMenuSupport;
 import com.rngtech.content.menu.ToolBenchMenu;
 import com.rngtech.content.registry.ModBlockEntities;
 import com.rngtech.content.registry.ModDataComponents;
@@ -141,6 +142,10 @@ public class ToolBenchBlockEntity extends BlockEntity implements MenuProvider {
         ItemStack target = refinementTarget(headTarget);
         if (!RefinementTargets.canRefine(target)) {
             showFailure(player, "rngtech.tool_bench.failure.invalid_refinement_target");
+            return false;
+        }
+        if (RefinementTargets.isMirrored(target)) {
+            showFailure(player, RefinementMenuSupport.MIRRORED_FAILURE);
             return false;
         }
 

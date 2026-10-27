@@ -131,7 +131,7 @@ public class AffixForgeBlockEntity extends BlockEntity implements MenuProvider {
                 return null;
             case KINETIC_LENS, EFFICIENCY_LENS:
                 return hasLensArray ? null : "rngtech.refinement.failure.requires_lens_array";
-            case UPGRADE_SELECTED_MODIFIER, ASCEND_RARITY, ASCENSION_CATALYST, CHAOS_CRYSTAL, EXPANSION_CRYSTAL, NULL_CRYSTAL, CORRUPT:
+            case UPGRADE_SELECTED_MODIFIER, ASCEND_RARITY, ASCENSION_CATALYST, CHAOS_CRYSTAL, EXPANSION_CRYSTAL, NULL_CRYSTAL, CORRUPT, MIRROR:
                 return hasResonanceMatrix ? null : "rngtech.refinement.failure.requires_resonance_matrix";
             default:
                 return "rngtech.refinement.failure.invalid_consumable";

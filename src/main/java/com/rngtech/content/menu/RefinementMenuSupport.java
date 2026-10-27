@@ -23,9 +23,11 @@ import com.rngtech.rpg.unique.UniqueItems;
 import com.rngtech.rpg.workorder.WorkOrderConditions;
 
 import net.minecraft.network.chat.Component;
+import net.minecraft.util.Unit;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ItemLike;
+import net.neoforged.neoforge.items.ItemHandlerHelper;
 import net.neoforged.neoforge.items.ItemStackHandler;
 import net.neoforged.neoforge.items.SlotItemHandler;
 
@@ -40,6 +42,7 @@ public final class RefinementMenuSupport {
     public static final int REFINEMENT_TARGET_SLOT_X = 24;
     public static final int REFINEMENT_CONSUMABLE_SLOT_X = 68;
     public static final int REFINEMENT_SLOT_Y = 42;
+    public static final String MIRRORED_FAILURE = "rngtech.refinement.failure.mirrored";
 
     public static ItemStack machineDisplayStack(ItemLike item, MachineTraits traits) {
         ItemStack stack = new ItemStack(item);
@@ -72,6 +75,10 @@ public final class RefinementMenuSupport {
         ItemStack consumable = machine.getRefinementInventory().getStackInSlot(0);
         if (!(consumable.getItem() instanceof RefinementConsumableItem refinementItem)) {
             showFailure(player, "rngtech.refinement.failure.invalid_consumable");
+            return false;
+        }
+        if (machine.isMirrored()) {
+            showFailure(player, MIRRORED_FAILURE);
             return false;
         }
 
@@ -115,6 +122,13 @@ public final class RefinementMenuSupport {
         ItemStack consumable = inventory.getStackInSlot(SLOT_CONSUMABLE);
         if (!(consumable.getItem() instanceof RefinementConsumableItem refinementItem)) {
             showFailure(player, "rngtech.refinement.failure.invalid_consumable");
+            return false;
+        }
+        if (refinementItem.operation() == RefinementOperation.MIRROR) {
+            return mirror(player, inventory, target);
+        }
+        if (RefinementTargets.isMirrored(target)) {
+            showFailure(player, MIRRORED_FAILURE);
             return false;
         }
         if (refinementItem.operation() == RefinementOperation.CORRUPT
@@ -174,6 +188,31 @@ public final class RefinementMenuSupport {
             shrinkStack(inventory, SLOT_MODIFIER);
         }
         showSuccess(player, result);
+        return true;
+    }
+
+    /**
+     * A Mirror Catalyst: the target stays as it was, and the player gets one Mirrored copy of it. No focus item works
+     * with the Mirror, so a filled focus slot stops it.
+     */
+    private static boolean mirror(Player player, ItemStackHandler inventory, ItemStack target) {
+        if (RefinementTargets.isMirrored(target)) {
+            showFailure(player, MIRRORED_FAILURE);
+            return false;
+        }
+        if (!RefinementTargets.canMirror(target)) {
+            showFailure(player, "rngtech.refinement.failure.cannot_mirror");
+            return false;
+        }
+        if (inventory.getSlots() > SLOT_MODIFIER && !inventory.getStackInSlot(SLOT_MODIFIER).isEmpty()) {
+            showFailure(player, "rngtech.refinement.failure.focus_rejects_mirror");
+            return false;
+        }
+        ItemStack copy = target.copyWithCount(1);
+        copy.set(ModDataComponents.MIRRORED.get(), Unit.INSTANCE);
+        shrinkStack(inventory, SLOT_CONSUMABLE);
+        ItemHandlerHelper.giveItemToPlayer(player, copy);
+        player.displayClientMessage(Component.translatable("rngtech.refinement.success.mirror"), true);
         return true;
     }
 

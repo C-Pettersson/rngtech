@@ -11,7 +11,8 @@
                         {
                             "function": "minecraft:copy_components",
                             "include": [
-                                "rngtech:work_orders"
+                                "rngtech:work_orders",
+                                "rngtech:mirrored"
                             ],
                             "source": "block_entity"
                         }

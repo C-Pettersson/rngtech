@@ -302,9 +302,11 @@ The reward table `rngtech:challenges/work_order` is a loot table with one pool a
 - The conditions `rngtech:order_tier` and `rngtech:order_prestige` take an inclusive `min` and `max`.
 - `rngtech:machine_family` takes a `family`, such as `melter`, and passes only for that machine's jobs.
 
-When the terminal lists the job, Bounty multiplies the rolled count. A Unique always pays one.
+When the terminal lists the job, Bounty multiplies the rolled count. A Unique or a Mirror Catalyst always pays one.
 
 The Unique reward is three entries in `rngtech:challenges/work_order`, one per Prestige band. Each nests the table `rngtech:work_orders/unique_reward`, which picks the Unique. Change the band weights to make Uniques more or less common. Change the nested table to change which Uniques drop, or how strongly they favour the job's machine.
+
+The Mirror Catalyst has no recipe and no config key. Its only source is three entries in `rngtech:challenges/work_order`, one per Prestige band, for Tier IV and V jobs. Remove those entries to remove the Mirror Catalyst from your pack, or change their weights to change how often it drops.
 
 ## Phase Array
 

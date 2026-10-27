@@ -2,6 +2,7 @@ package com.rngtech.content.workorder;
 
 import com.rngtech.content.loot.ChallengeContext;
 import com.rngtech.content.loot.ChallengeLoot;
+import com.rngtech.content.registry.ModItems;
 import com.rngtech.content.registry.ModTags;
 import com.rngtech.rpg.workorder.FulfilledWorkOrder;
 import com.rngtech.rpg.workorder.WorkOrder;
@@ -45,7 +46,7 @@ public final class WorkOrderRewards {
         return order.withRewards(ItemContainerContents.fromItems(roll(level, pos, context, random)));
     }
 
-    /** Rolls the reward table once for {@code order} and scales each result's amount by Bounty, except a Unique's. */
+    /** Rolls the reward table once for {@code order} and scales each result's amount by Bounty, except a fixed one's. */
     public static List<ItemStack> roll(Level level, BlockPos pos, FulfilledWorkOrder order, RandomGenerator random) {
         List<ItemStack> rolled = List.of();
         for (int attempt = 0; attempt < ROLL_ATTEMPTS && rolled.isEmpty(); attempt++) {
@@ -63,9 +64,9 @@ public final class WorkOrderRewards {
         return merged;
     }
 
-    /** Whether Bounty, Rush, and refinement leave {@code stack}'s amount alone: a Unique reward always pays one. */
+    /** Whether Bounty, Rush, and refinement leave {@code stack}'s amount alone: a Unique or Mirror Catalyst reward always pays one. */
     public static boolean fixedAmount(ItemStack stack) {
-        return stack.is(ModTags.Items.UNIQUES);
+        return stack.is(ModTags.Items.UNIQUES) || stack.is(ModItems.MIRROR_CATALYST.get());
     }
 
     /** The loot table {@code id} names, or {@code rngtech:challenges/work_order} for "" or an id that does not parse. */

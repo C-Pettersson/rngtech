@@ -203,6 +203,8 @@ A {{ item('rngtech:volatile_catalyst') }} corrupts a chip, with the usual [corru
 | Warped | Rerolls each condition's value within its tier. The reward stays the same. |
 | Blighted | Adds a condition that costs the machine but adds no reward. |
 
+A {{ item('rngtech:mirror_catalyst') }} copies a chip. You keep the original and get a [Mirrored](rarity-and-affixes.md#mirrored-items) copy. The copy has the same job, conditions, and reward. You cannot refine, corrupt, or copy it again. It stays Mirrored in a drive bay.
+
 The [Phase Array](phase-array.md) does not accept Job Chips.
 
 ### Rush
@@ -234,8 +236,11 @@ Each job pays one kind of reward, shown on the chip, so you choose jobs by what 
 | A {{ item('rngtech:glyph') }} of the job's tier | All |
 | {{ item('rngtech:volatile_catalyst', 'Volatile Catalysts') }}, {{ item('rngtech:affix_upgrade', 'Greater Affix Upgraders') }}, or an {{ item('rngtech:ascension_matrix') }} | III and higher |
 | An unidentified [Unique](uniques.md), most often one for the job's machine | All, but rare |
+| A {{ item('rngtech:mirror_catalyst') }} | IV and V, very rare |
 
 A Unique is the rarest reward. About 1 job in 130 pays one, so you see one every 20 or so refreshes. Prestige makes it more likely: about 1 in 160 at Prestige 0, 1 in 50 at Prestige 1, and 1 in 20 at Prestige 2 or more. The terminal picks the reward when it lists the job, so Prestige that you add later does not change it. A Unique reward is always one item, whatever the Bounty.
+
+A Mirror Catalyst is much rarer than a Unique. Only Tier IV and V jobs can pay it. About 1 job in 2,400 of all tiers pays one. Prestige makes it more likely: each Prestige band doubles the chance, up to Prestige 2. A Mirror Catalyst reward is always one item, whatever the Bounty.
 
 A Unique that fits the job's machine is three times as likely as one that does not. For example, a Melter job favours the Mineshaft Worn Pick-Jaw, both Heat Cores, the Trial Vault Escapement, and the Witch-Bottle Reflux Pump. Every Unique can still drop from any job. Battery Cell Uniques fit every machine, so they are never favoured.
 

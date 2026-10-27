@@ -233,6 +233,7 @@ public final class RNGTechJeiPlugin implements IModPlugin {
         );
         registration.addIngredientInfo(ModItems.SOUL_TRANSFER.get(), Component.translatable("rngtech.jei.soul_transfer.info"));
         registration.addIngredientInfo(ModItems.VOLATILE_CATALYST.get(), volatileCatalystInfo().toArray(Component[]::new));
+        registration.addIngredientInfo(ModItems.MIRROR_CATALYST.get(), Component.translatable("rngtech.jei.mirror_catalyst.info"));
         registration.addIngredientInfo(
                 ModItems.JAM_DEBRIS.get(),
                 Component.translatable(

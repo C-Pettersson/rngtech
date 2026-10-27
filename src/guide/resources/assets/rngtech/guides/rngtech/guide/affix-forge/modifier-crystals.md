@@ -12,8 +12,8 @@ With an Affix Modifier Socket installed, a crystal in the focus slot changes how
 
 | Crystal | Works with | Effect |
 |---|---|---|
-| <ItemLink id="rngtech:conservation_crystal" /> | Every catalyst except the Volatile Catalyst | 25% chance to keep the catalyst. The crystal is used up. |
-| <ItemLink id="rngtech:frugality_crystal" /> | Every catalyst except the Ascension Matrix and Volatile Catalyst | 25% chance the operation costs only 1 RP. For an Expansion Crystal that is the whole fill. The crystal is used up. |
+| <ItemLink id="rngtech:conservation_crystal" /> | Every catalyst except the Volatile Catalyst and Mirror Catalyst | 25% chance to keep the catalyst. The crystal is used up. |
+| <ItemLink id="rngtech:frugality_crystal" /> | Every catalyst except the Ascension Matrix, Volatile Catalyst, and Mirror Catalyst | 25% chance the operation costs only 1 RP. For an Expansion Crystal that is the whole fill. The crystal is used up. |
 | <ItemLink id="rngtech:transmutation_crystal" /> | Affix Upgrader, Greater Affix Upgrader | Swaps the upgraded affix for a different one in the same prefix or suffix slot. |
 | <ItemLink id="rngtech:resonance_crystal" /> | Affix Upgrader, Greater Affix Upgrader | Keeps the upgraded affix's roll quality in its new tier. |
 | <ItemLink id="rngtech:destabilization_crystal" /> | Affix Upgrader, Greater Affix Upgrader | Rerolls the item's other affixes, at their current tiers, after the upgrade. |

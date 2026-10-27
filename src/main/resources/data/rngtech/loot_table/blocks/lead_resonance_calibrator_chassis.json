@@ -18,7 +18,8 @@
                 "rngtech:machine_traits",
                 "rngtech:machine_progression",
                 "rngtech:calibration_streak",
-                "rngtech:work_orders"
+                "rngtech:work_orders",
+                "rngtech:mirrored"
               ],
               "source": "block_entity"
             }

@@ -27,4 +27,6 @@ A <ItemLink id="rngtech:volatile_catalyst" /> corrupts a chip, with the usual [c
 | Warped | Rerolls each condition's value within its tier. The reward stays the same. |
 | Blighted | Adds a condition that costs the machine but adds no reward. |
 
+A <ItemLink id="rngtech:mirror_catalyst" /> copies a chip. You keep the original and get a [Mirrored](rngtech:rarity-and-affixes/mirrored-items.md) copy. The copy has the same job, conditions, and reward. You cannot refine, corrupt, or copy it again. It stays Mirrored in a drive bay.
+
 The [Phase Array](rngtech:phase-array.md) does not accept Job Chips.

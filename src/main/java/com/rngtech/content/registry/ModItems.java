@@ -845,6 +845,10 @@ public final class ModItems {
             "volatile_catalyst",
             () -> new RefinementConsumableItem(RefinementOperation.CORRUPT, new Item.Properties())
     );
+    public static final DeferredItem<RefinementConsumableItem> MIRROR_CATALYST = ITEMS.register(
+            "mirror_catalyst",
+            () -> new RefinementConsumableItem(RefinementOperation.MIRROR, new Item.Properties().stacksTo(16).rarity(Rarity.RARE))
+    );
     public static final DeferredItem<GlyphItem> GLYPH = ITEMS.register(
             "glyph",
             () -> new GlyphItem(new Item.Properties())

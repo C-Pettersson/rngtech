@@ -4,7 +4,7 @@ import java.util.Locale;
 
 public enum RefinementModifier {
     NONE,
-    /** Conservation Crystal: 25% chance to keep the catalyst. Works with every catalyst but the Volatile Catalyst. */
+    /** Conservation Crystal: 25% chance to keep the catalyst. Works with every catalyst but the Volatile and Mirror Catalysts. */
     CONSERVE_CATALYST,
     /** Frugality Crystal: 25% chance a rolled RP cost becomes 1 RP. */
     REDUCE_POTENTIAL_COST,
@@ -20,6 +20,9 @@ public enum RefinementModifier {
     /** The failure key when this crystal does not work with {@code operation}, or null when it does. */
     public String failureKey(RefinementOperation operation) {
         RefinementAction action = operation.action();
+        if (this != NONE && action == RefinementAction.MIRROR) {
+            return "rngtech.refinement.failure.focus_rejects_mirror";
+        }
         return switch (this) {
             case NONE -> null;
             case CONSERVE_CATALYST -> action == RefinementAction.CORRUPT

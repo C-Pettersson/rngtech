@@ -33,6 +33,7 @@ item_ids:
   - rngtech:destabilization_crystal
   - rngtech:stabilization_crystal
   - rngtech:volatile_catalyst
+  - rngtech:mirror_catalyst
 ---
 
 # Affix Forge
@@ -60,6 +61,7 @@ You can read a forge from the outside. The item in the target slot stands on the
 - [Modifier lenses](rngtech:affix-forge/modifier-lenses.md)
 - [Modifier crystals](rngtech:affix-forge/modifier-crystals.md)
 - [Corrupting with a Volatile Catalyst](rngtech:affix-forge/corrupting-with-a-volatile-catalyst.md)
+- [Copying with a Mirror Catalyst](rngtech:affix-forge/copying-with-a-mirror-catalyst.md)
 
 ### Automation
 

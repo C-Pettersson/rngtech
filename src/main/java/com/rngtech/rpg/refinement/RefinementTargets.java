@@ -60,7 +60,10 @@ public final class RefinementTargets {
         return JobChipItem.isWorkOrder(stack) && JobChipItem.data(stack) != null;
     }
 
-    /** Whether the Phase Array takes this stack. It refines permanent Gear, so it turns away Job Chips, a consumable. */
+    /**
+     * Whether the Phase Array takes this stack. It refines permanent Gear, so it turns away Job Chips, a consumable. It
+     * takes a Mirrored copy but reports it locked.
+     */
     public static boolean canPhase(ItemStack stack) {
         return canRefine(stack) && !isJobChip(stack);
     }
@@ -77,6 +80,26 @@ public final class RefinementTargets {
         return canRefine(stack)
                 && (stack.getItem() instanceof MachinePartItem || stack.getItem() instanceof BatteryCellItem)
                 && CorruptionCatalog.active().canCorrupt(eligibilityProfile(stack).id());
+    }
+
+    /**
+     * Whether a Mirror Catalyst may copy this stack: a Gear part, Battery Cell, machine item, or Job Chip that is not a
+     * Unique and is not itself a Mirrored copy. Corrupted items may be copied.
+     */
+    public static boolean canMirror(ItemStack stack) {
+        return canRefine(stack)
+                && !isMirrored(stack)
+                && !UniqueItems.isUnique(stack)
+                && storedTraits(stack).rarity() != Rarity.UNIQUE
+                && (isJobChip(stack)
+                || stack.getItem() instanceof MachinePartItem
+                || stack.getItem() instanceof BatteryCellItem
+                || stack.getItem() instanceof MachineBlockItem);
+    }
+
+    /** A Mirror Catalyst's copy, which no refinement path changes. */
+    public static boolean isMirrored(ItemStack stack) {
+        return stack.has(ModDataComponents.MIRRORED.get());
     }
 
     public static boolean isCorrupted(ItemStack stack) {
