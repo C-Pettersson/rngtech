@@ -2,6 +2,7 @@ package com.rngtech.rpg.workorder;
 
 import com.rngtech.rpg.MachineModifier;
 import com.rngtech.rpg.MachineStat;
+import com.rngtech.rpg.MachineStatAccumulator;
 import com.rngtech.rpg.MachineTraits;
 import com.rngtech.rpg.ModifierOperation;
 import com.rngtech.rpg.ModifierSlot;
@@ -9,6 +10,7 @@ import com.rngtech.rpg.ModifierValueRange;
 import com.rngtech.rpg.Rarity;
 
 import com.google.gson.JsonParser;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.RandomSource;
 
@@ -30,6 +32,7 @@ public final class WorkOrderConditionChecks {
         rolls();
         costsOnly();
         deepOre();
+        handFeeding();
         templateRarity();
         return checks;
     }
@@ -88,9 +91,10 @@ public final class WorkOrderConditionChecks {
                 WorkOrderConditions.HAND_FEEDING, WorkOrderConditions.JAMMED_LINE, WorkOrderConditions.DEEP_ORE, WorkOrderConditions.SHORT_FUSE)),
                 "every Crusher condition rolls: " + seenCrusher);
         require(seenFurnace.equals(Set.of(WorkOrderConditions.STARVED_FEED, WorkOrderConditions.POWER_SURCHARGE, WorkOrderConditions.SHORT_CREW,
-                WorkOrderConditions.COLD_START, WorkOrderConditions.BRITTLE_LINING, WorkOrderConditions.DEEP_ORE, WorkOrderConditions.SHORT_FUSE)),
+                WorkOrderConditions.COLD_START, WorkOrderConditions.HAND_FEEDING, WorkOrderConditions.BRITTLE_LINING, WorkOrderConditions.DEEP_ORE,
+                WorkOrderConditions.SHORT_FUSE)),
                 "every Furnace condition rolls: " + seenFurnace);
-        require(WorkOrderConditions.profile("crusher").definitions().size() == 7 && WorkOrderConditions.profile("furnace").definitions().size() == 7,
+        require(WorkOrderConditions.profile("crusher").definitions().size() == 7 && WorkOrderConditions.profile("furnace").definitions().size() == 8,
                 "each family's profile holds the conditions it reads");
     }
 
@@ -124,18 +128,52 @@ public final class WorkOrderConditionChecks {
         }
     }
 
+    /**
+     * Deep Ore raises a stage part's minimum to the next stage with work that the tier's chassis runs, skipping stages no
+     * recipe reaches, and costs nothing when none is left, such as a Tier V Crusher job at Processing Level 8.
+     */
     private static void deepOre() {
         WorkPart part = new WorkPart(WorkObjectiveType.CRUSH, WorkFilter.STAGE, 4, "", 100);
         MachineTraits deep = new MachineTraits(Rarity.MAGIC, 0, List.of(WorkOrderConditions.get(WorkOrderConditions.DEEP_ORE).definition().roll(1, RandomSource.create(1L))), List.of());
+        WorkOrder order = new WorkOrder("crusher", 2, new WorkObjective(ResourceLocation.parse("rngtech:deep"), part), 5, 0, 100, 0);
         WorkReport atFour = new WorkReport(WorkObjectiveType.CRUSH, 4, 0, "", 1);
         WorkReport atFive = new WorkReport(WorkObjectiveType.CRUSH, 5, 0, "", 1);
-        require(WorkOrderConditions.counts(part, atFour, MachineTraits.EMPTY) && !WorkOrderConditions.counts(part, atFour, deep)
-                && WorkOrderConditions.counts(part, atFive, deep) && WorkOrderConditions.minimum(part, deep) == 5,
+        require(WorkOrderConditions.counts(order, part, atFour, MachineTraits.EMPTY) && !WorkOrderConditions.counts(order, part, atFour, deep)
+                && WorkOrderConditions.counts(order, part, atFive, deep) && WorkOrderConditions.minimum(order, part, deep) == 5,
                 "Deep Ore counts only work one level above the job's minimum");
-        WorkOrder order = new WorkOrder("crusher", 1, new WorkObjective(ResourceLocation.parse("rngtech:deep"), part), 4, 0, 100, 0);
         MachineWorkOrders orders = MachineWorkOrders.EMPTY.withLoaded(new LoadedWorkOrder(order, deep)).withActive(0);
         require(WorkOrderRules.progress(orders, atFour).orders() == orders && WorkOrderRules.progress(orders, atFive).orders().activeOrder().totalProgress() == 1,
                 "the machine's counting follows Deep Ore");
+
+        WorkPart top = new WorkPart(WorkObjectiveType.CRUSH, WorkFilter.STAGE, 8, "", 100);
+        WorkOrder topJob = new WorkOrder("crusher", 5, new WorkObjective(ResourceLocation.parse("rngtech:deep_top"), top), 8, 0, 100, 0);
+        require(WorkOrderConditions.minimum(topJob, top, deep) == 8 && WorkOrderConditions.counts(topJob, top, new WorkReport(WorkObjectiveType.CRUSH, 8, 0, "", 1), deep),
+                "Deep Ore costs nothing on a Tier V Crusher job at Processing Level 8, the top level");
+        require(WorkOrderFamilies.deepMinimum("crusher", 4, 6) == 6 && WorkOrderFamilies.deepMinimum("crusher", 5, 6) == 8
+                && WorkOrderFamilies.deepMinimum("alloy_furnace", 3, 4) == 6, "Deep Ore skips stages no recipe reaches");
+    }
+
+    /**
+     * of Hand Feeding rolls on every family whose machine rolls Instant Process Chance, and sets that chance to 0 through
+     * the machine's stats. The Forestry Companion has no Instant Process, so it never rolls there, and the Melter takes no
+     * Cold Start.
+     */
+    private static void handFeeding() {
+        WorkOrderConditions.Condition feeding = WorkOrderConditions.get(WorkOrderConditions.HAND_FEEDING);
+        require(feeding.families().equals(Set.of("crusher", "furnace", "alloy_furnace", "metal_press", "melter", "resonance_calibrator",
+                "component_assembler", "component_recycler")), "of Hand Feeding rolls on every machine with Instant Process: " + feeding.families());
+        require(!feeding.families().contains("forestry"), "the Forestry Companion has no Instant Process to stop");
+        require(!WorkOrderConditions.get(WorkOrderConditions.COLD_START).families().contains("melter"), "the Melter takes no Cold Start");
+        MachineTraits traits = new MachineTraits(Rarity.MAGIC, 0, List.of(feeding.definition().roll(1, RandomSource.create(4L))), List.of());
+        for (String family : feeding.families()) {
+            require(WorkOrderConditions.profile(family).definitions().contains(feeding.definition()), family + "'s profile holds of Hand Feeding");
+            WorkOrder order = new WorkOrder(family, 1, new WorkObjective(ResourceLocation.parse("rngtech:" + family + "_any"),
+                    new WorkPart(WorkObjectiveType.CRUSH, WorkFilter.ANY, 0, "", 100)), 4, 0, WorkOrder.BASE_BOUNTY, 0);
+            MachineStatAccumulator stats = new MachineStatAccumulator();
+            stats.apply(Component.literal("Gear"), new MachineModifier(ModifierSlot.IMPLICIT, MachineStat.INSTANT_PROCESS_CHANCE, ModifierOperation.ADD, 25));
+            WorkOrderConditions.apply(stats, new LoadedWorkOrder(order, traits));
+            require(stats.value(MachineStat.INSTANT_PROCESS_CHANCE) == 0, "of Hand Feeding stops Instant Process on " + family);
+        }
     }
 
     private static void templateRarity() {

@@ -39,7 +39,8 @@ final class WorkOrdersTab {
     private static final int MARGIN = 8;
     private static final int BUTTON_HEIGHT = 13;
     private static final int BUTTON_GAP = 3;
-    private static final int COUNT_WIDTH = 52;
+    /** The gap between a progress bar and its count. */
+    private static final int COUNT_GAP = 4;
     private static final int TEXT = 0xFF3F3F3F;
     private static final int TEXT_MUTED = 0xFF6B6B6B;
     private static final int DONE = 0xFF2F7F3F;
@@ -81,6 +82,8 @@ final class WorkOrdersTab {
         WorkOrderMenuSupport.View orders = view.workOrderView();
         int chosen = selection(orders);
         int right = leftPos + rowRight(width, font);
+        int countWidth = orders.slots().stream()
+                .mapToInt(slot -> font.width(JobChipItem.progressText(slot.objective(), slot.totalProgress()))).max().orElse(0) + COUNT_GAP;
         for (int bay = 0; bay < MachineWorkOrders.SLOTS; bay++) {
             int top = topPos + rowTop(bay);
             boolean loaded = bay < orders.slots().size();
@@ -97,7 +100,7 @@ final class WorkOrdersTab {
                 graphics.drawString(font, Component.translatable("rngtech.work_order.tab.empty_bay"), leftPos + TEXT_LEFT, top + 8, TEXT_MUTED, false);
                 continue;
             }
-            renderRow(graphics, font, orders.slots().get(bay), active, leftPos + TEXT_LEFT, top, right - 4);
+            renderRow(graphics, font, orders.slots().get(bay), active, leftPos + TEXT_LEFT, top, right - 4, countWidth);
         }
         for (Part part : parts(leftPos, topPos, width, font)) {
             if (part.action() != Action.ROW) {
@@ -154,7 +157,9 @@ final class WorkOrdersTab {
         return List.of();
     }
 
-    private void renderRow(GuiGraphics graphics, Font font, WorkOrderMenuSupport.Slot slot, boolean active, int left, int top, int right) {
+    /** One loaded bay: tier, job, and status on top, and a progress bar that ends {@code countWidth} short of the count. */
+    private void renderRow(GuiGraphics graphics, Font font, WorkOrderMenuSupport.Slot slot, boolean active, int left, int top, int right,
+            int countWidth) {
         String tier = GlyphItem.numeral(slot.tier());
         graphics.drawString(font, tier, left, top + 3, active ? accent : TEXT, false);
         int jobLeft = left + font.width(tier) + 4;
@@ -169,7 +174,7 @@ final class WorkOrdersTab {
         String job = font.plainSubstrByWidth(JobChipItem.shortObjectiveText(slot.objective()).getString(), jobRight - jobLeft);
         graphics.drawString(font, job, jobLeft, top + 3, TEXT, false);
         int barTop = top + 15;
-        int barRight = right - COUNT_WIDTH;
+        int barRight = right - countWidth;
         long target = Math.max(1, slot.totalTarget());
         int filled = (int) Math.round((barRight - left - 2) * Math.min(1.0, slot.totalProgress() / (double) target));
         graphics.fill(left, barTop, barRight, barTop + 5, ROW_BORDER);

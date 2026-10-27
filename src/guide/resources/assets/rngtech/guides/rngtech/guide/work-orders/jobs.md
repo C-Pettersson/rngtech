@@ -20,11 +20,13 @@ A job has one to three parts, and it is done when every part is done. The termin
 | A streak | Calibrate 12 components in a row at 80+ stability |
 | A stat goal | Reach a Processing Speed of 3.1 on a Crusher |
 
+A chip's tooltip shows its machine, job, condition names, chassis stage, and reward. Hold Shift for what each condition does and pays, the chip's Refinement Potential, and its Prestige.
+
 Only work the machine finishes while the chip is active counts. A batch counts every item it finishes.
 
 Any-work, stage, and setting jobs count **work**, not single items. Each item counts by its recipe's time, so a quick recipe counts as part of an item and a slow one as several. For example, Seeds in a Crusher count as a fraction of an item, and Raw Naquadah counts as several. The chip says "Counts work" on these jobs. Named-item, kind-of-output, and streak jobs count items. The Melter counts mB, and the Forestry Companion counts logs and crops.
 
-- **Stage jobs:** Hold Shift on the chip, or on its row in the Orders tab, to see the items that count. Furnace and Metal Press chips list materials instead.
+- **Stage jobs:** Hold Alt on the chip, or on its row in the Orders tab, to see the items that count. Furnace and Metal Press chips list materials instead.
 - **Streaks:** A streak counts work in a row. A failure resets it to 0, and so does work below the streak's setting. The chip remembers its best streak.
 - **Stat goals:** A stat goal asks the machine to reach a value of one of its stats. The value includes traits, [Gear](rngtech:gear.md), Mastery, and the chip's conditions. The machine must finish a job while the stat is at or above the target. Installing the right Gear is not enough on its own: the machine has to run. The Orders tab shows the value at the last finished job against the target.
 

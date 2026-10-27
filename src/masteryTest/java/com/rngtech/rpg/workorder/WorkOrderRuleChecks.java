@@ -5,8 +5,12 @@ import com.rngtech.rpg.CorruptionOutcome;
 import com.rngtech.rpg.MachineCorruption;
 import com.rngtech.rpg.MachineStat;
 import com.rngtech.rpg.MachineTraits;
+import com.rngtech.rpg.ProcessingBalanceSimulation;
 import com.rngtech.rpg.Rarity;
+import com.rngtech.rpg.progression.MachineMasteryFamily;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import net.minecraft.resources.ResourceLocation;
@@ -21,11 +25,14 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 import java.util.SplittableRandom;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 /** Rolling, loading, counting, and reward rolls for Work Orders, run from {@code MasteryChecks}. */
 public final class WorkOrderRuleChecks {
     private static int checks;
+    /** The Mastery level of the reference build a stat goal's top target is checked against: the simulation's lowest. */
+    private static final int REFERENCE_LEVEL = 10;
 
     private WorkOrderRuleChecks() { }
 
@@ -39,8 +46,10 @@ public final class WorkOrderRuleChecks {
         workCounting();
         itemJobs(shipped);
         rewardAmounts();
+        uniqueRate(shipped);
         rush();
         statGoals(shipped);
+        statGoalTargets(shipped);
         jobSizes(shipped);
         streaks();
         groups();
@@ -206,6 +215,48 @@ public final class WorkOrderRuleChecks {
         require(WorkOrderRules.scaledAmount(2, 300, random) == 6, "300% Bounty triples the amount");
     }
 
+    /**
+     * Uniques stay rare: a listed job pays one between 1 time in 200 and 1 time in 100. Each listing's chance is the
+     * Unique entries' share of the reward table's weights that pass at its tier and Prestige, with jobs and conditions
+     * rolled the way the terminal rolls them. Every Unique entry is a nested table; {@code check-work-orders.mjs} keeps
+     * the nested tables to the Unique one.
+     */
+    private static void uniqueRate(List<WorkObjectiveEntry> shipped) {
+        JsonArray entries = read(projectRoot().resolve("src/main/resources/data/rngtech/loot_table/challenges/work_order.json"))
+                .getAsJsonArray("pools").get(0).getAsJsonObject().getAsJsonArray("entries");
+        SplittableRandom random = new SplittableRandom(9L);
+        int listings = 50_000;
+        double chance = 0;
+        for (int listing = 0; listing < listings; listing++) {
+            int tier = WorkOrder.MIN_TIER + random.nextInt(WorkOrder.MAX_TIER - WorkOrder.MIN_TIER + 1);
+            WorkOrder order = WorkOrderRules.roll(shipped, tier, random);
+            int prestige = WorkOrderConditions.roll(order, null, RandomSource.create(random.nextLong())).order().prestige();
+            double total = 0;
+            double unique = 0;
+            for (JsonElement element : entries) {
+                JsonObject entry = element.getAsJsonObject();
+                if (!inRange(entry, "rngtech:order_tier", tier) || !inRange(entry, "rngtech:order_prestige", prestige)) { continue; }
+                int weight = entry.has("weight") ? entry.get("weight").getAsInt() : 1;
+                total += weight;
+                if (entry.get("type").getAsString().equals("minecraft:loot_table")) { unique += weight; }
+            }
+            chance += unique / total;
+        }
+        double rate = chance / listings;
+        require(rate >= 0.005 && rate <= 0.01, "a listed job pays a Unique 1 time in 100 to 200, not 1 in " + Math.round(1 / rate));
+    }
+
+    /** Whether {@code entry}'s {@code condition}, if it has one, lets {@code value} through its optional min and max. */
+    private static boolean inRange(JsonObject entry, String condition, int value) {
+        if (!entry.has("conditions")) { return true; }
+        for (JsonElement element : entry.getAsJsonArray("conditions")) {
+            JsonObject test = element.getAsJsonObject();
+            if (!test.get("condition").getAsString().equals(condition)) { continue; }
+            if (test.has("min") && value < test.get("min").getAsInt() || test.has("max") && value > test.get("max").getAsInt()) { return false; }
+        }
+        return true;
+    }
+
     /** Every shipped objective's minimum is met by at least one recipe a chassis at the tier's stage can run. */
     private static void reachable(List<WorkObjectiveEntry> shipped) {
         List<Integer> crushLevels = crusherLevels();
@@ -215,13 +266,7 @@ public final class WorkOrderRuleChecks {
                 int stage = WorkOrderFamilies.stageCap(entry.family(), tier);
                 boolean ok = switch (entry.filter()) {
                     case ANY -> true;
-                    case STAGE -> switch (entry.type()) {
-                        case CRUSH -> crushLevels.stream().anyMatch(level -> level >= minimum && level <= stage);
-                        case ASSEMBLE -> cellStages().stream().anyMatch(cell -> cell >= minimum && cell <= stage);
-                        case ALLOY -> alloyRecipes().stream().anyMatch(recipe -> recipe.get("minimum_component_stage").getAsInt() >= minimum
-                                && recipe.get("minimum_component_stage").getAsInt() <= stage);
-                        default -> minimum <= stage;
-                    };
+                    case STAGE -> stageReachable(entry, minimum, stage, crushLevels);
                     case SETTING -> minimum <= 100;
                     case ITEM -> !entry.options(stage, item -> true).isEmpty()
                             && entry.options().stream().allMatch(option -> hasRecipe(entry.type(), option.item()));
@@ -231,8 +276,25 @@ public final class WorkOrderRuleChecks {
                             && entry.options().stream().allMatch(option -> WorkOrderFamilies.group(entry.family(), option.item()));
                 };
                 require(ok, entry.id() + " Tier " + tier + " is reachable on a Stage " + stage + " chassis");
+                if (entry.filter() == WorkFilter.STAGE) {
+                    int deep = WorkOrderFamilies.deepMinimum(entry.family(), tier, minimum);
+                    require(stageReachable(entry, deep, stage, crushLevels), entry.id() + " Tier " + tier + " is reachable under Deep Ore at " + deep);
+                    require(deep > minimum || IntStream.rangeClosed(minimum + 1, stage).noneMatch(level -> stageReachable(entry, level, level, crushLevels)),
+                            entry.id() + " Tier " + tier + ": Deep Ore is free only where no stage above the minimum has work");
+                }
             }
         }
+    }
+
+    /** Whether a recipe of the entry's family at {@code minimum} or above runs on a Stage {@code stage} chassis. */
+    private static boolean stageReachable(WorkObjectiveEntry entry, int minimum, int stage, List<Integer> crushLevels) {
+        return switch (entry.type()) {
+            case CRUSH -> crushLevels.stream().anyMatch(level -> level >= minimum && level <= stage);
+            case ASSEMBLE -> cellStages().stream().anyMatch(cell -> cell >= minimum && cell <= stage);
+            case ALLOY -> alloyRecipes().stream().anyMatch(recipe -> recipe.get("minimum_component_stage").getAsInt() >= minimum
+                    && recipe.get("minimum_component_stage").getAsInt() <= stage);
+            default -> minimum <= stage;
+        };
     }
 
     static List<WorkObjectiveEntry> shippedObjectives() {
@@ -262,8 +324,8 @@ public final class WorkOrderRuleChecks {
 
     /**
      * Stat goals: each family ships some, their targets roll in hundredths of the stat, a goal tracks the machine's value at
-     * each completed job, can fall back, and is met only at or above the target. The tiers' targets come from the level-1
-     * processing balance simulation, so they are pinned here until it can run with Mastery again.
+     * each completed job, can fall back, and is met only at or above the target. The tiers' targets were drafted from the
+     * level-1 processing balance simulation; {@link #statGoalTargets} checks them against a reference build.
      */
     private static void statGoals(List<WorkObjectiveEntry> shipped) {
         List<WorkObjectiveEntry> goals = shipped.stream().filter(entry -> entry.filter() == WorkFilter.STAT).toList();
@@ -296,6 +358,36 @@ public final class WorkOrderRuleChecks {
             return;
         }
         throw new AssertionError("a Crusher stat goal named a stat the Crusher does not read");
+    }
+
+    /**
+     * Every shipped stat goal's top target is reachable: the processing balance simulation's best archetype build of the
+     * tier's stage, at its lowest simulated Mastery level, reaches it. Jobs ask for no Mastery level by default.
+     */
+    private static void statGoalTargets(List<WorkObjectiveEntry> shipped) {
+        ProcessingBalanceSimulation.loadDefaultConfig();
+        ProcessingBalanceSimulation simulation;
+        try {
+            simulation = new ProcessingBalanceSimulation(projectRoot());
+        } catch (IOException exception) {
+            throw new IllegalStateException("Cannot load the processing balance setups", exception);
+        }
+        for (WorkObjectiveEntry entry : shipped) {
+            if (entry.filter() != WorkFilter.STAT) { continue; }
+            MachineMasteryFamily family = switch (entry.family()) {
+                case "crusher" -> MachineMasteryFamily.CRUSHER;
+                case "furnace" -> MachineMasteryFamily.FURNACE;
+                default -> throw new AssertionError(entry.id() + " is a stat goal for a family the processing simulation does not model");
+            };
+            MachineStat stat = MachineStat.bySerializedName(entry.stat());
+            for (int tier = WorkOrder.MIN_TIER; tier <= WorkOrder.MAX_TIER; tier++) {
+                int stage = WorkOrderFamilies.stageCap(entry.family(), tier);
+                double top = entry.goal(tier).max() / (double) WorkPart.STAT_SCALE;
+                double best = simulation.bestStat(family, stage, stat, REFERENCE_LEVEL);
+                require(top <= best + 1e-9, entry.id() + " Tier " + tier + "'s top target " + top + " is reachable on a Stage " + stage
+                        + " reference build, which reaches " + Math.round(best * 100) / 100.0);
+            }
+        }
     }
 
     /** Streak jobs: they count like any work, a failure sets an unfinished streak back to 0, and the chip keeps its best streak. */

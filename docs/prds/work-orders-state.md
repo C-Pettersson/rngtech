@@ -2,13 +2,14 @@
 
 Source: [draft design](work-orders.md).
 
-Status: **Prototype**. The PRD is a draft with open questions and no release target. On 2026-10-25, after a first playtest, it was redesigned around a Dispatch Board vendor, readable order items, and an Orders tab on every processing machine. After a second playtest the same day, orders became Job Chips from a Dispatch Terminal, loaded through drive bays. The branch `feature/workplan-machine-065464` has every phase but the deferred UI polish done: Job Chips from a Dispatch Terminal, three drive bays on the Orders tab of all nine eligible machines, templates, conditions and Rush, stat, group, and streak jobs, refinement and corruption, Jade and JEI, and the player wiki page, in-game guide, and FTB Quests chapter. It is not merged and needs a full playtest. See [Code against the redesign](#code-against-the-redesign).
+Status: **Prototype**. The PRD is a draft; its open questions were resolved on 2026-10-26, and it targets the next 2.0 alpha. On 2026-10-25, after a first playtest, it was redesigned around a Dispatch Board vendor, readable order items, and an Orders tab on every processing machine. After a second playtest the same day, orders became Job Chips from a Dispatch Terminal, loaded through drive bays. The branch `feature/workplan-machine-065464` has every phase but the deferred UI polish done: Job Chips from a Dispatch Terminal, three drive bays on the Orders tab of all nine eligible machines, templates, conditions and Rush, stat, group, and streak jobs, refinement and corruption, Jade and JEI, and the player wiki page, in-game guide, and FTB Quests chapter. It merged to `main` in #214 (`794e5d01`) and needs a full playtest. The post-merge polish (stat-goal reachability, Hand Feeding on every Instant Process machine, JEI tier and reward text, and machine-weighted Unique rewards) is on `feature/work-orders-polish-f36a4f`. See [Code against the redesign](#code-against-the-redesign).
 
 ## Scope checklist
 
 - [x] Draft the PRD and this state page.
 - [x] Redesign after the first playtest (2026-10-25).
-- [ ] Resolve the PRD's open questions and accept it.
+- [x] Resolve the PRD's open questions (2026-10-26).
+- [ ] Accept the PRD.
 - [x] Create a feature branch from clean `main`.
 - [x] Order data and storage: readable order item data, the `rngtech:work_orders` machine component with three slots and an active index, drop carry, and round-trip checks.
 - [x] Core loop for the Crusher and Furnace: drive bays to load and unload, activate, switch, and abandon on an Orders tab; progress hooks; the Completed Job Chip; the reward table.
@@ -17,7 +18,7 @@ Status: **Prototype**. The PRD is a draft with open questions and no release tar
 - [x] Conditions: the `work_order` profiles and pool for the Crusher and Furnace, conditions as an effect source on the machine, reset-on-event conditions, and Rush. The Bonus Summary drawer section moved to phase 9.
 - [x] More jobs and machines: stat goals for the Crusher and Furnace, group and streak jobs, and Work Orders on every eligible machine: Crusher, Furnace, Component Assembler, Alloy Furnace, Metal Press, Melter, Resonance Calibrator, Forestry Companion, and Component Recycler.
 - [x] Refinement and corruption: Job Chips as refinement targets, chip corruption outcomes, and Phase Array rejection.
-- [ ] UI polish: Jade, JEI info, Affix Forge condition text, and the Job Chip lamp on machine models (done); the Bonus Summary section and drive-bay panels deferred by the user.
+- [x] UI polish: Jade, JEI info with tiers and reward kinds, Affix Forge condition text, and the Job Chip lamp on machine models. The user deferred the Bonus Summary section and dropped drive-bay panels.
 - [x] Documentation: wiki page, Machine Mastery and Rarity updates, the implementation matrix, the GuideME guide, Machine Design Notes, and an FTB Quests chapter.
 - [ ] In-game playtest of every eligible machine and tier.
 
@@ -300,6 +301,23 @@ Recorded 2026-10-26 before merging #214, from the user's go-ahead on the recomme
 - The Resonance Calibrator, Component Assembler, and Component Recycler are material-bound (`WorkOrderFamilies.sizedByTime` is false): their counts stay as set by hand, since their work eats catalysts, cell materials, or parts, and the speed sets only their Rush clock. `jobSizes` checks only time-sized families.
 - The Alloy Furnace's reference time is 600 ticks per output item, its median, not 1,200 per recipe: it reports work per item, and its recipes make one to four ingots. Its counts were regenerated, and its and the Metal Press's named-item parts are now half a stage job's count, like the Crusher's and Furnace's.
 
+Recorded 2026-10-26 for the post-merge polish, from the user:
+
+- Release target: the next 2.0 alpha, the last big feature before 2.0. Machines keep three drive bays. Unique rewards weight toward the job's machine.
+- Uniques should be really rare, about one per hundred jobs, seen after maybe 20 refreshes; that is the minimum scarcity, and rarer is fine.
+- Deep Ore may roll on a stage job at the top level; there it is a free condition. Found in playtest: a Tier V Crusher job at Processing Level 8 with Deep Ore asked for Level 9, which no recipe has, so nothing counted.
+- Chip tooltips show less by default, with details behind Shift and Alt, so a listing is quick to scan. The Orders tab's progress bars are shorter so the count fits beside them.
+- of Hand Feeding goes on every machine that rolls Instant Process. Cold Start stays off the Melter.
+- Thin Margins and drive-bay panels are dropped. Veteran Crew, pack-editable conditions, template condition names, and Jade on the Forestry cart are deferred; the Bonus Summary section waits for playtesters to ask.
+
+Recorded 2026-10-26 for the post-merge polish, from the build:
+
+- Stat-goal reachability uses `ProcessingBalanceSimulation.bestStat`: the best archetype build of the tier's stage, Furnace variants included, at Mastery level 10, the simulation's lowest level, since default jobs ask for no Mastery level. Every shipped top target passes with room to spare, so none was retuned. The tightest are Output Amount (Tier I 1.34 against 1.49) and Temperature Stability (Tier IV 1.90 against 2.36); Super Output Chance targets sit far below the 18% to 20% the builds reach.
+- Eight machines call `ProcessingChance.rollInstant`: the Crusher, Furnace, Alloy Furnace, Metal Press, Melter, Resonance Calibrator, Component Assembler, and Component Recycler. The Forestry Companion has no Instant Process. `WorkOrderConditions.INSTANT_PROCESS` names those eight families for of Hand Feeding.
+- `ChallengeContext.of(FulfilledWorkOrder, roll)` already carried the order's family, and `WorkOrderRewards.withRewards` builds that order from the listed job, so no plumbing changed. Each Unique whose host fits a Work Order machine gets a second entry at weight 2 behind `minecraft:any_of` over `rngtech:machine_family`, so it rolls three times as often on those machines. Fits by host: Crush Head on the Crusher and Melter; Heat Core on the Furnace, Alloy Furnace, Metal Press, and Melter; Alloy Crucible on the Alloy Furnace; Servo on the Alloy Furnace, Metal Press, and Melter; Fluid Pump on the Melter and Forestry Companion; Control Board on the Resonance Calibrator. Battery Cell Uniques power every machine and keep only their catalog entry.
+- The Prestige 2 gate made Uniques far rarer than wanted. Over 200,000 rolled listings, 88.3% had Prestige 0, 11.4% Prestige 1, and 0.23% Prestige 2, and the Melter, Resonance Calibrator, Component Assembler, Component Recycler, and Forestry Companion never reach 2 at listing. That was about 1 Unique in 5,000 jobs. The Unique kind is now three Prestige-band entries (weights 6, 20, and 50, with the other kinds' weights multiplied by 10) that nest `rngtech:work_orders/unique_reward`, which holds the per-Unique and per-machine entries. A listed job pays a Unique about 1 time in 131; `WorkOrderRuleChecks.uniqueRate` holds it between 1 in 200 and 1 in 100. Since the nested table only picks which Unique, every machine has the same Unique chance.
+- Bounty, Rush, Blessed, and refinement scaled a Unique reward's count like any other, so a Unique could pay two. `WorkOrderRewards.fixedAmount` keeps it at one. A roll that pays nothing, such as a Unique band whose every Unique is switched off, rolls again up to eight times.
+
 ## Code against the redesign
 
 The branch's loop was built for the earlier design. Phase 2 of the rework replaced the Mastery storage, the Mastery level gate, the tier and seed components, and the Tier I recipe; the lists below show what is left for later phases.
@@ -383,6 +401,9 @@ Recorded 2026-10-25 from the chips slice:
 - 2026-10-26: Rush only before a job starts, no auto-start on load, and SI fluid amounts on chips. Checks: the storage check for an inactive load, explicit Activate in every machine's GameTest, a refused Rush on a started chip, and SI text in `MelterWorkOrderGameTests`.
 - 2026-10-26: merged the machine challenge loot removal. Work Orders keep `ChallengeLoot.WORK_ORDER` as the one shipped table; the wiki Phase Array page, Modpack Creators, JEI Glyph page, implementation matrix, and `check-uniques.mjs` name Work Orders as the main Glyph source.
 - 2026-10-26: pre-merge tuning. Crusher Tier V capped, chassis-based speeds for the six other families, material-bound sizing for the Calibrator, Assembler, and Recycler, and the Alloy Furnace's per-item reference time.
+- 2026-10-26: post-merge polish. `WorkOrderRuleChecks.statGoalTargets` against `ProcessingBalanceSimulation.bestStat`; of Hand Feeding on all eight Instant Process families; JEI tier and reward pages for the Dispatch Terminal and Job Chip; machine-weighted Unique entries in the reward table. Checks: `WorkOrderConditionChecks.handFeeding`, `WorkOrderGameTests.handFeedingStopsInstantProcessOnEveryMachine` and `uniqueRewardsFavourTheJobsMachine`, and the family-entry rule in `check-work-orders.mjs`.
+- 2026-10-26: Unique rarity. The Unique kind became three Prestige-band entries nesting `rngtech:work_orders/unique_reward`, about 1 Unique per 131 listed jobs, and a Unique reward always pays one. Checks: `WorkOrderRuleChecks.uniqueRate`, the band and nested-table rules in `check-work-orders.mjs`, and the reworked `WorkOrderGameTests.uniqueRewardsFavourTheJobsMachine`.
+- 2026-10-27: Deep Ore is free where no stage above the minimum has work (`WorkOrderFamilies.deepMinimum`, which skips the Crusher's empty Processing Level 7 and the Alloy Furnace's empty Stage 5), a compact chip tooltip with Shift for details and Alt for what counts, and Orders tab bars that end before the widest count. Checks: the Deep Ore rule in `WorkOrderRuleChecks.reachable` and `WorkOrderConditionChecks.deepOre`.
 
 ## Verification
 
@@ -411,6 +432,8 @@ Recorded 2026-10-25 from the chips slice:
 - 2026-10-26: rework phase 8. `./gradlew quickCheck` (`masteryCheck` 671,509 checks), `./gradlew runGameTestServer` (292 tests), `npm run moddex:check`, and `npm run repo:check` passed. Not checked in a running client.
 - 2026-10-26: Job Chip lamp. `./gradlew quickCheck`, `./gradlew runGameTestServer` (293 tests), `npm run moddex:check`, and `npm run repo:check` passed; `tools/asset_audit.py` still reports 263 unallowlisted findings, none new. Every lamp was checked in rendered models from four sides, not in a running client. `mkdocs build --strict` was not run locally.
 - 2026-10-26: rework phase 10, documentation only. `mkdocs build --strict`, `mkdocs build --strict -f mkdocs.wiki.yml`, `python tools/rngwiki/guideme.py --check`, `npm run repo:check`, and `npm run moddex:check` passed. The FTB Quests chapter has not been loaded in a running client.
+- 2026-10-26: post-merge polish. `./gradlew quickCheck`, `./gradlew runGameTestServer` (295 tests), `npm run moddex:check`, `npm run repo:check`, `python tools/rngwiki/guideme.py --check`, `mkdocs build --strict`, and `mkdocs build --strict -f mkdocs.wiki.yml` passed. The JEI pages and Unique weighting have not been checked in a running client.
+- 2026-10-26: Unique rarity. `./gradlew ciCheck`, `./gradlew runGameTestServer` (295 tests), `npm run moddex:check`, `npm run repo:check`, `python tools/rngwiki/guideme.py --check`, and both `mkdocs build --strict` runs passed.
 
 ## Handoff and limits
 

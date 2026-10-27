@@ -163,22 +163,29 @@ public class JobChipItem extends Item {
         return number + (mega ? " MB" : " B");
     }
 
-    /**
-     * For a stage job, what counts toward it while Shift or Alt is held: Crusher inputs, or Furnace materials. Otherwise a
-     * hint to hold it. A job line such as "Processing Level 6+" or "Stage 5+" alone does not say what reaches it.
-     */
-    public static void appendEligibleItems(List<Component> lines, WorkObjective objective, MachineTraits traits) {
-        WorkPart listed = objective.parts().getFirst();
-        WorkPart part = new WorkPart(listed.type(), listed.filter(), WorkOrderConditions.minimum(listed, traits), listed.item(), listed.target());
-        if (!WorkOrderEligibility.lists(part)) {
-            return;
-        }
+    /** The stage part Alt lists what counts toward, with Deep Ore applied, or null when the job has no such list. */
+    private static WorkPart listedPart(WorkOrder order, MachineTraits traits) {
+        WorkPart listed = order.objective().parts().getFirst();
+        WorkPart part = new WorkPart(listed.type(), listed.filter(), WorkOrderConditions.minimum(order, listed, traits), listed.item(), listed.target());
+        return WorkOrderEligibility.lists(part) ? part : null;
+    }
+
+    /** Whether a part's list names materials, as Furnace and Metal Press jobs do, rather than items. */
+    private static String eligibleKind(WorkPart part) {
         WorkObjectiveType type = WorkObjectiveType.byId(part.type());
-        String kind = type == WorkObjectiveType.SMELT || type == WorkObjectiveType.PRESS ? "materials" : "items";
-        if (!TooltipKeyState.hasDetailKeyDown()) {
-            lines.add(Component.translatable("rngtech.tooltip.work_order.eligible_hint." + kind).withStyle(ChatFormatting.DARK_GRAY));
+        return type == WorkObjectiveType.SMELT || type == WorkObjectiveType.PRESS ? "materials" : "items";
+    }
+
+    /**
+     * For a stage job, what counts toward it while Alt is held: Crusher inputs, or Furnace materials. A job line such as
+     * "Processing Level 6+" or "Stage 5+" alone does not say what reaches it.
+     */
+    public static void appendEligibleItems(List<Component> lines, WorkOrder order, MachineTraits traits) {
+        WorkPart part = listedPart(order, traits);
+        if (part == null || !TooltipKeyState.hasAltDown()) {
             return;
         }
+        String kind = eligibleKind(part);
         RecipeManager recipes = ClientWorld.recipes();
         List<Component> names = recipes == null ? List.of() : WorkOrderEligibility.names(recipes, part);
         if (names.isEmpty()) {
@@ -278,7 +285,7 @@ public class JobChipItem extends Item {
         setJob(stack, WorkOrderConditions.rebalance(order, traits(stack), traits), traits);
     }
 
-    /** Stores a chip's job and conditions together, scaling a listed reward with any change in Bounty. */
+    /** Stores a chip's job and conditions together, scaling a listed reward with any change in Bounty, except a Unique. */
     public static void setJob(ItemStack stack, WorkOrder next, MachineTraits traits) {
         WorkOrder order = data(stack);
         List<ItemStack> listed = WorkOrderRewards.items(next.rewards());
@@ -286,7 +293,7 @@ public class JobChipItem extends Item {
         if (order != null && next.bounty() != order.bounty() && order.bounty() > 0 && !listed.isEmpty()) {
             double scale = next.bounty() / (double) order.bounty();
             stored = next.withRewards(ItemContainerContents.fromItems(listed.stream()
-                    .map(reward -> reward.copyWithCount(Math.max(1, (int) Math.round(reward.getCount() * scale))))
+                    .map(reward -> WorkOrderRewards.fixedAmount(reward) ? reward : reward.copyWithCount(Math.max(1, (int) Math.round(reward.getCount() * scale))))
                     .toList()));
         }
         stack.set(ModDataComponents.WORK_ORDER.get(), stored);
@@ -294,7 +301,11 @@ public class JobChipItem extends Item {
     }
 
     /** One line per condition: its name, its cost or rule, and the Bounty and Prestige it adds. */
-    public static void appendConditions(List<Component> lines, MachineTraits traits) {
+    /**
+     * One line per condition: its name, and with {@code details} its cost or rule and the Bounty and Prestige it adds. A
+     * corrupted chip leads with its outcome.
+     */
+    public static void appendConditions(List<Component> lines, MachineTraits traits, boolean details) {
         MachineCorruption corruption = traits.corruption();
         if (corruption != null) {
             lines.add(Component.translatable("rngtech.tooltip.work_order.corrupted." + corruption.outcome().getSerializedName())
@@ -310,6 +321,10 @@ public class JobChipItem extends Item {
                 continue;
             }
             String id = condition.id();
+            if (!details) {
+                lines.add(Component.translatable("rngtech.work_order.condition." + id).withStyle(ChatFormatting.RED));
+                continue;
+            }
             Component effect = WorkOrderConditions.effectText(modifier);
             boolean blessed = modifier.slot() == ModifierSlot.CORRUPTION && corruption.outcome() == CorruptionOutcome.BLESSED;
             boolean blighted = modifier.slot() == ModifierSlot.CORRUPTION && corruption.outcome() == CorruptionOutcome.BLIGHTED;
@@ -334,14 +349,15 @@ public class JobChipItem extends Item {
             tooltipComponents.add(Component.translatable("rngtech.tooltip.work_order.blank").withStyle(ChatFormatting.DARK_GRAY));
             return;
         }
+        boolean details = TooltipKeyState.hasShiftDown();
         tooltipComponents.add(familyName(order.family()).withStyle(ChatFormatting.GOLD));
         tooltipComponents.add(objectiveText(order.objective()).copy().withStyle(ChatFormatting.GRAY));
-        if (order.objective().parts().stream().anyMatch(part -> WorkOrderFamilies.countsWork(order.family(), part.filter()))) {
+        if (details && order.objective().parts().stream().anyMatch(part -> WorkOrderFamilies.countsWork(order.family(), part.filter()))) {
             tooltipComponents.add(Component.translatable("rngtech.tooltip.work_order.counts_work").withStyle(ChatFormatting.DARK_GRAY));
         }
-        appendEligibleItems(tooltipComponents, order.objective(), traits(stack));
-        appendConditions(tooltipComponents, traits(stack));
-        if (traits(stack).refinementPotential() > 0 && !traits(stack).isCorrupted()) {
+        appendEligibleItems(tooltipComponents, order, traits(stack));
+        appendConditions(tooltipComponents, traits(stack), details);
+        if (details && traits(stack).refinementPotential() > 0 && !traits(stack).isCorrupted()) {
             tooltipComponents.add(Component.translatable("rngtech.tooltip.work_order.potential", traits(stack).refinementPotential()).withStyle(ChatFormatting.DARK_AQUA));
         }
         if (order.minStage() > 0 || order.minMasteryLevel() > 0) {
@@ -368,9 +384,15 @@ public class JobChipItem extends Item {
             tooltipComponents.add(Component.translatable("rngtech.tooltip.work_order.rush",
                     clock(now < 0 ? 0 : Math.max(0, progress.rushDeadline() - now) / 20)).withStyle(ChatFormatting.GOLD));
         }
-        if (order.prestige() > 0) {
+        if (details && order.prestige() > 0) {
             tooltipComponents.add(Component.translatable("rngtech.tooltip.fulfilled_work_order.prestige", order.prestige()).withStyle(ChatFormatting.GRAY));
         }
-        tooltipComponents.add(Component.translatable("rngtech.tooltip.work_order.load").withStyle(ChatFormatting.DARK_GRAY));
+        if (details) {
+            tooltipComponents.add(Component.translatable("rngtech.tooltip.work_order.load").withStyle(ChatFormatting.DARK_GRAY));
+        } else if (!TooltipKeyState.hasAltDown()) {
+            WorkPart listed = listedPart(order, traits(stack));
+            tooltipComponents.add(Component.translatable("rngtech.tooltip.work_order.hint" + (listed == null ? "" : "." + eligibleKind(listed)))
+                    .withStyle(ChatFormatting.DARK_GRAY));
+        }
     }
 }

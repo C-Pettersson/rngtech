@@ -59,7 +59,7 @@ public final class WorkOrderOperations {
         List<ItemStack> listed = WorkOrderRewards.items(order.rewards());
         WorkOrder boosted = listed.isEmpty() ? order.withBounty(WorkOrder.rushAmount(order.bounty(), bonus))
                 : order.withRewards(ItemContainerContents.fromItems(listed.stream()
-                        .map(stack -> stack.copyWithCount(WorkOrder.rushAmount(stack.getCount(), bonus))).toList()));
+                        .map(stack -> WorkOrderRewards.fixedAmount(stack) ? stack : stack.copyWithCount(WorkOrder.rushAmount(stack.getCount(), bonus))).toList()));
         LoadedWorkOrder rushed = loaded.withOrder(boosted).withRush(host.workOrderGameTime() + WorkOrderRules.rushTicks(order, loaded.traits()));
         host.setWorkOrders(orders.withReplaced(index, rushed).withActive(index));
         return null;

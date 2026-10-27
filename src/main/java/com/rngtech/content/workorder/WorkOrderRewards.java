@@ -2,6 +2,7 @@ package com.rngtech.content.workorder;
 
 import com.rngtech.content.loot.ChallengeContext;
 import com.rngtech.content.loot.ChallengeLoot;
+import com.rngtech.content.registry.ModTags;
 import com.rngtech.rpg.workorder.FulfilledWorkOrder;
 import com.rngtech.rpg.workorder.WorkOrder;
 import com.rngtech.rpg.workorder.WorkOrderRules;
@@ -29,6 +30,8 @@ import java.util.random.RandomGenerator;
  */
 public final class WorkOrderRewards {
     private static final int MAX_STACKS = 27;
+    /** A roll that pays nothing, such as a Unique whose every copy is turned off, rolls again up to this many times. */
+    private static final int ROLL_ATTEMPTS = 8;
 
     private WorkOrderRewards() {
     }
@@ -42,11 +45,15 @@ public final class WorkOrderRewards {
         return order.withRewards(ItemContainerContents.fromItems(roll(level, pos, context, random)));
     }
 
-    /** Rolls the reward table once for {@code order} and scales each result's amount by Bounty. */
+    /** Rolls the reward table once for {@code order} and scales each result's amount by Bounty, except a Unique's. */
     public static List<ItemStack> roll(Level level, BlockPos pos, FulfilledWorkOrder order, RandomGenerator random) {
+        List<ItemStack> rolled = List.of();
+        for (int attempt = 0; attempt < ROLL_ATTEMPTS && rolled.isEmpty(); attempt++) {
+            rolled = ChallengeLoot.roll(level, pos, table(order.rewardTable()), ChallengeContext.of(order, 0));
+        }
         List<ItemStack> merged = new ArrayList<>();
-        for (ItemStack stack : ChallengeLoot.roll(level, pos, table(order.rewardTable()), ChallengeContext.of(order, 0))) {
-            int amount = WorkOrderRules.scaledAmount(stack.getCount(), order.bounty(), random);
+        for (ItemStack stack : rolled) {
+            int amount = fixedAmount(stack) ? stack.getCount() : WorkOrderRules.scaledAmount(stack.getCount(), order.bounty(), random);
             while (amount > 0 && merged.size() < MAX_STACKS) {
                 int count = Math.min(amount, stack.getMaxStackSize());
                 merge(merged, stack.copyWithCount(count));
@@ -54,6 +61,11 @@ public final class WorkOrderRewards {
             }
         }
         return merged;
+    }
+
+    /** Whether Bounty, Rush, and refinement leave {@code stack}'s amount alone: a Unique reward always pays one. */
+    public static boolean fixedAmount(ItemStack stack) {
+        return stack.is(ModTags.Items.UNIQUES);
     }
 
     /** The loot table {@code id} names, or {@code rngtech:challenges/work_order} for "" or an id that does not parse. */

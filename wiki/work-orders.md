@@ -99,11 +99,13 @@ A job has one to three parts, and it is done when every part is done. The termin
 | A streak | Calibrate 12 components in a row at 80+ stability |
 | A stat goal | Reach a Processing Speed of 3.1 on a Crusher |
 
+A chip's tooltip shows its machine, job, condition names, chassis stage, and reward. Hold Shift for what each condition does and pays, the chip's Refinement Potential, and its Prestige.
+
 Only work the machine finishes while the chip is active counts. A batch counts every item it finishes.
 
 Any-work, stage, and setting jobs count **work**, not single items. Each item counts by its recipe's time, so a quick recipe counts as part of an item and a slow one as several. For example, Seeds in a Crusher count as a fraction of an item, and Raw Naquadah counts as several. The chip says "Counts work" on these jobs. Named-item, kind-of-output, and streak jobs count items. The Melter counts mB, and the Forestry Companion counts logs and crops.
 
-- **Stage jobs:** Hold Shift on the chip, or on its row in the Orders tab, to see the items that count. Furnace and Metal Press chips list materials instead.
+- **Stage jobs:** Hold Alt on the chip, or on its row in the Orders tab, to see the items that count. Furnace and Metal Press chips list materials instead.
 - **Streaks:** A streak counts work in a row. A failure resets it to 0, and so does work below the streak's setting. The chip remembers its best streak.
 - **Stat goals:** A stat goal asks the machine to reach a value of one of its stats. The value includes traits, [Gear](gear.md), Mastery, and the chip's conditions. The machine must finish a job while the stat is at or above the target. Installing the right Gear is not enough on its own: the machine has to run. The Orders tab shows the value at the last finished job against the target.
 
@@ -160,7 +162,7 @@ A chip has a [rarity](rarity-and-affixes.md#rarity), like Gear:
 | Magic | 35% | 1 or 2 |
 | Rare | 15% | 3 or 4 |
 
-Conditions are affixes. A prefix lowers one of the machine's stats, and a suffix adds a rule to the job. Each condition adds Bounty, which makes the reward bigger. Rule conditions also add Prestige, which unlocks rarer rewards.
+Conditions are affixes. A prefix lowers one of the machine's stats, and a suffix adds a rule to the job. Each condition adds Bounty, which makes the reward bigger. Rule conditions also add Prestige, which makes a Unique reward more likely.
 
 Conditions apply only while their chip is active. A stat breakdown lists each one's cost, such as "Work Order: Starved Feed".
 
@@ -171,11 +173,11 @@ Conditions apply only while their chip is active. A stat breakdown lists each on
 | Short Crew | 1 less Batch Size | +30% Bounty | Crusher, Furnace, Alloy Furnace, Metal Press, Melter, Resonance Calibrator |
 | Cold Start | 10%–20% reduced Temperature Stability | +15% to +25% Bounty | Furnace, Alloy Furnace, Metal Press |
 | Unsteady Hands | 10%–20% reduced Stability | +15% to +25% Bounty | Metal Press, Resonance Calibrator |
-| of Hand Feeding | Instant Process does not occur | +20% Bounty | Crusher |
+| of Hand Feeding | Instant Process does not occur | +20% Bounty | All except the Forestry Companion |
 | of Brittle Lining | A heat failure resets the job's progress to 0 | +35% Bounty, +1 Prestige | Furnace, Alloy Furnace, Metal Press |
 | of the Jammed Line | A jam resets the job's progress to 0 | +30% Bounty, +1 Prestige | Crusher |
 | of Fine Tolerance | A calibration below the job's stability resets its progress to 0 | +35% Bounty, +1 Prestige | Resonance Calibrator stability jobs |
-| of Deep Ore | Only work one level above the job's minimum counts | +25% Bounty, +1 Prestige | Stage jobs |
+| of Deep Ore | Only work above the job's minimum counts. If the tier's chassis has no work above it, the condition costs nothing. | +25% Bounty, +1 Prestige | Stage jobs |
 | of the Short Fuse | Rush clock 25%–60% shorter | +25% to +60% Rush reward, only when you Rush | All |
 
 A higher-tier condition costs more and pays more. A chip only rolls conditions its job can use.
@@ -231,7 +233,11 @@ Each job pays one kind of reward, shown on the chip, so you choose jobs by what 
 | {{ item('rngtech:requisition', 'Requisitions') }} | All |
 | A {{ item('rngtech:glyph') }} of the job's tier | All |
 | {{ item('rngtech:volatile_catalyst', 'Volatile Catalysts') }}, {{ item('rngtech:affix_upgrade', 'Greater Affix Upgraders') }}, or an {{ item('rngtech:ascension_matrix') }} | III and higher |
-| An unidentified [Unique](uniques.md) | Prestige 2 or more |
+| An unidentified [Unique](uniques.md), most often one for the job's machine | All, but rare |
+
+A Unique is the rarest reward. About 1 job in 130 pays one, so you see one every 20 or so refreshes. Prestige makes it more likely: about 1 in 160 at Prestige 0, 1 in 50 at Prestige 1, and 1 in 20 at Prestige 2 or more. The terminal picks the reward when it lists the job, so Prestige that you add later does not change it. A Unique reward is always one item, whatever the Bounty.
+
+A Unique that fits the job's machine is three times as likely as one that does not. For example, a Melter job favours the Mineshaft Worn Pick-Jaw, both Heat Cores, the Trial Vault Escapement, and the Witch-Bottle Reflux Pump. Every Unique can still drop from any job. Battery Cell Uniques fit every machine, so they are never favoured.
 
 Rewards never include FE, ores, ingots, or other materials. Tier V jobs are the only source of Tier V Glyphs for the [Phase Array](phase-array.md).
 

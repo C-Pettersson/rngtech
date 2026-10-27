@@ -56,9 +56,36 @@ public final class ProcessingBalanceSimulation {
     private final Path recipeRoot;
     final JsonObject setups;
 
-    ProcessingBalanceSimulation(Path projectDir) throws IOException {
+    public ProcessingBalanceSimulation(Path projectDir) throws IOException {
         recipeRoot = projectDir.resolve("src/main/resources/data/rngtech/recipe");
         setups = read(projectDir.resolve("tools/balance/processing-setups.json"));
+    }
+
+    /**
+     * The highest value of {@code stat} any archetype build reaches for {@code family} on {@code stage} at Mastery
+     * {@code level}, the stage's Furnace variants included. Work Order stat goals are checked against it.
+     */
+    public double bestStat(MachineMasteryFamily family, int stage, MachineStat stat, int level) {
+        JsonObject stageSetup = null;
+        for (JsonElement element : setups.getAsJsonArray("stages")) {
+            if (element.getAsJsonObject().get("stage").getAsInt() == stage) { stageSetup = element.getAsJsonObject(); }
+        }
+        if (stageSetup == null) { throw new IllegalArgumentException("No processing setup for Stage " + stage); }
+        List<JsonObject> furnaceSetups = new ArrayList<>(List.of(stageSetup.getAsJsonObject("furnace")));
+        if (stageSetup.has("furnaceVariants")) { stageSetup.getAsJsonArray("furnaceVariants").forEach(variant -> furnaceSetups.add(variant.getAsJsonObject())); }
+        double best = Double.NEGATIVE_INFINITY;
+        for (JsonElement archetype : setups.getAsJsonObject("archetypes").asMap().values()) {
+            if (family == MachineMasteryFamily.CRUSHER) {
+                best = Math.max(best, crusher(stageSetup, archetype.getAsJsonObject().getAsJsonObject("crusher"), level).stats().value(stat));
+            } else if (family == MachineMasteryFamily.FURNACE) {
+                for (JsonObject furnaceSetup : furnaceSetups) {
+                    best = Math.max(best, furnace(stageSetup, furnaceSetup, archetype.getAsJsonObject().getAsJsonObject("furnace"), level).stats().value(stat));
+                }
+            } else {
+                throw new IllegalArgumentException("The processing simulation models only the Crusher and Furnace, not " + family);
+            }
+        }
+        return best;
     }
 
     public static void main(String[] args) throws IOException {
@@ -77,7 +104,7 @@ public final class ProcessingBalanceSimulation {
      * Loads RNGTechConfig defaults the way FML builds a fresh config file, so stat bases and recipe scaling read the real
      * values headless. {@code LoadedConfig} is FML-internal; with a corrected config, accepting it never saves.
      */
-    static void loadDefaultConfig() {
+    public static void loadDefaultConfig() {
         CommentedConfig config = CommentedConfig.inMemory();
         RNGTechConfig.SPEC.correct(config);
         try {

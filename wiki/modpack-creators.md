@@ -300,8 +300,11 @@ The reward table `rngtech:challenges/work_order` is a loot table with one pool a
 - `rngtech:set_order_count` sets an entry's count per tier (`"counts": [t1, t2, t3, t4, t5]`).
 - `rngtech:set_order_tier` sets a Glyph's tier to the job's tier, plus an optional `offset`.
 - The conditions `rngtech:order_tier` and `rngtech:order_prestige` take an inclusive `min` and `max`.
+- `rngtech:machine_family` takes a `family`, such as `melter`, and passes only for that machine's jobs.
 
-When the terminal lists the job, Bounty multiplies the rolled count.
+When the terminal lists the job, Bounty multiplies the rolled count. A Unique always pays one.
+
+The Unique reward is three entries in `rngtech:challenges/work_order`, one per Prestige band. Each nests the table `rngtech:work_orders/unique_reward`, which picks the Unique. Change the band weights to make Uniques more or less common. Change the nested table to change which Uniques drop, or how strongly they favour the job's machine.
 
 ## Phase Array
 
