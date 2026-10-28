@@ -193,7 +193,7 @@ public final class RefinementMenuSupport {
 
     /**
      * A Mirror Catalyst: the target stays as it was, and the player gets one Mirrored copy of it. No focus item works
-     * with the Mirror, so a filled focus slot stops it.
+     * with the Mirror, so a filled focus slot stops it. A tank's copy is empty, so the Mirror never copies fluid.
      */
     private static boolean mirror(Player player, ItemStackHandler inventory, ItemStack target) {
         if (RefinementTargets.isMirrored(target)) {
@@ -210,6 +210,7 @@ public final class RefinementMenuSupport {
         }
         ItemStack copy = target.copyWithCount(1);
         copy.set(ModDataComponents.MIRRORED.get(), Unit.INSTANCE);
+        copy.remove(ModDataComponents.TANK_CONTENTS.get());
         shrinkStack(inventory, SLOT_CONSUMABLE);
         ItemHandlerHelper.giveItemToPlayer(player, copy);
         player.displayClientMessage(Component.translatable("rngtech.refinement.success.mirror"), true);

@@ -7,7 +7,7 @@ import net.minecraft.network.chat.Component;
 import java.util.List;
 import java.util.Locale;
 
-final class CompactValueText {
+public final class CompactValueText {
     private static final String[] UNITS = {"", "K", "M", "G"};
 
     private CompactValueText() {
@@ -37,7 +37,7 @@ final class CompactValueText {
         return compact(amount) + " FE/t";
     }
 
-    static String fluidAmountPair(int amount, int capacity) {
+    public static String fluidAmountPair(int amount, int capacity) {
         int reference = Math.max(Math.abs(amount), Math.abs(capacity));
         if (reference >= 1_000_000_000) {
             return compactFluidValue(amount, 1_000_000_000) + " / " + compactFluidValue(capacity, 1_000_000_000) + "GB";

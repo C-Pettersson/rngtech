@@ -3,16 +3,13 @@
   "pools": [
     {
       "bonus_rolls": 0.0,
-      "conditions": [
-        { "condition": "minecraft:survives_explosion" }
-      ],
       "entries": [
         {
           "type": "minecraft:item",
           "functions": [
             {
               "function": "minecraft:copy_components",
-              "include": [ "rngtech:machine_traits", "rngtech:mirrored" ],
+              "include": [ "rngtech:machine_traits", "rngtech:mirrored", "rngtech:tank_contents" ],
               "source": "block_entity"
             }
           ],

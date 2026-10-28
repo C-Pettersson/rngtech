@@ -7,12 +7,14 @@ import com.rngtech.content.block.UniversalConnectorBlock;
 import com.rngtech.content.item.BatteryCellItem;
 import com.rngtech.content.item.GearParts;
 import com.rngtech.content.item.ServoItem;
+import com.rngtech.content.item.TankContents;
 import com.rngtech.content.machine.CompressorTankMaterial;
 import com.rngtech.content.menu.CompressorTankMenu;
 import com.rngtech.content.purge.FluidPurgeRole;
 import com.rngtech.content.purge.FluidPurgeTarget;
 import com.rngtech.content.purge.PurgeableFluidStorage;
 import com.rngtech.content.registry.ModBlockEntities;
+import com.rngtech.content.registry.ModDataComponents;
 import com.rngtech.rpg.ComponentBaseStatCatalog;
 import com.rngtech.rpg.MachineBaseStatCatalog;
 import com.rngtech.rpg.MachineModifier;
@@ -28,6 +30,7 @@ import com.rngtech.rpg.ModifierSlot;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.core.component.DataComponentMap;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.Connection;
@@ -45,6 +48,7 @@ import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.energy.IEnergyStorage;
 import net.neoforged.neoforge.fluids.FluidActionResult;
@@ -571,6 +575,35 @@ public class CompressorTankBlockEntity extends BaseMachineBlockEntity
         internalEnergy = Math.max(0, tag.getInt("Energy"));
         normalizeCompressedFluid();
         clampInternalEnergy();
+    }
+
+    @Override
+    protected void collectImplicitComponents(DataComponentMap.Builder components) {
+        super.collectImplicitComponents(components);
+        TankContents contents = TankContents.of(looseTank.getFluid(), compressedFluid);
+        if (!contents.isEmpty()) {
+            components.set(ModDataComponents.TANK_CONTENTS.get(), contents);
+        }
+    }
+
+    @Override
+    protected void applyImplicitComponents(BlockEntity.DataComponentInput componentInput) {
+        super.applyImplicitComponents(componentInput);
+        TankContents contents = componentInput.get(ModDataComponents.TANK_CONTENTS.get());
+        if (contents != null) {
+            FluidStack loose = contents.loose().copy();
+            looseTank.setFluid(loose.isEmpty() ? FluidStack.EMPTY : loose.copyWithAmount(Math.min(loose.getAmount(), looseTank.getCapacity())));
+            compressedFluid = contents.compressed().copy();
+            normalizeCompressedFluid();
+        }
+    }
+
+    @Override
+    @SuppressWarnings("deprecation")
+    public void removeComponentsFromTag(CompoundTag tag) {
+        super.removeComponentsFromTag(tag);
+        tag.remove("LooseTank");
+        tag.remove("CompressedFluid");
     }
 
     private boolean compressLooseFluid() {
