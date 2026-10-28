@@ -464,7 +464,7 @@ public class SolarArrayControllerBlockEntity extends BaseMachineBlockEntity impl
             map |= mapBits(panelPos, generation > 0.0);
             if (generation > 0.0) {
                 active++;
-                generatedThisTick += generation;
+                generatedThisTick += generation * RNGTechConfig.stageGenerationMultiplier(panel.material().stage());
             } else {
                 blocked++;
             }
@@ -473,7 +473,8 @@ public class SolarArrayControllerBlockEntity extends BaseMachineBlockEntity impl
 
         if (generatedThisTick > 0.0) {
             double controllerEfficiency = Math.max(0.01, stats.value(MachineStat.EFFICIENCY));
-            generatedThisTick = RNGTechConfig.generatedEnergy(Math.max(0.0, stats.generatedEnergyTotal(generatedThisTick, 1)) * controllerEfficiency);
+            generatedThisTick = Math.max(0.0, stats.generatedEnergyTotal(generatedThisTick, 1)) * controllerEfficiency
+                    * RNGTechConfig.ENERGY_GENERATION_MULTIPLIER.get();
         }
         if (active > 1 && materialState.singleMaterial() && stats.value(MachineStat.SOLAR_PANEL_SYNCHRONIZATION) > 0.0) {
             generatedThisTick *= 1.0 + stats.value(MachineStat.SOLAR_PANEL_SYNCHRONIZATION) / 100.0;

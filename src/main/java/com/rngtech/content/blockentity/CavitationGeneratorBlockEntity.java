@@ -809,7 +809,7 @@ public class CavitationGeneratorBlockEntity extends BaseMachineBlockEntity
         }
         int ticks = stats.adjustedProcessingTicks(recipe.processingTicks());
         return Math.max(1.0, RNGTechConfig.generatedEnergy(stats.generatedEnergyTotal(recipe.energy(), ticks)
-                * Math.max(0.1, stats.value(MachineStat.EFFICIENCY))));
+                * Math.max(0.1, stats.value(MachineStat.EFFICIENCY)), rotorStage(stats)));
     }
 
     private int effectiveHeatStrain(CavitationRecipe recipe, MachineStatAccumulator stats) {

@@ -1,10 +1,15 @@
-# RNGTech in Techopolis 3, optional: double the FE of every RNGTech generator.
+# RNGTech in Techopolis 3, optional: double the FE of RNGTech's Stage 5-8 generators.
 # Add these keys to config/rngtech-common.toml. Not playtested.
 # At 2.0, a Syngas Combustor makes about 480 FE/t and a Fuel Cell about 1,200 FE/t, near the Techopolis Bio
 # Generator's 640 to 1,280 FE/t at Elite Technium. A Vacuum Collapse Generator makes about 2,100 FE/t, near the
 # Techopolis Nuclear Reactor's 2,500 FE/t on Uranium at Ultimate Technium. Fuel burns for the same time, so FE
-# per item doubles too. Early burners also double, to 48-192 FE/t, beside Actually Additions' 40-120 FE/t Oil
-# Generator.
+# per item doubles too. Stages 1-4 stay at 1.0: the Solid Fuel Burner's 24-96 FE/t already sits beside Actually
+# Additions' 40-120 FE/t Oil Generator.
 
 [energy]
-	generationMultiplier = 2.0
+
+	[energy.stageGenerationMultiplier]
+		stage5 = 2.0
+		stage6 = 2.0
+		stage7 = 2.0
+		stage8 = 2.0

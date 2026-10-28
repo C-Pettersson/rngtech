@@ -7,8 +7,10 @@ import com.rngtech.content.material.OreDefinition;
 import com.rngtech.rpg.unique.UniqueCatalog;
 import com.rngtech.rpg.unique.UniqueDefinition;
 
+import net.minecraft.util.Mth;
 import net.neoforged.neoforge.common.ModConfigSpec;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -16,6 +18,7 @@ import java.util.Map;
 
 public final class RNGTechConfig {
     private static final ModConfigSpec.Builder BUILDER = new ModConfigSpec.Builder();
+    private static final int MAX_GENERATOR_STAGE = 8;
 
     public static final ModConfigSpec.IntValue CRUSHER_BASE_INPUT_SLOTS = BUILDER
             .comment("The base number of crusher input slots before modifiers are applied.")
@@ -86,8 +89,10 @@ public final class RNGTechConfig {
             .define("solar.dimensions.other", false);
 
     public static final ModConfigSpec.DoubleValue ENERGY_GENERATION_MULTIPLIER = BUILDER
-            .comment("Multiplier applied to the FE every RNGTech generator makes, after machine stats. Fuel burn time, heat, and byproducts stay the same, so FE per item scales too. Use it to match another energy mod in a modpack.")
+            .comment("Multiplier applied to the FE every RNGTech generator makes, after machine stats and together with energy.stageGenerationMultiplier. Fuel burn time, heat, and byproducts stay the same, so FE per item scales too. Use it to match another energy mod in a modpack.")
             .defineInRange("energy.generationMultiplier", 1.0D, 0.01D, 100.0D);
+
+    public static final List<ModConfigSpec.DoubleValue> ENERGY_STAGE_GENERATION_MULTIPLIERS = defineStageGenerationMultipliers();
 
     public static final ModConfigSpec.IntValue CALIBRATION_STABILITY_BONUS = BUILDER
             .comment("Flat stability adjustment applied to all calibrated outputs. Use negative values to make calibration more punishing.")
@@ -252,9 +257,24 @@ public final class RNGTechConfig {
         return new UniqueLootConfig(enabled, Collections.unmodifiableMap(values));
     }
 
-    /** {@code energy} FE from an RNGTech generator, scaled by the pack's generation multiplier. */
-    public static double generatedEnergy(double energy) {
-        return energy * ENERGY_GENERATION_MULTIPLIER.get();
+    private static List<ModConfigSpec.DoubleValue> defineStageGenerationMultipliers() {
+        List<ModConfigSpec.DoubleValue> values = new ArrayList<>();
+        for (int stage = 1; stage <= MAX_GENERATOR_STAGE; stage++) {
+            values.add(BUILDER
+                    .comment("Multiplier applied to the FE of Stage " + stage + " RNGTech generators, together with energy.generationMultiplier. A generator's stage is the stage of its Heat Core, Collapse Nozzle, or Cavitation Rotor when it uses one, or else the machine's own stage.")
+                    .defineInRange("energy.stageGenerationMultiplier.stage" + stage, 1.0D, 0.01D, 100.0D));
+        }
+        return Collections.unmodifiableList(values);
+    }
+
+    /** The pack's FE multiplier for a Stage {@code stage} generator; stages outside 1 to 8 use the nearest one. */
+    public static double stageGenerationMultiplier(int stage) {
+        return ENERGY_STAGE_GENERATION_MULTIPLIERS.get(Mth.clamp(stage, 1, MAX_GENERATOR_STAGE) - 1).get();
+    }
+
+    /** {@code energy} FE from a Stage {@code stage} RNGTech generator, scaled by the pack's global and stage multipliers. */
+    public static double generatedEnergy(double energy, int stage) {
+        return energy * ENERGY_GENERATION_MULTIPLIER.get() * stageGenerationMultiplier(stage);
     }
 
     /** Whether the default loot tables may drop {@code uniqueId}. */

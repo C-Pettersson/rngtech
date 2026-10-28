@@ -993,7 +993,8 @@ public class GasChemistryBlockEntity extends BaseMachineBlockEntity
 
     private long adjustedGeneration(long baseEnergy, int processingTicks) {
         MachineStatAccumulator stats = effectiveStats();
-        return Math.max(1L, Mth.lfloor(RNGTechConfig.generatedEnergy(stats.generatedEnergyTotal(baseEnergy, processingTicks) * stats.value(MachineStat.EFFICIENCY))));
+        return Math.max(1L, Mth.lfloor(RNGTechConfig.generatedEnergy(stats.generatedEnergyTotal(baseEnergy, processingTicks) * stats.value(MachineStat.EFFICIENCY),
+                machine.stage())));
     }
 
     private boolean canAcceptOutput(FluidTank tank, FluidStack output) {

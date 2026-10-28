@@ -23,6 +23,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Blocks;
+import net.neoforged.neoforge.common.ModConfigSpec;
 import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
@@ -168,6 +169,52 @@ public final class SolidFuelBurnerGameTests {
         check(base.energyRate() > 0, "The plain burner should be burning");
         check(doubled.energyRate() == 2 * base.energyRate(), "A 2x multiplier should double " + base.energyRate() + " FE/t, ran at " + doubled.energyRate());
         check(doubled.fuelMax() == base.fuelMax(), "Coal should burn for " + base.fuelMax() + " ticks at any multiplier, burned for " + doubled.fuelMax());
+        helper.succeed();
+    }
+
+    /**
+     * A stage multiplier scales only burners whose Heat Core has that stage, on top of the global multiplier. The
+     * config is set and restored within this tick, so other tests never see it.
+     */
+    @GameTest(template = MachineTestSupport.EMPTY)
+    public static void stageMultiplierFollowsTheHeatCore(GameTestHelper helper) {
+        SolidFuelBurnerBlockEntity plainSteel = burner(helper, new BlockPos(1, 1, 1), SolidFuelBurnerChassis.STEEL,
+                HeatCoreMaterial.STEEL, FuelBoxMaterial.IRON, new ItemStack(Items.COAL, 8));
+        SolidFuelBurnerBlockEntity scaledSteel = burner(helper, new BlockPos(3, 1, 1), SolidFuelBurnerChassis.STEEL,
+                HeatCoreMaterial.STEEL, FuelBoxMaterial.IRON, new ItemStack(Items.COAL, 8));
+        SolidFuelBurnerBlockEntity plainCopper = burner(helper, new BlockPos(1, 1, 3), SolidFuelBurnerChassis.STEEL,
+                HeatCoreMaterial.COPPER, FuelBoxMaterial.IRON, new ItemStack(Items.COAL, 8));
+        SolidFuelBurnerBlockEntity scaledCopper = burner(helper, new BlockPos(3, 1, 3), SolidFuelBurnerChassis.STEEL,
+                HeatCoreMaterial.COPPER, FuelBoxMaterial.IRON, new ItemStack(Items.COAL, 8));
+        double previousGlobal = RNGTechConfig.ENERGY_GENERATION_MULTIPLIER.get();
+        ModConfigSpec.DoubleValue stageFour = RNGTechConfig.ENERGY_STAGE_GENERATION_MULTIPLIERS.get(3);
+        double previousStageFour = stageFour.get();
+        MachineInfoSnapshot steelBase;
+        MachineInfoSnapshot steelScaled;
+        MachineInfoSnapshot copperBase;
+        MachineInfoSnapshot copperScaled;
+        try {
+            RNGTechConfig.ENERGY_GENERATION_MULTIPLIER.set(1.0D);
+            stageFour.set(1.0D);
+            tick(helper, plainSteel);
+            tick(helper, plainCopper);
+            steelBase = plainSteel.machineInfo();
+            copperBase = plainCopper.machineInfo();
+            RNGTechConfig.ENERGY_GENERATION_MULTIPLIER.set(2.0D);
+            stageFour.set(3.0D);
+            tick(helper, scaledSteel);
+            tick(helper, scaledCopper);
+            steelScaled = scaledSteel.machineInfo();
+            copperScaled = scaledCopper.machineInfo();
+        } finally {
+            RNGTechConfig.ENERGY_GENERATION_MULTIPLIER.set(previousGlobal);
+            stageFour.set(previousStageFour);
+        }
+        check(steelBase.energyRate() > 0 && copperBase.energyRate() > 0, "Both plain burners should be burning");
+        check(steelScaled.energyRate() == 6 * steelBase.energyRate(),
+                "2x global and 3x Stage 4 should make " + steelBase.energyRate() + " FE/t six times as much, ran at " + steelScaled.energyRate());
+        check(copperScaled.energyRate() == 2 * copperBase.energyRate(),
+                "A Copper Heat Core should get only the 2x global, " + copperBase.energyRate() + " FE/t ran at " + copperScaled.energyRate());
         helper.succeed();
     }
 

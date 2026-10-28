@@ -642,7 +642,8 @@ public class PotentialReactorBlockEntity extends BaseMachineBlockEntity implemen
         double efficiency = Math.max(0.1, stats.value(MachineStat.EFFICIENCY));
         double stability = Mth.clamp(stats.value(MachineStat.STABILITY), 0.25, 1.50);
         int ticks = stats.adjustedProcessingTicks(work.processingTicks());
-        return Math.max(1.0, RNGTechConfig.generatedEnergy(stats.generatedEnergyTotal(work.energy(), ticks) * efficiency * stability));
+        return Math.max(1.0, RNGTechConfig.generatedEnergy(stats.generatedEnergyTotal(work.energy(), ticks) * efficiency * stability,
+                refinementComponentStage()));
     }
 
     /** How many times an energy export looked a neighbour up instead of reusing its cached capability. */

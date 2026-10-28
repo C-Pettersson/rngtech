@@ -126,10 +126,10 @@ burners. From Elite up, the Bio Generator outruns the Syngas Combustor and Fuel 
 times the FE per fuel. At Ultimate, Extreme Reactors and the Nuclear Reactor pass every RNGTech generator. Players
 will run RNGTech machines on Techopolis power from Elite on. That works, because RNGTech uses plain FE.
 
-`optional/rngtech-common-energy.toml` sets `energy.generationMultiplier = 2.0`. That gives a Syngas Combustor
-about 480 FE/t and a Fuel Cell about 1,200 FE/t, near the Bio Generator, and a Vacuum Collapse Generator about
-2,100 FE/t, near the Nuclear Reactor on Uranium. Early burners also double, to 48-192 FE/t. This is not
-playtested.
+`optional/rngtech-common-energy.toml` doubles the FE of Stage 5-8 generators and leaves Stages 1-4 alone, where
+the burners already match the pack. That gives a Syngas Combustor about 480 FE/t and a Fuel Cell about
+1,200 FE/t, near the Bio Generator, and a Vacuum Collapse Generator about 2,100 FE/t, near the Nuclear Reactor on
+Uranium. This is not playtested.
 
 RNGTech machines use about as much energy as the pack's. Raw metal to ingots costs about `7,200 FE` per ingot in
 the Stage 1 Crusher and Furnace, and about `7,600 FE` in the Immersive Engineering Crusher and Mekanism Energized

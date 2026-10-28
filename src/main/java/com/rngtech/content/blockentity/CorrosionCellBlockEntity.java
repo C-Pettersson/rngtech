@@ -712,7 +712,8 @@ public class CorrosionCellBlockEntity extends BaseMachineBlockEntity
         double efficiency = Math.max(0.1, stats.value(MachineStat.EFFICIENCY));
         double stability = Mth.clamp(stats.value(MachineStat.STABILITY), 0.25, 1.50);
         int ticks = stats.adjustedProcessingTicks(recipe.processingTicks());
-        return Math.max(1.0, RNGTechConfig.generatedEnergy(stats.generatedEnergyTotal(recipe.energy(), ticks) * efficiency * stability));
+        return Math.max(1.0, RNGTechConfig.generatedEnergy(stats.generatedEnergyTotal(recipe.energy(), ticks) * efficiency * stability,
+                COMPONENT_STAGE));
     }
 
     private ItemStack availableElectrolyteStack() {

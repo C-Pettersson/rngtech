@@ -616,7 +616,8 @@ public class AmmoniaFuelCellBlockEntity extends BaseMachineBlockEntity
     private long adjustedEnergy(AmmoniaPowerCycleRecipe recipe) {
         MachineStatAccumulator stats = effectiveStats();
         int ticks = adjustedTicks(recipe);
-        return Math.max(1L, Mth.lfloor(RNGTechConfig.generatedEnergy(stats.generatedEnergyTotal(recipe.energy(), ticks) * stats.value(MachineStat.EFFICIENCY))));
+        return Math.max(1L, Mth.lfloor(RNGTechConfig.generatedEnergy(stats.generatedEnergyTotal(recipe.energy(), ticks) * stats.value(MachineStat.EFFICIENCY),
+                refinementComponentStage())));
     }
 
     public MachineStatAccumulator effectiveStats() {

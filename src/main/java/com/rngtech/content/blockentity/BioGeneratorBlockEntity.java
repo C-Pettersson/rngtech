@@ -924,7 +924,7 @@ public class BioGeneratorBlockEntity extends BaseMachineBlockEntity implements M
     private double ratedGeneration(MachineStatAccumulator stats) {
         double multiplier = Math.max(0.1, stats.effectiveEnergyGenerationMultiplier());
         double flatBonus = Math.max(0.0, stats.effectiveFlatEnergyGenerationBonus());
-        return RNGTechConfig.generatedEnergy(BASE_GENERATION_RATE * multiplier + flatBonus);
+        return RNGTechConfig.generatedEnergy(BASE_GENERATION_RATE * multiplier + flatBonus, refinementComponentStage());
     }
 
     /** Digestion and engine FE/t at the selected retention. */

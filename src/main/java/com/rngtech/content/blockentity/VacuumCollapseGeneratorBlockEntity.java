@@ -617,7 +617,13 @@ public class VacuumCollapseGeneratorBlockEntity extends BaseMachineBlockEntity i
         double instabilityPenalty = 1.0 - Math.min(0.35, instabilityPressure(recipe, stats, depth) * 0.08);
         int ticks = adjustedProcessingTicks(recipe, stats, depth);
         double baseEnergy = recipe.energy() * VacuumCollapseDynamics.energy(depth);
-        return Math.max(1L, Math.round(RNGTechConfig.generatedEnergy(stats.generatedEnergyTotal(baseEnergy, ticks) * efficiency * instabilityPenalty)));
+        return Math.max(1L, Math.round(RNGTechConfig.generatedEnergy(
+                stats.generatedEnergyTotal(baseEnergy, ticks) * efficiency * instabilityPenalty, generatorStage())));
+    }
+
+    /** The installed Collapse Nozzle sets the generator's stage for the pack's stage energy multiplier. */
+    private int generatorStage() {
+        return nozzleStack().getItem() instanceof CollapseNozzleItem nozzle ? nozzle.stage() : 7;
     }
 
     private int adjustedProcessingTicks(VacuumCollapseRecipe recipe, MachineStatAccumulator stats, int depth) {
