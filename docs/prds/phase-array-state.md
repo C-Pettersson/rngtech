@@ -2,7 +2,7 @@
 
 Source: [draft design](phase-array.md).
 
-Status: **Prototype**. The PRD was accepted on 2026-10-21 and every delivery phase merged to `main` in #205. The Exotic Affix Forge is replaced. Everything still needs an in-game playtest.
+Status: **Implemented**. The PRD was accepted on 2026-10-21 and every delivery phase merged to `main` in #205. The Exotic Affix Forge is replaced. The in-game playtest is done; the open questions below stay open.
 
 ## Scope checklist
 
@@ -17,7 +17,7 @@ Status: **Prototype**. The PRD was accepted on 2026-10-21 and every delivery pha
 - [x] Removal of the Exotic Affix Forge operations, history, recipe type, menu, screen, JEI category, and config keys (phase 4), then its catalyst item, wiki page, guide pages, and quest text (phase 7).
 - [x] Balance-world setup `rngbalance:phase_array`.
 - [x] Documentation: wiki page, Rarity and Affixes, Machine Stats, Battery Cells, Modpack Creators, the implementation matrix, the GuideME guide, Machine Design Notes, and quests.
-- [ ] In-game playtest of every operation and outcome.
+- [x] In-game playtest of every operation and outcome.
 
 ## Decisions
 
