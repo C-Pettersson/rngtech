@@ -136,14 +136,11 @@ public class SilicaGelDehumidifierMenu extends AbstractContainerMenu {
                 return ItemStack.EMPTY;
             }
         } else if (dehumidifier.isDryInput(stack)) {
-            if (!moveItemStackTo(
-                    stack,
-                    SilicaGelDehumidifierBlockEntity.SLOT_DRY_START,
-                    SilicaGelDehumidifierBlockEntity.SLOT_SATURATED_START,
-                    false
-            )) {
+            int remaining = dehumidifier.insertDryInput(stack.copy(), false).getCount();
+            if (remaining == stack.getCount()) {
                 return ItemStack.EMPTY;
             }
+            stack.setCount(remaining);
         } else {
             return ItemStack.EMPTY;
         }

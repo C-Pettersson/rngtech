@@ -92,8 +92,7 @@ public class SilicaGelDehumidifierBlockEntity extends BlockEntity
         }
     };
     private final MutableFluidTank waterTank = new MutableFluidTank(stack -> !stack.isEmpty(), TANK_CAPACITY);
-    private final IItemHandler inputHandler = new LaneInputItemHandler();
-    private final IItemHandler outputHandler = new LaneOutputItemHandler();
+    private final IItemHandler automationHandler = new AutomationItemHandler();
     private final IFluidHandler drainOnlyFluidHandler = new DrainOnlyFluidHandler();
     private final int[] progress = new int[LANE_COUNT];
     private final ContainerData menuData = new ContainerData() {
@@ -151,7 +150,9 @@ public class SilicaGelDehumidifierBlockEntity extends BlockEntity
             changed |= dehumidifier.tickLane(lane);
             active |= dehumidifier.progress[lane] > 0;
         }
-        BaseMachineBlock.setActive(level, pos, state, dehumidifier.structureValid && active);
+        boolean working = dehumidifier.structureValid && active;
+        BaseMachineBlock.setActive(level, pos, state, working);
+        dehumidifier.setColumnActive(working);
         if (changed) {
             dehumidifier.setChanged();
         }
@@ -187,16 +188,19 @@ public class SilicaGelDehumidifierBlockEntity extends BlockEntity
     }
 
     public IItemHandler getItemHandler(Direction side) {
-        if (side == null) {
-            return inventory;
+        return side == null ? inventory : automationHandler;
+    }
+
+    public IItemHandler getCasingItemHandler(Direction side) {
+        return structureValid && side != null ? automationHandler : null;
+    }
+
+    /** Puts dry beads in the lane inputs, each bead in the emptiest lane that can take it. */
+    public ItemStack insertDryInput(ItemStack stack, boolean simulate) {
+        if (!isDryInput(stack)) {
+            return stack;
         }
-        if (side == Direction.UP) {
-            return inputHandler;
-        }
-        if (side == Direction.DOWN) {
-            return outputHandler;
-        }
-        return null;
+        return EvenLaneFeed.insert(inventory, SLOT_DRY_START, LANE_COUNT, stack, simulate);
     }
 
     public IFluidHandler getFluidHandler(Direction side) {
@@ -437,8 +441,25 @@ public class SilicaGelDehumidifierBlockEntity extends BlockEntity
         if (!state.is(ModBlocks.SILICA_GEL_COLUMN_CASING.get()) || state.getValue(SilicaGelColumnCasingBlock.PART) == part) {
             return false;
         }
-        level.setBlock(pos, state.setValue(SilicaGelColumnCasingBlock.PART, part), Block.UPDATE_ALL);
+        BlockState updated = state.setValue(SilicaGelColumnCasingBlock.PART, part);
+        if (part == SilicaGelColumnCasingBlock.ColumnPart.SINGLE) {
+            updated = updated.setValue(SilicaGelColumnCasingBlock.ACTIVE, false);
+        }
+        level.setBlock(pos, updated, Block.UPDATE_ALL);
         return true;
+    }
+
+    private void setColumnActive(boolean active) {
+        if (!structureValid) {
+            return;
+        }
+        for (int offset = 1; offset <= 2; offset++) {
+            BlockPos pos = worldPosition.above(offset);
+            BlockState state = level.getBlockState(pos);
+            if (state.is(ModBlocks.SILICA_GEL_COLUMN_CASING.get()) && state.getValue(SilicaGelColumnCasingBlock.ACTIVE) != active) {
+                level.setBlock(pos, state.setValue(SilicaGelColumnCasingBlock.ACTIVE, active), Block.UPDATE_CLIENTS);
+            }
+        }
     }
 
     private int statusCode(int lane, DesiccantAbsorptionRecipe recipe) {
@@ -504,67 +525,36 @@ public class SilicaGelDehumidifierBlockEntity extends BlockEntity
         return (index - DATA_LANES_START) % DATA_PER_LANE;
     }
 
-    private final class LaneInputItemHandler implements IItemHandler {
+    /** Every face: dry beads go into the lanes evenly, saturated beads come out. */
+    private final class AutomationItemHandler implements IItemHandler {
         @Override
         public int getSlots() {
-            return LANE_COUNT;
+            return SLOT_COUNT;
         }
 
         @Override
         public ItemStack getStackInSlot(int slot) {
-            return inventory.getStackInSlot(inputSlot(slot));
+            return inventory.getStackInSlot(slot);
         }
 
         @Override
         public ItemStack insertItem(int slot, ItemStack stack, boolean simulate) {
-            return inventory.insertItem(inputSlot(slot), stack, simulate);
+            return slot < SLOT_SATURATED_START ? insertDryInput(stack, simulate) : stack;
         }
 
         @Override
         public ItemStack extractItem(int slot, int amount, boolean simulate) {
-            return ItemStack.EMPTY;
+            return slot >= SLOT_SATURATED_START ? inventory.extractItem(slot, amount, simulate) : ItemStack.EMPTY;
         }
 
         @Override
         public int getSlotLimit(int slot) {
-            return inventory.getSlotLimit(inputSlot(slot));
+            return inventory.getSlotLimit(slot);
         }
 
         @Override
         public boolean isItemValid(int slot, ItemStack stack) {
-            return inventory.isItemValid(inputSlot(slot), stack);
-        }
-    }
-
-    private final class LaneOutputItemHandler implements IItemHandler {
-        @Override
-        public int getSlots() {
-            return LANE_COUNT;
-        }
-
-        @Override
-        public ItemStack getStackInSlot(int slot) {
-            return inventory.getStackInSlot(outputSlot(slot));
-        }
-
-        @Override
-        public ItemStack insertItem(int slot, ItemStack stack, boolean simulate) {
-            return stack;
-        }
-
-        @Override
-        public ItemStack extractItem(int slot, int amount, boolean simulate) {
-            return inventory.extractItem(outputSlot(slot), amount, simulate);
-        }
-
-        @Override
-        public int getSlotLimit(int slot) {
-            return inventory.getSlotLimit(outputSlot(slot));
-        }
-
-        @Override
-        public boolean isItemValid(int slot, ItemStack stack) {
-            return false;
+            return inventory.isItemValid(slot, stack);
         }
     }
 
