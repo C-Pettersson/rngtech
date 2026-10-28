@@ -3,6 +3,7 @@ package com.rngtech;
 import com.rngtech.client.CableTintClient;
 import com.rngtech.client.ItemLinkClient;
 import com.rngtech.client.MinersCompanionLampClient;
+import com.rngtech.client.PlacementPreviewClient;
 import com.rngtech.client.configurator.ConfiguratorClient;
 import com.rngtech.client.renderer.AffixForgeRenderer;
 import com.rngtech.client.renderer.AlgaePhotobioreactorRenderer;
@@ -147,6 +148,7 @@ public final class RNGTechClient {
         NeoForge.EVENT_BUS.addListener(WrenchOverlayClient::onClientTick);
         NeoForge.EVENT_BUS.addListener(WrenchOverlayClient::onUseInput);
         NeoForge.EVENT_BUS.addListener(WrenchOverlayClient::onRenderLevel);
+        NeoForge.EVENT_BUS.addListener(PlacementPreviewClient::onRenderLevel);
         NeoForge.EVENT_BUS.addListener(ConfiguratorClient::onClientTick);
         NeoForge.EVENT_BUS.addListener(MachineSoundClient::onClientTick);
         NeoForge.EVENT_BUS.addListener(MinersCompanionLampClient::onClientTick);

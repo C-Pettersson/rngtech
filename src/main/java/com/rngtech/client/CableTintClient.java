@@ -34,7 +34,7 @@ public final class CableTintClient {
         );
     }
 
-    private static int tint(DyeColor color) {
+    public static int tint(DyeColor color) {
         return FastColor.ARGB32.opaque(color == null ? UNDYED_TINT : color.getTextureDiffuseColor());
     }
 }
