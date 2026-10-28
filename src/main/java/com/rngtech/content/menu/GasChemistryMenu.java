@@ -1,5 +1,6 @@
 package com.rngtech.content.menu;
 
+import com.rngtech.content.blockentity.BaseMachineBlockEntity;
 import com.rngtech.content.blockentity.GasChemistryBlockEntity;
 import com.rngtech.content.chemistry.GasChemistryMachine;
 import com.rngtech.content.energy.CombustionMixture;
@@ -50,7 +51,6 @@ public class GasChemistryMenu extends AbstractContainerMenu implements StatBreak
     private static final int DATA_ENERGY_TRANSFER = 13;
     private static final int DATA_PROCESSING_SPEED = 14;
     private static final int DATA_EFFICIENCY = 15;
-    private static final int DATA_MAX_TEMPERATURE = 16;
     private static final int DATA_REFINEMENT_POTENTIAL = 17;
     private static final int DATA_FLAT_ENERGY_GENERATION = 18;
     private static final int DATA_BASE_ENERGY_GENERATION = 19;
@@ -128,6 +128,9 @@ public class GasChemistryMenu extends AbstractContainerMenu implements StatBreak
     }
 
     public float progressFill() {
+        if (instantFlash()) {
+            return 1.0F;
+        }
         int ticks = data.get(DATA_PROCESSING_TICKS);
         return ticks <= 0 ? 0.0F : Mth.clamp((float) data.get(DATA_PROGRESS) / (float) ticks, 0.0F, 1.0F);
     }
@@ -166,8 +169,13 @@ public class GasChemistryMenu extends AbstractContainerMenu implements StatBreak
         return BUTTON_MIXTURE_BASE + CombustionMixture.clamp(mixture);
     }
 
+    /** Whether the bar should flash for a job that just finished instantly. */
+    public boolean instantFlash() {
+        return data.get(DATA_PROGRESS) == BaseMachineBlockEntity.INSTANT_FLASH_PROGRESS;
+    }
+
     public int progress() {
-        return data.get(DATA_PROGRESS);
+        return Math.max(0, data.get(DATA_PROGRESS));
     }
 
     public int processingTicks() {
@@ -280,10 +288,6 @@ public class GasChemistryMenu extends AbstractContainerMenu implements StatBreak
 
     public static int efficiencyDataIndex() {
         return DATA_EFFICIENCY;
-    }
-
-    public static int maxTemperatureDataIndex() {
-        return DATA_MAX_TEMPERATURE;
     }
 
     public static int refinementPotentialDataIndex() {

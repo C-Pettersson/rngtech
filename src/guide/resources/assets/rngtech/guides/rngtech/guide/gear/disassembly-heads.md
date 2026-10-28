@@ -8,7 +8,7 @@ navigation:
 
 # Disassembly Heads
 
-A Disassembly Head sets the processing level, speed, and stability of a powered [Component Recycler](rngtech:component-recycler.md). Recycling recipes need a head of at least their level.
+A Disassembly Head sets the processing level and speed of a powered [Component Recycler](rngtech:component-recycler.md). Recycling recipes need a head of at least their level.
 
 | Disassembly Head | Stage |
 |---|---:|

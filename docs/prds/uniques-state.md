@@ -74,6 +74,8 @@ Recorded 2026-10-10 during implementation:
 
 - 2026-10-26: removed the six machine-event challenge tables, their hooks in every machine and the Forestry Companion, `masteryLevelGained`, and `ChallengeLoot.reward` and `drop`. Machines roll no loot on their own events, so nothing drops on top of a machine. The `rngtech:challenge` type, `ChallengeContext`, and the conditions stay for Work Orders.
 
+- 2026-10-28: the Crying Crucible's less Stability drawback became (40–20)% less Overheat Tolerance. The Alloy Furnace never read Stability, so the old drawback did nothing; `UniqueStatReaders` no longer lists Stability for the Alloy Furnace, so the catalog rejects it there. Crucibles identified earlier load with the new line at its midpoint.
+
 ## Verification
 
 - 2026-10-04: documentation only. `npm run repo:check` and `mkdocs build --strict` passed. No Gradle or ModDex checks were run, because no code or data changed.

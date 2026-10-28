@@ -3,7 +3,6 @@
 These pages describe proposed systems or requirements beyond the implemented feature set. They are not release promises. Use [Current Implementation](reference/current-implementation.md) and the [player wiki](https://c-pettersson.github.io/rngtech/) to check what the mod does today.
 
 - [Crafting and Upgrades](systems/crafting.md): assembly and refinement context, plus planned breakthrough and strain systems.
-- [Affix-Driven Generator](content/affix-driven-generator.md), [Entropy Cell](content/entropy-cell.md), and [Ore Slurry Turbine](content/ore-slurry-turbine.md): unregistered generator concepts.
 - [Auto Balance](modifiers/auto-balance.md) and [Packer](modifiers/packer.md): planned modifiers. Implemented [Balance Mode](https://c-pettersson.github.io/rngtech/rarity-and-affixes/#balance-mode) is a separate Battery Chassis affix.
 - [Unique Item Ideas](reference/unique-item-ideas.md): candidate items, not registered content.
 - [Unique Items requirements](prds/uniques.md): accepted 2.0 design for a shared Unique catalog, ranged rolls, and eight launch Uniques.
@@ -21,14 +20,9 @@ Future work on machines that already ship. Design intent for their current behav
 
 ### Battery Chassis
 
-- Burst risk pass: give burst a budget (`ENERGY_TRANSFER x BURST_DURATION`), cooldown, and stability risk. Low-stability chassis such as Gold may overload, waste FE, or briefly lose burst; high-stability chassis such as Steel or Exotic burst more safely at a lower multiplier. Burst stays output-only, never creates energy or capacity, and never exceeds installed-cell output rates.
 - A Gear tab for non-cell chassis components, kept player-managed rather than exposed to hoppers or item pipes.
 - More global modifier areas: reservation (hold back a slot or a share of stored FE), matching bonuses for cells that share material, rarity, or modifier themes, throttled or charge-first output, redstone control, and side configuration.
 - Material directions not built yet: Lead shielding banks with low idle loss, Redstone and Quartz control and precise-balancing chassis, and Titanium or Tungstensteel high-transfer banks.
-
-### Battery Cells
-
-- Decide what cell Efficiency does. It shows in the cell tooltip, but no transfer path reads it.
 
 ### Corrosion Cell
 
@@ -51,11 +45,6 @@ Future work on machines that already ship. Design intent for their current behav
 - Rolled Fuel Governor modifiers: a fuel-control suffix and an automation-focused enchant-style effect. Today Fuel Governor, Quick Feed, Fuel Reserve, and Block Feed are fixed Fuel Box behaviors only.
 - Generator identity modifiers for burner chassis.
 
-### Gas Chemistry and Ammonia
-
-- The Coal Gasifier, Steam Methane Reformer, and Ammonia Synthesizer roll Bulk Speed but do not apply it. Wire it in or drop it from their profiles.
-- Stability and Fluid Transfer rolls on the Ammonia Catalyst Bed and Fuel Cell Membrane have no effect, and the Synthesizer ignores Efficiency and Instant Process. Wire them in or stop rolling them.
-
 ### Dormant Machines
 
 - Whether the End Relay or Nether Smeltworks should carry a Seal I tier with an ascendancy already chosen. The default keeps Seals as the only ascendancy source.
@@ -65,7 +54,6 @@ Future work on machines that already ship. Design intent for their current behav
 ### Furnace and Machine Chassis
 
 - Furnace-specific Gear for the Stage 0 Furnace, which already keeps a saved component slot.
-- A Washer machine. The `rngtech:washer_machine_chassis` ingredient is craftable, but no Washer block or recipe type exists.
 - Enchant-style chassis behavior.
 
 ### Modular Field Tools

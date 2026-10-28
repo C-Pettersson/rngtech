@@ -283,7 +283,8 @@ public class GasChemistryScreen extends AbstractContainerScreen<GasChemistryMenu
         int progressX = menu.machine() == GasChemistryMachine.COAL_GASIFIER ? GASIFIER_PROGRESS_X : STANDARD_PROGRESS_X;
         int progressWidth = menu.machine() == GasChemistryMachine.COAL_GASIFIER ? GASIFIER_PROGRESS_WIDTH : STANDARD_PROGRESS_WIDTH;
         guiGraphics.fill(leftPos + progressX, topPos + 54, leftPos + progressX + progressWidth, topPos + 62, DARK);
-        guiGraphics.fill(leftPos + progressX + 1, topPos + 55, leftPos + progressX + 1 + Math.round((progressWidth - 2) * menu.progressFill()), topPos + 61, PROGRESS);
+        guiGraphics.fill(leftPos + progressX + 1, topPos + 55, leftPos + progressX + 1 + Math.round((progressWidth - 2) * menu.progressFill()), topPos + 61,
+                menu.instantFlash() ? MachineScreenStyle.INSTANT_FLASH : PROGRESS);
         statusIcon(guiGraphics, progressX, 39);
         renderPurgeButtons(guiGraphics);
         if (menu.machine() == GasChemistryMachine.SYNGAS_COMBUSTOR) {
@@ -318,8 +319,7 @@ public class GasChemistryScreen extends AbstractContainerScreen<GasChemistryMenu
         }
         return new MachineScreenStyle.StatLine[] {
                 stat("rngtech.stat.energy_usage", menu.statValue(GasChemistryMenu.energyUsageDataIndex()), MachineStat.ENERGY_USAGE),
-                stat("rngtech.stat.processing_speed", menu.statValue(GasChemistryMenu.processingSpeedDataIndex()), MachineStat.PROCESSING_SPEED),
-                stat("rngtech.stat.max_temperature", menu.statValue(GasChemistryMenu.maxTemperatureDataIndex()), MachineStat.MAX_TEMPERATURE)
+                stat("rngtech.stat.processing_speed", menu.statValue(GasChemistryMenu.processingSpeedDataIndex()), MachineStat.PROCESSING_SPEED)
         };
     }
 

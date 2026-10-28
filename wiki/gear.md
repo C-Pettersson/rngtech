@@ -246,7 +246,7 @@ Recovery Filters also fit the [Component Recycler](component-recycler.md) (optio
 
 ### Disassembly Heads
 
-A Disassembly Head sets the processing level, speed, and stability of a powered [Component Recycler](component-recycler.md). Recycling recipes need a head of at least their level.
+A Disassembly Head sets the processing level and speed of a powered [Component Recycler](component-recycler.md). Recycling recipes need a head of at least their level.
 
 | Disassembly Head | Stage |
 |---|---:|
@@ -383,7 +383,7 @@ The [Vacuum Collapse Generator](vacuum-collapse-generator.md) needs both. The **
 
 ### Catalyst Beds and membranes
 
-These single-item parts gate the gas chemistry machines' recipes and tune their speed, efficiency, and stability. The Biogas Membrane instead sets how much Methane a Bio Generator take-off recovers; it rolls no affixes.
+These single-item parts gate the gas chemistry machines' recipes. The Catalyst Beds tune speed, energy use, and Instant Process. The Fuel Cell Membrane tunes generation, speed, and efficiency. The Biogas Membrane instead sets how much Methane a Bio Generator take-off recovers; it rolls no affixes.
 
 | Part | Used in |
 |---|---|

@@ -61,11 +61,11 @@
     ],
     "blighted": [
         {
-            "id": "stability",
+            "id": "temperature_stability",
             "weight": 100,
             "modifiers": [
                 {
-                    "stat": "stability",
+                    "stat": "temperature_stability",
                     "operation": "less",
                     "value": 0.8
                 }

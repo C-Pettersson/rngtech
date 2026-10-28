@@ -1,5 +1,8 @@
 package com.rngtech.rpg;
 
+import com.rngtech.content.tool.ToolHeadFamily;
+import com.rngtech.content.tool.ToolHeadMaterial;
+
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.LinkedHashSet;
@@ -1689,8 +1692,7 @@ public final class ModifierEligibilityProfiles {
                     MachineStat.INPUT_SLOTS,
                     MachineStat.ENERGY_GENERATION,
                     MachineStat.FUEL_DURATION,
-                    MachineStat.HEAT_ISOLATION,
-                    MachineStat.STABILITY
+                    MachineStat.HEAT_ISOLATION
             )
     );
     public static final ModifierEligibilityProfile BIO_GENERATOR = profile(
@@ -1811,11 +1813,10 @@ public final class ModifierEligibilityProfiles {
             poweredProcessingAffixes(
                     "recycling",
                     false,
-                    List.of(MACHINE_ENERGY_CAPACITY_ADD, RECYCLER_PATTERN_MEMORY, RECYCLER_CLEAN_BREAK),
+                    List.of(MACHINE_ENERGY_CAPACITY_ADD, RECYCLER_PATTERN_MEMORY),
                     MachineStat.ENERGY_CAPACITY,
                     MachineStat.ENERGY_USAGE,
-                    MachineStat.PROCESSING_SPEED,
-                    MachineStat.STABILITY
+                    MachineStat.PROCESSING_SPEED
             ),
             PROCESSING_MACHINE_BEHAVIORS
     );
@@ -1890,13 +1891,12 @@ public final class ModifierEligibilityProfiles {
             ),
             poweredProcessingAffixes(
                     "assembling",
-                    true,
+                    false,
                     MACHINE_ENERGY_CAPACITY_ADD,
                     MachineStat.ENERGY_CAPACITY,
                     MachineStat.ENERGY_USAGE,
                     MachineStat.PROCESSING_SPEED,
-                    MachineStat.FLUID_TRANSFER,
-                    MachineStat.STABILITY
+                    MachineStat.FLUID_TRANSFER
             ),
             PROCESSING_MACHINE_BEHAVIORS
     );
@@ -1916,15 +1916,11 @@ public final class ModifierEligibilityProfiles {
             ),
             poweredProcessingAffixes(
                     "gasifying",
-                    true,
+                    false,
                     MACHINE_ENERGY_CAPACITY_ADD,
                     MachineStat.ENERGY_CAPACITY,
                     MachineStat.ENERGY_USAGE,
-                    MachineStat.HEAT_TRANSFER,
-                    MachineStat.MAX_TEMPERATURE,
-                    MachineStat.PROCESSING_SPEED,
-                    MachineStat.STABILITY,
-                    MachineStat.FLUID_TRANSFER
+                    MachineStat.PROCESSING_SPEED
             ),
             PROCESSING_MACHINE_BEHAVIORS
     );
@@ -1946,9 +1942,7 @@ public final class ModifierEligibilityProfiles {
                     MachineStat.ENERGY_CAPACITY,
                     MachineStat.ENERGY_GENERATION,
                     MachineStat.EFFICIENCY,
-                    MachineStat.PROCESSING_SPEED,
-                    MachineStat.STABILITY,
-                    MachineStat.FLUID_TRANSFER
+                    MachineStat.PROCESSING_SPEED
             )
     );
     public static final ModifierEligibilityProfile STEAM_METHANE_REFORMER = profile(
@@ -1969,12 +1963,7 @@ public final class ModifierEligibilityProfiles {
                     MACHINE_ENERGY_CAPACITY_ADD,
                     MachineStat.ENERGY_CAPACITY,
                     MachineStat.ENERGY_USAGE,
-                    MachineStat.HEAT_TRANSFER,
-                    MachineStat.MAX_TEMPERATURE,
-                    MachineStat.PROCESSING_SPEED,
-                    MachineStat.EFFICIENCY,
-                    MachineStat.STABILITY,
-                    MachineStat.FLUID_TRANSFER
+                    MachineStat.PROCESSING_SPEED
             ),
             PROCESSING_MACHINE_BEHAVIORS
     );
@@ -2023,10 +2012,7 @@ public final class ModifierEligibilityProfiles {
                     MACHINE_ENERGY_CAPACITY_ADD,
                     MachineStat.ENERGY_CAPACITY,
                     MachineStat.ENERGY_USAGE,
-                    MachineStat.PROCESSING_SPEED,
-                    MachineStat.EFFICIENCY,
-                    MachineStat.STABILITY,
-                    MachineStat.FLUID_TRANSFER
+                    MachineStat.PROCESSING_SPEED
             ),
             PROCESSING_MACHINE_BEHAVIORS
     );
@@ -2049,9 +2035,7 @@ public final class ModifierEligibilityProfiles {
                     MachineStat.ENERGY_CAPACITY,
                     MachineStat.ENERGY_GENERATION,
                     MachineStat.PROCESSING_SPEED,
-                    MachineStat.EFFICIENCY,
-                    MachineStat.STABILITY,
-                    MachineStat.FLUID_TRANSFER
+                    MachineStat.EFFICIENCY
             )
     );
     public static final ModifierEligibilityProfile PHASE_EMITTER = profile(
@@ -2088,8 +2072,7 @@ public final class ModifierEligibilityProfiles {
                     MachineStat.ENERGY_CAPACITY,
                     MachineStat.ENERGY_USAGE,
                     MachineStat.PROCESSING_SPEED,
-                    MachineStat.FLUID_TRANSFER,
-                    MachineStat.STABILITY
+                    MachineStat.FLUID_TRANSFER
             )
     );
     public static final ModifierEligibilityProfile FLUID_TANK = profile(
@@ -2126,7 +2109,6 @@ public final class ModifierEligibilityProfiles {
                     MachineStat.THERMAL_MASS,
                     MachineStat.COOLING_RATE,
                     MachineStat.PROCESSING_SPEED,
-                    MachineStat.STABILITY,
                     MachineStat.TEMPERATURE_STABILITY,
                     MachineStat.OVERHEAT_TOLERANCE
             ),
@@ -2170,13 +2152,54 @@ public final class ModifierEligibilityProfiles {
                     MachineStat.MINING_SPEED,
                     MachineStat.ATTACK_SPEED,
                     MachineStat.STABILITY,
+                    MachineStat.LUCK
+            )
+    );
+    /** Only a Treefeller reads Tree Fell Limit. */
+    public static final ModifierEligibilityProfile TREEFELLER_HEAD = profile(
+            "treefeller_head",
+            Set.of(ModifierCapability.HAS_DURABILITY, ModifierCapability.HAS_FIELD_TOOL),
+            affixes(
+                    List.of(TOOL_HEAD_MOMENTUM_EDGE),
+                    MachineStat.DURABILITY,
+                    MachineStat.SELF_REPAIR,
+                    MachineStat.MINING_SPEED,
+                    MachineStat.ATTACK_SPEED,
+                    MachineStat.STABILITY,
                     MachineStat.LUCK,
-                    MachineStat.TREE_FELL_LIMIT,
+                    MachineStat.TREE_FELL_LIMIT
+            )
+    );
+    /** Ore Burst Speed scales the head's own ore burst base, which only ore-burst materials on a Pick or Hammer have. */
+    public static final ModifierEligibilityProfile ORE_BURST_HEAD = profile(
+            "ore_burst_head",
+            Set.of(ModifierCapability.HAS_DURABILITY, ModifierCapability.HAS_FIELD_TOOL),
+            affixes(
+                    List.of(TOOL_HEAD_MOMENTUM_EDGE),
+                    MachineStat.DURABILITY,
+                    MachineStat.SELF_REPAIR,
+                    MachineStat.MINING_SPEED,
+                    MachineStat.ATTACK_SPEED,
+                    MachineStat.STABILITY,
+                    MachineStat.LUCK,
                     MachineStat.ORE_BURST_SPEED
             )
     );
     public static final ModifierEligibilityProfile PICK_HEAD = profile(
             "pick_head",
+            Set.of(ModifierCapability.HAS_DURABILITY, ModifierCapability.HAS_FIELD_TOOL),
+            affixes(
+                    List.of(TOOL_HEAD_MOMENTUM_EDGE, TOOL_VEIN_MINER),
+                    MachineStat.DURABILITY,
+                    MachineStat.SELF_REPAIR,
+                    MachineStat.MINING_SPEED,
+                    MachineStat.ATTACK_SPEED,
+                    MachineStat.STABILITY,
+                    MachineStat.LUCK
+            )
+    );
+    public static final ModifierEligibilityProfile ORE_BURST_PICK_HEAD = profile(
+            "ore_burst_pick_head",
             Set.of(ModifierCapability.HAS_DURABILITY, ModifierCapability.HAS_FIELD_TOOL),
             affixes(
                     List.of(TOOL_HEAD_MOMENTUM_EDGE, TOOL_VEIN_MINER),
@@ -2236,7 +2259,6 @@ public final class ModifierEligibilityProfiles {
                             BATTERY_LEAK_QUENCHER
                     ),
                     MachineStat.ENERGY_CAPACITY,
-                    MachineStat.EFFICIENCY,
                     MachineStat.ENERGY_TRANSFER,
                     MachineStat.IDLE_LOSS
             )
@@ -2297,8 +2319,7 @@ public final class ModifierEligibilityProfiles {
                     MachineStat.THERMAL_MASS,
                     MachineStat.COOLING_RATE,
                     MachineStat.TEMPERATURE_STABILITY,
-                    MachineStat.OVERHEAT_TOLERANCE,
-                    MachineStat.STABILITY
+                    MachineStat.OVERHEAT_TOLERANCE
             ),
             POWER_GRACE_BEHAVIOR
     );
@@ -2363,10 +2384,9 @@ public final class ModifierEligibilityProfiles {
                     ModifierCapability.HAS_STABILITY
             ),
             affixes(
-                    List.of(FUEL_BOX_COAL_SILO, FUEL_BOX_DRAFT_COLLAR, FUEL_BOX_ASH_TRAP, FUEL_BOX_EMBER_METER, FUEL_BOX_CINDER_RETURN, FUEL_BOX_QUEUE_SEQUENCER),
+                    List.of(FUEL_BOX_COAL_SILO, FUEL_BOX_DRAFT_COLLAR, FUEL_BOX_EMBER_METER, FUEL_BOX_QUEUE_SEQUENCER),
                     MachineStat.FUEL_EFFICIENCY,
-                    MachineStat.FUEL_DURATION,
-                    MachineStat.STABILITY
+                    MachineStat.FUEL_DURATION
             )
     );
     public static final ModifierEligibilityProfile BIO_CHAMBER = profile(
@@ -2419,10 +2439,9 @@ public final class ModifierEligibilityProfiles {
             ),
             processingStatAffixes(
                     "screening",
-                    List.of(FILTER_FINE_MESH, FILTER_MAGNETIC_CATCH, FILTER_SIEVE_MEMORY, FILTER_FAST_BACKFLUSH, FILTER_CATALYST_SWEEP, FILTER_LOW_DRAG),
+                    List.of(FILTER_SIEVE_MEMORY, FILTER_FAST_BACKFLUSH, FILTER_LOW_DRAG),
                     MachineStat.EFFICIENCY,
                     MachineStat.PROCESSING_SPEED,
-                    MachineStat.OUTPUT_AMOUNT,
                     MachineStat.STABILITY
             )
     );
@@ -2450,10 +2469,7 @@ public final class ModifierEligibilityProfiles {
                     "catalyzing",
                     false,
                     MachineStat.ENERGY_USAGE,
-                    MachineStat.PROCESSING_SPEED,
-                    MachineStat.EFFICIENCY,
-                    MachineStat.STABILITY,
-                    MachineStat.FLUID_TRANSFER
+                    MachineStat.PROCESSING_SPEED
             )
     );
     public static final ModifierEligibilityProfile REFORMING_CATALYST_BED = profile(
@@ -2469,10 +2485,7 @@ public final class ModifierEligibilityProfiles {
                     "reforming",
                     false,
                     MachineStat.ENERGY_USAGE,
-                    MachineStat.PROCESSING_SPEED,
-                    MachineStat.EFFICIENCY,
-                    MachineStat.STABILITY,
-                    MachineStat.FLUID_TRANSFER
+                    MachineStat.PROCESSING_SPEED
             )
     );
     public static final ModifierEligibilityProfile FUEL_CELL_MEMBRANE = profile(
@@ -2489,9 +2502,7 @@ public final class ModifierEligibilityProfiles {
                     "membrane",
                     MachineStat.ENERGY_GENERATION,
                     MachineStat.PROCESSING_SPEED,
-                    MachineStat.EFFICIENCY,
-                    MachineStat.STABILITY,
-                    MachineStat.FLUID_TRANSFER
+                    MachineStat.EFFICIENCY
             )
     );
     public static final ModifierEligibilityProfile CATHODE = profile(
@@ -2591,9 +2602,8 @@ public final class ModifierEligibilityProfiles {
             processingAffixes(
                     "disassembling",
                     false,
-                    List.of(DISASSEMBLY_FASTENER_FINDER, DISASSEMBLY_GENTLE_PRY, DISASSEMBLY_TRACE_CUTTER),
-                    MachineStat.PROCESSING_SPEED,
-                    MachineStat.STABILITY
+                    List.of(DISASSEMBLY_TRACE_CUTTER),
+                    MachineStat.PROCESSING_SPEED
             )
     );
     public static final ModifierEligibilityProfile FLUID_PUMP = profile(
@@ -2639,7 +2649,7 @@ public final class ModifierEligibilityProfiles {
             poweredProcessingAffixes(
                     "calibrating",
                     false,
-                    List.of(COIL_HARMONIC_LOCK, COIL_PHASE_TAP, COIL_RETURN_WINDING),
+                    List.of(COIL_HARMONIC_LOCK, COIL_PHASE_TAP),
                     MachineStat.PROCESSING_SPEED,
                     MachineStat.ENERGY_USAGE,
                     MachineStat.CALIBRATION_QUALITY
@@ -2727,7 +2737,10 @@ public final class ModifierEligibilityProfiles {
                 ALLOY_FURNACE,
                 RESONANCE_CALIBRATOR,
                 TOOL_HEAD,
+                TREEFELLER_HEAD,
+                ORE_BURST_HEAD,
                 PICK_HEAD,
+                ORE_BURST_PICK_HEAD,
                 TOOL_ROD,
                 MODULAR_TOOL,
                 BATTERY_CELL,
@@ -2821,8 +2834,15 @@ public final class ModifierEligibilityProfiles {
         }
     }
 
-    public static ModifierEligibilityProfile forToolHead(boolean pickHead) {
-        return pickHead ? PICK_HEAD : TOOL_HEAD;
+    public static ModifierEligibilityProfile forToolHead(ToolHeadFamily family, ToolHeadMaterial material) {
+        boolean oreBurst = family.supportsOreBurst() && material.oreBurst();
+        if (family == ToolHeadFamily.PICK) {
+            return oreBurst ? ORE_BURST_PICK_HEAD : PICK_HEAD;
+        }
+        if (family == ToolHeadFamily.TREEFELLER) {
+            return TREEFELLER_HEAD;
+        }
+        return oreBurst ? ORE_BURST_HEAD : TOOL_HEAD;
     }
 
     public static ModifierEligibilityProfile forMachinePart(MachinePartType partType, MachineType machineType) {

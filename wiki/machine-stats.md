@@ -53,6 +53,7 @@ Stability means something different on each machine:
 | [Resonance Calibrator](resonance-calibrator.md) | Higher stability floor on calibrated outputs. |
 | [Solar Panel](solar-panel.md) Array Controller | Recovers part of the weather penalty. |
 | [Modular tools](modular-tools.md) | Above 1.0, a per-block chance to skip both the durability and FE cost. 1.10 is a 10% chance. |
+| [Battery Chassis](battery-chassis.md) | Below 1.0, part of each [burst](battery-chassis.md#burst) is lost. |
 
 ### Crusher stats
 
@@ -72,12 +73,13 @@ These come from Crusher prefixes and start at 0.
 |---|---|---|---|
 | Energy Capacity | How much FE the machine can store in its own buffer. Processing machines keep only a small buffer; a [Battery Cell](battery-cells.md) gives real storage. On a [Battery Chassis](battery-chassis.md) it scales the installed cells while they stay inside. | Every FE machine, Battery Chassis, and Battery Cells. | Higher |
 | Flat Energy Capacity | Fixed FE added to the buffer before percentage bonuses. | Machines and Battery Cells that roll a flat capacity prefix. | Higher |
-| Energy Transfer | Rate FE can move through storage: a Battery Cell's input rate and a Battery Chassis's transfer rating. Generators and processing machines have no FE limit of their own; the receiver or [connector tier](universal-cable.md#energy) sets the rate. | Battery Cells, Battery Chassis. | Higher |
-| Efficiency | More FE from the same fuel or recipe on generators, and less loss when a Battery Chassis or Cell charges and discharges. It does **not** cut the FE cost of processing recipes. | Generators, Battery Chassis, Battery Cells. | Higher |
+| Energy Transfer | Rate FE can move through storage: a Battery Cell's input rate, and on a Battery Chassis a raise to each installed cell's rates. Generators and processing machines have no FE limit of their own; the receiver or [connector tier](universal-cable.md#energy) sets the rate. | Battery Cells, Battery Chassis. | Higher |
+| Efficiency | More FE from the same fuel or recipe on generators, and less loss when a Battery Chassis charges and discharges. It does **not** cut the FE cost of processing recipes. | Generators, Battery Chassis. | Higher |
 | Idle Loss | Stored FE lost while sitting idle. | Battery Cells, Battery Chassis. | Lower |
 | Battery Slots | Active Battery Cell slots. | [Battery Chassis](battery-chassis.md). | Higher |
-| Burst Transfer | Burst output rating, as a multiple of the transfer rating, on chassis with a burst identity. Output still cannot exceed what the installed cells deliver. | [Battery Chassis](battery-chassis.md). | Higher |
-| Burst Duration | Ticks a burst can last before it has to recover. | [Battery Chassis](battery-chassis.md). | Higher |
+| Burst Transfer | Output during a [burst](battery-chassis.md#burst), as a multiple of the installed cells' rated output. | [Battery Chassis](battery-chassis.md). | Higher |
+| Burst Duration | Ticks of burst the window holds. It refills one tick for each tick without a burst. | [Battery Chassis](battery-chassis.md). | Higher |
+| Global Modifier Strength | How strongly the chassis's Capacity and Energy Transfer affixes act on each installed cell. | [Battery Chassis](battery-chassis.md). | Higher |
 
 ## Heat
 
