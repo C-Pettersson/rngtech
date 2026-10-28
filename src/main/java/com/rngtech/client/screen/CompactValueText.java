@@ -185,6 +185,9 @@ public final class CompactValueText {
     }
 
     private static String trimTrailingZeroes(String value) {
+        if (value.indexOf('.') < 0) {
+            return value;
+        }
         int end = value.length();
         while (end > 0 && value.charAt(end - 1) == '0') {
             end--;
