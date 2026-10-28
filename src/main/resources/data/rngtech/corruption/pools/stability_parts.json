@@ -1,12 +1,8 @@
 {
     "hosts": [
-        "fuel_box",
         "recovery_filter",
         "containment_lining",
-        "ammonia_catalyst_bed",
-        "reforming_catalyst_bed",
-        "dimensional_stabilizer",
-        "disassembly_head"
+        "dimensional_stabilizer"
     ],
     "blessed": [
         {

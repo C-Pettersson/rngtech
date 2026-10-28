@@ -722,7 +722,7 @@ public final class EnergyBalanceSimulation {
     }
 
     private static final List<GearItem> GEAR_ITEMS = List.of(
-            new GearItem("flint_shovel_head", "Flint Shovel Head", 0, "1 flint + 1 wooden button", ModifierEligibilityProfiles.forToolHead(false), 0),
+            new GearItem("flint_shovel_head", "Flint Shovel Head", 0, "1 flint + 1 wooden button", ModifierEligibilityProfiles.TOOL_HEAD, 0),
             new GearItem("wooden_tool_rod", "Wooden Tool Rod", 0, "3 sticks + 2 buttons", ModifierEligibilityProfiles.forMachine(MachineType.TOOL_ROD), 0),
             new GearItem("iron_tool_rod", "Iron Tool Rod", 1, "1 iron plate + 2 iron rods", ModifierEligibilityProfiles.forMachine(MachineType.TOOL_ROD), 0),
             new GearItem("iron_heat_core", "Iron Heat Core", 1, "2 iron coils, heat core, 2 coal, 4 redstone",

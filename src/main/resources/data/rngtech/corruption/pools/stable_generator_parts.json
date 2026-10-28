@@ -1,7 +1,6 @@
 {
     "hosts": [
         "reactor_chamber",
-        "fuel_cell_membrane",
         "cathode",
         "cavitation_rotor",
         "void_chamber",

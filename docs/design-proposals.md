@@ -20,14 +20,9 @@ Future work on machines that already ship. Design intent for their current behav
 
 ### Battery Chassis
 
-- Burst risk pass: give burst a budget (`ENERGY_TRANSFER x BURST_DURATION`), cooldown, and stability risk. Low-stability chassis such as Gold may overload, waste FE, or briefly lose burst; high-stability chassis such as Steel or Exotic burst more safely at a lower multiplier. Burst stays output-only, never creates energy or capacity, and never exceeds installed-cell output rates.
 - A Gear tab for non-cell chassis components, kept player-managed rather than exposed to hoppers or item pipes.
 - More global modifier areas: reservation (hold back a slot or a share of stored FE), matching bonuses for cells that share material, rarity, or modifier themes, throttled or charge-first output, redstone control, and side configuration.
 - Material directions not built yet: Lead shielding banks with low idle loss, Redstone and Quartz control and precise-balancing chassis, and Titanium or Tungstensteel high-transfer banks.
-
-### Battery Cells
-
-- Decide what cell Efficiency does. It shows in the cell tooltip, but no transfer path reads it.
 
 ### Corrosion Cell
 
@@ -49,11 +44,6 @@ Future work on machines that already ship. Design intent for their current behav
 
 - Rolled Fuel Governor modifiers: a fuel-control suffix and an automation-focused enchant-style effect. Today Fuel Governor, Quick Feed, Fuel Reserve, and Block Feed are fixed Fuel Box behaviors only.
 - Generator identity modifiers for burner chassis.
-
-### Gas Chemistry and Ammonia
-
-- The Coal Gasifier, Steam Methane Reformer, and Ammonia Synthesizer roll Bulk Speed but do not apply it. Wire it in or drop it from their profiles.
-- Stability and Fluid Transfer rolls on the Ammonia Catalyst Bed and Fuel Cell Membrane have no effect, and the Synthesizer ignores Efficiency and Instant Process. Wire them in or stop rolling them.
 
 ### Dormant Machines
 

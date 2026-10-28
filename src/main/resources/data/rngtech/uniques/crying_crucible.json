@@ -22,7 +22,7 @@
             "max": 0.2,
             "role": "drawback"
         },
-        "rngtech:stability": {
+        "rngtech:overheat_tolerance": {
             "operation": "more",
             "min": -0.4,
             "max": -0.2,

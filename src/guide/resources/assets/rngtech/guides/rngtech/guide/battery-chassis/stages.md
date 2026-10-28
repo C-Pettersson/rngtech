@@ -24,5 +24,3 @@ navigation:
 More slots is not always better. Low-slot chassis apply their affixes more strongly to each cell, so a focused Iron or Copper chassis can still be worth keeping.
 
 **Charge Balancer** spreads charging, discharging, and leakage evenly across all installed cells instead of filling or draining one at a time. Chassis without it can roll the **Balance Mode** prefix for the same effect. See [Balance Mode](rngtech:rarity-and-affixes.md#balance-mode). Balancing still respects each cell's own rates, stored FE, and free space: when one cell cannot take or give its share, the others cover it. It does not change capacity or transfer rate.
-
-The Copper and Gold chassis, and every chassis from Sparksteel up, carry a burst identity. It does not raise output above what the cells can deliver.

@@ -231,7 +231,7 @@ The Voltaic Potato Battery Cell moves onto the catalog with no stat lines: it st
 - **Identity:** a Bronze-class crucible tuned for blend recipes. It has the same fixed input-slot count as the Bronze crucible, so it does not skip the Steel crucible.
 - **Signature:** +(20–40)% Blend Speed and +(25–50) °C Blend Heat Reduction, which normally come only from Blendwright. Blend Heat Reduction is in degrees; Blendwright's Cold Mixing grants 100 °C.
 - **Ascendancy hook:** the signature itself stacks with Blendwright.
-- **Drawback:** (40–20)% increased Energy Usage, and (40–20)% less Stability, which raises failure strain on failure-bearing recipes. The draft's less Temperature Stability was dropped: blend recipes need 0.9 Temperature Stability and have no failure output, so it blocked every blend.
+- **Drawback:** (40–20)% increased Energy Usage, and (40–20)% less Overheat Tolerance, which lowers the overheat line so failure-bearing recipes run hot build strain sooner. Overheat Tolerance never drops the line below the safe maximum, so it cannot block a recipe. The draft's less Temperature Stability was dropped: blend recipes need 0.9 Temperature Stability and have no failure output, so it blocked every blend. The later less Stability drawback was replaced in alpha.4 because the Alloy Furnace never reads Stability.
 - **Why:** it opens a blend-recipe Alloy Furnace before the ascendancy, and rewards Blendwright players who accept more failures.
 
 ### Trial Vault Escapement

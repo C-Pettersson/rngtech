@@ -66,9 +66,10 @@ Mine a placed chassis with a pickaxe. It drops itself and keeps its rolled trait
 Put Battery Cells in the chassis, then connect it to generators and machines directly or with a [Universal Cable](universal-cable.md). The chassis accepts FE from any side and pushes stored FE out to adjacent blocks that accept it. It does not push FE back into a side that fed it on the same tick.
 
 - **Capacity** is the total of the installed cells, multiplied by the chassis's capacity affixes. That bonus only applies while the cells stay in this chassis.
-- **Input and output speed** come from the installed cells. Their combined charge and discharge rates are the limit, not the chassis, so a big chassis full of weak cells is still slow. These rates are per tick and shared by every side and connector, so adding sides or connectors does not raise them. An attached Universal Cable connector can cap it lower; while it runs at its cap and the cells could move more, the readout shows **Attached connector limits input energy** or **Attached connector limits output energy**.
+- **Input and output speed** come from the installed cells. Their combined charge and discharge rates are the limit, so a big chassis full of weak cells is still slow. Energy Transfer affixes on the chassis raise the rate of each cell while it stays in this chassis. These rates are per tick and shared by every side and connector, so adding sides or connectors does not raise them. An attached Universal Cable connector can cap it lower; while it runs at its cap and the cells could move more, the readout shows **Attached connector limits input energy** or **Attached connector limits output energy**.
 - **Idle loss** slowly drains stored FE. Cells leak on their own, and some chassis add or remove leakage.
 - **Efficiency** below 1.0 wastes FE: the chassis stores less than it accepts and draws more from its cells than it delivers. The Wooden, Copper, Gold, and Arclite chassis start below 1.0, and Efficiency affixes can raise it. Efficiency above 1.0 gives no bonus.
+- **Global Modifier Strength** sets how strongly the chassis's Capacity and Energy Transfer affixes act on each cell. It starts at 1.5 on the Wooden chassis and falls to 0.7 on the Exotic chassis. For example, 50% increased Energy Transfer on an Iron chassis, which has 1.3 strength, raises each cell's rates by 65%. Charged Storage always doubles capacity.
 
 Two Battery Chassis placed directly next to each other slowly even out their fill levels. Banks on the same cable network with connectors on Both also even out their charge and then stop, instead of draining each other, so daisy-chained banks pass charge along. See [storage balancing](universal-cable.md#energy).
 
@@ -91,7 +92,18 @@ More slots is not always better. Low-slot chassis apply their affixes more stron
 
 **Charge Balancer** spreads charging, discharging, and leakage evenly across all installed cells instead of filling or draining one at a time. Chassis without it can roll the **Balance Mode** prefix for the same effect. See [Balance Mode](rarity-and-affixes.md#balance-mode). Balancing still respects each cell's own rates, stored FE, and free space: when one cell cannot take or give its share, the others cover it. It does not change capacity or transfer rate.
 
-The Copper and Gold chassis, and every chassis from Sparksteel up, carry a burst identity. It does not raise output above what the cells can deliver.
+### Burst
+
+The Copper and Gold chassis, and every chassis from Sparksteel up, can burst. A burst lets the cells give out FE faster than their rated output for a short time:
+
+- When the chassis already gives its full rated output in a tick, it can give up to the rated output times its Burst Transfer. Gold has 2.5x and Aethergold has 4x.
+- Each tick that gives more than the rated output uses one tick of the burst window. The window holds Burst Duration ticks.
+- The window refills by one tick for each tick without a burst.
+- Stability below 1.0 wastes part of the burst. At 0.80 Stability, a Gold chassis loses 20% of the extra FE. At 1.0 Stability or more, a burst wastes nothing.
+- A burst does not make FE or capacity. It only empties the cells faster.
+- Two chassis placed directly next to each other do not burst while they even out their charge. Banks that even out over a [Universal Cable](universal-cable.md) can burst.
+
+Hover the Burst row on the Process tab to see the burst output and the ticks left in the window. An attached connector still caps the burst.
 
 ### Gear
 

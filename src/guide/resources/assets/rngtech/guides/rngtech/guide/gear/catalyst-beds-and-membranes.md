@@ -8,7 +8,7 @@ navigation:
 
 # Catalyst Beds and membranes
 
-These single-item parts gate the gas chemistry machines' recipes and tune their speed, efficiency, and stability. The Biogas Membrane instead sets how much Methane a Bio Generator take-off recovers; it rolls no affixes.
+These single-item parts gate the gas chemistry machines' recipes. The Catalyst Beds tune speed, energy use, and Instant Process. The Fuel Cell Membrane tunes generation, speed, and efficiency. The Biogas Membrane instead sets how much Methane a Bio Generator take-off recovers; it rolls no affixes.
 
 | Part | Used in |
 |---|---|

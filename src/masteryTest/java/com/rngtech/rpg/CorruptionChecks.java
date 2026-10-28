@@ -263,7 +263,7 @@ public final class CorruptionChecks {
                 RefinementOperation.CORRUPT, STAGE, RefinementSelection.none(), RefinementModifier.CONSERVE_CATALYST, Set.of(),
                 RandomSource.create(5L));
         require(!conservedCorrupt.success(), "other crystals are rejected with a Volatile Catalyst");
-        RefinementResult toolHead = RefinementEngine.apply(ModifierEligibilityProfiles.forToolHead(true), new MachineTraits(Rarity.MAGIC, 5,
+        RefinementResult toolHead = RefinementEngine.apply(ModifierEligibilityProfiles.PICK_HEAD, new MachineTraits(Rarity.MAGIC, 5,
                 List.of()), RefinementOperation.CORRUPT, STAGE, RandomSource.create(6L));
         require(!toolHead.success() && "rngtech.refinement.failure.cannot_corrupt".equals(toolHead.messageKey()),
                 "tool heads have no pool and cannot be corrupted");
