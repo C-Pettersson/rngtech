@@ -3,7 +3,6 @@
 These pages describe proposed systems or requirements beyond the implemented feature set. They are not release promises. Use [Current Implementation](reference/current-implementation.md) and the [player wiki](https://c-pettersson.github.io/rngtech/) to check what the mod does today.
 
 - [Crafting and Upgrades](systems/crafting.md): assembly and refinement context, plus planned breakthrough and strain systems.
-- [Affix-Driven Generator](content/affix-driven-generator.md), [Entropy Cell](content/entropy-cell.md), and [Ore Slurry Turbine](content/ore-slurry-turbine.md): unregistered generator concepts.
 - [Auto Balance](modifiers/auto-balance.md) and [Packer](modifiers/packer.md): planned modifiers. Implemented [Balance Mode](https://c-pettersson.github.io/rngtech/rarity-and-affixes/#balance-mode) is a separate Battery Chassis affix.
 - [Unique Item Ideas](reference/unique-item-ideas.md): candidate items, not registered content.
 - [Unique Items requirements](prds/uniques.md): accepted 2.0 design for a shared Unique catalog, ranged rolls, and eight launch Uniques.
@@ -65,7 +64,6 @@ Future work on machines that already ship. Design intent for their current behav
 ### Furnace and Machine Chassis
 
 - Furnace-specific Gear for the Stage 0 Furnace, which already keeps a saved component slot.
-- A Washer machine. The `rngtech:washer_machine_chassis` ingredient is craftable, but no Washer block or recipe type exists.
 - Enchant-style chassis behavior.
 
 ### Modular Field Tools

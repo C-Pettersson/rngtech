@@ -74,7 +74,6 @@ public final class ModCreativeTabs {
                     .icon(() -> ModItems.IRON_CRUSH_HEAD.get().getDefaultInstance())
                     .displayItems((parameters, output) -> {
                         output.accept(ModItems.FURNACE_MACHINE_CHASSIS.get());
-                        output.accept(ModItems.WASHER_MACHINE_CHASSIS.get());
                         output.accept(ModItems.SOLID_FUEL_BURNER_MACHINE_CHASSIS.get());
                         output.accept(ModItems.AFFIX_FORGE.get());
                         output.accept(ModItems.EXOTIC_AFFIX_FORGE.get());
