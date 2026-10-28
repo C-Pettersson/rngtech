@@ -20,7 +20,7 @@
             "item": "minecraft:ender_pearl"
         },
         "P": {
-            "item": "rngtech:nullite_plate"
+            "tag": "rngtech:plates/nullite"
         },
         "U": {
             "tag": "rngtech:circuits/ultimate"

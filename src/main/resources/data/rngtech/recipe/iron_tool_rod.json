@@ -2,10 +2,10 @@
     "type":  "rngtech:trait_shaped",
     "key":  {
                 "R":  {
-                          "item":  "rngtech:iron_rod"
+                          "tag":  "rngtech:rods/iron"
                       },
                 "P":  {
-                          "item":  "rngtech:iron_plate"
+                          "tag":  "rngtech:plates/iron"
                       }
             },
     "category":  "equipment",

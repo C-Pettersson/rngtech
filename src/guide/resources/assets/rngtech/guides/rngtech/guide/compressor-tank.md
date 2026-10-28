@@ -74,7 +74,4 @@ The tank screen has these tabs:
 ## Obtaining
 
 - [Crafting](rngtech:compressor-tank/crafting.md)
-
-### Breaking
-
-Mine a tank with a pickaxe. It drops itself with its rolled traits, plus any installed Gear and Refinement items. **The fluid inside is lost**, so empty the tank before you move it.
+- [Breaking](rngtech:compressor-tank/breaking.md)

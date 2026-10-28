@@ -23,7 +23,7 @@
       "ingredient": { "item": "rngtech:fuel_chamber" }
     },
     "G": {
-      "ingredient": { "tag": "c:ingots/steel" }
+      "ingredient": { "tag": "rngtech:ingots/steel" }
     },
     "H": {
       "ingredient": { "item": "rngtech:steel_casing" }

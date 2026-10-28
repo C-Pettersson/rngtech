@@ -9,7 +9,7 @@
   "category": "misc",
   "ingredients": [
     {
-      "tag": "c:ingots/bronze"
+      "tag": "rngtech:ingots/bronze"
     }
   ],
   "result": {

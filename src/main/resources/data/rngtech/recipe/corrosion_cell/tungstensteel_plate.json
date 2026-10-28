@@ -7,7 +7,7 @@
   ],
   "type": "rngtech:corrosion_cell",
   "plate": {
-    "item": "rngtech:tungstensteel_plate"
+    "tag": "rngtech:plates/tungstensteel"
   },
   "electrolyte": {
     "item": "rngtech:electrolyte"

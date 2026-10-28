@@ -24,7 +24,7 @@
       "calibration": { "family": "logic", "min_stage": 6, "min_stability": 85 }
     },
     "P": { "ingredient": { "item": "rngtech:exotic_machine_frame" } },
-    "W": { "ingredient": { "tag": "c:ingots/tungstensteel" } }
+    "W": { "ingredient": { "tag": "rngtech:ingots/tungstensteel" } }
   },
   "result": { "count": 1, "id": "rngtech:tungstensteel_resonance_calibrator_chassis" }
 }

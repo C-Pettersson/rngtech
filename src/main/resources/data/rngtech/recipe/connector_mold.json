@@ -22,13 +22,13 @@
   ],
   "key": {
     "B": {
-      "item": "rngtech:bronze_plate"
+      "tag": "rngtech:plates/bronze"
     },
     "C": {
       "item": "rngtech:copper_coil"
     },
     "I": {
-      "tag": "c:ingots/steel"
+      "tag": "rngtech:ingots/steel"
     },
     "R": {
       "item": "minecraft:redstone"

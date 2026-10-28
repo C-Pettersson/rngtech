@@ -14,10 +14,10 @@
   ],
   "key": {
     "B": {
-      "tag": "c:ingots/sparksteel"
+      "tag": "rngtech:ingots/sparksteel"
     },
     "P": {
-      "item": "rngtech:sparksteel_plate"
+      "tag": "rngtech:plates/sparksteel"
     },
     "R": {
       "item": "minecraft:redstone"

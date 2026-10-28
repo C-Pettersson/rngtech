@@ -17,10 +17,10 @@
       "item": "rngtech:bronze_casing"
     },
     "I": {
-      "tag": "c:ingots/bronze"
+      "tag": "rngtech:ingots/bronze"
     },
     "P": {
-      "item": "rngtech:bronze_plate"
+      "tag": "rngtech:plates/bronze"
     },
     "S": {
       "item": "rngtech:shielding"

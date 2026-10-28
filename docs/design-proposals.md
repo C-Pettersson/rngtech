@@ -66,10 +66,6 @@ Future work on machines that already ship. Design intent for their current behav
 - Furnace-specific Gear for the Stage 0 Furnace, which already keeps a saved component slot.
 - Enchant-style chassis behavior.
 
-### Fluid and Compressor Tanks
-
-- Portable tank contents. Breaking a tank drops the block, Gear, and Refinement inventory, but not stored loose or compressed fluid.
-
 ### Modular Field Tools
 
 - Calibrated tool-part recipes with Resonance Calibrator rod stabilization gates.

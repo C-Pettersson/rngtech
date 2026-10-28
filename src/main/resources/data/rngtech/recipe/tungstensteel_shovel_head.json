@@ -9,13 +9,13 @@
   ],
   "key": {
     "G": {
-      "item": "rngtech:tungstensteel_gear"
+      "tag": "rngtech:gears/tungstensteel"
     },
     "R": {
-      "item": "rngtech:tungstensteel_rod"
+      "tag": "rngtech:rods/tungstensteel"
     },
     "P": {
-      "item": "rngtech:tungstensteel_plate"
+      "tag": "rngtech:plates/tungstensteel"
     }
   },
   "pattern": [

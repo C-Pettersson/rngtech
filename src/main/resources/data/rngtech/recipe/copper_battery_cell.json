@@ -23,7 +23,7 @@
       "tag": "c:ingots/copper"
     },
     "P": {
-      "item": "rngtech:copper_plate"
+      "tag": "rngtech:plates/copper"
     },
     "R": {
       "item": "minecraft:redstone"

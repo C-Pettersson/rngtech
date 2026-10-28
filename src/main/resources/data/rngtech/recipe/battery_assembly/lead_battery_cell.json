@@ -12,7 +12,7 @@
       "item": "rngtech:battery_cell"
     },
     {
-      "item": "rngtech:lead_plate"
+      "tag": "rngtech:plates/lead"
     },
     {
       "tag": "c:ingots/lead"

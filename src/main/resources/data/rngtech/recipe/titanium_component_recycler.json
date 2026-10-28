@@ -20,7 +20,7 @@
                           "item":  "rngtech:titanium_disassembly_head"
                       },
                 "G":  {
-                          "item":  "rngtech:titanium_gear"
+                          "tag":  "rngtech:gears/titanium"
                       }
             },
     "result":  {

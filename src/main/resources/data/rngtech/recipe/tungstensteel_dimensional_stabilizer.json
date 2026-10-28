@@ -9,7 +9,7 @@
   "key": {
     "C": { "item": "rngtech:tungstensteel_casing" },
     "E": { "item": "minecraft:ender_pearl" },
-    "P": { "item": "rngtech:tungstensteel_plate" }
+    "P": { "tag": "rngtech:plates/tungstensteel" }
   },
   "result": {
     "id": "rngtech:tungstensteel_dimensional_stabilizer"

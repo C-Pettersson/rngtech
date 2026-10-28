@@ -14,7 +14,7 @@
   ],
   "key": {
     "A": {
-      "item": "rngtech:aluminum_plate"
+      "tag": "rngtech:plates/aluminum"
     },
     "C": {
       "item": "rngtech:aluminum_casing"

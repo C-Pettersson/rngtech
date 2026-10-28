@@ -20,7 +20,7 @@
       "ingredient": { "tag": "rngtech:machine_frames/exotic" }
     },
     "M": {
-      "ingredient": { "tag": "c:ingots/aethergold" }
+      "ingredient": { "tag": "rngtech:ingots/aethergold" }
     },
     "R": {
       "ingredient": { "item": "minecraft:redstone" }

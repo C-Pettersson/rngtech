@@ -23,7 +23,7 @@
       "item": "rngtech:output_bin"
     },
     "P": {
-      "item": "rngtech:iron_plate"
+      "tag": "rngtech:plates/iron"
     }
   },
   "result": {

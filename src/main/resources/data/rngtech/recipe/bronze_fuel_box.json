@@ -23,7 +23,7 @@
       "item": "minecraft:hopper"
     },
     "I": {
-      "tag": "c:ingots/bronze"
+      "tag": "rngtech:ingots/bronze"
     },
     "K": {
       "item": "minecraft:coal_block"

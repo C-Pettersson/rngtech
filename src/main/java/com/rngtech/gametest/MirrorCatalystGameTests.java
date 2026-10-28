@@ -10,6 +10,8 @@ import com.rngtech.content.blockentity.PhaseCradleBlockEntity;
 import com.rngtech.content.energy.BatteryCellMaterial;
 import com.rngtech.content.item.JobChipItem;
 import com.rngtech.content.item.RefinementConsumableItem;
+import com.rngtech.content.item.TankContents;
+import com.rngtech.content.machine.CompressorTankMaterial;
 import com.rngtech.content.machine.CrushHeadMaterial;
 import com.rngtech.content.machine.CrusherChassisMaterial;
 import com.rngtech.content.menu.RefinementMenuSupport;
@@ -40,6 +42,8 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.material.Fluids;
+import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 import net.neoforged.neoforge.items.ItemStackHandler;
@@ -82,6 +86,22 @@ public final class MirrorCatalystGameTests {
             check(ItemStack.matches(unmarked, target), "The copy differs from " + target + " beyond the Mirrored mark: " + copy);
             check(!RefinementTargets.canMirror(copy), "A Mirrored copy of " + target + " can be mirrored again");
         }
+        helper.succeed();
+    }
+
+    /** A filled tank's Mirrored copy is empty, so the Mirror never copies fluid; the original keeps its fluid. */
+    @GameTest(template = MachineTestSupport.EMPTY)
+    public static void mirrorLeavesTankFluidOnTheOriginal(GameTestHelper helper) {
+        Player player = helper.makeMockPlayer(GameType.CREATIVE);
+        ItemStack target = rolled(new ItemStack(ModItems.compressorTank(CompressorTankMaterial.STEEL).get()));
+        TankContents contents = TankContents.of(new FluidStack(Fluids.WATER, 40_000), new FluidStack(Fluids.WATER, 200_000));
+        target.set(ModDataComponents.TANK_CONTENTS.get(), contents);
+        ItemStackHandler forge = forge(target, new ItemStack(ModItems.MIRROR_CATALYST.get()));
+        check(RefinementMenuSupport.applyToTargetStack(player, forge, RefinementSelection.none(), false), "The Mirror failed on a filled tank");
+        check(contents.equals(forge.getStackInSlot(RefinementMenuSupport.SLOT_TARGET).get(ModDataComponents.TANK_CONTENTS.get())),
+                "The original tank lost its fluid");
+        ItemStack copy = carried(player, target);
+        check(RefinementTargets.isMirrored(copy) && !copy.has(ModDataComponents.TANK_CONTENTS.get()), "The Mirrored tank copied the fluid: " + copy);
         helper.succeed();
     }
 
