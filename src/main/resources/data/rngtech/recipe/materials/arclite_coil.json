@@ -14,10 +14,10 @@
   ],
   "key": {
     "B": {
-      "tag": "c:ingots/arclite"
+      "tag": "rngtech:ingots/arclite"
     },
     "P": {
-      "item": "rngtech:arclite_plate"
+      "tag": "rngtech:plates/arclite"
     },
     "R": {
       "item": "minecraft:redstone"

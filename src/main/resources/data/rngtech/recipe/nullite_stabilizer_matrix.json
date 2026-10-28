@@ -5,7 +5,7 @@
   "pattern": [ "SMS", "ICI", "SMS" ],
   "key": {
     "C": { "ingredient": { "item": "rngtech:stabilization_catalyst" } },
-    "I": { "ingredient": { "tag": "c:ingots/nullite" } },
+    "I": { "ingredient": { "tag": "rngtech:ingots/nullite" } },
     "M": { "ingredient": { "item": "rngtech:matrix" } },
     "S": {
       "ingredient": { "item": "rngtech:calibrated_diamond_crystal" },

@@ -7,7 +7,7 @@
   ],
   "type": "rngtech:corrosion_cell",
   "plate": {
-    "item": "rngtech:aluminum_plate"
+    "tag": "rngtech:plates/aluminum"
   },
   "electrolyte": {
     "item": "rngtech:electrolyte"

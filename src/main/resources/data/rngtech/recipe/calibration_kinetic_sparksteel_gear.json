@@ -8,7 +8,7 @@
   "type": "rngtech:calibration",
   "family": "kinetic",
   "ingredient": {
-    "item": "rngtech:sparksteel_gear"
+    "tag": "rngtech:gears/sparksteel"
   },
   "pattern": {
     "item": "rngtech:kinetic_calibration_pattern"

@@ -20,7 +20,7 @@
         },
         "G": {
             "ingredient": {
-                "item": "rngtech:aethergold_gear"
+                "tag": "rngtech:gears/aethergold"
             }
         },
         "H": {
@@ -35,7 +35,7 @@
         },
         "P": {
             "ingredient": {
-                "item": "rngtech:aethergold_plate"
+                "tag": "rngtech:plates/aethergold"
             }
         }
     },

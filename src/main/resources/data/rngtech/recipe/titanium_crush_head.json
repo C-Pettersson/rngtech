@@ -14,13 +14,13 @@
   ],
   "key": {
     "B": {
-      "item": "rngtech:aluminum_plate"
+      "tag": "rngtech:plates/aluminum"
     },
     "G": {
-      "item": "rngtech:titanium_gear"
+      "tag": "rngtech:gears/titanium"
     },
     "P": {
-      "item": "rngtech:titanium_plate"
+      "tag": "rngtech:plates/titanium"
     },
     "R": {
       "item": "minecraft:redstone"

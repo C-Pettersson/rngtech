@@ -388,6 +388,24 @@
       "reason": "Shared recipe and datapack hook for alloy-backed material families."
     }
   ],
+  "rngtech_tags": [
+    {
+      "forms": [
+        "plate",
+        "gear",
+        "rod"
+      ],
+      "reason": "Made in the Metal Press or by hand, so other mods' plates, gears, and rods do not skip that step."
+    },
+    {
+      "group": "alloys",
+      "forms": [
+        "ingot",
+        "nugget"
+      ],
+      "reason": "Made in the Alloy Furnace, so other mods' alloys do not skip it."
+    }
+  ],
   "generic_forms": [
     {
       "id": "machine_frame",

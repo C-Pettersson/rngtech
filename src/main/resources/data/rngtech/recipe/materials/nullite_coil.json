@@ -14,10 +14,10 @@
   ],
   "key": {
     "B": {
-      "tag": "c:ingots/nullite"
+      "tag": "rngtech:ingots/nullite"
     },
     "P": {
-      "item": "rngtech:nullite_plate"
+      "tag": "rngtech:plates/nullite"
     },
     "R": {
       "item": "minecraft:redstone"

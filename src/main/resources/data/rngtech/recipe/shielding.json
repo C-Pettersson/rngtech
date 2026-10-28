@@ -17,7 +17,7 @@
       "item": "rngtech:casing"
     },
     "P": {
-      "item": "rngtech:iron_plate"
+      "tag": "rngtech:plates/iron"
     },
     "S": {
       "item": "minecraft:smooth_stone"

@@ -17,7 +17,7 @@
       "ingredient": { "tag": "c:ingots/aluminum" }
     },
     "E": {
-      "ingredient": { "tag": "c:ingots/sparksteel" }
+      "ingredient": { "tag": "rngtech:ingots/sparksteel" }
     },
     "M": {
       "ingredient": { "tag": "rngtech:machine_frames/advanced" }

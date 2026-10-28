@@ -18,7 +18,7 @@
   ],
   "key": {
     "B": {
-      "item": "rngtech:bronze_plate"
+      "tag": "rngtech:plates/bronze"
     },
     "I": {
       "tag": "c:ingots/iron"

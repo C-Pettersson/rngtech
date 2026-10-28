@@ -13,7 +13,7 @@
     "C": { "item": "rngtech:aluminum_casing" },
     "G": { "item": "minecraft:glass" },
     "M": { "tag": "rngtech:machine_frames/advanced" },
-    "P": { "item": "rngtech:aluminum_plate" },
+    "P": { "tag": "rngtech:plates/aluminum" },
     "S": { "item": "rngtech:silica_gel_beads" }
   },
   "result": {

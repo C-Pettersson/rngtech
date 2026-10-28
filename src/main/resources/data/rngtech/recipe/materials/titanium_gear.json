@@ -18,10 +18,10 @@
   ],
   "key": {
     "G": {
-      "item": "rngtech:steel_gear"
+      "tag": "rngtech:gears/steel"
     },
     "P": {
-      "item": "rngtech:titanium_plate"
+      "tag": "rngtech:plates/titanium"
     }
   },
   "result": {

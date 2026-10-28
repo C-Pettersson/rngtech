@@ -18,7 +18,7 @@
     "E": { "item": "rngtech:energy_coil" },
     "P": { "item": "rngtech:copper_solar_panel" },
     "R": { "item": "minecraft:redstone" },
-    "S": { "item": "rngtech:steel_plate" }
+    "S": { "tag": "rngtech:plates/steel" }
   },
   "result": {
     "count": 1,

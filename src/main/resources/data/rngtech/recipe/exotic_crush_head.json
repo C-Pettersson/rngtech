@@ -11,7 +11,7 @@
       "ingredient": { "item": "rngtech:ascension_matrix" }
     },
     "B": {
-      "ingredient": { "item": "rngtech:tungstensteel_plate" }
+      "ingredient": { "tag": "rngtech:plates/tungstensteel" }
     },
     "K": {
       "ingredient": { "item": "rngtech:calibrated_kinetic_component" },

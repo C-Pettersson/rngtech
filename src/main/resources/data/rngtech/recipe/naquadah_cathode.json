@@ -17,10 +17,10 @@
       "tag": "rngtech:circuits/ultimate"
     },
     "P": {
-      "item": "rngtech:naquadah_plate"
+      "tag": "rngtech:plates/naquadah"
     },
     "R": {
-      "item": "rngtech:naquadah_rod"
+      "tag": "rngtech:rods/naquadah"
     }
   },
   "result": {

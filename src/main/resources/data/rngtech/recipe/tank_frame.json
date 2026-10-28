@@ -20,7 +20,7 @@
       "item": "rngtech:machine_frame"
     },
     "R": {
-      "item": "rngtech:iron_rod"
+      "tag": "rngtech:rods/iron"
     }
   },
   "result": {

@@ -7,7 +7,7 @@
   ],
   "key": {
     "P": {
-      "item": "rngtech:sparksteel_plate"
+      "tag": "rngtech:plates/sparksteel"
     },
     "C": {
       "item": "rngtech:control_board"

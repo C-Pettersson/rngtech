@@ -222,8 +222,8 @@ try {
     const bronzeCasingRecipe = data.rbom.recipes.find((recipe) => recipe.id === "rngtech:materials/bronze_casing");
     const bronzeCasingPressRecipe = data.rbom.recipes.find((recipe) => recipe.id === "rngtech:metal_press/bronze_casing");
     if (bronzeCasingRecipes[0] !== "rngtech:materials/bronze_casing"
-            || !bronzeCasingRecipe?.inputs?.some((input) => input.id === "c:ingots/bronze" && input.count === 5)
-            || !bronzeCasingRecipe.inputs?.some((input) => input.id === "c:nuggets/bronze" && input.count === 3)
+            || !bronzeCasingRecipe?.inputs?.some((input) => input.id === "rngtech:ingots/bronze" && input.count === 5)
+            || !bronzeCasingRecipe.inputs?.some((input) => input.id === "rngtech:nuggets/bronze" && input.count === 3)
             || !bronzeCasingPressRecipe?.inputs?.some((input) =>
                     input.id === "rngtech:casing_mold"
                     && input.reusable

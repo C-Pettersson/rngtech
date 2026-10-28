@@ -17,13 +17,13 @@
       "ingredient": { "tag": "rngtech:circuits/basic" }
     },
     "C": {
-      "ingredient": { "tag": "c:ingots/bronze" }
+      "ingredient": { "tag": "rngtech:ingots/bronze" }
     },
     "F": {
       "ingredient": { "tag": "rngtech:machine_frames/base" }
     },
     "I": {
-      "ingredient": { "tag": "c:ingots/bronze" }
+      "ingredient": { "tag": "rngtech:ingots/bronze" }
     },
     "R": {
       "ingredient": { "item": "minecraft:redstone" }

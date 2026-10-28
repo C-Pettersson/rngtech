@@ -9,7 +9,7 @@
   "category": "misc",
   "ingredients": [
     {
-      "tag": "c:ingots/steel"
+      "tag": "rngtech:ingots/steel"
     }
   ],
   "result": {

@@ -12,7 +12,7 @@
   "key": {
     "C": { "item": "rngtech:pressure_tank_frame" },
     "G": { "item": "minecraft:glass" },
-    "I": { "tag": "c:ingots/steel" }
+    "I": { "tag": "rngtech:ingots/steel" }
   },
   "result": {
     "count": 1,

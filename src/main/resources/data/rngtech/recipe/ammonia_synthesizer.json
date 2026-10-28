@@ -10,7 +10,7 @@
     "B": { "item": "rngtech:bus_bar" },
     "C": { "item": "rngtech:ammonia_catalyst_bed" },
     "M": { "tag": "rngtech:machine_frames/advanced" },
-    "P": { "item": "rngtech:titanium_plate" },
+    "P": { "tag": "rngtech:plates/titanium" },
     "T": { "item": "rngtech:titanium_casing" }
   },
   "result": {
