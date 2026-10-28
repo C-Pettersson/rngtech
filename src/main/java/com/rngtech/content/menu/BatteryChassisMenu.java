@@ -48,7 +48,8 @@ public class BatteryChassisMenu extends AbstractContainerMenu implements StatBre
     private static final int DATA_CONNECTOR_OUTPUT_CAP = 17;
     private static final int DATA_LAST_INPUT = 18;
     private static final int DATA_LAST_OUTPUT = 19;
-    private static final int DATA_COUNT = 20;
+    private static final int DATA_BURST_WINDOW = 20;
+    private static final int DATA_COUNT = 21;
     private static final int STAT_SCALE = 100;
     private static final int CELL_SLOT_START = 0;
 
@@ -189,6 +190,15 @@ public class BatteryChassisMenu extends AbstractContainerMenu implements StatBre
 
     public int lastOutput() {
         return data.get(DATA_LAST_OUTPUT);
+    }
+
+    /** Burst ticks left in the window; it refills one tick for each tick without a burst. */
+    public int burstWindow() {
+        return data.get(DATA_BURST_WINDOW);
+    }
+
+    public int burstDuration() {
+        return data.get(DATA_BURST_DURATION);
     }
 
     public int cellSlotCount() {

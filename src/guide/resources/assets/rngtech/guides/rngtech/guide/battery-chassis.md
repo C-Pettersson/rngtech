@@ -54,6 +54,7 @@ Each side, top and bottom included, shows what it touches. A side facing a cable
 
 - [Storing power](rngtech:battery-chassis/storing-power.md)
 - [Stages](rngtech:battery-chassis/stages.md)
+- [Burst](rngtech:battery-chassis/burst.md)
 
 ### Gear
 

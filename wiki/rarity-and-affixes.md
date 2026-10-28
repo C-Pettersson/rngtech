@@ -166,7 +166,7 @@ Most affixes simply raise or lower a [stat](machine-stats.md). A few change how 
 
 A suffix for processing machines. Each completed process adds 1% Processing Speed, up to 100%. Powered machines keep the same FE per craft, so their FE/t rises as they speed up. The bonus resets when the chain is interrupted, for example by invalid input, missing Gear, or a different recipe. Topping up the input with more of the same item keeps it.
 
-Bulk Speed works on the Crusher, electric Furnace, Alloy Furnace, Component Assembler, Component Recycler, Metal Press, Melter, Resonance Calibrator, Potential Reactor, and Corrosion Cell. On the two generators it can double FE/t at its cap. It can also roll on the Coal Gasifier, Steam Methane Reformer, and Ammonia Synthesizer, where it has no effect.
+Bulk Speed works on the Crusher, electric Furnace, Alloy Furnace, Component Assembler, Component Recycler, Metal Press, Melter, Resonance Calibrator, Coal Gasifier, Steam Methane Reformer, Ammonia Synthesizer, Potential Reactor, and Corrosion Cell. On the two generators it can double FE/t at its cap.
 
 Bulk Speed takes the processing-speed group, so it never appears alongside another speed suffix.
 
@@ -277,14 +277,14 @@ A corruption implicit is one fixed value, with no tier or range. It sits outside
 | Heat Core | 10% increased Max Temperature, 15% increased Temperature Stability, 15% increased Overheat Tolerance, 10% increased Heat Transfer, 10% increased Fuel Efficiency, 20% reduced Thermal Mass, or Power Grace | 20% less Temperature Stability, or 25% increased Thermal Mass |
 | Crush Head | +1 Processing Level (rare), +25% Jam Recovery, 10% increased Processing Speed, or 10% more Processing Speed | 25% more Jam Chance, or 15% less Processing Speed |
 | Servo | Power Grace, Auto Purge, 15% increased Overheat Tolerance, 10% increased Processing Speed, 15% increased Stability, 15% reduced Energy Use, or 20% increased Fluid Transfer | 15% less Processing Speed, or 20% less Stability |
-| Alloy Crucible | +15% Blend Speed, 15% increased Temperature Stability, 10% increased Processing Speed, 15% increased Overheat Tolerance, or 20% reduced Thermal Mass | 20% less Stability |
+| Alloy Crucible | +15% Blend Speed, 15% increased Temperature Stability, 10% increased Processing Speed, 15% increased Overheat Tolerance, or 20% reduced Thermal Mass | 20% less Temperature Stability |
 | Fluid Pump | 50% increased Fluid Capacity, or 30% increased Fluid Transfer | 30% less Fluid Transfer |
-| Battery Cell | 20% increased Energy Transfer, 30% less Idle Loss, 15% increased Energy Capacity, or 10% increased Efficiency | Doubled Idle Loss |
+| Battery Cell | 20% increased Energy Transfer, 30% less Idle Loss, or 15% increased Energy Capacity | Doubled Idle Loss |
 | Resonance Coil, Control Board, Stabilizer Matrix | +1 Coil Reach, 10% increased Catalyst Efficiency, 10% increased Calibration Precision, or 10% increased Processing Speed | 20% less Processing Speed, or 10% less Calibration Precision |
-| Bio Chamber, Fuel Box | 15% increased Fuel Efficiency, or 15% increased Fuel Duration; the Bio Chamber can also roll 10% increased Energy Generation, and the Fuel Box 15% increased Stability | 10% less Energy Generation on the Bio Chamber; 15% less Stability on the Fuel Box |
+| Bio Chamber, Fuel Box | 15% increased Fuel Efficiency, or 15% increased Fuel Duration; the Bio Chamber can also roll 10% increased Energy Generation | 10% less Energy Generation on the Bio Chamber; 15% less Fuel Efficiency on the Fuel Box |
 | Other generator parts | 10% increased Energy Generation; most also roll 15% increased Stability or 10% increased Processing Speed | 10% less Energy Generation |
-| Other parts | 15% increased Stability; most also roll 10% increased Processing Speed or 10% increased Efficiency | 15% less Stability |
-| Placed processing machine | 10% increased Processing Speed, 20% reduced Energy Use, or 15% increased Stability where the machine has it; +1 Batch Size (rare) on the Crusher, Furnace, Alloy Furnace, Melter, Metal Press, and Resonance Calibrator; 15% increased Fuel Efficiency or 10% increased Max Temperature on the Furnace | 25% increased Energy Use; 20% less Fuel Efficiency on the Furnace |
+| Other parts | 15% increased Stability, 10% increased Processing Speed, or 10% increased Efficiency, where the part's machine reads it | 15% less Stability or 15% less Processing Speed, where the part's machine reads it |
+| Placed processing machine | 10% increased Processing Speed, 20% reduced Energy Use, or 15% increased Stability on the Metal Press and Resonance Calibrator; +1 Batch Size (rare) on the Crusher, Furnace, Alloy Furnace, Melter, Metal Press, and Resonance Calibrator; 15% increased Fuel Efficiency or 10% increased Max Temperature on the Furnace | 25% increased Energy Use; 20% less Fuel Efficiency on the Furnace |
 | Placed generator | 10% increased Energy Generation, 15% increased Efficiency, and where the machine has them 15% increased Stability or 25% increased Energy Capacity | 20% less Efficiency |
 | Battery Chassis | +1 Battery Slot, 15% increased Energy Capacity, or 20% increased Energy Transfer | 15% increased Idle Loss |
 

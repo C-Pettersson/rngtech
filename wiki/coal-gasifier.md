@@ -71,7 +71,7 @@ The Gear tab has three slots:
 - **Battery Cell** (optional): Stage 5 or higher, such as a {{ item('rngtech:sparksteel_battery_cell') }}. It adds energy storage on top of the small internal buffer.
 - **Servo** (optional): {{ item('rngtech:steel_servo') }} or better. A {{ item('rngtech:nullite_servo') }} also auto-purges: when the Syngas tank is full, it voids the extra gas instead of stopping the machine.
 
-The stats and rolled affixes of installed Gear add to the Gasifier's own.
+The Heat Core only sets which recipes can run. Its stats do nothing in the Gasifier. The Servo adds its Processing Speed, Energy Usage, and Instant Process, with its rolled affixes, to the Gasifier's own.
 
 ### Automation
 

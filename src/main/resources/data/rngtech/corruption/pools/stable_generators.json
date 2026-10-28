@@ -1,12 +1,9 @@
 {
     "hosts": [
-        "solid_fuel_burner",
         "solar_array_controller",
         "potential_reactor",
         "corrosion_cell",
         "vacuum_collapse_generator",
-        "syngas_combustor",
-        "ammonia_fuel_cell",
         "cavitation_generator"
     ],
     "blessed": [

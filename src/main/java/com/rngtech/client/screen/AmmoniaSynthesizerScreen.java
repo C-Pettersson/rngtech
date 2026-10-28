@@ -68,7 +68,8 @@ public class AmmoniaSynthesizerScreen extends AbstractContainerScreen<AmmoniaSyn
             slot(guiGraphics, 195, 44);
             renderPurgeButtons(guiGraphics);
             guiGraphics.fill(leftPos + 92, topPos + 54, leftPos + 140, topPos + 62, DARK);
-            guiGraphics.fill(leftPos + 93, topPos + 55, leftPos + 93 + Math.round(46 * menu.progressFill()), topPos + 61, PROGRESS);
+            guiGraphics.fill(leftPos + 93, topPos + 55, leftPos + 93 + Math.round(46 * menu.progressFill()), topPos + 61,
+                    menu.instantFlash() ? MachineScreenStyle.INSTANT_FLASH : PROGRESS);
             statusIcon(guiGraphics, 92, 39);
         } else if (menu.selectedTab() == AmmoniaSynthesizerMenu.TAB_GEAR) {
             slot(guiGraphics, 79, 47);

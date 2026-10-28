@@ -1861,10 +1861,17 @@ function modifierProfileIdForItem(id) {
     if (local.endsWith("_resonance_calibrator_chassis")) {
         return "resonance_calibrator";
     }
-    if (local.endsWith("_pick_head")
-            || local.endsWith("_hammer_head")
-            || local.endsWith("_axe_head")
-            || local.endsWith("_treefeller_head")) {
+    if (local.endsWith("_treefeller_head")) {
+        return "treefeller_head";
+    }
+    const oreBurstHead = ["copper_", "nullite_", "exotic_"].some((material) => local.startsWith(material));
+    if (local.endsWith("_pick_head")) {
+        return oreBurstHead ? "ore_burst_pick_head" : "pick_head";
+    }
+    if (local.endsWith("_hammer_head")) {
+        return oreBurstHead ? "ore_burst_head" : "tool_head";
+    }
+    if (local.endsWith("_axe_head")) {
         return "tool_head";
     }
     if (local.endsWith("_tool_rod")) {

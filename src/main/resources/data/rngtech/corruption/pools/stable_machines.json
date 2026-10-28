@@ -1,14 +1,7 @@
 {
     "hosts": [
-        "alloy_furnace",
         "metal_press",
-        "component_recycler",
-        "battery_assembler",
-        "coal_gasifier",
-        "steam_methane_reformer",
-        "ammonia_synthesizer",
-        "resonance_calibrator",
-        "compressor_tank"
+        "resonance_calibrator"
     ],
     "blessed": [
         {

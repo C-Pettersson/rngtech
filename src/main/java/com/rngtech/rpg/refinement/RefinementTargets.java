@@ -24,7 +24,6 @@ import com.rngtech.content.item.ToolRodItem;
 import com.rngtech.content.item.UniquePartItem;
 import com.rngtech.content.recycling.RecyclingData;
 import com.rngtech.content.registry.ModDataComponents;
-import com.rngtech.content.tool.ToolHeadFamily;
 import com.rngtech.rpg.MachineImplicitCatalog;
 import com.rngtech.rpg.MachineTraitRoller;
 import com.rngtech.rpg.MachineTraits;
@@ -155,7 +154,7 @@ public final class RefinementTargets {
             return ModifierEligibilityProfiles.forMachinePart(part.partType(), part.machineType());
         }
         if (stack.getItem() instanceof ToolHeadItem head) {
-            return ModifierEligibilityProfiles.forToolHead(head.family() == ToolHeadFamily.PICK);
+            return ModifierEligibilityProfiles.forToolHead(head.family(), head.material());
         }
         if (stack.getItem() instanceof ToolRodItem) {
             return ModifierEligibilityProfiles.forMachine(MachineType.TOOL_ROD);

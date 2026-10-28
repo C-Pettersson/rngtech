@@ -52,8 +52,8 @@ Modifier operations (`ADD`, `INCREASED_PERCENT`, `DECREASED_PERCENT`, `MORE`, `L
 | `CALIBRATION_PRECISION` | Implemented | Resonance Calibrator variance control. Higher values narrow the stability spread for calibrated outputs. |
 | `CATALYST_EFFICIENCY` | Implemented | Resonance Calibrator catalyst preservation and stabilizer efficiency. Higher values can preserve catalysts during calibration. |
 | `REFINEMENT_POTENTIAL_BONUS` | Implemented | Flat bonus to Refinement Potential on calibrated outputs when the recipe can produce RP. |
-| `BURST_TRANSFER` | Implemented | Surge identity value for burst-oriented energy storage. Current Battery Chassis transfer remains cell-led; detailed battery chassis behavior is documented in [Battery Chassis](https://c-pettersson.github.io/rngtech/battery-chassis/). |
-| `BURST_DURATION` | Implemented | Number of ticks a chassis can sustain future burst-risk behavior. |
+| `BURST_TRANSFER` | Implemented | Multiplier on the installed cells' rated output while a Battery Chassis burst window lasts. See [Battery Chassis](https://c-pettersson.github.io/rngtech/battery-chassis/#burst). |
+| `BURST_DURATION` | Implemented | Ticks a Battery Chassis burst window holds. A bursting tick spends one; a tick without a burst refills one. |
 | `EFFICIENCY` | Implemented | Non-recipe efficiency. For generators and Potential Reactors, it increases recovered or generated FE. For fuel machines, it can extend fuel duration or output. For battery storage, it represents charge or discharge loss behavior. It does not reduce powered processing recipe FE cost. |
 | `IDLE_LOSS` | Implemented | Stored energy lost while the block is idle. Lower is better. |
 | `BATCH_SIZE` | Implemented | The most items a machine takes from one input stack and works together in one cycle. Base `1`, clamped to `1-16`. A cycle locks its batch when it starts: the largest batch the input, fluid, and output room allow. Every item in the batch pays its own FE and grants its own XP. Tungstensteel and Exotic Crusher chassis author `4` and `9`; Lead and Tungstensteel Resonance Calibrator chassis author `2` and `3`; Crusher Throughput prefixes, Even Loading, Dense Batching, and the Drop Forge, Mass Tuner, and Twin Crucible ascendancies add more. With Dense Batching allocated, an idle machine starts a cycle only once its input and output room fit a full batch: the batch it may lock, or less when its input slots cannot hold that many; the status reads Filling Batch. Metal Press circuit recipes never batch. Refiner’s Oath and Fused Crucibles turn batching off for a payoff that scales with Batch Size. Stored and authored `PARALLEL_JOBS` values load as `BATCH_SIZE`. Each Furnace lane batches separately; lanes come from `INPUT_SLOTS`. The Alloy Furnace batches whole recipe sets. |
@@ -62,7 +62,7 @@ Modifier operations (`ADD`, `INCREASED_PERCENT`, `DECREASED_PERCENT`, `MORE`, `L
 | `STABILITY` | Implemented | Reliability stat used for failures, quality variance, overclocking risk, battery chassis overload risk, or tool cost avoidance. Modular Field Tools use Stability above `1.0` as a per-block chance to skip both durability and FE cost; `1.10` is a `10%` skip chance. Potential Reactors currently use stability as a deterministic recovered-FE multiplier until jam or contamination behavior exists. Metal Press uses stability to reduce forming failure. Cavitation Generator: divides rotor wear per cycle. |
 | `UPGRADE_LIMIT` | Planned | Maximum number or total weight of upgrades the machine can accept. |
 | `BATTERY_SLOTS` | Implemented | Number of battery cell slots available in a battery chassis. Material identity sets the base count, and Battery Chassis slot prefixes can activate additional cell slots. |
-| `GLOBAL_MODIFIER_STRENGTH` | Implemented | Scalar for global chassis modifier effects applied to inserted cells. Current code exposes the stat for chassis traits and UI; broad cell-global behavior remains future work. |
+| `GLOBAL_MODIFIER_STRENGTH` | Implemented | Scales the bonus of a Battery Chassis's Capacity and Energy Transfer affixes on each installed cell. Charged Storage is not scaled. |
 | `MAX_TEMPERATURE` | Implemented | Highest effective operating temperature. Furnace, Alloy Furnace, Metal Press, and Melter compare this against recipe temperature gates. Electric Furnace and Alloy Furnace chassis gain additional effective temperature from installed Heat Cores. Metal Press requires an installed Heat Core, then combines the forming bed baseline with the Heat Core contribution. Cavitation Generator: softens the FE lost at the heat strain cap, `0.5 * 1000 / (1000 + Max Temperature / 4)`. |
 | `HEAT_TRANSFER` | Implemented | Heater power on the Furnace, Alloy Furnace, Metal Press, and Melter: the heat a lane can add per tick on top of what it loses and what the input absorbs, `30 HU/t x HEAT_TRANSFER`, falling to half near Max Temperature. Faster warmup and recovery and higher FE/t while heating; it no longer shortens crafts. Cavitation Generator: Heat Transfer beyond the installed Heat Core's own base multiplies the core's stage cooling of heat strain. |
 | `THERMAL_CONDUCTIVITY` | Implemented | Furnace, Alloy Furnace, Metal Press, and Melter: how fast heat reaches the input. It multiplies processing speed and wall loss, so FE/t rises and FE per craft stays about the same. Heat Cores and Alloy Crucibles carry it; the base is `1.0`. |
@@ -234,7 +234,7 @@ Alloy Furnaces use authored chassis base stats plus required Heat Core and Alloy
 | `COOLING_RATE` | `1.0x` neutral before affixes | Active cooling when the chamber is too hot. |
 | `TEMPERATURE_STABILITY` | `0.9-1.18x` from crucibles and Gear | Must meet recipe `required_temperature_stability` unless the active Stage 4+ recipe carries a failure output. |
 | `OVERHEAT_TOLERANCE` | `1.0x+` from Servo or affixes | Widens the safe heat band before overheat strain. |
-| `STABILITY` | `0.95-1.18x` chassis before Gear | General mixing reliability and modifier target. |
+| `STABILITY` | `0.95-1.18x` chassis before Gear | Base identity value only. The Alloy Furnace reads no Stability, so its affixes and Alloy Crucible affixes do not roll it. |
 
 ## Bio Generator Range
 
@@ -285,12 +285,12 @@ Battery chassis blocks use energy-related stats differently from normal processi
 |---|---:|---|
 | `BATTERY_SLOTS` | `1-14` | Material identity provides `1-10` slots. The Additional Battery Slots prefix can add up to `+4` active slots. |
 | `ENERGY_CAPACITY` | Installed-cell capacity multiplier | Increased capacity prefixes scale installed-cell capacity. Charged Storage is an untiered prefix that grants `100% more` capacity after the chassis has held energy continuously for `10` minutes. |
-| `ENERGY_TRANSFER` | Material-defined | Displayed chassis transfer rating. Effective input is governed by inserted cell input rates and free cell space; effective output is capped by inserted cell output rates and stored FE. Cell rates are per-tick budgets shared by every side and connector. |
-| `BURST_TRANSFER` | `1.0-4.0x ENERGY_TRANSFER` | Surge identity value retained for later risk tuning. Current transfer remains capped by inserted cell output rates. |
-| `BURST_DURATION` | `0-100 ticks` | How long future burst-risk behavior can be sustained. `0` means no burst window. Runtime burst identity requires the `BURST_RELEASE` behavior. |
+| `ENERGY_TRANSFER` | Material-defined | Displayed chassis transfer rating, not a cap. Increases above the material base raise each installed cell's input and output rates, scaled by `GLOBAL_MODIFIER_STRENGTH`. Effective input and output stay cell-led per-tick budgets shared by every side and connector. |
+| `BURST_TRANSFER` | `1.0-4.0x` cell output | Output multiplier on the installed cells' rated output while a burst window lasts, on chassis with `BURST_RELEASE`. |
+| `BURST_DURATION` | `0-100 ticks` | Burst window size. `0` means no burst window. Runtime burst requires the `BURST_RELEASE` behavior. |
 | `EFFICIENCY` | `0.9-1.1` | Charge or discharge efficiency. Higher means less loss. |
 | `IDLE_LOSS` | `0-0.05%/minute` | Passive leakage. Lower is better. Steel Battery Chassis applies flat `CELL_LEAKAGE_DAMPING` to installed cell loss before chassis loss is added; Aethergold seals installed-cell leakage entirely. |
-| `STABILITY` | `0.8-1.2` | Overload safety, burst reliability, and high-transfer risk. |
+| `STABILITY` | `0.8-1.2` | Below `1.0`, wastes that share of each burst's extra FE. |
 | `GLOBAL_MODIFIER_STRENGTH` | `0.7-1.3` | Per-cell strength of chassis-wide effects. Lower-slot chassis can be stronger per cell. |
 | `BUFFER_SIZE` | Small or `1` | Optional internal bookkeeping buffer. Should not replace inserted cell capacity. |
 
@@ -308,7 +308,7 @@ Component Assembler uses normal powered-processing stats plus fluid-input transf
 | `FLUID_TRANSFER` | `250 mB/t` input baseline | Caps side Electrolyte Solution or Lubricant filling. Dry `rngtech:electrolyte` dissolves at `125 mB` per item. |
 | `PROCESSING_SPEED` | `1.0x` baseline | Scales `rngtech:battery_assembly` processing time. |
 | `ENERGY_USAGE` | `1.0x` baseline | Scales recipe-authored FE cost. |
-| `STABILITY` | `1.0x` baseline | Rollable assembly reliability surface for future recipe-risk behavior. |
+| `STABILITY` | `1.0x` baseline | Base value only. The assembler reads no Stability, so it does not roll. |
 
 ## Fluid and Compressor Tank Range
 
@@ -324,7 +324,7 @@ Fluid and Compressor Tanks use authored material values for loose capacity, comp
 | `ENERGY_CAPACITY` | `2400-32000 FE` internal buffer for Steel+ | The installed Battery Cell adds extra stored FE, but the block exposes input only and cannot act as a battery. External FE goes into the internal buffer first, then into the installed Battery Cell if possible, with no machine-side intake cap. Iron through Bronze have no FE buffer or FE input. |
 | `ENERGY_USAGE` | `1.0x` baseline | Scales compression and decompression FE per bucket. Decompression costs `25%` of compression. |
 | `PROCESSING_SPEED` | `1.0x` baseline | Scales compression/decompression rate. Servo quality is averaged before it contributes. |
-| `STABILITY` | `1.0x` baseline | Rollable profile surface for future pressure-risk behavior; v1 does not leak or void fluid when power is missing. |
+| `STABILITY` | `1.0x` baseline | Base value only. The tank reads no Stability, so it does not roll; v1 does not leak or void fluid when power is missing. |
 
 ## Resonance Calibrator Range
 

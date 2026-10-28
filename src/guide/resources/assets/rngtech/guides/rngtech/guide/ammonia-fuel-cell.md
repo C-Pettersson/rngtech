@@ -33,7 +33,7 @@ Like every RNGTech machine, each Fuel Cell you craft rolls its own [rarity and a
 
 ### Gear
 
-- **Fuel Cell Membrane** (required): gates recipes by stage. The membrane has neutral base stats, so an unrolled one only unlocks the cell. Its rolled Energy Generation, Processing Speed, and Efficiency affixes apply to the fuel cell. Other rolls, such as Stability or Fluid Transfer, do nothing here.
+- **Fuel Cell Membrane** (required): gates recipes by stage. The membrane has neutral base stats, so an unrolled one only unlocks the cell. Its rolled Energy Generation, Processing Speed, and Efficiency affixes apply to the fuel cell. An older membrane can still show Stability or Fluid Transfer. Those affixes do nothing.
 - **Battery Cell** (optional): adds FE storage. Only Stage 6 and higher cells fit.
 
 ### Automation

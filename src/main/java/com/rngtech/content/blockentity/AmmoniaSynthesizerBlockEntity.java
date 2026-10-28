@@ -54,6 +54,7 @@ public class AmmoniaSynthesizerBlockEntity extends BaseMachineBlockEntity
         implements MenuProvider, PurgeableFluidStorage, MachineInfoProvider {
     private final RecipeCache<AmmoniaSynthesisRecipe> recipes = new RecipeCache<>(1);
     private final RecipeCache<UreaSynthesisRecipe> ureaRecipes = new RecipeCache<>(1);
+    private final BulkSpeedState bulkSpeed = new BulkSpeedState();
     public static final int SLOT_CATALYST_BED = 0;
     public static final int GEAR_SLOT_COUNT = 1;
     public static final int STATUS_READY = 0;
@@ -134,7 +135,7 @@ public class AmmoniaSynthesizerBlockEntity extends BaseMachineBlockEntity
         public int get(int index) {
             MachineStatAccumulator stats = effectiveStats();
             return switch (index) {
-                case DATA_PROGRESS -> progress;
+                case DATA_PROGRESS -> syncedProgress(0, progress);
                 case DATA_PROCESSING_TICKS -> activeTicks;
                 case DATA_ENERGY -> energyStorage.getEnergyStored();
                 case DATA_ENERGY_CAPACITY -> energyStorage.getMaxEnergyStored();
@@ -407,7 +408,7 @@ public class AmmoniaSynthesizerBlockEntity extends BaseMachineBlockEntity
     private boolean tickRecipe() {
         UreaSynthesisRecipe urea = currentUreaRecipe();
         if (urea != null && canRunUrea(urea)) {
-            return runCycle(true, urea.processingTicks(), urea.energy(), () -> {
+            return runCycle(urea, true, urea.processingTicks(), urea.energy(), () -> {
                 outputTank.drain(urea.ammoniaInput().amount(), IFluidHandler.FluidAction.EXECUTE);
                 carbonTank.drain(urea.carbonInput().amount(), IFluidHandler.FluidAction.EXECUTE);
                 ItemStack made = urea.resultStack();
@@ -417,25 +418,40 @@ public class AmmoniaSynthesizerBlockEntity extends BaseMachineBlockEntity
         }
         AmmoniaSynthesisRecipe recipe = currentRecipe();
         if (recipe == null || !canRun(recipe)) {
+            // Losing the recipe part-way through a job breaks the Bulk Speed chain; a full output only pauses it.
+            if (recipe == null && progress > 0 && bulkSpeed.reset()) {
+                setChanged();
+            }
             progress = 0;
             activeTicks = recipe == null ? 0 : recipe.processingTicks();
             activeEnergy = recipe == null ? 0 : recipe.energy();
             return false;
         }
-        return runCycle(false, recipe.processingTicks(), recipe.energy(), () -> {
+        return runCycle(recipe, false, recipe.processingTicks(), recipe.energy(), () -> {
             nitrogenTank.drain(recipe.nitrogenInput().amount(), IFluidHandler.FluidAction.EXECUTE);
             hydrogenTank.drain(recipe.hydrogenInput().amount(), IFluidHandler.FluidAction.EXECUTE);
             outputTank.fill(recipe.outputFluid(), IFluidHandler.FluidAction.EXECUTE);
         });
     }
 
-    private boolean runCycle(boolean urea, int ticks, int energy, Runnable complete) {
+    /** A job may finish at once through Instant Process, paying its whole FE, and each finished job feeds Bulk Speed. */
+    private boolean runCycle(Object recipe, boolean urea, int ticks, int energy, Runnable complete) {
         if (urea != ureaCycle) {
             ureaCycle = urea;
             progress = 0;
         }
+        if (progress == 0 && bulkSpeed.startRecipe(recipe)) {
+            setChanged();
+        }
         activeTicks = adjustedTicks(ticks);
         activeEnergy = adjustedEnergy(energy);
+        if (progress == 0 && level != null && ProcessingChance.rollInstant(level, effectiveStats())
+                && energyStorage.consumeEnergy(activeEnergy, true) >= activeEnergy) {
+            energyStorage.consumeEnergy(activeEnergy, false);
+            markInstantProcess();
+            completeCycle(complete);
+            return true;
+        }
         int cost = Math.max(1, Mth.ceil(activeEnergy / (double) activeTicks));
         if (energyStorage.consumeEnergy(cost, true) < cost) {
             return false;
@@ -443,10 +459,15 @@ public class AmmoniaSynthesizerBlockEntity extends BaseMachineBlockEntity
         energyStorage.consumeEnergy(cost, false);
         progress++;
         if (progress >= activeTicks) {
-            complete.run();
-            progress = 0;
+            completeCycle(complete);
         }
         return true;
+    }
+
+    private void completeCycle(Runnable complete) {
+        complete.run();
+        progress = 0;
+        bulkSpeed.recordProcess(effectiveTraits());
     }
 
     private UreaSynthesisRecipe currentUreaRecipe() {
@@ -554,7 +575,7 @@ public class AmmoniaSynthesizerBlockEntity extends BaseMachineBlockEntity
     }
 
     public MachineStatAccumulator effectiveStats() {
-        return cachedStats(0L);
+        return cachedStats(bulkSpeed.count());
     }
 
     @Override
@@ -564,6 +585,7 @@ public class AmmoniaSynthesizerBlockEntity extends BaseMachineBlockEntity
         if (isCatalystBed(catalystStack())) {
             ComponentBaseStatCatalog.applyEffectiveContribution(stats, catalystStack());
         }
+        bulkSpeed.apply(stats, effectiveTraits());
         return stats;
     }
 
@@ -635,6 +657,7 @@ public class AmmoniaSynthesizerBlockEntity extends BaseMachineBlockEntity
         tag.putInt("Progress", progress);
         tag.putInt("ActiveTicks", activeTicks);
         tag.putInt("ActiveEnergy", activeEnergy);
+        bulkSpeed.save(tag);
     }
 
     @Override
@@ -654,6 +677,7 @@ public class AmmoniaSynthesizerBlockEntity extends BaseMachineBlockEntity
         progress = tag.getInt("Progress");
         activeTicks = tag.getInt("ActiveTicks");
         activeEnergy = tag.getInt("ActiveEnergy");
+        bulkSpeed.load(tag);
     }
 
     private void dropSlot(Level level, ItemStackHandler inventory, int slot) {
