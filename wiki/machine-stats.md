@@ -98,7 +98,7 @@ Heat machines must warm up to a recipe's temperature before they start, and can 
 
 | Stat | What it does | Used by | Better |
 |---|---|---|---|
-| Energy Generation | FE the machine produces. On Solar Panels and Solid Fuel Burners it is FE/t directly; on recipe generators and the Bio Generator it multiplies the recipe or fuel's output, and flat rolls add FE/t on top. The Stats tab shows the final FE/t; hover it for the breakdown. | Every generator. | Higher |
+| Energy Generation | FE the machine produces. On Solar Panels and Solid Fuel Burners it is FE/t directly; on recipe generators and the Bio Generator it multiplies the recipe or fuel's output, and flat rolls add FE/t on top. The Stats tab shows the final FE/t; hover it for the breakdown. If your modpack changes RNGTech's energy settings, the hover shows them as **Pack setting**. | Every generator. | Higher |
 | Fuel Duration | Makes each fuel item burn longer. Generators keep the same FE/t; the Stage 0 Furnace smelts more per item. | [Furnace](furnace.md) (Stage 0), [Bio Generator](bio-generator.md), [Solid Fuel Burner](solid-fuel-burner.md). | Higher |
 | Fuel Efficiency | More value from each fuel item. Longer burns on the Stage 0 Furnace and Solid Fuel Burner, more total FE on the Bio Generator. Shown as **Bio Conversion** on the Algae Photobioreactor, where it scales algae output. | [Furnace](furnace.md) (Stage 0), [Solid Fuel Burner](solid-fuel-burner.md), [Bio Generator](bio-generator.md), [Algae Photobioreactor](algae-photobioreactor.md). | Higher |
 

@@ -13,6 +13,7 @@ import com.rngtech.content.energy.HeatCoreMaterial;
 import com.rngtech.content.energy.SolidFuelBurnerChassis;
 import com.rngtech.content.energy.SolidFuelBurnerStoke;
 import com.rngtech.content.item.BatteryCellItem;
+import com.rngtech.content.menu.SolidFuelBurnerMenu;
 import com.rngtech.content.registry.ModBlocks;
 import com.rngtech.content.registry.ModItems;
 
@@ -20,8 +21,10 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.block.Blocks;
 import net.neoforged.neoforge.common.ModConfigSpec;
 import net.neoforged.neoforge.gametest.GameTestHolder;
@@ -173,8 +176,9 @@ public final class SolidFuelBurnerGameTests {
     }
 
     /**
-     * A stage multiplier scales only burners whose Heat Core has that stage, on top of the global multiplier. The
-     * config is set and restored within this tick, so other tests never see it.
+     * A stage multiplier scales only burners whose Heat Core has that stage, on top of the global multiplier, and the
+     * menu reports the combined multiplier to the Stats tab. The config is set and restored within this tick, so other
+     * tests never see it.
      */
     @GameTest(template = MachineTestSupport.EMPTY)
     public static void stageMultiplierFollowsTheHeatCore(GameTestHelper helper) {
@@ -193,6 +197,8 @@ public final class SolidFuelBurnerGameTests {
         MachineInfoSnapshot steelScaled;
         MachineInfoSnapshot copperBase;
         MachineInfoSnapshot copperScaled;
+        double steelShown;
+        double copperShown;
         try {
             RNGTechConfig.ENERGY_GENERATION_MULTIPLIER.set(1.0D);
             stageFour.set(1.0D);
@@ -206,6 +212,9 @@ public final class SolidFuelBurnerGameTests {
             tick(helper, scaledCopper);
             steelScaled = scaledSteel.machineInfo();
             copperScaled = scaledCopper.machineInfo();
+            Inventory inventory = helper.makeMockPlayer(GameType.SURVIVAL).getInventory();
+            steelShown = new SolidFuelBurnerMenu(0, inventory, scaledSteel, scaledSteel.getMenuData()).packGenerationMultiplier();
+            copperShown = new SolidFuelBurnerMenu(0, inventory, scaledCopper, scaledCopper.getMenuData()).packGenerationMultiplier();
         } finally {
             RNGTechConfig.ENERGY_GENERATION_MULTIPLIER.set(previousGlobal);
             stageFour.set(previousStageFour);
@@ -215,6 +224,8 @@ public final class SolidFuelBurnerGameTests {
                 "2x global and 3x Stage 4 should make " + steelBase.energyRate() + " FE/t six times as much, ran at " + steelScaled.energyRate());
         check(copperScaled.energyRate() == 2 * copperBase.energyRate(),
                 "A Copper Heat Core should get only the 2x global, " + copperBase.energyRate() + " FE/t ran at " + copperScaled.energyRate());
+        check(Math.abs(steelShown - 6.0) < 0.001, "The Stats tab should name a 6x pack setting for the Steel Heat Core, got " + steelShown);
+        check(Math.abs(copperShown - 2.0) < 0.001, "The Stats tab should name a 2x pack setting for the Copper Heat Core, got " + copperShown);
         helper.succeed();
     }
 

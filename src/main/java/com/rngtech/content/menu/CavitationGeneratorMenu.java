@@ -78,7 +78,8 @@ public class CavitationGeneratorMenu extends AbstractContainerMenu implements St
     private static final int DATA_MAX_PENALTY = 42;
     private static final int DATA_FLUID_OUTPUT_RATE = 43;
     private static final int DATA_GENERATION_FLUID_BONUS = 44;
-    private static final int DATA_COUNT = 45;
+    private static final int DATA_PACK_GENERATION_MULTIPLIER = 45;
+    private static final int DATA_COUNT = 46;
     private static final int BUTTON_THROTTLE_BASE = 8000;
     private static final int STAT_SCALE = 100;
 
@@ -554,5 +555,10 @@ public class CavitationGeneratorMenu extends AbstractContainerMenu implements St
         public boolean isActive() {
             return activeSupplier.getAsBoolean();
         }
+    }
+
+    /** The pack's config multiplier on this generator's FE, global times stage. */
+    public double packGenerationMultiplier() {
+        return GenerationMenuSupport.packMultiplier(data.get(DATA_PACK_GENERATION_MULTIPLIER));
     }
 }

@@ -88,6 +88,8 @@ A generator's stage comes from the part that sets its output:
 | [Solar Panel](solar-panel.md) and Solar Array Controller | Each panel's own stage. |
 | Every other generator | The stage the machine shows, such as 5 for the [Syngas Combustor](syngas-combustor.md) and 6 for the [Fuel Cell](ammonia-fuel-cell.md). |
 
+Players see the result on each generator's Stats tab. The Energy Generation row shows the FE/t after both multipliers, and its hover lists them together as **Pack setting**.
+
 RNGTech has no multiplier for machine FE costs. To make the whole mod cheaper or more expensive, change the machine recipes too, so the stages stay in step.
 
 | You want to change | How |

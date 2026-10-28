@@ -686,7 +686,8 @@ public class BioGeneratorScreen extends AbstractContainerScreen<BioGeneratorMenu
                 statLines,
                 menu.energyPerTick(),
                 menu.statValue(BioGeneratorMenu.baseEnergyGenerationDataIndex()),
-                menu.statValue(BioGeneratorMenu.flatEnergyGenerationDataIndex())
+                menu.statValue(BioGeneratorMenu.flatEnergyGenerationDataIndex()),
+                menu.packGenerationMultiplier()
         );
     }
 

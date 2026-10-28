@@ -1,5 +1,7 @@
 package com.rngtech.rpg;
 
+import net.minecraft.network.chat.contents.TranslatableContents;
+
 import java.util.List;
 import java.util.Map;
 
@@ -16,6 +18,7 @@ public final class PartGenerationChecks {
         machineWideIncreasesScalePartFlatsOnce();
         additivePartsKeepTheirFlatSeparate();
         generationBreakdownExplainsFinalOutput();
+        generationBreakdownNamesThePackSetting();
         return checks;
     }
 
@@ -54,6 +57,18 @@ public final class PartGenerationChecks {
         near(MachineStatDisplay.generationOtherFactor(finalPerTick, 1000, multiplier, flat), 1.08, "breakdown isolates other stats");
         near(MachineStatDisplay.generationOtherFactor(finalPerTick, 0, multiplier, flat), 1.0, "unknown base hides the other line");
         require(MachineStatDisplay.energyRate(3592.4).equals("3,592 FE/t"), "Stats tab row shows final FE/t");
+    }
+
+    private static void generationBreakdownNamesThePackSetting() {
+        List<String> keys = MachineStatDisplay.generationBreakdown(2000, 1000, 1.0, 0, 2.0).stream()
+                .map(line -> line.getContents() instanceof TranslatableContents contents ? contents.getKey() : "")
+                .toList();
+        require(keys.contains("rngtech.stat.energy_generation.breakdown.pack"), "a 2x pack setting gets its own line");
+        require(!keys.contains("rngtech.stat.energy_generation.breakdown.other"), "the pack setting is not counted again as other stats");
+        List<String> plain = MachineStatDisplay.generationBreakdown(1000, 1000, 1.0, 0, 1.0).stream()
+                .map(line -> line.getContents() instanceof TranslatableContents contents ? contents.getKey() : "")
+                .toList();
+        require(!plain.contains("rngtech.stat.energy_generation.breakdown.pack"), "a 1x pack setting stays hidden");
     }
 
     private static MachineStatAccumulator machineWithChamberAndNozzle() {

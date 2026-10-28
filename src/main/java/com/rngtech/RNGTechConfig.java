@@ -272,9 +272,14 @@ public final class RNGTechConfig {
         return ENERGY_STAGE_GENERATION_MULTIPLIERS.get(Mth.clamp(stage, 1, MAX_GENERATOR_STAGE) - 1).get();
     }
 
+    /** The pack's global and stage multipliers together, for a Stage {@code stage} generator. */
+    public static double packGenerationMultiplier(int stage) {
+        return ENERGY_GENERATION_MULTIPLIER.get() * stageGenerationMultiplier(stage);
+    }
+
     /** {@code energy} FE from a Stage {@code stage} RNGTech generator, scaled by the pack's global and stage multipliers. */
     public static double generatedEnergy(double energy, int stage) {
-        return energy * ENERGY_GENERATION_MULTIPLIER.get() * stageGenerationMultiplier(stage);
+        return energy * packGenerationMultiplier(stage);
     }
 
     /** Whether the default loot tables may drop {@code uniqueId}. */

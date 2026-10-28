@@ -11,6 +11,7 @@ import com.rngtech.content.item.GearParts;
 import com.rngtech.content.item.MachinePartItem;
 import com.rngtech.content.item.SolidFuelBurnerPartItem;
 import com.rngtech.content.item.UniquePartItem;
+import com.rngtech.content.menu.GenerationMenuSupport;
 import com.rngtech.content.menu.SolidFuelBurnerMenu;
 import com.rngtech.content.registry.ModBlockEntities;
 import com.rngtech.rpg.ComponentBaseStatCatalog;
@@ -96,7 +97,8 @@ public class SolidFuelBurnerBlockEntity extends BaseMachineBlockEntity implement
     private static final int DATA_CONNECTOR_CAP = 19;
     private static final int DATA_STOKE = 20;
     private static final int DATA_RATED_GENERATION = 21;
-    private static final int DATA_COUNT = 22;
+    private static final int DATA_PACK_GENERATION_MULTIPLIER = 22;
+    private static final int DATA_COUNT = 23;
     private static final int STAT_SCALE = 100;
     private static final int VISUAL_SYNC_INTERVAL = 5;
     /** The fire's full height: a Steel Heat Core's base output. */
@@ -184,6 +186,7 @@ public class SolidFuelBurnerBlockEntity extends BaseMachineBlockEntity implement
                 case DATA_CONNECTOR_CAP -> connectorOutputCap();
                 case DATA_STOKE -> stoke;
                 case DATA_RATED_GENERATION -> ratedGeneration(stats);
+                case DATA_PACK_GENERATION_MULTIPLIER -> GenerationMenuSupport.packMultiplierData(generatorStage());
                 default -> 0;
             };
         }

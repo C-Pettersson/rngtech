@@ -554,17 +554,24 @@ final class MachineScreenStyle {
             StatLine[] statLines,
             double finalPerTick,
             double basePerTick,
-            double flatPerTick
+            double flatPerTick,
+            double packMultiplier
     ) {
         for (int index = 0; index < Math.min(stats.length, statLines.length); index++) {
             if (stats[index] == MachineStat.ENERGY_GENERATION) {
-                statLines[index] = generationBreakdownLine(statLines[index], finalPerTick, basePerTick, flatPerTick);
+                statLines[index] = generationBreakdownLine(statLines[index], finalPerTick, basePerTick, flatPerTick, packMultiplier);
             }
         }
         return statLines;
     }
 
-    static StatLine generationBreakdownLine(StatLine line, double finalPerTick, double basePerTick, double flatPerTick) {
+    static StatLine generationBreakdownLine(
+            StatLine line,
+            double finalPerTick,
+            double basePerTick,
+            double flatPerTick,
+            double packMultiplier
+    ) {
         double multiplier = line.strength();
         return new StatLine(
                 line.label(),
@@ -573,7 +580,31 @@ final class MachineScreenStyle {
                 false,
                 multiplier > 1.001,
                 Component.empty(),
-                MachineStatDisplay.generationBreakdown(finalPerTick, basePerTick, multiplier, flatPerTick)
+                MachineStatDisplay.generationBreakdown(finalPerTick, basePerTick, multiplier, flatPerTick, packMultiplier)
+        ).withStat(line.stat);
+    }
+
+    /**
+     * For a row whose stat is already FE/t, as on the Solid Fuel Burner: shows the FE/t after the pack's config
+     * multiplier and names that multiplier on hover. The row's strength stays the stat, which drives its pips.
+     */
+    static StatLine withPackGeneration(StatLine line, double packMultiplier) {
+        if (Math.abs(packMultiplier - 1.0) < 0.005) {
+            return line;
+        }
+        List<Component> lines = new ArrayList<>(line.tooltipLines);
+        if (lines.isEmpty() && !line.tooltip().getString().isEmpty()) {
+            lines.add(line.tooltip());
+        }
+        lines.add(MachineStatDisplay.packGenerationLine(packMultiplier));
+        return new StatLine(
+                line.label(),
+                MachineStatDisplay.energyRate(line.strength() * packMultiplier),
+                line.strength(),
+                line.integral,
+                line.enhanced(),
+                Component.empty(),
+                lines
         ).withStat(line.stat);
     }
 
