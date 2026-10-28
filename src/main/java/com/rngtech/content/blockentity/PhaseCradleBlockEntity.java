@@ -37,6 +37,8 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.Packet;
@@ -149,6 +151,11 @@ public class PhaseCradleBlockEntity extends BlockEntity implements MenuProvider,
 
     private static final int LINE_RESCAN_INTERVAL = 80;
     private static final int NO_OUTCOME = -1;
+    private static final int LEGACY_SLOT_TARGET = 0;
+    private static final int LEGACY_SLOT_OUTPUT = 2;
+    private static final int LEGACY_SLOT_BATTERY_CELL = 0;
+    private static final long HELD_ITEM_CHECK_INTERVAL = 20L;
+    private static final double HELD_ITEM_PLAYER_RANGE = 16.0D;
 
     private final ItemStackHandler items = new ItemStackHandler(SLOT_COUNT) {
         @Override
@@ -188,6 +195,8 @@ public class PhaseCradleBlockEntity extends BlockEntity implements MenuProvider,
             setChanged();
         }
     };
+    /** Items from an Exotic Affix Forge save that have no Cradle slot, kept until a player is near enough to collect them. */
+    private final List<ItemStack> heldItems = new ArrayList<>();
     private final ItemStackHandler cells = new ItemStackHandler(CELL_SLOTS) {
         @Override
         public boolean isItemValid(int slot, ItemStack stack) {
@@ -486,6 +495,7 @@ public class PhaseCradleBlockEntity extends BlockEntity implements MenuProvider,
             cradle.chargeParticles(server);
         }
         cradle.showCharge();
+        cradle.releaseHeldItems(level);
     }
 
     // -- What the line shows --------------------------------------------------------------------------------------
@@ -1295,6 +1305,7 @@ public class PhaseCradleBlockEntity extends BlockEntity implements MenuProvider,
         for (int slot = 0; slot < seats.getSlots(); slot++) {
             dropSlot(level, seats, slot);
         }
+        dropHeldItems(level);
     }
 
     private void dropSlot(Level level, ItemStackHandler inventory, int slot) {
@@ -1416,6 +1427,11 @@ public class PhaseCradleBlockEntity extends BlockEntity implements MenuProvider,
         tag.putInt("LastHeld", lastHeld);
         tag.putString("LastAction", lastAction == null ? "" : lastAction.getSerializedName());
         tag.putInt("LastSlipped", lastSlipped);
+        if (!heldItems.isEmpty()) {
+            ListTag held = new ListTag();
+            heldItems.forEach(stack -> held.add(stack.save(registries)));
+            tag.put("HeldItems", held);
+        }
         if (pulse != null) {
             tag.putInt("PulseOutcome", pulse.outcome().ordinal());
             tag.putInt("PulseHeld", pulse.held());
@@ -1434,8 +1450,14 @@ public class PhaseCradleBlockEntity extends BlockEntity implements MenuProvider,
                     tag.getInt("PulseHeld"), tag.getInt("PulseSlipped"));
             pulseTick = Integer.MAX_VALUE / 2;
         }
+        heldItems.clear();
+        for (Tag held : tag.getList("HeldItems", Tag.TAG_COMPOUND)) {
+            ItemStack.parse(registries, held).ifPresent(heldItems::add);
+        }
         if (tag.contains("Items")) {
             items.deserializeNBT(registries, tag.getCompound("Items"));
+        } else if (tag.contains("ProcessInventory") || tag.contains("GearInventory")) {
+            loadExoticForgeInventory(tag, registries);
         }
         if (tag.contains("Cells")) {
             cells.deserializeNBT(registries, tag.getCompound("Cells"));
@@ -1454,6 +1476,70 @@ public class PhaseCradleBlockEntity extends BlockEntity implements MenuProvider,
         lastHeld = tag.getInt("LastHeld");
         lastAction = tag.getString("LastAction").isEmpty() ? null : actionByName(tag.getString("LastAction"));
         lastSlipped = tag.getInt("LastSlipped");
+    }
+
+    /**
+     * Loads a block saved as the Exotic Affix Forge, which kept this id. Its target, output, and Battery Cell move into
+     * the Cradle's slots; its catalyst, and anything the Cradle cannot take, is held until a player is near.
+     */
+    private void loadExoticForgeInventory(CompoundTag tag, HolderLookup.Provider registries) {
+        ItemStackHandler process = new ItemStackHandler();
+        process.deserializeNBT(registries, tag.getCompound("ProcessInventory"));
+        ItemStackHandler gear = new ItemStackHandler();
+        gear.deserializeNBT(registries, tag.getCompound("GearInventory"));
+        ItemStackHandler migrated = new ItemStackHandler(SLOT_COUNT);
+        for (int slot = 0; slot < process.getSlots(); slot++) {
+            ItemStack stack = process.getStackInSlot(slot);
+            if (slot == LEGACY_SLOT_TARGET && RefinementTargets.canPhase(stack)) {
+                migrated.setStackInSlot(SLOT_TARGET, stack);
+            } else if (slot == LEGACY_SLOT_OUTPUT && stack.getCount() == 1) {
+                migrated.setStackInSlot(SLOT_OUTPUT, stack);
+            } else {
+                holdItem(stack);
+            }
+        }
+        ItemStackHandler migratedCells = new ItemStackHandler(CELL_SLOTS);
+        for (int slot = 0; slot < gear.getSlots(); slot++) {
+            ItemStack stack = gear.getStackInSlot(slot);
+            if (slot == LEGACY_SLOT_BATTERY_CELL && BatteryCellItem.isBatteryCell(stack)) {
+                migratedCells.setStackInSlot(0, stack);
+            } else {
+                holdItem(stack);
+            }
+        }
+        items.deserializeNBT(registries, migrated.serializeNBT(registries));
+        if (!tag.contains("Cells")) {
+            cells.deserializeNBT(registries, migratedCells.serializeNBT(registries));
+        }
+    }
+
+    private void holdItem(ItemStack stack) {
+        if (!stack.isEmpty()) {
+            heldItems.add(stack);
+        }
+    }
+
+    public List<ItemStack> heldItems() {
+        return List.copyOf(heldItems);
+    }
+
+    /** Drops held items once a player is close enough to collect them before they despawn. */
+    private void releaseHeldItems(Level level) {
+        if (heldItems.isEmpty() || level.getGameTime() % HELD_ITEM_CHECK_INTERVAL != 0L) {
+            return;
+        }
+        if (level.hasNearbyAlivePlayer(worldPosition.getX() + 0.5D, worldPosition.getY() + 0.5D, worldPosition.getZ() + 0.5D,
+                HELD_ITEM_PLAYER_RANGE)) {
+            dropHeldItems(level);
+            setChanged();
+        }
+    }
+
+    private void dropHeldItems(Level level) {
+        for (ItemStack stack : heldItems) {
+            Containers.dropItemStack(level, worldPosition.getX(), worldPosition.getY(), worldPosition.getZ(), stack.copy());
+        }
+        heldItems.clear();
     }
 
     private static PhaseArrayAction actionByName(String name) {
