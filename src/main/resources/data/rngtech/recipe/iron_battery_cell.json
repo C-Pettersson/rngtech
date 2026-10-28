@@ -23,7 +23,7 @@
       "tag": "c:ingots/iron"
     },
     "P": {
-      "item": "rngtech:iron_plate"
+      "tag": "rngtech:plates/iron"
     },
     "R": {
       "item": "minecraft:redstone"

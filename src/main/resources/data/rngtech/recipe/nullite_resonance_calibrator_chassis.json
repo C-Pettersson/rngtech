@@ -19,7 +19,7 @@
     },
     "B": { "ingredient": { "item": "rngtech:nullite_control_board" } },
     "C": { "ingredient": { "item": "rngtech:nullite_resonance_coil" } },
-    "E": { "ingredient": { "tag": "c:ingots/nullite" } },
+    "E": { "ingredient": { "tag": "rngtech:ingots/nullite" } },
     "L": {
       "ingredient": { "item": "rngtech:calibrated_diamond_crystal" },
       "calibration": { "family": "logic", "min_stage": 6, "min_stability": 85 }

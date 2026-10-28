@@ -61,7 +61,7 @@ The current code-backed crafting recipes use a small vanilla material set. Furna
 | Flint | Flint Crush Head, Wooden Crusher Chassis | Stage 0 crusher tooling and primitive body bracing. |
 | Iron ingot or nugget | Machine Frame, Crusher, Affix Forge, Iron Crush Head, Crude Energy Connector, Iron Battery Cell, Iron Battery Chassis, Forming Hammer, generic Casing, manual Iron Plate | Main early structural material. The base Machine Frame carries Stage 0-3 bodies and the Steel Metal Press body, while most other Steel-stage bodies move to the reinforced frame sink. |
 | Copper ingot, nugget, or block | Crusher, Furnace, Copper Energy Connector, Bus Bar, Energy Coil, Affix Forge, Affix Injector, Nullifier Coil, Copper Battery Cell, Copper Battery Chassis, manual Copper Plate | Main early energy and conductivity material. |
-| Bronze ingot tag | Bronze machine parts, manual Bronze Plate, manual Bronze Gear, Crude Press bootstrap, and Basic Circuit blanks | The early bootstrap crafts `3x c:ingots/copper`, `1x c:ingots/tin`, and `1x minecraft:charcoal` into `2` Bronze Ingots. The Alloy Furnace is the full-yield option, producing `4` Bronze Ingots from the same `3:1` Copper/Tin ratio plus Charcoal flux once Bronze Alloy Furnace gear is built. `c:ingots/bronze` remains the compatibility input where recipes need an ingot tag. |
+| Bronze ingot tag | Bronze machine parts, manual Bronze Plate, manual Bronze Gear, Crude Press bootstrap, and Basic Circuit blanks | The early bootstrap crafts `3x c:ingots/copper`, `1x c:ingots/tin`, and `1x minecraft:charcoal` into `2` Bronze Ingots. The Alloy Furnace is the full-yield option, producing `4` Bronze Ingots from the same `3:1` Copper/Tin ratio plus Charcoal flux once Bronze Alloy Furnace gear is built. RNGTech recipes take `rngtech:ingots/bronze`, which holds only RNGTech Bronze; `c:ingots/bronze` exports it. |
 | Redstone | Most machine and energy recipes, including Bus Bar and Energy Coil | Current control and energy-transfer ingredient. |
 | Smooth stone and vanilla Furnace | Machine Frame, Furnace, Crusher, Crusher Machine Chassis, generic Casing, solid fuel-burning generator chassis | Current machine body and vanilla bridge. Reinforced, Advanced, and Exotic Machine Frames build upward from later structural requirements instead of replacing early recipes. |
 | Coal | Solid fuel-burning generator chassis and Coal Dust | Coal can be crushed into `rngtech:coal_dust`, which combines with a water bucket to produce Carbon Exhaust Bucket for the Algae Photobioreactor. |
@@ -99,10 +99,11 @@ Use shared tags where possible:
 |---|---|
 | Ore | `c:ores/<material>` block and item tags |
 | Raw material | `c:raw_materials/<material>` |
-| Ingot | `c:ingots/<material>` |
+| Ingot | `c:ingots/<material>`; RNGTech recipes take alloy ingots through `rngtech:ingots/<alloy>` |
 | Storage block | `c:storage_blocks/<material>` |
 | Dust | `c:dusts/<material>` |
-| Nugget | `c:nuggets/<material>` |
+| Nugget | `c:nuggets/<material>`; RNGTech recipes take alloy nuggets through `rngtech:nuggets/<alloy>` |
+| Plate, gear, rod | `c:plates/<material>`, `c:gears/<material>`, `c:rods/<material>` for export; RNGTech recipes take `rngtech:plates/<material>`, `rngtech:gears/<material>`, and `rngtech:rods/<material>` so other mods' parts do not skip the Metal Press |
 | Circuit | `c:circuits/<tier>` for export; RNGTech recipes take `rngtech:circuits/<tier>` so other mods' circuits do not skip the circuit chain |
 | Material family | `rngtech:materials/family/<material>` |
 | Material family group | `rngtech:materials/family/<group>` |
@@ -180,7 +181,7 @@ RNGTech should remain playable with vanilla ingredients until optional compatibi
 
 ### Common Modded Compatibility
 
-Advanced recipes should prefer optional `c:` tags for common modded metals instead of hard dependencies.
+Advanced recipes should prefer optional `c:` tags for common modded metals instead of hard dependencies. Items RNGTech makes in a gated machine, the alloys and every plate, gear, and rod, are the exception: recipes take them through `rngtech:` tags that hold only RNGTech's item, so other mods' versions do not skip that machine. Mined metals such as Titanium stay on `c:` tags; ore hardness is their gate.
 
 | Role | Suggested Tags |
 |---|---|

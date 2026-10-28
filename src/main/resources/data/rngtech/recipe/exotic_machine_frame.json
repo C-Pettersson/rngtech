@@ -27,7 +27,7 @@
       "calibration": { "family": "structural", "min_stage": 3, "min_stability": 80 }
     },
     "T": {
-      "ingredient": { "item": "rngtech:tungstensteel_plate" }
+      "ingredient": { "tag": "rngtech:plates/tungstensteel" }
     }
   },
   "result": {

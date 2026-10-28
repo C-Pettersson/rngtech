@@ -38,7 +38,7 @@
     },
     "S": {
       "ingredient": {
-        "item": "rngtech:steel_plate"
+        "tag": "rngtech:plates/steel"
       }
     }
   },

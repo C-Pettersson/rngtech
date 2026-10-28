@@ -9,10 +9,10 @@
   "group": "battery_assembly_anodes",
   "ingredients": [
     {
-      "item": "rngtech:titanium_plate"
+      "tag": "rngtech:plates/titanium"
     },
     {
-      "item": "rngtech:titanium_plate"
+      "tag": "rngtech:plates/titanium"
     }
   ],
   "fluid_input": {

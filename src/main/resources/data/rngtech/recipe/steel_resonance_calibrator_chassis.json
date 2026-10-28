@@ -24,7 +24,7 @@
       "calibration": { "family": "logic", "min_stage": 2, "min_stability": 55 }
     },
     "P": { "ingredient": { "item": "rngtech:reinforced_machine_frame" } },
-    "S": { "ingredient": { "tag": "c:ingots/steel" } }
+    "S": { "ingredient": { "tag": "rngtech:ingots/steel" } }
   },
   "result": { "count": 1, "id": "rngtech:steel_resonance_calibrator_chassis" }
 }

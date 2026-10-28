@@ -5,7 +5,7 @@
   "pattern": [ "RPR", "IBI", "RPR" ],
   "key": {
     "B": { "item": "rngtech:control_board" },
-    "I": { "tag": "c:ingots/steel" },
+    "I": { "tag": "rngtech:ingots/steel" },
     "P": { "item": "rngtech:conductive_plate" },
     "R": { "item": "minecraft:redstone" }
   },

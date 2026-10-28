@@ -17,7 +17,7 @@
       "tag": "c:ingots/gold"
     },
     "P": {
-      "item": "rngtech:gold_plate"
+      "tag": "rngtech:plates/gold"
     },
     "R": {
       "item": "minecraft:redstone"

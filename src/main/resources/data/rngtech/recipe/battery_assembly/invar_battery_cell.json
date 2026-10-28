@@ -12,10 +12,10 @@
       "item": "rngtech:battery_cell"
     },
     {
-      "item": "rngtech:invar_plate"
+      "tag": "rngtech:plates/invar"
     },
     {
-      "tag": "c:ingots/invar"
+      "tag": "rngtech:ingots/invar"
     },
     {
       "item": "minecraft:redstone"

@@ -23,7 +23,7 @@
       "tag": "c:ingots/lead"
     },
     "P": {
-      "item": "rngtech:lead_plate"
+      "tag": "rngtech:plates/lead"
     },
     "R": {
       "item": "minecraft:redstone"

@@ -5,7 +5,7 @@
   "pattern": [ "SMS", "ICI", "SMS" ],
   "key": {
     "C": { "item": "rngtech:stabilization_catalyst" },
-    "I": { "tag": "c:ingots/steel" },
+    "I": { "tag": "rngtech:ingots/steel" },
     "M": { "item": "rngtech:matrix" },
     "S": { "item": "minecraft:diamond" }
   },

@@ -8,7 +8,7 @@
   "type": "rngtech:metal_press",
   "group": "metal_press_plates",
   "ingredient": {
-    "tag": "c:ingots/bronze"
+    "tag": "rngtech:ingots/bronze"
   },
   "mold": {
     "item": "rngtech:plate_mold"

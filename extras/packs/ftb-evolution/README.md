@@ -32,10 +32,25 @@ Newer RNGTech builds fix the ore and circuit problems themselves, so skip step 3
 - Ore hardness applies to other mods' ores only when `worldgen.ores.commonOreTagHardness` is on. It is off by
   default.
 - RNGTech recipes take `rngtech:circuits/<tier>`, which holds only RNGTech circuits.
+- RNGTech recipes take alloy ingots and nuggets through `rngtech:ingots/<alloy>` and `rngtech:nuggets/<alloy>`, and
+  plates, gears, and rods through `rngtech:plates/<metal>`, `rngtech:gears/<metal>`, and `rngtech:rods/<metal>`.
+  These tags hold only RNGTech items, so FTB Materials, Mekanism, Immersive Engineering, and Modern
+  Industrialization steel, bronze, and plates do not skip the Alloy Furnace or the Metal Press. The items stay in
+  the `c:` tags, and 196 other-mod recipe inputs in Evolution take an RNGTech Steel Plate.
+- RNGTech's AlmostUnified plugin keeps those items in RNGTech recipe outputs. AlmostUnified still turns RNGTech's
+  mined-metal outputs, such as Tin and Titanium ingots, into FTB Materials items.
 - Pickaxes that are not Modular tools reach up to hardness 6 by their tier, and the Netherite Pickaxe reaches every
   hardness. Diamond-tier pickaxes from other mods mine RNGTech Titanium, Tungsten, and Platinum ore. A config file
   written by an older RNGTech keeps its old value, so set `vanillaToolBridgePolicy = "TIER_LADDER"` under
   `[worldgen.ores]` when you upgrade.
+
+AlmostUnified hides RNGTech's alloys, plates, gears, and rods in JEI, because FTB Materials items are its targets.
+To show them, add these patterns to `ignored_items` in `config/almostunified/unification/materials.json`:
+
+```json
+"rngtech:(bronze|steel|invar|sparksteel|arclite|tungstensteel|nullite|aethergold)_(ingot|nugget)",
+"rngtech:[a-z]+_(plate|gear|rod)"
+```
 
 For energy, set `energy.generationMultiplier` in `config/rngtech-common.toml` instead of using the optional
 script. The setting scales every RNGTech generator, including the Solid Fuel Burner and Solar Panels, by one
@@ -122,10 +137,13 @@ Industrialization, behind an RNGTech Stage 5 Modular pickaxe.
 
 ## Known gaps
 
-- RNGTech's recipes ask for `#c:ingots/steel`, `bronze`, `invar`, `titanium`, and the other shared metals, so
-  Mekanism, Immersive Engineering, and Modern Industrialization alloys skip RNGTech's Alloy Furnace steps. This kit
-  leaves that as normal pack interop.
-- RNGTech does not tag its plates, gears, or rods under `c:`, so other mods cannot use RNGTech Metal Press output.
-  This keeps AlmostUnified from replacing RNGTech plates in RNGTech recipes.
+- In 2.0.0-alpha.3, RNGTech's recipes ask for `#c:ingots/steel`, `bronze`, `invar`, and the other alloys, so
+  Mekanism, Immersive Engineering, and Modern Industrialization alloys skip RNGTech's Alloy Furnace steps.
+  AlmostUnified also turns the Alloy Furnace's Steel and Bronze into FTB Materials items. Newer builds fix both.
+- In 2.0.0-alpha.3, RNGTech does not tag its plates, gears, or rods under `c:`, so other mods cannot use RNGTech
+  Metal Press output. Newer builds tag them.
+- Mined metals stay on `c:` tags in every build. Modern Industrialization Titanium, Tungsten, and Platinum ingots
+  work in RNGTech recipes, so its processing skips RNGTech's Furnace heat for those metals. RNGTech's own gate for
+  them is ore hardness, which reaches other mods' ores only when `commonOreTagHardness` is on.
 - In 2.0.0-alpha.3, `rngtech:trait_shaped` recipes cannot be encoded with `Recipe.CODEC`, so recipe dump tools
   skip them. Newer builds encode them.

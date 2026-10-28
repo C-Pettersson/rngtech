@@ -8,7 +8,7 @@
   "type": "rngtech:metal_press",
   "group": "metal_press_casings",
   "ingredient": {
-    "tag": "c:ingots/arclite"
+    "tag": "rngtech:ingots/arclite"
   },
   "input_count": 4,
   "mold": {

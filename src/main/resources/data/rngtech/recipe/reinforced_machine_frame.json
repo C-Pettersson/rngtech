@@ -20,7 +20,7 @@
       "item": "rngtech:machine_frame"
     },
     "P": {
-      "item": "rngtech:steel_plate"
+      "tag": "rngtech:plates/steel"
     },
     "S": {
       "item": "rngtech:steel_casing"

@@ -9,10 +9,10 @@
   "group": "battery_assembly_anodes",
   "ingredients": [
     {
-      "item": "rngtech:aluminum_plate"
+      "tag": "rngtech:plates/aluminum"
     },
     {
-      "item": "rngtech:aluminum_plate"
+      "tag": "rngtech:plates/aluminum"
     }
   ],
   "fluid_input": {

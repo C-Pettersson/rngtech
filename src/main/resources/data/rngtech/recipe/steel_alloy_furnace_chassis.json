@@ -26,7 +26,7 @@
       "item": "rngtech:steel_heat_core"
     },
     "I": {
-      "tag": "c:ingots/steel"
+      "tag": "rngtech:ingots/steel"
     },
     "R": {
       "item": "minecraft:redstone"

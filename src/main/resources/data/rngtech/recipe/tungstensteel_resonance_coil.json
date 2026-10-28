@@ -5,7 +5,7 @@
   "pattern": [ "RCR", "III", "RCR" ],
   "key": {
     "C": { "item": "rngtech:energy_coil" },
-    "I": { "tag": "c:ingots/tungstensteel" },
+    "I": { "tag": "rngtech:ingots/tungstensteel" },
     "R": { "item": "minecraft:redstone" }
   },
   "result": { "count": 1, "id": "rngtech:tungstensteel_resonance_coil" }
