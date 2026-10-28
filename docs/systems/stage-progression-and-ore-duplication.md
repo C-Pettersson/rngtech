@@ -1,6 +1,6 @@
 # Stage Progression and Ore Duplication
 
-Status: Prototype
+Status: Implemented
 
 Player guide: [Stages](https://c-pettersson.github.io/rngtech/stages/)
 
@@ -79,7 +79,7 @@ flowchart TD
         RngtechRecipe["Source ore recipes\nOre hardness: world harvest gate\nCrusher level: soft recipe pressure\nBase output: 3 crushed"]
     end
 
-    subgraph stats["Effective Crusher stats (prototype)"]
+    subgraph stats["Effective Crusher stats"]
         MachineAffixes["Crusher machine affixes"]
         CrushHead["Required installed Crush Head\nFlint level 1, Iron level 2"]
         Hardness["PROCESSING_LEVEL\nBelow recipe hardness costs more, slows, and can jam"]

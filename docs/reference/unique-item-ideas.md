@@ -2,7 +2,7 @@
 
 Status: Planned
 
-This page collects candidate Unique Gear and Battery Cells. The Voltaic Potato Battery Cell and the eight launch Uniques are implemented as a Prototype; see the [Current Implementation Matrix](current-implementation.md). The [Unique Items PRD](../prds/uniques.md) defines the catalog, sources, and launch set. Backlog entries are not current gameplay until a later task promotes them.
+This page collects candidate Unique Gear and Battery Cells. The Voltaic Potato Battery Cell and the eight launch Uniques are implemented; see the [Current Implementation Matrix](current-implementation.md). The [Unique Items PRD](../prds/uniques.md) defines the catalog, sources, and launch set. Backlog entries are not current gameplay until a later task promotes them.
 
 A strong Unique comes from one exact place in the world, solves one odd build problem, and carries one real drawback. It is a sidegrade or a build-around piece, not a higher stage.
 
@@ -19,7 +19,7 @@ A strong Unique comes from one exact place in the world, solves one odd build pr
 
 ## Launch Set
 
-Status: Prototype
+Status: Implemented
 
 These eight are implemented and specified, with their ranges, in the [Unique Items PRD](../prds/uniques.md#launch-uniques). Their shipped values live in the catalog under `data/rngtech/uniques/`.
 

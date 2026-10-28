@@ -29,7 +29,7 @@ Component material stages are based on ore and ingot families. Non-stage reagent
 
 Machine Frame tiers are shared recipe ingredients, not RPG trait owners. `rngtech:machine_frame` covers Stage 0-3 machine bodies, early support recipes, and the Steel Metal Press body; `rngtech:reinforced_machine_frame` gates most other Stage 4 Steel and Lead bodies, `rngtech:advanced_machine_frame` covers Stage 5-6, and `rngtech:exotic_machine_frame` covers Stage 7-8 with a Lubricant Bucket fluid gate. The frame tier helps structure assembly recipes; placed machine identity still comes from the machine or chassis item that is crafted.
 
-Current prototype rolling already treats starting affixes and Refinement Potential as separate outcomes. Rarity determines how many starting affixes can appear, while component stage determines the RP range and natural modifier tier weighting.
+Current rolling already treats starting affixes and Refinement Potential as separate outcomes. Rarity determines how many starting affixes can appear, while component stage determines the RP range and natural modifier tier weighting.
 
 ## Machine as Character
 
@@ -46,7 +46,7 @@ A machine build is made from several long-lived pieces.
 
 The player should care about the specific component they made, not only the block it sits inside.
 
-The current prototype has registered [Machine Chassis](https://c-pettersson.github.io/rngtech/stages/#machine-frames) subtype items and Gear tabs on placed Crusher and Furnace machines. The Stage 0 Furnace recipe still crafts `rngtech:furnace` directly, while electric Furnace chassis use staged placed blocks. Current item-only chassis items do not carry RPG traits, so no chassis item data is preserved into a placed machine unless the result itself is a rollable machine block item.
+The code has registered [Machine Chassis](https://c-pettersson.github.io/rngtech/stages/#machine-frames) subtype items and Gear tabs on placed Crusher and Furnace machines. The Stage 0 Furnace recipe still crafts `rngtech:furnace` directly, while electric Furnace chassis use staged placed blocks. Current item-only chassis items do not carry RPG traits, so no chassis item data is preserved into a placed machine unless the result itself is a rollable machine block item.
 
 The solid fuel-burning generator subtype exists as a chassis/category target only. It is not a placed machine block.
 
@@ -206,7 +206,7 @@ A lucky lower-stage component can reach forward into the next stage. Natural tie
 
 ## Unique Components
 
-Status: Prototype
+Status: Implemented
 
 Unique components are build-defining items. Each has authored, ranged stat lines, one signature mechanic, and one visible drawback, and each copy rolls its own values when identified. The [Unique Items PRD](../prds/uniques.md) defines the catalog and the launch set, and the [Unique Item Ideas](../reference/unique-item-ideas.md) page holds the backlog.
 

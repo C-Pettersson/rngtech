@@ -2,7 +2,7 @@
 
 Source: [draft design](work-orders.md).
 
-Status: **Prototype**. The PRD is a draft; its open questions were resolved on 2026-10-26, and it targets the next 2.0 alpha. On 2026-10-25, after a first playtest, it was redesigned around a Dispatch Board vendor, readable order items, and an Orders tab on every processing machine. After a second playtest the same day, orders became Job Chips from a Dispatch Terminal, loaded through drive bays. The branch `feature/workplan-machine-065464` has every phase but the deferred UI polish done: Job Chips from a Dispatch Terminal, three drive bays on the Orders tab of all nine eligible machines, templates, conditions and Rush, stat, group, and streak jobs, refinement and corruption, Jade and JEI, and the player wiki page, in-game guide, and FTB Quests chapter. It merged to `main` in #214 (`794e5d01`) and needs a full playtest. The post-merge polish (stat-goal reachability, Hand Feeding on every Instant Process machine, JEI tier and reward text, and machine-weighted Unique rewards) is on `feature/work-orders-polish-f36a4f`. See [Code against the redesign](#code-against-the-redesign).
+Status: **Implemented**. The PRD is a draft; its open questions were resolved on 2026-10-26, and it targets the next 2.0 alpha. On 2026-10-25, after a first playtest, it was redesigned around a Dispatch Board vendor, readable order items, and an Orders tab on every processing machine. After a second playtest the same day, orders became Job Chips from a Dispatch Terminal, loaded through drive bays. The branch `feature/workplan-machine-065464` has every phase but the deferred UI polish done: Job Chips from a Dispatch Terminal, three drive bays on the Orders tab of all nine eligible machines, templates, conditions and Rush, stat, group, and streak jobs, refinement and corruption, Jade and JEI, and the player wiki page, in-game guide, and FTB Quests chapter. It merged to `main` in #214 (`794e5d01`), the post-merge polish (stat-goal reachability, Hand Feeding on every Instant Process machine, JEI tier and reward text, and machine-weighted Unique rewards) in #215, and the Mirror Catalyst reward in #216. It is playtested. See [Code against the redesign](#code-against-the-redesign).
 
 ## Scope checklist
 
@@ -20,7 +20,7 @@ Status: **Prototype**. The PRD is a draft; its open questions were resolved on 2
 - [x] Refinement and corruption: Job Chips as refinement targets, chip corruption outcomes, and Phase Array rejection.
 - [x] UI polish: Jade, JEI info with tiers and reward kinds, Affix Forge condition text, and the Job Chip lamp on machine models. The user deferred the Bonus Summary section and dropped drive-bay panels.
 - [x] Documentation: wiki page, Machine Mastery and Rarity updates, the implementation matrix, the GuideME guide, Machine Design Notes, and an FTB Quests chapter.
-- [ ] In-game playtest of every eligible machine and tier.
+- [x] In-game playtest of every eligible machine and tier.
 
 ## Decisions
 

@@ -1,6 +1,6 @@
 # Component Stages
 
-Status: Prototype
+Status: Implemented
 
 Player guide: [Stages](https://c-pettersson.github.io/rngtech/stages/)
 
@@ -168,7 +168,7 @@ Servos control precision machine motion, power-drop tolerance, and failure resis
 | 7 | Nullite Servo | `c:ingots/nullite` | Fluid-output safety sidegrade with lower throughput. |
 | 8 | Exotic Servo | Pack-defined exotic ore or ingot tags | Optional endgame control behavior. |
 
-The current prototype implements `rngtech:steel_servo`, plus Stage 6+ `rngtech:titanium_servo`, `rngtech:tungstensteel_servo`, `rngtech:nullite_servo`, and `rngtech:exotic_servo`. Stage 6+ Servo recipes require lubricant: crafting uses `rngtech:lubricant_bucket`, and the Component Assembler can consume `1000 mB` stored Lubricant through the compatibility `rngtech:battery_assembly` recipe type. The Steel Servo recipe intentionally remains lubricant-free to avoid a Stage 4 progression loop. Nullite Servo is a Stage 7 sidegrade with fixed Auto Purge behavior and `0.5x PROCESSING_SPEED`. Cavitation Generator accepts only Stage 6+ Servos for nitrogen utility control, so Steel Servo remains a Metal Press and early-control part rather than a chemistry component.
+RNGTech implements `rngtech:steel_servo`, plus Stage 6+ `rngtech:titanium_servo`, `rngtech:tungstensteel_servo`, `rngtech:nullite_servo`, and `rngtech:exotic_servo`. Stage 6+ Servo recipes require lubricant: crafting uses `rngtech:lubricant_bucket`, and the Component Assembler can consume `1000 mB` stored Lubricant through the compatibility `rngtech:battery_assembly` recipe type. The Steel Servo recipe intentionally remains lubricant-free to avoid a Stage 4 progression loop. Nullite Servo is a Stage 7 sidegrade with fixed Auto Purge behavior and `0.5x PROCESSING_SPEED`. Cavitation Generator accepts only Stage 6+ Servos for nitrogen utility control, so Steel Servo remains a Metal Press and early-control part rather than a chemistry component.
 
 ### Fluid Pumps
 
@@ -181,7 +181,7 @@ Fluid Pumps control fluid transfer for machines with fluid input or output. They
 | 7 | Tungstensteel Fluid Pump | `c:ingots/tungstensteel`, `c:ingots/nullite` | `500 mB/t` |
 | 8 | Exotic Fluid Pump | Pack-defined exotic ore or ingot tags | `1000 mB/t` |
 
-The current prototype implements all three listed pumps as Melter Gear parts. No RNGTech fluid pipes are implemented; machines expose standard NeoForge fluid capabilities when the installed pump allows it.
+RNGTech implements all three listed pumps as Melter Gear parts. No RNGTech fluid pipes are implemented; machines expose standard NeoForge fluid capabilities when the installed pump allows it.
 
 ### Cathodes
 
@@ -226,7 +226,7 @@ Machine chassis items define the machine body or class. Chassis stage should des
 | 7 | Tungstensteel Crusher Chassis | `c:ingots/tungstensteel`, `c:ingots/nullite` | Heavy late-game output chassis. |
 | 8 | Exotic Crusher Chassis | `rngtech:materials/exotic/ingots` | Optional endgame chassis. |
 
-Crusher chassis are placed machine blocks in the current prototype. They gate the maximum installed Crush Head stage, provide authored base stat profiles, and carry fixed machine behavior identity.
+Crusher chassis are placed machine blocks. They gate the maximum installed Crush Head stage, provide authored base stat profiles, and carry fixed machine behavior identity.
 
 ### Component Recycler Chassis and Heads
 

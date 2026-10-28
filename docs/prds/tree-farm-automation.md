@@ -5,7 +5,7 @@
 
 PRD status: Draft
 
-Implementation status: Prototype
+Implementation status: Implemented
 
 Last updated: 2026-06-21
 

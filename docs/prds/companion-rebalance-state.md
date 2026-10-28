@@ -2,7 +2,7 @@
 
 Source: [Companion Rebalance PRD](companion-rebalance.md).
 
-Status: **Prototype** for the 2.0 release. All four slices are in and pass the automated checks; they still need an in-game playtest. Work happens on `feature/companion-rebalance`.
+Status: **Implemented** for the 2.0 release. All four slices are on `main`, pass the automated checks, and are playtested.
 
 ## Scope checklist
 
@@ -12,7 +12,7 @@ Status: **Prototype** for the 2.0 release. All four slices are in and pass the a
 - [x] Slice 2: tool-aware breaking with crack animations.
 - [x] Slice 3: Field Hand ascendancy, crops, sprinkler, water, and tilling.
 - [x] Slice 4: Companion Station overhaul and cart screen additions.
-- [ ] In-game playtest.
+- [x] In-game playtest.
 
 ## Decisions
 

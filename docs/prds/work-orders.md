@@ -4,7 +4,7 @@
 
 PRD status: Draft
 
-Implementation status: Prototype
+Implementation status: Implemented
 
 Release: Next 2.0 alpha
 

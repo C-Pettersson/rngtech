@@ -1,6 +1,6 @@
 # Shared Machine Mega Passive Tree
 
-Status: Prototype
+Status: Implemented
 
 ## Accepted design
 

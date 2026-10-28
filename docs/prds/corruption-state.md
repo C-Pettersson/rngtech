@@ -2,7 +2,7 @@
 
 Source: [draft design](corruption.md).
 
-Status: **Prototype** for the 2.0 release. The PRD was accepted on 2026-10-05. Phases 2 to 6 are in on `feature/corruption-prd-implementation-d6f800`, including the optional Jade, JEI, and filter work. Merged with the Unique catalog: Uniques accept the catalyst, Reforged rerolls their ranged lines, and Unique parts draw implicits from their part's pools. Everything still needs an in-game playtest.
+Status: **Implemented** for the 2.0 release. The PRD was accepted on 2026-10-05. Phases 2 to 6 are in on `feature/corruption-prd-implementation-d6f800`, including the optional Jade, JEI, and filter work. Merged with the Unique catalog: Uniques accept the catalyst, Reforged rerolls their ranged lines, and Unique parts draw implicits from their part's pools. It merged to `main` in #61 and is playtested.
 
 ## Scope checklist
 
@@ -15,7 +15,7 @@ Status: **Prototype** for the 2.0 release. The PRD was accepted on 2026-10-05. P
 - [x] UI: tooltips, the Affix Forge outcome preview, Refinement tab hover text, Jade, JEI, and optional filter matching.
 - [x] Documentation: Progression, Affix Forge, Exotic Affix Forge, Rarity, the implementation matrix, and quests.
 - [x] Reforged on a Unique rerolls its ranged lines inside their catalog ranges.
-- [ ] In-game playtest of every outcome on every station.
+- [x] In-game playtest of every outcome on every station.
 
 ## Decisions
 

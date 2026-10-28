@@ -2,7 +2,7 @@
 
 Source: [Batch Processing PRD](batch-processing.md).
 
-Status: **Prototype** for the 2.0 release. Slice 1 is merged and passed an in-game check on 2026-10-06. Slice 2 passed an in-game check on 2026-10-15 and merged as #164. Slices 3 and 4 pass the automated checks and ship with the [Heat Model](heat-model.md) prototype for one playtest.
+Status: **Implemented** for the 2.0 release, and playtested. Slice 1 is merged and passed an in-game check on 2026-10-06. Slice 2 passed an in-game check on 2026-10-15 and merged as #164. Slices 3 and 4 pass the automated checks and ship with the [Heat Model](heat-model.md).
 
 ## Scope checklist
 
@@ -13,7 +13,7 @@ Status: **Prototype** for the 2.0 release. Slice 1 is merged and passed an in-ga
 - [x] Slice 2: Lead Furnace shared Heat Core, Furnace and Alloy Furnace batching.
 - [x] Slice 3: Dense Batching, Batch Overhead path, and ascendancy values.
 - [x] Slice 4: stat display, hover text, Jade, language, and canonical docs. Progress pips are not done.
-- [ ] In-game playtest.
+- [x] In-game playtest.
 
 ## Decisions
 
