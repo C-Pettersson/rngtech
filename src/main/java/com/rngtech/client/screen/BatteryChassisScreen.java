@@ -364,6 +364,8 @@ public class BatteryChassisScreen extends AbstractContainerScreen<BatteryChassis
                         ? "rngtech.battery_chassis.tooltip.burst_connector_limited"
                         : "rngtech.battery_chassis.tooltip.burst",
                 CompactValueText.energyRate(menu.burstOutput()),
+                menu.burstWindow(),
+                menu.burstDuration(),
                 connectorCapText(menu.outputConnectorCap()),
                 CompactValueText.energyRate(menu.lastOutput())
         );

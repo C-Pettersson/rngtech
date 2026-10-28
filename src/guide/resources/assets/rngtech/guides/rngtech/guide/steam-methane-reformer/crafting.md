@@ -2,7 +2,7 @@
 navigation:
   title: "Crafting"
   parent: steam-methane-reformer.md
-  position: 3
+  position: 4
   icon: rngtech:steam_methane_reformer
 ---
 

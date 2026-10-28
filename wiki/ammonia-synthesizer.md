@@ -94,7 +94,7 @@ Urea synthesis uses the `rngtech:urea_synthesis` recipe type.
 
 The Gear tab has one required **Catalyst Bed** slot. The bed's stage must be high enough for the recipe; the default recipe needs a Stage 6 bed, which is what the Ammonia Catalyst Bed is.
 
-An unrolled Catalyst Bed only unlocks recipes. Its rolled Processing Speed and Energy Usage modifiers speed up the Synthesizer or cut its FE cost. Other rolls on the bed do nothing here.
+An unrolled Catalyst Bed only unlocks recipes. Its rolled Processing Speed, Energy Usage, and Instant Process affixes apply to the Synthesizer. An older bed can still show Efficiency, Stability, or Fluid Transfer. Those affixes do nothing.
 
 ### Automation
 

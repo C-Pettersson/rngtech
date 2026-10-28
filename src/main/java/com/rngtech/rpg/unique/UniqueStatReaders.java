@@ -82,10 +82,11 @@ public final class UniqueStatReaders {
         stats(Reader.CAVITATION_GENERATOR, Set.of(), MachineStat.PROCESSING_SPEED, MachineStat.STABILITY, MachineStat.EFFICIENCY,
                 MachineStat.FLUID_TRANSFER, MachineStat.OUTPUT_AMOUNT, MachineStat.TEMPERATURE_STABILITY, MachineStat.HEAT_TRANSFER,
                 MachineStat.STRAIN_RECOVERY, MachineStat.OVERHEAT_TOLERANCE, MachineStat.MAX_TEMPERATURE);
-        stats(Reader.GAS_CHEMISTRY, Set.of(), MachineStat.MAX_TEMPERATURE, MachineStat.PROCESSING_SPEED, MachineStat.ENERGY_USAGE,
-                MachineStat.EFFICIENCY);
-        stats(Reader.COMPRESSOR_TANK, Set.of(), MachineStat.PROCESSING_SPEED, MachineStat.ENERGY_USAGE, MachineStat.STABILITY,
-                MachineStat.FLUID_CAPACITY, MachineStat.FLUID_TRANSFER);
+        // The Heat Core is only a stage gate here; Efficiency is the Syngas Combustor's.
+        stats(Reader.GAS_CHEMISTRY, Set.of(), MachineStat.PROCESSING_SPEED, MachineStat.ENERGY_USAGE, MachineStat.EFFICIENCY,
+                MachineStat.INSTANT_PROCESS_CHANCE);
+        stats(Reader.COMPRESSOR_TANK, Set.of(), MachineStat.PROCESSING_SPEED, MachineStat.ENERGY_USAGE, MachineStat.FLUID_CAPACITY,
+                MachineStat.FLUID_TRANSFER);
         stats(Reader.CORROSION_CELL, Set.of(), MachineStat.FLUID_CAPACITY, MachineStat.FLUID_TRANSFER, MachineStat.PROCESSING_SPEED,
                 MachineStat.STABILITY, MachineStat.EFFICIENCY);
         stats(Reader.FORESTRY_CART, Set.of(), MachineStat.FLUID_CAPACITY, MachineStat.FLUID_TRANSFER);
@@ -95,7 +96,8 @@ public final class UniqueStatReaders {
                 MachineStat.REFINEMENT_POTENTIAL_BONUS, MachineStat.STREAK_CAP, MachineStat.STREAK_FLOOR);
         stats(Reader.BATTERY_CELL, Set.of(), MachineStat.ENERGY_CAPACITY, MachineStat.ENERGY_TRANSFER, MachineStat.EFFICIENCY,
                 MachineStat.IDLE_LOSS);
-        stats(Reader.BATTERY_CHASSIS, Set.of(), MachineStat.BURST_TRANSFER, MachineStat.BURST_DURATION);
+        stats(Reader.BATTERY_CHASSIS, Set.of(), MachineStat.BURST_TRANSFER, MachineStat.BURST_DURATION, MachineStat.STABILITY,
+                MachineStat.GLOBAL_MODIFIER_STRENGTH);
 
         behaviors(Reader.FURNACE, MachineBehavior.POWER_GRACE);
         behaviors(Reader.ALLOY_FURNACE, MachineBehavior.POWER_GRACE, MachineBehavior.ESCAPEMENT);

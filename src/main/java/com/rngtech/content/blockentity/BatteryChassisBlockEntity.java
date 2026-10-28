@@ -72,7 +72,8 @@ public class BatteryChassisBlockEntity extends BaseMachineBlockEntity implements
     private static final int DATA_CONNECTOR_OUTPUT_CAP = 17;
     private static final int DATA_LAST_INPUT = 18;
     private static final int DATA_LAST_OUTPUT = 19;
-    private static final int DATA_COUNT = 20;
+    private static final int DATA_BURST_WINDOW = 20;
+    private static final int DATA_COUNT = 21;
     private static final int STAT_SCALE = 100;
     private static final int LOSS_TICKS_PER_MINUTE = 20 * 60;
     private static final int CHARGED_STORAGE_REQUIRED_TICKS = 20 * 60 * 10;
@@ -125,6 +126,7 @@ public class BatteryChassisBlockEntity extends BaseMachineBlockEntity implements
                 case DATA_MAX_INPUT -> effectiveInputRate(context);
                 case DATA_MAX_OUTPUT -> effectiveOutputRate(context);
                 case DATA_BURST_OUTPUT -> effectiveBurstOutputRate(context);
+                case DATA_BURST_WINDOW -> burstCapable(context) ? burstTicksRemaining : 0;
                 case DATA_CELL_SLOTS -> context.activeSlots();
                 case DATA_ENERGY_TRANSFER -> effectiveChassisTransfer(context);
                 case DATA_BURST_TRANSFER -> scaledStat(context.stats(), MachineStat.BURST_TRANSFER);
@@ -462,20 +464,46 @@ public class BatteryChassisBlockEntity extends BaseMachineBlockEntity implements
         return context;
     }
 
+    /**
+     * Chassis Capacity and Energy Transfer affixes are global modifiers on the cells in its active slots. Global Modifier
+     * Strength scales their bonus, so a small chassis applies them more strongly; Charged Storage always doubles.
+     */
     private RuntimeContext buildRuntimeContext(MachineStatAccumulator stats, MachineTraits traits, long cellVersion, boolean chargedStorage) {
         int activeSlots = effectiveCellSlots(stats);
-        double capacityMultiplier = energyCapacityMultiplier(traits, chargedStorage);
+        double strength = Math.max(0.0, stats.value(MachineStat.GLOBAL_MODIFIER_STRENGTH));
+        double affixCapacity = energyCapacityMultiplier(traits, false);
+        double chargedFactor = affixCapacity > 0.0 ? energyCapacityMultiplier(traits, chargedStorage) / affixCapacity : 1.0;
+        double capacityMultiplier = globalModifier(affixCapacity, strength) * chargedFactor;
+        double baseTransfer = stats.baseValue(MachineStat.ENERGY_TRANSFER);
+        double transferMultiplier = globalModifier(baseTransfer > 0.0 ? stats.value(MachineStat.ENERGY_TRANSFER) / baseTransfer : 1.0, strength);
         int slots = inventory.getSlots();
         BatteryCellItem.CellStats[] cellStats = new BatteryCellItem.CellStats[slots];
         int[] capacities = new int[slots];
         for (int slot = 0; slot < slots; slot++) {
-            cellStats[slot] = cells.get(slot);
-            int baseCapacity = cellStats[slot].capacity();
-            capacities[slot] = baseCapacity <= 0 || slot >= activeSlots
-                    ? baseCapacity
-                    : Math.max(1, saturatedRoundToInt(baseCapacity * capacityMultiplier));
+            BatteryCellItem.CellStats cell = cells.get(slot);
+            int baseCapacity = cell.capacity();
+            boolean scaled = baseCapacity > 0 && slot < activeSlots;
+            cellStats[slot] = scaled ? withTransfer(cell, transferMultiplier) : cell;
+            capacities[slot] = scaled ? Math.max(1, saturatedRoundToInt(baseCapacity * capacityMultiplier)) : baseCapacity;
         }
         return new RuntimeContext(stats, traits, activeSlots, cellVersion, chargedStorage, cellStats, capacities);
+    }
+
+    private static double globalModifier(double multiplier, double strength) {
+        return Math.max(0.0, 1.0 + (multiplier - 1.0) * strength);
+    }
+
+    private static BatteryCellItem.CellStats withTransfer(BatteryCellItem.CellStats cell, double multiplier) {
+        if (Math.abs(multiplier - 1.0) < 1.0E-9) {
+            return cell;
+        }
+        return new BatteryCellItem.CellStats(
+                cell.capacity(),
+                Math.max(0, saturatedRoundToInt(cell.maxInput() * multiplier)),
+                Math.max(0, saturatedRoundToInt(cell.maxOutput() * multiplier)),
+                cell.efficiency(),
+                cell.idleLossPercentPerMinute()
+        );
     }
 
     /** How many times this chassis built a cell's stats, for checks that a steady chassis builds none. */
@@ -576,28 +604,72 @@ public class BatteryChassisBlockEntity extends BaseMachineBlockEntity implements
     }
 
     private int extractEnergyInternal(int toExtract, boolean simulate, RuntimeContext context) {
+        return extractEnergyInternal(toExtract, simulate, context, true);
+    }
+
+    /**
+     * Delivers up to {@code toExtract} FE within this tick's output budget. While a burst window is open the budget is the
+     * cells' output times Burst Transfer; FE above their rated output is the burst, and Stability below 1.0 wastes that
+     * share of it. Evening out with a neighbouring chassis never bursts.
+     */
+    private int extractEnergyInternal(int toExtract, boolean simulate, RuntimeContext context, boolean allowBurst) {
         if (toExtract <= 0 || !canExtractEnergy(context)) {
             return 0;
         }
 
         double efficiency = transferEfficiency(context);
-        int cellDrawCeiling = Math.min(cellOutputCeiling(context), energyStored(context));
-        int maxDeliveredByCells = deliveredAfterDischargeLoss(cellDrawCeiling, efficiency);
-        int delivered = Math.min(toExtract, Math.min(remainingOutputThisTick(context), maxDeliveredByCells));
+        double outputScale = allowBurst ? burstScale(context) : 1.0;
+        int cellDrawCeiling = Math.min(cellOutputCeiling(context, outputScale), energyStored(context));
+        int ratedLeft = remainingOutputThisTick(context);
+        if (outputScale <= 1.0) {
+            int maxDeliveredByCells = deliveredAfterDischargeLoss(cellDrawCeiling, efficiency);
+            int delivered = Math.min(toExtract, Math.min(ratedLeft, maxDeliveredByCells));
+            if (delivered <= 0) {
+                return 0;
+            }
+            int toDraw = drawRequiredForDelivery(delivered, efficiency);
+            if (!simulate) {
+                int drawn = drainEnergyFromCells(toDraw, true, context);
+                delivered = deliveredAfterDischargeLoss(drawn, efficiency);
+                if (drawn > 0) {
+                    recordEnergyOutput(delivered);
+                    setChanged();
+                }
+            }
+            return delivered;
+        }
+
+        double burstEfficiency = Math.min(1.0, efficiency) * Mth.clamp(context.stats().value(MachineStat.STABILITY), 0.01, 1.0);
+        int budget = Math.max(0, saturatedRoundToInt(cellOutputCeiling(context) * outputScale) - energyOutputThisTick);
+        int delivered = Math.min(toExtract, Math.min(budget, deliveredForDraw(cellDrawCeiling, ratedLeft, efficiency, burstEfficiency)));
         if (delivered <= 0) {
             return 0;
         }
-
-        int toDraw = drawRequiredForDelivery(delivered, efficiency);
+        int rated = Math.min(delivered, ratedLeft);
+        int toDraw = saturatedAdd(drawRequiredForDelivery(rated, efficiency), drawRequiredForDelivery(delivered - rated, burstEfficiency));
         if (!simulate) {
-            int drawn = drainEnergyFromCells(toDraw, true, context);
-            delivered = deliveredAfterDischargeLoss(drawn, efficiency);
+            int drawn = drainEnergyFromCells(toDraw, true, context, outputScale);
+            delivered = Math.min(delivered, deliveredForDraw(drawn, ratedLeft, efficiency, burstEfficiency));
             if (drawn > 0) {
                 recordEnergyOutput(delivered);
+                if (delivered > ratedLeft) {
+                    spendBurstTick();
+                }
                 setChanged();
             }
         }
         return delivered;
+    }
+
+    /** FE that {@code drawn} delivers when the first {@code ratedLeft} FE is rated output and the rest is burst. */
+    private int deliveredForDraw(int drawn, int ratedLeft, double efficiency, double burstEfficiency) {
+        if (drawn <= 0) {
+            return 0;
+        }
+        int rated = Math.min(ratedLeft, deliveredAfterDischargeLoss(drawn, efficiency));
+        int burstDraw = Math.max(0, drawn - drawRequiredForDelivery(rated, efficiency));
+        int burst = burstDraw <= 0 ? 0 : (int) Math.floor(burstDraw * burstEfficiency);
+        return saturatedAdd(rated, burst);
     }
 
     private boolean canReceiveEnergy() {
@@ -751,6 +823,12 @@ public class BatteryChassisBlockEntity extends BaseMachineBlockEntity implements
         return cellOutputCeiling(context);
     }
 
+    /** This tick's output budget: the rated output, or the burst output while a burst window is open. */
+    private int effectiveBurstAwareOutput(RuntimeContext context) {
+        double scale = burstScale(context);
+        return scale <= 1.0 ? effectiveOutputRate(context) : cellOutputCeiling(context, scale);
+    }
+
     private int effectiveChassisTransfer(MachineStatAccumulator stats) {
         return Math.max(0, saturatedRoundToInt(stats.value(MachineStat.ENERGY_TRANSFER)));
     }
@@ -759,12 +837,34 @@ public class BatteryChassisBlockEntity extends BaseMachineBlockEntity implements
         return effectiveChassisTransfer(context.stats());
     }
 
+    /** The cells' output while a burst lasts, or 0 for a chassis without a burst. */
     private int effectiveBurstOutputRate(RuntimeContext context) {
-        if (!context.hasBehavior(MachineBehavior.BURST_RELEASE)) {
-            return 0;
+        return burstCapable(context) ? cellOutputCeiling(context, burstTransfer(context)) : 0;
+    }
+
+    private boolean burstCapable(RuntimeContext context) {
+        return context.hasBehavior(MachineBehavior.BURST_RELEASE) && burstTransfer(context) > 1.0 && burstDuration(context) > 0;
+    }
+
+    private double burstTransfer(RuntimeContext context) {
+        return Math.max(1.0, context.stats().value(MachineStat.BURST_TRANSFER));
+    }
+
+    private int burstDuration(RuntimeContext context) {
+        return Math.max(0, (int) Math.round(context.stats().value(MachineStat.BURST_DURATION)));
+    }
+
+    /** Burst Transfer while a burst window is open, otherwise 1. */
+    private double burstScale(RuntimeContext context) {
+        return burstCapable(context) && burstTicksRemaining > 0 ? burstTransfer(context) : 1.0;
+    }
+
+    /** A tick that delivered more than the cells' rated output used one tick of the burst window. */
+    private void spendBurstTick() {
+        if (!burstUsedThisTick) {
+            burstUsedThisTick = true;
+            burstTicksRemaining = Math.max(0, burstTicksRemaining - 1);
         }
-        double burstRating = effectiveChassisTransfer(context) * Math.max(0.0, context.stats().value(MachineStat.BURST_TRANSFER));
-        return Math.max(0, saturatedRoundToInt(burstRating));
     }
 
     private int cellInputCeiling() {
@@ -789,12 +889,16 @@ public class BatteryChassisBlockEntity extends BaseMachineBlockEntity implements
     }
 
     private int cellOutputCeiling(RuntimeContext context) {
+        return cellOutputCeiling(context, 1.0);
+    }
+
+    private int cellOutputCeiling(RuntimeContext context, double outputScale) {
         int ceiling = 0;
         int activeSlots = context.activeSlots();
         for (int slot = 0; slot < activeSlots; slot++) {
             int stored = cellEnergyStored(slot, context);
             if (stored > 0) {
-                ceiling = saturatedAdd(ceiling, Math.min(context.cell(slot).maxOutput(), stored));
+                ceiling = saturatedAdd(ceiling, Math.min(cellOutputLimit(slot, context, outputScale), stored));
             }
         }
         return ceiling;
@@ -976,8 +1080,17 @@ public class BatteryChassisBlockEntity extends BaseMachineBlockEntity implements
     }
 
     private int drainEnergyFromCells(int amount, boolean respectTransferLimit, RuntimeContext context) {
+        return drainEnergyFromCells(amount, respectTransferLimit, context, 1.0);
+    }
+
+    private int cellOutputLimit(int slot, RuntimeContext context, double outputScale) {
+        int rated = context.cell(slot).maxOutput();
+        return outputScale <= 1.0 ? rated : saturatedRoundToInt(rated * outputScale);
+    }
+
+    private int drainEnergyFromCells(int amount, boolean respectTransferLimit, RuntimeContext context, double outputScale) {
         if (context.hasBehavior(MachineBehavior.CHARGE_BALANCER)) {
-            return drainEnergyFromCellsEvenly(amount, respectTransferLimit, context);
+            return drainEnergyFromCellsEvenly(amount, respectTransferLimit, context, outputScale);
         }
 
         int remaining = amount;
@@ -991,7 +1104,7 @@ public class BatteryChassisBlockEntity extends BaseMachineBlockEntity implements
                 continue;
             }
             int stored = cellEnergyStored(slot, context);
-            int limit = respectTransferLimit ? Math.min(remaining, context.cell(slot).maxOutput()) : remaining;
+            int limit = respectTransferLimit ? Math.min(remaining, cellOutputLimit(slot, context, outputScale)) : remaining;
             int extracted = Math.min(stored, limit);
             if (extracted > 0) {
                 BatteryCellItem.setEnergy(stack, stored - extracted, effectiveCellCapacity(slot, context));
@@ -1002,10 +1115,10 @@ public class BatteryChassisBlockEntity extends BaseMachineBlockEntity implements
         return removed;
     }
 
-    private int drainEnergyFromCellsEvenly(int amount, boolean respectTransferLimit, RuntimeContext context) {
+    private int drainEnergyFromCellsEvenly(int amount, boolean respectTransferLimit, RuntimeContext context, double outputScale) {
         int remaining = amount;
         int removed = 0;
-        List<CellTransfer> cells = drawableCells(respectTransferLimit, context);
+        List<CellTransfer> cells = drawableCells(respectTransferLimit, context, outputScale);
         List<CellTransfer> allCells = new ArrayList<>(cells);
         while (remaining > 0 && !cells.isEmpty()) {
             cells.sort(cellFillComparator(false));
@@ -1057,10 +1170,10 @@ public class BatteryChassisBlockEntity extends BaseMachineBlockEntity implements
     }
 
     private List<CellTransfer> drawableCells(boolean respectTransferLimit) {
-        return drawableCells(respectTransferLimit, runtimeContext());
+        return drawableCells(respectTransferLimit, runtimeContext(), 1.0);
     }
 
-    private List<CellTransfer> drawableCells(boolean respectTransferLimit, RuntimeContext context) {
+    private List<CellTransfer> drawableCells(boolean respectTransferLimit, RuntimeContext context, double outputScale) {
         List<CellTransfer> cells = new ArrayList<>();
         int activeSlots = context.activeSlots();
         for (int slot = 0; slot < activeSlots; slot++) {
@@ -1072,7 +1185,7 @@ public class BatteryChassisBlockEntity extends BaseMachineBlockEntity implements
             if (stored <= 0) {
                 continue;
             }
-            int transferLimit = respectTransferLimit ? Math.min(context.cell(slot).maxOutput(), stored) : stored;
+            int transferLimit = respectTransferLimit ? Math.min(cellOutputLimit(slot, context, outputScale), stored) : stored;
             if (transferLimit > 0) {
                 cells.add(new CellTransfer(slot, effectiveCellCapacity(slot, context), stored, transferLimit));
             }
@@ -1149,7 +1262,7 @@ public class BatteryChassisBlockEntity extends BaseMachineBlockEntity implements
             return false;
         }
 
-        int remainingOutput = Math.min(effectiveOutputRate(context), energyStored(context));
+        int remainingOutput = Math.min(effectiveBurstAwareOutput(context), energyStored(context));
         boolean exported = false;
         for (Direction direction : DIRECTIONS) {
             if (remainingOutput <= 0 || energyStored(context) <= 0) {
@@ -1196,7 +1309,7 @@ public class BatteryChassisBlockEntity extends BaseMachineBlockEntity implements
 
         Direction targetSide = direction.getOpposite();
         int accepted = target.receiveEnergyInternal(offer, true, targetSide, targetContext);
-        int delivered = extractEnergyInternal(accepted, false, sourceContext);
+        int delivered = extractEnergyInternal(accepted, false, sourceContext, false);
         target.receiveEnergyInternal(delivered, false, targetSide, targetContext);
         return delivered;
     }
@@ -1215,7 +1328,7 @@ public class BatteryChassisBlockEntity extends BaseMachineBlockEntity implements
             return 0;
         }
 
-        int maxOffer = extractEnergyInternal(remainingOutput, true, sourceContext);
+        int maxOffer = extractEnergyInternal(remainingOutput, true, sourceContext, false);
         maxOffer = Math.min(maxOffer, target.receiveEnergyInternal(maxOffer, true, null, targetContext));
         if (maxOffer <= 0) {
             return 0;
@@ -1348,10 +1461,11 @@ public class BatteryChassisBlockEntity extends BaseMachineBlockEntity implements
         BatteryCellItem.clampEnergy(stack, BatteryCellItem.energyCapacity(stack));
     }
 
+    /** The burst window refills one tick for each tick the chassis did not burst. */
     private void recoverBurstWindow() {
         RuntimeContext context = runtimeContext();
-        int burstDuration = Math.max(0, (int) Math.round(context.stats().value(MachineStat.BURST_DURATION)));
-        if (!context.hasBehavior(MachineBehavior.BURST_RELEASE) || burstDuration <= 0) {
+        int burstDuration = burstDuration(context);
+        if (!burstCapable(context)) {
             burstTicksRemaining = 0;
             burstUsedThisTick = false;
             return;

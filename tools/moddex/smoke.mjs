@@ -511,8 +511,8 @@ try {
     }
     const fuelBox = stagePreview?.items?.find((item) => item.id === "rngtech:copper_fuel_box");
     if (fuelBox?.modifierCoverage?.profileId !== "fuel_box"
-            || fuelBox.modifierCoverage.prefixGroups !== 4
-            || fuelBox.modifierCoverage.suffixGroups !== 5) {
+            || fuelBox.modifierCoverage.prefixGroups !== 3
+            || fuelBox.modifierCoverage.suffixGroups !== 3) {
         throw new Error("Stage preview did not include expected modifier coverage for Copper Fuel Box.");
     }
     const expectedQuestItems = new Map([

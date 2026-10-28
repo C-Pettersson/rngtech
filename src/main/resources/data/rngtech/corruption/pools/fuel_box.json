@@ -25,5 +25,18 @@
                 }
             ]
         }
+    ],
+    "blighted": [
+        {
+            "id": "fuel_efficiency",
+            "weight": 100,
+            "modifiers": [
+                {
+                    "stat": "fuel_efficiency",
+                    "operation": "less",
+                    "value": 0.85
+                }
+            ]
+        }
     ]
 }
