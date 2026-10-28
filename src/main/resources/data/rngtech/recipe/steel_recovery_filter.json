@@ -17,13 +17,13 @@
       "item": "minecraft:hopper"
     },
     "I": {
-      "tag": "c:ingots/steel"
+      "tag": "rngtech:ingots/steel"
     },
     "O": {
       "item": "rngtech:output_bin"
     },
     "P": {
-      "item": "rngtech:steel_plate"
+      "tag": "rngtech:plates/steel"
     }
   },
   "result": {

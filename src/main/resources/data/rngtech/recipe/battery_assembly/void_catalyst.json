@@ -14,12 +14,12 @@
   "ingredients": [
     {
       "ingredient": {
-        "tag": "c:ingots/nullite"
+        "tag": "rngtech:ingots/nullite"
       }
     },
     {
       "ingredient": {
-        "item": "rngtech:tungstensteel_plate"
+        "tag": "rngtech:plates/tungstensteel"
       }
     }
   ],

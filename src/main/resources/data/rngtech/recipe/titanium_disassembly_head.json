@@ -8,10 +8,10 @@
                 ],
     "key":  {
                 "P":  {
-                          "item":  "rngtech:titanium_plate"
+                          "tag":  "rngtech:plates/titanium"
                       },
                 "G":  {
-                          "item":  "rngtech:titanium_gear"
+                          "tag":  "rngtech:gears/titanium"
                       },
                 "M":  {
                           "item":  "rngtech:mechanism"

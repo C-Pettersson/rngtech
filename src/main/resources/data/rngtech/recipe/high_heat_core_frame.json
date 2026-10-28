@@ -23,7 +23,7 @@
       "item": "rngtech:refractory_casing"
     },
     "S": {
-      "item": "rngtech:sparksteel_rod"
+      "tag": "rngtech:rods/sparksteel"
     }
   },
   "result": {

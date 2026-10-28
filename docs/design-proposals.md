@@ -58,10 +58,6 @@ Future work on machines that already ship. Design intent for their current behav
 - A Washer machine. The `rngtech:washer_machine_chassis` ingredient is craftable, but no Washer block or recipe type exists.
 - Enchant-style chassis behavior.
 
-### Fluid and Compressor Tanks
-
-- Portable tank contents. Breaking a tank drops the block, Gear, and Refinement inventory, but not stored loose or compressed fluid.
-
 ### Modular Field Tools
 
 - Calibrated tool-part recipes with Resonance Calibrator rod stabilization gates.

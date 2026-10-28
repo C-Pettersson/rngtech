@@ -300,6 +300,8 @@ The Mirror Catalyst copies:
 
 It does not copy Uniques, Tool Heads, Tool Rods, companions, or unidentified or stripped items. It can copy a Corrupted item.
 
+It does not copy the fluid in a tank. The copy of a filled tank is empty, and the original keeps its fluid.
+
 The copy is **Mirrored**. Its icon shows flipped from left to right, and its tooltip says Mirrored under its name. A Mirrored item can never be changed:
 
 - The Affix Forge, Phase Array, Tool Bench, and Refinement tabs refuse it, and nothing is used.

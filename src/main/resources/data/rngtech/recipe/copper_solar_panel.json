@@ -18,7 +18,7 @@
     "G": { "item": "minecraft:glass_pane" },
     "P": { "item": "rngtech:solar_panel_frame" },
     "R": { "item": "minecraft:redstone" },
-    "W": { "item": "rngtech:copper_plate" }
+    "W": { "tag": "rngtech:plates/copper" }
   },
   "result": {
     "count": 1,

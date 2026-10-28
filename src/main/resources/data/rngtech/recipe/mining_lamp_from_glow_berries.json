@@ -18,7 +18,7 @@
   ],
   "key": {
     "B": {
-      "item": "rngtech:bronze_plate"
+      "tag": "rngtech:plates/bronze"
     },
     "C": {
       "item": "rngtech:copper_coil"
@@ -30,7 +30,7 @@
       "item": "minecraft:glow_berries"
     },
     "P": {
-      "item": "rngtech:copper_plate"
+      "tag": "rngtech:plates/copper"
     }
   },
   "result": {

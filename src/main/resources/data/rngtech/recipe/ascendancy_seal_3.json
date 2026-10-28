@@ -51,7 +51,7 @@
     },
     "X": {
       "ingredient": {
-        "item": "rngtech:naquadah_plate"
+        "tag": "rngtech:plates/naquadah"
       }
     }
   },

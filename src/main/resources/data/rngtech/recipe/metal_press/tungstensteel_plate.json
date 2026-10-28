@@ -8,7 +8,7 @@
   "type": "rngtech:metal_press",
   "group": "metal_press_plates",
   "ingredient": {
-    "tag": "c:ingots/tungstensteel"
+    "tag": "rngtech:ingots/tungstensteel"
   },
   "mold": {
     "item": "rngtech:plate_mold"

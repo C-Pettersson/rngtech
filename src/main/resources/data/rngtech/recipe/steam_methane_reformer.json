@@ -23,7 +23,7 @@
       "tag": "rngtech:machine_frames/base"
     },
     "P": {
-      "item": "rngtech:titanium_plate"
+      "tag": "rngtech:plates/titanium"
     },
     "T": {
       "item": "rngtech:titanium_casing"

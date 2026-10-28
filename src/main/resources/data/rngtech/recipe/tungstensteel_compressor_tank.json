@@ -13,7 +13,7 @@
   "key": {
     "C": { "item": "rngtech:pressure_tank_frame" },
     "G": { "item": "minecraft:glass" },
-    "I": { "tag": "c:ingots/tungstensteel" },
+    "I": { "tag": "rngtech:ingots/tungstensteel" },
     "T": { "item": "rngtech:titanium_casing" }
   },
   "result": {

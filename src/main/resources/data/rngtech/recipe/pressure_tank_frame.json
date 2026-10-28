@@ -20,7 +20,7 @@
       "item": "rngtech:reinforced_machine_frame"
     },
     "R": {
-      "item": "rngtech:steel_rod"
+      "tag": "rngtech:rods/steel"
     }
   },
   "result": {

@@ -14,10 +14,10 @@
     ],
     "key": {
         "P": {
-            "item": "rngtech:bronze_plate"
+            "tag": "rngtech:plates/bronze"
         },
         "R": {
-            "item": "rngtech:bronze_rod"
+            "tag": "rngtech:rods/bronze"
         },
         "S": {
             "item": "minecraft:shears"

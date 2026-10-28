@@ -58,7 +58,11 @@ Each stage has its own recipe built on a {{ item('rngtech:tank_frame') }} (Fluid
 
 ### Breaking
 
-Mine a tank with a pickaxe. It drops itself with its rolled traits, plus any installed Gear and Refinement items. **The fluid inside is lost**, so empty the tank before you move it.
+Mine a tank with a pickaxe. It drops itself with its rolled traits, plus any installed Gear and Refinement items. The tank item keeps the fluid inside, loose and compressed. Place the tank again to get back the same fluid. Then install its Gear again.
+
+When an explosion breaks a tank, the tank always drops with its fluid.
+
+The tooltip of a filled tank shows the fluid and the amount in each store. Tanks do not stack.
 
 ## Usage
 

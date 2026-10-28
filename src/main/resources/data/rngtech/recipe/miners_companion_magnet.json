@@ -22,7 +22,7 @@
       "calibration": { "family": "conductive", "min_stage": 2, "min_stability": 40 }
     },
     "I": {
-      "ingredient": { "item": "rngtech:iron_plate" }
+      "ingredient": { "tag": "rngtech:plates/iron" }
     },
     "R": {
       "ingredient": { "item": "minecraft:redstone" }

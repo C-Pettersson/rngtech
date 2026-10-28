@@ -24,10 +24,10 @@
       "item": "rngtech:pump_frame"
     },
     "G": {
-      "item": "rngtech:tungstensteel_gear"
+      "tag": "rngtech:gears/tungstensteel"
     },
     "P": {
-      "item": "rngtech:tungstensteel_plate"
+      "tag": "rngtech:plates/tungstensteel"
     }
   },
   "result": {

@@ -1,7 +1,7 @@
 {
   "type": "rngtech:calibration",
   "family": "kinetic",
-  "ingredient": { "item": "rngtech:iron_gear" },
+  "ingredient": { "tag": "rngtech:gears/iron" },
   "pattern": { "item": "rngtech:kinetic_calibration_pattern" },
   "catalyst": { "item": "minecraft:redstone" },
   "processing_ticks": 140,

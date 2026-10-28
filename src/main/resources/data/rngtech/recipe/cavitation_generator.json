@@ -17,7 +17,7 @@
       "ingredient": { "tag": "rngtech:machine_frames/advanced" }
     },
     "P": {
-      "ingredient": { "item": "rngtech:steel_plate" }
+      "ingredient": { "tag": "rngtech:plates/steel" }
     },
     "S": {
       "ingredient": { "item": "minecraft:smooth_stone" }
