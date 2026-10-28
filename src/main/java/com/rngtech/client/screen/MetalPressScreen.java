@@ -5,7 +5,6 @@ import com.rngtech.content.blockentity.MetalPressBlockEntity;
 import com.rngtech.content.menu.MetalPressMenu;
 import com.rngtech.content.menu.WorkOrderMenuSupport;
 import com.rngtech.content.registry.ModBlocks;
-import com.rngtech.content.registry.ModItems;
 import com.rngtech.rpg.MachineStat;
 import com.rngtech.rpg.progression.MachineMasteryFamily;
 import com.rngtech.rpg.progression.MegaPassiveNode;
@@ -138,7 +137,7 @@ public class MetalPressScreen extends AbstractContainerScreen<MetalPressMenu> im
                 .stats(MetalPressMenu.TAB_CONFIGURATION)
                 .refinement(MetalPressMenu.TAB_REFINEMENT)
                 .mastery(MetalPressMenu.TAB_MASTERY)
-                .tab(MetalPressMenu.TAB_ORDERS, "rngtech.tab.orders", ModItems.JOB_CHIP.get())
+                .orders(MetalPressMenu.TAB_ORDERS, menu::workOrdersShown)
                 .build();
         workOrdersTab = new WorkOrdersTab(menu, STAT_ACCENT);
         masterySupport = new MasteryScreenSupport<>(

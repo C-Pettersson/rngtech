@@ -20,6 +20,9 @@ public interface WorkOrderMenuView {
 
     WorkOrderMenuSupport.View workOrderView();
 
+    /** Whether the Orders tab shows: the player has found Work Orders, as synced by {@code WorkOrderDiscovery}. */
+    boolean workOrdersShown();
+
     /** The chip in drive bay {@code bay}, as its slot syncs it, or empty. */
     ItemStack workOrderChip(int bay);
 }

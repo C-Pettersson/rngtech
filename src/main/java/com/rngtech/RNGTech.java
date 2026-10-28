@@ -10,6 +10,7 @@ import com.rngtech.content.dormant.DormantSites;
 import com.rngtech.content.item.CableItem;
 import com.rngtech.content.item.UreaItem;
 import com.rngtech.content.minerscompanion.MinersCompanionEvents;
+import com.rngtech.content.registry.ModAttachments;
 import com.rngtech.content.registry.ModBlockEntities;
 import com.rngtech.content.registry.ModBlocks;
 import com.rngtech.content.registry.ModCapabilities;
@@ -66,6 +67,7 @@ public final class RNGTech {
         ModDataComponents.register(modBus);
         ModBlockEntities.register(modBus);
         ModMenus.register(modBus);
+        ModAttachments.register(modBus);
         ModRecipes.register(modBus);
         ModSounds.register(modBus);
         ModConditions.register(modBus);

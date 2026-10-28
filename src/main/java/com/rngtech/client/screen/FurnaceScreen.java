@@ -5,7 +5,6 @@ import com.rngtech.content.blockentity.FurnaceBlockEntity;
 import com.rngtech.content.menu.FurnaceMenu;
 import com.rngtech.content.menu.WorkOrderMenuSupport;
 import com.rngtech.content.registry.ModBlocks;
-import com.rngtech.content.registry.ModItems;
 import com.rngtech.rpg.MachineStat;
 import com.rngtech.rpg.MachineStatAccumulator;
 import com.rngtech.rpg.progression.FurnacePassiveTree;
@@ -182,7 +181,7 @@ public class FurnaceScreen extends AbstractContainerScreen<FurnaceMenu> implemen
                 .stats(FurnaceMenu.TAB_CONFIGURATION)
                 .refinement(FurnaceMenu.TAB_REFINEMENT)
                 .mastery(FurnaceMenu.TAB_MASTERY)
-                .tab(FurnaceMenu.TAB_ORDERS, "rngtech.tab.orders", ModItems.JOB_CHIP.get())
+                .orders(FurnaceMenu.TAB_ORDERS, menu::workOrdersShown)
                 .build();
         masterySupport = new MasteryScreenSupport<>(
                 FurnacePassiveTree.TREE,

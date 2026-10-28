@@ -6,7 +6,6 @@ import com.rngtech.content.machine.AlloyFurnaceChassisMaterial;
 import com.rngtech.content.menu.AlloyFurnaceMenu;
 import com.rngtech.content.menu.WorkOrderMenuSupport;
 import com.rngtech.content.registry.ModBlocks;
-import com.rngtech.content.registry.ModItems;
 import com.rngtech.rpg.MachineStat;
 import com.rngtech.rpg.progression.MachineMasteryFamily;
 import com.rngtech.rpg.progression.MegaPassiveNode;
@@ -126,7 +125,7 @@ public class AlloyFurnaceScreen extends AbstractContainerScreen<AlloyFurnaceMenu
                 .stats(AlloyFurnaceMenu.TAB_STATS)
                 .refinement(AlloyFurnaceMenu.TAB_REFINEMENT)
                 .mastery(AlloyFurnaceMenu.TAB_MASTERY)
-                .tab(AlloyFurnaceMenu.TAB_ORDERS, "rngtech.tab.orders", ModItems.JOB_CHIP.get())
+                .orders(AlloyFurnaceMenu.TAB_ORDERS, menu::workOrdersShown)
                 .build();
         workOrdersTab = new WorkOrdersTab(menu, STAT_ACCENT);
         masterySupport = new MasteryScreenSupport<>(
