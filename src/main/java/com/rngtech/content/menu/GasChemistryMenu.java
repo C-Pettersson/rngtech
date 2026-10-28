@@ -60,7 +60,8 @@ public class GasChemistryMenu extends AbstractContainerMenu implements StatBreak
     private static final int DATA_SECONDARY_OUTPUT_FLUID_ID = 23;
     private static final int DATA_MIXTURE = 24;
     private static final int DATA_EXHAUST_PER_CYCLE = 25;
-    private static final int DATA_COUNT = 26;
+    private static final int DATA_PACK_GENERATION_MULTIPLIER = 26;
+    private static final int DATA_COUNT = 27;
     private static final int BUTTON_MIXTURE_BASE = 8000;
     private static final int STAT_SCALE = 100;
     private static final int PROCESS_INPUT_SLOT = 0;
@@ -457,5 +458,10 @@ public class GasChemistryMenu extends AbstractContainerMenu implements StatBreak
         public boolean isActive() {
             return activeSupplier.getAsBoolean();
         }
+    }
+
+    /** The pack's config multiplier on this generator's FE, global times stage. */
+    public double packGenerationMultiplier() {
+        return GenerationMenuSupport.packMultiplier(data.get(DATA_PACK_GENERATION_MULTIPLIER));
     }
 }

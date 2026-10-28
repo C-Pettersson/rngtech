@@ -10,6 +10,7 @@ import com.rngtech.content.item.GearParts;
 import com.rngtech.content.item.ServoItem;
 import com.rngtech.content.item.SolidFuelBurnerPartItem;
 import com.rngtech.content.menu.GasChemistryMenu;
+import com.rngtech.content.menu.GenerationMenuSupport;
 import com.rngtech.content.purge.FluidOutputOverflow;
 import com.rngtech.content.purge.FluidPurgeRole;
 import com.rngtech.content.purge.FluidPurgeTarget;
@@ -121,6 +122,7 @@ public class GasChemistryBlockEntity extends BaseMachineBlockEntity
     private static final int DATA_SECONDARY_OUTPUT_FLUID_ID = 23;
     private static final int DATA_MIXTURE = 24;
     private static final int DATA_EXHAUST_PER_CYCLE = 25;
+    private static final int DATA_PACK_GENERATION_MULTIPLIER = 26;
     private static final int STAT_SCALE = 100;
     private static final int VISUAL_SYNC_INTERVAL = 5;
     private static final double EPSILON = 1.0E-9;
@@ -262,6 +264,7 @@ public class GasChemistryBlockEntity extends BaseMachineBlockEntity
                 case DATA_SECONDARY_OUTPUT_FLUID_ID -> BuiltInRegistries.FLUID.getId(secondaryOutputTank.getFluid().getFluid());
                 case DATA_MIXTURE -> mixture;
                 case DATA_EXHAUST_PER_CYCLE -> exhaustPerCycle();
+                case DATA_PACK_GENERATION_MULTIPLIER -> GenerationMenuSupport.packMultiplierData(machine.stage());
                 default -> 0;
             };
         }
@@ -272,7 +275,7 @@ public class GasChemistryBlockEntity extends BaseMachineBlockEntity
 
         @Override
         public int getCount() {
-            return DATA_EXHAUST_PER_CYCLE + 1;
+            return DATA_PACK_GENERATION_MULTIPLIER + 1;
         }
     };
 
@@ -1030,7 +1033,8 @@ public class GasChemistryBlockEntity extends BaseMachineBlockEntity
 
     private long adjustedGeneration(long baseEnergy, int processingTicks) {
         MachineStatAccumulator stats = effectiveStats();
-        return Math.max(1L, Mth.lfloor(RNGTechConfig.generatedEnergy(stats.generatedEnergyTotal(baseEnergy, processingTicks) * stats.value(MachineStat.EFFICIENCY))));
+        return Math.max(1L, Mth.lfloor(RNGTechConfig.generatedEnergy(stats.generatedEnergyTotal(baseEnergy, processingTicks) * stats.value(MachineStat.EFFICIENCY),
+                machine.stage())));
     }
 
     private boolean canAcceptOutput(FluidTank tank, FluidStack output) {

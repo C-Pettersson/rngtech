@@ -33,7 +33,7 @@ Every RNGTech machine, part, Battery Cell, and tool works from a set of **stats*
 
 | Stat | What it does | Used by | Better |
 |---|---|---|---|
-| Energy Generation | FE the machine produces. On Solar Panels and Solid Fuel Burners it is FE/t directly; on recipe generators and the Bio Generator it multiplies the recipe or fuel's output, and flat rolls add FE/t on top. The Stats tab shows the final FE/t; hover it for the breakdown. | Every generator. | Higher |
+| Energy Generation | FE the machine produces. On Solar Panels and Solid Fuel Burners it is FE/t directly; on recipe generators and the Bio Generator it multiplies the recipe or fuel's output, and flat rolls add FE/t on top. The Stats tab shows the final FE/t; hover it for the breakdown. If your modpack changes RNGTech's energy settings, the hover shows them as **Pack setting**. | Every generator. | Higher |
 | Fuel Duration | Makes each fuel item burn longer. Generators keep the same FE/t; the Stage 0 Furnace smelts more per item. | [Furnace](rngtech:furnace.md) (Stage 0), [Bio Generator](rngtech:bio-generator.md), [Solid Fuel Burner](rngtech:solid-fuel-burner.md). | Higher |
 | Fuel Efficiency | More value from each fuel item. Longer burns on the Stage 0 Furnace and Solid Fuel Burner, more total FE on the Bio Generator. Shown as **Bio Conversion** on the Algae Photobioreactor, where it scales algae output. | [Furnace](rngtech:furnace.md) (Stage 0), [Solid Fuel Burner](rngtech:solid-fuel-burner.md), [Bio Generator](rngtech:bio-generator.md), [Algae Photobioreactor](rngtech:algae-photobioreactor.md). | Higher |
 

@@ -5,6 +5,7 @@ import com.rngtech.content.block.BaseMachineBlock;
 import com.rngtech.content.energy.SolarPanelMaterial;
 import com.rngtech.content.item.BatteryCellItem;
 import com.rngtech.content.item.MachinePartItem;
+import com.rngtech.content.menu.GenerationMenuSupport;
 import com.rngtech.content.menu.SolarArrayControllerMenu;
 import com.rngtech.content.registry.ModBlockEntities;
 import com.rngtech.rpg.ComponentBaseStatCatalog;
@@ -91,6 +92,7 @@ public class SolarArrayControllerBlockEntity extends BaseMachineBlockEntity impl
     private static final int DATA_PANEL_RANGE = 20;
     private static final int DATA_FLAT_ENERGY_GENERATION = 21;
     private static final int DATA_BASE_ENERGY_GENERATION = 22;
+    private static final int DATA_PACK_GENERATION_MULTIPLIER = 23;
     private static final int STAT_SCALE = 100;
 
     private final ItemStackHandler gearInventory = new ItemStackHandler(GEAR_SLOT_COUNT) {
@@ -156,6 +158,7 @@ public class SolarArrayControllerBlockEntity extends BaseMachineBlockEntity impl
                 case DATA_LUNAR_INVERSION -> scaledStat(stats, MachineStat.LUNAR_INVERSION);
                 case DATA_PREVIEW_RANGE -> previewRange ? 1 : 0;
                 case DATA_PANEL_RANGE -> panelRange(stats);
+                case DATA_PACK_GENERATION_MULTIPLIER -> GenerationMenuSupport.packMultiplierData(lastPackMultiplier);
                 default -> 0;
             };
         }
@@ -166,7 +169,7 @@ public class SolarArrayControllerBlockEntity extends BaseMachineBlockEntity impl
 
         @Override
         public int getCount() {
-            return DATA_BASE_ENERGY_GENERATION + 1;
+            return DATA_PACK_GENERATION_MULTIPLIER + 1;
         }
     };
 
@@ -179,6 +182,7 @@ public class SolarArrayControllerBlockEntity extends BaseMachineBlockEntity impl
     private int scanCooldown;
     private int overflowPanelCount;
     private int lastEnergyPerTick;
+    private double lastPackMultiplier = 1.0;
     private int lastActivePanelCount;
     private int lastBlockedPanelCount;
     private int lastStatus = STATUS_NO_PANELS;
@@ -448,6 +452,7 @@ public class SolarArrayControllerBlockEntity extends BaseMachineBlockEntity impl
         int active = 0;
         int blocked = overflowPanelCount;
         double generatedThisTick = 0.0;
+        double panelGenerationThisTick = 0.0;
         long map = 0L;
         SolarPanelMaterialState materialState = SolarPanelMaterialState.empty();
         for (int index = 0; index < panelPositions.size(); index++) {
@@ -464,16 +469,21 @@ public class SolarArrayControllerBlockEntity extends BaseMachineBlockEntity impl
             map |= mapBits(panelPos, generation > 0.0);
             if (generation > 0.0) {
                 active++;
-                generatedThisTick += generation;
+                panelGenerationThisTick += generation;
+                generatedThisTick += generation * RNGTechConfig.stageGenerationMultiplier(panel.material().stage());
             } else {
                 blocked++;
             }
         }
         updatePanelMap(map);
+        if (panelGenerationThisTick > 0.0) {
+            lastPackMultiplier = generatedThisTick / panelGenerationThisTick * RNGTechConfig.ENERGY_GENERATION_MULTIPLIER.get();
+        }
 
         if (generatedThisTick > 0.0) {
             double controllerEfficiency = Math.max(0.01, stats.value(MachineStat.EFFICIENCY));
-            generatedThisTick = RNGTechConfig.generatedEnergy(Math.max(0.0, stats.generatedEnergyTotal(generatedThisTick, 1)) * controllerEfficiency);
+            generatedThisTick = Math.max(0.0, stats.generatedEnergyTotal(generatedThisTick, 1)) * controllerEfficiency
+                    * RNGTechConfig.ENERGY_GENERATION_MULTIPLIER.get();
         }
         if (active > 1 && materialState.singleMaterial() && stats.value(MachineStat.SOLAR_PANEL_SYNCHRONIZATION) > 0.0) {
             generatedThisTick *= 1.0 + stats.value(MachineStat.SOLAR_PANEL_SYNCHRONIZATION) / 100.0;

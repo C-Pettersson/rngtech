@@ -11,6 +11,7 @@ import com.rngtech.content.item.GearParts;
 import com.rngtech.content.item.MachinePartItem;
 import com.rngtech.content.item.SolidFuelBurnerPartItem;
 import com.rngtech.content.item.UniquePartItem;
+import com.rngtech.content.menu.GenerationMenuSupport;
 import com.rngtech.content.menu.SolidFuelBurnerMenu;
 import com.rngtech.content.registry.ModBlockEntities;
 import com.rngtech.rpg.ComponentBaseStatCatalog;
@@ -96,7 +97,8 @@ public class SolidFuelBurnerBlockEntity extends BaseMachineBlockEntity implement
     private static final int DATA_CONNECTOR_CAP = 19;
     private static final int DATA_STOKE = 20;
     private static final int DATA_RATED_GENERATION = 21;
-    private static final int DATA_COUNT = 22;
+    private static final int DATA_PACK_GENERATION_MULTIPLIER = 22;
+    private static final int DATA_COUNT = 23;
     private static final int STAT_SCALE = 100;
     private static final int VISUAL_SYNC_INTERVAL = 5;
     /** The fire's full height: a Steel Heat Core's base output. */
@@ -184,6 +186,7 @@ public class SolidFuelBurnerBlockEntity extends BaseMachineBlockEntity implement
                 case DATA_CONNECTOR_CAP -> connectorOutputCap();
                 case DATA_STOKE -> stoke;
                 case DATA_RATED_GENERATION -> ratedGeneration(stats);
+                case DATA_PACK_GENERATION_MULTIPLIER -> GenerationMenuSupport.packMultiplierData(generatorStage());
                 default -> 0;
             };
         }
@@ -595,7 +598,7 @@ public class SolidFuelBurnerBlockEntity extends BaseMachineBlockEntity implement
 
         int generation = effectiveGeneration(stats);
         double fuelEnergy = RNGTechConfig.generatedEnergy(effectiveFuelDurationTicks(fuelBurnTime, stats) * (double) FUEL_ENERGY_PER_BURN_TICK
-                * SolidFuelBurnerStoke.fuelEconomy(stoke));
+                * SolidFuelBurnerStoke.fuelEconomy(stoke), generatorStage());
         int effectiveFuelBurnTime = generation <= 0 ? 0 : Math.max(1, Mth.ceil(fuelEnergy / generation));
         burnTime = effectiveFuelBurnTime;
         totalBurnTime = effectiveFuelBurnTime;
@@ -776,7 +779,12 @@ public class SolidFuelBurnerBlockEntity extends BaseMachineBlockEntity implement
 
     /** FE/t at the rated stoke: the most this burner can make with its Heat Core and stats. */
     private int ratedGeneration(MachineStatAccumulator stats) {
-        return Math.max(0, (int) Math.round(RNGTechConfig.generatedEnergy(stats.value(MachineStat.ENERGY_GENERATION))));
+        return Math.max(0, (int) Math.round(RNGTechConfig.generatedEnergy(stats.value(MachineStat.ENERGY_GENERATION), generatorStage())));
+    }
+
+    /** The installed Heat Core sets the burner's stage for the pack's stage energy multiplier. */
+    private int generatorStage() {
+        return heatCoreStack().isEmpty() ? block.chassis().stage() : GearParts.stage(heatCoreStack());
     }
 
     private int connectorOutputCap() {

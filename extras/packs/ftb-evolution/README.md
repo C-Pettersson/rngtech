@@ -52,9 +52,10 @@ To show them, add these patterns to `ignored_items` in `config/almostunified/uni
 "rngtech:[a-z]+_(plate|gear|rod)"
 ```
 
-For energy, set `energy.generationMultiplier` in `config/rngtech-common.toml` instead of using the optional
-script. The setting scales every RNGTech generator, including the Solid Fuel Burner and Solar Panels, by one
-factor. The script scales only three recipe generators, each by its own factor.
+For energy, set the stage multipliers in `config/rngtech-common.toml` instead of using the optional script.
+`energy.stageGenerationMultiplier.stage5 = 1.5`, `stage6 = 2.0`, and `stage7 = 3.0` match the script's Syngas,
+Fuel Cell, and Vacuum Collapse factors. They also scale every other generator of those stages, Solar Panels
+included, which the script cannot change. `energy.generationMultiplier` scales every stage by one factor.
 
 ## What each file changes
 

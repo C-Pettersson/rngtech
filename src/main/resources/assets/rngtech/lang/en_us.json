@@ -2599,6 +2599,7 @@
   "rngtech.stat.energy_generation.breakdown.multiplier": "Generation: %s",
   "rngtech.stat.energy_generation.breakdown.flat": "Flat rolls: %s",
   "rngtech.stat.energy_generation.breakdown.other": "Speed, efficiency, and other stats: %s",
+  "rngtech.stat.energy_generation.breakdown.pack": "Pack setting: %s",
   "rngtech.stat.breakdown.title": "%s: %s",
   "rngtech.stat.breakdown.hint": "Hold Shift for the math",
   "rngtech.stat.vs_base": "vs base",

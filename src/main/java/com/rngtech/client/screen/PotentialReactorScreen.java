@@ -545,7 +545,8 @@ public class PotentialReactorScreen extends AbstractContainerScreen<PotentialRea
                 statLines,
                 menu.energyPerTick(),
                 menu.statValue(PotentialReactorMenu.baseEnergyGenerationDataIndex()),
-                menu.statValue(PotentialReactorMenu.flatEnergyGenerationDataIndex())
+                menu.statValue(PotentialReactorMenu.flatEnergyGenerationDataIndex()),
+                menu.packGenerationMultiplier()
         );
     }
 

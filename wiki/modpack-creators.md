@@ -74,12 +74,29 @@ Each row crushes ore down to dust in two steps and smelts the dust, with a Crush
 
 ### Scaling energy
 
-`energy.generationMultiplier` (default 1.0) multiplies the FE that every RNGTech generator makes. Fuels burn for the same time, so FE per item changes by the same factor. Use it to match another energy mod in your pack. RNGTech has no multiplier for machine FE costs. To make the whole mod cheaper or more expensive, change the machine recipes too, so the stages stay in step.
+`energy.generationMultiplier` (default 1.0) multiplies the FE that every RNGTech generator makes. Fuels burn for the same time, so FE per item changes by the same factor. Use it to match another energy mod in your pack.
+
+`energy.stageGenerationMultiplier.stage1` to `stage8` (default 1.0 each) multiply the FE of the generators of one stage. They apply together with the global multiplier, so a 2.0 global multiplier and a 1.5 Stage 6 multiplier give a Stage 6 generator 3 times its FE. Use them when another mod's power is close to RNGTech's early generators but far ahead of its late ones.
+
+A generator's stage comes from the part that sets its output:
+
+| Generator | Stage |
+|---|---|
+| [Solid Fuel Burner](solid-fuel-burner.md) | Its Heat Core. An Iron Heat Core is Stage 1 and a Steel Heat Core is Stage 4. |
+| [Vacuum Collapse Generator](vacuum-collapse-generator.md) | Its Collapse Nozzle. |
+| [Cavitation Generator](cavitation-generator.md) | Its rotor. |
+| [Solar Panel](solar-panel.md) and Solar Array Controller | Each panel's own stage. |
+| Every other generator | The stage the machine shows, such as 5 for the [Syngas Combustor](syngas-combustor.md) and 6 for the [Fuel Cell](ammonia-fuel-cell.md). |
+
+Players see the result on each generator's Stats tab. The Energy Generation row shows the FE/t after both multipliers, and its hover lists them together as **Pack setting**.
+
+RNGTech has no multiplier for machine FE costs. To make the whole mod cheaper or more expensive, change the machine recipes too, so the stages stay in step.
 
 | You want to change | How |
 |---|---|
 | FE cost of a machine recipe | Override the recipe in a datapack and change `energy` (total FE per craft) or `processing_ticks`. |
 | FE output of all RNGTech generators | `energy.generationMultiplier`. It also changes Solid Fuel Burner FE per item, Solar Panel FE/t, and Bio Generator FE per item. |
+| FE output of one stage's generators | `energy.stageGenerationMultiplier.stage1` to `stage8`. |
 | FE output of one fuel generator | Override its recipe and change `energy`: `gas_combustion` (Syngas), `ammonia_power_cycle` (Ammonia and Hydrogen in the Fuel Cell), `vacuum_collapse`, `cavitation`, `corrosion_cell`, `potential_reactor`. |
 | Solid Fuel Burner FE per item | Each fuel gives 10 FE per burn tick (Coal: 16,000 FE). Change the burn time in NeoForge's `furnace_fuels` data map. This also changes vanilla furnaces. |
 | Other mods' fuels in the Solid Fuel Burner | Add the item to a tier tag `rngtech:solid_fuel/tier_1` to `tier_4`, plus `rngtech:solid_fuel/item_fuels` or `block_fuels`. |
@@ -173,6 +190,7 @@ These live in `config/rngtech-common.toml`.
 | `worldgen.ores.vanillaToolBridgePolicy` | `TIER_LADDER` | How far tools other than Modular tools reach on ore hardness. See [Tool reach](#tool-reach). |
 | `worldgen.ores.commonOreTagHardness` | off | Turn on to give other mods' ores their metal's hardness. See [Ore hardness](#ore-hardness). |
 | `energy.generationMultiplier` | 1.0 | Multiplies the FE of every RNGTech generator. See [Scaling energy](#scaling-energy). |
+| `energy.stageGenerationMultiplier.stage1` to `stage8` | 1.0 | Multiplies the FE of one stage's generators, together with the global multiplier. See [Scaling energy](#scaling-energy). |
 | `restrictedTools.mode` | `NORMAL` | `WEAKENED` or `USELESS` vanilla tools. See [Restricted tools](#restricted-tools). |
 | `restrictedTools.weakenedSpeedMultiplier` | 0.25 | Mining speed of restricted tools in `WEAKENED` mode. |
 | `restrictedTools.vanillaRecipesEnabled` | on | Turn off to remove the stone to netherite pickaxe, axe, and shovel recipes. |

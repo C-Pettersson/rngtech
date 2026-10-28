@@ -624,7 +624,8 @@ public class CorrosionCellScreen extends AbstractContainerScreen<CorrosionCellMe
                 statLines,
                 menu.energyPerTick(),
                 menu.statValue(CorrosionCellMenu.baseEnergyGenerationDataIndex()),
-                menu.statValue(CorrosionCellMenu.flatEnergyGenerationDataIndex())
+                menu.statValue(CorrosionCellMenu.flatEnergyGenerationDataIndex()),
+                menu.packGenerationMultiplier()
         );
     }
 
