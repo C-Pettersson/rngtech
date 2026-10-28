@@ -319,6 +319,7 @@ public class CavitationGeneratorBlockEntity extends BaseMachineBlockEntity
     }
 
     public static void serverTick(Level level, BlockPos pos, BlockState state, CavitationGeneratorBlockEntity generator) {
+        generator.updateTankCapacity(generator.effectiveStats());
         generator.releaseRemovedGear(level);
         generator.drainInputContainer();
         boolean generated = generator.tickGenerator();
@@ -328,6 +329,15 @@ public class CavitationGeneratorBlockEntity extends BaseMachineBlockEntity
             generator.setChanged();
         }
         generator.syncVisualState(level);
+    }
+
+    /** Fluid Capacity sizes the input tank and the output tank keeps twice that; fluid above a smaller capacity stays until used. */
+    private void updateTankCapacity(MachineStatAccumulator stats) {
+        int capacity = Math.max(TANK_CAPACITY, (int) Math.round(stats.value(MachineStat.FLUID_CAPACITY)));
+        if (inputTank.getCapacity() != capacity) {
+            inputTank.setCapacity(capacity);
+            outputTank.setCapacity(capacity * (OUTPUT_TANK_CAPACITY / TANK_CAPACITY));
+        }
     }
 
     public int throttle() {

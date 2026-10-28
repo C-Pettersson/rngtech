@@ -58,7 +58,7 @@ The Gear tab has five slots:
 
 - **Heat Core** (required): sets the Melter's temperature. Iron through Titanium Heat Cores fit.
 - **Crush Head** (required): sets the Melter's hardness level.
-- **Fluid Pump** (required): lets the Melter output fluid, and sets how fast it fills containers and pushes fluid out of the sides. Rolled Fluid Capacity affixes on the pump enlarge both tanks.
+- **Fluid Pump** (required): lets the Melter output fluid, and sets how fast it fills containers and pushes fluid out of the sides. Rolled Fluid Capacity affixes on the pump or the Melter enlarge both tanks.
 - **Battery Cell** (optional): adds portable FE storage. Without a cell, the Melter keeps only a small working buffer and runs more slowly. Incoming FE fills the Melter's own buffer first, then charges the cell, and melting draws from the buffer before the cell.
 - **Servo** (optional): adds speed and control.
 

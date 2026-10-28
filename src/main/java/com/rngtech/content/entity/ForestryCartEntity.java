@@ -3814,6 +3814,7 @@ public class ForestryCartEntity extends AbstractMinecart implements MenuProvider
         }
     }
     @Override public MachineMasteryFamily masteryFamily() { return MachineMasteryFamily.FORESTRY; }
+    @Override public double masteryXpGain() { return MachineMasteryHost.xpGain(effectiveStats()); }
     /** The cart has no chassis stage and needs no particular Gear to ascend; crafting Seal I is its gate. */
     @Override public int ascendancyEntryStage() { return AscendancyCatalog.ENTRY_STAGE; }
 

@@ -245,7 +245,7 @@ public class GasChemistryBlockEntity extends BaseMachineBlockEntity
                 case DATA_INPUT -> inputTank.getFluidAmount();
                 case DATA_OUTPUT -> outputTank.getFluidAmount();
                 case DATA_SECONDARY_OUTPUT -> secondaryOutputTank.getFluidAmount();
-                case DATA_TANK_CAPACITY -> TANK_CAPACITY;
+                case DATA_TANK_CAPACITY -> inputTank.getCapacity();
                 case DATA_STATUS -> statusCode();
                 case DATA_ENERGY_DELTA -> currentEnergyDelta();
                 case DATA_ENERGY_GENERATION -> (int) Math.round(stats.effectiveEnergyGenerationMultiplier() * STAT_SCALE);
@@ -298,6 +298,7 @@ public class GasChemistryBlockEntity extends BaseMachineBlockEntity
     }
 
     public static void serverTick(Level level, BlockPos pos, BlockState state, GasChemistryBlockEntity gasChemistry) {
+        gasChemistry.updateTankCapacity(gasChemistry.effectiveStats());
         boolean worked = gasChemistry.tickRecipe();
         boolean exported = gasChemistry.machine == GasChemistryMachine.SYNGAS_COMBUSTOR && gasChemistry.exportEnergy(level, pos);
         BaseMachineBlock.setActive(level, pos, state, worked);
@@ -305,6 +306,17 @@ public class GasChemistryBlockEntity extends BaseMachineBlockEntity
             gasChemistry.setChanged();
         }
         gasChemistry.syncVisualState(level);
+    }
+
+    /** Fluid Capacity sizes every tank; fluid above a smaller capacity stays until it drains. */
+    private void updateTankCapacity(MachineStatAccumulator stats) {
+        int capacity = Math.max(TANK_CAPACITY, (int) Math.round(stats.value(MachineStat.FLUID_CAPACITY)));
+        if (inputTank.getCapacity() != capacity) {
+            waterTank.setCapacity(capacity);
+            inputTank.setCapacity(capacity);
+            outputTank.setCapacity(capacity);
+            secondaryOutputTank.setCapacity(capacity);
+        }
     }
 
     private boolean isCombustor() {
@@ -390,7 +402,7 @@ public class GasChemistryBlockEntity extends BaseMachineBlockEntity
 
     GasProcessorVisualState currentProcessorVisualState() {
         IEnergyStorage cell = batteryCellStorage();
-        float capacity = TANK_CAPACITY;
+        float capacity = inputTank.getCapacity();
         return new GasProcessorVisualState(
                 isActive(),
                 (float) effectiveStats().value(MachineStat.PROCESSING_SPEED),
@@ -1274,7 +1286,8 @@ public class GasChemistryBlockEntity extends BaseMachineBlockEntity
 
         @Override
         public int getTankCapacity(int tank) {
-            return exposedTank(tank) == null ? 0 : TANK_CAPACITY;
+            FluidTank exposed = exposedTank(tank);
+            return exposed == null ? 0 : exposed.getCapacity();
         }
 
         @Override

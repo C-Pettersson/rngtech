@@ -162,7 +162,7 @@ public class AmmoniaFuelCellBlockEntity extends BaseMachineBlockEntity
                 case DATA_ENERGY -> energyStored();
                 case DATA_ENERGY_CAPACITY -> energyCapacity();
                 case DATA_AMMONIA -> ammoniaTank.getFluidAmount();
-                case DATA_TANK_CAPACITY -> TANK_CAPACITY;
+                case DATA_TANK_CAPACITY -> ammoniaTank.getCapacity();
                 case DATA_FUEL_HYDROGEN -> burnsHydrogen() ? 1 : 0;
                 case DATA_STATUS -> statusCode();
                 case DATA_ENERGY_PER_TICK -> currentEnergyPerTick();
@@ -201,6 +201,7 @@ public class AmmoniaFuelCellBlockEntity extends BaseMachineBlockEntity
     }
 
     public static void serverTick(Level level, BlockPos pos, BlockState state, AmmoniaFuelCellBlockEntity fuelCell) {
+        fuelCell.updateTankCapacity(fuelCell.effectiveStats());
         boolean worked = fuelCell.tickRecipe();
         boolean exported = fuelCell.exportEnergy(level, pos);
         if (worked) {
@@ -262,11 +263,19 @@ public class AmmoniaFuelCellBlockEntity extends BaseMachineBlockEntity
         }
     }
 
+    /** Fluid Capacity sizes the fuel tank; fluid above a smaller capacity stays until it is burned. */
+    private void updateTankCapacity(MachineStatAccumulator stats) {
+        int capacity = Math.max(TANK_CAPACITY, (int) Math.round(stats.value(MachineStat.FLUID_CAPACITY)));
+        if (ammoniaTank.getCapacity() != capacity) {
+            ammoniaTank.setCapacity(capacity);
+        }
+    }
+
     private AmmoniaFuelCellVisualState currentVisualState() {
         ItemStack residue = processInventory.getStackInSlot(SLOT_RESIDUE);
         return new AmmoniaFuelCellVisualState(
                 isMembrane(membraneStack()),
-                ammoniaTank.getFluidAmount() / (float) TANK_CAPACITY,
+                ammoniaTank.getFluidAmount() / (float) ammoniaTank.getCapacity(),
                 residue.isEmpty() ? 0.0F : residue.getCount() / (float) Math.min(residue.getMaxStackSize(), processInventory.getSlotLimit(SLOT_RESIDUE)),
                 burnsHydrogen()
         );
@@ -682,7 +691,7 @@ public class AmmoniaFuelCellBlockEntity extends BaseMachineBlockEntity
 
         @Override
         public int getTankCapacity(int tank) {
-            return TANK_CAPACITY;
+            return tank == 0 ? ammoniaTank.getCapacity() : 0;
         }
 
         @Override

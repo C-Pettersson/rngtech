@@ -4,6 +4,7 @@ These pages describe proposed systems or requirements beyond the implemented fea
 
 - [Crafting and Upgrades](systems/crafting.md): assembly and refinement context, plus planned breakthrough and strain systems.
 - [Affix-Driven Generator](content/affix-driven-generator.md), [Entropy Cell](content/entropy-cell.md), and [Ore Slurry Turbine](content/ore-slurry-turbine.md): unregistered generator concepts.
+- [Shared Affixes](modifiers/shared-affixes.md): proposed filler, mid, and chase affixes that several machine families share, with the rejected ideas and the pool findings behind them.
 - [Auto Balance](modifiers/auto-balance.md) and [Packer](modifiers/packer.md): planned modifiers. Implemented [Balance Mode](https://c-pettersson.github.io/rngtech/rarity-and-affixes/#balance-mode) is a separate Battery Chassis affix.
 - [Unique Item Ideas](reference/unique-item-ideas.md): candidate items, not registered content.
 - [Unique Items requirements](prds/uniques.md): accepted 2.0 design for a shared Unique catalog, ranged rolls, and eight launch Uniques.

@@ -1065,6 +1065,11 @@ public class AlloyFurnaceBlockEntity extends BaseMachineBlockEntity implements M
     }
 
     @Override
+    public double masteryXpGain() {
+        return MachineMasteryHost.xpGain(effectiveStats());
+    }
+
+    @Override
     public int ascendancyEntryStage() {
         return chassis().stage();
     }
