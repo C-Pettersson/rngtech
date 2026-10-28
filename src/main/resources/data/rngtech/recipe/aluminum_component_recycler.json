@@ -20,7 +20,7 @@
                           "item":  "rngtech:aluminum_disassembly_head"
                       },
                 "G":  {
-                          "item":  "rngtech:aluminum_gear"
+                          "tag":  "rngtech:gears/aluminum"
                       }
             },
     "result":  {

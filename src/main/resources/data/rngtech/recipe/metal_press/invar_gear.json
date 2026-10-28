@@ -8,7 +8,7 @@
   "type": "rngtech:metal_press",
   "group": "metal_press_gears",
   "ingredient": {
-    "tag": "c:ingots/invar"
+    "tag": "rngtech:ingots/invar"
   },
   "input_count": 3,
   "mold": {

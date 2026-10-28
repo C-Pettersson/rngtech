@@ -10,7 +10,7 @@
     "GSG"
   ],
   "key": {
-    "A": { "item": "rngtech:aluminum_plate" },
+    "A": { "tag": "rngtech:plates/aluminum" },
     "C": { "item": "rngtech:aluminum_casing" },
     "G": { "item": "minecraft:glass_pane" },
     "S": { "item": "rngtech:silica_gel_beads" }

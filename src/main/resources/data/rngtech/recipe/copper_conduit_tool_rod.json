@@ -2,10 +2,10 @@
     "type":  "rngtech:trait_shaped",
     "key":  {
                 "R":  {
-                          "item":  "rngtech:copper_rod"
+                          "tag":  "rngtech:rods/copper"
                       },
                 "P":  {
-                          "item":  "rngtech:copper_plate"
+                          "tag":  "rngtech:plates/copper"
                       }
             },
     "category":  "equipment",

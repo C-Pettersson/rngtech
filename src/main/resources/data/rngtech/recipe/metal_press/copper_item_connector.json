@@ -8,7 +8,7 @@
   "type": "rngtech:metal_press",
   "group": "metal_press_item_connectors",
   "ingredient": {
-    "item": "rngtech:copper_gear"
+    "tag": "rngtech:gears/copper"
   },
   "input_count": 1,
   "mold": {

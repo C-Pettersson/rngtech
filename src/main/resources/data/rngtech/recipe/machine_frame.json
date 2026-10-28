@@ -20,7 +20,7 @@
       "tag": "c:ingots/iron"
     },
     "R": {
-      "item": "rngtech:iron_rod"
+      "tag": "rngtech:rods/iron"
     },
     "S": {
       "item": "minecraft:smooth_stone"

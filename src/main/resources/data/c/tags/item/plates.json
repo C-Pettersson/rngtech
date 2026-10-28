@@ -1,0 +1,28 @@
+{
+  "replace": false,
+  "values": [
+    "#c:plates/iron",
+    "#c:plates/copper",
+    "#c:plates/bronze",
+    "#c:plates/tin",
+    "#c:plates/zinc",
+    "#c:plates/gold",
+    "#c:plates/steel",
+    "#c:plates/invar",
+    "#c:plates/nickel",
+    "#c:plates/lead",
+    "#c:plates/silver",
+    "#c:plates/aluminum",
+    "#c:plates/sparksteel",
+    "#c:plates/osmium",
+    "#c:plates/titanium",
+    "#c:plates/arclite",
+    "#c:plates/tungsten",
+    "#c:plates/tungstensteel",
+    "#c:plates/nullite",
+    "#c:plates/aethergold",
+    "#c:plates/platinum",
+    "#c:plates/netherite",
+    "#c:plates/naquadah"
+  ]
+}

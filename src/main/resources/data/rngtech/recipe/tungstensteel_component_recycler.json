@@ -20,7 +20,7 @@
                           "item":  "rngtech:tungstensteel_disassembly_head"
                       },
                 "G":  {
-                          "item":  "rngtech:tungstensteel_gear"
+                          "tag":  "rngtech:gears/tungstensteel"
                       }
             },
     "result":  {

@@ -17,7 +17,7 @@
       "item": "rngtech:titanium_casing"
     },
     "P": {
-      "item": "rngtech:titanium_plate"
+      "tag": "rngtech:plates/titanium"
     },
     "S": {
       "item": "rngtech:silica_gel_beads"

@@ -20,7 +20,7 @@
                           "item":  "rngtech:bronze_disassembly_head"
                       },
                 "G":  {
-                          "item":  "rngtech:bronze_gear"
+                          "tag":  "rngtech:gears/bronze"
                       }
             },
     "result":  {

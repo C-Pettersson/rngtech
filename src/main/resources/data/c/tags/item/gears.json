@@ -1,0 +1,28 @@
+{
+  "replace": false,
+  "values": [
+    "#c:gears/iron",
+    "#c:gears/copper",
+    "#c:gears/bronze",
+    "#c:gears/tin",
+    "#c:gears/zinc",
+    "#c:gears/gold",
+    "#c:gears/steel",
+    "#c:gears/invar",
+    "#c:gears/nickel",
+    "#c:gears/lead",
+    "#c:gears/silver",
+    "#c:gears/aluminum",
+    "#c:gears/sparksteel",
+    "#c:gears/osmium",
+    "#c:gears/titanium",
+    "#c:gears/arclite",
+    "#c:gears/tungsten",
+    "#c:gears/tungstensteel",
+    "#c:gears/nullite",
+    "#c:gears/aethergold",
+    "#c:gears/platinum",
+    "#c:gears/netherite",
+    "#c:gears/naquadah"
+  ]
+}

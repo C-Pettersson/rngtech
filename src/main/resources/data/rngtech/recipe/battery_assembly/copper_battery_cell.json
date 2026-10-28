@@ -12,7 +12,7 @@
       "item": "rngtech:battery_cell"
     },
     {
-      "item": "rngtech:copper_plate"
+      "tag": "rngtech:plates/copper"
     },
     {
       "tag": "c:ingots/copper"

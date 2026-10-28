@@ -17,13 +17,13 @@
       "item": "minecraft:hopper"
     },
     "I": {
-      "tag": "c:ingots/bronze"
+      "tag": "rngtech:ingots/bronze"
     },
     "O": {
       "item": "rngtech:output_bin"
     },
     "P": {
-      "item": "rngtech:bronze_plate"
+      "tag": "rngtech:plates/bronze"
     }
   },
   "result": {

@@ -20,7 +20,7 @@
       "ingredient": { "tag": "rngtech:machine_frames/reinforced" }
     },
     "M": {
-      "ingredient": { "tag": "c:ingots/steel" }
+      "ingredient": { "tag": "rngtech:ingots/steel" }
     },
     "R": {
       "ingredient": { "item": "minecraft:redstone" }

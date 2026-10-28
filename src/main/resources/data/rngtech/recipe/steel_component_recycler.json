@@ -20,7 +20,7 @@
                           "item":  "rngtech:steel_disassembly_head"
                       },
                 "G":  {
-                          "item":  "rngtech:steel_gear"
+                          "tag":  "rngtech:gears/steel"
                       }
             },
     "result":  {

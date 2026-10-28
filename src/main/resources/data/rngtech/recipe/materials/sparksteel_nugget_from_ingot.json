@@ -9,7 +9,7 @@
   "category": "misc",
   "ingredients": [
     {
-      "tag": "c:ingots/sparksteel"
+      "tag": "rngtech:ingots/sparksteel"
     }
   ],
   "result": {

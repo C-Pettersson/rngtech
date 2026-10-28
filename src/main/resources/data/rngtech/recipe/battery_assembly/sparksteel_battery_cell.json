@@ -12,7 +12,7 @@
       "item": "rngtech:battery_cell"
     },
     {
-      "item": "rngtech:sparksteel_plate"
+      "tag": "rngtech:plates/sparksteel"
     },
     {
       "item": "minecraft:redstone"

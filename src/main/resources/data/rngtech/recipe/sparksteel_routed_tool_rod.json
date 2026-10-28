@@ -2,10 +2,10 @@
     "type":  "rngtech:trait_shaped",
     "key":  {
                 "R":  {
-                          "item":  "rngtech:sparksteel_rod"
+                          "tag":  "rngtech:rods/sparksteel"
                       },
                 "P":  {
-                          "item":  "rngtech:sparksteel_plate"
+                          "tag":  "rngtech:plates/sparksteel"
                       }
             },
     "category":  "equipment",

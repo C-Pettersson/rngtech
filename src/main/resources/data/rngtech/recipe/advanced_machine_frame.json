@@ -14,7 +14,7 @@
   ],
   "key": {
     "A": {
-      "ingredient": { "item": "rngtech:aluminum_plate" }
+      "ingredient": { "tag": "rngtech:plates/aluminum" }
     },
     "C": {
       "ingredient": { "tag": "rngtech:circuits/advanced" }

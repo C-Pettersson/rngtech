@@ -12,7 +12,7 @@
       "item": "rngtech:battery_cell"
     },
     {
-      "item": "rngtech:nullite_plate"
+      "tag": "rngtech:plates/nullite"
     },
     {
       "item": "minecraft:redstone"

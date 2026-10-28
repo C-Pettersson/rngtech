@@ -6,7 +6,7 @@
       "item": "minecraft:diamond"
     },
     {
-      "item": "rngtech:steel_plate"
+      "tag": "rngtech:plates/steel"
     }
   ],
   "neoforge:conditions": [

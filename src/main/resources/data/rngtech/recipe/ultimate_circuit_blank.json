@@ -43,7 +43,7 @@
     },
     "T": {
       "ingredient": {
-        "item": "rngtech:tungstensteel_plate"
+        "tag": "rngtech:plates/tungstensteel"
       }
     },
     "X": {

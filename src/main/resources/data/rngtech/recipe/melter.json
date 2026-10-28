@@ -40,7 +40,7 @@
     },
     "P": {
       "ingredient": {
-        "item": "rngtech:titanium_plate"
+        "tag": "rngtech:plates/titanium"
       }
     }
   },

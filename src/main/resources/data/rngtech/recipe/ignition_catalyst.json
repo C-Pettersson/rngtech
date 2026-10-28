@@ -14,10 +14,10 @@
   ],
   "key": {
     "G": {
-      "item": "rngtech:bronze_rod"
+      "tag": "rngtech:rods/bronze"
     },
     "N": {
-      "item": "rngtech:bronze_gear"
+      "tag": "rngtech:gears/bronze"
     },
     "T": [
       {

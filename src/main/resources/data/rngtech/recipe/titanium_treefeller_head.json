@@ -2,13 +2,13 @@
     "type":  "rngtech:trait_shaped",
     "key":  {
                 "G":  {
-                          "item":  "rngtech:titanium_gear"
+                          "tag":  "rngtech:gears/titanium"
                       },
                 "R":  {
-                          "item":  "rngtech:titanium_rod"
+                          "tag":  "rngtech:rods/titanium"
                       },
                 "P":  {
-                          "item":  "rngtech:titanium_plate"
+                          "tag":  "rngtech:plates/titanium"
                       }
             },
     "category":  "equipment",

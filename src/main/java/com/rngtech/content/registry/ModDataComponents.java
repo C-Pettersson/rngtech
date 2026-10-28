@@ -4,6 +4,7 @@ import com.rngtech.RNGTech;
 import com.rngtech.content.calibration.CalibrationState;
 import com.rngtech.content.calibration.CalibrationStreak;
 import com.rngtech.content.configurator.ConfiguratorPreset;
+import com.rngtech.content.item.TankContents;
 import com.rngtech.content.item.UnidentifiedTraitRoll;
 import com.rngtech.content.itemfilter.AdvancedItemFilterSettings;
 import com.rngtech.content.minerscompanion.MinersCompanionState;
@@ -288,6 +289,16 @@ public final class ModDataComponents {
                     builder -> builder
                             .persistent(Codec.STRING.listOf())
                             .networkSynchronized(ByteBufCodecs.STRING_UTF8.apply(ByteBufCodecs.list()))
+                            .cacheEncoding()
+            );
+
+    /** The loose and compressed fluid kept on a broken Fluid or Compressor Tank, restored when it is placed again. */
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<TankContents>> TANK_CONTENTS =
+            DATA_COMPONENTS.registerComponentType(
+                    "tank_contents",
+                    builder -> builder
+                            .persistent(TankContents.CODEC)
+                            .networkSynchronized(TankContents.STREAM_CODEC)
                             .cacheEncoding()
             );
 
