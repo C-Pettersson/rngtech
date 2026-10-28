@@ -213,7 +213,9 @@ public class CableBlock extends Block implements EntityBlock {
         }
 
         if (stack.is(ModItems.UNIVERSAL_CONNECTOR.get())) {
-            if (!isValidConnectorTarget(level.getBlockState(pos.relative(direction)))) {
+            // An open face takes the connector too; sneaking skips this and places a plate beyond the face instead.
+            BlockState target = level.getBlockState(pos.relative(direction));
+            if (!target.isAir() && !isValidConnectorTarget(target)) {
                 return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
             }
             if (level.getBlockEntity(pos) instanceof CableBlockEntity cable && cable.hasAnyConnector(direction)) {
