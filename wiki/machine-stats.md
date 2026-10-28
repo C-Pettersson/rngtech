@@ -140,7 +140,7 @@ All of these are better higher. See [Solar Panel](solar-panel.md).
 
 | Stat | What it does | Used by | Better |
 |---|---|---|---|
-| Fluid Capacity | Size of the machine's fluid tank. Fluid Pumps can roll it for the machine they sit in. | [Melter](melter.md), [Corrosion Cell](corrosion-cell.md), [Compressor Tanks](compressor-tank.md), the Forestry Companion's water tank. | Higher |
+| Fluid Capacity | Size of the machine's fluid tanks. Fluid Pumps can roll it for the machine they sit in, and machines that process or burn fluid can roll it themselves. It never makes a tank smaller than its normal size. | [Melter](melter.md), [Corrosion Cell](corrosion-cell.md), [Component Assembler](component-assembler.md), [Coal Gasifier](coal-gasifier.md), [Syngas Combustor](syngas-combustor.md), [Steam Methane Reformer](steam-methane-reformer.md), [Cavitation Generator](cavitation-generator.md), [Ammonia Synthesizer](ammonia-synthesizer.md), [Fuel Cell](ammonia-fuel-cell.md), [Compressor Tanks](compressor-tank.md), the Forestry Companion's water tank. | Higher |
 | Fluid Transfer | How fast fluid moves in or out, in mB/t. Usually set by an installed Fluid Pump; on Compressor Tanks it is the compression rate before Servos. | [Component Assembler](component-assembler.md), [Corrosion Cell](corrosion-cell.md), [Melter](melter.md), [Cavitation Generator](cavitation-generator.md), [Compressor Tanks](compressor-tank.md). | Higher |
 | Compression Ratio | How much fluid a Steel or higher Compressor Tank packs into its compressed store. Set by the tank's material. | [Compressor Tanks](compressor-tank.md). | Higher |
 

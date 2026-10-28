@@ -1144,6 +1144,11 @@ public class MetalPressBlockEntity extends BaseMachineBlockEntity
         return MachineMasteryFamily.METAL_PRESS;
     }
 
+    @Override
+    public double masteryXpGain() {
+        return MachineMasteryHost.xpGain(effectiveStats());
+    }
+
     /** The Crude Metal Press is the Stage 3 bootstrap body; the Steel Metal Press is Stage 4. */
     @Override
     public int ascendancyEntryStage() {

@@ -1564,6 +1564,7 @@ public class CrusherBlockEntity extends BaseMachineBlockEntity implements MenuPr
     }
 
     @Override public MachineMasteryFamily masteryFamily() { return MachineMasteryFamily.CRUSHER; }
+    @Override public double masteryXpGain() { return MachineMasteryHost.xpGain(effectiveStats()); }
     @Override public int ascendancyEntryStage() { return chassisMaterial().stage(); }
 
     @Override public MachineProgressionState machineProgression() { return super.machineProgression().forFamily(masteryFamily()); }

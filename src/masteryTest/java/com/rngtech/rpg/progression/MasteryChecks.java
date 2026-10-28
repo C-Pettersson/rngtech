@@ -67,6 +67,7 @@ public final class MasteryChecks {
         checks += com.rngtech.rpg.dormant.DormantChecks.run();
         checks += PartGenerationChecks.run();
         checks += com.rngtech.rpg.RollReadChecks.run();
+        checks += com.rngtech.rpg.SharedAffixChecks.run();
         checks += com.rngtech.rpg.PhaseArrayChecks.run();
         checks += com.rngtech.rpg.AnnealingChecks.run();
         checks += CrusherYieldChecks.run();

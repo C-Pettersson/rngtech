@@ -156,6 +156,8 @@ Machines with [Machine Mastery](machine-mastery.md) and the Gear they take can r
 
 They roll on the Crusher, Furnace, Alloy Furnace, Metal Press, Melter, Resonance Calibrator, and Forestry Companion, and on Crush Heads, Heat Cores, Servos, Fluid Pumps, Alloy Crucibles, Resonance Coils, Control Boards, and Stabilizer Matrices. A part that sits in a machine without Mastery, such as a Heat Core in a Solid Fuel Burner, gets nothing from them.
 
+The same machines and parts can roll **Studious** (of Study): increased Mastery XP gain, from 5–8% at Tier 1 to 33–45% at Tier 5. It also counts for the whole machine, and Studious rolls on the machine and its Gear add together. The machine levels faster. It gets no extra passive points.
+
 ## Notable affixes
 
 Most affixes simply raise or lower a [stat](machine-stats.md). A few change how the machine behaves.
@@ -189,6 +191,8 @@ A suffix that halves the failure strain a heat machine takes when its power drop
 | Super Output | A small chance to add one extra copy of the recipe's base output. |
 | Charged Storage | Battery Chassis only. 100% more installed-cell capacity after the chassis has held energy for 10 minutes straight. |
 | Additional Battery Slots | Battery Chassis only. Unlocks up to four extra cell slots. |
+| Twinned | Rare prefix on the Furnace, Alloy Furnace, Melter, Metal Press, and Resonance Calibrator. Adds 1 to 3 Batch Size. Each extra item in a batch still makes the cycle longer. It cannot roll beside the Crusher's Throughput. |
+| Brimming and Depth | Fluid Capacity on the Fluid Pump and on machines with tanks that process or burn fluid: the Melter, Component Assembler, Corrosion Cell, Coal Gasifier, Syngas Combustor, Steam Methane Reformer, Cavitation Generator, Ammonia Synthesizer, and Fuel Cell. Brimming adds a flat amount and Depth adds a percentage. All tanks of the machine grow together. A tank never gets smaller than its normal size. Fluid and Compressor Tanks do not roll it. |
 | Vein Miner | Rare Pick Head prefix. The Pick breaks connected ore of the same type, at an extra FE cost per block. |
 | Self Repair | Tool Head and Tool Rod prefix. Restores durability every 7.5 seconds while the tool sits idle in your hotbar or offhand. |
 

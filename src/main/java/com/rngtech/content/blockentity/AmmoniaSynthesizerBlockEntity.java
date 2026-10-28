@@ -142,7 +142,7 @@ public class AmmoniaSynthesizerBlockEntity extends BaseMachineBlockEntity
                 case DATA_NITROGEN -> nitrogenTank.getFluidAmount();
                 case DATA_HYDROGEN -> hydrogenTank.getFluidAmount();
                 case DATA_AMMONIA -> outputTank.getFluidAmount();
-                case DATA_TANK_CAPACITY -> TANK_CAPACITY;
+                case DATA_TANK_CAPACITY -> nitrogenTank.getCapacity();
                 case DATA_STATUS -> statusCode();
                 case DATA_ENERGY_USAGE -> scaledStat(stats, MachineStat.ENERGY_USAGE);
                 case DATA_ENERGY_TRANSFER -> scaledStat(stats, MachineStat.ENERGY_TRANSFER);
@@ -178,6 +178,7 @@ public class AmmoniaSynthesizerBlockEntity extends BaseMachineBlockEntity
     }
 
     public static void serverTick(Level level, BlockPos pos, BlockState state, AmmoniaSynthesizerBlockEntity synthesizer) {
+        synthesizer.updateTankCapacity(synthesizer.effectiveStats());
         synthesizer.repairMisroutedInputFluids();
         boolean worked = synthesizer.tickRecipe();
         BaseMachineBlock.setActive(level, pos, state, worked);
@@ -244,9 +245,9 @@ public class AmmoniaSynthesizerBlockEntity extends BaseMachineBlockEntity
                 isActive(),
                 (float) effectiveStats().value(MachineStat.PROCESSING_SPEED),
                 activeTicks <= 0 ? 0.0F : Mth.clamp(progress / (float) activeTicks, 0.0F, 1.0F),
-                nitrogenTank.getFluidAmount() / (float) TANK_CAPACITY,
-                hydrogenTank.getFluidAmount() / (float) TANK_CAPACITY,
-                outputTank.getFluidAmount() / (float) TANK_CAPACITY,
+                nitrogenTank.getFluidAmount() / (float) nitrogenTank.getCapacity(),
+                hydrogenTank.getFluidAmount() / (float) hydrogenTank.getCapacity(),
+                outputTank.getFluidAmount() / (float) outputTank.getCapacity(),
                 isCatalystBed(catalystStack())
         );
     }
@@ -592,6 +593,17 @@ public class AmmoniaSynthesizerBlockEntity extends BaseMachineBlockEntity
         return Mth.floor(stats.value(stat) * STAT_SCALE);
     }
 
+    /** Fluid Capacity sizes all four tanks; fluid above a smaller capacity stays until it drains. */
+    private void updateTankCapacity(MachineStatAccumulator stats) {
+        int capacity = Math.max(TANK_CAPACITY, (int) Math.round(stats.value(MachineStat.FLUID_CAPACITY)));
+        if (nitrogenTank.getCapacity() != capacity) {
+            nitrogenTank.setCapacity(capacity);
+            hydrogenTank.setCapacity(capacity);
+            outputTank.setCapacity(capacity);
+            carbonTank.setCapacity(capacity);
+        }
+    }
+
     private FluidTank tank(net.minecraft.world.level.material.Fluid acceptedFluid) {
         return new FluidTank(TANK_CAPACITY) {
             @Override
@@ -695,7 +707,7 @@ public class AmmoniaSynthesizerBlockEntity extends BaseMachineBlockEntity
 
         @Override
         public int getTankCapacity(int tank) {
-            return TANK_CAPACITY;
+            return nitrogenTank.getCapacity();
         }
 
         @Override

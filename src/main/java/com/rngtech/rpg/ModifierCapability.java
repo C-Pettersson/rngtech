@@ -29,5 +29,7 @@ public enum ModifierCapability {
     HAS_MINERS_COMPANION,
     /** Gear and bodies of machines with Machine Mastery, which can roll Control, Drive, and Reserve. */
     HAS_MASTERY_ATTRIBUTES,
-    HAS_PHASE_ARRAY
+    HAS_PHASE_ARRAY,
+    /** Recipe machines that work several items per cycle through Batch Size, other than the Crusher. */
+    HAS_BATCHING
 }

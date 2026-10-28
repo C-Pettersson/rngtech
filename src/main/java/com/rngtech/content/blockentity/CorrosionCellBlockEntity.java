@@ -568,7 +568,7 @@ public class CorrosionCellBlockEntity extends BaseMachineBlockEntity
         clampInternalEnergy();
     }
 
-    /** Fluid Capacity, from Fluid Pump affixes, sizes the electrolyte tank; fluid above a smaller capacity stays until used. */
+    /** Fluid Capacity, from the chassis and Fluid Pump affixes, sizes the electrolyte tank; fluid above a smaller capacity stays until used. */
     private void updateTankCapacity(MachineStatAccumulator stats) {
         int capacity = Math.max(TANK_CAPACITY, (int) Math.round(stats.value(MachineStat.FLUID_CAPACITY)));
         if (electrolyteTank.getCapacity() != capacity) {

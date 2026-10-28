@@ -101,6 +101,12 @@ public record MachineProgressionState(
     }
 
     public MachineProgressionState withAddedXp(long amount) { return withAddedScaledXp(amount, XP_REMAINDER_SCALE); }
+    /** Scaled XP times a Mastery XP gain multiplier, counted in quarters so small grants keep their bonus. */
+    public MachineProgressionState withAddedScaledXp(long amount, int quarters, double gain) {
+        if (gain == 1.0) { return withAddedScaledXp(amount, quarters); }
+        double units = (double) amount * Mth.clamp(quarters, 0, XP_REMAINDER_SCALE) * Math.max(0.0, gain);
+        return withAddedScaledXp(units >= Long.MAX_VALUE ? Long.MAX_VALUE : Math.round(units), 1);
+    }
     public MachineProgressionState withAddedScaledXp(long amount, int quarters) {
         quarters = Mth.clamp(quarters, 0, XP_REMAINDER_SCALE);
         if (amount <= 0 || quarters == 0 || level >= MAX_LEVEL) { return this; }

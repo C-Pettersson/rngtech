@@ -1010,6 +1010,11 @@ public class MelterBlockEntity extends BaseMachineBlockEntity
         return MachineMasteryFamily.MELTER;
     }
 
+    @Override
+    public double masteryXpGain() {
+        return MachineMasteryHost.xpGain(effectiveStats());
+    }
+
     /** The Melter has a single Titanium-stage body. */
     @Override
     public int ascendancyEntryStage() {

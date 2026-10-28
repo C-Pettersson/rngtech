@@ -52,6 +52,7 @@ nav:
       - Crafting and Upgrades: systems/crafting.md
       - Auto Balance: modifiers/auto-balance.md
       - Packer: modifiers/packer.md
+      - Shared Affixes: modifiers/shared-affixes.md
       - Unique Item Ideas: reference/unique-item-ideas.md
       - Passive Tree Framework: prds/passive-tree-framework.md
       - Machine Mega Passive Tree: prds/machine-mega-passive-tree.md

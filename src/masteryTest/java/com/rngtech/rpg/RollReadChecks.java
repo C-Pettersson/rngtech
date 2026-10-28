@@ -39,7 +39,9 @@ public final class RollReadChecks {
     private static final Set<MachineStat> HEAT = EnumSet.of(MachineStat.HEAT_TRANSFER, MachineStat.THERMAL_CONDUCTIVITY,
             MachineStat.MAX_TEMPERATURE, MachineStat.HEAT_ISOLATION, MachineStat.THERMAL_MASS, MachineStat.COOLING_RATE,
             MachineStat.TEMPERATURE_STABILITY, MachineStat.OVERHEAT_TOLERANCE);
-    private static final Set<MachineStat> ATTRIBUTES = EnumSet.of(MachineStat.CONTROL, MachineStat.DRIVE, MachineStat.RESERVE);
+    /** Control, Drive, Reserve, and Mastery XP gain: every Mastery host reads them machine-wide, from itself and its Gear. */
+    private static final Set<MachineStat> ATTRIBUTES = EnumSet.of(MachineStat.CONTROL, MachineStat.DRIVE, MachineStat.RESERVE,
+            MachineStat.MASTERY_XP_GAIN);
     private static final Set<MachineStat> BATCHING = EnumSet.of(MachineStat.BATCH_SIZE, MachineStat.BATCH_OVERHEAD);
     private static final Set<MachineStat> TOOL = EnumSet.of(MachineStat.DURABILITY, MachineStat.SELF_REPAIR, MachineStat.MINING_SPEED,
             MachineStat.ATTACK_SPEED, MachineStat.FE_USAGE, MachineStat.STABILITY, MachineStat.LUCK);
@@ -73,22 +75,22 @@ public final class RollReadChecks {
                 MachineStat.CATALYST_EFFICIENCY, MachineStat.REFINEMENT_POTENTIAL_BONUS, MachineStat.INSTANT_PROCESS_CHANCE,
                 MachineStat.SUPER_OUTPUT_CHANCE);
         reads("battery_assembler", Set.of(), MachineStat.PROCESSING_SPEED, MachineStat.ENERGY_USAGE, MachineStat.ENERGY_CAPACITY,
-                MachineStat.FLUID_TRANSFER, MachineStat.INSTANT_PROCESS_CHANCE);
+                MachineStat.FLUID_TRANSFER, MachineStat.FLUID_CAPACITY, MachineStat.INSTANT_PROCESS_CHANCE);
         reads("component_recycler", Set.of(), MachineStat.PROCESSING_SPEED, MachineStat.ENERGY_USAGE, MachineStat.ENERGY_CAPACITY,
                 MachineStat.PROCESSING_LEVEL, MachineStat.INSTANT_PROCESS_CHANCE);
         reads("compressor_tank", Set.of(), MachineStat.PROCESSING_SPEED, MachineStat.ENERGY_USAGE, MachineStat.ENERGY_CAPACITY,
                 MachineStat.FLUID_TRANSFER);
         reads("fluid_tank", Set.of());
         reads("coal_gasifier", Set.of(), MachineStat.PROCESSING_SPEED, MachineStat.ENERGY_USAGE, MachineStat.ENERGY_CAPACITY,
-                MachineStat.INSTANT_PROCESS_CHANCE);
+                MachineStat.FLUID_CAPACITY, MachineStat.INSTANT_PROCESS_CHANCE);
         reads("steam_methane_reformer", Set.of(), MachineStat.PROCESSING_SPEED, MachineStat.ENERGY_USAGE, MachineStat.ENERGY_CAPACITY,
-                MachineStat.INSTANT_PROCESS_CHANCE);
+                MachineStat.FLUID_CAPACITY, MachineStat.INSTANT_PROCESS_CHANCE);
         reads("syngas_combustor", Set.of(), MachineStat.PROCESSING_SPEED, MachineStat.ENERGY_CAPACITY, MachineStat.ENERGY_GENERATION,
-                MachineStat.EFFICIENCY);
+                MachineStat.EFFICIENCY, MachineStat.FLUID_CAPACITY);
         reads("ammonia_synthesizer", Set.of(), MachineStat.PROCESSING_SPEED, MachineStat.ENERGY_USAGE, MachineStat.ENERGY_CAPACITY,
-                MachineStat.INSTANT_PROCESS_CHANCE);
+                MachineStat.FLUID_CAPACITY, MachineStat.INSTANT_PROCESS_CHANCE);
         reads("ammonia_fuel_cell", Set.of(), MachineStat.PROCESSING_SPEED, MachineStat.ENERGY_CAPACITY, MachineStat.ENERGY_GENERATION,
-                MachineStat.EFFICIENCY);
+                MachineStat.EFFICIENCY, MachineStat.FLUID_CAPACITY);
         reads("solid_fuel_burner", Set.of(), MachineStat.ENERGY_GENERATION, MachineStat.EFFICIENCY, MachineStat.FUEL_EFFICIENCY,
                 MachineStat.FUEL_DURATION, MachineStat.HEAT_ISOLATION, MachineStat.INPUT_SLOTS);
         reads("bio_generator", Set.of(), MachineStat.ENERGY_GENERATION, MachineStat.EFFICIENCY, MachineStat.FUEL_EFFICIENCY,
@@ -112,7 +114,7 @@ public final class RollReadChecks {
         reads("cavitation_generator", Set.of(), MachineStat.PROCESSING_LEVEL, MachineStat.PROCESSING_SPEED, MachineStat.ENERGY_GENERATION,
                 MachineStat.EFFICIENCY, MachineStat.TEMPERATURE_STABILITY, MachineStat.STABILITY, MachineStat.OUTPUT_AMOUNT,
                 MachineStat.MAX_TEMPERATURE, MachineStat.OVERHEAT_TOLERANCE, MachineStat.STRAIN_RECOVERY, MachineStat.HEAT_TRANSFER,
-                MachineStat.FLUID_TRANSFER, MachineStat.ENERGY_CAPACITY, MachineStat.DURABILITY);
+                MachineStat.FLUID_TRANSFER, MachineStat.FLUID_CAPACITY, MachineStat.ENERGY_CAPACITY, MachineStat.DURABILITY);
         reads("battery_cell", Set.of(), MachineStat.ENERGY_CAPACITY, MachineStat.ENERGY_TRANSFER, MachineStat.IDLE_LOSS);
         reads("battery_chassis", Set.of(), MachineStat.ENERGY_CAPACITY, MachineStat.EFFICIENCY, MachineStat.ENERGY_TRANSFER,
                 MachineStat.BURST_TRANSFER, MachineStat.BURST_DURATION, MachineStat.STABILITY, MachineStat.IDLE_LOSS,

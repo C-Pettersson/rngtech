@@ -251,11 +251,20 @@ public class BatteryAssemblerBlockEntity extends BaseMachineBlockEntity
         assembler.syncVisualState(level);
     }
 
+    /** Fluid Capacity sizes the electrolyte tank; fluid above a smaller capacity stays until it is used. */
+    private void updateTankCapacity(MachineStatAccumulator stats) {
+        int capacity = Math.max(TANK_CAPACITY, (int) Math.round(stats.value(MachineStat.FLUID_CAPACITY)));
+        if (inputTank.getCapacity() != capacity) {
+            inputTank.setCapacity(capacity);
+        }
+    }
+
     private static void tickWork(Level level, BlockPos pos, BlockState state, BatteryAssemblerBlockEntity assembler) {
         assembler.dissolveElectrolyteReagent();
         assembler.drainInputContainer();
 
         MachineStatAccumulator stats = assembler.effectiveStats();
+        assembler.updateTankCapacity(stats);
         BatteryAssemblyRecipe recipe = assembler.nextRecipe();
         if (recipe == null) {
             assembler.resetCycleIfActive();

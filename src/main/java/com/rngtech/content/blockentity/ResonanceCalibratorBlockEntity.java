@@ -831,6 +831,11 @@ public class ResonanceCalibratorBlockEntity extends BaseMachineBlockEntity
     }
 
     @Override
+    public double masteryXpGain() {
+        return MachineMasteryHost.xpGain(effectiveStats());
+    }
+
+    @Override
     public int ascendancyEntryStage() {
         return chassis().stage();
     }
