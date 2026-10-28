@@ -333,7 +333,8 @@ tasks.withType(ProcessResources).configureEach {
     }
 }
 
-def githubRepository = System.getenv('GITHUB_REPOSITORY')
+// GitHub Packages rejects an owner with uppercase letters (HTTP 422), and this repository's owner has them.
+def githubRepository = System.getenv('GITHUB_REPOSITORY')?.toLowerCase(Locale.ROOT)
 
 publishing {
     publications {

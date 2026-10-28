@@ -34,4 +34,4 @@ Frames are plain crafting ingredients: they have no stats or affixes, and a fram
 - **Calibrated Structural Component** must be a Structural calibration, Stage 3+, stability 80+.
 - Requires the Tungstensteel material to be enabled.
 
-The Washer Machine Chassis can be crafted from a Machine Frame, but no recipe or machine uses it, so don't spend a frame on it.
+You can no longer craft the Washer Machine Chassis. No machine uses it. Put an old Washer Machine Chassis in a crafting grid to get its Machine Frame back.
