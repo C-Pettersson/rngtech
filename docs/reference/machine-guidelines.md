@@ -76,7 +76,7 @@ Use these tab responsibilities consistently.
 | Stats | Effective stats that apply to this machine's actual capabilities. |
 | Refinement | Shared placed-machine refinement UI for compatible machines. |
 | Mastery | Machine-owned XP, level, unspent passive points, and passive-tree nodes for machines that implement progression. |
-| Orders | Three Work Order drive bays and the active job's progress, on every processing machine, with or without Mastery. |
+| Orders | Three Work Order drive bays and the active job's progress, on every processing machine, with or without Mastery. Hidden until the player finds Work Orders, so early players do not meet a Stage 4 system on their first machine. |
 
 Battery Cells are Gear, not Process. A processing machine may expose a side-insertable Battery Cell slot for automation, but the UI should still present it as equipment.
 

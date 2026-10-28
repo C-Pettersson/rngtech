@@ -7,7 +7,6 @@ import com.rngtech.content.machine.CrusherChassisMaterial;
 import com.rngtech.content.menu.CrusherMenu;
 import com.rngtech.content.menu.WorkOrderMenuSupport;
 import com.rngtech.content.registry.ModBlocks;
-import com.rngtech.content.registry.ModItems;
 import com.rngtech.rpg.MachinePartType;
 import com.rngtech.rpg.MachineStat;
 import com.rngtech.rpg.progression.CrusherPassiveTree;
@@ -118,7 +117,7 @@ public class CrusherScreen extends AbstractContainerScreen<CrusherMenu> implemen
                 .stats(CrusherMenu.TAB_CONFIGURATION)
                 .refinement(CrusherMenu.TAB_REFINEMENT)
                 .mastery(CrusherMenu.TAB_MASTERY)
-                .tab(CrusherMenu.TAB_ORDERS, "rngtech.tab.orders", ModItems.JOB_CHIP.get())
+                .orders(CrusherMenu.TAB_ORDERS, menu::workOrdersShown)
                 .build();
         masterySupport = new MasteryScreenSupport<>(
                 CrusherPassiveTree.TREE,

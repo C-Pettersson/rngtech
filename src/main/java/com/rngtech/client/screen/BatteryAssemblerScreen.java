@@ -4,7 +4,6 @@ import com.rngtech.content.blockentity.BatteryAssemblerBlockEntity;
 import com.rngtech.content.menu.BatteryAssemblerMenu;
 import com.rngtech.content.menu.WorkOrderMenuSupport;
 import com.rngtech.content.registry.ModBlocks;
-import com.rngtech.content.registry.ModItems;
 import com.rngtech.rpg.MachineStat;
 
 import net.minecraft.client.gui.GuiGraphics;
@@ -81,7 +80,7 @@ public class BatteryAssemblerScreen extends AbstractContainerScreen<BatteryAssem
                 .gear(BatteryAssemblerMenu.TAB_GEAR)
                 .stats(BatteryAssemblerMenu.TAB_CONFIGURATION)
                 .refinement(BatteryAssemblerMenu.TAB_REFINEMENT)
-                .tab(BatteryAssemblerMenu.TAB_ORDERS, "rngtech.tab.orders", ModItems.JOB_CHIP.get())
+                .orders(BatteryAssemblerMenu.TAB_ORDERS, menu::workOrdersShown)
                 .build();
         workOrdersTab = new WorkOrdersTab(menu, STAT_ACCENT);
     }
