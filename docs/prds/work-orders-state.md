@@ -53,7 +53,7 @@ Recorded 2026-10-25 for phase 3 of the earlier design:
 - Orders are Normal with no conditions until phase 4, so every accepted order starts at 100% Bounty and Prestige 0. Crafted and plain stacks read as seed 0 until phase 6 adds first-hold rolling; `/rngtech work_order give` sets a random seed.
 - The first objectives are `crusher_hard_ore` (`crush`, counted by the recipe's Processing Level) and `furnace_hot_smelts` (`hot_smelt`, counted by the overheat slider). Their counts and minimums are draft numbers, not yet tuned against the processing balance simulation.
 - The reward table needs two things the PRD did not name. The loot condition `rngtech:order_roll` makes the next-order pool, the base Glyph, and the Unique roll once per order. The loot function `rngtech:set_order_tier`, with an optional `offset`, sets a Glyph's or a Work Order's tier from the order's tier.
-- The Uniques pool rolls the whole catalog through the existing `rngtech:unique_loot_enabled` gates. Weighting it toward the order's family stays an open question.
+- The Uniques pool rolls the whole catalog through the existing `rngtech:unique_loot_enabled` gates. Weighting it toward the order's family was left open here; the post-merge polish on 2026-10-26 settled it, so Unique rewards now weight toward the job's machine.
 - Accept takes the inventory slot of the order as its action value. The phase 7 panel will send it; until then only GameTests and code call it.
 - `check-volatile-catalyst.mjs` and `check-uniques.mjs` allow the Work Order reward table as their one exception. The new `check-work-orders.mjs` checks that table, the recipe condition, and recycling instead.
 
