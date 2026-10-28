@@ -14,7 +14,7 @@
   ],
   "key": {
     "B": {
-      "ingredient": { "tag": "c:circuits/elite" }
+      "ingredient": { "tag": "rngtech:circuits/elite" }
     },
     "C": {
       "ingredient": { "tag": "c:ingots/titanium" }

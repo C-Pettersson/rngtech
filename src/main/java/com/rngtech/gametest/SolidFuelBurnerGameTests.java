@@ -3,6 +3,7 @@ package com.rngtech.gametest;
 import static com.rngtech.gametest.MachineTestSupport.check;
 
 import com.rngtech.RNGTech;
+import com.rngtech.RNGTechConfig;
 import com.rngtech.content.blockentity.MachineInfoSnapshot;
 import com.rngtech.content.blockentity.SolidFuelBurnerBlockEntity;
 import com.rngtech.content.blockentity.SolidFuelBurnerVisualState;
@@ -141,6 +142,35 @@ public final class SolidFuelBurnerGameTests {
         });
     }
 
+    /**
+     * The pack's generation multiplier scales FE/t and FE per Coal, and the Coal burns for the same time. The config is
+     * set and restored within this tick, so other tests never see it.
+     */
+    @GameTest(template = MachineTestSupport.EMPTY)
+    public static void generationMultiplierScalesFePerCoal(GameTestHelper helper) {
+        SolidFuelBurnerBlockEntity plain = burner(helper, new BlockPos(1, 1, 2), SolidFuelBurnerChassis.STEEL,
+                HeatCoreMaterial.STEEL, FuelBoxMaterial.IRON, new ItemStack(Items.COAL, 8));
+        SolidFuelBurnerBlockEntity scaled = burner(helper, new BlockPos(3, 1, 2), SolidFuelBurnerChassis.STEEL,
+                HeatCoreMaterial.STEEL, FuelBoxMaterial.IRON, new ItemStack(Items.COAL, 8));
+        double previous = RNGTechConfig.ENERGY_GENERATION_MULTIPLIER.get();
+        MachineInfoSnapshot base;
+        MachineInfoSnapshot doubled;
+        try {
+            RNGTechConfig.ENERGY_GENERATION_MULTIPLIER.set(1.0D);
+            tick(helper, plain);
+            base = plain.machineInfo();
+            RNGTechConfig.ENERGY_GENERATION_MULTIPLIER.set(2.0D);
+            tick(helper, scaled);
+            doubled = scaled.machineInfo();
+        } finally {
+            RNGTechConfig.ENERGY_GENERATION_MULTIPLIER.set(previous);
+        }
+        check(base.energyRate() > 0, "The plain burner should be burning");
+        check(doubled.energyRate() == 2 * base.energyRate(), "A 2x multiplier should double " + base.energyRate() + " FE/t, ran at " + doubled.energyRate());
+        check(doubled.fuelMax() == base.fuelMax(), "Coal should burn for " + base.fuelMax() + " ticks at any multiplier, burned for " + doubled.fuelMax());
+        helper.succeed();
+    }
+
     /** Turning the stoke down mid-item keeps the item's burned share and revalues what is left at the new economy. */
     @GameTest(template = MachineTestSupport.EMPTY)
     public static void stokeChangeKeepsTheBurningItemsShare(GameTestHelper helper) {
@@ -179,6 +209,10 @@ public final class SolidFuelBurnerGameTests {
         copy.loadWithComponents(saved, helper.getLevel().registryAccess());
         check(copy.stoke() == 60, "Stoke should survive a save, was " + copy.stoke());
         helper.succeed();
+    }
+
+    private static void tick(GameTestHelper helper, SolidFuelBurnerBlockEntity burner) {
+        SolidFuelBurnerBlockEntity.serverTick(helper.getLevel(), burner.getBlockPos(), burner.getBlockState(), burner);
     }
 
     private static SolidFuelBurnerBlockEntity burner(

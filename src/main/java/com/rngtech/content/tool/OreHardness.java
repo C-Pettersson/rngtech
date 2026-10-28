@@ -19,7 +19,8 @@ import java.util.List;
 
 public final class OreHardness {
     public static final int MAX_LEVEL = 8;
-    private static final List<TagKey<Block>> HARDNESS_TAGS = createHardnessTags();
+    private static final List<TagKey<Block>> HARDNESS_TAGS = createHardnessTags("ore_hardness/level_");
+    private static final List<TagKey<Block>> COMMON_HARDNESS_TAGS = createHardnessTags("ore_hardness/common/level_");
 
     public static TagKey<Block> tagForLevel(int level) {
         if (level < 1 || level > MAX_LEVEL) {
@@ -28,9 +29,14 @@ public final class OreHardness {
         return HARDNESS_TAGS.get(level - 1);
     }
 
+    /**
+     * The highest level tag the block is in. The common tags, which hold other mods' ores by {@code c:ores/<metal>},
+     * count only when the pack turns on {@code worldgen.ores.commonOreTagHardness}.
+     */
     public static int level(BlockState state) {
+        boolean common = RNGTechConfig.ORE_COMMON_TAG_HARDNESS.get();
         for (int level = MAX_LEVEL; level >= 1; level--) {
-            if (state.is(tagForLevel(level))) {
+            if (state.is(tagForLevel(level)) || common && state.is(COMMON_HARDNESS_TAGS.get(level - 1))) {
                 return level;
             }
         }
@@ -71,6 +77,12 @@ public final class OreHardness {
         }
         return switch (RNGTechConfig.ORE_VANILLA_BRIDGE_POLICY.get()) {
             case BOOTSTRAP_ONLY -> 1;
+            case TIER_LADDER -> switch (tier) {
+                case 1 -> 1;
+                case 2 -> 3;
+                case 3 -> 6;
+                default -> MAX_LEVEL;
+            };
             case EARLY_BRIDGE -> tier >= 2 ? 2 : 1;
             case VANILLA_TIER_MAPPING -> {
                 if (tier >= 4) {
@@ -108,10 +120,10 @@ public final class OreHardness {
         return 1;
     }
 
-    private static List<TagKey<Block>> createHardnessTags() {
+    private static List<TagKey<Block>> createHardnessTags(String prefix) {
         List<TagKey<Block>> tags = new ArrayList<>();
         for (int level = 1; level <= MAX_LEVEL; level++) {
-            ResourceLocation id = RNGTech.id("ore_hardness/level_" + level);
+            ResourceLocation id = RNGTech.id(prefix + level);
             tags.add(TagKey.create(Registries.BLOCK, id));
         }
         return List.copyOf(tags);

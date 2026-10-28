@@ -21,7 +21,7 @@
       "item": "rngtech:bronze_plate"
     },
     "C": {
-      "tag": "c:circuits/basic"
+      "tag": "rngtech:circuits/basic"
     },
     "I": {
       "tag": "c:ingots/steel"

@@ -1,5 +1,6 @@
 package com.rngtech.content.blockentity;
 
+import com.rngtech.RNGTechConfig;
 import com.rngtech.content.block.BaseMachineBlock;
 import com.rngtech.content.energy.CavitationHeat;
 import com.rngtech.content.energy.CavitationRotorDynamics;
@@ -807,8 +808,8 @@ public class CavitationGeneratorBlockEntity extends BaseMachineBlockEntity
             return 0.0;
         }
         int ticks = stats.adjustedProcessingTicks(recipe.processingTicks());
-        return Math.max(1.0, stats.generatedEnergyTotal(recipe.energy(), ticks)
-                * Math.max(0.1, stats.value(MachineStat.EFFICIENCY)));
+        return Math.max(1.0, RNGTechConfig.generatedEnergy(stats.generatedEnergyTotal(recipe.energy(), ticks)
+                * Math.max(0.1, stats.value(MachineStat.EFFICIENCY))));
     }
 
     private int effectiveHeatStrain(CavitationRecipe recipe, MachineStatAccumulator stats) {

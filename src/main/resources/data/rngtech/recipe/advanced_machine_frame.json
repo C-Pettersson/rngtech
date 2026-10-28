@@ -17,7 +17,7 @@
       "ingredient": { "item": "rngtech:aluminum_plate" }
     },
     "C": {
-      "ingredient": { "tag": "c:circuits/advanced" }
+      "ingredient": { "tag": "rngtech:circuits/advanced" }
     },
     "M": {
       "ingredient": { "tag": "rngtech:machine_frames/reinforced" }

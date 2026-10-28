@@ -60,9 +60,11 @@ The only valid shape is a three-block column:
 
 If either casing is missing, all three lanes pause. Nothing is lost, and work resumes as soon as the column is complete again.
 
+While the machine works, a band of wet, blue beads climbs through the glass of both casings, and condensation drips from the glass.
+
 ### Drying the air
 
-The controller has three independent lanes. Put dry beads in any lane's input slot. Each lane turns one dry bead into one saturated bead and adds water to a shared 10,000 mB tank:
+The controller has three independent lanes. Put dry beads in any lane's input slot. Shift-click and automation spread dry beads evenly across the lanes. A lane never mixes normal and supercharged beads. Each lane turns one dry bead into one saturated bead and adds water to a shared 10,000 mB tank:
 
 | Dry bead | Water per bead | Time | All three lanes |
 |---|---:|---:|---:|
@@ -91,14 +93,14 @@ To throw water away, use the purge button beside the tank, or right-click the co
 
 ### Automation
 
-| Side | Behavior |
+| Face | Behavior |
 |---|---|
-| Top | Inserts dry beads into the lane input slots. |
-| Bottom | Extracts saturated beads from the lane output slots. |
-| Sides | Drain water. |
-| Casing sides | Drain water on behalf of the controller while the column is complete. |
+| Any controller face | Inserts dry beads into the lanes and extracts saturated beads. |
+| Controller sides | Drain water. |
+| Any casing face | Inserts and extracts beads for the controller while the column is complete. |
+| Casing sides | Drain water for the controller while the column is complete. |
 
-The casings sit on the controller's top face once the column is built, so you usually load dry beads by hand. The machine never accepts fluid, and has no FE connection. Casings do not handle items.
+Each inserted bead goes to the lane with the fewest beads that can take it. A hopper on top of the column or a Furnace chain therefore keeps all three lanes busy. Automation cannot pull dry beads out of a lane. The machine never accepts fluid and has no FE connection.
 
 ## Screen
 

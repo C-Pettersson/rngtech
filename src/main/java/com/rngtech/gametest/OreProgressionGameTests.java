@@ -5,36 +5,55 @@ import static com.rngtech.gametest.MachineTestSupport.check;
 import com.rngtech.RNGTech;
 import com.rngtech.RNGTechConfig;
 import com.rngtech.RNGTechConfig.RestrictedToolMode;
+import com.rngtech.RNGTechConfig.VanillaOreBridgePolicy;
 import com.rngtech.content.recipe.CrusherRecipe;
 import com.rngtech.content.registry.ModRecipes;
 import com.rngtech.content.tool.OreHardness;
 import com.rngtech.content.tool.RestrictedTools;
 
+import net.minecraft.core.registries.Registries;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.RecipeHolder;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
 import java.util.List;
 
-/** Ore hardness follows common ore tags, Crusher ore recipes match any mod's ore, and restricted tools lose their reach. */
+/** Ore hardness follows the level tags, Crusher ore recipes match any mod's ore, and restricted tools lose their reach. */
 @GameTestHolder(RNGTech.MOD_ID)
 @PrefixGameTestTemplate(false)
 public final class OreProgressionGameTests {
     private OreProgressionGameTests() {
     }
 
-    /** Nether Gold Ore is listed by no RNGTech file; it inherits Gold's hardness through {@code c:ores/gold}. */
     @GameTest(template = MachineTestSupport.EMPTY)
-    public static void commonOreTagsCarryHardness(GameTestHelper helper) {
+    public static void listedOresCarryHardness(GameTestHelper helper) {
         check(OreHardness.level(Blocks.NETHER_GOLD_ORE.defaultBlockState()) == 2, "Nether Gold Ore should share Gold's hardness 2");
         check(OreHardness.level(Blocks.DEEPSLATE_IRON_ORE.defaultBlockState()) == 1, "Deepslate Iron Ore should keep hardness 1");
         check(OreHardness.level(Blocks.STONE.defaultBlockState()) == 0, "Stone should have no ore hardness");
+        helper.succeed();
+    }
+
+    /** Other mods' ores reach the common level tags through {@code c:ores/<metal>}; the tags count only when turned on. */
+    @GameTest(template = MachineTestSupport.EMPTY)
+    public static void commonOreTagsCarryHardnessWhenEnabled(GameTestHelper helper) {
+        TagKey<Block> commonGold = TagKey.create(Registries.BLOCK, RNGTech.id("ore_hardness/common/level_2"));
+        check(Blocks.NETHER_GOLD_ORE.defaultBlockState().is(commonGold), "Nether Gold Ore should reach the common level 2 tag through c:ores/gold");
+        boolean previous = RNGTechConfig.ORE_COMMON_TAG_HARDNESS.get();
+        try {
+            RNGTechConfig.ORE_COMMON_TAG_HARDNESS.set(true);
+            check(OreHardness.level(Blocks.NETHER_GOLD_ORE.defaultBlockState()) == 2, "Nether Gold Ore should keep hardness 2 with common tags on");
+            check(OreHardness.level(Blocks.STONE.defaultBlockState()) == 0, "Stone should have no ore hardness with common tags on");
+        } finally {
+            RNGTechConfig.ORE_COMMON_TAG_HARDNESS.set(previous);
+        }
         helper.succeed();
     }
 
@@ -57,6 +76,22 @@ public final class OreProgressionGameTests {
         check(OreHardness.vanillaPickTier(new ItemStack(Items.DIAMOND_PICKAXE)) == 3, "A Diamond Pickaxe should read as diamond tier");
         check(OreHardness.vanillaPickTier(new ItemStack(Items.NETHERITE_PICKAXE)) == 4, "A Netherite Pickaxe should read as netherite tier");
         check(OreHardness.vanillaPickTier(new ItemStack(Items.DIAMOND_SHOVEL)) == 0, "A shovel should read as no tier");
+        helper.succeed();
+    }
+
+    /** The default ladder lets every pickaxe mine RNGTech ore by its tier, and the Netherite Pickaxe reaches all of it. */
+    @GameTest(template = MachineTestSupport.EMPTY)
+    public static void tierLadderReachesEveryHardness(GameTestHelper helper) {
+        VanillaOreBridgePolicy previous = RNGTechConfig.ORE_VANILLA_BRIDGE_POLICY.get();
+        try {
+            RNGTechConfig.ORE_VANILLA_BRIDGE_POLICY.set(VanillaOreBridgePolicy.TIER_LADDER);
+            check(OreHardness.oreReach(new ItemStack(Items.STONE_PICKAXE)) == 1, "A Stone Pickaxe should reach hardness 1");
+            check(OreHardness.oreReach(new ItemStack(Items.IRON_PICKAXE)) == 3, "An Iron Pickaxe should reach hardness 3");
+            check(OreHardness.oreReach(new ItemStack(Items.DIAMOND_PICKAXE)) == 6, "A Diamond Pickaxe should reach hardness 6");
+            check(OreHardness.oreReach(new ItemStack(Items.NETHERITE_PICKAXE)) == OreHardness.MAX_LEVEL, "A Netherite Pickaxe should reach every hardness");
+        } finally {
+            RNGTechConfig.ORE_VANILLA_BRIDGE_POLICY.set(previous);
+        }
         helper.succeed();
     }
 

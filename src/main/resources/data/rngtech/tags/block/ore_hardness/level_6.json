@@ -4,14 +4,6 @@
     "rngtech:tungsten_ore",
     "rngtech:deepslate_tungsten_ore",
     "rngtech:platinum_ore",
-    "rngtech:deepslate_platinum_ore",
-    {
-      "id": "#c:ores/tungsten",
-      "required": false
-    },
-    {
-      "id": "#c:ores/platinum",
-      "required": false
-    }
+    "rngtech:deepslate_platinum_ore"
   ]
 }

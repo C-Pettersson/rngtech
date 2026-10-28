@@ -14,7 +14,7 @@
   ],
   "key": {
     "E": {
-      "ingredient": { "tag": "c:circuits/elite" }
+      "ingredient": { "tag": "rngtech:circuits/elite" }
     },
     "L": {
       "ingredient": { "item": "rngtech:lubricated_frame_coupling" }

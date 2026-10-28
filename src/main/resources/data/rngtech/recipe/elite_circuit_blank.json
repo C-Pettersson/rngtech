@@ -19,7 +19,7 @@
   "key": {
     "A": {
       "ingredient": {
-        "tag": "c:circuits/advanced"
+        "tag": "rngtech:circuits/advanced"
       }
     },
     "B": {

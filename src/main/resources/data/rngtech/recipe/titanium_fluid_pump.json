@@ -14,7 +14,7 @@
   ],
   "key": {
     "E": {
-      "tag": "c:circuits/elite"
+      "tag": "rngtech:circuits/elite"
     },
     "F": {
       "item": "rngtech:pump_frame"

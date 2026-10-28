@@ -14,7 +14,7 @@
   ],
   "key": {
     "B": {
-      "tag": "c:circuits/basic"
+      "tag": "rngtech:circuits/basic"
     },
     "C": {
       "tag": "c:ingots/copper"

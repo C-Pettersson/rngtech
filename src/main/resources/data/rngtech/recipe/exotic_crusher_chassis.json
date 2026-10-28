@@ -8,7 +8,7 @@
   ],
   "key": {
     "A": {
-      "ingredient": { "tag": "c:circuits/ultimate" }
+      "ingredient": { "tag": "rngtech:circuits/ultimate" }
     },
     "N": {
       "ingredient": { "tag": "rngtech:materials/exotic/ingots" }

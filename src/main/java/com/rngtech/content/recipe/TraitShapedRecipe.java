@@ -18,6 +18,9 @@ import net.minecraft.world.item.crafting.ShapedRecipe;
 import net.minecraft.world.item.crafting.ShapedRecipePattern;
 
 public final class TraitShapedRecipe extends ShapedRecipe {
+    /** The pattern as written, before wrapping. The wrapped pattern has no key to encode back to JSON. */
+    private final ShapedRecipePattern sourcePattern;
+
     public TraitShapedRecipe(
             String group,
             CraftingBookCategory category,
@@ -26,6 +29,7 @@ public final class TraitShapedRecipe extends ShapedRecipe {
             boolean showNotification
     ) {
         super(group, category, UnidentifiedTraitIngredient.wrapPattern(pattern), result, showNotification);
+        this.sourcePattern = pattern;
     }
 
     @Override
@@ -71,9 +75,13 @@ public final class TraitShapedRecipe extends ShapedRecipe {
         );
     }
 
+    private ShapedRecipe toShaped() {
+        return new ShapedRecipe(getGroup(), category(), sourcePattern, super.getResultItem(null).copy(), showNotification());
+    }
+
     public static final class Serializer implements RecipeSerializer<TraitShapedRecipe> {
         private static final MapCodec<TraitShapedRecipe> CODEC =
-                ShapedRecipe.Serializer.CODEC.xmap(TraitShapedRecipe::fromShaped, recipe -> recipe);
+                ShapedRecipe.Serializer.CODEC.xmap(TraitShapedRecipe::fromShaped, TraitShapedRecipe::toShaped);
 
         private static final StreamCodec<RegistryFriendlyByteBuf, TraitShapedRecipe> STREAM_CODEC =
                 StreamCodec.of(Serializer::toNetwork, Serializer::fromNetwork);

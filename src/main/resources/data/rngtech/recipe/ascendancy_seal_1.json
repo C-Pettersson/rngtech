@@ -27,7 +27,7 @@
     },
     "C": {
       "ingredient": {
-        "tag": "c:circuits/advanced"
+        "tag": "rngtech:circuits/advanced"
       }
     },
     "K": {

@@ -36,6 +36,7 @@ VANILLA_ORE_HARDNESS = {
     "minecraft:deepslate_copper_ore": 1,
     "minecraft:gold_ore": 2,
     "minecraft:deepslate_gold_ore": 2,
+    "minecraft:nether_gold_ore": 2,
 }
 VANILLA_ORE_BURST_VALUES = [
     "minecraft:coal_ore",
@@ -519,6 +520,8 @@ def generate_circuit_tags(catalog: dict) -> None:
     ])
     for tier in ("basic", "advanced", "elite", "ultimate"):
         tag(f"c/tags/item/circuits/{tier}.json", [f"rngtech:{tier}_electric_circuit"])
+        # RNGTech recipes ask for this tag, so other mods' circuits in c:circuits do not skip RNGTech's circuit chain.
+        tag(f"rngtech/tags/item/circuits/{tier}.json", [f"rngtech:{tier}_electric_circuit"])
 
 
 def generate_recipes(catalog: dict, ore_catalog: dict) -> None:
@@ -748,7 +751,7 @@ def rewrite_recipe_result(path: Path, old_id: str, new_id: str) -> None:
 
 
 def material_ore_hardness(ore_catalog: dict) -> dict[str, int]:
-    """Gates every mod's ore of a material, through its common tag, at the material's hardness."""
+    """The hardness every mod's ore of a material gets through its common tag, when a pack turns that on."""
     hardness = {"iron": 1, "copper": 1, "gold": 2}
     for ore in ore_catalog["ores"]:
         hardness[ore["material"]] = ore["hardness_level"]
@@ -761,6 +764,7 @@ def generate_ore_resources(catalog: dict, ore_catalog: dict) -> None:
     disabled_values: list[str] = []
     rngtech_ore_values: list[str] = []
     hardness_values: dict[int, list[str]] = defaultdict(list)
+    common_hardness_values: dict[int, list[dict]] = defaultdict(list)
     pickaxe_values: list[str] = []
 
     for ore in ore_catalog["ores"]:
@@ -782,7 +786,7 @@ def generate_ore_resources(catalog: dict, ore_catalog: dict) -> None:
     for vanilla_ore, hardness in VANILLA_ORE_HARDNESS.items():
         hardness_values[hardness].append(vanilla_ore)
     for material_id, hardness in material_ore_hardness(ore_catalog).items():
-        hardness_values[hardness].append({"id": f"#c:ores/{material_id}", "required": False})
+        common_hardness_values[hardness].append({"id": f"#c:ores/{material_id}", "required": False})
 
     tag("rngtech/tags/block/ores.json", rngtech_ore_values)
     for host in ("stone", "deepslate"):
@@ -800,6 +804,8 @@ def generate_ore_resources(catalog: dict, ore_catalog: dict) -> None:
     tag("rngtech/tags/block/ore_burst_targets.json", [{"id": "#c:ores", "required": False}, *VANILLA_ORE_BURST_VALUES])
     for hardness, values in sorted(hardness_values.items()):
         tag(f"rngtech/tags/block/ore_hardness/level_{hardness}.json", values)
+    for hardness, values in sorted(common_hardness_values.items()):
+        tag(f"rngtech/tags/block/ore_hardness/common/level_{hardness}.json", values)
     replace_managed_tag_values(PICKAXE_MINING_TAG, pickaxe_values, managed_ore_block_values(catalog))
     generate_ore_worldgen(ore_catalog)
 

@@ -8,11 +8,11 @@ navigation:
 
 # Automation
 
-| Side | Behavior |
+| Face | Behavior |
 |---|---|
-| Top | Inserts dry beads into the lane input slots. |
-| Bottom | Extracts saturated beads from the lane output slots. |
-| Sides | Drain water. |
-| Casing sides | Drain water on behalf of the controller while the column is complete. |
+| Any controller face | Inserts dry beads into the lanes and extracts saturated beads. |
+| Controller sides | Drain water. |
+| Any casing face | Inserts and extracts beads for the controller while the column is complete. |
+| Casing sides | Drain water for the controller while the column is complete. |
 
-The casings sit on the controller's top face once the column is built, so you usually load dry beads by hand. The machine never accepts fluid, and has no FE connection. Casings do not handle items.
+Each inserted bead goes to the lane with the fewest beads that can take it. A hopper on top of the column or a Furnace chain therefore keeps all three lanes busy. Automation cannot pull dry beads out of a lane. The machine never accepts fluid and has no FE connection.
