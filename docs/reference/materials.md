@@ -70,7 +70,7 @@ The current code-backed crafting recipes use a small vanilla material set. Furna
 | Emerald | Ascension Catalyst, Ascension Matrix, Conservation Crystal, Transmutation Crystal, Expansion Crystal, and Calibrated Diamond Crystal calibration catalyst | Current rarity, value, and tuning pressure. |
 | Calibrated Diamond Crystal | Tungstensteel and Nullite Stabilizer Matrix recipes | Stage 6 logic-family calibration output made from Diamond with an Emerald catalyst; used as the T7+ crystal gate. |
 | Gold ingot, diamond, and emerald | Ascension Matrix | Current rarity-ascension ingredients. |
-| Electric circuit tiers | Shared recipe components and machine costs | Tier ladder from Basic through Ultimate; blanks are crafted from mineral insulation, alloy/conductive parts, redstone logic, and calibrated logic, then pressed with the Circuit Mold. Exposed through modern `c:circuits` tags. |
+| Electric circuit tiers | Shared recipe components and machine costs | Tier ladder from Basic through Ultimate; blanks are crafted from mineral insulation, alloy/conductive parts, redstone logic, and calibrated logic, then pressed with the Circuit Mold. RNGTech recipes take `rngtech:circuits/<tier>`; the circuits are also exposed through modern `c:circuits` tags. |
 | Logs, saplings, flowers, bone meal, and charcoal | Plant Reagent and Resin | Current vanilla-accessible organic path for organic reagents, Rubber, and lubricant tag inputs. The Electric Circuit chain does not depend on these materials. |
 
 The family ids below are registered. Their advanced behavior and most non-vanilla recipes remain design targets unless code or data recipes are added for them.
@@ -103,7 +103,7 @@ Use shared tags where possible:
 | Storage block | `c:storage_blocks/<material>` |
 | Dust | `c:dusts/<material>` |
 | Nugget | `c:nuggets/<material>` |
-| Circuit | `c:circuits/<tier>` |
+| Circuit | `c:circuits/<tier>` for export; RNGTech recipes take `rngtech:circuits/<tier>` so other mods' circuits do not skip the circuit chain |
 | Material family | `rngtech:materials/family/<material>` |
 | Material family group | `rngtech:materials/family/<group>` |
 | Exotic-stage recipe forms | `rngtech:materials/exotic/ingots`, `/plates`, `/gears`, `/rods`, and `/casings` |

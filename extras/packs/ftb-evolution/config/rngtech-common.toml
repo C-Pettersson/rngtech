@@ -1,0 +1,36 @@
+# RNGTech in FTB Evolution: only the settings that differ from RNGTech's defaults.
+# NeoForge adds every other key with its default value on first launch.
+# FTB Materials, GeOre, and Create Propulsion already generate these ores in Evolution, and AlmostUnified turns
+# RNGTech's raw drops into FTB Materials items. Titanium and Naquadah stay on: nothing else in the pack places them
+# in the Overworld.
+
+[worldgen]
+
+	[worldgen.ores]
+
+		[worldgen.ores.tin]
+			enabled = false
+
+		[worldgen.ores.zinc]
+			enabled = false
+
+		[worldgen.ores.nickel]
+			enabled = false
+
+		[worldgen.ores.lead]
+			enabled = false
+
+		[worldgen.ores.silver]
+			enabled = false
+
+		[worldgen.ores.aluminum]
+			enabled = false
+
+		[worldgen.ores.osmium]
+			enabled = false
+
+		[worldgen.ores.tungsten]
+			enabled = false
+
+		[worldgen.ores.platinum]
+			enabled = false

@@ -1,5 +1,6 @@
 package com.rngtech.content.blockentity;
 
+import com.rngtech.RNGTechConfig;
 import com.rngtech.content.block.BaseMachineBlock;
 import com.rngtech.content.block.PotentialReactorBlock;
 import com.rngtech.content.item.MachinePartItem;
@@ -641,7 +642,7 @@ public class PotentialReactorBlockEntity extends BaseMachineBlockEntity implemen
         double efficiency = Math.max(0.1, stats.value(MachineStat.EFFICIENCY));
         double stability = Mth.clamp(stats.value(MachineStat.STABILITY), 0.25, 1.50);
         int ticks = stats.adjustedProcessingTicks(work.processingTicks());
-        return Math.max(1.0, stats.generatedEnergyTotal(work.energy(), ticks) * efficiency * stability);
+        return Math.max(1.0, RNGTechConfig.generatedEnergy(stats.generatedEnergyTotal(work.energy(), ticks) * efficiency * stability));
     }
 
     /** How many times an energy export looked a neighbour up instead of reusing its cached capability. */

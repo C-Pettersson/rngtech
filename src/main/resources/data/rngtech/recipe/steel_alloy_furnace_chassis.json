@@ -14,7 +14,7 @@
   ],
   "key": {
     "B": {
-      "tag": "c:circuits/advanced"
+      "tag": "rngtech:circuits/advanced"
     },
     "C": {
       "item": "rngtech:refractory_casing"

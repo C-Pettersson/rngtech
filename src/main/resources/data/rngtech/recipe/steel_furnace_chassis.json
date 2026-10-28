@@ -14,7 +14,7 @@
   ],
   "key": {
     "B": {
-      "ingredient": { "tag": "c:circuits/advanced" }
+      "ingredient": { "tag": "rngtech:circuits/advanced" }
     },
     "C": {
       "ingredient": { "tag": "c:ingots/steel" }

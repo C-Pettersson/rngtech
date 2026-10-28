@@ -1,5 +1,6 @@
 package com.rngtech.content.blockentity;
 
+import com.rngtech.RNGTechConfig;
 import com.rngtech.content.block.BaseMachineBlock;
 import com.rngtech.content.chemistry.GasChemistryMachine;
 import com.rngtech.content.energy.CombustionMixture;
@@ -992,7 +993,7 @@ public class GasChemistryBlockEntity extends BaseMachineBlockEntity
 
     private long adjustedGeneration(long baseEnergy, int processingTicks) {
         MachineStatAccumulator stats = effectiveStats();
-        return Math.max(1L, Mth.lfloor(stats.generatedEnergyTotal(baseEnergy, processingTicks) * stats.value(MachineStat.EFFICIENCY)));
+        return Math.max(1L, Mth.lfloor(RNGTechConfig.generatedEnergy(stats.generatedEnergyTotal(baseEnergy, processingTicks) * stats.value(MachineStat.EFFICIENCY))));
     }
 
     private boolean canAcceptOutput(FluidTank tank, FluidStack output) {

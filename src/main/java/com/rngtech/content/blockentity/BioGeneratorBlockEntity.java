@@ -1,5 +1,6 @@
 package com.rngtech.content.blockentity;
 
+import com.rngtech.RNGTechConfig;
 import com.rngtech.content.block.BaseMachineBlock;
 import com.rngtech.content.energy.BiogasDigestion;
 import com.rngtech.content.item.BatteryCellItem;
@@ -923,7 +924,7 @@ public class BioGeneratorBlockEntity extends BaseMachineBlockEntity implements M
     private double ratedGeneration(MachineStatAccumulator stats) {
         double multiplier = Math.max(0.1, stats.effectiveEnergyGenerationMultiplier());
         double flatBonus = Math.max(0.0, stats.effectiveFlatEnergyGenerationBonus());
-        return BASE_GENERATION_RATE * multiplier + flatBonus;
+        return RNGTechConfig.generatedEnergy(BASE_GENERATION_RATE * multiplier + flatBonus);
     }
 
     /** Digestion and engine FE/t at the selected retention. */

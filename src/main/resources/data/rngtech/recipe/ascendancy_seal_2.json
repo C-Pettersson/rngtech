@@ -22,7 +22,7 @@
   "key": {
     "C": {
       "ingredient": {
-        "tag": "c:circuits/elite"
+        "tag": "rngtech:circuits/elite"
       }
     },
     "D": {

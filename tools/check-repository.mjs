@@ -42,6 +42,17 @@ for (const file of files) {
     }
 }
 
+// Lang text for a quest, task, or chapter that no quest file uses any more shows up as dead text for translators.
+const questFiles = files.filter(file => file.startsWith('extras/ftbquests/') && file.endsWith('.snbt') && existsSync(resolve(root, file)));
+const questIds = new Set(questFiles
+    .filter(file => !file.includes('/lang/'))
+    .flatMap(file => [...readFileSync(resolve(root, file), 'utf8').matchAll(/\b[0-9A-F]{16}\b/g)].map(match => match[0])));
+for (const file of questFiles.filter(file => file.includes('/lang/'))) {
+    for (const match of readFileSync(resolve(root, file), 'utf8').matchAll(/^\t[a-z_]+\.([0-9A-F]{16})\.[a-z_]+:/gm)) {
+        if (!questIds.has(match[1])) issues.push(`${file}: lang key for ${match[1]}, which no quest file uses`);
+    }
+}
+
 if (issues.length) {
     console.error(issues.join('\n'));
     process.exitCode = 1;

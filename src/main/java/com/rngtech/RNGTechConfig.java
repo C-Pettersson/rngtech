@@ -85,6 +85,10 @@ public final class RNGTechConfig {
             .comment("Whether Solar Panels and Solar Array Controllers generate FE in dimensions other than the Overworld, Nether, and End.")
             .define("solar.dimensions.other", false);
 
+    public static final ModConfigSpec.DoubleValue ENERGY_GENERATION_MULTIPLIER = BUILDER
+            .comment("Multiplier applied to the FE every RNGTech generator makes, after machine stats. Fuel burn time, heat, and byproducts stay the same, so FE per item scales too. Use it to match another energy mod in a modpack.")
+            .defineInRange("energy.generationMultiplier", 1.0D, 0.01D, 100.0D);
+
     public static final ModConfigSpec.IntValue CALIBRATION_STABILITY_BONUS = BUILDER
             .comment("Flat stability adjustment applied to all calibrated outputs. Use negative values to make calibration more punishing.")
             .defineInRange("calibration.stabilityBonus", 0, -100, 100);
@@ -214,6 +218,7 @@ public final class RNGTechConfig {
     private static final OreWorldgenConfig ORE_WORLDGEN_CONFIG = defineOreWorldgen();
     public static final ModConfigSpec.BooleanValue ORE_WORLDGEN_ENABLED = ORE_WORLDGEN_CONFIG.enabled();
     public static final ModConfigSpec.EnumValue<VanillaOreBridgePolicy> ORE_VANILLA_BRIDGE_POLICY = ORE_WORLDGEN_CONFIG.bridgePolicy();
+    public static final ModConfigSpec.BooleanValue ORE_COMMON_TAG_HARDNESS = ORE_WORLDGEN_CONFIG.commonTagHardness();
     public static final Map<String, ModConfigSpec.BooleanValue> ORE_WORLDGEN = ORE_WORLDGEN_CONFIG.materials();
 
     public static final ModConfigSpec SPEC = BUILDER.build();
@@ -247,6 +252,11 @@ public final class RNGTechConfig {
         return new UniqueLootConfig(enabled, Collections.unmodifiableMap(values));
     }
 
+    /** {@code energy} FE from an RNGTech generator, scaled by the pack's generation multiplier. */
+    public static double generatedEnergy(double energy) {
+        return energy * ENERGY_GENERATION_MULTIPLIER.get();
+    }
+
     /** Whether the default loot tables may drop {@code uniqueId}. */
     public static boolean uniqueLootEnabled(String uniqueId) {
         ModConfigSpec.BooleanValue unique = UNIQUE_LOOT.get(uniqueId);
@@ -261,7 +271,10 @@ public final class RNGTechConfig {
                 .define("enabled", true);
         ModConfigSpec.EnumValue<VanillaOreBridgePolicy> bridgePolicy = BUILDER
                 .comment("How far pickaxes that are not Modular tools reach on ore hardness, by their vanilla tier. Items in the rngtech:ore_reach data map use their listed level instead.")
-                .defineEnum("vanillaToolBridgePolicy", VanillaOreBridgePolicy.EARLY_BRIDGE);
+                .defineEnum("vanillaToolBridgePolicy", VanillaOreBridgePolicy.TIER_LADDER);
+        ModConfigSpec.BooleanValue commonTagHardness = BUILDER
+                .comment("Whether other mods' ores in a metal's c:ores/<metal> tag get that metal's ore hardness, through the rngtech:ore_hardness/common/level_<n> block tags. Off keeps hardness on RNGTech's own ores and the vanilla ores it lists, so other mods' pickaxes still mine their own ores. Turn it on for a pack where RNGTech gates all ore progression, and give other mods' tools an rngtech:ore_reach entry.")
+                .define("commonOreTagHardness", false);
         Map<String, ModConfigSpec.BooleanValue> values = new LinkedHashMap<>();
         for (OreDefinition ore : OreCatalog.ores()) {
             values.put(ore.materialId(), BUILDER
@@ -270,7 +283,7 @@ public final class RNGTechConfig {
         }
         BUILDER.pop();
         BUILDER.pop();
-        return new OreWorldgenConfig(enabled, bridgePolicy, Collections.unmodifiableMap(values));
+        return new OreWorldgenConfig(enabled, bridgePolicy, commonTagHardness, Collections.unmodifiableMap(values));
     }
 
     public enum DormantFailedAbsorb {
@@ -289,6 +302,7 @@ public final class RNGTechConfig {
         BOOTSTRAP_ONLY,
         EARLY_BRIDGE,
         VANILLA_TIER_MAPPING,
+        TIER_LADDER,
         MODULAR_ONLY
     }
 
@@ -298,6 +312,7 @@ public final class RNGTechConfig {
     private record OreWorldgenConfig(
             ModConfigSpec.BooleanValue enabled,
             ModConfigSpec.EnumValue<VanillaOreBridgePolicy> bridgePolicy,
+            ModConfigSpec.BooleanValue commonTagHardness,
             Map<String, ModConfigSpec.BooleanValue> materials
     ) {
     }

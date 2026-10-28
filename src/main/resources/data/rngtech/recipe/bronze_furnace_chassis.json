@@ -14,7 +14,7 @@
   ],
   "key": {
     "B": {
-      "ingredient": { "tag": "c:circuits/basic" }
+      "ingredient": { "tag": "rngtech:circuits/basic" }
     },
     "C": {
       "ingredient": { "tag": "c:ingots/bronze" }

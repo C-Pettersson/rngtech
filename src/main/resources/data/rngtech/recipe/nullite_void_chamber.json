@@ -23,7 +23,7 @@
             "item": "rngtech:nullite_plate"
         },
         "U": {
-            "tag": "c:circuits/ultimate"
+            "tag": "rngtech:circuits/ultimate"
         }
     },
     "result": {

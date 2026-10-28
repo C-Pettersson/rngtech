@@ -1,5 +1,6 @@
 package com.rngtech.content.blockentity;
 
+import com.rngtech.RNGTechConfig;
 import com.rngtech.content.block.BaseMachineBlock;
 import com.rngtech.content.energy.CorrosionCellLoad;
 import com.rngtech.content.item.BatteryCellItem;
@@ -711,7 +712,7 @@ public class CorrosionCellBlockEntity extends BaseMachineBlockEntity
         double efficiency = Math.max(0.1, stats.value(MachineStat.EFFICIENCY));
         double stability = Mth.clamp(stats.value(MachineStat.STABILITY), 0.25, 1.50);
         int ticks = stats.adjustedProcessingTicks(recipe.processingTicks());
-        return Math.max(1.0, stats.generatedEnergyTotal(recipe.energy(), ticks) * efficiency * stability);
+        return Math.max(1.0, RNGTechConfig.generatedEnergy(stats.generatedEnergyTotal(recipe.energy(), ticks) * efficiency * stability));
     }
 
     private ItemStack availableElectrolyteStack() {

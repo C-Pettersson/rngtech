@@ -74,12 +74,13 @@ Each row crushes ore down to dust in two steps and smelts the dust, with a Crush
 
 ### Scaling energy
 
-RNGTech has no global FE multiplier. To scale the whole mod, multiply generator and machine recipes by the same factor so the stages stay in step.
+`energy.generationMultiplier` (default 1.0) multiplies the FE that every RNGTech generator makes. Fuels burn for the same time, so FE per item changes by the same factor. Use it to match another energy mod in your pack. RNGTech has no multiplier for machine FE costs. To make the whole mod cheaper or more expensive, change the machine recipes too, so the stages stay in step.
 
 | You want to change | How |
 |---|---|
 | FE cost of a machine recipe | Override the recipe in a datapack and change `energy` (total FE per craft) or `processing_ticks`. |
-| FE output of a fuel generator | Override its recipe and change `energy`: `gas_combustion` (Syngas), `ammonia_power_cycle` (Ammonia and Hydrogen in the Fuel Cell), `vacuum_collapse`, `cavitation`, `corrosion_cell`, `potential_reactor`. |
+| FE output of all RNGTech generators | `energy.generationMultiplier`. It also changes Solid Fuel Burner FE per item, Solar Panel FE/t, and Bio Generator FE per item. |
+| FE output of one fuel generator | Override its recipe and change `energy`: `gas_combustion` (Syngas), `ammonia_power_cycle` (Ammonia and Hydrogen in the Fuel Cell), `vacuum_collapse`, `cavitation`, `corrosion_cell`, `potential_reactor`. |
 | Solid Fuel Burner FE per item | Each fuel gives 10 FE per burn tick (Coal: 16,000 FE). Change the burn time in NeoForge's `furnace_fuels` data map. This also changes vanilla furnaces. |
 | Other mods' fuels in the Solid Fuel Burner | Add the item to a tier tag `rngtech:solid_fuel/tier_1` to `tier_4`, plus `rngtech:solid_fuel/item_fuels` or `block_fuels`. |
 | Bio Generator fuels | Add the item to a `rngtech:bio_generator/*` tag. It gives that category's fixed FE, such as `potato_fuels` (120 FE). |
@@ -87,7 +88,7 @@ RNGTech has no global FE multiplier. To scale the whole mod, multiply generator 
 | Resonance Calibrator cost | `calibration.energyMultiplier` and `calibration.timeMultiplier`. |
 | Solar in other dimensions | `solar.dimensions.overworld`, `nether`, `end`, `other`. The Overworld is the default. |
 
-You cannot change these without code: connector caps, Battery Cell sizes, Heat Core FE/t, Solar Panel FE/t, and Bio Generator FE per category.
+You cannot change these one at a time without code: connector caps, Battery Cell sizes, Heat Core FE/t, Solar Panel FE/t, and Bio Generator FE per category.
 
 !!! warning "Recipe gotchas"
     - If `energy` holds an invalid value, such as `0` or a negative number, most recipe types fall back to their default without an error. RNGTech ignores misspelled fields. Check the value in JEI after `/reload`.
@@ -169,7 +170,9 @@ These live in `config/rngtech-common.toml`.
 | `materials.<material>` | on | Turn off to stop the material's recipes loading. Its items show as disabled. |
 | `worldgen.ores.enabled` | on | RNGTech ore generation in new chunks. |
 | `worldgen.ores.<material>.enabled` | on | One ore's generation. |
-| `worldgen.ores.vanillaToolBridgePolicy` | `EARLY_BRIDGE` | How far tools other than Modular tools reach on ore hardness. See [Tool reach](#tool-reach). |
+| `worldgen.ores.vanillaToolBridgePolicy` | `TIER_LADDER` | How far tools other than Modular tools reach on ore hardness. See [Tool reach](#tool-reach). |
+| `worldgen.ores.commonOreTagHardness` | off | Turn on to give other mods' ores their metal's hardness. See [Ore hardness](#ore-hardness). |
+| `energy.generationMultiplier` | 1.0 | Multiplies the FE of every RNGTech generator. See [Scaling energy](#scaling-energy). |
 | `restrictedTools.mode` | `NORMAL` | `WEAKENED` or `USELESS` vanilla tools. See [Restricted tools](#restricted-tools). |
 | `restrictedTools.weakenedSpeedMultiplier` | 0.25 | Mining speed of restricted tools in `WEAKENED` mode. |
 | `restrictedTools.vanillaRecipesEnabled` | on | Turn off to remove the stone to netherite pickaxe, axe, and shovel recipes. |
@@ -193,7 +196,7 @@ Players move through RNGTech's stages by mining harder ores with better [Modular
 
 Each metal has an ore hardness from 1 to 8: 1 for Iron and Copper, 2 for Gold, Tin, and Zinc, and up to 8 for Naquadah. The [Ore hardness](modular-tools.md#ore-hardness) table lists which tool heads reach each level.
 
-- **Other mods' ores** of the same metal get the same hardness. The block tags `rngtech:ore_hardness/level_1` to `level_8` include each metal's common tag, such as `c:ores/tin`. This also gates Nether Gold Ore, which is in `c:ores/gold`.
+- **Other mods' ores** have no hardness by default, so other mods' pickaxes still mine them. Set `worldgen.ores.commonOreTagHardness` to on to give them their metal's hardness. The block tags `rngtech:ore_hardness/common/level_1` to `level_8` hold each metal's common tag, such as `c:ores/tin`, and count only when the setting is on.
 - **Add an ore** RNGTech doesn't know, such as Diamond Ore, by adding it to a level tag.
 - **Raise an ore** by adding it to a higher level tag. An ore in several level tags uses the highest one.
 - **Lower an ore** by overriding its level tag with `"replace": true`, leaving the ore out, then adding it to the lower tag.
@@ -209,8 +212,9 @@ Modular tools reach their head's hardness. Every other item reaches as far as `w
 |---|---:|---:|---:|---:|
 | `MODULAR_ONLY` | none | none | none | none |
 | `BOOTSTRAP_ONLY` | 1 | 1 | 1 | 1 |
-| `EARLY_BRIDGE` (default) | 1 | 2 | 2 | 2 |
+| `EARLY_BRIDGE` | 1 | 2 | 2 | 2 |
 | `VANILLA_TIER_MAPPING` | 1 | 2 | 4 | 5 |
+| `TIER_LADDER` (default) | 1 | 3 | 6 | 8 |
 
 Wooden and golden pickaxes, axes, and shovels reach no ore hardness. Only the Netherite Pickaxe counts as netherite tier, because vanilla has no block that needs one. Give another mod's tool its own reach in the `rngtech:ore_reach` item data map, at `data/rngtech/data_maps/item/ore_reach.json` in your datapack. A listed item ignores the policy:
 
@@ -244,6 +248,7 @@ For a pack where RNGTech's Modular tools are the only way to mine, put this in `
 ```toml
 [worldgen.ores]
     vanillaToolBridgePolicy = "MODULAR_ONLY"
+    commonOreTagHardness = true
 
 [restrictedTools]
     mode = "USELESS"
@@ -332,7 +337,8 @@ Glyphs (`rngtech:glyph`) have no recipe. Their tier is the `rngtech:glyph_tier` 
 
 ## Compatibility
 
-- **Other mods' metals:** RNGTech recipes use common tags such as `c:ingots/tin` and `c:ores/tin`, so other mods' tin works in them. Their ores share RNGTech's [ore hardness](#ore-hardness).
+- **Other mods' metals:** RNGTech recipes use common tags such as `c:ingots/tin` and `c:ores/tin`, so other mods' tin works in them. Their ores get RNGTech's [ore hardness](#ore-hardness) only when you turn it on.
+- **Circuits:** RNGTech's Electric Circuits are in `c:circuits/basic` to `ultimate`, so other mods' recipes can use them. RNGTech recipes ask for `rngtech:circuits/basic` to `ultimate`, which hold only RNGTech's circuits. Add another mod's circuit to one of these tags to let RNGTech recipes take it.
 - **AE2 and Refined Storage:** Universal Cables can link their networks.
 - **JEI and Jade** show RNGTech recipes and machine state.
 - **FTB Quests:** the repository has a ready-made quest line in [extras/ftbquests](https://github.com/c-pettersson/rngtech/tree/main/extras/ftbquests). Copy its `config/ftbquests` into your pack.

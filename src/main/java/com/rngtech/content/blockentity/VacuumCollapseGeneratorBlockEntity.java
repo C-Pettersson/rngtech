@@ -1,5 +1,6 @@
 package com.rngtech.content.blockentity;
 
+import com.rngtech.RNGTechConfig;
 import com.rngtech.content.block.BaseMachineBlock;
 import com.rngtech.content.block.VacuumCollapseGeneratorBlock;
 import com.rngtech.content.item.CollapseNozzleItem;
@@ -616,7 +617,7 @@ public class VacuumCollapseGeneratorBlockEntity extends BaseMachineBlockEntity i
         double instabilityPenalty = 1.0 - Math.min(0.35, instabilityPressure(recipe, stats, depth) * 0.08);
         int ticks = adjustedProcessingTicks(recipe, stats, depth);
         double baseEnergy = recipe.energy() * VacuumCollapseDynamics.energy(depth);
-        return Math.max(1L, Math.round(stats.generatedEnergyTotal(baseEnergy, ticks) * efficiency * instabilityPenalty));
+        return Math.max(1L, Math.round(RNGTechConfig.generatedEnergy(stats.generatedEnergyTotal(baseEnergy, ticks) * efficiency * instabilityPenalty)));
     }
 
     private int adjustedProcessingTicks(VacuumCollapseRecipe recipe, MachineStatAccumulator stats, int depth) {

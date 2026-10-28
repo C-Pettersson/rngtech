@@ -102,7 +102,7 @@ item_ids:
 - **Built at:** [Tool Bench](rngtech:tool-bench.md)
 - **Power:** Optional Battery Cell
 
-**Modular Field Tools** are RNGTech's picks, hammers, shovels, diggers, axes, and treefellers. Each one is built at the [Tool Bench](rngtech:tool-bench.md) from a separate **Tool Head** and **Tool Rod**, and each part keeps its own rarity and affixes. They are also how you mine the harder RNGTech ores; vanilla pickaxes only reach the first two ore-hardness levels by default.
+**Modular Field Tools** are RNGTech's picks, hammers, shovels, diggers, axes, and treefellers. Each one is built at the [Tool Bench](rngtech:tool-bench.md) from a separate **Tool Head** and **Tool Rod**, and each part keeps its own rarity and affixes. They mine RNGTech ores early, and other pickaxes also mine them by their tier.
 
 ## Tool types
 

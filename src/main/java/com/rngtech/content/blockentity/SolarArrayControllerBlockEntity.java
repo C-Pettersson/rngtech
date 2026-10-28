@@ -1,5 +1,6 @@
 package com.rngtech.content.blockentity;
 
+import com.rngtech.RNGTechConfig;
 import com.rngtech.content.block.BaseMachineBlock;
 import com.rngtech.content.energy.SolarPanelMaterial;
 import com.rngtech.content.item.BatteryCellItem;
@@ -472,7 +473,7 @@ public class SolarArrayControllerBlockEntity extends BaseMachineBlockEntity impl
 
         if (generatedThisTick > 0.0) {
             double controllerEfficiency = Math.max(0.01, stats.value(MachineStat.EFFICIENCY));
-            generatedThisTick = Math.max(0.0, stats.generatedEnergyTotal(generatedThisTick, 1)) * controllerEfficiency;
+            generatedThisTick = RNGTechConfig.generatedEnergy(Math.max(0.0, stats.generatedEnergyTotal(generatedThisTick, 1)) * controllerEfficiency);
         }
         if (active > 1 && materialState.singleMaterial() && stats.value(MachineStat.SOLAR_PANEL_SYNCHRONIZATION) > 0.0) {
             generatedThisTick *= 1.0 + stats.value(MachineStat.SOLAR_PANEL_SYNCHRONIZATION) / 100.0;

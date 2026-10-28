@@ -18,7 +18,7 @@
   ],
   "key": {
     "B": {
-      "tag": "c:circuits/basic"
+      "tag": "rngtech:circuits/basic"
     },
     "C": {
       "tag": "rngtech:machine_frames/base"
