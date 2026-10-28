@@ -310,7 +310,8 @@ public class GasChemistryScreen extends AbstractContainerScreen<GasChemistryMenu
                             stat("rngtech.stat.energy_generation", menu.statValue(GasChemistryMenu.energyGenerationDataIndex()), MachineStat.ENERGY_GENERATION),
                             menu.energyDelta(),
                             menu.statValue(GasChemistryMenu.baseEnergyGenerationDataIndex()),
-                            menu.statValue(GasChemistryMenu.flatEnergyGenerationDataIndex())
+                            menu.statValue(GasChemistryMenu.flatEnergyGenerationDataIndex()),
+                            menu.packGenerationMultiplier()
                     ),
                     stat("rngtech.stat.efficiency", menu.statValue(GasChemistryMenu.efficiencyDataIndex()), MachineStat.EFFICIENCY),
                     stat("rngtech.stat.processing_speed", menu.statValue(GasChemistryMenu.processingSpeedDataIndex()), MachineStat.PROCESSING_SPEED)

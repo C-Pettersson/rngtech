@@ -1,0 +1,33 @@
+# RNGTech in Techopolis 3: only the settings that differ from RNGTech's defaults.
+# NeoForge adds every other key with its default value on first launch.
+# AllTheOres, Mekanism, Immersive Engineering, and Mekanism More Machine already generate these ores, and
+# AlmostUnified turns RNGTech's ingots and dusts into their AllTheOres versions anyway. Titanium, Tungsten, and
+# Naquadah stay on: nothing else in the pack places them.
+
+[worldgen]
+
+	[worldgen.ores]
+
+		[worldgen.ores.tin]
+			enabled = false
+
+		[worldgen.ores.zinc]
+			enabled = false
+
+		[worldgen.ores.nickel]
+			enabled = false
+
+		[worldgen.ores.lead]
+			enabled = false
+
+		[worldgen.ores.silver]
+			enabled = false
+
+		[worldgen.ores.aluminum]
+			enabled = false
+
+		[worldgen.ores.osmium]
+			enabled = false
+
+		[worldgen.ores.platinum]
+			enabled = false

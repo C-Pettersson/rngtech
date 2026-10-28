@@ -57,7 +57,8 @@ public class CorrosionCellMenu extends AbstractContainerMenu implements StatBrea
     private static final int DATA_ELECTROLYTE_FLUID_ID = 21;
     private static final int DATA_LOAD = 22;
     private static final int DATA_LIVE_LOAD = 23;
-    private static final int DATA_COUNT = 24;
+    private static final int DATA_PACK_GENERATION_MULTIPLIER = 24;
+    private static final int DATA_COUNT = 25;
     private static final int BUTTON_LOAD_BASE = 8000;
     private static final int STAT_SCALE = 100;
     private static final int PLATE_SLOT = 0;
@@ -434,5 +435,10 @@ public class CorrosionCellMenu extends AbstractContainerMenu implements StatBrea
         public boolean isActive() {
             return activeSupplier.getAsBoolean();
         }
+    }
+
+    /** The pack's config multiplier on this generator's FE, global times stage. */
+    public double packGenerationMultiplier() {
+        return GenerationMenuSupport.packMultiplier(data.get(DATA_PACK_GENERATION_MULTIPLIER));
     }
 }

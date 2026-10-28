@@ -605,7 +605,8 @@ public class VacuumCollapseGeneratorScreen extends AbstractContainerScreen<Vacuu
                 statLines,
                 menu.averageEnergyPerTick(),
                 menu.statValue(VacuumCollapseGeneratorMenu.baseEnergyGenerationDataIndex()),
-                menu.statValue(VacuumCollapseGeneratorMenu.flatEnergyGenerationDataIndex())
+                menu.statValue(VacuumCollapseGeneratorMenu.flatEnergyGenerationDataIndex()),
+                menu.packGenerationMultiplier()
         );
     }
 

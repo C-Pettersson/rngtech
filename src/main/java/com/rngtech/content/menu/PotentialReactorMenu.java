@@ -53,7 +53,8 @@ public class PotentialReactorMenu extends AbstractContainerMenu implements StatB
     private static final int DATA_BASE_ENERGY_GENERATION = 17;
     private static final int DATA_REPEAT_PAYOUT = 18;
     private static final int DATA_BURN_HISTORY = 19;
-    private static final int DATA_COUNT = DATA_BURN_HISTORY + PotentialReactorBlockEntity.BURN_MEMORY;
+    private static final int DATA_PACK_GENERATION_MULTIPLIER = DATA_BURN_HISTORY + PotentialReactorBlockEntity.BURN_MEMORY;
+    private static final int DATA_COUNT = DATA_PACK_GENERATION_MULTIPLIER + 1;
     private static final int STAT_SCALE = 100;
     private static final int INPUT_SLOT = 0;
     private static final int RESIDUE_SLOT = 1;
@@ -391,5 +392,10 @@ public class PotentialReactorMenu extends AbstractContainerMenu implements StatB
         public boolean isActive() {
             return activeSupplier.getAsBoolean();
         }
+    }
+
+    /** The pack's config multiplier on this generator's FE, global times stage. */
+    public double packGenerationMultiplier() {
+        return GenerationMenuSupport.packMultiplier(data.get(DATA_PACK_GENERATION_MULTIPLIER));
     }
 }

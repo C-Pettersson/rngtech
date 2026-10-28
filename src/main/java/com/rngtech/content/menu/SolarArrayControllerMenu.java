@@ -52,7 +52,8 @@ public class SolarArrayControllerMenu extends AbstractContainerMenu implements S
     private static final int DATA_PANEL_RANGE = 20;
     private static final int DATA_FLAT_ENERGY_GENERATION = 21;
     private static final int DATA_BASE_ENERGY_GENERATION = 22;
-    private static final int DATA_COUNT = 23;
+    private static final int DATA_PACK_GENERATION_MULTIPLIER = 23;
+    private static final int DATA_COUNT = 24;
     private static final int STAT_SCALE = 100;
     public static final int BUTTON_TOGGLE_PREVIEW_RANGE = 10;
     private static final int BATTERY_CELL_SLOT = 0;
@@ -399,5 +400,10 @@ public class SolarArrayControllerMenu extends AbstractContainerMenu implements S
         public boolean isActive() {
             return activeSupplier.getAsBoolean();
         }
+    }
+
+    /** The pack's config multiplier on this generator's FE, global times stage. */
+    public double packGenerationMultiplier() {
+        return GenerationMenuSupport.packMultiplier(data.get(DATA_PACK_GENERATION_MULTIPLIER));
     }
 }

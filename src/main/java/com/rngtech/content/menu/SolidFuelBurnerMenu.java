@@ -51,7 +51,8 @@ public class SolidFuelBurnerMenu extends AbstractContainerMenu implements StatBr
     private static final int DATA_CONNECTOR_CAP = 19;
     private static final int DATA_STOKE = 20;
     private static final int DATA_RATED_GENERATION = 21;
-    private static final int DATA_COUNT = 22;
+    private static final int DATA_PACK_GENERATION_MULTIPLIER = 22;
+    private static final int DATA_COUNT = 23;
     private static final int BUTTON_STOKE_BASE = 8000;
     private static final int STAT_SCALE = 100;
     private static final int FUEL_SLOT_START = 0;
@@ -396,5 +397,10 @@ public class SolidFuelBurnerMenu extends AbstractContainerMenu implements StatBr
         public boolean isActive() {
             return activeSupplier.getAsBoolean();
         }
+    }
+
+    /** The pack's config multiplier on this generator's FE, global times stage. */
+    public double packGenerationMultiplier() {
+        return GenerationMenuSupport.packMultiplier(data.get(DATA_PACK_GENERATION_MULTIPLIER));
     }
 }

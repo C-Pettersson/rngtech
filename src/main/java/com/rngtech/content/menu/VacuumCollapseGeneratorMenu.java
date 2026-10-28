@@ -58,7 +58,8 @@ public class VacuumCollapseGeneratorMenu extends AbstractContainerMenu implement
     private static final int DATA_PEAK_HIGH = 25;
     private static final int DATA_AVERAGE_LOW = 26;
     private static final int DATA_AVERAGE_HIGH = 27;
-    private static final int DATA_COUNT = 28;
+    private static final int DATA_PACK_GENERATION_MULTIPLIER = 28;
+    private static final int DATA_COUNT = 29;
     private static final int BUTTON_DEPTH_BASE = 9000;
     private static final int STAT_SCALE = 100;
     private static final int INPUT_SLOT = 0;
@@ -403,5 +404,10 @@ public class VacuumCollapseGeneratorMenu extends AbstractContainerMenu implement
         public boolean isActive() {
             return activeSupplier.getAsBoolean();
         }
+    }
+
+    /** The pack's config multiplier on this generator's FE, global times stage. */
+    public double packGenerationMultiplier() {
+        return GenerationMenuSupport.packMultiplier(data.get(DATA_PACK_GENERATION_MULTIPLIER));
     }
 }

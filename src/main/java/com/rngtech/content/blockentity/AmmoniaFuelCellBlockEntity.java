@@ -5,6 +5,7 @@ import com.rngtech.content.block.BaseMachineBlock;
 import com.rngtech.content.item.AmmoniaPartItem;
 import com.rngtech.content.item.BatteryCellItem;
 import com.rngtech.content.menu.AmmoniaFuelCellMenu;
+import com.rngtech.content.menu.GenerationMenuSupport;
 import com.rngtech.content.purge.FluidPurgeRole;
 import com.rngtech.content.purge.FluidPurgeTarget;
 import com.rngtech.content.purge.PurgeableFluidStorage;
@@ -86,6 +87,7 @@ public class AmmoniaFuelCellBlockEntity extends BaseMachineBlockEntity
     private static final int DATA_FLAT_ENERGY_GENERATION = 13;
     private static final int DATA_BASE_ENERGY_GENERATION = 14;
     private static final int DATA_FUEL_HYDROGEN = 15;
+    private static final int DATA_PACK_GENERATION_MULTIPLIER = 16;
     private static final int STAT_SCALE = 100;
     private static final int VISUAL_SYNC_INTERVAL = 5;
     private static final Direction[] ENERGY_OUTPUT_DIRECTIONS = {
@@ -173,6 +175,7 @@ public class AmmoniaFuelCellBlockEntity extends BaseMachineBlockEntity
                 case DATA_EFFICIENCY -> scaledStat(stats, MachineStat.EFFICIENCY);
                 case DATA_PROCESSING_SPEED -> scaledStat(stats, MachineStat.PROCESSING_SPEED);
                 case DATA_REFINEMENT_POTENTIAL -> scaledStat(stats, MachineStat.REFINEMENT_POTENTIAL);
+                case DATA_PACK_GENERATION_MULTIPLIER -> GenerationMenuSupport.packMultiplierData(refinementComponentStage());
                 default -> 0;
             };
         }
@@ -183,7 +186,7 @@ public class AmmoniaFuelCellBlockEntity extends BaseMachineBlockEntity
 
         @Override
         public int getCount() {
-            return DATA_FUEL_HYDROGEN + 1;
+            return DATA_PACK_GENERATION_MULTIPLIER + 1;
         }
     };
 
@@ -616,7 +619,8 @@ public class AmmoniaFuelCellBlockEntity extends BaseMachineBlockEntity
     private long adjustedEnergy(AmmoniaPowerCycleRecipe recipe) {
         MachineStatAccumulator stats = effectiveStats();
         int ticks = adjustedTicks(recipe);
-        return Math.max(1L, Mth.lfloor(RNGTechConfig.generatedEnergy(stats.generatedEnergyTotal(recipe.energy(), ticks) * stats.value(MachineStat.EFFICIENCY))));
+        return Math.max(1L, Mth.lfloor(RNGTechConfig.generatedEnergy(stats.generatedEnergyTotal(recipe.energy(), ticks) * stats.value(MachineStat.EFFICIENCY),
+                refinementComponentStage())));
     }
 
     public MachineStatAccumulator effectiveStats() {

@@ -6,6 +6,7 @@ import com.rngtech.content.block.VacuumCollapseGeneratorBlock;
 import com.rngtech.content.item.CollapseNozzleItem;
 import com.rngtech.content.item.MachinePartItem;
 import com.rngtech.content.item.VacuumCollapsePartItem;
+import com.rngtech.content.menu.GenerationMenuSupport;
 import com.rngtech.content.menu.VacuumCollapseGeneratorMenu;
 import com.rngtech.content.recipe.VacuumCollapseRecipe;
 import com.rngtech.content.registry.ModBlockEntities;
@@ -97,6 +98,7 @@ public class VacuumCollapseGeneratorBlockEntity extends BaseMachineBlockEntity i
     private static final int DATA_PEAK_HIGH = 25;
     private static final int DATA_AVERAGE_LOW = 26;
     private static final int DATA_AVERAGE_HIGH = 27;
+    private static final int DATA_PACK_GENERATION_MULTIPLIER = 28;
     private static final int STAT_SCALE = 100;
     private static final int BASE_TRANSFER = 8192;
     private static final int VISUAL_SYNC_INTERVAL = 5;
@@ -181,6 +183,7 @@ public class VacuumCollapseGeneratorBlockEntity extends BaseMachineBlockEntity i
                 case DATA_PEAK_HIGH -> highInt(peakEnergyPerTick(stats));
                 case DATA_AVERAGE_LOW -> lowInt(collapseAverageEnergyPerTick(stats));
                 case DATA_AVERAGE_HIGH -> highInt(collapseAverageEnergyPerTick(stats));
+                case DATA_PACK_GENERATION_MULTIPLIER -> GenerationMenuSupport.packMultiplierData(generatorStage());
                 default -> 0;
             };
         }
@@ -191,7 +194,7 @@ public class VacuumCollapseGeneratorBlockEntity extends BaseMachineBlockEntity i
 
         @Override
         public int getCount() {
-            return DATA_AVERAGE_HIGH + 1;
+            return DATA_PACK_GENERATION_MULTIPLIER + 1;
         }
     };
 
@@ -617,7 +620,13 @@ public class VacuumCollapseGeneratorBlockEntity extends BaseMachineBlockEntity i
         double instabilityPenalty = 1.0 - Math.min(0.35, instabilityPressure(recipe, stats, depth) * 0.08);
         int ticks = adjustedProcessingTicks(recipe, stats, depth);
         double baseEnergy = recipe.energy() * VacuumCollapseDynamics.energy(depth);
-        return Math.max(1L, Math.round(RNGTechConfig.generatedEnergy(stats.generatedEnergyTotal(baseEnergy, ticks) * efficiency * instabilityPenalty)));
+        return Math.max(1L, Math.round(RNGTechConfig.generatedEnergy(
+                stats.generatedEnergyTotal(baseEnergy, ticks) * efficiency * instabilityPenalty, generatorStage())));
+    }
+
+    /** The installed Collapse Nozzle sets the generator's stage for the pack's stage energy multiplier. */
+    private int generatorStage() {
+        return nozzleStack().getItem() instanceof CollapseNozzleItem nozzle ? nozzle.stage() : 7;
     }
 
     private int adjustedProcessingTicks(VacuumCollapseRecipe recipe, MachineStatAccumulator stats, int depth) {

@@ -647,7 +647,8 @@ public class CavitationGeneratorScreen extends AbstractContainerScreen<Cavitatio
                 lines.toArray(MachineScreenStyle.StatLine[]::new),
                 menu.energyPerTick(),
                 menu.statValue(CavitationGeneratorMenu.baseEnergyGenerationDataIndex()),
-                menu.statValue(CavitationGeneratorMenu.flatEnergyGenerationDataIndex())
+                menu.statValue(CavitationGeneratorMenu.flatEnergyGenerationDataIndex()),
+                menu.packGenerationMultiplier()
         );
     }
 

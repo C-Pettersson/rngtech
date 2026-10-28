@@ -10,6 +10,7 @@ import com.rngtech.content.item.CollapseNozzleItem;
 import com.rngtech.content.item.GearParts;
 import com.rngtech.content.item.MachinePartItem;
 import com.rngtech.content.menu.CavitationGeneratorMenu;
+import com.rngtech.content.menu.GenerationMenuSupport;
 import com.rngtech.content.purge.FluidOutputOverflow;
 import com.rngtech.content.purge.FluidPurgeRole;
 import com.rngtech.content.purge.FluidPurgeTarget;
@@ -142,6 +143,7 @@ public class CavitationGeneratorBlockEntity extends BaseMachineBlockEntity
     private static final int DATA_MAX_PENALTY = 42;
     private static final int DATA_FLUID_OUTPUT_RATE = 43;
     private static final int DATA_GENERATION_FLUID_BONUS = 44;
+    private static final int DATA_PACK_GENERATION_MULTIPLIER = 45;
     private static final int STAT_SCALE = 100;
     /** Share of the extra FE Energy Generation bonuses would make that a fluid-output cycle adds to its fluid instead. */
     public static final double GENERATION_TO_FLUID = 0.25;
@@ -282,6 +284,7 @@ public class CavitationGeneratorBlockEntity extends BaseMachineBlockEntity
                 case DATA_GENERATION_FLUID_BONUS -> recipe == null || recipe.fluidOutputStack().isEmpty()
                         ? 0
                         : (int) Math.round((generationFluidMultiplier(recipe, stats) - 1.0) * STAT_SCALE * STAT_SCALE);
+                case DATA_PACK_GENERATION_MULTIPLIER -> GenerationMenuSupport.packMultiplierData(rotorStage(stats));
                 default -> 0;
             };
         }
@@ -292,7 +295,7 @@ public class CavitationGeneratorBlockEntity extends BaseMachineBlockEntity
 
         @Override
         public int getCount() {
-            return DATA_GENERATION_FLUID_BONUS + 1;
+            return DATA_PACK_GENERATION_MULTIPLIER + 1;
         }
     };
 
@@ -809,7 +812,7 @@ public class CavitationGeneratorBlockEntity extends BaseMachineBlockEntity
         }
         int ticks = stats.adjustedProcessingTicks(recipe.processingTicks());
         return Math.max(1.0, RNGTechConfig.generatedEnergy(stats.generatedEnergyTotal(recipe.energy(), ticks)
-                * Math.max(0.1, stats.value(MachineStat.EFFICIENCY))));
+                * Math.max(0.1, stats.value(MachineStat.EFFICIENCY)), rotorStage(stats)));
     }
 
     private int effectiveHeatStrain(CavitationRecipe recipe, MachineStatAccumulator stats) {

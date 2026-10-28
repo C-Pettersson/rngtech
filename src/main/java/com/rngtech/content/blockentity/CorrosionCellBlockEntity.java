@@ -8,6 +8,7 @@ import com.rngtech.content.item.CathodeItem;
 import com.rngtech.content.item.GearParts;
 import com.rngtech.content.item.MachinePartItem;
 import com.rngtech.content.menu.CorrosionCellMenu;
+import com.rngtech.content.menu.GenerationMenuSupport;
 import com.rngtech.content.purge.FluidPurgeRole;
 import com.rngtech.content.purge.FluidPurgeTarget;
 import com.rngtech.content.purge.PurgeableFluidStorage;
@@ -115,6 +116,7 @@ public class CorrosionCellBlockEntity extends BaseMachineBlockEntity
     private static final int DATA_ELECTROLYTE_FLUID_ID = 21;
     private static final int DATA_LOAD = 22;
     private static final int DATA_LIVE_LOAD = 23;
+    private static final int DATA_PACK_GENERATION_MULTIPLIER = 24;
     private static final int STAT_SCALE = 100;
     private static final int COMPONENT_STAGE = 4;
     private static final int VISUAL_SYNC_INTERVAL = 2;
@@ -222,6 +224,7 @@ public class CorrosionCellBlockEntity extends BaseMachineBlockEntity
                 case DATA_ELECTROLYTE_FLUID_ID -> BuiltInRegistries.FLUID.getId(electrolyteTank.getFluid().getFluid());
                 case DATA_LOAD -> load;
                 case DATA_LIVE_LOAD -> (int) Math.round(liveCurrent * 100.0);
+                case DATA_PACK_GENERATION_MULTIPLIER -> GenerationMenuSupport.packMultiplierData(COMPONENT_STAGE);
                 default -> 0;
             };
         }
@@ -232,7 +235,7 @@ public class CorrosionCellBlockEntity extends BaseMachineBlockEntity
 
         @Override
         public int getCount() {
-            return DATA_LIVE_LOAD + 1;
+            return DATA_PACK_GENERATION_MULTIPLIER + 1;
         }
     };
 
@@ -712,7 +715,8 @@ public class CorrosionCellBlockEntity extends BaseMachineBlockEntity
         double efficiency = Math.max(0.1, stats.value(MachineStat.EFFICIENCY));
         double stability = Mth.clamp(stats.value(MachineStat.STABILITY), 0.25, 1.50);
         int ticks = stats.adjustedProcessingTicks(recipe.processingTicks());
-        return Math.max(1.0, RNGTechConfig.generatedEnergy(stats.generatedEnergyTotal(recipe.energy(), ticks) * efficiency * stability));
+        return Math.max(1.0, RNGTechConfig.generatedEnergy(stats.generatedEnergyTotal(recipe.energy(), ticks) * efficiency * stability,
+                COMPONENT_STAGE));
     }
 
     private ItemStack availableElectrolyteStack() {
