@@ -7,6 +7,7 @@ import com.rngtech.content.block.BaseMachineBlock;
 import com.rngtech.content.block.PhaseCoilBlock;
 import com.rngtech.content.block.PhaseEmitterBlock;
 import com.rngtech.content.blockentity.PhaseCradleBlockEntity;
+import com.rngtech.content.energy.BatteryCellMaterial;
 import com.rngtech.content.item.GlyphItem;
 import com.rngtech.content.recipe.PhaseArrayRecipe;
 import com.rngtech.content.registry.ModBlocks;
@@ -27,14 +28,18 @@ import com.google.gson.JsonObject;
 import com.mojang.serialization.JsonOps;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.level.block.Blocks;
 import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
+import net.neoforged.neoforge.items.ItemStackHandler;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -168,6 +173,44 @@ public final class PhaseArrayGameTests {
             check(PhaseStrain.get(output) >= 1, "A pulse adds Strain, found " + PhaseStrain.get(output));
             check(RefinementTargets.canRefine(output), "The output should still be refinable");
         });
+    }
+
+    /**
+     * A Cradle saved as an Exotic Affix Forge, which kept the same id, keeps its target, output, and Battery Cell. Its
+     * catalyst has no Cradle slot, so it is held on the Cradle and drops with it.
+     */
+    @GameTest(template = MachineTestSupport.EMPTY, timeoutTicks = TIMEOUT)
+    public static void exoticForgeSaveKeepsItsItems(GameTestHelper helper) {
+        PhaseCradleBlockEntity cradle = cradle(helper);
+        HolderLookup.Provider registries = helper.getLevel().registryAccess();
+        ItemStack target = new ItemStack(ModItems.PHASE_COIL.get());
+        RefinementTargets.setTraits(target, cheapTraits(0));
+        ItemStackHandler process = new ItemStackHandler(3);
+        process.setStackInSlot(0, target.copy());
+        process.setStackInSlot(1, new ItemStack(Items.AMETHYST_SHARD, 4));
+        process.setStackInSlot(2, new ItemStack(Items.DIAMOND));
+        ItemStackHandler gear = new ItemStackHandler(1);
+        gear.setStackInSlot(0, new ItemStack(ModItems.batteryCell(BatteryCellMaterial.IRON).get()));
+        CompoundTag tag = cradle.saveWithFullMetadata(registries);
+        tag.remove("Items");
+        tag.remove("Cells");
+        tag.put("ProcessInventory", process.serializeNBT(registries));
+        tag.put("GearInventory", gear.serializeNBT(registries));
+        cradle.loadWithComponents(tag, registries);
+
+        check(ItemStack.matches(cradle.targetStack(), target), "The forge's target should move to the Cradle's target slot");
+        check(cradle.outputStack().is(Items.DIAMOND), "The forge's output should move to the Cradle's output slot");
+        check(cradle.getCells().getStackInSlot(0).is(ModItems.batteryCell(BatteryCellMaterial.IRON).get()),
+                "The forge's Battery Cell should move to the first cell socket");
+        List<ItemStack> held = cradle.heldItems();
+        check(held.size() == 1 && held.get(0).is(Items.AMETHYST_SHARD) && held.get(0).getCount() == 4,
+                "The catalyst should be held, found " + held);
+        cradle.loadWithComponents(cradle.saveWithFullMetadata(registries), registries);
+        check(cradle.heldItems().size() == 1, "Held items should survive a save and load");
+
+        helper.setBlock(CRADLE, Blocks.AIR);
+        helper.assertItemEntityPresent(Items.AMETHYST_SHARD, CRADLE, 2.0D);
+        helper.succeed();
     }
 
     /** Attune on a four-Coil line keeps every affix's identity and tier, rolls their values, and adds one Strain. */
