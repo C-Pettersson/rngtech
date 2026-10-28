@@ -21,7 +21,7 @@ When an item stack is created, its identity may add an authored base stat profil
 
 Current generation rolls rarity and Refinement Potential independently. Rarity controls starting affix count, while Refinement Potential comes from component stage. Starting modifiers do not spend or reduce that rolled potential.
 
-Current prototype rarity weights are stage-sensitive. Stage `0` targets roll `35%` Normal, `50%` Magic, and `15%` Rare. Stage `1-4` targets roll `70%` Magic and `30%` Rare with no natural Normal outcome, making early crafted gear reliably show affixes while it is still likely to be replaced later. Stage `5+` targets roll `50%` Normal, `40%` Magic, and `10%` Rare. Unique remains authored-only.
+Current rarity weights are stage-sensitive. Stage `0` targets roll `35%` Normal, `50%` Magic, and `15%` Rare. Stage `1-4` targets roll `70%` Magic and `30%` Rare with no natural Normal outcome, making early crafted gear reliably show affixes while it is still likely to be replaced later. Stage `5+` targets roll `50%` Normal, `40%` Magic, and `10%` Rare. Unique remains authored-only.
 
 After rarity and slot-count rules choose a slot, generation uses two weighted steps. First, it filters legal affix families by target profile, slot, `CAN_ROLL`, target stats, and `mod_group` conflicts, then chooses one family by roll weight. Second, it chooses a tier for that family by combining the global tier weight, the family's tier weight, and component-stage weighting. Rarity controls affix count only; it does not control tier eligibility. Ordinary families default to family weight `100` and equal tier base weights unless code overrides them.
 
@@ -128,7 +128,7 @@ Two stats bend the increased layer:
 - `ENERGY_USAGE` divides by its reductions instead of subtracting them, so one large roll cannot empty the bucket and hit the usage floor: `(base + additions) * more and less factors * (1 + increased / 100) / (1 + reduced / 100)`.
 - Crusher `OUTPUT_AMOUNT` bends its increased bucket with a soft cap; see [Crusher Yield](../reference/machine-stats.md#crusher-yield).
 
-Status: Prototype
+Status: Implemented
 
 Player-facing wording uses **increased**, **reduced**, **more**, and **less** explicitly. The internal `DECREASED_PERCENT` operation is displayed as reduced. Mastery fixed values and ceilings resolve after ordinary modifiers; see [hard constraints](machine-mastery.md#modifier-keywords-and-hard-constraints).
 
@@ -172,7 +172,7 @@ Example: an energy-generation affix at tier 2 rolls one value from `4-10%`, such
 
 ## Attribute suffixes
 
-Status: Prototype
+Status: Implemented
 
 Machines with [Machine Mastery](machine-mastery.md#attributes) and the Gear they accept roll flat Control, Drive, and Reserve suffixes through the `HAS_MASTERY_ATTRIBUTES` capability: the Crusher, Furnace, electric Furnace, Alloy Furnace, Metal Press, Melter, Resonance Calibrator, and Forestry Companion, and Crush Heads, Heat Cores, Servos, Fluid Pumps, Alloy Crucibles, Resonance Coils, Control Boards, and Stabilizer Matrices. Each attribute is its own modifier group with roll weight `50`, so one item can hold up to three attribute suffixes but never two of one attribute.
 
@@ -401,7 +401,7 @@ Fixed authored modifiers do not use tier ranges unless a specific item stores on
 
 `INSTANT_PROCESS_CHANCE` is checked when eligible processing starts. Powered machines only complete instantly when they can pay the full adjusted craft FE up front; otherwise the process continues through normal progress. Fuel-driven furnace processing spends normal fuel work when the instant outcome succeeds.
 
-Status: Prototype
+Status: Implemented
 
 ## Eligibility
 

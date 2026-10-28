@@ -1,10 +1,10 @@
 # PRD: Phase Array
 
-> Design requirements, not a release status report. See [Current Implementation](../reference/current-implementation.md) and the [Exotic Affix Forge](https://c-pettersson.github.io/rngtech/exotic-affix-forge/) wiki page for current behavior.
+> Design requirements, not a release status report. See [Current Implementation](../reference/current-implementation.md) and the [Phase Array](https://c-pettersson.github.io/rngtech/phase-array/) wiki page for current behavior.
 
 PRD status: Accepted
 
-Implementation status: Prototype
+Implementation status: Implemented
 
 Release: Not scheduled
 

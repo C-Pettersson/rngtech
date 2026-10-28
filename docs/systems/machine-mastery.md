@@ -1,6 +1,6 @@
 # Machine Mastery
 
-Status: Prototype
+Status: Implemented
 
 Player guide: [Machine Mastery](https://c-pettersson.github.io/rngtech/machine-mastery/)
 
@@ -63,7 +63,7 @@ Explicit attribute scaling is separate. A node can grant an authored percentage 
 
 Each scaling notable also grants 10% increased of its attribute. Attribute Transfiguration grants 100% more of each attribute with no inherent bonuses, so it only pays a build whose explicit scaling outweighs the inherent conversions, such as an actuation keystone fed by attribute suffixes. Singular Drive and Deep Reserve grant 50% more of one attribute with 50% less of the other two.
 
-This is the attribute-stacking trade-off. Increased-attribute nodes (4% on small nodes, 12% plus 5 flat on notables, 6% of all three on the Integrated notables, and 8% on Convergence) are weaker than direct stat nodes for a machine that only has travel points, and stronger once scaling notables and Gear suffixes raise the base. An attribute suffix spends a slot that could hold a direct stat. In a greedy 99-point speed build, a Drive/Reserve Furnace reaches about 180% increased Processing Speed with ordinary nodes; Reserve Actuation reaches about 135%, or about 190% with 60 Reserve from Gear; adding Attribute Transfiguration reaches about 255%, or about 370% with that Gear. These numbers are prototype targets for playtesting.
+This is the attribute-stacking trade-off. Increased-attribute nodes (4% on small nodes, 12% plus 5 flat on notables, 6% of all three on the Integrated notables, and 8% on Convergence) are weaker than direct stat nodes for a machine that only has travel points, and stronger once scaling notables and Gear suffixes raise the base. An attribute suffix spends a slot that could hold a direct stat. In a greedy 99-point speed build, a Drive/Reserve Furnace reaches about 180% increased Processing Speed with ordinary nodes; Reserve Actuation reaches about 135%, or about 190% with 60 Reserve from Gear; adding Attribute Transfiguration reaches about 255%, or about 370% with that Gear. These numbers are balance targets.
 
 Surge Cycling trades guaranteed speed for random speed. It is meant for long recipes: a hit skips a slow job outright, and a miss runs it at unboosted speed. The 75% cap keeps that wait in play, so it must stay below certainty and the keystone must not become a pure speed upgrade. On every machine that has Instant Process, the whole increased and reduced Processing Speed bucket applies to Instant Process chance instead, at 30% of its value, and Instant Process cannot exceed 75%. A net reduction lowers Instant Process rather than slowing the machine. More and less multipliers still apply to speed. The conversion reads the bucket after Gear and every later change, so speed suffixes still matter under it. The Stats tab lists Instant Process whenever a Mastery machine has any. A plain build at 200% increased Processing Speed runs three times as fast; under Surge Cycling the same build gets 60% Instant Process, about 2.5 times as fast, and Instant Process suffixes, Surge nodes, and Kinetic Feed take it to the 75% cap, four times as fast.
 
@@ -131,7 +131,7 @@ The player guide covers the Mastery screen workflow, controls, Bonus Summary, co
 
 ## Ascendancies
 
-Status: Prototype. Ascendancies still need an in-game playtest, and their node values are subject to balance testing.
+Status: Implemented. Ascendancy node values can still change with balance tuning.
 
 An ascendancy is a family-specific specialization for one machine, modeled on Path of Exile ascendancy classes. Every Mastery family has two; the Forestry Companion has three. A machine chooses one when it uses its first Ascendancy Seal, then spends ascendancy points in that ascendancy's small tree. Ascendancy points are separate from the shared tree's points and allocations.
 

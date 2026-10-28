@@ -2,7 +2,7 @@
 
 Source: [draft design](uniques.md).
 
-Status: **Prototype** for the 2.0 release. The PRD was accepted on 2026-10-05, and phases 2–6 landed on `feature/uniques-implementation-88f3c4` on 2026-10-10: the framework, sources, all eight launch Uniques, the UI, and documentation. They still need an in-game playtest.
+Status: **Implemented** for the 2.0 release. The PRD was accepted on 2026-10-05, and phases 2–6 landed on `feature/uniques-implementation-88f3c4` on 2026-10-10: the framework, sources, all eight launch Uniques, the UI, and documentation. They merged to `main` in #60 and are playtested.
 
 ## Scope checklist
 
@@ -15,7 +15,7 @@ Status: **Prototype** for the 2.0 release. The PRD was accepted on 2026-10-05, a
 - [x] Launch content: eight Uniques, the `ESCAPEMENT`, `REFLUX`, and `ECHO_STREAK` behaviors, textures, and language keys.
 - [x] UI: unidentified and identified tooltips, the Shift roll view, dimmed unread stats, JEI pages, and foil.
 - [x] Documentation: Rarity, Machine Parts, Battery Cells, Machine Stats, the implementation matrix, the ideas page, and quests.
-- [ ] In-game playtest of every launch Unique.
+- [x] In-game playtest of every launch Unique.
 
 ## Decisions
 

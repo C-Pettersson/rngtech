@@ -25,9 +25,10 @@ RNGTech is a **Minecraft 1.21.1 / NeoForge** technology mod where every machine 
 ## What makes it different
 
 - **Machines roll like loot.** Machines, Gear parts, Battery Cells, tool parts, and companions roll Normal, Magic, or Rare rarity with tiered prefixes and suffixes. A machine's chassis sets its limits; the Gear installed inside it does the work. [Rarity and Affixes →](https://c-pettersson.github.io/rngtech/rarity-and-affixes/)
-- **Crafting with a budget.** Each item rolls Refinement Potential. Crystals, catalysts, and coils add, upgrade, reroll, or remove affixes, and every change spends RP, so no item can be pushed forever. [Affix Forge →](https://c-pettersson.github.io/rngtech/affix-forge/)
-- **A passive tree for your machines.** Machines earn XP from real work and spend points on a shared 1,346-node tree with attributes, notables, and keystones. Ascendancy Seals unlock a specialization per machine family, and build codes copy a tree to the next machine. [Machine Mastery →](https://c-pettersson.github.io/rngtech/machine-mastery/)
+- **Crafting with a budget.** Each item rolls Refinement Potential. Crystals, catalysts, and coils add, upgrade, reroll, or remove affixes, and every change spends RP, so no item can be pushed forever. At the endgame, the Phase Array multiblock lets you choose the change instead of rolling for it. [Affix Forge →](https://c-pettersson.github.io/rngtech/affix-forge/)
+- **A passive tree for your machines.** Machines earn XP from real work and spend points on a shared 1,368-node tree with attributes, notables, and keystones. Ascendancy Seals unlock a specialization per machine family, and build codes copy a tree to the next machine. A Soul Transfer moves a machine's whole Mastery to its upgrade. [Machine Mastery →](https://c-pettersson.github.io/rngtech/machine-mastery/)
 - **Uniques and Corruption.** Uniques are found in structure chests, never crafted: each has a signature effect, a visible drawback, and its own rolled values. A Volatile Catalyst corrupts a finished item for one last gamble that locks it for good. [Uniques →](https://c-pettersson.github.io/rngtech/uniques/)
+- **Work Orders.** A Dispatch Terminal lists jobs on Job Chips. Load a chip into a processing machine, finish the job, and redeem it for the reward it shows, so a maxed machine still has goals. [Work Orders →](https://c-pettersson.github.io/rngtech/work-orders/)
 - **Swap parts as you progress.** Put a better Crush Head or Heat Core into the machine you already have. One cheap Universal Cable carries power, fluids, and items, and the connector modules on it set the limits. [Universal Cable →](https://c-pettersson.github.io/rngtech/universal-cable/)
 - **Grounded tech progression.** Crushing, smelting, alloying, metal forming, recycling, calibration, fluid and gas chemistry, nine kinds of generators, modular field tools, a Miner's Companion, and a rail-riding Forestry Companion.
 
@@ -40,7 +41,7 @@ The rarity, crafting currency, and passive-tree ideas come from **Path of Exile*
 3. Follow [Getting Started](https://c-pettersson.github.io/rngtech/getting-started/) on the player wiki.
 
 > [!NOTE]
-> **2.0 is in alpha.** The shared passive tree, ascendancies, Unique items, and Corruption are in the 2.0 alpha files on CurseForge's Files tab; the default release file is still 1.2.0.
+> **2.0 is in alpha.** The shared passive tree, ascendancies, Unique items, Corruption, the Phase Array, and Work Orders are in the 2.0 alpha files on CurseForge's Files tab; the default release file is still 1.2.0.
 
 RNGTech is in active development. Back up your worlds before updating.
 

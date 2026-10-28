@@ -2,7 +2,7 @@
 
 Source: [accepted design](machine-mega-passive-tree.md).
 
-Status: **Done** — implementation and travel-road redesign completed 2026-09-27; layered 1300-node redesign and level-100 cap completed 2026-09-28. Gameplay remains a Prototype pending focused playtesting.
+Status: **Done** — implementation and travel-road redesign completed 2026-09-27; layered 1300-node redesign and level-100 cap completed 2026-09-28. Gameplay is Implemented and playtested.
 
 ## Scope checklist
 

@@ -4,7 +4,7 @@
 
 RNGTech is a tech mod for Minecraft 1.21.1 on NeoForge where every machine you craft is a loot drop. Each one rolls a rarity and a set of affixes, like gear in Path of Exile or Last Epoch, so two Crushers from the same recipe rarely match. Keep the good rolls, refine them, and level them up as you work through nine material stages, from flint tools to exotic alloys.
 
-> **2.0 is in alpha.** This page describes 2.0. The passive tree, ascendancies, Unique items, and Corruption are in the 2.0 alpha files on the Files tab; the default release file is still 1.2.0.
+> **2.0 is in alpha.** This page describes 2.0. The passive tree, ascendancies, Unique items, Corruption, the Phase Array, and Work Orders are in the 2.0 alpha files on the Files tab; the default release file is still 1.2.0.
 
 ## Itemization
 
@@ -22,6 +22,8 @@ The chassis is the block you place. It sets base stats and caps how advanced its
 
 Each item also rolls Refinement Potential (RP). At the Affix Forge, single-purpose crystals, catalysts, and coils add, upgrade, reroll, or remove affixes, or promote rarity. Every change spends RP. When it runs out, the item is finished.
 
+At the endgame, the [Phase Array](https://c-pettersson.github.io/rngtech/phase-array/) lets you choose instead of roll. Build a line of Coils from its Cradle, then raise, remove, add, or swap one affix of your choice. Each pulse costs FE and adds strain, and the deeper operations spend Glyphs that no recipe makes.
+
 ![The Affix Forge](https://media.forgecdn.net/attachments/1709/662/affix-forge-png.png)
 
 ## Uniques and Corruption
@@ -30,9 +32,13 @@ Uniques are Gear parts and Battery Cells you find in structure chests, never cra
 
 ## Machines level up
 
-Crushers, Furnaces, Alloy Furnaces, Metal Presses, Resonance Calibrators, Melters, and the Forestry Companion earn XP from their work, and harder jobs pay more. Points go into a shared 1,346-node passive tree. Keystones ask for a trade: Steady State gives 50% more Stability for 15% less Processing Speed. Ascendancy Seals unlock a specialization tree for each machine family, and a build code copies a finished tree to the next machine.
+Crushers, Furnaces, Alloy Furnaces, Metal Presses, Resonance Calibrators, Melters, and the Forestry Companion earn XP from their work, and harder jobs pay more. Points go into a shared 1,368-node passive tree. Keystones ask for a trade: Steady State gives 50% more Stability for 15% less Processing Speed. Ascendancy Seals unlock a specialization tree for each machine family, and a build code copies a finished tree to the next machine. A Soul Transfer moves a machine's whole Mastery to its upgrade, and Dormant Machines found in the world hold souls of their own.
 
 ![The Machine Mastery tree](https://media.forgecdn.net/attachments/1733/353/passive-tree-rngtech-png.png)
+
+## Work Orders
+
+A Dispatch Terminal lists jobs for your processing machines, each on a Job Chip that shows its machine, tier, stage, conditions, and reward before you take it. Load the chip, finish the job, and redeem it. Work Orders give a maxed machine new goals, and the rarest rewards come only from them. [Work Orders on the wiki](https://c-pettersson.github.io/rngtech/work-orders/)
 
 ## One cable for everything
 

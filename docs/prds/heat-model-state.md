@@ -2,7 +2,7 @@
 
 Source: [Heat Model PRD](heat-model.md).
 
-Status: **Prototype** for the 2.0 release. All four slices are implemented together with batching slices 3 and 4 and pass the automated checks. The in-game playtest decides whether the direction stays.
+Status: **Implemented** for the 2.0 release. All four slices shipped together with batching slices 3 and 4 in #180, pass the automated checks, and are playtested.
 
 ## Scope checklist
 
@@ -14,7 +14,7 @@ Status: **Prototype** for the 2.0 release. All four slices are implemented toget
 - [x] Slice 2: Heat Core and chassis profiles, affix eligibility. Stored affixes are not rewritten; see the decisions below.
 - [x] Slice 3: passive tree and ascendancy changes.
 - [x] Slice 4: UI, Jade, language, and canonical docs.
-- [ ] In-game playtest.
+- [x] In-game playtest.
 
 ## Decisions
 

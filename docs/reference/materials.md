@@ -1,16 +1,16 @@
 # Materials List
 
-Status: Prototype
+Status: Implemented
 
 This page defines the material families and recipe forms used by advanced RNGTech machines, machine parts, battery systems, and refinement items.
 
-The material catalog, ore generation, alloying, and survival recipe chains are implemented prototypes. Broader component-upgrade and breakthrough systems remain planned. See [Current Implementation](current-implementation.md) for the feature inventory.
+The material catalog, ore generation, alloying, and survival recipe chains are implemented. Broader component-upgrade and breakthrough systems remain planned. See [Current Implementation](current-implementation.md) for the feature inventory.
 
 [Component Stages](component-stages.md) defines how material stages work. This page names the material families and crafting inputs used by those stages.
 
 ## Code-Backed Catalog
 
-Status: Prototype
+Status: Implemented
 
 The current implementation registers texture-backed RNGTech item ids for staged material family forms that RNGTech owns, plus generic recipe forms, RNGTech-owned non-stage materials, and RNGTech-owned ore block items. Vanilla-owned forms listed in the catalog's `vanilla_form_mappings` use Minecraft item ids in tags and recipes instead of duplicate RNGTech items. The material catalog source is `src/main/resources/data/rngtech/materials/catalog.json`; ore block and worldgen profiles are sourced from `src/main/resources/data/rngtech/materials/ore_catalog.json`.
 
@@ -51,7 +51,7 @@ Large-deposit packs can disable RNGTech placement by config or by overriding `da
 
 ## Current Recipe Baseline
 
-Status: Prototype
+Status: Implemented
 
 The current code-backed crafting recipes use a small vanilla material set. Furnace dust-to-ingot recipes exist for non-alloy staged material families and are gated by material enablement, component stage, and heat requirements. Non-alloy crushed materials can smelt directly to ingots at `600` ticks and `7,200 FE` so early Crusher-to-Furnace hopper automation works. Running crushed material through the Crusher again produces dust quickly and cheaply, making the Crusher-to-Crusher-to-Furnace chain the better energy and throughput option at `260` ticks and `6,000 FE` before machine modifiers. Ore-to-ingot and crushed-to-ingot recipes are not the alloy path.
 
@@ -70,7 +70,7 @@ The current code-backed crafting recipes use a small vanilla material set. Furna
 | Emerald | Ascension Catalyst, Ascension Matrix, Conservation Crystal, Transmutation Crystal, Expansion Crystal, and Calibrated Diamond Crystal calibration catalyst | Current rarity, value, and tuning pressure. |
 | Calibrated Diamond Crystal | Tungstensteel and Nullite Stabilizer Matrix recipes | Stage 6 logic-family calibration output made from Diamond with an Emerald catalyst; used as the T7+ crystal gate. |
 | Gold ingot, diamond, and emerald | Ascension Matrix | Current rarity-ascension ingredients. |
-| Electric circuit tiers | Shared recipe components and machine costs | Prototype tier ladder from Basic through Ultimate; blanks are crafted from mineral insulation, alloy/conductive parts, redstone logic, and calibrated logic, then pressed with the Circuit Mold. Exposed through modern `c:circuits` tags. |
+| Electric circuit tiers | Shared recipe components and machine costs | Tier ladder from Basic through Ultimate; blanks are crafted from mineral insulation, alloy/conductive parts, redstone logic, and calibrated logic, then pressed with the Circuit Mold. Exposed through modern `c:circuits` tags. |
 | Logs, saplings, flowers, bone meal, and charcoal | Plant Reagent and Resin | Current vanilla-accessible organic path for organic reagents, Rubber, and lubricant tag inputs. The Electric Circuit chain does not depend on these materials. |
 
 The family ids below are registered. Their advanced behavior and most non-vanilla recipes remain design targets unless code or data recipes are added for them.

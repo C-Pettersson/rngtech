@@ -2,13 +2,13 @@
 
 Source: [draft design](phase-array.md).
 
-Status: **Prototype**. The PRD was accepted on 2026-10-21 and every delivery phase is in on `feature/gear-crafting-refinement-7baeee`. The Exotic Affix Forge is replaced. Everything still needs an in-game playtest.
+Status: **Implemented**. The PRD was accepted on 2026-10-21 and every delivery phase merged to `main` in #205. The Exotic Affix Forge is replaced. The in-game playtest is done; the open questions below stay open.
 
 ## Scope checklist
 
 - [x] Draft the PRD and this state page.
 - [x] Resolve the decisions and accept the PRD. The open questions stay open for the simulation and formation phases.
-- [ ] Create a feature branch from clean `main`.
+- [x] Create a feature branch from clean `main`.
 - [x] Simulation: `./gradlew phaseArraySim`, `tools/balance/phase-array-scenarios.json`, and the PRD's numbers set from it.
 - [x] Parts and formation: Emitter, Coil, Glyph, their profiles, the line pattern, formation, and the Cradle rename.
 - [x] Operations with instant outcomes: the `rngtech:phase_array` recipe type, the Cradle screen, charge, and every operation through the refinement library.
@@ -17,7 +17,7 @@ Status: **Prototype**. The PRD was accepted on 2026-10-21 and every delivery pha
 - [x] Removal of the Exotic Affix Forge operations, history, recipe type, menu, screen, JEI category, and config keys (phase 4), then its catalyst item, wiki page, guide pages, and quest text (phase 7).
 - [x] Balance-world setup `rngbalance:phase_array`.
 - [x] Documentation: wiki page, Rarity and Affixes, Machine Stats, Battery Cells, Modpack Creators, the implementation matrix, the GuideME guide, Machine Design Notes, and quests.
-- [ ] In-game playtest of every operation and outcome.
+- [x] In-game playtest of every operation and outcome.
 
 ## Decisions
 

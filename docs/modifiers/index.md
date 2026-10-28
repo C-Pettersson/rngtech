@@ -69,8 +69,8 @@ Named behavioral modifiers are documented as pages once they become concrete des
 | Batch Start | Planned | Eligibility matrix only |
 | Bulk Speed | Implemented | [Bulk Speed](https://c-pettersson.github.io/rngtech/rarity-and-affixes/#bulk-speed) |
 | Catalyst Saver | Deferred | Eligibility matrix only |
-| Energy category modifiers | Prototype | See code-backed stat modifiers above |
-| Fuel Governor | Prototype fixed behavior; rolled named modifier planned | [Fuel Governor](https://c-pettersson.github.io/rngtech/rarity-and-affixes/#fuel-governor) |
+| Energy category modifiers | Implemented | See code-backed stat modifiers above |
+| Fuel Governor | Implemented fixed behavior; rolled named modifier planned | [Fuel Governor](https://c-pettersson.github.io/rngtech/rarity-and-affixes/#fuel-governor) |
 | Fuel Reserve | Planned | Eligibility matrix only |
 | Graceful Progress | Planned | Eligibility matrix only |
 | Input Filter | Planned | Eligibility matrix only |

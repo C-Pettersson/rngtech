@@ -2,7 +2,7 @@
 
 Source: [draft design](work-orders.md).
 
-Status: **Prototype**. The PRD is a draft; its open questions were resolved on 2026-10-26, and it targets the next 2.0 alpha. On 2026-10-25, after a first playtest, it was redesigned around a Dispatch Board vendor, readable order items, and an Orders tab on every processing machine. After a second playtest the same day, orders became Job Chips from a Dispatch Terminal, loaded through drive bays. The branch `feature/workplan-machine-065464` has every phase but the deferred UI polish done: Job Chips from a Dispatch Terminal, three drive bays on the Orders tab of all nine eligible machines, templates, conditions and Rush, stat, group, and streak jobs, refinement and corruption, Jade and JEI, and the player wiki page, in-game guide, and FTB Quests chapter. It merged to `main` in #214 (`794e5d01`) and needs a full playtest. The post-merge polish (stat-goal reachability, Hand Feeding on every Instant Process machine, JEI tier and reward text, and machine-weighted Unique rewards) is on `feature/work-orders-polish-f36a4f`. See [Code against the redesign](#code-against-the-redesign).
+Status: **Implemented**. The PRD is a draft; its open questions were resolved on 2026-10-26, and it targets the next 2.0 alpha. On 2026-10-25, after a first playtest, it was redesigned around a Dispatch Board vendor, readable order items, and an Orders tab on every processing machine. After a second playtest the same day, orders became Job Chips from a Dispatch Terminal, loaded through drive bays. The branch `feature/workplan-machine-065464` has every phase but the deferred UI polish done: Job Chips from a Dispatch Terminal, three drive bays on the Orders tab of all nine eligible machines, templates, conditions and Rush, stat, group, and streak jobs, refinement and corruption, Jade and JEI, and the player wiki page, in-game guide, and FTB Quests chapter. It merged to `main` in #214 (`794e5d01`), the post-merge polish (stat-goal reachability, Hand Feeding on every Instant Process machine, JEI tier and reward text, and machine-weighted Unique rewards) in #215, and the Mirror Catalyst reward in #216. It is playtested. See [Code against the redesign](#code-against-the-redesign).
 
 ## Scope checklist
 
@@ -20,7 +20,7 @@ Status: **Prototype**. The PRD is a draft; its open questions were resolved on 2
 - [x] Refinement and corruption: Job Chips as refinement targets, chip corruption outcomes, and Phase Array rejection.
 - [x] UI polish: Jade, JEI info with tiers and reward kinds, Affix Forge condition text, and the Job Chip lamp on machine models. The user deferred the Bonus Summary section and dropped drive-bay panels.
 - [x] Documentation: wiki page, Machine Mastery and Rarity updates, the implementation matrix, the GuideME guide, Machine Design Notes, and an FTB Quests chapter.
-- [ ] In-game playtest of every eligible machine and tier.
+- [x] In-game playtest of every eligible machine and tier.
 
 ## Decisions
 
@@ -53,7 +53,7 @@ Recorded 2026-10-25 for phase 3 of the earlier design:
 - Orders are Normal with no conditions until phase 4, so every accepted order starts at 100% Bounty and Prestige 0. Crafted and plain stacks read as seed 0 until phase 6 adds first-hold rolling; `/rngtech work_order give` sets a random seed.
 - The first objectives are `crusher_hard_ore` (`crush`, counted by the recipe's Processing Level) and `furnace_hot_smelts` (`hot_smelt`, counted by the overheat slider). Their counts and minimums are draft numbers, not yet tuned against the processing balance simulation.
 - The reward table needs two things the PRD did not name. The loot condition `rngtech:order_roll` makes the next-order pool, the base Glyph, and the Unique roll once per order. The loot function `rngtech:set_order_tier`, with an optional `offset`, sets a Glyph's or a Work Order's tier from the order's tier.
-- The Uniques pool rolls the whole catalog through the existing `rngtech:unique_loot_enabled` gates. Weighting it toward the order's family stays an open question.
+- The Uniques pool rolls the whole catalog through the existing `rngtech:unique_loot_enabled` gates. Weighting it toward the order's family was left open here; the post-merge polish on 2026-10-26 settled it, so Unique rewards now weight toward the job's machine.
 - Accept takes the inventory slot of the order as its action value. The phase 7 panel will send it; until then only GameTests and code call it.
 - `check-volatile-catalyst.mjs` and `check-uniques.mjs` allow the Work Order reward table as their one exception. The new `check-work-orders.mjs` checks that table, the recipe condition, and recycling instead.
 
